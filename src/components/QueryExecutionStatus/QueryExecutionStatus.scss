@@ -1,0 +1,14 @@
+.kv-query-execution-status {
+    display: flex;
+    gap: 4px;
+
+    align-items: center;
+
+    color: var(--yc-color-text-complementary);
+    &__result-status-icon {
+        color: var(--yc-color-text-positive);
+        &_error {
+            color: var(--yc-color-text-danger);
+        }
+    }
+}

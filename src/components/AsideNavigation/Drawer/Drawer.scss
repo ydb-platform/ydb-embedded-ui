@@ -21,7 +21,7 @@
     }
 
     &__item-transition-enter-done {
-        // Хак, чтобы не размывался текст после анимации в некоторых браузерах
+        // it is hack to prevent text blur after animation in any browsers
         filter: blur(0px);
 
         transform: translateZ(0);
@@ -55,9 +55,9 @@
     }
 
     &__veil-transition-enter-active {
-        transition: opacity 300ms;
-
         opacity: 1;
+
+        transition: opacity 300ms;
     }
 
     &__veil-transition-exit {
@@ -65,9 +65,9 @@
     }
 
     &__veil-transition-exit-active {
-        transition: opacity 300ms;
-
         opacity: 0;
+
+        transition: opacity 300ms;
     }
 
     &__veil-transition-exit-done {

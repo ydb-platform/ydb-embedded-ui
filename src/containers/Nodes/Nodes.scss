@@ -2,26 +2,14 @@
 
 .cluster-nodes {
     overflow: auto;
+    @include flex-container();
 
     &__search {
-        width: 255px;
-        margin: 0 15px 0 0;
+        @include search();
     }
 
     &__controls {
-        display: flex;
-        justify-content: space-between;
-
-        margin: 17px 0;
-    }
-
-    &__controls-left {
-        display: flex;
-        align-items: center;
-
-        & > * {
-            margin-right: 25px;
-        }
+        @include controls();
     }
 
     &__show-all-wrapper {
@@ -39,12 +27,12 @@
     &__table-content {
         overflow: auto;
 
+        height: 100%;
+
         @include freeze-nth-column(1);
         @include freeze-nth-column(2, 80px);
-        @include freeze-nth-column(3, 120px);
 
         @include table-styles;
         @include table-sticky-styles;
     }
-    @include flex-container();
 }

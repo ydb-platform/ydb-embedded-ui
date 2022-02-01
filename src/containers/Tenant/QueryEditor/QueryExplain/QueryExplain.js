@@ -1,11 +1,9 @@
 import React, {useEffect, useState, useMemo} from 'react';
 import cn from 'bem-cn-lite';
 import MonacoEditor from 'react-monaco-editor';
-import {Loader, Tabs} from '@yandex-cloud/uikit';
+import {Loader, RadioButton} from '@yandex-cloud/uikit';
 import JSONTree from 'react-json-inspector';
 import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco';
-
-import './QueryExplain.scss';
 import {
     TopologyWrapper,
     CompactTopologyWrapper,
@@ -14,6 +12,16 @@ import {
 } from '@yandex-cloud/paranoid';
 import {renderExplainNode} from '../../../../utils';
 import {explainVersions} from '../../../../store/reducers/explainQuery';
+import QueryExecutionStatus from '../../../../components/QueryExecutionStatus/QueryExecutionStatus';
+import Divider from '../../../../components/Divider/Divider';
+import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
+import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+
+import 'react-json-inspector/json-inspector.css';
+import './QueryExplain.scss';
+import {useDispatch, useSelector} from 'react-redux';
+import { disableFullscreen } from '../../../../store/reducers/fullscreen';
 
 const b = cn('kv-query-explain');
 
@@ -41,20 +49,29 @@ const EDITOR_OPTIONS = {
     wrappingIndent: 'indent',
 };
 
-const TabsIds = {
+const ExplainOptionIds = {
     schema: 'schema',
     json: 'json',
     ast: 'ast',
 };
 
-const tabsItems = [
-    {id: TabsIds.schema, title: 'Schema'},
-    {id: TabsIds.json, title: 'JSON'},
-    {id: TabsIds.ast, title: 'AST'},
+const explainOptions = [
+    {value: ExplainOptionIds.schema, content: 'Schema'},
+    {value: ExplainOptionIds.json, content: 'JSON'},
+    {value: ExplainOptionIds.ast, content: 'AST'},
 ];
 
 function QueryExplain(props) {
-    const [activeTab, setActiveTab] = useState(TabsIds.schema);
+    const dispatch = useDispatch()
+    const [activeOption, setActiveOption] = useState(ExplainOptionIds.schema);
+
+    const isFullscreen = useSelector((state) => state.fullscreen);
+
+    useEffect(() => {
+        return () => {
+            dispatch(disableFullscreen());
+        };
+    }, []);
 
     const {explain = {}, theme} = props;
     const {links, nodes, version, graphDepth} = explain;
@@ -95,17 +112,36 @@ function QueryExplain(props) {
     }, [links, nodes, theme, version]);
 
     useEffect(() => {
-        if (!props.ast && activeTab === TabsIds.ast) {
+        if (!props.ast && activeOption === ExplainOptionIds.ast) {
             props.astQuery();
         }
-    }, [activeTab]);
+    }, [activeOption]);
 
-    const onSelectTab = (tabId) => {
-        setActiveTab(tabId);
+    const onSelectOption = (tabId) => {
+        setActiveOption(tabId);
+    };
+
+    const renderLoader = () => {
+        return (
+            <div className={b('loader')}>
+                <Loader size="m" />
+            </div>
+        );
+    };
+
+    const renderStub = () => {
+        const {explain} = props;
+        if (!explain) {
+            return 'Explain of query is empty';
+        }
+        if (!explain.nodes.length) {
+            return 'There is no explanation for the request';
+        }
+        return null;
     };
 
     const renderTextExplain = () => {
-        return (
+        const content = (
             <JSONTree
                 data={props.explain?.pristine}
                 isExpanded={() => true}
@@ -115,14 +151,24 @@ function QueryExplain(props) {
                 }}
             />
         );
+        return (
+            <React.Fragment>
+                {content}
+                {renderStub()}
+                {isFullscreen && (
+                    <Fullscreen>
+                        <div className={b('inspector', {fullscreen: true})}>{content}</div>
+                    </Fullscreen>
+                )}
+            </React.Fragment>
+        );
     };
 
     const renderAstExplain = () => {
-        return props.loadingAst ? (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
-        ) : (
+        if (!props.ast) {
+            return 'There is no AST explanation for the request';
+        }
+        const content = (
             <div className={b('ast')}>
                 <MonacoEditor
                     language={LANGUAGE_S_EXPRESSION_ID}
@@ -132,35 +178,89 @@ function QueryExplain(props) {
                 />
             </div>
         );
+        return (
+            <React.Fragment>
+                {content}
+                {isFullscreen && <Fullscreen>{content}</Fullscreen>}
+            </React.Fragment>
+        );
     };
 
     const renderGraph = () => {
         const graphHeight = `${Math.max(graphDepth * 100, 200)}px`;
-        return (
+        const content = (
             <div
                 className={b('explain-canvas-container', {
-                    hidden: activeTab !== TabsIds.schema,
+                    hidden: activeOption !== ExplainOptionIds.schema,
                 })}
-                style={{height: graphHeight, minHeight: graphHeight}}
+                style={{height: graphHeight, minHeight: graphHeight, width: '100%'}}
             >
                 {graph}
             </div>
         );
+        return (
+            <React.Fragment>
+                {content}
+                {isFullscreen && <Fullscreen>{content}</Fullscreen>}
+                {renderStub()}
+            </React.Fragment>
+        );
+    };
+
+    const renderContent = () => {
+        const {error, loading, loadingAst} = props;
+        if (loading || loadingAst) {
+            return renderLoader();
+        }
+
+        if (error) {
+            return error.data ? error.data : error;
+        }
+
+        switch (activeOption) {
+            case ExplainOptionIds.json: {
+                return renderTextExplain();
+            }
+            case ExplainOptionIds.ast: {
+                return renderAstExplain();
+            }
+            case ExplainOptionIds.schema: {
+                return renderGraph();
+            }
+            default:
+                return null;
+        }
     };
 
     return (
         <React.Fragment>
-            <div className={b('tabs-wrapper')}>
-                <Tabs
-                    items={tabsItems}
-                    onSelectTab={onSelectTab}
-                    activeTab={activeTab}
-                    className={b('tabs')}
-                />
+            <div className={b('controls')}>
+                <div className={b('controls-right')}>
+                    <QueryExecutionStatus hasError={Boolean(props.error)} />
+                    {!props.error && (
+                        <React.Fragment>
+                            <Divider />
+                            <RadioButton
+                                options={explainOptions}
+                                value={activeOption}
+                                onUpdate={onSelectOption}
+                            />
+                        </React.Fragment>
+                    )}
+                </div>
+                <div className={b('controls-left')}>
+                    <EnableFullscreenButton
+                        disabled={Boolean(props.error) || activeOption === ExplainOptionIds.schema}
+                    />
+                    <PaneVisibilityToggleButtons
+                        onCollapse={props.onCollapseResults}
+                        onExpand={props.onExpandResults}
+                        isCollapsed={props.isResultsCollapsed}
+                        initialDirection="bottom"
+                    />
+                </div>
             </div>
-            {activeTab === TabsIds.json && renderTextExplain()}
-            {activeTab === TabsIds.ast && renderAstExplain()}
-            {activeTab === TabsIds.schema && renderGraph()}
+            <div className={b('result')}>{renderContent()}</div>
         </React.Fragment>
     );
 }

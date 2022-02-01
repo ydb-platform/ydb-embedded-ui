@@ -2,7 +2,7 @@ const _ = require('lodash');
 const path = require('path');
 
 const srcRoot = path.resolve(__dirname, 'src');
-const commonRoot = path.resolve(__dirname, 'node_modules/@yandex-data-ui/common');
+const uiKitRoot = path.resolve(__dirname, 'node_modules/@yandex-cloud/uikit');
 
 module.exports = function override(config, env) {
     //do stuff with the webpack config...
@@ -10,7 +10,7 @@ module.exports = function override(config, env) {
     const oneOfRule = config.module.rules.find((r) => r.oneOf);
     oneOfRule.oneOf.splice(0, 0, {
         test: /\.svg$/,
-        include: [path.resolve(srcRoot, 'assets/icons'), path.resolve(commonRoot, 'assets/icons')],
+        include: [path.resolve(srcRoot, 'assets/icons'), path.resolve(uiKitRoot, 'assets/icons')],
         loader: '@svgr/webpack',
         options: {dimensions: false},
     });

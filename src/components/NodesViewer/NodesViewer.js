@@ -11,7 +11,7 @@ import ProblemFilter, {problemFilterType} from '../ProblemFilter/ProblemFilter';
 
 import {withSearch} from '../../HOCS';
 import {calcUptime} from '../../utils';
-import {ALL} from '../../utils/constants';
+import {ALL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {changeFilter} from '../../store/reducers/settings';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {getNodesColumns} from '../../utils/getNodesColumns';
@@ -19,13 +19,6 @@ import {getNodesColumns} from '../../utils/getNodesColumns';
 import './NodesViewer.scss';
 
 const b = cn('nodes-viewer');
-
-const tableSettings = {
-    displayIndices: false,
-    stickyHead: DataTable.MOVING,
-    syncHeadOnResize: true,
-    dynamicRender: true,
-};
 
 class NodesViewer extends React.PureComponent {
     static propTypes = {
@@ -127,9 +120,9 @@ class NodesViewer extends React.PureComponent {
             showControls,
             hideTooltip,
             showTooltip,
-            additionalNodesInfo={},
+            additionalNodesInfo = {},
         } = this.props;
-        const {filteredNodes} = this.state;
+        const {filteredNodes = []} = this.state;
 
         const columns = getNodesColumns({
             tabletsPath: path,
@@ -138,32 +131,29 @@ class NodesViewer extends React.PureComponent {
             getNodeRef: additionalNodesInfo.getNodeRef,
         });
 
-        if (filteredNodes && Array.isArray(filteredNodes)) {
-            const nodesToShow = NodesViewer.selectNodesToShow(filteredNodes, searchQuery);
+        const nodesToShow = NodesViewer.selectNodesToShow(filteredNodes, searchQuery);
 
-            return (
-                <div className={`${b()} ${className}`}>
-                    {showControls ? this.renderControls() : null}
-                    <div className={b('table-wrapper')}>
-                        {nodesToShow.length === 0 ? (
-                            <div className="no-problem" />
-                        ) : (
-                            <div className={b('table-content')}>
-                                <DataTable
-                                    theme="internal"
-                                    key={filter}
-                                    data={nodesToShow}
-                                    columns={columns}
-                                    settings={tableSettings}
-                                />
-                            </div>
-                        )}
-                    </div>
+        return (
+            <div className={`${b()} ${className}`}>
+                {showControls ? this.renderControls() : null}
+                <div className={b('table-wrapper')}>
+                    {nodesToShow.length === 0 ? (
+                        <div className="no-problem" />
+                    ) : (
+                        <div className={b('table-content')}>
+                            <DataTable
+                                theme="yandex-cloud"
+                                key={filter}
+                                data={nodesToShow}
+                                columns={columns}
+                                settings={DEFAULT_TABLE_SETTINGS}
+                                emptyDataMessage="No such nodes"
+                            />
+                        </div>
+                    )}
                 </div>
-            );
-        }
-
-        return <div className="error">no nodes data</div>;
+            </div>
+        );
     }
 }
 

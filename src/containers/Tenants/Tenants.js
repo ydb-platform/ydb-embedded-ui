@@ -5,34 +5,29 @@ import {connect} from 'react-redux';
 import _ from 'lodash';
 
 import DataTable from '@yandex-cloud/react-data-table';
-import {Loader, Switch, TextInput, Button} from '@yandex-cloud/uikit';
+import {Loader, TextInput, Button} from '@yandex-cloud/uikit';
 
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
 import TabletsStatistic from '../../components/TabletsStatistic/TabletsStatistic';
 import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
-import {AutoFetcher} from '../Cluster/Cluster';
+import {AutoFetcher} from '../../utils/autofetcher';
 
-import routes, {createHref} from '../../routes';
-import {formatCPU, formatNumber, formatBytes} from '../../utils';
+import routes, {CLUSTER_PAGES, createHref} from '../../routes';
+import {formatCPU, formatBytesToGigabyte} from '../../utils';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
-import {ALL} from '../../utils/constants';
+import {ALL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {getTenantsInfo} from '../../store/reducers/tenants';
 import {changeFilter} from '../../store/reducers/settings';
+import {setHeader} from '../../store/reducers/header';
+
 import {clusterName} from '../../store';
-import {TENANT_PAGES} from '../Tenant/TenantPages';
+import {TenantTabsGroups, TENANT_GENERAL_TABS, TENANT_INFO_TABS} from '../Tenant/TenantPages';
 
 import './Tenants.scss';
 
 const b = cn('tenants');
-
-const tableSettings = {
-    displayIndices: false,
-    stickyHead: DataTable.MOVING,
-    syncHeadOnResize: true,
-    dynamicRender: true,
-};
 
 class Tenants extends React.Component {
     static renderLoader() {
@@ -53,6 +48,7 @@ class Tenants extends React.Component {
         hideTooltip: PropTypes.func,
         searchQuery: PropTypes.string,
         handleSearchQuery: PropTypes.func,
+        setHeader: PropTypes.func,
         filter: problemFilterType,
         changeFilter: PropTypes.func,
         cluster: PropTypes.object,
@@ -74,42 +70,35 @@ class Tenants extends React.Component {
         });
     }
 
-    state = {
-        formatValues: false,
-    };
-
     componentDidMount() {
         this.autofetcher = new AutoFetcher();
         this.props.getTenantsInfo(clusterName);
         this.autofetcher.fetch(() => this.props.getTenantsInfo(clusterName));
+        this.props.setHeader([
+            {
+                text: CLUSTER_PAGES.tenants.title,
+                link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.tenants.id}),
+            },
+        ]);
     }
 
     componentWillUnmount() {
         this.autofetcher.stop();
     }
 
-    handleFormatChange = () => {
-        this.setState({formatValues: !this.state.formatValues});
-    };
-
     renderControls() {
         const {searchQuery, handleSearchQuery, filter, changeFilter} = this.props;
-        const {formatValues} = this.state;
 
         return (
             <div className={b('controls')}>
-                <div className={b('controls-left')}>
-                    <TextInput
-                        className={b('search')}
-                        placeholder="Database name…"
-                        text={searchQuery}
-                        onUpdate={handleSearchQuery}
-                        hasClear
-                    />
-                    <ProblemFilter value={filter} onChange={changeFilter} />
-                </div>
-
-                <Switch onUpdate={this.handleFormatChange} checked={formatValues} content="raw" />
+                <TextInput
+                    className={b('search')}
+                    placeholder="Database name"
+                    text={searchQuery}
+                    onUpdate={handleSearchQuery}
+                    hasClear
+                />
+                <ProblemFilter value={filter} onChange={changeFilter} />
             </div>
         );
     }
@@ -131,7 +120,6 @@ class Tenants extends React.Component {
             handleSearchQuery,
             additionalTenantsInfo = {},
         } = this.props;
-        const {formatValues} = this.state;
 
         const filteredTenantsBySearch = tenants.filter(
             (item) =>
@@ -146,25 +134,25 @@ class Tenants extends React.Component {
                 name: 'Name',
                 header: 'Database',
                 render: ({value, row}) => {
+                    const backend = row.MonitoringEndpoint ?? row.backend;
                     const tenantBackend = additionalTenantsInfo.tenantBackend
-                        ? additionalTenantsInfo.tenantBackend(row.backend)
+                        ? additionalTenantsInfo.tenantBackend(backend)
                         : undefined;
+                    const isExternalLink = Boolean(backend);
                     return (
                         <React.Fragment>
                             <EntityStatus
-                                externalLink={Boolean(row.backend)}
+                                externalLink={isExternalLink}
                                 className={b('name')}
                                 name={value || 'unknown database'}
                                 status={row.Overall}
                                 hasClipboardButton
-                                path={createHref(
-                                    routes.tenant,
-                                    {page: TENANT_PAGES[0].id},
-                                    {
-                                        name: value,
-                                        backend: tenantBackend,
-                                    },
-                                )}
+                                path={createHref(routes.tenant, undefined, {
+                                    name: value,
+                                    backend: tenantBackend,
+                                    [TenantTabsGroups.info]: TENANT_INFO_TABS[0].id,
+                                    [TenantTabsGroups.general]: TENANT_GENERAL_TABS[0].id,
+                                })}
                             />
                             {additionalTenantsInfo.name && additionalTenantsInfo.name(value, row)}
                         </React.Fragment>
@@ -244,8 +232,7 @@ class Tenants extends React.Component {
                     const memory = MemoryUsed ?? Metrics.Memory;
                     return isNaN(Number(memory)) ? 0 : Number(memory);
                 },
-                render: ({value}) =>
-                    value ? (formatValues ? formatNumber(value) : formatBytes(value)) : '—',
+                render: ({value}) => (value ? formatBytesToGigabyte(value) : '—'),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -262,8 +249,7 @@ class Tenants extends React.Component {
                     const storage = StorageAllocatedSize ?? Metrics.Storage;
                     return isNaN(Number(storage)) ? 0 : Number(storage);
                 },
-                render: ({value}) =>
-                    value ? (formatValues ? formatNumber(value) : formatBytes(value)) : '—',
+                render: ({value}) => (value ? formatBytesToGigabyte(value) : '—'),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -298,7 +284,7 @@ class Tenants extends React.Component {
                 name: 'Tablets',
                 header: 'Tablets States',
                 sortable: false,
-                width: 370,
+                width: 430,
                 render: ({value, row}) =>
                     value ? (
                         <TabletsStatistic path={row.Name} tablets={value} nodeIds={row.NodeIds} />
@@ -308,9 +294,7 @@ class Tenants extends React.Component {
             },
         ];
 
-        if (filteredTenants.length === 0 && filter === ALL) {
-            return <div className="error"> no tenants data</div>;
-        } else if (filteredTenants.length === 0) {
+        if (filteredTenants.length === 0 && filter !== ALL) {
             return <div className="no-problem" />;
         }
 
@@ -318,11 +302,12 @@ class Tenants extends React.Component {
             <div className={b('table-wrapper')}>
                 <div className={b('table-content')}>
                     <DataTable
-                        theme="internal"
+                        theme="yandex-cloud"
                         data={filteredTenants}
                         columns={columns}
-                        settings={tableSettings}
+                        settings={DEFAULT_TABLE_SETTINGS}
                         dynamicRender={true}
+                        emptyDataMessage="No such tenants"
                     />
                 </div>
             </div>
@@ -370,6 +355,7 @@ const mapDispatchToProps = {
     hideTooltip,
     showTooltip,
     changeFilter,
+    setHeader,
 };
 
 export default withSearch(connect(mapStateToProps, mapDispatchToProps)(Tenants));

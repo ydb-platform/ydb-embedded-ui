@@ -1,6 +1,7 @@
 .nv-settings {
     display: grid;
     grid-template-columns: 216px 1fr;
+
     width: 834px;
     height: 100%;
 
@@ -17,6 +18,7 @@
         display: grid;
         align-items: center;
         justify-items: center;
+
         height: 100%;
     }
 
@@ -26,9 +28,10 @@
 
     &__heading {
         margin: 20px 20px 0;
+
         font-size: var(--yc-text-body2-font-size);
-        line-height: var(--yc-text-body2-line-height);
         font-weight: 500;
+        line-height: var(--yc-text-body2-line-height);
     }
 
     &__search {
@@ -36,31 +39,38 @@
     }
 
     &__page {
-        padding: 20px;
         overflow-y: auto;
+
+        padding: 20px;
     }
 
     &__section {
         &-heading {
             margin: 0;
+
             font-size: var(--yc-text-body2-font-size);
-            line-height: var(--yc-text-body2-line-height);
             font-weight: 500;
+            line-height: var(--yc-text-body2-line-height);
 
             &_badge {
-                display: inline-block;
                 position: relative;
 
+                display: inline-block;
+
                 &::after {
-                    content: '';
+                    position: absolute;
+                    top: 1px;
+                    right: -8px;
+
                     display: block;
+
                     width: 6px;
                     height: 6px;
+
+                    content: '';
+
                     border-radius: 50%;
                     background-color: var(--yc-color-text-danger);
-                    position: absolute;
-                    right: -8px;
-                    top: 1px;
                 }
             }
         }
@@ -93,21 +103,26 @@
             position: relative;
 
             &::after {
-                content: '';
+                position: absolute;
+                top: 1px;
+                right: -10px;
+
                 display: block;
+
                 width: 4px;
                 height: 4px;
+
+                content: '';
+
                 border-radius: 50%;
                 background-color: var(--yc-color-text-danger);
-                position: absolute;
-                right: -10px;
-                top: 1px;
             }
         }
     }
 
     &__found {
         font-weight: 500;
+
         background: var(--yc-color-base-selection);
     }
 }

@@ -1,49 +1,29 @@
-.split {
-    position: absolute;
+.kv-split {
     z-index: 0;
+
     display: flex;
+
     height: 100%;
-    outline: none;
+
     user-select: text;
 
-    &.vertical {
-        right: 0;
-        left: 0;
+    outline: none;
+
+    &.horizontal {
         flex-direction: row;
     }
 
-    &.horizontal {
-        top: 0;
-        bottom: 0;
+    &.vertical {
         flex-direction: column;
+
         width: 100%;
         min-height: 100%;
     }
 
-    &__pane {
-        position: relative;
-        outline: none;
-
-        &_secondary {
-            flex: 1;
-
-            &.vertical {
-                min-width: 0;
-            }
-
-            &.horizontal {
-                min-height: 0;
-            }
-        }
-
-        &_hide {
-            overflow: hidden;
-        }
-    }
-
-    &__resizer {
+    .gutter {
         position: relative;
         z-index: 10;
+
         background: var(--yc-color-base-background);
 
         &::after {
@@ -52,13 +32,16 @@
             right: 0;
             bottom: 0;
             left: 0;
-            background-color: var(--yc-color-base-generic-ultralight);
+
             content: '';
+
+            background-color: var(--yc-color-base-generic-ultralight);
         }
 
         &.active::after,
         &:hover::after {
             background-color: var(--yc-color-line-generic-hover);
+
             transition: background-color 1s ease;
         }
 
@@ -66,41 +49,51 @@
             display: none;
         }
 
-        &.horizontal {
+        &.gutter-vertical {
             width: 100%;
             height: 8px;
+
             cursor: row-resize;
 
             &::before {
                 position: absolute;
                 top: 50%;
                 left: 50%;
+
                 width: 16px;
                 height: 4px;
-                border-color: var(--yc-color-base-generic-hover);
-                border-style: solid;
-                border-width: 1px 0;
-                transform: translate(-50%, -50%);
+
                 content: '';
+
+                border-width: 1px 0;
+                border-style: solid;
+                border-color: var(--yc-color-base-generic-hover);
+
+                transform: translate(-50%, -50%);
             }
         }
 
-        &.vertical {
+        &.gutter-horizontal {
             width: 8px;
             height: 100%;
+
             cursor: col-resize;
 
             &::before {
                 position: absolute;
                 top: 50%;
                 left: 50%;
+
                 width: 4px;
                 height: 16px;
-                border-color: var(--yc-color-base-generic-hover);
-                border-style: solid;
-                border-width: 0 1px;
-                transform: translate(-50%, -50%);
+
                 content: '';
+
+                border-width: 0 1px;
+                border-style: solid;
+                border-color: var(--yc-color-base-generic-hover);
+
+                transform: translate(-50%, -50%);
             }
         }
     }

@@ -1,8 +1,8 @@
 @import '../../styles/mixins.scss';
 
 .tenants {
-    @include flex-container();
     overflow: auto;
+    @include flex-container();
 
     &__format-label {
         margin-right: 15px;
@@ -17,8 +17,7 @@
     }
 
     &__search {
-        width: 450px;
-        margin: 0 15px 0 0;
+        @include search();
     }
 
     &__tablets {
@@ -30,30 +29,18 @@
     }
 
     &__controls {
-        display: flex;
-        justify-content: space-between;
-        margin: 17px 0;
-    }
-
-    &__controls-left {
-        display: flex;
-        align-items: center;
-
-        & > * {
-            margin-right: 25px;
-        }
+        @include controls();
     }
 
     &__table-wrapper {
-        @include flex-container();
         overflow: auto;
+        @include flex-container();
     }
 
     &__table-content {
         @include freeze-nth-column(1);
 
         @include table-styles;
-        @include table-sticky-styles;
     }
 
     &__type-value {

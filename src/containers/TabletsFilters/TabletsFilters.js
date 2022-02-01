@@ -5,13 +5,13 @@ import cn from 'bem-cn-lite';
 import qs from 'qs';
 import _ from 'lodash';
 
-import {Loader, Progress} from '@yandex-cloud/uikit';
+import {Loader} from '@yandex-cloud/uikit';
 import {Select} from '@yandex-cloud/uikit/build/esm/components/unstable/Select';
 import ReactList from 'react-list';
 
 import Tablet from '../../components/Tablet/Tablet';
 
-import {COLORS_PRIORITY, TABLET_COLOR_TO_STATES, TABLETS_STATES} from '../../utils/constants';
+import {TABLET_COLOR_TO_STATES, TABLETS_STATES} from '../../utils/constants';
 import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
 import {
     getTabletsInfo,
@@ -23,9 +23,6 @@ import {
 } from '../../store/reducers/tabletsFilters';
 
 import './TabletsFilters.scss';
-
-// чтобы при очень маленьком проценте все равно были видны проблемные места, установим минимальный процент в 3
-const minOverallPercentValue = 3;
 
 const b = cn('tablets-filters');
 
@@ -155,76 +152,6 @@ class TabletsFilters extends React.Component {
                 size={size}
                 className={b('tablet')}
             />
-        );
-    };
-
-    renderOverall = (tablets) => {
-        const {hideTooltip, showTooltip} = this.props;
-        const tabletsCount = tablets.length;
-
-        const substractPercentsFromMaxPercents = (statesForOverallProgress, substractValue) => {
-            Object.keys(statesForOverallProgress).some((key) => {
-                if (statesForOverallProgress[key] > 10) {
-                    statesForOverallProgress[key] -= minOverallPercentValue - substractValue;
-                    return true;
-                }
-                return false;
-            });
-        };
-
-        // определим, сколько таблеток какого цвета имеется в tablets
-        const statesForOverallProgress = tablets.reduce((acc, tablet) => {
-            const color = tablet.Overall.toLowerCase();
-            if (!acc[color]) {
-                acc[color] = 1;
-            } else {
-                acc[color]++;
-            }
-
-            return acc;
-        }, {});
-
-        const tooltipData = [];
-
-        // подсчитаем, сколько процентов составляет каждый цвет в statesForOverallProgress и заодно сгенерируем информацию для тултипа
-        Object.keys(statesForOverallProgress).forEach((key) => {
-            const percents = (statesForOverallProgress[key] / tabletsCount) * 100;
-            const value = statesForOverallProgress[key];
-            statesForOverallProgress[key] = percents;
-            tooltipData.push({color: key, percents, value, total: tablets.length});
-        });
-
-        // заменим все проценты, значения которых меньше 3 на тройку
-        Object.keys(statesForOverallProgress).forEach((key) => {
-            if (statesForOverallProgress[key] < minOverallPercentValue) {
-                substractPercentsFromMaxPercents(
-                    statesForOverallProgress,
-                    statesForOverallProgress[key],
-                );
-                statesForOverallProgress[key] = minOverallPercentValue;
-            }
-        });
-
-        const memoryProgress = 100;
-        const stack = Object.keys(statesForOverallProgress).map((key) => ({
-            color: `var(--color-status-${key}-solid-70)`,
-            colorKey: key,
-            value: statesForOverallProgress[key],
-        }));
-
-        // сортируем наш stack, чтобы цвета были в порядке "зеленый, оранжевый, желтый, красный, черный"
-        stack.sort((a, b) => COLORS_PRIORITY[b.colorKey] - COLORS_PRIORITY[a.colorKey]);
-
-        return (
-            <div className={b('row', {overall: true})}>
-                <span className={b('label', {overall: true})}>Overall</span>
-                <div
-                    onMouseLeave={hideTooltip}
-                    onMouseEnter={(e) => showTooltip(e.target, tooltipData, 'tabletsOverall')}
-                >
-                    <Progress value={memoryProgress} stack={stack} />
-                </div>
-            </div>
         );
     };
 

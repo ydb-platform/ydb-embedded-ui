@@ -43,6 +43,7 @@ class App extends React.Component {
         return (
             <AsideNavigation>
                 <Content singleClusterMode={this.props.singleClusterMode} />
+                <div id="fullscreen-root"></div>
             </AsideNavigation>
         );
     }

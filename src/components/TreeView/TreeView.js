@@ -29,7 +29,7 @@ const TreeView = (props) => {
                     className={b('arrow-icon', {extended: !collapsed})}
                     onClick={clickableLabel ? undefined : onClick}
                 >
-                    <Icon name="arrow-right" viewBox="0 0 6 11" width="6" height="11" />
+                    <Icon name="arrow-right" viewBox="0 0 6 11" width={6} height={11} />
                 </span>
             ) : null}
             {nodeLabel}

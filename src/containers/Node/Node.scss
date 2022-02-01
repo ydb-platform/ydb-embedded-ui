@@ -1,18 +1,19 @@
 @import '../../styles/mixins';
 
 .node {
-    @include flex-container();
     overflow: auto;
+    @include flex-container();
 
     &__content {
-        @include flex-container();
         overflow: auto;
+        @include flex-container();
     }
 
     &__storage {
-        padding-left: 20px;
         overflow: auto;
+
         height: 100%;
+        padding-left: 20px;
     }
 
     &__tabs {
@@ -20,8 +21,9 @@
     }
 
     &__tab {
-        text-decoration: none;
         margin-right: 40px;
+
+        text-decoration: none;
 
         &:last-child {
             margin-right: 0;

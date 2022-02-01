@@ -1,0 +1,82 @@
+.tenant-overview {
+    padding-bottom: 20px;
+    &__loader {
+        display: flex;
+        justify-content: center;
+    }
+    &__tenant-name {
+        display: flex;
+        align-items: center;
+
+        & .yc-link {
+            display: flex;
+        }
+    }
+
+    &__top {
+        display: flex;
+        align-items: center;
+
+        margin-bottom: 20px;
+    }
+
+    &__top-label {
+        gap: 10px;
+
+        margin-bottom: 20px;
+
+        font-weight: 600;
+    }
+
+    &__common-info {
+        display: flex;
+        gap: 20px;
+
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+
+    &__system-tablets {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+
+        margin-left: 15px;
+    }
+
+    &__collapse-title {
+        font-size: var(--yc-text-body2-font-size);
+        font-weight: 500;
+        line-height: var(--yc-text-body2-line-height);
+        //text-transform: uppercase;
+    }
+
+    &__section {
+        border-radius: 10px;
+
+        &_metrics {
+            .info-viewer__label {
+                min-width: 150px;
+            }
+            .info-viewer__value {
+                min-width: 100px;
+            }
+        }
+
+        &_pools {
+            display: grid;
+            grid-gap: 7px 20px;
+
+            grid-template-columns: 110px 110px;
+        }
+    }
+
+    &__section-title {
+        margin-bottom: 20px;
+
+        font-size: var(--yc-text-body2-font-size);
+        font-weight: 500;
+        line-height: var(--yc-text-body2-line-height);
+    }
+}

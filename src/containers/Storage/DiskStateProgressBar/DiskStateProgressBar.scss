@@ -1,0 +1,77 @@
+.storage-disk-progress-bar {
+    $block: &;
+    position: relative;
+
+    display: inline-block;
+
+    width: 100%;
+    max-width: 200px;
+    height: var(--yc-text-body2-line-height);
+
+    border: 1px solid var(--yc-color-infographics-misc-medium);
+    border-radius: 2px;
+    background-color: var(--yc-color-infographics-misc-light);
+
+    #{$block}__filled {
+        background-color: var(--yc-color-infographics-misc-medium);
+    }
+
+    &_green {
+        border: 1px solid var(--yc-color-infographics-positive-heavy);
+        background-color: var(--yc-color-infographics-positive-light);
+        #{$block}__filled {
+            background-color: var(--yc-color-infographics-positive-heavy);
+        }
+    }
+
+    &_blue {
+        border: 1px solid var(--yc-color-infographics-info-medium);
+        background-color: var(--yc-color-infographics-info-light);
+        #{$block}__filled {
+            background-color: var(--yc-color-infographics-info-medium);
+        }
+    }
+
+    &_yellow {
+        border: 1px solid var(--yc-color-infographics-warning-heavy);
+        background-color: var(--yc-color-infographics-yellow-light);
+        #{$block}__filled {
+            background-color: var(--yc-color-infographics-warning-heavy);
+        }
+    }
+
+    &_orange {
+        border: 1px solid var(--yc-color-base-warning-orange);
+        background-color: var(--yc-color-infographics-warning-light);
+        #{$block}__filled {
+            background-color: var(--yc-color-base-warning-orange);
+        }
+    }
+    &_red {
+        border: 1px solid var(--yc-color-infographics-danger-heavy);
+        background-color: var(--yc-color-infographics-danger-light);
+        #{$block}__filled {
+            background-color: var(--yc-color-infographics-danger-heavy);
+        }
+    }
+
+    &__filled {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        height: 100%;
+
+        border-radius: 2px 0 0 2px;
+    }
+    &__filled-title {
+        position: absolute;
+        top: 0;
+        left: 5px;
+
+        font-size: var(--yc-text-body-font-size);
+        line-height: inherit;
+
+        color: inherit;
+    }
+}

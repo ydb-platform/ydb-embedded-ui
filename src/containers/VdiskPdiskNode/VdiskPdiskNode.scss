@@ -2,10 +2,12 @@
 
 .vdisk-pdisk-node {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
     grid-gap: 20px;
 
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+
     padding: 20px;
+    @include container-fluid();
 
     .info-viewer__items {
         grid-template-columns: max-content;
@@ -25,11 +27,10 @@
     &__title {
         margin-right: 16px;
 
-        text-transform: uppercase;
-
         font-size: var(--yc-text-body2-font-size);
         font-weight: 500;
         line-height: var(--yc-text-body2-line-height);
+        text-transform: uppercase;
     }
 
     &__section {
@@ -47,8 +48,8 @@
     }
     &__loader {
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
 
         width: 100%;
         margin-top: 50px;
@@ -56,5 +57,4 @@
     .info-viewer__row {
         align-items: flex-end;
     }
-    @include container-fluid();
 }

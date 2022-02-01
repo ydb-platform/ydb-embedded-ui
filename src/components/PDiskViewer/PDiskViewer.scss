@@ -5,9 +5,11 @@
     &__item,
     &__size {
         margin-right: 24px;
-        color: var(--yc-color-text-complementary);
+
         font-size: var(--yc-text-body2-font-size);
         line-height: 0;
+
+        color: var(--yc-color-text-complementary);
     }
 
     &__item .entity-status {
@@ -25,16 +27,20 @@
 
     &__size {
         width: 120px;
-        color: var(--yc-color-text-complementary);
+
         font-size: 10px;
+
+        color: var(--yc-color-text-complementary);
     }
 
     &__label {
         margin: 0 5px;
         &_link {
-            color: var(--yc-color-base-special);
-            text-decoration: none;
             display: inline-block;
+
+            text-decoration: none;
+
+            color: var(--yc-color-base-special);
         }
     }
 }

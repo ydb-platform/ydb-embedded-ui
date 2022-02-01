@@ -32,6 +32,9 @@ import shardsWorkload from './shardsWorkload';
 import hotKeys from './hotKeys';
 import olapStats from './olapStats';
 import authentication from './authentication';
+import header from './header';
+import saveQuery from './saveQuery';
+import fullscreen from './fullscreen';
 
 function singleClusterMode(state = true) {
     return state;
@@ -71,6 +74,9 @@ export const rootReducer = {
     shardsWorkload,
     hotKeys,
     authentication,
+    header,
+    saveQuery,
+    fullscreen,
 };
 
 export default combineReducers({

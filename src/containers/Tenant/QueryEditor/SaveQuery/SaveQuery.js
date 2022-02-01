@@ -1,11 +1,11 @@
-import React, {useState, useMemo, useRef} from 'react';
+import React, {useState, useRef} from 'react';
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Dialog, DropdownMenu, Popup, TextInput, Button} from '@yandex-cloud/uikit';
 
-import SavedQueries from '../SavedQueries/SavedQueries';
 import Icon from '../../../../components/Icon/Icon';
+import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
 
 import './SaveQuery.scss';
 
@@ -14,27 +14,21 @@ const b = cn('kv-save-query');
 const EMBEDDED_VERSION_WARNING =
     'Please be aware: after cookies delete your saved queries will be lost.';
 
-function SaveQuery({
-    savedQueries,
-    onSaveQuery,
-    saveButtonDisabled,
-    changeUserInput,
-    onDeleteQuery,
-}) {
+function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
     const singleClusterMode = useSelector((state) => state.singleClusterMode);
     const [isDialogVisible, setIsDialogVisible] = useState(false);
     const [isEmbeddedWarningVisible, setIsEmbeddedWarningVisible] = useState(false);
     const [queryName, setQueryName] = useState('');
     const [validationError, setValidationError] = useState(null);
-    const [queryNameToEdit, setQueryNameToEdit] = useState(null);
+
+    const queryNameToEdit = useSelector((state) => state.saveQuery);
+    const dispatch = useDispatch();
 
     const warningRef = useRef();
 
-    const hasSavedQueries = useMemo(() => savedQueries && savedQueries.length > 0, [savedQueries]);
-
     const onSaveQueryClick = () => {
         setIsDialogVisible(true);
-        setQueryNameToEdit(null);
+        dispatch(setQueryNameToEdit(null));
     };
 
     const onCloseDialog = () => {
@@ -71,7 +65,7 @@ function SaveQuery({
 
     const onEditQueryClick = () => {
         onSaveQuery(queryNameToEdit);
-        setQueryNameToEdit(null);
+        dispatch(setQueryNameToEdit(null));
     };
 
     const renderDialog = () => {
@@ -155,14 +149,7 @@ function SaveQuery({
         <React.Fragment>
             {queryNameToEdit ? renderSaveDropdownMenu() : renderSaveButton(onSaveQueryClick)}
             {isDialogVisible && renderDialog()}
-            {hasSavedQueries && (
-                <SavedQueries
-                    savedQueries={savedQueries}
-                    changeUserInput={changeUserInput}
-                    onDeleteQuery={onDeleteQuery}
-                    setQueryNameToEdit={setQueryNameToEdit}
-                />
-            )}
+
             {singleClusterMode && renderEmbeddedVersionWarning()}
         </React.Fragment>
     );

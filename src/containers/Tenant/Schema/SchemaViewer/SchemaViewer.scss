@@ -1,28 +1,7 @@
 .schema-viewer {
-    &__title {
-        font-weight: 500;
-    }
-    &__row {
-        position: relative;
-        margin-bottom: 5px;
-    }
+    padding: 0px 12px;
     &__key-icon {
         display: flex;
         align-items: center;
-    }
-    &__table {
-        background: none;
-        text-align: left;
-        margin-top: -6px;
-
-        td {
-            padding: 5px 2px;
-        }
-    }
-    &__type {
-        color: var(--yc-color-text-secondary);
-    }
-    &__name {
-        padding-left: 10px !important;
     }
 }

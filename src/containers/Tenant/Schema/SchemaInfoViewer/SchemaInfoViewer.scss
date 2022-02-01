@@ -1,5 +1,4 @@
-.schema-viewer {
-    padding: 20px;
+.schema-info-viewer {
     overflow: auto;
 
     &__item {
@@ -8,14 +7,5 @@
         .info-viewer__items {
             grid-template-columns: minmax(max-content, 280px);
         }
-    }
-
-    &__title {
-        margin: 0;
-        color: var(--yc-color-text-primary);
-        font-size: var(--yc-text-body2-font-size);
-        font-weight: 500;
-        line-height: var(--yc-text-body2-line-height);
-        margin-bottom: 15px;
     }
 }

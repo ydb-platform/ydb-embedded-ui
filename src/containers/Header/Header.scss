@@ -1,72 +1,28 @@
+@import '../../styles/mixins.scss';
+
 .header {
-    height: 60px;
-    flex: 0 0 auto;
-    padding: 0 15px;
     display: flex;
-    align-items: center;
+    flex: 0 0 40px;
     justify-content: space-between;
-    border-bottom: 1px solid var(--yc-color-base-generic);
+    align-items: center;
 
-    &__logo {
-        margin-right: 40px;
-        color: var(--yc-color-text-dark-primary);
-        .yc-root_theme_dark & {
-            color: var(--yc-color-text-light-primary);
-        }
-        .yc-root_theme_light & {
-            color: var(--yc-color-text-dark-primary);
-        }
-        user-select: none;
-        height: 38px;
-        width: 143px;
-    }
-    &__cluster-info {
-    }
+    padding: 0 20px 0 18px;
+
+    font-weight: 600;
+
+    border-bottom: 1px solid var(--yc-color-line-generic);
+
+    @include body2-typography;
+
     &__cluster-info-title {
-        color: var(--yc-color-text-secondary);
+        font-size: var(--yc-text-body-font-size);
         text-transform: uppercase;
-        font-size: 12px;
-        margin-bottom: 3px;
+
+        color: var(--yc-color-text-secondary);
     }
+
     &__cluster-info-name {
-        font-size: 17px;
+        font-size: var(--yc-text-body2-font-size);
         font-weight: 500;
-    }
-
-    &__theme-toggle {
-        display: flex;
-        align-items: center;
-        margin-right: 15px;
-        margin-left: auto;
-        color: var(--yc-color-text-primary);
-
-        .yc-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .yc-button__text {
-            margin: 0;
-        }
-    }
-
-    &__theme-toggle + .host {
-        margin-left: 25px;
-    }
-
-    &__space-divider {
-        width: 100%;
-    }
-
-    &__theme-button {
-        width: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    &__help-center {
-        margin-right: 15px;
     }
 }

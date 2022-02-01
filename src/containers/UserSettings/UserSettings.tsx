@@ -8,8 +8,6 @@ import {THEME_KEY} from '../../utils/constants';
 //@ts-ignore
 import {setSettingValue} from '../../store/reducers/settings';
 
-// import './UserSettings.scss';
-
 enum Theme {
     light = 'light',
     dark = 'dark',

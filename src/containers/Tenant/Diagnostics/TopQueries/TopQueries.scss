@@ -1,0 +1,54 @@
+@import '../../../../styles/mixins.scss';
+
+.kv-top-queries {
+    height: 100%;
+
+    @include query-data-table;
+    &__message-container {
+        padding: 15px 0;
+    }
+
+    &__loader {
+        display: flex;
+        justify-content: center;
+    }
+
+    &__owner-container {
+        margin: 10px;
+
+        .yc-staff-card {
+            display: inline-block;
+        }
+    }
+
+    &__text {
+        font-size: var(--yc-text-body-font-size);
+        line-height: var(--yc-text-body-line-height);
+
+        color: var(--yc-color-text-primary);
+
+        &::first-letter {
+            color: var(--yc-color-text-danger);
+        }
+    }
+
+    &__result &__table-content {
+        & .data-table {
+            &,
+            &__table {
+                width: 100%;
+            }
+            &__td {
+                vertical-align: top;
+                white-space: pre;
+                word-break: break-word;
+            }
+
+            &__row {
+                max-height: 80px;
+
+                cursor: pointer;
+            }
+        }
+    }
+}

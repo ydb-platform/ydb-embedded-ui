@@ -1,5 +1,6 @@
 .elements-pagination {
     display: flex;
+
     padding-left: 1px;
 
     &__divider {
@@ -7,16 +8,18 @@
     }
 
     &__control {
-        margin: 0 -1px;
         display: flex;
         align-items: center;
+
+        margin: 0 -1px;
     }
 
     &__icon {
-        color: var(--yc-color-text-primary);
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
+
+        color: var(--yc-color-text-primary);
     }
 
     &__control:hover {

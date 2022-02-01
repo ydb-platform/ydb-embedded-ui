@@ -3,39 +3,60 @@
     align-items: center;
 
     .tree-view_item {
-        padding: 5px 0;
-        margin: 0;
         flex-wrap: wrap;
+
+        margin: 0;
+        padding: 5px 0;
     }
 
     .tree-view_children {
-        padding-left: 15px;
         margin: 0;
+        padding-left: 15px;
     }
 
     &__label {
         display: flex;
-        align-items: center;
         overflow: hidden;
-        cursor: pointer;
-        padding: 0 5px;
-        border-radius: 3px;
-        height: 20px;
+        align-items: center;
 
-        &:hover {
-            background-color: var(--yc-color-base-info-hover);
+        width: 100%;
+        height: 20px;
+        padding: 0 5px;
+
+        cursor: pointer;
+
+        & > svg {
+            color: var(--yc-color-text-hint);
         }
     }
 
-    &_active > .tree-view > .tree-view_item &__label {
+    &_active > .tree-view > .tree-view_item {
+        font-weight: 600;
+
         background-color: var(--yc-color-base-info);
+    }
+
+    &__name-wrapper {
+        display: inline-flex;
+        justify-content: space-between;
+
+        width: 100%;
     }
 
     &__name {
         display: inline;
-        text-overflow: ellipsis;
-        white-space: nowrap;
         overflow: hidden;
+
         margin-left: 6px;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+}
+
+.tree-view_item {
+    border-bottom: 1px solid var(--yc-color-line-generic);
+    &:hover {
+        background-color: var(--yc-color-base-simple-hover);
     }
 }

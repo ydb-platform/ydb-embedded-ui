@@ -2,12 +2,16 @@
 
 .schema {
     .tree-view_item {
-        padding: 2px 0;
         margin: 0;
+        padding: 2px 0;
     }
 
     .tree-view_children {
-        padding-left: 15px;
         margin: 0;
+        padding-left: 15px;
+    }
+    &__loader {
+        display: flex;
+        justify-content: center;
     }
 }

@@ -1,14 +1,16 @@
 @import '../../styles/mixins';
 
 .full-group-viewer {
+    overflow: auto;
     @include container-fluid();
     @include flex-container();
-    overflow: auto;
 
     &__section {
-        min-width: 315px;
         display: inline-block;
+
+        min-width: 315px;
         margin-right: 40px;
+
         border-radius: 5px;
 
         .info-viewer__label {
@@ -21,9 +23,10 @@
     }
 
     .data-table {
+        overflow: auto;
+
         margin-top: 50px;
         @include flex-container();
-        overflow: auto;
     }
 
     .data-table__table {

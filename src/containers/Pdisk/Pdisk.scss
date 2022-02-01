@@ -1,8 +1,8 @@
 @import '../../styles/mixins.scss';
 
 .pdisk {
-    @include container-fluid();
     padding: 20px;
+    @include container-fluid();
 
     .info-viewer__items {
         grid-template-columns: auto;
@@ -18,11 +18,12 @@
     }
 
     &__title {
-        font-size: var(--yc-text-body2-font-size);
-        line-height: var(--yc-text-body2-line-height);
-        font-weight: 500;
-        text-transform: uppercase;
         margin-right: 16px;
+
+        font-size: var(--yc-text-body2-font-size);
+        font-weight: 500;
+        line-height: var(--yc-text-body2-line-height);
+        text-transform: uppercase;
     }
 
     &__section {
@@ -34,7 +35,8 @@
     }
 
     &__link {
-        color: var(--yc-color-base-special);
         text-decoration: none;
+
+        color: var(--yc-color-base-special);
     }
 }

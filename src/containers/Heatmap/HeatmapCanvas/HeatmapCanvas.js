@@ -111,9 +111,9 @@ export const HeatmapCanvas = (props) => {
         }
     };
     const _onCanvasMouseLeave = () => {
-        // Таймаут нужен для того, чтобы точно скрыть тултип. В методе _onCanvasMouseMove используется throttle.
-        // И это может вызвать функцию отрисовки тултипа уже после фактического покидания области канваса. Для этого
-        // в таймауте используем задержку больше, чем время задержки в throttle.
+        // Timeout is needed to surely hide tooltip. In _onCanvasMouseMove method is is used "throttle"
+        // and it can cause tooltip render function after canvas field is actually leaved.
+        //So we use in timeout we use a delay greater then delay in throttle.
         setTimeout(() => {
             props.hideTooltip();
         }, 40);

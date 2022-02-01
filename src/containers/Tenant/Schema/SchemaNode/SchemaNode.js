@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
@@ -13,15 +12,16 @@ import {getDescribe} from '../../../../store/reducers/describe';
 import {getSchemaAcl} from '../../../../store/reducers/schemaAcl';
 
 import './SchemaNode.scss';
+import SchemaNodeActions from '../SchemaNodeActions/SchemaNodeActions';
+import {isTableType} from '../../Tenant';
 
 const b = cn('schema-node');
 
-export const FOLDERS_TYPE = [
-    'EPathTypeDir',
-    'EPathTypeSubDomain',
-    'EPathTypeExtSubDomain',
-    'EPathTypeOlapStore',
-];
+export const SUBDOMAIN_FOLDER_TYPE = 'EPathTypeSubDomain';
+export const TABLE_TYPE = 'EPathTypeTable';
+export const OLAP_TABLE_TYPE = 'EPathTypeOlapTable';
+
+export const FOLDERS_TYPE = ['EPathTypeDir', 'EPathTypeExtSubDomain', 'EPathTypeOlapStore'];
 
 class SchemaNode extends React.Component {
     static propTypes = {
@@ -30,10 +30,12 @@ class SchemaNode extends React.Component {
         getSchema: PropTypes.func.isRequired,
         setCurrentSchemaPath: PropTypes.func,
         currentSchemaPath: PropTypes.string,
+        isRoot: PropTypes.bool,
     };
 
     state = {
         collapsed: true,
+        active: false,
     };
 
     schemaNodeRef = React.createRef();
@@ -42,7 +44,7 @@ class SchemaNode extends React.Component {
         const {currentSchemaPath, isRoot} = this.props;
         const schemaPath = this.getSchemaPath();
 
-        if (schemaPath === currentSchemaPath) {
+        if (schemaPath === currentSchemaPath && !this.state.active) {
             this.addActiveClass();
         }
 
@@ -53,6 +55,15 @@ class SchemaNode extends React.Component {
             isRoot
         ) {
             this.setState({collapsed: false});
+        }
+    }
+
+    componentDidUpdate() {
+        const {currentSchemaPath} = this.props;
+        const schemaPath = this.getSchemaPath();
+
+        if (schemaPath === currentSchemaPath && !this.state.active) {
+            this.addActiveClass();
         }
     }
 
@@ -67,15 +78,18 @@ class SchemaNode extends React.Component {
     };
 
     setIcon = (data) => {
+        const viewBox = '0 0 16 16';
         const {collapsed} = this.state;
         if (FOLDERS_TYPE.indexOf(data.PathType) !== -1) {
             return collapsed ? (
-                <Icon name="folder" viewBox="0 0 13 10" width={14} height={14} />
+                <Icon name="folder" viewBox={viewBox} width={16} height={16} />
             ) : (
-                <Icon name="openFolder" viewBox="0 0 13 10" width={14} height={14} />
+                <Icon name="openFolder" viewBox={viewBox} width={16} height={16} />
             );
-        } else if (data.PathType === 'EPathTypeTable' || data.PathType === 'EPathTypeOlapTable') {
-            return <Icon name="table" viewBox="0 0 13 10" width={14} height={14} />;
+        } else if (data.PathType === TABLE_TYPE || data.PathType === OLAP_TABLE_TYPE) {
+            return <Icon name="table" viewBox={viewBox} width={16} height={16} />;
+        } else if (data.PathType === SUBDOMAIN_FOLDER_TYPE) {
+            return <Icon name="subdomain" viewBox={viewBox} width={16} height={16} />;
         }
     };
 
@@ -85,9 +99,9 @@ class SchemaNode extends React.Component {
         if (currentActiveSchemaNode) {
             currentActiveSchemaNode.classList.remove(activeClass);
         }
-        // eslint-disable-next-line react/no-find-dom-node
-        const activeNode = ReactDOM.findDOMNode(this);
+        const activeNode = this.schemaNodeRef.current;
         if (activeNode) {
+            this.setState({active: true});
             activeNode.classList.add(activeClass);
         }
     };
@@ -105,18 +119,23 @@ class SchemaNode extends React.Component {
     };
 
     render() {
-        const {data, fullPath, isRoot = false} = this.props;
+        const {data, fullPath, isRoot = false, currentSchemaPath, currentItem = {}} = this.props;
         const {collapsed} = this.state;
 
         if (!data) {
             return null;
         }
+        const currentPathType = currentItem.PathDescription?.Self?.PathType;
+        const type = isTableType(currentPathType);
 
-        const hasArrow = data.PathType !== 'EPathTypeTable';
+        const hasArrow = data.PathType !== TABLE_TYPE;
         const label = (
             <div className={b('label')}>
                 {this.setIcon(data)}
-                <div className={b('name')}>{data.Name}</div>
+                <div className={b('name-wrapper')}>
+                    <div className={b('name')}>{data.Name}</div>
+                    <SchemaNodeActions name={currentSchemaPath} isTableType={type} />
+                </div>
             </div>
         );
         return (
@@ -137,6 +156,7 @@ class SchemaNode extends React.Component {
 function mapStateToProps(state) {
     return {
         currentSchemaPath: state.schema.currentSchemaPath,
+        currentItem: state.schema.currentSchema,
     };
 }
 

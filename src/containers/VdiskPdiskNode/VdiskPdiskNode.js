@@ -11,7 +11,7 @@ import InfoViewer from '../../components/InfoViewer/InfoViewer';
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
 import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
-import {AutoFetcher} from '../Cluster/Cluster';
+import {AutoFetcher} from '../../utils/autofetcher';
 
 import {getVdiskInfo, clearStore as clearStoreVDisk} from '../../store/reducers/vdisk';
 import {getPdiskInfo, clearStore as clearStorePDisk} from '../../store/reducers/pdisk';

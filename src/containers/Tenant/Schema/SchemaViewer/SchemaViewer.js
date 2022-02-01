@@ -1,19 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
-import './SchemaViewer.scss';
 
 import find from 'lodash/find';
 
 import Icon from '../../../../components/Icon/Icon';
+import DataTable from '@yandex-cloud/react-data-table';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import './SchemaViewer.scss';
 
 const b = cn('schema-viewer');
+
+const SchemaViewerColumns = {
+    id: 'Id',
+    name: 'Name',
+    key: 'Key',
+    type: 'Type',
+};
 
 class SchemaViewer extends React.Component {
     static propTypes = {
         data: PropTypes.arrayOf(PropTypes.object),
     };
-    render() {
+
+    renderTable() {
         const {data = {}} = this.props;
         const keyColumnsIds = data.KeyColumnIds ?? [];
         const keyColumns = keyColumnsIds.map((key) => {
@@ -22,41 +32,50 @@ class SchemaViewer extends React.Component {
         });
         const restColumns = data.Columns?.filter((item) => !keyColumnsIds.includes(item.Id)) ?? [];
 
-        const columns = [...keyColumns, ...restColumns];
+        const columns = [
+            {
+                name: SchemaViewerColumns.id,
+                width: 40,
+            },
+            {
+                name: SchemaViewerColumns.key,
+                width: 40,
+                sortAccessor: (row) => {
+                    return keyColumnsIds.includes(row.Id) ? 1 : 0;
+                },
+                render: ({row}) => {
+                    return keyColumnsIds.includes(row.Id) ? (
+                        <div className={b('key-icon')}>
+                            <Icon name="key" viewBox="0 0 12 7" width={12} height={7} />
+                        </div>
+                    ) : null;
+                },
+            },
+            {
+                name: SchemaViewerColumns.name,
+                width: 100,
+            },
+            {
+                name: SchemaViewerColumns.type,
+                width: 100,
+            },
+        ];
 
+        const tableData = [...keyColumns, ...restColumns];
         return (
-            <div className={b()}>
-                <div className={b('title')}>Schema</div>
-                {columns.length > 0 ? (
-                    <table className={b('table')}>
-                        {columns.map((info, key) => (
-                            <tr key={key} className={b('row')}>
-                                <td>
-                                    {keyColumnsIds.includes(info.Id) && (
-                                        <div className={b('key-icon')}>
-                                            <Icon
-                                                name="key"
-                                                viewBox="0 0 12 7"
-                                                width={12}
-                                                height={7}
-                                            />
-                                        </div>
-                                    )}
-                                </td>
-                                <td className={b('type')}>
-                                    <span>{info.Type}</span>
-                                </td>
-                                <td className={b('name')}>
-                                    <span>{info.Name}</span>
-                                </td>
-                            </tr>
-                        ))}
-                    </table>
-                ) : (
-                    <div>no schema data</div>
-                )}
-            </div>
+            <DataTable
+                theme="yandex-cloud"
+                data={tableData}
+                columns={columns}
+                settings={{...DEFAULT_TABLE_SETTINGS, stickyTop: 107}}
+                dynamicRender={true}
+                initialSortOrder={{columnId: SchemaViewerColumns.key, order: DataTable.DESCENDING}}
+            />
         );
+    }
+
+    render() {
+        return <div className={b()}>{this.renderTable()}</div>;
     }
 }
 

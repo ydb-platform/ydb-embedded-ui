@@ -6,17 +6,21 @@ import {Dialog, Popup, Button} from '@yandex-cloud/uikit';
 import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
 import Icon from '../../../../components/Icon/Icon';
 import './SavedQueries.scss';
+import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
+import {useDispatch} from 'react-redux';
 
 const b = cn('saved-queries');
 
 const MAX_QUERY_HEIGHT = 3;
 
-function SavedQueries({savedQueries, changeUserInput, onDeleteQuery, setQueryNameToEdit}) {
+function SavedQueries({savedQueries, changeUserInput, onDeleteQuery}) {
     const [isSavedQueriesVisible, setIsSavedQueriesVisible] = useState(false);
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
     const [queryNameToDelete, setQueryNameToDelete] = useState(null);
 
     const [popupForceRender, setPopupForceRender] = useState(null);
+
+    const dispatch = useDispatch();
     const anchor = useRef(null);
 
     const onShowSavedQueriesClick = () => {
@@ -30,7 +34,7 @@ function SavedQueries({savedQueries, changeUserInput, onDeleteQuery, setQueryNam
     const onSavedQueryClick = (queryText, queryName) => {
         return () => {
             changeUserInput({input: queryText});
-            setQueryNameToEdit(queryName);
+            dispatch(setQueryNameToEdit(queryName));
             setIsSavedQueriesVisible(false);
         };
     };
@@ -89,7 +93,7 @@ function SavedQueries({savedQueries, changeUserInput, onDeleteQuery, setQueryNam
                 className={b('popup-wrapper')}
                 anchorRef={anchor}
                 open={isSavedQueriesVisible}
-                placement={['top']}
+                placement={['bottom-end']}
                 onClose={onCloseSavedQueries}
             >
                 <div className={b()}>

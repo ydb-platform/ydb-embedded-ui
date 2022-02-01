@@ -5,7 +5,10 @@
 
     &__node-wrapper {
         display: flex;
+        overflow: hidden;
         align-items: center;
+
+        width: 100%;
 
         &_clickable {
             cursor: pointer;
@@ -15,8 +18,10 @@
     &__arrow-icon {
         display: flex;
         justify-content: center;
+
         width: 11px;
         margin-right: 8px;
+
         cursor: pointer;
 
         &_extended {
@@ -26,5 +31,9 @@
         & .yc-icon {
             vertical-align: middle;
         }
+    }
+    .yc-icon {
+        display: flex;
+        flex-shrink: 0;
     }
 }

@@ -1,3 +1,5 @@
+import DataTable from '@yandex-cloud/react-data-table';
+
 const SECOND = 1000;
 
 export const CLUSTER_AUTO_RELOAD_INTERVAL = 10 * SECOND;
@@ -10,8 +12,9 @@ export const PDISK_AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const VDISK_AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const HEALTHCHECK_RELOAD_INTERVAL = 10 * SECOND;
-export const MEGABYTE = 1000000;
-export const TERABYTE = 1000000000000;
+export const MEGABYTE = 1_000_000;
+export const GIGABYTE = 1_000_000_000;
+export const TERABYTE = 1_000_000_000_000;
 export const GROUP = 'group';
 
 export const DAY_IN_SECONDS = 24 * 60 * 60;
@@ -108,19 +111,34 @@ export const COLORS_PRIORITY = {
     yellow: 4,
     orange: 3,
     red: 2,
-    black: 1,
-    gray: 1,
+    blue: 1,
+    grey: 1,
 };
 
 export const ALL = 'All';
-export const PROBLEMS = 'Problems';
+export const PROBLEMS = 'With problems';
 
 export const THEME_KEY = 'theme';
 export const SAVED_QUERIES_KEY = 'saved_queries';
 export const DATA_QA_TUNE_COLUMNS_POPUP = 'tune-columns-popup';
-export const SELECTED_COLUMNS_KEY = 'selectedColumns';
+
 export const defaultUserSettings = {
     [THEME_KEY]: 'light',
 };
 export const DEFAULT_SIZE_RESULT_PANE_KEY = 'default-size-result-pane';
-export const DEFAULT_SIZE_SHEMA_TREE_PANE_KEY = 'default-size-schema-tree-pane';
+export const DEFAULT_SIZE_TENANT_SUMMARY_KEY = 'default-size-tenant-summary-pane';
+export const DEFAULT_SIZE_TENANT_KEY = 'default-size-tenant-pane';
+
+export const DEFAULT_IS_TENANT_SUMMARY_COLLAPSED = 'default-is-tenant-summary-collapsed';
+
+export const DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED = 'default-is-tenant-common-info-collapsed';
+
+export const DEFAULT_IS_QUERY_RESULT_COLLAPSED = 'default-is-query-result-collapsed';
+
+export const DEFAULT_TABLE_SETTINGS = {
+    displayIndices: false,
+    stickyHead: DataTable.MOVING,
+    syncHeadOnResize: true,
+    dynamicRender: true,
+    highlightRows: true,
+};

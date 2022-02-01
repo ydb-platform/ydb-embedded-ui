@@ -1,0 +1,25 @@
+.kv-nodes {
+    &__external-button {
+        display: inline-flex;
+        visibility: hidden;
+        align-items: center;
+
+        margin-left: 4px;
+
+        transform: translateY(-1px);
+
+        .yc-button__text {
+            margin: 0 4px;
+        }
+    }
+
+    &__host-name {
+        width: 90%;
+    }
+}
+
+.data-table__row:hover {
+    .kv-nodes__external-button {
+        visibility: visible;
+    }
+}

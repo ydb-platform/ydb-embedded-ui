@@ -1,21 +1,23 @@
 @import '../../styles/mixins.scss';
 
 .full-node-viewer {
-    @include container-fluid();
     font-size: var(--yc-text-body2-font-size);
     line-height: var(--yc-text-body2-line-height);
+    @include container-fluid();
 
     &__title {
-        font-size: var(--yc-text-body2-font-size);
-        line-height: var(--yc-text-body2-line-height);
         margin: 0 20px 0 0;
+
+        font-size: var(--yc-text-body2-font-size);
         font-weight: 500;
+        line-height: var(--yc-text-body2-line-height);
         text-transform: uppercase;
     }
 
     &__row {
         display: flex;
         align-items: center;
+
         margin: 15px 0;
 
         &_id {
@@ -25,20 +27,23 @@
 
     &__common-info {
         display: flex;
-        align-items: stretch;
         justify-content: flex-start;
+        align-items: stretch;
     }
 
     &__section {
-        padding: 15px;
         margin-right: 20px;
+        padding: 15px;
+
         border-radius: 10px;
 
         &_pools {
-            padding: 15px 15px 15px 0;
             display: grid;
-            grid-template-columns: 110px 110px;
             grid-gap: 7px 20px;
+
+            grid-template-columns: 110px 110px;
+
+            padding: 15px 15px 15px 0;
         }
     }
 
@@ -47,12 +52,14 @@
     }
 
     &__label {
-        color: var(--yc-color-text-hint);
-        font-size: var(--yc-text-body2-font-size);
         min-width: 100px;
         margin-right: 25px;
+
+        font-size: var(--yc-text-body2-font-size);
         line-height: 18px;
         white-space: nowrap;
+
+        color: var(--yc-color-text-hint);
 
         .yc-root_theme_dark & {
             color: var(--yc-color-text-hint);
@@ -65,10 +72,11 @@
     }
 
     &__section-title {
+        margin: 15px 0 0;
+
         font-size: var(--yc-text-body2-font-size);
-        line-height: var(--yc-text-body2-line-height);
-        margin: 15px 0 0 0;
         font-weight: 500;
+        line-height: var(--yc-text-body2-line-height);
     }
 
     &__link {

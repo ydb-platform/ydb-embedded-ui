@@ -27,7 +27,7 @@ export class ProgressViewer extends React.Component {
     };
 
     static defaultProps = {
-        size: 'ns',
+        size: 'xs',
         colorizeProgress: false,
         capacity: 100,
         inverseColorize: false,

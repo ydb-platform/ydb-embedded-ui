@@ -1,0 +1,176 @@
+@import '../../../../../styles/mixins.scss';
+
+.issue {
+    display: flex;
+    align-items: center;
+
+    height: 40px;
+    margin-left: 36px;
+
+    cursor: pointer;
+    .km-tree-view__arrow-icon + & {
+        margin-left: 0;
+    }
+
+    &_active {
+        border-radius: 4px;
+        background: var(--yc-color-base-info);
+    }
+
+    &__wpapper {
+        & .km-tree-view__node-wrapper {
+            height: 40px;
+
+            & .km-tree-view__arrow-icon {
+                display: flex;
+                align-items: center;
+
+                width: 36px;
+                height: 36px;
+                margin: 0;
+            }
+        }
+
+        & .tree-view_item {
+            margin: 0;
+        }
+    }
+
+    &__field {
+        padding: 0 10px;
+
+        &_status {
+            display: flex;
+
+            min-width: 470px;
+
+            white-space: nowrap;
+        }
+        &_type {
+            min-width: 160px;
+        }
+        &_additional {
+            width: max-content;
+
+            cursor: pointer;
+
+            color: var(--yc-color-text-link);
+
+            &:hover {
+                color: var(--yc-color-text-link-hover);
+            }
+        }
+        &_message {
+            overflow: hidden;
+
+            width: 300px;
+
+            white-space: normal;
+        }
+    }
+
+    &__field-tooltip {
+        &#{&} {
+            min-width: 500px;
+            max-width: 500px;
+        }
+    }
+
+    &__field-label {
+        color: var(--yc-color-text-secondary);
+    }
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    margin-right: 4px;
+
+    border-radius: 4px;
+
+    &_good,
+    &_green {
+        background-color: var(--yc-color-base-positive-heavy);
+    }
+    &_degraded,
+    &_yellow {
+        background-color: var(--yc-color-base-warning-heavy);
+    }
+
+    &_blue {
+        background-color: var(--yc-color-base-info-heavy);
+    }
+
+    &_emergency,
+    &_red {
+        background: var(--yc-color-base-danger-heavy);
+    }
+    &_unspecified,
+    &_gray,
+    &_grey {
+        background: var(--yc-color-text-complementary);
+    }
+    &_maintenance_required,
+    &_orange {
+        background: var(--yc-color-text-warning-heavy);
+    }
+}
+
+.issue-viewer {
+    display: flex;
+
+    &__tree {
+        padding-right: 20px;
+    }
+
+    &__checkbox {
+        margin: 5px 0 10px;
+    }
+
+    &__info-panel {
+        position: sticky;
+        top: 20px;
+
+        width: 500px;
+        height: 100%;
+        padding: 5px 20px 20px;
+
+        border-radius: 4px;
+        background: var(--yc-color-base-generic);
+    }
+
+    &__inspector {
+        @include json-tree-styles();
+
+        :not(.json-inspector__leaf_expanded).json-inspector__leaf_composite:before {
+            content: '';
+        }
+        .json-inspector__leaf_expanded.json-inspector__leaf_composite:before {
+            content: '';
+        }
+
+        & .json-inspector {
+            &__line:hover:after {
+                background: transparent;
+            }
+            &__show-original:hover:after,
+            &__show-original:hover:before {
+                color: transparent;
+            }
+
+            &__value_helper {
+                display: none;
+            }
+
+            &__value {
+                overflow: hidden;
+
+                word-break: break-all;
+
+                & > span {
+                    user-select: all;
+                }
+            }
+        }
+    }
+}

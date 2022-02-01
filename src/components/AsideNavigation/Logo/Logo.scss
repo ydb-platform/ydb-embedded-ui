@@ -1,7 +1,7 @@
 .nv-aside-header-logo {
     display: flex;
-    align-items: center;
     flex-shrink: 0;
+    align-items: center;
 
     height: 32px;
     margin: 12px 0;
@@ -10,19 +10,18 @@
 
     &__logo-btn-place {
         display: flex;
-        align-items: center;
         flex-shrink: 0;
         justify-content: center;
+        align-items: center;
 
         width: var(--nv-aside-header-min-width);
     }
 
     &__logo {
-        vertical-align: middle;
-
         font-family: 'Rubik', sans-serif;
         font-size: 16px;
         line-height: 20px;
+        vertical-align: middle;
     }
 
     &__logo-link {

@@ -7,7 +7,7 @@ import {formatCPU, formatBytes} from '../../../../utils';
 
 import InfoViewer from '../../../../components/InfoViewer/InfoViewer';
 
-const b = cn('schema-viewer');
+const b = cn('schema-info-viewer');
 
 class SchemaInfoViewer extends React.Component {
     static propTypes = {
@@ -26,7 +26,8 @@ class SchemaInfoViewer extends React.Component {
         const {data} = this.props;
 
         if (data) {
-            const {TableStats = {}, TabletMetrics = {}} = data.PathDescription;
+            const {PathDescription = {}} = data;
+            const {TableStats = {}, TabletMetrics = {}} = PathDescription;
             const tableStatsInfo =
                 TableStats &&
                 Object.keys(TableStats).map((key) => ({
@@ -49,11 +50,10 @@ class SchemaInfoViewer extends React.Component {
             return (
                 <div className={b()}>
                     <div className={b('item')}>
-                        {Boolean(infoLength) && (
-                            <>
-                                <div className={b('title')}>General</div>
-                                <InfoViewer info={generalInfo}></InfoViewer>
-                            </>
+                        {infoLength ? (
+                            <InfoViewer info={generalInfo}></InfoViewer>
+                        ) : (
+                            <div>Empty</div>
                         )}
                     </div>
                 </div>

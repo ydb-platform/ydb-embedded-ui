@@ -5,11 +5,14 @@
     &__common {
         display: flex;
         align-items: center;
+
         margin-bottom: 4px;
     }
     &__status {
         display: flex;
+
         margin-right: 15px;
+
         font-size: var(--yc-text-body2-font-size);
         line-height: var(--yc-text-body2-line-height);
     }
@@ -19,6 +22,7 @@
     }
     &__info-item {
         display: flex;
+
         margin-right: 20px;
 
         &:last-child {
@@ -26,18 +30,21 @@
         }
     }
     &__label {
-        color: var(--yc-color-text-hint);
+        margin-right: 10px;
+
         font-size: var(--yc-text-body-font-size);
         line-height: var(--yc-text-body-line-height);
-        margin-right: 10px;
+
+        color: var(--yc-color-text-hint);
 
         .yc-root_theme_dark & {
             color: var(--yc-color-text-hint);
         }
     }
     &__value {
-        color: var(--yc-color-text-primary);
         font-size: var(--yc-text-body-font-size);
         line-height: var(--yc-text-body-line-height);
+
+        color: var(--yc-color-text-primary);
     }
 }
