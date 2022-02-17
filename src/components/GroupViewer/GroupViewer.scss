@@ -1,0 +1,41 @@
+.group-viewer {
+    display: flex;
+    align-items: center;
+    &__group {
+        margin-right: 20px;
+    }
+
+    &__label {
+        color: var(--yc-color-text-complementary);
+        font-size: var(--yc-text-body-font-size);
+        margin-right: 20px;
+    }
+
+    &__name {
+        color: var(--yc-color-base-special);
+        text-decoration: none;
+        display: inline-block;
+
+        &:before {
+            transform: translateY(3px);
+        }
+    }
+
+    &__latency {
+        margin-right: 20px;
+    }
+
+    &__vdisks {
+        display: flex;
+    }
+
+    &__disk-overall {
+        .entity-status:before {
+            margin-right: 5px;
+        }
+    }
+
+    &__progress {
+        margin-right: 10px;
+    }
+}

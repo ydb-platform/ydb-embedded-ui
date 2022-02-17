@@ -1,0 +1,171 @@
+import {useContext, useEffect, useMemo} from 'react';
+import cn from 'bem-cn-lite';
+import {connect} from 'react-redux';
+import InternalLink from '../../../components/InternalLink/InternalLink';
+import {Loader} from '@yandex-cloud/uikit';
+import DataTable from '@yandex-cloud/react-data-table';
+import routes, {createHref} from '../../../routes';
+
+import {sendShardQuery, setShardQueryOptions} from '../../../store/reducers/shardsWorkload';
+import {setCurrentSchemaPath, getSchema} from '../../../store/reducers/schema';
+import {AutoFetcher} from '../../Cluster/Cluster';
+
+import './TopShards.scss';
+import {OLAP_STORE_TYPE, OLAP_TABLE_TYPE} from '../Schema/SchemaMain/SchemaMain';
+import HistoryContext from '../../../contexts/HistoryContext';
+
+const b = cn('top-shards');
+const bLink = cn('yc-link');
+
+const TABLE_SETTINGS = {
+    displayIndices: false,
+    syncHeadOnResize: true,
+    stickyHead: DataTable.MOVING,
+};
+
+const tableColumnsNames = {
+    TabletId: 'TabletId',
+    CPUCores: 'CPUCores',
+    Path: 'Path',
+};
+
+const autofetcher = new AutoFetcher();
+
+function prepareCPUWorkloadValue(value) {
+    return `${(value * 100).toFixed(2)}%`;
+}
+
+function TopShards({
+    sendShardQuery,
+    currentSchemaPath,
+    path,
+    loading,
+    data,
+    error,
+    setCurrentSchemaPath,
+    getSchema,
+    autorefresh,
+    wasLoaded,
+    setShardQueryOptions,
+    type,
+}) {
+    useEffect(() => {
+        if (autorefresh) {
+            autofetcher.start();
+            autofetcher.fetch(() => sendShardQuery({database: path, path: currentSchemaPath}));
+        } else {
+            autofetcher.stop();
+        }
+        return () => {
+            autofetcher.stop();
+        };
+    }, [autorefresh]);
+
+    useEffect(() => {
+        sendShardQuery({database: path, path: currentSchemaPath});
+        setShardQueryOptions({
+            wasLoaded: false,
+            data: undefined,
+        });
+    }, [currentSchemaPath]);
+
+    const renderLoader = () => {
+        return (
+            <div className={b('loader')}>
+                <Loader size="l" />
+            </div>
+        );
+    };
+
+    const history = useContext(HistoryContext);
+
+    const onSchemaClick = (schemaPath) => {
+        return () => {
+            setCurrentSchemaPath(schemaPath);
+            getSchema({path: schemaPath});
+            history.go(0);
+        };
+    };
+
+    const tableColumns = useMemo(() => {
+        return [
+            {
+                name: tableColumnsNames.Path,
+                // eslint-disable-next-line
+                render: ({value}) => {
+                    return (
+                        <span onClick={onSchemaClick(value)} className={bLink({view: 'normal'})}>
+                            {value}
+                        </span>
+                    );
+                },
+            },
+            {
+                name: tableColumnsNames.CPUCores,
+                // eslint-disable-next-line
+                render: ({value}) => {
+                    return prepareCPUWorkloadValue(value);
+                },
+                align: DataTable.RIGHT,
+            },
+            {
+                name: tableColumnsNames.TabletId,
+                // eslint-disable-next-line
+                render: ({value}) => {
+                    return (
+                        <InternalLink to={createHref(routes.tablet, {id: value})}>
+                            {value}
+                        </InternalLink>
+                    );
+                },
+            },
+        ];
+    }, []);
+
+    const renderContent = () => {
+        if (type === OLAP_STORE_TYPE || type === OLAP_TABLE_TYPE) {
+            return <div className={b('no-data')}>No data</div>;
+        }
+        if (error) {
+            return error.data;
+        }
+        return data && data.length > 0 ? (
+            <div className={b('table')}>
+                <DataTable
+                    columns={tableColumns}
+                    data={data}
+                    settings={TABLE_SETTINGS}
+                    className={b('table')}
+                    theme="internal"
+                />
+            </div>
+        ) : (
+            data
+        );
+    };
+
+    return <div className={b()}>{loading && !wasLoaded ? renderLoader() : renderContent()}</div>;
+}
+
+const mapStateToProps = (state) => {
+    const {loading, data, error, wasLoaded} = state.shardsWorkload;
+    const {Path} = state.schema.currentSchema;
+    const {autorefresh} = state.schema;
+    return {
+        loading,
+        data,
+        error,
+        currentSchemaPath: Path,
+        autorefresh,
+        wasLoaded,
+    };
+};
+
+const mapDispatchToProps = {
+    sendShardQuery,
+    setCurrentSchemaPath,
+    getSchema,
+    setShardQueryOptions,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TopShards);

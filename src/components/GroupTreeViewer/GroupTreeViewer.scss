@@ -1,0 +1,17 @@
+@import '../../styles/react-treeview';
+
+.group-tree-viewer {
+    &__row {
+        display: flex;
+        align-items: center;
+        height: 34px;
+    }
+
+    &__disk {
+        margin: 8px 10px 8px 20px;
+    }
+
+    &__vdisk {
+        margin-right: 25px;
+    }
+}

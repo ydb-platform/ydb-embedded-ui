@@ -1,0 +1,16 @@
+.nv-aside-header-tooltip {
+    &.yc-popup {
+        animation-name: none;
+
+        border: none;
+        box-shadow: none;
+    }
+
+    &__text {
+        padding: 6px 12px;
+
+        color: var(--yc-color-text-light-primary);
+        border-radius: 4px;
+        background-color: var(--yc-color-base-float-heavy);
+    }
+}

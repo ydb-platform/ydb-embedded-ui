@@ -1,0 +1,82 @@
+$popup-width: 700px;
+
+.saved-queries {
+    $block: &;
+    padding: 12px 16px 12px;
+    &__popup-wrapper {
+        border-radius: 4px;
+        width: $popup-width;
+        max-width: $popup-width !important;
+        // max-height: 70vh;
+        overflow: hidden;
+        :nth-child(2) {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        &::before {
+            border-radius: 4px;
+            width: $popup-width;
+        }
+    }
+    &__saved-queries-row {
+        display: flex;
+        align-items: center;
+        padding: 8px 5px;
+        border-bottom: 1px solid var(--yc-color-line-generic);
+        &:hover {
+            color: var(--yc-color-text-link-hover);
+            background: var(--yc-color-base-simple-hover);
+            cursor: pointer;
+            #{$block}__query-controls {
+                display: flex;
+            }
+        }
+        &_header {
+            font-weight: 500;
+            &:hover {
+                color: var(--yc-color-text-primary);
+                background: var(--yc-color-base-background);
+                cursor: auto;
+            }
+        }
+    }
+    &__query-name {
+        margin-right: 8px;
+        flex-basis: 90px;
+        max-width: 90px;
+        flex-shrink: 0;
+        flex-grow: 0;
+        white-space: pre-wrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 500;
+    }
+    &__query-body {
+        flex-grow: 1;
+        white-space: pre;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 75%;
+        &_header {
+            display: flex;
+            justify-content: center;
+        }
+    }
+    &__query-controls {
+        display: none;
+    }
+    &__control-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        color: var(--yc-color-text-hint);
+        &:hover {
+            color: var(--yc-color-text-secondary);
+        }
+    }
+    &__dialog-query-name {
+        font-weight: 500;
+    }
+}

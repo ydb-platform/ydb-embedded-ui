@@ -1,0 +1,42 @@
+@import '../../../../styles/mixins.scss';
+
+.kv-query-explain {
+    &__tabs {
+        background-color: var(--yc-color-base-background);
+    }
+    &__tabs-wrapper {
+        position: sticky;
+        top: 0;
+        background-color: var(--yc-color-base-background);
+        padding-bottom: 20px;
+        z-index: 2;
+    }
+    &__explain-canvas-container {
+        margin-bottom: 20px;
+        overflow-y: auto;
+        &_hidden {
+            display: none;
+        }
+    }
+    &__inspector {
+        @include json-tree-styles();
+        overflow-y: auto;
+        &
+            .json-inspector__leaf.json-inspector__leaf_root.json-inspector__leaf_expanded.json-inspector__leaf_composite {
+            max-width: calc(100% - 50px);
+        }
+    }
+
+    &__ast {
+        margin: 20px 0;
+        white-space: pre-wrap;
+        height: 100%;
+    }
+    &__loader {
+        width: 100%;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

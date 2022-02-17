@@ -1,0 +1,73 @@
+@import '../../styles/mixins.scss';
+
+.tenants {
+    @include flex-container();
+    overflow: auto;
+
+    &__format-label {
+        margin-right: 15px;
+    }
+
+    &__title {
+        text-align: center;
+    }
+
+    &__tooltip {
+        animation: none !important;
+    }
+
+    &__search {
+        width: 450px;
+        margin: 0 15px 0 0;
+    }
+
+    &__tablets {
+        padding: 0 !important;
+
+        .tablets-viewer__grid {
+            grid-gap: 20px;
+        }
+    }
+
+    &__controls {
+        display: flex;
+        justify-content: space-between;
+        margin: 17px 0;
+    }
+
+    &__controls-left {
+        display: flex;
+        align-items: center;
+
+        & > * {
+            margin-right: 25px;
+        }
+    }
+
+    &__table-wrapper {
+        @include flex-container();
+        overflow: auto;
+    }
+
+    &__table-content {
+        @include freeze-nth-column(1);
+
+        @include table-styles;
+        @include table-sticky-styles;
+    }
+
+    &__type-value {
+        margin-right: 10px;
+    }
+
+    &__type-button {
+        visibility: hidden;
+    }
+
+    .data-table__row:hover &__type-button {
+        visibility: visible;
+    }
+    &__name {
+        max-width: 90%;
+    }
+}

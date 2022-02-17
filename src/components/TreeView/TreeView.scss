@@ -1,0 +1,30 @@
+.km-tree-view {
+    & .tree-view_arrow {
+        display: none;
+    }
+
+    &__node-wrapper {
+        display: flex;
+        align-items: center;
+
+        &_clickable {
+            cursor: pointer;
+        }
+    }
+
+    &__arrow-icon {
+        display: flex;
+        justify-content: center;
+        width: 11px;
+        margin-right: 8px;
+        cursor: pointer;
+
+        &_extended {
+            transform: rotate(90deg);
+        }
+
+        & .yc-icon {
+            vertical-align: middle;
+        }
+    }
+}

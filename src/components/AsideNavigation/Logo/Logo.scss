@@ -1,0 +1,44 @@
+.nv-aside-header-logo {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+
+    height: 32px;
+    margin: 12px 0;
+
+    font-family: 'Rubik', sans-serif;
+
+    &__logo-btn-place {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        justify-content: center;
+
+        width: var(--nv-aside-header-min-width);
+    }
+
+    &__logo {
+        vertical-align: middle;
+
+        font-family: 'Rubik', sans-serif;
+        font-size: 16px;
+        line-height: 20px;
+    }
+
+    &__logo-link {
+        &,
+        &:hover,
+        &:active,
+        &:visited,
+        &:focus {
+            text-decoration: none;
+
+            color: inherit;
+            outline: none;
+        }
+    }
+
+    .yc-root &__btn-logo.button2_theme_flat.button2_hovered_yes::before {
+        background-color: transparent;
+    }
+}

@@ -1,0 +1,31 @@
+.km-critical-dialog {
+    width: 252px !important;
+
+    &__warning-icon {
+        margin-right: 16px;
+    }
+
+    &__body {
+        display: flex;
+        align-items: center;
+        padding: 16px 16px 0 16px;
+    }
+
+    & .yc-dialog-footer {
+        padding: 20px 4px 4px 4px;
+    }
+
+    & .yc-dialog-footer__children {
+        display: none;
+    }
+
+    & .yc-dialog-footer__button {
+        margin: 0;
+        min-width: 120px;
+        box-sizing: border-box;
+    }
+
+    & .yc-dialog-footer__button_action_cancel {
+        margin-right: 4px;
+    }
+}

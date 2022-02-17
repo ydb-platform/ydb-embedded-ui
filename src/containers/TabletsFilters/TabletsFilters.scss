@@ -1,0 +1,104 @@
+@import '../../styles/mixins';
+
+.tablets-filters {
+    @include flex-container();
+    overflow: auto;
+    max-height: 400px;
+    // max-width: 400px;
+
+    &__node {
+        font-size: var(--yc-text-body-font-size);
+        line-height: var(--yc-text-body-line-height);
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__node-meta {
+        color: var(--yc-color-text-secondary);
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+
+        &_overall {
+            margin: 15px 20px;
+
+            .yc-progress {
+                width: 300px;
+                margin: 0;
+            }
+        }
+    }
+
+    &__label {
+        font-size: var(--yc-text-body2-font-size);
+        line-height: var(--yc-text-body2-line-height);
+        font-weight: 500;
+        text-transform: uppercase;
+        margin-right: 16px;
+
+        &_overall {
+            margin-right: 15px;
+        }
+    }
+
+    &__items {
+        display: flex;
+        flex-wrap: wrap;
+        flex: 1 1 auto;
+        overflow: auto;
+        padding: 5px 20px;
+    }
+
+    &__items-wrapper {
+        overflow: auto;
+    }
+
+    &__filters {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+        padding: 0 20px;
+    }
+
+    &__filter-label {
+        margin-right: 15px;
+        white-space: nowrap;
+    }
+
+    &__filter-wrapper {
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+    }
+
+    &__filter-control {
+        margin-right: 10px;
+        min-width: 100px;
+        max-width: 200px;
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+
+    &__tablet {
+        margin-bottom: 2px;
+    }
+
+    &__empty-message {
+        display: flex;
+        justify-content: center;
+    }
+
+    &__tenant {
+        padding: 20px 20px 10px 20px;
+    }
+
+    .tablet {
+        display: inline-block;
+        text-align: center;
+        line-height: 18px;
+    }
+}

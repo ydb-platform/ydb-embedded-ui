@@ -1,0 +1,126 @@
+const SECOND = 1000;
+
+export const CLUSTER_AUTO_RELOAD_INTERVAL = 10 * SECOND;
+export const TENANT_AUTO_RELOAD_INTERVAL = 10 * SECOND;
+export const TENANTS_AUTO_RELOAD_INTERVAL = 10 * SECOND;
+export const STORAGE_AUTO_RELOAD_INTERVAL = 10 * SECOND;
+export const GROUP_AUTO_RELOAD_INTERVAL = 10 * SECOND;
+export const NODE_AUTO_RELOAD_INTERVAL = 10 * SECOND;
+export const PDISK_AUTO_RELOAD_INTERVAL = 10 * SECOND;
+export const VDISK_AUTO_RELOAD_INTERVAL = 10 * SECOND;
+export const AUTO_RELOAD_INTERVAL = 10 * SECOND;
+export const HEALTHCHECK_RELOAD_INTERVAL = 10 * SECOND;
+export const MEGABYTE = 1000000;
+export const TERABYTE = 1000000000000;
+export const GROUP = 'group';
+
+export const DAY_IN_SECONDS = 24 * 60 * 60;
+
+export const TABLET_STATES = {
+    TABLET_VOLATILE_STATE_UNKNOWN: 'unknown',
+    TABLET_VOLATILE_STATE_STOPPED: 'stopped',
+    TABLET_VOLATILE_STATE_BOOTING: 'booting',
+    TABLET_VOLATILE_STATE_STARTING: 'starting',
+    TABLET_VOLATILE_STATE_RUNNING: 'running',
+    TABLET_VOLATILE_STATE_BLOCKED: 'blocked',
+};
+
+export const TABLET_COLORS = {
+    Created: 'gray',
+    ResolveStateStorage: 'lightgray',
+    Candidate: 'lightgray',
+    BlockBlobStorage: 'lightgray',
+    RebuildGraph: 'yellow',
+    Restored: 'yellow',
+    Discover: 'orange',
+    Lock: 'lightblue',
+    Dead: 'black',
+    Active: 'lightgreen',
+};
+
+export const TABLET_COLOR_TO_STATES = {
+    Red: [
+        'Created',
+        'ResolveStateStorage',
+        'Candidate',
+        'BlockBlobStorage',
+        'WriteZeroEntry',
+        'Restored',
+        'Discover',
+        'Lock',
+        'Dead',
+    ],
+    Orange: ['RebuildGraph'],
+    Yellow: ['ResolveMaster', 'ResolveLeader'],
+    Green: ['Deleted', 'Active'],
+};
+
+export const TABLETS_STATES = [
+    'Active',
+    'Deleted',
+    'Created',
+    'ResolveStateStorage',
+    'Candidate',
+    'BlockBlobStorage',
+    'WriteZeroEntry',
+    'Restored',
+    'Discover',
+    'Lock',
+    'Dead',
+    'RebuildGraph',
+    'ResolveLeader',
+];
+
+export const TxAllocator = 'TxAllocator';
+
+export const TABLET_SYMBOLS = {
+    OldTxProxy: 'P',
+    TxProxy: 'P',
+    BSController: 'BS',
+    Dummy: 'DY',
+    RTMRPartition: 'RP',
+    PersQueueReadBalancer: 'PB',
+    Cms: 'CM',
+    BlockStorePartition: 'BP',
+    BlockStoreVolume: 'BV',
+    Console: 'CN',
+    TenantSlotBroker: 'TB',
+};
+
+export const getTabletLabel = (type) => {
+    if (!type) {
+        return;
+    }
+    const defaultValue = type.match(/[A-Z]/g).join('');
+
+    return TABLET_SYMBOLS[type] || defaultValue;
+};
+
+export const LOAD_AVERAGE_TIME_INTERVALS = ['1 min', '5 min', '15 min'];
+
+export const PDISK_CATEGORIES = {
+    0: 'HDD',
+    1: 'SSD',
+};
+
+export const COLORS_PRIORITY = {
+    green: 5,
+    yellow: 4,
+    orange: 3,
+    red: 2,
+    black: 1,
+    gray: 1,
+};
+
+export const ALL = 'All';
+export const PROBLEMS = 'Problems';
+
+export const THEME_KEY = 'theme';
+export const SAVED_QUERIES_KEY = 'saved_queries';
+export const DATA_QA_TUNE_COLUMNS_POPUP = 'tune-columns-popup';
+export const SELECTED_COLUMNS_KEY = 'selectedColumns';
+export const defaultUserSettings = {
+    [THEME_KEY]: 'light',
+};
+export const DEFAULT_SIZE_RESULT_PANE_KEY = 'default-size-result-pane';
+export const DEFAULT_SIZE_SHEMA_TREE_PANE_KEY = 'default-size-schema-tree-pane';

@@ -1,0 +1,341 @@
+import React from 'react';
+import cn from 'bem-cn-lite';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+import _ from 'lodash';
+
+import {Link} from 'react-router-dom';
+import {Loader, Checkbox} from '@yandex-cloud/uikit';
+
+import NodeNetwork from './NodeNetwork/NodeNetwork';
+import Icon from '../../../components/Icon/Icon';
+import ProblemFilter, {problemFilterType} from '../../../components/ProblemFilter/ProblemFilter';
+
+import {getNetworkInfo} from '../../../store/reducers/network';
+import {hideTooltip, showTooltip} from '../../../store/reducers/tooltip';
+import {ALL, PROBLEMS} from '../../../utils/constants';
+import routes, {createHref} from '../../../routes';
+import {changeFilter} from '../../../store/reducers/settings';
+
+import './Network.scss';
+
+const b = cn('network');
+
+class Network extends React.Component {
+    static propTypes = {
+        getNetworkInfo: PropTypes.func,
+        netWorkInfo: PropTypes.object,
+        hideTooltip: PropTypes.func,
+        showTooltip: PropTypes.func,
+        error: PropTypes.object,
+        wasLoaded: PropTypes.bool,
+        loading: PropTypes.bool,
+        path: PropTypes.string,
+        filter: problemFilterType,
+        changeFilter: PropTypes.func,
+    };
+
+    static defaultProps = {};
+
+    static renderLoader() {
+        return (
+            <div className="loader">
+                <Loader size="l" />
+            </div>
+        );
+    }
+
+    state = {
+        howNodeSeeOtherNodesSortType: '',
+        howOthersSeeNodeSortType: '',
+        howNodeSeeOtherSearch: '',
+        howOtherSeeNodeSearch: '',
+        hoveredNode: undefined,
+        clickedNode: undefined,
+        highlightedNodes: [],
+        showId: false,
+        showRacks: false,
+    };
+
+    componentDidMount() {
+        const {path} = this.props;
+        this.props.getNetworkInfo(path);
+    }
+
+    onChange = (field, num) => {
+        this.setState({[field]: num});
+    };
+
+    handleSortChange = (sortItem) => {
+        this.setState({sort: sortItem});
+    };
+
+    handleNodeClickWrap = (nodeInfo) => {
+        return () => {
+            const {clickedNode} = this.state;
+            const {NodeId} = nodeInfo;
+            if (!clickedNode) {
+                this.setState({
+                    clickedNode: nodeInfo,
+                    rightNodes: this.groupNodesByField(nodeInfo.Peers, 'NodeType'),
+                });
+            } else if (NodeId === clickedNode.nodeId) {
+                this.setState({clickedNode: undefined});
+            } else {
+                this.setState({
+                    clickedNode: nodeInfo,
+                    rightNodes: this.groupNodesByField(nodeInfo.Peers, 'NodeType'),
+                });
+            }
+        };
+    };
+
+    groupNodesByField = (nodes, field) => {
+        return _.reduce(
+            nodes,
+            (acc, node) => {
+                if (!acc[node[field]]) {
+                    acc[node[field]] = [node];
+                } else {
+                    acc[node[field]].push(node);
+                }
+                return acc;
+            },
+            {},
+        );
+    };
+
+    getConnectedNodesCount = (peers) => {
+        const res = peers?.reduce((acc, item) => (item.Connected ? acc + 1 : acc), 0);
+        return res;
+    };
+
+    renderNodes = (nodes, isRight) => {
+        const {showId, showRacks, clickedNode} = this.state;
+        let problemNodesCount = 0;
+        const {showTooltip, hideTooltip, filter} = this.props;
+        const result = Object.keys(nodes).map((key, j) => {
+            const nodesGroupedByRack = this.groupNodesByField(nodes[key], 'Rack');
+            return (
+                <div key={j} className={b('nodes-container', {right: isRight})}>
+                    <div className={b('nodes-title')}>{key} nodes</div>
+                    <div className={b('nodes')}>
+                        {showRacks
+                            ? Object.keys(nodesGroupedByRack).map((key, i) => (
+                                  <div key={i} className={b('rack-column')}>
+                                      <div className={b('rack-index')}>
+                                          {key === 'undefined' ? '?' : key}
+                                      </div>
+                                      {/* eslint-disable-next-line array-callback-return */}
+                                      {nodesGroupedByRack[key].map((nodeInfo, index) => {
+                                          let capacity, connected;
+                                          if (!isRight && nodeInfo?.Peers) {
+                                              capacity = Object.keys(nodeInfo?.Peers).length;
+                                              connected = this.getConnectedNodesCount(
+                                                  nodeInfo?.Peers,
+                                              );
+                                          }
+
+                                          if (
+                                              (filter === PROBLEMS && capacity !== connected) ||
+                                              filter === ALL ||
+                                              isRight
+                                          ) {
+                                              problemNodesCount++;
+                                              return (
+                                                  <NodeNetwork
+                                                      key={index}
+                                                      nodeId={nodeInfo.NodeId}
+                                                      showID={showId}
+                                                      rack={nodeInfo.Rack}
+                                                      status={nodeInfo.ConnectStatus}
+                                                      capacity={capacity}
+                                                      connected={connected}
+                                                      onMouseEnter={showTooltip}
+                                                      onMouseLeave={hideTooltip}
+                                                      onClick={
+                                                          !isRight &&
+                                                          this.handleNodeClickWrap(nodeInfo)
+                                                      }
+                                                      isBlurred={
+                                                          !isRight &&
+                                                          clickedNode &&
+                                                          clickedNode.NodeId !== nodeInfo.NodeId
+                                                      }
+                                                  />
+                                              );
+                                          }
+                                      })}
+                                  </div>
+                              ))
+                            : // eslint-disable-next-line array-callback-return
+                              nodes[key].map((nodeInfo, index) => {
+                                  let capacity, connected;
+                                  if (!isRight) {
+                                      capacity = nodeInfo?.Peers?.length;
+                                      connected = this.getConnectedNodesCount(nodeInfo?.Peers);
+                                  }
+
+                                  if (
+                                      (filter === PROBLEMS && capacity !== connected) ||
+                                      filter === ALL ||
+                                      isRight
+                                  ) {
+                                      problemNodesCount++;
+                                      return (
+                                          <NodeNetwork
+                                              key={index}
+                                              nodeId={nodeInfo.NodeId}
+                                              showID={showId}
+                                              rack={nodeInfo.Rack}
+                                              status={nodeInfo.ConnectStatus}
+                                              capacity={nodeInfo?.Peers && nodeInfo?.Peers.length}
+                                              connected={
+                                                  nodeInfo?.Peers &&
+                                                  this.getConnectedNodesCount(nodeInfo?.Peers)
+                                              }
+                                              onMouseEnter={showTooltip}
+                                              onMouseLeave={hideTooltip}
+                                              onClick={
+                                                  !isRight && this.handleNodeClickWrap(nodeInfo)
+                                              }
+                                              isBlurred={
+                                                  !isRight &&
+                                                  clickedNode &&
+                                                  clickedNode.NodeId !== nodeInfo.NodeId
+                                              }
+                                          />
+                                      );
+                                  }
+                              })}
+                    </div>
+                </div>
+            );
+        });
+
+        if (filter === PROBLEMS && problemNodesCount === 0) {
+            return <div className="no-problem" />;
+        } else {
+            return result;
+        }
+    };
+
+    renderContent = () => {
+        const {netWorkInfo, filter, changeFilter} = this.props;
+
+        const {showId, showRacks, rightNodes} = this.state;
+        const {clickedNode} = this.state;
+
+        const nodes = netWorkInfo.Tenants && netWorkInfo.Tenants[0].Nodes;
+        const nodesGroupedByType = this.groupNodesByField(nodes, 'NodeType');
+
+        if (!nodes?.length) {
+            return <div className="error">no nodes data</div>;
+        }
+
+        return (
+            <div className={b()}>
+                <div className={b('inner')}>
+                    <div className={b('nodes-row')}>
+                        <div className={b('left')}>
+                            <div className={b('controls-wrapper')}>
+                                <div className={b('controls')}>
+                                    <ProblemFilter
+                                        value={filter}
+                                        onChange={changeFilter}
+                                        className={b('problem-filter')}
+                                    />
+                                    <div className={b('checkbox-wrapper')}>
+                                        <Checkbox
+                                            onUpdate={() => this.onChange('showId', !showId)}
+                                            checked={showId}
+                                        >
+                                            ID
+                                        </Checkbox>
+                                    </div>
+                                    <div className={b('checkbox-wrapper')}>
+                                        <Checkbox
+                                            onUpdate={() => this.onChange('showRacks', !showRacks)}
+                                            checked={showRacks}
+                                        >
+                                            Racks
+                                        </Checkbox>
+                                    </div>
+                                </div>
+                            </div>
+                            {this.renderNodes(nodesGroupedByType)}
+                        </div>
+
+                        <div className={b('right')}>
+                            {clickedNode ? (
+                                <div>
+                                    <div className={b('label')}>
+                                        Connectivity of node{' '}
+                                        <Link
+                                            className={b('link')}
+                                            to={createHref(routes.node, {
+                                                id: clickedNode.NodeId,
+                                                activeTab: 'storage',
+                                            })}
+                                        >
+                                            {clickedNode.NodeId}
+                                        </Link>{' '}
+                                        to other nodes
+                                    </div>
+                                    <div className={b('nodes-row')}>
+                                        {this.renderNodes(rightNodes, true)}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className={b('placeholder')}>
+                                    <div className={b('placeholder-img')}>
+                                        <Icon
+                                            name="network-placeholder"
+                                            viewBox="0 0 221 204"
+                                            width={221}
+                                            height={204}
+                                        />
+                                    </div>
+
+                                    <div className={b('placeholder-text')}>
+                                        Select node to see its connectivity to other nodes
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    render() {
+        const {loading, wasLoaded, error} = this.props;
+        if (loading && !wasLoaded) {
+            return Network.renderLoader();
+        } else if (error) {
+            return <div>{error.statusText}</div>;
+        } else {
+            return this.renderContent();
+        }
+    }
+}
+
+const mapStateToProps = (state) => {
+    const {wasLoaded, loading, data: netWorkInfo} = state.network;
+    return {
+        netWorkInfo,
+        wasLoaded,
+        loading,
+        filter: state.settings.problemFilter,
+    };
+};
+
+const mapDispatchToProps = {
+    getNetworkInfo,
+    hideTooltip,
+    showTooltip,
+    changeFilter,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Network);

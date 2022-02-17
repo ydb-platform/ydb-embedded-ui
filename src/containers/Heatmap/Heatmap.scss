@@ -1,0 +1,94 @@
+@import '../../styles/mixins';
+
+.heatmap {
+    @include flex-container();
+    overflow: auto;
+
+    &__loader {
+        display: flex;
+        flex: 1 1 auto;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__limits {
+        display: flex;
+        align-items: center;
+        margin-left: 20px;
+    }
+    &__limits-block {
+        display: flex;
+        margin-right: 10px;
+    }
+    &__limits-title {
+        color: var(--yc-color-text-secondary);
+        margin-right: 5px;
+    }
+    &__limits-value {
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+
+        &_overall {
+            margin: 15px 20px;
+
+            .yc-progress {
+                width: 300px;
+                margin: 0;
+            }
+        }
+    }
+
+    &__label {
+        font-size: var(--yc-text-body2-font-size);
+        line-height: var(--yc-text-body2-line-height);
+        font-weight: 500;
+        text-transform: uppercase;
+        margin-right: 16px;
+
+        &_overall {
+            margin-right: 15px;
+        }
+    }
+
+    &__items {
+        overflow: auto;
+    }
+    &__canvas-container {
+        overflow: auto;
+        cursor: pointer;
+    }
+
+    &__filters {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+    }
+
+    &__filter-control {
+        margin-right: 10px;
+        min-width: 100px;
+        max-width: 200px;
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+    &__sort-checkbox {
+        margin-left: 10px;
+    }
+    &__histogram-checkbox {
+        margin-left: 10px;
+    }
+
+    &__row {
+        display: flex;
+        margin-bottom: 2px;
+    }
+
+    .tablet {
+        margin-bottom: 2px;
+    }
+}

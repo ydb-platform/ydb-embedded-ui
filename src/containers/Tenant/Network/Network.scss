@@ -1,0 +1,145 @@
+@import '../../../styles/mixins.scss';
+
+.network {
+    @include container-fluid();
+    font-size: var(--yc-text-body2-font-size);
+    line-height: var(--yc-text-body2-line-height);
+    max-width: 1305px;
+    display: flex;
+    @include flex-container();
+    overflow: auto;
+    justify-content: space-between;
+
+    &__problem-filter {
+        margin-right: 15px;
+    }
+
+    &__nodes-row {
+        display: flex;
+        @include flex-container();
+        overflow: auto;
+        flex-direction: row;
+        height: 100%;
+        align-items: flex-start;
+    }
+
+    &__inner {
+        @include flex-container();
+        overflow: auto;
+    }
+
+    &__right {
+        width: 100%;
+        height: 100%;
+        padding-left: 55px;
+    }
+
+    &__left {
+        padding-right: 55px;
+        border-right: 1px solid var(--yc-color-base-generic-accent);
+        height: 100%;
+    }
+
+    &__placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        flex-grow: 1;
+        height: 100%;
+    }
+
+    &__placeholder-text {
+        margin-top: 15px;
+    }
+
+    &__placeholder-img {
+        color: transparent;
+    }
+
+    &__nodes {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    &__nodes-container {
+        min-width: 325px;
+
+        &_right {
+            margin-right: 60px;
+        }
+    }
+
+    &__nodes-title {
+        color: var(--yc-color-text-secondary);
+        font-size: var(--yc-text-body2-font-size);
+        line-height: var(--yc-text-body2-line-height);
+        border-bottom: 1px solid var(--yc-color-base-generic-accent);
+        margin: 0 0 15px 0;
+    }
+
+    &__link {
+        color: var(--yc-color-base-special);
+        text-decoration: none;
+    }
+
+    &__title {
+        font-size: var(--yc-text-body-font-size);
+        font-weight: 500;
+        line-height: var(--yc-text-body-line-height);
+        margin: 20px 0;
+    }
+
+    &__checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+        label {
+            white-space: nowrap;
+        }
+    }
+
+    &__label {
+        margin: 25px 0 16px 0;
+    }
+
+    &__controls {
+        display: flex;
+        align-items: center;
+        margin-bottom: 13px;
+        margin-top: 15px;
+        margin-right: 144px;
+
+        & .radiobox {
+            margin-right: 15px;
+        }
+    }
+
+    &__controls-wrapper {
+        display: flex;
+        align-items: center;
+        @include flex-container();
+        flex-direction: row;
+    }
+
+    &__select {
+        max-width: 115px;
+        margin: 0 15px;
+    }
+
+    &__rack-column {
+        border-radius: 4px;
+        background-color: rgba(0, 0, 0, 0.07);
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        padding: 2px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+
+        .node-network {
+            margin-right: 0;
+        }
+    }
+}

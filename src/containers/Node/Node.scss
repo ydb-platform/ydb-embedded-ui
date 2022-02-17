@@ -1,0 +1,34 @@
+@import '../../styles/mixins';
+
+.node {
+    @include flex-container();
+    overflow: auto;
+
+    &__content {
+        @include flex-container();
+        overflow: auto;
+    }
+
+    &__storage {
+        padding-left: 20px;
+        overflow: auto;
+        height: 100%;
+    }
+
+    &__tabs {
+        padding: 0 15px;
+    }
+
+    &__tab {
+        text-decoration: none;
+        margin-right: 40px;
+
+        &:last-child {
+            margin-right: 0;
+        }
+
+        &:first-letter {
+            text-transform: uppercase;
+        }
+    }
+}

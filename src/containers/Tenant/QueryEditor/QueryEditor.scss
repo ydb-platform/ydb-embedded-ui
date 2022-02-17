@@ -1,0 +1,71 @@
+@import '../../../styles/mixins.scss';
+
+.query-editor {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    height: 100%;
+    position: relative;
+
+    & .yc-button__text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__monaco {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    &__monaco-wrapper {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+    }
+
+    &__pane-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+    }
+
+    &__controls {
+        display: flex;
+        align-items: flex-end;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--yc-color-line-generic);
+        min-height: 28px;
+
+        & > * {
+            margin-right: 16px;
+        }
+    }
+
+    &__control-run {
+        display: flex;
+        align-items: center;
+    }
+
+    &__run-switcher {
+        margin-left: 1px;
+    }
+
+    &__history-controls {
+        display: flex;
+        align-items: center;
+    }
+
+    &__history-label {
+        margin-right: 8px;
+    }
+
+    @include query-data-table;
+
+    &__cell {
+        @include cell-container;
+    }
+}

@@ -1,0 +1,88 @@
+@import '../../styles/mixins.scss';
+
+.tablet-page {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+
+    $_: &;
+
+    &__tenant {
+        margin-bottom: 20px;
+    }
+
+    &__pane-wrapper {
+        display: flex;
+    }
+
+    &__left-pane {
+        margin-right: 70px;
+    }
+    &__history-title {
+        @include body2-typography();
+        margin-bottom: 15px;
+    }
+
+    &__placeholder {
+        display: flex;
+        flex: 1 1 auto;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+
+        &_header {
+            margin-bottom: 20px;
+
+            & #{$_}__link {
+                margin: 0 10px 0 5px;
+            }
+        }
+    }
+
+    &__title {
+        font-size: var(--yc-text-body2-font-size);
+        line-height: var(--yc-text-body2-line-height);
+        font-weight: 500;
+        text-transform: uppercase;
+        margin-right: 16px;
+    }
+
+    .info-viewer__items {
+        grid-template-columns: auto;
+    }
+
+    &__link {
+        @extend .link;
+    }
+
+    &__controls {
+        margin: 20px 0 15px;
+    }
+
+    &__control {
+        margin-right: 15px;
+    }
+
+    &__links {
+        display: flex;
+        margin: 5px 0 10px 0;
+        padding: 0;
+        list-style-type: none;
+
+        & > * {
+            margin: 0 10px 0 0;
+        }
+    }
+
+    &__top-label {
+        font-size: var(--yc-text-body2-font-size);
+        line-height: var(--yc-text-body2-line-height);
+        font-weight: 500;
+        text-transform: uppercase;
+        margin-right: 16px;
+    }
+}

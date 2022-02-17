@@ -1,0 +1,43 @@
+.kv-navigation {
+    &__internal-user {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-left: 16px;
+
+        line-height: var(--yc-text-body2-line-height);
+    }
+    &__user-info-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+    &__ydb-internal-user-title {
+        font-weight: 500;
+    }
+    &__user-icon {
+        color: var(--yc-color-text-misc);
+    }
+    &__ydb-user-wrapper {
+        width: 300px;
+        padding: 10px;
+    }
+}
+
+.nv-aside-header-footer-item__popup {
+    .nv-user-menu-content__organizations {
+        margin-top: 19px;
+        margin-left: 0;
+        .yc-menu__item {
+            cursor: auto;
+        }
+    }
+
+    .yc-menu__item {
+        //stylelint-disable-next-line declaration-no-important
+        padding-right: 0 !important;
+        &:hover {
+            background-color: unset;
+        }
+    }
+}

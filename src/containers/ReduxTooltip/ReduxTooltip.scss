@@ -1,0 +1,67 @@
+@import '../../styles/mixins.scss';
+
+.popup2 {
+    animation: none !important;
+    max-width: 300px;
+}
+
+.pool-tooltip,
+.tablet-tooltip,
+.node-tootltip,
+.tabletsOverall-tooltip,
+.histogram-tooltip {
+    padding: 10px;
+
+    &__label {
+        padding-right: 15px;
+        color: var(--yc-color-text-secondary);
+    }
+}
+
+.json-tooltip {
+    padding: 20px 20px 20px 0;
+
+    &__inspector {
+        @include json-tree-styles();
+
+        :not(.json-inspector__leaf_expanded).json-inspector__leaf_composite:before {
+            content: '';
+        }
+        .json-inspector__leaf_expanded.json-inspector__leaf_composite:before {
+            content: '';
+        }
+
+        & .json-inspector {
+            &__line:hover:after {
+                background: transparent;
+            }
+            &__show-original:hover:after,
+            &__show-original:hover:before {
+                color: transparent;
+            }
+
+            &__value_helper {
+                display: none;
+            }
+        }
+    }
+}
+
+.cell-tooltip {
+    padding: 10px;
+    word-break: break-word;
+}
+
+.tablet-tooltip {
+    padding: 10px;
+    &__label {
+        padding-right: 15px;
+        color: var(--yc-color-text-secondary);
+    }
+
+    &__value {
+        &_blue {
+            color: var(--yc-color-base-special);
+        }
+    }
+}

@@ -1,0 +1,42 @@
+.km-tip-popup {
+    background-color: var(--yc-color-base-background);
+    z-index: 1;
+    max-width: 250px;
+    border-radius: 4px;
+    padding: 16px 20px 20px 16px;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--yc-color-text-primary);
+    position: relative;
+
+    &__wrapper {
+        border-radius: 4px;
+        border: 1px solid var(--yc-color-text-info) !important;
+
+        .popup2__tail {
+            border: 1px solid var(--yc-color-text-info) !important;
+            background-color: var(--yc-color-base-background);
+        }
+    }
+
+    &__cross-icon-wrapper {
+        position: absolute;
+        top: 16px;
+        right: 12px;
+    }
+
+    &__cross-icon {
+        color: var(--yc-color-text-secondary);
+    }
+
+    &__title {
+        font-size: 17px;
+        line-height: 24px;
+        margin-bottom: 8px;
+        padding-right: 36px;
+    }
+
+    &__content {
+        color: var(--yc-color-text-complementary);
+    }
+}

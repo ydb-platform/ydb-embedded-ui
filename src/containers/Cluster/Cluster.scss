@@ -1,0 +1,52 @@
+@import '../../styles/mixins.scss';
+
+.cluster {
+    @include flex-container();
+    padding: 0 20px;
+    overflow: auto;
+
+    &__tab {
+        text-decoration: none;
+
+        &:first-letter {
+            text-transform: uppercase;
+        }
+    }
+
+    &__format-label {
+        margin-right: 15px;
+    }
+
+    &__title {
+        text-align: center;
+    }
+
+    &__tooltip {
+        animation: none !important;
+    }
+
+    &__search {
+        width: 255px;
+        margin: 0 15px 0 0;
+    }
+
+    &__tablets {
+        padding: 0 !important;
+
+        .tablets-viewer__grid {
+            grid-template-columns: 125px;
+        }
+    }
+
+    &__controls {
+        display: flex;
+        justify-content: space-between;
+        margin: 17px 0;
+    }
+
+    &__table-wrapper {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+    }
+}

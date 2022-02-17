@@ -1,0 +1,32 @@
+@import '../../styles/mixins';
+
+.full-group-viewer {
+    @include container-fluid();
+    @include flex-container();
+    overflow: auto;
+
+    &__section {
+        min-width: 315px;
+        display: inline-block;
+        margin-right: 40px;
+        border-radius: 5px;
+
+        .info-viewer__label {
+            min-width: 75px;
+        }
+    }
+
+    .info-viewer__items {
+        grid-template-columns: max-content;
+    }
+
+    .data-table {
+        margin-top: 50px;
+        @include flex-container();
+        overflow: auto;
+    }
+
+    .data-table__table {
+        width: 100%;
+    }
+}

@@ -1,0 +1,90 @@
+@import '../../../../styles/mixins';
+
+.schema-main {
+    display: flex;
+    flex: 1 1 auto;
+    overflow: auto;
+    position: relative;
+
+    &__tree {
+        display: flex;
+        flex: 0 0 auto;
+        padding-left: 15px;
+        padding-top: 15px;
+        overflow: auto;
+        height: 100%;
+
+        .tree-view_item {
+            padding: 2px 0;
+            margin: 0;
+        }
+
+        & > div > .tree-view {
+            padding-bottom: 15px;
+        }
+    }
+    &__content {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        overflow: auto;
+        height: 100%;
+    }
+    &__info-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 15px 5px;
+    }
+    &__info {
+        display: flex;
+        align-items: center;
+    }
+    &__entity-type {
+        padding: 3px 8px;
+        margin-right: 5px;
+        border-radius: 3px;
+        background-color: var(--yc-color-base-generic);
+        text-transform: lowercase;
+
+        &_error {
+            padding: 3px 0;
+            background-color: transparent;
+        }
+    }
+
+    &__tabs {
+        padding: 0 15px;
+    }
+
+    &__tab-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        padding: 0 15px;
+        overflow-y: auto;
+    }
+
+    &__hosts {
+        padding: 15px;
+    }
+    &__hosts-message {
+        @include body2-typography();
+        margin-bottom: 10px;
+    }
+    &__hosts-list {
+        margin: 10px 0;
+        padding-left: 7px;
+        list-style-type: none;
+    }
+    &__host-link {
+        font-size: var(--yc-text-body2-font-size);
+        line-height: var(--yc-text-body2-line-height);
+        margin-bottom: 3px;
+    }
+
+    &__clipboard-button {
+        margin-left: 5px;
+        color: var(--yc-color-text-secondary);
+    }
+}

@@ -1,0 +1,23 @@
+.top-shards {
+    height: 100%;
+    padding-top: 10px;
+
+    background-color: var(--yc-color-base-background);
+    &__loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        height: 100%;
+    }
+
+    &__table {
+        overflow: auto;
+
+        margin-top: 5px;
+    }
+
+    &__no-data {
+        margin-top: 5px;
+    }
+}

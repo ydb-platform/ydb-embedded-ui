@@ -1,0 +1,26 @@
+.global-storage-groups {
+    &__vdisks-wrapper {
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        justify-content: center;
+    }
+    &__pool-name-wrapper {
+        display: flex;
+        align-items: flex-end;
+    }
+    &__pool-name {
+        display: inline-block;
+        overflow: hidden;
+
+        max-width: 150px;
+
+        text-overflow: ellipsis;
+    }
+    &__group-id {
+        font-weight: 500;
+    }
+    &__tooltip {
+        word-break: break-all;
+    }
+}

@@ -1,0 +1,40 @@
+@import '../../styles/mixins.scss';
+
+.vdisk {
+    @include container-fluid();
+    padding: 20px;
+
+    .info-viewer__items {
+        grid-template-columns: max-content;
+    }
+
+    &__row {
+        display: flex;
+    }
+
+    &__column {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__title {
+        font-size: var(--yc-text-body2-font-size);
+        line-height: var(--yc-text-body2-line-height);
+        font-weight: 500;
+        text-transform: uppercase;
+        margin-right: 16px;
+    }
+
+    &__section {
+        padding: 15px 0;
+
+        .info-viewer__label {
+            min-width: 205px;
+        }
+    }
+
+    &__link {
+        color: var(--yc-color-base-special);
+        text-decoration: none;
+    }
+}

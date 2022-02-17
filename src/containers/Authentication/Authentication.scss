@@ -1,0 +1,37 @@
+.authentication {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100%;
+
+    &__form-wrapper {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        flex-shrink: 0;
+        justify-content: center;
+
+        width: 50%;
+        min-width: 320px;
+        height: 50%;
+        min-height: 170px;
+
+        border-radius: 5px;
+        background-color: var(--yc-color-base-info);
+        box-shadow: 0px 1px 5px var(--yc-color-sfx-shadow);
+    }
+
+    &__field-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        width: 250px;
+        margin-bottom: 10px;
+
+        &:last-child {
+            margin-bottom: 16px;
+        }
+    }
+}

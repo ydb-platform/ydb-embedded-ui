@@ -1,0 +1,41 @@
+.schema-node {
+    display: flex;
+    align-items: center;
+
+    .tree-view_item {
+        padding: 5px 0;
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .tree-view_children {
+        padding-left: 15px;
+        margin: 0;
+    }
+
+    &__label {
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        cursor: pointer;
+        padding: 0 5px;
+        border-radius: 3px;
+        height: 20px;
+
+        &:hover {
+            background-color: var(--yc-color-base-info-hover);
+        }
+    }
+
+    &_active > .tree-view > .tree-view_item &__label {
+        background-color: var(--yc-color-base-info);
+    }
+
+    &__name {
+        display: inline;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        margin-left: 6px;
+    }
+}

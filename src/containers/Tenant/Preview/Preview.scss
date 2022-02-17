@@ -1,0 +1,20 @@
+@import '../../../styles/mixins.scss';
+
+.kv-preview {
+    &__message-container {
+        padding: 15px 0;
+    }
+
+    &__loader-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    @include query-data-table;
+
+    &__cell {
+        @include cell-container;
+    }
+}

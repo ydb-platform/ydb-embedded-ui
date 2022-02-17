@@ -1,0 +1,24 @@
+@import '../../../../styles/mixins.scss';
+
+.kv-query-result {
+    &__result {
+        overflow: auto;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        & .data-table__table-wrapper {
+            padding-bottom: 0;
+        }
+    }
+    &__tabs {
+        position: sticky;
+        top: 0;
+        background-color: var(--yc-color-base-background);
+        z-index: 2;
+    }
+    &__inspector {
+        @include json-tree-styles();
+        max-width: calc(100% - 50px);
+    }
+}

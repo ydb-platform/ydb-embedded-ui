@@ -1,0 +1,40 @@
+.pdisk-viewer {
+    display: flex;
+    align-items: center;
+
+    &__item,
+    &__size {
+        margin-right: 24px;
+        color: var(--yc-color-text-complementary);
+        font-size: var(--yc-text-body2-font-size);
+        line-height: 0;
+    }
+
+    &__item .entity-status {
+        min-width: 100px;
+    }
+
+    &__item .entity-status a {
+        overflow: initial;
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+    }
+
+    &__size {
+        width: 120px;
+        color: var(--yc-color-text-complementary);
+        font-size: 10px;
+    }
+
+    &__label {
+        margin: 0 5px;
+        &_link {
+            color: var(--yc-color-base-special);
+            text-decoration: none;
+            display: inline-block;
+        }
+    }
+}

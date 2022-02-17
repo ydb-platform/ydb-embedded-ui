@@ -1,0 +1,12 @@
+.kv-truncated-query {
+    word-break: break-word;
+    white-space: pre;
+    vertical-align: top;
+    max-width: 100%;
+
+    &_color {
+        &_secondary {
+            color: var(--yc-color-text-secondary);
+        }
+    }
+}

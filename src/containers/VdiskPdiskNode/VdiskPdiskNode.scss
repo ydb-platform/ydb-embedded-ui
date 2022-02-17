@@ -1,0 +1,60 @@
+@import '../../styles/mixins.scss';
+
+.vdisk-pdisk-node {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    grid-gap: 20px;
+
+    padding: 20px;
+
+    .info-viewer__items {
+        grid-template-columns: max-content;
+    }
+
+    &__row {
+        display: flex;
+    }
+
+    &__column {
+        display: flex;
+        flex-direction: column;
+
+        margin-bottom: 15px;
+    }
+
+    &__title {
+        margin-right: 16px;
+
+        text-transform: uppercase;
+
+        font-size: var(--yc-text-body2-font-size);
+        font-weight: 500;
+        line-height: var(--yc-text-body2-line-height);
+    }
+
+    &__section {
+        padding: 15px 0;
+
+        .info-viewer__label {
+            min-width: 205px;
+        }
+    }
+
+    &__link {
+        text-decoration: none;
+
+        color: var(--yc-color-base-special);
+    }
+    &__loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+        margin-top: 50px;
+    }
+    .info-viewer__row {
+        align-items: flex-end;
+    }
+    @include container-fluid();
+}

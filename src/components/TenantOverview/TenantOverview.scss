@@ -1,0 +1,75 @@
+.tenant-overview {
+    padding: 15px;
+
+    &__top {
+        display: flex;
+        align-items: center;
+
+        margin-bottom: 10px;
+    }
+
+    &__top-label {
+        margin-right: 16px;
+
+        text-transform: uppercase;
+
+        font-size: var(--yc-text-body2-font-size);
+        font-weight: 500;
+        line-height: var(--yc-text-body2-line-height);
+    }
+
+    &__common-info {
+        display: flex;
+        align-items: stretch;
+        justify-content: flex-start;
+
+        padding-left: 12px;
+    }
+
+    &__system-tablets {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+
+        margin-left: 15px;
+    }
+
+    &__collapse-title {
+        font-size: var(--yc-text-body2-font-size);
+        font-weight: 500;
+        line-height: var(--yc-text-body2-line-height);
+        //text-transform: uppercase;
+    }
+
+    &__section {
+        margin-right: 20px;
+        padding: 0 15px 0 0;
+
+        border-radius: 10px;
+
+        &_metrics {
+            .info-viewer__label {
+                min-width: 150px;
+            }
+            .info-viewer__value {
+                min-width: 100px;
+            }
+        }
+
+        &_pools {
+            display: grid;
+
+            padding: 15px 15px 0 0;
+            grid-template-columns: 110px 110px;
+            grid-gap: 7px 20px;
+        }
+    }
+
+    &__section-title {
+        margin: 0;
+
+        font-size: var(--yc-text-body2-font-size);
+        font-weight: 500;
+        line-height: var(--yc-text-body2-line-height);
+    }
+}

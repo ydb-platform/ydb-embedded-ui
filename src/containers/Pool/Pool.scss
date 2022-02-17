@@ -1,0 +1,32 @@
+@import '../../styles/mixins.scss';
+
+.pool {
+    @include container-fluid();
+
+    &__row {
+        display: flex;
+    }
+
+    &__title {
+        font-size: var(--yc-text-body2-font-size);
+        line-height: var(--yc-text-body2-line-height);
+        font-weight: 500;
+        text-transform: uppercase;
+        margin-right: 16px;
+
+        &_groups {
+            margin-right: 32px;
+        }
+    }
+
+    &__controls {
+        display: flex;
+        align-items: center;
+        margin: 25px 0 10px 0;
+    }
+
+    &__breadcrumbs {
+        font-size: var(--yc-text-body2-font-size);
+        padding: 20px 0;
+    }
+}

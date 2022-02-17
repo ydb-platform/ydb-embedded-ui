@@ -1,0 +1,34 @@
+@import '../../../styles/mixins.scss';
+
+.kv-acl {
+    &__message-container {
+        padding: 15px 0;
+    }
+
+    &__loader-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    @include query-data-table;
+
+    &__owner-container {
+        margin: 10px;
+
+        .yc-staff-card {
+            display: inline-block;
+        }
+    }
+
+    &__text {
+        font-size: var(--yc-text-body-font-size);
+        line-height: var(--yc-text-body-line-height);
+        color: var(--yc-color-text-primary);
+
+        &::first-letter {
+            color: var(--yc-color-text-danger);
+        }
+    }
+}
