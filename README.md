@@ -8,8 +8,8 @@ Local viewer for YDB clusters
 
 1) Run on a machine with Docker installed:
    ```
-   docker pull registry.yandex.net/yandex-docker-local-ydb:testing`
-   docker run --hostname localhost -e YDB_ALLOW_ORIGIN="http://localhost:3000" -dp 2135:2135 -dp 8765:8765 registry.yandex.net/yandex-docker-local-ydb:testing
+   docker pull cr.yandex/yc/yandex-docker-local-ydb`
+   docker run --hostname localhost -e YDB_ALLOW_ORIGIN="http://localhost:3000" -dp 2135:2135 -dp 8765:8765 cr.yandex/yc/yandex-docker-local-ydb
    ```
 2) Run the frontend app in the development mode, via invoking `npm run dev`
 3) Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.\
