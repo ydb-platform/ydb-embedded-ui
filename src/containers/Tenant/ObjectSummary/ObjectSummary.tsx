@@ -104,6 +104,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
 
     const {name: tenantName, info: infoTab} = queryParams;
     const tenantData = _.get(data[tenantName as string], 'PathDescription.Self');
+    const currentSchemaData = _.get(data[currentSchemaPath], 'PathDescription.Self');
 
     const tableSchema =
         currentItem?.PathDescription?.Table || currentItem?.PathDescription?.OlapTableDescription;
@@ -152,7 +153,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
     };
 
     const renderObjectOverview = () => {
-        const startTimeInMilliseconds = tenantData?.CreateStep / 1000;
+        const startTimeInMilliseconds = currentSchemaData?.CreateStep / 1000;
         let createTime = 'Unknown';
         if (startTimeInMilliseconds) {
             createTime = new Date(startTimeInMilliseconds).toUTCString();
