@@ -23,9 +23,26 @@
     font-size: var(--yc-text-body2-font-size);
     line-height: var(--yc-text-body2-line-height);
 }
+@mixin body3-typography() {
+    font-size: var(--yc-text-body3-font-size);
+    line-height: var(--yc-text-body3-line-height);
+}
 @mixin lead-typography() {
     font-size: var(--yc-text-lead-font-size);
     line-height: var(--yc-text-lead-line-height);
+}
+
+@mixin title-typography() {
+    font-size: var(--yc-text-title-font-size);
+    line-height: var(--yc-text-title-line-height);
+}
+
+@mixin sticky-top {
+    position: sticky;
+    top: 0;
+    left: 0;
+
+    background-color: var(--yc-color-base-background);
 }
 
 @mixin loader() {
@@ -35,8 +52,8 @@
     left: 50%;
 
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 }
 
 @mixin cell-container() {
@@ -50,21 +67,30 @@
     text-overflow: ellipsis;
 }
 
+@mixin controls() {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 16px 0 18px;
+}
+
+@mixin search() {
+    width: 238px;
+}
+
 @mixin query-data-table() {
     & .data-table {
         $_: &;
 
         &__table {
             border-spacing: 0;
-
             border-collapse: separate;
         }
 
         &__th,
         &__td {
             vertical-align: middle;
-
-            border: none;
         }
 
         &__box {
@@ -102,6 +128,17 @@
     $border-width: 1px;
     $clearance-width: 1px; /* Delete clearance and cancel column shadow for previous columns */
 
+    @for $i from 0 through $nth {
+        & .data-table__td:nth-child(#{$i}),
+        & .data-table__head-row:first-child .data-table__th:nth-child(#{$i}) {
+            box-shadow: unset;
+
+            @if $i < $nth {
+                border-right: unset;
+            }
+        }
+    }
+
     /* Freeze td */
     & .data-table__td:nth-child(#{$nth}),
     & .data-table__head-row:first-child .data-table__th:nth-child(#{$nth}) {
@@ -112,35 +149,19 @@
         border-right: $border-width solid var(--yc-color-line-generic);
         background-color: var(--yc-color-base-background);
     }
-
-    @for $i from 0 through $nth {
-        & .data-table__td:nth-child(#{$i}),
-        & .data-table__head-row:first-child .data-table__th:nth-child(#{$i}) {
-            box-shadow: -$clearance-width 0 0 var(--yc-color-base-background);
-
-            @if $i < $nth {
-                border-right: $border-width solid var(--yc-color-base-background);
-            }
-        }
+    .data-table__row:hover .data-table__td:nth-child(#{$nth}) {
+        background-color: var(--yc-color-base-float-hover) !important;
     }
 }
 
 @mixin table-styles {
     & .data-table {
-        width: 100%;
-
         &__table {
             width: 100%;
-
-            border-spacing: 0;
-
-            border-collapse: separate;
-
-            font-size: var(--yc-text-body2-font-size);
-            line-height: 18px;
         }
 
-        &__th {
+        &__row,
+        &__sticky th {
             height: 40px;
         }
 
@@ -175,9 +196,9 @@
         position: absolute;
         left: 20px;
 
-        color: var(--yc-color-text-secondary);
-
         font-size: 9px;
+
+        color: var(--yc-color-text-secondary);
     }
     .json-inspector__leaf_composite.json-inspector__leaf_root:before {
         left: 0;
@@ -206,7 +227,6 @@
         }
         &__toolbar {
             width: 300px;
-
             margin-bottom: 10px;
 
             border: 1px solid var(--yc-color-line-generic);
@@ -214,26 +234,21 @@
         }
         &__search {
             box-sizing: border-box;
-
             width: 300px;
             height: 28px;
-
             margin: 0;
-
             padding: 0;
 
+            font-family: var(--yc-font-family);
+            font-size: 13px;
             vertical-align: top;
 
             color: var(--yc-color-text-primary);
-
             border: 0 solid transparent;
             border-width: 0 8px;
             border-right-width: 22px;
             outline: 0;
             background: none;
-
-            font-family: var(--yc-font-family);
-            font-size: 13px;
         }
         &__value {
             &_helper {

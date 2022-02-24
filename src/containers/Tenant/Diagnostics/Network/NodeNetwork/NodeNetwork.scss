@@ -1,0 +1,54 @@
+.node-network {
+    display: inline-block;
+
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    padding: 0 5px;
+
+    font-size: 12px;
+    line-height: 14px;
+    cursor: pointer;
+    text-align: center;
+    text-transform: uppercase;
+
+    color: var(--yc-color-text-complementary);
+    border: 1px solid transparent;
+    border-radius: 4px;
+
+    &_id {
+        width: 42px;
+        height: 14px;
+    }
+
+    &_blur {
+        opacity: 0.25;
+    }
+
+    &_gray {
+        background: var(--yc-color-text-secondary);
+    }
+
+    &_black {
+        color: var(--yc-color-text-light-primary);
+        background-color: var(--yc-color-text-primary);
+    }
+
+    &_green {
+        background-color: var(--yc-color-base-positive-heavy);
+    }
+
+    &_yellow {
+        background-color: var(--yc-color-base-warning-heavy);
+    }
+
+    &_red {
+        background-color: var(--yc-color-text-yandex-red);
+    }
+
+    &:hover {
+        border: 1px solid var(--yc-color-text-primary);
+    }
+}

@@ -10,23 +10,18 @@ import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/P
 
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
-import {AUTO_RELOAD_INTERVAL, ALL} from '../../utils/constants';
+import {AUTO_RELOAD_INTERVAL, ALL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {getFilteredNodes} from '../../store/reducers/clusterNodes';
 import {getNodes} from '../../store/reducers/nodes';
 import {changeFilter} from '../../store/reducers/settings';
+import {setHeader} from '../../store/reducers/header';
+import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 import {calcUptime} from '../../utils';
 import {getNodesColumns} from '../../utils/getNodesColumns';
 
 import './Nodes.scss';
 
 const b = cn('cluster-nodes');
-
-const tableSettings = {
-    displayIndices: false,
-    stickyHead: DataTable.MOVING,
-    syncHeadOnResize: true,
-    dynamicRender: true,
-};
 
 class Nodes extends React.Component {
     static renderLoader() {
@@ -49,14 +44,22 @@ class Nodes extends React.Component {
         handleSearchQuery: PropTypes.func,
         filter: problemFilterType,
         changeFilter: PropTypes.func,
+        setHeader: PropTypes.func,
         className: PropTypes.string,
         singleClusterMode: PropTypes.bool,
         additionalNodesInfo: PropTypes.object,
     };
 
     componentDidMount() {
-        this.props.getNodesList();
-        this.reloadDescriptor = setInterval(() => this.props.getNodesList(), AUTO_RELOAD_INTERVAL);
+        const {getNodesList, setHeader} = this.props;
+        getNodesList();
+        this.reloadDescriptor = setInterval(() => getNodesList(), AUTO_RELOAD_INTERVAL);
+        setHeader([
+            {
+                text: CLUSTER_PAGES.nodes.title,
+                link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.nodes.id}),
+            },
+        ]);
     }
 
     componentWillUnmount() {
@@ -76,18 +79,15 @@ class Nodes extends React.Component {
 
         return (
             <div className={b('controls')}>
-                <div className={b('controls-left')}>
-                    <TextInput
-                        className={b('search')}
-                        size="s"
-                        placeholder="Host name…"
-                        text={searchQuery}
-                        onUpdate={this.handleSearchQueryChange}
-                        hasClear
-                    />
-                    <ProblemFilter value={filter} onChange={this.handleFilterChange} />
-                    <Label theme="info" size="m">{`Nodes: ${nodes.length}`}</Label>
-                </div>
+                <TextInput
+                    className={b('search')}
+                    placeholder="Host name"
+                    text={searchQuery}
+                    onUpdate={this.handleSearchQueryChange}
+                    hasClear
+                />
+                <ProblemFilter value={filter} onChange={this.handleFilterChange} />
+                <Label theme="info" size="m">{`Nodes: ${nodes?.length}`}</Label>
             </div>
         );
     }
@@ -123,24 +123,24 @@ class Nodes extends React.Component {
         }));
 
         if (preparedNodes.length === 0) {
-            if (filter === ALL) {
-                return <div className="error">no nodes data</div>;
+            if (filter !== ALL) {
+                return <div className="no-problem" />;
             }
-            return <div className="no-problem" />;
         }
 
         return (
             <div className={b('table-wrapper')}>
                 <div className={b('table-content')}>
                     <DataTable
-                        theme="internal"
+                        theme="yandex-cloud"
                         data={preparedNodes}
                         columns={columns}
-                        settings={tableSettings}
+                        settings={DEFAULT_TABLE_SETTINGS}
                         initialSortOrder={{
                             columnId: 'NodeId',
                             order: DataTable.ASCENDING,
                         }}
+                        emptyDataMessage='No such nodes'
                     />
                 </div>
             </div>
@@ -188,6 +188,7 @@ const mapDispatchToProps = {
     hideTooltip,
     showTooltip,
     changeFilter,
+    setHeader,
 };
 
 export default withSearch(connect(mapStateToProps, mapDispatchToProps)(Nodes));

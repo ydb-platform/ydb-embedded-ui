@@ -1,0 +1,27 @@
+@import '../../../../styles/mixins.scss';
+
+.kv-describe {
+    &__message-container {
+        padding: 15px 0;
+    }
+
+    &__result {
+        display: flex;
+        overflow: auto;
+        flex: 0 0 auto;
+
+        padding: 10px 20px 20px 0;
+    }
+
+    &__loader-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        height: 100%;
+    }
+
+    &__tree {
+        @include json-tree-styles();
+    }
+}

@@ -1,41 +1,47 @@
 .tablets-statistic {
     display: flex;
     align-items: center;
+    gap: 2px;
 
     &__tablet {
-        // min-width: 20px;
-        padding: 2px 4px;
-        height: 20px;
         display: inline-block;
-        border-radius: 4px;
+
+        height: 20px;
+        padding: 0 4px;
+
+        font-size: 11px;
+        line-height: 20px;
         text-align: center;
-        line-height: 14px;
-        color: var(--yc-color-text-complementary);
-        text-transform: uppercase;
-        font-size: 10px;
-        margin-right: 4px;
         text-decoration: none;
-        border: 1px solid var(--yc-color-base-generic-medium-hover);
+        text-transform: uppercase;
+
+        color: var(--yc-color-text-secondary);
+        border: 1px solid;
+        border-radius: 2px;
 
         &_state_green {
-            background-color: var(--yc-color-base-positive-heavy);
+            color: var(--yc-color-text-positive);
+            background-color: var(--yc-color-base-positive);
         }
         &_state_yellow {
-            background-color: var(--yc-color-base-warning-heavy);
+            color: var(--yc-color-text-warning-medium);
+            background-color: var(--yc-color-base-warning);
         }
         &_state_blue {
-            background-color: var(--yc-color-base-info-heavy);
+            color: var(--yc-color-text-info);
+            background-color: var(--yc-color-base-info);
         }
         &_state_orange {
-            background: var(--yc-color-text-warning-heavy);
+            color: var(--yc-color-text-warning-heavy);
+            background-color: var(--yc-color-infographics-warning-light);
         }
         &_state_red {
-            background: var(--yc-color-base-danger-heavy);
-            color: var(--yc-color-text-light-primary);
+            color: var(--yc-color-text-danger);
+            background: var(--yc-color-base-danger);
         }
         &_state_gray {
-            background: var(--yc-color-text-complementary);
-            color: var(--yc-color-text-light-primary);
+            color: var(--yc-color-text-secondary);
+            border: 1px solid var(--yc-color-line-generic-hover);
         }
     }
 }

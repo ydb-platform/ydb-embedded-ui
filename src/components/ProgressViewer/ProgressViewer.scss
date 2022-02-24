@@ -1,32 +1,37 @@
 .progress-viewer {
-    min-width: 120px;
-    padding: 0 4px;
-    height: 23px;
-    font-size: var(--yc-text-body2-font-size);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--yc-color-text-light-primary);
-    background: var(--yc-color-base-generic-accent);
     position: relative;
+
+    display: flex;
     overflow: hidden;
-    border-radius: 4px;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 120px;
+    height: 23px;
+    padding: 0 4px;
+
+    font-size: var(--yc-text-body2-font-size);
     white-space: nowrap;
+
+    color: var(--yc-color-text-light-primary);
+    border-radius: 2px;
+    background: var(--yc-color-base-generic);
 
     &__line {
         position: absolute;
-        height: 100%;
-        left: 0;
         top: 0;
+        left: 0;
+
+        height: 100%;
 
         &_bg_scarlet {
-            background: var(--yc-color-base-danger-heavy);
+            background: var(--yc-color-infographics-danger-heavy);
         }
         &_bg_apple {
-            background: var(--yc-color-base-positive-heavy);
+            background: var(--yc-color-infographics-positive-heavy);
         }
         &_bg_saffron {
-            background: var(--yc-color-base-warning-heavy);
+            background: var(--yc-color-infographics-warning-heavy);
         }
     }
 
@@ -42,38 +47,43 @@
     }
 
     &_size_xs {
-        height: 18px;
-        font-size: 10px;
-        line-height: var(--yc-text-lead-line-height);
+        height: 20px;
+
+        font-size: var(--yc-text-body2-font-size);
+        line-height: var(--yc-text-body2-line-height);
     }
 
     &_size_s {
         height: 28px;
+
         font-size: var(--yc-text-body-font-size);
         line-height: 28px;
     }
     &_size_m {
         height: 32px;
+
         font-size: var(--yc-text-body2-font-size);
         line-height: 32px;
     }
 
     &_size_ns {
         height: 24px;
+
         font-size: 13px;
         line-height: var(--yc-text-lead-line-height);
     }
 
     &_size_n {
         height: 36px;
+
         font-size: var(--yc-text-body-font-size);
         line-height: 36px;
     }
 
     &_size_l {
         height: 38px;
+
         font-size: var(--yc-text-lead-font-size);
-        line-height: var(--yc-text-lead-line-height);
         line-height: 38px;
     }
 

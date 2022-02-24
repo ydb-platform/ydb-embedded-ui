@@ -13,19 +13,16 @@ import {
 import {Icon, Button} from '@yandex-cloud/uikit';
 import signOutIcon from '../../assets/icons/signOut.svg';
 import signInIcon from '../../assets/icons/signIn.svg';
-
 import databaseIcon from '../../assets/icons/server.svg';
-
 import storageIcon from '../../assets/icons/storage.svg';
+import clusterIcon from '../../assets/icons/cluster.svg';
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
 import databasesIcon from '../../assets/icons/databases.svg';
 import userSecret from '../../assets/icons/user-secret.svg';
 import userChecked from '../../assets/icons/user-check.svg';
 //@ts-ignore
 import UserSettings from '../UserSettings/UserSettings';
-//@ts-ignore
-import routes, {createHref} from '../../routes';
-import {CLUSTER_PAGES} from '../Cluster/Cluster';
+import routes, {createHref, CLUSTER_PAGES} from '../../routes';
 
 //@ts-ignore
 import {logout, setIsNotAuthenticated} from '../../store/reducers/authentication';
@@ -140,6 +137,16 @@ const items: MenuItem[] = [
             activeTab: CLUSTER_PAGES.storage.id,
         }),
         locationKeys: ['/storage'],
+    },
+    {
+        id: CLUSTER_PAGES.cluster.id,
+        title: 'Cluster',
+        icon: clusterIcon,
+        iconSize: 20,
+        location: createHref(routes.cluster, {
+            activeTab: CLUSTER_PAGES.cluster.id,
+        }),
+        locationKeys: ['/cluster/cluster'],
     },
 ];
 

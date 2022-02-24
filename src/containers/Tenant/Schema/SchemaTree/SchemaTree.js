@@ -33,14 +33,14 @@ class SchemaTree extends React.Component {
 
     renderLoader() {
         return (
-            <div className="loader">
-                <Loader size="l" />
+            <div className={b('loader')}>
+                <Loader size="m" />
             </div>
         );
     }
 
     removeArrow = () => {
-        // А как еще эту задачу решить, кроме как лезть в DOM?
+        // And how else to solve this problem, except to get into the DOM?
         const nodeWithArrow =
             // eslint-disable-next-line react/no-find-dom-node
             ReactDOM.findDOMNode(this)?.parentNode?.parentNode?.querySelector('.tree-view_arrow');
@@ -75,12 +75,13 @@ class SchemaTree extends React.Component {
                 </div>
             );
         } else {
-            return this.renderLoader();
+            return null;
         }
     };
 
     render() {
         const {loading, wasLoaded, error, currentSchema: schema} = this.props;
+
         if (loading && !wasLoaded) {
             return this.renderLoader();
         } else if (

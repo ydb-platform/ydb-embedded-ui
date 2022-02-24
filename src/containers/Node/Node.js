@@ -10,7 +10,7 @@ import {withRouter, Link} from 'react-router-dom';
 import FullNodeViewer from '../../components/FullNodeViewer/FullNodeViewer';
 import {TABLETS, STORAGE, NODE_PAGES} from './NodePages';
 import Tablets from '../Tablets/Tablets';
-import Storage from '../StorageV2/Storage';
+import Storage from '../Storage/Storage';
 
 import {getNodeInfo} from '../../store/reducers/node';
 import {NODE_AUTO_RELOAD_INTERVAL} from '../../utils/constants';

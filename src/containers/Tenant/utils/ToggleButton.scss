@@ -1,0 +1,26 @@
+.kv-pane-visibility-button {
+    &_hidden {
+        display: none;
+    }
+
+    &_bottom {
+        transform: rotate(180deg);
+    }
+
+    &_bottom.rotate {
+        transform: rotate(0);
+    }
+    &_left {
+        transform: rotate(-90deg);
+    }
+
+    &_left.rotate {
+        transform: rotate(90deg);
+    }
+    &_top {
+    }
+
+    &_top.rotate {
+        transform: rotate(180deg);
+    }
+}

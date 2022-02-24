@@ -2,7 +2,7 @@ import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
 
 const FETCH_HOT_KEYS = createRequestActionTypes('hot_keys', 'FETCH_HOT_KEYS');
-const SET_HOT_KEYS_OPTIONS = createRequestActionTypes('hot_keys', 'SET_HOT_KEYS_OPTIONS');
+const SET_HOT_KEYS_OPTIONS = 'hot_keys/SET_HOT_KEYS_OPTIONS';
 
 const initialState = {loading: true, data: {}, wasLoaded: false};
 

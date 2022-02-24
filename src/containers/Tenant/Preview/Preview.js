@@ -4,21 +4,26 @@ import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 
 import DataTable from '@yandex-cloud/react-data-table';
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader, Button} from '@yandex-cloud/uikit';
+
+import Icon from '../../../components/Icon/Icon';
+import Fullscreen from '../../../components/Fullscreen/Fullscreen';
 
 import {sendQuery, setQueryOptions} from '../../../store/reducers/preview';
 import {showTooltip, hideTooltip} from '../../../store/reducers/tooltip';
 import {prepareQueryResponse} from '../../../utils/index';
 
-import {OLAP_TABLE_TYPE, TABLE_TYPE} from '../Schema/SchemaMain/SchemaMain';
-import {AutoFetcher} from '../../Cluster/Cluster';
+import {OLAP_TABLE_TYPE, TABLE_TYPE} from '../Tenant';
+import {AutoFetcher} from '../../../utils/autofetcher';
+import EnableFullscreenButton from '../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
+import {setShowPreview} from '../../../store/reducers/schema';
 
 import './Preview.scss';
 
 const TABLE_SETTINGS = {
-    displayIndices: false,
-    syncHeadOnResize: true,
-    stickyHead: DataTable.MOVING,
+    ...DEFAULT_TABLE_SETTINGS,
+    stripedRows: true,
 };
 
 const b = cn('kv-preview');
@@ -90,6 +95,31 @@ class Preview extends React.Component {
         });
     };
 
+    onClosePreview = () => {
+        this.props.setShowPreview(false);
+    };
+
+    renderHeader = () => {
+        const {currentSchemaPath, error} = this.props;
+        return (
+            <div className={b('header')}>
+                <div className={b('title')}>
+                    Preview <div className={b('table-name')}>{currentSchemaPath}</div>
+                </div>
+                <div className={b('controls-left')}>
+                    <EnableFullscreenButton disabled={Boolean(error)} />
+                    <Button
+                        view="flat-secondary"
+                        onClick={this.onClosePreview}
+                        title="Close preview"
+                    >
+                        <Icon name="close" viewBox={'0 0 16 16'} width={16} height={16} />
+                    </Button>
+                </div>
+            </div>
+        );
+    };
+
     renderTable = () => {
         const {data, showTooltip} = this.props;
 
@@ -116,10 +146,12 @@ class Preview extends React.Component {
     };
 
     render() {
-        const {error, loading, data = [], type, wasLoaded} = this.props;
+        const {error, loading, data = [], type, wasLoaded, isFullscreen} = this.props;
+
+        let message;
 
         if (type !== TABLE_TYPE && type !== OLAP_TABLE_TYPE) {
-            return <div className={b('message-container')}>Not available</div>;
+            message = <div className={b('message-container')}>Not available</div>;
         }
 
         if (loading && !wasLoaded) {
@@ -131,16 +163,19 @@ class Preview extends React.Component {
         }
 
         if (error) {
-            return <div className={b('message-container')}>{error.data || error}</div>;
+            message = <div className={b('message-container')}>{error.data || error}</div>;
         }
 
         if (!loading && data.length === 0) {
-            return <div className={b('message-container')}>Table is empty</div>;
+            message = <div className={b('message-container')}>Table is empty</div>;
         }
+
+        const content = message ?? <div className={b('result')}>{this.renderTable()}</div>;
 
         return (
             <div className={b()}>
-                <div className={b('result')}>{this.renderTable()}</div>
+                {this.renderHeader()}
+                {isFullscreen ? <Fullscreen>{content}</Fullscreen> : content}
             </div>
         );
     }
@@ -148,7 +183,7 @@ class Preview extends React.Component {
 
 const mapStateToProps = (state) => {
     const {data = [], loading, error, wasLoaded} = state.preview;
-    const {autorefresh} = state.schema;
+    const {autorefresh, currentSchemaPath} = state.schema;
 
     return {
         data,
@@ -156,6 +191,8 @@ const mapStateToProps = (state) => {
         error,
         autorefresh,
         wasLoaded,
+        currentSchemaPath,
+        isFullscreen: state.fullscreen,
     };
 };
 
@@ -164,6 +201,7 @@ const mapDispatchToProps = {
     showTooltip,
     hideTooltip,
     setQueryOptions,
+    setShowPreview,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Preview);

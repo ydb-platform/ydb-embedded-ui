@@ -1,0 +1,144 @@
+@import '../../../../styles/mixins.scss';
+
+.network {
+    display: flex;
+    overflow: auto;
+    flex-grow: 1;
+    justify-content: space-between;
+
+    max-width: 1305px;
+    height: 100%;
+
+    font-size: var(--yc-text-body2-font-size);
+    line-height: var(--yc-text-body2-line-height);
+
+    &__nodes-row {
+        display: flex;
+        overflow: auto;
+        flex-grow: 1;
+        flex-direction: row;
+        align-items: flex-start;
+
+        height: 100%;
+    }
+
+    &__inner {
+        overflow: auto;
+        @include flex-container();
+    }
+
+    &__right {
+        width: 100%;
+        height: 100%;
+        padding-left: 20px;
+    }
+
+    &__left {
+        height: 100%;
+
+        border-right: 1px solid var(--yc-color-base-generic-accent);
+    }
+
+    &__placeholder {
+        display: flex;
+        flex-grow: 1;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        width: 100%;
+        height: 100%;
+    }
+
+    &__placeholder-text {
+        margin-top: 15px;
+    }
+
+    &__placeholder-img {
+        color: transparent;
+    }
+
+    &__nodes {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    &__nodes-container {
+        min-width: 325px;
+
+        &_right {
+            margin-right: 60px;
+        }
+    }
+
+    &__nodes-title {
+        margin: 0 0 15px;
+
+        font-size: var(--yc-text-body2-font-size);
+        line-height: var(--yc-text-body2-line-height);
+
+        color: var(--yc-color-text-secondary);
+        border-bottom: 1px solid var(--yc-color-base-generic-accent);
+    }
+
+    &__link {
+        text-decoration: none;
+
+        color: var(--yc-color-base-special);
+    }
+
+    &__title {
+        margin: 20px 0;
+
+        font-size: var(--yc-text-body-font-size);
+        font-weight: 500;
+        line-height: var(--yc-text-body-line-height);
+    }
+
+    &__checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        label {
+            white-space: nowrap;
+        }
+    }
+
+    &__label {
+        margin-bottom: 16px;
+    }
+
+    &__controls {
+        display: flex;
+        gap: 12px;
+
+        margin-bottom: 16px;
+    }
+
+    &__controls-wrapper {
+        display: flex;
+        flex-direction: row;
+        @include flex-container();
+    }
+
+    &__select {
+        max-width: 115px;
+        margin: 0 15px;
+    }
+
+    &__rack-column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        margin-right: 5px;
+        margin-bottom: 5px;
+        padding: 2px;
+
+        border-radius: 4px;
+        background-color: rgba(0, 0, 0, 0.07);
+
+        .node-network {
+            margin-right: 0;
+        }
+    }
+}

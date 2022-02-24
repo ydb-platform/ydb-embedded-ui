@@ -2,32 +2,38 @@ $popup-width: 700px;
 
 .saved-queries {
     $block: &;
-    padding: 12px 16px 12px;
+    padding: 12px 16px;
     &__popup-wrapper {
-        border-radius: 4px;
+        overflow: hidden;
+
         width: $popup-width;
         max-width: $popup-width !important;
-        // max-height: 70vh;
-        overflow: hidden;
+
+        border-radius: 4px;
         :nth-child(2) {
-            max-height: 70vh;
             overflow-y: auto;
+
+            max-height: 50vh;
         }
 
         &::before {
-            border-radius: 4px;
             width: $popup-width;
+
+            border-radius: 4px;
         }
     }
     &__saved-queries-row {
         display: flex;
         align-items: center;
+
         padding: 8px 5px;
+
         border-bottom: 1px solid var(--yc-color-line-generic);
         &:hover {
+            cursor: pointer;
+
             color: var(--yc-color-text-link-hover);
             background: var(--yc-color-base-simple-hover);
-            cursor: pointer;
             #{$block}__query-controls {
                 display: flex;
             }
@@ -35,29 +41,32 @@ $popup-width: 700px;
         &_header {
             font-weight: 500;
             &:hover {
+                cursor: auto;
+
                 color: var(--yc-color-text-primary);
                 background: var(--yc-color-base-background);
-                cursor: auto;
             }
         }
     }
     &__query-name {
-        margin-right: 8px;
-        flex-basis: 90px;
-        max-width: 90px;
-        flex-shrink: 0;
-        flex-grow: 0;
-        white-space: pre-wrap;
         overflow: hidden;
-        text-overflow: ellipsis;
+        flex: 0 0 90px;
+
+        max-width: 90px;
+        margin-right: 8px;
+
         font-weight: 500;
+        white-space: pre-wrap;
+        text-overflow: ellipsis;
     }
     &__query-body {
+        overflow: hidden;
         flex-grow: 1;
+
+        max-width: 75%;
+
         white-space: pre;
         text-overflow: ellipsis;
-        overflow: hidden;
-        max-width: 75%;
         &_header {
             display: flex;
             justify-content: center;
@@ -68,9 +77,11 @@ $popup-width: 700px;
     }
     &__control-button {
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
+
         width: 24px;
+
         color: var(--yc-color-text-hint);
         &:hover {
             color: var(--yc-color-text-secondary);

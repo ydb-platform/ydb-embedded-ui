@@ -1,7 +1,7 @@
 import numeral from 'numeral';
 import _ from 'lodash';
 
-import {MEGABYTE, TERABYTE, DAY_IN_SECONDS} from './constants';
+import {MEGABYTE, TERABYTE, DAY_IN_SECONDS, GIGABYTE} from './constants';
 
 import locales from 'numeral/locales'; // eslint-disable-line no-unused-vars
 numeral.locale('ru');
@@ -9,6 +9,10 @@ numeral.localeData().delimiters.decimal = '.';
 
 export const formatBytes = (bytes) => {
     return numeral(bytes).format('0 ib').replace('i', '');
+};
+
+export const formatBytesToGigabyte = (bytes) => {
+    return `${Math.floor(bytes / GIGABYTE)} GB`;
 };
 
 export const stringifyVdiskId = (id) => {
@@ -57,7 +61,7 @@ export const calcUptime = (milliseconds) => {
     return formatUptime((currentDate - Number(milliseconds)) / 1000);
 };
 
-// функция определяет, сколько нод имеют статус Connected "true"
+// determine how many nodes have status Connected "true"
 export const getConnectedNodesCount = (nodeStateInfo) => {
     return nodeStateInfo?.reduce((acc, item) => (item.Connected ? acc + 1 : acc), 0);
 };

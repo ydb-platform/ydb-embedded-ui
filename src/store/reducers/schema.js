@@ -3,6 +3,7 @@ import '../../services/api';
 
 const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
 const SET_SCHEMA = 'schema/SET_SCHEMA';
+const SET_SHOW_PREVIEW = 'schema/SET_SHOW_PREVIEW';
 const ENABLE_AUTOREFRESH = 'schema/ENABLE_AUTOREFRESH';
 const DISABLE_AUTOREFRESH = 'schema/DISABLE_AUTOREFRESH';
 
@@ -12,6 +13,7 @@ export const initialState = {
     data: {},
     currentSchemaPath: undefined,
     autorefresh: false,
+    showPreview: false,
 };
 
 const schema = function z(state = initialState, action) {
@@ -64,6 +66,12 @@ const schema = function z(state = initialState, action) {
                 autorefresh: false,
             };
         }
+        case SET_SHOW_PREVIEW: {
+            return {
+                ...state,
+                showPreview: action.data,
+            };
+        }
         default:
             return state;
     }
@@ -90,6 +98,12 @@ export function enableAutorefresh() {
 export function disableAutorefresh() {
     return {
         type: DISABLE_AUTOREFRESH,
+    };
+}
+export function setShowPreview(value) {
+    return {
+        type: SET_SHOW_PREVIEW,
+        data: value,
     };
 }
 export default schema;

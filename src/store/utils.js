@@ -1,9 +1,7 @@
-import {Toaster} from '@yandex-cloud/uikit';
+import createToast from '../utils/createToast';
 import {SET_UNAUTHENTICATED} from './reducers/authentication';
 
 export const nop = (result) => result;
-
-const toaster = new Toaster();
 
 export function createRequestActionTypes(prefix, type) {
     return {
@@ -35,13 +33,11 @@ export function createApiRequest({actions, request, dataHandler = nop}) {
                     type: SET_UNAUTHENTICATED.SUCCESS,
                 });
             } else if (error && error.status && error.statusText) {
-                toaster.createToast({
+                createToast({
                     name: 'Request failure',
                     title: 'Request failure',
                     type: 'error',
                     content: `${error.status} ${error.statusText}`,
-                    isClosable: true,
-                    allowAutoHiding: false,
                 });
             }
             dispatch({

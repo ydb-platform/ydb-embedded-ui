@@ -1,0 +1,79 @@
+@import '../../../../styles/mixins.scss';
+
+.healthcheck {
+    padding: 25px 20px 20px;
+
+    &__loader {
+        display: flex;
+        justify-content: center;
+    }
+
+    &__message-container {
+        padding: 15px 0;
+    }
+
+    &__self-check-status {
+        display: flex;
+        align-items: center;
+
+        margin-bottom: 20px;
+    }
+
+    &__self-check-status-label {
+        margin: 0 10px 0 0;
+    }
+
+    &__self-check-update {
+        margin-left: 20px;
+    }
+
+    &__status-wrapper {
+        display: flex;
+        gap: 8px;
+
+        margin-bottom: 15px;
+    }
+
+    &__preview-title {
+        font-weight: 600;
+    }
+
+    &__self-check-status-indicator {
+        padding: 0 8px;
+
+        border-radius: 4px;
+
+        &_good,
+        &_green {
+            color: var(--yc-color-text-positive);
+            background-color: var(--yc-color-base-positive);
+        }
+        &_degraded,
+        &_yellow {
+            color: var(--yc-color-text-warning-medium);
+            background-color: var(--yc-color-base-warning);
+        }
+
+        &_blue {
+            color: var(--yc-color-text-info);
+            background-color: var(--yc-color-base-info);
+        }
+
+        &_emergency,
+        &_red {
+            color: var(--yc-color-text-danger);
+            background-color: var(--yc-color-base-danger);
+        }
+        &_unspecified,
+        &_gray,
+        &_grey {
+            color: var(--yc-color-text-misc);
+            background-color: var(--yc-color-base-misc);
+        }
+        &_maintenance_required,
+        &_orange {
+            color: var(--yc-color-text-warning-heavy);
+            background-color: var(--yc-color-infographics-warning-light);
+        }
+    }
+}

@@ -1,20 +1,62 @@
 @import '../../../styles/mixins.scss';
 
 .kv-preview {
+    height: 100%;
+    @include query-data-table;
+
+    .yc-button__text {
+        margin: 0 6px;
+    }
+
+    &__header {
+        position: sticky;
+        top: 0;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        height: 40px;
+        padding: 0 19px;
+
+        border-bottom: 1px solid var(--yc-color-line-generic);
+        background-color: var(--yc-color-base-background);
+    }
+
+    &__title {
+        display: flex;
+    }
+
+    &__table-name {
+        margin-left: 4px;
+
+        color: var(--yc-color-text-complementary);
+    }
+
+    &__controls-left {
+        display: flex;
+        gap: 5px;
+    }
     &__message-container {
-        padding: 15px 0;
+        padding: 15px 19px;
     }
 
     &__loader-container {
         display: flex;
         justify-content: center;
         align-items: center;
+
         height: 100%;
     }
 
-    @include query-data-table;
-
     &__cell {
         @include cell-container;
+    }
+
+    &__result {
+        overflow: auto;
+
+        height: calc(100% - 40px);
+        padding: 0 19px;
     }
 }

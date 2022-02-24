@@ -16,7 +16,7 @@ const paramSetup = {
             initialState: initialSettingsState.problemFilter,
         },
     },
-    '/tenant/schema': {
+    '/tenant': {
         sort: {
             stateKey: 'heatmap.sort',
             initialState: initialHeatmapState.sort,

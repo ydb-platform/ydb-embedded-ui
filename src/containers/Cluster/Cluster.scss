@@ -1,9 +1,10 @@
 @import '../../styles/mixins.scss';
 
 .cluster {
-    @include flex-container();
-    padding: 0 20px;
     overflow: auto;
+
+    padding: 0 20px;
+    @include flex-container();
 
     &__tab {
         text-decoration: none;
@@ -41,12 +42,13 @@
     &__controls {
         display: flex;
         justify-content: space-between;
+
         margin: 17px 0;
     }
 
     &__table-wrapper {
         display: flex;
-        flex-direction: column;
         flex: 1 1 auto;
+        flex-direction: column;
     }
 }

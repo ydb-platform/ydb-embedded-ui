@@ -1,22 +1,28 @@
 @import '../../../styles/mixins.scss';
 
 .kv-acl {
+    padding: 0 12px 16px;
+    @include query-data-table;
     &__message-container {
-        padding: 15px 0;
+        padding: 0 12px 16px;
     }
 
     &__loader-container {
         display: flex;
         justify-content: center;
         align-items: center;
+
         height: 100%;
     }
 
-    @include query-data-table;
-
     &__owner-container {
-        margin: 10px;
+        position: sticky;
+        z-index: 2;
+        top: 0;
 
+        padding-bottom: 16px;
+
+        background-color: var(--yc-color-base-background);
         .yc-staff-card {
             display: inline-block;
         }
@@ -25,10 +31,15 @@
     &__text {
         font-size: var(--yc-text-body-font-size);
         line-height: var(--yc-text-body-line-height);
+
         color: var(--yc-color-text-primary);
 
         &::first-letter {
             color: var(--yc-color-text-danger);
         }
+    }
+
+    &__result {
+        overflow: auto;
     }
 }

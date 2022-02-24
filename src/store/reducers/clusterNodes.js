@@ -61,7 +61,7 @@ export const getFilteredNodes = createSelector(
             return nodes;
         }
 
-        return nodes.filter(({Overall}) => {
+        return nodes?.filter(({Overall}) => {
             return Overall && Overall !== 'Green';
         });
     },

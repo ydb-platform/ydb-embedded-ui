@@ -10,7 +10,7 @@ import ProgressViewer from '../ProgressViewer/ProgressViewer';
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs';
 
 import {stringifyVdiskId, formatStorageValues} from '../../utils';
-import {PDISK_CATEGORIES} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, PDISK_CATEGORIES} from '../../utils/constants';
 import routes, {createHref} from '../../routes';
 
 import './FullGroupViewer.scss';
@@ -18,10 +18,8 @@ import './FullGroupViewer.scss';
 const b = cn('full-group-viewer');
 
 const tableSettings = {
-    displayIndices: false,
+    ...DEFAULT_TABLE_SETTINGS,
     stickyHead: DataTable.FIXED,
-    syncHeadOnResize: true,
-    dynamicRender: true,
 };
 
 class FullGroupViewer extends React.Component {

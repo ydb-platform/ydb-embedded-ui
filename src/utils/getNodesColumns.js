@@ -1,6 +1,8 @@
+import React from 'react';
+import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import DataTable from '@yandex-cloud/react-data-table';
-import {Link as ExternalLink, Tooltip} from '@yandex-cloud/uikit';
+import {Button, Tooltip} from '@yandex-cloud/uikit';
 
 import Icon from '../components/Icon/Icon';
 import EntityStatus from '../components/EntityStatus/EntityStatus';
@@ -13,6 +15,8 @@ import routes, {createHref} from '../routes';
 import {STORAGE, TABLETS} from '../containers/Node/NodePages';
 import {formatBytes} from './index';
 
+const b = cn('kv-nodes');
+
 export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeRef}) {
     const columns = [
         {
@@ -22,39 +26,32 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
             align: DataTable.RIGHT,
         },
         {
-            name: 'NodeRef',
-            header: '',
-            sortable: false,
-            render: ({row}) => {
-                const nodeRef = getNodeRef ? getNodeRef(row) : undefined;
-                return (
-                    nodeRef && (
-                        <ExternalLink href={nodeRef}>
-                            <Icon name="external" />
-                        </ExternalLink>
-                    )
-                );
-            },
-            width: '40px',
-            align: DataTable.LEFT,
-        },
-        {
             name: 'Host',
             render: ({row, value}) => {
                 const hasStorage = _.find(row?.Roles, (el) => el === STORAGE_ROLE);
+                const nodeRef = getNodeRef ? getNodeRef(row) : undefined;
+
                 if (typeof value === 'undefined') {
                     return <span>—</span>;
                 }
                 return (
-                    <EntityStatus
-                        name={row.Host}
-                        status={row.Overall}
-                        path={createHref(routes.node, {
-                            id: row.NodeId,
-                            activeTab: hasStorage ? STORAGE : TABLETS,
-                        })}
-                        hasClipboardButton
-                    />
+                    <React.Fragment>
+                        <EntityStatus
+                            name={row.Host}
+                            status={row.Overall}
+                            path={createHref(routes.node, {
+                                id: row.NodeId,
+                                activeTab: hasStorage ? STORAGE : TABLETS,
+                            })}
+                            hasClipboardButton
+                            className={b('host-name')}
+                        />
+                        {nodeRef && (
+                            <Button size="s" href={nodeRef} className={b('external-button')}>
+                                <Icon name="external" />
+                            </Button>
+                        )}
+                    </React.Fragment>
                 );
             },
             width: '350px',
@@ -136,7 +133,7 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
         },
         {
             name: 'Tablets',
-            width: '330px',
+            width: '430px',
             render: ({row}) => {
                 return row.Tablets ? (
                     <TabletsStatistic

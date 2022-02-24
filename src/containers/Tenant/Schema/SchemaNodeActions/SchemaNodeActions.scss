@@ -1,0 +1,17 @@
+.kv-schema-node-actions {
+    visibility: hidden;
+
+    &__popup {
+        .yc-menu__list-item {
+            line-height: 36px;
+        }
+    }
+}
+
+.tree-view_item {
+    &:hover {
+        .kv-schema-node-actions {
+            visibility: visible;
+        }
+    }
+}

@@ -1,0 +1,11 @@
+.top-shards {
+    background-color: var(--yc-color-base-background);
+    &__loader {
+        display: flex;
+        justify-content: center;
+    }
+
+    &__table {
+        height: 100%;
+    }
+}

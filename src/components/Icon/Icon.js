@@ -18,6 +18,8 @@ Icon.propTypes = {
     height: PropTypes.number,
     width: PropTypes.number,
     viewBox: PropTypes.string,
+    className: PropTypes.string,
+    onClick: PropTypes.func,
 };
 Icon.defaultProps = {
     height: 16,

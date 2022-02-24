@@ -6,15 +6,19 @@
     }
 
     &__label {
-        color: var(--yc-color-text-complementary);
-        font-size: var(--yc-text-body-font-size);
         margin-right: 20px;
+
+        font-size: var(--yc-text-body-font-size);
+
+        color: var(--yc-color-text-complementary);
     }
 
     &__name {
-        color: var(--yc-color-base-special);
-        text-decoration: none;
         display: inline-block;
+
+        text-decoration: none;
+
+        color: var(--yc-color-base-special);
 
         &:before {
             transform: translateY(3px);

@@ -1,11 +1,13 @@
 .tag {
-    padding: 2px 5px;
-    text-transform: uppercase;
-    background: var(--yc-color-base-generic);
-    border-radius: 3px;
-    font-size: 12px;
-    color: var(--yc-color-text-primary);
     margin-right: 5px;
+    padding: 2px 5px;
+
+    font-size: 12px;
+    text-transform: uppercase;
+
+    color: var(--yc-color-text-primary);
+    border-radius: 3px;
+    background: var(--yc-color-base-generic);
 
     &:last-child {
         margin-right: 0;

@@ -5,9 +5,9 @@ import {connect} from 'react-redux';
 
 import {ThemeProvider} from '@yandex-cloud/uikit';
 
-import routes, {createHref} from '../../routes';
+import routes, {createHref, CLUSTER_PAGES} from '../../routes';
 
-import Cluster, {CLUSTER_PAGES} from '../Cluster/Cluster';
+import Cluster from '../Cluster/Cluster';
 import Tenant from '../Tenant/Tenant';
 import Node from '../Node/Node';
 import Pdisk from '../Pdisk/Pdisk';

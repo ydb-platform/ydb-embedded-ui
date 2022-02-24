@@ -1,6 +1,0 @@
-@import '../../../styles/mixins.scss';
-
-.compute {
-    @include flex-container();
-    overflow: auto;
-}

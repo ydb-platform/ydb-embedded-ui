@@ -1,0 +1,13 @@
+.kv-tenant-overview {
+    &__title {
+        margin: 0;
+        margin-bottom: 15px;
+
+        font-weight: 600;
+    }
+    &__loader {
+        display: flex;
+        flex-grow: 1;
+        justify-content: center;
+    }
+}

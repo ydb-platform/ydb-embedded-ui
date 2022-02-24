@@ -5,65 +5,66 @@ import _ from 'lodash';
 import {connect} from 'react-redux';
 import {Loader} from '@yandex-cloud/uikit';
 import DataTable from '@yandex-cloud/react-data-table';
+import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 
 import './Acl.scss';
 
 const b = cn('kv-acl');
 
-const TABLE_SETTINGS = {
-    displayIndices: false,
-    syncHeadOnResize: true,
-    stickyHead: DataTable.MOVING,
-};
 const COLUMN_WIDTH = 140;
-const COLUMNS = [
-    {
-        name: 'AccessType',
-        header: 'Access Type',
-        sortable: false,
-        width: COLUMN_WIDTH,
-    },
-    {
-        name: 'AccessRights',
-        header: 'Access Rights',
-        render: ({value}) => {
-            return _.map(value, (item, index) => {
-                return <div key={index}>{item}</div>;
-            });
-        },
-        width: COLUMN_WIDTH,
-        sortable: false,
-    },
-    {
-        name: 'Subject',
-        sortable: false,
-        // eslint-disable-next-line react/display-name
-        render: ({value}) => {
-            return Acl.prepareLogin(value);
-        },
-        width: COLUMN_WIDTH,
-    },
-    {
-        name: 'InheritanceType',
-        header: 'Inheritance Type',
-        render: ({value}) => {
-            return _.map(value, (item, index) => {
-                return <div key={index}>{item}</div>;
-            });
-        },
-        width: COLUMN_WIDTH,
-        sortable: false,
-    },
-];
 
 class Acl extends React.Component {
     static propTypes = {
         error: PropTypes.string,
         acl: PropTypes.array,
         loading: PropTypes.bool,
+        additionalTenantInfo: PropTypes.object,
     };
 
-    static prepareLogin = (value) => {
+    COLUMNS = [
+        {
+            name: 'AccessType',
+            header: 'Access Type',
+            sortable: false,
+            width: COLUMN_WIDTH,
+        },
+        {
+            name: 'AccessRights',
+            header: 'Access Rights',
+            render: ({value}) => {
+                return _.map(value, (item, index) => {
+                    return <div key={index}>{item}</div>;
+                });
+            },
+            width: COLUMN_WIDTH,
+            sortable: false,
+        },
+        {
+            name: 'Subject',
+            sortable: false,
+            // eslint-disable-next-line react/display-name
+            render: ({value}) => {
+                return this.prepareLogin(value);
+            },
+            width: COLUMN_WIDTH,
+        },
+        {
+            name: 'InheritanceType',
+            header: 'Inheritance Type',
+            render: ({value}) => {
+                return _.map(value, (item, index) => {
+                    return <div key={index}>{item}</div>;
+                });
+            },
+            width: COLUMN_WIDTH,
+            sortable: false,
+        },
+    ];
+
+    prepareLogin = (value) => {
+        if (this.props.prepareLogin) {
+            return this.props.additionalTenantInfo?.prepareLogin(value);
+        }
         if (value && value.endsWith('@staff') && !value.startsWith('svc_')) {
             const login = value.split('@')[0];
             return login;
@@ -79,7 +80,13 @@ class Acl extends React.Component {
             return null;
         }
 
-        return <DataTable columns={COLUMNS} data={acl} settings={TABLE_SETTINGS} />;
+        return (
+            <DataTable
+                columns={this.COLUMNS}
+                data={acl}
+                settings={{...DEFAULT_TABLE_SETTINGS, stickyTop: 36}}
+            />
+        );
     };
 
     renderOwner = () => {
@@ -92,7 +99,7 @@ class Acl extends React.Component {
         return (
             <div className={b('owner-container')}>
                 <span className={b('owner-label')}>Owner: </span>
-                {Acl.prepareLogin(owner)}
+                {this.prepareLogin(owner)}
             </div>
         );
     };

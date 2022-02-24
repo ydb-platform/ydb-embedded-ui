@@ -1,16 +1,16 @@
-import React from 'react';
+import {useEffect, useReducer, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import {connect, useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import MonacoEditor from 'react-monaco-editor';
 import DataTable from '@yandex-cloud/react-data-table';
-import {Button, Toaster, CopyToClipboard} from '@yandex-cloud/uikit';
+import {Button} from '@yandex-cloud/uikit';
 import {Select} from '@yandex-cloud/uikit/build/esm/components/unstable/Select';
 import SplitPane from '../../../components/SplitPane';
 
-import Pagination from '../../../components/Pagination/Pagination';
 import SaveQuery from './SaveQuery/SaveQuery';
+import SavedQueries from './SavedQueries/SavedQueries';
 import Icon from '../../../components/Icon/Icon';
 import QueryResult from './QueryResult/QueryResult';
 import QueryExplain from './QueryExplain/QueryExplain';
@@ -27,14 +27,25 @@ import {
 import {getExplainQuery, getExplainQueryAst} from '../../../store/reducers/explainQuery';
 import {showTooltip} from '../../../store/reducers/tooltip';
 import {getSettingValue, setSettingValue} from '../../../store/reducers/settings';
-import {THEME_KEY, DEFAULT_SIZE_RESULT_PANE_KEY, SAVED_QUERIES_KEY} from '../../../utils/constants';
+import {
+    DEFAULT_IS_QUERY_RESULT_COLLAPSED,
+    DEFAULT_SIZE_RESULT_PANE_KEY,
+    DEFAULT_TABLE_SETTINGS,
+    SAVED_QUERIES_KEY,
+} from '../../../utils/constants';
 import {prepareQueryResponse} from '../../../utils/index';
 
 import {parseJson} from '../../../utils/utils';
 
 import './QueryEditor.scss';
-
-const toaster = new Toaster();
+import Divider from '../../../components/Divider/Divider';
+import QueriesHistory from './QueriesHistory/QueriesHistory';
+import {
+    PaneVisibilityActionTypes,
+    paneVisibilityToggleReducerCreator,
+} from '../utils/paneVisibilityToggleHelpers';
+import Preview from '../Preview/Preview';
+import { setShowPreview } from '../../../store/reducers/schema';
 
 export const RUN_ACTIONS = [
     {value: RUN_ACTIONS_VALUES.script, content: 'Run Script'},
@@ -42,11 +53,13 @@ export const RUN_ACTIONS = [
 ];
 
 const TABLE_SETTINGS = {
-    displayIndices: false,
-    syncHeadOnResize: true,
-    stickyHead: DataTable.MOVING,
+    ...DEFAULT_TABLE_SETTINGS,
     sortable: false,
+    dynamicItemSizeGetter: () => 40,
+    dynamicRenderType: 'variable',
+    stripedRows: true,
 };
+
 const EDITOR_OPTIONS = {
     automaticLayout: true,
     selectOnLineNumbers: true,
@@ -63,66 +76,97 @@ const RESULT_TYPES = {
 
 const b = cn('query-editor');
 
-class QueryEditor extends React.Component {
-    static propTypes = {
-        sendQuery: PropTypes.func,
-        path: PropTypes.string,
-        response: PropTypes.oneOfType([PropTypes.bool, PropTypes.array]),
-        executeQuery: PropTypes.object,
-        explainQuery: PropTypes.object,
-        showTooltip: PropTypes.func,
-        theme: PropTypes.string,
-    };
+const propTypes = {
+    sendQuery: PropTypes.func,
+    path: PropTypes.string,
+    response: PropTypes.oneOfType([PropTypes.bool, PropTypes.array]),
+    executeQuery: PropTypes.object,
+    explainQuery: PropTypes.object,
+    showTooltip: PropTypes.func,
+    theme: PropTypes.string,
+    type: PropTypes.string,
+};
 
-    state = {
-        resultType: RESULT_TYPES.EXECUTE,
-        runAction: RUN_ACTIONS[0].value,
-    };
+const initialTenantCommonInfoState = {
+    triggerExpand: false,
+    triggerCollapse: false,
+    collapsed: true,
+};
+function QueryEditor(props) {
+    const [resultType, setResultType] = useState(RESULT_TYPES.EXECUTE);
 
-    editorRef = null;
+    const dispatch = useDispatch()
 
-    componentDidMount() {
-        this.updateEditor();
+    const [resultVisibilityState, dispatchResultVisibilityState] = useReducer(
+        paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
+        initialTenantCommonInfoState,
+    );
 
-        window.addEventListener('resize', this.onChangeWindow);
-        window.addEventListener('storage', this.storageEventHandler);
-    }
+    const editorRef = useRef(null);
 
-    checkIfHasUnsavedInput(e) {
-        e.preventDefault();
-        // Chrome requires returnValue to be set
-        e.returnValue = '';
-    }
+    useEffect(() => {
+        updateEditor();
 
-    componentWillUnmount() {
-        window.removeEventListener('resize', this.onChangeWindow);
-        window.removeEventListener('storage', this.storageEventHandler);
-        window.onbeforeunload = undefined;
-    }
+        window.addEventListener('resize', onChangeWindow);
+        window.addEventListener('storage', storageEventHandler);
 
-    componentDidUpdate() {
+        return () => {
+            window.removeEventListener('resize', onChangeWindow);
+            window.removeEventListener('storage', storageEventHandler);
+            window.onbeforeunload = undefined;
+        };
+    }, []);
+
+    useEffect(() => {
+        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
+    }, []);
+
+    useEffect(() => {
+        const {showPreview} = props;
+        if (showPreview && resultVisibilityState.collapsed) {
+            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        }
+    }, [props.showPreview, resultVisibilityState.collapsed]);
+
+    useEffect(() => {
         const {
             explainQuery: {data},
             executeQuery: {input, history},
-        } = this.props;
+        } = props;
 
         const hasUnsavedInput = input
             ? input !== history.queries[history.queries?.length - 1]
             : false;
 
         if (hasUnsavedInput) {
-            window.onbeforeunload = this.checkIfHasUnsavedInput;
+            window.onbeforeunload = checkIfHasUnsavedInput;
         } else {
             window.onbeforeunload = undefined;
         }
 
-        if (!data || this.state.resultType !== RESULT_TYPES.EXPLAIN) {
+        if (!data || resultType !== RESULT_TYPES.EXPLAIN) {
             return;
         }
-    }
+    }, [props.executeQuery, props.executeQuery]);
 
-    editorDidMount = (editor, monaco) => {
-        this.editorRef = editor;
+    useEffect(() => {
+        const {
+            path,
+            executeQuery: {input},
+        } = props;
+        if (resultType === RESULT_TYPES.EXPLAIN) {
+            props.getExplainQuery({query: input, database: path});
+        }
+    }, [resultType]);
+
+    const checkIfHasUnsavedInput = (e) => {
+        e.preventDefault();
+        // Chrome requires returnValue to be set
+        e.returnValue = '';
+    };
+
+    const editorDidMount = (editor, monaco) => {
+        editorRef.current = editor;
         editor.focus();
         editor.addAction({
             id: 'run',
@@ -140,7 +184,7 @@ class QueryEditor extends React.Component {
             // Method that will be executed when the action is triggered.
             // @param editor The editor instance is passed in as a convinience
             run: () => {
-                this.handleSendClick();
+                handleSendClick();
             },
         });
 
@@ -154,7 +198,7 @@ class QueryEditor extends React.Component {
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 2,
             run: () => {
-                this.handlePreviousHistoryClick();
+                handlePreviousHistoryClick();
             },
         });
         editor.addAction({
@@ -167,7 +211,7 @@ class QueryEditor extends React.Component {
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 3,
             run: () => {
-                this.handleNextHistoryClick();
+                handleNextHistoryClick();
             },
         });
 
@@ -185,62 +229,65 @@ class QueryEditor extends React.Component {
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 4,
             run: () => {
-                this.handleGetExplainQueryClick();
+                handleGetExplainQueryClick();
             },
         });
     };
-    onChange = (newValue) => {
-        this.props.changeUserInput({input: newValue});
+    const onChange = (newValue) => {
+        props.changeUserInput({input: newValue});
     };
 
-    handleSendClick = () => {
+    const handleSendClick = () => {
         const {
             path,
             executeQuery: {input, history, runAction},
             sendQuery,
             saveQueryToHistory,
-        } = this.props;
+        } = props;
 
-        this.setState({resultType: RESULT_TYPES.EXECUTE});
+        setResultType(RESULT_TYPES.EXECUTE);
         sendQuery({query: input, database: path, action: runAction});
+        dispatch(setShowPreview(false))
 
         const {queries, currentIndex} = history;
         if (input !== queries[currentIndex]) {
             saveQueryToHistory(input);
         }
+        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
 
-    handleCancelClick = () => {
-        this.props.cancelQuery();
+    const handleGetExplainQueryClick = () => {
+        setResultType(RESULT_TYPES.EXPLAIN);
+        dispatch(setShowPreview(false))
+        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
 
-    handleGetExplainQueryClick = () => {
-        const {
-            path,
-            executeQuery: {input},
-            getExplainQuery,
-        } = this.props;
-
-        this.setState({resultType: RESULT_TYPES.EXPLAIN}, () => {
-            getExplainQuery({query: input, database: path});
-        });
-    };
-
-    handleAstQuery = () => {
+    const handleAstQuery = () => {
         const {
             path,
             executeQuery: {input},
             getExplainQueryAst,
-        } = this.props;
+        } = props;
         getExplainQueryAst({query: input, database: path});
     };
 
-    renderExecuteQuery = () => {
+    const onCollapseResultHandler = () => {
+        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
+    };
+    const onExpandResultHandler = () => {
+        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+    };
+
+    const onSplitStartDrugAdditional = () => {
+        dispatchResultVisibilityState(PaneVisibilityActionTypes.clear);
+    };
+
+    const renderExecuteQuery = () => {
         const {
             executeQuery: {data, error, stats},
             showTooltip,
-        } = this.props;
-        const result = this.getExecuteResult();
+        } = props;
+        const result = getExecuteResult();
         const shouldRenderAnswer = result.length || error;
 
         if (!shouldRenderAnswer) {
@@ -265,56 +312,62 @@ class QueryEditor extends React.Component {
         }
 
         const preparedData = prepareQueryResponse(data);
+
         const content = columns.length ? (
             <DataTable
                 columns={columns}
                 data={preparedData}
                 settings={TABLE_SETTINGS}
-                theme="common"
+                theme="yandex-cloud"
             />
         ) : (
             <div>{result}</div>
         );
-        return <QueryResult result={content} stats={stats} />;
+        const results = getPreparedResult();
+        const disabled = !results.length || resultType !== RESULT_TYPES.EXECUTE;
+        return (
+            <QueryResult
+                result={content}
+                stats={stats}
+                error={Boolean(error)}
+                textResults={results}
+                copyDisabled={disabled}
+                isResultsCollapsed={resultVisibilityState.collapsed}
+                onExpandResults={onExpandResultHandler}
+                onCollapseResults={onCollapseResultHandler}
+            />
+        );
     };
-
-    renderExplainQuery = () => {
+    const renderExplainQuery = () => {
         const {
             explainQuery: {data, dataAst, error, loading, loadingAst},
             theme,
-        } = this.props;
-
-        if (error) {
-            return error.data ? error.data : error;
-        } else if (!data && !loading) {
-            return 'Explain of query is empty';
-        } else if (!data) {
-            return null;
-        } else if (!data.nodes.length) {
-            return 'There is no explanation for the request';
-        }
+        } = props;
 
         return (
             <QueryExplain
+                error={error}
                 explain={data}
-                astQuery={this.handleAstQuery}
+                astQuery={handleAstQuery}
                 ast={dataAst?.ast}
+                loading={loading}
                 loadingAst={loadingAst}
                 theme={theme}
+                isResultsCollapsed={resultVisibilityState.collapsed}
+                onExpandResults={onExpandResultHandler}
+                onCollapseResults={onCollapseResultHandler}
             />
         );
     };
 
-    renderResult = () => {
-        const {resultType} = this.state;
-
+    const renderResult = () => {
         let result;
         switch (resultType) {
             case RESULT_TYPES.EXECUTE:
-                result = this.renderExecuteQuery();
+                result = renderExecuteQuery();
                 break;
             case RESULT_TYPES.EXPLAIN:
-                result = this.renderExplainQuery();
+                result = renderExplainQuery();
                 break;
             default:
                 result = null;
@@ -323,15 +376,24 @@ class QueryEditor extends React.Component {
         return result;
     };
 
-    handlePreviousHistoryClick = () => {
+    const renderPreview = () => {
+        const {path, type, currentSchema = {}} = props;
+        const partCount = currentSchema?.PathDescription?.TableStats?.PartCount;
+        // onExpandResultHandler();
+        return (
+            <Preview database={path} table={currentSchema.Path} type={type} partCount={partCount} />
+        );
+    };
+
+    const handlePreviousHistoryClick = () => {
         const {
             changeUserInput,
             executeQuery: {history},
             goToPreviousQuery,
-        } = this.props;
+        } = props;
         const {queries, currentIndex} = history;
 
-        if (this.previousButtonIsDisabled()) {
+        if (previousButtonIsDisabled()) {
             return;
         }
 
@@ -339,15 +401,15 @@ class QueryEditor extends React.Component {
         changeUserInput({input: queries[currentIndex - 1]});
     };
 
-    handleNextHistoryClick = () => {
+    const handleNextHistoryClick = () => {
         const {
             changeUserInput,
             executeQuery: {history},
             goToNextQuery,
-        } = this.props;
+        } = props;
         const {queries, currentIndex} = history;
 
-        if (this.nextButtonIsDisabled()) {
+        if (nextButtonIsDisabled()) {
             return;
         }
 
@@ -355,55 +417,38 @@ class QueryEditor extends React.Component {
         changeUserInput({input: queries[currentIndex + 1]});
     };
 
-    previousButtonIsDisabled = () => {
+    const previousButtonIsDisabled = () => {
         const {
             history: {currentIndex},
-        } = this.props.executeQuery;
+        } = props.executeQuery;
 
         return currentIndex <= 0;
     };
 
-    nextButtonIsDisabled = () => {
+    const nextButtonIsDisabled = () => {
         const {
             history: {queries, currentIndex},
-        } = this.props.executeQuery;
+        } = props.executeQuery;
 
         return queries.length - 1 === currentIndex;
     };
 
-    renderHistoryNavigation = () => {
+    const renderHistoryNavigation = () => {
+        const {changeUserInput} = props;
         return (
             <div className={b('history-controls')}>
-                <span className={b('history-label')}>History:</span>
-                <Pagination
-                    previous={{
-                        handler: this.handlePreviousHistoryClick,
-                        hotkeyHandler: this.handlePreviousHistoryClick,
-                        hotkeyScope: 'all',
-                        hotkey: 'ctrl+up, command+up',
-                        tooltip: 'Previous query [ctrl+↑]',
-                        disabled: this.previousButtonIsDisabled(),
-                    }}
-                    next={{
-                        handler: this.handleNextHistoryClick,
-                        hotkeyHandler: this.handleNextHistoryClick,
-                        hotkeyScope: 'all',
-                        hotkey: 'ctrl+down, command+down',
-                        tooltip: 'Next query [ctrl+↓]',
-                        disabled: this.nextButtonIsDisabled(),
-                    }}
-                />
+                <QueriesHistory changeUserInput={changeUserInput} />
             </div>
         );
     };
 
-    getExecuteResult = () => {
+    const getExecuteResult = () => {
         const {
             data = [],
             error,
             loading,
             history: {queries},
-        } = this.props.executeQuery;
+        } = props.executeQuery;
 
         if (error) {
             return error.data || error;
@@ -416,10 +461,10 @@ class QueryEditor extends React.Component {
         }
     };
 
-    getPreparedResult = () => {
+    const getPreparedResult = () => {
         const {
             executeQuery: {data},
-        } = this.props;
+        } = props;
         const columnDivider = '\t';
         const rowDivider = '\n';
 
@@ -447,68 +492,28 @@ class QueryEditor extends React.Component {
             .join(rowDivider);
     };
 
-    renderClipboardButton = () => {
-        const results = this.getPreparedResult();
-        const {resultType} = this.state;
-        const disabled = !results.length || resultType !== RESULT_TYPES.EXECUTE;
-
-        return (
-            <CopyToClipboard text={results} timeout={1000}>
-                {(state) => {
-                    if (state === 'success') {
-                        toaster.createToast({
-                            name: 'Copied',
-                            title: 'Results were copied to clipboard successfully',
-                            type: state,
-                        });
-                    }
-
-                    return (
-                        <Button onClick={() => {}} disabled={disabled}>
-                            Copy results
-                        </Button>
-                    );
-                }}
-            </CopyToClipboard>
-        );
-    };
-
-    onChangeWindow = _.throttle(() => {
-        this.updateEditor();
+    const onChangeWindow = _.throttle(() => {
+        updateEditor();
     }, 100);
 
-    storageEventHandler = (event) => {
+    const storageEventHandler = (event) => {
         if (event.key === SAVED_QUERIES_KEY) {
-            this.props.setSettingValue(SAVED_QUERIES_KEY, event.newValue);
+            props.setSettingValue(SAVED_QUERIES_KEY, event.newValue);
         }
     };
 
-    updateEditor = () => {
-        if (this.editorRef) {
-            this.editorRef.layout();
+    const updateEditor = () => {
+        if (editorRef.current) {
+            editorRef.current.layout();
         }
     };
 
-    onChangeSplit = (size) => {
-        this.setDefaultSizeResultPane(size);
-        this.updateEditor();
-    };
-    setDefaultSizeResultPane = (size) => {
-        localStorage.setItem(DEFAULT_SIZE_RESULT_PANE_KEY, size);
-    };
-    getDefaultSizeResultPane = () => {
-        let size = parseInt(localStorage.getItem(DEFAULT_SIZE_RESULT_PANE_KEY), 10) || 250;
-        size = `${size}px`;
-
-        return size;
-    };
-
-    onSaveQueryHandler = (queryName) => {
+    const onSaveQueryHandler = (queryName) => {
         const {
             executeQuery: {input},
             savedQueries = [],
             setSettingValue,
-        } = this.props;
+        } = props;
 
         const queryIndex = savedQueries.findIndex(
             (el) => el.name.toLowerCase() === queryName.toLowerCase(),
@@ -524,112 +529,132 @@ class QueryEditor extends React.Component {
         setSettingValue(SAVED_QUERIES_KEY, JSON.stringify(newSavedQueries));
     };
 
-    onDeleteQueryHandler = (queryName) => {
-        const {savedQueries = [], setSettingValue} = this.props;
+    const onDeleteQueryHandler = (queryName) => {
+        const {savedQueries = [], setSettingValue} = props;
         const newSavedQueries = savedQueries.filter(
             (el) => el.name.toLowerCase() !== queryName.toLowerCase(),
         );
         setSettingValue(SAVED_QUERIES_KEY, JSON.stringify(newSavedQueries));
     };
 
-    render() {
-        const {executeQuery, explainQuery, theme, savedQueries, changeUserInput} = this.props;
+    const renderControls = () => {
+        const {executeQuery, explainQuery, savedQueries} = props;
         const {runAction} = executeQuery;
         const runIsDisabled = !executeQuery.input || executeQuery.loading;
-        const runText = _.find(RUN_ACTIONS, {value: runAction}).title;
-        const loadingResult = executeQuery.loading || explainQuery.loading;
-        const result = this.renderResult();
-        const showSecondPane = Boolean(result) || loadingResult;
-        const defaultSizeResultPane = this.getDefaultSizeResultPane();
+        const runText = _.find(RUN_ACTIONS, {value: runAction}).content;
+        return (
+            <div className={b('controls')}>
+                <div className={b('control-run')}>
+                    <Button
+                        onClick={handleSendClick}
+                        view="action"
+                        pin="round-brick"
+                        disabled={runIsDisabled}
+                        loading={executeQuery.loading}
+                    >
+                        <Icon name="startPlay" viewBox="0 0 16 16" width={16} height={16} />
+                        {runText}
+                    </Button>
+                    <Select
+                        view="action"
+                        options={RUN_ACTIONS}
+                        value={undefined}
+                        disabled={runIsDisabled}
+                        pin="brick-round"
+                        // renderSwitcher={() => (
+                        //     <div className={b('run-switcher')}>
+                        //         <Button
+                        //             view="action"
+                        //             pin="brick-round"
+                        //             disabled={runIsDisabled}
+                        //             loading={executeQuery.loading}
+                        //         >
+                        //             <Icon name="chevron-down" width={16} height={16} />
+                        //         </Button>
+                        //     </div>
+                        // )}
+                        onUpdate={(value) => {
+                            props.selectRunAction(value[0]);
+                        }}
+                    />
+                </div>
+                <Button
+                    onClick={handleGetExplainQueryClick}
+                    disabled={!executeQuery.input}
+                    loading={explainQuery.loading}
+                >
+                    Explain
+                </Button>
+                <Divider />
+                <SaveQuery
+                    savedQueries={savedQueries}
+                    onSaveQuery={onSaveQueryHandler}
+                    saveButtonDisabled={runIsDisabled}
+                />
+            </div>
+        );
+    };
+
+    const renderUpperControls = () => {
+        const {savedQueries, changeUserInput} = props;
 
         return (
-            <div className={b()}>
-                <SplitPane
-                    split="horizontal"
-                    primary="second"
-                    minSize={100}
-                    maxSize={-57}
-                    defaultSize={defaultSizeResultPane}
-                    hidePane={!showSecondPane}
-                    pane1Style={{minHeight: '50px'}}
-                    onChange={this.onChangeSplit}
-                >
-                    <div className={b('pane-wrapper')}>
-                        <div className={b('monaco-wrapper')}>
-                            <div className={b('monaco')}>
-                                <MonacoEditor
-                                    language="sql"
-                                    value={executeQuery.input}
-                                    options={EDITOR_OPTIONS}
-                                    onChange={this.onChange}
-                                    editorDidMount={this.editorDidMount}
-                                    theme={`vs-${theme}`}
-                                />
-                            </div>
-                        </div>
-                        <div className={b('controls')}>
-                            <div className={b('control-run')}>
-                                <Button
-                                    onClick={this.handleSendClick}
-                                    view="action"
-                                    pin="round-brick"
-                                    disabled={runIsDisabled}
-                                    loading={executeQuery.loading}
-                                >
-                                    {runText}
-                                </Button>
-                                <Select
-                                    options={RUN_ACTIONS}
-                                    value={runAction}
-                                    disabled={runIsDisabled}
-                                    renderSwitcher={() => (
-                                        <div className={b('run-switcher')}>
-                                            <Button
-                                                view="action"
-                                                pin="brick-round"
-                                                disabled={runIsDisabled}
-                                                loading={executeQuery.loading}
-                                            >
-                                                <Icon name="chevron-down" width={16} height={16} />
-                                            </Button>
-                                        </div>
-                                    )}
-                                    onUpdate={(value) => {
-                                        this.props.selectRunAction(value);
-                                    }}
-                                />
-                            </div>
-                            <Button
-                                onClick={this.handleGetExplainQueryClick}
-                                disabled={!executeQuery.input}
-                                loading={explainQuery.loading}
-                            >
-                                Explain
-                            </Button>
-                            {this.renderHistoryNavigation()}
-                            {this.renderClipboardButton()}
-                            <SaveQuery
-                                savedQueries={savedQueries}
-                                onSaveQuery={this.onSaveQueryHandler}
-                                saveButtonDisabled={runIsDisabled}
-                                changeUserInput={changeUserInput}
-                                onDeleteQuery={this.onDeleteQueryHandler}
+            <div className={b('upper-controls')}>
+                {renderHistoryNavigation()}
+                <SavedQueries
+                    savedQueries={savedQueries}
+                    changeUserInput={changeUserInput}
+                    onDeleteQuery={onDeleteQueryHandler}
+                />
+            </div>
+        );
+    };
+
+    const {executeQuery, theme} = props;
+    const result = renderResult();
+
+    return (
+        <div className={b()}>
+            <SplitPane
+                direction="vertical"
+                defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
+                triggerCollapse={resultVisibilityState.triggerCollapse}
+                triggerExpand={resultVisibilityState.triggerExpand}
+                minSize={[0, 52]}
+                collapsedSizes={[100, 0]}
+                onSplitStartDrugAdditional={onSplitStartDrugAdditional}
+            >
+                <div className={b('pane-wrapper')}>
+                    <div className={b('monaco-wrapper')}>
+                        <div className={b('monaco')}>
+                            <MonacoEditor
+                                language="sql"
+                                value={executeQuery.input}
+                                options={EDITOR_OPTIONS}
+                                onChange={onChange}
+                                editorDidMount={editorDidMount}
+                                theme={`vs-${theme}`}
                             />
                         </div>
                     </div>
-                    {showSecondPane && <div className={b('pane-wrapper')}>{result}</div>}
-                </SplitPane>
-            </div>
-        );
-    }
+                    {renderControls()}
+                    {renderUpperControls()}
+                </div>
+                <div className={b('pane-wrapper')}>
+                    {props.showPreview ? renderPreview() : result}
+                </div>
+            </SplitPane>
+        </div>
+    );
 }
 
 const mapStateToProps = (state) => {
     return {
         executeQuery: state.executeQuery,
         explainQuery: state.explainQuery,
-        theme: getSettingValue(state, THEME_KEY),
         savedQueries: parseJson(getSettingValue(state, SAVED_QUERIES_KEY)),
+        showPreview: state.schema.showPreview,
+        currentSchema: state.schema.currentSchema,
     };
 };
 
@@ -645,5 +670,7 @@ const mapDispatchToProps = {
     setSettingValue,
     selectRunAction,
 };
+
+QueryEditor.propTypes = propTypes;
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryEditor);

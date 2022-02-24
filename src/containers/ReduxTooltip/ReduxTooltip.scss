@@ -1,8 +1,9 @@
 @import '../../styles/mixins.scss';
 
 .popup2 {
-    animation: none !important;
     max-width: 300px;
+
+    animation: none !important;
 }
 
 .pool-tooltip,
@@ -14,6 +15,7 @@
 
     &__label {
         padding-right: 15px;
+
         color: var(--yc-color-text-secondary);
     }
 }
@@ -49,6 +51,7 @@
 
 .cell-tooltip {
     padding: 10px;
+
     word-break: break-word;
 }
 
@@ -56,6 +59,7 @@
     padding: 10px;
     &__label {
         padding-right: 15px;
+
         color: var(--yc-color-text-secondary);
     }
 

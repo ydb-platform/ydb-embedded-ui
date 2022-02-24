@@ -6,44 +6,52 @@
         align-items: flex-start;
     }
     &__field-title {
-        @include body2-typography();
-        line-height: 32px;
-        font-weight: 500;
-        white-space: nowrap;
         margin-right: 12px;
+
+        font-weight: 500;
+        line-height: 32px;
+        white-space: nowrap;
+        @include body2-typography();
         &.required {
             &::after {
                 content: '*';
+
                 color: var(--yc-color-text-danger);
             }
         }
     }
     &__control-wrapper {
-        flex-grow: 1;
         display: flex;
+        flex-grow: 1;
         flex-direction: column;
     }
     &__error {
         display: inline-block;
+
         height: 17px;
+
         color: var(--yc-color-text-danger);
     }
     &__embedded-tooltip {
-        height: 100%;
         display: flex;
         align-items: center;
-        color: var(--yc-color-text-secondary);
+
+        height: 100%;
         margin-left: -10px;
+
+        color: var(--yc-color-text-secondary);
         &:hover {
             cursor: pointer;
+
             color: var(--yc-color-text-complementary);
         }
     }
 
     &__embedded-popup {
-        padding: 10px;
-        border-radius: 5px;
         max-width: 150px !important;
+        padding: 10px;
+
+        border-radius: 5px;
         &::before {
             border-radius: 5px;
         }

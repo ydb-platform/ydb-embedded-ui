@@ -1,8 +1,9 @@
 .kv-truncated-query {
-    word-break: break-word;
-    white-space: pre;
-    vertical-align: top;
     max-width: 100%;
+
+    vertical-align: top;
+    white-space: pre;
+    word-break: break-word;
 
     &_color {
         &_secondary {

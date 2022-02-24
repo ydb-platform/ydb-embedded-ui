@@ -1,24 +1,24 @@
 @import '../../styles/mixins.scss';
 
 .nodes-viewer {
-    @include flex-container();
     overflow: auto;
+    @include flex-container();
 
     &__controls {
-        margin: 25px 0 20px 20px;
         display: flex;
         align-items: center;
+        gap: 12px;
 
-        & > * {
-            margin-right: 25px;
-        }
+        margin: 0 0 8px;
     }
 
     &__name {
-        color: var(--yc-color-base-special);
+        display: inline-block;
+
         cursor: pointer;
         text-decoration: none;
-        display: inline-block;
+
+        color: var(--yc-color-base-special);
     }
 
     &__search {
@@ -30,8 +30,9 @@
     }
 
     &__tablets {
-        padding: 0 !important;
         overflow-x: auto;
+
+        padding: 0 !important;
 
         .tablets-viewer__grid {
             justify-content: center;
@@ -40,16 +41,17 @@
     }
 
     &__table-wrapper {
-        @include flex-container();
         overflow: auto;
+        @include flex-container();
     }
 
     &__table-content {
         overflow: auto;
+
         height: 100%;
         @include freeze-nth-column(1);
         @include freeze-nth-column(2, 80px);
-        @include freeze-nth-column(3, 120px);
+        @include freeze-nth-column(3, 430px);
 
         @include table-styles;
         @include table-sticky-styles;
@@ -58,8 +60,10 @@
         width: 100%;
         span {
             display: block;
-            width: 100%;
             overflow: hidden;
+
+            width: 100%;
+
             text-overflow: ellipsis;
         }
     }

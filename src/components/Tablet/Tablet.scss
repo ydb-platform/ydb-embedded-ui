@@ -1,16 +1,18 @@
 .tablet {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     width: 18px;
     height: 18px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--yc-color-text-complementary);
-    text-transform: uppercase;
+
     font-size: 10px;
     cursor: pointer;
+    text-transform: uppercase;
 
+    color: var(--yc-color-text-complementary);
     border: 1px solid var(--yc-color-base-generic-medium-hover);
+    border-radius: 4px;
 
     &__wrapper {
         margin-right: 2px;
@@ -22,6 +24,7 @@
 
     &__type {
         line-height: 17px;
+
         color: var(--yc-color-text-complementary);
     }
 

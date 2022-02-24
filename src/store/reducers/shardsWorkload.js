@@ -2,7 +2,7 @@ import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
 
 const SEND_SHARD_QUERY = createRequestActionTypes('query', 'SEND_SHARD_QUERY');
-const SET_SHARD_QUERY_OPTIONS = createRequestActionTypes('query', 'SET_SHARD_QUERY_OPTIONS');
+const SET_SHARD_QUERY_OPTIONS = 'query/SET_SHARD_QUERY_OPTIONS';
 
 const initialState = {
     loading: false,

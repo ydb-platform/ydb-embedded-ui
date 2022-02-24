@@ -1,37 +1,86 @@
+@import '../../styles/mixins.scss';
+
 .authentication {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 
     height: 100%;
 
-    &__form-wrapper {
+    background-color: rgba(184, 212, 253, 0.1);
+    background-image: radial-gradient(
+            at 0% 100%,
+            rgba(0, 102, 255, 0.15) 20%,
+            rgba(247, 247, 247, 0) 40%
+        ),
+        radial-gradient(at 55% 0%, rgba(0, 102, 255, 0.15) 20%, rgba(247, 247, 247, 0) 40%),
+        radial-gradient(at 110% 100%, rgba(0, 102, 255, 0.15) 20%, rgba(247, 247, 247, 0) 40%);
+    background-blend-mode: normal;
+
+    .yc-text-input {
+        display: flex;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        width: 100%;
+
+        font-size: var(--yc-text-body-font-size);
+        line-height: var(--yc-text-header-line-height);
+    }
+
+    &__logo {
         display: flex;
         align-items: center;
+
+        font-size: 16px;
+        font-weight: 600;
+        gap: 8px;
+    }
+
+    &__title {
+        margin: 34px 0 16px;
+
+        font-weight: 600;
+        @include title-typography();
+    }
+
+    &__form-wrapper {
+        display: flex;
         flex-direction: column;
         flex-shrink: 0;
         justify-content: center;
+        align-items: center;
 
-        width: 50%;
+        width: 400px;
         min-width: 320px;
-        height: 50%;
-        min-height: 170px;
+        padding: 40px;
 
-        border-radius: 5px;
-        background-color: var(--yc-color-base-info);
-        box-shadow: 0px 1px 5px var(--yc-color-sfx-shadow);
+        border-radius: 16px;
+        background-color: var(--yc-color-base-background);
     }
 
     &__field-wrapper {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: flex-start;
 
-        width: 250px;
-        margin-bottom: 10px;
-
-        &:last-child {
-            margin-bottom: 16px;
+        width: 320px;
+        margin-bottom: 16px;
+        .yc-text-input_state_error {
+            flex-direction: column;
         }
+    }
+
+    &__button-sign-in {
+        display: inline-flex;
+        justify-content: center;
+    }
+
+    &__show-password-button {
+        margin-left: 4px;
     }
 }

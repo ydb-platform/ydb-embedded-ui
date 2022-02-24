@@ -12,7 +12,7 @@ import {Loader, Checkbox} from '@yandex-cloud/uikit';
 import {Select} from '@yandex-cloud/uikit/build/esm/components/unstable/Select';
 import {HeatmapCanvas} from './HeatmapCanvas/HeatmapCanvas';
 import {Histogram} from './Histogram/Histogram';
-import {AutoFetcher} from '../Cluster/Cluster';
+import {AutoFetcher} from '../../utils/autofetcher';
 
 import './Heatmap.scss';
 

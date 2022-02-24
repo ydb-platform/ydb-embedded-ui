@@ -12,16 +12,13 @@ import {
 import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
 
 import Tablet from '../../components/Tablet/Tablet';
-import {Loader, Progress} from '@yandex-cloud/uikit';
+import {Loader} from '@yandex-cloud/uikit';
 import {Select} from '@yandex-cloud/uikit/build/esm/components/unstable/Select';
 import ReactList from 'react-list';
-import {COLORS_PRIORITY} from '../../utils/constants';
-import {AutoFetcher} from '../Cluster/Cluster';
+import {AutoFetcher} from '../../utils/autofetcher';
 
 import './Tablets.scss';
-
-// чтобы при очень маленьком проценте все равно были видны проблемные места, установим минимальный процент в 3
-const minOverallPercentValue = 3;
+import TabletsOverall from '../../components/TabletsOverall/TabletsOverall';
 
 const b = cn('tablets');
 
@@ -42,14 +39,6 @@ class Tablets extends React.Component {
 
     autofetcher;
 
-    static renderLoader() {
-        return (
-            <div className={b('loader-wrapper')}>
-                <Loader size="m" />
-            </div>
-        );
-    }
-
     state = {
         filteredTablets: [],
     };
@@ -65,6 +54,11 @@ class Tablets extends React.Component {
 
     componentDidUpdate(prevProps) {
         const {autorefresh} = this.props;
+
+        if (!prevProps.path && this.props.path) {
+            this.makeRequestIfPathOrNodeExist();
+        }
+
         if (prevProps.path && this.props.path && prevProps.path !== this.props.path) {
             this.props.clearWasLoadingFlag();
             this.makeRequestIfPathOrNodeExist();
@@ -84,6 +78,14 @@ class Tablets extends React.Component {
     componentWillUnmount() {
         this.autofetcher.stop();
     }
+
+    renderLoader = () => {
+        return (
+            <div className={b('loader-wrapper')}>
+                <Loader size="m" />
+            </div>
+        );
+    };
 
     makeRequestIfPathOrNodeExist = () => {
         const {nodeId, path} = this.props;
@@ -136,76 +138,6 @@ class Tablets extends React.Component {
         this.setState({filteredTablets});
     };
 
-    renderOverall = (tablets) => {
-        const {hideTooltip, showTooltip} = this.props;
-        const tabletsCount = tablets.length;
-
-        const substractPercentsFromMaxPercents = (statesForOverallProgress, substractValue) => {
-            Object.keys(statesForOverallProgress).some((key) => {
-                if (statesForOverallProgress[key] > 10) {
-                    statesForOverallProgress[key] -= minOverallPercentValue - substractValue;
-                    return true;
-                }
-                return false;
-            });
-        };
-
-        // определим, сколько таблеток какого цвета имеется в tablets
-        const statesForOverallProgress = tablets.reduce((acc, tablet) => {
-            const color = tablet.Overall.toLowerCase();
-            if (!acc[color]) {
-                acc[color] = 1;
-            } else {
-                acc[color]++;
-            }
-
-            return acc;
-        }, {});
-
-        const tooltipData = [];
-
-        // подсчитаем, сколько процентов составляет каждый цвет в statesForOverallProgress и заодно сгенерируем информацию для тултипа
-        Object.keys(statesForOverallProgress).forEach((key) => {
-            const percents = (statesForOverallProgress[key] / tabletsCount) * 100;
-            const value = statesForOverallProgress[key];
-            statesForOverallProgress[key] = percents;
-            tooltipData.push({color: key, percents, value, total: tablets.length});
-        });
-
-        // заменим все проценты, значения которых меньше 3 на тройку
-        Object.keys(statesForOverallProgress).forEach((key) => {
-            if (statesForOverallProgress[key] < minOverallPercentValue) {
-                substractPercentsFromMaxPercents(
-                    statesForOverallProgress,
-                    statesForOverallProgress[key],
-                );
-                statesForOverallProgress[key] = minOverallPercentValue;
-            }
-        });
-
-        const memoryProgress = 100;
-        const stack = Object.keys(statesForOverallProgress).map((key) => ({
-            color: `var(--color-status-${key}-solid-70)`,
-            colorKey: key,
-            value: statesForOverallProgress[key],
-        }));
-
-        // сортируем наш stack, чтобы цвета были в порядке "зеленый, оранжевый, желтый, красный, черный"
-        stack.sort((a, b) => COLORS_PRIORITY[b.colorKey] - COLORS_PRIORITY[a.colorKey]);
-
-        return (
-            <div className={b('row', {overall: true})}>
-                <span className={b('label', {overall: true})}>Overall</span>
-                <div
-                    onMouseLeave={hideTooltip}
-                    onMouseEnter={(e) => showTooltip(e.target, tooltipData, 'tabletsOverall')}
-                >
-                    <Progress value={memoryProgress} stack={stack} />
-                </div>
-            </div>
-        );
-    };
-
     renderContent = (tablets) => {
         const states = Array.from(new Set(...[tablets.map((tblt) => tblt.State)])).map((item) => ({
             value: item,
@@ -220,13 +152,11 @@ class Tablets extends React.Component {
 
         return (
             <div className={b()}>
-                {this.renderOverall(tablets)}
-
-                <div className={b('filters')}>
+                <div className={b('header')}>
                     <Select
                         className={b('filter-control')}
                         multiple
-                        placeholder="All"
+                        placeholder="All items"
                         label="States:"
                         options={states}
                         value={stateFilter}
@@ -236,13 +166,14 @@ class Tablets extends React.Component {
                     <Select
                         className={b('filter-control')}
                         multiple
-                        placeholder="All"
+                        placeholder="All items"
                         label="Types:"
                         options={types}
                         value={typeFilter}
                         onUpdate={this.handleTypeFilterChange}
                         width="100%"
                     />
+                    <TabletsOverall tablets={tablets} />
                 </div>
 
                 <div className={b('items')}>
@@ -259,7 +190,7 @@ class Tablets extends React.Component {
     render() {
         const {loading, wasLoaded, error, tablets} = this.props;
         if (loading && !wasLoaded) {
-            return Tablets.renderLoader();
+            return this.renderLoader();
         } else if (error) {
             return <div>{error.statusText}</div>;
         } else {
