@@ -7,10 +7,18 @@ const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
 const GO_TO_PREVIOUS_QUERY = 'query/GO_TO_PREVIOUS_QUERY';
 const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
 const SELECT_RUN_ACTION = 'query/SELECT_RUN_ACTION';
+const MONACO_HOT_KEY = 'query/MONACO_HOT_KEY';
 
 export const RUN_ACTIONS_VALUES = {
     script: 'execute-script',
     scan: 'execute-scan',
+};
+
+export const MONACO_HOT_KEY_ACTIONS = {
+    sendQuery: 'sendQuery',
+    goPrev: 'goPrev',
+    goNext: 'goNext',
+    getExplain: 'getExplain',
 };
 
 const initialState = {
@@ -21,6 +29,7 @@ const initialState = {
         currentIndex: -1,
     },
     runAction: RUN_ACTIONS_VALUES.script,
+    monacoHotKey: null,
 };
 
 const executeQuery = (state = initialState, action) => {
@@ -104,6 +113,13 @@ const executeQuery = (state = initialState, action) => {
             };
         }
 
+        case MONACO_HOT_KEY: {
+            return {
+                ...state,
+                monacoHotKey: action.data,
+            };
+        }
+
         default:
             return state;
     }
@@ -152,6 +168,13 @@ export const goToNextQuery = () => {
 export const changeUserInput = ({input}) => {
     return (dispatch) => {
         dispatch({type: CHANGE_USER_INPUT, data: {input}});
+    };
+};
+
+export const setMonacoHotKey = (value) => {
+    return {
+        type: MONACO_HOT_KEY,
+        data: value,
     };
 };
 

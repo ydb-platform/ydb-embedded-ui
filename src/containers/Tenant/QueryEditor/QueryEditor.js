@@ -1,6 +1,6 @@
 import {useEffect, useReducer, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
-import {connect, useDispatch} from 'react-redux';
+import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import MonacoEditor from 'react-monaco-editor';
@@ -23,6 +23,8 @@ import {
     goToNextQuery,
     selectRunAction,
     RUN_ACTIONS_VALUES,
+    MONACO_HOT_KEY_ACTIONS,
+    setMonacoHotKey,
 } from '../../../store/reducers/executeQuery';
 import {getExplainQuery, getExplainQueryAst} from '../../../store/reducers/explainQuery';
 import {showTooltip} from '../../../store/reducers/tooltip';
@@ -45,7 +47,7 @@ import {
     paneVisibilityToggleReducerCreator,
 } from '../utils/paneVisibilityToggleHelpers';
 import Preview from '../Preview/Preview';
-import { setShowPreview } from '../../../store/reducers/schema';
+import {setShowPreview} from '../../../store/reducers/schema';
 
 export const RUN_ACTIONS = [
     {value: RUN_ACTIONS_VALUES.script, content: 'Run Script'},
@@ -83,6 +85,7 @@ const propTypes = {
     executeQuery: PropTypes.object,
     explainQuery: PropTypes.object,
     showTooltip: PropTypes.func,
+    setMonacoHotKey: PropTypes.func,
     theme: PropTypes.string,
     type: PropTypes.string,
 };
@@ -94,8 +97,6 @@ const initialTenantCommonInfoState = {
 };
 function QueryEditor(props) {
     const [resultType, setResultType] = useState(RESULT_TYPES.EXECUTE);
-
-    const dispatch = useDispatch()
 
     const [resultVisibilityState, dispatchResultVisibilityState] = useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
@@ -114,6 +115,7 @@ function QueryEditor(props) {
             window.removeEventListener('resize', onChangeWindow);
             window.removeEventListener('storage', storageEventHandler);
             window.onbeforeunload = undefined;
+            props.setMonacoHotKey(null);
         };
     }, []);
 
@@ -150,19 +152,35 @@ function QueryEditor(props) {
     }, [props.executeQuery, props.executeQuery]);
 
     useEffect(() => {
-        const {
-            path,
-            executeQuery: {input},
-        } = props;
-        if (resultType === RESULT_TYPES.EXPLAIN) {
-            props.getExplainQuery({query: input, database: path});
+        const {monacoHotKey, setMonacoHotKey} = props;
+        setMonacoHotKey(null);
+        switch (monacoHotKey) {
+            case MONACO_HOT_KEY_ACTIONS.sendQuery: {
+                return handleSendClick();
+            }
+            case MONACO_HOT_KEY_ACTIONS.goPrev: {
+                return handlePreviousHistoryClick();
+            }
+            case MONACO_HOT_KEY_ACTIONS.goNext: {
+                return handleNextHistoryClick();
+            }
+            case MONACO_HOT_KEY_ACTIONS.getExplain: {
+                return handleGetExplainQueryClick();
+            }
+            default: {
+                return;
+            }
         }
-    }, [resultType]);
+    }, [props.monacoHotKey]);
 
     const checkIfHasUnsavedInput = (e) => {
         e.preventDefault();
         // Chrome requires returnValue to be set
         e.returnValue = '';
+    };
+
+    const handleKeyBinding = (value) => {
+        return () => props.setMonacoHotKey(value);
     };
 
     const editorDidMount = (editor, monaco) => {
@@ -183,9 +201,7 @@ function QueryEditor(props) {
             contextMenuOrder: 1,
             // Method that will be executed when the action is triggered.
             // @param editor The editor instance is passed in as a convinience
-            run: () => {
-                handleSendClick();
-            },
+            run: handleKeyBinding(MONACO_HOT_KEY_ACTIONS.sendQuery),
         });
 
         editor.addAction({
@@ -197,9 +213,7 @@ function QueryEditor(props) {
             ],
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 2,
-            run: () => {
-                handlePreviousHistoryClick();
-            },
+            run: handleKeyBinding(MONACO_HOT_KEY_ACTIONS.goPrev),
         });
         editor.addAction({
             id: 'next-query',
@@ -210,9 +224,7 @@ function QueryEditor(props) {
             ],
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 3,
-            run: () => {
-                handleNextHistoryClick();
-            },
+            run: handleKeyBinding(MONACO_HOT_KEY_ACTIONS.goNext),
         });
 
         editor.addAction({
@@ -228,9 +240,7 @@ function QueryEditor(props) {
             keybindingContext: null,
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 4,
-            run: () => {
-                handleGetExplainQueryClick();
-            },
+            run: handleKeyBinding(MONACO_HOT_KEY_ACTIONS.getExplain),
         });
     };
     const onChange = (newValue) => {
@@ -243,11 +253,12 @@ function QueryEditor(props) {
             executeQuery: {input, history, runAction},
             sendQuery,
             saveQueryToHistory,
+            setShowPreview,
         } = props;
 
         setResultType(RESULT_TYPES.EXECUTE);
         sendQuery({query: input, database: path, action: runAction});
-        dispatch(setShowPreview(false))
+        setShowPreview(false);
 
         const {queries, currentIndex} = history;
         if (input !== queries[currentIndex]) {
@@ -257,8 +268,15 @@ function QueryEditor(props) {
     };
 
     const handleGetExplainQueryClick = () => {
+        const {
+            path,
+            executeQuery: {input},
+            getExplainQuery,
+            setShowPreview,
+        } = props;
         setResultType(RESULT_TYPES.EXPLAIN);
-        dispatch(setShowPreview(false))
+        getExplainQuery({query: input, database: path});
+        setShowPreview(false);
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
 
@@ -655,6 +673,7 @@ const mapStateToProps = (state) => {
         savedQueries: parseJson(getSettingValue(state, SAVED_QUERIES_KEY)),
         showPreview: state.schema.showPreview,
         currentSchema: state.schema.currentSchema,
+        monacoHotKey: state.executeQuery?.monacoHotKey,
     };
 };
 
@@ -669,6 +688,8 @@ const mapDispatchToProps = {
     getExplainQueryAst,
     setSettingValue,
     selectRunAction,
+    setShowPreview,
+    setMonacoHotKey,
 };
 
 QueryEditor.propTypes = propTypes;
