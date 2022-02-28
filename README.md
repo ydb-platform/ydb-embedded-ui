@@ -24,5 +24,5 @@ The build is minified and the filenames include the hashes.
 
 To test production bundle with latest YDB backend release, do the following:
 1) Build a production bundle with a few tweaks for embedded version: `npm run build:embedded`.
-2) Invoke `docker run -it --hostname localhost -e YDB_LOCAL_SURVIVE_RESTART=true -dp 2135:2135 -p 8765:8765 -v ~/projects/ydb-embedded-ui/build:/ydb_data/node_1/contentmonitoring cr.yandex/yc/yandex-docker-local-ydb:latest`
+2) Invoke `docker run -it --hostname localhost -dp 2135:2135 -p 8765:8765 -v ~/projects/ydb-embedded-ui/build:/ydb_data/node_1/contentmonitoring cr.yandex/yc/yandex-docker-local-ydb:latest`
 3) Open [embedded YDB UI](http://localhost:8765/monitoring) to view it in the browser.

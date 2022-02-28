@@ -1,14 +1,14 @@
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useEffect, useState} from 'react';
 import cn from 'bem-cn-lite';
 import MonacoEditor from 'react-monaco-editor';
 import {Loader, RadioButton} from '@yandex-cloud/uikit';
 import JSONTree from 'react-json-inspector';
 import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco';
 import {
-    TopologyWrapper,
-    CompactTopologyWrapper,
     TextOverflow,
     getYdbPlanNodeShape,
+    getCompactTopology,
+    getTopology,
 } from '@yandex-cloud/paranoid';
 import {renderExplainNode} from '../../../../utils';
 import {explainVersions} from '../../../../store/reducers/explainQuery';
@@ -21,7 +21,7 @@ import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import 'react-json-inspector/json-inspector.css';
 import './QueryExplain.scss';
 import {useDispatch, useSelector} from 'react-redux';
-import { disableFullscreen } from '../../../../store/reducers/fullscreen';
+import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 
 const b = cn('kv-query-explain');
 
@@ -61,8 +61,42 @@ const explainOptions = [
     {value: ExplainOptionIds.ast, content: 'AST'},
 ];
 
+function GraphRoot(props) {
+    let paranoid;
+    useEffect(() => {
+        const {data, opts, shapes, version} = props;
+        if (version === explainVersions.v2) {
+            paranoid = getTopology('graphRoot', props.data, opts, shapes);
+            paranoid.render();
+        } else if (version === explainVersions.v1) {
+            paranoid = getCompactTopology('graphRoot', data, opts);
+            paranoid.renderCompactTopology();
+        }
+    }, []);
+
+    useEffect(() => {
+        const graphRoot = document.getElementById('graphRoot');
+
+        if (!graphRoot) {
+            throw new Error("Can't find element with id #graphRoot");
+        }
+
+        graphRoot.innerHTML = '';
+
+        const {data, opts} = props;
+        paranoid = getCompactTopology('graphRoot', data, opts);
+        paranoid.renderCompactTopology();
+    }, [props.opts.colors]);
+
+    useEffect(() => {
+        paranoid.updateData(props.data);
+    }, [props.data]);
+
+    return <div id="graphRoot" style={{height: '100vh'}} />;
+}
+
 function QueryExplain(props) {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const [activeOption, setActiveOption] = useState(ExplainOptionIds.schema);
 
     const isFullscreen = useSelector((state) => state.fullscreen);
@@ -75,41 +109,6 @@ function QueryExplain(props) {
 
     const {explain = {}, theme} = props;
     const {links, nodes, version, graphDepth} = explain;
-
-    const graph = useMemo(() => {
-        if (links && nodes) {
-            if (version === explainVersions.v2) {
-                return (
-                    <TopologyWrapper
-                        data={{links, nodes}}
-                        opts={{
-                            renderNodeTitle: renderExplainNode,
-                            textOverflow: TextOverflow.Normal,
-                            colors: theme === 'dark' ? DARK_COLORS : {},
-                            initialZoomFitsCanvas: true,
-                        }}
-                        shapes={{
-                            node: getYdbPlanNodeShape,
-                        }}
-                    />
-                );
-            } else if (version === explainVersions.v1) {
-                return (
-                    <CompactTopologyWrapper
-                        data={{links, nodes}}
-                        opts={{
-                            renderNodeTitle: renderExplainNode,
-                            textOverflow: TextOverflow.Normal,
-                            colors: theme === 'dark' ? DARK_COLORS : {},
-                            initialZoomFitsCanvas: true,
-                        }}
-                    />
-                );
-            }
-            return 'The explanation format of the query is not supported';
-        }
-        return null;
-    }, [links, nodes, theme, version]);
 
     useEffect(() => {
         if (!props.ast && activeOption === ExplainOptionIds.ast) {
@@ -188,19 +187,37 @@ function QueryExplain(props) {
 
     const renderGraph = () => {
         const graphHeight = `${Math.max(graphDepth * 100, 200)}px`;
-        const content = (
-            <div
-                className={b('explain-canvas-container', {
-                    hidden: activeOption !== ExplainOptionIds.schema,
-                })}
-                style={{height: graphHeight, minHeight: graphHeight, width: '100%'}}
-            >
-                {graph}
-            </div>
-        );
+
+        const content =
+            links && nodes && nodes.length ? (
+                <div
+                    className={b('explain-canvas-container', {
+                        hidden: activeOption !== ExplainOptionIds.schema,
+                    })}
+                    style={{
+                        height: isFullscreen ? '100%' : graphHeight,
+                        minHeight: graphHeight,
+                        width: '100%',
+                    }}
+                >
+                    <GraphRoot
+                        version={version}
+                        data={{links, nodes}}
+                        opts={{
+                            renderNodeTitle: renderExplainNode,
+                            textOverflow: TextOverflow.Normal,
+                            colors: theme === 'dark' ? DARK_COLORS : {},
+                            initialZoomFitsCanvas: true,
+                        }}
+                        shapes={{
+                            node: getYdbPlanNodeShape,
+                        }}
+                    />
+                </div>
+            ) : null;
         return (
             <React.Fragment>
-                {content}
+                {!isFullscreen && content}
                 {isFullscreen && <Fullscreen>{content}</Fullscreen>}
                 {renderStub()}
             </React.Fragment>
@@ -249,9 +266,7 @@ function QueryExplain(props) {
                     )}
                 </div>
                 <div className={b('controls-left')}>
-                    <EnableFullscreenButton
-                        disabled={Boolean(props.error) || activeOption === ExplainOptionIds.schema}
-                    />
+                    <EnableFullscreenButton disabled={Boolean(props.error)} />
                     <PaneVisibilityToggleButtons
                         onCollapse={props.onCollapseResults}
                         onExpand={props.onExpandResults}
