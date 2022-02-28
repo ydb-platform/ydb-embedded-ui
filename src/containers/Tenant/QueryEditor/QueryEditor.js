@@ -153,6 +153,9 @@ function QueryEditor(props) {
 
     useEffect(() => {
         const {monacoHotKey, setMonacoHotKey} = props;
+        if (monacoHotKey === null) {
+            return 
+        }
         setMonacoHotKey(null);
         switch (monacoHotKey) {
             case MONACO_HOT_KEY_ACTIONS.sendQuery: {
