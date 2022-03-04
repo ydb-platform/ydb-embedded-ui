@@ -13,7 +13,9 @@
     max-height: 100%;
 
     &__overview-wrapper {
+        display: flex;
         overflow: auto;
+        flex-grow: 1;
 
         padding: 0 12px 16px;
     }
@@ -91,7 +93,15 @@
     }
 
     &__info {
+        display: flex;
         overflow: hidden;
+        flex-direction: column;
+    }
+
+    &__schema {
+        display: flex;
+        overflow: auto;
+        flex-grow: 1;
     }
 
     &__info-controls {

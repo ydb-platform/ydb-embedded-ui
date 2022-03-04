@@ -78,7 +78,7 @@ interface ObjectSummaryProps {
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
     isCollapsed: boolean;
-    additionalTenantInfo?: any
+    additionalTenantInfo?: any;
 }
 
 function ObjectSummary(props: ObjectSummaryProps) {
@@ -168,10 +168,16 @@ function ObjectSummary(props: ObjectSummaryProps) {
     const renderTabContent = () => {
         switch (infoTab) {
             case TenantInfoTabsIds.acl: {
-                return <Acl additionalTenantInfo={props.additionalTenantInfo}/>;
+                return <Acl additionalTenantInfo={props.additionalTenantInfo} />;
             }
             case TenantInfoTabsIds.schema: {
-                return loadingSchema ? renderLoader() : <SchemaViewer data={schema} />;
+                return loadingSchema ? (
+                    renderLoader()
+                ) : (
+                    <div className={b('schema')}>
+                        <SchemaViewer data={schema} />
+                    </div>
+                );
             }
             default: {
                 return renderObjectOverview();
@@ -194,7 +200,9 @@ function ObjectSummary(props: ObjectSummaryProps) {
                     <div className={b('tree-title')}>Navigation</div>
                 </div>
                 <div className={b('tree')}>
-                    {tenantData && <SchemaNode fullPath={tenantName as string} data={tenantData} isRoot />}
+                    {tenantData && (
+                        <SchemaNode fullPath={tenantName as string} data={tenantData} isRoot />
+                    )}
                 </div>
             </div>
         );
