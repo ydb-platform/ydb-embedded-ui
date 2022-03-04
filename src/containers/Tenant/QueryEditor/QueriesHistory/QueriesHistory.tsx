@@ -38,6 +38,7 @@ function QueriesHistory(props: QueriesHistoryProps) {
     };
 
     const renderSavedQueries = () => {
+        const reversedHistory = ([] as string[]).concat(history).reverse();
         return (
             <Popup
                 className={b('popup-wrapper')}
@@ -47,7 +48,7 @@ function QueriesHistory(props: QueriesHistoryProps) {
                 onClose={onCloseHistory}
             >
                 <div className={b()}>
-                    {history.length === 0 ? (
+                    {reversedHistory.length === 0 ? (
                         <div className={b('empty')}>History is empty</div>
                     ) : (
                         <React.Fragment>
@@ -57,7 +58,7 @@ function QueriesHistory(props: QueriesHistoryProps) {
                                 </div>
                             </div>
                             <div>
-                                {history?.reverse().map((query, index) => {
+                                {reversedHistory.map((query, index) => {
                                     return (
                                         <div
                                             className={b('saved-queries-row')}

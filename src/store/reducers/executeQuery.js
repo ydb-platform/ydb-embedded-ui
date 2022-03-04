@@ -1,5 +1,9 @@
 import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
+import {getValueFromLS, parseJson} from '../../utils/utils';
+import {QUERIES_HISTORY_KEY} from '../../utils/constants';
+
+const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
 const SEND_QUERY = createRequestActionTypes('query', 'SEND_QUERY');
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
@@ -8,6 +12,10 @@ const GO_TO_PREVIOUS_QUERY = 'query/GO_TO_PREVIOUS_QUERY';
 const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
 const SELECT_RUN_ACTION = 'query/SELECT_RUN_ACTION';
 const MONACO_HOT_KEY = 'query/MONACO_HOT_KEY';
+
+const queriesHistoryInitial = parseJson(getValueFromLS(QUERIES_HISTORY_KEY, []));
+
+const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
 export const RUN_ACTIONS_VALUES = {
     script: 'execute-script',
@@ -25,7 +33,7 @@ const initialState = {
     loading: false,
     input: '',
     history: {
-        queries: [],
+        queries: queriesHistoryInitial.slice(sliceLimit < 0 ? 0 : sliceLimit),
         currentIndex: -1,
     },
     runAction: RUN_ACTIONS_VALUES.script,
@@ -76,7 +84,11 @@ const executeQuery = (state = initialState, action) => {
 
         case SAVE_QUERY_TO_HISTORY: {
             const query = action.data;
-            const newQueries = [...state.history.queries, query];
+            const sliceLimit = state.history.queries.length + 1 - MAXIMUM_QUERIES_IN_HISTORY;
+            const newQueries = [...state.history.queries, query].slice(
+                sliceLimit < 0 ? 0 : sliceLimit,
+            );
+            window.localStorage.setItem(QUERIES_HISTORY_KEY, JSON.stringify(newQueries));
             const currentIndex = newQueries.length - 1;
 
             return {
