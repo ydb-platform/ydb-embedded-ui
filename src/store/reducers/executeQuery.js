@@ -84,9 +84,8 @@ const executeQuery = (state = initialState, action) => {
 
         case SAVE_QUERY_TO_HISTORY: {
             const query = action.data;
-            const sliceLimit = state.history.queries.length + 1 - MAXIMUM_QUERIES_IN_HISTORY;
             const newQueries = [...state.history.queries, query].slice(
-                sliceLimit < 0 ? 0 : sliceLimit,
+                state.history.queries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
             );
             window.localStorage.setItem(QUERIES_HISTORY_KEY, JSON.stringify(newQueries));
             const currentIndex = newQueries.length - 1;
