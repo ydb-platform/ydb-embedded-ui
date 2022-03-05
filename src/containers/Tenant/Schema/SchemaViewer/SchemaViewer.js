@@ -67,7 +67,7 @@ class SchemaViewer extends React.Component {
                 theme="yandex-cloud"
                 data={tableData}
                 columns={columns}
-                settings={{...DEFAULT_TABLE_SETTINGS, stickyTop: 107}}
+                settings={DEFAULT_TABLE_SETTINGS}
                 dynamicRender={true}
                 initialSortOrder={{columnId: SchemaViewerColumns.key, order: DataTable.DESCENDING}}
             />

@@ -1,6 +1,10 @@
 @import '../../../styles/mixins.scss';
 
 .kv-acl {
+    display: flex;
+    overflow: auto;
+    flex-grow: 1;
+
     padding: 0 12px 16px;
     @include query-data-table;
     &__message-container {
@@ -37,9 +41,5 @@
         &::first-letter {
             color: var(--yc-color-text-danger);
         }
-    }
-
-    &__result {
-        overflow: auto;
     }
 }
