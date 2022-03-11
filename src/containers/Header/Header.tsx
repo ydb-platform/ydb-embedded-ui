@@ -1,15 +1,19 @@
-import {useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {useHistory, useLocation} from 'react-router';
+import {Breadcrumbs, BreadcrumbsItem, Link} from '@yandex-cloud/uikit';
 
-import {clusterName as clusterNameLocation} from '../../store';
+import Divider from '../../components/Divider/Divider';
+//@ts-ignore
+import Icon from '../../components/Icon/Icon';
+
+import {clusterName as clusterNameLocation, backend, customBackend} from '../../store';
 import {getClusterInfo} from '../../store/reducers/cluster';
 import {getHostInfo} from '../../store/reducers/host';
+import {HeaderItemType} from '../../store/reducers/header';
 
 import './Header.scss';
-import {Breadcrumbs, BreadcrumbsItem} from '@yandex-cloud/uikit';
-import {HeaderItemType} from '../../store/reducers/header';
 
 const b = cn('header');
 
@@ -49,6 +53,12 @@ function Header() {
     const renderHeader = () => {
         const clusterNameFinal = singleClusterMode ? host.ClusterName : clusterName;
 
+        let link = backend + '/internal';
+
+        if (singleClusterMode && !customBackend) {
+            link = `/internal`;
+        }
+
         const breadcrumbItems = header.reduce((acc, el) => {
             acc.push({text: el.text, action: () => history.push(el.link)});
             return acc;
@@ -63,8 +73,20 @@ function Header() {
                         firstDisplayedItemsCount={1}
                     />
                 </div>
-                <div>
-                    {clusterNameFinal && <ClusterName name={clusterNameFinal} />}
+
+                <div className={b('cluster-name-wrapper')}>
+                    <Link href={link} target="_blank">
+                        Internal viewer{' '}
+                        <Icon name="external" viewBox={'0 0 16 16'} width={16} height={16} />
+                    </Link>
+                    {clusterNameFinal && (
+                        <React.Fragment>
+                            <div className={b('divider')}>
+                                <Divider />
+                            </div>
+                            <ClusterName name={clusterNameFinal} />
+                        </React.Fragment>
+                    )}
                 </div>
             </header>
         );

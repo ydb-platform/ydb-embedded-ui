@@ -25,4 +25,16 @@
         font-size: var(--yc-text-body2-font-size);
         font-weight: 500;
     }
+
+    &__cluster-name-wrapper {
+        display: flex;
+        align-items: center;
+
+        height: 100%;
+        gap: 5px;
+    }
+
+    &__divider {
+        height: 80%;
+    }
 }
