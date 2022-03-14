@@ -214,7 +214,7 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
 
     if (visibleEntities === VisibleEntities.Space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
-        emptyMessage = 'No storage groups with space problems.';
+        emptyMessage = 'No groups with out of space errors.';
     }
 
     if (visibleEntities === VisibleEntities.Missing) {
