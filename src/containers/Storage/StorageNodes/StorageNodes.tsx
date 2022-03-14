@@ -118,7 +118,7 @@ function StorageNodes({data, tableSettings, visibleEntities}: StorageGroupsProps
 
     if (visibleEntities === VisibleEntities.Space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
-        emptyMessage = 'No nodes with space problems.';
+        emptyMessage = 'No nodes with out of space errors.';
     }
     if (visibleEntities === VisibleEntities.Missing) {
         emptyMessage = 'No degraded nodes.';
