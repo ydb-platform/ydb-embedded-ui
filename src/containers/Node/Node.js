@@ -8,7 +8,7 @@ import {Loader, Tabs} from '@yandex-cloud/uikit';
 import {withRouter, Link} from 'react-router-dom';
 
 import FullNodeViewer from '../../components/FullNodeViewer/FullNodeViewer';
-import {TABLETS, STORAGE, NODE_PAGES} from './NodePages';
+import {TABLETS, STORAGE, NODE_PAGES, OVERVIEW} from './NodePages';
 import Tablets from '../Tablets/Tablets';
 import Storage from '../Storage/Storage';
 
@@ -69,7 +69,7 @@ class Node extends React.Component {
         if (node) {
             const hasStorage = _.find(node.Roles, (el) => el === STORAGE_ROLE);
             if (!hasStorage) {
-                activeTab = TABLETS;
+                activeTab = OVERVIEW;
             }
             this.setState((prev) => {
                 if (prev.activeTab !== activeTab) {

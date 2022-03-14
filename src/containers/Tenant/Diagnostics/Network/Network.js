@@ -14,11 +14,11 @@ import ProblemFilter, {problemFilterType} from '../../../../components/ProblemFi
 import {getNetworkInfo} from '../../../../store/reducers/network';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
 import {ALL, PROBLEMS} from '../../../../utils/constants';
-import routes, {createHref} from '../../../../routes';
 import {changeFilter} from '../../../../store/reducers/settings';
+import {AutoFetcher} from '../../../../utils/autofetcher';
+import {getDefaultNodePath} from '../../../Node/NodePages';
 
 import './Network.scss';
-import {AutoFetcher} from '../../../../utils/autofetcher';
 
 const b = cn('network');
 
@@ -301,10 +301,7 @@ class Network extends React.Component {
                                         Connectivity of node{' '}
                                         <Link
                                             className={b('link')}
-                                            to={createHref(routes.node, {
-                                                id: clickedNode.NodeId,
-                                                activeTab: 'storage',
-                                            })}
+                                            to={getDefaultNodePath(clickedNode.NodeId)}
                                         >
                                             {clickedNode.NodeId}
                                         </Link>{' '}

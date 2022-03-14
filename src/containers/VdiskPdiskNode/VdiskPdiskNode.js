@@ -20,6 +20,7 @@ import {getNodeInfo} from '../../store/reducers/node';
 import {calcUptime, stringifyVdiskId, formatStorageValuesToGb} from '../../utils';
 import routes, {createHref} from '../../routes';
 import {bytesToSpeed, bytesToGB} from '../../utils/utils';
+import {getDefaultNodePath} from '../Node/NodePages';
 
 import './VdiskPdiskNode.scss';
 
@@ -329,10 +330,7 @@ class VdiskPdiskNode extends React.Component {
             {
                 label: 'Node Id',
                 value: (
-                    <Link
-                        className={b('link')}
-                        to={createHref(routes.node, {id: NodeId, activeTab: 'storage'})}
-                    >
+                    <Link className={b('link')} to={getDefaultNodePath(NodeId)}>
                         {NodeId}
                     </Link>
                 ),

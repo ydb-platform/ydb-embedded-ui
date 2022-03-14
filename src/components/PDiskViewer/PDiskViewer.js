@@ -8,6 +8,8 @@ import EntityStatus from '../EntityStatus/EntityStatus';
 import {formatStorageValues} from '../../utils';
 import routes, {createHref} from '../../routes';
 
+import {getDefaultNodePath} from '../../containers/Node/NodePages';
+
 import './PDiskViewer.scss';
 
 const b = cn('pdisk-viewer');
@@ -48,10 +50,7 @@ class PDiskViewer extends React.Component {
                             <EntityStatus
                                 status={'green'}
                                 label="NodeID"
-                                path={createHref(routes.node, {
-                                    id: disk.NodeId,
-                                    activeTab: 'storage',
-                                })}
+                                path={getDefaultNodePath(disk.NodeId)}
                                 name={disk.NodeId}
                             />
                         </div>

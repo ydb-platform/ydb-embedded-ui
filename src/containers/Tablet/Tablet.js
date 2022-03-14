@@ -19,6 +19,7 @@ import {Link as ExternalLink, Button, Loader} from '@yandex-cloud/uikit';
 import DataTable from '@yandex-cloud/react-data-table';
 import CriticalActionDialog from '../../components/CriticalActionDialog/CriticalActionDialog';
 import routes, {createHref} from '../../routes';
+import { getDefaultNodePath } from '../Node/NodePages';
 
 import './Tablet.scss';
 
@@ -316,13 +317,7 @@ class Tablet extends React.Component {
             {
                 label: 'Node',
                 value: (
-                    <Link
-                        className={b('link')}
-                        to={createHref(routes.node, {
-                            id: String(tablet.NodeId),
-                            activeTab: 'storage',
-                        })}
-                    >
+                    <Link className={b('link')} to={getDefaultNodePath(String(tablet.NodeId))}>
                         {tablet.NodeId}
                     </Link>
                 ),

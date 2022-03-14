@@ -13,6 +13,7 @@ import {getVdiskInfo, clearStore} from '../../store/reducers/vdisk';
 import {VDISK_AUTO_RELOAD_INTERVAL} from '../../utils/constants';
 import {formatBytes, calcUptime, stringifyVdiskId} from '../../utils';
 import routes, {createHref} from '../../routes';
+import {getDefaultNodePath} from '../Node/NodePages';
 
 import './Vdisk.scss';
 
@@ -80,10 +81,7 @@ class Vdisk extends React.Component {
             {
                 label: 'NodeId',
                 value: (
-                    <Link
-                        className={b('link')}
-                        to={createHref(routes.node, {id: NodeId, activeTab: 'storage'})}
-                    >
+                    <Link className={b('link')} to={getDefaultNodePath(NodeId)}>
                         {NodeId}
                     </Link>
                 ),
