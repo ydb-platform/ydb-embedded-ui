@@ -14,7 +14,7 @@ import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
 import {getPdiskInfo, clearStore} from '../../store/reducers/pdisk';
 import {PDISK_AUTO_RELOAD_INTERVAL} from '../../utils/constants';
 import {formatStorageValues, calcUptime} from '../../utils';
-import routes, {createHref} from '../../routes';
+import {getDefaultNodePath} from '../Node/NodePages';
 
 import './Pdisk.scss';
 
@@ -97,10 +97,7 @@ class Pdisk extends React.Component {
             {
                 label: 'NodeId',
                 value: (
-                    <Link
-                        className={b('link')}
-                        to={createHref(routes.node, {id: NodeId, activeTab: 'storage'})}
-                    >
+                    <Link className={b('link')} to={getDefaultNodePath(NodeId)}>
                         {NodeId}
                     </Link>
                 ),

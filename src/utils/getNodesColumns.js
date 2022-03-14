@@ -6,13 +6,11 @@ import {Button, Tooltip} from '@yandex-cloud/uikit';
 
 import Icon from '../components/Icon/Icon';
 import EntityStatus from '../components/EntityStatus/EntityStatus';
-import {STORAGE_ROLE} from '../containers/Node/Node';
 import PoolsGraph from '../components/PoolsGraph/PoolsGraph';
 import ProgressViewer from '../components/ProgressViewer/ProgressViewer';
 import TabletsStatistic from '../components/TabletsStatistic/TabletsStatistic';
 
-import routes, {createHref} from '../routes';
-import {STORAGE, TABLETS} from '../containers/Node/NodePages';
+import {getDefaultNodePath} from '../containers/Node/NodePages';
 import {formatBytes} from './index';
 
 const b = cn('kv-nodes');
@@ -28,7 +26,6 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
         {
             name: 'Host',
             render: ({row, value}) => {
-                const hasStorage = _.find(row?.Roles, (el) => el === STORAGE_ROLE);
                 const nodeRef = getNodeRef ? getNodeRef(row) : undefined;
 
                 if (typeof value === 'undefined') {
@@ -39,10 +36,7 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
                         <EntityStatus
                             name={row.Host}
                             status={row.Overall}
-                            path={createHref(routes.node, {
-                                id: row.NodeId,
-                                activeTab: hasStorage ? STORAGE : TABLETS,
-                            })}
+                            path={getDefaultNodePath(row.NodeId)}
                             hasClipboardButton
                             className={b('host-name')}
                         />
