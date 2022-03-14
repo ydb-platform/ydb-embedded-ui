@@ -114,9 +114,14 @@ function StorageNodes({data, tableSettings, visibleEntities}: StorageGroupsProps
     ];
 
     let columns = allColumns;
+    let emptyMessage = 'No such nodes.';
 
     if (visibleEntities === VisibleEntities.Space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
+        emptyMessage = 'No nodes with space problems.';
+    }
+    if (visibleEntities === VisibleEntities.Missing) {
+        emptyMessage = 'No degraded nodes.';
     }
 
     return data ? (
@@ -127,7 +132,7 @@ function StorageNodes({data, tableSettings, visibleEntities}: StorageGroupsProps
             columns={columns}
             settings={tableSettings}
             initialSortOrder={setSortOrder(visibleEntities)}
-            emptyDataMessage="No such nodes."
+            emptyDataMessage={emptyMessage}
         />
     ) : null;
 }

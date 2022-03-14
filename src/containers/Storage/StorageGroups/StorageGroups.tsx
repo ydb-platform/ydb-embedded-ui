@@ -210,13 +210,16 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
     ];
 
     let columns = allColumns;
+    let emptyMessage = 'No such groups.';
 
     if (visibleEntities === VisibleEntities.Space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
+        emptyMessage = 'No storage groups with space problems.';
     }
 
     if (visibleEntities === VisibleEntities.Missing) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.UsedSpaceFlag);
+        emptyMessage = 'No degraded groups.';
     }
     return data ? (
         <DataTable
@@ -226,7 +229,7 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
             columns={columns}
             settings={tableSettings}
             initialSortOrder={setSortOrder(visibleEntities)}
-            emptyDataMessage="No such groups."
+            emptyDataMessage={emptyMessage}
         />
     ) : null;
 }
