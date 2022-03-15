@@ -34,7 +34,10 @@ const initialState = {
     input: '',
     history: {
         queries: queriesHistoryInitial.slice(sliceLimit < 0 ? 0 : sliceLimit),
-        currentIndex: -1,
+        currentIndex:
+            queriesHistoryInitial.length > MAXIMUM_QUERIES_IN_HISTORY
+                ? MAXIMUM_QUERIES_IN_HISTORY - 1
+                : queriesHistoryInitial.length - 1,
     },
     runAction: RUN_ACTIONS_VALUES.script,
     monacoHotKey: null,
