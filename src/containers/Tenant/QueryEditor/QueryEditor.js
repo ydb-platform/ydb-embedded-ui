@@ -154,7 +154,7 @@ function QueryEditor(props) {
     useEffect(() => {
         const {monacoHotKey, setMonacoHotKey} = props;
         if (monacoHotKey === null) {
-            return 
+            return;
         }
         setMonacoHotKey(null);
         switch (monacoHotKey) {
@@ -464,19 +464,12 @@ function QueryEditor(props) {
     };
 
     const getExecuteResult = () => {
-        const {
-            data = [],
-            error,
-            loading,
-            history: {queries},
-        } = props.executeQuery;
+        const {data = [], error} = props.executeQuery;
 
         if (error) {
             return error.data || error;
         } else if (data.length > 0) {
             return data;
-        } else if (!loading && queries.length) {
-            return 'The request was successful';
         } else {
             return '';
         }

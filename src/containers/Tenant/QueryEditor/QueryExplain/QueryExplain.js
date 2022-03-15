@@ -252,28 +252,32 @@ function QueryExplain(props) {
     return (
         <React.Fragment>
             <div className={b('controls')}>
-                <div className={b('controls-right')}>
-                    <QueryExecutionStatus hasError={Boolean(props.error)} />
-                    {!props.error && (
-                        <React.Fragment>
-                            <Divider />
-                            <RadioButton
-                                options={explainOptions}
-                                value={activeOption}
-                                onUpdate={onSelectOption}
+                {!props.loading && (
+                    <React.Fragment>
+                        <div className={b('controls-right')}>
+                            <QueryExecutionStatus hasError={Boolean(props.error)} />
+                            {!props.error && (
+                                <React.Fragment>
+                                    <Divider />
+                                    <RadioButton
+                                        options={explainOptions}
+                                        value={activeOption}
+                                        onUpdate={onSelectOption}
+                                    />
+                                </React.Fragment>
+                            )}
+                        </div>
+                        <div className={b('controls-left')}>
+                            <EnableFullscreenButton disabled={Boolean(props.error)} />
+                            <PaneVisibilityToggleButtons
+                                onCollapse={props.onCollapseResults}
+                                onExpand={props.onExpandResults}
+                                isCollapsed={props.isResultsCollapsed}
+                                initialDirection="bottom"
                             />
-                        </React.Fragment>
-                    )}
-                </div>
-                <div className={b('controls-left')}>
-                    <EnableFullscreenButton disabled={Boolean(props.error)} />
-                    <PaneVisibilityToggleButtons
-                        onCollapse={props.onCollapseResults}
-                        onExpand={props.onExpandResults}
-                        isCollapsed={props.isResultsCollapsed}
-                        initialDirection="bottom"
-                    />
-                </div>
+                        </div>
+                    </React.Fragment>
+                )}
             </div>
             <div className={b('result')}>{renderContent()}</div>
         </React.Fragment>
