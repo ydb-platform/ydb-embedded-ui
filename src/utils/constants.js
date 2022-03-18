@@ -2,16 +2,10 @@ import DataTable from '@yandex-cloud/react-data-table';
 
 const SECOND = 1000;
 
-export const CLUSTER_AUTO_RELOAD_INTERVAL = 10 * SECOND;
-export const TENANT_AUTO_RELOAD_INTERVAL = 10 * SECOND;
-export const TENANTS_AUTO_RELOAD_INTERVAL = 10 * SECOND;
-export const STORAGE_AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const GROUP_AUTO_RELOAD_INTERVAL = 10 * SECOND;
-export const NODE_AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const PDISK_AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const VDISK_AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const AUTO_RELOAD_INTERVAL = 10 * SECOND;
-export const HEALTHCHECK_RELOAD_INTERVAL = 10 * SECOND;
 export const MEGABYTE = 1_000_000;
 export const GIGABYTE = 1_000_000_000;
 export const TERABYTE = 1_000_000_000_000;

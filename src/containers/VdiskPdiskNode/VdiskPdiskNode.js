@@ -30,7 +30,7 @@ function valueIsDefined(value) {
     return value !== null && value !== undefined;
 }
 
-function Vdisk({
+export function Vdisk({
     AllocatedSize,
     DiskSpace,
     FrontQueues,

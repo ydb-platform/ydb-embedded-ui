@@ -5,6 +5,8 @@
     @include flex-container();
 
     &__content {
+        position: relative;
+
         overflow: auto;
         @include flex-container();
     }
@@ -17,7 +19,8 @@
     }
 
     &__tabs {
-        padding: 0 15px;
+        padding: 16px 20px 0;
+        @include body2-typography();
     }
 
     &__tab {
@@ -32,5 +35,13 @@
         &:first-letter {
             text-transform: uppercase;
         }
+    }
+
+    &__overview-wrapper {
+        padding: 0 20px;
+    }
+
+    &__node-page-wrapper {
+        padding: 20px;
     }
 }

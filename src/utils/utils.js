@@ -19,7 +19,7 @@ export function getValueFromLS(key, defaultValue) {
     return;
 }
 
-const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
+const sizes = [' B', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB'];
 const base = 1000;
 
 export function bytesToSize(bytes) {
@@ -72,4 +72,13 @@ export function bytesToGB(bytes, shouldRound) {
     } else {
         return val.toFixed() + sizes[3];
     }
+}
+
+export function pad9(val) {
+    const len = String(val).length;
+    let result = val
+    for (let i = len; i < 9; i++) {
+        result = "0" + result;
+    }
+    return result;
 }

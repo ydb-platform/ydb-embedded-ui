@@ -154,7 +154,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
 
     const renderObjectOverview = () => {
         const startTimeInMilliseconds = currentSchemaData?.CreateStep / 1000;
-        let createTime = 'Unknown';
+        let createTime = '';
         if (startTimeInMilliseconds) {
             createTime = new Date(startTimeInMilliseconds).toUTCString();
         }

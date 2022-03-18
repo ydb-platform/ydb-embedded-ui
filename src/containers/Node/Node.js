@@ -7,21 +7,27 @@ import _ from 'lodash';
 import {Loader, Tabs} from '@yandex-cloud/uikit';
 import {withRouter, Link} from 'react-router-dom';
 
-import FullNodeViewer from '../../components/FullNodeViewer/FullNodeViewer';
-import {TABLETS, STORAGE, NODE_PAGES, OVERVIEW} from './NodePages';
+import {TABLETS, STORAGE, NODE_PAGES, OVERVIEW, STRUCTURE} from './NodePages';
 import Tablets from '../Tablets/Tablets';
 import Storage from '../Storage/Storage';
+import NodeOverview from './NodeOverview/NodeOverview';
+import NodeStructure from './NodeStructure/NodeStructure';
 
-import {getNodeInfo} from '../../store/reducers/node';
-import {NODE_AUTO_RELOAD_INTERVAL} from '../../utils/constants';
-import routes, {createHref} from '../../routes';
-import {backend} from '../../store';
+import {getNodeInfo, resetNode} from '../../store/reducers/node';
+import routes, {CLUSTER_PAGES, createHref} from '../../routes';
+import {setHeader} from '../../store/reducers/header';
+import {AutoFetcher} from '../../utils/autofetcher';
 
 import './Node.scss';
 
 const b = cn('node');
 
 export const STORAGE_ROLE = 'Storage';
+
+const headerNodes = {
+    text: CLUSTER_PAGES.nodes.title,
+    link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.nodes.id}),
+};
 
 class Node extends React.Component {
     static renderLoader() {
@@ -54,17 +60,26 @@ class Node extends React.Component {
     };
 
     componentDidMount() {
-        const {id} = this.props.match.params;
+        const {setHeader} = this.props;
         this.setState({activeTab: this.props.activeTab});
-        this.props.getNodeInfo(id);
-        this.reloadDescriptor = setInterval(
-            () => this.props.getNodeInfo(id),
-            NODE_AUTO_RELOAD_INTERVAL,
-        );
+        this.fetchData();
+        this.autofetcher = new AutoFetcher();
+        this.autofetcher.fetch(() => this.fetchData());
+        setHeader([headerNodes]);
     }
 
-    componentDidUpdate() {
-        const {node} = this.props;
+    componentDidUpdate(prevProps) {
+        const prevId = prevProps.match.params.id;
+        const {id} = this.props.match.params;
+        const {resetNode} = this.props;
+        if (prevId !== id) {
+            resetNode();
+            this.fetchData();
+            this.autofetcher.stop();
+            this.autofetcher.start();
+            this.autofetcher.fetch(() => this.fetchData());
+        }
+        const {node, setHeader} = this.props;
         let {activeTab} = this.props;
         if (node) {
             const hasStorage = _.find(node.Roles, (el) => el === STORAGE_ROLE);
@@ -76,12 +91,24 @@ class Node extends React.Component {
                     return {activeTab};
                 }
             });
+            setHeader([
+                headerNodes,
+                {
+                    text: node.Host,
+                },
+            ]);
         }
     }
 
     componentWillUnmount() {
-        clearInterval(this.reloadDescriptor);
+        this.autofetcher.stop();
     }
+
+    fetchData = () => {
+        const {id} = this.props.match.params;
+        const {getNodeInfo} = this.props;
+        getNodeInfo(id);
+    };
 
     renderTabs() {
         const {node} = this.props;
@@ -116,6 +143,7 @@ class Node extends React.Component {
     renderTabContent() {
         const {activeTab} = this.state;
         const {id} = this.props.match.params;
+        const {additionalNodesInfo, node} = this.props;
 
         switch (activeTab) {
             case STORAGE: {
@@ -126,7 +154,27 @@ class Node extends React.Component {
                 );
             }
             case TABLETS: {
-                return <Tablets nodeId={id} />;
+                return <Tablets nodeId={id} className={b('node-page-wrapper')} />;
+            }
+
+            case OVERVIEW: {
+                return (
+                    <NodeOverview
+                        additionalNodesInfo={additionalNodesInfo}
+                        node={node}
+                        className={b('overview-wrapper')}
+                    />
+                );
+            }
+
+            case STRUCTURE: {
+                return (
+                    <NodeStructure
+                        className={b('node-page-wrapper')}
+                        nodeId={id}
+                        additionalNodesInfo={additionalNodesInfo}
+                    />
+                );
             }
             default:
                 return false;
@@ -134,7 +182,7 @@ class Node extends React.Component {
     }
 
     render() {
-        const {className, loading, wasLoaded, error, node, additionalNodesInfo} = this.props;
+        const {className, loading, wasLoaded, error, node} = this.props;
 
         if (loading && !wasLoaded) {
             return Node.renderLoader();
@@ -144,11 +192,6 @@ class Node extends React.Component {
             if (node) {
                 return (
                     <div className={`${b()} ${className}`}>
-                        <FullNodeViewer
-                            node={node}
-                            backend={backend}
-                            additionalNodesInfo={additionalNodesInfo}
-                        />
                         {this.renderTabs()}
 
                         <div className={b('content')}>{this.renderTabContent()}</div>
@@ -179,6 +222,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = {
     getNodeInfo,
+    setHeader,
+    resetNode,
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Node));

@@ -31,7 +31,6 @@ class Compute extends React.Component {
         getNodes: PropTypes.func,
         hideTooltip: PropTypes.func,
         showTooltip: PropTypes.func,
-        timeoutForRequest: PropTypes.number,
     };
 
     autofetcher;
@@ -102,7 +101,7 @@ class Compute extends React.Component {
 }
 
 function mapStateToProps(state, ownProps) {
-    const {data, loading, wasLoaded, error, timeoutForRequest} = state.nodes;
+    const {data, loading, wasLoaded, error} = state.nodes;
     const {autorefresh} = state.schema;
     const {search} = ownProps.location;
     const queryParams = qs.parse(search, {
@@ -113,7 +112,6 @@ function mapStateToProps(state, ownProps) {
     return {
         nodes,
         tenantName,
-        timeoutForRequest,
         loading,
         wasLoaded,
         error,

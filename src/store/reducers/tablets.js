@@ -1,6 +1,5 @@
 import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
-import {AUTO_RELOAD_INTERVAL} from '../../utils/constants';
 
 const FETCH_TABLETS = createRequestActionTypes('tablets', 'FETCH_TABLETS');
 
@@ -21,12 +20,10 @@ const tablets = function z(state = initialState, action) {
             };
         }
         case FETCH_TABLETS.SUCCESS: {
-            const timeout = new Date().getTime() - state.requestTime;
             return {
                 ...state,
                 data: action.data,
                 loading: false,
-                timeoutForRequest: timeout > AUTO_RELOAD_INTERVAL ? timeout : AUTO_RELOAD_INTERVAL,
                 error: undefined,
                 wasLoaded: true,
             };

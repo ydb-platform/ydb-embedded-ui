@@ -32,9 +32,9 @@ class Tablets extends React.Component {
         hideTooltip: PropTypes.func,
         getTabletsInfo: PropTypes.func,
         nodeId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        timeoutForRequest: PropTypes.number,
         path: PropTypes.string,
         clearWasLoadingFlag: PropTypes.func,
+        className: PropTypes.string,
     };
 
     autofetcher;
@@ -148,10 +148,10 @@ class Tablets extends React.Component {
             content: item,
         }));
         const {filteredTablets} = this.state;
-        const {stateFilter, typeFilter} = this.props;
+        const {stateFilter, typeFilter, className} = this.props;
 
         return (
-            <div className={b()}>
+            <div className={(b(), className)}>
                 <div className={b('header')}>
                     <Select
                         className={b('filter-control')}
@@ -204,19 +204,11 @@ class Tablets extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    const {
-        data = {},
-        wasLoaded,
-        loading,
-        timeoutForRequest,
-        stateFilter,
-        typeFilter,
-    } = state.tablets;
+    const {data = {}, wasLoaded, loading, stateFilter, typeFilter} = state.tablets;
     const {autorefresh} = state.schema;
     const {TabletStateInfo: tablets = []} = data;
     return {
         tablets,
-        timeoutForRequest,
         wasLoaded,
         loading,
         stateFilter,
