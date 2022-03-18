@@ -3,13 +3,12 @@
 .full-node-viewer {
     font-size: var(--yc-text-body2-font-size);
     line-height: var(--yc-text-body2-line-height);
-    @include container-fluid();
 
     &__title {
         margin: 0 20px 0 0;
 
         font-size: var(--yc-text-body2-font-size);
-        font-weight: 500;
+        font-weight: 600;
         line-height: var(--yc-text-body2-line-height);
         text-transform: uppercase;
     }
@@ -27,14 +26,12 @@
 
     &__common-info {
         display: flex;
+        flex-direction: column;
         justify-content: flex-start;
         align-items: stretch;
     }
 
     &__section {
-        margin-right: 20px;
-        padding: 15px;
-
         border-radius: 10px;
 
         &_pools {
@@ -42,8 +39,6 @@
             grid-gap: 7px 20px;
 
             grid-template-columns: 110px 110px;
-
-            padding: 15px 15px 15px 0;
         }
     }
 
@@ -72,10 +67,10 @@
     }
 
     &__section-title {
-        margin: 15px 0 0;
+        margin: 15px 0 10px;
 
         font-size: var(--yc-text-body2-font-size);
-        font-weight: 500;
+        font-weight: 600;
         line-height: var(--yc-text-body2-line-height);
     }
 

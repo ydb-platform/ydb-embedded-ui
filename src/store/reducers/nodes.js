@@ -1,6 +1,5 @@
 import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
-import {AUTO_RELOAD_INTERVAL} from '../../utils/constants';
 
 const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
 
@@ -14,13 +13,11 @@ const nodes = function z(state = {loading: true, wasLoaded: false}, action) {
             };
         }
         case FETCH_NODES.SUCCESS: {
-            const timeout = new Date().getTime() - state.requestTime;
             return {
                 ...state,
                 data: action.data,
                 loading: false,
                 wasLoaded: true,
-                timeoutForRequest: timeout > AUTO_RELOAD_INTERVAL ? timeout : AUTO_RELOAD_INTERVAL,
                 error: undefined,
             };
         }

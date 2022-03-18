@@ -1,0 +1,127 @@
+@import '../../../styles/mixins.scss';
+
+.kv-node-structure {
+    display: flex;
+    overflow: auto;
+    flex-direction: column;
+    flex-shrink: 0;
+    @include body2-typography();
+
+    &__loader {
+        display: flex;
+        flex-grow: 1;
+        justify-content: center;
+    }
+
+    &__pdisk {
+        display: flex;
+        flex-direction: column;
+
+        width: 573px;
+        margin-bottom: 8px;
+        padding-left: 20px;
+
+        border: 1px solid var(--yc-color-line-generic);
+        border-radius: 5px;
+    }
+
+    &__pdisk-id {
+        display: flex;
+        align-items: flex-end;
+    }
+
+    &__pdisk-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        height: 48px;
+    }
+
+    &__pdisk-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        font-weight: 600;
+    }
+
+    &__pdisk-details {
+        margin-bottom: 20px;
+    }
+
+    &__link {
+        text-decoration: none;
+
+        color: var(--yc-color-base-special);
+    }
+
+    &__vdisks-header {
+        font-weight: 600;
+    }
+
+    &__vdisks-container {
+        margin-bottom: 42px;
+    }
+
+    &__vdisk-details {
+        overflow: auto;
+
+        max-height: 90vh;
+
+        .vdisk-pdisk-node__column {
+            margin-bottom: 0;
+        }
+        .vdisk-pdisk-node__section {
+            padding-bottom: 0;
+        }
+    }
+
+    &__vdisk-id {
+        display: flex;
+        align-items: center;
+
+        &_selected {
+            color: var(--yc-color-text-info);
+        }
+    }
+
+    &__vdisk-details-button {
+        &_selected {
+            color: var(--yc-color-text-info);
+        }
+    }
+
+    &__external-button {
+        display: inline-flex;
+        align-items: center;
+
+        margin-left: 4px;
+
+        transform: translateY(-1px);
+
+        .yc-button__text {
+            margin: 0 4px;
+        }
+
+        &_hidden {
+            visibility: hidden;
+        }
+    }
+
+    .data-table__row:hover {
+        .kv-node-structure__external-button_hidden {
+            visibility: visible;
+        }
+    }
+
+    &__selected-vdisk {
+        animation: onSelectedVdiskAnimation 4s;
+    }
+}
+
+@keyframes onSelectedVdiskAnimation {
+    0% {
+        background-color: var(--yc-color-base-info-hover);
+    }
+}

@@ -3,6 +3,7 @@ import routes, {createHref} from '../../routes';
 export const STORAGE = 'storage';
 export const TABLETS = 'tablets';
 export const OVERVIEW = 'overview';
+export const STRUCTURE = 'structure';
 
 export const NODE_PAGES = [
     {
@@ -13,6 +14,7 @@ export const NODE_PAGES = [
         id: STORAGE,
         name: 'Storage',
     },
+    {id: STRUCTURE, name: 'Structure'},
     {
         id: TABLETS,
         name: 'Tablets',

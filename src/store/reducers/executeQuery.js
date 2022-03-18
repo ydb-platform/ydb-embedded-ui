@@ -13,7 +13,7 @@ const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
 const SELECT_RUN_ACTION = 'query/SELECT_RUN_ACTION';
 const MONACO_HOT_KEY = 'query/MONACO_HOT_KEY';
 
-const queriesHistoryInitial = parseJson(getValueFromLS(QUERIES_HISTORY_KEY, []));
+const queriesHistoryInitial = parseJson(getValueFromLS(QUERIES_HISTORY_KEY, '[]'));
 
 const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 

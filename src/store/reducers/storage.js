@@ -6,8 +6,14 @@ import {calcUptime} from '../../utils';
 
 export const VisibleEntities = {
     All: 'All',
-    Missing: 'Degraded',
-    Space: 'Out of Space ',
+    Missing: 'Missing',
+    Space: 'Space',
+};
+
+export const VisibleEntitiesTitles = {
+    [VisibleEntities.All]: 'All',
+    [VisibleEntities.Missing]: 'Degraded',
+    [VisibleEntities.Space]: 'Out of Space',
 };
 
 export const StorageTypes = {

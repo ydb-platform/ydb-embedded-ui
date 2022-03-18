@@ -35,7 +35,6 @@ class Heatmap extends React.Component {
         hideTooltip: PropTypes.func,
         getTabletsInfo: PropTypes.func,
         nodeId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        timeoutForRequest: PropTypes.number,
         path: PropTypes.string,
         clearWasLoadingFlag: PropTypes.func,
         metrics: PropTypes.array,

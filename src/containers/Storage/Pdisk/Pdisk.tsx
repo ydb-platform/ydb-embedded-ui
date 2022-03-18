@@ -11,6 +11,7 @@ import {getPDiskId} from '../../../utils';
 import DiskStateProgressBar, {
     diskProgressColors,
 } from '../DiskStateProgressBar/DiskStateProgressBar';
+import {STRUCTURE} from '../../Node/NodePages';
 
 import './Pdisk.scss';
 
@@ -119,7 +120,7 @@ function Pdisk(props: PDiskProps) {
                 className={b('popup-wrapper')}
                 anchorRef={anchor}
                 open={isPopupVisible}
-                placement={['top']}
+                placement={['top', 'bottom']}
                 hasArrow
             >
                 <div className={b('popup-content')}>
@@ -153,10 +154,11 @@ function Pdisk(props: PDiskProps) {
                 <DiskStateProgressBar
                     diskAllocatedPercent={pdiskAllocatedPercent}
                     severity={severity as keyof typeof diskProgressColors}
-                    href={createHref(routes.vdisk, undefined, {
-                        pdiskId: props.PDiskId,
-                        nodeId: props.NodeId,
-                    })}
+                    href={createHref(
+                        routes.node,
+                        {id: props.NodeId, activeTab: STRUCTURE},
+                        {pdiskId: props.PDiskId},
+                    )}
                 />
             </div>
         </React.Fragment>

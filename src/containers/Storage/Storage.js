@@ -18,6 +18,7 @@ import {
     getNodesObject,
     StorageTypes,
     setStorageType,
+    VisibleEntitiesTitles,
 } from '../../store/reducers/storage';
 import {getNodesList} from '../../store/reducers/clusterNodes';
 import StorageGroups from './StorageGroups/StorageGroups';
@@ -68,12 +69,7 @@ class Storage extends React.Component {
             getNodesList,
             getStorageInfo,
         } = this.props;
-        setHeader([
-            {
-                text: CLUSTER_PAGES.storage.title,
-                link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.storage.id}),
-            },
-        ]);
+
         this.autofetcher = new AutoFetcher();
         getNodesList();
         if (tenant || nodeId) {
@@ -85,6 +81,12 @@ class Storage extends React.Component {
                 type: storageType,
             });
         } else {
+            setHeader([
+                {
+                    text: CLUSTER_PAGES.storage.title,
+                    link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.storage.id}),
+                },
+            ]);
             getStorageInfo({
                 tenant,
                 nodeId,
@@ -209,13 +211,13 @@ class Storage extends React.Component {
                 </div>
                 <RadioButton value={visibleEntities} onUpdate={this.onGroupVisibilityChange}>
                     <RadioButton.Option value={VisibleEntities.Missing}>
-                        {VisibleEntities.Missing}
+                        {VisibleEntitiesTitles[VisibleEntities.Missing]}
                     </RadioButton.Option>
                     <RadioButton.Option value={VisibleEntities.Space}>
-                        {VisibleEntities.Space}
+                        {VisibleEntitiesTitles[VisibleEntities.Space]}
                     </RadioButton.Option>
                     <RadioButton.Option value={VisibleEntities.All}>
-                        {VisibleEntities.All}
+                        {VisibleEntitiesTitles[VisibleEntities.All]}
                     </RadioButton.Option>
                 </RadioButton>
 
