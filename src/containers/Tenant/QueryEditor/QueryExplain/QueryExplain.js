@@ -72,6 +72,9 @@ function GraphRoot(props) {
             paranoid = getCompactTopology('graphRoot', data, opts);
             paranoid.renderCompactTopology();
         }
+        return () => {
+            paranoid = undefined;
+        };
     }, []);
 
     useEffect(() => {
@@ -89,7 +92,7 @@ function GraphRoot(props) {
     }, [props.opts.colors]);
 
     useEffect(() => {
-        paranoid.updateData(props.data);
+        paranoid?.updateData(props.data);
     }, [props.data]);
 
     return <div id="graphRoot" style={{height: '100vh'}} />;
