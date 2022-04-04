@@ -1,5 +1,5 @@
-import React, {useContext} from 'react';
-import HistoryContext from '../../../contexts/HistoryContext';
+import React from 'react';
+import InternalLink from '../../../components/InternalLink/InternalLink';
 import cn from 'bem-cn-lite';
 
 import './DiskStateProgressBar.scss';
@@ -26,12 +26,19 @@ function DiskStateProgressBar({
     severity,
     href,
 }: DiskStateProgressBarProps) {
-    const history = useContext(HistoryContext);
-    const onDiskClick = () => {
-        if (href) {
-            history.push(href);
-        }
+    const renderAllocatedPercent = () => {
+        return (
+            diskAllocatedPercent >= 0 && (
+                <React.Fragment>
+                    <div className={b('filled')} style={{width: `${diskAllocatedPercent}%`}} />
+                    <div className={b('filled-title')}>
+                        {`${Math.round(diskAllocatedPercent)}%`}
+                    </div>
+                </React.Fragment>
+            )
+        );
     };
+
     return (
         <div
             className={
@@ -39,15 +46,13 @@ function DiskStateProgressBar({
                     ? b({[diskProgressColors[severity].toLowerCase()]: true})
                     : undefined
             }
-            onClick={onDiskClick}
         >
-            {diskAllocatedPercent >= 0 && (
-                <React.Fragment>
-                    <div className={b('filled')} style={{width: `${diskAllocatedPercent}%`}} />
-                    <div className={b('filled-title')}>
-                        {`${Math.round(diskAllocatedPercent)}%`}
-                    </div>
-                </React.Fragment>
+            {href ? (
+                <InternalLink to={href} className={b('link')}>
+                    {renderAllocatedPercent()}
+                </InternalLink>
+            ) : (
+                renderAllocatedPercent()
             )}
         </div>
     );
