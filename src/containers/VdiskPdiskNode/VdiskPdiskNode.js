@@ -84,7 +84,7 @@ function Vdisk({
             value: <EntityStatus status={SatisfactionRank.LevelRank.Flag} />,
         });
     }
-    vdiskInfo.push({label: 'Replicated', value: Replicated ? '✓' : '☓'});
+    vdiskInfo.push({label: 'Replicated', value: Replicated ? 'Yes' : 'No'});
     vdiskInfo.push({label: 'Allocated Size', value: bytesToGB(AllocatedSize)});
     vdiskInfo.push({label: 'Available Size', value: bytesToGB(AvailableSize)});
     if (Number(AllocatedSize) >= 0 && Number(AvailableSize) >= 0) {
