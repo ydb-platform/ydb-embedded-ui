@@ -340,6 +340,7 @@ function QueryEditor(props) {
                 data={preparedData}
                 settings={TABLE_SETTINGS}
                 theme="yandex-cloud"
+                rowKey={(_, index) => index}
             />
         ) : (
             <div>{result}</div>
