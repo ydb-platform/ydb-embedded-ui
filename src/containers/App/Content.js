@@ -12,7 +12,6 @@ import Tenant from '../Tenant/Tenant';
 import Node from '../Node/Node';
 import Pdisk from '../Pdisk/Pdisk';
 import Group from '../Group/Group';
-import VdiskPdiskNode from '../VdiskPdiskNode/VdiskPdiskNode';
 import Pool from '../Pool/Pool';
 import Tablet from '../Tablet/Tablet';
 import TabletsFilters from '../TabletsFilters/TabletsFilters';
@@ -44,7 +43,6 @@ export function Content(props) {
                     <Route path={routes.cluster} component={Cluster} />
                     <Route path={routes.tenant} component={Tenant} />
                     <Route path={routes.pdisk} component={Pdisk} />
-                    <Route path={routes.vdisk} component={VdiskPdiskNode} />
                     <Route path={routes.node} component={Node} />
                     <Route path={routes.group} component={Group} />
                     <Route path={routes.pool} component={Pool} />
