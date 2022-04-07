@@ -97,4 +97,8 @@
     &__cell {
         @include cell-container;
     }
+
+    &__select-query-action {
+        margin-left: 2px;
+    }
 }
