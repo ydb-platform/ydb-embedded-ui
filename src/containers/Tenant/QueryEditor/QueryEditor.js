@@ -5,8 +5,7 @@ import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import MonacoEditor from 'react-monaco-editor';
 import DataTable from '@yandex-cloud/react-data-table';
-import {Button} from '@yandex-cloud/uikit';
-import {Select} from '@yandex-cloud/uikit/build/esm/components/unstable/Select';
+import {Button, DropdownMenu} from '@yandex-cloud/uikit';
 import SplitPane from '../../../components/SplitPane';
 
 import SaveQuery from './SaveQuery/SaveQuery';
@@ -553,10 +552,18 @@ function QueryEditor(props) {
     };
 
     const renderControls = () => {
-        const {executeQuery, explainQuery, savedQueries} = props;
+        const {executeQuery, explainQuery, savedQueries, selectRunAction} = props;
         const {runAction} = executeQuery;
         const runIsDisabled = !executeQuery.input || executeQuery.loading;
         const runText = _.find(RUN_ACTIONS, {value: runAction}).content;
+
+        const menuItems = RUN_ACTIONS.map((action) => {
+            return {
+                text: action.content,
+                action: () => selectRunAction(action.value),
+            };
+        });
+
         return (
             <div className={b('controls')}>
                 <div className={b('control-run')}>
@@ -570,27 +577,19 @@ function QueryEditor(props) {
                         <Icon name="startPlay" viewBox="0 0 16 16" width={16} height={16} />
                         {runText}
                     </Button>
-                    <Select
-                        view="action"
-                        options={RUN_ACTIONS}
-                        value={undefined}
-                        disabled={runIsDisabled}
-                        pin="brick-round"
-                        // renderSwitcher={() => (
-                        //     <div className={b('run-switcher')}>
-                        //         <Button
-                        //             view="action"
-                        //             pin="brick-round"
-                        //             disabled={runIsDisabled}
-                        //             loading={executeQuery.loading}
-                        //         >
-                        //             <Icon name="chevron-down" width={16} height={16} />
-                        //         </Button>
-                        //     </div>
-                        // )}
-                        onUpdate={(value) => {
-                            props.selectRunAction(value[0]);
-                        }}
+                    <DropdownMenu
+                        items={menuItems}
+                        switcher={
+                            <Button
+                                view="action"
+                                pin="brick-round"
+                                disabled={runIsDisabled}
+                                loading={executeQuery.loading}
+                                className={b('select-query-action')}
+                            >
+                                <Icon name="chevron-down" width={16} height={16} />
+                            </Button>
+                        }
                     />
                 </div>
                 <Button
