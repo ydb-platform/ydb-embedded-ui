@@ -99,7 +99,7 @@ function Authentication({authenticate, error}: any) {
                     onClick={onLoginClick}
                     width="max"
                     size="l"
-                    disabled={Boolean(!login || !pass || loginError || passwordError)}
+                    disabled={Boolean(!login || loginError || passwordError)}
                     className={b('button-sign-in')}
                 >
                     Sign in
