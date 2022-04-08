@@ -1,4 +1,4 @@
-.global-storage-groups {
+.global-storage-nodes {
     &__pdisks-wrapper {
         display: flex;
         overflow-x: auto;
@@ -15,7 +15,8 @@
         display: inline-block;
         overflow: hidden;
 
-        max-width: 340px;
+        width: 330px;
+        max-width: 330px;
 
         text-overflow: ellipsis;
     }

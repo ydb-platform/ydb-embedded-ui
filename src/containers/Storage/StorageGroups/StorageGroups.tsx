@@ -84,7 +84,7 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
         {
             name: TableColumnsIds.PoolName,
             header: tableColumnsNames[TableColumnsIds.PoolName],
-            width: 160,
+            width: 250,
             render: ({value}) => {
                 const splitted = (value as string)?.split('/');
                 return (

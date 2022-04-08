@@ -34,7 +34,7 @@ const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
     Missing: 'Missing',
 };
 
-const b = cn('global-storage-groups');
+const b = cn('global-storage-nodes');
 
 function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder | undefined {
     switch (visibleEntities) {
