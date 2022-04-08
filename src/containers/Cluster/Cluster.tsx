@@ -35,7 +35,7 @@ function Cluster(props: ClusterProps) {
                 return <Storage {...props} />;
             }
             case CLUSTER_PAGES.cluster.id: {
-                return <ClusterInfo />;
+                return <ClusterInfo additionalClusterInfo={props.additionalClusterInfo} />;
             }
             default: {
                 return null;

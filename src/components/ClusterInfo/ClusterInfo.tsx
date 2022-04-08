@@ -31,7 +31,7 @@ import {Link, Loader} from '@yandex-cloud/uikit';
 //@ts-ignore
 import Icon from '../Icon/Icon';
 import {setHeader} from '../../store/reducers/header';
-import routes, { CLUSTER_PAGES, createHref } from '../../routes';
+import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 
 const b = cn('cluster-info');
 
@@ -62,7 +62,7 @@ interface ClusterInfoProps {
     setHeader: any;
     getClusterInfo: (clusterName: string) => void;
     clusterTitle?: string;
-    additionalInfo?: IClusterInfoItem[];
+    additionalClusterInfo?: IClusterInfoItem[];
     loading: boolean;
     singleClusterMode: boolean;
     wasLoaded: boolean;
@@ -128,7 +128,11 @@ class ClusterInfo extends React.Component<ClusterInfoProps> {
     private autofetcher: any;
 
     private getInfo() {
-        const {cluster = {} as ICluster, additionalInfo = [], singleClusterMode} = this.props;
+        const {
+            cluster = {} as ICluster,
+            additionalClusterInfo = [],
+            singleClusterMode,
+        } = this.props;
         const {StorageTotal, StorageUsed} = cluster;
 
         let link = backend + '/internal';
@@ -173,7 +177,7 @@ class ClusterInfo extends React.Component<ClusterInfoProps> {
                 label: 'Versions',
                 value: <div>{cluster.Versions?.join(', ')}</div>,
             },
-            ...additionalInfo,
+            ...additionalClusterInfo,
             {
                 label: 'Internal viewer',
                 value: (
