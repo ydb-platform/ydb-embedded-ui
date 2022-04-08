@@ -67,6 +67,7 @@
     &__vdisk-details {
         overflow: auto;
 
+        min-width: 200px;
         max-height: 90vh;
 
         .vdisk-pdisk-node__column {

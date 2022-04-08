@@ -26,7 +26,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         return this.get(this.getPath('/viewer/json/tenantinfo'), {
             tablets: 1,
             storage: 1,
-            nodes: 1,
         });
     }
     getTenantInfo({path}) {
