@@ -65,8 +65,7 @@
     }
     &__filled-title {
         position: absolute;
-        top: 0;
-        left: 5px;
+        z-index: 2;
 
         font-size: var(--yc-text-body-font-size);
         line-height: inherit;
@@ -76,6 +75,7 @@
 
     &__link {
         display: flex;
+        justify-content: center;
 
         height: 100%;
 
