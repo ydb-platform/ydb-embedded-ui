@@ -45,6 +45,14 @@ const vDiskTableColumnsNames: Record<VDiskTableColumnsIdsValues, string> = {
     Info: '',
 };
 
+interface RowType {
+    id: string;
+    [VDiskTableColumnsIds.slotId]: number;
+    [VDiskTableColumnsIds.VDiskState]: string;
+    AllocatedSize: string;
+    AvailableSize: string;
+}
+
 function getColumns({
     pDiskId,
     selectedVdiskId,
@@ -54,7 +62,7 @@ function getColumns({
     selectedVdiskId?: string;
     nodeHref?: string;
 }) {
-    const columns: Column<any>[] = [
+    const columns: Column<RowType>[] = [
         {
             name: VDiskTableColumnsIds.slotId as string,
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.slotId],
@@ -69,7 +77,7 @@ function getColumns({
 
                 return (
                     <div className={b('vdisk-id', {selected: row.id === selectedVdiskId})}>
-                        <span>{value as any}</span>
+                        <span>{value as number}</span>
                         {vdiskInternalViewerLink && (
                             <Button
                                 size="s"

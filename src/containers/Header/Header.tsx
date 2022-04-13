@@ -60,7 +60,12 @@ function Header() {
         }
 
         const breadcrumbItems = header.reduce((acc, el) => {
-            acc.push({text: el.text, action: () => history.push(el.link)});
+            const action = () => {
+                if (el.link) {
+                    history.push(el.link);
+                }
+            };
+            acc.push({text: el.text, action});
             return acc;
         }, [] as BreadcrumbsItem[]);
 

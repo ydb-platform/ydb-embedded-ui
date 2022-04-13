@@ -19,7 +19,7 @@ import {Link as ExternalLink, Button, Loader} from '@yandex-cloud/uikit';
 import DataTable from '@yandex-cloud/react-data-table';
 import CriticalActionDialog from '../../components/CriticalActionDialog/CriticalActionDialog';
 import routes, {createHref} from '../../routes';
-import { getDefaultNodePath } from '../Node/NodePages';
+import {getDefaultNodePath} from '../Node/NodePages';
 
 import './Tablet.scss';
 

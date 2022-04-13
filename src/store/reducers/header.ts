@@ -1,6 +1,6 @@
 const SET_HEADER = 'SET_HEADER';
 
-export type HeaderItemType = {text: string; link: string};
+export type HeaderItemType = {text: string; link?: string};
 
 const initialState: HeaderItemType[] = [];
 
