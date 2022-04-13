@@ -57,6 +57,7 @@ class Storage extends React.Component {
         visibleEntities: PropTypes.string,
         setHeader: PropTypes.func,
         tenant: PropTypes.string,
+        nodeId: PropTypes.string,
     };
 
     componentDidMount() {

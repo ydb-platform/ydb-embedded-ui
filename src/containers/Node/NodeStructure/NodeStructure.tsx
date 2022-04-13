@@ -5,9 +5,8 @@ import _ from 'lodash';
 
 import cn from 'bem-cn-lite';
 
-import {Loader} from '@yandex-cloud/uikit';
-
 import {PDisk} from './Pdisk';
+import Loader from '../.././../components/Loader/Loader';
 
 import {getNodeStructure, selectNodeStructure} from '../../../store/reducers/node';
 
@@ -29,6 +28,7 @@ interface NodeStructureProps {
     nodeId: string;
     className?: string;
     additionalNodesInfo?: any;
+    scrollContainer: Element | null;
 }
 
 const autofetcher = new AutoFetcher();
@@ -36,10 +36,13 @@ const autofetcher = new AutoFetcher();
 function NodeStructure(props: NodeStructureProps) {
     const dispatch = useDispatch();
 
-    const nodeStructure: any = useSelector((state: any) => selectNodeStructure(state));
+    const nodeStructure: any = useSelector(selectNodeStructure);
 
-    const {loadingStructure, wasLoadedStructure} = useSelector((state: any) => state.node);
-    const nodeData = useSelector((state: any) => state.node?.data?.SystemStateInfo?.[0]);
+    const loadingStructure = useSelector((state: any) => state.node.loadingStructure);
+    const wasLoadedStructure = useSelector((state: any) => state.node.wasLoadedStructure);
+    const nodeData = useSelector(
+        (state: any) => state.node?.data?.SystemStateInfo?.[0]
+    );
 
     const nodeHref = useMemo(() => {
         return props.additionalNodesInfo?.getNodeRef
@@ -56,12 +59,11 @@ function NodeStructure(props: NodeStructureProps) {
 
     const scrolled = useRef(false);
 
-    const scrollContainer = useRef<Element>();
-
     useEffect(() => {
         return () => {
-            if (scrollContainer.current) {
-                scrollContainer.current.scrollTo({
+            const {scrollContainer} = props;
+            if (scrollContainer) {
+                scrollContainer.scrollTo({
                     behavior: 'smooth',
                     top: 0,
                 });
@@ -82,18 +84,17 @@ function NodeStructure(props: NodeStructureProps) {
     }, [props.nodeId, dispatch]);
 
     useEffect(() => {
-        if (!_.isEmpty(nodeStructure)) {
+        if (!_.isEmpty(nodeStructure) && props.scrollContainer) {
             isReady.current = true;
         }
-    }, [nodeStructure]);
+    }, [nodeStructure, props.scrollContainer]);
 
     useEffect(() => {
-        if (isReady.current && !scrolled.current) {
+        const {scrollContainer} = props;
+        if (isReady.current && !scrolled.current && scrollContainer) {
             const element = document.getElementById(
                 generateId({type: 'pdisk', id: pdiskIdFromUrl as string}),
             );
-
-            const container = document.querySelector('.node__content');
 
             let scrollToVdisk = 0;
 
@@ -108,9 +109,8 @@ function NodeStructure(props: NodeStructureProps) {
                 }
             }
 
-            if (element && container) {
-                scrollContainer.current = container;
-                container.scrollTo({
+            if (element) {
+                scrollContainer.scrollTo({
                     behavior: 'smooth',
                     // should subtract 20 to avoid sticking the element to tabs
                     top: scrollToVdisk ? scrollToVdisk : element.offsetTop - 20,
@@ -118,14 +118,7 @@ function NodeStructure(props: NodeStructureProps) {
                 scrolled.current = true;
             }
         }
-        return () => {
-            isReady.current = false;
-        };
-    }, [isReady, pdiskIdFromUrl, vdiskIdFromUrl, nodeStructure]);
-
-    const renderLoader = () => {
-        return <Loader className={b('loader')} size="m" />;
-    };
+    }, [nodeStructure, props.scrollContainer, pdiskIdFromUrl, vdiskIdFromUrl]);
 
     const renderStub = () => {
         return 'There is no information about node structure.';
@@ -149,7 +142,7 @@ function NodeStructure(props: NodeStructureProps) {
 
     const renderContent = () => {
         if (loadingStructure && !wasLoadedStructure) {
-            return renderLoader();
+            return <Loader size="m" />;
         }
         return renderStructure();
     };

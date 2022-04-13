@@ -26,7 +26,6 @@ class Acl extends React.Component {
             name: 'AccessType',
             header: 'Access Type',
             sortable: false,
-            width: COLUMN_WIDTH,
         },
         {
             name: 'AccessRights',
@@ -36,7 +35,6 @@ class Acl extends React.Component {
                     return <div key={index}>{item}</div>;
                 });
             },
-            width: COLUMN_WIDTH,
             sortable: false,
         },
         {
@@ -56,7 +54,6 @@ class Acl extends React.Component {
                     return <div key={index}>{item}</div>;
                 });
             },
-            width: COLUMN_WIDTH,
             sortable: false,
         },
     ];
