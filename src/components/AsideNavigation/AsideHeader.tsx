@@ -20,7 +20,7 @@ import {
     FooterItemIconView,
 } from './constants';
 import i18n from './i18n';
-import {Lang} from 'utils/i18n';
+
 import {getLocalData, setLocalData} from './helpers';
 import {SetSlotsContext, SlotsProvider} from './AsideHeaderFooterSlot/SlotsContext';
 import {SlotName} from './AsideHeaderFooterSlot/AsideHeaderFooterSlot';
@@ -28,6 +28,7 @@ import {SlotName} from './AsideHeaderFooterSlot/AsideHeaderFooterSlot';
 import controlMenuButton from '../../assets/icons/control-menu-button.svg';
 
 import './AsideHeader.scss';
+import {Lang} from '../../utils/i18n';
 
 const b = block('nv-aside-header');
 

@@ -52,6 +52,9 @@
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "prepublishOnly": "npm run package",
+    "typecheck": "npm run typecheck:server && npm run typecheck:ui",
+    "typecheck:server": "tsc -p src/server --noEmit",
+    "typecheck:ui": "tsc -p src/ui --noEmit",
     "prepare": "husky install"
   },
   "lint-staged": {
@@ -78,6 +81,7 @@
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
     "@types/lodash": "^4.14.178",
+    "@types/react": "^17.0.44",
     "@types/react-dom": "^17.0.11",
     "@types/react-router": "^5.1.17",
     "@types/react-router-dom": "^5.3.2",
@@ -99,6 +103,6 @@
     "react-app-rewired": "^2.1.11",
     "react-dom": "^17.0.2",
     "stylelint": "^14.3.0",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.5"
   }
 }

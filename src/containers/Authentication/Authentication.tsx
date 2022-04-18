@@ -43,7 +43,7 @@ function Authentication({authenticate, error}: any) {
         authenticate(login, pass);
     };
 
-    const onEnterClick = (e: KeyboardEvent<HTMLInputElement>) => {
+    const onEnterClick = (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         if (e.keyCode === 13) {
             onLoginClick();
         }
