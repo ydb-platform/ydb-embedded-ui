@@ -1,12 +1,12 @@
 import React from 'react';
 import cn from 'bem-cn-lite';
 
-import ProgressViewer from 'components/ProgressViewer/ProgressViewer';
-import {formatStorageValuesToGb, stringifyVdiskId} from 'utils';
-import {bytesToGB, bytesToSpeed} from 'utils/utils';
+import ProgressViewer from '../../../components/ProgressViewer/ProgressViewer';
+import {formatStorageValuesToGb, stringifyVdiskId} from '../../../utils';
+import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import {valueIsDefined} from './NodeStructure';
-import InfoViewer from 'components/InfoViewer/InfoViewer';
+import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 
 const b = cn('kv-node-structure');
 
