@@ -153,7 +153,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
     };
 
     const renderObjectOverview = () => {
-        const startTimeInMilliseconds = currentSchemaData?.CreateStep / 1000;
+        const startTimeInMilliseconds = Number(currentSchemaData?.CreateStep);
         let createTime = '';
         if (startTimeInMilliseconds) {
             createTime = new Date(startTimeInMilliseconds).toUTCString();
