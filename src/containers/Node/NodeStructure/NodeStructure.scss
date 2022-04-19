@@ -1,10 +1,13 @@
 @import '../../../styles/mixins.scss';
 
 .kv-node-structure {
+    position: relative;
+
     display: flex;
     overflow: auto;
     flex-direction: column;
     flex-shrink: 0;
+    @include flex-container();
     @include body2-typography();
 
     &__loader {

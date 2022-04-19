@@ -39,7 +39,6 @@ interface NodeProps {
 
 function Node(props: NodeProps) {
     const dispatch = useDispatch();
-    const repaint = React.useState({})[1];
 
     const wasLoaded = useSelector((state: any) => state.node.wasLoaded);
     const loading = useSelector((state: any) => state.node.loading);
@@ -71,8 +70,6 @@ function Node(props: NodeProps) {
 
         return {activeTabVerified, nodeTabs};
     }, [activeTab, node]);
-
-    const nodeContainerRef = React.useRef<HTMLDivElement | null>(null);
 
     React.useEffect(() => {
         const fetchData = () => dispatch(getNodeInfo(nodeId));
@@ -148,19 +145,11 @@ function Node(props: NodeProps) {
                         className={b('node-page-wrapper')}
                         nodeId={nodeId}
                         additionalNodesInfo={additionalNodesInfo}
-                        scrollContainer={nodeContainerRef.current}
                     />
                 );
             }
             default:
                 return false;
-        }
-    };
-
-    const onRefChange = (ref: HTMLDivElement) => {
-        if (!nodeContainerRef.current) {
-            nodeContainerRef.current = ref;
-            repaint({});
         }
     };
 
@@ -171,12 +160,10 @@ function Node(props: NodeProps) {
     } else {
         if (node) {
             return (
-                <div className={`${b()} ${props.className}`}>
+                <div className={b(null, props.className)}>
                     {renderTabs()}
 
-                    <div className={b('content')} ref={onRefChange}>
-                        {renderTabContent()}
-                    </div>
+                    <div className={b('content')}>{renderTabContent()}</div>
                 </div>
             );
         }
