@@ -28,7 +28,6 @@ interface NodeStructureProps {
     nodeId: string;
     className?: string;
     additionalNodesInfo?: any;
-    scrollContainer: Element | null;
 }
 
 const autofetcher = new AutoFetcher();
@@ -40,9 +39,7 @@ function NodeStructure(props: NodeStructureProps) {
 
     const loadingStructure = useSelector((state: any) => state.node.loadingStructure);
     const wasLoadedStructure = useSelector((state: any) => state.node.wasLoadedStructure);
-    const nodeData = useSelector(
-        (state: any) => state.node?.data?.SystemStateInfo?.[0]
-    );
+    const nodeData = useSelector((state: any) => state.node?.data?.SystemStateInfo?.[0]);
 
     const nodeHref = useMemo(() => {
         return props.additionalNodesInfo?.getNodeRef
@@ -55,13 +52,15 @@ function NodeStructure(props: NodeStructureProps) {
         true,
     ).query;
 
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const scrollContainer = scrollContainerRef.current;
+
     const isReady = useRef(false);
 
     const scrolled = useRef(false);
 
     useEffect(() => {
         return () => {
-            const {scrollContainer} = props;
             if (scrollContainer) {
                 scrollContainer.scrollTo({
                     behavior: 'smooth',
@@ -84,13 +83,12 @@ function NodeStructure(props: NodeStructureProps) {
     }, [props.nodeId, dispatch]);
 
     useEffect(() => {
-        if (!_.isEmpty(nodeStructure) && props.scrollContainer) {
+        if (!_.isEmpty(nodeStructure) && scrollContainer) {
             isReady.current = true;
         }
-    }, [nodeStructure, props.scrollContainer]);
+    }, [nodeStructure]);
 
     useEffect(() => {
-        const {scrollContainer} = props;
         if (isReady.current && !scrolled.current && scrollContainer) {
             const element = document.getElementById(
                 generateId({type: 'pdisk', id: pdiskIdFromUrl as string}),
@@ -105,7 +103,7 @@ function NodeStructure(props: NodeStructureProps) {
                 const order = vDisk?.order;
 
                 if (dataTable) {
-                    scrollToVdisk += (dataTable as HTMLElement).offsetTop + 40 * (order + 1);
+                    scrollToVdisk += (dataTable as HTMLElement).offsetTop + 40 * order;
                 }
             }
 
@@ -113,12 +111,12 @@ function NodeStructure(props: NodeStructureProps) {
                 scrollContainer.scrollTo({
                     behavior: 'smooth',
                     // should subtract 20 to avoid sticking the element to tabs
-                    top: scrollToVdisk ? scrollToVdisk : element.offsetTop - 20,
+                    top: scrollToVdisk ? scrollToVdisk : element.offsetTop,
                 });
                 scrolled.current = true;
             }
         }
-    }, [nodeStructure, props.scrollContainer, pdiskIdFromUrl, vdiskIdFromUrl]);
+    }, [nodeStructure, pdiskIdFromUrl, vdiskIdFromUrl]);
 
     const renderStub = () => {
         return 'There is no information about node structure.';
@@ -147,7 +145,11 @@ function NodeStructure(props: NodeStructureProps) {
         return renderStructure();
     };
 
-    return <div className={b(null, props.className)}>{renderContent()}</div>;
+    return (
+        <div className={b()} ref={scrollContainerRef}>
+            <div className={props.className}>{renderContent()}</div>
+        </div>
+    );
 }
 
 export default NodeStructure;
