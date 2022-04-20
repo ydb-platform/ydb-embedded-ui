@@ -32,7 +32,7 @@ class FullNodeViewer extends React.Component {
     render() {
         const {node, className, additionalNodesInfo={}} = this.props;
         const nodeHref = additionalNodesInfo.getNodeRef
-            ? additionalNodesInfo.getNodeRef(node)
+            ? additionalNodesInfo.getNodeRef(node) + 'internal'
             : undefined;
 
         const commonInfo = [

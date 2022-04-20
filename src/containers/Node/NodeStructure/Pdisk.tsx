@@ -68,11 +68,11 @@ function getColumns({
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.slotId],
             width: 100,
             render: ({value, row}) => {
-                let vdiskInternalViewerLink: string | undefined;
+                let vdiskInternalViewerLink = '';
 
                 if (nodeHref && value !== undefined) {
                     vdiskInternalViewerLink +=
-                        nodeHref + '/actors/vdisks/vdisk' + pad9(pDiskId) + '_' + pad9(value);
+                        nodeHref + 'actors/vdisks/vdisk' + pad9(pDiskId) + '_' + pad9(value);
                 }
 
                 return (
@@ -195,10 +195,10 @@ export function PDisk(props: PDiskProps) {
             SerialNumber,
         } = data;
 
-        let pDiskInternalViewerLink: string | undefined;
+        let pDiskInternalViewerLink = '';
 
         if (nodeHref) {
-            pDiskInternalViewerLink += nodeHref + '/actors/pdisks/pdisk' + pad9(PDiskId);
+            pDiskInternalViewerLink += nodeHref + 'actors/pdisks/pdisk' + pad9(PDiskId);
         }
 
         const pdiskInfo: any = [
