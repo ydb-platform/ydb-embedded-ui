@@ -35,7 +35,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             storage: true,
         });
     }
-    getStorageInfo({tenant, filter, nodeId, type}) {
+    getStorageInfo({tenant, filter, nodeId, type}, {concurrentId}) {
         return this.get(
             this.getPath(
                 `/viewer/json/${type === StorageTypes.nodes ? 'nodes' : 'storage'}?enums=true`,
@@ -44,6 +44,9 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 tenant,
                 node_id: nodeId,
                 with: filter,
+            },
+            {
+                concurrentId,
             },
         );
     }

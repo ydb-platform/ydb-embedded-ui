@@ -74,6 +74,8 @@ const storage = function z(state = initialState, action) {
             return {
                 ...state,
                 visible: action.data,
+                wasLoaded: false,
+                error: undefined,
             };
         }
         case SET_STORAGE_TYPE: {
@@ -81,6 +83,7 @@ const storage = function z(state = initialState, action) {
                 ...state,
                 type: action.data,
                 wasLoaded: false,
+                error: undefined,
             };
         }
         default:
@@ -94,9 +97,9 @@ export function setInitialState() {
     };
 }
 
-export function getStorageInfo({tenant, filter, nodeId, type}) {
+export function getStorageInfo({tenant, filter, nodeId, type}, {concurrentId}) {
     return createApiRequest({
-        request: window.api.getStorageInfo({tenant, filter, nodeId, type}),
+        request: window.api.getStorageInfo({tenant, filter, nodeId, type}, {concurrentId}),
         actions: FETCH_STORAGE,
     });
 }
