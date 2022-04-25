@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 import DataTable from '@yandex-cloud/react-data-table';
-import {Loader, RadioButton, Label} from '@yandex-cloud/uikit';
+import {RadioButton, Label} from '@yandex-cloud/uikit';
 
 import StorageFilter from './StorageFilter/StorageFilter';
 import {AutoFetcher} from '../../utils/autofetcher';
+import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 
 import {
     getStorageInfo,
@@ -68,17 +69,14 @@ class Storage extends React.Component {
             storageType,
             setHeader,
             getNodesList,
-            getStorageInfo,
         } = this.props;
 
         this.autofetcher = new AutoFetcher();
         getNodesList();
         if (tenant || nodeId) {
             setVisibleEntities(VisibleEntities.All);
-            getStorageInfo({
-                tenant,
+            this.getStorageInfo({
                 filter: FILTER_OPTIONS.All,
-                nodeId,
                 type: storageType,
             });
         } else {
@@ -88,16 +86,12 @@ class Storage extends React.Component {
                     link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.storage.id}),
                 },
             ]);
-            getStorageInfo({
-                tenant,
-                nodeId,
+            this.getStorageInfo({
                 filter: FILTER_OPTIONS.Missing,
                 type: storageType,
             });
             this.autofetcher.fetch(() =>
-                getStorageInfo({
-                    tenant,
-                    nodeId,
+                this.getStorageInfo({
                     filter: FILTER_OPTIONS.Missing,
                     type: storageType,
                 }),
@@ -107,30 +101,23 @@ class Storage extends React.Component {
 
     componentDidUpdate(prevProps) {
         const {
-            tenant,
             visibleEntities,
-            getStorageInfo,
-            nodeId,
             storageType,
             autorefresh,
             database,
         } = this.props;
 
         const startFetch = () => {
-            getStorageInfo({
-                tenant,
+            this.getStorageInfo({
                 filter: FILTER_OPTIONS[visibleEntities],
-                nodeId,
                 type: storageType,
             });
 
             this.autofetcher.stop();
             this.autofetcher.start();
             this.autofetcher.fetch(() =>
-                getStorageInfo({
-                    tenant,
+                this.getStorageInfo({
                     filter: FILTER_OPTIONS[visibleEntities],
-                    nodeId,
                     type: storageType,
                 }),
             );
@@ -157,11 +144,25 @@ class Storage extends React.Component {
         this.props.setInitialState();
     }
 
+    getStorageInfo(data) {
+        const {
+            tenant,
+            nodeId,
+            getStorageInfo,
+        } = this.props;
+
+        getStorageInfo({
+            tenant,
+            nodeId,
+            ...data,
+        }, {
+            concurrentId: 'getStorageInfo',
+        });
+    }
+
     renderLoader() {
         return (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
+            <TableSkeleton className={b('loader')}/>
         );
     }
 
@@ -200,8 +201,9 @@ class Storage extends React.Component {
     };
 
     renderControls() {
-        const {setStorageFilter, visibleEntities, storageType, flatListStorageEntities} =
+        const {setStorageFilter, visibleEntities, storageType, flatListStorageEntities, loading, wasLoaded} =
             this.props;
+        const showLoader = loading && !wasLoaded;
         return (
             <div className={b('controls')}>
                 <div className={b('search')}>
@@ -232,25 +234,28 @@ class Storage extends React.Component {
                 </RadioButton>
                 <Label theme="info" size="m">{`${
                     storageType === StorageTypes.groups ? 'Groups' : 'Nodes'
-                }: ${flatListStorageEntities.length}`}</Label>
+                }: ${(showLoader) ? '...' : flatListStorageEntities.length}`}</Label>
             </div>
         );
     }
 
     render() {
         const {loading, wasLoaded, error} = this.props;
-        if (loading && !wasLoaded) {
-            return this.renderLoader();
-        } else if (error) {
-            return <div>{error.statusText}</div>;
-        } else {
-            return (
-                <div className={b()}>
-                    {this.renderControls()}
-                    {this.renderDataTable()}
-                </div>
-            );
-        }
+        const showLoader = loading && !wasLoaded;
+
+        return (
+            <div className={b()}>
+                {this.renderControls()}
+                {error && (
+                    <div>{error.statusText}</div>
+                )}
+                {showLoader ? (
+                    this.renderLoader()
+                ) : (
+                    this.renderDataTable()
+                )}
+            </div>
+        );
     }
 }
 
