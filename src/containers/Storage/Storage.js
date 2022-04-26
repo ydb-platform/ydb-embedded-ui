@@ -20,6 +20,7 @@ import {
     StorageTypes,
     setStorageType,
     VisibleEntitiesTitles,
+    getStoragePoolsGroupsCount,
 } from '../../store/reducers/storage';
 import {getNodesList} from '../../store/reducers/clusterNodes';
 import StorageGroups from './StorageGroups/StorageGroups';
@@ -52,6 +53,7 @@ class Storage extends React.Component {
         getStorageInfo: PropTypes.func,
         setInitialState: PropTypes.func,
         flatListStorageEntities: PropTypes.array,
+        groupsCount: PropTypes.object,
         setStorageFilter: PropTypes.func,
         setVisibleEntities: PropTypes.func,
         visibleEntities: PropTypes.string,
@@ -199,10 +201,44 @@ class Storage extends React.Component {
         setStorageType(value);
     };
 
+    renderEntitiesCount() {
+        const {
+            storageType,
+            groupsCount,
+            flatListStorageEntities,
+            loading,
+            wasLoaded,
+        } = this.props;
+
+        let label = `${storageType === StorageTypes.groups ? 'Groups' : 'Nodes'}: `;
+
+        if (loading && !wasLoaded) {
+            label += '...';
+            return label;
+        }
+
+        if (storageType === StorageTypes.nodes) {
+            label += flatListStorageEntities.length;
+        }
+
+        if (storageType === StorageTypes.groups) {
+            if (groupsCount.total === groupsCount.found) {
+                label += groupsCount.total;
+            } else {
+                label += `${groupsCount.found} out of ${groupsCount.total}`;
+            }
+        }
+
+        return label;
+    }
+
     renderControls() {
-        const {setStorageFilter, visibleEntities, storageType, flatListStorageEntities, loading, wasLoaded} =
-            this.props;
-        const showLoader = loading && !wasLoaded;
+        const {
+            setStorageFilter,
+            visibleEntities,
+            storageType,
+        } = this.props;
+
         return (
             <div className={b('controls')}>
                 <div className={b('search')}>
@@ -231,9 +267,9 @@ class Storage extends React.Component {
                         {StorageTypes.nodes}
                     </RadioButton.Option>
                 </RadioButton>
-                <Label theme="info" size="m">{`${
-                    storageType === StorageTypes.groups ? 'Groups' : 'Nodes'
-                }: ${(showLoader) ? '...' : flatListStorageEntities.length}`}</Label>
+                <Label theme="info" size="m">
+                    {this.renderEntitiesCount()}
+                </Label>
             </div>
         );
     }
@@ -270,6 +306,7 @@ function mapStateToProps(state) {
 
     return {
         flatListStorageEntities: getFilteredEntities(state),
+        groupsCount: getStoragePoolsGroupsCount(state),
         autorefresh: state.schema.autorefresh,
         nodes: getNodesObject(state),
         loading,
