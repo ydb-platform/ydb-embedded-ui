@@ -125,6 +125,10 @@ export function setVisibleEntities(value) {
 }
 
 export const getStoragePools = (state) => state.storage.data?.StoragePools;
+export const getStoragePoolsGroupsCount = (state) => ({
+    total: state.storage.data?.TotalGroups || 0,
+    found: state.storage.data?.FoundGroups || 0,
+});
 export const getStorageNodes = (state) => state.storage.data?.Nodes;
 export const getStorageFilter = (state) => state.storage.filter;
 export const getVisibleEntities = (state) => state.storage.visible;
