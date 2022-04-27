@@ -235,11 +235,18 @@ function Vdisk(props) {
                 <DiskStateProgressBar
                     diskAllocatedPercent={vdiskAllocatedPercent}
                     severity={severity}
-                    href={createHref(
-                        routes.node,
-                        {id: props.NodeId, activeTab: STRUCTURE},
-                        {pdiskId: props.PDisk?.PDiskId, vdiskId: stringifyVdiskId(props.VDiskId)},
-                    )}
+                    href={
+                        props.NodeId
+                            ? createHref(
+                                  routes.node,
+                                  {id: props.NodeId, activeTab: STRUCTURE},
+                                  {
+                                      pdiskId: props.PDisk?.PDiskId,
+                                      vdiskId: stringifyVdiskId(props.VDiskId),
+                                  },
+                              )
+                            : undefined
+                    }
                 />
             </div>
         </React.Fragment>
