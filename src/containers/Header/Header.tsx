@@ -26,15 +26,15 @@ function ClusterName({name}: {name: string}) {
     );
 }
 
-function Header() {
+interface HeaderProps {
+    clusterName: string
+}
+
+function Header({clusterName}: HeaderProps) {
     const dispatch = useDispatch();
     const {data: host}: {data: {ClusterName?: string}} = useSelector((state: any) => state.host);
     const {singleClusterMode, header}: {singleClusterMode: boolean; header: HeaderItemType[]} =
         useSelector((state: any) => state);
-
-    const clusterName: string = useSelector(
-        (state: any) => state.cluster.data?.Name || state.clusterInfo?.title,
-    );
 
     const location = useLocation();
     const history = useHistory();
