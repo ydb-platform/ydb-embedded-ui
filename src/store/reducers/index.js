@@ -20,7 +20,6 @@ import tablet from './tablet';
 import executeQuery from './executeQuery';
 import explainQuery from './explainQuery';
 import tabletsFilters from './tabletsFilters';
-import clusterInfo from './clusterInfo';
 import settings from './settings';
 import preview from './preview';
 import nodesList from './clusterNodes';
@@ -63,7 +62,6 @@ export const rootReducer = {
     explainQuery,
     tabletsFilters,
     heatmap,
-    clusterInfo,
     settings,
     preview,
     nodesList,

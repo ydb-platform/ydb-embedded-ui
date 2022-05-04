@@ -33,7 +33,7 @@ function Header() {
         useSelector((state: any) => state);
 
     const clusterName: string = useSelector(
-        (state: any) => state.cluster.data?.Name || state.clusterInfo.title,
+        (state: any) => state.cluster.data?.Name || state.clusterInfo?.title,
     );
 
     const location = useLocation();
