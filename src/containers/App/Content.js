@@ -59,7 +59,7 @@ export function Content(props) {
     };
     return (
         <React.Fragment>
-            {!isClustersPage && <Header />}
+            {!isClustersPage && <Header clusterName={props.clusterName} />}
             <main className={b('main')}>{renderRoute()}</main>
             <ReduxTooltip />
             <AppIcons />
@@ -70,6 +70,7 @@ export function Content(props) {
 Content.propTypes = {
     singleClusterMode: PropTypes.bool,
     children: PropTypes.node,
+    clusterName: PropTypes.string,
 };
 
 function ContentWrapper(props) {

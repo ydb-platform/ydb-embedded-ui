@@ -17,6 +17,8 @@ registerLanguages();
 class App extends React.Component {
     static propTypes = {
         isAuthenticated: PropTypes.bool,
+        singleClusterMode: PropTypes.bool,
+        clusterName: PropTypes.string,
         children: PropTypes.node,
     };
 
@@ -40,9 +42,10 @@ class App extends React.Component {
     }
 
     renderContentWithNavigation() {
+        const {singleClusterMode, clusterName} = this.props;
         return (
             <AsideNavigation>
-                <Content singleClusterMode={this.props.singleClusterMode} />
+                <Content singleClusterMode={singleClusterMode} clusterName={clusterName} />
                 <div id="fullscreen-root"></div>
             </AsideNavigation>
         );
@@ -58,6 +61,7 @@ function mapStateToProps(state) {
         isAuthenticated: state.authentication.isAuthenticated,
         internalUser: state.authentication.user,
         singleClusterMode: state.singleClusterMode,
+        clusterName: state.cluster.data?.Name,
     };
 }
 
