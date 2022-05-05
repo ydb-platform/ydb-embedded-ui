@@ -5,11 +5,7 @@
     @include flex-container();
 
     &__controls {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        margin: 0 0 8px;
+        @include controls;
     }
 
     &__name {
