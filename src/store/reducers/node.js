@@ -86,7 +86,7 @@ export const getNodeInfo = (id) => {
 
 export const getNodeStructure = (nodeId) => {
     return createApiRequest({
-        request: window.api.getStorageInfo({nodeId}),
+        request: window.api.getStorageInfo({nodeId}, {concurrentId: 'getNodeStructure'}),
         actions: FETCH_NODE_STRUCTURE,
     });
 };
