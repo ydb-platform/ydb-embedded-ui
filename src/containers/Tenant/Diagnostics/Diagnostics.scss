@@ -1,13 +1,11 @@
 .kv-tenant-diagnostics {
+    display: flex;
     overflow: hidden;
+    flex-direction: column;
 
     height: 100%;
-    &__header-wrapper {
-        position: sticky;
-        z-index: 2;
-        top: 0;
-        left: 0;
 
+    &__header-wrapper {
         padding: 13px 20px 16px;
 
         background-color: var(--yc-color-base-background);
@@ -36,9 +34,9 @@
 
     &__page-wrapper {
         overflow: auto;
+        flex-grow: 1;
 
         width: 100%;
-        height: calc(100% - 69px);
         padding: 0 20px;
 
         & .global-storage {
