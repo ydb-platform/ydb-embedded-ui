@@ -40,9 +40,9 @@
         padding: 0 20px;
 
         & .global-storage {
-            height: calc(100% + 16px);
-            max-height: calc(100% + 16px);
-            margin-top: -16px;
+            &__controls {
+                padding-top: 0;
+            }
         }
     }
 }
