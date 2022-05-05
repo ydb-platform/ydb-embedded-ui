@@ -37,23 +37,22 @@
 
     &__status-wrapper {
         display: flex;
-        gap: 8px;
+        align-items: baseline;
 
         margin-bottom: 15px;
+        gap: 8px;
     }
 
     &__preview-title {
-        display: flex;
-        align-items: center;
-
         font-weight: 600;
+        line-height: 24px;
     }
 
     &__self-check-status-indicator {
-        display: flex;
-        align-items: center;
-
         padding: 0 8px;
+
+        font-size: 13px;
+        line-height: 24px;
 
         border-radius: 4px;
 
