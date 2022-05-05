@@ -40,7 +40,6 @@ const FILTER_OPTIONS = {
 const tableSettings = {
     ...DEFAULT_TABLE_SETTINGS,
     defaultOrder: DataTable.DESCENDING,
-    stickyTop: 62,
 };
 
 class Storage extends React.Component {
