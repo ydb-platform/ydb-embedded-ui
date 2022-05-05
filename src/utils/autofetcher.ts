@@ -3,6 +3,7 @@ export class AutoFetcher {
         this.timeout = AutoFetcher.DEFAULT_TIMEOUT;
         this.active = true;
         this.timer = undefined;
+        this.launchCounter = 0;
     }
 
     wait(ms: number) {
@@ -16,12 +17,20 @@ export class AutoFetcher {
             return;
         }
 
+        const currentLaunch = this.launchCounter;
+
         await this.wait(this.timeout);
 
         if (this.active) {
             const startTs = Date.now();
             await request();
             const finishTs = Date.now();
+
+            if (currentLaunch !== this.launchCounter) {
+                // autofetcher was restarted while request was in progress
+                // stop further fetches, we are in deprecated thread
+                return;
+            }
 
             const responseTime = finishTs - startTs;
             const nextTimeout =
@@ -40,6 +49,7 @@ export class AutoFetcher {
         this.active = false;
     }
     start() {
+        this.launchCounter++;
         this.active = true;
     }
 
@@ -48,4 +58,5 @@ export class AutoFetcher {
     timeout: number;
     active: boolean;
     timer: undefined | ReturnType<typeof setTimeout>;
+    launchCounter: number;
 }
