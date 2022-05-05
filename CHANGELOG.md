@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.2.6](https://www.github.com/ydb-platform/ydb-embedded-ui/compare/v1.2.5...v1.2.6) (2022-05-05)
+
+
+### Bug Fixes
+
+* code-review ([1068339](https://www.github.com/ydb-platform/ydb-embedded-ui/commit/1068339d128fb44b661837b7d777b5e5f725a611))
+* **Diagnostics:** layout ([2b11c35](https://www.github.com/ydb-platform/ydb-embedded-ui/commit/2b11c35c14cd1fa17d36bbeb2a371fb2fef3fb70))
+
 ### [1.2.5](https://www.github.com/ydb-platform/ydb-embedded-ui/compare/v1.2.4...v1.2.5) (2022-05-05)
 
 
