@@ -1,5 +1,16 @@
 # Changelog
 
+### [1.2.5](https://www.github.com/ydb-platform/ydb-embedded-ui/compare/v1.2.4...v1.2.5) (2022-05-05)
+
+
+### Bug Fixes
+
+* **Node:** right padding on the storage page ([3a09d80](https://www.github.com/ydb-platform/ydb-embedded-ui/commit/3a09d8030c2b9d8f34675f3a790e19bba5b864e4))
+* **Tenant:** fix horizontal scrollbar on diagnostics storage page ([017f5f3](https://www.github.com/ydb-platform/ydb-embedded-ui/commit/017f5f3470875824b11575c506837ab461a4e840))
+* **Tenant:** keep acl heading at top ([7859fc6](https://www.github.com/ydb-platform/ydb-embedded-ui/commit/7859fc6a2e47071daf18b48a23974f2393e31417))
+* **Storage:** move filters out of scrollable container ([66baaec](https://www.github.com/ydb-platform/ydb-embedded-ui/commit/66baaec170449c89da2d9f8e2170875c13334e68))
+* **NodesViewer:** match default control styles ([c007674](https://www.github.com/ydb-platform/ydb-embedded-ui/commit/c0076742e78fdb87aadae9b22e073b923e7ca57e))
+
 ### [1.2.4](https://www.github.com/ydb-platform/ydb-embedded-ui/compare/v1.2.3...v1.2.4) (2022-05-05)
 
 
