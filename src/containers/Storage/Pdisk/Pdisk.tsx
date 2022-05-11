@@ -13,6 +13,8 @@ import DiskStateProgressBar, {
 } from '../DiskStateProgressBar/DiskStateProgressBar';
 import {STRUCTURE} from '../../Node/NodePages';
 
+import {colorSeverity, NOT_AVAILABLE_SEVERITY} from '../utils';
+
 import './Pdisk.scss';
 
 const b = cn('pdisk-storage');
@@ -34,14 +36,6 @@ const stateSeverity = {
     DeviceIoError: 5,
 };
 
-const colorSeverity = {
-    Grey: 0,
-    Green: 1,
-    Blue: 2,
-    Yellow: 3,
-    Orange: 4,
-    Red: 5,
-};
 type PDiskState = keyof typeof stateSeverity;
 
 interface PDiskProps {
@@ -57,7 +51,7 @@ interface PDiskProps {
 }
 
 const getStateSeverity = (pDiskState?: PDiskState) => {
-    return pDiskState ? stateSeverity[pDiskState] : colorSeverity.Grey;
+    return pDiskState ? stateSeverity[pDiskState] : NOT_AVAILABLE_SEVERITY;
 };
 
 function Pdisk(props: PDiskProps) {
