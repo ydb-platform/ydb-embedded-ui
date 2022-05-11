@@ -12,6 +12,8 @@ import DiskStateProgressBar, {
 } from '../DiskStateProgressBar/DiskStateProgressBar';
 import {STRUCTURE} from '../../Node/NodePages';
 
+import {colorSeverity, NOT_AVAILABLE_SEVERITY} from '../utils';
+
 import './Vdisk.scss';
 
 const b = cn('vdisk-storage');
@@ -34,17 +36,8 @@ const stateSeverity = {
     OK: 1,
 };
 
-const colorSeverity = {
-    Grey: 0,
-    Green: 1,
-    Blue: 2,
-    Yellow: 3,
-    Orange: 4,
-    Red: 5,
-};
-
 const getStateSeverity = (vDiskState) => {
-    return stateSeverity[vDiskState] ?? colorSeverity.Grey;
+    return stateSeverity[vDiskState] ?? NOT_AVAILABLE_SEVERITY;
 };
 
 const getColorSeverity = (color) => {
@@ -57,15 +50,25 @@ function Vdisk(props) {
 
     const anchor = useRef();
 
+    // determine disk status severity
     useEffect(() => {
         const {DiskSpace, VDiskState, FrontQueues, Replicated} = props;
+
+        // if the disk is not available, this determines its status severity regardless of other features
+        if (!VDiskState) {
+            setSeverity(NOT_AVAILABLE_SEVERITY);
+            return;
+        }
+
         const DiskSpaceSeverity = getColorSeverity(DiskSpace);
         const VDiskSpaceSeverity = getStateSeverity(VDiskState);
         const FrontQueuesSeverity = Math.min(colorSeverity.Orange, getColorSeverity(FrontQueues));
+
         let newSeverity = Math.max(DiskSpaceSeverity, VDiskSpaceSeverity, FrontQueuesSeverity);
         if (!Replicated && newSeverity === colorSeverity.Green) {
             newSeverity = colorSeverity.Blue;
         }
+
         setSeverity(newSeverity);
     }, [props.VDiskState, props.DiskSpace, props.FrontQueues, props.Replicated]);
 
