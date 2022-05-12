@@ -17,9 +17,9 @@ import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 import {formatCPU, formatBytesToGigabyte} from '../../utils';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
-import {ALL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {ALL, DEFAULT_TABLE_SETTINGS, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
 import {getTenantsInfo} from '../../store/reducers/tenants';
-import {changeFilter} from '../../store/reducers/settings';
+import {changeFilter, getSettingValue} from '../../store/reducers/settings';
 import {setHeader} from '../../store/reducers/header';
 
 import {clusterName} from '../../store';
@@ -119,6 +119,7 @@ class Tenants extends React.Component {
             filter,
             handleSearchQuery,
             additionalTenantsInfo = {},
+            savedTenantInitialTab,
         } = this.props;
 
         const filteredTenantsBySearch = tenants.filter(
@@ -128,6 +129,9 @@ class Tenants extends React.Component {
             filter,
         );
         const filteredTenants = Tenants.filterTenants(filteredTenantsBySearch, filter);
+
+        const initialTenantGeneralTab = savedTenantInitialTab || TENANT_GENERAL_TABS[0].id;
+        const initialTenantInfoTab = TENANT_INFO_TABS[0].id;
 
         const columns = [
             {
@@ -150,8 +154,8 @@ class Tenants extends React.Component {
                                 path={createHref(routes.tenant, undefined, {
                                     name: value,
                                     backend: tenantBackend,
-                                    [TenantTabsGroups.info]: TENANT_INFO_TABS[0].id,
-                                    [TenantTabsGroups.general]: TENANT_GENERAL_TABS[0].id,
+                                    [TenantTabsGroups.info]: initialTenantInfoTab,
+                                    [TenantTabsGroups.general]: initialTenantGeneralTab,
                                 })}
                             />
                             {additionalTenantsInfo.name && additionalTenantsInfo.name(value, row)}
@@ -347,6 +351,7 @@ const mapStateToProps = (state) => {
         loading,
         error,
         filter: state.settings.problemFilter,
+        savedTenantInitialTab: getSettingValue(state, TENANT_INITIAL_TAB_KEY),
     };
 };
 
