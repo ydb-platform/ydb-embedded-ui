@@ -144,7 +144,7 @@ body,
 }
 
 .data-table__row:hover .entity-status__clipboard-button {
-    visibility: visible;
+    display: flex;
 }
 
 .no-problem {
