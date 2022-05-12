@@ -9,8 +9,7 @@
     line-height: var(--yc-text-body2-line-height);
 
     &__clipboard-button {
-        display: flex;
-        visibility: hidden;
+        display: none;
         align-items: center;
 
         margin-left: 8px;
@@ -22,7 +21,7 @@
         }
 
         &_visible {
-            visibility: visible;
+            display: flex;
         }
     }
 

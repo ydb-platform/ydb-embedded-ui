@@ -31,7 +31,7 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
                     return <span>—</span>;
                 }
                 return (
-                    <React.Fragment>
+                    <div className={b('host-name-wrapper')}>
                         <EntityStatus
                             name={row.Host}
                             status={row.Overall}
@@ -44,7 +44,7 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
                                 <Icon name="external" />
                             </Button>
                         )}
-                    </React.Fragment>
+                    </div>
                 );
             },
             width: '350px',

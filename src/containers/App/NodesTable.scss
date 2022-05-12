@@ -1,7 +1,10 @@
 .kv-nodes {
+    &__host-name-wrapper {
+        display: flex;
+    }
+
     &__external-button {
-        display: inline-flex;
-        visibility: hidden;
+        display: none;
         align-items: center;
 
         margin-left: 4px;
@@ -14,12 +17,12 @@
     }
 
     &__host-name {
-        width: 90%;
+        overflow: hidden;
     }
 }
 
 .data-table__row:hover {
     .kv-nodes__external-button {
-        visibility: visible;
+        display: inline-flex;
     }
 }
