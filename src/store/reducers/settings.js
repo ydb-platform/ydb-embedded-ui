@@ -1,4 +1,4 @@
-import {ALL, defaultUserSettings, SAVED_QUERIES_KEY, THEME_KEY} from '../../utils/constants';
+import {ALL, defaultUserSettings, SAVED_QUERIES_KEY, THEME_KEY, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
 import '../../services/api';
 import {getValueFromLS} from '../../utils/utils';
 
@@ -13,6 +13,9 @@ const theme = window.web_version
 const savedQueries = window.web_version
     ? userSettings[SAVED_QUERIES_KEY]
     : getValueFromLS(SAVED_QUERIES_KEY, '[]');
+const savedTenantGeneralTab = window.web_version
+    ? userSettings[TENANT_INITIAL_TAB_KEY]
+    : getValueFromLS(TENANT_INITIAL_TAB_KEY);
 
 export const initialState = {
     problemFilter: ALL,
@@ -21,6 +24,7 @@ export const initialState = {
         ...userSettings,
         theme,
         [SAVED_QUERIES_KEY]: savedQueries,
+        [TENANT_INITIAL_TAB_KEY]: savedTenantGeneralTab,
     },
     systemSettings,
 };

@@ -137,3 +137,5 @@ export const DEFAULT_TABLE_SETTINGS = {
     dynamicRender: true,
     highlightRows: true,
 };
+
+export const TENANT_INITIAL_TAB_KEY = 'saved_tenant_initial_tab';

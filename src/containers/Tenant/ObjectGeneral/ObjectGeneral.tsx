@@ -1,3 +1,4 @@
+import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
@@ -11,16 +12,18 @@ import Diagnostics from '../Diagnostics/Diagnostics';
 
 import {TenantGeneralTabsIds, TenantTabsGroups, TENANT_GENERAL_TABS} from '../TenantPages';
 import routes, {createHref} from '../../../routes';
+import {setSettingValue} from '../../../store/reducers/settings';
+import {TENANT_INITIAL_TAB_KEY} from '../../../utils/constants';
 
 import './ObjectGeneral.scss';
 
 const b = cn('object-general');
 
-interface ObjectGeneralProps {
+type ObjectGeneralProps = {
     type: string;
     additionalTenantInfo?: any;
     additionalNodesInfo?: any;
-}
+} & typeof mapDispatchToProps;
 
 function ObjectGeneral(props: ObjectGeneralProps) {
     const location = useLocation();
@@ -63,6 +66,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
                         );
                     }}
                     allowNotSelected
+                    onSelectTab={(id) => props.setSettingValue(TENANT_INITIAL_TAB_KEY, id)}
                 />
             </div>
         );
@@ -101,4 +105,8 @@ function ObjectGeneral(props: ObjectGeneralProps) {
     return renderContent();
 }
 
-export default ObjectGeneral;
+const mapDispatchToProps = {
+    setSettingValue,
+};
+
+export default connect(null, mapDispatchToProps)(ObjectGeneral);
