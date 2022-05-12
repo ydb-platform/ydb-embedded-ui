@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://www.github.com/ydb-platform/ydb-embedded-ui/compare/v1.2.6...v1.3.0) (2022-05-12)
+
+
+### Features
+
+* **Storage:** red progress bars for unavailable disks ([17cf94d](https://www.github.com/ydb-platform/ydb-embedded-ui/commit/17cf94defb23681bc62c768d3282eed00c7e974d))
+
 ### [1.2.6](https://www.github.com/ydb-platform/ydb-embedded-ui/compare/v1.2.5...v1.2.6) (2022-05-05)
 
 
