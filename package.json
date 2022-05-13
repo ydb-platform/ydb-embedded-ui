@@ -34,7 +34,6 @@
     "react-scripts": "4.0.3",
     "react-split": "2.0.14",
     "react-transition-group": "4.4.2",
-    "react-treeview": "0.4.7",
     "redux": "4.0.1",
     "redux-location-state": "2.6.0",
     "redux-thunk": "2.3.0",
