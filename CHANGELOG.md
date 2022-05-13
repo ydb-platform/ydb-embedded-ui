@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://www.github.com/ydb-platform/ydb-embedded-ui/compare/v1.3.0...v1.4.0) (2022-05-13)
+
+
+### Features
+
+* **Tenant:** save initial tab preference ([7195d0f](https://www.github.com/ydb-platform/ydb-embedded-ui/commit/7195d0f7f5754c461555211515f80ea96464ca15))
+
 ## [1.3.0](https://www.github.com/ydb-platform/ydb-embedded-ui/compare/v1.2.6...v1.3.0) (2022-05-12)
 
 
