@@ -40,7 +40,8 @@
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
     "sass": "1.32.8",
-    "web-vitals": "1.1.2"
+    "web-vitals": "1.1.2",
+    "ydb-ui-components": "1.2.3"
   },
   "scripts": {
     "start": "react-app-rewired start",
