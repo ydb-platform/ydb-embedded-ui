@@ -19,11 +19,12 @@ import './ObjectGeneral.scss';
 
 const b = cn('object-general');
 
-type ObjectGeneralProps = {
+interface ObjectGeneralProps {
     type: string;
     additionalTenantInfo?: any;
     additionalNodesInfo?: any;
-} & typeof mapDispatchToProps;
+    setSettingValue: (name: string, value: string) => void;
+}
 
 function ObjectGeneral(props: ObjectGeneralProps) {
     const location = useLocation();
