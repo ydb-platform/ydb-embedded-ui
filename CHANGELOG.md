@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.3.0...v1.4.0) (2022-05-16)
+
+
+### Features
+
+* **Tenant:** save initial tab preference ([7195d0f](https://github.com/ydb-platform/ydb-embedded-ui/commit/7195d0f7f5754c461555211515f80ea96464ca15))
+
+
+### UI Updtaes
+
+* **NodesTable:** don't reserve space for icons next to node fqdn ([8fcf1b3](https://github.com/ydb-platform/ydb-embedded-ui/commit/8fcf1b3269dee7ada83d7c5abcf44ad004191851))
+
+
+### Bug Fixes
+
+* **Tenant:** mapDispatchToProps types ([7dcaf56](https://github.com/ydb-platform/ydb-embedded-ui/commit/7dcaf561ec0c361d52d789b2ea3b1aba75339d83))
+
 ## [1.3.0](https://www.github.com/ydb-platform/ydb-embedded-ui/compare/v1.2.6...v1.3.0) (2022-05-12)
 
 
