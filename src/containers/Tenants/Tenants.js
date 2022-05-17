@@ -144,7 +144,7 @@ class Tenants extends React.Component {
                         : undefined;
                     const isExternalLink = Boolean(backend);
                     return (
-                        <React.Fragment>
+                        <div className={b('name-wrapper')}>
                             <EntityStatus
                                 externalLink={isExternalLink}
                                 className={b('name')}
@@ -159,7 +159,7 @@ class Tenants extends React.Component {
                                 })}
                             />
                             {additionalTenantsInfo.name && additionalTenantsInfo.name(value, row)}
-                        </React.Fragment>
+                        </div>
                     );
                 },
                 width: 440,

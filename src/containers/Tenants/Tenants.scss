@@ -54,7 +54,13 @@
     .data-table__row:hover &__type-button {
         visibility: visible;
     }
+
+    &__name-wrapper {
+        display: flex;
+        align-items: center;
+    }
+
     &__name {
-        max-width: 90%;
+        overflow: hidden;
     }
 }
