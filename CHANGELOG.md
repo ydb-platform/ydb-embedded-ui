@@ -1,5 +1,17 @@
 # Changelog
 
+### [1.4.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.4.0...v1.4.1) (2022-05-17)
+
+
+### UI Updates
+
+* **Tenant:** add tenant name wrapper ([8176d28](https://github.com/ydb-platform/ydb-embedded-ui/commit/8176d28a5769b2b95d667ed960ad34d7a0d9bb4c))
+
+
+### Bug Fixes
+
+* **NodesTable:** align external link icon ([a379796](https://github.com/ydb-platform/ydb-embedded-ui/commit/a379796c6b8087f25f95ce3db4be33f18da71e04))
+
 ## [1.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.3.0...v1.4.0) (2022-05-16)
 
 
