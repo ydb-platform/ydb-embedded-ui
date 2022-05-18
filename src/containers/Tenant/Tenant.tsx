@@ -127,7 +127,7 @@ function Tenant(props: TenantProps) {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerExpand);
     };
 
-    const onSplitStartDrugAdditional = () => {
+    const onSplitStartDragAdditional = () => {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.clear);
     };
 
@@ -139,7 +139,7 @@ function Tenant(props: TenantProps) {
                 triggerCollapse={summaryVisibilityState.triggerCollapse}
                 triggerExpand={summaryVisibilityState.triggerExpand}
                 minSize={[36, 200]}
-                onSplitStartDrugAdditional={onSplitStartDrugAdditional}
+                onSplitStartDragAdditional={onSplitStartDragAdditional}
             >
                 <ObjectSummary
                     type={entityType as string}
