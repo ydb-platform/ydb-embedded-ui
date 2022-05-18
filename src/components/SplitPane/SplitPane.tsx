@@ -18,8 +18,8 @@ interface SplitPaneProps {
     minSize?: number[];
     triggerCollapse?: boolean;
     triggerExpand?: boolean;
-    onSplitStartDrugAdditional?: VoidFunction;
-    onSplitDrugAdditional?: VoidFunction;
+    onSplitStartDragAdditional?: VoidFunction;
+    onSplitDragAdditional?: VoidFunction;
 }
 
 const minSizeDefaultInner = [0, 100];
@@ -41,17 +41,17 @@ function SplitPane(props: SplitPaneProps) {
         localStorage.setItem(defaultSizePaneKey, sizes.join(','));
     };
     const onDragHandler = (sizes: number[]) => {
-        const {onSplitDrugAdditional} = props;
-        if (onSplitDrugAdditional) {
-            onSplitDrugAdditional();
+        const {onSplitDragAdditional} = props;
+        if (onSplitDragAdditional) {
+            onSplitDragAdditional();
         }
         setDefaultSizePane(sizes);
     };
 
     const onDragStartHandler = () => {
-        const {onSplitStartDrugAdditional} = props;
-        if (onSplitStartDrugAdditional) {
-            onSplitStartDrugAdditional();
+        const {onSplitStartDragAdditional} = props;
+        if (onSplitStartDragAdditional) {
+            onSplitStartDragAdditional();
         }
         setInnerSizes(undefined);
     };

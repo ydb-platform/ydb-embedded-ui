@@ -298,7 +298,7 @@ function QueryEditor(props) {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
 
-    const onSplitStartDrugAdditional = () => {
+    const onSplitStartDragAdditional = () => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.clear);
     };
 
@@ -636,7 +636,7 @@ function QueryEditor(props) {
                 triggerExpand={resultVisibilityState.triggerExpand}
                 minSize={[0, 52]}
                 collapsedSizes={[100, 0]}
-                onSplitStartDrugAdditional={onSplitStartDrugAdditional}
+                onSplitStartDragAdditional={onSplitStartDragAdditional}
             >
                 <div className={b('pane-wrapper')}>
                     <div className={b('monaco-wrapper')}>

@@ -215,7 +215,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
 
-    const onSplitStartDrugAdditional = () => {
+    const onSplitStartDragAdditional = () => {
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.clear);
     };
 
@@ -278,7 +278,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
                     <SplitPane
                         direction="vertical"
                         defaultSizePaneKey={DEFAULT_SIZE_TENANT_SUMMARY_KEY}
-                        onSplitStartDrugAdditional={onSplitStartDrugAdditional}
+                        onSplitStartDragAdditional={onSplitStartDragAdditional}
                         triggerCollapse={commonInfoVisibilityState.triggerCollapse}
                         triggerExpand={commonInfoVisibilityState.triggerExpand}
                         minSize={[200, 52]}
