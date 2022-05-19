@@ -70,14 +70,14 @@ export const getActions = (
                 .then(() => {
                     createToast({
                         name: 'Copied',
-                        title: 'Path was copied to clipboard successfully',
+                        title: 'The path is copied to the clipboard',
                         type: 'success',
                     });
                 })
                 .catch(() => {
                     createToast({
                         name: 'Not copied',
-                        title: 'Path was not copied to clipboard successfully',
+                        title: 'Couldn’t copy the path',
                         type: 'error',
                     });
                 });
