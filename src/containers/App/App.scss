@@ -117,32 +117,6 @@ body,
     border-color: var(--yc-color-text-danger);
 }
 
-.tree-view_item {
-    /* stylelint-disable-next-line declaration-no-important*/
-    cursor: default !important;
-}
-
-.tree-view_children {
-    margin-left: 25px;
-}
-
-.tree-view_arrow {
-    padding: 2px;
-
-    line-height: 0.8;
-
-    transform: rotate(90deg);
-}
-
-.tree-view_arrow-collapsed {
-    transform: rotate(0deg);
-}
-
-.tree-view_arrow:after {
-    font-size: var(--yc-text-body2-font-size);
-    content: '❯';
-}
-
 .data-table__row:hover .entity-status__clipboard-button {
     display: flex;
 }

@@ -7,18 +7,13 @@ import qs from 'qs';
 import _ from 'lodash';
 
 import {Button, HelpTooltip, Loader, Tabs} from '@yandex-cloud/uikit';
-//@ts-ignore
+
 import SplitPane from '../../../components/SplitPane';
-//@ts-ignore
-import SchemaNode from '../Schema/SchemaNode/SchemaNode';
-//@ts-ignore
+import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import Acl from '../Acl/Acl';
-//@ts-ignore
 import SchemaViewer from '../Schema/SchemaViewer/SchemaViewer';
 import CopyToClipboard from '../../../components/CopyToClipboard/CopyToClipboard';
-//@ts-ignore
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
-//@ts-ignore
 import Icon from '../../../components/Icon/Icon';
 
 import {OLAP_TABLE_TYPE, TABLE_TYPE} from '../Tenant';
@@ -26,7 +21,6 @@ import {OLAP_TABLE_TYPE, TABLE_TYPE} from '../Tenant';
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
-    //@ts-ignore
 } from '../../../utils/constants';
 import {
     TenantGeneralTabsIds,
@@ -41,10 +35,10 @@ import {
     paneVisibilityToggleReducerCreator,
     PaneVisibilityToggleButtons,
 } from '../utils/paneVisibilityToggleHelpers';
-//@ts-ignore
 import {setShowPreview} from '../../../store/reducers/schema';
 
 import './ObjectSummary.scss';
+
 const b = cn('object-summary');
 
 const getInitialIsSummaryCollapsed = () => {
@@ -103,7 +97,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
     });
 
     const {name: tenantName, info: infoTab} = queryParams;
-    const tenantData = _.get(data[tenantName as string], 'PathDescription.Self');
+    const pathData = _.get(data[tenantName as string], 'PathDescription.Self');
     const currentSchemaData = _.get(data[currentSchemaPath], 'PathDescription.Self');
 
     const tableSchema =
@@ -195,13 +189,20 @@ function ObjectSummary(props: ObjectSummaryProps) {
 
     const renderTree = () => {
         return (
-            <div>
+            <div className={b('tree-wrapper')}>
                 <div className={b('tree-header')}>
                     <div className={b('tree-title')}>Navigation</div>
                 </div>
                 <div className={b('tree')}>
-                    {tenantData && (
-                        <SchemaNode fullPath={tenantName as string} data={tenantData} isRoot />
+                    {pathData && (
+                        <SchemaTree
+                            rootPath={tenantName as string}
+                            // for the root pathData.Name contains the same string as tenantName,
+                            // but without the leading slash
+                            rootName={pathData?.Name || tenantName}
+                            rootType={pathData.PathType}
+                            currentPath={currentSchemaPath}
+                        />
                     )}
                 </div>
             </div>
