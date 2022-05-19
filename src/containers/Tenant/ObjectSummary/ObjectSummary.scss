@@ -26,8 +26,8 @@
 
     &__action-button {
         position: absolute;
-        top: 12px;
-        right: 4px;
+        top: 8px; // centered relative to the heading
+        right: 5px; // centered relative to the collapsed panel
 
         background-color: var(--yc-color-base-background);
         &_hidden {
@@ -41,32 +41,26 @@
         align-items: center;
     }
 
-    &__tree {
+    &__tree-wrapper {
         display: flex;
-        overflow: scroll;
-        flex: 0 0 auto;
         flex-direction: column;
+    }
+
+    &__tree {
+        overflow-y: scroll;
+        flex: 1 1 auto;
 
         height: 100%;
         padding: 0 12px 12px;
-
-        .tree-view_item {
-            margin: 0;
-            padding: 2px 0;
-        }
-
-        & > div > .tree-view {
-            padding-bottom: 15px;
-        }
     }
 
     &__tree-header {
         display: flex;
+        flex: 0 0 auto;
         justify-content: space-between;
         align-items: center;
 
         padding: 12px 12px 8px;
-        @include sticky-top();
     }
 
     &__tree-title {
