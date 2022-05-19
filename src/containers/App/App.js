@@ -25,6 +25,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         i18n.setLang(I18N.LANGS.en);
+        I18N.setDefaultLang(I18N.LANGS.en); // for the peer dependency ydb-ui-components, should match the language above
     }
 
     componentDidMount() {
