@@ -43,9 +43,11 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
     };
 
     const onSaveClick = () => {
-        if (queryName && !validationError) {
-            onSaveQuery(queryName);
+        if (!queryName || validationError) {
+            return;
         }
+
+        onSaveQuery(queryName);
         onCloseDialog();
     };
 
@@ -56,7 +58,13 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
 
     const renderDialog = () => {
         return (
-            <Dialog open={isDialogVisible} hasCloseButton={false} size="s" onClose={onCloseDialog}>
+            <Dialog
+                open={isDialogVisible}
+                hasCloseButton={false}
+                size="s"
+                onClose={onCloseDialog}
+                onEnterKeyDown={onSaveClick}
+            >
                 <Dialog.Header caption="Save query" />
                 <Dialog.Body className={b('dialog-body')}>
                     {singleClusterMode && (
