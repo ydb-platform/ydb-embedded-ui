@@ -1,17 +1,19 @@
-@import '../../../../styles/mixins.scss';
-
 .kv-save-query {
-    &__dialog-body {
+    &__dialog-row {
         display: flex;
         align-items: flex-start;
+
+        & + & {
+            margin-top: var(--yc-text-body-line-height);
+        }
     }
     &__field-title {
         margin-right: 12px;
 
         font-weight: 500;
-        line-height: 32px;
+        line-height: 28px;
         white-space: nowrap;
-        @include body2-typography();
+
         &.required {
             &::after {
                 content: '*';
