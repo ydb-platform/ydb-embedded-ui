@@ -114,9 +114,9 @@ export const getActions = (
                     copyItem,
                 ],
                 [
-                    {text: 'Alter table', action: onAlterTableClick},
-                    {text: 'Select query', action: onSelectQueryClick},
-                    {text: 'Upsert query', action: onUpsertQueryClick},
+                    {text: 'Alter table...', action: onAlterTableClick},
+                    {text: 'Select query...', action: onSelectQueryClick},
+                    {text: 'Upsert query...', action: onUpsertQueryClick},
                 ],
             ]
             : [
@@ -124,7 +124,7 @@ export const getActions = (
                     copyItem,
                 ],
                 [
-                    {text: 'Create table', action: onCreateTableClick},
+                    {text: 'Create table...', action: onCreateTableClick},
                 ],
             ];
     };
