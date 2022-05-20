@@ -86,6 +86,7 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
                                 text={queryName}
                                 onUpdate={onQueryNameChange}
                                 hasClear
+                                autoFocus
                             />
                             <span className={b('error')}>{validationError}</span>
                         </div>
