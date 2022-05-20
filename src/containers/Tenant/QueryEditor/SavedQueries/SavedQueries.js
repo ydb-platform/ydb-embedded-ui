@@ -71,6 +71,7 @@ function SavedQueries({savedQueries, changeUserInput, onDeleteQuery}) {
                 hasCloseButton={false}
                 size="s"
                 onClose={onClickCancelDelete}
+                onEnterKeyDown={onConfirmDeleteClick}
             >
                 <Dialog.Header caption="Delete query" />
                 <Dialog.Body className={b('dialog-body')}>
