@@ -5,35 +5,12 @@
     align-items: center;
 
     height: 40px;
-    margin-left: 36px;
 
     cursor: pointer;
-    .km-tree-view__arrow-icon + & {
-        margin-left: 0;
-    }
 
     &_active {
         border-radius: 4px;
         background: var(--yc-color-base-info);
-    }
-
-    &__wpapper {
-        & .km-tree-view__node-wrapper {
-            height: 40px;
-
-            & .km-tree-view__arrow-icon {
-                display: flex;
-                align-items: center;
-
-                width: 36px;
-                height: 36px;
-                margin: 0;
-            }
-        }
-
-        & .tree-view_item {
-            margin: 0;
-        }
     }
 
     &__field {
@@ -171,6 +148,17 @@
                     user-select: all;
                 }
             }
+        }
+    }
+
+    .ydb-tree-view {
+        &__item {
+            height: 40px;
+        }
+
+        .tree-view_arrow {
+            width: 40px;
+            height: 40px;
         }
     }
 }
