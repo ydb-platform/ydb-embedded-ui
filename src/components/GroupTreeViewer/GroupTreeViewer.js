@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import {withRouter} from 'react-router';
 
+import {TreeView} from 'ydb-ui-components';
+
 import GroupViewer from '../GroupViewer/GroupViewer';
 import PDiskViewer from '../PDiskViewer/PDiskViewer';
 import EntityStatus from '../EntityStatus/EntityStatus';
-import TreeView from '../TreeView/TreeView';
 import {stringifyVdiskId} from '../../utils';
 import routes, {createHref} from '../../routes';
 import {backend} from '../../store';
@@ -50,7 +51,7 @@ class GroupTreeViewer extends React.Component {
                 <div className={b()}>
                     <TreeView
                         key={group.GroupID}
-                        nodeLabel={label2}
+                        name={label2}
                         collapsed={collapsed}
                         onClick={onClick}
                     >
