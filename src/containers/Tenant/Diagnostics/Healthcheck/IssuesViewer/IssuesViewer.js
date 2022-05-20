@@ -7,7 +7,8 @@ import _filter from 'lodash/fp/filter';
 import _sortBy from 'lodash/fp/sortBy';
 import _uniqBy from 'lodash/fp/uniqBy';
 
-import TreeView from '../../../../../components/TreeView/TreeView';
+import {TreeView} from 'ydb-ui-components';
+
 import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 
 import './IssueViewer.scss';
@@ -45,7 +46,7 @@ const IssueRow = ({data, treeLevel, active, setInfoForActive, onClick}) => {
             </div>
             <div
                 className={issueBlock('field', {message: true})}
-                style={{marginLeft: -treeLevel * 25 + 'px'}}
+                style={{marginLeft: -treeLevel * 24 + 'px'}}
             >
                 {message}
             </div>
@@ -85,21 +86,20 @@ const IssuesViewer = ({issues}) => {
                 return (
                     <TreeView
                         key={id}
-                        nodeLabel={
+                        name={
                             <IssueRow
                                 data={item}
                                 treeLevel={treeLevel}
                                 active={isActive}
                                 setInfoForActive={setInfoData}
-                                onClick={() => setActiveItem(id)}
                             />
                         }
-                        className={issueBlock('wpapper', {active: isActive})}
                         collapsed={
                             typeof collapsedIssues[id] === 'undefined' || collapsedIssues[id]
                         }
                         hasArrow={hasArrow}
-                        onClick={() => {
+                        onClick={() => setActiveItem(id)}
+                        onArrowClick={() => {
                             const newValue =
                                 typeof collapsedIssues[id] === 'undefined'
                                     ? false
