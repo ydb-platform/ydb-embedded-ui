@@ -30,7 +30,7 @@ const issueBlock = cn('issue');
 
 const IssueRow = ({data, treeLevel, active, setInfoForActive, onClick}) => {
     // eslint-disable-next-line no-unused-vars
-    const {id, status, message, type, ...rest} = data;
+    const {id, status, message, type, reasonsItems, ...rest} = data;
 
     useEffect(() => {
         if (active) {
