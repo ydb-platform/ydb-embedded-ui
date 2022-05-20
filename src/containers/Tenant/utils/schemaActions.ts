@@ -44,23 +44,39 @@ export const getActions = (
             ignoreQueryPrefix: true,
         });
 
+        const switchTabToQuery = () => {
+            history.push(
+                createHref(routes.tenant, undefined, {
+                    ...queryParams,
+                    [TenantTabsGroups.general]: TenantGeneralTabsIds.query,
+                }),
+            );
+        };
+
         const onCreateTableClick = () => {
             dispatch(changeUserInput({input: createTableTemplate(path)}));
+            switchTabToQuery();
+            // here and in the other handlers this should be called after switching tab:
+            // redux-location-state catches the history.push event from the tab switching
+            // before active path updates in url, preventing its update at all
             setActivePath(path);
         };
 
         const onAlterTableClick = () => {
             dispatch(changeUserInput({input: alterTableTemplate(path)}));
+            switchTabToQuery();
             setActivePath(path);
         };
 
         const onSelectQueryClick = () => {
             dispatch(changeUserInput({input: selectQueryTemplate(path)}));
+            switchTabToQuery();
             setActivePath(path);
         };
 
         const onUpsertQueryClick = () => {
             dispatch(changeUserInput({input: upsertQueryTemplate(path)}));
+            switchTabToQuery();
             setActivePath(path);
         };
 
@@ -85,12 +101,7 @@ export const getActions = (
 
         const onOpenPreviewClick = () => {
             dispatch(setShowPreview(true));
-            history.push(
-                createHref(routes.tenant, undefined, {
-                    ...queryParams,
-                    [TenantTabsGroups.general]: TenantGeneralTabsIds.query,
-                }),
-            );
+            switchTabToQuery();
             setActivePath(path);
         };
 
