@@ -1,5 +1,19 @@
 # Changelog
 
+### [1.4.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.4.1...v1.4.2) (2022-05-23)
+
+
+### UI Updates
+
+* **QueryEditor:** replace warning for query losing with note about how query are saved ([89820ca](https://github.com/ydb-platform/ydb-embedded-ui/commit/89820ca7e2d02f880eb81d484b8947d599798d5f))
+
+
+### Bug Fixes
+
+* **QueryEditor:** confirm query deletion with enter ([d3dadbd](https://github.com/ydb-platform/ydb-embedded-ui/commit/d3dadbd0244fead5f41bd98445669c4f5ce23c43))
+* **QueryEditor:** field autofocus in query save dialog ([9225238](https://github.com/ydb-platform/ydb-embedded-ui/commit/92252384dc68c40191f7898fff9a2c1106b0b2f1))
+* **QueryEditor:** save query with enter ([5f9c450](https://github.com/ydb-platform/ydb-embedded-ui/commit/5f9c450aedc90f0e162515294a74000c006f9be7))
+
 ### [1.4.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.4.0...v1.4.1) (2022-05-17)
 
 
