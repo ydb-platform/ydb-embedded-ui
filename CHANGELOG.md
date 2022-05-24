@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.4.2...v1.5.0) (2022-05-24)
+
+
+### Features
+
+* **Healthcheck:** use TreeView in issues viewer ([bcd81e5](https://github.com/ydb-platform/ydb-embedded-ui/commit/bcd81e56dc613cf3e9f31d77d930b79e070372e4))
+* **Tenant:** use NavigationTree for schemas ([f2867e1](https://github.com/ydb-platform/ydb-embedded-ui/commit/f2867e18898028ca265df46fcc8bfa4f929173f0))
+
+
+### Bug Fixes
+
+* **Healthcheck:** don't display reasonsItems in issues viewer ([f0a545f](https://github.com/ydb-platform/ydb-embedded-ui/commit/f0a545f7c70d449c121d64f8d1820e53b880a0fc))
+* **Tenant:** add ellipsis to menu items inserting queries ([09135a2](https://github.com/ydb-platform/ydb-embedded-ui/commit/09135a2777ec9183ddf71bd2a4de66c5ef422ac8))
+* **Tenant:** change messages for path copy toasts ([09adfa5](https://github.com/ydb-platform/ydb-embedded-ui/commit/09adfa52735bf706deb1ee9bf37f4bfa459b3758))
+* **Tenant:** switch to query tab for inserted query ([991f156](https://github.com/ydb-platform/ydb-embedded-ui/commit/991f156ff819c58ff79146a44b57fb400729f325))
+
 ### [1.4.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.4.1...v1.4.2) (2022-05-23)
 
 
