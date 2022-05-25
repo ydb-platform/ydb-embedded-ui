@@ -1,13 +1,11 @@
-import qs from 'qs';
 import {Dispatch} from 'react';
-import {History} from 'history';
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
-import routes, {createHref} from '../../../routes';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {setShowPreview} from '../../../store/reducers/schema';
+import {setTopLevelTab} from '../../../store/reducers/tenant';
 import createToast from '../../../utils/createToast';
-import {TenantGeneralTabsIds, TenantTabsGroups} from '../TenantPages';
+import {TenantGeneralTabsIds} from '../TenantPages';
 
 const createTableTemplate = (path: string) => {
     return `CREATE TABLE \`${path}/my_table\`
@@ -36,29 +34,16 @@ VALUES ( );`;
 
 export const getActions = (
     dispatch: Dispatch<any>,
-    history: History<unknown>,
     setActivePath: (path: string) => void,
 ) =>
     (path: string, type: NavigationTreeNodeType) => {
-        const queryParams = qs.parse(location.search, {
-            ignoreQueryPrefix: true,
-        });
-
         const switchTabToQuery = () => {
-            history.push(
-                createHref(routes.tenant, undefined, {
-                    ...queryParams,
-                    [TenantTabsGroups.general]: TenantGeneralTabsIds.query,
-                }),
-            );
+            dispatch(setTopLevelTab(TenantGeneralTabsIds.query));
         };
 
         const onCreateTableClick = () => {
             dispatch(changeUserInput({input: createTableTemplate(path)}));
             switchTabToQuery();
-            // here and in the other handlers this should be called after switching tab:
-            // redux-location-state catches the history.push event from the tab switching
-            // before active path updates in url, preventing its update at all
             setActivePath(path);
         };
 

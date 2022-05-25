@@ -36,6 +36,7 @@ import {
     PaneVisibilityToggleButtons,
 } from '../utils/paneVisibilityToggleHelpers';
 import {setShowPreview} from '../../../store/reducers/schema';
+import {setTopLevelTab} from '../../../store/reducers/tenant';
 
 import './ObjectSummary.scss';
 
@@ -222,12 +223,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
 
     const onOpenPreview = () => {
         dispatch(setShowPreview(true));
-        history.push(
-            createHref(routes.tenant, undefined, {
-                ...queryParams,
-                [TenantTabsGroups.general]: TenantGeneralTabsIds.query,
-            }),
-        );
+        dispatch(setTopLevelTab(TenantGeneralTabsIds.query));
     };
 
     const renderCommonInfoControls = () => {
