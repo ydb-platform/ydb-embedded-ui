@@ -42,6 +42,12 @@ const paramSetup = {
             stateKey: 'tablets.typeFilter',
             type: 'array',
         },
+        general: {
+            stateKey: 'tenant.topLevelTab',
+        },
+        generalTab: {
+            stateKey: 'tenant.diagnosticsTab',
+        },
     },
 };
 

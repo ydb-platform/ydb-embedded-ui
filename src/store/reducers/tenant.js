@@ -3,6 +3,8 @@ import '../../services/api';
 import _ from 'lodash';
 
 const FETCH_TENANT = createRequestActionTypes('tenant', 'FETCH_TENANT');
+const SET_TOP_LEVEL_TAB = 'tenant/SET_TOP_LEVEL_TAB';
+const SET_DIAGNOSTICS_TAB = 'tenant/SET_DIAGNOSTICS_TAB';
 
 const tenantReducer = (state = {loading: false, tenant: {}}, action) => {
     switch (action.type) {
@@ -41,6 +43,20 @@ const tenantReducer = (state = {loading: false, tenant: {}}, action) => {
             };
         }
 
+        case SET_TOP_LEVEL_TAB: {
+            return {
+                ...state,
+                topLevelTab: action.data,
+            };
+        }
+
+        case SET_DIAGNOSTICS_TAB: {
+            return {
+                ...state,
+                diagnosticsTab: action.data,
+            };
+        }
+
         default:
             return state;
     }
@@ -72,5 +88,19 @@ export const getTenantInfo = ({path}) => {
         },
     });
 };
+
+export function setTopLevelTab(tab) {
+    return {
+        type: SET_TOP_LEVEL_TAB,
+        data: tab,
+    };
+}
+
+export function setDiagnosticsTab(tab) {
+    return {
+        type: SET_DIAGNOSTICS_TAB,
+        data: tab,
+    };
+}
 
 export default tenantReducer;

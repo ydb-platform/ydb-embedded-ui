@@ -3,7 +3,7 @@ import qs from 'qs';
 import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
-import {useHistory, useLocation} from 'react-router';
+import {useLocation} from 'react-router';
 
 import {Switch, Tabs} from '@yandex-cloud/uikit';
 
@@ -34,8 +34,10 @@ import {TenantGeneralTabsIds, TenantTabsGroups} from '../TenantPages';
 import {GeneralPagesIds, DATABASE_PAGES, TABLE_PAGES, DIR_PAGES} from './DiagnosticsPages';
 //@ts-ignore
 import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema';
+import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant';
 
 import './Diagnostics.scss';
+
 interface DiagnosticsProps {
     type: string;
     additionalTenantInfo?: any;
@@ -51,16 +53,17 @@ function Diagnostics(props: DiagnosticsProps) {
         currentSchema: currentItem = {},
         autorefresh,
     } = useSelector((state: any) => state.schema);
+    const {
+        diagnosticsTab = GeneralPagesIds.overview,
+    } = useSelector((state: any) => state.tenant);
 
     const location = useLocation();
-
-    const history = useHistory();
 
     const queryParams = qs.parse(location.search, {
         ignoreQueryPrefix: true,
     });
 
-    const {name: tenantName, generalTab = GeneralPagesIds.overview} = queryParams;
+    const {name: tenantName} = queryParams;
 
     const isDatabase = currentSchemaPath === tenantName;
 
@@ -79,22 +82,17 @@ function Diagnostics(props: DiagnosticsProps) {
     }, [props.type]);
 
     const forwardToDiagnosticTab = (tab: GeneralPagesIds) => {
-        history.push(
-            createHref(routes.tenant, undefined, {
-                ...queryParams,
-                [TenantTabsGroups.generalTab]: tab,
-            }),
-        );
+        dispatch(setDiagnosticsTab(tab));
     };
     const activeTab = useMemo(() => {
-        if (pages.find((el) => el.id === generalTab)) {
-            return generalTab;
+        if (pages.find((el) => el.id === diagnosticsTab)) {
+            return diagnosticsTab;
         } else {
             const newPage = pages[0].id;
             forwardToDiagnosticTab(newPage);
             return newPage;
         }
-    }, [pages, generalTab]);
+    }, [pages, diagnosticsTab]);
 
     const onAutorefreshToggle = (value: boolean) => {
         if (value) {
@@ -105,12 +103,7 @@ function Diagnostics(props: DiagnosticsProps) {
     };
 
     const forwardToGeneralTab = (tab: TenantGeneralTabsIds) => {
-        history.push(
-            createHref(routes.tenant, undefined, {
-                ...queryParams,
-                [TenantTabsGroups.general]: tab,
-            }),
-        );
+        dispatch(setTopLevelTab(tab));
     };
 
     const renderTabContent = () => {
@@ -118,7 +111,7 @@ function Diagnostics(props: DiagnosticsProps) {
 
         const tenantNameString = tenantName as string;
 
-        switch (generalTab) {
+        switch (diagnosticsTab) {
             case GeneralPagesIds.overview: {
                 return (
                     <DetailedOverview

@@ -1,5 +1,4 @@
 import {useDispatch} from 'react-redux';
-import {useHistory} from 'react-router';
 
 import {NavigationTree} from 'ydb-ui-components';
 
@@ -26,7 +25,6 @@ export function SchemaTree(props: SchemaTreeProps) {
     } = props;
 
     const dispatch = useDispatch();
-    const history = useHistory();
 
     const fetchPath = (path: string) => window.api.getSchema(
         {path},
@@ -55,7 +53,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 collapsed: false,
             }}
             fetchPath={fetchPath}
-            getActions={getActions(dispatch, history, handleActivePathUpdate)}
+            getActions={getActions(dispatch, handleActivePathUpdate)}
             activePath={currentPath}
             onActivePathUpdate={handleActivePathUpdate}
             cache={false}
