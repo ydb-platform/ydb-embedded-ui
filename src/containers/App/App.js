@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {i18n as YDBComponentsI18N} from 'ydb-ui-components';
-import {I18N, i18n} from '../../utils/i18n';
+import {i18n, Lang} from '../../utils/i18n';
 
 import ContentWrapper, {Content} from './Content';
 import AsideNavigation from '../AsideNavigation/AsideNavigation';
@@ -25,8 +25,8 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        i18n.setLang(I18N.LANGS.en);
-        YDBComponentsI18N.setLang(I18N.LANGS.en);
+        i18n.setLang(Lang.En);
+        YDBComponentsI18N.setLang(Lang.En);
     }
 
     componentDidMount() {
