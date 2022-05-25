@@ -72,6 +72,7 @@ function Authentication({authenticate, error}: any) {
                         onUpdate={onLoginUpdate}
                         placeholder={'Username'}
                         error={loginError}
+                        onKeyDown={onEnterClick}
                         size="l"
                         autoFocus
                     />
