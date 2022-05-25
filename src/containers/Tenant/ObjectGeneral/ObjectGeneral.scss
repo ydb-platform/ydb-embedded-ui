@@ -16,23 +16,22 @@
         padding: 13px 20px 0;
 
         box-shadow: inset 0 -1px 0 0 var(--yc-color-line-generic);
-        @include body3-typography();
         .yc-tabs {
             box-shadow: unset;
         }
     }
     &__tab {
         text-decoration: none;
+
+        // fix for bug in uikit, gap is set for yc-tabs__item:not(:last-child),
+        // it doesn't work for wrapped items
+        // feel free to remove if the bug is fixed
+        &:not(:last-child) {
+            margin-right: var(--yc-tabs-gap);
+        }
     }
 
     &__loader {
         display: flex;
-    }
-
-    &__tab-label {
-        display: flex;
-        gap: 5px;
-
-        align-items: center;
     }
 }

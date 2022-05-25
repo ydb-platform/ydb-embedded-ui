@@ -164,6 +164,7 @@ function Diagnostics(props: DiagnosticsProps) {
             <div className={b('header-wrapper')}>
                 <div className={b('tabs')}>
                     <Tabs
+                        size="l"
                         items={pages}
                         activeTab={activeTab as string}
                         wrapTo={({id}, node) => {

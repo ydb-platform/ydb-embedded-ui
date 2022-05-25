@@ -22,7 +22,7 @@
 
         width: 573px;
         margin-bottom: 8px;
-        padding-left: 20px;
+        padding: 0 10px 0 20px;
 
         border: 1px solid var(--yc-color-line-generic);
         border-radius: 5px;
@@ -137,9 +137,9 @@
     &__title {
         margin-right: 16px;
 
-        font-size: var(--yc-text-body2-font-size);
+        font-size: var(--yc-text-body-2-font-size);
         font-weight: 500;
-        line-height: var(--yc-text-body2-line-height);
+        line-height: var(--yc-text-body-2-line-height);
         text-transform: uppercase;
     }
 }

@@ -47,21 +47,21 @@
         font-weight: 500;
 
         &_size_s {
-            font-size: var(--yc-text-lead-font-size);
-            line-height: var(--yc-text-lead-line-height);
+            font-size: var(--yc-text-subheader-3-font-size);
+            line-height: var(--yc-text-subheader-3-line-height);
         }
 
         &_size_m {
-            font-size: var(--yc-text-title-font-size);
-            line-height: var(--yc-text-title-line-height);
+            font-size: var(--yc-text-header-2-font-size);
+            line-height: var(--yc-text-header-2-line-height);
         }
     }
 
     &__description {
         grid-area: description;
 
-        font-size: var(--yc-text-body2-font-size);
-        line-height: var(--yc-text-body2-line-height);
+        font-size: var(--yc-text-body-2-font-size);
+        line-height: var(--yc-text-body-2-line-height);
     }
 
     &__actions {

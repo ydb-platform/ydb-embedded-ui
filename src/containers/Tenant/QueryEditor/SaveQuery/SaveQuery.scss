@@ -4,7 +4,7 @@
         align-items: flex-start;
 
         & + & {
-            margin-top: var(--yc-text-body-line-height);
+            margin-top: var(--yc-text-body-1-line-height);
         }
     }
     &__field-title {

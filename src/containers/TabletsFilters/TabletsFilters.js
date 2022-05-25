@@ -5,8 +5,7 @@ import cn from 'bem-cn-lite';
 import qs from 'qs';
 import _ from 'lodash';
 
-import {Loader} from '@yandex-cloud/uikit';
-import {Select} from '@yandex-cloud/uikit/build/esm/components/unstable/Select';
+import {Loader, Select} from '@yandex-cloud/uikit';
 import ReactList from 'react-list';
 
 import Tablet from '../../components/Tablet/Tablet';

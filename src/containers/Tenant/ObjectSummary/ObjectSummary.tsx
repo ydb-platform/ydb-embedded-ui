@@ -6,7 +6,7 @@ import {useHistory, useLocation} from 'react-router';
 import qs from 'qs';
 import _ from 'lodash';
 
-import {Button, HelpTooltip, Loader, Tabs} from '@yandex-cloud/uikit';
+import {Button, HelpPopover, Loader, Tabs} from '@yandex-cloud/uikit';
 
 import SplitPane from '../../../components/SplitPane';
 import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
@@ -127,6 +127,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
         return (
             <div className={b('tabs')}>
                 <Tabs
+                    size="l"
                     items={tabsItems}
                     activeTab={infoTab as string}
                     wrapTo={({id}, node) => {
@@ -260,7 +261,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
             <div className={b('entity-type')}>{type}</div>
         ) : (
             <div className={b('entity-type', {error: true})}>
-                <HelpTooltip content={message} offset={{left: 0}} />
+                <HelpPopover content={message} offset={{left: 0}} />
             </div>
         );
     };

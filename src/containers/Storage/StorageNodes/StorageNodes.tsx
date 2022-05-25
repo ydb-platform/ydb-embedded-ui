@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
-import {Tooltip, TooltipBehavior} from '@yandex-cloud/uikit';
+import {Popover, PopoverBehavior} from '@yandex-cloud/uikit';
 //@ts-ignore
 import {VisibleEntities} from '../../../store/reducers/storage';
 import Pdisk from '../Pdisk/Pdisk';
@@ -71,13 +71,13 @@ function StorageNodes({data, tableSettings, visibleEntities}: StorageGroupsProps
             render: ({value}) => {
                 return (
                     <div className={b('tooltip-wrapper')}>
-                        <Tooltip
+                        <Popover
                             content={<span className={b('tooltip')}>{value as string}</span>}
                             placement={['right']}
-                            behavior={TooltipBehavior.Immediate}
+                            behavior={PopoverBehavior.Immediate}
                         >
                             <span className={b('pool-name')}>{value as string}</span>
-                        </Tooltip>
+                        </Popover>
                     </div>
                 );
             },

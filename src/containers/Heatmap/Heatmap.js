@@ -8,8 +8,7 @@ import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
 import {COLORS_RANGE_SIZE, getColorRange, getColorIndex, getCurrentMetricLimits} from './util';
 import {formatNumber} from '../../utils';
 
-import {Loader, Checkbox} from '@yandex-cloud/uikit';
-import {Select} from '@yandex-cloud/uikit/build/esm/components/unstable/Select';
+import {Loader, Checkbox, Select} from '@yandex-cloud/uikit';
 import {HeatmapCanvas} from './HeatmapCanvas/HeatmapCanvas';
 import {Histogram} from './Histogram/Histogram';
 import {AutoFetcher} from '../../utils/autofetcher';

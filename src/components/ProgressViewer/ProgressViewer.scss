@@ -10,7 +10,7 @@
     height: 23px;
     padding: 0 4px;
 
-    font-size: var(--yc-text-body2-font-size);
+    font-size: var(--yc-text-body-2-font-size);
     white-space: nowrap;
 
     color: var(--yc-color-text-light-primary);
@@ -49,20 +49,20 @@
     &_size_xs {
         height: 20px;
 
-        font-size: var(--yc-text-body2-font-size);
-        line-height: var(--yc-text-body2-line-height);
+        font-size: var(--yc-text-body-2-font-size);
+        line-height: var(--yc-text-body-2-line-height);
     }
 
     &_size_s {
         height: 28px;
 
-        font-size: var(--yc-text-body-font-size);
+        font-size: var(--yc-text-body-1-font-size);
         line-height: 28px;
     }
     &_size_m {
         height: 32px;
 
-        font-size: var(--yc-text-body2-font-size);
+        font-size: var(--yc-text-body-2-font-size);
         line-height: 32px;
     }
 
@@ -70,25 +70,25 @@
         height: 24px;
 
         font-size: 13px;
-        line-height: var(--yc-text-lead-line-height);
+        line-height: var(--yc-text-subheader-3-line-height);
     }
 
     &_size_n {
         height: 36px;
 
-        font-size: var(--yc-text-body-font-size);
+        font-size: var(--yc-text-body-1-font-size);
         line-height: 36px;
     }
 
     &_size_l {
         height: 38px;
 
-        font-size: var(--yc-text-lead-font-size);
+        font-size: var(--yc-text-subheader-3-font-size);
         line-height: 38px;
     }
 
     &_size_head {
-        font-size: var(--yc-text-body-font-size);
+        font-size: var(--yc-text-body-1-font-size);
         line-height: 36px;
     }
 }

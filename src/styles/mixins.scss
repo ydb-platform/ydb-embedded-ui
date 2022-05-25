@@ -16,25 +16,25 @@
 }
 
 @mixin body-typography() {
-    font-size: var(--yc-text-body-font-size);
-    line-height: var(--yc-text-body-line-height);
+    font-size: var(--yc-text-body-1-font-size);
+    line-height: var(--yc-text-body-1-line-height);
 }
 @mixin body2-typography() {
-    font-size: var(--yc-text-body2-font-size);
-    line-height: var(--yc-text-body2-line-height);
+    font-size: var(--yc-text-body-2-font-size);
+    line-height: var(--yc-text-body-2-line-height);
 }
 @mixin body3-typography() {
-    font-size: var(--yc-text-body3-font-size);
-    line-height: var(--yc-text-body3-line-height);
+    font-size: var(--yc-text-body-3-font-size);
+    line-height: var(--yc-text-body-3-line-height);
 }
 @mixin lead-typography() {
-    font-size: var(--yc-text-lead-font-size);
-    line-height: var(--yc-text-lead-line-height);
+    font-size: var(--yc-text-subheader-3-font-size);
+    line-height: var(--yc-text-subheader-3-line-height);
 }
 
 @mixin title-typography() {
-    font-size: var(--yc-text-title-font-size);
-    line-height: var(--yc-text-title-line-height);
+    font-size: var(--yc-text-header-2-font-size);
+    line-height: var(--yc-text-header-2-line-height);
 }
 
 @mixin sticky-top {
@@ -188,8 +188,8 @@
 @mixin json-tree-styles {
     // stylelint-disable
     font-family: var(--yc-font-family-monospace) !important;
-    font-size: var(--yc-text-code-font-size) !important;
-    line-height: var(--yc-text-code-line-height) !important;
+    font-size: var(--yc-text-code-1-font-size) !important;
+    line-height: var(--yc-text-code-1-line-height) !important;
     // stylelint-enable
 
     .json-inspector__leaf_composite:before {
@@ -239,7 +239,7 @@
             margin: 0;
             padding: 0;
 
-            font-family: var(--yc-font-family);
+            font-family: var(--yc-text-body-font-family);
             font-size: 13px;
             vertical-align: top;
 
