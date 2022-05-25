@@ -107,6 +107,7 @@
     "typescript": "^4.5.5"
   },
   "peerDependencies": {
-    "@yandex-cloud/browserslist-config": "^1.0.1"
+    "@yandex-cloud/browserslist-config": "^1.0.1",
+    "@yandex-cloud/uikit": "^2.4.0"
   }
 }
