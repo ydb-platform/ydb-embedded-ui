@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
-import {Tooltip, TooltipBehavior} from '@yandex-cloud/uikit';
+import {Popover, PopoverBehavior} from '@yandex-cloud/uikit';
 
 import Vdisk from '../Vdisk/Vdisk';
 //@ts-ignore
@@ -90,15 +90,15 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
                 return (
                     <div className={b('pool-name-wrapper')}>
                         {splitted && (
-                            <Tooltip
+                            <Popover
                                 content={<span className={b('tooltip')}>{value as string}</span>}
                                 placement={['right']}
-                                behavior={TooltipBehavior.Immediate}
+                                behavior={PopoverBehavior.Immediate}
                             >
                                 <span className={b('pool-name')}>
                                     {splitted[splitted.length - 1]}
                                 </span>
-                            </Tooltip>
+                            </Popover>
                         )}
                     </div>
                 );

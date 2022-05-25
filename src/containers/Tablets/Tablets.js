@@ -12,8 +12,7 @@ import {
 import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
 
 import Tablet from '../../components/Tablet/Tablet';
-import {Loader} from '@yandex-cloud/uikit';
-import {Select} from '@yandex-cloud/uikit/build/esm/components/unstable/Select';
+import {Loader, Select} from '@yandex-cloud/uikit';
 import ReactList from 'react-list';
 import {AutoFetcher} from '../../utils/autofetcher';
 

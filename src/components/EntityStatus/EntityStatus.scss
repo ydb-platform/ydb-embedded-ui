@@ -5,8 +5,8 @@
     max-width: 100%;
     height: 100%;
 
-    font-size: var(--yc-text-body2-font-size);
-    line-height: var(--yc-text-body2-line-height);
+    font-size: var(--yc-text-body-2-font-size);
+    line-height: var(--yc-text-body-2-line-height);
 
     &__clipboard-button {
         display: none;
@@ -42,8 +42,8 @@
     &__label {
         margin-right: 2px;
 
-        font-size: var(--yc-text-body2-font-size);
-        line-height: var(--yc-text-body2-line-height);
+        font-size: var(--yc-text-body-2-font-size);
+        line-height: var(--yc-text-body-2-line-height);
 
         color: var(--yc-color-text-complementary);
     }
@@ -96,7 +96,7 @@
     }
 
     &_size_m {
-        font-size: var(--yc-text-body2-font-size);
-        line-height: var(--yc-text-body2-line-height);
+        font-size: var(--yc-text-body-2-font-size);
+        line-height: var(--yc-text-body-2-line-height);
     }
 }

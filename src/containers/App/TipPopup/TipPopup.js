@@ -54,7 +54,7 @@ function TipPopup({dbChangePopupVisibility, dataAttribute, initialIsPopupVisible
                 <div className={b('title')}>{tipData.title}</div>
                 <div className={b('content')}>{tipData.description}</div>
                 <div className={b('cross-icon-wrapper')}>
-                    <Button view="clear" onClick={onClosePopupClick}>
+                    <Button view="flat-secondary" onClick={onClosePopupClick}>
                         <Icon data={closeIcon} size={10} className={b('cross-icon')} />
                     </Button>
                 </div>

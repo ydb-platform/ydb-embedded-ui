@@ -1,6 +1,6 @@
 .pool-usage {
-    font-size: var(--yc-text-body2-font-size);
-    line-height: var(--yc-text-body2-line-height);
+    font-size: var(--yc-text-body-2-font-size);
+    line-height: var(--yc-text-body-2-line-height);
     &__info {
         display: flex;
         justify-content: space-between;
@@ -17,7 +17,7 @@
     }
 
     &__threads {
-        font-size: var(--yc-text-body-font-size);
+        font-size: var(--yc-text-body-1-font-size);
 
         color: var(--yc-color-text-hint);
 
@@ -29,7 +29,7 @@
     &__percents {
         margin-right: 2px;
 
-        font-size: var(--yc-text-body-font-size);
+        font-size: var(--yc-text-body-1-font-size);
 
         color: var(--yc-color-text-primary);
     }
@@ -44,7 +44,7 @@
 
         height: 6px;
 
-        font-size: var(--yc-text-body2-font-size);
+        font-size: var(--yc-text-body-2-font-size);
 
         border-radius: 4px;
         background-color: var(--yc-color-base-generic-accent);

@@ -98,6 +98,7 @@ function Node(props: NodeProps) {
         return (
             <div className={b('tabs')}>
                 <Tabs
+                    size="l"
                     items={nodeTabs}
                     activeTab={activeTabVerified}
                     wrapTo={({id}, node) => (

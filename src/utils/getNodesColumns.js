@@ -1,7 +1,6 @@
-import React from 'react';
 import cn from 'bem-cn-lite';
 import DataTable from '@yandex-cloud/react-data-table';
-import {Button, Tooltip} from '@yandex-cloud/uikit';
+import {Button, Popover} from '@yandex-cloud/uikit';
 
 import Icon from '../components/Icon/Icon';
 import EntityStatus from '../components/EntityStatus/EntityStatus';
@@ -62,7 +61,7 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
             width: '200px',
             align: DataTable.LEFT,
             render: ({value}) => {
-                return <Tooltip content={value}>{value}</Tooltip>;
+                return <Popover content={value}>{value}</Popover>;
             },
         },
         {

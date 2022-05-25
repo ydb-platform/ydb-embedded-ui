@@ -5,7 +5,7 @@
     display: inline-block;
 
     width: 100%;
-    height: var(--yc-text-body2-line-height);
+    height: var(--yc-text-body-2-line-height);
 
     border: 1px solid var(--yc-color-infographics-misc-medium);
     border-radius: 2px;
@@ -67,7 +67,7 @@
         position: absolute;
         z-index: 2;
 
-        font-size: var(--yc-text-body-font-size);
+        font-size: var(--yc-text-body-1-font-size);
         line-height: inherit;
 
         color: inherit;

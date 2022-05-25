@@ -2,7 +2,7 @@ import {useState} from 'react';
 import cn from 'bem-cn-lite';
 import _ from 'lodash';
 
-import {ArrowToggle, Button, Tooltip} from '@yandex-cloud/uikit';
+import {ArrowToggle, Button, Popover} from '@yandex-cloud/uikit';
 
 import DataTable, {Column, Settings} from '@yandex-cloud/react-data-table';
 
@@ -126,20 +126,20 @@ function getColumns({
             width: 70,
             render: ({row}) => {
                 return (
-                    <Tooltip
+                    <Popover
                         placement={['right']}
                         content={<Vdisk {...row} />}
                         contentClassName={b('vdisk-details')}
                     >
                         <Button
-                            view="clear"
+                            view="flat-secondary"
                             className={b('vdisk-details-button', {
                                 selected: row.id === selectedVdiskId,
                             })}
                         >
                             <Icon name="information" viewBox="0 0 512 512" height={16} width={16} />
                         </Button>
-                    </Tooltip>
+                    </Popover>
                 );
             },
             sortable: false,
@@ -213,7 +213,7 @@ export function PDisk(props: PDiskProps) {
                                 className={b('external-button')}
                                 href={pDiskInternalViewerLink}
                                 target="_blank"
-                                view="clear"
+                                view="flat-secondary"
                             >
                                 <Icon name="external" />
                             </Button>
@@ -289,7 +289,7 @@ export function PDisk(props: PDiskProps) {
                     <span>{data.Path}</span>
                     <EntityStatus status={data.Device} name={`${data.NodeId}-${data.PDiskId}`} />
                 </div>
-                <Button onClick={unfolded ? onClosePDiskDetails : onOpenPDiskDetails} view="clear">
+                <Button onClick={unfolded ? onClosePDiskDetails : onOpenPDiskDetails} view="flat-secondary">
                     <ArrowToggle direction={unfolded ? 'top' : 'bottom'} />
                 </Button>
             </div>

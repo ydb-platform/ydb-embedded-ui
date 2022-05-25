@@ -38,21 +38,11 @@ function ObjectGeneral(props: ObjectGeneralProps) {
     const {name: tenantName, general: generalTab} = queryParams;
 
     const renderTabs = () => {
-        const pages = TENANT_GENERAL_TABS.map((page) => {
-            return {
-                ...page,
-                title: (
-                    <div className={b('tab-label')}>
-                        {page.icon}
-                        {page.title}
-                    </div>
-                ),
-            };
-        });
         return (
             <div className={b('tabs')}>
                 <Tabs
-                    items={pages}
+                    size="xl"
+                    items={TENANT_GENERAL_TABS}
                     activeTab={generalTab as string}
                     wrapTo={({id}, node) => {
                         const path = createHref(routes.tenant, undefined, {

@@ -29,9 +29,9 @@
     &__heading {
         margin: 20px 20px 0;
 
-        font-size: var(--yc-text-body2-font-size);
+        font-size: var(--yc-text-body-2-font-size);
         font-weight: 500;
-        line-height: var(--yc-text-body2-line-height);
+        line-height: var(--yc-text-body-2-line-height);
     }
 
     &__search {
@@ -48,9 +48,9 @@
         &-heading {
             margin: 0;
 
-            font-size: var(--yc-text-body2-font-size);
+            font-size: var(--yc-text-body-2-font-size);
             font-weight: 500;
-            line-height: var(--yc-text-body2-line-height);
+            line-height: var(--yc-text-body-2-line-height);
 
             &_badge {
                 position: relative;
