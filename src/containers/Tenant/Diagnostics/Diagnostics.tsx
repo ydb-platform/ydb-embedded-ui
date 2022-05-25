@@ -79,7 +79,7 @@ function Diagnostics(props: DiagnosticsProps) {
             pages = TABLE_PAGES;
         }
         return pages;
-    }, [props.type]);
+    }, [props.type, isDatabase]);
 
     const forwardToDiagnosticTab = (tab: GeneralPagesIds) => {
         dispatch(setDiagnosticsTab(tab));
