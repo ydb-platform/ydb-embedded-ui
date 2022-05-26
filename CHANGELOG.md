@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.5.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.5.1...v1.5.2) (2022-05-26)
+
+
+### Bug Fixes
+
+* **Tenant:** always update diagnostics tabs for root ([db03266](https://github.com/ydb-platform/ydb-embedded-ui/commit/db03266fd7dd6e4588c1db0d109bdfaa8f693e2d))
+* **Tenant:** don't use HistoryAPI and redux-location-state together ([c1bc562](https://github.com/ydb-platform/ydb-embedded-ui/commit/c1bc5621e3ead44b1b84e592f8d7106bbc918e37))
+
 ### [1.5.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.5.0...v1.5.1) (2022-05-25)
 
 
