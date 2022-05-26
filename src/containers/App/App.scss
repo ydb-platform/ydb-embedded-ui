@@ -3,7 +3,13 @@
 @import './NodesTable';
 
 * {
+    // FIXME: this is an overkill, potentially could break external components, needs refactoring
     box-sizing: border-box;
+}
+
+.yc-select-popup__tick-icon {
+    // this is a local fix, remove after the refactoring
+    box-sizing: content-box;
 }
 
 html,
