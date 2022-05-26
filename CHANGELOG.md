@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.5.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.5.2...v1.5.3) (2022-05-26)
+
+
+### Bug Fixes
+
+* proper icon size in uikit/Select ([a665d6d](https://github.com/ydb-platform/ydb-embedded-ui/commit/a665d6d829dae61ccf25566dd7b8cd1e46a743bb))
+* update code for @yandex-cloud/uikit@^2.0.0 ([49d67a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/49d67a1bddcba6fa138b5ebaeb280f16366b3329))
+
 ### [1.5.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.5.1...v1.5.2) (2022-05-26)
 
 
