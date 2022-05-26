@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
+import {i18n as YDBComponentsI18N} from 'ydb-ui-components/build/components/i18n';
 import {I18N, i18n} from '../../utils/i18n';
 
 import ContentWrapper, {Content} from './Content';
@@ -25,7 +26,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         i18n.setLang(I18N.LANGS.en);
-        I18N.setDefaultLang(I18N.LANGS.en); // for the peer dependency ydb-ui-components, should match the language above
+        YDBComponentsI18N.setLang(I18N.LANGS.en);
     }
 
     componentDidMount() {
