@@ -1,5 +1,21 @@
 # Changelog
 
+### [1.5.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.5.2...v1.5.3) (2022-05-26)
+
+
+### Bug Fixes
+
+* explicitly set lang for ydb-ui-components i18n ([5684524](https://github.com/ydb-platform/ydb-embedded-ui/commit/5684524267e2cbf19a44de75b0e0b2bf98b617fd))
+* proper icon size in uikit/Select ([a665d6d](https://github.com/ydb-platform/ydb-embedded-ui/commit/a665d6d829dae61ccf25566dd7b8cd1e46a743bb))
+* update code for @yandex-cloud/uikit@^2.0.0 ([49d67a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/49d67a1bddcba6fa138b5ebaeb280f16366b3329))
+
+
+### chore
+
+* update @yandex-cloud/uikit to 2.4.0 ([d2eb2e5](https://github.com/ydb-platform/ydb-embedded-ui/commit/d2eb2e5db147604ae346aea295ae22759712eaa4))
+* add @yandex-cloud/uikit to peer deps ([9c9f599](https://github.com/ydb-platform/ydb-embedded-ui/commit/9c9f5997dcca1be5868d013da311a28e495e7faa))
+* update ydb-ui-components to v2.0.1 ([3d6a8d3](https://github.com/ydb-platform/ydb-embedded-ui/commit/3d6a8d30ab2ab47203eb956904e891ae106c0bc7))
+
 ### [1.5.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.5.1...v1.5.2) (2022-05-26)
 
 
