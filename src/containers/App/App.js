@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
-import {i18n as YDBComponentsI18N} from 'ydb-ui-components/build/components/i18n';
+import {i18n as YDBComponentsI18N} from 'ydb-ui-components';
 import {I18N, i18n} from '../../utils/i18n';
 
 import ContentWrapper, {Content} from './Content';
