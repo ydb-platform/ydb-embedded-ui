@@ -234,7 +234,10 @@ function QueryExplain(props) {
         }
 
         if (error) {
-            return error.data ? error.data : error;
+            if (error.data) {
+                return typeof error.data === 'string' ? error.data : error.data.error?.message;
+            }
+            return error;
         }
 
         switch (activeOption) {

@@ -105,7 +105,7 @@ function HotKeys({
 
     const renderContent = () => {
         if (error) {
-            return error.data;
+            return error.data?.error?.message || error.data || error;
         }
         return data !== null ? (
             <div className={b('table-content')}>

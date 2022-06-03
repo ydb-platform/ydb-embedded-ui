@@ -14,7 +14,7 @@ import HistoryContext from '../../../../contexts/HistoryContext';
 import './TopShards.scss';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {Loader} from '@yandex-cloud/uikit';
-import { OLAP_STORE_TYPE, OLAP_TABLE_TYPE } from '../../Tenant';
+import {OLAP_STORE_TYPE, OLAP_TABLE_TYPE} from '../../Tenant';
 
 const b = cn('top-shards');
 const bLink = cn('yc-link');
@@ -123,7 +123,7 @@ function TopShards({
             return 'No data';
         }
         if (error) {
-            return error.data || error;
+            return error.data?.error?.message || error.data || error;
         }
 
         return data && data.length > 0 ? (

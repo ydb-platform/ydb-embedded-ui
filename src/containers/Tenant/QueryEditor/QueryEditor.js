@@ -307,58 +307,56 @@ function QueryEditor(props) {
             executeQuery: {data, error, stats},
             showTooltip,
         } = props;
-        const result = getExecuteResult();
-        const shouldRenderAnswer = result.length || error;
 
-        if (!shouldRenderAnswer) {
-            return null;
+        let content;
+        if (data) {
+            let columns = [];
+            if (data.length > 0) {
+                columns = Object.keys(data[0]).map((key) => ({
+                    name: key,
+                    render: ({value}) => {
+                        return (
+                            <span
+                                className={b('cell')}
+                                onClick={(e) => showTooltip(e.target, value, 'cell')}
+                            >
+                                {value}
+                            </span>
+                        );
+                    },
+                }));
+                const preparedData = prepareQueryResponse(data);
+
+                content = columns.length ? (
+                    <DataTable
+                        columns={columns}
+                        data={preparedData}
+                        settings={TABLE_SETTINGS}
+                        theme="yandex-cloud"
+                        rowKey={(_, index) => index}
+                    />
+                ) : (
+                    <div>{data}</div>
+                );
+            }
         }
+        const textResults = getPreparedResult();
+        const disabled = !textResults.length || resultType !== RESULT_TYPES.EXECUTE;
 
-        let columns = [];
-        if (data && data.length > 0) {
-            columns = Object.keys(data[0]).map((key) => ({
-                name: key,
-                render: ({value}) => {
-                    return (
-                        <span
-                            className={b('cell')}
-                            onClick={(e) => showTooltip(e.target, value, 'cell')}
-                        >
-                            {value}
-                        </span>
-                    );
-                },
-            }));
-        }
-
-        const preparedData = prepareQueryResponse(data);
-
-        const content = columns.length ? (
-            <DataTable
-                columns={columns}
-                data={preparedData}
-                settings={TABLE_SETTINGS}
-                theme="yandex-cloud"
-                rowKey={(_, index) => index}
-            />
-        ) : (
-            <div>{result}</div>
-        );
-        const results = getPreparedResult();
-        const disabled = !results.length || resultType !== RESULT_TYPES.EXECUTE;
-        return (
+        return data || error ? (
             <QueryResult
                 result={content}
                 stats={stats}
-                error={Boolean(error)}
-                textResults={results}
+                error={error}
+                textResults={textResults}
                 copyDisabled={disabled}
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}
             />
-        );
+        ) : null;
     };
+
     const renderExplainQuery = () => {
         const {
             explainQuery: {data, dataAst, error, loading, loadingAst},
@@ -461,18 +459,6 @@ function QueryEditor(props) {
                 <QueriesHistory changeUserInput={changeUserInput} />
             </div>
         );
-    };
-
-    const getExecuteResult = () => {
-        const {data = [], error} = props.executeQuery;
-
-        if (error) {
-            return error.data || error;
-        } else if (data.length > 0) {
-            return data;
-        } else {
-            return '';
-        }
     };
 
     const getPreparedResult = () => {

@@ -13,6 +13,7 @@ import './QueryResult.scss';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import QueryExecutionStatus from '../../../../components/QueryExecutionStatus/QueryExecutionStatus';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import ResultIssues from '../Issues/Issues';
 
 const b = cn('kv-query-result');
 
@@ -27,7 +28,9 @@ const resultOptions = [
 ];
 
 function QueryResult(props) {
-    const [activeSection, setActiveSection] = useState(resultOptionsIds.result);
+    const [activeSection, setActiveSection] = useState(
+        props.result ? resultOptionsIds.result : resultOptionsIds.stats,
+    );
     const isFullscreen = useSelector((state) => state.fullscreen);
     const dispatch = useDispatch();
 
@@ -83,9 +86,32 @@ function QueryResult(props) {
         return (
             <React.Fragment>
                 {result}
-                {isFullscreen && <Fullscreen><div className={b('result', {fullscreen: true})}>{result}</div></Fullscreen>}
+                {isFullscreen && (
+                    <Fullscreen>
+                        <div className={b('result', {fullscreen: true})}>{result}</div>
+                    </Fullscreen>
+                )}
             </React.Fragment>
         );
+    };
+
+    const renderIssues = () => {
+        const error = props.error?.data;
+
+        const hasIssues = error?.issues && Array.isArray(error.issues);
+
+        return hasIssues ? (
+            <React.Fragment>
+                <ResultIssues data={error} />
+                {isFullscreen && (
+                    <Fullscreen>
+                        <div className={b('result', {fullscreen: true})}>
+                            <ResultIssues data={error} />
+                        </div>
+                    </Fullscreen>
+                )}
+            </React.Fragment>
+        ) : null;
     };
 
     return (
@@ -107,7 +133,7 @@ function QueryResult(props) {
                 </div>
                 <div className={b('controls-left')}>
                     {renderClipboardButton()}
-                    <EnableFullscreenButton disabled={Boolean(props.error)}/>
+                    <EnableFullscreenButton />
                     <PaneVisibilityToggleButtons
                         onCollapse={props.onCollapseResults}
                         onExpand={props.onExpandResults}
@@ -117,8 +143,9 @@ function QueryResult(props) {
                 </div>
             </div>
             <div className={b('result')}>
-                {activeSection === resultOptionsIds.result && renderResult()}
-                {activeSection === resultOptionsIds.stats && renderStats()}
+                {activeSection === resultOptionsIds.result && !props.error && renderResult()}
+                {activeSection === resultOptionsIds.stats && !props.error && renderStats()}
+                {renderIssues()}
             </div>
         </React.Fragment>
     );
