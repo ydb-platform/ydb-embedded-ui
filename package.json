@@ -52,9 +52,7 @@
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "prepublishOnly": "npm run package",
-    "typecheck": "npm run typecheck:server && npm run typecheck:ui",
-    "typecheck:server": "tsc -p src/server --noEmit",
-    "typecheck:ui": "tsc -p src/ui --noEmit",
+    "typecheck": "tsc --noEmit",
     "prepare": "husky install"
   },
   "lint-staged": {
