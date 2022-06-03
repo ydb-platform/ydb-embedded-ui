@@ -8,7 +8,7 @@ import {changeUserInput} from '../../../../store/reducers/executeQuery';
 import {sendQuery, setQueryOptions} from '../../../../store/reducers/executeTopQueries';
 import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {AutoFetcher} from '../../../../utils/autofetcher';
-import { OLAP_STORE_TYPE, OLAP_TABLE_TYPE } from '../../Tenant';
+import {OLAP_STORE_TYPE, OLAP_TABLE_TYPE} from '../../Tenant';
 
 import './TopQueries.scss';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
@@ -151,7 +151,7 @@ class TopQueries extends React.Component {
         if (type === OLAP_STORE_TYPE || type === OLAP_TABLE_TYPE) {
             message = 'No data';
         } else if (error && !error.isCancelled) {
-            message = (error.data || error).slice(0, 300);
+            message = (error.data?.error?.message || error.data || error).slice(0, 300);
         } else if (!loading && !data) {
             message = 'No data';
         }

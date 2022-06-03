@@ -32,7 +32,7 @@ export function createApiRequest({actions, request, dataHandler = nop}) {
                 dispatch({
                     type: SET_UNAUTHENTICATED.SUCCESS,
                 });
-            } else if (error && error.status && error.statusText) {
+            } else if (error && Number(error.status) >= 500 && error.statusText) {
                 createToast({
                     name: 'Request failure',
                     title: 'Request failure',

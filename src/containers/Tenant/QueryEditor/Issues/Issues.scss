@@ -1,0 +1,124 @@
+.kv-result-issues {
+    overflow: auto;
+
+    height: 100%;
+    padding: 0 10px;
+    &__error-message {
+        position: sticky;
+        z-index: 2;
+        top: 0;
+        left: 0;
+
+        display: flex;
+        align-items: center;
+
+        padding: 10px 0;
+
+        background-color: var(--yc-color-base-background);
+    }
+    &__error-message-text {
+        margin: 0 10px;
+    }
+}
+
+.kv-issues {
+    position: relative;
+}
+
+.kv-issue {
+    &_leaf {
+        margin-left: 31px;
+    }
+
+    &__issues {
+        padding-left: 24px;
+    }
+
+    &__line {
+        display: flex;
+        align-items: flex-start;
+
+        margin: 0 0 10px;
+        padding: 0 10px 0 0;
+    }
+
+    &__place-text {
+        display: inline-block;
+
+        padding-right: 10px;
+
+        text-align: left;
+
+        color: var(--yc-color-text-secondary);
+    }
+
+    &__message {
+        display: flex;
+
+        margin-right: auto;
+        margin-left: 10px;
+
+        font-family: var(--yc-font-family-monospace);
+        font-size: var(--yc-text-code-2-font-size);
+        line-height: var(--yc-text-header-2-line-height);
+    }
+
+    &__message-text {
+        flex: 1 1 auto;
+
+        min-width: 240px;
+
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    &__code {
+        flex: 0 0 auto;
+
+        margin-left: 1.5em;
+        padding: 3px 0;
+
+        font-size: 12px;
+
+        color: var(--yc-color-text-complementary);
+    }
+
+    &__arrow-toggle {
+        margin-right: 5px;
+        .yc-button__text {
+            margin: 0 5px;
+        }
+    }
+}
+
+.yql-issue-severity {
+    display: flex;
+    align-items: center;
+
+    line-height: 28px;
+    white-space: nowrap;
+
+    &_severity_fatal &__icon {
+        color: var(--yc-color-text-danger);
+    }
+
+    &_severity_error &__icon {
+        color: var(--yc-color-text-danger);
+    }
+
+    &_severity_warning &__icon {
+        color: var(--yc-color-text-warning-medium);
+    }
+
+    &_severity_info &__icon {
+        color: var(--yc-color-text-info);
+    }
+
+    &__title {
+        margin-left: 4px;
+
+        text-transform: capitalize;
+
+        color: var(--yc-color-text-complementary);
+    }
+}

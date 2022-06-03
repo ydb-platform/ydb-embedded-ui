@@ -163,7 +163,11 @@ class Preview extends React.Component {
         }
 
         if (error) {
-            message = <div className={b('message-container')}>{error.data || error}</div>;
+            message = (
+                <div className={b('message-container')}>
+                    {error.data?.error?.message || error.data || error}
+                </div>
+            );
         }
 
         if (!loading && data.length === 0) {
