@@ -138,3 +138,7 @@ export const prepareQueryResponse = (data) => {
         return formattedData;
     });
 };
+
+export function prepareQueryError(error) {
+    return error.data?.error?.message || error.data || error
+}

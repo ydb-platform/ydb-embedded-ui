@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 import DataTable from '@yandex-cloud/react-data-table';
+import {Loader} from '@yandex-cloud/uikit';
 
 import {changeUserInput} from '../../../../store/reducers/executeQuery';
 import {sendQuery, setQueryOptions} from '../../../../store/reducers/executeTopQueries';
@@ -10,11 +11,11 @@ import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery
 import {AutoFetcher} from '../../../../utils/autofetcher';
 import {OLAP_STORE_TYPE, OLAP_TABLE_TYPE} from '../../Tenant';
 
-import './TopQueries.scss';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {TenantGeneralTabsIds} from '../../TenantPages';
-import {Loader} from '@yandex-cloud/uikit';
+import {prepareQueryError} from '../../../../utils';
 
+import './TopQueries.scss';
 
 const b = cn('kv-top-queries');
 
@@ -151,7 +152,7 @@ class TopQueries extends React.Component {
         if (type === OLAP_STORE_TYPE || type === OLAP_TABLE_TYPE) {
             message = 'No data';
         } else if (error && !error.isCancelled) {
-            message = (error.data?.error?.message || error.data || error).slice(0, 300);
+            message = prepareQueryError(error).slice(0, 300);
         } else if (!loading && !data) {
             message = 'No data';
         }

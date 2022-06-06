@@ -40,7 +40,10 @@ export default function ResultIssues({data, className}: ResultIssuesProps) {
             const severity = getSeverity(data?.error?.severity);
             content = (
                 <React.Fragment>
-                    <IssueSeverity severity={severity} /> <span className={blockWrapper('error-message-text')}>{data?.error?.message}</span>
+                    <IssueSeverity severity={severity} />{' '}
+                    <span className={blockWrapper('error-message-text')}>
+                        {data?.error?.message}
+                    </span>
                 </React.Fragment>
             );
         }
@@ -71,9 +74,9 @@ interface IssuesProps {
 }
 export function Issues({issues, className}: IssuesProps) {
     const mostSevereIssue = issues.reduce((result, issue) => {
-        const severity = issue.severity ? issue.severity : 10;
-        return result < severity ? result : severity;
-    }, issues[0].severity ?? 10);
+        const severity = issue.severity ?? 10;
+        return Math.min(result, severity);
+    }, 10);
     return (
         <div className={blockIssues(null, className)}>
             {issues.map((issue, index) => (

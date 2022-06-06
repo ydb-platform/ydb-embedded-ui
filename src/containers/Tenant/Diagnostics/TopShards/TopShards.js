@@ -1,20 +1,21 @@
 import {useContext, useEffect, useMemo} from 'react';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
-import InternalLink from '../../../../components/InternalLink/InternalLink';
+import {Loader} from '@yandex-cloud/uikit';
 import DataTable from '@yandex-cloud/react-data-table';
-import routes, {createHref} from '../../../../routes';
 
+import InternalLink from '../../../../components/InternalLink/InternalLink';
+
+import routes, {createHref} from '../../../../routes';
 import {sendShardQuery, setShardQueryOptions} from '../../../../store/reducers/shardsWorkload';
 import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema';
 import {AutoFetcher} from '../../../../utils/autofetcher';
-
 import HistoryContext from '../../../../contexts/HistoryContext';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {OLAP_STORE_TYPE, OLAP_TABLE_TYPE} from '../../Tenant';
+import {prepareQueryError} from '../../../../utils';
 
 import './TopShards.scss';
-import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {Loader} from '@yandex-cloud/uikit';
-import {OLAP_STORE_TYPE, OLAP_TABLE_TYPE} from '../../Tenant';
 
 const b = cn('top-shards');
 const bLink = cn('yc-link');
@@ -123,7 +124,7 @@ function TopShards({
             return 'No data';
         }
         if (error) {
-            return error.data?.error?.message || error.data || error;
+            return prepareQueryError(error);
         }
 
         return data && data.length > 0 ? (
