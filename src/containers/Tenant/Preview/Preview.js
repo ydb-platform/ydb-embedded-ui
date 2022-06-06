@@ -11,7 +11,7 @@ import Fullscreen from '../../../components/Fullscreen/Fullscreen';
 
 import {sendQuery, setQueryOptions} from '../../../store/reducers/preview';
 import {showTooltip, hideTooltip} from '../../../store/reducers/tooltip';
-import {prepareQueryResponse} from '../../../utils/index';
+import {prepareQueryError, prepareQueryResponse} from '../../../utils/index';
 
 import {OLAP_TABLE_TYPE, TABLE_TYPE} from '../Tenant';
 import {AutoFetcher} from '../../../utils/autofetcher';
@@ -163,11 +163,7 @@ class Preview extends React.Component {
         }
 
         if (error) {
-            message = (
-                <div className={b('message-container')}>
-                    {error.data?.error?.message || error.data || error}
-                </div>
-            );
+            message = <div className={b('message-container')}>{prepareQueryError(error)}</div>;
         }
 
         if (!loading && data.length === 0) {

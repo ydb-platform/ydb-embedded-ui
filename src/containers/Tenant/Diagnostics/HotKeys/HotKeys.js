@@ -8,9 +8,10 @@ import Icon from '../../../../components/Icon/Icon';
 
 import {AutoFetcher} from '../../../../utils/autofetcher';
 import {getHotKeys, setHotKeysOptions} from '../../../../store/reducers/hotKeys';
+import {TABLE_TYPE} from '../../Tenant';
+import {prepareQueryError} from '../../../../utils';
 
 import './HotKeys.scss';
-import {TABLE_TYPE} from '../../Tenant';
 
 const b = cn('hot-keys');
 
@@ -105,7 +106,7 @@ function HotKeys({
 
     const renderContent = () => {
         if (error) {
-            return error.data?.error?.message || error.data || error;
+            return prepareQueryError(error);
         }
         return data !== null ? (
             <div className={b('table-content')}>
