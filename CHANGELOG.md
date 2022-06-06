@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.5.3...v1.6.0) (2022-06-06)
+
+
+### Features
+
+* query issues displaying ([3ba4c25](https://github.com/ydb-platform/ydb-embedded-ui/commit/3ba4c2591542ef902eba4f7c44550f3c59618575))
+
+
+### Bug Fixes
+
+* code-review ([742c58a](https://github.com/ydb-platform/ydb-embedded-ui/commit/742c58a9bc4fa0dd0b24aa0119b7352e2be6fc8e))
+* **package.json:** typecheck script ([111b525](https://github.com/ydb-platform/ydb-embedded-ui/commit/111b525f51a050010bbc03a3d0990be00c18ccd8))
+
 ### [1.5.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.5.2...v1.5.3) (2022-05-26)
 
 
