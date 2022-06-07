@@ -201,7 +201,7 @@ class Tenants extends React.Component {
             },
             {
                 name: 'State',
-                width: 80,
+                width: 90,
                 render: ({value}) => (value ? value.toLowerCase() : '—'),
                 customStyle: () => ({textTransform: 'capitalize'}),
             },
