@@ -28,9 +28,7 @@ const resultOptions = [
 ];
 
 function QueryResult(props) {
-    const [activeSection, setActiveSection] = useState(
-        props.result ? resultOptionsIds.result : resultOptionsIds.stats,
-    );
+    const [activeSection, setActiveSection] = useState(resultOptionsIds.result);
     const isFullscreen = useSelector((state) => state.fullscreen);
     const dispatch = useDispatch();
 
@@ -111,7 +109,9 @@ function QueryResult(props) {
                     </Fullscreen>
                 )}
             </React.Fragment>
-        ) : <span>{error?.data ?? error}</span>;
+        ) : (
+            <span>{error?.data ?? error}</span>
+        );
     };
 
     return (
