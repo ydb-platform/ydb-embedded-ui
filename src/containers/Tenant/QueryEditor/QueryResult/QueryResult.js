@@ -111,7 +111,7 @@ function QueryResult(props) {
                     </Fullscreen>
                 )}
             </React.Fragment>
-        ) : null;
+        ) : <span>{error?.data ?? error}</span>;
     };
 
     return (
