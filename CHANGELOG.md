@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.6.0...v1.6.1) (2022-06-07)
+
+
+### Bug Fixes
+
+* should show Pending instead of Pendin ([0b93f80](https://github.com/ydb-platform/ydb-embedded-ui/commit/0b93f8000dffca27cd26321eb86f41e4f458faa6))
+* should show query error even if no issues ([708bac5](https://github.com/ydb-platform/ydb-embedded-ui/commit/708bac56c2e671ec23e23c5055d0c0a9d419cd86))
+
 ## [1.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.5.3...v1.6.0) (2022-06-06)
 
 
