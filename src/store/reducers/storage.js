@@ -130,6 +130,10 @@ export const getStoragePoolsGroupsCount = (state) => ({
     found: state.storage.data?.FoundGroups || 0,
 });
 export const getStorageNodes = (state) => state.storage.data?.Nodes;
+export const getStorageNodesCount = (state) => ({
+    total: state.storage.data?.TotalNodes || 0,
+    found: state.storage.data?.FoundNodes || 0,
+});
 export const getStorageFilter = (state) => state.storage.filter;
 export const getVisibleEntities = (state) => state.storage.visible;
 export const getStorageType = (state) => state.storage.type;

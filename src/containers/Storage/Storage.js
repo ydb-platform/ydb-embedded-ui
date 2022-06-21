@@ -21,6 +21,7 @@ import {
     setStorageType,
     VisibleEntitiesTitles,
     getStoragePoolsGroupsCount,
+    getStorageNodesCount,
 } from '../../store/reducers/storage';
 import {getNodesList} from '../../store/reducers/clusterNodes';
 import StorageGroups from './StorageGroups/StorageGroups';
@@ -54,6 +55,7 @@ class Storage extends React.Component {
         setInitialState: PropTypes.func,
         flatListStorageEntities: PropTypes.array,
         groupsCount: PropTypes.object,
+        nodesCount: PropTypes.object,
         setStorageFilter: PropTypes.func,
         setVisibleEntities: PropTypes.func,
         visibleEntities: PropTypes.string,
@@ -205,28 +207,23 @@ class Storage extends React.Component {
         const {
             storageType,
             groupsCount,
-            flatListStorageEntities,
+            nodesCount,
             loading,
             wasLoaded,
         } = this.props;
 
         let label = `${storageType === StorageTypes.groups ? 'Groups' : 'Nodes'}: `;
+        const count = storageType === StorageTypes.groups ? groupsCount : nodesCount;
 
         if (loading && !wasLoaded) {
             label += '...';
             return label;
         }
 
-        if (storageType === StorageTypes.nodes) {
-            label += flatListStorageEntities.length;
-        }
-
-        if (storageType === StorageTypes.groups) {
-            if (groupsCount.total === groupsCount.found) {
-                label += groupsCount.total;
-            } else {
-                label += `${groupsCount.found} out of ${groupsCount.total}`;
-            }
+        if (count.total === count.found) {
+            label += count.total;
+        } else {
+            label += `${count.found} of ${count.total}`;
         }
 
         return label;
@@ -309,6 +306,7 @@ function mapStateToProps(state) {
         groupsCount: getStoragePoolsGroupsCount(state),
         autorefresh: state.schema.autorefresh,
         nodes: getNodesObject(state),
+        nodesCount: getStorageNodesCount(state),
         loading,
         wasLoaded,
         error,
