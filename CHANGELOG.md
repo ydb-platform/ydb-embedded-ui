@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.6.2...v1.6.3) (2022-06-22)
+
+
+### Bug Fixes
+
+* **ClipboardButton:** clickable area now matches visual area ([8c0b5ef](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c0b5ef27d5d31b28a29455b3019de23bdbf8f68))
+
 ## [1.6.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.6.1...v1.6.2) (2022-06-07)
 
 
