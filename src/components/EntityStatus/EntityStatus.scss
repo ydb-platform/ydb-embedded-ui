@@ -17,11 +17,16 @@
         color: var(--yc-color-text-secondary);
 
         .yc-button__text {
-            margin: 0 4px;
+            margin: 0;
+        }
+
+        .yc-clipboard-button {
+            width: 24px;
+            height: 24px;
         }
 
         &_visible {
-            display: flex;
+            display: inline-flex;
         }
     }
 

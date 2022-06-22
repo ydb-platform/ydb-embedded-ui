@@ -80,15 +80,15 @@ class EntityStatus extends React.Component {
                 )}
                 {this.renderLink()}
                 {hasClipboardButton && (
-                    <span
+                    <Button
+                        component="span"
+                        size="s"
                         className={b('clipboard-button', {
                             visible: false,
                         })}
                     >
-                        <Button size="s">
-                            <ClipboardButton text={name} size={16} />
-                        </Button>
-                    </span>
+                        <ClipboardButton text={name} size={16} />
+                    </Button>
                 )}
             </div>
         );
