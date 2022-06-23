@@ -102,7 +102,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
     const currentSchemaData = _.get(data[currentSchemaPath], 'PathDescription.Self');
 
     const tableSchema =
-        currentItem?.PathDescription?.Table || currentItem?.PathDescription?.OlapTableDescription;
+        currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
 
     const schema =
         props.type === OLAP_TABLE_TYPE ? prepareOlapTableSchema(tableSchema) : tableSchema;

@@ -95,7 +95,7 @@ function Overview(props: OverviewProps) {
     }, [autorefresh]);
 
     const tableSchema =
-        currentItem?.PathDescription?.Table || currentItem?.PathDescription?.OlapTableDescription;
+        currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
 
     const schemaData = useMemo(() => {
         return props.type === OLAP_TABLE_TYPE
