@@ -1,17 +1,20 @@
-import type {NavigationTreeNodeType} from "ydb-ui-components";
+import type {NavigationTreeNodeType} from 'ydb-ui-components';
+import {EPathType} from '../../../types/api/schema';
 
-const DB_TYPES = new Set(['EPathTypeSubDomain']);
-const TABLE_TYPES = new Set(['EPathTypeTable', 'EPathTypeOlapTable']);
-const DIR_TYPES = new Set(['EPathTypeDir', 'EPathTypeOlapStore']);
-
-export const calcNavigationTreeType = (type: string): NavigationTreeNodeType => {
-    if (DIR_TYPES.has(type)) {
-        return 'directory';
-    } else if (TABLE_TYPES.has(type)) {
-        return 'table';
-    } else if (DB_TYPES.has(type)) {
-        return 'database';
+export const mapPathTypeToNavigationTreeType = (
+    type: EPathType = EPathType.EPathTypeDir,
+    defaultType: NavigationTreeNodeType = 'directory'
+): NavigationTreeNodeType => {
+    switch (type) {
+        case EPathType.EPathTypeSubDomain:
+            return 'database';
+        case EPathType.EPathTypeTable:
+        case EPathType.EPathTypeColumnTable:
+            return 'table';
+        case EPathType.EPathTypeDir:
+        case EPathType.EPathTypeColumnStore:
+            return 'directory';
+        default:
+            return defaultType;
     }
-
-    return 'directory';
 };
