@@ -5,14 +5,15 @@ import {NavigationTree} from 'ydb-ui-components';
 import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema';
 import {getDescribe} from '../../../../store/reducers/describe';
 import {getSchemaAcl} from '../../../../store/reducers/schemaAcl';
+import type {EPathType} from '../../../../types/api/schema';
 
-import {calcNavigationTreeType} from '../../utils/schema';
+import {mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 
 interface SchemaTreeProps {
     rootPath: string;
     rootName: string;
-    rootType: string;
+    rootType: EPathType;
     currentPath: string;
 }
 
@@ -31,9 +32,9 @@ export function SchemaTree(props: SchemaTreeProps) {
         {concurrentId: `NavigationTree.getSchema|${path}`},
     )
         .then(({PathDescription: {Children = []} = {}}) => {
-            return Children.map(({Name, PathType}) => ({
+            return Children.map(({Name = '', PathType}) => ({
                 name: Name,
-                type: calcNavigationTreeType(PathType),
+                type: mapPathTypeToNavigationTreeType(PathType),
             }));
         });
 
@@ -49,7 +50,7 @@ export function SchemaTree(props: SchemaTreeProps) {
             rootState={{
                 path: rootPath,
                 name: rootName,
-                type: calcNavigationTreeType(rootType),
+                type: mapPathTypeToNavigationTreeType(rootType),
                 collapsed: false,
             }}
             fetchPath={fetchPath}
