@@ -28,8 +28,8 @@ import './Tenant.scss';
 const b = cn('tenant-page');
 
 export const TABLE_TYPE = 'Table';
-export const OLAP_TABLE_TYPE = 'OlapTable';
-export const OLAP_STORE_TYPE = 'OlapStore';
+export const OLAP_TABLE_TYPE = 'ColumnTable';
+export const OLAP_STORE_TYPE = 'ColumnStore';
 
 export function calcEntityType(currentPathType?: string) {
     return currentPathType && currentPathType.replace('EPathType', '');
