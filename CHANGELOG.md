@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.6.3...v1.6.4) (2022-06-24)
+
+
+### Bug Fixes
+
+* **Tenant:** properly display ColumnTables ([14d1e07](https://github.com/ydb-platform/ydb-embedded-ui/commit/14d1e074bf615be50f4f466d25e605b418f22b47))
+
 ## [1.6.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.6.2...v1.6.3) (2022-06-22)
 
 
