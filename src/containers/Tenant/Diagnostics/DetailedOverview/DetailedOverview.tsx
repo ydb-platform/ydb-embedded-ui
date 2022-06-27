@@ -3,6 +3,8 @@ import {useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 
 import {Button, Modal} from '@yandex-cloud/uikit';
+
+import type {EPathType} from '../../../../types/api/schema';
 //@ts-ignore
 import Icon from '../../../../components/Icon/Icon';
 import Overview from '../Overview/Overview';
@@ -14,7 +16,7 @@ import TenantOverview from '../TenantOverview/TenantOverview';
 import './DetailedOverview.scss';
 
 interface DetailedOverviewProps {
-    type: string;
+    type?: EPathType;
     className?: string;
     tenantName: string;
     additionalTenantInfo?: any;

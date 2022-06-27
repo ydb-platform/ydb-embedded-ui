@@ -8,7 +8,7 @@ import Icon from '../../../../components/Icon/Icon';
 
 import {AutoFetcher} from '../../../../utils/autofetcher';
 import {getHotKeys, setHotKeysOptions} from '../../../../store/reducers/hotKeys';
-import {TABLE_TYPE} from '../../Tenant';
+import {EPathType} from '../../../../types/api/schema';
 import {prepareQueryError} from '../../../../utils';
 
 import './HotKeys.scss';
@@ -42,7 +42,8 @@ function HotKeys({
     type,
 }) {
     const fetchData = () => {
-        if (type === TABLE_TYPE) {
+        // ColumnTables excluded intentionally
+        if (type === EPathType.EPathTypeTable) {
             getHotKeys(currentSchemaPath);
         }
     };

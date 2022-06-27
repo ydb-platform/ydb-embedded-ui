@@ -12,7 +12,7 @@ import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema
 import {AutoFetcher} from '../../../../utils/autofetcher';
 import HistoryContext from '../../../../contexts/HistoryContext';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {OLAP_STORE_TYPE, OLAP_TABLE_TYPE} from '../../Tenant';
+import {isColumnEntityType} from '../../utils/schema';
 import {prepareQueryError} from '../../../../utils';
 
 import './TopShards.scss';
@@ -120,7 +120,7 @@ function TopShards({
     };
 
     const renderContent = () => {
-        if (type === OLAP_STORE_TYPE || type === OLAP_TABLE_TYPE) {
+        if (isColumnEntityType(type)) {
             return 'No data';
         }
         if (error) {

@@ -13,7 +13,7 @@ import {sendQuery, setQueryOptions} from '../../../store/reducers/preview';
 import {showTooltip, hideTooltip} from '../../../store/reducers/tooltip';
 import {prepareQueryError, prepareQueryResponse} from '../../../utils/index';
 
-import {OLAP_TABLE_TYPE, TABLE_TYPE} from '../Tenant';
+import {isTableType} from '../utils/schema';
 import {AutoFetcher} from '../../../utils/autofetcher';
 import EnableFullscreenButton from '../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
@@ -82,7 +82,7 @@ class Preview extends React.Component {
     sendQueryForPreview = () => {
         const {sendQuery, database, table, type} = this.props;
 
-        if (type !== TABLE_TYPE && type !== OLAP_TABLE_TYPE) {
+        if (!isTableType(type)) {
             return;
         }
 
@@ -150,7 +150,7 @@ class Preview extends React.Component {
 
         let message;
 
-        if (type !== TABLE_TYPE && type !== OLAP_TABLE_TYPE) {
+        if (!isTableType(type)) {
             message = <div className={b('message-container')}>Not available</div>;
         }
 
