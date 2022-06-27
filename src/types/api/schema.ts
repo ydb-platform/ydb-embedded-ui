@@ -88,6 +88,7 @@ export enum EPathType {
     EPathTypeSubDomain = 'EPathTypeSubDomain',
     EPathTypeColumnStore = 'EPathTypeColumnStore',
     EPathTypeColumnTable = 'EPathTypeColumnTable',
+    EPathTypeTableIndex = 'EPathTypeTableIndex', 
 }
 
 enum EPathSubType {

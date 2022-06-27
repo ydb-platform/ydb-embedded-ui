@@ -35,6 +35,9 @@ export function SchemaTree(props: SchemaTreeProps) {
             return Children.map(({Name = '', PathType}) => ({
                 name: Name,
                 type: mapPathTypeToNavigationTreeType(PathType),
+                // FIXME: should only be explicitly set to true for tables with indexes
+                // at the moment of writing there is no property to determine this, fix later
+                expandable: true,
             }));
         });
 

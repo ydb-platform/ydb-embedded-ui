@@ -13,6 +13,7 @@ export const mapPathTypeToNavigationTreeType = (
             return 'table';
         case EPathType.EPathTypeDir:
         case EPathType.EPathTypeColumnStore:
+        case EPathType.EPathTypeTableIndex:
             return 'directory';
         default:
             return defaultType;
