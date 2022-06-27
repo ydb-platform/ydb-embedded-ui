@@ -18,3 +18,10 @@ export const mapPathTypeToNavigationTreeType = (
             return defaultType;
     }
 };
+
+export const isTableType = (type?: EPathType) =>
+    mapPathTypeToNavigationTreeType(type) === 'table';
+
+export const isColumnEntityType = (type?: EPathType) =>
+    type === EPathType.EPathTypeColumnStore ||
+    type === EPathType.EPathTypeColumnTable;

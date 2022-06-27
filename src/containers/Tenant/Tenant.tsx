@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useReducer} from 'react';
+import {useEffect, useReducer} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
@@ -22,27 +22,11 @@ import {
 //@ts-ignore
 import {getTenantInfo, clearTenant} from '../../store/reducers/tenant';
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
+import type {TEvDescribeSchemeResult} from '../../types/api/schema';
 
 import './Tenant.scss';
 
 const b = cn('tenant-page');
-
-export const TABLE_TYPE = 'Table';
-export const OLAP_TABLE_TYPE = 'ColumnTable';
-export const OLAP_STORE_TYPE = 'ColumnStore';
-
-export function calcEntityType(currentPathType?: string) {
-    return currentPathType && currentPathType.replace('EPathType', '');
-}
-
-export function isTableType(currentPathType?: string) {
-    const type = calcEntityType(currentPathType);
-
-    if (type === TABLE_TYPE || type === OLAP_TABLE_TYPE) {
-        return true;
-    }
-    return false;
-}
 
 const getInitialIsSummaryCollapsed = () => {
     return Boolean(localStorage.getItem(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED));
@@ -114,11 +98,7 @@ function Tenant(props: TenantProps) {
         };
     }, [tenantName, dispatch]);
 
-    const currentPathType = currentItem.PathDescription?.Self?.PathType;
-
-    const entityType = useMemo(() => {
-        return calcEntityType(currentPathType);
-    }, [currentPathType]);
+    const currentPathType = (currentItem as TEvDescribeSchemeResult).PathDescription?.Self?.PathType;
 
     const onCollapseSummaryHandler = () => {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
@@ -142,14 +122,14 @@ function Tenant(props: TenantProps) {
                 onSplitStartDragAdditional={onSplitStartDragAdditional}
             >
                 <ObjectSummary
-                    type={entityType as string}
+                    type={currentPathType}
                     onCollapseSummary={onCollapseSummaryHandler}
                     onExpandSummary={onExpandSummaryHandler}
                     isCollapsed={summaryVisibilityState.collapsed}
                     additionalTenantInfo={props.additionalTenantInfo}
                 />
                 <ObjectGeneral
-                    type={entityType as string}
+                    type={currentPathType}
                     additionalTenantInfo={props.additionalTenantInfo}
                     additionalNodesInfo={props.additionalNodesInfo}
                 />

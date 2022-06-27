@@ -29,7 +29,8 @@ import Compute from './Compute/Compute';
 import Tablets from '../../Tablets/Tablets';
 
 import routes, {createHref} from '../../../routes';
-import {OLAP_TABLE_TYPE, TABLE_TYPE} from '../Tenant';
+import type {EPathType} from '../../../types/api/schema';
+import {isTableType} from '../utils/schema';
 import {TenantGeneralTabsIds, TenantTabsGroups} from '../TenantPages';
 import {GeneralPagesIds, DATABASE_PAGES, TABLE_PAGES, DIR_PAGES} from './DiagnosticsPages';
 //@ts-ignore
@@ -39,7 +40,7 @@ import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant'
 import './Diagnostics.scss';
 
 interface DiagnosticsProps {
-    type: string;
+    type?: EPathType;
     additionalTenantInfo?: any;
     additionalNodesInfo?: any;
 }
@@ -68,8 +69,7 @@ function Diagnostics(props: DiagnosticsProps) {
     const isDatabase = currentSchemaPath === tenantName;
 
     const pages = useMemo(() => {
-        const {type} = props;
-        const isTable = type === TABLE_TYPE || type === OLAP_TABLE_TYPE;
+        const isTable = isTableType(props.type);
 
         let pages = DIR_PAGES;
 

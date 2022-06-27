@@ -16,7 +16,8 @@ import CopyToClipboard from '../../../components/CopyToClipboard/CopyToClipboard
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import Icon from '../../../components/Icon/Icon';
 
-import {OLAP_TABLE_TYPE, TABLE_TYPE} from '../Tenant';
+import type {EPathType} from '../../../types/api/schema';
+import {isColumnEntityType, isTableType} from '../utils/schema';
 
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
@@ -69,7 +70,7 @@ function prepareOlapTableSchema(tableSchema: any) {
 }
 
 interface ObjectSummaryProps {
-    type: string;
+    type?: EPathType;
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
     isCollapsed: boolean;
@@ -104,12 +105,13 @@ function ObjectSummary(props: ObjectSummaryProps) {
     const tableSchema =
         currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
 
-    const schema =
-        props.type === OLAP_TABLE_TYPE ? prepareOlapTableSchema(tableSchema) : tableSchema;
+    const schema = isTableType(props.type) && isColumnEntityType(props.type)
+        ? prepareOlapTableSchema(tableSchema)
+        : tableSchema;
 
     useEffect(() => {
         const {type} = props;
-        const isTable = type === TABLE_TYPE || type === OLAP_TABLE_TYPE;
+        const isTable = isTableType(type);
 
         if (type && !isTable && !TENANT_INFO_TABS.find((el) => el.id === infoTab)) {
             history.push({
@@ -120,8 +122,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
     }, [props.type]);
 
     const renderTabs = () => {
-        const {type} = props;
-        const isTable = type === TABLE_TYPE || type === OLAP_TABLE_TYPE;
+        const isTable = isTableType(props.type);
         const tabsItems = isTable ? [...TENANT_INFO_TABS, ...TENANT_SCHEMA_TAB] : TENANT_INFO_TABS;
 
         return (
@@ -228,8 +229,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
     };
 
     const renderCommonInfoControls = () => {
-        const {type} = props;
-        const isTable = type === TABLE_TYPE || type === OLAP_TABLE_TYPE;
+        const isTable = isTableType(props.type);
         return (
             <React.Fragment>
                 {isTable && (
@@ -257,8 +257,8 @@ function ObjectSummary(props: ObjectSummaryProps) {
             message = `${Status}: ${Reason}`;
         }
 
-        return props.type ? (
-            <div className={b('entity-type')}>{type}</div>
+        return type ? (
+            <div className={b('entity-type')}>{type.replace('EPathType', '')}</div>
         ) : (
             <div className={b('entity-type', {error: true})}>
                 <HelpPopover content={message} offset={{left: 0}} />

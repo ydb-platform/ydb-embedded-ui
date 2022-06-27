@@ -14,13 +14,14 @@ import {TenantGeneralTabsIds, TenantTabsGroups, TENANT_GENERAL_TABS} from '../Te
 import routes, {createHref} from '../../../routes';
 import {setSettingValue} from '../../../store/reducers/settings';
 import {TENANT_INITIAL_TAB_KEY} from '../../../utils/constants';
+import type {EPathType} from '../../../types/api/schema';
 
 import './ObjectGeneral.scss';
 
 const b = cn('object-general');
 
 interface ObjectGeneralProps {
-    type: string;
+    type?: EPathType;
     additionalTenantInfo?: any;
     additionalNodesInfo?: any;
     setSettingValue: (name: string, value: string) => void;

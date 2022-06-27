@@ -7,7 +7,8 @@ import {Loader} from '@yandex-cloud/uikit';
 //@ts-ignore
 import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';
 
-import {OLAP_TABLE_TYPE} from '../../Tenant';
+import type {EPathType} from '../../../../types/api/schema';
+import {isColumnEntityType, isTableType} from '../../utils/schema';
 import {AutoFetcher} from '../../../../utils/autofetcher';
 //@ts-ignore
 import {getSchema} from '../../../../store/reducers/schema';
@@ -44,7 +45,7 @@ function prepareOlapTableGeneral(tableData: any, olapStats: any[]) {
 }
 
 interface OverviewProps {
-    type: string;
+    type?: EPathType;
     className?: string;
     tenantName?: string;
 }
@@ -70,7 +71,7 @@ function Overview(props: OverviewProps) {
         const schemaPath = currentSchemaPath || tenantName;
         dispatch(getSchema({path: schemaPath}));
 
-        if (type === OLAP_TABLE_TYPE) {
+        if (isTableType(type) && isColumnEntityType(type)) {
             dispatch(getOlapStats({path: schemaPath}));
         }
     };
@@ -98,7 +99,7 @@ function Overview(props: OverviewProps) {
         currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
 
     const schemaData = useMemo(() => {
-        return props.type === OLAP_TABLE_TYPE
+        return isTableType(props.type) && isColumnEntityType(props.type)
             ? prepareOlapTableGeneral(tableSchema, olapStats)
             : currentItem;
     }, [props.type, tableSchema, olapStats, currentItem]);
