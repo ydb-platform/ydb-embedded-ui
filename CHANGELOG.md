@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.6.4...v1.7.0) (2022-06-29)
+
+
+### Features
+
+* **Storage:** show total groups count ([5e31cfe](https://github.com/ydb-platform/ydb-embedded-ui/commit/5e31cfee9edc50fa4bc0770c443b136291a3536e))
+* **Storage:** show total nodes count ([b438f70](https://github.com/ydb-platform/ydb-embedded-ui/commit/b438f7075961e878a1412ca185743c4374dd9178))
+* **Tenant:** display tables indexes ([693a100](https://github.com/ydb-platform/ydb-embedded-ui/commit/693a1001db6487b2d43aeca7d8168afcd06f5cbd))
+
 ## [1.6.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.6.3...v1.6.4) (2022-06-24)
 
 
