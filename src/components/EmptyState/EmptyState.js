@@ -16,16 +16,18 @@ export default function EmptyState({image, title, description, actions, size}) {
     return (
         <div className={block({size})}>
             <div className={block('wrapper', {size})}>
-                {image ? (
-                    image
-                ) : (
-                    <Icon
-                        viewBox="0 0 383 396"
-                        name="emptyState"
-                        width={sizes[size]}
-                        height={sizes[size]}
-                    />
-                )}
+                <div className={block('image')}>
+                    {image ? (
+                        image
+                    ) : (
+                        <Icon
+                            viewBox="0 0 383 396"
+                            name="emptyState"
+                            width={sizes[size]}
+                            height={sizes[size]}
+                        />
+                    )}
+                </div>
 
                 <div className={block('title', {size})}>{title}</div>
                 <div className={block('description')}>{description}</div>
