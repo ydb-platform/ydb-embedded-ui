@@ -91,7 +91,7 @@ export enum EPathType {
     EPathTypeTableIndex = 'EPathTypeTableIndex', 
 }
 
-enum EPathSubType {
+export enum EPathSubType {
     EPathSubTypeEmpty = 'EPathSubTypeEmpty',
     EPathSubTypeSyncIndexImplTable = 'EPathSubTypeSyncIndexImplTable',
     EPathSubTypeAsyncIndexImplTable = 'EPathSubTypeAsyncIndexImplTable',
