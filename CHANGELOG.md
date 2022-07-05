@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.7.0...v1.7.1) (2022-07-05)
+
+
+### Performance Improvements
+
+* **Tenant:** use api call viewer/json/acl instead of metainfo ([c3603c4](https://github.com/ydb-platform/ydb-embedded-ui/commit/c3603c4b364cef79cb4790c7e9e4378d5b66e0ed))
+
 ## [1.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.6.4...v1.7.0) (2022-06-29)
 
 
