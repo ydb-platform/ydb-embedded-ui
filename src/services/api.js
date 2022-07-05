@@ -98,7 +98,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     }
     getSchemaAcl({path}) {
         return this.get(
-            this.getPath('/viewer/json/metainfo'),
+            this.getPath('/viewer/json/acl'),
             {
                 path,
             },
