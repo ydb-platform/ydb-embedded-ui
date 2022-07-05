@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.7.1...v1.8.0) (2022-07-05)
+
+
+### Features
+
+* add Illustration component ([7d10880](https://github.com/ydb-platform/ydb-embedded-ui/commit/7d10880cd4d9f945e7c8a7232327d8db68f0865c))
+* **Tenant:** proper 403 error page ([d822a2b](https://github.com/ydb-platform/ydb-embedded-ui/commit/d822a2b6e3e18c24882ecf30db399087053b83b3))
+
+
+### Bug Fixes
+
+* fix empty state illustration layout ([7cfd97e](https://github.com/ydb-platform/ydb-embedded-ui/commit/7cfd97e13ebcaa703478bd7b4e29774150bd569e))
+
 ## [1.7.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.7.0...v1.7.1) (2022-07-05)
 
 
