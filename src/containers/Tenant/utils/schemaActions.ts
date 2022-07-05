@@ -15,7 +15,6 @@ const createTableTemplate = (path: string) => {
     PRIMARY KEY (\`id\`)
 );`;
 };
-
 const alterTableTemplate = (path: string) => {
     return `ALTER TABLE \`${path}\`
     ADD COLUMN is_deleted Bool;`;
@@ -32,40 +31,23 @@ const upsertQueryTemplate = (path: string) => {
 VALUES ( );`;
 };
 
-export const getActions = (
+const bindActions = (
+    path: string,
     dispatch: Dispatch<any>,
     setActivePath: (path: string) => void,
-) =>
-    (path: string, type: NavigationTreeNodeType) => {
-        const switchTabToQuery = () => {
-            dispatch(setTopLevelTab(TenantGeneralTabsIds.query));
-        };
+) => {
+    const inputQuery = (tmpl: (path: string) => string) => () => {
+        dispatch(changeUserInput({input: tmpl(path)}));
+        dispatch(setTopLevelTab(TenantGeneralTabsIds.query))
+        setActivePath(path);
+    }
 
-        const onCreateTableClick = () => {
-            dispatch(changeUserInput({input: createTableTemplate(path)}));
-            switchTabToQuery();
-            setActivePath(path);
-        };
-
-        const onAlterTableClick = () => {
-            dispatch(changeUserInput({input: alterTableTemplate(path)}));
-            switchTabToQuery();
-            setActivePath(path);
-        };
-
-        const onSelectQueryClick = () => {
-            dispatch(changeUserInput({input: selectQueryTemplate(path)}));
-            switchTabToQuery();
-            setActivePath(path);
-        };
-
-        const onUpsertQueryClick = () => {
-            dispatch(changeUserInput({input: upsertQueryTemplate(path)}));
-            switchTabToQuery();
-            setActivePath(path);
-        };
-
-        const onCopyPathClick = () => {
+    return {
+        createTable: inputQuery(createTableTemplate),
+        alterTable: inputQuery(alterTableTemplate),
+        selectQuery: inputQuery(selectQueryTemplate),
+        upsertQuery: inputQuery(upsertQueryTemplate),
+        copyPath: () => {
             navigator.clipboard
                 .writeText(path)
                 .then(() => {
@@ -82,26 +64,33 @@ export const getActions = (
                         type: 'error',
                     });
                 });
-        };
-
-        const onOpenPreviewClick = () => {
+        },
+        openPreview: () => {
             dispatch(setShowPreview(true));
-            switchTabToQuery();
+            dispatch(setTopLevelTab(TenantGeneralTabsIds.query))
             setActivePath(path);
-        };
+        },
+    };
+};
 
-        const copyItem = {text: 'Copy path', action: onCopyPathClick};
+export const getActions = (
+    dispatch: Dispatch<any>,
+    setActivePath: (path: string) => void,
+) =>
+    (path: string, type: NavigationTreeNodeType) => {
+        const actions = bindActions(path, dispatch, setActivePath);
+        const copyItem = {text: 'Copy path', action: actions.copyPath};
 
         return type === 'table'
             ? [
                 [
-                    {text: 'Open preview', action: onOpenPreviewClick},
+                    {text: 'Open preview', action: actions.openPreview},
                     copyItem,
                 ],
                 [
-                    {text: 'Alter table...', action: onAlterTableClick},
-                    {text: 'Select query...', action: onSelectQueryClick},
-                    {text: 'Upsert query...', action: onUpsertQueryClick},
+                    {text: 'Alter table...', action: actions.alterTable},
+                    {text: 'Select query...', action: actions.selectQuery},
+                    {text: 'Upsert query...', action: actions.upsertQuery},
                 ],
             ]
             : [
@@ -109,7 +98,7 @@ export const getActions = (
                     copyItem,
                 ],
                 [
-                    {text: 'Create table...', action: onCreateTableClick},
+                    {text: 'Create table...', action: actions.createTable},
                 ],
             ];
     };
