@@ -30,9 +30,8 @@ import Tablets from '../../Tablets/Tablets';
 
 import routes, {createHref} from '../../../routes';
 import type {EPathType} from '../../../types/api/schema';
-import {isTableType} from '../utils/schema';
 import {TenantGeneralTabsIds, TenantTabsGroups} from '../TenantPages';
-import {GeneralPagesIds, DATABASE_PAGES, TABLE_PAGES, DIR_PAGES} from './DiagnosticsPages';
+import {GeneralPagesIds, DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
 //@ts-ignore
 import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema';
 import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant';
@@ -66,20 +65,15 @@ function Diagnostics(props: DiagnosticsProps) {
 
     const {name: tenantName} = queryParams;
 
-    const isDatabase = currentSchemaPath === tenantName;
+    const isRoot = currentSchemaPath === tenantName;
 
     const pages = useMemo(() => {
-        const isTable = isTableType(props.type);
-
-        let pages = DIR_PAGES;
-
-        if (isDatabase) {
-            pages = DATABASE_PAGES;
-        } else if (isTable) {
-            pages = TABLE_PAGES;
+        if (isRoot) {
+            return DATABASE_PAGES;
         }
-        return pages;
-    }, [props.type, isDatabase]);
+
+        return getPagesByType(props.type);
+    }, [props.type, isRoot]);
 
     const forwardToDiagnosticTab = (tab: GeneralPagesIds) => {
         dispatch(setDiagnosticsTab(tab));
