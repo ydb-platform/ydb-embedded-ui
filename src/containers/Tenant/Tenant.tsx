@@ -4,6 +4,9 @@ import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
 import qs from 'qs';
 
+import EmptyState from '../../components/EmptyState/EmptyState';
+import {Illustration} from '../../components/Illustration';
+
 import ObjectSummary from './ObjectSummary/ObjectSummary';
 import {setHeader} from '../../store/reducers/header';
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
@@ -52,6 +55,9 @@ function Tenant(props: TenantProps) {
     const {currentSchemaPath, currentSchema: currentItem = {}} = useSelector(
         (state: any) => state.schema,
     );
+
+    const {data: {status: tenantStatus = 200} = {}} = useSelector((state: any) => state.tenant);
+    const {error: {status: schemaStatus = 200} = {}} = useSelector((state: any) => state.schema);
 
     const dispatch = useDispatch();
 
@@ -111,29 +117,39 @@ function Tenant(props: TenantProps) {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.clear);
     };
 
+    const showBlockingError = tenantStatus === 403 || schemaStatus === 403;
+
     return (
         <div className={b()}>
-            <SplitPane
-                defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                defaultSizes={[25, 75]}
-                triggerCollapse={summaryVisibilityState.triggerCollapse}
-                triggerExpand={summaryVisibilityState.triggerExpand}
-                minSize={[36, 200]}
-                onSplitStartDragAdditional={onSplitStartDragAdditional}
-            >
-                <ObjectSummary
-                    type={currentPathType}
-                    onCollapseSummary={onCollapseSummaryHandler}
-                    onExpandSummary={onExpandSummaryHandler}
-                    isCollapsed={summaryVisibilityState.collapsed}
-                    additionalTenantInfo={props.additionalTenantInfo}
+            {showBlockingError ? (
+                <EmptyState
+                    image={<Illustration name="403" />}
+                    title="Access denied"
+                    description="You don’t have the necessary roles to view this page."
                 />
-                <ObjectGeneral
-                    type={currentPathType}
-                    additionalTenantInfo={props.additionalTenantInfo}
-                    additionalNodesInfo={props.additionalNodesInfo}
-                />
-            </SplitPane>
+            ) : (
+                <SplitPane
+                    defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                    defaultSizes={[25, 75]}
+                    triggerCollapse={summaryVisibilityState.triggerCollapse}
+                    triggerExpand={summaryVisibilityState.triggerExpand}
+                    minSize={[36, 200]}
+                    onSplitStartDragAdditional={onSplitStartDragAdditional}
+                >
+                    <ObjectSummary
+                        type={currentPathType}
+                        onCollapseSummary={onCollapseSummaryHandler}
+                        onExpandSummary={onExpandSummaryHandler}
+                        isCollapsed={summaryVisibilityState.collapsed}
+                        additionalTenantInfo={props.additionalTenantInfo}
+                    />
+                    <ObjectGeneral
+                        type={currentPathType}
+                        additionalTenantInfo={props.additionalTenantInfo}
+                        additionalNodesInfo={props.additionalNodesInfo}
+                    />
+                </SplitPane>
+            )}
         </div>
     );
 }
