@@ -1,3 +1,5 @@
+import {EPathType} from "../../../types/api/schema";
+
 export enum GeneralPagesIds {
     'overview' = 'Overview',
     'topQueries' = 'topQueries',
@@ -73,3 +75,21 @@ export const DATABASE_PAGES = [
 export const TABLE_PAGES = [overview, topShards, graph, tablets, hotKeys, describe];
 
 export const DIR_PAGES = [overview, topShards, describe];
+
+export const INDEX_PAGES = [overview];
+
+export const getPagesByType = (type?: EPathType) => {
+    switch (type) {
+        case EPathType.EPathTypeColumnStore:
+        case EPathType.EPathTypeSubDomain:
+            return DATABASE_PAGES;
+        case EPathType.EPathTypeColumnTable:
+        case EPathType.EPathTypeTable:
+            return TABLE_PAGES;
+        case EPathType.EPathTypeTableIndex:
+            return INDEX_PAGES;
+        case EPathType.EPathTypeDir:
+        default:
+            return DIR_PAGES;
+    }
+}
