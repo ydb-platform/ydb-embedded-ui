@@ -32,9 +32,9 @@ export function SchemaTree(props: SchemaTreeProps) {
         {concurrentId: `NavigationTree.getSchema|${path}`},
     )
         .then(({PathDescription: {Children = []} = {}}) => {
-            return Children.map(({Name = '', PathType}) => ({
+            return Children.map(({Name = '', PathType, PathSubType}) => ({
                 name: Name,
-                type: mapPathTypeToNavigationTreeType(PathType),
+                type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
                 // FIXME: should only be explicitly set to true for tables with indexes
                 // at the moment of writing there is no property to determine this, fix later
                 expandable: true,

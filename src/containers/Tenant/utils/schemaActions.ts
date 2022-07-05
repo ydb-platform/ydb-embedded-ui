@@ -81,24 +81,35 @@ export const getActions = (
         const actions = bindActions(path, dispatch, setActivePath);
         const copyItem = {text: 'Copy path', action: actions.copyPath};
 
-        return type === 'table'
-            ? [
-                [
-                    {text: 'Open preview', action: actions.openPreview},
+        switch (type) {
+            case 'database':
+            case 'directory':
+                return [
+                    [
+                        copyItem,
+                    ],
+                    [
+                        {text: 'Create table...', action: actions.createTable},
+                    ],
+                ];
+            case 'table':
+                return [
+                    [
+                        {text: 'Open preview', action: actions.openPreview},
+                        copyItem,
+                    ],
+                    [
+                        {text: 'Alter table...', action: actions.alterTable},
+                        {text: 'Select query...', action: actions.selectQuery},
+                        {text: 'Upsert query...', action: actions.upsertQuery},
+                    ],
+                ];
+            case 'index_table':
+                return [
                     copyItem,
-                ],
-                [
-                    {text: 'Alter table...', action: actions.alterTable},
-                    {text: 'Select query...', action: actions.selectQuery},
-                    {text: 'Upsert query...', action: actions.upsertQuery},
-                ],
-            ]
-            : [
-                [
-                    copyItem,
-                ],
-                [
-                    {text: 'Create table...', action: actions.createTable},
-                ],
-            ];
+                ];
+            case 'index':
+            default:
+                return [];
+        }
     };
