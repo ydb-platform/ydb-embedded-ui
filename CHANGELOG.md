@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.0...v1.8.1) (2022-07-06)
+
+
+### Bug Fixes
+
+* **Tenant:** diagnostics view for table indexes ([63d3133](https://github.com/ydb-platform/ydb-embedded-ui/commit/63d3133c0d61f6d39186f0c5df2eb6983a9c8bf7))
+* **Tenant:** own context actions for table indexes ([3cd946a](https://github.com/ydb-platform/ydb-embedded-ui/commit/3cd946a333be402cec70569affef5865b0dd8934))
+
 ## [1.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.7.1...v1.8.0) (2022-07-05)
 
 
