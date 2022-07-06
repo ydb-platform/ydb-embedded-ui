@@ -104,7 +104,10 @@ function Tenant(props: TenantProps) {
         };
     }, [tenantName, dispatch]);
 
-    const currentPathType = (currentItem as TEvDescribeSchemeResult).PathDescription?.Self?.PathType;
+    const {
+        PathType: currentPathType,
+        PathSubType: currentPathSubType,
+    } = (currentItem as TEvDescribeSchemeResult).PathDescription?.Self || {};
 
     const onCollapseSummaryHandler = () => {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
@@ -138,6 +141,7 @@ function Tenant(props: TenantProps) {
                 >
                     <ObjectSummary
                         type={currentPathType}
+                        subType={currentPathSubType}
                         onCollapseSummary={onCollapseSummaryHandler}
                         onExpandSummary={onExpandSummaryHandler}
                         isCollapsed={summaryVisibilityState.collapsed}
