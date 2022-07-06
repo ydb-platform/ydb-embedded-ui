@@ -35,6 +35,9 @@ export const mapPathTypeToNavigationTreeType = (
 export const isTableType = (type?: EPathType) =>
     mapPathTypeToNavigationTreeType(type) === 'table';
 
+export const isIndexTable = (subType?: EPathSubType) =>
+    mapTablePathSubTypeToNavigationTreeType(subType) === 'index_table';
+
 export const isColumnEntityType = (type?: EPathType) =>
     type === EPathType.EPathTypeColumnStore ||
     type === EPathType.EPathTypeColumnTable;

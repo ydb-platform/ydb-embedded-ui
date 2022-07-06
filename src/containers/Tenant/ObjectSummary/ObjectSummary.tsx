@@ -16,8 +16,8 @@ import CopyToClipboard from '../../../components/CopyToClipboard/CopyToClipboard
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import Icon from '../../../components/Icon/Icon';
 
-import type {EPathType} from '../../../types/api/schema';
-import {isColumnEntityType, isTableType} from '../utils/schema';
+import type {EPathSubType, EPathType} from '../../../types/api/schema';
+import {isColumnEntityType, isIndexTable, isTableType} from '../utils/schema';
 
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
@@ -71,6 +71,7 @@ function prepareOlapTableSchema(tableSchema: any) {
 
 interface ObjectSummaryProps {
     type?: EPathType;
+    subType?: EPathSubType;
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
     isCollapsed: boolean;
@@ -229,10 +230,10 @@ function ObjectSummary(props: ObjectSummaryProps) {
     };
 
     const renderCommonInfoControls = () => {
-        const isTable = isTableType(props.type);
+        const showPreview = isTableType(props.type) && !isIndexTable(props.subType);
         return (
             <React.Fragment>
-                {isTable && (
+                {showPreview && (
                     <Button view="flat-secondary" onClick={onOpenPreview} title="Show preview">
                         <Icon name="tablePreview" viewBox={'0 0 16 16'} height={16} width={16} />
                     </Button>
