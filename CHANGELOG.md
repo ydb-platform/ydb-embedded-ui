@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.1...v1.8.2) (2022-07-07)
+
+
+### Bug Fixes
+
+* **Tenant:** 3 tabs for indexes ([9280384](https://github.com/ydb-platform/ydb-embedded-ui/commit/9280384733938c4bd269bf6f9adf23efb552c6e8))
+* **Tenant:** hide preview button for index tables ([a25e0ea](https://github.com/ydb-platform/ydb-embedded-ui/commit/a25e0ea0413277e27c54d123e2be7a15b8a2aaa4))
+
 ## [1.8.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.0...v1.8.1) (2022-07-06)
 
 
