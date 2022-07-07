@@ -153,6 +153,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             database,
             action,
             stats,
+            timeout: 600000,
         });
     }
     getExplainQuery(query, database) {
@@ -160,6 +161,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             query,
             database,
             action: 'explain',
+            timeout: 600000,
         });
     }
     getExplainQueryAst(query, database) {
@@ -167,6 +169,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             query,
             database,
             action: 'explain-ast',
+            timeout: 600000,
         });
     }
     getHotKeys(path, enableSampling) {
