@@ -76,8 +76,6 @@ export const TABLE_PAGES = [overview, topShards, graph, tablets, hotKeys, descri
 
 export const DIR_PAGES = [overview, topShards, describe];
 
-export const INDEX_PAGES = [overview];
-
 export const getPagesByType = (type?: EPathType) => {
     switch (type) {
         case EPathType.EPathTypeColumnStore:
@@ -86,9 +84,8 @@ export const getPagesByType = (type?: EPathType) => {
         case EPathType.EPathTypeColumnTable:
         case EPathType.EPathTypeTable:
             return TABLE_PAGES;
-        case EPathType.EPathTypeTableIndex:
-            return INDEX_PAGES;
         case EPathType.EPathTypeDir:
+        case EPathType.EPathTypeTableIndex:
         default:
             return DIR_PAGES;
     }
