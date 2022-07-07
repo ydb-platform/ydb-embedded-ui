@@ -24,7 +24,7 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
         {
             name: 'Host',
             render: ({row, value}) => {
-                const nodeRef = getNodeRef ? getNodeRef(row) : undefined;
+                const nodeRef = getNodeRef ? getNodeRef(row) + 'internal' : undefined;
 
                 if (typeof value === 'undefined') {
                     return <span>—</span>;
