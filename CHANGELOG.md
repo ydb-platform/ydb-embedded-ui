@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.2...v1.8.3) (2022-07-08)
+
+
+### Bug Fixes
+
+* timeout 600 sec for requests /viewer/json/query ([cf65122](https://github.com/ydb-platform/ydb-embedded-ui/commit/cf651221f866e5f56ecf6c900b3778dedc31eb95))
+
 ## [1.8.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.1...v1.8.2) (2022-07-07)
 
 
