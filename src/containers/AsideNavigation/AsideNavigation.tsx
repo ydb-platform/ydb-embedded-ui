@@ -189,6 +189,7 @@ function AsideNavigation(props: AsideNavigationProps) {
                 onLogoIconClick={() => history.push('/')}
                 menuItems={menuItems}
                 settings={<UserSettings />}
+                initIsCompact
                 className={b()}
                 renderContent={() => props.children}
                 renderFooter={({isCompact, asideRef}) => (
