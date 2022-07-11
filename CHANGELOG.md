@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.3...v1.8.4) (2022-07-11)
+
+
+### Bug Fixes
+
+* **Nodes:** add /internal for nodes external link ([a649dd2](https://github.com/ydb-platform/ydb-embedded-ui/commit/a649dd209bae4abd6916f23d0894df893602aaf7))
+
 ## [1.8.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.2...v1.8.3) (2022-07-08)
 
 
