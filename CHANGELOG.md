@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.5](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.4...v1.8.5) (2022-07-11)
+
+
+### Bug Fixes
+
+* **AsideNavigation:** aside header is compact by default ([aa3ad03](https://github.com/ydb-platform/ydb-embedded-ui/commit/aa3ad033fc6b62e6f2ee595e266343e67e764ec6))
+
 ## [1.8.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.3...v1.8.4) (2022-07-11)
 
 
