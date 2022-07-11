@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
+import {configure as configureUiKit} from '@yandex-cloud/uikit';
 import {i18n as YDBComponentsI18N} from 'ydb-ui-components';
 import {i18n, Lang} from '../../utils/i18n';
 
@@ -27,6 +28,9 @@ class App extends React.Component {
         super(props);
         i18n.setLang(Lang.En);
         YDBComponentsI18N.setLang(Lang.En);
+        configureUiKit({
+            lang: Lang.En,
+        });
     }
 
     componentDidMount() {
