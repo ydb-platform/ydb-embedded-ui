@@ -115,7 +115,9 @@ class Storage extends React.Component {
                 filter: FILTER_OPTIONS[visibleEntities],
                 type: storageType,
             });
+        };
 
+        const restartAutorefresh = () => {
             this.autofetcher.stop();
             this.autofetcher.start();
             this.autofetcher.fetch(() =>
@@ -131,14 +133,15 @@ class Storage extends React.Component {
         }
         if (database && autorefresh && !prevProps.autorefresh) {
             startFetch();
+            restartAutorefresh();
         }
 
-        if (
-            (storageType !== prevProps.storageType ||
-                visibleEntities !== prevProps.visibleEntities) &&
-            (!database || (database && autorefresh))
-        ) {
+        if (storageType !== prevProps.storageType || visibleEntities !== prevProps.visibleEntities) {
             startFetch();
+
+            if (!database || (database && autorefresh)) {
+                restartAutorefresh();
+            }
         }
     }
 
