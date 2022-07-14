@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.6](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.5...v1.8.6) (2022-07-14)
+
+
+### Bug Fixes
+
+* **Tenant:** fix switching between groups and nodes on storage tab ([6923885](https://github.com/ydb-platform/ydb-embedded-ui/commit/6923885336fa21ac985879e41685137adbf8159a))
+
 ## [1.8.5](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.4...v1.8.5) (2022-07-11)
 
 
