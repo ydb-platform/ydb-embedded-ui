@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.7](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.6...v1.8.7) (2022-07-18)
+
+
+### Bug Fixes
+
+* **Preview:** sort numbers as numbers, not string ([6c42a62](https://github.com/ydb-platform/ydb-embedded-ui/commit/6c42a62d077fcb9419ceb680906d4cef78a0134f))
+
 ## [1.8.6](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.5...v1.8.6) (2022-07-14)
 
 
