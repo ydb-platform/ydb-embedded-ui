@@ -27,8 +27,8 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         i18n.setLang(Lang.En);
-        configureYdbUiComponents({lang: Lang.En});
         configureUiKit({lang: Lang.En});
+        configureYdbUiComponents({lang: Lang.En});
     }
 
     componentDidMount() {
