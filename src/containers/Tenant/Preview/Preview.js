@@ -12,6 +12,7 @@ import Fullscreen from '../../../components/Fullscreen/Fullscreen';
 import {sendQuery, setQueryOptions} from '../../../store/reducers/preview';
 import {showTooltip, hideTooltip} from '../../../store/reducers/tooltip';
 import {prepareQueryError, prepareQueryResponse} from '../../../utils/index';
+import {isNumeric} from '../../../utils/utils';
 
 import {isTableType} from '../utils/schema';
 import {AutoFetcher} from '../../../utils/autofetcher';
@@ -127,6 +128,8 @@ class Preview extends React.Component {
         if (data && data.length > 0) {
             columns = Object.keys(data[0]).map((key) => ({
                 name: key,
+                align: isNumeric(data[0][key]) ? DataTable.RIGHT : DataTable.LEFT,
+                sortAccessor: (row) => isNumeric(row[key]) ? Number(row[key]) : row[key],
                 render: ({value}) => {
                     return (
                         <span

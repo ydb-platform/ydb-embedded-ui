@@ -82,3 +82,10 @@ export function pad9(val) {
     }
     return result;
 }
+
+export function isNumeric(value) {
+    // need both isNaN and isNaN(parseFloat):
+    // - isNaN treats true/false/''/etc. as numbers, parseFloat fixes this
+    // - parseFloat treats '123qwe' as number, isNaN fixes this
+    return !isNaN(value) && !isNaN(parseFloat(value));
+};
