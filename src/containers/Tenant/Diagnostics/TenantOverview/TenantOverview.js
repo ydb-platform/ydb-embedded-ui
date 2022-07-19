@@ -139,17 +139,17 @@ class TenantOverview extends React.Component {
                             this.props.tenant.Name,
                             this.props.tenant.Type,
                         )}
-                    <div className={b('system-tablets')}>
-                        {SystemTablets &&
-                            SystemTablets.map((tablet, tabletIndex) => (
-                                <Tablet
-                                    onMouseEnter={showTooltip}
-                                    onMouseLeave={hideTooltip}
-                                    key={tabletIndex}
-                                    tablet={tablet}
-                                />
-                            ))}
-                    </div>
+                </div>
+                <div className={b('system-tablets')}>
+                    {SystemTablets &&
+                        SystemTablets.map((tablet, tabletIndex) => (
+                            <Tablet
+                                onMouseEnter={showTooltip}
+                                onMouseLeave={hideTooltip}
+                                key={tabletIndex}
+                                tablet={tablet}
+                            />
+                        ))}
                 </div>
                 <div className={b('common-info')}>
                     {PoolStats ? (
