@@ -11,7 +11,7 @@ const propTypes = {
     className: PropTypes.string,
     toolTipVisible: PropTypes.bool,
     currentHoveredRef: PropTypes.object,
-    data: PropTypes.object,
+    data: PropTypes.any,
     template: PropTypes.func,
     hideTooltip: PropTypes.func,
 };
