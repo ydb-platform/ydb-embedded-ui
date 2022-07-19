@@ -93,7 +93,7 @@ function TabletsOverall({tablets}: TabletsOverallProps) {
         <div className={b('row', {overall: true})}>
             <span className={b('label', {overall: true})}>Overall:</span>
             <div
-                onMouseLeave={dispatch(hideTooltip)}
+                onMouseLeave={() => dispatch(hideTooltip())}
                 onMouseEnter={(e) => dispatch(showTooltip(e.target, tooltipData, 'tabletsOverall'))}
             >
                 <Progress value={memoryProgress} stack={stack} />
