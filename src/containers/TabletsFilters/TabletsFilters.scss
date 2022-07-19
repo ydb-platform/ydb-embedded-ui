@@ -18,16 +18,10 @@
     }
 
     &__items {
-        display: flex;
         overflow: auto;
         flex: 1 1 auto;
-        flex-wrap: wrap;
 
         padding: 5px 20px;
-    }
-
-    &__items-wrapper {
-        overflow: auto;
     }
 
     &__filters {
