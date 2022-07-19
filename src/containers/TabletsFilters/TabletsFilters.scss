@@ -3,7 +3,6 @@
 .tablets-filters {
     overflow: auto;
 
-    max-height: 400px;
     @include flex-container();
 
     &__node {
