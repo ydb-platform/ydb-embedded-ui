@@ -150,7 +150,7 @@ class Tablets extends React.Component {
         const {stateFilter, typeFilter, className} = this.props;
 
         return (
-            <div className={(b(), className)}>
+            <div className={b(null, className)}>
                 <div className={b('header')}>
                     <Select
                         className={b('filter-control')}
