@@ -14,9 +14,11 @@ import {Vdisk} from './Vdisk';
 
 import {bytesToGB, pad9} from '../../../utils/utils';
 import {formatStorageValuesToGb} from '../../../utils';
+import {getPDiskType} from '../../../utils/pdisk';
 
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {valueIsDefined} from './NodeStructure';
+import {PDiskTitleBadge} from './PDiskTitleBadge';
 
 const b = cn('kv-node-structure');
 
@@ -230,6 +232,7 @@ export function PDisk(props: PDiskProps) {
         }
         if (valueIsDefined(Category)) {
             pdiskInfo.push({label: 'Category', value: Category});
+            pdiskInfo.push({label: 'Type', value: getPDiskType(data)});
         }
         pdiskInfo.push({
             label: 'Allocated Size',
@@ -286,8 +289,17 @@ export function PDisk(props: PDiskProps) {
         <div className={b('pdisk')} id={props.id}>
             <div className={b('pdisk-header')}>
                 <div className={b('pdisk-title-wrapper')}>
-                    <span>{data.Path}</span>
-                    <EntityStatus status={data.Device} name={`${data.NodeId}-${data.PDiskId}`} />
+                    <EntityStatus status={data.Device} />
+                    <PDiskTitleBadge label="PDiskID" value={data.PDiskId} />
+                    <PDiskTitleBadge value={getPDiskType(data)} />
+                    <ProgressViewer
+                        value={data.TotalSize - data.AvailableSize}
+                        capacity={data.TotalSize}
+                        formatValues={formatStorageValuesToGb}
+                        colorizeProgress={true}
+                        className={b('size')}
+                    />
+                    <PDiskTitleBadge label="VDisks" value={data.vDisks.length} />
                 </div>
                 <Button onClick={unfolded ? onClosePDiskDetails : onOpenPDiskDetails} view="flat-secondary">
                     <ArrowToggle direction={unfolded ? 'top' : 'bottom'} />

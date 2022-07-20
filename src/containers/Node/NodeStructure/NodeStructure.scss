@@ -44,9 +44,24 @@
     &__pdisk-title-wrapper {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 16px;
 
         font-weight: 600;
+
+        .entity-status__status-icon {
+            margin-right: 0;
+        }
+    }
+
+    &__pdisk-title-item {
+        display: flex;
+        gap: 4px;
+
+        &-label {
+            font-weight: 400;
+
+            color: var(--yc-color-text-secondary);
+        }
     }
 
     &__pdisk-details {
