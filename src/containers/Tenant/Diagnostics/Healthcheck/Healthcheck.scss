@@ -1,3 +1,4 @@
+@use '../DetailedOverview/DetailedOverview.scss' as detailedOverview;
 @import '../../../../styles/mixins.scss';
 
 .healthcheck {
@@ -37,14 +38,17 @@
 
     &__status-wrapper {
         display: flex;
-        align-items: baseline;
 
-        margin-bottom: 15px;
+        margin-bottom: detailedOverview.$section-title-margin;
         gap: 8px;
     }
 
     &__preview-title {
         font-weight: 600;
+        line-height: detailedOverview.$section-title-line-height;
+    }
+
+    &__preview-content {
         line-height: 24px;
     }
 

@@ -1,3 +1,5 @@
+@use '../DetailedOverview/DetailedOverview.scss' as detailedOverview;
+
 .tenant-overview {
     padding-bottom: 20px;
     &__loader {
@@ -30,13 +32,15 @@
         align-items: center;
 
         margin-bottom: 10px;
+
+        line-height: 24px;
     }
 
     &__top-label {
-        margin-bottom: 20px;
+        margin-bottom: detailedOverview.$section-title-margin;
 
         font-weight: 600;
-        line-height: 24px;
+        line-height: detailedOverview.$section-title-line-height;
         gap: 10px;
     }
 
@@ -54,7 +58,7 @@
         flex-wrap: wrap;
         align-items: center;
 
-        margin-bottom: 20px;
+        margin-bottom: 35px;
     }
 
     &__collapse-title {
@@ -88,7 +92,7 @@
         margin-bottom: 20px;
 
         font-size: var(--yc-text-body-2-font-size);
-        font-weight: 500;
+        font-weight: 600;
         line-height: var(--yc-text-body-2-line-height);
     }
 }
