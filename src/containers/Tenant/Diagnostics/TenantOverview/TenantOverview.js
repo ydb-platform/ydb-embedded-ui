@@ -25,9 +25,11 @@ const renderName = (tenant) => {
     if (tenant) {
         const {Name} = tenant;
         return (
-            <div className={b('tenant-name')}>
+            <div className={b('tenant-name-wrapper')}>
                 <EntityStatus status={tenant.State} />
-                <span>{Name}</span>
+                <span className={b('tenant-name-trim')}>
+                    <span className={b('tenant-name')}>{Name}</span>
+                </span>
             </div>
         );
     }
