@@ -1,9 +1,10 @@
 .kv-detailed-overview {
     display: flex;
-    gap: 10px;
+    gap: 20px;
     &__section {
         display: flex;
-        flex: 0 0 50%;
+        overflow-x: hidden;
+        flex: 0 0 calc(50% - 10px);
         flex-direction: column;
     }
 

@@ -4,13 +4,25 @@
         display: flex;
         justify-content: center;
     }
-    &__tenant-name {
+    &__tenant-name-wrapper {
         display: flex;
+        overflow: hidden;
         align-items: center;
 
         & .yc-link {
             display: flex;
         }
+    }
+    &__tenant-name-trim {
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        direction: rtl;
+    }
+
+    &__tenant-name {
+        unicode-bidi: plaintext;
     }
 
     &__top {
