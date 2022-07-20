@@ -97,10 +97,14 @@ class Healthcheck extends React.Component {
                     </div>
                     {this.renderUpdateButton()}
                 </div>
-                <div>
+                <div className={b('preview-content')}>
                     {text}
                     {!statusOk && (
-                        <Button view="flat-info" onClick={showMoreHandler}>
+                        <Button
+                            view="flat-info"
+                            onClick={showMoreHandler}
+                            size="s"
+                        >
                             Show details
                         </Button>
                     )}
