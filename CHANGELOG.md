@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.8.8](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.7...v1.8.8) (2022-07-21)
+
+
+### Bug Fixes
+
+* **TabletsFilters:** display tablets grid full-height ([0dde809](https://github.com/ydb-platform/ydb-embedded-ui/commit/0dde8097fe026248aade97f034fa35c56b28e903))
+* **TabletsOverall:** properly hide tooltip on mouseleave ([df36eba](https://github.com/ydb-platform/ydb-embedded-ui/commit/df36ebaf44d8966bc419f3720d51390dfd767a87))
+* **Tablets:** properly display tablets in grid ([f3b64fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/f3b64fae3a1e1a46ababd2d2f04ddff488698676))
+* **Tenant:** align info in overview ([acb39fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/acb39fab70b7b4e0e78124fd887b2f1b76815221))
+* **Tenant:** display tenant name in single line ([301e391](https://github.com/ydb-platform/ydb-embedded-ui/commit/301e3911330024f80ebfda6d1a16823b64d94b36))
+* **Tenant:** move tablets under tenant name ([b7e4b8f](https://github.com/ydb-platform/ydb-embedded-ui/commit/b7e4b8f7027f1481a7c1baff77bf8ad5e2ed467c))
+
 ## [1.8.7](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.6...v1.8.7) (2022-07-18)
 
 
