@@ -2,7 +2,6 @@ import React from 'react';
 import cn from 'bem-cn-lite';
 import PropTypes from 'prop-types';
 
-import {BasicNodeViewer} from '../BasicNodeViewer';
 import InfoViewer from '../InfoViewer/InfoViewer';
 import ProgressViewer from '../ProgressViewer/ProgressViewer';
 import PoolUsage from '../PoolUsage/PoolUsage';
@@ -20,7 +19,6 @@ class FullNodeViewer extends React.Component {
         node: PropTypes.object.isRequired,
         backend: PropTypes.string,
         singleClusterMode: PropTypes.bool,
-        additionalNodesInfo: PropTypes.object,
     };
 
     static defaultProps = {
@@ -28,7 +26,7 @@ class FullNodeViewer extends React.Component {
     };
 
     render() {
-        const {node, className, additionalNodesInfo} = this.props;
+        const {node, className} = this.props;
 
         const commonInfo = [
             {label: 'Version', value: node.Version},
@@ -45,31 +43,27 @@ class FullNodeViewer extends React.Component {
         return (
             <div className={`${b()} ${className}`}>
                 {node ? (
-                    <div>
-                        <BasicNodeViewer node={node} additionalNodesInfo={additionalNodesInfo} />
-
-                        <div className={b('common-info')}>
-                            <div>
-                                <div className={b('section-title')}>Pools</div>
-                                <div className={b('section', {pools: true})}>
-                                    {node.PoolStats.map((pool, poolIndex) => (
-                                        <PoolUsage key={poolIndex} data={pool} />
-                                    ))}
-                                </div>
+                    <div className={b('common-info')}>
+                        <div>
+                            <div className={b('section-title')}>Pools</div>
+                            <div className={b('section', {pools: true})}>
+                                {node.PoolStats.map((pool, poolIndex) => (
+                                    <PoolUsage key={poolIndex} data={pool} />
+                                ))}
                             </div>
-
-                            <InfoViewer
-                                title="Common info"
-                                className={b('section')}
-                                info={commonInfo}
-                            />
-
-                            <InfoViewer
-                                title="Load average"
-                                className={b('section', {average: true})}
-                                info={averageInfo}
-                            />
                         </div>
+
+                        <InfoViewer
+                            title="Common info"
+                            className={b('section')}
+                            info={commonInfo}
+                        />
+
+                        <InfoViewer
+                            title="Load average"
+                            className={b('section', {average: true})}
+                            info={averageInfo}
+                        />
                     </div>
                 ) : (
                     <div className="error">no data</div>

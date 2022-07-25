@@ -13,6 +13,7 @@ import Storage from '../Storage/Storage';
 import NodeOverview from './NodeOverview/NodeOverview';
 import NodeStructure from './NodeStructure/NodeStructure';
 import Loader from '../../components/Loader/Loader';
+import {BasicNodeViewer} from '../../components/BasicNodeViewer';
 
 import {getNodeInfo, resetNode} from '../../store/reducers/node';
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
@@ -133,7 +134,6 @@ function Node(props: NodeProps) {
             case OVERVIEW: {
                 return (
                     <NodeOverview
-                        additionalNodesInfo={additionalNodesInfo}
                         node={node}
                         className={b('overview-wrapper')}
                     />
@@ -162,6 +162,12 @@ function Node(props: NodeProps) {
         if (node) {
             return (
                 <div className={b(null, props.className)}>
+                    <BasicNodeViewer
+                        node={node}
+                        additionalNodesInfo={props.additionalNodesInfo}
+                        className={b('header')}
+                    />
+
                     {renderTabs()}
 
                     <div className={b('content')}>{renderTabContent()}</div>

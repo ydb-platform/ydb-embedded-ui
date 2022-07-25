@@ -4,6 +4,10 @@
     overflow: auto;
     @include flex-container();
 
+    &__header {
+        margin: 16px 20px;
+    }
+
     &__content {
         position: relative;
 
@@ -19,7 +23,7 @@
     }
 
     &__tabs {
-        padding: 16px 20px 0;
+        padding: 0 20px;
     }
 
     &__tab {
