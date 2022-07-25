@@ -12,6 +12,8 @@ class EntityStatus extends React.Component {
     static propTypes = {
         status: PropTypes.string,
         name: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        onNameMouseEnter: PropTypes.func,
+        onNameMouseLeave: PropTypes.func,
         path: PropTypes.string,
         size: PropTypes.string,
         label: PropTypes.string,
@@ -49,19 +51,29 @@ class EntityStatus extends React.Component {
         );
     }
     renderLink() {
-        const {externalLink, name, path} = this.props;
+        const {externalLink, name, path, onNameMouseEnter, onNameMouseLeave} = this.props;
 
         if (externalLink) {
             return <ExternalLink href={path}>{name}</ExternalLink>;
         }
 
         return path ? (
-            <Link title={name} to={path}>
+            <Link
+                title={name}
+                to={path}
+                onMouseEnter={onNameMouseEnter}
+                onMouseLeave={onNameMouseLeave}
+            >
                 {name}
             </Link>
         ) : (
             name && (
-                <span className={b('name')} title={name}>
+                <span
+                    className={b('name')}
+                    title={name}
+                    onMouseEnter={onNameMouseEnter}
+                    onMouseLeave={onNameMouseLeave}
+                >
                     {name}
                 </span>
             )
