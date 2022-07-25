@@ -5,16 +5,14 @@ import {backend} from '../../../store';
 
 interface NodeOverviewProps {
     node: any;
-    additionalNodesInfo: any;
     className?: string;
 }
 
-function NodeOverview({node, additionalNodesInfo, className}: NodeOverviewProps) {
+function NodeOverview({node, className}: NodeOverviewProps) {
     return (
         <FullNodeViewer
             node={node}
             backend={backend}
-            additionalNodesInfo={additionalNodesInfo}
             className={className}
         />
     );
