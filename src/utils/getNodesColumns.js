@@ -33,6 +33,8 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
                     <div className={b('host-name-wrapper')}>
                         <EntityStatus
                             name={row.Host}
+                            onNameMouseEnter={(e) => showTooltip(e.target, row, 'nodeEndpoints')}
+                            onNameMouseLeave={hideTooltip}
                             status={row.Overall}
                             path={getDefaultNodePath(row.NodeId)}
                             hasClipboardButton

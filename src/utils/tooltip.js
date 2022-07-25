@@ -109,6 +109,32 @@ const NodeTooltip = (props) => {
     );
 };
 
+const NodeEndpointsTooltip = (props) => {
+    const {data} = props;
+    return (
+        data && (
+            <div className={nodeB()}>
+                <table>
+                    <tbody>
+                        {data.Rack && (
+                            <tr>
+                                <td className={nodeB('label')}>Rack</td>
+                                <td className={nodeB('value')}>{data.Rack}</td>
+                            </tr>
+                        )}
+                        {data.Endpoints && data.Endpoints.length && data.Endpoints.map(({Name, Address}) => (
+                            <tr key={Name}>
+                                <td className={nodeB('label')}>{Name}</td>
+                                <td className={nodeB('value')}>{Address}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        )
+    );
+};
+
 const tabletsOverallB = cn('tabletsOverall-tooltip');
 
 const TabletsOverallTooltip = (props) => {
@@ -175,6 +201,7 @@ export const tooltipTemplates = {
     tablet: (data, additionalData) => <TabletTooltip data={data} additionalData={additionalData} />,
     // eslint-disable-next-line react/display-name
     node: (data) => <NodeTooltip data={data} />,
+    nodeEndpoints: (data) => <NodeEndpointsTooltip data={data} />,
     // eslint-disable-next-line react/display-name
     tabletsOverall: (data) => <TabletsOverallTooltip data={data} />,
     // eslint-disable-next-line react/display-name
