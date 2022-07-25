@@ -2,12 +2,10 @@ import React from 'react';
 import cn from 'bem-cn-lite';
 import PropTypes from 'prop-types';
 
+import {BasicNodeViewer} from '../BasicNodeViewer';
 import InfoViewer from '../InfoViewer/InfoViewer';
-import EntityStatus from '../EntityStatus/EntityStatus';
 import ProgressViewer from '../ProgressViewer/ProgressViewer';
 import PoolUsage from '../PoolUsage/PoolUsage';
-import Tags from '../Tags/Tags';
-import Icon from '../Icon/Icon';
 
 import {LOAD_AVERAGE_TIME_INTERVALS} from '../../utils/constants';
 import {calcUptime} from '../../utils';
@@ -30,10 +28,7 @@ class FullNodeViewer extends React.Component {
     };
 
     render() {
-        const {node, className, additionalNodesInfo={}} = this.props;
-        const nodeHref = additionalNodesInfo.getNodeRef
-            ? additionalNodesInfo.getNodeRef(node) + 'internal'
-            : undefined;
+        const {node, className, additionalNodesInfo} = this.props;
 
         const commonInfo = [
             {label: 'Version', value: node.Version},
@@ -51,28 +46,7 @@ class FullNodeViewer extends React.Component {
             <div className={`${b()} ${className}`}>
                 {node ? (
                     <div>
-                        <div className={b('row')}>
-                            <div className={b('title')}>Node</div>
-                            <EntityStatus status={node.SystemState} name={node.Host} />
-                            {nodeHref && (
-                                <a
-                                    rel="noopener noreferrer"
-                                    className={b('link', {external: true})}
-                                    href={nodeHref}
-                                    target="_blank"
-                                >
-                                    <Icon name="external" />
-                                </a>
-                            )}
-
-                            <div className={b('row', {id: true})}>
-                                <label className={b('label', {id: true})}>NodeID</label>
-                                <label>{node.NodeId}</label>
-                            </div>
-
-                            <Tags tags={[node.DataCenter]} />
-                            <Tags tags={node.Roles} tagsType="blue" />
-                        </div>
+                        <BasicNodeViewer node={node} additionalNodesInfo={additionalNodesInfo} />
 
                         <div className={b('common-info')}>
                             <div>

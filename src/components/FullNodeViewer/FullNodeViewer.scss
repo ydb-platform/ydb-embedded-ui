@@ -4,26 +4,6 @@
     font-size: var(--yc-text-body-2-font-size);
     line-height: var(--yc-text-body-2-line-height);
 
-    &__title {
-        margin: 0 20px 0 0;
-
-        font-size: var(--yc-text-body-2-font-size);
-        font-weight: 600;
-        line-height: var(--yc-text-body-2-line-height);
-        text-transform: uppercase;
-    }
-
-    &__row {
-        display: flex;
-        align-items: center;
-
-        margin: 15px 0;
-
-        &_id {
-            margin: 0 15px 0 24px;
-        }
-    }
-
     &__common-info {
         display: flex;
         flex-direction: column;
@@ -46,36 +26,11 @@
         min-width: 60px;
     }
 
-    &__label {
-        min-width: 100px;
-        margin-right: 25px;
-
-        font-size: var(--yc-text-body-2-font-size);
-        line-height: 18px;
-        white-space: nowrap;
-
-        color: var(--yc-color-text-hint);
-
-        .yc-root_theme_dark & {
-            color: var(--yc-color-text-hint);
-        }
-
-        &_id {
-            min-width: auto;
-            margin-right: 10px;
-        }
-    }
-
     &__section-title {
         margin: 15px 0 10px;
 
         font-size: var(--yc-text-body-2-font-size);
         font-weight: 600;
         line-height: var(--yc-text-body-2-line-height);
-    }
-
-    &__link {
-        margin-left: 5px;
-        @extend .link;
     }
 }

@@ -1,0 +1,43 @@
+@import '../../styles/mixins.scss';
+
+.basic-node-viewer {
+    font-size: var(--yc-text-body-2-font-size);
+    line-height: var(--yc-text-body-2-line-height);
+
+    display: flex;
+    align-items: center;
+
+    margin: 15px 0;
+
+    &__title {
+        margin: 0 20px 0 0;
+
+        font-size: var(--yc-text-body-2-font-size);
+        font-weight: 600;
+        line-height: var(--yc-text-body-2-line-height);
+        text-transform: uppercase;
+    }
+
+    &__id {
+        margin: 0 15px 0 24px;
+    }
+
+    &__label {
+        margin-right: 10px;
+
+        font-size: var(--yc-text-body-2-font-size);
+        line-height: 18px;
+        white-space: nowrap;
+
+        color: var(--yc-color-text-hint);
+
+        .yc-root_theme_dark & {
+            color: var(--yc-color-text-hint);
+        }
+    }
+
+    &__link {
+        margin-left: 5px;
+        @extend .link;
+    }
+}
