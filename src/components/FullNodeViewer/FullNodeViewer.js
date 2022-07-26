@@ -28,6 +28,11 @@ class FullNodeViewer extends React.Component {
     render() {
         const {node, className} = this.props;
 
+        const endpointsInfo = node.Endpoints?.map(({Name, Address}) => ({
+            label: Name,
+            value: Address,
+        }));
+
         const commonInfo = [
             {label: 'Version', value: node.Version},
             {label: 'Uptime', value: calcUptime(node.StartTime)},
@@ -52,6 +57,14 @@ class FullNodeViewer extends React.Component {
                                 ))}
                             </div>
                         </div>
+
+                        {endpointsInfo && endpointsInfo.length && (
+                            <InfoViewer
+                                title="Endpoints"
+                                className={b('section')}
+                                info={endpointsInfo}
+                            />
+                        )}
 
                         <InfoViewer
                             title="Common info"
