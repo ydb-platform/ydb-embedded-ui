@@ -61,6 +61,7 @@ export function SchemaTree(props: SchemaTreeProps) {
             activePath={currentPath}
             onActivePathUpdate={handleActivePathUpdate}
             cache={false}
+            virtualize
         />
     );
 }
