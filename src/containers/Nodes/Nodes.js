@@ -63,6 +63,7 @@ class Nodes extends React.Component {
     }
 
     componentWillUnmount() {
+        this.props.hideTooltip();
         clearInterval(this.reloadDescriptor);
     }
 
