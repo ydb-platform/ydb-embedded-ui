@@ -76,7 +76,7 @@ export class ProgressViewer extends React.Component {
 
         if (!isNaN(fillWidth)) {
             return (
-                <div className={b({size})}>
+                <div className={b({size}, className)}>
                     <div className={b('line', {bg})} style={lineStyle}></div>
                     <span className={b('text', {text})}>
                         {`${valueText} ${divider} ${capacityText}`}
