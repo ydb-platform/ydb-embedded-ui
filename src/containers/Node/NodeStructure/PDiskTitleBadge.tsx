@@ -6,11 +6,12 @@ const b = cn('kv-node-structure');
 interface PDiskTitleBadgeProps {
     label?: string;
     value: ReactNode;
+    className?: string;
 }
 
-export function PDiskTitleBadge({label, value}: PDiskTitleBadgeProps) {
+export function PDiskTitleBadge({label, value, className}: PDiskTitleBadgeProps) {
     return (
-        <span className={b('pdisk-title-item')}>
+        <span className={b('pdisk-title-item', className)}>
             {label && (
                 <span className={b('pdisk-title-item-label')}>
                     {label}:
