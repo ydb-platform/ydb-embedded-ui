@@ -6,9 +6,10 @@ import {Loader} from '@yandex-cloud/uikit';
 
 //@ts-ignore
 import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';
+import {IndexInfoViewer} from '../../../../components/IndexInfoViewer/IndexInfoViewer';
 
 import type {EPathType} from '../../../../types/api/schema';
-import {isColumnEntityType, isTableType} from '../../utils/schema';
+import {isColumnEntityType, isTableType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {AutoFetcher} from '../../../../utils/autofetcher';
 //@ts-ignore
 import {getSchema} from '../../../../store/reducers/schema';
@@ -112,11 +113,24 @@ function Overview(props: OverviewProps) {
         );
     };
 
+    const renderContent = () => {
+        switch (mapPathTypeToNavigationTreeType(props.type)) {
+            case 'index':
+                return (
+                    <IndexInfoViewer data={schemaData} />
+                );
+            default:
+                return (
+                    <SchemaInfoViewer fullPath={currentItem.Path} data={schemaData} />
+                );
+        }
+    }
+
     return loading && !wasLoaded ? (
         renderLoader()
     ) : (
         <div className={props.className}>
-            <SchemaInfoViewer fullPath={currentItem.Path} data={schemaData} />
+            {renderContent()}
         </div>
     );
 }

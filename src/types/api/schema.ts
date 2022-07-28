@@ -54,6 +54,8 @@ interface TPathDescription {
 
     ColumnStoreDescription?: unknown;
     ColumnTableDescription?: unknown;
+
+    TableIndex?: TIndexDescription;
 }
 
 interface TDirEntry {
@@ -78,6 +80,27 @@ interface TDirEntry {
     PathVersion?: string;
     PathSubType?: EPathSubType;
     Version?: TPathVersion;
+}
+
+export interface TIndexDescription {
+    Name?: string;
+    /** uint64 */
+    LocalPathId?: string;
+
+    Type?: EIndexType;
+    State?: EIndexState;
+
+    KeyColumnNames?: string[];
+
+    /** uint64 */
+    SchemaVersion?: string;
+
+    /** uint64 */
+    PathOwnerId?: string;
+
+    DataColumnNames?: string[];
+    /** uint64 */
+    DataSize?: string;
 }
 
 // incomplete
@@ -110,6 +133,19 @@ enum EPathState {
     EPathStateMigrated = 'EPathStateMigrated',
     EPathStateRestore = 'EPathStateRestore',
     EPathStateMoving = 'EPathStateMoving',
+}
+
+enum EIndexType {
+    EIndexTypeInvalid = 'EIndexTypeInvalid',
+    EIndexTypeGlobal = 'EIndexTypeGlobal',
+    EIndexTypeGlobalAsync = 'EIndexTypeGlobalAsync',
+}
+
+enum EIndexState {
+    EIndexStateInvalid = 'EIndexStateInvalid',
+    EIndexStateReady = 'EIndexStateReady',
+    EIndexStateNotReady = 'EIndexStateNotReady',
+    EIndexStateWriteOnly = 'EIndexStateWriteOnly',
 }
 
 // incomplete
