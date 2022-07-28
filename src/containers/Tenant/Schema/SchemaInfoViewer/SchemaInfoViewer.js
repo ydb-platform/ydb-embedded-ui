@@ -39,18 +39,15 @@ class SchemaInfoViewer extends React.Component {
                 value: this.formatTabletMetricsValue(key, TabletMetrics[key].toString()),
             }));
 
-            let generalInfo = [
+            const generalInfo = [
                 ...tabletMetricsInfo,
                 ...tableStatsInfo,
             ];
-            generalInfo = Object.assign(generalInfo);
-
-            const infoLength = Object.keys(generalInfo).length;
-
+ 
             return (
                 <div className={b()}>
                     <div className={b('item')}>
-                        {infoLength ? (
+                        {generalInfo.length ? (
                             <InfoViewer info={generalInfo}></InfoViewer>
                         ) : (
                             <div>Empty</div>
