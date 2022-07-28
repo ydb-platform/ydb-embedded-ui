@@ -28,8 +28,14 @@ class SchemaInfoViewer extends React.Component {
         if (data) {
             const {PathDescription = {}} = data;
             const {TableStats = {}, TabletMetrics = {}} = PathDescription;
+            const {PartCount, ...restTableStats} = TableStats;
 
-            const tableStatsInfo = Object.keys(TableStats).map((key) => ({
+            const priorityInfo = [{
+                label: 'PartCount',
+                value: PartCount,
+            }].filter(({value}) => value !== undefined);
+
+            const tableStatsInfo = Object.keys(restTableStats).map((key) => ({
                 label: key,
                 value: TableStats[key].toString(),
             }));
@@ -40,6 +46,7 @@ class SchemaInfoViewer extends React.Component {
             }));
 
             const generalInfo = [
+                ...priorityInfo,
                 ...tabletMetricsInfo,
                 ...tableStatsInfo,
             ];
