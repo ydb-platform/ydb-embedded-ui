@@ -28,21 +28,21 @@ class SchemaInfoViewer extends React.Component {
         if (data) {
             const {PathDescription = {}} = data;
             const {TableStats = {}, TabletMetrics = {}} = PathDescription;
-            const tableStatsInfo =
-                TableStats &&
-                Object.keys(TableStats).map((key) => ({
-                    label: key,
-                    value: TableStats[key].toString(),
-                }));
 
-            const tabletMetricsInfo =
-                TableStats &&
-                Object.keys(TabletMetrics).map((key) => ({
-                    label: key,
-                    value: this.formatTabletMetricsValue(key, TabletMetrics[key].toString()),
-                }));
+            const tableStatsInfo = Object.keys(TableStats).map((key) => ({
+                label: key,
+                value: TableStats[key].toString(),
+            }));
 
-            let generalInfo = Object.assign(tableStatsInfo, tabletMetricsInfo);
+            const tabletMetricsInfo = Object.keys(TabletMetrics).map((key) => ({
+                label: key,
+                value: this.formatTabletMetricsValue(key, TabletMetrics[key].toString()),
+            }));
+
+            let generalInfo = [
+                ...tabletMetricsInfo,
+                ...tableStatsInfo,
+            ];
             generalInfo = Object.assign(generalInfo);
 
             const infoLength = Object.keys(generalInfo).length;
