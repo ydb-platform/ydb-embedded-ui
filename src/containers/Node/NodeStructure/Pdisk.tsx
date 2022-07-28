@@ -290,16 +290,26 @@ export function PDisk(props: PDiskProps) {
             <div className={b('pdisk-header')}>
                 <div className={b('pdisk-title-wrapper')}>
                     <EntityStatus status={data.Device} />
-                    <PDiskTitleBadge label="PDiskID" value={data.PDiskId} />
-                    <PDiskTitleBadge value={getPDiskType(data)} />
+                    <PDiskTitleBadge
+                        label="PDiskID"
+                        value={data.PDiskId}
+                        className={b('pdisk-title-id')}
+                    />
+                    <PDiskTitleBadge
+                        value={getPDiskType(data)}
+                        className={b('pdisk-title-type')}
+                    />
                     <ProgressViewer
                         value={data.TotalSize - data.AvailableSize}
                         capacity={data.TotalSize}
                         formatValues={formatStorageValuesToGb}
                         colorizeProgress={true}
-                        className={b('size')}
+                        className={b('pdisk-title-size')}
                     />
-                    <PDiskTitleBadge label="VDisks" value={data.vDisks.length} />
+                    <PDiskTitleBadge
+                        label="VDisks"
+                        value={data.vDisks.length}
+                    />
                 </div>
                 <Button onClick={unfolded ? onClosePDiskDetails : onOpenPDiskDetails} view="flat-secondary">
                     <ArrowToggle direction={unfolded ? 'top' : 'bottom'} />

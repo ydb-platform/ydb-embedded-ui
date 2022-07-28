@@ -64,6 +64,20 @@
         }
     }
 
+    &__pdisk-title-id {
+        min-width: 110px;
+    }
+
+    &__pdisk-title-type {
+        justify-content: flex-end;
+
+        min-width: 50px;
+    }
+
+    &__pdisk-title-size {
+        min-width: 150px;
+    }
+
     &__pdisk-details {
         margin-bottom: 20px;
     }
