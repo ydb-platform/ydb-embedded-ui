@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.8...v1.9.0) (2022-07-29)
+
+
+### Features
+
+* **Node:** display endpoints in overview ([89e9e47](https://github.com/ydb-platform/ydb-embedded-ui/commit/89e9e470499b6f458e8949211d97293c0b7d9b97))
+* **Node:** display node basic info above tabs ([aafb15b](https://github.com/ydb-platform/ydb-embedded-ui/commit/aafb15b399bf116026eff36f3c4ac817e2c40e18))
+* **Node:** more informative pdisks panels ([342712b](https://github.com/ydb-platform/ydb-embedded-ui/commit/342712bcaa793971e1ca354da57fb962639ef90c))
+* **Nodes:** show node endpoints in tooltip ([34be559](https://github.com/ydb-platform/ydb-embedded-ui/commit/34be55957e02f947ede30b43f22fde82d21df308))
+* **Tenant:** table index overview ([2aed714](https://github.com/ydb-platform/ydb-embedded-ui/commit/2aed71488cde1175e6569c236ab609bb126f9cf3))
+* **Tenant:** virtualized tree in schema ([815f558](https://github.com/ydb-platform/ydb-embedded-ui/commit/815f5588e5fed6fb86f69653c4937e975465372f))
+* utils for parsing bitfields in pdisk data ([da22b4a](https://github.com/ydb-platform/ydb-embedded-ui/commit/da22b4afde9efe4d9605cefb69ddd51aed989722))
+
+
+### Bug Fixes
+
+* **Node:** fix pdisk title items width ([ca5fec6](https://github.com/ydb-platform/ydb-embedded-ui/commit/ca5fec6388364b7d1d6362f1bda36431d9c29749))
+* **Nodes:** hide tooltip on unmount ([54e4fdc](https://github.com/ydb-platform/ydb-embedded-ui/commit/54e4fdc8045c555338e79d89a93faf58e888fa0e))
+* **ProgressViewer:** apply provided custom class name ([aa60e9d](https://github.com/ydb-platform/ydb-embedded-ui/commit/aa60e9d1b9c0752853f4323d3bcfd220bedd272d))
+* **Tenant:** display all table props in overview ([d70e311](https://github.com/ydb-platform/ydb-embedded-ui/commit/d70e311296f6a4d1781f6e72929c70e0db7c3226))
+* **Tenant:** display PartCount first in table overview ([8c09746](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c09746b026a23a36fe31be94057cc92535aceaa))
+
 ## [1.8.8](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.7...v1.8.8) (2022-07-21)
 
 
