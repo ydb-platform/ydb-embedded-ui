@@ -6,7 +6,7 @@ enum EFlag {
     Red = 'Red',
 }
 
-enum TPDiskState {
+export enum TPDiskState {
     Initial = 'Initial',
     InitialFormatRead = 'InitialFormatRead',
     InitialFormatReadError = 'InitialFormatReadError',
