@@ -38,9 +38,7 @@ const stateSeverity = {
     [TPDiskState.DeviceIoError]: 5,
 };
 
-interface PDiskProps extends TPDiskStateInfo {
-    Host?: string;
-}
+type PDiskProps = TPDiskStateInfo;
 
 const isSeverityKey = (key?: TPDiskState): key is keyof typeof stateSeverity =>
     key !== undefined && key in stateSeverity;
@@ -71,8 +69,7 @@ function Pdisk(props: PDiskProps) {
     };
     /* eslint-disable */
     const preparePdiskData = () => {
-        const {AvailableSize, TotalSize, State, PDiskId, NodeId, Host, Path, Realtime, Device} =
-            props;
+        const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Device} = props;
         const errorColors = [
             diskProgressColors[colorSeverity.Orange as keyof typeof diskProgressColors],
             diskProgressColors[colorSeverity.Red as keyof typeof diskProgressColors],
@@ -87,7 +84,6 @@ function Pdisk(props: PDiskProps) {
         pdiskData.push({property: 'Type', value: getPDiskType(props) || 'unknown'});
         NodeId && pdiskData.push({property: 'Node Id', value: NodeId});
 
-        Host && pdiskData.push({property: 'Host', value: Host});
         Path && pdiskData.push({property: 'Path', value: Path});
         pdiskData.push({
             property: 'Available',
