@@ -8,6 +8,7 @@ import {bytesToGB} from '../../../utils/utils';
 import routes, {createHref} from '../../../routes';
 //@ts-ignore
 import {getPDiskId} from '../../../utils';
+import {TPDiskStateInfo, TPDiskState} from '../../../types/api/storage';
 import DiskStateProgressBar, {
     diskProgressColors,
 } from '../DiskStateProgressBar/DiskStateProgressBar';
@@ -20,38 +21,31 @@ import './Pdisk.scss';
 const b = cn('pdisk-storage');
 
 const stateSeverity = {
-    Initial: 0,
-    Normal: 1,
-    InitialFormatRead: 3,
-    InitialSysLogRead: 3,
-    InitialCommonLogRead: 3,
-    InitialFormatReadError: 5,
-    InitialSysLogReadError: 5,
-    InitialSysLogParseError: 5,
-    InitialCommonLogReadError: 5,
-    InitialCommonLogParseError: 5,
-    CommonLoggerInitError: 5,
-    OpenFileError: 5,
-    ChunkQuotaError: 5,
-    DeviceIoError: 5,
+    [TPDiskState.Initial]: 0,
+    [TPDiskState.Normal]: 1,
+    [TPDiskState.InitialFormatRead]: 3,
+    [TPDiskState.InitialSysLogRead]: 3,
+    [TPDiskState.InitialCommonLogRead]: 3,
+    [TPDiskState.InitialFormatReadError]: 5,
+    [TPDiskState.InitialSysLogReadError]: 5,
+    [TPDiskState.InitialSysLogParseError]: 5,
+    [TPDiskState.InitialCommonLogReadError]: 5,
+    [TPDiskState.InitialCommonLogParseError]: 5,
+    [TPDiskState.CommonLoggerInitError]: 5,
+    [TPDiskState.OpenFileError]: 5,
+    [TPDiskState.ChunkQuotaError]: 5,
+    [TPDiskState.DeviceIoError]: 5,
 };
 
-type PDiskState = keyof typeof stateSeverity;
-
-interface PDiskProps {
-    NodeId: number;
+interface PDiskProps extends TPDiskStateInfo {
     Host?: string;
-    Path?: string;
-    Realtime?: string;
-    Device?: string;
-    AvailableSize?: string;
-    TotalSize?: string;
-    State?: PDiskState;
-    PDiskId: number;
 }
 
-const getStateSeverity = (pDiskState?: PDiskState) => {
-    return pDiskState ? stateSeverity[pDiskState] : NOT_AVAILABLE_SEVERITY;
+const isSeverityKey = (key?: TPDiskState): key is keyof typeof stateSeverity =>
+    key !== undefined && key in stateSeverity;
+
+const getStateSeverity = (pDiskState?: TPDiskState) => {
+    return isSeverityKey(pDiskState) ? stateSeverity[pDiskState] : NOT_AVAILABLE_SEVERITY;
 };
 
 function Pdisk(props: PDiskProps) {
@@ -151,7 +145,7 @@ function Pdisk(props: PDiskProps) {
                     href={createHref(
                         routes.node,
                         {id: props.NodeId, activeTab: STRUCTURE},
-                        {pdiskId: props.PDiskId},
+                        {pdiskId: props.PDiskId || ''},
                     )}
                 />
             </div>
