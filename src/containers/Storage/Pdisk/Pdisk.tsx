@@ -8,6 +8,7 @@ import {bytesToGB} from '../../../utils/utils';
 import routes, {createHref} from '../../../routes';
 //@ts-ignore
 import {getPDiskId} from '../../../utils';
+import {getPDiskType} from '../../../utils/pdisk';
 import {TPDiskStateInfo, TPDiskState} from '../../../types/api/storage';
 import DiskStateProgressBar, {
     diskProgressColors,
@@ -83,6 +84,7 @@ function Pdisk(props: PDiskProps) {
         ];
 
         pdiskData.push({property: 'State', value: State || 'not available'});
+        pdiskData.push({property: 'Type', value: getPDiskType(props) || 'unknown'});
         NodeId && pdiskData.push({property: 'Node Id', value: NodeId});
 
         Host && pdiskData.push({property: 'Host', value: Host});

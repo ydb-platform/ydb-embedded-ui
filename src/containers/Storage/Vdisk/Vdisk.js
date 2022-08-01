@@ -7,6 +7,7 @@ import {Popup} from '@yandex-cloud/uikit';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import routes, {createHref} from '../../../routes';
 import {stringifyVdiskId, getPDiskId} from '../../../utils';
+import {getPDiskType} from '../../../utils/pdisk';
 import DiskStateProgressBar, {
     diskProgressColors,
 } from '../DiskStateProgressBar/DiskStateProgressBar';
@@ -169,6 +170,7 @@ function Vdisk(props) {
                 property: 'State',
                 value: PDisk.State || 'not available',
             });
+            pdiskData.push({property: 'Type', value: getPDiskType(PDisk) || 'unknown'});
             PDisk.NodeId && pdiskData.push({property: 'Node Id', value: PDisk.NodeId});
             PDisk.NodeId &&
                 nodes[PDisk.NodeId] &&
