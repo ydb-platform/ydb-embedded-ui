@@ -108,11 +108,16 @@ export enum EPathType {
     EPathTypeInvalid = 'EPathTypeInvalid',
     EPathTypeDir = 'EPathTypeDir',
     EPathTypeTable = 'EPathTypeTable',
+
     EPathTypeSubDomain = 'EPathTypeSubDomain',
+
+    EPathTypeTableIndex = 'EPathTypeTableIndex', 
+    EPathTypeExtSubDomain = 'EPathTypeExtSubDomain',
+
     EPathTypeColumnStore = 'EPathTypeColumnStore',
     EPathTypeColumnTable = 'EPathTypeColumnTable',
-    EPathTypeTableIndex = 'EPathTypeTableIndex', 
     EPathTypeCdcStream = 'EPathTypeCdcStream',
+
 }
 
 export enum EPathSubType {

@@ -18,6 +18,7 @@ export const mapPathTypeToNavigationTreeType = (
 ): NavigationTreeNodeType => {
     switch (type) {
         case EPathType.EPathTypeSubDomain:
+        case EPathType.EPathTypeExtSubDomain:
             return 'database';
         case EPathType.EPathTypeTable:
             return mapTablePathSubTypeToNavigationTreeType(subType);
