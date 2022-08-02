@@ -112,6 +112,7 @@ export enum EPathType {
     EPathTypeColumnStore = 'EPathTypeColumnStore',
     EPathTypeColumnTable = 'EPathTypeColumnTable',
     EPathTypeTableIndex = 'EPathTypeTableIndex', 
+    EPathTypeCdcStream = 'EPathTypeCdcStream',
 }
 
 export enum EPathSubType {
