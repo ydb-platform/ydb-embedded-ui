@@ -20,13 +20,16 @@ export const mapPathTypeToNavigationTreeType = (
         case EPathType.EPathTypeSubDomain:
             return 'database';
         case EPathType.EPathTypeTable:
-        case EPathType.EPathTypeColumnTable:
             return mapTablePathSubTypeToNavigationTreeType(subType);
+        case EPathType.EPathTypeColumnTable:
+            return 'column_table';
         case EPathType.EPathTypeDir:
         case EPathType.EPathTypeColumnStore:
             return 'directory';
         case EPathType.EPathTypeTableIndex:
             return 'index';
+        case EPathType.EPathTypeCdcStream:
+            return 'topic';
         default:
             return defaultType;
     }
