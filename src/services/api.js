@@ -147,14 +147,19 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             state: 0,
         });
     }
-    sendQuery({query, database, action, stats}) {
-        return this.post(this.getPath('/viewer/json/query'), {
-            query,
-            database,
-            action,
-            stats,
-            timeout: 600000,
-        });
+    sendQuery({query, database, action, stats}, {concurrentId} = {}) {
+        return this.post(
+            this.getPath('/viewer/json/query'),
+            {
+                query,
+                database,
+                action,
+                stats,
+                timeout: 600000,
+            },
+            null,
+            {concurrentId},
+        );
     }
     getExplainQuery(query, database) {
         return this.post(this.getPath('/viewer/json/query'), {
