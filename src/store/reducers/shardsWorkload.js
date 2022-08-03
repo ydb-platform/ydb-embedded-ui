@@ -9,8 +9,22 @@ const initialState = {
     wasLoaded: false,
 };
 
-function createShardQuery(path) {
-    return `SELECT Path, TabletId, CPUCores, DataSize FROM \`.sys/partition_stats\` WHERE Path='${path}' OR Path LIKE '${path}/%' ORDER BY CPUCores DESC LIMIT 20`;
+function formatSortOrder({columnId, order}) {
+    return `${columnId} ${order}`;
+}
+
+function createShardQuery(path, sortOrder) {
+    const orderBy = Array.isArray(sortOrder) ?
+        `ORDER BY ${sortOrder.map(formatSortOrder).join(', ')}` :
+        '';
+
+    return `SELECT Path, TabletId, CPUCores, DataSize
+FROM \`.sys/partition_stats\`
+WHERE
+    Path='${path}'
+    OR Path LIKE '${path}/%'
+${orderBy}
+LIMIT 20`;
 }
 
 const queryAction = 'execute-scan';
@@ -51,12 +65,14 @@ const shardsWorkload = (state = initialState, action) => {
     }
 };
 
-export const sendShardQuery = ({database, path = ''}) => {
+export const sendShardQuery = ({database, path = '', sortOrder}) => {
     return createApiRequest({
         request: window.api.sendQuery({
-            query: createShardQuery(path),
+            query: createShardQuery(path, sortOrder),
             database,
             action: queryAction,
+        }, {
+            concurrentId: 'topShards',
         }),
         actions: SEND_SHARD_QUERY,
         dataHandler: (result) => {
