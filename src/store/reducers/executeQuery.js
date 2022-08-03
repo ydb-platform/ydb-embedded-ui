@@ -141,7 +141,7 @@ const executeQuery = (state = initialState, action) => {
 
 export const sendQuery = ({query, database, action}) => {
     return createApiRequest({
-        request: window.api.sendQuery(query, database, action, 'profile'),
+        request: window.api.sendQuery({query, database, action, stats: 'profile'}),
         actions: SEND_QUERY,
         dataHandler: (result) => {
             const resultData = result.result ?? result;

@@ -52,7 +52,11 @@ const olapStats = (state = initialState, action) => {
 
 export const getOlapStats = ({path = ''}) => {
     return createApiRequest({
-        request: window.api.sendQuery(createOlatStatsQuery(path), path, queryAction),
+        request: window.api.sendQuery({
+            query: createOlatStatsQuery(path),
+            database: path,
+            action: queryAction,
+        }),
         actions: FETCH_OLAP_STATS,
         dataHandler: (result) => {
             if (result && typeof result === 'string') {

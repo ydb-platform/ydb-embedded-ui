@@ -47,7 +47,7 @@ const preview = (state = initialState, action) => {
 
 export const sendQuery = ({query, database, action}) => {
     return createApiRequest({
-        request: window.api.sendQuery(query, database, action),
+        request: window.api.sendQuery({query, database, action}),
         actions: SEND_QUERY,
         dataHandler: (data) => {
             if (!Array.isArray(data)) {
