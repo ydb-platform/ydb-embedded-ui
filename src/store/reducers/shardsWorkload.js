@@ -10,7 +10,7 @@ const initialState = {
 };
 
 function createShardQuery(path) {
-    return `SELECT Path, TabletId, CPUCores FROM \`.sys/partition_stats\` WHERE Path='${path}' OR Path LIKE '${path}/%' ORDER BY CPUCores DESC LIMIT 20`;
+    return `SELECT Path, TabletId, CPUCores, DataSize FROM \`.sys/partition_stats\` WHERE Path='${path}' OR Path LIKE '${path}/%' ORDER BY CPUCores DESC LIMIT 20`;
 }
 
 const queryAction = 'execute-scan';
