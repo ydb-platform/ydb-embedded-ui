@@ -1,4 +1,4 @@
-import {useContext, useEffect, useMemo} from 'react';
+import {useState, useContext, useEffect, useMemo} from 'react';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 import {Loader} from '@yandex-cloud/uikit';
@@ -20,6 +20,13 @@ import './TopShards.scss';
 const b = cn('top-shards');
 const bLink = cn('yc-link');
 
+const TABLE_SETTINGS = {
+    ...DEFAULT_TABLE_SETTINGS,
+    externalSort: true,
+    disableSortReset: true,
+    defaultOrder: DataTable.DESCENDING,
+};
+
 const tableColumnsNames = {
     TabletId: 'TabletId',
     CPUCores: 'CPUCores',
@@ -27,10 +34,25 @@ const tableColumnsNames = {
     Path: 'Path',
 };
 
+const INITIAL_SORT_ORDER = [{
+    columnId: tableColumnsNames.CPUCores,
+    order: DataTable.DESCENDING,
+}];
+
 const autofetcher = new AutoFetcher();
 
 function prepareCPUWorkloadValue(value) {
     return `${(value * 100).toFixed(2)}%`;
+}
+
+function parseColumnsSortOrder(columns) {
+    return columns.map(({columnId, order}) => ({
+        columnId,
+        order: {
+            [DataTable.ASCENDING]: 'ASC',
+            [DataTable.DESCENDING]: 'DESC',
+        }[order],
+    }));
 }
 
 function TopShards({
@@ -47,25 +69,40 @@ function TopShards({
     setShardQueryOptions,
     type,
 }) {
+    const [sortOrder, setSortOrder] = useState(INITIAL_SORT_ORDER);
+
     useEffect(() => {
+        autofetcher.stop();
+
         if (autorefresh) {
             autofetcher.start();
-            autofetcher.fetch(() => sendShardQuery({database: path, path: currentSchemaPath}));
-        } else {
-            autofetcher.stop();
+            autofetcher.fetch(() => sendShardQuery({
+                database: path,
+                path: currentSchemaPath,
+                sortOrder: parseColumnsSortOrder(sortOrder),
+            }));
         }
+
         return () => {
             autofetcher.stop();
         };
-    }, [autorefresh]);
+    }, [autorefresh, currentSchemaPath, path, sendShardQuery, sortOrder]);
 
+    // don't show loader for requests triggered by table sort, only for path change
     useEffect(() => {
-        sendShardQuery({database: path, path: currentSchemaPath});
         setShardQueryOptions({
             wasLoaded: false,
             data: undefined,
         });
-    }, [currentSchemaPath]);
+    }, [currentSchemaPath, path, setShardQueryOptions]);
+
+    useEffect(() => {
+        sendShardQuery({
+            database: path,
+            path: currentSchemaPath,
+            sortOrder: parseColumnsSortOrder(sortOrder),
+        });
+    }, [currentSchemaPath, path, sendShardQuery, sortOrder]);
 
     const history = useContext(HistoryContext);
 
@@ -89,6 +126,7 @@ function TopShards({
                         </span>
                     );
                 },
+                sortable: false,
             },
             {
                 name: tableColumnsNames.CPUCores,
@@ -112,6 +150,7 @@ function TopShards({
                         </InternalLink>
                     );
                 },
+                sortable: false,
             },
         ];
     }, []);
@@ -128,7 +167,7 @@ function TopShards({
         if (isColumnEntityType(type)) {
             return 'No data';
         }
-        if (error) {
+        if (error && !error.isCancelled) {
             return prepareQueryError(error);
         }
 
@@ -137,9 +176,11 @@ function TopShards({
                 <DataTable
                     columns={tableColumns}
                     data={data}
-                    settings={DEFAULT_TABLE_SETTINGS}
+                    settings={TABLE_SETTINGS}
                     className={b('table')}
                     theme="yandex-cloud"
+                    onSort={setSortOrder}
+                    sortOrder={sortOrder}
                 />
             </div>
         ) : (
