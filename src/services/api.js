@@ -147,7 +147,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             state: 0,
         });
     }
-    sendQuery(query, database, action, stats) {
+    sendQuery({query, database, action, stats}) {
         return this.post(this.getPath('/viewer/json/query'), {
             query,
             database,

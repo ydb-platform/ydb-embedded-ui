@@ -53,7 +53,11 @@ const shardsWorkload = (state = initialState, action) => {
 
 export const sendShardQuery = ({database, path = ''}) => {
     return createApiRequest({
-        request: window.api.sendQuery(createShardQuery(path), database, queryAction),
+        request: window.api.sendQuery({
+            query: createShardQuery(path),
+            database,
+            action: queryAction,
+        }),
         actions: SEND_SHARD_QUERY,
         dataHandler: (result) => {
             if (result && typeof result === 'string') {
