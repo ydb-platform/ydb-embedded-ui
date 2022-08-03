@@ -23,6 +23,7 @@ const bLink = cn('yc-link');
 const tableColumnsNames = {
     TabletId: 'TabletId',
     CPUCores: 'CPUCores',
+    DataSize: 'DataSize',
     Path: 'Path',
 };
 
@@ -95,6 +96,10 @@ function TopShards({
                 render: ({value}) => {
                     return prepareCPUWorkloadValue(value);
                 },
+                align: DataTable.RIGHT,
+            },
+            {
+                name: tableColumnsNames.DataSize,
                 align: DataTable.RIGHT,
             },
             {
