@@ -23,6 +23,7 @@ const bLink = cn('yc-link');
 
 const TABLE_SETTINGS = {
     ...DEFAULT_TABLE_SETTINGS,
+    dynamicRender: false, // no more than 20 rows
     externalSort: true,
     disableSortReset: true,
     defaultOrder: DataTable.DESCENDING,
