@@ -36,11 +36,6 @@ const tableColumnsNames = {
     Path: 'Path',
 };
 
-const INITIAL_SORT_ORDER = [{
-    columnId: tableColumnsNames.CPUCores,
-    order: DataTable.DESCENDING,
-}];
-
 const autofetcher = new AutoFetcher();
 
 function prepareCPUWorkloadValue(value) {
@@ -51,14 +46,22 @@ function prepareDateSizeValue(value) {
     return new Intl.NumberFormat(i18n.lang).format(value);
 }
 
-function parseColumnsSortOrder(columns) {
-    return columns.map(({columnId, order}) => ({
+function stringToDataTableSortOrder(value) {
+    return value && value.split(',').map((columnId) => ({
         columnId,
-        order: {
-            [DataTable.ASCENDING]: 'ASC',
-            [DataTable.DESCENDING]: 'DESC',
-        }[order],
+        order: DataTable.DESCENDING,
     }));
+}
+
+function stringToQuerySortOrder(value) {
+    return value && value.split(',').map((columnId) => ({
+        columnId,
+        order: 'DESC',
+    }));
+}
+
+function dataTableToStringSortOrder(value = []) {
+    return value.map(({columnId}) => columnId).join(',');
 }
 
 function TopShards({
@@ -75,7 +78,7 @@ function TopShards({
     setShardQueryOptions,
     type,
 }) {
-    const [sortOrder, setSortOrder] = useState(INITIAL_SORT_ORDER);
+    const [sortOrder, setSortOrder] = useState(tableColumnsNames.CPUCores);
 
     useEffect(() => {
         autofetcher.stop();
@@ -85,7 +88,7 @@ function TopShards({
             autofetcher.fetch(() => sendShardQuery({
                 database: path,
                 path: currentSchemaPath,
-                sortOrder: parseColumnsSortOrder(sortOrder),
+                sortOrder: stringToQuerySortOrder(sortOrder),
             }));
         }
 
@@ -106,7 +109,7 @@ function TopShards({
         sendShardQuery({
             database: path,
             path: currentSchemaPath,
-            sortOrder: parseColumnsSortOrder(sortOrder),
+            sortOrder: stringToQuerySortOrder(sortOrder),
         });
     }, [currentSchemaPath, path, sendShardQuery, sortOrder]);
 
@@ -118,6 +121,13 @@ function TopShards({
             getSchema({path: schemaPath});
             history.go(0);
         };
+    };
+
+    const onSort = (newSortOrder) => {
+        // omit information about sort order to disable ASC order, only DESC makes sense for top shards
+        // use a string (and not the DataTable default format) to prevent reference change,
+        // which would cause an excess state change, to avoid repeating requests
+        setSortOrder(dataTableToStringSortOrder(newSortOrder));
     };
 
     const tableColumns = useMemo(() => {
@@ -189,8 +199,8 @@ function TopShards({
                     settings={TABLE_SETTINGS}
                     className={b('table')}
                     theme="yandex-cloud"
-                    onSort={setSortOrder}
-                    sortOrder={sortOrder}
+                    onSort={onSort}
+                    sortOrder={stringToDataTableSortOrder(sortOrder)}
                 />
             </div>
         ) : (
