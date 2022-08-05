@@ -1,5 +1,5 @@
 import {Dispatch} from 'react';
-import type {NavigationTreeNodeType} from 'ydb-ui-components';
+import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {setShowPreview} from '../../../store/reducers/schema';
@@ -73,6 +73,8 @@ const bindActions = (
     };
 };
 
+type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
+
 export const getActions = (
     dispatch: Dispatch<any>,
     setActivePath: (path: string) => void,
@@ -81,35 +83,43 @@ export const getActions = (
         const actions = bindActions(path, dispatch, setActivePath);
         const copyItem = {text: 'Copy path', action: actions.copyPath};
 
-        switch (type) {
-            case 'database':
-            case 'directory':
-                return [
-                    [
-                        copyItem,
-                    ],
-                    [
-                        {text: 'Create table...', action: actions.createTable},
-                    ],
-                ];
-            case 'table':
-                return [
-                    [
-                        {text: 'Open preview', action: actions.openPreview},
-                        copyItem,
-                    ],
-                    [
-                        {text: 'Alter table...', action: actions.alterTable},
-                        {text: 'Select query...', action: actions.selectQuery},
-                        {text: 'Upsert query...', action: actions.upsertQuery},
-                    ],
-                ];
-            case 'index_table':
-                return [
-                    copyItem,
-                ];
-            case 'index':
-            default:
-                return [];
-        }
+        const DIR_SET: ActionsSet = [
+            [
+                copyItem,
+            ],
+            [
+                {text: 'Create table...', action: actions.createTable},
+            ],
+        ];
+        const TABLE_SET: ActionsSet = [
+            [
+                {text: 'Open preview', action: actions.openPreview},
+                copyItem,
+            ],
+            [
+                {text: 'Alter table...', action: actions.alterTable},
+                {text: 'Select query...', action: actions.selectQuery},
+                {text: 'Upsert query...', action: actions.upsertQuery},
+            ],
+        ];
+
+        const JUST_COPY: ActionsSet = [
+            copyItem,
+        ];
+
+        const EMPTY_SET: ActionsSet = [];
+
+        // verbose mapping to guarantee a correct actions set for new node types
+        // TS will error when a new type is added in the lib but is not mapped here
+        const nodeTypeToActions: Record<NavigationTreeNodeType, ActionsSet> = {
+            database: DIR_SET,
+            directory: DIR_SET,
+            table: TABLE_SET,
+            column_table: TABLE_SET,
+            index_table: JUST_COPY,
+            index: EMPTY_SET,
+            topic: DIR_SET,
+        };
+
+        return nodeTypeToActions[type];
     };

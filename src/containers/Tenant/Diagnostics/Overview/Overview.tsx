@@ -1,4 +1,4 @@
-import {useEffect, useMemo} from 'react';
+import {ReactNode, useEffect, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 
@@ -8,8 +8,8 @@ import {Loader} from '@yandex-cloud/uikit';
 import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';
 import {IndexInfoViewer} from '../../../../components/IndexInfoViewer/IndexInfoViewer';
 
-import type {EPathType} from '../../../../types/api/schema';
-import {isColumnEntityType, isTableType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
+import {EPathType} from '../../../../types/api/schema';
+import {isColumnEntityType, isTableType} from '../../utils/schema';
 import {AutoFetcher} from '../../../../utils/autofetcher';
 //@ts-ignore
 import {getSchema} from '../../../../store/reducers/schema';
@@ -114,16 +114,23 @@ function Overview(props: OverviewProps) {
     };
 
     const renderContent = () => {
-        switch (mapPathTypeToNavigationTreeType(props.type)) {
-            case 'index':
-                return (
-                    <IndexInfoViewer data={schemaData} />
-                );
-            default:
-                return (
-                    <SchemaInfoViewer fullPath={currentItem.Path} data={schemaData} />
-                );
-        }
+        // verbose mapping to guarantee a correct render for new path types
+        // TS will error when a new type is added but not mapped here
+        const pathTypeToComponent: Record<EPathType, (() => ReactNode) | undefined> = {
+            [EPathType.EPathTypeInvalid]: undefined,
+            [EPathType.EPathTypeDir]: undefined,
+            [EPathType.EPathTypeTable]: undefined,
+            [EPathType.EPathTypeSubDomain]: undefined,
+            [EPathType.EPathTypeTableIndex]: () => <IndexInfoViewer data={schemaData} />,
+            [EPathType.EPathTypeExtSubDomain]: undefined,
+            [EPathType.EPathTypeColumnStore]: undefined,
+            [EPathType.EPathTypeColumnTable]: undefined,
+            [EPathType.EPathTypeCdcStream]: undefined,
+        };
+
+        return (props.type && pathTypeToComponent[props.type]?.()) || (
+            <SchemaInfoViewer fullPath={currentItem.Path} data={schemaData} />
+        );
     }
 
     return loading && !wasLoaded ? (
