@@ -13,6 +13,11 @@ export enum GeneralPagesIds {
     'graph' = 'graph',
 }
 
+type Page = {
+    id: GeneralPagesIds,
+    title: string,
+};
+
 const overview = {
     id: GeneralPagesIds.overview,
     title: 'Overview',
@@ -76,17 +81,22 @@ export const TABLE_PAGES = [overview, topShards, graph, tablets, hotKeys, descri
 
 export const DIR_PAGES = [overview, topShards, describe];
 
-export const getPagesByType = (type?: EPathType) => {
-    switch (type) {
-        case EPathType.EPathTypeColumnStore:
-        case EPathType.EPathTypeSubDomain:
-            return DATABASE_PAGES;
-        case EPathType.EPathTypeColumnTable:
-        case EPathType.EPathTypeTable:
-            return TABLE_PAGES;
-        case EPathType.EPathTypeDir:
-        case EPathType.EPathTypeTableIndex:
-        default:
-            return DIR_PAGES;
-    }
-}
+// verbose mapping to guarantee correct tabs for new path types
+// TS will error when a new type is added but not mapped here
+const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
+    [EPathType.EPathTypeInvalid]: undefined,
+
+    [EPathType.EPathTypeSubDomain]: DATABASE_PAGES,
+    [EPathType.EPathTypeExtSubDomain]: DATABASE_PAGES,
+    [EPathType.EPathTypeColumnStore]: DATABASE_PAGES,
+
+    [EPathType.EPathTypeTable]: TABLE_PAGES,
+    [EPathType.EPathTypeColumnTable]: TABLE_PAGES,
+
+    [EPathType.EPathTypeDir]: DIR_PAGES,
+    [EPathType.EPathTypeTableIndex]: DIR_PAGES,
+    [EPathType.EPathTypeCdcStream]: DIR_PAGES,
+};
+
+export const getPagesByType = (type?: EPathType) =>
+    (type && pathTypeToPages[type]) || DIR_PAGES;

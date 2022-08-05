@@ -1,47 +1,88 @@
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
 
-const mapTablePathSubTypeToNavigationTreeType = (subType?: EPathSubType) => {
-    switch (subType) {
-        case EPathSubType.EPathSubTypeSyncIndexImplTable:
-        case EPathSubType.EPathSubTypeAsyncIndexImplTable:
-            return 'index_table';
-        default:
-            return 'table';
-    }
+// this file contains verbose mappings that are typed in a way that ensures
+// correctness when a new node type or a new path type is added
+// TS will error if a new entity is added but not mapped here
+
+const pathSubTypeToNodeType: Record<EPathSubType, NavigationTreeNodeType | undefined> = {
+    [EPathSubType.EPathSubTypeSyncIndexImplTable]: 'index_table',
+    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: 'index_table',
+
+    [EPathSubType.EPathSubTypeStreamImpl]: undefined,
+    [EPathSubType.EPathSubTypeEmpty]: undefined,
+};
+
+const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> = {
+    [EPathType.EPathTypeInvalid]: undefined,
+
+    [EPathType.EPathTypeSubDomain]: 'database',
+    [EPathType.EPathTypeExtSubDomain]: 'database',
+
+    [EPathType.EPathTypeDir]: 'directory',
+    [EPathType.EPathTypeColumnStore]: 'directory',
+
+    [EPathType.EPathTypeTable]: 'table',
+
+    [EPathType.EPathTypeTableIndex]: 'index',
+
+    [EPathType.EPathTypeColumnTable]: 'column_table',
+
+    [EPathType.EPathTypeCdcStream]: 'topic',
 };
 
 export const mapPathTypeToNavigationTreeType = (
     type: EPathType = EPathType.EPathTypeDir,
     subType?: EPathSubType,
     defaultType: NavigationTreeNodeType = 'directory'
-): NavigationTreeNodeType => {
-    switch (type) {
-        case EPathType.EPathTypeSubDomain:
-        case EPathType.EPathTypeExtSubDomain:
-            return 'database';
-        case EPathType.EPathTypeTable:
-            return mapTablePathSubTypeToNavigationTreeType(subType);
-        case EPathType.EPathTypeColumnTable:
-            return 'column_table';
-        case EPathType.EPathTypeDir:
-        case EPathType.EPathTypeColumnStore:
-            return 'directory';
-        case EPathType.EPathTypeTableIndex:
-            return 'index';
-        case EPathType.EPathTypeCdcStream:
-            return 'topic';
-        default:
-            return defaultType;
-    }
+): NavigationTreeNodeType =>
+    (subType && pathSubTypeToNodeType[subType]) || pathTypeToNodeType[type] || defaultType;
+
+// ====================
+
+const pathTypeToIsTable: Record<EPathType, boolean> = {
+    [EPathType.EPathTypeTable]: true,
+    [EPathType.EPathTypeColumnTable]: true,
+
+    [EPathType.EPathTypeInvalid]: false,
+    [EPathType.EPathTypeDir]: false,
+    [EPathType.EPathTypeSubDomain]: false,
+    [EPathType.EPathTypeTableIndex]: false,
+    [EPathType.EPathTypeExtSubDomain]: false,
+    [EPathType.EPathTypeColumnStore]: false,
+    [EPathType.EPathTypeCdcStream]: false,
 };
 
-export const isTableType = (type?: EPathType) =>
-    mapPathTypeToNavigationTreeType(type) === 'table';
+export const isTableType = (pathType?: EPathType) =>
+    (pathType && pathTypeToIsTable[pathType]) ?? false;
+
+// ====================
+
+const pathSubTypeToIsIndexImpl: Record<EPathSubType, boolean> = {
+    [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
+
+    [EPathSubType.EPathSubTypeStreamImpl]: false,
+    [EPathSubType.EPathSubTypeEmpty]: false,
+};
 
 export const isIndexTable = (subType?: EPathSubType) =>
-    mapTablePathSubTypeToNavigationTreeType(subType) === 'index_table';
+    (subType && pathSubTypeToIsIndexImpl[subType]) ?? false;
+
+// ====================
+
+const pathTypeToIsColumn: Record<EPathType, boolean> = {
+    [EPathType.EPathTypeColumnStore]: true,
+    [EPathType.EPathTypeColumnTable]: true,
+
+    [EPathType.EPathTypeInvalid]: false,
+    [EPathType.EPathTypeDir]: false,
+    [EPathType.EPathTypeTable]: false,
+    [EPathType.EPathTypeSubDomain]: false,
+    [EPathType.EPathTypeTableIndex]: false,
+    [EPathType.EPathTypeExtSubDomain]: false,
+    [EPathType.EPathTypeCdcStream]: false,
+};
 
 export const isColumnEntityType = (type?: EPathType) =>
-    type === EPathType.EPathTypeColumnStore ||
-    type === EPathType.EPathTypeColumnTable;
+    (type && pathTypeToIsColumn[type]) ?? false;
