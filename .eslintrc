@@ -1,4 +1,15 @@
 {
     "extends": ["@yandex-cloud/eslint-config", "prettier"],
-    "root": true
+    "root": true,
+    "overrides": [
+        {
+            "files": [
+                "config-overrides.js",
+                "commitlint.config.js"
+            ],
+            "env": {
+                "node": true
+            }
+        }
+    ]
 }
