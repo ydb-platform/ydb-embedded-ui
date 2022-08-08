@@ -9,9 +9,6 @@
     "url": "git@github.com:ydb-platform/ydb-embedded-ui.git"
   },
   "dependencies": {
-    "@testing-library/jest-dom": "5.15.0",
-    "@testing-library/react": "11.2.7",
-    "@testing-library/user-event": "12.8.3",
     "@types/qs": "6.9.7",
     "@yandex-cloud/i18n": "0.6.0",
     "@yandex-cloud/paranoid": "1.0.0",
@@ -63,6 +60,27 @@
       "eslint --fix --quiet"
     ]
   },
+  "jest": {
+    "verbose": true,
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts",
+      "tsx"
+    ],
+    "rootDir": ".",
+    "transform": {
+      "^.+\\.[jt]sx?$": "ts-jest"
+    },
+    "coverageDirectory": "./coverage",
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx,js,jsx}"
+    ],
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "jest-transform-css"
+    }
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -78,6 +96,9 @@
   "devDependencies": {
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
+    "@testing-library/jest-dom": "^5.15.0",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
     "@types/lodash": "^4.14.178",
     "@types/react": "^17.0.44",
     "@types/react-dom": "^17.0.11",
@@ -95,6 +116,7 @@
     "copyfiles": "^2.4.1",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",
+    "jest-transform-css": "^4.0.1",
     "lint-staged": "^12.3.7",
     "postcss": "^8.4.6",
     "prettier": "^2.5.1",
@@ -102,6 +124,7 @@
     "react-app-rewired": "^2.1.11",
     "react-dom": "^17.0.2",
     "stylelint": "^14.3.0",
+    "ts-jest": "^28.0.7",
     "typescript": "^4.5.5"
   },
   "peerDependencies": {
