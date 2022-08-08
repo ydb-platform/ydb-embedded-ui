@@ -13,12 +13,20 @@ function formatSortOrder({columnId, order}) {
     return `${columnId} ${order}`;
 }
 
-function createShardQuery(path, sortOrder) {
+function createShardQuery(path, sortOrder, tenantName) {
     const orderBy = Array.isArray(sortOrder) ?
         `ORDER BY ${sortOrder.map(formatSortOrder).join(', ')}` :
         '';
 
-    return `SELECT Path, TabletId, CPUCores, DataSize
+    const pathSelect = tenantName ?
+        `CAST(SUBSTRING(CAST(Path AS String), ${tenantName.length}) AS Utf8) AS Path` :
+        'Path';
+
+    return `SELECT
+    ${pathSelect},
+    TabletId,
+    CPUCores,
+    DataSize
 FROM \`.sys/partition_stats\`
 WHERE
     Path='${path}'
@@ -68,7 +76,7 @@ const shardsWorkload = (state = initialState, action) => {
 export const sendShardQuery = ({database, path = '', sortOrder}) => {
     return createApiRequest({
         request: window.api.sendQuery({
-            query: createShardQuery(path, sortOrder),
+            query: createShardQuery(path, sortOrder, database),
             database,
             action: queryAction,
         }, {
