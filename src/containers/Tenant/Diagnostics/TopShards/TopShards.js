@@ -137,7 +137,11 @@ function TopShards({
                 // eslint-disable-next-line
                 render: ({value}) => {
                     return (
-                        <span onClick={onSchemaClick(value)} className={bLink({view: 'normal'})}>
+                        <span
+                            // tenant name is substringed out in sql query but is needed here
+                            onClick={onSchemaClick(path + value)}
+                            className={bLink({view: 'normal'})}
+                        >
                             {value}
                         </span>
                     );
