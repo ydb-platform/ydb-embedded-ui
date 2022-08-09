@@ -199,7 +199,7 @@ class Tablet extends React.Component {
                 return (
                     <CriticalActionDialog
                         visible={dialogVisible}
-                        text="The tablet will be killed. Do you want to proceed?"
+                        text="The tablet will be restarted. Do you want to proceed?"
                         onClose={this.hideDialog}
                         onConfirm={this._onKillClick}
                     />
@@ -363,7 +363,7 @@ class Tablet extends React.Component {
                                 disabled={this.isDisabledKill()}
                                 className={b('control')}
                             >
-                                Kill
+                                Restart
                             </Button>
                             {this.hasHiveId() ? (
                                 <React.Fragment>
