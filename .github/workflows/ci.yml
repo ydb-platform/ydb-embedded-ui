@@ -24,3 +24,13 @@ jobs:
       - uses: actions/setup-node@v2
       - run: npm ci
       - run: npm run typecheck
+
+  unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+      - run: npm ci
+      - run: npm test
