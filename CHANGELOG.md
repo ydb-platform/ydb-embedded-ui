@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.9.0...v1.10.0) (2022-08-10)
+
+
+### Features
+
+* **TopShards:** add DataSize column ([cbcd047](https://github.com/ydb-platform/ydb-embedded-ui/commit/cbcd047d277f699a67bc002a5542f3b9f6a0c942))
+* **TopShards:** sort table data on backend ([dc28c5c](https://github.com/ydb-platform/ydb-embedded-ui/commit/dc28c5c75b0036480bf804d49f82fc54eac98c8e))
+
+
+### Bug Fixes
+
+* add concurrentId for sendQuery request ([dc6b32a](https://github.com/ydb-platform/ydb-embedded-ui/commit/dc6b32a8fd51064ddeca2fc60a0f08a725216334))
+* **Storage:** display pdisk type in tooltip ([2b03a35](https://github.com/ydb-platform/ydb-embedded-ui/commit/2b03a35fc11ddeae3bdd30a0690b324ae917f5c3))
+* **Tablet:** change Kill to Restart ([dd585b1](https://github.com/ydb-platform/ydb-embedded-ui/commit/dd585b1d1a6a5ddb484a702523773b169900f582))
+* **Tenant:** add missing schema node types ([62a0ecb](https://github.com/ydb-platform/ydb-embedded-ui/commit/62a0ecb848dbcee53e18535cbf7c03a731d0cfeb))
+* **Tenant:** ensure correct behavior for new schema node types ([f80c381](https://github.com/ydb-platform/ydb-embedded-ui/commit/f80c38152656e8bbbe51ec38b29fc0d954c361cc))
+* **Tenant:** use new schema icons ([389a921](https://github.com/ydb-platform/ydb-embedded-ui/commit/389a9214c64b1adb183fa0c6caa6f2ec536dbef3))
+* **TopShards:** disable virtualization for table ([006d3d9](https://github.com/ydb-platform/ydb-embedded-ui/commit/006d3d9fb9a4744b8bb4ad03e53693199213f80e))
+* **TopShards:** format DataSize value ([c51ce66](https://github.com/ydb-platform/ydb-embedded-ui/commit/c51ce66286f6454f7252d1194628ee5a50aafba2))
+* **TopShards:** only allow DESC sort ([6aa326f](https://github.com/ydb-platform/ydb-embedded-ui/commit/6aa326fc4b8165f00f8b3ecf5becdb0943ed57af))
+* **TopShards:** substring tenant name out of shards path ([9e57672](https://github.com/ydb-platform/ydb-embedded-ui/commit/9e5767222c7dac7734c68abd08067cea507b1e15))
+
 ## [1.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.8.8...v1.9.0) (2022-07-29)
 
 
