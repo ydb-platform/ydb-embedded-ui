@@ -139,3 +139,4 @@ export const DEFAULT_TABLE_SETTINGS = {
 };
 
 export const TENANT_INITIAL_TAB_KEY = 'saved_tenant_initial_tab';
+export const QUERY_INITIAL_RUN_ACTION_KEY = 'query_initial_run_action';

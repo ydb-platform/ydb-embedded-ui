@@ -1,4 +1,11 @@
-import {ALL, defaultUserSettings, SAVED_QUERIES_KEY, THEME_KEY, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
+import {
+    defaultUserSettings,
+    ALL,
+    SAVED_QUERIES_KEY,
+    THEME_KEY,
+    TENANT_INITIAL_TAB_KEY,
+    QUERY_INITIAL_RUN_ACTION_KEY,
+} from '../../utils/constants';
 import '../../services/api';
 import {getValueFromLS} from '../../utils/utils';
 
@@ -7,24 +14,24 @@ const SET_SETTING_VALUE = 'settings/SET_VALUE';
 
 const userSettings = window.userSettings || {};
 const systemSettings = window.systemSettings || {};
-const theme = window.web_version
-    ? userSettings.theme || 'light'
-    : getValueFromLS(THEME_KEY, 'light');
-const savedQueries = window.web_version
-    ? userSettings[SAVED_QUERIES_KEY]
-    : getValueFromLS(SAVED_QUERIES_KEY, '[]');
-const savedTenantGeneralTab = window.web_version
-    ? userSettings[TENANT_INITIAL_TAB_KEY]
-    : getValueFromLS(TENANT_INITIAL_TAB_KEY);
+
+export function readSavedSettingsValue(key, defaultValue) {
+    const savedValue = window.web_version
+        ? userSettings[key]
+        : getValueFromLS(key);
+
+    return savedValue ?? defaultValue;
+}
 
 export const initialState = {
     problemFilter: ALL,
     userSettings: {
         ...defaultUserSettings,
         ...userSettings,
-        theme,
-        [SAVED_QUERIES_KEY]: savedQueries,
-        [TENANT_INITIAL_TAB_KEY]: savedTenantGeneralTab,
+        theme: readSavedSettingsValue(THEME_KEY, 'light'),
+        [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),
+        [TENANT_INITIAL_TAB_KEY]: readSavedSettingsValue(TENANT_INITIAL_TAB_KEY),
+        [QUERY_INITIAL_RUN_ACTION_KEY]: readSavedSettingsValue(QUERY_INITIAL_RUN_ACTION_KEY),
     },
     systemSettings,
 };
