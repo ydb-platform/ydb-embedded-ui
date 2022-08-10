@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.10.0...v1.10.1) (2022-08-10)
+
+
+### Bug Fixes
+
+* **Tenant:** fix actions set for topics ([0c75bf4](https://github.com/ydb-platform/ydb-embedded-ui/commit/0c75bf4561966dd663ab1cd7c7b81ef6b4632e50))
+
 ## [1.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.9.0...v1.10.0) (2022-08-10)
 
 
