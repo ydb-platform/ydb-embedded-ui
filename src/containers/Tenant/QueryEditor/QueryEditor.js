@@ -33,6 +33,7 @@ import {
     DEFAULT_SIZE_RESULT_PANE_KEY,
     DEFAULT_TABLE_SETTINGS,
     SAVED_QUERIES_KEY,
+    QUERY_INITIAL_RUN_ACTION_KEY,
 } from '../../../utils/constants';
 import {prepareQueryResponse} from '../../../utils/index';
 
@@ -538,7 +539,13 @@ function QueryEditor(props) {
     };
 
     const renderControls = () => {
-        const {executeQuery, explainQuery, savedQueries, selectRunAction} = props;
+        const {
+            executeQuery,
+            explainQuery,
+            savedQueries,
+            selectRunAction,
+            setSettingValue,
+        } = props;
         const {runAction} = executeQuery;
         const runIsDisabled = !executeQuery.input || executeQuery.loading;
         const runText = _.find(RUN_ACTIONS, {value: runAction}).content;
@@ -546,7 +553,10 @@ function QueryEditor(props) {
         const menuItems = RUN_ACTIONS.map((action) => {
             return {
                 text: action.content,
-                action: () => selectRunAction(action.value),
+                action: () => {
+                    selectRunAction(action.value);
+                    setSettingValue(QUERY_INITIAL_RUN_ACTION_KEY, action.value);
+                },
             };
         });
 

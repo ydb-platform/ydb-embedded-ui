@@ -1,7 +1,8 @@
 import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
 import {getValueFromLS, parseJson} from '../../utils/utils';
-import {QUERIES_HISTORY_KEY} from '../../utils/constants';
+import {QUERIES_HISTORY_KEY, QUERY_INITIAL_RUN_ACTION_KEY} from '../../utils/constants';
+import {readSavedSettingsValue} from './settings';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
@@ -39,7 +40,7 @@ const initialState = {
                 ? MAXIMUM_QUERIES_IN_HISTORY - 1
                 : queriesHistoryInitial.length - 1,
     },
-    runAction: RUN_ACTIONS_VALUES.script,
+    runAction: readSavedSettingsValue(QUERY_INITIAL_RUN_ACTION_KEY, RUN_ACTIONS_VALUES.script),
     monacoHotKey: null,
 };
 
