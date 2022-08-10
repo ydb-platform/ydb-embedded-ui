@@ -114,11 +114,14 @@ export const getActions = (
         const nodeTypeToActions: Record<NavigationTreeNodeType, ActionsSet> = {
             database: DIR_SET,
             directory: DIR_SET,
+
             table: TABLE_SET,
             column_table: TABLE_SET,
+
             index_table: JUST_COPY,
+            topic: JUST_COPY,
+
             index: EMPTY_SET,
-            topic: DIR_SET,
         };
 
         return nodeTypeToActions[type];
