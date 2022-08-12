@@ -28,7 +28,7 @@ export const parseBitField = <T extends Record<string, number>>(
 };
 
 export enum IPDiskType {
-    ROT = 'ROT',
+    HDD = 'HDD', // ROT (Rotation?) = HDD
     SSD = 'SSD',
     MVME = 'NVME',
 }
@@ -67,7 +67,7 @@ export const getPDiskType = (data: TPDiskStateInfo): IPDiskType | undefined => {
                 return IPDiskType.MVME;
         }
     } else if (categoryBitField.typeExt === '0') {
-        return IPDiskType.ROT;
+        return IPDiskType.HDD;
     }
 
     return undefined;
