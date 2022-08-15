@@ -194,12 +194,13 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
             render: ({value, row}) => (
                 <div className={b('vdisks-wrapper')}>
                     {_.map(value as any, (el) => (
-                        <Vdisk
-                            key={stringifyVdiskId(el.VDiskId)}
-                            {...el}
-                            PoolName={row[TableColumnsIds.PoolName]}
-                            nodes={nodes}
-                        />
+                        <div className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
+                            <Vdisk
+                                {...el}
+                                PoolName={row[TableColumnsIds.PoolName]}
+                                nodes={nodes}
+                            />
+                        </div>
                     ))}
                 </div>
             ),
