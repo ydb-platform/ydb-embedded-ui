@@ -1,0 +1,55 @@
+.stack {
+    --ydb-stack-base-z-index: 100;
+    --ydb-stack-offset-x: 4px;
+    --ydb-stack-offset-y: 4px;
+    --ydb-stack-offset-x-hover: 4px;
+    --ydb-stack-offset-y-hover: 8px;
+
+    position: relative;
+
+    &__layer {
+        transition: transform 0.1s ease-out;
+
+        &:first-child {
+            position: relative;
+            z-index: var(--ydb-stack-base-z-index);
+        }
+
+        & + & {
+            position: absolute;
+            z-index: calc(var(--ydb-stack-base-z-index) - var(--ydb-stack-level));
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            transform: translate(
+                calc(var(--ydb-stack-level) * var(--ydb-stack-offset-x)),
+                calc(var(--ydb-stack-level) * var(--ydb-stack-offset-y))
+            );
+        }
+    }
+
+    &:hover {
+        .stack__layer:first-child {
+            transform: translate(
+                calc(-1 * var(--ydb-stack-offset-x-hover)),
+                calc(-1 * var(--ydb-stack-offset-y-hover))
+            );
+        }
+
+        .stack__layer + .stack__layer {
+            transform: translate(
+                calc(
+                    var(--ydb-stack-level) * (var(--ydb-stack-offset-x-hover) * 2) -
+                        var(--ydb-stack-offset-x-hover)
+                ),
+                calc(
+                    var(--ydb-stack-level) * (var(--ydb-stack-offset-y-hover) * 2) -
+                        var(--ydb-stack-offset-y-hover)
+                )
+            );
+        }
+    }
+}
