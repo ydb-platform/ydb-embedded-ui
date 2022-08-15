@@ -1,11 +1,19 @@
 .global-storage-groups {
     &__vdisks-wrapper {
         display: flex;
-        overflow-x: auto;
-        overflow-y: hidden;
         justify-content: center;
 
         min-width: 500px;
+    }
+    &__vdisks-item {
+        flex-grow: 1;
+
+        max-width: 200px;
+        margin-right: 10px;
+
+        &:last-child {
+            margin-right: 0px;
+        }
     }
     &__pool-name-wrapper {
         display: flex;

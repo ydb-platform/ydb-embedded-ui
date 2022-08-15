@@ -1,16 +1,6 @@
 .vdisk-storage {
-    display: flex;
-    flex-grow: 1;
-    align-items: center;
-
-    max-width: 200px;
-    margin-right: 10px;
-
     cursor: pointer;
 
-    &:last-child {
-        margin-right: 0px;
-    }
     &__popup-wrapper {
         padding: 5px 10px;
     }
