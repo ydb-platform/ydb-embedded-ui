@@ -14,8 +14,9 @@ function formatValue<Shape, Key extends keyof Shape>(
     label: Key,
     value: Shape[Key],
     formatters: ValueFormatters<Shape>,
+    defaultFormatter?: (value: Shape[Key]) => string | undefined,
 ) {
-    const formatter = formatters[label];
+    const formatter = formatters[label] || defaultFormatter;
     const formattedValue = formatter ? formatter(value) : value;
 
     return String(formattedValue ?? '');
@@ -24,14 +25,16 @@ function formatValue<Shape, Key extends keyof Shape>(
 interface CreateInfoFormatterOptions<Shape> {
     values?: ValueFormatters<Shape>,
     labels?: LabelMap<Shape>,
+    defaultValueFormatter?: (value: Shape[keyof Shape]) => string | undefined,
 }
 
 export function createInfoFormatter<Shape extends Record<string, any>>({
     values: valueFormatters,
     labels: labelMap,
+    defaultValueFormatter,
 }: CreateInfoFormatterOptions<Shape>) {
     return <Key extends keyof Shape>(label: Key, value: Shape[Key]) => ({
         label: formatLabel(label, labelMap || {}),
-        value: formatValue(label, value, valueFormatters || {}),
+        value: formatValue(label, value, valueFormatters || {}, defaultValueFormatter),
     });
 }
