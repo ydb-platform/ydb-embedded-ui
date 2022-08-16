@@ -21,6 +21,19 @@ const formatTabletMetricsItem = createInfoFormatter({
     defaultValueFormatter: formatNumber,
 });
 
+const formatFollowerGroupItem = createInfoFormatter({
+    values: {
+        FollowerCount: formatNumber,
+    },
+});
+
+const formatPartitionConfigItem = createInfoFormatter({
+    values: {
+        FollowerCount: formatNumber,
+        CrossDataCenterFollowerCount: formatNumber,
+    },
+});
+
 const formatTableStatsItem = createInfoFormatter({
     values: {
         DataSize: formatBytes,
@@ -57,7 +70,7 @@ class SchemaInfoViewer extends React.Component {
 
     renderContent(data) {
         const {PathDescription = {}} = data;
-        const {TableStats = {}, TabletMetrics = {}} = PathDescription;
+        const {TableStats = {}, TabletMetrics = {}, Table: {PartitionConfig = {}} = {}} = PathDescription;
         const {
             PartCount,
             RowCount,
@@ -82,6 +95,7 @@ class SchemaInfoViewer extends React.Component {
 
             ...restTableStats
         } = TableStats;
+        const {FollowerGroups, FollowerCount, CrossDataCenterFollowerCount} = PartitionConfig;
 
         const tableStatsInfo = [
             formatTableStats({
@@ -116,8 +130,25 @@ class SchemaInfoViewer extends React.Component {
             formatTabletMetricsItem(key, TabletMetrics[key])
         );
 
+        const partitionConfigInfo = [];
+
+        if (Array.isArray(FollowerGroups) && FollowerGroups.length > 0) {
+            partitionConfigInfo.push(...Object.keys(FollowerGroups[0]).map((key) =>
+                formatFollowerGroupItem(key, FollowerGroups[0][key])
+            ));
+        } else if (FollowerCount !== undefined) {
+            partitionConfigInfo.push(
+                formatPartitionConfigItem('FollowerCount', FollowerCount)
+            );
+        } else if (CrossDataCenterFollowerCount !== undefined) {
+            partitionConfigInfo.push(
+                formatPartitionConfigItem('CrossDataCenterFollowerCount', CrossDataCenterFollowerCount)
+            );
+        }
+
         if ([
             tabletMetricsInfo,
+            partitionConfigInfo,
             tableStatsInfo.flat(),
         ].flat().length === 0) {
             return (
@@ -127,9 +158,10 @@ class SchemaInfoViewer extends React.Component {
 
         return (
             <div className={b('row')}>
-                {tabletMetricsInfo.length > 0 ? (
+                {tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0 ? (
                     <div className={b('col')}>
                         {this.renderItem(tabletMetricsInfo, 'Tablet Metrics')}
+                        {this.renderItem(partitionConfigInfo, 'Partition Config')}
                     </div>
                 ) : null}
                 <div className={b('col')}>

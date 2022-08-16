@@ -47,7 +47,7 @@ interface TPathDescription {
     Children?: TDirEntry[];
 
     // for table
-    Table?: unknown;
+    Table?: TTableDescription;
     TableStats?: TTableStats;
     TabletMetrics?: unknown;
     TablePartitions?: unknown[];
@@ -80,6 +80,43 @@ interface TDirEntry {
     PathVersion?: string;
     PathSubType?: EPathSubType;
     Version?: TPathVersion;
+}
+
+// incomplete
+export interface TTableDescription {
+    PartitionConfig?: TPartitionConfig;
+}
+
+// incomplete
+export interface TPartitionConfig {
+    /** uint64 */
+    FollowerCount?: string;
+    /**
+     * uint32
+     * @deprecated use FollowerGroups
+     */
+    CrossDataCenterFollowerCount?: string;
+    /** 0 or 1 items */
+    FollowerGroups?: TFollowerGroup[];
+}
+
+export interface TFollowerGroup {
+    /** uint32 */
+    FollowerCount?: string;
+    AllowLeaderPromotion?: boolean;
+    AllowClientRead?: boolean;
+    /** uint32[] */
+    AllowedNodeIDs?: string[];
+    /**
+     * uint32[]
+     * @deprecated use AllowedDataCenters
+     */
+    AllowedDataCenterNumIDs?: string[];
+    RequireAllDataCenters?: boolean;
+    LocalNodeOnly?: boolean;
+    RequireDifferentNodes?: boolean;
+    FollowerCountPerDataCenter?: boolean; // multiplies FollowerCount by number of DataCenters
+    AllowedDataCenters?: string[];
 }
 
 interface TTableStats {
