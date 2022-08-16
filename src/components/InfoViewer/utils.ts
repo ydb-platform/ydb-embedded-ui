@@ -2,7 +2,7 @@ type LabelMap<T> = {
     [label in keyof T]?: string;
 }
 
-type FieldMappers<T> = {
+type ValueFormatters<T> = {
     [label in keyof T]?: (value: T[label]) => string | undefined;
 }
 
@@ -13,20 +13,25 @@ function formatLabel<Shape>(label: keyof Shape, map: LabelMap<Shape>) {
 function formatValue<Shape, Key extends keyof Shape>(
     label: Key,
     value: Shape[Key],
-    mappers: FieldMappers<Shape>,
+    formatters: ValueFormatters<Shape>,
 ) {
-    const mapper = mappers[label];
-    const mappedValue = mapper ? mapper(value) : value;
+    const formatter = formatters[label];
+    const formattedValue = formatter ? formatter(value) : value;
 
-    return String(mappedValue ?? '');
+    return String(formattedValue ?? '');
 }
 
-export function createInfoFormatter<Shape extends Record<string, any>>(
-    fieldMappers?: FieldMappers<Shape>,
-    labelMap?: LabelMap<Shape>,
-) {
+interface CreateInfoFormatterOptions<Shape> {
+    values?: ValueFormatters<Shape>,
+    labels?: LabelMap<Shape>,
+}
+
+export function createInfoFormatter<Shape extends Record<string, any>>({
+    values: valueFormatters,
+    labels: labelMap,
+}: CreateInfoFormatterOptions<Shape>) {
     return <Key extends keyof Shape>(label: Key, value: Shape[Key]) => ({
         label: formatLabel(label, labelMap || {}),
-        value: formatValue(label, value, fieldMappers || {}),
+        value: formatValue(label, value, valueFormatters || {}),
     });
 }
