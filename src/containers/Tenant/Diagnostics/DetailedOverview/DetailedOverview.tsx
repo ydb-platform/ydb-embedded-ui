@@ -60,20 +60,21 @@ function DetailedOverview(props: DetailedOverviewProps) {
         const isTenant = tenantName === currentSchemaPath;
         return (
             <div className={b()}>
-                <div className={b('section')}>
-                    {!isTenant && (
-                        <Overview type={type} tenantName={tenantName} />
-                    )}
-                    {isTenant && <TenantOverview tenantName={tenantName} additionalTenantInfo={additionalTenantInfo}/>}
-                </div>
-                {isTenant && (
-                    <div className={b('section')}>
-                        <Healthcheck
-                            tenant={tenantName}
-                            preview={true}
-                            showMoreHandler={openModalHandler}
-                        />
-                    </div>
+                {isTenant ? (
+                    <>
+                        <div className={b('section')}>
+                            <TenantOverview tenantName={tenantName} additionalTenantInfo={additionalTenantInfo} />
+                        </div>
+                        <div className={b('section')}>
+                            <Healthcheck
+                                tenant={tenantName}
+                                preview={true}
+                                showMoreHandler={openModalHandler}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <Overview type={type} tenantName={tenantName} />
                 )}
             </div>
         );

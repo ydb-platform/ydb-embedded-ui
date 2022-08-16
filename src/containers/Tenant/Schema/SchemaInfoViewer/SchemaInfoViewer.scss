@@ -1,6 +1,24 @@
 .schema-info-viewer {
     overflow: auto;
 
+    &__row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+
+    &__col {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        & + & {
+            margin-left: 50px;
+        }
+    }
+
     &__item {
         margin-bottom: 20px;
 

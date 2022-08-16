@@ -12,6 +12,8 @@ export const formatBytes = (bytes) => {
     return numeral(bytes).format('0 ib').replace('i', '');
 };
 
+export const formatBps = (bytes) => formatBytes(bytes) + '/s';
+
 export const formatBytesToGigabyte = (bytes) => {
     return `${Math.floor(bytes / GIGABYTE)} GB`;
 };
