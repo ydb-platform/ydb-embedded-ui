@@ -1,11 +1,12 @@
 import numeral from 'numeral';
 import _ from 'lodash';
 
+import {i18n} from './i18n';
 import {MEGABYTE, TERABYTE, DAY_IN_SECONDS, GIGABYTE} from './constants';
 
 import locales from 'numeral/locales'; // eslint-disable-line no-unused-vars
-numeral.locale('ru');
-numeral.localeData().delimiters.decimal = '.';
+
+numeral.locale(i18n.lang);
 
 export const formatBytes = (bytes) => {
     return numeral(bytes).format('0 ib').replace('i', '');
