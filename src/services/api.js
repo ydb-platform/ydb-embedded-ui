@@ -83,7 +83,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 path,
                 enums: true,
                 backup: false,
-                partition_config: false,
                 partition_stats: false,
                 partitioning_info: false,
             },
