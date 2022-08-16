@@ -16,7 +16,7 @@ export interface TEvDescribeSchemeResult {
     PathOwnerId?: string;
 }
 
-enum EStatus  {
+enum EStatus {
     StatusSuccess = 'StatusSuccess',
     StatusAccepted = 'StatusAccepted',
     StatusPathDoesNotExist = 'StatusPathDoesNotExist',
@@ -48,7 +48,7 @@ interface TPathDescription {
 
     // for table
     Table?: unknown;
-    TableStats?: unknown;
+    TableStats?: TTableStats;
     TabletMetrics?: unknown;
     TablePartitions?: unknown[];
 
@@ -82,6 +82,82 @@ interface TDirEntry {
     Version?: TPathVersion;
 }
 
+interface TTableStats {
+    /** uint64 */
+    DataSize?: string;
+    /** uint64 */
+    RowCount?: string;
+    /** uint64 */
+    IndexSize?: string;
+    /** uint64 */
+    InMemSize?: string;
+
+    /**
+     * uint64
+     * unix time in millisec
+     */
+    LastAccessTime?: string;
+    /**
+     * uint64
+     * unix time in millisec
+     */
+    LastUpdateTime?: string;
+
+    RowCountHistogram?: THistogram;
+    DataSizeHistogram?: THistogram;
+
+    /** uint64 */
+    ImmediateTxCompleted?: string;
+    /** uint64 */
+    PlannedTxCompleted?: string;
+    /** uint64 */
+    TxRejectedByOverload?: string;
+    /** uint64 */
+    TxRejectedBySpace?: string;
+    /** uint64 */
+    TxCompleteLagMsec?: string;
+    /** uint64 */
+    InFlightTxCount?: string;
+
+    /** uint64 */
+    RowUpdates?: string;
+    /** uint64 */
+    RowDeletes?: string;
+    /** uint64 */
+    RowReads?: string;
+    /** uint64 */
+    RangeReads?: string;
+    /** uint64 */
+    RangeReadRows?: string;
+
+    /** uint64 */
+    PartCount?: string;
+
+    KeyAccessSample?: THistogram;
+
+    /** uint64 */
+    SearchHeight?: string;
+
+    /**
+     * uint64
+     * seconds since epoch
+     */
+    LastFullCompactionTs?: string;
+
+    // i.e. this shard lent to other shards
+    HasLoanedParts?: boolean;
+}
+
+interface THistogram {
+    Buckets?: THistogramBucket[];
+}
+
+interface THistogramBucket {
+    Key?: string;
+    /** uint64 */
+    Value?: string;
+}
+
 export interface TIndexDescription {
     Name?: string;
     /** uint64 */
@@ -111,7 +187,7 @@ export enum EPathType {
 
     EPathTypeSubDomain = 'EPathTypeSubDomain',
 
-    EPathTypeTableIndex = 'EPathTypeTableIndex', 
+    EPathTypeTableIndex = 'EPathTypeTableIndex',
     EPathTypeExtSubDomain = 'EPathTypeExtSubDomain',
 
     EPathTypeColumnStore = 'EPathTypeColumnStore',
