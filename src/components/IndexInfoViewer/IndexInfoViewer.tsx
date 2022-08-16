@@ -10,13 +10,16 @@ const DISPLAYED_FIELDS: Set<keyof TIndexDescription> = new Set([
 ]);
 
 const formatItem = createInfoFormatter<TIndexDescription>({
-    Type: (value) => value?.substring(10), // trims EIndexType prefix
-    State: (value) => value?.substring(11), // trims EIndexState prefix
-    KeyColumnNames: (value) => value?.join(', '),
-    DataColumnNames: (value) => value?.join(', '),
-}, {
-    KeyColumnNames: 'Columns',
-    DataColumnNames: 'Includes',
+    values: {
+        Type: (value) => value?.substring(10), // trims EIndexType prefix
+        State: (value) => value?.substring(11), // trims EIndexState prefix
+        KeyColumnNames: (value) => value?.join(', '),
+        DataColumnNames: (value) => value?.join(', '),
+    },
+    labels: {
+        KeyColumnNames: 'Columns',
+        DataColumnNames: 'Includes',
+    },
 });
 
 interface IndexInfoViewerProps {
