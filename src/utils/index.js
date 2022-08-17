@@ -9,7 +9,8 @@ import locales from 'numeral/locales'; // eslint-disable-line no-unused-vars
 numeral.locale(i18n.lang);
 
 export const formatBytes = (bytes) => {
-    return numeral(bytes).format('0 ib').replace('i', '');
+    // by agreement, display byte values in decimal scale
+    return numeral(bytes).format('0 b');
 };
 
 export const formatBps = (bytes) => formatBytes(bytes) + '/s';

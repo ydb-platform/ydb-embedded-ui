@@ -6,6 +6,9 @@ export const GROUP_AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const PDISK_AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const VDISK_AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const AUTO_RELOAD_INTERVAL = 10 * SECOND;
+// by agreement, display all byte values in decimal scale
+// values in data are always in bytes, never in higher units,
+// therefore there is no issue arbitrary converting them in UI
 export const MEGABYTE = 1_000_000;
 export const GIGABYTE = 1_000_000_000;
 export const TERABYTE = 1_000_000_000_000;
