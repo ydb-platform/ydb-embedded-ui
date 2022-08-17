@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.10.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.10.1...v1.10.2) (2022-08-17)
+
+
+### Bug Fixes
+
+* convert bytes on decimal scale ([db9b0a7](https://github.com/ydb-platform/ydb-embedded-ui/commit/db9b0a71fc5334f5a40992cc6abc0688782ad5d2))
+* display HDD instead of ROT as pdisk type ([bd9e5ba](https://github.com/ydb-platform/ydb-embedded-ui/commit/bd9e5ba4e594cb3a1f6a964f619f9824e083ae7c))
+* **InfoViewer:** accept default value formatter ([e03d8cc](https://github.com/ydb-platform/ydb-embedded-ui/commit/e03d8cc5de76e4ac00b05586ae6f6522a9708fb0))
+* **InfoViewer:** allow longer labels ([89060a3](https://github.com/ydb-platform/ydb-embedded-ui/commit/89060a381858b5beaa3c3cf3402c13c917705676))
+* **Overview:** display table r/o replicas ([6dbe0b4](https://github.com/ydb-platform/ydb-embedded-ui/commit/6dbe0b45fc5e3867f9d6141d270c15508a693e35))
+* **Overview:** format & group table info in overview ([1a35cfc](https://github.com/ydb-platform/ydb-embedded-ui/commit/1a35cfcd2075454c4a1f1fc4961a4b3106b6d225))
+* **QueryEditor:** save chosen run action ([b0fb436](https://github.com/ydb-platform/ydb-embedded-ui/commit/b0fb43651e0c6d1dc5d6a25f92716703402b556d))
+* use current i18n lang for numeral formatting ([5d58fcf](https://github.com/ydb-platform/ydb-embedded-ui/commit/5d58fcffde21924f3cbe6c28946c7a9f755a8490))
+
 ## [1.10.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.10.0...v1.10.1) (2022-08-10)
 
 
