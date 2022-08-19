@@ -1,6 +1,5 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
 import cn from 'bem-cn-lite';
-import _ from 'lodash';
 import {Popup} from '@yandex-cloud/uikit';
 
 import type {RequiredField} from '../../../types';
@@ -12,6 +11,7 @@ import routes, {createHref} from '../../../routes';
 import {getPDiskId} from '../../../utils';
 import {getPDiskType} from '../../../utils/pdisk';
 import {TPDiskStateInfo, TPDiskState} from '../../../types/api/storage';
+import {InfoViewer} from '../../../components/InfoViewer';
 import DiskStateProgressBar, {
     diskProgressColors,
 } from '../DiskStateProgressBar/DiskStateProgressBar';
@@ -78,51 +78,46 @@ function Pdisk(props: PDiskProps) {
             diskProgressColors[colorSeverity.Yellow as keyof typeof diskProgressColors],
         ];
 
-        const pdiskData: {property: string; value: string | number}[] = [
-            {property: 'PDisk', value: getPDiskId({NodeId, PDiskId})},
+        const pdiskData: {label: string; value: string | number}[] = [
+            {label: 'PDisk', value: getPDiskId({NodeId, PDiskId})},
         ];
 
-        pdiskData.push({property: 'State', value: State || 'not available'});
-        pdiskData.push({property: 'Type', value: getPDiskType(props) || 'unknown'});
-        NodeId && pdiskData.push({property: 'Node Id', value: NodeId});
+        pdiskData.push({label: 'State', value: State || 'not available'});
+        pdiskData.push({label: 'Type', value: getPDiskType(props) || 'unknown'});
+        NodeId && pdiskData.push({label: 'Node Id', value: NodeId});
 
-        Path && pdiskData.push({property: 'Path', value: Path});
+        Path && pdiskData.push({label: 'Path', value: Path});
         pdiskData.push({
-            property: 'Available',
+            label: 'Available',
             value: `${bytesToGB(AvailableSize)} of ${bytesToGB(TotalSize)}`,
         });
         Realtime &&
             errorColors.includes(Realtime) &&
-            pdiskData.push({property: 'Realtime', value: Realtime});
+            pdiskData.push({label: 'Realtime', value: Realtime});
         Device &&
             errorColors.includes(Device) &&
-            pdiskData.push({property: 'Device', value: Device});
+            pdiskData.push({label: 'Device', value: Device});
         return pdiskData;
     };
     /* eslint-enable */
 
-    const renderPopup = () => {
-        const pdiskData = preparePdiskData();
-        return (
-            <Popup
-                className={b('popup-wrapper')}
-                anchorRef={anchor}
-                open={isPopupVisible}
-                placement={['top', 'bottom']}
-                hasArrow
-            >
-                <div className={b('popup-content')}>
-                    <div className={b('popup-section-name')}>PDisk</div>
-                    {_.map(pdiskData, (row) => (
-                        <React.Fragment key={row.property}>
-                            <div className={b('property')}>{row.property}</div>
-                            <div className={b('value')}>{row.value}</div>
-                        </React.Fragment>
-                    ))}
-                </div>
-            </Popup>
-        );
-    };
+    const renderPopup = () => (
+        <Popup
+            className={b('popup-wrapper')}
+            anchorRef={anchor}
+            open={isPopupVisible}
+            placement={['top', 'bottom']}
+            // bigger offset for easier switching to neighbour nodes
+            // matches the default offset for popup with arrow out of a sense of beauty
+            offset={[0, 12]}
+        >
+            <InfoViewer
+                title="PDisk"
+                info={preparePdiskData()}
+                size="s"
+            />
+        </Popup>
+    );
 
     const pdiskAllocatedPercent = useMemo(() => {
         const {AvailableSize, TotalSize} = props;
