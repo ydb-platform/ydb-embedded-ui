@@ -12,13 +12,14 @@ interface InfoViewerProps {
     title?: string;
     info?: InfoViewerItem[];
     dots?: boolean;
+    size?: 's';
     className?: string;
 }
 
 const b = cn('info-viewer');
 
-const InfoViewer = ({title, info, dots = true, className}: InfoViewerProps) => (
-    <div className={b(null, className)}>
+const InfoViewer = ({title, info, dots = true, size, className}: InfoViewerProps) => (
+    <div className={b({size}, className)}>
         {title && <div className={b('title')}>{title}</div>}
         {info && info.length > 0 ? (
             <div className={b('items')}>
