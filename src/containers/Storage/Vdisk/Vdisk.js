@@ -1,13 +1,13 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
-import _ from 'lodash';
 import {Popup} from '@yandex-cloud/uikit';
 
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import routes, {createHref} from '../../../routes';
 import {stringifyVdiskId, getPDiskId} from '../../../utils';
 import {getPDiskType} from '../../../utils/pdisk';
+import {InfoViewer} from '../../../components/InfoViewer';
 import DiskStateProgressBar, {
     diskProgressColors,
 } from '../DiskStateProgressBar/DiskStateProgressBar';
@@ -97,62 +97,62 @@ function Vdisk(props) {
             ReadThroughput,
             WriteThroughput,
         } = props;
-        const vdiskData = [{property: 'VDisk', value: stringifyVdiskId(VDiskId)}];
-        vdiskData.push({property: 'State', value: VDiskState ?? 'not available'});
-        PoolName && vdiskData.push({property: 'StoragePool', value: PoolName});
+        const vdiskData = [{label: 'VDisk', value: stringifyVdiskId(VDiskId)}];
+        vdiskData.push({label: 'State', value: VDiskState ?? 'not available'});
+        PoolName && vdiskData.push({label: 'StoragePool', value: PoolName});
 
         SatisfactionRank &&
             SatisfactionRank.FreshRank?.Flag !== diskProgressColors[colorSeverity.Green] &&
             vdiskData.push({
-                property: 'Fresh',
+                label: 'Fresh',
                 value: SatisfactionRank.FreshRank.Flag,
             });
 
         SatisfactionRank &&
             SatisfactionRank.LevelRank?.Flag !== diskProgressColors[colorSeverity.Green] &&
             vdiskData.push({
-                property: 'Level',
+                label: 'Level',
                 value: SatisfactionRank.LevelRank.Flag,
             });
 
         SatisfactionRank &&
             SatisfactionRank.FreshRank?.RankPercent &&
             vdiskData.push({
-                property: 'Fresh',
+                label: 'Fresh',
                 value: SatisfactionRank.FreshRank.RankPercent,
             });
 
         SatisfactionRank &&
             SatisfactionRank.LevelRank?.RankPercent &&
             vdiskData.push({
-                property: 'Level',
+                label: 'Level',
                 value: SatisfactionRank.LevelRank.RankPercent,
             });
 
         DiskSpace &&
             DiskSpace !== diskProgressColors[colorSeverity.Green] &&
-            vdiskData.push({property: 'Space', value: DiskSpace});
+            vdiskData.push({label: 'Space', value: DiskSpace});
 
         FrontQueues &&
             FrontQueues !== diskProgressColors[colorSeverity.Green] &&
-            vdiskData.push({property: 'FrontQueues', value: FrontQueues});
+            vdiskData.push({label: 'FrontQueues', value: FrontQueues});
 
-        !Replicated && vdiskData.push({property: 'Replicated', value: 'NO'});
+        !Replicated && vdiskData.push({label: 'Replicated', value: 'NO'});
 
-        UnsyncedVDisks && vdiskData.push({property: 'UnsyncVDisks', value: UnsyncedVDisks});
+        UnsyncedVDisks && vdiskData.push({label: 'UnsyncVDisks', value: UnsyncedVDisks});
 
         Boolean(Number(AllocatedSize)) &&
             vdiskData.push({
-                property: 'Allocated',
+                label: 'Allocated',
                 value: bytesToGB(AllocatedSize),
             });
 
         Boolean(Number(ReadThroughput)) &&
-            vdiskData.push({property: 'Read', value: bytesToSpeed(ReadThroughput)});
+            vdiskData.push({label: 'Read', value: bytesToSpeed(ReadThroughput)});
 
         Boolean(Number(WriteThroughput)) &&
             vdiskData.push({
-                property: 'Write',
+                label: 'Write',
                 value: bytesToSpeed(WriteThroughput),
             });
 
@@ -167,61 +167,53 @@ function Vdisk(props) {
             diskProgressColors[colorSeverity.Yellow],
         ];
         if (PDisk && nodes) {
-            const pdiskData = [{property: 'PDisk', value: getPDiskId(PDisk)}];
+            const pdiskData = [{label: 'PDisk', value: getPDiskId(PDisk)}];
             pdiskData.push({
-                property: 'State',
+                label: 'State',
                 value: PDisk.State || 'not available',
             });
-            pdiskData.push({property: 'Type', value: getPDiskType(PDisk) || 'unknown'});
-            PDisk.NodeId && pdiskData.push({property: 'Node Id', value: PDisk.NodeId});
+            pdiskData.push({label: 'Type', value: getPDiskType(PDisk) || 'unknown'});
+            PDisk.NodeId && pdiskData.push({label: 'Node Id', value: PDisk.NodeId});
             PDisk.NodeId &&
                 nodes[PDisk.NodeId] &&
-                pdiskData.push({property: 'Host', value: nodes[PDisk.NodeId]});
-            PDisk.Path && pdiskData.push({property: 'Path', value: PDisk.Path});
+                pdiskData.push({label: 'Host', value: nodes[PDisk.NodeId]});
+            PDisk.Path && pdiskData.push({label: 'Path', value: PDisk.Path});
             pdiskData.push({
-                property: 'Available',
+                label: 'Available',
                 value: `${bytesToGB(PDisk.AvailableSize)} of ${bytesToGB(PDisk.TotalSize)}`,
             });
             errorColors.includes(PDisk.Realtime) &&
-                pdiskData.push({property: 'Realtime', value: PDisk.Realtime});
+                pdiskData.push({label: 'Realtime', value: PDisk.Realtime});
             errorColors.includes(PDisk.Device) &&
-                pdiskData.push({property: 'Device', value: PDisk.Device});
+                pdiskData.push({label: 'Device', value: PDisk.Device});
             return pdiskData;
         }
         return null;
     };
     /* eslint-enable */
 
-    const renderPopup = () => {
-        const vdiskData = prepareVdiskData();
-        const pdiskData = preparePdiskData();
-        return (
-            <Popup
-                className={b('popup-wrapper')}
-                anchorRef={anchor}
-                open={isPopupVisible}
-                placement={['top', 'bottom']}
-                hasArrow
-            >
-                <div className={b('popup-content')}>
-                    <div className={b('popup-section-name')}>VDisk</div>
-                    {_.map(vdiskData, (row) => (
-                        <React.Fragment key={row.property}>
-                            <div className={b('property')}>{row.property}</div>
-                            <div className={b('value')}>{row.value}</div>
-                        </React.Fragment>
-                    ))}
-                    <div className={b('popup-section-name')}>PDisk</div>
-                    {_.map(pdiskData, (row) => (
-                        <React.Fragment key={row.property}>
-                            <div className={b('property')}>{row.property}</div>
-                            <div className={b('value')}>{row.value}</div>
-                        </React.Fragment>
-                    ))}
-                </div>
-            </Popup>
-        );
-    };
+    const renderPopup = () => (
+        <Popup
+            className={b('popup-wrapper')}
+            anchorRef={anchor}
+            open={isPopupVisible}
+            placement={['top', 'bottom']}
+            // bigger offset for easier switching to neighbour nodes
+            // matches the default offset for popup with arrow out of a sense of beauty
+            offset={[0, 12]}
+        >
+            <InfoViewer
+                title="VDisk"
+                info={prepareVdiskData()}
+                size="s"
+            />
+            <InfoViewer
+                title="PDisk"
+                info={preparePdiskData()}
+                size="s"
+            />
+        </Popup>
+    );
 
     const vdiskAllocatedPercent = useMemo(() => {
         const {AvailableSize, AllocatedSize, PDisk} = props;
@@ -245,13 +237,13 @@ function Vdisk(props) {
                     href={
                         props.NodeId
                             ? createHref(
-                                  routes.node,
-                                  {id: props.NodeId, activeTab: STRUCTURE},
-                                  {
-                                      pdiskId: props.PDisk?.PDiskId,
-                                      vdiskId: stringifyVdiskId(props.VDiskId),
-                                  },
-                              )
+                                routes.node,
+                                {id: props.NodeId, activeTab: STRUCTURE},
+                                {
+                                    pdiskId: props.PDisk?.PDiskId,
+                                    vdiskId: stringifyVdiskId(props.VDiskId),
+                                },
+                            )
                             : undefined
                     }
                 />

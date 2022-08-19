@@ -1,25 +1,11 @@
 .vdisk-storage {
-    cursor: pointer;
-
     &__popup-wrapper {
-        padding: 5px 10px;
-    }
-    &__popup-content {
-        display: grid;
-        justify-items: stretch;
-        column-gap: 5px;
-    }
-    &__popup-section-name {
-        grid-column: 1 / 3;
+        padding: 12px;
 
-        margin: 5px 0;
-
-        font-weight: 500;
-        text-align: center;
-
-        border-bottom: 1px solid var(--yc-color-line-generic);
-    }
-    &__property {
-        text-align: right;
+        .info-viewer + .info-viewer {
+            border-top: 1px solid var(--yc-color-line-generic);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
     }
 }
