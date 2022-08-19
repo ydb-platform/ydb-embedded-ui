@@ -52,3 +52,124 @@ export interface TPDiskStateInfo {
     Overall?: EFlag;
     SerialNumber?: string;
 }
+
+export enum EVDiskState {
+    Initial = 'Initial',
+    LocalRecoveryError = 'LocalRecoveryError',
+    SyncGuidRecovery = 'SyncGuidRecovery',
+    SyncGuidRecoveryError = 'SyncGuidRecoveryError',
+    OK = 'OK',
+    PDiskError = 'PDiskError',
+}
+
+interface TRank {
+    /**
+     * uint32
+     * Rank in percents; 0-100% is good; >100% is bad.
+     * Formula for rank calculation is the following:
+     * Rank = actual_value / max_allowed_value * 100
+     */
+    RankPercent?: string;
+
+    /**
+     * Flag is the Rank transformed to something simple
+     * to understand: Green, Yellow or Red
+     */
+    Flag?: EFlag;
+}
+
+interface TVDiskSatisfactionRank {
+    FreshRank?: TRank;
+    LevelRank?: TRank;
+}
+
+interface TVDiskID {
+    /** uint32 */
+    GroupID?: string;
+    /** uint32 */
+    GroupGeneration?: string;
+    /** uint32 */
+    Ring?: string;
+    /** uint32 */
+    Domain?: string;
+    /** uint32 */
+    VDisk?: string;
+}
+
+export interface TVDiskStateInfo {
+    VDiskId?: TVDiskID;
+    /** uint64 */
+    CreateTime?: string;
+    /** uint64 */
+    ChangeTime?: string;
+    /** uint32 */
+    PDiskId?: string;
+    /** uint32 */
+    VDiskSlotId?: string;
+    /** uint64 */
+    Guid?: string;
+    /** uint64 */
+    Kind?: string;
+    /** uint32 */
+    NodeId?: string;
+    /** uint32 */
+    Count?: string;
+
+    Overall?: EFlag;
+
+    /** Current state of VDisk */
+    VDiskState?: EVDiskState;
+    /** Disk space flags */
+    DiskSpace?: EFlag;
+    /** Compaction satisfaction rank */
+    SatisfactionRank?: TVDiskSatisfactionRank;
+    /** Is VDisk replicated? (i.e. contains all blobs it must have) */
+    Replicated?: boolean;
+    /** Does this VDisk has any yet unreplicated phantom-like blobs? */
+    UnreplicatedPhantoms?: boolean;
+    /** The same for the non-phantom-like blobs. */
+    UnreplicatedNonPhantoms?: boolean;
+    /**
+     * uint64
+     * How many unsynced VDisks from current BlobStorage group we see
+     */
+    UnsyncedVDisks?: string;
+    /**
+     * uint64
+     * How much this VDisk have allocated on corresponding PDisk
+     */
+    AllocatedSize?: string;
+    /**
+     * uint64
+     * How much space is available for VDisk corresponding to PDisk's hard space limits
+     */
+    AvailableSize?: string;
+    /** Does this disk has some unreadable but not yet restored blobs? */
+    HasUnreadableBlobs?: boolean;
+    /** fixed64 */
+    IncarnationGuid?: string;
+    DonorMode?: boolean;
+    /**
+     * fixed64
+     * VDisk actor instance guid
+     */
+    InstanceGuid?: string;
+    Donors?: TVDiskStateInfo[];
+
+    /** VDisk (Skeleton) Front Queue Status */
+    FrontQueues?: EFlag;
+
+    /** VDisk storage pool label */
+    StoragePoolName?: string;
+
+    /**
+     * uint64
+     * Read bytes per second from PDisk for TEvVGet blobs only
+     */
+    ReadThroughput?: string;
+    /**
+     * uint64
+     * Write bytes per second to PDisk for TEvVPut blobs and replication bytes only
+     */
+    WriteThroughput?: string;
+}
