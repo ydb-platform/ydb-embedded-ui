@@ -1,5 +1,5 @@
 import type {TEvDescribeSchemeResult, TIndexDescription} from '../../types/api/schema';
-import {InfoViewer, createInfoFormatter} from '../InfoViewer';
+import {InfoViewer, createInfoFormatter, InfoViewerItem} from '../InfoViewer';
 
 const DISPLAYED_FIELDS: Set<keyof TIndexDescription> = new Set([
     'Type',
@@ -34,7 +34,7 @@ export const IndexInfoViewer = ({data}: IndexInfoViewerProps) => {
     }
 
     const TableIndex = data.PathDescription?.TableIndex;
-    const info: Array<{label?: string, value?: unknown}> = [];
+    const info: Array<InfoViewerItem> = [];
 
     let key: keyof TIndexDescription;
     for (key in TableIndex) {
