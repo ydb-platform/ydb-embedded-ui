@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
-import {Popup} from '@yandex-cloud/uikit';
+import {Label, Popup} from '@yandex-cloud/uikit';
 
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import routes, {createHref} from '../../../routes';
@@ -202,6 +202,7 @@ function Vdisk(props) {
             // matches the default offset for popup with arrow out of a sense of beauty
             offset={[0, 12]}
         >
+            {props.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
             <InfoViewer
                 title="VDisk"
                 info={prepareVdiskData()}

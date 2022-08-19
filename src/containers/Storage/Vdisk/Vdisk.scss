@@ -3,9 +3,14 @@
         padding: 12px;
 
         .info-viewer + .info-viewer {
-            border-top: 1px solid var(--yc-color-line-generic);
-            padding-top: 8px;
             margin-top: 8px;
+            padding-top: 8px;
+
+            border-top: 1px solid var(--yc-color-line-generic);
         }
+    }
+
+    &__donor-label {
+        margin-bottom: 8px;
     }
 }
