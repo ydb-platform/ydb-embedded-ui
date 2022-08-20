@@ -2,6 +2,8 @@ import React, {useEffect, useState, useRef, useMemo} from 'react';
 import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import {Popup} from '@yandex-cloud/uikit';
+
+import type {RequiredField} from '../../../types';
 //@ts-ignore
 import {bytesToGB} from '../../../utils/utils';
 //@ts-ignore
@@ -38,7 +40,7 @@ const stateSeverity = {
     [TPDiskState.DeviceIoError]: 5,
 };
 
-type PDiskProps = TPDiskStateInfo;
+type PDiskProps = RequiredField<TPDiskStateInfo, 'NodeId'>;
 
 const isSeverityKey = (key?: TPDiskState): key is keyof typeof stateSeverity =>
     key !== undefined && key in stateSeverity;
