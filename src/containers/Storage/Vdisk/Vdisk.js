@@ -26,6 +26,7 @@ const propTypes = {
     FrontQueues: PropTypes.string,
     Replicated: PropTypes.bool,
     PoolName: PropTypes.string,
+    VDiskId: PropTypes.object,
 };
 
 const stateSeverity = {
