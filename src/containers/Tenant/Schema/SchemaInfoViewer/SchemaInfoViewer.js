@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import './SchemaInfoViewer.scss';
 
-import {formatCPU, formatBytes, formatNumber, formatBps} from '../../../../utils';
+import {formatCPU, formatBytes, formatNumber, formatBps, formatDateTime} from '../../../../utils';
 
 import {InfoViewer, createInfoFormatter} from '../../../../components/InfoViewer';
 
@@ -38,8 +38,8 @@ const formatTableStatsItem = createInfoFormatter({
     values: {
         DataSize: formatBytes,
         IndexSize: formatBytes,
-        LastAccessTime: (value) => value > 0 ? new Date(Number(value)).toUTCString() : 'N/A',
-        LastUpdateTime: (value) => value > 0 ? new Date(Number(value)).toUTCString() : 'N/A',
+        LastAccessTime: formatDateTime,
+        LastUpdateTime: formatDateTime,
     },
     defaultValueFormatter: formatNumber,
 });

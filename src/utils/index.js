@@ -1,14 +1,18 @@
 import numeral from 'numeral';
+import locales from 'numeral/locales'; // eslint-disable-line no-unused-vars
 import _ from 'lodash';
 
 import {i18n} from './i18n';
 import {MEGABYTE, TERABYTE, DAY_IN_SECONDS, GIGABYTE} from './constants';
-
-import locales from 'numeral/locales'; // eslint-disable-line no-unused-vars
+import {isNumeric} from './utils';
 
 numeral.locale(i18n.lang);
 
 export const formatBytes = (bytes) => {
+    if (!isNumeric(bytes)) {
+        return '';
+    }
+
     // by agreement, display byte values in decimal scale
     return numeral(bytes).format('0 b');
 };
@@ -53,11 +57,27 @@ export const formatThroughput = (value, total) => {
 };
 
 export const formatNumber = (number) => {
+    if (!isNumeric(number)) {
+        return '';
+    }
+
     return numeral(number).format();
 };
 
 export const formatCPU = (value) => {
+    if (!isNumeric(value)) {
+        return '';
+    }
+
     return numeral(value / 1000000).format('0.00');
+};
+
+export const formatDateTime = (value) => {
+    if (!isNumeric(value)) {
+        return '';
+    }
+
+    return value > 0 ? new Date(Number(value)).toUTCString() : 'N/A';
 };
 
 export const calcUptime = (milliseconds) => {
