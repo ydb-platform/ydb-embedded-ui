@@ -1,4 +1,8 @@
 .global-storage-groups {
+    &__vdisks-column {
+        overflow: visible; // to enable stacked disks overflow the row
+    }
+
     &__vdisks-wrapper {
         display: flex;
         justify-content: center;
@@ -13,6 +17,14 @@
 
         &:last-child {
             margin-right: 0px;
+        }
+
+        .stack__layer {
+            background: var(--yc-color-base-background);
+
+            .data-table__row:hover & {
+                background: var(--yc-color-base-float-hover);
+            }
         }
     }
     &__pool-name-wrapper {

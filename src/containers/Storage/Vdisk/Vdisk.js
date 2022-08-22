@@ -27,6 +27,7 @@ const propTypes = {
     Replicated: PropTypes.bool,
     PoolName: PropTypes.string,
     VDiskId: PropTypes.object,
+    nodes: PropTypes.object,
 };
 
 const stateSeverity = {
