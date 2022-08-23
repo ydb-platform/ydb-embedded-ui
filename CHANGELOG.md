@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.10.3...v1.11.0) (2022-08-23)
+
+
+### Features
+
+* **Stack:** new component for stacked elements ([c42ba37](https://github.com/ydb-platform/ydb-embedded-ui/commit/c42ba37fafdd9dedc4be9d625d7e756a83c01fe3))
+* **Storage:** display donor disks ([b808fe9](https://github.com/ydb-platform/ydb-embedded-ui/commit/b808fe951987c615f797af56017f8045a1ed852f))
+* **VDisk:** display label for donors ([bba5ae8](https://github.com/ydb-platform/ydb-embedded-ui/commit/bba5ae8e44347a5b1d9cb72424f5a963a6848e59))
+
+
+### Bug Fixes
+
+* **InfoViewer:** add size_s ([fc06451](https://github.com/ydb-platform/ydb-embedded-ui/commit/fc0645118f64a79f660d734c2ff43c42c738fd40))
+* **PDisk:** new popup design ([9c0355d](https://github.com/ydb-platform/ydb-embedded-ui/commit/9c0355d4d9ccf69d43a5287b0e78d7c7993c4a18))
+* **PDisk:** restrict component interface ([328efa9](https://github.com/ydb-platform/ydb-embedded-ui/commit/328efa90d214eca1bceeeb5bd9099aab36a3ddb0))
+* **Storage:** shrink tooltip active area on Pool Name ([30a2b92](https://github.com/ydb-platform/ydb-embedded-ui/commit/30a2b92ff598d9caeabe17a4b8de214943945a91))
+* **VDisk:** add a missing prop type ([39b6cf3](https://github.com/ydb-platform/ydb-embedded-ui/commit/39b6cf38811cab6c4374c77d3eb63c11fa7b83d5))
+* **VDisk:** don't paint donors blue ([6b148b9](https://github.com/ydb-platform/ydb-embedded-ui/commit/6b148b914663a74e528a01a35f575f87ed6e9f09))
+* **VDisk:** new popup design ([107b139](https://github.com/ydb-platform/ydb-embedded-ui/commit/107b13900b08631ea42034a6a2f7961c49c86556))
+
 ## [1.10.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.10.2...v1.10.3) (2022-08-23)
 
 
