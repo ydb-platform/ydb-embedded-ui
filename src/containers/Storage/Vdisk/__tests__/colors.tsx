@@ -98,18 +98,66 @@ describe('VDisk state', () => {
                     VDiskState="OK" // severity 1, green
                     Replicated={true}
                 />
+            </>
+        );
+
+        const [disk1, disk2] = getAllByRole('meter');
+
+        expect(disk1.className).toMatch(/_blue\b/i);
+        expect(disk2.className).not.toMatch(/_blue\b/i);
+    });
+
+    it('Should display replicating VDisks in a not-OK state with a regular color', () => {
+        const {getAllByRole} = render(
+            <>
                 <VDisk
-                    VDiskId={{Domain: 3}}
+                    VDiskId={{Domain: 1}}
                     VDiskState="Initial" // severity 3, yellow
                     Replicated={false}
+                    />
+                <VDisk
+                    VDiskId={{Domain: 2}}
+                    VDiskState="PDiskError" // severity 5, red
+                    Replicated={false}
+                />
+            </>
+        );
+
+        const [disk1, disk2] = getAllByRole('meter');
+
+        expect(disk1.className).toMatch(/_yellow\b/i);
+        expect(disk2.className).toMatch(/_red\b/i);
+    });
+
+    it('Should always display donor VDisks with a regular color', () => {
+        const {getAllByRole} = render(
+            <>
+                <VDisk
+                    VDiskId={{Domain: 1}}
+                    VDiskState="OK" // severity 1, green
+                    Replicated={false} // donors are always in the not replicated state since they are leftovers
+                    DonorMode
+                />
+                <VDisk
+                    VDiskId={{Domain: 2}}
+                    VDiskState="Initial" // severity 3, yellow
+                    Replicated={false}
+                    DonorMode
+                />
+                <VDisk
+                    VDiskId={{Domain: 3}}
+                    VDiskState="PDiskError" // severity 5, red
+                    Replicated={false}
+                    DonorMode
                 />
             </>
         );
 
         const [disk1, disk2, disk3] = getAllByRole('meter');
 
-        expect(disk1.className).toMatch(/_blue\b/i);
-        expect(disk2.className).not.toMatch(/_blue\b/i);
-        expect(disk3.className).not.toMatch(/_blue\b/i);
+        expect(disk1.className).not.toMatch(/_blue\b/i);
+        expect(disk1.className).toMatch(/_green\b/i);
+        expect(disk2.className).toMatch(/_yellow\b/i);
+        expect(disk3.className).toMatch(/_red\b/i);
     });
 });
