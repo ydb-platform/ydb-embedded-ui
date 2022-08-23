@@ -30,14 +30,16 @@
     &__pool-name-wrapper {
         display: flex;
         align-items: flex-end;
+
+        width: 230px;
     }
     &__pool-name {
         display: inline-block;
         overflow: hidden;
 
-        width: 230px;
         max-width: 230px;
 
+        vertical-align: top;
         text-overflow: ellipsis;
     }
     &__group-id {
