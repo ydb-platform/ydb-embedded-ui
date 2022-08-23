@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.10.2...v1.10.3) (2022-08-23)
+
+
+### Bug Fixes
+
+* **Overview:** format undefined values to empty string, not 0 ([1a37c27](https://github.com/ydb-platform/ydb-embedded-ui/commit/1a37c278328ad8eb4397d9507566829f01a9c872))
+
 ## [1.10.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.10.1...v1.10.2) (2022-08-17)
 
 
