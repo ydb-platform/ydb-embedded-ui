@@ -46,6 +46,11 @@ function DiskStateProgressBar({
                     ? b({[diskProgressColors[severity].toLowerCase()]: true})
                     : undefined
             }
+            role="meter"
+            aria-label="Disk allocated space"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={diskAllocatedPercent}
         >
             {href ? (
                 <InternalLink to={href} className={b('link')}>
