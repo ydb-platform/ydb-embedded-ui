@@ -27,6 +27,7 @@ const propTypes = {
     Replicated: PropTypes.bool,
     PoolName: PropTypes.string,
     VDiskId: PropTypes.object,
+    DonorMode: PropTypes.bool,
     nodes: PropTypes.object,
 };
 
@@ -55,7 +56,7 @@ function Vdisk(props) {
 
     // determine disk status severity
     useEffect(() => {
-        const {DiskSpace, VDiskState, FrontQueues, Replicated} = props;
+        const {DiskSpace, VDiskState, FrontQueues, Replicated, DonorMode} = props;
 
         // if the disk is not available, this determines its status severity regardless of other features
         if (!VDiskState) {
@@ -68,7 +69,10 @@ function Vdisk(props) {
         const FrontQueuesSeverity = Math.min(colorSeverity.Orange, getColorSeverity(FrontQueues));
 
         let newSeverity = Math.max(DiskSpaceSeverity, VDiskSpaceSeverity, FrontQueuesSeverity);
-        if (!Replicated && newSeverity === colorSeverity.Green) {
+
+        // donors are always in the not replicated state since they are leftovers
+        // painting them blue is useless
+        if (!Replicated && !DonorMode && newSeverity === colorSeverity.Green) {
             newSeverity = colorSeverity.Blue;
         }
 
