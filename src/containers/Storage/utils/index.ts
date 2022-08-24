@@ -40,3 +40,11 @@ export const getDegradedSeverity = (group: IStoragePoolGroup) => {
 
     return evaluate(group.Missing);
 };
+
+export const getUsageSeverity = generateEvaluator(80, 85);
+
+export const getUsage = (data: IStoragePoolGroup, step = 1) => {
+    const usage = Math.round((data.Used * 100) / data.Limit);
+
+    return Math.floor(usage / step) * step;
+};

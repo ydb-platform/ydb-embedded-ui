@@ -16,7 +16,7 @@ import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {stringifyVdiskId} from '../../../utils';
 
 import Vdisk from '../Vdisk/Vdisk';
-import {isFullDonorData, getDegradedSeverity} from '../utils';
+import {isFullDonorData, getDegradedSeverity, getUsageSeverity, getUsage} from '../utils';
 
 import './StorageGroups.scss';
 
@@ -49,7 +49,7 @@ const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
     Used: 'Used',
     Limit: 'Limit',
     UsedSpaceFlag: 'Space',
-    UsedPercents: 'Used percents',
+    UsedPercents: 'Usage',
     Read: 'Read',
     Write: 'Write',
     VDisks: 'VDisks',
@@ -121,6 +121,24 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
             defaultOrder: DataTable.DESCENDING,
         },
         {
+            name: TableColumnsIds.UsedPercents,
+            header: tableColumnsNames[TableColumnsIds.UsedPercents],
+            width: 100,
+            render: ({row}) => {
+                const usage = getUsage(row, 5);
+                return (
+                    <Label
+                        theme={getUsageSeverity(usage)}
+                        className={b('usage-label', {overload: usage >= 100})}
+                    >
+                        ≥ {usage}%
+                    </Label>
+                );
+            },
+            sortAccessor: getUsage,
+            align: DataTable.LEFT,
+        },
+        {
             name: TableColumnsIds.GroupID,
             header: tableColumnsNames[TableColumnsIds.GroupID],
             width: 130,
@@ -147,18 +165,6 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
             },
             align: DataTable.RIGHT,
         },
-        // {
-        //     name: tableColumnsIds.UsedPercents,
-        //     header: tableColumnsNames[tableColumnsIds.UsedPercents],
-        //     width: '100px',
-        //     render: ({row}) => {
-        //         return (
-        //             Math.round((row[tableColumnsIds.Used] * 100) / row[tableColumnsIds.Limit]) +
-        //             '%'
-        //         );
-        //     },
-        //     align: DataTable.RIGHT,
-        // },
         {
             name: TableColumnsIds.UsedSpaceFlag,
             header: tableColumnsNames[TableColumnsIds.UsedSpaceFlag],
