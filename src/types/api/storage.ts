@@ -170,3 +170,49 @@ export interface TVDiskStateInfo {
      */
     WriteThroughput?: string;
 }
+
+export interface TBSGroupStateInfo {
+    /** uint32 */
+    GroupID?: string;
+    ErasureSpecies?: string;
+    VDisks?: TVDiskStateInfo[];
+    /** uint64 */
+    ChangeTime?: string;
+    /** uint32 */
+    NodeId?: string; // filled during merge
+    /** uint32 */
+    GroupGeneration?: string;
+    Overall?: EFlag;
+    Latency?: EFlag;
+    /** uint32 */
+    Count?: string; // filled during group count
+    StoragePoolName?: string; // from BS_CONTROLLER
+}
+
+export interface TStoragePoolInfo {
+    Overall?: EFlag;
+    Name?: string;
+    Kind?: string;
+    Groups?: TBSGroupStateInfo[];
+    /** uint64 */
+    AcquiredUnits?: string;
+    AcquiredIOPS?: number;
+    /** uint64 */
+    AcquiredThroughput?: string;
+    /** uint64 */
+    AcquiredSize?: string;
+    MaximumIOPS?: number;
+    /** uint64 */
+    MaximumThroughput?: string;
+    /** uint64 */
+    MaximumSize?: string;
+}
+
+export interface TStorageInfo {
+    Overall?: EFlag;
+    StoragePools?: TStoragePoolInfo[];
+    /** uint64 */
+    TotalGroups?: string;
+    /** uint64 */
+    FoundGroups?: string;
+}

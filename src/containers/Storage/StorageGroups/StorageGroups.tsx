@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
-import {Popover, PopoverBehavior} from '@yandex-cloud/uikit';
+import {Label, Popover, PopoverBehavior} from '@yandex-cloud/uikit';
 
 import {Stack} from '../../../components/Stack/Stack';
 //@ts-ignore
@@ -16,7 +16,7 @@ import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {stringifyVdiskId} from '../../../utils';
 
 import Vdisk from '../Vdisk/Vdisk';
-import {isFullDonorData} from '../utils';
+import {isFullDonorData, getDegradedSeverity} from '../utils';
 
 import './StorageGroups.scss';
 
@@ -53,7 +53,7 @@ const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
     Read: 'Read',
     Write: 'Write',
     VDisks: 'VDisks',
-    Missing: 'Missing',
+    Missing: 'Degraded',
 };
 
 const b = cn('global-storage-groups');
@@ -62,8 +62,8 @@ function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder 
     switch (visibleEntities) {
         case VisibleEntities.All: {
             return {
-                columnId: TableColumnsIds.GroupID,
-                order: DataTable.ASCENDING,
+                columnId: TableColumnsIds.Missing,
+                order: DataTable.DESCENDING,
             };
         }
         case VisibleEntities.Missing: {
@@ -109,6 +109,16 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
                 );
             },
             align: DataTable.LEFT,
+        },
+        {
+            name: TableColumnsIds.Missing,
+            header: tableColumnsNames[TableColumnsIds.Missing],
+            width: 100,
+            render: ({value, row}) => value ? (
+                <Label theme={getDegradedSeverity(row)}>Degraded: {value}</Label>
+            ) : '-',
+            align: DataTable.LEFT,
+            defaultOrder: DataTable.DESCENDING,
         },
         {
             name: TableColumnsIds.GroupID,
@@ -185,13 +195,6 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
                 return value ? bytesToSpeed(value) : '-';
             },
             align: DataTable.RIGHT,
-        },
-        {
-            name: TableColumnsIds.Missing,
-            header: tableColumnsNames[TableColumnsIds.Missing],
-            width: 100,
-            align: DataTable.CENTER,
-            defaultOrder: DataTable.DESCENDING,
         },
         {
             name: TableColumnsIds.VDisks,
