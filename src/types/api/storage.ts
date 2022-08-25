@@ -64,12 +64,11 @@ export enum EVDiskState {
 
 interface TRank {
     /**
-     * uint32
      * Rank in percents; 0-100% is good; >100% is bad.
      * Formula for rank calculation is the following:
      * Rank = actual_value / max_allowed_value * 100
      */
-    RankPercent?: string;
+    RankPercent?: number;
 
     /**
      * Flag is the Rank transformed to something simple
@@ -84,25 +83,17 @@ interface TVDiskSatisfactionRank {
 }
 
 interface TVDiskID {
-    /** uint32 */
-    GroupID?: string;
-    /** uint32 */
-    GroupGeneration?: string;
-    /** uint32 */
-    Ring?: string;
-    /** uint32 */
-    Domain?: string;
-    /** uint32 */
-    VDisk?: string;
+    GroupID?: number;
+    GroupGeneration?: number;
+    Ring?: number;
+    Domain?: number;
+    VDisk?: number;
 }
 
 export interface TVSlotId {
-    /** uint32 */
-    NodeId?: string;
-    /** uint32 */
-    PDiskId?: string;
-    /** uint32 */
-    VSlotId?: string;
+    NodeId?: number;
+    PDiskId?: number;
+    VSlotId?: number;
 }
 
 export interface TVDiskStateInfo {
@@ -111,18 +102,14 @@ export interface TVDiskStateInfo {
     CreateTime?: string;
     /** uint64 */
     ChangeTime?: string;
-    /** uint32 */
-    PDiskId?: string;
-    /** uint32 */
-    VDiskSlotId?: string;
+    PDiskId?: number;
+    VDiskSlotId?: number;
     /** uint64 */
     Guid?: string;
     /** uint64 */
     Kind?: string;
-    /** uint32 */
-    NodeId?: string;
-    /** uint32 */
-    Count?: string;
+    NodeId?: number;
+    Count?: number;
 
     Overall?: EFlag;
 

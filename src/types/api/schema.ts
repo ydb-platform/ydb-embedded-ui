@@ -91,27 +91,19 @@ export interface TTableDescription {
 export interface TPartitionConfig {
     /** uint64 */
     FollowerCount?: string;
-    /**
-     * uint32
-     * @deprecated use FollowerGroups
-     */
-    CrossDataCenterFollowerCount?: string;
+    /** @deprecated use FollowerGroups */
+    CrossDataCenterFollowerCount?: number;
     /** 0 or 1 items */
     FollowerGroups?: TFollowerGroup[];
 }
 
 export interface TFollowerGroup {
-    /** uint32 */
-    FollowerCount?: string;
+    FollowerCount?: number;
     AllowLeaderPromotion?: boolean;
     AllowClientRead?: boolean;
-    /** uint32[] */
-    AllowedNodeIDs?: string[];
-    /**
-     * uint32[]
-     * @deprecated use AllowedDataCenters
-     */
-    AllowedDataCenterNumIDs?: string[];
+    AllowedNodeIDs?: number[];
+    /** @deprecated use AllowedDataCenters */
+    AllowedDataCenterNumIDs?: number[];
     RequireAllDataCenters?: boolean;
     LocalNodeOnly?: boolean;
     RequireDifferentNodes?: boolean;
