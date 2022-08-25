@@ -3,7 +3,6 @@ import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
 import {Popover, PopoverBehavior} from '@yandex-cloud/uikit';
 
-import Vdisk from '../Vdisk/Vdisk';
 import {Stack} from '../../../components/Stack/Stack';
 //@ts-ignore
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
@@ -15,6 +14,9 @@ import {VisibleEntities} from '../../../store/reducers/storage';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 //@ts-ignore
 import {stringifyVdiskId} from '../../../utils';
+
+import Vdisk from '../Vdisk/Vdisk';
+import {isFullDonorData} from '../utils';
 
 import './StorageGroups.scss';
 
@@ -197,34 +199,38 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
             header: tableColumnsNames[TableColumnsIds.VDisks],
             render: ({value, row}) => (
                 <div className={b('vdisks-wrapper')}>
-                    {_.map(value as TVDiskStateInfo[], (el) => (
-                        Array.isArray(el.Donors) && el.Donors.length > 0 ? (
-                            <Stack className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
-                                <Vdisk
-                                    {...el}
-                                    PoolName={row[TableColumnsIds.PoolName]}
-                                    nodes={nodes}
-                                />
-                                {el.Donors.map((donor) => (
+                    {_.map(value as TVDiskStateInfo[], (el) => {
+                        const donors = Array.isArray(el.Donors) ? el.Donors.filter(isFullDonorData) : [];
+
+                        return (
+                            donors.length > 0 ? (
+                                <Stack className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
                                     <Vdisk
-                                        {...donor}
-                                        // donor and acceptor are always in the same group
+                                        {...el}
                                         PoolName={row[TableColumnsIds.PoolName]}
                                         nodes={nodes}
-                                        key={stringifyVdiskId(donor.VDiskId)}
                                     />
-                                ))}
-                            </Stack>
-                        ) : (
-                            <div className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
-                                <Vdisk
-                                    {...el}
-                                    PoolName={row[TableColumnsIds.PoolName]}
-                                    nodes={nodes}
-                                />
-                            </div>
-                        )
-                    ))}
+                                    {donors.map((donor) => (
+                                        <Vdisk
+                                            {...donor}
+                                            // donor and acceptor are always in the same group
+                                            PoolName={row[TableColumnsIds.PoolName]}
+                                            nodes={nodes}
+                                            key={stringifyVdiskId(donor.VDiskId)}
+                                        />
+                                    ))}
+                                </Stack>
+                            ) : (
+                                <div className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
+                                    <Vdisk
+                                        {...el}
+                                        PoolName={row[TableColumnsIds.PoolName]}
+                                        nodes={nodes}
+                                    />
+                                </div>
+                            )
+                        );
+                    })}
                 </div>
             ),
             align: DataTable.CENTER,
