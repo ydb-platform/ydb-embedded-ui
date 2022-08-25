@@ -96,6 +96,15 @@ interface TVDiskID {
     VDisk?: string;
 }
 
+export interface TVSlotId {
+    /** uint32 */
+    NodeId?: string;
+    /** uint32 */
+    PDiskId?: string;
+    /** uint32 */
+    VSlotId?: string;
+}
+
 export interface TVDiskStateInfo {
     VDiskId?: TVDiskID;
     /** uint64 */
@@ -154,7 +163,8 @@ export interface TVDiskStateInfo {
      * VDisk actor instance guid
      */
     InstanceGuid?: string;
-    Donors?: TVDiskStateInfo[];
+    // in reality it is `Donors: TVDiskStateInfo[] | TVSlotId[]`, but this way it is more error-proof
+    Donors?: Array<TVDiskStateInfo | TVSlotId>;
 
     /** VDisk (Skeleton) Front Queue Status */
     FrontQueues?: EFlag;
