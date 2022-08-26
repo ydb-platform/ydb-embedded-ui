@@ -131,7 +131,7 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
                 return row.Limit ? (
                     <Label
                         theme={getUsageSeverity(usage)}
-                        className={b('usage-label', {overload: usage >= 100})}
+                        className={b('usage-label', {overload: usage >= 90})}
                     >
                         ≥ {usage}%
                     </Label>
