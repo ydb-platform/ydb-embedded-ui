@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.11.1...v1.12.0) (2022-08-26)
+
+
+### Features
+
+* **Storage:** show usage column ([73aed5f](https://github.com/ydb-platform/ydb-embedded-ui/commit/73aed5f9ed60b6d2bd77fd315ae514ee7443c489))
+* **Storage:** vividly show degraded disks count ([7315a9c](https://github.com/ydb-platform/ydb-embedded-ui/commit/7315a9cfd98002a7fab85d721712aa82c6dbb552))
+
 ## [1.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.11.0...v1.11.1) (2022-08-26)
 
 
