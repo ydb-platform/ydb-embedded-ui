@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.12.0...v1.12.1) (2022-08-26)
+
+
+### Bug Fixes
+
+* **Storage:** properly display usage for 0 storage ([aee67f9](https://github.com/ydb-platform/ydb-embedded-ui/commit/aee67f9314341c995e2c9468f5eedc48fa0a3d35))
+
 ## [1.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.11.1...v1.12.0) (2022-08-26)
 
 
