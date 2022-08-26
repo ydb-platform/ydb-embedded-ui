@@ -133,7 +133,7 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
                         theme={getUsageSeverity(usage)}
                         className={b('usage-label', {overload: usage >= 90})}
                     >
-                        ≥ {usage}%
+                        {usage}%
                     </Label>
                 ) : '-';
             },
