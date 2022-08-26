@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.11.0...v1.11.1) (2022-08-26)
+
+
+### Bug Fixes
+
+* number type instead of string for uint32 ([e60799e](https://github.com/ydb-platform/ydb-embedded-ui/commit/e60799edec4ef831e8c0d51f4384cde83520541d))
+* **Storage:** expect arbitrary donors data ([09f8e08](https://github.com/ydb-platform/ydb-embedded-ui/commit/09f8e085c94faacd9da502643355e932346502ac))
+* vdisk data contains pdisk data, not id ([bd1ea7f](https://github.com/ydb-platform/ydb-embedded-ui/commit/bd1ea7f59e0461256bb12f146b50470d21ac1ace))
+
 ## [1.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.10.3...v1.11.0) (2022-08-23)
 
 
