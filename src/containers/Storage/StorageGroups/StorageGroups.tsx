@@ -126,16 +126,19 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
             width: 100,
             render: ({row}) => {
                 const usage = getUsage(row, 5);
-                return (
+                // without a limit the usage can be evaluated as 0,
+                // but the absence of a value is more clear
+                return row.Limit ? (
                     <Label
                         theme={getUsageSeverity(usage)}
                         className={b('usage-label', {overload: usage >= 100})}
                     >
                         ≥ {usage}%
                     </Label>
-                );
+                ) : '-';
             },
-            sortAccessor: getUsage,
+            // without a limit exclude usage from sort to display at the bottom
+            sortAccessor: (row) => row.Limit ? getUsage(row) : null,
             align: DataTable.LEFT,
         },
         {
