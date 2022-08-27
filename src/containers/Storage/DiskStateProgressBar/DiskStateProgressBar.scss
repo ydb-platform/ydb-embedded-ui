@@ -1,4 +1,8 @@
 .storage-disk-progress-bar {
+    $border-width: 2px;
+    $outer-border-radius: 4px;
+    $inner-border-radius: $outer-border-radius - $border-width;
+
     $block: &;
     position: relative;
 
@@ -9,8 +13,8 @@
 
     vertical-align: top;
 
-    border: 1px solid var(--yc-color-infographics-misc-medium);
-    border-radius: 2px;
+    border: $border-width solid var(--yc-color-infographics-misc-heavy);
+    border-radius: $outer-border-radius;
     background-color: var(--yc-color-infographics-misc-light);
 
     #{$block}__filled {
@@ -18,15 +22,20 @@
     }
 
     &_green {
-        border: 1px solid var(--yc-color-infographics-positive-heavy);
+        border-color: var(--yc-color-infographics-positive-heavy);
         background-color: var(--yc-color-infographics-positive-light);
         #{$block}__filled {
-            background-color: var(--yc-color-infographics-positive-heavy);
+            background-color: var(--yc-color-infographics-positive-medium);
+
+            .yc-root_theme_dark & {
+                // the common medium green is too bright for this case
+                background-color: rgb(124, 227, 121, 0.4);
+            }
         }
     }
 
     &_blue {
-        border: 1px solid var(--yc-color-infographics-info-medium);
+        border-color: var(--yc-color-infographics-info-heavy);
         background-color: var(--yc-color-infographics-info-light);
         #{$block}__filled {
             background-color: var(--yc-color-infographics-info-medium);
@@ -34,25 +43,25 @@
     }
 
     &_yellow {
-        border: 1px solid var(--yc-color-infographics-warning-heavy);
+        border-color: var(--yc-color-infographics-warning-heavy);
         background-color: var(--yc-color-infographics-yellow-light);
         #{$block}__filled {
-            background-color: var(--yc-color-infographics-warning-heavy);
+            background-color: var(--yc-color-infographics-yellow-medium);
         }
     }
 
     &_orange {
-        border: 1px solid var(--yc-color-base-warning-orange);
+        border-color: var(--yc-color-base-warning-orange);
         background-color: var(--yc-color-infographics-warning-light);
         #{$block}__filled {
-            background-color: var(--yc-color-base-warning-orange);
+            background-color: var(--yc-color-infographics-warning-medium);
         }
     }
     &_red {
-        border: 1px solid var(--yc-color-infographics-danger-heavy);
+        border-color: var(--yc-color-infographics-danger-heavy);
         background-color: var(--yc-color-infographics-danger-light);
         #{$block}__filled {
-            background-color: var(--yc-color-infographics-danger-heavy);
+            background-color: var(--yc-color-infographics-danger-medium);
         }
     }
 
@@ -63,14 +72,15 @@
 
         height: 100%;
 
-        border-radius: 2px 0 0 2px;
+        border-radius: $inner-border-radius 0 0 $inner-border-radius;
     }
     &__filled-title {
         position: absolute;
         z-index: 2;
 
         font-size: var(--yc-text-body-1-font-size);
-        line-height: inherit;
+        // bar height minus borders
+        line-height: calc(var(--yc-text-body-2-line-height) - #{$border-width * 2});
 
         color: inherit;
     }
@@ -79,8 +89,16 @@
         display: flex;
         justify-content: center;
 
-        height: 100%;
+        // extend active area to include borders
+        height: var(--yc-text-body-2-line-height);
+        margin: -$border-width;
+        padding: $border-width;
 
         color: inherit;
+        border-radius: $outer-border-radius;
+
+        &:hover {
+            color: inherit;
+        }
     }
 }
