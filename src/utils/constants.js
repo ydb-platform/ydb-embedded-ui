@@ -116,12 +116,14 @@ export const ALL = 'All';
 export const PROBLEMS = 'With problems';
 
 export const THEME_KEY = 'theme';
+export const INVERTED_DISKS_KEY = 'invertedDisks';
 export const SAVED_QUERIES_KEY = 'saved_queries';
 export const QUERIES_HISTORY_KEY = 'queries_history';
 export const DATA_QA_TUNE_COLUMNS_POPUP = 'tune-columns-popup';
 
 export const defaultUserSettings = {
     [THEME_KEY]: 'light',
+    [INVERTED_DISKS_KEY]: false,
 };
 export const DEFAULT_SIZE_RESULT_PANE_KEY = 'default-size-result-pane';
 export const DEFAULT_SIZE_TENANT_SUMMARY_KEY = 'default-size-tenant-summary-pane';

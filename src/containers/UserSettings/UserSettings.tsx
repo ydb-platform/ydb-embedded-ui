@@ -1,10 +1,11 @@
 import {connect} from 'react-redux';
 
-import {RadioButton} from '@yandex-cloud/uikit';
+import {RadioButton, Switch} from '@yandex-cloud/uikit';
 import {Settings} from '../../components/AsideNavigation/Settings';
 import favoriteFilledIcon from '../../assets/icons/star.svg';
+import flaskIcon from '../../assets/icons/flask.svg';
 //@ts-ignore
-import {THEME_KEY} from '../../utils/constants';
+import {INVERTED_DISKS_KEY, THEME_KEY} from '../../utils/constants';
 //@ts-ignore
 import {setSettingValue} from '../../store/reducers/settings';
 
@@ -17,6 +18,10 @@ enum Theme {
 function UserSettings(props: any) {
     const _onThemeChangeHandler = (value: string) => {
         props.setSettingValue(THEME_KEY, value);
+    };
+
+    const _onInvertedDisksChangeHandler = (value: boolean) => {
+        props.setSettingValue(INVERTED_DISKS_KEY, value);
     };
 
     return (
@@ -36,15 +41,33 @@ function UserSettings(props: any) {
                     </Settings.Item>
                 </Settings.Section>
             </Settings.Page>
+            <Settings.Page
+                id="experiments"
+                title="Experiments"
+                icon={{data: flaskIcon}}
+            >
+                <Settings.Section title="Experiments">
+                    <Settings.Item title="Inverted disks space indicators">
+                        <Switch
+                            checked={props.invertedDisks}
+                            onUpdate={_onInvertedDisksChangeHandler}
+                        />
+                    </Settings.Item>
+                </Settings.Section>
+            </Settings.Page>
         </Settings>
     );
 }
 
 const mapStateToProps = (state: any) => {
-    const {theme} = state.settings.userSettings;
+    const {
+        theme,
+        invertedDisks,
+    } = state.settings.userSettings;
 
     return {
         theme,
+        invertedDisks,
     };
 };
 

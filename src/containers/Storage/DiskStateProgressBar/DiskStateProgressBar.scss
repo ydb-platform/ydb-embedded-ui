@@ -73,6 +73,13 @@
         height: 100%;
 
         border-radius: $inner-border-radius 0 0 $inner-border-radius;
+
+        #{$block}_inverted & {
+            right: 0;
+            left: auto;
+
+            border-radius: 0 $inner-border-radius $inner-border-radius 0;
+        }
     }
     &__filled-title {
         position: absolute;

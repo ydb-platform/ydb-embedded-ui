@@ -1,6 +1,11 @@
 import React from 'react';
-import InternalLink from '../../../components/InternalLink/InternalLink';
+import {useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
+
+import {INVERTED_DISKS_KEY} from '../../../utils/constants';
+import {getSettingValue} from '../../../store/reducers/settings';
+
+import InternalLink from '../../../components/InternalLink/InternalLink';
 
 import './DiskStateProgressBar.scss';
 
@@ -26,11 +31,16 @@ function DiskStateProgressBar({
     severity,
     href,
 }: DiskStateProgressBarProps) {
+    const inverted = useSelector((state) => getSettingValue(state, INVERTED_DISKS_KEY));
+
     const renderAllocatedPercent = () => {
         return (
             diskAllocatedPercent >= 0 && (
                 <React.Fragment>
-                    <div className={b('filled')} style={{width: `${diskAllocatedPercent}%`}} />
+                    <div
+                        className={b('filled')}
+                        style={{width: `${inverted ? 100 - diskAllocatedPercent : diskAllocatedPercent}%`}}
+                    />
                     <div className={b('filled-title')}>
                         {`${Math.round(diskAllocatedPercent)}%`}
                     </div>
@@ -39,13 +49,14 @@ function DiskStateProgressBar({
         );
     };
 
+    const mods: Record<string, boolean | undefined> = {inverted};
+    if (severity !== undefined && severity in diskProgressColors) {
+        mods[diskProgressColors[severity].toLocaleLowerCase()] = true;
+    }
+
     return (
         <div
-            className={
-                severity !== undefined
-                    ? b({[diskProgressColors[severity].toLowerCase()]: true})
-                    : undefined
-            }
+            className={b(mods)}
             role="meter"
             aria-label="Disk allocated space"
             aria-valuemin={0}
