@@ -1,0 +1,31 @@
+.usage-filter {
+    &__option {
+        flex-grow: 1;
+
+        &-title {
+            height: var(--yc-text-body-1-line-height);
+
+            font-size: var(--yc-text-body-1-font-size);
+            line-height: var(--yc-text-body-1-line-height);
+        }
+
+        &-meta {
+            padding: 0 5px;
+            position: relative;
+            border-radius: 3px;
+            font-size: var(--yc-text-caption-2-font-size);
+            line-height: var(--yc-text-caption-2-line-height);
+        }
+
+        &-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: -1;
+
+            background-color: var(--yc-color-infographics-info-medium);
+            border-radius: 3px;
+        }
+    }
+}

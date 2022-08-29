@@ -46,6 +46,7 @@ export const getDegradedSeverity = (group: IStoragePoolGroup) => {
 };
 
 export const getUsageSeverity = generateEvaluator(80, 85, ['success', 'warning', 'danger']);
+export const getUsageSeverityForEntityStatus = generateEvaluator(80, 85, ['Green', 'Yellow', 'Red']);
 
 export const getUsage = (data: IStoragePoolGroup, step = 1) => {
     // if limit is 0, display 0
