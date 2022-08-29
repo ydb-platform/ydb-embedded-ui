@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.12.1...v1.12.2) (2022-08-29)
+
+
+### Bug Fixes
+
+* **Storage:** bright red usage starting from 90% ([69b7ed2](https://github.com/ydb-platform/ydb-embedded-ui/commit/69b7ed248151f518ffc5fabbdccf5ea9bbcd9405))
+* **Storage:** display usage without gte sign ([39630a2](https://github.com/ydb-platform/ydb-embedded-ui/commit/39630a2a06b574d53d0ef74c1b3e0dc96b9666a8))
+
 ## [1.12.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.12.0...v1.12.1) (2022-08-26)
 
 
