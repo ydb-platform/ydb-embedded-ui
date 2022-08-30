@@ -5,7 +5,7 @@ import cn from 'bem-cn-lite';
 import DataTable from '@yandex-cloud/react-data-table';
 import {RadioButton, Label} from '@yandex-cloud/uikit';
 
-import StorageFilter from './StorageFilter/StorageFilter';
+import {StorageFilter} from './StorageFilter';
 import {AutoFetcher} from '../../utils/autofetcher';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 
@@ -234,6 +234,7 @@ class Storage extends React.Component {
 
     renderControls() {
         const {
+            filter,
             setStorageFilter,
             visibleEntities,
             storageType,
@@ -243,8 +244,9 @@ class Storage extends React.Component {
             <div className={b('controls')}>
                 <div className={b('search')}>
                     <StorageFilter
-                        changeReduxStorageFilter={setStorageFilter}
-                        storageType={storageType}
+                        placeholder={storageType === StorageTypes.groups ? 'Group ID, Pool name' : 'Node ID, FQDN'}
+                        onChange={setStorageFilter}
+                        value={filter}
                     />
                 </div>
                 <RadioButton value={visibleEntities} onUpdate={this.onGroupVisibilityChange}>
