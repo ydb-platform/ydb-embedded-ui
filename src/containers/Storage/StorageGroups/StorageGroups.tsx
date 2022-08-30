@@ -14,9 +14,10 @@ import {VisibleEntities} from '../../../store/reducers/storage';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 //@ts-ignore
 import {stringifyVdiskId} from '../../../utils';
+import {getUsage, isFullDonorData} from '../../../utils/storage';
 
 import Vdisk from '../Vdisk/Vdisk';
-import {isFullDonorData, getDegradedSeverity, getUsageSeverity, getUsage} from '../utils';
+import {getDegradedSeverity, getUsageSeverity} from '../utils';
 
 import './StorageGroups.scss';
 

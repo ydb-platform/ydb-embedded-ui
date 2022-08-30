@@ -1,10 +1,6 @@
-import type {TVDiskStateInfo, TVSlotId} from '../../../types/api/storage';
 import type {IStoragePoolGroup} from '../../../types/store/storage';
 
 export * from './constants';
-
-export const isFullDonorData = (donor: TVDiskStateInfo | TVSlotId): donor is TVDiskStateInfo =>
-    'VDiskId' in donor;
 
 const generateEvaluator = <
     OkLevel extends string,
@@ -47,10 +43,3 @@ export const getDegradedSeverity = (group: IStoragePoolGroup) => {
 
 export const getUsageSeverity = generateEvaluator(80, 85, ['success', 'warning', 'danger']);
 export const getUsageSeverityForEntityStatus = generateEvaluator(80, 85, ['Green', 'Yellow', 'Red']);
-
-export const getUsage = (data: IStoragePoolGroup, step = 1) => {
-    // if limit is 0, display 0
-    const usage = Math.round((data.Used * 100) / data.Limit) || 0;
-
-    return Math.floor(usage / step) * step;
-};
