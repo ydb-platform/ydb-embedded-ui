@@ -211,6 +211,7 @@ class Storage extends React.Component {
             storageType,
             groupsCount,
             nodesCount,
+            flatListStorageEntities,
             loading,
             wasLoaded,
         } = this.props;
@@ -223,10 +224,10 @@ class Storage extends React.Component {
             return label;
         }
 
-        if (count.total === count.found) {
+        if (count.total === flatListStorageEntities.length) {
             label += count.total;
         } else {
-            label += `${count.found} of ${count.total}`;
+            label += `${flatListStorageEntities.length} of ${count.total}`;
         }
 
         return label;
