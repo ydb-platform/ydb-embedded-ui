@@ -6,6 +6,7 @@ import DataTable from '@yandex-cloud/react-data-table';
 import {RadioButton, Label} from '@yandex-cloud/uikit';
 
 import {StorageFilter} from './StorageFilter';
+import {UsageFilter} from './UsageFilter';
 import {AutoFetcher} from '../../utils/autofetcher';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 
@@ -16,12 +17,14 @@ import {
     VisibleEntities,
     setVisibleEntities,
     setStorageFilter,
+    setUsageFilter,
     getNodesObject,
     StorageTypes,
     setStorageType,
     VisibleEntitiesTitles,
     getStoragePoolsGroupsCount,
     getStorageNodesCount,
+    getUsageFilterOptions,
 } from '../../store/reducers/storage';
 import {getNodesList} from '../../store/reducers/clusterNodes';
 import StorageGroups from './StorageGroups/StorageGroups';
@@ -239,6 +242,9 @@ class Storage extends React.Component {
             setStorageFilter,
             visibleEntities,
             storageType,
+            usageFilter,
+            setUsageFilter,
+            usageFilterOptions,
         } = this.props;
 
         return (
@@ -270,6 +276,16 @@ class Storage extends React.Component {
                         {StorageTypes.nodes}
                     </RadioButton.Option>
                 </RadioButton>
+
+                {storageType === StorageTypes.groups && (
+                    <UsageFilter
+                        value={usageFilter}
+                        onChange={setUsageFilter}
+                        groups={usageFilterOptions}
+                        disabled={usageFilterOptions.length === 0}
+                    />
+                )}
+
                 <Label theme="info" size="m">
                     {this.renderEntitiesCount()}
                 </Label>
@@ -305,6 +321,7 @@ function mapStateToProps(state) {
         visible: visibleEntities,
         type: storageType,
         filter,
+        usageFilter,
     } = state.storage;
 
     return {
@@ -319,6 +336,8 @@ function mapStateToProps(state) {
         visibleEntities,
         storageType,
         filter,
+        usageFilter,
+        usageFilterOptions: getUsageFilterOptions(state),
     };
 }
 
@@ -326,6 +345,7 @@ const mapDispatchToProps = {
     getStorageInfo,
     setInitialState,
     setStorageFilter,
+    setUsageFilter,
     setVisibleEntities: setVisibleEntities,
     getNodesList,
     setStorageType,
