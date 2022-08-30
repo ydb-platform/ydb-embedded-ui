@@ -3,6 +3,7 @@ import '../../services/api';
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 import {calcUptime} from '../../utils';
+import {getUsage} from '../../containers/Storage/utils';
 
 export const VisibleEntities = {
     All: 'All',
@@ -24,6 +25,7 @@ export const StorageTypes = {
 const FETCH_STORAGE = createRequestActionTypes('storage', 'FETCH_STORAGE');
 const SET_INITIAL = 'storage/SET_INITIAL';
 const SET_FILTER = 'storage/SET_FILTER';
+const SET_USAGE_FILTER = 'storage/SET_USAGE_FILTER';
 const SET_VISIBLE_GROUPS = 'storage/SET_VISIBLE_GROUPS';
 const SET_STORAGE_TYPE = 'storage/SET_STORAGE_TYPE';
 
@@ -31,6 +33,7 @@ const initialState = {
     loading: true,
     wasLoaded: false,
     filter: '',
+    usageFilter: [],
     visible: VisibleEntities.Missing,
     type: StorageTypes.groups,
 };
@@ -70,6 +73,12 @@ const storage = function z(state = initialState, action) {
                 filter: action.data,
             };
         }
+        case SET_USAGE_FILTER: {
+            return {
+                ...state,
+                usageFilter: action.data,
+            };
+        }
         case SET_VISIBLE_GROUPS: {
             return {
                 ...state,
@@ -82,6 +91,8 @@ const storage = function z(state = initialState, action) {
             return {
                 ...state,
                 type: action.data,
+                filter: '',
+                usageFilter: [],
                 wasLoaded: false,
                 error: undefined,
             };
@@ -117,6 +128,14 @@ export function setStorageFilter(value) {
         data: value,
     };
 }
+
+export function setUsageFilter(value) {
+    return {
+        type: SET_USAGE_FILTER,
+        data: value,
+    };
+}
+
 export function setVisibleEntities(value) {
     return {
         type: SET_VISIBLE_GROUPS,
@@ -135,6 +154,7 @@ export const getStorageNodesCount = (state) => ({
     found: state.storage.data?.FoundNodes || 0,
 });
 export const getStorageFilter = (state) => state.storage.filter;
+export const getUsageFilter = (state) => state.storage.usageFilter;
 export const getVisibleEntities = (state) => state.storage.visible;
 export const getStorageType = (state) => state.storage.type;
 export const getNodesObject = (state) =>
@@ -271,26 +291,67 @@ export const getVisibleEntitiesList = createSelector(
     },
 );
 
-export const getFilteredEntities = createSelector(
-    [getStorageFilter, getStorageType, getVisibleEntitiesList],
-    (filter, type, entities) => {
-        const cleanedFilter = filter.trim().toLowerCase();
-        if (!cleanedFilter) {
-            return entities;
-        } else {
-            return _.filter(entities, (e) => {
-                if (type === StorageTypes.groups) {
-                    return (
-                        e.PoolName.toLowerCase().includes(cleanedFilter) ||
-                        e.GroupID?.toString().includes(cleanedFilter)
-                    );
-                }
-                return (
-                    e.NodeId.toString().includes(cleanedFilter) ||
-                    e.FQDN.toLowerCase().includes(cleanedFilter)
-                );
-            });
+const filterByText = (entities, type, text) => {
+    const cleanedFilter = text.trim().toLowerCase();
+
+    if (!cleanedFilter) {
+        return entities;
+    }
+
+    return entities.filter((entity) => {
+        if (type === StorageTypes.groups) {
+            return (
+                entity.PoolName.toLowerCase().includes(cleanedFilter) ||
+                entity.GroupID?.toString().includes(cleanedFilter)
+            );
         }
+
+        return (
+            entity.NodeId.toString().includes(cleanedFilter) ||
+            entity.FQDN.toLowerCase().includes(cleanedFilter)
+        );
+    });
+};
+
+const filterByUsage = (entities, usage) => {
+    if (!Array.isArray(usage) || usage.length === 0) {
+        return entities;
+    }
+
+    return entities.filter((entity) => {
+        const entityUsage = getUsage(entity, 5);
+        return usage.some((val) => Number(val) <= entityUsage && entityUsage < Number(val) + 5);
+    });
+};
+
+export const getFilteredEntities = createSelector(
+    [getStorageFilter, getUsageFilter, getStorageType, getVisibleEntitiesList],
+    (textFilter, usageFilter, type, entities) => {
+        let result = entities;
+        result = filterByText(result, type, textFilter);
+        result = filterByUsage(result, usageFilter);
+        return result;
+    },
+);
+
+export const getUsageFilterOptions = createSelector(
+    getVisibleEntitiesList,
+    (entities) => {
+        const items = {};
+
+        entities.forEach((entity) => {
+            const usage = getUsage(entity, 5);
+
+            if (!Object.hasOwn(items, usage)) {
+                items[usage] = 0;
+            }
+
+            items[usage] += 1;
+        });
+
+        return Object.entries(items)
+            .map(([threshold, count]) => ({threshold, count}))
+            .sort((a, b) => b.threshold - a.threshold);
     },
 );
 
