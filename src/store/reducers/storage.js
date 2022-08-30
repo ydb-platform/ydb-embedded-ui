@@ -3,7 +3,7 @@ import '../../services/api';
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 import {calcUptime} from '../../utils';
-import {getUsage} from '../../containers/Storage/utils';
+import {getUsage} from '../../utils/storage';
 
 export const VisibleEntities = {
     All: 'All',
