@@ -227,8 +227,9 @@ class Storage extends React.Component {
             return label;
         }
 
-        if (count.total === flatListStorageEntities.length) {
-            label += count.total;
+        // count.total can be missing in old versions
+        if (flatListStorageEntities.length === Number(count.total) || !count.total) {
+            label += flatListStorageEntities.length;
         } else {
             label += `${flatListStorageEntities.length} of ${count.total}`;
         }
