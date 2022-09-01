@@ -24,8 +24,6 @@ import HotKeys from './HotKeys/HotKeys';
 //@ts-ignore
 import Heatmap from '../../Heatmap/Heatmap';
 //@ts-ignore
-import Compute from './Compute/Compute';
-//@ts-ignore
 import Tablets from '../../Tablets/Tablets';
 
 import routes, {createHref} from '../../../routes';
@@ -126,9 +124,6 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case GeneralPagesIds.topShards: {
                 return <TopShards path={tenantNameString} type={type} />;
-            }
-            case GeneralPagesIds.nodes: {
-                return <Compute additionalNodesInfo={props.additionalNodesInfo} />;
             }
             case GeneralPagesIds.tablets: {
                 return <Tablets path={currentItem.Path} />;

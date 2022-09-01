@@ -4,7 +4,6 @@ export enum GeneralPagesIds {
     'overview' = 'Overview',
     'topQueries' = 'topQueries',
     'topShards' = 'topShards',
-    'nodes' = 'Nodes',
     'tablets' = 'Tablets',
     'storage' = 'Storage',
     'network' = 'Network',
@@ -31,11 +30,6 @@ const topQueries = {
 const topShards = {
     id: GeneralPagesIds.topShards,
     title: 'Top shards',
-};
-
-const nodes = {
-    id: GeneralPagesIds.nodes,
-    title: 'Nodes',
 };
 
 const tablets = {
@@ -70,7 +64,6 @@ export const DATABASE_PAGES = [
     overview,
     topQueries,
     topShards,
-    nodes,
     tablets,
     storage,
     network,

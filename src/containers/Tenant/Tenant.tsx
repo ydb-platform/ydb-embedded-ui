@@ -1,32 +1,34 @@
-import {useEffect, useReducer} from 'react';
+import {ReactNode, useEffect, useReducer} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
 import qs from 'qs';
 
+import {useThemeValue} from '@yandex-cloud/uikit';
+
+import routes, {CLUSTER_PAGES, createHref} from '../../routes';
+import {setHeader} from '../../store/reducers/header';
+import {disableAutorefresh, getSchema} from '../../store/reducers/schema';
+import {getSchemaAcl} from '../../store/reducers/schemaAcl';
+import {getTenantInfo, clearTenant} from '../../store/reducers/tenant';
+import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
+import type {TEvDescribeSchemeResult} from '../../types/api/schema';
+
 import EmptyState from '../../components/EmptyState/EmptyState';
 import {Illustration} from '../../components/Illustration';
-
-import {setHeader} from '../../store/reducers/header';
-import ObjectGeneralTabs from './ObjectGeneralTabs/ObjectGeneralTabs';
-import ObjectSummary from './ObjectSummary/ObjectSummary';
-import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
-//@ts-ignore
 import SplitPane from '../../components/SplitPane';
-//@ts-ignore
-import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
-//@ts-ignore
-import {disableAutorefresh, getSchema} from '../../store/reducers/schema';
-//@ts-ignore
-import {getSchemaAcl} from '../../store/reducers/schemaAcl';
+
 import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
 } from './utils/paneVisibilityToggleHelpers';
-//@ts-ignore
-import {getTenantInfo, clearTenant} from '../../store/reducers/tenant';
-import routes, {CLUSTER_PAGES, createHref} from '../../routes';
-import type {TEvDescribeSchemeResult} from '../../types/api/schema';
+
+import {TenantGeneralTabsIds} from './TenantPages';
+import ObjectGeneralTabs from './ObjectGeneralTabs/ObjectGeneralTabs';
+import ObjectSummary from './ObjectSummary/ObjectSummary';
+import QueryEditor from './QueryEditor/QueryEditor';
+import Diagnostics from './Diagnostics/Diagnostics';
+import Compute from './Diagnostics/Compute/Compute';
 
 import './Tenant.scss';
 
@@ -64,12 +66,15 @@ function Tenant(props: TenantProps) {
 
     const location = useLocation();
 
+    const theme = useThemeValue();
+
     const queryParams = qs.parse(location.search, {
         ignoreQueryPrefix: true,
     });
 
-    const {name} = queryParams;
+    const {name, general} = queryParams;
     const tenantName = name as string;
+    const generalTab = general as string;
 
     useEffect(() => {
         const schemaPath = currentSchemaPath || tenantName;
@@ -123,6 +128,52 @@ function Tenant(props: TenantProps) {
 
     const showBlockingError = tenantStatus === 403 || schemaStatus === 403;
 
+    const renderSplitPane = (children: ReactNode) => (
+        <SplitPane
+            defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+            defaultSizes={[25, 75]}
+            triggerCollapse={summaryVisibilityState.triggerCollapse}
+            triggerExpand={summaryVisibilityState.triggerExpand}
+            minSize={[36, 200]}
+            onSplitStartDragAdditional={onSplitStartDragAdditional}
+        >
+            <ObjectSummary
+                type={currentPathType}
+                subType={currentPathSubType}
+                onCollapseSummary={onCollapseSummaryHandler}
+                onExpandSummary={onExpandSummaryHandler}
+                isCollapsed={summaryVisibilityState.collapsed}
+                additionalTenantInfo={props.additionalTenantInfo}
+            />
+            <div className={b('split-pane-warpper')}>
+                {children}
+            </div>
+        </SplitPane>
+    );
+
+    const renderTabContent = () => {
+        const {additionalTenantInfo, additionalNodesInfo} = props;
+
+        switch (generalTab) {
+            case TenantGeneralTabsIds.query:
+                return renderSplitPane(
+                    <QueryEditor path={tenantName as string} theme={theme} type={currentPathType} />
+                );
+            case TenantGeneralTabsIds.nodes:
+                return (
+                    <Compute additionalNodesInfo={additionalNodesInfo} />
+                );
+            default:
+                return renderSplitPane(
+                    <Diagnostics
+                        type={currentPathType}
+                        additionalTenantInfo={additionalTenantInfo}
+                        additionalNodesInfo={additionalNodesInfo}
+                    />
+                );
+        }
+    }
+
     return (
         <div className={b()}>
             {showBlockingError ? (
@@ -134,28 +185,9 @@ function Tenant(props: TenantProps) {
             ) : (
                 <>
                     <ObjectGeneralTabs />
-                    <SplitPane
-                        defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                        defaultSizes={[25, 75]}
-                        triggerCollapse={summaryVisibilityState.triggerCollapse}
-                        triggerExpand={summaryVisibilityState.triggerExpand}
-                        minSize={[36, 200]}
-                        onSplitStartDragAdditional={onSplitStartDragAdditional}
-                    >
-                        <ObjectSummary
-                            type={currentPathType}
-                            subType={currentPathSubType}
-                            onCollapseSummary={onCollapseSummaryHandler}
-                            onExpandSummary={onExpandSummaryHandler}
-                            isCollapsed={summaryVisibilityState.collapsed}
-                            additionalTenantInfo={props.additionalTenantInfo}
-                        />
-                        <ObjectGeneral
-                            type={currentPathType}
-                            additionalTenantInfo={props.additionalTenantInfo}
-                            additionalNodesInfo={props.additionalNodesInfo}
-                        />
-                    </SplitPane>
+                    <div className={b('tab-content')}>
+                        {renderTabContent()}
+                    </div>
                 </>
             )}
         </div>

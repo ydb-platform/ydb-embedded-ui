@@ -4,6 +4,7 @@ import Icon from '../../components/Icon/Icon';
 export enum TenantGeneralTabsIds {
     query = 'query',
     diagnostics = 'diagnostics',
+    nodes = 'nodes',
 }
 export enum TenantInfoTabsIds {
     overview = 'overview',
@@ -27,6 +28,11 @@ export const TENANT_GENERAL_TABS = [
         id: TenantGeneralTabsIds.diagnostics,
         title: 'Diagnostics',
         icon: <Icon name="diagnostics" viewBox="0 0 17 16" />,
+    },
+    {
+        id: TenantGeneralTabsIds.nodes,
+        title: 'Nodes',
+        icon: <Icon name="nodes" viewBox="0 0 512 512" />
     },
 ];
 export const TENANT_INFO_TABS = [
