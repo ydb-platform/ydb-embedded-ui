@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.12.2...v1.13.0) (2022-09-01)
+
+
+### Features
+
+* **Storage:** add usage filter component ([a35067f](https://github.com/ydb-platform/ydb-embedded-ui/commit/a35067f8c34ad5d3faf4fb9381c0d6023df9afbd))
+* **Storage:** usage filter ([276f027](https://github.com/ydb-platform/ydb-embedded-ui/commit/276f0270a458601929624a4872ec81e001931853))
+
+
+### Bug Fixes
+
+* **Storage:** properly debounce text input filter ([bc5e8fd](https://github.com/ydb-platform/ydb-embedded-ui/commit/bc5e8fd7b067b850f0376b55d995213292b8a31e))
+* **Storage:** use current list size for counter ([e6fea58](https://github.com/ydb-platform/ydb-embedded-ui/commit/e6fea58b075de4c35ad8a60d339417c1e7204d83))
+* **Tenant:** move general tabs outside navigation ([5bf21ea](https://github.com/ydb-platform/ydb-embedded-ui/commit/5bf21eac6f38c0392c8dc6e04be1b6fd0e147064))
+
 ## [1.12.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.12.1...v1.12.2) (2022-08-29)
 
 
