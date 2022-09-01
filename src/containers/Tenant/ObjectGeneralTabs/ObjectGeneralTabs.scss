@@ -1,0 +1,9 @@
+@import '../../../styles/mixins.scss';
+
+.object-general-tabs {
+    padding: 12px 20px 0 12px;
+
+    &__tab {
+        text-decoration: none;
+    }
+}

@@ -1,20 +1,15 @@
-import {connect} from 'react-redux';
-import {Link} from 'react-router-dom';
-import cn from 'bem-cn-lite';
-import {useLocation} from 'react-router';
 import qs from 'qs';
-import _ from 'lodash';
+import {useLocation} from 'react-router';
+import cn from 'bem-cn-lite';
 
-import {Tabs, useThemeValue} from '@yandex-cloud/uikit';
-//@ts-ignore
+import {useThemeValue} from '@yandex-cloud/uikit';
+
+import type {EPathType} from '../../../types/api/schema';
+
 import QueryEditor from '../QueryEditor/QueryEditor';
 import Diagnostics from '../Diagnostics/Diagnostics';
 
-import {TenantGeneralTabsIds, TenantTabsGroups, TENANT_GENERAL_TABS} from '../TenantPages';
-import routes, {createHref} from '../../../routes';
-import {setSettingValue} from '../../../store/reducers/settings';
-import {TENANT_INITIAL_TAB_KEY} from '../../../utils/constants';
-import type {EPathType} from '../../../types/api/schema';
+import {TenantGeneralTabsIds} from '../TenantPages';
 
 import './ObjectGeneral.scss';
 
@@ -24,7 +19,6 @@ interface ObjectGeneralProps {
     type?: EPathType;
     additionalTenantInfo?: any;
     additionalNodesInfo?: any;
-    setSettingValue: (name: string, value: string) => void;
 }
 
 function ObjectGeneral(props: ObjectGeneralProps) {
@@ -37,32 +31,6 @@ function ObjectGeneral(props: ObjectGeneralProps) {
     });
 
     const {name: tenantName, general: generalTab} = queryParams;
-
-    const renderTabs = () => {
-        return (
-            <div className={b('tabs')}>
-                <Tabs
-                    size="xl"
-                    items={TENANT_GENERAL_TABS}
-                    activeTab={generalTab as string}
-                    wrapTo={({id}, node) => {
-                        const path = createHref(routes.tenant, undefined, {
-                            ...queryParams,
-                            name: tenantName as string,
-                            [TenantTabsGroups.general]: id,
-                        });
-                        return (
-                            <Link to={path} key={id} className={b('tab')}>
-                                {node}
-                            </Link>
-                        );
-                    }}
-                    allowNotSelected
-                    onSelectTab={(id) => props.setSettingValue(TENANT_INITIAL_TAB_KEY, id)}
-                />
-            </div>
-        );
-    };
 
     const renderTabContent = () => {
         const {type, additionalTenantInfo, additionalNodesInfo} = props;
@@ -88,7 +56,6 @@ function ObjectGeneral(props: ObjectGeneralProps) {
         }
         return (
             <div className={b()}>
-                {renderTabs()}
                 {renderTabContent()}
             </div>
         );
@@ -97,8 +64,4 @@ function ObjectGeneral(props: ObjectGeneralProps) {
     return renderContent();
 }
 
-const mapDispatchToProps = {
-    setSettingValue,
-};
-
-export default connect(null, mapDispatchToProps)(ObjectGeneral);
+export default ObjectGeneral;
