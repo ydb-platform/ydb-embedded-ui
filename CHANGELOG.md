@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.13.0...v1.13.1) (2022-09-02)
+
+
+### Bug Fixes
+
+* **Storage:** fix groups/nodes counter ([9b59ae0](https://github.com/ydb-platform/ydb-embedded-ui/commit/9b59ae0d045beff7aa45560e028618a88bd8483f))
+
 ## [1.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.12.2...v1.13.0) (2022-09-01)
 
 
