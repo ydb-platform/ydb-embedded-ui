@@ -7,7 +7,7 @@
     flex: 1 1 auto;
     flex-direction: column;
 
-    height: calc(100% - 56px);
+    height: 100%;
 
     @include query-data-table;
 

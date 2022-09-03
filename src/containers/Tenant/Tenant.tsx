@@ -134,28 +134,30 @@ function Tenant(props: TenantProps) {
             ) : (
                 <>
                     <ObjectGeneralTabs />
-                    <SplitPane
-                        defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                        defaultSizes={[25, 75]}
-                        triggerCollapse={summaryVisibilityState.triggerCollapse}
-                        triggerExpand={summaryVisibilityState.triggerExpand}
-                        minSize={[36, 200]}
-                        onSplitStartDragAdditional={onSplitStartDragAdditional}
-                    >
-                        <ObjectSummary
-                            type={currentPathType}
-                            subType={currentPathSubType}
-                            onCollapseSummary={onCollapseSummaryHandler}
-                            onExpandSummary={onExpandSummaryHandler}
-                            isCollapsed={summaryVisibilityState.collapsed}
-                            additionalTenantInfo={props.additionalTenantInfo}
-                        />
-                        <ObjectGeneral
-                            type={currentPathType}
-                            additionalTenantInfo={props.additionalTenantInfo}
-                            additionalNodesInfo={props.additionalNodesInfo}
-                        />
-                    </SplitPane>
+                    <div className={b('tab-content')}>
+                        <SplitPane
+                            defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                            defaultSizes={[25, 75]}
+                            triggerCollapse={summaryVisibilityState.triggerCollapse}
+                            triggerExpand={summaryVisibilityState.triggerExpand}
+                            minSize={[36, 200]}
+                            onSplitStartDragAdditional={onSplitStartDragAdditional}
+                        >
+                            <ObjectSummary
+                                type={currentPathType}
+                                subType={currentPathSubType}
+                                onCollapseSummary={onCollapseSummaryHandler}
+                                onExpandSummary={onExpandSummaryHandler}
+                                isCollapsed={summaryVisibilityState.collapsed}
+                                additionalTenantInfo={props.additionalTenantInfo}
+                            />
+                            <ObjectGeneral
+                                type={currentPathType}
+                                additionalTenantInfo={props.additionalTenantInfo}
+                                additionalNodesInfo={props.additionalNodesInfo}
+                            />
+                        </SplitPane>
+                    </div>
                 </>
             )}
         </div>
