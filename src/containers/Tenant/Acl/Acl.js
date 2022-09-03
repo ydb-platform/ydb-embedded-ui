@@ -13,6 +13,12 @@ const b = cn('kv-acl');
 
 const COLUMN_WIDTH = 140;
 
+const TABLE_SETTINGS = {
+    ...DEFAULT_TABLE_SETTINGS,
+    dynamicRender: false,
+    stickyTop: 36,
+};
+
 class Acl extends React.Component {
     static propTypes = {
         error: PropTypes.string,
@@ -81,7 +87,7 @@ class Acl extends React.Component {
             <DataTable
                 columns={this.COLUMNS}
                 data={acl}
-                settings={{...DEFAULT_TABLE_SETTINGS, stickyTop: 36}}
+                settings={TABLE_SETTINGS}
             />
         );
     };
