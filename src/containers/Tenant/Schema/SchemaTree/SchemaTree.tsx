@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 
 import {NavigationTree} from 'ydb-ui-components';
@@ -47,6 +48,13 @@ export function SchemaTree(props: SchemaTreeProps) {
         dispatch(getDescribe({path: activePath}));
         dispatch(getSchemaAcl({path: activePath}));
     };
+
+    useEffect(() => {
+        // if the cached path is not in the current tree, show root
+        if (!currentPath.startsWith(rootPath)) {
+            handleActivePathUpdate(rootPath);
+        }
+    }, []);
 
     return (
         <NavigationTree
