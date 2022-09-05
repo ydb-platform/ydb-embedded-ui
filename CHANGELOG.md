@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.13.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.13.1...v1.13.2) (2022-09-05)
+
+
+### Bug Fixes
+
+* **Tenant:** fix acl scroll ([161bc8d](https://github.com/ydb-platform/ydb-embedded-ui/commit/161bc8d507de126c1383a10713e2ffaaaf13301d))
+* **Tenant:** fix layout after moving tabs ([6abfded](https://github.com/ydb-platform/ydb-embedded-ui/commit/6abfdedb97345b555be306d49ea2454f35de9bb4))
+* **Tenant:** load root if cahced path is not in tree ([2d86044](https://github.com/ydb-platform/ydb-embedded-ui/commit/2d8604464711a638dbd20cf8a14142b0de3e3a95))
+
 ## [1.13.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.13.0...v1.13.1) (2022-09-02)
 
 
