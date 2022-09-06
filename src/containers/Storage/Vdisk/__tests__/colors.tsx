@@ -1,10 +1,10 @@
-import {render} from '@testing-library/react'
+import {renderWithStore} from '../../../../utils/tests/providers';
 
 import VDisk from '../Vdisk'
 
 describe('VDisk state', () => {
     it('Should determine severity based on the highest value among VDiskState, DiskSpace and FrontQueues', () => {
-        const {getAllByRole} = render(
+        const {getAllByRole} = renderWithStore(
             <>
                 <VDisk
                     VDiskId={{Domain: 1}}
@@ -35,7 +35,7 @@ describe('VDisk state', () => {
     });
 
     it('Should not pick the highest severity based on FrontQueues value', () => {
-        const {getAllByRole} = render(
+        const {getAllByRole} = renderWithStore(
             <>
                 <VDisk
                     VDiskId={{Domain: 1}}
@@ -59,7 +59,7 @@ describe('VDisk state', () => {
     });
 
     it('Should display as unavailable when no VDiskState is provided', () => {
-        const {getAllByRole} = render(
+        const {getAllByRole} = renderWithStore(
             <>
                 <VDisk VDiskId={{Domain: 1}} />
                 <VDisk VDiskId={{Domain: 2}} VDiskState="OK" />
@@ -86,7 +86,7 @@ describe('VDisk state', () => {
     });
 
     it('Should display replicating VDisks in OK state with a distinct color', () => {
-        const {getAllByRole} = render(
+        const {getAllByRole} = renderWithStore(
             <>
                 <VDisk
                     VDiskId={{Domain: 1}}
@@ -108,7 +108,7 @@ describe('VDisk state', () => {
     });
 
     it('Should display replicating VDisks in a not-OK state with a regular color', () => {
-        const {getAllByRole} = render(
+        const {getAllByRole} = renderWithStore(
             <>
                 <VDisk
                     VDiskId={{Domain: 1}}
@@ -130,7 +130,7 @@ describe('VDisk state', () => {
     });
 
     it('Should always display donor VDisks with a regular color', () => {
-        const {getAllByRole} = render(
+        const {getAllByRole} = renderWithStore(
             <>
                 <VDisk
                     VDiskId={{Domain: 1}}
