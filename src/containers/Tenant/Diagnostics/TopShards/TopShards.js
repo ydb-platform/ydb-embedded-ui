@@ -13,7 +13,7 @@ import {AutoFetcher} from '../../../../utils/autofetcher';
 import HistoryContext from '../../../../contexts/HistoryContext';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {isColumnEntityType} from '../../utils/schema';
-import {prepareQueryError} from '../../../../utils';
+import {prepareQueryError} from '../../../../utils/query';
 import {i18n} from '../../../../utils/i18n';
 
 import './TopShards.scss';

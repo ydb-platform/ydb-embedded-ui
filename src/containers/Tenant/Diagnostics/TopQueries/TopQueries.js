@@ -13,7 +13,7 @@ import {isColumnEntityType} from '../../utils/schema';
 
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {TenantGeneralTabsIds} from '../../TenantPages';
-import {prepareQueryError} from '../../../../utils';
+import {prepareQueryError} from '../../../../utils/query';
 
 import './TopQueries.scss';
 

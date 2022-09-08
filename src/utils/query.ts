@@ -30,3 +30,30 @@ export const parseResponseTypeClassic = (data: ClassicResponse): IQueryResult =>
 
     return data;
 };
+
+export const prepareQueryResponse = (data?: KeyValueRow[]) => {
+    if (!Array.isArray(data)) {
+        return [];
+    }
+ 
+    return data.map((row) => {
+        const formattedData: KeyValueRow = {};
+
+        for (const field in row) {
+            if (Object.prototype.hasOwnProperty.call(row, field)) {
+                const type = typeof row[field];
+                if (type === 'object' || type === 'boolean' || Array.isArray(row[field])) {
+                    formattedData[field] = JSON.stringify(row[field]);
+                } else {
+                    formattedData[field] = row[field];
+                }
+            }
+        }
+
+        return formattedData;
+    });
+};
+
+export function prepareQueryError(error: any) {
+    return error.data?.error?.message || error.data || error.statusText || JSON.stringify(error);
+}

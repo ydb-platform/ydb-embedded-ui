@@ -11,7 +11,7 @@ import Fullscreen from '../../../components/Fullscreen/Fullscreen';
 
 import {sendQuery, setQueryOptions} from '../../../store/reducers/preview';
 import {showTooltip, hideTooltip} from '../../../store/reducers/tooltip';
-import {prepareQueryError, prepareQueryResponse} from '../../../utils/index';
+import {prepareQueryError, prepareQueryResponse} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 
 import {isTableType} from '../utils/schema';
