@@ -69,3 +69,20 @@ export function createApiRequest<
 
     return doRequest;
 }
+
+export type ApiRequestAction<
+    Actions extends ReturnType<typeof createRequestActionTypes>,
+    SuccessResponse = unknown,
+    ErrorResponse = unknown
+> =
+    | {
+        type: Actions['REQUEST'],
+    }
+    | {
+        type: Actions['SUCCESS'],
+        data: SuccessResponse,
+    }
+    | {
+        type: Actions['FAILURE'],
+        error: ErrorResponse,
+    };
