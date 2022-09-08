@@ -1,5 +1,8 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
+
+import type {ClassicResponse} from '../../types/api/query';
+
+import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
 
 const SEND_QUERY = createRequestActionTypes('preview', 'SEND_QUERY');
 const SET_QUERY_OPTIONS = 'preview/SET_QUERY_OPTIONS';
@@ -9,7 +12,10 @@ const initialState = {
     wasLoaded: false,
 };
 
-const preview = (state = initialState, action) => {
+const preview = (
+    state = initialState,
+    action: ApiRequestAction<typeof SEND_QUERY, ClassicResponse> | ReturnType<typeof setQueryOptions>,
+) => {
     switch (action.type) {
         case SEND_QUERY.REQUEST: {
             return {
@@ -45,12 +51,22 @@ const preview = (state = initialState, action) => {
     }
 };
 
-export const sendQuery = ({query, database, action}) => {
+interface SendQueryParams {
+    query?: string;
+    database?: string;
+    action?: string;
+};
+
+export const sendQuery = ({query, database, action}: SendQueryParams) => {
     return createApiRequest({
         request: window.api.sendQuery({query, database, action}),
         actions: SEND_QUERY,
-        dataHandler: (data) => {
-            if (!Array.isArray(data)) {
+        dataHandler: (data): ClassicResponse => {
+            if (!data) {
+                return [];
+            }
+
+            if (typeof data === 'string') {
                 try {
                     return JSON.parse(data);
                 } catch (e) {
@@ -58,16 +74,20 @@ export const sendQuery = ({query, database, action}) => {
                 }
             }
 
+            if (!Array.isArray(data)) {
+                return data.result || [];
+            }
+
             return data;
         },
     });
 };
 
-export function setQueryOptions(options) {
+export function setQueryOptions(options: any) {
     return {
         type: SET_QUERY_OPTIONS,
         data: options,
-    };
+    } as const;
 }
 
 export default preview;
