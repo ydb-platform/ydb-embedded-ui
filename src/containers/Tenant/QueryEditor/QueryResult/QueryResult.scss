@@ -7,8 +7,8 @@
         flex-grow: 1;
         flex-direction: column;
 
-        margin-top: 20px;
-        padding: 0px 8px;
+        padding: 0px 10px;
+
         @include query-data-table();
         & .data-table__table-wrapper {
             padding-bottom: 0;

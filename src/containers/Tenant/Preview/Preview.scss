@@ -16,8 +16,8 @@
         justify-content: space-between;
         align-items: center;
 
-        height: 40px;
-        padding: 0 19px;
+        height: 53px;
+        padding: 0 20px;
 
         border-bottom: 1px solid var(--yc-color-line-generic);
         background-color: var(--yc-color-base-background);
@@ -38,7 +38,7 @@
         gap: 5px;
     }
     &__message-container {
-        padding: 15px 19px;
+        padding: 15px 20px;
     }
 
     &__loader-container {
@@ -57,6 +57,6 @@
         overflow: auto;
 
         height: calc(100% - 40px);
-        padding: 0 19px;
+        padding: 0 10px;
     }
 }
