@@ -2,7 +2,7 @@ import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
 
 const SEND_QUERY = createRequestActionTypes('preview', 'SEND_QUERY');
-const SET_QUERY_OPTIONS = createRequestActionTypes('preview', 'SET_QUERY_OPTIONS');
+const SET_QUERY_OPTIONS = 'preview/SET_QUERY_OPTIONS';
 
 const initialState = {
     loading: false,
