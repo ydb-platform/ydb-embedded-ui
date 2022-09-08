@@ -3,29 +3,21 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import DataTable from '@yandex-cloud/react-data-table';
 import {Loader, Button} from '@yandex-cloud/uikit';
 
 import Icon from '../../../components/Icon/Icon';
 import Fullscreen from '../../../components/Fullscreen/Fullscreen';
+import {QueryResultTable} from '../../../components/QueryResultTable';
 
 import {sendQuery, setQueryOptions} from '../../../store/reducers/preview';
-import {showTooltip, hideTooltip} from '../../../store/reducers/tooltip';
-import {prepareQueryError, prepareQueryResponse} from '../../../utils/query';
-import {isNumeric} from '../../../utils/utils';
+import {prepareQueryError} from '../../../utils/query';
 
 import {isTableType} from '../utils/schema';
 import {AutoFetcher} from '../../../utils/autofetcher';
 import EnableFullscreenButton from '../../../components/EnableFullscreenButton/EnableFullscreenButton';
-import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {setShowPreview} from '../../../store/reducers/schema';
 
 import './Preview.scss';
-
-const TABLE_SETTINGS = {
-    ...DEFAULT_TABLE_SETTINGS,
-    stripedRows: true,
-};
 
 const b = cn('kv-preview');
 
@@ -38,8 +30,6 @@ class Preview extends React.Component {
         data: PropTypes.array,
         loading: PropTypes.bool,
         type: PropTypes.string,
-        showTooltip: PropTypes.func,
-        hideTooltip: PropTypes.func,
         partCount: PropTypes.string,
     };
 
@@ -55,11 +45,10 @@ class Preview extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const {table, hideTooltip, autorefresh, setQueryOptions} = this.props;
+        const {table, autorefresh, setQueryOptions} = this.props;
 
         if (prevProps.table !== table) {
             this.sendQueryForPreview();
-            hideTooltip();
             setQueryOptions({
                 wasLoaded: false,
                 data: undefined,
@@ -121,35 +110,8 @@ class Preview extends React.Component {
         );
     };
 
-    renderTable = () => {
-        const {data, showTooltip} = this.props;
-
-        let columns = [];
-        if (data && data.length > 0) {
-            columns = Object.keys(data[0]).map((key) => ({
-                name: key,
-                align: isNumeric(data[0][key]) ? DataTable.RIGHT : DataTable.LEFT,
-                sortAccessor: (row) => isNumeric(row[key]) ? Number(row[key]) : row[key],
-                render: ({value}) => {
-                    return (
-                        <span
-                            className={b('cell')}
-                            onClick={(e) => showTooltip(e.target, value, 'cell')}
-                        >
-                            {value}
-                        </span>
-                    );
-                },
-            }));
-        }
-
-        const preparedData = prepareQueryResponse(data);
-
-        return <DataTable columns={columns} data={preparedData} settings={TABLE_SETTINGS} />;
-    };
-
     render() {
-        const {error, loading, data = [], type, wasLoaded, isFullscreen} = this.props;
+        const {error, loading, data, type, wasLoaded, isFullscreen} = this.props;
 
         if (loading && !wasLoaded) {
             return (
@@ -165,11 +127,13 @@ class Preview extends React.Component {
             message = <div className={b('message-container')}>Not available</div>;
         } else if (error) {
             message = <div className={b('message-container')}>{prepareQueryError(error)}</div>;
-        } else if (!loading && data.length === 0) {
-            message = <div className={b('message-container')}>Table is empty</div>;
         }
 
-        const content = message ?? <div className={b('result')}>{this.renderTable()}</div>;
+        const content = message ?? (
+            <div className={b('result')}>
+                <QueryResultTable data={data.result} columns={data.columns} />
+            </div>
+        );
 
         return (
             <div className={b()}>
@@ -181,7 +145,7 @@ class Preview extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    const {data = [], loading, error, wasLoaded} = state.preview;
+    const {data = {result: []}, loading, error, wasLoaded} = state.preview;
     const {autorefresh, currentSchemaPath} = state.schema;
 
     return {
@@ -197,8 +161,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     sendQuery,
-    showTooltip,
-    hideTooltip,
     setQueryOptions,
     setShowPreview,
 };
