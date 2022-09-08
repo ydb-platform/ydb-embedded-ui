@@ -8,7 +8,7 @@ import Icon from '../../../../components/Icon/Icon';
 
 import {AutoFetcher} from '../../../../utils/autofetcher';
 import {getHotKeys, setHotKeysOptions} from '../../../../store/reducers/hotKeys';
-import {prepareQueryError} from '../../../../utils';
+import {prepareQueryError} from '../../../../utils/query';
 
 import {isColumnEntityType, isTableType} from '../../utils/schema';
 

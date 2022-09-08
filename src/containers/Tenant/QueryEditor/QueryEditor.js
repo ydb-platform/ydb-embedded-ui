@@ -35,7 +35,7 @@ import {
     SAVED_QUERIES_KEY,
     QUERY_INITIAL_RUN_ACTION_KEY,
 } from '../../../utils/constants';
-import {prepareQueryResponse} from '../../../utils/index';
+import {prepareQueryResponse} from '../../../utils/query';
 
 import {parseJson} from '../../../utils/utils';
 

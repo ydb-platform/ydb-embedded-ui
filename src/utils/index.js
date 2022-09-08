@@ -1,6 +1,5 @@
 import numeral from 'numeral';
 import locales from 'numeral/locales'; // eslint-disable-line no-unused-vars
-import _ from 'lodash';
 
 import {i18n} from './i18n';
 import {MEGABYTE, TERABYTE, DAY_IN_SECONDS, GIGABYTE} from './constants';
@@ -143,26 +142,3 @@ export const getMetaForExplainNode = (node) => {
             return '';
     }
 };
-
-export const prepareQueryResponse = (data) => {
-    return _.map(data, (item) => {
-        const formattedData = {};
-
-        for (const field in item) {
-            if (Object.prototype.hasOwnProperty.call(item, field)) {
-                const type = typeof item[field];
-                if (type === 'object' || type === 'boolean' || Array.isArray(item[field])) {
-                    formattedData[field] = JSON.stringify(item[field]);
-                } else {
-                    formattedData[field] = item[field];
-                }
-            }
-        }
-
-        return formattedData;
-    });
-};
-
-export function prepareQueryError(error) {
-    return error.data?.error?.message || error.data || error.statusText || JSON.stringify(error);
-}
