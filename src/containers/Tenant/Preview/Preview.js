@@ -151,12 +151,6 @@ class Preview extends React.Component {
     render() {
         const {error, loading, data = [], type, wasLoaded, isFullscreen} = this.props;
 
-        let message;
-
-        if (!isTableType(type)) {
-            message = <div className={b('message-container')}>Not available</div>;
-        }
-
         if (loading && !wasLoaded) {
             return (
                 <div className={b('loader-container')}>
@@ -165,11 +159,13 @@ class Preview extends React.Component {
             );
         }
 
-        if (error) {
-            message = <div className={b('message-container')}>{prepareQueryError(error)}</div>;
-        }
+        let message;
 
-        if (!loading && data.length === 0) {
+        if (!isTableType(type)) {
+            message = <div className={b('message-container')}>Not available</div>;
+        } else if (error) {
+            message = <div className={b('message-container')}>{prepareQueryError(error)}</div>;
+        } else if (!loading && data.length === 0) {
             message = <div className={b('message-container')}>Table is empty</div>;
         }
 
