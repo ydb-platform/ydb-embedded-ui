@@ -164,5 +164,5 @@ export const prepareQueryResponse = (data) => {
 };
 
 export function prepareQueryError(error) {
-    return error.data?.error?.message || error.data || error
+    return error.data?.error?.message || error.data || error.statusText || JSON.stringify(error);
 }
