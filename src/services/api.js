@@ -146,9 +146,9 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             state: 0,
         });
     }
-    sendQuery({query, database, action, stats}, {concurrentId} = {}) {
+    sendQuery({query, database, action, stats, schema}, {concurrentId} = {}) {
         return this.post(
-            this.getPath('/viewer/json/query'),
+            this.getPath(`/viewer/json/query${schema ? `?schema=${schema}` : ''}`),
             {
                 query,
                 database,
