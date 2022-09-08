@@ -87,13 +87,15 @@ export const TABLET_SYMBOLS = {
     TenantSlotBroker: 'TB',
 };
 
-export const getTabletLabel = (type) => {
-    if (!type) {
-        return;
-    }
-    const defaultValue = type.match(/[A-Z]/g).join('');
+const isTabletType = (type: string): type is keyof typeof TABLET_SYMBOLS => type in TABLET_SYMBOLS;
 
-    return TABLET_SYMBOLS[type] || defaultValue;
+export const getTabletLabel = (type?: string) => {
+    if (!type) {
+        return undefined;
+    }
+    const defaultValue = type.match(/[A-Z]/g)?.join('');
+
+    return isTabletType(type) ? TABLET_SYMBOLS[type] : defaultValue;
 };
 
 export const LOAD_AVERAGE_TIME_INTERVALS = ['1 min', '5 min', '15 min'];
@@ -141,7 +143,7 @@ export const DEFAULT_TABLE_SETTINGS = {
     syncHeadOnResize: true,
     dynamicRender: true,
     highlightRows: true,
-};
+} as const;
 
 export const TENANT_INITIAL_TAB_KEY = 'saved_tenant_initial_tab';
 export const QUERY_INITIAL_RUN_ACTION_KEY = 'query_initial_run_action';
