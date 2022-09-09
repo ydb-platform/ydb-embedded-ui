@@ -94,10 +94,6 @@
         color: var(--yc-color-text-secondary);
     }
 
-    &__cell {
-        @include cell-container;
-    }
-
     &__select-query-action {
         margin-left: 2px;
     }

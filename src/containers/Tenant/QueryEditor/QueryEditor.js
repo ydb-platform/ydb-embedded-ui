@@ -4,9 +4,10 @@ import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import MonacoEditor from 'react-monaco-editor';
-import DataTable from '@yandex-cloud/react-data-table';
 import {Button, DropdownMenu} from '@yandex-cloud/uikit';
+
 import SplitPane from '../../../components/SplitPane';
+import {QueryResultTable} from '../../../components/QueryResultTable';
 
 import SaveQuery from './SaveQuery/SaveQuery';
 import SavedQueries from './SavedQueries/SavedQueries';
@@ -26,16 +27,13 @@ import {
     setMonacoHotKey,
 } from '../../../store/reducers/executeQuery';
 import {getExplainQuery, getExplainQueryAst} from '../../../store/reducers/explainQuery';
-import {showTooltip} from '../../../store/reducers/tooltip';
 import {getSettingValue, setSettingValue} from '../../../store/reducers/settings';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
-    DEFAULT_TABLE_SETTINGS,
     SAVED_QUERIES_KEY,
     QUERY_INITIAL_RUN_ACTION_KEY,
 } from '../../../utils/constants';
-import {prepareQueryResponse} from '../../../utils/query';
 
 import {parseJson} from '../../../utils/utils';
 
@@ -55,11 +53,9 @@ export const RUN_ACTIONS = [
 ];
 
 const TABLE_SETTINGS = {
-    ...DEFAULT_TABLE_SETTINGS,
     sortable: false,
     dynamicItemSizeGetter: () => 40,
     dynamicRenderType: 'variable',
-    stripedRows: true,
 };
 
 const EDITOR_OPTIONS = {
@@ -84,7 +80,6 @@ const propTypes = {
     response: PropTypes.oneOfType([PropTypes.bool, PropTypes.array]),
     executeQuery: PropTypes.object,
     explainQuery: PropTypes.object,
-    showTooltip: PropTypes.func,
     setMonacoHotKey: PropTypes.func,
     theme: PropTypes.string,
     type: PropTypes.string,
@@ -306,40 +301,17 @@ function QueryEditor(props) {
     const renderExecuteQuery = () => {
         const {
             executeQuery: {data, error, stats},
-            showTooltip,
         } = props;
 
         let content;
         if (data) {
-            let columns = [];
-            if (data.length > 0) {
-                columns = Object.keys(data[0]).map((key) => ({
-                    name: key,
-                    render: ({value}) => {
-                        return (
-                            <span
-                                className={b('cell')}
-                                onClick={(e) => showTooltip(e.target, value, 'cell')}
-                            >
-                                {value}
-                            </span>
-                        );
-                    },
-                }));
-                const preparedData = prepareQueryResponse(data);
-
-                content = columns.length ? (
-                    <DataTable
-                        columns={columns}
-                        data={preparedData}
-                        settings={TABLE_SETTINGS}
-                        theme="yandex-cloud"
-                        rowKey={(_, index) => index}
-                    />
-                ) : (
-                    <div>{data}</div>
-                );
-            }
+            content = (
+                <QueryResultTable
+                    data={data.result}
+                    columns={data.columns}
+                    settings={TABLE_SETTINGS}
+                />
+            );
         }
         const textResults = getPreparedResult();
         const disabled = !textResults.length || resultType !== RESULT_TYPES.EXECUTE;
@@ -469,12 +441,12 @@ function QueryEditor(props) {
         const columnDivider = '\t';
         const rowDivider = '\n';
 
-        if (!data?.length) {
+        if (!data?.result?.length) {
             return '';
         }
 
-        const columnHeaders = Object.keys(data[0]);
-        const rows = [columnHeaders].concat(data);
+        const columnHeaders = Object.keys(data.result[0]);
+        const rows = [columnHeaders].concat(data.result);
 
         return rows
             .map((item) => {
@@ -675,7 +647,6 @@ const mapDispatchToProps = {
     saveQueryToHistory,
     goToPreviousQuery,
     goToNextQuery,
-    showTooltip,
     getExplainQuery,
     getExplainQueryAst,
     setSettingValue,
