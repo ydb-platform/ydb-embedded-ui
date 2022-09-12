@@ -2,7 +2,7 @@ import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
 import {getValueFromLS, parseJson} from '../../utils/utils';
 import {QUERIES_HISTORY_KEY, QUERY_INITIAL_RUN_ACTION_KEY} from '../../utils/constants';
-import {isModern, parseResponseTypeClassic, parseResponseTypeModern} from '../../utils/query';
+import {parseQueryAPIExecuteResponse} from '../../utils/query';
 import {readSavedSettingsValue} from './settings';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
@@ -145,25 +145,7 @@ export const sendQuery = ({query, database, action}) => {
     return createApiRequest({
         request: window.api.sendQuery({schema: 'modern', query, database, action, stats: 'profile'}),
         actions: SEND_QUERY,
-        dataHandler: (result) => {
-            if (!result) {
-                return {result: []};
-            }
-
-            if (typeof result === 'string') {
-                try {
-                    return JSON.parse(result);
-                } catch (e) {
-                    return {result: []};
-                }
-            }
-
-            if (isModern(result)) {
-                return parseResponseTypeModern(result);
-            } else {
-                return parseResponseTypeClassic(result);
-            }
-        },
+        dataHandler: parseQueryAPIExecuteResponse,
     });
 };
 

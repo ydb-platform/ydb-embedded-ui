@@ -17,16 +17,19 @@ interface Window {
             },
             axiosOptions?: AxiosOptions,
         ) => Promise<import('../types/api/storage').TStorageInfo>;
-        sendQuery: <Schema extends 'modern' | 'classic' | 'ydb' | undefined = undefined>(
+        sendQuery: <
+            Action extends import('../types/api/query').Actions,
+            Schema extends import('../types/api/query').Schemas = undefined
+        >(
             params: {
                 query?: string,
                 database?: string,
-                action?: string,
+                action?: Action,
                 stats?: string,
                 schema?: Schema,
             },
             axiosOptions?: AxiosOptions,
-        ) => Promise<import('../types/api/query').QueryResponse<Schema>>;
+        ) => Promise<import('../types/api/query').QueryAPIResponse<Action, Schema>>;
         [method: string]: Function;
     };
 }
