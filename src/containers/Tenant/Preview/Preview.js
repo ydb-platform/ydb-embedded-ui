@@ -145,7 +145,7 @@ class Preview extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    const {data = {result: []}, loading, error, wasLoaded} = state.preview;
+    const {data = {}, loading, error, wasLoaded} = state.preview;
     const {autorefresh, currentSchemaPath} = state.schema;
 
     return {
