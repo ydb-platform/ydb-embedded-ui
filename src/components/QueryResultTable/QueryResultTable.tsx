@@ -63,7 +63,8 @@ const prepareGenericColumns = (data: KeyValueRow[]) => {
 
 const getRowIndex = (_: unknown, index: number) => index
 
-interface QueryResultTableProps extends Omit<DataTableProps<KeyValueRow>, 'columns' | 'theme'> {
+interface QueryResultTableProps extends Omit<DataTableProps<KeyValueRow>, 'data' | 'columns' | 'theme'> {
+    data?: KeyValueRow[];
     columns?: ColumnType[];
 }
 
@@ -85,6 +86,12 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
         ...TABLE_SETTINGS,
         ...settingsMix,
     }), [settingsMix]);
+
+    // empty data is expected to be be an empty array
+    // undefined data is not rendered at all
+    if (!Array.isArray(rawData)) {
+        return null;
+    }
 
     if (!columns.length) {
         return (
