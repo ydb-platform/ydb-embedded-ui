@@ -63,7 +63,7 @@ const prepareGenericColumns = (data: KeyValueRow[]) => {
 
 const getRowIndex = (_: unknown, index: number) => index
 
-interface QueryResultTableProps extends Omit<DataTableProps<KeyValueRow>, 'columns'> {
+interface QueryResultTableProps extends Omit<DataTableProps<KeyValueRow>, 'columns' | 'theme'> {
     columns?: ColumnType[];
 }
 
@@ -96,6 +96,7 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
 
     return (
         <DataTable
+            theme="yandex-cloud"
             data={data}
             columns={columns}
             settings={settings}
