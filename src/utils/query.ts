@@ -1,12 +1,16 @@
 import {YQLType} from '../types';
-import type {ClassicResponse, KeyValueRow, ModernResponse, YdbResponse} from '../types/api/query';
+import type {
+    AnyExecuteResponse,
+    CommonFields,
+    DeepExecuteResponse,
+    DeprecatedExecuteResponsePlain,
+    ExecuteClassicResponsePlain,
+    ExecuteModernResponse,
+    KeyValueRow,
+    QueryAPIExecuteResponse,
+    Schemas,
+} from '../types/api/query';
 import type {IQueryResult} from '../types/store/query';
-
-export const isModern = (response: ClassicResponse | ModernResponse | YdbResponse): response is ModernResponse =>
-    response &&
-    !Array.isArray(response) &&
-    Array.isArray(response.result) &&
-    Array.isArray(response.result[0]);
 
 // eslint-disable-next-line complexity
 export const getColumnType = (type: string) => {
@@ -45,11 +49,11 @@ export const getColumnType = (type: string) => {
     }
 }
 
-export const parseResponseTypeModern = (data: ModernResponse): IQueryResult => {
+const parseExecuteModernResponse = (data: ExecuteModernResponse): IQueryResult => {
     const {result, columns, ...restData} = data;
 
     return {
-        result: result.map((row) => {
+        result: result && columns && result.map((row) => {
             return row.reduce((newRow: KeyValueRow, cellData, columnIndex) => {
                 const {name} = columns[columnIndex];
                 newRow[name] = cellData;
@@ -61,19 +65,74 @@ export const parseResponseTypeModern = (data: ModernResponse): IQueryResult => {
     };
 };
 
-export const parseResponseTypeClassic = (data: ClassicResponse): IQueryResult => {
-    if (Array.isArray(data)) {
-        return {result: data};
+const parseDeprecatedExecuteResponseValue = (data?: DeprecatedExecuteResponsePlain | ExecuteClassicResponsePlain): KeyValueRow[] | undefined => {
+    if (!data) {
+        return undefined;
     }
 
-    return data;
+    if (typeof data === 'string') {
+        try {
+            return JSON.parse(data);
+        } catch (e) {
+            return undefined;
+        }
+    }
+
+    if (Array.isArray(data)) {
+        return data;
+    }
+
+    // Plan is not a valid response in this case
+    return undefined;
+};
+
+const hasResult = (data: AnyExecuteResponse): data is DeepExecuteResponse => Boolean(
+    data && typeof data === 'object' && 'result' in data
+);
+
+const isModern = (response: AnyExecuteResponse): response is ExecuteModernResponse => Boolean(
+    response &&
+    !Array.isArray(response) &&
+    Array.isArray((response as ExecuteModernResponse).result) &&
+    Array.isArray((response as ExecuteModernResponse).columns)
+);
+
+const hasCommonFields = (data: AnyExecuteResponse): data is CommonFields => Boolean(
+    data && typeof data === 'object' && ('ast' in data || 'plan' in data || 'stats' in data)
+);
+
+// complex logic because of the variety of possible responses
+// after all backends are updated to the latest version, it can be simplified
+export const parseQueryAPIExecuteResponse = <T extends Schemas>(data: QueryAPIExecuteResponse<T>): IQueryResult => {
+    if (!data) {
+        return {};
+    }
+
+    if (hasResult(data)) {
+        if (isModern(data)) {
+            return parseExecuteModernResponse(data);
+        }
+
+        return {
+            ...data,
+            result: parseDeprecatedExecuteResponseValue(data.result),
+        };
+    }
+
+    if (hasCommonFields(data)) {
+        return data;
+    }
+
+    return {
+        result: parseDeprecatedExecuteResponseValue(data),
+    };
 };
 
 export const prepareQueryResponse = (data?: KeyValueRow[]) => {
     if (!Array.isArray(data)) {
         return [];
     }
- 
+
     return data.map((row) => {
         const formattedData: KeyValueRow = {};
 

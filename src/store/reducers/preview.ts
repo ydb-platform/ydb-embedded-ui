@@ -1,7 +1,8 @@
 import '../../services/api';
 
+import type {ErrorRepsonse, ExecuteActions} from '../../types/api/query';
 import type {IQueryResult} from '../../types/store/query';
-import {isModern, parseResponseTypeClassic, parseResponseTypeModern} from '../../utils/query';
+import {parseQueryAPIExecuteResponse} from '../../utils/query';
 
 import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
 
@@ -15,7 +16,7 @@ const initialState = {
 
 const preview = (
     state = initialState,
-    action: ApiRequestAction<typeof SEND_QUERY, IQueryResult> | ReturnType<typeof setQueryOptions>,
+    action: ApiRequestAction<typeof SEND_QUERY, IQueryResult, ErrorRepsonse> | ReturnType<typeof setQueryOptions>,
 ) => {
     switch (action.type) {
         case SEND_QUERY.REQUEST: {
@@ -55,32 +56,14 @@ const preview = (
 interface SendQueryParams {
     query?: string;
     database?: string;
-    action?: string;
+    action?: ExecuteActions;
 };
 
 export const sendQuery = ({query, database, action}: SendQueryParams) => {
     return createApiRequest({
         request: window.api.sendQuery({schema: 'modern', query, database, action}),
         actions: SEND_QUERY,
-        dataHandler: (data): IQueryResult => {
-            if (!data) {
-                return {result: []};
-            }
-
-            if (typeof data === 'string') {
-                try {
-                    return JSON.parse(data);
-                } catch (e) {
-                    return {result: []};
-                }
-            }
-
-            if (isModern(data)) {
-                return parseResponseTypeModern(data);
-            } else {
-                return parseResponseTypeClassic(data);
-            }
-        },
+        dataHandler: parseQueryAPIExecuteResponse,
     });
 };
 
