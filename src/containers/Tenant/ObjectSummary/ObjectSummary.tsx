@@ -1,4 +1,4 @@
-import React, {useEffect, useReducer} from 'react';
+import React, {ReactNode, useEffect, useReducer} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Link} from 'react-router-dom';
 import cn from 'bem-cn-lite';
@@ -16,7 +16,7 @@ import CopyToClipboard from '../../../components/CopyToClipboard/CopyToClipboard
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import Icon from '../../../components/Icon/Icon';
 
-import type {EPathSubType, EPathType, TDirEntry} from '../../../types/api/schema';
+import {EPathSubType, EPathType, TDirEntry} from '../../../types/api/schema';
 import {isColumnEntityType, isIndexTable, isTableType} from '../utils/schema';
 
 import {
@@ -151,14 +151,35 @@ function ObjectSummary(props: ObjectSummaryProps) {
     };
 
     const renderObjectOverview = () => {
-        const startTimeInMilliseconds = Number(currentSchemaData?.CreateStep);
-        let createTime = '';
-        if (startTimeInMilliseconds) {
-            createTime = new Date(startTimeInMilliseconds).toUTCString();
+        // verbose mapping to guarantee a correct render for new path types
+        // TS will error when a new type is added but not mapped here
+        const pathTypeToComponent: Record<EPathType, (() => ReactNode) | undefined> = {
+            [EPathType.EPathTypeInvalid]: undefined,
+            [EPathType.EPathTypeDir]: undefined,
+            [EPathType.EPathTypeTable]: undefined,
+            [EPathType.EPathTypeSubDomain]: undefined,
+            [EPathType.EPathTypeTableIndex]: undefined,
+            [EPathType.EPathTypeExtSubDomain]: undefined,
+            [EPathType.EPathTypeColumnStore]: undefined,
+            [EPathType.EPathTypeColumnTable]: undefined,
+            [EPathType.EPathTypeCdcStream]: () => undefined,
+        };
+
+        let component = currentSchemaData?.PathType && pathTypeToComponent[currentSchemaData.PathType]?.();
+
+        if (!component) {
+            const startTimeInMilliseconds = Number(currentSchemaData?.CreateStep);
+            let createTime = '';
+            if (startTimeInMilliseconds) {
+                createTime = new Date(startTimeInMilliseconds).toUTCString();
+            }
+
+            component = <InfoViewer info={[{label: 'Create time', value: createTime}]} />;
         }
+
         return (
             <div className={b('overview-wrapper')}>
-                <InfoViewer info={[{label: 'Create time', value: createTime}]} />
+                {component}
             </div>
         );
     };
