@@ -20,7 +20,7 @@ type Page = {
 
 const overview = {
     id: GeneralPagesIds.overview,
-    title: 'Overview',
+    title: 'Info',
 };
 
 const topQueries = {
