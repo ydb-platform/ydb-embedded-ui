@@ -81,6 +81,8 @@ export const TABLE_PAGES = [overview, topShards, graph, tablets, hotKeys, descri
 
 export const DIR_PAGES = [overview, topShards, describe];
 
+export const TOPIC_PAGES = [overview, describe];
+
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here
 const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
@@ -95,7 +97,8 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
 
     [EPathType.EPathTypeDir]: DIR_PAGES,
     [EPathType.EPathTypeTableIndex]: DIR_PAGES,
-    [EPathType.EPathTypeCdcStream]: DIR_PAGES,
+    
+    [EPathType.EPathTypeCdcStream]: TOPIC_PAGES,
 };
 
 export const getPagesByType = (type?: EPathType) =>

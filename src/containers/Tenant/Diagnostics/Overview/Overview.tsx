@@ -6,7 +6,10 @@ import {Loader} from '@yandex-cloud/uikit';
 
 //@ts-ignore
 import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';
-import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
+import {
+    CDCStreamInfo,
+    TableIndexInfo,
+} from '../../../../components/InfoViewer/schemaInfo';
 
 import {EPathType} from '../../../../types/api/schema';
 import {isColumnEntityType, isTableType} from '../../utils/schema';
@@ -125,7 +128,7 @@ function Overview(props: OverviewProps) {
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
-            [EPathType.EPathTypeCdcStream]: undefined,
+            [EPathType.EPathTypeCdcStream]: () => <CDCStreamInfo data={schemaData} />,
         };
 
         return (props.type && pathTypeToComponent[props.type]?.()) || (
