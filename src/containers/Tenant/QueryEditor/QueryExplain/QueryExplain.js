@@ -111,7 +111,7 @@ function QueryExplain(props) {
     }, []);
 
     const {explain = {}, theme} = props;
-    const {links, nodes, version, graphDepth} = explain;
+    const {links, nodes, version} = explain;
 
     useEffect(() => {
         if (!props.ast && activeOption === ExplainOptionIds.ast) {
@@ -133,13 +133,20 @@ function QueryExplain(props) {
 
     const renderStub = () => {
         const {explain} = props;
+
+        let message;
+
         if (!explain) {
-            return 'Explain of query is empty';
+            message = 'Explain of query is empty';
+        } else if (!explain.nodes.length) {
+            message = 'There is no explanation for the request';
         }
-        if (!explain.nodes.length) {
-            return 'There is no explanation for the request';
-        }
-        return null;
+
+        return message ? (
+            <div className={b('text-message')}>
+                {message}
+            </div>
+        ) : null;
     };
 
     const renderTextExplain = () => {
@@ -157,18 +164,18 @@ function QueryExplain(props) {
             <React.Fragment>
                 {content}
                 {renderStub()}
-                {isFullscreen && (
-                    <Fullscreen>
-                        <div className={b('inspector', {fullscreen: true})}>{content}</div>
-                    </Fullscreen>
-                )}
+                {isFullscreen && <Fullscreen>{content}</Fullscreen>}
             </React.Fragment>
         );
     };
 
     const renderAstExplain = () => {
         if (!props.ast) {
-            return 'There is no AST explanation for the request';
+            return (
+                <div className={b('text-message')}>
+                    There is no AST explanation for the request
+                </div>
+            );
         }
         const content = (
             <div className={b('ast')}>
@@ -189,19 +196,12 @@ function QueryExplain(props) {
     };
 
     const renderGraph = () => {
-        const graphHeight = `${Math.max(graphDepth * 100, 200)}px`;
-
         const content =
             links && nodes && nodes.length ? (
                 <div
                     className={b('explain-canvas-container', {
                         hidden: activeOption !== ExplainOptionIds.schema,
                     })}
-                    style={{
-                        height: isFullscreen ? '100%' : graphHeight,
-                        minHeight: graphHeight,
-                        width: '100%',
-                    }}
                 >
                     <GraphRoot
                         version={version}
@@ -227,6 +227,24 @@ function QueryExplain(props) {
         );
     };
 
+    const renderError = () => {
+        const {error} = props;
+
+        let message;
+
+        if (error.data) {
+            message = typeof error.data === 'string' ? error.data : error.data.error?.message;
+        } else {
+            message = error;
+        }
+
+        return (
+            <div className={b('text-message')}>
+                {message}
+            </div>
+        );
+    };
+
     const renderContent = () => {
         const {error, loading, loadingAst} = props;
         if (loading || loadingAst) {
@@ -234,10 +252,7 @@ function QueryExplain(props) {
         }
 
         if (error) {
-            if (error.data) {
-                return typeof error.data === 'string' ? error.data : error.data.error?.message;
-            }
-            return error;
+            return renderError();
         }
 
         switch (activeOption) {
