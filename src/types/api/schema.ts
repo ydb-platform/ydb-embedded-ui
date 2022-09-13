@@ -56,9 +56,11 @@ interface TPathDescription {
     ColumnTableDescription?: unknown;
 
     TableIndex?: TIndexDescription;
+
+    CdcStreamDescription?: TCdcStreamDescription;
 }
 
-interface TDirEntry {
+export interface TDirEntry {
     Name?: string;
     /** uint64 */
     PathId?: string;
@@ -206,6 +208,44 @@ export interface TIndexDescription {
     DataColumnNames?: string[];
     /** uint64 */
     DataSize?: string;
+}
+
+enum ECdcStreamMode {
+    ECdcStreamModeInvalid = 'ECdcStreamModeInvalid',
+    ECdcStreamModeKeysOnly = 'ECdcStreamModeKeysOnly',
+    ECdcStreamModeUpdate = 'ECdcStreamModeUpdate',
+    ECdcStreamModeNewImage = 'ECdcStreamModeNewImage',
+    ECdcStreamModeOldImage = 'ECdcStreamModeOldImage',
+    ECdcStreamModeNewAndOldImages = 'ECdcStreamModeNewAndOldImages',
+}
+
+enum ECdcStreamFormat {
+    ECdcStreamFormatInvalid = 'ECdcStreamFormatInvalid',
+    ECdcStreamFormatProto = 'ECdcStreamFormatProto',
+    ECdcStreamFormatJson = 'ECdcStreamFormatJson',
+}
+
+enum ECdcStreamState {
+    ECdcStreamStateInvalid = 'ECdcStreamStateInvalid',
+    ECdcStreamStateReady = 'ECdcStreamStateReady',
+    ECdcStreamStateDisabled = 'ECdcStreamStateDisabled',
+}
+
+interface TPathID {
+    /** fixed64 */
+    OwnerId?: string;
+    /** uint64 */
+    LocalId?: string;
+}
+
+export interface TCdcStreamDescription {
+    Name?: string;
+    Mode?: ECdcStreamMode;
+    Format?: ECdcStreamFormat;
+    PathId?: TPathID;
+    State?: ECdcStreamState;
+    /** uint64 */
+    SchemaVersion?: string;
 }
 
 // incomplete
