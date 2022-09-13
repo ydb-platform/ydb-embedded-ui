@@ -6,7 +6,7 @@ import {Loader} from '@yandex-cloud/uikit';
 
 //@ts-ignore
 import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';
-import {IndexInfoViewer} from '../../../../components/IndexInfoViewer/IndexInfoViewer';
+import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 
 import {EPathType} from '../../../../types/api/schema';
 import {isColumnEntityType, isTableType} from '../../utils/schema';
@@ -121,7 +121,7 @@ function Overview(props: OverviewProps) {
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeTable]: undefined,
             [EPathType.EPathTypeSubDomain]: undefined,
-            [EPathType.EPathTypeTableIndex]: () => <IndexInfoViewer data={schemaData} />,
+            [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={schemaData} />,
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
