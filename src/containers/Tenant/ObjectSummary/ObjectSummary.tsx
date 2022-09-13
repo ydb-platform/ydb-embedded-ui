@@ -16,7 +16,7 @@ import CopyToClipboard from '../../../components/CopyToClipboard/CopyToClipboard
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import Icon from '../../../components/Icon/Icon';
 
-import type {EPathSubType, EPathType} from '../../../types/api/schema';
+import type {EPathSubType, EPathType, TDirEntry} from '../../../types/api/schema';
 import {isColumnEntityType, isIndexTable, isTableType} from '../utils/schema';
 
 import {
@@ -100,8 +100,8 @@ function ObjectSummary(props: ObjectSummaryProps) {
     });
 
     const {name: tenantName, info: infoTab} = queryParams;
-    const pathData = _.get(data[tenantName as string], 'PathDescription.Self');
-    const currentSchemaData = _.get(data[currentSchemaPath], 'PathDescription.Self');
+    const pathData: TDirEntry | undefined = _.get(data[tenantName as string], 'PathDescription.Self');
+    const currentSchemaData: TDirEntry | undefined = _.get(data[currentSchemaPath], 'PathDescription.Self');
 
     const tableSchema =
         currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
@@ -203,7 +203,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
                             rootPath={tenantName as string}
                             // for the root pathData.Name contains the same string as tenantName,
                             // but without the leading slash
-                            rootName={pathData?.Name || tenantName}
+                            rootName={pathData.Name || String(tenantName)}
                             rootType={pathData.PathType}
                             currentPath={currentSchemaPath}
                         />

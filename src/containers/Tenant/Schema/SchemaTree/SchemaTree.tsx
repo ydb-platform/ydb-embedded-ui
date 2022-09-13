@@ -14,7 +14,7 @@ import {getActions} from '../../utils/schemaActions';
 interface SchemaTreeProps {
     rootPath: string;
     rootName: string;
-    rootType: EPathType;
+    rootType?: EPathType;
     currentPath: string;
 }
 
