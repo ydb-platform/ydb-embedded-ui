@@ -20,9 +20,8 @@ const alterTableTemplate = (path: string) => {
     ADD COLUMN is_deleted Bool;`;
 };
 const selectQueryTemplate = (path: string) => {
-    return `SELECT \`id\`, \`name\`
+    return `SELECT *
     FROM \`${path}\`
-    ORDER BY \`id\`
     LIMIT 10;`;
 };
 const upsertQueryTemplate = (path: string) => {
