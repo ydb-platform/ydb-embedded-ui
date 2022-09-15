@@ -14,7 +14,7 @@ import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/P
 import {AutoFetcher} from '../../utils/autofetcher';
 
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
-import {formatCPU, formatBytesToGigabyte} from '../../utils';
+import {formatCPU, formatBytesToGigabyte, formatNumber} from '../../utils';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
 import {ALL, DEFAULT_TABLE_SETTINGS, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
@@ -258,12 +258,22 @@ class Tenants extends React.Component {
                 defaultOrder: DataTable.DESCENDING,
             },
             {
+                name: 'NodeIds',
+                header: 'Nodes',
+                width: 100,
+                accessor: ({NodeIds}) => NodeIds.length,
+                sortAccessor: ({NodeIds}) => NodeIds.length,
+                render: ({value}) => formatNumber(value) || '—',
+                align: DataTable.RIGHT,
+                defaultOrder: DataTable.DESCENDING,
+            },
+            {
                 name: 'StorageGroups',
                 header: 'Groups',
                 width: 100,
                 sortAccessor: ({StorageGroups}) =>
                     isNaN(Number(StorageGroups)) ? 0 : Number(StorageGroups),
-                render: ({value}) => value ?? '—',
+                render: ({value}) => formatNumber(value) || '—',
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
