@@ -99,6 +99,7 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeTableIndex]: DIR_PAGES,
     
     [EPathType.EPathTypeCdcStream]: TOPIC_PAGES,
+    [EPathType.EPathTypePersQueueGroup]: TOPIC_PAGES,
 };
 
 export const getPagesByType = (type?: EPathType) =>

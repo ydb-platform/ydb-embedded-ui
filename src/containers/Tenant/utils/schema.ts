@@ -29,6 +29,7 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeColumnTable]: 'column_table',
 
     [EPathType.EPathTypeCdcStream]: 'topic',
+    [EPathType.EPathTypePersQueueGroup]: 'topic',
 };
 
 export const mapPathTypeToNavigationTreeType = (
@@ -51,6 +52,7 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypeExtSubDomain]: false,
     [EPathType.EPathTypeColumnStore]: false,
     [EPathType.EPathTypeCdcStream]: false,
+    [EPathType.EPathTypePersQueueGroup]: false,
 };
 
 export const isTableType = (pathType?: EPathType) =>
@@ -82,6 +84,7 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeExtSubDomain]: false,
     [EPathType.EPathTypeCdcStream]: false,
+    [EPathType.EPathTypePersQueueGroup]: false,
 };
 
 export const isColumnEntityType = (type?: EPathType) =>
