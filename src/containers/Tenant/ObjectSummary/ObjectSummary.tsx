@@ -14,7 +14,10 @@ import Acl from '../Acl/Acl';
 import SchemaViewer from '../Schema/SchemaViewer/SchemaViewer';
 import CopyToClipboard from '../../../components/CopyToClipboard/CopyToClipboard';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
-import {CDCStreamOverview} from '../../../components/InfoViewer/schemaOverview';
+import {
+    CDCStreamOverview,
+    PersQueueGroupOverview,
+} from '../../../components/InfoViewer/schemaOverview';
 import Icon from '../../../components/Icon/Icon';
 
 import {EPathSubType, EPathType, TDirEntry} from '../../../types/api/schema';
@@ -164,6 +167,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
             [EPathType.EPathTypeCdcStream]: () => <CDCStreamOverview data={data[currentSchemaPath]} />,
+            [EPathType.EPathTypePersQueueGroup]: () => <PersQueueGroupOverview data={data[currentSchemaPath]} />,
         };
 
         let component = currentSchemaData?.PathType && pathTypeToComponent[currentSchemaData.PathType]?.();

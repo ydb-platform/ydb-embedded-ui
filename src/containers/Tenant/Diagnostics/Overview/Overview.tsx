@@ -9,6 +9,7 @@ import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';
 import {
     CDCStreamInfo,
     TableIndexInfo,
+    PersQueueGroupInfo,
 } from '../../../../components/InfoViewer/schemaInfo';
 
 import {EPathType} from '../../../../types/api/schema';
@@ -129,6 +130,7 @@ function Overview(props: OverviewProps) {
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
             [EPathType.EPathTypeCdcStream]: () => <CDCStreamInfo data={schemaData} />,
+            [EPathType.EPathTypePersQueueGroup]: () => <PersQueueGroupInfo data={schemaData} />,
         };
 
         return (props.type && pathTypeToComponent[props.type]?.()) || (
