@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.14.0...v1.14.1) (2022-09-16)
+
+
+### Bug Fixes
+
+* **Tenants:** display nodes count 0 for undefined NodeIds ([4be42ec](https://github.com/ydb-platform/ydb-embedded-ui/commit/4be42eca84557929837e799d7d8dcebd858470d4))
+
 ## [1.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.13.2...v1.14.0) (2022-09-16)
 
 
