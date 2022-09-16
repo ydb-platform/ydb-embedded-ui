@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.13.2...v1.14.0) (2022-09-16)
+
+
+### Features
+
+* **Preview:** use modern query schema ([60bed3f](https://github.com/ydb-platform/ydb-embedded-ui/commit/60bed3fcb0fd76b869883742a2f2911201c0c226))
+* **QueryEditor:** use modern query schema ([ecf38aa](https://github.com/ydb-platform/ydb-embedded-ui/commit/ecf38aa6b164ef7705e004aa77c8dab0e3164b51))
+* **QueryResultTable:** component for displaying query result ([1b8be10](https://github.com/ydb-platform/ydb-embedded-ui/commit/1b8be10546ad9ae13b1043b2871b2aa110a5b6d4))
+* **Storage:** experimental settings for disk colors ([b4291f4](https://github.com/ydb-platform/ydb-embedded-ui/commit/b4291f4ca19c588bc17eca50da51e898e6ccf581))
+* **Tenant:** cdc streams info ([4cc773f](https://github.com/ydb-platform/ydb-embedded-ui/commit/4cc773f0351e3f1f6e279d1bebbb78329695e9ae))
+* **Tenant:** cdc streams overview ([d1aed44](https://github.com/ydb-platform/ydb-embedded-ui/commit/d1aed4467135adaf01a06f8c4c4a4b3eb0b53106))
+* **Tenant:** pq groups info & overview ([e1878a6](https://github.com/ydb-platform/ydb-embedded-ui/commit/e1878a6353933f74e62b204bf210f56a18a16c49))
+* **Tenants:** display tenant nodes count ([72aef25](https://github.com/ydb-platform/ydb-embedded-ui/commit/72aef250006aae53d7704ff539b9eb537e6bfbd4))
+* use schema param in sendQuery api ([01f9c71](https://github.com/ydb-platform/ydb-embedded-ui/commit/01f9c71190622279f03cd1c01d6b6e8e6739362a))
+
+
+### UI Updates
+
+* **Storage:** new disks design ([26033d2](https://github.com/ydb-platform/ydb-embedded-ui/commit/26033d21e994c6ece7b3b8999d0fabbf82b43021))
+* **Tenant:** consistent paddings for query results ([7f0a7c2](https://github.com/ydb-platform/ydb-embedded-ui/commit/7f0a7c28d18e48013223239b5780dbaca18f68a8))
+
+
+### Bug Fixes
+
+* always parse query error to string ([0fcabf7](https://github.com/ydb-platform/ydb-embedded-ui/commit/0fcabf7042adfc728f1ec651ebae50e8c40e9199))
+* correct types & parsing for query api response ([d6a177c](https://github.com/ydb-platform/ydb-embedded-ui/commit/d6a177cd0e726f1d19e27c642e0a9c1d2832bbe0))
+* **Preview:** display "table is empty" only for tables ([21a93c1](https://github.com/ydb-platform/ydb-embedded-ui/commit/21a93c1a070dbd04f7338537200cd2cb9849ff88))
+* **Preview:** fix action type id ([7793fad](https://github.com/ydb-platform/ydb-embedded-ui/commit/7793fad6b618bfc4c35b85481b2a0b794698eaa1))
+* **QueryResultTable:** don't display absent result as empty ([e2e5bfa](https://github.com/ydb-platform/ydb-embedded-ui/commit/e2e5bfaf0dbb89ec64766bf4ed5a4fab10ae8844))
+* **QueryResultTable:** don't require theme prop ([c9686d4](https://github.com/ydb-platform/ydb-embedded-ui/commit/c9686d46eb2efdeb4bc093ecd44619e6c1a9c2fd))
+* **Tenant:** input working query for 'select query' action in schema ([de152bd](https://github.com/ydb-platform/ydb-embedded-ui/commit/de152bdcc38fd6f4b1e5a5e6102c621f0155be36))
+* **Tenant:** rename tab overview -> info ([2d13ffe](https://github.com/ydb-platform/ydb-embedded-ui/commit/2d13ffeb149765680c2887ea7ffb86d68ac92d5c))
+
 ## [1.13.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.13.1...v1.13.2) (2022-09-05)
 
 
