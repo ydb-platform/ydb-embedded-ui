@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.14.1...v1.14.2) (2022-09-19)
+
+
+### Bug Fixes
+
+* process new explain format ([2ede9ab](https://github.com/ydb-platform/ydb-embedded-ui/commit/2ede9ab11a29667204cca110858b0cca74588255))
+* process new query format ([eb880be](https://github.com/ydb-platform/ydb-embedded-ui/commit/eb880be36b99efe7f0c0ff96b58401293ff080e1))
+
 ## [1.14.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.14.0...v1.14.1) (2022-09-16)
 
 
