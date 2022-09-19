@@ -69,7 +69,8 @@ function Overview(props: OverviewProps) {
         currentSchemaPath,
     } = useSelector((state: any) => state.schema);
 
-    const {data: olapStats} = useSelector((state: any) => state.olapStats);
+    let {data: olapStats} = useSelector((state: any) => state.olapStats);
+    olapStats = olapStats && olapStats.result ? olapStats.result : olapStats;
 
     const fetchOverviewData = () => {
         const {tenantName, type} = props;

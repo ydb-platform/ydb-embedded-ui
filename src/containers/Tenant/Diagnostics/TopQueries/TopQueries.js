@@ -171,7 +171,7 @@ const mapStateToProps = (state) => {
     const {autorefresh} = state.schema;
     return {
         loading,
-        data,
+        data: data && data.result ? data.result: data,
         error,
         wasLoaded,
         autorefresh,
