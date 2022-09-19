@@ -72,6 +72,9 @@ export const getExplainQueryAst = ({query, database}) => {
     return createApiRequest({
         request: window.api.getExplainQueryAst(query, database),
         actions: GET_EXPLAIN_QUERY_AST,
+        dataHandler: (result) => {
+            return result && result.ast ? result.ast : result;
+        },
     });
 };
 
@@ -87,6 +90,7 @@ export const getExplainQuery = ({query, database}) => {
         request: window.api.getExplainQuery(query, database),
         actions: GET_EXPLAIN_QUERY,
         dataHandler: (result) => {
+            result = result && result.plan ? result.plan : result;
             let links = [];
             let nodes = [];
             let graphDepth;
