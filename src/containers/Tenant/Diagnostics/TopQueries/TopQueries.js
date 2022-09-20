@@ -167,11 +167,11 @@ class TopQueries extends React.Component {
     }
 }
 const mapStateToProps = (state) => {
-    const {loading, data, error, wasLoaded} = state.executeTopQueries;
+    const {loading, data = {}, error, wasLoaded} = state.executeTopQueries;
     const {autorefresh} = state.schema;
     return {
         loading,
-        data: data && data.result ? data.result: data,
+        data: data.result,
         error,
         wasLoaded,
         autorefresh,
