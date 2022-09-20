@@ -7,8 +7,6 @@ import type {
     ExecuteClassicResponsePlain,
     ExecuteModernResponse,
     KeyValueRow,
-    QueryAPIExecuteResponse,
-    Schemas,
 } from '../types/api/query';
 import type {IQueryResult} from '../types/store/query';
 
@@ -103,7 +101,7 @@ const hasCommonFields = (data: AnyExecuteResponse): data is CommonFields => Bool
 
 // complex logic because of the variety of possible responses
 // after all backends are updated to the latest version, it can be simplified
-export const parseQueryAPIExecuteResponse = <T extends Schemas>(data: QueryAPIExecuteResponse<T>): IQueryResult => {
+export const parseQueryAPIExecuteResponse = (data: AnyExecuteResponse): IQueryResult => {
     if (!data) {
         return {};
     }

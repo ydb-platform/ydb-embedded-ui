@@ -46,15 +46,12 @@ export interface ColumnType {
 // modern response
 
 export type ExecuteModernResponse = {
-    // either both fields exist, or neither one does
-    // they can be undefined for queries like `insert into`
-    result?: ArrayRow[];
-    columns?: ColumnType[];
+    result: ArrayRow[];
+    columns: ColumnType[];
 } & CommonFields;
 
 export type ExecuteClassicResponseDeep = {
-    // can be undefined for queries like `insert into`
-    result?: KeyValueRow[];
+    result: KeyValueRow[];
 } & CommonFields;
 
 // can be undefined for queries like `insert into`
@@ -63,19 +60,20 @@ export type ExecuteClassicResponsePlain = KeyValueRow[] | undefined;
 export type ExecuteClassicResponse = ExecuteClassicResponseDeep | ExecuteClassicResponsePlain;
 
 export type ExecuteYdbResponse = {
-    // can be undefined for queries like `insert into`
-    result?: KeyValueRow[];
+    result: KeyValueRow[];
 } & CommonFields;
 
-type ExecuteResponse<Schema extends Schemas> = (
-    Schema extends 'modern'
-        ? ExecuteModernResponse
-        : Schema extends 'ydb'
-            ? ExecuteYdbResponse
-            : Schema extends 'classic' | undefined
-                ? ExecuteClassicResponse
-                : unknown
-);
+type ExecuteResponse<Schema extends Schemas> = 
+    | CommonFields // result can be undefined for queries like `insert into`
+    | (
+        Schema extends 'modern'
+            ? ExecuteModernResponse
+            : Schema extends 'ydb'
+                ? ExecuteYdbResponse
+                : Schema extends 'classic' | undefined
+                    ? ExecuteClassicResponse
+                    : unknown
+    );
 
 // deprecated response from older versions, backward compatibility
 
@@ -138,7 +136,9 @@ export type AnyExecuteResponse =
     | ExecuteModernResponse
     | ExecuteClassicResponse
     | ExecuteYdbResponse
-    | DeprecatedExecuteResponse;
+    | CommonFields
+    | DeprecatedExecuteResponse
+    | null;
 
 export type DeepExecuteResponse =
     | ExecuteModernResponse
