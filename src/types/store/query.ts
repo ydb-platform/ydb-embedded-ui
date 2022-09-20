@@ -5,5 +5,5 @@ export interface IQueryResult {
     columns?: ColumnType[];
     stats?: any;
     plan?: any;
-    ast?: any;
+    ast?: string;
 }

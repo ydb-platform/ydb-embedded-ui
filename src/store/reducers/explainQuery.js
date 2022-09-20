@@ -1,8 +1,12 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import '../../services/api';
 import _ from 'lodash';
+
+import '../../services/api';
+
 import {getExplainNodeId, getMetaForExplainNode} from '../../utils';
 import {preparePlan} from '../../utils/prepareQueryExplain';
+import {parseQueryAPIExplainResponse} from '../../utils/query';
+
+import {createRequestActionTypes, createApiRequest} from '../utils';
 
 const GET_EXPLAIN_QUERY = createRequestActionTypes('query', 'GET_EXPLAIN_QUERY');
 const GET_EXPLAIN_QUERY_AST = createRequestActionTypes('query', 'GET_EXPLAIN_QUERY_AST');
@@ -26,7 +30,8 @@ const explainQuery = (state = initialState, action) => {
         case GET_EXPLAIN_QUERY.SUCCESS: {
             return {
                 ...state,
-                data: action.data,
+                data: action.data.plan,
+                dataAst: action.data.ast,
                 loading: false,
                 error: undefined,
             };
@@ -50,7 +55,7 @@ const explainQuery = (state = initialState, action) => {
         case GET_EXPLAIN_QUERY_AST.SUCCESS: {
             return {
                 ...state,
-                dataAst: action.data,
+                dataAst: action.data.ast,
                 loadingAst: false,
                 error: undefined,
             };
@@ -72,9 +77,7 @@ export const getExplainQueryAst = ({query, database}) => {
     return createApiRequest({
         request: window.api.getExplainQueryAst(query, database),
         actions: GET_EXPLAIN_QUERY_AST,
-        dataHandler: (result) => {
-            return result && result.ast ? result.ast : result;
-        },
+        dataHandler: parseQueryAPIExplainResponse,
     });
 };
 
@@ -89,8 +92,9 @@ export const getExplainQuery = ({query, database}) => {
     return createApiRequest({
         request: window.api.getExplainQuery(query, database),
         actions: GET_EXPLAIN_QUERY,
-        dataHandler: (result) => {
-            result = result && result.plan ? result.plan : result;
+        dataHandler: (response) => {
+            const {plan: result, ast} = parseQueryAPIExplainResponse(response);
+
             let links = [];
             let nodes = [];
             let graphDepth;
@@ -164,12 +168,15 @@ export const getExplainQuery = ({query, database}) => {
             }
 
             return {
-                links,
-                nodes,
-                tables,
-                version: meta.version,
-                pristine: result,
-                graphDepth,
+                plan: {
+                    links,
+                    nodes,
+                    tables,
+                    version: meta.version,
+                    pristine: result,
+                    graphDepth,
+                },
+                ast,
             };
         },
     });
