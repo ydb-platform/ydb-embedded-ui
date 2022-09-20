@@ -1,4 +1,4 @@
-import {ReactNode, useEffect, useMemo} from 'react';
+import {ReactNode, useCallback, useEffect, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 
@@ -60,7 +60,10 @@ const b = cn('kv-tenant-overview');
 const autofetcher = new AutoFetcher();
 
 function Overview(props: OverviewProps) {
+    const {tenantName, type} = props;
+
     const dispatch = useDispatch();
+
     const {
         currentSchema: currentItem = {},
         loading,
@@ -69,45 +72,42 @@ function Overview(props: OverviewProps) {
         currentSchemaPath,
     } = useSelector((state: any) => state.schema);
 
-    const {data: { result: olapStats } = { result: undefined }} = useSelector((state: any) => state.olapStats);
+    const {
+        data: { result: olapStats } = { result: undefined },
+    } = useSelector((state: any) => state.olapStats);
 
-    const fetchOverviewData = () => {
-        const {tenantName, type} = props;
+    const fetchOverviewData = useCallback(() => {
         const schemaPath = currentSchemaPath || tenantName;
         dispatch(getSchema({path: schemaPath}));
 
         if (isTableType(type) && isColumnEntityType(type)) {
             dispatch(getOlapStats({path: schemaPath}));
         }
-    };
+    }, [currentSchemaPath, dispatch, tenantName, type]);
+
+    useEffect(fetchOverviewData, [fetchOverviewData]);
 
     useEffect(() => {
-        fetchOverviewData();
-        return () => {
-            autofetcher.stop();
-        };
-    }, []);
+        autofetcher.stop();
 
-    useEffect(() => {
         if (autorefresh) {
-            fetchOverviewData();
-            autofetcher.stop();
             autofetcher.start();
             autofetcher.fetch(() => fetchOverviewData());
         }
-        if (autorefresh === false) {
+
+        return () => {
             autofetcher.stop();
-        }
-    }, [autorefresh]);
+        };
+    }, [autorefresh, fetchOverviewData]);
 
     const tableSchema =
         currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
 
     const schemaData = useMemo(() => {
-        return isTableType(props.type) && isColumnEntityType(props.type)
+        return isTableType(type) && isColumnEntityType(type)
             ? prepareOlapTableGeneral(tableSchema, olapStats)
             : currentItem;
-    }, [props.type, tableSchema, olapStats, currentItem]);
+    }, [type, tableSchema, olapStats, currentItem]);
 
     const renderLoader = () => {
         return (
@@ -133,7 +133,7 @@ function Overview(props: OverviewProps) {
             [EPathType.EPathTypePersQueueGroup]: () => <PersQueueGroupInfo data={schemaData} />,
         };
 
-        return (props.type && pathTypeToComponent[props.type]?.()) || (
+        return (type && pathTypeToComponent[type]?.()) || (
             <SchemaInfoViewer fullPath={currentItem.Path} data={schemaData} />
         );
     }
