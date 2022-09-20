@@ -105,9 +105,9 @@ type ExplainResponse = CommonFields;
 
 type DeprecatedExplainResponse<Action extends ExplainActions> = (
     Action extends 'explain-ast'
-        ? {ast: AST} & DeprecatedCommonFields
-        : Actions extends 'explain'
-            ? ({result: Plan} & DeprecatedCommonFields) | Plan
+        ? ({result: {ast: AST}} & Required<DeprecatedCommonFields>) | {ast: AST}
+        : Action extends 'explain'
+            ? ({result: Plan} & Required<DeprecatedCommonFields>) | Plan
             : unknown
 );
 
@@ -145,3 +145,14 @@ export type DeepExecuteResponse =
     | ExecuteClassicResponseDeep
     | ExecuteYdbResponse
     | DeprecatedExecuteResponseDeep;
+
+export type AnyExplainResponse = 
+    | ExplainResponse
+    | CommonFields
+    | DeprecatedExplainResponse<'explain'>
+    | DeprecatedExplainResponse<'explain-ast'>
+    | null;
+
+export type AnyResponse =
+    | AnyExecuteResponse
+    | AnyExplainResponse;

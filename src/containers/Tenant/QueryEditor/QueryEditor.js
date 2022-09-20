@@ -341,7 +341,7 @@ function QueryEditor(props) {
                 error={error}
                 explain={data}
                 astQuery={handleAstQuery}
-                ast={dataAst?.ast}
+                ast={dataAst}
                 loading={loading}
                 loadingAst={loadingAst}
                 theme={theme}

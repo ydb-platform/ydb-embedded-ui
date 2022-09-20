@@ -1,6 +1,8 @@
 import {YQLType} from '../types';
 import type {
     AnyExecuteResponse,
+    AnyExplainResponse,
+    AnyResponse,
     CommonFields,
     DeepExecuteResponse,
     DeprecatedExecuteResponsePlain,
@@ -95,7 +97,7 @@ const isModern = (response: AnyExecuteResponse): response is ExecuteModernRespon
     Array.isArray((response as ExecuteModernResponse).columns)
 );
 
-const hasCommonFields = (data: AnyExecuteResponse): data is CommonFields => Boolean(
+const hasCommonFields = (data: AnyResponse): data is CommonFields => Boolean(
     data && typeof data === 'object' && ('ast' in data || 'plan' in data || 'stats' in data)
 );
 
@@ -124,6 +126,40 @@ export const parseQueryAPIExecuteResponse = (data: AnyExecuteResponse): IQueryRe
     return {
         result: parseDeprecatedExecuteResponseValue(data),
     };
+};
+
+// complex logic because of the variety of possible responses
+// after all backends are updated to the latest version, it can be simplified
+export const parseQueryAPIExplainResponse = (data: AnyExplainResponse): IQueryResult => {
+    if (!data) {
+        return {};
+    }
+
+    if ('ast' in data) {
+        return data;
+    }
+
+    if ('result' in data) {
+        const {result, ...restData} = data;
+
+        if ('ast' in data.result) {
+            return {
+                ast: result.ast,
+                ...restData,
+            };
+        }
+
+        return {
+            plan: data.result,
+            ...restData,
+        };
+    }
+
+    if (hasCommonFields(data)) {
+        return data;
+    }
+
+    return {plan: data};
 };
 
 export const prepareQueryResponse = (data?: KeyValueRow[]) => {
