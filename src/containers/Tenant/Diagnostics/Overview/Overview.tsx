@@ -25,11 +25,11 @@ import './Overview.scss';
 function prepareOlapTableGeneral(tableData: any, olapStats?: any[]) {
     const {ColumnShardCount} = tableData;
     const Bytes = olapStats?.reduce((acc, el) => {
-        acc += parseInt(el.Bytes) ?? 0;
+        acc += parseInt(el.Bytes) || 0;
         return acc;
     }, 0);
     const Rows = olapStats?.reduce((acc, el) => {
-        acc += parseInt(el.Rows) ?? 0;
+        acc += parseInt(el.Rows) || 0;
         return acc;
     }, 0);
     const tabletIds = olapStats?.reduce((acc, el) => {
