@@ -22,7 +22,7 @@ import {getOlapStats} from '../../../../store/reducers/olapStats';
 
 import './Overview.scss';
 
-function prepareOlapTableGeneral(tableData: any, olapStats: any[]) {
+function prepareOlapTableGeneral(tableData: any, olapStats?: any[]) {
     const {ColumnShardCount} = tableData;
     const Bytes = olapStats?.reduce((acc, el) => {
         acc += parseInt(el.Bytes) ?? 0;
@@ -69,8 +69,7 @@ function Overview(props: OverviewProps) {
         currentSchemaPath,
     } = useSelector((state: any) => state.schema);
 
-    let {data: olapStats} = useSelector((state: any) => state.olapStats);
-    olapStats = olapStats && olapStats.result ? olapStats.result : olapStats;
+    const {data: { result: olapStats } = { result: undefined }} = useSelector((state: any) => state.olapStats);
 
     const fetchOverviewData = () => {
         const {tenantName, type} = props;
