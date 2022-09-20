@@ -14,8 +14,8 @@
         justify-content: flex-start;
         align-items: flex-start;
 
-        & + & {
-            margin-left: 50px;
+        &:not(:last-child) {
+            margin-right: 50px;
         }
     }
 
