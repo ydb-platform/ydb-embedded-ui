@@ -1,5 +1,8 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
+
+import {parseQueryAPIExecuteResponse} from '../../utils/query';
+
+import {createRequestActionTypes, createApiRequest} from '../utils';
 
 const SEND_SHARD_QUERY = createRequestActionTypes('query', 'SEND_SHARD_QUERY');
 const SET_SHARD_QUERY_OPTIONS = 'query/SET_SHARD_QUERY_OPTIONS';
@@ -76,6 +79,7 @@ const shardsWorkload = (state = initialState, action) => {
 export const sendShardQuery = ({database, path = '', sortOrder}) => {
     return createApiRequest({
         request: window.api.sendQuery({
+            schema: 'modern',
             query: createShardQuery(path, sortOrder, database),
             database,
             action: queryAction,
@@ -83,13 +87,7 @@ export const sendShardQuery = ({database, path = '', sortOrder}) => {
             concurrentId: 'topShards',
         }),
         actions: SEND_SHARD_QUERY,
-        dataHandler: (result) => {
-            if (result && typeof result === 'string') {
-                throw 'Unexpected token in JSON.';
-            }
-
-            return result;
-        },
+        dataHandler: parseQueryAPIExecuteResponse,
     });
 };
 

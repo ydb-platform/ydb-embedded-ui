@@ -216,11 +216,11 @@ function TopShards({
 }
 
 const mapStateToProps = (state) => {
-    const {loading, data, error, wasLoaded} = state.shardsWorkload;
+    const {loading, data = {}, error, wasLoaded} = state.shardsWorkload;
     const {autorefresh} = state.schema;
     return {
         loading,
-        data: data && data.result ? data.result : data,
+        data: data.result,
         error,
         currentSchemaPath: state.schema?.currentSchema?.Path,
         autorefresh,
