@@ -1,4 +1,7 @@
-import {parseQueryAPIExecuteResponse} from './query';
+import {
+    parseQueryAPIExecuteResponse,
+    parseQueryAPIExplainResponse,
+} from './query';
 
 describe('API utils', () => {
     describe('json/viewer/query', () => {
@@ -182,6 +185,61 @@ describe('API utils', () => {
                         expect(actual.columns).toBeUndefined();
                         expect(actual.stats).toEqual(response.stats);
                     });
+                });
+            });
+        });
+
+        describe('parseQueryAPIExplainResponse', () => {
+            it('should handle empty response', () => {
+                expect(parseQueryAPIExplainResponse(null)).toEqual({});
+            });
+
+            it('should accept stats without a plan', () => {
+                const stats = {metric: 'good'};
+                expect(parseQueryAPIExplainResponse({stats}).stats).toEqual(stats);
+            });
+
+            describe('old format', () => {
+                describe('explain', () => {
+                    it('should parse plan data in the root', () => {
+                        const plan = {foo: 'bar'};
+                        expect(parseQueryAPIExplainResponse(plan).plan).toEqual(plan);
+                    });
+
+                    it('should parse plan in the result field with stats', () => {
+                        const plan = {foo: 'bar'};
+                        const stats = {metric: 'good'};
+                        const actual = parseQueryAPIExplainResponse({result: plan, stats});
+                        expect(actual.plan).toEqual(plan);
+                        expect(actual.stats).toEqual(stats);
+                    });
+                });
+
+                describe('explain-ast', () => {
+                    it('should parse ast field in the root', () => {
+                        const ast = 'ast';
+                        expect(parseQueryAPIExplainResponse({ast}).ast).toBe(ast);
+                    });
+
+                    it('should parse ast in the result field with stats', () => {
+                        const ast = 'ast';
+                        const stats = {metric: 'good'};
+                        const actual = parseQueryAPIExplainResponse({result: {ast}, stats});
+                        expect(actual.ast).toBe(ast);
+                        expect(actual.stats).toEqual(stats);
+                    });
+                });
+            });
+
+            describe('new format', () => {
+                it('should parse explain response with stats', () => {
+                    const plan = {foo: 'bar'};
+                    const ast = 'ast';
+                    const stats = {metric: 'good'};
+                    const actual = parseQueryAPIExplainResponse({plan, ast, stats});
+                    expect(actual.plan).toEqual(plan);
+                    expect(actual.ast).toBe(ast);
+                    expect(actual.stats).toEqual(stats);
                 });
             });
         });
