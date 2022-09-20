@@ -1,5 +1,8 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
+
+import {parseQueryAPIExecuteResponse} from '../../utils/query';
+
+import {createRequestActionTypes, createApiRequest} from '../utils';
 
 const FETCH_OLAP_STATS = createRequestActionTypes('query', 'SEND_OLAP_STATS_QUERY');
 const SET_OLAP_STATS_OPTIONS = createRequestActionTypes('query', 'SET_OLAP_STATS_OPTIONS');
@@ -53,18 +56,13 @@ const olapStats = (state = initialState, action) => {
 export const getOlapStats = ({path = ''}) => {
     return createApiRequest({
         request: window.api.sendQuery({
+            schema: 'modern',
             query: createOlatStatsQuery(path),
             database: path,
             action: queryAction,
         }),
         actions: FETCH_OLAP_STATS,
-        dataHandler: (result) => {
-            if (result && typeof result === 'string') {
-                throw 'Unexpected token in JSON.';
-            }
-
-            return result;
-        },
+        dataHandler: parseQueryAPIExecuteResponse,
     });
 };
 
