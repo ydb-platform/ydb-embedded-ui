@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Popup, useVirtualElementRef} from '@yandex-cloud/uikit';
+import {Popup, useVirtualElementRef} from '@gravity-ui/uikit';
 
 import {hideTooltip} from '../../store/reducers/tooltip';
 

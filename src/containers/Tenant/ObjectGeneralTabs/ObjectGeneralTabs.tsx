@@ -4,7 +4,7 @@ import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
 import cn from 'bem-cn-lite';
 
-import {Tabs} from '@yandex-cloud/uikit';
+import {Tabs} from '@gravity-ui/uikit';
 
 import routes, {createHref} from '../../../routes';
 import {TENANT_INITIAL_TAB_KEY} from '../../../utils/constants';

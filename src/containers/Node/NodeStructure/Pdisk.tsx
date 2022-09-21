@@ -2,7 +2,7 @@ import {useState} from 'react';
 import cn from 'bem-cn-lite';
 import _ from 'lodash';
 
-import {ArrowToggle, Button, Popover} from '@yandex-cloud/uikit';
+import {ArrowToggle, Button, Popover} from '@gravity-ui/uikit';
 
 import DataTable, {Column, Settings} from '@yandex-cloud/react-data-table';
 

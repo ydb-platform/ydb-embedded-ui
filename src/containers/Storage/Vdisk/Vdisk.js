@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
-import {Label, Popup} from '@yandex-cloud/uikit';
+import {Label, Popup} from '@gravity-ui/uikit';
 
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import routes, {createHref} from '../../../routes';

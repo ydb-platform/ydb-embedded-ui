@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
-import {Dialog, Popup, Button} from '@yandex-cloud/uikit';
+import {Dialog, Popup, Button} from '@gravity-ui/uikit';
 
 import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
 import Icon from '../../../../components/Icon/Icon';

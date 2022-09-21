@@ -15,7 +15,7 @@ import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import {Tag} from '../../components/Tag/Tag';
 import Icon from '../../components/Icon/Icon';
 import EmptyState from '../../components/EmptyState/EmptyState';
-import {Link as ExternalLink, Button, Loader} from '@yandex-cloud/uikit';
+import {Link as ExternalLink, Button, Loader} from '@gravity-ui/uikit';
 import DataTable from '@yandex-cloud/react-data-table';
 import CriticalActionDialog from '../../components/CriticalActionDialog/CriticalActionDialog';
 import routes, {createHref} from '../../routes';

@@ -8,7 +8,7 @@ import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
 import {COLORS_RANGE_SIZE, getColorRange, getColorIndex, getCurrentMetricLimits} from './util';
 import {formatNumber} from '../../utils';
 
-import {Loader, Checkbox, Select} from '@yandex-cloud/uikit';
+import {Loader, Checkbox, Select} from '@gravity-ui/uikit';
 import {HeatmapCanvas} from './HeatmapCanvas/HeatmapCanvas';
 import {Histogram} from './Histogram/Histogram';
 import {AutoFetcher} from '../../utils/autofetcher';

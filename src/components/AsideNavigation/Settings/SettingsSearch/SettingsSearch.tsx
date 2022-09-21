@@ -1,6 +1,6 @@
 import React from 'react';
 import block from 'bem-cn-lite';
-import {TextInput} from '@yandex-cloud/uikit';
+import {TextInput} from '@gravity-ui/uikit';
 
 import i18n from '../i18n';
 

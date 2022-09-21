@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 
 import {Link} from 'react-router-dom';
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader} from '@gravity-ui/uikit';
 
 import InfoViewer from '../../components/InfoViewer/InfoViewer';
 import EntityStatus from '../../components/EntityStatus/EntityStatus';

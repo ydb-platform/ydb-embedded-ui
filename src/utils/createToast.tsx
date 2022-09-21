@@ -1,4 +1,4 @@
-import {Toaster} from '@yandex-cloud/uikit';
+import {Toaster} from '@gravity-ui/uikit';
 
 const toaster = new Toaster();
 

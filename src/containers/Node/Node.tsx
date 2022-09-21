@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 import {useDispatch, useSelector} from 'react-redux';
 import _ from 'lodash';
 
-import {Tabs} from '@yandex-cloud/uikit';
+import {Tabs} from '@gravity-ui/uikit';
 import {Link} from 'react-router-dom';
 
 import {TABLETS, STORAGE, NODE_PAGES, OVERVIEW, STRUCTURE} from './NodePages';

@@ -27,7 +27,7 @@ import {TxAllocator} from '../../utils/constants';
 
 import './ClusterInfo.scss';
 import {AutoFetcher} from '../../utils/autofetcher';
-import {Link, Loader} from '@yandex-cloud/uikit';
+import {Link, Loader} from '@gravity-ui/uikit';
 //@ts-ignore
 import Icon from '../Icon/Icon';
 import {setHeader} from '../../store/reducers/header';

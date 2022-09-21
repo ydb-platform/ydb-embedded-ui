@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
-import {Popover, PopoverBehavior} from '@yandex-cloud/uikit';
+import {Popover, PopoverBehavior} from '@gravity-ui/uikit';
 //@ts-ignore
 import {VisibleEntities} from '../../../store/reducers/storage';
 import Pdisk from '../Pdisk/Pdisk';

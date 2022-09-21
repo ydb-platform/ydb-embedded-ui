@@ -1,4 +1,4 @@
-import {Button} from '@yandex-cloud/uikit';
+import {Button} from '@gravity-ui/uikit';
 import {useDispatch} from 'react-redux';
 import {enableFullscreen} from '../../store/reducers/fullscreen';
 import Icon from '../Icon/Icon';

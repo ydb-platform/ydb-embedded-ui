@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 
-import {Link as ExternalLink} from '@yandex-cloud/uikit';
+import {Link as ExternalLink} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import {Tag} from '../../../components/Tag/Tag';

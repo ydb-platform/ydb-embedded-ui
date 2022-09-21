@@ -6,7 +6,7 @@ import {useHistory, useLocation} from 'react-router';
 import qs from 'qs';
 import _ from 'lodash';
 
-import {Button, HelpPopover, Loader, Tabs} from '@yandex-cloud/uikit';
+import {Button, HelpPopover, Loader, Tabs} from '@gravity-ui/uikit';
 
 import SplitPane from '../../../components/SplitPane';
 import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';

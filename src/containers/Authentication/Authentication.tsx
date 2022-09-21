@@ -1,7 +1,7 @@
 import {KeyboardEvent, useEffect, useState} from 'react';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
-import {Button, TextInput, Icon, Link as ExternalLink} from '@yandex-cloud/uikit';
+import {Button, TextInput, Icon, Link as ExternalLink} from '@gravity-ui/uikit';
 //@ts-ignore
 import {authenticate} from '../../store/reducers/authentication';
 

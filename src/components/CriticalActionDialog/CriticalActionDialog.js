@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
-import {Dialog} from '@yandex-cloud/uikit';
+import {Dialog} from '@gravity-ui/uikit';
 import Icon from '../Icon/Icon';
 
 import './CriticalActionDialog.scss';

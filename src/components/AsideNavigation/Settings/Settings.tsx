@@ -2,7 +2,7 @@ import React from 'react';
 import block from 'bem-cn-lite';
 import i18n from './i18n';
 
-import {IconProps, Loader} from '@yandex-cloud/uikit';
+import {IconProps, Loader} from '@gravity-ui/uikit';
 import {SettingsSearch} from './SettingsSearch/SettingsSearch';
 import {SettingsMenu, SettingsMenuItems, SettingsMenuInstance} from './SettingsMenu/SettingsMenu';
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 import DataTable from '@yandex-cloud/react-data-table';
-import {RadioButton, Label} from '@yandex-cloud/uikit';
+import {RadioButton, Label} from '@gravity-ui/uikit';
 
 import {StorageFilter} from './StorageFilter';
 import {UsageFilter} from './UsageFilter';

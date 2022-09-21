@@ -12,7 +12,7 @@ import {
 import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
 
 import Tablet from '../../components/Tablet/Tablet';
-import {Loader, Select} from '@yandex-cloud/uikit';
+import {Loader, Select} from '@gravity-ui/uikit';
 import ReactList from 'react-list';
 import {AutoFetcher} from '../../utils/autofetcher';
 

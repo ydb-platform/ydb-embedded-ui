@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 
 import DataTable from '@yandex-cloud/react-data-table';
-import {Loader, TextInput, Label} from '@yandex-cloud/uikit';
+import {Loader, TextInput, Label} from '@gravity-ui/uikit';
 
 import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
 

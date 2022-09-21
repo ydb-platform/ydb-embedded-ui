@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import {Loader, Button} from '@yandex-cloud/uikit';
+import {Loader, Button} from '@gravity-ui/uikit';
 
 import IssuesViewer from './IssuesViewer/IssuesViewer';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import block from 'bem-cn-lite';
-import {Button, Icon} from '@yandex-cloud/uikit';
+import {Button, Icon} from '@gravity-ui/uikit';
 
 import './Logo.scss';
 

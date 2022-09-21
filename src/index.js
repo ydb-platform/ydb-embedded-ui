@@ -5,7 +5,7 @@ import App from './containers/App/App';
 import {Provider} from 'react-redux';
 import configureStore from './store';
 import reportWebVitals from './reportWebVitals';
-import '@yandex-cloud/uikit/styles/styles.scss';
+import '@gravity-ui/uikit/styles/styles.scss';
 import HistoryContext from './contexts/HistoryContext';
 
 const {store, history} = configureStore();

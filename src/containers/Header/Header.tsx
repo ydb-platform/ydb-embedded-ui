@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {useHistory, useLocation} from 'react-router';
-import {Breadcrumbs, BreadcrumbsItem, Link} from '@yandex-cloud/uikit';
+import {Breadcrumbs, BreadcrumbsItem, Link} from '@gravity-ui/uikit';
 
 import Divider from '../../components/Divider/Divider';
 //@ts-ignore

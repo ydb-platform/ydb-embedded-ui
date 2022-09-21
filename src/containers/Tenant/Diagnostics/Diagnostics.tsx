@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {useLocation} from 'react-router';
 
-import {Switch, Tabs} from '@yandex-cloud/uikit';
+import {Switch, Tabs} from '@gravity-ui/uikit';
 
 //@ts-ignore
 import TopQueries from './TopQueries/TopQueries';

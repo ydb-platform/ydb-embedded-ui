@@ -1,5 +1,5 @@
 import cn from 'bem-cn-lite';
-import {Loader as KitLoader, LoaderSize} from '@yandex-cloud/uikit';
+import {Loader as KitLoader, LoaderSize} from '@gravity-ui/uikit';
 
 import './Loader.scss';
 

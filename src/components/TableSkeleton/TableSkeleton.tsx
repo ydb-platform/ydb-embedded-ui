@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import block from 'bem-cn-lite';
-import { Skeleton } from '@yandex-cloud/uikit';
+import { Skeleton } from '@gravity-ui/uikit';
 
 import './TableSkeleton.scss';
 

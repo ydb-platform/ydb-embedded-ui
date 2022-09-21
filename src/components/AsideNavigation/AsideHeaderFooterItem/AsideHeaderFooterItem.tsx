@@ -1,6 +1,6 @@
 import React from 'react';
 import block from 'bem-cn-lite';
-import {Icon, Popup, PopupPlacement, PopupProps} from '@yandex-cloud/uikit';
+import {Icon, Popup, PopupPlacement, PopupProps} from '@gravity-ui/uikit';
 
 import {AsideHeaderTooltip} from '../AsideHeaderTooltip/AsideHeaderTooltip';
 import {AsideHeaderFooterSlot, SlotName} from '../AsideHeaderFooterSlot/AsideHeaderFooterSlot';

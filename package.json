@@ -99,6 +99,7 @@
     "@gravity-ui/prettier-config": "^1.0.1",
     "@gravity-ui/stylelint-config": "^1.0.1",
     "@gravity-ui/tsconfig": "^1.0.0",
+    "@gravity-ui/uikit": "^3.0.1",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -112,7 +113,6 @@
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@yandex-cloud/axios-wrapper": "^1.0.2",
     "@yandex-cloud/browserslist-config": "1.0.1",
-    "@yandex-cloud/uikit": "^2.8.0",
     "copyfiles": "^2.4.1",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",
@@ -129,6 +129,6 @@
   },
   "peerDependencies": {
     "@yandex-cloud/browserslist-config": "^1.0.1",
-    "@yandex-cloud/uikit": "^2.8.0"
+    "@gravity-ui/uikit": "^3.0.1"
   }
 }

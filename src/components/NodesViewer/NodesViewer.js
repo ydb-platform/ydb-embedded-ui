@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import {connect} from 'react-redux';
 
-import {TextInput, Label} from '@yandex-cloud/uikit';
+import {TextInput, Label} from '@gravity-ui/uikit';
 import DataTable from '@yandex-cloud/react-data-table';
 
 import ProblemFilter, {problemFilterType} from '../ProblemFilter/ProblemFilter';

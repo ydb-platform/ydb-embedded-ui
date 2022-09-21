@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
-import {configure as configureUiKit} from '@yandex-cloud/uikit';
+import {configure as configureUiKit} from '@gravity-ui/uikit';
 import {configure as configureYdbUiComponents} from 'ydb-ui-components';
 import {i18n, Lang} from '../../utils/i18n';
 

@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 import _ from 'lodash';
 
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader} from '@gravity-ui/uikit';
 import ReactList from 'react-list';
 
 import EntityStatus from '../../components/EntityStatus/EntityStatus';

@@ -3,7 +3,7 @@ import {Switch, Route, Redirect, Router} from 'react-router-dom';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 
-import {ThemeProvider} from '@yandex-cloud/uikit';
+import {ThemeProvider} from '@gravity-ui/uikit';
 
 import routes, {createHref, CLUSTER_PAGES} from '../../routes';
 

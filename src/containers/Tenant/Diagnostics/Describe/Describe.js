@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
 
 import {getDescribe} from '../../../../store/reducers/describe';

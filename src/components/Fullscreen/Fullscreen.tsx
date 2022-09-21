@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import ReactDOM from 'react-dom';
 
-import {Button} from '@yandex-cloud/uikit';
+import {Button} from '@gravity-ui/uikit';
 import cn from 'bem-cn-lite';
 
 import {useDispatch} from 'react-redux';

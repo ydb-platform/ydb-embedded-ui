@@ -1,7 +1,7 @@
 import * as React from 'react';
 import cn from 'bem-cn-lite';
 
-import {Button, Icon, ArrowToggle} from '@yandex-cloud/uikit';
+import {Button, Icon, ArrowToggle} from '@gravity-ui/uikit';
 import ShortyString from '../../../../components/ShortyString/ShortyString';
 
 import {IssueType, SEVERITY, getSeverity} from './models';

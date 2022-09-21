@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import _ from 'lodash';
 
 import {Link} from 'react-router-dom';
-import {Loader, Checkbox} from '@yandex-cloud/uikit';
+import {Loader, Checkbox} from '@gravity-ui/uikit';
 
 import NodeNetwork from './NodeNetwork/NodeNetwork';
 import Icon from '../../../../components/Icon/Icon';

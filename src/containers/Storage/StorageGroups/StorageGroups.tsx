@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
-import {Label, Popover, PopoverBehavior} from '@yandex-cloud/uikit';
+import {Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {Stack} from '../../../components/Stack/Stack';
 //@ts-ignore

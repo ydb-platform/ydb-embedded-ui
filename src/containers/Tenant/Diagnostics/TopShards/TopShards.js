@@ -1,7 +1,7 @@
 import {useState, useContext, useEffect, useMemo} from 'react';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader} from '@gravity-ui/uikit';
 import DataTable from '@yandex-cloud/react-data-table';
 
 import InternalLink from '../../../../components/InternalLink/InternalLink';
