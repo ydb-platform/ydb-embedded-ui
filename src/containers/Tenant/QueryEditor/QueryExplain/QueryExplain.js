@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import cn from 'bem-cn-lite';
 import MonacoEditor from 'react-monaco-editor';
 import {Loader, RadioButton} from '@yandex-cloud/uikit';
@@ -62,18 +62,25 @@ const explainOptions = [
 ];
 
 function GraphRoot(props) {
-    let paranoid;
-    useEffect(() => {
+    const paranoid = useRef();
+
+    const render = () => {
         const {data, opts, shapes, version} = props;
+
         if (version === explainVersions.v2) {
-            paranoid = getTopology('graphRoot', props.data, opts, shapes);
-            paranoid.render();
+            paranoid.current = getTopology('graphRoot', data, opts, shapes);
+            paranoid.current.render();
         } else if (version === explainVersions.v1) {
-            paranoid = getCompactTopology('graphRoot', data, opts);
-            paranoid.renderCompactTopology();
+            paranoid.current = getCompactTopology('graphRoot', data, opts);
+            paranoid.current.renderCompactTopology();
         }
+    }
+
+    useEffect(() => {
+        render();
+
         return () => {
-            paranoid = undefined;
+            paranoid.current = undefined;
         };
     }, []);
 
@@ -86,13 +93,11 @@ function GraphRoot(props) {
 
         graphRoot.innerHTML = '';
 
-        const {data, opts} = props;
-        paranoid = getCompactTopology('graphRoot', data, opts);
-        paranoid.renderCompactTopology();
+        render();
     }, [props.opts.colors]);
 
     useEffect(() => {
-        paranoid?.updateData(props.data);
+        paranoid.current?.updateData?.(props.data);
     }, [props.data]);
 
     return <div id="graphRoot" style={{height: '100vh'}} />;
