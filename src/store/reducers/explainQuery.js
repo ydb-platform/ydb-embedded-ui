@@ -101,7 +101,6 @@ export const getExplainQuery = ({query, database}) => {
 
             let links = [];
             let nodes = [];
-            let graphDepth;
             const {tables, meta, Plan} = result;
 
             if (supportedExplainQueryVersions.indexOf(meta.version) === -1) {
@@ -114,9 +113,7 @@ export const getExplainQuery = ({query, database}) => {
                 const preparedPlan = preparePlan(Plan);
                 links = preparedPlan.links;
                 nodes = preparedPlan.nodes;
-                graphDepth = preparedPlan.graphDepth;
             } else {
-                graphDepth = tables.length;
                 _.forEach(tables, (table) => {
                     nodes.push({
                         name: table.name,
@@ -162,7 +159,6 @@ export const getExplainQuery = ({query, database}) => {
                     tables,
                     version: meta.version,
                     pristine: result,
-                    graphDepth,
                 },
                 ast,
             };

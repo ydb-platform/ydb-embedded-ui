@@ -59,8 +59,6 @@ export function preparePlan(plan: Plan) {
     const nodes: GraphNode[] = [];
     const links: Link[] = [];
 
-    let graphDepth = 0;
-
     function parsePlans(plans: Plan[] = [], from: string, curDepth: number) {
         const depth = curDepth + 1;
         plans.forEach((p) => {
@@ -77,7 +75,6 @@ export function preparePlan(plan: Plan) {
             };
             nodes.push(node);
             links.push({from, to: node.name});
-            graphDepth = Math.max(graphDepth, depth);
             parsePlans(p.Plans, node.name, depth);
         });
     }
@@ -96,6 +93,5 @@ export function preparePlan(plan: Plan) {
     return {
         nodes,
         links,
-        graphDepth,
     };
 }
