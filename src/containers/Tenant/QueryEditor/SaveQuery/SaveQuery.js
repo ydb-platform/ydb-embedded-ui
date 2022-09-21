@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
 import {useDispatch, useSelector} from 'react-redux';
-import {Dialog, DropdownMenu, TextInput, Button} from '@yandex-cloud/uikit';
+import {Dialog, DropdownMenu, TextInput, Button} from '@gravity-ui/uikit';
 
 import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
 

@@ -1,6 +1,6 @@
 import cn from 'bem-cn-lite';
 import DataTable from '@yandex-cloud/react-data-table';
-import {Button, Popover} from '@yandex-cloud/uikit';
+import {Button, Popover} from '@gravity-ui/uikit';
 
 import Icon from '../components/Icon/Icon';
 import EntityStatus from '../components/EntityStatus/EntityStatus';

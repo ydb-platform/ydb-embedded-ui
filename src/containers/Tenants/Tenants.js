@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import _ from 'lodash';
 
 import DataTable from '@yandex-cloud/react-data-table';
-import {Loader, TextInput, Button} from '@yandex-cloud/uikit';
+import {Loader, TextInput, Button} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';

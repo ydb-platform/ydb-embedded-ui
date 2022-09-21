@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import MonacoEditor from 'react-monaco-editor';
-import {Button, DropdownMenu} from '@yandex-cloud/uikit';
+import {Button, DropdownMenu} from '@gravity-ui/uikit';
 
 import SplitPane from '../../../components/SplitPane';
 import {QueryResultTable} from '../../../components/QueryResultTable';

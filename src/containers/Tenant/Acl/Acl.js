@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import {connect} from 'react-redux';
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader} from '@gravity-ui/uikit';
 import DataTable from '@yandex-cloud/react-data-table';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 

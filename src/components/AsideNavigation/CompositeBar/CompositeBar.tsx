@@ -1,7 +1,7 @@
 import React from 'react';
 import block from 'bem-cn-lite';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import {List, Icon, Popup, PopupPlacement} from '@yandex-cloud/uikit';
+import {List, Icon, Popup, PopupPlacement} from '@gravity-ui/uikit';
 
 import {AsideHeaderMenuItem} from '../types';
 import i18n from '../i18n';

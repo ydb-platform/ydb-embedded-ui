@@ -1,7 +1,7 @@
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import {Progress} from '@yandex-cloud/uikit';
+import {Progress} from '@gravity-ui/uikit';
 
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {COLORS_PRIORITY} from '../../utils/constants';

@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import qs from 'qs';
 
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader} from '@gravity-ui/uikit';
 
 import NodesViewer from '../../../../components/NodesViewer/NodesViewer';
 

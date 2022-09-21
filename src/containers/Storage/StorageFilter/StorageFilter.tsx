@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 
-import {TextInput} from '@yandex-cloud/uikit';
+import {TextInput} from '@gravity-ui/uikit';
 
 interface StorageFilterProps {
     className?: string;

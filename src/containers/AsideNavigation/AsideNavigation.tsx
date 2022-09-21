@@ -10,7 +10,7 @@ import {
     AsideHeaderMenuItem,
     SlotName,
 } from '../../components/AsideNavigation/AsideHeader';
-import {Icon, Button} from '@yandex-cloud/uikit';
+import {Icon, Button} from '@gravity-ui/uikit';
 import signOutIcon from '../../assets/icons/signOut.svg';
 import signInIcon from '../../assets/icons/signIn.svg';
 import databaseIcon from '../../assets/icons/server.svg';

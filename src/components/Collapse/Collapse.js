@@ -1,6 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
 import block from 'bem-cn-lite';
-import {ArrowToggle, Button} from '@yandex-cloud/uikit';
+import {ArrowToggle, Button} from '@gravity-ui/uikit';
 
 import './Collapse.scss';
 

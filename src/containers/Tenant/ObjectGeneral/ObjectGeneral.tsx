@@ -2,7 +2,7 @@ import qs from 'qs';
 import {useLocation} from 'react-router';
 import cn from 'bem-cn-lite';
 
-import {useThemeValue} from '@yandex-cloud/uikit';
+import {useThemeValue} from '@gravity-ui/uikit';
 
 import type {EPathType} from '../../../types/api/schema';
 

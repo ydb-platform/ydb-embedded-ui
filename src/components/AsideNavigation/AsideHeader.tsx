@@ -3,7 +3,7 @@ import block from 'bem-cn-lite';
 import noop from 'lodash/noop';
 import throttle from 'lodash/throttle';
 
-import {Button, Icon} from '@yandex-cloud/uikit';
+import {Button, Icon} from '@gravity-ui/uikit';
 
 import {Drawer, DrawerItem} from './Drawer';
 import {Logo, LogoProps} from './Logo/Logo';

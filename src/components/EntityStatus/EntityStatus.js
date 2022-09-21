@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
-import {ClipboardButton, Link as ExternalLink, Button} from '@yandex-cloud/uikit';
+import {ClipboardButton, Link as ExternalLink, Button} from '@gravity-ui/uikit';
 
 import './EntityStatus.scss';
 

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import {Icon as UiKitIcon} from '@yandex-cloud/uikit';
+import {Icon as UiKitIcon} from '@gravity-ui/uikit';
 
 export default function Icon({name, height, width, viewBox, className, onClick}) {
     return (

@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import cn from 'bem-cn-lite';
 import MonacoEditor from 'react-monaco-editor';
-import {Loader, RadioButton} from '@yandex-cloud/uikit';
+import {Loader, RadioButton} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
 import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco';
 import {

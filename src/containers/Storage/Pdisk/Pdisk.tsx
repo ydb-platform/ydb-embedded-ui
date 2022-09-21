@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
 import cn from 'bem-cn-lite';
-import {Popup} from '@yandex-cloud/uikit';
+import {Popup} from '@gravity-ui/uikit';
 
 import type {RequiredField} from '../../../types';
 //@ts-ignore

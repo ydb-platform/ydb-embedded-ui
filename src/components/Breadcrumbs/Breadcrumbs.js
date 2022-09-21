@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
-import {Breadcrumbs as BreadcrumbsUiKit} from '@yandex-cloud/uikit';
+import {Breadcrumbs as BreadcrumbsUiKit} from '@gravity-ui/uikit';
 
 import './Breadcrumbs.scss';
 

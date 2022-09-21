@@ -1,4 +1,4 @@
-import {Button, CopyToClipboard as CopyToClipboardUiKit} from '@yandex-cloud/uikit';
+import {Button, CopyToClipboard as CopyToClipboardUiKit} from '@gravity-ui/uikit';
 import createToast from '../../utils/createToast';
 //@ts-ignore
 import Icon from '../Icon/Icon';

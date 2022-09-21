@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import {Button, Modal} from '@yandex-cloud/uikit';
+import {Button, Modal} from '@gravity-ui/uikit';
 
 import type {EPathType} from '../../../../types/api/schema';
 //@ts-ignore

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import cn from 'bem-cn-lite';
 
-import {Link} from '@yandex-cloud/uikit';
+import {Link} from '@gravity-ui/uikit';
 
 import './ShortyString.scss';
 

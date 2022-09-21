@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 
-import {RadioButton, Switch} from '@yandex-cloud/uikit';
+import {RadioButton, Switch} from '@gravity-ui/uikit';
 import {Settings} from '../../components/AsideNavigation/Settings';
 import favoriteFilledIcon from '../../assets/icons/star.svg';
 import flaskIcon from '../../assets/icons/flask.svg';

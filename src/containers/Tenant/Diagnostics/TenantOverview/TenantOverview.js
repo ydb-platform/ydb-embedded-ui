@@ -17,7 +17,7 @@ import {TABLET_STATES} from '../../../../utils/constants';
 
 import './TenantOverview.scss';
 import {AutoFetcher} from '../../../../utils/autofetcher';
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader} from '@gravity-ui/uikit';
 
 const b = cn('tenant-overview');
 

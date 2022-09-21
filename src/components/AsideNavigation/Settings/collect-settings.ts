@@ -1,5 +1,5 @@
 import React from 'react';
-import {IconProps} from '@yandex-cloud/uikit';
+import {IconProps} from '@gravity-ui/uikit';
 import {invariant} from './helpers';
 
 type SettingsMenu = (SettingsMenuGroup | SettingsMenuItem)[];

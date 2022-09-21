@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 import {getGroupInfo, clearStore} from '../../store/reducers/group';
 import FullGroupViewer from '../../components/FullGroupViewer/FullGroupViewer';
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader} from '@gravity-ui/uikit';
 import {GROUP_AUTO_RELOAD_INTERVAL} from '../../utils/constants';
 import './Group.scss';
 

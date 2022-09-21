@@ -9,4 +9,4 @@ declare module '*.jpeg';
 declare module '*.ico';
 
 declare type SVGIconData =
-    import('@yandex-cloud/uikit/build/esm/components/Icon/types').SVGIconData;
+    import('@gravity-ui/uikit/build/esm/components/Icon/types').SVGIconData;

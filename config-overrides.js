@@ -1,7 +1,7 @@
 const path = require('path');
 
 const srcRoot = path.resolve(__dirname, 'src');
-const uiKitRoot = path.resolve(__dirname, 'node_modules/@yandex-cloud/uikit');
+const uiKitRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/uikit');
 
 module.exports = {
     webpack: (config, env) => {

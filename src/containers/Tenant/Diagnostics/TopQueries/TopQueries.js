@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 import DataTable from '@yandex-cloud/react-data-table';
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader} from '@gravity-ui/uikit';
 
 import {changeUserInput} from '../../../../store/reducers/executeQuery';
 import {sendQuery, setQueryOptions} from '../../../../store/reducers/executeTopQueries';

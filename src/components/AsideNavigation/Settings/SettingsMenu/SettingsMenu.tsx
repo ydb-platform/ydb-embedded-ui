@@ -1,7 +1,7 @@
 import React from 'react';
 import block from 'bem-cn-lite';
 
-import {Icon, IconProps, Link} from '@yandex-cloud/uikit';
+import {Icon, IconProps, Link} from '@gravity-ui/uikit';
 
 import {useCurrent, useStableCallback} from '../helpers';
 

@@ -5,7 +5,7 @@ import cn from 'bem-cn-lite';
 import qs from 'qs';
 import _ from 'lodash';
 
-import {Loader, Select} from '@yandex-cloud/uikit';
+import {Loader, Select} from '@gravity-ui/uikit';
 import ReactList from 'react-list';
 
 import Tablet from '../../components/Tablet/Tablet';

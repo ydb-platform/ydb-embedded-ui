@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import cn from 'bem-cn-lite';
-import {useThemeValue} from '@yandex-cloud/uikit';
+import {useThemeValue} from '@gravity-ui/uikit';
 
 export interface IllustrationProps {
     name: string;

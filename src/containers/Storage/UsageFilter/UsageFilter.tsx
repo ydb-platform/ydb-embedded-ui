@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import cn from 'bem-cn-lite';
 
-import {Select, SelectOption} from '@yandex-cloud/uikit';
+import {Select, SelectOption} from '@gravity-ui/uikit';
 
 import EntityStatus from "../../../components/EntityStatus/EntityStatus";
 

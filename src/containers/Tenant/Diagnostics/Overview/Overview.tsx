@@ -2,7 +2,7 @@ import {ReactNode, useCallback, useEffect, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import {Loader} from '@yandex-cloud/uikit';
+import {Loader} from '@gravity-ui/uikit';
 
 //@ts-ignore
 import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';

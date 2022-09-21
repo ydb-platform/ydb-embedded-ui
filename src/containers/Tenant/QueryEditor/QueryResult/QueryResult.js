@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
-import {RadioButton} from '@yandex-cloud/uikit';
+import {RadioButton} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
 
 import CopyToClipboard from '../../../../components/CopyToClipboard/CopyToClipboard';

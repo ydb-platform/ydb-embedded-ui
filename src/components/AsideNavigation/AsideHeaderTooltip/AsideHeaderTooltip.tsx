@@ -1,6 +1,6 @@
 import React from 'react';
 import block from 'bem-cn-lite';
-import {Popup, PopupPlacement} from '@yandex-cloud/uikit';
+import {Popup, PopupPlacement} from '@gravity-ui/uikit';
 import './AsideHeaderTooltip.scss';
 
 const b = block('nv-aside-header-tooltip');

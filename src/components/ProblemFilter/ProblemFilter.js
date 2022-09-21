@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-import {RadioButton} from '@yandex-cloud/uikit';
+import {RadioButton} from '@gravity-ui/uikit';
 
 import {ALL, PROBLEMS} from '../../utils/constants';
 

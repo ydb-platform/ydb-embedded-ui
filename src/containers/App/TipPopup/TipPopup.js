@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import cn from 'bem-cn-lite';
 
-import {Button, Icon, Popup} from '@yandex-cloud/uikit';
+import {Button, Icon, Popup} from '@gravity-ui/uikit';
 import closeIcon from '../../../assets/icons/close.svg';
 
 import {DATA_QA_TUNE_COLUMNS_POPUP} from '../../../utils/constants';
