@@ -1,5 +1,5 @@
 {
-    "extends": "@yandex-cloud/eslint-config/client",
+    "extends": "@gravity-ui/eslint-config/client",
     "rules": {
         "react/jsx-uses-react": "off",
         "react/react-in-jsx-scope": "off"
