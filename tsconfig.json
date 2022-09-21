@@ -1,5 +1,5 @@
 {
-  "extends": "@yandex-cloud/tsconfig/tsconfig",
+  "extends": "@gravity-ui/tsconfig/tsconfig",
   "compilerOptions": {
     "outDir": "build/esm",
     "module": "esnext",
