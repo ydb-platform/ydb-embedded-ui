@@ -125,7 +125,7 @@ export const getExplainQuery = ({query, database}) => {
                     const tableTypes = {};
 
                     const {reads = [], writes = []} = table;
-                    let prevEl = null;
+                    let prevNodeId = table.name;
 
                     _.forEach([...reads, ...writes], (node) => {
                         if (tableTypes[node.type]) {
@@ -140,22 +140,6 @@ export const getExplainQuery = ({query, database}) => {
                             tableTypes[node.type],
                         );
 
-                        let prevNodeId = table.name;
-                        if (prevEl) {
-                            prevNodeId =
-                                node.type === prevEl.type
-                                    ? getExplainNodeId(
-                                          table.name,
-                                          prevEl.type,
-                                          tableTypes[prevEl.type] - 1,
-                                      )
-                                    : getExplainNodeId(
-                                          table.name,
-                                          prevEl.type,
-                                          tableTypes[prevEl.type],
-                                      );
-                        }
-
                         links.push({
                             from: prevNodeId,
                             to: nodeId,
@@ -166,7 +150,7 @@ export const getExplainQuery = ({query, database}) => {
                             id: nodeId,
                         });
 
-                        prevEl = node;
+                        prevNodeId = nodeId;
                     });
                 });
             }
