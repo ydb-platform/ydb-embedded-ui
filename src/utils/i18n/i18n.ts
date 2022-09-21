@@ -1,4 +1,4 @@
-import {I18N} from '@yandex-cloud/i18n';
+import {I18N} from '@gravity-ui/i18n';
 
 export enum Lang {
     En = 'en',
