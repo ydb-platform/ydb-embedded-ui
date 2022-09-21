@@ -1,8 +1,8 @@
 {
     "extends": [
-        "@yandex-cloud/stylelint-config",
-        "@yandex-cloud/stylelint-config/order",
-        "@yandex-cloud/stylelint-config/prettier"
+        "@gravity-ui/stylelint-config",
+        "@gravity-ui/stylelint-config/order",
+        "@gravity-ui/stylelint-config/prettier"
     ],
     "rules": {
         "declaration-colon-space-after": "always-single-line",
