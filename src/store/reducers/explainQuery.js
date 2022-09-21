@@ -95,6 +95,10 @@ export const getExplainQuery = ({query, database}) => {
         dataHandler: (response) => {
             const {plan: result, ast} = parseQueryAPIExplainResponse(response);
 
+            if (!result) {
+                return {ast};
+            }
+
             let links = [];
             let nodes = [];
             let graphDepth;

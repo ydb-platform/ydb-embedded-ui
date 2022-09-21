@@ -110,9 +110,6 @@ function QueryExplain(props) {
         };
     }, []);
 
-    const {explain = {}, theme} = props;
-    const {links, nodes, version} = explain;
-
     useEffect(() => {
         if (!props.ast && activeOption === ExplainOptionIds.ast) {
             props.astQuery();
@@ -132,27 +129,23 @@ function QueryExplain(props) {
     };
 
     const renderStub = () => {
-        const {explain} = props;
-
-        let message;
-
-        if (!explain) {
-            message = 'Explain of query is empty';
-        } else if (!explain.nodes.length) {
-            message = 'There is no explanation for the request';
-        }
-
-        return message ? (
+        return (
             <div className={b('text-message')}>
-                {message}
+                There is no explanation for the request
             </div>
-        ) : null;
+        );
     };
 
     const renderTextExplain = () => {
+        const {explain} = props;
+
+        if (!explain) {
+            return renderStub();
+        }
+
         const content = (
             <JSONTree
-                data={props.explain?.pristine}
+                data={explain.pristine}
                 isExpanded={() => true}
                 className={b('inspector')}
                 searchOptions={{
@@ -160,10 +153,10 @@ function QueryExplain(props) {
                 }}
             />
         );
+
         return (
             <React.Fragment>
                 {content}
-                {renderStub()}
                 {isFullscreen && <Fullscreen>{content}</Fullscreen>}
             </React.Fragment>
         );
@@ -196,6 +189,13 @@ function QueryExplain(props) {
     };
 
     const renderGraph = () => {
+        const {explain = {}, theme} = props;
+        const {links, nodes, version} = explain;
+
+        if (!explain.nodes?.length) {
+            return renderStub();
+        }
+
         const content =
             links && nodes && nodes.length ? (
                 <div
@@ -222,7 +222,6 @@ function QueryExplain(props) {
             <React.Fragment>
                 {!isFullscreen && content}
                 {isFullscreen && <Fullscreen>{content}</Fullscreen>}
-                {renderStub()}
             </React.Fragment>
         );
     };
