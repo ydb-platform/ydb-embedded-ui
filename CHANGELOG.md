@@ -3,6 +3,11 @@
 ## [2.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.14.2...v2.0.0) (2022-09-26)
 
 
+### ⚠ BREAKING CHANGES
+
+* peer deps update: migrated from `@yandex-cloud/uikit` to `@gravity-ui/uikit`
+
+
 ### Bug Fixes
 
 * **QueryEditor:** adjust execute issues scrollbar position ([8b03400](https://github.com/ydb-platform/ydb-embedded-ui/commit/8b03400aa084a660f44dced437a97e4b956704d6))
@@ -18,11 +23,6 @@
 * **TopQueries:** modern query response ([fe2b45a](https://github.com/ydb-platform/ydb-embedded-ui/commit/fe2b45a15b25c4d1ca8324e9727bee9194bdb9bc))
 * **TopShards:** modern query response ([3f847eb](https://github.com/ydb-platform/ydb-embedded-ui/commit/3f847eb23fe1fca216e2026764a897cbafd56a38))
 * **UserSettings:** save invertedDisks as string ([d41dcc6](https://github.com/ydb-platform/ydb-embedded-ui/commit/d41dcc68d4eff47ddb54781e1bbd8192ba669500))
-
-
-### chore
-
-* bump major version ([a89fe8e](https://github.com/ydb-platform/ydb-embedded-ui/commit/a89fe8eae2e906e885c9efd112446cb93c47332e))
 
 ## [1.14.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.14.1...v1.14.2) (2022-09-19)
 
