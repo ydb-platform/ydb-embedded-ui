@@ -186,6 +186,7 @@ class Storage extends React.Component {
                         data={flatListStorageEntities}
                         tableSettings={tableSettings}
                         nodes={nodes}
+                        onShowAll={() => this.onGroupVisibilityChange(VisibleEntities.All)}
                     />
                 )}
                 {storageType === StorageTypes.nodes && (
@@ -193,6 +194,7 @@ class Storage extends React.Component {
                         visibleEntities={visibleEntities}
                         data={flatListStorageEntities}
                         tableSettings={tableSettings}
+                        onShowAll={() => this.onGroupVisibilityChange(VisibleEntities.All)}
                     />
                 )}
             </div>
