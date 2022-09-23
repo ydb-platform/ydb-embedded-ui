@@ -2,10 +2,14 @@ import _ from 'lodash';
 import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
 import {Popover, PopoverBehavior} from '@gravity-ui/uikit';
+
 //@ts-ignore
 import {VisibleEntities} from '../../../store/reducers/storage';
+
+import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
 import Pdisk from '../Pdisk/Pdisk';
 
+import i18n from './i18n';
 import './StorageNodes.scss';
 
 enum TableColumnsIds {
@@ -19,11 +23,12 @@ enum TableColumnsIds {
 type TableColumnsIdsKeys = keyof typeof TableColumnsIds;
 type TableColumnsIdsValues = typeof TableColumnsIds[TableColumnsIdsKeys];
 
-interface StorageGroupsProps {
+interface StorageNodesProps {
     data: any;
     nodes: any;
     tableSettings: Settings;
     visibleEntities: keyof typeof VisibleEntities;
+    onShowAll?: VoidFunction;
 }
 
 const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
@@ -56,7 +61,7 @@ function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder 
     }
 }
 
-function StorageNodes({data, tableSettings, visibleEntities}: StorageGroupsProps) {
+function StorageNodes({data, tableSettings, visibleEntities, onShowAll}: StorageNodesProps) {
     const allColumns: Column<any>[] = [
         {
             name: TableColumnsIds.NodeId,
@@ -114,14 +119,26 @@ function StorageNodes({data, tableSettings, visibleEntities}: StorageGroupsProps
     ];
 
     let columns = allColumns;
-    let emptyMessage = 'No such nodes.';
 
     if (visibleEntities === VisibleEntities.Space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
-        emptyMessage = 'No nodes with out of space errors.';
+
+        return (
+            <EmptyFilter
+                title={i18n('empty.out_of_space')}
+                showAll={i18n('show_all')}
+                onShowAll={onShowAll}
+            />
+        );
     }
     if (visibleEntities === VisibleEntities.Missing) {
-        emptyMessage = 'No degraded nodes.';
+        return (
+            <EmptyFilter
+                title={i18n('empty.degraded')}
+                showAll={i18n('show_all')}
+                onShowAll={onShowAll}
+            />
+        );
     }
 
     return data ? (
@@ -132,7 +149,7 @@ function StorageNodes({data, tableSettings, visibleEntities}: StorageGroupsProps
             columns={columns}
             settings={tableSettings}
             initialSortOrder={setSortOrder(visibleEntities)}
-            emptyDataMessage={emptyMessage}
+            emptyDataMessage={i18n('empty.default')}
         />
     ) : null;
 }

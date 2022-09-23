@@ -16,9 +16,11 @@ import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {stringifyVdiskId} from '../../../utils';
 import {getUsage, isFullDonorData} from '../../../utils/storage';
 
+import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
 import Vdisk from '../Vdisk/Vdisk';
 import {getDegradedSeverity, getUsageSeverity} from '../utils';
 
+import i18n from './i18n';
 import './StorageGroups.scss';
 
 enum TableColumnsIds {
@@ -42,6 +44,7 @@ interface StorageGroupsProps {
     nodes: any;
     tableSettings: Settings;
     visibleEntities: keyof typeof VisibleEntities;
+    onShowAll?: VoidFunction;
 }
 
 const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
@@ -85,7 +88,7 @@ function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder 
     }
 }
 
-function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGroupsProps) {
+function StorageGroups({data, tableSettings, visibleEntities, nodes, onShowAll}: StorageGroupsProps) {
     const allColumns: Column<any>[] = [
         {
             name: TableColumnsIds.PoolName,
@@ -253,17 +256,35 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
     ];
 
     let columns = allColumns;
-    let emptyMessage = 'No such groups.';
 
     if (visibleEntities === VisibleEntities.Space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
-        emptyMessage = 'No groups with out of space errors.';
+
+        if (!data.length) {
+            return (
+                <EmptyFilter
+                    title={i18n('empty.out_of_space')}
+                    showAll={i18n('show_all')}
+                    onShowAll={onShowAll}
+                />
+            );
+        }
     }
 
     if (visibleEntities === VisibleEntities.Missing) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.UsedSpaceFlag);
-        emptyMessage = 'No degraded groups.';
+
+        if (!data.length) {
+            return (
+                <EmptyFilter
+                    title={i18n('empty.degraded')}
+                    showAll={i18n('show_all')}
+                    onShowAll={onShowAll}
+                />
+            );
+        }
     }
+
     return data ? (
         <DataTable
             key={visibleEntities as string}
@@ -272,7 +293,7 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes}: StorageGro
             columns={columns}
             settings={tableSettings}
             initialSortOrder={setSortOrder(visibleEntities)}
-            emptyDataMessage={emptyMessage}
+            emptyDataMessage={i18n('empty.default')}
         />
     ) : null;
 }

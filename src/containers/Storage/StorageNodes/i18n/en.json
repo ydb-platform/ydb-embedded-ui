@@ -1,0 +1,6 @@
+{
+    "empty.default": "No such nodes",
+    "empty.out_of_space": "No nodes with out of space errors",
+    "empty.degraded": "No degraded nodes",
+    "show_all": "Show all nodes"
+}
