@@ -21,7 +21,7 @@ function UserSettings(props: any) {
     };
 
     const _onInvertedDisksChangeHandler = (value: boolean) => {
-        props.setSettingValue(INVERTED_DISKS_KEY, value);
+        props.setSettingValue(INVERTED_DISKS_KEY, String(value));
     };
 
     return (
