@@ -16,6 +16,8 @@ import {changeFilter} from '../../store/reducers/settings';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {getNodesColumns} from '../../utils/getNodesColumns';
 
+import {Illustration} from '../Illustration';
+
 import './NodesViewer.scss';
 
 const b = cn('nodes-viewer');
@@ -138,7 +140,7 @@ class NodesViewer extends React.PureComponent {
                 {showControls ? this.renderControls() : null}
                 <div className={b('table-wrapper')}>
                     {nodesToShow.length === 0 ? (
-                        <div className="no-problem" />
+                        <Illustration name="thumbsUp" width="200" />
                     ) : (
                         <div className={b('table-content')}>
                             <DataTable

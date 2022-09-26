@@ -12,9 +12,11 @@ type IllustrationStore = Record<string, Record<string, () => Promise<{default: a
 const store: IllustrationStore = {
     light: {
         403: () => import('../../assets/illustrations/light/403.svg'),
+        thumbsUp: () => import('../../assets/illustrations/light/thumbsUp.svg'),
     },
     dark: {
         403: () => import('../../assets/illustrations/dark/403.svg'),
+        thumbsUp: () => import('../../assets/illustrations/light/thumbsUp.svg'),
     },
 };
 
