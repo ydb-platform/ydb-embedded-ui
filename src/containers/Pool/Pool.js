@@ -11,6 +11,7 @@ import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import GroupTreeViewer from '../../components/GroupTreeViewer/GroupTreeViewer';
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
 import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
+import {Illustration} from '../../components/Illustration';
 
 import {getPoolInfo} from '../../store/reducers/pool';
 import {AUTO_RELOAD_INTERVAL, ALL} from '../../utils/constants';
@@ -119,7 +120,7 @@ class Pool extends React.Component {
                     </div>
 
                     {filteredGroups.length === 0 ? (
-                        <div className="no-problem" />
+                        <Illustration name="thumbsUp" width="200" />
                     ) : (
                         <ReactList
                             itemRenderer={this.makeRenderGroups(filteredGroups)}

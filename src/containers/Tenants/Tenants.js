@@ -11,6 +11,7 @@ import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
 import TabletsStatistic from '../../components/TabletsStatistic/TabletsStatistic';
 import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
+import {Illustration} from '../../components/Illustration';
 import {AutoFetcher} from '../../utils/autofetcher';
 
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
@@ -309,7 +310,7 @@ class Tenants extends React.Component {
         ];
 
         if (filteredTenants.length === 0 && filter !== ALL) {
-            return <div className="no-problem" />;
+            return <Illustration name="thumbsUp" width="200" />;
         }
 
         return (

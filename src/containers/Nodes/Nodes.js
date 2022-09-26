@@ -7,6 +7,7 @@ import DataTable from '@yandex-cloud/react-data-table';
 import {Loader, TextInput, Label} from '@gravity-ui/uikit';
 
 import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
+import {Illustration} from '../../components/Illustration';
 
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
@@ -125,7 +126,7 @@ class Nodes extends React.Component {
 
         if (preparedNodes.length === 0) {
             if (filter !== ALL) {
-                return <div className="no-problem" />;
+                return <Illustration name="thumbsUp" width="200" />;
             }
         }
 

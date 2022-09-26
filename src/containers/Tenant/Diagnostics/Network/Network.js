@@ -10,6 +10,7 @@ import {Loader, Checkbox} from '@gravity-ui/uikit';
 import NodeNetwork from './NodeNetwork/NodeNetwork';
 import Icon from '../../../../components/Icon/Icon';
 import ProblemFilter, {problemFilterType} from '../../../../components/ProblemFilter/ProblemFilter';
+import {Illustration} from '../../../../components/Illustration';
 
 import {getNetworkInfo} from '../../../../store/reducers/network';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
@@ -242,7 +243,7 @@ class Network extends React.Component {
         });
 
         if (filter === PROBLEMS && problemNodesCount === 0) {
-            return <div className="no-problem" />;
+            return <Illustration name="thumbsUp" width="200" />;
         } else {
             return result;
         }
