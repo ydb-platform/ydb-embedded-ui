@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.14.2...v2.0.0) (2022-09-26)
+
+
+### Bug Fixes
+
+* **QueryEditor:** adjust execute issues scrollbar position ([8b03400](https://github.com/ydb-platform/ydb-embedded-ui/commit/8b03400aa084a660f44dced437a97e4b956704d6))
+* **QueryEditor:** adjust explain components position ([193d326](https://github.com/ydb-platform/ydb-embedded-ui/commit/193d3263c2c9b57381f8d5ba160b95e76b5d32af))
+* **QueryEditor:** properly handle empty query explanations ([5943d1b](https://github.com/ydb-platform/ydb-embedded-ui/commit/5943d1b38534e26729310e34aa24dc30a658a0fa))
+* **QueryEditor:** render v2 explain with default topology ([44947e1](https://github.com/ydb-platform/ydb-embedded-ui/commit/44947e10248f5d14d0d685a030e2dbca0c87399d))
+* **QueryEditor:** use modern explain query schema ([78acc45](https://github.com/ydb-platform/ydb-embedded-ui/commit/78acc45765d9f9ff45a37934be61559373b5c07c))
+* **Storage:** encouraging message for empty filtered lists ([028aa8d](https://github.com/ydb-platform/ydb-embedded-ui/commit/028aa8db2ddff9f64d1b6ac6543d7d640a3187a9))
+* **Tenant:** adjust info tab spacings ([89e5809](https://github.com/ydb-platform/ydb-embedded-ui/commit/89e580939766c2ed4018b4e46c3b34d8744a9957))
+* **Tenant:** display 0 values in columns tables info ([ba2cbde](https://github.com/ydb-platform/ydb-embedded-ui/commit/ba2cbde662471dfbe34892154aa2211088100f31))
+* **Tenant:** modern query response for column tables ([ab2e45f](https://github.com/ydb-platform/ydb-embedded-ui/commit/ab2e45f4df33a2366f3a673b1beab97f3d76a3a4))
+* **Tenant:** properly fetch column tables data for info tab ([8762746](https://github.com/ydb-platform/ydb-embedded-ui/commit/8762746d9c89faeea25f9f47107b6d93fffee918))
+* **TopQueries:** modern query response ([fe2b45a](https://github.com/ydb-platform/ydb-embedded-ui/commit/fe2b45a15b25c4d1ca8324e9727bee9194bdb9bc))
+* **TopShards:** modern query response ([3f847eb](https://github.com/ydb-platform/ydb-embedded-ui/commit/3f847eb23fe1fca216e2026764a897cbafd56a38))
+* **UserSettings:** save invertedDisks as string ([d41dcc6](https://github.com/ydb-platform/ydb-embedded-ui/commit/d41dcc68d4eff47ddb54781e1bbd8192ba669500))
+
+
+### chore
+
+* bump major version ([a89fe8e](https://github.com/ydb-platform/ydb-embedded-ui/commit/a89fe8eae2e906e885c9efd112446cb93c47332e))
+
 ## [1.14.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.14.1...v1.14.2) (2022-09-19)
 
 
