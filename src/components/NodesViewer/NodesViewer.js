@@ -106,6 +106,7 @@ class NodesViewer extends React.PureComponent {
                     text={searchQuery}
                     onUpdate={handleSearchQuery}
                     hasClear
+                    autoFocus
                 />
                 <ProblemFilter value={filter} onChange={this.onChangeProblemFilter} />
                 <Label theme="info" size="m">{`Nodes: ${nodesToShow.length}`}</Label>

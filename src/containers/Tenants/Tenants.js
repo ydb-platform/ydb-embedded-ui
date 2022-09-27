@@ -98,6 +98,7 @@ class Tenants extends React.Component {
                     text={searchQuery}
                     onUpdate={handleSearchQuery}
                     hasClear
+                    autoFocus
                 />
                 <ProblemFilter value={filter} onChange={changeFilter} />
             </div>

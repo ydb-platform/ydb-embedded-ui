@@ -87,6 +87,7 @@ class Nodes extends React.Component {
                     text={searchQuery}
                     onUpdate={this.handleSearchQueryChange}
                     hasClear
+                    autoFocus
                 />
                 <ProblemFilter value={filter} onChange={this.handleFilterChange} />
                 <Label theme="info" size="m">{`Nodes: ${nodes?.length}`}</Label>
