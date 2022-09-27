@@ -47,6 +47,7 @@ export const StorageFilter = (props: StorageFilterProps) => {
             value={filterValue}
             onUpdate={changeFilter}
             hasClear
+            autoFocus
         />
     );
 }
