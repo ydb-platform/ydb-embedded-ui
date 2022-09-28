@@ -292,7 +292,7 @@ function QueryExplain(props) {
                             )}
                         </div>
                         <div className={b('controls-left')}>
-                            <EnableFullscreenButton disabled={Boolean(props.error)} />
+                            <EnableFullscreenButton disabled={Boolean(props.error) || !hasContent()} />
                             <PaneVisibilityToggleButtons
                                 onCollapse={props.onCollapseResults}
                                 onExpand={props.onExpandResults}
