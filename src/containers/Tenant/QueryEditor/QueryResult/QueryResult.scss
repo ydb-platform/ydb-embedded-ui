@@ -51,6 +51,7 @@
     }
     &__inspector {
         max-width: calc(100% - 50px);
+        padding: 15px 10px;
         @include json-tree-styles();
         &_fullscreen {
             overflow: auto;
