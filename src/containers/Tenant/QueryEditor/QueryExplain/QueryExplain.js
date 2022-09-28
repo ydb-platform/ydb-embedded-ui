@@ -141,16 +141,23 @@ function QueryExplain(props) {
         );
     };
 
-    const renderTextExplain = () => {
-        const {explain} = props;
-
-        if (!explain) {
-            return renderStub();
+    const hasContent = () => {
+        switch (activeOption) {
+            case ExplainOptionIds.schema:
+                return Boolean(props.explain?.nodes?.length);
+            case ExplainOptionIds.json:
+                return Boolean(props.explain);
+            case ExplainOptionIds.ast:
+                return Boolean(props.ast);
+            default:
+                return false;
         }
+    };
 
+    const renderTextExplain = () => {
         const content = (
             <JSONTree
-                data={explain.pristine}
+                data={props.explain?.pristine}
                 isExpanded={() => true}
                 className={b('inspector')}
                 searchOptions={{
@@ -168,13 +175,6 @@ function QueryExplain(props) {
     };
 
     const renderAstExplain = () => {
-        if (!props.ast) {
-            return (
-                <div className={b('text-message')}>
-                    There is no AST explanation for the request
-                </div>
-            );
-        }
         const content = (
             <div className={b('ast')}>
                 <MonacoEditor
@@ -196,11 +196,6 @@ function QueryExplain(props) {
     const renderGraph = () => {
         const {explain = {}, theme} = props;
         const {links, nodes, version} = explain;
-
-        if (!explain.nodes?.length) {
-            return renderStub();
-        }
-
         const content =
             links && nodes && nodes.length ? (
                 <div
@@ -257,6 +252,10 @@ function QueryExplain(props) {
 
         if (error) {
             return renderError();
+        }
+
+        if (!hasContent()) {
+            return renderStub();
         }
 
         switch (activeOption) {
