@@ -8,8 +8,7 @@ import type {EPathType} from '../../../../types/api/schema';
 //@ts-ignore
 import Icon from '../../../../components/Icon/Icon';
 import Overview from '../Overview/Overview';
-//@ts-ignore
-import Healthcheck from '../Healthcheck/Healthcheck';
+import {Healthcheck} from '../Healthcheck';
 //@ts-ignore
 import TenantOverview from '../TenantOverview/TenantOverview';
 
