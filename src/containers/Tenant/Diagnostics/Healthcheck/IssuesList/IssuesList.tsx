@@ -2,6 +2,8 @@ import cn from 'bem-cn-lite';
 
 import {Button} from '@gravity-ui/uikit';
 
+import type {IHealthCheck} from '../../../../../types/store/healthcheck';
+
 import IssuesViewer from '../IssuesViewer/IssuesViewer';
 
 import i18n from '../i18n';
@@ -9,7 +11,7 @@ import i18n from '../i18n';
 const b = cn('healthcheck');
 
 interface IssuesListProps {
-    data?: any;
+    data?: IHealthCheck;
     loading?: boolean;
     onUpdate: VoidFunction;
 }
