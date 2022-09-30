@@ -1,10 +1,16 @@
-import {DependencyList, useEffect} from 'react';
+import {DependencyList, useEffect, useRef} from 'react';
 
 import {AutoFetcher} from '../autofetcher';
 
-const autofetcher = new AutoFetcher();
-
 export const useAutofetcher = (fetchData: VoidFunction, deps: DependencyList, enabled = true) => {
+    const ref = useRef<AutoFetcher | null>(null);
+
+    if (ref.current === null) {
+        ref.current = new AutoFetcher();
+    }
+
+    const autofetcher = ref.current;
+
     // initial fetch
     useEffect(fetchData, deps); // eslint-disable-line react-hooks/exhaustive-deps
 
