@@ -38,6 +38,7 @@ interface Window {
             query: string,
             database: string,
         ) => Promise<import('../types/api/query').QueryAPIExplainResponse<'explain-ast'>>;
+        getHealthcheckInfo: (database: string) => Promise<import('../types/api/healthcheck').HealthCheckAPIResponse>,
         [method: string]: Function;
     };
 }

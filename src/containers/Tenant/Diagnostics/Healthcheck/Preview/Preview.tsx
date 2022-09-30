@@ -2,12 +2,15 @@ import cn from 'bem-cn-lite';
 
 import {Button} from '@gravity-ui/uikit';
 
+import {SelfCheckResult} from '../../../../../types/api/healthcheck';
+import type {IHealthCheck} from '../../../../../types/store/healthcheck';
+
 import i18n from '../i18n';
 
 const b = cn('healthcheck');
 
 interface PreviewProps {
-    data?: any;
+    data?: IHealthCheck;
     loading?: boolean;
     onShowMore?: VoidFunction;
     onUpdate: VoidFunction;
@@ -28,7 +31,7 @@ export const Preview = (props: PreviewProps) => {
     const {self_check_result: selfCheckResult} = data;
     const modifier = selfCheckResult.toLowerCase();
 
-    const statusOk = selfCheckResult === 'GOOD';
+    const statusOk = selfCheckResult === SelfCheckResult.GOOD;
     const text = statusOk
         ? i18n('status_message.ok')
         : i18n('status_message.error');
