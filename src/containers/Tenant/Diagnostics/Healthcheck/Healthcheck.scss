@@ -2,7 +2,9 @@
 @import '../../../../styles/mixins.scss';
 
 .healthcheck {
-    padding: 25px 20px 20px;
+    &__issues-list {
+        padding: 25px 20px 20px;
+    }
 
     &__issues {
         overflow-x: hidden;
