@@ -30,6 +30,14 @@ interface Window {
             },
             axiosOptions?: AxiosOptions,
         ) => Promise<import('../types/api/query').QueryAPIResponse<Action, Schema>>;
+        getExplainQuery: (
+            query: string,
+            database: string,
+        ) => Promise<import('../types/api/query').QueryAPIExplainResponse<'explain'>>;
+        getExplainQueryAst: (
+            query: string,
+            database: string,
+        ) => Promise<import('../types/api/query').QueryAPIExplainResponse<'explain-ast'>>;
         [method: string]: Function;
     };
 }
