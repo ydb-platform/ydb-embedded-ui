@@ -11,6 +11,7 @@ import {getHealthcheckInfo} from '../../../../store/reducers/healthcheckInfo';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
 import {AutoFetcher} from '../../../../utils/autofetcher';
 
+import i18n from './i18n';
 import './Healthcheck.scss';
 
 const b = cn('healthcheck');
@@ -73,7 +74,7 @@ class Healthcheck extends React.Component {
         const {loading} = this.props;
         return (
             <Button size="s" onClick={this.fetchHealthcheck} loading={loading}>
-                Update
+                {i18n('label.update')}
             </Button>
         );
     }
@@ -85,15 +86,15 @@ class Healthcheck extends React.Component {
 
         const statusOk = selfCheckResult === 'GOOD';
         const text = statusOk
-            ? 'No issues have been found on this database.'
-            : 'Several issues have been found on this database.';
+            ? i18n('status_message.ok')
+            : i18n('status_message.error');
 
         return (
             <div>
                 <div className={b('status-wrapper')}>
-                    <div className={b('preview-title')}>Healthcheck</div>
+                    <div className={b('preview-title')}>{i18n('title.healthcheck')}</div>
                     <div className={b('self-check-status-indicator', {[modifier]: true})}>
-                        {statusOk ? 'Ok' : 'Error'}
+                        {statusOk ? i18n('ok') : i18n('error')}
                     </div>
                     {this.renderUpdateButton()}
                 </div>
@@ -105,7 +106,7 @@ class Healthcheck extends React.Component {
                             onClick={showMoreHandler}
                             size="s"
                         >
-                            Show details
+                            {i18n('label.show-details')}
                         </Button>
                     )}
                 </div>
@@ -120,7 +121,7 @@ class Healthcheck extends React.Component {
 
         return (
             <div className={b('self-check-status')}>
-                <h3 className={b('self-check-status-label')}>Self check status</h3>
+                <h3 className={b('self-check-status-label')}>{i18n('title.self-check-status')}</h3>
                 <div className={b('self-check-status-indicator', {[modifier]: true})} />
                 {selfCheckResult}
                 <div className={b('self-check-update')}>{this.renderUpdateButton()}</div>
@@ -138,7 +139,7 @@ class Healthcheck extends React.Component {
 
         return (
             <div className={b('issues')}>
-                <h3>Issues</h3>
+                <h3>{i18n('title.issues')}</h3>
                 <IssuesViewer
                     issues={issueLog}
                     showTooltip={showTooltip}
@@ -169,7 +170,7 @@ class Healthcheck extends React.Component {
             return this.renderContent();
         } else if (loading && !wasLoaded) {
             return this.renderLoader();
-        } else return <div className="error">no healthcheck data</div>;
+        } else return <div className="error">{i18n('no-data')}</div>;
     }
 }
 
