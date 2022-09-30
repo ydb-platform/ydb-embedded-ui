@@ -1,4 +1,4 @@
-import {ReactNode, useCallback, useEffect, useMemo} from 'react';
+import {ReactNode, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 
@@ -14,11 +14,11 @@ import {
 
 import {EPathType} from '../../../../types/api/schema';
 import {isColumnEntityType, isTableType} from '../../utils/schema';
-import {AutoFetcher} from '../../../../utils/autofetcher';
 //@ts-ignore
 import {getSchema} from '../../../../store/reducers/schema';
 //@ts-ignore
 import {getOlapStats} from '../../../../store/reducers/olapStats';
+import {useAutofetcher} from '../../../../utils/hooks';
 
 import './Overview.scss';
 
@@ -57,8 +57,6 @@ interface OverviewProps {
 
 const b = cn('kv-tenant-overview');
 
-const autofetcher = new AutoFetcher();
-
 function Overview(props: OverviewProps) {
     const {tenantName, type} = props;
 
@@ -76,29 +74,14 @@ function Overview(props: OverviewProps) {
         data: { result: olapStats } = { result: undefined },
     } = useSelector((state: any) => state.olapStats);
 
-    const fetchOverviewData = useCallback(() => {
+    useAutofetcher(() => {
         const schemaPath = currentSchemaPath || tenantName;
         dispatch(getSchema({path: schemaPath}));
 
         if (isTableType(type) && isColumnEntityType(type)) {
             dispatch(getOlapStats({path: schemaPath}));
         }
-    }, [currentSchemaPath, dispatch, tenantName, type]);
-
-    useEffect(fetchOverviewData, [fetchOverviewData]);
-
-    useEffect(() => {
-        autofetcher.stop();
-
-        if (autorefresh) {
-            autofetcher.start();
-            autofetcher.fetch(() => fetchOverviewData());
-        }
-
-        return () => {
-            autofetcher.stop();
-        };
-    }, [autorefresh, fetchOverviewData]);
+    }, [currentSchemaPath, dispatch, tenantName, type], autorefresh);
 
     const tableSchema =
         currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
