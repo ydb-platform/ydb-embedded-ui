@@ -2,9 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
-import {ClipboardButton, Link as ExternalLink, Button} from '@gravity-ui/uikit';
+import {ClipboardButton, Link as ExternalLink, Button, Icon} from '@gravity-ui/uikit';
+
+import circleInfoIcon from '../../assets/icons/circle-info.svg';
+import circleExclamationIcon from '../../assets/icons/circle-exclamation.svg';
+import triangleExclamationIcon from '../../assets/icons/triangle-exclamation.svg';
+import circleTimesIcon from '../../assets/icons/circle-xmark.svg';
 
 import './EntityStatus.scss';
+
+const icons = {
+    BLUE: circleInfoIcon,
+    YELLOW: circleExclamationIcon,
+    ORANGE: triangleExclamationIcon,
+    RED: circleTimesIcon,
+};
 
 const b = cn('entity-status');
 
@@ -22,6 +34,7 @@ class EntityStatus extends React.Component {
         showStatus: PropTypes.bool,
         externalLink: PropTypes.bool,
         className: PropTypes.string,
+        mode: PropTypes.oneOf(['color', 'icons']),
     };
 
     static defaultProps = {
@@ -31,15 +44,27 @@ class EntityStatus extends React.Component {
         label: '',
         showStatus: true,
         externalLink: false,
+        mode: 'color',
     };
     renderIcon() {
-        const {status, size, showStatus} = this.props;
+        const {status, size, showStatus, mode} = this.props;
 
         if (!showStatus) {
             return null;
         }
 
-        return <div className={b('status-icon', {state: status.toLowerCase(), size})} />;
+        const modifiers = {state: status.toLowerCase(), size};
+
+        if (mode === 'icons' && icons[status]) {
+            return (
+                <Icon
+                    className={b('status-icon', modifiers)}
+                    data={icons[status]}
+                />
+            );
+        }
+
+        return <div className={b('status-color', modifiers)} />;
     }
     renderStatusLink() {
         const {iconPath} = this.props;

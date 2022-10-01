@@ -16,6 +16,7 @@ import './Healthcheck.scss';
 interface HealthcheckProps {
     tenant: string;
     preview?: boolean;
+    fetchData?: boolean;
     showMoreHandler?: VoidFunction;
 }
 
@@ -25,6 +26,7 @@ export const Healthcheck = (props: HealthcheckProps) => {
     const {
         tenant,
         preview,
+        fetchData = true,
         showMoreHandler,
     } = props;
 
@@ -34,8 +36,10 @@ export const Healthcheck = (props: HealthcheckProps) => {
     const {autorefresh} = useSelector((state: any) => state.schema);
 
     const fetchHealthcheck = useCallback(() => {
-        dispatch(getHealthcheckInfo(tenant));
-    }, [dispatch, tenant]);
+        if (fetchData) {            
+            dispatch(getHealthcheckInfo(tenant));
+        }
+    }, [dispatch, fetchData, tenant]);
 
     useAutofetcher(fetchHealthcheck, [fetchHealthcheck], autorefresh);
 
