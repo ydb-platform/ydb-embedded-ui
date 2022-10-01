@@ -5,7 +5,6 @@
     "label.update": "Update",
     "label.show-details": "Show details",
     "status_massage.ok": "No issues have been found on this database",
-    "status_message.error": "Several issues have been found on this database",
     "ok": "Ok",
     "error": "Error",
     "no-data": "no healthcheck data"

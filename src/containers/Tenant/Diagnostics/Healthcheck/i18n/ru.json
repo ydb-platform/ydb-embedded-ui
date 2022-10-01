@@ -5,7 +5,6 @@
     "label.update": "Обновить",
     "label.show-details": "Посмотреть подробности",
     "status_massage.ok": "В базе данных нет проблем",
-    "status_message.error": "В базе данных есть несколько проблем",
     "ok": "Ok",
     "error": "Ошибка",
     "no-data": "нет данных healthcheck"

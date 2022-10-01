@@ -41,7 +41,7 @@ function DetailedOverview(props: DetailedOverviewProps) {
     const renderModal = () => {
         return (
             <Modal open={isModalVisible} onClose={closeModalHandler} className={b('modal')}>
-                <Healthcheck tenant={props.tenantName} />
+                <Healthcheck tenant={props.tenantName} fetchData={false} />
                 <Button
                     className={b('close-modal-button')}
                     onClick={closeModalHandler}

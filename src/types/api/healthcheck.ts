@@ -73,7 +73,7 @@ interface Location {
     database: LocationDatabase;
 }
 
-interface IssueLog {
+export interface IssueLog {
     id: string;
     status: StatusFlag;
     message: string;
