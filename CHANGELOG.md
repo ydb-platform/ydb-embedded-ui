@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.0.0...v2.1.0) (2022-10-04)
+
+
+### Features
+
+* autofocus all text search fields ([a38ee84](https://github.com/ydb-platform/ydb-embedded-ui/commit/a38ee84abad4202f5e9b8af897eb68d2c006233a))
+* **Healthcheck:** display first level issues in overview ([10b4bf5](https://github.com/ydb-platform/ydb-embedded-ui/commit/10b4bf5d15d32f028702ff8cfecca0e06bc5616f))
+
+
+### Bug Fixes
+
+* fix production assets paths ([8eaad0f](https://github.com/ydb-platform/ydb-embedded-ui/commit/8eaad0f1db109c4cf3cbf7d11ad32ea335a6b0c1))
+* **Healthcheck:** add translations ([75f9851](https://github.com/ydb-platform/ydb-embedded-ui/commit/75f9851a35766ef692805a6f154d40340b003487))
+* move eslint hooks rule extension to src config ([179b81d](https://github.com/ydb-platform/ydb-embedded-ui/commit/179b81d60adf422addc8d72f947800c72bd3e4c5))
+* **QueryEditor:** disable fullscreen button for empty result ([4825b5b](https://github.com/ydb-platform/ydb-embedded-ui/commit/4825b5b8dcb89fcafd828dabbace521ddc429922))
+* **QueryEditor:** fix query stats spacings ([b836d72](https://github.com/ydb-platform/ydb-embedded-ui/commit/b836d72824a791b3fde2b9e4585c6c9b42385265))
+* **useAutofetcher:** private autofetcher instance for each usage ([3f34b7a](https://github.com/ydb-platform/ydb-embedded-ui/commit/3f34b7aee2042562a42e6d1a7daf03ffddd888c0))
+
 ## [2.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v1.14.2...v2.0.0) (2022-09-26)
 
 
