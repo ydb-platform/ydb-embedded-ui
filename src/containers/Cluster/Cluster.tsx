@@ -14,9 +14,9 @@ import ClusterInfo from '../../components/ClusterInfo/ClusterInfo';
 const b = cn('cluster');
 
 interface ClusterProps {
-    additionalClusterInfo: any;
-    additionalTenantsInfo: any;
-    additionalNodesInfo: any;
+    additionalClusterInfo?: any;
+    additionalTenantsInfo?: any;
+    additionalNodesInfo?: any;
 }
 
 function Cluster(props: ClusterProps) {
