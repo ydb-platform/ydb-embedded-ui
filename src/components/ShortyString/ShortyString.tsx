@@ -10,6 +10,8 @@ const block = cn('kv-shorty-string');
 type Props = {
     value?: string;
     limit?: number;
+    /** in strict mode the text always trims at the limit, otherwise it is allowed to overflow a little */
+    strict?: boolean;
     displayLength?: boolean;
     render?: (value: string) => React.ReactNode;
     onToggle?: () => void;
@@ -20,6 +22,7 @@ type Props = {
 export default function ShortyString({
     value = '',
     limit = 200,
+    strict = false,
     displayLength = true,
     render = (v: string) => v,
     onToggle,
@@ -27,12 +30,21 @@ export default function ShortyString({
     collapseLabel = 'Show less',
 }: Props) {
     const [expanded, setExpanded] = React.useState(false);
-    const hasToggle = value.length > limit;
-    const length =
-        displayLength && !expanded ? `(${value.length} symbols)` : undefined;
 
-    const text = expanded || value.length <= limit ? value : value.slice(0, limit - 4) + '\u00a0...';
-    const label = expanded ? collapseLabel : expandLabel;
+    const toggleLabelAction = expanded ? collapseLabel : expandLabel;
+    const toggleLabelSymbolsCount = displayLength && !expanded
+        ? ` (${value.length} symbols)`
+        : '';
+    const toggleLabel = toggleLabelAction + toggleLabelSymbolsCount;
+
+    // showing toogle button with a label that is longer than the hidden part is pointless,
+    // hence compare to limit + length in the not-strict mode
+    const hasToggle = value.length > limit + (strict ? 0 : toggleLabel.length);
+
+    const text = expanded || !hasToggle
+        ? value
+        : value.slice(0, limit - 4) + '\u00a0...';
+
     return (
         <div className={block()}>
             {render(text)}
@@ -45,7 +57,7 @@ export default function ShortyString({
                         onToggle?.();
                     }}
                 >
-                    {label} {length}
+                    {toggleLabel}
                 </Link>
             ) : null}
         </div>
