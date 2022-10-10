@@ -1,11 +1,11 @@
 {
-    "title.healthcheck": "Healthcheck",
-    "title.issues": "Issues",
-    "title.self-check-status": "Self check status",
-    "label.update": "Update",
-    "label.show-details": "Show details",
-    "status_massage.ok": "No issues have been found on this database",
-    "ok": "Ok",
-    "error": "Error",
-    "no-data": "no healthcheck data"
+  "title.healthcheck": "Healthcheck",
+  "title.issues": "Issues",
+  "title.self-check-status": "Self check status",
+  "label.update": "Update",
+  "label.show-details": "Show details",
+  "status_message.ok": "No issues have been found on this database",
+  "ok": "Ok",
+  "error": "Error",
+  "no-data": "no healthcheck data"
 }

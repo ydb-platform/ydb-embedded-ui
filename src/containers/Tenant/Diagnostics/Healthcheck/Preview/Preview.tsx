@@ -20,18 +20,16 @@ interface PreviewProps {
 }
 
 export const Preview = (props: PreviewProps) => {
-    const {
-        data,
-        loading,
-        onShowMore,
-        onUpdate,
-    } = props;
+    const {data, loading, onShowMore, onUpdate} = props;
 
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
     const isStatusOK = selfCheckResult === SelfCheckResult.GOOD;
 
     const issuesLog = data?.issue_log;
-    const firstLevelIssues = useMemo(() => issuesLog?.filter(({level}) => level === 1), [issuesLog]);
+    const firstLevelIssues = useMemo(
+        () => issuesLog?.filter(({level}) => level === 1),
+        [issuesLog],
+    );
 
     if (!data) {
         return null;
@@ -56,17 +54,11 @@ export const Preview = (props: PreviewProps) => {
     const renderFirstLevelIssues = () => {
         return (
             <div className={b('preview-content')}>
-                {
-                    isStatusOK ?
-                        i18n('status_massage.ok') :
-                        firstLevelIssues?.map((issue) => (
-                            <IssuePreview
-                                key={issue.id}
-                                data={issue}
-                                onShowMore={onShowMore}
-                            />
-                        ))
-                }
+                {isStatusOK
+                    ? i18n('status_message.ok')
+                    : firstLevelIssues?.map((issue) => (
+                          <IssuePreview key={issue.id} data={issue} onShowMore={onShowMore} />
+                      ))}
             </div>
         );
     };
