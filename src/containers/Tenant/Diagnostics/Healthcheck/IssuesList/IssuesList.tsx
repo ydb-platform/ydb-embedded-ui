@@ -1,6 +1,8 @@
 import cn from 'bem-cn-lite';
 
-import {Button} from '@gravity-ui/uikit';
+import {Button, Icon} from '@gravity-ui/uikit';
+
+import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
 import type {IHealthCheck} from '../../../../../types/store/healthcheck';
 
@@ -38,7 +40,7 @@ export const IssuesList = (props: IssuesListProps) => {
                 {selfCheckResult}
                 <div className={b('self-check-update')}>
                     <Button size="s" onClick={onUpdate} loading={loading}>
-                        {i18n('label.update')}
+                        <Icon data={updateArrow} />
                     </Button>
                 </div>
             </div>
