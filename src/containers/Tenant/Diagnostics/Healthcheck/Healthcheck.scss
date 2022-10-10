@@ -1,5 +1,6 @@
 @use '../DetailedOverview/DetailedOverview.scss' as detailedOverview;
 @import '../../../../styles/mixins.scss';
+@import '@gravity-ui/uikit/styles/mixins.scss';
 
 .healthcheck {
     &__issues-list {
@@ -27,19 +28,21 @@
         padding: 15px 0;
     }
 
-    &__self-check-status {
+    &__issues-list-header {
         display: flex;
         align-items: center;
 
         margin-bottom: 20px;
     }
 
-    &__self-check-status-label {
+    &__issues-list-header-title {
         margin: 0 10px 0 0;
+
+        @include text-header-1();
     }
 
-    &__self-check-update {
-        margin-left: 20px;
+    &__issues-list-header-update {
+        margin-left: 10px;
     }
 
     &__status-wrapper {

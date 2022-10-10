@@ -19,28 +19,19 @@ interface IssuesListProps {
 }
 
 export const IssuesList = (props: IssuesListProps) => {
-    const {
-        data,
-        loading,
-        onUpdate,
-    } = props;
+    const {data, loading, onUpdate} = props;
 
     if (!data) {
         return null;
     }
 
-    const renderOverviewStatus = () => {
-        const {self_check_result: selfCheckResult} = data;
-        const modifier = selfCheckResult.toLowerCase();
-
+    const renderHealthcheckHeader = () => {
         return (
-            <div className={b('self-check-status')}>
-                <h3 className={b('self-check-status-label')}>{i18n('title.self-check-status')}</h3>
-                <div className={b('self-check-status-indicator', {[modifier]: true})} />
-                {selfCheckResult}
-                <div className={b('self-check-update')}>
-                    <Button size="s" onClick={onUpdate} loading={loading}>
-                        <Icon data={updateArrow} />
+            <div className={b('issues-list-header')}>
+                <h3 className={b('issues-list-header-title')}>{i18n('title.healthcheck')}</h3>
+                <div className={b('issues-list-header-update')}>
+                    <Button size="s" onClick={onUpdate} loading={loading} view="flat-secondary">
+                        <Icon data={updateArrow} height={20} width={20} />
                     </Button>
                 </div>
             </div>
@@ -56,15 +47,14 @@ export const IssuesList = (props: IssuesListProps) => {
 
         return (
             <div className={b('issues')}>
-                <h3>{i18n('title.issues')}</h3>
                 <IssuesViewer issues={issueLog} />
             </div>
         );
-    }
+    };
 
     return (
         <div className={b('issues-list')}>
-            {renderOverviewStatus()}
+            {renderHealthcheckHeader()}
             {renderHealthcheckIssues()}
         </div>
     );
