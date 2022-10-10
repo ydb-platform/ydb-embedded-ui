@@ -1,7 +1,9 @@
 import {useMemo} from 'react';
 import cn from 'bem-cn-lite';
 
-import {Button} from '@gravity-ui/uikit';
+import {Button, Icon} from '@gravity-ui/uikit';
+
+import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import type {IHealthCheck} from '../../../../../types/store/healthcheck';
@@ -44,8 +46,8 @@ export const Preview = (props: PreviewProps) => {
                 <div className={b('self-check-status-indicator', {[modifier]: true})}>
                     {isStatusOK ? i18n('ok') : i18n('error')}
                 </div>
-                <Button size="s" onClick={onUpdate} loading={loading}>
-                    {i18n('label.update')}
+                <Button size="s" onClick={onUpdate} loading={loading} view="flat-secondary">
+                    <Icon data={updateArrow} width={20} height={20} />
                 </Button>
             </div>
         );
