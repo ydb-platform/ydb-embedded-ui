@@ -44,7 +44,7 @@ export const Preview = (props: PreviewProps) => {
             <div className={b('status-wrapper')}>
                 <div className={b('preview-title')}>{i18n('title.healthcheck')}</div>
                 <div className={b('self-check-status-indicator', {[modifier]: true})}>
-                    {isStatusOK ? i18n('ok') : i18n('error')}
+                    {selfCheckResult}
                 </div>
                 <Button size="s" onClick={onUpdate} loading={loading} view="flat-secondary">
                     <Icon data={updateArrow} width={20} height={20} />
