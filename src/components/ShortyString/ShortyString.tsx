@@ -3,6 +3,7 @@ import cn from 'bem-cn-lite';
 
 import {Link} from '@gravity-ui/uikit';
 
+import i18n from './i18n';
 import './ShortyString.scss';
 
 const block = cn('kv-shorty-string');
@@ -26,14 +27,14 @@ export default function ShortyString({
     displayLength = true,
     render = (v: string) => v,
     onToggle,
-    expandLabel = 'Show more',
-    collapseLabel = 'Show less',
+    expandLabel = i18n('default_expand_label'),
+    collapseLabel = i18n('default_collapse_label'),
 }: Props) {
     const [expanded, setExpanded] = React.useState(false);
 
     const toggleLabelAction = expanded ? collapseLabel : expandLabel;
     const toggleLabelSymbolsCount = displayLength && !expanded
-        ? ` (${value.length} symbols)`
+        ? i18n('chars_count', {count: value.length})
         : '';
     const toggleLabel = toggleLabelAction + toggleLabelSymbolsCount;
 
