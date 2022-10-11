@@ -107,7 +107,7 @@ class Tenants extends React.Component {
 
     getControlPlaneValue = (item) => {
         const parts = _.get(item, 'Name', []).split('/');
-        const defaultValue = parts.length ? parts.slice(-1) : '—';
+        const defaultValue = parts.length ? parts[parts.length - 1] : '—';
 
         return _.get(item, 'ControlPlane.name', defaultValue);
     };
