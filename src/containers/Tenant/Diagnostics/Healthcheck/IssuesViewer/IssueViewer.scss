@@ -1,5 +1,22 @@
 @import '../../../../../styles/mixins.scss';
 
+@mixin set-tree-margins($tree-level, $tree-margin: 24px) {
+    $calculated-margin: calc(#{$tree-margin} * #{$tree-level});
+
+    .issue-viewer__info-panel {
+        margin-left: $calculated-margin;
+    }
+
+    .ydb-tree-view__item {
+        margin-left: $calculated-margin;
+        padding-left: 0;
+    }
+
+    .issue__field_message {
+        margin-left: calc(-1 * #{$calculated-margin});
+    }
+}
+
 .issue {
     display: flex;
     align-items: center;
@@ -7,11 +24,6 @@
     height: 40px;
 
     cursor: pointer;
-
-    &_active {
-        border-radius: 4px;
-        background: var(--yc-color-base-info);
-    }
 
     &__field {
         padding: 0 10px;
@@ -106,11 +118,10 @@
 
     &__info-panel {
         position: sticky;
-        top: 20px;
 
-        width: 500px;
         height: 100%;
-        padding: 5px 20px 20px;
+        margin: 11px 0;
+        padding: 8px 20px;
 
         border-radius: 4px;
         background: var(--yc-color-base-generic);
@@ -159,6 +170,26 @@
         .tree-view_arrow {
             width: 40px;
             height: 40px;
+        }
+
+        .ydb-tree-view {
+            @include set-tree-margins(1);
+        }
+
+        .ydb-tree-view .ydb-tree-view {
+            @include set-tree-margins(2);
+        }
+
+        .ydb-tree-view .ydb-tree-view .ydb-tree-view {
+            @include set-tree-margins(3);
+        }
+
+        .ydb-tree-view .ydb-tree-view .ydb-tree-view .ydb-tree-view {
+            @include set-tree-margins(4);
+        }
+
+        .ydb-tree-view .ydb-tree-view .ydb-tree-view .ydb-tree-view .ydb-tree-view {
+            @include set-tree-margins(5);
         }
     }
 }

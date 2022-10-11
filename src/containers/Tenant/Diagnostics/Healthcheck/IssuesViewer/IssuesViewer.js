@@ -13,44 +13,17 @@ import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 
 import './IssueViewer.scss';
 
-// const indicatorBlock = cn('indicator');
-
-// const IssueStatus = ({status, name}) => {
-//     const modifier = status && status.toLowerCase();
-
-//     return (
-//         <React.Fragment>
-//             <div className={indicatorBlock({[modifier]: true})} />
-//             {name}
-//         </React.Fragment>
-//     );
-// };
-
 const issueBlock = cn('issue');
 
-const IssueRow = ({data, treeLevel, active, setInfoForActive, onClick}) => {
-    // eslint-disable-next-line no-unused-vars
-    const {id, status, message, type, reasonsItems, ...rest} = data;
-
-    useEffect(() => {
-        if (active) {
-            setInfoForActive(rest);
-        }
-    }, [active, setInfoForActive]);
+const IssueRow = ({data, onClick}) => {
+    const {status, message, type} = data;
 
     return (
-        <div className={issueBlock({active})} onClick={onClick}>
+        <div className={issueBlock()} onClick={onClick}>
             <div className={issueBlock('field', {status: true})}>
-                <EntityStatus status={status} name={id} />
-                {/* <IssueStatus status={status} name={id} /> */}
+                <EntityStatus mode="icons" status={status} name={type} />
             </div>
-            <div
-                className={issueBlock('field', {message: true})}
-                style={{marginLeft: -treeLevel * 24 + 'px'}}
-            >
-                {message}
-            </div>
-            <div className={issueBlock('field', {type: true})}>{type}</div>
+            <div className={issueBlock('field', {message: true})}>{message}</div>
         </div>
     );
 };
@@ -60,15 +33,6 @@ const issueViewerBlock = cn('issue-viewer');
 const IssuesViewer = ({issues}) => {
     const [data, setData] = useState([]);
     const [collapsedIssues, setCollapsedIssues] = useState({});
-    const [activeItem, setActiveItem] = useState();
-    const [infoData, setInfoData] = useState();
-
-    useEffect(() => {
-        if (!activeItem && data.length) {
-            const {id} = data[0];
-            setActiveItem(id);
-        }
-    }, [data]);
 
     useEffect(() => {
         const newData = getInvertedConsequencesTree({data: issues});
@@ -77,67 +41,64 @@ const IssuesViewer = ({issues}) => {
     }, [issues]);
 
     const renderTree = useCallback(
-        (data, childrenKey, treeLevel = 0) => {
+        (data, childrenKey) => {
             return _.map(data, (item) => {
                 const {id} = item;
-                const isActive = activeItem === item.id;
-                const hasArrow = item[childrenKey].length;
+
+                // eslint-disable-next-line no-unused-vars
+                const {status, message, type, reasonsItems, reason, level, ...rest} = item;
+
+                const isCollapsed =
+                    typeof collapsedIssues[id] === 'undefined' || collapsedIssues[id];
+
+                const toggleCollapsed = () => {
+                    setCollapsedIssues((collapsedIssues) => ({
+                        ...collapsedIssues,
+                        [id]: !isCollapsed,
+                    }));
+                };
 
                 return (
                     <TreeView
                         key={id}
-                        name={
-                            <IssueRow
-                                data={item}
-                                treeLevel={treeLevel}
-                                active={isActive}
-                                setInfoForActive={setInfoData}
-                            />
-                        }
-                        collapsed={
-                            typeof collapsedIssues[id] === 'undefined' || collapsedIssues[id]
-                        }
-                        hasArrow={hasArrow}
-                        onClick={() => setActiveItem(id)}
-                        onArrowClick={() => {
-                            const newValue =
-                                typeof collapsedIssues[id] === 'undefined'
-                                    ? false
-                                    : !collapsedIssues[id];
-                            const newCollapsedIssues = {...collapsedIssues, [id]: newValue};
-                            setCollapsedIssues(newCollapsedIssues);
-                        }}
+                        name={<IssueRow data={item} />}
+                        collapsed={isCollapsed}
+                        hasArrow={true}
+                        onClick={toggleCollapsed}
+                        onArrowClick={toggleCollapsed}
                     >
-                        {renderTree(item[childrenKey], childrenKey, treeLevel + 1)}
+                        {renderInfoPanel(rest)}
+                        {renderTree(item[childrenKey], childrenKey)}
                     </TreeView>
                 );
             });
         },
-        [data, collapsedIssues, activeItem],
+        [data, collapsedIssues],
     );
 
-    const renderInfoPanel = useCallback(() => {
-        if (!infoData) {
-            return null;
-        }
+    const renderInfoPanel = useCallback(
+        (info) => {
+            if (!info) {
+                return null;
+            }
 
-        return (
-            <div className={issueViewerBlock('info-panel')}>
-                <h3>Additional info for {activeItem}</h3>
-                <JSONTree
-                    data={infoData}
-                    search={false}
-                    isExpanded={() => true}
-                    className={issueViewerBlock('inspector')}
-                />
-            </div>
-        );
-    }, [data, infoData, activeItem]);
+            return (
+                <div className={issueViewerBlock('info-panel')}>
+                    <JSONTree
+                        data={info}
+                        search={false}
+                        isExpanded={() => true}
+                        className={issueViewerBlock('inspector')}
+                    />
+                </div>
+            );
+        },
+        [data],
+    );
 
     return (
         <div className={issueViewerBlock()}>
             <div className={issueViewerBlock('tree')}>{renderTree(data, 'reasonsItems')}</div>
-            {renderInfoPanel()}
         </div>
     );
 };
