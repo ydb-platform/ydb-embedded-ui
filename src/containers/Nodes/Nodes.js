@@ -114,11 +114,10 @@ class Nodes extends React.Component {
         });
 
         let preparedNodes = searchQuery
-            ? nodes.filter((node) =>
-                  node.Host
-                      ? node.Host.includes(searchQuery) || String(node.NodeId).includes(searchQuery)
-                      : true,
-              )
+            ? nodes.filter((node) => {
+                  const re = new RegExp(searchQuery, 'i');
+                  return node.Host ? re.test(node.Host) || re.test(String(node.NodeId)) : true;
+              })
             : nodes;
         preparedNodes = preparedNodes.map((node) => ({
             ...node,
@@ -143,7 +142,7 @@ class Nodes extends React.Component {
                             columnId: 'NodeId',
                             order: DataTable.ASCENDING,
                         }}
-                        emptyDataMessage='No such nodes'
+                        emptyDataMessage="No such nodes"
                     />
                 </div>
             </div>
