@@ -124,12 +124,10 @@ class Tenants extends React.Component {
             savedTenantInitialTab,
         } = this.props;
 
-        const filteredTenantsBySearch = tenants.filter(
-            (item) =>
-                item.Name.includes(searchQuery) ||
-                this.getControlPlaneValue(item).includes(searchQuery),
-            filter,
-        );
+        const filteredTenantsBySearch = tenants.filter((item) => {
+            const re = new RegExp(searchQuery, 'i');
+            return re.test(item.Name) || re.test(this.getControlPlaneValue(item));
+        });
         const filteredTenants = Tenants.filterTenants(filteredTenantsBySearch, filter);
 
         const initialTenantGeneralTab = savedTenantInitialTab || TENANT_GENERAL_TABS[0].id;
