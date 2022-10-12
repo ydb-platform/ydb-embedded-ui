@@ -3,6 +3,10 @@
 @import '@gravity-ui/uikit/styles/mixins.scss';
 
 .healthcheck {
+    // Since most of the inner containers have fixed width, we can set fixed width here as well
+    // Thus we will get rid of unneeded layout shift when scrollbar appear
+    min-width: 885px;
+
     &__issues-list {
         padding: 25px 20px 20px;
     }
