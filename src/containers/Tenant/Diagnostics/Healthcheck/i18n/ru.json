@@ -1,11 +1,7 @@
 {
   "title.healthcheck": "Healthcheck",
-  "title.issues": "Проблемы",
-  "title.self-check-status": "Статус самопроверки",
   "label.update": "Обновить",
   "label.show-details": "Посмотреть подробности",
   "status_message.ok": "В базе данных нет проблем",
-  "ok": "Ok",
-  "error": "Ошибка",
   "no-data": "нет данных healthcheck"
 }
