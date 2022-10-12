@@ -26,11 +26,12 @@ const b = cn('kv-detailed-overview');
 function DetailedOverview(props: DetailedOverviewProps) {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const {
-        currentSchemaPath,
-    } = useSelector((state: any) => state.schema);
+    const [expandedIssueId, setExpandedIssueId] = useState<string>();
 
-    const openModalHandler = () => {
+    const {currentSchemaPath} = useSelector((state: any) => state.schema);
+
+    const openModalHandler = (id: string) => {
+        setExpandedIssueId(id);
         setIsModalVisible(true);
     };
 
@@ -41,12 +42,16 @@ function DetailedOverview(props: DetailedOverviewProps) {
     const renderModal = () => {
         return (
             <Modal open={isModalVisible} onClose={closeModalHandler} className={b('modal')}>
-                <Healthcheck tenant={props.tenantName} fetchData={false} />
+                <Healthcheck
+                    tenant={props.tenantName}
+                    fetchData={false}
+                    expandedIssueId={expandedIssueId}
+                />
                 <Button
                     className={b('close-modal-button')}
                     onClick={closeModalHandler}
                     view="flat-secondary"
-                    title='Close'
+                    title="Close"
                 >
                     <Icon name="close" viewBox={'0 0 16 16 '} height={20} width={20} />
                 </Button>
@@ -62,7 +67,10 @@ function DetailedOverview(props: DetailedOverviewProps) {
                 {isTenant ? (
                     <>
                         <div className={b('section')}>
-                            <TenantOverview tenantName={tenantName} additionalTenantInfo={additionalTenantInfo} />
+                            <TenantOverview
+                                tenantName={tenantName}
+                                additionalTenantInfo={additionalTenantInfo}
+                            />
                         </div>
                         <div className={b('section')}>
                             <Healthcheck
