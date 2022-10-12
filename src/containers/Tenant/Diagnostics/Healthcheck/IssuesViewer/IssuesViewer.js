@@ -30,7 +30,7 @@ const IssueRow = ({data, onClick}) => {
 
 const issueViewerBlock = cn('issue-viewer');
 
-const IssuesViewer = ({issues}) => {
+const IssuesViewer = ({issues, expandedIssueId}) => {
     const [data, setData] = useState([]);
     const [collapsedIssues, setCollapsedIssues] = useState({});
 
@@ -47,6 +47,10 @@ const IssuesViewer = ({issues}) => {
 
                 // eslint-disable-next-line no-unused-vars
                 const {status, message, type, reasonsItems, reason, level, ...rest} = item;
+
+                if (level === 1 && expandedIssueId && id !== expandedIssueId) {
+                    return;
+                }
 
                 const isCollapsed =
                     typeof collapsedIssues[id] === 'undefined' || collapsedIssues[id];

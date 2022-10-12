@@ -17,18 +17,14 @@ interface HealthcheckProps {
     tenant: string;
     preview?: boolean;
     fetchData?: boolean;
-    showMoreHandler?: VoidFunction;
+    expandedIssueId?: string;
+    showMoreHandler?: (id: string) => void;
 }
 
 const b = cn('healthcheck');
 
 export const Healthcheck = (props: HealthcheckProps) => {
-    const {
-        tenant,
-        preview,
-        fetchData = true,
-        showMoreHandler,
-    } = props;
+    const {tenant, preview, fetchData = true, showMoreHandler, expandedIssueId} = props;
 
     const dispatch = useDispatch();
 
@@ -36,7 +32,7 @@ export const Healthcheck = (props: HealthcheckProps) => {
     const {autorefresh} = useSelector((state: any) => state.schema);
 
     const fetchHealthcheck = useCallback(() => {
-        if (fetchData) {            
+        if (fetchData) {
             dispatch(getHealthcheckInfo(tenant));
         }
     }, [dispatch, fetchData, tenant]);
@@ -67,20 +63,15 @@ export const Healthcheck = (props: HealthcheckProps) => {
             ) : (
                 <IssuesList
                     data={data}
+                    expandedIssueId={expandedIssueId}
                     loading={loading}
                     onUpdate={fetchHealthcheck}
                 />
             );
         }
 
-        return (
-            <div className="error">{i18n('no-data')}</div>
-        );
+        return <div className="error">{i18n('no-data')}</div>;
     };
 
-    return (
-        <div className={b()}>
-            {renderContent()}
-        </div>
-    );
+    return <div className={b()}>{renderContent()}</div>;
 };

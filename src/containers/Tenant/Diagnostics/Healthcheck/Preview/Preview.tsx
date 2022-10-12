@@ -17,8 +17,8 @@ const b = cn('healthcheck');
 interface PreviewProps {
     data?: IHealthCheck;
     loading?: boolean;
-    onShowMore?: VoidFunction;
     onUpdate: VoidFunction;
+    onShowMore?: (id: string) => void;
 }
 
 export const Preview = (props: PreviewProps) => {

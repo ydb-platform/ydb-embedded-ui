@@ -15,11 +15,12 @@ const b = cn('healthcheck');
 interface IssuesListProps {
     data?: IHealthCheck;
     loading?: boolean;
+    expandedIssueId?: string;
     onUpdate: VoidFunction;
 }
 
 export const IssuesList = (props: IssuesListProps) => {
-    const {data, loading, onUpdate} = props;
+    const {data, loading, onUpdate, expandedIssueId} = props;
 
     if (!data) {
         return null;
@@ -47,7 +48,7 @@ export const IssuesList = (props: IssuesListProps) => {
 
         return (
             <div className={b('issues')}>
-                <IssuesViewer issues={issueLog} />
+                <IssuesViewer issues={issueLog} expandedIssueId={expandedIssueId} />
             </div>
         );
     };

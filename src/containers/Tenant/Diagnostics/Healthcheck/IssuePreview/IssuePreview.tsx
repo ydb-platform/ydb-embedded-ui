@@ -11,14 +11,11 @@ const b = cn('healthcheck');
 
 interface IssuePreviewProps {
     data?: IssueLog;
-    onShowMore?: VoidFunction;
+    onShowMore?: (id: string) => void;
 }
 
 export const IssuePreview = (props: IssuePreviewProps) => {
-    const {
-        data,
-        onShowMore,
-    } = props;
+    const {data, onShowMore} = props;
 
     if (!data) {
         return null;
@@ -27,8 +24,12 @@ export const IssuePreview = (props: IssuePreviewProps) => {
     return (
         <div className={b('issue-preview')}>
             <EntityStatus mode="icons" status={data.status} name={data.type} />
-            <Text as="div" color="secondary" variant="body-2">{data.message}</Text>
-            <Link onClick={onShowMore}>{i18n('label.show-details')}</Link>
+            <Text as="div" color="secondary" variant="body-2">
+                {data.message}
+            </Text>
+            <Link onClick={() => onShowMore && onShowMore(data.id)}>
+                {i18n('label.show-details')}
+            </Link>
         </div>
     );
 };
