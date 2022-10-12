@@ -149,6 +149,7 @@ class Tenants extends React.Component {
                                 externalLink={isExternalLink}
                                 className={b('name')}
                                 name={value || 'unknown database'}
+                                withLeftTrim={true}
                                 status={row.Overall}
                                 hasClipboardButton
                                 path={createHref(routes.tenant, undefined, {
