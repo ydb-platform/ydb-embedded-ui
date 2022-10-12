@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
-import {ClipboardButton, Link as ExternalLink, Button, Icon} from '@gravity-ui/uikit';
+import {ClipboardButton, Link as UIKitLink, Button, Icon} from '@gravity-ui/uikit';
 
 import circleInfoIcon from '../../assets/icons/circle-info.svg';
 import circleExclamationIcon from '../../assets/icons/circle-exclamation.svg';
@@ -35,6 +35,7 @@ class EntityStatus extends React.Component {
         externalLink: PropTypes.bool,
         className: PropTypes.string,
         mode: PropTypes.oneOf(['color', 'icons']),
+        withLeftTrim: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -45,6 +46,7 @@ class EntityStatus extends React.Component {
         showStatus: true,
         externalLink: false,
         mode: 'color',
+        withLeftTrim: false,
     };
     renderIcon() {
         const {status, size, showStatus, mode} = this.props;
@@ -56,12 +58,7 @@ class EntityStatus extends React.Component {
         const modifiers = {state: status.toLowerCase(), size};
 
         if (mode === 'icons' && icons[status]) {
-            return (
-                <Icon
-                    className={b('status-icon', modifiers)}
-                    data={icons[status]}
-                />
-            );
+            return <Icon className={b('status-icon', modifiers)} data={icons[status]} />;
         }
 
         return <div className={b('status-color', modifiers)} />;
@@ -70,21 +67,25 @@ class EntityStatus extends React.Component {
         const {iconPath} = this.props;
 
         return (
-            <ExternalLink target="_blank" href={iconPath}>
+            <UIKitLink target="_blank" href={iconPath}>
                 {this.renderIcon()}
-            </ExternalLink>
+            </UIKitLink>
         );
     }
     renderLink() {
         const {externalLink, name, path, onNameMouseEnter, onNameMouseLeave} = this.props;
 
         if (externalLink) {
-            return <ExternalLink href={path}>{name}</ExternalLink>;
+            return (
+                <UIKitLink className={b('name')} href={path}>
+                    {name}
+                </UIKitLink>
+            );
         }
 
         return path ? (
             <Link
-                title={name}
+                className={b('name')}
                 to={path}
                 onMouseEnter={onNameMouseEnter}
                 onMouseLeave={onNameMouseLeave}
@@ -95,7 +96,6 @@ class EntityStatus extends React.Component {
             name && (
                 <span
                     className={b('name')}
-                    title={name}
                     onMouseEnter={onNameMouseEnter}
                     onMouseLeave={onNameMouseLeave}
                 >
@@ -108,14 +108,16 @@ class EntityStatus extends React.Component {
         const {name, label, iconPath, hasClipboardButton, className} = this.props;
 
         return (
-            <div className={b(null, className)}>
+            <div className={b(null, className)} title={name}>
                 {iconPath ? this.renderStatusLink() : this.renderIcon()}
                 {label && (
                     <span title={label} className={b('label')}>
                         {label}
                     </span>
                 )}
-                {this.renderLink()}
+                <span className={b('link', {'with-left-trim': this.props.withLeftTrim})}>
+                    {this.renderLink()}
+                </span>
                 {hasClipboardButton && (
                     <Button
                         component="span"

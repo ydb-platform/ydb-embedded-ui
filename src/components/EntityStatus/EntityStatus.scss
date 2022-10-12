@@ -31,11 +31,7 @@
     }
 
     a {
-        overflow: hidden;
-
-        white-space: nowrap;
         text-decoration: none;
-        text-overflow: ellipsis;
 
         color: var(--yc-color-text-link);
     }
@@ -53,12 +49,25 @@
         color: var(--yc-color-text-complementary);
     }
 
-    &__name {
+    &__link {
+        overflow: hidden;
+
         white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    &__link_with-left-trim {
+        direction: rtl;
+
+        .entity-status__name {
+            unicode-bidi: plaintext;
+        }
     }
 
     &__status-color,
     &__status-icon {
+        flex-shrink: 0;
+
         margin-right: 8px;
 
         border-radius: 3px;
