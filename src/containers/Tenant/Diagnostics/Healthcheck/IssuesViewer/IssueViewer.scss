@@ -1,22 +1,5 @@
 @import '../../../../../styles/mixins.scss';
 
-@mixin set-tree-margins($tree-level, $tree-margin: 24px) {
-    $calculated-margin: calc(#{$tree-margin} * #{$tree-level});
-
-    .issue-viewer__info-panel {
-        margin-left: $calculated-margin;
-    }
-
-    .ydb-tree-view__item {
-        margin-left: $calculated-margin;
-        padding-left: 0;
-    }
-
-    .issue__field_message {
-        margin-left: calc(-1 * #{$calculated-margin});
-    }
-}
-
 .issue {
     display: flex;
     align-items: center;
@@ -163,6 +146,8 @@
     }
 
     .ydb-tree-view {
+
+        $calculated-margin: calc(24px * var(--ydb-tree-view-level));
         &__item {
             height: 40px;
         }
@@ -172,24 +157,18 @@
             height: 40px;
         }
 
-        .ydb-tree-view {
-            @include set-tree-margins(1);
+        // Without !important this class does not have enough weight compared to styles set in TreeView
+        .ydb-tree-view__item {
+            margin-left: $calculated-margin !important;
+            padding-left: 0 !important;
         }
 
-        .ydb-tree-view .ydb-tree-view {
-            @include set-tree-margins(2);
+        .issue-viewer__info-panel {
+            margin-left: $calculated-margin;
         }
 
-        .ydb-tree-view .ydb-tree-view .ydb-tree-view {
-            @include set-tree-margins(3);
-        }
-
-        .ydb-tree-view .ydb-tree-view .ydb-tree-view .ydb-tree-view {
-            @include set-tree-margins(4);
-        }
-
-        .ydb-tree-view .ydb-tree-view .ydb-tree-view .ydb-tree-view .ydb-tree-view {
-            @include set-tree-margins(5);
+        .issue__field_message {
+            margin-left: calc(-1 * #{$calculated-margin});
         }
     }
 }
