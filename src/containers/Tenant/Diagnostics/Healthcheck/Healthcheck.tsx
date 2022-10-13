@@ -32,12 +32,18 @@ export const Healthcheck = (props: HealthcheckProps) => {
     const {autorefresh} = useSelector((state: any) => state.schema);
 
     const fetchHealthcheck = useCallback(() => {
-        if (fetchData) {
-            dispatch(getHealthcheckInfo(tenant));
-        }
-    }, [dispatch, fetchData, tenant]);
+        dispatch(getHealthcheckInfo(tenant));
+    }, [dispatch, tenant]);
 
-    useAutofetcher(fetchHealthcheck, [fetchHealthcheck], autorefresh);
+    useAutofetcher(
+        () => {
+            if (fetchData) {
+                fetchHealthcheck();
+            }
+        },
+        [fetchData, fetchHealthcheck],
+        autorefresh,
+    );
 
     const renderContent = () => {
         if (error) {
