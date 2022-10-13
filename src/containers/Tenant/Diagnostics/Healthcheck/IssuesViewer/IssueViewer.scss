@@ -2,6 +2,7 @@
 
 .issue {
     display: flex;
+    justify-content: space-between;
     align-items: center;
 
     height: 40px;
@@ -9,17 +10,13 @@
     cursor: pointer;
 
     &__field {
-        padding: 0 10px;
+        display: flex;
+        overflow: hidden;
 
         &_status {
             display: flex;
 
-            min-width: 470px;
-
             white-space: nowrap;
-        }
-        &_type {
-            min-width: 160px;
         }
         &_additional {
             width: max-content;
@@ -34,6 +31,7 @@
         }
         &_message {
             overflow: hidden;
+            flex-shrink: 0;
 
             width: 300px;
 
@@ -91,8 +89,10 @@
 .issue-viewer {
     display: flex;
 
+    width: 820px;
+
     &__tree {
-        padding-right: 20px;
+        width: 100%;
     }
 
     &__checkbox {
@@ -146,8 +146,8 @@
     }
 
     .ydb-tree-view {
-
         $calculated-margin: calc(24px * var(--ydb-tree-view-level));
+
         &__item {
             height: 40px;
         }
@@ -165,10 +165,6 @@
 
         .issue-viewer__info-panel {
             margin-left: $calculated-margin;
-        }
-
-        .issue__field_message {
-            margin-left: calc(-1 * #{$calculated-margin});
         }
     }
 }
