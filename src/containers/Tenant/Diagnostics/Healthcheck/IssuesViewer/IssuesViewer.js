@@ -70,6 +70,7 @@ const IssuesViewer = ({issues, expandedIssueId}) => {
                         hasArrow={true}
                         onClick={toggleCollapsed}
                         onArrowClick={toggleCollapsed}
+                        level={level - 1}
                     >
                         {renderInfoPanel(rest)}
                         {renderTree(item[childrenKey], childrenKey)}
