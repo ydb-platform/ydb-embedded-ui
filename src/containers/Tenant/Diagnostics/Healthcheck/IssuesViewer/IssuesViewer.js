@@ -1,11 +1,7 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useState} from 'react';
 import cn from 'bem-cn-lite';
 import JSONTree from 'react-json-inspector';
 import _ from 'lodash';
-import _flow from 'lodash/fp/flow';
-import _filter from 'lodash/fp/filter';
-import _sortBy from 'lodash/fp/sortBy';
-import _uniqBy from 'lodash/fp/uniqBy';
 
 import {TreeView} from 'ydb-ui-components';
 
@@ -30,15 +26,8 @@ const IssueRow = ({data, onClick}) => {
 
 const issueViewerBlock = cn('issue-viewer');
 
-const IssuesViewer = ({issues, expandedIssueId}) => {
-    const [data, setData] = useState([]);
+const IssuesViewer = ({issue}) => {
     const [collapsedIssues, setCollapsedIssues] = useState({});
-
-    useEffect(() => {
-        const newData = getInvertedConsequencesTree({data: issues});
-
-        setData(newData);
-    }, [issues]);
 
     const renderTree = useCallback(
         (data, childrenKey) => {
@@ -47,10 +36,6 @@ const IssuesViewer = ({issues, expandedIssueId}) => {
 
                 // eslint-disable-next-line no-unused-vars
                 const {status, message, type, reasonsItems, reason, level, ...rest} = item;
-
-                if (level === 1 && expandedIssueId && id !== expandedIssueId) {
-                    return;
-                }
 
                 const isCollapsed =
                     typeof collapsedIssues[id] === 'undefined' || collapsedIssues[id];
@@ -78,7 +63,7 @@ const IssuesViewer = ({issues, expandedIssueId}) => {
                 );
             });
         },
-        [data, collapsedIssues],
+        [issue, collapsedIssues],
     );
 
     const renderInfoPanel = useCallback(
@@ -98,54 +83,14 @@ const IssuesViewer = ({issues, expandedIssueId}) => {
                 </div>
             );
         },
-        [data],
+        [issue],
     );
 
     return (
         <div className={issueViewerBlock()}>
-            <div className={issueViewerBlock('tree')}>{renderTree(data, 'reasonsItems')}</div>
+            <div className={issueViewerBlock('tree')}>{renderTree([issue], 'reasonsItems')}</div>
         </div>
     );
 };
-
-function getReasonsForIssue({issue, data}) {
-    return _.filter(data, (item) => issue.reason && issue.reason.indexOf(item.id) !== -1);
-}
-
-const mapStatusToPriority = {
-    RED: 0,
-    ORANGE: 1,
-    YELLOW: 2,
-    BLUE: 3,
-    GREEN: 4,
-};
-
-function getInvertedConsequencesTree({data, roots: receivedRoots}) {
-    let roots = receivedRoots;
-    if (!roots && data) {
-        roots = _flow([
-            _filter((item) => {
-                return !_.find(
-                    data,
-                    (issue) => issue.reason && issue.reason.indexOf(item.id) !== -1,
-                );
-            }),
-            _uniqBy((item) => item.id),
-            _sortBy(({status}) => mapStatusToPriority[status]),
-        ])(data);
-    }
-
-    return _.map(roots, (issue) => {
-        const reasonsItems = getInvertedConsequencesTree({
-            roots: getReasonsForIssue({issue, data}),
-            data,
-        });
-
-        return {
-            ...issue,
-            reasonsItems,
-        };
-    });
-}
 
 export default IssuesViewer;

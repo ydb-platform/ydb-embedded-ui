@@ -1,4 +1,3 @@
-import {useMemo} from 'react';
 import cn from 'bem-cn-lite';
 
 import {Button, Icon} from '@gravity-ui/uikit';
@@ -6,7 +5,7 @@ import {Button, Icon} from '@gravity-ui/uikit';
 import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
-import type {IHealthCheck} from '../../../../../types/store/healthcheck';
+import type {IIssuesTree} from '../../../../../types/store/healthcheck';
 
 import {IssuePreview} from '../IssuePreview';
 
@@ -15,25 +14,19 @@ import i18n from '../i18n';
 const b = cn('healthcheck');
 
 interface PreviewProps {
-    data?: IHealthCheck;
+    selfCheckResult: SelfCheckResult;
+    issuesTrees?: IIssuesTree[];
     loading?: boolean;
-    onUpdate: VoidFunction;
     onShowMore?: (id: string) => void;
+    onUpdate: VoidFunction;
 }
 
 export const Preview = (props: PreviewProps) => {
-    const {data, loading, onShowMore, onUpdate} = props;
+    const {selfCheckResult, issuesTrees, loading, onShowMore, onUpdate} = props;
 
-    const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
     const isStatusOK = selfCheckResult === SelfCheckResult.GOOD;
 
-    const issuesLog = data?.issue_log;
-    const firstLevelIssues = useMemo(
-        () => issuesLog?.filter(({level}) => level === 1),
-        [issuesLog],
-    );
-
-    if (!data) {
+    if (!issuesTrees) {
         return null;
     }
 
@@ -58,8 +51,12 @@ export const Preview = (props: PreviewProps) => {
             <div className={b('preview-content')}>
                 {isStatusOK
                     ? i18n('status_message.ok')
-                    : firstLevelIssues?.map((issue) => (
-                          <IssuePreview key={issue.id} data={issue} onShowMore={onShowMore} />
+                    : issuesTrees?.map((issueTree) => (
+                          <IssuePreview
+                              key={issueTree.id}
+                              data={issueTree}
+                              onShowMore={onShowMore}
+                          />
                       ))}
             </div>
         );

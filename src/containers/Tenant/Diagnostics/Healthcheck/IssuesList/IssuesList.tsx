@@ -4,7 +4,7 @@ import {Button, Icon} from '@gravity-ui/uikit';
 
 import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
-import type {IHealthCheck} from '../../../../../types/store/healthcheck';
+import type {IIssuesTree} from '../../../../../types/store/healthcheck';
 
 import IssuesViewer from '../IssuesViewer/IssuesViewer';
 
@@ -13,16 +13,15 @@ import i18n from '../i18n';
 const b = cn('healthcheck');
 
 interface IssuesListProps {
-    data?: IHealthCheck;
+    issue?: IIssuesTree;
     loading?: boolean;
-    expandedIssueId?: string;
     onUpdate: VoidFunction;
 }
 
 export const IssuesList = (props: IssuesListProps) => {
-    const {data, loading, onUpdate, expandedIssueId} = props;
+    const {loading, onUpdate, issue} = props;
 
-    if (!data) {
+    if (!issue) {
         return null;
     }
 
@@ -40,15 +39,9 @@ export const IssuesList = (props: IssuesListProps) => {
     };
 
     const renderHealthcheckIssues = () => {
-        const {issue_log: issueLog} = data;
-
-        if (!issueLog) {
-            return null;
-        }
-
         return (
             <div className={b('issues')}>
-                <IssuesViewer issues={issueLog} expandedIssueId={expandedIssueId} />
+                <IssuesViewer issue={issue} />
             </div>
         );
     };

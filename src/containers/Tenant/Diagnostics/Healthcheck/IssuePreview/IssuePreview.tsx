@@ -27,9 +27,7 @@ export const IssuePreview = (props: IssuePreviewProps) => {
             <Text as="div" color="secondary" variant="body-2">
                 {data.message}
             </Text>
-            <Link onClick={() => onShowMore && onShowMore(data.id)}>
-                {i18n('label.show-details')}
-            </Link>
+            <Link onClick={() => onShowMore?.(data.id)}>{i18n('label.show-details')}</Link>
         </div>
     );
 };
