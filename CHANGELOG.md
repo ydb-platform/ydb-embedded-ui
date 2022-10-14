@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.1.0...v2.2.0) (2022-10-14)
+
+
+### Features
+
+* **Healthcheck:** rework issues list in modal ([e7cb0df](https://github.com/ydb-platform/ydb-embedded-ui/commit/e7cb0df58e22c8c9cd25aae83b78be4808e9ba81))
+
+
+### Bug Fixes
+
+* **EntityStatus:** enable component to left trim links ([fbc6c51](https://github.com/ydb-platform/ydb-embedded-ui/commit/fbc6c51f9fbea3c1a7f5f70cb542971a41f4d8b3))
+* fix pre-commit prettier linting and add json linting ([#189](https://github.com/ydb-platform/ydb-embedded-ui/issues/189)) ([047415d](https://github.com/ydb-platform/ydb-embedded-ui/commit/047415d2d69ecf4a2d99f0092b9e6735bd8efbc0))
+* **Healthcheck:** delete unneeded i18n translations ([0c6de90](https://github.com/ydb-platform/ydb-embedded-ui/commit/0c6de9031607e4cde1387387393a9cfc9e1e2b8f))
+* **Healthcheck:** enable update button in modal to fetch data ([de0b06e](https://github.com/ydb-platform/ydb-embedded-ui/commit/de0b06e7f2d3536df1b3896cbf86a947b2e7a291))
+* **Healthcheck:** fix layout shift on scrollbar appearance ([ccdde6e](https://github.com/ydb-platform/ydb-embedded-ui/commit/ccdde6e065abbdb1c22a2c3bdd17e63f706d0f77))
+* **Healthcheck:** fix styles for long issues trees ([32f1a8d](https://github.com/ydb-platform/ydb-embedded-ui/commit/32f1a8db58d9f84073327b92dcd80a5b4626a526))
+* **Healthcheck:** fix variable typo ([0f0e056](https://github.com/ydb-platform/ydb-embedded-ui/commit/0f0e056576b9ec18fc3ce574d3742d55e5da6e35))
+* **Healthcheck:** full check status in a preview ([bc0b51e](https://github.com/ydb-platform/ydb-embedded-ui/commit/bc0b51eedd4ff3b4ae1650946832f463a6703c12))
+* **Healthcheck:** make modal show only one first level issue ([cdc95a7](https://github.com/ydb-platform/ydb-embedded-ui/commit/cdc95a7412c1266d990df7e2807630a8f4c88780))
+* **Healthcheck:** redesign healthcheck header ([867f57a](https://github.com/ydb-platform/ydb-embedded-ui/commit/867f57aed84b7b72c22a816c6ac02387490ff495))
+* **Healthcheck:** replace update button with icon ([709a994](https://github.com/ydb-platform/ydb-embedded-ui/commit/709a994544f068db1b0fe09009ecb4d8db46fc38))
+* **Healthcheck:** update styles to be closer to the design ([aa1083d](https://github.com/ydb-platform/ydb-embedded-ui/commit/aa1083d299e24590336eeb3d913a9c53fd77bad6))
+* **Nodes:** case insensitive search ([11d2c98](https://github.com/ydb-platform/ydb-embedded-ui/commit/11d2c985e0c30bb74ed07e22273d8b3459b54c89))
+* **QueryEditor:** smarter error message trim ([8632948](https://github.com/ydb-platform/ydb-embedded-ui/commit/863294828090dc8eb2595884283d0996156c3785))
+* **Tenants:** case insensitive search ([0ad93f5](https://github.com/ydb-platform/ydb-embedded-ui/commit/0ad93f57dcbba7d9746be54a4ba7b76ab4d45108))
+* **Tenants:** fix filtering by ControlPlane name ([4941c82](https://github.com/ydb-platform/ydb-embedded-ui/commit/4941c821cdbb7c5d0da26a3b0d5c00d8979401c0))
+* **Tenants:** left trim db names in db list ([81bf0fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/81bf0fafe901d3601dc04fdf71939e914493ff1c))
+
 ## [2.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.0.0...v2.1.0) (2022-10-04)
 
 
