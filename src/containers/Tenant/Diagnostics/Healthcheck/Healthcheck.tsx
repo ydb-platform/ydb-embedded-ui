@@ -4,7 +4,12 @@ import cn from 'bem-cn-lite';
 
 import {Loader} from '@gravity-ui/uikit';
 
-import {getHealthcheckInfo} from '../../../../store/reducers/healthcheckInfo';
+import {SelfCheckResult} from '../../../../types/api/healthcheck';
+import {
+    getHealthcheckInfo,
+    selectInvertedIssuesConsequenceTrees,
+    selectIssueConsequenceById,
+} from '../../../../store/reducers/healthcheckInfo';
 import {useAutofetcher} from '../../../../utils/hooks';
 
 import {IssuesList} from './IssuesList';
@@ -29,6 +34,13 @@ export const Healthcheck = (props: HealthcheckProps) => {
     const dispatch = useDispatch();
 
     const {data, loading, wasLoaded, error} = useSelector((state: any) => state.healthcheckInfo);
+    const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
+
+    const issuesTrees = useSelector(selectInvertedIssuesConsequenceTrees);
+    const expandedIssueConsequence = useSelector((state) =>
+        selectIssueConsequenceById(state, expandedIssueId),
+    );
+
     const {autorefresh} = useSelector((state: any) => state.schema);
 
     const fetchHealthcheck = useCallback(() => {
@@ -61,15 +73,15 @@ export const Healthcheck = (props: HealthcheckProps) => {
         if (data && data['self_check_result']) {
             return preview ? (
                 <Preview
-                    data={data}
+                    issuesTrees={issuesTrees}
+                    selfCheckResult={selfCheckResult}
                     loading={loading}
                     onShowMore={showMoreHandler}
                     onUpdate={fetchHealthcheck}
                 />
             ) : (
                 <IssuesList
-                    data={data}
-                    expandedIssueId={expandedIssueId}
+                    issue={expandedIssueConsequence}
                     loading={loading}
                     onUpdate={fetchHealthcheck}
                 />
