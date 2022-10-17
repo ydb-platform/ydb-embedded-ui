@@ -1,19 +1,27 @@
 import {useCallback, useState} from 'react';
 import cn from 'bem-cn-lite';
-import JSONTree from 'react-json-inspector';
 import _ from 'lodash';
+
+// @ts-ignore
+import JSONTree from 'react-json-inspector';
 
 import {TreeView} from 'ydb-ui-components';
 
+import {IIssuesTree} from '../../../../../types/store/healthcheck';
 import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 
 import './IssueViewer.scss';
 
 const issueBlock = cn('issue');
 
-const IssueRow = ({data, onClick}) => {
-    const {status, message, type} = data;
+interface IssueRowProps {
+    status: string;
+    message: string;
+    type: string;
+    onClick?: VoidFunction;
+}
 
+const IssueRow = ({status, message, type, onClick}: IssueRowProps) => {
     return (
         <div className={issueBlock()} onClick={onClick}>
             <div className={issueBlock('field', {status: true})}>
@@ -26,16 +34,18 @@ const IssueRow = ({data, onClick}) => {
 
 const issueViewerBlock = cn('issue-viewer');
 
-const IssuesViewer = ({issue}) => {
-    const [collapsedIssues, setCollapsedIssues] = useState({});
+interface IssuesViewerProps {
+    issue: IIssuesTree;
+}
+
+const IssuesViewer = ({issue}: IssuesViewerProps) => {
+    const [collapsedIssues, setCollapsedIssues] = useState<Record<string, boolean>>({});
 
     const renderTree = useCallback(
-        (data, childrenKey) => {
+        (data) => {
             return _.map(data, (item) => {
                 const {id} = item;
-
-                // eslint-disable-next-line no-unused-vars
-                const {status, message, type, reasonsItems, reason, level, ...rest} = item;
+                const {status, message, type, reasonsItems, level, ...rest} = item;
 
                 const isCollapsed =
                     typeof collapsedIssues[id] === 'undefined' || collapsedIssues[id];
@@ -50,15 +60,15 @@ const IssuesViewer = ({issue}) => {
                 return (
                     <TreeView
                         key={id}
-                        name={<IssueRow data={item} />}
+                        name={<IssueRow status={status} message={message} type={type} />}
                         collapsed={isCollapsed}
                         hasArrow={true}
                         onClick={toggleCollapsed}
                         onArrowClick={toggleCollapsed}
                         level={level - 1}
                     >
-                        {renderInfoPanel(rest)}
-                        {renderTree(item[childrenKey], childrenKey)}
+                        {renderInfoPanel(_.omit(rest, ['reason']))}
+                        {renderTree(reasonsItems)}
                     </TreeView>
                 );
             });
@@ -88,7 +98,7 @@ const IssuesViewer = ({issue}) => {
 
     return (
         <div className={issueViewerBlock()}>
-            <div className={issueViewerBlock('tree')}>{renderTree([issue], 'reasonsItems')}</div>
+            <div className={issueViewerBlock('tree')}>{renderTree([issue])}</div>
         </div>
     );
 };
