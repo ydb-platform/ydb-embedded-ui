@@ -38,7 +38,7 @@ export const Healthcheck = (props: HealthcheckProps) => {
 
     const issuesTrees = useSelector(selectInvertedIssuesConsequenceTrees);
     const expandedIssueConsequence = useSelector((state) =>
-        selectIssueConsequenceById(state, expandedIssueId),
+        selectIssueConsequenceById(state, expandedIssueId || ''),
     );
 
     const {autorefresh} = useSelector((state: any) => state.schema);

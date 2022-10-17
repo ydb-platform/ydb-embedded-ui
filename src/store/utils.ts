@@ -7,7 +7,10 @@ import {SET_UNAUTHENTICATED} from './reducers/authentication';
 
 export const nop = (result: any) => result;
 
-export function createRequestActionTypes<Prefix extends string, Type extends string>(prefix: Prefix, type: Type) {
+export function createRequestActionTypes<Prefix extends string, Type extends string>(
+    prefix: Prefix,
+    type: Type,
+) {
     return {
         REQUEST: `${prefix}/${type}_REQUEST`,
         SUCCESS: `${prefix}/${type}_SUCCESS`,
@@ -15,19 +18,24 @@ export function createRequestActionTypes<Prefix extends string, Type extends str
     } as const;
 }
 
-const isAxiosResponse = (response: any): response is AxiosResponse => response && 'status' in response;
+const isAxiosResponse = (response: any): response is AxiosResponse =>
+    response && 'status' in response;
 
 type CreateApiRequestParams<Actions, Response, HandledResponse> = {
     actions: Actions;
     request: Promise<Response>;
-    dataHandler: (data: Response, getState?: () => any) => HandledResponse;
+    dataHandler?: (data: Response, getState?: () => any) => HandledResponse;
 };
 
 export function createApiRequest<
     Actions extends ReturnType<typeof createRequestActionTypes>,
     Response,
     HandledResponse,
->({actions, request, dataHandler = nop}: CreateApiRequestParams<Actions, Response, HandledResponse>) {
+>({
+    actions,
+    request,
+    dataHandler = nop,
+}: CreateApiRequestParams<Actions, Response, HandledResponse>) {
     const doRequest = async function (dispatch: Dispatch, getState: () => any) {
         dispatch({
             type: actions.REQUEST,
@@ -73,16 +81,16 @@ export function createApiRequest<
 export type ApiRequestAction<
     Actions extends ReturnType<typeof createRequestActionTypes>,
     SuccessResponse = unknown,
-    ErrorResponse = unknown
+    ErrorResponse = unknown,
 > =
     | {
-        type: Actions['REQUEST'],
-    }
+          type: Actions['REQUEST'];
+      }
     | {
-        type: Actions['SUCCESS'],
-        data: SuccessResponse,
-    }
+          type: Actions['SUCCESS'];
+          data: SuccessResponse;
+      }
     | {
-        type: Actions['FAILURE'],
-        error: ErrorResponse,
-    };
+          type: Actions['FAILURE'];
+          error: ErrorResponse;
+      };
