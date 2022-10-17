@@ -5,14 +5,20 @@ import _sortBy from 'lodash/fp/sortBy';
 import _uniqBy from 'lodash/fp/uniqBy';
 import {createSelector} from 'reselect';
 
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import {IIssuesTree} from '../../types/store/healthcheck';
+import {HealthCheckAPIResponse, IssueLog, StatusFlag} from '../../types/api/healthcheck';
+
 import '../../services/api';
+import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
 
 const FETCH_HEALTHCHECK = createRequestActionTypes('cluster', 'FETCH_HEALTHCHECK');
 
 const initialState = {loading: false, wasLoaded: false};
 
-const healthcheckInfo = function (state = initialState, action) {
+const healthcheckInfo = function (
+    state = initialState,
+    action: ApiRequestAction<typeof FETCH_HEALTHCHECK, HealthCheckAPIResponse, unknown>,
+) {
     switch (action.type) {
         case FETCH_HEALTHCHECK.REQUEST: {
             return {
@@ -43,7 +49,7 @@ const healthcheckInfo = function (state = initialState, action) {
     }
 };
 
-const mapStatusToPriority = {
+const mapStatusToPriority: Partial<Record<StatusFlag, number>> = {
     RED: 0,
     ORANGE: 1,
     YELLOW: 2,
@@ -51,22 +57,31 @@ const mapStatusToPriority = {
     GREEN: 4,
 };
 
-const getReasonsForIssue = ({issue, data}) => {
-    return _.filter(data, (item) => issue.reason && issue.reason.indexOf(item.id) !== -1);
+const getReasonsForIssue = ({issue, data}: {issue: IssueLog; data: IssueLog[]}) => {
+    return _.filter(
+        data,
+        (item) => issue.reason && issue.reason.indexOf(item.id) !== -1,
+    ) as IssueLog[];
 };
 
-const getInvertedConsequencesTree = ({data, roots: receivedRoots}) => {
+const getInvertedConsequencesTree = ({
+    data,
+    roots: receivedRoots,
+}: {
+    data: IssueLog[];
+    roots?: IssueLog[];
+}): IIssuesTree[] => {
     let roots = receivedRoots;
     if (!roots && data) {
         roots = _flow([
-            _filter((item) => {
+            _filter((item: IssueLog) => {
                 return !_.find(
                     data,
                     (issue) => issue.reason && issue.reason.indexOf(item.id) !== -1,
                 );
             }),
-            _uniqBy((item) => item.id),
-            _sortBy(({status}) => mapStatusToPriority[status]),
+            _uniqBy((item: IssueLog) => item.id),
+            _sortBy(({status}: {status: StatusFlag}) => mapStatusToPriority[status]),
         ])(data);
     }
 
@@ -83,18 +98,21 @@ const getInvertedConsequencesTree = ({data, roots: receivedRoots}) => {
     });
 };
 
-const getIssuesLog = (state) => state.healthcheckInfo.data?.issue_log;
+const getIssuesLog = (state: any) => state.healthcheckInfo.data?.issue_log;
 
-export const selectInvertedIssuesConsequenceTrees = createSelector(getIssuesLog, (issueLog) => {
-    return getInvertedConsequencesTree({data: issueLog});
-});
-
-export const selectIssueConsequenceById = createSelector(
-    [selectInvertedIssuesConsequenceTrees, (state, id) => id],
-    (issueTree, id) => issueTree.filter((issue) => issue.id === id)[0],
+export const selectInvertedIssuesConsequenceTrees = createSelector(
+    getIssuesLog,
+    (issueLog: IssueLog[]) => {
+        return getInvertedConsequencesTree({data: issueLog});
+    },
 );
 
-export function getHealthcheckInfo(database) {
+export const selectIssueConsequenceById = createSelector(
+    [selectInvertedIssuesConsequenceTrees, (_: any, id: string) => id],
+    (issueTree, id) => issueTree.filter((issue: IIssuesTree) => issue.id === id)[0],
+);
+
+export function getHealthcheckInfo(database: string) {
     return createApiRequest({
         request: window.api.getHealthcheckInfo(database),
         actions: FETCH_HEALTHCHECK,

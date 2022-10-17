@@ -6,7 +6,7 @@ export enum SelfCheckResult {
     EMERGENCY = 'EMERGENCY',
 }
 
-enum StatusFlag {
+export enum StatusFlag {
     UNSPECIFIED = 'UNSPECIFIED',
     GREY = 'GREY',
     GREEN = 'GREEN',
