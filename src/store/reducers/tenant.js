@@ -6,7 +6,7 @@ const FETCH_TENANT = createRequestActionTypes('tenant', 'FETCH_TENANT');
 const SET_TOP_LEVEL_TAB = 'tenant/SET_TOP_LEVEL_TAB';
 const SET_DIAGNOSTICS_TAB = 'tenant/SET_DIAGNOSTICS_TAB';
 
-const tenantReducer = (state = {loading: false, tenant: {}}, action) => {
+const tenantReducer = (state = {loading: false, wasLoaded: false, tenant: {}}, action) => {
     switch (action.type) {
         case FETCH_TENANT.REQUEST: {
             return {
@@ -23,6 +23,7 @@ const tenantReducer = (state = {loading: false, tenant: {}}, action) => {
                 tenant,
                 tenantNodes,
                 loading: false,
+                wasLoaded: true,
                 error: undefined,
             };
         }
@@ -32,6 +33,7 @@ const tenantReducer = (state = {loading: false, tenant: {}}, action) => {
                 ...state,
                 data: action.error,
                 loading: false,
+                wasLoaded: true,
             };
         }
 
