@@ -15,9 +15,12 @@ import {
 import {EPathType} from '../../../../types/api/schema';
 import {isColumnEntityType, isTableType} from '../../utils/schema';
 //@ts-ignore
-import {getSchema} from '../../../../store/reducers/schema';
+import {getSchema, resetLoadingState} from '../../../../store/reducers/schema';
 //@ts-ignore
-import {getOlapStats} from '../../../../store/reducers/olapStats';
+import {
+    getOlapStats,
+    resetLoadingState as resetOlapLoadingState,
+} from '../../../../store/reducers/olapStats';
 import {useAutofetcher} from '../../../../utils/hooks';
 
 import './Overview.scss';
@@ -64,22 +67,30 @@ function Overview(props: OverviewProps) {
 
     const {
         currentSchema: currentItem = {},
-        loading,
+        loading: schemaLoading,
         wasLoaded,
         autorefresh,
         currentSchemaPath,
     } = useSelector((state: any) => state.schema);
 
-    const {data: {result: olapStats} = {result: undefined}} = useSelector(
-        (state: any) => state.olapStats,
-    );
+    const {data: {result: olapStats} = {result: undefined}, loading: olapStatsLoading} =
+        useSelector((state: any) => state.olapStats);
+
+    const loading = schemaLoading || olapStatsLoading;
 
     useAutofetcher(
-        () => {
+        (isBackground) => {
+            if (!isBackground) {
+                dispatch(resetLoadingState());
+            }
+
             const schemaPath = currentSchemaPath || tenantName;
             dispatch(getSchema({path: schemaPath}));
 
             if (isTableType(type) && isColumnEntityType(type)) {
+                if (!isBackground) {
+                    dispatch(resetOlapLoadingState());
+                }
                 dispatch(getOlapStats({path: schemaPath}));
             }
         },

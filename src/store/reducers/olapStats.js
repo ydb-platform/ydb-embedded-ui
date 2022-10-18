@@ -6,6 +6,7 @@ import {createRequestActionTypes, createApiRequest} from '../utils';
 
 const FETCH_OLAP_STATS = createRequestActionTypes('query', 'SEND_OLAP_STATS_QUERY');
 const SET_OLAP_STATS_OPTIONS = createRequestActionTypes('query', 'SET_OLAP_STATS_OPTIONS');
+const RESET_LOADING_STATE = 'olapStats/RESET_LOADING_STATE';
 
 const initialState = {
     loading: false,
@@ -48,6 +49,12 @@ const olapStats = (state = initialState, action) => {
                 ...state,
                 ...action.data,
             };
+        case RESET_LOADING_STATE: {
+            return {
+                ...state,
+                wasLoaded: initialState.wasLoaded,
+            };
+        }
         default:
             return state;
     }
@@ -70,6 +77,12 @@ export function setOlapStatsOptions(options) {
     return {
         type: SET_OLAP_STATS_OPTIONS,
         data: options,
+    };
+}
+
+export function resetLoadingState() {
+    return {
+        type: RESET_LOADING_STATE,
     };
 }
 
