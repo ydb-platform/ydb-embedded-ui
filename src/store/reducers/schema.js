@@ -2,6 +2,7 @@ import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
 
 const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
+const PRELOAD_SCHEMA = 'schema/PRELOAD_SCHEMA';
 const SET_SCHEMA = 'schema/SET_SCHEMA';
 const SET_SHOW_PREVIEW = 'schema/SET_SHOW_PREVIEW';
 const ENABLE_AUTOREFRESH = 'schema/ENABLE_AUTOREFRESH';
@@ -46,6 +47,19 @@ const schema = function z(state = initialState, action) {
                 ...state,
                 error: action.error,
                 loading: false,
+            };
+        }
+        case PRELOAD_SCHEMA: {
+            if (state.data[action.path]) {
+                return state;
+            }
+
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    [action.path]: action.data,
+                },
             };
         }
         case SET_SCHEMA: {
@@ -106,4 +120,14 @@ export function setShowPreview(value) {
         data: value,
     };
 }
+
+// only stores the passed data if the path doesn't exist yet
+export function preloadSchema(path, data) {
+    return {
+        type: PRELOAD_SCHEMA,
+        path,
+        data,
+    };
+}
+
 export default schema;

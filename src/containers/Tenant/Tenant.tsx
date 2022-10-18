@@ -57,6 +57,10 @@ function Tenant(props: TenantProps) {
         (state: any) => state.schema,
     );
 
+    const {PathType: preloadedPathType, PathSubType: preloadedPathSubType} = useSelector(
+        (state: any) => state.schema.data[currentSchemaPath]?.PathDescription?.Self || {},
+    );
+
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
         (currentItem as TEvDescribeSchemeResult).PathDescription?.Self || {};
 
@@ -142,15 +146,15 @@ function Tenant(props: TenantProps) {
                             onSplitStartDragAdditional={onSplitStartDragAdditional}
                         >
                             <ObjectSummary
-                                type={currentPathType}
-                                subType={currentPathSubType}
+                                type={preloadedPathType || currentPathType}
+                                subType={preloadedPathSubType || currentPathSubType}
                                 onCollapseSummary={onCollapseSummaryHandler}
                                 onExpandSummary={onExpandSummaryHandler}
                                 isCollapsed={summaryVisibilityState.collapsed}
                                 additionalTenantInfo={props.additionalTenantInfo}
                             />
                             <ObjectGeneral
-                                type={currentPathType}
+                                type={preloadedPathType || currentPathType}
                                 additionalTenantInfo={props.additionalTenantInfo}
                                 additionalNodesInfo={props.additionalNodesInfo}
                             />
