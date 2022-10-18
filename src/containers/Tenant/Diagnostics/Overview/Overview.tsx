@@ -70,18 +70,22 @@ function Overview(props: OverviewProps) {
         currentSchemaPath,
     } = useSelector((state: any) => state.schema);
 
-    const {
-        data: { result: olapStats } = { result: undefined },
-    } = useSelector((state: any) => state.olapStats);
+    const {data: {result: olapStats} = {result: undefined}} = useSelector(
+        (state: any) => state.olapStats,
+    );
 
-    useAutofetcher(() => {
-        const schemaPath = currentSchemaPath || tenantName;
-        dispatch(getSchema({path: schemaPath}));
+    useAutofetcher(
+        () => {
+            const schemaPath = currentSchemaPath || tenantName;
+            dispatch(getSchema({path: schemaPath}));
 
-        if (isTableType(type) && isColumnEntityType(type)) {
-            dispatch(getOlapStats({path: schemaPath}));
-        }
-    }, [currentSchemaPath, dispatch, tenantName, type], autorefresh);
+            if (isTableType(type) && isColumnEntityType(type)) {
+                dispatch(getOlapStats({path: schemaPath}));
+            }
+        },
+        [currentSchemaPath, dispatch, tenantName, type],
+        autorefresh,
+    );
 
     const tableSchema =
         currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
@@ -116,17 +120,17 @@ function Overview(props: OverviewProps) {
             [EPathType.EPathTypePersQueueGroup]: () => <PersQueueGroupInfo data={schemaData} />,
         };
 
-        return (type && pathTypeToComponent[type]?.()) || (
-            <SchemaInfoViewer fullPath={currentItem.Path} data={schemaData} />
+        return (
+            (type && pathTypeToComponent[type]?.()) || (
+                <SchemaInfoViewer fullPath={currentItem.Path} data={schemaData} />
+            )
         );
-    }
+    };
 
     return loading && !wasLoaded ? (
         renderLoader()
     ) : (
-        <div className={props.className}>
-            {renderContent()}
-        </div>
+        <div className={props.className}>{renderContent()}</div>
     );
 }
 
