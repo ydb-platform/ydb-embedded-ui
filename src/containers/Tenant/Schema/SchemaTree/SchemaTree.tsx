@@ -19,28 +19,22 @@ interface SchemaTreeProps {
 }
 
 export function SchemaTree(props: SchemaTreeProps) {
-    const {
-        rootPath,
-        rootName,
-        rootType,
-        currentPath,
-    } = props;
+    const {rootPath, rootName, rootType, currentPath} = props;
 
     const dispatch = useDispatch();
 
-    const fetchPath = (path: string) => window.api.getSchema(
-        {path},
-        {concurrentId: `NavigationTree.getSchema|${path}`},
-    )
-        .then(({PathDescription: {Children = []} = {}}) => {
-            return Children.map(({Name = '', PathType, PathSubType}) => ({
-                name: Name,
-                type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
-                // FIXME: should only be explicitly set to true for tables with indexes
-                // at the moment of writing there is no property to determine this, fix later
-                expandable: true,
-            }));
-        });
+    const fetchPath = (path: string) =>
+        window.api
+            .getSchema({path}, {concurrentId: `NavigationTree.getSchema|${path}`})
+            .then(({PathDescription: {Children = []} = {}}) => {
+                return Children.map(({Name = '', PathType, PathSubType}) => ({
+                    name: Name,
+                    type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
+                    // FIXME: should only be explicitly set to true for tables with indexes
+                    // at the moment of writing there is no property to determine this, fix later
+                    expandable: true,
+                }));
+            });
 
     const handleActivePathUpdate = (activePath: string) => {
         dispatch(setCurrentSchemaPath(activePath));
