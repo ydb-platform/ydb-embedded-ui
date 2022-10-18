@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {useLocation} from 'react-router';
 
-import {Switch, Tabs} from '@gravity-ui/uikit';
+import {Loader, Switch, Tabs} from '@gravity-ui/uikit';
 
 //@ts-ignore
 import TopQueries from './TopQueries/TopQueries';
@@ -53,9 +53,9 @@ function Diagnostics(props: DiagnosticsProps) {
         currentSchema: currentItem = {},
         autorefresh,
     } = useSelector((state: any) => state.schema);
-    const {
-        diagnosticsTab = GeneralPagesIds.overview,
-    } = useSelector((state: any) => state.tenant);
+    const {diagnosticsTab = GeneralPagesIds.overview, wasLoaded} = useSelector(
+        (state: any) => state.tenant,
+    );
 
     const location = useLocation();
 
@@ -79,14 +79,17 @@ function Diagnostics(props: DiagnosticsProps) {
         dispatch(setDiagnosticsTab(tab));
     };
     const activeTab = useMemo(() => {
-        if (pages.find((el) => el.id === diagnosticsTab)) {
-            return diagnosticsTab;
-        } else {
-            const newPage = pages[0].id;
-            forwardToDiagnosticTab(newPage);
-            return newPage;
+        if (wasLoaded) {
+            if (pages.find((el) => el.id === diagnosticsTab)) {
+                return diagnosticsTab;
+            } else {
+                const newPage = pages[0].id;
+                forwardToDiagnosticTab(newPage);
+                return newPage;
+            }
         }
-    }, [pages, diagnosticsTab]);
+        return undefined;
+    }, [pages, diagnosticsTab, wasLoaded]);
 
     const onAutorefreshToggle = (value: boolean) => {
         if (value) {
@@ -184,6 +187,17 @@ function Diagnostics(props: DiagnosticsProps) {
             </div>
         );
     };
+
+    // Loader prevents incorrect loading of tabs
+    // After tabs are initially loaded it is no longer needed
+    // Thus there is no also "loading" check as in other parts of the project
+    if (!wasLoaded) {
+        return (
+            <div className={b('loader')}>
+                <Loader size="l" />
+            </div>
+        );
+    }
 
     return (
         <div className={b()}>

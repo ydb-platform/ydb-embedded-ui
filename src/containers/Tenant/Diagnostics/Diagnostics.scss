@@ -5,6 +5,13 @@
 
     height: 100%;
 
+    &__loader {
+        display: flex;
+        flex-grow: 1;
+        justify-content: center;
+        align-items: center;
+    }
+
     &__header-wrapper {
         padding: 13px 20px 16px;
 
