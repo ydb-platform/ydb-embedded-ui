@@ -7,6 +7,7 @@ const SET_SCHEMA = 'schema/SET_SCHEMA';
 const SET_SHOW_PREVIEW = 'schema/SET_SHOW_PREVIEW';
 const ENABLE_AUTOREFRESH = 'schema/ENABLE_AUTOREFRESH';
 const DISABLE_AUTOREFRESH = 'schema/DISABLE_AUTOREFRESH';
+const RESET_LOADING_STATE = 'schema/RESET_LOADING_STATE';
 
 export const initialState = {
     loading: true,
@@ -43,6 +44,10 @@ const schema = function z(state = initialState, action) {
             };
         }
         case FETCH_SCHEMA.FAILURE: {
+            if (action.error.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error,
@@ -66,6 +71,7 @@ const schema = function z(state = initialState, action) {
             return {
                 ...state,
                 currentSchemaPath: action.data,
+                wasLoaded: false,
             };
         }
         case ENABLE_AUTOREFRESH: {
@@ -84,6 +90,12 @@ const schema = function z(state = initialState, action) {
             return {
                 ...state,
                 showPreview: action.data,
+            };
+        }
+        case RESET_LOADING_STATE: {
+            return {
+                ...state,
+                wasLoaded: initialState.wasLoaded,
             };
         }
         default:
@@ -127,6 +139,12 @@ export function preloadSchema(path, data) {
         type: PRELOAD_SCHEMA,
         path,
         data,
+    };
+}
+
+export function resetLoadingState() {
+    return {
+        type: RESET_LOADING_STATE,
     };
 }
 

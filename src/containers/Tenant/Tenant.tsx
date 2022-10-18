@@ -16,7 +16,7 @@ import SplitPane from '../../components/SplitPane';
 //@ts-ignore
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 //@ts-ignore
-import {disableAutorefresh, getSchema} from '../../store/reducers/schema';
+import {disableAutorefresh, getSchema, resetLoadingState} from '../../store/reducers/schema';
 //@ts-ignore
 import {getSchemaAcl} from '../../store/reducers/schemaAcl';
 import {
@@ -80,6 +80,7 @@ function Tenant(props: TenantProps) {
 
     useEffect(() => {
         const schemaPath = currentSchemaPath || tenantName;
+        dispatch(resetLoadingState());
         dispatch(getSchema({path: tenantName}));
         dispatch(getSchema({path: schemaPath}));
         dispatch(getSchemaAcl({path: schemaPath}));
