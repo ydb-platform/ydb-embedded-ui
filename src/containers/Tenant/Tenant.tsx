@@ -57,6 +57,9 @@ function Tenant(props: TenantProps) {
         (state: any) => state.schema,
     );
 
+    const {PathType: currentPathType, PathSubType: currentPathSubType} =
+        (currentItem as TEvDescribeSchemeResult).PathDescription?.Self || {};
+
     const {data: {status: tenantStatus = 200} = {}} = useSelector((state: any) => state.tenant);
     const {error: {status: schemaStatus = 200} = {}} = useSelector((state: any) => state.schema);
 
@@ -104,11 +107,6 @@ function Tenant(props: TenantProps) {
             dispatch(clearTenant());
         };
     }, [tenantName, dispatch]);
-
-    const {
-        PathType: currentPathType,
-        PathSubType: currentPathSubType,
-    } = (currentItem as TEvDescribeSchemeResult).PathDescription?.Self || {};
 
     const onCollapseSummaryHandler = () => {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
