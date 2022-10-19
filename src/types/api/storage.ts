@@ -191,6 +191,7 @@ export interface TBSGroupStateInfo {
     ReadThroughput?: string;
     /** uint64 */
     WriteThroughput?: string;
+    Encryption?: boolean;
 }
 
 interface THiveStorageGroupStats {
