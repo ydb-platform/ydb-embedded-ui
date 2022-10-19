@@ -1,8 +1,11 @@
 .pdisk-storage {
+    position: relative;
+
     display: flex;
     flex-grow: 1;
     align-items: center;
 
+    min-width: 120px;
     max-width: 200px;
     margin-right: 10px;
 
@@ -14,5 +17,14 @@
 
     &__popup-wrapper {
         padding: 12px;
+    }
+
+    &__media-type {
+        position: absolute;
+        right: 4px;
+
+        font-size: var(--yc-text-body-1-font-size);
+
+        color: var(--yc-color-text-secondary);
     }
 }
