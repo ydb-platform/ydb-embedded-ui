@@ -4,6 +4,7 @@ import _ from 'lodash';
 import {createSelector} from 'reselect';
 import {calcUptime} from '../../utils';
 import {getUsage} from '../../utils/storage';
+import {getPDiskType} from '../../utils/pdisk';
 
 export const VisibleEntities = {
     All: 'All',
@@ -229,6 +230,10 @@ export const getFlatListStorageGroups = createSelector([getStoragePools], (stora
                         },
                         0,
                     );
+                    const mediaType = group.VDisks?.reduce((type, vdisk) => {
+                        const currentType = getPDiskType(vdisk.PDisk || {});
+                        return currentType && (currentType === type || type === '') ? currentType : 'Mixed';
+                    }, '');
                     return [
                         ...acc,
                         {
@@ -240,6 +245,7 @@ export const getFlatListStorageGroups = createSelector([getStoragePools], (stora
                             Limit: limitSizeBytes,
                             Missing: missing,
                             UsedSpaceFlag,
+                            Type: mediaType || null,
                         },
                     ];
                 },

@@ -25,6 +25,7 @@ import './StorageGroups.scss';
 
 enum TableColumnsIds {
     PoolName = 'PoolName',
+    Type = 'Type',
     GroupID = 'GroupID',
     Used = 'Used',
     Limit = 'Limit',
@@ -49,6 +50,7 @@ interface StorageGroupsProps {
 
 const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
     PoolName: 'Pool Name',
+    Type: 'Type',
     GroupID: 'Group ID',
     Used: 'Used',
     Limit: 'Limit',
@@ -113,6 +115,11 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes, onShowAll}:
                 );
             },
             align: DataTable.LEFT,
+        },
+        {
+            name: TableColumnsIds.Type,
+            header: tableColumnsNames[TableColumnsIds.Type],
+            render: ({value}) => <Label>{value as string || '—'}</Label>,
         },
         {
             name: TableColumnsIds.Missing,
