@@ -123,8 +123,9 @@ function Pdisk(props: PDiskProps) {
         const {AvailableSize, TotalSize} = props;
 
         if (!AvailableSize || !TotalSize) {
-            return;
+            return undefined;
         }
+
         return !isNaN(Number(AvailableSize)) && !isNaN(Number(TotalSize))
             ? Math.round(((Number(TotalSize) - Number(AvailableSize)) * 100) / Number(TotalSize))
             : undefined;
@@ -143,6 +144,7 @@ function Pdisk(props: PDiskProps) {
                         {pdiskId: props.PDiskId || ''},
                     )}
                 />
+                <div className={b('media-type')}>{getPDiskType(props)}</div>
             </div>
         </React.Fragment>
     );
