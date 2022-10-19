@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.2.0...v2.2.1) (2022-10-19)
+
+
+### Bug Fixes
+
+* revert prettier config, fix build ([c47dddf](https://github.com/ydb-platform/ydb-embedded-ui/commit/c47dddf834eadfd5642af62e0cc94f7567ec68fd))
+
 ## [2.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.1.0...v2.2.0) (2022-10-14)
 
 
