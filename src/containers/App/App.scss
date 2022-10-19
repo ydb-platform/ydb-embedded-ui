@@ -31,6 +31,10 @@ body,
     --data-table-row-height: 40px;
 }
 
+.yc-root {
+    --ydb-data-table-color-hover: var(--yc-color-base-float-hover);
+}
+
 .yc-select__label {
     font-weight: 600;
 }
@@ -130,7 +134,7 @@ body,
 }
 
 .yc-root .data-table_highlight-rows .data-table__row:hover {
-    background: var(--yc-color-base-float-hover);
+    background: var(--ydb-data-table-color-hover);
 }
 
 .yc-table-column-setup__item {
