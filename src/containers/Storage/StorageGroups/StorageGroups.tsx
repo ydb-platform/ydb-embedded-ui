@@ -1,7 +1,9 @@
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
-import {Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
+import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
+
+import shieldIcon from '../../../assets/icons/shield.svg';
 
 import {Stack} from '../../../components/Stack/Stack';
 //@ts-ignore
@@ -119,7 +121,23 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes, onShowAll}:
         {
             name: TableColumnsIds.Type,
             header: tableColumnsNames[TableColumnsIds.Type],
-            render: ({value}) => <Label>{value as string || '—'}</Label>,
+            render: ({value, row}) => (
+                <>
+                    <Label>{value as string || '—'}</Label>
+                    {' '}
+                    {row.Encryption && (
+                        <Popover
+                            content={i18n('encrypted')}
+                            placement="right"
+                            behavior={PopoverBehavior.Immediate}
+                        >
+                            <Label>
+                                <Icon data={shieldIcon} />
+                            </Label>
+                        </Popover>
+                    )}
+                </>
+            ),
         },
         {
             name: TableColumnsIds.Missing,
