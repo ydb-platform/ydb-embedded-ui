@@ -8,4 +8,5 @@ export interface IStoragePoolGroup extends TBSGroupStateInfo {
     Limit: number;
     Missing: number;
     UsedSpaceFlag: number;
+    Type: string | null;
 }
