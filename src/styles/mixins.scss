@@ -150,7 +150,7 @@
         background-color: var(--yc-color-base-background);
     }
     .data-table__row:hover .data-table__td:nth-child(#{$nth}) {
-        background-color: var(--yc-color-base-float-hover) !important;
+        background-color: var(--ydb-data-table-color-hover) !important;
     }
 }
 
