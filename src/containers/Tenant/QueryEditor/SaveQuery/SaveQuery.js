@@ -83,7 +83,7 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
                             <TextInput
                                 id="queryName"
                                 placeholder="Enter query name"
-                                text={queryName}
+                                value={queryName}
                                 onUpdate={onQueryNameChange}
                                 hasClear
                                 autoFocus

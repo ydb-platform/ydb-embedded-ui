@@ -95,7 +95,7 @@ class Tenants extends React.Component {
                 <TextInput
                     className={b('search')}
                     placeholder="Database name"
-                    text={searchQuery}
+                    value={searchQuery}
                     onUpdate={handleSearchQuery}
                     hasClear
                     autoFocus
