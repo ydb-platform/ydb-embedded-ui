@@ -1,6 +1,4 @@
-import _ from 'lodash';
 import _flow from 'lodash/fp/flow';
-import _filter from 'lodash/fp/filter';
 import _sortBy from 'lodash/fp/sortBy';
 import _uniqBy from 'lodash/fp/uniqBy';
 import {createSelector} from 'reselect';
@@ -58,10 +56,7 @@ const mapStatusToPriority: Partial<Record<StatusFlag, number>> = {
 };
 
 const getReasonsForIssue = ({issue, data}: {issue: IssueLog; data: IssueLog[]}) => {
-    return _.filter(
-        data,
-        (item) => issue.reason && issue.reason.indexOf(item.id) !== -1,
-    ) as IssueLog[];
+    return data.filter((item) => issue.reason && issue.reason.indexOf(item.id) !== -1);
 };
 
 const getInvertedConsequencesTree = ({
@@ -73,29 +68,29 @@ const getInvertedConsequencesTree = ({
 }): IIssuesTree[] => {
     let roots = receivedRoots;
     if (!roots && data) {
-        roots = _flow([
-            _filter((item: IssueLog) => {
-                return !_.find(
-                    data,
-                    (issue) => issue.reason && issue.reason.indexOf(item.id) !== -1,
-                );
-            }),
-            _uniqBy((item: IssueLog) => item.id),
-            _sortBy(({status}: {status: StatusFlag}) => mapStatusToPriority[status]),
-        ])(data);
-    }
-
-    return _.map(roots, (issue) => {
-        const reasonsItems = getInvertedConsequencesTree({
-            roots: getReasonsForIssue({issue, data}),
-            data,
+        roots = data.filter((item) => {
+            return !data.find((issue) => issue.reason && issue.reason.indexOf(item.id) !== -1);
         });
 
-        return {
-            ...issue,
-            reasonsItems,
-        };
-    });
+        roots = _flow([
+            _uniqBy((item: IssueLog) => item.id),
+            _sortBy(({status}: {status: StatusFlag}) => mapStatusToPriority[status]),
+        ])(roots);
+    }
+
+    return roots
+        ? roots.map((issue) => {
+              const reasonsItems = getInvertedConsequencesTree({
+                  roots: getReasonsForIssue({issue, data}),
+                  data,
+              });
+
+              return {
+                  ...issue,
+                  reasonsItems,
+              };
+          })
+        : [];
 };
 
 const getIssuesLog = (state: any) => state.healthcheckInfo.data?.issue_log;
@@ -109,7 +104,7 @@ export const selectInvertedIssuesConsequenceTrees = createSelector(
 
 export const selectIssueConsequenceById = createSelector(
     [selectInvertedIssuesConsequenceTrees, (_: any, id: string) => id],
-    (issueTree, id) => issueTree.filter((issue: IIssuesTree) => issue.id === id)[0],
+    (issueTree, id) => issueTree.find((issue: IIssuesTree) => issue.id === id),
 );
 
 export function getHealthcheckInfo(database: string) {

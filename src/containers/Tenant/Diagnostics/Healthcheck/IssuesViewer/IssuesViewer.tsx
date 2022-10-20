@@ -1,6 +1,6 @@
 import {useCallback, useState} from 'react';
 import cn from 'bem-cn-lite';
-import _ from 'lodash';
+import _omit from 'lodash/omit';
 
 // @ts-ignore
 import JSONTree from 'react-json-inspector';
@@ -42,8 +42,8 @@ const IssuesViewer = ({issue}: IssuesViewerProps) => {
     const [collapsedIssues, setCollapsedIssues] = useState<Record<string, boolean>>({});
 
     const renderTree = useCallback(
-        (data) => {
-            return _.map(data, (item) => {
+        (data: IIssuesTree[]) => {
+            return data.map((item) => {
                 const {id} = item;
                 const {status, message, type, reasonsItems, level, ...rest} = item;
 
@@ -67,8 +67,8 @@ const IssuesViewer = ({issue}: IssuesViewerProps) => {
                         onArrowClick={toggleCollapsed}
                         level={level - 1}
                     >
-                        {renderInfoPanel(_.omit(rest, ['reason']))}
-                        {renderTree(reasonsItems)}
+                        {renderInfoPanel(_omit(rest, ['reason']))}
+                        {renderTree(reasonsItems || [])}
                     </TreeView>
                 );
             });
