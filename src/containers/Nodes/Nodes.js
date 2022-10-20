@@ -84,7 +84,7 @@ class Nodes extends React.Component {
                 <TextInput
                     className={b('search')}
                     placeholder="Host name"
-                    text={searchQuery}
+                    value={searchQuery}
                     onUpdate={this.handleSearchQueryChange}
                     hasClear
                     autoFocus

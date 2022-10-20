@@ -103,7 +103,7 @@ class NodesViewer extends React.PureComponent {
                     className={b('search')}
                     size="s"
                     placeholder="Host name…"
-                    text={searchQuery}
+                    value={searchQuery}
                     onUpdate={handleSearchQuery}
                     hasClear
                     autoFocus
