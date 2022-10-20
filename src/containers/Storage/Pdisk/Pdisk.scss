@@ -1,18 +1,12 @@
 .pdisk-storage {
     position: relative;
 
-    display: flex;
-    flex-grow: 1;
-    align-items: center;
-
     min-width: 120px;
-    max-width: 200px;
-    margin-right: 10px;
 
-    cursor: pointer;
+    border-radius: 4px; // to match interactive area with disk shape
 
-    &:last-child {
-        margin-right: 0px;
+    &__content {
+        border-radius: 4px; // to match interactive area with disk shape
     }
 
     &__popup-wrapper {
@@ -21,6 +15,7 @@
 
     &__media-type {
         position: absolute;
+        top: 0;
         right: 4px;
 
         font-size: var(--yc-text-body-1-font-size);

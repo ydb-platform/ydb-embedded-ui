@@ -5,8 +5,6 @@ import cn from 'bem-cn-lite';
 import {INVERTED_DISKS_KEY} from '../../../utils/constants';
 import {getSettingValue} from '../../../store/reducers/settings';
 
-import InternalLink from '../../../components/InternalLink/InternalLink';
-
 import './DiskStateProgressBar.scss';
 
 const b = cn('storage-disk-progress-bar');
@@ -23,13 +21,11 @@ export const diskProgressColors = {
 interface DiskStateProgressBarProps {
     diskAllocatedPercent?: number;
     severity?: keyof typeof diskProgressColors;
-    href?: string;
 }
 
 function DiskStateProgressBar({
     diskAllocatedPercent = -1,
     severity,
-    href,
 }: DiskStateProgressBarProps) {
     const inverted = useSelector((state) => getSettingValue(state, INVERTED_DISKS_KEY));
 
@@ -63,13 +59,7 @@ function DiskStateProgressBar({
             aria-valuemax={100}
             aria-valuenow={diskAllocatedPercent}
         >
-            {href ? (
-                <InternalLink to={href} className={b('link')}>
-                    {renderAllocatedPercent()}
-                </InternalLink>
-            ) : (
-                renderAllocatedPercent()
-            )}
+            {renderAllocatedPercent()}
         </div>
     );
 }

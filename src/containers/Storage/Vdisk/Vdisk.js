@@ -1,17 +1,22 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
+
 import {Label, Popup} from '@gravity-ui/uikit';
 
-import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
+import InternalLink from '../../../components/InternalLink/InternalLink';
+import {InfoViewer} from '../../../components/InfoViewer';
+
 import routes, {createHref} from '../../../routes';
 import {stringifyVdiskId, getPDiskId} from '../../../utils';
 import {getPDiskType} from '../../../utils/pdisk';
-import {InfoViewer} from '../../../components/InfoViewer';
+import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
+
+import {STRUCTURE} from '../../Node/NodePages';
+
 import DiskStateProgressBar, {
     diskProgressColors,
 } from '../DiskStateProgressBar/DiskStateProgressBar';
-import {STRUCTURE} from '../../Node/NodePages';
 
 import {colorSeverity, NOT_AVAILABLE_SEVERITY} from '../utils';
 
@@ -225,33 +230,41 @@ function Vdisk(props) {
         const available = AvailableSize ? AvailableSize : PDisk?.AvailableSize;
 
         if (!available) {
-            return;
+            return undefined;
         }
-        return !isNaN(Number(AllocatedSize))
-            ? (Number(AllocatedSize) * 100) / (Number(available) + Number(AllocatedSize))
-            : undefined;
+
+        return isNaN(Number(AllocatedSize))
+            ? undefined
+            : (Number(AllocatedSize) * 100) / (Number(available) + Number(AllocatedSize));
     }, [props.AllocatedSize, props.AvailableSize, props.PDisk?.AvailableSize]);
 
     return (
         <React.Fragment>
             {renderPopup()}
             <div className={b()} ref={anchor} onMouseEnter={showPopup} onMouseLeave={hidePopup}>
-                <DiskStateProgressBar
-                    diskAllocatedPercent={vdiskAllocatedPercent}
-                    severity={severity}
-                    href={
-                        props.NodeId
-                            ? createHref(
-                                routes.node,
-                                {id: props.NodeId, activeTab: STRUCTURE},
-                                {
-                                    pdiskId: props.PDisk?.PDiskId,
-                                    vdiskId: stringifyVdiskId(props.VDiskId),
-                                },
-                            )
-                            : undefined
-                    }
-                />
+                {props.NodeId ? (
+                    <InternalLink
+                        to={createHref(
+                            routes.node,
+                            {id: props.NodeId, activeTab: STRUCTURE},
+                            {
+                                pdiskId: props.PDisk?.PDiskId,
+                                vdiskId: stringifyVdiskId(props.VDiskId),
+                            },
+                        )}
+                        className={b('content')}
+                    >
+                        <DiskStateProgressBar
+                            diskAllocatedPercent={vdiskAllocatedPercent}
+                            severity={severity}
+                        />
+                    </InternalLink>
+                ) : (
+                    <DiskStateProgressBar
+                        diskAllocatedPercent={vdiskAllocatedPercent}
+                        severity={severity}
+                    />
+                )}
             </div>
         </React.Fragment>
     );

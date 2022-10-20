@@ -1,18 +1,20 @@
 .storage-disk-progress-bar {
+    $block: &;
+
     $border-width: 2px;
     $outer-border-radius: 4px;
     $inner-border-radius: $outer-border-radius - $border-width;
 
-    $block: &;
     position: relative;
 
-    display: inline-block;
+    display: block;
 
-    width: 100%;
+    min-width: 50px;
     height: var(--yc-text-body-2-line-height);
 
-    vertical-align: top;
+    text-align: center;
 
+    color: var(--yc-color-text-primary);
     border: $border-width solid var(--yc-color-infographics-misc-heavy);
     border-radius: $outer-border-radius;
     background-color: var(--yc-color-infographics-misc-light);
@@ -82,7 +84,7 @@
         }
     }
     &__filled-title {
-        position: absolute;
+        position: relative;
         z-index: 2;
 
         font-size: var(--yc-text-body-1-font-size);
