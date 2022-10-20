@@ -75,13 +75,13 @@ function StorageNodes({data, tableSettings, visibleEntities, onShowAll}: Storage
             width: 350,
             render: ({value}) => {
                 return (
-                    <div className={b('tooltip-wrapper')}>
+                    <div className={b('fqdn-wrapper')}>
                         <Popover
                             content={value as string}
                             placement={['right']}
                             behavior={PopoverBehavior.Immediate}
                         >
-                            <span className={b('pool-name')}>{value as string}</span>
+                            <span className={b('fqdn')}>{value as string}</span>
                         </Popover>
                     </div>
                 );

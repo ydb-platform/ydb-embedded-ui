@@ -7,24 +7,19 @@
 
         min-width: 500px;
     }
-    &__pool-name-wrapper {
-        display: flex;
-        align-items: flex-end;
+    &__fqdn-wrapper {
+        width: 330px;
     }
-    &__pool-name {
+    &__fqdn {
         display: inline-block;
         overflow: hidden;
 
-        width: 330px;
         max-width: 330px;
 
+        vertical-align: top;
         text-overflow: ellipsis;
     }
     &__group-id {
         font-weight: 500;
-    }
-    &__tooltip-wrapper {
-        display: flex;
-        align-items: center;
     }
 }
