@@ -1,4 +1,10 @@
 .vdisk-storage {
+    border-radius: 4px; // to match interactive area with disk shape
+
+    &__content {
+        border-radius: 4px; // to match interactive area with disk shape
+    }
+
     &__popup-wrapper {
         padding: 12px;
 

@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
+
 import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
 import {Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
-//@ts-ignore
 import {VisibleEntities} from '../../../store/reducers/storage';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
@@ -108,7 +108,9 @@ function StorageNodes({data, tableSettings, visibleEntities, onShowAll}: Storage
             render: ({value, row}) => (
                 <div className={b('pdisks-wrapper')}>
                     {_.map(value as any, (el) => (
-                        <Pdisk key={el.PDiskId} {...el} NodeId={row.NodeId} />
+                        <div className={b('pdisks-item')}>
+                            <Pdisk key={el.PDiskId} {...el} NodeId={row.NodeId} />
+                        </div>
                     ))}
                 </div>
             ),

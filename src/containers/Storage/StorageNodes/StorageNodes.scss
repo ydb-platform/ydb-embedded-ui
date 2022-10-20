@@ -7,6 +7,16 @@
 
         min-width: 500px;
     }
+    &__pdisks-item {
+        flex-grow: 1;
+
+        max-width: 200px;
+        margin-right: 10px;
+
+        &:last-child {
+            margin-right: 0px;
+        }
+    }
     &__fqdn-wrapper {
         width: 330px;
     }

@@ -1,21 +1,23 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
 import cn from 'bem-cn-lite';
+
 import {Popup} from '@gravity-ui/uikit';
 
-import type {RequiredField} from '../../../types';
-//@ts-ignore
-import {bytesToGB} from '../../../utils/utils';
-//@ts-ignore
+import {InfoViewer} from '../../../components/InfoViewer';
+import InternalLink from '../../../components/InternalLink/InternalLink';
+
 import routes, {createHref} from '../../../routes';
-//@ts-ignore
+import type {RequiredField} from '../../../types';
+import {TPDiskStateInfo, TPDiskState} from '../../../types/api/storage';
 import {getPDiskId} from '../../../utils';
 import {getPDiskType} from '../../../utils/pdisk';
-import {TPDiskStateInfo, TPDiskState} from '../../../types/api/storage';
-import {InfoViewer} from '../../../components/InfoViewer';
+import {bytesToGB} from '../../../utils/utils';
+
+import {STRUCTURE} from '../../Node/NodePages';
+
 import DiskStateProgressBar, {
     diskProgressColors,
 } from '../DiskStateProgressBar/DiskStateProgressBar';
-import {STRUCTURE} from '../../Node/NodePages';
 
 import {colorSeverity, NOT_AVAILABLE_SEVERITY} from '../utils';
 
@@ -135,16 +137,20 @@ function Pdisk(props: PDiskProps) {
         <React.Fragment>
             {renderPopup()}
             <div className={b()} ref={anchor} onMouseEnter={showPopup} onMouseLeave={hidePopup}>
-                <DiskStateProgressBar
-                    diskAllocatedPercent={pdiskAllocatedPercent}
-                    severity={severity as keyof typeof diskProgressColors}
-                    href={createHref(
+                <InternalLink
+                    to={createHref(
                         routes.node,
                         {id: props.NodeId, activeTab: STRUCTURE},
                         {pdiskId: props.PDiskId || ''},
                     )}
-                />
-                <div className={b('media-type')}>{getPDiskType(props)}</div>
+                    className={b('content')}
+                >
+                    <DiskStateProgressBar
+                        diskAllocatedPercent={pdiskAllocatedPercent}
+                        severity={severity as keyof typeof diskProgressColors}
+                    />
+                    <div className={b('media-type')}>{getPDiskType(props)}</div>
+                </InternalLink>
             </div>
         </React.Fragment>
     );
