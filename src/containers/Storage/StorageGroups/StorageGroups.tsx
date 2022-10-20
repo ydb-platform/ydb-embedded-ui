@@ -100,7 +100,7 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes, onShowAll}:
                     <div className={b('pool-name-wrapper')}>
                         {splitted && (
                             <Popover
-                                content={<span className={b('tooltip')}>{value as string}</span>}
+                                content={value as string}
                                 placement={['right']}
                                 behavior={PopoverBehavior.Immediate}
                             >

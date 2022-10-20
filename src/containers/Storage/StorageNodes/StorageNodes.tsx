@@ -77,7 +77,7 @@ function StorageNodes({data, tableSettings, visibleEntities, onShowAll}: Storage
                 return (
                     <div className={b('tooltip-wrapper')}>
                         <Popover
-                            content={<span className={b('tooltip')}>{value as string}</span>}
+                            content={value as string}
                             placement={['right']}
                             behavior={PopoverBehavior.Immediate}
                         >
