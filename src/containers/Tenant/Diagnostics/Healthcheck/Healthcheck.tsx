@@ -7,12 +7,12 @@ import {Loader} from '@gravity-ui/uikit';
 import {SelfCheckResult} from '../../../../types/api/healthcheck';
 import {
     getHealthcheckInfo,
-    selectInvertedIssuesConsequenceTrees,
-    selectIssueConsequenceById,
+    selectIssuesTrees,
+    selectIssueTreeById,
 } from '../../../../store/reducers/healthcheckInfo';
 import {useAutofetcher} from '../../../../utils/hooks';
 
-import {IssuesList} from './IssuesList';
+import {Details} from './Details';
 import {Preview} from './Preview';
 
 import i18n from './i18n';
@@ -36,9 +36,9 @@ export const Healthcheck = (props: HealthcheckProps) => {
     const {data, loading, wasLoaded, error} = useSelector((state: any) => state.healthcheckInfo);
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
 
-    const issuesTrees = useSelector(selectInvertedIssuesConsequenceTrees);
-    const expandedIssueConsequence = useSelector((state) =>
-        selectIssueConsequenceById(state, expandedIssueId || ''),
+    const issuesTrees = useSelector(selectIssuesTrees);
+    const expandedIssueTree = useSelector((state) =>
+        selectIssueTreeById(state, expandedIssueId || ''),
     );
 
     const {autorefresh} = useSelector((state: any) => state.schema);
@@ -80,8 +80,8 @@ export const Healthcheck = (props: HealthcheckProps) => {
                     onUpdate={fetchHealthcheck}
                 />
             ) : (
-                <IssuesList
-                    issue={expandedIssueConsequence}
+                <Details
+                    issueTree={expandedIssueTree}
                     loading={loading}
                     onUpdate={fetchHealthcheck}
                 />

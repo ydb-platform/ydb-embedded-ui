@@ -7,7 +7,7 @@
     // Thus we will get rid of unneeded layout shift when scrollbar appear
     min-width: 885px;
 
-    &__issues-list {
+    &__details {
         padding: 25px 20px 20px;
     }
 
@@ -15,7 +15,7 @@
         margin-bottom: 15px;
     }
 
-    &__issues {
+    &__issues-wrapper {
         overflow-x: hidden;
         overflow-y: auto;
 
@@ -32,20 +32,20 @@
         padding: 15px 0;
     }
 
-    &__issues-list-header {
+    &__details-header {
         display: flex;
         align-items: center;
 
         margin-bottom: 20px;
     }
 
-    &__issues-list-header-title {
+    &__details-header-title {
         margin: 0 10px 0 0;
 
         @include text-header-1();
     }
 
-    &__issues-list-header-update {
+    &__details-header-update {
         margin-left: 10px;
     }
 

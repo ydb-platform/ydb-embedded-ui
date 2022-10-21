@@ -8,37 +8,18 @@ import JSONTree from 'react-json-inspector';
 import {TreeView} from 'ydb-ui-components';
 
 import {IIssuesTree} from '../../../../../types/store/healthcheck';
-import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 
-import './IssueViewer.scss';
+import {IssueTreeItem} from './IssueTreeItem';
 
-const issueBlock = cn('issue');
+import './IssueTree.scss';
 
-interface IssueRowProps {
-    status: string;
-    message: string;
-    type: string;
-    onClick?: VoidFunction;
-}
-
-const IssueRow = ({status, message, type, onClick}: IssueRowProps) => {
-    return (
-        <div className={issueBlock()} onClick={onClick}>
-            <div className={issueBlock('field', {status: true})}>
-                <EntityStatus mode="icons" status={status} name={type} />
-            </div>
-            <div className={issueBlock('field', {message: true})}>{message}</div>
-        </div>
-    );
-};
-
-const issueViewerBlock = cn('issue-viewer');
+const b = cn('issue-tree');
 
 interface IssuesViewerProps {
-    issue: IIssuesTree;
+    issueTree: IIssuesTree;
 }
 
-const IssuesViewer = ({issue}: IssuesViewerProps) => {
+const IssueTree = ({issueTree}: IssuesViewerProps) => {
     const [collapsedIssues, setCollapsedIssues] = useState<Record<string, boolean>>({});
 
     const renderTree = useCallback(
@@ -60,7 +41,7 @@ const IssuesViewer = ({issue}: IssuesViewerProps) => {
                 return (
                     <TreeView
                         key={id}
-                        name={<IssueRow status={status} message={message} type={type} />}
+                        name={<IssueTreeItem status={status} message={message} type={type} />}
                         collapsed={isCollapsed}
                         hasArrow={true}
                         onClick={toggleCollapsed}
@@ -73,7 +54,7 @@ const IssuesViewer = ({issue}: IssuesViewerProps) => {
                 );
             });
         },
-        [issue, collapsedIssues],
+        [issueTree, collapsedIssues],
     );
 
     const renderInfoPanel = useCallback(
@@ -83,24 +64,24 @@ const IssuesViewer = ({issue}: IssuesViewerProps) => {
             }
 
             return (
-                <div className={issueViewerBlock('info-panel')}>
+                <div className={b('info-panel')}>
                     <JSONTree
                         data={info}
                         search={false}
                         isExpanded={() => true}
-                        className={issueViewerBlock('inspector')}
+                        className={b('inspector')}
                     />
                 </div>
             );
         },
-        [issue],
+        [issueTree],
     );
 
     return (
-        <div className={issueViewerBlock()}>
-            <div className={issueViewerBlock('tree')}>{renderTree([issue])}</div>
+        <div className={b()}>
+            <div className={b('block')}>{renderTree([issueTree])}</div>
         </div>
     );
 };
 
-export default IssuesViewer;
+export default IssueTree;

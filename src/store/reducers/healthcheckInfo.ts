@@ -95,16 +95,13 @@ const getInvertedConsequencesTree = ({
 
 const getIssuesLog = (state: any) => state.healthcheckInfo.data?.issue_log;
 
-export const selectInvertedIssuesConsequenceTrees = createSelector(
-    getIssuesLog,
-    (issueLog: IssueLog[]) => {
-        return getInvertedConsequencesTree({data: issueLog});
-    },
-);
+export const selectIssuesTrees = createSelector(getIssuesLog, (issueLog: IssueLog[]) => {
+    return getInvertedConsequencesTree({data: issueLog});
+});
 
-export const selectIssueConsequenceById = createSelector(
-    [selectInvertedIssuesConsequenceTrees, (_: any, id: string) => id],
-    (issueTree, id) => issueTree.find((issue: IIssuesTree) => issue.id === id),
+export const selectIssueTreeById = createSelector(
+    [selectIssuesTrees, (_: any, id: string) => id],
+    (issueTrees, id) => issueTrees.find((issueTree: IIssuesTree) => issueTree.id === id),
 );
 
 export function getHealthcheckInfo(database: string) {
