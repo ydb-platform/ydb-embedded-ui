@@ -7,8 +7,8 @@ import {Loader} from '@gravity-ui/uikit';
 import {SelfCheckResult} from '../../../../types/api/healthcheck';
 import {
     getHealthcheckInfo,
-    selectIssuesTrees,
-    selectIssueTreeById,
+    selectIssuesTreeById,
+    selectIssuesTreesRoots,
 } from '../../../../store/reducers/healthcheckInfo';
 import {useAutofetcher} from '../../../../utils/hooks';
 
@@ -36,10 +36,8 @@ export const Healthcheck = (props: HealthcheckProps) => {
     const {data, loading, wasLoaded, error} = useSelector((state: any) => state.healthcheckInfo);
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
 
-    const issuesTrees = useSelector(selectIssuesTrees);
-    const expandedIssueTree = useSelector((state) =>
-        selectIssueTreeById(state, expandedIssueId || ''),
-    );
+    const issuesTreesRoots = useSelector(selectIssuesTreesRoots);
+    const expandedIssueTree = useSelector((state) => selectIssuesTreeById(state, expandedIssueId));
 
     const {autorefresh} = useSelector((state: any) => state.schema);
 
@@ -73,7 +71,7 @@ export const Healthcheck = (props: HealthcheckProps) => {
         if (data && data['self_check_result']) {
             return preview ? (
                 <Preview
-                    issuesTrees={issuesTrees}
+                    issuesTrees={issuesTreesRoots}
                     selfCheckResult={selfCheckResult}
                     loading={loading}
                     onShowMore={showMoreHandler}

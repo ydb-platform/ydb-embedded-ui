@@ -1,6 +1,7 @@
 import _flow from 'lodash/fp/flow';
 import _sortBy from 'lodash/fp/sortBy';
 import _uniqBy from 'lodash/fp/uniqBy';
+import _omit from 'lodash/omit';
 import {createSelector} from 'reselect';
 
 import {IIssuesTree} from '../../types/store/healthcheck';
@@ -59,25 +60,26 @@ const getReasonsForIssue = ({issue, data}: {issue: IssueLog; data: IssueLog[]}) 
     return data.filter((item) => issue.reason && issue.reason.indexOf(item.id) !== -1);
 };
 
+const getRoots = (data: IssueLog[]) => {
+    let roots = data.filter((item) => {
+        return !data.find((issue) => issue.reason && issue.reason.indexOf(item.id) !== -1);
+    });
+
+    roots = _flow([
+        _uniqBy((item: IssueLog) => item.id),
+        _sortBy(({status}: {status: StatusFlag}) => mapStatusToPriority[status]),
+    ])(roots);
+
+    return roots;
+};
+
 const getInvertedConsequencesTree = ({
     data,
-    roots: receivedRoots,
+    roots,
 }: {
     data: IssueLog[];
     roots?: IssueLog[];
 }): IIssuesTree[] => {
-    let roots = receivedRoots;
-    if (!roots && data) {
-        roots = data.filter((item) => {
-            return !data.find((issue) => issue.reason && issue.reason.indexOf(item.id) !== -1);
-        });
-
-        roots = _flow([
-            _uniqBy((item: IssueLog) => item.id),
-            _sortBy(({status}: {status: StatusFlag}) => mapStatusToPriority[status]),
-        ])(roots);
-    }
-
     return roots
         ? roots.map((issue) => {
               const reasonsItems = getInvertedConsequencesTree({
@@ -93,15 +95,22 @@ const getInvertedConsequencesTree = ({
         : [];
 };
 
-const getIssuesLog = (state: any) => state.healthcheckInfo.data?.issue_log;
+const getIssuesLog = (state: any): IssueLog[] | undefined => state.healthcheckInfo.data?.issue_log;
 
-export const selectIssuesTrees = createSelector(getIssuesLog, (issueLog: IssueLog[]) => {
-    return getInvertedConsequencesTree({data: issueLog});
-});
+export const selectIssuesTreesRoots = createSelector(getIssuesLog, (issues = []) =>
+    getRoots(issues),
+);
 
-export const selectIssueTreeById = createSelector(
-    [selectIssuesTrees, (_: any, id: string) => id],
-    (issueTrees, id) => issueTrees.find((issueTree: IIssuesTree) => issueTree.id === id),
+export const selectIssuesTrees = createSelector(
+    [getIssuesLog, selectIssuesTreesRoots],
+    (data = [], roots = []) => {
+        return getInvertedConsequencesTree({data, roots});
+    },
+);
+
+export const selectIssuesTreeById = createSelector(
+    [selectIssuesTrees, (_: any, id: string | undefined) => id],
+    (issuesTrees = [], id) => issuesTrees.find((issuesTree: IIssuesTree) => issuesTree.id === id),
 );
 
 export function getHealthcheckInfo(database: string) {
