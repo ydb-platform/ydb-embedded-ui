@@ -1,56 +1,5 @@
 @import '../../../../../styles/mixins.scss';
 
-.issue {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    height: 40px;
-
-    cursor: pointer;
-
-    &__field {
-        display: flex;
-        overflow: hidden;
-
-        &_status {
-            display: flex;
-
-            white-space: nowrap;
-        }
-        &_additional {
-            width: max-content;
-
-            cursor: pointer;
-
-            color: var(--yc-color-text-link);
-
-            &:hover {
-                color: var(--yc-color-text-link-hover);
-            }
-        }
-        &_message {
-            overflow: hidden;
-            flex-shrink: 0;
-
-            width: 300px;
-
-            white-space: normal;
-        }
-    }
-
-    &__field-tooltip {
-        &#{&} {
-            min-width: 500px;
-            max-width: 500px;
-        }
-    }
-
-    &__field-label {
-        color: var(--yc-color-text-secondary);
-    }
-}
-
 .indicator {
     width: 12px;
     height: 12px;
@@ -86,12 +35,12 @@
     }
 }
 
-.issue-viewer {
+.issue-tree {
     display: flex;
 
     width: 820px;
 
-    &__tree {
+    &__block {
         width: 100%;
     }
 
@@ -163,7 +112,7 @@
             padding-left: 0 !important;
         }
 
-        .issue-viewer__info-panel {
+        .issue-tree__info-panel {
             margin-left: $calculated-margin;
         }
     }

@@ -2,19 +2,19 @@ import cn from 'bem-cn-lite';
 
 import {Link, Text} from '@gravity-ui/uikit';
 
-import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
-import {IssueLog} from '../../../../../types/api/healthcheck';
+import EntityStatus from '../../../../../../components/EntityStatus/EntityStatus';
+import {IssueLog} from '../../../../../../types/api/healthcheck';
 
-import i18n from '../i18n';
+import i18n from '../../i18n';
 
 const b = cn('healthcheck');
 
-interface IssuePreviewProps {
+interface PreviewItemProps {
     data?: IssueLog;
     onShowMore?: (id: string) => void;
 }
 
-export const IssuePreview = (props: IssuePreviewProps) => {
+export const PreviewItem = (props: PreviewItemProps) => {
     const {data, onShowMore} = props;
 
     if (!data) {

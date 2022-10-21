@@ -7,7 +7,7 @@ import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import type {IIssuesTree} from '../../../../../types/store/healthcheck';
 
-import {IssuePreview} from '../IssuePreview';
+import {PreviewItem} from './PreviewItem';
 
 import i18n from '../i18n';
 
@@ -52,7 +52,7 @@ export const Preview = (props: PreviewProps) => {
                 {isStatusOK
                     ? i18n('status_message.ok')
                     : issuesTrees?.map((issueTree) => (
-                          <IssuePreview
+                          <PreviewItem
                               key={issueTree.id}
                               data={issueTree}
                               onShowMore={onShowMore}
