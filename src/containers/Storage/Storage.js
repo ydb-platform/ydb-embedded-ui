@@ -5,7 +5,7 @@ import cn from 'bem-cn-lite';
 import DataTable from '@yandex-cloud/react-data-table';
 import {RadioButton, Label} from '@gravity-ui/uikit';
 
-import {StorageFilter} from './StorageFilter';
+import {Search} from '../../components/Search';
 import {UsageFilter} from './UsageFilter';
 import {AutoFetcher} from '../../utils/autofetcher';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
@@ -236,7 +236,7 @@ class Storage extends React.Component {
         return (
             <div className={b('controls')}>
                 <div className={b('search')}>
-                    <StorageFilter
+                    <Search
                         placeholder={
                             storageType === StorageTypes.groups
                                 ? 'Group ID, Pool name'
