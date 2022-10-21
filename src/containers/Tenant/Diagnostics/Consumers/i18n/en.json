@@ -1,0 +1,6 @@
+{
+  "search.placeholder": "Consumer name",
+  "table.emptyDataMessage": "No consumers match the current search",
+  "table.columns.consumerName": "Consumer",
+  "noConsumersMessage": "This topic has no consumers"
+}

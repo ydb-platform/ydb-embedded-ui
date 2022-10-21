@@ -27,6 +27,7 @@ import Heatmap from '../../Heatmap/Heatmap';
 import Compute from './Compute/Compute';
 //@ts-ignore
 import Tablets from '../../Tablets/Tablets';
+import {Consumers} from './Consumers';
 
 import routes, {createHref} from '../../../routes';
 import type {EPathType} from '../../../types/api/schema';
@@ -150,6 +151,9 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case GeneralPagesIds.graph: {
                 return <Heatmap path={currentItem.Path} />;
+            }
+            case GeneralPagesIds.consumers: {
+                return <Consumers path={currentItem.Path} />;
             }
             default: {
                 return <div>No data...</div>;
