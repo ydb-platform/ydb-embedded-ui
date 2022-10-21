@@ -1,4 +1,4 @@
-import {EPathType} from "../../../types/api/schema";
+import {EPathType} from '../../../types/api/schema';
 
 export enum GeneralPagesIds {
     'overview' = 'Overview',
@@ -11,11 +11,12 @@ export enum GeneralPagesIds {
     'describe' = 'Describe',
     'hotKeys' = 'hotKeys',
     'graph' = 'graph',
+    'consumers' = 'consumers',
 }
 
 type Page = {
-    id: GeneralPagesIds,
-    title: string,
+    id: GeneralPagesIds;
+    title: string;
 };
 
 const overview = {
@@ -66,6 +67,11 @@ const graph = {
     title: 'Graph',
 };
 
+const consumers = {
+    id: GeneralPagesIds.consumers,
+    title: 'Consumers',
+};
+
 export const DATABASE_PAGES = [
     overview,
     topQueries,
@@ -81,7 +87,8 @@ export const TABLE_PAGES = [overview, topShards, graph, tablets, hotKeys, descri
 
 export const DIR_PAGES = [overview, topShards, describe];
 
-export const TOPIC_PAGES = [overview, describe];
+export const CDC_STREAM_PAGES = [overview, describe];
+export const TOPIC_PAGES = [overview, consumers, describe];
 
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here
@@ -97,10 +104,10 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
 
     [EPathType.EPathTypeDir]: DIR_PAGES,
     [EPathType.EPathTypeTableIndex]: DIR_PAGES,
-    
-    [EPathType.EPathTypeCdcStream]: TOPIC_PAGES,
+
+    [EPathType.EPathTypeCdcStream]: CDC_STREAM_PAGES,
+
     [EPathType.EPathTypePersQueueGroup]: TOPIC_PAGES,
 };
 
-export const getPagesByType = (type?: EPathType) =>
-    (type && pathTypeToPages[type]) || DIR_PAGES;
+export const getPagesByType = (type?: EPathType) => (type && pathTypeToPages[type]) || DIR_PAGES;

@@ -1,0 +1,6 @@
+{
+  "search.placeholder": "Название читателя",
+  "table.emptyDataMessage": "По заданному поиску нет читателей",
+  "table.columns.consumerName": "Читатель",
+  "noConsumersMessage": "У этого топика нет читателей"
+}
