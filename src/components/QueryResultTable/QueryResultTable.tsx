@@ -53,7 +53,7 @@ const prepareGenericColumns = (data: KeyValueRow[]) => {
         const column: Column<KeyValueRow> = {
             name,
             align: isNumeric(data[0][name]) ? DataTable.RIGHT : DataTable.LEFT,
-            sortAccessor: (row) => isNumeric(row[name]) ? Number(row[name]) : row[name],
+            sortAccessor: (row) => (isNumeric(row[name]) ? Number(row[name]) : row[name]),
             render: ({value}) => <Cell value={value as string} />,
         };
 
@@ -61,31 +61,28 @@ const prepareGenericColumns = (data: KeyValueRow[]) => {
     });
 };
 
-const getRowIndex = (_: unknown, index: number) => index
+const getRowIndex = (_: unknown, index: number) => index;
 
-interface QueryResultTableProps extends Omit<DataTableProps<KeyValueRow>, 'data' | 'columns' | 'theme'> {
+interface QueryResultTableProps
+    extends Omit<DataTableProps<KeyValueRow>, 'data' | 'columns' | 'theme'> {
     data?: KeyValueRow[];
     columns?: ColumnType[];
 }
 
 export const QueryResultTable = (props: QueryResultTableProps) => {
-    const {
-        columns: rawColumns,
-        data: rawData,
-        settings: settingsMix,
-        ...restProps
-    } = props;
+    const {columns: rawColumns, data: rawData, settings: settingsMix, ...restProps} = props;
 
     const data = useMemo(() => prepareQueryResponse(rawData), [rawData]);
     const columns = useMemo(() => {
-        return rawColumns ?
-            prepareTypedColumns(rawColumns) :
-            prepareGenericColumns(data);
+        return rawColumns ? prepareTypedColumns(rawColumns) : prepareGenericColumns(data);
     }, [data, rawColumns]);
-    const settings = useMemo(() => ({
-        ...TABLE_SETTINGS,
-        ...settingsMix,
-    }), [settingsMix]);
+    const settings = useMemo(
+        () => ({
+            ...TABLE_SETTINGS,
+            ...settingsMix,
+        }),
+        [settingsMix],
+    );
 
     // empty data is expected to be be an empty array
     // undefined data is not rendered at all
@@ -94,11 +91,7 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
     }
 
     if (!columns.length) {
-        return (
-            <div className={b('message')}>
-                {i18n('empty')}
-            </div>
-        );
+        return <div className={b('message')}>{i18n('empty')}</div>;
     }
 
     return (
