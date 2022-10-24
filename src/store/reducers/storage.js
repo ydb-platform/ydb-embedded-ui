@@ -340,25 +340,22 @@ export const getFilteredEntities = createSelector(
     },
 );
 
-export const getUsageFilterOptions = createSelector(
-    getVisibleEntitiesList,
-    (entities) => {
-        const items = {};
+export const getUsageFilterOptions = createSelector(getVisibleEntitiesList, (entities) => {
+    const items = {};
 
-        entities.forEach((entity) => {
-            const usage = getUsage(entity, 5);
+    entities.forEach((entity) => {
+        const usage = getUsage(entity, 5);
 
-            if (!Object.hasOwn(items, usage)) {
-                items[usage] = 0;
-            }
+        if (!Object.hasOwn(items, usage)) {
+            items[usage] = 0;
+        }
 
-            items[usage] += 1;
-        });
+        items[usage] += 1;
+    });
 
-        return Object.entries(items)
-            .map(([threshold, count]) => ({threshold, count}))
-            .sort((a, b) => b.threshold - a.threshold);
-    },
-);
+    return Object.entries(items)
+        .map(([threshold, count]) => ({threshold, count}))
+        .sort((a, b) => b.threshold - a.threshold);
+});
 
 export default storage;
