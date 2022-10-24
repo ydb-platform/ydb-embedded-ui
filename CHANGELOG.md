@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.2.1...v2.3.0) (2022-10-24)
+
+
+### Features
+
+* **PDisk:** display type on disk progressbar ([00bcbf5](https://github.com/ydb-platform/ydb-embedded-ui/commit/00bcbf5d439ca3bb4834fd5f191c65f0ac62585f))
+* **Storage:** display media type for groups ([cdff5e9](https://github.com/ydb-platform/ydb-embedded-ui/commit/cdff5e9882f3f1f8769a3aeaf3e53c05f3ce1c07))
+* **Storage:** display shield icon for encrypted groups ([d0a4442](https://github.com/ydb-platform/ydb-embedded-ui/commit/d0a4442dc100c312dcc54afcf685057cc587211d))
+
+
+### Bug Fixes
+
+* **Diagnostics:** fix tabs reset on page reload ([68d2971](https://github.com/ydb-platform/ydb-embedded-ui/commit/68d297165aea1360d1081349d8133804004f8fe0))
+* **Storage:** prevent loading reset on cancelled fetch ([625159a](https://github.com/ydb-platform/ydb-embedded-ui/commit/625159a396e1ab84fe9da94d047da67fdd03b30f))
+* **Storage:** shrink tooltip active area on FQDN ([7c33d5a](https://github.com/ydb-platform/ydb-embedded-ui/commit/7c33d5afb561efa64f90ce5b93edd30f7d27c247))
+* **Tenant:** prevent selected tab reset on tree navigation ([a4e633a](https://github.com/ydb-platform/ydb-embedded-ui/commit/a4e633aa45c803503fe69e52f0f2cfac4c6aae0d))
+* **Tenant:** show loader when fetching overview data ([ae77495](https://github.com/ydb-platform/ydb-embedded-ui/commit/ae77495faa687652040a1f2965700184220778b4))
+* use correct prop for textinputs value ([de97ba1](https://github.com/ydb-platform/ydb-embedded-ui/commit/de97ba17ba8da54a626509cf08f147f9fcc67004))
+* **useAutofetcher:** pass argument to indicate background fetch ([4063cb1](https://github.com/ydb-platform/ydb-embedded-ui/commit/4063cb1411338d351b612fc46c06bcc708fe32f1))
+
 ## [2.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.2.0...v2.2.1) (2022-10-19)
 
 
