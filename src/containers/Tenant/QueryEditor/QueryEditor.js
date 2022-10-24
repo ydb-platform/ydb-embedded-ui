@@ -511,13 +511,7 @@ function QueryEditor(props) {
     };
 
     const renderControls = () => {
-        const {
-            executeQuery,
-            explainQuery,
-            savedQueries,
-            selectRunAction,
-            setSettingValue,
-        } = props;
+        const {executeQuery, explainQuery, savedQueries, selectRunAction, setSettingValue} = props;
         const {runAction} = executeQuery;
         const runIsDisabled = !executeQuery.input || executeQuery.loading;
         const runText = _.find(RUN_ACTIONS, {value: runAction}).content;
