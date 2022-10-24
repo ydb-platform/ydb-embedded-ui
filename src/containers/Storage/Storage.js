@@ -68,14 +68,8 @@ class Storage extends React.Component {
     };
 
     componentDidMount() {
-        const {
-            tenant,
-            nodeId,
-            setVisibleEntities,
-            storageType,
-            setHeader,
-            getNodesList,
-        } = this.props;
+        const {tenant, nodeId, setVisibleEntities, storageType, setHeader, getNodesList} =
+            this.props;
 
         this.autofetcher = new AutoFetcher();
         getNodesList();
@@ -106,12 +100,7 @@ class Storage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const {
-            visibleEntities,
-            storageType,
-            autorefresh,
-            database,
-        } = this.props;
+        const {visibleEntities, storageType, autorefresh, database} = this.props;
 
         const startFetch = () => {
             this.getStorageInfo({
@@ -139,7 +128,10 @@ class Storage extends React.Component {
             restartAutorefresh();
         }
 
-        if (storageType !== prevProps.storageType || visibleEntities !== prevProps.visibleEntities) {
+        if (
+            storageType !== prevProps.storageType ||
+            visibleEntities !== prevProps.visibleEntities
+        ) {
             startFetch();
 
             if (!database || (database && autorefresh)) {
@@ -154,25 +146,22 @@ class Storage extends React.Component {
     }
 
     getStorageInfo(data) {
-        const {
-            tenant,
-            nodeId,
-            getStorageInfo,
-        } = this.props;
+        const {tenant, nodeId, getStorageInfo} = this.props;
 
-        getStorageInfo({
-            tenant,
-            nodeId,
-            ...data,
-        }, {
-            concurrentId: 'getStorageInfo',
-        });
+        getStorageInfo(
+            {
+                tenant,
+                nodeId,
+                ...data,
+            },
+            {
+                concurrentId: 'getStorageInfo',
+            },
+        );
     }
 
     renderLoader() {
-        return (
-            <TableSkeleton className={b('loader')}/>
-        );
+        return <TableSkeleton className={b('loader')} />;
     }
 
     renderDataTable() {
@@ -212,14 +201,8 @@ class Storage extends React.Component {
     };
 
     renderEntitiesCount() {
-        const {
-            storageType,
-            groupsCount,
-            nodesCount,
-            flatListStorageEntities,
-            loading,
-            wasLoaded,
-        } = this.props;
+        const {storageType, groupsCount, nodesCount, flatListStorageEntities, loading, wasLoaded} =
+            this.props;
 
         let label = `${storageType === StorageTypes.groups ? 'Groups' : 'Nodes'}: `;
         const count = storageType === StorageTypes.groups ? groupsCount : nodesCount;
@@ -254,7 +237,11 @@ class Storage extends React.Component {
             <div className={b('controls')}>
                 <div className={b('search')}>
                     <StorageFilter
-                        placeholder={storageType === StorageTypes.groups ? 'Group ID, Pool name' : 'Node ID, FQDN'}
+                        placeholder={
+                            storageType === StorageTypes.groups
+                                ? 'Group ID, Pool name'
+                                : 'Node ID, FQDN'
+                        }
                         onChange={setStorageFilter}
                         value={filter}
                     />
@@ -303,14 +290,8 @@ class Storage extends React.Component {
         return (
             <div className={b()}>
                 {this.renderControls()}
-                {error && (
-                    <div>{error.statusText}</div>
-                )}
-                {showLoader ? (
-                    this.renderLoader()
-                ) : (
-                    this.renderDataTable()
-                )}
+                {error && <div>{error.statusText}</div>}
+                {showLoader ? this.renderLoader() : this.renderDataTable()}
             </div>
         );
     }
