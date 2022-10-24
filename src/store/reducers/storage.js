@@ -57,10 +57,17 @@ const storage = function z(state = initialState, action) {
             };
         }
         case FETCH_STORAGE.FAILURE: {
+            if (action.error.isCancelled) {
+                return {
+                    ...state,
+                };
+            }
+
             return {
                 ...state,
                 error: action.error,
                 loading: false,
+                wasLoaded: true,
             };
         }
         case SET_INITIAL: {
