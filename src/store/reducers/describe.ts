@@ -1,9 +1,13 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
+import {TEvDescribeSchemeResult} from '../../types/api/schema';
+import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
 
 const FETCH_DESCRIBE = createRequestActionTypes('describe', 'FETCH_DESCRIBE');
 
-const describe = function z(state = {loading: false, wasLoaded: false, data: {}}, action) {
+const describe = function z(
+    state = {loading: false, wasLoaded: false, data: {}},
+    action: ApiRequestAction<typeof FETCH_DESCRIBE, TEvDescribeSchemeResult, unknown>,
+) {
     switch (action.type) {
         case FETCH_DESCRIBE.REQUEST: {
             return {
@@ -13,7 +17,10 @@ const describe = function z(state = {loading: false, wasLoaded: false, data: {}}
         }
         case FETCH_DESCRIBE.SUCCESS: {
             const newData = JSON.parse(JSON.stringify(state.data));
-            newData[action.data.Path] = action.data;
+
+            // In  case of successful fetch data should always has some Path, so we could cast type here
+            newData[action.data.Path as string] = action.data;
+
             return {
                 ...state,
                 data: newData,
@@ -35,7 +42,7 @@ const describe = function z(state = {loading: false, wasLoaded: false, data: {}}
     }
 };
 
-export function getDescribe({path}) {
+export function getDescribe({path}: {path: string}) {
     return createApiRequest({
         request: window.api.getDescribe({path}),
         actions: FETCH_DESCRIBE,
