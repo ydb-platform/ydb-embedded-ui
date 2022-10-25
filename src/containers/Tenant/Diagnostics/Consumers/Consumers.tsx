@@ -7,17 +7,13 @@ import DataTable, {Column} from '@yandex-cloud/react-data-table';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutofetcher} from '../../../../utils/hooks';
 import {Search} from '../../../../components/Search';
-import {getDescribe} from '../../../../store/reducers/describe';
+import {getDescribe, selectConsumers} from '../../../../store/reducers/describe';
 
 import i18n from './i18n';
 
 import './Consumers.scss';
 
 const b = block('ydb-consumers');
-
-interface Consumer {
-    name: string;
-}
 
 interface ConsumersProps {
     path: string;
@@ -32,17 +28,13 @@ export const Consumers = ({path}: ConsumersProps) => {
 
     useAutofetcher(fetchData, [path]);
 
-    const data = useSelector((state: any) => state.describe.data);
-    const consumersNames: string[] =
-        data[path]?.PathDescription?.PersQueueGroup.PQTabletConfig.ReadRules || [];
+    const consumers = useSelector((state) => selectConsumers(state, path));
 
-    const consumers: Consumer[] = consumersNames.map((name: string) => ({name}));
-
-    const [consumersToRender, setConsumersToRender] = useState<Consumer[]>(consumers);
+    const [consumersToRender, setConsumersToRender] = useState(consumers);
 
     useEffect(() => {
         setConsumersToRender(consumers);
-    }, [consumersNames]);
+    }, [consumers]);
 
     const filterConsumersByName = (search: string) => {
         const filteredConsumers = search
