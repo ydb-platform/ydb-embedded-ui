@@ -52,7 +52,13 @@
     &__result {
         overflow: auto;
 
+        // This fixes last row display for ordinary preview (not fullscreen)
         height: calc(100% - 40px);
         padding: 0 10px;
+
+        // Fix white space footer block for fullscreen preview
+        .kv-fullscreen & {
+            height: 100%;
+        }
     }
 }

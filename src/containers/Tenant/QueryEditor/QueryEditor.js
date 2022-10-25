@@ -54,8 +54,6 @@ export const RUN_ACTIONS = [
 
 const TABLE_SETTINGS = {
     sortable: false,
-    dynamicItemSizeGetter: () => 40,
-    dynamicRenderType: 'variable',
 };
 
 const EDITOR_OPTIONS = {
