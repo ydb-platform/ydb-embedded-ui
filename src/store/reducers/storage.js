@@ -39,7 +39,7 @@ const initialState = {
     type: StorageTypes.groups,
 };
 
-const storage = function z(state = initialState, action) {
+const storage = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_STORAGE.REQUEST: {
             return {
@@ -57,10 +57,8 @@ const storage = function z(state = initialState, action) {
             };
         }
         case FETCH_STORAGE.FAILURE: {
-            if (action.error.isCancelled) {
-                return {
-                    ...state,
-                };
+            if (action.error?.isCancelled) {
+                return state;
             }
 
             return {
@@ -239,7 +237,9 @@ export const getFlatListStorageGroups = createSelector([getStoragePools], (stora
                     );
                     const mediaType = group.VDisks?.reduce((type, vdisk) => {
                         const currentType = getPDiskType(vdisk.PDisk || {});
-                        return currentType && (currentType === type || type === '') ? currentType : 'Mixed';
+                        return currentType && (currentType === type || type === '')
+                            ? currentType
+                            : 'Mixed';
                     }, '');
                     return [
                         ...acc,
