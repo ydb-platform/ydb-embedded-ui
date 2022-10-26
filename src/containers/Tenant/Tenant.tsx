@@ -4,8 +4,7 @@ import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
 import qs from 'qs';
 
-import EmptyState from '../../components/EmptyState/EmptyState';
-import {Illustration} from '../../components/Illustration';
+import {AccessDenied} from '../../components/Errors/403';
 
 import {setHeader} from '../../store/reducers/header';
 import ObjectGeneralTabs from './ObjectGeneralTabs/ObjectGeneralTabs';
@@ -129,11 +128,7 @@ function Tenant(props: TenantProps) {
     return (
         <div className={b()}>
             {showBlockingError ? (
-                <EmptyState
-                    image={<Illustration name="403" />}
-                    title="Access denied"
-                    description="You don’t have the necessary roles to view this page."
-                />
+                <AccessDenied />
             ) : (
                 <>
                     <ObjectGeneralTabs />
