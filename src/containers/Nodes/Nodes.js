@@ -8,6 +8,7 @@ import {Loader, TextInput, Label} from '@gravity-ui/uikit';
 
 import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
+import {AccessDenied} from '../../components/Errors/403';
 
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
@@ -164,6 +165,10 @@ class Nodes extends React.Component {
         if (loading && !wasLoaded) {
             return Nodes.renderLoader();
         } else if (error) {
+            if (error.status === 403) {
+                return <AccessDenied />;
+            }
+
             return <div>{error.statusText}</div>;
         } else {
             return this.renderContent();
