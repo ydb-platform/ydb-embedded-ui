@@ -9,6 +9,7 @@ import {Search} from '../../components/Search';
 import {UsageFilter} from './UsageFilter';
 import {AutoFetcher} from '../../utils/autofetcher';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
+import {AccessDenied} from '../../components/Errors/403';
 
 import {
     getStorageInfo,
@@ -287,10 +288,17 @@ class Storage extends React.Component {
         const {loading, wasLoaded, error} = this.props;
         const showLoader = loading && !wasLoaded;
 
+        if (error) {
+            if (error.status === 403) {
+                return <AccessDenied />;
+            }
+
+            return <div className={b()}>{error.statusText}</div>;
+        }
+
         return (
             <div className={b()}>
                 {this.renderControls()}
-                {error && <div>{error.statusText}</div>}
                 {showLoader ? this.renderLoader() : this.renderDataTable()}
             </div>
         );
