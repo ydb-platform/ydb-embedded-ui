@@ -9,6 +9,7 @@ import {Loader, Select} from '@gravity-ui/uikit';
 import ReactList from 'react-list';
 
 import Tablet from '../../components/Tablet/Tablet';
+import {AccessDenied} from '../../components/Errors/403';
 
 import {TABLET_COLOR_TO_STATES, TABLETS_STATES} from '../../utils/constants';
 import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
@@ -212,6 +213,10 @@ class TabletsFilters extends React.Component {
         if (loading && !wasLoaded) {
             return TabletsFilters.renderLoader();
         } else if (error && typeof error === 'object') {
+            if (error.status === 403) {
+                return <AccessDenied />;
+            }
+
             return <div>{error.statusText}</div>;
         } else {
             return this.renderContent();
