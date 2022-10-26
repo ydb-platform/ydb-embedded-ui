@@ -18,7 +18,7 @@ export const initialState = {
     showPreview: false,
 };
 
-const schema = function z(state = initialState, action) {
+const schema = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_SCHEMA.REQUEST: {
             return {
@@ -44,7 +44,7 @@ const schema = function z(state = initialState, action) {
             };
         }
         case FETCH_SCHEMA.FAILURE: {
-            if (action.error.isCancelled) {
+            if (action.error?.isCancelled) {
                 return state;
             }
 
