@@ -5,6 +5,7 @@ import cn from 'bem-cn-lite';
 import {Loader} from '@gravity-ui/uikit';
 
 import {SelfCheckResult} from '../../../../types/api/healthcheck';
+import {IRootState} from '../../../../types/store';
 import {
     getHealthcheckInfo,
     selectIssuesTreeById,
@@ -33,11 +34,15 @@ export const Healthcheck = (props: HealthcheckProps) => {
 
     const dispatch = useDispatch();
 
-    const {data, loading, wasLoaded, error} = useSelector((state: any) => state.healthcheckInfo);
+    const {data, loading, wasLoaded, error} = useSelector(
+        (state: IRootState) => state.healthcheckInfo,
+    );
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
 
     const issuesTreesRoots = useSelector(selectIssuesTreesRoots);
-    const expandedIssueTree = useSelector((state) => selectIssuesTreeById(state, expandedIssueId));
+    const expandedIssueTree = useSelector((state: IRootState) =>
+        selectIssuesTreeById(state, expandedIssueId),
+    );
 
     const {autorefresh} = useSelector((state: any) => state.schema);
 
