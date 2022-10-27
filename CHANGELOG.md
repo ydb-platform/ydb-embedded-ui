@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.3.0...v2.4.0) (2022-10-27)
+
+
+### Features
+
+* **Diagnostics:** add consumers tab for topics ([4bb801c](https://github.com/ydb-platform/ydb-embedded-ui/commit/4bb801c0ef19dcda227c59e464b08f5e8f284c38))
+
+
+### Bug Fixes
+
+* add checks for fetch failure with no errors ([2c55107](https://github.com/ydb-platform/ydb-embedded-ui/commit/2c55107a7b47b3540ed0af66630ff85591f269a1))
+* **Nodes:** display access denied on 403 ([7832afe](https://github.com/ydb-platform/ydb-embedded-ui/commit/7832afee601a40fc8b75f83bf0ed18b01c798d71))
+* **QueryResult:** fix table display in fullscreen ([98674db](https://github.com/ydb-platform/ydb-embedded-ui/commit/98674db26b5fb09ac0d039a7779ae0c58951adde))
+* **QueryResultTable:** make preview display all rows ([0ac83d0](https://github.com/ydb-platform/ydb-embedded-ui/commit/0ac83d0258b0d0d3d2e14c06be096fe5ddce02da))
+* **Storage:** display access denied on 403 ([6d20333](https://github.com/ydb-platform/ydb-embedded-ui/commit/6d2033378956a54f05190905b0d537c6bd6c9851))
+* **TabletsFilters:** display access denied on 403 ([018be19](https://github.com/ydb-platform/ydb-embedded-ui/commit/018be199602123f1d90e58c0b95545f6accc41fb))
+
 ## [2.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.2.1...v2.3.0) (2022-10-24)
 
 
