@@ -33,7 +33,7 @@
     "redux": "4.0.1",
     "redux-location-state": "2.6.0",
     "redux-thunk": "2.3.0",
-    "reselect": "4.0.0",
+    "reselect": "4.1.6",
     "sass": "1.32.8",
     "web-vitals": "1.1.2",
     "ydb-ui-components": "3.0.1"

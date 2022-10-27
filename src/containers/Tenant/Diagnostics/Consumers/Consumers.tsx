@@ -4,6 +4,7 @@ import block from 'bem-cn-lite';
 
 import DataTable, {Column} from '@yandex-cloud/react-data-table';
 
+import {IRootState} from '../../../../types/store';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutofetcher} from '../../../../utils/hooks';
 import {Search} from '../../../../components/Search';
@@ -28,7 +29,7 @@ export const Consumers = ({path}: ConsumersProps) => {
 
     useAutofetcher(fetchData, [path]);
 
-    const consumers = useSelector((state) => selectConsumers(state, path));
+    const consumers = useSelector((state: IRootState) => selectConsumers(state, path));
 
     const [consumersToRender, setConsumersToRender] = useState(consumers);
 

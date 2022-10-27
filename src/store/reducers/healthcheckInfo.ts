@@ -2,9 +2,13 @@ import _flow from 'lodash/fp/flow';
 import _sortBy from 'lodash/fp/sortBy';
 import _uniqBy from 'lodash/fp/uniqBy';
 import _omit from 'lodash/omit';
-import {createSelector} from 'reselect';
+import {createSelector, Selector} from 'reselect';
 
-import {IIssuesTree} from '../../types/store/healthcheck';
+import {
+    IHealthcheckInfoState,
+    IHealthcheckInfoRootStateSlice,
+    IIssuesTree,
+} from '../../types/store/healthcheck';
 import {HealthCheckAPIResponse, IssueLog, StatusFlag} from '../../types/api/healthcheck';
 
 import '../../services/api';
@@ -12,7 +16,7 @@ import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../u
 
 const FETCH_HEALTHCHECK = createRequestActionTypes('cluster', 'FETCH_HEALTHCHECK');
 
-const initialState = {loading: false, wasLoaded: false};
+const initialState: IHealthcheckInfoState = {loading: false, wasLoaded: false};
 
 const healthcheckInfo = function (
     state = initialState,
@@ -60,7 +64,7 @@ const getReasonsForIssue = ({issue, data}: {issue: IssueLog; data: IssueLog[]}) 
     return data.filter((item) => issue.reason && issue.reason.indexOf(item.id) !== -1);
 };
 
-const getRoots = (data: IssueLog[]) => {
+const getRoots = (data: IssueLog[]): IssueLog[] => {
     let roots = data.filter((item) => {
         return !data.find((issue) => issue.reason && issue.reason.indexOf(item.id) !== -1);
     });
@@ -95,22 +99,23 @@ const getInvertedConsequencesTree = ({
         : [];
 };
 
-const getIssuesLog = (state: any): IssueLog[] | undefined => state.healthcheckInfo.data?.issue_log;
+const getIssuesLog = (state: IHealthcheckInfoRootStateSlice) =>
+    state.healthcheckInfo.data?.issue_log;
 
-export const selectIssuesTreesRoots = createSelector(getIssuesLog, (issues = []) =>
-    getRoots(issues),
-);
+export const selectIssuesTreesRoots: Selector<IHealthcheckInfoRootStateSlice, IssueLog[]> =
+    createSelector(getIssuesLog, (issues = []) => getRoots(issues));
 
-export const selectIssuesTrees = createSelector(
-    [getIssuesLog, selectIssuesTreesRoots],
-    (data = [], roots = []) => {
+export const selectIssuesTrees: Selector<IHealthcheckInfoRootStateSlice, IIssuesTree[]> =
+    createSelector([getIssuesLog, selectIssuesTreesRoots], (data = [], roots = []) => {
         return getInvertedConsequencesTree({data, roots});
-    },
-);
+    });
 
-export const selectIssuesTreeById = createSelector(
-    [selectIssuesTrees, (_: any, id: string | undefined) => id],
-    (issuesTrees = [], id) => issuesTrees.find((issuesTree: IIssuesTree) => issuesTree.id === id),
+export const selectIssuesTreeById: Selector<
+    IHealthcheckInfoRootStateSlice,
+    IIssuesTree | undefined,
+    [string | undefined]
+> = createSelector([selectIssuesTrees, (_, id: string | undefined) => id], (issuesTrees = [], id) =>
+    issuesTrees.find((issuesTree) => issuesTree.id === id),
 );
 
 export function getHealthcheckInfo(database: string) {

@@ -1,14 +1,21 @@
-import {createSelector} from 'reselect';
+import {createSelector, Selector} from 'reselect';
 
 import '../../services/api';
 import {TEvDescribeSchemeResult} from '../../types/api/schema';
 import {IConsumer} from '../../types/api/consumers';
+import {IDescribeRootStateSlice, IDescribeState} from '../../types/store/describe';
 import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
 
 const FETCH_DESCRIBE = createRequestActionTypes('describe', 'FETCH_DESCRIBE');
 
+const initialState: IDescribeState = {
+    loading: false,
+    wasLoaded: false,
+    data: {},
+};
+
 const describe = (
-    state = {loading: false, wasLoaded: false, data: {}},
+    state = initialState,
     action: ApiRequestAction<typeof FETCH_DESCRIBE, TEvDescribeSchemeResult, unknown>,
 ) => {
     switch (action.type) {
@@ -50,16 +57,21 @@ const describe = (
 };
 
 // Consumers selectors
-const selectConsumersNames = (state: any, path: string): string[] | undefined =>
-    state.describe.data[path]?.PathDescription?.PersQueueGroup?.PQTabletConfig?.ReadRules;
+const selectConsumersNames: Selector<IDescribeRootStateSlice, string[] | undefined, [string]> = (
+    state,
+    path,
+) => state.describe.data[path]?.PathDescription?.PersQueueGroup?.PQTabletConfig?.ReadRules;
 
-export const selectConsumers = createSelector(selectConsumersNames, (names = []): IConsumer[] => {
-    const consumers = names.map((name) => {
-        return {name};
-    });
+export const selectConsumers: Selector<IDescribeRootStateSlice, IConsumer[]> = createSelector(
+    selectConsumersNames,
+    (names = []) => {
+        const consumers = names.map((name) => {
+            return {name};
+        });
 
-    return consumers;
-});
+        return consumers;
+    },
+);
 
 export function getDescribe({path}: {path: string}) {
     return createApiRequest({
