@@ -35,7 +35,7 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
 export const mapPathTypeToNavigationTreeType = (
     type: EPathType = EPathType.EPathTypeDir,
     subType?: EPathSubType,
-    defaultType: NavigationTreeNodeType = 'directory'
+    defaultType: NavigationTreeNodeType = 'directory',
 ): NavigationTreeNodeType =>
     (subType && pathSubTypeToNodeType[subType]) || pathTypeToNodeType[type] || defaultType;
 
@@ -87,5 +87,4 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypePersQueueGroup]: false,
 };
 
-export const isColumnEntityType = (type?: EPathType) =>
-    (type && pathTypeToIsColumn[type]) ?? false;
+export const isColumnEntityType = (type?: EPathType) => (type && pathTypeToIsColumn[type]) ?? false;

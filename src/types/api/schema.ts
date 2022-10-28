@@ -263,7 +263,6 @@ export enum EPathType {
     EPathTypeColumnStore = 'EPathTypeColumnStore',
     EPathTypeColumnTable = 'EPathTypeColumnTable',
     EPathTypeCdcStream = 'EPathTypeCdcStream',
-
 }
 
 export enum EPathSubType {
@@ -414,7 +413,7 @@ interface TPQPartitionConfig {
     ExplicitChannelProfiles?: TChannelProfile[];
 
     MirrorFrom?: TMirrorPartitionConfig;
-};
+}
 
 interface TPQTabletConfig {
     /** uint64 */
@@ -437,7 +436,7 @@ interface TPQTabletConfig {
     ReadFromTimestampsMs?: number[];
     /** uint64[] */
     ConsumerFormatVersions?: number[];
-    
+
     ConsumerCodecs?: TCodecs[];
     ReadRuleServiceTypes?: string;
 
@@ -461,7 +460,7 @@ interface TPQTabletConfig {
     PartitionKeySchema?: TKeyComponentSchema[];
 
     Partitions?: TPartition[];
-    
+
     MeteringMode?: EMeteringMode;
 }
 
@@ -481,7 +480,7 @@ export interface TPersQueueGroupDescription {
     /** uint64 */
     PathId?: string;
     TotalGroupCount: number;
-    
+
     PartitionsToAdd?: TPartitionToAdd[];
     PartitionsToDelete?: number[];
     NextPartitionId?: number;

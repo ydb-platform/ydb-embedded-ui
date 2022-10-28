@@ -9,9 +9,7 @@ interface PersQueueGroupOverviewProps {
 
 export const PersQueueGroupOverview = ({data}: PersQueueGroupOverviewProps) => {
     if (!data) {
-        return (
-            <div className="error">No PersQueueGroup data</div>
-        );
+        return <div className="error">No PersQueueGroup data</div>;
     }
 
     const pqGroup = data.PathDescription?.PersQueueGroup;
@@ -21,15 +19,12 @@ export const PersQueueGroupOverview = ({data}: PersQueueGroupOverviewProps) => {
     info.push(formatCommonItem('CreateStep', data.PathDescription?.Self?.CreateStep));
 
     info.push(formatPQGroupItem('Partitions', pqGroup?.Partitions || []));
-    info.push(formatPQGroupItem('PQTabletConfig', pqGroup?.PQTabletConfig || {PartitionConfig: {LifetimeSeconds: 0}}));
-
-    return (
-        <>
-            {info.length ? (
-                <InfoViewer info={info}></InfoViewer>
-            ) : (
-                <>Empty</>
-            )}
-        </>
+    info.push(
+        formatPQGroupItem(
+            'PQTabletConfig',
+            pqGroup?.PQTabletConfig || {PartitionConfig: {LifetimeSeconds: 0}},
+        ),
     );
+
+    return <>{info.length ? <InfoViewer info={info}></InfoViewer> : <>Empty</>}</>;
 };

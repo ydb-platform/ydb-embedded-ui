@@ -104,15 +104,22 @@ function ObjectSummary(props: ObjectSummaryProps) {
     });
 
     const {name: tenantName, info: infoTab} = queryParams;
-    const pathData: TDirEntry | undefined = _.get(data[tenantName as string], 'PathDescription.Self');
-    const currentSchemaData: TDirEntry | undefined = _.get(data[currentSchemaPath], 'PathDescription.Self');
+    const pathData: TDirEntry | undefined = _.get(
+        data[tenantName as string],
+        'PathDescription.Self',
+    );
+    const currentSchemaData: TDirEntry | undefined = _.get(
+        data[currentSchemaPath],
+        'PathDescription.Self',
+    );
 
     const tableSchema =
         currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
 
-    const schema = isTableType(props.type) && isColumnEntityType(props.type)
-        ? prepareOlapTableSchema(tableSchema)
-        : tableSchema;
+    const schema =
+        isTableType(props.type) && isColumnEntityType(props.type)
+            ? prepareOlapTableSchema(tableSchema)
+            : tableSchema;
 
     useEffect(() => {
         const {type} = props;
@@ -166,11 +173,16 @@ function ObjectSummary(props: ObjectSummaryProps) {
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
-            [EPathType.EPathTypeCdcStream]: () => <CDCStreamOverview data={data[currentSchemaPath]} />,
-            [EPathType.EPathTypePersQueueGroup]: () => <PersQueueGroupOverview data={data[currentSchemaPath]} />,
+            [EPathType.EPathTypeCdcStream]: () => (
+                <CDCStreamOverview data={data[currentSchemaPath]} />
+            ),
+            [EPathType.EPathTypePersQueueGroup]: () => (
+                <PersQueueGroupOverview data={data[currentSchemaPath]} />
+            ),
         };
 
-        let component = currentSchemaData?.PathType && pathTypeToComponent[currentSchemaData.PathType]?.();
+        let component =
+            currentSchemaData?.PathType && pathTypeToComponent[currentSchemaData.PathType]?.();
 
         if (!component) {
             const startTimeInMilliseconds = Number(currentSchemaData?.CreateStep);
@@ -182,11 +194,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
             component = <InfoViewer info={[{label: 'Create time', value: createTime}]} />;
         }
 
-        return (
-            <div className={b('overview-wrapper')}>
-                {component}
-            </div>
-        );
+        return <div className={b('overview-wrapper')}>{component}</div>;
     };
 
     const renderTabContent = () => {
