@@ -8,7 +8,7 @@ import {getDescribe} from '../../../../store/reducers/describe';
 import {getSchemaAcl} from '../../../../store/reducers/schemaAcl';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 
-import {mapPathTypeToNavigationTreeType} from '../../utils/schema';
+import {checkIfPathNested, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 
 interface SchemaTreeProps {
@@ -30,10 +30,15 @@ export function SchemaTree(props: SchemaTreeProps) {
                 const {PathDescription: {Children = []} = {}} = data;
 
                 const preloadedData: Record<string, TEvDescribeSchemeResult> = {
-                    [path]: data
+                    [path]: data,
                 };
 
-                const childItems = Children.map((childData) => {
+                const filteredChildren = Children.filter(
+                    (child) =>
+                        !checkIfPathNested(data.PathDescription?.Self?.PathType, child.PathType),
+                );
+
+                const childItems = filteredChildren.map((childData) => {
                     const {Name = '', PathType, PathSubType} = childData;
 
                     // not full data, but it contains PathType, which ensures seamless switch between nodes
