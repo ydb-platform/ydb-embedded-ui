@@ -1,23 +1,25 @@
 import {createSelector, Selector} from 'reselect';
+import {Reducer} from 'redux';
 
 import '../../services/api';
 import {TEvDescribeSchemeResult} from '../../types/api/schema';
 import {IConsumer} from '../../types/api/consumers';
 import {IDescribeRootStateSlice, IDescribeState} from '../../types/store/describe';
+import {IResponseError} from '../../types/api/error';
 import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
 
 const FETCH_DESCRIBE = createRequestActionTypes('describe', 'FETCH_DESCRIBE');
 
-const initialState: IDescribeState = {
+const initialState = {
     loading: false,
     wasLoaded: false,
     data: {},
 };
 
-const describe = (
-    state = initialState,
-    action: ApiRequestAction<typeof FETCH_DESCRIBE, TEvDescribeSchemeResult, unknown>,
-) => {
+const describe: Reducer<
+    IDescribeState,
+    ApiRequestAction<typeof FETCH_DESCRIBE, TEvDescribeSchemeResult, IResponseError>
+> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_DESCRIBE.REQUEST: {
             return {

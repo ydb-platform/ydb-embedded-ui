@@ -1,12 +1,14 @@
+import {Reducer} from 'redux';
+
 const SET_QUERY_NAME_TO_EDIT = 'SET_QUERY_NAME_TO_EDIT';
 const CLEAR_QUERY_NAME_TO_EDIT = 'CLEAR_QUERY_NAME_TO_EDIT';
 
+type IAction = ReturnType<typeof setQueryNameToEdit> | ReturnType<typeof clearQueryNameToEdit>;
+type ISaveQueryState = string | null;
+
 const initialState = null;
 
-const saveQuery = function (
-    state = initialState,
-    action: ReturnType<typeof setQueryNameToEdit> | ReturnType<typeof clearQueryNameToEdit>,
-) {
+const saveQuery: Reducer<ISaveQueryState, IAction> = function (state = initialState, action) {
     switch (action.type) {
         case SET_QUERY_NAME_TO_EDIT:
             return action.data;

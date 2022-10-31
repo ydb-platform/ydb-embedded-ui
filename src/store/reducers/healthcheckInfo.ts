@@ -3,6 +3,7 @@ import _sortBy from 'lodash/fp/sortBy';
 import _uniqBy from 'lodash/fp/uniqBy';
 import _omit from 'lodash/omit';
 import {createSelector, Selector} from 'reselect';
+import {Reducer} from 'redux';
 
 import {
     IHealthcheckInfoState,
@@ -10,18 +11,19 @@ import {
     IIssuesTree,
 } from '../../types/store/healthcheck';
 import {HealthCheckAPIResponse, IssueLog, StatusFlag} from '../../types/api/healthcheck';
+import {IResponseError} from '../../types/api/error';
 
 import '../../services/api';
 import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
 
 const FETCH_HEALTHCHECK = createRequestActionTypes('cluster', 'FETCH_HEALTHCHECK');
 
-const initialState: IHealthcheckInfoState = {loading: false, wasLoaded: false};
+const initialState = {loading: false, wasLoaded: false};
 
-const healthcheckInfo = function (
-    state = initialState,
-    action: ApiRequestAction<typeof FETCH_HEALTHCHECK, HealthCheckAPIResponse, unknown>,
-) {
+const healthcheckInfo: Reducer<
+    IHealthcheckInfoState,
+    ApiRequestAction<typeof FETCH_HEALTHCHECK, HealthCheckAPIResponse, IResponseError>
+> = function (state = initialState, action) {
     switch (action.type) {
         case FETCH_HEALTHCHECK.REQUEST: {
             return {
