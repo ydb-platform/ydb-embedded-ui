@@ -4,7 +4,7 @@ import block from 'bem-cn-lite';
 
 import DataTable, {Column} from '@yandex-cloud/react-data-table';
 
-import {IRootState} from '../../../../types/store';
+import {IRootState} from '../../../../store/reducers';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutofetcher} from '../../../../utils/hooks';
 import {Search} from '../../../../components/Search';

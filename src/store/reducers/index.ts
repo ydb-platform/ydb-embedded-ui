@@ -34,10 +34,7 @@ import authentication from './authentication';
 import header from './header';
 import saveQuery from './saveQuery';
 import fullscreen from './fullscreen';
-
-function singleClusterMode(state = true) {
-    return state;
-}
+import singleClusterMode from './singleClusterMode';
 
 export const rootReducer = {
     singleClusterMode,
@@ -77,6 +74,11 @@ export const rootReducer = {
     fullscreen,
 };
 
-export default combineReducers({
+const combinedReducer = combineReducers({
     ...rootReducer,
 });
+
+export type IRootReducer = typeof combinedReducer;
+export type IRootState = ReturnType<IRootReducer>;
+
+export default combinedReducer;

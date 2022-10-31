@@ -5,7 +5,7 @@ import cn from 'bem-cn-lite';
 import {Loader} from '@gravity-ui/uikit';
 
 import {SelfCheckResult} from '../../../../types/api/healthcheck';
-import {IRootState} from '../../../../types/store';
+import {IRootState} from '../../../../store/reducers';
 import {
     getHealthcheckInfo,
     selectIssuesTreeById,
