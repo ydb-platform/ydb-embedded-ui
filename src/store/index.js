@@ -1,46 +1,15 @@
 import {createStore, applyMiddleware, compose} from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import getLocationMiddleware from './state-url-mapping';
 import {createBrowserHistory} from 'history';
 import {listenForHistoryChange} from 'redux-location-state';
 
+import {getUrlData} from './getUrlData';
+import getLocationMiddleware from './state-url-mapping';
 import rootReducer from './reducers';
 
-import url from 'url';
-
-export const webVersion = window.web_version;
-
-export const customBackend = window.custom_backend;
-
-export const getUrlData = (href, singleClusterMode) => {
-    if (!singleClusterMode) {
-        const {backend, clusterName} = url.parse(href, true).query;
-        return {
-            basename: '/',
-            backend,
-            clusterName,
-        };
-    } else if (customBackend) {
-        const {backend} = url.parse(href, true).query;
-        return {
-            basename: '/',
-            backend: backend || window.custom_backend,
-        };
-    } else {
-        const parsedPrefix = window.location.pathname.match(/.*(?=\/monitoring)/) || [];
-        const basenamePrefix = Boolean(parsedPrefix.length) && parsedPrefix[0];
-        const basename = [basenamePrefix, 'monitoring'].filter(Boolean).join('/');
-
-        return {
-            basename,
-            backend: basenamePrefix || '',
-        };
-    }
-};
+export let backend, basename, clusterName;
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-
-export let backend, basename, clusterName;
 
 function _configureStore(aRootReducer, history, singleClusterMode) {
     const {locationMiddleware, reducersWithLocation} = getLocationMiddleware(history, aRootReducer);
@@ -51,7 +20,7 @@ function _configureStore(aRootReducer, history, singleClusterMode) {
     });
 }
 
-export default function configureStore(aRootReducer = rootReducer, singleClusterMode = true) {
+function configureStore(aRootReducer = rootReducer, singleClusterMode = true) {
     ({backend, basename, clusterName} = getUrlData(window.location.href, singleClusterMode));
     const history = createBrowserHistory({basename});
 
@@ -59,3 +28,8 @@ export default function configureStore(aRootReducer = rootReducer, singleCluster
     listenForHistoryChange(store, history);
     return {history, store};
 }
+
+export const webVersion = window.web_version;
+export const customBackend = window.custom_backend;
+
+export default configureStore;
