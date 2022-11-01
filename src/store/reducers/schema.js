@@ -2,7 +2,7 @@ import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
 
 const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
-const PRELOAD_SCHEMA = 'schema/PRELOAD_SCHEMA';
+const PRELOAD_SCHEMAS = 'schema/PRELOAD_SCHEMAS';
 const SET_SCHEMA = 'schema/SET_SCHEMA';
 const SET_SHOW_PREVIEW = 'schema/SET_SHOW_PREVIEW';
 const ENABLE_AUTOREFRESH = 'schema/ENABLE_AUTOREFRESH';
@@ -54,16 +54,13 @@ const schema = (state = initialState, action) => {
                 loading: false,
             };
         }
-        case PRELOAD_SCHEMA: {
-            if (state.data[action.path]) {
-                return state;
-            }
-
+        case PRELOAD_SCHEMAS: {
             return {
                 ...state,
                 data: {
+                    // we don't want to overwrite existing paths
+                    ...action.data,
                     ...state.data,
-                    [action.path]: action.data,
                 },
             };
         }
@@ -133,11 +130,11 @@ export function setShowPreview(value) {
     };
 }
 
-// only stores the passed data if the path doesn't exist yet
-export function preloadSchema(path, data) {
+// only stores data for paths that are not in the store yet
+// existing paths are ignored
+export function preloadSchemas(data) {
     return {
-        type: PRELOAD_SCHEMA,
-        path,
+        type: PRELOAD_SCHEMAS,
         data,
     };
 }
