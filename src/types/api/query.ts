@@ -8,16 +8,16 @@ export interface CommonFields {
     ast?: AST;
     plan?: Plan;
     stats?: Stats;
-};
+}
 
 interface DeprecatedCommonFields {
     stats?: Stats;
 }
 
-export interface ErrorRepsonse {
+export interface ErrorResponse {
     error?: any;
     issues?: any;
-};
+}
 
 export type ExecuteActions = 'execute-script' | 'execute' | 'execute-scan' | undefined;
 export type ExplainActions = 'explain' | 'explain-ast';
@@ -34,7 +34,7 @@ type CellValue = string | number | null | undefined;
 
 export type KeyValueRow<T = CellValue> = {
     [key: string]: T;
-}
+};
 
 export type ArrayRow<T = CellValue> = Array<T>;
 
@@ -63,17 +63,15 @@ export type ExecuteYdbResponse = {
     result: KeyValueRow[];
 } & CommonFields;
 
-type ExecuteResponse<Schema extends Schemas> = 
+type ExecuteResponse<Schema extends Schemas> =
     | CommonFields // result can be undefined for queries like `insert into`
-    | (
-        Schema extends 'modern'
-            ? ExecuteModernResponse
-            : Schema extends 'ydb'
-                ? ExecuteYdbResponse
-                : Schema extends 'classic' | undefined
-                    ? ExecuteClassicResponse
-                    : unknown
-    );
+    | (Schema extends 'modern'
+          ? ExecuteModernResponse
+          : Schema extends 'ydb'
+            ? ExecuteYdbResponse
+            : Schema extends 'classic' | undefined
+                ? ExecuteClassicResponse
+                : unknown);
 
 // deprecated response from older versions, backward compatibility
 
@@ -92,8 +90,9 @@ export type DeprecatedExecuteResponseDeep = {
 // can be undefined for queries like `insert into`
 export type DeprecatedExecuteResponsePlain = DeprecatedExecuteResponseValue | undefined;
 
-export type DeprecatedExecuteResponse = DeprecatedExecuteResponseDeep | DeprecatedExecuteResponsePlain;
-
+export type DeprecatedExecuteResponse =
+    | DeprecatedExecuteResponseDeep
+    | DeprecatedExecuteResponsePlain;
 
 // ==== EXPLAIN ====
 
@@ -103,14 +102,12 @@ type ExplainResponse = CommonFields;
 
 // deprecated response from older versions, backward compatibility
 
-type DeprecatedExplainResponse<Action extends ExplainActions> = (
+type DeprecatedExplainResponse<Action extends ExplainActions> = 
     Action extends 'explain-ast'
         ? ({result: {ast: AST}} & Required<DeprecatedCommonFields>) | {ast: AST}
         : Action extends 'explain'
             ? ({result: Plan} & Required<DeprecatedCommonFields>) | Plan
-            : unknown
-);
-
+            : unknown;
 
 // ==== COMBINED API RESPONSE ====
 
@@ -124,15 +121,14 @@ export type QueryAPIExplainResponse<Action extends ExplainActions> =
     | DeprecatedExplainResponse<Action>
     | null;
 
-export type QueryAPIResponse<Action extends Actions, Schema extends Schemas = undefined> = (
+export type QueryAPIResponse<Action extends Actions, Schema extends Schemas = undefined> = 
     Action extends ExecuteActions
         ? QueryAPIExecuteResponse<Schema>
         : Action extends ExplainActions
             ? QueryAPIExplainResponse<Action>
-            : unknown
-);
+            : unknown;
 
-export type AnyExecuteResponse = 
+export type AnyExecuteResponse =
     | ExecuteModernResponse
     | ExecuteClassicResponse
     | ExecuteYdbResponse
@@ -146,13 +142,11 @@ export type DeepExecuteResponse =
     | ExecuteYdbResponse
     | DeprecatedExecuteResponseDeep;
 
-export type AnyExplainResponse = 
+export type AnyExplainResponse =
     | ExplainResponse
     | CommonFields
     | DeprecatedExplainResponse<'explain'>
     | DeprecatedExplainResponse<'explain-ast'>
     | null;
 
-export type AnyResponse =
-    | AnyExecuteResponse
-    | AnyExplainResponse;
+export type AnyResponse = AnyExecuteResponse | AnyExplainResponse;
