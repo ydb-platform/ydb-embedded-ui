@@ -1,6 +1,6 @@
 import '../../services/api';
 
-import type {ErrorRepsonse, ExecuteActions} from '../../types/api/query';
+import type {ErrorResponse, ExecuteActions} from '../../types/api/query';
 import type {IQueryResult} from '../../types/store/query';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
 
@@ -16,7 +16,7 @@ const initialState = {
 
 const preview = (
     state = initialState,
-    action: ApiRequestAction<typeof SEND_QUERY, IQueryResult, ErrorRepsonse> | ReturnType<typeof setQueryOptions>,
+    action: ApiRequestAction<typeof SEND_QUERY, IQueryResult, ErrorResponse> | ReturnType<typeof setQueryOptions>,
 ) => {
     switch (action.type) {
         case SEND_QUERY.REQUEST: {
