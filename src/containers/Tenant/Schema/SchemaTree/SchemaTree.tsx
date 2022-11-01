@@ -3,10 +3,10 @@ import {useDispatch} from 'react-redux';
 
 import {NavigationTree} from 'ydb-ui-components';
 
-import {setCurrentSchemaPath, getSchema, preloadSchema} from '../../../../store/reducers/schema';
+import {setCurrentSchemaPath, getSchema, preloadSchemas} from '../../../../store/reducers/schema';
 import {getDescribe} from '../../../../store/reducers/describe';
 import {getSchemaAcl} from '../../../../store/reducers/schemaAcl';
-import type {EPathType} from '../../../../types/api/schema';
+import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 
 import {mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
@@ -29,15 +29,15 @@ export function SchemaTree(props: SchemaTreeProps) {
             .then((data) => {
                 const {PathDescription: {Children = []} = {}} = data;
 
-                dispatch(preloadSchema(path, data));
+                const preloadedData: Record<string, TEvDescribeSchemeResult> = {
+                    [path]: data
+                };
 
-                return Children.map((childData) => {
+                const childItems = Children.map((childData) => {
                     const {Name = '', PathType, PathSubType} = childData;
 
                     // not full data, but it contains PathType, which ensures seamless switch between nodes
-                    dispatch(
-                        preloadSchema(`${path}/${Name}`, {PathDescription: {Self: childData}}),
-                    );
+                    preloadedData[`${path}/${Name}`] = {PathDescription: {Self: childData}};
 
                     return {
                         name: Name,
@@ -47,6 +47,10 @@ export function SchemaTree(props: SchemaTreeProps) {
                         expandable: true,
                     };
                 });
+
+                dispatch(preloadSchemas(preloadedData));
+
+                return childItems;
             });
 
     const handleActivePathUpdate = (activePath: string) => {
