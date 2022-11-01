@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.4.0...v2.4.1) (2022-11-01)
+
+
+### Performance Improvements
+
+* **SchemaTree:** batch preloaded data dispatch ([c9ac514](https://github.com/ydb-platform/ydb-embedded-ui/commit/c9ac514aabf5e9674aae95956604f47ba8a2d257))
+
 ## [2.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.3.0...v2.4.0) (2022-10-27)
 
 
