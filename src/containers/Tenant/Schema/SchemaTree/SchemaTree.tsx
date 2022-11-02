@@ -60,6 +60,9 @@ export function SchemaTree(props: SchemaTreeProps) {
 
     const handleActivePathUpdate = (activePath: string) => {
         dispatch(setCurrentSchemaPath(activePath));
+
+        // FIXME: these dispatches seem to be useless, as data is requested in every tab anyway
+        // But it needs to be checked more carefully
         dispatch(getSchema({path: activePath}));
         dispatch(getDescribe({path: activePath}));
         dispatch(getSchemaAcl({path: activePath}));

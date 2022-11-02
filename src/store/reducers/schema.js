@@ -1,5 +1,8 @@
+import {createSelector} from 'reselect';
+
 import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
+import {nestedPaths} from '../../containers/Tenant/utils/schema';
 
 const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
 const PRELOAD_SCHEMAS = 'schema/PRELOAD_SCHEMAS';
@@ -144,5 +147,30 @@ export function resetLoadingState() {
         type: RESET_LOADING_STATE,
     };
 }
+
+const selectSchemaChildren = (state, path) => {
+    return state.schema.data[path]?.PathDescription?.Children;
+};
+
+const selectSchemaPathType = (state, path) =>
+    state.schema.data[path]?.PathDescription?.Self?.PathType;
+
+export const selectSchemaChildrenPaths = createSelector(
+    [
+        (_, path) => path,
+        (state, path) => selectSchemaPathType(state, path),
+        (state, path) => selectSchemaChildren(state, path),
+    ],
+    (path, pathType, children) => {
+        const nestedChildrenTypes = nestedPaths[pathType];
+        if (nestedChildrenTypes && children) {
+            return children
+                .filter((child) => nestedChildrenTypes.includes(child.PathType))
+                .map((child) => path + '/' + child.Name);
+        } else {
+            return undefined;
+        }
+    },
+);
 
 export default schema;

@@ -87,7 +87,7 @@ export const TABLE_PAGES = [overview, topShards, graph, tablets, hotKeys, descri
 
 export const DIR_PAGES = [overview, topShards, describe];
 
-export const CDC_STREAM_PAGES = [overview, describe];
+export const CDC_STREAM_PAGES = [overview, consumers, describe];
 export const TOPIC_PAGES = [overview, consumers, describe];
 
 // verbose mapping to guarantee correct tabs for new path types

@@ -3,4 +3,9 @@
         width: 200px;
         margin-bottom: 20px;
     }
+    &__loader {
+        display: flex;
+        flex-grow: 1;
+        justify-content: center;
+    }
 }

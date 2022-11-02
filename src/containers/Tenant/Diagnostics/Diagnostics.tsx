@@ -34,7 +34,11 @@ import type {EPathType} from '../../../types/api/schema';
 import {TenantGeneralTabsIds, TenantTabsGroups} from '../TenantPages';
 import {GeneralPagesIds, DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
 //@ts-ignore
-import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema';
+import {
+    enableAutorefresh,
+    disableAutorefresh,
+    selectSchemaChildrenPaths,
+} from '../../../store/reducers/schema';
 import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant';
 
 import './Diagnostics.scss';
@@ -56,6 +60,9 @@ function Diagnostics(props: DiagnosticsProps) {
     } = useSelector((state: any) => state.schema);
     const {diagnosticsTab = GeneralPagesIds.overview, wasLoaded} = useSelector(
         (state: any) => state.tenant,
+    );
+    const schemaNestedChildrenPaths = useSelector((state) =>
+        selectSchemaChildrenPaths(state, currentSchemaPath),
     );
 
     const location = useLocation();
@@ -153,7 +160,13 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Heatmap path={currentItem.Path} />;
             }
             case GeneralPagesIds.consumers: {
-                return <Consumers path={currentItem.Path} />;
+                return (
+                    <Consumers
+                        path={currentItem.Path}
+                        pathType={props.type}
+                        schemaNestedChildrenPaths={schemaNestedChildrenPaths}
+                    />
+                );
             }
             default: {
                 return <div>No data...</div>;
