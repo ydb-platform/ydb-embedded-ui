@@ -1,17 +1,16 @@
 import {useCallback} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 
 import {Loader} from '@gravity-ui/uikit';
 
 import {SelfCheckResult} from '../../../../types/api/healthcheck';
-import {IRootState} from '../../../../store/reducers';
+import {useTypedSelector, useAutofetcher} from '../../../../utils/hooks';
 import {
     getHealthcheckInfo,
     selectIssuesTreeById,
     selectIssuesTreesRoots,
 } from '../../../../store/reducers/healthcheckInfo';
-import {useAutofetcher} from '../../../../utils/hooks';
 
 import {Details} from './Details';
 import {Preview} from './Preview';
@@ -34,17 +33,15 @@ export const Healthcheck = (props: HealthcheckProps) => {
 
     const dispatch = useDispatch();
 
-    const {data, loading, wasLoaded, error} = useSelector(
-        (state: IRootState) => state.healthcheckInfo,
-    );
+    const {data, loading, wasLoaded, error} = useTypedSelector((state) => state.healthcheckInfo);
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
 
-    const issuesTreesRoots = useSelector(selectIssuesTreesRoots);
-    const expandedIssueTree = useSelector((state: IRootState) =>
+    const issuesTreesRoots = useTypedSelector(selectIssuesTreesRoots);
+    const expandedIssueTree = useTypedSelector((state) =>
         selectIssuesTreeById(state, expandedIssueId),
     );
 
-    const {autorefresh} = useSelector((state: any) => state.schema);
+    const {autorefresh} = useTypedSelector((state) => state.schema);
 
     const fetchHealthcheck = useCallback(() => {
         dispatch(getHealthcheckInfo(tenant));

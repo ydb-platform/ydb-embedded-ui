@@ -32,4 +32,6 @@ function configureStore(aRootReducer = rootReducer, singleClusterMode = true) {
 export const webVersion = window.web_version;
 export const customBackend = window.custom_backend;
 
+export * from "./reducers"
+
 export default configureStore;

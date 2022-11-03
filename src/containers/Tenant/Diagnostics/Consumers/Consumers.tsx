@@ -1,12 +1,11 @@
 import {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 
 import DataTable, {Column} from '@yandex-cloud/react-data-table';
 
-import {IRootState} from '../../../../store/reducers';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {useAutofetcher} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {Search} from '../../../../components/Search';
 import {getDescribe, selectConsumers} from '../../../../store/reducers/describe';
 
@@ -29,7 +28,7 @@ export const Consumers = ({path}: ConsumersProps) => {
 
     useAutofetcher(fetchData, [path]);
 
-    const consumers = useSelector((state: IRootState) => selectConsumers(state, path));
+    const consumers = useTypedSelector((state) => selectConsumers(state, path));
 
     const [consumersToRender, setConsumersToRender] = useState(consumers);
 
