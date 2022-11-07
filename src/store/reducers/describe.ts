@@ -2,54 +2,100 @@ import {createSelector, Selector} from 'reselect';
 import {Reducer} from 'redux';
 
 import '../../services/api';
-import {TEvDescribeSchemeResult} from '../../types/api/schema';
 import {IConsumer} from '../../types/api/consumers';
-import {IDescribeRootStateSlice, IDescribeState} from '../../types/store/describe';
-import {IResponseError} from '../../types/api/error';
-import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
+import {
+    IDescribeRootStateSlice,
+    IDescribeState,
+    IDescribeData,
+    IDescribeAction,
+    IDescribeFetchAdditionalParams,
+} from '../../types/store/describe';
+import {createRequestActionTypes, createApiRequest} from '../utils';
 
-const FETCH_DESCRIBE = createRequestActionTypes('describe', 'FETCH_DESCRIBE');
+export const FETCH_DESCRIBE = createRequestActionTypes('describe', 'FETCH_DESCRIBE');
 
 const initialState = {
-    loading: false,
+    loading: true,
     wasLoaded: false,
     data: {},
+    currentDescribe: undefined,
+    currentDescribePath: undefined,
 };
 
-const describe: Reducer<
-    IDescribeState,
-    ApiRequestAction<typeof FETCH_DESCRIBE, TEvDescribeSchemeResult, IResponseError>
-> = (state = initialState, action) => {
+const describe: Reducer<IDescribeState, IDescribeAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_DESCRIBE.REQUEST: {
+            // Reset loading helps to keep correct loader render on tabs or path change
+            const resetLoading = action.additionalParams?.resetLoadingState;
+            const wasLoaded = resetLoading ? false : state.wasLoaded;
+
+            // Current describe corresponds to current path, this prevents rendering incorrect data
+            // when path is changed
+            const newPath = action.additionalParams?.currentDescribePath;
+            const currentDescribePath = newPath || state.currentDescribePath;
+
             return {
                 ...state,
                 loading: true,
+                wasLoaded,
+                currentDescribePath,
             };
         }
         case FETCH_DESCRIBE.SUCCESS: {
-            let newData;
+            const data = action.data;
 
-            if (action.data.Path) {
+            const currentDescribePath = action.additionalParams?.currentDescribePath;
+            const isCurrentDescribePath = currentDescribePath === state.currentDescribePath;
+
+            let newData: IDescribeData = {},
+                currentDescribe: any = {},
+                wasLoaded = true;
+
+            if (Array.isArray(data)) {
                 newData = JSON.parse(JSON.stringify(state.data));
-                newData[action.data.Path] = action.data;
+
+                data.forEach((item) => {
+                    if (item.Path) {
+                        newData[item.Path] = item;
+                        if (isCurrentDescribePath) {
+                            currentDescribe[item.Path] = item;
+                        }
+                    }
+                });
             } else {
-                newData = state.data;
+                if (data.Path) {
+                    newData = JSON.parse(JSON.stringify(state.data));
+                    newData[data.Path] = data;
+                    if (isCurrentDescribePath) {
+                        currentDescribe = data;
+                    }
+                }
+            }
+
+            // Do not reset wasLoaded state if it is not loading current path describe
+            // May be needed in case of schema switch while data has not been loaded
+            if (!isCurrentDescribePath) {
+                wasLoaded = state.wasLoaded;
             }
 
             return {
                 ...state,
-                data: newData,
-                currentDescribe: action.data,
+                data: newData || state.data,
+                currentDescribe: currentDescribe || state.currentDescribe,
                 loading: false,
-                wasLoaded: true,
+                wasLoaded: wasLoaded,
                 error: undefined,
             };
         }
         case FETCH_DESCRIBE.FAILURE: {
+            if (action.error?.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error,
+                wasLoaded: true,
                 loading: false,
             };
         }
@@ -75,10 +121,22 @@ export const selectConsumers: Selector<IDescribeRootStateSlice, IConsumer[]> = c
     },
 );
 
-export function getDescribe({path}: {path: string}) {
+export function getDescribe(
+    {path}: {path: string | string[]},
+    additionalParams?: IDescribeFetchAdditionalParams,
+) {
+    let request;
+
+    if (Array.isArray(path)) {
+        request = path.map((p) => window.api.getDescribe({path: p}));
+    } else {
+        request = window.api.getDescribe({path});
+    }
+
     return createApiRequest({
-        request: window.api.getDescribe({path}),
+        request,
         actions: FETCH_DESCRIBE,
+        additionalParams,
     });
 }
 

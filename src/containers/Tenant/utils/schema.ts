@@ -95,8 +95,10 @@ export const nestedPaths: Partial<Record<EPathType, EPathType[]>> = {
     [EPathType.EPathTypeCdcStream]: [EPathType.EPathTypePersQueueGroup],
 };
 
+export const checkIfPathHasNestedChildren = (pathType?: EPathType) => {
+    const length = pathType && nestedPaths[pathType]?.length;
+    return length && length > 0;
+};
+
 export const checkIfPathNested = (parentPathType?: EPathType, childPathType?: EPathType) =>
-    parentPathType &&
-    childPathType &&
-    nestedPaths[parentPathType] &&
-    nestedPaths[parentPathType]?.includes(childPathType);
+    parentPathType && childPathType && nestedPaths[parentPathType]?.includes(childPathType);

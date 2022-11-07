@@ -89,11 +89,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId: concurrentId || `getSchema|${path}`},
         );
     }
-    getDescribe({path}) {
-        return this.get(this.getPath('/viewer/json/describe'), {
-            path,
-            enums: true,
-        });
+    getDescribe({path}, {concurrentId} = {}) {
+        return this.get(
+            this.getPath('/viewer/json/describe'),
+            {
+                path,
+                enums: true,
+            },
+            {concurrentId: concurrentId || `getDescribe|${path}`},
+        );
     }
     getSchemaAcl({path}) {
         return this.get(

@@ -1,13 +1,16 @@
-import {useEffect} from 'react';
-import cn from 'bem-cn-lite';
 import {useDispatch, useSelector} from 'react-redux';
-import {Loader} from '@gravity-ui/uikit';
-import 'react-json-inspector/json-inspector.css';
+import cn from 'bem-cn-lite';
 // @ts-ignore
 import JSONTree from 'react-json-inspector';
+import 'react-json-inspector/json-inspector.css';
 
-import {getDescribe} from '../../../../store/reducers/describe';
+import {Loader} from '@gravity-ui/uikit';
+
 import {useAutofetcher} from '../../../../utils/hooks';
+import {EPathType} from '../../../../types/api/schema';
+import {getDescribe} from '../../../../store/reducers/describe';
+
+import {checkIfPathHasNestedChildren} from '../../utils/schema';
 
 import './Describe.scss';
 
@@ -16,35 +19,60 @@ const b = cn('kv-describe');
 const expandMap = new Map();
 
 interface IDescribeProps {
+    pathType: EPathType;
     tenant: string;
+    schemaNestedChildrenPaths?: string[];
 }
 
-const Describe = ({tenant}: IDescribeProps) => {
+const Describe = ({pathType, tenant, schemaNestedChildrenPaths}: IDescribeProps) => {
     const dispatch = useDispatch();
 
-    const {
-        currentDescribe: data,
-        error,
-        loading,
-        wasLoaded,
-    } = useSelector((state: any) => state.describe);
-    const {autorefresh, currentSchemaPath} = useSelector((state: any) => state.schema);
+    const {currentDescribe, error, loading, wasLoaded} = useSelector(
+        (state: any) => state.describe,
+    );
 
-    const fetchData = () => {
+    const {
+        autorefresh,
+        currentSchemaPath,
+        loading: schemaLoading,
+        wasLoaded: schemaWasLoaded,
+    } = useSelector((state: any) => state.schema);
+
+    const hasNested = checkIfPathHasNestedChildren(pathType);
+
+    const fetchData = (resetLoadingState: boolean) => {
         const path = currentSchemaPath || tenant;
-        dispatch(getDescribe({path}));
+
+        if (hasNested) {
+            // Prevent fetch when shema is not loaded
+            // as in this case component may lack correct children data that is loaded in shema
+            if (!schemaWasLoaded) {
+                return;
+            }
+
+            if (schemaNestedChildrenPaths && schemaNestedChildrenPaths.length > 0) {
+                const paths = [path, ...schemaNestedChildrenPaths];
+                dispatch(
+                    getDescribe({path: paths}, {resetLoadingState, currentDescribePath: path}),
+                );
+            } else {
+                dispatch(getDescribe({path}, {resetLoadingState, currentDescribePath: path}));
+            }
+        } else {
+            dispatch(getDescribe({path}, {resetLoadingState, currentDescribePath: path}));
+        }
     };
 
-    useAutofetcher(fetchData, [], autorefresh);
-
-    useEffect(() => {
-        fetchData();
-    }, [currentSchemaPath]);
+    useAutofetcher(
+        (isBackground) => fetchData(!isBackground),
+        [tenant, currentSchemaPath, schemaWasLoaded, schemaNestedChildrenPaths],
+        autorefresh,
+    );
 
     const renderDescribeJson = () => {
         return (
             <JSONTree
-                data={data}
+                data={currentDescribe}
                 className={b('tree')}
                 onClick={({path}: {path: string}) => {
                     const newValue = !(expandMap.get(path) || false);
@@ -60,7 +88,10 @@ const Describe = ({tenant}: IDescribeProps) => {
         );
     };
 
-    if (loading && !wasLoaded) {
+    // Schema loads children paths.
+    // To prevent rendering describe without children where children are needed,
+    // schema loading state is checked here
+    if (!wasLoaded || (hasNested && schemaLoading && !schemaWasLoaded)) {
         return (
             <div className={b('loader-container')}>
                 <Loader size="m" />
@@ -72,7 +103,7 @@ const Describe = ({tenant}: IDescribeProps) => {
         return <div className={b('message-container')}>{error.data || error}</div>;
     }
 
-    if (!loading && !data) {
+    if (!loading && !currentDescribe) {
         return <div className={b('message-container')}>Empty</div>;
     }
 
