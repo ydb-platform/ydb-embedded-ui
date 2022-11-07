@@ -4,6 +4,7 @@ import {
     TopologyNodeDataStats,
     TopologyNodeDataStatsSection,
     ExplainPlanNodeData,
+    TopologyNodeDataStatsItem,
 } from '@yandex-cloud/paranoid';
 
 interface PlanOperator {
@@ -24,6 +25,8 @@ export interface Plan {
 export interface RootPlan {
     Plan: Plan;
 }
+
+const CONNECTION_NODE_META_FIELDS = new Set(['PlanNodeId', 'PlanNodeType', 'Node Type', 'Plans']);
 
 function prepareStats(plan: Plan) {
     const stats: TopologyNodeDataStats[] = [];
@@ -52,21 +55,52 @@ function prepareStats(plan: Plan) {
         });
     }
 
+    if (plan.PlanNodeType === 'Connection') {
+        const attrStats: TopologyNodeDataStatsItem[] = [];
+
+        for (const [key, value] of Object.entries(plan)) {
+            if (CONNECTION_NODE_META_FIELDS.has(key)) {
+                continue;
+            }
+
+            attrStats.push({name: key, value: String(value)});
+        }
+
+        if (attrStats.length > 0) {
+            stats.push({
+                group: 'Attributes',
+                stats: attrStats,
+            });
+        }
+    }
+
     return stats;
+}
+
+function getNodeType(plan: Plan) {
+    switch (plan.PlanNodeType) {
+        case 'Connection':
+            return 'connection';
+        case 'ResultSet':
+            return 'result';
+        case 'Query':
+            return 'query';
+        default:
+            return 'stage';
+    }
 }
 
 export function preparePlan(plan: Plan) {
     const nodes: GraphNode[] = [];
     const links: Link[] = [];
 
-    function parsePlans(plans: Plan[] = [], from: string, curDepth: number) {
-        const depth = curDepth + 1;
+    function parsePlans(plans: Plan[] = [], from: string) {
         plans.forEach((p) => {
             const node: GraphNode<ExplainPlanNodeData> = {
                 name: String(p.PlanNodeId),
                 data: {
                     id: p.PlanNodeId,
-                    type: p.PlanNodeType === 'Connection' ? 'connection' : 'stage',
+                    type: getNodeType(p),
                     name: p['Node Type'],
                     operators: p.Operators?.map((o) => o.Name),
                     stats: prepareStats(p),
@@ -75,7 +109,7 @@ export function preparePlan(plan: Plan) {
             };
             nodes.push(node);
             links.push({from, to: node.name});
-            parsePlans(p.Plans, node.name, depth);
+            parsePlans(p.Plans, node.name);
         });
     }
 
@@ -84,12 +118,13 @@ export function preparePlan(plan: Plan) {
         name: String(rootPlan.PlanNodeId),
         data: {
             id: rootPlan.PlanNodeId,
-            type: 'stage',
+            type: getNodeType(rootPlan),
             name: rootPlan['Node Type'],
         },
     };
     nodes.push(rootNode);
-    parsePlans(rootPlan.Plans, rootNode.name, 0);
+    parsePlans(rootPlan.Plans, rootNode.name);
+
     return {
         nodes,
         links,
