@@ -78,9 +78,12 @@ function Tenant(props: TenantProps) {
     const tenantName = name as string;
 
     useEffect(() => {
+        dispatch(getSchema({path: tenantName}));
+    }, [tenantName, dispatch]);
+
+    useEffect(() => {
         const schemaPath = currentSchemaPath || tenantName;
         dispatch(resetLoadingState());
-        dispatch(getSchema({path: tenantName}));
         dispatch(getSchema({path: schemaPath}));
         dispatch(getSchemaAcl({path: schemaPath}));
     }, [tenantName, currentSchemaPath, dispatch]);
