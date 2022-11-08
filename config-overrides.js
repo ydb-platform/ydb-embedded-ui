@@ -14,17 +14,6 @@ module.exports = {
         });
 
         if (env === 'production') {
-            oneOfRule.oneOf.splice(0, 0, {
-                test: /\.svg$/,
-                include: path.resolve(srcRoot, 'assets/illustrations'),
-                loader: 'file-loader',
-                options: {
-                    // default is 'static/media/...', but the embedded version static is served from 'resources/media/...',
-                    // and the 'resources' substring is handled by the publicPath below
-                    name: 'media/[name].[hash:8].[ext]',
-                },
-            });
-            config.output.publicPath = 'resources/';
             config.output.path = path.resolve(__dirname, 'build/');
         }
 
