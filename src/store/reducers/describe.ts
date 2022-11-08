@@ -105,21 +105,19 @@ const describe: Reducer<IDescribeState, IDescribeAction> = (state = initialState
 };
 
 // Consumers selectors
-const selectConsumersNames: Selector<IDescribeRootStateSlice, string[] | undefined, [string]> = (
-    state,
-    path,
-) => state.describe.data[path]?.PathDescription?.PersQueueGroup?.PQTabletConfig?.ReadRules;
+const selectConsumersNames = (state: IDescribeRootStateSlice, path: string | undefined) =>
+    path
+        ? state.describe.data[path]?.PathDescription?.PersQueueGroup?.PQTabletConfig?.ReadRules
+        : undefined;
 
-export const selectConsumers: Selector<IDescribeRootStateSlice, IConsumer[]> = createSelector(
-    selectConsumersNames,
-    (names = []) => {
+export const selectConsumers: Selector<IDescribeRootStateSlice, IConsumer[], [string | undefined]> =
+    createSelector(selectConsumersNames, (names = []) => {
         const consumers = names.map((name) => {
             return {name};
         });
 
         return consumers;
-    },
-);
+    });
 
 export function getDescribe(
     {path}: {path: string | string[]},

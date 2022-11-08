@@ -1,10 +1,17 @@
-import {createSelector} from 'reselect';
+import {Reducer} from 'redux';
+import {Selector, createSelector} from 'reselect';
 
-import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
 import {nestedPaths} from '../../containers/Tenant/utils/schema';
+import {
+    ISchemaRootStateSlice,
+    ISchemaState,
+    ISchemaData,
+    ISchemaAction,
+} from '../../types/store/schema';
+import {createRequestActionTypes, createApiRequest} from '../utils';
 
-const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
+export const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
 const PRELOAD_SCHEMAS = 'schema/PRELOAD_SCHEMAS';
 const SET_SCHEMA = 'schema/SET_SCHEMA';
 const SET_SHOW_PREVIEW = 'schema/SET_SHOW_PREVIEW';
@@ -21,7 +28,7 @@ export const initialState = {
     showPreview: false,
 };
 
-const schema = (state = initialState, action) => {
+const schema: Reducer<ISchemaState, ISchemaAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_SCHEMA.REQUEST: {
             return {
@@ -31,7 +38,10 @@ const schema = (state = initialState, action) => {
         }
         case FETCH_SCHEMA.SUCCESS: {
             const newData = JSON.parse(JSON.stringify(state.data));
-            newData[action.data.Path] = action.data;
+
+            if (action.data.Path) {
+                newData[action.data.Path] = action.data;
+            }
             const currentSchema = state.currentSchemaPath
                 ? newData[state.currentSchemaPath]
                 : action.data;
@@ -103,69 +113,76 @@ const schema = (state = initialState, action) => {
     }
 };
 
-export function getSchema({path}) {
+export function getSchema({path}: {path: string}) {
     return createApiRequest({
         request: window.api.getSchema({path}),
         actions: FETCH_SCHEMA,
     });
 }
 
-export function setCurrentSchemaPath(currentSchemaPath) {
+export function setCurrentSchemaPath(currentSchemaPath: string) {
     return {
         type: SET_SCHEMA,
         data: currentSchemaPath,
-    };
+    } as const;
 }
 export function enableAutorefresh() {
     return {
         type: ENABLE_AUTOREFRESH,
-    };
+    } as const;
 }
 export function disableAutorefresh() {
     return {
         type: DISABLE_AUTOREFRESH,
-    };
+    } as const;
 }
-export function setShowPreview(value) {
+export function setShowPreview(value: boolean) {
     return {
         type: SET_SHOW_PREVIEW,
         data: value,
-    };
+    } as const;
 }
 
 // only stores data for paths that are not in the store yet
 // existing paths are ignored
-export function preloadSchemas(data) {
+export function preloadSchemas(data: ISchemaData) {
     return {
         type: PRELOAD_SCHEMAS,
         data,
-    };
+    } as const;
 }
 
 export function resetLoadingState() {
     return {
         type: RESET_LOADING_STATE,
-    };
+    } as const;
 }
 
-const selectSchemaChildren = (state, path) => {
-    return state.schema.data[path]?.PathDescription?.Children;
-};
+const selectSchemaChildren = (state: ISchemaRootStateSlice, path: string | undefined) =>
+    path ? state.schema.data[path]?.PathDescription?.Children : undefined;
 
-const selectSchemaPathType = (state, path) =>
-    state.schema.data[path]?.PathDescription?.Self?.PathType;
+const selectSchemaPathType = (state: ISchemaRootStateSlice, path: string | undefined) =>
+    path ? state.schema.data[path]?.PathDescription?.Self?.PathType : undefined;
 
-export const selectSchemaChildrenPaths = createSelector(
+export const selectSchemaChildrenPaths: Selector<
+    ISchemaRootStateSlice,
+    string[] | undefined,
+    [string | undefined]
+> = createSelector(
     [
-        (_, path) => path,
+        (_, path: string | undefined) => path,
         (state, path) => selectSchemaPathType(state, path),
         (state, path) => selectSchemaChildren(state, path),
     ],
     (path, pathType, children) => {
+        if (!path || !pathType) {
+            return undefined;
+        }
+
         const nestedChildrenTypes = nestedPaths[pathType];
         if (nestedChildrenTypes && children) {
             return children
-                .filter((child) => nestedChildrenTypes.includes(child.PathType))
+                .filter((child) => child.PathType && nestedChildrenTypes.includes(child.PathType))
                 .map((child) => path + '/' + child.Name);
         } else {
             return undefined;

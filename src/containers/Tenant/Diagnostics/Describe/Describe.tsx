@@ -19,7 +19,7 @@ const b = cn('kv-describe');
 const expandMap = new Map();
 
 interface IDescribeProps {
-    pathType: EPathType;
+    pathType?: EPathType;
     tenant: string;
     schemaNestedChildrenPaths?: string[];
 }

@@ -31,6 +31,7 @@ import {Consumers} from './Consumers';
 
 import routes, {createHref} from '../../../routes';
 import type {EPathType} from '../../../types/api/schema';
+import {useTypedSelector} from '../../../utils/hooks';
 import {TenantGeneralTabsIds, TenantTabsGroups} from '../TenantPages';
 import {GeneralPagesIds, DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
 //@ts-ignore
@@ -61,7 +62,7 @@ function Diagnostics(props: DiagnosticsProps) {
     const {diagnosticsTab = GeneralPagesIds.overview, wasLoaded} = useSelector(
         (state: any) => state.tenant,
     );
-    const schemaNestedChildrenPaths = useSelector((state) =>
+    const schemaNestedChildrenPaths = useTypedSelector((state) =>
         selectSchemaChildrenPaths(state, currentSchemaPath),
     );
 
