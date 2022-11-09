@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.4.1...v2.4.2) (2022-11-09)
+
+
+### Bug Fixes
+
+* **QueryExplain:** apply all node types ([06d26de](https://github.com/ydb-platform/ydb-embedded-ui/commit/06d26def15496f8e2de00d941b39bf6a68382f14))
+
 ## [2.4.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.4.0...v2.4.1) (2022-11-01)
 
 
