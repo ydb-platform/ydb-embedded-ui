@@ -4,8 +4,6 @@ import {useDispatch} from 'react-redux';
 import {NavigationTree} from 'ydb-ui-components';
 
 import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema';
-// import {getDescribe} from '../../../../store/reducers/describe';
-// import {getSchemaAcl} from '../../../../store/reducers/schemaAcl';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 
 import {checkIfPathNested, mapPathTypeToNavigationTreeType} from '../../utils/schema';
@@ -60,13 +58,6 @@ export function SchemaTree(props: SchemaTreeProps) {
 
     const handleActivePathUpdate = (activePath: string) => {
         dispatch(setCurrentSchemaPath(activePath));
-
-        // FIXME: these dispatches seem to be useless, as data is requested in every tab anyway
-        // But it needs to be checked more carefully
-        // For example, somewhere it fixes not sufficient data update inside componentDidUpdate
-        // dispatch(getSchema({path: activePath}));
-        // dispatch(getDescribe({path: activePath}));
-        // dispatch(getSchemaAcl({path: activePath}));
     };
 
     useEffect(() => {
