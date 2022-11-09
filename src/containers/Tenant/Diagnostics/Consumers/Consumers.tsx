@@ -27,6 +27,7 @@ export const Consumers = ({path, pathType, schemaNestedChildrenPaths}: Consumers
     const dispath = useDispatch();
 
     const {loading, wasLoaded} = useTypedSelector((state) => state.describe);
+    const {autorefresh} = useTypedSelector((state) => state.schema);
 
     const isCdcStream = pathType === EPathType.EPathTypeCdcStream;
 
@@ -54,6 +55,7 @@ export const Consumers = ({path, pathType, schemaNestedChildrenPaths}: Consumers
     useAutofetcher(
         (isBackground) => fetchData(!isBackground),
         [path, pathType, schemaNestedChildrenPaths],
+        autorefresh,
     );
 
     const consumers = useTypedSelector((state) => selectConsumers(state, targetPath));
