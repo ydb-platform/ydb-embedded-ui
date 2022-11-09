@@ -44,12 +44,6 @@ const Describe = ({pathType, tenant, schemaNestedChildrenPaths}: IDescribeProps)
         const path = currentSchemaPath || tenant;
 
         if (hasNested) {
-            // Prevent fetch when shema is not loaded
-            // as in this case component may lack correct children data that is loaded in shema
-            if (!schemaWasLoaded) {
-                return;
-            }
-
             if (schemaNestedChildrenPaths && schemaNestedChildrenPaths.length > 0) {
                 const paths = [path, ...schemaNestedChildrenPaths];
                 dispatch(
@@ -65,7 +59,7 @@ const Describe = ({pathType, tenant, schemaNestedChildrenPaths}: IDescribeProps)
 
     useAutofetcher(
         (isBackground) => fetchData(!isBackground),
-        [tenant, currentSchemaPath, schemaWasLoaded, schemaNestedChildrenPaths],
+        [tenant, currentSchemaPath, schemaNestedChildrenPaths],
         autorefresh,
     );
 

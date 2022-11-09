@@ -25,5 +25,13 @@ export const PersQueueGroupInfo = ({data}: PersQueueGrouopInfoProps) => {
         ),
     );
 
-    return <>{info.length ? <InfoViewer info={info}></InfoViewer> : <>Empty</>}</>;
+    return (
+        <>
+            {info.length ? (
+                <InfoViewer title="PersQueueGroup" info={info}></InfoViewer>
+            ) : (
+                <>Empty</>
+            )}
+        </>
+    );
 };

@@ -5,7 +5,7 @@ import {NavigationTree} from 'ydb-ui-components';
 
 import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema';
 // import {getDescribe} from '../../../../store/reducers/describe';
-import {getSchemaAcl} from '../../../../store/reducers/schemaAcl';
+// import {getSchemaAcl} from '../../../../store/reducers/schemaAcl';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 
 import {checkIfPathNested, mapPathTypeToNavigationTreeType} from '../../utils/schema';
@@ -66,7 +66,7 @@ export function SchemaTree(props: SchemaTreeProps) {
         // For example, somewhere it fixes not sufficient data update inside componentDidUpdate
         // dispatch(getSchema({path: activePath}));
         // dispatch(getDescribe({path: activePath}));
-        dispatch(getSchemaAcl({path: activePath}));
+        // dispatch(getSchemaAcl({path: activePath}));
     };
 
     useEffect(() => {

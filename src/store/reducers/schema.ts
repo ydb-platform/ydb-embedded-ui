@@ -18,6 +18,7 @@ const SET_SHOW_PREVIEW = 'schema/SET_SHOW_PREVIEW';
 const ENABLE_AUTOREFRESH = 'schema/ENABLE_AUTOREFRESH';
 const DISABLE_AUTOREFRESH = 'schema/DISABLE_AUTOREFRESH';
 const RESET_LOADING_STATE = 'schema/RESET_LOADING_STATE';
+const RESET_CURRENT_SCHEMA_NESTED_CHILDREN = 'schema/RESET_LOADING_STATE';
 
 export const initialState = {
     loading: true,
@@ -39,19 +40,38 @@ const schema: Reducer<ISchemaState, ISchemaAction> = (state = initialState, acti
         case FETCH_SCHEMA.SUCCESS: {
             const newData = JSON.parse(JSON.stringify(state.data));
 
-            if (action.data.Path) {
-                newData[action.data.Path] = action.data;
+            let currentSchemaPath, currentSchema, currentSchemaNestedChildren;
+
+            if (Array.isArray(action.data) && action.data.length > 0) {
+                const isCurrent =
+                    !state.currentSchemaPath || action.data[0].Path === state.currentSchemaPath;
+
+                newData[action.data[0].Path] = action.data[0];
+
+                currentSchema = isCurrent ? action.data[0] : state.currentSchema;
+                currentSchemaPath = isCurrent ? action.data[0].Path : state.currentSchemaPath;
+
+                currentSchemaNestedChildren = action.data.slice(1);
+            } else {
+                if (action.data.Path) {
+                    newData[action.data.Path] = action.data;
+                }
+
+                const isCurrent =
+                    !state.currentSchemaPath || action.data.Path === state.currentSchemaPath;
+
+                currentSchema = isCurrent ? action.data : state.currentSchema;
+                currentSchemaPath = isCurrent ? action.data.Path : state.currentSchemaPath;
             }
-            const currentSchema = state.currentSchemaPath
-                ? newData[state.currentSchemaPath]
-                : action.data;
-            const currentSchemaPath = state.currentSchemaPath || action.data.Path;
+
             return {
                 ...state,
                 error: undefined,
                 data: newData,
                 currentSchema,
                 currentSchemaPath,
+                currentSchemaNestedChildren:
+                    currentSchemaNestedChildren || state.currentSchemaNestedChildren,
                 loading: false,
                 wasLoaded: true,
             };
@@ -108,14 +128,28 @@ const schema: Reducer<ISchemaState, ISchemaAction> = (state = initialState, acti
                 wasLoaded: initialState.wasLoaded,
             };
         }
+        case RESET_CURRENT_SCHEMA_NESTED_CHILDREN: {
+            return {
+                ...state,
+                currentSchemaNestedChildren: undefined,
+            };
+        }
         default:
             return state;
     }
 };
 
-export function getSchema({path}: {path: string}) {
+export function getSchema({path}: {path: string | string[]}) {
+    let request;
+
+    if (Array.isArray(path)) {
+        request = path.map((p) => window.api.getSchema({path: p}));
+    } else {
+        request = window.api.getSchema({path});
+    }
+
     return createApiRequest({
-        request: window.api.getSchema({path}),
+        request,
         actions: FETCH_SCHEMA,
     });
 }
@@ -158,29 +192,31 @@ export function resetLoadingState() {
     } as const;
 }
 
+export function resetCurrentSchemaNestedChildren() {
+    return {
+        type: RESET_CURRENT_SCHEMA_NESTED_CHILDREN,
+    } as const;
+}
+
 const selectSchemaChildren = (state: ISchemaRootStateSlice, path: string | undefined) =>
     path ? state.schema.data[path]?.PathDescription?.Children : undefined;
 
 const selectSchemaPathType = (state: ISchemaRootStateSlice, path: string | undefined) =>
     path ? state.schema.data[path]?.PathDescription?.Self?.PathType : undefined;
 
+// should be used with shallowEqual option in react-redux useSelector
 export const selectSchemaChildrenPaths: Selector<
     ISchemaRootStateSlice,
     string[] | undefined,
     [string | undefined]
 > = createSelector(
-    [
-        (_, path: string | undefined) => path,
-        (state, path) => selectSchemaPathType(state, path),
-        (state, path) => selectSchemaChildren(state, path),
-    ],
+    [(_, path: string | undefined) => path, selectSchemaPathType, selectSchemaChildren],
     (path, pathType, children) => {
-        if (!path || !pathType) {
+        if (!path || !pathType || !children) {
             return undefined;
         }
-
         const nestedChildrenTypes = nestedPaths[pathType];
-        if (nestedChildrenTypes && children) {
+        if (nestedChildrenTypes) {
             return children
                 .filter((child) => child.PathType && nestedChildrenTypes.includes(child.PathType))
                 .map((child) => path + '/' + child.Name);

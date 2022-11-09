@@ -6,6 +6,7 @@ import {
     resetLoadingState,
     setCurrentSchemaPath,
     setShowPreview,
+    resetCurrentSchemaNestedChildren,
 } from '../../store/reducers/schema';
 import {ApiRequestAction} from '../../store/utils';
 import {IResponseError} from '../api/error';
@@ -18,6 +19,8 @@ export interface ISchemaState {
     wasLoaded: boolean;
     data: ISchemaData;
     currentSchemaPath: string | undefined;
+    currentSchema?: TEvDescribeSchemeResult;
+    currentSchemaNestedChildren?: TEvDescribeSchemeResult[];
     autorefresh: boolean;
     showPreview: boolean;
 }
@@ -37,6 +40,7 @@ export type ISchemaAction =
           | ReturnType<typeof setShowPreview>
           | ReturnType<typeof preloadSchemas>
           | ReturnType<typeof resetLoadingState>
+          | ReturnType<typeof resetCurrentSchemaNestedChildren>
       );
 
 export interface ISchemaRootStateSlice {

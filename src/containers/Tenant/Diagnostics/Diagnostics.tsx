@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 import qs from 'qs';
 import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
-import {useDispatch, useSelector} from 'react-redux';
+import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import {useLocation} from 'react-router';
 
 import {Loader, Switch, Tabs} from '@gravity-ui/uikit';
@@ -34,7 +34,6 @@ import type {EPathType} from '../../../types/api/schema';
 import {useTypedSelector} from '../../../utils/hooks';
 import {TenantGeneralTabsIds, TenantTabsGroups} from '../TenantPages';
 import {GeneralPagesIds, DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
-//@ts-ignore
 import {
     enableAutorefresh,
     disableAutorefresh,
@@ -62,8 +61,9 @@ function Diagnostics(props: DiagnosticsProps) {
     const {diagnosticsTab = GeneralPagesIds.overview, wasLoaded} = useSelector(
         (state: any) => state.tenant,
     );
-    const schemaNestedChildrenPaths = useTypedSelector((state) =>
-        selectSchemaChildrenPaths(state, currentSchemaPath),
+    const schemaNestedChildrenPaths = useTypedSelector(
+        (state) => selectSchemaChildrenPaths(state, currentSchemaPath),
+        shallowEqual,
     );
 
     const location = useLocation();

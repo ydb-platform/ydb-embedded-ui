@@ -2,14 +2,16 @@ import type {TEvDescribeSchemeResult, TCdcStreamDescription} from '../../../type
 
 import {formatCdcStreamItem, formatCommonItem} from '../formatters';
 import {InfoViewer, InfoViewerItem} from '..';
+import {PersQueueGroupInfo} from './PersQueueGroupInfo';
 
 const DISPLAYED_FIELDS: Set<keyof TCdcStreamDescription> = new Set(['Mode', 'Format']);
 
 interface CDCStreamInfoProps {
     data?: TEvDescribeSchemeResult;
+    nestedChildren?: TEvDescribeSchemeResult[];
 }
 
-export const CDCStreamInfo = ({data}: CDCStreamInfoProps) => {
+export const CDCStreamInfo = ({data, nestedChildren}: CDCStreamInfoProps) => {
     if (!data) {
         return <div className="error">No CDC Stream data</div>;
     }
@@ -26,6 +28,10 @@ export const CDCStreamInfo = ({data}: CDCStreamInfoProps) => {
             info.push(formatCdcStreamItem(key, TableIndex?.[key]));
         }
     }
-
-    return <>{info.length ? <InfoViewer info={info}></InfoViewer> : <>Empty</>}</>;
+    return (
+        <>
+            {info.length ? <InfoViewer title="CdcStream" info={info}></InfoViewer> : <>Empty</>}
+            {nestedChildren ? <PersQueueGroupInfo data={nestedChildren[0]} /> : <></>}
+        </>
+    );
 };

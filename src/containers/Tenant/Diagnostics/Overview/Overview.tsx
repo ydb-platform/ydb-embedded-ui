@@ -1,27 +1,29 @@
 import {ReactNode, useMemo} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 
 import {Loader} from '@gravity-ui/uikit';
 
-//@ts-ignore
-import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';
 import {
     CDCStreamInfo,
     TableIndexInfo,
     PersQueueGroupInfo,
 } from '../../../../components/InfoViewer/schemaInfo';
+import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';
 
 import {EPathType} from '../../../../types/api/schema';
-import {isColumnEntityType, isTableType} from '../../utils/schema';
-//@ts-ignore
-import {getSchema, resetLoadingState} from '../../../../store/reducers/schema';
-//@ts-ignore
+import {checkIfPathHasNestedChildren, isColumnEntityType, isTableType} from '../../utils/schema';
+import {
+    getSchema,
+    resetCurrentSchemaNestedChildren,
+    resetLoadingState,
+    selectSchemaChildrenPaths,
+} from '../../../../store/reducers/schema';
 import {
     getOlapStats,
     resetLoadingState as resetOlapLoadingState,
 } from '../../../../store/reducers/olapStats';
-import {useAutofetcher} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 
 import './Overview.scss';
 
@@ -71,30 +73,44 @@ function Overview(props: OverviewProps) {
         wasLoaded,
         autorefresh,
         currentSchemaPath,
-    } = useSelector((state: any) => state.schema);
+        currentSchemaNestedChildren,
+    } = useTypedSelector((state: any) => state.schema);
 
     const {data: {result: olapStats} = {result: undefined}, loading: olapStatsLoading} =
         useSelector((state: any) => state.olapStats);
 
+    const hasNestedChildren = checkIfPathHasNestedChildren(type);
+    const nestedChildrenPaths = useTypedSelector((state) =>
+        selectSchemaChildrenPaths(state, currentSchemaPath), shallowEqual
+    );
+
     const loading = schemaLoading || olapStatsLoading;
+
+    const fetchData = (isBackground: boolean) => {
+        if (!isBackground) {
+            dispatch(resetLoadingState());
+            dispatch(resetCurrentSchemaNestedChildren());
+        }
+        const schemaPath = currentSchemaPath || tenantName;
+        if (hasNestedChildren && nestedChildrenPaths && nestedChildrenPaths.length > 0) {
+            const paths = [schemaPath, ...nestedChildrenPaths];
+            dispatch(getSchema({path: paths}));
+        } else {
+            dispatch(getSchema({path: schemaPath}));
+        }
+        if (isTableType(type) && isColumnEntityType(type)) {
+            if (!isBackground) {
+                dispatch(resetOlapLoadingState());
+            }
+            dispatch(getOlapStats({path: schemaPath}));
+        }
+    };
 
     useAutofetcher(
         (isBackground) => {
-            if (!isBackground) {
-                dispatch(resetLoadingState());
-            }
-
-            const schemaPath = currentSchemaPath || tenantName;
-            dispatch(getSchema({path: schemaPath}));
-
-            if (isTableType(type) && isColumnEntityType(type)) {
-                if (!isBackground) {
-                    dispatch(resetOlapLoadingState());
-                }
-                dispatch(getOlapStats({path: schemaPath}));
-            }
+            fetchData(isBackground);
         },
-        [currentSchemaPath, dispatch, tenantName, type],
+        [currentSchemaPath, dispatch, tenantName, type, nestedChildrenPaths],
         autorefresh,
     );
 
@@ -127,7 +143,9 @@ function Overview(props: OverviewProps) {
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
-            [EPathType.EPathTypeCdcStream]: () => <CDCStreamInfo data={schemaData} />,
+            [EPathType.EPathTypeCdcStream]: () => (
+                <CDCStreamInfo data={schemaData} nestedChildren={currentSchemaNestedChildren} />
+            ),
             [EPathType.EPathTypePersQueueGroup]: () => <PersQueueGroupInfo data={schemaData} />,
         };
 
