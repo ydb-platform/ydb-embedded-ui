@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 
 import DataTable, {Column} from '@yandex-cloud/react-data-table';
@@ -26,23 +26,35 @@ interface ConsumersProps {
 export const Consumers = ({path, pathType, schemaNestedChildrenPaths}: ConsumersProps) => {
     const dispath = useDispatch();
 
+    const {loading, wasLoaded} = useTypedSelector((state) => state.describe);
+
     const isCdcStream = pathType === EPathType.EPathTypeCdcStream;
 
     const targetPath = useMemo(
         () =>
             // Since every CDC Stream have only one nested PersQueueGroup, we select only first item
-            (isCdcStream ? schemaNestedChildrenPaths && schemaNestedChildrenPaths[0] : path) ||
-            path,
+            isCdcStream ? schemaNestedChildrenPaths && schemaNestedChildrenPaths[0] : path,
         [path, pathType, schemaNestedChildrenPaths],
     );
 
-    const fetchData = () => {
-        dispath(getDescribe({path: targetPath}));
+    const fetchData = (resetLoadingState: boolean) => {
+        // For PersQueueTopic targetPath is defined
+        // For CDC Stream path become defined when schema is loaded
+        // as it loads no its own data, but data of the child
+        if (targetPath) {
+            dispath(
+                getDescribe(
+                    {path: targetPath},
+                    {resetLoadingState, currentDescribePath: targetPath},
+                ),
+            );
+        }
     };
 
-    useAutofetcher(fetchData, [path, pathType, schemaNestedChildrenPaths]);
-
-    const {loading, wasLoaded} = useSelector((state: any) => state.describe);
+    useAutofetcher(
+        (isBackground) => fetchData(!isBackground),
+        [path, pathType, schemaNestedChildrenPaths],
+    );
 
     const consumers = useTypedSelector((state) => selectConsumers(state, targetPath));
 
@@ -75,7 +87,7 @@ export const Consumers = ({path, pathType, schemaNestedChildrenPaths}: Consumers
         },
     ];
 
-    if (loading && !wasLoaded) {
+    if ((loading && !wasLoaded) || (isCdcStream && !targetPath)) {
         return (
             <div className={b('loader')}>
                 <Loader size="m" />

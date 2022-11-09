@@ -155,7 +155,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return (
                     <Describe
                         tenant={tenantNameString}
-                        pathType={props.type}
+                        pathType={type}
                         schemaNestedChildrenPaths={schemaNestedChildrenPaths}
                     />
                 );
@@ -169,8 +169,8 @@ function Diagnostics(props: DiagnosticsProps) {
             case GeneralPagesIds.consumers: {
                 return (
                     <Consumers
-                        path={currentItem.Path}
-                        pathType={props.type}
+                        path={currentSchemaPath}
+                        pathType={type}
                         schemaNestedChildrenPaths={schemaNestedChildrenPaths}
                     />
                 );
