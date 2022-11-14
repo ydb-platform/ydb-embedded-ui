@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@gravity-ui/i18n": "^1.0.0",
-    "@yandex-cloud/paranoid": "^1.2.1",
+    "@yandex-cloud/paranoid": "^1.3.0",
     "@yandex-cloud/react-data-table": "0.2.1",
     "axios": "0.19.2",
     "bem-cn-lite": "4.0.0",
