@@ -12,7 +12,7 @@ import {
     PersQueueGroupInfo,
 } from '../../../../components/InfoViewer/schemaInfo';
 
-import {EPathType} from '../../../../types/api/schema';
+import {EPathType, TColumnTableDescription} from '../../../../types/api/schema';
 import {isColumnEntityType, isTableType} from '../../utils/schema';
 //@ts-ignore
 import {getSchema, resetLoadingState} from '../../../../store/reducers/schema';
@@ -25,7 +25,7 @@ import {useAutofetcher} from '../../../../utils/hooks';
 
 import './Overview.scss';
 
-function prepareOlapTableGeneral(tableData: any, olapStats?: any[]) {
+function prepareOlapTableGeneral(tableData: TColumnTableDescription = {}, olapStats?: any[]) {
     const {ColumnShardCount} = tableData;
     const Bytes = olapStats?.reduce((acc, el) => {
         acc += parseInt(el.Bytes) || 0;
@@ -103,7 +103,8 @@ function Overview(props: OverviewProps) {
 
     const schemaData = useMemo(() => {
         return isTableType(type) && isColumnEntityType(type)
-            ? prepareOlapTableGeneral(tableSchema, olapStats)
+            ? // process data for ColumnTable
+              prepareOlapTableGeneral(tableSchema, olapStats)
             : currentItem;
     }, [type, tableSchema, olapStats, currentItem]);
 
