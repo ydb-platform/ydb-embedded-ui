@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.4.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.4.2...v2.4.3) (2022-11-14)
+
+
+### Bug Fixes
+
+* fix app crash on ColumnTable path type ([a1aefa8](https://github.com/ydb-platform/ydb-embedded-ui/commit/a1aefa876600b1b459bf3024f0704883431df5a2))
+* **schema:** add types for ColumnTable and ColumnStore ([dc13307](https://github.com/ydb-platform/ydb-embedded-ui/commit/dc13307dcea801c05863b7dd5ee19f01aa074c85))
+
 ## [2.4.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.4.1...v2.4.2) (2022-11-09)
 
 
