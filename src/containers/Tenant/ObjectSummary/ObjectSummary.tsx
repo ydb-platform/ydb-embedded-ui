@@ -20,7 +20,12 @@ import {
 } from '../../../components/InfoViewer/schemaOverview';
 import Icon from '../../../components/Icon/Icon';
 
-import {EPathSubType, EPathType, TDirEntry} from '../../../types/api/schema';
+import {
+    EPathSubType,
+    EPathType,
+    TColumnTableDescription,
+    TDirEntry,
+} from '../../../types/api/schema';
 import {isColumnEntityType, isIndexTable, isTableType} from '../utils/schema';
 
 import {
@@ -57,19 +62,26 @@ const initialTenantCommonInfoState = {
     collapsed: getInitialIsSummaryCollapsed(),
 };
 
-function prepareOlapTableSchema(tableSchema: any) {
-    const {Name, Schema = {}} = tableSchema;
-    const {Columns, KeyColumnNames} = Schema;
-    const KeyColumnIds = KeyColumnNames?.map((name: string) => {
-        const column = Columns?.find((el: any) => el.Name === name);
-        return column.Id;
-    });
+function prepareOlapTableSchema(tableSchema: TColumnTableDescription = {}) {
+    const {Name, Schema} = tableSchema;
+
+    if (Schema) {
+        const {Columns, KeyColumnNames} = Schema;
+        const KeyColumnIds = KeyColumnNames?.map((name: string) => {
+            const column = Columns?.find((el) => el.Name === name);
+            return column?.Id;
+        });
+
+        return {
+            Columns,
+            KeyColumnNames,
+            Name,
+            KeyColumnIds,
+        };
+    }
 
     return {
-        Columns,
-        KeyColumnNames,
         Name,
-        KeyColumnIds,
     };
 }
 
@@ -118,7 +130,8 @@ function ObjectSummary(props: ObjectSummaryProps) {
 
     const schema =
         isTableType(props.type) && isColumnEntityType(props.type)
-            ? prepareOlapTableSchema(tableSchema)
+            ? // process data for ColumnTable
+              prepareOlapTableSchema(tableSchema)
             : tableSchema;
 
     useEffect(() => {
