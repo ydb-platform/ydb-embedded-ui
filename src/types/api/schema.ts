@@ -52,8 +52,8 @@ interface TPathDescription {
     TabletMetrics?: unknown;
     TablePartitions?: unknown[];
 
-    ColumnStoreDescription?: unknown;
-    ColumnTableDescription?: unknown;
+    ColumnStoreDescription?: TColumnStoreDescription;
+    ColumnTableDescription?: TColumnTableDescription;
 
     TableIndex?: TIndexDescription;
 
@@ -85,12 +85,12 @@ export interface TDirEntry {
     Version?: TPathVersion;
 }
 
-// incomplete
+// FIXME: incomplete
 export interface TTableDescription {
     PartitionConfig?: TPartitionConfig;
 }
 
-// incomplete
+// FIXME: incomplete
 export interface TPartitionConfig {
     /** uint64 */
     FollowerCount?: string;
@@ -263,7 +263,6 @@ export enum EPathType {
     EPathTypeColumnStore = 'EPathTypeColumnStore',
     EPathTypeColumnTable = 'EPathTypeColumnTable',
     EPathTypeCdcStream = 'EPathTypeCdcStream',
-
 }
 
 export enum EPathSubType {
@@ -414,7 +413,7 @@ interface TPQPartitionConfig {
     ExplicitChannelProfiles?: TChannelProfile[];
 
     MirrorFrom?: TMirrorPartitionConfig;
-};
+}
 
 interface TPQTabletConfig {
     /** uint64 */
@@ -437,7 +436,7 @@ interface TPQTabletConfig {
     ReadFromTimestampsMs?: number[];
     /** uint64[] */
     ConsumerFormatVersions?: number[];
-    
+
     ConsumerCodecs?: TCodecs[];
     ReadRuleServiceTypes?: string;
 
@@ -461,7 +460,7 @@ interface TPQTabletConfig {
     PartitionKeySchema?: TKeyComponentSchema[];
 
     Partitions?: TPartition[];
-    
+
     MeteringMode?: EMeteringMode;
 }
 
@@ -481,7 +480,7 @@ export interface TPersQueueGroupDescription {
     /** uint64 */
     PathId?: string;
     TotalGroupCount: number;
-    
+
     PartitionsToAdd?: TPartitionToAdd[];
     PartitionsToDelete?: number[];
     NextPartitionId?: number;
@@ -496,4 +495,159 @@ export interface TPersQueueGroupDescription {
     PartitionBoundaries?: any;
 
     BootstrapConfig?: TBootstrapConfig;
+}
+
+export interface TColumnTableDescription {
+    Name?: string;
+
+    Schema?: TColumnTableSchema;
+    TtlSettings?: TColumnDataLifeCycle;
+
+    SchemaPresetId?: number;
+    SchemaPresetName?: string;
+
+    ColumnStorePathId?: TPathID;
+
+    ColumnShardCount?: number;
+    Sharding?: TColumnTableSharding;
+
+    /** uint64 */
+    SchemaPresetVersionAdj?: string;
+    /** uint64 */
+    TtlSettingsPresetVersionAdj?: string;
+
+    StorageConfig?: TColumnStorageConfig;
+}
+
+interface TColumnTableSchema {
+    Columns: TOlapColumnDescription[];
+    KeyColumnNames: string[];
+    Engine?: EColumnTableEngine;
+    NextColumnId?: number;
+
+    /** uint64 */
+    Version?: string;
+
+    DefaultCompression?: TCompressionOptions;
+    EnableTiering?: boolean;
+}
+
+interface TOlapColumnDescription {
+    Id?: number;
+    Name?: string;
+    Type?: string;
+    TypeId?: number;
+    TypeInfo?: TTypeInfo;
+}
+
+interface TTypeInfo {
+    PgTypeId?: number;
+}
+
+enum EColumnTableEngine {
+    COLUMN_ENGINE_NONE = 'COLUMN_ENGINE_NONE',
+    COLUMN_ENGINE_REPLACING_TIMESERIES = 'COLUMN_ENGINE_REPLACING_TIMESERIES',
+}
+
+interface TCompressionOptions {
+    CompressionCodec?: EColumnCodec;
+    CompressionLevel?: number;
+}
+
+enum EColumnCodec {
+    ColumnCodecPlain = 'ColumnCodecPlain',
+    ColumnCodecLZ4 = 'ColumnCodecLZ4',
+    ColumnCodecZSTD = 'ColumnCodecZSTD',
+}
+
+interface TColumnDataLifeCycle {
+    Enabled?: TTtl;
+    Disabled?: {};
+    Tiering?: TStorageTiering;
+
+    /** uint64 */
+    Version?: string;
+}
+
+interface TTtl {
+    ColumnName?: string;
+
+    ExpireAfterSeconds?: number;
+
+    /** uint64 */
+    ExpireAfterBytes?: string;
+
+    ColumnUnit?: EUnit;
+}
+
+interface TStorageTier {
+    Name?: string;
+    Eviction?: TTtl;
+}
+interface TStorageTiering {
+    Tiers: TStorageTier[];
+}
+
+enum EUnit {
+    UNIT_AUTO = 'UNIT_AUTO',
+    UNIT_SECONDS = 'UNIT_SECONDS',
+    UNIT_MILLISECONDS = 'UNIT_MILLISECONDS',
+    UNIT_MICROSECONDS = 'UNIT_MICROSECONDS',
+    UNIT_NANOSECONDS = 'UNIT_NANOSECONDS',
+}
+
+interface TColumnTableSharding {
+    /** uint64 */
+    Version?: string;
+
+    /** uint64 */
+    ColumnShards: string[];
+
+    /** uint64 */
+    AdditionalColumnShards: string[];
+
+    UniquePrimaryKey?: boolean;
+
+    RandomSharding?: {};
+    HashSharding?: THashSharding;
+}
+
+interface THashSharding {
+    Function?: EHashFunction;
+    Columns: string[];
+    UniqueShardKey?: boolean;
+    ActiveShardsCount?: number;
+}
+enum EHashFunction {
+    HASH_FUNCTION_MODULO_N = 'HASH_FUNCTION_MODULO_N',
+    HASH_FUNCTION_CLOUD_LOGS = 'HASH_FUNCTION_CLOUD_LOGS',
+}
+interface TColumnStorageConfig {
+    SysLog?: TStorageSettings;
+    Log?: TStorageSettings;
+    Data?: TStorageSettings;
+    DataChannelCount?: number;
+}
+interface TStorageSettings {
+    PreferredPoolKind?: string;
+    AllowOtherKinds?: boolean;
+}
+export interface TColumnStoreDescription {
+    Name?: string;
+    ColumnShardCount?: number;
+
+    /** uint64 */
+    ColumnShards: string[];
+
+    SchemaPresets: TColumnTableSchemaPreset[];
+    StorageConfig?: TColumnStorageConfig;
+
+    NextSchemaPresetId?: number;
+    NextTtlSettingsPresetId?: number;
+}
+
+interface TColumnTableSchemaPreset {
+    Id?: number;
+    Name?: string;
+    Schema?: TColumnTableSchema;
 }
