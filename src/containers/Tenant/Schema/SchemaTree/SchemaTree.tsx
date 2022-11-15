@@ -4,7 +4,6 @@ import {useDispatch} from 'react-redux';
 import {NavigationTree} from 'ydb-ui-components';
 
 import {setCurrentSchemaPath, getSchema, preloadSchemas} from '../../../../store/reducers/schema';
-import {getDescribe} from '../../../../store/reducers/describe';
 import {getSchemaAcl} from '../../../../store/reducers/schemaAcl';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 
@@ -30,7 +29,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 const {PathDescription: {Children = []} = {}} = data;
 
                 const preloadedData: Record<string, TEvDescribeSchemeResult> = {
-                    [path]: data
+                    [path]: data,
                 };
 
                 const childItems = Children.map((childData) => {
@@ -56,7 +55,6 @@ export function SchemaTree(props: SchemaTreeProps) {
     const handleActivePathUpdate = (activePath: string) => {
         dispatch(setCurrentSchemaPath(activePath));
         dispatch(getSchema({path: activePath}));
-        dispatch(getDescribe({path: activePath}));
         dispatch(getSchemaAcl({path: activePath}));
     };
 
