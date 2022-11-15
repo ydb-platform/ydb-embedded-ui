@@ -1,4 +1,5 @@
 export interface IResponseError {
-    status: number;
-    statusText: string;
+    data?: unknown;
+    status?: number;
+    statusText?: string;
 }
