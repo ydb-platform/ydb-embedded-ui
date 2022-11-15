@@ -51,6 +51,7 @@ const describe: Reducer<
                 ...state,
                 error: action.error,
                 loading: false,
+                wasLoaded: true,
             };
         }
         default:
