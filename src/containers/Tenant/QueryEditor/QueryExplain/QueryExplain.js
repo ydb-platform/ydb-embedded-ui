@@ -74,7 +74,7 @@ function GraphRoot(props) {
             paranoid.current = getCompactTopology('graphRoot', data, opts);
             paranoid.current.renderCompactTopology();
         }
-    }
+    };
 
     useEffect(() => {
         render();
@@ -134,11 +134,7 @@ function QueryExplain(props) {
     };
 
     const renderStub = () => {
-        return (
-            <div className={b('text-message')}>
-                There is no explanation for the request
-            </div>
-        );
+        return <div className={b('text-message')}>There is no explanation for the request</div>;
     };
 
     const hasContent = () => {
@@ -237,11 +233,7 @@ function QueryExplain(props) {
             message = error;
         }
 
-        return (
-            <div className={b('text-message')}>
-                {message}
-            </div>
-        );
+        return <div className={b('text-message')}>{message}</div>;
     };
 
     const renderContent = () => {
@@ -292,7 +284,9 @@ function QueryExplain(props) {
                             )}
                         </div>
                         <div className={b('controls-left')}>
-                            <EnableFullscreenButton disabled={Boolean(props.error) || !hasContent()} />
+                            <EnableFullscreenButton
+                                disabled={Boolean(props.error) || !hasContent()}
+                            />
                             <PaneVisibilityToggleButtons
                                 onCollapse={props.onCollapseResults}
                                 onExpand={props.onExpandResults}
