@@ -9,7 +9,11 @@ import {Loader} from '@gravity-ui/uikit';
 
 import {prepareQueryError} from '../../../../utils/query';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
-import {getDescribe} from '../../../../store/reducers/describe';
+import {
+    getDescribe,
+    setDataWasNotLoaded,
+    setCurrentDescribePath,
+} from '../../../../store/reducers/describe';
 
 import './Describe.scss';
 
@@ -30,11 +34,19 @@ const Describe = ({tenant}: IDescribeProps) => {
 
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
 
-    const fetchData = useCallback(() => {
-        const path = currentSchemaPath || tenant;
+    const fetchData = useCallback(
+        (isBackground: boolean) => {
+            if (!isBackground) {
+                dispatch(setDataWasNotLoaded());
+            }
 
-        dispatch(getDescribe({path}));
-    }, [currentSchemaPath, tenant, dispatch]);
+            const path = currentSchemaPath || tenant;
+
+            dispatch(setCurrentDescribePath(path));
+            dispatch(getDescribe({path}));
+        },
+        [currentSchemaPath, tenant, dispatch],
+    );
 
     useAutofetcher(fetchData, [fetchData], autorefresh);
 
