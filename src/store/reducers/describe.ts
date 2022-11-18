@@ -56,6 +56,10 @@ const describe: Reducer<IDescribeState, IDescribeAction> = (state = initialState
         }
 
         case FETCH_DESCRIBE.FAILURE: {
+            if (action.error?.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error,
