@@ -3,8 +3,7 @@ import {useDispatch} from 'react-redux';
 
 import {NavigationTree} from 'ydb-ui-components';
 
-import {setCurrentSchemaPath, getSchema, preloadSchemas} from '../../../../store/reducers/schema';
-import {getSchemaAcl} from '../../../../store/reducers/schemaAcl';
+import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 
 import {mapPathTypeToNavigationTreeType} from '../../utils/schema';
@@ -54,8 +53,6 @@ export function SchemaTree(props: SchemaTreeProps) {
 
     const handleActivePathUpdate = (activePath: string) => {
         dispatch(setCurrentSchemaPath(activePath));
-        dispatch(getSchema({path: activePath}));
-        dispatch(getSchemaAcl({path: activePath}));
     };
 
     useEffect(() => {
