@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import cn from 'bem-cn-lite';
 import MonacoEditor from 'react-monaco-editor';
 import {Loader, RadioButton} from '@gravity-ui/uikit';
@@ -25,20 +25,6 @@ import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 
 const b = cn('kv-query-explain');
 
-const DARK_COLORS = {
-    success: 'rgba(59,201,53,0.75)',
-    error: '#bf3230',
-    warning: '#cc6810',
-    mute: 'rgba(255,255,255,0.15)',
-    stroke: 'rgba(255,255,255,0.17)',
-    fill: '#313037',
-    nodeFill: '#3b3a41',
-    nodeShadow: 'rgba(0,0,0,0.2)',
-    titleColor: 'rgba(255,255,255,0.7)',
-    textColor: 'rgba(255,255,255,0.55)',
-    buttonBorderColor: 'rgba(255,255,255,0.07)',
-};
-
 const EDITOR_OPTIONS = {
     automaticLayout: true,
     selectOnLineNumbers: true,
@@ -64,9 +50,15 @@ const explainOptions = [
 function GraphRoot(props) {
     const paranoid = useRef();
 
-    const render = () => {
-        const {data, opts, shapes, version} = props;
+    const {data, opts, shapes, version, theme} = props;
 
+    const [componentTheme, updateComponentTheme] = useState(theme);
+
+    useEffect(() => {
+        updateComponentTheme(theme);
+    }, [theme]);
+
+    const render = useCallback(() => {
         if (version === explainVersions.v2) {
             paranoid.current = getTopology('graphRoot', data, opts, shapes);
             paranoid.current.render();
@@ -74,7 +66,7 @@ function GraphRoot(props) {
             paranoid.current = getCompactTopology('graphRoot', data, opts);
             paranoid.current.renderCompactTopology();
         }
-    };
+    }, [data, opts, shapes, version]);
 
     useEffect(() => {
         render();
@@ -94,7 +86,7 @@ function GraphRoot(props) {
         graphRoot.innerHTML = '';
 
         render();
-    }, [props.opts.colors]);
+    }, [componentTheme, render]);
 
     useEffect(() => {
         paranoid.current?.updateData?.(props.data);
@@ -200,12 +192,12 @@ function QueryExplain(props) {
                     })}
                 >
                     <GraphRoot
+                        theme={theme}
                         version={version}
                         data={{links, nodes}}
                         opts={{
                             renderNodeTitle: renderExplainNode,
                             textOverflow: TextOverflow.Normal,
-                            colors: theme === 'dark' ? DARK_COLORS : {},
                             initialZoomFitsCanvas: true,
                         }}
                         shapes={{
