@@ -83,8 +83,11 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 path,
                 enums: true,
                 backup: false,
+                private: true,
+                partition_config: false,
                 partition_stats: false,
                 partitioning_info: false,
+                subs: 1,
             },
             {concurrentId: concurrentId || `getSchema|${path}`},
         );
@@ -93,6 +96,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         return this.get(this.getPath('/viewer/json/describe'), {
             path,
             enums: true,
+            partition_stats: true,
+            subs: 0,
         });
     }
     getSchemaAcl({path}) {
