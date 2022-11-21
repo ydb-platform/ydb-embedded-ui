@@ -1,7 +1,11 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import {Reducer} from 'redux';
+
+import {ISchemaAction, ISchemaData, ISchemaState} from '../../types/store/schema';
 import '../../services/api';
 
-const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
+import {createRequestActionTypes, createApiRequest} from '../utils';
+
+export const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
 const PRELOAD_SCHEMAS = 'schema/PRELOAD_SCHEMAS';
 const SET_SCHEMA = 'schema/SET_SCHEMA';
 const SET_SHOW_PREVIEW = 'schema/SET_SHOW_PREVIEW';
@@ -18,7 +22,7 @@ export const initialState = {
     showPreview: false,
 };
 
-const schema = (state = initialState, action) => {
+const schema: Reducer<ISchemaState, ISchemaAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_SCHEMA.REQUEST: {
             return {
@@ -28,7 +32,11 @@ const schema = (state = initialState, action) => {
         }
         case FETCH_SCHEMA.SUCCESS: {
             const newData = JSON.parse(JSON.stringify(state.data));
-            newData[action.data.Path] = action.data;
+
+            if (action.data.Path) {
+                newData[action.data.Path] = action.data;
+            }
+
             const currentSchema = state.currentSchemaPath
                 ? newData[state.currentSchemaPath]
                 : action.data;
@@ -100,49 +108,49 @@ const schema = (state = initialState, action) => {
     }
 };
 
-export function getSchema({path}) {
+export function getSchema({path}: {path: string}) {
     return createApiRequest({
         request: window.api.getSchema({path}),
         actions: FETCH_SCHEMA,
     });
 }
 
-export function setCurrentSchemaPath(currentSchemaPath) {
+export function setCurrentSchemaPath(currentSchemaPath: string) {
     return {
         type: SET_SCHEMA,
         data: currentSchemaPath,
-    };
+    } as const;
 }
 export function enableAutorefresh() {
     return {
         type: ENABLE_AUTOREFRESH,
-    };
+    } as const;
 }
 export function disableAutorefresh() {
     return {
         type: DISABLE_AUTOREFRESH,
-    };
+    } as const;
 }
-export function setShowPreview(value) {
+export function setShowPreview(value: boolean) {
     return {
         type: SET_SHOW_PREVIEW,
         data: value,
-    };
+    } as const;
 }
 
 // only stores data for paths that are not in the store yet
 // existing paths are ignored
-export function preloadSchemas(data) {
+export function preloadSchemas(data: ISchemaData) {
     return {
         type: PRELOAD_SCHEMAS,
         data,
-    };
+    } as const;
 }
 
 export function resetLoadingState() {
     return {
         type: RESET_LOADING_STATE,
-    };
+    } as const;
 }
 
 export default schema;
