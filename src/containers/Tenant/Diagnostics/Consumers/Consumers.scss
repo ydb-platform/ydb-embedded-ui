@@ -3,4 +3,11 @@
         width: 200px;
         margin-bottom: 20px;
     }
+    &__loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        height: 100%;
+    }
 }
