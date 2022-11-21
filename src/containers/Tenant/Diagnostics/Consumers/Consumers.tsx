@@ -1,13 +1,20 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 
+import {Loader} from '@gravity-ui/uikit';
 import DataTable, {Column} from '@yandex-cloud/react-data-table';
 
+import {prepareQueryError} from '../../../../utils/query';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {Search} from '../../../../components/Search';
-import {getDescribe, selectConsumers} from '../../../../store/reducers/describe';
+import {
+    getDescribe,
+    selectConsumers,
+    setCurrentDescribePath,
+    setDataWasNotLoaded,
+} from '../../../../store/reducers/describe';
 
 import i18n from './i18n';
 
@@ -20,14 +27,23 @@ interface ConsumersProps {
 }
 
 export const Consumers = ({path}: ConsumersProps) => {
-    const dispath = useDispatch();
+    const dispatch = useDispatch();
 
-    const fetchData = () => {
-        dispath(getDescribe({path}));
-    };
+    const fetchData = useCallback(
+        (isBackground: boolean) => {
+            if (!isBackground) {
+                dispatch(setDataWasNotLoaded());
+            }
+            dispatch(setCurrentDescribePath(path));
+            dispatch(getDescribe({path}));
+        },
 
-    useAutofetcher(fetchData, [path]);
+        [path, dispatch],
+    );
 
+    useAutofetcher(fetchData, [fetchData]);
+
+    const {loading, wasLoaded, error} = useTypedSelector((state) => state.describe);
     const consumers = useTypedSelector((state) => selectConsumers(state, path));
 
     const [consumersToRender, setConsumersToRender] = useState(consumers);
@@ -59,8 +75,20 @@ export const Consumers = ({path}: ConsumersProps) => {
         },
     ];
 
+    if (loading && !wasLoaded) {
+        return (
+            <div className={b('loader')}>
+                <Loader size="m" />
+            </div>
+        );
+    }
+
+    if (!loading && error) {
+        return <div className={b('message', 'error')}>{prepareQueryError(error)}</div>;
+    }
+
     if (consumers.length === 0) {
-        return <div>{i18n('noConsumersMessage')}</div>;
+        return <div className={b('message')}>{i18n('noConsumersMessage')}</div>;
     }
 
     return (

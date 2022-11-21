@@ -153,7 +153,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Heatmap path={currentItem.Path} />;
             }
             case GeneralPagesIds.consumers: {
-                return <Consumers path={currentItem.Path} />;
+                return <Consumers path={currentSchemaPath} />;
             }
             default: {
                 return <div>No data...</div>;
