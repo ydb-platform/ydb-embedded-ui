@@ -41,7 +41,9 @@ export const Consumers = ({path}: ConsumersProps) => {
         [path, dispatch],
     );
 
-    useAutofetcher(fetchData, [fetchData]);
+    const {autorefresh} = useTypedSelector((state) => state.schema);
+
+    useAutofetcher(fetchData, [fetchData], autorefresh);
 
     const {loading, wasLoaded, error} = useTypedSelector((state) => state.describe);
     const consumers = useTypedSelector((state) => selectConsumers(state, path));
