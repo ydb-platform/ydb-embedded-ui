@@ -3,9 +3,9 @@
         display: flex;
         overflow-x: auto;
         overflow-y: hidden;
-        justify-content: center;
+        justify-content: left;
 
-        min-width: 500px;
+        width: max-content;
     }
     &__pdisks-item {
         flex-grow: 1;
