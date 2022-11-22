@@ -8,7 +8,9 @@ import {RadioButton, Label} from '@gravity-ui/uikit';
 import {Search} from '../../components/Search';
 import {UsageFilter} from './UsageFilter';
 import {AutoFetcher} from '../../utils/autofetcher';
+import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
+import {UptimeFilter} from '../../components/UptimeFIlter';
 import {AccessDenied} from '../../components/Errors/403';
 
 import {
@@ -22,6 +24,7 @@ import {
     getNodesObject,
     StorageTypes,
     setStorageType,
+    setNodesUptimeFilter,
     VisibleEntitiesTitles,
     getStoragePoolsGroupsCount,
     getStorageNodesCount,
@@ -66,6 +69,8 @@ class Storage extends React.Component {
         setHeader: PropTypes.func,
         tenant: PropTypes.string,
         nodeId: PropTypes.string,
+        nodesUptimeFilter: PropTypes.string,
+        setNodesUptimeFilter: PropTypes.func,
     };
 
     componentDidMount() {
@@ -201,6 +206,15 @@ class Storage extends React.Component {
         setStorageType(value);
     };
 
+    onUptimeFilterChange = (value) => {
+        this.props.setNodesUptimeFilter(value);
+    };
+
+    onShowAllNodes = () => {
+        this.onGroupVisibilityChange(VisibleEntities.All);
+        this.onUptimeFilterChange(NodesUptimeFilterValues.All);
+    };
+
     renderEntitiesCount() {
         const {storageType, groupsCount, nodesCount, flatListStorageEntities, loading, wasLoaded} =
             this.props;
@@ -230,6 +244,7 @@ class Storage extends React.Component {
             visibleEntities,
             storageType,
             usageFilter,
+            nodesUptimeFilter,
             setUsageFilter,
             usageFilterOptions,
         } = this.props;
@@ -247,6 +262,16 @@ class Storage extends React.Component {
                         value={filter}
                     />
                 </div>
+
+                <RadioButton value={storageType} onUpdate={this.onStorageTypeChange}>
+                    <RadioButton.Option value={StorageTypes.groups}>
+                        {StorageTypes.groups}
+                    </RadioButton.Option>
+                    <RadioButton.Option value={StorageTypes.nodes}>
+                        {StorageTypes.nodes}
+                    </RadioButton.Option>
+                </RadioButton>
+
                 <RadioButton value={visibleEntities} onUpdate={this.onGroupVisibilityChange}>
                     <RadioButton.Option value={VisibleEntities.Missing}>
                         {VisibleEntitiesTitles[VisibleEntities.Missing]}
@@ -259,14 +284,9 @@ class Storage extends React.Component {
                     </RadioButton.Option>
                 </RadioButton>
 
-                <RadioButton value={storageType} onUpdate={this.onStorageTypeChange}>
-                    <RadioButton.Option value={StorageTypes.groups}>
-                        {StorageTypes.groups}
-                    </RadioButton.Option>
-                    <RadioButton.Option value={StorageTypes.nodes}>
-                        {StorageTypes.nodes}
-                    </RadioButton.Option>
-                </RadioButton>
+                {storageType === StorageTypes.nodes && (
+                    <UptimeFilter value={nodesUptimeFilter} onChange={this.onUptimeFilterChange} />
+                )}
 
                 {storageType === StorageTypes.groups && (
                     <UsageFilter
@@ -314,6 +334,7 @@ function mapStateToProps(state) {
         type: storageType,
         filter,
         usageFilter,
+        nodesUptimeFilter,
     } = state.storage;
 
     return {
@@ -329,6 +350,7 @@ function mapStateToProps(state) {
         storageType,
         filter,
         usageFilter,
+        nodesUptimeFilter,
         usageFilterOptions: getUsageFilterOptions(state),
     };
 }
@@ -339,6 +361,7 @@ const mapDispatchToProps = {
     setStorageFilter,
     setUsageFilter,
     setVisibleEntities: setVisibleEntities,
+    setNodesUptimeFilter,
     getNodesList,
     setStorageType,
     setHeader,
