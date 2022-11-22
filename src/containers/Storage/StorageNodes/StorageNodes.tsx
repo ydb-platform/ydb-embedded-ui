@@ -125,15 +125,17 @@ function StorageNodes({data, tableSettings, visibleEntities, onShowAll}: Storage
     if (visibleEntities === VisibleEntities.Space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
 
-        return (
-            <EmptyFilter
-                title={i18n('empty.out_of_space')}
-                showAll={i18n('show_all')}
-                onShowAll={onShowAll}
-            />
-        );
+        if (!data.length) {
+            return (
+                <EmptyFilter
+                    title={i18n('empty.out_of_space')}
+                    showAll={i18n('show_all')}
+                    onShowAll={onShowAll}
+                />
+            );
+        }
     }
-    if (visibleEntities === VisibleEntities.Missing) {
+    if (visibleEntities === VisibleEntities.Missing && !data.length) {
         return (
             <EmptyFilter
                 title={i18n('empty.degraded')}
