@@ -3,7 +3,14 @@ import '../../services/api';
 
 const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
 
-const nodes = function z(state = {loading: true, wasLoaded: false}, action) {
+const CLEAR_NODES = 'nodes/CLEAR_NODES';
+
+const initialState = {
+    loading: true,
+    wasLoaded: false,
+};
+
+const nodes = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_NODES.REQUEST: {
             return {
@@ -28,7 +35,7 @@ const nodes = function z(state = {loading: true, wasLoaded: false}, action) {
                 loading: false,
             };
         }
-        case 'CLEAR_NODES': {
+        case CLEAR_NODES: {
             return {
                 ...state,
                 loading: true,
@@ -50,6 +57,6 @@ export function getNodes(path) {
     });
 }
 
-export const clearNodes = () => ({type: 'CLEAR_NODES'});
+export const clearNodes = () => ({type: CLEAR_NODES});
 
 export default nodes;
