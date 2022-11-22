@@ -9,17 +9,19 @@ import {Loader, TextInput, Label} from '@gravity-ui/uikit';
 import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
 import {AccessDenied} from '../../components/Errors/403';
+import {UptimeFilter} from '../../components/UptimeFIlter';
 
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
 import {AUTO_RELOAD_INTERVAL, ALL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {getFilteredNodes} from '../../store/reducers/clusterNodes';
-import {getNodes} from '../../store/reducers/nodes';
+import {getNodes, setNodesUptimeFilter} from '../../store/reducers/nodes';
 import {changeFilter} from '../../store/reducers/settings';
 import {setHeader} from '../../store/reducers/header';
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 import {calcUptime} from '../../utils';
 import {getNodesColumns} from '../../utils/getNodesColumns';
+import {NodesUptimeFilterValues} from '../../utils/nodes';
 
 import './Nodes.scss';
 
@@ -44,12 +46,14 @@ class Nodes extends React.Component {
         hideTooltip: PropTypes.func,
         searchQuery: PropTypes.string,
         handleSearchQuery: PropTypes.func,
-        filter: problemFilterType,
+        problemFilter: problemFilterType,
         changeFilter: PropTypes.func,
         setHeader: PropTypes.func,
         className: PropTypes.string,
         singleClusterMode: PropTypes.bool,
         additionalNodesInfo: PropTypes.object,
+        nodesUptimeFilter: PropTypes.string,
+        setNodesUptimeFilter: PropTypes.func,
     };
 
     componentDidMount() {
@@ -73,12 +77,16 @@ class Nodes extends React.Component {
         this.props.handleSearchQuery(search);
     };
 
-    handleFilterChange = (filter) => {
-        this.props.changeFilter(filter);
+    handleProblemFilterChange = (value) => {
+        this.props.changeFilter(value);
+    };
+
+    handleUptimeFilterChange = (value) => {
+        this.props.setNodesUptimeFilter(value);
     };
 
     renderControls() {
-        const {searchQuery, filter, nodes} = this.props;
+        const {nodes, searchQuery, problemFilter, nodesUptimeFilter} = this.props;
 
         return (
             <div className={b('controls')}>
@@ -90,7 +98,8 @@ class Nodes extends React.Component {
                     hasClear
                     autoFocus
                 />
-                <ProblemFilter value={filter} onChange={this.handleFilterChange} />
+                <ProblemFilter value={problemFilter} onChange={this.handleProblemFilterChange} />
+                <UptimeFilter value={nodesUptimeFilter} onChange={this.handleUptimeFilterChange} />
                 <Label theme="info" size="m">{`Nodes: ${nodes?.length}`}</Label>
             </div>
         );
@@ -99,7 +108,8 @@ class Nodes extends React.Component {
     renderTable = () => {
         const {
             nodes = [],
-            filter,
+            problemFilter,
+            nodesUptimeFilter,
             searchQuery,
             showTooltip,
             hideTooltip,
@@ -126,7 +136,7 @@ class Nodes extends React.Component {
         }));
 
         if (preparedNodes.length === 0) {
-            if (filter !== ALL) {
+            if (problemFilter !== ALL || nodesUptimeFilter !== NodesUptimeFilterValues.All) {
                 return <Illustration name="thumbsUp" width="200" />;
             }
         }
@@ -177,7 +187,7 @@ class Nodes extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    const {wasLoaded, loading, error} = state.nodes;
+    const {wasLoaded, loading, error, nodesUptimeFilter} = state.nodes;
 
     const nodes = getFilteredNodes(state);
     return {
@@ -186,7 +196,8 @@ const mapStateToProps = (state) => {
         wasLoaded,
         loading,
         error,
-        filter: state.settings.problemFilter,
+        problemFilter: state.settings.problemFilter,
+        nodesUptimeFilter,
     };
 };
 
@@ -196,6 +207,7 @@ const mapDispatchToProps = {
     showTooltip,
     changeFilter,
     setHeader,
+    setNodesUptimeFilter,
 };
 
 export default withSearch(connect(mapStateToProps, mapDispatchToProps)(Nodes));
