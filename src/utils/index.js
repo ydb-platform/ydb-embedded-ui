@@ -79,9 +79,13 @@ export const formatDateTime = (value) => {
     return value > 0 ? new Date(Number(value)).toUTCString() : 'N/A';
 };
 
-export const calcUptime = (milliseconds) => {
+export const calcUptimeInSeconds = (milliseconds) => {
     const currentDate = new Date();
-    return formatUptime((currentDate - Number(milliseconds)) / 1000);
+    return (currentDate - Number(milliseconds)) / 1000;
+};
+
+export const calcUptime = (milliseconds) => {
+    return formatUptime(calcUptimeInSeconds(milliseconds));
 };
 
 // determine how many nodes have status Connected "true"

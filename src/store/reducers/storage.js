@@ -1,10 +1,14 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import '../../services/api';
 import _ from 'lodash';
 import {createSelector} from 'reselect';
-import {calcUptime} from '../../utils';
+
+import {calcUptime, calcUptimeInSeconds} from '../../utils';
 import {getUsage} from '../../utils/storage';
+import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {getPDiskType} from '../../utils/pdisk';
+import {HOUR_IN_SECONDS} from '../../utils/constants';
+import '../../services/api';
+
+import {createRequestActionTypes, createApiRequest} from '../utils';
 
 export const VisibleEntities = {
     All: 'All',
@@ -29,6 +33,7 @@ const SET_FILTER = 'storage/SET_FILTER';
 const SET_USAGE_FILTER = 'storage/SET_USAGE_FILTER';
 const SET_VISIBLE_GROUPS = 'storage/SET_VISIBLE_GROUPS';
 const SET_STORAGE_TYPE = 'storage/SET_STORAGE_TYPE';
+const SET_NODES_UPTIME_FILTER = 'storage/SET_NODES_UPTIME_FILTER';
 
 const initialState = {
     loading: true,
@@ -36,6 +41,7 @@ const initialState = {
     filter: '',
     usageFilter: [],
     visible: VisibleEntities.Missing,
+    nodesUptimeFilter: NodesUptimeFilterValues.All,
     type: StorageTypes.groups,
 };
 
@@ -91,6 +97,13 @@ const storage = (state = initialState, action) => {
                 visible: action.data,
                 wasLoaded: false,
                 error: undefined,
+            };
+        }
+
+        case SET_NODES_UPTIME_FILTER: {
+            return {
+                ...state,
+                nodesUptimeFilter: action.data,
             };
         }
         case SET_STORAGE_TYPE: {
@@ -149,6 +162,13 @@ export function setVisibleEntities(value) {
     };
 }
 
+export function setNodesUptimeFilter(value) {
+    return {
+        type: SET_NODES_UPTIME_FILTER,
+        data: value,
+    };
+}
+
 export const getStoragePools = (state) => state.storage.data?.StoragePools;
 export const getStoragePoolsGroupsCount = (state) => ({
     total: state.storage.data?.TotalGroups || 0,
@@ -162,6 +182,7 @@ export const getStorageNodesCount = (state) => ({
 export const getStorageFilter = (state) => state.storage.filter;
 export const getUsageFilter = (state) => state.storage.usageFilter;
 export const getVisibleEntities = (state) => state.storage.visible;
+export const getNodesUptimeFilter = (state) => state.storage.nodesUptimeFilter;
 export const getStorageType = (state) => state.storage.type;
 export const getNodesObject = (state) =>
     _.reduce(
@@ -337,12 +358,32 @@ const filterByUsage = (entities, usage) => {
     });
 };
 
+export const filterByUptime = (nodes = [], nodesUptimeFilter) => {
+    if (nodesUptimeFilter === NodesUptimeFilterValues.All) {
+        return nodes;
+    }
+    return nodes.filter(({StartTime}) => {
+        return !StartTime || calcUptimeInSeconds(StartTime) < HOUR_IN_SECONDS;
+    });
+};
+
 export const getFilteredEntities = createSelector(
-    [getStorageFilter, getUsageFilter, getStorageType, getVisibleEntitiesList],
-    (textFilter, usageFilter, type, entities) => {
+    [
+        getStorageFilter,
+        getUsageFilter,
+        getStorageType,
+        getNodesUptimeFilter,
+        getVisibleEntitiesList,
+    ],
+    (textFilter, usageFilter, type, nodesUptimeFilter, entities) => {
         let result = entities;
         result = filterByText(result, type, textFilter);
         result = filterByUsage(result, usageFilter);
+
+        if (type === StorageTypes.nodes) {
+            result = filterByUptime(result, nodesUptimeFilter);
+        }
+
         return result;
     },
 );
