@@ -1,6 +1,8 @@
 {
-    "empty.default": "Нет узлов",
-    "empty.out_of_space": "Нет узлов, в которых кончается место",
-    "empty.degraded": "Нет деградировавших узлов",
-    "show_all": "Показать все узлы"
+  "empty.default": "Нет узлов",
+  "empty.out_of_space": "Нет узлов, в которых кончается место",
+  "empty.degraded": "Нет деградировавших узлов",
+  "empty.small_uptime": "Нет узлов с uptime < 1h",
+  "empty.several_filters": "Нет узлов, подходящих под текущие фильтры",
+  "show_all": "Показать все узлы"
 }

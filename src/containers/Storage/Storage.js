@@ -171,7 +171,8 @@ class Storage extends React.Component {
     }
 
     renderDataTable() {
-        const {flatListStorageEntities, visibleEntities, nodes, storageType} = this.props;
+        const {flatListStorageEntities, visibleEntities, nodesUptimeFilter, nodes, storageType} =
+            this.props;
 
         return (
             <div className={b('table-wrapper')}>
@@ -187,9 +188,10 @@ class Storage extends React.Component {
                 {storageType === StorageTypes.nodes && (
                     <StorageNodes
                         visibleEntities={visibleEntities}
+                        nodesUptimeFilter={nodesUptimeFilter}
                         data={flatListStorageEntities}
                         tableSettings={tableSettings}
-                        onShowAll={() => this.onGroupVisibilityChange(VisibleEntities.All)}
+                        onShowAll={this.onShowAllNodes}
                     />
                 )}
             </div>

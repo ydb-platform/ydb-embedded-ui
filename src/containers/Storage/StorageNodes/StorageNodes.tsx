@@ -5,6 +5,7 @@ import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-t
 import {Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {VisibleEntities} from '../../../store/reducers/storage';
+import {NodesUptimeFilterValues} from '../../../utils/nodes';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
 import Pdisk from '../Pdisk/Pdisk';
@@ -28,6 +29,7 @@ interface StorageNodesProps {
     nodes: any;
     tableSettings: Settings;
     visibleEntities: keyof typeof VisibleEntities;
+    nodesUptimeFilter: keyof typeof NodesUptimeFilterValues;
     onShowAll?: VoidFunction;
 }
 
@@ -61,7 +63,13 @@ function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder 
     }
 }
 
-function StorageNodes({data, tableSettings, visibleEntities, onShowAll}: StorageNodesProps) {
+function StorageNodes({
+    data,
+    tableSettings,
+    visibleEntities,
+    onShowAll,
+    nodesUptimeFilter,
+}: StorageNodesProps) {
     const allColumns: Column<any>[] = [
         {
             name: TableColumnsIds.NodeId,
@@ -124,25 +132,33 @@ function StorageNodes({data, tableSettings, visibleEntities, onShowAll}: Storage
 
     if (visibleEntities === VisibleEntities.Space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
-
-        if (!data.length) {
-            return (
-                <EmptyFilter
-                    title={i18n('empty.out_of_space')}
-                    showAll={i18n('show_all')}
-                    onShowAll={onShowAll}
-                />
-            );
-        }
     }
-    if (visibleEntities === VisibleEntities.Missing && !data.length) {
-        return (
-            <EmptyFilter
-                title={i18n('empty.degraded')}
-                showAll={i18n('show_all')}
-                onShowAll={onShowAll}
-            />
-        );
+
+    if (!data.length) {
+        let message;
+
+        if (visibleEntities === VisibleEntities.Space) {
+            message = i18n('empty.out_of_space');
+        }
+
+        if (visibleEntities === VisibleEntities.Missing) {
+            message = i18n('empty.degraded');
+        }
+
+        if (nodesUptimeFilter === NodesUptimeFilterValues.SmallUptime) {
+            message = i18n('empty.small_uptime');
+        }
+
+        if (
+            visibleEntities !== VisibleEntities.All &&
+            nodesUptimeFilter !== NodesUptimeFilterValues.All
+        ) {
+            message = i18n('empty.several_filters');
+        }
+
+        if (message) {
+            return <EmptyFilter title={message} showAll={i18n('show_all')} onShowAll={onShowAll} />;
+        }
     }
 
     return data ? (
