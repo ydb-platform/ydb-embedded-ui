@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.4.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.4.3...v2.4.4) (2022-11-22)
+
+
+### Bug Fixes
+
+* **api:** update getDescribe and getSchema requests params ([d70ba54](https://github.com/ydb-platform/ydb-embedded-ui/commit/d70ba54b90b9c86a393bd3f7845183114e5afbf1))
+* **describe:** cancel concurrent requests ([2f39ad0](https://github.com/ydb-platform/ydb-embedded-ui/commit/2f39ad0f736d44c3749d9523f5024151c51fcf6f))
+* **Describe:** render loader on path change ([baf552a](https://github.com/ydb-platform/ydb-embedded-ui/commit/baf552af8bb67046baa36e9115064b4b192cb015))
+* **QueryExplain:** fix colors on theme change ([cc0a2d6](https://github.com/ydb-platform/ydb-embedded-ui/commit/cc0a2d67139457748089c6bf1fb1045b0a6b0b93))
+* **SchemaTree:** remove unneeded fetches ([c7c0489](https://github.com/ydb-platform/ydb-embedded-ui/commit/c7c048937c5ae9e5e243d6e538aab8c2e2921df5))
+* **SchemaTree:** remove unneeded getDescribe ([1146f13](https://github.com/ydb-platform/ydb-embedded-ui/commit/1146f13a7a5a277a292b3789d45a0872dda0c487))
+* **Tenant:** make tenant fetch schema only on tenant change ([ccefbff](https://github.com/ydb-platform/ydb-embedded-ui/commit/ccefbffea08fc8f248a3dd1135e82de6db9f0645))
+
 ## [2.4.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.4.2...v2.4.3) (2022-11-14)
 
 
