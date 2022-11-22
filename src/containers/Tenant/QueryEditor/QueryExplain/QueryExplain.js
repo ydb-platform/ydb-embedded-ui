@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import cn from 'bem-cn-lite';
 import MonacoEditor from 'react-monaco-editor';
 import {Loader, RadioButton} from '@gravity-ui/uikit';
@@ -58,7 +58,7 @@ function GraphRoot(props) {
         updateComponentTheme(theme);
     }, [theme]);
 
-    const render = useCallback(() => {
+    const render = () => {
         if (version === explainVersions.v2) {
             paranoid.current = getTopology('graphRoot', data, opts, shapes);
             paranoid.current.render();
@@ -66,7 +66,7 @@ function GraphRoot(props) {
             paranoid.current = getCompactTopology('graphRoot', data, opts);
             paranoid.current.renderCompactTopology();
         }
-    }, [data, opts, shapes, version]);
+    };
 
     useEffect(() => {
         render();
@@ -86,7 +86,7 @@ function GraphRoot(props) {
         graphRoot.innerHTML = '';
 
         render();
-    }, [componentTheme, render]);
+    }, [componentTheme]);
 
     useEffect(() => {
         paranoid.current?.updateData?.(props.data);
