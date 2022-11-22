@@ -1,13 +1,16 @@
 import {createRequestActionTypes, createApiRequest} from '../utils';
 import '../../services/api';
+import {NodesUptimeFilterValues} from '../../utils/nodes';
 
 const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
 
 const CLEAR_NODES = 'nodes/CLEAR_NODES';
+const SET_NODES_UPTIME_FILTER = 'nodes/SET_NODES_UPTIME_FILTER';
 
 const initialState = {
     loading: true,
     wasLoaded: false,
+    nodesUptimeFilter: NodesUptimeFilterValues.All,
 };
 
 const nodes = (state = initialState, action) => {
@@ -45,6 +48,10 @@ const nodes = (state = initialState, action) => {
                 error: undefined,
             };
         }
+
+        case SET_NODES_UPTIME_FILTER: {
+            return {...state, nodesUptimeFilter: action.data};
+        }
         default:
             return state;
     }
@@ -58,5 +65,12 @@ export function getNodes(path) {
 }
 
 export const clearNodes = () => ({type: CLEAR_NODES});
+
+export const setNodesUptimeFilter = (value) => ({
+    type: SET_NODES_UPTIME_FILTER,
+    data: value,
+});
+
+export const getNodesUptimeFilter = (state) => state.nodes.nodesUptimeFilter;
 
 export default nodes;
