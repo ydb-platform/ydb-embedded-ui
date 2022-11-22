@@ -1,6 +1,8 @@
 {
-    "empty.default": "No such nodes",
-    "empty.out_of_space": "No nodes with out of space errors",
-    "empty.degraded": "No degraded nodes",
-    "show_all": "Show all nodes"
+  "empty.default": "No such nodes",
+  "empty.out_of_space": "No nodes with out of space errors",
+  "empty.degraded": "No degraded nodes",
+  "empty.small_uptime": "No nodes with uptime < 1h",
+  "empty.several_filters": "No nodes match current filters combination",
+  "show_all": "Show all nodes"
 }
