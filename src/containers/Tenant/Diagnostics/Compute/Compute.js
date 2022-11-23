@@ -7,7 +7,7 @@ import qs from 'qs';
 
 import {Loader} from '@gravity-ui/uikit';
 
-import NodesViewer from '../../../../components/NodesViewer/NodesViewer';
+import NodesViewer from '../../../NodesViewer/NodesViewer';
 
 import {backend} from '../../../../store';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
