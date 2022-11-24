@@ -3,14 +3,16 @@ import {Loader as KitLoader, LoaderSize} from '@gravity-ui/uikit';
 
 import './Loader.scss';
 
-const b = cn('kv-loader');
+const b = cn('ydb-loader');
 
-function Loader({size = 'l'}: {size?: LoaderSize}) {
+interface LoaderProps {
+    size?: LoaderSize;
+}
+
+export const Loader = ({size = 'm'}: LoaderProps) => {
     return (
         <div className={b()}>
             <KitLoader size={size} />
         </div>
     );
-}
-
-export default Loader;
+};

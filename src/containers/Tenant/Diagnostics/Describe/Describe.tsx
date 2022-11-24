@@ -5,7 +5,7 @@ import cn from 'bem-cn-lite';
 import JSONTree from 'react-json-inspector';
 import 'react-json-inspector/json-inspector.css';
 
-import {Loader} from '@gravity-ui/uikit';
+import {Loader} from '../../../../components/Loader';
 
 import {prepareQueryError} from '../../../../utils/query';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
@@ -51,11 +51,7 @@ const Describe = ({tenant}: IDescribeProps) => {
     useAutofetcher(fetchData, [fetchData], autorefresh);
 
     if (loading && !wasLoaded) {
-        return (
-            <div className={b('loader-container')}>
-                <Loader size="m" />
-            </div>
-        );
+        return <Loader size="m" />;
     }
 
     if (error) {

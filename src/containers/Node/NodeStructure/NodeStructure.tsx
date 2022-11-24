@@ -6,7 +6,7 @@ import _ from 'lodash';
 import cn from 'bem-cn-lite';
 
 import {PDisk} from './Pdisk';
-import Loader from '../.././../components/Loader/Loader';
+import {Loader} from '../.././../components/Loader';
 
 import {getNodeStructure, selectNodeStructure} from '../../../store/reducers/node';
 
