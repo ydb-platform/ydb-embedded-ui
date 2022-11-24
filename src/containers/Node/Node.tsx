@@ -12,7 +12,7 @@ import Tablets from '../Tablets/Tablets';
 import Storage from '../Storage/Storage';
 import NodeOverview from './NodeOverview/NodeOverview';
 import NodeStructure from './NodeStructure/NodeStructure';
-import Loader from '../../components/Loader/Loader';
+import {Loader} from '../../components/Loader';
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
 
 import {getNodeInfo, resetNode} from '../../store/reducers/node';
@@ -132,12 +132,7 @@ function Node(props: NodeProps) {
             }
 
             case OVERVIEW: {
-                return (
-                    <NodeOverview
-                        node={node}
-                        className={b('overview-wrapper')}
-                    />
-                );
+                return <NodeOverview node={node} className={b('overview-wrapper')} />;
             }
 
             case STRUCTURE: {
@@ -155,7 +150,7 @@ function Node(props: NodeProps) {
     };
 
     if (loading && !wasLoaded) {
-        return <Loader />;
+        return <Loader size="l" />;
     } else if (error) {
         return <div>{error.statusText}</div>;
     } else {

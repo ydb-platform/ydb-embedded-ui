@@ -5,7 +5,9 @@ import {Link} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {useLocation} from 'react-router';
 
-import {Loader, Switch, Tabs} from '@gravity-ui/uikit';
+import {Switch, Tabs} from '@gravity-ui/uikit';
+
+import {Loader} from '../../../components/Loader';
 
 //@ts-ignore
 import TopQueries from './TopQueries/TopQueries';
@@ -196,11 +198,7 @@ function Diagnostics(props: DiagnosticsProps) {
     // After tabs are initially loaded it is no longer needed
     // Thus there is no also "loading" check as in other parts of the project
     if (!wasLoaded) {
-        return (
-            <div className={b('loader')}>
-                <Loader size="l" />
-            </div>
-        );
+        return <Loader size="l" />;
     }
 
     return (

@@ -10,12 +10,6 @@
     @include flex-container();
     @include body2-typography();
 
-    &__loader {
-        display: flex;
-        flex-grow: 1;
-        justify-content: center;
-    }
-
     &__pdisk {
         display: flex;
         flex-direction: column;

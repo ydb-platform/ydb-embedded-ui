@@ -2,9 +2,9 @@ import {useCallback, useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 
-import {Loader} from '@gravity-ui/uikit';
 import DataTable, {Column} from '@yandex-cloud/react-data-table';
 
+import { Loader } from '../../../../components/Loader';
 import {prepareQueryError} from '../../../../utils/query';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
@@ -78,11 +78,7 @@ export const Consumers = ({path}: ConsumersProps) => {
     ];
 
     if (loading && !wasLoaded) {
-        return (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
-        );
+        return <Loader size="m" />;
     }
 
     if (!loading && error) {
