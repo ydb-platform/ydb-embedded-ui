@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.4.4...v2.5.0) (2022-11-25)
+
+
+### Features
+
+* **Nodes:** add uptime filter ([9bb4f66](https://github.com/ydb-platform/ydb-embedded-ui/commit/9bb4f664df8fadec5b5e612b2adb866c28415efa))
+* **NodesViewer:** add uptime filter ([a802442](https://github.com/ydb-platform/ydb-embedded-ui/commit/a8024422a09ff95e55c399d26046f5103cab3f89))
+* **Storage:** add nodes uptime filter ([d8cfea1](https://github.com/ydb-platform/ydb-embedded-ui/commit/d8cfea14369e8235d1f7ef86a9a3f34c05efdf5c))
+
+
+### Bug Fixes
+
+* **Consumers:** add autorefresh to useAutofetcher ([e0da2a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/e0da2a11fcd18cb8ba808a07873a78cbf7191cdc))
+* **Consumers:** add loader ([a59f472](https://github.com/ydb-platform/ydb-embedded-ui/commit/a59f472fd7c9347bcde8cc21d4001f999fc88110))
+* **QueryExplain:** fix schema rerender on path change ([eb52978](https://github.com/ydb-platform/ydb-embedded-ui/commit/eb529787bf747bb2bf49bae65676011426341a23))
+* **Storage:** add message on empty nodes with small uptime ([70959ab](https://github.com/ydb-platform/ydb-embedded-ui/commit/70959ab90bd0f81ebab7712b7d34c0ca80f4dd0b))
+* **Storage:** fix uneven PDisks ([0269dba](https://github.com/ydb-platform/ydb-embedded-ui/commit/0269dbab0336ae5b8cbf43e1b52458e932527a66))
+* **StorageNodes:** fix message display on not empty data ([bb5fffa](https://github.com/ydb-platform/ydb-embedded-ui/commit/bb5fffa786cde3f680375f8e11e3893c52c4f6da))
+* **UsageFilter:** add min-width ([56b2701](https://github.com/ydb-platform/ydb-embedded-ui/commit/56b2701a17420e0322fac0223bce26e18a2f0e47))
+
 ## [2.4.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.4.3...v2.4.4) (2022-11-22)
 
 
