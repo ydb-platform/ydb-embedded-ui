@@ -17,9 +17,7 @@ interface TableIndexInfoProps {
 
 export const TableIndexInfo = ({data}: TableIndexInfoProps) => {
     if (!data) {
-        return (
-            <div className="error">no index data</div>
-        );
+        return <div className="error">no index data</div>;
     }
 
     const TableIndex = data.PathDescription?.TableIndex;
@@ -32,13 +30,5 @@ export const TableIndexInfo = ({data}: TableIndexInfoProps) => {
         }
     }
 
-    return (
-        <>
-            {info.length ? (
-                <InfoViewer info={info}></InfoViewer>
-            ) : (
-                <>Empty</>
-            )}
-        </>
-    );
+    return <>{info.length ? <InfoViewer info={info}></InfoViewer> : <>Empty</>}</>;
 };

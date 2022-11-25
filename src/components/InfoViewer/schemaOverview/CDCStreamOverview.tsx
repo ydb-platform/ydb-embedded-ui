@@ -3,10 +3,7 @@ import type {TEvDescribeSchemeResult, TCdcStreamDescription} from '../../../type
 import {InfoViewer, InfoViewerItem} from '..';
 import {formatCdcStreamItem, formatCommonItem} from '../formatters';
 
-const DISPLAYED_FIELDS: Set<keyof TCdcStreamDescription> = new Set([
-    'Mode',
-    'Format',
-]);
+const DISPLAYED_FIELDS: Set<keyof TCdcStreamDescription> = new Set(['Mode', 'Format']);
 
 interface CDCStreamOverviewProps {
     data?: TEvDescribeSchemeResult;
@@ -14,9 +11,7 @@ interface CDCStreamOverviewProps {
 
 export const CDCStreamOverview = ({data}: CDCStreamOverviewProps) => {
     if (!data) {
-        return (
-            <div className="error">No CDC Stream data</div>
-        );
+        return <div className="error">No CDC Stream data</div>;
     }
 
     const TableIndex = data.PathDescription?.CdcStreamDescription;
@@ -32,13 +27,5 @@ export const CDCStreamOverview = ({data}: CDCStreamOverviewProps) => {
         }
     }
 
-    return (
-        <>
-            {info.length ? (
-                <InfoViewer info={info}></InfoViewer>
-            ) : (
-                <>Empty</>
-            )}
-        </>
-    );
+    return <>{info.length ? <InfoViewer info={info}></InfoViewer> : <>Empty</>}</>;
 };

@@ -83,13 +83,7 @@ class Acl extends React.Component {
             return null;
         }
 
-        return (
-            <DataTable
-                columns={this.COLUMNS}
-                data={acl}
-                settings={TABLE_SETTINGS}
-            />
-        );
+        return <DataTable columns={this.COLUMNS} data={acl} settings={TABLE_SETTINGS} />;
     };
 
     renderOwner = () => {

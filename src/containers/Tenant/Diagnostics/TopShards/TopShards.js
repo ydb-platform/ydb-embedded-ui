@@ -47,17 +47,23 @@ function prepareDateSizeValue(value) {
 }
 
 function stringToDataTableSortOrder(value) {
-    return value && value.split(',').map((columnId) => ({
-        columnId,
-        order: DataTable.DESCENDING,
-    }));
+    return (
+        value &&
+        value.split(',').map((columnId) => ({
+            columnId,
+            order: DataTable.DESCENDING,
+        }))
+    );
 }
 
 function stringToQuerySortOrder(value) {
-    return value && value.split(',').map((columnId) => ({
-        columnId,
-        order: 'DESC',
-    }));
+    return (
+        value &&
+        value.split(',').map((columnId) => ({
+            columnId,
+            order: 'DESC',
+        }))
+    );
 }
 
 function dataTableToStringSortOrder(value = []) {
@@ -85,11 +91,13 @@ function TopShards({
 
         if (autorefresh) {
             autofetcher.start();
-            autofetcher.fetch(() => sendShardQuery({
-                database: path,
-                path: currentSchemaPath,
-                sortOrder: stringToQuerySortOrder(sortOrder),
-            }));
+            autofetcher.fetch(() =>
+                sendShardQuery({
+                    database: path,
+                    path: currentSchemaPath,
+                    sortOrder: stringToQuerySortOrder(sortOrder),
+                }),
+            );
         }
 
         return () => {

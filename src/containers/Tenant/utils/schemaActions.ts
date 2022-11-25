@@ -37,9 +37,9 @@ const bindActions = (
 ) => {
     const inputQuery = (tmpl: (path: string) => string) => () => {
         dispatch(changeUserInput({input: tmpl(path)}));
-        dispatch(setTopLevelTab(TenantGeneralTabsIds.query))
+        dispatch(setTopLevelTab(TenantGeneralTabsIds.query));
         setActivePath(path);
-    }
+    };
 
     return {
         createTable: inputQuery(createTableTemplate),
@@ -66,7 +66,7 @@ const bindActions = (
         },
         openPreview: () => {
             dispatch(setShowPreview(true));
-            dispatch(setTopLevelTab(TenantGeneralTabsIds.query))
+            dispatch(setTopLevelTab(TenantGeneralTabsIds.query));
             setActivePath(path);
         },
     };
@@ -74,27 +74,18 @@ const bindActions = (
 
 type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
 
-export const getActions = (
-    dispatch: Dispatch<any>,
-    setActivePath: (path: string) => void,
-) =>
+export const getActions =
+    (dispatch: Dispatch<any>, setActivePath: (path: string) => void) =>
     (path: string, type: NavigationTreeNodeType) => {
         const actions = bindActions(path, dispatch, setActivePath);
         const copyItem = {text: 'Copy path', action: actions.copyPath};
 
         const DIR_SET: ActionsSet = [
-            [
-                copyItem,
-            ],
-            [
-                {text: 'Create table...', action: actions.createTable},
-            ],
+            [copyItem],
+            [{text: 'Create table...', action: actions.createTable}],
         ];
         const TABLE_SET: ActionsSet = [
-            [
-                {text: 'Open preview', action: actions.openPreview},
-                copyItem,
-            ],
+            [{text: 'Open preview', action: actions.openPreview}, copyItem],
             [
                 {text: 'Alter table...', action: actions.alterTable},
                 {text: 'Select query...', action: actions.selectQuery},
@@ -102,9 +93,7 @@ export const getActions = (
             ],
         ];
 
-        const JUST_COPY: ActionsSet = [
-            copyItem,
-        ];
+        const JUST_COPY: ActionsSet = [copyItem];
 
         const EMPTY_SET: ActionsSet = [];
 

@@ -14,7 +14,7 @@ export enum TenantInfoTabsIds {
 export enum TenantTabsGroups {
     info = 'info',
     general = 'general',
-    generalTab = 'generalTab'
+    generalTab = 'generalTab',
 }
 
 export const TENANT_GENERAL_TABS = [

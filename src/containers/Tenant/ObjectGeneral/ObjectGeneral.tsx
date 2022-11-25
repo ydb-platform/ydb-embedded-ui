@@ -54,11 +54,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
         if (!tenantName) {
             return null;
         }
-        return (
-            <div className={b()}>
-                {renderTabContent()}
-            </div>
-        );
+        return <div className={b()}>{renderTabContent()}</div>;
     };
 
     return renderContent();

@@ -32,7 +32,8 @@ export const formatPQGroupItem = createInfoFormatter<TPersQueueGroupDescription>
     values: {
         Partitions: (value) => formatNumber(value?.length || 0),
         PQTabletConfig: (value) => {
-            const hours = Math.round(value.PartitionConfig.LifetimeSeconds / HOUR_IN_SECONDS * 100) / 100;
+            const hours =
+                Math.round((value.PartitionConfig.LifetimeSeconds / HOUR_IN_SECONDS) * 100) / 100;
             return `${formatNumber(hours)} hours`;
         },
     },
