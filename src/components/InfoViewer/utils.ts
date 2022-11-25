@@ -1,12 +1,12 @@
-import type {ReactNode} from "react";
+import type {ReactNode} from 'react';
 
 type LabelMap<T> = {
     [label in keyof T]?: string;
-}
+};
 
 type ValueFormatters<T> = {
     [label in keyof T]?: (value: T[label]) => ReactNode;
-}
+};
 
 function formatLabel<Shape>(label: keyof Shape, map: LabelMap<Shape>) {
     return map[label] ?? label;
@@ -25,9 +25,9 @@ function formatValue<Shape, Key extends keyof Shape>(
 }
 
 interface CreateInfoFormatterOptions<Shape> {
-    values?: ValueFormatters<Shape>,
-    labels?: LabelMap<Shape>,
-    defaultValueFormatter?: (value: Shape[keyof Shape]) => ReactNode,
+    values?: ValueFormatters<Shape>;
+    labels?: LabelMap<Shape>;
+    defaultValueFormatter?: (value: Shape[keyof Shape]) => ReactNode;
 }
 
 export function createInfoFormatter<Shape extends Record<string, any>>({

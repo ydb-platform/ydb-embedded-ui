@@ -44,9 +44,10 @@ const formatTableStatsItem = createInfoFormatter({
     defaultValueFormatter: formatNumber,
 });
 
-const formatTableStats = (fields) => Object.entries(fields)
-    .map(([label, value]) => formatTableStatsItem(label, value))
-    .filter(({value}) => Boolean(value));
+const formatTableStats = (fields) =>
+    Object.entries(fields)
+        .map(([label, value]) => formatTableStatsItem(label, value))
+        .filter(({value}) => Boolean(value));
 
 class SchemaInfoViewer extends React.Component {
     static propTypes = {
@@ -60,17 +61,18 @@ class SchemaInfoViewer extends React.Component {
 
         return (
             <div className={b('item')}>
-                <InfoViewer
-                    title={title}
-                    info={itemData}
-                />
+                <InfoViewer title={title} info={itemData} />
             </div>
         );
     }
 
     renderContent(data) {
         const {PathDescription = {}} = data;
-        const {TableStats = {}, TabletMetrics = {}, Table: {PartitionConfig = {}} = {}} = PathDescription;
+        const {
+            TableStats = {},
+            TabletMetrics = {},
+            Table: {PartitionConfig = {}} = {},
+        } = PathDescription;
         const {
             PartCount,
             RowCount,
@@ -127,33 +129,30 @@ class SchemaInfoViewer extends React.Component {
         ];
 
         const tabletMetricsInfo = Object.keys(TabletMetrics).map((key) =>
-            formatTabletMetricsItem(key, TabletMetrics[key])
+            formatTabletMetricsItem(key, TabletMetrics[key]),
         );
 
         const partitionConfigInfo = [];
 
         if (Array.isArray(FollowerGroups) && FollowerGroups.length > 0) {
-            partitionConfigInfo.push(...Object.keys(FollowerGroups[0]).map((key) =>
-                formatFollowerGroupItem(key, FollowerGroups[0][key])
-            ));
-        } else if (FollowerCount !== undefined) {
             partitionConfigInfo.push(
-                formatPartitionConfigItem('FollowerCount', FollowerCount)
+                ...Object.keys(FollowerGroups[0]).map((key) =>
+                    formatFollowerGroupItem(key, FollowerGroups[0][key]),
+                ),
             );
+        } else if (FollowerCount !== undefined) {
+            partitionConfigInfo.push(formatPartitionConfigItem('FollowerCount', FollowerCount));
         } else if (CrossDataCenterFollowerCount !== undefined) {
             partitionConfigInfo.push(
-                formatPartitionConfigItem('CrossDataCenterFollowerCount', CrossDataCenterFollowerCount)
+                formatPartitionConfigItem(
+                    'CrossDataCenterFollowerCount',
+                    CrossDataCenterFollowerCount,
+                ),
             );
         }
 
-        if ([
-            tabletMetricsInfo,
-            partitionConfigInfo,
-            tableStatsInfo.flat(),
-        ].flat().length === 0) {
-            return (
-                <div className={b('item')}>Empty</div>
-            );
+        if ([tabletMetricsInfo, partitionConfigInfo, tableStatsInfo.flat()].flat().length === 0) {
+            return <div className={b('item')}>Empty</div>;
         }
 
         return (
@@ -179,11 +178,7 @@ class SchemaInfoViewer extends React.Component {
         const {data} = this.props;
 
         if (data) {
-            return (
-                <div className={b()}>
-                    {this.renderContent(data)}
-                </div>
-            );
+            return <div className={b()}>{this.renderContent(data)}</div>;
         } else {
             return <div className="error">no schema data</div>;
         }

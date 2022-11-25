@@ -73,10 +73,7 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
                         </div>
                     )}
                     <div className={b('dialog-row')}>
-                        <label
-                            htmlFor="queryName"
-                            className={b('field-title', 'required')}
-                        >
+                        <label htmlFor="queryName" className={b('field-title', 'required')}>
                             Query name
                         </label>
                         <div className={b('control-wrapper')}>
