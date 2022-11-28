@@ -1,7 +1,15 @@
 import {Reducer} from 'redux';
+import {createSelector, Selector} from 'reselect';
 
-import {ISchemaAction, ISchemaData, ISchemaState} from '../../types/store/schema';
+import {
+    ISchemaAction,
+    ISchemaData,
+    ISchemaRootStateSlice,
+    ISchemaState,
+} from '../../types/store/schema';
+import {EPathType} from '../../types/api/schema';
 import '../../services/api';
+import {isEntityWithMergedImplementation} from '../../containers/Tenant/utils/schema';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
@@ -152,5 +160,28 @@ export function resetLoadingState() {
         type: RESET_LOADING_STATE,
     } as const;
 }
+
+export const selectSchemaChildren = (state: ISchemaRootStateSlice, path: string | undefined) =>
+    path ? state.schema.data[path]?.PathDescription?.Children : undefined;
+
+export const selectSchemaData = (state: ISchemaRootStateSlice, path: string | undefined) =>
+    path ? state.schema.data[path] : undefined;
+
+export const selectSchemaMergedChildrenPaths: Selector<
+    ISchemaRootStateSlice,
+    string[] | undefined,
+    [string | undefined, EPathType | undefined]
+> = createSelector(
+    [
+        (_, path?: string) => path,
+        (_, _path, type: EPathType | undefined) => type,
+        selectSchemaChildren,
+    ],
+    (path, type, children) => {
+        return isEntityWithMergedImplementation(type)
+            ? children?.map(({Name}) => path + '/' + Name)
+            : undefined;
+    },
+);
 
 export default schema;

@@ -75,6 +75,7 @@ const describe: Reducer<IDescribeState, IDescribeAction> = (state = initialState
         case SET_DATA_WAS_NOT_LOADED: {
             return {
                 ...state,
+                loading: true,
                 wasLoaded: false,
             };
         }
