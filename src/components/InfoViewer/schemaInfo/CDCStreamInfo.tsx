@@ -27,5 +27,13 @@ export const CDCStreamInfo = ({data}: CDCStreamInfoProps) => {
         }
     }
 
-    return <>{info.length ? <InfoViewer info={info}></InfoViewer> : <>Empty</>}</>;
+    info.push(formatPQGroupItem('Partitions', pqGroup?.Partitions || []));
+    info.push(
+        formatPQGroupItem(
+            'PQTabletConfig',
+            pqGroup?.PQTabletConfig || {PartitionConfig: {LifetimeSeconds: 0}},
+        ),
+    );
+
+    return <InfoViewer title={'Changefeed'} info={info} />;
 };

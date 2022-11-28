@@ -117,9 +117,48 @@ const schema: Reducer<ISchemaState, ISchemaAction> = (state = initialState, acti
 };
 
 export function getSchema({path}: {path: string}) {
+    const request = window.api.getSchema({path});
+    return createApiRequest({
+        request,
+        actions: FETCH_SCHEMA,
+        dataHandler: (data): ISchemaHandledResponse => {
+            const newData: ISchemaData = {};
+            if (data.Path) {
+                newData[data.Path] = data;
+            }
+            return {
+                path: data.Path,
+                currentSchema: data,
+                data: newData,
+            };
+        },
+    });
+}
+
+export function getSchemaBatched(paths: string[]) {
+    const requestArray = paths.map((p) =>
+        window.api.getSchema({path: p}, {concurrentId: `getSchemaBatched|${p}`}),
+    );
+    const request = Promise.all(requestArray);
+
     return createApiRequest({
         request: window.api.getSchema({path}),
         actions: FETCH_SCHEMA,
+        dataHandler: (data): ISchemaHandledResponse => {
+            const newData: ISchemaData = {};
+
+            data.forEach((dataItem) => {
+                if (dataItem.Path) {
+                    newData[dataItem.Path] = dataItem;
+                }
+            });
+
+            return {
+                path: data[0].Path,
+                currentSchema: data[0],
+                data: newData,
+            };
+        },
     });
 }
 

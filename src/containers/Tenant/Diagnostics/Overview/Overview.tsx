@@ -15,7 +15,12 @@ import {
 import {EPathType, TColumnTableDescription} from '../../../../types/api/schema';
 import {isColumnEntityType, isTableType} from '../../utils/schema';
 //@ts-ignore
-import {getSchema, resetLoadingState} from '../../../../store/reducers/schema';
+import {
+    getSchema,
+    getSchemaBatched,
+    resetLoadingState,
+    selectSchemaMergedChildrenPaths,
+} from '../../../../store/reducers/schema';
 //@ts-ignore
 import {
     getOlapStats,
@@ -78,14 +83,31 @@ function Overview(props: OverviewProps) {
 
     const loading = schemaLoading || olapStatsLoading;
 
-    useAutofetcher(
-        (isBackground) => {
+    const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
+
+    // There is a circular dependency here. Fetch data depends on children paths
+    // When data in store updated on fetch request,
+    // new object is set there, so source children array is updated
+    // This updates selector, the selector returns a new array, and data is fetched again
+    // To prevent it, shallowEqual, which compares array content, was added
+    const mergedChildrenPaths = useTypedSelector(
+        (state) => selectSchemaMergedChildrenPaths(state, currentSchemaPath, type),
+        shallowEqual,
+    );
+
+    const fetchData = useCallback(
+        (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(resetLoadingState());
             }
 
             const schemaPath = currentSchemaPath || tenantName;
-            dispatch(getSchema({path: schemaPath}));
+
+            if (!isEntityWithMergedImpl) {
+                dispatch(getSchema({path: schemaPath}));
+            } else if (mergedChildrenPaths) {
+                dispatch(getSchemaBatched([schemaPath, ...mergedChildrenPaths]));
+            }
 
             if (isTableType(type) && isColumnEntityType(type)) {
                 if (!isBackground) {

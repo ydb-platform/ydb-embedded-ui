@@ -146,7 +146,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Network path={tenantNameString} />;
             }
             case GeneralPagesIds.describe: {
-                return <Describe tenant={tenantNameString} />;
+                return <Describe tenant={tenantNameString} type={type} />;
             }
             case GeneralPagesIds.hotKeys: {
                 return <HotKeys type={type} />;

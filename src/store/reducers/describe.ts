@@ -3,7 +3,13 @@ import {Reducer} from 'redux';
 
 import '../../services/api';
 import {IConsumer} from '../../types/api/consumers';
-import {IDescribeRootStateSlice, IDescribeState, IDescribeAction} from '../../types/store/describe';
+import {
+    IDescribeRootStateSlice,
+    IDescribeState,
+    IDescribeAction,
+    IDescribeHandledResponse,
+    IDescribeData,
+} from '../../types/store/describe';
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
 export const FETCH_DESCRIBE = createRequestActionTypes('describe', 'FETCH_DESCRIBE');
@@ -27,16 +33,8 @@ const describe: Reducer<IDescribeState, IDescribeAction> = (state = initialState
             };
         }
         case FETCH_DESCRIBE.SUCCESS: {
-            const data = action.data;
-
-            const isCurrentDescribePath = data.Path === state.currentDescribePath;
-
-            let newData = state.data;
-
-            if (data.Path) {
-                newData = JSON.parse(JSON.stringify(state.data));
-                newData[data.Path] = data;
-            }
+            const isCurrentDescribePath = action.data.path === state.currentDescribePath;
+            const newData = {...state.data, ...action.data.data};
 
             if (!isCurrentDescribePath) {
                 return {
@@ -48,7 +46,7 @@ const describe: Reducer<IDescribeState, IDescribeAction> = (state = initialState
             return {
                 ...state,
                 data: newData,
-                currentDescribe: data,
+                currentDescribe: action.data.currentDescribe,
                 loading: false,
                 wasLoaded: true,
                 error: undefined,
@@ -75,7 +73,6 @@ const describe: Reducer<IDescribeState, IDescribeAction> = (state = initialState
         case SET_DATA_WAS_NOT_LOADED: {
             return {
                 ...state,
-                loading: true,
                 wasLoaded: false,
             };
         }
@@ -98,7 +95,7 @@ export const setDataWasNotLoaded = () => {
 };
 
 // Consumers selectors
-const selectConsumersNames = (state: IDescribeRootStateSlice, path: string | undefined) =>
+const selectConsumersNames = (state: IDescribeRootStateSlice, path?: string) =>
     path
         ? state.describe.data[path]?.PathDescription?.PersQueueGroup?.PQTabletConfig?.ReadRules
         : undefined;
@@ -107,9 +104,53 @@ export const selectConsumers: Selector<IDescribeRootStateSlice, IConsumer[], [st
     createSelector(selectConsumersNames, (names = []) => names.map((name) => ({name})));
 
 export function getDescribe({path}: {path: string}) {
+    const request = window.api.getDescribe({path});
     return createApiRequest({
-        request: window.api.getDescribe({path}),
+        request,
         actions: FETCH_DESCRIBE,
+        dataHandler: (data): IDescribeHandledResponse => {
+            const dataPath = data.Path;
+            const currentDescribe: IDescribeData = {};
+            const newData: IDescribeData = {};
+
+            if (dataPath) {
+                currentDescribe[dataPath] = data;
+                newData[dataPath] = data;
+            }
+
+            return {
+                path: dataPath,
+                currentDescribe,
+                data: newData,
+            };
+        },
+    });
+}
+
+export function getDescribeBatched(paths: string[]) {
+    const requestsArray = paths.map((p) => window.api.getDescribe({path: p}));
+
+    const request = Promise.all(requestsArray);
+    return createApiRequest({
+        request,
+        actions: FETCH_DESCRIBE,
+        dataHandler: (data): IDescribeHandledResponse => {
+            const currentDescribe: IDescribeData = {};
+            const newData: IDescribeData = {};
+
+            data.forEach((dataItem) => {
+                if (dataItem.Path) {
+                    newData[dataItem.Path] = dataItem;
+                    currentDescribe[dataItem.Path] = dataItem;
+                }
+            });
+
+            return {
+                path: data[0].Path,
+                currentDescribe,
+                data: newData,
+            };
+        },
     });
 }
 
