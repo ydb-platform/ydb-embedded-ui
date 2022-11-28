@@ -6,7 +6,7 @@ import {NavigationTree} from 'ydb-ui-components';
 import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 
-import {mapPathTypeToNavigationTreeType} from '../../utils/schema';
+import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 
 interface SchemaTreeProps {
@@ -42,7 +42,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                         type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
                         // FIXME: should only be explicitly set to true for tables with indexes
                         // at the moment of writing there is no property to determine this, fix later
-                        expandable: true,
+                        expandable: !isChildlessPathType(PathType, PathSubType),
                     };
                 });
 

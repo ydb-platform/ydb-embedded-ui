@@ -151,5 +151,5 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
     [EPathType.EPathTypeExtSubDomain]: false,
 };
 
-export const isChildlessPathType = (type?: EPathType) =>
-    (type && pathTypeToChildless[type]) ?? false;
+export const isChildlessPathType = (type?: EPathType, subType?: EPathSubType) =>
+    ((subType && pathSubTypeToChildless[subType]) || (type && pathTypeToChildless[type])) ?? false;
