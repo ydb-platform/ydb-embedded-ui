@@ -4,7 +4,8 @@ import block from 'bem-cn-lite';
 
 import DataTable, {Column} from '@yandex-cloud/react-data-table';
 
-import { Loader } from '../../../../components/Loader';
+import type {EPathType} from '../../../../types/api/schema';
+import {Loader} from '../../../../components/Loader';
 import {prepareQueryError} from '../../../../utils/query';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
@@ -15,6 +16,9 @@ import {
     setCurrentDescribePath,
     setDataWasNotLoaded,
 } from '../../../../store/reducers/describe';
+import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema';
+
+import {isCdcStreamEntityType} from '../../utils/schema';
 
 import i18n from './i18n';
 
@@ -24,21 +28,33 @@ const b = block('ydb-consumers');
 
 interface ConsumersProps {
     path: string;
+    type?: EPathType;
 }
 
-export const Consumers = ({path}: ConsumersProps) => {
+export const Consumers = ({path, type}: ConsumersProps) => {
     const dispatch = useDispatch();
+
+    const isCdcStream = isCdcStreamEntityType(type);
+
+    const mergedChildrenPaths = useTypedSelector((state) =>
+        selectSchemaMergedChildrenPaths(state, path, type),
+    );
+
+    const dataPath = isCdcStream ? mergedChildrenPaths?.[0] : path;
 
     const fetchData = useCallback(
         (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded());
             }
-            dispatch(setCurrentDescribePath(path));
-            dispatch(getDescribe({path}));
+
+            if (dataPath) {
+                dispatch(setCurrentDescribePath(dataPath));
+                dispatch(getDescribe({path: dataPath}));
+            }
         },
 
-        [path, dispatch],
+        [dispatch, dataPath],
     );
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
@@ -46,7 +62,7 @@ export const Consumers = ({path}: ConsumersProps) => {
     useAutofetcher(fetchData, [fetchData], autorefresh);
 
     const {loading, wasLoaded, error} = useTypedSelector((state) => state.describe);
-    const consumers = useTypedSelector((state) => selectConsumers(state, path));
+    const consumers = useTypedSelector((state) => selectConsumers(state, dataPath));
 
     const [consumersToRender, setConsumersToRender] = useState(consumers);
 

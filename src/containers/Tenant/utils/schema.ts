@@ -88,3 +88,68 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
 };
 
 export const isColumnEntityType = (type?: EPathType) => (type && pathTypeToIsColumn[type]) ?? false;
+
+// ====================
+
+const pathTypeToIsCdcStream: Record<EPathType, boolean> = {
+    [EPathType.EPathTypeCdcStream]: true,
+
+    [EPathType.EPathTypeInvalid]: false,
+    [EPathType.EPathTypeColumnStore]: false,
+    [EPathType.EPathTypeColumnTable]: false,
+    [EPathType.EPathTypeDir]: false,
+    [EPathType.EPathTypeTable]: false,
+    [EPathType.EPathTypeSubDomain]: false,
+    [EPathType.EPathTypeTableIndex]: false,
+    [EPathType.EPathTypeExtSubDomain]: false,
+    [EPathType.EPathTypePersQueueGroup]: false,
+};
+
+export const isCdcStreamEntityType = (type?: EPathType) =>
+    (type && pathTypeToIsCdcStream[type]) ?? false;
+
+// ====================
+
+const pathTypeToEntityWithMergedImplementation: Record<EPathType, boolean> = {
+    [EPathType.EPathTypeCdcStream]: true,
+
+    [EPathType.EPathTypePersQueueGroup]: false,
+    [EPathType.EPathTypeInvalid]: false,
+    [EPathType.EPathTypeColumnStore]: false,
+    [EPathType.EPathTypeColumnTable]: false,
+    [EPathType.EPathTypeDir]: false,
+    [EPathType.EPathTypeTable]: false,
+    [EPathType.EPathTypeSubDomain]: false,
+    [EPathType.EPathTypeTableIndex]: false,
+    [EPathType.EPathTypeExtSubDomain]: false,
+};
+
+export const isEntityWithMergedImplementation = (type?: EPathType) =>
+    (type && pathTypeToEntityWithMergedImplementation[type]) ?? false;
+
+// ====================
+
+const pathSubTypeToChildless: Record<EPathSubType, boolean> = {
+    [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
+
+    [EPathSubType.EPathSubTypeStreamImpl]: false,
+    [EPathSubType.EPathSubTypeEmpty]: false,
+};
+
+const pathTypeToChildless: Record<EPathType, boolean> = {
+    [EPathType.EPathTypeCdcStream]: true,
+    [EPathType.EPathTypePersQueueGroup]: true,
+
+    [EPathType.EPathTypeInvalid]: false,
+    [EPathType.EPathTypeColumnStore]: false,
+    [EPathType.EPathTypeColumnTable]: false,
+    [EPathType.EPathTypeDir]: false,
+    [EPathType.EPathTypeTable]: false,
+    [EPathType.EPathTypeSubDomain]: false,
+    [EPathType.EPathTypeTableIndex]: false,
+    [EPathType.EPathTypeExtSubDomain]: false,
+};
+
+export const isChildlessPathType = (type?: EPathType) =>
+    (type && pathTypeToChildless[type]) ?? false;
