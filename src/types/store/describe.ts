@@ -13,14 +13,20 @@ export interface IDescribeState {
     loading: boolean;
     wasLoaded: boolean;
     data: IDescribeData;
-    currentDescribe?: TEvDescribeSchemeResult;
+    currentDescribe?: IDescribeData;
     currentDescribePath?: string;
     error?: IResponseError;
 }
 
+export interface IDescribeHandledResponse {
+    path: string | undefined;
+    data: IDescribeData | undefined;
+    currentDescribe: IDescribeData | undefined;
+}
+
 type IDescribeApiRequestAction = ApiRequestAction<
     typeof FETCH_DESCRIBE,
-    TEvDescribeSchemeResult,
+    IDescribeHandledResponse,
     IResponseError
 >;
 
