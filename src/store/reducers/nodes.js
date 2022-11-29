@@ -6,6 +6,7 @@ const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
 
 const CLEAR_NODES = 'nodes/CLEAR_NODES';
 const SET_NODES_UPTIME_FILTER = 'nodes/SET_NODES_UPTIME_FILTER';
+const SET_DATA_WAS_NOT_LOADED = 'nodes/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {
     loading: true,
@@ -52,6 +53,12 @@ const nodes = (state = initialState, action) => {
         case SET_NODES_UPTIME_FILTER: {
             return {...state, nodesUptimeFilter: action.data};
         }
+        case SET_DATA_WAS_NOT_LOADED: {
+            return {
+                ...state,
+                wasLoaded: false,
+            };
+        }
         default:
             return state;
     }
@@ -70,6 +77,12 @@ export const setNodesUptimeFilter = (value) => ({
     type: SET_NODES_UPTIME_FILTER,
     data: value,
 });
+
+export const setDataWasNotLoaded = () => {
+    return {
+        type: SET_DATA_WAS_NOT_LOADED,
+    };
+};
 
 export const getNodesUptimeFilter = (state) => state.nodes.nodesUptimeFilter;
 

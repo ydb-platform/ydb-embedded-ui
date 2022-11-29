@@ -2,8 +2,6 @@ import React from 'react';
 import cn from 'bem-cn-lite';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
-import qs from 'qs';
 
 import {Loader} from '@gravity-ui/uikit';
 
@@ -11,7 +9,7 @@ import NodesViewer from '../../../NodesViewer/NodesViewer';
 
 import {backend} from '../../../../store';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
-import {getNodes, clearNodes} from '../../../../store/reducers/nodes';
+import {getNodes, clearNodes, setDataWasNotLoaded} from '../../../../store/reducers/nodes';
 
 import './Compute.scss';
 import {AutoFetcher} from '../../../../utils/autofetcher';
@@ -28,6 +26,7 @@ class Compute extends React.Component {
         autorefresh: PropTypes.bool,
         error: PropTypes.object,
         wasLoaded: PropTypes.bool,
+        setDataWasNotLoaded: PropTypes.func,
         getNodes: PropTypes.func,
         hideTooltip: PropTypes.func,
         showTooltip: PropTypes.func,
@@ -50,12 +49,25 @@ class Compute extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const {autorefresh, getNodes, tenantName} = this.props;
+        const {autorefresh, getNodes, setDataWasNotLoaded, tenantName} = this.props;
+
+        const restartAutorefresh = () => {
+            this.autofetcher.stop();
+            this.autofetcher.start();
+            this.autofetcher.fetch(() => getNodes(tenantName));
+        };
+
+        if (tenantName !== prevProps.tenantName) {
+            setDataWasNotLoaded();
+            getNodes(tenantName);
+            if (autorefresh) {
+                restartAutorefresh();
+            }
+        }
 
         if (autorefresh && !prevProps.autorefresh) {
             getNodes(tenantName);
-            this.autofetcher.start();
-            this.autofetcher.fetch(() => getNodes(tenantName));
+            restartAutorefresh();
         }
         if (!autorefresh && prevProps.autorefresh) {
             this.autofetcher.stop();
@@ -103,15 +115,10 @@ class Compute extends React.Component {
 function mapStateToProps(state, ownProps) {
     const {data, loading, wasLoaded, error} = state.nodes;
     const {autorefresh} = state.schema;
-    const {search} = ownProps.location;
-    const queryParams = qs.parse(search, {
-        ignoreQueryPrefix: true,
-    });
-    const {name: tenantName} = queryParams;
     const nodes = (data && data.Tenants && data.Tenants[0] && data.Tenants[0].Nodes) || [];
     return {
+        ...ownProps,
         nodes,
-        tenantName,
         loading,
         wasLoaded,
         error,
@@ -124,8 +131,9 @@ const mapDispatchToProps = {
     clearNodes,
     hideTooltip,
     showTooltip,
+    setDataWasNotLoaded,
 };
 
 const ConnectedCompute = connect(mapStateToProps, mapDispatchToProps)(Compute);
 
-export default withRouter(ConnectedCompute);
+export default ConnectedCompute;
