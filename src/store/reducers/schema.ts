@@ -4,6 +4,7 @@ import {createSelector, Selector} from 'reselect';
 import {
     ISchemaAction,
     ISchemaData,
+    ISchemaHandledResponse,
     ISchemaRootStateSlice,
     ISchemaState,
 } from '../../types/store/schema';
@@ -39,22 +40,24 @@ const schema: Reducer<ISchemaState, ISchemaAction> = (state = initialState, acti
             };
         }
         case FETCH_SCHEMA.SUCCESS: {
-            const newData = JSON.parse(JSON.stringify(state.data));
+            const isCurrentSchema =
+                !state.currentSchemaPath || state.currentSchemaPath === action.data.path;
 
-            if (action.data.Path) {
-                newData[action.data.Path] = action.data;
+            const newData = {...state.data, ...action.data.data};
+
+            if (!isCurrentSchema) {
+                return {
+                    ...state,
+                    data: newData,
+                };
             }
 
-            const currentSchema = state.currentSchemaPath
-                ? newData[state.currentSchemaPath]
-                : action.data;
-            const currentSchemaPath = state.currentSchemaPath || action.data.Path;
             return {
                 ...state,
                 error: undefined,
                 data: newData,
-                currentSchema,
-                currentSchemaPath,
+                currentSchema: action.data.currentSchema,
+                currentSchemaPath: action.data.path,
                 loading: false,
                 wasLoaded: true,
             };
@@ -142,7 +145,7 @@ export function getSchemaBatched(paths: string[]) {
     const request = Promise.all(requestArray);
 
     return createApiRequest({
-        request: window.api.getSchema({path}),
+        request,
         actions: FETCH_SCHEMA,
         dataHandler: (data): ISchemaHandledResponse => {
             const newData: ISchemaData = {};
@@ -200,10 +203,10 @@ export function resetLoadingState() {
     } as const;
 }
 
-export const selectSchemaChildren = (state: ISchemaRootStateSlice, path: string | undefined) =>
+export const selectSchemaChildren = (state: ISchemaRootStateSlice, path?: string) =>
     path ? state.schema.data[path]?.PathDescription?.Children : undefined;
 
-export const selectSchemaData = (state: ISchemaRootStateSlice, path: string | undefined) =>
+export const selectSchemaData = (state: ISchemaRootStateSlice, path?: string) =>
     path ? state.schema.data[path] : undefined;
 
 export const selectSchemaMergedChildrenPaths: Selector<

@@ -24,9 +24,15 @@ export interface ISchemaState {
     error?: IResponseError;
 }
 
+export interface ISchemaHandledResponse {
+    path: string | undefined;
+    currentSchema: TEvDescribeSchemeResult | undefined;
+    data: ISchemaData | undefined;
+}
+
 type ISchemaApiRequestAction = ApiRequestAction<
     typeof FETCH_SCHEMA,
-    TEvDescribeSchemeResult,
+    ISchemaHandledResponse,
     IResponseError
 >;
 
