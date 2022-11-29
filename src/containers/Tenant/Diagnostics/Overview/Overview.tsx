@@ -1,5 +1,5 @@
-import {ReactNode, useMemo} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {ReactNode, useCallback, useMemo} from 'react';
+import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 
 import {Loader} from '@gravity-ui/uikit';
@@ -13,7 +13,11 @@ import {
 } from '../../../../components/InfoViewer/schemaInfo';
 
 import {EPathType, TColumnTableDescription} from '../../../../types/api/schema';
-import {isColumnEntityType, isTableType} from '../../utils/schema';
+import {
+    isEntityWithMergedImplementation,
+    isColumnEntityType,
+    isTableType,
+} from '../../utils/schema';
 //@ts-ignore
 import {
     getSchema,
@@ -26,7 +30,7 @@ import {
     getOlapStats,
     resetLoadingState as resetOlapLoadingState,
 } from '../../../../store/reducers/olapStats';
-import {useAutofetcher} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 
 import './Overview.scss';
 
@@ -65,9 +69,7 @@ interface OverviewProps {
 
 const b = cn('kv-tenant-overview');
 
-function Overview(props: OverviewProps) {
-    const {tenantName, type} = props;
-
+function Overview({type, tenantName, className}: OverviewProps) {
     const dispatch = useDispatch();
 
     const {
@@ -116,9 +118,17 @@ function Overview(props: OverviewProps) {
                 dispatch(getOlapStats({path: schemaPath}));
             }
         },
-        [currentSchemaPath, dispatch, tenantName, type],
-        autorefresh,
+        [
+            tenantName,
+            currentSchemaPath,
+            type,
+            isEntityWithMergedImpl,
+            mergedChildrenPaths,
+            dispatch,
+        ],
     );
+
+    useAutofetcher(fetchData, [fetchData], autorefresh);
 
     const tableSchema =
         currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
@@ -150,7 +160,9 @@ function Overview(props: OverviewProps) {
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
-            [EPathType.EPathTypeCdcStream]: () => <CDCStreamInfo data={schemaData} />,
+            [EPathType.EPathTypeCdcStream]: () => (
+                <CDCStreamInfo data={schemaData} childrenPaths={mergedChildrenPaths} />
+            ),
             [EPathType.EPathTypePersQueueGroup]: () => <PersQueueGroupInfo data={schemaData} />,
         };
 
@@ -161,10 +173,10 @@ function Overview(props: OverviewProps) {
         );
     };
 
-    return loading && !wasLoaded ? (
+    return (loading && !wasLoaded) || (isEntityWithMergedImpl && !mergedChildrenPaths) ? (
         renderLoader()
     ) : (
-        <div className={props.className}>{renderContent()}</div>
+        <div className={className}>{renderContent()}</div>
     );
 }
 
