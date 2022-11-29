@@ -90,6 +90,7 @@ class TopQueries extends React.Component {
                 wasLoaded: false,
                 data: undefined,
             });
+            this.getTopQueries();
         }
     }
 
