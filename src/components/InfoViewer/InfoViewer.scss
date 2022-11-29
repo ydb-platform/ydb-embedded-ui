@@ -24,10 +24,10 @@
 
     &__row {
         display: flex;
-        align-items: flex-end;
+        align-items: baseline;
 
         max-width: 100%;
-        height: 24px;
+        padding-top: 4px;
     }
 
     &__label {
@@ -54,7 +54,7 @@
     &__value {
         display: flex;
 
-        white-space: nowrap;
+        word-break: break-all;
     }
 
     &_size {
