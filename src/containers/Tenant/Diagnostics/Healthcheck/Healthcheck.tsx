@@ -10,6 +10,7 @@ import {
     getHealthcheckInfo,
     selectIssuesTreeById,
     selectIssuesTreesRoots,
+    setDataWasNotLoaded,
 } from '../../../../store/reducers/healthcheckInfo';
 
 import {Details} from './Details';
@@ -43,14 +44,21 @@ export const Healthcheck = (props: HealthcheckProps) => {
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
-    const fetchHealthcheck = useCallback(() => {
-        dispatch(getHealthcheckInfo(tenant));
-    }, [dispatch, tenant]);
+    const fetchHealthcheck = useCallback(
+        (isBackground = true) => {
+            if (!isBackground) {
+                dispatch(setDataWasNotLoaded());
+            }
+
+            dispatch(getHealthcheckInfo(tenant));
+        },
+        [dispatch, tenant],
+    );
 
     useAutofetcher(
-        () => {
+        (isBackground) => {
             if (fetchData) {
-                fetchHealthcheck();
+                fetchHealthcheck(isBackground);
             }
         },
         [fetchData, fetchHealthcheck],

@@ -9,21 +9,23 @@ import {
     IHealthcheckInfoState,
     IHealthcheckInfoRootStateSlice,
     IIssuesTree,
+    IHealthCheckInfoAction,
 } from '../../types/store/healthcheck';
-import {HealthCheckAPIResponse, IssueLog, StatusFlag} from '../../types/api/healthcheck';
-import {IResponseError} from '../../types/api/error';
+import {IssueLog, StatusFlag} from '../../types/api/healthcheck';
 
 import '../../services/api';
-import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
+import {createRequestActionTypes, createApiRequest} from '../utils';
 
-const FETCH_HEALTHCHECK = createRequestActionTypes('cluster', 'FETCH_HEALTHCHECK');
+export const FETCH_HEALTHCHECK = createRequestActionTypes('cluster', 'FETCH_HEALTHCHECK');
+
+const SET_DATA_WAS_NOT_LOADED = 'healthcheckInfo/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {loading: false, wasLoaded: false};
 
-const healthcheckInfo: Reducer<
-    IHealthcheckInfoState,
-    ApiRequestAction<typeof FETCH_HEALTHCHECK, HealthCheckAPIResponse, IResponseError>
-> = function (state = initialState, action) {
+const healthcheckInfo: Reducer<IHealthcheckInfoState, IHealthCheckInfoAction> = function (
+    state = initialState,
+    action,
+) {
     switch (action.type) {
         case FETCH_HEALTHCHECK.REQUEST: {
             return {
@@ -47,6 +49,13 @@ const healthcheckInfo: Reducer<
                 ...state,
                 error: action.error,
                 loading: false,
+            };
+        }
+
+        case SET_DATA_WAS_NOT_LOADED: {
+            return {
+                ...state,
+                wasLoaded: false,
             };
         }
         default:
@@ -126,5 +135,11 @@ export function getHealthcheckInfo(database: string) {
         actions: FETCH_HEALTHCHECK,
     });
 }
+
+export const setDataWasNotLoaded = () => {
+    return {
+        type: SET_DATA_WAS_NOT_LOADED,
+    } as const;
+};
 
 export default healthcheckInfo;
