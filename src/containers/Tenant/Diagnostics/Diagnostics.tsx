@@ -38,6 +38,7 @@ import {GeneralPagesIds, DATABASE_PAGES, getPagesByType} from './DiagnosticsPage
 //@ts-ignore
 import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema';
 import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant';
+import {isDatabaseEntityType} from '../utils/schema';
 
 import './Diagnostics.scss';
 
@@ -66,17 +67,17 @@ function Diagnostics(props: DiagnosticsProps) {
         ignoreQueryPrefix: true,
     });
 
-    const {name: tenantName} = queryParams;
-
-    const isRoot = currentSchemaPath === tenantName;
+    const {name: rootTenantName} = queryParams;
+    const tenantName = isDatabaseEntityType(props.type) ? currentSchemaPath : rootTenantName;
+    const isDatabase = isDatabaseEntityType(props.type) || currentSchemaPath === rootTenantName;
 
     const pages = useMemo(() => {
-        if (isRoot) {
+        if (isDatabase) {
             return DATABASE_PAGES;
         }
 
         return getPagesByType(props.type);
-    }, [props.type, isRoot]);
+    }, [props.type, isDatabase]);
 
     const forwardToDiagnosticTab = (tab: GeneralPagesIds) => {
         dispatch(setDiagnosticsTab(tab));
@@ -134,7 +135,12 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <TopShards path={tenantNameString} type={type} />;
             }
             case GeneralPagesIds.nodes: {
-                return <Compute additionalNodesInfo={props.additionalNodesInfo} />;
+                return (
+                    <Compute
+                        tenantName={tenantNameString}
+                        additionalNodesInfo={props.additionalNodesInfo}
+                    />
+                );
             }
             case GeneralPagesIds.tablets: {
                 return <Tablets path={currentItem.Path} />;

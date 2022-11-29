@@ -53,6 +53,7 @@ class TenantOverview extends React.Component {
 
     componentDidMount() {
         const {tenantName, autorefresh, getTenantInfo} = this.props;
+        getTenantInfo({path: tenantName});
         this.autofetcher = new AutoFetcher();
         if (autorefresh) {
             this.autofetcher.start();
@@ -62,12 +63,25 @@ class TenantOverview extends React.Component {
 
     componentDidUpdate(prevProps) {
         const {autorefresh, tenantName, getTenantInfo} = this.props;
-        if (autorefresh && !prevProps.autorefresh) {
-            getTenantInfo({path: tenantName});
+
+        const restartAutorefresh = () => {
             this.autofetcher.stop();
             this.autofetcher.start();
             this.autofetcher.fetch(() => getTenantInfo({path: tenantName}));
+        };
+
+        if (prevProps.tenantName !== this.props.tenantName) {
+            getTenantInfo({path: tenantName});
+            if (autorefresh) {
+                restartAutorefresh();
+            }
         }
+
+        if (autorefresh && !prevProps.autorefresh) {
+            getTenantInfo({path: tenantName});
+            restartAutorefresh();
+        }
+
         if (!autorefresh && prevProps.autorefresh) {
             this.autofetcher.stop();
         }
