@@ -12,7 +12,7 @@ import Icon from '../../../../components/Icon/Icon';
 import ProblemFilter, {problemFilterType} from '../../../../components/ProblemFilter/ProblemFilter';
 import {Illustration} from '../../../../components/Illustration';
 
-import {getNetworkInfo} from '../../../../store/reducers/network';
+import {getNetworkInfo, setDataWasNotLoaded} from '../../../../store/reducers/network';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
 import {ALL, PROBLEMS} from '../../../../utils/constants';
 import {changeFilter} from '../../../../store/reducers/settings';
@@ -26,6 +26,7 @@ const b = cn('network');
 class Network extends React.Component {
     static propTypes = {
         getNetworkInfo: PropTypes.func,
+        setDataWasNotLoaded: PropTypes.func,
         netWorkInfo: PropTypes.object,
         hideTooltip: PropTypes.func,
         showTooltip: PropTypes.func,
@@ -75,15 +76,26 @@ class Network extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const {autorefresh, path} = this.props;
+        const {autorefresh, path, setDataWasNotLoaded, getNetworkInfo} = this.props;
+
+        const restartAutorefresh = () => {
+            this.autofetcher.stop();
+            this.autofetcher.start();
+            this.autofetcher.fetch(() => getNetworkInfo(path));
+        };
 
         if (autorefresh && !prevProps.autorefresh) {
             getNetworkInfo(path);
-            this.autofetcher.start();
-            this.autofetcher.fetch(() => getNetworkInfo(path));
+            restartAutorefresh();
         }
         if (!autorefresh && prevProps.autorefresh) {
             this.autofetcher.stop();
+        }
+
+        if (path !== prevProps.path) {
+            setDataWasNotLoaded();
+            getNetworkInfo(path);
+            restartAutorefresh();
         }
     }
 
@@ -364,6 +376,7 @@ const mapDispatchToProps = {
     hideTooltip,
     showTooltip,
     changeFilter,
+    setDataWasNotLoaded,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Network);

@@ -6,7 +6,15 @@ const FETCH_ALL_NODES_NETWORK = createRequestActionTypes(
     'FETCH_ALL_NODES_NETWORK',
 );
 
-const network = (state = {data: {}, loading: true, wasLoaded: false}, action) => {
+const SET_DATA_WAS_NOT_LOADED = 'network/SET_DATA_WAS_NOT_LOADED';
+
+const initialState = {
+    data: {},
+    loading: false,
+    wasLoaded: false,
+};
+
+const network = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_ALL_NODES_NETWORK.REQUEST: {
             return {
@@ -30,9 +38,22 @@ const network = (state = {data: {}, loading: true, wasLoaded: false}, action) =>
                 loading: false,
             };
         }
+
+        case SET_DATA_WAS_NOT_LOADED: {
+            return {
+                ...state,
+                wasLoaded: false,
+            };
+        }
         default:
             return state;
     }
+};
+
+export const setDataWasNotLoaded = () => {
+    return {
+        type: SET_DATA_WAS_NOT_LOADED,
+    };
 };
 
 export const getNetworkInfo = (tenant) => {
