@@ -34,6 +34,7 @@ const SET_USAGE_FILTER = 'storage/SET_USAGE_FILTER';
 const SET_VISIBLE_GROUPS = 'storage/SET_VISIBLE_GROUPS';
 const SET_STORAGE_TYPE = 'storage/SET_STORAGE_TYPE';
 const SET_NODES_UPTIME_FILTER = 'storage/SET_NODES_UPTIME_FILTER';
+const SET_DATA_WAS_NOT_LOADED = 'storage/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {
     loading: true,
@@ -116,6 +117,12 @@ const storage = (state = initialState, action) => {
                 error: undefined,
             };
         }
+        case SET_DATA_WAS_NOT_LOADED: {
+            return {
+                ...state,
+                wasLoaded: false,
+            };
+        }
         default:
             return state;
     }
@@ -168,6 +175,12 @@ export function setNodesUptimeFilter(value) {
         data: value,
     };
 }
+
+export const setDataWasNotLoaded = () => {
+    return {
+        type: SET_DATA_WAS_NOT_LOADED,
+    };
+};
 
 export const getStoragePools = (state) => state.storage.data?.StoragePools;
 export const getStoragePoolsGroupsCount = (state) => ({

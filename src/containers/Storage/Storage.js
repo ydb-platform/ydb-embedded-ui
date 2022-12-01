@@ -25,6 +25,7 @@ import {
     StorageTypes,
     setStorageType,
     setNodesUptimeFilter,
+    setDataWasNotLoaded,
     VisibleEntitiesTitles,
     getStoragePoolsGroupsCount,
     getStorageNodesCount,
@@ -71,6 +72,7 @@ class Storage extends React.Component {
         nodeId: PropTypes.string,
         nodesUptimeFilter: PropTypes.string,
         setNodesUptimeFilter: PropTypes.func,
+        setDataWasNotLoaded: PropTypes.func,
     };
 
     componentDidMount() {
@@ -106,7 +108,8 @@ class Storage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const {visibleEntities, storageType, autorefresh, database} = this.props;
+        const {visibleEntities, storageType, autorefresh, database, tenant, setDataWasNotLoaded} =
+            this.props;
 
         const startFetch = () => {
             this.getStorageInfo({
@@ -143,6 +146,12 @@ class Storage extends React.Component {
             if (!database || (database && autorefresh)) {
                 restartAutorefresh();
             }
+        }
+
+        if (tenant !== prevProps.tenant) {
+            setDataWasNotLoaded();
+            startFetch();
+            restartAutorefresh();
         }
     }
 
@@ -367,6 +376,7 @@ const mapDispatchToProps = {
     getNodesList,
     setStorageType,
     setHeader,
+    setDataWasNotLoaded,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Storage);
