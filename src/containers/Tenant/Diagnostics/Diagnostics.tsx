@@ -143,7 +143,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 );
             }
             case GeneralPagesIds.tablets: {
-                return <Tablets path={currentItem.Path} />;
+                return <Tablets path={currentSchemaPath} />;
             }
             case GeneralPagesIds.storage: {
                 return <Storage tenant={tenantNameString} database={true} />;
