@@ -2,7 +2,7 @@ import {MemoryRouter} from 'react-router-dom';
 
 import {renderWithStore} from '../../../../utils/tests/providers';
 
-import {TPDiskState} from '../../../../types/api/storage'
+import {TPDiskState} from '../../../../types/api/pdisk'
 
 import PDisk from '../Pdisk'
 

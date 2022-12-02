@@ -1,4 +1,4 @@
-import type {TPDiskStateInfo} from "../types/api/storage";
+import type {TPDiskStateInfo} from '../types/api/pdisk';
 
 // TODO: move to utils or index after converting them to TS
 /**
