@@ -9,7 +9,7 @@ import {Stack} from '../../../components/Stack/Stack';
 //@ts-ignore
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 
-import {TVDiskStateInfo} from '../../../types/api/storage';
+import {TVDiskStateInfo} from '../../../types/api/vdisk';
 //@ts-ignore
 import {VisibleEntities} from '../../../store/reducers/storage';
 //@ts-ignore
@@ -92,7 +92,13 @@ function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder 
     }
 }
 
-function StorageGroups({data, tableSettings, visibleEntities, nodes, onShowAll}: StorageGroupsProps) {
+function StorageGroups({
+    data,
+    tableSettings,
+    visibleEntities,
+    nodes,
+    onShowAll,
+}: StorageGroupsProps) {
     const allColumns: Column<any>[] = [
         {
             name: TableColumnsIds.PoolName,
@@ -123,7 +129,7 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes, onShowAll}:
             header: tableColumnsNames[TableColumnsIds.Type],
             render: ({value, row}) => (
                 <>
-                    <Label>{value as string || '—'}</Label>
+                    <Label>{(value as string) || '—'}</Label>
                     {' '}
                     {row.Encryption && (
                         <Popover
@@ -143,9 +149,8 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes, onShowAll}:
             name: TableColumnsIds.Missing,
             header: tableColumnsNames[TableColumnsIds.Missing],
             width: 100,
-            render: ({value, row}) => value ? (
-                <Label theme={getDegradedSeverity(row)}>Degraded: {value}</Label>
-            ) : '-',
+            render: ({value, row}) =>
+                value ? <Label theme={getDegradedSeverity(row)}>Degraded: {value}</Label> : '-',
             align: DataTable.LEFT,
             defaultOrder: DataTable.DESCENDING,
         },
@@ -164,10 +169,12 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes, onShowAll}:
                     >
                         {usage}%
                     </Label>
-                ) : '-';
+                ) : (
+                    '-'
+                );
             },
             // without a limit exclude usage from sort to display at the bottom
-            sortAccessor: (row) => row.Limit ? getUsage(row) : null,
+            sortAccessor: (row) => (row.Limit ? getUsage(row) : null),
             align: DataTable.LEFT,
         },
         {
@@ -241,35 +248,35 @@ function StorageGroups({data, tableSettings, visibleEntities, nodes, onShowAll}:
             render: ({value, row}) => (
                 <div className={b('vdisks-wrapper')}>
                     {_.map(value as TVDiskStateInfo[], (el) => {
-                        const donors = Array.isArray(el.Donors) ? el.Donors.filter(isFullDonorData) : [];
+                        const donors = Array.isArray(el.Donors)
+                            ? el.Donors.filter(isFullDonorData)
+                            : [];
 
-                        return (
-                            donors.length > 0 ? (
-                                <Stack className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
+                        return donors.length > 0 ? (
+                            <Stack className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
+                                <Vdisk
+                                    {...el}
+                                    PoolName={row[TableColumnsIds.PoolName]}
+                                    nodes={nodes}
+                                />
+                                {donors.map((donor) => (
                                     <Vdisk
-                                        {...el}
+                                        {...donor}
+                                        // donor and acceptor are always in the same group
                                         PoolName={row[TableColumnsIds.PoolName]}
                                         nodes={nodes}
+                                        key={stringifyVdiskId(donor.VDiskId)}
                                     />
-                                    {donors.map((donor) => (
-                                        <Vdisk
-                                            {...donor}
-                                            // donor and acceptor are always in the same group
-                                            PoolName={row[TableColumnsIds.PoolName]}
-                                            nodes={nodes}
-                                            key={stringifyVdiskId(donor.VDiskId)}
-                                        />
-                                    ))}
-                                </Stack>
-                            ) : (
-                                <div className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
-                                    <Vdisk
-                                        {...el}
-                                        PoolName={row[TableColumnsIds.PoolName]}
-                                        nodes={nodes}
-                                    />
-                                </div>
-                            )
+                                ))}
+                            </Stack>
+                        ) : (
+                            <div className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
+                                <Vdisk
+                                    {...el}
+                                    PoolName={row[TableColumnsIds.PoolName]}
+                                    nodes={nodes}
+                                />
+                            </div>
                         );
                     })}
                 </div>

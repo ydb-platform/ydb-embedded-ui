@@ -8,7 +8,7 @@ import InternalLink from '../../../components/InternalLink/InternalLink';
 
 import routes, {createHref} from '../../../routes';
 import type {RequiredField} from '../../../types';
-import {TPDiskStateInfo, TPDiskState} from '../../../types/api/storage';
+import {TPDiskStateInfo, TPDiskState} from '../../../types/api/pdisk';
 import {getPDiskId} from '../../../utils';
 import {getPDiskType} from '../../../utils/pdisk';
 import {bytesToGB} from '../../../utils/utils';
@@ -96,9 +96,7 @@ function Pdisk(props: PDiskProps) {
         Realtime &&
             errorColors.includes(Realtime) &&
             pdiskData.push({label: 'Realtime', value: Realtime});
-        Device &&
-            errorColors.includes(Device) &&
-            pdiskData.push({label: 'Device', value: Device});
+        Device && errorColors.includes(Device) && pdiskData.push({label: 'Device', value: Device});
         return pdiskData;
     };
     /* eslint-enable */
@@ -113,11 +111,7 @@ function Pdisk(props: PDiskProps) {
             // matches the default offset for popup with arrow out of a sense of beauty
             offset={[0, 12]}
         >
-            <InfoViewer
-                title="PDisk"
-                info={preparePdiskData()}
-                size="s"
-            />
+            <InfoViewer title="PDisk" info={preparePdiskData()} size="s" />
         </Popup>
     );
 

@@ -1,4 +1,4 @@
-import type {TVDiskStateInfo, TVSlotId} from '../types/api/storage';
+import type {TVSlotId, TVDiskStateInfo} from '../types/api/vdisk';
 import type {IStoragePoolGroup} from '../types/store/storage';
 
 export const isFullDonorData = (donor: TVDiskStateInfo | TVSlotId): donor is TVDiskStateInfo =>
