@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.5.0...v2.6.0) (2022-12-05)
+
+
+### Features
+
+* **Describe:** add topic data for CDCStream ([3a289d4](https://github.com/ydb-platform/ydb-embedded-ui/commit/3a289d4f6452e3f2d719c0d508f48b389fd044d7))
+* **Diagnostics:** add consumers tab for CdcStream ([22c6efd](https://github.com/ydb-platform/ydb-embedded-ui/commit/22c6efdd39d85ab1585943bc13d88cf03f9bc2ae))
+* **Overview:** add topic data for CDCStream ([be80545](https://github.com/ydb-platform/ydb-embedded-ui/commit/be80545df65a03820265875fedd98c6f181af491))
+
+
+### Bug Fixes
+
+* **Compute:** update data on path change ([1783240](https://github.com/ydb-platform/ydb-embedded-ui/commit/17832403623ae3e718f47aec508c834cd2e3458c))
+* **Diagnostics:** render db tabs for not root dbs ([7d46ce2](https://github.com/ydb-platform/ydb-embedded-ui/commit/7d46ce2783a58b1ae6e41cae6592e78f95d61bcc))
+* **Healthcheck:** render loader on path change ([ec40f19](https://github.com/ydb-platform/ydb-embedded-ui/commit/ec40f19c0b369de0b8d0658b4a1dd68c5c419c1c))
+* **InfoViewer:** allow multiline values ([17755dc](https://github.com/ydb-platform/ydb-embedded-ui/commit/17755dc2eae7b6fc0a56ff70da95679fc590dccb))
+* **Network:** update data on path change ([588c53f](https://github.com/ydb-platform/ydb-embedded-ui/commit/588c53f80a81376301216a77d9ead95cdff9812f))
+* **SchemaTree:** do not expand childless components ([90468de](https://github.com/ydb-platform/ydb-embedded-ui/commit/90468de74b74e00a66255ba042378c9d7e1cbc27))
+* **Storage:** update data on path change ([f5486bc](https://github.com/ydb-platform/ydb-embedded-ui/commit/f5486bcb2838b9e290c566089980533b4d22d035))
+* **Tablets:** fix postponed data update on path change ([d474c6c](https://github.com/ydb-platform/ydb-embedded-ui/commit/d474c6cb36597f0c720ef3bb8d0360ec73973e26))
+* **TopQueries:** update data on path change ([32d7720](https://github.com/ydb-platform/ydb-embedded-ui/commit/32d77208b8ef09682c41160c60a1a7742b0c6c4c))
+
 ## [2.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.4.4...v2.5.0) (2022-11-25)
 
 
