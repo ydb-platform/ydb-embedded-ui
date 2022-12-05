@@ -41,7 +41,7 @@ enum EStatus {
 interface TPathDescription {
     /** info about the path itself */
     Self?: TDirEntry;
-    DomainDescription?: unknown;
+    DomainDescription?: TDomainDescription;
 
     // for directory
     Children?: TDirEntry[];
@@ -83,6 +83,145 @@ export interface TDirEntry {
     PathVersion?: string;
     PathSubType?: EPathSubType;
     Version?: TPathVersion;
+}
+
+interface TDomainDescription {
+    ProcessingParams?: TProcessingParams;
+
+    DomainKey?: TDomainKey;
+
+    StoragePools?: TStoragePool[];
+
+    /** uint64 */
+    PathsInside?: string;
+    /** uint64 */
+    PathsLimit?: string;
+    /** uint64 */
+    ShardsInside?: string;
+    /** uint64 */
+    ShardsLimit?: string;
+
+    ResourcesDomainKey?: TDomainKey;
+
+    DiskSpaceUsage?: TDiskSpaceUsage;
+
+    /** uint64 */
+    PQPartitionsInside?: string;
+    /** uint64 */
+    PQPartitionsLimit?: string;
+
+    DomainState?: TDomainState;
+
+    DeclaredSchemeQuotas?: TSchemeQuotas;
+    DatabaseQuotas?: DatabaseQuotas;
+    SecurityState?: TSecurityState;
+}
+
+interface TDomainKey {
+    /** fixed64 */
+    SchemeShard?: string;
+    /** fixed64 */
+    PathId?: string;
+}
+
+interface TProcessingParams {
+    Version?: number;
+    /** uint64 */
+    PlanResolution?: string;
+    /** fixed64 */
+    Coordinators?: string[];
+    /** uint64 */
+    TimeCastBucketsPerMediator?: string;
+    /** fixed64 */
+    Mediators?: string[];
+    /** fixed64 */
+    SchemeShard?: string;
+    /** fixed64 */
+    Hive?: string;
+    /** fixed64 */
+    SysViewProcessor?: string;
+}
+
+interface TDomainState {
+    DiskQuotaExceeded?: boolean;
+}
+
+interface TDiskSpaceUsage {
+    Tables?: TTables;
+}
+
+interface TTables {
+    /** uint64 */
+    TotalSize?: string;
+    /** uint64 */
+    DataSize?: string;
+    /** uint64 */
+    IndexSize?: string;
+}
+
+interface TStoragePool {
+    Name?: string;
+    Kind?: string;
+}
+
+interface TSchemeQuotas {
+    SchemeQuotas?: TSchemeQuota[];
+}
+
+interface TSchemeQuota {
+    /** double */
+    BucketSize?: number;
+    /** uint64 */
+    BucketSeconds?: string;
+}
+
+interface TSecurityState {
+    PublicKeys?: TPublicKey[];
+    Sids?: TSid[];
+    Audience: string;
+}
+
+interface TPublicKey {
+    /** uint64 */
+    KeyId: string;
+    KeyDataPEM: string;
+    /** uint64 */
+    ExpiresAt: string;
+}
+
+interface TSid {
+    Name: string;
+    Type: SidType;
+
+    Hash: string;
+    Members?: string[];
+}
+
+enum SidType {
+    'UNKNOWN' = 'UNKNOWN',
+    'USER' = 'USER',
+    'GROUP' = 'GROUP',
+}
+
+interface DatabaseQuotas {
+    /** uint64 */
+    // eslint-disable-next-line camelcase
+    data_size_hard_quota: string;
+
+    /** uint64 */
+    // eslint-disable-next-line camelcase
+    data_size_soft_quota: string;
+
+    /** uint64 */
+    // eslint-disable-next-line camelcase
+    data_stream_shards_quota: string;
+
+    /** uint64 */
+    // eslint-disable-next-line camelcase
+    data_stream_reserved_storage_quota: string;
+
+    // eslint-disable-next-line camelcase
+    ttl_min_run_internal_seconds: number;
 }
 
 // FIXME: incomplete
