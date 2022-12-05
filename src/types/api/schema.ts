@@ -659,8 +659,8 @@ export interface TColumnTableDescription {
 }
 
 interface TColumnTableSchema {
-    Columns: TOlapColumnDescription[];
-    KeyColumnNames: string[];
+    Columns?: TOlapColumnDescription[];
+    KeyColumnNames?: string[];
     Engine?: EColumnTableEngine;
     NextColumnId?: number;
 
@@ -724,7 +724,7 @@ interface TStorageTier {
     Eviction?: TTtl;
 }
 interface TStorageTiering {
-    Tiers: TStorageTier[];
+    Tiers?: TStorageTier[];
 }
 
 enum EUnit {
@@ -740,10 +740,10 @@ interface TColumnTableSharding {
     Version?: string;
 
     /** uint64 */
-    ColumnShards: string[];
+    ColumnShards?: string[];
 
     /** uint64 */
-    AdditionalColumnShards: string[];
+    AdditionalColumnShards?: string[];
 
     UniquePrimaryKey?: boolean;
 
@@ -753,7 +753,7 @@ interface TColumnTableSharding {
 
 interface THashSharding {
     Function?: EHashFunction;
-    Columns: string[];
+    Columns?: string[];
     UniqueShardKey?: boolean;
     ActiveShardsCount?: number;
 }
@@ -776,9 +776,9 @@ export interface TColumnStoreDescription {
     ColumnShardCount?: number;
 
     /** uint64 */
-    ColumnShards: string[];
+    ColumnShards?: string[];
 
-    SchemaPresets: TColumnTableSchemaPreset[];
+    SchemaPresets?: TColumnTableSchemaPreset[];
     StorageConfig?: TColumnStorageConfig;
 
     NextSchemaPresetId?: number;
