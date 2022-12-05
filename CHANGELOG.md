@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.6.0...v3.0.0) (2022-12-05)
+
+
+### ⚠ BREAKING CHANGES
+
+Updated build config ([11e02c6](https://github.com/ydb-platform/ydb-embedded-ui/commit/11e02c668ef186f058b2ece9d5f1082d0e96e23d))
+
+**Before the change**
+- the target dir for the production build was `build/resources`
+- `favicon.png` was placed directly in `build`
+
+**After the change**
+- the target dir is `build/static`
+- `favicon.png` is in `build/static`
+
+This change is intended to simplify build config and make it closer to the default one. Previously there were some custom tweaks after the build, they caused bugs and were hard to maintain. Now the application builds using the default `create-react-app` config.
+
+
 ## [2.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.5.0...v2.6.0) (2022-12-05)
 
 
