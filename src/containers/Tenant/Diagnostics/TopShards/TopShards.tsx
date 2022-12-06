@@ -1,27 +1,33 @@
 import {useState, useContext, useEffect, useMemo} from 'react';
+import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
-import {connect} from 'react-redux';
+
+import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
-import DataTable from '@yandex-cloud/react-data-table';
 
 import InternalLink from '../../../../components/InternalLink/InternalLink';
 
+import HistoryContext from '../../../../contexts/HistoryContext';
+
 import routes, {createHref} from '../../../../routes';
+
 import {sendShardQuery, setShardQueryOptions} from '../../../../store/reducers/shardsWorkload';
 import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema';
-import {AutoFetcher} from '../../../../utils/autofetcher';
-import HistoryContext from '../../../../contexts/HistoryContext';
+
+import type {EPathType} from '../../../../types/api/schema';
+
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {isColumnEntityType} from '../../utils/schema';
-import {prepareQueryError} from '../../../../utils/query';
+import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {i18n} from '../../../../utils/i18n';
+import {prepareQueryError} from '../../../../utils/query';
+import {isColumnEntityType} from '../../utils/schema';
 
 import './TopShards.scss';
 
 const b = cn('top-shards');
 const bLink = cn('yc-link');
 
-const TABLE_SETTINGS = {
+const TABLE_SETTINGS: Settings = {
     ...DEFAULT_TABLE_SETTINGS,
     dynamicRender: false, // no more than 20 rows
     externalSort: true,
@@ -36,27 +42,24 @@ const tableColumnsNames = {
     Path: 'Path',
 };
 
-const autofetcher = new AutoFetcher();
-
-function prepareCPUWorkloadValue(value) {
-    return `${(value * 100).toFixed(2)}%`;
+function prepareCPUWorkloadValue(value: string) {
+    return `${(Number(value) * 100).toFixed(2)}%`;
 }
 
-function prepareDateSizeValue(value) {
+function prepareDateSizeValue(value: number) {
     return new Intl.NumberFormat(i18n.lang).format(value);
 }
 
-function stringToDataTableSortOrder(value) {
-    return (
-        value &&
-        value.split(',').map((columnId) => ({
-            columnId,
-            order: DataTable.DESCENDING,
-        }))
-    );
+function stringToDataTableSortOrder(value: string): SortOrder[] | undefined {
+    return value
+        ? value.split(',').map((columnId) => ({
+              columnId,
+              order: DataTable.DESCENDING,
+          }))
+        : undefined;
 }
 
-function stringToQuerySortOrder(value) {
+function stringToQuerySortOrder(value: string) {
     return (
         value &&
         value.split(',').map((columnId) => ({
@@ -66,91 +69,82 @@ function stringToQuerySortOrder(value) {
     );
 }
 
-function dataTableToStringSortOrder(value = []) {
-    return value.map(({columnId}) => columnId).join(',');
+function dataTableToStringSortOrder(value: SortOrder | SortOrder[] = []) {
+    const sortOrders = Array.isArray(value) ? value : [value];
+    return sortOrders.map(({columnId}) => columnId).join(',');
 }
 
-function TopShards({
-    sendShardQuery,
-    currentSchemaPath,
-    path,
-    loading,
-    data,
-    error,
-    setCurrentSchemaPath,
-    getSchema,
-    autorefresh,
-    wasLoaded,
-    setShardQueryOptions,
-    type,
-}) {
+interface TopShardsProps {
+    tenantPath: string;
+    type?: EPathType;
+}
+
+export const TopShards = ({tenantPath, type}: TopShardsProps) => {
+    const dispatch = useDispatch();
+
+    const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
+
+    const {
+        loading,
+        data: {result: data = undefined} = {},
+        error,
+        wasLoaded,
+    } = useTypedSelector((state) => state.shardsWorkload);
+
     const [sortOrder, setSortOrder] = useState(tableColumnsNames.CPUCores);
 
-    useEffect(() => {
-        autofetcher.stop();
-
-        if (autorefresh) {
-            autofetcher.start();
-            autofetcher.fetch(() =>
+    useAutofetcher(
+        () => {
+            dispatch(
                 sendShardQuery({
-                    database: path,
+                    database: tenantPath,
                     path: currentSchemaPath,
                     sortOrder: stringToQuerySortOrder(sortOrder),
                 }),
             );
-        }
-
-        return () => {
-            autofetcher.stop();
-        };
-    }, [autorefresh, currentSchemaPath, path, sendShardQuery, sortOrder]);
+        },
+        [dispatch, currentSchemaPath, tenantPath, sortOrder],
+        autorefresh,
+    );
 
     // don't show loader for requests triggered by table sort, only for path change
     useEffect(() => {
-        setShardQueryOptions({
-            wasLoaded: false,
-            data: undefined,
-        });
-    }, [currentSchemaPath, path, setShardQueryOptions]);
-
-    useEffect(() => {
-        sendShardQuery({
-            database: path,
-            path: currentSchemaPath,
-            sortOrder: stringToQuerySortOrder(sortOrder),
-        });
-    }, [currentSchemaPath, path, sendShardQuery, sortOrder]);
+        dispatch(
+            setShardQueryOptions({
+                wasLoaded: false,
+                data: undefined,
+            }),
+        );
+    }, [dispatch, currentSchemaPath, tenantPath]);
 
     const history = useContext(HistoryContext);
 
-    const onSchemaClick = (schemaPath) => {
-        return () => {
-            setCurrentSchemaPath(schemaPath);
-            getSchema({path: schemaPath});
-            history.go(0);
-        };
-    };
-
-    const onSort = (newSortOrder) => {
+    const onSort = (newSortOrder?: SortOrder | SortOrder[]) => {
         // omit information about sort order to disable ASC order, only DESC makes sense for top shards
         // use a string (and not the DataTable default format) to prevent reference change,
         // which would cause an excess state change, to avoid repeating requests
         setSortOrder(dataTableToStringSortOrder(newSortOrder));
     };
 
-    const tableColumns = useMemo(() => {
+    const tableColumns: Column<any>[] = useMemo(() => {
+        const onSchemaClick = (schemaPath: string) => {
+            return () => {
+                dispatch(setCurrentSchemaPath(schemaPath));
+                dispatch(getSchema({path: schemaPath}));
+                history.go(0);
+            };
+        };
+
         return [
             {
                 name: tableColumnsNames.Path,
-                // eslint-disable-next-line
-                render: ({value}) => {
+                render: ({value: relativeNodePath}) => {
                     return (
                         <span
-                            // tenant name is substringed out in sql query but is needed here
-                            onClick={onSchemaClick(path + value)}
+                            onClick={onSchemaClick(tenantPath + relativeNodePath)}
                             className={bLink({view: 'normal'})}
                         >
-                            {value}
+                            {relativeNodePath as string}
                         </span>
                     );
                 },
@@ -158,9 +152,8 @@ function TopShards({
             },
             {
                 name: tableColumnsNames.CPUCores,
-                // eslint-disable-next-line
                 render: ({value}) => {
-                    return prepareCPUWorkloadValue(value);
+                    return prepareCPUWorkloadValue(value as string);
                 },
                 align: DataTable.RIGHT,
             },
@@ -168,24 +161,23 @@ function TopShards({
                 name: tableColumnsNames.DataSize,
                 header: 'DataSize (B)',
                 render: ({value}) => {
-                    return prepareDateSizeValue(value);
+                    return prepareDateSizeValue(value as number);
                 },
                 align: DataTable.RIGHT,
             },
             {
                 name: tableColumnsNames.TabletId,
-                // eslint-disable-next-line
                 render: ({value}) => {
                     return (
                         <InternalLink to={createHref(routes.tablet, {id: value})}>
-                            {value}
+                            {value as string}
                         </InternalLink>
                     );
                 },
                 sortable: false,
             },
         ];
-    }, []);
+    }, [dispatch, history, tenantPath]);
 
     const renderLoader = () => {
         return (
@@ -209,7 +201,6 @@ function TopShards({
                     columns={tableColumns}
                     data={data}
                     settings={TABLE_SETTINGS}
-                    className={b('table')}
                     theme="yandex-cloud"
                     onSort={onSort}
                     sortOrder={stringToDataTableSortOrder(sortOrder)}
@@ -221,26 +212,4 @@ function TopShards({
     };
 
     return loading && !wasLoaded ? renderLoader() : <div className={b()}>{renderContent()}</div>;
-}
-
-const mapStateToProps = (state) => {
-    const {loading, data = {}, error, wasLoaded} = state.shardsWorkload;
-    const {autorefresh} = state.schema;
-    return {
-        loading,
-        data: data.result,
-        error,
-        currentSchemaPath: state.schema?.currentSchema?.Path,
-        autorefresh,
-        wasLoaded,
-    };
 };
-
-const mapDispatchToProps = {
-    sendShardQuery,
-    setCurrentSchemaPath,
-    getSchema,
-    setShardQueryOptions,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(TopShards);
