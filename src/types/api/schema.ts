@@ -38,7 +38,7 @@ enum EStatus {
 }
 
 // incomplete interface, only currently used fields are covered
-interface TPathDescription {
+export interface TPathDescription {
     /** info about the path itself */
     Self?: TDirEntry;
     DomainDescription?: TDomainDescription;
