@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
-import './SchemaInfoViewer.scss';
 
 import {formatCPU, formatBytes, formatNumber, formatBps, formatDateTime} from '../../../../utils';
 
 import {InfoViewer, createInfoFormatter} from '../../../../components/InfoViewer';
+
+import {getEntityName} from '../../utils';
+
+import './SchemaInfoViewer.scss';
 
 const b = cn('schema-info-viewer');
 
@@ -68,6 +71,8 @@ class SchemaInfoViewer extends React.Component {
 
     renderContent(data) {
         const {PathDescription = {}} = data;
+        const entityName = getEntityName(PathDescription);
+
         const {
             TableStats = {},
             TabletMetrics = {},
@@ -99,13 +104,15 @@ class SchemaInfoViewer extends React.Component {
         } = TableStats;
         const {FollowerGroups, FollowerCount, CrossDataCenterFollowerCount} = PartitionConfig;
 
+        const generalTableInfo = formatTableStats({
+            PartCount,
+            RowCount,
+            DataSize,
+            IndexSize,
+            ...restTableStats,
+        });
+
         const tableStatsInfo = [
-            formatTableStats({
-                PartCount,
-                RowCount,
-                DataSize,
-                IndexSize,
-            }),
             formatTableStats({
                 LastAccessTime,
                 LastUpdateTime,
@@ -125,7 +132,6 @@ class SchemaInfoViewer extends React.Component {
                 RangeReads,
                 RangeReadRows,
             }),
-            formatTableStats(restTableStats),
         ];
 
         const tabletMetricsInfo = Object.keys(TabletMetrics).map((key) =>
@@ -151,24 +157,30 @@ class SchemaInfoViewer extends React.Component {
             );
         }
 
-        if ([tabletMetricsInfo, partitionConfigInfo, tableStatsInfo.flat()].flat().length === 0) {
-            return <div className={b('item')}>Empty</div>;
+        if (
+            [generalTableInfo, tabletMetricsInfo, partitionConfigInfo, tableStatsInfo.flat()].flat()
+                .length === 0
+        ) {
+            return <div className={b('title')}>{entityName}</div>;
         }
 
         return (
-            <div className={b('row')}>
-                {tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0 ? (
+            <div>
+                <div>{this.renderItem(generalTableInfo, entityName)}</div>
+                <div className={b('row')}>
+                    {tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0 ? (
+                        <div className={b('col')}>
+                            {this.renderItem(tabletMetricsInfo, 'Tablet Metrics')}
+                            {this.renderItem(partitionConfigInfo, 'Partition Config')}
+                        </div>
+                    ) : null}
                     <div className={b('col')}>
-                        {this.renderItem(tabletMetricsInfo, 'Tablet Metrics')}
-                        {this.renderItem(partitionConfigInfo, 'Partition Config')}
+                        {tableStatsInfo.map((info, index) => (
+                            <React.Fragment key={index}>
+                                {this.renderItem(info, index === 0 ? 'Table Stats' : undefined)}
+                            </React.Fragment>
+                        ))}
                     </div>
-                ) : null}
-                <div className={b('col')}>
-                    {tableStatsInfo.map((info, index) => (
-                        <React.Fragment key={index}>
-                            {this.renderItem(info, index === 0 ? 'Table Stats' : undefined)}
-                        </React.Fragment>
-                    ))}
                 </div>
             </div>
         );
@@ -176,11 +188,12 @@ class SchemaInfoViewer extends React.Component {
 
     render() {
         const {data} = this.props;
+        const entityName = getEntityName(data?.PathDescription);
 
         if (data) {
             return <div className={b()}>{this.renderContent(data)}</div>;
         } else {
-            return <div className="error">no schema data</div>;
+            return <div className="error">No {entityName} data</div>;
         }
     }
 }
