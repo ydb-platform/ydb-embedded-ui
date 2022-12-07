@@ -19,7 +19,7 @@ export interface TNodeInfo {
     Tablets?: TTabletStateInfo[];
 }
 
-interface TSystemStateInfo {
+export interface TSystemStateInfo {
     /** uint64 */
     StartTime?: string;
     /** uint64 */
@@ -57,7 +57,7 @@ interface TSystemStateInfo {
     Location?: TNodeLocation;
 }
 
-interface TPoolStats {
+export interface TPoolStats {
     Name?: string;
     /** double */
     Usage?: number;

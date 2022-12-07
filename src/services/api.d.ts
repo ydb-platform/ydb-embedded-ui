@@ -45,6 +45,9 @@ interface Window {
         getHealthcheckInfo: (
             database: string,
         ) => Promise<import('../types/api/healthcheck').HealthCheckAPIResponse>;
+        getTenantInfo: (params: {
+            path: string;
+        }) => Promise<import('../types/api/tenant').TTenantInfo>;
         [method: string]: Function;
     };
 }
