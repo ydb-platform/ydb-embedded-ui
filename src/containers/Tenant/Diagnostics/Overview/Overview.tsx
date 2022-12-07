@@ -12,7 +12,10 @@ import {
     PersQueueGroupInfo,
 } from '../../../../components/InfoViewer/schemaInfo';
 
-import {EPathType, TColumnTableDescription} from '../../../../types/api/schema';
+import {
+    EPathType,
+    TEvDescribeSchemeResult,
+} from '../../../../types/api/schema';
 import {
     isEntityWithMergedImplementation,
     isColumnEntityType,
@@ -34,8 +37,9 @@ import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 
 import './Overview.scss';
 
-function prepareOlapTableGeneral(tableData: TColumnTableDescription = {}, olapStats?: any[]) {
-    const {ColumnShardCount} = tableData;
+function prepareOlapTableGeneral(item?: TEvDescribeSchemeResult, olapStats?: any[]) {
+    const tableData = item?.PathDescription?.ColumnTableDescription;
+
     const Bytes = olapStats?.reduce((acc, el) => {
         acc += parseInt(el.Bytes) || 0;
         return acc;
@@ -51,8 +55,9 @@ function prepareOlapTableGeneral(tableData: TColumnTableDescription = {}, olapSt
 
     return {
         PathDescription: {
+            Self: item?.PathDescription?.Self,
             TableStats: {
-                ColumnShardCount,
+                ColumnShardCount: tableData?.ColumnShardCount,
                 Bytes: Bytes?.toLocaleString('ru-RU', {useGrouping: true}) ?? 0,
                 Rows: Rows?.toLocaleString('ru-RU', {useGrouping: true}) ?? 0,
                 Parts: tabletIds?.size ?? 0,
@@ -130,15 +135,12 @@ function Overview({type, tenantName, className}: OverviewProps) {
 
     useAutofetcher(fetchData, [fetchData], autorefresh);
 
-    const tableSchema =
-        currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
-
     const schemaData = useMemo(() => {
         return isTableType(type) && isColumnEntityType(type)
             ? // process data for ColumnTable
-              prepareOlapTableGeneral(tableSchema, olapStats)
+              prepareOlapTableGeneral(currentItem, olapStats)
             : currentItem;
-    }, [type, tableSchema, olapStats, currentItem]);
+    }, [type, olapStats, currentItem]);
 
     const renderLoader = () => {
         return (
