@@ -1,4 +1,5 @@
 import type {TEvDescribeSchemeResult, TIndexDescription} from '../../../types/api/schema';
+import {getEntityName} from '../../../containers/Tenant/utils';
 
 import {formatTableIndexItem} from '../formatters';
 import {InfoViewer, InfoViewerItem} from '..';
@@ -16,8 +17,10 @@ interface TableIndexInfoProps {
 }
 
 export const TableIndexInfo = ({data}: TableIndexInfoProps) => {
+    const entityName = getEntityName(data?.PathDescription);
+
     if (!data) {
-        return <div className="error">no index data</div>;
+        return <div className="error">No {entityName} data</div>;
     }
 
     const TableIndex = data.PathDescription?.TableIndex;
@@ -30,5 +33,5 @@ export const TableIndexInfo = ({data}: TableIndexInfoProps) => {
         }
     }
 
-    return <>{info.length ? <InfoViewer info={info}></InfoViewer> : <>Empty</>}</>;
+    return <InfoViewer title={entityName} info={info} />;
 };

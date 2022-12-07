@@ -1,6 +1,7 @@
 import type {TEvDescribeSchemeResult, TCdcStreamDescription} from '../../../types/api/schema';
 import {useTypedSelector} from '../../../utils/hooks';
 import {selectSchemaData} from '../../../store/reducers/schema';
+import {getEntityName} from '../../../containers/Tenant/utils';
 
 import {formatCdcStreamItem, formatPQGroupItem, formatCommonItem} from '../formatters';
 import {InfoViewer, InfoViewerItem} from '..';
@@ -15,8 +16,10 @@ interface CDCStreamInfoProps {
 export const CDCStreamInfo = ({data, childrenPaths}: CDCStreamInfoProps) => {
     const pqGroupData = useTypedSelector((state) => selectSchemaData(state, childrenPaths?.[0]));
 
+    const entityName = getEntityName(data?.PathDescription);
+
     if (!data || !pqGroupData) {
-        return <div className="error">No Changefeed data</div>;
+        return <div className="error">No {entityName} data</div>;
     }
 
     const cdcStream = data.PathDescription?.CdcStreamDescription;
@@ -41,5 +44,5 @@ export const CDCStreamInfo = ({data, childrenPaths}: CDCStreamInfoProps) => {
         ),
     );
 
-    return <InfoViewer title={'Changefeed'} info={info} />;
+    return <InfoViewer title={entityName} info={info} />;
 };
