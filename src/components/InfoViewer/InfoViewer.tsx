@@ -35,7 +35,7 @@ const InfoViewer = ({title, info, dots = true, size, className}: InfoViewerProps
                 ))}
             </div>
         ) : (
-            <>no {title} data</>
+            <>No {title} data</>
         )}
     </div>
 );
