@@ -1,7 +1,27 @@
 .top-shards {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+
     background-color: var(--yc-color-base-background);
+
     &__loader {
         display: flex;
         justify-content: center;
+    }
+
+    &__controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 16px;
+
+        margin-bottom: 10px;
+    }
+
+    &__table {
+        overflow: auto;
+        flex-grow: 1;
     }
 }

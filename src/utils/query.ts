@@ -186,5 +186,5 @@ export const prepareQueryResponse = (data?: KeyValueRow[]) => {
 };
 
 export function prepareQueryError(error: any) {
-    return error.data?.error?.message || error.data || error.statusText || JSON.stringify(error);
+    return error.data?.error?.message || error.message || error.data || error.statusText || JSON.stringify(error);
 }

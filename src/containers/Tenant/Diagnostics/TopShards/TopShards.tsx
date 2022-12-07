@@ -11,18 +11,28 @@ import HistoryContext from '../../../../contexts/HistoryContext';
 
 import routes, {createHref} from '../../../../routes';
 
-import {sendShardQuery, setShardQueryOptions} from '../../../../store/reducers/shardsWorkload';
+import {
+    sendShardQuery,
+    setShardQueryOptions,
+    setTopShardFilters,
+} from '../../../../store/reducers/shardsWorkload';
 import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema';
+import type {IShardsWorkloadFilters} from '../../../../types/store/shardsWorkload';
 
 import type {EPathType} from '../../../../types/api/schema';
 
-import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {formatDateTime, formatNumber} from '../../../../utils';
+import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
-import {i18n} from '../../../../utils/i18n';
 import {prepareQueryError} from '../../../../utils/query';
+
+import {getDefaultNodePath} from '../../../Node/NodePages';
 
 import {isColumnEntityType} from '../../utils/schema';
 
+import {DateRange, DateRangeValues} from './DateRange';
+
+import i18n from './i18n';
 import './TopShards.scss';
 
 const b = cn('top-shards');
@@ -41,14 +51,13 @@ const tableColumnsNames = {
     CPUCores: 'CPUCores',
     DataSize: 'DataSize',
     Path: 'Path',
+    NodeId: 'NodeId',
+    PeakTime: 'PeakTime',
+    InFlightTxCount: 'InFlightTxCount',
 };
 
 function prepareCPUWorkloadValue(value: string) {
     return `${(Number(value) * 100).toFixed(2)}%`;
-}
-
-function prepareDateSizeValue(value: number) {
-    return new Intl.NumberFormat(i18n.lang).format(value);
 }
 
 function stringToDataTableSortOrder(value: string): SortOrder[] | undefined {
@@ -87,9 +96,23 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     const {
         loading,
         data: {result: data = undefined} = {},
+        filters: storeFilters,
         error,
         wasLoaded,
     } = useTypedSelector((state) => state.shardsWorkload);
+
+    // default date range should be the last hour, but shouldn't propagate into URL until user interacts with the control
+    // redux initial value can't be used, as it synchronizes with URL
+    const [filters, setFilters] = useState<IShardsWorkloadFilters>(() => {
+        if (!storeFilters?.from && !storeFilters?.to) {
+            return {
+                from: Date.now() - HOUR_IN_SECONDS * 1000,
+                to: Date.now(),
+            };
+        }
+
+        return storeFilters;
+    });
 
     const [sortOrder, setSortOrder] = useState(tableColumnsNames.CPUCores);
 
@@ -100,10 +123,11 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
                     database: tenantPath,
                     path: currentSchemaPath,
                     sortOrder: stringToQuerySortOrder(sortOrder),
+                    filters,
                 }),
             );
         },
-        [dispatch, currentSchemaPath, tenantPath, sortOrder],
+        [dispatch, tenantPath, currentSchemaPath, sortOrder, filters],
         autorefresh,
     );
 
@@ -115,7 +139,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
                 data: undefined,
             }),
         );
-    }, [dispatch, currentSchemaPath, tenantPath]);
+    }, [dispatch, currentSchemaPath, tenantPath, filters]);
 
     const history = useContext(HistoryContext);
 
@@ -124,6 +148,11 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         // use a string (and not the DataTable default format) to prevent reference change,
         // which would cause an excess state change, to avoid repeating requests
         setSortOrder(dataTableToStringSortOrder(newSortOrder));
+    };
+
+    const handleDateRangeChange = (value: DateRangeValues) => {
+        dispatch(setTopShardFilters(value));
+        setFilters(value);
     };
 
     const tableColumns: Column<any>[] = useMemo(() => {
@@ -161,7 +190,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
                 name: tableColumnsNames.DataSize,
                 header: 'DataSize (B)',
                 render: ({value}) => {
-                    return prepareDateSizeValue(value as number);
+                    return formatNumber(value as number);
                 },
                 align: DataTable.RIGHT,
             },
@@ -174,6 +203,29 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
                         </InternalLink>
                     );
                 },
+                sortable: false,
+            },
+            {
+                name: tableColumnsNames.NodeId,
+                render: ({value: nodeId}) => {
+                    return (
+                        <InternalLink to={getDefaultNodePath(nodeId as string)}>
+                            {nodeId as string}
+                        </InternalLink>
+                    );
+                },
+                align: DataTable.RIGHT,
+                sortable: false,
+            },
+            {
+                name: tableColumnsNames.PeakTime,
+                render: ({value}) => formatDateTime(new Date(value as string).valueOf()),
+                sortable: false,
+            },
+            {
+                name: tableColumnsNames.InFlightTxCount,
+                render: ({value}) => formatNumber(value as number),
+                align: DataTable.RIGHT,
                 sortable: false,
             },
         ];
@@ -192,12 +244,12 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             return renderLoader();
         }
 
-        if (!data || data.length === 0 || isColumnEntityType(type)) {
-            return 'No data';
+        if (error && !error.isCancelled) {
+            return <div className="error">{prepareQueryError(error)}</div>;
         }
 
-        if (error && !error.isCancelled) {
-            return prepareQueryError(error);
+        if (!data || isColumnEntityType(type)) {
+            return i18n('no-data');
         }
 
         return (
@@ -216,6 +268,10 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
 
     return (
         <div className={b()}>
+            <div className={b('controls')}>
+                {i18n('description')}
+                <DateRange from={filters.from} to={filters.to} onChange={handleDateRangeChange} />
+            </div>
             {renderContent()}
         </div>
     );
