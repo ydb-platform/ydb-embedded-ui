@@ -1,5 +1,7 @@
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
+
 import {EPathSubType, EPathType} from '../../../types/api/schema';
+import {ETenantType} from '../../../types/api/tenant';
 
 // this file contains verbose mappings that are typed in a way that ensures
 // correctness when a new node type or a new path type is added
@@ -38,6 +40,49 @@ export const mapPathTypeToNavigationTreeType = (
     defaultType: NavigationTreeNodeType = 'directory',
 ): NavigationTreeNodeType =>
     (subType && pathSubTypeToNodeType[subType]) || pathTypeToNodeType[type] || defaultType;
+
+// ====================
+
+const pathSubTypeToEntityName: Record<EPathSubType, string | undefined> = {
+    [EPathSubType.EPathSubTypeSyncIndexImplTable]: 'Secondary Index Table',
+    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: 'Secondary Index Table',
+
+    [EPathSubType.EPathSubTypeStreamImpl]: undefined,
+    [EPathSubType.EPathSubTypeEmpty]: undefined,
+};
+
+const pathTypeToEntityName: Record<EPathType, string | undefined> = {
+    [EPathType.EPathTypeInvalid]: undefined,
+
+    [EPathType.EPathTypeSubDomain]: 'Database',
+    [EPathType.EPathTypeExtSubDomain]: 'Database',
+
+    [EPathType.EPathTypeDir]: 'Directory',
+    [EPathType.EPathTypeTable]: 'Table',
+    [EPathType.EPathTypeTableIndex]: 'Secondary Index',
+    [EPathType.EPathTypeColumnStore]: 'Tablestore',
+    [EPathType.EPathTypeColumnTable]: 'Columntable',
+    [EPathType.EPathTypeCdcStream]: 'Changefeed',
+    [EPathType.EPathTypePersQueueGroup]: 'Topic',
+};
+
+export const mapPathTypeToEntityName = (
+    type?: EPathType,
+    subType?: EPathSubType,
+): string | undefined =>
+    (subType && pathSubTypeToEntityName[subType]) || (type && pathTypeToEntityName[type]);
+
+// ====================
+
+const databaseTypeToDBName: Record<ETenantType, string | undefined> = {
+    [ETenantType.UnknownTenantType]: 'Database',
+    [ETenantType.Domain]: 'Cluster Root',
+    [ETenantType.Dedicated]: 'Dedicated Database',
+    [ETenantType.Shared]: 'Shared Database',
+    [ETenantType.Serverless]: 'Serverless Database',
+};
+
+export const mapDatabaseTypeToDBName = (type?: ETenantType) => type && databaseTypeToDBName[type];
 
 // ====================
 
