@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 import PropTypes from 'prop-types';
+import {Loader} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
 import InfoViewer from '../../../../components/InfoViewer/InfoViewer';
@@ -14,10 +15,11 @@ import {getTenantInfo} from '../../../../store/reducers/tenant';
 import {formatCPU} from '../../../../utils';
 import {bytesToGB} from '../../../../utils/utils';
 import {TABLET_STATES} from '../../../../utils/constants';
+import {AutoFetcher} from '../../../../utils/autofetcher';
+
+import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
 import './TenantOverview.scss';
-import {AutoFetcher} from '../../../../utils/autofetcher';
-import {Loader} from '@gravity-ui/uikit';
 
 const b = cn('tenant-overview');
 
@@ -113,6 +115,7 @@ class TenantOverview extends React.Component {
             SystemTablets,
         } = tenant;
 
+        const tenantName = mapDatabaseTypeToDBName(Type);
         const memoryRaw = MemoryUsed ?? Metrics.Memory;
 
         const memory = (memoryRaw && bytesToGB(memoryRaw)) || 'no data';
@@ -147,7 +150,7 @@ class TenantOverview extends React.Component {
             this.renderLoader()
         ) : (
             <div className={b()}>
-                <div className={b('top-label')}>Database</div>
+                <div className={b('top-label')}>{tenantName}</div>
                 <div className={b('top')}>
                     {renderName(tenant)}
                     {this.props.additionalTenantInfo &&

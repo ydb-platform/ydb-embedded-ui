@@ -90,7 +90,7 @@ function Tenant(props: TenantProps) {
 
     useEffect(() => {
         dispatch(disableAutorefresh());
-    }, [currentSchemaPath, tenantName]);
+    }, [currentSchemaPath, tenantName, dispatch]);
 
     useEffect(() => {
         if (tenantName) {
