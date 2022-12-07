@@ -20,6 +20,7 @@ import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {i18n} from '../../../../utils/i18n';
 import {prepareQueryError} from '../../../../utils/query';
+
 import {isColumnEntityType} from '../../utils/schema';
 
 import './TopShards.scss';
@@ -188,9 +189,14 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     };
 
     const renderContent = () => {
+        if (loading && !wasLoaded) {
+            return renderLoader();
+        }
+
         if (isColumnEntityType(type)) {
             return 'No data';
         }
+
         if (error && !error.isCancelled) {
             return prepareQueryError(error);
         }
@@ -211,5 +217,9 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         );
     };
 
-    return loading && !wasLoaded ? renderLoader() : <div className={b()}>{renderContent()}</div>;
+    return (
+        <div className={b()}>
+            {renderContent()}
+        </div>
+    );
 };
