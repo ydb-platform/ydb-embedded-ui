@@ -61,13 +61,12 @@ function stringToDataTableSortOrder(value: string): SortOrder[] | undefined {
 }
 
 function stringToQuerySortOrder(value: string) {
-    return (
-        value &&
-        value.split(',').map((columnId) => ({
-            columnId,
-            order: 'DESC',
-        }))
-    );
+    return value
+        ? value.split(',').map((columnId) => ({
+              columnId,
+              order: 'DESC',
+          }))
+        : undefined;
 }
 
 function dataTableToStringSortOrder(value: SortOrder | SortOrder[] = []) {
