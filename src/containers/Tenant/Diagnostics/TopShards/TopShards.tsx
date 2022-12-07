@@ -193,7 +193,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             return renderLoader();
         }
 
-        if (isColumnEntityType(type)) {
+        if (!data || data.length === 0 || isColumnEntityType(type)) {
             return 'No data';
         }
 
@@ -201,7 +201,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             return prepareQueryError(error);
         }
 
-        return data && data.length > 0 ? (
+        return (
             <div className={b('table')}>
                 <DataTable
                     columns={tableColumns}
@@ -212,8 +212,6 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
                     sortOrder={stringToDataTableSortOrder(sortOrder)}
                 />
             </div>
-        ) : (
-            data
         );
     };
 
