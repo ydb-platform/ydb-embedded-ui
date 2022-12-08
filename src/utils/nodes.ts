@@ -1,7 +1,7 @@
-export const NodesUptimeFilterValues = {
-    All: 'All',
-    SmallUptime: 'SmallUptime',
-};
+export enum NodesUptimeFilterValues {
+    'All' = 'All',
+    'SmallUptime' = 'SmallUptime',
+}
 
 export const NodesUptimeFilterTitles = {
     [NodesUptimeFilterValues.All]: 'All',

@@ -1,8 +1,12 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import type {Reducer} from 'redux';
+
 import '../../services/api';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {INodesAction, INodesRootStateSlice, INodesState} from '../../types/store/nodes';
 
-const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
+import {createRequestActionTypes, createApiRequest} from '../utils';
+
+export const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
 
 const CLEAR_NODES = 'nodes/CLEAR_NODES';
 const SET_NODES_UPTIME_FILTER = 'nodes/SET_NODES_UPTIME_FILTER';
@@ -14,13 +18,12 @@ const initialState = {
     nodesUptimeFilter: NodesUptimeFilterValues.All,
 };
 
-const nodes = (state = initialState, action) => {
+const nodes: Reducer<INodesState, INodesAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_NODES.REQUEST: {
             return {
                 ...state,
                 loading: true,
-                requestTime: new Date().getTime(),
             };
         }
         case FETCH_NODES.SUCCESS: {
@@ -45,13 +48,15 @@ const nodes = (state = initialState, action) => {
                 loading: true,
                 data: undefined,
                 wasLoaded: false,
-                requestTime: new Date().getTime(),
                 error: undefined,
             };
         }
 
         case SET_NODES_UPTIME_FILTER: {
-            return {...state, nodesUptimeFilter: action.data};
+            return {
+                ...state,
+                nodesUptimeFilter: action.data,
+            };
         }
         case SET_DATA_WAS_NOT_LOADED: {
             return {
@@ -64,26 +69,27 @@ const nodes = (state = initialState, action) => {
     }
 };
 
-export function getNodes(path) {
+export function getNodes(path: string) {
     return createApiRequest({
         request: window.api.getNodes(path),
         actions: FETCH_NODES,
     });
 }
 
-export const clearNodes = () => ({type: CLEAR_NODES});
+export const clearNodes = () => ({type: CLEAR_NODES} as const);
 
-export const setNodesUptimeFilter = (value) => ({
-    type: SET_NODES_UPTIME_FILTER,
-    data: value,
-});
+export const setNodesUptimeFilter = (value: NodesUptimeFilterValues) =>
+    ({
+        type: SET_NODES_UPTIME_FILTER,
+        data: value,
+    } as const);
 
 export const setDataWasNotLoaded = () => {
     return {
         type: SET_DATA_WAS_NOT_LOADED,
-    };
+    } as const;
 };
 
-export const getNodesUptimeFilter = (state) => state.nodes.nodesUptimeFilter;
+export const getNodesUptimeFilter = (state: INodesRootStateSlice) => state.nodes.nodesUptimeFilter;
 
 export default nodes;
