@@ -10,7 +10,7 @@ import {Loader, TextInput, Button} from '@gravity-ui/uikit';
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
 import TabletsStatistic from '../../components/TabletsStatistic/TabletsStatistic';
-import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
+import {ProblemFilter} from '../../components/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
 import {AutoFetcher} from '../../utils/autofetcher';
 
@@ -50,7 +50,7 @@ class Tenants extends React.Component {
         searchQuery: PropTypes.string,
         handleSearchQuery: PropTypes.func,
         setHeader: PropTypes.func,
-        filter: problemFilterType,
+        filter: PropTypes.string,
         changeFilter: PropTypes.func,
         cluster: PropTypes.object,
         singleClusterMode: PropTypes.bool,
