@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {TextInput, Label} from '@gravity-ui/uikit';
 import DataTable from '@yandex-cloud/react-data-table';
 
-import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
+import {ProblemFilter} from '../../components/ProblemFilter';
 import {UptimeFilter} from '../../components/UptimeFIlter';
 import {Illustration} from '../../components/Illustration';
 
@@ -48,7 +48,7 @@ class NodesViewer extends React.PureComponent {
         handleSearchQuery: PropTypes.func,
         showTooltip: PropTypes.func,
         hideTooltip: PropTypes.func,
-        problemFilter: problemFilterType,
+        problemFilter: PropTypes.string,
         nodesUptimeFilter: PropTypes.string,
         setNodesUptimeFilter: PropTypes.func,
         changeFilter: PropTypes.func,

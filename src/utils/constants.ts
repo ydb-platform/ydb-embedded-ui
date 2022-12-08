@@ -118,6 +118,8 @@ export const COLORS_PRIORITY = {
 export const ALL = 'All';
 export const PROBLEMS = 'With problems';
 
+export type IProblemFilterValues = typeof ALL | typeof PROBLEMS;
+
 export const THEME_KEY = 'theme';
 export const INVERTED_DISKS_KEY = 'invertedDisks';
 export const SAVED_QUERIES_KEY = 'saved_queries';

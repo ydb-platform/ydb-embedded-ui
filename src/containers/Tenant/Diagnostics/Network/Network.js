@@ -9,7 +9,7 @@ import {Loader, Checkbox} from '@gravity-ui/uikit';
 
 import NodeNetwork from './NodeNetwork/NodeNetwork';
 import Icon from '../../../../components/Icon/Icon';
-import ProblemFilter, {problemFilterType} from '../../../../components/ProblemFilter/ProblemFilter';
+import {ProblemFilter} from '../../../../components/ProblemFilter';
 import {Illustration} from '../../../../components/Illustration';
 
 import {getNetworkInfo, setDataWasNotLoaded} from '../../../../store/reducers/network';
@@ -35,7 +35,7 @@ class Network extends React.Component {
         loading: PropTypes.bool,
         autorefresh: PropTypes.bool,
         path: PropTypes.string,
-        filter: problemFilterType,
+        filter: PropTypes.string,
         changeFilter: PropTypes.func,
     };
 

@@ -10,7 +10,7 @@ import ReactList from 'react-list';
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import GroupTreeViewer from '../../components/GroupTreeViewer/GroupTreeViewer';
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
-import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
+import {ProblemFilter} from '../../components/ProblemFilter/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
 
 import {getPoolInfo} from '../../store/reducers/pool';
@@ -38,7 +38,7 @@ class Pool extends React.Component {
         pool: PropTypes.object,
         poolName: PropTypes.string,
         match: PropTypes.object,
-        filter: problemFilterType,
+        filter: PropTypes.string,
         changeFilter: PropTypes.func,
     };
 

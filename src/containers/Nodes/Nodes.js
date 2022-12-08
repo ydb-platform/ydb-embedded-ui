@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import DataTable from '@yandex-cloud/react-data-table';
 import {Loader, TextInput, Label} from '@gravity-ui/uikit';
 
-import ProblemFilter, {problemFilterType} from '../../components/ProblemFilter/ProblemFilter';
+import {ProblemFilter} from '../../components/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
 import {AccessDenied} from '../../components/Errors/403';
 import {UptimeFilter} from '../../components/UptimeFIlter';
@@ -46,7 +46,7 @@ class Nodes extends React.Component {
         hideTooltip: PropTypes.func,
         searchQuery: PropTypes.string,
         handleSearchQuery: PropTypes.func,
-        problemFilter: problemFilterType,
+        problemFilter: PropTypes.string,
         changeFilter: PropTypes.func,
         setHeader: PropTypes.func,
         className: PropTypes.string,
