@@ -1,8 +1,19 @@
-import {toolTipConstants} from '../../utils/actionsConstants';
-import {tooltipTemplates} from '../../utils/tooltip';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
+import type {Reducer} from 'redux';
 
-const initialState = {
+import {tooltipTemplates} from '../../utils/tooltip';
+
+import {
+    ITooltipAction,
+    ITooltipPositions,
+    ITooltipState,
+    ITooltipTemplateType,
+} from '../../types/store/tooltip';
+
+const HIDE_TOOLTIP = 'tooltip/HIDE_TOOLTIP';
+const UPDATE_REF = 'tooltip/UPDATE_REF';
+
+const initialState: ITooltipState = {
     toolTipVisible: false,
     currentHoveredRef: undefined,
     data: undefined,
@@ -10,9 +21,9 @@ const initialState = {
     template: tooltipTemplates['pool'],
 };
 
-const tooltip = (state = initialState, action) => {
+const tooltip: Reducer<ITooltipState, ITooltipAction> = (state = initialState, action) => {
     switch (action.type) {
-        case toolTipConstants.HIDE_TOOLTIP: {
+        case HIDE_TOOLTIP: {
             return {
                 ...state,
                 currentHoveredRef: undefined,
@@ -20,8 +31,8 @@ const tooltip = (state = initialState, action) => {
             };
         }
 
-        case toolTipConstants.UPDATE_REF: {
-            if (action.templateType === 'cell' && _.isEqual(action.node, state.currentHoveredRef)) {
+        case UPDATE_REF: {
+            if (action.templateType === 'cell' && isEqual(action.node, state.currentHoveredRef)) {
                 return {
                     ...state,
                     currentHoveredRef: undefined,
@@ -36,7 +47,7 @@ const tooltip = (state = initialState, action) => {
                 positions: action.positions,
                 data: action.data,
                 additionalData: action.additionalData,
-                type: action.templateType,
+                templateType: action.templateType,
                 template: tooltipTemplates[action.templateType],
             };
         }
@@ -47,12 +58,18 @@ const tooltip = (state = initialState, action) => {
 };
 
 export const hideTooltip = () => {
-    return {type: toolTipConstants.HIDE_TOOLTIP};
+    return {type: HIDE_TOOLTIP} as const;
 };
 
-export const showTooltip = (node, data, templateType, additionalData, positions) => {
+export const showTooltip = (
+    node: EventTarget,
+    data: any,
+    templateType: ITooltipTemplateType,
+    additionalData?: any,
+    positions?: ITooltipPositions,
+) => {
     return {
-        type: toolTipConstants.UPDATE_REF,
+        type: UPDATE_REF,
         node,
         data,
         templateType,
