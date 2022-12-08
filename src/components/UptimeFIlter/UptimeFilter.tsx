@@ -3,13 +3,14 @@ import {RadioButton} from '@gravity-ui/uikit';
 import {NodesUptimeFilterValues, NodesUptimeFilterTitles} from '../../utils/nodes';
 
 interface UptimeFilterProps {
-    value: keyof typeof NodesUptimeFilterValues;
+    value: NodesUptimeFilterValues;
     onChange: (value: string) => void;
+    className?: string;
 }
 
-export const UptimeFilter = ({value, onChange}: UptimeFilterProps) => {
+export const UptimeFilter = ({value, onChange, className}: UptimeFilterProps) => {
     return (
-        <RadioButton value={value} onUpdate={onChange}>
+        <RadioButton value={value} onUpdate={onChange} className={className}>
             <RadioButton.Option value={NodesUptimeFilterValues.All}>
                 {NodesUptimeFilterTitles[NodesUptimeFilterValues.All]}
             </RadioButton.Option>

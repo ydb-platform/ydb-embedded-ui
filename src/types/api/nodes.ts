@@ -12,7 +12,7 @@ export interface TNodesInfo {
     FoundNodes: string;
 }
 
-interface TNodeInfo {
+export interface TNodeInfo {
     NodeId: number;
     SystemState: TSystemStateInfo;
     PDisks?: TPDiskStateInfo[];
