@@ -58,7 +58,7 @@ interface ClusterInfoProps {
     className?: string;
     cluster?: ICluster;
     hideTooltip: VoidFunction;
-    showTooltip: VoidFunction;
+    showTooltip: Function;
     setHeader: any;
     getClusterInfo: (clusterName: string) => void;
     clusterTitle?: string;

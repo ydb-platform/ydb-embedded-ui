@@ -122,12 +122,14 @@ const NodeEndpointsTooltip = (props) => {
                                 <td className={nodeB('value')}>{data.Rack}</td>
                             </tr>
                         )}
-                        {data.Endpoints && data.Endpoints.length && data.Endpoints.map(({Name, Address}) => (
-                            <tr key={Name}>
-                                <td className={nodeB('label')}>{Name}</td>
-                                <td className={nodeB('value')}>{Address}</td>
-                            </tr>
-                        ))}
+                        {data.Endpoints &&
+                            data.Endpoints.length &&
+                            data.Endpoints.map(({Name, Address}) => (
+                                <tr key={Name}>
+                                    <td className={nodeB('label')}>{Name}</td>
+                                    <td className={nodeB('value')}>{Address}</td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>
