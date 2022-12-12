@@ -1,5 +1,8 @@
 import {EFlag} from './enums';
 
+// endpoint: /viewer/json/tabletinfo
+// source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/sys_view.proto
+
 export interface TEvTabletStateResponse {
     TabletStateInfo?: TTabletStateInfo[];
 

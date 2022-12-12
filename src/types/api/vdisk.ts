@@ -1,6 +1,9 @@
 import {EFlag} from './enums';
 import {TPDiskStateInfo} from './pdisk';
 
+// endpoint: /viewer/json/vdiskinfo
+// source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/node_whiteboard.proto
+
 export interface TVDiskStateInfo {
     VDiskId?: TVDiskID;
     /** uint64 */
