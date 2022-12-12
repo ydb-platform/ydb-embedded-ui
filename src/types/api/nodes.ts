@@ -2,6 +2,9 @@ import {EFlag} from './enums';
 import {TPDiskStateInfo} from './pdisk';
 import {TTabletStateInfo} from './tablet';
 
+// endpoint: /viewer/json/nodes
+// source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
+
 export interface TNodesInfo {
     Overall: EFlag;
     Nodes?: TNodeInfo[];
@@ -64,12 +67,12 @@ export interface TPoolStats {
     Threads?: number;
 }
 
-interface TEndpoint {
+export interface TEndpoint {
     Name?: string;
     Address?: string;
 }
 
-interface TLegacyNodeLocation {
+export interface TLegacyNodeLocation {
     DataCenter?: number;
     Room?: number;
     Rack?: number;

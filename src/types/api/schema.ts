@@ -37,6 +37,7 @@ enum EStatus {
     StatusResourceExhausted = 'StatusResourceExhausted',
 }
 
+// source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/flat_scheme_op.proto
 // incomplete interface, only currently used fields are covered
 export interface TPathDescription {
     /** info about the path itself */

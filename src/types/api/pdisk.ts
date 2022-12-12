@@ -1,5 +1,8 @@
 import {EFlag} from './enums';
 
+// endpoint: /viewer/json/pdiskinfo
+// source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/node_whiteboard.proto
+
 export interface TPDiskStateInfo {
     PDiskId?: number;
     /** uint64 */
