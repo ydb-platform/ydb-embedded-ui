@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.0.0...v3.0.1) (2022-12-12)
+
+
+### Bug Fixes
+
+* **Overview:** display titles for topic, stream and tableIndex ([2ee7889](https://github.com/ydb-platform/ydb-embedded-ui/commit/2ee788932d4f0a6fbe3e9e0526b8ba50e3103d76))
+* **SchemaOverview:** display entity name ([2d28a2a](https://github.com/ydb-platform/ydb-embedded-ui/commit/2d28a2ad30263e31bc3c8b783d4f42af92537624))
+* **TenantOverview:** display database type in title ([5f73eed](https://github.com/ydb-platform/ydb-embedded-ui/commit/5f73eed6f9043586885f8e68137d8f31923e8e3b))
+* **TopShards:** render a message for empty data ([8cda003](https://github.com/ydb-platform/ydb-embedded-ui/commit/8cda0038396b356b10033b44824933f711e1175e))
+
 ## [3.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v2.6.0...v3.0.0) (2022-12-05)
 
 
