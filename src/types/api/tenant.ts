@@ -54,7 +54,7 @@ interface THiveDomainStatsStateCount {
     Count?: number;
 }
 
-interface TMetrics {
+export interface TMetrics {
     /** uint64 */
     CPU?: string;
     /** uint64 */
