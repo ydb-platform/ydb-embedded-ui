@@ -1,4 +1,4 @@
-import AxiosWrapper from '@yandex-cloud/axios-wrapper';
+import AxiosWrapper from '@gravity-ui/axios-wrapper';
 
 import {backend as BACKEND} from '../store';
 import {StorageTypes} from '../store/reducers/storage';
