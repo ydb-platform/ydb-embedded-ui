@@ -1,8 +1,8 @@
-import {useEffect, useState} from 'react';
+import {ImgHTMLAttributes, useEffect, useState} from 'react';
 import cn from 'bem-cn-lite';
 import {useThemeValue} from '@gravity-ui/uikit';
 
-export interface IllustrationProps {
+export interface IllustrationProps extends ImgHTMLAttributes<HTMLImageElement> {
     name: string;
     className?: string;
 }
@@ -38,12 +38,5 @@ export const Illustration = ({name, className, ...props}: IllustrationProps) => 
         }
     }, [srcGetter]);
 
-    return (
-        <img
-            alt={name}
-            src={src}
-            className={b(null, className)}
-            {...props}
-        />
-    );
-}
+    return <img alt={name} src={src} className={b(null, className)} {...props} />;
+};
