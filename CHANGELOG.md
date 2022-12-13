@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.0.1...v3.1.0) (2022-12-13)
+
+
+### Features
+
+* **TopShards:** date range filter ([aab4396](https://github.com/ydb-platform/ydb-embedded-ui/commit/aab439600ec28d30799c4a7ef7a9c68fcacc148c))
+
 ## [3.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.0.0...v3.0.1) (2022-12-12)
 
 
