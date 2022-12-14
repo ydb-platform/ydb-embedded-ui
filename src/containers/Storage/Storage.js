@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 import DataTable from '@yandex-cloud/react-data-table';
-import {RadioButton, Label} from '@gravity-ui/uikit';
+import {RadioButton} from '@gravity-ui/uikit';
 
 import {Search} from '../../components/Search';
 import {UsageFilter} from './UsageFilter';
@@ -12,6 +12,7 @@ import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {UptimeFilter} from '../../components/UptimeFIlter';
 import {AccessDenied} from '../../components/Errors/403';
+import {EntitiesCount} from '../../components/EntitiesCount';
 
 import {
     getStorageInfo,
@@ -230,22 +231,17 @@ class Storage extends React.Component {
         const {storageType, groupsCount, nodesCount, flatListStorageEntities, loading, wasLoaded} =
             this.props;
 
-        let label = `${storageType === StorageTypes.groups ? 'Groups' : 'Nodes'}: `;
+        const entityName = storageType === StorageTypes.groups ? 'Groups' : 'Nodes';
         const count = storageType === StorageTypes.groups ? groupsCount : nodesCount;
 
-        if (loading && !wasLoaded) {
-            label += '...';
-            return label;
-        }
-
-        // count.total can be missing in old versions
-        if (flatListStorageEntities.length === Number(count.total) || !count.total) {
-            label += flatListStorageEntities.length;
-        } else {
-            label += `${flatListStorageEntities.length} of ${count.total}`;
-        }
-
-        return label;
+        return (
+            <EntitiesCount
+                label={entityName}
+                loading={loading && !wasLoaded}
+                total={count.total}
+                current={flatListStorageEntities.length}
+            />
+        );
     }
 
     renderControls() {
@@ -307,10 +303,7 @@ class Storage extends React.Component {
                         disabled={usageFilterOptions.length === 0}
                     />
                 )}
-
-                <Label theme="info" size="m">
-                    {this.renderEntitiesCount()}
-                </Label>
+                {this.renderEntitiesCount()}
             </div>
         );
     }
