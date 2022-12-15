@@ -41,7 +41,7 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
                             className={b('host-name')}
                         />
                         {nodeRef && (
-                            <Button size="s" href={nodeRef} className={b('external-button')}>
+                            <Button size="s" href={nodeRef} className={b('external-button')} target="_blank">
                                 <Icon name="external" />
                             </Button>
                         )}
