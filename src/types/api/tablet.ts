@@ -1,5 +1,18 @@
 import {EFlag} from './enums';
 
+export interface TEvTabletStateResponse {
+    TabletStateInfo?: TTabletStateInfo[];
+
+    /** uint64 */
+    ResponseTime?: string;
+    /** uint64 */
+    ResponseDuration?: string;
+    /** uint64 */
+    ProcessDuration?: string;
+
+    Packed5?: unknown;
+}
+
 export interface TTabletStateInfo {
     /** uint64 */
     TabletId?: string;
@@ -37,7 +50,7 @@ interface TDomainKey {
     PathId?: string;
 }
 
-enum EType {
+export enum EType {
     'Unknown' = 'Unknown',
     'OldSchemeShard' = 'OldSchemeShard',
     'OldDataShard' = 'OldDataShard',
@@ -79,7 +92,7 @@ enum EType {
     'TypeInvalid' = 'TypeInvalid',
 }
 
-enum ETabletState {
+export enum ETabletState {
     'Created' = 'Created',
     'ResolveStateStorage' = 'ResolveStateStorage',
     'Candidate' = 'Candidate',
