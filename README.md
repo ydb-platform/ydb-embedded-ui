@@ -15,6 +15,8 @@ Local viewer for YDB clusters
 3) Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.\
    You will also see any lint errors in the console.
 
+For API reference, open Swagger UI on http://localhost:8765/viewer/api/.
+
 ### Making a production bundle.
 
 Base command `npm run build` builds the app for production to the `build` folder.\
