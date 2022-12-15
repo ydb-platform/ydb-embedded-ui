@@ -1,7 +1,20 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import type {Reducer} from 'redux';
 import '../../services/api';
 
-const FETCH_TABLETS = createRequestActionTypes('tablets', 'FETCH_TABLETS');
+import type {ETabletState, EType} from '../../types/api/tablet';
+import type {
+    ITabletsAction,
+    ITabletsApiRequestParams,
+    ITabletsState,
+} from '../../types/store/tablets';
+
+import {createRequestActionTypes, createApiRequest} from '../utils';
+
+export const FETCH_TABLETS = createRequestActionTypes('tablets', 'FETCH_TABLETS');
+
+const CLEAR_WAS_LOADING_TABLETS = 'tablets/CLEAR_WAS_LOADING_TABLETS';
+const SET_STATE_FILTER = 'tablets/SET_STATE_FILTER';
+const SET_TYPE_FILTER = 'tablets/SET_TYPE_FILTER';
 
 const initialState = {
     loading: true,
@@ -10,13 +23,12 @@ const initialState = {
     typeFilter: [],
 };
 
-const tablets = function z(state = initialState, action) {
+const tablets: Reducer<ITabletsState, ITabletsAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_TABLETS.REQUEST: {
             return {
                 ...state,
                 loading: true,
-                requestTime: new Date().getTime(),
             };
         }
         case FETCH_TABLETS.SUCCESS: {
@@ -35,20 +47,20 @@ const tablets = function z(state = initialState, action) {
                 loading: false,
             };
         }
-        case 'CLEAR_WAS_LOADING_TABLETS': {
+        case CLEAR_WAS_LOADING_TABLETS: {
             return {
                 ...state,
                 wasLoaded: false,
                 loading: true,
             };
         }
-        case 'SET_STATE_FILTER': {
+        case SET_STATE_FILTER: {
             return {
                 ...state,
                 stateFilter: action.data,
             };
         }
-        case 'SET_TYPE_FILTER': {
+        case SET_TYPE_FILTER: {
             return {
                 ...state,
                 typeFilter: action.data,
@@ -59,25 +71,26 @@ const tablets = function z(state = initialState, action) {
     }
 };
 
-export const setStateFilter = (stateFilter) => {
+export const setStateFilter = (stateFilter: ETabletState[]) => {
     return {
-        type: 'SET_STATE_FILTER',
+        type: SET_STATE_FILTER,
         data: stateFilter,
-    };
+    } as const;
 };
 
-export const setTypeFilter = (typeFilter) => {
+export const setTypeFilter = (typeFilter: EType[]) => {
     return {
-        type: 'SET_TYPE_FILTER',
+        type: SET_TYPE_FILTER,
         data: typeFilter,
-    };
+    } as const;
 };
 
-export const clearWasLoadingFlag = () => ({
-    type: 'CLEAR_WAS_LOADING_TABLETS',
-});
+export const clearWasLoadingFlag = () =>
+    ({
+        type: CLEAR_WAS_LOADING_TABLETS,
+    } as const);
 
-export function getTabletsInfo(data) {
+export function getTabletsInfo(data: ITabletsApiRequestParams) {
     return createApiRequest({
         request: window.api.getTabletsInfo(data),
         actions: FETCH_TABLETS,

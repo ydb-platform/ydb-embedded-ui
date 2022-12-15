@@ -48,6 +48,13 @@ interface Window {
         getTenantInfo: (params: {
             path: string;
         }) => Promise<import('../types/api/tenant').TTenantInfo>;
+        getTabletsInfo: (params: {
+            nodes?: string[];
+            path?: string;
+        }) => Promise<import('../types/api/tablet').TEvTabletStateResponse>;
+        getHeatmapData: (params: {
+            path: string;
+        }) => Promise<import('../types/api/schema').TEvDescribeSchemeResult>;
         [method: string]: Function;
     };
 }
