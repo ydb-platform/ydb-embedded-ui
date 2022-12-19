@@ -31,7 +31,7 @@ const topQueries = {
 
 const topShards = {
     id: GeneralPagesIds.topShards,
-    title: 'Top shards',
+    title: 'Overloaded shards',
 };
 
 const nodes = {
