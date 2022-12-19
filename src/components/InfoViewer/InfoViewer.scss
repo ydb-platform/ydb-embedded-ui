@@ -54,6 +54,8 @@
     &__value {
         display: flex;
 
+        min-width: 120px;
+
         word-break: break-all;
     }
 
