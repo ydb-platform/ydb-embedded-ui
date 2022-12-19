@@ -3,7 +3,7 @@ import {ChangeEventHandler} from 'react';
 
 import './DateRange.scss';
 
-const b = cn('top-shards');
+const b = cn('overloaded-shards');
 
 export interface DateRangeValues {
     /** ms from epoch */

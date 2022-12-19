@@ -1,4 +1,4 @@
-import {SEND_SHARD_QUERY, setShardQueryOptions, setTopShardFilters} from '../../store/reducers/shardsWorkload';
+import {SEND_SHARD_QUERY, setShardsState, setShardsQueryFilters} from '../../store/reducers/shardsWorkload';
 import type {ApiRequestAction} from '../../store/utils';
 import type {IResponseError} from '../api/error';
 import type {IQueryResult} from './query';
@@ -20,8 +20,8 @@ export interface IShardsWorkloadState {
 
 export type IShardsWorkloadAction =
     | ApiRequestAction<typeof SEND_SHARD_QUERY, IQueryResult, IResponseError>
-    | ReturnType<typeof setShardQueryOptions>
-    | ReturnType<typeof setTopShardFilters>;
+    | ReturnType<typeof setShardsState>
+    | ReturnType<typeof setShardsQueryFilters>;
 
 export interface IShardsWorkloadRootStateSlice {
     shardsWorkload: IShardsWorkloadState;

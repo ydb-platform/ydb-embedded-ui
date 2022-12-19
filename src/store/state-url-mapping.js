@@ -48,11 +48,11 @@ const paramSetup = {
         generalTab: {
             stateKey: 'tenant.diagnosticsTab',
         },
-        topShardsFrom: {
+        shardsDateFrom: {
             stateKey: 'shardsWorkload.filters.from',
             type: 'number',
         },
-        topShardsTo: {
+        shardsDateTo: {
             stateKey: 'shardsWorkload.filters.to',
             type: 'number',
         },
