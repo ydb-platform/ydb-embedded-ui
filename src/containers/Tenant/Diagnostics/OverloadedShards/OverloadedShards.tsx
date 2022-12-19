@@ -13,8 +13,8 @@ import routes, {createHref} from '../../../../routes';
 
 import {
     sendShardQuery,
-    setShardQueryOptions,
-    setTopShardFilters,
+    setShardsState,
+    setShardsQueryFilters,
 } from '../../../../store/reducers/shardsWorkload';
 import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema';
 import type {IShardsWorkloadFilters} from '../../../../types/store/shardsWorkload';
@@ -33,9 +33,9 @@ import {isColumnEntityType} from '../../utils/schema';
 import {DateRange, DateRangeValues} from './DateRange';
 
 import i18n from './i18n';
-import './TopShards.scss';
+import './OverloadedShards.scss';
 
-const b = cn('top-shards');
+const b = cn('overloaded-shards');
 const bLink = cn('yc-link');
 
 const TABLE_SETTINGS: Settings = {
@@ -83,12 +83,12 @@ function dataTableToStringSortOrder(value: SortOrder | SortOrder[] = []) {
     return sortOrders.map(({columnId}) => columnId).join(',');
 }
 
-interface TopShardsProps {
+interface OverloadedShardsProps {
     tenantPath: string;
     type?: EPathType;
 }
 
-export const TopShards = ({tenantPath, type}: TopShardsProps) => {
+export const OverloadedShards = ({tenantPath, type}: OverloadedShardsProps) => {
     const dispatch = useDispatch();
 
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
@@ -134,7 +134,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     // don't show loader for requests triggered by table sort, only for path change
     useEffect(() => {
         dispatch(
-            setShardQueryOptions({
+            setShardsState({
                 wasLoaded: false,
                 data: undefined,
             }),
@@ -144,14 +144,14 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     const history = useContext(HistoryContext);
 
     const onSort = (newSortOrder?: SortOrder | SortOrder[]) => {
-        // omit information about sort order to disable ASC order, only DESC makes sense for top shards
+        // omit information about sort order to disable ASC order, only DESC makes sense for overloaded shards
         // use a string (and not the DataTable default format) to prevent reference change,
         // which would cause an excess state change, to avoid repeating requests
         setSortOrder(dataTableToStringSortOrder(newSortOrder));
     };
 
     const handleDateRangeChange = (value: DateRangeValues) => {
-        dispatch(setTopShardFilters(value));
+        dispatch(setShardsQueryFilters(value));
         setFilters(value);
     };
 

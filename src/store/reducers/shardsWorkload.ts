@@ -12,8 +12,8 @@ import {parseQueryAPIExecuteResponse} from '../../utils/query';
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
 export const SEND_SHARD_QUERY = createRequestActionTypes('query', 'SEND_SHARD_QUERY');
-const SET_SHARD_QUERY_OPTIONS = 'query/SET_SHARD_QUERY_OPTIONS';
-const SET_TOP_SHARDS_FILTERS = 'shardsWorkload/SET_TOP_SHARDS_FILTERS';
+const SET_SHARD_STATE = 'query/SET_SHARD_STATE';
+const SET_SHARD_QUERY_FILTERS = 'shardsWorkload/SET_SHARD_QUERY_FILTERS';
 
 const initialState = {
     loading: false,
@@ -115,12 +115,12 @@ const shardsWorkload: Reducer<IShardsWorkloadState, IShardsWorkloadAction> = (
                 loading: false,
             };
         }
-        case SET_SHARD_QUERY_OPTIONS:
+        case SET_SHARD_STATE:
             return {
                 ...state,
                 ...action.data,
             };
-        case SET_TOP_SHARDS_FILTERS:
+        case SET_SHARD_QUERY_FILTERS:
             return {
                 ...state,
                 filters: {
@@ -151,7 +151,7 @@ export const sendShardQuery = ({database, path = '', sortOrder, filters}: SendSh
                     action: queryAction,
                 },
                 {
-                    concurrentId: 'topShards',
+                    concurrentId: 'shardsWorkload',
                 },
             ),
             actions: SEND_SHARD_QUERY,
@@ -165,16 +165,16 @@ export const sendShardQuery = ({database, path = '', sortOrder, filters}: SendSh
     }
 };
 
-export function setShardQueryOptions(options: Partial<IShardsWorkloadState>) {
+export function setShardsState(options: Partial<IShardsWorkloadState>) {
     return {
-        type: SET_SHARD_QUERY_OPTIONS,
+        type: SET_SHARD_STATE,
         data: options,
     } as const;
 }
 
-export function setTopShardFilters(filters: Partial<IShardsWorkloadFilters>) {
+export function setShardsQueryFilters(filters: Partial<IShardsWorkloadFilters>) {
     return {
-        type: SET_TOP_SHARDS_FILTERS,
+        type: SET_SHARD_QUERY_FILTERS,
         filters,
     } as const;
 }
