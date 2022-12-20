@@ -2,10 +2,11 @@ import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
 
 import {getTabletLabel} from '../../utils/constants';
+import {mapTabletStateToColorState} from '../../utils/tablet';
 import routes, {createHref} from '../../routes';
 
-import {TTabletStateInfo as TFullTabletStateInfo} from '../../types/api/tablet';
-import {TTabletStateInfo as TComputeTabletStateInfo} from '../../types/api/compute';
+import type {TTabletStateInfo as TFullTabletStateInfo} from '../../types/api/tablet';
+import type {TTabletStateInfo as TComputeTabletStateInfo} from '../../types/api/compute';
 
 import './TabletsStatistic.scss';
 
@@ -19,7 +20,7 @@ const prepareTablets = (tablets: ITablets) => {
             label: getTabletLabel(tablet.Type),
             type: tablet.Type,
             count: tablet.Count,
-            state: tablet.State,
+            state: mapTabletStateToColorState(tablet.State),
         };
     });
 
