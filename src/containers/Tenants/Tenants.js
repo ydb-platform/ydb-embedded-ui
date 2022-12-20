@@ -9,7 +9,7 @@ import {Loader, TextInput, Button} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
-import TabletsStatistic from '../../components/TabletsStatistic/TabletsStatistic';
+import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
 import {AutoFetcher} from '../../utils/autofetcher';

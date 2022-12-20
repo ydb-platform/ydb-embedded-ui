@@ -6,7 +6,7 @@ import Icon from '../components/Icon/Icon';
 import EntityStatus from '../components/EntityStatus/EntityStatus';
 import PoolsGraph from '../components/PoolsGraph/PoolsGraph';
 import ProgressViewer from '../components/ProgressViewer/ProgressViewer';
-import TabletsStatistic from '../components/TabletsStatistic/TabletsStatistic';
+import {TabletsStatistic} from '../components/TabletsStatistic';
 
 import {getDefaultNodePath} from '../containers/Node/NodePages';
 import {formatBytes} from './index';
@@ -41,7 +41,12 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
                             className={b('host-name')}
                         />
                         {nodeRef && (
-                            <Button size="s" href={nodeRef} className={b('external-button')} target="_blank">
+                            <Button
+                                size="s"
+                                href={nodeRef}
+                                className={b('external-button')}
+                                target="_blank"
+                            >
                                 <Icon name="external" />
                             </Button>
                         )}
