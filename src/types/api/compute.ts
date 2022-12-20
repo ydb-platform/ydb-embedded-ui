@@ -45,7 +45,7 @@ interface TComputeNodeInfo {
 
 // Tablets in compute nodes
 // Types for tabletInfo and tablets inside nodes and storage endpoints are in tablet.ts
-interface TTabletStateInfo {
+export interface TTabletStateInfo {
     Type: string;
     State: EFlag;
     Count: number;
