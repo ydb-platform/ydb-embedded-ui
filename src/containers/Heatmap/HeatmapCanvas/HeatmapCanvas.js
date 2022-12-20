@@ -161,7 +161,8 @@ export const HeatmapCanvas = (props) => {
 
 HeatmapCanvas.propTypes = {
     tablets: PropTypes.array,
-    parentRef: PropTypes.node,
+    parentRef: PropTypes.object,
     showTooltip: PropTypes.func,
     hideTooltip: PropTypes.func,
+    currentMetric: PropTypes.string,
 };

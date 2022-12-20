@@ -22,7 +22,7 @@ import Describe from './Describe/Describe';
 //@ts-ignore
 import HotKeys from './HotKeys/HotKeys';
 //@ts-ignore
-import Heatmap from '../../Heatmap/Heatmap';
+import {Heatmap} from '../../Heatmap';
 //@ts-ignore
 import Compute from './Compute/Compute';
 //@ts-ignore
@@ -50,11 +50,7 @@ const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
     const dispatch = useDispatch();
-    const {
-        currentSchemaPath,
-        currentSchema: currentItem = {},
-        autorefresh,
-    } = useSelector((state: any) => state.schema);
+    const {currentSchemaPath, autorefresh} = useSelector((state: any) => state.schema);
     const {diagnosticsTab = GeneralPagesIds.overview, wasLoaded} = useSelector(
         (state: any) => state.tenant,
     );
@@ -156,7 +152,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <HotKeys type={type} />;
             }
             case GeneralPagesIds.graph: {
-                return <Heatmap path={currentItem.Path} />;
+                return <Heatmap path={currentSchemaPath} />;
             }
             case GeneralPagesIds.consumers: {
                 return <Consumers path={currentSchemaPath} type={type} />;
