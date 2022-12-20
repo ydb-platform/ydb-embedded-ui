@@ -1,3 +1,5 @@
+import {TMetrics} from './tenant';
+
 export interface TEvDescribeSchemeResult {
     Status?: EStatus;
     Reason?: string;
@@ -50,8 +52,10 @@ export interface TPathDescription {
     // for table
     Table?: TTableDescription;
     TableStats?: TTableStats;
-    TabletMetrics?: unknown;
-    TablePartitions?: unknown[];
+    TabletMetrics?: TMetrics;
+    TablePartitions?: TTablePartition[];
+    TablePartitionStats?: TTableStats[];
+    TablePartitionMetrics?: TMetrics[];
 
     ColumnStoreDescription?: TColumnStoreDescription;
     ColumnTableDescription?: TColumnTableDescription;
@@ -254,7 +258,7 @@ export interface TFollowerGroup {
     AllowedDataCenters?: string[];
 }
 
-interface TTableStats {
+export interface TTableStats {
     /** uint64 */
     DataSize?: string;
     /** uint64 */
@@ -790,4 +794,13 @@ interface TColumnTableSchemaPreset {
     Id?: number;
     Name?: string;
     Schema?: TColumnTableSchema;
+}
+
+interface TTablePartition {
+    /** bytes */
+    EndOfRangeKeyPrefix?: unknown;
+    IsPoint?: boolean;
+    IsInclusive?: boolean;
+    /** uint64 */
+    DatashardId?: string;
 }
