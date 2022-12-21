@@ -26,7 +26,7 @@ import Heatmap from '../../Heatmap/Heatmap';
 //@ts-ignore
 import Compute from './Compute/Compute';
 //@ts-ignore
-import Tablets from '../../Tablets/Tablets';
+import {Tablets} from '../../Tablets';
 import {Consumers} from './Consumers';
 
 import routes, {createHref} from '../../../routes';
