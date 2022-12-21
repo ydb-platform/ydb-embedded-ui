@@ -2,7 +2,6 @@ import {createSelector, Selector} from 'reselect';
 import {Reducer} from 'redux';
 
 import '../../services/api';
-import {IConsumer} from '../../types/api/consumers';
 import {
     IDescribeRootStateSlice,
     IDescribeState,
@@ -99,6 +98,10 @@ const selectConsumersNames = (state: IDescribeRootStateSlice, path?: string) =>
     path
         ? state.describe.data[path]?.PathDescription?.PersQueueGroup?.PQTabletConfig?.ReadRules
         : undefined;
+
+interface IConsumer {
+    name: string;
+}
 
 export const selectConsumers: Selector<IDescribeRootStateSlice, IConsumer[], [string | undefined]> =
     createSelector(selectConsumersNames, (names = []) => names.map((name) => ({name})));
