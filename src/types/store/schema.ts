@@ -25,9 +25,9 @@ export interface ISchemaState {
 }
 
 export interface ISchemaHandledResponse {
-    path: string | undefined;
-    currentSchema: TEvDescribeSchemeResult | undefined;
-    data: ISchemaData | undefined;
+    path?: string;
+    currentSchema?: TEvDescribeSchemeResult;
+    data?: ISchemaData;
 }
 
 type ISchemaApiRequestAction = ApiRequestAction<
