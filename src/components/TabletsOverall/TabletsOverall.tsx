@@ -25,7 +25,7 @@ const b = cn('kv-tablets-overall');
 type Color = keyof typeof colors;
 
 interface TabletsOverallProps {
-    tablets: {Overall: string}[];
+    tablets: {Overall?: string}[];
 }
 
 function TabletsOverall({tablets}: TabletsOverallProps) {
@@ -48,10 +48,10 @@ function TabletsOverall({tablets}: TabletsOverallProps) {
 
     // determine how many tablets of what color are in "tablets"
     const statesForOverallProgress: Record<string, number> = tablets.reduce((acc, tablet) => {
-        const color = tablet.Overall.toLowerCase();
-        if (!acc[color]) {
+        const color = tablet.Overall?.toLowerCase();
+        if (color && !acc[color]) {
             acc[color] = 1;
-        } else {
+        } else if (color) {
             acc[color]++;
         }
 

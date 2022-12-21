@@ -8,7 +8,7 @@ import {Tabs} from '@gravity-ui/uikit';
 import {Link} from 'react-router-dom';
 
 import {TABLETS, STORAGE, NODE_PAGES, OVERVIEW, STRUCTURE} from './NodePages';
-import Tablets from '../Tablets/Tablets';
+import {Tablets} from '../Tablets';
 import Storage from '../Storage/Storage';
 import NodeOverview from './NodeOverview/NodeOverview';
 import NodeStructure from './NodeStructure/NodeStructure';
