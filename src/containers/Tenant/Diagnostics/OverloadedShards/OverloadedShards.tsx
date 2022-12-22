@@ -5,6 +5,7 @@ import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 
+import {DateRange, DateRangeValues} from '../../../../components/DateRange';
 import InternalLink from '../../../../components/InternalLink/InternalLink';
 
 import HistoryContext from '../../../../contexts/HistoryContext';
@@ -29,8 +30,6 @@ import {prepareQueryError} from '../../../../utils/query';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 
 import {isColumnEntityType} from '../../utils/schema';
-
-import {DateRange, DateRangeValues} from './DateRange';
 
 import i18n from './i18n';
 import './OverloadedShards.scss';

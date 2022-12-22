@@ -1,9 +1,9 @@
-import cn from 'bem-cn-lite';
 import {ChangeEventHandler} from 'react';
+import cn from 'bem-cn-lite';
 
 import './DateRange.scss';
 
-const b = cn('overloaded-shards');
+const b = cn('date-range');
 
 export interface DateRangeValues {
     /** ms from epoch */
@@ -54,13 +54,13 @@ export const DateRange = ({from, to, className, onChange}: DateRangeProps) => {
     const endISO = toTimezonelessISOString(to);
 
     return (
-        <div className={b('date-range', className)}>
+        <div className={b(null, className)}>
             <input
                 type="datetime-local"
                 value={startISO}
                 max={endISO}
                 onChange={handleFromChange}
-                className={b('date-range-input')}
+                className={b('input')}
             />
             —
             <input
@@ -68,7 +68,7 @@ export const DateRange = ({from, to, className, onChange}: DateRangeProps) => {
                 min={startISO}
                 value={endISO}
                 onChange={handleToChange}
-                className={b('date-range-input')}
+                className={b('input')}
             />
         </div>
     );
