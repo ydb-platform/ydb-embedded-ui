@@ -1,0 +1,11 @@
+.date-range {
+    &__input {
+        min-width: 190px;
+        padding: 5px 8px;
+
+        color: var(--yc-color-text-primary);
+        border: 1px solid var(--yc-color-line-generic);
+        border-radius: var(--yc-border-radius-m);
+        background: transparent;
+    }
+}
