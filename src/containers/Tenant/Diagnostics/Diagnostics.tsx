@@ -9,8 +9,7 @@ import {Switch, Tabs} from '@gravity-ui/uikit';
 
 import {Loader} from '../../../components/Loader';
 
-//@ts-ignore
-import TopQueries from './TopQueries/TopQueries';
+import {TopQueries} from './TopQueries';
 //@ts-ignore
 import DetailedOverview from './DetailedOverview/DetailedOverview';
 import {OverloadedShards} from './OverloadedShards';
