@@ -2,7 +2,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import DataTable, {Column} from '@yandex-cloud/react-data-table';
+import DataTable, {Column, Settings} from '@yandex-cloud/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 
 import {DateRange, DateRangeValues} from '../../../../components/DateRange';
@@ -32,6 +32,11 @@ import i18n from './i18n';
 import './TopQueries.scss';
 
 const b = cn('kv-top-queries');
+
+const TABLE_SETTINGS: Settings = {
+    ...DEFAULT_TABLE_SETTINGS,
+    dynamicRenderType: 'variable',
+};
 
 const MAX_QUERY_HEIGHT = 10;
 const COLUMNS: Column<KeyValueRow>[] = [
@@ -172,7 +177,7 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
                 <DataTable
                     columns={COLUMNS}
                     data={data}
-                    settings={DEFAULT_TABLE_SETTINGS}
+                    settings={TABLE_SETTINGS}
                     onRowClick={handleRowClick}
                     theme="yandex-cloud"
                 />
