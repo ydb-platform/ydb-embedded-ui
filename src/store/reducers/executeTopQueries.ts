@@ -53,6 +53,10 @@ function getFiltersConditions(path: string, filters?: ITopQueriesFilters) {
         conditions.push(`IntervalEnd IN ${getMaxIntervalSubquery(path)}`);
     }
 
+    if (filters?.text) {
+        conditions.push(`QueryText ILIKE '%${filters.text}%'`);
+    }
+
     return conditions.join(' AND ');
 }
 

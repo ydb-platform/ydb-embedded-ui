@@ -8,6 +8,7 @@ export interface ITopQueriesFilters {
     from?: number;
     /** ms from epoch */
     to?: number;
+    text?: string;
 }
 
 export interface ITopQueriesState {

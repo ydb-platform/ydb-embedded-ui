@@ -6,6 +6,7 @@ import DataTable, {Column} from '@yandex-cloud/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 
 import {DateRange, DateRangeValues} from '../../../../components/DateRange';
+import {Search} from '../../../../components/Search';
 import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
 
 import {changeUserInput} from '../../../../store/reducers/executeQuery';
@@ -68,14 +69,14 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
 
     const preventFetch = useRef(false);
 
-    // filters sync between redux state and URL
+    // some filters sync between redux state and URL
     // component state is for default values,
     // default values are determined from the query response, and should not propagate to URL
-    const [dateRangeFilters, setDateRangeFilters] = useState<ITopQueriesFilters>(storeFilters);
+    const [filters, setFilters] = useState<ITopQueriesFilters>(storeFilters);
 
     useEffect(() => {
-        dispatch(setTopQueriesFilters(dateRangeFilters));
-    }, [dispatch, dateRangeFilters]);
+        dispatch(setTopQueriesFilters(filters));
+    }, [dispatch, filters]);
 
     const setDefaultFiltersFromResponse = (responseData?: IQueryResult) => {
         const intervalEnd = responseData?.result?.[0]?.IntervalEnd;
@@ -84,7 +85,7 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
             const to = new Date(intervalEnd).getTime();
             const from = new Date(to - HOUR_IN_SECONDS * 1000).getTime();
 
-            setDateRangeFilters((currentFilters) => {
+            setFilters((currentFilters) => {
                 // request without filters returns the latest interval with data
                 // only in this case should update filters in ui
                 // also don't update if user already interacted with controls
@@ -119,11 +120,11 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
 
             // @ts-expect-error
             // typed dispatch required, remove error expectation after adding it
-            dispatch(fetchTopQueries({database: path, filters: dateRangeFilters})).then(
+            dispatch(fetchTopQueries({database: path, filters})).then(
                 setDefaultFiltersFromResponse,
             );
         },
-        [dispatch, dateRangeFilters, path],
+        [dispatch, filters, path],
         autorefresh,
     );
 
@@ -137,8 +138,12 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
         [changeSchemaTab, dispatch],
     );
 
+    const handleTextSearchUpdate = (text: string) => {
+        setFilters((currentFilters) => ({...currentFilters, text}));
+    };
+
     const handleDateRangeChange = (value: DateRangeValues) => {
-        setDateRangeFilters((currentFilters) => ({...currentFilters, ...value}));
+        setFilters((currentFilters) => ({...currentFilters, ...value}));
     };
 
     const renderLoader = () => {
@@ -178,11 +183,13 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
     return (
         <div className={b()}>
             <div className={b('controls')}>
-                <DateRange
-                    from={dateRangeFilters.from}
-                    to={dateRangeFilters.to}
-                    onChange={handleDateRangeChange}
+                <Search
+                    value={filters.text}
+                    onChange={handleTextSearchUpdate}
+                    placeholder={i18n('filter.text.placeholder')}
+                    className={b('search')}
                 />
+                <DateRange from={filters.from} to={filters.to} onChange={handleDateRangeChange} />
             </div>
             {renderContent()}
         </div>

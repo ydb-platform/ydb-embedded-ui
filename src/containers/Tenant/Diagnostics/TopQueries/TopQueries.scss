@@ -16,10 +16,13 @@
     &__controls {
         display: flex;
         flex-wrap: wrap;
-        align-items: baseline;
         gap: 16px;
 
         margin-bottom: 10px;
+    }
+
+    &__search {
+        @include search();
     }
 
     &__result {
