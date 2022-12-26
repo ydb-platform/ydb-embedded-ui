@@ -56,6 +56,14 @@ const paramSetup = {
             stateKey: 'shardsWorkload.filters.to',
             type: 'number',
         },
+        topQueriesDateFrom: {
+            stateKey: 'executeTopQueries.filters.from',
+            type: 'number',
+        },
+        topQueriesDateTo: {
+            stateKey: 'executeTopQueries.filters.to',
+            type: 'number',
+        },
     },
 };
 
