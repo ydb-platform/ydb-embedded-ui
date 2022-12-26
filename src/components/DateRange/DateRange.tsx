@@ -57,7 +57,7 @@ export const DateRange = ({from, to, className, onChange}: DateRangeProps) => {
         <div className={b(null, className)}>
             <input
                 type="datetime-local"
-                value={startISO}
+                value={startISO || ''}
                 max={endISO}
                 onChange={handleFromChange}
                 className={b('input')}
@@ -66,7 +66,7 @@ export const DateRange = ({from, to, className, onChange}: DateRangeProps) => {
             <input
                 type="datetime-local"
                 min={startISO}
-                value={endISO}
+                value={endISO || ''}
                 onChange={handleToChange}
                 className={b('input')}
             />

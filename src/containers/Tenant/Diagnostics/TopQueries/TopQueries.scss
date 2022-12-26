@@ -1,43 +1,37 @@
 @import '../../../../styles/mixins.scss';
 
 .kv-top-queries {
+    display: flex;
+    flex-direction: column;
+
     height: 100%;
 
     @include query-data-table;
-    &__message-container {
-        padding: 15px 0;
-    }
 
     &__loader {
         display: flex;
         justify-content: center;
     }
 
-    &__owner-container {
-        margin: 10px;
+    &__controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 16px;
 
-        .yc-staff-card {
-            display: inline-block;
-        }
+        margin-bottom: 10px;
     }
 
-    &__text {
-        font-size: var(--yc-text-body-1-font-size);
-        line-height: var(--yc-text-body-1-line-height);
+    &__result {
+        overflow: auto;
+        flex-grow: 1;
 
-        color: var(--yc-color-text-primary);
-
-        &::first-letter {
-            color: var(--yc-color-text-danger);
-        }
-    }
-
-    &__result &__table-content {
-        & .data-table {
+        .data-table {
             &,
             &__table {
                 width: 100%;
             }
+
             &__td {
                 vertical-align: top;
                 white-space: pre;

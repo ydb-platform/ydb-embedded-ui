@@ -1,18 +1,26 @@
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 
 import DataTable, {Column} from '@yandex-cloud/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 
+import {DateRange, DateRangeValues} from '../../../../components/DateRange';
 import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
 
 import {changeUserInput} from '../../../../store/reducers/executeQuery';
-import {fetchTopQueries, setTopQueriesState} from '../../../../store/reducers/executeTopQueries';
+import {
+    fetchTopQueries,
+    setTopQueriesFilters,
+    setTopQueriesState,
+} from '../../../../store/reducers/executeTopQueries';
 
 import type {KeyValueRow} from '../../../../types/api/query';
 import type {EPathType} from '../../../../types/api/schema';
+import type {ITopQueriesFilters} from '../../../../types/store/executeTopQueries';
+import type {IQueryResult} from '../../../../types/store/query';
 
-import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
 
@@ -21,7 +29,6 @@ import {TenantGeneralTabsIds} from '../../TenantPages';
 
 import i18n from './i18n';
 import './TopQueries.scss';
-import {useCallback, useEffect} from 'react';
 
 const b = cn('kv-top-queries');
 
@@ -56,22 +63,69 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
         wasLoaded,
         error,
         data: {result: data = undefined} = {},
+        filters: storeFilters,
     } = useTypedSelector((state) => state.executeTopQueries);
 
-    useAutofetcher(
-        () => dispatch(fetchTopQueries({database: path})),
-        [dispatch, path],
-        autorefresh,
-    );
+    const preventFetch = useRef(false);
+
+    // filters sync between redux state and URL
+    // component state is for default values,
+    // default values are determined from the query response, and should not propagate to URL
+    const [dateRangeFilters, setDateRangeFilters] = useState<ITopQueriesFilters>(storeFilters);
 
     useEffect(() => {
-        dispatch(
-            setTopQueriesState({
-                wasLoaded: false,
-                data: undefined,
-            }),
-        );
-    }, [dispatch, path]);
+        dispatch(setTopQueriesFilters(dateRangeFilters));
+    }, [dispatch, dateRangeFilters]);
+
+    const setDefaultFiltersFromResponse = (responseData?: IQueryResult) => {
+        const intervalEnd = responseData?.result?.[0]?.IntervalEnd;
+
+        if (intervalEnd) {
+            const to = new Date(intervalEnd).getTime();
+            const from = new Date(to - HOUR_IN_SECONDS * 1000).getTime();
+
+            setDateRangeFilters((currentFilters) => {
+                // request without filters returns the latest interval with data
+                // only in this case should update filters in ui
+                // also don't update if user already interacted with controls
+                const shouldUpdateFilters = !currentFilters.from && !currentFilters.to;
+
+                if (!shouldUpdateFilters) {
+                    return currentFilters;
+                }
+
+                preventFetch.current = true;
+
+                return {...currentFilters, from, to};
+            });
+        }
+    };
+
+    useAutofetcher(
+        (isBackground) => {
+            if (preventFetch.current) {
+                preventFetch.current = false;
+                return;
+            }
+
+            if (!isBackground) {
+                dispatch(
+                    setTopQueriesState({
+                        wasLoaded: false,
+                        data: undefined,
+                    }),
+                );
+            }
+
+            // @ts-expect-error
+            // typed dispatch required, remove error expectation after adding it
+            dispatch(fetchTopQueries({database: path, filters: dateRangeFilters})).then(
+                setDefaultFiltersFromResponse,
+            );
+        },
+        [dispatch, dateRangeFilters, path],
+        autorefresh,
+    );
 
     const handleRowClick = useCallback(
         (row) => {
@@ -82,6 +136,10 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
         },
         [changeSchemaTab, dispatch],
     );
+
+    const handleDateRangeChange = (value: DateRangeValues) => {
+        setDateRangeFilters((currentFilters) => ({...currentFilters, ...value}));
+    };
 
     const renderLoader = () => {
         return (
@@ -106,20 +164,27 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
 
         return (
             <div className={b('result')}>
-                <div className={b('table-wrapper')}>
-                    <div className={b('table-content')}>
-                        <DataTable
-                            columns={COLUMNS}
-                            data={data}
-                            settings={DEFAULT_TABLE_SETTINGS}
-                            onRowClick={handleRowClick}
-                            theme="yandex-cloud"
-                        />
-                    </div>
-                </div>
+                <DataTable
+                    columns={COLUMNS}
+                    data={data}
+                    settings={DEFAULT_TABLE_SETTINGS}
+                    onRowClick={handleRowClick}
+                    theme="yandex-cloud"
+                />
             </div>
         );
     };
 
-    return <div className={b()}>{renderContent()}</div>;
+    return (
+        <div className={b()}>
+            <div className={b('controls')}>
+                <DateRange
+                    from={dateRangeFilters.from}
+                    to={dateRangeFilters.to}
+                    onChange={handleDateRangeChange}
+                />
+            </div>
+            {renderContent()}
+        </div>
+    );
 };
