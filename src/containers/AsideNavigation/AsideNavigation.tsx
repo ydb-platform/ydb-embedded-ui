@@ -1,16 +1,12 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import {connect} from 'react-redux';
+import {useLocation} from 'react-router';
 import {useHistory} from 'react-router-dom';
 import cn from 'bem-cn-lite';
-import {useLocation} from 'react-router';
-import {connect} from 'react-redux';
 
-import {
-    AsideHeader,
-    AsideHeaderFooterItem,
-    AsideHeaderMenuItem,
-    SlotName,
-} from '../../components/AsideNavigation/AsideHeader';
 import {Icon, Button} from '@gravity-ui/uikit';
+import {AsideHeader, MenuItem as AsideHeaderMenuItem, FooterItem} from '@gravity-ui/navigation';
+
 import signOutIcon from '../../assets/icons/signOut.svg';
 import signInIcon from '../../assets/icons/signIn.svg';
 import databaseIcon from '../../assets/icons/server.svg';
@@ -20,12 +16,17 @@ import ydbLogoIcon from '../../assets/icons/ydb.svg';
 import databasesIcon from '../../assets/icons/databases.svg';
 import userSecret from '../../assets/icons/user-secret.svg';
 import userChecked from '../../assets/icons/user-check.svg';
-//@ts-ignore
+import settingsIcon from '../../assets/icons/settings.svg';
+import supportIcon from '../../assets/icons/support.svg';
+
 import UserSettings from '../UserSettings/UserSettings';
+
 import routes, {createHref, CLUSTER_PAGES} from '../../routes';
 
-//@ts-ignore
 import {logout, setIsNotAuthenticated} from '../../store/reducers/authentication';
+import {getSettingValue, setSettingValue} from '../../store/reducers/settings';
+
+import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
 
 import './AsideNavigation.scss';
 
@@ -77,17 +78,21 @@ interface YdbUserDropdownProps {
 
 function YdbUserDropdown({isCompact, popupAnchor, ydbUser}: YdbUserDropdownProps) {
     const [isUserDropdownVisible, setIsUserDropdownVisible] = useState(false);
-    const iconDate = ydbUser?.login ? userChecked : userSecret;
+    const iconData = ydbUser?.login ? userChecked : userSecret;
     return (
-        <AsideHeaderFooterItem
-            isCurrent={isUserDropdownVisible}
-            slot={SlotName.User}
-            renderCustomIcon={() => <Icon data={iconDate} size={22} className={b('user-icon')} />}
-            text={ydbUser?.login ?? 'Account'}
-            isCompact={isCompact}
+        <FooterItem
+            compact={isCompact}
+            item={{
+                id: 'user-popup',
+                title: ydbUser?.login ?? 'Account',
+                current: isUserDropdownVisible,
+                icon: iconData,
+                iconSize: 22,
+                onItemClick: () => setIsUserDropdownVisible(true),
+            }}
+            enableTooltip={!isUserDropdownVisible}
             popupAnchor={popupAnchor}
             popupVisible={isUserDropdownVisible}
-            onClick={() => setIsUserDropdownVisible(true)}
             onClosePopup={() => setIsUserDropdownVisible(false)}
             renderPopupContent={() => (
                 <div className={b('ydb-user-wrapper')}>
@@ -105,8 +110,10 @@ function YdbUserDropdown({isCompact, popupAnchor, ydbUser}: YdbUserDropdownProps
 interface AsideNavigationProps {
     children: React.ReactNode;
     ydbUser: string;
+    compact: boolean;
     logout: VoidFunction;
     setIsNotAuthenticated: VoidFunction;
+    setSettingValue: (name: string, value: string) => void;
 }
 
 const items: MenuItem[] = [
@@ -150,9 +157,29 @@ const items: MenuItem[] = [
     },
 ];
 
+enum Panel {
+    UserSettings = 'UserSettings',
+}
+
 function AsideNavigation(props: AsideNavigationProps) {
     const location = useLocation();
     const history = useHistory();
+
+    const [visiblePanel, setVisiblePanel] = useState<Panel>();
+
+    const setIsCompact = (compact: boolean) => {
+        props.setSettingValue(ASIDE_HEADER_COMPACT_KEY, JSON.stringify(compact));
+    };
+
+    // navigation managed its compact state internally before, and its approach is not compatible with settings
+    // to migrate, save the incoming value again; save only `false` because `true` is the default value
+    // assume it is safe to remove this code block if it is at least a few months old
+    // there a two of these, search for a similar comment
+    useEffect(() => {
+        if (props.compact === false) {
+            setIsCompact(props.compact);
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const menuItems: AsideHeaderMenuItem[] = React.useMemo(() => {
         const {pathname} = location;
@@ -184,28 +211,51 @@ function AsideNavigation(props: AsideNavigationProps) {
     return (
         <React.Fragment>
             <AsideHeader
-                logoText="YDB"
-                logoIcon={ydbLogoIcon}
-                onLogoIconClick={() => history.push('/')}
+                logo={{
+                    text: 'YDB',
+                    icon: ydbLogoIcon,
+                    onClick: () => history.push('/'),
+                }}
                 menuItems={menuItems}
-                settings={<UserSettings />}
-                initIsCompact
+                compact={props.compact}
+                onChangeCompact={setIsCompact}
                 className={b()}
                 renderContent={() => props.children}
-                renderFooter={({isCompact, asideRef}) => (
+                renderFooter={({compact, asideRef}) => (
                     <React.Fragment>
-                        <AsideHeaderFooterItem
-                            slot={SlotName.Support}
-                            iconSize={24}
-                            text="Documentation"
-                            isCompact={isCompact}
-                            onClick={() => {
-                                window.open('http://ydb.tech/docs', '_blank', 'noreferrer');
+                        <FooterItem
+                            compact={compact}
+                            item={{
+                                id: 'documentation',
+                                title: 'Documentation',
+                                icon: supportIcon,
+                                iconSize: 24,
+                                onItemClick: () => {
+                                    window.open('https://ydb.tech/docs', '_blank', 'noreferrer');
+                                },
                             }}
                         />
 
+                        <FooterItem
+                            item={{
+                                id: 'user-settings',
+                                title: 'Settings',
+                                icon: settingsIcon,
+                                iconSize: 24,
+                                current: visiblePanel === Panel.UserSettings,
+                                onItemClick: () => {
+                                    setVisiblePanel(
+                                        visiblePanel === Panel.UserSettings
+                                            ? undefined
+                                            : Panel.UserSettings,
+                                    );
+                                },
+                            }}
+                            compact={compact}
+                        />
+
                         <YdbUserDropdown
-                            isCompact={isCompact}
+                            isCompact={compact}
                             popupAnchor={asideRef}
                             ydbUser={{
                                 login: props.ydbUser,
@@ -215,6 +265,16 @@ function AsideNavigation(props: AsideNavigationProps) {
                         />
                     </React.Fragment>
                 )}
+                panelItems={[
+                    {
+                        id: 'user-settings',
+                        visible: visiblePanel === Panel.UserSettings,
+                        content: <UserSettings />,
+                    },
+                ]}
+                onClosePanel={() => {
+                    setVisiblePanel(undefined);
+                }}
             />
         </React.Fragment>
     );
@@ -225,12 +285,14 @@ const mapStateToProps = (state: any) => {
 
     return {
         ydbUser,
+        compact: JSON.parse(getSettingValue(state, ASIDE_HEADER_COMPACT_KEY)),
     };
 };
 
 const mapDispatchToProps = {
     logout,
     setIsNotAuthenticated,
+    setSettingValue,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AsideNavigation);

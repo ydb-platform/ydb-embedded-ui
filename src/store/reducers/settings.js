@@ -1,11 +1,11 @@
 import {
-    defaultUserSettings,
     ALL,
     SAVED_QUERIES_KEY,
     THEME_KEY,
     TENANT_INITIAL_TAB_KEY,
     QUERY_INITIAL_RUN_ACTION_KEY,
     INVERTED_DISKS_KEY,
+    ASIDE_HEADER_COMPACT_KEY,
 } from '../../utils/constants';
 import '../../services/api';
 import {getValueFromLS} from '../../utils/utils';
@@ -24,16 +24,26 @@ export function readSavedSettingsValue(key, defaultValue) {
     return savedValue ?? defaultValue;
 }
 
+// navigation managed its compact state internally before, and its approach is not compatible with settings
+// try reading the old localStorage entry to use it as a default value, for backward compatibility
+// assume it is safe to remove this code block if it is at least a few months old
+// there a two of these, search for a similar comment
+let legacyAsideNavCompactState = '';
+try {
+    legacyAsideNavCompactState = String(JSON.parse(getValueFromLS('nvAsideHeader')).isCompact);
+    localStorage.removeItem('nvAsideHeader');
+} catch {}
+
 export const initialState = {
     problemFilter: ALL,
     userSettings: {
-        ...defaultUserSettings,
         ...userSettings,
         [THEME_KEY]: readSavedSettingsValue(THEME_KEY, 'light'),
         [INVERTED_DISKS_KEY]: readSavedSettingsValue(INVERTED_DISKS_KEY, 'false'),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),
         [TENANT_INITIAL_TAB_KEY]: readSavedSettingsValue(TENANT_INITIAL_TAB_KEY),
         [QUERY_INITIAL_RUN_ACTION_KEY]: readSavedSettingsValue(QUERY_INITIAL_RUN_ACTION_KEY),
+        [ASIDE_HEADER_COMPACT_KEY]: readSavedSettingsValue(ASIDE_HEADER_COMPACT_KEY, legacyAsideNavCompactState || 'true'),
     },
     systemSettings,
 };

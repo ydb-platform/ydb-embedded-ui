@@ -1,12 +1,13 @@
 import {connect} from 'react-redux';
 
 import {RadioButton, Switch} from '@gravity-ui/uikit';
-import {Settings} from '../../components/AsideNavigation/Settings';
+import {Settings} from '@gravity-ui/navigation';
+
 import favoriteFilledIcon from '../../assets/icons/star.svg';
 import flaskIcon from '../../assets/icons/flask.svg';
-//@ts-ignore
+
 import {INVERTED_DISKS_KEY, THEME_KEY} from '../../utils/constants';
-//@ts-ignore
+
 import {setSettingValue} from '../../store/reducers/settings';
 
 enum Theme {
