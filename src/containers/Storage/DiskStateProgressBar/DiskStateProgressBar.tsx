@@ -41,7 +41,11 @@ export function DiskStateProgressBar({
                 <React.Fragment>
                     <div
                         className={b('filled')}
-                        style={{width: `${inverted ? 100 - diskAllocatedPercent : diskAllocatedPercent}%`}}
+                        style={{
+                            width: `${
+                                inverted ? 100 - diskAllocatedPercent : diskAllocatedPercent
+                            }%`,
+                        }}
                     />
                     <div className={b('filled-title')}>
                         {`${Math.round(diskAllocatedPercent)}%`}
@@ -53,7 +57,7 @@ export function DiskStateProgressBar({
 
     const mods: Record<string, boolean | undefined> = {inverted};
 
-    const color = severity && severityToColor[severity];
+    const color = severity !== undefined && severityToColor[severity];
     if (color) {
         mods[color.toLocaleLowerCase()] = true;
     }
