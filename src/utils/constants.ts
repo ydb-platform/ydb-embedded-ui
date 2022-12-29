@@ -39,39 +39,6 @@ export const TABLET_COLORS = {
     Active: 'lightgreen',
 };
 
-export const TABLET_COLOR_TO_STATES = {
-    Red: [
-        'Created',
-        'ResolveStateStorage',
-        'Candidate',
-        'BlockBlobStorage',
-        'WriteZeroEntry',
-        'Restored',
-        'Discover',
-        'Lock',
-        'Dead',
-    ],
-    Orange: ['RebuildGraph'],
-    Yellow: ['ResolveMaster', 'ResolveLeader'],
-    Green: ['Deleted', 'Active'],
-};
-
-export const TABLETS_STATES = [
-    'Active',
-    'Deleted',
-    'Created',
-    'ResolveStateStorage',
-    'Candidate',
-    'BlockBlobStorage',
-    'WriteZeroEntry',
-    'Restored',
-    'Discover',
-    'Lock',
-    'Dead',
-    'RebuildGraph',
-    'ResolveLeader',
-];
-
 export const TxAllocator = 'TxAllocator';
 
 export const TABLET_SYMBOLS = {

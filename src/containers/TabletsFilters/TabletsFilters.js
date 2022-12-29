@@ -11,7 +11,7 @@ import ReactList from 'react-list';
 import Tablet from '../../components/Tablet/Tablet';
 import {AccessDenied} from '../../components/Errors/403';
 
-import {TABLET_COLOR_TO_STATES, TABLETS_STATES} from '../../utils/constants';
+import {tabletColorToTabletState, tabletStates} from '../../utils/tablet';
 import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
 import {
     getTabletsInfo,
@@ -61,7 +61,7 @@ class TabletsFilters extends React.Component {
     };
 
     static getStateFiltersFromColor = (color) => {
-        return TABLET_COLOR_TO_STATES[color] || [color];
+        return tabletColorToTabletState[color] || [color];
     };
 
     static CONTROL_WIDTH = 220;
@@ -159,7 +159,7 @@ class TabletsFilters extends React.Component {
         const {nodeFilter, tenantPath} = this.state;
         const {tablets, filteredTablets, nodes, stateFilter, typeFilter, error} = this.props;
 
-        const states = TABLETS_STATES.map((item) => ({value: item, content: item}));
+        const states = tabletStates.map((item) => ({value: item, content: item}));
         const types = Array.from(new Set(...[_.map(tablets, (tblt) => tblt.Type)])).map((item) => ({
             value: item,
             content: item,
