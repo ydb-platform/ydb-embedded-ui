@@ -1,15 +1,16 @@
 .kv-fullscreen {
-    position: fixed;
+    // should expand to fill the content area, keeping aside navigation visible
+    // counts on .ycn-aside-header__content to have position: relative, it is set in App.scss
+    position: absolute;
     z-index: 10;
     top: 0;
-    left: var(--nv-aside-header-size);
+    right: 0;
+    bottom: 0;
+    left: 0;
 
     display: flex;
     overflow: hidden;
     flex-grow: 1;
-
-    width: calc(100% - var(--nv-aside-header-size));
-    height: 100%;
 
     background-color: var(--yc-color-base-background);
 
@@ -18,6 +19,7 @@
         z-index: 11;
         top: 8px;
         right: 20px;
+
         .yc-button__text {
             display: flex;
             align-items: center;

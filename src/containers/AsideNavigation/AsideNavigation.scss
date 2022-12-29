@@ -23,21 +23,3 @@
         padding: 10px;
     }
 }
-
-.nv-aside-header-footer-item__popup {
-    .nv-user-menu-content__organizations {
-        margin-top: 19px;
-        margin-left: 0;
-        .yc-menu__item {
-            cursor: auto;
-        }
-    }
-
-    .yc-menu__item {
-        //stylelint-disable-next-line declaration-no-important
-        padding-right: 0 !important;
-        &:hover {
-            background-color: unset;
-        }
-    }
-}

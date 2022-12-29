@@ -47,11 +47,13 @@ body,
     color: var(--yc-color-text-secondary);
 }
 
-.nv-aside-header__pane-container {
+.ycn-aside-header__pane-container {
     height: 100%;
 }
 
-.nv-aside-header__content {
+.ycn-aside-header__content {
+    position: relative;
+
     display: flex;
     overflow: auto;
     flex-direction: column;
