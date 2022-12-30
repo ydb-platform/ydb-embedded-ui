@@ -27,7 +27,7 @@ function DiskStateProgressBar({
     diskAllocatedPercent = -1,
     severity,
 }: DiskStateProgressBarProps) {
-    const inverted = useSelector((state) => getSettingValue(state, INVERTED_DISKS_KEY));
+    const inverted = useSelector((state) => JSON.parse(getSettingValue(state, INVERTED_DISKS_KEY)));
 
     const renderAllocatedPercent = () => {
         return (
