@@ -67,7 +67,7 @@ const mapStateToProps = (state: any) => {
 
     return {
         theme,
-        invertedDisks,
+        invertedDisks: JSON.parse(invertedDisks),
     };
 };
 

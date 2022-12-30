@@ -30,7 +30,7 @@ export const initialState = {
         ...defaultUserSettings,
         ...userSettings,
         [THEME_KEY]: readSavedSettingsValue(THEME_KEY, 'light'),
-        [INVERTED_DISKS_KEY]: readSavedSettingsValue(INVERTED_DISKS_KEY) === 'true',
+        [INVERTED_DISKS_KEY]: readSavedSettingsValue(INVERTED_DISKS_KEY, 'false'),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),
         [TENANT_INITIAL_TAB_KEY]: readSavedSettingsValue(TENANT_INITIAL_TAB_KEY),
         [QUERY_INITIAL_RUN_ACTION_KEY]: readSavedSettingsValue(QUERY_INITIAL_RUN_ACTION_KEY),
