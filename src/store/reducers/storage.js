@@ -307,6 +307,7 @@ export const getFlatListStorageNodes = createSelector([getStorageNodes], (storag
         return {
             NodeId: node.NodeId,
             FQDN: systemState.Host,
+            DataCenter: systemState.DataCenter,
             Rack: systemState.Rack,
             uptime: calcUptime(systemState.StartTime),
             StartTime: systemState.StartTime,
