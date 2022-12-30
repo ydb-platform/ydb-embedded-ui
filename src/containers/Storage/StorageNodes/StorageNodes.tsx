@@ -16,6 +16,7 @@ import './StorageNodes.scss';
 enum TableColumnsIds {
     NodeId = 'NodeId',
     FQDN = 'FQDN',
+    Rack = 'Rack',
     uptime = 'uptime',
     PDisks = 'PDisks',
     Missing = 'Missing',
@@ -36,6 +37,7 @@ interface StorageNodesProps {
 const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
     NodeId: 'Node ID',
     FQDN: 'FQDN',
+    Rack: 'Rack',
     uptime: 'Uptime',
     PDisks: 'PDisks',
     Missing: 'Missing',
@@ -94,6 +96,12 @@ function StorageNodes({
                     </div>
                 );
             },
+            align: DataTable.LEFT,
+        },
+        {
+            name: TableColumnsIds.Rack,
+            header: tableColumnsNames[TableColumnsIds.Rack],
+            render: ({row}) => row.Rack || '—',
             align: DataTable.LEFT,
         },
         {
