@@ -59,6 +59,13 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
             width: '60px',
         },
         {
+            name: 'Rack',
+            header: 'Rack',
+            align: DataTable.LEFT,
+            render: ({value}) => (value ? value : '—'),
+            width: '80px',
+        },
+        {
             name: 'Version',
             width: '200px',
             align: DataTable.LEFT,
