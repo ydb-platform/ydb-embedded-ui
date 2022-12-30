@@ -22,6 +22,8 @@ import {
 
 import './Tablets.scss';
 
+import i18n from './i18n';
+
 const b = cn('tablets');
 
 interface TabletsProps {
@@ -127,8 +129,8 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
                     <Select
                         className={b('filter-control')}
                         multiple
-                        placeholder="All items"
-                        label="States:"
+                        placeholder={i18n('controls.allItems')}
+                        label={`${i18n('controls.state')}:`}
                         options={states}
                         value={stateFilter}
                         onUpdate={handleStateFilterChange}
@@ -136,8 +138,8 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
                     <Select
                         className={b('filter-control')}
                         multiple
-                        placeholder="All items"
-                        label="Types:"
+                        placeholder={i18n('controls.allItems')}
+                        label={`${i18n('controls.type')}:`}
                         options={types}
                         value={typeFilter}
                         onUpdate={handleTypeFilterChange}
@@ -161,6 +163,10 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
     } else if (error) {
         return <div className="error">{error.statusText}</div>;
     } else {
-        return tablets.length > 0 ? renderContent() : <div className="error">No tablets data</div>;
+        return tablets.length > 0 ? (
+            renderContent()
+        ) : (
+            <div className="error">{i18n('noTabletsData')}</div>
+        );
     }
 };
