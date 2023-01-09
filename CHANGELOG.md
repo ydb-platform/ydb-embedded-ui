@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.1.0...v3.2.0) (2023-01-09)
+
+
+### Features
+
+* **Nodes:** display rack in table ([3b8cdd5](https://github.com/ydb-platform/ydb-embedded-ui/commit/3b8cdd5b472f98132b2faaa9b71b8911750545a6))
+* **StorageNodes:** display datacenter in table ([4507bfd](https://github.com/ydb-platform/ydb-embedded-ui/commit/4507bfde839b0aafa3722828b7528885c6ac8f84))
+* **TopQueries:** date range filter ([b9a8e95](https://github.com/ydb-platform/ydb-embedded-ui/commit/b9a8e9504fa68556a724b214ee91b73ec900d37e))
+* **TopQueries:** filter by query text ([2c8ea97](https://github.com/ydb-platform/ydb-embedded-ui/commit/2c8ea97dd215ea59165cf05315bc5809cf7fafd7))
+
+
+### Bug Fixes
+
+* **InfoViewer:** min width for values ([64a4fd4](https://github.com/ydb-platform/ydb-embedded-ui/commit/64a4fd4de16738a9e2fac9cb4fba94eafc938762))
+* **Nodes:** open external link in new tab ([b7c3ddd](https://github.com/ydb-platform/ydb-embedded-ui/commit/b7c3ddd1e611f2b61466e3eda51f3341f8407588))
+* **TopQueries:** proper table dynamic render type ([9add6ca](https://github.com/ydb-platform/ydb-embedded-ui/commit/9add6ca9fbfe0475caf1586070a800210320cee6))
+* **TopShards:** rename to overloaded shards ([d9978bd](https://github.com/ydb-platform/ydb-embedded-ui/commit/d9978bdd84b9a883e4eefcac7f85f856da55d770))
+* **UserSettings:** treat invertedDisks settings as string ([ad7742a](https://github.com/ydb-platform/ydb-embedded-ui/commit/ad7742a6bf0be59c2b9cbbf947aaa66f79d748be))
+
 ## [3.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.0.1...v3.1.0) (2022-12-13)
 
 
