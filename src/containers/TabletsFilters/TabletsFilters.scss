@@ -6,14 +6,18 @@
     @include flex-container();
 
     &__node {
-        display: flex;
-        flex-direction: column;
+        overflow: hidden;
 
         font-size: var(--yc-text-body-1-font-size);
         line-height: var(--yc-text-body-1-line-height);
     }
 
     &__node-meta {
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
         color: var(--yc-color-text-secondary);
     }
 

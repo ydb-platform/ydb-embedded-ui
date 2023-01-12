@@ -243,8 +243,6 @@ const Filters = ({
                 <Select
                     multiple
                     label="Node ID"
-                    showApply
-                    showItemMeta
                     width={TabletsFilters.CONTROL_WIDTH}
                     popupWidth={TabletsFilters.POPUP_WIDTH}
                     placeholder="All"
@@ -255,7 +253,7 @@ const Filters = ({
                         return (
                             <div className={b('node')}>
                                 <div>{option.content}</div>
-                                <div className={b('node-meta')}>{option.meta}</div>
+                                <div className={b('node-meta')} title={option.meta}>{option.meta}</div>
                             </div>
                         );
                     }}
@@ -267,7 +265,6 @@ const Filters = ({
                 <Select
                     multiple
                     label="multiple"
-                    showApply
                     width={TabletsFilters.CONTROL_WIDTH}
                     placeholder="All"
                     options={states}
@@ -280,7 +277,6 @@ const Filters = ({
                 <Select
                     multiple
                     label="Types"
-                    showApply
                     width={TabletsFilters.CONTROL_WIDTH}
                     placeholder="All"
                     options={types}
