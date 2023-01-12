@@ -21,15 +21,17 @@ describe('PDisk state', () => {
     });
 
     it('Should display as unavailabe when no State is provided', () => {
-        const {getByRole} = renderWithStore(
+        const {getAllByRole} = renderWithStore(
             <MemoryRouter>
                 <PDisk nodeId={1} />
+                <PDisk nodeId={2} data={{State: TPDiskState.ChunkQuotaError}} />
             </MemoryRouter>,
         );
 
-        const disk = getByRole('meter');
+        const [disk1, disk2] = getAllByRole('meter');
 
-        // unavailable disks display with the highest severity
-        expect(disk.className).toMatch(/_red\b/i);
+        // unavailable disks display with the grey color
+        expect(disk1.className).toMatch(/_grey\b/i);
+        expect(disk2.className).not.toMatch(/_grey\b/i);
     });
 });
