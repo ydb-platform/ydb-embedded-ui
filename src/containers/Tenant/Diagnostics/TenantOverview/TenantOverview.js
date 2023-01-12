@@ -171,18 +171,18 @@ class TenantOverview extends React.Component {
                         ))}
                 </div>
                 <div className={b('common-info')}>
-                    {PoolStats ? (
-                        <div>
-                            <div className={b('section-title')}>Pools</div>
+                    <div>
+                        <div className={b('section-title')}>Pools</div>
+                        {PoolStats ? (
                             <div className={b('section', {pools: true})}>
                                 {PoolStats.map((pool, poolIndex) => (
                                     <PoolUsage key={poolIndex} data={pool} />
                                 ))}
                             </div>
-                        </div>
-                    ) : (
-                        <div className="error">no pools data</div>
-                    )}
+                        ) : (
+                            <div className="error">no pools data</div>
+                        )}
+                    </div>
                     <InfoViewer
                         title="Metrics"
                         className={b('section', {metrics: true})}
