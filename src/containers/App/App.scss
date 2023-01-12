@@ -118,17 +118,7 @@ body,
 }
 
 .error {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    margin: 2px;
-    padding: 2px;
-
-    text-align: center;
-
     color: var(--yc-color-text-danger);
-    border-color: var(--yc-color-text-danger);
 }
 
 .data-table__row:hover .entity-status__clipboard-button {
