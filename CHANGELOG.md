@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.2.0...v3.2.1) (2023-01-12)
+
+
+### Bug Fixes
+
+* align standard errors to the left ([cce100c](https://github.com/ydb-platform/ydb-embedded-ui/commit/cce100c5df83243df1fb0bc59d84d0d9b33719e6))
+* **TabletsFilters:** properly display long data in select options ([ea37d9f](https://github.com/ydb-platform/ydb-embedded-ui/commit/ea37d9fc08245ccdd38a6120dd620f59a528879c))
+* **TabletsFilters:** replace constants ([ea948ca](https://github.com/ydb-platform/ydb-embedded-ui/commit/ea948ca86276b5521979105b2ab99546da389e80))
+* **TabletsStatistic:** process different tablets state types ([78798de](https://github.com/ydb-platform/ydb-embedded-ui/commit/78798de984bf4f6133515bb1c440e4fe0d15b07e))
+* **Tenant:** always display Pools heading ([94baeff](https://github.com/ydb-platform/ydb-embedded-ui/commit/94baeff82f9c2c1aecda7c11c3b090125ba9e4b6))
+
 ## [3.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.1.0...v3.2.0) (2023-01-09)
 
 
