@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import ReactList from 'react-list';
@@ -45,7 +45,7 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
     } = useTypedSelector((state) => state.tablets);
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
-    const {TabletStateInfo: tablets = []} = data;
+    const tablets = useMemo(() => data?.TabletStateInfo || [], [data]);
 
     const fetchData = useCallback(
         (isBackground) => {
