@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.2.1...v3.2.2) (2023-01-13)
+
+
+### Bug Fixes
+
+* **Tablets:** fix infinite rerender ([79b3c58](https://github.com/ydb-platform/ydb-embedded-ui/commit/79b3c58fb7c3ff7f123e111189b10f42c5272401))
+
 ## [3.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.2.0...v3.2.1) (2023-01-12)
 
 
