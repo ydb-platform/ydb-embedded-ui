@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 import _ from 'lodash';
+import {escapeRegExp} from 'lodash/fp';
 
 import DataTable from '@yandex-cloud/react-data-table';
 import {Loader, TextInput, Button} from '@gravity-ui/uikit';
@@ -125,7 +126,7 @@ class Tenants extends React.Component {
         } = this.props;
 
         const filteredTenantsBySearch = tenants.filter((item) => {
-            const re = new RegExp(searchQuery, 'i');
+            const re = new RegExp(escapeRegExp(searchQuery), 'i');
             return re.test(item.Name) || re.test(this.getControlPlaneValue(item));
         });
         const filteredTenants = Tenants.filterTenants(filteredTenantsBySearch, filter);
