@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
+import { escapeRegExp } from 'lodash/fp';
 
 import DataTable, {Column} from '@yandex-cloud/react-data-table';
 
@@ -73,7 +74,7 @@ export const Consumers = ({path, type}: ConsumersProps) => {
     const filterConsumersByName = (search: string) => {
         const filteredConsumers = search
             ? consumers.filter((consumer) => {
-                  const re = new RegExp(search, 'i');
+                  const re = new RegExp(escapeRegExp(search), 'i');
                   return re.test(consumer.name);
               })
             : consumers;

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
+import {escapeRegExp} from 'lodash/fp';
 
 import DataTable from '@yandex-cloud/react-data-table';
 import {Loader, TextInput, Label} from '@gravity-ui/uikit';
@@ -126,7 +127,7 @@ class Nodes extends React.Component {
 
         let preparedNodes = searchQuery
             ? nodes.filter((node) => {
-                  const re = new RegExp(searchQuery, 'i');
+                  const re = new RegExp(escapeRegExp(searchQuery), 'i');
                   return node.Host ? re.test(node.Host) || re.test(String(node.NodeId)) : true;
               })
             : nodes;
