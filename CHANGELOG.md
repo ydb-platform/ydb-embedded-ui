@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.2.2...v3.2.3) (2023-01-16)
+
+
+### Bug Fixes
+
+* fix crash on invalid search query ([4d6f551](https://github.com/ydb-platform/ydb-embedded-ui/commit/4d6f551fa4348a05ca3d8d2d6bd8b52ccb6310ee))
+
 ## [3.2.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.2.1...v3.2.2) (2023-01-13)
 
 
