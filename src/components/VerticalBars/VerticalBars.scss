@@ -1,0 +1,17 @@
+.ydb-bars {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+
+    height: 20px;
+
+    &__value {
+        display: flex;
+
+        width: 6px;
+        min-height: 3px;
+        margin-right: 2px;
+
+        background-color: var(--yc-color-infographics-info-heavy);
+    }
+}
