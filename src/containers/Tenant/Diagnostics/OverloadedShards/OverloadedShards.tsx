@@ -6,7 +6,7 @@ import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-t
 import {Loader} from '@gravity-ui/uikit';
 
 import {DateRange, DateRangeValues} from '../../../../components/DateRange';
-import InternalLink from '../../../../components/InternalLink/InternalLink';
+import {InternalLink} from '../../../../components/InternalLink';
 
 import HistoryContext from '../../../../contexts/HistoryContext';
 
