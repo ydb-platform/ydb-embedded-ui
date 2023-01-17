@@ -55,6 +55,9 @@ interface Window {
         getHeatmapData: (params: {
             path: string;
         }) => Promise<import('../types/api/schema').TEvDescribeSchemeResult>;
+        getTopic: (params: {
+            path?: string;
+        }) => Promise<import('../types/api/topic').DescribeTopicResult>;
         [method: string]: Function;
     };
 }

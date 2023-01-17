@@ -17,6 +17,7 @@ import network from './network';
 import pool from './pool';
 import tenants from './tenants';
 import tablet from './tablet';
+import topic from './topic';
 import executeQuery from './executeQuery';
 import explainQuery from './explainQuery';
 import tabletsFilters from './tabletsFilters';
@@ -55,6 +56,7 @@ export const rootReducer = {
     pool,
     tenants,
     tablet,
+    topic,
     executeQuery,
     explainQuery,
     tabletsFilters,
