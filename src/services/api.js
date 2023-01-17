@@ -129,6 +129,13 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             path,
         });
     }
+    getTopic({path}) {
+        return this.get(this.getPath('/viewer/json/describe_topic'), {
+            enums: true,
+            include_stats: true,
+            path,
+        });
+    }
     getPoolInfo(poolName) {
         return this.get(this.getPath('/viewer/json/storage'), {
             pool: poolName,
