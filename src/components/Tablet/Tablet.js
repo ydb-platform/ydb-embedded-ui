@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 
-import InternalLink from '../InternalLink/InternalLink';
+import {InternalLink} from '../InternalLink';
 
 import {getTabletLabel} from '../../utils/constants';
 import routes, {createHref} from '../../routes';

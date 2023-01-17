@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 
 import {Label, Popup} from '@gravity-ui/uikit';
 
-import InternalLink from '../../../components/InternalLink/InternalLink';
+import {InternalLink} from '../../../components/InternalLink';
 import {InfoViewer} from '../../../components/InfoViewer';
 
 import routes, {createHref} from '../../../routes';
