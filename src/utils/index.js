@@ -2,7 +2,7 @@ import numeral from 'numeral';
 import locales from 'numeral/locales'; // eslint-disable-line no-unused-vars
 
 import {i18n} from './i18n';
-import {MEGABYTE, TERABYTE, DAY_IN_SECONDS, GIGABYTE} from './constants';
+import {MEGABYTE, TERABYTE, GIGABYTE, DAY_IN_SECONDS} from './constants';
 import {isNumeric} from './utils';
 
 numeral.locale(i18n.lang);

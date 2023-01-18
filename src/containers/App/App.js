@@ -14,6 +14,10 @@ import {registerLanguages} from '../../utils/monaco';
 
 import './App.scss';
 
+i18n.setLang(Lang.En);
+configureYdbUiComponents({lang: Lang.En});
+configureUiKit({lang: Lang.En});
+
 registerLanguages();
 
 class App extends React.Component {
@@ -23,13 +27,6 @@ class App extends React.Component {
         clusterName: PropTypes.string,
         children: PropTypes.node,
     };
-
-    constructor(props) {
-        super(props);
-        i18n.setLang(Lang.En);
-        configureYdbUiComponents({lang: Lang.En});
-        configureUiKit({lang: Lang.En});
-    }
 
     componentDidMount() {
         const {isAuthenticated, getUser} = this.props;

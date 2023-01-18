@@ -1,0 +1,7 @@
+{
+  "daysHours": "{{days}}д {{hours}}ч",
+  "hoursMin": "{{hours}}ч {{minutes}}м",
+  "minSec": "{{minutes}}м {{seconds}}с",
+  "secMs": "{{seconds}}с {{ms}}мс",
+  "ms": "{{ms}}мс"
+}
