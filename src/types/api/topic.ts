@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 
+import {IProtobufTimeObject} from './common';
 import {Consumer, Entry, MultipleWindowsStat, PartitionStats, SupportedCodecs} from './consumer';
 
 /**
@@ -27,7 +28,7 @@ export interface DescribeTopicResult {
      *
      * How long data in partition should be stored.
      */
-    retention_period?: string;
+    retention_period?: string | IProtobufTimeObject;
 
     /**
      * int64
@@ -98,7 +99,7 @@ interface PartitionInfo {
     partition_stats?: PartitionStats;
 }
 
-interface TopicStats {
+export interface TopicStats {
     /**
      * int64
      *
@@ -111,14 +112,14 @@ interface TopicStats {
      *
      * Minimum of timestamps of last write among all partitions.
      */
-    min_last_write_time?: string;
+    min_last_write_time?: string | IProtobufTimeObject;
 
     /**
      * google.protobuf.Duration
      *
      * Maximum of differences between write timestamp and create timestamp for all messages, written during last minute.
      */
-    max_write_time_lag?: string;
+    max_write_time_lag?: string | IProtobufTimeObject;
 
     /** How much bytes were written statistics. */
     bytes_written?: MultipleWindowsStat;
