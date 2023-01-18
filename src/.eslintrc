@@ -3,8 +3,12 @@
     "rules": {
         "react/jsx-uses-react": "off",
         "react/react-in-jsx-scope": "off",
-        "react-hooks/exhaustive-deps": ["warn", {
-            "additionalHooks": "(useAutofetcher)"
-        }]
+        "react-hooks/exhaustive-deps": [
+            "warn",
+            {
+                "additionalHooks": "(useAutofetcher)"
+            }
+        ],
+        "valid-jsdoc": "off"
     }
 }
