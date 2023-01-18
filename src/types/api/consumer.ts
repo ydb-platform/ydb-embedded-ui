@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
 
+import {IProtobufTimeObject} from './common';
+
 /**
  * endpoint: /json/describe_consumer
  *
@@ -65,27 +67,27 @@ interface PartitionConsumerStats {
      *
      * Timestamp of providing this partition to this session by server.
      */
-    partition_read_session_create_time?: string;
+    partition_read_session_create_time?: string | IProtobufTimeObject;
 
     /**
      * google.protobuf.Timestamp
      *
      * Timestamp of last read from this partition. */
-    last_read_time?: string;
+    last_read_time?: string | IProtobufTimeObject;
 
     /**
      * google.protobuf.Duration
      *
      * Maximum of differences between timestamp of read and write timestamp for all messages, read during last minute.
      */
-    max_read_time_lag?: string;
+    max_read_time_lag?: string | IProtobufTimeObject;
 
     /**
      * google.protobuf.Duration
      *
      * Maximum of differences between write timestamp and create timestamp for all messages, read during last minute.
      */
-    max_write_time_lag?: string;
+    max_write_time_lag?: string | IProtobufTimeObject;
 
     /** How much bytes were read during several windows statistics from this partiton. */
     bytes_read?: MultipleWindowsStat;
@@ -113,14 +115,14 @@ export interface PartitionStats {
      *
      * Timestamp of last write.
      */
-    last_write_time?: string;
+    last_write_time?: string | IProtobufTimeObject;
 
     /**
      * google.protobuf.Duration
      *
      * Maximum of differences between write timestamp and create timestamp for all messages, written during last minute.
      */
-    max_write_time_lag?: string;
+    max_write_time_lag?: string | IProtobufTimeObject;
 
     /** How much bytes were written during several windows in this partition. */
     bytes_written?: MultipleWindowsStat;
@@ -148,7 +150,7 @@ export interface Consumer {
      *
      * All messages with smaller server written_at timestamp will be skipped.
      */
-    read_from?: string;
+    read_from?: string | IProtobufTimeObject;
 
     /**
      * List of supported codecs by this consumer.
@@ -170,21 +172,21 @@ interface ConsumerStats {
      *
      * Minimal timestamp of last read from partitions.
      */
-    min_partitions_last_read_time?: string;
+    min_partitions_last_read_time?: string | IProtobufTimeObject;
 
     /**
      * google.protobuf.Duration
      *
      * Maximum of differences between timestamp of read and write timestamp for all messages, read during last minute.
      */
-    max_read_time_lag?: string;
+    max_read_time_lag?: string | IProtobufTimeObject;
 
     /**
      * google.protobuf.Duration
      *
      * Maximum of differences between write timestamp and create timestamp for all messages, read during last minute.
      */
-    max_write_time_lag?: string;
+    max_write_time_lag?: string | IProtobufTimeObject;
 
     /** Bytes read stastics. */
     bytes_read?: MultipleWindowsStat;
