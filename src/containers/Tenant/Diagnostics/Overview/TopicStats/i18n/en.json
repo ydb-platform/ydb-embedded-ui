@@ -1,0 +1,3 @@
+{
+  "notSupportedVersion": "Topic stats are not supported in the current cluster version. Update cluster version to see topic stats"
+}

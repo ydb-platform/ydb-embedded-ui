@@ -1,0 +1,30 @@
+@import '../../../../../styles/mixins.scss';
+
+.ydb-overview-topic-stats {
+    &__title {
+        @include info-viewer-title();
+    }
+
+    .ydb-loader {
+        margin-top: 50px;
+    }
+
+    .ydb-bars {
+        margin-top: -5px;
+    }
+
+    &__info {
+        .info-viewer__label-text_multiline {
+            max-width: 150px;
+        }
+    }
+
+    &__bytes-written {
+        margin-top: 7px;
+        padding-left: 20px;
+
+        .info-viewer__label {
+            min-width: 180px;
+        }
+    }
+}

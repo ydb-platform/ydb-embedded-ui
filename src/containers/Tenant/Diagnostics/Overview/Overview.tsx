@@ -6,20 +6,17 @@ import {Loader} from '@gravity-ui/uikit';
 
 //@ts-ignore
 import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';
-import {
-    CDCStreamInfo,
-    TableIndexInfo,
-    PersQueueGroupInfo,
-} from '../../../../components/InfoViewer/schemaInfo';
+import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 
-import {
-    EPathType,
-    TEvDescribeSchemeResult,
-} from '../../../../types/api/schema';
+import {TopicInfo} from './TopicInfo';
+import {ChangefeedInfo} from './ChangefeedInfo';
+
+import {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {
     isEntityWithMergedImplementation,
     isColumnEntityType,
     isTableType,
+    isPathTypeWithTopic,
 } from '../../utils/schema';
 //@ts-ignore
 import {
@@ -28,6 +25,7 @@ import {
     resetLoadingState,
     selectSchemaMergedChildrenPaths,
 } from '../../../../store/reducers/schema';
+import {getTopic} from '../../../../store/reducers/topic';
 //@ts-ignore
 import {
     getOlapStats,
@@ -122,6 +120,10 @@ function Overview({type, tenantName, className}: OverviewProps) {
                 }
                 dispatch(getOlapStats({path: schemaPath}));
             }
+
+            if (isPathTypeWithTopic(type)) {
+                dispatch(getTopic(currentSchemaPath));
+            }
         },
         [
             tenantName,
@@ -163,9 +165,9 @@ function Overview({type, tenantName, className}: OverviewProps) {
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
             [EPathType.EPathTypeCdcStream]: () => (
-                <CDCStreamInfo data={schemaData} childrenPaths={mergedChildrenPaths} />
+                <ChangefeedInfo data={schemaData} childrenPaths={mergedChildrenPaths} />
             ),
-            [EPathType.EPathTypePersQueueGroup]: () => <PersQueueGroupInfo data={schemaData} />,
+            [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={schemaData} />,
         };
 
         return (
@@ -175,11 +177,11 @@ function Overview({type, tenantName, className}: OverviewProps) {
         );
     };
 
-    return (loading && !wasLoaded) || (isEntityWithMergedImpl && !mergedChildrenPaths) ? (
-        renderLoader()
-    ) : (
-        <div className={className}>{renderContent()}</div>
-    );
+    if ((loading && !wasLoaded) || (isEntityWithMergedImpl && !mergedChildrenPaths)) {
+        return renderLoader();
+    }
+
+    return <div className={className}>{renderContent()}</div>;
 }
 
 export default Overview;

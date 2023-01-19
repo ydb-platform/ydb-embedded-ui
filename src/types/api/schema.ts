@@ -479,7 +479,7 @@ interface TKeyComponentSchema {
     TypeId?: number;
 }
 
-enum EMeteringMode {
+export enum EMeteringMode {
     METERING_MODE_RESERVED_CAPACITY = 'METERING_MODE_RESERVED_CAPACITY',
     METERING_MODE_REQUEST_UNITS = 'METERING_MODE_REQUEST_UNITS',
 }
@@ -526,7 +526,7 @@ interface TMirrorPartitionConfig {
     SyncWriteTime?: boolean;
 }
 
-interface TPQPartitionConfig {
+export interface TPQPartitionConfig {
     MaxCountInPartition?: number;
     /** int64 */
     MaxSizeInPartition?: string;
@@ -559,7 +559,7 @@ interface TPQPartitionConfig {
     MirrorFrom?: TMirrorPartitionConfig;
 }
 
-interface TPQTabletConfig {
+export interface TPQTabletConfig {
     /** uint64 */
     CacheSize?: string;
     PartitionConfig: TPQPartitionConfig;
