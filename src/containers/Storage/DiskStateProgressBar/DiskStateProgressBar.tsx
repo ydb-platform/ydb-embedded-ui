@@ -9,21 +9,27 @@ import './DiskStateProgressBar.scss';
 
 const b = cn('storage-disk-progress-bar');
 
-export const diskProgressColors = {
-    0: 'Grey',
-    1: 'Green',
-    2: 'Blue',
-    3: 'Yellow',
-    4: 'Orange',
-    5: 'Red',
-};
+// numeric enum to allow ordinal comparison
+export enum EDiskStateSeverity {
+    Grey = 0,
+    Green = 1,
+    Blue = 2,
+    Yellow = 3,
+    Orange = 4,
+    Red = 5,
+}
+
+const severityToColor = Object.entries(EDiskStateSeverity).reduce(
+    (acc, [color, severity]) => ({...acc, [severity]: color}),
+    {} as Record<EDiskStateSeverity, keyof typeof EDiskStateSeverity>,
+);
 
 interface DiskStateProgressBarProps {
     diskAllocatedPercent?: number;
-    severity?: keyof typeof diskProgressColors;
+    severity?: EDiskStateSeverity;
 }
 
-function DiskStateProgressBar({
+export function DiskStateProgressBar({
     diskAllocatedPercent = -1,
     severity,
 }: DiskStateProgressBarProps) {
@@ -46,8 +52,10 @@ function DiskStateProgressBar({
     };
 
     const mods: Record<string, boolean | undefined> = {inverted};
-    if (severity !== undefined && severity in diskProgressColors) {
-        mods[diskProgressColors[severity].toLocaleLowerCase()] = true;
+
+    const color = severity && severityToColor[severity];
+    if (color) {
+        mods[color.toLocaleLowerCase()] = true;
     }
 
     return (
@@ -63,5 +71,3 @@ function DiskStateProgressBar({
         </div>
     );
 }
-
-export default DiskStateProgressBar;

@@ -8,6 +8,7 @@ import {InternalLink} from '../../../components/InternalLink';
 
 import routes, {createHref} from '../../../routes';
 import type {RequiredField} from '../../../types';
+import {EFlag} from '../../../types/api/enums';
 import {TPDiskStateInfo, TPDiskState} from '../../../types/api/pdisk';
 import {getPDiskId} from '../../../utils';
 import {getPDiskType} from '../../../utils/pdisk';
@@ -15,31 +16,29 @@ import {bytesToGB} from '../../../utils/utils';
 
 import {STRUCTURE} from '../../Node/NodePages';
 
-import DiskStateProgressBar, {
-    diskProgressColors,
-} from '../DiskStateProgressBar/DiskStateProgressBar';
+import {DiskStateProgressBar, EDiskStateSeverity} from '../DiskStateProgressBar';
 
-import {colorSeverity, NOT_AVAILABLE_SEVERITY} from '../utils';
+import {NOT_AVAILABLE_SEVERITY} from '../utils';
 
 import './Pdisk.scss';
 
 const b = cn('pdisk-storage');
 
 const stateSeverity = {
-    [TPDiskState.Initial]: 0,
-    [TPDiskState.Normal]: 1,
-    [TPDiskState.InitialFormatRead]: 3,
-    [TPDiskState.InitialSysLogRead]: 3,
-    [TPDiskState.InitialCommonLogRead]: 3,
-    [TPDiskState.InitialFormatReadError]: 5,
-    [TPDiskState.InitialSysLogReadError]: 5,
-    [TPDiskState.InitialSysLogParseError]: 5,
-    [TPDiskState.InitialCommonLogReadError]: 5,
-    [TPDiskState.InitialCommonLogParseError]: 5,
-    [TPDiskState.CommonLoggerInitError]: 5,
-    [TPDiskState.OpenFileError]: 5,
-    [TPDiskState.ChunkQuotaError]: 5,
-    [TPDiskState.DeviceIoError]: 5,
+    [TPDiskState.Initial]: EDiskStateSeverity.Grey,
+    [TPDiskState.Normal]: EDiskStateSeverity.Green,
+    [TPDiskState.InitialFormatRead]: EDiskStateSeverity.Yellow,
+    [TPDiskState.InitialSysLogRead]: EDiskStateSeverity.Yellow,
+    [TPDiskState.InitialCommonLogRead]: EDiskStateSeverity.Yellow,
+    [TPDiskState.InitialFormatReadError]: EDiskStateSeverity.Red,
+    [TPDiskState.InitialSysLogReadError]: EDiskStateSeverity.Red,
+    [TPDiskState.InitialSysLogParseError]: EDiskStateSeverity.Red,
+    [TPDiskState.InitialCommonLogReadError]: EDiskStateSeverity.Red,
+    [TPDiskState.InitialCommonLogParseError]: EDiskStateSeverity.Red,
+    [TPDiskState.CommonLoggerInitError]: EDiskStateSeverity.Red,
+    [TPDiskState.OpenFileError]: EDiskStateSeverity.Red,
+    [TPDiskState.ChunkQuotaError]: EDiskStateSeverity.Red,
+    [TPDiskState.DeviceIoError]: EDiskStateSeverity.Red,
 };
 
 type PDiskProps = RequiredField<TPDiskStateInfo, 'NodeId'>;
@@ -75,9 +74,9 @@ function Pdisk(props: PDiskProps) {
     const preparePdiskData = () => {
         const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Device} = props;
         const errorColors = [
-            diskProgressColors[colorSeverity.Orange as keyof typeof diskProgressColors],
-            diskProgressColors[colorSeverity.Red as keyof typeof diskProgressColors],
-            diskProgressColors[colorSeverity.Yellow as keyof typeof diskProgressColors],
+            EFlag.Orange,
+            EFlag.Red,
+            EFlag.Yellow,
         ];
 
         const pdiskData: {label: string; value: string | number}[] = [
@@ -141,7 +140,7 @@ function Pdisk(props: PDiskProps) {
                 >
                     <DiskStateProgressBar
                         diskAllocatedPercent={pdiskAllocatedPercent}
-                        severity={severity as keyof typeof diskProgressColors}
+                        severity={severity}
                     />
                     <div className={b('media-type')}>{getPDiskType(props)}</div>
                 </InternalLink>

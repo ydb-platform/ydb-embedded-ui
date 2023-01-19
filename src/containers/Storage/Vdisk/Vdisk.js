@@ -8,17 +8,16 @@ import {InternalLink} from '../../../components/InternalLink';
 import {InfoViewer} from '../../../components/InfoViewer';
 
 import routes, {createHref} from '../../../routes';
+import {EFlag} from '../../../types/api/enums';
 import {stringifyVdiskId, getPDiskId} from '../../../utils';
 import {getPDiskType} from '../../../utils/pdisk';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 
 import {STRUCTURE} from '../../Node/NodePages';
 
-import DiskStateProgressBar, {
-    diskProgressColors,
-} from '../DiskStateProgressBar/DiskStateProgressBar';
+import {DiskStateProgressBar, EDiskStateSeverity} from '../DiskStateProgressBar';
 
-import {colorSeverity, NOT_AVAILABLE_SEVERITY} from '../utils';
+import {NOT_AVAILABLE_SEVERITY} from '../utils';
 
 import './Vdisk.scss';
 
@@ -37,12 +36,12 @@ const propTypes = {
 };
 
 const stateSeverity = {
-    Initial: 3,
-    LocalRecoveryError: 5,
-    SyncGuidRecoveryError: 5,
-    SyncGuidRecovery: 3,
-    PDiskError: 5,
-    OK: 1,
+    Initial: EDiskStateSeverity.Yellow,
+    LocalRecoveryError: EDiskStateSeverity.Red,
+    SyncGuidRecoveryError: EDiskStateSeverity.Red,
+    SyncGuidRecovery: EDiskStateSeverity.Yellow,
+    PDiskError: EDiskStateSeverity.Red,
+    OK: EDiskStateSeverity.Green,
 };
 
 const getStateSeverity = (vDiskState) => {
@@ -50,7 +49,7 @@ const getStateSeverity = (vDiskState) => {
 };
 
 const getColorSeverity = (color) => {
-    return colorSeverity[color] ?? colorSeverity.Grey;
+    return EDiskStateSeverity[color] ?? EDiskStateSeverity.Grey;
 };
 
 function Vdisk(props) {
@@ -71,14 +70,14 @@ function Vdisk(props) {
 
         const DiskSpaceSeverity = getColorSeverity(DiskSpace);
         const VDiskSpaceSeverity = getStateSeverity(VDiskState);
-        const FrontQueuesSeverity = Math.min(colorSeverity.Orange, getColorSeverity(FrontQueues));
+        const FrontQueuesSeverity = Math.min(EDiskStateSeverity.Orange, getColorSeverity(FrontQueues));
 
         let newSeverity = Math.max(DiskSpaceSeverity, VDiskSpaceSeverity, FrontQueuesSeverity);
 
         // donors are always in the not replicated state since they are leftovers
         // painting them blue is useless
-        if (!Replicated && !DonorMode && newSeverity === colorSeverity.Green) {
-            newSeverity = colorSeverity.Blue;
+        if (!Replicated && !DonorMode && newSeverity === EDiskStateSeverity.Green) {
+            newSeverity = EDiskStateSeverity.Blue;
         }
 
         setSeverity(newSeverity);
@@ -111,14 +110,14 @@ function Vdisk(props) {
         PoolName && vdiskData.push({label: 'StoragePool', value: PoolName});
 
         SatisfactionRank &&
-            SatisfactionRank.FreshRank?.Flag !== diskProgressColors[colorSeverity.Green] &&
+            SatisfactionRank.FreshRank?.Flag !== EFlag.Green &&
             vdiskData.push({
                 label: 'Fresh',
                 value: SatisfactionRank.FreshRank.Flag,
             });
 
         SatisfactionRank &&
-            SatisfactionRank.LevelRank?.Flag !== diskProgressColors[colorSeverity.Green] &&
+            SatisfactionRank.LevelRank?.Flag !== EFlag.Green &&
             vdiskData.push({
                 label: 'Level',
                 value: SatisfactionRank.LevelRank.Flag,
@@ -139,11 +138,11 @@ function Vdisk(props) {
             });
 
         DiskSpace &&
-            DiskSpace !== diskProgressColors[colorSeverity.Green] &&
+            DiskSpace !== EFlag.Green &&
             vdiskData.push({label: 'Space', value: DiskSpace});
 
         FrontQueues &&
-            FrontQueues !== diskProgressColors[colorSeverity.Green] &&
+            FrontQueues !== EFlag.Green &&
             vdiskData.push({label: 'FrontQueues', value: FrontQueues});
 
         !Replicated && vdiskData.push({label: 'Replicated', value: 'NO'});
@@ -171,9 +170,9 @@ function Vdisk(props) {
     const preparePdiskData = () => {
         const {PDisk, nodes} = props;
         const errorColors = [
-            diskProgressColors[colorSeverity.Orange],
-            diskProgressColors[colorSeverity.Red],
-            diskProgressColors[colorSeverity.Yellow],
+            EFlag.Orange,
+            EFlag.Red,
+            EFlag.Yellow,
         ];
         if (PDisk && nodes) {
             const pdiskData = [{label: 'PDisk', value: getPDiskId(PDisk)}];
