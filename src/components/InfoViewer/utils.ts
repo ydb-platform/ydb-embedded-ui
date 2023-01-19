@@ -1,5 +1,7 @@
 import type {ReactNode} from 'react';
 
+import {InfoViewerItem} from './InfoViewer';
+
 type LabelMap<T> = {
     [label in keyof T]?: string;
 };
@@ -40,3 +42,16 @@ export function createInfoFormatter<Shape extends Record<string, any>>({
         value: formatValue(label, value, valueFormatters || {}, defaultValueFormatter),
     });
 }
+
+export const formatObject = <Shape extends Record<string, any>>(
+    formatter: <Key extends keyof Shape>(value: Key, label: Shape[Key]) => InfoViewerItem,
+    obj?: Partial<Shape>,
+): InfoViewerItem[] => {
+    if (!obj) {
+        return [];
+    }
+
+    return Object.entries(obj)
+        .map(([label, value]) => formatter(label, value))
+        .filter(({value}) => Boolean(value));
+};

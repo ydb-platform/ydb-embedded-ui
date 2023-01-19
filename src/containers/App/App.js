@@ -2,10 +2,6 @@ import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
-import {configure as configureUiKit} from '@gravity-ui/uikit';
-import {configure as configureYdbUiComponents} from 'ydb-ui-components';
-import {i18n, Lang} from '../../utils/i18n';
-
 import ContentWrapper, {Content} from './Content';
 import AsideNavigation from '../AsideNavigation/AsideNavigation';
 
@@ -13,10 +9,6 @@ import {getUser} from '../../store/reducers/authentication';
 import {registerLanguages} from '../../utils/monaco';
 
 import './App.scss';
-
-i18n.setLang(Lang.En);
-configureYdbUiComponents({lang: Lang.En});
-configureUiKit({lang: Lang.En});
 
 registerLanguages();
 
