@@ -44,6 +44,7 @@ export enum TPDiskState {
     ChunkQuotaError = 'ChunkQuotaError',
     DeviceIoError = 'DeviceIoError',
 
+    // these can't be sent to UI
     Missing = 'Missing',
     Timeout = 'Timeout',
     NodeDisconnected = 'NodeDisconnected',
