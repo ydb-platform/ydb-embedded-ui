@@ -27,15 +27,21 @@ const severityToColor = Object.entries(EDiskStateSeverity).reduce(
 interface DiskStateProgressBarProps {
     diskAllocatedPercent?: number;
     severity?: EDiskStateSeverity;
+    compact?: boolean;
 }
 
 export function DiskStateProgressBar({
     diskAllocatedPercent = -1,
     severity,
+    compact,
 }: DiskStateProgressBarProps) {
     const inverted = useSelector((state) => JSON.parse(getSettingValue(state, INVERTED_DISKS_KEY)));
 
     const renderAllocatedPercent = () => {
+        if (compact) {
+            return <div className={b('filled')} style={{width: '100%'}} />;
+        }
+
         return (
             diskAllocatedPercent >= 0 && (
                 <React.Fragment>
@@ -55,7 +61,7 @@ export function DiskStateProgressBar({
         );
     };
 
-    const mods: Record<string, boolean | undefined> = {inverted};
+    const mods: Record<string, boolean | undefined> = {inverted, compact};
 
     const color = severity !== undefined && severityToColor[severity];
     if (color) {

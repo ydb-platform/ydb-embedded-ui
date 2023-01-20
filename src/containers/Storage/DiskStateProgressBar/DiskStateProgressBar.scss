@@ -1,7 +1,7 @@
 .storage-disk-progress-bar {
     $block: &;
 
-    $border-width: 2px;
+    $border-width: 1px;
     $outer-border-radius: 4px;
     $inner-border-radius: $outer-border-radius - $border-width;
 
@@ -10,7 +10,7 @@
     display: block;
 
     min-width: 50px;
-    height: var(--yc-text-body-2-line-height);
+    height: var(--yc-text-body-3-line-height);
 
     text-align: center;
 
@@ -18,6 +18,17 @@
     border: $border-width solid var(--yc-color-infographics-misc-heavy);
     border-radius: $outer-border-radius;
     background-color: var(--yc-color-infographics-misc-light);
+
+    &_compact {
+        min-width: 0;
+        height: 12px;
+
+        border-radius: 2px;
+
+        #{$block}__filled {
+            border-radius: 1px;
+        }
+    }
 
     #{$block}__filled {
         background-color: var(--yc-color-infographics-misc-medium);
@@ -89,7 +100,7 @@
 
         font-size: var(--yc-text-body-1-font-size);
         // bar height minus borders
-        line-height: calc(var(--yc-text-body-2-line-height) - #{$border-width * 2});
+        line-height: calc(var(--yc-text-body-3-line-height) - #{$border-width * 2});
 
         color: inherit;
     }

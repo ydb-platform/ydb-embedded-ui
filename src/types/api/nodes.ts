@@ -1,6 +1,7 @@
 import {EFlag} from './enums';
 import {TPDiskStateInfo} from './pdisk';
 import {TTabletStateInfo} from './tablet';
+import {TVDiskStateInfo} from './vdisk';
 
 // endpoint: /viewer/json/nodes
 // source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
@@ -19,6 +20,7 @@ export interface TNodeInfo {
     NodeId: number;
     SystemState: TSystemStateInfo;
     PDisks?: TPDiskStateInfo[];
+    VDisks?: TVDiskStateInfo[];
     Tablets?: TTabletStateInfo[];
 }
 

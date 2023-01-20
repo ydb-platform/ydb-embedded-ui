@@ -10,6 +10,7 @@ export interface TVDiskStateInfo {
     CreateTime?: string;
     /** uint64 */
     ChangeTime?: string;
+    PDiskId?: number;
     PDisk?: TPDiskStateInfo;
     VDiskSlotId?: number;
     /** uint64 */
