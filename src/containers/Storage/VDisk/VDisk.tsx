@@ -49,9 +49,10 @@ interface VDiskProps {
     data?: TVDiskStateInfo;
     poolName?: string;
     nodes?: NodesHosts;
+    compact?: boolean;
 }
 
-export const VDisk = ({data = {}, poolName, nodes}: VDiskProps) => {
+export const VDisk = ({data = {}, poolName, nodes, compact}: VDiskProps) => {
     const [severity, setSeverity] = useState(getStateSeverity(data.VDiskState));
     const [isPopupVisible, setIsPopupVisible] = useState(false);
 
@@ -131,12 +132,14 @@ export const VDisk = ({data = {}, poolName, nodes}: VDiskProps) => {
                         <DiskStateProgressBar
                             diskAllocatedPercent={vdiskAllocatedPercent}
                             severity={severity}
+                            compact={compact}
                         />
                     </InternalLink>
                 ) : (
                     <DiskStateProgressBar
                         diskAllocatedPercent={vdiskAllocatedPercent}
                         severity={severity}
+                        compact={compact}
                     />
                 )}
             </div>

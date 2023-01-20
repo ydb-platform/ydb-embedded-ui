@@ -128,7 +128,7 @@ export const VDiskPopup = ({data, poolName, nodes, ...props}: VDiskPopupProps) =
         >
             {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
             <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
-            <InfoViewer title="PDisk" info={pdiskInfo} size="s" />
+            {pdiskInfo && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
         </Popup>
     );
 };

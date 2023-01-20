@@ -317,6 +317,19 @@ export const getFlatListStorageNodes = createSelector([getStorageNodes], (storag
     });
 });
 
+export const getVDisksForPDisk = createSelector(
+    getStorageNodes,
+    (_state, nodeId) => nodeId,
+    (_state, _nodeId, pdiskId) => pdiskId,
+    (storageNodes, nodeId, pdiskId) => {
+        const targetNode = storageNodes?.find((node) => node.NodeId === nodeId);
+        return targetNode?.VDisks?.filter((vdisk) => vdisk.PDiskId === pdiskId).map((data) => ({
+            ...data,
+            NodeId: nodeId,
+        }));
+    },
+);
+
 export const getFlatListStorage = createSelector(
     [getStorageType, getFlatListStorageGroups, getFlatListStorageNodes],
     (storageType, groupsList, nodesList) => {

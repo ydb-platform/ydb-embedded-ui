@@ -183,7 +183,10 @@ function StorageNodes({
             theme="yandex-cloud"
             data={data}
             columns={columns}
-            settings={tableSettings}
+            settings={{
+                ...tableSettings,
+                dynamicRenderType: 'variable',
+            }}
             initialSortOrder={setSortOrder(visibleEntities)}
             emptyDataMessage={i18n('empty.default')}
         />

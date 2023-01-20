@@ -3,10 +3,24 @@
 
     width: 120px;
 
-    border-radius: 4px; // to match interactive area with disk shape
-
     &__content {
+        position: relative;
+
         border-radius: 4px; // to match interactive area with disk shape
+    }
+
+    &__vdisks {
+        display: flex;
+        // this breaks disks relative sizes, but disks rarely exceed one line
+        flex-wrap: wrap;
+        gap: 2px;
+
+        margin-bottom: 4px;
+    }
+
+    &__vdisks-item {
+        flex-basis: 5px;
+        flex-shrink: 0;
     }
 
     &__media-type {
@@ -15,6 +29,7 @@
         right: 4px;
 
         font-size: var(--yc-text-body-1-font-size);
+        line-height: var(--yc-text-body-3-line-height);
 
         color: var(--yc-color-text-secondary);
     }

@@ -4,13 +4,18 @@ import cn from 'bem-cn-lite';
 import {InternalLink} from '../../../components/InternalLink';
 
 import routes, {createHref} from '../../../routes';
+import {getVDisksForPDisk} from '../../../store/reducers/storage';
 import {TPDiskStateInfo, TPDiskState} from '../../../types/api/pdisk';
+import {TVDiskStateInfo} from '../../../types/api/vdisk';
+import {stringifyVdiskId} from '../../../utils';
+import {useTypedSelector} from '../../../utils/hooks';
 import {getPDiskType} from '../../../utils/pdisk';
 
 import {STRUCTURE} from '../../Node/NodePages';
 
 import {DiskStateProgressBar, EDiskStateSeverity} from '../DiskStateProgressBar';
 import {PDiskPopup} from '../PDiskPopup';
+import {VDisk} from '../VDisk';
 
 import {NOT_AVAILABLE_SEVERITY} from '../utils';
 
@@ -51,6 +56,12 @@ export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
     // NodeId in data is required for the popup
     const data = useMemo(() => ({...rawData, NodeId: nodeId}), [rawData, nodeId]);
 
+    const vdisks: TVDiskStateInfo[] | undefined = useTypedSelector((state) =>
+        // @ts-expect-error selector is correct, but js infers broken type
+        // unignore after rewriting reducer in ts
+        getVDisksForPDisk(state, nodeId, data.PDiskId),
+    );
+
     const [severity, setSeverity] = useState(getStateSeverity(data.State));
     const [isPopupVisible, setIsPopupVisible] = useState(false);
 
@@ -83,10 +94,35 @@ export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
             : undefined;
     }, [data]);
 
+    const renderVDisks = () => {
+        if (!vdisks?.length) {
+            return null;
+        }
+
+        return (
+            <div className={b('vdisks')}>
+                {vdisks.map((vdisk) => (
+                    <div
+                        key={stringifyVdiskId(vdisk.VDiskId)}
+                        className={b('vdisks-item')}
+                        style={{
+                            // 1 is small enough for empty disks to be of the minimum width
+                            // but if all of them are empty, `flex-grow: 1` would size them evenly
+                            flexGrow: (Number(vdisk.AllocatedSize) || 1),
+                        }}
+                    >
+                        <VDisk data={vdisk} compact />
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
     return (
         <React.Fragment>
             <PDiskPopup data={data} anchorRef={anchor} open={isPopupVisible} />
-            <div className={b()} ref={anchor} onMouseEnter={showPopup} onMouseLeave={hidePopup}>
+            <div className={b()} ref={anchor}>
+                {renderVDisks()}
                 <InternalLink
                     to={createHref(
                         routes.node,
@@ -94,6 +130,8 @@ export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
                         {pdiskId: data.PDiskId || ''},
                     )}
                     className={b('content')}
+                    onMouseEnter={showPopup}
+                    onMouseLeave={hidePopup}
                 >
                     <DiskStateProgressBar
                         diskAllocatedPercent={pdiskAllocatedPercent}
