@@ -4,19 +4,4 @@
     &__content {
         border-radius: 4px; // to match interactive area with disk shape
     }
-
-    &__popup-wrapper {
-        padding: 12px;
-
-        .info-viewer + .info-viewer {
-            margin-top: 8px;
-            padding-top: 8px;
-
-            border-top: 1px solid var(--yc-color-line-generic);
-        }
-    }
-
-    &__donor-label {
-        margin-bottom: 8px;
-    }
 }

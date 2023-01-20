@@ -17,7 +17,12 @@ const b = cn('pdisk-storage-popup');
 
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
-const preparePDiskData = (data: TPDiskStateInfo) => {
+export type NodesHosts = {
+    // NodeId => Host
+    [nodeId: number]: string;
+}
+
+export const preparePDiskData = (data: TPDiskStateInfo, nodes?: NodesHosts) => {
     const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Device} = data;
 
     const pdiskData: InfoViewerItem[] = [
@@ -28,6 +33,10 @@ const preparePDiskData = (data: TPDiskStateInfo) => {
 
     if (NodeId) {
         pdiskData.push({label: 'Node Id', value: NodeId});
+    }
+
+    if (nodes && NodeId && nodes[NodeId]) {
+        pdiskData.push({label: 'Host', value: nodes[NodeId]});
     }
 
     if (Path) {
@@ -52,10 +61,11 @@ const preparePDiskData = (data: TPDiskStateInfo) => {
 
 interface PDiskPopupProps extends PopupProps {
     data: TPDiskStateInfo;
+    nodes?: NodesHosts;
 }
 
-export const PDiskPopup = ({data, ...props}: PDiskPopupProps) => {
-    const info = useMemo(() => preparePDiskData(data), [data]);
+export const PDiskPopup = ({data, nodes, ...props}: PDiskPopupProps) => {
+    const info = useMemo(() => preparePDiskData(data, nodes), [data, nodes]);
 
     return (
         <Popup
