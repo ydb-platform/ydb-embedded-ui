@@ -93,21 +93,4 @@
 
         color: inherit;
     }
-
-    &__link {
-        display: flex;
-        justify-content: center;
-
-        // extend active area to include borders
-        height: var(--yc-text-body-2-line-height);
-        margin: -$border-width;
-        padding: $border-width;
-
-        color: inherit;
-        border-radius: $outer-border-radius;
-
-        &:hover {
-            color: inherit;
-        }
-    }
 }
