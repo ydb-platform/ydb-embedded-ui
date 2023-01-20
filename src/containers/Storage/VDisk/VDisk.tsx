@@ -1,14 +1,14 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
-import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 
 import {Label, Popup} from '@gravity-ui/uikit';
 
 import {InternalLink} from '../../../components/InternalLink';
-import {InfoViewer} from '../../../components/InfoViewer';
+import {InfoViewer, InfoViewerItem} from '../../../components/InfoViewer';
 
 import routes, {createHref} from '../../../routes';
 import {EFlag} from '../../../types/api/enums';
+import {EVDiskState, TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId, getPDiskId} from '../../../utils';
 import {getPDiskType} from '../../../utils/pdisk';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
@@ -19,23 +19,11 @@ import {DiskStateProgressBar, EDiskStateSeverity} from '../DiskStateProgressBar'
 
 import {NOT_AVAILABLE_SEVERITY} from '../utils';
 
-import './Vdisk.scss';
+import './VDisk.scss';
 
 const b = cn('vdisk-storage');
 
-const propTypes = {
-    SatisfactionRank: PropTypes.object,
-    VDiskState: PropTypes.string,
-    DiskSpace: PropTypes.string,
-    FrontQueues: PropTypes.string,
-    Replicated: PropTypes.bool,
-    PoolName: PropTypes.string,
-    VDiskId: PropTypes.object,
-    DonorMode: PropTypes.bool,
-    nodes: PropTypes.object,
-};
-
-const stateSeverity = {
+const stateSeverity: Record<EVDiskState, EDiskStateSeverity> = {
     Initial: EDiskStateSeverity.Yellow,
     LocalRecoveryError: EDiskStateSeverity.Red,
     SyncGuidRecoveryError: EDiskStateSeverity.Red,
@@ -44,23 +32,40 @@ const stateSeverity = {
     OK: EDiskStateSeverity.Green,
 };
 
-const getStateSeverity = (vDiskState) => {
+const getStateSeverity = (vDiskState?: EVDiskState) => {
+    if (!vDiskState) {
+        return NOT_AVAILABLE_SEVERITY;
+    }
+
     return stateSeverity[vDiskState] ?? NOT_AVAILABLE_SEVERITY;
 };
 
-const getColorSeverity = (color) => {
+const getColorSeverity = (color?: EFlag) => {
+    if (!color) {
+        return EDiskStateSeverity.Grey;
+    }
+
     return EDiskStateSeverity[color] ?? EDiskStateSeverity.Grey;
 };
 
-function Vdisk(props) {
-    const [severity, setSeverity] = useState(getStateSeverity(props.VDiskState));
+interface VDiskProps {
+    data?: TVDiskStateInfo;
+    poolName?: string;
+    /** NodeId => Host */
+    nodes?: {
+        [nodeId: number]: string;
+    };
+}
+
+export const VDisk = ({data = {}, poolName, nodes}: VDiskProps) => {
+    const [severity, setSeverity] = useState(getStateSeverity(data.VDiskState));
     const [isPopupVisible, setIsPopupVisible] = useState(false);
 
-    const anchor = useRef();
+    const anchor = useRef(null);
 
     // determine disk status severity
     useEffect(() => {
-        const {DiskSpace, VDiskState, FrontQueues, Replicated, DonorMode} = props;
+        const {DiskSpace, VDiskState, FrontQueues, Replicated, DonorMode} = data;
 
         // if the disk is not available, this determines its status severity regardless of other features
         if (!VDiskState) {
@@ -70,7 +75,10 @@ function Vdisk(props) {
 
         const DiskSpaceSeverity = getColorSeverity(DiskSpace);
         const VDiskSpaceSeverity = getStateSeverity(VDiskState);
-        const FrontQueuesSeverity = Math.min(EDiskStateSeverity.Orange, getColorSeverity(FrontQueues));
+        const FrontQueuesSeverity = Math.min(
+            EDiskStateSeverity.Orange,
+            getColorSeverity(FrontQueues),
+        );
 
         let newSeverity = Math.max(DiskSpaceSeverity, VDiskSpaceSeverity, FrontQueuesSeverity);
 
@@ -81,7 +89,7 @@ function Vdisk(props) {
         }
 
         setSeverity(newSeverity);
-    }, [props.VDiskState, props.DiskSpace, props.FrontQueues, props.Replicated]);
+    }, [data]);
 
     const showPopup = () => {
         setIsPopupVisible(true);
@@ -90,12 +98,12 @@ function Vdisk(props) {
     const hidePopup = () => {
         setIsPopupVisible(false);
     };
-    /* eslint-disable */
+
+    /* eslint-disable @typescript-eslint/no-unused-expressions */
     const prepareVdiskData = () => {
         const {
             VDiskId,
             VDiskState,
-            PoolName,
             SatisfactionRank,
             DiskSpace,
             FrontQueues,
@@ -104,23 +112,23 @@ function Vdisk(props) {
             AllocatedSize,
             ReadThroughput,
             WriteThroughput,
-        } = props;
-        const vdiskData = [{label: 'VDisk', value: stringifyVdiskId(VDiskId)}];
+        } = data;
+        const vdiskData: InfoViewerItem[] = [{label: 'VDisk', value: stringifyVdiskId(VDiskId)}];
         vdiskData.push({label: 'State', value: VDiskState ?? 'not available'});
-        PoolName && vdiskData.push({label: 'StoragePool', value: PoolName});
+        poolName && vdiskData.push({label: 'StoragePool', value: poolName});
 
         SatisfactionRank &&
             SatisfactionRank.FreshRank?.Flag !== EFlag.Green &&
             vdiskData.push({
                 label: 'Fresh',
-                value: SatisfactionRank.FreshRank.Flag,
+                value: SatisfactionRank.FreshRank?.Flag,
             });
 
         SatisfactionRank &&
             SatisfactionRank.LevelRank?.Flag !== EFlag.Green &&
             vdiskData.push({
                 label: 'Level',
-                value: SatisfactionRank.LevelRank.Flag,
+                value: SatisfactionRank.LevelRank?.Flag,
             });
 
         SatisfactionRank &&
@@ -168,14 +176,10 @@ function Vdisk(props) {
     };
 
     const preparePdiskData = () => {
-        const {PDisk, nodes} = props;
-        const errorColors = [
-            EFlag.Orange,
-            EFlag.Red,
-            EFlag.Yellow,
-        ];
+        const {PDisk} = data;
+        const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
         if (PDisk && nodes) {
-            const pdiskData = [{label: 'PDisk', value: getPDiskId(PDisk)}];
+            const pdiskData: InfoViewerItem[] = [{label: 'PDisk', value: getPDiskId(PDisk)}];
             pdiskData.push({
                 label: 'State',
                 value: PDisk.State || 'not available',
@@ -190,15 +194,17 @@ function Vdisk(props) {
                 label: 'Available',
                 value: `${bytesToGB(PDisk.AvailableSize)} of ${bytesToGB(PDisk.TotalSize)}`,
             });
-            errorColors.includes(PDisk.Realtime) &&
+            PDisk.Realtime &&
+                errorColors.includes(PDisk.Realtime) &&
                 pdiskData.push({label: 'Realtime', value: PDisk.Realtime});
-            errorColors.includes(PDisk.Device) &&
+            PDisk.Device &&
+                errorColors.includes(PDisk.Device) &&
                 pdiskData.push({label: 'Device', value: PDisk.Device});
             return pdiskData;
         }
-        return null;
+        return undefined;
     };
-    /* eslint-enable */
+    /* eslint-enable @typescript-eslint/no-unused-expressions */
 
     const renderPopup = () => (
         <Popup
@@ -210,22 +216,14 @@ function Vdisk(props) {
             // matches the default offset for popup with arrow out of a sense of beauty
             offset={[0, 12]}
         >
-            {props.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
-            <InfoViewer
-                title="VDisk"
-                info={prepareVdiskData()}
-                size="s"
-            />
-            <InfoViewer
-                title="PDisk"
-                info={preparePdiskData()}
-                size="s"
-            />
+            {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
+            <InfoViewer title="VDisk" info={prepareVdiskData()} size="s" />
+            <InfoViewer title="PDisk" info={preparePdiskData()} size="s" />
         </Popup>
     );
 
     const vdiskAllocatedPercent = useMemo(() => {
-        const {AvailableSize, AllocatedSize, PDisk} = props;
+        const {AvailableSize, AllocatedSize, PDisk} = data;
         const available = AvailableSize ? AvailableSize : PDisk?.AvailableSize;
 
         if (!available) {
@@ -235,20 +233,20 @@ function Vdisk(props) {
         return isNaN(Number(AllocatedSize))
             ? undefined
             : (Number(AllocatedSize) * 100) / (Number(available) + Number(AllocatedSize));
-    }, [props.AllocatedSize, props.AvailableSize, props.PDisk?.AvailableSize]);
+    }, [data]);
 
     return (
         <React.Fragment>
             {renderPopup()}
             <div className={b()} ref={anchor} onMouseEnter={showPopup} onMouseLeave={hidePopup}>
-                {props.NodeId ? (
+                {data.NodeId ? (
                     <InternalLink
                         to={createHref(
                             routes.node,
-                            {id: props.NodeId, activeTab: STRUCTURE},
+                            {id: data.NodeId, activeTab: STRUCTURE},
                             {
-                                pdiskId: props.PDisk?.PDiskId,
-                                vdiskId: stringifyVdiskId(props.VDiskId),
+                                pdiskId: data.PDisk?.PDiskId,
+                                vdiskId: stringifyVdiskId(data.VDiskId),
                             },
                         )}
                         className={b('content')}
@@ -267,8 +265,4 @@ function Vdisk(props) {
             </div>
         </React.Fragment>
     );
-}
-
-Vdisk.propTypes = propTypes;
-
-export default Vdisk;
+};
