@@ -19,7 +19,7 @@ import {stringifyVdiskId} from '../../../utils';
 import {getUsage, isFullDonorData} from '../../../utils/storage';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
-import Vdisk from '../Vdisk/Vdisk';
+import {VDisk} from '../VDisk';
 import {getDegradedSeverity, getUsageSeverity} from '../utils';
 
 import i18n from './i18n';
@@ -254,16 +254,16 @@ function StorageGroups({
 
                         return donors.length > 0 ? (
                             <Stack className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
-                                <Vdisk
-                                    {...el}
-                                    PoolName={row[TableColumnsIds.PoolName]}
+                                <VDisk
+                                    data={el}
+                                    poolName={row[TableColumnsIds.PoolName]}
                                     nodes={nodes}
                                 />
                                 {donors.map((donor) => (
-                                    <Vdisk
-                                        {...donor}
+                                    <VDisk
+                                        data={donor}
                                         // donor and acceptor are always in the same group
-                                        PoolName={row[TableColumnsIds.PoolName]}
+                                        poolName={row[TableColumnsIds.PoolName]}
                                         nodes={nodes}
                                         key={stringifyVdiskId(donor.VDiskId)}
                                     />
@@ -271,9 +271,9 @@ function StorageGroups({
                             </Stack>
                         ) : (
                             <div className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
-                                <Vdisk
-                                    {...el}
-                                    PoolName={row[TableColumnsIds.PoolName]}
+                                <VDisk
+                                    data={el}
+                                    poolName={row[TableColumnsIds.PoolName]}
                                     nodes={nodes}
                                 />
                             </div>

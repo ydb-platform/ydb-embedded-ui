@@ -113,7 +113,7 @@ interface TRank {
     Flag?: EFlag;
 }
 
-enum EVDiskState {
+export enum EVDiskState {
     Initial = 'Initial',
     LocalRecoveryError = 'LocalRecoveryError',
     SyncGuidRecovery = 'SyncGuidRecovery',
