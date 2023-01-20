@@ -8,7 +8,7 @@ import {VisibleEntities} from '../../../store/reducers/storage';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
-import Pdisk from '../Pdisk/Pdisk';
+import {PDisk} from '../PDisk';
 
 import i18n from './i18n';
 import './StorageNodes.scss';
@@ -132,8 +132,8 @@ function StorageNodes({
             render: ({value, row}) => (
                 <div className={b('pdisks-wrapper')}>
                     {_.map(value as any, (el) => (
-                        <div className={b('pdisks-item')}>
-                            <Pdisk key={el.PDiskId} {...el} NodeId={row.NodeId} />
+                        <div className={b('pdisks-item')} key={el.PDiskId}>
+                            <PDisk data={el} nodeId={row.NodeId} />
                         </div>
                     ))}
                 </div>

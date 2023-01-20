@@ -7,7 +7,6 @@ import {InfoViewer} from '../../../components/InfoViewer';
 import {InternalLink} from '../../../components/InternalLink';
 
 import routes, {createHref} from '../../../routes';
-import type {RequiredField} from '../../../types';
 import {EFlag} from '../../../types/api/enums';
 import {TPDiskStateInfo, TPDiskState} from '../../../types/api/pdisk';
 import {getPDiskId} from '../../../utils';
@@ -20,7 +19,7 @@ import {DiskStateProgressBar, EDiskStateSeverity} from '../DiskStateProgressBar'
 
 import {NOT_AVAILABLE_SEVERITY} from '../utils';
 
-import './Pdisk.scss';
+import './PDisk.scss';
 
 const b = cn('pdisk-storage');
 
@@ -41,7 +40,10 @@ const stateSeverity = {
     [TPDiskState.DeviceIoError]: EDiskStateSeverity.Red,
 };
 
-type PDiskProps = RequiredField<TPDiskStateInfo, 'NodeId'>;
+interface PDiskProps {
+    nodeId: number;
+    data?: TPDiskStateInfo;
+}
 
 const isSeverityKey = (key?: TPDiskState): key is keyof typeof stateSeverity =>
     key !== undefined && key in stateSeverity;
@@ -50,18 +52,18 @@ const getStateSeverity = (pDiskState?: TPDiskState) => {
     return isSeverityKey(pDiskState) ? stateSeverity[pDiskState] : NOT_AVAILABLE_SEVERITY;
 };
 
-function Pdisk(props: PDiskProps) {
-    const [severity, setSeverity] = useState(getStateSeverity(props.State));
+export const PDisk = ({nodeId, data = {}}: PDiskProps) => {
+    const [severity, setSeverity] = useState(getStateSeverity(data.State));
     const [isPopupVisible, setIsPopupVisible] = useState(false);
 
     const anchor = useRef(null);
 
     useEffect(() => {
-        const newSeverity = getStateSeverity(props.State);
+        const newSeverity = getStateSeverity(data.State);
         if (severity !== newSeverity) {
             setSeverity(newSeverity);
         }
-    }, [props.State]);
+    }, [data.State]);
 
     const showPopup = () => {
         setIsPopupVisible(true);
@@ -72,19 +74,15 @@ function Pdisk(props: PDiskProps) {
     };
     /* eslint-disable */
     const preparePdiskData = () => {
-        const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Device} = props;
-        const errorColors = [
-            EFlag.Orange,
-            EFlag.Red,
-            EFlag.Yellow,
-        ];
+        const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Device} = data;
+        const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
         const pdiskData: {label: string; value: string | number}[] = [
             {label: 'PDisk', value: getPDiskId({NodeId, PDiskId})},
         ];
 
         pdiskData.push({label: 'State', value: State || 'not available'});
-        pdiskData.push({label: 'Type', value: getPDiskType(props) || 'unknown'});
+        pdiskData.push({label: 'Type', value: getPDiskType(data) || 'unknown'});
         NodeId && pdiskData.push({label: 'Node Id', value: NodeId});
 
         Path && pdiskData.push({label: 'Path', value: Path});
@@ -115,7 +113,7 @@ function Pdisk(props: PDiskProps) {
     );
 
     const pdiskAllocatedPercent = useMemo(() => {
-        const {AvailableSize, TotalSize} = props;
+        const {AvailableSize, TotalSize} = data;
 
         if (!AvailableSize || !TotalSize) {
             return undefined;
@@ -124,7 +122,7 @@ function Pdisk(props: PDiskProps) {
         return !isNaN(Number(AvailableSize)) && !isNaN(Number(TotalSize))
             ? Math.round(((Number(TotalSize) - Number(AvailableSize)) * 100) / Number(TotalSize))
             : undefined;
-    }, [props.AvailableSize, props.TotalSize]);
+    }, [data]);
 
     return (
         <React.Fragment>
@@ -133,8 +131,8 @@ function Pdisk(props: PDiskProps) {
                 <InternalLink
                     to={createHref(
                         routes.node,
-                        {id: props.NodeId, activeTab: STRUCTURE},
-                        {pdiskId: props.PDiskId || ''},
+                        {id: nodeId, activeTab: STRUCTURE},
+                        {pdiskId: data.PDiskId || ''},
                     )}
                     className={b('content')}
                 >
@@ -142,11 +140,9 @@ function Pdisk(props: PDiskProps) {
                         diskAllocatedPercent={pdiskAllocatedPercent}
                         severity={severity}
                     />
-                    <div className={b('media-type')}>{getPDiskType(props)}</div>
+                    <div className={b('media-type')}>{getPDiskType(data)}</div>
                 </InternalLink>
             </div>
         </React.Fragment>
     );
 }
-
-export default Pdisk;
