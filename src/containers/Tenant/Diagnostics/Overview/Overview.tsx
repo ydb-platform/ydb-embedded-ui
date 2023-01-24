@@ -5,6 +5,7 @@ import {Loader} from '../../../../components/Loader';
 
 //@ts-ignore
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 
 import {TopicInfo} from './TopicInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
@@ -76,6 +77,7 @@ function Overview({type, tenantName, className}: OverviewProps) {
         wasLoaded,
         autorefresh,
         currentSchemaPath,
+        error,
     } = useSelector((state: any) => state.schema);
 
     const {data: {result: olapStats} = {result: undefined}, loading: olapStatsLoading} =
@@ -162,6 +164,10 @@ function Overview({type, tenantName, className}: OverviewProps) {
 
     if ((loading && !wasLoaded) || (isEntityWithMergedImpl && !mergedChildrenPaths)) {
         return <Loader size="m" />;
+    }
+
+    if (error) {
+        return <ResponseError error={error} />;
     }
 
     return <div className={className}>{renderContent()}</div>;
