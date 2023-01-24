@@ -76,6 +76,7 @@ function Overview({type, tenantName, className}: OverviewProps) {
         wasLoaded,
         autorefresh,
         currentSchemaPath,
+        error,
     } = useSelector((state: any) => state.schema);
 
     const {data: {result: olapStats} = {result: undefined}, loading: olapStatsLoading} =
@@ -162,6 +163,10 @@ function Overview({type, tenantName, className}: OverviewProps) {
 
     if ((loading && !wasLoaded) || (isEntityWithMergedImpl && !mergedChildrenPaths)) {
         return <Loader size="m" />;
+    }
+
+    if (error) {
+        return <div className="error">{error.statusText}</div>;
     }
 
     return <div className={className}>{renderContent()}</div>;
