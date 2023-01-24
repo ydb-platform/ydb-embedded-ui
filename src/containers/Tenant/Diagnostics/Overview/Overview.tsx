@@ -1,15 +1,14 @@
 import {ReactNode, useCallback, useMemo} from 'react';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
-import cn from 'bem-cn-lite';
 
-import {Loader} from '@gravity-ui/uikit';
+import {Loader} from '../../../../components/Loader';
 
 //@ts-ignore
-import SchemaInfoViewer from '../../Schema/SchemaInfoViewer/SchemaInfoViewer';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 
 import {TopicInfo} from './TopicInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
+import {TableInfo} from './TableInfo';
 
 import {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {
@@ -32,8 +31,6 @@ import {
     resetLoadingState as resetOlapLoadingState,
 } from '../../../../store/reducers/olapStats';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
-
-import './Overview.scss';
 
 function prepareOlapTableGeneral(item?: TEvDescribeSchemeResult, olapStats?: any[]) {
     const tableData = item?.PathDescription?.ColumnTableDescription;
@@ -69,8 +66,6 @@ interface OverviewProps {
     className?: string;
     tenantName?: string;
 }
-
-const b = cn('kv-tenant-overview');
 
 function Overview({type, tenantName, className}: OverviewProps) {
     const dispatch = useDispatch();
@@ -144,14 +139,6 @@ function Overview({type, tenantName, className}: OverviewProps) {
             : currentItem;
     }, [type, olapStats, currentItem]);
 
-    const renderLoader = () => {
-        return (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
-        );
-    };
-
     const renderContent = () => {
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
@@ -170,15 +157,11 @@ function Overview({type, tenantName, className}: OverviewProps) {
             [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={schemaData} />,
         };
 
-        return (
-            (type && pathTypeToComponent[type]?.()) || (
-                <SchemaInfoViewer fullPath={currentItem.Path} data={schemaData} />
-            )
-        );
+        return (type && pathTypeToComponent[type]?.()) || <TableInfo data={schemaData} />;
     };
 
     if ((loading && !wasLoaded) || (isEntityWithMergedImpl && !mergedChildrenPaths)) {
-        return renderLoader();
+        return <Loader size="m" />;
     }
 
     return <div className={className}>{renderContent()}</div>;
