@@ -32,7 +32,7 @@ import {
     getStorageNodesCount,
     getUsageFilterOptions,
 } from '../../store/reducers/storage';
-import {getNodesList} from '../../store/reducers/clusterNodes';
+import {getNodesList} from '../../store/reducers/nodesList';
 import StorageGroups from './StorageGroups/StorageGroups';
 import StorageNodes from './StorageNodes/StorageNodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';

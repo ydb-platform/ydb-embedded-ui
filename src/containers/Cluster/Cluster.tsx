@@ -2,7 +2,7 @@ import cn from 'bem-cn-lite';
 //@ts-ignore
 import Tenants from '../Tenants/Tenants';
 //@ts-ignore
-import Nodes from '../Nodes/Nodes';
+import {Nodes} from '../Nodes/Nodes';
 //@ts-ignore
 import Storage from '../Storage/Storage';
 import routes, {CLUSTER_PAGES} from '../../routes';
@@ -28,7 +28,7 @@ function Cluster(props: ClusterProps) {
                 return <Tenants {...props} />;
             }
             case CLUSTER_PAGES.nodes.id: {
-                return <Nodes {...props} />;
+                return <Nodes additionalNodesInfo={props.additionalNodesInfo} />;
             }
             case CLUSTER_PAGES.storage.id: {
                 //@ts-ignore

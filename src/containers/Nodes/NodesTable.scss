@@ -1,4 +1,4 @@
-.kv-nodes {
+.ydb-nodes-table {
     &__host-name-wrapper {
         display: flex;
     }
@@ -20,7 +20,7 @@
 }
 
 .data-table__row:hover {
-    .kv-nodes__external-button {
+    .ydb-nodes-table__external-button {
         display: inline-flex;
     }
 }

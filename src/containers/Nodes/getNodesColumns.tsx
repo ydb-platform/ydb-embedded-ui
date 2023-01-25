@@ -1,20 +1,37 @@
 import cn from 'bem-cn-lite';
-import DataTable from '@yandex-cloud/react-data-table';
+import DataTable, {Column} from '@yandex-cloud/react-data-table';
 import {Button, Popover} from '@gravity-ui/uikit';
 
-import Icon from '../components/Icon/Icon';
-import EntityStatus from '../components/EntityStatus/EntityStatus';
-import PoolsGraph from '../components/PoolsGraph/PoolsGraph';
-import ProgressViewer from '../components/ProgressViewer/ProgressViewer';
-import {TabletsStatistic} from '../components/TabletsStatistic';
+import Icon from '../../components/Icon/Icon';
+import EntityStatus from '../../components/EntityStatus/EntityStatus';
+import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
+import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
+import {TabletsStatistic} from '../../components/TabletsStatistic';
 
-import {getDefaultNodePath} from '../containers/Node/NodePages';
-import {formatBytes} from './index';
+import {formatBytes} from '../../utils/index';
+import {INodesPreparedEntity} from '../../types/store/nodes';
+import {showTooltip as externalShowTooltip} from '../../store/reducers/tooltip';
 
-const b = cn('kv-nodes');
+import {getDefaultNodePath} from '../Node/NodePages';
 
-export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeRef}) {
-    const columns = [
+import './NodesTable.scss';
+
+const b = cn('ydb-nodes-table');
+
+interface GetNodesColumnsProps {
+    showTooltip: (...args: Parameters<typeof externalShowTooltip>) => void;
+    hideTooltip: VoidFunction;
+    tabletsPath?: string;
+    getNodeRef?: Function;
+}
+
+export function getNodesColumns({
+    showTooltip,
+    hideTooltip,
+    tabletsPath,
+    getNodeRef,
+}: GetNodesColumnsProps) {
+    const columns: Column<INodesPreparedEntity>[] = [
         {
             name: 'NodeId',
             header: '#',
@@ -23,19 +40,20 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
         },
         {
             name: 'Host',
-            render: ({row, value}) => {
+            render: ({row}) => {
                 const nodeRef = getNodeRef ? getNodeRef(row) + 'internal' : undefined;
-
-                if (typeof value === 'undefined') {
+                if (typeof row.Host === 'undefined') {
                     return <span>—</span>;
                 }
                 return (
                     <div className={b('host-name-wrapper')}>
                         <EntityStatus
                             name={row.Host}
-                            onNameMouseEnter={(e) => showTooltip(e.target, row, 'nodeEndpoints')}
+                            onNameMouseEnter={(e: MouseEvent) =>
+                                showTooltip(e.target, row, 'nodeEndpoints')
+                            }
                             onNameMouseLeave={hideTooltip}
-                            status={row.Overall}
+                            status={row.SystemState}
                             path={getDefaultNodePath(row.NodeId)}
                             hasClipboardButton
                             className={b('host-name')}
@@ -60,28 +78,28 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
             name: 'DataCenter',
             header: 'DC',
             align: DataTable.LEFT,
-            render: ({value}) => (value ? value : '—'),
+            render: ({row}) => (row.DataCenter ? row.DataCenter : '—'),
             width: '60px',
         },
         {
             name: 'Rack',
             header: 'Rack',
             align: DataTable.LEFT,
-            render: ({value}) => (value ? value : '—'),
+            render: ({row}) => (row.Rack ? row.Rack : '—'),
             width: '80px',
         },
         {
             name: 'Version',
             width: '200px',
             align: DataTable.LEFT,
-            render: ({value}) => {
-                return <Popover content={value}>{value}</Popover>;
+            render: ({row}) => {
+                return <Popover content={row.Version}>{row.Version}</Popover>;
             },
         },
         {
-            name: 'uptime',
+            name: 'Uptime',
             header: 'Uptime',
-            sortAccessor: ({StartTime}) => -StartTime,
+            sortAccessor: ({StartTime}) => StartTime && -StartTime,
             align: DataTable.LEFT,
             width: '110px',
         },
@@ -90,12 +108,9 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
             header: 'Memory',
             sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
             defaultOrder: DataTable.DESCENDING,
-            render: ({value, row}) => {
-                if (value) {
-                    return formatBytes(value);
-                }
-                if (row.Metrics) {
-                    return formatBytes(row.Metrics.Memory);
+            render: ({row}) => {
+                if (row.MemoryUsed) {
+                    return formatBytes(row.MemoryUsed);
                 } else {
                     return '—';
                 }
@@ -107,14 +122,20 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
             name: 'PoolStats',
             header: 'CPU',
             sortAccessor: ({PoolStats = []}) =>
-                PoolStats.reduce((acc, item) => acc + item.Usage, 0),
+                PoolStats.reduce((acc, item) => {
+                    if (item.Usage) {
+                        return acc + item.Usage;
+                    } else {
+                        return acc;
+                    }
+                }, 0),
             defaultOrder: DataTable.DESCENDING,
-            render: ({value}) =>
-                value ? (
+            render: ({row}) =>
+                row.PoolStats ? (
                     <PoolsGraph
                         onMouseEnter={showTooltip}
                         onMouseLeave={hideTooltip}
-                        pools={value}
+                        pools={row.PoolStats}
                     />
                 ) : (
                     '—'
@@ -128,9 +149,13 @@ export function getNodesColumns({showTooltip, hideTooltip, tabletsPath, getNodeR
             sortAccessor: ({LoadAverage = []}) =>
                 LoadAverage.slice(0, 1).reduce((acc, item) => acc + item, 0),
             defaultOrder: DataTable.DESCENDING,
-            render: ({value}) =>
-                value && value.length > 0 ? (
-                    <ProgressViewer value={value[0]} percents={true} colorizeProgress={true} />
+            render: ({row}) =>
+                row.LoadAverage && row.LoadAverage.length > 0 ? (
+                    <ProgressViewer
+                        value={row.LoadAverage[0]}
+                        percents={true}
+                        colorizeProgress={true}
+                    />
                 ) : (
                     '—'
                 ),

@@ -11,7 +11,7 @@ export interface ITooltipPositions {
 export interface ITooltipState {
     toolTipVisible: boolean;
     positions?: ITooltipPositions;
-    currentHoveredRef?: EventTarget;
+    currentHoveredRef?: EventTarget | null;
     template: (data: any) => JSX.Element;
     templateType: ITooltipTemplateType;
     data?: any;

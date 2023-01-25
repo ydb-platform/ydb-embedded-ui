@@ -29,7 +29,7 @@ const prepareTablets = (tablets: ITablets) => {
 
 interface TabletsStatisticProps {
     tablets: ITablets;
-    path: string;
+    path: string | undefined;
     nodeIds: string[] | number[];
 }
 

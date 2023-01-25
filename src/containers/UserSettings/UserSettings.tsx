@@ -6,7 +6,11 @@ import {Settings} from '@gravity-ui/navigation';
 import favoriteFilledIcon from '../../assets/icons/star.svg';
 import flaskIcon from '../../assets/icons/flask.svg';
 
-import {INVERTED_DISKS_KEY, THEME_KEY} from '../../utils/constants';
+import {
+    INVERTED_DISKS_KEY,
+    THEME_KEY,
+    USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
+} from '../../utils/constants';
 
 import {setSettingValue} from '../../store/reducers/settings';
 
@@ -23,6 +27,10 @@ function UserSettings(props: any) {
 
     const _onInvertedDisksChangeHandler = (value: boolean) => {
         props.setSettingValue(INVERTED_DISKS_KEY, String(value));
+    };
+
+    const _onNodesEndpointChangeHandler = (value: boolean) => {
+        props.setSettingValue(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY, String(value));
     };
 
     return (
@@ -42,16 +50,18 @@ function UserSettings(props: any) {
                     </Settings.Item>
                 </Settings.Section>
             </Settings.Page>
-            <Settings.Page
-                id="experiments"
-                title="Experiments"
-                icon={{data: flaskIcon}}
-            >
+            <Settings.Page id="experiments" title="Experiments" icon={{data: flaskIcon}}>
                 <Settings.Section title="Experiments">
                     <Settings.Item title="Inverted disks space indicators">
                         <Switch
                             checked={props.invertedDisks}
                             onUpdate={_onInvertedDisksChangeHandler}
+                        />
+                    </Settings.Item>
+                    <Settings.Item title="Use /viewer/json/nodes for Nodes Tab in diagnostics">
+                        <Switch
+                            checked={props.useNodesEndpointInDiagnostics}
+                            onUpdate={_onNodesEndpointChangeHandler}
                         />
                     </Settings.Item>
                 </Settings.Section>
@@ -61,14 +71,12 @@ function UserSettings(props: any) {
 }
 
 const mapStateToProps = (state: any) => {
-    const {
-        theme,
-        invertedDisks,
-    } = state.settings.userSettings;
+    const {theme, invertedDisks, useNodesEndpointInDiagnostics} = state.settings.userSettings;
 
     return {
         theme,
         invertedDisks: JSON.parse(invertedDisks),
+        useNodesEndpointInDiagnostics: JSON.parse(useNodesEndpointInDiagnostics),
     };
 };
 

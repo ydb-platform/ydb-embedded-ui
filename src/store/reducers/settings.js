@@ -6,6 +6,7 @@ import {
     QUERY_INITIAL_RUN_ACTION_KEY,
     INVERTED_DISKS_KEY,
     ASIDE_HEADER_COMPACT_KEY,
+    USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
 } from '../../utils/constants';
 import '../../services/api';
 import {getValueFromLS} from '../../utils/utils';
@@ -17,9 +18,7 @@ const userSettings = window.userSettings || {};
 const systemSettings = window.systemSettings || {};
 
 export function readSavedSettingsValue(key, defaultValue) {
-    const savedValue = window.web_version
-        ? userSettings[key]
-        : getValueFromLS(key);
+    const savedValue = window.web_version ? userSettings[key] : getValueFromLS(key);
 
     return savedValue ?? defaultValue;
 }
@@ -40,10 +39,17 @@ export const initialState = {
         ...userSettings,
         [THEME_KEY]: readSavedSettingsValue(THEME_KEY, 'light'),
         [INVERTED_DISKS_KEY]: readSavedSettingsValue(INVERTED_DISKS_KEY, 'false'),
+        [USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY]: readSavedSettingsValue(
+            USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
+            'false',
+        ),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),
         [TENANT_INITIAL_TAB_KEY]: readSavedSettingsValue(TENANT_INITIAL_TAB_KEY),
         [QUERY_INITIAL_RUN_ACTION_KEY]: readSavedSettingsValue(QUERY_INITIAL_RUN_ACTION_KEY),
-        [ASIDE_HEADER_COMPACT_KEY]: readSavedSettingsValue(ASIDE_HEADER_COMPACT_KEY, legacyAsideNavCompactState || 'true'),
+        [ASIDE_HEADER_COMPACT_KEY]: readSavedSettingsValue(
+            ASIDE_HEADER_COMPACT_KEY,
+            legacyAsideNavCompactState || 'true',
+        ),
     },
     systemSettings,
 };

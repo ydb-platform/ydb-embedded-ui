@@ -39,8 +39,8 @@
         width: 100%;
         padding: 0 20px;
 
-        & .nodes-viewer,
-        & .global-storage {
+        & .global-storage,
+        & .ydb-nodes {
             &__controls {
                 padding-top: 0;
             }
