@@ -23,7 +23,7 @@ import explainQuery from './explainQuery';
 import tabletsFilters from './tabletsFilters';
 import settings from './settings';
 import preview from './preview';
-import nodesList from './clusterNodes';
+import nodesList from './nodesList';
 import describe from './describe';
 import schemaAcl from './schemaAcl';
 import executeTopQueries from './executeTopQueries';

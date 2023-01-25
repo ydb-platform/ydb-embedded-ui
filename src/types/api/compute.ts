@@ -17,7 +17,7 @@ interface TComputeTenantInfo {
     Nodes?: TComputeNodeInfo[];
 }
 
-interface TComputeNodeInfo {
+export interface TComputeNodeInfo {
     /** uint64 */
     StartTime: string;
     /** uint64 */

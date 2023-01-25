@@ -173,11 +173,13 @@ class TabletsFilters extends React.Component {
 
         return (
             <div className={b()}>
-                {/* {this.renderOverall(tablets)} */}
-
-                <div className={b('tenant')}>
-                    <span className={b('label')}>Database: </span> {tenantPath}
-                </div>
+                {tenantPath ? (
+                    <div className={b('tenant')}>
+                        <>
+                            <span className={b('label')}>Database: </span> {tenantPath}
+                        </>
+                    </div>
+                ) : null}
                 <MemoizedFilters
                     nodesForSelect={nodesForSelect}
                     nodeFilter={nodeFilter}
@@ -253,7 +255,9 @@ const Filters = ({
                         return (
                             <div className={b('node')}>
                                 <div>{option.content}</div>
-                                <div className={b('node-meta')} title={option.meta}>{option.meta}</div>
+                                <div className={b('node-meta')} title={option.meta}>
+                                    {option.meta}
+                                </div>
                             </div>
                         );
                     }}

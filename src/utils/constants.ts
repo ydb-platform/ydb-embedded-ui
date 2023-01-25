@@ -92,6 +92,7 @@ export type IProblemFilterValues = typeof ALL | typeof PROBLEMS;
 
 export const THEME_KEY = 'theme';
 export const INVERTED_DISKS_KEY = 'invertedDisks';
+export const USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY = 'useNodesEndpointInDiagnostics';
 export const SAVED_QUERIES_KEY = 'saved_queries';
 export const ASIDE_HEADER_COMPACT_KEY = 'asideHeaderCompact';
 export const QUERIES_HISTORY_KEY = 'queries_history';

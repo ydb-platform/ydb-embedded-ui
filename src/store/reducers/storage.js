@@ -1,14 +1,14 @@
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 
-import {calcUptime, calcUptimeInSeconds} from '../../utils';
+import {calcUptime} from '../../utils';
 import {getUsage} from '../../utils/storage';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {getPDiskType} from '../../utils/pdisk';
-import {HOUR_IN_SECONDS} from '../../utils/constants';
 import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
+import {filterNodesByUptime} from './nodes';
 
 export const VisibleEntities = {
     All: 'All',
@@ -393,15 +393,6 @@ const filterByUsage = (entities, usage) => {
     });
 };
 
-export const filterByUptime = (nodes = [], nodesUptimeFilter) => {
-    if (nodesUptimeFilter === NodesUptimeFilterValues.All) {
-        return nodes;
-    }
-    return nodes.filter(({StartTime}) => {
-        return !StartTime || calcUptimeInSeconds(StartTime) < HOUR_IN_SECONDS;
-    });
-};
-
 export const getFilteredEntities = createSelector(
     [
         getStorageFilter,
@@ -416,7 +407,7 @@ export const getFilteredEntities = createSelector(
         result = filterByUsage(result, usageFilter);
 
         if (type === StorageTypes.nodes) {
-            result = filterByUptime(result, nodesUptimeFilter);
+            result = filterNodesByUptime(result, nodesUptimeFilter);
         }
 
         return result;

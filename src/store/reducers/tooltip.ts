@@ -62,7 +62,7 @@ export const hideTooltip = () => {
 };
 
 export const showTooltip = (
-    node: EventTarget,
+    node: EventTarget | null,
     data: any,
     templateType: ITooltipTemplateType,
     additionalData?: any,

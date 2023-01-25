@@ -23,8 +23,7 @@ import Describe from './Describe/Describe';
 import HotKeys from './HotKeys/HotKeys';
 //@ts-ignore
 import {Heatmap} from '../../Heatmap';
-//@ts-ignore
-import Compute from './Compute/Compute';
+import {Nodes} from '../../Nodes';
 //@ts-ignore
 import {Tablets} from '../../Tablets';
 import {Consumers} from './Consumers';
@@ -130,8 +129,8 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case GeneralPagesIds.nodes: {
                 return (
-                    <Compute
-                        tenantName={tenantNameString}
+                    <Nodes
+                        tenantPath={tenantNameString}
                         additionalNodesInfo={props.additionalNodesInfo}
                     />
                 );

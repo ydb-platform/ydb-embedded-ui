@@ -1,7 +1,11 @@
 @import '../../styles/mixins.scss';
 
-.cluster-nodes {
+.ydb-nodes {
     overflow: auto;
+    flex-grow: 1;
+
+    height: 100%;
+
     @include flex-container();
 
     &__search {
