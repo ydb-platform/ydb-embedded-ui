@@ -1,3 +1,6 @@
+import type {IResponseError} from '../api/error';
+import type {TComputeInfo} from '../api/compute';
+
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {
     FETCH_NODES,
@@ -6,18 +9,30 @@ import {
     setNodesUptimeFilter,
 } from '../../store/reducers/nodes';
 import {ApiRequestAction} from '../../store/utils';
-import {IResponseError} from '../api/error';
-import {TNodesInfo} from '../api/nodes';
 
 export interface INodesState {
     loading: boolean;
     wasLoaded: boolean;
     nodesUptimeFilter: NodesUptimeFilterValues;
-    data?: TNodesInfo;
+    data?: TComputeInfo;
     error?: IResponseError;
 }
 
-type INodesApiRequestAction = ApiRequestAction<typeof FETCH_NODES, TNodesInfo, IResponseError>;
+type INodesApiRequestNodeType = 'static' | 'dynamic' | 'any';
+
+// Space - out of space nodes
+// Missing - nodes with missing disks
+type INodesApiRequestProblemType = 'missing' | 'space';
+
+export interface INodesApiRequestParams {
+    tenant?: string;
+    type?: INodesApiRequestNodeType;
+    filter?: INodesApiRequestProblemType;
+    storage?: boolean;
+    tablets?: boolean;
+}
+
+type INodesApiRequestAction = ApiRequestAction<typeof FETCH_NODES, TComputeInfo, IResponseError>;
 
 export type INodesAction =
     | INodesApiRequestAction

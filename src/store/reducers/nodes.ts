@@ -71,7 +71,7 @@ const nodes: Reducer<INodesState, INodesAction> = (state = initialState, action)
 
 export function getNodes(path: string) {
     return createApiRequest({
-        request: window.api.getNodes(path),
+        request: window.api.getCompute(path),
         actions: FETCH_NODES,
     });
 }

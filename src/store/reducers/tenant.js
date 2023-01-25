@@ -5,6 +5,7 @@ import _ from 'lodash';
 const FETCH_TENANT = createRequestActionTypes('tenant', 'FETCH_TENANT');
 const SET_TOP_LEVEL_TAB = 'tenant/SET_TOP_LEVEL_TAB';
 const SET_DIAGNOSTICS_TAB = 'tenant/SET_DIAGNOSTICS_TAB';
+const CLEAR_TENANT = 'tenant/CLEAR_TENANT';
 
 const tenantReducer = (state = {loading: false, wasLoaded: false, tenant: {}}, action) => {
     switch (action.type) {
@@ -37,7 +38,7 @@ const tenantReducer = (state = {loading: false, wasLoaded: false, tenant: {}}, a
             };
         }
 
-        case 'CLEAR_TENANT': {
+        case CLEAR_TENANT: {
             return {
                 ...state,
                 tenant: {},
@@ -65,12 +66,12 @@ const tenantReducer = (state = {loading: false, wasLoaded: false, tenant: {}}, a
 };
 
 export const clearTenant = () => {
-    return {type: 'CLEAR_TENANT'};
+    return {type: CLEAR_TENANT};
 };
 
 export const getTenantInfo = ({path}) => {
     return createApiRequest({
-        request: Promise.all([window.api.getTenantInfo({path}), window.api.getNodes(path)]),
+        request: Promise.all([window.api.getTenantInfo({path}), window.api.getCompute(path)]),
         actions: FETCH_TENANT,
         dataHandler: ([tenantData, nodesData]) => {
             const tenant = tenantData.TenantInfo[0];
@@ -83,7 +84,7 @@ export const getTenantInfo = ({path}) => {
                     };
                 }
 
-                return;
+                return undefined;
             }).filter(Boolean);
 
             return {tenant, tenantNodes};
