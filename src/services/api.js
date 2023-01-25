@@ -1,7 +1,6 @@
 import AxiosWrapper from '@gravity-ui/axios-wrapper';
 
 import {backend as BACKEND} from '../store';
-import {StorageTypes} from '../store/reducers/storage';
 
 const config = {withCredentials: !window.custom_backend};
 
@@ -13,9 +12,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     }
     getClusterInfo() {
         return this.get(this.getPath('/viewer/json/cluster'), {tablets: true});
-    }
-    getNodes(path) {
-        return this.get(this.getPath('/viewer/json/compute?enums=true'), {path});
     }
     getNodeInfo(id) {
         return this.get(this.getPath('/viewer/json/sysinfo?enums=true'), {
@@ -35,11 +31,27 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             storage: true,
         });
     }
-    getStorageInfo({tenant, filter, nodeId, type}, {concurrentId} = {}) {
+    getNodes({tenant, filter, storage, type = 'any', tablets = true}, {concurrentId} = {}) {
         return this.get(
-            this.getPath(
-                `/viewer/json/${type === StorageTypes.nodes ? 'nodes' : 'storage'}?enums=true`,
-            ),
+            this.getPath('/viewer/json/nodes?enums=true'),
+            {
+                tenant,
+                with: filter,
+                storage,
+                type,
+                tablets,
+            },
+            {
+                concurrentId,
+            },
+        );
+    }
+    getCompute(path) {
+        return this.get(this.getPath('/viewer/json/compute?enums=true'), {path});
+    }
+    getStorageInfo({tenant, filter, nodeId}, {concurrentId} = {}) {
+        return this.get(
+            this.getPath(`/viewer/json/storage?enums=true`),
             {
                 tenant,
                 node_id: nodeId,

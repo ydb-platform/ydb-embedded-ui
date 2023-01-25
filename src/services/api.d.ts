@@ -17,10 +17,14 @@ interface Window {
                 tenant: string;
                 filter: string;
                 nodeId: string;
-                type: 'Groups' | 'Nodes';
             },
             axiosOptions?: AxiosOptions,
         ) => Promise<import('../types/api/storage').TStorageInfo>;
+        getNodes: (
+            params: import('../types/store/nodes').INodesApiRequestParams,
+            axiosOptions?: AxiosOptions,
+        ) => Promise<import('../types/api/nodes').TNodesInfo>;
+        getCompute: (path: string) => Promise<import('../types/api/compute').TComputeInfo>;
         sendQuery: <
             Action extends import('../types/api/query').Actions,
             Schema extends import('../types/api/query').Schemas = undefined,
