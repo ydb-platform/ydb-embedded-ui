@@ -17,9 +17,6 @@ import {
     setCurrentDescribePath,
     setDataWasNotLoaded,
 } from '../../../../store/reducers/describe';
-import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema';
-
-import {isCdcStreamEntityType} from '../../utils/schema';
 
 import i18n from './i18n';
 
@@ -28,20 +25,12 @@ import './Consumers.scss';
 const b = block('ydb-consumers');
 
 interface ConsumersProps {
-    path: string;
+    path?: string;
     type?: EPathType;
 }
 
-export const Consumers = ({path, type}: ConsumersProps) => {
+export const Consumers = ({path: dataPath}: ConsumersProps) => {
     const dispatch = useDispatch();
-
-    const isCdcStream = isCdcStreamEntityType(type);
-
-    const mergedChildrenPaths = useTypedSelector((state) =>
-        selectSchemaMergedChildrenPaths(state, path, type),
-    );
-
-    const dataPath = isCdcStream ? mergedChildrenPaths?.[0] : path;
 
     const fetchData = useCallback(
         (isBackground: boolean) => {
@@ -86,7 +75,7 @@ export const Consumers = ({path, type}: ConsumersProps) => {
         filterConsumersByName(value);
     };
 
-    const columns: Column<any>[] = [
+    const columns: Column<unknown>[] = [
         {
             name: 'name',
             header: i18n('table.columns.consumerName'),

@@ -1,12 +1,23 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import '../../services/api';
 import _ from 'lodash';
+
+import {GeneralPagesIds} from '../../containers/Tenant/Diagnostics/DiagnosticsPages';
+
+import '../../services/api';
+import {createRequestActionTypes, createApiRequest} from '../utils';
 
 const FETCH_TENANT = createRequestActionTypes('tenant', 'FETCH_TENANT');
 const SET_TOP_LEVEL_TAB = 'tenant/SET_TOP_LEVEL_TAB';
 const SET_DIAGNOSTICS_TAB = 'tenant/SET_DIAGNOSTICS_TAB';
+const CLEAR_TENANT = 'tenant/CLEAR_TENANT';
 
-const tenantReducer = (state = {loading: false, wasLoaded: false, tenant: {}}, action) => {
+const initialState = {
+    loading: false,
+    wasLoaded: false,
+    tenant: {},
+    diagnosticsTab: GeneralPagesIds.overview,
+};
+
+const tenantReducer = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_TENANT.REQUEST: {
             return {
@@ -37,7 +48,7 @@ const tenantReducer = (state = {loading: false, wasLoaded: false, tenant: {}}, a
             };
         }
 
-        case 'CLEAR_TENANT': {
+        case CLEAR_TENANT: {
             return {
                 ...state,
                 tenant: {},
@@ -65,7 +76,7 @@ const tenantReducer = (state = {loading: false, wasLoaded: false, tenant: {}}, a
 };
 
 export const clearTenant = () => {
-    return {type: 'CLEAR_TENANT'};
+    return {type: CLEAR_TENANT};
 };
 
 export const getTenantInfo = ({path}) => {
@@ -83,7 +94,7 @@ export const getTenantInfo = ({path}) => {
                     };
                 }
 
-                return;
+                return undefined;
             }).filter(Boolean);
 
             return {tenant, tenantNodes};

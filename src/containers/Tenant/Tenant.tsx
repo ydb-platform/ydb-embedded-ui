@@ -1,5 +1,5 @@
 import {useEffect, useReducer} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
 import qs from 'qs';
@@ -15,7 +15,13 @@ import SplitPane from '../../components/SplitPane';
 //@ts-ignore
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 //@ts-ignore
-import {disableAutorefresh, getSchema, resetLoadingState} from '../../store/reducers/schema';
+import {
+    disableAutorefresh,
+    getSchema,
+    getSchemaBatched,
+    resetLoadingState,
+    selectSchemaMergedChildrenPaths,
+} from '../../store/reducers/schema';
 //@ts-ignore
 import {getSchemaAcl} from '../../store/reducers/schemaAcl';
 import {
@@ -26,6 +32,9 @@ import {
 import {getTenantInfo, clearTenant} from '../../store/reducers/tenant';
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 import type {TEvDescribeSchemeResult} from '../../types/api/schema';
+
+import {useTypedSelector} from '../../utils/hooks';
+import {isEntityWithMergedImplementation} from './utils/schema';
 
 import './Tenant.scss';
 
@@ -66,6 +75,16 @@ function Tenant(props: TenantProps) {
     const {data: {status: tenantStatus = 200} = {}} = useSelector((state: any) => state.tenant);
     const {error: {status: schemaStatus = 200} = {}} = useSelector((state: any) => state.schema);
 
+    const mergedChildrenPaths = useTypedSelector(
+        (state) =>
+            selectSchemaMergedChildrenPaths(
+                state,
+                currentSchemaPath,
+                currentPathType || preloadedPathType,
+            ),
+        shallowEqual,
+    );
+
     const dispatch = useDispatch();
 
     const location = useLocation();
@@ -84,9 +103,17 @@ function Tenant(props: TenantProps) {
 
     useEffect(() => {
         dispatch(resetLoadingState());
-        dispatch(getSchema({path: currentSchemaPath}));
+
+        if (isEntityWithMergedImplementation(currentPathType || preloadedPathType)) {
+            if (mergedChildrenPaths) {
+                dispatch(getSchemaBatched([currentSchemaPath, ...mergedChildrenPaths]));
+            }
+        } else {
+            dispatch(getSchema({path: currentSchemaPath}));
+        }
+
         dispatch(getSchemaAcl({path: currentSchemaPath}));
-    }, [currentSchemaPath, dispatch]);
+    }, [currentSchemaPath, dispatch, preloadedPathType, currentPathType, mergedChildrenPaths]);
 
     useEffect(() => {
         dispatch(disableAutorefresh());
@@ -154,6 +181,7 @@ function Tenant(props: TenantProps) {
                             />
                             <ObjectGeneral
                                 type={preloadedPathType || currentPathType}
+                                subType={preloadedPathSubType || currentPathSubType}
                                 additionalTenantInfo={props.additionalTenantInfo}
                                 additionalNodesInfo={props.additionalNodesInfo}
                             />

@@ -1,59 +1,61 @@
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 import qs from 'qs';
 import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
-import {useDispatch, useSelector} from 'react-redux';
+import {shallowEqual, useDispatch} from 'react-redux';
 import {useLocation} from 'react-router';
 
 import {Switch, Tabs} from '@gravity-ui/uikit';
 
+import routes, {createHref} from '../../../routes';
+import type {EPathSubType, EPathType} from '../../../types/api/schema';
+import {useTypedSelector} from '../../../utils/hooks';
+import {
+    enableAutorefresh,
+    disableAutorefresh,
+    selectSchemaMergedChildrenPaths,
+} from '../../../store/reducers/schema';
+import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant';
+
 import {Loader} from '../../../components/Loader';
 
-import {TopQueries} from './TopQueries';
-//@ts-ignore
-import DetailedOverview from './DetailedOverview/DetailedOverview';
-import {OverloadedShards} from './OverloadedShards';
-//@ts-ignore
 import Storage from '../../Storage/Storage';
-//@ts-ignore
-import Network from './Network/Network';
-//@ts-ignore
-import Describe from './Describe/Describe';
-//@ts-ignore
-import HotKeys from './HotKeys/HotKeys';
-//@ts-ignore
 import {Heatmap} from '../../Heatmap';
-//@ts-ignore
-import Compute from './Compute/Compute';
-//@ts-ignore
 import {Tablets} from '../../Tablets';
-import {Consumers} from './Consumers';
 
-import routes, {createHref} from '../../../routes';
-import type {EPathType} from '../../../types/api/schema';
 import {TenantGeneralTabsIds, TenantTabsGroups} from '../TenantPages';
 import {GeneralPagesIds, DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
-//@ts-ignore
-import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema';
-import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant';
-import {isDatabaseEntityType} from '../utils/schema';
+
+import {
+    isDatabaseEntityType,
+    isEntityWithMergedImplementation,
+    isMergedPathSubType,
+} from '../utils/schema';
+
+import {TopQueries} from './TopQueries';
+import {OverloadedShards} from './OverloadedShards';
+import {Consumers} from './Consumers';
+import DetailedOverview from './DetailedOverview/DetailedOverview';
+import Network from './Network/Network';
+import Describe from './Describe/Describe';
+import HotKeys from './HotKeys/HotKeys';
+import Compute from './Compute/Compute';
 
 import './Diagnostics.scss';
 
+const b = cn('kv-tenant-diagnostics');
+
 interface DiagnosticsProps {
     type?: EPathType;
-    additionalTenantInfo?: any;
-    additionalNodesInfo?: any;
+    subType?: EPathSubType;
+    additionalTenantInfo?: unknown;
+    additionalNodesInfo?: unknown;
 }
-
-const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
     const dispatch = useDispatch();
-    const {currentSchemaPath, autorefresh} = useSelector((state: any) => state.schema);
-    const {diagnosticsTab = GeneralPagesIds.overview, wasLoaded} = useSelector(
-        (state: any) => state.tenant,
-    );
+    const {currentSchemaPath, autorefresh} = useTypedSelector((state) => state.schema);
+    const {diagnosticsTab, wasLoaded} = useTypedSelector((state) => state.tenant);
 
     const location = useLocation();
 
@@ -73,9 +75,13 @@ function Diagnostics(props: DiagnosticsProps) {
         return getPagesByType(props.type);
     }, [props.type, isDatabase]);
 
-    const forwardToDiagnosticTab = (tab: GeneralPagesIds) => {
-        dispatch(setDiagnosticsTab(tab));
-    };
+    const forwardToDiagnosticTab = useCallback(
+        (tab: GeneralPagesIds) => {
+            dispatch(setDiagnosticsTab(tab));
+        },
+        [dispatch],
+    );
+
     const activeTab = useMemo(() => {
         if (wasLoaded) {
             if (pages.find((el) => el.id === diagnosticsTab)) {
@@ -87,7 +93,23 @@ function Diagnostics(props: DiagnosticsProps) {
             }
         }
         return undefined;
-    }, [pages, diagnosticsTab, wasLoaded]);
+    }, [pages, diagnosticsTab, wasLoaded, forwardToDiagnosticTab]);
+
+    let targetDataPath = currentSchemaPath;
+
+    const mergedChildrenPaths = useTypedSelector(
+        (state) => selectSchemaMergedChildrenPaths(state, currentSchemaPath, props.type),
+        shallowEqual,
+    );
+
+    // For the case of direct access to merged entity (via saved link or OverloadedShards table)
+    if (isMergedPathSubType(props.subType)) {
+        targetDataPath = undefined;
+    }
+
+    if (isEntityWithMergedImplementation(props.type)) {
+        targetDataPath = mergedChildrenPaths?.[0];
+    }
 
     const onAutorefreshToggle = (value: boolean) => {
         if (value) {
@@ -126,7 +148,13 @@ function Diagnostics(props: DiagnosticsProps) {
                 );
             }
             case GeneralPagesIds.overloadedShards: {
-                return <OverloadedShards tenantPath={tenantNameString} type={type} />;
+                return (
+                    <OverloadedShards
+                        tenantPath={tenantNameString}
+                        currentPath={targetDataPath}
+                        type={type}
+                    />
+                );
             }
             case GeneralPagesIds.nodes: {
                 return (
@@ -136,26 +164,27 @@ function Diagnostics(props: DiagnosticsProps) {
                     />
                 );
             }
-            case GeneralPagesIds.tablets: {
-                return <Tablets path={currentSchemaPath} />;
-            }
+
             case GeneralPagesIds.storage: {
                 return <Storage tenant={tenantNameString} database={true} />;
-            }
-            case GeneralPagesIds.network: {
-                return <Network path={tenantNameString} />;
             }
             case GeneralPagesIds.describe: {
                 return <Describe tenant={tenantNameString} type={type} />;
             }
+            case GeneralPagesIds.network: {
+                return <Network path={tenantNameString} />;
+            }
+            case GeneralPagesIds.tablets: {
+                return <Tablets path={currentSchemaPath} />;
+            }
             case GeneralPagesIds.hotKeys: {
-                return <HotKeys type={type} />;
+                return <HotKeys path={targetDataPath} type={type} />;
             }
             case GeneralPagesIds.graph: {
-                return <Heatmap path={currentSchemaPath} />;
+                return <Heatmap path={targetDataPath} />;
             }
             case GeneralPagesIds.consumers: {
-                return <Consumers path={currentSchemaPath} type={type} />;
+                return <Consumers path={targetDataPath} type={type} />;
             }
             default: {
                 return <div>No data...</div>;

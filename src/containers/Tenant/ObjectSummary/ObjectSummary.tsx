@@ -1,10 +1,10 @@
 import React, {ReactNode, useEffect, useReducer} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {shallowEqual, useDispatch} from 'react-redux';
 import {Link} from 'react-router-dom';
 import cn from 'bem-cn-lite';
 import {useHistory, useLocation} from 'react-router';
 import qs from 'qs';
-import _ from 'lodash';
+import {get} from 'lodash';
 
 import {Button, HelpPopover, Loader, Tabs} from '@gravity-ui/uikit';
 
@@ -25,8 +25,9 @@ import {
     EPathType,
     TColumnTableDescription,
     TDirEntry,
+    TTableDescription,
 } from '../../../types/api/schema';
-import {isColumnEntityType, isIndexTable, isTableType} from '../utils/schema';
+import {isColumnEntityType, isIndexPathType, isIndexTable, isTableType} from '../utils/schema';
 
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
@@ -45,10 +46,11 @@ import {
     paneVisibilityToggleReducerCreator,
     PaneVisibilityToggleButtons,
 } from '../utils/paneVisibilityToggleHelpers';
-import {setShowPreview} from '../../../store/reducers/schema';
+import {setShowPreview, selectSchemaMergedChildrenPaths} from '../../../store/reducers/schema';
 import {setTopLevelTab} from '../../../store/reducers/tenant';
 
 import './ObjectSummary.scss';
+import {useTypedSelector} from '../../../utils/hooks';
 
 const b = cn('object-summary');
 
@@ -96,16 +98,24 @@ interface ObjectSummaryProps {
 
 function ObjectSummary(props: ObjectSummaryProps) {
     const dispatch = useDispatch();
+
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED),
         initialTenantCommonInfoState,
     );
+
     const {
         data,
         currentSchemaPath,
         currentSchema: currentItem = {},
         loading: loadingSchema,
-    } = useSelector((state: any) => state.schema);
+        wasLoaded,
+    } = useTypedSelector((state) => state.schema);
+
+    const mergedChildrenPaths = useTypedSelector(
+        (state) => selectSchemaMergedChildrenPaths(state, currentSchemaPath, props.type),
+        shallowEqual,
+    );
 
     const location = useLocation();
 
@@ -116,27 +126,28 @@ function ObjectSummary(props: ObjectSummaryProps) {
     });
 
     const {name: tenantName, info: infoTab} = queryParams;
-    const pathData: TDirEntry | undefined = _.get(
-        data[tenantName as string],
-        'PathDescription.Self',
-    );
-    const currentSchemaData: TDirEntry | undefined = _.get(
-        data[currentSchemaPath],
+    const pathData: TDirEntry | undefined = get(data[tenantName as string], 'PathDescription.Self');
+
+    const currentSchemaData: TDirEntry | undefined = get(
+        currentSchemaPath && data[currentSchemaPath],
         'PathDescription.Self',
     );
 
-    const tableSchema =
-        currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
+    let schema: TTableDescription | ReturnType<typeof prepareOlapTableSchema> | undefined;
 
-    const schema =
-        isTableType(props.type) && isColumnEntityType(props.type)
-            ? // process data for ColumnTable
-              prepareOlapTableSchema(tableSchema)
-            : tableSchema;
+    if (isTableType(props.type) && isColumnEntityType(props.type)) {
+        // process data for ColumnTable
+        schema = prepareOlapTableSchema(currentItem?.PathDescription?.ColumnTableDescription);
+    } else if (isIndexPathType(props.type) && mergedChildrenPaths?.[0]) {
+        const targetPath = mergedChildrenPaths?.[0];
+        schema = data[targetPath]?.PathDescription?.Table;
+    } else {
+        schema = currentItem?.PathDescription?.Table;
+    }
 
     useEffect(() => {
         const {type} = props;
-        const isTable = isTableType(type);
+        const isTable = isTableType(type) || isIndexPathType(type);
 
         if (type && !isTable && !TENANT_INFO_TABS.find((el) => el.id === infoTab)) {
             history.push({
@@ -147,7 +158,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
     }, [props.type]);
 
     const renderTabs = () => {
-        const isTable = isTableType(props.type);
+        const isTable = isTableType(props.type) || isIndexPathType(props.type);
         const tabsItems = isTable ? [...TENANT_INFO_TABS, ...TENANT_SCHEMA_TAB] : TENANT_INFO_TABS;
 
         return (
@@ -175,6 +186,8 @@ function ObjectSummary(props: ObjectSummaryProps) {
     };
 
     const renderObjectOverview = () => {
+        const dataToRender = currentSchemaPath ? data[currentSchemaPath] : undefined;
+
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
         const pathTypeToComponent: Record<EPathType, (() => ReactNode) | undefined> = {
@@ -186,11 +199,9 @@ function ObjectSummary(props: ObjectSummaryProps) {
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
-            [EPathType.EPathTypeCdcStream]: () => (
-                <CDCStreamOverview data={data[currentSchemaPath]} />
-            ),
+            [EPathType.EPathTypeCdcStream]: () => <CDCStreamOverview data={dataToRender} />,
             [EPathType.EPathTypePersQueueGroup]: () => (
-                <PersQueueGroupOverview data={data[currentSchemaPath]} />
+                <PersQueueGroupOverview data={dataToRender} />
             ),
         };
 
@@ -210,15 +221,25 @@ function ObjectSummary(props: ObjectSummaryProps) {
         return <div className={b('overview-wrapper')}>{component}</div>;
     };
 
+    const renderLoader = () => {
+        return (
+            <div className={b('loader')}>
+                <Loader size="m" />
+            </div>
+        );
+    };
+
     const renderTabContent = () => {
         switch (infoTab) {
             case TenantInfoTabsIds.acl: {
                 return <Acl additionalTenantInfo={props.additionalTenantInfo} />;
             }
             case TenantInfoTabsIds.schema: {
-                return loadingSchema ? (
-                    renderLoader()
-                ) : (
+                if (loadingSchema && !wasLoaded) {
+                    return renderLoader();
+                }
+
+                return (
                     <div className={b('schema')}>
                         <SchemaViewer data={schema} />
                     </div>
@@ -228,14 +249,6 @@ function ObjectSummary(props: ObjectSummaryProps) {
                 return renderObjectOverview();
             }
         }
-    };
-
-    const renderLoader = () => {
-        return (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
-        );
     };
 
     const renderTree = () => {
@@ -285,7 +298,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
                         <Icon name="tablePreview" viewBox={'0 0 16 16'} height={16} width={16} />
                     </Button>
                 )}
-                <CopyToClipboard text={currentSchemaPath} title="Copy schema path" />
+                <CopyToClipboard text={currentSchemaPath || ''} title="Copy schema path" />
                 <PaneVisibilityToggleButtons
                     onCollapse={onCollapseInfoHandler}
                     onExpand={onExpandInfoHandler}

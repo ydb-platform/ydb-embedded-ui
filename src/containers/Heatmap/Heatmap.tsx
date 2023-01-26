@@ -22,7 +22,7 @@ const b = cn('heatmap');
 const COLORS_RANGE = getColorRange(COLORS_RANGE_SIZE);
 
 interface HeatmapProps {
-    path: string;
+    path?: string;
 }
 
 export const Heatmap = ({path}: HeatmapProps) => {

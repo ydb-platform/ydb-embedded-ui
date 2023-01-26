@@ -7,11 +7,11 @@ import {InfoViewer} from '../../../../../components/InfoViewer';
 
 import {getEntityName} from '../../../utils';
 
-import {prepareTableInfo} from './prepareTableInfo';
+import {prepareTableInfo} from '../utils';
 
-import './TableInfo.scss';
+import '../Overview.scss';
 
-const b = cn('ydb-diagnostics-table-info');
+const b = cn('ydb-diagnostics-overview');
 
 interface TableInfoProps {
     data?: TEvDescribeSchemeResult;

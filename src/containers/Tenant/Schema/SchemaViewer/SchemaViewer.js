@@ -20,7 +20,7 @@ const SchemaViewerColumns = {
 
 class SchemaViewer extends React.Component {
     static propTypes = {
-        data: PropTypes.arrayOf(PropTypes.object),
+        data: PropTypes.object,
     };
 
     renderTable() {

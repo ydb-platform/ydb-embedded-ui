@@ -17,7 +17,7 @@ import {
     setShardsState,
     setShardsQueryFilters,
 } from '../../../../store/reducers/shardsWorkload';
-import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema';
+import {setCurrentSchemaPath} from '../../../../store/reducers/schema';
 import type {IShardsWorkloadFilters} from '../../../../types/store/shardsWorkload';
 
 import type {EPathType} from '../../../../types/api/schema';
@@ -84,13 +84,14 @@ function dataTableToStringSortOrder(value: SortOrder | SortOrder[] = []) {
 
 interface OverloadedShardsProps {
     tenantPath: string;
+    currentPath?: string;
     type?: EPathType;
 }
 
-export const OverloadedShards = ({tenantPath, type}: OverloadedShardsProps) => {
+export const OverloadedShards = ({tenantPath, currentPath, type}: OverloadedShardsProps) => {
     const dispatch = useDispatch();
 
-    const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
+    const {autorefresh} = useTypedSelector((state) => state.schema);
 
     const {
         loading,
@@ -116,17 +117,27 @@ export const OverloadedShards = ({tenantPath, type}: OverloadedShardsProps) => {
     const [sortOrder, setSortOrder] = useState(tableColumnsNames.CPUCores);
 
     useAutofetcher(
-        () => {
-            dispatch(
-                sendShardQuery({
-                    database: tenantPath,
-                    path: currentSchemaPath,
-                    sortOrder: stringToQuerySortOrder(sortOrder),
-                    filters,
-                }),
-            );
+        (isBackground) => {
+            if (!isBackground) {
+                dispatch(
+                    setShardsState({
+                        loading: true,
+                        wasLoaded: false,
+                    }),
+                );
+            }
+            if (currentPath) {
+                dispatch(
+                    sendShardQuery({
+                        database: tenantPath,
+                        path: currentPath,
+                        sortOrder: stringToQuerySortOrder(sortOrder),
+                        filters,
+                    }),
+                );
+            }
         },
-        [dispatch, tenantPath, currentSchemaPath, sortOrder, filters],
+        [dispatch, tenantPath, currentPath, sortOrder, filters],
         autorefresh,
     );
 
@@ -138,7 +149,7 @@ export const OverloadedShards = ({tenantPath, type}: OverloadedShardsProps) => {
                 data: undefined,
             }),
         );
-    }, [dispatch, currentSchemaPath, tenantPath, filters]);
+    }, [dispatch, currentPath, tenantPath, filters]);
 
     const history = useContext(HistoryContext);
 
@@ -158,7 +169,6 @@ export const OverloadedShards = ({tenantPath, type}: OverloadedShardsProps) => {
         const onSchemaClick = (schemaPath: string) => {
             return () => {
                 dispatch(setCurrentSchemaPath(schemaPath));
-                dispatch(getSchema({path: schemaPath}));
                 history.go(0);
             };
         };

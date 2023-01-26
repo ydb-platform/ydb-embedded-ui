@@ -103,7 +103,8 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeColumnTable]: TABLE_PAGES,
 
     [EPathType.EPathTypeDir]: DIR_PAGES,
-    [EPathType.EPathTypeTableIndex]: DIR_PAGES,
+
+    [EPathType.EPathTypeTableIndex]: TABLE_PAGES,
 
     [EPathType.EPathTypeCdcStream]: CDC_STREAM_PAGES,
 

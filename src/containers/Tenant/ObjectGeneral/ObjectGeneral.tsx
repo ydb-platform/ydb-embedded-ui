@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 
 import {useThemeValue} from '@gravity-ui/uikit';
 
-import type {EPathType} from '../../../types/api/schema';
+import type {EPathSubType, EPathType} from '../../../types/api/schema';
 
 import QueryEditor from '../QueryEditor/QueryEditor';
 import Diagnostics from '../Diagnostics/Diagnostics';
@@ -17,6 +17,7 @@ const b = cn('object-general');
 
 interface ObjectGeneralProps {
     type?: EPathType;
+    subType?: EPathSubType;
     additionalTenantInfo?: any;
     additionalNodesInfo?: any;
 }
@@ -33,7 +34,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
     const {name: tenantName, general: generalTab} = queryParams;
 
     const renderTabContent = () => {
-        const {type, additionalTenantInfo, additionalNodesInfo} = props;
+        const {type, subType, additionalTenantInfo, additionalNodesInfo} = props;
         switch (generalTab) {
             case TenantGeneralTabsIds.query: {
                 return <QueryEditor path={tenantName as string} theme={theme} type={type} />;
@@ -42,6 +43,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
                 return (
                     <Diagnostics
                         type={type}
+                        subType={subType}
                         additionalTenantInfo={additionalTenantInfo}
                         additionalNodesInfo={additionalNodesInfo}
                     />

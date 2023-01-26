@@ -3,9 +3,7 @@ import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 
 import {Loader} from '../../../../components/Loader';
 
-//@ts-ignore
-import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
-
+import {TableIndexInfo} from './TableIndexInfo';
 import {TopicInfo} from './TopicInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
 import {TableInfo} from './TableInfo';
@@ -148,7 +146,9 @@ function Overview({type, tenantName, className}: OverviewProps) {
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeTable]: undefined,
             [EPathType.EPathTypeSubDomain]: undefined,
-            [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={schemaData} />,
+            [EPathType.EPathTypeTableIndex]: () => (
+                <TableIndexInfo data={schemaData} childrenPaths={mergedChildrenPaths} />
+            ),
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,

@@ -109,20 +109,21 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
         );
     };
 
-    const renderContent = () => {
-        const states = Array.from(new Set(tablets.map((tablet) => tablet.State)))
-            .filter((state): state is ETabletState => state !== undefined)
-            .map((item) => ({
-                value: item,
-                content: item,
-            }));
-        const types = Array.from(new Set(tablets.map((tablet) => tablet.Type)))
-            .filter((type): type is EType => type !== undefined)
-            .map((item) => ({
-                value: item,
-                content: item,
-            }));
+    const states = Array.from(new Set(tablets.map((tablet) => tablet.State)))
+        .filter((state): state is ETabletState => state !== undefined)
+        .map((item) => ({
+            value: item,
+            content: item,
+        }));
 
+    const types = Array.from(new Set(tablets.map((tablet) => tablet.Type)))
+        .filter((type): type is EType => type !== undefined)
+        .map((item) => ({
+            value: item,
+            content: item,
+        }));
+
+    const renderContent = () => {
         return (
             <div className={b(null, className)}>
                 <div className={b('header')}>

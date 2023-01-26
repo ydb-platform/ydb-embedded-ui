@@ -176,6 +176,7 @@ export const isCdcStreamEntityType = (type?: EPathType) =>
 
 const pathTypeToEntityWithMergedImplementation: Record<EPathType, boolean> = {
     [EPathType.EPathTypeCdcStream]: true,
+    [EPathType.EPathTypeTableIndex]: true,
 
     [EPathType.EPathTypePersQueueGroup]: false,
     [EPathType.EPathTypeInvalid]: false,
@@ -184,12 +185,24 @@ const pathTypeToEntityWithMergedImplementation: Record<EPathType, boolean> = {
     [EPathType.EPathTypeDir]: false,
     [EPathType.EPathTypeTable]: false,
     [EPathType.EPathTypeSubDomain]: false,
-    [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeExtSubDomain]: false,
 };
 
 export const isEntityWithMergedImplementation = (type?: EPathType) =>
     (type && pathTypeToEntityWithMergedImplementation[type]) ?? false;
+
+// ====================
+
+const pathSubTypeToIsMerged: Record<EPathSubType, boolean> = {
+    [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeStreamImpl]: true,
+
+    [EPathSubType.EPathSubTypeEmpty]: false,
+};
+
+export const isMergedPathSubType = (subType?: EPathSubType) =>
+    (subType && pathSubTypeToIsMerged[subType]) ?? false;
 
 // ====================
 
@@ -204,6 +217,7 @@ const pathSubTypeToChildless: Record<EPathSubType, boolean> = {
 const pathTypeToChildless: Record<EPathType, boolean> = {
     [EPathType.EPathTypeCdcStream]: true,
     [EPathType.EPathTypePersQueueGroup]: true,
+    [EPathType.EPathTypeTableIndex]: true,
 
     [EPathType.EPathTypeInvalid]: false,
     [EPathType.EPathTypeColumnStore]: false,
@@ -211,12 +225,15 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
     [EPathType.EPathTypeDir]: false,
     [EPathType.EPathTypeTable]: false,
     [EPathType.EPathTypeSubDomain]: false,
-    [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeExtSubDomain]: false,
 };
 
 export const isChildlessPathType = (type?: EPathType, subType?: EPathSubType) =>
     ((subType && pathSubTypeToChildless[subType]) || (type && pathTypeToChildless[type])) ?? false;
+
+// ====================
+
+export const isIndexPathType = (type?: EPathType) => type === EPathType.EPathTypeTableIndex;
 
 // ====================
 

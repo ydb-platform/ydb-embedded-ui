@@ -32,7 +32,6 @@ const autofetcher = new AutoFetcher();
 
 function HotKeys({
     getHotKeys,
-    currentSchemaPath,
     loading,
     wasLoaded,
     error,
@@ -41,10 +40,11 @@ function HotKeys({
     setHotKeysOptions,
     currentSchema,
     type,
+    path,
 }) {
     const fetchData = () => {
         if (isTableType(type) && !isColumnEntityType(type)) {
-            getHotKeys(currentSchemaPath);
+            getHotKeys(path);
         }
     };
     useEffect(() => {
@@ -66,7 +66,7 @@ function HotKeys({
             wasLoaded: false,
             data: undefined,
         });
-    }, [currentSchemaPath]);
+    }, [path]);
 
     const renderLoader = () => {
         return (
@@ -137,12 +137,10 @@ function HotKeys({
 const mapStateToProps = (state) => {
     const {loading, data, error, wasLoaded} = state.hotKeys;
     const {currentSchema = {}, autorefresh} = state.schema;
-    const {Path} = currentSchema;
     return {
         loading,
         data,
         error,
-        currentSchemaPath: Path,
         autorefresh,
         wasLoaded,
         currentSchema,

@@ -53,7 +53,7 @@ interface Window {
             path?: string;
         }) => Promise<import('../types/api/tablet').TEvTabletStateResponse>;
         getHeatmapData: (params: {
-            path: string;
+            path?: string;
         }) => Promise<import('../types/api/schema').TEvDescribeSchemeResult>;
         getTopic: (params: {
             path?: string;

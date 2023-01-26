@@ -1,9 +1,13 @@
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 
-import {NavigationTree} from 'ydb-ui-components';
+import {NavigationTree, NavigationTreeDataItem} from 'ydb-ui-components';
 
-import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema';
+import {
+    setCurrentSchemaPath,
+    preloadSchemas,
+    resetLoadingState,
+} from '../../../../store/reducers/schema';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
@@ -13,7 +17,7 @@ interface SchemaTreeProps {
     rootPath: string;
     rootName: string;
     rootType?: EPathType;
-    currentPath: string;
+    currentPath?: string;
 }
 
 export function SchemaTree(props: SchemaTreeProps) {
@@ -21,11 +25,12 @@ export function SchemaTree(props: SchemaTreeProps) {
 
     const dispatch = useDispatch();
 
-    const fetchPath = (path: string) =>
+    const fetchPath = (path: string): Promise<NavigationTreeDataItem[] | undefined> =>
         window.api
             .getSchema({path}, {concurrentId: `NavigationTree.getSchema|${path}`})
             .then((data) => {
-                const {PathDescription: {Children = []} = {}} = data;
+                const {PathDescription: {Children = [], Self = {}} = {}} = data;
+                const {PathType: SelfPathType, PathSubType: SelfPathSubType} = Self;
 
                 const preloadedData: Record<string, TEvDescribeSchemeResult> = {
                     [path]: data,
@@ -48,19 +53,35 @@ export function SchemaTree(props: SchemaTreeProps) {
 
                 dispatch(preloadSchemas(preloadedData));
 
+                // Childless entities also include entities that have children,
+                // which for some reason are hidden
+                // In this case a user cannot navigate to them in the app
+                // But can directly access them via url
+                // To prevent it,tree rendering stops on childless component
+                if (isChildlessPathType(SelfPathType, SelfPathSubType)) {
+                    dispatch(setCurrentSchemaPath(path));
+                    dispatch(resetLoadingState());
+
+                    // NavigationTree renders nothing, when children are undefined
+                    return undefined;
+                }
+
                 return childItems;
             });
 
-    const handleActivePathUpdate = (activePath: string) => {
-        dispatch(setCurrentSchemaPath(activePath));
-    };
+    const handleActivePathUpdate = useCallback(
+        (activePath: string) => {
+            dispatch(setCurrentSchemaPath(activePath));
+        },
+        [dispatch],
+    );
 
     useEffect(() => {
         // if the cached path is not in the current tree, show root
-        if (!currentPath.startsWith(rootPath)) {
+        if (currentPath && !currentPath.startsWith(rootPath)) {
             handleActivePathUpdate(rootPath);
         }
-    }, []);
+    }, [currentPath, rootPath, handleActivePathUpdate]);
 
     return (
         <NavigationTree
@@ -70,6 +91,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 type: mapPathTypeToNavigationTreeType(rootType),
                 collapsed: false,
             }}
+            // @ts-ignore
             fetchPath={fetchPath}
             getActions={getActions(dispatch, handleActivePathUpdate)}
             activePath={currentPath}
