@@ -1,6 +1,8 @@
+import {ReactNode} from 'react';
 import {connect} from 'react-redux';
+import cn from 'bem-cn-lite';
 
-import {RadioButton, Switch} from '@gravity-ui/uikit';
+import {RadioButton, Switch, HelpPopover} from '@gravity-ui/uikit';
 import {Settings} from '@gravity-ui/navigation';
 
 import favoriteFilledIcon from '../../assets/icons/star.svg';
@@ -13,6 +15,10 @@ import {
 } from '../../utils/constants';
 
 import {setSettingValue} from '../../store/reducers/settings';
+
+import './UserSettings.scss';
+
+const b = cn('ydb-user-settings');
 
 enum Theme {
     light = 'light',
@@ -31,6 +37,19 @@ function UserSettings(props: any) {
 
     const _onNodesEndpointChangeHandler = (value: boolean) => {
         props.setSettingValue(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY, String(value));
+    };
+
+    const renderBreakNodesSettingsItem = (title: ReactNode) => {
+        return (
+            <div className={b('item-with-popup')}>
+                {title}
+                <HelpPopover
+                    content="Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on older versions"
+                    contentClassName={b('popup')}
+                    hasArrow={true}
+                />
+            </div>
+        );
     };
 
     return (
@@ -58,7 +77,10 @@ function UserSettings(props: any) {
                             onUpdate={_onInvertedDisksChangeHandler}
                         />
                     </Settings.Item>
-                    <Settings.Item title="Use /viewer/json/nodes for Nodes Tab in diagnostics">
+                    <Settings.Item
+                        title="Break the Nodes tab in Diagnostics"
+                        renderTitleComponent={renderBreakNodesSettingsItem}
+                    >
                         <Switch
                             checked={props.useNodesEndpointInDiagnostics}
                             onUpdate={_onNodesEndpointChangeHandler}
