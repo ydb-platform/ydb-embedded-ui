@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.2.3...v3.3.0) (2023-01-30)
+
+
+### Features
+
+* **Nodes:** use /viewer/json/nodes endpoint ([226cc70](https://github.com/ydb-platform/ydb-embedded-ui/commit/226cc70dcb89262890856b4d0cb03eac0675256d))
+* **Overview:** display topic stats for topics and streams ([08e9fe0](https://github.com/ydb-platform/ydb-embedded-ui/commit/08e9fe0ee379715229474322a03ec668e26bdb9b))
+* **Storage:** display vdisks over pdisks ([bb5d1fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/bb5d1fa5ae2953ca30b13df45340b7a1a63056cb))
+
+
+### Bug Fixes
+
+* add duration formatter ([e325d98](https://github.com/ydb-platform/ydb-embedded-ui/commit/e325d98845d29dea208debdfcb88d330c1d6daee))
+* add protobuf time formatters ([c74cd9d](https://github.com/ydb-platform/ydb-embedded-ui/commit/c74cd9d0949674414ba2c9754e3dcc5c2be622a5))
+* add verticalBars component ([053ffa8](https://github.com/ydb-platform/ydb-embedded-ui/commit/053ffa8fd460f89f4296a96fcf46a9267ac4cae3))
+* **PDisk:** grey color for unknown state ([54f7e15](https://github.com/ydb-platform/ydb-embedded-ui/commit/54f7e159aaddd932ccecddfb10265ee596fed1e2))
+* **Storage:** request only static nodes ([e91e136](https://github.com/ydb-platform/ydb-embedded-ui/commit/e91e136d7c72bea694c7a282c83d577cc60e5386))
+* **Topic:** add reducer for describe_topic ([7c61dc9](https://github.com/ydb-platform/ydb-embedded-ui/commit/7c61dc906452df2e1a77a2ff602916f6ea785df5))
+* update PDisks and VDisks tests ([3bf660e](https://github.com/ydb-platform/ydb-embedded-ui/commit/3bf660e41d92e1a32444872c5fb9d47209bef8b5))
+
 ## [3.2.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.2.2...v3.2.3) (2023-01-16)
 
 
