@@ -91,6 +91,8 @@ const initialTenantCommonInfoState = {
 function QueryEditor(props) {
     const [resultType, setResultType] = useState(RESULT_TYPES.EXECUTE);
 
+    const [isResultLoaded, setIsResultLoaded] = useState(false);
+
     const [resultVisibilityState, dispatchResultVisibilityState] = useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
         initialTenantCommonInfoState,
@@ -117,11 +119,12 @@ function QueryEditor(props) {
     }, []);
 
     useEffect(() => {
-        const {showPreview} = props;
-        if (showPreview && resultVisibilityState.collapsed) {
+        if (props.showPreview || isResultLoaded) {
             dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        } else {
+            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
         }
-    }, [props.showPreview, resultVisibilityState.collapsed]);
+    }, [props.showPreview, isResultLoaded]);
 
     useEffect(() => {
         const {
@@ -254,6 +257,7 @@ function QueryEditor(props) {
 
         setResultType(RESULT_TYPES.EXECUTE);
         sendQuery({query: input, database: path, action: runAction});
+        setIsResultLoaded(true);
         setShowPreview(false);
 
         const {queries, currentIndex} = history;
@@ -272,6 +276,7 @@ function QueryEditor(props) {
         } = props;
         setResultType(RESULT_TYPES.EXPLAIN);
         getExplainQuery({query: input, database: path});
+        setIsResultLoaded(true);
         setShowPreview(false);
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
