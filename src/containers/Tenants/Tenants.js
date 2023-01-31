@@ -218,8 +218,9 @@ class Tenants extends React.Component {
                 },
                 accessor: ({Metrics = {}, CoresUsed}) => {
                     if (!isNaN(Number(CoresUsed))) {
-                        const cores = Math.round(Number(CoresUsed) * 100) / 100;
-                        return cores || '—';
+                        return Number(CoresUsed) * 100 > 1
+                            ? formatCPU(Number(CoresUsed) * 1_000_000)
+                            : '—';
                     } else {
                         return Number(Metrics.CPU) ? formatCPU(Number(Metrics.CPU)) : '—';
                     }
