@@ -8,7 +8,7 @@ import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
 import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
 
-import {formatBytes} from '../../utils/index';
+import {formatBytesToGigabyte} from '../../utils/index';
 import {INodesPreparedEntity} from '../../types/store/nodes';
 import {showTooltip as externalShowTooltip} from '../../store/reducers/tooltip';
 
@@ -100,7 +100,7 @@ export function getNodesColumns({
             name: 'Uptime',
             header: 'Uptime',
             sortAccessor: ({StartTime}) => StartTime && -StartTime,
-            align: DataTable.LEFT,
+            align: DataTable.RIGHT,
             width: '110px',
         },
         {
@@ -110,7 +110,7 @@ export function getNodesColumns({
             defaultOrder: DataTable.DESCENDING,
             render: ({row}) => {
                 if (row.MemoryUsed) {
-                    return formatBytes(row.MemoryUsed);
+                    return formatBytesToGigabyte(row.MemoryUsed);
                 } else {
                     return '—';
                 }
