@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.3.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.3.1...v3.3.2) (2023-01-31)
+
+
+### Bug Fixes
+
+* **QueryEditor:** collapse bottom panel if empty ([566db3b](https://github.com/ydb-platform/ydb-embedded-ui/commit/566db3b15c4393555071f058c88ad36b4073cc2d))
+* **VDisk:** use pdiskid field for link ([5ee0705](https://github.com/ydb-platform/ydb-embedded-ui/commit/5ee0705416aa31be9bee4be0776ecb8a61d3e82c))
+
 ## [3.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.3.0...v3.3.1) (2023-01-31)
 
 
