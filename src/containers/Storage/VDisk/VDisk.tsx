@@ -123,7 +123,7 @@ export const VDisk = ({data = {}, poolName, nodes, compact}: VDiskProps) => {
                             routes.node,
                             {id: data.NodeId, activeTab: STRUCTURE},
                             {
-                                pdiskId: data.PDisk?.PDiskId,
+                                pdiskId: data.PDiskId ?? data.PDisk?.PDiskId,
                                 vdiskId: stringifyVdiskId(data.VDiskId),
                             },
                         )}
