@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.3.0...v3.3.1) (2023-01-31)
+
+
+### Bug Fixes
+
+* **UserSettings:** reword nodes setting and add popup ([2fda2b8](https://github.com/ydb-platform/ydb-embedded-ui/commit/2fda2b815b921a8163f80527c45f788172df4ba8))
+
 ## [3.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.2.3...v3.3.0) (2023-01-30)
 
 
