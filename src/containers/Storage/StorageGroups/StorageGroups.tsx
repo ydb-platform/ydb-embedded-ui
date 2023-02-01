@@ -20,7 +20,7 @@ import {getUsage, isFullDonorData} from '../../../utils/storage';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
 import {VDisk} from '../VDisk';
-import {getDegradedSeverity, getUsageSeverity} from '../utils';
+import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../utils';
 
 import i18n from './i18n';
 import './StorageGroups.scss';
@@ -127,6 +127,7 @@ function StorageGroups({
         {
             name: TableColumnsIds.Type,
             header: tableColumnsNames[TableColumnsIds.Type],
+            // prettier-ignore
             render: ({value, row}) => (
                 <>
                     <Label>{(value as string) || '—'}</Label>
@@ -164,7 +165,7 @@ function StorageGroups({
                 // but the absence of a value is more clear
                 return row.Limit ? (
                     <Label
-                        theme={getUsageSeverity(usage)}
+                        theme={getUsageSeverityForStorageGroup(usage)}
                         className={b('usage-label', {overload: usage >= 90})}
                     >
                         {usage}%

@@ -17,7 +17,7 @@ import {DiskStateProgressBar, EDiskStateSeverity} from '../DiskStateProgressBar'
 import {PDiskPopup} from '../PDiskPopup';
 import {VDisk} from '../VDisk';
 
-import {NOT_AVAILABLE_SEVERITY} from '../utils';
+import {getUsageSeverityForPDisk, NOT_AVAILABLE_SEVERITY} from '../utils';
 
 import './PDisk.scss';
 
@@ -67,21 +67,6 @@ export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
 
     const anchor = useRef(null);
 
-    useEffect(() => {
-        const newSeverity = getStateSeverity(data.State);
-        if (severity !== newSeverity) {
-            setSeverity(newSeverity);
-        }
-    }, [data.State]);
-
-    const showPopup = () => {
-        setIsPopupVisible(true);
-    };
-
-    const hidePopup = () => {
-        setIsPopupVisible(false);
-    };
-
     const pdiskAllocatedPercent = useMemo(() => {
         const {AvailableSize, TotalSize} = data;
 
@@ -93,6 +78,29 @@ export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
             ? Math.round(((Number(TotalSize) - Number(AvailableSize)) * 100) / Number(TotalSize))
             : undefined;
     }, [data]);
+
+    useEffect(() => {
+        const newStateSeverity = getStateSeverity(data.State);
+        const newSpaceSeverityFlag = getUsageSeverityForPDisk(pdiskAllocatedPercent || 0);
+
+        let newSeverity: number;
+
+        if (newStateSeverity === NOT_AVAILABLE_SEVERITY || !newSpaceSeverityFlag) {
+            newSeverity = newStateSeverity;
+        } else {
+            newSeverity = Math.max(newStateSeverity, EDiskStateSeverity[newSpaceSeverityFlag]);
+        }
+
+        setSeverity(newSeverity);
+    }, [data.State, pdiskAllocatedPercent]);
+
+    const showPopup = () => {
+        setIsPopupVisible(true);
+    };
+
+    const hidePopup = () => {
+        setIsPopupVisible(false);
+    };
 
     const renderVDisks = () => {
         if (!vdisks?.length) {
@@ -108,7 +116,7 @@ export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
                         style={{
                             // 1 is small enough for empty disks to be of the minimum width
                             // but if all of them are empty, `flex-grow: 1` would size them evenly
-                            flexGrow: (Number(vdisk.AllocatedSize) || 1),
+                            flexGrow: Number(vdisk.AllocatedSize) || 1,
                         }}
                     >
                         <VDisk data={vdisk} compact />

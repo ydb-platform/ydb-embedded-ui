@@ -1,12 +1,14 @@
 import type {IStoragePoolGroup} from '../../../types/store/storage';
+import {EFlag} from '../../../types/api/enums';
 
 export * from './constants';
 
-const generateEvaluator = <
-    OkLevel extends string,
-    WarnLevel extends string,
-    CritLevel extends string
->(warn: number, crit: number, levels: [OkLevel, WarnLevel, CritLevel]) =>
+const generateEvaluator =
+    <OkLevel extends string, WarnLevel extends string, CritLevel extends string>(
+        warn: number,
+        crit: number,
+        levels: [OkLevel, WarnLevel, CritLevel],
+    ) =>
     (value: number) => {
         if (0 <= value && value < warn) {
             return levels[0];
@@ -34,12 +36,26 @@ const canEvaluateErasureSpecies = (value?: string): value is keyof typeof degrad
     value !== undefined && value in degradationEvaluators;
 
 export const getDegradedSeverity = (group: IStoragePoolGroup) => {
-    const evaluate = canEvaluateErasureSpecies(group.ErasureSpecies) ?
-        degradationEvaluators[group.ErasureSpecies] :
-        defaultDegradationEvaluator;
+    const evaluate = canEvaluateErasureSpecies(group.ErasureSpecies)
+        ? degradationEvaluators[group.ErasureSpecies]
+        : defaultDegradationEvaluator;
 
     return evaluate(group.Missing);
 };
 
-export const getUsageSeverity = generateEvaluator(80, 85, ['success', 'warning', 'danger']);
-export const getUsageSeverityForEntityStatus = generateEvaluator(80, 85, ['Green', 'Yellow', 'Red']);
+export const getUsageSeverityForStorageGroup = generateEvaluator(80, 85, [
+    'success',
+    'warning',
+    'danger',
+]);
+export const getUsageSeverityForEntityStatus = generateEvaluator(80, 85, [
+    'Green',
+    'Yellow',
+    'Red',
+]);
+
+export const getUsageSeverityForPDisk = generateEvaluator(85, 95, [
+    EFlag.Green,
+    EFlag.Yellow,
+    EFlag.Red,
+]);
