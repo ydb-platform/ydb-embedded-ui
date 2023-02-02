@@ -1,6 +1,8 @@
 import numeral from 'numeral';
 import locales from 'numeral/locales'; // eslint-disable-line no-unused-vars
 
+import {dateTimeParse} from '@gravity-ui/date-utils';
+
 import {i18n} from './i18n';
 import {MEGABYTE, TERABYTE, GIGABYTE, DAY_IN_SECONDS} from './constants';
 import {isNumeric} from './utils';
@@ -76,7 +78,7 @@ export const formatDateTime = (value) => {
         return '';
     }
 
-    return value > 0 ? new Date(Number(value)).toUTCString() : 'N/A';
+    return value > 0 ? dateTimeParse(Number(value)).format('YYYY-MM-DD HH:mm') : 'N/A';
 };
 
 export const calcUptimeInSeconds = (milliseconds) => {

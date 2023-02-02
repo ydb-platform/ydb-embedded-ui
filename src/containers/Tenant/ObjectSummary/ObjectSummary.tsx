@@ -26,6 +26,8 @@ import {
     TColumnTableDescription,
     TDirEntry,
 } from '../../../types/api/schema';
+
+import {formatDateTime} from '../../../utils';
 import {isColumnEntityType, isIndexTable, isTableType} from '../utils/schema';
 
 import {
@@ -201,7 +203,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
             const startTimeInMilliseconds = Number(currentSchemaData?.CreateStep);
             let createTime = '';
             if (startTimeInMilliseconds) {
-                createTime = new Date(startTimeInMilliseconds).toUTCString();
+                createTime = formatDateTime(startTimeInMilliseconds);
             }
 
             component = <InfoViewer info={[{label: 'Create time', value: createTime}]} />;
