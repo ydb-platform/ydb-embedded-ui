@@ -12,7 +12,7 @@ import {
 } from '@gravity-ui/paranoid';
 import {renderExplainNode} from '../../../../utils';
 import {explainVersions} from '../../../../store/reducers/explainQuery';
-import QueryExecutionStatus from '../../../../components/QueryExecutionStatus/QueryExecutionStatus';
+import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import Divider from '../../../../components/Divider/Divider';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
@@ -263,7 +263,7 @@ function QueryExplain(props) {
                 {!props.loading && (
                     <React.Fragment>
                         <div className={b('controls-right')}>
-                            <QueryExecutionStatus hasError={Boolean(props.error)} />
+                            <QueryExecutionStatus error={props.error} />
                             {!props.error && (
                                 <React.Fragment>
                                     <Divider />

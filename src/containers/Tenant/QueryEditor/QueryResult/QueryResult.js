@@ -11,7 +11,7 @@ import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 
 import './QueryResult.scss';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
-import QueryExecutionStatus from '../../../../components/QueryExecutionStatus/QueryExecutionStatus';
+import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import ResultIssues from '../Issues/Issues';
 import {prepareQueryError} from '../../../../utils/query';
@@ -127,7 +127,7 @@ function QueryResult(props) {
         <React.Fragment>
             <div className={b('controls')}>
                 <div className={b('controls-right')}>
-                    <QueryExecutionStatus hasError={Boolean(props.error)} />
+                    <QueryExecutionStatus error={props.error} />
 
                     {props.stats && !props.error && (
                         <React.Fragment>
