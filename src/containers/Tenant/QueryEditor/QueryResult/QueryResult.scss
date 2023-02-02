@@ -20,6 +20,10 @@
         }
     }
 
+    &__error {
+        padding: 15px 10px;
+    }
+
     &__controls {
         position: sticky;
         z-index: 2;

@@ -14,6 +14,7 @@ import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpe
 import QueryExecutionStatus from '../../../../components/QueryExecutionStatus/QueryExecutionStatus';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import ResultIssues from '../Issues/Issues';
+import {prepareQueryError} from '../../../../utils/query';
 
 const b = cn('kv-query-result');
 
@@ -94,24 +95,32 @@ function QueryResult(props) {
     };
 
     const renderIssues = () => {
-        const error = props.error?.data;
+        const error = props.error;
 
-        const hasIssues = error?.issues && Array.isArray(error.issues);
+        const hasIssues = error?.data?.issues && Array.isArray(error.data.issues);
 
-        return hasIssues ? (
-            <React.Fragment>
-                <ResultIssues data={error} />
-                {isFullscreen && (
-                    <Fullscreen>
-                        <div className={b('result', {fullscreen: true})}>
-                            <ResultIssues data={error} />
-                        </div>
-                    </Fullscreen>
-                )}
-            </React.Fragment>
-        ) : (
-            <span>{error?.data ?? error}</span>
-        );
+        if (hasIssues) {
+            return (
+                <React.Fragment>
+                    <ResultIssues data={error.data} />
+                    {isFullscreen && (
+                        <Fullscreen>
+                            <div className={b('result', {fullscreen: true})}>
+                                <ResultIssues data={error.data} />
+                            </div>
+                        </Fullscreen>
+                    )}
+                </React.Fragment>
+            )
+        }
+
+        if (error) {
+            return (
+                <div className={b('error')}>
+                    {prepareQueryError(error)}
+                </div>
+            );
+        }
     };
 
     return (
