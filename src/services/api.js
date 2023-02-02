@@ -185,7 +185,10 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 timeout: 600000,
             },
             null,
-            {concurrentId},
+            {
+                concurrentId,
+                timeout: 9 * 60 * 1000,
+            },
         );
     }
     getExplainQuery(query, database) {
