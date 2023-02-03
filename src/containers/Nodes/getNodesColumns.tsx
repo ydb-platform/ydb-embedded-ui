@@ -1,5 +1,5 @@
 import cn from 'bem-cn-lite';
-import DataTable, {Column} from '@yandex-cloud/react-data-table';
+import DataTable, {Column} from '@gravity-ui/react-data-table';
 import {Button, Popover} from '@gravity-ui/uikit';
 
 import Icon from '../../components/Icon/Icon';

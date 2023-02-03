@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import {ArrowToggle, Button, Popover} from '@gravity-ui/uikit';
 
-import DataTable, {Column, Settings} from '@yandex-cloud/react-data-table';
+import DataTable, {Column, Settings} from '@gravity-ui/react-data-table';
 
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
@@ -295,10 +295,7 @@ export function PDisk(props: PDiskProps) {
                         value={data.PDiskId}
                         className={b('pdisk-title-id')}
                     />
-                    <PDiskTitleBadge
-                        value={getPDiskType(data)}
-                        className={b('pdisk-title-type')}
-                    />
+                    <PDiskTitleBadge value={getPDiskType(data)} className={b('pdisk-title-type')} />
                     <ProgressViewer
                         value={data.TotalSize - data.AvailableSize}
                         capacity={data.TotalSize}
@@ -306,12 +303,12 @@ export function PDisk(props: PDiskProps) {
                         colorizeProgress={true}
                         className={b('pdisk-title-size')}
                     />
-                    <PDiskTitleBadge
-                        label="VDisks"
-                        value={data.vDisks.length}
-                    />
+                    <PDiskTitleBadge label="VDisks" value={data.vDisks.length} />
                 </div>
-                <Button onClick={unfolded ? onClosePDiskDetails : onOpenPDiskDetails} view="flat-secondary">
+                <Button
+                    onClick={unfolded ? onClosePDiskDetails : onOpenPDiskDetails}
+                    view="flat-secondary"
+                >
                     <ArrowToggle direction={unfolded ? 'top' : 'bottom'} />
                 </Button>
             </div>

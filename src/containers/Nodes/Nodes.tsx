@@ -2,7 +2,7 @@ import {useCallback, useEffect} from 'react';
 import cn from 'bem-cn-lite';
 import {useDispatch} from 'react-redux';
 
-import DataTable from '@yandex-cloud/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {Illustration} from '../../components/Illustration';
