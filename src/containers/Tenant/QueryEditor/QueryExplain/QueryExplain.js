@@ -1,27 +1,32 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 import MonacoEditor from 'react-monaco-editor';
-import {Loader, RadioButton} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
-import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco';
+import 'react-json-inspector/json-inspector.css';
+
 import {
     TextOverflow,
     getYdbPlanNodeShape,
     getCompactTopology,
     getTopology,
 } from '@gravity-ui/paranoid';
-import {renderExplainNode} from '../../../../utils';
-import {explainVersions} from '../../../../store/reducers/explainQuery';
-import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
+import {Loader, RadioButton} from '@gravity-ui/uikit';
+
 import Divider from '../../../../components/Divider/Divider';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
-import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 
-import 'react-json-inspector/json-inspector.css';
-import './QueryExplain.scss';
-import {useDispatch, useSelector} from 'react-redux';
+import {explainVersions} from '../../../../store/reducers/explainQuery';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
+
+import {renderExplainNode} from '../../../../utils';
+import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco';
+
+import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
+
+import './QueryExplain.scss';
 
 const b = cn('kv-query-explain');
 
