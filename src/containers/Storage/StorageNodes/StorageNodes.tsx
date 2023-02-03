@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
 
-import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
+import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import {Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {VisibleEntities} from '../../../store/reducers/storage';

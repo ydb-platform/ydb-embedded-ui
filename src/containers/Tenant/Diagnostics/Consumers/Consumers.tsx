@@ -1,9 +1,9 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
-import { escapeRegExp } from 'lodash/fp';
+import {escapeRegExp} from 'lodash/fp';
 
-import DataTable, {Column} from '@yandex-cloud/react-data-table';
+import DataTable, {Column} from '@gravity-ui/react-data-table';
 
 import type {EPathType} from '../../../../types/api/schema';
 import {Loader} from '../../../../components/Loader';

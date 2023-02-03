@@ -1,8 +1,8 @@
 import {useMemo} from 'react';
 import cn from 'bem-cn-lite';
 
-import DataTable from '@yandex-cloud/react-data-table';
-import type {Column, DataTableProps, Settings} from '@yandex-cloud/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
+import type {Column, DataTableProps, Settings} from '@gravity-ui/react-data-table';
 
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';

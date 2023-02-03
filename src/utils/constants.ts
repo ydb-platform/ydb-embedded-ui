@@ -1,4 +1,4 @@
-import DataTable from '@yandex-cloud/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
 const SECOND = 1000;
 

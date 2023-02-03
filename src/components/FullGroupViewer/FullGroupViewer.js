@@ -2,7 +2,7 @@ import React from 'react';
 import cn from 'bem-cn-lite';
 import PropTypes from 'prop-types';
 
-import DataTable from '@yandex-cloud/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
 import InfoViewer from '../InfoViewer/InfoViewer';
 import EntityStatus from '../EntityStatus/EntityStatus';

@@ -2,7 +2,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import DataTable, {Column, Settings} from '@yandex-cloud/react-data-table';
+import DataTable, {Column, Settings} from '@gravity-ui/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 
 import {DateRange, DateRangeValues} from '../../../../components/DateRange';

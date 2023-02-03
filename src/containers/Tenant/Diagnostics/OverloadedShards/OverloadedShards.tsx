@@ -2,7 +2,7 @@ import {useState, useContext, useEffect, useMemo} from 'react';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import DataTable, {Column, Settings, SortOrder} from '@yandex-cloud/react-data-table';
+import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 
 import {DateRange, DateRangeValues} from '../../../../components/DateRange';
