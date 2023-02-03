@@ -420,7 +420,7 @@ export const getUsageFilterOptions = createSelector(getVisibleEntitiesList, (ent
     entities.forEach((entity) => {
         const usage = getUsage(entity, 5);
 
-        if (!Object.hasOwn(items, usage)) {
+        if (!Object.prototype.hasOwnProperty.call(items, usage)) {
             items[usage] = 0;
         }
 
