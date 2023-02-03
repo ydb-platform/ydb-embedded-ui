@@ -1,20 +1,25 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
-import {RadioButton} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
+
+import {RadioButton} from '@gravity-ui/uikit';
 
 import CopyToClipboard from '../../../../components/CopyToClipboard/CopyToClipboard';
 import Divider from '../../../../components/Divider/Divider';
+import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
+
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 
-import './QueryResult.scss';
-import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
-import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
-import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
-import ResultIssues from '../Issues/Issues';
 import {prepareQueryError} from '../../../../utils/query';
+
+import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
+
+import ResultIssues from '../Issues/Issues';
+
+import './QueryResult.scss';
 
 const b = cn('kv-query-result');
 
