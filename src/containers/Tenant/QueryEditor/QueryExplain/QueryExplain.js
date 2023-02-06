@@ -9,7 +9,7 @@ import {
     getYdbPlanNodeShape,
     getCompactTopology,
     getTopology,
-} from '@yandex-cloud/paranoid';
+} from '@gravity-ui/paranoid';
 import {renderExplainNode} from '../../../../utils';
 import {explainVersions} from '../../../../store/reducers/explainQuery';
 import QueryExecutionStatus from '../../../../components/QueryExecutionStatus/QueryExecutionStatus';
