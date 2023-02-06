@@ -5,7 +5,7 @@ import {
     TopologyNodeDataStatsSection,
     ExplainPlanNodeData,
     TopologyNodeDataStatsItem,
-} from '@yandex-cloud/paranoid';
+} from '@gravity-ui/paranoid';
 
 interface PlanOperator {
     Name: string;
