@@ -23,7 +23,7 @@ import UserSettings from '../UserSettings/UserSettings';
 
 import routes, {createHref, CLUSTER_PAGES} from '../../routes';
 
-import {logout, setIsNotAuthenticated} from '../../store/reducers/authentication';
+import {logout} from '../../store/reducers/authentication';
 import {getSettingValue, setSettingValue} from '../../store/reducers/settings';
 
 import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
@@ -43,10 +43,15 @@ interface MenuItem {
 interface YbdInternalUserProps {
     ydbUser?: string;
     logout: VoidFunction;
-    setIsNotAuthenticated: VoidFunction;
 }
 
-function YbdInternalUser({ydbUser, logout, setIsNotAuthenticated}: YbdInternalUserProps) {
+function YbdInternalUser({ydbUser, logout}: YbdInternalUserProps) {
+    const history = useHistory();
+
+    const handleLoginClick = () => {
+        history.push(createHref(routes.auth, undefined, {returnUrl: encodeURI(location.href)}));
+    };
+
     return (
         <div className={b('internal-user')}>
             <div className={b('user-info-wrapper')}>
@@ -58,7 +63,7 @@ function YbdInternalUser({ydbUser, logout, setIsNotAuthenticated}: YbdInternalUs
                     <Icon data={signOutIcon} size={16} />
                 </Button>
             ) : (
-                <Button view="flat-secondary" onClick={setIsNotAuthenticated} title="login">
+                <Button view="flat-secondary" title="login" onClick={handleLoginClick}>
                     <Icon data={signInIcon} size={16} />
                 </Button>
             )}
@@ -71,7 +76,6 @@ interface YdbUserDropdownProps {
     ydbUser: {
         login?: string;
         logout: VoidFunction;
-        setIsNotAuthenticated: VoidFunction;
     };
     popupAnchor: React.RefObject<HTMLDivElement>;
 }
@@ -96,11 +100,7 @@ function YdbUserDropdown({isCompact, popupAnchor, ydbUser}: YdbUserDropdownProps
             onClosePopup={() => setIsUserDropdownVisible(false)}
             renderPopupContent={() => (
                 <div className={b('ydb-user-wrapper')}>
-                    <YbdInternalUser
-                        ydbUser={ydbUser.login}
-                        logout={ydbUser.logout}
-                        setIsNotAuthenticated={ydbUser.setIsNotAuthenticated}
-                    />
+                    <YbdInternalUser ydbUser={ydbUser.login} logout={ydbUser.logout} />
                 </div>
             )}
         />
@@ -112,7 +112,6 @@ interface AsideNavigationProps {
     ydbUser: string;
     compact: boolean;
     logout: VoidFunction;
-    setIsNotAuthenticated: VoidFunction;
     setSettingValue: (name: string, value: string) => void;
 }
 
@@ -260,7 +259,6 @@ function AsideNavigation(props: AsideNavigationProps) {
                             ydbUser={{
                                 login: props.ydbUser,
                                 logout: props.logout,
-                                setIsNotAuthenticated: props.setIsNotAuthenticated,
                             }}
                         />
                     </React.Fragment>
@@ -291,7 +289,6 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = {
     logout,
-    setIsNotAuthenticated,
     setSettingValue,
 };
 
