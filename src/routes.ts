@@ -16,6 +16,7 @@ const routes = {
     tablet: '/tablet/:id',
     tabletsFilters: '/tabletsFilters',
     clusterPage: '/clusters/:name',
+    auth: '/auth',
 };
 
 export const CLUSTER_PAGES = {

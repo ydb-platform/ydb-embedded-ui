@@ -83,4 +83,10 @@
     &__show-password-button {
         margin-left: 4px;
     }
+
+    &__close {
+        position: absolute;
+        top: 40px;
+        right: 40px;
+    }
 }

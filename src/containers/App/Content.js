@@ -79,11 +79,18 @@ function ContentWrapper(props) {
         <HistoryContext.Consumer>
             {(history) => (
                 <Router history={history}>
-                    <ThemeProvider theme={theme}>
-                        <div className={!singleClusterMode ? b() : b({embedded: true})}>
-                            {isAuthenticated ? props.children : <Authentication />}
-                        </div>
-                    </ThemeProvider>
+                    <Switch>
+                        <Route path={routes.auth}>
+                            <Authentication closable />
+                        </Route>
+                        <Route>
+                            <ThemeProvider theme={theme}>
+                                <div className={b({embedded: singleClusterMode})}>
+                                    {isAuthenticated ? props.children : <Authentication />}
+                                </div>
+                            </ThemeProvider>
+                        </Route>
+                    </Switch>
                 </Router>
             )}
         </HistoryContext.Consumer>
