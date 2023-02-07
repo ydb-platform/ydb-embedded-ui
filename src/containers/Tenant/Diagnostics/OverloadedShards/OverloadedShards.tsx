@@ -53,6 +53,7 @@ const tableColumnsNames = {
     NodeId: 'NodeId',
     PeakTime: 'PeakTime',
     InFlightTxCount: 'InFlightTxCount',
+    IntervalEnd: 'IntervalEnd',
 };
 
 function prepareCPUWorkloadValue(value: string) {
@@ -227,6 +228,10 @@ export const OverloadedShards = ({tenantPath, type}: OverloadedShardsProps) => {
                 align: DataTable.RIGHT,
                 sortable: false,
             },
+            {
+                name: tableColumnsNames.IntervalEnd,
+                render: ({value}) => formatDateTime(new Date(value as string).getTime()),
+            }
         ];
     }, [dispatch, history, tenantPath]);
 
