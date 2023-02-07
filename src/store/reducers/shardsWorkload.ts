@@ -77,7 +77,8 @@ function createShardQuery(
     DataSize,
     NodeId,
     PeakTime,
-    InFlightTxCount
+    InFlightTxCount,
+    IntervalEnd
 FROM \`.sys/top_partitions_one_hour\`
 WHERE ${where}
 ${orderBy}
