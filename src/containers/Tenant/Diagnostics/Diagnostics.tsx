@@ -12,7 +12,7 @@ import {Loader} from '../../../components/Loader';
 import {TopQueries} from './TopQueries';
 //@ts-ignore
 import DetailedOverview from './DetailedOverview/DetailedOverview';
-import {OverloadedShards} from './OverloadedShards';
+import {TopShards} from './TopShards';
 //@ts-ignore
 import Storage from '../../Storage/Storage';
 //@ts-ignore
@@ -124,8 +124,8 @@ function Diagnostics(props: DiagnosticsProps) {
                     />
                 );
             }
-            case GeneralPagesIds.overloadedShards: {
-                return <OverloadedShards tenantPath={tenantNameString} type={type} />;
+            case GeneralPagesIds.topShards: {
+                return <TopShards tenantPath={tenantNameString} type={type} />;
             }
             case GeneralPagesIds.nodes: {
                 return (
