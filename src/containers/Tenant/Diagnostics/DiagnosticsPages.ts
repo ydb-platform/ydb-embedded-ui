@@ -3,7 +3,7 @@ import {EPathType} from '../../../types/api/schema';
 export enum GeneralPagesIds {
     'overview' = 'Overview',
     'topQueries' = 'topQueries',
-    'overloadedShards' = 'overloadedShards',
+    'topShards' = 'topShards',
     'nodes' = 'Nodes',
     'tablets' = 'Tablets',
     'storage' = 'Storage',
@@ -29,8 +29,8 @@ const topQueries = {
     title: 'Top queries',
 };
 
-const overloadedShards = {
-    id: GeneralPagesIds.overloadedShards,
+const topShards = {
+    id: GeneralPagesIds.topShards,
     title: 'Top shards',
 };
 
@@ -75,7 +75,7 @@ const consumers = {
 export const DATABASE_PAGES = [
     overview,
     topQueries,
-    overloadedShards,
+    topShards,
     nodes,
     tablets,
     storage,
@@ -83,9 +83,9 @@ export const DATABASE_PAGES = [
     describe,
 ];
 
-export const TABLE_PAGES = [overview, overloadedShards, graph, tablets, hotKeys, describe];
+export const TABLE_PAGES = [overview, topShards, graph, tablets, hotKeys, describe];
 
-export const DIR_PAGES = [overview, overloadedShards, describe];
+export const DIR_PAGES = [overview, topShards, describe];
 
 export const CDC_STREAM_PAGES = [overview, consumers, describe];
 export const TOPIC_PAGES = [overview, consumers, describe];

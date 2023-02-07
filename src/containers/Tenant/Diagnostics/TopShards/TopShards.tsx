@@ -32,9 +32,9 @@ import {getDefaultNodePath} from '../../../Node/NodePages';
 import {isColumnEntityType} from '../../utils/schema';
 
 import i18n from './i18n';
-import './OverloadedShards.scss';
+import './TopShards.scss';
 
-const b = cn('overloaded-shards');
+const b = cn('top-shards');
 const bLink = cn('yc-link');
 
 const TABLE_SETTINGS: Settings = {
@@ -83,12 +83,12 @@ function dataTableToStringSortOrder(value: SortOrder | SortOrder[] = []) {
     return sortOrders.map(({columnId}) => columnId).join(',');
 }
 
-interface OverloadedShardsProps {
+interface TopShardsProps {
     tenantPath: string;
     type?: EPathType;
 }
 
-export const OverloadedShards = ({tenantPath, type}: OverloadedShardsProps) => {
+export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     const dispatch = useDispatch();
 
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
@@ -144,7 +144,7 @@ export const OverloadedShards = ({tenantPath, type}: OverloadedShardsProps) => {
     const history = useContext(HistoryContext);
 
     const onSort = (newSortOrder?: SortOrder | SortOrder[]) => {
-        // omit information about sort order to disable ASC order, only DESC makes sense for overloaded shards
+        // omit information about sort order to disable ASC order, only DESC makes sense for top shards
         // use a string (and not the DataTable default format) to prevent reference change,
         // which would cause an excess state change, to avoid repeating requests
         setSortOrder(dataTableToStringSortOrder(newSortOrder));
