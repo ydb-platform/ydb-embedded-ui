@@ -21,6 +21,7 @@ import type {EPathType} from '../../../../types/api/schema';
 import type {ITopQueriesFilters} from '../../../../types/store/executeTopQueries';
 import type {IQueryResult} from '../../../../types/store/query';
 
+import {formatDateTime} from '../../../../utils';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
@@ -50,6 +51,11 @@ const COLUMNS: Column<KeyValueRow>[] = [
         width: 500,
         sortable: false,
         render: ({value}) => <TruncatedQuery value={value} maxQueryHeight={MAX_QUERY_HEIGHT} />,
+    },
+    {
+        name: 'IntervalEnd',
+        width: 140,
+        render: ({value}) => formatDateTime(new Date(value as string).getTime()),
     },
 ];
 
