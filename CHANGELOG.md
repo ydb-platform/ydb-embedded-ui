@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.3.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.3.2...v3.3.3) (2023-02-08)
+
+
+### Bug Fixes
+
+* **Auth:** add a step in history for auth form ([c72d06e](https://github.com/ydb-platform/ydb-embedded-ui/commit/c72d06ecacdba47cac59bd705c1185e1ddf0b20d))
+* format dates with date-utils ([948598b](https://github.com/ydb-platform/ydb-embedded-ui/commit/948598b83c9bdd09268d128e15a42d5a6e0c15cc))
+* **InfoViewer:** add prop renderEmptyState ([44fe28f](https://github.com/ydb-platform/ydb-embedded-ui/commit/44fe28f72ea299b3b5d9b5a33a0a0130d471f7dd))
+* minor fixes in Nodes and Tenants tables ([8dca43a](https://github.com/ydb-platform/ydb-embedded-ui/commit/8dca43a482b0da31dbc618875b416dcfcedac036))
+* **OverloadedShards:** display IntervalEnd ([c7cbd72](https://github.com/ydb-platform/ydb-embedded-ui/commit/c7cbd7215eaf60601941410acb13ffb25d151eb9))
+* **Overview:** display error statusText on schema error ([99b030f](https://github.com/ydb-platform/ydb-embedded-ui/commit/99b030f90e6044e98a151e5128603835c84e1b4e))
+* **PDisk:** calculate severity based on usage ([64c6890](https://github.com/ydb-platform/ydb-embedded-ui/commit/64c6890ac6d5a77aef73da7dfc7f1eaff8a72441))
+* **QueryEditor:** make client request timeout 9 min ([44528a8](https://github.com/ydb-platform/ydb-embedded-ui/commit/44528a865b039003cda4c7b1b1367840da015d09))
+* **QueryEditor:** result status for aborted connection ([4b0d84b](https://github.com/ydb-platform/ydb-embedded-ui/commit/4b0d84b550deb41a140d4a3d215e52084507a558))
+* **QueryResult:** output client error messages ([deef610](https://github.com/ydb-platform/ydb-embedded-ui/commit/deef6103f4d08825837520cab9e8ae5b8c7fd496))
+* **Storage:** replace hasOwn to hasOwnProperty ([2452310](https://github.com/ydb-platform/ydb-embedded-ui/commit/2452310ce8e953d7a9ee4bbaa2bd466396aa0131))
+* **TopQueries:** display IntervalEnd ([e5b2b07](https://github.com/ydb-platform/ydb-embedded-ui/commit/e5b2b07cf1e686c20817dcdc1ae32e0c8912a21a))
+
 ## [3.3.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.3.1...v3.3.2) (2023-01-31)
 
 
