@@ -1,0 +1,33 @@
+.ydb-diagnostics-partitions-columns-header {
+    &__multiline {
+        white-space: normal;
+    }
+
+    &__read-session {
+        width: 80px;
+
+        white-space: normal;
+    }
+
+    &__lags {
+        white-space: nowrap;
+    }
+
+    &__messages {
+        width: 90px;
+
+        white-space: normal;
+    }
+
+    &__lags-popover-content {
+        max-width: 300px;
+
+        div:nth-child(1) {
+            margin-bottom: 10px;
+        }
+    }
+
+    &__messages-popover-content {
+        max-width: 200px;
+    }
+}

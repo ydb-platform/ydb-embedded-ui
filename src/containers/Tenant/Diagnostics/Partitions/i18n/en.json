@@ -1,0 +1,13 @@
+{
+  "lagsPopover.writeLags": "Write lags statistics (time format dd hh:mm:ss)",
+  "lagsPopover.readLags": "Read lags statistics (time format dd hh:mm:ss)",
+  "headers.unread": "End offset - Last read offset",
+  "headers.uncommited": "End offset - Committed offset",
+  "controls.consumerSelector": "Consumer:",
+  "controls.consumerSelector.placeholder": "Consumer",
+  "controls.partitionSearch": "Partition ID",
+  "controls.generalSearch": "Host, Host ID, Reader, Read Session ID",
+  "table.emptyDataMessage": "No partitions match the current search",
+  "noConsumersMessage.topic": "This topic has no consumers",
+  "noConsumersMessage.stream": "This changefeed has no consumers"
+}

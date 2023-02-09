@@ -1,0 +1,13 @@
+.ydb-diagnostics-partitions-columns {
+    &__lags-header {
+        text-align: center;
+    }
+
+    &__string-with-copy {
+        overflow: hidden;
+
+        max-width: 150px;
+
+        text-overflow: ellipsis;
+    }
+}
