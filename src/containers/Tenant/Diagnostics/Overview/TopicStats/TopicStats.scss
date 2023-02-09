@@ -9,8 +9,16 @@
         margin-top: 50px;
     }
 
-    .ydb-bars {
+    .info-viewer__row {
+        align-items: flex-start;
+    }
+
+    .speed-multimeter {
         margin-top: -5px;
+
+        &__content {
+            justify-content: flex-start;
+        }
     }
 
     &__info {

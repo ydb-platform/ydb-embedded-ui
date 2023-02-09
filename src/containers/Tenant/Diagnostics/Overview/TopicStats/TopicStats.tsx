@@ -6,12 +6,10 @@ import type {DescribeTopicResult} from '../../../../../types/api/topic';
 import {Loader} from '../../../../../components/Loader';
 import {InfoViewerItem, formatObject, InfoViewer} from '../../../../../components/InfoViewer';
 
-import {
-    prepareBytesWritten,
-    formatTopicStats,
-} from '../../../../../components/InfoViewer/formatters';
+import {formatTopicStats} from '../../../../../components/InfoViewer/formatters';
 
 import {useTypedSelector} from '../../../../../utils/hooks';
+import {convertBytesObjectToSpeed} from '../../../../../utils/bytesParsers';
 import {formatBps} from '../../../../../utils';
 
 import i18n from './i18n';
@@ -29,20 +27,20 @@ const prepareTopicInfo = (data: DescribeTopicResult): Array<InfoViewerItem> => {
 };
 
 const prepareBytesWrittenInfo = (data: DescribeTopicResult): Array<InfoViewerItem> => {
-    const preparedBytes = prepareBytesWritten(data?.topic_stats?.bytes_written);
+    const preparedBytes = convertBytesObjectToSpeed(data?.topic_stats?.bytes_written);
 
     return [
         {
             label: 'per minute',
-            value: formatBps(preparedBytes.per_minute),
+            value: formatBps(preparedBytes.perMinute),
         },
         {
             label: 'per hour',
-            value: formatBps(preparedBytes.per_hour),
+            value: formatBps(preparedBytes.perHour),
         },
         {
             label: 'per day',
-            value: formatBps(preparedBytes.per_day),
+            value: formatBps(preparedBytes.perDay),
         },
     ];
 };
