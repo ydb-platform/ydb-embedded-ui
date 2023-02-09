@@ -62,6 +62,10 @@ interface Window {
         getTopic: (params: {
             path?: string;
         }) => Promise<import('../types/api/topic').DescribeTopicResult>;
+        getConsumer: (params: {
+            path?: string;
+            consumer?: string;
+        }) => Promise<import('../types/api/consumer').DescribeConsumerResult>;
         [method: string]: Function;
     };
 }
