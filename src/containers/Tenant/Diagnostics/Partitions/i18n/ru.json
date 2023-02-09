@@ -1,0 +1,13 @@
+{
+  "lagsPopover.writeLags": "Статистика лагов записи (формат времени дд чч:мм:сс)",
+  "lagsPopover.readLags": "Статистика лагов чтения (формат времени дд чч:мм:сс)",
+  "headers.unread": "End offset - Last read offset",
+  "headers.uncommited": "End offset - Committed offset",
+  "controls.consumerSelector": "Читатель:",
+  "controls.consumerSelector.placeholder": "Читатель",
+  "controls.partitionSearch": "Partition ID",
+  "controls.generalSearch": "Host, Host ID, Reader, Read Session ID",
+  "table.emptyDataMessage": "По заданному поиску нет партиций",
+  "noConsumersMessage.topic": "У этого топика нет читателей",
+  "noConsumersMessage.stream": "У этого стрима нет читателей"
+}

@@ -1,0 +1,45 @@
+@import '../../../../styles/mixins.scss';
+
+.ydb-diagnostics-partitions {
+    overflow: auto;
+    flex-grow: 1;
+
+    height: 100%;
+
+    @include flex-container();
+
+    &__controls {
+        @include controls();
+    }
+
+    &__consumer-select {
+        width: 220px;
+    }
+
+    &__search {
+        @include search();
+        &_partition {
+            width: 100px;
+        }
+        &_general {
+            width: 280px;
+        }
+    }
+
+    &__table-settings .yc-icon {
+        width: 20px;
+    }
+
+    &__table-wrapper {
+        overflow: auto;
+        @include flex-container();
+    }
+
+    &__table-content {
+        overflow: auto;
+
+        height: 100%;
+
+        @include freeze-nth-column(1);
+    }
+}

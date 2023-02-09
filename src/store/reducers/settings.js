@@ -7,6 +7,7 @@ import {
     INVERTED_DISKS_KEY,
     ASIDE_HEADER_COMPACT_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
+    PARTITIONS_SELECTED_COLUMNS_KEY,
 } from '../../utils/constants';
 import '../../services/api';
 import {getValueFromLS} from '../../utils/utils';
@@ -50,6 +51,7 @@ export const initialState = {
             ASIDE_HEADER_COMPACT_KEY,
             legacyAsideNavCompactState || 'true',
         ),
+        [PARTITIONS_SELECTED_COLUMNS_KEY]: readSavedSettingsValue(PARTITIONS_SELECTED_COLUMNS_KEY),
     },
     systemSettings,
 };

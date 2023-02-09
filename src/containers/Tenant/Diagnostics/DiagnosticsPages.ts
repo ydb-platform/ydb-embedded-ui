@@ -12,6 +12,7 @@ export enum GeneralPagesIds {
     'hotKeys' = 'hotKeys',
     'graph' = 'graph',
     'consumers' = 'consumers',
+    'partitions' = 'partitions',
 }
 
 type Page = {
@@ -72,6 +73,11 @@ const consumers = {
     title: 'Consumers',
 };
 
+const partitions = {
+    id: GeneralPagesIds.partitions,
+    title: 'Partitions',
+};
+
 export const DATABASE_PAGES = [
     overview,
     topQueries,
@@ -87,8 +93,8 @@ export const TABLE_PAGES = [overview, topShards, graph, tablets, hotKeys, descri
 
 export const DIR_PAGES = [overview, topShards, describe];
 
-export const CDC_STREAM_PAGES = [overview, consumers, describe];
-export const TOPIC_PAGES = [overview, consumers, describe];
+export const CDC_STREAM_PAGES = [overview, consumers, partitions, describe];
+export const TOPIC_PAGES = [overview, consumers, partitions, describe];
 
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here

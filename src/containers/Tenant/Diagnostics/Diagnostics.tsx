@@ -27,6 +27,7 @@ import {Nodes} from '../../Nodes';
 //@ts-ignore
 import {Tablets} from '../../Tablets';
 import {Consumers} from './Consumers';
+import {PartitionsWrapper} from './Partitions';
 
 import routes, {createHref} from '../../../routes';
 import type {EPathType} from '../../../types/api/schema';
@@ -155,6 +156,9 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case GeneralPagesIds.consumers: {
                 return <Consumers path={currentSchemaPath} type={type} />;
+            }
+            case GeneralPagesIds.partitions: {
+                return <PartitionsWrapper path={currentSchemaPath} type={type} />;
             }
             default: {
                 return <div>No data...</div>;
