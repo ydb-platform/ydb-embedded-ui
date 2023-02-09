@@ -9,6 +9,8 @@ import {isNumeric} from './utils';
 
 numeral.locale(i18n.lang);
 
+// Here you can't control displayed size and precision
+// If you need more custom format, use formatBytesCustom instead
 export const formatBytes = (bytes) => {
     if (!isNumeric(bytes)) {
         return '';
@@ -40,6 +42,10 @@ export const formatUptime = (seconds) => {
         .join(' ');
 
     return uptime;
+};
+
+export const formatMsToUptime = (ms) => {
+    return formatUptime(ms / 1000);
 };
 
 export const formatIOPS = (value, capacity) => {

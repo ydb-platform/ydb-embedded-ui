@@ -76,9 +76,9 @@ export function bytesToGB(bytes, shouldRound) {
 
 export function pad9(val) {
     const len = String(val).length;
-    let result = val
+    let result = val;
     for (let i = len; i < 9; i++) {
-        result = "0" + result;
+        result = '0' + result;
     }
     return result;
 }
@@ -88,4 +88,4 @@ export function isNumeric(value) {
     // - isNaN treats true/false/''/etc. as numbers, parseFloat fixes this
     // - parseFloat treats '123qwe' as number, isNaN fixes this
     return !isNaN(value) && !isNaN(parseFloat(value));
-};
+}
