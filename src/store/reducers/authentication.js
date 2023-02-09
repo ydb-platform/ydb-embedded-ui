@@ -34,21 +34,6 @@ const authentication = function (state = initialState, action) {
     }
 };
 
-export const setIsNotAuthenticated = () => {
-    return (dispatch) => {
-        dispatch({
-            type: SET_UNAUTHENTICATED.SUCCESS,
-        });
-    };
-};
-export const setIsAuthenticated = () => {
-    return (dispatch) => {
-        dispatch({
-            type: SET_AUTHENTICATED.SUCCESS,
-        });
-    };
-};
-
 export const authenticate = (user, password) => {
     return createApiRequest({
         request: window.api.authenticate(user, password),
