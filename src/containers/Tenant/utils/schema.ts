@@ -155,22 +155,7 @@ export const isDatabaseEntityType = (type?: EPathType) =>
 
 // ====================
 
-const pathTypeToIsCdcStream: Record<EPathType, boolean> = {
-    [EPathType.EPathTypeCdcStream]: true,
-
-    [EPathType.EPathTypeInvalid]: false,
-    [EPathType.EPathTypeColumnStore]: false,
-    [EPathType.EPathTypeColumnTable]: false,
-    [EPathType.EPathTypeDir]: false,
-    [EPathType.EPathTypeTable]: false,
-    [EPathType.EPathTypeSubDomain]: false,
-    [EPathType.EPathTypeTableIndex]: false,
-    [EPathType.EPathTypeExtSubDomain]: false,
-    [EPathType.EPathTypePersQueueGroup]: false,
-};
-
-export const isCdcStreamEntityType = (type?: EPathType) =>
-    (type && pathTypeToIsCdcStream[type]) ?? false;
+export const isCdcStreamEntityType = (type?: EPathType) => type === EPathType.EPathTypeCdcStream;
 
 // ====================
 
