@@ -141,12 +141,28 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             path,
         });
     }
-    getTopic({path}) {
-        return this.get(this.getPath('/viewer/json/describe_topic'), {
-            enums: true,
-            include_stats: true,
-            path,
-        });
+    getTopic({path}, {concurrentId} = {}) {
+        return this.get(
+            this.getPath('/viewer/json/describe_topic'),
+            {
+                enums: true,
+                include_stats: true,
+                path,
+            },
+            {concurrentId: concurrentId || 'getTopic'},
+        );
+    }
+    getConsumer({path, consumer}, {concurrentId} = {}) {
+        return this.get(
+            this.getPath('/viewer/json/describe_consumer'),
+            {
+                enums: true,
+                include_stats: true,
+                path,
+                consumer,
+            },
+            {concurrentId: concurrentId || 'getConsumer'},
+        );
     }
     getPoolInfo(poolName) {
         return this.get(this.getPath('/viewer/json/storage'), {
