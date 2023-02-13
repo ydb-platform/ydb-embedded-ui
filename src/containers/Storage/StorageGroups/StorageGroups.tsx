@@ -28,6 +28,7 @@ import './StorageGroups.scss';
 enum TableColumnsIds {
     PoolName = 'PoolName',
     Type = 'Type',
+    ErasureSpecies = 'ErasureSpecies',
     GroupID = 'GroupID',
     Used = 'Used',
     Limit = 'Limit',
@@ -53,6 +54,7 @@ interface StorageGroupsProps {
 const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
     PoolName: 'Pool Name',
     Type: 'Type',
+    ErasureSpecies: 'Erasure',
     GroupID: 'Group ID',
     Used: 'Used',
     Limit: 'Limit',
@@ -145,6 +147,12 @@ function StorageGroups({
                     )}
                 </>
             ),
+        },
+        {
+            name: TableColumnsIds.ErasureSpecies,
+            header: tableColumnsNames[TableColumnsIds.ErasureSpecies],
+            render: ({row}) => (row.ErasureSpecies ? row.ErasureSpecies : '-'),
+            align: DataTable.LEFT,
         },
         {
             name: TableColumnsIds.Missing,
