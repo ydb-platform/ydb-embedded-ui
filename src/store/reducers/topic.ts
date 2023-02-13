@@ -1,9 +1,19 @@
+/* eslint-disable camelcase */
 import type {Reducer} from 'redux';
+import {createSelector, Selector} from 'reselect';
 
-import type {ITopicAction, ITopicState} from '../../types/store/topic';
+import type {
+    IPreparedConsumerData,
+    IPreparedTopicStats,
+    ITopicAction,
+    ITopicRootStateSlice,
+    ITopicState,
+} from '../../types/store/topic';
 import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
+import {parseLag, parseTimestampToIdleTime} from '../../utils/timeParsers';
+import {convertBytesObjectToSpeed} from '../../utils/bytesParsers';
 
 export const FETCH_TOPIC = createRequestActionTypes('topic', 'FETCH_TOPIC');
 
@@ -71,5 +81,52 @@ export function getTopic(path?: string) {
         actions: FETCH_TOPIC,
     });
 }
+
+const selectTopicStats = (state: ITopicRootStateSlice) => state.topic.data?.topic_stats;
+const selectConsumers = (state: ITopicRootStateSlice) => state.topic.data?.consumers;
+
+export const selectPreparedTopicStats: Selector<
+    ITopicRootStateSlice,
+    IPreparedTopicStats | undefined
+> = createSelector([selectTopicStats], (rawTopicStats) => {
+    if (!rawTopicStats) {
+        return undefined;
+    }
+
+    const {
+        store_size_bytes = '0',
+        min_last_write_time,
+        max_write_time_lag,
+        bytes_written,
+    } = rawTopicStats || {};
+
+    return {
+        storeSize: store_size_bytes,
+        partitionsIdleTime: parseTimestampToIdleTime(min_last_write_time),
+        partitionsWriteLag: parseLag(max_write_time_lag),
+        writeSpeed: convertBytesObjectToSpeed(bytes_written),
+    };
+});
+
+export const selectPreparedConsumersData: Selector<
+    ITopicRootStateSlice,
+    IPreparedConsumerData[] | undefined
+> = createSelector([selectConsumers], (consumers) => {
+    return consumers?.map((consumer) => {
+        const {name, consumer_stats} = consumer || {};
+
+        const {min_partitions_last_read_time, max_read_time_lag, max_write_time_lag, bytes_read} =
+            consumer_stats || {};
+
+        return {
+            name,
+            readSpeed: convertBytesObjectToSpeed(bytes_read),
+
+            writeLag: parseLag(max_write_time_lag),
+            readLag: parseLag(max_read_time_lag),
+            readIdleTime: parseTimestampToIdleTime(min_partitions_last_read_time),
+        };
+    });
+});
 
 export default topic;

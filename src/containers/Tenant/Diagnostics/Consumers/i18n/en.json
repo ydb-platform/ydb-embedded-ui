@@ -1,6 +1,7 @@
 {
-  "search.placeholder": "Consumer name",
+  "noConsumersMessage.topic": "This topic has no consumers",
+  "noConsumersMessage.stream": "This changefeed has no consumers",
+  "lagsPopover.readLags": "Read lags statistics, maximum among all consumer partitions (time format dd hh:mm:ss)",
   "table.emptyDataMessage": "No consumers match the current search",
-  "table.columns.consumerName": "Consumer",
-  "noConsumersMessage": "This topic has no consumers"
+  "controls.search": "Consumer"
 }
