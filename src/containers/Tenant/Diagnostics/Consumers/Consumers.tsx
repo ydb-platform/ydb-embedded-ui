@@ -1,31 +1,36 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 import {escapeRegExp} from 'lodash/fp';
 
-import DataTable, {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
 import type {EPathType} from '../../../../types/api/schema';
+
 import {Loader} from '../../../../components/Loader';
-import {prepareQueryError} from '../../../../utils/query';
-import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {Search} from '../../../../components/Search';
+import {ResponseError} from '../../../../components/Errors/ResponseError';
+
+import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+
 import {
-    getDescribe,
-    selectConsumers,
-    setCurrentDescribePath,
+    selectPreparedConsumersData,
+    selectPreparedTopicStats,
+    getTopic,
     setDataWasNotLoaded,
-} from '../../../../store/reducers/describe';
-import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema';
+} from '../../../../store/reducers/topic';
 
 import {isCdcStreamEntityType} from '../../utils/schema';
+
+import {ConsumersTopicStats} from './TopicStats';
+import {columns} from './columns';
 
 import i18n from './i18n';
 
 import './Consumers.scss';
 
-const b = block('ydb-consumers');
+const b = block('ydb-diagnostics-consumers');
 
 interface ConsumersProps {
     path: string;
@@ -33,93 +38,81 @@ interface ConsumersProps {
 }
 
 export const Consumers = ({path, type}: ConsumersProps) => {
-    const dispatch = useDispatch();
-
     const isCdcStream = isCdcStreamEntityType(type);
 
-    const mergedChildrenPaths = useTypedSelector((state) =>
-        selectSchemaMergedChildrenPaths(state, path, type),
-    );
+    const dispatch = useDispatch();
 
-    const dataPath = isCdcStream ? mergedChildrenPaths?.[0] : path;
-
-    const fetchData = useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-
-            if (dataPath) {
-                dispatch(setCurrentDescribePath(dataPath));
-                dispatch(getDescribe({path: dataPath}));
-            }
-        },
-
-        [dispatch, dataPath],
-    );
+    const [searchValue, setSearchValue] = useState('');
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
+    const {loading, wasLoaded, error} = useTypedSelector((state) => state.topic);
+
+    const consumers = useTypedSelector((state) => selectPreparedConsumersData(state));
+    const topic = useTypedSelector((state) => selectPreparedTopicStats(state));
+
+    const fetchData = useCallback(
+        (isBackground) => {
+            if (!isBackground) {
+                dispatch(setDataWasNotLoaded);
+            }
+
+            dispatch(getTopic(path));
+        },
+        [dispatch, path],
+    );
 
     useAutofetcher(fetchData, [fetchData], autorefresh);
 
-    const {loading, wasLoaded, error} = useTypedSelector((state) => state.describe);
-    const consumers = useTypedSelector((state) => selectConsumers(state, dataPath));
+    const dataToRender = useMemo(() => {
+        if (!consumers) {
+            return [];
+        }
 
-    const [consumersToRender, setConsumersToRender] = useState(consumers);
+        const searchRe = new RegExp(escapeRegExp(searchValue), 'i');
 
-    useEffect(() => {
-        setConsumersToRender(consumers);
-    }, [consumers]);
+        return consumers.filter((consumer) => {
+            return searchRe.test(String(consumer.name));
+        });
+    }, [consumers, searchValue]);
 
-    const filterConsumersByName = (search: string) => {
-        const filteredConsumers = search
-            ? consumers.filter((consumer) => {
-                  const re = new RegExp(escapeRegExp(search), 'i');
-                  return re.test(consumer.name);
-              })
-            : consumers;
-
-        setConsumersToRender(filteredConsumers);
+    const handleSearchChange = (value: string) => {
+        setSearchValue(value);
     };
-
-    const handleSearch = (value: string) => {
-        filterConsumersByName(value);
-    };
-
-    const columns: Column<any>[] = [
-        {
-            name: 'name',
-            header: i18n('table.columns.consumerName'),
-            width: 200,
-        },
-    ];
 
     if (loading && !wasLoaded) {
         return <Loader size="m" />;
     }
 
-    if (!loading && error) {
-        return <div className={b('message', 'error')}>{prepareQueryError(error)}</div>;
+    if (error) {
+        return <ResponseError error={error} />;
     }
 
-    if (consumers.length === 0) {
-        return <div className={b('message')}>{i18n('noConsumersMessage')}</div>;
+    if (!consumers || !consumers.length) {
+        return <div>{i18n(`noConsumersMessage.${isCdcStream ? 'stream' : 'topic'}`)}</div>;
     }
 
     return (
         <div className={b()}>
-            <Search
-                onChange={handleSearch}
-                placeholder={i18n('search.placeholder')}
-                className={b('search')}
-            />
-            <DataTable
-                theme="yandex-cloud"
-                settings={DEFAULT_TABLE_SETTINGS}
-                columns={columns}
-                data={consumersToRender}
-                emptyDataMessage={i18n('table.emptyDataMessage')}
-            />
+            <div className={b('controls')}>
+                <Search
+                    onChange={handleSearchChange}
+                    placeholder={i18n('controls.search')}
+                    className={b('search')}
+                    value={searchValue}
+                />
+                {topic && <ConsumersTopicStats data={topic} />}
+            </div>
+            <div className={b('table-wrapper')}>
+                <div className={b('table-content')}>
+                    <DataTable
+                        theme="yandex-cloud"
+                        data={dataToRender}
+                        columns={columns}
+                        settings={DEFAULT_TABLE_SETTINGS}
+                        emptyDataMessage={i18n('table.emptyDataMessage')}
+                    />
+                </div>
+            </div>
         </div>
     );
 };

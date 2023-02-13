@@ -1,6 +1,7 @@
 {
-  "search.placeholder": "Название читателя",
+  "noConsumersMessage.topic": "У этого топика нет читателей",
+  "noConsumersMessage.stream": "У этого стрима нет читателей",
+  "lagsPopover.readLags": "Статистика лагов чтения, максимальной значение среди всех партиций читателя (формат времени дд чч:мм:сс)",
   "table.emptyDataMessage": "По заданному поиску нет читателей",
-  "table.columns.consumerName": "Читатель",
-  "noConsumersMessage": "У этого топика нет читателей"
+  "controls.search": "Consumer"
 }

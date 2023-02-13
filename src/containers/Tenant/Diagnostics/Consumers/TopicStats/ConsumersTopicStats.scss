@@ -1,0 +1,32 @@
+.ydb-diagnostics-consumers-topic-stats {
+    font-size: var(--yc-text-body-2-font-size);
+    line-height: var(--yc-text-body-2-line-height);
+
+    &__wrapper {
+        display: flex;
+        flex-direction: row;
+
+        padding-left: 16px;
+
+        border-left: 1px solid var(--yc-color-line-generic);
+    }
+
+    &__item {
+        display: flex;
+        flex-direction: column;
+
+        margin-right: 20px;
+    }
+    &__label {
+        margin-bottom: 4px;
+
+        color: var(--yc-color-text-secondary);
+    }
+    &__value {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        height: 30px;
+    }
+}
