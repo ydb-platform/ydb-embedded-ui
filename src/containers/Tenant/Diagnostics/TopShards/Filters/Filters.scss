@@ -1,0 +1,8 @@
+.top-shards {
+    &__filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 16px;
+    }
+}

@@ -3,11 +3,17 @@ import type {ApiRequestAction} from '../../store/utils';
 import type {IResponseError} from '../api/error';
 import type {IQueryResult} from './query';
 
+export enum EShardsWorkloadMode {
+    Immediate = 'immediate',
+    History = 'history',
+}
+
 export interface IShardsWorkloadFilters {
     /** ms from epoch */
     from?: number;
     /** ms from epoch */
     to?: number;
+    mode?: EShardsWorkloadMode;
 }
 
 export interface IShardsWorkloadState {

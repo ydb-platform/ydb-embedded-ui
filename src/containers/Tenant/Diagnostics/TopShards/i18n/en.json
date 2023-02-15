@@ -1,4 +1,6 @@
 {
   "no-data": "No data",
-  "description": "Shards with CPU load over 70% are listed"
+  "filters.mode.immediate": "Immediate",
+  "filters.mode.history": "Historical",
+  "description": "Historical data only tracks shards with CPU load over 70%"
 }
