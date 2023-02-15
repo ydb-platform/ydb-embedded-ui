@@ -6,6 +6,7 @@ import type {
     IShardsWorkloadFilters,
     IShardsWorkloadState,
 } from '../../types/store/shardsWorkload';
+import {EShardsWorkloadMode} from '../../types/store/shardsWorkload';
 
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
 
@@ -51,7 +52,7 @@ function getFiltersConditions(filters?: IShardsWorkloadFilters) {
     return conditions.join(' AND ');
 }
 
-function createShardQuery(
+function createShardQueryHistorical(
     path: string,
     filters?: IShardsWorkloadFilters,
     sortOrder?: SortOrder[],
@@ -81,6 +82,28 @@ function createShardQuery(
     IntervalEnd
 FROM \`.sys/top_partitions_one_hour\`
 WHERE ${where}
+${orderBy}
+LIMIT 20`;
+}
+
+function createShardQueryImmediate(path: string, sortOrder?: SortOrder[], tenantName?: string) {
+    const pathSelect = tenantName
+        ? `CAST(SUBSTRING(CAST(Path AS String), ${tenantName.length}) AS Utf8) AS Path`
+        : 'Path';
+
+    const orderBy = sortOrder ? `ORDER BY ${sortOrder.map(formatSortOrder).join(', ')}` : '';
+
+    return `SELECT
+    ${pathSelect},
+    TabletId,
+    CPUCores,
+    DataSize,
+    NodeId,
+    InFlightTxCount
+FROM \`.sys/partition_stats\`
+WHERE
+    Path='${path}'
+    OR Path LIKE '${path}/%'
 ${orderBy}
 LIMIT 20`;
 }
@@ -147,7 +170,10 @@ export const sendShardQuery = ({database, path = '', sortOrder, filters}: SendSh
             request: window.api.sendQuery(
                 {
                     schema: 'modern',
-                    query: createShardQuery(path, filters, sortOrder, database),
+                    query:
+                        filters?.mode === EShardsWorkloadMode.Immediate
+                            ? createShardQueryImmediate(path, sortOrder, database)
+                            : createShardQueryHistorical(path, filters, sortOrder, database),
                     database,
                     action: queryAction,
                 },

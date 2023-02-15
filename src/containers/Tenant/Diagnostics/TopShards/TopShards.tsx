@@ -5,7 +5,6 @@ import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 
-import {DateRange, DateRangeValues} from '../../../../components/DateRange';
 import {InternalLink} from '../../../../components/InternalLink';
 
 import HistoryContext from '../../../../contexts/HistoryContext';
@@ -18,7 +17,7 @@ import {
     setShardsQueryFilters,
 } from '../../../../store/reducers/shardsWorkload';
 import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema';
-import type {IShardsWorkloadFilters} from '../../../../types/store/shardsWorkload';
+import {EShardsWorkloadMode, IShardsWorkloadFilters} from '../../../../types/store/shardsWorkload';
 
 import type {EPathType} from '../../../../types/api/schema';
 
@@ -31,10 +30,12 @@ import {getDefaultNodePath} from '../../../Node/NodePages';
 
 import {isColumnEntityType} from '../../utils/schema';
 
+import {Filters} from './Filters';
+
 import i18n from './i18n';
 import './TopShards.scss';
 
-const b = cn('top-shards');
+export const b = cn('top-shards');
 const bLink = cn('yc-link');
 
 const TABLE_SETTINGS: Settings = {
@@ -83,6 +84,12 @@ function dataTableToStringSortOrder(value: SortOrder | SortOrder[] = []) {
     return sortOrders.map(({columnId}) => columnId).join(',');
 }
 
+function fillDateRangeFor(value: IShardsWorkloadFilters) {
+    value.to = Date.now();
+    value.from = value.to - HOUR_IN_SECONDS * 1000;
+    return value;
+}
+
 interface TopShardsProps {
     tenantPath: string;
     type?: EPathType;
@@ -101,17 +108,20 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         wasLoaded,
     } = useTypedSelector((state) => state.shardsWorkload);
 
-    // default date range should be the last hour, but shouldn't propagate into URL until user interacts with the control
+    // default filters shouldn't propagate into URL until user interacts with the control
     // redux initial value can't be used, as it synchronizes with URL
     const [filters, setFilters] = useState<IShardsWorkloadFilters>(() => {
-        if (!storeFilters?.from && !storeFilters?.to) {
-            return {
-                from: Date.now() - HOUR_IN_SECONDS * 1000,
-                to: Date.now(),
-            };
+        const defaultValue = {...storeFilters};
+
+        if (!defaultValue.mode) {
+            defaultValue.mode = EShardsWorkloadMode.Immediate;
         }
 
-        return storeFilters;
+        if (!defaultValue.from && !defaultValue.to) {
+            fillDateRangeFor(defaultValue);
+        }
+
+        return defaultValue;
     });
 
     const [sortOrder, setSortOrder] = useState(tableColumnsNames.CPUCores);
@@ -150,12 +160,28 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         setSortOrder(dataTableToStringSortOrder(newSortOrder));
     };
 
-    const handleDateRangeChange = (value: DateRangeValues) => {
+    const handleFiltersChange = (value: Partial<IShardsWorkloadFilters>) => {
+        const newStateValue = {...value};
+        const isDateRangePristine =
+            !storeFilters.from && !storeFilters.to && !value.from && !value.to;
+
+        if (isDateRangePristine) {
+            switch (value.mode) {
+                case EShardsWorkloadMode.Immediate:
+                    newStateValue.from = newStateValue.to = undefined;
+                    break;
+                case EShardsWorkloadMode.History:
+                    // should default to the current datetime every time history mode activates
+                    fillDateRangeFor(newStateValue);
+                    break;
+            }
+        }
+
         dispatch(setShardsQueryFilters(value));
-        setFilters(value);
+        setFilters((state) => ({...state, ...newStateValue}));
     };
 
-    const tableColumns: Column<any>[] = useMemo(() => {
+    const tableColumns = useMemo(() => {
         const onSchemaClick = (schemaPath: string) => {
             return () => {
                 dispatch(setCurrentSchemaPath(schemaPath));
@@ -164,7 +190,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             };
         };
 
-        return [
+        const columns: Column<any>[] = [
             {
                 name: tableColumnsNames.Path,
                 render: ({value: relativeNodePath}) => {
@@ -218,22 +244,28 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
                 sortable: false,
             },
             {
-                name: tableColumnsNames.PeakTime,
-                render: ({value}) => formatDateTime(new Date(value as string).valueOf()),
-                sortable: false,
-            },
-            {
                 name: tableColumnsNames.InFlightTxCount,
                 render: ({value}) => formatNumber(value as number),
                 align: DataTable.RIGHT,
                 sortable: false,
             },
-            {
+        ];
+
+        if (filters.mode === EShardsWorkloadMode.History) {
+            // after NodeId
+            columns.splice(5, 0, {
+                name: tableColumnsNames.PeakTime,
+                render: ({value}) => formatDateTime(new Date(value as string).valueOf()),
+                sortable: false,
+            });
+            columns.push({
                 name: tableColumnsNames.IntervalEnd,
                 render: ({value}) => formatDateTime(new Date(value as string).getTime()),
-            }
-        ];
-    }, [dispatch, history, tenantPath]);
+            });
+        }
+
+        return columns;
+    }, [dispatch, filters.mode, history, tenantPath]);
 
     const renderLoader = () => {
         return (
@@ -272,10 +304,8 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
 
     return (
         <div className={b()}>
-            <div className={b('controls')}>
-                {i18n('description')}
-                <DateRange from={filters.from} to={filters.to} onChange={handleDateRangeChange} />
-            </div>
+            <Filters value={filters} onChange={handleFiltersChange} />
+            {filters.mode === EShardsWorkloadMode.History && <div>{i18n('description')}</div>}
             {renderContent()}
         </div>
     );
