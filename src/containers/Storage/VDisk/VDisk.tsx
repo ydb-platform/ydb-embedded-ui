@@ -7,6 +7,7 @@ import routes, {createHref} from '../../../routes';
 import {EFlag} from '../../../types/api/enums';
 import {EVDiskState, TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId} from '../../../utils';
+import {isFullVDiksData} from '../../../utils/storage';
 
 import {STRUCTURE} from '../../Node/NodePages';
 
@@ -14,6 +15,7 @@ import {DiskStateProgressBar, EDiskStateSeverity} from '../DiskStateProgressBar'
 import type {NodesHosts} from '../PDiskPopup';
 import {VDiskPopup} from '../VDiskPopup';
 
+import type {IUnavailableDonor} from '../utils/types';
 import {NOT_AVAILABLE_SEVERITY} from '../utils';
 
 import './VDisk.scss';
@@ -46,20 +48,29 @@ const getColorSeverity = (color?: EFlag) => {
 };
 
 interface VDiskProps {
-    data?: TVDiskStateInfo;
+    data?: TVDiskStateInfo | IUnavailableDonor;
     poolName?: string;
     nodes?: NodesHosts;
     compact?: boolean;
 }
 
 export const VDisk = ({data = {}, poolName, nodes, compact}: VDiskProps) => {
-    const [severity, setSeverity] = useState(getStateSeverity(data.VDiskState));
+    const isFullData = isFullVDiksData(data);
+
+    const [severity, setSeverity] = useState(
+        getStateSeverity(isFullData ? data.VDiskState : undefined),
+    );
     const [isPopupVisible, setIsPopupVisible] = useState(false);
 
     const anchor = useRef(null);
 
     // determine disk status severity
     useEffect(() => {
+        if (!isFullData) {
+            setSeverity(NOT_AVAILABLE_SEVERITY);
+            return;
+        }
+
         const {DiskSpace, VDiskState, FrontQueues, Replicated, DonorMode} = data;
 
         // if the disk is not available, this determines its status severity regardless of other features
@@ -84,7 +95,7 @@ export const VDisk = ({data = {}, poolName, nodes, compact}: VDiskProps) => {
         }
 
         setSeverity(newSeverity);
-    }, [data]);
+    }, [data, isFullData]);
 
     const showPopup = () => {
         setIsPopupVisible(true);
@@ -95,6 +106,10 @@ export const VDisk = ({data = {}, poolName, nodes, compact}: VDiskProps) => {
     };
 
     const vdiskAllocatedPercent = useMemo(() => {
+        if (!isFullData) {
+            return undefined;
+        }
+
         const {AvailableSize, AllocatedSize, PDisk} = data;
         const available = AvailableSize ? AvailableSize : PDisk?.AvailableSize;
 
@@ -105,7 +120,7 @@ export const VDisk = ({data = {}, poolName, nodes, compact}: VDiskProps) => {
         return isNaN(Number(AllocatedSize))
             ? undefined
             : (Number(AllocatedSize) * 100) / (Number(available) + Number(AllocatedSize));
-    }, [data]);
+    }, [data, isFullData]);
 
     return (
         <React.Fragment>
@@ -117,7 +132,7 @@ export const VDisk = ({data = {}, poolName, nodes, compact}: VDiskProps) => {
                 open={isPopupVisible}
             />
             <div className={b()} ref={anchor} onMouseEnter={showPopup} onMouseLeave={hidePopup}>
-                {data.NodeId ? (
+                {data.NodeId && isFullData ? (
                     <InternalLink
                         to={createHref(
                             routes.node,
