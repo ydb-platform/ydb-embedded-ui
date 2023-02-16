@@ -1,8 +1,8 @@
 import type {TVSlotId, TVDiskStateInfo} from '../types/api/vdisk';
 import type {IStoragePoolGroup} from '../types/store/storage';
 
-export const isFullDonorData = (donor: TVDiskStateInfo | TVSlotId): donor is TVDiskStateInfo =>
-    'VDiskId' in donor;
+export const isFullVDiksData = (disk: TVDiskStateInfo | TVSlotId): disk is TVDiskStateInfo =>
+    'VDiskId' in disk;
 
 export const getUsage = (data: IStoragePoolGroup, step = 1) => {
     // if limit is 0, display 0

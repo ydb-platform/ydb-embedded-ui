@@ -16,7 +16,7 @@ import {VisibleEntities} from '../../../store/reducers/storage';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 //@ts-ignore
 import {stringifyVdiskId} from '../../../utils';
-import {getUsage, isFullDonorData} from '../../../utils/storage';
+import {getUsage, isFullVDiksData} from '../../../utils/storage';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
 import {VDisk} from '../VDisk';
@@ -257,26 +257,30 @@ function StorageGroups({
             render: ({value, row}) => (
                 <div className={b('vdisks-wrapper')}>
                     {_.map(value as TVDiskStateInfo[], (el) => {
-                        const donors = Array.isArray(el.Donors)
-                            ? el.Donors.filter(isFullDonorData)
-                            : [];
+                        const donors = el.Donors;
 
-                        return donors.length > 0 ? (
+                        return donors && donors.length > 0 ? (
                             <Stack className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
                                 <VDisk
                                     data={el}
                                     poolName={row[TableColumnsIds.PoolName]}
                                     nodes={nodes}
                                 />
-                                {donors.map((donor) => (
-                                    <VDisk
-                                        data={donor}
-                                        // donor and acceptor are always in the same group
-                                        poolName={row[TableColumnsIds.PoolName]}
-                                        nodes={nodes}
-                                        key={stringifyVdiskId(donor.VDiskId)}
-                                    />
-                                ))}
+                                {donors.map((donor) => {
+                                    const isFullData = isFullVDiksData(donor);
+
+                                    return (
+                                        <VDisk
+                                            data={isFullData ? donor : {...donor, DonorMode: true}}
+                                            // donor and acceptor are always in the same group
+                                            poolName={row[TableColumnsIds.PoolName]}
+                                            nodes={nodes}
+                                            key={stringifyVdiskId(
+                                                isFullData ? donor.VDiskId : donor,
+                                            )}
+                                        />
+                                    );
+                                })}
                             </Stack>
                         ) : (
                             <div className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>

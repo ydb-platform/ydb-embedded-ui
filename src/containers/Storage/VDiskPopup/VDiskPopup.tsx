@@ -6,15 +6,36 @@ import {Label, Popup, PopupProps} from '@gravity-ui/uikit';
 import {InfoViewer, InfoViewerItem} from '../../../components/InfoViewer';
 
 import {EFlag} from '../../../types/api/enums';
-import {TVDiskStateInfo} from '../../../types/api/vdisk';
+import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId} from '../../../utils';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
+import {isFullVDiksData} from '../../../utils/storage';
+
+import type {IUnavailableDonor} from '../utils/types';
 
 import {NodesHosts, preparePDiskData} from '../PDiskPopup';
 
 import './VDiskPopup.scss';
 
 const b = cn('vdisk-storage-popup');
+
+const prepareUnavailableVDiskData = (data: IUnavailableDonor, poolName?: string) => {
+    const {NodeId, PDiskId, VSlotId} = data;
+
+    const vdiskData: InfoViewerItem[] = [{label: 'State', value: 'not available'}];
+
+    if (poolName) {
+        vdiskData.push({label: 'StoragePool', value: poolName});
+    }
+
+    vdiskData.push(
+        {label: 'NodeId', value: NodeId ?? '–'},
+        {label: 'PDiskId', value: PDiskId ?? '–'},
+        {label: 'VSlotId', value: VSlotId ?? '–'},
+    );
+
+    return vdiskData;
+};
 
 const prepareVDiskData = (data: TVDiskStateInfo, poolName?: string) => {
     const {
@@ -105,16 +126,24 @@ const prepareVDiskData = (data: TVDiskStateInfo, poolName?: string) => {
 };
 
 interface VDiskPopupProps extends PopupProps {
-    data: TVDiskStateInfo;
+    data: TVDiskStateInfo | IUnavailableDonor;
     poolName?: string;
     nodes?: NodesHosts;
 }
 
 export const VDiskPopup = ({data, poolName, nodes, ...props}: VDiskPopupProps) => {
-    const vdiskInfo = useMemo(() => prepareVDiskData(data, poolName), [data, poolName]);
+    const isFullData = isFullVDiksData(data);
+
+    const vdiskInfo = useMemo(
+        () =>
+            isFullData
+                ? prepareVDiskData(data, poolName)
+                : prepareUnavailableVDiskData(data, poolName),
+        [data, poolName, isFullData],
+    );
     const pdiskInfo = useMemo(
-        () => data.PDisk && preparePDiskData(data.PDisk, nodes),
-        [data.PDisk, nodes],
+        () => isFullData && data.PDisk && preparePDiskData(data.PDisk, nodes),
+        [data, nodes, isFullData],
     );
 
     return (
