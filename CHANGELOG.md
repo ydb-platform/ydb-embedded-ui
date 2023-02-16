@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.3.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.3.3...v3.3.4) (2023-02-16)
+
+
+### Bug Fixes
+
+* **OverloadedShards:** rename to top shards ([ffa4f27](https://github.com/ydb-platform/ydb-embedded-ui/commit/ffa4f27f2cf0a5e12b2800c81bf61b1d3c25912c))
+* **StorageGroups:** display Erasure ([4a7ebc0](https://github.com/ydb-platform/ydb-embedded-ui/commit/4a7ebc08b87fe75af83df70a38ebd486d64d6d4e))
+* **TopShards:** switch between history and immediate data ([eeb9bb0](https://github.com/ydb-platform/ydb-embedded-ui/commit/eeb9bb0911b9e889b633558c9d3c13f986f72bfe))
+
 ## [3.3.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.3.2...v3.3.3) (2023-02-08)
 
 
