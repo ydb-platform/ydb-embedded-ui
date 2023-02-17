@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.3.4...v3.4.0) (2023-02-17)
+
+
+### Features
+
+* **Diagnostics:** add Partitions tab ([914702b](https://github.com/ydb-platform/ydb-embedded-ui/commit/914702be7e8aea28fcdc9f2ddf1cb7356995146a))
+* **Diagnostics:** rework Consumers tab ([0dae9d8](https://github.com/ydb-platform/ydb-embedded-ui/commit/0dae9d84c254d556db2a0d18345fdc10c152172a))
+
+
+### Bug Fixes
+
+* add read and lag images ([a3f0648](https://github.com/ydb-platform/ydb-embedded-ui/commit/a3f0648fc4f23c2ac2c9e73c4078bf5f06d1a57e))
+* add reducer for consumer ([4ab65e3](https://github.com/ydb-platform/ydb-embedded-ui/commit/4ab65e3fb3dd4f29b4757473275ba84bec0f5411))
+* add SpeedMultiMeter component ([39acbf1](https://github.com/ydb-platform/ydb-embedded-ui/commit/39acbf1a1e234f36a090b29935872e694e1525c0))
+* **ResponseError:** make error prop optional ([f706e94](https://github.com/ydb-platform/ydb-embedded-ui/commit/f706e940e51e62841e18338775b01183831761e1))
+* **Storage:** display not full donors ([13f4b9f](https://github.com/ydb-platform/ydb-embedded-ui/commit/13f4b9fe9f796e8ef6fee094f7b5bc6056e2833b))
+* **Topic:** use SpeedMultiMeter and utils functions ([3e0293c](https://github.com/ydb-platform/ydb-embedded-ui/commit/3e0293cc5cf69c2dee5b6c4cdcf053829960dac5))
+* **utils:** add formatBytesCustom function ([2f18c22](https://github.com/ydb-platform/ydb-embedded-ui/commit/2f18c2233b37b666e16327af0ca8e20bccf01de6))
+
 ## [3.3.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.3.3...v3.3.4) (2023-02-16)
 
 
