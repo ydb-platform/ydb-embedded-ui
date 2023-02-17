@@ -133,6 +133,10 @@ const shardsWorkload: Reducer<IShardsWorkloadState, IShardsWorkloadAction> = (
         }
         // 401 Unauthorized error is handled by GenericAPI
         case SEND_SHARD_QUERY.FAILURE: {
+            if (action.error?.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error || 'Unauthorized',
