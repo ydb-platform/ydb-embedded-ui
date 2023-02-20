@@ -247,10 +247,10 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             this.getPath(`/tablets/app?TabletID=${hiveId}&page=ResumeTablet&tablet=${id}`),
         );
     }
-    getTabletDescribe(TenantId) {
+    getTabletDescribe(tenantId) {
         return this.get(this.getPath('/viewer/json/describe'), {
-            schemeshard_id: TenantId.SchemeShard,
-            path_id: TenantId.PathId,
+            schemeshard_id: tenantId?.SchemeShard,
+            path_id: tenantId?.PathId,
         });
     }
     postSetting(name, value) {

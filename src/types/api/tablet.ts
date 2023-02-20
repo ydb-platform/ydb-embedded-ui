@@ -1,8 +1,10 @@
 import {EFlag} from './enums';
 
-// endpoint: /viewer/json/tabletinfo
-// source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/sys_view.proto
-
+/**
+ * endpoint: /viewer/json/tabletinfo
+ *
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/sys_view.proto
+ */
 export interface TEvTabletStateResponse {
     TabletStateInfo?: TTabletStateInfo[];
 
@@ -15,6 +17,12 @@ export interface TEvTabletStateResponse {
 
     Packed5?: unknown;
 }
+
+/**
+ * endpoint: /viewer/json/tabletinfo with merge=false in query.
+ * Maps nodes to their tablets
+ */
+export type UnmergedTEvTabletStateResponse = Record<string, TEvTabletStateResponse>;
 
 export interface TTabletStateInfo {
     /** uint64 */
@@ -46,7 +54,7 @@ interface TCustomTabletAttribute {
     Value?: string;
 }
 
-interface TDomainKey {
+export interface TDomainKey {
     /** fixed64 */
     SchemeShard?: string;
     /** fixed64 */
