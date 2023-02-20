@@ -111,9 +111,9 @@ class Tablet extends React.Component {
         const {isFirstFetchData} = this.state;
 
         if (version && this.isValidVersion()) {
-            this.props.getTablet(id).then(({tablet}) => {
-                if (isFirstFetchData && tablet.TenantId) {
-                    this.props.getTabletDescribe(tablet.TenantId);
+            this.props.getTablet(id).then(({tabletData}) => {
+                if (isFirstFetchData && tabletData.TenantId) {
+                    this.props.getTabletDescribe(tabletData.TenantId);
                 }
 
                 this.setState({isFirstFetchData: false});

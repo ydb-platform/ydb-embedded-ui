@@ -57,6 +57,15 @@ interface Window {
             nodes?: string[];
             path?: string;
         }) => Promise<import('../types/api/tablet').TEvTabletStateResponse>;
+        getTabletDescribe: (
+            tenantId?: import('../types/api/tablet').TDomainKey,
+        ) => Promise<import('../types/api/schema').TEvDescribeSchemeResult>;
+        getTablet: (params: {
+            id?: string;
+        }) => Promise<import('../types/api/tablet').TEvTabletStateResponse>;
+        getTabletHistory: (params: {
+            id?: string;
+        }) => Promise<import('../types/api/tablet').UnmergedTEvTabletStateResponse>;
         getHeatmapData: (params: {
             path: string;
         }) => Promise<import('../types/api/schema').TEvDescribeSchemeResult>;
