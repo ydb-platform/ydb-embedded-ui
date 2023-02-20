@@ -1,31 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Link} from 'react-router-dom';
 import cn from 'bem-cn-lite';
-import _ from 'lodash';
 
-import {calcUptime} from '../../utils';
 import {backend} from '../../store';
 import {getTablet, getTabletDescribe} from '../../store/reducers/tablet';
 import '../../services/api';
 
-import InfoViewer from '../../components/InfoViewer/InfoViewer';
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import {Tag} from '../../components/Tag';
 import {Icon} from '../../components/Icon';
 import {EmptyState} from '../../components/EmptyState';
 import {Link as ExternalLink, Button, Loader} from '@gravity-ui/uikit';
-import DataTable from '@gravity-ui/react-data-table';
 import {CriticalActionDialog} from '../../components/CriticalActionDialog';
 import routes, {createHref} from '../../routes';
 import {getDefaultNodePath} from '../Node/NodePages';
 
 import {TabletTable} from './TabletTable';
+import {TabletInfo} from './TabletInfo';
 
 import './Tablet.scss';
 
-const b = cn('tablet-page');
+export const b = cn('tablet-page');
 
 class Tablet extends React.Component {
     static propTypes = {
@@ -194,23 +190,11 @@ class Tablet extends React.Component {
         }
     };
 
-    hasUptime = () => {
-        const {tablet} = this.props;
-
-        return tablet.State === 'Active';
-    };
-
     hasHiveId = () => {
         const {tablet} = this.props;
         const {HiveId} = tablet;
 
         return HiveId && HiveId !== '0';
-    };
-
-    getSchemeShard = () => {
-        const {tablet} = this.props;
-
-        return _.get(tablet, 'TenantId.SchemeShard');
     };
 
     isDisabledResume = () => {
@@ -244,53 +228,6 @@ class Tablet extends React.Component {
     renderTablet = () => {
         const {tablet, tenantPath} = this.props;
         const {TabletId: id} = tablet;
-        const schemeShard = this.getSchemeShard();
-
-        const tabletInfo = [
-            {label: 'Database', value: tenantPath},
-            this.hasHiveId()
-                ? {
-                      label: 'HiveId',
-                      value: (
-                          <ExternalLink
-                              href={createHref(routes.tablet, {id: tablet.HiveId})}
-                              target="_blank"
-                          >
-                              {tablet.HiveId}
-                          </ExternalLink>
-                      ),
-                  }
-                : null,
-            schemeShard
-                ? {
-                      label: 'SchemeShard',
-                      value: (
-                          <ExternalLink
-                              href={createHref(routes.tablet, {id: schemeShard})}
-                              target="_blank"
-                          >
-                              {schemeShard}
-                          </ExternalLink>
-                      ),
-                  }
-                : null,
-            {label: 'Type', value: tablet.Type},
-            {label: 'State', value: tablet.State},
-            this.hasUptime() ? {label: 'Uptime', value: calcUptime(tablet.ChangeTime)} : null,
-            {label: 'Generation', value: tablet.Generation},
-            {
-                label: 'Node',
-                value: (
-                    <Link className={b('link')} to={getDefaultNodePath(String(tablet.NodeId))}>
-                        {tablet.NodeId}
-                    </Link>
-                ),
-            },
-        ].filter(Boolean);
-
-        if (tablet.SlaveId || tablet.FollowerId) {
-            tabletInfo.push({label: 'Follower', value: tablet.SlaveId || tablet.FollowerId});
-        }
 
         const externalLinks = [
             {
@@ -319,7 +256,7 @@ class Tablet extends React.Component {
                             </a>
                             {(tablet.Master || tablet.Leader) && <Tag text="Leader" type="blue" />}
                         </div>
-                        <InfoViewer info={tabletInfo} />
+                        <TabletInfo tablet={tablet} tenantPath={tenantPath} />
                         <div className={b('controls')}>
                             <Button
                                 onClick={this.showKillDialog}
