@@ -1,5 +1,4 @@
-//@ts-ignore
-import Icon from '../../components/Icon/Icon';
+import {Icon} from '../../components/Icon';
 
 export enum TenantGeneralTabsIds {
     query = 'query',

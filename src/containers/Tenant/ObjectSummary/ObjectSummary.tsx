@@ -18,7 +18,7 @@ import {
     CDCStreamOverview,
     PersQueueGroupOverview,
 } from '../../../components/InfoViewer/schemaOverview';
-import Icon from '../../../components/Icon/Icon';
+import {Icon} from '../../../components/Icon';
 
 import {
     EPathSubType,

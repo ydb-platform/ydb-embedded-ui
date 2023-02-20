@@ -2,7 +2,7 @@ import cn from 'bem-cn-lite';
 
 import EntityStatus from '../EntityStatus/EntityStatus';
 import {Tags} from '../Tags';
-import Icon from '../Icon/Icon';
+import {Icon} from '../Icon';
 
 import './BasicNodeViewer.scss';
 

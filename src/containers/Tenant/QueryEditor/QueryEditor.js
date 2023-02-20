@@ -11,7 +11,7 @@ import {QueryResultTable} from '../../../components/QueryResultTable';
 
 import SaveQuery from './SaveQuery/SaveQuery';
 import SavedQueries from './SavedQueries/SavedQueries';
-import Icon from '../../../components/Icon/Icon';
+import {Icon} from '../../../components/Icon';
 import QueryResult from './QueryResult/QueryResult';
 import QueryExplain from './QueryExplain/QueryExplain';
 

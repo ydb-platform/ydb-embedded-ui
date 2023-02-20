@@ -8,7 +8,7 @@ import {Link} from 'react-router-dom';
 import {Loader, Checkbox} from '@gravity-ui/uikit';
 
 import NodeNetwork from './NodeNetwork/NodeNetwork';
-import Icon from '../../../../components/Icon/Icon';
+import {Icon} from '../../../../components/Icon';
 import {ProblemFilter} from '../../../../components/ProblemFilter';
 import {Illustration} from '../../../../components/Illustration';
 

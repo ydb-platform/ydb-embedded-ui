@@ -5,7 +5,7 @@ import cn from 'bem-cn-lite';
 
 import {Loader, Button} from '@gravity-ui/uikit';
 
-import Icon from '../../../components/Icon/Icon';
+import {Icon} from '../../../components/Icon';
 import Fullscreen from '../../../components/Fullscreen/Fullscreen';
 import {QueryResultTable} from '../../../components/QueryResultTable';
 

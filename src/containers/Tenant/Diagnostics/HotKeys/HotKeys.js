@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Loader} from '@gravity-ui/uikit';
 import DataTable from '@gravity-ui/react-data-table';
 
-import Icon from '../../../../components/Icon/Icon';
+import {Icon} from '../../../../components/Icon';
 
 import {AutoFetcher} from '../../../../utils/autofetcher';
 import {getHotKeys, setHotKeysOptions} from '../../../../store/reducers/hotKeys';

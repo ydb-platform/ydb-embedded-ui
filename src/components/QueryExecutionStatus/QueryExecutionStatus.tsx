@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 
 import {Icon as UiKitIcon} from '@gravity-ui/uikit';
 
-import Icon from '../Icon/Icon';
+import {Icon} from '../Icon';
 
 import questionIcon from '../../assets/icons/question.svg';
 

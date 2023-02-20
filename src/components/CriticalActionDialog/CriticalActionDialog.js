@@ -2,7 +2,7 @@ import {useState} from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 import {Dialog} from '@gravity-ui/uikit';
-import Icon from '../Icon/Icon';
+import {Icon} from '../Icon';
 
 import './CriticalActionDialog.scss';
 

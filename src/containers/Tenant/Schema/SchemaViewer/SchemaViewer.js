@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 
 import find from 'lodash/find';
 
-import Icon from '../../../../components/Icon/Icon';
+import {Icon} from '../../../../components/Icon';
 import DataTable from '@gravity-ui/react-data-table';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import './SchemaViewer.scss';

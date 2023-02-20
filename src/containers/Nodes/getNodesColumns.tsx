@@ -2,7 +2,7 @@ import cn from 'bem-cn-lite';
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 import {Button, Popover} from '@gravity-ui/uikit';
 
-import Icon from '../../components/Icon/Icon';
+import {Icon} from '../../components/Icon';
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
 import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';

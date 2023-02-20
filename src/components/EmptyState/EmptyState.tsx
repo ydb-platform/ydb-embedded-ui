@@ -1,7 +1,7 @@
 import {ReactNode} from 'react';
 import cn from 'bem-cn-lite';
 
-import Icon from '../Icon/Icon';
+import {Icon} from '../Icon';
 
 import './EmptyState.scss';
 

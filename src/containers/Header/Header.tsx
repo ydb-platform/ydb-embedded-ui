@@ -5,8 +5,7 @@ import {useHistory, useLocation} from 'react-router';
 import {Breadcrumbs, BreadcrumbsItem, Link} from '@gravity-ui/uikit';
 
 import Divider from '../../components/Divider/Divider';
-//@ts-ignore
-import Icon from '../../components/Icon/Icon';
+import {Icon} from '../../components/Icon';
 
 import {clusterName as clusterNameLocation, backend, customBackend} from '../../store';
 import {getClusterInfo} from '../../store/reducers/cluster';
@@ -27,7 +26,7 @@ function ClusterName({name}: {name: string}) {
 }
 
 interface HeaderProps {
-    clusterName: string
+    clusterName: string;
 }
 
 function Header({clusterName}: HeaderProps) {

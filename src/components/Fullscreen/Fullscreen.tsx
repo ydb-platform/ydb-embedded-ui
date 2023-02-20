@@ -6,7 +6,7 @@ import cn from 'bem-cn-lite';
 
 import {useDispatch} from 'react-redux';
 import {disableFullscreen} from '../../store/reducers/fullscreen';
-import Icon from '../Icon/Icon';
+import {Icon} from '../Icon';
 
 import './Fullscreen.scss';
 
