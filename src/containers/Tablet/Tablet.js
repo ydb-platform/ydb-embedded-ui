@@ -21,47 +21,11 @@ import {CriticalActionDialog} from '../../components/CriticalActionDialog';
 import routes, {createHref} from '../../routes';
 import {getDefaultNodePath} from '../Node/NodePages';
 
+import {TabletTable} from './TabletTable';
+
 import './Tablet.scss';
 
 const b = cn('tablet-page');
-
-const TABLE_SETTINGS = {
-    displayIndices: false,
-};
-
-const CLUSTERS_COLUMNS = [
-    {
-        name: 'generation',
-        header: 'Generation',
-        align: DataTable.RIGHT,
-    },
-    {
-        name: 'nodeId',
-        header: 'Node ID',
-        align: DataTable.RIGHT,
-        sortable: false,
-    },
-    {
-        name: 'changeTime',
-        header: 'Change time',
-        align: DataTable.RIGHT,
-        sortable: false,
-        render: ({value}) => calcUptime(value),
-    },
-    {
-        name: 'state',
-        header: 'State',
-        sortable: false,
-    },
-    {
-        name: 'follower_id',
-        header: 'Follower ID',
-        sortable: false,
-        render: ({row}) => {
-            return row.leader ? 'leader' : row.followerId;
-        },
-    },
-];
 
 class Tablet extends React.Component {
     static propTypes = {
@@ -388,15 +352,7 @@ class Tablet extends React.Component {
                         </div>
                     </div>
                     <div className={b('rigth-pane')}>
-                        <DataTable
-                            data={this.props.history}
-                            columns={CLUSTERS_COLUMNS}
-                            settings={TABLE_SETTINGS}
-                            initialSortOrder={{
-                                columnId: 'generation',
-                                order: DataTable.DESCENDING,
-                            }}
-                        />
+                        <TabletTable history={this.props.history} />
                     </div>
                 </div>
                 {this.renderDialog()}
