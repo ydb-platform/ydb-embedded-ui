@@ -24,8 +24,7 @@ import {formatStorageValues} from '../../utils';
 //@ts-ignore
 import {TxAllocator} from '../../utils/constants';
 import {AutoFetcher} from '../../utils/autofetcher';
-//@ts-ignore
-import Icon from '../Icon/Icon';
+import {Icon} from '../Icon';
 import {setHeader} from '../../store/reducers/header';
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 

@@ -13,7 +13,7 @@ import '../../services/api';
 import InfoViewer from '../../components/InfoViewer/InfoViewer';
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import {Tag} from '../../components/Tag';
-import Icon from '../../components/Icon/Icon';
+import {Icon} from '../../components/Icon';
 import {EmptyState} from '../../components/EmptyState';
 import {Link as ExternalLink, Button, Loader} from '@gravity-ui/uikit';
 import DataTable from '@gravity-ui/react-data-table';

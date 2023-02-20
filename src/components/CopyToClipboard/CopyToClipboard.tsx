@@ -1,7 +1,6 @@
 import {Button, CopyToClipboard as CopyToClipboardUiKit} from '@gravity-ui/uikit';
 import createToast from '../../utils/createToast';
-//@ts-ignore
-import Icon from '../Icon/Icon';
+import {Icon} from '../Icon';
 
 interface CopyToClipboardProps {
     text: string;

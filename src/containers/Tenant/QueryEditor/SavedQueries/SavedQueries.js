@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 import {Dialog, Popup, Button} from '@gravity-ui/uikit';
 
 import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
-import Icon from '../../../../components/Icon/Icon';
+import {Icon} from '../../../../components/Icon';
 import './SavedQueries.scss';
 import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
 import {useDispatch} from 'react-redux';
