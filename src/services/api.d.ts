@@ -52,6 +52,7 @@ interface Window {
         getTenantInfo: (params: {
             path: string;
         }) => Promise<import('../types/api/tenant').TTenantInfo>;
+        getClusterInfo: () => Promise<import('../types/api/cluster').TClusterInfo>;
         getTabletsInfo: (params: {
             nodes?: string[];
             path?: string;
