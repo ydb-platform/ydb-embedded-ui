@@ -1,11 +1,15 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import type {Reducer} from 'redux';
+
+import type {IHostAction, IHostState} from '../../types/store/host';
 import '../../services/api';
 
-const FETCH_HOST = createRequestActionTypes('host', 'FETCH_HOST');
+import {createRequestActionTypes, createApiRequest} from '../utils';
+
+export const FETCH_HOST = createRequestActionTypes('host', 'FETCH_HOST');
 
 const initialState = {loading: true, wasLoaded: false, data: {}};
 
-const cluster = function (state = initialState, action) {
+const host: Reducer<IHostState, IHostAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_HOST.REQUEST: {
             return {
@@ -16,7 +20,7 @@ const cluster = function (state = initialState, action) {
         case FETCH_HOST.SUCCESS: {
             return {
                 ...state,
-                data: action.data.SystemStateInfo[0],
+                data: action.data.SystemStateInfo?.[0],
                 loading: false,
                 wasLoaded: true,
                 error: undefined,
@@ -41,4 +45,4 @@ export function getHostInfo() {
     });
 }
 
-export default cluster;
+export default host;
