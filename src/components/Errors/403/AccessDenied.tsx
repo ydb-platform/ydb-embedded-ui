@@ -1,4 +1,4 @@
-import EmptyState from '../../EmptyState/EmptyState';
+import {EmptyState} from '../../EmptyState';
 import {Illustration} from '../../Illustration';
 
 import i18n from '../i18n';

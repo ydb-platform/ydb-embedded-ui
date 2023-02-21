@@ -1,5 +1,6 @@
-import PropTypes from 'prop-types';
+import {ReactNode} from 'react';
 import cn from 'bem-cn-lite';
+
 import Icon from '../Icon/Icon';
 
 import './EmptyState.scss';
@@ -12,7 +13,15 @@ const sizes = {
     l: 350,
 };
 
-export default function EmptyState({image, title, description, actions, size}) {
+interface EmptyStateProps {
+    title: string;
+    image?: ReactNode;
+    description?: ReactNode;
+    actions?: ReactNode[];
+    size?: keyof typeof sizes;
+}
+
+export const EmptyState = ({image, title, description, actions, size = 'm'}: EmptyStateProps) => {
     return (
         <div className={block({size})}>
             <div className={block('wrapper', {size})}>
@@ -35,16 +44,4 @@ export default function EmptyState({image, title, description, actions, size}) {
             </div>
         </div>
     );
-}
-
-EmptyState.propTypes = {
-    title: PropTypes.string.isRequired,
-    image: PropTypes.node,
-    description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    actions: PropTypes.arrayOf(PropTypes.node),
-    size: PropTypes.string,
-};
-
-EmptyState.defaultProps = {
-    size: 'm',
 };
