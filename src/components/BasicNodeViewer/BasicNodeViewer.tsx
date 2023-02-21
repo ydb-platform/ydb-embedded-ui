@@ -1,7 +1,7 @@
 import cn from 'bem-cn-lite';
 
 import EntityStatus from '../EntityStatus/EntityStatus';
-import Tags from '../Tags/Tags';
+import {Tags} from '../Tags';
 import Icon from '../Icon/Icon';
 
 import './BasicNodeViewer.scss';
@@ -47,7 +47,6 @@ export const BasicNodeViewer = ({node, additionalNodesInfo, className}: BasicNod
             ) : (
                 <div className="error">no data</div>
             )}
-
         </div>
     );
 };

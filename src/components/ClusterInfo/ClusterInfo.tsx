@@ -8,8 +8,7 @@ import EntityStatus from '../EntityStatus/EntityStatus';
 import ProgressViewer from '../ProgressViewer/ProgressViewer';
 //@ts-ignore
 import InfoViewer from '../InfoViewer/InfoViewer';
-//@ts-ignore
-import Tags from '../Tags/Tags';
+import {Tags} from '../Tags';
 //@ts-ignore
 import Tablet from '../Tablet/Tablet';
 
