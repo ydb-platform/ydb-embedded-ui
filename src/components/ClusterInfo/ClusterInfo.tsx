@@ -1,6 +1,7 @@
 import React, {ReactNode} from 'react';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
+import {Link, Loader} from '@gravity-ui/uikit';
 
 //@ts-ignore
 import EntityStatus from '../EntityStatus/EntityStatus';
@@ -23,14 +24,16 @@ import {clusterName, backend, customBackend} from '../../store';
 import {formatStorageValues} from '../../utils';
 //@ts-ignore
 import {TxAllocator} from '../../utils/constants';
-
-import './ClusterInfo.scss';
 import {AutoFetcher} from '../../utils/autofetcher';
-import {Link, Loader} from '@gravity-ui/uikit';
 //@ts-ignore
 import Icon from '../Icon/Icon';
 import {setHeader} from '../../store/reducers/header';
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
+
+import type {TClusterInfo} from '../../types/api/cluster';
+import type {TTabletStateInfo} from '../../types/api/tablet';
+
+import './ClusterInfo.scss';
 
 const b = cn('cluster-info');
 
@@ -39,25 +42,11 @@ export interface IClusterInfoItem {
     value: ReactNode;
 }
 
-interface ICluster {
-    StorageTotal: string;
-    StorageUsed: string;
-    NodesAlive: number;
-    NodesTotal: number;
-    LoadAverage: number;
-    NumberOfCpus: number;
-    Versions: string[];
-    Name?: string;
-    Overall: string;
-    DataCenters?: string[];
-    SystemTablets?: ITablet[];
-}
-
 interface ClusterInfoProps {
     className?: string;
-    cluster?: ICluster;
+    cluster?: TClusterInfo;
     hideTooltip: VoidFunction;
-    showTooltip: Function;
+    showTooltip: (...args: Parameters<typeof showTooltip>) => void;
     setHeader: any;
     getClusterInfo: (clusterName: string) => void;
     clusterTitle?: string;
@@ -68,12 +57,8 @@ interface ClusterInfoProps {
     error?: {statusText: string};
 }
 
-interface ITablet {
-    Type: string;
-}
-
 class ClusterInfo extends React.Component<ClusterInfoProps> {
-    static compareTablets(tablet1: ITablet, tablet2: ITablet) {
+    static compareTablets(tablet1: TTabletStateInfo, tablet2: TTabletStateInfo) {
         if (tablet1.Type === TxAllocator) {
             return 1;
         }
@@ -127,11 +112,7 @@ class ClusterInfo extends React.Component<ClusterInfoProps> {
     private autofetcher: any;
 
     private getInfo() {
-        const {
-            cluster = {} as ICluster,
-            additionalClusterInfo = [],
-            singleClusterMode,
-        } = this.props;
+        const {cluster = {}, additionalClusterInfo = [], singleClusterMode} = this.props;
         const {StorageTotal, StorageUsed} = cluster;
 
         let link = backend + '/internal';
@@ -192,7 +173,7 @@ class ClusterInfo extends React.Component<ClusterInfoProps> {
 
     private renderContent = () => {
         const {
-            cluster = {} as ICluster,
+            cluster = {},
             showTooltip,
             hideTooltip,
             clusterTitle,
