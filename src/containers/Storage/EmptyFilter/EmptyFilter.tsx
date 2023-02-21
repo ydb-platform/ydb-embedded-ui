@@ -1,6 +1,6 @@
 import {Button} from '@gravity-ui/uikit';
 
-import EmptyState from '../../../components/EmptyState/EmptyState';
+import {EmptyState} from '../../../components/EmptyState';
 import {Illustration} from '../../../components/Illustration';
 
 import i18n from './i18n';
@@ -22,13 +22,12 @@ export const EmptyFilter = ({
         image={<Illustration name="thumbsUp" />}
         title={title}
         description={message}
-        actions={onShowAll && [
-            <Button
-                key="show-all"
-                onClick={onShowAll}
-            >
-                {showAll}
-            </Button>
-        ]}
+        actions={
+            onShowAll && [
+                <Button key="show-all" onClick={onShowAll}>
+                    {showAll}
+                </Button>,
+            ]
+        }
     />
 );
