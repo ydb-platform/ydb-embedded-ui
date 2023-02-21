@@ -8,7 +8,7 @@ import _ from 'lodash';
 import {Loader, Select} from '@gravity-ui/uikit';
 import ReactList from 'react-list';
 
-import Tablet from '../../components/Tablet/Tablet';
+import {Tablet} from '../../components/Tablet';
 import {AccessDenied} from '../../components/Errors/403';
 
 import {tabletColorToTabletState, tabletStates} from '../../utils/tablet';
