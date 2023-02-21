@@ -7,7 +7,7 @@ import {Loader} from '@gravity-ui/uikit';
 import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
 import InfoViewer from '../../../../components/InfoViewer/InfoViewer';
 import PoolUsage from '../../../../components/PoolUsage/PoolUsage';
-import Tablet from '../../../../components/Tablet/Tablet';
+import {Tablet} from '../../../../components/Tablet';
 
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
 import {getTenantInfo} from '../../../../store/reducers/tenant';

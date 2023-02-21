@@ -10,8 +10,7 @@ import ProgressViewer from '../ProgressViewer/ProgressViewer';
 //@ts-ignore
 import InfoViewer from '../InfoViewer/InfoViewer';
 import {Tags} from '../Tags';
-//@ts-ignore
-import Tablet from '../Tablet/Tablet';
+import {Tablet} from '../Tablet';
 
 //@ts-ignore
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';

@@ -18,7 +18,9 @@ export interface ITooltipState {
     additionalData?: any;
 }
 
-export type ITooltipAction = ReturnType<typeof hideTooltip> | ReturnType<typeof showTooltip>;
+export type ShowTooltipFunction = typeof showTooltip;
+
+export type ITooltipAction = ReturnType<typeof hideTooltip> | ReturnType<ShowTooltipFunction>;
 
 export interface ITooltipRootStateSlice {
     tooltip: ITooltipState;

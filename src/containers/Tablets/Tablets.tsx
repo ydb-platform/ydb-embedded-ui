@@ -5,7 +5,7 @@ import ReactList from 'react-list';
 
 import {Select} from '@gravity-ui/uikit';
 
-import Tablet from '../../components/Tablet/Tablet';
+import {Tablet} from '../../components/Tablet';
 import TabletsOverall from '../../components/TabletsOverall/TabletsOverall';
 import {Loader} from '../../components/Loader';
 
@@ -104,7 +104,6 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
                 onMouseEnter={onShowTooltip}
                 tablet={tabletsToRender[tabletIndex]}
                 key={tabletIndex}
-                className={b('tablet')}
             />
         );
     };
