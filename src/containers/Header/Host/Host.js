@@ -5,7 +5,7 @@ import cn from 'bem-cn-lite';
 import {Link as ExternalLink} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
-import {Tag} from '../../../components/Tag/Tag';
+import {Tag} from '../../../components/Tag';
 
 import {calcUptime} from '../../../utils';
 import {customBackend} from '../../../store';
