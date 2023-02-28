@@ -21,6 +21,21 @@
     &__vdisks-item {
         flex-basis: 5px;
         flex-shrink: 0;
+
+        .stack__layer {
+            background: var(--yc-color-base-background);
+
+            .data-table__row:hover & {
+                background: var(--ydb-data-table-color-hover);
+            }
+        }
+    }
+
+    &__donors-stack {
+        --ydb-stack-offset-x: 0px;
+        --ydb-stack-offset-y: -2px;
+        --ydb-stack-offset-x-hover: 0px;
+        --ydb-stack-offset-y-hover: -7px;
     }
 
     &__media-type {

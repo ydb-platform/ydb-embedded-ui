@@ -128,6 +128,7 @@ function StorageNodes({
         },
         {
             name: TableColumnsIds.PDisks,
+            className: b('pdisks-column'),
             header: tableColumnsNames[TableColumnsIds.PDisks],
             render: ({value, row}) => (
                 <div className={b('pdisks-wrapper')}>
