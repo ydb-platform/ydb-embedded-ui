@@ -2,6 +2,7 @@ import React, {useEffect, useState, useRef, useMemo} from 'react';
 import cn from 'bem-cn-lite';
 
 import {InternalLink} from '../../../components/InternalLink';
+import {Stack} from '../../../components/Stack/Stack';
 
 import routes, {createHref} from '../../../routes';
 import {getVDisksForPDisk} from '../../../store/reducers/storage';
@@ -10,6 +11,7 @@ import {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId} from '../../../utils';
 import {useTypedSelector} from '../../../utils/hooks';
 import {getPDiskType} from '../../../utils/pdisk';
+import {isFullVDiksData} from '../../../utils/storage';
 
 import {STRUCTURE} from '../../Node/NodePages';
 
@@ -109,19 +111,42 @@ export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
 
         return (
             <div className={b('vdisks')}>
-                {vdisks.map((vdisk) => (
-                    <div
-                        key={stringifyVdiskId(vdisk.VDiskId)}
-                        className={b('vdisks-item')}
-                        style={{
-                            // 1 is small enough for empty disks to be of the minimum width
-                            // but if all of them are empty, `flex-grow: 1` would size them evenly
-                            flexGrow: Number(vdisk.AllocatedSize) || 1,
-                        }}
-                    >
-                        <VDisk data={vdisk} compact />
-                    </div>
-                ))}
+                {vdisks.map((vdisk) => {
+                    const donors = vdisk.Donors;
+
+                    return (
+                        <div
+                            key={stringifyVdiskId(vdisk.VDiskId)}
+                            className={b('vdisks-item')}
+                            style={{
+                                // 1 is small enough for empty disks to be of the minimum width
+                                // but if all of them are empty, `flex-grow: 1` would size them evenly
+                                flexGrow: Number(vdisk.AllocatedSize) || 1,
+                            }}
+                        >
+                            {donors && donors.length ? (
+                                <Stack className={b('donors-stack')} key={stringifyVdiskId(vdisk.VDiskId)}>
+                                    <VDisk data={vdisk} compact />
+                                    {donors.map((donor) => {
+                                        const isFullData = isFullVDiksData(donor);
+
+                                        return (
+                                            <VDisk
+                                                compact
+                                                data={isFullData ? donor : {...donor, DonorMode: true}}
+                                                key={stringifyVdiskId(
+                                                    isFullData ? donor.VDiskId : donor,
+                                                )}
+                                            />
+                                        );
+                                    })}
+                                </Stack>
+                            ) : (
+                                <VDisk data={vdisk} compact />
+                            )}
+                        </div>
+                    );
+                })}
             </div>
         );
     };
