@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.4.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.0...v3.4.1) (2023-03-01)
+
+
+### Bug Fixes
+
+* **Consumers:** enable navigation to Partitions tab ([fa79081](https://github.com/ydb-platform/ydb-embedded-ui/commit/fa7908124bc4392e272aa829fd4e5c1639fcf209))
+* **Consumers:** update topic stats values align ([f2af851](https://github.com/ydb-platform/ydb-embedded-ui/commit/f2af851208a640ef9aa392fd7176eb579a2401db))
+* **TopShards:** keep state on request cancel ([1bd4f65](https://github.com/ydb-platform/ydb-embedded-ui/commit/1bd4f65dd047b42f8edf9e4bb41c722f30220d77))
+
 ## [3.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.3.4...v3.4.0) (2023-02-17)
 
 
