@@ -1,9 +1,15 @@
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 import block from 'bem-cn-lite';
+import qs from 'qs';
 
 import type {IPreparedConsumerData} from '../../../../../types/store/topic';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {InternalLink} from '../../../../../components/InternalLink';
 import {formatMsToUptime} from '../../../../../utils';
+import routes, {createHref} from '../../../../../routes';
+
+import {TenantTabsGroups} from '../../../TenantPages';
+import {GeneralPagesIds} from '../../DiagnosticsPages';
 
 import {
     CONSUMERS_COLUMNS_IDS,
@@ -23,7 +29,27 @@ export const columns: Column<IPreparedConsumerData>[] = [
         name: CONSUMERS_COLUMNS_IDS.CONSUMER,
         header: CONSUMERS_COLUMNS_TITILES[CONSUMERS_COLUMNS_IDS.CONSUMER],
         align: DataTable.LEFT,
-        render: ({row}) => row.name || '-',
+        render: ({row}) => {
+            if (!row.name) {
+                return '–';
+            }
+
+            const queryParams = qs.parse(location.search, {
+                ignoreQueryPrefix: true,
+            });
+
+            return (
+                <InternalLink
+                    to={createHref(routes.tenant, undefined, {
+                        ...queryParams,
+                        [TenantTabsGroups.generalTab]: GeneralPagesIds.partitions,
+                        selectedConsumer: row.name,
+                    })}
+                >
+                    {row.name}
+                </InternalLink>
+            );
+        },
     },
     {
         name: CONSUMERS_COLUMNS_IDS.READ_SPEED,

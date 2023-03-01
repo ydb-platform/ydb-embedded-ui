@@ -67,6 +67,9 @@ const paramSetup = {
             stateKey: 'executeTopQueries.filters.to',
             type: 'number',
         },
+        selectedConsumer: {
+            stateKey: 'consumer.selectedConsumer',
+        },
     },
 };
 
