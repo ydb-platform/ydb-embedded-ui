@@ -20,6 +20,7 @@ import {createRequestActionTypes, createApiRequest} from '../utils';
 export const FETCH_CONSUMER = createRequestActionTypes('consumer', 'FETCH_CONSUMER');
 
 const SET_DATA_WAS_NOT_LOADED = 'consumer/SET_DATA_WAS_NOT_LOADED';
+const SET_SELECTED_CONSUMER = 'consumer/SET_SELECTED_CONSUMER';
 
 const initialState = {
     loading: false,
@@ -66,6 +67,12 @@ const consumer: Reducer<IConsumerState, IConsumerAction> = (state = initialState
                 wasLoaded: false,
             };
         }
+        case SET_SELECTED_CONSUMER: {
+            return {
+                ...state,
+                selectedConsumer: action.data,
+            };
+        }
         default:
             return state;
     }
@@ -74,6 +81,13 @@ const consumer: Reducer<IConsumerState, IConsumerAction> = (state = initialState
 export const setDataWasNotLoaded = () => {
     return {
         type: SET_DATA_WAS_NOT_LOADED,
+    } as const;
+};
+
+export const setSelectedConsumer = (value?: string) => {
+    return {
+        type: SET_SELECTED_CONSUMER,
+        data: value,
     } as const;
 };
 

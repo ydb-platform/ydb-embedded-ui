@@ -1,5 +1,5 @@
 import block from 'bem-cn-lite';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {escapeRegExp} from 'lodash/fp';
 
@@ -17,6 +17,7 @@ import {
     getConsumer,
     selectPreparedPartitionsData,
     setDataWasNotLoaded,
+    setSelectedConsumer,
 } from '../../../../store/reducers/consumer';
 
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
@@ -52,14 +53,17 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
 
     const dispatch = useDispatch();
 
-    const [selectedConsumer, setSelectedConsumer] = useState<string[]>();
+    const isFirstRenderRef = useRef(true);
+
     const [generalSearchValue, setGeneralSearchValue] = useState('');
     const [partitionIdSearchValue, setPartitionIdSearchValue] = useState('');
 
     const [componentCurrentPath, setComponentCurrentPath] = useState(path);
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const {loading, wasLoaded, error} = useTypedSelector((state) => state.consumer);
+    const {loading, wasLoaded, error, selectedConsumer} = useTypedSelector(
+        (state) => state.consumer,
+    );
 
     const partitions = useTypedSelector((state) => selectPreparedPartitionsData(state));
 
@@ -70,7 +74,15 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
     useEffect(() => {
         // Manual path control to ensure it updates with other values so no request with wrong params will be sent
         setComponentCurrentPath(path);
-    }, [path]);
+
+        // Do not reset selected consumer on first effect call
+        // To enable navigating to specific consumer
+        if (isFirstRenderRef.current) {
+            isFirstRenderRef.current = false;
+        } else {
+            dispatch(setSelectedConsumer(undefined));
+        }
+    }, [dispatch, path]);
 
     const fetchConsumerData = useCallback(
         (isBackground: boolean) => {
@@ -78,8 +90,8 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
                 dispatch(setDataWasNotLoaded());
             }
 
-            if (selectedConsumer && selectedConsumer.length) {
-                dispatch(getConsumer(componentCurrentPath, selectedConsumer[0]));
+            if (selectedConsumer) {
+                dispatch(getConsumer(componentCurrentPath, selectedConsumer));
             }
         },
         [dispatch, selectedConsumer, componentCurrentPath],
@@ -99,12 +111,10 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
     );
 
     useEffect(() => {
-        if (consumersToSelect && consumersToSelect.length) {
-            setSelectedConsumer([consumersToSelect[0].value]);
-        } else {
-            setSelectedConsumer(undefined);
+        if (consumersToSelect && consumersToSelect.length && !selectedConsumer) {
+            dispatch(setSelectedConsumer(consumersToSelect[0].value));
         }
-    }, [consumersToSelect]);
+    }, [dispatch, consumersToSelect, selectedConsumer]);
 
     const selectedColumns: string[] = useMemo(
         () =>
@@ -183,7 +193,7 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
     };
 
     const handleConsumerSelectChange = (value: string[]) => {
-        setSelectedConsumer(value);
+        dispatch(setSelectedConsumer(value[0]));
     };
 
     const handlePartitionIdSearchChange = (value: string) => {
@@ -210,7 +220,7 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
                     placeholder={i18n('controls.consumerSelector.placeholder')}
                     label={i18n('controls.consumerSelector')}
                     options={consumersToSelect}
-                    value={selectedConsumer}
+                    value={[selectedConsumer || '']}
                     onUpdate={handleConsumerSelectChange}
                 />
                 <Search
