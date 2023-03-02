@@ -222,6 +222,7 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
                     options={consumersToSelect}
                     value={[selectedConsumer || '']}
                     onUpdate={handleConsumerSelectChange}
+                    filterable={consumers && consumers.length > 5}
                 />
                 <Search
                     onChange={handlePartitionIdSearchChange}
