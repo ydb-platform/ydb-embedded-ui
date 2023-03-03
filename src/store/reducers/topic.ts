@@ -18,6 +18,7 @@ import {convertBytesObjectToSpeed} from '../../utils/bytesParsers';
 export const FETCH_TOPIC = createRequestActionTypes('topic', 'FETCH_TOPIC');
 
 const SET_DATA_WAS_NOT_LOADED = 'topic/SET_DATA_WAS_NOT_LOADED';
+const CLEAN_TOPIC_DATA = 'topic/CLEAN_TOPIC_DATA';
 
 const initialState = {
     loading: true,
@@ -64,6 +65,12 @@ const topic: Reducer<ITopicState, ITopicAction> = (state = initialState, action)
                 wasLoaded: false,
             };
         }
+        case CLEAN_TOPIC_DATA: {
+            return {
+                ...state,
+                data: undefined,
+            };
+        }
         default:
             return state;
     }
@@ -72,6 +79,12 @@ const topic: Reducer<ITopicState, ITopicAction> = (state = initialState, action)
 export const setDataWasNotLoaded = () => {
     return {
         type: SET_DATA_WAS_NOT_LOADED,
+    } as const;
+};
+
+export const cleanTopicData = () => {
+    return {
+        type: CLEAN_TOPIC_DATA,
     } as const;
 };
 
