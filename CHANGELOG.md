@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.4.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.1...v3.4.2) (2023-03-03)
+
+
+### Bug Fixes
+
+* **Partitions:** add search to consumers filter ([95e4462](https://github.com/ydb-platform/ydb-embedded-ui/commit/95e446295cb2b2729daf0d0ef719e37c7c8e0d3c))
+* **Partitions:** fix error on wrong consumer in query string ([44269fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/44269fa9240fe31c9ef69e061c20d58b2b55fae3))
+* **PDisk:** display vdisks donors ([8b39b01](https://github.com/ydb-platform/ydb-embedded-ui/commit/8b39b01e8bf62624e9e12ac0a329fda5d03cc8df))
+
 ## [3.4.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.0...v3.4.1) (2023-03-01)
 
 
