@@ -1,4 +1,4 @@
-import {FETCH_TOPIC, setDataWasNotLoaded} from '../../store/reducers/topic';
+import {FETCH_TOPIC, cleanTopicData, setDataWasNotLoaded} from '../../store/reducers/topic';
 import type {ApiRequestAction} from '../../store/utils';
 import type {IProcessSpeedStats} from '../../utils/bytesParsers';
 import type {IResponseError} from '../api/error';
@@ -31,7 +31,8 @@ export interface ITopicState {
 
 export type ITopicAction =
     | ApiRequestAction<typeof FETCH_TOPIC, DescribeTopicResult, IResponseError>
-    | ReturnType<typeof setDataWasNotLoaded>;
+    | ReturnType<typeof setDataWasNotLoaded>
+    | ReturnType<typeof cleanTopicData>;
 
 export interface ITopicRootStateSlice {
     topic: ITopicState;

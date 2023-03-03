@@ -6,6 +6,7 @@ import type {EPathType} from '../../../../types/api/schema';
 import {useTypedSelector} from '../../../../utils/hooks';
 
 import {
+    cleanTopicData,
     getTopic,
     setDataWasNotLoaded as setTopicDataWasNotLoaded,
 } from '../../../../store/reducers/topic';
@@ -61,6 +62,7 @@ export const PartitionsWrapper = ({path, type}: PartitionsWrapperProps) => {
 
     useEffect(() => {
         dispatch(setTopicDataWasNotLoaded());
+        dispatch(cleanTopicData());
         dispatch(setNodesDataWasNotLoaded());
 
         dispatch(getTopic(path));

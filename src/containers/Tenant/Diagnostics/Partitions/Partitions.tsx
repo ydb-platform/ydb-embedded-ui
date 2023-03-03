@@ -1,5 +1,5 @@
 import block from 'bem-cn-lite';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {escapeRegExp} from 'lodash/fp';
 
@@ -53,8 +53,6 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
 
     const dispatch = useDispatch();
 
-    const isFirstRenderRef = useRef(true);
-
     const [generalSearchValue, setGeneralSearchValue] = useState('');
     const [partitionIdSearchValue, setPartitionIdSearchValue] = useState('');
 
@@ -74,14 +72,6 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
     useEffect(() => {
         // Manual path control to ensure it updates with other values so no request with wrong params will be sent
         setComponentCurrentPath(path);
-
-        // Do not reset selected consumer on first effect call
-        // To enable navigating to specific consumer
-        if (isFirstRenderRef.current) {
-            isFirstRenderRef.current = false;
-        } else {
-            dispatch(setSelectedConsumer(undefined));
-        }
     }, [dispatch, path]);
 
     const fetchConsumerData = useCallback(
@@ -90,11 +80,11 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
                 dispatch(setDataWasNotLoaded());
             }
 
-            if (selectedConsumer) {
+            if (selectedConsumer && consumers && consumers.includes(selectedConsumer)) {
                 dispatch(getConsumer(componentCurrentPath, selectedConsumer));
             }
         },
-        [dispatch, selectedConsumer, componentCurrentPath],
+        [dispatch, selectedConsumer, componentCurrentPath, consumers],
     );
 
     useAutofetcher(fetchConsumerData, [fetchConsumerData], autorefresh);
@@ -111,10 +101,13 @@ export const Partitions = ({path, type, nodes, consumers}: PartitionsProps) => {
     );
 
     useEffect(() => {
-        if (consumersToSelect && consumersToSelect.length && !selectedConsumer) {
+        const shouldUpdateSelectedConsumer =
+            !selectedConsumer || (consumers && !consumers.includes(selectedConsumer));
+
+        if (consumersToSelect && consumersToSelect.length && shouldUpdateSelectedConsumer) {
             dispatch(setSelectedConsumer(consumersToSelect[0].value));
         }
-    }, [dispatch, consumersToSelect, selectedConsumer]);
+    }, [dispatch, consumersToSelect, selectedConsumer, consumers]);
 
     const selectedColumns: string[] = useMemo(
         () =>
