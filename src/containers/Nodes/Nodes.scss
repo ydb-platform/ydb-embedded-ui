@@ -39,4 +39,8 @@
         @include table-styles;
         @include table-sticky-styles;
     }
+
+    &__node_unavailable {
+        opacity: 0.6;
+    }
 }

@@ -21,7 +21,7 @@ import {
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
 } from '../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
-import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
 
 import {setHeader} from '../../store/reducers/header';
 import {
@@ -166,6 +166,7 @@ export const Nodes = ({tenantPath, className, additionalNodesInfo = {}}: NodesPr
                             order: DataTable.ASCENDING,
                         }}
                         emptyDataMessage={i18n('empty.default')}
+                        rowClassName={(row) => b('node', {unavailable: isUnavailableNode(row)})}
                     />
                 </div>
             </div>
