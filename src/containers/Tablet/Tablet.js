@@ -17,7 +17,7 @@ import {Icon} from '../../components/Icon';
 import {EmptyState} from '../../components/EmptyState';
 import {Link as ExternalLink, Button, Loader} from '@gravity-ui/uikit';
 import DataTable from '@gravity-ui/react-data-table';
-import CriticalActionDialog from '../../components/CriticalActionDialog/CriticalActionDialog';
+import {CriticalActionDialog} from '../../components/CriticalActionDialog';
 import routes, {createHref} from '../../routes';
 import {getDefaultNodePath} from '../Node/NodePages';
 
