@@ -11,7 +11,7 @@ import {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId} from '../../../utils';
 import {useTypedSelector} from '../../../utils/hooks';
 import {getPDiskType} from '../../../utils/pdisk';
-import {isFullVDiksData} from '../../../utils/storage';
+import {isFullVDiskData} from '../../../utils/storage';
 
 import {STRUCTURE} from '../../Node/NodePages';
 
@@ -125,15 +125,20 @@ export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
                             }}
                         >
                             {donors && donors.length ? (
-                                <Stack className={b('donors-stack')} key={stringifyVdiskId(vdisk.VDiskId)}>
+                                <Stack
+                                    className={b('donors-stack')}
+                                    key={stringifyVdiskId(vdisk.VDiskId)}
+                                >
                                     <VDisk data={vdisk} compact />
                                     {donors.map((donor) => {
-                                        const isFullData = isFullVDiksData(donor);
+                                        const isFullData = isFullVDiskData(donor);
 
                                         return (
                                             <VDisk
                                                 compact
-                                                data={isFullData ? donor : {...donor, DonorMode: true}}
+                                                data={
+                                                    isFullData ? donor : {...donor, DonorMode: true}
+                                                }
                                                 key={stringifyVdiskId(
                                                     isFullData ? donor.VDiskId : donor,
                                                 )}

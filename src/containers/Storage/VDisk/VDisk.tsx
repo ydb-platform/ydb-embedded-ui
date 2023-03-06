@@ -7,7 +7,7 @@ import routes, {createHref} from '../../../routes';
 import {EFlag} from '../../../types/api/enums';
 import {EVDiskState, TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId} from '../../../utils';
-import {isFullVDiksData} from '../../../utils/storage';
+import {isFullVDiskData} from '../../../utils/storage';
 
 import {STRUCTURE} from '../../Node/NodePages';
 
@@ -55,7 +55,7 @@ interface VDiskProps {
 }
 
 export const VDisk = ({data = {}, poolName, nodes, compact}: VDiskProps) => {
-    const isFullData = isFullVDiksData(data);
+    const isFullData = isFullVDiskData(data);
 
     const [severity, setSeverity] = useState(
         getStateSeverity(isFullData ? data.VDiskState : undefined),
