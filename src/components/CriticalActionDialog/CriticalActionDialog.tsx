@@ -1,22 +1,34 @@
-import {useState} from 'react';
-import PropTypes from 'prop-types';
+import {FormEvent, useState} from 'react';
 import cn from 'bem-cn-lite';
 import {Dialog} from '@gravity-ui/uikit';
+
 import {Icon} from '../Icon';
 
 import './CriticalActionDialog.scss';
 
-const b = cn('km-critical-dialog');
+const b = cn('ydb-critical-dialog');
 
-export default function CriticalActionDialog({visible, onClose, onConfirm, text}) {
-    const [progress, setProgress] = useState(false);
+interface CriticalActionDialogProps {
+    visible: boolean;
+    text: string;
+    onClose: VoidFunction;
+    onConfirm: () => Promise<unknown>;
+}
 
-    const onSubmit = (e) => {
+export const CriticalActionDialog = ({
+    visible,
+    text,
+    onClose,
+    onConfirm,
+}: CriticalActionDialogProps) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setProgress(true);
+        setIsLoading(true);
 
         return onConfirm().then(() => {
-            setProgress(false);
+            setIsLoading(false);
             onClose();
         });
     };
@@ -32,7 +44,7 @@ export default function CriticalActionDialog({visible, onClose, onConfirm, text}
                 </Dialog.Body>
 
                 <Dialog.Footer
-                    progress={progress}
+                    loading={isLoading}
                     preset="default"
                     textButtonApply="Confirm"
                     textButtonCancel="Cancel"
@@ -43,11 +55,4 @@ export default function CriticalActionDialog({visible, onClose, onConfirm, text}
             </form>
         </Dialog>
     );
-}
-
-CriticalActionDialog.propTypes = {
-    visible: PropTypes.bool,
-    onClose: PropTypes.func,
-    onConfirm: PropTypes.func,
-    text: PropTypes.string,
 };
