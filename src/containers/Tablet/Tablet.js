@@ -13,11 +13,10 @@ import {Icon} from '../../components/Icon';
 import {EmptyState} from '../../components/EmptyState';
 import {Link as ExternalLink, Button, Loader} from '@gravity-ui/uikit';
 import {CriticalActionDialog} from '../../components/CriticalActionDialog';
-import routes, {createHref} from '../../routes';
-import {getDefaultNodePath} from '../Node/NodePages';
 
 import {TabletTable} from './TabletTable';
 import {TabletInfo} from './TabletInfo';
+import {TabletControls} from './TabletControls';
 
 import './Tablet.scss';
 
@@ -53,18 +52,9 @@ class Tablet extends React.Component {
     }
 
     state = {
-        typeVisibleDialog: null,
-        dialogVisible: false,
         isFirstFetchData: true,
         tenantPath: '-',
-        disableTabletActions: false,
     };
-
-    makeShowDialog = (type) => () => this.setState({dialogVisible: true, typeVisibleDialog: type});
-    showKillDialog = this.makeShowDialog('kill');
-    showStopDialog = this.makeShowDialog('stop');
-    showResumeDialog = this.makeShowDialog('resume');
-    hideDialog = () => this.setState({dialogVisible: false, typeVisibleDialog: null});
 
     fetchTabletInfo = () => {
         const {version, id} = this.props;
@@ -85,9 +75,7 @@ class Tablet extends React.Component {
             }
 
             this.fetcher = setInterval(() => {
-                this.props.getTablet(id).then(() => {
-                    this.setState({disableTabletActions: false});
-                });
+                this.props.getTablet(id);
             }, 10000);
         }
     };
@@ -126,104 +114,6 @@ class Tablet extends React.Component {
             </li>
         );
     };
-    _onKillClick = () => {
-        const {TabletId: id} = this.props.tablet;
-
-        this.setState({disableTabletActions: true});
-
-        return window.api.killTablet(id);
-    };
-    _onStopClick = () => {
-        const {TabletId: id, HiveId: hiveId} = this.props.tablet;
-
-        this.setState({disableTabletActions: true});
-
-        return window.api.stopTablet(id, hiveId);
-    };
-    _onResumeClick = () => {
-        const {TabletId: id, HiveId: hiveId} = this.props.tablet;
-
-        this.setState({disableTabletActions: true});
-
-        return window.api.resumeTablet(id, hiveId);
-    };
-    renderDialog = () => {
-        const {dialogVisible, typeVisibleDialog} = this.state;
-
-        if (!dialogVisible) {
-            return null;
-        }
-
-        switch (typeVisibleDialog) {
-            case 'kill': {
-                return (
-                    <CriticalActionDialog
-                        visible={dialogVisible}
-                        text="The tablet will be restarted. Do you want to proceed?"
-                        onClose={this.hideDialog}
-                        onConfirm={this._onKillClick}
-                    />
-                );
-            }
-            case 'stop': {
-                return (
-                    <CriticalActionDialog
-                        visible={dialogVisible}
-                        text="The tablet will be stopped. Do you want to proceed?"
-                        onClose={this.hideDialog}
-                        onConfirm={this._onStopClick}
-                    />
-                );
-            }
-            case 'resume': {
-                return (
-                    <CriticalActionDialog
-                        visible={dialogVisible}
-                        text="The tablet will be resumed. Do you want to proceed?"
-                        onClose={this.hideDialog}
-                        onConfirm={this._onResumeClick}
-                    />
-                );
-            }
-            default:
-                return null;
-        }
-    };
-
-    hasHiveId = () => {
-        const {tablet} = this.props;
-        const {HiveId} = tablet;
-
-        return HiveId && HiveId !== '0';
-    };
-
-    isDisabledResume = () => {
-        const {tablet} = this.props;
-        const {disableTabletActions} = this.state;
-
-        if (disableTabletActions) {
-            return true;
-        }
-
-        return tablet.State !== 'Stopped' && tablet.State !== 'Dead';
-    };
-
-    isDisabledKill = () => {
-        const {disableTabletActions} = this.state;
-
-        return disableTabletActions;
-    };
-
-    isDisabledStop = () => {
-        const {tablet} = this.props;
-        const {disableTabletActions} = this.state;
-
-        if (disableTabletActions) {
-            return true;
-        }
-
-        return tablet.State === 'Stopped' || tablet.State === 'Deleted';
-    };
 
     renderTablet = () => {
         const {tablet, tenantPath} = this.props;
@@ -257,42 +147,12 @@ class Tablet extends React.Component {
                             {(tablet.Master || tablet.Leader) && <Tag text="Leader" type="blue" />}
                         </div>
                         <TabletInfo tablet={tablet} tenantPath={tenantPath} />
-                        <div className={b('controls')}>
-                            <Button
-                                onClick={this.showKillDialog}
-                                view="action"
-                                disabled={this.isDisabledKill()}
-                                className={b('control')}
-                            >
-                                Restart
-                            </Button>
-                            {this.hasHiveId() ? (
-                                <React.Fragment>
-                                    <Button
-                                        onClick={this.showStopDialog}
-                                        view="action"
-                                        disabled={this.isDisabledStop()}
-                                        className={b('control')}
-                                    >
-                                        Stop
-                                    </Button>
-                                    <Button
-                                        onClick={this.showResumeDialog}
-                                        view="action"
-                                        disabled={this.isDisabledResume()}
-                                        className={b('control')}
-                                    >
-                                        Resume
-                                    </Button>
-                                </React.Fragment>
-                            ) : null}
-                        </div>
+                        <TabletControls tablet={tablet} />
                     </div>
                     <div className={b('rigth-pane')}>
                         <TabletTable history={this.props.history} />
                     </div>
                 </div>
-                {this.renderDialog()}
             </div>
         );
     };
