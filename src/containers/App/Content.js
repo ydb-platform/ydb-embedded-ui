@@ -13,7 +13,7 @@ import Node from '../Node/Node';
 import Pdisk from '../Pdisk/Pdisk';
 import Group from '../Group/Group';
 import Pool from '../Pool/Pool';
-import Tablet from '../Tablet/Tablet';
+import {Tablet} from '../Tablet';
 import TabletsFilters from '../TabletsFilters/TabletsFilters';
 import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
 import Header from '../Header/Header';
