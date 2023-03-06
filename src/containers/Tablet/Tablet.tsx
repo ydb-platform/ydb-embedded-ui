@@ -19,6 +19,8 @@ import {TabletTable} from './TabletTable';
 import {TabletInfo} from './TabletInfo';
 import {TabletControls} from './TabletControls';
 
+import i18n from './i18n';
+
 import './Tablet.scss';
 
 export const b = cn('tablet-page');
@@ -69,7 +71,7 @@ export const Tablet = () => {
     if (!tablet || !Object.keys(tablet).length) {
         return (
             <div className={b('placeholder')}>
-                <EmptyState title="The tablet was not found" />
+                <EmptyState title={i18n('emptyState')} />
             </div>
         );
     }
@@ -89,7 +91,7 @@ export const Tablet = () => {
                 <div className={b('left-pane')}>
                     <ul className={b('links')}>{externalLinks.map(renderExternalLinks)}</ul>
                     <div className={b('row', {header: true})}>
-                        <span className={b('title')}>Tablet</span>
+                        <span className={b('title')}>{i18n('tablet.header')}</span>
                         <EntityStatus status={Overall} name={TabletId} />
                         <a
                             rel="noopener noreferrer"

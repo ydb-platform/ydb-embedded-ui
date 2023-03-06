@@ -4,6 +4,7 @@ import {Button} from '@gravity-ui/uikit';
 import {ETabletState, TTabletStateInfo} from '../../../types/api/tablet';
 import {CriticalActionDialog} from '../../../components/CriticalActionDialog';
 
+import i18n from '../i18n';
 import {b} from '../Tablet';
 
 enum EVisibleDialogType {
@@ -91,7 +92,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
                 return (
                     <CriticalActionDialog
                         visible={isDialogVisible}
-                        text="The tablet will be restarted. Do you want to proceed?"
+                        text={i18n('dialog.kill')}
                         onClose={hideDialog}
                         onConfirm={_onKillClick}
                     />
@@ -101,7 +102,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
                 return (
                     <CriticalActionDialog
                         visible={isDialogVisible}
-                        text="The tablet will be stopped. Do you want to proceed?"
+                        text={i18n('dialog.stop')}
                         onClose={hideDialog}
                         onConfirm={_onStopClick}
                     />
@@ -111,7 +112,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
                 return (
                     <CriticalActionDialog
                         visible={isDialogVisible}
-                        text="The tablet will be resumed. Do you want to proceed?"
+                        text={i18n('dialog.resume')}
                         onClose={hideDialog}
                         onConfirm={_onResumeClick}
                     />
@@ -130,7 +131,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
                 disabled={isDisabledKill()}
                 className={b('control')}
             >
-                Restart
+                {i18n('controls.kill')}
             </Button>
             {hasHiveId() ? (
                 <>
@@ -140,7 +141,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
                         disabled={isDisabledStop()}
                         className={b('control')}
                     >
-                        Stop
+                        {i18n('controls.stop')}
                     </Button>
                     <Button
                         onClick={showResumeDialog}
@@ -148,7 +149,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
                         disabled={isDisabledResume()}
                         className={b('control')}
                     >
-                        Resume
+                        {i18n('controls.resume')}
                     </Button>
                 </>
             ) : null}
