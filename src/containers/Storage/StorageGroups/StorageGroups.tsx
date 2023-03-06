@@ -16,7 +16,7 @@ import {VisibleEntities} from '../../../store/reducers/storage';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 //@ts-ignore
 import {stringifyVdiskId} from '../../../utils';
-import {getUsage, isFullVDiksData} from '../../../utils/storage';
+import {getUsage, isFullVDiskData} from '../../../utils/storage';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
 import {VDisk} from '../VDisk';
@@ -267,7 +267,7 @@ function StorageGroups({
                                     nodes={nodes}
                                 />
                                 {donors.map((donor) => {
-                                    const isFullData = isFullVDiksData(donor);
+                                    const isFullData = isFullVDiskData(donor);
 
                                     return (
                                         <VDisk

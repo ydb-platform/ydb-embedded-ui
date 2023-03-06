@@ -9,7 +9,7 @@ import {EFlag} from '../../../types/api/enums';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId} from '../../../utils';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
-import {isFullVDiksData} from '../../../utils/storage';
+import {isFullVDiskData} from '../../../utils/storage';
 
 import type {IUnavailableDonor} from '../utils/types';
 
@@ -132,7 +132,7 @@ interface VDiskPopupProps extends PopupProps {
 }
 
 export const VDiskPopup = ({data, poolName, nodes, ...props}: VDiskPopupProps) => {
-    const isFullData = isFullVDiksData(data);
+    const isFullData = isFullVDiskData(data);
 
     const vdiskInfo = useMemo(
         () =>
