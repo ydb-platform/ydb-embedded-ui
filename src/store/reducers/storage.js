@@ -313,6 +313,7 @@ export const getFlatListStorageNodes = createSelector([getStorageNodes], (storag
         }).length;
         return {
             NodeId: node.NodeId,
+            SystemState: systemState.SystemState,
             FQDN: systemState.Host,
             DataCenter: systemState.DataCenter,
             Rack: systemState.Rack,

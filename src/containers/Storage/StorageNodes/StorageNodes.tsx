@@ -5,7 +5,7 @@ import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-tab
 import {Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {VisibleEntities} from '../../../store/reducers/storage';
-import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {isUnavailableNode, NodesUptimeFilterValues} from '../../../utils/nodes';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
 import {PDisk} from '../PDisk';
@@ -190,6 +190,7 @@ function StorageNodes({
             }}
             initialSortOrder={setSortOrder(visibleEntities)}
             emptyDataMessage={i18n('empty.default')}
+            rowClassName={(row) => b('node', {unavailable: isUnavailableNode(row)})}
         />
     ) : null;
 }
