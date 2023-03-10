@@ -10,6 +10,7 @@ import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 import '../../services/api';
 
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
+import {ResponseError} from '../../components/Errors/ResponseError';
 import {Tag} from '../../components/Tag';
 import {Icon} from '../../components/Icon';
 import {EmptyState} from '../../components/EmptyState';
@@ -39,6 +40,7 @@ export const Tablet = () => {
         id: tabletId,
         history = [],
         tenantPath,
+        error,
     } = useTypedSelector((state) => state.tablet);
 
     useEffect(() => {
@@ -66,6 +68,10 @@ export const Tablet = () => {
 
     if (loading && id !== tabletId && isFirstDataFetchRef.current) {
         return <Loader size="l" />;
+    }
+
+    if (error) {
+        return <ResponseError error={error} />;
     }
 
     if (!tablet || !Object.keys(tablet).length) {
