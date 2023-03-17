@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.4.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.2...v3.4.3) (2023-03-17)
+
+
+### Bug Fixes
+
+* add opacity to unavailable nodes ([8b82c78](https://github.com/ydb-platform/ydb-embedded-ui/commit/8b82c78f0b6bed536ca23c63b78b141b29afc4a8))
+* **Tablet:** add error check ([49f13cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/49f13cf0cff2d6dad59b8f6a4c2885966bf3450a))
+* **VDisk:** fix typo ([1528d03](https://github.com/ydb-platform/ydb-embedded-ui/commit/1528d03531f482e438e0bdb6c761be236822fc27))
+
 ## [3.4.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.1...v3.4.2) (2023-03-03)
 
 
