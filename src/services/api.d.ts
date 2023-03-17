@@ -77,6 +77,9 @@ interface Window {
             consumer?: string;
         }) => Promise<import('../types/api/consumer').DescribeConsumerResult>;
         getHostInfo: () => Promise<import('../types/api/systemState').TEvSystemStateResponse>;
+        getNodeInfo: (
+            id?: string,
+        ) => Promise<import('../types/api/systemState').TEvSystemStateResponse>;
         [method: string]: Function;
     };
 }
