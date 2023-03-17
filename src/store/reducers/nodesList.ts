@@ -1,11 +1,14 @@
+import type {Reducer} from 'redux';
+
+import type {NodesListState, NodesListAction} from '../../types/store/nodesList';
 import '../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
-const FETCH_NODES_LIST = createRequestActionTypes('tenants', 'FETCH_NODES_LIST');
+export const FETCH_NODES_LIST = createRequestActionTypes('nodesList', 'FETCH_NODES_LIST');
 
 const initialState = {loading: true, wasLoaded: false, data: []};
 
-const nodesList = function (state = initialState, action) {
+const nodesList: Reducer<NodesListState, NodesListAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_NODES_LIST.REQUEST: {
             return {
