@@ -131,7 +131,8 @@ function Diagnostics(props: DiagnosticsProps) {
             case GeneralPagesIds.nodes: {
                 return (
                     <Nodes
-                        tenantPath={tenantNameString}
+                        path={currentSchemaPath}
+                        type={type}
                         additionalNodesInfo={props.additionalNodesInfo}
                     />
                 );

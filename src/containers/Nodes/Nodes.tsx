@@ -4,10 +4,11 @@ import {useDispatch} from 'react-redux';
 
 import DataTable from '@gravity-ui/react-data-table';
 
+import type {EPathType} from '../../types/api/schema';
+
 import {AccessDenied} from '../../components/Errors/403';
 import {Illustration} from '../../components/Illustration';
 import {Loader} from '../../components/Loader';
-
 import {Search} from '../../components/Search';
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {UptimeFilter} from '../../components/UptimeFIlter';
@@ -35,6 +36,8 @@ import {
 import {changeFilter, getSettingValue} from '../../store/reducers/settings';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 
+import {isDatabaseEntityType} from '../Tenant/utils/schema';
+
 import {getNodesColumns} from './getNodesColumns';
 
 import './Nodes.scss';
@@ -48,22 +51,23 @@ interface IAdditionalNodesInfo extends Record<string, unknown> {
 }
 
 interface NodesProps {
-    tenantPath?: string;
+    path?: string;
+    type?: EPathType;
     className?: string;
     additionalNodesInfo?: IAdditionalNodesInfo;
 }
 
-export const Nodes = ({tenantPath, className, additionalNodesInfo = {}}: NodesProps) => {
+export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesProps) => {
     const dispatch = useDispatch();
 
-    const isClusterNodes = !tenantPath;
+    const isClusterNodes = !path;
 
     // Since Nodes component is used in several places,
     // we need to reset filters, searchValue and loading state
     // in nodes reducer when path changes
     useEffect(() => {
         dispatch(resetNodesState());
-    }, [dispatch, tenantPath]);
+    }, [dispatch, path]);
 
     const {wasLoaded, loading, error, nodesUptimeFilter, searchValue, totalNodes} =
         useTypedSelector((state) => state.nodes);
@@ -77,12 +81,14 @@ export const Nodes = ({tenantPath, className, additionalNodesInfo = {}}: NodesPr
     );
 
     const fetchNodes = useCallback(() => {
-        if (tenantPath && !JSON.parse(useNodesEndpoint)) {
-            dispatch(getComputeNodes(tenantPath));
+        // For not DB entities we always use /compute endpoint instead of /nodes
+        // since /nodes can return data only for tenants
+        if (path && (!JSON.parse(useNodesEndpoint) || !isDatabaseEntityType(type))) {
+            dispatch(getComputeNodes(path));
         } else {
-            dispatch(getNodes({tenant: tenantPath}));
+            dispatch(getNodes({tenant: path}));
         }
-    }, [dispatch, tenantPath, useNodesEndpoint]);
+    }, [dispatch, path, type, useNodesEndpoint]);
 
     useAutofetcher(fetchNodes, [fetchNodes], isClusterNodes ? true : autorefresh);
 
