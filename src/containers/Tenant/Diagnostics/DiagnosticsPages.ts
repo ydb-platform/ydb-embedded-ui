@@ -89,12 +89,12 @@ export const DATABASE_PAGES = [
     describe,
 ];
 
-export const TABLE_PAGES = [overview, topShards, graph, tablets, hotKeys, describe];
+export const TABLE_PAGES = [overview, topShards, nodes, graph, tablets, hotKeys, describe];
 
-export const DIR_PAGES = [overview, topShards, describe];
+export const DIR_PAGES = [overview, topShards, nodes, describe];
 
-export const CDC_STREAM_PAGES = [overview, consumers, partitions, describe];
-export const TOPIC_PAGES = [overview, consumers, partitions, describe];
+export const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, describe];
+export const TOPIC_PAGES = [overview, consumers, partitions, nodes, describe];
 
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here
