@@ -80,6 +80,7 @@ interface Window {
         getNodeInfo: (
             id?: string,
         ) => Promise<import('../types/api/systemState').TEvSystemStateResponse>;
+        getNodesList: () => Promise<import('../types/api/nodesList').TEvNodesInfo>;
         [method: string]: Function;
     };
 }
