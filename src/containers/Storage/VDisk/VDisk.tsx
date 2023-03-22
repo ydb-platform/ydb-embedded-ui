@@ -1,6 +1,8 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
 import cn from 'bem-cn-lite';
 
+import type {NodesMap} from '../../../types/store/nodesList';
+
 import {InternalLink} from '../../../components/InternalLink';
 
 import routes, {createHref} from '../../../routes';
@@ -12,7 +14,6 @@ import {isFullVDiskData} from '../../../utils/storage';
 import {STRUCTURE} from '../../Node/NodePages';
 
 import {DiskStateProgressBar, EDiskStateSeverity} from '../DiskStateProgressBar';
-import type {NodesHosts} from '../PDiskPopup';
 import {VDiskPopup} from '../VDiskPopup';
 
 import type {IUnavailableDonor} from '../utils/types';
@@ -50,7 +51,7 @@ const getColorSeverity = (color?: EFlag) => {
 interface VDiskProps {
     data?: TVDiskStateInfo | IUnavailableDonor;
     poolName?: string;
-    nodes?: NodesHosts;
+    nodes?: NodesMap;
     compact?: boolean;
 }
 

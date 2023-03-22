@@ -3,6 +3,8 @@ import cn from 'bem-cn-lite';
 
 import {Label, Popup, PopupProps} from '@gravity-ui/uikit';
 
+import type {NodesMap} from '../../../types/store/nodesList';
+
 import {InfoViewer, InfoViewerItem} from '../../../components/InfoViewer';
 
 import {EFlag} from '../../../types/api/enums';
@@ -13,7 +15,7 @@ import {isFullVDiskData} from '../../../utils/storage';
 
 import type {IUnavailableDonor} from '../utils/types';
 
-import {NodesHosts, preparePDiskData} from '../PDiskPopup';
+import {preparePDiskData} from '../PDiskPopup';
 
 import './VDiskPopup.scss';
 
@@ -128,7 +130,7 @@ const prepareVDiskData = (data: TVDiskStateInfo, poolName?: string) => {
 interface VDiskPopupProps extends PopupProps {
     data: TVDiskStateInfo | IUnavailableDonor;
     poolName?: string;
-    nodes?: NodesHosts;
+    nodes?: NodesMap;
 }
 
 export const VDiskPopup = ({data, poolName, nodes, ...props}: VDiskPopupProps) => {

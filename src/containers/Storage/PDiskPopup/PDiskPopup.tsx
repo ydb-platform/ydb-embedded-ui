@@ -3,6 +3,8 @@ import cn from 'bem-cn-lite';
 
 import {Popup, PopupProps} from '@gravity-ui/uikit';
 
+import type {NodesMap} from '../../../types/store/nodesList';
+
 import {InfoViewer, InfoViewerItem} from '../../../components/InfoViewer';
 
 import {EFlag} from '../../../types/api/enums';
@@ -17,12 +19,7 @@ const b = cn('pdisk-storage-popup');
 
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
-export type NodesHosts = {
-    // NodeId => Host
-    [nodeId: number]: string;
-}
-
-export const preparePDiskData = (data: TPDiskStateInfo, nodes?: NodesHosts) => {
+export const preparePDiskData = (data: TPDiskStateInfo, nodes?: NodesMap) => {
     const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Device} = data;
 
     const pdiskData: InfoViewerItem[] = [
@@ -35,8 +32,8 @@ export const preparePDiskData = (data: TPDiskStateInfo, nodes?: NodesHosts) => {
         pdiskData.push({label: 'Node Id', value: NodeId});
     }
 
-    if (nodes && NodeId && nodes[NodeId]) {
-        pdiskData.push({label: 'Host', value: nodes[NodeId]});
+    if (nodes && NodeId && nodes.get(NodeId)) {
+        pdiskData.push({label: 'Host', value: nodes.get(NodeId)});
     }
 
     if (Path) {
@@ -61,7 +58,7 @@ export const preparePDiskData = (data: TPDiskStateInfo, nodes?: NodesHosts) => {
 
 interface PDiskPopupProps extends PopupProps {
     data: TPDiskStateInfo;
-    nodes?: NodesHosts;
+    nodes?: NodesMap;
 }
 
 export const PDiskPopup = ({data, nodes, ...props}: PDiskPopupProps) => {

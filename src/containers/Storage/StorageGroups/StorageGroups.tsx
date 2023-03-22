@@ -3,6 +3,8 @@ import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
+import type {NodesMap} from '../../../types/store/nodesList';
+
 import shieldIcon from '../../../assets/icons/shield.svg';
 
 import {Stack} from '../../../components/Stack/Stack';
@@ -45,7 +47,7 @@ type TableColumnsIdsValues = typeof TableColumnsIds[TableColumnsIdsKeys];
 
 interface StorageGroupsProps {
     data: any;
-    nodes: any;
+    nodes: NodesMap;
     tableSettings: Settings;
     visibleEntities: keyof typeof VisibleEntities;
     onShowAll?: VoidFunction;
