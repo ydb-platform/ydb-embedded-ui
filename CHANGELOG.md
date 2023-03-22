@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.3...v3.4.4) (2023-03-22)
+
+
+### Bug Fixes
+
+* **Diagnostics:** display nodes tab for not db entities ([a542dbc](https://github.com/ydb-platform/ydb-embedded-ui/commit/a542dbc23d01138a5c1a4126cfc1836a1543b68c))
+
 ## [3.4.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.2...v3.4.3) (2023-03-17)
 
 
