@@ -1,7 +1,7 @@
 import block from 'bem-cn-lite';
 
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
-import {WriteLagImage, ReadLagImage} from '../../../../../components/LagImages';
+import {LagPopover} from '../../../../../components/LagPopover';
 
 import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITILES} from '../utils/constants';
 
@@ -29,14 +29,7 @@ export const WriteLagsHeader = () => (
     <LabelWithPopover
         className={b('lags')}
         text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.READ_LAGS]}
-        content={
-            <div className={b('lags-popover-content')}>
-                <div>{i18n('lagsPopover.writeLags')}</div>
-                <div>
-                    <WriteLagImage />
-                </div>
-            </div>
-        }
+        content={<LagPopover text={i18n('lagsPopover.readLags')} type="read" />}
     />
 );
 
@@ -44,14 +37,7 @@ export const ReadLagsHeader = () => (
     <LabelWithPopover
         className={b('lags')}
         text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.WRITE_LAGS]}
-        content={
-            <div className={b('lags-popover-content')}>
-                <div>{i18n('lagsPopover.readLags')}</div>
-                <div>
-                    <ReadLagImage />
-                </div>
-            </div>
-        }
+        content={<LagPopover text={i18n('lagsPopover.writeLags')} type="write" />}
     />
 );
 

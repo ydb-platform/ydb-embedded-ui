@@ -1,0 +1,13 @@
+.ydb-lag-popover {
+    div:nth-child(1) {
+        margin-bottom: 10px;
+    }
+
+    &_type_read {
+        max-width: 280px;
+    }
+
+    &_type_write {
+        max-width: 220px;
+    }
+}
