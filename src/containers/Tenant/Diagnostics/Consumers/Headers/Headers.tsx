@@ -14,8 +14,8 @@ const b = block('ydb-diagnostics-consumers-columns-header');
 export const ReadLagsHeader = () => (
     <LabelWithPopover
         className={b('lags')}
-        headerText={CONSUMERS_COLUMNS_TITILES[CONSUMERS_COLUMNS_IDS.READ_LAGS]}
-        popoverContent={
+        text={CONSUMERS_COLUMNS_TITILES[CONSUMERS_COLUMNS_IDS.READ_LAGS]}
+        content={
             <div className={b('lags-popover-content')}>
                 <div>{i18n('lagsPopover.readLags')}</div>
                 <div>
