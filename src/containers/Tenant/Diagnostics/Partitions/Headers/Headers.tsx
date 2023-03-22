@@ -28,8 +28,8 @@ export const ReadSessionHeader = () => (
 export const WriteLagsHeader = () => (
     <LabelWithPopover
         className={b('lags')}
-        headerText={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.READ_LAGS]}
-        popoverContent={
+        text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.READ_LAGS]}
+        content={
             <div className={b('lags-popover-content')}>
                 <div>{i18n('lagsPopover.writeLags')}</div>
                 <div>
@@ -43,8 +43,8 @@ export const WriteLagsHeader = () => (
 export const ReadLagsHeader = () => (
     <LabelWithPopover
         className={b('lags')}
-        headerText={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.WRITE_LAGS]}
-        popoverContent={
+        text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.WRITE_LAGS]}
+        content={
             <div className={b('lags-popover-content')}>
                 <div>{i18n('lagsPopover.readLags')}</div>
                 <div>
@@ -58,19 +58,15 @@ export const ReadLagsHeader = () => (
 export const UnreadMessagesHeader = () => (
     <LabelWithPopover
         className={b('messages')}
-        headerText={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.UNREAD_MESSAGES]}
-        popoverContent={
-            <div className={b('messages-popover-content')}>{i18n('headers.unread')}</div>
-        }
+        text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.UNREAD_MESSAGES]}
+        content={<div className={b('messages-popover-content')}>{i18n('headers.unread')}</div>}
     />
 );
 
 export const UncommitedMessagesHeader = () => (
     <LabelWithPopover
         className={b('messages')}
-        headerText={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.UNCOMMITED_MESSAGES]}
-        popoverContent={
-            <div className={b('messages-popover-content')}>{i18n('headers.uncommited')}</div>
-        }
+        text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.UNCOMMITED_MESSAGES]}
+        content={<div className={b('messages-popover-content')}>{i18n('headers.uncommited')}</div>}
     />
 );

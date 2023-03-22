@@ -3,18 +3,14 @@ import type {ReactNode} from 'react';
 import {HelpPopover} from '@gravity-ui/uikit';
 
 interface LabelWithPopoverProps {
-    headerText: string;
-    popoverContent: ReactNode;
+    text: string;
+    content: ReactNode;
     className?: string;
 }
 
-export const LabelWithPopover = ({
-    headerText,
-    popoverContent,
-    className,
-}: LabelWithPopoverProps) => (
+export const LabelWithPopover = ({text, content, className}: LabelWithPopoverProps) => (
     <div className={className}>
-        {headerText}
-        <HelpPopover content={popoverContent} />
+        {text}
+        <HelpPopover content={content} />
     </div>
 );
