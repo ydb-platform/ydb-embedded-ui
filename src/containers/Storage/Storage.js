@@ -22,7 +22,6 @@ import {
     setVisibleEntities,
     setStorageFilter,
     setUsageFilter,
-    getNodesObject,
     StorageTypes,
     setStorageType,
     setNodesUptimeFilter,
@@ -32,7 +31,7 @@ import {
     getStorageNodesCount,
     getUsageFilterOptions,
 } from '../../store/reducers/storage';
-import {getNodesList} from '../../store/reducers/nodesList';
+import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
 import StorageGroups from './StorageGroups/StorageGroups';
 import StorageNodes from './StorageNodes/StorageNodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
@@ -345,7 +344,7 @@ function mapStateToProps(state) {
         flatListStorageEntities: getFilteredEntities(state),
         groupsCount: getStoragePoolsGroupsCount(state),
         autorefresh: state.schema.autorefresh,
-        nodes: getNodesObject(state),
+        nodes: selectNodesMap(state),
         nodesCount: getStorageNodesCount(state),
         loading,
         wasLoaded,

@@ -204,15 +204,6 @@ export const getUsageFilter = (state) => state.storage.usageFilter;
 export const getVisibleEntities = (state) => state.storage.visible;
 export const getNodesUptimeFilter = (state) => state.storage.nodesUptimeFilter;
 export const getStorageType = (state) => state.storage.type;
-export const getNodesObject = (state) =>
-    _.reduce(
-        state.nodesList?.data,
-        (acc, el) => {
-            acc[el.NodeId] = el.Host;
-            return acc;
-        },
-        {},
-    );
 
 const FLAGS_POINTS = {
     Green: 1,

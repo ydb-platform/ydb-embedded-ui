@@ -1,6 +1,11 @@
 import type {Reducer} from 'redux';
 
-import type {NodesListState, NodesListAction} from '../../types/store/nodesList';
+import type {
+    NodesListState,
+    NodesListAction,
+    NodesListRootStateSlice,
+    NodesMap,
+} from '../../types/store/nodesList';
 import '../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
@@ -39,13 +44,17 @@ const nodesList: Reducer<NodesListState, NodesListAction> = (state = initialStat
 
 export function getNodesList() {
     return createApiRequest({
-        request: window.api.getNodeInfo(),
+        request: window.api.getNodesList(),
         actions: FETCH_NODES_LIST,
-        dataHandler: (data) => {
-            const {SystemStateInfo: nodes = []} = data;
-            return nodes;
-        },
     });
 }
+
+export const selectNodesMap = (state: NodesListRootStateSlice) =>
+    state.nodesList.data?.reduce<NodesMap>((nodesMap, node) => {
+        if (node.Id && node.Host) {
+            nodesMap.set(node.Id, node.Host);
+        }
+        return nodesMap;
+    }, new Map());
 
 export default nodesList;
