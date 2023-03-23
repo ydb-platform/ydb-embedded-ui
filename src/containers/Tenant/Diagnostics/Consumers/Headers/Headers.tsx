@@ -1,7 +1,7 @@
 import block from 'bem-cn-lite';
 
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
-import {LagPopover} from '../../../../../components/LagPopover';
+import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
 
 import {CONSUMERS_COLUMNS_IDS, CONSUMERS_COLUMNS_TITILES} from '../utils/constants';
 
@@ -15,6 +15,6 @@ export const ReadLagsHeader = () => (
     <LabelWithPopover
         className={b('lags')}
         text={CONSUMERS_COLUMNS_TITILES[CONSUMERS_COLUMNS_IDS.READ_LAGS]}
-        content={<LagPopover text={i18n('lagsPopover.readLags')} type="read" />}
+        popoverContent={<LagPopoverContent text={i18n('lagsPopover.readLags')} type="read" />}
     />
 );

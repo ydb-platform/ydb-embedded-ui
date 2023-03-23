@@ -1,16 +1,19 @@
 import cn from 'bem-cn-lite';
-import {isEmpty} from 'lodash/fp';
 
-import type {DescribeTopicResult} from '../../../../../types/api/topic';
+import type {IPreparedTopicStats} from '../../../../../types/store/topic';
 
 import {Loader} from '../../../../../components/Loader';
-import {InfoViewerItem, formatObject, InfoViewer} from '../../../../../components/InfoViewer';
-
-import {formatTopicStats} from '../../../../../components/InfoViewer/formatters';
+import {InfoViewerItem, InfoViewer} from '../../../../../components/InfoViewer';
+import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
+import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
+import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
 import {useTypedSelector} from '../../../../../utils/hooks';
-import {convertBytesObjectToSpeed} from '../../../../../utils/bytesParsers';
-import {formatBps} from '../../../../../utils';
+import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
+import {formatBps, formatBytes} from '../../../../../utils';
+
+import {selectPreparedTopicStats} from '../../../../../store/reducers/topic';
 
 import i18n from './i18n';
 
@@ -18,35 +21,61 @@ import './TopicStats.scss';
 
 const b = cn('ydb-overview-topic-stats');
 
-const prepareTopicInfo = (data: DescribeTopicResult): Array<InfoViewerItem> => {
+const prepareTopicInfo = (data: IPreparedTopicStats): Array<InfoViewerItem> => {
     return [
-        ...formatObject(formatTopicStats, {
-            ...data.topic_stats,
-        }),
+        {label: 'Store size', value: formatBytes(data.storeSize)},
+        {
+            label: (
+                <LabelWithPopover
+                    text={'Write idle time'}
+                    popoverContent={
+                        <LagPopoverContent text={i18n('writeIdleTimePopover')} type="write" />
+                    }
+                />
+            ),
+            value: formatDurationToShortTimeFormat(data.partitionsIdleTime),
+        },
+        {
+            label: (
+                <LabelWithPopover
+                    text={'Write lag'}
+                    popoverContent={
+                        <LagPopoverContent text={i18n('writeLagPopover')} type="write" />
+                    }
+                />
+            ),
+            value: formatDurationToShortTimeFormat(data.partitionsWriteLag),
+        },
+        {
+            label: 'Average write speed',
+            value: <SpeedMultiMeter data={data.writeSpeed} withValue={false} />,
+        },
     ];
 };
 
-const prepareBytesWrittenInfo = (data: DescribeTopicResult): Array<InfoViewerItem> => {
-    const preparedBytes = convertBytesObjectToSpeed(data?.topic_stats?.bytes_written);
+const prepareBytesWrittenInfo = (data: IPreparedTopicStats): Array<InfoViewerItem> => {
+    const writeSpeed = data.writeSpeed;
 
     return [
         {
             label: 'per minute',
-            value: formatBps(preparedBytes.perMinute),
+            value: formatBps(writeSpeed.perMinute),
         },
         {
             label: 'per hour',
-            value: formatBps(preparedBytes.perHour),
+            value: formatBps(writeSpeed.perHour),
         },
         {
             label: 'per day',
-            value: formatBps(preparedBytes.perDay),
+            value: formatBps(writeSpeed.perDay),
         },
     ];
 };
 
 export const TopicStats = () => {
-    const {data, error, loading, wasLoaded} = useTypedSelector((state) => state.topic);
+    const {error, loading, wasLoaded} = useTypedSelector((state) => state.topic);
+
+    const data = useTypedSelector(selectPreparedTopicStats);
 
     if (loading && !wasLoaded) {
         return (
@@ -56,24 +85,14 @@ export const TopicStats = () => {
         );
     }
 
-    // There are several backed versions with different behaviour
-    // Possible returns on older versions:
-    // 1. Error when trying to access endpoint
-    // 2. No data
-    // 3. HTML page of Internal Viewer with an error
-    // 4. Data with no topic stats
-    // 5. Topic Stats as an empty object
-    if (
-        error ||
-        !data ||
-        typeof data !== 'object' ||
-        !data.topic_stats ||
-        isEmpty(data.topic_stats)
-    ) {
+    // If there is at least some empty data object
+    // we initialize its fields with zero values
+    // so no data at all is considered to be error as well
+    if (error || !data) {
         return (
             <div className={b()}>
                 <div className={b('title')}>Stats</div>
-                <div className="error">{i18n('notSupportedVersion')}</div>
+                <ResponseError error={error} />
             </div>
         );
     }

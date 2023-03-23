@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 import './InfoViewer.scss';
 
 export interface InfoViewerItem {
-    label: string;
+    label: ReactNode;
     value: ReactNode;
 }
 
@@ -39,7 +39,7 @@ const InfoViewer = ({
             {info && info.length > 0 ? (
                 <div className={b('items')}>
                     {info.map((data, infoIndex) => (
-                        <div className={b('row')} key={data.label + infoIndex}>
+                        <div className={b('row')} key={infoIndex}>
                             <div className={b('label')}>
                                 <div className={b('label-text', {multiline: multilineLabels})}>
                                     {data.label}

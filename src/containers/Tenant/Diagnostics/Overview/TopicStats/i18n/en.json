@@ -1,3 +1,4 @@
 {
-  "notSupportedVersion": "Topic stats are not supported in the current cluster version. Update cluster version to see topic stats"
+  "writeLagPopover": "Write lag, maximum among all topic partitions",
+  "writeIdleTimePopover": "Write idle time, maximum among all topic partitions"
 }
