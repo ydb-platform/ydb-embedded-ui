@@ -1,7 +1,7 @@
 import block from 'bem-cn-lite';
 
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
-import {LagPopover} from '../../../../../components/LagPopover';
+import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
 
 import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITILES} from '../utils/constants';
 
@@ -29,7 +29,7 @@ export const WriteLagsHeader = () => (
     <LabelWithPopover
         className={b('lags')}
         text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.READ_LAGS]}
-        content={<LagPopover text={i18n('lagsPopover.readLags')} type="read" />}
+        popoverContent={<LagPopoverContent text={i18n('lagsPopover.readLags')} type="read" />}
     />
 );
 
@@ -37,7 +37,7 @@ export const ReadLagsHeader = () => (
     <LabelWithPopover
         className={b('lags')}
         text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.WRITE_LAGS]}
-        content={<LagPopover text={i18n('lagsPopover.writeLags')} type="write" />}
+        popoverContent={<LagPopoverContent text={i18n('lagsPopover.writeLags')} type="write" />}
     />
 );
 
@@ -45,7 +45,9 @@ export const UnreadMessagesHeader = () => (
     <LabelWithPopover
         className={b('messages')}
         text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.UNREAD_MESSAGES]}
-        content={<div className={b('messages-popover-content')}>{i18n('headers.unread')}</div>}
+        popoverContent={
+            <div className={b('messages-popover-content')}>{i18n('headers.unread')}</div>
+        }
     />
 );
 
@@ -53,6 +55,8 @@ export const UncommitedMessagesHeader = () => (
     <LabelWithPopover
         className={b('messages')}
         text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.UNCOMMITED_MESSAGES]}
-        content={<div className={b('messages-popover-content')}>{i18n('headers.uncommited')}</div>}
+        popoverContent={
+            <div className={b('messages-popover-content')}>{i18n('headers.uncommited')}</div>
+        }
     />
 );

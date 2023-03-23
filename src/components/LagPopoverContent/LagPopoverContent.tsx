@@ -2,18 +2,18 @@ import block from 'bem-cn-lite';
 
 import {ReadLagImage, WriteLagImage} from '../LagImages';
 
-import './LagPopover.scss';
+import './LagPopoverContent.scss';
 
-const b = block('ydb-lag-popover');
+const b = block('ydb-lag-popover-content');
 
-interface LagPopoverProps {
+interface LagPopoverContentProps {
     text: string;
     type: 'read' | 'write';
 }
 
-export const LagPopover = ({text, type}: LagPopoverProps) => (
+export const LagPopoverContent = ({text, type}: LagPopoverContentProps) => (
     <div className={b({type})}>
-        <div>{text}</div>
+        <div className={b('text')}>{text}</div>
         <div>{type === 'read' ? <ReadLagImage /> : <WriteLagImage />}</div>
     </div>
 );
