@@ -2,10 +2,20 @@ import _ from 'lodash';
 import cn from 'bem-cn-lite';
 
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
-import {Popover, PopoverBehavior} from '@gravity-ui/uikit';
+import {Button, Popover, PopoverBehavior} from '@gravity-ui/uikit';
+
+import {NodeEndpointsTooltip} from '../../../components/Tooltips/NodeEndpointsTooltip/NodeEndpointsTooltip';
+import EntityStatus from '../../../components/EntityStatus/EntityStatus';
+import {IconWrapper} from '../../../components/Icon';
 
 import {VisibleEntities} from '../../../store/reducers/storage';
-import {isUnavailableNode, NodesUptimeFilterValues} from '../../../utils/nodes';
+import {
+    AdditionalNodesInfo,
+    isUnavailableNode,
+    NodesUptimeFilterValues,
+} from '../../../utils/nodes';
+
+import {getDefaultNodePath} from '../../Node/NodePages';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
 import {PDisk} from '../PDisk';
@@ -33,6 +43,7 @@ interface StorageNodesProps {
     visibleEntities: keyof typeof VisibleEntities;
     nodesUptimeFilter: keyof typeof NodesUptimeFilterValues;
     onShowAll?: VoidFunction;
+    additionalNodesInfo?: AdditionalNodesInfo;
 }
 
 const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
@@ -73,7 +84,10 @@ function StorageNodes({
     visibleEntities,
     onShowAll,
     nodesUptimeFilter,
+    additionalNodesInfo,
 }: StorageNodesProps) {
+    const getNodeRef = additionalNodesInfo?.getNodeRef;
+
     const allColumns: Column<any>[] = [
         {
             name: TableColumnsIds.NodeId,
@@ -85,15 +99,37 @@ function StorageNodes({
             name: TableColumnsIds.FQDN,
             header: tableColumnsNames[TableColumnsIds.FQDN],
             width: 350,
-            render: ({value}) => {
+            render: ({row}) => {
+                const nodeRef = getNodeRef ? getNodeRef(row) + 'internal' : undefined;
+                if (!row.Host) {
+                    return <span>—</span>;
+                }
                 return (
-                    <div className={b('fqdn-wrapper')}>
+                    <div className={b('fqdn-field-wrapper')}>
                         <Popover
-                            content={value as string}
-                            placement={['right']}
+                            content={<NodeEndpointsTooltip data={row} />}
+                            placement={['top', 'bottom']}
                             behavior={PopoverBehavior.Immediate}
                         >
-                            <span className={b('fqdn')}>{value as string}</span>
+                            <div className={b('fqdn-wrapper')}>
+                                <EntityStatus
+                                    name={row.Host}
+                                    showStatus={false}
+                                    path={getDefaultNodePath(row.NodeId)}
+                                    hasClipboardButton
+                                    className={b('fqdn')}
+                                />
+                                {nodeRef && (
+                                    <Button
+                                        size="s"
+                                        href={nodeRef}
+                                        className={b('external-button')}
+                                        target="_blank"
+                                    >
+                                        <IconWrapper name="external" />
+                                    </Button>
+                                )}
+                            </div>
                         </Popover>
                     </div>
                 );

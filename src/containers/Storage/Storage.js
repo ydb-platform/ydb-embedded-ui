@@ -73,6 +73,7 @@ class Storage extends React.Component {
         nodesUptimeFilter: PropTypes.string,
         setNodesUptimeFilter: PropTypes.func,
         setDataWasNotLoaded: PropTypes.func,
+        additionalNodesInfo: PropTypes.object,
     };
 
     componentDidMount() {
@@ -180,8 +181,14 @@ class Storage extends React.Component {
     }
 
     renderDataTable() {
-        const {flatListStorageEntities, visibleEntities, nodesUptimeFilter, nodes, storageType} =
-            this.props;
+        const {
+            flatListStorageEntities,
+            visibleEntities,
+            nodesUptimeFilter,
+            nodes,
+            storageType,
+            additionalNodesInfo,
+        } = this.props;
 
         return (
             <div className={b('table-wrapper')}>
@@ -201,6 +208,7 @@ class Storage extends React.Component {
                         data={flatListStorageEntities}
                         tableSettings={tableSettings}
                         onShowAll={this.onShowAllNodes}
+                        additionalNodesInfo={additionalNodesInfo}
                     />
                 )}
             </div>

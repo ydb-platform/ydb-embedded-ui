@@ -2,7 +2,7 @@ import cn from 'bem-cn-lite';
 import {calcUptime} from '.';
 import JSONTree from 'react-json-inspector';
 
-import {NodeEndpointsTooltip} from '../components/Tooltips/NodeEndpointsTooltip';
+import {NodeEndpointsTooltip} from '../components/Tooltips/NodeEndpointsTooltip/NodeEndpointsTooltip';
 
 const poolB = cn('pool-tooltip');
 

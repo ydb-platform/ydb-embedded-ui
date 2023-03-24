@@ -305,9 +305,10 @@ export const getFlatListStorageNodes = createSelector([getStorageNodes], (storag
         return {
             NodeId: node.NodeId,
             SystemState: systemState.SystemState,
-            FQDN: systemState.Host,
             DataCenter: systemState.DataCenter,
             Rack: systemState.Rack,
+            Host: systemState.Host,
+            Endpoints: systemState.Endpoints,
             uptime: calcUptime(systemState.StartTime),
             StartTime: systemState.StartTime,
             PDisks: node.PDisks,
@@ -369,7 +370,7 @@ const filterByText = (entities, type, text) => {
 
         return (
             entity.NodeId.toString().includes(cleanedFilter) ||
-            entity.FQDN.toLowerCase().includes(cleanedFilter)
+            entity.Host.toLowerCase().includes(cleanedFilter)
         );
     });
 };

@@ -31,3 +31,9 @@ export const Icon = ({
         />
     );
 };
+
+// When used with uikit components Icon is considered as text element and corresponding styles are applied
+// IconWrapper overrides displayName to 'Icon', so it will be considered as an icon with right styles
+export const IconWrapper = (props: IconProps) => <Icon {...props} />;
+
+IconWrapper.displayName = 'Icon';
