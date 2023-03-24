@@ -20,23 +20,36 @@
             margin-right: 0px;
         }
     }
-    &__fqdn-wrapper {
+    &__fqdn-field-wrapper {
         width: 330px;
     }
-    &__fqdn {
-        display: inline-block;
-        overflow: hidden;
+    &__fqdn-wrapper {
+        display: flex;
+        align-items: center;
 
         max-width: 330px;
-
-        vertical-align: top;
-        text-overflow: ellipsis;
     }
+    &__fqdn {
+        overflow: hidden;
+    }
+
     &__group-id {
         font-weight: 500;
     }
 
     &__node_unavailable {
         opacity: 0.6;
+    }
+
+    &__external-button {
+        display: none;
+
+        margin-left: 4px;
+    }
+}
+
+.data-table__row:hover {
+    .global-storage-nodes__external-button {
+        display: inline-flex;
     }
 }

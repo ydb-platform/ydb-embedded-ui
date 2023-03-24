@@ -2,12 +2,12 @@ import cn from 'bem-cn-lite';
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 import {Button, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
-import {Icon} from '../../components/Icon';
+import {IconWrapper} from '../../components/Icon';
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
 import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
-import {NodeEndpointsTooltip} from '../../components/Tooltips/NodeEndpointsTooltip';
+import {NodeEndpointsTooltip} from '../../components/Tooltips/NodeEndpointsTooltip/NodeEndpointsTooltip';
 
 import {formatBytesToGigabyte} from '../../utils/index';
 import {INodesPreparedEntity} from '../../types/store/nodes';
@@ -47,29 +47,31 @@ export function getNodesColumns({
                     return <span>—</span>;
                 }
                 return (
-                    <div className={b('host-name-wrapper')}>
+                    <div className={b('host-field-wrapper')}>
                         <Popover
                             content={<NodeEndpointsTooltip data={row} />}
                             placement={['top', 'bottom']}
                             behavior={PopoverBehavior.Immediate}
                         >
-                            <EntityStatus
-                                name={row.Host}
-                                status={row.SystemState}
-                                path={getDefaultNodePath(row.NodeId)}
-                                hasClipboardButton
-                                className={b('host-name')}
-                            />
-                            {nodeRef && (
-                                <Button
-                                    size="s"
-                                    href={nodeRef}
-                                    className={b('external-button')}
-                                    target="_blank"
-                                >
-                                    <Icon name="external" />
-                                </Button>
-                            )}
+                            <div className={b('host-wrapper')}>
+                                <EntityStatus
+                                    name={row.Host}
+                                    status={row.SystemState}
+                                    path={getDefaultNodePath(row.NodeId)}
+                                    hasClipboardButton
+                                    className={b('host')}
+                                />
+                                {nodeRef && (
+                                    <Button
+                                        size="s"
+                                        href={nodeRef}
+                                        className={b('external-button')}
+                                        target="_blank"
+                                    >
+                                        <IconWrapper name="external" />
+                                    </Button>
+                                )}
+                            </div>
                         </Popover>
                     </div>
                 );

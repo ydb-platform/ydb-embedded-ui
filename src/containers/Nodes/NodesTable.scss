@@ -1,21 +1,22 @@
 .ydb-nodes-table {
-    &__host-name-wrapper {
+    &__host-field-wrapper {
         display: flex;
+    }
+
+    &__host-wrapper {
+        display: flex;
+
+        max-width: 330px;
+    }
+
+    &__host {
+        overflow: hidden;
     }
 
     &__external-button {
         display: none;
-        align-items: center;
 
         margin-left: 4px;
-
-        .yc-button__text {
-            margin: 0 4px;
-        }
-    }
-
-    &__host-name {
-        overflow: hidden;
     }
 }
 
