@@ -2,6 +2,8 @@ import cn from 'bem-cn-lite';
 import {calcUptime} from '.';
 import JSONTree from 'react-json-inspector';
 
+import {NodeEndpointsTooltip} from '../components/Tooltips/NodeEndpointsTooltip';
+
 const poolB = cn('pool-tooltip');
 
 const PoolTooltip = (props) => {
@@ -102,34 +104,6 @@ const NodeTooltip = (props) => {
                                 </td>
                             </tr>
                         )}
-                    </tbody>
-                </table>
-            </div>
-        )
-    );
-};
-
-const NodeEndpointsTooltip = (props) => {
-    const {data} = props;
-    return (
-        data && (
-            <div className={nodeB()}>
-                <table>
-                    <tbody>
-                        {data.Rack && (
-                            <tr>
-                                <td className={nodeB('label')}>Rack</td>
-                                <td className={nodeB('value')}>{data.Rack}</td>
-                            </tr>
-                        )}
-                        {data.Endpoints &&
-                            data.Endpoints.length &&
-                            data.Endpoints.map(({Name, Address}) => (
-                                <tr key={Name}>
-                                    <td className={nodeB('label')}>{Name}</td>
-                                    <td className={nodeB('value')}>{Address}</td>
-                                </tr>
-                            ))}
                     </tbody>
                 </table>
             </div>
