@@ -22,7 +22,7 @@ import {
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
 } from '../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
-import {isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
+import {AdditionalNodesInfo, isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
 
 import {setHeader} from '../../store/reducers/header';
 import {
@@ -46,15 +46,11 @@ import i18n from './i18n';
 
 const b = cn('ydb-nodes');
 
-interface IAdditionalNodesInfo extends Record<string, unknown> {
-    getNodeRef?: Function;
-}
-
 interface NodesProps {
     path?: string;
     type?: EPathType;
     className?: string;
-    additionalNodesInfo?: IAdditionalNodesInfo;
+    additionalNodesInfo?: AdditionalNodesInfo;
 }
 
 export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesProps) => {
