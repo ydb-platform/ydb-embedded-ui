@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.4.5](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.4...v3.4.5) (2023-03-30)
+
+
+### Bug Fixes
+
+* **Consumers:** fix typo ([aaa9dbd](https://github.com/ydb-platform/ydb-embedded-ui/commit/aaa9dbda1f28702917793a61bae2813f6ef018bb))
+* **PDisk:** add display block to content ([130dab2](https://github.com/ydb-platform/ydb-embedded-ui/commit/130dab20ffdc9da77225c94a6e6064f0308a1c2a))
+* **Storage:** get nodes hosts from /nodelist ([cc82dd9](https://github.com/ydb-platform/ydb-embedded-ui/commit/cc82dd93808133b0d1dcd21b31ee3744df4f7383))
+* **StorageNodes:** make fqdn similar to nodes page ([344298a](https://github.com/ydb-platform/ydb-embedded-ui/commit/344298a9a29380f1068b002fa304cdcc221ce0d4))
+* **TopicInfo:** do not display /s when speed is undefined ([2d41832](https://github.com/ydb-platform/ydb-embedded-ui/commit/2d4183247ec33acdfa45be72a93f0dbd93b716e0))
+* **TopicStats:** use prepared stats, update fields ([a614a8c](https://github.com/ydb-platform/ydb-embedded-ui/commit/a614a8caa2744b844d97f23f25e5385387367d6b))
+
 ## [3.4.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.3...v3.4.4) (2023-03-22)
 
 
