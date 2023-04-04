@@ -5,3 +5,6 @@ export const storagePage = 'cluster/storage';
 export const clusterPage = 'cluster/cluster';
 export const authPage = 'auth';
 export const tenantPage = 'tenant';
+
+// Entities
+export const tenantName = '/local';

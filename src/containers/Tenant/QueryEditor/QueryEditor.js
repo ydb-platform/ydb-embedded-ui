@@ -544,6 +544,7 @@ function QueryEditor(props) {
                     </Button>
                     <DropdownMenu
                         items={menuItems}
+                        popupClassName={b('select-query-action-popup')}
                         switcher={
                             <Button
                                 view="action"
