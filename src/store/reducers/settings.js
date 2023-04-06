@@ -38,7 +38,7 @@ export const initialState = {
     problemFilter: ALL,
     userSettings: {
         ...userSettings,
-        [THEME_KEY]: readSavedSettingsValue(THEME_KEY, 'light'),
+        [THEME_KEY]: readSavedSettingsValue(THEME_KEY, 'system'),
         [INVERTED_DISKS_KEY]: readSavedSettingsValue(INVERTED_DISKS_KEY, 'false'),
         [USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY]: readSavedSettingsValue(
             USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
