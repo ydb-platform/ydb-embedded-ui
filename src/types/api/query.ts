@@ -63,6 +63,7 @@ export type ExecuteYdbResponse = {
     result: KeyValueRow[];
 } & CommonFields;
 
+// prettier-ignore
 type ExecuteResponse<Schema extends Schemas> =
     | CommonFields // result can be undefined for queries like `insert into`
     | (Schema extends 'modern'
@@ -102,6 +103,7 @@ type ExplainResponse = CommonFields;
 
 // deprecated response from older versions, backward compatibility
 
+// prettier-ignore
 type DeprecatedExplainResponse<Action extends ExplainActions> = 
     Action extends 'explain-ast'
         ? ({result: {ast: AST}} & Required<DeprecatedCommonFields>) | {ast: AST}
@@ -121,6 +123,7 @@ export type QueryAPIExplainResponse<Action extends ExplainActions> =
     | DeprecatedExplainResponse<Action>
     | null;
 
+// prettier-ignore
 export type QueryAPIResponse<Action extends Actions, Schema extends Schemas = undefined> = 
     Action extends ExecuteActions
         ? QueryAPIExecuteResponse<Schema>

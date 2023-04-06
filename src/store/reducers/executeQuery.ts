@@ -1,13 +1,25 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import '../../services/api';
+import type {Reducer} from 'redux';
+
+import type {Actions} from '../../types/api/query';
+import type {
+    ExecuteQueryAction,
+    ExecuteQueryState,
+    MonacoHotKeyAction,
+    RunAction,
+} from '../../types/store/executeQuery';
 import {getValueFromLS, parseJson} from '../../utils/utils';
 import {QUERIES_HISTORY_KEY, QUERY_INITIAL_RUN_ACTION_KEY} from '../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
+import '../../services/api';
+
+import {createRequestActionTypes, createApiRequest} from '../utils';
+
 import {readSavedSettingsValue} from './settings';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
-const SEND_QUERY = createRequestActionTypes('query', 'SEND_QUERY');
+export const SEND_QUERY = createRequestActionTypes('query', 'SEND_QUERY');
+
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
 const GO_TO_PREVIOUS_QUERY = 'query/GO_TO_PREVIOUS_QUERY';
@@ -15,21 +27,21 @@ const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
 const SELECT_RUN_ACTION = 'query/SELECT_RUN_ACTION';
 const MONACO_HOT_KEY = 'query/MONACO_HOT_KEY';
 
-const queriesHistoryInitial = parseJson(getValueFromLS(QUERIES_HISTORY_KEY, '[]'));
+const queriesHistoryInitial: string[] = parseJson(getValueFromLS(QUERIES_HISTORY_KEY, '[]'));
 
 const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
 export const RUN_ACTIONS_VALUES = {
     script: 'execute-script',
     scan: 'execute-scan',
-};
+} as const;
 
 export const MONACO_HOT_KEY_ACTIONS = {
     sendQuery: 'sendQuery',
     goPrev: 'goPrev',
     goNext: 'goNext',
     getExplain: 'getExplain',
-};
+} as const;
 
 const initialState = {
     loading: false,
@@ -45,7 +57,10 @@ const initialState = {
     monacoHotKey: null,
 };
 
-const executeQuery = (state = initialState, action) => {
+const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
+    state = initialState,
+    action,
+) => {
     switch (action.type) {
         case SEND_QUERY.REQUEST: {
             return {
@@ -141,51 +156,66 @@ const executeQuery = (state = initialState, action) => {
     }
 };
 
-export const sendQuery = ({query, database, action}) => {
+export const sendQuery = ({
+    query,
+    database,
+    action,
+}: {
+    query: string;
+    database: string;
+    action: Actions;
+}) => {
     return createApiRequest({
-        request: window.api.sendQuery({schema: 'modern', query, database, action, stats: 'profile'}),
+        request: window.api.sendQuery({
+            schema: 'modern',
+            query,
+            database,
+            action,
+            stats: 'profile',
+        }),
         actions: SEND_QUERY,
         dataHandler: parseQueryAPIExecuteResponse,
     });
 };
 
-export const saveQueryToHistory = (query) => {
+export const saveQueryToHistory = (query: string) => {
     return {
         type: SAVE_QUERY_TO_HISTORY,
         data: query,
-    };
+    } as const;
 };
 
-export const selectRunAction = (value) => {
+export const selectRunAction = (value: RunAction) => {
     return {
         type: SELECT_RUN_ACTION,
         data: value,
-    };
+    } as const;
 };
 
 export const goToPreviousQuery = () => {
     return {
         type: GO_TO_PREVIOUS_QUERY,
-    };
+    } as const;
 };
 
 export const goToNextQuery = () => {
     return {
         type: GO_TO_NEXT_QUERY,
-    };
+    } as const;
 };
 
-export const changeUserInput = ({input}) => {
-    return (dispatch) => {
-        dispatch({type: CHANGE_USER_INPUT, data: {input}});
-    };
+export const changeUserInput = ({input}: {input: string}) => {
+    return {
+        type: CHANGE_USER_INPUT,
+        data: {input},
+    } as const;
 };
 
-export const setMonacoHotKey = (value) => {
+export const setMonacoHotKey = (value: MonacoHotKeyAction) => {
     return {
         type: MONACO_HOT_KEY,
         data: value,
-    };
+    } as const;
 };
 
 export default executeQuery;
