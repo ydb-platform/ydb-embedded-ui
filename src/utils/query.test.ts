@@ -1,7 +1,4 @@
-import {
-    parseQueryAPIExecuteResponse,
-    parseQueryAPIExplainResponse,
-} from './query';
+import {parseQueryAPIExecuteResponse, parseQueryAPIExplainResponse} from './query';
 
 describe('API utils', () => {
     describe('json/viewer/query', () => {
@@ -45,7 +42,9 @@ describe('API utils', () => {
 
                     it('should accept key-value rows in the result field', () => {
                         const response = {result: [{foo: 'bar'}]};
-                        expect(parseQueryAPIExecuteResponse(response).result).toEqual(response.result);
+                        expect(parseQueryAPIExecuteResponse(response).result).toEqual(
+                            response.result,
+                        );
                     });
                 });
 
@@ -98,19 +97,24 @@ describe('API utils', () => {
                     it('should parse modern schema', () => {
                         const response = {
                             result: [['42', 'hello world']],
-                            columns: [{
-                                name: 'id',
-                                type: 'Uint64?'
-                            }, {
-                                name: 'value',
-                                type: 'Utf8?'
-                            }],
+                            columns: [
+                                {
+                                    name: 'id',
+                                    type: 'Uint64?',
+                                },
+                                {
+                                    name: 'value',
+                                    type: 'Utf8?',
+                                },
+                            ],
                         };
                         const actual = parseQueryAPIExecuteResponse(response);
-                        expect(actual.result).toEqual([{
-                            id: '42',
-                            value: 'hello world'
-                        }]);
+                        expect(actual.result).toEqual([
+                            {
+                                id: '42',
+                                value: 'hello world',
+                            },
+                        ]);
                         expect(actual.columns).toEqual(response.columns);
                     });
 
@@ -125,12 +129,16 @@ describe('API utils', () => {
 
                     it('should parse deep classic schema', () => {
                         const response = {result: [{foo: 'bar'}]};
-                        expect(parseQueryAPIExecuteResponse(response).result).toEqual(response.result);
+                        expect(parseQueryAPIExecuteResponse(response).result).toEqual(
+                            response.result,
+                        );
                     });
 
                     it('should parse ydb schema', () => {
                         const response = {result: [{foo: 'bar'}]};
-                        expect(parseQueryAPIExecuteResponse(response).result).toEqual(response.result);
+                        expect(parseQueryAPIExecuteResponse(response).result).toEqual(
+                            response.result,
+                        );
                     });
                 });
 
@@ -138,20 +146,25 @@ describe('API utils', () => {
                     it('should parse modern schema', () => {
                         const response = {
                             result: [['42', 'hello world']],
-                            columns: [{
-                                name: 'id',
-                                type: 'Uint64?'
-                            }, {
-                                name: 'value',
-                                type: 'Utf8?'
-                            }],
+                            columns: [
+                                {
+                                    name: 'id',
+                                    type: 'Uint64?',
+                                },
+                                {
+                                    name: 'value',
+                                    type: 'Utf8?',
+                                },
+                            ],
                             stats: {metric: 'good'},
                         };
                         const actual = parseQueryAPIExecuteResponse(response);
-                        expect(actual.result).toEqual([{
-                            id: '42',
-                            value: 'hello world'
-                        }]);
+                        expect(actual.result).toEqual([
+                            {
+                                id: '42',
+                                value: 'hello world',
+                            },
+                        ]);
                         expect(actual.columns).toEqual(response.columns);
                         expect(actual.stats).toEqual(response.stats);
                     });

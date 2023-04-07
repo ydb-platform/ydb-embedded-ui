@@ -47,25 +47,30 @@ export const getColumnType = (type: string) => {
         default:
             return undefined;
     }
-}
+};
 
 const parseExecuteModernResponse = (data: ExecuteModernResponse): IQueryResult => {
     const {result, columns, ...restData} = data;
 
     return {
-        result: result && columns && result.map((row) => {
-            return row.reduce((newRow: KeyValueRow, cellData, columnIndex) => {
-                const {name} = columns[columnIndex];
-                newRow[name] = cellData;
-                return newRow;
-            }, {});
-        }),
+        result:
+            result &&
+            columns &&
+            result.map((row) => {
+                return row.reduce((newRow: KeyValueRow, cellData, columnIndex) => {
+                    const {name} = columns[columnIndex];
+                    newRow[name] = cellData;
+                    return newRow;
+                }, {});
+            }),
         columns,
         ...restData,
     };
 };
 
-const parseDeprecatedExecuteResponseValue = (data?: DeprecatedExecuteResponsePlain | ExecuteClassicResponsePlain): KeyValueRow[] | undefined => {
+const parseDeprecatedExecuteResponseValue = (
+    data?: DeprecatedExecuteResponsePlain | ExecuteClassicResponsePlain,
+): KeyValueRow[] | undefined => {
     if (!data) {
         return undefined;
     }
@@ -86,20 +91,21 @@ const parseDeprecatedExecuteResponseValue = (data?: DeprecatedExecuteResponsePla
     return undefined;
 };
 
-const hasResult = (data: AnyExecuteResponse): data is DeepExecuteResponse => Boolean(
-    data && typeof data === 'object' && 'result' in data
-);
+const hasResult = (data: AnyExecuteResponse): data is DeepExecuteResponse =>
+    Boolean(data && typeof data === 'object' && 'result' in data);
 
-const isModern = (response: AnyExecuteResponse): response is ExecuteModernResponse => Boolean(
-    response &&
-    !Array.isArray(response) &&
-    Array.isArray((response as ExecuteModernResponse).result) &&
-    Array.isArray((response as ExecuteModernResponse).columns)
-);
+const isModern = (response: AnyExecuteResponse): response is ExecuteModernResponse =>
+    Boolean(
+        response &&
+            !Array.isArray(response) &&
+            Array.isArray((response as ExecuteModernResponse).result) &&
+            Array.isArray((response as ExecuteModernResponse).columns),
+    );
 
-const hasCommonFields = (data: AnyResponse): data is CommonFields => Boolean(
-    data && typeof data === 'object' && ('ast' in data || 'plan' in data || 'stats' in data)
-);
+const hasCommonFields = (data: AnyResponse): data is CommonFields =>
+    Boolean(
+        data && typeof data === 'object' && ('ast' in data || 'plan' in data || 'stats' in data),
+    );
 
 // complex logic because of the variety of possible responses
 // after all backends are updated to the latest version, it can be simplified
@@ -186,5 +192,11 @@ export const prepareQueryResponse = (data?: KeyValueRow[]) => {
 };
 
 export function prepareQueryError(error: any) {
-    return error.data?.error?.message || error.message || error.data || error.statusText || JSON.stringify(error);
+    return (
+        error.data?.error?.message ||
+        error.message ||
+        error.data ||
+        error.statusText ||
+        JSON.stringify(error)
+    );
 }
