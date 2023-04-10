@@ -1,11 +1,13 @@
-import '../../services/api';
+import type {Reducer} from 'redux';
 
+import type {OlapStatsAction, OlapStatsState} from '../../types/store/olapStats';
+
+import '../../services/api';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
-const FETCH_OLAP_STATS = createRequestActionTypes('query', 'SEND_OLAP_STATS_QUERY');
-const SET_OLAP_STATS_OPTIONS = createRequestActionTypes('query', 'SET_OLAP_STATS_OPTIONS');
+export const FETCH_OLAP_STATS = createRequestActionTypes('query', 'SEND_OLAP_STATS_QUERY');
 const RESET_LOADING_STATE = 'olapStats/RESET_LOADING_STATE';
 
 const initialState = {
@@ -13,13 +15,13 @@ const initialState = {
     wasLoaded: false,
 };
 
-function createOlatStatsQuery(path) {
+function createOlatStatsQuery(path: string) {
     return `SELECT * FROM \`${path}/.sys/primary_index_stats\``;
 }
 
 const queryAction = 'execute-scan';
 
-const olapStats = (state = initialState, action) => {
+const olapStats: Reducer<OlapStatsState, OlapStatsAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_OLAP_STATS.REQUEST: {
             return {
@@ -44,11 +46,6 @@ const olapStats = (state = initialState, action) => {
                 loading: false,
             };
         }
-        case SET_OLAP_STATS_OPTIONS:
-            return {
-                ...state,
-                ...action.data,
-            };
         case RESET_LOADING_STATE: {
             return {
                 ...state,
@@ -73,17 +70,10 @@ export const getOlapStats = ({path = ''}) => {
     });
 };
 
-export function setOlapStatsOptions(options) {
-    return {
-        type: SET_OLAP_STATS_OPTIONS,
-        data: options,
-    };
-}
-
 export function resetLoadingState() {
     return {
         type: RESET_LOADING_STATE,
-    };
+    } as const;
 }
 
 export default olapStats;
