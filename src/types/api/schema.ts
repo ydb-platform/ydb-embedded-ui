@@ -306,7 +306,7 @@ interface TSplitBoundary {
     SerializedKeyPrefix?: unknown;
 }
 
-interface TTTLSettings {
+export interface TTTLSettings {
     Enabled?: TEnabled;
     Disabled?: {};
     UseTiering?: string;
@@ -1224,7 +1224,7 @@ enum EColumnCodec {
     ColumnCodecZSTD = 'ColumnCodecZSTD',
 }
 
-interface TColumnDataLifeCycle {
+export interface TColumnDataLifeCycle {
     Enabled?: TTtl;
     Disabled?: {};
     Tiering?: TStorageTiering;

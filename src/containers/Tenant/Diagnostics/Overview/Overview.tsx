@@ -1,4 +1,4 @@
-import {ReactNode, useCallback, useMemo} from 'react';
+import {ReactNode, useCallback} from 'react';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 
 import {Loader} from '../../../../components/Loader';
@@ -11,7 +11,7 @@ import {TopicInfo} from './TopicInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
 import {TableInfo} from './TableInfo';
 
-import {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {EPathType} from '../../../../types/api/schema';
 import {
     isEntityWithMergedImplementation,
     isColumnEntityType,
@@ -33,35 +33,6 @@ import {
 } from '../../../../store/reducers/olapStats';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 
-function prepareOlapTableGeneral(item?: TEvDescribeSchemeResult, olapStats?: any[]) {
-    const tableData = item?.PathDescription?.ColumnTableDescription;
-
-    const Bytes = olapStats?.reduce((acc, el) => {
-        acc += parseInt(el.Bytes) || 0;
-        return acc;
-    }, 0);
-    const Rows = olapStats?.reduce((acc, el) => {
-        acc += parseInt(el.Rows) || 0;
-        return acc;
-    }, 0);
-    const tabletIds = olapStats?.reduce((acc, el) => {
-        acc.add(el.TabletId);
-        return acc;
-    }, new Set());
-
-    return {
-        PathDescription: {
-            Self: item?.PathDescription?.Self,
-            TableStats: {
-                ColumnShardCount: tableData?.ColumnShardCount,
-                Bytes: Bytes?.toLocaleString('ru-RU', {useGrouping: true}) ?? 0,
-                Rows: Rows?.toLocaleString('ru-RU', {useGrouping: true}) ?? 0,
-                Parts: tabletIds?.size ?? 0,
-            },
-        },
-    };
-}
-
 interface OverviewProps {
     type?: EPathType;
     className?: string;
@@ -81,7 +52,7 @@ function Overview({type, tenantName, className}: OverviewProps) {
     } = useSelector((state: any) => state.schema);
 
     const {data: {result: olapStats} = {result: undefined}, loading: olapStatsLoading} =
-        useSelector((state: any) => state.olapStats);
+        useTypedSelector((state) => state.olapStats);
 
     const loading = schemaLoading || olapStatsLoading;
 
@@ -134,13 +105,6 @@ function Overview({type, tenantName, className}: OverviewProps) {
 
     useAutofetcher(fetchData, [fetchData], autorefresh);
 
-    const schemaData = useMemo(() => {
-        return isTableType(type) && isColumnEntityType(type)
-            ? // process data for ColumnTable
-              prepareOlapTableGeneral(currentItem, olapStats)
-            : currentItem;
-    }, [type, olapStats, currentItem]);
-
     const renderContent = () => {
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
@@ -149,17 +113,21 @@ function Overview({type, tenantName, className}: OverviewProps) {
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeTable]: undefined,
             [EPathType.EPathTypeSubDomain]: undefined,
-            [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={schemaData} />,
+            [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={currentItem} />,
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
             [EPathType.EPathTypeCdcStream]: () => (
-                <ChangefeedInfo data={schemaData} childrenPaths={mergedChildrenPaths} />
+                <ChangefeedInfo data={currentItem} childrenPaths={mergedChildrenPaths} />
             ),
-            [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={schemaData} />,
+            [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={currentItem} />,
         };
 
-        return (type && pathTypeToComponent[type]?.()) || <TableInfo data={schemaData} />;
+        return (
+            (type && pathTypeToComponent[type]?.()) || (
+                <TableInfo data={currentItem} type={type} olapStats={olapStats} />
+            )
+        );
     };
 
     if ((loading && !wasLoaded) || (isEntityWithMergedImpl && !mergedChildrenPaths)) {
