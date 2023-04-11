@@ -3,5 +3,9 @@
   "hoursMin": "{{hours}}ч {{minutes}}м",
   "minSec": "{{minutes}}м {{seconds}}с",
   "secMs": "{{seconds}}с {{ms}}мс",
+  "days": "{{days}}д",
+  "hours": "{{hours}}ч",
+  "min": "{{minutes}}м",
+  "sec": "{{seconds}}с",
   "ms": "{{ms}}мс"
 }

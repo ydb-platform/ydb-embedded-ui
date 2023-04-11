@@ -1,8 +1,8 @@
 import {useMemo} from 'react';
 import cn from 'bem-cn-lite';
 
-import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-
+import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
+import type {KeyValueRow} from '../../../../../types/api/query';
 import {InfoViewer} from '../../../../../components/InfoViewer';
 
 import {getEntityName} from '../../../utils';
@@ -17,27 +17,40 @@ const b = cn('ydb-diagnostics-table-info');
 
 interface TableInfoProps {
     data?: TEvDescribeSchemeResult;
+    type?: EPathType;
+    olapStats?: KeyValueRow[];
 }
 
-export const TableInfo = ({data}: TableInfoProps) => {
+export const TableInfo = ({data, type, olapStats}: TableInfoProps) => {
     const entityName = getEntityName(data?.PathDescription);
 
     const {
-        generalTableInfo = [],
+        generalInfo = [],
         tableStatsInfo = [],
         tabletMetricsInfo = [],
         partitionConfigInfo = [],
-    } = useMemo(() => prepareTableInfo(data), [data]);
+    } = useMemo(() => prepareTableInfo(data, type, olapStats), [data, type, olapStats]);
 
     return (
         <div className={b()}>
             <InfoViewer
-                info={generalTableInfo}
+                info={generalInfo}
                 title={entityName}
                 className={b('info-block')}
                 renderEmptyState={() => <div className={b('title')}>{entityName}</div>}
             />
             <div className={b('row')}>
+                <div className={b('col')}>
+                    {tableStatsInfo.map((info, index) => (
+                        <InfoViewer
+                            key={index}
+                            info={info}
+                            title={index === 0 ? i18n('tableStats') : undefined}
+                            className={b('info-block')}
+                            renderEmptyState={() => null}
+                        />
+                    ))}
+                </div>
                 {tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0 ? (
                     <div className={b('col')}>
                         <InfoViewer
@@ -54,17 +67,6 @@ export const TableInfo = ({data}: TableInfoProps) => {
                         />
                     </div>
                 ) : null}
-                <div className={b('col')}>
-                    {tableStatsInfo.map((info, index) => (
-                        <InfoViewer
-                            key={index}
-                            info={info}
-                            title={index === 0 ? i18n('tableStats') : undefined}
-                            className={b('info-block')}
-                            renderEmptyState={() => null}
-                        />
-                    ))}
-                </div>
             </div>
         </div>
     );
