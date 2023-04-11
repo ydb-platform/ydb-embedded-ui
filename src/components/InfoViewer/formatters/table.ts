@@ -20,6 +20,12 @@ export const formatFollowerGroupItem = createInfoFormatter<TFollowerGroup>({
     values: {
         FollowerCount: formatNumber,
     },
+    labels: {
+        // Make it shorter to fit label width
+        FollowerCountPerDataCenter: 'FollowerCountPerDC',
+    },
+    // Most of the FollowerGroup fields are arrays or boolean
+    defaultValueFormatter: (value) => value && String(value),
 });
 
 export const formatPartitionConfigItem = createInfoFormatter<TPartitionConfig>({
