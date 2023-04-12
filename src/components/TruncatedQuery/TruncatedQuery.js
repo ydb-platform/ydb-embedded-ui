@@ -16,7 +16,7 @@ function TruncatedQuery({value, maxQueryHeight}) {
         return (
             <React.Fragment>
                 <span className={b()}>{content}</span>
-                <span className={b({color: 'secondary'})}>{message}</span>
+                <span className={b('message', {color: 'secondary'})}>{message}</span>
             </React.Fragment>
         );
     }
