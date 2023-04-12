@@ -66,7 +66,11 @@ const getQueryText = (path: string, filters?: ITopQueriesFilters) => {
 SELECT
     CPUTime as CPUTimeUs,
     QueryText,
-    IntervalEnd
+    IntervalEnd,
+    EndTime,
+    ReadRows,
+    ReadBytes,
+    UserSID
 FROM \`${path}/.sys/top_queries_by_cpu_time_one_hour\`
 WHERE ${filterConditions || 'true'}
 `;
