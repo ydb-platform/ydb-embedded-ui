@@ -91,7 +91,7 @@ function getNodeType(plan: Plan) {
 }
 
 export function preparePlan(plan: Plan) {
-    const nodes: GraphNode[] = [];
+    const nodes: GraphNode<ExplainPlanNodeData>[] = [];
     const links: Link[] = [];
 
     function parsePlans(plans: Plan[] = [], from: string) {

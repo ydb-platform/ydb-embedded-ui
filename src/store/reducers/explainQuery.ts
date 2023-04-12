@@ -1,6 +1,13 @@
+import type {Reducer} from 'redux';
+import type {ExplainPlanNodeData, GraphNode, Link} from '@gravity-ui/paranoid';
 import _ from 'lodash';
 
 import '../../services/api';
+import type {
+    ExplainQueryAction,
+    ExplainQueryState,
+    PreparedExplainResponse,
+} from '../../types/store/explainQuery';
 
 import {getExplainNodeId, getMetaForExplainNode} from '../../utils';
 import {preparePlan} from '../../utils/prepareQueryExplain';
@@ -8,14 +15,17 @@ import {parseQueryAPIExplainResponse} from '../../utils/query';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
-const GET_EXPLAIN_QUERY = createRequestActionTypes('query', 'GET_EXPLAIN_QUERY');
-const GET_EXPLAIN_QUERY_AST = createRequestActionTypes('query', 'GET_EXPLAIN_QUERY_AST');
+export const GET_EXPLAIN_QUERY = createRequestActionTypes('query', 'GET_EXPLAIN_QUERY');
+export const GET_EXPLAIN_QUERY_AST = createRequestActionTypes('query', 'GET_EXPLAIN_QUERY_AST');
 
 const initialState = {
     loading: false,
 };
 
-const explainQuery = (state = initialState, action) => {
+const explainQuery: Reducer<ExplainQueryState, ExplainQueryAction> = (
+    state = initialState,
+    action,
+) => {
     switch (action.type) {
         case GET_EXPLAIN_QUERY.REQUEST: {
             return {
@@ -73,7 +83,7 @@ const explainQuery = (state = initialState, action) => {
     }
 };
 
-export const getExplainQueryAst = ({query, database}) => {
+export const getExplainQueryAst = ({query, database}: {query: string; database: string}) => {
     return createApiRequest({
         request: window.api.getExplainQueryAst(query, database),
         actions: GET_EXPLAIN_QUERY_AST,
@@ -88,27 +98,31 @@ export const explainVersions = {
 
 const supportedExplainQueryVersions = Object.values(explainVersions);
 
-export const getExplainQuery = ({query, database}) => {
+export const getExplainQuery = ({query, database}: {query: string; database: string}) => {
     return createApiRequest({
         request: window.api.getExplainQuery(query, database),
         actions: GET_EXPLAIN_QUERY,
-        dataHandler: (response) => {
+        dataHandler: (response): PreparedExplainResponse => {
             const {plan: result, ast} = parseQueryAPIExplainResponse(response);
 
             if (!result) {
                 return {ast};
             }
 
-            let links = [];
-            let nodes = [];
+            let links: Link[] = [];
+            let nodes: GraphNode<ExplainPlanNodeData>[] = [];
             const {tables, meta, Plan} = result;
 
             if (supportedExplainQueryVersions.indexOf(meta.version) === -1) {
                 return {
-                    pristine: result,
-                    version: meta.version,
+                    plan: {
+                        pristine: result,
+                        version: meta.version,
+                    },
+                    ast,
                 };
             }
+
             if (meta.version === explainVersions.v2) {
                 const preparedPlan = preparePlan(Plan);
                 links = preparedPlan.links;
@@ -141,6 +155,7 @@ export const getExplainQuery = ({query, database}) => {
                             from: prevNodeId,
                             to: nodeId,
                         });
+
                         nodes.push({
                             name: nodeId,
                             meta: getMetaForExplainNode(node),
