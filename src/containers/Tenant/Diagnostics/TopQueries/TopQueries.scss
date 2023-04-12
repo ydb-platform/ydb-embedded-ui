@@ -25,27 +25,33 @@
         @include search();
     }
 
-    &__result {
+    &__table {
         overflow: auto;
         flex-grow: 1;
 
         .data-table {
-            &,
-            &__table {
-                width: 100%;
-            }
-
-            &__td {
-                vertical-align: top;
-                white-space: pre;
-                word-break: break-word;
-            }
-
             &__row {
-                max-height: 80px;
-
                 cursor: pointer;
             }
         }
+    }
+
+    &__query {
+        overflow: hidden;
+
+        width: 500px;
+
+        vertical-align: top;
+        white-space: pre-wrap;
+        text-overflow: ellipsis;
+        word-break: break-word;
+    }
+
+    &__user-sid {
+        overflow: hidden;
+
+        max-width: 200px;
+
+        text-overflow: ellipsis;
     }
 }

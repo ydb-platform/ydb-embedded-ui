@@ -21,7 +21,7 @@ import type {EPathType} from '../../../../types/api/schema';
 import type {ITopQueriesFilters} from '../../../../types/store/executeTopQueries';
 import type {IQueryResult} from '../../../../types/store/query';
 
-import {formatDateTime} from '../../../../utils';
+import {formatDateTime, formatNumber} from '../../../../utils';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
@@ -43,19 +43,41 @@ const MAX_QUERY_HEIGHT = 10;
 const COLUMNS: Column<KeyValueRow>[] = [
     {
         name: 'CPUTimeUs',
-        width: 140,
-        sortAccessor: (row) => Number(row['CPUTimeUs']),
+        sortAccessor: (row) => Number(row.CPUTimeUs),
+        align: DataTable.RIGHT,
     },
     {
         name: 'QueryText',
         width: 500,
         sortable: false,
-        render: ({value}) => <TruncatedQuery value={value} maxQueryHeight={MAX_QUERY_HEIGHT} />,
+        render: ({row}) => (
+            <div className={b('query')}>
+                <TruncatedQuery value={row.QueryText} maxQueryHeight={MAX_QUERY_HEIGHT} />
+            </div>
+        ),
     },
     {
-        name: 'IntervalEnd',
-        width: 140,
-        render: ({value}) => formatDateTime(new Date(value as string).getTime()),
+        name: 'EndTime',
+        render: ({row}) => formatDateTime(new Date(row.EndTime as string).getTime()),
+        align: DataTable.RIGHT,
+    },
+    {
+        name: 'ReadRows',
+        render: ({row}) => formatNumber(row.ReadRows),
+        sortAccessor: (row) => Number(row.ReadRows),
+        align: DataTable.RIGHT,
+    },
+    {
+        name: 'ReadBytes',
+        render: ({row}) => formatNumber(row.ReadBytes),
+        sortAccessor: (row) => Number(row.ReadBytes),
+        align: DataTable.RIGHT,
+    },
+    {
+        name: 'UserSID',
+        render: ({row}) => <div className={b('user-sid')}>{row.UserSID || '–'}</div>,
+        sortAccessor: (row) => String(row.UserSID),
+        align: DataTable.LEFT,
     },
 ];
 
@@ -179,7 +201,7 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
         }
 
         return (
-            <div className={b('result')}>
+            <div className={b('table')}>
                 <DataTable
                     columns={COLUMNS}
                     data={data}
