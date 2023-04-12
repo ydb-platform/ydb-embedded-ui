@@ -5,9 +5,13 @@
     white-space: pre;
     word-break: break-word;
 
-    &_color {
-        &_secondary {
-            color: var(--yc-color-text-secondary);
+    &__message {
+        white-space: pre-wrap;
+
+        &_color {
+            &_secondary {
+                color: var(--yc-color-text-secondary);
+            }
         }
     }
 }
