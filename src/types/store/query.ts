@@ -1,9 +1,9 @@
-import type {KeyValueRow, ColumnType} from '../api/query';
+import type {KeyValueRow, ColumnType, TKqpStatsQuery, ScanPlan, ScriptPlan} from '../api/query';
 
 export interface IQueryResult {
     result?: KeyValueRow[];
     columns?: ColumnType[];
-    stats?: any;
-    plan?: any;
+    stats?: TKqpStatsQuery;
+    plan?: ScriptPlan | ScanPlan;
     ast?: string;
 }
