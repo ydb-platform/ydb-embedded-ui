@@ -65,7 +65,7 @@ interface TDqExecutionStats {
     Extra: unknown;
 }
 
-interface TKqpStatsQuery {
+export interface TKqpStatsQuery {
     /** uint64 */
     DurationUs?: string;
     Compilation?: TKqpStatsCompile;
@@ -91,7 +91,7 @@ export interface PlanMeta {
     type: 'script' | 'query';
 }
 
-interface PlanTable {
+export interface PlanTable {
     name: string;
     reads?: {
         type: string;
@@ -138,52 +138,21 @@ export interface PlanNode {
     'Parent Relationship'?: string;
 }
 
-interface ScriptPlan {
-    queries: {
+export interface ScriptPlan {
+    queries?: {
         Plan: PlanNode;
         tables?: PlanTable[];
     }[];
     meta: PlanMeta;
 }
 
-interface ScanPlan {
-    Plan: PlanNode;
-    tables: PlanTable[];
+export interface ScanPlan {
+    Plan?: PlanNode;
+    tables?: PlanTable[];
     meta: PlanMeta;
 }
 
-// ====================
-// common
-
-type Plan = ScanPlan | ScriptPlan;
-type AST = string;
-type Stats = TKqpStatsQuery;
-
-export interface CommonFields {
-    ast?: AST;
-    plan?: Plan;
-    stats?: Stats;
-}
-
-interface DeprecatedCommonFields {
-    stats?: Stats;
-}
-
-export interface ErrorResponse {
-    error?: IssueMessage;
-    issues?: IssueMessage[];
-}
-
-export type ExecuteActions = 'execute-script' | 'execute' | 'execute-scan' | undefined;
-export type ExplainActions = 'explain' | 'explain-ast';
-export type Actions = ExecuteActions | ExplainActions;
-
-// undefined == 'classic'
-export type Schemas = 'classic' | 'modern' | 'ydb' | undefined;
-
-// ==== EXECUTE ====
-
-// common types
+// ==== Common ====
 
 export type CellValue = string | number | null | undefined;
 
@@ -198,113 +167,86 @@ export interface ColumnType {
     type: string;
 }
 
-// modern response
+/** undefined = 'classic' */
+export type Schemas = 'classic' | 'modern' | 'ydb' | undefined;
 
-export type ExecuteModernResponse = {
-    result: ArrayRow[];
-    columns: ColumnType[];
-} & CommonFields;
+/**
+ * undefined = 'execute'
+ *
+ * execute and execute-script have similar responses
+ */
+export type ExecuteActions = 'execute' | 'execute-scan' | 'execute-script' | undefined;
 
-export type ExecuteClassicResponseDeep = {
-    result: KeyValueRow[];
-} & CommonFields;
+/** explain, explain-scan and explain-ast have similar responses */
+export type ExplainActions = 'explain' | 'explain-scan' | 'explain-script' | 'explain-ast';
 
-// can be undefined for queries like `insert into`
-export type ExecuteClassicResponsePlain = KeyValueRow[] | undefined;
+export type Actions = ExecuteActions | ExplainActions;
 
-export type ExecuteClassicResponse = ExecuteClassicResponseDeep | ExecuteClassicResponsePlain;
+// ==== Error response ====
+export interface ErrorResponse {
+    error?: IssueMessage;
+    issues?: IssueMessage[];
+}
 
-export type ExecuteYdbResponse = {
-    result: KeyValueRow[];
-} & CommonFields;
+// ==== Explain Response ====
 
-// prettier-ignore
-type ExecuteResponse<Schema extends Schemas> =
-    | CommonFields // result can be undefined for queries like `insert into`
-    | (Schema extends 'modern'
-          ? ExecuteModernResponse
-          : Schema extends 'ydb'
-            ? ExecuteYdbResponse
-            : Schema extends 'classic' | undefined
-                ? ExecuteClassicResponse
-                : unknown);
+export interface ExplainScriptResponse {
+    plan?: ScriptPlan;
+}
 
-// deprecated response from older versions, backward compatibility
+export interface ExplainScanResponse {
+    ast?: string;
+    plan?: ScanPlan;
+}
 
-type DeprecatedExecuteResponseValue =
-    | KeyValueRow[]
-    | string
-    // can be here because of a bug in the previous backend version
-    // should be ignored in parsing
-    | Plan;
+export type ExplainResponse<Action extends ExplainActions> = Action extends 'explain-script'
+    ? ExplainScriptResponse
+    : ExplainScanResponse;
 
-export type DeprecatedExecuteResponseDeep = {
-    // can be undefined for queries like `insert into`
-    result?: DeprecatedExecuteResponseValue;
-} & DeprecatedCommonFields;
+// ==== Execute Response ====
 
-// can be undefined for queries like `insert into`
-export type DeprecatedExecuteResponsePlain = DeprecatedExecuteResponseValue | undefined;
+type ResultFields<Schema extends Schemas> = Schema extends 'modern'
+    ? {
+          result?: ArrayRow[];
+          columns?: ColumnType[];
+      }
+    : {
+          result?: KeyValueRow[];
+      };
 
-export type DeprecatedExecuteResponse =
-    | DeprecatedExecuteResponseDeep
-    | DeprecatedExecuteResponsePlain;
+export type ExecuteScanResponse<Schema extends Schemas> = ResultFields<Schema>;
 
-// ==== EXPLAIN ====
+export type ExecuteScriptResponse<Schema extends Schemas> = {
+    plan?: ScriptPlan;
+    ast?: string;
+    stats?: TKqpStatsQuery;
+} & ResultFields<Schema>;
 
-// modern response
+export type ExecuteResponse<
+    Schema extends Schemas,
+    Action extends ExecuteActions,
+> = Action extends 'execute-scan' ? ExecuteScanResponse<Schema> : ExecuteScriptResponse<Schema>;
 
-type ExplainResponse = CommonFields;
-
-// deprecated response from older versions, backward compatibility
-
-// prettier-ignore
-type DeprecatedExplainResponse<Action extends ExplainActions> = 
-    Action extends 'explain-ast'
-        ? ({result: {ast: AST}} & Required<DeprecatedCommonFields>) | {ast: AST}
-        : Action extends 'explain'
-            ? ({result: Plan} & Required<DeprecatedCommonFields>) | Plan
+// ==== Combined API response ====
+export type QueryAPIResponse<
+    Schema extends Schemas,
+    Action extends Actions,
+> = Action extends ExplainActions
+    ? ExplainResponse<Action>
+    : Action extends ExecuteActions
+    ? ExecuteResponse<Schema, Action>
     : unknown;
 
-// ==== COMBINED API RESPONSE ====
+// ==== types to use in query result preparation ====
+export type AnyExplainResponse = ExplainScanResponse | ExplainScriptResponse;
 
-export type QueryAPIExecuteResponse<Schema extends Schemas = undefined> =
-    | ExecuteResponse<Schema>
-    | DeprecatedExecuteResponse
-    | null;
-
-export type QueryAPIExplainResponse<Action extends ExplainActions> =
-    | ExplainResponse
-    | DeprecatedExplainResponse<Action>
-    | null;
-
-// prettier-ignore
-export type QueryAPIResponse<Action extends Actions, Schema extends Schemas = undefined> = 
-    Action extends ExecuteActions
-        ? QueryAPIExecuteResponse<Schema>
-        : Action extends ExplainActions
-            ? QueryAPIExplainResponse<Action>
-            : unknown;
+export type ExecuteModernResponse = ExecuteScanResponse<'modern'> | ExecuteScriptResponse<'modern'>;
+export type ExecuteClassicResponse =
+    | ExecuteScanResponse<'classic'>
+    | ExecuteScriptResponse<'classic'>;
+export type ExecuteYdbResponse = ExecuteScanResponse<'ydb'> | ExecuteScriptResponse<'ydb'>;
 
 export type AnyExecuteResponse =
     | ExecuteModernResponse
     | ExecuteClassicResponse
-    | ExecuteYdbResponse
-    | CommonFields
-    | DeprecatedExecuteResponse
-    | null;
-
-export type DeepExecuteResponse =
-    | ExecuteModernResponse
-    | ExecuteClassicResponseDeep
-    | ExecuteYdbResponse
-    | DeprecatedExecuteResponseDeep;
-
-export type AnyExplainResponse =
-    | ExplainResponse
-    | CommonFields
-    | DeprecatedExplainResponse<'explain'>
-    | DeprecatedExplainResponse<'explain-ast'>
-    | null;
-
-export type AnyResponse = AnyExecuteResponse | AnyExplainResponse;
+    | ExecuteYdbResponse;

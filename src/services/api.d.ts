@@ -26,8 +26,8 @@ interface Window {
         ) => Promise<import('../types/api/nodes').TNodesInfo>;
         getCompute: (path: string) => Promise<import('../types/api/compute').TComputeInfo>;
         sendQuery: <
+            Schema extends import('../types/api/query').Schemas,
             Action extends import('../types/api/query').Actions,
-            Schema extends import('../types/api/query').Schemas = undefined,
         >(
             params: {
                 query?: string;
@@ -37,15 +37,15 @@ interface Window {
                 schema?: Schema;
             },
             axiosOptions?: AxiosOptions,
-        ) => Promise<import('../types/api/query').QueryAPIResponse<Action, Schema>>;
-        getExplainQuery: (
+        ) => Promise<import('../types/api/query').QueryAPIResponse<Schema, Action>>;
+        getExplainQuery: <Action extends import('../types/api/query').ExplainActions = 'explain'>(
             query: string,
             database: string,
-        ) => Promise<import('../types/api/query').QueryAPIExplainResponse<'explain'>>;
+        ) => Promise<import('../types/api/query').ExplainResponse<Action>>;
         getExplainQueryAst: (
             query: string,
             database: string,
-        ) => Promise<import('../types/api/query').QueryAPIExplainResponse<'explain-ast'>>;
+        ) => Promise<import('../types/api/query').ExplainResponse<'explain-ast'>>;
         getHealthcheckInfo: (
             database: string,
         ) => Promise<import('../types/api/healthcheck').HealthCheckAPIResponse>;
