@@ -7,3 +7,8 @@ export interface IQueryResult {
     plan?: any;
     ast?: string;
 }
+
+export interface QueryRequestParams {
+    database: string;
+    query: string;
+}

@@ -7,6 +7,7 @@ import type {
     MonacoHotKeyAction,
     RunAction,
 } from '../../types/store/executeQuery';
+import type {QueryRequestParams} from '../../types/store/query';
 import {getValueFromLS, parseJson} from '../../utils/utils';
 import {QUERIES_HISTORY_KEY, QUERY_INITIAL_RUN_ACTION_KEY} from '../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
@@ -156,15 +157,11 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
     }
 };
 
-export const sendQuery = ({
-    query,
-    database,
-    action,
-}: {
-    query: string;
-    database: string;
+interface SendQueryParams extends QueryRequestParams {
     action: Actions;
-}) => {
+}
+
+export const sendQuery = ({query, database, action}: SendQueryParams) => {
     return createApiRequest({
         request: window.api.sendQuery({
             schema: 'modern',
