@@ -11,7 +11,7 @@ import type {
 import type {QueryRequestParams} from '../../types/store/query';
 
 import {preparePlan} from '../../utils/prepareQueryExplain';
-import {parseQueryAPIExplainResponse} from '../../utils/query';
+import {parseQueryAPIExplainResponse, parseQueryExplainPlan} from '../../utils/query';
 import {parseQueryError} from '../../utils/error';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
@@ -102,19 +102,19 @@ export const getExplainQuery = ({query, database}: QueryRequestParams) => {
         request: window.api.getExplainQuery(query, database),
         actions: GET_EXPLAIN_QUERY,
         dataHandler: (response): PreparedExplainResponse => {
-            const {plan: result, ast} = parseQueryAPIExplainResponse(response);
+            const {plan: rawPlan, ast} = parseQueryAPIExplainResponse(response);
 
-            if (!result) {
+            if (!rawPlan) {
                 return {ast};
             }
 
-            const {tables, meta, Plan} = result;
+            const {tables, meta, Plan} = parseQueryExplainPlan(rawPlan);
 
             if (supportedExplainQueryVersions.indexOf(meta.version) === -1) {
                 // Do not prepare plan for not supported versions
                 return {
                     plan: {
-                        pristine: result,
+                        pristine: rawPlan,
                         version: meta.version,
                     },
                     ast,
@@ -136,7 +136,7 @@ export const getExplainQuery = ({query, database}: QueryRequestParams) => {
                     nodes,
                     tables,
                     version: meta.version,
-                    pristine: result,
+                    pristine: rawPlan,
                 },
                 ast,
             };

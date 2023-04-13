@@ -2,13 +2,10 @@ import {YQLType} from '../types';
 import type {
     AnyExecuteResponse,
     AnyExplainResponse,
-    AnyResponse,
-    CommonFields,
-    DeepExecuteResponse,
-    DeprecatedExecuteResponsePlain,
-    ExecuteClassicResponsePlain,
     ExecuteModernResponse,
     KeyValueRow,
+    ScanPlan,
+    ScriptPlan,
 } from '../types/api/query';
 import type {IQueryResult} from '../types/store/query';
 
@@ -49,6 +46,7 @@ export const getColumnType = (type: string) => {
     }
 };
 
+/** parse response result field from ArrayRow to KeyValueRow */
 const parseExecuteModernResponse = (data: ExecuteModernResponse): IQueryResult => {
     const {result, columns, ...restData} = data;
 
@@ -57,42 +55,16 @@ const parseExecuteModernResponse = (data: ExecuteModernResponse): IQueryResult =
             result &&
             columns &&
             result.map((row) => {
-                return row.reduce((newRow: KeyValueRow, cellData, columnIndex) => {
+                return row.reduce((newRow, cellData, columnIndex) => {
                     const {name} = columns[columnIndex];
                     newRow[name] = cellData;
                     return newRow;
-                }, {});
+                }, {} as KeyValueRow);
             }),
         columns,
         ...restData,
     };
 };
-
-const parseDeprecatedExecuteResponseValue = (
-    data?: DeprecatedExecuteResponsePlain | ExecuteClassicResponsePlain,
-): KeyValueRow[] | undefined => {
-    if (!data) {
-        return undefined;
-    }
-
-    if (typeof data === 'string') {
-        try {
-            return JSON.parse(data);
-        } catch (e) {
-            return undefined;
-        }
-    }
-
-    if (Array.isArray(data)) {
-        return data;
-    }
-
-    // Plan is not a valid response in this case
-    return undefined;
-};
-
-const hasResult = (data: AnyExecuteResponse): data is DeepExecuteResponse =>
-    Boolean(data && typeof data === 'object' && 'result' in data);
 
 const isModern = (response: AnyExecuteResponse): response is ExecuteModernResponse =>
     Boolean(
@@ -102,70 +74,64 @@ const isModern = (response: AnyExecuteResponse): response is ExecuteModernRespon
             Array.isArray((response as ExecuteModernResponse).columns),
     );
 
-const hasCommonFields = (data: AnyResponse): data is CommonFields =>
-    Boolean(
-        data && typeof data === 'object' && ('ast' in data || 'plan' in data || 'stats' in data),
+type UnsupportedQueryResponseFormat =
+    | Array<unknown>
+    | string
+    | null
+    | undefined
+    | {result: string | Record<string, unknown>};
+
+const isUnsupportedType = (
+    data: AnyExecuteResponse | AnyExplainResponse | UnsupportedQueryResponseFormat,
+): data is UnsupportedQueryResponseFormat => {
+    return Boolean(
+        !data ||
+            typeof data !== 'object' ||
+            Array.isArray(data) ||
+            ('result' in data && !Array.isArray(data.result)),
     );
-
-// complex logic because of the variety of possible responses
-// after all backends are updated to the latest version, it can be simplified
-export const parseQueryAPIExecuteResponse = (data: AnyExecuteResponse): IQueryResult => {
-    if (!data) {
-        return {};
-    }
-
-    if (hasResult(data)) {
-        if (isModern(data)) {
-            return parseExecuteModernResponse(data);
-        }
-
-        return {
-            ...data,
-            result: parseDeprecatedExecuteResponseValue(data.result),
-        };
-    }
-
-    if (hasCommonFields(data)) {
-        return data;
-    }
-
-    return {
-        result: parseDeprecatedExecuteResponseValue(data),
-    };
 };
 
-// complex logic because of the variety of possible responses
-// after all backends are updated to the latest version, it can be simplified
-export const parseQueryAPIExplainResponse = (data: AnyExplainResponse): IQueryResult => {
-    if (!data) {
+export const parseQueryAPIExecuteResponse = (
+    data: AnyExecuteResponse | UnsupportedQueryResponseFormat,
+): IQueryResult => {
+    if (isUnsupportedType(data)) {
+        return {};
+    }
+    if (isModern(data)) {
+        return parseExecuteModernResponse(data);
+    }
+
+    return data;
+};
+
+export const parseQueryAPIExplainResponse = (
+    data: AnyExplainResponse | UnsupportedQueryResponseFormat,
+): IQueryResult => {
+    if (isUnsupportedType(data)) {
         return {};
     }
 
-    if ('ast' in data) {
-        return data;
-    }
+    return data;
+};
 
-    if ('result' in data) {
-        const {result, ...restData} = data;
+const isExplainScriptPlan = (plan: ScriptPlan | ScanPlan): plan is ScriptPlan =>
+    Boolean(plan && 'queries' in plan);
 
-        if ('ast' in data.result) {
-            return {
-                ast: result.ast,
-                ...restData,
-            };
+export const parseQueryExplainPlan = (plan: ScriptPlan | ScanPlan): ScanPlan => {
+    if (isExplainScriptPlan(plan)) {
+        if (!plan.queries || !plan.queries.length) {
+            return {meta: plan.meta};
         }
 
         return {
-            plan: data.result,
-            ...restData,
+            Plan: plan.queries[0].Plan,
+            tables: plan.queries[0].tables,
+            meta: plan.meta,
         };
     }
 
-    if (hasCommonFields(data)) {
-        return data;
-    }
-
-    return {plan: data};
+    return plan;
 };
 
 export const prepareQueryResponse = (data?: KeyValueRow[]) => {
