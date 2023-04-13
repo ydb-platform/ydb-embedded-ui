@@ -5,12 +5,7 @@ import MonacoEditor from 'react-monaco-editor';
 import JSONTree from 'react-json-inspector';
 import 'react-json-inspector/json-inspector.css';
 
-import {
-    TextOverflow,
-    getYdbPlanNodeShape,
-    getCompactTopology,
-    getTopology,
-} from '@gravity-ui/paranoid';
+import {TextOverflow, getYdbPlanNodeShape, getTopology} from '@gravity-ui/paranoid';
 import {Loader, RadioButton} from '@gravity-ui/uikit';
 
 import Divider from '../../../../components/Divider/Divider';
@@ -55,7 +50,7 @@ const explainOptions = [
 function GraphRoot(props) {
     const paranoid = useRef();
 
-    const {data, opts, shapes, version, theme} = props;
+    const {data, opts, shapes, theme} = props;
 
     const [componentTheme, updateComponentTheme] = useState(theme);
 
@@ -64,13 +59,8 @@ function GraphRoot(props) {
     }, [theme]);
 
     const render = () => {
-        if (version === explainVersions.v2) {
-            paranoid.current = getTopology('graphRoot', data, opts, shapes);
-            paranoid.current.render();
-        } else if (version === explainVersions.v1) {
-            paranoid.current = getCompactTopology('graphRoot', data, opts);
-            paranoid.current.renderCompactTopology();
-        }
+        paranoid.current = getTopology('graphRoot', data, opts, shapes);
+        paranoid.current.render();
     };
 
     useEffect(() => {
@@ -189,8 +179,12 @@ function QueryExplain(props) {
     const renderGraph = () => {
         const {explain = {}, theme} = props;
         const {links, nodes, version} = explain;
+
+        const isSupportedVersion = version === explainVersions.v2;
+        const isEnoughDataForGraph = links && nodes && nodes.length;
+
         const content =
-            links && nodes && nodes.length ? (
+            isSupportedVersion && isEnoughDataForGraph ? (
                 <div
                     className={b('explain-canvas-container', {
                         hidden: activeOption !== ExplainOptionIds.schema,
@@ -198,7 +192,6 @@ function QueryExplain(props) {
                 >
                     <GraphRoot
                         theme={theme}
-                        version={version}
                         data={{links, nodes}}
                         opts={{
                             renderNodeTitle: renderExplainNode,
