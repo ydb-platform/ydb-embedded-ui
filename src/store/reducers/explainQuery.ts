@@ -9,7 +9,6 @@ import type {
     PreparedExplainResponse,
 } from '../../types/store/explainQuery';
 
-import {getExplainNodeId, getMetaForExplainNode} from '../../utils';
 import {preparePlan} from '../../utils/prepareQueryExplain';
 import {parseQueryAPIExplainResponse} from '../../utils/query';
 
@@ -92,7 +91,6 @@ export const getExplainQueryAst = ({query, database}: {query: string; database: 
 };
 
 export const explainVersions = {
-    v1: '0.1',
     v2: '0.2',
 };
 
@@ -109,11 +107,10 @@ export const getExplainQuery = ({query, database}: {query: string; database: str
                 return {ast};
             }
 
-            let links: Link[] = [];
-            let nodes: GraphNode<ExplainPlanNodeData>[] = [];
             const {tables, meta, Plan} = result;
 
             if (supportedExplainQueryVersions.indexOf(meta.version) === -1) {
+                // Do not prepare plan for not supported versions
                 return {
                     plan: {
                         pristine: result,
@@ -123,48 +120,13 @@ export const getExplainQuery = ({query, database}: {query: string; database: str
                 };
             }
 
-            if (meta.version === explainVersions.v2) {
+            let links: Link[] = [];
+            let nodes: GraphNode<ExplainPlanNodeData>[] = [];
+
+            if (Plan) {
                 const preparedPlan = preparePlan(Plan);
                 links = preparedPlan.links;
                 nodes = preparedPlan.nodes;
-            } else {
-                _.forEach(tables, (table) => {
-                    nodes.push({
-                        name: table.name,
-                    });
-
-                    const tableTypes = {};
-
-                    const {reads = [], writes = []} = table;
-                    let prevNodeId = table.name;
-
-                    _.forEach([...reads, ...writes], (node) => {
-                        if (tableTypes[node.type]) {
-                            tableTypes[node.type] = tableTypes[node.type] + 1;
-                        } else {
-                            tableTypes[node.type] = 1;
-                        }
-
-                        const nodeId = getExplainNodeId(
-                            table.name,
-                            node.type,
-                            tableTypes[node.type],
-                        );
-
-                        links.push({
-                            from: prevNodeId,
-                            to: nodeId,
-                        });
-
-                        nodes.push({
-                            name: nodeId,
-                            meta: getMetaForExplainNode(node),
-                            id: nodeId,
-                        });
-
-                        prevNodeId = nodeId;
-                    });
-                });
             }
 
             return {

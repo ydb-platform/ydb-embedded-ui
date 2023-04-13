@@ -5,12 +5,7 @@ import MonacoEditor from 'react-monaco-editor';
 import JSONTree from 'react-json-inspector';
 import 'react-json-inspector/json-inspector.css';
 
-import {
-    TextOverflow,
-    getYdbPlanNodeShape,
-    getCompactTopology,
-    getTopology,
-} from '@gravity-ui/paranoid';
+import {TextOverflow, getYdbPlanNodeShape, getTopology} from '@gravity-ui/paranoid';
 import {Loader, RadioButton} from '@gravity-ui/uikit';
 
 import Divider from '../../../../components/Divider/Divider';
@@ -67,9 +62,6 @@ function GraphRoot(props) {
         if (version === explainVersions.v2) {
             paranoid.current = getTopology('graphRoot', data, opts, shapes);
             paranoid.current.render();
-        } else if (version === explainVersions.v1) {
-            paranoid.current = getCompactTopology('graphRoot', data, opts);
-            paranoid.current.renderCompactTopology();
         }
     };
 
