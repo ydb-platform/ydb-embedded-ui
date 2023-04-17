@@ -1,5 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
+import {useHistory, useLocation} from 'react-router';
+import qs from 'qs';
 import cn from 'bem-cn-lite';
 
 import DataTable, {Column, Settings} from '@gravity-ui/react-data-table';
@@ -25,9 +27,10 @@ import {formatDateTime, formatNumber} from '../../../../utils';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
+import routes, {createHref} from '../../../../routes';
 
 import {isColumnEntityType} from '../../utils/schema';
-import {TenantGeneralTabsIds} from '../../TenantPages';
+import {TenantGeneralTabsIds, TenantTabsGroups} from '../../TenantPages';
 
 import i18n from './i18n';
 import './TopQueries.scss';
@@ -87,8 +90,10 @@ interface TopQueriesProps {
     type?: EPathType;
 }
 
-export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
+export const TopQueries = ({path, type}: TopQueriesProps) => {
     const dispatch = useDispatch();
+    const location = useLocation();
+    const history = useHistory();
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
@@ -166,9 +171,19 @@ export const TopQueries = ({path, type, changeSchemaTab}: TopQueriesProps) => {
             const {QueryText: input} = row;
 
             dispatch(changeUserInput({input}));
-            changeSchemaTab(TenantGeneralTabsIds.query);
+
+            const queryParams = qs.parse(location.search, {
+                ignoreQueryPrefix: true,
+            });
+
+            const queryPath = createHref(routes.tenant, undefined, {
+                ...queryParams,
+                [TenantTabsGroups.general]: TenantGeneralTabsIds.query,
+            });
+
+            history.push(queryPath);
         },
-        [changeSchemaTab, dispatch],
+        [dispatch, history, location],
     );
 
     const handleTextSearchUpdate = (text: string) => {
