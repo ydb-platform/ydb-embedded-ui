@@ -11,6 +11,7 @@ import type {
 
 import {preparePlan} from '../../utils/prepareQueryExplain';
 import {parseQueryAPIExplainResponse, parseQueryExplainPlan} from '../../utils/query';
+import {isNetworkError} from '../../utils/error';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
@@ -47,6 +48,14 @@ const explainQuery: Reducer<ExplainQueryState, ExplainQueryAction> = (
         }
         // 401 Unauthorized error is handled by GenericAPI
         case GET_EXPLAIN_QUERY.FAILURE: {
+            if (isNetworkError(action.error)) {
+                return {
+                    ...state,
+                    error: action.error.message,
+                    loading: false,
+                };
+            }
+
             return {
                 ...state,
                 error: action.error || 'Unauthorized',
@@ -70,6 +79,14 @@ const explainQuery: Reducer<ExplainQueryState, ExplainQueryAction> = (
             };
         }
         case GET_EXPLAIN_QUERY_AST.FAILURE: {
+            if (isNetworkError(action.error)) {
+                return {
+                    ...state,
+                    error: action.error.message,
+                    loading: false,
+                };
+            }
+
             return {
                 ...state,
                 errorAst: action.error || 'Unauthorized',
