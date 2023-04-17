@@ -243,13 +243,11 @@ export const getFlatListStorageGroups = createSelector([getStoragePools], (stora
                     const limitSizeBytes = _.reduce(
                         group.VDisks,
                         (acc, vDisk) => {
-                            return (
-                                acc +
-                                (Number(vDisk.AvailableSize) ||
-                                    Number(vDisk.PDisk?.AvailableSize) ||
-                                    0) +
-                                (Number(vDisk.AllocatedSize) || 0)
-                            );
+                            const {AvailableSize, AllocatedSize, PDisk} = vDisk;
+                            const available = (AvailableSize ?? PDisk?.AvailableSize) || 0;
+                            const allocated = AllocatedSize || 0;
+
+                            return acc + Number(available) + Number(allocated);
                         },
                         0,
                     );
