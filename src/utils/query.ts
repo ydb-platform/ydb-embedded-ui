@@ -9,6 +9,11 @@ import type {
 } from '../types/api/query';
 import type {IQueryResult} from '../types/store/query';
 
+export enum QueryModes {
+    scan = 'scan',
+    script = 'script',
+}
+
 // eslint-disable-next-line complexity
 export const getColumnType = (type: string) => {
     switch (type.replace(/\?$/, '')) {
