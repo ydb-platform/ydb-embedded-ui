@@ -30,7 +30,7 @@ export type Schemas = 'classic' | 'modern' | 'ydb' | undefined;
 
 // common types
 
-type CellValue = string | number | null | undefined;
+export type CellValue = string | number | null | undefined;
 
 export type KeyValueRow<T = CellValue> = {
     [key: string]: T;

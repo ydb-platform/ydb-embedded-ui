@@ -20,6 +20,7 @@ import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema
 import {EShardsWorkloadMode, IShardsWorkloadFilters} from '../../../../types/store/shardsWorkload';
 
 import type {EPathType} from '../../../../types/api/schema';
+import type {CellValue, KeyValueRow} from '../../../../types/api/query';
 
 import {formatDateTime, formatNumber} from '../../../../utils';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
@@ -57,8 +58,15 @@ const tableColumnsNames = {
     IntervalEnd: 'IntervalEnd',
 };
 
-function prepareCPUWorkloadValue(value: string) {
+function prepareCPUWorkloadValue(value: string | number) {
     return `${(Number(value) * 100).toFixed(2)}%`;
+}
+
+function prepareDateTimeValue(value: CellValue) {
+    if (!value) {
+        return '–';
+    }
+    return formatDateTime(new Date(value).getTime());
 }
 
 function stringToDataTableSortOrder(value: string): SortOrder[] | undefined {
@@ -190,16 +198,17 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             };
         };
 
-        const columns: Column<any>[] = [
+        const columns: Column<KeyValueRow>[] = [
             {
                 name: tableColumnsNames.Path,
-                render: ({value: relativeNodePath}) => {
+                render: ({row}) => {
+                    // row.Path - relative schema path
                     return (
                         <span
-                            onClick={onSchemaClick(tenantPath + relativeNodePath)}
+                            onClick={onSchemaClick(tenantPath + row.Path)}
                             className={bLink({view: 'normal'})}
                         >
-                            {relativeNodePath as string}
+                            {row.Path}
                         </span>
                     );
                 },
@@ -207,25 +216,28 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             },
             {
                 name: tableColumnsNames.CPUCores,
-                render: ({value}) => {
-                    return prepareCPUWorkloadValue(value as string);
+                render: ({row}) => {
+                    return prepareCPUWorkloadValue(row.CPUCores || 0);
                 },
                 align: DataTable.RIGHT,
             },
             {
                 name: tableColumnsNames.DataSize,
                 header: 'DataSize (B)',
-                render: ({value}) => {
-                    return formatNumber(value as number);
+                render: ({row}) => {
+                    return formatNumber(row.DataSize);
                 },
                 align: DataTable.RIGHT,
             },
             {
                 name: tableColumnsNames.TabletId,
-                render: ({value}) => {
+                render: ({row}) => {
+                    if (!row.TabletId) {
+                        return '–';
+                    }
                     return (
-                        <InternalLink to={createHref(routes.tablet, {id: value})}>
-                            {value as string}
+                        <InternalLink to={createHref(routes.tablet, {id: row.TabletId})}>
+                            {row.TabletId}
                         </InternalLink>
                     );
                 },
@@ -233,10 +245,13 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             },
             {
                 name: tableColumnsNames.NodeId,
-                render: ({value: nodeId}) => {
+                render: ({row}) => {
+                    if (!row.NodeId) {
+                        return '–';
+                    }
                     return (
-                        <InternalLink to={getDefaultNodePath(nodeId as string)}>
-                            {nodeId as string}
+                        <InternalLink to={getDefaultNodePath(row.NodeId)}>
+                            {row.NodeId}
                         </InternalLink>
                     );
                 },
@@ -245,7 +260,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             },
             {
                 name: tableColumnsNames.InFlightTxCount,
-                render: ({value}) => formatNumber(value as number),
+                render: ({row}) => formatNumber(row.InFlightTxCount),
                 align: DataTable.RIGHT,
                 sortable: false,
             },
@@ -255,12 +270,16 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             // after NodeId
             columns.splice(5, 0, {
                 name: tableColumnsNames.PeakTime,
-                render: ({value}) => formatDateTime(new Date(value as string).valueOf()),
+                render: ({row}) => {
+                    return prepareDateTimeValue(row.PeakTime);
+                },
                 sortable: false,
             });
             columns.push({
                 name: tableColumnsNames.IntervalEnd,
-                render: ({value}) => formatDateTime(new Date(value as string).getTime()),
+                render: ({row}) => {
+                    return prepareDateTimeValue(row.IntervalEnd);
+                },
             });
         }
 
