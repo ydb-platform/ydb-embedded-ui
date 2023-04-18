@@ -116,7 +116,7 @@ function QueryExplain(props) {
         if (!props.ast && activeOption === ExplainOptionIds.ast) {
             props.astQuery();
         }
-    }, [activeOption]);
+    }, [activeOption, props.ast]);
 
     const onSelectOption = (tabId) => {
         setActiveOption(tabId);
