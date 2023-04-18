@@ -21,7 +21,7 @@ export const NODE_PAGES = [
     },
 ];
 
-export function getDefaultNodePath(nodeId) {
+export function getDefaultNodePath(nodeId: string | number) {
     return createHref(routes.node, {
         id: nodeId,
         activeTab: OVERVIEW,

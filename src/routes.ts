@@ -28,7 +28,7 @@ export const CLUSTER_PAGES = {
 
 export function createHref(
     route: string,
-    params?: object,
+    params?: Record<string, string | number>,
     query: Record<string | number, string | number | string[] | number[] | undefined> = {},
 ) {
     let extendedQuery = query;
