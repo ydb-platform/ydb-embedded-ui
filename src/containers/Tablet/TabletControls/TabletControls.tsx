@@ -9,8 +9,8 @@ import {b} from '../Tablet';
 
 enum EVisibleDialogType {
     'kill' = 'kill',
-    'stop' = 'kill',
-    'resume' = 'kill',
+    'stop' = 'stop',
+    'resume' = 'resume',
 }
 
 type VisibleDialogType = EVisibleDialogType | null;
