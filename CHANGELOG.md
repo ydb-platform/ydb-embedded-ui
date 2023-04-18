@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.5...v3.5.0) (2023-04-18)
+
+
+### Features
+
+* **TableInfo:** extend Table and ColumnTable info ([89e54aa](https://github.com/ydb-platform/ydb-embedded-ui/commit/89e54aa97d7bcbabfd5100daeb1dc0c03608e86e))
+* **TopQueries:** add columns ([b49b98d](https://github.com/ydb-platform/ydb-embedded-ui/commit/b49b98db2da08c355b23f4a33bf05247530543db))
+
+
+### Bug Fixes
+
+* **settings:** use system theme by default ([726c9cb](https://github.com/ydb-platform/ydb-embedded-ui/commit/726c9cb14d7f87cc9248340d1ebebfc8bf0d0384))
+* **Storage:** fix incorrect usage on zero available space ([2704cd7](https://github.com/ydb-platform/ydb-embedded-ui/commit/2704cd7c696d337cc8e3af68941cf444f8dfae81))
+* **TableInfo:** add default format for FollowerGroup fields ([961334a](https://github.com/ydb-platform/ydb-embedded-ui/commit/961334aabe89672994f0f3440e20602e180b3394))
+* **Tablet:** fix dialog type enum ([c477042](https://github.com/ydb-platform/ydb-embedded-ui/commit/c477042cacc2e777cae4bd6981381a8042c603ed))
+* **TopQueries:** enable go back to TopQueries from Query tab ([bbdfe72](https://github.com/ydb-platform/ydb-embedded-ui/commit/bbdfe726c9081f01422dca787b83399ea44b3956))
+* **TopShards:** fix table crash on undefined values ([604e99a](https://github.com/ydb-platform/ydb-embedded-ui/commit/604e99a9427021c61ceb8ea366e316e629032b84))
+* **TruncatedQuery:** wrap message ([f41b7ff](https://github.com/ydb-platform/ydb-embedded-ui/commit/f41b7ff33ac0145446ca89aab031036247f3ddf8))
+
 ## [3.4.5](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.4...v3.4.5) (2023-03-30)
 
 
