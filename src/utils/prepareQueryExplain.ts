@@ -1,4 +1,4 @@
-import {
+import type {
     Link,
     GraphNode,
     TopologyNodeDataStats,
@@ -7,28 +7,11 @@ import {
     TopologyNodeDataStatsItem,
 } from '@gravity-ui/paranoid';
 
-interface PlanOperator {
-    Name: string;
-    [key: string]: any;
-}
-
-export interface Plan {
-    PlanNodeId: number;
-    'Node Type': string;
-    Plans?: Plan[];
-    Operators?: PlanOperator[];
-    Tables?: string[];
-    PlanNodeType?: string;
-    [key: string]: any;
-}
-
-export interface RootPlan {
-    Plan: Plan;
-}
+import type {PlanNode} from '../types/api/query';
 
 const CONNECTION_NODE_META_FIELDS = new Set(['PlanNodeId', 'PlanNodeType', 'Node Type', 'Plans']);
 
-function prepareStats(plan: Plan) {
+function prepareStats(plan: PlanNode) {
     const stats: TopologyNodeDataStats[] = [];
 
     if (plan.Operators) {
@@ -77,7 +60,7 @@ function prepareStats(plan: Plan) {
     return stats;
 }
 
-function getNodeType(plan: Plan) {
+function getNodeType(plan: PlanNode) {
     switch (plan.PlanNodeType) {
         case 'Connection':
             return 'connection';
@@ -90,11 +73,11 @@ function getNodeType(plan: Plan) {
     }
 }
 
-export function preparePlan(plan: Plan) {
+export function preparePlan(plan: PlanNode) {
     const nodes: GraphNode[] = [];
     const links: Link[] = [];
 
-    function parsePlans(plans: Plan[] = [], from: string) {
+    function parsePlans(plans: PlanNode[] = [], from: string) {
         plans.forEach((p) => {
             const node: GraphNode<ExplainPlanNodeData> = {
                 name: String(p.PlanNodeId),
