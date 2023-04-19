@@ -2,8 +2,9 @@ import React, {useRef, useState} from 'react';
 import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import {Button, Popup} from '@gravity-ui/uikit';
+
 import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {useSelector} from 'react-redux';
+import {useTypedSelector} from '../../../../utils/hooks';
 
 import './QueriesHistory.scss';
 
@@ -17,8 +18,7 @@ interface QueriesHistoryProps {
 
 function QueriesHistory(props: QueriesHistoryProps) {
     const [isHistoryVisible, setIsHistoryVisible] = useState(false);
-    const history: string[] =
-        useSelector((state: any) => state.executeQuery.history?.queries) ?? [];
+    const history = useTypedSelector((state) => state.executeQuery.history.queries) ?? [];
     const anchor = useRef(null);
 
     const onShowHistoryClick = () => {
