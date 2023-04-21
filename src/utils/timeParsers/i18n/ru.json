@@ -1,11 +1,11 @@
 {
-  "daysHours": "{{days}}д {{hours}}ч",
-  "hoursMin": "{{hours}}ч {{minutes}}м",
-  "minSec": "{{minutes}}м {{seconds}}с",
-  "secMs": "{{seconds}}с {{ms}}мс",
-  "days": "{{days}}д",
-  "hours": "{{hours}}ч",
-  "min": "{{minutes}}м",
-  "sec": "{{seconds}}с",
-  "ms": "{{ms}}мс"
+  "daysHours": "{{days}}\u00a0д\u00a0{{hours}}\u00a0ч",
+  "hoursMin": "{{hours}}\u00a0ч\u00a0{{minutes}}\u00a0м",
+  "minSec": "{{minutes}}\u00a0м\u00a0{{seconds}}\u00a0с",
+  "secMs": "{{seconds}}\u00a0с\u00a0{{ms}}\u00a0мс",
+  "days": "{{days}}\u00a0д",
+  "hours": "{{hours}}\u00a0ч",
+  "min": "{{minutes}}\u00a0м",
+  "sec": "{{seconds}}\u00a0с",
+  "ms": "{{ms}}\u00a0мс"
 }
