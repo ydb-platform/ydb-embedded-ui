@@ -18,6 +18,7 @@ import {prepareQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 
 import ResultIssues from '../Issues/Issues';
+import {QueryDuration} from '../QueryDuration/QueryDuration';
 
 import './QueryResult.scss';
 
@@ -116,15 +117,11 @@ function QueryResult(props) {
                         </Fullscreen>
                     )}
                 </React.Fragment>
-            )
+            );
         }
 
         if (error) {
-            return (
-                <div className={b('error')}>
-                    {prepareQueryError(error)}
-                </div>
-            );
+            return <div className={b('error')}>{prepareQueryError(error)}</div>;
         }
     };
 
@@ -136,6 +133,7 @@ function QueryResult(props) {
 
                     {props.stats && !props.error && (
                         <React.Fragment>
+                            <QueryDuration duration={props.stats?.DurationUs} />
                             <Divider />
                             <RadioButton
                                 options={resultOptions}
