@@ -1,4 +1,5 @@
-import type {KeyValueRow, ColumnType} from '../api/query';
+import type {NetworkError} from '../api/error';
+import type {KeyValueRow, ColumnType, ErrorResponse} from '../api/query';
 
 export interface IQueryResult {
     result?: KeyValueRow[];
@@ -12,3 +13,5 @@ export interface QueryRequestParams {
     database: string;
     query: string;
 }
+
+export type QueryError = NetworkError | ErrorResponse;

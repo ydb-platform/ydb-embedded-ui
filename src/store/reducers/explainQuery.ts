@@ -12,6 +12,7 @@ import type {QueryRequestParams} from '../../types/store/query';
 
 import {preparePlan} from '../../utils/prepareQueryExplain';
 import {parseQueryAPIExplainResponse} from '../../utils/query';
+import {parseQueryError} from '../../utils/error';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
@@ -46,11 +47,10 @@ const explainQuery: Reducer<ExplainQueryState, ExplainQueryAction> = (
                 error: undefined,
             };
         }
-        // 401 Unauthorized error is handled by GenericAPI
         case GET_EXPLAIN_QUERY.FAILURE: {
             return {
                 ...state,
-                error: action.error || 'Unauthorized',
+                error: parseQueryError(action.error),
                 loading: false,
             };
         }
@@ -73,7 +73,7 @@ const explainQuery: Reducer<ExplainQueryState, ExplainQueryAction> = (
         case GET_EXPLAIN_QUERY_AST.FAILURE: {
             return {
                 ...state,
-                errorAst: action.error || 'Unauthorized',
+                errorAst: parseQueryError(action.error),
                 loadingAst: false,
             };
         }
