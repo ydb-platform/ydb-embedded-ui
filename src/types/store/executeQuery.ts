@@ -10,8 +10,9 @@ import {
     RUN_ACTIONS_VALUES,
 } from '../../store/reducers/executeQuery';
 import type {ApiRequestAction} from '../../store/utils';
+import type {ErrorResponse} from '../api/query';
 import type {ValueOf} from '../common';
-import type {IQueryResult} from './query';
+import type {IQueryResult, QueryError} from './query';
 
 export type MonacoHotKeyAction = ValueOf<typeof MONACO_HOT_KEY_ACTIONS>;
 export type RunAction = ValueOf<typeof RUN_ACTIONS_VALUES>;
@@ -27,10 +28,10 @@ export interface ExecuteQueryState {
     monacoHotKey: null | MonacoHotKeyAction;
     data?: IQueryResult;
     stats?: IQueryResult['stats'];
-    error?: unknown;
+    error?: string | ErrorResponse;
 }
 
-type SendQueryAction = ApiRequestAction<typeof SEND_QUERY, IQueryResult, unknown>;
+type SendQueryAction = ApiRequestAction<typeof SEND_QUERY, IQueryResult, QueryError>;
 
 export type ExecuteQueryAction =
     | SendQueryAction

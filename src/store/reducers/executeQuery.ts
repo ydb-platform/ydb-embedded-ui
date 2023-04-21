@@ -11,6 +11,7 @@ import type {QueryRequestParams} from '../../types/store/query';
 import {getValueFromLS, parseJson} from '../../utils/utils';
 import {QUERIES_HISTORY_KEY, QUERY_INITIAL_RUN_ACTION_KEY} from '../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
+import {parseQueryError} from '../../utils/error';
 import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
@@ -80,11 +81,10 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
                 error: undefined,
             };
         }
-        // 401 Unauthorized error is handled by GenericAPI
         case SEND_QUERY.FAILURE: {
             return {
                 ...state,
-                error: action.error || 'Unauthorized',
+                error: parseQueryError(action.error),
                 loading: false,
             };
         }
