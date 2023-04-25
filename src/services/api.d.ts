@@ -38,14 +38,14 @@ interface Window {
             },
             axiosOptions?: AxiosOptions,
         ) => Promise<import('../types/api/query').QueryAPIResponse<Action, Schema>>;
-        getExplainQuery: (
+        getExplainQuery: <Action extends import('../types/api/query').ExplainActions = 'explain'>(
             query: string,
             database: string,
-        ) => Promise<import('../types/api/query').QueryAPIExplainResponse<'explain'>>;
+        ) => Promise<import('../types/api/query').ExplainResponse<Action>>;
         getExplainQueryAst: (
             query: string,
             database: string,
-        ) => Promise<import('../types/api/query').QueryAPIExplainResponse<'explain-ast'>>;
+        ) => Promise<import('../types/api/query').ExplainResponse<'explain-ast'>>;
         getHealthcheckInfo: (
             database: string,
         ) => Promise<import('../types/api/healthcheck').HealthCheckAPIResponse>;
