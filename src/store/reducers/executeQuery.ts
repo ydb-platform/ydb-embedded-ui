@@ -1,22 +1,19 @@
 import type {Reducer} from 'redux';
 
-import type {Actions} from '../../types/api/query';
+import type {ExecuteActions} from '../../types/api/query';
 import type {
     ExecuteQueryAction,
     ExecuteQueryState,
     MonacoHotKeyAction,
-    RunAction,
 } from '../../types/store/executeQuery';
-import type {QueryRequestParams} from '../../types/store/query';
+import type {QueryRequestParams, QueryModes} from '../../types/store/query';
 import {getValueFromLS, parseJson} from '../../utils/utils';
-import {QUERIES_HISTORY_KEY, QUERY_INITIAL_RUN_ACTION_KEY} from '../../utils/constants';
+import {QUERIES_HISTORY_KEY} from '../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
 import {parseQueryError} from '../../utils/error';
 import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
-
-import {readSavedSettingsValue} from './settings';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
@@ -26,17 +23,11 @@ const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
 const GO_TO_PREVIOUS_QUERY = 'query/GO_TO_PREVIOUS_QUERY';
 const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
-const SELECT_RUN_ACTION = 'query/SELECT_RUN_ACTION';
 const MONACO_HOT_KEY = 'query/MONACO_HOT_KEY';
 
 const queriesHistoryInitial: string[] = parseJson(getValueFromLS(QUERIES_HISTORY_KEY, '[]'));
 
 const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
-
-export const RUN_ACTIONS_VALUES = {
-    script: 'execute-script',
-    scan: 'execute-scan',
-} as const;
 
 export const MONACO_HOT_KEY_ACTIONS = {
     sendQuery: 'sendQuery',
@@ -55,7 +46,6 @@ const initialState = {
                 ? MAXIMUM_QUERIES_IN_HISTORY - 1
                 : queriesHistoryInitial.length - 1,
     },
-    runAction: readSavedSettingsValue(QUERY_INITIAL_RUN_ACTION_KEY, RUN_ACTIONS_VALUES.script),
     monacoHotKey: null,
 };
 
@@ -86,13 +76,6 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
                 ...state,
                 error: parseQueryError(action.error),
                 loading: false,
-            };
-        }
-
-        case SELECT_RUN_ACTION: {
-            return {
-                ...state,
-                runAction: action.data,
             };
         }
 
@@ -158,10 +141,12 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
 };
 
 interface SendQueryParams extends QueryRequestParams {
-    action: Actions;
+    mode?: QueryModes;
 }
 
-export const sendQuery = ({query, database, action}: SendQueryParams) => {
+export const sendExecuteQuery = ({query, database, mode}: SendQueryParams) => {
+    const action: ExecuteActions = mode ? `execute-${mode}` : 'execute';
+
     return createApiRequest({
         request: window.api.sendQuery({
             schema: 'modern',
@@ -179,13 +164,6 @@ export const saveQueryToHistory = (query: string) => {
     return {
         type: SAVE_QUERY_TO_HISTORY,
         data: query,
-    } as const;
-};
-
-export const selectRunAction = (value: RunAction) => {
-    return {
-        type: SELECT_RUN_ACTION,
-        data: value,
     } as const;
 };
 

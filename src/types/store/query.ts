@@ -22,3 +22,8 @@ export interface QueryRequestParams {
 }
 
 export type QueryError = NetworkError | ErrorResponse;
+
+export enum QueryModes {
+    scan = 'scan',
+    script = 'script',
+}

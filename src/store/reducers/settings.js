@@ -3,14 +3,16 @@ import {
     SAVED_QUERIES_KEY,
     THEME_KEY,
     TENANT_INITIAL_TAB_KEY,
-    QUERY_INITIAL_RUN_ACTION_KEY,
     INVERTED_DISKS_KEY,
     ASIDE_HEADER_COMPACT_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     PARTITIONS_SELECTED_COLUMNS_KEY,
+    QUERY_INITIAL_MODE_KEY,
+    ENABLE_QUERY_MODES_FOR_EXPLAIN,
 } from '../../utils/constants';
 import '../../services/api';
-import {getValueFromLS} from '../../utils/utils';
+import {getValueFromLS, parseJson} from '../../utils/utils';
+import {QueryModes} from '../../types/store/query';
 
 const CHANGE_PROBLEM_FILTER = 'settings/CHANGE_PROBLEM_FILTER';
 const SET_SETTING_VALUE = 'settings/SET_VALUE';
@@ -44,9 +46,13 @@ export const initialState = {
             USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
             'false',
         ),
+        [ENABLE_QUERY_MODES_FOR_EXPLAIN]: readSavedSettingsValue(
+            ENABLE_QUERY_MODES_FOR_EXPLAIN,
+            'false',
+        ),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),
         [TENANT_INITIAL_TAB_KEY]: readSavedSettingsValue(TENANT_INITIAL_TAB_KEY),
-        [QUERY_INITIAL_RUN_ACTION_KEY]: readSavedSettingsValue(QUERY_INITIAL_RUN_ACTION_KEY),
+        [QUERY_INITIAL_MODE_KEY]: readSavedSettingsValue(QUERY_INITIAL_MODE_KEY, QueryModes.script),
         [ASIDE_HEADER_COMPACT_KEY]: readSavedSettingsValue(
             ASIDE_HEADER_COMPACT_KEY,
             legacyAsideNavCompactState || 'true',
@@ -95,6 +101,15 @@ export const setSettingValue = (name, value) => {
 
 export const getSettingValue = (state, name) => {
     return state.settings.userSettings[name];
+};
+
+/**
+ * Returns parsed settings value.
+ * If value cannot be parsed, returns initially stored string
+ */
+export const getParsedSettingValue = (state, name) => {
+    const value = state.settings.userSettings[name];
+    return parseJson(value);
 };
 
 export const changeFilter = (filter) => {

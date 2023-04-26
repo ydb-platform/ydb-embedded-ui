@@ -4,41 +4,36 @@ import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import MonacoEditor from 'react-monaco-editor';
-import {Button, DropdownMenu} from '@gravity-ui/uikit';
 
 import SplitPane from '../../../components/SplitPane';
 import {QueryResultTable} from '../../../components/QueryResultTable';
 
-import SaveQuery from './SaveQuery/SaveQuery';
 import SavedQueries from './SavedQueries/SavedQueries';
-import {Icon} from '../../../components/Icon';
 import QueryResult from './QueryResult/QueryResult';
 import QueryExplain from './QueryExplain/QueryExplain';
+import {QueryEditorControls} from './QueryEditorControls/QueryEditorControls';
+import {OldQueryEditorControls} from './QueryEditorControls/OldQueryEditorControls';
 
 import {
-    sendQuery,
+    sendExecuteQuery,
     changeUserInput,
     saveQueryToHistory,
     goToPreviousQuery,
     goToNextQuery,
-    selectRunAction,
-    RUN_ACTIONS_VALUES,
     MONACO_HOT_KEY_ACTIONS,
     setMonacoHotKey,
 } from '../../../store/reducers/executeQuery';
 import {getExplainQuery, getExplainQueryAst} from '../../../store/reducers/explainQuery';
-import {getSettingValue, setSettingValue} from '../../../store/reducers/settings';
+import {getParsedSettingValue, setSettingValue} from '../../../store/reducers/settings';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
     SAVED_QUERIES_KEY,
-    QUERY_INITIAL_RUN_ACTION_KEY,
+    QUERY_INITIAL_MODE_KEY,
+    ENABLE_QUERY_MODES_FOR_EXPLAIN,
 } from '../../../utils/constants';
 
-import {parseJson} from '../../../utils/utils';
-
 import './QueryEditor.scss';
-import Divider from '../../../components/Divider/Divider';
 import QueriesHistory from './QueriesHistory/QueriesHistory';
 import {
     PaneVisibilityActionTypes,
@@ -46,11 +41,6 @@ import {
 } from '../utils/paneVisibilityToggleHelpers';
 import Preview from '../Preview/Preview';
 import {setShowPreview} from '../../../store/reducers/schema';
-
-export const RUN_ACTIONS = [
-    {value: RUN_ACTIONS_VALUES.script, content: 'Run Script'},
-    {value: RUN_ACTIONS_VALUES.scan, content: 'Run Scan'},
-];
 
 const TABLE_SETTINGS = {
     sortable: false,
@@ -73,7 +63,7 @@ const RESULT_TYPES = {
 const b = cn('query-editor');
 
 const propTypes = {
-    sendQuery: PropTypes.func,
+    sendExecuteQuery: PropTypes.func,
     path: PropTypes.string,
     response: PropTypes.oneOfType([PropTypes.bool, PropTypes.array]),
     executeQuery: PropTypes.object,
@@ -81,6 +71,7 @@ const propTypes = {
     setMonacoHotKey: PropTypes.func,
     theme: PropTypes.string,
     type: PropTypes.string,
+    initialQueryMode: PropTypes.string,
 };
 
 const initialTenantCommonInfoState = {
@@ -92,6 +83,7 @@ function QueryEditor(props) {
     const [resultType, setResultType] = useState(RESULT_TYPES.EXECUTE);
 
     const [isResultLoaded, setIsResultLoaded] = useState(false);
+    const [queryMode, setQueryMode] = useState(props.initialQueryMode);
 
     const [resultVisibilityState, dispatchResultVisibilityState] = useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
@@ -155,7 +147,7 @@ function QueryEditor(props) {
         setMonacoHotKey(null);
         switch (monacoHotKey) {
             case MONACO_HOT_KEY_ACTIONS.sendQuery: {
-                return handleSendClick();
+                return handleSendExecuteClick(queryMode);
             }
             case MONACO_HOT_KEY_ACTIONS.goPrev: {
                 return handlePreviousHistoryClick();
@@ -246,17 +238,17 @@ function QueryEditor(props) {
         props.changeUserInput({input: newValue});
     };
 
-    const handleSendClick = () => {
+    const handleSendExecuteClick = (mode) => {
         const {
             path,
-            executeQuery: {input, history, runAction},
-            sendQuery,
+            executeQuery: {input, history},
+            sendExecuteQuery,
             saveQueryToHistory,
             setShowPreview,
         } = props;
 
         setResultType(RESULT_TYPES.EXECUTE);
-        sendQuery({query: input, database: path, action: runAction});
+        sendExecuteQuery({query: input, database: path, mode});
         setIsResultLoaded(true);
         setShowPreview(false);
 
@@ -267,15 +259,20 @@ function QueryEditor(props) {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
 
-    const handleGetExplainQueryClick = () => {
+    const handleGetExplainQueryClick = (mode) => {
         const {
             path,
             executeQuery: {input},
             getExplainQuery,
             setShowPreview,
         } = props;
+
         setResultType(RESULT_TYPES.EXPLAIN);
-        getExplainQuery({query: input, database: path});
+        getExplainQuery({
+            query: input,
+            database: path,
+            mode: mode,
+        });
         setIsResultLoaded(true);
         setShowPreview(false);
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
@@ -513,65 +510,42 @@ function QueryEditor(props) {
         setSettingValue(SAVED_QUERIES_KEY, JSON.stringify(newSavedQueries));
     };
 
-    const renderControls = () => {
-        const {executeQuery, explainQuery, savedQueries, selectRunAction, setSettingValue} = props;
-        const {runAction} = executeQuery;
-        const runIsDisabled = !executeQuery.input || executeQuery.loading;
-        const runText = _.find(RUN_ACTIONS, {value: runAction}).content;
+    const onUpdateQueryMode = (mode) => {
+        setQueryMode(mode);
+        props.setSettingValue(QUERY_INITIAL_MODE_KEY, mode);
+    };
 
-        const menuItems = RUN_ACTIONS.map((action) => {
-            return {
-                text: action.content,
-                action: () => {
-                    selectRunAction(action.value);
-                    setSettingValue(QUERY_INITIAL_RUN_ACTION_KEY, action.value);
-                },
-            };
-        });
+    const renderControls = () => {
+        const {executeQuery, explainQuery, savedQueries, enableQueryModesForExplain} = props;
+
+        if (enableQueryModesForExplain) {
+            return (
+                <QueryEditorControls
+                    onRunButtonClick={handleSendExecuteClick}
+                    runIsLoading={executeQuery.loading}
+                    onExplainButtonClick={handleGetExplainQueryClick}
+                    explainIsLoading={explainQuery.loading}
+                    onSaveQueryClick={onSaveQueryHandler}
+                    savedQueries={savedQueries}
+                    disabled={!executeQuery.input}
+                    onUpdateQueryMode={onUpdateQueryMode}
+                    queryMode={queryMode}
+                />
+            );
+        }
 
         return (
-            <div className={b('controls')}>
-                <div className={b('control-run')}>
-                    <Button
-                        onClick={handleSendClick}
-                        view="action"
-                        pin="round-brick"
-                        disabled={runIsDisabled}
-                        loading={executeQuery.loading}
-                    >
-                        <Icon name="startPlay" viewBox="0 0 16 16" width={16} height={16} />
-                        {runText}
-                    </Button>
-                    <DropdownMenu
-                        items={menuItems}
-                        popupClassName={b('select-query-action-popup')}
-                        switcher={
-                            <Button
-                                view="action"
-                                pin="brick-round"
-                                disabled={runIsDisabled}
-                                loading={executeQuery.loading}
-                                className={b('select-query-action')}
-                            >
-                                <Icon name="chevron-down" width={16} height={16} />
-                            </Button>
-                        }
-                    />
-                </div>
-                <Button
-                    onClick={handleGetExplainQueryClick}
-                    disabled={!executeQuery.input}
-                    loading={explainQuery.loading}
-                >
-                    Explain
-                </Button>
-                <Divider />
-                <SaveQuery
-                    savedQueries={savedQueries}
-                    onSaveQuery={onSaveQueryHandler}
-                    saveButtonDisabled={runIsDisabled}
-                />
-            </div>
+            <OldQueryEditorControls
+                onRunButtonClick={handleSendExecuteClick}
+                runIsLoading={executeQuery.loading}
+                onExplainButtonClick={handleGetExplainQueryClick}
+                explainIsLoading={explainQuery.loading}
+                onSaveQueryClick={onSaveQueryHandler}
+                savedQueries={savedQueries}
+                disabled={!executeQuery.input}
+                onUpdateQueryMode={onUpdateQueryMode}
+                queryMode={queryMode}
+            />
         );
     };
 
@@ -632,7 +606,9 @@ const mapStateToProps = (state) => {
     return {
         executeQuery: state.executeQuery,
         explainQuery: state.explainQuery,
-        savedQueries: parseJson(getSettingValue(state, SAVED_QUERIES_KEY)),
+        savedQueries: getParsedSettingValue(state, SAVED_QUERIES_KEY),
+        initialQueryMode: getParsedSettingValue(state, QUERY_INITIAL_MODE_KEY),
+        enableQueryModesForExplain: getParsedSettingValue(state, ENABLE_QUERY_MODES_FOR_EXPLAIN),
         showPreview: state.schema.showPreview,
         currentSchema: state.schema.currentSchema,
         monacoHotKey: state.executeQuery?.monacoHotKey,
@@ -640,7 +616,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-    sendQuery,
+    sendExecuteQuery,
     changeUserInput,
     saveQueryToHistory,
     goToPreviousQuery,
@@ -648,7 +624,6 @@ const mapDispatchToProps = {
     getExplainQuery,
     getExplainQueryAst,
     setSettingValue,
-    selectRunAction,
     setShowPreview,
     setMonacoHotKey,
 };

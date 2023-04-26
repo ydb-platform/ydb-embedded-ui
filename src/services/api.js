@@ -207,11 +207,11 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
-    getExplainQuery(query, database) {
+    getExplainQuery(query, database, action = 'explain') {
         return this.post(this.getPath('/viewer/json/query'), {
             query,
             database,
-            action: 'explain',
+            action,
             timeout: 600000,
         });
     }
