@@ -102,12 +102,6 @@ function QueryExplain(props) {
         };
     }, []);
 
-    useEffect(() => {
-        if (!props.ast && activeOption === ExplainOptionIds.ast) {
-            props.astQuery();
-        }
-    }, [activeOption, props.ast]);
-
     const onSelectOption = (tabId) => {
         setActiveOption(tabId);
     };
@@ -121,7 +115,9 @@ function QueryExplain(props) {
     };
 
     const renderStub = () => {
-        return <div className={b('text-message')}>There is no explanation for the request</div>;
+        return (
+            <div className={b('text-message')}>{`There is no ${activeOption} for the request`}</div>
+        );
     };
 
     const hasContent = () => {
