@@ -94,6 +94,7 @@ export type IProblemFilterValues = typeof ALL | typeof PROBLEMS;
 export const THEME_KEY = 'theme';
 export const INVERTED_DISKS_KEY = 'invertedDisks';
 export const USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY = 'useNodesEndpointInDiagnostics';
+export const ENABLE_QUERY_MODES_FOR_EXPLAIN = 'enableQueryModesForExplain';
 export const SAVED_QUERIES_KEY = 'saved_queries';
 export const ASIDE_HEADER_COMPACT_KEY = 'asideHeaderCompact';
 export const QUERIES_HISTORY_KEY = 'queries_history';
@@ -118,6 +119,6 @@ export const DEFAULT_TABLE_SETTINGS = {
 } as const;
 
 export const TENANT_INITIAL_TAB_KEY = 'saved_tenant_initial_tab';
-export const QUERY_INITIAL_RUN_ACTION_KEY = 'query_initial_run_action';
+export const QUERY_INITIAL_MODE_KEY = 'query_initial_mode';
 
 export const PARTITIONS_SELECTED_COLUMNS_KEY = 'partitionsSelectedColumns';

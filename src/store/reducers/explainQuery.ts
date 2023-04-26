@@ -3,12 +3,13 @@ import type {ExplainPlanNodeData, GraphNode, Link} from '@gravity-ui/paranoid';
 import _ from 'lodash';
 
 import '../../services/api';
+import type {ExplainActions} from '../../types/api/query';
 import type {
     ExplainQueryAction,
     ExplainQueryState,
     PreparedExplainResponse,
 } from '../../types/store/explainQuery';
-import type {QueryRequestParams} from '../../types/store/query';
+import type {QueryRequestParams, QueryModes} from '../../types/store/query';
 
 import {preparePlan} from '../../utils/prepareQueryExplain';
 import {parseQueryAPIExplainResponse, parseQueryExplainPlan} from '../../utils/query';
@@ -97,9 +98,15 @@ export const explainVersions = {
 
 const supportedExplainQueryVersions = Object.values(explainVersions);
 
-export const getExplainQuery = ({query, database}: QueryRequestParams) => {
+interface ExplainQueryParams extends QueryRequestParams {
+    mode?: QueryModes;
+}
+
+export const getExplainQuery = ({query, database, mode}: ExplainQueryParams) => {
+    const action: ExplainActions = mode ? `explain-${mode}` : 'explain';
+
     return createApiRequest({
-        request: window.api.getExplainQuery(query, database),
+        request: window.api.getExplainQuery(query, database, action),
         actions: GET_EXPLAIN_QUERY,
         dataHandler: (response): PreparedExplainResponse => {
             const {plan: rawPlan, ast} = parseQueryAPIExplainResponse(response);

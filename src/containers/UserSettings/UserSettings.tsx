@@ -9,6 +9,7 @@ import favoriteFilledIcon from '../../assets/icons/star.svg';
 import flaskIcon from '../../assets/icons/flask.svg';
 
 import {
+    ENABLE_QUERY_MODES_FOR_EXPLAIN,
     INVERTED_DISKS_KEY,
     THEME_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
@@ -39,12 +40,29 @@ function UserSettings(props: any) {
         props.setSettingValue(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY, String(value));
     };
 
+    const _onExplainQueryModesChangeHandler = (value: boolean) => {
+        props.setSettingValue(ENABLE_QUERY_MODES_FOR_EXPLAIN, String(value));
+    };
+
     const renderBreakNodesSettingsItem = (title: ReactNode) => {
         return (
             <div className={b('item-with-popup')}>
                 {title}
                 <HelpPopover
                     content="Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on older versions"
+                    contentClassName={b('popup')}
+                    hasArrow={true}
+                />
+            </div>
+        );
+    };
+
+    const renderEnableExplainQueryModesItem = (title: ReactNode) => {
+        return (
+            <div className={b('item-with-popup')}>
+                {title}
+                <HelpPopover
+                    content="Enable script | scan query mode selector for both run and explain. May not work on some versions"
                     contentClassName={b('popup')}
                     hasArrow={true}
                 />
@@ -86,6 +104,15 @@ function UserSettings(props: any) {
                             onUpdate={_onNodesEndpointChangeHandler}
                         />
                     </Settings.Item>
+                    <Settings.Item
+                        title="Enable query modes for explain"
+                        renderTitleComponent={renderEnableExplainQueryModesItem}
+                    >
+                        <Switch
+                            checked={props.enableQueryModesForExplain}
+                            onUpdate={_onExplainQueryModesChangeHandler}
+                        />
+                    </Settings.Item>
                 </Settings.Section>
             </Settings.Page>
         </Settings>
@@ -93,12 +120,14 @@ function UserSettings(props: any) {
 }
 
 const mapStateToProps = (state: any) => {
-    const {theme, invertedDisks, useNodesEndpointInDiagnostics} = state.settings.userSettings;
+    const {theme, invertedDisks, useNodesEndpointInDiagnostics, enableQueryModesForExplain} =
+        state.settings.userSettings;
 
     return {
         theme,
         invertedDisks: JSON.parse(invertedDisks),
         useNodesEndpointInDiagnostics: JSON.parse(useNodesEndpointInDiagnostics),
+        enableQueryModesForExplain: JSON.parse(enableQueryModesForExplain),
     };
 };
 

@@ -1,11 +1,10 @@
 export function parseJson(value) {
     if (!value) {
-        return;
+        return undefined;
     }
     try {
         return JSON.parse(value);
     } catch (err) {
-        console.log(err);
         return value;
     }
 }

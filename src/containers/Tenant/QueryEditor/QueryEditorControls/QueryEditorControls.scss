@@ -1,0 +1,57 @@
+.ydb-query-editor-controls {
+    display: flex;
+    flex: 0 0 40px;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    min-height: 40px;
+    padding: 5px 20px;
+
+    border-top: 1px solid var(--yc-color-line-generic);
+    border-bottom: 1px solid var(--yc-color-line-generic);
+    background-color: var(--yc-color-base-background);
+    gap: 24px;
+
+    &__left {
+        display: flex;
+        gap: 12px;
+    }
+
+    &__run {
+        display: flex;
+        align-items: center;
+        .yc-select__option-text {
+            display: none;
+        }
+
+        .yc-button__text {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+    }
+
+    &__select-query-action {
+        margin-left: 2px;
+    }
+
+    &__mode-selector {
+        &__popup {
+            width: 120px;
+        }
+
+        &__button {
+            width: 120px;
+            margin-left: 2px;
+        }
+
+        &__button-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            width: 100px;
+        }
+    }
+}

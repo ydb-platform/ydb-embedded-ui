@@ -54,35 +54,6 @@
         align-items: center;
     }
 
-    &__controls {
-        display: flex;
-        flex: 0 0 40px;
-        align-items: flex-end;
-
-        min-height: 40px;
-        padding: 5px 20px;
-
-        border-top: 1px solid var(--yc-color-line-generic);
-        border-bottom: 1px solid var(--yc-color-line-generic);
-        background-color: var(--yc-color-base-background);
-        gap: 12px;
-    }
-
-    &__control-run {
-        display: flex;
-        align-items: center;
-        .yc-select__option-text {
-            display: none;
-        }
-
-        .yc-button__text {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-    }
-
     &__history-controls {
         display: flex;
         align-items: center;
@@ -92,9 +63,5 @@
         margin-right: 8px;
 
         color: var(--yc-color-text-secondary);
-    }
-
-    &__select-query-action {
-        margin-left: 2px;
     }
 }

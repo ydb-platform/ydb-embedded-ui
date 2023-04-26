@@ -41,6 +41,7 @@ interface Window {
         getExplainQuery: <Action extends import('../types/api/query').ExplainActions = 'explain'>(
             query: string,
             database: string,
+            action?: Action,
         ) => Promise<import('../types/api/query').ExplainResponse<Action>>;
         getExplainQueryAst: (
             query: string,
