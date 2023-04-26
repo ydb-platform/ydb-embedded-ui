@@ -9,18 +9,15 @@ type ExplainResultType = 'Schema' | 'JSON' | 'AST';
 export class QueryEditor extends BaseModel {
     protected readonly editorTextArea: Locator;
     protected readonly runButton: Locator;
-    protected readonly scanButton: Locator;
+    protected readonly explainButton: Locator;
 
     constructor(page: Page) {
         super(page, page.locator('.query-editor'));
 
         this.editorTextArea = this.selector.locator('.query-editor__monaco textarea');
 
-        this.runButton = this.selector.locator('.query-editor__control-run > button');
-
-        this.scanButton = this.selector
-            .locator('.query-editor__controls > button')
-            .locator('nth=0');
+        this.runButton = this.selector.getByRole('button', {name: /Run/});
+        this.explainButton = this.selector.getByRole('button', {name: /Explain/});
     }
 
     async runScript(query: string) {
@@ -35,7 +32,7 @@ export class QueryEditor extends BaseModel {
     }
     async explain(query: string) {
         await this.editorTextArea.fill(query);
-        await this.scanButton.click();
+        await this.explainButton.click();
     }
 
     // eslint-disable-next-line consistent-return
@@ -72,10 +69,14 @@ export class QueryEditor extends BaseModel {
     }
 
     protected async selectRunButtonType(type: ButtonType) {
-        const selectRunModeButton = this.selector.locator('.query-editor__select-query-action');
+        const selectRunModeButton = this.selector.locator(
+            '.ydb-query-editor-controls__select-query-action',
+        );
         await selectRunModeButton.click();
 
-        const runModeSelect = this.page.locator('.query-editor__select-query-action-popup');
+        const runModeSelect = this.page.locator(
+            '.ydb-query-editor-controls__select-query-action-popup',
+        );
         await runModeSelect.waitFor({state: 'visible'});
         await runModeSelect.getByText(type).click();
     }
