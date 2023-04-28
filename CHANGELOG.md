@@ -1,5 +1,27 @@
 # Changelog
 
+## [4.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.5.0...v4.0.0) (2023-04-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* app no longer parses query responses from older ydb versions
+* v0.1 explain plans are no longer rendered
+
+### Features
+
+* enable explain-script parsing, remove deprecated code ([5c6e9a2](https://github.com/ydb-platform/ydb-embedded-ui/commit/5c6e9a21026ea9eb3e32650e6fdda89c7900e7e6))
+* **QueryEditor:** add explain query modes ([39ad943](https://github.com/ydb-platform/ydb-embedded-ui/commit/39ad9434c1622e22901e6cc1af1568e0edf6b434))
+* **QueryEditor:** display query duration ([967f102](https://github.com/ydb-platform/ydb-embedded-ui/commit/967f10296d2362709654172ed7318509286efc78))
+* remove support for explain v0.1 ([c8741a6](https://github.com/ydb-platform/ydb-embedded-ui/commit/c8741a69b82053185a07c7ba563455d4f28ecdce))
+
+
+### Bug Fixes
+
+* **query:** correctly process NetworkError on actions failure ([cf5bd6c](https://github.com/ydb-platform/ydb-embedded-ui/commit/cf5bd6c5c4c2972fec93b2dc9135c92c639fa5f9))
+* **QueryExplain:** do not request ast when missing ([54cf151](https://github.com/ydb-platform/ydb-embedded-ui/commit/54cf151452e17256173736450f5727085ea591ff))
+* **QueryExplain:** request AST if it is empty ([d028b4e](https://github.com/ydb-platform/ydb-embedded-ui/commit/d028b4ed08a98281baff81683204f1cbc1c20c37))
+
 ## [3.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.4.5...v3.5.0) (2023-04-18)
 
 
