@@ -15,6 +15,8 @@ export const NodesUptimeFilterTitles = {
 export const isUnavailableNode = (node: INodesPreparedEntity | TSystemStateInfo) =>
     !node.SystemState || node.SystemState === EFlag.Grey;
 
+export type NodeAddress = Pick<TSystemStateInfo, 'Host' | 'Endpoints'>;
+
 export interface AdditionalNodesInfo extends Record<string, unknown> {
-    getNodeRef?: Function;
+    getNodeRef?: (node?: NodeAddress) => string;
 }

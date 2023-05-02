@@ -1,12 +1,10 @@
-.ydb-nodes-table {
-    &__host-field-wrapper {
-        display: flex;
-    }
+.ydb-node-host-wrapper {
+    display: flex;
 
     &__host-wrapper {
         display: flex;
 
-        max-width: 330px;
+        width: 330px;
     }
 
     &__host {
@@ -21,7 +19,7 @@
 }
 
 .data-table__row:hover {
-    .ydb-nodes-table__external-button {
+    .ydb-node-host-wrapper__external-button {
         display: inline-flex;
     }
 }
