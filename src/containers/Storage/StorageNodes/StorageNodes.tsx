@@ -2,11 +2,6 @@ import _ from 'lodash';
 import cn from 'bem-cn-lite';
 
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
-import {Button, Popover, PopoverBehavior} from '@gravity-ui/uikit';
-
-import {NodeEndpointsTooltip} from '../../../components/Tooltips/NodeEndpointsTooltip/NodeEndpointsTooltip';
-import EntityStatus from '../../../components/EntityStatus/EntityStatus';
-import {IconWrapper} from '../../../components/Icon';
 
 import {VisibleEntities} from '../../../store/reducers/storage';
 import {
@@ -15,7 +10,7 @@ import {
     NodesUptimeFilterValues,
 } from '../../../utils/nodes';
 
-import {getDefaultNodePath} from '../../Node/NodePages';
+import {NodeHostWrapper} from '../../../components/NodeHostWrapper/NodeHostWrapper';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
 import {PDisk} from '../PDisk';
@@ -100,39 +95,7 @@ function StorageNodes({
             header: tableColumnsNames[TableColumnsIds.FQDN],
             width: 350,
             render: ({row}) => {
-                const nodeRef = getNodeRef ? getNodeRef(row) + 'internal' : undefined;
-                if (!row.Host) {
-                    return <span>—</span>;
-                }
-                return (
-                    <div className={b('fqdn-field-wrapper')}>
-                        <Popover
-                            content={<NodeEndpointsTooltip data={row} />}
-                            placement={['top', 'bottom']}
-                            behavior={PopoverBehavior.Immediate}
-                        >
-                            <div className={b('fqdn-wrapper')}>
-                                <EntityStatus
-                                    name={row.Host}
-                                    showStatus={false}
-                                    path={getDefaultNodePath(row.NodeId)}
-                                    hasClipboardButton
-                                    className={b('fqdn')}
-                                />
-                                {nodeRef && (
-                                    <Button
-                                        size="s"
-                                        href={nodeRef}
-                                        className={b('external-button')}
-                                        target="_blank"
-                                    >
-                                        <IconWrapper name="external" />
-                                    </Button>
-                                )}
-                            </div>
-                        </Popover>
-                    </div>
-                );
+                return <NodeHostWrapper node={row} getNodeRef={getNodeRef} />;
             },
             align: DataTable.LEFT,
         },

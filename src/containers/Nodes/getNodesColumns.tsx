@@ -1,29 +1,22 @@
-import cn from 'bem-cn-lite';
 import DataTable, {Column} from '@gravity-ui/react-data-table';
-import {Button, Popover, PopoverBehavior} from '@gravity-ui/uikit';
+import {Popover} from '@gravity-ui/uikit';
 
-import {IconWrapper} from '../../components/Icon';
-import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
 import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
-import {NodeEndpointsTooltip} from '../../components/Tooltips/NodeEndpointsTooltip/NodeEndpointsTooltip';
+import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
 
+import type {NodeAddress} from '../../utils/nodes';
 import {formatBytesToGigabyte} from '../../utils/index';
-import {INodesPreparedEntity} from '../../types/store/nodes';
+
+import type {INodesPreparedEntity} from '../../types/store/nodes';
 import {showTooltip as externalShowTooltip} from '../../store/reducers/tooltip';
-
-import {getDefaultNodePath} from '../Node/NodePages';
-
-import './NodesTable.scss';
-
-const b = cn('ydb-nodes-table');
 
 interface GetNodesColumnsProps {
     showTooltip: (...args: Parameters<typeof externalShowTooltip>) => void;
     hideTooltip: VoidFunction;
     tabletsPath?: string;
-    getNodeRef?: Function;
+    getNodeRef?: (node?: NodeAddress) => string;
 }
 
 export function getNodesColumns({
@@ -42,39 +35,7 @@ export function getNodesColumns({
         {
             name: 'Host',
             render: ({row}) => {
-                const nodeRef = getNodeRef ? getNodeRef(row) + 'internal' : undefined;
-                if (typeof row.Host === 'undefined') {
-                    return <span>—</span>;
-                }
-                return (
-                    <div className={b('host-field-wrapper')}>
-                        <Popover
-                            content={<NodeEndpointsTooltip data={row} />}
-                            placement={['top', 'bottom']}
-                            behavior={PopoverBehavior.Immediate}
-                        >
-                            <div className={b('host-wrapper')}>
-                                <EntityStatus
-                                    name={row.Host}
-                                    status={row.SystemState}
-                                    path={getDefaultNodePath(row.NodeId)}
-                                    hasClipboardButton
-                                    className={b('host')}
-                                />
-                                {nodeRef && (
-                                    <Button
-                                        size="s"
-                                        href={nodeRef}
-                                        className={b('external-button')}
-                                        target="_blank"
-                                    >
-                                        <IconWrapper name="external" />
-                                    </Button>
-                                )}
-                            </div>
-                        </Popover>
-                    </div>
-                );
+                return <NodeHostWrapper node={row} getNodeRef={getNodeRef} />;
             },
             width: '350px',
             align: DataTable.LEFT,
