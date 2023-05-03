@@ -37,4 +37,9 @@ interface Window {
     custom_backend?: string;
 
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof import('redux').compose;
+
+    userSettings?: Record<string, string | undefined>;
+    systemSettings?: Record<string, string | undefined>;
+
+    api: import('../services/api').YdbEmbeddedAPI;
 }
