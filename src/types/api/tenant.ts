@@ -3,7 +3,7 @@ import {TPoolStats, TSystemStateInfo} from './nodes';
 import {TTabletStateInfo} from './tablet';
 
 /**
- * endpoint: /viewer/json/tenantinfo
+ * endpoint: /viewer/json/tenants
  *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
  */
@@ -11,6 +11,11 @@ export interface TTenants {
     Tenants?: TTenant[];
 }
 
+/**
+ * endpoint: /viewer/json/tenantinfo
+ *
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
+ */
 export interface TTenantInfo {
     TenantInfo?: TTenant[];
     Errors?: string[];

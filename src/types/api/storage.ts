@@ -1,9 +1,11 @@
 import {EFlag} from './enums';
 import {TVDiskStateInfo} from './vdisk';
 
-// endpoint: /viewer/json/storage
-// source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
-
+/**
+ * endpoint: /viewer/json/storage
+ * 
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
+ */
 export interface TStorageInfo {
     Overall?: EFlag;
     StoragePools?: TStoragePoolInfo[];
