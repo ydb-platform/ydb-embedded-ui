@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import {useLocation} from 'react-router';
 import {useHistory} from 'react-router-dom';
@@ -169,16 +169,6 @@ function AsideNavigation(props: AsideNavigationProps) {
     const setIsCompact = (compact: boolean) => {
         props.setSettingValue(ASIDE_HEADER_COMPACT_KEY, JSON.stringify(compact));
     };
-
-    // navigation managed its compact state internally before, and its approach is not compatible with settings
-    // to migrate, save the incoming value again; save only `false` because `true` is the default value
-    // assume it is safe to remove this code block if it is at least a few months old
-    // there a two of these, search for a similar comment
-    useEffect(() => {
-        if (props.compact === false) {
-            setIsCompact(props.compact);
-        }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const menuItems: AsideHeaderMenuItem[] = React.useMemo(() => {
         const {pathname} = location;
