@@ -2,9 +2,11 @@ import {EFlag} from './enums';
 import {TEndpoint, TLegacyNodeLocation, TPoolStats} from './nodes';
 import {TMetrics} from './tenant';
 
-// endpoint: viewer/json/compute
-// source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
-
+/**
+ * endpoint: viewer/json/compute
+ * 
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
+ */
 export interface TComputeInfo {
     Overall: EFlag;
     Tenants?: TComputeTenantInfo[];
