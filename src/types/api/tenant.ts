@@ -2,9 +2,11 @@ import {EFlag} from './enums';
 import {TPoolStats, TSystemStateInfo} from './nodes';
 import {TTabletStateInfo} from './tablet';
 
-// endpoint: /viewer/json/tenantinfo
-// source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
-
+/**
+ * endpoint: /viewer/json/tenantinfo
+ *
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
+ */
 export interface TTenants {
     Tenants?: TTenant[];
 }
@@ -47,6 +49,8 @@ export interface TTenant {
     CoresUsed: number;
     /** uint64 */
     StorageGroups: string;
+    MonitoringEndpoint?: string; // additional
+    ControlPlane?: ControlPlane; // additional
 }
 
 interface THiveDomainStatsStateCount {
@@ -105,6 +109,11 @@ interface TTenantResource {
     Zone: string;
     Kind: string;
     Count: number;
+}
+
+/** incomplete */
+interface ControlPlane {
+    name?: string;
 }
 
 export enum ETenantType {
