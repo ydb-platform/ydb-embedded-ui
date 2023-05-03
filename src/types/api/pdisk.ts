@@ -2,9 +2,16 @@ import {EFlag} from './enums';
 
 /**
  * endpoint: /viewer/json/pdiskinfo
- * 
+ *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/node_whiteboard.proto
  */
+export interface TEvPDiskStateResponse {
+    PDiskStateInfo?: TPDiskStateInfo[];
+    /** uint64 */
+    ResponseTime?: string;
+    ResponseDuration?: number;
+}
+
 export interface TPDiskStateInfo {
     PDiskId?: number;
     /** uint64 */

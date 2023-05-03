@@ -6,6 +6,12 @@ import {TPDiskStateInfo} from './pdisk';
  *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/node_whiteboard.proto
  */
+export interface TEvVDiskStateResponse {
+    VDiskStateInfo?: TVDiskStateInfo[];
+    ResponseTime?: string;
+    ResponseDuration?: number;
+}
+
 export interface TVDiskStateInfo {
     VDiskId?: TVDiskID;
     /** uint64 */
