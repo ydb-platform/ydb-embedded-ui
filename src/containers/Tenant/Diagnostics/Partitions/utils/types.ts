@@ -1,6 +1,6 @@
-import type {IPreparedPartitionData} from '../../../../../types/store/consumer';
+import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
 
-export interface IPreparedPartitionDataWithHosts extends IPreparedPartitionData {
+export interface PreparedPartitionDataWithHosts extends PreparedPartitionData {
     partitionHost: string | undefined;
     connectionHost: string | undefined;
 }

@@ -74,7 +74,7 @@ export interface DescribeTopicResult {
 }
 
 /** Partition info types differs for consumer and topic, although they are very similar */
-interface PartitionInfo {
+export interface PartitionInfo {
     /** int64  */
     partition_id?: string;
 
