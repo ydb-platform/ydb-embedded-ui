@@ -14,8 +14,9 @@ import {
     PARTITIONS_READ_LAGS_SUB_COLUMNS_TITLES,
     PARTITIONS_WRITE_LAGS_SUB_COLUMNS_IDS,
     PARTITIONS_WRITE_LAGS_SUB_COLUMNS_TITLES,
+    generalPartitionColumnsIds,
 } from '../utils/constants';
-import type {IPreparedPartitionDataWithHosts} from '../utils/types';
+import type {PreparedPartitionDataWithHosts} from '../utils/types';
 
 import {
     MultilineHeader,
@@ -30,7 +31,7 @@ import './Columns.scss';
 
 const b = block('ydb-diagnostics-partitions-columns');
 
-export const columns: Column<IPreparedPartitionDataWithHosts>[] = [
+export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.PARTITION_ID,
         header: (
@@ -63,7 +64,7 @@ export const columns: Column<IPreparedPartitionDataWithHosts>[] = [
         name: PARTITIONS_COLUMNS_IDS.READ_SPEED,
         header: PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.READ_SPEED],
         align: DataTable.LEFT,
-        sortAccessor: (row) => row.readSpeed.perMinute,
+        sortAccessor: (row) => row.readSpeed?.perMinute,
         render: ({row}) => <SpeedMultiMeter data={row.readSpeed} />,
     },
     {
@@ -210,10 +211,10 @@ export const columns: Column<IPreparedPartitionDataWithHosts>[] = [
         ),
         align: DataTable.LEFT,
         render: ({row}) =>
-            row.partitionHost ? (
+            row.partitionNodeId && row.partitionHost ? (
                 <EntityStatus
                     name={row.partitionHost}
-                    path={getDefaultNodePath(row.partitionHost)}
+                    path={getDefaultNodePath(row.partitionNodeId)}
                     showStatus={false}
                     hasClipboardButton
                     className={b('string-with-copy')}
@@ -231,7 +232,7 @@ export const columns: Column<IPreparedPartitionDataWithHosts>[] = [
         ),
         align: DataTable.LEFT,
         render: ({row}) =>
-            row.connectionHost ? (
+            row.connectionNodeId && row.connectionHost ? (
                 <EntityStatus
                     name={row.connectionHost}
                     path={getDefaultNodePath(row.connectionNodeId)}
@@ -244,3 +245,11 @@ export const columns: Column<IPreparedPartitionDataWithHosts>[] = [
             ),
     },
 ];
+
+// Topics without consumers have partitions data with no data corresponding to consumers
+// These columns will be empty and should not be displayed
+export const generalColumns = allColumns.filter((column) => {
+    return generalPartitionColumnsIds.includes(
+        column.name as typeof generalPartitionColumnsIds[number],
+    );
+});

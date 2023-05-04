@@ -71,4 +71,16 @@ export const PARTITIONS_READ_LAGS_SUB_COLUMNS_TITLES = {
     [PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_READ_IDLE_TIME]: 'read idle time',
 } as const;
 
-export const PARTITIONS_DEFAULT_SELECTED_COLUMNS = Object.values(PARTITIONS_COLUMNS_IDS);
+// Topics without consumers have partitions data with no data corresponding to consumers
+// These columns will be empty and should not be displayed
+export const generalPartitionColumnsIds = [
+    PARTITIONS_COLUMNS_IDS.PARTITION_ID,
+    PARTITIONS_COLUMNS_IDS.STORE_SIZE,
+    PARTITIONS_COLUMNS_IDS.WRITE_SPEED,
+    PARTITIONS_COLUMNS_IDS.WRITE_LAGS,
+    PARTITIONS_COLUMNS_IDS.START_OFFSET,
+    PARTITIONS_COLUMNS_IDS.END_OFFSET,
+    PARTITIONS_COLUMNS_IDS.PARTITION_HOST,
+];
+
+export const allPartitionsColumnsIds = Object.values(PARTITIONS_COLUMNS_IDS);

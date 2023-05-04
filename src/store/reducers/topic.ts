@@ -98,6 +98,13 @@ export function getTopic(path?: string) {
 const selectTopicStats = (state: ITopicRootStateSlice) => state.topic.data?.topic_stats;
 const selectConsumers = (state: ITopicRootStateSlice) => state.topic.data?.consumers;
 
+export const selectConsumersNames: Selector<ITopicRootStateSlice, string[] | undefined> =
+    createSelector([selectConsumers], (consumers) => {
+        return consumers
+            ?.map((consumer) => consumer?.name)
+            .filter((consumer): consumer is string => consumer !== undefined);
+    });
+
 export const selectPreparedTopicStats: Selector<
     ITopicRootStateSlice,
     IPreparedTopicStats | undefined

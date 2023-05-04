@@ -6,7 +6,7 @@ import {
     INVERTED_DISKS_KEY,
     ASIDE_HEADER_COMPACT_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
-    PARTITIONS_SELECTED_COLUMNS_KEY,
+    PARTITIONS_HIDDEN_COLUMNS_KEY,
     QUERY_INITIAL_MODE_KEY,
     ENABLE_QUERY_MODES_FOR_EXPLAIN,
 } from '../../utils/constants';
@@ -44,7 +44,7 @@ export const initialState = {
         [TENANT_INITIAL_TAB_KEY]: readSavedSettingsValue(TENANT_INITIAL_TAB_KEY),
         [QUERY_INITIAL_MODE_KEY]: readSavedSettingsValue(QUERY_INITIAL_MODE_KEY, QueryModes.script),
         [ASIDE_HEADER_COMPACT_KEY]: readSavedSettingsValue(ASIDE_HEADER_COMPACT_KEY, 'true'),
-        [PARTITIONS_SELECTED_COLUMNS_KEY]: readSavedSettingsValue(PARTITIONS_SELECTED_COLUMNS_KEY),
+        [PARTITIONS_HIDDEN_COLUMNS_KEY]: readSavedSettingsValue(PARTITIONS_HIDDEN_COLUMNS_KEY),
     },
     systemSettings,
 };

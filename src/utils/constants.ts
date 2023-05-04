@@ -121,4 +121,4 @@ export const DEFAULT_TABLE_SETTINGS = {
 export const TENANT_INITIAL_TAB_KEY = 'saved_tenant_initial_tab';
 export const QUERY_INITIAL_MODE_KEY = 'query_initial_mode';
 
-export const PARTITIONS_SELECTED_COLUMNS_KEY = 'partitionsSelectedColumns';
+export const PARTITIONS_HIDDEN_COLUMNS_KEY = 'partitionsHiddenColumns';

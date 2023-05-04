@@ -216,7 +216,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getConsumer(
-        {path, consumer}: {path?: string; consumer?: string},
+        {path, consumer}: {path: string; consumer: string},
         {concurrentId}: AxiosOptions = {},
     ) {
         return this.get<DescribeConsumerResult>(
