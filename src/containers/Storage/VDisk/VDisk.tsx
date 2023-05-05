@@ -16,7 +16,7 @@ import {STRUCTURE} from '../../Node/NodePages';
 import {DiskStateProgressBar, EDiskStateSeverity} from '../DiskStateProgressBar';
 import {VDiskPopup} from '../VDiskPopup';
 
-import type {IUnavailableDonor} from '../utils/types';
+import type {UnavailableDonor} from '../utils/types';
 import {NOT_AVAILABLE_SEVERITY} from '../utils';
 
 import './VDisk.scss';
@@ -49,13 +49,12 @@ const getColorSeverity = (color?: EFlag) => {
 };
 
 interface VDiskProps {
-    data?: TVDiskStateInfo | IUnavailableDonor;
-    poolName?: string;
+    data?: TVDiskStateInfo | UnavailableDonor;
     nodes?: NodesMap;
     compact?: boolean;
 }
 
-export const VDisk = ({data = {}, poolName, nodes, compact}: VDiskProps) => {
+export const VDisk = ({data = {}, nodes, compact}: VDiskProps) => {
     const isFullData = isFullVDiskData(data);
 
     const [severity, setSeverity] = useState(
@@ -125,13 +124,7 @@ export const VDisk = ({data = {}, poolName, nodes, compact}: VDiskProps) => {
 
     return (
         <React.Fragment>
-            <VDiskPopup
-                data={data}
-                poolName={poolName}
-                nodes={nodes}
-                anchorRef={anchor}
-                open={isPopupVisible}
-            />
+            <VDiskPopup data={data} nodes={nodes} anchorRef={anchor} open={isPopupVisible} />
             <div className={b()} ref={anchor} onMouseEnter={showPopup} onMouseLeave={hidePopup}>
                 {data.NodeId && isFullData ? (
                     <InternalLink

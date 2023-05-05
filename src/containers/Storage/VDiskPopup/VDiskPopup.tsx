@@ -13,7 +13,7 @@ import {stringifyVdiskId} from '../../../utils';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {isFullVDiskData} from '../../../utils/storage';
 
-import type {IUnavailableDonor} from '../utils/types';
+import type {UnavailableDonor} from '../utils/types';
 
 import {preparePDiskData} from '../PDiskPopup';
 
@@ -21,13 +21,13 @@ import './VDiskPopup.scss';
 
 const b = cn('vdisk-storage-popup');
 
-const prepareUnavailableVDiskData = (data: IUnavailableDonor, poolName?: string) => {
-    const {NodeId, PDiskId, VSlotId} = data;
+const prepareUnavailableVDiskData = (data: UnavailableDonor) => {
+    const {NodeId, PDiskId, VSlotId, StoragePoolName} = data;
 
     const vdiskData: InfoViewerItem[] = [{label: 'State', value: 'not available'}];
 
-    if (poolName) {
-        vdiskData.push({label: 'StoragePool', value: poolName});
+    if (StoragePoolName) {
+        vdiskData.push({label: 'StoragePool', value: StoragePoolName});
     }
 
     vdiskData.push(
@@ -39,7 +39,7 @@ const prepareUnavailableVDiskData = (data: IUnavailableDonor, poolName?: string)
     return vdiskData;
 };
 
-const prepareVDiskData = (data: TVDiskStateInfo, poolName?: string) => {
+const prepareVDiskData = (data: TVDiskStateInfo) => {
     const {
         VDiskId,
         VDiskState,
@@ -51,6 +51,7 @@ const prepareVDiskData = (data: TVDiskStateInfo, poolName?: string) => {
         AllocatedSize,
         ReadThroughput,
         WriteThroughput,
+        StoragePoolName,
     } = data;
 
     const vdiskData: InfoViewerItem[] = [
@@ -58,8 +59,8 @@ const prepareVDiskData = (data: TVDiskStateInfo, poolName?: string) => {
         {label: 'State', value: VDiskState ?? 'not available'},
     ];
 
-    if (poolName) {
-        vdiskData.push({label: 'StoragePool', value: poolName});
+    if (StoragePoolName) {
+        vdiskData.push({label: 'StoragePool', value: StoragePoolName});
     }
 
     if (SatisfactionRank && SatisfactionRank.FreshRank?.Flag !== EFlag.Green) {
@@ -128,20 +129,16 @@ const prepareVDiskData = (data: TVDiskStateInfo, poolName?: string) => {
 };
 
 interface VDiskPopupProps extends PopupProps {
-    data: TVDiskStateInfo | IUnavailableDonor;
-    poolName?: string;
+    data: TVDiskStateInfo | UnavailableDonor;
     nodes?: NodesMap;
 }
 
-export const VDiskPopup = ({data, poolName, nodes, ...props}: VDiskPopupProps) => {
+export const VDiskPopup = ({data, nodes, ...props}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
 
     const vdiskInfo = useMemo(
-        () =>
-            isFullData
-                ? prepareVDiskData(data, poolName)
-                : prepareUnavailableVDiskData(data, poolName),
-        [data, poolName, isFullData],
+        () => (isFullData ? prepareVDiskData(data) : prepareUnavailableVDiskData(data)),
+        [data, isFullData],
     );
     const pdiskInfo = useMemo(
         () => isFullData && data.PDisk && preparePDiskData(data.PDisk, nodes),

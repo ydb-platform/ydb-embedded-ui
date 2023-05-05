@@ -256,18 +256,14 @@ function StorageGroups({
             name: TableColumnsIds.VDisks,
             className: b('vdisks-column'),
             header: tableColumnsNames[TableColumnsIds.VDisks],
-            render: ({value, row}) => (
+            render: ({value}) => (
                 <div className={b('vdisks-wrapper')}>
                     {_.map(value as TVDiskStateInfo[], (el) => {
                         const donors = el.Donors;
 
                         return donors && donors.length > 0 ? (
                             <Stack className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
-                                <VDisk
-                                    data={el}
-                                    poolName={row[TableColumnsIds.PoolName]}
-                                    nodes={nodes}
-                                />
+                                <VDisk data={el} nodes={nodes} />
                                 {donors.map((donor) => {
                                     const isFullData = isFullVDiskData(donor);
 
@@ -275,7 +271,6 @@ function StorageGroups({
                                         <VDisk
                                             data={isFullData ? donor : {...donor, DonorMode: true}}
                                             // donor and acceptor are always in the same group
-                                            poolName={row[TableColumnsIds.PoolName]}
                                             nodes={nodes}
                                             key={stringifyVdiskId(
                                                 isFullData ? donor.VDiskId : donor,
@@ -286,11 +281,7 @@ function StorageGroups({
                             </Stack>
                         ) : (
                             <div className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
-                                <VDisk
-                                    data={el}
-                                    poolName={row[TableColumnsIds.PoolName]}
-                                    nodes={nodes}
-                                />
+                                <VDisk data={el} nodes={nodes} />
                             </div>
                         );
                     })}

@@ -1,5 +1,6 @@
 import {TVSlotId} from '../../../types/api/vdisk';
 
-export interface IUnavailableDonor extends TVSlotId {
+export interface UnavailableDonor extends TVSlotId {
     DonorMode?: boolean;
+    StoragePoolName?: string;
 }

@@ -116,7 +116,11 @@ export const selectNodeStructure = createSelector(
                     if (!structure[String(pDiskId)]) {
                         structure[String(pDiskId)] = {vDisks: {}, ...vd.PDisk};
                     }
-                    structure[String(pDiskId)].vDisks[vDiskId] = vd;
+                    structure[String(pDiskId)].vDisks[vDiskId] = {
+                        ...vd,
+                        // VDisk doesn't have its own StoragePoolName when located inside StoragePool data
+                        StoragePoolName: pool.Name,
+                    };
                 });
             });
         });

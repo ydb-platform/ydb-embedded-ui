@@ -271,10 +271,22 @@ export const getFlatListStorageGroups = createSelector([getStoragePools], (stora
                             ? currentType
                             : 'Mixed';
                     }, '');
+
+                    // VDisk doesn't have its own StoragePoolName when located inside StoragePool data
+                    const vDisks = group.VDisks?.map((vdisk) => ({
+                        ...vdisk,
+                        StoragePoolName: pool.Name,
+                        Donors: vdisk.Donors?.map((donor) => ({
+                            ...donor,
+                            StoragePoolName: pool.Name,
+                        })),
+                    }));
+
                     return [
                         ...acc,
                         {
                             ...group,
+                            VDisks: vDisks,
                             Read: readSpeedBytesPerSec,
                             Write: writeSpeedBytesPerSec,
                             PoolName: pool.Name,
