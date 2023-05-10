@@ -89,4 +89,8 @@
         line-height: var(--yc-text-body-2-line-height);
         text-transform: uppercase;
     }
+
+    &__host {
+        width: 300px;
+    }
 }

@@ -4,10 +4,10 @@ import type {
     NodesListState,
     NodesListAction,
     NodesListRootStateSlice,
-    NodesMap,
 } from '../../types/store/nodesList';
 import '../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../utils';
+import {prepareNodesMap} from '../../utils/nodes';
 
 export const FETCH_NODES_LIST = createRequestActionTypes('nodesList', 'FETCH_NODES_LIST');
 
@@ -50,11 +50,6 @@ export function getNodesList() {
 }
 
 export const selectNodesMap = (state: NodesListRootStateSlice) =>
-    state.nodesList.data?.reduce<NodesMap>((nodesMap, node) => {
-        if (node.Id && node.Host) {
-            nodesMap.set(node.Id, node.Host);
-        }
-        return nodesMap;
-    }, new Map());
+    prepareNodesMap(state.nodesList.data);
 
 export default nodesList;
