@@ -16,6 +16,7 @@ const SchemaViewerColumns = {
     name: 'Name',
     key: 'Key',
     type: 'Type',
+    notNull: 'NotNull',
 };
 
 class SchemaViewer extends React.Component {
@@ -58,6 +59,17 @@ class SchemaViewer extends React.Component {
             {
                 name: SchemaViewerColumns.type,
                 width: 100,
+            },
+            {
+                name: SchemaViewerColumns.notNull,
+                width: 100,
+                render: ({row}) => {
+                    if (row.NotNull) {
+                        return '\u2713';
+                    }
+
+                    return undefined;
+                },
             },
         ];
 
