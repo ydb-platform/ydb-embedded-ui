@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.0.0...v4.1.0) (2023-05-10)
+
+
+### Features
+
+* **Navigation:** remove legacy navigation setting support ([8544f11](https://github.com/ydb-platform/ydb-embedded-ui/commit/8544f114255ba44834d38cd9e709450c49e4a96a))
+
+
+### Bug Fixes
+
+* disable link and popover for unavailable nodes ([990a9fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/990a9fa42a7133a6c40d07e11c3518240e18b4a9))
+
 ## [4.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v3.5.0...v4.0.0) (2023-04-28)
 
 
