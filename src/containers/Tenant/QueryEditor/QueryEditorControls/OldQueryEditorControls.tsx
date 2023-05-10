@@ -48,7 +48,7 @@ export const OldQueryEditorControls = ({
                     </Button>
                     <DropdownMenu
                         items={runModeSelectorMenuItems}
-                        popupClassName={b('select-query-action-popup')}
+                        popupProps={{className: b('select-query-action-popup')}}
                         switcher={
                             <Button
                                 view="action"
