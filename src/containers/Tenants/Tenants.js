@@ -20,7 +20,7 @@ import {formatCPU, formatBytesToGigabyte, formatNumber} from '../../utils';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
 import {ALL, DEFAULT_TABLE_SETTINGS, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
-import {getTenantsInfo} from '../../store/reducers/tenants';
+import {getTenantsInfo} from '../../store/reducers/tenants/tenants';
 import {changeFilter, getSettingValue} from '../../store/reducers/settings';
 import {setHeader} from '../../store/reducers/header';
 

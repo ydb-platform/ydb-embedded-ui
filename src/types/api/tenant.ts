@@ -54,6 +54,7 @@ export interface TTenant {
     CoresUsed: number;
     /** uint64 */
     StorageGroups: string;
+
     MonitoringEndpoint?: string; // additional
     ControlPlane?: ControlPlane; // additional
 }

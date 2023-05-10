@@ -15,7 +15,7 @@ import schema from './schema';
 import host from './host';
 import network from './network';
 import pool from './pool';
-import tenants from './tenants';
+import tenants from './tenants/tenants';
 import tablet from './tablet';
 import topic from './topic';
 import consumer from './consumer';
