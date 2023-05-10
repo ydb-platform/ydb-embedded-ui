@@ -2,11 +2,13 @@ import {ReactNode} from 'react';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import {RadioButton, Switch, HelpPopover} from '@gravity-ui/uikit';
+import {RadioButton, Switch} from '@gravity-ui/uikit';
 import {Settings} from '@gravity-ui/navigation';
 
 import favoriteFilledIcon from '../../assets/icons/star.svg';
 import flaskIcon from '../../assets/icons/flask.svg';
+
+import {LabelWithPopover} from '../../components/LabelWithPopover/LabelWithPopover';
 
 import {
     ENABLE_QUERY_MODES_FOR_EXPLAIN,
@@ -46,27 +48,27 @@ function UserSettings(props: any) {
 
     const renderBreakNodesSettingsItem = (title: ReactNode) => {
         return (
-            <div className={b('item-with-popup')}>
-                {title}
-                <HelpPopover
-                    content="Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on older versions"
-                    contentClassName={b('popup')}
-                    hasArrow={true}
-                />
-            </div>
+            <LabelWithPopover
+                className={b('item-with-popup')}
+                contentClassName={b('popup')}
+                text={title}
+                popoverContent={
+                    'Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on older versions'
+                }
+            />
         );
     };
 
     const renderEnableExplainQueryModesItem = (title: ReactNode) => {
         return (
-            <div className={b('item-with-popup')}>
-                {title}
-                <HelpPopover
-                    content="Enable script | scan query mode selector for both run and explain. May not work on some versions"
-                    contentClassName={b('popup')}
-                    hasArrow={true}
-                />
-            </div>
+            <LabelWithPopover
+                className={b('item-with-popup')}
+                contentClassName={b('popup')}
+                text={title}
+                popoverContent={
+                    'Enable script | scan query mode selector for both run and explain. May not work on some versions'
+                }
+            />
         );
     };
 

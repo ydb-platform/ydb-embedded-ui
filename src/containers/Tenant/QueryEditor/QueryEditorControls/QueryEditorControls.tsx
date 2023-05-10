@@ -61,7 +61,7 @@ export const QueryEditorControls = ({
                 </Button>
                 <DropdownMenu
                     items={querySelectorMenuItems}
-                    popupClassName={b('mode-selector__popup')}
+                    popupProps={{className: b('mode-selector__popup')}}
                     switcher={
                         <Button className={b('mode-selector__button')}>
                             <span className={b('mode-selector__button-content')}>

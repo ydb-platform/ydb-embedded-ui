@@ -10,13 +10,13 @@ interface CreateToastProps {
 }
 
 function createToast({name, title, type, content}: CreateToastProps) {
-    return toaster.createToast({
+    return toaster.add({
         name: name ?? 'Request succeeded',
         title: title ?? 'Request succeeded',
         type: type ?? 'success',
         content: content,
         isClosable: true,
-        allowAutoHiding: type === 'success',
+        autoHiding: type === 'success' ? 5000 : false,
     });
 }
 
