@@ -4,6 +4,7 @@ import {AxiosResponse} from 'axios';
 import createToast from '../utils/createToast';
 
 import {SET_UNAUTHENTICATED} from './reducers/authentication';
+import type {GetState} from './reducers';
 
 export const nop = (result: any) => result;
 
@@ -24,7 +25,7 @@ const isAxiosResponse = (response: any): response is AxiosResponse =>
 type CreateApiRequestParams<Actions, Response, HandledResponse> = {
     actions: Actions;
     request: Promise<Response>;
-    dataHandler?: (data: Response, getState?: () => any) => HandledResponse;
+    dataHandler?: (data: Response, getState: GetState) => HandledResponse;
 };
 
 export function createApiRequest<
@@ -36,7 +37,7 @@ export function createApiRequest<
     request,
     dataHandler = nop,
 }: CreateApiRequestParams<Actions, Response, HandledResponse>) {
-    const doRequest = async function (dispatch: Dispatch, getState: () => any) {
+    const doRequest = async function (dispatch: Dispatch, getState: GetState) {
         dispatch({
             type: actions.REQUEST,
         });

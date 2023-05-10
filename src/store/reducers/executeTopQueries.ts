@@ -13,7 +13,7 @@ import {parseQueryAPIExecuteResponse} from '../../utils/query';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
-import type {IRootState} from '.';
+import type {RootState} from '.';
 
 export const FETCH_TOP_QUERIES = createRequestActionTypes('top-queries', 'FETCH_TOP_QUERIES');
 const SET_TOP_QUERIES_STATE = 'top-queries/SET_TOP_QUERIES_STATE';
@@ -126,7 +126,7 @@ const executeTopQueries: Reducer<ITopQueriesState, ITopQueriesAction> = (
 type FetchTopQueries = (params: {
     database: string;
     filters?: ITopQueriesFilters;
-}) => ThunkAction<Promise<IQueryResult | undefined>, IRootState, unknown, AnyAction>;
+}) => ThunkAction<Promise<IQueryResult | undefined>, RootState, unknown, AnyAction>;
 
 export const fetchTopQueries: FetchTopQueries =
     ({database, filters}) =>
