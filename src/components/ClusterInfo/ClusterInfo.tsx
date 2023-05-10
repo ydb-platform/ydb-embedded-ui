@@ -15,7 +15,7 @@ import {Tablet} from '../Tablet';
 //@ts-ignore
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 //@ts-ignore
-import {getClusterInfo} from '../../store/reducers/cluster';
+import {getClusterInfo} from '../../store/reducers/cluster/cluster';
 //@ts-ignore
 import {clusterName, backend, customBackend} from '../../store';
 
@@ -68,6 +68,8 @@ class ClusterInfo extends React.Component<ClusterInfoProps> {
         return 0;
     }
 
+    private autofetcher: any;
+
     componentDidMount() {
         const {setHeader} = this.props;
         setHeader([
@@ -106,8 +108,6 @@ class ClusterInfo extends React.Component<ClusterInfoProps> {
         }
         return <div className={b(null, className)}>{helper || this.renderContent()}</div>;
     }
-
-    private autofetcher: any;
 
     private getInfo() {
         const {cluster = {}, additionalClusterInfo = [], singleClusterMode} = this.props;
