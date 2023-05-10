@@ -82,7 +82,8 @@ const combinedReducer = combineReducers({
     ...rootReducer,
 });
 
-export type IRootReducer = typeof combinedReducer;
-export type IRootState = ReturnType<IRootReducer>;
+export type RootReducer = typeof combinedReducer;
+export type RootState = ReturnType<RootReducer>;
+export type GetState = () => RootState;
 
 export default combinedReducer;
