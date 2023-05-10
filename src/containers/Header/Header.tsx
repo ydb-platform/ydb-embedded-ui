@@ -8,7 +8,7 @@ import Divider from '../../components/Divider/Divider';
 import {Icon} from '../../components/Icon';
 
 import {clusterName as clusterNameLocation, backend, customBackend} from '../../store';
-import {getClusterInfo} from '../../store/reducers/cluster';
+import {getClusterInfo} from '../../store/reducers/cluster/cluster';
 import {getHostInfo} from '../../store/reducers/host';
 import {HeaderItemType} from '../../store/reducers/header';
 

@@ -1,11 +1,14 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import '../../services/api';
+import type {Reducer} from 'redux';
 
-const FETCH_CLUSTER = createRequestActionTypes('cluster', 'FETCH_CLUSTER');
+import '../../../services/api';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
+import type {ClusterAction, ClusterState} from './types';
+
+export const FETCH_CLUSTER = createRequestActionTypes('cluster', 'FETCH_CLUSTER');
 
 const initialState = {loading: true, wasLoaded: false};
 
-const cluster = function (state = initialState, action) {
+const cluster: Reducer<ClusterState, ClusterAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_CLUSTER.REQUEST: {
             return {
@@ -14,17 +17,9 @@ const cluster = function (state = initialState, action) {
             };
         }
         case FETCH_CLUSTER.SUCCESS: {
-            const {data} = action;
-            const clusterInfo = data.cluster ? data.cluster.cluster : data;
-            const clusterName = data.cluster?.title || data.Name;
             return {
                 ...state,
-                data: {
-                    ...clusterInfo,
-                    balancer: data.cluster?.balancer,
-                    solomon: data.cluster?.solomon,
-                    Name: clusterName,
-                },
+                data: action.data,
                 loading: false,
                 wasLoaded: true,
                 error: undefined,
@@ -42,7 +37,7 @@ const cluster = function (state = initialState, action) {
     }
 };
 
-export function getClusterInfo(clusterName) {
+export function getClusterInfo(clusterName?: string) {
     return createApiRequest({
         request: window.api.getClusterInfo(clusterName),
         actions: FETCH_CLUSTER,
