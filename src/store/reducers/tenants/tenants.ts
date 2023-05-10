@@ -1,12 +1,15 @@
-import _ from 'lodash';
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import '../../services/api';
+import type {Reducer} from 'redux';
 
-const FETCH_TENANTS = createRequestActionTypes('tenants', 'FETCH_TENANTS');
+import '../../../services/api';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
 
-const initialState = {loading: true, wasLoaded: false, data: {}};
+import type {TenantsAction, TenantsState} from './types';
 
-const tenants = function (state = initialState, action) {
+export const FETCH_TENANTS = createRequestActionTypes('tenants', 'FETCH_TENANTS');
+
+const initialState = {loading: true, wasLoaded: false};
+
+const tenants: Reducer<TenantsState, TenantsAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_TENANTS.REQUEST: {
             return {
@@ -35,20 +38,22 @@ const tenants = function (state = initialState, action) {
     }
 };
 
-export function getTenantsInfo(clusterName) {
+export function getTenantsInfo(clusterName?: string) {
     return createApiRequest({
         request: window.api.getTenants(clusterName),
         actions: FETCH_TENANTS,
         dataHandler: (response, getState) => {
             const {singleClusterMode} = getState();
+
             if (singleClusterMode) {
                 return response.TenantInfo;
             } else {
-                return response.databases?.map((tenant) => {
+                return response.TenantInfo?.map((tenant) => {
                     const node = tenant.Nodes ? tenant.Nodes[0] : {};
                     const address =
                         node.Host && node.Endpoints
-                            ? _.find(node.Endpoints, {Name: 'http-mon'})?.Address
+                            ? node.Endpoints.find((endpoint) => endpoint.Name === 'http-mon')
+                                  ?.Address
                             : undefined;
                     const backend = node.Host ? `${node.Host}${address ? address : ''}` : undefined;
                     return {...tenant, backend};
