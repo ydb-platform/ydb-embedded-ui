@@ -11,6 +11,7 @@ export interface ITabletPreparedHistoryItem {
     state: ETabletState | undefined;
     leader: boolean | undefined;
     followerId: number | undefined;
+    fqdn: string | undefined;
 }
 
 export interface ITabletState {

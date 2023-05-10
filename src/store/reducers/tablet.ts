@@ -11,6 +11,7 @@ import type {
 import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
+import {prepareNodesMap} from '../../utils/nodes';
 
 export const FETCH_TABLET = createRequestActionTypes('TABLET', 'FETCH_TABLET');
 export const FETCH_TABLET_DESCRIBE = createRequestActionTypes('TABLET', 'FETCH_TABLET_DESCRIBE');
@@ -63,9 +64,19 @@ const tablet: Reducer<ITabletState, ITabletAction> = (state = initialState, acti
 
 export const getTablet = (id: string) => {
     return createApiRequest({
-        request: Promise.all([window.api.getTablet({id}), window.api.getTabletHistory({id})]),
+        request: Promise.all([
+            window.api.getTablet({id}),
+            window.api.getTabletHistory({id}),
+            window.api.getNodesList(),
+        ]),
         actions: FETCH_TABLET,
-        dataHandler: ([tabletResponseData, historyResponseData]): ITabletHandledResponse => {
+        dataHandler: ([
+            tabletResponseData,
+            historyResponseData,
+            nodesList,
+        ]): ITabletHandledResponse => {
+            const nodesMap = prepareNodesMap(nodesList);
+
             const historyData = Object.keys(historyResponseData).reduce<
                 ITabletPreparedHistoryItem[]
             >((list, nodeId) => {
@@ -75,6 +86,8 @@ export const getTablet = (id: string) => {
 
                     const {ChangeTime, Generation, State, Leader, FollowerId} = leaderTablet;
 
+                    const fqdn = nodesMap && nodeId ? nodesMap.get(Number(nodeId)) : undefined;
+
                     list.push({
                         nodeId,
                         generation: Generation,
@@ -82,6 +95,7 @@ export const getTablet = (id: string) => {
                         state: State,
                         leader: Leader,
                         followerId: FollowerId,
+                        fqdn,
                     });
                 }
                 return list;

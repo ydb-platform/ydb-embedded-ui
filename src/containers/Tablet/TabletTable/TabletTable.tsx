@@ -1,19 +1,19 @@
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 
+import EntityStatus from '../../../components/EntityStatus/EntityStatus';
+import {InternalLink} from '../../../components/InternalLink/InternalLink';
+
 import type {ITabletPreparedHistoryItem} from '../../../types/store/tablet';
 import {calcUptime} from '../../../utils';
+import {getDefaultNodePath} from '../../Node/NodePages';
+
+import {b} from '../Tablet';
 
 const columns: Column<ITabletPreparedHistoryItem>[] = [
     {
         name: 'Generation',
         align: DataTable.RIGHT,
         render: ({row}) => row.generation,
-    },
-    {
-        name: 'Node ID',
-        align: DataTable.RIGHT,
-        sortable: false,
-        render: ({row}) => row.nodeId,
     },
     {
         name: 'Change time',
@@ -31,6 +31,28 @@ const columns: Column<ITabletPreparedHistoryItem>[] = [
         sortable: false,
         render: ({row}) => {
             return row.leader ? 'leader' : row.followerId;
+        },
+    },
+    {
+        name: 'Node ID',
+        align: DataTable.RIGHT,
+        sortable: false,
+        render: ({row}) => {
+            return <InternalLink to={getDefaultNodePath(row.nodeId)}>{row.nodeId}</InternalLink>;
+        },
+    },
+    {
+        name: 'Node FQDN',
+        sortable: false,
+        render: ({row}) => {
+            if (!row.fqdn) {
+                return <span>—</span>;
+            }
+            return (
+                <div className={b('host')}>
+                    <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />
+                </div>
+            );
         },
     },
 ];
