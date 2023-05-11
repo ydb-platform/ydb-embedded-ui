@@ -86,9 +86,10 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
 
     const generalTableInfo: InfoViewerItem[] = [];
 
-    const partitioningBySize = PartitioningPolicy.SizeToSplit
-        ? `Enabled, split size: ${formatBytes(PartitioningPolicy.SizeToSplit)}`
-        : 'Disabled';
+    const partitioningBySize =
+        PartitioningPolicy.SizeToSplit && Number(PartitioningPolicy.SizeToSplit) > 0
+            ? `Enabled, split size: ${formatBytes(PartitioningPolicy.SizeToSplit)}`
+            : 'Disabled';
 
     const partitioningByLoad = PartitioningPolicy.SplitByLoadSettings?.Enabled
         ? 'Enabled'
