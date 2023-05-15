@@ -34,10 +34,6 @@ body,
     --ydb-data-table-color-hover: var(--yc-color-base-float-hover);
 }
 
-.yc-select__label {
-    font-weight: 600;
-}
-
 :is(#tab, .yc-tabs-item_active .yc-tabs-item__title) {
     color: var(--yc-color-text-primary) !important;
 }
@@ -110,9 +106,16 @@ body,
         align-items: center;
     }
 
+    // Should be removed after https://github.com/ydb-platform/ydb-embedded-ui/issues/344
     .yc-button__text {
         display: flex;
         align-items: center;
+    }
+
+    .g-select {
+        .yc-button__text {
+            align-items: baseline;
+        }
     }
 }
 
