@@ -287,7 +287,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 stats,
                 timeout: 600000,
             },
-            null,
+            {},
             {
                 concurrentId,
                 timeout: 9 * 60 * 1000,
@@ -307,7 +307,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 action: action || 'explain',
                 timeout: 600000,
             },
-            null,
+            {},
         );
     }
     getExplainQueryAst(query: string, database: string) {
@@ -319,7 +319,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 action: 'explain-ast',
                 timeout: 600000,
             },
-            null,
+            {},
         );
     }
     getHotKeys(path: string, enableSampling: boolean) {
@@ -334,18 +334,18 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         });
     }
     killTablet(id?: string) {
-        return this.get<string>(this.getPath(`/tablets?KillTabletID=${id}`), null);
+        return this.get<string>(this.getPath(`/tablets?KillTabletID=${id}`), {});
     }
     stopTablet(id?: string, hiveId?: string) {
         return this.get<string>(
             this.getPath(`/tablets/app?TabletID=${hiveId}&page=StopTablet&tablet=${id}`),
-            null,
+            {},
         );
     }
     resumeTablet(id?: string, hiveId?: string) {
         return this.get<string>(
             this.getPath(`/tablets/app?TabletID=${hiveId}&page=ResumeTablet&tablet=${id}`),
-            null,
+            {},
         );
     }
     getTabletDescribe(tenantId: TDomainKey) {
@@ -368,14 +368,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 user,
                 password,
             },
-            null,
+            {},
         );
     }
     logout() {
-        return this.post(this.getPath('/logout'), null, null);
+        return this.post(this.getPath('/logout'), {}, {});
     }
     whoami() {
-        return this.get<TUserToken>(this.getPath('/viewer/json/whoami'), null);
+        return this.get<TUserToken>(this.getPath('/viewer/json/whoami'), {});
     }
 }
 
