@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.1.0...v4.2.0) (2023-05-16)
+
+
+### Features
+
+* **Tablet:** display node fqdn in table ([4d8099a](https://github.com/ydb-platform/ydb-embedded-ui/commit/4d8099a454f34fc76886b26ca948895171c57ab8))
+
+
+### Bug Fixes
+
+* **api:** change nulls to empty objects ([0ab14e8](https://github.com/ydb-platform/ydb-embedded-ui/commit/0ab14e883a47aeac2f2bab437f2214a32ccb1c9b))
+* display storage pool in VDisks popups ([5b5dd8a](https://github.com/ydb-platform/ydb-embedded-ui/commit/5b5dd8a4e6cb4bcc1ead78a7c06d2e80a81424cc))
+* fix Select label and values align ([f796730](https://github.com/ydb-platform/ydb-embedded-ui/commit/f7967309fe4a042e7637de212f33b1ebfc6877fc))
+* **Overview:** partitioning by size disabled for 0 SizeToSpit ([1028e7d](https://github.com/ydb-platform/ydb-embedded-ui/commit/1028e7d8d3566f5f5e6b2ebe04112ef135d7b55e))
+* **Schema:** display NotNull columns ([d61eaa4](https://github.com/ydb-platform/ydb-embedded-ui/commit/d61eaa4ccff357c1e9ca6efde855ec46be24a314))
+
 ## [4.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.0.0...v4.1.0) (2023-05-10)
 
 
