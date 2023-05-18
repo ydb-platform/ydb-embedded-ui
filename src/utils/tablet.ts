@@ -1,23 +1,24 @@
 import {EFlag} from '../types/api/enums';
 import {ETabletState} from '../types/api/tablet';
 
+// Similar to mapping in https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/viewer.cpp
 const tabletStateToColorState: Record<ETabletState, EFlag> = {
-    [ETabletState.Active]: EFlag.Green,
-    [ETabletState.Deleted]: EFlag.Green,
-
-    [ETabletState.RebuildGraph]: EFlag.Orange,
-    [ETabletState.ResolveLeader]: EFlag.Yellow,
-
-    [ETabletState.Created]: EFlag.Red,
-    [ETabletState.ResolveStateStorage]: EFlag.Red,
-    [ETabletState.Candidate]: EFlag.Red,
-    [ETabletState.BlockBlobStorage]: EFlag.Red,
-    [ETabletState.WriteZeroEntry]: EFlag.Red,
-    [ETabletState.Restored]: EFlag.Red,
-    [ETabletState.Discover]: EFlag.Red,
-    [ETabletState.Lock]: EFlag.Red,
     [ETabletState.Dead]: EFlag.Red,
-    [ETabletState.Stopped]: EFlag.Red,
+
+    [ETabletState.Created]: EFlag.Yellow,
+    [ETabletState.ResolveStateStorage]: EFlag.Yellow,
+    [ETabletState.Candidate]: EFlag.Yellow,
+    [ETabletState.BlockBlobStorage]: EFlag.Yellow,
+    [ETabletState.WriteZeroEntry]: EFlag.Yellow,
+    [ETabletState.Restored]: EFlag.Yellow,
+    [ETabletState.Discover]: EFlag.Yellow,
+    [ETabletState.Lock]: EFlag.Yellow,
+    [ETabletState.Stopped]: EFlag.Yellow,
+    [ETabletState.ResolveLeader]: EFlag.Yellow,
+    [ETabletState.RebuildGraph]: EFlag.Yellow,
+
+    [ETabletState.Deleted]: EFlag.Green,
+    [ETabletState.Active]: EFlag.Green,
 };
 
 export const tabletStates = Object.keys(ETabletState);
