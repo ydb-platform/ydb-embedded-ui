@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.2.0...v4.2.1) (2023-05-18)
+
+
+### Bug Fixes
+
+* export toaster ([b5d12c0](https://github.com/ydb-platform/ydb-embedded-ui/commit/b5d12c0aa39ea3877a9b74071e3124f89a309ca3))
+
 ## [4.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.1.0...v4.2.0) (2023-05-16)
 
 
