@@ -8,14 +8,8 @@ const routes = {
     cluster: '/cluster/:activeTab?',
     tenant: '/tenant',
     node: '/node/:id/:activeTab?',
-    pdisk: '/pdisk/:id',
-    group: '/group/:id',
-    vdisk: '/vdisk',
-    network: '/network',
-    pool: '/pool/:poolName',
     tablet: '/tablet/:id',
     tabletsFilters: '/tabletsFilters',
-    clusterPage: '/clusters/:name',
     auth: '/auth',
 };
 

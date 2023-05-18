@@ -10,9 +10,6 @@ import routes, {createHref, CLUSTER_PAGES} from '../../routes';
 import Cluster from '../Cluster/Cluster';
 import Tenant from '../Tenant/Tenant';
 import Node from '../Node/Node';
-import Pdisk from '../Pdisk/Pdisk';
-import Group from '../Group/Group';
-import Pool from '../Pool/Pool';
 import {Tablet} from '../Tablet';
 import TabletsFilters from '../TabletsFilters/TabletsFilters';
 import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
@@ -42,10 +39,7 @@ export function Content(props) {
                 <Switch>
                     <Route path={routes.cluster} component={Cluster} />
                     <Route path={routes.tenant} component={Tenant} />
-                    <Route path={routes.pdisk} component={Pdisk} />
                     <Route path={routes.node} component={Node} />
-                    <Route path={routes.group} component={Group} />
-                    <Route path={routes.pool} component={Pool} />
                     <Route path={routes.tablet} component={Tablet} />
                     <Route path={routes.tabletsFilters} component={TabletsFilters} />
                     <Redirect
