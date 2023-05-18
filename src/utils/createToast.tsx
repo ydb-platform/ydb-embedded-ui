@@ -1,6 +1,6 @@
 import {Toaster} from '@gravity-ui/uikit';
 
-const toaster = new Toaster();
+export const toaster = new Toaster();
 
 interface CreateToastProps {
     name?: string;
