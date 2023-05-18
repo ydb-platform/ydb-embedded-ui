@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.2.1...v4.3.0) (2023-05-18)
+
+
+### Features
+
+* **Partitions:** display partitions for topic without consumers ([0843a49](https://github.com/ydb-platform/ydb-embedded-ui/commit/0843a49c46cb6765b376832a847c3ac0ce8b6b85))
+
+
+### Bug Fixes
+
+* **Tablet:** update state to color mapping ([7ccc8c7](https://github.com/ydb-platform/ydb-embedded-ui/commit/7ccc8c79225cd311a7a3674150335b58a94f293e))
+
 ## [4.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.2.0...v4.2.1) (2023-05-18)
 
 
