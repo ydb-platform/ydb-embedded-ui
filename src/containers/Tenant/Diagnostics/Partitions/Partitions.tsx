@@ -8,7 +8,6 @@ import {useAutofetcher, useTypedSelector, useSetting} from '../../../../utils/ho
 import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
 
 import {getNodesList, selectNodesMap} from '../../../../store/reducers/nodesList';
-import {setSelectedConsumer} from '../../../../store/reducers/consumer';
 import {
     cleanTopicData,
     getTopic,
@@ -18,6 +17,7 @@ import {
 import {
     getPartitions,
     setDataWasNotLoaded as setPartitionsDataWasNotLoaded,
+    setSelectedConsumer,
 } from '../../../../store/reducers/partitions/partitions';
 
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
@@ -52,12 +52,12 @@ export const Partitions = ({path}: PartitionsProps) => {
     const consumers = useTypedSelector(selectConsumersNames);
     const nodesMap = useTypedSelector(selectNodesMap);
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const {selectedConsumer} = useTypedSelector((state) => state.consumer);
     const {
         loading: partitionsLoading,
         wasLoaded: partitionsWasLoaded,
         error: partitionsError,
         partitions: rawPartitions,
+        selectedConsumer,
     } = useTypedSelector((state) => state.partitions);
     const {
         loading: topicLoading,

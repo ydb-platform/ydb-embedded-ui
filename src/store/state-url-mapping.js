@@ -68,7 +68,7 @@ const paramSetup = {
             type: 'number',
         },
         selectedConsumer: {
-            stateKey: 'consumer.selectedConsumer',
+            stateKey: 'partitions.selectedConsumer',
         },
     },
 };
