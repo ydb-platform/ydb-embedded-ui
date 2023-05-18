@@ -1,6 +1,0 @@
-@import '../../styles/mixins';
-
-.group {
-    overflow: auto;
-    @include flex-container();
-}
