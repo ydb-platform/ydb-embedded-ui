@@ -18,7 +18,6 @@ import pool from './pool';
 import tenants from './tenants/tenants';
 import tablet from './tablet';
 import topic from './topic';
-import consumer from './consumer';
 import partitions from './partitions/partitions';
 import executeQuery from './executeQuery';
 import explainQuery from './explainQuery';
@@ -59,7 +58,6 @@ export const rootReducer = {
     tenants,
     tablet,
     topic,
-    consumer,
     partitions,
     executeQuery,
     explainQuery,

@@ -9,11 +9,13 @@ import {prepareConsumerPartitions, prepareTopicPartitions} from './utils';
 
 export const FETCH_PARTITIONS = createRequestActionTypes('partitions', 'FETCH_PARTITIONS');
 
+const SET_SELECTED_CONSUMER = 'partitions/SET_SELECTED_CONSUMER';
 const SET_DATA_WAS_NOT_LOADED = 'partitions/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {
     loading: false,
     wasLoaded: false,
+    selectedConsumer: undefined,
 };
 
 const partitions: Reducer<PartitionsState, PartitionsAction> = (state = initialState, action) => {
@@ -44,6 +46,12 @@ const partitions: Reducer<PartitionsState, PartitionsAction> = (state = initialS
                 loading: false,
             };
         }
+        case SET_SELECTED_CONSUMER: {
+            return {
+                ...state,
+                selectedConsumer: action.data,
+            };
+        }
         case SET_DATA_WAS_NOT_LOADED: {
             return {
                 ...state,
@@ -53,6 +61,13 @@ const partitions: Reducer<PartitionsState, PartitionsAction> = (state = initialS
         default:
             return state;
     }
+};
+
+export const setSelectedConsumer = (value?: string) => {
+    return {
+        type: SET_SELECTED_CONSUMER,
+        data: value,
+    } as const;
 };
 
 export const setDataWasNotLoaded = () => {

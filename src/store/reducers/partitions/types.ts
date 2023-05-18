@@ -2,7 +2,7 @@ import type {IResponseError} from '../../../types/api/error';
 import type {IProcessSpeedStats} from '../../../utils/bytesParsers';
 import type {ApiRequestAction} from '../../utils';
 
-import {FETCH_PARTITIONS, setDataWasNotLoaded} from './partitions';
+import {FETCH_PARTITIONS, setDataWasNotLoaded, setSelectedConsumer} from './partitions';
 
 // Fields that could be undefined corresponds to partitions without consumers
 export interface PreparedPartitionData {
@@ -36,10 +36,12 @@ export interface PreparedPartitionData {
 export interface PartitionsState {
     loading: boolean;
     wasLoaded: boolean;
+    selectedConsumer: string | undefined;
     partitions?: PreparedPartitionData[];
     error?: IResponseError;
 }
 
 export type PartitionsAction =
     | ApiRequestAction<typeof FETCH_PARTITIONS, PreparedPartitionData[], IResponseError>
-    | ReturnType<typeof setDataWasNotLoaded>;
+    | ReturnType<typeof setDataWasNotLoaded>
+    | ReturnType<typeof setSelectedConsumer>;
