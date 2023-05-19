@@ -2,9 +2,6 @@ import DataTable from '@gravity-ui/react-data-table';
 
 const SECOND = 1000;
 
-export const GROUP_AUTO_RELOAD_INTERVAL = 10 * SECOND;
-export const PDISK_AUTO_RELOAD_INTERVAL = 10 * SECOND;
-export const VDISK_AUTO_RELOAD_INTERVAL = 10 * SECOND;
 export const AUTO_RELOAD_INTERVAL = 10 * SECOND;
 // by agreement, display all byte values in decimal scale
 // values in data are always in bytes, never in higher units,
@@ -13,7 +10,6 @@ export const KILOBYTE = 1_000;
 export const MEGABYTE = 1_000_000;
 export const GIGABYTE = 1_000_000_000;
 export const TERABYTE = 1_000_000_000_000;
-export const GROUP = 'group';
 
 export const MINUTE_IN_SECONDS = 60;
 export const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
@@ -71,11 +67,6 @@ export const getTabletLabel = (type?: string) => {
 };
 
 export const LOAD_AVERAGE_TIME_INTERVALS = ['1 min', '5 min', '15 min'];
-
-export const PDISK_CATEGORIES = {
-    0: 'HDD',
-    1: 'SSD',
-};
 
 export const COLORS_PRIORITY = {
     green: 5,
