@@ -5,16 +5,12 @@ import cluster from './cluster/cluster';
 import tenant from './tenant';
 import storage from './storage';
 import node from './node';
-import pdisk from './pdisk';
-import vdisk from './vdisk';
-import group from './group';
 import tooltip from './tooltip';
 import tablets from './tablets';
 import heatmap from './heatmap';
 import schema from './schema';
 import host from './host';
 import network from './network';
-import pool from './pool';
 import tenants from './tenants/tenants';
 import tablet from './tablet';
 import topic from './topic';
@@ -45,16 +41,12 @@ export const rootReducer = {
     tenant,
     storage,
     node,
-    pdisk,
-    vdisk,
-    group,
     tooltip,
     tablets,
     schema,
     olapStats,
     host,
     network,
-    pool,
     tenants,
     tablet,
     topic,
