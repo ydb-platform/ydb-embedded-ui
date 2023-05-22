@@ -4,13 +4,13 @@ import {connect} from 'react-redux';
 import {Link, Loader} from '@gravity-ui/uikit';
 
 //@ts-ignore
-import EntityStatus from '../EntityStatus/EntityStatus';
+import EntityStatus from '../../components/EntityStatus/EntityStatus';
 //@ts-ignore
-import ProgressViewer from '../ProgressViewer/ProgressViewer';
+import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
 //@ts-ignore
-import InfoViewer from '../InfoViewer/InfoViewer';
-import {Tags} from '../Tags';
-import {Tablet} from '../Tablet';
+import InfoViewer from '../../components/InfoViewer/InfoViewer';
+import {Tags} from '../../components/Tags';
+import {Tablet} from '../../components/Tablet';
 
 //@ts-ignore
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
@@ -24,7 +24,7 @@ import {formatStorageValues} from '../../utils';
 //@ts-ignore
 import {TxAllocator} from '../../utils/constants';
 import {AutoFetcher} from '../../utils/autofetcher';
-import {Icon} from '../Icon';
+import {Icon} from '../../components/Icon';
 import {setHeader} from '../../store/reducers/header';
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 
