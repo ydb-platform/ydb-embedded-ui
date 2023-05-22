@@ -12,7 +12,6 @@ import {Loader} from '../../components/Loader';
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 import {ETabletState, EType, TTabletStateInfo} from '../../types/api/tablet';
 
-import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
 import {
     getTabletsInfo,
     clearWasLoadingFlag,
@@ -89,23 +88,8 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
         dispatch(setTypeFilter(value as EType[]));
     };
 
-    const onShowTooltip = (...args: Parameters<typeof showTooltip>) => {
-        dispatch(showTooltip(...args));
-    };
-
-    const onHideTooltip = () => {
-        dispatch(hideTooltip());
-    };
-
     const renderTablet = (tabletIndex: number) => {
-        return (
-            <Tablet
-                onMouseLeave={onHideTooltip}
-                onMouseEnter={onShowTooltip}
-                tablet={tabletsToRender[tabletIndex]}
-                key={tabletIndex}
-            />
-        );
+        return <Tablet tablet={tabletsToRender[tabletIndex]} key={tabletIndex} />;
     };
 
     const renderContent = () => {

@@ -16,7 +16,6 @@ import {Loader} from '../../components/Loader';
 import {ResponseError} from '../../components/Errors/ResponseError';
 
 import type {AdditionalVersionsProps} from '../../types/additionalProps';
-import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {getClusterInfo} from '../../store/reducers/cluster/cluster';
 import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
 import {backend, customBackend} from '../../store';
@@ -90,14 +89,6 @@ export const ClusterInfo = ({
     const versionsValues = useMemo(() => {
         return parseNodesToVersionsValues(nodes, versionToColor);
     }, [nodes, versionToColor]);
-
-    const onShowTooltip = (...args: Parameters<typeof showTooltip>) => {
-        dispatch(showTooltip(...args));
-    };
-
-    const onHideTooltip = () => {
-        dispatch(hideTooltip());
-    };
 
     const getInfo = () => {
         let link = backend + '/internal';
@@ -183,12 +174,7 @@ export const ClusterInfo = ({
                             {cluster?.SystemTablets &&
                                 cluster.SystemTablets.sort(compareTablets).map(
                                     (tablet, tabletIndex) => (
-                                        <Tablet
-                                            onMouseEnter={onShowTooltip}
-                                            onMouseLeave={onHideTooltip}
-                                            key={tabletIndex}
-                                            tablet={tablet}
-                                        />
+                                        <Tablet key={tabletIndex} tablet={tablet} />
                                     ),
                                 )}
                         </div>
