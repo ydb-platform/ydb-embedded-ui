@@ -2,7 +2,7 @@ import cn from 'bem-cn-lite';
 import {calcUptime} from '.';
 import JSONTree from 'react-json-inspector';
 
-import {NodeEndpointsTooltip} from '../components/Tooltips/NodeEndpointsTooltip/NodeEndpointsTooltip';
+import {NodeEndpointsTooltipContent} from '../components/TooltipsContent';
 
 const poolB = cn('pool-tooltip');
 
@@ -177,7 +177,7 @@ export const tooltipTemplates = {
     tablet: (data, additionalData) => <TabletTooltip data={data} additionalData={additionalData} />,
     // eslint-disable-next-line react/display-name
     node: (data) => <NodeTooltip data={data} />,
-    nodeEndpoints: (data) => <NodeEndpointsTooltip data={data} />,
+    nodeEndpoints: (data) => <NodeEndpointsTooltipContent data={data} />,
     // eslint-disable-next-line react/display-name
     tabletsOverall: (data) => <TabletsOverallTooltip data={data} />,
     // eslint-disable-next-line react/display-name
