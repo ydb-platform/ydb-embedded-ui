@@ -9,7 +9,7 @@ import routes, {CLUSTER_PAGES} from '../../routes';
 
 import './Cluster.scss';
 import {useRouteMatch} from 'react-router';
-import ClusterInfo from '../ClusterInfo/ClusterInfo';
+import {ClusterInfo} from '../ClusterInfo/ClusterInfo';
 
 const b = cn('cluster');
 

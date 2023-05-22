@@ -1,132 +1,91 @@
-import React, {ReactNode} from 'react';
-import cn from 'bem-cn-lite';
-import {connect} from 'react-redux';
-import {Link, Loader} from '@gravity-ui/uikit';
+import React, {useCallback, useEffect} from 'react';
+import {useDispatch} from 'react-redux';
+import {useLocation} from 'react-router';
+import block from 'bem-cn-lite';
+import qs from 'qs';
 
-//@ts-ignore
+import {Link} from '@gravity-ui/uikit';
+
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
-//@ts-ignore
 import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
-//@ts-ignore
-import InfoViewer from '../../components/InfoViewer/InfoViewer';
+import InfoViewer, {InfoViewerItem} from '../../components/InfoViewer/InfoViewer';
 import {Tags} from '../../components/Tags';
 import {Tablet} from '../../components/Tablet';
-
-//@ts-ignore
-import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
-//@ts-ignore
-import {getClusterInfo} from '../../store/reducers/cluster/cluster';
-//@ts-ignore
-import {clusterName, backend, customBackend} from '../../store';
-
-//@ts-ignore
-import {formatStorageValues} from '../../utils';
-//@ts-ignore
-import {TxAllocator} from '../../utils/constants';
-import {AutoFetcher} from '../../utils/autofetcher';
 import {Icon} from '../../components/Icon';
+import {Loader} from '../../components/Loader';
+import {ResponseError} from '../../components/Errors/ResponseError';
+
+import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
+import {getClusterInfo} from '../../store/reducers/cluster/cluster';
+import {backend, customBackend} from '../../store';
 import {setHeader} from '../../store/reducers/header';
+import {formatStorageValues} from '../../utils';
+import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 
-import type {TClusterInfo} from '../../types/api/cluster';
-import type {TTabletStateInfo} from '../../types/api/tablet';
+import {compareTablets} from './utils';
 
 import './ClusterInfo.scss';
 
-const b = cn('cluster-info');
-
-export interface IClusterInfoItem {
-    label: string;
-    value: ReactNode;
-}
+const b = block('cluster-info');
 
 interface ClusterInfoProps {
-    className?: string;
-    cluster?: TClusterInfo;
-    hideTooltip: VoidFunction;
-    showTooltip: (...args: Parameters<typeof showTooltip>) => void;
-    setHeader: any;
-    getClusterInfo: (clusterName: string) => void;
     clusterTitle?: string;
-    additionalClusterInfo?: IClusterInfoItem[];
-    loading: boolean;
-    singleClusterMode: boolean;
-    wasLoaded: boolean;
-    error?: {statusText: string};
+    additionalClusterInfo?: InfoViewerItem[];
 }
 
-class ClusterInfo extends React.Component<ClusterInfoProps> {
-    static compareTablets(tablet1: TTabletStateInfo, tablet2: TTabletStateInfo) {
-        if (tablet1.Type === TxAllocator) {
-            return 1;
-        }
+export const ClusterInfo = ({clusterTitle, additionalClusterInfo = []}: ClusterInfoProps) => {
+    const dispatch = useDispatch();
+    const location = useLocation();
 
-        if (tablet2.Type === TxAllocator) {
-            return -1;
-        }
+    const queryParams = qs.parse(location.search, {
+        ignoreQueryPrefix: true,
+    });
+    const {clusterName} = queryParams;
 
-        return 0;
-    }
+    const {data: cluster, loading, wasLoaded, error} = useTypedSelector((state) => state.cluster);
+    const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
-    private autofetcher: any;
-
-    componentDidMount() {
-        const {setHeader} = this.props;
-        setHeader([
-            {
-                text: CLUSTER_PAGES.cluster.title,
-                link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.cluster.id}),
-            },
-        ]);
-        this.props.getClusterInfo(clusterName);
-        this.autofetcher = new AutoFetcher();
-        this.autofetcher.fetch(() => this.props.getClusterInfo(clusterName));
-    }
-
-    shouldComponentUpdate(nextProps: ClusterInfoProps) {
-        const {cluster = {}} = nextProps;
-        return !(Object.keys(cluster).length === 0);
-    }
-
-    componentWillUnmount() {
-        this.autofetcher.stop();
-    }
-
-    renderLoader() {
-        return (
-            <div className={b('loader')}>
-                <Loader size="l" />
-            </div>
+    useEffect(() => {
+        dispatch(
+            setHeader([
+                {
+                    text: CLUSTER_PAGES.cluster.title,
+                    link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.cluster.id}),
+                },
+            ]),
         );
-    }
+    }, [dispatch]);
 
-    render() {
-        const {className, error} = this.props;
-        let helper;
-        if (error) {
-            helper = error.statusText;
-        }
-        return <div className={b(null, className)}>{helper || this.renderContent()}</div>;
-    }
+    const fetchData = useCallback(() => {
+        dispatch(getClusterInfo(clusterName ? String(clusterName) : undefined));
+    }, [dispatch, clusterName]);
 
-    private getInfo() {
-        const {cluster = {}, additionalClusterInfo = [], singleClusterMode} = this.props;
-        const {StorageTotal, StorageUsed} = cluster;
+    useAutofetcher(fetchData, [fetchData], true);
 
+    const onShowTooltip = (...args: Parameters<typeof showTooltip>) => {
+        dispatch(showTooltip(...args));
+    };
+
+    const onHideTooltip = () => {
+        dispatch(hideTooltip());
+    };
+
+    const getInfo = () => {
         let link = backend + '/internal';
 
         if (singleClusterMode && !customBackend) {
             link = `/internal`;
         }
 
-        const info: IClusterInfoItem[] = [
+        const info: InfoViewerItem[] = [
             {
                 label: 'Nodes',
                 value: (
                     <ProgressViewer
                         className={b('metric-field')}
-                        value={cluster.NodesAlive}
-                        capacity={cluster.NodesTotal}
+                        value={cluster?.NodesAlive}
+                        capacity={cluster?.NodesTotal}
                     />
                 ),
             },
@@ -135,8 +94,8 @@ class ClusterInfo extends React.Component<ClusterInfoProps> {
                 value: (
                     <ProgressViewer
                         className={b('metric-field')}
-                        value={cluster.LoadAverage}
-                        capacity={cluster.NumberOfCpus}
+                        value={cluster?.LoadAverage}
+                        capacity={cluster?.NumberOfCpus}
                     />
                 ),
             },
@@ -145,15 +104,15 @@ class ClusterInfo extends React.Component<ClusterInfoProps> {
                 value: (
                     <ProgressViewer
                         className={b('metric-field')}
-                        value={StorageUsed}
-                        capacity={StorageTotal}
+                        value={cluster?.StorageUsed}
+                        capacity={cluster?.StorageTotal}
                         formatValues={formatStorageValues}
                     />
                 ),
             },
             {
                 label: 'Versions',
-                value: <div>{cluster.Versions?.join(', ')}</div>,
+                value: <div>{cluster?.Versions?.join(', ')}</div>,
             },
             ...additionalClusterInfo,
             {
@@ -167,73 +126,41 @@ class ClusterInfo extends React.Component<ClusterInfoProps> {
         ];
 
         return info;
+    };
+
+    if (loading && !wasLoaded) {
+        return <Loader size="l" />;
     }
 
-    private renderContent = () => {
-        const {
-            cluster = {},
-            showTooltip,
-            hideTooltip,
-            clusterTitle,
-            loading,
-            wasLoaded,
-        } = this.props;
-        const {Name: clusterName = 'Unknown cluster'} = cluster;
-
-        const info = this.getInfo();
-
-        return loading && !wasLoaded ? (
-            this.renderLoader()
-        ) : (
-            <React.Fragment>
-                <div className={b('common')}>
-                    <div className={b('url')}>
-                        <EntityStatus
-                            size="m"
-                            status={cluster.Overall}
-                            name={clusterTitle ?? clusterName}
-                        />
-                    </div>
-
-                    {cluster.DataCenters && <Tags tags={cluster.DataCenters} />}
-
-                    <div className={b('system-tablets')}>
-                        {cluster.SystemTablets &&
-                            cluster.SystemTablets.sort(ClusterInfo.compareTablets).map(
-                                (tablet, tabletIndex) => (
-                                    <Tablet
-                                        onMouseEnter={showTooltip}
-                                        onMouseLeave={hideTooltip}
-                                        key={tabletIndex}
-                                        tablet={tablet}
-                                    />
-                                ),
-                            )}
-                    </div>
+    if (error) {
+        return <ResponseError error={error} />;
+    }
+    return (
+        <React.Fragment>
+            <div className={b('common')}>
+                <div className={b('url')}>
+                    <EntityStatus
+                        size="m"
+                        status={cluster?.Overall}
+                        name={clusterTitle ?? cluster?.Name ?? 'Unknown cluster'}
+                    />
                 </div>
-                <InfoViewer dots={true} info={info} />
-            </React.Fragment>
-        );
-    };
-}
 
-const mapStateToProps = (state: any) => {
-    const {data: cluster, loading, error, wasLoaded} = state.cluster;
+                {cluster?.DataCenters && <Tags tags={cluster?.DataCenters} />}
 
-    return {
-        cluster,
-        loading,
-        wasLoaded,
-        error,
-        singleClusterMode: state.singleClusterMode,
-    };
+                <div className={b('system-tablets')}>
+                    {cluster?.SystemTablets &&
+                        cluster.SystemTablets.sort(compareTablets).map((tablet, tabletIndex) => (
+                            <Tablet
+                                onMouseEnter={onShowTooltip}
+                                onMouseLeave={onHideTooltip}
+                                key={tabletIndex}
+                                tablet={tablet}
+                            />
+                        ))}
+                </div>
+            </div>
+            <InfoViewer dots={true} info={getInfo()} />
+        </React.Fragment>
+    );
 };
-
-const mapDispatchToProps = {
-    getClusterInfo,
-    hideTooltip,
-    showTooltip,
-    setHeader,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ClusterInfo);
