@@ -39,8 +39,6 @@ export const TABLET_COLORS = {
     Active: 'lightgreen',
 };
 
-export const TxAllocator = 'TxAllocator';
-
 export const TABLET_SYMBOLS = {
     OldTxProxy: 'P',
     TxProxy: 'P',
