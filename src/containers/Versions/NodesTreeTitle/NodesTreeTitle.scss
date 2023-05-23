@@ -1,0 +1,55 @@
+.ydb-versions-nodes-tree-title {
+    &__overview {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        width: 100%;
+    }
+
+    &__overview-info {
+        display: flex;
+        align-items: center;
+
+        margin-left: 25px;
+
+        & > *:not(:first-child) {
+            margin-left: 30px;
+        }
+    }
+    &__overview-container {
+        display: flex;
+        align-items: center;
+    }
+    &__info-label {
+        font-weight: 200;
+
+        color: var(--yc-color-text-complementary);
+
+        &_margin_left {
+            margin-left: 5px;
+        }
+        &_margin_right {
+            margin-right: 5px;
+        }
+    }
+
+    &__version-color {
+        width: 16px;
+        height: 16px;
+        margin-right: 10px;
+
+        border-radius: 100%;
+    }
+
+    &__version-progress {
+        display: flex;
+        align-items: center;
+
+        width: 250px;
+
+        & .yc-progress {
+            width: 200px;
+        }
+    }
+}
