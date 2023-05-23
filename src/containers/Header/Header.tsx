@@ -1,16 +1,16 @@
 import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
-import {useHistory, useLocation} from 'react-router';
+import {useHistory} from 'react-router';
 import {Breadcrumbs, BreadcrumbsItem, Link} from '@gravity-ui/uikit';
 
 import Divider from '../../components/Divider/Divider';
 import {Icon} from '../../components/Icon';
 
-import {clusterName as clusterNameLocation, backend, customBackend} from '../../store';
-import {getClusterInfo} from '../../store/reducers/cluster/cluster';
+import {backend, customBackend} from '../../store';
 import {getHostInfo} from '../../store/reducers/host';
 import {HeaderItemType} from '../../store/reducers/header';
+import {useTypedSelector} from '../../utils/hooks';
 
 import './Header.scss';
 
@@ -31,26 +31,19 @@ interface HeaderProps {
 
 function Header({clusterName}: HeaderProps) {
     const dispatch = useDispatch();
-    const {data: host}: {data: {ClusterName?: string}} = useSelector((state: any) => state.host);
-    const {singleClusterMode, header}: {singleClusterMode: boolean; header: HeaderItemType[]} =
-        useSelector((state: any) => state);
 
-    const location = useLocation();
+    const {singleClusterMode, header}: {singleClusterMode: boolean; header: HeaderItemType[]} =
+        useTypedSelector((state) => state);
+    const {data: host} = useTypedSelector((state) => state.host);
+
     const history = useHistory();
 
-    const {pathname} = location;
-
     useEffect(() => {
-        const isClustersPage = pathname.includes('/clusters');
-
-        if (!isClustersPage && !clusterName && !singleClusterMode) {
-            dispatch(getClusterInfo(clusterNameLocation));
-        }
         dispatch(getHostInfo());
-    }, []);
+    }, [dispatch]);
 
     const renderHeader = () => {
-        const clusterNameFinal = singleClusterMode ? host.ClusterName : clusterName;
+        const clusterNameFinal = singleClusterMode ? host?.ClusterName : clusterName;
 
         let link = backend + '/internal';
 
