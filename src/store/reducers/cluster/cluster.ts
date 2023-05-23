@@ -26,6 +26,10 @@ const cluster: Reducer<ClusterState, ClusterAction> = (state = initialState, act
             };
         }
         case FETCH_CLUSTER.FAILURE: {
+            if (action.error?.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error,
