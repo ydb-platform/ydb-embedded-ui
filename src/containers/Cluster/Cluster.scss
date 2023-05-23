@@ -6,6 +6,10 @@
     padding: 0 20px;
     @include flex-container();
 
+    &_tab_cluster {
+        padding: 0px;
+    }
+
     &__tab {
         text-decoration: none;
 
