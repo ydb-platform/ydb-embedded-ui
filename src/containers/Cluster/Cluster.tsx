@@ -43,7 +43,7 @@ function Cluster(props: ClusterProps) {
         }
     };
 
-    return <div className={b()}>{renderRoutes()}</div>;
+    return <div className={b({tab: activeTab})}>{renderRoutes()}</div>;
 }
 
 export default Cluster;
