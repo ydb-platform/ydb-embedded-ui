@@ -50,6 +50,9 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             tablets: true,
         });
     }
+    getClusterNodes() {
+        return this.get<TEvSystemStateResponse>(this.getPath('/viewer/json/sysinfo'), {});
+    }
     getNodeInfo(id?: string) {
         return this.get<TEvSystemStateResponse>(this.getPath('/viewer/json/sysinfo?enums=true'), {
             node_id: id,
