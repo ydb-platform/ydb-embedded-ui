@@ -16,7 +16,7 @@ import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
 import Header from '../Header/Header';
 import AppIcons from '../AppIcons/AppIcons';
 
-import {getSettingValue} from '../../store/reducers/settings';
+import {getParsedSettingValue} from '../../store/reducers/settings';
 import {THEME_KEY} from '../../utils/constants';
 
 import './App.scss';
@@ -100,7 +100,7 @@ ContentWrapper.propTypes = {
 
 function mapStateToProps(state) {
     return {
-        theme: getSettingValue(state, THEME_KEY),
+        theme: getParsedSettingValue(state, THEME_KEY),
         isAuthenticated: state.authentication.isAuthenticated,
         singleClusterMode: state.singleClusterMode,
     };

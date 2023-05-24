@@ -19,7 +19,7 @@ import userChecked from '../../assets/icons/user-check.svg';
 import settingsIcon from '../../assets/icons/settings.svg';
 import supportIcon from '../../assets/icons/support.svg';
 
-import UserSettings from '../UserSettings/UserSettings';
+import {UserSettings} from '../UserSettings/UserSettings';
 
 import routes, {createHref, CLUSTER_PAGES} from '../../routes';
 
