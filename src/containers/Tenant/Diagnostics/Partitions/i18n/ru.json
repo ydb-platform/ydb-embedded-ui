@@ -4,7 +4,7 @@
   "headers.unread": "End offset - Last read offset",
   "headers.uncommited": "End offset - Committed offset",
   "controls.consumerSelector": "Читатель:",
-  "controls.consumerSelector.placeholder": "Читатель",
+  "controls.consumerSelector.emptyOption": "Нет читателя",
   "controls.partitionSearch": "Partition ID",
   "controls.generalSearch": "Host, Host ID, Reader, Read Session ID",
   "table.emptyDataMessage": "По заданному поиску нет партиций",

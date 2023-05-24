@@ -16,6 +16,10 @@
         width: 220px;
     }
 
+    &__select-option_empty {
+        color: var(--yc-color-text-hint);
+    }
+
     &__search {
         @include search();
         &_partition {
