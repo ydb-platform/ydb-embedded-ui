@@ -15,7 +15,7 @@ const SET_DATA_WAS_NOT_LOADED = 'partitions/SET_DATA_WAS_NOT_LOADED';
 const initialState = {
     loading: false,
     wasLoaded: false,
-    selectedConsumer: undefined,
+    selectedConsumer: '',
 };
 
 const partitions: Reducer<PartitionsState, PartitionsAction> = (state = initialState, action) => {
@@ -63,7 +63,7 @@ const partitions: Reducer<PartitionsState, PartitionsAction> = (state = initialS
     }
 };
 
-export const setSelectedConsumer = (value?: string) => {
+export const setSelectedConsumer = (value: string) => {
     return {
         type: SET_SELECTED_CONSUMER,
         data: value,

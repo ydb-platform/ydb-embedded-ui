@@ -113,7 +113,7 @@ export const Partitions = ({path}: PartitionsProps) => {
             selectedConsumer && consumers && !consumers.includes(selectedConsumer);
 
         if (isTopicWithoutConsumers || wrongSelectedConsumer) {
-            dispatch(setSelectedConsumer());
+            dispatch(setSelectedConsumer(''));
         }
     }, [dispatch, topicWasLoaded, selectedConsumer, consumers]);
 
@@ -125,7 +125,7 @@ export const Partitions = ({path}: PartitionsProps) => {
         setHiddenColumns(newHiddenColumns);
     };
 
-    const handleSelectedConsumerChange = (value?: string) => {
+    const handleSelectedConsumerChange = (value: string) => {
         dispatch(setSelectedConsumer(value));
     };
 

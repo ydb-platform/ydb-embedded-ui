@@ -2,7 +2,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {escapeRegExp} from 'lodash/fp';
 
 import {TableColumnSetupItem} from '@gravity-ui/uikit/build/esm/components/Table/hoc/withTableSettings/withTableSettings';
-import {Select, TableColumnSetup} from '@gravity-ui/uikit';
+import {Select, SelectOption, TableColumnSetup} from '@gravity-ui/uikit';
 
 import type {ValueOf} from '../../../../../types/common';
 
@@ -15,8 +15,8 @@ import {b} from '../Partitions';
 
 interface PartitionsControlsProps {
     consumers: string[] | undefined;
-    selectedConsumer: string | undefined;
-    onSelectedConsumerChange: (consumer: string | undefined) => void;
+    selectedConsumer: string;
+    onSelectedConsumerChange: (consumer: string) => void;
     selectDisabled: boolean;
     partitions: PreparedPartitionDataWithHosts[] | undefined;
     onSearchChange: (filteredPartitions: PreparedPartitionDataWithHosts[]) => void;
@@ -38,9 +38,6 @@ export const PartitionsControls = ({
 }: PartitionsControlsProps) => {
     const [generalSearchValue, setGeneralSearchValue] = useState('');
     const [partitionIdSearchValue, setPartitionIdSearchValue] = useState('');
-
-    // Manual select control to enforce single-select behaviour for multiple select type
-    const [consumerSelectOpen, setConsumerSelectOpen] = useState(false);
 
     useEffect(() => {
         if (!partitions) {
@@ -83,16 +80,17 @@ export const PartitionsControls = ({
         onSearchChange(filteredPartitions);
     }, [partitionIdSearchValue, generalSearchValue, partitions, onSearchChange]);
 
-    const consumersToSelect = useMemo(
-        () =>
-            consumers
+    const consumersToSelect = useMemo(() => {
+        const options =
+            consumers && consumers.length
                 ? consumers.map((consumer) => ({
                       value: consumer,
                       content: consumer,
                   }))
-                : undefined,
-        [consumers],
-    );
+                : [];
+
+        return [{value: '', content: i18n('controls.consumerSelector.emptyOption')}, ...options];
+    }, [consumers]);
 
     const columnsToSelect = useMemo(() => {
         return initialColumnsIds.map((id) => {
@@ -106,10 +104,7 @@ export const PartitionsControls = ({
     }, [initialColumnsIds, hiddenColumns]);
 
     const handleConsumerSelectChange = (value: string[]) => {
-        // As we have selector with multiple options, the first value corresponds to previous value
-        // The second value is currently chosen consumer
-        onSelectedConsumerChange(value[1]);
-        setConsumerSelectOpen(false);
+        onSelectedConsumerChange(value[0]);
     };
 
     const handlePartitionIdSearchChange = (value: string) => {
@@ -137,25 +132,24 @@ export const PartitionsControls = ({
         onHiddenColumnsChange(result);
     };
 
+    const renderOption = (option: SelectOption) => {
+        return (
+            <div className={b('select-option', {empty: option.value === ''})}>{option.content}</div>
+        );
+    };
+
     return (
         <div className={b('controls')}>
             <Select
                 className={b('consumer-select')}
-                placeholder={i18n('controls.consumerSelector.placeholder')}
                 label={i18n('controls.consumerSelector')}
                 options={consumersToSelect}
-                value={[selectedConsumer || '']}
+                value={[selectedConsumer]}
                 onUpdate={handleConsumerSelectChange}
                 filterable={consumers && consumers.length > 5}
                 disabled={selectDisabled || !consumers || !consumers.length}
-                open={consumerSelectOpen}
-                onOpenChange={setConsumerSelectOpen}
-                // Although only one value could be selected
-                // Multiple type Select is used
-                // The reason - we need Select to be able to work with no value
-                // And it is easier to make multiple Select close on value change
-                // Than to enable single select to work with empty values
-                multiple
+                renderOption={renderOption}
+                renderSelectedOption={renderOption}
             />
             <Search
                 onChange={handlePartitionIdSearchChange}

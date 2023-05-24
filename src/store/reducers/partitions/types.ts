@@ -36,7 +36,7 @@ export interface PreparedPartitionData {
 export interface PartitionsState {
     loading: boolean;
     wasLoaded: boolean;
-    selectedConsumer: string | undefined;
+    selectedConsumer: string;
     partitions?: PreparedPartitionData[];
     error?: IResponseError;
 }
