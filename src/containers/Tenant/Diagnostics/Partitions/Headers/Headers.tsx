@@ -28,16 +28,16 @@ export const ReadSessionHeader = () => (
 export const WriteLagsHeader = () => (
     <LabelWithPopover
         className={b('lags')}
-        text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.READ_LAGS]}
-        popoverContent={<LagPopoverContent text={i18n('lagsPopover.readLags')} type="read" />}
+        text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.WRITE_LAGS]}
+        popoverContent={<LagPopoverContent text={i18n('lagsPopover.writeLags')} type="write" />}
     />
 );
 
 export const ReadLagsHeader = () => (
     <LabelWithPopover
         className={b('lags')}
-        text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.WRITE_LAGS]}
-        popoverContent={<LagPopoverContent text={i18n('lagsPopover.writeLags')} type="write" />}
+        text={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.READ_LAGS]}
+        popoverContent={<LagPopoverContent text={i18n('lagsPopover.readLags')} type="read" />}
     />
 );
 
