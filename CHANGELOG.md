@@ -1,5 +1,22 @@
 # Changelog
 
+## [4.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.3.0...v4.4.0) (2023-05-25)
+
+
+### Features
+
+* add Versions ([#394](https://github.com/ydb-platform/ydb-embedded-ui/issues/394)) ([d5abb58](https://github.com/ydb-platform/ydb-embedded-ui/commit/d5abb586a127135c5756a3aa5076060c0dce3fba))
+* remove unsupported pages ([b2bc3b2](https://github.com/ydb-platform/ydb-embedded-ui/commit/b2bc3b22029679769bb0de73f2c33827028de8a8))
+
+
+### Bug Fixes
+
+* **ClusterInfo:** do not show response error on cancelled requests ([83501b5](https://github.com/ydb-platform/ydb-embedded-ui/commit/83501b50f0c266ba654858767ca89a2a3fa891ed))
+* **Cluster:** remove padding from cluster page ([8138823](https://github.com/ydb-platform/ydb-embedded-ui/commit/8138823a9d5d3dbd1f086fb0bb23265d7faa8025))
+* **Partitions:** fix columns titles ([4fe21a0](https://github.com/ydb-platform/ydb-embedded-ui/commit/4fe21a0dc149c7bca0611c74990756fbdc5fb273))
+* **Partitions:** update Select empty value ([a7df6d1](https://github.com/ydb-platform/ydb-embedded-ui/commit/a7df6d1c86224a4534fac048cebc61b6f5a78fde))
+* **UserSettings:** separate Setting, enable additional settings ([#396](https://github.com/ydb-platform/ydb-embedded-ui/issues/396)) ([e8a17a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/e8a17a160c82212a181b1ef4e3b9f223db29907e))
+
 ## [4.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.2.1...v4.3.0) (2023-05-18)
 
 
