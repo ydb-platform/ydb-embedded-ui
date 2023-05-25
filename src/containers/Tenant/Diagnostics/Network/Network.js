@@ -14,8 +14,8 @@ import {Illustration} from '../../../../components/Illustration';
 
 import {getNetworkInfo, setDataWasNotLoaded} from '../../../../store/reducers/network';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
-import {ALL, PROBLEMS} from '../../../../utils/constants';
-import {changeFilter} from '../../../../store/reducers/settings';
+import {ProblemFilterValues} from '../../../../store/reducers/settings/types';
+import {changeFilter} from '../../../../store/reducers/settings/settings';
 import {AutoFetcher} from '../../../../utils/autofetcher';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 
@@ -178,8 +178,9 @@ class Network extends React.Component {
                                           }
 
                                           if (
-                                              (filter === PROBLEMS && capacity !== connected) ||
-                                              filter === ALL ||
+                                              (filter === ProblemFilterValues.PROBLEMS &&
+                                                  capacity !== connected) ||
+                                              filter === ProblemFilterValues.ALL ||
                                               isRight
                                           ) {
                                               problemNodesCount++;
@@ -218,8 +219,9 @@ class Network extends React.Component {
                                   }
 
                                   if (
-                                      (filter === PROBLEMS && capacity !== connected) ||
-                                      filter === ALL ||
+                                      (filter === ProblemFilterValues.PROBLEMS &&
+                                          capacity !== connected) ||
+                                      filter === ProblemFilterValues.ALL ||
                                       isRight
                                   ) {
                                       problemNodesCount++;
@@ -254,7 +256,7 @@ class Network extends React.Component {
             );
         });
 
-        if (filter === PROBLEMS && problemNodesCount === 0) {
+        if (filter === ProblemFilterValues.PROBLEMS && problemNodesCount === 0) {
             return <Illustration name="thumbsUp" width="200" />;
         } else {
             return result;

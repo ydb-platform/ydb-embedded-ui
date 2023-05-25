@@ -19,9 +19,10 @@ import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 import {formatCPU, formatBytesToGigabyte, formatNumber} from '../../utils';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
-import {ALL, DEFAULT_TABLE_SETTINGS, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
 import {getTenantsInfo} from '../../store/reducers/tenants/tenants';
-import {changeFilter, getSettingValue} from '../../store/reducers/settings';
+import {changeFilter, getSettingValue} from '../../store/reducers/settings/settings';
+import {ProblemFilterValues} from '../../store/reducers/settings/types';
 import {setHeader} from '../../store/reducers/header';
 
 import {clusterName} from '../../store';
@@ -63,7 +64,7 @@ class Tenants extends React.Component {
     };
 
     static filterTenants(tenants, filter) {
-        if (filter === ALL) {
+        if (filter === ProblemFilterValues.ALL) {
             return tenants;
         }
 
@@ -311,7 +312,7 @@ class Tenants extends React.Component {
             },
         ];
 
-        if (filteredTenants.length === 0 && filter !== ALL) {
+        if (filteredTenants.length === 0 && filter !== ProblemFilterValues.ALL) {
             return <Illustration name="thumbsUp" width="200" />;
         }
 

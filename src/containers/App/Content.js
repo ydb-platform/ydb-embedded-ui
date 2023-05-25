@@ -16,7 +16,7 @@ import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
 import Header from '../Header/Header';
 import AppIcons from '../AppIcons/AppIcons';
 
-import {getParsedSettingValue} from '../../store/reducers/settings';
+import {getParsedSettingValue} from '../../store/reducers/settings/settings';
 import {THEME_KEY} from '../../utils/constants';
 
 import './App.scss';

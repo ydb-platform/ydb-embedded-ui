@@ -6,7 +6,7 @@ import {parseQuery} from 'redux-location-state/lib/parseQuery';
 import {LOCATION_PUSH, LOCATION_POP} from 'redux-location-state/lib/constants';
 import {getMatchingDeclaredPath} from 'redux-location-state/lib/helpers';
 
-import {initialState as initialSettingsState} from './reducers/settings';
+import {initialState as initialSettingsState} from './reducers/settings/settings';
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 
 const paramSetup = {
