@@ -4,11 +4,11 @@ import DataTable, {Column} from '@gravity-ui/react-data-table';
 
 import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
 import type {ShowTooltipFunction} from '../../../types/store/tooltip';
-import type {AdditionalVersionsProps} from '../../../types/additionalProps';
 
 import {hideTooltip, showTooltip} from '../../../store/reducers/tooltip';
+import {isUnavailableNode} from '../../../utils/nodes';
 import {formatBytes} from '../../../utils';
-import routes, {createHref} from '../../../routes';
+import {getDefaultNodePath} from '../../Node/NodePages';
 
 import ProgressViewer from '../../../components/ProgressViewer/ProgressViewer';
 import PoolsGraph from '../../../components/PoolsGraph/PoolsGraph';
@@ -17,11 +17,9 @@ import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 const getColumns = ({
     onShowTooltip,
     onHideTooltip,
-    additionalVersionsProps,
 }: {
     onShowTooltip: (...args: Parameters<ShowTooltipFunction>) => void;
     onHideTooltip: VoidFunction;
-    additionalVersionsProps?: AdditionalVersionsProps;
 }): Column<PreparedClusterNode>[] => [
     {
         name: 'NodeId',
@@ -38,23 +36,11 @@ const getColumns = ({
             const host = row.Host && `${row.Host}${port || ''}`;
             const title = host || 'unknown';
 
-            const nodeHref =
-                row.NodeId && host
-                    ? createHref(
-                          routes.node,
-                          {id: row.NodeId, activeTab: 'storage'},
-                          {backend: additionalVersionsProps?.getBackend?.(host)},
-                      )
-                    : undefined;
+            const nodePath =
+                !isUnavailableNode(row) && row.NodeId ? getDefaultNodePath(row.NodeId) : undefined;
 
             return (
-                <EntityStatus
-                    name={title}
-                    path={nodeHref}
-                    hasClipboardButton
-                    showStatus={false}
-                    externalLink
-                />
+                <EntityStatus name={title} path={nodePath} hasClipboardButton showStatus={false} />
             );
         },
         width: '400px',
@@ -138,10 +124,9 @@ const getColumns = ({
 
 interface NodesTableProps {
     nodes: PreparedClusterNode[];
-    additionalVersionsProps?: AdditionalVersionsProps;
 }
 
-export const NodesTable = ({nodes, additionalVersionsProps}: NodesTableProps) => {
+export const NodesTable = ({nodes}: NodesTableProps) => {
     const dispatch = useDispatch();
 
     const onShowTooltip = (...args: Parameters<ShowTooltipFunction>) => {
@@ -156,7 +141,7 @@ export const NodesTable = ({nodes, additionalVersionsProps}: NodesTableProps) =>
         <DataTable
             theme="yandex-cloud"
             data={nodes}
-            columns={getColumns({onShowTooltip, onHideTooltip, additionalVersionsProps})}
+            columns={getColumns({onShowTooltip, onHideTooltip})}
             settings={{
                 displayIndices: false,
             }}

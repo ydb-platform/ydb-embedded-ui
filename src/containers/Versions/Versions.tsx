@@ -3,7 +3,6 @@ import block from 'bem-cn-lite';
 
 import {Checkbox, RadioButton} from '@gravity-ui/uikit';
 
-import type {AdditionalVersionsProps} from '../../types/additionalProps';
 import type {PreparedClusterNode} from '../../store/reducers/clusterNodes/types';
 import type {VersionToColorMap} from '../../types/versions';
 import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
@@ -17,10 +16,9 @@ const b = block('ydb-versions');
 interface VersionsProps {
     nodes?: PreparedClusterNode[];
     versionToColor?: VersionToColorMap;
-    additionalVersionsProps?: AdditionalVersionsProps;
 }
 
-export const Versions = ({nodes = [], versionToColor, additionalVersionsProps}: VersionsProps) => {
+export const Versions = ({nodes = [], versionToColor}: VersionsProps) => {
     const [groupByValue, setGroupByValue] = useState<GroupByValue>(GroupByValue.VERSION);
     const [expanded, setExpanded] = useState(false);
 
@@ -71,7 +69,6 @@ export const Versions = ({nodes = [], versionToColor, additionalVersionsProps}: 
                         nodes={itemNodes}
                         items={items}
                         versionColor={versionColor}
-                        additionalVersionsProps={additionalVersionsProps}
                     />
                 ))}
             </>
@@ -90,7 +87,6 @@ export const Versions = ({nodes = [], versionToColor, additionalVersionsProps}: 
                             expanded={expanded}
                             versionColor={versionColor}
                             versionsValues={versionsValues}
-                            additionalVersionsProps={additionalVersionsProps}
                         />
                     ),
                 )}
@@ -108,7 +104,6 @@ export const Versions = ({nodes = [], versionToColor, additionalVersionsProps}: 
                             items={items}
                             versionColor={versionColor}
                             versionsValues={versionsValues}
-                            additionalVersionsProps={additionalVersionsProps}
                         />
                     ),
                 )}

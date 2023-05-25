@@ -201,11 +201,7 @@ export const ClusterInfo = ({
                 </div>
             </div>
 
-            <Versions
-                nodes={nodes}
-                versionToColor={versionToColor}
-                additionalVersionsProps={additionalVersionsProps}
-            />
+            <Versions nodes={nodes} versionToColor={versionToColor} />
         </div>
     );
 };

@@ -5,7 +5,6 @@ import {TreeView} from 'ydb-ui-components';
 
 import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
 import type {VersionValue} from '../../../types/versions';
-import type {AdditionalVersionsProps} from '../../../types/additionalProps';
 
 import type {GroupedNodesItem} from '../types';
 import {NodesTreeTitle} from '../NodesTreeTitle/NodesTreeTitle';
@@ -23,7 +22,6 @@ interface GroupedNodesTreeProps {
     versionColor?: string;
     versionsValues?: VersionValue[];
     level?: number;
-    additionalVersionsProps?: AdditionalVersionsProps;
 }
 
 export const GroupedNodesTree = ({
@@ -34,7 +32,6 @@ export const GroupedNodesTree = ({
     versionColor,
     versionsValues,
     level = 0,
-    additionalVersionsProps,
 }: GroupedNodesTreeProps) => {
     const [isOpened, toggleBlock] = useState(false);
 
@@ -93,10 +90,7 @@ export const GroupedNodesTree = ({
                 onArrowClick={toggleCollapsed}
             >
                 <div className={b('dt-wrapper')}>
-                    <NodesTable
-                        nodes={nodes || []}
-                        additionalVersionsProps={additionalVersionsProps}
-                    />
+                    <NodesTable nodes={nodes || []} />
                 </div>
             </TreeView>
         </div>
