@@ -1,0 +1,20 @@
+{
+  "page.general": "Общие",
+  "section.general": "Общие",
+
+  "page.experiments": "Эксперименты",
+  "section.experiments": "Эксперименты",
+
+  "settings.theme.title": "Тема",
+  "settings.theme.option-dark": "Тёмная",
+  "settings.theme.option-light": "Светлая",
+  "settings.theme.option-system": "Системная",
+
+  "settings.invertedDisks.title": "Инвертированные индикаторы места на дисках",
+
+  "settings.useNodesEndpoint.title": "Сломать вкладку Nodes в диагностике",
+  "settings.useNodesEndpoint.popover": "Использовать эндпоинт /viewer/json/nodes для вкладки Nodes в диагностике. Может возвращать некорректные данные на версиях до 23-1",
+
+  "settings.enableQueryModesForExplain.title": "Включить режимы выполнения запроса для explain",
+  "settings.enableQueryModesForExplain.popover": "Включить общий переключатель script | scan для run и explain. Может работать некорректно на версиях до 23-2"
+}

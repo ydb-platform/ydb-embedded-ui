@@ -1,0 +1,20 @@
+{
+  "page.general": "General",
+  "section.general": "General",
+
+  "page.experiments": "Experiments",
+  "section.experiments": "Experiments",
+
+  "settings.theme.title": "Interface theme",
+  "settings.theme.option-dark": "Dark",
+  "settings.theme.option-light": "Light",
+  "settings.theme.option-system": "System",
+
+  "settings.invertedDisks.title": "Inverted disks space indicators",
+
+  "settings.useNodesEndpoint.title": "Break the Nodes tab in Diagnostics",
+  "settings.useNodesEndpoint.popover": "Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on versions before 23-1",
+
+  "settings.enableQueryModesForExplain.title": "Enable query modes for explain",
+  "settings.enableQueryModesForExplain.popover": "Enable script | scan query mode selector for both run and explain. May not work on versions before 23-2"
+}
