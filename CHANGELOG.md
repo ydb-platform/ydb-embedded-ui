@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.4.0...v4.4.1) (2023-05-25)
+
+
+### Bug Fixes
+
+* **Nodes:** fix endpoint setting ([#397](https://github.com/ydb-platform/ydb-embedded-ui/issues/397)) ([4aea8a2](https://github.com/ydb-platform/ydb-embedded-ui/commit/4aea8a2597909338e31ac51577989a4d82ec93cf))
+
 ## [4.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.3.0...v4.4.0) (2023-05-25)
 
 
