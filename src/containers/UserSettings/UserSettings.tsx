@@ -13,6 +13,7 @@ import {
 } from '../../utils/constants';
 
 import {Setting, SettingProps} from './Setting';
+import i18n from './i18n';
 
 import './UserSettings.scss';
 
@@ -27,15 +28,15 @@ enum Theme {
 const themeValues = [
     {
         value: Theme.system,
-        content: 'System',
+        content: i18n('settings.theme.option-system'),
     },
     {
         value: Theme.light,
-        content: 'Light',
+        content: i18n('settings.theme.option-light'),
     },
     {
         value: Theme.dark,
-        content: 'Dark',
+        content: i18n('settings.theme.option-dark'),
     },
 ];
 
@@ -53,13 +54,13 @@ export const UserSettings = ({settings}: UserSettingsProps) => {
         <Settings>
             <Settings.Page
                 id={SettingsSection.general}
-                title="General"
+                title={i18n('page.general')}
                 icon={{data: favoriteFilledIcon, height: 14, width: 14}}
             >
-                <Settings.Section title="General">
+                <Settings.Section title={i18n('section.general')}>
                     <Setting
                         settingKey={THEME_KEY}
-                        title="Interface theme"
+                        title={i18n('settings.theme.title')}
                         type="radio"
                         values={themeValues}
                     />
@@ -70,27 +71,23 @@ export const UserSettings = ({settings}: UserSettingsProps) => {
             </Settings.Page>
             <Settings.Page
                 id={SettingsSection.experiments}
-                title="Experiments"
+                title={i18n('page.experiments')}
                 icon={{data: flaskIcon}}
             >
-                <Settings.Section title="Experiments">
+                <Settings.Section title={i18n('section.experiments')}>
                     <Setting
                         settingKey={INVERTED_DISKS_KEY}
-                        title={'Inverted disks space indicators'}
+                        title={i18n('settings.invertedDisks.title')}
                     />
                     <Setting
                         settingKey={USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY}
-                        title={'Break the Nodes tab in Diagnostics'}
-                        helpPopoverContent={
-                            'Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on older versions'
-                        }
+                        title={i18n('settings.useNodesEndpoint.title')}
+                        helpPopoverContent={i18n('settings.useNodesEndpoint.popover')}
                     />
                     <Setting
                         settingKey={ENABLE_QUERY_MODES_FOR_EXPLAIN}
-                        title={'Enable query modes for explain'}
-                        helpPopoverContent={
-                            'Enable script | scan query mode selector for both run and explain. May not work on some versions'
-                        }
+                        title={i18n('settings.enableQueryModesForExplain.title')}
+                        helpPopoverContent={i18n('settings.enableQueryModesForExplain.popover')}
                     />
                     {settings?.[SettingsSection.experiments]?.map((setting) => (
                         <Setting key={setting.settingKey} {...setting} />
