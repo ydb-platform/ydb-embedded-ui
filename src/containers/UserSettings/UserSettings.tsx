@@ -84,7 +84,6 @@ export const UserSettings = ({settings}: UserSettingsProps) => {
                         helpPopoverContent={
                             'Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on older versions'
                         }
-                        withHelpPopover
                     />
                     <Setting
                         settingKey={ENABLE_QUERY_MODES_FOR_EXPLAIN}
@@ -92,7 +91,6 @@ export const UserSettings = ({settings}: UserSettingsProps) => {
                         helpPopoverContent={
                             'Enable script | scan query mode selector for both run and explain. May not work on some versions'
                         }
-                        withHelpPopover
                     />
                     {settings?.[SettingsSection.experiments]?.map((setting) => (
                         <Setting key={setting.settingKey} {...setting} />

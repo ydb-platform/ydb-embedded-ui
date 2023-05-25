@@ -15,7 +15,6 @@ export interface SettingProps {
     type?: SettingsElementType;
     title: string;
     settingKey: string;
-    withHelpPopover?: boolean;
     helpPopoverContent?: ReactNode;
     values?: {value: string; content: string}[];
     defaultValue?: unknown;
@@ -25,7 +24,6 @@ export const Setting = ({
     type = 'switch',
     settingKey,
     title,
-    withHelpPopover,
     helpPopoverContent,
     values,
     defaultValue,
@@ -33,7 +31,7 @@ export const Setting = ({
     const [settingValue, setValue] = useSetting(settingKey, defaultValue);
 
     const renderTitleComponent = (value: ReactNode) => {
-        if (withHelpPopover) {
+        if (helpPopoverContent) {
             return (
                 <LabelWithPopover
                     className={b('item-with-popup')}
