@@ -21,7 +21,7 @@ import {
     DEFAULT_TABLE_SETTINGS,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
 } from '../../utils/constants';
-import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
+import {useAutofetcher, useSetting, useTypedSelector} from '../../utils/hooks';
 import {AdditionalNodesInfo, isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
 
 import {setHeader} from '../../store/reducers/header';
@@ -33,7 +33,7 @@ import {
     resetNodesState,
     getComputeNodes,
 } from '../../store/reducers/nodes';
-import {changeFilter, getSettingValue} from '../../store/reducers/settings';
+import {changeFilter} from '../../store/reducers/settings';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 
 import {isDatabaseEntityType} from '../Tenant/utils/schema';
@@ -72,14 +72,12 @@ export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesPr
 
     const nodes = useTypedSelector(getFilteredPreparedNodesList);
 
-    const useNodesEndpoint = useTypedSelector((state) =>
-        getSettingValue(state, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY),
-    );
+    const [useNodesEndpoint] = useSetting(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY);
 
     const fetchNodes = useCallback(() => {
         // For not DB entities we always use /compute endpoint instead of /nodes
         // since /nodes can return data only for tenants
-        if (path && (!JSON.parse(useNodesEndpoint) || !isDatabaseEntityType(type))) {
+        if (path && (useNodesEndpoint || !isDatabaseEntityType(type))) {
             dispatch(getComputeNodes(path));
         } else {
             dispatch(getNodes({tenant: path}));

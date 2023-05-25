@@ -1,9 +1,8 @@
 import React from 'react';
-import {useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 
 import {INVERTED_DISKS_KEY} from '../../../utils/constants';
-import {getSettingValue} from '../../../store/reducers/settings';
+import {useSetting} from '../../../utils/hooks';
 
 import './DiskStateProgressBar.scss';
 
@@ -35,7 +34,7 @@ export function DiskStateProgressBar({
     severity,
     compact,
 }: DiskStateProgressBarProps) {
-    const inverted = useSelector((state) => JSON.parse(getSettingValue(state, INVERTED_DISKS_KEY)));
+    const [inverted] = useSetting<boolean | undefined>(INVERTED_DISKS_KEY);
 
     const renderAllocatedPercent = () => {
         if (compact) {

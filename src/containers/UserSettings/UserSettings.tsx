@@ -1,14 +1,9 @@
-import {ReactNode} from 'react';
-import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import {RadioButton, Switch} from '@gravity-ui/uikit';
 import {Settings} from '@gravity-ui/navigation';
 
 import favoriteFilledIcon from '../../assets/icons/star.svg';
 import flaskIcon from '../../assets/icons/flask.svg';
-
-import {LabelWithPopover} from '../../components/LabelWithPopover/LabelWithPopover';
 
 import {
     ENABLE_QUERY_MODES_FOR_EXPLAIN,
@@ -17,11 +12,11 @@ import {
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
 } from '../../utils/constants';
 
-import {setSettingValue} from '../../store/reducers/settings';
+import {Setting, SettingProps} from './Setting';
 
 import './UserSettings.scss';
 
-const b = cn('ydb-user-settings');
+export const b = cn('ydb-user-settings');
 
 enum Theme {
     light = 'light',
@@ -29,112 +24,79 @@ enum Theme {
     system = 'system',
 }
 
-function UserSettings(props: any) {
-    const _onThemeChangeHandler = (value: string) => {
-        props.setSettingValue(THEME_KEY, value);
-    };
+const themeValues = [
+    {
+        value: Theme.system,
+        content: 'System',
+    },
+    {
+        value: Theme.light,
+        content: 'Light',
+    },
+    {
+        value: Theme.dark,
+        content: 'Dark',
+    },
+];
 
-    const _onInvertedDisksChangeHandler = (value: boolean) => {
-        props.setSettingValue(INVERTED_DISKS_KEY, String(value));
-    };
+export enum SettingsSection {
+    general = 'general',
+    experiments = 'experiments',
+}
 
-    const _onNodesEndpointChangeHandler = (value: boolean) => {
-        props.setSettingValue(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY, String(value));
-    };
+interface UserSettingsProps {
+    settings?: Partial<Record<SettingsSection, SettingProps[]>>;
+}
 
-    const _onExplainQueryModesChangeHandler = (value: boolean) => {
-        props.setSettingValue(ENABLE_QUERY_MODES_FOR_EXPLAIN, String(value));
-    };
-
-    const renderBreakNodesSettingsItem = (title: ReactNode) => {
-        return (
-            <LabelWithPopover
-                className={b('item-with-popup')}
-                contentClassName={b('popup')}
-                text={title}
-                popoverContent={
-                    'Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on older versions'
-                }
-            />
-        );
-    };
-
-    const renderEnableExplainQueryModesItem = (title: ReactNode) => {
-        return (
-            <LabelWithPopover
-                className={b('item-with-popup')}
-                contentClassName={b('popup')}
-                text={title}
-                popoverContent={
-                    'Enable script | scan query mode selector for both run and explain. May not work on some versions'
-                }
-            />
-        );
-    };
-
+export const UserSettings = ({settings}: UserSettingsProps) => {
     return (
         <Settings>
             <Settings.Page
-                id="general"
+                id={SettingsSection.general}
                 title="General"
                 icon={{data: favoriteFilledIcon, height: 14, width: 14}}
             >
                 <Settings.Section title="General">
-                    <Settings.Item title="Interface theme">
-                        <RadioButton value={props.theme} onUpdate={_onThemeChangeHandler}>
-                            <RadioButton.Option value={Theme.system}>System</RadioButton.Option>
-                            <RadioButton.Option value={Theme.light}>Light</RadioButton.Option>
-                            <RadioButton.Option value={Theme.dark}>Dark</RadioButton.Option>
-                        </RadioButton>
-                    </Settings.Item>
+                    <Setting
+                        settingKey={THEME_KEY}
+                        title="Interface theme"
+                        type="radio"
+                        values={themeValues}
+                    />
+                    {settings?.[SettingsSection.general]?.map((setting) => (
+                        <Setting key={setting.settingKey} {...setting} />
+                    ))}
                 </Settings.Section>
             </Settings.Page>
-            <Settings.Page id="experiments" title="Experiments" icon={{data: flaskIcon}}>
+            <Settings.Page
+                id={SettingsSection.experiments}
+                title="Experiments"
+                icon={{data: flaskIcon}}
+            >
                 <Settings.Section title="Experiments">
-                    <Settings.Item title="Inverted disks space indicators">
-                        <Switch
-                            checked={props.invertedDisks}
-                            onUpdate={_onInvertedDisksChangeHandler}
-                        />
-                    </Settings.Item>
-                    <Settings.Item
-                        title="Break the Nodes tab in Diagnostics"
-                        renderTitleComponent={renderBreakNodesSettingsItem}
-                    >
-                        <Switch
-                            checked={props.useNodesEndpointInDiagnostics}
-                            onUpdate={_onNodesEndpointChangeHandler}
-                        />
-                    </Settings.Item>
-                    <Settings.Item
-                        title="Enable query modes for explain"
-                        renderTitleComponent={renderEnableExplainQueryModesItem}
-                    >
-                        <Switch
-                            checked={props.enableQueryModesForExplain}
-                            onUpdate={_onExplainQueryModesChangeHandler}
-                        />
-                    </Settings.Item>
+                    <Setting
+                        settingKey={INVERTED_DISKS_KEY}
+                        title={'Inverted disks space indicators'}
+                    />
+                    <Setting
+                        settingKey={USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY}
+                        title={'Break the Nodes tab in Diagnostics'}
+                        helpPopoverContent={
+                            'Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on older versions'
+                        }
+                    />
+                    <Setting
+                        settingKey={ENABLE_QUERY_MODES_FOR_EXPLAIN}
+                        title={'Enable query modes for explain'}
+                        helpPopoverContent={
+                            'Enable script | scan query mode selector for both run and explain. May not work on some versions'
+                        }
+                    />
+                    {settings?.[SettingsSection.experiments]?.map((setting) => (
+                        <Setting key={setting.settingKey} {...setting} />
+                    ))}
                 </Settings.Section>
             </Settings.Page>
         </Settings>
     );
-}
-
-const mapStateToProps = (state: any) => {
-    const {theme, invertedDisks, useNodesEndpointInDiagnostics, enableQueryModesForExplain} =
-        state.settings.userSettings;
-
-    return {
-        theme,
-        invertedDisks: JSON.parse(invertedDisks),
-        useNodesEndpointInDiagnostics: JSON.parse(useNodesEndpointInDiagnostics),
-        enableQueryModesForExplain: JSON.parse(enableQueryModesForExplain),
-    };
 };
-
-const mapDispatchToProps = {
-    setSettingValue,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(UserSettings);
