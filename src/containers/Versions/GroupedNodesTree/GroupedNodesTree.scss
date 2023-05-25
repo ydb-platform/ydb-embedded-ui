@@ -1,0 +1,59 @@
+@import '../../../styles/mixins.scss';
+
+.ydb-versions-grouped-node-tree {
+    $item-width: 100%;
+    $margin-size: 24px;
+
+    &_first-level {
+        margin-top: 10px;
+        margin-bottom: 10px;
+
+        border: 1px solid var(--yc-color-line-generic);
+        border-radius: 10px;
+    }
+
+    &__dt-wrapper {
+        position: relative;
+        z-index: 0;
+
+        overflow-x: auto;
+
+        margin-right: $margin-size;
+        margin-left: $margin-size;
+
+        @include freeze-nth-column(1);
+        @include freeze-nth-column(2, 80px);
+
+        @include table-styles;
+    }
+
+    .ydb-tree-view {
+        font-size: var(--yc-text-body-2-font-size);
+        line-height: var(--yc-text-body-2-line-height);
+
+        // Apply margin ignoring first element of the tree
+        .ydb-tree-view {
+            margin-left: $margin-size;
+        }
+    }
+
+    & .tree-view_item {
+        height: 40px;
+        margin: 0;
+
+        // By default tree is rendered with padding calculated based on level
+        // We replace padding with margin for correct hover
+        padding: 0 10px !important;
+
+        border: 0;
+        border-radius: 10px;
+    }
+
+    & .tree-view_children .tree-view_item {
+        width: $item-width;
+    }
+
+    & .yc-progress__stack {
+        cursor: pointer;
+    }
+}

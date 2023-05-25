@@ -1,15 +1,15 @@
+import {useRouteMatch} from 'react-router';
 import cn from 'bem-cn-lite';
-//@ts-ignore
-import Tenants from '../Tenants/Tenants';
-//@ts-ignore
-import {Nodes} from '../Nodes/Nodes';
-//@ts-ignore
-import Storage from '../Storage/Storage';
+
+import type {AdditionalVersionsProps} from '../../types/additionalProps';
 import routes, {CLUSTER_PAGES} from '../../routes';
 
-import './Cluster.scss';
-import {useRouteMatch} from 'react-router';
 import {ClusterInfo} from '../ClusterInfo/ClusterInfo';
+import Tenants from '../Tenants/Tenants';
+import {Nodes} from '../Nodes/Nodes';
+import Storage from '../Storage/Storage';
+
+import './Cluster.scss';
 
 const b = cn('cluster');
 
@@ -17,6 +17,7 @@ interface ClusterProps {
     additionalClusterInfo?: any;
     additionalTenantsInfo?: any;
     additionalNodesInfo?: any;
+    additionalVersionsProps?: AdditionalVersionsProps;
 }
 
 function Cluster(props: ClusterProps) {
@@ -35,7 +36,12 @@ function Cluster(props: ClusterProps) {
                 return <Storage {...props} />;
             }
             case CLUSTER_PAGES.cluster.id: {
-                return <ClusterInfo additionalClusterInfo={props.additionalClusterInfo} />;
+                return (
+                    <ClusterInfo
+                        additionalClusterInfo={props.additionalClusterInfo}
+                        additionalVersionsProps={props.additionalVersionsProps}
+                    />
+                );
             }
             default: {
                 return null;
