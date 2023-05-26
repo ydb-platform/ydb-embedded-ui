@@ -14,10 +14,11 @@ import type {
     INodesRootStateSlice,
     INodesState,
 } from '../../types/store/nodes';
+import type {ValueOf} from '../../types/common';
 import {EFlag} from '../../types/api/enums';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
-import {ProblemFilterValues} from './settings/types';
+import {ProblemFilterValues} from './settings/settings';
 
 export const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
 
@@ -179,7 +180,7 @@ const getNodesList = (state: INodesRootStateSlice) => state.nodes.data;
 
 const filterNodesByProblemsStatus = (
     nodesList: INodesPreparedEntity[] = [],
-    problemFilter: ProblemFilterValues,
+    problemFilter: ValueOf<typeof ProblemFilterValues>,
 ) => {
     if (problemFilter === ProblemFilterValues.ALL) {
         return nodesList;

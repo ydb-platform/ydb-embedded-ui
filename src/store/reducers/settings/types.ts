@@ -1,12 +1,8 @@
-import {changeFilter, SET_SETTING_VALUE} from './settings';
-
-export enum ProblemFilterValues {
-    ALL = 'All',
-    PROBLEMS = 'With problems',
-}
+import type {ValueOf} from '../../../types/common';
+import {changeFilter, ProblemFilterValues, SET_SETTING_VALUE} from './settings';
 
 export interface SettingsState {
-    problemFilter: ProblemFilterValues;
+    problemFilter: ValueOf<typeof ProblemFilterValues>;
     userSettings: Record<string, string | undefined>;
     systemSettings: Record<string, string | undefined>;
 }

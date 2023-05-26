@@ -1,9 +1,10 @@
 import {RadioButton} from '@gravity-ui/uikit';
 
-import {ProblemFilterValues} from '../../store/reducers/settings/types';
+import type {ValueOf} from '../../types/common';
+import {ProblemFilterValues} from '../../store/reducers/settings/settings';
 
 interface ProblemFilterProps {
-    value: ProblemFilterValues;
+    value: ValueOf<typeof ProblemFilterValues>;
     onChange: (value: string) => void;
     className?: string;
 }

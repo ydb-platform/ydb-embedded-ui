@@ -14,8 +14,7 @@ import {Illustration} from '../../../../components/Illustration';
 
 import {getNetworkInfo, setDataWasNotLoaded} from '../../../../store/reducers/network';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
-import {ProblemFilterValues} from '../../../../store/reducers/settings/types';
-import {changeFilter} from '../../../../store/reducers/settings/settings';
+import {changeFilter, ProblemFilterValues} from '../../../../store/reducers/settings/settings';
 import {AutoFetcher} from '../../../../utils/autofetcher';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 

@@ -21,8 +21,11 @@ import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
 import {DEFAULT_TABLE_SETTINGS, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
 import {getTenantsInfo} from '../../store/reducers/tenants/tenants';
-import {changeFilter, getSettingValue} from '../../store/reducers/settings/settings';
-import {ProblemFilterValues} from '../../store/reducers/settings/types';
+import {
+    changeFilter,
+    getSettingValue,
+    ProblemFilterValues,
+} from '../../store/reducers/settings/settings';
 import {setHeader} from '../../store/reducers/header';
 
 import {clusterName} from '../../store';

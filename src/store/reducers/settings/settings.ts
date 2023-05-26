@@ -1,6 +1,7 @@
 import type {Reducer} from 'redux';
 import type {ThunkAction} from 'redux-thunk';
 
+import type {ValueOf} from '../../../types/common';
 import {
     SAVED_QUERIES_KEY,
     THEME_KEY,
@@ -23,10 +24,14 @@ import type {
     SettingsRootStateSlice,
     SettingsState,
 } from './types';
-import {ProblemFilterValues} from './types';
 
 const CHANGE_PROBLEM_FILTER = 'settings/CHANGE_PROBLEM_FILTER';
 export const SET_SETTING_VALUE = 'settings/SET_VALUE';
+
+export const ProblemFilterValues = {
+    ALL: 'All',
+    PROBLEMS: 'With problems',
+} as const;
 
 const userSettings = window.userSettings || {};
 const systemSettings = window.systemSettings || {};
@@ -113,7 +118,7 @@ export const getParsedSettingValue = (state: SettingsRootStateSlice, name: strin
     return parseJson(value);
 };
 
-export const changeFilter = (filter: ProblemFilterValues) => {
+export const changeFilter = (filter: ValueOf<typeof ProblemFilterValues>) => {
     return {
         type: CHANGE_PROBLEM_FILTER,
         data: filter,
