@@ -57,7 +57,7 @@ export const prepareConsumerPartitions = (
         const {partition_id = '0', partition_stats, partition_consumer_stats} = partition;
 
         const preparedPartitionStats = prepareGeneralPartitionStats(partition_stats);
-        const endOffset = preparedPartitionStats;
+        const {endOffset} = preparedPartitionStats;
 
         const {
             last_read_offset = '0',
