@@ -16,7 +16,7 @@ export interface SettingProps {
     title: string;
     settingKey: string;
     helpPopoverContent?: ReactNode;
-    values?: {value: string; content: string}[];
+    options?: {value: string; content: string}[];
     defaultValue?: unknown;
 }
 
@@ -25,7 +25,7 @@ export const Setting = ({
     settingKey,
     title,
     helpPopoverContent,
-    values,
+    options,
     defaultValue,
 }: SettingProps) => {
     const [settingValue, setValue] = useSetting(settingKey, defaultValue);
@@ -52,13 +52,13 @@ export const Setting = ({
             }
 
             case 'radio': {
-                if (!values) {
+                if (!options) {
                     return null;
                 }
 
                 return (
                     <RadioButton value={String(settingValue)} onUpdate={setValue}>
-                        {values.map(({value, content}) => {
+                        {options.map(({value, content}) => {
                             return (
                                 <RadioButton.Option value={value} key={value}>
                                     {content}
