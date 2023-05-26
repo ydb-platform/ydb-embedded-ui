@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
-import {getParsedSettingValue, setSettingValue} from '../../store/reducers/settings';
+import {getParsedSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
 
 import {useTypedSelector} from './useTypedSelector';
 

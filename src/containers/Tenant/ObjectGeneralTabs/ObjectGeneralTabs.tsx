@@ -8,7 +8,7 @@ import {Tabs} from '@gravity-ui/uikit';
 
 import routes, {createHref} from '../../../routes';
 import {TENANT_INITIAL_TAB_KEY} from '../../../utils/constants';
-import {setSettingValue} from '../../../store/reducers/settings';
+import {setSettingValue} from '../../../store/reducers/settings/settings';
 
 import {TenantTabsGroups, TENANT_GENERAL_TABS} from '../TenantPages';
 

@@ -19,7 +19,7 @@ import partitions from './partitions/partitions';
 import executeQuery from './executeQuery';
 import explainQuery from './explainQuery';
 import tabletsFilters from './tabletsFilters';
-import settings from './settings';
+import settings from './settings/settings';
 import preview from './preview';
 import nodesList from './nodesList';
 import describe from './describe';

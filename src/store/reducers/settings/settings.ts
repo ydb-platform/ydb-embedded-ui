@@ -1,5 +1,8 @@
+import type {Reducer} from 'redux';
+import type {ThunkAction} from 'redux-thunk';
+
+import type {ValueOf} from '../../../types/common';
 import {
-    ALL,
     SAVED_QUERIES_KEY,
     THEME_KEY,
     TENANT_INITIAL_TAB_KEY,
@@ -9,25 +12,38 @@ import {
     PARTITIONS_HIDDEN_COLUMNS_KEY,
     QUERY_INITIAL_MODE_KEY,
     ENABLE_QUERY_MODES_FOR_EXPLAIN,
-} from '../../utils/constants';
-import '../../services/api';
-import {getValueFromLS, parseJson} from '../../utils/utils';
-import {QueryModes} from '../../types/store/query';
+} from '../../../utils/constants';
+import '../../../services/api';
+import {getValueFromLS, parseJson} from '../../../utils/utils';
+import {QueryModes} from '../../../types/store/query';
+
+import type {RootState} from '..';
+import type {
+    SetSettingValueAction,
+    SettingsAction,
+    SettingsRootStateSlice,
+    SettingsState,
+} from './types';
 
 const CHANGE_PROBLEM_FILTER = 'settings/CHANGE_PROBLEM_FILTER';
-const SET_SETTING_VALUE = 'settings/SET_VALUE';
+export const SET_SETTING_VALUE = 'settings/SET_VALUE';
+
+export const ProblemFilterValues = {
+    ALL: 'All',
+    PROBLEMS: 'With problems',
+} as const;
 
 const userSettings = window.userSettings || {};
 const systemSettings = window.systemSettings || {};
 
-export function readSavedSettingsValue(key, defaultValue) {
+export function readSavedSettingsValue(key: string, defaultValue?: string) {
     const savedValue = window.web_version ? userSettings[key] : getValueFromLS(key);
 
     return savedValue ?? defaultValue;
 }
 
 export const initialState = {
-    problemFilter: ALL,
+    problemFilter: ProblemFilterValues.ALL,
     userSettings: {
         ...userSettings,
         [THEME_KEY]: readSavedSettingsValue(THEME_KEY, 'system'),
@@ -49,7 +65,7 @@ export const initialState = {
     systemSettings,
 };
 
-const settings = (state = initialState, action) => {
+const settings: Reducer<SettingsState, SettingsAction> = (state = initialState, action) => {
     switch (action.type) {
         case CHANGE_PROBLEM_FILTER:
             return {
@@ -74,7 +90,10 @@ const settings = (state = initialState, action) => {
     }
 };
 
-export const setSettingValue = (name, value) => {
+export const setSettingValue = (
+    name: string,
+    value: string,
+): ThunkAction<void, RootState, unknown, SetSettingValueAction> => {
     return (dispatch, getState) => {
         dispatch({type: SET_SETTING_VALUE, data: {name, value}});
         const {singleClusterMode} = getState();
@@ -86,7 +105,7 @@ export const setSettingValue = (name, value) => {
     };
 };
 
-export const getSettingValue = (state, name) => {
+export const getSettingValue = (state: SettingsRootStateSlice, name: string) => {
     return state.settings.userSettings[name];
 };
 
@@ -94,16 +113,16 @@ export const getSettingValue = (state, name) => {
  * Returns parsed settings value.
  * If value cannot be parsed, returns initially stored string
  */
-export const getParsedSettingValue = (state, name) => {
+export const getParsedSettingValue = (state: SettingsRootStateSlice, name: string) => {
     const value = state.settings.userSettings[name];
     return parseJson(value);
 };
 
-export const changeFilter = (filter) => {
+export const changeFilter = (filter: ValueOf<typeof ProblemFilterValues>) => {
     return {
         type: CHANGE_PROBLEM_FILTER,
         data: filter,
-    };
+    } as const;
 };
 
 export default settings;

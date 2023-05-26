@@ -24,7 +24,7 @@ import {
     setMonacoHotKey,
 } from '../../../store/reducers/executeQuery';
 import {getExplainQuery, getExplainQueryAst} from '../../../store/reducers/explainQuery';
-import {getParsedSettingValue, setSettingValue} from '../../../store/reducers/settings';
+import {getParsedSettingValue, setSettingValue} from '../../../store/reducers/settings/settings';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,

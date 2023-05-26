@@ -24,7 +24,7 @@ import {UserSettings} from '../UserSettings/UserSettings';
 import routes, {createHref, CLUSTER_PAGES} from '../../routes';
 
 import {logout} from '../../store/reducers/authentication';
-import {getSettingValue, setSettingValue} from '../../store/reducers/settings';
+import {getParsedSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
 
 import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
 
@@ -273,7 +273,7 @@ const mapStateToProps = (state: any) => {
 
     return {
         ydbUser,
-        compact: JSON.parse(getSettingValue(state, ASIDE_HEADER_COMPACT_KEY)),
+        compact: getParsedSettingValue(state, ASIDE_HEADER_COMPACT_KEY),
     };
 };
 

@@ -5,6 +5,7 @@ import {useDispatch} from 'react-redux';
 import DataTable from '@gravity-ui/react-data-table';
 
 import type {EPathType} from '../../types/api/schema';
+import type {ValueOf} from '../../types/common';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {Illustration} from '../../components/Illustration';
@@ -16,11 +17,7 @@ import {EntitiesCount} from '../../components/EntitiesCount';
 
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 
-import {
-    ALL,
-    DEFAULT_TABLE_SETTINGS,
-    USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
-} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
 import {useAutofetcher, useSetting, useTypedSelector} from '../../utils/hooks';
 import {AdditionalNodesInfo, isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
 
@@ -33,7 +30,7 @@ import {
     resetNodesState,
     getComputeNodes,
 } from '../../store/reducers/nodes';
-import {changeFilter} from '../../store/reducers/settings';
+import {changeFilter, ProblemFilterValues} from '../../store/reducers/settings/settings';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 
 import {isDatabaseEntityType} from '../Tenant/utils/schema';
@@ -104,7 +101,7 @@ export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesPr
     };
 
     const handleProblemFilterChange = (value: string) => {
-        dispatch(changeFilter(value));
+        dispatch(changeFilter(value as ValueOf<typeof ProblemFilterValues>));
     };
 
     const handleUptimeFilterChange = (value: string) => {
@@ -148,7 +145,10 @@ export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesPr
         });
 
         if (nodes && nodes.length === 0) {
-            if (problemFilter !== ALL || nodesUptimeFilter !== NodesUptimeFilterValues.All) {
+            if (
+                problemFilter !== ProblemFilterValues.ALL ||
+                nodesUptimeFilter !== NodesUptimeFilterValues.All
+            ) {
                 return <Illustration name="thumbsUp" width="200" />;
             }
         }

@@ -3,7 +3,7 @@ import {createSelector, Selector} from 'reselect';
 import {escapeRegExp} from 'lodash/fp';
 
 import '../../services/api';
-import {ALL, HOUR_IN_SECONDS, IProblemFilterValues} from '../../utils/constants';
+import {HOUR_IN_SECONDS} from '../../utils/constants';
 import {calcUptime, calcUptimeInSeconds} from '../../utils';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import type {
@@ -14,9 +14,11 @@ import type {
     INodesRootStateSlice,
     INodesState,
 } from '../../types/store/nodes';
+import type {ValueOf} from '../../types/common';
 import {EFlag} from '../../types/api/enums';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
+import {ProblemFilterValues} from './settings/settings';
 
 export const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
 
@@ -178,9 +180,9 @@ const getNodesList = (state: INodesRootStateSlice) => state.nodes.data;
 
 const filterNodesByProblemsStatus = (
     nodesList: INodesPreparedEntity[] = [],
-    problemFilter: IProblemFilterValues,
+    problemFilter: ValueOf<typeof ProblemFilterValues>,
 ) => {
-    if (problemFilter === ALL) {
+    if (problemFilter === ProblemFilterValues.ALL) {
         return nodesList;
     }
 
