@@ -14,17 +14,19 @@ import type {SettingProps} from './Setting';
 import i18n from './i18n';
 
 export interface SettingsSection {
+    id: string;
     title: string;
-    settings: Record<string, SettingProps>;
+    settings: SettingProps[];
 }
 
 export interface SettingsPage {
+    id: string;
     title: string;
     icon: IconProps;
-    sections: Record<string, SettingsSection>;
+    sections: SettingsSection[];
 }
 
-export type YDBEmbeddedUISettings = Record<string, SettingsPage>;
+export type YDBEmbeddedUISettings = SettingsPage[];
 
 const themeOptions = [
     {
@@ -41,52 +43,49 @@ const themeOptions = [
     },
 ];
 
-const themeSetting: SettingProps = {
+export const themeSetting: SettingProps = {
     settingKey: THEME_KEY,
     title: i18n('settings.theme.title'),
     type: 'radio',
     options: themeOptions,
 };
-const invertedDisksSetting: SettingProps = {
+export const invertedDisksSetting: SettingProps = {
     settingKey: INVERTED_DISKS_KEY,
     title: i18n('settings.invertedDisks.title'),
 };
-const useNodesEndpointSetting: SettingProps = {
+export const useNodesEndpointSetting: SettingProps = {
     settingKey: USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     title: i18n('settings.useNodesEndpoint.title'),
     helpPopoverContent: i18n('settings.useNodesEndpoint.popover'),
 };
-const enableQueryModesForExplainSetting: SettingProps = {
+export const enableQueryModesForExplainSetting: SettingProps = {
     settingKey: ENABLE_QUERY_MODES_FOR_EXPLAIN,
     title: i18n('settings.enableQueryModesForExplain.title'),
     helpPopoverContent: i18n('settings.enableQueryModesForExplain.popover'),
 };
 
-export const settings: YDBEmbeddedUISettings = {
-    general: {
-        title: i18n('page.general'),
-        icon: {data: favoriteFilledIcon, height: 14, width: 14},
-        sections: {
-            general: {
-                title: i18n('section.general'),
-                settings: {
-                    [THEME_KEY]: themeSetting,
-                },
-            },
-        },
-    },
-    experiments: {
-        title: i18n('page.experiments'),
-        icon: {data: flaskIcon},
-        sections: {
-            experiments: {
-                title: i18n('section.experiments'),
-                settings: {
-                    [INVERTED_DISKS_KEY]: invertedDisksSetting,
-                    [USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY]: useNodesEndpointSetting,
-                    [ENABLE_QUERY_MODES_FOR_EXPLAIN]: enableQueryModesForExplainSetting,
-                },
-            },
-        },
-    },
+export const generalSection: SettingsSection = {
+    id: 'generalSection',
+    title: i18n('section.general'),
+    settings: [themeSetting],
 };
+export const experimentsSection: SettingsSection = {
+    id: 'experimentsSection',
+    title: i18n('section.experiments'),
+    settings: [invertedDisksSetting, useNodesEndpointSetting, enableQueryModesForExplainSetting],
+};
+
+export const generalPage: SettingsPage = {
+    id: 'generalPage',
+    title: i18n('page.general'),
+    icon: {data: favoriteFilledIcon, height: 14, width: 14},
+    sections: [generalSection],
+};
+export const experimentsPage: SettingsPage = {
+    id: 'experimentsPage',
+    title: i18n('page.experiments'),
+    icon: {data: flaskIcon},
+    sections: [experimentsSection],
+};
+
+export const settings: YDBEmbeddedUISettings = [generalPage, experimentsPage];

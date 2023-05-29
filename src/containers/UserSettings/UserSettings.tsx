@@ -16,24 +16,18 @@ interface UserSettingsProps {
 export const UserSettings = ({settings: userSettings = settings}: UserSettingsProps) => {
     return (
         <Settings>
-            {Object.keys(userSettings).map((key) => {
-                const {title, icon, sections = {}} = userSettings[key];
+            {userSettings.map((page) => {
+                const {id, title, icon, sections = []} = page;
 
                 return (
-                    <Settings.Page key={key} id={key} title={title} icon={icon}>
-                        {Object.keys(sections).map((sectionKey) => {
-                            const {title: sectionTitle, settings: sectionSettings = {}} =
-                                sections[sectionKey];
+                    <Settings.Page key={id} id={id} title={title} icon={icon}>
+                        {sections.map((section) => {
+                            const {title: sectionTitle, settings: sectionSettings = []} = section;
 
                             return (
-                                <Settings.Section key={sectionKey} title={sectionTitle}>
-                                    {Object.keys(sectionSettings).map((settingKey) => {
-                                        return (
-                                            <Setting
-                                                key={settingKey}
-                                                {...sectionSettings[settingKey]}
-                                            />
-                                        );
+                                <Settings.Section key={id} title={sectionTitle}>
+                                    {sectionSettings.map((setting) => {
+                                        return <Setting key={setting.settingKey} {...setting} />;
                                     })}
                                 </Settings.Section>
                             );
