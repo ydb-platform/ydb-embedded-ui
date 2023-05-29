@@ -17,9 +17,10 @@ type VisibleDialogType = EVisibleDialogType | null;
 
 interface TabletControlsProps {
     tablet: TTabletStateInfo;
+    fetchData: VoidFunction;
 }
 
-export const TabletControls = ({tablet}: TabletControlsProps) => {
+export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
     const {TabletId, HiveId} = tablet;
 
     const [isDialogVisible, setIsDialogVisible] = useState(false);
@@ -95,6 +96,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
                         text={i18n('dialog.kill')}
                         onClose={hideDialog}
                         onConfirm={_onKillClick}
+                        onConfirmActionFinish={fetchData}
                     />
                 );
             }
@@ -105,6 +107,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
                         text={i18n('dialog.stop')}
                         onClose={hideDialog}
                         onConfirm={_onStopClick}
+                        onConfirmActionFinish={fetchData}
                     />
                 );
             }
@@ -115,6 +118,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
                         text={i18n('dialog.resume')}
                         onClose={hideDialog}
                         onConfirm={_onResumeClick}
+                        onConfirmActionFinish={fetchData}
                     />
                 );
             }

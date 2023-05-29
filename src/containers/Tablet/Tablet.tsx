@@ -110,7 +110,7 @@ export const Tablet = () => {
                         {Leader && <Tag text="Leader" type="blue" />}
                     </div>
                     <TabletInfo tablet={tablet} tenantPath={tenantPath} />
-                    <TabletControls tablet={tablet} />
+                    <TabletControls tablet={tablet} fetchData={fetchData} />
                 </div>
                 <div className={b('rigth-pane')}>
                     <TabletTable history={history} />
