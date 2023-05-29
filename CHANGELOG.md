@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.4.1...v4.4.2) (2023-05-29)
+
+
+### Bug Fixes
+
+* **Partitions:** fix offsets calculation ([#402](https://github.com/ydb-platform/ydb-embedded-ui/issues/402)) ([fd4741f](https://github.com/ydb-platform/ydb-embedded-ui/commit/fd4741f8761aa6aa9ec31681522c4d261a83273f))
+
 ## [4.4.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.4.0...v4.4.1) (2023-05-25)
 
 
