@@ -4,7 +4,7 @@ import cn from 'bem-cn-lite';
 import type {AdditionalVersionsProps} from '../../types/additionalProps';
 import routes, {CLUSTER_PAGES} from '../../routes';
 
-import {ClusterInfo} from '../ClusterInfo/ClusterInfo';
+import {ClusterInfo} from './ClusterInfo/ClusterInfo';
 import Tenants from '../Tenants/Tenants';
 import {Nodes} from '../Nodes/Nodes';
 import Storage from '../Storage/Storage';

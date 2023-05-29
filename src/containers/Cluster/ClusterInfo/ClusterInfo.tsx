@@ -6,26 +6,29 @@ import qs from 'qs';
 
 import {Link, Progress} from '@gravity-ui/uikit';
 
-import EntityStatus from '../../components/EntityStatus/EntityStatus';
-import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
-import InfoViewer, {InfoViewerItem} from '../../components/InfoViewer/InfoViewer';
-import {Tags} from '../../components/Tags';
-import {Tablet} from '../../components/Tablet';
-import {Icon} from '../../components/Icon';
-import {Loader} from '../../components/Loader';
-import {ResponseError} from '../../components/Errors/ResponseError';
+import EntityStatus from '../../../components/EntityStatus/EntityStatus';
+import ProgressViewer from '../../../components/ProgressViewer/ProgressViewer';
+import InfoViewer, {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
+import {Tags} from '../../../components/Tags';
+import {Tablet} from '../../../components/Tablet';
+import {Icon} from '../../../components/Icon';
+import {Loader} from '../../../components/Loader';
+import {ResponseError} from '../../../components/Errors/ResponseError';
 
-import type {AdditionalVersionsProps} from '../../types/additionalProps';
-import {getClusterInfo} from '../../store/reducers/cluster/cluster';
-import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
-import {backend, customBackend} from '../../store';
-import {setHeader} from '../../store/reducers/header';
-import {formatStorageValues} from '../../utils';
-import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
-import {parseVersionsToVersionToColorMap, parseNodesToVersionsValues} from '../../utils/versions';
-import routes, {CLUSTER_PAGES, createHref} from '../../routes';
+import type {AdditionalVersionsProps} from '../../../types/additionalProps';
+import {getClusterInfo} from '../../../store/reducers/cluster/cluster';
+import {getClusterNodes} from '../../../store/reducers/clusterNodes/clusterNodes';
+import {backend, customBackend} from '../../../store';
+import {setHeader} from '../../../store/reducers/header';
+import {formatStorageValues} from '../../../utils';
+import {useAutofetcher, useTypedSelector} from '../../../utils/hooks';
+import {
+    parseVersionsToVersionToColorMap,
+    parseNodesToVersionsValues,
+} from '../../../utils/versions';
+import routes, {CLUSTER_PAGES, createHref} from '../../../routes';
 
-import {Versions} from '../Versions/Versions';
+import {Versions} from '../../Versions/Versions';
 
 import {compareTablets} from './utils';
 
