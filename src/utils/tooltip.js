@@ -1,8 +1,7 @@
 import cn from 'bem-cn-lite';
-import {calcUptime} from '.';
 import JSONTree from 'react-json-inspector';
 
-import {NodeEndpointsTooltip} from '../components/Tooltips/NodeEndpointsTooltip/NodeEndpointsTooltip';
+import {NodeEndpointsTooltipContent, TabletTooltipContent} from '../components/TooltipsContent';
 
 const poolB = cn('pool-tooltip');
 
@@ -26,52 +25,6 @@ const PoolTooltip = (props) => {
                             <td className={poolB('label')}>Threads</td>
                             <td>{data.Threads}</td>
                         </tr>
-                    </tbody>
-                </table>
-            </div>
-        )
-    );
-};
-
-const tabletB = cn('tablet-tooltip');
-
-const TabletTooltip = (props) => {
-    const {data, additionalData} = props;
-    return (
-        data && (
-            <div className={tabletB()}>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td className={tabletB('label')}>Tablet</td>
-                            <td className={tabletB('value')}>{data.TabletId}</td>
-                        </tr>
-                        <tr>
-                            <td className={tabletB('label')}>NodeID</td>
-                            <td className={tabletB('value')}>{data.NodeId}</td>
-                        </tr>
-                        <tr>
-                            <td className={tabletB('label')}>State</td>
-                            <td className={tabletB('value')}>{data.State}</td>
-                        </tr>
-                        <tr>
-                            <td className={tabletB('label')}>Type</td>
-                            <td className={tabletB('value')}>{data.Type}</td>
-                        </tr>
-                        <tr>
-                            <td className={tabletB('label')}>Uptime</td>
-                            <td className={tabletB('value')}>{calcUptime(data.ChangeTime)}</td>
-                        </tr>
-                        <tr>
-                            <td className={tabletB('label')}>Generation</td>
-                            <td className={tabletB('value')}>{data.Generation}</td>
-                        </tr>
-                        {additionalData && (
-                            <tr>
-                                <td className={tabletB('label')}>{additionalData.name}</td>
-                                <td className={tabletB('value')}>{additionalData.value}</td>
-                            </tr>
-                        )}
                     </tbody>
                 </table>
             </div>
@@ -174,10 +127,10 @@ export const tooltipTemplates = {
     // eslint-disable-next-line react/display-name
     pool: (data) => <PoolTooltip data={data} />,
     // eslint-disable-next-line react/display-name
-    tablet: (data, additionalData) => <TabletTooltip data={data} additionalData={additionalData} />,
+    tablet: (data) => <TabletTooltipContent data={data} />,
     // eslint-disable-next-line react/display-name
     node: (data) => <NodeTooltip data={data} />,
-    nodeEndpoints: (data) => <NodeEndpointsTooltip data={data} />,
+    nodeEndpoints: (data) => <NodeEndpointsTooltipContent data={data} />,
     // eslint-disable-next-line react/display-name
     tabletsOverall: (data) => <TabletsOverallTooltip data={data} />,
     // eslint-disable-next-line react/display-name

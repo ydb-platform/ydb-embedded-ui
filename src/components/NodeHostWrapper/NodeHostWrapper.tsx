@@ -7,7 +7,7 @@ import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import {isUnavailableNode, NodeAddress} from '../../utils/nodes';
 
 import EntityStatus from '../EntityStatus/EntityStatus';
-import {NodeEndpointsTooltip} from '../Tooltips/NodeEndpointsTooltip/NodeEndpointsTooltip';
+import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 import {IconWrapper} from '../Icon';
 
 import './NodeHostWrapper.scss';
@@ -31,7 +31,7 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
         <div className={b()}>
             <Popover
                 disabled={!isNodeAvailable}
-                content={<NodeEndpointsTooltip data={node} />}
+                content={<NodeEndpointsTooltipContent data={node} />}
                 placement={['top', 'bottom']}
                 behavior={PopoverBehavior.Immediate}
             >

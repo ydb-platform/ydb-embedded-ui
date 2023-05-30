@@ -9,7 +9,6 @@ import InfoViewer from '../../../../components/InfoViewer/InfoViewer';
 import PoolUsage from '../../../../components/PoolUsage/PoolUsage';
 import {Tablet} from '../../../../components/Tablet';
 
-import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
 import {getTenantInfo} from '../../../../store/reducers/tenant';
 
 import {formatCPU} from '../../../../utils';
@@ -44,8 +43,6 @@ class TenantOverview extends React.Component {
         loading: PropTypes.bool,
         autorefresh: PropTypes.bool,
         tenant: PropTypes.object,
-        hideTooltip: PropTypes.func,
-        showTooltip: PropTypes.func,
         systemTablets: PropTypes.array,
         additionalTenantInfo: PropTypes.func,
         tenantName: PropTypes.string,
@@ -102,7 +99,7 @@ class TenantOverview extends React.Component {
     };
 
     render() {
-        const {tenant, hideTooltip, showTooltip, loading} = this.props;
+        const {tenant, loading} = this.props;
         const {
             Metrics = {},
             PoolStats,
@@ -162,12 +159,7 @@ class TenantOverview extends React.Component {
                 <div className={b('system-tablets')}>
                     {SystemTablets &&
                         SystemTablets.map((tablet, tabletIndex) => (
-                            <Tablet
-                                onMouseEnter={showTooltip}
-                                onMouseLeave={hideTooltip}
-                                key={tabletIndex}
-                                tablet={tablet}
-                            />
+                            <Tablet key={tabletIndex} tablet={tablet} />
                         ))}
                 </div>
                 <div className={b('common-info')}>
@@ -211,8 +203,6 @@ function mapStateToProps(state) {
 }
 
 const mapDispatchToProps = {
-    hideTooltip,
-    showTooltip,
     getTenantInfo,
 };
 

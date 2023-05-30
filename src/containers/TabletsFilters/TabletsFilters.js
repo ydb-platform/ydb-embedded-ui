@@ -12,7 +12,6 @@ import {Tablet} from '../../components/Tablet';
 import {AccessDenied} from '../../components/Errors/403';
 
 import {tabletColorToTabletState, tabletStates} from '../../utils/tablet';
-import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
 import {
     getTabletsInfo,
     clearWasLoadingFlag,
@@ -30,8 +29,6 @@ class TabletsFilters extends React.Component {
     static propTypes = {
         wasLoaded: PropTypes.bool,
         loading: PropTypes.bool,
-        showTooltip: PropTypes.func,
-        hideTooltip: PropTypes.func,
         getTabletsInfo: PropTypes.func,
         timeoutForRequest: PropTypes.number,
         path: PropTypes.string,
@@ -141,17 +138,10 @@ class TabletsFilters extends React.Component {
     };
 
     renderTablet = (index, key) => {
-        const {filteredTablets, hideTooltip, showTooltip, size} = this.props;
+        const {filteredTablets, size} = this.props;
 
         return (
-            <Tablet
-                onMouseLeave={hideTooltip}
-                onMouseEnter={showTooltip}
-                tablet={filteredTablets[index]}
-                key={key}
-                size={size}
-                className={b('tablet')}
-            />
+            <Tablet tablet={filteredTablets[index]} key={key} size={size} className={b('tablet')} />
         );
     };
 
@@ -333,8 +323,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     getTabletsInfo,
-    hideTooltip,
-    showTooltip,
     clearWasLoadingFlag,
     setStateFilter,
     setTypeFilter,

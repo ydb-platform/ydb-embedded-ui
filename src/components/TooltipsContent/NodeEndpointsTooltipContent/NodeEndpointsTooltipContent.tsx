@@ -4,15 +4,15 @@ import type {TSystemStateInfo} from '../../../types/api/nodes';
 
 import {InfoViewer, InfoViewerItem} from '../../InfoViewer';
 
-import './NodeEndpointsTooltip.scss';
+import './NodeEndpointsTooltipContent.scss';
 
-const b = block('ydb-node-endpoints-tooltip');
+const b = block('ydb-node-endpoints-tooltip-content');
 
 interface NodeEdpointsTooltipProps {
     data?: TSystemStateInfo;
 }
 
-export const NodeEndpointsTooltip = ({data}: NodeEdpointsTooltipProps) => {
+export const NodeEndpointsTooltipContent = ({data}: NodeEdpointsTooltipProps) => {
     const info: InfoViewerItem[] = [];
 
     if (data?.Rack) {

@@ -1,12 +1,12 @@
-import {useRef} from 'react';
 import cn from 'bem-cn-lite';
 
 import type {TTabletStateInfo} from '../../types/api/tablet';
-import type {ShowTooltipFunction} from '../../types/store/tooltip';
 import {getTabletLabel} from '../../utils/constants';
 import routes, {createHref} from '../../routes';
 
+import {ContentWithPopup} from '../ContentWithPopup/ContentWithPopup';
 import {InternalLink} from '../InternalLink';
+import {TabletTooltipContent} from '../TooltipsContent';
 
 import './Tablet.scss';
 
@@ -14,46 +14,22 @@ const b = cn('tablet');
 
 interface TabletProps {
     tablet?: TTabletStateInfo;
-    onMouseEnter?: (...args: Parameters<ShowTooltipFunction>) => void;
-    onMouseLeave?: VoidFunction;
 }
 
-export const Tablet = ({
-    tablet = {},
-    onMouseEnter = () => {},
-    onMouseLeave = () => {},
-}: TabletProps) => {
-    const ref = useRef(null);
-
-    const _onTabletMouseEnter = () => {
-        onMouseEnter(ref.current, tablet, 'tablet');
-    };
-
-    const _onTabletClick = () => {
-        const {TabletId: id} = tablet;
-
-        if (id) {
-            onMouseLeave();
-        }
-    };
-
+export const Tablet = ({tablet = {}}: TabletProps) => {
     const {TabletId: id} = tablet;
     const status = tablet.Overall?.toLowerCase();
 
     return (
-        <InternalLink
-            onClick={_onTabletClick}
-            to={id && createHref(routes.tablet, {id})}
+        <ContentWithPopup
             className={b('wrapper')}
+            content={<TabletTooltipContent data={tablet} className={b('popup-content')} />}
         >
-            <div
-                ref={ref}
-                className={b({status})}
-                onMouseEnter={_onTabletMouseEnter}
-                onMouseLeave={onMouseLeave}
-            >
-                <div className={b('type')}>{[getTabletLabel(tablet.Type)]}</div>
-            </div>
-        </InternalLink>
+            <InternalLink to={id && createHref(routes.tablet, {id})}>
+                <div className={b({status})}>
+                    <div className={b('type')}>{[getTabletLabel(tablet.Type)]}</div>
+                </div>
+            </InternalLink>
+        </ContentWithPopup>
     );
 };
