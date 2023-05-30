@@ -1,7 +1,7 @@
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 import {Popover} from '@gravity-ui/uikit';
 
-import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
+import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
@@ -10,21 +10,13 @@ import type {NodeAddress} from '../../utils/nodes';
 import {formatBytesToGigabyte} from '../../utils/index';
 
 import type {INodesPreparedEntity} from '../../types/store/nodes';
-import {showTooltip as externalShowTooltip} from '../../store/reducers/tooltip';
 
 interface GetNodesColumnsProps {
-    showTooltip: (...args: Parameters<typeof externalShowTooltip>) => void;
-    hideTooltip: VoidFunction;
     tabletsPath?: string;
     getNodeRef?: (node?: NodeAddress) => string;
 }
 
-export function getNodesColumns({
-    showTooltip,
-    hideTooltip,
-    tabletsPath,
-    getNodeRef,
-}: GetNodesColumnsProps) {
+export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps) {
     const columns: Column<INodesPreparedEntity>[] = [
         {
             name: 'NodeId',
@@ -96,16 +88,7 @@ export function getNodesColumns({
                     }
                 }, 0),
             defaultOrder: DataTable.DESCENDING,
-            render: ({row}) =>
-                row.PoolStats ? (
-                    <PoolsGraph
-                        onMouseEnter={showTooltip}
-                        onMouseLeave={hideTooltip}
-                        pools={row.PoolStats}
-                    />
-                ) : (
-                    '—'
-                ),
+            render: ({row}) => (row.PoolStats ? <PoolsGraph pools={row.PoolStats} /> : '—'),
             align: DataTable.LEFT,
             width: '120px',
         },

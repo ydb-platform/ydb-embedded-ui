@@ -31,7 +31,6 @@ import {
     getComputeNodes,
 } from '../../store/reducers/nodes';
 import {changeFilter, ProblemFilterValues} from '../../store/reducers/settings/settings';
-import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 
 import {isDatabaseEntityType} from '../Tenant/utils/schema';
 
@@ -129,18 +128,8 @@ export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesPr
         );
     };
 
-    const onShowTooltip = (...args: Parameters<typeof showTooltip>) => {
-        dispatch(showTooltip(...args));
-    };
-
-    const onHideTooltip = () => {
-        dispatch(hideTooltip());
-    };
-
     const renderTable = () => {
         const columns = getNodesColumns({
-            showTooltip: onShowTooltip,
-            hideTooltip: onHideTooltip,
             getNodeRef: additionalNodesInfo.getNodeRef,
         });
 

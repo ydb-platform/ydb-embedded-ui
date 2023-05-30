@@ -1,26 +1,15 @@
-import {useDispatch} from 'react-redux';
-
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 
 import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
-import type {ShowTooltipFunction} from '../../../types/store/tooltip';
-
-import {hideTooltip, showTooltip} from '../../../store/reducers/tooltip';
 import {isUnavailableNode} from '../../../utils/nodes';
 import {formatBytes} from '../../../utils';
 import {getDefaultNodePath} from '../../Node/NodePages';
 
 import ProgressViewer from '../../../components/ProgressViewer/ProgressViewer';
-import PoolsGraph from '../../../components/PoolsGraph/PoolsGraph';
+import {PoolsGraph} from '../../../components/PoolsGraph/PoolsGraph';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 
-const getColumns = ({
-    onShowTooltip,
-    onHideTooltip,
-}: {
-    onShowTooltip: (...args: Parameters<ShowTooltipFunction>) => void;
-    onHideTooltip: VoidFunction;
-}): Column<PreparedClusterNode>[] => [
+const getColumns = (): Column<PreparedClusterNode>[] => [
     {
         name: 'NodeId',
         header: '#',
@@ -89,16 +78,7 @@ const getColumns = ({
             PoolStats.reduce((acc, item) => acc + (item.Usage || 0), 0),
         defaultOrder: DataTable.DESCENDING,
         width: '120px',
-        render: ({row}) =>
-            row.PoolStats ? (
-                <PoolsGraph
-                    onMouseEnter={onShowTooltip}
-                    onMouseLeave={onHideTooltip}
-                    pools={row.PoolStats}
-                />
-            ) : (
-                '—'
-            ),
+        render: ({row}) => (row.PoolStats ? <PoolsGraph pools={row.PoolStats} /> : '—'),
         align: DataTable.LEFT,
     },
     {
@@ -127,21 +107,11 @@ interface NodesTableProps {
 }
 
 export const NodesTable = ({nodes}: NodesTableProps) => {
-    const dispatch = useDispatch();
-
-    const onShowTooltip = (...args: Parameters<ShowTooltipFunction>) => {
-        dispatch(showTooltip(...args));
-    };
-
-    const onHideTooltip = () => {
-        dispatch(hideTooltip());
-    };
-
     return (
         <DataTable
             theme="yandex-cloud"
             data={nodes}
-            columns={getColumns({onShowTooltip, onHideTooltip})}
+            columns={getColumns()}
             settings={{
                 displayIndices: false,
             }}
