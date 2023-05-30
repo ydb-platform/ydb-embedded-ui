@@ -2,20 +2,20 @@ import {ReactNode, useRef, useState} from 'react';
 
 import {Popup, PopupProps} from '@gravity-ui/uikit';
 
-interface WithPopupWrapperProps extends PopupProps {
+interface ContentWithPopupProps extends PopupProps {
     content: ReactNode;
     className?: string;
     children?: ReactNode;
 }
 
-export const WithPopupWrapper = ({
+export const ContentWithPopup = ({
     children,
     content,
     className,
     hasArrow = true,
     placement = ['top', 'bottom'],
     ...props
-}: WithPopupWrapperProps) => {
+}: ContentWithPopupProps) => {
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const anchor = useRef(null);
 

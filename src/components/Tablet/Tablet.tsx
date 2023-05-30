@@ -4,7 +4,7 @@ import type {TTabletStateInfo} from '../../types/api/tablet';
 import {getTabletLabel} from '../../utils/constants';
 import routes, {createHref} from '../../routes';
 
-import {WithPopupWrapper} from '../WithPopupWrapper/WithPopupWrapper';
+import {ContentWithPopup} from '../ContentWithPopup/ContentWithPopup';
 import {InternalLink} from '../InternalLink';
 import {TabletTooltipContent} from '../TooltipsContent';
 
@@ -21,7 +21,7 @@ export const Tablet = ({tablet = {}}: TabletProps) => {
     const status = tablet.Overall?.toLowerCase();
 
     return (
-        <WithPopupWrapper
+        <ContentWithPopup
             className={b('wrapper')}
             content={<TabletTooltipContent data={tablet} className={b('popup-content')} />}
         >
@@ -30,6 +30,6 @@ export const Tablet = ({tablet = {}}: TabletProps) => {
                     <div className={b('type')}>{[getTabletLabel(tablet.Type)]}</div>
                 </div>
             </InternalLink>
-        </WithPopupWrapper>
+        </ContentWithPopup>
     );
 };
