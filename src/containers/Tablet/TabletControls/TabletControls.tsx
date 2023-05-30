@@ -25,11 +25,11 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
 
     const [isDialogVisible, setIsDialogVisible] = useState(false);
     const [visibleDialogType, setVisibleDialogType] = useState<VisibleDialogType>(null);
-    const [isTabletActionsDisabled, setIsTabletActionsDisabled] = useState(false);
+    const [isTabletActionLoading, setIsTabletActionLoading] = useState(false);
 
     // Enable controls after data update
     useEffect(() => {
-        setIsTabletActionsDisabled(false);
+        setIsTabletActionLoading(false);
     }, [tablet]);
 
     const makeShowDialog = (type: VisibleDialogType) => () => {
@@ -47,15 +47,15 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
     };
 
     const _onKillClick = () => {
-        setIsTabletActionsDisabled(true);
+        setIsTabletActionLoading(true);
         return window.api.killTablet(TabletId);
     };
     const _onStopClick = () => {
-        setIsTabletActionsDisabled(true);
+        setIsTabletActionLoading(true);
         return window.api.stopTablet(TabletId, HiveId);
     };
     const _onResumeClick = () => {
-        setIsTabletActionsDisabled(true);
+        setIsTabletActionLoading(true);
         return window.api.resumeTablet(TabletId, HiveId);
     };
 
@@ -63,25 +63,11 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
         return HiveId && HiveId !== '0';
     };
 
-    const isDisabledResume = () => {
-        if (isTabletActionsDisabled) {
-            return true;
-        }
+    const isDisabledResume =
+        tablet.State !== ETabletState.Stopped && tablet.State !== ETabletState.Dead;
 
-        return tablet.State !== ETabletState.Stopped && tablet.State !== ETabletState.Dead;
-    };
-
-    const isDisabledKill = () => {
-        return isTabletActionsDisabled;
-    };
-
-    const isDisabledStop = () => {
-        if (isTabletActionsDisabled) {
-            return true;
-        }
-
-        return tablet.State === ETabletState.Stopped || tablet.State === ETabletState.Deleted;
-    };
+    const isDisabledStop =
+        tablet.State === ETabletState.Stopped || tablet.State === ETabletState.Deleted;
 
     const renderDialog = () => {
         if (!isDialogVisible) {
@@ -132,7 +118,7 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
             <Button
                 onClick={showKillDialog}
                 view="action"
-                disabled={isDisabledKill()}
+                loading={isTabletActionLoading}
                 className={b('control')}
             >
                 {i18n('controls.kill')}
@@ -142,7 +128,8 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                     <Button
                         onClick={showStopDialog}
                         view="action"
-                        disabled={isDisabledStop()}
+                        disabled={isDisabledStop}
+                        loading={!isDisabledStop && isTabletActionLoading}
                         className={b('control')}
                     >
                         {i18n('controls.stop')}
@@ -150,7 +137,8 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                     <Button
                         onClick={showResumeDialog}
                         view="action"
-                        disabled={isDisabledResume()}
+                        disabled={isDisabledResume}
+                        loading={!isDisabledResume && isTabletActionLoading}
                         className={b('control')}
                     >
                         {i18n('controls.resume')}

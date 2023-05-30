@@ -52,6 +52,10 @@
         text-transform: uppercase;
     }
 
+    &__loader {
+        width: 25px;
+    }
+
     .info-viewer__items {
         grid-template-columns: auto;
     }

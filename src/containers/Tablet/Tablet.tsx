@@ -108,6 +108,7 @@ export const Tablet = () => {
                             <Icon name="external" />
                         </a>
                         {Leader && <Tag text="Leader" type="blue" />}
+                        <span className={b('loader')}>{loading && <Loader size="s" />}</span>
                     </div>
                     <TabletInfo tablet={tablet} tenantPath={tenantPath} />
                     <TabletControls tablet={tablet} fetchData={fetchData} />
