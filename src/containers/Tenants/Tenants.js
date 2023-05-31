@@ -9,7 +9,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {Loader, TextInput, Button} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
-import PoolsGraph from '../../components/PoolsGraph/PoolsGraph';
+import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
@@ -17,7 +17,6 @@ import {AutoFetcher} from '../../utils/autofetcher';
 
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 import {formatCPU, formatBytesToGigabyte, formatNumber} from '../../utils';
-import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import {withSearch} from '../../HOCS';
 import {DEFAULT_TABLE_SETTINGS, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
 import {getTenantsInfo} from '../../store/reducers/tenants/tenants';
@@ -50,8 +49,6 @@ class Tenants extends React.Component {
         error: PropTypes.bool,
         getTenantsInfo: PropTypes.func,
         tenants: PropTypes.array,
-        showTooltip: PropTypes.func,
-        hideTooltip: PropTypes.func,
         searchQuery: PropTypes.string,
         handleSearchQuery: PropTypes.func,
         setHeader: PropTypes.func,
@@ -121,8 +118,6 @@ class Tenants extends React.Component {
         const {
             tenants = [],
             searchQuery,
-            showTooltip,
-            hideTooltip,
             filter,
             handleSearchQuery,
             additionalTenantsInfo = {},
@@ -291,15 +286,8 @@ class Tenants extends React.Component {
                 sortAccessor: ({PoolStats = []}) =>
                     PoolStats.reduce((acc, item) => acc + item.Usage, 0),
                 defaultOrder: DataTable.DESCENDING,
-                align: DataTable.CENTER,
-                render: ({value}) => (
-                    <PoolsGraph
-                        onMouseEnter={showTooltip}
-                        onMouseLeave={hideTooltip}
-                        rowInfo={value}
-                        pools={value}
-                    />
-                ),
+                align: DataTable.LEFT,
+                render: ({value}) => <PoolsGraph rowInfo={value} pools={value} />,
             },
             {
                 name: 'Tablets',
@@ -374,8 +362,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     getTenantsInfo,
-    hideTooltip,
-    showTooltip,
     changeFilter,
     setHeader,
 };

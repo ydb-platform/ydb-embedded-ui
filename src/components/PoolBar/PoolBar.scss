@@ -1,4 +1,4 @@
-.pool-bar {
+.ydb-pool-bar {
     position: relative;
 
     width: 6px;
@@ -9,6 +9,11 @@
 
     border: 1px solid;
     border-radius: 1px;
+
+    &__popup-content {
+        width: 170px;
+        padding: 10px;
+    }
 
     &:last-child {
         margin-right: 0;

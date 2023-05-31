@@ -1,36 +1,11 @@
 import cn from 'bem-cn-lite';
 import JSONTree from 'react-json-inspector';
 
-import {NodeEndpointsTooltipContent, TabletTooltipContent} from '../components/TooltipsContent';
-
-const poolB = cn('pool-tooltip');
-
-const PoolTooltip = (props) => {
-    const {data} = props;
-    const usage = (data.Usage * 100).toFixed(2);
-    return (
-        data && (
-            <div className={poolB()}>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td className={poolB('label')}>Pool</td>
-                            <td>{data.Name}</td>
-                        </tr>
-                        <tr>
-                            <td className={poolB('label')}>Usage</td>
-                            <td>{usage} %</td>
-                        </tr>
-                        <tr>
-                            <td className={poolB('label')}>Threads</td>
-                            <td>{data.Threads}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        )
-    );
-};
+import {
+    NodeEndpointsTooltipContent,
+    TabletTooltipContent,
+    PoolTooltipContent,
+} from '../components/TooltipsContent';
 
 const nodeB = cn('node-tootltip');
 
@@ -125,7 +100,7 @@ const jsonB = cn('json-tooltip');
 
 export const tooltipTemplates = {
     // eslint-disable-next-line react/display-name
-    pool: (data) => <PoolTooltip data={data} />,
+    pool: (data) => <PoolTooltipContent data={data} />,
     // eslint-disable-next-line react/display-name
     tablet: (data) => <TabletTooltipContent data={data} />,
     // eslint-disable-next-line react/display-name
