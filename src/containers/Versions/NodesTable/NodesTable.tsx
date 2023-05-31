@@ -9,7 +9,7 @@ import ProgressViewer from '../../../components/ProgressViewer/ProgressViewer';
 import {PoolsGraph} from '../../../components/PoolsGraph/PoolsGraph';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 
-const getColumns = (): Column<PreparedClusterNode>[] => [
+const columns: Column<PreparedClusterNode>[] = [
     {
         name: 'NodeId',
         header: '#',
@@ -111,7 +111,7 @@ export const NodesTable = ({nodes}: NodesTableProps) => {
         <DataTable
             theme="yandex-cloud"
             data={nodes}
-            columns={getColumns()}
+            columns={columns}
             settings={{
                 displayIndices: false,
             }}
