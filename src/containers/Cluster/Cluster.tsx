@@ -1,7 +1,7 @@
 import {useRouteMatch} from 'react-router';
 import cn from 'bem-cn-lite';
 
-import type {AdditionalVersionsProps} from '../../types/additionalProps';
+import type {AdditionalClusterProps, AdditionalVersionsProps} from '../../types/additionalProps';
 import routes, {CLUSTER_PAGES} from '../../routes';
 
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';
@@ -14,32 +14,36 @@ import './Cluster.scss';
 const b = cn('cluster');
 
 interface ClusterProps {
-    additionalClusterInfo?: any;
     additionalTenantsInfo?: any;
     additionalNodesInfo?: any;
+    additionalClusterProps?: AdditionalClusterProps;
     additionalVersionsProps?: AdditionalVersionsProps;
 }
 
-function Cluster(props: ClusterProps) {
+function Cluster({
+    additionalTenantsInfo,
+    additionalNodesInfo,
+    additionalClusterProps,
+    additionalVersionsProps,
+}: ClusterProps) {
     const match = useRouteMatch<{activeTab?: string}>(routes.cluster);
     const activeTab = match?.params?.activeTab ?? CLUSTER_PAGES.tenants.id;
     const renderRoutes = () => {
         switch (activeTab) {
             case CLUSTER_PAGES.tenants.id: {
-                return <Tenants {...props} />;
+                return <Tenants additionalTenantsInfo={additionalTenantsInfo} />;
             }
             case CLUSTER_PAGES.nodes.id: {
-                return <Nodes additionalNodesInfo={props.additionalNodesInfo} />;
+                return <Nodes additionalNodesInfo={additionalNodesInfo} />;
             }
             case CLUSTER_PAGES.storage.id: {
-                //@ts-ignore
-                return <Storage {...props} />;
+                return <Storage additionalNodesInfo={additionalNodesInfo} />;
             }
             case CLUSTER_PAGES.cluster.id: {
                 return (
                     <ClusterInfo
-                        additionalClusterInfo={props.additionalClusterInfo}
-                        additionalVersionsProps={props.additionalVersionsProps}
+                        additionalClusterProps={additionalClusterProps}
+                        additionalVersionsProps={additionalVersionsProps}
                     />
                 );
             }
