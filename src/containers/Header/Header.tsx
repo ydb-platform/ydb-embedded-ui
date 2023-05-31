@@ -5,6 +5,7 @@ import {useHistory} from 'react-router';
 import {Breadcrumbs, BreadcrumbsItem} from '@gravity-ui/uikit';
 
 import Divider from '../../components/Divider/Divider';
+import {ExternalLinkWithIcon} from '../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
 
 import {backend, customBackend} from '../../store';
 import {getHostInfo} from '../../store/reducers/host';
@@ -12,7 +13,6 @@ import {HeaderItemType} from '../../store/reducers/header';
 import {useTypedSelector} from '../../utils/hooks';
 
 import './Header.scss';
-import {ExternalLinkWithIcon} from '../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
 
 const b = cn('header');
 
