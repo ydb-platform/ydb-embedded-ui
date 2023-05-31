@@ -2,10 +2,9 @@ import React, {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {useHistory} from 'react-router';
-import {Breadcrumbs, BreadcrumbsItem, Link} from '@gravity-ui/uikit';
+import {Breadcrumbs, BreadcrumbsItem} from '@gravity-ui/uikit';
 
 import Divider from '../../components/Divider/Divider';
-import {Icon} from '../../components/Icon';
 
 import {backend, customBackend} from '../../store';
 import {getHostInfo} from '../../store/reducers/host';
@@ -13,6 +12,7 @@ import {HeaderItemType} from '../../store/reducers/header';
 import {useTypedSelector} from '../../utils/hooks';
 
 import './Header.scss';
+import {ExternalLinkWithIcon} from '../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
 
 const b = cn('header');
 
@@ -72,10 +72,7 @@ function Header({clusterName}: HeaderProps) {
                 </div>
 
                 <div className={b('cluster-name-wrapper')}>
-                    <Link href={link} target="_blank">
-                        Internal viewer{' '}
-                        <Icon name="external" viewBox={'0 0 16 16'} width={16} height={16} />
-                    </Link>
+                    <ExternalLinkWithIcon title={'Internal Viewer'} url={link} />
                     {clusterNameFinal && (
                         <React.Fragment>
                             <div className={b('divider')}>
