@@ -5,11 +5,10 @@ import cn from 'bem-cn-lite';
 import {useThemeValue} from '@gravity-ui/uikit';
 
 import type {EPathType} from '../../../types/api/schema';
+import {TENANT_GENERAL_TABS_IDS} from '../../../store/reducers/tenant/constants';
 
 import QueryEditor from '../QueryEditor/QueryEditor';
 import Diagnostics from '../Diagnostics/Diagnostics';
-
-import {TenantGeneralTabsIds} from '../TenantPages';
 
 import './ObjectGeneral.scss';
 
@@ -35,7 +34,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
     const renderTabContent = () => {
         const {type, additionalTenantInfo, additionalNodesInfo} = props;
         switch (generalTab) {
-            case TenantGeneralTabsIds.query: {
+            case TENANT_GENERAL_TABS_IDS.query: {
                 return <QueryEditor path={tenantName as string} theme={theme} type={type} />;
             }
             default: {

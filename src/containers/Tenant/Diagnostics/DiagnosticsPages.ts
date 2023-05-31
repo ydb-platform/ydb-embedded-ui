@@ -1,80 +1,67 @@
+import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {EPathType} from '../../../types/api/schema';
 
-export enum GeneralPagesIds {
-    'overview' = 'Overview',
-    'topQueries' = 'topQueries',
-    'topShards' = 'topShards',
-    'nodes' = 'Nodes',
-    'tablets' = 'Tablets',
-    'storage' = 'Storage',
-    'network' = 'Network',
-    'describe' = 'Describe',
-    'hotKeys' = 'hotKeys',
-    'graph' = 'graph',
-    'consumers' = 'consumers',
-    'partitions' = 'partitions',
-}
-
 type Page = {
-    id: GeneralPagesIds;
+    id: TenantDiagnosticsTab;
     title: string;
 };
 
 const overview = {
-    id: GeneralPagesIds.overview,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.overview,
     title: 'Info',
 };
 
 const topQueries = {
-    id: GeneralPagesIds.topQueries,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.topQueries,
     title: 'Top queries',
 };
 
 const topShards = {
-    id: GeneralPagesIds.topShards,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.topShards,
     title: 'Top shards',
 };
 
 const nodes = {
-    id: GeneralPagesIds.nodes,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
     title: 'Nodes',
 };
 
 const tablets = {
-    id: GeneralPagesIds.tablets,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.tablets,
     title: 'Tablets',
 };
 const storage = {
-    id: GeneralPagesIds.storage,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.storage,
     title: 'Storage',
 };
 const network = {
-    id: GeneralPagesIds.network,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.network,
     title: 'Network',
 };
 
 const describe = {
-    id: GeneralPagesIds.describe,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.describe,
     title: 'Describe',
 };
 
 const hotKeys = {
-    id: GeneralPagesIds.hotKeys,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.hotKeys,
     title: 'Hot keys',
 };
 
 const graph = {
-    id: GeneralPagesIds.graph,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.graph,
     title: 'Graph',
 };
 
 const consumers = {
-    id: GeneralPagesIds.consumers,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.consumers,
     title: 'Consumers',
 };
 
 const partitions = {
-    id: GeneralPagesIds.partitions,
+    id: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
     title: 'Partitions',
 };
 

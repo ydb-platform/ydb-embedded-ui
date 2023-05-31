@@ -3,7 +3,7 @@ import {combineReducers} from 'redux';
 import nodes from './nodes';
 import cluster from './cluster/cluster';
 import clusterNodes from './clusterNodes/clusterNodes';
-import tenant from './tenant';
+import tenant from './tenant/tenant';
 import storage from './storage';
 import node from './node';
 import tooltip from './tooltip';

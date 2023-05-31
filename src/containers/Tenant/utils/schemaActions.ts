@@ -3,9 +3,9 @@ import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-component
 
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {setShowPreview} from '../../../store/reducers/schema';
-import {setTopLevelTab} from '../../../store/reducers/tenant';
+import {setTopLevelTab} from '../../../store/reducers/tenant/tenant';
+import {TENANT_GENERAL_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import createToast from '../../../utils/createToast';
-import {TenantGeneralTabsIds} from '../TenantPages';
 
 const createTableTemplate = (path: string) => {
     return `CREATE TABLE \`${path}/my_table\`
@@ -37,7 +37,7 @@ const bindActions = (
 ) => {
     const inputQuery = (tmpl: (path: string) => string) => () => {
         dispatch(changeUserInput({input: tmpl(path)}));
-        dispatch(setTopLevelTab(TenantGeneralTabsIds.query));
+        dispatch(setTopLevelTab(TENANT_GENERAL_TABS_IDS.query));
         setActivePath(path);
     };
 
@@ -66,7 +66,7 @@ const bindActions = (
         },
         openPreview: () => {
             dispatch(setShowPreview(true));
-            dispatch(setTopLevelTab(TenantGeneralTabsIds.query));
+            dispatch(setTopLevelTab(TENANT_GENERAL_TABS_IDS.query));
             setActivePath(path);
         },
     };

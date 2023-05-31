@@ -3,13 +3,13 @@ import block from 'bem-cn-lite';
 import qs from 'qs';
 
 import type {IPreparedConsumerData} from '../../../../../types/store/topic';
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import {InternalLink} from '../../../../../components/InternalLink';
 import {formatMsToUptime} from '../../../../../utils';
 import routes, {createHref} from '../../../../../routes';
 
 import {TenantTabsGroups} from '../../../TenantPages';
-import {GeneralPagesIds} from '../../DiagnosticsPages';
 
 import {
     CONSUMERS_COLUMNS_IDS,
@@ -42,7 +42,7 @@ export const columns: Column<IPreparedConsumerData>[] = [
                 <InternalLink
                     to={createHref(routes.tenant, undefined, {
                         ...queryParams,
-                        [TenantTabsGroups.generalTab]: GeneralPagesIds.partitions,
+                        [TenantTabsGroups.generalTab]: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
                         selectedConsumer: row.name,
                     })}
                 >

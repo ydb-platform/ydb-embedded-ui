@@ -35,7 +35,6 @@ import {
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
 } from '../../../utils/constants';
 import {
-    TenantGeneralTabsIds,
     TenantInfoTabsIds,
     TenantTabsGroups,
     TENANT_INFO_TABS,
@@ -48,7 +47,8 @@ import {
     PaneVisibilityToggleButtons,
 } from '../utils/paneVisibilityToggleHelpers';
 import {setShowPreview} from '../../../store/reducers/schema';
-import {setTopLevelTab} from '../../../store/reducers/tenant';
+import {setTopLevelTab} from '../../../store/reducers/tenant/tenant';
+import {TENANT_GENERAL_TABS_IDS} from '../../../store/reducers/tenant/constants';
 
 import './ObjectSummary.scss';
 
@@ -275,7 +275,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
 
     const onOpenPreview = () => {
         dispatch(setShowPreview(true));
-        dispatch(setTopLevelTab(TenantGeneralTabsIds.query));
+        dispatch(setTopLevelTab(TENANT_GENERAL_TABS_IDS.query));
     };
 
     const renderCommonInfoControls = () => {
