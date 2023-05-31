@@ -42,10 +42,10 @@ import './ClusterInfo.scss';
 const b = block('cluster-info');
 
 const getInfo = (
-    cluster: TClusterInfo = {},
-    versionsValues: VersionValue[] = [],
-    additionalInfo: InfoViewerItem[] = [],
-    links: ClusterLink[] = [],
+    cluster: TClusterInfo,
+    versionsValues: VersionValue[],
+    additionalInfo: InfoViewerItem[],
+    links: ClusterLink[],
 ) => {
     const info: InfoViewerItem[] = [];
 
@@ -140,7 +140,12 @@ export const ClusterInfo = ({
     });
     const {clusterName} = queryParams;
 
-    const {data: cluster, loading, wasLoaded, error} = useTypedSelector((state) => state.cluster);
+    const {
+        data: cluster = {},
+        loading,
+        wasLoaded,
+        error,
+    } = useTypedSelector((state) => state.cluster);
     const {
         nodes,
         loading: nodesLoading,
@@ -171,7 +176,7 @@ export const ClusterInfo = ({
         if (additionalVersionsProps?.getVersionToColorMap) {
             return additionalVersionsProps.getVersionToColorMap();
         }
-        return parseVersionsToVersionToColorMap(cluster?.Versions);
+        return parseVersionsToVersionToColorMap(cluster.Versions);
     }, [additionalVersionsProps, cluster]);
 
     const versionsValues = useMemo(() => {
@@ -205,8 +210,8 @@ export const ClusterInfo = ({
                 <div className={b('title')}>
                     <EntityStatus
                         size="m"
-                        status={cluster?.Overall}
-                        name={clusterTitle ?? cluster?.Name ?? 'Unknown cluster'}
+                        status={cluster.Overall}
+                        name={clusterTitle ?? cluster.Name ?? 'Unknown cluster'}
                     />
                 </div>
                 <InfoViewer dots={true} info={clusterInfo} />
