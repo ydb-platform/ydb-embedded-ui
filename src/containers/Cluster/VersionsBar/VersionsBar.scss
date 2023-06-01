@@ -1,0 +1,27 @@
+.ydb-cluster-versions-bar {
+    display: flex;
+    flex-direction: column;
+
+    width: 600px;
+
+    & .yc-progress {
+        width: 100%;
+    }
+
+    &__versions {
+        display: flex;
+        flex-flow: row wrap;
+
+        margin-top: 6px;
+    }
+
+    &__version-title {
+        margin-left: 3px;
+
+        white-space: nowrap;
+    }
+
+    & .yc-progress__stack {
+        cursor: pointer;
+    }
+}

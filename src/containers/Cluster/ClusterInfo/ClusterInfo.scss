@@ -1,4 +1,4 @@
-@import '../../styles/mixins';
+@import '../../../styles/mixins';
 
 .cluster-info {
     $_: &;
@@ -20,29 +20,12 @@
         background: var(--yc-color-base-background);
     }
 
-    &__loader {
-        display: flex;
-        justify-content: center;
-
-        margin-top: 16px;
-    }
-
-    &__common {
+    &__title {
         display: flex;
         align-items: center;
 
         margin-top: 16px;
         margin-bottom: 20px;
-    }
-
-    &__title {
-        margin-bottom: 15px;
-
-        font-weight: 600;
-    }
-
-    &__url {
-        margin-right: 14px;
     }
 
     &__metric-field {
@@ -53,8 +36,6 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-
-        margin-left: 15px;
 
         & .tablet {
             margin-bottom: 2px;
@@ -81,31 +62,18 @@
         margin-left: 15px;
         padding: 0 !important;
     }
+
+    &__links {
+        display: flex;
+        flex-flow: row wrap;
+
+        gap: 12px;
+    }
+
     &__clipboard-button {
         display: flex;
         align-items: center;
 
         margin-left: 5px;
-    }
-    &__progress-label {
-        margin: 0 10px 0 0;
-
-        font-weight: 200;
-    }
-
-    &__version-progress {
-        display: flex;
-        align-items: center;
-
-        width: $progress_width;
-        margin-top: 20px;
-
-        & .yc-progress {
-            width: $progress_width;
-        }
-    }
-
-    & .yc-progress__stack {
-        cursor: pointer;
     }
 }
