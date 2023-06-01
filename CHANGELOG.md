@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.4.2...v4.5.0) (2023-06-01)
+
+
+### Features
+
+* **ClusterInfo:** update versions bar, rework DC and Tablets fields ([#407](https://github.com/ydb-platform/ydb-embedded-ui/issues/407)) ([4824f0d](https://github.com/ydb-platform/ydb-embedded-ui/commit/4824f0d2be9d7bec3641302c88b39a3a87f37c18))
+
 ## [4.4.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.4.1...v4.4.2) (2023-05-29)
 
 
