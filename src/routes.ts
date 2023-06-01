@@ -1,7 +1,7 @@
 import qs from 'qs';
 import {compile} from 'path-to-regexp';
 import isEmpty from 'lodash/isEmpty';
-//@ts-ignore
+
 import {backend, clusterName, webVersion} from './store';
 
 const routes = {

@@ -4,28 +4,27 @@ import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
 import qs from 'qs';
 
+import type {TEvDescribeSchemeResult} from '../../types/api/schema';
+
+import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
+import {useTypedSelector} from '../../utils/hooks';
+import routes, {CLUSTER_PAGES, createHref} from '../../routes';
+import {setHeader} from '../../store/reducers/header';
+import {disableAutorefresh, getSchema, resetLoadingState} from '../../store/reducers/schema';
+import {getSchemaAcl} from '../../store/reducers/schemaAcl';
+import {getTenantInfo, clearTenant} from '../../store/reducers/tenant/tenant';
+
+import SplitPane from '../../components/SplitPane';
 import {AccessDenied} from '../../components/Errors/403';
 
-import {setHeader} from '../../store/reducers/header';
 import ObjectGeneralTabs from './ObjectGeneralTabs/ObjectGeneralTabs';
 import ObjectSummary from './ObjectSummary/ObjectSummary';
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
-//@ts-ignore
-import SplitPane from '../../components/SplitPane';
-//@ts-ignore
-import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
-//@ts-ignore
-import {disableAutorefresh, getSchema, resetLoadingState} from '../../store/reducers/schema';
-//@ts-ignore
-import {getSchemaAcl} from '../../store/reducers/schemaAcl';
+
 import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
 } from './utils/paneVisibilityToggleHelpers';
-//@ts-ignore
-import {getTenantInfo, clearTenant} from '../../store/reducers/tenant';
-import routes, {CLUSTER_PAGES, createHref} from '../../routes';
-import type {TEvDescribeSchemeResult} from '../../types/api/schema';
 
 import './Tenant.scss';
 
@@ -63,8 +62,8 @@ function Tenant(props: TenantProps) {
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
         (currentItem as TEvDescribeSchemeResult).PathDescription?.Self || {};
 
-    const {data: {status: tenantStatus = 200} = {}} = useSelector((state: any) => state.tenant);
-    const {error: {status: schemaStatus = 200} = {}} = useSelector((state: any) => state.schema);
+    const {error: {status: tenantStatus = 200} = {}} = useTypedSelector((state) => state.tenant);
+    const {error: {status: schemaStatus = 200} = {}} = useTypedSelector((state) => state.schema);
 
     const dispatch = useDispatch();
 

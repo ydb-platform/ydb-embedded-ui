@@ -7,36 +7,35 @@ import {useLocation} from 'react-router';
 
 import {Switch, Tabs} from '@gravity-ui/uikit';
 
+import type {EPathType} from '../../../types/api/schema';
+
+import {useTypedSelector} from '../../../utils/hooks';
+import routes, {createHref} from '../../../routes';
+import type {TenantDiagnosticsTab, TenantGeneralTab} from '../../../store/reducers/tenant/types';
+import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema';
+import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
+
 import {Loader} from '../../../components/Loader';
 
-import {TopQueries} from './TopQueries';
-//@ts-ignore
-import DetailedOverview from './DetailedOverview/DetailedOverview';
-import {TopShards} from './TopShards';
-//@ts-ignore
-import Storage from '../../Storage/Storage';
-//@ts-ignore
-import Network from './Network/Network';
-//@ts-ignore
-import Describe from './Describe/Describe';
-//@ts-ignore
-import HotKeys from './HotKeys/HotKeys';
-//@ts-ignore
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes';
-//@ts-ignore
+import Storage from '../../Storage/Storage';
 import {Tablets} from '../../Tablets';
-import {Consumers} from './Consumers';
-import {Partitions} from './Partitions/Partitions';
 
-import routes, {createHref} from '../../../routes';
-import type {EPathType} from '../../../types/api/schema';
-import {TenantGeneralTabsIds, TenantTabsGroups} from '../TenantPages';
-import {GeneralPagesIds, DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
-//@ts-ignore
-import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema';
-import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant';
+import Describe from './Describe/Describe';
+import HotKeys from './HotKeys/HotKeys';
+import Network from './Network/Network';
+import {Partitions} from './Partitions/Partitions';
+import {Consumers} from './Consumers';
+import {TopQueries} from './TopQueries';
+import {TopShards} from './TopShards';
+import DetailedOverview from './DetailedOverview/DetailedOverview';
+
 import {isDatabaseEntityType} from '../utils/schema';
+
+import {TenantTabsGroups} from '../TenantPages';
+import {DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
 
 import './Diagnostics.scss';
 
@@ -51,8 +50,8 @@ const b = cn('kv-tenant-diagnostics');
 function Diagnostics(props: DiagnosticsProps) {
     const dispatch = useDispatch();
     const {currentSchemaPath, autorefresh} = useSelector((state: any) => state.schema);
-    const {diagnosticsTab = GeneralPagesIds.overview, wasLoaded} = useSelector(
-        (state: any) => state.tenant,
+    const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview, wasLoaded} = useTypedSelector(
+        (state) => state.tenant,
     );
 
     const location = useLocation();
@@ -73,7 +72,7 @@ function Diagnostics(props: DiagnosticsProps) {
         return getPagesByType(props.type);
     }, [props.type, isDatabase]);
 
-    const forwardToDiagnosticTab = (tab: GeneralPagesIds) => {
+    const forwardToDiagnosticTab = (tab: TenantDiagnosticsTab) => {
         dispatch(setDiagnosticsTab(tab));
     };
     const activeTab = useMemo(() => {
@@ -97,7 +96,7 @@ function Diagnostics(props: DiagnosticsProps) {
         }
     };
 
-    const forwardToGeneralTab = (tab: TenantGeneralTabsIds) => {
+    const forwardToGeneralTab = (tab: TenantGeneralTab) => {
         dispatch(setTopLevelTab(tab));
     };
 
@@ -107,7 +106,7 @@ function Diagnostics(props: DiagnosticsProps) {
         const tenantNameString = tenantName as string;
 
         switch (diagnosticsTab) {
-            case GeneralPagesIds.overview: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.overview: {
                 return (
                     <DetailedOverview
                         type={type}
@@ -116,7 +115,7 @@ function Diagnostics(props: DiagnosticsProps) {
                     />
                 );
             }
-            case GeneralPagesIds.topQueries: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.topQueries: {
                 return (
                     <TopQueries
                         path={tenantNameString}
@@ -125,10 +124,10 @@ function Diagnostics(props: DiagnosticsProps) {
                     />
                 );
             }
-            case GeneralPagesIds.topShards: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.topShards: {
                 return <TopShards tenantPath={tenantNameString} type={type} />;
             }
-            case GeneralPagesIds.nodes: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.nodes: {
                 return (
                     <Nodes
                         path={currentSchemaPath}
@@ -137,28 +136,28 @@ function Diagnostics(props: DiagnosticsProps) {
                     />
                 );
             }
-            case GeneralPagesIds.tablets: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.tablets: {
                 return <Tablets path={currentSchemaPath} />;
             }
-            case GeneralPagesIds.storage: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.storage: {
                 return <Storage tenant={tenantNameString} database={true} />;
             }
-            case GeneralPagesIds.network: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.network: {
                 return <Network path={tenantNameString} />;
             }
-            case GeneralPagesIds.describe: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.describe: {
                 return <Describe tenant={tenantNameString} type={type} />;
             }
-            case GeneralPagesIds.hotKeys: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.hotKeys: {
                 return <HotKeys type={type} />;
             }
-            case GeneralPagesIds.graph: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.graph: {
                 return <Heatmap path={currentSchemaPath} />;
             }
-            case GeneralPagesIds.consumers: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.consumers: {
                 return <Consumers path={currentSchemaPath} type={type} />;
             }
-            case GeneralPagesIds.partitions: {
+            case TENANT_DIAGNOSTICS_TABS_IDS.partitions: {
                 return <Partitions path={currentSchemaPath} />;
             }
             default: {

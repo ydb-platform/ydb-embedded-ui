@@ -9,7 +9,7 @@ import InfoViewer from '../../../../components/InfoViewer/InfoViewer';
 import PoolUsage from '../../../../components/PoolUsage/PoolUsage';
 import {Tablet} from '../../../../components/Tablet';
 
-import {getTenantInfo} from '../../../../store/reducers/tenant';
+import {getTenantInfo} from '../../../../store/reducers/tenant/tenant';
 
 import {formatCPU} from '../../../../utils';
 import {bytesToGB} from '../../../../utils/utils';
@@ -191,7 +191,7 @@ class TenantOverview extends React.Component {
 }
 
 function mapStateToProps(state) {
-    const {tenant = {}, loading, data: {status} = {}} = state.tenant;
+    const {tenant = {}, loading, error: {status} = {}} = state.tenant;
     const {autorefresh} = state.schema;
 
     return {

@@ -1,9 +1,6 @@
 import {Icon} from '../../components/Icon';
+import {TENANT_GENERAL_TABS_IDS} from '../../store/reducers/tenant/constants';
 
-export enum TenantGeneralTabsIds {
-    query = 'query',
-    diagnostics = 'diagnostics',
-}
 export enum TenantInfoTabsIds {
     overview = 'overview',
     acl = 'acl',
@@ -18,12 +15,12 @@ export enum TenantTabsGroups {
 
 export const TENANT_GENERAL_TABS = [
     {
-        id: TenantGeneralTabsIds.query,
+        id: TENANT_GENERAL_TABS_IDS.query,
         title: 'Query',
         icon: <Icon name="query" viewBox="0 0 16 16" />,
     },
     {
-        id: TenantGeneralTabsIds.diagnostics,
+        id: TENANT_GENERAL_TABS_IDS.diagnostics,
         title: 'Diagnostics',
         icon: <Icon name="diagnostics" viewBox="0 0 17 16" />,
     },

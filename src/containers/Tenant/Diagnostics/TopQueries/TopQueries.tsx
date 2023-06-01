@@ -22,7 +22,9 @@ import type {KeyValueRow} from '../../../../types/api/query';
 import type {EPathType} from '../../../../types/api/schema';
 import type {ITopQueriesFilters} from '../../../../types/store/executeTopQueries';
 import type {IQueryResult} from '../../../../types/store/query';
+import type {TenantGeneralTab} from '../../../../store/reducers/tenant/types';
 
+import {TENANT_GENERAL_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {formatDateTime, formatNumber} from '../../../../utils';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
@@ -30,7 +32,7 @@ import {prepareQueryError} from '../../../../utils/query';
 import routes, {createHref} from '../../../../routes';
 
 import {isColumnEntityType} from '../../utils/schema';
-import {TenantGeneralTabsIds, TenantTabsGroups} from '../../TenantPages';
+import {TenantTabsGroups} from '../../TenantPages';
 
 import i18n from './i18n';
 import './TopQueries.scss';
@@ -86,7 +88,7 @@ const COLUMNS: Column<KeyValueRow>[] = [
 
 interface TopQueriesProps {
     path: string;
-    changeSchemaTab: (tab: TenantGeneralTabsIds) => void;
+    changeSchemaTab: (tab: TenantGeneralTab) => void;
     type?: EPathType;
 }
 
@@ -178,7 +180,7 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
 
             const queryPath = createHref(routes.tenant, undefined, {
                 ...queryParams,
-                [TenantTabsGroups.general]: TenantGeneralTabsIds.query,
+                [TenantTabsGroups.general]: TENANT_GENERAL_TABS_IDS.query,
             });
 
             history.push(queryPath);
