@@ -11,7 +11,7 @@ import tablets from './tablets';
 import heatmap from './heatmap';
 import schema from './schema';
 import host from './host';
-import network from './network';
+import network from './network/network';
 import tenants from './tenants/tenants';
 import tablet from './tablet';
 import topic from './topic';
