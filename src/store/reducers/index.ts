@@ -23,7 +23,7 @@ import settings from './settings/settings';
 import preview from './preview';
 import nodesList from './nodesList';
 import describe from './describe';
-import schemaAcl from './schemaAcl';
+import schemaAcl from './schemaAcl/schemaAcl';
 import executeTopQueries from './executeTopQueries';
 import healthcheckInfo from './healthcheckInfo';
 import shardsWorkload from './shardsWorkload';

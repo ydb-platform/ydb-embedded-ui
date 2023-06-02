@@ -16,7 +16,7 @@ export interface TMetaCommonInfo {
     ACL?: TACE[];
 }
 
-interface TACE {
+export interface TACE {
     AccessType: string;
     AccessRights?: string[];
     Subject: string;
