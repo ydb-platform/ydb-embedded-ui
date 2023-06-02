@@ -99,8 +99,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             filter,
             nodeId,
         }: {
-            tenant: string;
-            filter: string;
+            tenant?: string;
+            filter?: string;
             nodeId: string;
         },
         {concurrentId}: AxiosOptions = {},
