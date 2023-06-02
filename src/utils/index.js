@@ -97,7 +97,8 @@ export const formatDateTime = (value) => {
 
 export const calcUptimeInSeconds = (milliseconds) => {
     const currentDate = new Date();
-    return (currentDate - Number(milliseconds)) / 1000;
+    const diff = currentDate - Number(milliseconds);
+    return diff <= 0 ? 0 : diff / 1000;
 };
 
 export const calcUptime = (milliseconds) => {

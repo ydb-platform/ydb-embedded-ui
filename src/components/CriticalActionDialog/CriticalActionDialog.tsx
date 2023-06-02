@@ -13,6 +13,7 @@ interface CriticalActionDialogProps {
     text: string;
     onClose: VoidFunction;
     onConfirm: () => Promise<unknown>;
+    onConfirmActionFinish: VoidFunction;
 }
 
 export const CriticalActionDialog = ({
@@ -20,6 +21,7 @@ export const CriticalActionDialog = ({
     text,
     onClose,
     onConfirm,
+    onConfirmActionFinish,
 }: CriticalActionDialogProps) => {
     const [isLoading, setIsLoading] = useState(false);
 
@@ -28,6 +30,7 @@ export const CriticalActionDialog = ({
         setIsLoading(true);
 
         return onConfirm().then(() => {
+            onConfirmActionFinish();
             setIsLoading(false);
             onClose();
         });
