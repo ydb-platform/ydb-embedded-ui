@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.5.0...v4.5.1) (2023-06-02)
+
+
+### Bug Fixes
+
+* **Tablet:** fetch data on action finish ([#405](https://github.com/ydb-platform/ydb-embedded-ui/issues/405)) ([f1d71c5](https://github.com/ydb-platform/ydb-embedded-ui/commit/f1d71c5af330a0a13246f8d87433e6bba1d3509a))
+
 ## [4.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.4.2...v4.5.0) (2023-06-01)
 
 
