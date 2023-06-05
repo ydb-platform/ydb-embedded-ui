@@ -12,7 +12,7 @@ import {Icon} from '../../../../components/Icon';
 import {ProblemFilter} from '../../../../components/ProblemFilter';
 import {Illustration} from '../../../../components/Illustration';
 
-import {getNetworkInfo, setDataWasNotLoaded} from '../../../../store/reducers/network';
+import {getNetworkInfo, setDataWasNotLoaded} from '../../../../store/reducers/network/network';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
 import {changeFilter, ProblemFilterValues} from '../../../../store/reducers/settings/settings';
 import {AutoFetcher} from '../../../../utils/autofetcher';
@@ -361,7 +361,7 @@ class Network extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    const {wasLoaded, loading, data: netWorkInfo} = state.network;
+    const {wasLoaded, loading, data: netWorkInfo = {}} = state.network;
     const {autorefresh} = state.schema;
     return {
         netWorkInfo,

@@ -1,20 +1,23 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import '../../services/api';
+import {Reducer} from 'redux';
 
-const FETCH_ALL_NODES_NETWORK = createRequestActionTypes(
-    'ALL_NODES_NETWORK',
+import '../../../services/api';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
+
+import type {NetworkAction, NetworkState} from './types';
+
+export const FETCH_ALL_NODES_NETWORK = createRequestActionTypes(
+    'network',
     'FETCH_ALL_NODES_NETWORK',
 );
 
 const SET_DATA_WAS_NOT_LOADED = 'network/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {
-    data: {},
     loading: false,
     wasLoaded: false,
 };
 
-const network = (state = initialState, action) => {
+const network: Reducer<NetworkState, NetworkAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_ALL_NODES_NETWORK.REQUEST: {
             return {
@@ -53,10 +56,10 @@ const network = (state = initialState, action) => {
 export const setDataWasNotLoaded = () => {
     return {
         type: SET_DATA_WAS_NOT_LOADED,
-    };
+    } as const;
 };
 
-export const getNetworkInfo = (tenant) => {
+export const getNetworkInfo = (tenant: string) => {
     return createApiRequest({
         request: window.api.getNetwork(tenant),
         actions: FETCH_ALL_NODES_NETWORK,
