@@ -11,7 +11,7 @@ import {useTypedSelector} from '../../utils/hooks';
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 import {setHeader} from '../../store/reducers/header';
 import {disableAutorefresh, getSchema, resetLoadingState} from '../../store/reducers/schema';
-import {getSchemaAcl} from '../../store/reducers/schemaAcl';
+import {getSchemaAcl} from '../../store/reducers/schemaAcl/schemaAcl';
 import {getTenantInfo, clearTenant} from '../../store/reducers/tenant/tenant';
 
 import SplitPane from '../../components/SplitPane';
