@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import InfoViewer from '../InfoViewer/InfoViewer';
 import ProgressViewer from '../ProgressViewer/ProgressViewer';
-import PoolUsage from '../PoolUsage/PoolUsage';
+import {PoolUsage} from '../PoolUsage/PoolUsage';
 
 import {LOAD_AVERAGE_TIME_INTERVALS} from '../../utils/constants';
 import {calcUptime} from '../../utils';

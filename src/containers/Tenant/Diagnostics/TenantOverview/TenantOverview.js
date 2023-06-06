@@ -6,7 +6,7 @@ import {Loader} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
 import InfoViewer from '../../../../components/InfoViewer/InfoViewer';
-import PoolUsage from '../../../../components/PoolUsage/PoolUsage';
+import {PoolUsage} from '../../../../components/PoolUsage/PoolUsage';
 import {Tablet} from '../../../../components/Tablet';
 
 import {getTenantInfo} from '../../../../store/reducers/tenant/tenant';
