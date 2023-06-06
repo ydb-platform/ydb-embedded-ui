@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.5.1...v4.5.2) (2023-06-06)
+
+
+### Bug Fixes
+
+* **Versions:** enable table dynamic render ([#416](https://github.com/ydb-platform/ydb-embedded-ui/issues/416)) ([3c877ea](https://github.com/ydb-platform/ydb-embedded-ui/commit/3c877ea88a0c4036213b38099676f473cf3ac2d6))
+
 ## [4.5.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.5.0...v4.5.1) (2023-06-02)
 
 
