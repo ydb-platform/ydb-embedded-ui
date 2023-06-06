@@ -1,16 +1,19 @@
 import {useEffect, useRef, useMemo} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import url from 'url';
 import _ from 'lodash';
 
 import cn from 'bem-cn-lite';
 
-import {PDisk} from './Pdisk';
 import {Loader} from '../.././../components/Loader';
 
-import {getNodeStructure, selectNodeStructure} from '../../../store/reducers/node';
+import {getNodeStructure} from '../../../store/reducers/node/node';
+import {selectNodeStructure} from '../../../store/reducers/node/selectors';
 
 import {AutoFetcher} from '../../../utils/autofetcher';
+import {useTypedSelector} from '../../../utils/hooks';
+
+import {PDisk} from './Pdisk';
 
 import './NodeStructure.scss';
 
@@ -32,20 +35,19 @@ interface NodeStructureProps {
 
 const autofetcher = new AutoFetcher();
 
-function NodeStructure(props: NodeStructureProps) {
+function NodeStructure({nodeId, className, additionalNodesInfo}: NodeStructureProps) {
     const dispatch = useDispatch();
 
-    const nodeStructure: any = useSelector(selectNodeStructure);
+    const nodeStructure = useTypedSelector(selectNodeStructure);
 
-    const loadingStructure = useSelector((state: any) => state.node.loadingStructure);
-    const wasLoadedStructure = useSelector((state: any) => state.node.wasLoadedStructure);
-    const nodeData = useSelector((state: any) => state.node?.data?.SystemStateInfo?.[0]);
+    const {loadingStructure, wasLoadedStructure} = useTypedSelector((state) => state.node);
+    const nodeData = useTypedSelector((state) => state.node?.data?.SystemStateInfo?.[0]);
 
     const nodeHref = useMemo(() => {
-        return props.additionalNodesInfo?.getNodeRef
-            ? props.additionalNodesInfo.getNodeRef(nodeData)
+        return additionalNodesInfo?.getNodeRef
+            ? additionalNodesInfo.getNodeRef(nodeData)
             : undefined;
-    }, [nodeData, props.additionalNodesInfo]);
+    }, [nodeData, additionalNodesInfo]);
 
     const {pdiskId: pdiskIdFromUrl, vdiskId: vdiskIdFromUrl} = url.parse(
         window.location.href,
@@ -71,16 +73,16 @@ function NodeStructure(props: NodeStructureProps) {
     }, []);
 
     useEffect(() => {
-        dispatch(getNodeStructure(props.nodeId));
+        dispatch(getNodeStructure(nodeId));
         autofetcher.start();
-        autofetcher.fetch(() => dispatch(getNodeStructure(props.nodeId)));
+        autofetcher.fetch(() => dispatch(getNodeStructure(nodeId)));
 
         return () => {
             scrolled.current = false;
             isReady.current = false;
             autofetcher.stop();
         };
-    }, [props.nodeId, dispatch]);
+    }, [nodeId, dispatch]);
 
     useEffect(() => {
         if (!_.isEmpty(nodeStructure) && scrollContainer) {
@@ -98,9 +100,9 @@ function NodeStructure(props: NodeStructureProps) {
 
             if (vdiskIdFromUrl) {
                 const vDisks = nodeStructure[pdiskIdFromUrl as string]?.vDisks;
-                const vDisk = vDisks?.find((el: any) => el.id === vdiskIdFromUrl);
+                const vDisk = vDisks?.find((el) => el.id === vdiskIdFromUrl);
                 const dataTable = vDisk ? document.querySelector('.data-table') : undefined;
-                const order = vDisk?.order;
+                const order = vDisk?.order || 0;
 
                 if (dataTable) {
                     scrollToVdisk += (dataTable as HTMLElement).offsetTop + 40 * order;
@@ -147,7 +149,7 @@ function NodeStructure(props: NodeStructureProps) {
 
     return (
         <div className={b()} ref={scrollContainerRef}>
-            <div className={props.className}>{renderContent()}</div>
+            <div className={className}>{renderContent()}</div>
         </div>
     );
 }

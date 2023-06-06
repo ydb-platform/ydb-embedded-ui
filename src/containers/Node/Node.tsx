@@ -15,7 +15,7 @@ import NodeStructure from './NodeStructure/NodeStructure';
 import {Loader} from '../../components/Loader';
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
 
-import {getNodeInfo, resetNode} from '../../store/reducers/node';
+import {getNodeInfo, resetNode} from '../../store/reducers/node/node';
 import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 import {setHeader} from '../../store/reducers/header';
 import {AutoFetcher} from '../../utils/autofetcher';
