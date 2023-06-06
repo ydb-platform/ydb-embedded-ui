@@ -2,6 +2,7 @@ import DataTable, {Column} from '@gravity-ui/react-data-table';
 
 import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
 import {isUnavailableNode} from '../../../utils/nodes';
+import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {formatBytes} from '../../../utils';
 import {getDefaultNodePath} from '../../Node/NodePages';
 
@@ -112,9 +113,7 @@ export const NodesTable = ({nodes}: NodesTableProps) => {
             theme="yandex-cloud"
             data={nodes}
             columns={columns}
-            settings={{
-                displayIndices: false,
-            }}
+            settings={DEFAULT_TABLE_SETTINGS}
         />
     );
 };
