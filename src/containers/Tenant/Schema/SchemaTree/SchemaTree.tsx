@@ -3,7 +3,7 @@ import {useDispatch} from 'react-redux';
 
 import {NavigationTree} from 'ydb-ui-components';
 
-import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema';
+import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema/schema';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';

@@ -46,7 +46,7 @@ import {
     paneVisibilityToggleReducerCreator,
     PaneVisibilityToggleButtons,
 } from '../utils/paneVisibilityToggleHelpers';
-import {setShowPreview} from '../../../store/reducers/schema';
+import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {setTopLevelTab} from '../../../store/reducers/tenant/tenant';
 import {TENANT_GENERAL_TABS_IDS} from '../../../store/reducers/tenant/constants';
 

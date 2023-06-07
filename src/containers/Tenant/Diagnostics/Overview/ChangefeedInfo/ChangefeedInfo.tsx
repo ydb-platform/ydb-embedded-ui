@@ -7,7 +7,7 @@ import {
 } from '../../../../../components/InfoViewer/formatters';
 
 import {useTypedSelector} from '../../../../../utils/hooks';
-import {selectSchemaData} from '../../../../../store/reducers/schema';
+import {selectSchemaData} from '../../../../../store/reducers/schema/schema';
 
 import {getEntityName} from '../../../utils';
 

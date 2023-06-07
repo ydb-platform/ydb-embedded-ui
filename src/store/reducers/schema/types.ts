@@ -1,3 +1,7 @@
+import type {ApiRequestAction} from '../../utils';
+import type {IResponseError} from '../../../types/api/error';
+import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
+
 import {
     disableAutorefresh,
     enableAutorefresh,
@@ -6,17 +10,14 @@ import {
     resetLoadingState,
     setCurrentSchemaPath,
     setShowPreview,
-} from '../../store/reducers/schema';
-import {ApiRequestAction} from '../../store/utils';
-import {IResponseError} from '../api/error';
-import {TEvDescribeSchemeResult} from '../api/schema';
+} from './schema';
 
-export type ISchemaData = Record<string, TEvDescribeSchemeResult>;
+export type SchemaData = Record<string, TEvDescribeSchemeResult>;
 
-export interface ISchemaState {
+export interface SchemaState {
     loading: boolean;
     wasLoaded: boolean;
-    data: ISchemaData;
+    data: SchemaData;
     currentSchema?: TEvDescribeSchemeResult;
     currentSchemaPath?: string;
     autorefresh: boolean;
@@ -24,20 +25,20 @@ export interface ISchemaState {
     error?: IResponseError;
 }
 
-export interface ISchemaHandledResponse {
+export interface SchemaHandledResponse {
     path?: string;
     currentSchema?: TEvDescribeSchemeResult;
-    data?: ISchemaData;
+    data?: SchemaData;
 }
 
-type ISchemaApiRequestAction = ApiRequestAction<
+type SchemaApiRequestAction = ApiRequestAction<
     typeof FETCH_SCHEMA,
-    ISchemaHandledResponse,
+    SchemaHandledResponse,
     IResponseError
 >;
 
-export type ISchemaAction =
-    | ISchemaApiRequestAction
+export type SchemaAction =
+    | SchemaApiRequestAction
     | (
           | ReturnType<typeof setCurrentSchemaPath>
           | ReturnType<typeof enableAutorefresh>
@@ -47,6 +48,6 @@ export type ISchemaAction =
           | ReturnType<typeof resetLoadingState>
       );
 
-export interface ISchemaRootStateSlice {
-    schema: ISchemaState;
+export interface SchemaStateSlice {
+    schema: SchemaState;
 }

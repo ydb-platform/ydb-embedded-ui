@@ -16,7 +16,7 @@ import {
     setShardsState,
     setShardsQueryFilters,
 } from '../../../../store/reducers/shardsWorkload';
-import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema';
+import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema/schema';
 import {EShardsWorkloadMode, IShardsWorkloadFilters} from '../../../../types/store/shardsWorkload';
 
 import type {EPathType} from '../../../../types/api/schema';

@@ -15,7 +15,7 @@ import {prepareQueryError} from '../../../utils/query';
 import {isTableType} from '../utils/schema';
 import {AutoFetcher} from '../../../utils/autofetcher';
 import EnableFullscreenButton from '../../../components/EnableFullscreenButton/EnableFullscreenButton';
-import {setShowPreview} from '../../../store/reducers/schema';
+import {setShowPreview} from '../../../store/reducers/schema/schema';
 
 import './Preview.scss';
 
