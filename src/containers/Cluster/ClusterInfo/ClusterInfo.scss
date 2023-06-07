@@ -1,31 +1,48 @@
 @import '../../../styles/mixins';
 
 .cluster-info {
-    $_: &;
-    $progress_width: 100%;
-
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-
     width: 100%;
 
-    font-size: var(--yc-text-body-2-font-size);
-    line-height: var(--yc-text-body-2-line-height);
-
     &__header {
-        padding: 20px;
+        display: flex;
 
-        border-bottom: 1px solid var(--yc-color-line-generic);
-        background: var(--yc-color-base-background);
+        width: fit-content;
+        margin-bottom: 20px;
+
+        cursor: pointer;
+
+        &__expand-button {
+            margin-left: 6px;
+
+            &_rotate {
+                transform: rotate(180deg);
+            }
+        }
     }
 
-    &__title {
-        display: flex;
-        align-items: center;
+    &__title .entity-status__name {
+        font-size: var(--yc-text-header-1-font-size);
+        font-weight: var(--yc-text-header-font-weight);
+        line-height: var(--yc-text-header-1-line-height);
+    }
 
-        margin-top: 16px;
+    &__title-skeleton {
+        width: 20%;
+        min-width: 200px;
+        height: var(--yc-text-header-1-line-height);
+    }
+
+    &__error {
+        font-size: var(--yc-text-body-2-font-size);
+        line-height: var(--yc-text-body-2-line-height);
+    }
+
+    &__info {
         margin-bottom: 20px;
+
+        &_hidden {
+            display: none;
+        }
     }
 
     &__metric-field {
@@ -38,7 +55,7 @@
         align-items: center;
 
         & .tablet {
-            margin-bottom: 2px;
+            margin-top: 2px;
         }
     }
 

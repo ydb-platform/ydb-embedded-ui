@@ -9,11 +9,7 @@ import {AsideHeader, MenuItem as AsideHeaderMenuItem, FooterItem} from '@gravity
 
 import signOutIcon from '../../assets/icons/signOut.svg';
 import signInIcon from '../../assets/icons/signIn.svg';
-import databaseIcon from '../../assets/icons/server.svg';
-import storageIcon from '../../assets/icons/storage.svg';
-import clusterIcon from '../../assets/icons/cluster.svg';
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
-import databasesIcon from '../../assets/icons/databases.svg';
 import userSecret from '../../assets/icons/user-secret.svg';
 import userChecked from '../../assets/icons/user-check.svg';
 import settingsIcon from '../../assets/icons/settings.svg';
@@ -21,7 +17,7 @@ import supportIcon from '../../assets/icons/support.svg';
 
 import {UserSettings} from '../UserSettings/UserSettings';
 
-import routes, {createHref, CLUSTER_PAGES} from '../../routes';
+import routes, {createHref} from '../../routes';
 
 import {logout} from '../../store/reducers/authentication';
 import {getParsedSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
@@ -115,46 +111,8 @@ interface AsideNavigationProps {
     setSettingValue: (name: string, value: string) => void;
 }
 
-const items: MenuItem[] = [
-    {
-        id: CLUSTER_PAGES.tenants.id,
-        title: 'Databases',
-        icon: databasesIcon,
-        iconSize: 20,
-        location: createHref(routes.cluster, {
-            activeTab: CLUSTER_PAGES.tenants.id,
-        }),
-        locationKeys: ['/tenant'],
-    },
-    {
-        id: CLUSTER_PAGES.nodes.id,
-        title: 'Nodes',
-        icon: databaseIcon,
-        iconSize: 20,
-        location: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.nodes.id}),
-        locationKeys: ['/node'],
-    },
-    {
-        id: CLUSTER_PAGES.storage.id,
-        title: 'Storage',
-        icon: storageIcon,
-        iconSize: 20,
-        location: createHref(routes.cluster, {
-            activeTab: CLUSTER_PAGES.storage.id,
-        }),
-        locationKeys: ['/storage'],
-    },
-    {
-        id: CLUSTER_PAGES.cluster.id,
-        title: 'Cluster',
-        icon: clusterIcon,
-        iconSize: 20,
-        location: createHref(routes.cluster, {
-            activeTab: CLUSTER_PAGES.cluster.id,
-        }),
-        locationKeys: ['/cluster/cluster'],
-    },
-];
+// FIXME: add items or delete
+const items: MenuItem[] = [];
 
 enum Panel {
     UserSettings = 'UserSettings',
@@ -172,17 +130,13 @@ function AsideNavigation(props: AsideNavigationProps) {
 
     const menuItems: AsideHeaderMenuItem[] = React.useMemo(() => {
         const {pathname} = location;
-        const isClusterPage = pathname === '/cluster';
         const menuItems: AsideHeaderMenuItem[] = items.map((item) => {
             const locationKeysCoincidence = item.locationKeys?.filter((key) =>
                 pathname.startsWith(key),
             );
-            let current =
+            const current =
                 (locationKeysCoincidence && locationKeysCoincidence.length > 0) ||
                 item.location.startsWith(pathname);
-            if (isClusterPage && item.id !== CLUSTER_PAGES.tenants.id) {
-                current = false;
-            }
             return {
                 id: item.id,
                 title: item.title,

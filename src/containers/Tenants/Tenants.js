@@ -15,7 +15,7 @@ import {ProblemFilter} from '../../components/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
 import {AutoFetcher} from '../../utils/autofetcher';
 
-import routes, {CLUSTER_PAGES, createHref} from '../../routes';
+import routes, {createHref} from '../../routes';
 import {formatCPU, formatBytesToGigabyte, formatNumber} from '../../utils';
 import {withSearch} from '../../HOCS';
 import {DEFAULT_TABLE_SETTINGS, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
@@ -25,7 +25,6 @@ import {
     getSettingValue,
     ProblemFilterValues,
 } from '../../store/reducers/settings/settings';
-import {setHeader} from '../../store/reducers/header';
 
 import {clusterName} from '../../store';
 import {TenantTabsGroups, TENANT_GENERAL_TABS, TENANT_INFO_TABS} from '../Tenant/TenantPages';
@@ -51,7 +50,6 @@ class Tenants extends React.Component {
         tenants: PropTypes.array,
         searchQuery: PropTypes.string,
         handleSearchQuery: PropTypes.func,
-        setHeader: PropTypes.func,
         filter: PropTypes.string,
         changeFilter: PropTypes.func,
         cluster: PropTypes.object,
@@ -77,12 +75,6 @@ class Tenants extends React.Component {
         this.autofetcher = new AutoFetcher();
         this.props.getTenantsInfo(clusterName);
         this.autofetcher.fetch(() => this.props.getTenantsInfo(clusterName));
-        this.props.setHeader([
-            {
-                text: CLUSTER_PAGES.tenants.title,
-                link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.tenants.id}),
-            },
-        ]);
     }
 
     componentWillUnmount() {
@@ -94,14 +86,15 @@ class Tenants extends React.Component {
 
         return (
             <div className={b('controls')}>
-                <TextInput
-                    className={b('search')}
-                    placeholder="Database name"
-                    value={searchQuery}
-                    onUpdate={handleSearchQuery}
-                    hasClear
-                    autoFocus
-                />
+                <div className={b('search')}>
+                    <TextInput
+                        placeholder="Database name"
+                        value={searchQuery}
+                        onUpdate={handleSearchQuery}
+                        hasClear
+                        autoFocus
+                    />
+                </div>
                 <ProblemFilter value={filter} onChange={changeFilter} />
             </div>
         );
@@ -309,16 +302,14 @@ class Tenants extends React.Component {
 
         return (
             <div className={b('table-wrapper')}>
-                <div className={b('table-content')}>
-                    <DataTable
-                        theme="yandex-cloud"
-                        data={filteredTenants}
-                        columns={columns}
-                        settings={DEFAULT_TABLE_SETTINGS}
-                        dynamicRender={true}
-                        emptyDataMessage="No such tenants"
-                    />
-                </div>
+                <DataTable
+                    theme="yandex-cloud"
+                    data={filteredTenants}
+                    columns={columns}
+                    settings={DEFAULT_TABLE_SETTINGS}
+                    dynamicRender={true}
+                    emptyDataMessage="No such tenants"
+                />
             </div>
         );
     };
@@ -363,7 +354,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     getTenantsInfo,
     changeFilter,
-    setHeader,
 };
 
 export default withSearch(connect(mapStateToProps, mapDispatchToProps)(Tenants));

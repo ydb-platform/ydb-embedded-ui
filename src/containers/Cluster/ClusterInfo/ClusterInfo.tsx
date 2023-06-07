@@ -1,39 +1,27 @@
-import {useCallback, useEffect, useMemo} from 'react';
-import {useDispatch} from 'react-redux';
-import {useLocation} from 'react-router';
 import block from 'bem-cn-lite';
-import qs from 'qs';
+
+import {Skeleton} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import ProgressViewer from '../../../components/ProgressViewer/ProgressViewer';
 import InfoViewer, {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {Tags} from '../../../components/Tags';
 import {Tablet} from '../../../components/Tablet';
-import {Loader} from '../../../components/Loader';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {ExternalLinkWithIcon} from '../../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
+import {IconWrapper as Icon} from '../../../components/Icon/Icon';
 
-import type {
-    AdditionalClusterProps,
-    AdditionalVersionsProps,
-    ClusterLink,
-} from '../../../types/additionalProps';
+import type {IResponseError} from '../../../types/api/error';
+import type {AdditionalClusterProps, ClusterLink} from '../../../types/additionalProps';
 import type {VersionValue} from '../../../types/versions';
 import type {TClusterInfo} from '../../../types/api/cluster';
-import {getClusterNodes} from '../../../store/reducers/clusterNodes/clusterNodes';
-import {getClusterInfo} from '../../../store/reducers/cluster/cluster';
 import {backend, customBackend} from '../../../store';
-import {setHeader} from '../../../store/reducers/header';
 import {formatStorageValues} from '../../../utils';
-import {useAutofetcher, useTypedSelector} from '../../../utils/hooks';
-import {
-    parseVersionsToVersionToColorMap,
-    parseNodesToVersionsValues,
-} from '../../../utils/versions';
-import routes, {CLUSTER_PAGES, createHref} from '../../../routes';
+import {useSetting, useTypedSelector} from '../../../utils/hooks';
+import {CLUSTER_INFO_HIDDEN_KEY} from '../../../utils/constants';
 
-import {Versions} from '../../Versions/Versions';
 import {VersionsBar} from '../VersionsBar/VersionsBar';
+import {ClusterInfoSkeleton} from '../ClusterInfoSkeleton/ClusterInfoSkeleton';
 
 import {compareTablets} from './utils';
 
@@ -122,74 +110,27 @@ const getInfo = (
 };
 
 interface ClusterInfoProps {
-    clusterTitle?: string;
+    cluster?: TClusterInfo;
+    versionsValues?: VersionValue[];
+    loading?: boolean;
+    error?: IResponseError;
     additionalClusterProps?: AdditionalClusterProps;
-    additionalVersionsProps?: AdditionalVersionsProps;
 }
 
 export const ClusterInfo = ({
-    clusterTitle,
+    cluster = {},
+    versionsValues = [],
+    loading,
+    error,
     additionalClusterProps = {},
-    additionalVersionsProps = {},
 }: ClusterInfoProps) => {
-    const dispatch = useDispatch();
-    const location = useLocation();
-
-    const queryParams = qs.parse(location.search, {
-        ignoreQueryPrefix: true,
-    });
-    const {clusterName} = queryParams;
-
-    const {
-        data: cluster = {},
-        loading,
-        wasLoaded,
-        error,
-    } = useTypedSelector((state) => state.cluster);
-    const {
-        nodes,
-        loading: nodesLoading,
-        wasLoaded: nodesWasLoaded,
-        error: nodesError,
-    } = useTypedSelector((state) => state.clusterNodes);
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
-    useEffect(() => {
-        dispatch(
-            setHeader([
-                {
-                    text: CLUSTER_PAGES.cluster.title,
-                    link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.cluster.id}),
-                },
-            ]),
-        );
-    }, [dispatch]);
+    const [clusterInfoHidden, setClusterInfoHidden] = useSetting(CLUSTER_INFO_HIDDEN_KEY, false);
 
-    const fetchData = useCallback(() => {
-        dispatch(getClusterInfo(clusterName ? String(clusterName) : undefined));
-        dispatch(getClusterNodes());
-    }, [dispatch, clusterName]);
-
-    useAutofetcher(fetchData, [fetchData], true);
-
-    const versionToColor = useMemo(() => {
-        if (additionalVersionsProps?.getVersionToColorMap) {
-            return additionalVersionsProps.getVersionToColorMap();
-        }
-        return parseVersionsToVersionToColorMap(cluster.Versions);
-    }, [additionalVersionsProps, cluster]);
-
-    const versionsValues = useMemo(() => {
-        return parseNodesToVersionsValues(nodes, versionToColor);
-    }, [nodes, versionToColor]);
-
-    if ((loading && !wasLoaded) || (nodesLoading && !nodesWasLoaded)) {
-        return <Loader size="l" />;
-    }
-
-    if (error || nodesError) {
-        return <ResponseError error={error || nodesError} />;
-    }
+    const togleClusterInfoVisibility = () => {
+        setClusterInfoHidden(!clusterInfoHidden);
+    };
 
     let internalLink = backend + '/internal';
 
@@ -204,20 +145,45 @@ export const ClusterInfo = ({
         ...links,
     ]);
 
+    const getContent = () => {
+        if (loading) {
+            return <ClusterInfoSkeleton />;
+        }
+
+        if (error) {
+            <ResponseError error={error} className={b('error')} />;
+        }
+
+        return <InfoViewer dots={true} info={clusterInfo} />;
+    };
+
+    const getClusterTitle = () => {
+        if (loading) {
+            return <Skeleton className={b('title-skeleton')} />;
+        }
+
+        return (
+            <EntityStatus
+                size="m"
+                status={cluster?.Overall}
+                name={cluster?.Name ?? 'Unknown cluster'}
+                className={b('title')}
+            />
+        );
+    };
+
     return (
         <div className={b()}>
-            <div className={b('header')}>
-                <div className={b('title')}>
-                    <EntityStatus
-                        size="m"
-                        status={cluster.Overall}
-                        name={clusterTitle ?? cluster.Name ?? 'Unknown cluster'}
-                    />
-                </div>
-                <InfoViewer dots={true} info={clusterInfo} />
+            <div className={b('header')} onClick={togleClusterInfoVisibility}>
+                {getClusterTitle()}
+                <Icon
+                    name="chevron-down"
+                    width={24}
+                    height={24}
+                    className={b('header__expand-button', {rotate: clusterInfoHidden})}
+                />
             </div>
-
-            <Versions nodes={nodes} versionToColor={versionToColor} />
+            <div className={b('info', {hidden: clusterInfoHidden})}>{getContent()}</div>
         </div>
     );
 };

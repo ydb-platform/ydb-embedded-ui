@@ -13,13 +13,6 @@ const routes = {
     auth: '/auth',
 };
 
-export const CLUSTER_PAGES = {
-    tenants: {id: 'tenants', name: 'Databases', title: 'Database list'},
-    nodes: {id: 'nodes', name: 'Nodes', title: 'Nodes'},
-    storage: {id: 'storage', name: 'Storage', title: 'Storage'},
-    cluster: {id: 'cluster', name: 'Cluster', title: 'Cluster'},
-};
-
 export function createHref(
     route: string,
     params?: Record<string, string | number>,

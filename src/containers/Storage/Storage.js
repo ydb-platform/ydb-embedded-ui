@@ -35,8 +35,6 @@ import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
 import StorageGroups from './StorageGroups/StorageGroups';
 import StorageNodes from './StorageNodes/StorageNodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {setHeader} from '../../store/reducers/header';
-import routes, {CLUSTER_PAGES, createHref} from '../../routes';
 
 import './Storage.scss';
 
@@ -67,7 +65,6 @@ class Storage extends React.Component {
         setStorageFilter: PropTypes.func,
         setVisibleEntities: PropTypes.func,
         visibleEntities: PropTypes.string,
-        setHeader: PropTypes.func,
         tenant: PropTypes.string,
         nodeId: PropTypes.string,
         nodesUptimeFilter: PropTypes.string,
@@ -77,7 +74,7 @@ class Storage extends React.Component {
     };
 
     componentDidMount() {
-        const {tenant, nodeId, setVisibleEntities, storageType, setHeader, getNodesList} =
+        const {tenant, nodeId, setVisibleEntities, storageType, getNodesList} =
             this.props;
 
         this.autofetcher = new AutoFetcher();
@@ -89,12 +86,6 @@ class Storage extends React.Component {
                 type: storageType,
             });
         } else {
-            setHeader([
-                {
-                    text: CLUSTER_PAGES.storage.title,
-                    link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.storage.id}),
-                },
-            ]);
             this.getStorageInfo({
                 filter: FILTER_OPTIONS.Missing,
                 type: storageType,
@@ -375,7 +366,6 @@ const mapDispatchToProps = {
     setNodesUptimeFilter,
     getNodesList,
     setStorageType,
-    setHeader,
     setDataWasNotLoaded,
 };
 

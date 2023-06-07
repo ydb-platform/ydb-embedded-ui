@@ -12,6 +12,7 @@ import {
     PARTITIONS_HIDDEN_COLUMNS_KEY,
     QUERY_INITIAL_MODE_KEY,
     ENABLE_QUERY_MODES_FOR_EXPLAIN,
+    CLUSTER_INFO_HIDDEN_KEY,
 } from '../../../utils/constants';
 import '../../../services/api';
 import {getValueFromLS, parseJson} from '../../../utils/utils';
@@ -61,6 +62,7 @@ export const initialState = {
         [QUERY_INITIAL_MODE_KEY]: readSavedSettingsValue(QUERY_INITIAL_MODE_KEY, QueryModes.script),
         [ASIDE_HEADER_COMPACT_KEY]: readSavedSettingsValue(ASIDE_HEADER_COMPACT_KEY, 'true'),
         [PARTITIONS_HIDDEN_COLUMNS_KEY]: readSavedSettingsValue(PARTITIONS_HIDDEN_COLUMNS_KEY),
+        [CLUSTER_INFO_HIDDEN_KEY]: readSavedSettingsValue(CLUSTER_INFO_HIDDEN_KEY, 'false'),
     },
     systemSettings,
 };

@@ -2,57 +2,16 @@
 
 .cluster {
     overflow: auto;
+    flex-grow: 1;
 
-    padding: 0 20px;
+    height: 100%;
+    padding: 20px 20px 0px;
+
     @include flex-container();
 
-    &_tab_cluster {
-        padding: 0px;
-    }
+    &__content {
+        overflow: auto;
 
-    &__tab {
-        text-decoration: none;
-
-        &:first-letter {
-            text-transform: uppercase;
-        }
-    }
-
-    &__format-label {
-        margin-right: 15px;
-    }
-
-    &__title {
-        text-align: center;
-    }
-
-    &__tooltip {
-        animation: none !important;
-    }
-
-    &__search {
-        width: 255px;
-        margin: 0 15px 0 0;
-    }
-
-    &__tablets {
-        padding: 0 !important;
-
-        .tablets-viewer__grid {
-            grid-template-columns: 125px;
-        }
-    }
-
-    &__controls {
-        display: flex;
-        justify-content: space-between;
-
-        margin: 17px 0;
-    }
-
-    &__table-wrapper {
-        display: flex;
-        flex: 1 1 auto;
-        flex-direction: column;
+        height: 100%;
     }
 }

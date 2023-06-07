@@ -15,13 +15,10 @@ import {ProblemFilter} from '../../components/ProblemFilter';
 import {UptimeFilter} from '../../components/UptimeFIlter';
 import {EntitiesCount} from '../../components/EntitiesCount';
 
-import routes, {CLUSTER_PAGES, createHref} from '../../routes';
-
 import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
 import {useAutofetcher, useSetting, useTypedSelector} from '../../utils/hooks';
 import {AdditionalNodesInfo, isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
 
-import {setHeader} from '../../store/reducers/header';
 import {
     getNodes,
     getFilteredPreparedNodesList,
@@ -81,19 +78,6 @@ export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesPr
     }, [dispatch, path, type, useNodesEndpoint]);
 
     useAutofetcher(fetchNodes, [fetchNodes], isClusterNodes ? true : autorefresh);
-
-    useEffect(() => {
-        if (isClusterNodes) {
-            dispatch(
-                setHeader([
-                    {
-                        text: CLUSTER_PAGES.nodes.title,
-                        link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.nodes.id}),
-                    },
-                ]),
-            );
-        }
-    }, [dispatch, isClusterNodes]);
 
     const handleSearchQueryChange = (value: string) => {
         dispatch(setSearchValue(value));

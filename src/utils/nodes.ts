@@ -20,7 +20,7 @@ export const isUnavailableNode = (node: INodesPreparedEntity | TSystemStateInfo)
 export type NodeAddress = Pick<TSystemStateInfo, 'Host' | 'Endpoints'>;
 
 export interface AdditionalNodesInfo extends Record<string, unknown> {
-    getNodeRef?: (node?: NodeAddress) => string;
+    getNodeRef?: (node?: NodeAddress) => string | null;
 }
 
 export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {

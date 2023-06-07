@@ -16,7 +16,7 @@ const b = block('ydb-node-host-wrapper');
 
 interface NodeHostWrapperProps {
     node: INodesPreparedEntity;
-    getNodeRef?: (node?: NodeAddress) => string;
+    getNodeRef?: (node?: NodeAddress) => string | null;
 }
 
 export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {

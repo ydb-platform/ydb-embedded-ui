@@ -13,7 +13,7 @@ import type {INodesPreparedEntity} from '../../types/store/nodes';
 
 interface GetNodesColumnsProps {
     tabletsPath?: string;
-    getNodeRef?: (node?: NodeAddress) => string;
+    getNodeRef?: (node?: NodeAddress) => string | null;
 }
 
 export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps) {
