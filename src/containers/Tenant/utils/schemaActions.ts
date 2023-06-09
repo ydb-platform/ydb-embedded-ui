@@ -2,7 +2,7 @@ import {Dispatch} from 'react';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
 import {changeUserInput} from '../../../store/reducers/executeQuery';
-import {setShowPreview} from '../../../store/reducers/schema';
+import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {setTopLevelTab} from '../../../store/reducers/tenant/tenant';
 import {TENANT_GENERAL_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import createToast from '../../../utils/createToast';

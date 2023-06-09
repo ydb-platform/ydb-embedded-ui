@@ -9,7 +9,7 @@ import node from './node/node';
 import tooltip from './tooltip';
 import tablets from './tablets';
 import heatmap from './heatmap';
-import schema from './schema';
+import schema from './schema/schema';
 import host from './host';
 import network from './network/network';
 import tenants from './tenants/tenants';

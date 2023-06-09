@@ -1,18 +1,20 @@
-import {Reducer} from 'redux';
-import {createSelector, Selector} from 'reselect';
+import type {Reducer} from 'redux';
+import type {Selector} from 'reselect';
 
-import {
-    ISchemaAction,
-    ISchemaData,
-    ISchemaHandledResponse,
-    ISchemaRootStateSlice,
-    ISchemaState,
-} from '../../types/store/schema';
-import {EPathType} from '../../types/api/schema';
-import '../../services/api';
-import {isEntityWithMergedImplementation} from '../../containers/Tenant/utils/schema';
+import {createSelector} from 'reselect';
 
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import type {EPathType} from '../../../types/api/schema';
+import type {
+    SchemaAction,
+    SchemaData,
+    SchemaHandledResponse,
+    SchemaStateSlice,
+    SchemaState,
+} from './types';
+
+import '../../../services/api';
+import {isEntityWithMergedImplementation} from '../../../containers/Tenant/utils/schema';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 export const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
 const PRELOAD_SCHEMAS = 'schema/PRELOAD_SCHEMAS';
@@ -31,7 +33,7 @@ export const initialState = {
     showPreview: false,
 };
 
-const schema: Reducer<ISchemaState, ISchemaAction> = (state = initialState, action) => {
+const schema: Reducer<SchemaState, SchemaAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_SCHEMA.REQUEST: {
             return {
@@ -124,8 +126,8 @@ export function getSchema({path}: {path: string}) {
     return createApiRequest({
         request,
         actions: FETCH_SCHEMA,
-        dataHandler: (data): ISchemaHandledResponse => {
-            const newData: ISchemaData = {};
+        dataHandler: (data): SchemaHandledResponse => {
+            const newData: SchemaData = {};
             if (data.Path) {
                 newData[data.Path] = data;
             }
@@ -147,8 +149,8 @@ export function getSchemaBatched(paths: string[]) {
     return createApiRequest({
         request,
         actions: FETCH_SCHEMA,
-        dataHandler: (data): ISchemaHandledResponse => {
-            const newData: ISchemaData = {};
+        dataHandler: (data): SchemaHandledResponse => {
+            const newData: SchemaData = {};
 
             data.forEach((dataItem) => {
                 if (dataItem.Path) {
@@ -190,7 +192,7 @@ export function setShowPreview(value: boolean) {
 
 // only stores data for paths that are not in the store yet
 // existing paths are ignored
-export function preloadSchemas(data: ISchemaData) {
+export function preloadSchemas(data: SchemaData) {
     return {
         type: PRELOAD_SCHEMAS,
         data,
@@ -203,14 +205,14 @@ export function resetLoadingState() {
     } as const;
 }
 
-export const selectSchemaChildren = (state: ISchemaRootStateSlice, path?: string) =>
+export const selectSchemaChildren = (state: SchemaStateSlice, path?: string) =>
     path ? state.schema.data[path]?.PathDescription?.Children : undefined;
 
-export const selectSchemaData = (state: ISchemaRootStateSlice, path?: string) =>
+export const selectSchemaData = (state: SchemaStateSlice, path?: string) =>
     path ? state.schema.data[path] : undefined;
 
 export const selectSchemaMergedChildrenPaths: Selector<
-    ISchemaRootStateSlice,
+    SchemaStateSlice,
     string[] | undefined,
     [string | undefined, EPathType | undefined]
 > = createSelector(

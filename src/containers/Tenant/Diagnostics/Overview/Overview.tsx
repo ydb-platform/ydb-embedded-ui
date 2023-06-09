@@ -24,7 +24,7 @@ import {
     getSchemaBatched,
     resetLoadingState,
     selectSchemaMergedChildrenPaths,
-} from '../../../../store/reducers/schema';
+} from '../../../../store/reducers/schema/schema';
 import {getTopic} from '../../../../store/reducers/topic';
 //@ts-ignore
 import {

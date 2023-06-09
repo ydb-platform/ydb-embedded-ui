@@ -40,7 +40,7 @@ import {
     paneVisibilityToggleReducerCreator,
 } from '../utils/paneVisibilityToggleHelpers';
 import Preview from '../Preview/Preview';
-import {setShowPreview} from '../../../store/reducers/schema';
+import {setShowPreview} from '../../../store/reducers/schema/schema';
 
 const TABLE_SETTINGS = {
     sortable: false,

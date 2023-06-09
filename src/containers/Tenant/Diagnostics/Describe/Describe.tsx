@@ -15,7 +15,7 @@ import {
     setCurrentDescribePath,
     getDescribeBatched,
 } from '../../../../store/reducers/describe';
-import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema';
+import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 
 import {isEntityWithMergedImplementation} from '../../utils/schema';

@@ -12,7 +12,7 @@ import type {EPathType} from '../../../types/api/schema';
 import {useTypedSelector} from '../../../utils/hooks';
 import routes, {createHref} from '../../../routes';
 import type {TenantDiagnosticsTab, TenantGeneralTab} from '../../../store/reducers/tenant/types';
-import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema';
+import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema/schema';
 import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 
