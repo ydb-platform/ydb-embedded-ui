@@ -4,7 +4,7 @@ import favoriteFilledIcon from '../../assets/icons/star.svg';
 import flaskIcon from '../../assets/icons/flask.svg';
 
 import {
-    ENABLE_QUERY_MODES_FOR_EXPLAIN,
+    ENABLE_ADDITIONAL_QUERY_MODES,
     INVERTED_DISKS_KEY,
     THEME_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
@@ -59,9 +59,9 @@ export const useNodesEndpointSetting: SettingProps = {
     helpPopoverContent: i18n('settings.useNodesEndpoint.popover'),
 };
 export const enableQueryModesForExplainSetting: SettingProps = {
-    settingKey: ENABLE_QUERY_MODES_FOR_EXPLAIN,
-    title: i18n('settings.enableQueryModesForExplain.title'),
-    helpPopoverContent: i18n('settings.enableQueryModesForExplain.popover'),
+    settingKey: ENABLE_ADDITIONAL_QUERY_MODES,
+    title: i18n('settings.enableAdditionalQueryModes.title'),
+    helpPopoverContent: i18n('settings.enableAdditionalQueryModes.popover'),
 };
 
 export const generalSection: SettingsSection = {

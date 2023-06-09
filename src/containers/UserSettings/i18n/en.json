@@ -15,6 +15,6 @@
   "settings.useNodesEndpoint.title": "Break the Nodes tab in Diagnostics",
   "settings.useNodesEndpoint.popover": "Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on versions before 23-1",
 
-  "settings.enableQueryModesForExplain.title": "Enable query modes for explain",
-  "settings.enableQueryModesForExplain.popover": "Enable script | scan query mode selector for both run and explain. May not work on versions before 23-2"
+  "settings.enableAdditionalQueryModes.title": "Enable additional query modes",
+  "settings.enableAdditionalQueryModes.popover": "Adds 'data' and 'query' modes for run. Enables query modes for explain. May not work on some versions"
 }

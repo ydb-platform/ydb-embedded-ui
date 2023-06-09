@@ -8,9 +8,16 @@ import SaveQuery from '../SaveQuery/SaveQuery';
 
 import i18n from '../i18n';
 
-import {b, QueryEditorControlsProps, QueryModeSelectorTitles} from './shared';
+import {QueryEditorControlsProps, b} from './shared';
 
 import './QueryEditorControls.scss';
+
+export const QueryModeSelectorTitles = {
+    [QueryModes.script]: 'Script',
+    [QueryModes.scan]: 'Scan',
+    [QueryModes.data]: 'Data',
+    [QueryModes.query]: 'Query',
+} as const;
 
 export const QueryEditorControls = ({
     onRunButtonClick,

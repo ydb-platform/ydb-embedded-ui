@@ -2,7 +2,7 @@ import type {ExplainPlanNodeData, GraphNode, Link} from '@gravity-ui/paranoid';
 
 import {GET_EXPLAIN_QUERY, GET_EXPLAIN_QUERY_AST} from '../../store/reducers/explainQuery';
 import type {ApiRequestAction} from '../../store/utils';
-import type {PlanTable, ErrorResponse, ScanPlan, ScriptPlan} from '../api/query';
+import type {PlanTable, ErrorResponse, QueryPlan, ScriptPlan} from '../api/query';
 import type {IQueryResult, QueryError} from './query';
 
 export interface PreparedExplainResponse {
@@ -11,7 +11,7 @@ export interface PreparedExplainResponse {
         nodes?: GraphNode<ExplainPlanNodeData>[];
         tables?: PlanTable[];
         version?: string;
-        pristine?: ScanPlan | ScriptPlan;
+        pristine?: QueryPlan | ScriptPlan;
     };
     ast?: string;
 }

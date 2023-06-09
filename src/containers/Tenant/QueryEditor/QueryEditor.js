@@ -30,7 +30,7 @@ import {
     DEFAULT_SIZE_RESULT_PANE_KEY,
     SAVED_QUERIES_KEY,
     QUERY_INITIAL_MODE_KEY,
-    ENABLE_QUERY_MODES_FOR_EXPLAIN,
+    ENABLE_ADDITIONAL_QUERY_MODES,
 } from '../../../utils/constants';
 
 import './QueryEditor.scss';
@@ -516,9 +516,9 @@ function QueryEditor(props) {
     };
 
     const renderControls = () => {
-        const {executeQuery, explainQuery, savedQueries, enableQueryModesForExplain} = props;
+        const {executeQuery, explainQuery, savedQueries, enableAdditionalQueryModes} = props;
 
-        if (enableQueryModesForExplain) {
+        if (enableAdditionalQueryModes) {
             return (
                 <QueryEditorControls
                     onRunButtonClick={handleSendExecuteClick}
@@ -608,7 +608,7 @@ const mapStateToProps = (state) => {
         explainQuery: state.explainQuery,
         savedQueries: getParsedSettingValue(state, SAVED_QUERIES_KEY),
         initialQueryMode: getParsedSettingValue(state, QUERY_INITIAL_MODE_KEY),
-        enableQueryModesForExplain: getParsedSettingValue(state, ENABLE_QUERY_MODES_FOR_EXPLAIN),
+        enableAdditionalQueryModes: getParsedSettingValue(state, ENABLE_ADDITIONAL_QUERY_MODES),
         showPreview: state.schema.showPreview,
         currentSchema: state.schema.currentSchema,
         monacoHotKey: state.executeQuery?.monacoHotKey,
