@@ -66,7 +66,7 @@ function Cluster({
     } = useTypedSelector((state) => state.clusterNodes);
 
     const {Name} = cluster;
-    
+
     const infoLoading = (clusterLoading && !clusterWasLoaded) || (nodesLoading && !nodesWasLoaded);
 
     useEffect(() => {
@@ -159,7 +159,7 @@ function Cluster({
                     wrapTo={({id}, node) => {
                         const path = getClusterPath(id as ClusterTab, queryParams);
                         return (
-                            <InternalLink to={path} key={id} className={b('tab')}>
+                            <InternalLink to={path} key={id}>
                                 {node}
                             </InternalLink>
                         );

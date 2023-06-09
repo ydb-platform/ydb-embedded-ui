@@ -75,9 +75,9 @@ export const Versions = ({versionToColor}: VersionsProps) => {
     const storageNodesContent = storageNodes?.length ? (
         <>
             <h3>Storage nodes</h3>
-            {storageNodes.map(({title, nodes: itemNodes, items, versionColor}, index) => (
+            {storageNodes.map(({title, nodes: itemNodes, items, versionColor}) => (
                 <GroupedNodesTree
-                    key={`storage-nodes-${index}`}
+                    key={`storage-nodes-${title}`}
                     title={title}
                     nodes={itemNodes}
                     items={items}
@@ -90,36 +90,32 @@ export const Versions = ({versionToColor}: VersionsProps) => {
         <>
             <h3>Database nodes</h3>
             {renderControls()}
-            {tenantNodes.map(
-                ({title, nodes: itemNodes, items, versionColor, versionsValues}, index) => (
-                    <GroupedNodesTree
-                        key={`tenant-nodes-${index}`}
-                        title={title}
-                        nodes={itemNodes}
-                        items={items}
-                        expanded={expanded}
-                        versionColor={versionColor}
-                        versionsValues={versionsValues}
-                    />
-                ),
-            )}
+            {tenantNodes.map(({title, nodes: itemNodes, items, versionColor, versionsValues}) => (
+                <GroupedNodesTree
+                    key={`tenant-nodes-${title}`}
+                    title={title}
+                    nodes={itemNodes}
+                    items={items}
+                    expanded={expanded}
+                    versionColor={versionColor}
+                    versionsValues={versionsValues}
+                />
+            ))}
         </>
     ) : null;
     const otherNodesContent = otherNodes?.length ? (
         <>
             <h3>Other nodes</h3>
-            {otherNodes.map(
-                ({title, nodes: itemNodes, items, versionColor, versionsValues}, index) => (
-                    <GroupedNodesTree
-                        key={`other-nodes-${index}`}
-                        title={title}
-                        nodes={itemNodes}
-                        items={items}
-                        versionColor={versionColor}
-                        versionsValues={versionsValues}
-                    />
-                ),
-            )}
+            {otherNodes.map(({title, nodes: itemNodes, items, versionColor, versionsValues}) => (
+                <GroupedNodesTree
+                    key={`other-nodes-${title}`}
+                    title={title}
+                    nodes={itemNodes}
+                    items={items}
+                    versionColor={versionColor}
+                    versionsValues={versionsValues}
+                />
+            ))}
         </>
     ) : null;
 
