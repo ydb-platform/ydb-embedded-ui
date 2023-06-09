@@ -106,3 +106,5 @@ export const TENANT_INITIAL_TAB_KEY = 'saved_tenant_initial_tab';
 export const QUERY_INITIAL_MODE_KEY = 'query_initial_mode';
 
 export const PARTITIONS_HIDDEN_COLUMNS_KEY = 'partitionsHiddenColumns';
+
+export const CLUSTER_INFO_HIDDEN_KEY = 'clusterInfoHidden';

@@ -3,10 +3,6 @@
 .ydb-versions {
     $_: &;
 
-    &__content {
-        padding: 20px;
-    }
-
     &__controls {
         display: flex;
         align-items: center;

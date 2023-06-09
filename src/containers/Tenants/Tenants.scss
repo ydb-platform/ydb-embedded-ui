@@ -1,7 +1,7 @@
 @import '../../styles/mixins.scss';
 
 .tenants {
-    overflow: auto;
+    height: 100%;
     @include flex-container();
 
     &__format-label {
@@ -34,10 +34,8 @@
 
     &__table-wrapper {
         overflow: auto;
-        @include flex-container();
-    }
+        flex-grow: 1;
 
-    &__table-content {
         @include freeze-nth-column(1);
 
         @include table-styles;

@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 
 import {ThemeProvider} from '@gravity-ui/uikit';
 
-import routes, {createHref, CLUSTER_PAGES} from '../../routes';
+import routes, {createHref} from '../../routes';
 
 import Cluster from '../Cluster/Cluster';
 import Tenant from '../Tenant/Tenant';
@@ -23,6 +23,7 @@ import './App.scss';
 import PropTypes from 'prop-types';
 import HistoryContext from '../../contexts/HistoryContext';
 import Authentication from '../Authentication/Authentication';
+import {clusterTabsIds} from '../Cluster/utils';
 
 const b = cn('app');
 
@@ -44,7 +45,7 @@ export function Content(props) {
                     <Route path={routes.tabletsFilters} component={TabletsFilters} />
                     <Redirect
                         to={createHref(routes.cluster, {
-                            activeTab: CLUSTER_PAGES.tenants.id,
+                            activeTab: clusterTabsIds.tenants,
                         })}
                     />
                 </Switch>

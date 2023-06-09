@@ -6,6 +6,9 @@ import {Link as ExternalLink} from '@gravity-ui/uikit';
 
 import {backend} from '../../store';
 import {getTablet, getTabletDescribe} from '../../store/reducers/tablet';
+import {setHeader} from '../../store/reducers/header';
+import routes, {createHref} from '../../routes';
+
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 import '../../services/api';
 
@@ -15,6 +18,8 @@ import {Tag} from '../../components/Tag';
 import {Icon} from '../../components/Icon';
 import {EmptyState} from '../../components/EmptyState';
 import {Loader} from '../../components/Loader';
+
+import {getClusterPath} from '../Cluster/utils';
 
 import {TabletTable} from './TabletTable';
 import {TabletInfo} from './TabletInfo';
@@ -55,6 +60,29 @@ export const Tablet = () => {
     }, [dispatch, id]);
 
     useAutofetcher(fetchData, [fetchData], true);
+
+    useEffect(() => {
+        dispatch(
+            setHeader([
+                {
+                    text: 'Cluster',
+                    link: getClusterPath(),
+                },
+                {
+                    text: 'Tablets',
+                    link: createHref(routes.tabletsFilters, undefined, {
+                        nodeIds: tablet.NodeId ? [tablet.NodeId] : [],
+                        state: tablet.State,
+                        type: tablet.Type,
+                        tenantPath,
+                    }),
+                },
+                {
+                    text: tablet.TabletId ?? 'Tablet',
+                },
+            ]),
+        );
+    }, [dispatch, tenantPath, tablet]);
 
     const renderExternalLinks = (link: {name: string; path: string}, index: number) => {
         return (

@@ -8,7 +8,7 @@ import type {TEvDescribeSchemeResult} from '../../types/api/schema';
 
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedSelector} from '../../utils/hooks';
-import routes, {CLUSTER_PAGES, createHref} from '../../routes';
+import routes, {createHref} from '../../routes';
 import {setHeader} from '../../store/reducers/header';
 import {disableAutorefresh, getSchema, resetLoadingState} from '../../store/reducers/schema/schema';
 import {getSchemaAcl} from '../../store/reducers/schemaAcl/schemaAcl';
@@ -16,6 +16,8 @@ import {getTenantInfo, clearTenant} from '../../store/reducers/tenant/tenant';
 
 import SplitPane from '../../components/SplitPane';
 import {AccessDenied} from '../../components/Errors/403';
+
+import {getClusterPath} from '../Cluster/utils';
 
 import ObjectGeneralTabs from './ObjectGeneralTabs/ObjectGeneralTabs';
 import ObjectSummary from './ObjectSummary/ObjectSummary';
@@ -97,8 +99,8 @@ function Tenant(props: TenantProps) {
             dispatch(
                 setHeader([
                     {
-                        text: CLUSTER_PAGES.tenants.title,
-                        link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.tenants.id}),
+                        text: 'Cluster',
+                        link: getClusterPath(),
                     },
                     {
                         text: tenantName.startsWith('/') ? tenantName.slice(1) : tenantName,

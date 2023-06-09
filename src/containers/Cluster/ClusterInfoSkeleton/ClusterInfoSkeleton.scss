@@ -1,0 +1,48 @@
+.ydb-cluster-info-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    margin-top: 5px;
+
+    &__row {
+        display: flex;
+        align-items: flex-start;
+
+        min-height: var(--yc-text-body-2-font-size);
+
+        .yc-skeleton {
+            min-height: var(--yc-text-body-2-font-size);
+        }
+    }
+
+    &__label {
+        display: flex;
+        flex: 0 1 auto;
+        align-items: baseline;
+
+        width: 200px;
+
+        &__text {
+            width: 100px;
+        }
+
+        &__dots {
+            width: 100px;
+            margin: 0 2px;
+
+            border-bottom: 1px dotted var(--yc-color-text-secondary);
+        }
+    }
+
+    &__value {
+        min-width: 200px;
+        max-width: 20%;
+    }
+
+    &__versions {
+        min-width: 400px;
+        max-width: 40%;
+        height: 36px;
+    }
+}

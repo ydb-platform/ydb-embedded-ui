@@ -16,20 +16,16 @@ import {Loader} from '../../components/Loader';
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
 
 import {getNodeInfo, resetNode} from '../../store/reducers/node/node';
-import routes, {CLUSTER_PAGES, createHref} from '../../routes';
-import {setHeader} from '../../store/reducers/header';
+import routes, {createHref} from '../../routes';
+import {HeaderItemType, setHeader} from '../../store/reducers/header';
 import {AutoFetcher} from '../../utils/autofetcher';
+import {clusterTabsIds, getClusterPath} from '../Cluster/utils';
 
 import './Node.scss';
 
 const b = cn('node');
 
 export const STORAGE_ROLE = 'Storage';
-
-const headerNodes = {
-    text: CLUSTER_PAGES.nodes.title,
-    link: createHref(routes.cluster, {activeTab: CLUSTER_PAGES.nodes.id}),
-};
 
 const autofetcher = new AutoFetcher();
 
@@ -73,27 +69,33 @@ function Node(props: NodeProps) {
     }, [activeTab, node]);
 
     React.useEffect(() => {
+        const headerItems: HeaderItemType[] = [
+            {
+                text: 'Cluster',
+                link: getClusterPath(clusterTabsIds.nodes),
+            },
+        ];
+
+        if (nodeHost) {
+            headerItems.push({
+                text: nodeHost,
+            });
+        }
+
+        dispatch(setHeader(headerItems));
+    }, [dispatch, nodeHost]);
+
+    React.useEffect(() => {
         const fetchData = () => dispatch(getNodeInfo(nodeId));
         fetchData();
         autofetcher.start();
         autofetcher.fetch(() => fetchData());
-        dispatch(setHeader([headerNodes]));
+
         return () => {
             autofetcher.stop();
             dispatch(resetNode());
         };
-    }, [nodeId]);
-
-    React.useEffect(() => {
-        dispatch(
-            setHeader([
-                headerNodes,
-                {
-                    text: nodeHost,
-                },
-            ]),
-        );
-    }, [nodeHost]);
+    }, [dispatch, nodeId]);
 
     const renderTabs = () => {
         return (

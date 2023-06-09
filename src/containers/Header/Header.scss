@@ -13,28 +13,4 @@
     border-bottom: 1px solid var(--yc-color-line-generic);
 
     @include body2-typography;
-
-    &__cluster-info-title {
-        font-size: var(--yc-text-body-1-font-size);
-        text-transform: uppercase;
-
-        color: var(--yc-color-text-secondary);
-    }
-
-    &__cluster-info-name {
-        font-size: var(--yc-text-body-2-font-size);
-        font-weight: 500;
-    }
-
-    &__cluster-name-wrapper {
-        display: flex;
-        align-items: center;
-
-        height: 100%;
-        gap: 5px;
-    }
-
-    &__divider {
-        height: 80%;
-    }
 }
