@@ -53,9 +53,6 @@ function Overview({type, tenantName}: OverviewProps) {
         wasLoaded: olapStatsWasLoaded,
     } = useTypedSelector((state) => state.olapStats);
 
-    const loading =
-        (overviewLoading && !overviewWasLoaded) || (olapStatsLoading && !olapStatsWasLoaded);
-
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
     // shalloEqual prevents rerenders when new schema data is loaded
@@ -63,6 +60,10 @@ function Overview({type, tenantName}: OverviewProps) {
         (state) => selectSchemaMergedChildrenPaths(state, currentSchemaPath, type),
         shallowEqual,
     );
+
+    const entityLoading =
+        (overviewLoading && !overviewWasLoaded) || (olapStatsLoading && !olapStatsWasLoaded);
+    const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
 
     const fetchData = useCallback(
         (isBackground: boolean) => {
@@ -132,7 +133,7 @@ function Overview({type, tenantName}: OverviewProps) {
         );
     };
 
-    if (loading) {
+    if (entityLoading || entityNotReady) {
         return <Loader size="m" />;
     }
 
