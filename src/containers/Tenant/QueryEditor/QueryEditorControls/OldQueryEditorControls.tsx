@@ -1,5 +1,5 @@
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
-import {useEffect, useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {QueryModes} from '../../../../types/store/query';
 import {Icon} from '../../../../components/Icon';
@@ -28,13 +28,6 @@ export const OldQueryEditorControls = ({
     onUpdateQueryMode,
     queryMode,
 }: QueryEditorControlsProps) => {
-    // On setting change when 'data' or 'query' option selected
-    useEffect(() => {
-        if (queryMode !== QueryModes.script && queryMode !== QueryModes.scan) {
-            onUpdateQueryMode(QueryModes.script);
-        }
-    }, [queryMode, onUpdateQueryMode]);
-
     const runModeSelectorMenuItems = useMemo(() => {
         return Object.entries(QueryModeSelectorTitles).map(([mode, title]) => {
             return {

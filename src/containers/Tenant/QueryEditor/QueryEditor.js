@@ -8,12 +8,6 @@ import MonacoEditor from 'react-monaco-editor';
 import SplitPane from '../../../components/SplitPane';
 import {QueryResultTable} from '../../../components/QueryResultTable';
 
-import SavedQueries from './SavedQueries/SavedQueries';
-import QueryResult from './QueryResult/QueryResult';
-import QueryExplain from './QueryExplain/QueryExplain';
-import {QueryEditorControls} from './QueryEditorControls/QueryEditorControls';
-import {OldQueryEditorControls} from './QueryEditorControls/OldQueryEditorControls';
-
 import {
     sendExecuteQuery,
     changeUserInput,
@@ -25,6 +19,7 @@ import {
 } from '../../../store/reducers/executeQuery';
 import {getExplainQuery, getExplainQueryAst} from '../../../store/reducers/explainQuery';
 import {getParsedSettingValue, setSettingValue} from '../../../store/reducers/settings/settings';
+import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
@@ -32,15 +27,23 @@ import {
     QUERY_INITIAL_MODE_KEY,
     ENABLE_ADDITIONAL_QUERY_MODES,
 } from '../../../utils/constants';
+import {useSetting} from '../../../utils/hooks';
+import {QueryModes} from '../../../types/store/query';
 
-import './QueryEditor.scss';
-import QueriesHistory from './QueriesHistory/QueriesHistory';
 import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
 } from '../utils/paneVisibilityToggleHelpers';
 import Preview from '../Preview/Preview';
-import {setShowPreview} from '../../../store/reducers/schema/schema';
+
+import SavedQueries from './SavedQueries/SavedQueries';
+import QueryResult from './QueryResult/QueryResult';
+import QueryExplain from './QueryExplain/QueryExplain';
+import {QueryEditorControls} from './QueryEditorControls/QueryEditorControls';
+import {OldQueryEditorControls} from './QueryEditorControls/OldQueryEditorControls';
+import QueriesHistory from './QueriesHistory/QueriesHistory';
+
+import './QueryEditor.scss';
 
 const TABLE_SETTINGS = {
     sortable: false,
@@ -83,7 +86,15 @@ function QueryEditor(props) {
     const [resultType, setResultType] = useState(RESULT_TYPES.EXECUTE);
 
     const [isResultLoaded, setIsResultLoaded] = useState(false);
-    const [queryMode, setQueryMode] = useState(props.initialQueryMode);
+    const [queryMode, setQueryMode] = useSetting(QUERY_INITIAL_MODE_KEY);
+    const [enableAdditionalQueryModes] = useSetting(ENABLE_ADDITIONAL_QUERY_MODES);
+
+    useEffect(() => {
+        const isNewQueryMode = queryMode !== QueryModes.script && queryMode !== QueryModes.scan;
+        if (!enableAdditionalQueryModes && isNewQueryMode) {
+            setQueryMode(QueryModes.script);
+        }
+    }, [enableAdditionalQueryModes, queryMode, setQueryMode]);
 
     const [resultVisibilityState, dispatchResultVisibilityState] = useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
@@ -510,13 +521,8 @@ function QueryEditor(props) {
         setSettingValue(SAVED_QUERIES_KEY, JSON.stringify(newSavedQueries));
     };
 
-    const onUpdateQueryMode = (mode) => {
-        setQueryMode(mode);
-        props.setSettingValue(QUERY_INITIAL_MODE_KEY, mode);
-    };
-
     const renderControls = () => {
-        const {executeQuery, explainQuery, savedQueries, enableAdditionalQueryModes} = props;
+        const {executeQuery, explainQuery, savedQueries} = props;
 
         if (enableAdditionalQueryModes) {
             return (
@@ -528,7 +534,7 @@ function QueryEditor(props) {
                     onSaveQueryClick={onSaveQueryHandler}
                     savedQueries={savedQueries}
                     disabled={!executeQuery.input}
-                    onUpdateQueryMode={onUpdateQueryMode}
+                    onUpdateQueryMode={setQueryMode}
                     queryMode={queryMode}
                 />
             );
@@ -543,7 +549,7 @@ function QueryEditor(props) {
                 onSaveQueryClick={onSaveQueryHandler}
                 savedQueries={savedQueries}
                 disabled={!executeQuery.input}
-                onUpdateQueryMode={onUpdateQueryMode}
+                onUpdateQueryMode={setQueryMode}
                 queryMode={queryMode}
             />
         );
@@ -607,8 +613,6 @@ const mapStateToProps = (state) => {
         executeQuery: state.executeQuery,
         explainQuery: state.explainQuery,
         savedQueries: getParsedSettingValue(state, SAVED_QUERIES_KEY),
-        initialQueryMode: getParsedSettingValue(state, QUERY_INITIAL_MODE_KEY),
-        enableAdditionalQueryModes: getParsedSettingValue(state, ENABLE_ADDITIONAL_QUERY_MODES),
         showPreview: state.schema.showPreview,
         currentSchema: state.schema.currentSchema,
         monacoHotKey: state.executeQuery?.monacoHotKey,
