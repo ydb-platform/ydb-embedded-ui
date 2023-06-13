@@ -4,7 +4,7 @@ import type {
     AnyExplainResponse,
     ExecuteModernResponse,
     KeyValueRow,
-    ScanPlan,
+    QueryPlan,
     ScriptPlan,
 } from '../types/api/query';
 import type {IQueryResult} from '../types/store/query';
@@ -115,10 +115,10 @@ export const parseQueryAPIExplainResponse = (
     return data;
 };
 
-const isExplainScriptPlan = (plan: ScriptPlan | ScanPlan): plan is ScriptPlan =>
+const isExplainScriptPlan = (plan: ScriptPlan | QueryPlan): plan is ScriptPlan =>
     Boolean(plan && 'queries' in plan);
 
-export const parseQueryExplainPlan = (plan: ScriptPlan | ScanPlan): ScanPlan => {
+export const parseQueryExplainPlan = (plan: ScriptPlan | QueryPlan): QueryPlan => {
     if (isExplainScriptPlan(plan)) {
         if (!plan.queries || !plan.queries.length) {
             return {meta: plan.meta};

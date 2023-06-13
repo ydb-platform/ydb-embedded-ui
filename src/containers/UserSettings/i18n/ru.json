@@ -15,6 +15,6 @@
   "settings.useNodesEndpoint.title": "Сломать вкладку Nodes в диагностике",
   "settings.useNodesEndpoint.popover": "Использовать эндпоинт /viewer/json/nodes для вкладки Nodes в диагностике. Может возвращать некорректные данные на версиях до 23-1",
 
-  "settings.enableQueryModesForExplain.title": "Включить режимы выполнения запроса для explain",
-  "settings.enableQueryModesForExplain.popover": "Включить общий переключатель script | scan для run и explain. Может работать некорректно на версиях до 23-2"
+  "settings.enableAdditionalQueryModes.title": "Включить дополнительные режимы выполнения запросов",
+  "settings.enableAdditionalQueryModes.popover": "Добавляет режимы 'data' и 'query' для run. Включает возможность выбрать режим выполнения запроса для explain. Может работать некорректно на некоторых версиях"
 }

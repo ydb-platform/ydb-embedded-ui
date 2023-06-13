@@ -6,9 +6,16 @@ import {Icon} from '../../../../components/Icon';
 
 import SaveQuery from '../SaveQuery/SaveQuery';
 
-import {b, QueryEditorControlsProps, QueryModeSelectorTitles} from './shared';
+import {QueryEditorControlsProps, b} from './shared';
 
 import './QueryEditorControls.scss';
+
+type OldQueryModes = QueryModes.script | QueryModes.scan;
+
+export const QueryModeSelectorTitles = {
+    [QueryModes.script]: 'Script',
+    [QueryModes.scan]: 'Scan',
+} as const;
 
 export const OldQueryEditorControls = ({
     onRunButtonClick,
@@ -26,7 +33,7 @@ export const OldQueryEditorControls = ({
             return {
                 text: `Run ${title}`,
                 action: () => {
-                    onUpdateQueryMode(mode as QueryModes);
+                    onUpdateQueryMode(mode as OldQueryModes);
                 },
             };
         });
@@ -44,7 +51,7 @@ export const OldQueryEditorControls = ({
                         loading={runIsLoading}
                     >
                         <Icon name="startPlay" viewBox="0 0 16 16" width={16} height={16} />
-                        {`Run ${QueryModeSelectorTitles[queryMode]}`}
+                        {`Run ${QueryModeSelectorTitles[queryMode as OldQueryModes]}`}
                     </Button>
                     <DropdownMenu
                         items={runModeSelectorMenuItems}

@@ -11,7 +11,7 @@ import {
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     PARTITIONS_HIDDEN_COLUMNS_KEY,
     QUERY_INITIAL_MODE_KEY,
-    ENABLE_QUERY_MODES_FOR_EXPLAIN,
+    ENABLE_ADDITIONAL_QUERY_MODES,
     CLUSTER_INFO_HIDDEN_KEY,
 } from '../../../utils/constants';
 import '../../../services/api';
@@ -53,8 +53,8 @@ export const initialState = {
             USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
             'false',
         ),
-        [ENABLE_QUERY_MODES_FOR_EXPLAIN]: readSavedSettingsValue(
-            ENABLE_QUERY_MODES_FOR_EXPLAIN,
+        [ENABLE_ADDITIONAL_QUERY_MODES]: readSavedSettingsValue(
+            ENABLE_ADDITIONAL_QUERY_MODES,
             'false',
         ),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),

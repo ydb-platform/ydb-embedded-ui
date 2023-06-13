@@ -4,7 +4,7 @@ import type {
     ColumnType,
     ErrorResponse,
     ScriptPlan,
-    ScanPlan,
+    QueryPlan,
     TKqpStatsQuery,
 } from '../api/query';
 
@@ -12,7 +12,7 @@ export interface IQueryResult {
     result?: KeyValueRow[];
     columns?: ColumnType[];
     stats?: TKqpStatsQuery;
-    plan?: ScriptPlan | ScanPlan;
+    plan?: ScriptPlan | QueryPlan;
     ast?: string;
 }
 
@@ -26,4 +26,6 @@ export type QueryError = NetworkError | ErrorResponse;
 export enum QueryModes {
     scan = 'scan',
     script = 'script',
+    data = 'data',
+    query = 'query',
 }

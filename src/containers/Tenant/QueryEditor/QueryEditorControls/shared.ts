@@ -1,13 +1,8 @@
 import block from 'bem-cn-lite';
 
-import {QueryModes} from '../../../../types/store/query';
+import type {QueryModes} from '../../../../types/store/query';
 
 export const b = block('ydb-query-editor-controls');
-
-export const QueryModeSelectorTitles = {
-    [QueryModes.script]: 'Script',
-    [QueryModes.scan]: 'Scan',
-} as const;
 
 export interface QueryEditorControlsProps {
     onRunButtonClick: (mode?: QueryModes) => void;

@@ -24,17 +24,17 @@ interface TKqpStatsCompile {}
 interface TDqTableStats {
     TablePath?: string;
     /** uint64 */
-    ReadRows?: string;
+    ReadRows?: string | number;
     /** uint64 */
-    ReadBytes?: string;
+    ReadBytes?: string | number;
     /** uint64 */
-    WriteRows?: string;
+    WriteRows?: string | number;
     /** uint64 */
-    WriteBytes?: string;
+    WriteBytes?: string | number;
     /** uint64 */
-    EraseRows?: string;
+    EraseRows?: string | number;
     /** uint64 */
-    EraseBytes?: string;
+    EraseBytes?: string | number;
     AffectedPartitions?: number;
     Extra?: unknown;
 }
@@ -42,24 +42,24 @@ interface TDqTableStats {
 /** source: https://github.com/ydb-platform/ydb/blob/main/ydb/library/yql/dq/actors/protos/dq_stats.proto */
 interface TDqExecutionStats {
     /** uint64 */
-    CpuTimeUs?: string;
+    CpuTimeUs?: string | number;
     /** uint64 */
-    DurationUs?: string;
+    DurationUs?: string | number;
     /** uint64 */
-    ResultRows?: string;
+    ResultRows?: string | number;
     /** uint64 */
-    ResultBytes?: string;
+    ResultBytes?: string | number;
 
     Tables?: TDqTableStats[];
 
     /** uint64 */
-    ExecuterCpuTimeUs?: string;
+    ExecuterCpuTimeUs?: string | number;
     /** uint64 */
-    StartTimeMs?: string;
+    StartTimeMs?: string | number;
     /** uint64 */
-    FinishTimeMs?: string;
+    FinishTimeMs?: string | number;
     /** uint64 */
-    FirstRowTimeMs?: string;
+    FirstRowTimeMs?: string | number;
 
     Stages?: TDqStageStats[];
     TxPlansWithStats?: string[];
@@ -70,17 +70,17 @@ interface TDqExecutionStats {
 /** source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/kqp_stats.proto */
 export interface TKqpStatsQuery {
     /** uint64 */
-    DurationUs?: string;
+    DurationUs?: string | number;
     Compilation?: TKqpStatsCompile;
 
     /** uint64 */
-    WorkerCpuTimeUs?: string;
+    WorkerCpuTimeUs?: string | number;
     /** uint64 */
-    ReadSetsCount?: string;
+    ReadSetsCount?: string | number;
     /** uint64 */
-    MaxShardProgramSize?: string;
+    MaxShardProgramSize?: string | number;
     /** uint64 */
-    MaxShardReplySize?: string;
+    MaxShardReplySize?: string | number;
 
     Executions?: TDqExecutionStats[];
 }
@@ -120,6 +120,10 @@ interface PlanNodeStats {
     TotalOutputBytes?: number;
     TotalDurationMs?: number;
     TotalOutputRows?: number;
+
+    ComputeNodes?: unknown[];
+    NodesScanShards?: unknown[];
+    UseLlvm?: unknown;
 }
 
 interface PlanNodeOperator {
@@ -128,6 +132,7 @@ interface PlanNodeOperator {
     ReadLimit?: string;
     ReadColumns?: string[];
     ReadRanges?: string[];
+    ReadRange?: string[];
     Table?: string;
     Iterator?: string;
 }
@@ -153,7 +158,7 @@ export interface ScriptPlan {
     meta: PlanMeta;
 }
 
-export interface ScanPlan {
+export interface QueryPlan {
     Plan?: PlanNode;
     tables?: PlanTable[];
     meta: PlanMeta;
@@ -177,15 +182,22 @@ export interface ColumnType {
 /** undefined = 'classic' */
 export type Schemas = 'classic' | 'modern' | 'ydb' | undefined;
 
-/**
- * undefined = 'execute'
- *
- * execute and execute-script have similar responses
- */
-export type ExecuteActions = 'execute' | 'execute-scan' | 'execute-script' | undefined;
+/** undefined = 'execute' */
+export type ExecuteActions =
+    | 'execute'
+    | 'execute-scan'
+    | 'execute-script'
+    | 'execute-data'
+    | 'execute-query'
+    | undefined;
 
-/** explain, explain-scan and explain-ast have similar responses */
-export type ExplainActions = 'explain' | 'explain-scan' | 'explain-script' | 'explain-ast';
+export type ExplainActions =
+    | 'explain'
+    | 'explain-scan'
+    | 'explain-script'
+    | 'explain-data'
+    | 'explain-query'
+    | 'explain-ast';
 
 export type Actions = ExecuteActions | ExplainActions;
 
@@ -197,19 +209,27 @@ export interface ErrorResponse {
 }
 
 // ==== Explain Responses ====
-
+/**
+ * meta.type = 'script'
+ *
+ * explain-script
+ */
 export interface ExplainScriptResponse {
     plan?: ScriptPlan;
 }
-
-export interface ExplainScanResponse {
+/**
+ * meta.type = 'query'
+ *
+ * explain, explain-scan, explain-data, explain-query, explain-ast
+ */
+export interface ExplainQueryResponse {
     ast?: string;
-    plan?: ScanPlan;
+    plan?: QueryPlan;
 }
 
 export type ExplainResponse<Action extends ExplainActions> = Action extends 'explain-script'
     ? ExplainScriptResponse
-    : ExplainScanResponse;
+    : ExplainQueryResponse;
 
 // ==== Execute Responses ====
 
@@ -222,22 +242,34 @@ type ResultFields<Schema extends Schemas> = Schema extends 'modern'
           result?: KeyValueRow[];
       };
 
-export type ExecuteScanResponse<Schema extends Schemas> = {
-    plan?: ScanPlan;
+/**
+ * meta.type = 'query'
+ *
+ * execute-scan, execute-data, execute-query
+ */
+export type ExecuteQueryResponse<Schema extends Schemas> = {
+    plan?: QueryPlan;
     ast?: string;
     stats?: TKqpStatsQuery;
 } & ResultFields<Schema>;
 
+/**
+ * meta.type = 'script'
+ *
+ * execute, execute-script
+ */
 export type ExecuteScriptResponse<Schema extends Schemas> = {
     plan?: ScriptPlan;
     ast?: string;
     stats?: TKqpStatsQuery;
 } & ResultFields<Schema>;
 
-export type ExecuteResponse<
-    Action extends ExecuteActions,
-    Schema extends Schemas,
-> = Action extends 'execute-scan' ? ExecuteScanResponse<Schema> : ExecuteScriptResponse<Schema>;
+export type ExecuteResponse<Action extends ExecuteActions, Schema extends Schemas> = Action extends
+    | 'execute-scan'
+    | 'execute-data'
+    | 'execute-query'
+    ? ExecuteQueryResponse<Schema>
+    : ExecuteScriptResponse<Schema>;
 
 // ==== Combined API response ====
 export type QueryAPIResponse<
@@ -250,13 +282,15 @@ export type QueryAPIResponse<
     : unknown;
 
 // ==== types to use in query result preparation ====
-export type AnyExplainResponse = ExplainScanResponse | ExplainScriptResponse;
+export type AnyExplainResponse = ExplainQueryResponse | ExplainScriptResponse;
 
-export type ExecuteModernResponse = ExecuteScanResponse<'modern'> | ExecuteScriptResponse<'modern'>;
+export type ExecuteModernResponse =
+    | ExecuteQueryResponse<'modern'>
+    | ExecuteScriptResponse<'modern'>;
 export type ExecuteClassicResponse =
-    | ExecuteScanResponse<'classic'>
+    | ExecuteQueryResponse<'classic'>
     | ExecuteScriptResponse<'classic'>;
-export type ExecuteYdbResponse = ExecuteScanResponse<'ydb'> | ExecuteScriptResponse<'ydb'>;
+export type ExecuteYdbResponse = ExecuteQueryResponse<'ydb'> | ExecuteScriptResponse<'ydb'>;
 
 export type AnyExecuteResponse =
     | ExecuteModernResponse
