@@ -1,85 +1,88 @@
 import {ReactNode, useCallback} from 'react';
-import {shallowEqual, useDispatch, useSelector} from 'react-redux';
+import {shallowEqual, useDispatch} from 'react-redux';
 
 import {Loader} from '../../../../components/Loader';
-
-//@ts-ignore
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 
-import {TopicInfo} from './TopicInfo';
-import {ChangefeedInfo} from './ChangefeedInfo';
-import {TableInfo} from './TableInfo';
-
 import {EPathType} from '../../../../types/api/schema';
+import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
+import {getTopic} from '../../../../store/reducers/topic';
+import {
+    getOlapStats,
+    resetLoadingState as resetOlapLoadingState,
+} from '../../../../store/reducers/olapStats';
+import {
+    getOverview,
+    getOverviewBatched,
+    setCurrentOverviewPath,
+    setDataWasNotLoaded,
+} from '../../../../store/reducers/overview/overview';
+
 import {
     isEntityWithMergedImplementation,
     isColumnEntityType,
     isTableType,
     isPathTypeWithTopic,
 } from '../../utils/schema';
-//@ts-ignore
-import {
-    getSchema,
-    getSchemaBatched,
-    resetLoadingState,
-    selectSchemaMergedChildrenPaths,
-} from '../../../../store/reducers/schema/schema';
-import {getTopic} from '../../../../store/reducers/topic';
-//@ts-ignore
-import {
-    getOlapStats,
-    resetLoadingState as resetOlapLoadingState,
-} from '../../../../store/reducers/olapStats';
-import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+
+import {TopicInfo} from './TopicInfo';
+import {ChangefeedInfo} from './ChangefeedInfo';
+import {TableInfo} from './TableInfo';
 
 interface OverviewProps {
     type?: EPathType;
-    className?: string;
     tenantName?: string;
 }
 
-function Overview({type, tenantName, className}: OverviewProps) {
+function Overview({type, tenantName}: OverviewProps) {
     const dispatch = useDispatch();
 
+    const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
     const {
-        currentSchema: currentItem = {},
-        loading: schemaLoading,
-        wasLoaded,
-        autorefresh,
-        currentSchemaPath,
-        error,
-    } = useSelector((state: any) => state.schema);
-
-    const {data: {result: olapStats} = {result: undefined}, loading: olapStatsLoading} =
-        useTypedSelector((state) => state.olapStats);
-
-    const loading = schemaLoading || olapStatsLoading;
+        data,
+        additionalData,
+        loading: overviewLoading,
+        wasLoaded: overviewWasLoaded,
+        error: overviewError,
+    } = useTypedSelector((state) => state.overview);
+    const {
+        data: {result: olapStats} = {result: undefined},
+        loading: olapStatsLoading,
+        wasLoaded: olapStatsWasLoaded,
+    } = useTypedSelector((state) => state.olapStats);
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
-    // There is a circular dependency here. Fetch data depends on children paths
-    // When data in store updated on fetch request,
-    // new object is set there, so source children array is updated
-    // This updates selector, the selector returns a new array, and data is fetched again
-    // To prevent it, shallowEqual, which compares array content, was added
+    // shalloEqual prevents rerenders when new schema data is loaded
     const mergedChildrenPaths = useTypedSelector(
         (state) => selectSchemaMergedChildrenPaths(state, currentSchemaPath, type),
         shallowEqual,
     );
 
+    const entityLoading =
+        (overviewLoading && !overviewWasLoaded) || (olapStatsLoading && !olapStatsWasLoaded);
+    const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
+
     const fetchData = useCallback(
         (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(resetLoadingState());
-            }
-
             const schemaPath = currentSchemaPath || tenantName;
 
+            if (!schemaPath) {
+                return;
+            }
+
+            dispatch(setCurrentOverviewPath(schemaPath));
+
+            if (!isBackground) {
+                dispatch(setDataWasNotLoaded());
+            }
+
             if (!isEntityWithMergedImpl) {
-                dispatch(getSchema({path: schemaPath}));
+                dispatch(getOverview({path: schemaPath}));
             } else if (mergedChildrenPaths) {
-                dispatch(getSchemaBatched([schemaPath, ...mergedChildrenPaths]));
+                dispatch(getOverviewBatched([schemaPath, ...mergedChildrenPaths]));
             }
 
             if (isTableType(type) && isColumnEntityType(type)) {
@@ -113,32 +116,32 @@ function Overview({type, tenantName, className}: OverviewProps) {
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeTable]: undefined,
             [EPathType.EPathTypeSubDomain]: undefined,
-            [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={currentItem} />,
+            [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={data} />,
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
             [EPathType.EPathTypeCdcStream]: () => (
-                <ChangefeedInfo data={currentItem} childrenPaths={mergedChildrenPaths} />
+                <ChangefeedInfo data={data} topic={additionalData?.[0]} />
             ),
-            [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={currentItem} />,
+            [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={data} />,
         };
 
         return (
             (type && pathTypeToComponent[type]?.()) || (
-                <TableInfo data={currentItem} type={type} olapStats={olapStats} />
+                <TableInfo data={data} type={type} olapStats={olapStats} />
             )
         );
     };
 
-    if ((loading && !wasLoaded) || (isEntityWithMergedImpl && !mergedChildrenPaths)) {
+    if (entityLoading || entityNotReady) {
         return <Loader size="m" />;
     }
 
-    if (error) {
-        return <ResponseError error={error} />;
+    if (overviewError) {
+        return <ResponseError error={overviewError} />;
     }
 
-    return <div className={className}>{renderContent()}</div>;
+    return <div>{renderContent()}</div>;
 }
 
 export default Overview;

@@ -10,9 +10,8 @@ import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../.
 import {useTypedSelector} from '../../utils/hooks';
 import routes, {createHref} from '../../routes';
 import {setHeader} from '../../store/reducers/header';
-import {disableAutorefresh, getSchema, resetLoadingState} from '../../store/reducers/schema/schema';
+import {disableAutorefresh, getSchema} from '../../store/reducers/schema/schema';
 import {getSchemaAcl} from '../../store/reducers/schemaAcl/schemaAcl';
-import {getTenantInfo, clearTenant} from '../../store/reducers/tenant/tenant';
 
 import SplitPane from '../../components/SplitPane';
 import {AccessDenied} from '../../components/Errors/403';
@@ -64,7 +63,6 @@ function Tenant(props: TenantProps) {
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
         (currentItem as TEvDescribeSchemeResult).PathDescription?.Self || {};
 
-    const {error: {status: tenantStatus = 200} = {}} = useTypedSelector((state) => state.tenant);
     const {error: {status: schemaStatus = 200} = {}} = useTypedSelector((state) => state.schema);
 
     const dispatch = useDispatch();
@@ -84,7 +82,6 @@ function Tenant(props: TenantProps) {
     }, [tenantName, dispatch]);
 
     useEffect(() => {
-        dispatch(resetLoadingState());
         dispatch(getSchema({path: currentSchemaPath}));
         dispatch(getSchemaAcl({path: currentSchemaPath}));
     }, [currentSchemaPath, dispatch]);
@@ -95,7 +92,6 @@ function Tenant(props: TenantProps) {
 
     useEffect(() => {
         if (tenantName) {
-            dispatch(getTenantInfo({path: tenantName}));
             dispatch(
                 setHeader([
                     {
@@ -111,9 +107,6 @@ function Tenant(props: TenantProps) {
                 ]),
             );
         }
-        return () => {
-            dispatch(clearTenant());
-        };
     }, [tenantName, dispatch]);
 
     const onCollapseSummaryHandler = () => {
@@ -127,7 +120,7 @@ function Tenant(props: TenantProps) {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.clear);
     };
 
-    const showBlockingError = tenantStatus === 403 || schemaStatus === 403;
+    const showBlockingError = schemaStatus === 403;
 
     return (
         <div className={b()}>

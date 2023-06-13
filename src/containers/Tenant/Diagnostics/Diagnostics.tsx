@@ -49,8 +49,8 @@ const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
     const dispatch = useDispatch();
-    const {currentSchemaPath, autorefresh} = useSelector((state: any) => state.schema);
-    const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview, wasLoaded} = useTypedSelector(
+    const {currentSchemaPath, autorefresh, wasLoaded} = useSelector((state: any) => state.schema);
+    const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
     );
 

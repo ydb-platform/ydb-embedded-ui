@@ -7,7 +7,6 @@ import {
 } from '../../../../../components/InfoViewer/formatters';
 
 import {useTypedSelector} from '../../../../../utils/hooks';
-import {selectSchemaData} from '../../../../../store/reducers/schema/schema';
 
 import {getEntityName} from '../../../utils';
 
@@ -42,27 +41,26 @@ const prepareChangefeedInfo = (
 
 interface ChangefeedProps {
     data?: TEvDescribeSchemeResult;
-    childrenPaths?: string[];
+    topic?: TEvDescribeSchemeResult;
 }
 
 /** Displays overview for CDCStream EPathType */
-export const ChangefeedInfo = ({data, childrenPaths}: ChangefeedProps) => {
+export const ChangefeedInfo = ({data, topic}: ChangefeedProps) => {
     const entityName = getEntityName(data?.PathDescription);
 
     const {error: schemaError} = useTypedSelector((state) => state.schema);
-    const pqGroupData = useTypedSelector((state) => selectSchemaData(state, childrenPaths?.[0]));
 
     if (schemaError) {
         return <div className="error">{schemaError.statusText}</div>;
     }
 
-    if (!data || !pqGroupData) {
+    if (!data || !topic) {
         return <div className="error">No {entityName} data</div>;
     }
 
     return (
         <div>
-            <InfoViewer title={entityName} info={prepareChangefeedInfo(data, pqGroupData)} />
+            <InfoViewer title={entityName} info={prepareChangefeedInfo(data, topic)} />
             <TopicStats />
         </div>
     );

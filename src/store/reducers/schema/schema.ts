@@ -89,7 +89,6 @@ const schema: Reducer<SchemaState, SchemaAction> = (state = initialState, action
             return {
                 ...state,
                 currentSchemaPath: action.data,
-                wasLoaded: false,
             };
         }
         case ENABLE_AUTOREFRESH: {
@@ -140,33 +139,6 @@ export function getSchema({path}: {path: string}) {
     });
 }
 
-export function getSchemaBatched(paths: string[]) {
-    const requestArray = paths.map((p) =>
-        window.api.getSchema({path: p}, {concurrentId: `getSchemaBatched|${p}`}),
-    );
-    const request = Promise.all(requestArray);
-
-    return createApiRequest({
-        request,
-        actions: FETCH_SCHEMA,
-        dataHandler: (data): SchemaHandledResponse => {
-            const newData: SchemaData = {};
-
-            data.forEach((dataItem) => {
-                if (dataItem.Path) {
-                    newData[dataItem.Path] = dataItem;
-                }
-            });
-
-            return {
-                path: data[0].Path,
-                currentSchema: data[0],
-                data: newData,
-            };
-        },
-    });
-}
-
 export function setCurrentSchemaPath(currentSchemaPath: string) {
     return {
         type: SET_SCHEMA,
@@ -205,7 +177,7 @@ export function resetLoadingState() {
     } as const;
 }
 
-export const selectSchemaChildren = (state: SchemaStateSlice, path?: string) =>
+const selectSchemaChildren = (state: SchemaStateSlice, path?: string) =>
     path ? state.schema.data[path]?.PathDescription?.Children : undefined;
 
 export const selectSchemaData = (state: SchemaStateSlice, path?: string) =>
