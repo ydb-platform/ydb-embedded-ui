@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.5.2...v4.6.0) (2023-06-13)
+
+
+### Features
+
+* **QueryEditor:** add data and query modes ([#422](https://github.com/ydb-platform/ydb-embedded-ui/issues/422)) ([c142f03](https://github.com/ydb-platform/ydb-embedded-ui/commit/c142f03e9caeab4dcf1d34b3988e949a94213932))
+* rework navigation, update breadcrumbs ([#418](https://github.com/ydb-platform/ydb-embedded-ui/issues/418)) ([2d807d6](https://github.com/ydb-platform/ydb-embedded-ui/commit/2d807d6a52e13edcf2a7e1591672224339d91949))
+
+
+### Bug Fixes
+
+* **Diagnostics:** remove unneded tenantInfo fetch ([#420](https://github.com/ydb-platform/ydb-embedded-ui/issues/420)) ([ccaafe4](https://github.com/ydb-platform/ydb-embedded-ui/commit/ccaafe4ec9346ee1ec2ebd2a62600274f2175bfb))
+
 ## [4.5.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.5.1...v4.5.2) (2023-06-06)
 
 
