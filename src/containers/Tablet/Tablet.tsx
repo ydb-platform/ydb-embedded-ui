@@ -114,7 +114,7 @@ export const Tablet = () => {
 
     const externalLinks = [
         {
-            name: 'Internal viewer - tablet',
+            name: 'Developer UI - tablet',
             path: `/tablets?TabletID=${TabletId}`,
         },
     ];

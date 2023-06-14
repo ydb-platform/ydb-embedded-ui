@@ -49,7 +49,7 @@ function Header() {
                 </div>
 
                 <ExternalLinkWithIcon
-                    title={'Internal Viewer'}
+                    title={'Developer UI'}
                     url={getInternalLink(singleClusterMode)}
                 />
             </header>

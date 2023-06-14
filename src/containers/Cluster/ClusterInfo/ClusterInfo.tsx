@@ -141,7 +141,7 @@ export const ClusterInfo = ({
     const {info = [], links = []} = additionalClusterProps;
 
     const clusterInfo = getInfo(cluster, versionsValues, info, [
-        {title: 'Internal Viewer', url: internalLink},
+        {title: 'Developer UI', url: internalLink},
         ...links,
     ]);
 
