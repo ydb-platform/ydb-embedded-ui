@@ -49,6 +49,7 @@ export const Tablet = () => {
         error,
     } = useTypedSelector((state) => state.tablet);
 
+    // NOTE: should be reviewed when migrating to React 18
     useEffect(() => {
         return () => {
             dispatch(clearTabletData());
