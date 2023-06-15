@@ -28,10 +28,12 @@ export interface NodeState {
     data: TEvSystemStateResponse;
     loading: boolean;
     wasLoaded: boolean;
+    error?: IResponseError;
 
     nodeStructure: TStorageInfo;
     loadingStructure: boolean;
     wasLoadedStructure: boolean;
+    errorStructure?: IResponseError;
 }
 
 export type NodeAction =

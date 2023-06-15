@@ -1,4 +1,4 @@
-import routes, {createHref} from '../../routes';
+import routes, {Query, createHref} from '../../routes';
 
 export const STORAGE = 'storage';
 export const TABLETS = 'tablets';
@@ -21,9 +21,13 @@ export const NODE_PAGES = [
     },
 ];
 
-export function getDefaultNodePath(nodeId: string | number) {
-    return createHref(routes.node, {
-        id: nodeId,
-        activeTab: OVERVIEW,
-    });
+export function getDefaultNodePath(nodeId: string | number, query: Query = {}) {
+    return createHref(
+        routes.node,
+        {
+            id: nodeId,
+            activeTab: OVERVIEW,
+        },
+        query,
+    );
 }
