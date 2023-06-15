@@ -1,3 +1,4 @@
+import type {Location} from 'history';
 import qs from 'qs';
 import {compile} from 'path-to-regexp';
 import isEmpty from 'lodash/isEmpty';
@@ -11,6 +12,12 @@ const routes = {
     tablet: '/tablet/:id',
     tabletsFilters: '/tabletsFilters',
     auth: '/auth',
+};
+
+export const parseQuery = (location: Location) => {
+    return qs.parse(location.search, {
+        ignoreQueryPrefix: true,
+    });
 };
 
 export type Query = Record<string | number, string | number | string[] | number[] | undefined>;

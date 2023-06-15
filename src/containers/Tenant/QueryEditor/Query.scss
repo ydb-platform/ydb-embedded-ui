@@ -1,0 +1,16 @@
+@import '../../../styles/mixins.scss';
+
+.ydb-query {
+    max-height: 100%;
+    @include flex-container();
+
+    &__tabs {
+        padding: 13px 20px 16px;
+    }
+
+    &__content {
+        overflow: hidden;
+
+        height: 100%;
+    }
+}

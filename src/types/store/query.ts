@@ -29,3 +29,8 @@ export enum QueryModes {
     data = 'data',
     query = 'query',
 }
+
+export interface SavedQuery {
+    name: string;
+    body: string;
+}

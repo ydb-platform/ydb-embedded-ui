@@ -176,7 +176,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         wrapTo={({id}, node) => {
                             const path = createHref(routes.tenant, undefined, {
                                 ...queryParams,
-                                [TenantTabsGroups.generalTab]: id,
+                                [TenantTabsGroups.diagnosticsTab]: id,
                             });
 
                             return (

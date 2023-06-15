@@ -45,7 +45,10 @@ const paramSetup = {
         general: {
             stateKey: 'tenant.topLevelTab',
         },
-        generalTab: {
+        queryTab: {
+            stateKey: 'tenant.queryTab',
+        },
+        diagnosticsTab: {
             stateKey: 'tenant.diagnosticsTab',
         },
         shardsMode: {

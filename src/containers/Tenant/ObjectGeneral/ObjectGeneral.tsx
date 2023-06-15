@@ -7,7 +7,7 @@ import {useThemeValue} from '@gravity-ui/uikit';
 import type {EPathType} from '../../../types/api/schema';
 import {TENANT_GENERAL_TABS_IDS} from '../../../store/reducers/tenant/constants';
 
-import QueryEditor from '../QueryEditor/QueryEditor';
+import {Query} from '../QueryEditor/Query';
 import Diagnostics from '../Diagnostics/Diagnostics';
 
 import './ObjectGeneral.scss';
@@ -35,7 +35,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
         const {type, additionalTenantInfo, additionalNodesInfo} = props;
         switch (generalTab) {
             case TENANT_GENERAL_TABS_IDS.query: {
-                return <QueryEditor path={tenantName as string} theme={theme} type={type} />;
+                return <Query path={tenantName as string} theme={theme} type={type} />;
             }
             default: {
                 return (

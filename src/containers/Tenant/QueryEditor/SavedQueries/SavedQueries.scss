@@ -1,92 +1,65 @@
-$popup-width: 700px;
+@import '../../../../styles/mixins.scss';
 
-.saved-queries {
+.ydb-saved-queries {
     $block: &;
-    padding: 12px 16px;
-    &__popup-wrapper {
-        overflow: hidden;
 
-        width: $popup-width;
-        max-width: $popup-width !important;
+    overflow: auto;
 
-        border-radius: 4px;
-        :nth-child(2) {
-            overflow-y: auto;
+    height: 100%;
+    padding: 0 16px;
 
-            max-height: 50vh;
-        }
+    @include flex-container();
+    @include table-styles;
 
-        &::before {
-            width: $popup-width;
+    &__row {
+        cursor: pointer;
 
-            border-radius: 4px;
-        }
-    }
-    &__saved-queries-row {
-        display: flex;
-        align-items: center;
-
-        padding: 8px 5px;
-
-        border-bottom: 1px solid var(--yc-color-line-generic);
-        &:hover {
-            cursor: pointer;
-
-            color: var(--yc-color-text-link-hover);
-            background: var(--yc-color-base-simple-hover);
-            #{$block}__query-controls {
+        :hover {
+            #{$block}__control-delete {
                 display: flex;
             }
         }
-        &_header {
-            font-weight: 500;
-            &:hover {
-                cursor: auto;
-
-                color: var(--yc-color-text-primary);
-                background: var(--yc-color-base-background);
-            }
-        }
     }
+
     &__query-name {
         overflow: hidden;
-        flex: 0 0 90px;
 
-        max-width: 90px;
-        margin-right: 8px;
-
-        font-weight: 500;
         white-space: pre-wrap;
         text-overflow: ellipsis;
     }
+
+    &__query {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     &__query-body {
         overflow: hidden;
         flex-grow: 1;
 
-        max-width: 75%;
+        max-width: 100%;
 
         white-space: pre;
         text-overflow: ellipsis;
-        &_header {
-            display: flex;
-            justify-content: center;
-        }
     }
-    &__query-controls {
+
+    &__control-delete {
         display: none;
+
+        width: fit-content;
+
+        cursor: pointer;
     }
+
     &__control-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        width: 24px;
-
         color: var(--yc-color-text-hint);
         &:hover {
             color: var(--yc-color-text-secondary);
         }
     }
+
     &__dialog-query-name {
         font-weight: 500;
     }
