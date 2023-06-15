@@ -1,8 +1,8 @@
+import type {ApiRequestAction} from '../../store/utils';
 import type {IResponseError} from '../api/error';
 import type {ETabletState, TTabletStateInfo} from '../api/tablet';
 
-import {FETCH_TABLET, FETCH_TABLET_DESCRIBE} from '../../store/reducers/tablet';
-import {ApiRequestAction} from '../../store/utils';
+import {FETCH_TABLET, FETCH_TABLET_DESCRIBE, clearTabletData} from '../../store/reducers/tablet';
 
 export interface ITabletPreparedHistoryItem {
     nodeId: string;
@@ -16,7 +16,7 @@ export interface ITabletPreparedHistoryItem {
 
 export interface ITabletState {
     loading: boolean;
-    tenantPath: string;
+    tenantPath?: string;
     error?: IResponseError;
     id?: string;
     history?: ITabletPreparedHistoryItem[];
@@ -44,7 +44,10 @@ type ITabletDescribeApiRequestAction = ApiRequestAction<
     IResponseError
 >;
 
-export type ITabletAction = ITabletApiRequestAction | ITabletDescribeApiRequestAction;
+export type ITabletAction =
+    | ITabletApiRequestAction
+    | ITabletDescribeApiRequestAction
+    | ReturnType<typeof clearTabletData>;
 
 export interface ITabletRootStateSlice {
     tablet: ITabletState;

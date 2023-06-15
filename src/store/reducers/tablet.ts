@@ -16,9 +16,11 @@ import {prepareNodesMap} from '../../utils/nodes';
 export const FETCH_TABLET = createRequestActionTypes('TABLET', 'FETCH_TABLET');
 export const FETCH_TABLET_DESCRIBE = createRequestActionTypes('TABLET', 'FETCH_TABLET_DESCRIBE');
 
+const CLEAR_TABLET_DATA = 'tablet/CLEAR_TABLET_DATA';
+
 const initialState = {
     loading: false,
-    tenantPath: '-',
+    tenantPath: undefined,
 };
 
 const tablet: Reducer<ITabletState, ITabletAction> = (state = initialState, action) => {
@@ -55,6 +57,15 @@ const tablet: Reducer<ITabletState, ITabletAction> = (state = initialState, acti
                 ...state,
                 tenantPath,
                 error: undefined,
+            };
+        }
+        case CLEAR_TABLET_DATA: {
+            return {
+                ...state,
+                id: undefined,
+                tenantPath: undefined,
+                data: undefined,
+                history: undefined,
             };
         }
         default:
@@ -120,6 +131,12 @@ export const getTabletDescribe = (tenantId: TDomainKey = {}) => {
             return {tenantPath};
         },
     });
+};
+
+export const clearTabletData = () => {
+    return {
+        type: CLEAR_TABLET_DATA,
+    } as const;
 };
 
 export default tablet;

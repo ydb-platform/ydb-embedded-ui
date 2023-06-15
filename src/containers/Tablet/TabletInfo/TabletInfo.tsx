@@ -12,7 +12,7 @@ import {b} from '../Tablet';
 
 interface TabletInfoProps {
     tablet: TTabletStateInfo;
-    tenantPath: string;
+    tenantPath?: string;
 }
 
 export const TabletInfo = ({tablet, tenantPath}: TabletInfoProps) => {
@@ -30,7 +30,7 @@ export const TabletInfo = ({tablet, tenantPath}: TabletInfoProps) => {
     const hasHiveId = HiveId && HiveId !== '0';
     const hasUptime = State === ETabletState.Active;
 
-    const tabletInfo: InfoViewerItem[] = [{label: 'Database', value: tenantPath}];
+    const tabletInfo: InfoViewerItem[] = [{label: 'Database', value: tenantPath || '-'}];
 
     if (hasHiveId) {
         tabletInfo.push({

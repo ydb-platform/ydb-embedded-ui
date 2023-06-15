@@ -5,7 +5,7 @@ import cn from 'bem-cn-lite';
 import {Link as ExternalLink} from '@gravity-ui/uikit';
 
 import {backend} from '../../store';
-import {getTablet, getTabletDescribe} from '../../store/reducers/tablet';
+import {getTablet, getTabletDescribe, clearTabletData} from '../../store/reducers/tablet';
 import {setHeader} from '../../store/reducers/header';
 import routes, {createHref} from '../../routes';
 
@@ -48,6 +48,12 @@ export const Tablet = () => {
         tenantPath,
         error,
     } = useTypedSelector((state) => state.tablet);
+
+    useEffect(() => {
+        return () => {
+            dispatch(clearTabletData());
+        };
+    }, [dispatch]);
 
     useEffect(() => {
         if (isFirstDataFetchRef.current && tablet && tablet.TenantId) {
