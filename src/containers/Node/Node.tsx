@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useRouteMatch} from 'react-router';
 import cn from 'bem-cn-lite';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import _ from 'lodash';
 
 import {Tabs} from '@gravity-ui/uikit';
@@ -19,6 +19,7 @@ import {getNodeInfo, resetNode} from '../../store/reducers/node/node';
 import routes, {createHref} from '../../routes';
 import {HeaderItemType, setHeader} from '../../store/reducers/header';
 import {AutoFetcher} from '../../utils/autofetcher';
+import {useTypedSelector} from '../../utils/hooks';
 import {clusterTabsIds, getClusterPath} from '../Cluster/utils';
 
 import './Node.scss';
@@ -37,12 +38,8 @@ interface NodeProps {
 function Node(props: NodeProps) {
     const dispatch = useDispatch();
 
-    const wasLoaded = useSelector((state: any) => state.node.wasLoaded);
-    const loading = useSelector((state: any) => state.node.loading);
-    const error = useSelector((state: any) => state.node.error);
-
-    const node = useSelector((state: any) => state.node?.data?.SystemStateInfo?.[0]);
-
+    const {loading, wasLoaded, error, data} = useTypedSelector((state) => state.node);
+    const node = data?.SystemStateInfo?.[0];
     const nodeHost = node?.Host;
 
     const match =

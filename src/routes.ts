@@ -13,10 +13,12 @@ const routes = {
     auth: '/auth',
 };
 
+export type Query = Record<string | number, string | number | string[] | number[] | undefined>;
+
 export function createHref(
     route: string,
     params?: Record<string, string | number>,
-    query: Record<string | number, string | number | string[] | number[] | undefined> = {},
+    query: Query = {},
 ) {
     let extendedQuery = query;
 
