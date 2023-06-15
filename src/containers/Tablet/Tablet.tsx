@@ -10,6 +10,7 @@ import {setHeader} from '../../store/reducers/header';
 import routes, {createHref} from '../../routes';
 
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
+import {DEVELOPER_UI} from '../../utils/constants';
 import '../../services/api';
 
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
@@ -114,7 +115,7 @@ export const Tablet = () => {
 
     const externalLinks = [
         {
-            name: 'Internal viewer - tablet',
+            name: `${DEVELOPER_UI} - tablet`,
             path: `/tablets?TabletID=${TabletId}`,
         },
     ];

@@ -35,7 +35,7 @@ const topic: Reducer<ITopicState, ITopicAction> = (state = initialState, action)
             };
         }
         case FETCH_TOPIC.SUCCESS: {
-            // On older version it can return HTML page of Internal Viewer with an error
+            // On older version it can return HTML page of Developer UI with an error
             if (typeof action.data !== 'object') {
                 return {...state, loading: false, error: {}};
             }

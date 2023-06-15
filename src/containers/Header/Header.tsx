@@ -8,6 +8,7 @@ import {ExternalLinkWithIcon} from '../../components/ExternalLinkWithIcon/Extern
 import {backend, customBackend} from '../../store';
 import {HeaderItemType} from '../../store/reducers/header';
 import {useTypedSelector} from '../../utils/hooks';
+import {DEVELOPER_UI} from '../../utils/constants';
 
 import './Header.scss';
 
@@ -49,7 +50,7 @@ function Header() {
                 </div>
 
                 <ExternalLinkWithIcon
-                    title={'Internal Viewer'}
+                    title={DEVELOPER_UI}
                     url={getInternalLink(singleClusterMode)}
                 />
             </header>

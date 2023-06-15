@@ -3,7 +3,7 @@ import {test, expect} from '@playwright/test';
 test.describe('Test InternalViewer', async () => {
     test('Test internalViewer header link', async ({page}) => {
         page.goto('');
-        const link = page.locator('header').locator('a').getByText('Internal Viewer');
+        const link = page.locator('header').locator('a').getByText('Developer UI');
         const href = await link.getAttribute('href');
 
         expect(href).not.toBeNull();
