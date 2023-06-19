@@ -124,13 +124,13 @@ function Cluster({
     const getTabEntityCount = (tabId: ClusterTab) => {
         switch (tabId) {
             case clusterTabsIds.tenants: {
-                return cluster?.Tenants;
+                return cluster?.Tenants ? Number(cluster.Tenants) : undefined;
             }
             case clusterTabsIds.nodes: {
-                return cluster?.NodesTotal;
+                return cluster?.NodesTotal ? Number(cluster.NodesTotal) : undefined;
             }
             default: {
-                return null;
+                return undefined;
             }
         }
     };
@@ -153,7 +153,7 @@ function Cluster({
                     items={clusterTabs.map((item) => {
                         return {
                             ...item,
-                            title: `${item.title} ${getTabEntityCount(item.id) || ''}`,
+                            counter: getTabEntityCount(item.id),
                         };
                     })}
                     wrapTo={({id}, node) => {
