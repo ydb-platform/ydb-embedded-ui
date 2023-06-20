@@ -15,7 +15,7 @@
         cursor: pointer;
 
         :hover {
-            #{$block}__control-delete {
+            #{$block}__controls {
                 display: flex;
             }
         }
@@ -45,15 +45,18 @@
         text-overflow: ellipsis;
     }
 
-    &__control-delete {
+    &__controls {
         display: none;
-
-        width: fit-content;
-
-        cursor: pointer;
     }
 
     &__control-button {
+        display: flex;
+
+        width: fit-content;
+        margin-left: 5px;
+
+        cursor: pointer;
+
         color: var(--yc-color-text-hint);
         &:hover {
             color: var(--yc-color-text-secondary);

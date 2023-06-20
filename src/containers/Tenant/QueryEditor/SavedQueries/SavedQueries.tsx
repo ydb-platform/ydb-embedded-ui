@@ -108,14 +108,16 @@ export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: Sav
                     <div className={b('query-body')}>
                         <TruncatedQuery value={query.body} maxQueryHeight={MAX_QUERY_HEIGHT} />
                     </div>
-                    <span className={b('control-delete')} onClick={onDeleteQueryClick(query.name)}>
-                        <IconWrapper
-                            name="trash"
-                            viewBox="0 0 24 24"
-                            height={14}
-                            width={14}
+                    <span className={b('controls')}>
+                        <span className={b('control-button')}>
+                            <IconWrapper name="pencil" viewBox="0 0 24 24" />
+                        </span>
+                        <span
                             className={b('control-button')}
-                        />
+                            onClick={onDeleteQueryClick(query.name)}
+                        >
+                            <IconWrapper name="trash" viewBox="0 0 24 24" />
+                        </span>
                     </span>
                 </div>
             ),
