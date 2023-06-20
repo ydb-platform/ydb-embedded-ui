@@ -3,6 +3,12 @@ export const TENANT_GENERAL_TABS_IDS = {
     diagnostics: 'diagnostics',
 } as const;
 
+export const TENANT_QUERY_TABS_ID = {
+    newQuery: 'newQuery',
+    history: 'history',
+    saved: 'saved',
+} as const;
+
 export const TENANT_DIAGNOSTICS_TABS_IDS = {
     overview: 'overview',
     topQueries: 'topQueries',

@@ -1,5 +1,6 @@
-import {Icon} from '../../components/Icon';
 import {TENANT_GENERAL_TABS_IDS} from '../../store/reducers/tenant/constants';
+import routes, {createHref} from '../../routes';
+import {Icon} from '../../components/Icon';
 
 export enum TenantInfoTabsIds {
     overview = 'overview',
@@ -10,7 +11,8 @@ export enum TenantInfoTabsIds {
 export enum TenantTabsGroups {
     info = 'info',
     general = 'general',
-    generalTab = 'generalTab',
+    queryTab = 'queryTab',
+    diagnosticsTab = 'diagnosticsTab',
 }
 
 export const TENANT_GENERAL_TABS = [
@@ -42,3 +44,7 @@ export const TENANT_SCHEMA_TAB = [
         title: 'Schema',
     },
 ];
+
+export const getTenantPath = (query = {}) => {
+    return createHref(routes.tenant, undefined, query);
+};

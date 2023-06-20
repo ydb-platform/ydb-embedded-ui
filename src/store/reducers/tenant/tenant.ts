@@ -1,7 +1,13 @@
 import type {Reducer} from 'redux';
 
 import type {TTenant} from '../../../types/api/tenant';
-import type {TenantAction, TenantDiagnosticsTab, TenantGeneralTab, TenantState} from './types';
+import type {
+    TenantAction,
+    TenantDiagnosticsTab,
+    TenantGeneralTab,
+    TenantQueryTab,
+    TenantState,
+} from './types';
 
 import '../../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
@@ -9,6 +15,7 @@ import {createRequestActionTypes, createApiRequest} from '../../utils';
 export const FETCH_TENANT = createRequestActionTypes('tenant', 'FETCH_TENANT');
 
 const SET_TOP_LEVEL_TAB = 'tenant/SET_TOP_LEVEL_TAB';
+const SET_QUERY_TAB = 'tenant/SET_QUERY_TAB';
 const SET_DIAGNOSTICS_TAB = 'tenant/SET_DIAGNOSTICS_TAB';
 const CLEAR_TENANT = 'tenant/CLEAR_TENANT';
 
@@ -56,7 +63,12 @@ const tenantReducer: Reducer<TenantState, TenantAction> = (state = initialState,
                 topLevelTab: action.data,
             };
         }
-
+        case SET_QUERY_TAB: {
+            return {
+                ...state,
+                queryTab: action.data,
+            };
+        }
         case SET_DIAGNOSTICS_TAB: {
             return {
                 ...state,
@@ -86,6 +98,13 @@ export const clearTenant = () => {
 export function setTopLevelTab(tab: TenantGeneralTab) {
     return {
         type: SET_TOP_LEVEL_TAB,
+        data: tab,
+    } as const;
+}
+
+export function setQueryTab(tab: TenantQueryTab) {
+    return {
+        type: SET_QUERY_TAB,
         data: tab,
     } as const;
 }

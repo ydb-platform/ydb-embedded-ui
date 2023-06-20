@@ -105,7 +105,7 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
     const renderSaveButton = (onClick) => {
         return (
             <Button onClick={onClick} disabled={saveButtonDisabled}>
-                Save query
+                {queryNameToEdit ? 'Edit query' : 'Save query'}
             </Button>
         );
     };
@@ -113,12 +113,12 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
     const renderSaveDropdownMenu = () => {
         const items = [
             {
-                action: onSaveQueryClick,
-                text: 'Save as new',
-            },
-            {
                 action: onEditQueryClick,
                 text: 'Edit existing',
+            },
+            {
+                action: onSaveQueryClick,
+                text: 'Save as new',
             },
         ];
         return (

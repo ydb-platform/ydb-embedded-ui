@@ -1,94 +1,59 @@
-import React, {useRef, useState} from 'react';
-import cn from 'bem-cn-lite';
-import _ from 'lodash';
-import {Button, Popup} from '@gravity-ui/uikit';
+import {useDispatch} from 'react-redux';
+import block from 'bem-cn-lite';
+
+import DataTable, {Column} from '@gravity-ui/react-data-table';
 
 import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
+import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {useTypedSelector} from '../../../../utils/hooks';
+import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
+
+import i18n from '../i18n';
 
 import './QueriesHistory.scss';
 
-const b = cn('kv-queries-history');
-
-const MAX_QUERY_HEIGHT = 3;
+const b = block('ydb-queries-history');
 
 interface QueriesHistoryProps {
     changeUserInput: (value: {input: string}) => void;
 }
 
-function QueriesHistory(props: QueriesHistoryProps) {
-    const [isHistoryVisible, setIsHistoryVisible] = useState(false);
-    const history = useTypedSelector((state) => state.executeQuery.history.queries) ?? [];
-    const anchor = useRef(null);
+function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
+    const dispatch = useDispatch();
 
-    const onShowHistoryClick = () => {
-        setIsHistoryVisible(true);
-    };
-
-    const onCloseHistory = () => {
-        setIsHistoryVisible(false);
-    };
+    const queriesHistory = useTypedSelector((state) => state.executeQuery.history.queries) ?? [];
+    const reversedHistory = [...queriesHistory].reverse();
 
     const onQueryClick = (queryText: string) => {
-        const {changeUserInput} = props;
-        return () => {
-            changeUserInput({input: queryText});
-            onCloseHistory();
-        };
+        changeUserInput({input: queryText});
+        dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
     };
 
-    const renderSavedQueries = () => {
-        const reversedHistory = ([] as string[]).concat(history).reverse();
-        return (
-            <Popup
-                className={b('popup-wrapper')}
-                anchorRef={anchor}
-                open={isHistoryVisible}
-                placement={['bottom-end']}
-                onClose={onCloseHistory}
-            >
-                <div className={b()}>
-                    {reversedHistory.length === 0 ? (
-                        <div className={b('empty')}>History is empty</div>
-                    ) : (
-                        <React.Fragment>
-                            <div className={b('saved-queries-row', {header: true})}>
-                                <div className={b('query-body', {header: true})}>
-                                    <span>QueryText</span>
-                                </div>
-                            </div>
-                            <div>
-                                {reversedHistory.map((query, index) => {
-                                    return (
-                                        <div
-                                            className={b('saved-queries-row')}
-                                            onClick={onQueryClick(query)}
-                                            key={index}
-                                        >
-                                            <div className={b('query-body')}>
-                                                <TruncatedQuery
-                                                    value={query}
-                                                    maxQueryHeight={MAX_QUERY_HEIGHT}
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </React.Fragment>
-                    )}
+    const columns: Column<string>[] = [
+        {
+            name: 'queryText',
+            header: 'Query Text',
+            render: ({row: query}) => (
+                <div className={b('query')}>
+                    <TruncatedQuery value={query} maxQueryHeight={MAX_QUERY_HEIGHT} />
                 </div>
-            </Popup>
-        );
-    };
+            ),
+            sortable: false,
+        },
+    ];
 
     return (
-        <React.Fragment>
-            <Button ref={anchor} onClick={onShowHistoryClick}>
-                Query history
-            </Button>
-            {isHistoryVisible && renderSavedQueries()}
-        </React.Fragment>
+        <div className={b()}>
+            <DataTable
+                theme="yandex-cloud"
+                columns={columns}
+                data={reversedHistory}
+                settings={QUERY_TABLE_SETTINGS}
+                emptyDataMessage={i18n('history.empty')}
+                onRowClick={(row) => onQueryClick(row)}
+            />
+        </div>
     );
 }
 

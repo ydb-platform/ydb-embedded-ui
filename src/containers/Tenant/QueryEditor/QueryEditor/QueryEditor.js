@@ -5,43 +5,40 @@ import cn from 'bem-cn-lite';
 import _ from 'lodash';
 import MonacoEditor from 'react-monaco-editor';
 
-import SplitPane from '../../../components/SplitPane';
-import {QueryResultTable} from '../../../components/QueryResultTable';
+import SplitPane from '../../../../components/SplitPane';
+import {QueryResultTable} from '../../../../components/QueryResultTable';
 
 import {
     sendExecuteQuery,
-    changeUserInput,
     saveQueryToHistory,
     goToPreviousQuery,
     goToNextQuery,
     MONACO_HOT_KEY_ACTIONS,
     setMonacoHotKey,
-} from '../../../store/reducers/executeQuery';
-import {getExplainQuery, getExplainQueryAst} from '../../../store/reducers/explainQuery';
-import {getParsedSettingValue, setSettingValue} from '../../../store/reducers/settings/settings';
-import {setShowPreview} from '../../../store/reducers/schema/schema';
+} from '../../../../store/reducers/executeQuery';
+import {getExplainQuery, getExplainQueryAst} from '../../../../store/reducers/explainQuery';
+import {getParsedSettingValue, setSettingValue} from '../../../../store/reducers/settings/settings';
+import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
     SAVED_QUERIES_KEY,
     QUERY_INITIAL_MODE_KEY,
     ENABLE_ADDITIONAL_QUERY_MODES,
-} from '../../../utils/constants';
-import {useSetting} from '../../../utils/hooks';
-import {QueryModes} from '../../../types/store/query';
+} from '../../../../utils/constants';
+import {useSetting} from '../../../../utils/hooks';
+import {QueryModes} from '../../../../types/store/query';
 
 import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
-} from '../utils/paneVisibilityToggleHelpers';
-import Preview from '../Preview/Preview';
+} from '../../utils/paneVisibilityToggleHelpers';
+import Preview from '../../Preview/Preview';
 
-import SavedQueries from './SavedQueries/SavedQueries';
-import QueryResult from './QueryResult/QueryResult';
-import QueryExplain from './QueryExplain/QueryExplain';
-import {QueryEditorControls} from './QueryEditorControls/QueryEditorControls';
-import {OldQueryEditorControls} from './QueryEditorControls/OldQueryEditorControls';
-import QueriesHistory from './QueriesHistory/QueriesHistory';
+import QueryResult from '../QueryResult/QueryResult';
+import QueryExplain from '../QueryExplain/QueryExplain';
+import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
+import {OldQueryEditorControls} from '../QueryEditorControls/OldQueryEditorControls';
 
 import './QueryEditor.scss';
 
@@ -67,6 +64,7 @@ const b = cn('query-editor');
 
 const propTypes = {
     sendExecuteQuery: PropTypes.func,
+    changeUserInput: PropTypes.func,
     path: PropTypes.string,
     response: PropTypes.oneOfType([PropTypes.bool, PropTypes.array]),
     executeQuery: PropTypes.object,
@@ -436,15 +434,6 @@ function QueryEditor(props) {
         return queries.length - 1 === currentIndex;
     };
 
-    const renderHistoryNavigation = () => {
-        const {changeUserInput} = props;
-        return (
-            <div className={b('history-controls')}>
-                <QueriesHistory changeUserInput={changeUserInput} />
-            </div>
-        );
-    };
-
     const getPreparedResult = () => {
         const {
             executeQuery: {data},
@@ -513,14 +502,6 @@ function QueryEditor(props) {
         setSettingValue(SAVED_QUERIES_KEY, JSON.stringify(newSavedQueries));
     };
 
-    const onDeleteQueryHandler = (queryName) => {
-        const {savedQueries = [], setSettingValue} = props;
-        const newSavedQueries = savedQueries.filter(
-            (el) => el.name.toLowerCase() !== queryName.toLowerCase(),
-        );
-        setSettingValue(SAVED_QUERIES_KEY, JSON.stringify(newSavedQueries));
-    };
-
     const renderControls = () => {
         const {executeQuery, explainQuery, savedQueries} = props;
 
@@ -555,21 +536,6 @@ function QueryEditor(props) {
         );
     };
 
-    const renderUpperControls = () => {
-        const {savedQueries, changeUserInput} = props;
-
-        return (
-            <div className={b('upper-controls')}>
-                {renderHistoryNavigation()}
-                <SavedQueries
-                    savedQueries={savedQueries}
-                    changeUserInput={changeUserInput}
-                    onDeleteQuery={onDeleteQueryHandler}
-                />
-            </div>
-        );
-    };
-
     const {executeQuery, theme} = props;
     const result = renderResult();
 
@@ -584,7 +550,11 @@ function QueryEditor(props) {
                 collapsedSizes={[100, 0]}
                 onSplitStartDragAdditional={onSplitStartDragAdditional}
             >
-                <div className={b('pane-wrapper')}>
+                <div
+                    className={b('pane-wrapper', {
+                        top: true,
+                    })}
+                >
                     <div className={b('monaco-wrapper')}>
                         <div className={b('monaco')}>
                             <MonacoEditor
@@ -598,7 +568,6 @@ function QueryEditor(props) {
                         </div>
                     </div>
                     {renderControls()}
-                    {renderUpperControls()}
                 </div>
                 <div className={b('pane-wrapper')}>
                     {props.showPreview ? renderPreview() : result}
@@ -621,7 +590,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     sendExecuteQuery,
-    changeUserInput,
     saveQueryToHistory,
     goToPreviousQuery,
     goToNextQuery,

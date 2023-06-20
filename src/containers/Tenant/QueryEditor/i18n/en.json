@@ -1,3 +1,12 @@
 {
-  "controls.query-mode-selector_type": "Type:"
+  "controls.query-mode-selector_type": "Type:",
+  "tabs.newQuery": "New query",
+  "tabs.history": "History",
+  "tabs.saved": "Saved",
+  "history.empty": "History is empty",
+  "saved.empty": "There are no saved queries",
+  "delete-dialog.header": "Delete query",
+  "delete-dialog.question": "Are you sure you want to delete query",
+  "delete-dialog.delete": "Delete",
+  "delete-dialog.cancel": "Cancel"
 }

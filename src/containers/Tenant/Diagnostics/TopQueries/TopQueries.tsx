@@ -4,7 +4,7 @@ import {useHistory, useLocation} from 'react-router';
 import qs from 'qs';
 import cn from 'bem-cn-lite';
 
-import DataTable, {Column, Settings} from '@gravity-ui/react-data-table';
+import DataTable, {Column} from '@gravity-ui/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 
 import {DateRange, DateRangeValues} from '../../../../components/DateRange';
@@ -24,27 +24,24 @@ import type {ITopQueriesFilters} from '../../../../types/store/executeTopQueries
 import type {IQueryResult} from '../../../../types/store/query';
 import type {TenantGeneralTab} from '../../../../store/reducers/tenant/types';
 
-import {TENANT_GENERAL_TABS_IDS} from '../../../../store/reducers/tenant/constants';
+import {
+    TENANT_GENERAL_TABS_IDS,
+    TENANT_QUERY_TABS_ID,
+} from '../../../../store/reducers/tenant/constants';
 import {formatDateTime, formatNumber} from '../../../../utils';
-import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
+import {HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
-import routes, {createHref} from '../../../../routes';
 
+import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {isColumnEntityType} from '../../utils/schema';
-import {TenantTabsGroups} from '../../TenantPages';
+import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 
 import i18n from './i18n';
 import './TopQueries.scss';
 
 const b = cn('kv-top-queries');
 
-const TABLE_SETTINGS: Settings = {
-    ...DEFAULT_TABLE_SETTINGS,
-    dynamicRenderType: 'variable',
-};
-
-const MAX_QUERY_HEIGHT = 10;
 const COLUMNS: Column<KeyValueRow>[] = [
     {
         name: 'CPUTimeUs',
@@ -178,9 +175,10 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
                 ignoreQueryPrefix: true,
             });
 
-            const queryPath = createHref(routes.tenant, undefined, {
+            const queryPath = getTenantPath({
                 ...queryParams,
                 [TenantTabsGroups.general]: TENANT_GENERAL_TABS_IDS.query,
+                [TenantTabsGroups.queryTab]: TENANT_QUERY_TABS_ID.newQuery,
             });
 
             history.push(queryPath);
@@ -222,7 +220,7 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
                 <DataTable
                     columns={COLUMNS}
                     data={data}
-                    settings={TABLE_SETTINGS}
+                    settings={QUERY_TABLE_SETTINGS}
                     onRowClick={handleRowClick}
                     theme="yandex-cloud"
                 />
