@@ -2,6 +2,7 @@ const path = require('path');
 
 const srcRoot = path.resolve(__dirname, 'src');
 const uiKitRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/uikit');
+const uiKitIconsRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/icons');
 
 module.exports = {
     webpack: (config, env) => {
@@ -11,6 +12,7 @@ module.exports = {
             include: [
                 path.resolve(srcRoot, 'assets/icons'),
                 path.resolve(uiKitRoot, 'assets/icons'),
+                uiKitIconsRoot,
             ],
             loader: '@svgr/webpack',
             options: {dimensions: false},
