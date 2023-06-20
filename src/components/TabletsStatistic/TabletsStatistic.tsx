@@ -12,9 +12,9 @@ import './TabletsStatistic.scss';
 
 const b = cn('tablets-statistic');
 
-type ITablets = TFullTabletStateInfo[] | TComputeTabletStateInfo[];
+type Tablets = TFullTabletStateInfo[] | TComputeTabletStateInfo[];
 
-const prepareTablets = (tablets: ITablets) => {
+const prepareTablets = (tablets: Tablets) => {
     const res = tablets.map((tablet) => {
         return {
             label: getTabletLabel(tablet.Type),
@@ -28,25 +28,32 @@ const prepareTablets = (tablets: ITablets) => {
 };
 
 interface TabletsStatisticProps {
-    tablets: ITablets;
+    tablets: Tablets;
     path: string | undefined;
     nodeIds: string[] | number[];
+    backend?: string;
 }
 
-export const TabletsStatistic = ({tablets = [], path, nodeIds}: TabletsStatisticProps) => {
+export const TabletsStatistic = ({tablets = [], path, nodeIds, backend}: TabletsStatisticProps) => {
     const renderTabletInfo = (item: ReturnType<typeof prepareTablets>[number], index: number) => {
-        return (
-            <Link
-                to={createHref(routes.tabletsFilters, undefined, {
-                    nodeIds,
-                    state: item.state,
-                    type: item.type,
-                    path,
-                })}
-                key={index}
-                className={b('tablet', {state: item.state?.toLowerCase()})}
-            >
-                {item.label}: {item.count}
+        const tabletsPath = createHref(routes.tabletsFilters, undefined, {
+            nodeIds,
+            state: item.state,
+            type: item.type,
+            path,
+            backend,
+        });
+
+        const label = `${item.label}: ${item.count}`;
+        const className = b('tablet', {state: item.state?.toLowerCase()});
+
+        return backend ? (
+            <a href={tabletsPath} key={index} className={className}>
+                {label}
+            </a>
+        ) : (
+            <Link to={tabletsPath} key={index} className={className}>
+                {label}
             </Link>
         );
     };
