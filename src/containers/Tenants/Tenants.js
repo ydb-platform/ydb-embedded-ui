@@ -126,15 +126,19 @@ class Tenants extends React.Component {
         const initialTenantGeneralTab = savedTenantInitialTab || TENANT_GENERAL_TABS[0].id;
         const initialTenantInfoTab = TENANT_INFO_TABS[0].id;
 
+        const getTenantBackend = (tenant) => {
+            const backend = tenant.MonitoringEndpoint ?? tenant.backend;
+            return additionalTenantsInfo.tenantBackend
+                ? additionalTenantsInfo.tenantBackend(backend)
+                : undefined;
+        };
+
         const columns = [
             {
                 name: 'Name',
                 header: 'Database',
                 render: ({value, row}) => {
-                    const backend = row.MonitoringEndpoint ?? row.backend;
-                    const tenantBackend = additionalTenantsInfo.tenantBackend
-                        ? additionalTenantsInfo.tenantBackend(backend)
-                        : undefined;
+                    const backend = getTenantBackend(row);
                     const isExternalLink = Boolean(backend);
                     return (
                         <div className={b('name-wrapper')}>
@@ -147,7 +151,7 @@ class Tenants extends React.Component {
                                 hasClipboardButton
                                 path={createHref(routes.tenant, undefined, {
                                     name: value,
-                                    backend: tenantBackend,
+                                    backend,
                                     [TenantTabsGroups.info]: initialTenantInfoTab,
                                     [TenantTabsGroups.general]: initialTenantGeneralTab,
                                 })}
@@ -287,12 +291,20 @@ class Tenants extends React.Component {
                 header: 'Tablets States',
                 sortable: false,
                 width: 430,
-                render: ({value, row}) =>
-                    value ? (
-                        <TabletsStatistic path={row.Name} tablets={value} nodeIds={row.NodeIds} />
+                render: ({value, row}) => {
+                    const backend = getTenantBackend(row);
+
+                    return value ? (
+                        <TabletsStatistic
+                            path={row.Name}
+                            tablets={value}
+                            nodeIds={row.NodeIds}
+                            backend={backend}
+                        />
                     ) : (
                         '—'
-                    ),
+                    );
+                },
             },
         ];
 
