@@ -2,7 +2,7 @@ import {MouseEvent, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 
-import {Dialog} from '@gravity-ui/uikit';
+import {Dialog, Button} from '@gravity-ui/uikit';
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 
 import type {SavedQuery} from '../../../../types/store/query';
@@ -109,15 +109,12 @@ export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: Sav
                         <TruncatedQuery value={query.body} maxQueryHeight={MAX_QUERY_HEIGHT} />
                     </div>
                     <span className={b('controls')}>
-                        <span className={b('control-button')}>
+                        <Button view="flat-secondary">
                             <IconWrapper name="pencil" viewBox="0 0 24 24" />
-                        </span>
-                        <span
-                            className={b('control-button')}
-                            onClick={onDeleteQueryClick(query.name)}
-                        >
+                        </Button>
+                        <Button view="flat-secondary" onClick={onDeleteQueryClick(query.name)}>
                             <IconWrapper name="trash" viewBox="0 0 24 24" />
-                        </span>
+                        </Button>
                     </span>
                 </div>
             ),

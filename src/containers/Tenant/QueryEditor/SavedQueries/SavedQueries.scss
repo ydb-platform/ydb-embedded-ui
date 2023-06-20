@@ -49,20 +49,6 @@
         display: none;
     }
 
-    &__control-button {
-        display: flex;
-
-        width: fit-content;
-        margin-left: 5px;
-
-        cursor: pointer;
-
-        color: var(--yc-color-text-hint);
-        &:hover {
-            color: var(--yc-color-text-secondary);
-        }
-    }
-
     &__dialog-query-name {
         font-weight: 500;
     }
