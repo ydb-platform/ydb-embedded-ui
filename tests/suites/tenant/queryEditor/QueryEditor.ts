@@ -39,7 +39,7 @@ export class QueryEditor extends BaseModel {
     async getExplainResult(type: ExplainResultType) {
         await this.selectExplainResultType(type);
 
-        const resultArea = this.selector.locator('.kv-query-explain__result');
+        const resultArea = this.selector.locator('.ydb-query-explain-result__result');
 
         switch (type) {
             case 'Schema': {
@@ -49,13 +49,13 @@ export class QueryEditor extends BaseModel {
                 return resultArea.locator('.json-inspector');
             }
             case 'AST': {
-                return resultArea.locator('.kv-query-explain__ast');
+                return resultArea.locator('.ydb-query-explain-result__ast');
             }
         }
     }
 
     getRunResultTable() {
-        const runResult = this.selector.locator('.kv-query-result__result');
+        const runResult = this.selector.locator('.ydb-query-execute-result__result');
 
         // Result table is present only on successful not empty results
         const resultTable = selectContentTable(runResult);
@@ -64,7 +64,7 @@ export class QueryEditor extends BaseModel {
     }
 
     protected async selectExplainResultType(type: ExplainResultType) {
-        const radio = this.selector.locator('.kv-query-explain__controls .yc-radio-button');
+        const radio = this.selector.locator('.ydb-query-explain-result__controls .yc-radio-button');
         await radio.getByLabel(type).click();
     }
 
