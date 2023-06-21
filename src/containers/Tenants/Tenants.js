@@ -19,6 +19,7 @@ import routes, {createHref} from '../../routes';
 import {formatCPU, formatBytesToGigabyte, formatNumber} from '../../utils';
 import {withSearch} from '../../HOCS';
 import {DEFAULT_TABLE_SETTINGS, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
+import {TENANT_GENERAL_TABS_IDS} from '../../store/reducers/tenant/constants';
 import {getTenantsInfo} from '../../store/reducers/tenants/tenants';
 import {
     changeFilter,
@@ -27,7 +28,7 @@ import {
 } from '../../store/reducers/settings/settings';
 
 import {clusterName} from '../../store';
-import {TenantTabsGroups, TENANT_GENERAL_TABS, TENANT_INFO_TABS} from '../Tenant/TenantPages';
+import {TenantTabsGroups, TENANT_INFO_TABS} from '../Tenant/TenantPages';
 
 import './Tenants.scss';
 
@@ -123,7 +124,7 @@ class Tenants extends React.Component {
         });
         const filteredTenants = Tenants.filterTenants(filteredTenantsBySearch, filter);
 
-        const initialTenantGeneralTab = savedTenantInitialTab || TENANT_GENERAL_TABS[0].id;
+        const initialTenantGeneralTab = savedTenantInitialTab || TENANT_GENERAL_TABS_IDS.query;
         const initialTenantInfoTab = TENANT_INFO_TABS[0].id;
 
         const getTenantBackend = (tenant) => {

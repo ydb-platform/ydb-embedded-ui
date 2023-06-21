@@ -7,6 +7,9 @@ import cn from 'bem-cn-lite';
 import {Icon, Button} from '@gravity-ui/uikit';
 import {AsideHeader, MenuItem as AsideHeaderMenuItem, FooterItem} from '@gravity-ui/navigation';
 
+import squareChartBarIcon from '@gravity-ui/icons/svgs/square-chart-bar.svg';
+import pulseIcon from '@gravity-ui/icons/svgs/pulse.svg';
+
 import signOutIcon from '../../assets/icons/signOut.svg';
 import signInIcon from '../../assets/icons/signIn.svg';
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
@@ -15,18 +18,20 @@ import userChecked from '../../assets/icons/user-check.svg';
 import settingsIcon from '../../assets/icons/settings.svg';
 import supportIcon from '../../assets/icons/support.svg';
 
-import {UserSettings} from '../UserSettings/UserSettings';
-
-import routes, {createHref} from '../../routes';
-
 import {logout} from '../../store/reducers/authentication';
 import {getParsedSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
+import {TENANT_GENERAL_TABS_IDS} from '../../store/reducers/tenant/constants';
+import routes, {createHref, parseQuery} from '../../routes';
+import {useSetting, useTypedSelector} from '../../utils/hooks';
+import {ASIDE_HEADER_COMPACT_KEY, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
 
-import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
+import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
+import {UserSettings} from '../UserSettings/UserSettings';
 
 import './AsideNavigation.scss';
 
 const b = cn('kv-navigation');
+
 interface MenuItem {
     id: string;
     title: string;
@@ -111,9 +116,6 @@ interface AsideNavigationProps {
     setSettingValue: (name: string, value: string) => void;
 }
 
-// FIXME: add items or delete
-const items: MenuItem[] = [];
-
 enum Panel {
     UserSettings = 'UserSettings',
 }
@@ -124,19 +126,52 @@ function AsideNavigation(props: AsideNavigationProps) {
 
     const [visiblePanel, setVisiblePanel] = useState<Panel>();
 
+    const [initiaTenantTab, setTenantInitialTab] = useSetting<string>(
+        TENANT_INITIAL_TAB_KEY,
+        TENANT_GENERAL_TABS_IDS.query,
+    );
+    const {topLevelTab = initiaTenantTab} = useTypedSelector((state) => state.tenant);
+
     const setIsCompact = (compact: boolean) => {
         props.setSettingValue(ASIDE_HEADER_COMPACT_KEY, JSON.stringify(compact));
     };
 
+    const {pathname} = location;
+    const queryParams = parseQuery(location);
+
+    const isTenantPage = pathname === '/tenant';
+
     const menuItems: AsideHeaderMenuItem[] = React.useMemo(() => {
-        const {pathname} = location;
-        const menuItems: AsideHeaderMenuItem[] = items.map((item) => {
-            const locationKeysCoincidence = item.locationKeys?.filter((key) =>
-                pathname.startsWith(key),
-            );
-            const current =
-                (locationKeysCoincidence && locationKeysCoincidence.length > 0) ||
-                item.location.startsWith(pathname);
+        if (!isTenantPage) {
+            return [];
+        }
+
+        const items: MenuItem[] = [
+            {
+                id: TENANT_GENERAL_TABS_IDS.diagnostics,
+                title: 'Diagnostics',
+                icon: squareChartBarIcon,
+                iconSize: 20,
+                location: getTenantPath({
+                    ...queryParams,
+                    [TenantTabsGroups.general]: TENANT_GENERAL_TABS_IDS.diagnostics,
+                }),
+            },
+            {
+                id: TENANT_GENERAL_TABS_IDS.query,
+                title: 'Query',
+                icon: pulseIcon,
+                iconSize: 20,
+                location: getTenantPath({
+                    ...queryParams,
+                    [TenantTabsGroups.general]: TENANT_GENERAL_TABS_IDS.query,
+                }),
+            },
+        ];
+
+        return items.map((item) => {
+            const current = item.id === topLevelTab;
+
             return {
                 id: item.id,
                 title: item.title,
@@ -144,12 +179,12 @@ function AsideNavigation(props: AsideNavigationProps) {
                 iconSize: item.iconSize,
                 current,
                 onItemClick: () => {
+                    setTenantInitialTab(item.id);
                     history.push(item.location);
                 },
             };
         });
-        return menuItems;
-    }, [location, history]);
+    }, [topLevelTab, isTenantPage, setTenantInitialTab, history, queryParams]);
 
     return (
         <React.Fragment>

@@ -15,7 +15,6 @@ import {getSchemaAcl} from '../../store/reducers/schemaAcl/schemaAcl';
 import SplitPane from '../../components/SplitPane';
 import {AccessDenied} from '../../components/Errors/403';
 
-import ObjectGeneralTabs from './ObjectGeneralTabs/ObjectGeneralTabs';
 import ObjectSummary from './ObjectSummary/ObjectSummary';
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 
@@ -111,33 +110,28 @@ function Tenant(props: TenantProps) {
             {showBlockingError ? (
                 <AccessDenied />
             ) : (
-                <>
-                    <ObjectGeneralTabs />
-                    <div className={b('tab-content')}>
-                        <SplitPane
-                            defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                            defaultSizes={[25, 75]}
-                            triggerCollapse={summaryVisibilityState.triggerCollapse}
-                            triggerExpand={summaryVisibilityState.triggerExpand}
-                            minSize={[36, 200]}
-                            onSplitStartDragAdditional={onSplitStartDragAdditional}
-                        >
-                            <ObjectSummary
-                                type={preloadedPathType || currentPathType}
-                                subType={preloadedPathSubType || currentPathSubType}
-                                onCollapseSummary={onCollapseSummaryHandler}
-                                onExpandSummary={onExpandSummaryHandler}
-                                isCollapsed={summaryVisibilityState.collapsed}
-                                additionalTenantInfo={props.additionalTenantInfo}
-                            />
-                            <ObjectGeneral
-                                type={preloadedPathType || currentPathType}
-                                additionalTenantInfo={props.additionalTenantInfo}
-                                additionalNodesInfo={props.additionalNodesInfo}
-                            />
-                        </SplitPane>
-                    </div>
-                </>
+                <SplitPane
+                    defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                    defaultSizes={[25, 75]}
+                    triggerCollapse={summaryVisibilityState.triggerCollapse}
+                    triggerExpand={summaryVisibilityState.triggerExpand}
+                    minSize={[36, 200]}
+                    onSplitStartDragAdditional={onSplitStartDragAdditional}
+                >
+                    <ObjectSummary
+                        type={preloadedPathType || currentPathType}
+                        subType={preloadedPathSubType || currentPathSubType}
+                        onCollapseSummary={onCollapseSummaryHandler}
+                        onExpandSummary={onExpandSummaryHandler}
+                        isCollapsed={summaryVisibilityState.collapsed}
+                        additionalTenantInfo={props.additionalTenantInfo}
+                    />
+                    <ObjectGeneral
+                        type={preloadedPathType || currentPathType}
+                        additionalTenantInfo={props.additionalTenantInfo}
+                        additionalNodesInfo={props.additionalNodesInfo}
+                    />
+                </SplitPane>
             )}
         </div>
     );
