@@ -105,6 +105,7 @@ class TenantOverview extends React.Component {
             PoolStats,
             StateStats = [],
             MemoryUsed,
+            Name,
             CoresUsed,
             StorageGroups,
             StorageAllocatedSize,
@@ -159,7 +160,7 @@ class TenantOverview extends React.Component {
                 <div className={b('system-tablets')}>
                     {SystemTablets &&
                         SystemTablets.map((tablet, tabletIndex) => (
-                            <Tablet key={tabletIndex} tablet={tablet} />
+                            <Tablet key={tabletIndex} tablet={tablet} tenantName={Name} />
                         ))}
                 </div>
                 <div className={b('common-info')}>

@@ -44,11 +44,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     getPath(path: string) {
         return `${BACKEND}${path}`;
     }
-    getClusterInfo(clusterName?: string) {
-        return this.get<TClusterInfo>(this.getPath('/viewer/json/cluster'), {
-            name: clusterName,
-            tablets: true,
-        });
+    getClusterInfo(clusterName?: string, {concurrentId}: AxiosOptions = {}) {
+        return this.get<TClusterInfo>(
+            this.getPath('/viewer/json/cluster'),
+            {
+                name: clusterName,
+                tablets: true,
+            },
+            {concurrentId: concurrentId || `getClusterInfo`},
+        );
     }
     getClusterNodes({concurrentId}: AxiosOptions = {}) {
         return this.get<TEvSystemStateResponse>(

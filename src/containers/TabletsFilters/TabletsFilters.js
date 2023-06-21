@@ -11,7 +11,7 @@ import ReactList from 'react-list';
 import {Tablet} from '../../components/Tablet';
 import {AccessDenied} from '../../components/Errors/403';
 
-import {setHeader} from '../../store/reducers/header';
+import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {tabletColorToTabletState, tabletStates} from '../../utils/tablet';
 import {
     getTabletsInfo,
@@ -21,8 +21,6 @@ import {
     getFilteredTablets,
     getTablets,
 } from '../../store/reducers/tabletsFilters';
-
-import {getClusterPath} from '../Cluster/utils';
 
 import './TabletsFilters.scss';
 
@@ -76,7 +74,7 @@ class TabletsFilters extends React.Component {
     reloadDescriptor = -1;
 
     componentDidMount() {
-        const {setStateFilter, setTypeFilter, setHeader} = this.props;
+        const {setStateFilter, setTypeFilter, setHeaderBreadcrumbs} = this.props;
 
         const queryParams = qs.parse(this.props.location.search, {
             ignoreQueryPrefix: true,
@@ -92,15 +90,9 @@ class TabletsFilters extends React.Component {
             this.makeRequest();
         });
 
-        setHeader([
-            {
-                text: 'Cluster',
-                link: getClusterPath(),
-            },
-            {
-                text: 'Tablets'
-            }
-        ]);
+        setHeaderBreadcrumbs('tablets', {
+            tenantName: path,
+        });
     }
 
     componentDidUpdate(prevProps) {
@@ -155,7 +147,13 @@ class TabletsFilters extends React.Component {
         const {filteredTablets, size} = this.props;
 
         return (
-            <Tablet tablet={filteredTablets[index]} key={key} size={size} className={b('tablet')} />
+            <Tablet
+                tablet={filteredTablets[index]}
+                tenantName={this.state.tenantPath}
+                key={key}
+                size={size}
+                className={b('tablet')}
+            />
         );
     };
 
@@ -340,7 +338,7 @@ const mapDispatchToProps = {
     clearWasLoadingFlag,
     setStateFilter,
     setTypeFilter,
-    setHeader,
+    setHeaderBreadcrumbs,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(TabletsFilters);

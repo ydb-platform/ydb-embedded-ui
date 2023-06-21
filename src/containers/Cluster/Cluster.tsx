@@ -10,7 +10,7 @@ import type {AdditionalClusterProps, AdditionalVersionsProps} from '../../types/
 import type {AdditionalNodesInfo} from '../../utils/nodes';
 import routes from '../../routes';
 
-import {setHeader} from '../../store/reducers/header';
+import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {getClusterInfo} from '../../store/reducers/cluster/cluster';
 import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
 import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../../utils/versions';
@@ -80,14 +80,7 @@ function Cluster({
     );
 
     useEffect(() => {
-        dispatch(
-            setHeader([
-                {
-                    text: Name || 'Cluster',
-                    link: getClusterPath(),
-                },
-            ]),
-        );
+        dispatch(setHeaderBreadcrumbs('cluster', {}));
     }, [dispatch, Name]);
 
     const versionToColor = useMemo(() => {
