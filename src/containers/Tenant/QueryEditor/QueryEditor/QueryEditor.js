@@ -35,10 +35,12 @@ import {
 } from '../../utils/paneVisibilityToggleHelpers';
 import Preview from '../../Preview/Preview';
 
-import QueryResult from '../QueryResult/QueryResult';
-import QueryExplain from '../QueryExplain/QueryExplain';
+import {ExecuteResult} from '../ExecuteResult/ExecuteResult';
+import {ExplainResult} from '../ExplainResult/ExplainResult';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import {OldQueryEditorControls} from '../QueryEditorControls/OldQueryEditorControls';
+
+import {getPreparedResult} from '../utils/getPreparedResult';
 
 import './QueryEditor.scss';
 
@@ -322,11 +324,11 @@ function QueryEditor(props) {
                 />
             );
         }
-        const textResults = getPreparedResult();
+        const textResults = getPreparedResult(data);
         const disabled = !textResults.length || resultType !== RESULT_TYPES.EXECUTE;
 
         return data || error ? (
-            <QueryResult
+            <ExecuteResult
                 result={content}
                 stats={stats}
                 error={error}
@@ -346,7 +348,7 @@ function QueryEditor(props) {
         } = props;
 
         return (
-            <QueryExplain
+            <ExplainResult
                 error={error}
                 explain={data}
                 astQuery={handleAstQuery}
@@ -432,37 +434,6 @@ function QueryEditor(props) {
         } = props.executeQuery;
 
         return queries.length - 1 === currentIndex;
-    };
-
-    const getPreparedResult = () => {
-        const {
-            executeQuery: {data},
-        } = props;
-        const columnDivider = '\t';
-        const rowDivider = '\n';
-
-        if (!data?.result?.length) {
-            return '';
-        }
-
-        const columnHeaders = Object.keys(data.result[0]);
-        const rows = [columnHeaders].concat(data.result);
-
-        return rows
-            .map((item) => {
-                const row = [];
-
-                for (const field in item) {
-                    if (typeof item[field] === 'object' || Array.isArray(item[field])) {
-                        row.push(JSON.stringify(item[field]));
-                    } else {
-                        row.push(item[field]);
-                    }
-                }
-
-                return row.join(columnDivider);
-            })
-            .join(rowDivider);
     };
 
     const onChangeWindow = _.throttle(() => {

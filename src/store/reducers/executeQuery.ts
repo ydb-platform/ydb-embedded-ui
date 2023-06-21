@@ -186,7 +186,7 @@ export const changeUserInput = ({input}: {input: string}) => {
     } as const;
 };
 
-export const setMonacoHotKey = (value: MonacoHotKeyAction) => {
+export const setMonacoHotKey = (value: MonacoHotKeyAction | null) => {
     return {
         type: MONACO_HOT_KEY,
         data: value,

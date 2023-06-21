@@ -21,9 +21,9 @@ import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco';
 
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 
-import './QueryExplain.scss';
+import './ExplainResult.scss';
 
-const b = cn('kv-query-explain');
+const b = cn('ydb-query-explain-result');
 
 const EDITOR_OPTIONS = {
     automaticLayout: true,
@@ -90,7 +90,7 @@ function GraphRoot(props) {
     return <div id="graphRoot" style={{height: '100vh'}} />;
 }
 
-function QueryExplain(props) {
+export function ExplainResult(props) {
     const dispatch = useDispatch();
     const [activeOption, setActiveOption] = useState(ExplainOptionIds.schema);
 
@@ -287,5 +287,3 @@ function QueryExplain(props) {
         </React.Fragment>
     );
 }
-
-export default QueryExplain;
