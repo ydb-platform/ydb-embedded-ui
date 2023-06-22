@@ -99,5 +99,5 @@ export const Healthcheck = (props: HealthcheckProps) => {
         return <div className="error">{i18n('no-data')}</div>;
     };
 
-    return <div className={b()}>{renderContent()}</div>;
+    return <div className={b({expanded: !preview})}>{renderContent()}</div>;
 };
