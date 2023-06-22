@@ -74,8 +74,8 @@ function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder 
     switch (visibleEntities) {
         case VisibleEntities.All: {
             return {
-                columnId: TableColumnsIds.Missing,
-                order: DataTable.DESCENDING,
+                columnId: TableColumnsIds.PoolName,
+                order: DataTable.ASCENDING,
             };
         }
         case VisibleEntities.Missing: {
@@ -87,7 +87,7 @@ function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder 
         case VisibleEntities.Space: {
             return {
                 columnId: TableColumnsIds.UsedSpaceFlag,
-                order: DataTable.ASCENDING,
+                order: DataTable.DESCENDING,
             };
         }
         default: {
@@ -294,6 +294,14 @@ function StorageGroups({
     ];
 
     let columns = allColumns;
+
+    if (visibleEntities === VisibleEntities.All) {
+        columns = allColumns.filter((col) => {
+            return (
+                col.name !== TableColumnsIds.Missing && col.name !== TableColumnsIds.UsedSpaceFlag
+            );
+        });
+    }
 
     if (visibleEntities === VisibleEntities.Space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
