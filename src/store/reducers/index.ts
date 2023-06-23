@@ -31,7 +31,7 @@ import shardsWorkload from './shardsWorkload';
 import hotKeys from './hotKeys';
 import olapStats from './olapStats';
 import authentication from './authentication';
-import header from './header';
+import header from './header/header';
 import saveQuery from './saveQuery';
 import fullscreen from './fullscreen';
 import singleClusterMode from './singleClusterMode';

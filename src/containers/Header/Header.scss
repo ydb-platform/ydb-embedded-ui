@@ -13,4 +13,13 @@
     border-bottom: 1px solid var(--yc-color-line-generic);
 
     @include body2-typography;
+
+    &__breadcrumb {
+        display: flex;
+        align-items: center;
+
+        &__icon {
+            margin-right: 3px;
+        }
+    }
 }

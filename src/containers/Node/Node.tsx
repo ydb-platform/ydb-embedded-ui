@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useRouteMatch} from 'react-router';
+import {useLocation, useRouteMatch} from 'react-router';
 import cn from 'bem-cn-lite';
 import {useDispatch} from 'react-redux';
 import _ from 'lodash';
@@ -16,11 +16,12 @@ import {Loader} from '../../components/Loader';
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
 
 import {getNodeInfo, resetNode} from '../../store/reducers/node/node';
-import routes, {createHref} from '../../routes';
-import {HeaderItemType, setHeader} from '../../store/reducers/header';
+import routes, {createHref, parseQuery} from '../../routes';
+import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {AutoFetcher} from '../../utils/autofetcher';
 import {useTypedSelector} from '../../utils/hooks';
-import {clusterTabsIds, getClusterPath} from '../Cluster/utils';
+
+import {clusterTabsIds} from '../Cluster/utils';
 
 import './Node.scss';
 
@@ -37,15 +38,16 @@ interface NodeProps {
 
 function Node(props: NodeProps) {
     const dispatch = useDispatch();
+    const location = useLocation();
 
     const {loading, wasLoaded, error, data} = useTypedSelector((state) => state.node);
     const node = data?.SystemStateInfo?.[0];
-    const nodeHost = node?.Host;
 
     const match =
         useRouteMatch<{id: string; activeTab: string}>(routes.node) ?? Object.create(null);
 
     const {id: nodeId, activeTab} = match.params;
+    const {tenantName: tenantNameFromQuery} = parseQuery(location);
 
     const {activeTabVerified, nodeTabs} = React.useMemo(() => {
         const hasStorage = _.find(node?.Roles as any[], (el) => el === STORAGE_ROLE);
@@ -66,21 +68,16 @@ function Node(props: NodeProps) {
     }, [activeTab, node]);
 
     React.useEffect(() => {
-        const headerItems: HeaderItemType[] = [
-            {
-                text: 'Cluster',
-                link: getClusterPath(clusterTabsIds.nodes),
-            },
-        ];
+        const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
 
-        if (nodeHost) {
-            headerItems.push({
-                text: nodeHost,
-            });
-        }
-
-        dispatch(setHeader(headerItems));
-    }, [dispatch, nodeHost]);
+        dispatch(
+            setHeaderBreadcrumbs('node', {
+                clusterTab: clusterTabsIds.nodes,
+                tenantName,
+                nodeId,
+            }),
+        );
+    }, [dispatch, node, nodeId, tenantNameFromQuery]);
 
     React.useEffect(() => {
         const fetchData = () => dispatch(getNodeInfo(nodeId));

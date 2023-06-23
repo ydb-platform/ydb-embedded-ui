@@ -8,15 +8,12 @@ import type {TEvDescribeSchemeResult} from '../../types/api/schema';
 
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedSelector} from '../../utils/hooks';
-import routes, {createHref} from '../../routes';
-import {setHeader} from '../../store/reducers/header';
+import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {disableAutorefresh, getSchema} from '../../store/reducers/schema/schema';
 import {getSchemaAcl} from '../../store/reducers/schemaAcl/schemaAcl';
 
 import SplitPane from '../../components/SplitPane';
 import {AccessDenied} from '../../components/Errors/403';
-
-import {getClusterPath} from '../Cluster/utils';
 
 import ObjectGeneralTabs from './ObjectGeneralTabs/ObjectGeneralTabs';
 import ObjectSummary from './ObjectSummary/ObjectSummary';
@@ -92,20 +89,7 @@ function Tenant(props: TenantProps) {
 
     useEffect(() => {
         if (tenantName) {
-            dispatch(
-                setHeader([
-                    {
-                        text: 'Cluster',
-                        link: getClusterPath(),
-                    },
-                    {
-                        text: tenantName.startsWith('/') ? tenantName.slice(1) : tenantName,
-                        link: createHref(routes.tenant, undefined, {
-                            name: tenantName,
-                        }),
-                    },
-                ]),
-            );
+            dispatch(setHeaderBreadcrumbs('tenant', {tenantName}));
         }
     }, [tenantName, dispatch]);
 

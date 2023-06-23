@@ -1,17 +1,17 @@
 import {useCallback, useEffect, useRef} from 'react';
-import {useParams} from 'react-router';
+import {useLocation, useParams} from 'react-router';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {Link as ExternalLink} from '@gravity-ui/uikit';
 
 import {backend} from '../../store';
 import {getTablet, getTabletDescribe, clearTabletData} from '../../store/reducers/tablet';
-import {setHeader} from '../../store/reducers/header';
-import routes, {createHref} from '../../routes';
+import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 import {DEVELOPER_UI} from '../../utils/constants';
 import '../../services/api';
+import {parseQuery} from '../../routes';
 
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -19,8 +19,6 @@ import {Tag} from '../../components/Tag';
 import {Icon} from '../../components/Icon';
 import {EmptyState} from '../../components/EmptyState';
 import {Loader} from '../../components/Loader';
-
-import {getClusterPath} from '../Cluster/utils';
 
 import {TabletTable} from './TabletTable';
 import {TabletInfo} from './TabletInfo';
@@ -36,6 +34,7 @@ export const Tablet = () => {
     const isFirstDataFetchRef = useRef(true);
 
     const dispatch = useDispatch();
+    const location = useLocation();
 
     const params = useParams<{id: string}>();
     const {id} = params;
@@ -48,6 +47,18 @@ export const Tablet = () => {
         tenantPath,
         error,
     } = useTypedSelector((state) => state.tablet);
+
+    const {
+        nodeId: queryNodeId,
+        type: queryType,
+        state: queryState,
+        tenantName: queryTenantName,
+    } = parseQuery(location);
+
+    const nodeId = tablet.NodeId?.toString() || queryNodeId?.toString();
+    const tabletState = tablet.State || queryState?.toString();
+    const tabletType = tablet.Type || queryType?.toString();
+    const tenantName = tenantPath || queryTenantName?.toString();
 
     // NOTE: should be reviewed when migrating to React 18
     useEffect(() => {
@@ -71,26 +82,15 @@ export const Tablet = () => {
 
     useEffect(() => {
         dispatch(
-            setHeader([
-                {
-                    text: 'Cluster',
-                    link: getClusterPath(),
-                },
-                {
-                    text: 'Tablets',
-                    link: createHref(routes.tabletsFilters, undefined, {
-                        nodeIds: tablet.NodeId ? [tablet.NodeId] : [],
-                        state: tablet.State,
-                        type: tablet.Type,
-                        tenantPath,
-                    }),
-                },
-                {
-                    text: tablet.TabletId ?? 'Tablet',
-                },
-            ]),
+            setHeaderBreadcrumbs('tablet', {
+                nodeIds: nodeId ? [nodeId] : [],
+                state: tabletState,
+                type: tabletType,
+                tenantName,
+                tabletId: id,
+            }),
         );
-    }, [dispatch, tenantPath, tablet]);
+    }, [dispatch, tenantName, id, nodeId, tabletState, tabletType]);
 
     const renderExternalLinks = (link: {name: string; path: string}, index: number) => {
         return (
@@ -146,7 +146,7 @@ export const Tablet = () => {
                         {Leader && <Tag text="Leader" type="blue" />}
                         <span className={b('loader')}>{loading && <Loader size="s" />}</span>
                     </div>
-                    <TabletInfo tablet={tablet} tenantPath={tenantPath} />
+                    <TabletInfo tablet={tablet} tenantPath={tenantName} />
                     <TabletControls tablet={tablet} fetchData={fetchData} />
                 </div>
                 <div className={b('rigth-pane')}>

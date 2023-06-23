@@ -14,18 +14,32 @@ const b = cn('tablet');
 
 interface TabletProps {
     tablet?: TTabletStateInfo;
+    tenantName?: string;
 }
 
-export const Tablet = ({tablet = {}}: TabletProps) => {
-    const {TabletId: id} = tablet;
+export const Tablet = ({tablet = {}, tenantName}: TabletProps) => {
+    const {TabletId: id, NodeId, Type, State} = tablet;
     const status = tablet.Overall?.toLowerCase();
+
+    const tabletPath =
+        id &&
+        createHref(
+            routes.tablet,
+            {id},
+            {
+                nodeId: NodeId,
+                type: Type,
+                state: State,
+                tenantName,
+            },
+        );
 
     return (
         <ContentWithPopup
             className={b('wrapper')}
             content={<TabletTooltipContent data={tablet} className={b('popup-content')} />}
         >
-            <InternalLink to={id && createHref(routes.tablet, {id})}>
+            <InternalLink to={tabletPath}>
                 <div className={b({status})}>
                     <div className={b('type')}>{[getTabletLabel(tablet.Type)]}</div>
                 </div>

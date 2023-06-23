@@ -1,5 +1,5 @@
 import React from 'react';
-import {Switch, Route, Redirect, Router} from 'react-router-dom';
+import {Switch, Route, Redirect, Router, useLocation} from 'react-router-dom';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 
@@ -28,6 +28,8 @@ import {clusterTabsIds} from '../Cluster/utils';
 const b = cn('app');
 
 export function Content(props) {
+    const location = useLocation();
+
     const {singleClusterMode} = props;
     const isClustersPage =
         location.pathname.includes('/clusters') ||
@@ -54,7 +56,7 @@ export function Content(props) {
     };
     return (
         <React.Fragment>
-            {!isClustersPage && <Header clusterName={props.clusterName} />}
+            {!isClustersPage && <Header mainPage={props.mainPage} />}
             <main className={b('main')}>{renderRoute()}</main>
             <ReduxTooltip />
             <AppIcons />
@@ -66,6 +68,7 @@ Content.propTypes = {
     singleClusterMode: PropTypes.bool,
     children: PropTypes.node,
     clusterName: PropTypes.string,
+    mainPage: PropTypes.object,
 };
 
 function ContentWrapper(props) {

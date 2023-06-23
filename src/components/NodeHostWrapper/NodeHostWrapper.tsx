@@ -26,6 +26,11 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
 
     const isNodeAvailable = !isUnavailableNode(node);
     const nodeRef = isNodeAvailable && getNodeRef ? getNodeRef(node) + 'internal' : undefined;
+    const nodePath = isNodeAvailable
+        ? getDefaultNodePath(node.NodeId, {
+              tenantName: node.TenantName,
+          })
+        : undefined;
 
     return (
         <div className={b()}>
@@ -39,7 +44,7 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
                     <EntityStatus
                         name={node.Host}
                         status={node.SystemState}
-                        path={isNodeAvailable ? getDefaultNodePath(node.NodeId) : undefined}
+                        path={nodePath}
                         hasClipboardButton
                         className={b('host')}
                     />
