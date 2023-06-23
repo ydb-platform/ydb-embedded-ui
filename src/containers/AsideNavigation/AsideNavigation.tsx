@@ -21,7 +21,7 @@ import supportIcon from '../../assets/icons/support.svg';
 import {logout} from '../../store/reducers/authentication';
 import {getParsedSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
 import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../store/reducers/tenant/constants';
-import routes, {createHref, parseQuery} from '../../routes';
+import routes, {TENANT, createHref, parseQuery} from '../../routes';
 import {useSetting, useTypedSelector} from '../../utils/hooks';
 import {ASIDE_HEADER_COMPACT_KEY, TENANT_INITIAL_PAGE_KEY} from '../../utils/constants';
 
@@ -136,7 +136,7 @@ function AsideNavigation(props: AsideNavigationProps) {
     const {pathname} = location;
     const queryParams = parseQuery(location);
 
-    const isTenantPage = pathname === '/tenant';
+    const isTenantPage = pathname === `/${TENANT}`;
 
     const menuItems: AsideHeaderMenuItem[] = React.useMemo(() => {
         if (!isTenantPage) {
