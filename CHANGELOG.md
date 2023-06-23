@@ -1,5 +1,25 @@
 # Changelog
 
+## [4.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.6.0...v4.7.0) (2023-06-23)
+
+
+### Features
+
+* **QueryEditor:** transform history and saved to tabs ([#427](https://github.com/ydb-platform/ydb-embedded-ui/issues/427)) ([6378ca7](https://github.com/ydb-platform/ydb-embedded-ui/commit/6378ca7013239b33e55c1f88fdde7cab3a102df6))
+* update breadcrumbs ([#432](https://github.com/ydb-platform/ydb-embedded-ui/issues/432)) ([e583a03](https://github.com/ydb-platform/ydb-embedded-ui/commit/e583a03fe0d77698f29c924e611133f015c3f7ad))
+
+
+### Bug Fixes
+
+* **Cluster:** add icons to tabs ([#430](https://github.com/ydb-platform/ydb-embedded-ui/issues/430)) ([e9e649f](https://github.com/ydb-platform/ydb-embedded-ui/commit/e9e649f614691e44172c9b93dd3119066c145413))
+* **ClusterInfo:** hide by default ([#435](https://github.com/ydb-platform/ydb-embedded-ui/issues/435)) ([ef2b353](https://github.com/ydb-platform/ydb-embedded-ui/commit/ef2b3535f2c6324a34c4386680f5050655a04eb4))
+* **Cluster:** use counter from uikit for tabs ([#428](https://github.com/ydb-platform/ydb-embedded-ui/issues/428)) ([19ca3bd](https://github.com/ydb-platform/ydb-embedded-ui/commit/19ca3bd14b15bdab1a9621939ddceee6d23b08ac))
+* **DetailedOverview:** prevent tenant info scroll on overflow ([#434](https://github.com/ydb-platform/ydb-embedded-ui/issues/434)) ([8ed6076](https://github.com/ydb-platform/ydb-embedded-ui/commit/8ed60760d54913d05f39d35d00a34c8b1d7d9738))
+* rename Internal Viewer to Developer UI ([#423](https://github.com/ydb-platform/ydb-embedded-ui/issues/423)) ([3eb21f3](https://github.com/ydb-platform/ydb-embedded-ui/commit/3eb21f35a230cc591f02ef9b195f99031f832e8a))
+* **Storage:** update columns ([#437](https://github.com/ydb-platform/ydb-embedded-ui/issues/437)) ([264fbc9](https://github.com/ydb-platform/ydb-embedded-ui/commit/264fbc984cd9ef1467110d3e2f5ed9b29a526c2b))
+* **Tablet:** clear tablet data on unmount ([#425](https://github.com/ydb-platform/ydb-embedded-ui/issues/425)) ([5d308cd](https://github.com/ydb-platform/ydb-embedded-ui/commit/5d308cdded342d7a40cbc6a91431d3f286c39b8a))
+* **TabletsStatistic:** use tenant backend ([#429](https://github.com/ydb-platform/ydb-embedded-ui/issues/429)) ([d290684](https://github.com/ydb-platform/ydb-embedded-ui/commit/d290684ba08aec8b66c0492ba571a5337b5b896c))
+
 ## [4.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.5.2...v4.6.0) (2023-06-13)
 
 
