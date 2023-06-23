@@ -23,7 +23,8 @@ const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
 const GO_TO_PREVIOUS_QUERY = 'query/GO_TO_PREVIOUS_QUERY';
 const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
-const MONACO_HOT_KEY = 'query/MONACO_HOT_KEY';
+const SET_MONACO_HOT_KEY = 'query/SET_MONACO_HOT_KEY';
+const SET_TENANT_PATH = 'query/SET_TENANT_PATH';
 
 const queriesHistoryInitial: string[] = parseJson(getValueFromLS(QUERIES_HISTORY_KEY, '[]'));
 
@@ -128,10 +129,16 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
             };
         }
 
-        case MONACO_HOT_KEY: {
+        case SET_MONACO_HOT_KEY: {
             return {
                 ...state,
                 monacoHotKey: action.data,
+            };
+        }
+        case SET_TENANT_PATH: {
+            return {
+                ...state,
+                tenantPath: action.data,
             };
         }
 
@@ -188,7 +195,14 @@ export const changeUserInput = ({input}: {input: string}) => {
 
 export const setMonacoHotKey = (value: MonacoHotKeyAction | null) => {
     return {
-        type: MONACO_HOT_KEY,
+        type: SET_MONACO_HOT_KEY,
+        data: value,
+    } as const;
+};
+
+export const setTenantPath = (value: string) => {
+    return {
+        type: SET_TENANT_PATH,
         data: value,
     } as const;
 };

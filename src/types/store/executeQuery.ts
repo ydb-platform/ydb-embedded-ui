@@ -5,6 +5,7 @@ import {
     goToPreviousQuery,
     setMonacoHotKey,
     goToNextQuery,
+    setTenantPath,
     MONACO_HOT_KEY_ACTIONS,
 } from '../../store/reducers/executeQuery';
 import type {ApiRequestAction} from '../../store/utils';
@@ -22,6 +23,7 @@ export interface ExecuteQueryState {
         currentIndex: number;
     };
     monacoHotKey: null | MonacoHotKeyAction;
+    tenantPath?: string;
     data?: IQueryResult;
     stats?: IQueryResult['stats'];
     error?: string | ErrorResponse;
@@ -35,4 +37,5 @@ export type ExecuteQueryAction =
     | ReturnType<typeof goToPreviousQuery>
     | ReturnType<typeof changeUserInput>
     | ReturnType<typeof saveQueryToHistory>
-    | ReturnType<typeof setMonacoHotKey>;
+    | ReturnType<typeof setMonacoHotKey>
+    | ReturnType<typeof setTenantPath>;
