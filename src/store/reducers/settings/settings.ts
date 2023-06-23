@@ -62,7 +62,7 @@ export const initialState = {
         [QUERY_INITIAL_MODE_KEY]: readSavedSettingsValue(QUERY_INITIAL_MODE_KEY, QueryModes.script),
         [ASIDE_HEADER_COMPACT_KEY]: readSavedSettingsValue(ASIDE_HEADER_COMPACT_KEY, 'true'),
         [PARTITIONS_HIDDEN_COLUMNS_KEY]: readSavedSettingsValue(PARTITIONS_HIDDEN_COLUMNS_KEY),
-        [CLUSTER_INFO_HIDDEN_KEY]: readSavedSettingsValue(CLUSTER_INFO_HIDDEN_KEY, 'false'),
+        [CLUSTER_INFO_HIDDEN_KEY]: readSavedSettingsValue(CLUSTER_INFO_HIDDEN_KEY, 'true'),
     },
     systemSettings,
 };

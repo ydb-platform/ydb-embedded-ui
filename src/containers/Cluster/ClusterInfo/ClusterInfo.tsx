@@ -126,7 +126,7 @@ export const ClusterInfo = ({
 }: ClusterInfoProps) => {
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
-    const [clusterInfoHidden, setClusterInfoHidden] = useSetting(CLUSTER_INFO_HIDDEN_KEY, false);
+    const [clusterInfoHidden, setClusterInfoHidden] = useSetting<boolean>(CLUSTER_INFO_HIDDEN_KEY);
 
     const togleClusterInfoVisibility = () => {
         setClusterInfoHidden(!clusterInfoHidden);
