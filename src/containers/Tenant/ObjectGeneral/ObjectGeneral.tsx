@@ -7,7 +7,7 @@ import {useThemeValue} from '@gravity-ui/uikit';
 import type {EPathType} from '../../../types/api/schema';
 import {TENANT_GENERAL_TABS_IDS} from '../../../store/reducers/tenant/constants';
 
-import {Query} from '../QueryEditor/Query';
+import {Query} from '../Query/Query';
 import Diagnostics from '../Diagnostics/Diagnostics';
 
 import './ObjectGeneral.scss';

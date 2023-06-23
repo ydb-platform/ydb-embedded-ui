@@ -20,9 +20,9 @@ import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpe
 import ResultIssues from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
 
-import './QueryResult.scss';
+import './ExecuteResult.scss';
 
-const b = cn('kv-query-result');
+const b = cn('ydb-query-execute-result');
 
 const resultOptionsIds = {
     result: 'result',
@@ -34,7 +34,7 @@ const resultOptions = [
     {value: resultOptionsIds.stats, content: 'Stats'},
 ];
 
-function QueryResult(props) {
+export function ExecuteResult(props) {
     const [activeSection, setActiveSection] = useState(resultOptionsIds.result);
     const isFullscreen = useSelector((state) => state.fullscreen);
     const dispatch = useDispatch();
@@ -162,5 +162,3 @@ function QueryResult(props) {
         </React.Fragment>
     );
 }
-
-export default QueryResult;
