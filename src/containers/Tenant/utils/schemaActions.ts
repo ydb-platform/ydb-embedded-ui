@@ -3,10 +3,10 @@ import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-component
 
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
-import {setQueryTab, setTopLevelTab} from '../../../store/reducers/tenant/tenant';
+import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import {
     TENANT_QUERY_TABS_ID,
-    TENANT_GENERAL_TABS_IDS,
+    TENANT_PAGES_IDS,
 } from '../../../store/reducers/tenant/constants';
 import createToast from '../../../utils/createToast';
 
@@ -40,7 +40,7 @@ const bindActions = (
 ) => {
     const inputQuery = (tmpl: (path: string) => string) => () => {
         dispatch(changeUserInput({input: tmpl(path)}));
-        dispatch(setTopLevelTab(TENANT_GENERAL_TABS_IDS.query));
+        dispatch(setTenantPage(TENANT_PAGES_IDS.query));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
         setActivePath(path);
     };
@@ -70,7 +70,7 @@ const bindActions = (
         },
         openPreview: () => {
             dispatch(setShowPreview(true));
-            dispatch(setTopLevelTab(TENANT_GENERAL_TABS_IDS.query));
+            dispatch(setTenantPage(TENANT_PAGES_IDS.query));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(path);
         },

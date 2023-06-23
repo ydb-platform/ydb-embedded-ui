@@ -5,7 +5,7 @@ import type {ValueOf} from '../../../types/common';
 import {
     SAVED_QUERIES_KEY,
     THEME_KEY,
-    TENANT_INITIAL_TAB_KEY,
+    TENANT_INITIAL_PAGE_KEY,
     INVERTED_DISKS_KEY,
     ASIDE_HEADER_COMPACT_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
@@ -17,6 +17,8 @@ import {
 import '../../../services/api';
 import {getValueFromLS, parseJson} from '../../../utils/utils';
 import {QueryModes} from '../../../types/store/query';
+
+import {TENANT_PAGES_IDS} from '../tenant/constants';
 
 import type {RootState} from '..';
 import type {
@@ -58,7 +60,10 @@ export const initialState = {
             'false',
         ),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),
-        [TENANT_INITIAL_TAB_KEY]: readSavedSettingsValue(TENANT_INITIAL_TAB_KEY),
+        [TENANT_INITIAL_PAGE_KEY]: readSavedSettingsValue(
+            TENANT_INITIAL_PAGE_KEY,
+            TENANT_PAGES_IDS.query,
+        ),
         [QUERY_INITIAL_MODE_KEY]: readSavedSettingsValue(QUERY_INITIAL_MODE_KEY, QueryModes.script),
         [ASIDE_HEADER_COMPACT_KEY]: readSavedSettingsValue(ASIDE_HEADER_COMPACT_KEY, 'true'),
         [PARTITIONS_HIDDEN_COLUMNS_KEY]: readSavedSettingsValue(PARTITIONS_HIDDEN_COLUMNS_KEY),

@@ -11,9 +11,9 @@ import type {EPathType} from '../../../types/api/schema';
 
 import {useTypedSelector} from '../../../utils/hooks';
 import routes, {createHref} from '../../../routes';
-import type {TenantDiagnosticsTab, TenantGeneralTab} from '../../../store/reducers/tenant/types';
+import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema/schema';
-import {setTopLevelTab, setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
+import { setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 
 import {Loader} from '../../../components/Loader';
@@ -96,10 +96,6 @@ function Diagnostics(props: DiagnosticsProps) {
         }
     };
 
-    const forwardToGeneralTab = (tab: TenantGeneralTab) => {
-        dispatch(setTopLevelTab(tab));
-    };
-
     const renderTabContent = () => {
         const {type} = props;
 
@@ -116,13 +112,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topQueries: {
-                return (
-                    <TopQueries
-                        path={tenantNameString}
-                        changeSchemaTab={forwardToGeneralTab}
-                        type={type}
-                    />
-                );
+                return <TopQueries path={tenantNameString} type={type} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topShards: {
                 return <TopShards tenantPath={tenantNameString} type={type} />;

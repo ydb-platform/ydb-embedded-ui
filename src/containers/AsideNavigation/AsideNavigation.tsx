@@ -20,12 +20,12 @@ import supportIcon from '../../assets/icons/support.svg';
 
 import {logout} from '../../store/reducers/authentication';
 import {getParsedSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
-import {TENANT_GENERAL_TABS_IDS} from '../../store/reducers/tenant/constants';
+import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../store/reducers/tenant/constants';
 import routes, {createHref, parseQuery} from '../../routes';
 import {useSetting, useTypedSelector} from '../../utils/hooks';
-import {ASIDE_HEADER_COMPACT_KEY, TENANT_INITIAL_TAB_KEY} from '../../utils/constants';
+import {ASIDE_HEADER_COMPACT_KEY, TENANT_INITIAL_PAGE_KEY} from '../../utils/constants';
 
-import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
+import {getTenantPath} from '../Tenant/TenantPages';
 import {UserSettings} from '../UserSettings/UserSettings';
 
 import './AsideNavigation.scss';
@@ -126,11 +126,8 @@ function AsideNavigation(props: AsideNavigationProps) {
 
     const [visiblePanel, setVisiblePanel] = useState<Panel>();
 
-    const [initiaTenantTab, setTenantInitialTab] = useSetting<string>(
-        TENANT_INITIAL_TAB_KEY,
-        TENANT_GENERAL_TABS_IDS.query,
-    );
-    const {topLevelTab = initiaTenantTab} = useTypedSelector((state) => state.tenant);
+    const [initialTenantPage, setInitialTenantPage] = useSetting<string>(TENANT_INITIAL_PAGE_KEY);
+    const {tenantPage = initialTenantPage} = useTypedSelector((state) => state.tenant);
 
     const setIsCompact = (compact: boolean) => {
         props.setSettingValue(ASIDE_HEADER_COMPACT_KEY, JSON.stringify(compact));
@@ -148,29 +145,29 @@ function AsideNavigation(props: AsideNavigationProps) {
 
         const items: MenuItem[] = [
             {
-                id: TENANT_GENERAL_TABS_IDS.diagnostics,
+                id: TENANT_PAGES_IDS.diagnostics,
                 title: 'Diagnostics',
                 icon: squareChartBarIcon,
                 iconSize: 20,
                 location: getTenantPath({
                     ...queryParams,
-                    [TenantTabsGroups.general]: TENANT_GENERAL_TABS_IDS.diagnostics,
+                    [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
                 }),
             },
             {
-                id: TENANT_GENERAL_TABS_IDS.query,
+                id: TENANT_PAGES_IDS.query,
                 title: 'Query',
                 icon: pulseIcon,
                 iconSize: 20,
                 location: getTenantPath({
                     ...queryParams,
-                    [TenantTabsGroups.general]: TENANT_GENERAL_TABS_IDS.query,
+                    [TENANT_PAGE]: TENANT_PAGES_IDS.query,
                 }),
             },
         ];
 
         return items.map((item) => {
-            const current = item.id === topLevelTab;
+            const current = item.id === tenantPage;
 
             return {
                 id: item.id,
@@ -179,12 +176,12 @@ function AsideNavigation(props: AsideNavigationProps) {
                 iconSize: item.iconSize,
                 current,
                 onItemClick: () => {
-                    setTenantInitialTab(item.id);
+                    setInitialTenantPage(item.id);
                     history.push(item.location);
                 },
             };
         });
-    }, [topLevelTab, isTenantPage, setTenantInitialTab, history, queryParams]);
+    }, [tenantPage, isTenantPage, setInitialTenantPage, history, queryParams]);
 
     return (
         <React.Fragment>

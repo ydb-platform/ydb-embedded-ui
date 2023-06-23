@@ -8,7 +8,6 @@ export enum TenantInfoTabsIds {
 
 export enum TenantTabsGroups {
     info = 'info',
-    general = 'general',
     queryTab = 'queryTab',
     diagnosticsTab = 'diagnosticsTab',
 }

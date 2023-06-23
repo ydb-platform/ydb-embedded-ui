@@ -4,9 +4,9 @@ import cn from 'bem-cn-lite';
 import {useThemeValue} from '@gravity-ui/uikit';
 
 import type {EPathType} from '../../../types/api/schema';
-import {TENANT_GENERAL_TABS_IDS} from '../../../store/reducers/tenant/constants';
+import {TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import {useSetting} from '../../../utils/hooks';
-import {TENANT_INITIAL_TAB_KEY} from '../../../utils/constants';
+import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {parseQuery} from '../../../routes';
 
 import {Query} from '../Query/Query';
@@ -26,15 +26,15 @@ function ObjectGeneral(props: ObjectGeneralProps) {
     const location = useLocation();
     const theme = useThemeValue();
 
-    const [initialTab] = useSetting<string>(TENANT_INITIAL_TAB_KEY, TENANT_GENERAL_TABS_IDS.query);
+    const [initialPage] = useSetting<string>(TENANT_INITIAL_PAGE_KEY);
 
     const queryParams = parseQuery(location);
-    const {name: tenantName, general: generalTab = initialTab} = queryParams;
+    const {name: tenantName, tenantPage = initialPage} = queryParams;
 
     const renderTabContent = () => {
         const {type, additionalTenantInfo, additionalNodesInfo} = props;
-        switch (generalTab) {
-            case TENANT_GENERAL_TABS_IDS.query: {
+        switch (tenantPage) {
+            case TENANT_PAGES_IDS.query: {
                 return <Query path={tenantName as string} theme={theme} type={type} />;
             }
             default: {
