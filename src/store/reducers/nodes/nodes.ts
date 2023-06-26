@@ -2,10 +2,10 @@ import type {Reducer} from 'redux';
 import {createSelector, Selector} from 'reselect';
 import {escapeRegExp} from 'lodash/fp';
 
-import '../../services/api';
-import {HOUR_IN_SECONDS} from '../../utils/constants';
-import {calcUptime, calcUptimeInSeconds} from '../../utils';
-import {NodesUptimeFilterValues} from '../../utils/nodes';
+import '../../../services/api';
+import {HOUR_IN_SECONDS} from '../../../utils/constants';
+import {calcUptime, calcUptimeInSeconds} from '../../../utils';
+import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {
     INodesAction,
     INodesApiRequestParams,
@@ -13,12 +13,12 @@ import type {
     INodesPreparedEntity,
     INodesRootStateSlice,
     INodesState,
-} from '../../types/store/nodes';
-import type {ValueOf} from '../../types/common';
-import {EFlag} from '../../types/api/enums';
+} from './types';
+import type {ValueOf} from '../../../types/common';
+import {EFlag} from '../../../types/api/enums';
 
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import {ProblemFilterValues} from './settings/settings';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {ProblemFilterValues} from '../settings/settings';
 
 export const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
 

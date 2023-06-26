@@ -28,7 +28,7 @@ import type {DescribeTopicResult} from '../types/api/topic';
 import type {TEvPDiskStateResponse} from '../types/api/pdisk';
 import type {TEvVDiskStateResponse} from '../types/api/vdisk';
 import type {TUserToken} from '../types/api/whoami';
-import type {INodesApiRequestParams} from '../types/store/nodes';
+import type {INodesApiRequestParams} from '../store/reducers/nodes/types';
 
 import {backend as BACKEND} from '../store';
 

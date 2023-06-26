@@ -9,7 +9,7 @@ import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper'
 import type {NodeAddress} from '../../utils/nodes';
 import {formatBytesToGigabyte} from '../../utils/index';
 
-import type {INodesPreparedEntity} from '../../types/store/nodes';
+import type {INodesPreparedEntity} from '../../store/reducers/nodes/types';
 
 interface GetNodesColumnsProps {
     tabletsPath?: string;

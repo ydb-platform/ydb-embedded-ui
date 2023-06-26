@@ -1,6 +1,6 @@
 import type {TSystemStateInfo} from '../types/api/nodes';
 import type {TNodeInfo} from '../types/api/nodesList';
-import type {INodesPreparedEntity} from '../types/store/nodes';
+import type {INodesPreparedEntity} from '../store/reducers/nodes/types';
 import type {NodesMap} from '../types/store/nodesList';
 import {EFlag} from '../types/api/enums';
 

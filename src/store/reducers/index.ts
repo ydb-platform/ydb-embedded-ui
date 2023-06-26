@@ -1,6 +1,6 @@
 import {combineReducers} from 'redux';
 
-import nodes from './nodes';
+import nodes from './nodes/nodes';
 import cluster from './cluster/cluster';
 import clusterNodes from './clusterNodes/clusterNodes';
 import tenant from './tenant/tenant';

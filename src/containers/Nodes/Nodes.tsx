@@ -26,7 +26,7 @@ import {
     setSearchValue,
     resetNodesState,
     getComputeNodes,
-} from '../../store/reducers/nodes';
+} from '../../store/reducers/nodes/nodes';
 import {changeFilter, ProblemFilterValues} from '../../store/reducers/settings/settings';
 
 import {isDatabaseEntityType} from '../Tenant/utils/schema';

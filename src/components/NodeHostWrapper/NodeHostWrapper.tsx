@@ -2,7 +2,7 @@ import block from 'bem-cn-lite';
 
 import {Button, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
-import type {INodesPreparedEntity} from '../../types/store/nodes';
+import type {INodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import {isUnavailableNode, NodeAddress} from '../../utils/nodes';
 

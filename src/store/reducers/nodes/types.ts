@@ -1,18 +1,18 @@
-import type {IResponseError} from '../api/error';
-import type {TEndpoint, TPoolStats} from '../api/nodes';
-import type {TTabletStateInfo as TComputeTabletStateInfo} from '../api/compute';
-import type {TTabletStateInfo as TFullTabletStateInfo} from '../api/tablet';
-import type {EFlag} from '../api/enums';
+import type {IResponseError} from '../../../types/api/error';
+import type {TEndpoint, TPoolStats} from '../../../types/api/nodes';
+import type {TTabletStateInfo as TComputeTabletStateInfo} from '../../../types/api/compute';
+import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
+import type {EFlag} from '../../../types/api/enums';
 
-import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {
     FETCH_NODES,
     resetNodesState,
     setDataWasNotLoaded,
     setNodesUptimeFilter,
     setSearchValue,
-} from '../../store/reducers/nodes';
-import {ApiRequestAction} from '../../store/utils';
+} from './nodes';
+import {ApiRequestAction} from '../../utils';
 
 // Since nodes from different endpoints can have different types,
 // This type describes fields, that are expected by tables with nodes

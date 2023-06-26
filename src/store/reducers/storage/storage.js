@@ -8,7 +8,7 @@ import {getPDiskType} from '../../../utils/pdisk';
 import '../../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../../utils';
-import {filterNodesByUptime} from '../nodes';
+import {filterNodesByUptime} from '../nodes/nodes';
 
 export const VisibleEntities = {
     All: 'All',
