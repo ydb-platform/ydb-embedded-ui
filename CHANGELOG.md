@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.8.0...v4.8.1) (2023-06-26)
+
+
+### Bug Fixes
+
+* **Tenants:** fix tenant link ([#439](https://github.com/ydb-platform/ydb-embedded-ui/issues/439)) ([432c621](https://github.com/ydb-platform/ydb-embedded-ui/commit/432c621eb2fb2ffd5a747299af930236d5cc06f7))
+
 ## [4.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.7.0...v4.8.0) (2023-06-26)
 
 
