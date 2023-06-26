@@ -120,18 +120,12 @@ enum Panel {
     UserSettings = 'UserSettings',
 }
 
-function AsideNavigation(props: AsideNavigationProps) {
+export const useGetLeftNavigationItems = () => {
     const location = useLocation();
     const history = useHistory();
 
-    const [visiblePanel, setVisiblePanel] = useState<Panel>();
-
     const [initialTenantPage, setInitialTenantPage] = useSetting<string>(TENANT_INITIAL_PAGE_KEY);
     const {tenantPage = initialTenantPage} = useTypedSelector((state) => state.tenant);
-
-    const setIsCompact = (compact: boolean) => {
-        props.setSettingValue(ASIDE_HEADER_COMPACT_KEY, JSON.stringify(compact));
-    };
 
     const {pathname} = location;
     const queryParams = parseQuery(location);
@@ -182,6 +176,20 @@ function AsideNavigation(props: AsideNavigationProps) {
             };
         });
     }, [tenantPage, isTenantPage, setInitialTenantPage, history, queryParams]);
+
+    return menuItems;
+};
+
+function AsideNavigation(props: AsideNavigationProps) {
+    const history = useHistory();
+
+    const [visiblePanel, setVisiblePanel] = useState<Panel>();
+
+    const setIsCompact = (compact: boolean) => {
+        props.setSettingValue(ASIDE_HEADER_COMPACT_KEY, JSON.stringify(compact));
+    };
+
+    const menuItems = useGetLeftNavigationItems();
 
     return (
         <React.Fragment>
