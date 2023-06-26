@@ -1,24 +1,20 @@
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
+
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import type {NodesMap} from '../../../types/store/nodesList';
+import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 
-import shieldIcon from '../../../assets/icons/shield.svg';
-
-import {Stack} from '../../../components/Stack/Stack';
-//@ts-ignore
-import EntityStatus from '../../../components/EntityStatus/EntityStatus';
-
-import {TVDiskStateInfo} from '../../../types/api/vdisk';
-//@ts-ignore
-import {VisibleEntities} from '../../../store/reducers/storage/storage';
-//@ts-ignore
+import {VisibleEntities} from '../../../store/reducers/storage/constants';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
-//@ts-ignore
 import {stringifyVdiskId} from '../../../utils';
 import {getUsage, isFullVDiskData} from '../../../utils/storage';
+
+import shieldIcon from '../../../assets/icons/shield.svg';
+import {Stack} from '../../../components/Stack/Stack';
+import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
 import {VDisk} from '../VDisk';
@@ -72,19 +68,19 @@ const b = cn('global-storage-groups');
 
 function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder | undefined {
     switch (visibleEntities) {
-        case VisibleEntities.All: {
+        case VisibleEntities.all: {
             return {
                 columnId: TableColumnsIds.PoolName,
                 order: DataTable.ASCENDING,
             };
         }
-        case VisibleEntities.Missing: {
+        case VisibleEntities.missing: {
             return {
                 columnId: TableColumnsIds.Missing,
                 order: DataTable.DESCENDING,
             };
         }
-        case VisibleEntities.Space: {
+        case VisibleEntities.space: {
             return {
                 columnId: TableColumnsIds.UsedSpaceFlag,
                 order: DataTable.DESCENDING,
@@ -295,7 +291,7 @@ function StorageGroups({
 
     let columns = allColumns;
 
-    if (visibleEntities === VisibleEntities.All) {
+    if (visibleEntities === VisibleEntities.all) {
         columns = allColumns.filter((col) => {
             return (
                 col.name !== TableColumnsIds.Missing && col.name !== TableColumnsIds.UsedSpaceFlag
@@ -303,7 +299,7 @@ function StorageGroups({
         });
     }
 
-    if (visibleEntities === VisibleEntities.Space) {
+    if (visibleEntities === VisibleEntities.space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
 
         if (!data.length) {
@@ -317,7 +313,7 @@ function StorageGroups({
         }
     }
 
-    if (visibleEntities === VisibleEntities.Missing) {
+    if (visibleEntities === VisibleEntities.missing) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.UsedSpaceFlag);
 
         if (!data.length) {

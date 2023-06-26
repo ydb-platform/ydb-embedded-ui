@@ -3,7 +3,7 @@ import cn from 'bem-cn-lite';
 
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 
-import {VisibleEntities} from '../../../store/reducers/storage/storage';
+import {VisibleEntities} from '../../../store/reducers/storage/constants';
 import {
     AdditionalNodesInfo,
     isUnavailableNode,
@@ -55,13 +55,13 @@ const b = cn('global-storage-nodes');
 
 function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder | undefined {
     switch (visibleEntities) {
-        case VisibleEntities.All: {
+        case VisibleEntities.all: {
             return {
                 columnId: TableColumnsIds.NodeId,
                 order: DataTable.ASCENDING,
             };
         }
-        case VisibleEntities.Missing: {
+        case VisibleEntities.missing: {
             return {
                 columnId: TableColumnsIds.Missing,
                 order: DataTable.DESCENDING,
@@ -146,18 +146,18 @@ function StorageNodes({
 
     let columns = allColumns;
 
-    if (visibleEntities === VisibleEntities.Space) {
+    if (visibleEntities === VisibleEntities.space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
     }
 
     if (!data.length) {
         let message;
 
-        if (visibleEntities === VisibleEntities.Space) {
+        if (visibleEntities === VisibleEntities.space) {
             message = i18n('empty.out_of_space');
         }
 
-        if (visibleEntities === VisibleEntities.Missing) {
+        if (visibleEntities === VisibleEntities.missing) {
             message = i18n('empty.degraded');
         }
 
@@ -166,7 +166,7 @@ function StorageNodes({
         }
 
         if (
-            visibleEntities !== VisibleEntities.All &&
+            visibleEntities !== VisibleEntities.all &&
             nodesUptimeFilter !== NodesUptimeFilterValues.All
         ) {
             message = i18n('empty.several_filters');

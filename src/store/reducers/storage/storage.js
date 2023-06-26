@@ -10,22 +10,7 @@ import '../../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 import {filterNodesByUptime} from '../nodes/nodes';
 
-export const VisibleEntities = {
-    All: 'All',
-    Missing: 'Missing',
-    Space: 'Space',
-};
-
-export const VisibleEntitiesTitles = {
-    [VisibleEntities.All]: 'All',
-    [VisibleEntities.Missing]: 'Degraded',
-    [VisibleEntities.Space]: 'Out of Space',
-};
-
-export const StorageTypes = {
-    groups: 'Groups',
-    nodes: 'Nodes',
-};
+import {VisibleEntities, StorageTypes} from './constants';
 
 const FETCH_STORAGE = createRequestActionTypes('storage', 'FETCH_STORAGE');
 const SET_INITIAL = 'storage/SET_INITIAL';
@@ -41,7 +26,7 @@ const initialState = {
     wasLoaded: false,
     filter: '',
     usageFilter: [],
-    visible: VisibleEntities.Missing,
+    visible: VisibleEntities.missing,
     nodesUptimeFilter: NodesUptimeFilterValues.All,
     type: StorageTypes.groups,
 };
@@ -356,9 +341,9 @@ export const getFlatListStorage = createSelector(
 export const getVisibleEntitiesList = createSelector(
     [getVisibleEntities, getFlatListStorage],
     (visibleGroups, storageList) => {
-        if (visibleGroups === VisibleEntities.All) {
+        if (visibleGroups === VisibleEntities.all) {
             return storageList;
-        } else if (visibleGroups === VisibleEntities.Missing) {
+        } else if (visibleGroups === VisibleEntities.missing) {
             return _.filter(storageList, (g) => g.Missing > 0);
         } else {
             return _.filter(storageList, (g) => g.UsedSpaceFlag > 100);
