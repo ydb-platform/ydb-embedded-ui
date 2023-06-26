@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.7.0...v4.8.0) (2023-06-26)
+
+
+### Features
+
+* **Tenant:** transform general tabs into left navigation items ([#431](https://github.com/ydb-platform/ydb-embedded-ui/issues/431)) ([7117b96](https://github.com/ydb-platform/ydb-embedded-ui/commit/7117b9622d5f6469dcc2bcc1c0d5cb71d4f94c0b))
+
 ## [4.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.6.0...v4.7.0) (2023-06-23)
 
 
