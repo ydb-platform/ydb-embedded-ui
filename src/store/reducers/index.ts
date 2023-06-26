@@ -4,7 +4,7 @@ import nodes from './nodes';
 import cluster from './cluster/cluster';
 import clusterNodes from './clusterNodes/clusterNodes';
 import tenant from './tenant/tenant';
-import storage from './storage';
+import storage from './storage/storage';
 import node from './node/node';
 import tooltip from './tooltip';
 import tablets from './tablets';

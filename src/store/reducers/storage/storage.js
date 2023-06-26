@@ -1,14 +1,14 @@
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 
-import {calcUptime} from '../../utils';
-import {getUsage} from '../../utils/storage';
-import {NodesUptimeFilterValues} from '../../utils/nodes';
-import {getPDiskType} from '../../utils/pdisk';
-import '../../services/api';
+import {calcUptime} from '../../../utils';
+import {getUsage} from '../../../utils/storage';
+import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {getPDiskType} from '../../../utils/pdisk';
+import '../../../services/api';
 
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import {filterNodesByUptime} from './nodes';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {filterNodesByUptime} from '../nodes';
 
 export const VisibleEntities = {
     All: 'All',

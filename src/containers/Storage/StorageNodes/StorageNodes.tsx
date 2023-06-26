@@ -3,7 +3,7 @@ import cn from 'bem-cn-lite';
 
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 
-import {VisibleEntities} from '../../../store/reducers/storage';
+import {VisibleEntities} from '../../../store/reducers/storage/storage';
 import {
     AdditionalNodesInfo,
     isUnavailableNode,

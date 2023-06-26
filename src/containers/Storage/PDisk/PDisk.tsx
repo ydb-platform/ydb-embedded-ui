@@ -5,7 +5,7 @@ import {InternalLink} from '../../../components/InternalLink';
 import {Stack} from '../../../components/Stack/Stack';
 
 import routes, {createHref} from '../../../routes';
-import {getVDisksForPDisk} from '../../../store/reducers/storage';
+import {getVDisksForPDisk} from '../../../store/reducers/storage/storage';
 import {TPDiskStateInfo, TPDiskState} from '../../../types/api/pdisk';
 import {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId} from '../../../utils';

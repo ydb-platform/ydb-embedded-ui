@@ -13,7 +13,7 @@ import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 
 import {TVDiskStateInfo} from '../../../types/api/vdisk';
 //@ts-ignore
-import {VisibleEntities} from '../../../store/reducers/storage';
+import {VisibleEntities} from '../../../store/reducers/storage/storage';
 //@ts-ignore
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 //@ts-ignore

@@ -30,7 +30,7 @@ import {
     getStoragePoolsGroupsCount,
     getStorageNodesCount,
     getUsageFilterOptions,
-} from '../../store/reducers/storage';
+} from '../../store/reducers/storage/storage';
 import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
 import StorageGroups from './StorageGroups/StorageGroups';
 import StorageNodes from './StorageNodes/StorageNodes';
