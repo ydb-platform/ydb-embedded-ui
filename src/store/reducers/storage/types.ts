@@ -1,6 +1,12 @@
 import type {ValueOf} from '../../../types/common';
 
-import {StorageTypes, VisibleEntities} from './constants';
+import {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
 
-export type VisibleEntity = ValueOf<typeof VisibleEntities>;
-export type StorageType = ValueOf<typeof StorageTypes>;
+export type VisibleEntities = ValueOf<typeof VISIBLE_ENTITIES>;
+export type StorageType = ValueOf<typeof STORAGE_TYPES>;
+
+export interface StorageApiRequestParams {
+    tenant?: string;
+    nodeId?: string;
+    visibleEntities?: VisibleEntities;
+}

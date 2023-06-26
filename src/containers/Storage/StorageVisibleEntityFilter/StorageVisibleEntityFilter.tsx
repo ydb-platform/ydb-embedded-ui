@@ -1,30 +1,30 @@
 import {RadioButton} from '@gravity-ui/uikit';
 
-import type {VisibleEntity} from '../../../store/reducers/storage/types';
-import {VisibleEntities} from '../../../store/reducers/storage/constants';
+import type {VisibleEntities} from '../../../store/reducers/storage/types';
+import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 
 export const VisibleEntitiesTitles = {
-    [VisibleEntities.all]: 'All',
-    [VisibleEntities.missing]: 'Degraded',
-    [VisibleEntities.space]: 'Out of Space',
+    [VISIBLE_ENTITIES.all]: 'All',
+    [VISIBLE_ENTITIES.missing]: 'Degraded',
+    [VISIBLE_ENTITIES.space]: 'Out of Space',
 };
 
 interface StorageProblemFilterProps {
-    value: VisibleEntity;
+    value: VisibleEntities;
     onChange: (value: string) => void;
 }
 
 export const StorageVisibleEntityFilter = ({value, onChange}: StorageProblemFilterProps) => {
     return (
         <RadioButton value={value} onUpdate={onChange}>
-            <RadioButton.Option value={VisibleEntities.missing}>
-                {VisibleEntitiesTitles[VisibleEntities.missing]}
+            <RadioButton.Option value={VISIBLE_ENTITIES.missing}>
+                {VisibleEntitiesTitles[VISIBLE_ENTITIES.missing]}
             </RadioButton.Option>
-            <RadioButton.Option value={VisibleEntities.space}>
-                {VisibleEntitiesTitles[VisibleEntities.space]}
+            <RadioButton.Option value={VISIBLE_ENTITIES.space}>
+                {VisibleEntitiesTitles[VISIBLE_ENTITIES.space]}
             </RadioButton.Option>
-            <RadioButton.Option value={VisibleEntities.all}>
-                {VisibleEntitiesTitles[VisibleEntities.all]}
+            <RadioButton.Option value={VISIBLE_ENTITIES.all}>
+                {VisibleEntitiesTitles[VISIBLE_ENTITIES.all]}
             </RadioButton.Option>
         </RadioButton>
     );

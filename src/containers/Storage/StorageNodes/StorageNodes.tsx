@@ -3,7 +3,9 @@ import cn from 'bem-cn-lite';
 
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 
-import {VisibleEntities} from '../../../store/reducers/storage/constants';
+import type {VisibleEntities} from '../../../store/reducers/storage/types';
+
+import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {
     AdditionalNodesInfo,
     isUnavailableNode,
@@ -35,7 +37,7 @@ interface StorageNodesProps {
     data: any;
     nodes: any;
     tableSettings: Settings;
-    visibleEntities: keyof typeof VisibleEntities;
+    visibleEntities: VisibleEntities;
     nodesUptimeFilter: keyof typeof NodesUptimeFilterValues;
     onShowAll?: VoidFunction;
     additionalNodesInfo?: AdditionalNodesInfo;
@@ -53,15 +55,15 @@ const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
 
 const b = cn('global-storage-nodes');
 
-function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder | undefined {
+function setSortOrder(visibleEntities: VisibleEntities): SortOrder | undefined {
     switch (visibleEntities) {
-        case VisibleEntities.all: {
+        case VISIBLE_ENTITIES.all: {
             return {
                 columnId: TableColumnsIds.NodeId,
                 order: DataTable.ASCENDING,
             };
         }
-        case VisibleEntities.missing: {
+        case VISIBLE_ENTITIES.missing: {
             return {
                 columnId: TableColumnsIds.Missing,
                 order: DataTable.DESCENDING,
@@ -146,18 +148,18 @@ function StorageNodes({
 
     let columns = allColumns;
 
-    if (visibleEntities === VisibleEntities.space) {
+    if (visibleEntities === VISIBLE_ENTITIES.space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
     }
 
     if (!data.length) {
         let message;
 
-        if (visibleEntities === VisibleEntities.space) {
+        if (visibleEntities === VISIBLE_ENTITIES.space) {
             message = i18n('empty.out_of_space');
         }
 
-        if (visibleEntities === VisibleEntities.missing) {
+        if (visibleEntities === VISIBLE_ENTITIES.missing) {
             message = i18n('empty.degraded');
         }
 
@@ -166,7 +168,7 @@ function StorageNodes({
         }
 
         if (
-            visibleEntities !== VisibleEntities.all &&
+            visibleEntities !== VISIBLE_ENTITIES.all &&
             nodesUptimeFilter !== NodesUptimeFilterValues.All
         ) {
             message = i18n('empty.several_filters');

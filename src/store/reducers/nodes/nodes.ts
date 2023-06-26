@@ -2,7 +2,6 @@ import type {Reducer} from 'redux';
 import {createSelector, Selector} from 'reselect';
 import {escapeRegExp} from 'lodash/fp';
 
-import type {NodesApiRequestParams} from '../../../types/entities/nodes';
 import type {ValueOf} from '../../../types/common';
 import '../../../services/api';
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
@@ -15,6 +14,7 @@ import {ProblemFilterValues} from '../settings/settings';
 
 import type {
     NodesAction,
+    NodesApiRequestParams,
     NodesHandledResponse,
     NodesPreparedEntity,
     NodesStateSlice,
@@ -93,9 +93,9 @@ const nodes: Reducer<NodesState, NodesAction> = (state = initialState, action) =
     }
 };
 
-export function getNodes({tenant, problemFilter, type = 'any'}: NodesApiRequestParams) {
+export function getNodes({tenant, visibleEntities, type = 'any'}: NodesApiRequestParams) {
     return createApiRequest({
-        request: window.api.getNodes({tenant, problemFilter, type}),
+        request: window.api.getNodes({tenant, visibleEntities, type}),
         actions: FETCH_NODES,
         dataHandler: (data): NodesHandledResponse => {
             const rawNodes = data.Nodes || [];

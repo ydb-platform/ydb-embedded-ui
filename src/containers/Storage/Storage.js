@@ -27,7 +27,7 @@ import {
     getStorageNodesCount,
     getUsageFilterOptions,
 } from '../../store/reducers/storage/storage';
-import {VisibleEntities, StorageTypes} from '../../store/reducers/storage/constants';
+import {VISIBLE_ENTITIES, STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
 import StorageGroups from './StorageGroups/StorageGroups';
 import StorageNodes from './StorageNodes/StorageNodes';
@@ -74,18 +74,18 @@ class Storage extends React.Component {
         this.autofetcher = new AutoFetcher();
         getNodesList();
         if (tenant || nodeId) {
-            setVisibleEntities(VisibleEntities.all);
+            setVisibleEntities(VISIBLE_ENTITIES.all);
             this.getStorageInfo({
                 type: storageType,
             });
         } else {
             this.getStorageInfo({
-                filter: VisibleEntities.missing,
+                visibleEntities: VISIBLE_ENTITIES.missing,
                 type: storageType,
             });
             this.autofetcher.fetch(() =>
                 this.getStorageInfo({
-                    filter: VisibleEntities.missing,
+                    visibleEntities: VISIBLE_ENTITIES.missing,
                     type: storageType,
                 }),
             );
@@ -98,7 +98,7 @@ class Storage extends React.Component {
 
         const startFetch = () => {
             this.getStorageInfo({
-                filter: visibleEntities,
+                visibleEntities,
                 type: storageType,
             });
         };
@@ -108,7 +108,7 @@ class Storage extends React.Component {
             this.autofetcher.start();
             this.autofetcher.fetch(() =>
                 this.getStorageInfo({
-                    filter: visibleEntities,
+                    visibleEntities,
                     type: storageType,
                 }),
             );
@@ -176,16 +176,16 @@ class Storage extends React.Component {
 
         return (
             <div className={b('table-wrapper')}>
-                {storageType === StorageTypes.groups && (
+                {storageType === STORAGE_TYPES.groups && (
                     <StorageGroups
                         visibleEntities={visibleEntities}
                         data={flatListStorageEntities}
                         tableSettings={tableSettings}
                         nodes={nodes}
-                        onShowAll={() => this.onGroupVisibilityChange(VisibleEntities.all)}
+                        onShowAll={() => this.onGroupVisibilityChange(VISIBLE_ENTITIES.all)}
                     />
                 )}
-                {storageType === StorageTypes.nodes && (
+                {storageType === STORAGE_TYPES.nodes && (
                     <StorageNodes
                         visibleEntities={visibleEntities}
                         nodesUptimeFilter={nodesUptimeFilter}
@@ -214,7 +214,7 @@ class Storage extends React.Component {
     };
 
     onShowAllNodes = () => {
-        this.onGroupVisibilityChange(VisibleEntities.all);
+        this.onGroupVisibilityChange(VISIBLE_ENTITIES.all);
         this.onUptimeFilterChange(NodesUptimeFilterValues.All);
     };
 
@@ -222,8 +222,8 @@ class Storage extends React.Component {
         const {storageType, groupsCount, nodesCount, flatListStorageEntities, loading, wasLoaded} =
             this.props;
 
-        const entityName = storageType === StorageTypes.groups ? 'Groups' : 'Nodes';
-        const count = storageType === StorageTypes.groups ? groupsCount : nodesCount;
+        const entityName = storageType === STORAGE_TYPES.groups ? 'Groups' : 'Nodes';
+        const count = storageType === STORAGE_TYPES.groups ? groupsCount : nodesCount;
 
         return (
             <EntitiesCount
@@ -252,7 +252,7 @@ class Storage extends React.Component {
                 <div className={b('search')}>
                     <Search
                         placeholder={
-                            storageType === StorageTypes.groups
+                            storageType === STORAGE_TYPES.groups
                                 ? 'Group ID, Pool name'
                                 : 'Node ID, FQDN'
                         }
@@ -267,11 +267,11 @@ class Storage extends React.Component {
                     onChange={this.onGroupVisibilityChange}
                 />
 
-                {storageType === StorageTypes.nodes && (
+                {storageType === STORAGE_TYPES.nodes && (
                     <UptimeFilter value={nodesUptimeFilter} onChange={this.onUptimeFilterChange} />
                 )}
 
-                {storageType === StorageTypes.groups && (
+                {storageType === STORAGE_TYPES.groups && (
                     <UsageFilter
                         value={usageFilter}
                         onChange={setUsageFilter}

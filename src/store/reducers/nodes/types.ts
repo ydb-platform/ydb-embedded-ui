@@ -4,6 +4,7 @@ import type {TTabletStateInfo as TComputeTabletStateInfo} from '../../../types/a
 import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
 import type {EFlag} from '../../../types/api/enums';
 import type {ApiRequestAction} from '../../utils';
+import type {VisibleEntities} from '../storage/types';
 
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {
@@ -41,6 +42,16 @@ export interface NodesState {
     data?: NodesPreparedEntity[];
     totalNodes?: number;
     error?: IResponseError;
+}
+
+export type NodeType = 'static' | 'dynamic' | 'any';
+
+export interface NodesApiRequestParams {
+    tenant?: string;
+    type?: NodeType;
+    visibleEntities?: VisibleEntities;
+    storage?: boolean;
+    tablets?: boolean;
 }
 
 export interface NodesHandledResponse {

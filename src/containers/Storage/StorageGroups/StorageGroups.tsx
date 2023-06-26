@@ -6,8 +6,9 @@ import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import type {NodesMap} from '../../../types/store/nodesList';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
+import type {VisibleEntities} from '../../../store/reducers/storage/types';
 
-import {VisibleEntities} from '../../../store/reducers/storage/constants';
+import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {stringifyVdiskId} from '../../../utils';
 import {getUsage, isFullVDiskData} from '../../../utils/storage';
@@ -45,7 +46,7 @@ interface StorageGroupsProps {
     data: any;
     nodes: NodesMap;
     tableSettings: Settings;
-    visibleEntities: keyof typeof VisibleEntities;
+    visibleEntities: VisibleEntities;
     onShowAll?: VoidFunction;
 }
 
@@ -66,21 +67,21 @@ const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
 
 const b = cn('global-storage-groups');
 
-function setSortOrder(visibleEntities: keyof typeof VisibleEntities): SortOrder | undefined {
+function setSortOrder(visibleEntities: VisibleEntities): SortOrder | undefined {
     switch (visibleEntities) {
-        case VisibleEntities.all: {
+        case VISIBLE_ENTITIES.all: {
             return {
                 columnId: TableColumnsIds.PoolName,
                 order: DataTable.ASCENDING,
             };
         }
-        case VisibleEntities.missing: {
+        case VISIBLE_ENTITIES.missing: {
             return {
                 columnId: TableColumnsIds.Missing,
                 order: DataTable.DESCENDING,
             };
         }
-        case VisibleEntities.space: {
+        case VISIBLE_ENTITIES.space: {
             return {
                 columnId: TableColumnsIds.UsedSpaceFlag,
                 order: DataTable.DESCENDING,
@@ -291,7 +292,7 @@ function StorageGroups({
 
     let columns = allColumns;
 
-    if (visibleEntities === VisibleEntities.all) {
+    if (visibleEntities === VISIBLE_ENTITIES.all) {
         columns = allColumns.filter((col) => {
             return (
                 col.name !== TableColumnsIds.Missing && col.name !== TableColumnsIds.UsedSpaceFlag
@@ -299,7 +300,7 @@ function StorageGroups({
         });
     }
 
-    if (visibleEntities === VisibleEntities.space) {
+    if (visibleEntities === VISIBLE_ENTITIES.space) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
 
         if (!data.length) {
@@ -313,7 +314,7 @@ function StorageGroups({
         }
     }
 
-    if (visibleEntities === VisibleEntities.missing) {
+    if (visibleEntities === VISIBLE_ENTITIES.missing) {
         columns = allColumns.filter((col) => col.name !== TableColumnsIds.UsedSpaceFlag);
 
         if (!data.length) {
