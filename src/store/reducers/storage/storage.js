@@ -137,13 +137,16 @@ export function setInitialState() {
 export function getStorageInfo({tenant, filter, nodeId, type}, {concurrentId}) {
     if (type === StorageTypes.nodes) {
         return createApiRequest({
-            request: window.api.getNodes({tenant, filter, type: 'static'}, {concurrentId}),
+            request: window.api.getNodes(
+                {tenant, problemFilter: filter, type: 'static'},
+                {concurrentId},
+            ),
             actions: FETCH_STORAGE,
         });
     }
 
     return createApiRequest({
-        request: window.api.getStorageInfo({tenant, filter, nodeId}, {concurrentId}),
+        request: window.api.getStorageInfo({tenant, problemFilter: filter, nodeId}, {concurrentId}),
         actions: FETCH_STORAGE,
     });
 }

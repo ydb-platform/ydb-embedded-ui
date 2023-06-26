@@ -2,23 +2,24 @@ import type {Reducer} from 'redux';
 import {createSelector, Selector} from 'reselect';
 import {escapeRegExp} from 'lodash/fp';
 
+import type {NodesApiRequestParams} from '../../../types/entities/nodes';
+import type {ValueOf} from '../../../types/common';
 import '../../../services/api';
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
 import {calcUptime, calcUptimeInSeconds} from '../../../utils';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
-import type {
-    INodesAction,
-    INodesApiRequestParams,
-    INodesHandledResponse,
-    INodesPreparedEntity,
-    INodesRootStateSlice,
-    INodesState,
-} from './types';
-import type {ValueOf} from '../../../types/common';
 import {EFlag} from '../../../types/api/enums';
 
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 import {ProblemFilterValues} from '../settings/settings';
+
+import type {
+    NodesAction,
+    NodesHandledResponse,
+    NodesPreparedEntity,
+    NodesStateSlice,
+    NodesState,
+} from './types';
 
 export const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
 
@@ -34,7 +35,7 @@ const initialState = {
     searchValue: '',
 };
 
-const nodes: Reducer<INodesState, INodesAction> = (state = initialState, action) => {
+const nodes: Reducer<NodesState, NodesAction> = (state = initialState, action) => {
     switch (action.type) {
         case FETCH_NODES.REQUEST: {
             return {
@@ -92,11 +93,11 @@ const nodes: Reducer<INodesState, INodesAction> = (state = initialState, action)
     }
 };
 
-export function getNodes({tenant, filter, type = 'any'}: INodesApiRequestParams) {
+export function getNodes({tenant, problemFilter, type = 'any'}: NodesApiRequestParams) {
     return createApiRequest({
-        request: window.api.getNodes({tenant, filter, type}),
+        request: window.api.getNodes({tenant, problemFilter, type}),
         actions: FETCH_NODES,
-        dataHandler: (data): INodesHandledResponse => {
+        dataHandler: (data): NodesHandledResponse => {
             const rawNodes = data.Nodes || [];
 
             const preparedNodes = rawNodes.map((node) => {
@@ -121,8 +122,8 @@ export function getComputeNodes(path: string) {
     return createApiRequest({
         request: window.api.getCompute(path),
         actions: FETCH_NODES,
-        dataHandler: (data): INodesHandledResponse => {
-            const preparedNodes: INodesPreparedEntity[] = [];
+        dataHandler: (data): NodesHandledResponse => {
+            const preparedNodes: NodesPreparedEntity[] = [];
 
             if (data.Tenants) {
                 for (const tenant of data.Tenants) {
@@ -174,12 +175,12 @@ export const setSearchValue = (value: string) => {
     } as const;
 };
 
-const getNodesUptimeFilter = (state: INodesRootStateSlice) => state.nodes.nodesUptimeFilter;
-const getSearchValue = (state: INodesRootStateSlice) => state.nodes.searchValue;
-const getNodesList = (state: INodesRootStateSlice) => state.nodes.data;
+const getNodesUptimeFilter = (state: NodesStateSlice) => state.nodes.nodesUptimeFilter;
+const getSearchValue = (state: NodesStateSlice) => state.nodes.searchValue;
+const getNodesList = (state: NodesStateSlice) => state.nodes.data;
 
 const filterNodesByProblemsStatus = (
-    nodesList: INodesPreparedEntity[] = [],
+    nodesList: NodesPreparedEntity[] = [],
     problemFilter: ValueOf<typeof ProblemFilterValues>,
 ) => {
     if (problemFilter === ProblemFilterValues.ALL) {
@@ -192,7 +193,7 @@ const filterNodesByProblemsStatus = (
 };
 
 export const filterNodesByUptime = (
-    nodesList: INodesPreparedEntity[] = [],
+    nodesList: NodesPreparedEntity[] = [],
     nodesUptimeFilter: NodesUptimeFilterValues,
 ) => {
     if (nodesUptimeFilter === NodesUptimeFilterValues.All) {
@@ -203,7 +204,7 @@ export const filterNodesByUptime = (
     });
 };
 
-const filterNodesBySearchValue = (nodesList: INodesPreparedEntity[] = [], searchValue: string) => {
+const filterNodesBySearchValue = (nodesList: NodesPreparedEntity[] = [], searchValue: string) => {
     if (!searchValue) {
         return nodesList;
     }
@@ -215,8 +216,8 @@ const filterNodesBySearchValue = (nodesList: INodesPreparedEntity[] = [], search
 };
 
 export const getFilteredPreparedNodesList: Selector<
-    INodesRootStateSlice,
-    INodesPreparedEntity[] | undefined
+    NodesStateSlice,
+    NodesPreparedEntity[] | undefined
 > = createSelector(
     [getNodesList, getNodesUptimeFilter, getSearchValue, (state) => state.settings.problemFilter],
     (nodesList, uptimeFilter, searchValue, problemFilter) => {

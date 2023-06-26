@@ -1,6 +1,6 @@
 import type {TSystemStateInfo} from '../types/api/nodes';
 import type {TNodeInfo} from '../types/api/nodesList';
-import type {INodesPreparedEntity} from '../store/reducers/nodes/types';
+import type {NodesPreparedEntity} from '../store/reducers/nodes/types';
 import type {NodesMap} from '../types/store/nodesList';
 import {EFlag} from '../types/api/enums';
 
@@ -14,7 +14,7 @@ export const NodesUptimeFilterTitles = {
     [NodesUptimeFilterValues.SmallUptime]: 'Uptime < 1h',
 };
 
-export const isUnavailableNode = (node: INodesPreparedEntity | TSystemStateInfo) =>
+export const isUnavailableNode = (node: NodesPreparedEntity | TSystemStateInfo) =>
     !node.SystemState || node.SystemState === EFlag.Grey;
 
 export type NodeAddress = Pick<TSystemStateInfo, 'Host' | 'Endpoints'>;
