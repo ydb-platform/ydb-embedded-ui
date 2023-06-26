@@ -18,14 +18,9 @@ import {AutoFetcher} from '../../utils/autofetcher';
 import routes, {createHref} from '../../routes';
 import {formatCPU, formatBytesToGigabyte, formatNumber} from '../../utils';
 import {withSearch} from '../../HOCS';
-import {DEFAULT_TABLE_SETTINGS, TENANT_INITIAL_PAGE_KEY} from '../../utils/constants';
-import {TENANT_PAGES_IDS} from '../../store/reducers/tenant/constants';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {getTenantsInfo} from '../../store/reducers/tenants/tenants';
-import {
-    changeFilter,
-    getSettingValue,
-    ProblemFilterValues,
-} from '../../store/reducers/settings/settings';
+import {changeFilter, ProblemFilterValues} from '../../store/reducers/settings/settings';
 
 import {clusterName} from '../../store';
 import {TenantTabsGroups, TENANT_INFO_TABS} from '../Tenant/TenantPages';
@@ -115,7 +110,6 @@ class Tenants extends React.Component {
             filter,
             handleSearchQuery,
             additionalTenantsInfo = {},
-            savedTenantInitialTab,
         } = this.props;
 
         const filteredTenantsBySearch = tenants.filter((item) => {
@@ -124,7 +118,6 @@ class Tenants extends React.Component {
         });
         const filteredTenants = Tenants.filterTenants(filteredTenantsBySearch, filter);
 
-        const initialTenantGeneralTab = savedTenantInitialTab || TENANT_PAGES_IDS.query;
         const initialTenantInfoTab = TENANT_INFO_TABS[0].id;
 
         const getTenantBackend = (tenant) => {
@@ -154,7 +147,6 @@ class Tenants extends React.Component {
                                     name: value,
                                     backend,
                                     [TenantTabsGroups.info]: initialTenantInfoTab,
-                                    [TenantTabsGroups.general]: initialTenantGeneralTab,
                                 })}
                             />
                             {additionalTenantsInfo.name && additionalTenantsInfo.name(value, row)}
@@ -360,7 +352,6 @@ const mapStateToProps = (state) => {
         loading,
         error,
         filter: state.settings.problemFilter,
-        savedTenantInitialTab: getSettingValue(state, TENANT_INITIAL_PAGE_KEY),
     };
 };
 
