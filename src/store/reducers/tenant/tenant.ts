@@ -4,7 +4,7 @@ import type {TTenant} from '../../../types/api/tenant';
 import type {
     TenantAction,
     TenantDiagnosticsTab,
-    TenantGeneralTab,
+    TenantPage,
     TenantQueryTab,
     TenantState,
 } from './types';
@@ -60,7 +60,7 @@ const tenantReducer: Reducer<TenantState, TenantAction> = (state = initialState,
         case SET_TOP_LEVEL_TAB: {
             return {
                 ...state,
-                topLevelTab: action.data,
+                tenantPage: action.data,
             };
         }
         case SET_QUERY_TAB: {
@@ -95,10 +95,10 @@ export const clearTenant = () => {
     return {type: CLEAR_TENANT} as const;
 };
 
-export function setTopLevelTab(tab: TenantGeneralTab) {
+export function setTenantPage(page: TenantPage) {
     return {
         type: SET_TOP_LEVEL_TAB,
-        data: tab,
+        data: page,
     } as const;
 }
 

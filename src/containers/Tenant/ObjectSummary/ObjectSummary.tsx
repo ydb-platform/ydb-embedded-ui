@@ -47,9 +47,9 @@ import {
     PaneVisibilityToggleButtons,
 } from '../utils/paneVisibilityToggleHelpers';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
-import {setQueryTab, setTopLevelTab} from '../../../store/reducers/tenant/tenant';
+import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import {
-    TENANT_GENERAL_TABS_IDS,
+    TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../store/reducers/tenant/constants';
 
@@ -278,7 +278,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
 
     const onOpenPreview = () => {
         dispatch(setShowPreview(true));
-        dispatch(setTopLevelTab(TENANT_GENERAL_TABS_IDS.query));
+        dispatch(setTenantPage(TENANT_PAGES_IDS.query));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
     };
 

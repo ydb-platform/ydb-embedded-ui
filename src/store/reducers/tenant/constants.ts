@@ -1,4 +1,6 @@
-export const TENANT_GENERAL_TABS_IDS = {
+export const TENANT_PAGE = 'tenantPage';
+
+export const TENANT_PAGES_IDS = {
     query: 'query',
     diagnostics: 'diagnostics',
 } as const;

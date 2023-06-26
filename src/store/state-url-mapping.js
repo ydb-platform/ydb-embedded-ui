@@ -42,8 +42,8 @@ const paramSetup = {
             stateKey: 'tablets.typeFilter',
             type: 'array',
         },
-        general: {
-            stateKey: 'tenant.topLevelTab',
+        tenantPage: {
+            stateKey: 'tenant.tenantPage',
         },
         queryTab: {
             stateKey: 'tenant.queryTab',

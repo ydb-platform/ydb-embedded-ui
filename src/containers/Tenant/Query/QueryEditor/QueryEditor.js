@@ -15,6 +15,7 @@ import {
     goToNextQuery,
     MONACO_HOT_KEY_ACTIONS,
     setMonacoHotKey,
+    setTenantPath,
 } from '../../../../store/reducers/executeQuery';
 import {getExplainQuery, getExplainQueryAst} from '../../../../store/reducers/explainQuery';
 import {getParsedSettingValue, setSettingValue} from '../../../../store/reducers/settings/settings';
@@ -75,6 +76,7 @@ const propTypes = {
     theme: PropTypes.string,
     type: PropTypes.string,
     initialQueryMode: PropTypes.string,
+    setTenantPath: PropTypes.func,
 };
 
 const initialTenantCommonInfoState = {
@@ -83,6 +85,9 @@ const initialTenantCommonInfoState = {
     collapsed: true,
 };
 function QueryEditor(props) {
+    const {path, executeQuery, theme, setTenantPath, changeUserInput} = props;
+    const {tenantPath: savedPath} = executeQuery;
+
     const [resultType, setResultType] = useState(RESULT_TYPES.EXECUTE);
 
     const [isResultLoaded, setIsResultLoaded] = useState(false);
@@ -95,6 +100,13 @@ function QueryEditor(props) {
             setQueryMode(QueryModes.script);
         }
     }, [enableAdditionalQueryModes, queryMode, setQueryMode]);
+
+    useEffect(() => {
+        if (savedPath !== path) {
+            setTenantPath(path);
+            changeUserInput({input: ''});
+        }
+    }, [changeUserInput, setTenantPath, path, savedPath]);
 
     const [resultVisibilityState, dispatchResultVisibilityState] = useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
@@ -507,7 +519,6 @@ function QueryEditor(props) {
         );
     };
 
-    const {executeQuery, theme} = props;
     const result = renderResult();
 
     return (
@@ -569,6 +580,7 @@ const mapDispatchToProps = {
     setSettingValue,
     setShowPreview,
     setMonacoHotKey,
+    setTenantPath,
 };
 
 QueryEditor.propTypes = propTypes;

@@ -5,13 +5,18 @@ import isEmpty from 'lodash/isEmpty';
 
 import {backend, clusterName, webVersion} from './store';
 
+export const CLUSTER = 'cluster';
+export const TENANT = 'tenant';
+export const NODE = 'node';
+export const TABLET = 'tablet';
+
 const routes = {
-    cluster: '/cluster/:activeTab?',
-    tenant: '/tenant',
-    node: '/node/:id/:activeTab?',
-    tablet: '/tablet/:id',
-    tabletsFilters: '/tabletsFilters',
-    auth: '/auth',
+    cluster: `/${CLUSTER}/:activeTab?`,
+    tenant: `/${TENANT}`,
+    node: `/${NODE}/:id/:activeTab?`,
+    tablet: `/${TABLET}/:id`,
+    tabletsFilters: `/tabletsFilters`,
+    auth: `/auth`,
 };
 
 export const parseQuery = (location: Location) => {
