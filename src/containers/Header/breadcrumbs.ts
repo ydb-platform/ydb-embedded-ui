@@ -10,10 +10,15 @@ import type {
     TabletsBreadcrumbsOptions,
     TenantBreadcrumbsOptions,
 } from '../../store/reducers/header/types';
+import {
+    TENANT_DIAGNOSTICS_TABS_IDS,
+    TENANT_PAGE,
+    TENANT_PAGES_IDS,
+} from '../../store/reducers/tenant/constants';
 import routes, {createHref} from '../../routes';
 
 import {getClusterPath} from '../Cluster/utils';
-import {getTenantPath} from '../Tenant/TenantPages';
+import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
 import {getDefaultNodePath} from '../Node/NodePages';
 
 const prepareTenantName = (tenantName: string) => {
@@ -61,10 +66,16 @@ const getNodeBreadcrumbs = (options: NodeBreadcrumbsOptions, query = {}): RawBre
     // Compute nodes have tenantName, storage nodes doesn't
     const isStorageNode = !tenantName;
 
+    const newQuery = {
+        ...query,
+        [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
+        [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
+    };
+
     if (isStorageNode) {
         breadcrumbs = getClusterBreadcrumbs(options, query);
     } else {
-        breadcrumbs = getTenantBreadcrumbs(options, query);
+        breadcrumbs = getTenantBreadcrumbs(options, newQuery);
     }
 
     const text = nodeId ? `Node ${nodeId}` : 'Node';
@@ -79,21 +90,26 @@ const getTabletsBreadcrubms = (
     options: TabletsBreadcrumbsOptions,
     query = {},
 ): RawBreadcrumbItem[] => {
-    const {tenantName, nodeIds, state, type} = options;
+    const {tenantName, nodeIds} = options;
+
+    const newQuery = {
+        ...query,
+        [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
+        [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.tablets,
+    };
 
     let breadcrumbs: RawBreadcrumbItem[];
 
     // Cluster system tablets don't have tenantName
     if (tenantName) {
-        breadcrumbs = getTenantBreadcrumbs(options, query);
+        breadcrumbs = getTenantBreadcrumbs(options, newQuery);
     } else {
         breadcrumbs = getClusterBreadcrumbs(options, query);
     }
 
     const link = createHref(routes.tabletsFilters, undefined, {
+        ...query,
         nodeIds,
-        state,
-        type,
         path: tenantName,
     });
 

@@ -18,21 +18,10 @@ interface TabletProps {
 }
 
 export const Tablet = ({tablet = {}, tenantName}: TabletProps) => {
-    const {TabletId: id, NodeId, Type, State} = tablet;
+    const {TabletId: id, NodeId} = tablet;
     const status = tablet.Overall?.toLowerCase();
 
-    const tabletPath =
-        id &&
-        createHref(
-            routes.tablet,
-            {id},
-            {
-                nodeId: NodeId,
-                type: Type,
-                state: State,
-                tenantName,
-            },
-        );
+    const tabletPath = id && createHref(routes.tablet, {id}, {nodeId: NodeId, tenantName});
 
     return (
         <ContentWithPopup

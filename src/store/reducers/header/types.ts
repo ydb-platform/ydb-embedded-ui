@@ -19,8 +19,6 @@ export interface NodeBreadcrumbsOptions extends TenantBreadcrumbsOptions {
 
 export interface TabletsBreadcrumbsOptions extends TenantBreadcrumbsOptions {
     nodeIds?: string[] | number[];
-    state?: string;
-    type?: string;
 }
 
 export interface TabletBreadcrumbsOptions extends TabletsBreadcrumbsOptions {
