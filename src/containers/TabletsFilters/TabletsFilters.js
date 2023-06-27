@@ -81,10 +81,15 @@ class TabletsFilters extends React.Component {
         });
         const {nodeIds, type, path, state} = queryParams;
         const nodes = TabletsFilters.parseNodes(nodeIds);
-        const stateFilter = TabletsFilters.getStateFiltersFromColor(state);
 
-        setStateFilter(stateFilter);
-        setTypeFilter([type]);
+        if (state) {
+            const stateFilter = TabletsFilters.getStateFiltersFromColor(state);
+            setStateFilter(stateFilter);
+        }
+
+        if (type) {
+            setTypeFilter([type]);
+        }
 
         this.setState({nodeFilter: nodes, tenantPath: path}, () => {
             this.makeRequest();

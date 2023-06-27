@@ -48,16 +48,9 @@ export const Tablet = () => {
         error,
     } = useTypedSelector((state) => state.tablet);
 
-    const {
-        nodeId: queryNodeId,
-        type: queryType,
-        state: queryState,
-        tenantName: queryTenantName,
-    } = parseQuery(location);
+    const {nodeId: queryNodeId, tenantName: queryTenantName} = parseQuery(location);
 
     const nodeId = tablet.NodeId?.toString() || queryNodeId?.toString();
-    const tabletState = tablet.State || queryState?.toString();
-    const tabletType = tablet.Type || queryType?.toString();
     const tenantName = tenantPath || queryTenantName?.toString();
 
     // NOTE: should be reviewed when migrating to React 18
@@ -84,13 +77,11 @@ export const Tablet = () => {
         dispatch(
             setHeaderBreadcrumbs('tablet', {
                 nodeIds: nodeId ? [nodeId] : [],
-                state: tabletState,
-                type: tabletType,
                 tenantName,
                 tabletId: id,
             }),
         );
-    }, [dispatch, tenantName, id, nodeId, tabletState, tabletType]);
+    }, [dispatch, tenantName, id, nodeId]);
 
     const renderExternalLinks = (link: {name: string; path: string}, index: number) => {
         return (
