@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.8.1...v4.8.2) (2023-06-27)
+
+
+### Bug Fixes
+
+* **breadcrumbs:** update tenant and tablet params ([#443](https://github.com/ydb-platform/ydb-embedded-ui/issues/443)) ([b0d31ac](https://github.com/ydb-platform/ydb-embedded-ui/commit/b0d31acce6d6e97d759180c885e6aea3b762a91c))
+
 ## [4.8.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.8.0...v4.8.1) (2023-06-26)
 
 
