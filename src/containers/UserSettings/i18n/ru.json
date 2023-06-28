@@ -16,5 +16,5 @@
   "settings.useNodesEndpoint.popover": "Использовать эндпоинт /viewer/json/nodes для вкладки Nodes в диагностике. Может возвращать некорректные данные на версиях до 23-1",
 
   "settings.enableAdditionalQueryModes.title": "Включить дополнительные режимы выполнения запросов",
-  "settings.enableAdditionalQueryModes.popover": "Добавляет режимы 'data' и 'query' для run. Включает возможность выбрать режим выполнения запроса для explain. Может работать некорректно на некоторых версиях"
+  "settings.enableAdditionalQueryModes.popover": "Добавляет режимы 'Data' и 'Query'. Может работать некорректно на некоторых версиях"
 }

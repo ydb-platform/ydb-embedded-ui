@@ -15,22 +15,12 @@
     }
 
     &__run {
-        display: flex;
-        align-items: center;
-        .yc-select__option-text {
-            display: none;
-        }
-
         .yc-button__text {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
         }
-    }
-
-    &__select-query-action {
-        margin-left: 2px;
     }
 
     &__mode-selector {

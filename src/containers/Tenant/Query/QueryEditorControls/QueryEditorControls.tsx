@@ -1,3 +1,5 @@
+import block from 'bem-cn-lite';
+
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
 import {useMemo} from 'react';
 
@@ -8,16 +10,34 @@ import SaveQuery from '../SaveQuery/SaveQuery';
 
 import i18n from '../i18n';
 
-import {QueryEditorControlsProps, b} from './shared';
-
 import './QueryEditorControls.scss';
 
-export const QueryModeSelectorTitles = {
+const b = block('ydb-query-editor-controls');
+
+const OldQueryModeSelectorTitles = {
+    [QueryModes.script]: 'Script',
+    [QueryModes.scan]: 'Scan',
+} as const;
+
+const QueryModeSelectorTitles = {
     [QueryModes.script]: 'Script',
     [QueryModes.scan]: 'Scan',
     [QueryModes.data]: 'Data',
     [QueryModes.query]: 'Query',
 } as const;
+
+interface QueryEditorControlsProps {
+    onRunButtonClick: (mode?: QueryModes) => void;
+    runIsLoading: boolean;
+    onExplainButtonClick: (mode?: QueryModes) => void;
+    explainIsLoading: boolean;
+    onSaveQueryClick: (queryName: string) => void;
+    savedQueries: unknown;
+    disabled: boolean;
+    onUpdateQueryMode: (mode: QueryModes) => void;
+    queryMode: QueryModes;
+    enableAdditionalQueryModes: boolean;
+}
 
 export const QueryEditorControls = ({
     onRunButtonClick,
@@ -29,9 +49,14 @@ export const QueryEditorControls = ({
     disabled,
     onUpdateQueryMode,
     queryMode,
+    enableAdditionalQueryModes,
 }: QueryEditorControlsProps) => {
     const querySelectorMenuItems = useMemo(() => {
-        return Object.entries(QueryModeSelectorTitles).map(([mode, title]) => {
+        const titles = enableAdditionalQueryModes
+            ? QueryModeSelectorTitles
+            : OldQueryModeSelectorTitles;
+
+        return Object.entries(titles).map(([mode, title]) => {
             return {
                 text: title,
                 action: () => {
@@ -39,7 +64,7 @@ export const QueryEditorControls = ({
                 },
             };
         });
-    }, [onUpdateQueryMode]);
+    }, [onUpdateQueryMode, enableAdditionalQueryModes]);
 
     return (
         <div className={b()}>

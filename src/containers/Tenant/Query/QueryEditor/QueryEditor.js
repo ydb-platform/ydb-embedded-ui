@@ -39,7 +39,6 @@ import Preview from '../../Preview/Preview';
 import {ExecuteResult} from '../ExecuteResult/ExecuteResult';
 import {ExplainResult} from '../ExplainResult/ExplainResult';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
-import {OldQueryEditorControls} from '../QueryEditorControls/OldQueryEditorControls';
 
 import {getPreparedResult} from '../utils/getPreparedResult';
 
@@ -488,24 +487,8 @@ function QueryEditor(props) {
     const renderControls = () => {
         const {executeQuery, explainQuery, savedQueries} = props;
 
-        if (enableAdditionalQueryModes) {
-            return (
-                <QueryEditorControls
-                    onRunButtonClick={handleSendExecuteClick}
-                    runIsLoading={executeQuery.loading}
-                    onExplainButtonClick={handleGetExplainQueryClick}
-                    explainIsLoading={explainQuery.loading}
-                    onSaveQueryClick={onSaveQueryHandler}
-                    savedQueries={savedQueries}
-                    disabled={!executeQuery.input}
-                    onUpdateQueryMode={setQueryMode}
-                    queryMode={queryMode}
-                />
-            );
-        }
-
         return (
-            <OldQueryEditorControls
+            <QueryEditorControls
                 onRunButtonClick={handleSendExecuteClick}
                 runIsLoading={executeQuery.loading}
                 onExplainButtonClick={handleGetExplainQueryClick}
@@ -515,6 +498,7 @@ function QueryEditor(props) {
                 disabled={!executeQuery.input}
                 onUpdateQueryMode={setQueryMode}
                 queryMode={queryMode}
+                enableAdditionalQueryModes={enableAdditionalQueryModes}
             />
         );
     };
