@@ -3,8 +3,11 @@ import {Locator, Page} from '@playwright/test';
 import {BaseModel} from '../../../models/BaseModel';
 import {selectContentTable} from '../../../utils/selectContentTable';
 
-type ButtonType = 'Run Script' | 'Run Scan';
+type QueryMode = 'Script' | 'Scan';
 type ExplainResultType = 'Schema' | 'JSON' | 'AST';
+
+const queryModeSelectorQa = 'query-mode-selector';
+const queryModeSelectorPopupQa = 'query-mode-selector-popup';
 
 export class QueryEditor extends BaseModel {
     protected readonly editorTextArea: Locator;
@@ -19,18 +22,14 @@ export class QueryEditor extends BaseModel {
         this.runButton = this.selector.getByRole('button', {name: /Run/});
         this.explainButton = this.selector.getByRole('button', {name: /Explain/});
     }
+    async run(query: string, mode: QueryMode) {
+        await this.selectQueryMode(mode);
+        await this.editorTextArea.fill(query);
+        await this.runButton.click();
+    }
 
-    async runScript(query: string) {
-        await this.editorTextArea.fill(query);
-        await this.selectRunButtonType('Run Script');
-        await this.runButton.click();
-    }
-    async runScan(query: string) {
-        await this.editorTextArea.fill(query);
-        await this.selectRunButtonType('Run Scan');
-        await this.runButton.click();
-    }
-    async explain(query: string) {
+    async explain(query: string, mode: QueryMode) {
+        await this.selectQueryMode(mode);
         await this.editorTextArea.fill(query);
         await this.explainButton.click();
     }
@@ -68,16 +67,14 @@ export class QueryEditor extends BaseModel {
         await radio.getByLabel(type).click();
     }
 
-    protected async selectRunButtonType(type: ButtonType) {
-        const selectRunModeButton = this.selector.locator(
-            '.ydb-query-editor-controls__select-query-action',
-        );
-        await selectRunModeButton.click();
+    protected async selectQueryMode(type: QueryMode) {
+        const queryModeSelector = this.selector.getByTestId(queryModeSelectorQa);
 
-        const runModeSelect = this.page.locator(
-            '.ydb-query-editor-controls__select-query-action-popup',
-        );
-        await runModeSelect.waitFor({state: 'visible'});
-        await runModeSelect.getByText(type).click();
+        await queryModeSelector.click();
+
+        const queryModeSelectorPopup = this.page.getByTestId(queryModeSelectorPopupQa);
+
+        await queryModeSelectorPopup.waitFor({state: 'visible'});
+        await queryModeSelectorPopup.getByText(type).click();
     }
 }

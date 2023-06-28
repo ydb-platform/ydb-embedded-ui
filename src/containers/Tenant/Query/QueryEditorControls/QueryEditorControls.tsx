@@ -12,6 +12,9 @@ import i18n from '../i18n';
 
 import './QueryEditorControls.scss';
 
+const queryModeSelectorQa = 'query-mode-selector';
+const queryModeSelectorPopupQa = 'query-mode-selector-popup';
+
 const b = block('ydb-query-editor-controls');
 
 const OldQueryModeSelectorTitles = {
@@ -93,9 +96,12 @@ export const QueryEditorControls = ({
                 </Button>
                 <DropdownMenu
                     items={querySelectorMenuItems}
-                    popupProps={{className: b('mode-selector__popup')}}
+                    popupProps={{
+                        className: b('mode-selector__popup'),
+                        qa: queryModeSelectorPopupQa,
+                    }}
                     switcher={
-                        <Button className={b('mode-selector__button')}>
+                        <Button className={b('mode-selector__button')} qa={queryModeSelectorQa}>
                             <span className={b('mode-selector__button-content')}>
                                 {`${i18n('controls.query-mode-selector_type')} ${
                                     QueryModeSelectorTitles[queryMode]

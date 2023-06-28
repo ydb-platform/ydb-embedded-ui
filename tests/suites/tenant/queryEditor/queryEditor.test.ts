@@ -21,21 +21,32 @@ test.describe('Test Query Editor', async () => {
 
     test('Can run scipt', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.runScript(testQuery);
+        await queryEditor.run(testQuery, 'Script');
 
         await expect(queryEditor.getRunResultTable()).toBeVisible();
     });
 
     test('Can run scan', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.runScan(testQuery);
+        await queryEditor.run(testQuery, 'Scan');
 
         await expect(queryEditor.getRunResultTable()).toBeVisible();
     });
 
-    test('Can get explain', async ({page}) => {
+    test('Can get explain script', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.explain(testQuery);
+        await queryEditor.explain(testQuery, 'Script');
+
+        const explainSchema = await queryEditor.getExplainResult('Schema');
+        await expect(explainSchema).toBeVisible();
+
+        const explainJSON = await queryEditor.getExplainResult('JSON');
+        await expect(explainJSON).toBeVisible();
+    });
+
+    test('Can get explain scan', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.explain(testQuery, 'Scan');
 
         const explainSchema = await queryEditor.getExplainResult('Schema');
         await expect(explainSchema).toBeVisible();
