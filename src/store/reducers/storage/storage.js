@@ -335,19 +335,6 @@ export const getFlatListStorage = createSelector(
     },
 );
 
-export const getVisibleEntitiesList = createSelector(
-    [getVisibleEntities, getFlatListStorage],
-    (visibleGroups, storageList) => {
-        if (visibleGroups === VISIBLE_ENTITIES.all) {
-            return storageList;
-        } else if (visibleGroups === VISIBLE_ENTITIES.missing) {
-            return _.filter(storageList, (g) => g.Missing > 0);
-        } else {
-            return _.filter(storageList, (g) => g.UsedSpaceFlag > 100);
-        }
-    },
-);
-
 const filterByText = (entities, type, text) => {
     const cleanedFilter = text.trim().toLowerCase();
 
@@ -382,13 +369,7 @@ const filterByUsage = (entities, usage) => {
 };
 
 export const getFilteredEntities = createSelector(
-    [
-        getStorageFilter,
-        getUsageFilter,
-        getStorageType,
-        getNodesUptimeFilter,
-        getVisibleEntitiesList,
-    ],
+    [getStorageFilter, getUsageFilter, getStorageType, getNodesUptimeFilter, getFlatListStorage],
     (textFilter, usageFilter, type, nodesUptimeFilter, entities) => {
         let result = entities;
         result = filterByText(result, type, textFilter);
@@ -402,7 +383,7 @@ export const getFilteredEntities = createSelector(
     },
 );
 
-export const getUsageFilterOptions = createSelector(getVisibleEntitiesList, (entities) => {
+export const getUsageFilterOptions = createSelector(getFlatListStorage, (entities) => {
     const items = {};
 
     entities.forEach((entity) => {
