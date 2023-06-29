@@ -9,7 +9,7 @@ import type {
     ExplainQueryState,
     PreparedExplainResponse,
 } from '../../types/store/explainQuery';
-import type {QueryRequestParams, QueryModes} from '../../types/store/query';
+import type {QueryRequestParams, QueryMode} from '../../types/store/query';
 
 import {preparePlan} from '../../utils/prepareQueryExplain';
 import {parseQueryAPIExplainResponse, parseQueryExplainPlan} from '../../utils/query';
@@ -99,7 +99,7 @@ export const explainVersions = {
 const supportedExplainQueryVersions = Object.values(explainVersions);
 
 interface ExplainQueryParams extends QueryRequestParams {
-    mode?: QueryModes;
+    mode?: QueryMode;
 }
 
 export const getExplainQuery = ({query, database, mode}: ExplainQueryParams) => {

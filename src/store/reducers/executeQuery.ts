@@ -6,7 +6,7 @@ import type {
     ExecuteQueryState,
     MonacoHotKeyAction,
 } from '../../types/store/executeQuery';
-import type {QueryRequestParams, QueryModes} from '../../types/store/query';
+import type {QueryRequestParams, QueryMode} from '../../types/store/query';
 import {getValueFromLS, parseJson} from '../../utils/utils';
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
@@ -34,7 +34,6 @@ export const MONACO_HOT_KEY_ACTIONS = {
     sendQuery: 'sendQuery',
     goPrev: 'goPrev',
     goNext: 'goNext',
-    getExplain: 'getExplain',
 } as const;
 
 const initialState = {
@@ -148,7 +147,7 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
 };
 
 interface SendQueryParams extends QueryRequestParams {
-    mode?: QueryModes;
+    mode?: QueryMode;
 }
 
 export const sendExecuteQuery = ({query, database, mode}: SendQueryParams) => {
