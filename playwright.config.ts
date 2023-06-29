@@ -14,6 +14,7 @@ const config: PlaywrightTestConfig = {
           },
     use: {
         baseURL: baseUrl || 'http://localhost:3000/',
+        testIdAttribute: 'data-qa',
     },
     projects: [
         {

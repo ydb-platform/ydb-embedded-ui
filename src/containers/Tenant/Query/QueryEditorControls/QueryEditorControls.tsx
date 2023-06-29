@@ -1,3 +1,5 @@
+import block from 'bem-cn-lite';
+
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
 import {useMemo} from 'react';
 
@@ -8,16 +10,37 @@ import SaveQuery from '../SaveQuery/SaveQuery';
 
 import i18n from '../i18n';
 
-import {QueryEditorControlsProps, b} from './shared';
-
 import './QueryEditorControls.scss';
 
-export const QueryModeSelectorTitles = {
+const queryModeSelectorQa = 'query-mode-selector';
+const queryModeSelectorPopupQa = 'query-mode-selector-popup';
+
+const b = block('ydb-query-editor-controls');
+
+const OldQueryModeSelectorTitles = {
+    [QueryModes.script]: 'Script',
+    [QueryModes.scan]: 'Scan',
+} as const;
+
+const QueryModeSelectorTitles = {
     [QueryModes.script]: 'Script',
     [QueryModes.scan]: 'Scan',
     [QueryModes.data]: 'Data',
     [QueryModes.query]: 'Query',
 } as const;
+
+interface QueryEditorControlsProps {
+    onRunButtonClick: (mode?: QueryModes) => void;
+    runIsLoading: boolean;
+    onExplainButtonClick: (mode?: QueryModes) => void;
+    explainIsLoading: boolean;
+    onSaveQueryClick: (queryName: string) => void;
+    savedQueries: unknown;
+    disabled: boolean;
+    onUpdateQueryMode: (mode: QueryModes) => void;
+    queryMode: QueryModes;
+    enableAdditionalQueryModes: boolean;
+}
 
 export const QueryEditorControls = ({
     onRunButtonClick,
@@ -29,9 +52,14 @@ export const QueryEditorControls = ({
     disabled,
     onUpdateQueryMode,
     queryMode,
+    enableAdditionalQueryModes,
 }: QueryEditorControlsProps) => {
     const querySelectorMenuItems = useMemo(() => {
-        return Object.entries(QueryModeSelectorTitles).map(([mode, title]) => {
+        const titles = enableAdditionalQueryModes
+            ? QueryModeSelectorTitles
+            : OldQueryModeSelectorTitles;
+
+        return Object.entries(titles).map(([mode, title]) => {
             return {
                 text: title,
                 action: () => {
@@ -39,7 +67,7 @@ export const QueryEditorControls = ({
                 },
             };
         });
-    }, [onUpdateQueryMode]);
+    }, [onUpdateQueryMode, enableAdditionalQueryModes]);
 
     return (
         <div className={b()}>
@@ -68,9 +96,12 @@ export const QueryEditorControls = ({
                 </Button>
                 <DropdownMenu
                     items={querySelectorMenuItems}
-                    popupProps={{className: b('mode-selector__popup')}}
+                    popupProps={{
+                        className: b('mode-selector__popup'),
+                        qa: queryModeSelectorPopupQa,
+                    }}
                     switcher={
-                        <Button className={b('mode-selector__button')}>
+                        <Button className={b('mode-selector__button')} qa={queryModeSelectorQa}>
                             <span className={b('mode-selector__button-content')}>
                                 {`${i18n('controls.query-mode-selector_type')} ${
                                     QueryModeSelectorTitles[queryMode]

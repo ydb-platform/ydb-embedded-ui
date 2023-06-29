@@ -16,5 +16,5 @@
   "settings.useNodesEndpoint.popover": "Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on versions before 23-1",
 
   "settings.enableAdditionalQueryModes.title": "Enable additional query modes",
-  "settings.enableAdditionalQueryModes.popover": "Adds 'data' and 'query' modes for run. Enables query modes for explain. May not work on some versions"
+  "settings.enableAdditionalQueryModes.popover": "Adds 'Data' and 'Query' modes. May not work on some versions"
 }
