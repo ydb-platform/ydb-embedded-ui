@@ -24,12 +24,10 @@
     }
 
     &__mode-selector {
-        &__popup {
-            width: 120px;
-        }
+        $b: &;
 
         &__button {
-            width: 120px;
+            width: 189px;
             margin-left: 2px;
         }
 
@@ -38,7 +36,24 @@
             justify-content: space-between;
             align-items: center;
 
-            width: 100px;
+            width: 163px;
+        }
+
+        &__popup {
+            width: 189px;
+
+            &_extended {
+                width: 241px;
+            }
+        }
+
+        &_extended {
+            #{$b}__button {
+                width: 241px;
+            }
+            #{$b}__button-content {
+                width: 215px;
+            }
         }
     }
 }
