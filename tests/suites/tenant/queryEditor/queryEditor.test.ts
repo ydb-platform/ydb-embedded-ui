@@ -21,7 +21,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Can run scipt', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.run(testQuery, 'Script');
+        await queryEditor.run(testQuery, 'YQL Script');
 
         await expect(queryEditor.getRunResultTable()).toBeVisible();
     });
@@ -35,7 +35,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Can get explain script', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.explain(testQuery, 'Script');
+        await queryEditor.explain(testQuery, 'YQL Script');
 
         const explainSchema = await queryEditor.getExplainResult('Schema');
         await expect(explainSchema).toBeVisible();

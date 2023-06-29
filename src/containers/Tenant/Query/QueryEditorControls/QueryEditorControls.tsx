@@ -19,15 +19,15 @@ const queryModeSelectorPopupQa = 'query-mode-selector-popup';
 const b = block('ydb-query-editor-controls');
 
 const OldQueryModeSelectorTitles = {
-    [QUERY_MODES.script]: 'Script',
+    [QUERY_MODES.script]: 'YQL Script',
     [QUERY_MODES.scan]: 'Scan',
 } as const;
 
 const QueryModeSelectorTitles = {
-    [QUERY_MODES.script]: 'Script',
+    [QUERY_MODES.script]: 'YQL Script',
     [QUERY_MODES.scan]: 'Scan',
     [QUERY_MODES.data]: 'Data',
-    [QUERY_MODES.query]: 'Query',
+    [QUERY_MODES.query]: 'YQL - QueryService',
 } as const;
 
 interface QueryEditorControlsProps {
@@ -102,23 +102,31 @@ export const QueryEditorControls = ({
                 >
                     Explain
                 </Button>
-                <DropdownMenu
-                    items={querySelectorMenuItems}
-                    popupProps={{
-                        className: b('mode-selector__popup'),
-                        qa: queryModeSelectorPopupQa,
-                    }}
-                    switcher={
-                        <Button className={b('mode-selector__button')} qa={queryModeSelectorQa}>
-                            <span className={b('mode-selector__button-content')}>
-                                {`${i18n('controls.query-mode-selector_type')} ${
-                                    QueryModeSelectorTitles[queryMode]
-                                }`}
-                                <Icon name="chevron-down" width={16} height={16} />
-                            </span>
-                        </Button>
-                    }
-                />
+                <div
+                    className={b('mode-selector', {
+                        extended: enableAdditionalQueryModes,
+                    })}
+                >
+                    <DropdownMenu
+                        items={querySelectorMenuItems}
+                        popupProps={{
+                            className: b('mode-selector__popup', {
+                                extended: enableAdditionalQueryModes,
+                            }),
+                            qa: queryModeSelectorPopupQa,
+                        }}
+                        switcher={
+                            <Button className={b('mode-selector__button')} qa={queryModeSelectorQa}>
+                                <span className={b('mode-selector__button-content')}>
+                                    {`${i18n('controls.query-mode-selector_type')} ${
+                                        QueryModeSelectorTitles[queryMode]
+                                    }`}
+                                    <Icon name="chevron-down" width={16} height={16} />
+                                </span>
+                            </Button>
+                        }
+                    />
+                </div>
             </div>
             <SaveQuery
                 savedQueries={savedQueries}
