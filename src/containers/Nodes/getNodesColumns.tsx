@@ -9,7 +9,7 @@ import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper'
 import type {NodeAddress} from '../../utils/nodes';
 import {formatBytesToGigabyte} from '../../utils/index';
 
-import type {INodesPreparedEntity} from '../../types/store/nodes';
+import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 
 interface GetNodesColumnsProps {
     tabletsPath?: string;
@@ -17,7 +17,7 @@ interface GetNodesColumnsProps {
 }
 
 export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps) {
-    const columns: Column<INodesPreparedEntity>[] = [
+    const columns: Column<NodesPreparedEntity>[] = [
         {
             name: 'NodeId',
             header: '#',

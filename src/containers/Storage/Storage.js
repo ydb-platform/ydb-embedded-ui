@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
 import DataTable from '@gravity-ui/react-data-table';
-import {RadioButton} from '@gravity-ui/uikit';
 
 import {Search} from '../../components/Search';
 import {UsageFilter} from './UsageFilter';
@@ -18,32 +17,28 @@ import {
     getStorageInfo,
     setInitialState,
     getFilteredEntities,
-    VisibleEntities,
     setVisibleEntities,
     setStorageFilter,
     setUsageFilter,
-    StorageTypes,
     setStorageType,
     setNodesUptimeFilter,
     setDataWasNotLoaded,
-    VisibleEntitiesTitles,
     getStoragePoolsGroupsCount,
     getStorageNodesCount,
     getUsageFilterOptions,
-} from '../../store/reducers/storage';
+} from '../../store/reducers/storage/storage';
+import {VISIBLE_ENTITIES, STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
 import StorageGroups from './StorageGroups/StorageGroups';
 import StorageNodes from './StorageNodes/StorageNodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 
+import {StorageTypeFilter} from './StorageTypeFilter/StorageTypeFilter';
+import {StorageVisibleEntityFilter} from './StorageVisibleEntityFilter/StorageVisibleEntityFilter';
+
 import './Storage.scss';
 
 const b = cn('global-storage');
-
-const FILTER_OPTIONS = {
-    Missing: 'missing',
-    Space: 'space',
-};
 
 const tableSettings = {
     ...DEFAULT_TABLE_SETTINGS,
@@ -74,25 +69,23 @@ class Storage extends React.Component {
     };
 
     componentDidMount() {
-        const {tenant, nodeId, setVisibleEntities, storageType, getNodesList} =
-            this.props;
+        const {tenant, nodeId, setVisibleEntities, storageType, getNodesList} = this.props;
 
         this.autofetcher = new AutoFetcher();
         getNodesList();
         if (tenant || nodeId) {
-            setVisibleEntities(VisibleEntities.All);
+            setVisibleEntities(VISIBLE_ENTITIES.all);
             this.getStorageInfo({
-                filter: FILTER_OPTIONS.All,
                 type: storageType,
             });
         } else {
             this.getStorageInfo({
-                filter: FILTER_OPTIONS.Missing,
+                visibleEntities: VISIBLE_ENTITIES.missing,
                 type: storageType,
             });
             this.autofetcher.fetch(() =>
                 this.getStorageInfo({
-                    filter: FILTER_OPTIONS.Missing,
+                    visibleEntities: VISIBLE_ENTITIES.missing,
                     type: storageType,
                 }),
             );
@@ -105,7 +98,7 @@ class Storage extends React.Component {
 
         const startFetch = () => {
             this.getStorageInfo({
-                filter: FILTER_OPTIONS[visibleEntities],
+                visibleEntities,
                 type: storageType,
             });
         };
@@ -115,7 +108,7 @@ class Storage extends React.Component {
             this.autofetcher.start();
             this.autofetcher.fetch(() =>
                 this.getStorageInfo({
-                    filter: FILTER_OPTIONS[visibleEntities],
+                    visibleEntities,
                     type: storageType,
                 }),
             );
@@ -183,16 +176,16 @@ class Storage extends React.Component {
 
         return (
             <div className={b('table-wrapper')}>
-                {storageType === StorageTypes.groups && (
+                {storageType === STORAGE_TYPES.groups && (
                     <StorageGroups
                         visibleEntities={visibleEntities}
                         data={flatListStorageEntities}
                         tableSettings={tableSettings}
                         nodes={nodes}
-                        onShowAll={() => this.onGroupVisibilityChange(VisibleEntities.All)}
+                        onShowAll={() => this.onGroupVisibilityChange(VISIBLE_ENTITIES.all)}
                     />
                 )}
-                {storageType === StorageTypes.nodes && (
+                {storageType === STORAGE_TYPES.nodes && (
                     <StorageNodes
                         visibleEntities={visibleEntities}
                         nodesUptimeFilter={nodesUptimeFilter}
@@ -221,7 +214,7 @@ class Storage extends React.Component {
     };
 
     onShowAllNodes = () => {
-        this.onGroupVisibilityChange(VisibleEntities.All);
+        this.onGroupVisibilityChange(VISIBLE_ENTITIES.all);
         this.onUptimeFilterChange(NodesUptimeFilterValues.All);
     };
 
@@ -229,8 +222,8 @@ class Storage extends React.Component {
         const {storageType, groupsCount, nodesCount, flatListStorageEntities, loading, wasLoaded} =
             this.props;
 
-        const entityName = storageType === StorageTypes.groups ? 'Groups' : 'Nodes';
-        const count = storageType === StorageTypes.groups ? groupsCount : nodesCount;
+        const entityName = storageType === STORAGE_TYPES.groups ? 'Groups' : 'Nodes';
+        const count = storageType === STORAGE_TYPES.groups ? groupsCount : nodesCount;
 
         return (
             <EntitiesCount
@@ -259,7 +252,7 @@ class Storage extends React.Component {
                 <div className={b('search')}>
                     <Search
                         placeholder={
-                            storageType === StorageTypes.groups
+                            storageType === STORAGE_TYPES.groups
                                 ? 'Group ID, Pool name'
                                 : 'Node ID, FQDN'
                         }
@@ -268,32 +261,17 @@ class Storage extends React.Component {
                     />
                 </div>
 
-                <RadioButton value={storageType} onUpdate={this.onStorageTypeChange}>
-                    <RadioButton.Option value={StorageTypes.groups}>
-                        {StorageTypes.groups}
-                    </RadioButton.Option>
-                    <RadioButton.Option value={StorageTypes.nodes}>
-                        {StorageTypes.nodes}
-                    </RadioButton.Option>
-                </RadioButton>
+                <StorageTypeFilter value={storageType} onChange={this.onStorageTypeChange} />
+                <StorageVisibleEntityFilter
+                    value={visibleEntities}
+                    onChange={this.onGroupVisibilityChange}
+                />
 
-                <RadioButton value={visibleEntities} onUpdate={this.onGroupVisibilityChange}>
-                    <RadioButton.Option value={VisibleEntities.Missing}>
-                        {VisibleEntitiesTitles[VisibleEntities.Missing]}
-                    </RadioButton.Option>
-                    <RadioButton.Option value={VisibleEntities.Space}>
-                        {VisibleEntitiesTitles[VisibleEntities.Space]}
-                    </RadioButton.Option>
-                    <RadioButton.Option value={VisibleEntities.All}>
-                        {VisibleEntitiesTitles[VisibleEntities.All]}
-                    </RadioButton.Option>
-                </RadioButton>
-
-                {storageType === StorageTypes.nodes && (
+                {storageType === STORAGE_TYPES.nodes && (
                     <UptimeFilter value={nodesUptimeFilter} onChange={this.onUptimeFilterChange} />
                 )}
 
-                {storageType === StorageTypes.groups && (
+                {storageType === STORAGE_TYPES.groups && (
                     <UsageFilter
                         value={usageFilter}
                         onChange={setUsageFilter}

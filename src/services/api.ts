@@ -28,7 +28,8 @@ import type {DescribeTopicResult} from '../types/api/topic';
 import type {TEvPDiskStateResponse} from '../types/api/pdisk';
 import type {TEvVDiskStateResponse} from '../types/api/vdisk';
 import type {TUserToken} from '../types/api/whoami';
-import type {INodesApiRequestParams} from '../types/store/nodes';
+import type {NodesApiRequestParams} from '../store/reducers/nodes/types';
+import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 
 import {backend as BACKEND} from '../store';
 
@@ -81,14 +82,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         });
     }
     getNodes(
-        {tenant, filter, storage, type = 'any', tablets = true}: INodesApiRequestParams,
+        {tenant, visibleEntities, storage, type = 'any', tablets = true}: NodesApiRequestParams,
         {concurrentId}: AxiosOptions = {},
     ) {
         return this.get<TNodesInfo>(
             this.getPath('/viewer/json/nodes?enums=true'),
             {
                 tenant,
-                with: filter,
+                with: visibleEntities,
                 storage,
                 type,
                 tablets,
@@ -102,15 +103,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         return this.get<TComputeInfo>(this.getPath('/viewer/json/compute?enums=true'), {path});
     }
     getStorageInfo(
-        {
-            tenant,
-            filter,
-            nodeId,
-        }: {
-            tenant?: string;
-            filter?: string;
-            nodeId: string;
-        },
+        {tenant, visibleEntities, nodeId}: StorageApiRequestParams,
         {concurrentId}: AxiosOptions = {},
     ) {
         return this.get<TStorageInfo>(
@@ -118,7 +111,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {
                 tenant,
                 node_id: nodeId,
-                with: filter,
+                with: visibleEntities,
             },
             {
                 concurrentId,

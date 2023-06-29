@@ -1,31 +1,16 @@
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 
-import {calcUptime} from '../../utils';
-import {getUsage} from '../../utils/storage';
-import {NodesUptimeFilterValues} from '../../utils/nodes';
-import {getPDiskType} from '../../utils/pdisk';
-import '../../services/api';
+import {calcUptime} from '../../../utils';
+import {getUsage} from '../../../utils/storage';
+import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {getPDiskType} from '../../../utils/pdisk';
+import '../../../services/api';
 
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import {filterNodesByUptime} from './nodes';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {filterNodesByUptime} from '../nodes/nodes';
 
-export const VisibleEntities = {
-    All: 'All',
-    Missing: 'Missing',
-    Space: 'Space',
-};
-
-export const VisibleEntitiesTitles = {
-    [VisibleEntities.All]: 'All',
-    [VisibleEntities.Missing]: 'Degraded',
-    [VisibleEntities.Space]: 'Out of Space',
-};
-
-export const StorageTypes = {
-    groups: 'Groups',
-    nodes: 'Nodes',
-};
+import {VISIBLE_ENTITIES, STORAGE_TYPES} from './constants';
 
 const FETCH_STORAGE = createRequestActionTypes('storage', 'FETCH_STORAGE');
 const SET_INITIAL = 'storage/SET_INITIAL';
@@ -41,9 +26,9 @@ const initialState = {
     wasLoaded: false,
     filter: '',
     usageFilter: [],
-    visible: VisibleEntities.Missing,
+    visible: VISIBLE_ENTITIES.missing,
     nodesUptimeFilter: NodesUptimeFilterValues.All,
-    type: StorageTypes.groups,
+    type: STORAGE_TYPES.groups,
 };
 
 const storage = (state = initialState, action) => {
@@ -134,16 +119,16 @@ export function setInitialState() {
     };
 }
 
-export function getStorageInfo({tenant, filter, nodeId, type}, {concurrentId}) {
-    if (type === StorageTypes.nodes) {
+export function getStorageInfo({tenant, visibleEntities, nodeId, type}, {concurrentId}) {
+    if (type === STORAGE_TYPES.nodes) {
         return createApiRequest({
-            request: window.api.getNodes({tenant, filter, type: 'static'}, {concurrentId}),
+            request: window.api.getNodes({tenant, visibleEntities, type: 'static'}, {concurrentId}),
             actions: FETCH_STORAGE,
         });
     }
 
     return createApiRequest({
-        request: window.api.getStorageInfo({tenant, filter, nodeId}, {concurrentId}),
+        request: window.api.getStorageInfo({tenant, visibleEntities, nodeId}, {concurrentId}),
         actions: FETCH_STORAGE,
     });
 }
@@ -343,7 +328,7 @@ export const getVDisksForPDisk = createSelector(
 export const getFlatListStorage = createSelector(
     [getStorageType, getFlatListStorageGroups, getFlatListStorageNodes],
     (storageType, groupsList, nodesList) => {
-        if (storageType === StorageTypes.groups) {
+        if (storageType === STORAGE_TYPES.groups) {
             return groupsList;
         }
         return nodesList;
@@ -353,9 +338,9 @@ export const getFlatListStorage = createSelector(
 export const getVisibleEntitiesList = createSelector(
     [getVisibleEntities, getFlatListStorage],
     (visibleGroups, storageList) => {
-        if (visibleGroups === VisibleEntities.All) {
+        if (visibleGroups === VISIBLE_ENTITIES.all) {
             return storageList;
-        } else if (visibleGroups === VisibleEntities.Missing) {
+        } else if (visibleGroups === VISIBLE_ENTITIES.missing) {
             return _.filter(storageList, (g) => g.Missing > 0);
         } else {
             return _.filter(storageList, (g) => g.UsedSpaceFlag > 100);
@@ -371,7 +356,7 @@ const filterByText = (entities, type, text) => {
     }
 
     return entities.filter((entity) => {
-        if (type === StorageTypes.groups) {
+        if (type === STORAGE_TYPES.groups) {
             return (
                 entity.PoolName.toLowerCase().includes(cleanedFilter) ||
                 entity.GroupID?.toString().includes(cleanedFilter)
@@ -409,7 +394,7 @@ export const getFilteredEntities = createSelector(
         result = filterByText(result, type, textFilter);
         result = filterByUsage(result, usageFilter);
 
-        if (type === StorageTypes.nodes) {
+        if (type === STORAGE_TYPES.nodes) {
             result = filterNodesByUptime(result, nodesUptimeFilter);
         }
 

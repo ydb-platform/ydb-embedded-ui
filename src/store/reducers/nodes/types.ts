@@ -1,22 +1,23 @@
-import type {IResponseError} from '../api/error';
-import type {TEndpoint, TPoolStats} from '../api/nodes';
-import type {TTabletStateInfo as TComputeTabletStateInfo} from '../api/compute';
-import type {TTabletStateInfo as TFullTabletStateInfo} from '../api/tablet';
-import type {EFlag} from '../api/enums';
+import type {IResponseError} from '../../../types/api/error';
+import type {TEndpoint, TPoolStats} from '../../../types/api/nodes';
+import type {TTabletStateInfo as TComputeTabletStateInfo} from '../../../types/api/compute';
+import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
+import type {EFlag} from '../../../types/api/enums';
+import type {ApiRequestAction} from '../../utils';
+import type {VisibleEntities} from '../storage/types';
 
-import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {
     FETCH_NODES,
     resetNodesState,
     setDataWasNotLoaded,
     setNodesUptimeFilter,
     setSearchValue,
-} from '../../store/reducers/nodes';
-import {ApiRequestAction} from '../../store/utils';
+} from './nodes';
 
 // Since nodes from different endpoints can have different types,
 // This type describes fields, that are expected by tables with nodes
-export interface INodesPreparedEntity {
+export interface NodesPreparedEntity {
     NodeId: number;
     Host?: string;
     SystemState?: EFlag;
@@ -33,43 +34,39 @@ export interface INodesPreparedEntity {
     Endpoints?: TEndpoint[];
 }
 
-export interface INodesState {
+export interface NodesState {
     loading: boolean;
     wasLoaded: boolean;
     nodesUptimeFilter: NodesUptimeFilterValues;
     searchValue: string;
-    data?: INodesPreparedEntity[];
+    data?: NodesPreparedEntity[];
     totalNodes?: number;
     error?: IResponseError;
 }
 
-type INodesApiRequestNodeType = 'static' | 'dynamic' | 'any';
+export type NodeType = 'static' | 'dynamic' | 'any';
 
-// Space - out of space nodes
-// Missing - nodes with missing disks
-type INodesApiRequestProblemType = 'missing' | 'space';
-
-export interface INodesApiRequestParams {
+export interface NodesApiRequestParams {
     tenant?: string;
-    type?: INodesApiRequestNodeType;
-    filter?: INodesApiRequestProblemType;
+    type?: NodeType;
+    visibleEntities?: VisibleEntities;
     storage?: boolean;
     tablets?: boolean;
 }
 
-export interface INodesHandledResponse {
-    Nodes?: INodesPreparedEntity[];
+export interface NodesHandledResponse {
+    Nodes?: NodesPreparedEntity[];
     TotalNodes: number;
 }
 
-type INodesApiRequestAction = ApiRequestAction<
+type NodesApiRequestAction = ApiRequestAction<
     typeof FETCH_NODES,
-    INodesHandledResponse,
+    NodesHandledResponse,
     IResponseError
 >;
 
-export type INodesAction =
-    | INodesApiRequestAction
+export type NodesAction =
+    | NodesApiRequestAction
     | (
           | ReturnType<typeof setDataWasNotLoaded>
           | ReturnType<typeof setNodesUptimeFilter>
@@ -77,6 +74,6 @@ export type INodesAction =
           | ReturnType<typeof resetNodesState>
       );
 
-export interface INodesRootStateSlice {
-    nodes: INodesState;
+export interface NodesStateSlice {
+    nodes: NodesState;
 }
