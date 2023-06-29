@@ -117,7 +117,7 @@ function StorageNodes({
             name: TableColumnsIds.uptime,
             header: tableColumnsNames[TableColumnsIds.uptime],
             width: 130,
-            sortAccessor: ({StartTime}) => -StartTime,
+            sortAccessor: ({StartTime}) => (StartTime ? -StartTime : 0),
             align: DataTable.RIGHT,
         },
         {
