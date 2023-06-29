@@ -3,7 +3,7 @@ import {Locator, Page} from '@playwright/test';
 import {BaseModel} from '../../../models/BaseModel';
 import {selectContentTable} from '../../../utils/selectContentTable';
 
-type QueryMode = 'Script' | 'Scan';
+type QueryMode = 'YQL Script' | 'Scan';
 type ExplainResultType = 'Schema' | 'JSON' | 'AST';
 
 const queryModeSelectorQa = 'query-mode-selector';
