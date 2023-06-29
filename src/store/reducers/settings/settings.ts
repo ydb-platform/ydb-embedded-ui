@@ -13,10 +13,11 @@ import {
     QUERY_INITIAL_MODE_KEY,
     ENABLE_ADDITIONAL_QUERY_MODES,
     CLUSTER_INFO_HIDDEN_KEY,
+    LAST_USED_QUERY_ACTION_KEY,
 } from '../../../utils/constants';
 import '../../../services/api';
 import {getValueFromLS, parseJson} from '../../../utils/utils';
-import {QueryModes} from '../../../types/store/query';
+import {QUERY_ACTIONS, QUERY_MODES} from '../../../utils/query';
 
 import {TENANT_PAGES_IDS} from '../tenant/constants';
 
@@ -64,7 +65,14 @@ export const initialState = {
             TENANT_INITIAL_PAGE_KEY,
             TENANT_PAGES_IDS.query,
         ),
-        [QUERY_INITIAL_MODE_KEY]: readSavedSettingsValue(QUERY_INITIAL_MODE_KEY, QueryModes.script),
+        [QUERY_INITIAL_MODE_KEY]: readSavedSettingsValue(
+            QUERY_INITIAL_MODE_KEY,
+            QUERY_MODES.script,
+        ),
+        [LAST_USED_QUERY_ACTION_KEY]: readSavedSettingsValue(
+            LAST_USED_QUERY_ACTION_KEY,
+            QUERY_ACTIONS.execute,
+        ),
         [ASIDE_HEADER_COMPACT_KEY]: readSavedSettingsValue(ASIDE_HEADER_COMPACT_KEY, 'true'),
         [PARTITIONS_HIDDEN_COLUMNS_KEY]: readSavedSettingsValue(PARTITIONS_HIDDEN_COLUMNS_KEY),
         [CLUSTER_INFO_HIDDEN_KEY]: readSavedSettingsValue(CLUSTER_INFO_HIDDEN_KEY, 'true'),

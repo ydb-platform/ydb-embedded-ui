@@ -1,3 +1,5 @@
+import {QUERY_ACTIONS, QUERY_MODES} from '../../utils/query';
+
 import type {NetworkError} from '../api/error';
 import type {
     KeyValueRow,
@@ -7,6 +9,7 @@ import type {
     QueryPlan,
     TKqpStatsQuery,
 } from '../api/query';
+import type {ValueOf} from '../common';
 
 export interface IQueryResult {
     result?: KeyValueRow[];
@@ -23,12 +26,8 @@ export interface QueryRequestParams {
 
 export type QueryError = NetworkError | ErrorResponse;
 
-export enum QueryModes {
-    scan = 'scan',
-    script = 'script',
-    data = 'data',
-    query = 'query',
-}
+export type QueryAction = ValueOf<typeof QUERY_ACTIONS>;
+export type QueryMode = ValueOf<typeof QUERY_MODES>;
 
 export interface SavedQuery {
     name: string;

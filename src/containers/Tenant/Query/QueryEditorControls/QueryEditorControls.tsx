@@ -1,9 +1,10 @@
 import block from 'bem-cn-lite';
 
-import {Button, DropdownMenu} from '@gravity-ui/uikit';
+import {Button, ButtonView, DropdownMenu} from '@gravity-ui/uikit';
 import {useMemo} from 'react';
 
-import {QueryModes} from '../../../../types/store/query';
+import type {QueryAction, QueryMode} from '../../../../types/store/query';
+import {QUERY_MODES} from '../../../../utils/query';
 import {Icon} from '../../../../components/Icon';
 
 import SaveQuery from '../SaveQuery/SaveQuery';
@@ -18,28 +19,29 @@ const queryModeSelectorPopupQa = 'query-mode-selector-popup';
 const b = block('ydb-query-editor-controls');
 
 const OldQueryModeSelectorTitles = {
-    [QueryModes.script]: 'Script',
-    [QueryModes.scan]: 'Scan',
+    [QUERY_MODES.script]: 'Script',
+    [QUERY_MODES.scan]: 'Scan',
 } as const;
 
 const QueryModeSelectorTitles = {
-    [QueryModes.script]: 'Script',
-    [QueryModes.scan]: 'Scan',
-    [QueryModes.data]: 'Data',
-    [QueryModes.query]: 'Query',
+    [QUERY_MODES.script]: 'Script',
+    [QUERY_MODES.scan]: 'Scan',
+    [QUERY_MODES.data]: 'Data',
+    [QUERY_MODES.query]: 'Query',
 } as const;
 
 interface QueryEditorControlsProps {
-    onRunButtonClick: (mode?: QueryModes) => void;
+    onRunButtonClick: (mode?: QueryMode) => void;
     runIsLoading: boolean;
-    onExplainButtonClick: (mode?: QueryModes) => void;
+    onExplainButtonClick: (mode?: QueryMode) => void;
     explainIsLoading: boolean;
     onSaveQueryClick: (queryName: string) => void;
     savedQueries: unknown;
     disabled: boolean;
-    onUpdateQueryMode: (mode: QueryModes) => void;
-    queryMode: QueryModes;
+    onUpdateQueryMode: (mode: QueryMode) => void;
+    queryMode: QueryMode;
     enableAdditionalQueryModes: boolean;
+    highlitedAction: QueryAction;
 }
 
 export const QueryEditorControls = ({
@@ -52,6 +54,7 @@ export const QueryEditorControls = ({
     disabled,
     onUpdateQueryMode,
     queryMode,
+    highlitedAction,
     enableAdditionalQueryModes,
 }: QueryEditorControlsProps) => {
     const querySelectorMenuItems = useMemo(() => {
@@ -63,11 +66,15 @@ export const QueryEditorControls = ({
             return {
                 text: title,
                 action: () => {
-                    onUpdateQueryMode(mode as QueryModes);
+                    onUpdateQueryMode(mode as QueryMode);
                 },
             };
         });
     }, [onUpdateQueryMode, enableAdditionalQueryModes]);
+
+    const runView: ButtonView | undefined = highlitedAction === 'execute' ? 'action' : undefined;
+    const explainView: ButtonView | undefined =
+        highlitedAction === 'explain' ? 'action' : undefined;
 
     return (
         <div className={b()}>
@@ -77,9 +84,9 @@ export const QueryEditorControls = ({
                         onClick={() => {
                             onRunButtonClick(queryMode);
                         }}
-                        view="action"
                         disabled={disabled}
                         loading={runIsLoading}
+                        view={runView}
                     >
                         <Icon name="startPlay" viewBox="0 0 16 16" width={16} height={16} />
                         {'Run'}
@@ -91,6 +98,7 @@ export const QueryEditorControls = ({
                     }}
                     disabled={disabled}
                     loading={explainIsLoading}
+                    view={explainView}
                 >
                     Explain
                 </Button>

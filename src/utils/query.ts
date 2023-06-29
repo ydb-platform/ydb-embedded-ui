@@ -9,6 +9,18 @@ import type {
 } from '../types/api/query';
 import type {IQueryResult} from '../types/store/query';
 
+export const QUERY_ACTIONS = {
+    execute: 'execute',
+    explain: 'explain',
+} as const;
+
+export const QUERY_MODES = {
+    scan: 'scan',
+    script: 'script',
+    data: 'data',
+    query: 'query',
+} as const;
+
 // eslint-disable-next-line complexity
 export const getColumnType = (type: string) => {
     switch (type.replace(/\?$/, '')) {

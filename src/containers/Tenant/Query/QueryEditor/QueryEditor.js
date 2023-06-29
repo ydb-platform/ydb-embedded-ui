@@ -26,9 +26,10 @@ import {
     SAVED_QUERIES_KEY,
     QUERY_INITIAL_MODE_KEY,
     ENABLE_ADDITIONAL_QUERY_MODES,
+    LAST_USED_QUERY_ACTION_KEY,
 } from '../../../../utils/constants';
 import {useSetting} from '../../../../utils/hooks';
-import {QueryModes} from '../../../../types/store/query';
+import {QUERY_ACTIONS, QUERY_MODES} from '../../../../utils/query';
 
 import {
     PaneVisibilityActionTypes,
@@ -92,11 +93,12 @@ function QueryEditor(props) {
     const [isResultLoaded, setIsResultLoaded] = useState(false);
     const [queryMode, setQueryMode] = useSetting(QUERY_INITIAL_MODE_KEY);
     const [enableAdditionalQueryModes] = useSetting(ENABLE_ADDITIONAL_QUERY_MODES);
+    const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting(LAST_USED_QUERY_ACTION_KEY);
 
     useEffect(() => {
-        const isNewQueryMode = queryMode !== QueryModes.script && queryMode !== QueryModes.scan;
+        const isNewQueryMode = queryMode !== QUERY_MODES.script && queryMode !== QUERY_MODES.scan;
         if (!enableAdditionalQueryModes && isNewQueryMode) {
-            setQueryMode(QueryModes.script);
+            setQueryMode(QUERY_MODES.script);
         }
     }, [enableAdditionalQueryModes, queryMode, setQueryMode]);
 
@@ -169,16 +171,17 @@ function QueryEditor(props) {
         setMonacoHotKey(null);
         switch (monacoHotKey) {
             case MONACO_HOT_KEY_ACTIONS.sendQuery: {
-                return handleSendExecuteClick(queryMode);
+                if (lastUsedQueryAction === QUERY_ACTIONS.explain) {
+                    return handleGetExplainQueryClick(queryMode);
+                } else {
+                    return handleSendExecuteClick(queryMode);
+                }
             }
             case MONACO_HOT_KEY_ACTIONS.goPrev: {
                 return handlePreviousHistoryClick();
             }
             case MONACO_HOT_KEY_ACTIONS.goNext: {
                 return handleNextHistoryClick();
-            }
-            case MONACO_HOT_KEY_ACTIONS.getExplain: {
-                return handleGetExplainQueryClick();
             }
             default: {
                 return;
@@ -200,8 +203,8 @@ function QueryEditor(props) {
         editorRef.current = editor;
         editor.focus();
         editor.addAction({
-            id: 'run',
-            label: 'Run',
+            id: 'sendQuery',
+            label: 'Send query',
             keybindings: [
                 // eslint-disable-next-line no-bitwise
                 monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
@@ -239,22 +242,6 @@ function QueryEditor(props) {
             contextMenuOrder: 3,
             run: handleKeyBinding(MONACO_HOT_KEY_ACTIONS.goNext),
         });
-
-        editor.addAction({
-            id: 'explain',
-            label: 'Explain',
-            keybindings: [
-                // eslint-disable-next-line no-bitwise
-                monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_E,
-            ],
-            // A precondition for this action.
-            precondition: null,
-            // A rule to evaluate on top of the precondition in order to dispatch the keybindings.
-            keybindingContext: null,
-            contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
-            contextMenuOrder: 4,
-            run: handleKeyBinding(MONACO_HOT_KEY_ACTIONS.getExplain),
-        });
     };
     const onChange = (newValue) => {
         props.changeUserInput({input: newValue});
@@ -269,6 +256,7 @@ function QueryEditor(props) {
             setShowPreview,
         } = props;
 
+        setLastUsedQueryAction(QUERY_ACTIONS.execute);
         setResultType(RESULT_TYPES.EXECUTE);
         sendExecuteQuery({query: input, database: path, mode});
         setIsResultLoaded(true);
@@ -289,6 +277,7 @@ function QueryEditor(props) {
             setShowPreview,
         } = props;
 
+        setLastUsedQueryAction(QUERY_ACTIONS.explain);
         setResultType(RESULT_TYPES.EXPLAIN);
         getExplainQuery({
             query: input,
@@ -499,6 +488,7 @@ function QueryEditor(props) {
                 onUpdateQueryMode={setQueryMode}
                 queryMode={queryMode}
                 enableAdditionalQueryModes={enableAdditionalQueryModes}
+                highlitedAction={lastUsedQueryAction}
             />
         );
     };

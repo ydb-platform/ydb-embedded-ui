@@ -105,6 +105,7 @@ export const DEFAULT_TABLE_SETTINGS = {
 } as const;
 
 export const QUERY_INITIAL_MODE_KEY = 'query_initial_mode';
+export const LAST_USED_QUERY_ACTION_KEY = 'last_used_query_action';
 
 export const PARTITIONS_HIDDEN_COLUMNS_KEY = 'partitionsHiddenColumns';
 
