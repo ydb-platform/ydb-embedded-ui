@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.8.2...v4.9.0) (2023-06-30)
+
+
+### Features
+
+* **QueryEditor:** remove old controls, update setting ([#445](https://github.com/ydb-platform/ydb-embedded-ui/issues/445)) ([75efd44](https://github.com/ydb-platform/ydb-embedded-ui/commit/75efd444c8b8ba5213117ec9c33f6b9664855a2c))
+
+
+### Bug Fixes
+
+* **QueryEditor:** color last used query action, run on command ([#436](https://github.com/ydb-platform/ydb-embedded-ui/issues/436)) ([c4d3bb8](https://github.com/ydb-platform/ydb-embedded-ui/commit/c4d3bb81bc1cea8ec3fe2e5e7e18c997d94f5714))
+* **QueryEditor:** rename query modes ([#449](https://github.com/ydb-platform/ydb-embedded-ui/issues/449)) ([c93c9c1](https://github.com/ydb-platform/ydb-embedded-ui/commit/c93c9c17ba26e01c596009657cac02ecc9cc9ab0))
+* **StorageNodes:** sort by uptime ([#447](https://github.com/ydb-platform/ydb-embedded-ui/issues/447)) ([283cb81](https://github.com/ydb-platform/ydb-embedded-ui/commit/283cb81b3f4711ddc2bb991615729a9bda7e893c))
+* **Storage:** remove visible entities filter ([#448](https://github.com/ydb-platform/ydb-embedded-ui/issues/448)) ([b4d9489](https://github.com/ydb-platform/ydb-embedded-ui/commit/b4d948965cd349a54fe833a6b81ea3b087782735))
+
 ## [4.8.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.8.1...v4.8.2) (2023-06-27)
 
 
