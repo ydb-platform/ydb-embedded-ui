@@ -5,9 +5,8 @@ import {InternalLink} from '../../../components/InternalLink';
 import {Stack} from '../../../components/Stack/Stack';
 
 import routes, {createHref} from '../../../routes';
-import {getVDisksForPDisk} from '../../../store/reducers/storage/storage';
+import {selectVDisksForPDisk} from '../../../store/reducers/storage/selectors';
 import {TPDiskStateInfo, TPDiskState} from '../../../types/api/pdisk';
-import {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId} from '../../../utils';
 import {useTypedSelector} from '../../../utils/hooks';
 import {getPDiskType} from '../../../utils/pdisk';
@@ -58,11 +57,7 @@ export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
     // NodeId in data is required for the popup
     const data = useMemo(() => ({...rawData, NodeId: nodeId}), [rawData, nodeId]);
 
-    const vdisks: TVDiskStateInfo[] | undefined = useTypedSelector((state) =>
-        // @ts-expect-error selector is correct, but js infers broken type
-        // unignore after rewriting reducer in ts
-        getVDisksForPDisk(state, nodeId, data.PDiskId),
-    );
+    const vdisks = useTypedSelector((state) => selectVDisksForPDisk(state, nodeId, data.PDiskId));
 
     const [severity, setSeverity] = useState(getStateSeverity(data.State));
     const [isPopupVisible, setIsPopupVisible] = useState(false);
