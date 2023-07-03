@@ -10,10 +10,10 @@ import {Link} from 'react-router-dom';
 import {TABLETS, STORAGE, NODE_PAGES, OVERVIEW, STRUCTURE} from './NodePages';
 import {Tablets} from '../Tablets';
 import Storage from '../Storage/Storage';
-import NodeOverview from './NodeOverview/NodeOverview';
 import NodeStructure from './NodeStructure/NodeStructure';
 import {Loader} from '../../components/Loader';
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
+import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 
 import {getNodeInfo, resetNode} from '../../store/reducers/node/node';
 import routes, {createHref, parseQuery} from '../../routes';
@@ -128,7 +128,7 @@ function Node(props: NodeProps) {
             }
 
             case OVERVIEW: {
-                return <NodeOverview node={node} className={b('overview-wrapper')} />;
+                return <FullNodeViewer node={node} className={b('overview-wrapper')} />;
             }
 
             case STRUCTURE: {
