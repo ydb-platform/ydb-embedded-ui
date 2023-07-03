@@ -9,7 +9,7 @@ import {Loader} from '@gravity-ui/uikit';
 
 import {DateRange, DateRangeValues} from '../../../../components/DateRange';
 import {Search} from '../../../../components/Search';
-import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 
 import {changeUserInput} from '../../../../store/reducers/executeQuery';
 import {
@@ -23,7 +23,11 @@ import type {EPathType} from '../../../../types/api/schema';
 import type {ITopQueriesFilters} from '../../../../types/store/executeTopQueries';
 import type {IQueryResult} from '../../../../types/store/query';
 
-import {TENANT_PAGE, TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
+import {
+    TENANT_PAGE,
+    TENANT_PAGES_IDS,
+    TENANT_QUERY_TABS_ID,
+} from '../../../../store/reducers/tenant/constants';
 import {formatDateTime, formatNumber} from '../../../../utils';
 import {HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
@@ -50,7 +54,10 @@ const COLUMNS: Column<KeyValueRow>[] = [
         sortable: false,
         render: ({row}) => (
             <div className={b('query')}>
-                <TruncatedQuery value={row.QueryText} maxQueryHeight={MAX_QUERY_HEIGHT} />
+                <TruncatedQuery
+                    value={row.QueryText?.toString()}
+                    maxQueryHeight={MAX_QUERY_HEIGHT}
+                />
             </div>
         ),
     },

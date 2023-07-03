@@ -10,7 +10,7 @@ import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 
-import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {IconWrapper} from '../../../../components/Icon';
 
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
