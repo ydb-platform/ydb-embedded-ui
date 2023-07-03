@@ -104,8 +104,10 @@ function QueryEditor(props) {
 
     useEffect(() => {
         if (savedPath !== path) {
+            if (savedPath) {
+                changeUserInput({input: ''});
+            }
             setTenantPath(path);
-            changeUserInput({input: ''});
         }
     }, [changeUserInput, setTenantPath, path, savedPath]);
 
