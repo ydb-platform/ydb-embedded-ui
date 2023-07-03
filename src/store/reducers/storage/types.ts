@@ -16,7 +16,7 @@ import {
     setDataWasNotLoaded,
     setInitialState,
     setNodesUptimeFilter,
-    setStorageFilter,
+    setStorageTextFilter,
     setStorageType,
     setUsageFilter,
     setVisibleEntities,
@@ -81,7 +81,7 @@ export type StorageAction =
     | GetStorageInfoApiRequestAction
     | ReturnType<typeof setInitialState>
     | ReturnType<typeof setStorageType>
-    | ReturnType<typeof setStorageFilter>
+    | ReturnType<typeof setStorageTextFilter>
     | ReturnType<typeof setUsageFilter>
     | ReturnType<typeof setVisibleEntities>
     | ReturnType<typeof setNodesUptimeFilter>

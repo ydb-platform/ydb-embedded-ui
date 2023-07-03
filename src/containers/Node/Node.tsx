@@ -9,7 +9,7 @@ import {Link} from 'react-router-dom';
 
 import {TABLETS, STORAGE, NODE_PAGES, OVERVIEW, STRUCTURE} from './NodePages';
 import {Tablets} from '../Tablets';
-import Storage from '../Storage/Storage';
+import {Storage} from '../Storage/Storage';
 import NodeStructure from './NodeStructure/NodeStructure';
 import {Loader} from '../../components/Loader';
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
