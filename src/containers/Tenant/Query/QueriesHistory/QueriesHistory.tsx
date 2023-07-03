@@ -3,7 +3,7 @@ import block from 'bem-cn-lite';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 
-import TruncatedQuery from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {useTypedSelector} from '../../../../utils/hooks';

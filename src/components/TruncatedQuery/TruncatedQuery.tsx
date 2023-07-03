@@ -1,11 +1,15 @@
-import React from 'react';
 import cn from 'bem-cn-lite';
 
 import './TruncatedQuery.scss';
 
 const b = cn('kv-truncated-query');
 
-function TruncatedQuery({value, maxQueryHeight}) {
+interface TruncatedQueryProps {
+    value: string | undefined;
+    maxQueryHeight?: number;
+}
+
+export const TruncatedQuery = ({value = '', maxQueryHeight = 6}: TruncatedQueryProps) => {
     const lines = value.split('\n');
     const truncated = lines.length > maxQueryHeight;
 
@@ -14,13 +18,11 @@ function TruncatedQuery({value, maxQueryHeight}) {
         const message =
             '\n...\nThe request was truncated. Click on the line to show the full query on the query tab';
         return (
-            <React.Fragment>
+            <>
                 <span className={b()}>{content}</span>
                 <span className={b('message', {color: 'secondary'})}>{message}</span>
-            </React.Fragment>
+            </>
         );
     }
-    return value;
-}
-
-export default TruncatedQuery;
+    return <>{value}</>;
+};
