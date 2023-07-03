@@ -192,8 +192,8 @@ const filterNodesByProblemsStatus = (
     });
 };
 
-export const filterNodesByUptime = (
-    nodesList: NodesPreparedEntity[] = [],
+export const filterNodesByUptime = <T extends {StartTime?: string}>(
+    nodesList: T[] = [],
     nodesUptimeFilter: NodesUptimeFilterValues,
 ) => {
     if (nodesUptimeFilter === NodesUptimeFilterValues.All) {

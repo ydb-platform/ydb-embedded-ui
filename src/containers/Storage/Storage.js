@@ -16,17 +16,20 @@ import {EntitiesCount} from '../../components/EntitiesCount';
 import {
     getStorageInfo,
     setInitialState,
-    getFilteredEntities,
     setVisibleEntities,
     setStorageFilter,
     setUsageFilter,
     setStorageType,
     setNodesUptimeFilter,
     setDataWasNotLoaded,
-    getStoragePoolsGroupsCount,
-    getStorageNodesCount,
-    getUsageFilterOptions,
 } from '../../store/reducers/storage/storage';
+import {
+    selectFilteredGroups,
+    selectFilteredNodes,
+    selectStorageNodesCount,
+    selectStorageGroupsCount,
+    selectUsageFilterOptions,
+} from '../../store/reducers/storage/selectors';
 import {VISIBLE_ENTITIES, STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
 import StorageGroups from './StorageGroups/StorageGroups';
@@ -54,7 +57,8 @@ class Storage extends React.Component {
         database: PropTypes.bool,
         getStorageInfo: PropTypes.func,
         setInitialState: PropTypes.func,
-        flatListStorageEntities: PropTypes.array,
+        storageNodes: PropTypes.array,
+        storageGroups: PropTypes.array,
         groupsCount: PropTypes.object,
         nodesCount: PropTypes.object,
         setStorageFilter: PropTypes.func,
@@ -166,7 +170,8 @@ class Storage extends React.Component {
 
     renderDataTable() {
         const {
-            flatListStorageEntities,
+            storageNodes,
+            storageGroups,
             visibleEntities,
             nodesUptimeFilter,
             nodes,
@@ -179,7 +184,7 @@ class Storage extends React.Component {
                 {storageType === STORAGE_TYPES.groups && (
                     <StorageGroups
                         visibleEntities={visibleEntities}
-                        data={flatListStorageEntities}
+                        data={storageGroups}
                         tableSettings={tableSettings}
                         nodes={nodes}
                         onShowAll={() => this.onGroupVisibilityChange(VISIBLE_ENTITIES.all)}
@@ -189,7 +194,7 @@ class Storage extends React.Component {
                     <StorageNodes
                         visibleEntities={visibleEntities}
                         nodesUptimeFilter={nodesUptimeFilter}
-                        data={flatListStorageEntities}
+                        data={storageNodes}
                         tableSettings={tableSettings}
                         onShowAll={this.onShowAllNodes}
                         additionalNodesInfo={additionalNodesInfo}
@@ -219,18 +224,27 @@ class Storage extends React.Component {
     };
 
     renderEntitiesCount() {
-        const {storageType, groupsCount, nodesCount, flatListStorageEntities, loading, wasLoaded} =
-            this.props;
+        const {
+            storageType,
+            groupsCount,
+            nodesCount,
+            storageGroups,
+            storageNodes,
+            loading,
+            wasLoaded,
+        } = this.props;
 
         const entityName = storageType === STORAGE_TYPES.groups ? 'Groups' : 'Nodes';
         const count = storageType === STORAGE_TYPES.groups ? groupsCount : nodesCount;
+        const current =
+            storageType === STORAGE_TYPES.groups ? storageGroups.length : storageNodes.length;
 
         return (
             <EntitiesCount
                 label={entityName}
                 loading={loading && !wasLoaded}
                 total={count.total}
-                current={flatListStorageEntities.length}
+                current={current}
             />
         );
     }
@@ -318,11 +332,12 @@ function mapStateToProps(state) {
     } = state.storage;
 
     return {
-        flatListStorageEntities: getFilteredEntities(state),
-        groupsCount: getStoragePoolsGroupsCount(state),
+        storageNodes: selectFilteredNodes(state),
+        storageGroups: selectFilteredGroups(state),
+        nodesCount: selectStorageNodesCount(state),
+        groupsCount: selectStorageGroupsCount(state),
         autorefresh: state.schema.autorefresh,
         nodes: selectNodesMap(state),
-        nodesCount: getStorageNodesCount(state),
         loading,
         wasLoaded,
         error,
@@ -331,7 +346,7 @@ function mapStateToProps(state) {
         filter,
         usageFilter,
         nodesUptimeFilter,
-        usageFilterOptions: getUsageFilterOptions(state),
+        usageFilterOptions: selectUsageFilterOptions(state),
     };
 }
 

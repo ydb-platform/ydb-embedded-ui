@@ -57,7 +57,7 @@ export interface TBSGroupStateInfo {
     Encryption?: boolean;
 }
 
-interface THiveStorageGroupStats {
+export interface THiveStorageGroupStats {
     GroupID?: number;
     /** uint64 */
     AcquiredUnits?: string;
