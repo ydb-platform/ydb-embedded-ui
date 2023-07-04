@@ -35,7 +35,7 @@ import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
 } from '../../utils/paneVisibilityToggleHelpers';
-import Preview from '../../Preview/Preview';
+import {Preview} from '../../Preview/Preview';
 
 import {ExecuteResult} from '../ExecuteResult/ExecuteResult';
 import {ExplainResult} from '../ExplainResult/ExplainResult';
@@ -382,12 +382,8 @@ function QueryEditor(props) {
     };
 
     const renderPreview = () => {
-        const {path, type, currentSchema = {}} = props;
-        const partCount = currentSchema?.PathDescription?.TableStats?.PartCount;
-        // onExpandResultHandler();
-        return (
-            <Preview database={path} table={currentSchema.Path} type={type} partCount={partCount} />
-        );
+        const {path, type} = props;
+        return <Preview database={path} type={type} />;
     };
 
     const handlePreviousHistoryClick = () => {
