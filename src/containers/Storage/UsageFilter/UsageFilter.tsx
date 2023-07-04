@@ -3,7 +3,7 @@ import cn from 'bem-cn-lite';
 
 import {Select, SelectOption} from '@gravity-ui/uikit';
 
-import EntityStatus from "../../../components/EntityStatus/EntityStatus";
+import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 
 import {getUsageSeverityForEntityStatus} from '../utils';
 
@@ -27,14 +27,7 @@ interface UsageFilterProps {
 const b = cn('usage-filter');
 
 export const UsageFilter = (props: UsageFilterProps) => {
-    const {
-        className,
-        value = [],
-        groups = [],
-        onChange,
-        debounce = 200,
-        disabled,
-    } = props;
+    const {className, value = [], groups = [], onChange, debounce = 200, disabled} = props;
 
     const [filterValue, setFilterValue] = useState(value);
     const timer = useRef<number>();
@@ -50,11 +43,15 @@ export const UsageFilter = (props: UsageFilterProps) => {
         });
     }, [value]);
 
-    const options = useMemo(() => groups.map(({threshold, count}) => ({
-        value: String(threshold),
-        text: `${threshold}%`,
-        data: {count}
-    })), [groups]);
+    const options = useMemo(
+        () =>
+            groups.map(({threshold, count}) => ({
+                value: String(threshold),
+                text: `${threshold}%`,
+                data: {count},
+            })),
+        [groups],
+    );
 
     const handleUpdate = (newValue: string[]) => {
         setFilterValue(newValue);
@@ -67,17 +64,20 @@ export const UsageFilter = (props: UsageFilterProps) => {
 
     const maxWidth = Math.max(...groups.map(({count}) => count));
 
-    const renderOption = ({value, data, text}: SelectOption) => (
+    const renderOption = ({value: optionValue, data, text}: SelectOption) => (
         <div className={b('option')}>
             <EntityStatus
                 className={b('option-title')}
-                status={getUsageSeverityForEntityStatus(Number(value))}
+                status={getUsageSeverityForEntityStatus(Number(optionValue))}
                 name={text}
                 size="xs"
             />
             <div className={b('option-meta')}>
                 {i18n('groups_count', {count: data.count})}
-                <div className={b('option-bar')} style={{width: `${data.count / maxWidth * 100}%`}} />
+                <div
+                    className={b('option-bar')}
+                    style={{width: `${(data.count / maxWidth) * 100}%`}}
+                />
             </div>
         </div>
     );
