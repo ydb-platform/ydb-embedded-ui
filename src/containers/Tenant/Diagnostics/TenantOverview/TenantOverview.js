@@ -27,10 +27,13 @@ const renderName = (tenant) => {
         const {Name} = tenant;
         return (
             <div className={b('tenant-name-wrapper')}>
-                <EntityStatus status={tenant.State} />
-                <span className={b('tenant-name-trim')}>
-                    <span className={b('tenant-name')}>{Name}</span>
-                </span>
+                <EntityStatus
+                    status={tenant.State}
+                    name={Name}
+                    withLeftTrim
+                    hasClipboardButton
+                    clipboardButtonAlwaysVisible
+                />
             </div>
         );
     }
