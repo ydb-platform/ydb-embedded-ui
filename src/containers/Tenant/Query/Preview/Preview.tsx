@@ -4,18 +4,18 @@ import cn from 'bem-cn-lite';
 
 import {Loader, Button} from '@gravity-ui/uikit';
 
-import type {EPathType} from '../../../types/api/schema';
-import {sendQuery, setQueryOptions} from '../../../store/reducers/preview';
-import {setShowPreview} from '../../../store/reducers/schema/schema';
-import {prepareQueryError} from '../../../utils/query';
-import {useAutofetcher, useTypedSelector} from '../../../utils/hooks';
+import type {EPathType} from '../../../../types/api/schema';
+import {sendQuery, setQueryOptions} from '../../../../store/reducers/preview';
+import {setShowPreview} from '../../../../store/reducers/schema/schema';
+import {prepareQueryError} from '../../../../utils/query';
+import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 
-import {Icon} from '../../../components/Icon';
-import Fullscreen from '../../../components/Fullscreen/Fullscreen';
-import {QueryResultTable} from '../../../components/QueryResultTable';
-import EnableFullscreenButton from '../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {Icon} from '../../../../components/Icon';
+import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {QueryResultTable} from '../../../../components/QueryResultTable';
+import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 
-import {isTableType} from '../utils/schema';
+import {isTableType} from '../../utils/schema';
 
 import './Preview.scss';
 

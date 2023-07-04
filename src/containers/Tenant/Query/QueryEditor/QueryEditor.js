@@ -35,7 +35,7 @@ import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
 } from '../../utils/paneVisibilityToggleHelpers';
-import {Preview} from '../../Preview/Preview';
+import {Preview} from '../Preview/Preview';
 
 import {ExecuteResult} from '../ExecuteResult/ExecuteResult';
 import {ExplainResult} from '../ExplainResult/ExplainResult';
