@@ -117,7 +117,7 @@ const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
         Rack: systemState.Rack,
         Host: systemState.Host,
         Endpoints: systemState.Endpoints,
-        uptime: calcUptime(systemState.StartTime),
+        Uptime: calcUptime(systemState.StartTime),
         StartTime: systemState.StartTime,
         PDisks: node.PDisks,
         Missing: missing,
