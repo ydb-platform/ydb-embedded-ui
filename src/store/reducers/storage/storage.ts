@@ -124,7 +124,7 @@ export function getStorageInfo(
         nodeId?: string;
         type?: StorageType;
     },
-    {concurrentId}: {concurrentId: string},
+    {concurrentId}: {concurrentId?: string} = {},
 ) {
     if (type === STORAGE_TYPES.nodes) {
         return createApiRequest({
@@ -154,7 +154,7 @@ export function setStorageType(value: StorageType) {
     } as const;
 }
 
-export function setStorageFilter(value: string) {
+export function setStorageTextFilter(value: string) {
     return {
         type: SET_FILTER,
         data: value,

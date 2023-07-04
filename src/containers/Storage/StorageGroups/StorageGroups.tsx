@@ -44,7 +44,7 @@ type TableColumnsIdsValues = typeof TableColumnsIds[TableColumnsIdsKeys];
 
 interface StorageGroupsProps {
     data: any;
-    nodes: NodesMap;
+    nodes?: NodesMap;
     tableSettings: Settings;
     visibleEntities: VisibleEntities;
     onShowAll?: VoidFunction;

@@ -19,7 +19,7 @@ import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 import {InternalLink} from '../../components/InternalLink';
 import Tenants from '../Tenants/Tenants';
 import {Nodes} from '../Nodes/Nodes';
-import Storage from '../Storage/Storage';
+import {Storage} from '../Storage/Storage';
 import {Versions} from '../Versions/Versions';
 
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';

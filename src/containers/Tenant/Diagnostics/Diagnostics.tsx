@@ -13,14 +13,14 @@ import {useTypedSelector} from '../../../utils/hooks';
 import routes, {createHref} from '../../../routes';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema/schema';
-import { setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
+import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 
 import {Loader} from '../../../components/Loader';
 
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes';
-import Storage from '../../Storage/Storage';
+import {Storage} from '../../Storage/Storage';
 import {Tablets} from '../../Tablets';
 
 import Describe from './Describe/Describe';
@@ -130,7 +130,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Tablets path={currentSchemaPath} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.storage: {
-                return <Storage tenant={tenantNameString} database={true} />;
+                return <Storage tenant={tenantNameString} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.network: {
                 return <Network path={tenantNameString} />;
