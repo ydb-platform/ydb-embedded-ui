@@ -1,12 +1,19 @@
 {
   "controls.query-mode-selector_type": "Тип запроса:",
+
   "tabs.newQuery": "Новый запрос",
   "tabs.history": "История",
   "tabs.saved": "Сохраненные",
+
   "history.empty": "История пуста",
   "saved.empty": "Нет сохраненных запросов",
+
   "delete-dialog.header": "Удалить запрос",
   "delete-dialog.question": "Вы уверены что хотите удалить запрос",
   "delete-dialog.delete": "Удалить",
-  "delete-dialog.cancel": "Отменить"
+  "delete-dialog.cancel": "Отменить",
+
+  "preview.title": "Предпросмотр",
+  "preview.not-available": "Предпросмотр недоступен",
+  "preview.close": "Закрыть предпросмотр"
 }

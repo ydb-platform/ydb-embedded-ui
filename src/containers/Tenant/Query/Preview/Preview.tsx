@@ -17,6 +17,8 @@ import EnableFullscreenButton from '../../../../components/EnableFullscreenButto
 
 import {isTableType} from '../../utils/schema';
 
+import i18n from '../i18n';
+
 import './Preview.scss';
 
 const b = cn('kv-preview');
@@ -71,14 +73,15 @@ export const Preview = ({database, type}: PreviewProps) => {
         return (
             <div className={b('header')}>
                 <div className={b('title')}>
-                    Preview <div className={b('table-name')}>{currentSchemaPath}</div>
+                    {i18n('preview.title')}{' '}
+                    <div className={b('table-name')}>{currentSchemaPath}</div>
                 </div>
                 <div className={b('controls-left')}>
                     <EnableFullscreenButton disabled={Boolean(error)} />
                     <Button
                         view="flat-secondary"
                         onClick={handleClosePreview}
-                        title="Close preview"
+                        title={i18n('preview.close')}
                     >
                         <Icon name="close" viewBox={'0 0 16 16'} width={16} height={16} />
                     </Button>
@@ -98,7 +101,7 @@ export const Preview = ({database, type}: PreviewProps) => {
     let message;
 
     if (!isTableType(type)) {
-        message = <div className={b('message-container')}>Not available</div>;
+        message = <div className={b('message-container')}>{i18n('preview.not-available')}</div>;
     } else if (error) {
         message = <div className={b('message-container')}>{prepareQueryError(error)}</div>;
     }

@@ -1,12 +1,19 @@
 {
   "controls.query-mode-selector_type": "Query type:",
+
   "tabs.newQuery": "New query",
   "tabs.history": "History",
   "tabs.saved": "Saved",
+
   "history.empty": "History is empty",
   "saved.empty": "There are no saved queries",
+
   "delete-dialog.header": "Delete query",
   "delete-dialog.question": "Are you sure you want to delete query",
   "delete-dialog.delete": "Delete",
-  "delete-dialog.cancel": "Cancel"
+  "delete-dialog.cancel": "Cancel",
+
+  "preview.title": "Preview",
+  "preview.not-available": "Preview is not available",
+  "preview.close": "Close preview"
 }
