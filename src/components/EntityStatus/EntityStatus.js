@@ -31,6 +31,7 @@ class EntityStatus extends React.Component {
         label: PropTypes.string,
         iconPath: PropTypes.string,
         hasClipboardButton: PropTypes.bool,
+        clipboardButtonAlwaysVisible: PropTypes.bool,
         showStatus: PropTypes.bool,
         externalLink: PropTypes.bool,
         className: PropTypes.string,
@@ -47,6 +48,7 @@ class EntityStatus extends React.Component {
         externalLink: false,
         mode: 'color',
         withLeftTrim: false,
+        clipboardButtonAlwaysVisible: false,
     };
     renderIcon() {
         const {status, size, showStatus, mode} = this.props;
@@ -123,7 +125,7 @@ class EntityStatus extends React.Component {
                         component="span"
                         size="s"
                         className={b('clipboard-button', {
-                            visible: false,
+                            visible: this.props.clipboardButtonAlwaysVisible,
                         })}
                     >
                         <ClipboardButton text={name} size={16} />
