@@ -1,14 +1,15 @@
 import type {TFollowerGroup, TPartitionConfig, TTableStats} from '../../../types/api/schema';
 import type {TMetrics} from '../../../types/api/tenant';
-import {formatCPU, formatBytes, formatNumber, formatBps, formatDateTime} from '../../../utils';
+import {formatCPU, formatNumber, formatBps, formatDateTime} from '../../../utils';
+import {toFormattedSize} from '../../FormattedBytes/utils';
 
 import {createInfoFormatter} from '../utils';
 
 export const formatTabletMetricsItem = createInfoFormatter<TMetrics>({
     values: {
         CPU: formatCPU,
-        Memory: formatBytes,
-        Storage: formatBytes,
+        Memory: toFormattedSize,
+        Storage: toFormattedSize,
         Network: formatBps,
         ReadThroughput: formatBps,
         WriteThroughput: formatBps,
@@ -37,8 +38,8 @@ export const formatPartitionConfigItem = createInfoFormatter<TPartitionConfig>({
 
 export const formatTableStatsItem = createInfoFormatter<TTableStats>({
     values: {
-        DataSize: formatBytes,
-        IndexSize: formatBytes,
+        DataSize: toFormattedSize,
+        IndexSize: toFormattedSize,
         LastAccessTime: formatDateTime,
         LastUpdateTime: formatDateTime,
     },
