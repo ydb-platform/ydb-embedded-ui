@@ -1,4 +1,5 @@
-import {GIGABYTE, KILOBYTE, MEGABYTE} from '../constants';
+import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE} from '../constants';
+import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
 
 import i18n from './i18n';
@@ -20,13 +21,17 @@ const sizes = {
         value: GIGABYTE,
         label: i18n('gb'),
     },
+    tb: {
+        value: TERABYTE,
+        label: i18n('tb'),
+    },
 };
 
-export type IBytesSizes = keyof typeof sizes;
+export type BytesSizes = keyof typeof sizes;
 
 interface FormatBytesArgs {
     value: number | string | undefined;
-    size?: IBytesSizes;
+    size?: BytesSizes;
     precision?: number;
     withLabel?: boolean;
     isSpeed?: boolean;
@@ -44,6 +49,7 @@ export const formatBytesCustom = ({
     }
 
     let result = (Number(value) / sizes[size].value).toFixed(precision);
+    result = configuredNumeral(result).format();
 
     if (withLabel) {
         result += ` ${sizes[size].label}`;

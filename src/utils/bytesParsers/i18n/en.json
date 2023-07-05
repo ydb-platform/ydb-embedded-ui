@@ -3,5 +3,6 @@
   "kb": "KB",
   "mb": "MB",
   "gb": "GB",
+  "tb": "TB",
   "perSecond": "/s"
 }

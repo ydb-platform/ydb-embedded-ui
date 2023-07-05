@@ -1,13 +1,8 @@
-import numeral from 'numeral';
-import locales from 'numeral/locales'; // eslint-disable-line no-unused-vars
-
 import {dateTimeParse} from '@gravity-ui/date-utils';
 
-import {i18n} from './i18n';
 import {MEGABYTE, TERABYTE, GIGABYTE, DAY_IN_SECONDS} from './constants';
 import {isNumeric} from './utils';
-
-numeral.locale(i18n.lang);
+import {configuredNumeral} from './numeral';
 
 // Here you can't control displayed size and precision
 // If you need more custom format, use formatBytesCustom instead
@@ -17,7 +12,7 @@ export const formatBytes = (bytes) => {
     }
 
     // by agreement, display byte values in decimal scale
-    return numeral(bytes).format('0 b');
+    return configuredNumeral(bytes).format('0 b');
 };
 
 export const formatBps = (bytes) => {
@@ -45,7 +40,7 @@ export const formatUptime = (seconds) => {
     const days = Math.floor(seconds / DAY_IN_SECONDS);
     const remain = seconds % DAY_IN_SECONDS;
 
-    const uptime = [days && `${days}d`, numeral(remain).format('00:00:00')]
+    const uptime = [days && `${days}d`, configuredNumeral(remain).format('00:00:00')]
         .filter(Boolean)
         .join(' ');
 
@@ -76,7 +71,7 @@ export const formatNumber = (number) => {
         return '';
     }
 
-    return numeral(number).format();
+    return configuredNumeral(number).format();
 };
 
 export const formatCPU = (value) => {
@@ -84,7 +79,7 @@ export const formatCPU = (value) => {
         return '';
     }
 
-    return numeral(value / 1000000).format('0.00');
+    return configuredNumeral(value / 1000000).format('0.00');
 };
 
 export const formatDateTime = (value) => {
