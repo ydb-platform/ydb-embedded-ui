@@ -2,7 +2,7 @@ import {useState} from 'react';
 import cn from 'bem-cn-lite';
 import {Popover} from '@gravity-ui/uikit';
 
-import {formatBytesCustom, BytesSizes, IProcessSpeedStats} from '../../utils/bytesParsers';
+import {formatBytesCustom, BytesSizes, ProcessSpeedStats} from '../../utils/bytesParsers';
 
 import './SpeedMultiMeter.scss';
 
@@ -11,7 +11,7 @@ import i18n from './i18n';
 const b = cn('speed-multimeter');
 
 interface SpeedMultiMeterProps {
-    data?: IProcessSpeedStats;
+    data?: ProcessSpeedStats;
     speedSize?: BytesSizes;
     withValue?: boolean;
     withPopover?: boolean;

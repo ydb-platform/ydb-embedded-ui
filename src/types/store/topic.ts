@@ -1,12 +1,12 @@
 import {FETCH_TOPIC, cleanTopicData, setDataWasNotLoaded} from '../../store/reducers/topic';
 import type {ApiRequestAction} from '../../store/utils';
-import type {IProcessSpeedStats} from '../../utils/bytesParsers';
+import type {ProcessSpeedStats} from '../../utils/bytesParsers';
 import type {IResponseError} from '../api/error';
 import type {DescribeTopicResult} from '../api/topic';
 
 export interface IPreparedConsumerData {
     name: string | undefined;
-    readSpeed: IProcessSpeedStats;
+    readSpeed: ProcessSpeedStats;
 
     writeLag: number;
     readLag: number;
@@ -19,7 +19,7 @@ export interface IPreparedTopicStats {
     partitionsWriteLag: number;
     partitionsIdleTime: number;
 
-    writeSpeed: IProcessSpeedStats;
+    writeSpeed: ProcessSpeedStats;
 }
 
 export interface ITopicState {
