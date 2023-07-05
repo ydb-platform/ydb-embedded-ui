@@ -34,8 +34,8 @@ import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 import {AdditionalNodesInfo, NodesUptimeFilterValues} from '../../utils/nodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 
-import StorageGroups from './StorageGroups/StorageGroups';
-import StorageNodes from './StorageNodes/StorageNodes';
+import {StorageGroups} from './StorageGroups/StorageGroups';
+import {StorageNodes} from './StorageNodes/StorageNodes';
 import {StorageTypeFilter} from './StorageTypeFilter/StorageTypeFilter';
 import {StorageVisibleEntityFilter} from './StorageVisibleEntityFilter/StorageVisibleEntityFilter';
 import {UsageFilter} from './UsageFilter';
@@ -158,7 +158,6 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
                         visibleEntities={visibleEntities}
                         nodesUptimeFilter={nodesUptimeFilter}
                         data={storageNodes}
-                        nodes={nodesMap}
                         tableSettings={tableSettings}
                         onShowAll={handleShowAllNodes}
                         additionalNodesInfo={additionalNodesInfo}

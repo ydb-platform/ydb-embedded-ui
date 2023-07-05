@@ -1,12 +1,10 @@
-import _ from 'lodash';
 import cn from 'bem-cn-lite';
 
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import type {NodesMap} from '../../../types/store/nodesList';
-import type {TVDiskStateInfo} from '../../../types/api/vdisk';
-import type {VisibleEntities} from '../../../store/reducers/storage/types';
+import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
 
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
@@ -43,7 +41,7 @@ type TableColumnsIdsKeys = keyof typeof TableColumnsIds;
 type TableColumnsIdsValues = typeof TableColumnsIds[TableColumnsIdsKeys];
 
 interface StorageGroupsProps {
-    data: any;
+    data: PreparedStorageGroup[];
     nodes?: NodesMap;
     tableSettings: Settings;
     visibleEntities: VisibleEntities;
@@ -93,25 +91,25 @@ function setSortOrder(visibleEntities: VisibleEntities): SortOrder | undefined {
     }
 }
 
-function StorageGroups({
+export function StorageGroups({
     data,
     tableSettings,
     visibleEntities,
     nodes,
     onShowAll,
 }: StorageGroupsProps) {
-    const allColumns: Column<any>[] = [
+    const allColumns: Column<PreparedStorageGroup>[] = [
         {
             name: TableColumnsIds.PoolName,
             header: tableColumnsNames[TableColumnsIds.PoolName],
             width: 250,
-            render: ({value}) => {
-                const splitted = (value as string)?.split('/');
+            render: ({row}) => {
+                const splitted = row.PoolName?.split('/');
                 return (
                     <div className={b('pool-name-wrapper')}>
                         {splitted && (
                             <Popover
-                                content={value as string}
+                                content={row.PoolName}
                                 placement={['right']}
                                 behavior={PopoverBehavior.Immediate}
                             >
@@ -129,9 +127,9 @@ function StorageGroups({
             name: TableColumnsIds.Type,
             header: tableColumnsNames[TableColumnsIds.Type],
             // prettier-ignore
-            render: ({value, row}) => (
+            render: ({row}) => (
                 <>
-                    <Label>{(value as string) || '—'}</Label>
+                    <Label>{row.Type || '—'}</Label>
                     {' '}
                     {row.Encryption && (
                         <Popover
@@ -157,8 +155,12 @@ function StorageGroups({
             name: TableColumnsIds.Missing,
             header: tableColumnsNames[TableColumnsIds.Missing],
             width: 100,
-            render: ({value, row}) =>
-                value ? <Label theme={getDegradedSeverity(row)}>Degraded: {value}</Label> : '-',
+            render: ({row}) =>
+                row.Missing ? (
+                    <Label theme={getDegradedSeverity(row)}>Degraded: {row.Missing}</Label>
+                ) : (
+                    '-'
+                ),
             align: DataTable.LEFT,
             defaultOrder: DataTable.DESCENDING,
         },
@@ -189,8 +191,8 @@ function StorageGroups({
             name: TableColumnsIds.GroupID,
             header: tableColumnsNames[TableColumnsIds.GroupID],
             width: 130,
-            render: ({value}) => {
-                return <span className={b('group-id')}>{value as number}</span>;
+            render: ({row}) => {
+                return <span className={b('group-id')}>{row.GroupID}</span>;
             },
             align: DataTable.RIGHT,
         },
@@ -198,8 +200,8 @@ function StorageGroups({
             name: TableColumnsIds.Used,
             header: tableColumnsNames[TableColumnsIds.Used],
             width: 100,
-            render: ({value}) => {
-                return bytesToGB(value, true);
+            render: ({row}) => {
+                return bytesToGB(row.Used, true);
             },
             align: DataTable.RIGHT,
         },
@@ -207,8 +209,8 @@ function StorageGroups({
             name: TableColumnsIds.Limit,
             header: tableColumnsNames[TableColumnsIds.Limit],
             width: 100,
-            render: ({value}) => {
-                return bytesToGB(value);
+            render: ({row}) => {
+                return bytesToGB(row.Limit);
             },
             align: DataTable.RIGHT,
         },
@@ -216,15 +218,17 @@ function StorageGroups({
             name: TableColumnsIds.UsedSpaceFlag,
             header: tableColumnsNames[TableColumnsIds.UsedSpaceFlag],
             width: 110,
-            render: ({value}) => {
-                const val = value as number;
+            render: ({row}) => {
+                const value = row.UsedSpaceFlag;
+
                 let color = 'Red';
-                if (val < 100) {
+
+                if (value < 100) {
                     color = 'Green';
-                } else if (val < 10000) {
+                } else if (value < 10000) {
                     color = 'Yellow';
-                } else if (val < 1000000) {
-                    value = 'Orange';
+                } else if (value < 1000000) {
+                    color = 'Orange';
                 }
                 return <EntityStatus status={color} />;
             },
@@ -235,8 +239,8 @@ function StorageGroups({
             name: TableColumnsIds.Read,
             header: tableColumnsNames[TableColumnsIds.Read],
             width: 100,
-            render: ({value}) => {
-                return value ? bytesToSpeed(value) : '-';
+            render: ({row}) => {
+                return row.Read ? bytesToSpeed(row.Read) : '-';
             },
             align: DataTable.RIGHT,
         },
@@ -244,8 +248,8 @@ function StorageGroups({
             name: TableColumnsIds.Write,
             header: tableColumnsNames[TableColumnsIds.Write],
             width: 100,
-            render: ({value}) => {
-                return value ? bytesToSpeed(value) : '-';
+            render: ({row}) => {
+                return row.Write ? bytesToSpeed(row.Write) : '-';
             },
             align: DataTable.RIGHT,
         },
@@ -253,14 +257,17 @@ function StorageGroups({
             name: TableColumnsIds.VDisks,
             className: b('vdisks-column'),
             header: tableColumnsNames[TableColumnsIds.VDisks],
-            render: ({value}) => (
+            render: ({row}) => (
                 <div className={b('vdisks-wrapper')}>
-                    {_.map(value as TVDiskStateInfo[], (el) => {
-                        const donors = el.Donors;
+                    {row.VDisks?.map((vDisk) => {
+                        const donors = vDisk.Donors;
 
                         return donors && donors.length > 0 ? (
-                            <Stack className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
-                                <VDisk data={el} nodes={nodes} />
+                            <Stack
+                                className={b('vdisks-item')}
+                                key={stringifyVdiskId(vDisk.VDiskId)}
+                            >
+                                <VDisk data={vDisk} nodes={nodes} />
                                 {donors.map((donor) => {
                                     const isFullData = isFullVDiskData(donor);
 
@@ -277,8 +284,8 @@ function StorageGroups({
                                 })}
                             </Stack>
                         ) : (
-                            <div className={b('vdisks-item')} key={stringifyVdiskId(el.VDiskId)}>
-                                <VDisk data={el} nodes={nodes} />
+                            <div className={b('vdisks-item')} key={stringifyVdiskId(vDisk.VDiskId)}>
+                                <VDisk data={vDisk} nodes={nodes} />
                             </div>
                         );
                     })}
@@ -330,7 +337,7 @@ function StorageGroups({
 
     return data ? (
         <DataTable
-            key={visibleEntities as string}
+            key={visibleEntities}
             theme="yandex-cloud"
             data={data}
             columns={columns}
@@ -340,5 +347,3 @@ function StorageGroups({
         />
     ) : null;
 }
-
-export default StorageGroups;

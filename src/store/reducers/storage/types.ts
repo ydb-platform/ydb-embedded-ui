@@ -26,11 +26,11 @@ export type VisibleEntities = ValueOf<typeof VISIBLE_ENTITIES>;
 export type StorageType = ValueOf<typeof STORAGE_TYPES>;
 
 export interface PreparedStorageNode extends TSystemStateInfo {
-    NodeId: number | undefined;
+    NodeId: number;
     PDisks: TPDiskStateInfo[] | undefined;
 
     Missing: number;
-    uptime: string;
+    Uptime: string;
 }
 
 export type RawStorageGroup = TBSGroupStateInfo & THiveStorageGroupStats;

@@ -1,9 +1,8 @@
-import _ from 'lodash';
 import cn from 'bem-cn-lite';
 
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 
-import type {VisibleEntities} from '../../../store/reducers/storage/types';
+import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {
@@ -25,7 +24,7 @@ enum TableColumnsIds {
     FQDN = 'FQDN',
     DataCenter = 'DataCenter',
     Rack = 'Rack',
-    uptime = 'uptime',
+    Uptime = 'Uptime',
     PDisks = 'PDisks',
     Missing = 'Missing',
 }
@@ -34,8 +33,7 @@ type TableColumnsIdsKeys = keyof typeof TableColumnsIds;
 type TableColumnsIdsValues = typeof TableColumnsIds[TableColumnsIdsKeys];
 
 interface StorageNodesProps {
-    data: any;
-    nodes: any;
+    data: PreparedStorageNode[];
     tableSettings: Settings;
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: keyof typeof NodesUptimeFilterValues;
@@ -48,7 +46,7 @@ const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
     FQDN: 'FQDN',
     DataCenter: 'DC',
     Rack: 'Rack',
-    uptime: 'Uptime',
+    Uptime: 'Uptime',
     PDisks: 'PDisks',
     Missing: 'Missing',
 };
@@ -75,7 +73,7 @@ function setSortOrder(visibleEntities: VisibleEntities): SortOrder | undefined {
     }
 }
 
-function StorageNodes({
+export function StorageNodes({
     data,
     tableSettings,
     visibleEntities,
@@ -85,7 +83,7 @@ function StorageNodes({
 }: StorageNodesProps) {
     const getNodeRef = additionalNodesInfo?.getNodeRef;
 
-    const allColumns: Column<any>[] = [
+    const allColumns: Column<PreparedStorageNode>[] = [
         {
             name: TableColumnsIds.NodeId,
             header: tableColumnsNames[TableColumnsIds.NodeId],
@@ -114,8 +112,8 @@ function StorageNodes({
             align: DataTable.LEFT,
         },
         {
-            name: TableColumnsIds.uptime,
-            header: tableColumnsNames[TableColumnsIds.uptime],
+            name: TableColumnsIds.Uptime,
+            header: tableColumnsNames[TableColumnsIds.Uptime],
             width: 130,
             sortAccessor: ({StartTime}) => (StartTime ? -StartTime : 0),
             align: DataTable.RIGHT,
@@ -131,11 +129,11 @@ function StorageNodes({
             name: TableColumnsIds.PDisks,
             className: b('pdisks-column'),
             header: tableColumnsNames[TableColumnsIds.PDisks],
-            render: ({value, row}) => (
+            render: ({row}) => (
                 <div className={b('pdisks-wrapper')}>
-                    {_.map(value as any, (el) => (
-                        <div className={b('pdisks-item')} key={el.PDiskId}>
-                            <PDisk data={el} nodeId={row.NodeId} />
+                    {row.PDisks?.map((pDisk) => (
+                        <div className={b('pdisks-item')} key={pDisk.PDiskId}>
+                            <PDisk data={pDisk} nodeId={row.NodeId} />
                         </div>
                     ))}
                 </div>
@@ -195,5 +193,3 @@ function StorageNodes({
         />
     ) : null;
 }
-
-export default StorageNodes;
