@@ -29,43 +29,11 @@ const sizes = {
 
 export type BytesSizes = keyof typeof sizes;
 
-interface FormatToSizeArgs {
-    value: number;
-    size?: BytesSizes;
-    precision?: number;
-    withLabel?: boolean;
-    isSpeed?: boolean;
-}
-
-const formatToSize = ({
-    value,
-    size = 'mb',
-    precision = 0,
-    withLabel = true,
-    isSpeed = false,
-}: FormatToSizeArgs) => {
-    let result = (Number(value) / sizes[size].value).toFixed(precision);
-    result = formatNumber(result);
-
-    if (withLabel) {
-        result += ` ${sizes[size].label}`;
-
-        if (isSpeed) {
-            result += i18n('perSecond');
-        }
-    }
-
-    return result;
-};
-
-interface FormatToSignificantDigitsArgs extends Omit<FormatToSizeArgs, 'size'> {
-    significantDigits?: number;
-}
-
 /**
  * This function is needed to keep more than 3 digits of the same size.
  *
  * @param significantDigits - number of digits above 3
+ * @returns size to format value to get required number of digits
  *
  * By default value converted to the next size when it's above 1000,
  * so we have 900mb and 1gb. To extend it additional significantDigits could be set
@@ -78,11 +46,7 @@ interface FormatToSignificantDigitsArgs extends Omit<FormatToSizeArgs, 'size'> {
  *
  * significantDigits = 3 - 900 000 mb and 1000 gb
  */
-const formatToSignificantDigits = ({
-    value,
-    significantDigits = 0,
-    ...params
-}: FormatToSignificantDigitsArgs) => {
+const getSizeWithSignificantDigits = (value: number, significantDigits: number) => {
     const multiplier = 10 ** significantDigits;
 
     const tbLevel = sizes.tb.value * multiplier;
@@ -105,27 +69,64 @@ const formatToSignificantDigits = ({
         size = 'tb';
     }
 
-    return formatToSize({value, size, ...params});
+    return size;
 };
 
-export type FormatBytesArgs = Omit<FormatToSizeArgs, 'value'> &
-    Omit<FormatToSignificantDigitsArgs, 'value'> & {
-        value: number | string | undefined;
-    };
+interface FormatToSizeArgs {
+    value: number;
+    size?: BytesSizes;
+    precision?: number;
+}
+
+const formatToSize = ({value, size = 'mb', precision = 0}: FormatToSizeArgs) => {
+    const result = (Number(value) / sizes[size].value).toFixed(precision);
+
+    return formatNumber(result);
+};
+
+const addSizeLabel = (result: string, size: BytesSizes) => {
+    return result + ` ${sizes[size].label}`;
+};
+
+const addSpeedLabel = (result: string, size: BytesSizes) => {
+    return addSizeLabel(result, size) + i18n('perSecond');
+};
+
+export type FormatBytesArgs = Omit<FormatToSizeArgs, 'value'> & {
+    value: number | string | undefined | null;
+    withSpeedLabel?: boolean;
+    withSizeLabel?: boolean;
+    significantDigits?: number;
+};
 
 /**
  * @param significantDigits - number of digits above 3
  */
-export const formatBytes = ({value, size, ...params}: FormatBytesArgs) => {
+export const formatBytes = ({
+    value,
+    size,
+    withSpeedLabel = false,
+    withSizeLabel = true,
+    significantDigits = 0,
+    ...params
+}: FormatBytesArgs) => {
     if (!isNumeric(value)) {
         return '';
     }
 
     const numValue = Number(value);
 
-    if (size) {
-        return formatToSize({value: numValue, size, ...params});
-    } else {
-        return formatToSignificantDigits({value: numValue, ...params});
+    const sizeToConvert = size ?? getSizeWithSignificantDigits(numValue, significantDigits);
+
+    const result = formatToSize({value: numValue, size: sizeToConvert, ...params});
+
+    if (withSpeedLabel) {
+        return addSpeedLabel(result, sizeToConvert);
     }
+
+    if (withSizeLabel) {
+        return addSizeLabel(result, sizeToConvert);
+    }
+
+    return result;
 };

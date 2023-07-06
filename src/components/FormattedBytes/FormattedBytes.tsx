@@ -2,9 +2,9 @@ import {FormatBytesArgs, formatBytes} from '../../utils/bytesParsers';
 
 type FormattedBytesProps = FormatBytesArgs;
 
-export const FormattedBytes = ({value, isSpeed, ...params}: FormattedBytesProps) => {
-    const formatted = formatBytes({value, isSpeed, ...params});
-    const bytes = formatBytes({value, isSpeed, size: 'b'});
+export const FormattedBytes = ({value, withSpeedLabel, ...params}: FormattedBytesProps) => {
+    const formatted = formatBytes({value, withSpeedLabel, ...params});
+    const bytes = formatBytes({value, withSpeedLabel, size: 'b'});
 
     return <span title={bytes}>{formatted}</span>;
 };

@@ -27,7 +27,7 @@ export const SpeedMultiMeter = ({
     const rawValues = [perMinute, perHour, perDay];
 
     const formatValue = (value: number) =>
-        formatBytes({value: value, size: speedSize, isSpeed: true});
+        formatBytes({value: value, size: speedSize, withSpeedLabel: true});
 
     const formattedValues = [
         {value: formatValue(perMinute), label: i18n('perMinute')},
