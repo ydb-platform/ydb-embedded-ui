@@ -289,7 +289,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 database,
                 action,
                 stats,
-                timeout: 600000,
+                timeout: 10 * 60 * 1000,
             },
             {},
             {
