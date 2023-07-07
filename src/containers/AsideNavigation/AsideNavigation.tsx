@@ -139,23 +139,23 @@ export const useGetLeftNavigationItems = () => {
 
         const items: MenuItem[] = [
             {
-                id: TENANT_PAGES_IDS.diagnostics,
-                title: 'Diagnostics',
+                id: TENANT_PAGES_IDS.query,
+                title: 'Query',
                 icon: squareChartBarIcon,
                 iconSize: 20,
                 location: getTenantPath({
                     ...queryParams,
-                    [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
+                    [TENANT_PAGE]: TENANT_PAGES_IDS.query,
                 }),
             },
             {
-                id: TENANT_PAGES_IDS.query,
-                title: 'Query',
+                id: TENANT_PAGES_IDS.diagnostics,
+                title: 'Diagnostics',
                 icon: pulseIcon,
                 iconSize: 20,
                 location: getTenantPath({
                     ...queryParams,
-                    [TENANT_PAGE]: TENANT_PAGES_IDS.query,
+                    [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
                 }),
             },
         ];
