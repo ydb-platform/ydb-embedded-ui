@@ -1,5 +1,5 @@
 import type {IResponseError} from '../../../types/api/error';
-import type {IProcessSpeedStats} from '../../../utils/bytesParsers';
+import type {ProcessSpeedStats} from '../../../utils/bytesParsers';
 import type {ApiRequestAction} from '../../utils';
 
 import {FETCH_PARTITIONS, setDataWasNotLoaded, setSelectedConsumer} from './partitions';
@@ -9,8 +9,8 @@ export interface PreparedPartitionData {
     partitionId: string;
     storeSize: string;
 
-    writeSpeed: IProcessSpeedStats;
-    readSpeed?: IProcessSpeedStats;
+    writeSpeed: ProcessSpeedStats;
+    readSpeed?: ProcessSpeedStats;
 
     partitionWriteLag: number;
     partitionWriteIdleTime: number;

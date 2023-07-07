@@ -2,7 +2,7 @@ import {useState} from 'react';
 import cn from 'bem-cn-lite';
 import {Popover} from '@gravity-ui/uikit';
 
-import {formatBytesCustom, IBytesSizes, IProcessSpeedStats} from '../../utils/bytesParsers';
+import {formatBytes, BytesSizes, ProcessSpeedStats} from '../../utils/bytesParsers';
 
 import './SpeedMultiMeter.scss';
 
@@ -11,8 +11,8 @@ import i18n from './i18n';
 const b = cn('speed-multimeter');
 
 interface SpeedMultiMeterProps {
-    data?: IProcessSpeedStats;
-    speedSize?: IBytesSizes;
+    data?: ProcessSpeedStats;
+    speedSize?: BytesSizes;
     withValue?: boolean;
     withPopover?: boolean;
 }
@@ -27,7 +27,7 @@ export const SpeedMultiMeter = ({
     const rawValues = [perMinute, perHour, perDay];
 
     const formatValue = (value: number) =>
-        formatBytesCustom({value: value, size: speedSize, isSpeed: true});
+        formatBytes({value: value, size: speedSize, withSpeedLabel: true});
 
     const formattedValues = [
         {value: formatValue(perMinute), label: i18n('perMinute')},

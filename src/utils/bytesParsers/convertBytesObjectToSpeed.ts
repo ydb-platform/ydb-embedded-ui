@@ -2,7 +2,7 @@ import type {MultipleWindowsStat} from '../../types/api/consumer';
 
 import {DAY_IN_SECONDS, HOUR_IN_SECONDS, MINUTE_IN_SECONDS} from '../constants';
 
-export interface IProcessSpeedStats {
+export interface ProcessSpeedStats {
     perMinute: number;
     perHour: number;
     perDay: number;
@@ -14,7 +14,7 @@ export interface IProcessSpeedStats {
  */
 export const convertBytesObjectToSpeed = (
     data: MultipleWindowsStat | undefined,
-): IProcessSpeedStats => {
+): ProcessSpeedStats => {
     return {
         perMinute:
             data && data.per_minute ? Math.round(Number(data.per_minute) / MINUTE_IN_SECONDS) : 0,
