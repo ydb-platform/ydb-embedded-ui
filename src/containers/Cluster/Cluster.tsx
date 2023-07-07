@@ -6,7 +6,11 @@ import qs from 'qs';
 
 import {Tabs} from '@gravity-ui/uikit';
 
-import type {AdditionalClusterProps, AdditionalVersionsProps} from '../../types/additionalProps';
+import type {
+    AdditionalClusterProps,
+    AdditionalTenantsProps,
+    AdditionalVersionsProps,
+} from '../../types/additionalProps';
 import type {AdditionalNodesInfo} from '../../utils/nodes';
 import routes from '../../routes';
 
@@ -17,7 +21,7 @@ import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../.
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 
 import {InternalLink} from '../../components/InternalLink';
-import Tenants from '../Tenants/Tenants';
+import {Tenants} from '../Tenants/Tenants';
 import {Nodes} from '../Nodes/Nodes';
 import {Storage} from '../Storage/Storage';
 import {Versions} from '../Versions/Versions';
@@ -30,7 +34,7 @@ import './Cluster.scss';
 const b = cn('cluster');
 
 interface ClusterProps {
-    additionalTenantsInfo?: unknown;
+    additionalTenantsProps?: AdditionalTenantsProps;
     additionalNodesInfo?: AdditionalNodesInfo;
     additionalClusterProps?: AdditionalClusterProps;
     additionalVersionsProps?: AdditionalVersionsProps;
@@ -38,7 +42,7 @@ interface ClusterProps {
 
 function Cluster({
     additionalClusterProps,
-    additionalTenantsInfo,
+    additionalTenantsProps,
     additionalNodesInfo,
     additionalVersionsProps,
 }: ClusterProps) {
@@ -97,7 +101,7 @@ function Cluster({
     const renderTab = () => {
         switch (activeTab) {
             case clusterTabsIds.tenants: {
-                return <Tenants additionalTenantsInfo={additionalTenantsInfo} />;
+                return <Tenants additionalTenantsProps={additionalTenantsProps} />;
             }
             case clusterTabsIds.nodes: {
                 return <Nodes additionalNodesInfo={additionalNodesInfo} />;

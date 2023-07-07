@@ -1,8 +1,10 @@
 import type {ValueOf} from '../../../types/common';
 import {changeFilter, ProblemFilterValues, SET_SETTING_VALUE} from './settings';
 
+export type ProblemFilterValue = ValueOf<typeof ProblemFilterValues>;
+
 export interface SettingsState {
-    problemFilter: ValueOf<typeof ProblemFilterValues>;
+    problemFilter: ProblemFilterValue;
     userSettings: Record<string, string | undefined>;
     systemSettings: Record<string, string | undefined>;
 }

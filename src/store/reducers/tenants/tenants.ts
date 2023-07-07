@@ -4,10 +4,13 @@ import '../../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 import type {TenantsAction, TenantsState} from './types';
+import {prepareTenants} from './utils';
 
 export const FETCH_TENANTS = createRequestActionTypes('tenants', 'FETCH_TENANTS');
 
-const initialState = {loading: true, wasLoaded: false};
+const SET_SEARCH_VALUE = 'tenants/SET_SEARCH_VALUE';
+
+const initialState = {loading: true, wasLoaded: false, searchValue: '', tenants: []};
 
 const tenants: Reducer<TenantsState, TenantsAction> = (state = initialState, action) => {
     switch (action.type) {
@@ -33,6 +36,12 @@ const tenants: Reducer<TenantsState, TenantsAction> = (state = initialState, act
                 loading: false,
             };
         }
+        case SET_SEARCH_VALUE: {
+            return {
+                ...state,
+                searchValue: action.data,
+            };
+        }
         default:
             return state;
     }
@@ -45,22 +54,20 @@ export function getTenantsInfo(clusterName?: string) {
         dataHandler: (response, getState) => {
             const {singleClusterMode} = getState();
 
-            if (singleClusterMode) {
-                return response.TenantInfo;
-            } else {
-                return response.TenantInfo?.map((tenant) => {
-                    const node = tenant.Nodes ? tenant.Nodes[0] : {};
-                    const address =
-                        node.Host && node.Endpoints
-                            ? node.Endpoints.find((endpoint) => endpoint.Name === 'http-mon')
-                                  ?.Address
-                            : undefined;
-                    const backend = node.Host ? `${node.Host}${address ? address : ''}` : undefined;
-                    return {...tenant, backend};
-                });
+            if (!response.TenantInfo) {
+                return [];
             }
+
+            return prepareTenants(response.TenantInfo, singleClusterMode);
         },
     });
 }
+
+export const setSearchValue = (value: string) => {
+    return {
+        type: SET_SEARCH_VALUE,
+        data: value,
+    } as const;
+};
 
 export default tenants;

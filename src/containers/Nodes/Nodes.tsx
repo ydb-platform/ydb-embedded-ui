@@ -5,7 +5,7 @@ import {useDispatch} from 'react-redux';
 import DataTable from '@gravity-ui/react-data-table';
 
 import type {EPathType} from '../../types/api/schema';
-import type {ValueOf} from '../../types/common';
+import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {Illustration} from '../../components/Illustration';
@@ -84,7 +84,7 @@ export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesPr
     };
 
     const handleProblemFilterChange = (value: string) => {
-        dispatch(changeFilter(value as ValueOf<typeof ProblemFilterValues>));
+        dispatch(changeFilter(value as ProblemFilterValue));
     };
 
     const handleUptimeFilterChange = (value: string) => {

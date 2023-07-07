@@ -2,13 +2,13 @@ import type {Reducer} from 'redux';
 import {createSelector, Selector} from 'reselect';
 import {escapeRegExp} from 'lodash/fp';
 
-import type {ValueOf} from '../../../types/common';
 import '../../../services/api';
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
 import {calcUptime, calcUptimeInSeconds} from '../../../utils';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {EFlag} from '../../../types/api/enums';
 
+import type {ProblemFilterValue} from '../settings/types';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 import {ProblemFilterValues} from '../settings/settings';
 
@@ -181,7 +181,7 @@ const getNodesList = (state: NodesStateSlice) => state.nodes.data;
 
 const filterNodesByProblemsStatus = (
     nodesList: NodesPreparedEntity[] = [],
-    problemFilter: ValueOf<typeof ProblemFilterValues>,
+    problemFilter: ProblemFilterValue,
 ) => {
     if (problemFilter === ProblemFilterValues.ALL) {
         return nodesList;
