@@ -282,19 +282,24 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         },
         {concurrentId}: AxiosOptions = {},
     ) {
+        // Time difference to ensure that timeout from ui will be shown rather than backend error
+        const uiTimeout = 9 * 60 * 1000;
+        const backendTimeout = 10 * 60 * 1000;
+
         return this.post<QueryAPIResponse<Action, Schema>>(
-            this.getPath(`/viewer/json/query${schema ? `?schema=${schema}` : ''}`),
+            this.getPath(
+                `/viewer/json/query?timeout=${backendTimeout}${schema ? `&schema=${schema}` : ''}`,
+            ),
             {
                 query,
                 database,
                 action,
                 stats,
-                timeout: 10 * 60 * 1000,
             },
             {},
             {
                 concurrentId,
-                timeout: 9 * 60 * 1000,
+                timeout: uiTimeout,
             },
         );
     }
