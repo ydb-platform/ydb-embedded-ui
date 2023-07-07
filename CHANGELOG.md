@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.9.0...v4.10.0) (2023-07-07)
+
+
+### Bug Fixes
+
+* **AsideNavigation:** swap icons ([#465](https://github.com/ydb-platform/ydb-embedded-ui/issues/465)) ([13bc92a](https://github.com/ydb-platform/ydb-embedded-ui/commit/13bc92a0150ee8d809b3811b528f5d31f4999815))
+* move sendQuery timeout to request query ([#464](https://github.com/ydb-platform/ydb-embedded-ui/issues/464)) ([6323038](https://github.com/ydb-platform/ydb-embedded-ui/commit/6323038b9e327a9e348812b43514008e9d07640c))
+* **QueryEditor:** do not reset input on empty savedPath ([#451](https://github.com/ydb-platform/ydb-embedded-ui/issues/451)) ([7f98e44](https://github.com/ydb-platform/ydb-embedded-ui/commit/7f98e44834b54bfc1398bb418909fae21e22a3dc))
+* show 5 digits size in table info ([#461](https://github.com/ydb-platform/ydb-embedded-ui/issues/461)) ([8c4ecc4](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c4ecc41ed41cad34debaa6ff7f39f1f10f8d974))
+* **TenantOverview:** add copy button to tenant name ([#459](https://github.com/ydb-platform/ydb-embedded-ui/issues/459)) ([2d8b380](https://github.com/ydb-platform/ydb-embedded-ui/commit/2d8b38049a038fb889e82d0135c026462107a124))
+* **UsageFilter:** fix bar flashes ([#457](https://github.com/ydb-platform/ydb-embedded-ui/issues/457)) ([ae1965e](https://github.com/ydb-platform/ydb-embedded-ui/commit/ae1965ec894c7d012f0ebfc5949b73d4499b390e))
+
 ## [4.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.8.2...v4.9.0) (2023-06-30)
 
 
