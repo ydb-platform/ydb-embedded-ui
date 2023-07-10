@@ -1,4 +1,5 @@
-import {TIndexDescription} from '../../../types/api/schema';
+import type {TIndexDescription} from '../../../types/api/schema';
+import {toFormattedSize} from '../../FormattedBytes/utils';
 
 import {createInfoFormatter} from '../utils';
 
@@ -8,6 +9,7 @@ export const formatTableIndexItem = createInfoFormatter<TIndexDescription>({
         State: (value) => value?.substring(11), // trims EIndexState prefix
         KeyColumnNames: (value) => value?.join(', '),
         DataColumnNames: (value) => value?.join(', '),
+        DataSize: toFormattedSize,
     },
     labels: {
         KeyColumnNames: 'Columns',
