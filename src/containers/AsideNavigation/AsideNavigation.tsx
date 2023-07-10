@@ -7,7 +7,7 @@ import cn from 'bem-cn-lite';
 import {Icon, Button} from '@gravity-ui/uikit';
 import {AsideHeader, MenuItem as AsideHeaderMenuItem, FooterItem} from '@gravity-ui/navigation';
 
-import squareChartBarIcon from '@gravity-ui/icons/svgs/square-chart-bar.svg';
+import terminalIcon from '@gravity-ui/icons/svgs/terminal.svg';
 import pulseIcon from '@gravity-ui/icons/svgs/pulse.svg';
 
 import signOutIcon from '../../assets/icons/signOut.svg';
@@ -141,7 +141,7 @@ export const useGetLeftNavigationItems = () => {
             {
                 id: TENANT_PAGES_IDS.query,
                 title: 'Query',
-                icon: squareChartBarIcon,
+                icon: terminalIcon,
                 iconSize: 20,
                 location: getTenantPath({
                     ...queryParams,
