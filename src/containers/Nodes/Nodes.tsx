@@ -9,11 +9,12 @@ import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {Illustration} from '../../components/Illustration';
-import {Loader} from '../../components/Loader';
 import {Search} from '../../components/Search';
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {UptimeFilter} from '../../components/UptimeFIlter';
 import {EntitiesCount} from '../../components/EntitiesCount';
+import {TableLayout} from '../../components/TableLayout/TableLayout';
+import {ResponseError} from '../../components/Errors/ResponseError';
 
 import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
 import {useAutofetcher, useSetting, useTypedSelector} from '../../utils/hooks';
@@ -42,11 +43,10 @@ const b = cn('ydb-nodes');
 interface NodesProps {
     path?: string;
     type?: EPathType;
-    className?: string;
     additionalNodesInfo?: AdditionalNodesInfo;
 }
 
-export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesProps) => {
+export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {
     const dispatch = useDispatch();
 
     const isClusterNodes = !path;
@@ -93,7 +93,7 @@ export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesPr
 
     const renderControls = () => {
         return (
-            <div className={b('controls')}>
+            <>
                 <Search
                     onChange={handleSearchQueryChange}
                     placeholder="Host name"
@@ -108,7 +108,7 @@ export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesPr
                     label={'Nodes'}
                     loading={loading && !wasLoaded}
                 />
-            </div>
+            </>
         );
     };
 
@@ -127,44 +127,34 @@ export const Nodes = ({path, type, className, additionalNodesInfo = {}}: NodesPr
         }
 
         return (
-            <div className={b('table-wrapper')}>
-                <div className={b('table-content')}>
-                    <DataTable
-                        theme="yandex-cloud"
-                        data={nodes || []}
-                        columns={columns}
-                        settings={DEFAULT_TABLE_SETTINGS}
-                        initialSortOrder={{
-                            columnId: 'NodeId',
-                            order: DataTable.ASCENDING,
-                        }}
-                        emptyDataMessage={i18n('empty.default')}
-                        rowClassName={(row) => b('node', {unavailable: isUnavailableNode(row)})}
-                    />
-                </div>
-            </div>
+            <DataTable
+                theme="yandex-cloud"
+                data={nodes || []}
+                columns={columns}
+                settings={DEFAULT_TABLE_SETTINGS}
+                initialSortOrder={{
+                    columnId: 'NodeId',
+                    order: DataTable.ASCENDING,
+                }}
+                emptyDataMessage={i18n('empty.default')}
+                rowClassName={(row) => b('node', {unavailable: isUnavailableNode(row)})}
+            />
         );
     };
-
-    const renderContent = () => {
-        return (
-            <div className={b(null, className)}>
-                {renderControls()}
-                {renderTable()}
-            </div>
-        );
-    };
-
-    if (loading && !wasLoaded) {
-        return <Loader size={isClusterNodes ? 'l' : 'm'} />;
-    }
 
     if (error) {
         if (error.status === 403) {
             return <AccessDenied />;
         }
-        return <div>{error.statusText}</div>;
+        return <ResponseError error={error} />;
     }
 
-    return renderContent();
+    return (
+        <TableLayout>
+            <TableLayout.Controls>{renderControls()}</TableLayout.Controls>
+            <TableLayout.Table loading={loading && !wasLoaded} className={b('table')}>
+                {renderTable()}
+            </TableLayout.Table>
+        </TableLayout>
+    );
 };

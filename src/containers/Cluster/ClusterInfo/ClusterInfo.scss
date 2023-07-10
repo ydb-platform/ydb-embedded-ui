@@ -1,7 +1,11 @@
 @import '../../../styles/mixins';
 
 .cluster-info {
+    position: sticky;
+    left: 0;
+
     width: 100%;
+    padding-top: 20px;
 
     &__header {
         display: flex;

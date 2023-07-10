@@ -5,13 +5,16 @@
     flex-grow: 1;
 
     height: 100%;
-    padding: 20px 20px 0px;
+    padding: 0 20px;
 
     @include flex-container();
 
-    &__content {
-        overflow: auto;
+    &__tabs {
+        position: sticky;
+        left: 0;
+    }
 
-        height: 100%;
+    &__content {
+        height: max-content;
     }
 }

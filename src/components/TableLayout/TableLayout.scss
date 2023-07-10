@@ -1,0 +1,30 @@
+@import '../../styles/mixins.scss';
+
+.ydb-table-layout {
+    display: inline-block;
+
+    box-sizing: border-box;
+    min-width: 100%;
+
+    &__controls-wrapper {
+        z-index: 3;
+
+        box-sizing: border-box;
+        width: 100%;
+
+        @include sticky-top();
+    }
+
+    &__controls {
+        z-index: 3;
+
+        width: max-content;
+        @include controls();
+        @include sticky-top();
+    }
+
+    .data-table__sticky_moving {
+        // Place table head right after controls
+        top: 62px !important;
+    }
+}

@@ -1,19 +1,8 @@
 @import '../../styles/mixins.scss';
 
 .ydb-nodes {
-    overflow: auto;
-    flex-grow: 1;
-
-    height: 100%;
-
-    @include flex-container();
-
     &__search {
         @include search();
-    }
-
-    &__controls {
-        @include controls();
     }
 
     &__show-all-wrapper {
@@ -23,19 +12,7 @@
         margin-bottom: 15px;
     }
 
-    &__table-wrapper {
-        overflow: auto;
-        @include flex-container();
-    }
-
-    &__table-content {
-        overflow: auto;
-
-        height: 100%;
-
-        @include freeze-nth-column(1);
-        @include freeze-nth-column(2, 80px);
-
+    &__table {
         @include table-styles;
         @include table-sticky-styles;
     }

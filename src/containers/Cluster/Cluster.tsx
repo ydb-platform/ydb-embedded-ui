@@ -142,7 +142,7 @@ function Cluster({
                 additionalClusterProps={additionalClusterProps}
             />
 
-            <div>
+            <div className={b('tabs')}>
                 <Tabs
                     size="l"
                     allowNotSelected={true}
