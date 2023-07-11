@@ -13,9 +13,11 @@ interface StorageTypeFilterProps {
     onChange: (value: string) => void;
 }
 
+const storageTypeFilterQa = 'storage-type-filter';
+
 export const StorageTypeFilter = ({value, onChange}: StorageTypeFilterProps) => {
     return (
-        <RadioButton value={value} onUpdate={onChange}>
+        <RadioButton value={value} onUpdate={onChange} qa={storageTypeFilterQa}>
             <RadioButton.Option value={STORAGE_TYPES.groups}>
                 {StorageTypesTitles[STORAGE_TYPES.groups]}
             </RadioButton.Option>

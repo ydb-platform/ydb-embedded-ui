@@ -14,9 +14,11 @@ interface StorageProblemFilterProps {
     onChange: (value: string) => void;
 }
 
-export const StorageVisibleEntityFilter = ({value, onChange}: StorageProblemFilterProps) => {
+const storageVisibleEntitiesFilterQa = 'storage-visible-entities-filter';
+
+export const StorageVisibleEntitiesFilter = ({value, onChange}: StorageProblemFilterProps) => {
     return (
-        <RadioButton value={value} onUpdate={onChange}>
+        <RadioButton value={value} onUpdate={onChange} qa={storageVisibleEntitiesFilterQa}>
             <RadioButton.Option value={VISIBLE_ENTITIES.missing}>
                 {VisibleEntitiesTitles[VISIBLE_ENTITIES.missing]}
             </RadioButton.Option>

@@ -38,7 +38,7 @@ import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {StorageGroups} from './StorageGroups/StorageGroups';
 import {StorageNodes} from './StorageNodes/StorageNodes';
 import {StorageTypeFilter} from './StorageTypeFilter/StorageTypeFilter';
-import {StorageVisibleEntityFilter} from './StorageVisibleEntityFilter/StorageVisibleEntityFilter';
+import {StorageVisibleEntitiesFilter} from './StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
 import {UsageFilter} from './UsageFilter';
 
 import './Storage.scss';
@@ -196,7 +196,7 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
                 </div>
 
                 <StorageTypeFilter value={storageType} onChange={handleStorageTypeChange} />
-                <StorageVisibleEntityFilter
+                <StorageVisibleEntitiesFilter
                     value={visibleEntities}
                     onChange={handleGroupVisibilityChange}
                 />
