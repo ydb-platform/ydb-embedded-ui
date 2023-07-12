@@ -4,13 +4,20 @@ import {TMetrics} from './tenant';
 
 /**
  * endpoint: viewer/json/compute
- * 
+ *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
+ *
+ * response has 2 versions, depending on version param in request
  */
 export interface TComputeInfo {
     Overall: EFlag;
-    Tenants?: TComputeTenantInfo[];
+    Tenants?: TComputeTenantInfo[]; // v1
     Errors?: string[];
+    /** uint64 */
+    TotalNodes: string;
+    /** uint64 */
+    FoundNodes: string;
+    Nodes?: TComputeNodeInfo[]; // v2
 }
 
 interface TComputeTenantInfo {
@@ -43,6 +50,7 @@ export interface TComputeNodeInfo {
     MemoryLimit?: string;
     Metrics: TMetrics;
     Tablets?: TTabletStateInfo[];
+    Tenant?: string; // For v2 response without grouping by tenants
 }
 
 // Tablets in compute nodes
@@ -51,4 +59,21 @@ export interface TTabletStateInfo {
     Type: string;
     State: EFlag;
     Count: number;
+}
+
+export enum EVersion {
+    v1,
+    v2, // only this versions works with sorting
+}
+
+export enum ESort {
+    NodeId,
+    Host,
+    DC,
+    Rack,
+    Version,
+    Uptime,
+    Memory,
+    CPU,
+    LoadAverage,
 }
