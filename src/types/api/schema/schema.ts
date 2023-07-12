@@ -1,4 +1,6 @@
-import {TMetrics} from './tenant';
+import type {TMetrics} from '../tenant';
+import type {TExternalDataSourceDescription} from './externalDataSource';
+import type {TExternalTableDescription} from './externalTable';
 
 export interface TEvDescribeSchemeResult {
     Status?: EStatus;
@@ -64,6 +66,9 @@ export interface TPathDescription {
 
     CdcStreamDescription?: TCdcStreamDescription;
     PersQueueGroup?: TPersQueueGroupDescription;
+
+    ExternalTableDescription?: TExternalTableDescription;
+    ExternalDataSourceDescription?: TExternalDataSourceDescription;
 }
 
 export interface TDirEntry {
@@ -282,7 +287,7 @@ export interface TTableDescription {
     Sequences?: TSequenceDescription[];
 }
 
-interface TColumnDescription {
+export interface TColumnDescription {
     Name?: string;
     Type?: string;
     TypeId?: number;
@@ -896,7 +901,7 @@ enum ECdcStreamState {
     ECdcStreamStateDisabled = 'ECdcStreamStateDisabled',
 }
 
-interface TPathID {
+export interface TPathID {
     /** fixed64 */
     OwnerId?: string;
     /** uint64 */
@@ -1156,7 +1161,7 @@ export interface TPersQueueGroupDescription {
     /** uint64 */
     BalancerTabletID?: string;
 
-    PartitionBoundaries?: any;
+    PartitionBoundaries?: unknown;
 
     BootstrapConfig?: TBootstrapConfig;
 }
