@@ -1,4 +1,4 @@
-import type {TColumnDescription, TPathID} from './schema';
+import type {TColumnDescription, TPathID} from './shared';
 
 export interface TExternalTableDescription {
     Name?: string;

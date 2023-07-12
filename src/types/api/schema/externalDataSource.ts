@@ -1,4 +1,4 @@
-import type {TPathID} from './schema';
+import type {TPathID} from './shared';
 
 export interface TExternalDataSourceDescription {
     Name?: string;
