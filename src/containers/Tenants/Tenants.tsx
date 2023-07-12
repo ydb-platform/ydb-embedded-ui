@@ -10,7 +10,7 @@ import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
 import {Search} from '../../components/Search';
-import {TableLayout} from '../../components/TableLayout/TableLayout';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
 
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
@@ -252,11 +252,11 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     }
 
     return (
-        <TableLayout>
-            <TableLayout.Controls>{renderControls()}</TableLayout.Controls>
-            <TableLayout.Table loading={loading && !wasLoaded} className={b('table')}>
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Table loading={loading && !wasLoaded} className={b('table')}>
                 {renderTable()}
-            </TableLayout.Table>
-        </TableLayout>
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };

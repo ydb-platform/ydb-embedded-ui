@@ -1,6 +1,6 @@
 @import '../../styles/mixins.scss';
 
-.ydb-table-layout {
+.ydb-table-with-controls-layout {
     display: inline-block;
 
     box-sizing: border-box;
@@ -19,6 +19,8 @@
         z-index: 3;
 
         width: max-content;
+        height: 62px;
+
         @include controls();
         @include sticky-top();
     }

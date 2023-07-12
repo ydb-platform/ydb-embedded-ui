@@ -164,7 +164,7 @@ function Cluster({
                 />
             </div>
 
-            <div className={b('content')}>{renderTab()}</div>
+            <div>{renderTab()}</div>
         </div>
     );
 }

@@ -8,7 +8,7 @@ import {Search} from '../../components/Search';
 import {UptimeFilter} from '../../components/UptimeFIlter';
 import {AccessDenied} from '../../components/Errors/403';
 import {EntitiesCount} from '../../components/EntitiesCount';
-import {TableLayout} from '../../components/TableLayout/TableLayout';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
 
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
@@ -227,11 +227,11 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
     }
 
     return (
-        <TableLayout>
-            <TableLayout.Controls>{renderControls()}</TableLayout.Controls>
-            <TableLayout.Table loading={loading && !wasLoaded} className={b('table')}>
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Table loading={loading && !wasLoaded} className={b('table')}>
                 {renderDataTable()}
-            </TableLayout.Table>
-        </TableLayout>
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };

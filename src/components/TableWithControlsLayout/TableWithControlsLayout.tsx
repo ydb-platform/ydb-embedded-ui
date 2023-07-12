@@ -3,24 +3,30 @@ import block from 'bem-cn-lite';
 
 import {TableSkeleton} from '../TableSkeleton/TableSkeleton';
 
-import './TableLayout.scss';
+import './TableWithControlsLayout.scss';
 
-const b = block('ydb-table-layout');
+const b = block('ydb-table-with-controls-layout');
 
-interface TableLayoutItemProps {
+interface TableWithControlsLayoutItemProps {
     children: ReactNode;
     className?: string;
 }
 
-interface TableProps extends TableLayoutItemProps {
+interface TableProps extends TableWithControlsLayoutItemProps {
     loading?: boolean;
 }
 
-export const TableLayout = ({children, className}: TableLayoutItemProps) => {
+export const TableWithControlsLayout = ({
+    children,
+    className,
+}: TableWithControlsLayoutItemProps) => {
     return <div className={b(null, className)}>{children}</div>;
 };
 
-TableLayout.Controls = function TableControls({children, className}: TableLayoutItemProps) {
+TableWithControlsLayout.Controls = function TableControls({
+    children,
+    className,
+}: TableWithControlsLayoutItemProps) {
     return (
         <div className={b('controls-wrapper')}>
             <div className={b('controls', className)}>{children}</div>
@@ -28,7 +34,7 @@ TableLayout.Controls = function TableControls({children, className}: TableLayout
     );
 };
 
-TableLayout.Table = function Table({children, loading, className}: TableProps) {
+TableWithControlsLayout.Table = function Table({children, loading, className}: TableProps) {
     if (loading) {
         return <TableSkeleton className={b('loader')} />;
     }

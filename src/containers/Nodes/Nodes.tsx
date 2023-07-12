@@ -13,7 +13,7 @@ import {Search} from '../../components/Search';
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {UptimeFilter} from '../../components/UptimeFIlter';
 import {EntitiesCount} from '../../components/EntitiesCount';
-import {TableLayout} from '../../components/TableLayout/TableLayout';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
 
 import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
@@ -150,11 +150,11 @@ export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {
     }
 
     return (
-        <TableLayout>
-            <TableLayout.Controls>{renderControls()}</TableLayout.Controls>
-            <TableLayout.Table loading={loading && !wasLoaded} className={b('table')}>
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Table loading={loading && !wasLoaded} className={b('table')}>
                 {renderTable()}
-            </TableLayout.Table>
-        </TableLayout>
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };
