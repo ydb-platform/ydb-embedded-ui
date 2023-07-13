@@ -6,13 +6,9 @@
     justify-content: space-between;
     align-items: center;
 
-    padding: 0 20px 0 18px;
-
-    font-weight: 600;
+    padding: 0 20px 0 12px;
 
     border-bottom: 1px solid var(--yc-color-line-generic);
-
-    @include body2-typography;
 
     &__breadcrumb {
         display: flex;
