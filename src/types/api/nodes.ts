@@ -5,7 +5,7 @@ import {TVDiskStateInfo} from './vdisk';
 
 /**
  * endpoint: /viewer/json/nodes
- * 
+ *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
  */
 export interface TNodesInfo {
@@ -100,4 +100,15 @@ interface TNodeLocation {
 enum EConfigState {
     'Consistent' = 'Consistent',
     'Outdated' = 'Outdated',
+}
+
+export enum ESort {
+    NodeId,
+    Host,
+    DC,
+    Version,
+    Uptime,
+    Memory,
+    CPU,
+    LoadAverage,
 }
