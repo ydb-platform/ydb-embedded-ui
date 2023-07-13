@@ -15,7 +15,7 @@ import type {
     StorageStateSlice,
     UsageFilter,
 } from './types';
-import {filterNodesByUptime} from '../nodes/nodes';
+import {filterNodesByUptime} from '../nodes/selectors';
 
 // ==== Prepare data ====
 const FLAGS_POINTS = {

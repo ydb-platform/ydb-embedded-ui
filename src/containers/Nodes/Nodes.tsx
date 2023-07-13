@@ -22,12 +22,12 @@ import {AdditionalNodesInfo, isUnavailableNode, NodesUptimeFilterValues} from '.
 
 import {
     getNodes,
-    getFilteredPreparedNodesList,
     setNodesUptimeFilter,
     setSearchValue,
     resetNodesState,
     getComputeNodes,
 } from '../../store/reducers/nodes/nodes';
+import {selectFilteredNodes} from '../../store/reducers/nodes/selectors';
 import {changeFilter, ProblemFilterValues} from '../../store/reducers/settings/settings';
 
 import {isDatabaseEntityType} from '../Tenant/utils/schema';
@@ -63,7 +63,7 @@ export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {
     const problemFilter = useTypedSelector((state) => state.settings.problemFilter);
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
-    const nodes = useTypedSelector(getFilteredPreparedNodesList);
+    const nodes = useTypedSelector(selectFilteredNodes);
 
     const [useNodesEndpoint] = useSetting(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY);
 
