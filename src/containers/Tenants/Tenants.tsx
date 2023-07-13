@@ -2,7 +2,7 @@ import cn from 'bem-cn-lite';
 import {useDispatch} from 'react-redux';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
-import {Loader, Button} from '@gravity-ui/uikit';
+import {Button} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
@@ -10,6 +10,7 @@ import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
 import {Search} from '../../components/Search';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
 
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
@@ -66,7 +67,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
 
     const renderControls = () => {
         return (
-            <div className={b('controls')}>
+            <>
                 <Search
                     value={searchValue}
                     onChange={handleSearchChange}
@@ -74,7 +75,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                     className={b('search')}
                 />
                 <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
-            </div>
+            </>
         );
     };
 
@@ -236,34 +237,26 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
         }
 
         return (
-            <div className={b('table-wrapper')}>
-                <DataTable
-                    theme="yandex-cloud"
-                    data={filteredTenants}
-                    columns={columns}
-                    settings={DEFAULT_TABLE_SETTINGS}
-                    emptyDataMessage="No such tenants"
-                />
-            </div>
+            <DataTable
+                theme="yandex-cloud"
+                data={filteredTenants}
+                columns={columns}
+                settings={DEFAULT_TABLE_SETTINGS}
+                emptyDataMessage="No such tenants"
+            />
         );
     };
-
-    if (loading && !wasLoaded) {
-        return (
-            <div className={'loader'}>
-                <Loader size="l" />
-            </div>
-        );
-    }
 
     if (error) {
         return <ResponseError error={error} />;
     }
 
     return (
-        <div className={b()}>
-            {renderControls()}
-            {renderTable()}
-        </div>
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Table loading={loading && !wasLoaded} className={b('table')}>
+                {renderTable()}
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };

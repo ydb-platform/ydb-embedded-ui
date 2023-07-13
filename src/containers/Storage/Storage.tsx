@@ -5,10 +5,11 @@ import cn from 'bem-cn-lite';
 import DataTable, {Settings} from '@gravity-ui/react-data-table';
 
 import {Search} from '../../components/Search';
-import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {UptimeFilter} from '../../components/UptimeFIlter';
 import {AccessDenied} from '../../components/Errors/403';
 import {EntitiesCount} from '../../components/EntitiesCount';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {ResponseError} from '../../components/Errors/ResponseError';
 
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
 import {
@@ -37,7 +38,7 @@ import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {StorageGroups} from './StorageGroups/StorageGroups';
 import {StorageNodes} from './StorageNodes/StorageNodes';
 import {StorageTypeFilter} from './StorageTypeFilter/StorageTypeFilter';
-import {StorageVisibleEntityFilter} from './StorageVisibleEntityFilter/StorageVisibleEntityFilter';
+import {StorageVisibleEntitiesFilter} from './StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
 import {UsageFilter} from './UsageFilter';
 
 import './Storage.scss';
@@ -137,13 +138,9 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
         handleUptimeFilterChange(NodesUptimeFilterValues.All);
     };
 
-    const renderLoader = () => {
-        return <TableSkeleton className={b('loader')} />;
-    };
-
     const renderDataTable = () => {
         return (
-            <div className={b('table-wrapper')}>
+            <>
                 {storageType === STORAGE_TYPES.groups && (
                     <StorageGroups
                         visibleEntities={visibleEntities}
@@ -163,7 +160,7 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
                         additionalNodesInfo={additionalNodesInfo}
                     />
                 )}
-            </div>
+            </>
         );
     };
 
@@ -185,7 +182,7 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
 
     const renderControls = () => {
         return (
-            <div className={b('controls')}>
+            <>
                 <div className={b('search')}>
                     <Search
                         placeholder={
@@ -199,7 +196,7 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
                 </div>
 
                 <StorageTypeFilter value={storageType} onChange={handleStorageTypeChange} />
-                <StorageVisibleEntityFilter
+                <StorageVisibleEntitiesFilter
                     value={visibleEntities}
                     onChange={handleGroupVisibilityChange}
                 />
@@ -217,24 +214,24 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
                     />
                 )}
                 {renderEntitiesCount()}
-            </div>
+            </>
         );
     };
-
-    const showLoader = loading && !wasLoaded;
 
     if (error) {
         if (error.status === 403) {
             return <AccessDenied />;
         }
 
-        return <div className={b()}>{error.statusText}</div>;
+        return <ResponseError error={error} />;
     }
 
     return (
-        <div className={b()}>
-            {renderControls()}
-            {showLoader ? renderLoader() : renderDataTable()}
-        </div>
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Table loading={loading && !wasLoaded} className={b('table')}>
+                {renderDataTable()}
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };

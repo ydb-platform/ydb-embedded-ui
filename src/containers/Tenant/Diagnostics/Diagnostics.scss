@@ -39,10 +39,14 @@
         width: 100%;
         padding: 0 20px;
 
-        & .global-storage,
-        & .ydb-nodes {
+        .ydb-table-with-controls-layout {
             &__controls {
+                height: 46px;
                 padding-top: 0;
+            }
+
+            .data-table__sticky_moving {
+                top: 46px !important;
             }
         }
     }

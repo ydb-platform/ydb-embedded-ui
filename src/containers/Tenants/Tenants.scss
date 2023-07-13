@@ -1,9 +1,6 @@
 @import '../../styles/mixins.scss';
 
 .tenants {
-    height: 100%;
-    @include flex-container();
-
     &__format-label {
         margin-right: 15px;
     }
@@ -28,16 +25,7 @@
         }
     }
 
-    &__controls {
-        @include controls();
-    }
-
-    &__table-wrapper {
-        overflow: auto;
-        flex-grow: 1;
-
-        @include freeze-nth-column(1);
-
+    &__table {
         @include table-styles;
     }
 

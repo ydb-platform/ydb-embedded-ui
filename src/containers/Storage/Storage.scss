@@ -1,24 +1,11 @@
 @import '../../styles/mixins.scss';
 
 .global-storage {
-    height: 100%;
-    max-height: 100%;
-    @include flex-container;
-
-    &__controls {
-        @include controls();
-    }
     &__search {
         @include search();
     }
 
-    &__table-wrapper {
-        overflow: auto;
-        flex-grow: 1;
-
-        font-size: var(--yc-text-body-2-font-size);
-        line-height: var(--yc-text-body-2-line-height);
-
+    &__table {
         .yc-tooltip {
             // stylelint-disable-next-line declaration-no-important
             height: var(--yc-text-body-2-line-height) !important;

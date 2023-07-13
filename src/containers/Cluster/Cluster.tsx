@@ -142,7 +142,7 @@ function Cluster({
                 additionalClusterProps={additionalClusterProps}
             />
 
-            <div>
+            <div className={b('tabs')}>
                 <Tabs
                     size="l"
                     allowNotSelected={true}
@@ -164,7 +164,7 @@ function Cluster({
                 />
             </div>
 
-            <div className={b('content')}>{renderTab()}</div>
+            <div>{renderTab()}</div>
         </div>
     );
 }
