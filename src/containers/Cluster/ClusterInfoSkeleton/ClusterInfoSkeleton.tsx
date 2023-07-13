@@ -18,7 +18,7 @@ interface ClusterInfoSkeletonProps {
     rows?: number;
 }
 
-export const ClusterInfoSkeleton = ({rows = 6, className}: ClusterInfoSkeletonProps) => (
+export const ClusterInfoSkeleton = ({rows = 7, className}: ClusterInfoSkeletonProps) => (
     <div className={b(null, className)}>
         {[...new Array(rows)].map((_, index) => (
             <div className={b('row')} key={`skeleton-row-${index}`}>
