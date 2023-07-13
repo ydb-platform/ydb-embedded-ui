@@ -57,6 +57,13 @@ const getInfo = (
         });
     }
 
+    if (cluster.Tenants) {
+        info.push({
+            label: 'Databases',
+            value: cluster.Tenants,
+        });
+    }
+
     info.push(
         {
             label: 'Nodes',
