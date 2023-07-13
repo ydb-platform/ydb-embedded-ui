@@ -118,20 +118,6 @@ function Cluster({
         }
     };
 
-    const getTabEntityCount = (tabId: ClusterTab) => {
-        switch (tabId) {
-            case clusterTabsIds.tenants: {
-                return cluster?.Tenants ? Number(cluster.Tenants) : undefined;
-            }
-            case clusterTabsIds.nodes: {
-                return cluster?.NodesTotal ? Number(cluster.NodesTotal) : undefined;
-            }
-            default: {
-                return undefined;
-            }
-        }
-    };
-
     return (
         <div className={b()}>
             <ClusterInfo
@@ -147,12 +133,7 @@ function Cluster({
                     size="l"
                     allowNotSelected={true}
                     activeTab={activeTab as string}
-                    items={clusterTabs.map((item) => {
-                        return {
-                            ...item,
-                            counter: getTabEntityCount(item.id),
-                        };
-                    })}
+                    items={clusterTabs}
                     wrapTo={({id}, node) => {
                         const path = getClusterPath(id as ClusterTab, queryParams);
                         return (
