@@ -1,25 +1,12 @@
 import type {Reducer} from 'redux';
-import {createSelector, Selector} from 'reselect';
-import {escapeRegExp} from 'lodash/fp';
 
 import '../../../services/api';
-import {HOUR_IN_SECONDS} from '../../../utils/constants';
-import {calcUptime, calcUptimeInSeconds} from '../../../utils';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
-import {EFlag} from '../../../types/api/enums';
 
-import type {ProblemFilterValue} from '../settings/types';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
-import {ProblemFilterValues} from '../settings/settings';
 
-import type {
-    NodesAction,
-    NodesApiRequestParams,
-    NodesHandledResponse,
-    NodesPreparedEntity,
-    NodesStateSlice,
-    NodesState,
-} from './types';
+import type {NodesAction, NodesApiRequestParams, NodesState} from './types';
+import {prepareComputeNodesData, prepareNodesData} from './utils';
 
 export const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
 
@@ -97,24 +84,7 @@ export function getNodes({tenant, visibleEntities, type = 'any'}: NodesApiReques
     return createApiRequest({
         request: window.api.getNodes({tenant, visibleEntities, type}),
         actions: FETCH_NODES,
-        dataHandler: (data): NodesHandledResponse => {
-            const rawNodes = data.Nodes || [];
-
-            const preparedNodes = rawNodes.map((node) => {
-                return {
-                    ...node?.SystemState,
-                    Tablets: node?.Tablets,
-                    NodeId: node?.NodeId,
-                    Uptime: calcUptime(node?.SystemState?.StartTime),
-                    TenantName: node?.SystemState?.Tenants?.[0],
-                };
-            });
-
-            return {
-                Nodes: preparedNodes,
-                TotalNodes: Number(data.TotalNodes) || preparedNodes.length,
-            };
-        },
+        dataHandler: prepareNodesData,
     });
 }
 
@@ -122,31 +92,7 @@ export function getComputeNodes(path: string) {
     return createApiRequest({
         request: window.api.getCompute(path),
         actions: FETCH_NODES,
-        dataHandler: (data): NodesHandledResponse => {
-            const preparedNodes: NodesPreparedEntity[] = [];
-
-            if (data.Tenants) {
-                for (const tenant of data.Tenants) {
-                    if (tenant && tenant.Nodes) {
-                        const tenantNodes = tenant.Nodes.map((node) => {
-                            return {
-                                ...node,
-                                TenantName: tenant.Name,
-                                SystemState: node?.Overall,
-                                Uptime: calcUptime(node?.StartTime),
-                            };
-                        });
-
-                        preparedNodes.push(...tenantNodes);
-                    }
-                }
-            }
-
-            return {
-                Nodes: preparedNodes,
-                TotalNodes: preparedNodes.length,
-            };
-        },
+        dataHandler: prepareComputeNodesData,
     });
 }
 
@@ -174,59 +120,5 @@ export const setSearchValue = (value: string) => {
         data: value,
     } as const;
 };
-
-const getNodesUptimeFilter = (state: NodesStateSlice) => state.nodes.nodesUptimeFilter;
-const getSearchValue = (state: NodesStateSlice) => state.nodes.searchValue;
-const getNodesList = (state: NodesStateSlice) => state.nodes.data;
-
-const filterNodesByProblemsStatus = (
-    nodesList: NodesPreparedEntity[] = [],
-    problemFilter: ProblemFilterValue,
-) => {
-    if (problemFilter === ProblemFilterValues.ALL) {
-        return nodesList;
-    }
-
-    return nodesList.filter(({SystemState}) => {
-        return SystemState && SystemState !== EFlag.Green;
-    });
-};
-
-export const filterNodesByUptime = <T extends {StartTime?: string}>(
-    nodesList: T[] = [],
-    nodesUptimeFilter: NodesUptimeFilterValues,
-) => {
-    if (nodesUptimeFilter === NodesUptimeFilterValues.All) {
-        return nodesList;
-    }
-    return nodesList.filter(({StartTime}) => {
-        return !StartTime || calcUptimeInSeconds(StartTime) < HOUR_IN_SECONDS;
-    });
-};
-
-const filterNodesBySearchValue = (nodesList: NodesPreparedEntity[] = [], searchValue: string) => {
-    if (!searchValue) {
-        return nodesList;
-    }
-    const re = new RegExp(escapeRegExp(searchValue), 'i');
-
-    return nodesList.filter((node) => {
-        return node.Host ? re.test(node.Host) || re.test(String(node.NodeId)) : true;
-    });
-};
-
-export const getFilteredPreparedNodesList: Selector<
-    NodesStateSlice,
-    NodesPreparedEntity[] | undefined
-> = createSelector(
-    [getNodesList, getNodesUptimeFilter, getSearchValue, (state) => state.settings.problemFilter],
-    (nodesList, uptimeFilter, searchValue, problemFilter) => {
-        let result = filterNodesByUptime(nodesList, uptimeFilter);
-        result = filterNodesByProblemsStatus(result, problemFilter);
-        result = filterNodesBySearchValue(result, searchValue);
-
-        return result;
-    },
-);
 
 export default nodes;
