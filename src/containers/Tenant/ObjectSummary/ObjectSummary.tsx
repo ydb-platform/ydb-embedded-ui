@@ -48,10 +48,7 @@ import {
 } from '../utils/paneVisibilityToggleHelpers';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import {
-    TENANT_PAGES_IDS,
-    TENANT_QUERY_TABS_ID,
-} from '../../../store/reducers/tenant/constants';
+import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 
 import './ObjectSummary.scss';
 
@@ -246,9 +243,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
     const renderTree = () => {
         return (
             <div className={b('tree-wrapper')}>
-                <div className={b('tree-header')}>
-                    <div className={b('tree-title')}>Navigation</div>
-                </div>
+                <div className={b('tree-header')}>Navigation</div>
                 <div className={b('tree')}>
                     {pathData && (
                         <SchemaTree

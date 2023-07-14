@@ -26,7 +26,7 @@
 
     &__action-button {
         position: absolute;
-        top: 8px; // centered relative to the heading
+        top: 19px; // centered relative to the heading
         right: 5px; // centered relative to the collapsed panel
 
         background-color: var(--yc-color-base-background);
@@ -51,20 +51,11 @@
         flex: 1 1 auto;
 
         height: 100%;
-        padding: 0 12px 12px;
+        padding: 0 12px 12px 16px;
     }
 
     &__tree-header {
-        display: flex;
-        flex: 0 0 auto;
-        justify-content: space-between;
-        align-items: center;
-
-        padding: 12px 12px 8px;
-    }
-
-    &__tree-title {
-        font-weight: 600;
+        padding: 23px 12px 17px 20px;
     }
 
     &__sticky-top {
