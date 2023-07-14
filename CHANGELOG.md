@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.10.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.10.0...v4.10.1) (2023-07-14)
+
+
+### Bug Fixes
+
+* apply design fixes ([#475](https://github.com/ydb-platform/ydb-embedded-ui/issues/475)) ([5e7c9ca](https://github.com/ydb-platform/ydb-embedded-ui/commit/5e7c9caa9f54094a3eb6448d92d43242d3e738dd))
+* **AsideNavigation:** replace query icon ([#466](https://github.com/ydb-platform/ydb-embedded-ui/issues/466)) ([4495eb2](https://github.com/ydb-platform/ydb-embedded-ui/commit/4495eb2634e48feda677c03591b92393ad28981e))
+* **ClusterInfo:** add Databases field ([#474](https://github.com/ydb-platform/ydb-embedded-ui/issues/474)) ([28a9936](https://github.com/ydb-platform/ydb-embedded-ui/commit/28a99364bf5e916381a54a59d4d3f979b35f6eff))
+* **Cluster:** make global scroll ([#470](https://github.com/ydb-platform/ydb-embedded-ui/issues/470)) ([30f8bc5](https://github.com/ydb-platform/ydb-embedded-ui/commit/30f8bc5ce52fceda076d278b1464d413e899ae21))
+* **Cluster:** remove tabs icons and numbers ([#473](https://github.com/ydb-platform/ydb-embedded-ui/issues/473)) ([d2e43d4](https://github.com/ydb-platform/ydb-embedded-ui/commit/d2e43d41759b085f34b7f29f52f3aba60cd0588f))
+* **Query:** rename New Query tab to Query ([#467](https://github.com/ydb-platform/ydb-embedded-ui/issues/467)) ([c3f5585](https://github.com/ydb-platform/ydb-embedded-ui/commit/c3f5585562a204ef0831d0c45766b17c3dc72f82))
+* **TableIndexInfo:** format DataSize ([#468](https://github.com/ydb-platform/ydb-embedded-ui/issues/468)) ([a189b8c](https://github.com/ydb-platform/ydb-embedded-ui/commit/a189b8cf9610f6b1b7b5f4c01896eda5f8347ebf))
+
 ## [4.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.9.0...v4.10.0) (2023-07-07)
 
 
