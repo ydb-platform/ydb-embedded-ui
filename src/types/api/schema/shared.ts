@@ -28,9 +28,9 @@ export interface TColumnDescription {
 }
 
 export enum EColumnCodec {
-    ColumnCodecPlain,
-    ColumnCodecLZ4,
-    ColumnCodecZSTD,
+    ColumnCodecPlain = 'ColumnCodecPlain',
+    ColumnCodecLZ4 = 'ColumnCodecLZ4',
+    ColumnCodecZSTD = 'ColumnCodecZSTD',
 }
 
 export enum EUnit {
