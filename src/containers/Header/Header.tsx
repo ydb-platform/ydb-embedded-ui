@@ -10,7 +10,7 @@ import {ExternalLinkWithIcon} from '../../components/ExternalLinkWithIcon/Extern
 import {backend, customBackend} from '../../store';
 import {getClusterInfo} from '../../store/reducers/cluster/cluster';
 import {useTypedSelector} from '../../utils/hooks';
-import {DEVELOPER_UI} from '../../utils/constants';
+import {DEVELOPER_UI_TITLE} from '../../utils/constants';
 import {parseQuery} from '../../routes';
 
 import {RawBreadcrumbItem, getBreadcrumbs} from './breadcrumbs';
@@ -105,7 +105,7 @@ function Header({mainPage}: HeaderProps) {
                 </div>
 
                 <ExternalLinkWithIcon
-                    title={DEVELOPER_UI}
+                    title={DEVELOPER_UI_TITLE}
                     url={getInternalLink(singleClusterMode)}
                 />
             </header>
