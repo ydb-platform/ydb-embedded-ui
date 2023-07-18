@@ -9,6 +9,18 @@
                 "additionalHooks": "(useAutofetcher)"
             }
         ],
-        "valid-jsdoc": "off"
+        "valid-jsdoc": "off",
+        "@typescript-eslint/naming-convention": [
+            "warn",
+            {
+                "selector": "typeLike",
+                "format": ["PascalCase"],
+                "leadingUnderscore": "forbid",
+                "custom": {
+                    "regex": "^I[A-Z]",
+                    "match": false
+                }
+            }
+        ]
     }
 }
