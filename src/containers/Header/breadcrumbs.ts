@@ -16,6 +16,7 @@ import {
     TENANT_PAGES_IDS,
 } from '../../store/reducers/tenant/constants';
 import routes, {createHref} from '../../routes';
+import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
 
 import {getClusterPath} from '../Cluster/utils';
 import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
@@ -39,7 +40,7 @@ const getClusterBreadcrumbs = (
 
     return [
         {
-            text: clusterName || 'Cluster',
+            text: clusterName || CLUSTER_DEFAULT_TITLE,
             link: getClusterPath(clusterTab, query),
             icon: nodesRightIcon,
         },

@@ -75,8 +75,11 @@ export const COLORS_PRIORITY = {
     grey: 1,
 };
 
-export const DEVELOPER_UI = 'Developer UI';
+// ==== Titles ====
+export const DEVELOPER_UI_TITLE = 'Developer UI';
+export const CLUSTER_DEFAULT_TITLE = 'Cluster';
 
+// ==== Settings ====
 export const THEME_KEY = 'theme';
 export const INVERTED_DISKS_KEY = 'invertedDisks';
 export const USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY = 'useNodesEndpointInDiagnostics';

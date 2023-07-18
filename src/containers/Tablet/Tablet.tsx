@@ -9,7 +9,7 @@ import {getTablet, getTabletDescribe, clearTabletData} from '../../store/reducer
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
-import {DEVELOPER_UI} from '../../utils/constants';
+import {DEVELOPER_UI_TITLE} from '../../utils/constants';
 import '../../services/api';
 import {parseQuery} from '../../routes';
 
@@ -113,7 +113,7 @@ export const Tablet = () => {
 
     const externalLinks = [
         {
-            name: `${DEVELOPER_UI} - tablet`,
+            name: `${DEVELOPER_UI_TITLE} - tablet`,
             path: `/tablets?TabletID=${TabletId}`,
         },
     ];
