@@ -2,10 +2,16 @@ import type {Reducer} from 'redux';
 
 import '../../../services/api';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {EVersion} from '../../../types/api/compute';
 
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
-import type {NodesAction, NodesApiRequestParams, NodesState} from './types';
+import type {
+    ComputeApiRequestParams,
+    NodesAction,
+    NodesApiRequestParams,
+    NodesState,
+} from './types';
 import {prepareComputeNodesData, prepareNodesData} from './utils';
 
 export const FETCH_NODES = createRequestActionTypes('nodes', 'FETCH_NODES');
@@ -80,17 +86,20 @@ const nodes: Reducer<NodesState, NodesAction> = (state = initialState, action) =
     }
 };
 
-export function getNodes({tenant, visibleEntities, type = 'any'}: NodesApiRequestParams) {
+export function getNodes({type = 'any', ...params}: NodesApiRequestParams) {
     return createApiRequest({
-        request: window.api.getNodes({tenant, visibleEntities, type}),
+        request: window.api.getNodes({
+            type,
+            ...params,
+        }),
         actions: FETCH_NODES,
         dataHandler: prepareNodesData,
     });
 }
 
-export function getComputeNodes(path: string) {
+export function getComputeNodes({version = EVersion.v2, ...params}: ComputeApiRequestParams) {
     return createApiRequest({
-        request: window.api.getCompute(path),
+        request: window.api.getCompute({version, ...params}),
         actions: FETCH_NODES,
         dataHandler: prepareComputeNodesData,
     });

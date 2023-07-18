@@ -579,38 +579,38 @@ interface TBackgroundPolicy {
 }
 
 enum EPurpose {
-    SysLog,
-    Log,
-    Data,
-    External,
+    SysLog = 'SysLog',
+    Log = 'Log',
+    Data = 'Data',
+    External = 'External',
 }
 
 enum EFreezeState {
-    Unspecified,
-    Freeze,
-    Unfreeze,
+    Unspecified = 'Unspecified',
+    Freeze = 'Freeze',
+    Unfreeze = 'Unfreeze',
 }
 
 enum EColumnCache {
-    ColumnCacheNone,
-    ColumnCacheOnce,
-    ColumnCacheEver,
+    ColumnCacheNone = 'ColumnCacheNone',
+    ColumnCacheOnce = 'ColumnCacheOnce',
+    ColumnCacheEver = 'ColumnCacheEver',
 }
 
 enum EColumnStorage {
-    ColumnStorage1,
-    ColumnStorage2,
-    ColumnStorage1Ext1,
-    ColumnStorage1Ext2,
-    ColumnStorage2Ext1,
-    ColumnStorage2Ext2,
-    ColumnStorage1Med2Ext2,
-    ColumnStorage2Med2Ext2,
-    ColumnStorageTest_1_2_1k,
+    ColumnStorage1 = 'ColumnStorage1',
+    ColumnStorage2 = 'ColumnStorage2',
+    ColumnStorage1Ext1 = 'ColumnStorage1Ext1',
+    ColumnStorage1Ext2 = 'ColumnStorage1Ext2',
+    ColumnStorage2Ext1 = 'ColumnStorage2Ext1',
+    ColumnStorage2Ext2 = 'ColumnStorage2Ext2',
+    ColumnStorage1Med2Ext2 = 'ColumnStorage1Med2Ext2',
+    ColumnStorage2Med2Ext2 = 'ColumnStorage2Med2Ext2',
+    ColumnStorageTest_1_2_1k = 'ColumnStorageTest_1_2_1k',
 }
 
 enum ECompactionStrategy {
-    CompactionStrategyUnset,
-    CompactionStrategyGenerational,
-    CompactionStrategySharded,
+    CompactionStrategyUnset = 'CompactionStrategyUnset',
+    CompactionStrategyGenerational = 'CompactionStrategyGenerational',
+    CompactionStrategySharded = 'CompactionStrategySharded',
 }

@@ -42,7 +42,7 @@ interface TNetNodePeerInfo {
 }
 
 enum ENodeType {
-    UnknownNodeType,
-    Static,
-    Dynamic,
+    UnknownNodeType = 'UnknownNodeType',
+    Static = 'Static',
+    Dynamic = 'Dynamic',
 }

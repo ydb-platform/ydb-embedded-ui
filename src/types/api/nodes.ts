@@ -103,12 +103,13 @@ enum EConfigState {
 }
 
 export enum ESort {
-    NodeId,
-    Host,
-    DC,
-    Version,
-    Uptime,
-    Memory,
-    CPU,
-    LoadAverage,
+    NodeId = 'NodeId',
+    Host = 'Host',
+    DC = 'DC',
+    Rack = 'Rack',
+    Version = 'Version',
+    Uptime = 'Uptime',
+    Memory = 'Memory',
+    CPU = 'CPU',
+    LoadAverage = 'LoadAverage',
 }

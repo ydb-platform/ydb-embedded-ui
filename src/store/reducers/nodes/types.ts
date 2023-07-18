@@ -1,6 +1,9 @@
 import type {IResponseError} from '../../../types/api/error';
 import type {TEndpoint, TPoolStats} from '../../../types/api/nodes';
-import type {TTabletStateInfo as TComputeTabletStateInfo} from '../../../types/api/compute';
+import type {
+    EVersion,
+    TTabletStateInfo as TComputeTabletStateInfo,
+} from '../../../types/api/compute';
 import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
 import type {EFlag} from '../../../types/api/enums';
 import type {ApiRequestAction} from '../../utils';
@@ -46,17 +49,33 @@ export interface NodesState {
 
 export type NodeType = 'static' | 'dynamic' | 'any';
 
-export interface NodesApiRequestParams {
+interface RequestParams {
+    filter?: string; // NodeId or Host
+    uptime?: number; // return nodes with less uptime in seconds
+    problems_only?: boolean; // return nodes with SystemState !== EFlag.Green
+    sort?: string; // Sort by one of ESort params (may differ for /nodes and /compute)
+
+    offser?: number;
+    limit?: number;
+}
+
+export interface NodesApiRequestParams extends RequestParams {
     tenant?: string;
     type?: NodeType;
-    visibleEntities?: VisibleEntities;
+    visibleEntities?: VisibleEntities; // "with" param
     storage?: boolean;
     tablets?: boolean;
+}
+
+export interface ComputeApiRequestParams extends RequestParams {
+    path: string;
+    version?: EVersion; // only v2 works with filters
 }
 
 export interface NodesHandledResponse {
     Nodes?: NodesPreparedEntity[];
     TotalNodes: number;
+    FoundNodes?: number;
 }
 
 type NodesApiRequestAction = ApiRequestAction<

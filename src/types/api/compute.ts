@@ -62,18 +62,18 @@ export interface TTabletStateInfo {
 }
 
 export enum EVersion {
-    v1,
-    v2, // only this versions works with sorting
+    v1 = 'v1',
+    v2 = 'v2', // only this versions works with sorting
 }
 
 export enum ESort {
-    NodeId,
-    Host,
-    DC,
-    Rack,
-    Version,
-    Uptime,
-    Memory,
-    CPU,
-    LoadAverage,
+    NodeId = 'NodeId',
+    Host = 'Host',
+    DC = 'DC',
+    Rack = 'Rack',
+    Version = 'Version',
+    Uptime = 'Uptime',
+    Memory = 'Memory',
+    CPU = 'CPU',
+    LoadAverage = 'LoadAverage',
 }
