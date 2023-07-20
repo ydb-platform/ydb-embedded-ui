@@ -1,6 +1,6 @@
 @import '../../../styles/mixins.scss';
 
-.kv-acl {
+.ydb-acl {
     display: flex;
     overflow: auto;
     flex-grow: 1;
@@ -14,14 +14,6 @@
 
     &__message-container {
         padding: 0 12px 16px;
-    }
-
-    &__loader-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        height: 100%;
     }
 
     &__owner-container {

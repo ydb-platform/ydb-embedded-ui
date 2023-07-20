@@ -10,7 +10,6 @@ import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../.
 import {useTypedSelector} from '../../utils/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {disableAutorefresh, getSchema} from '../../store/reducers/schema/schema';
-import {getSchemaAcl} from '../../store/reducers/schemaAcl/schemaAcl';
 
 import SplitPane from '../../components/SplitPane';
 import {AccessDenied} from '../../components/Errors/403';
@@ -74,12 +73,10 @@ function Tenant(props: TenantProps) {
 
     useEffect(() => {
         dispatch(getSchema({path: tenantName}));
-        dispatch(getSchemaAcl({path: tenantName}));
     }, [tenantName, dispatch]);
 
     useEffect(() => {
         dispatch(getSchema({path: currentSchemaPath}));
-        dispatch(getSchemaAcl({path: currentSchemaPath}));
     }, [currentSchemaPath, dispatch]);
 
     useEffect(() => {
@@ -124,7 +121,6 @@ function Tenant(props: TenantProps) {
                         onCollapseSummary={onCollapseSummaryHandler}
                         onExpandSummary={onExpandSummaryHandler}
                         isCollapsed={summaryVisibilityState.collapsed}
-                        additionalTenantInfo={props.additionalTenantInfo}
                     />
                     <ObjectGeneral
                         type={preloadedPathType || currentPathType}

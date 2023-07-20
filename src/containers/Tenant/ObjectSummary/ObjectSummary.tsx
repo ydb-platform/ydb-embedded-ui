@@ -31,7 +31,7 @@ import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/te
 
 import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import SchemaViewer from '../Schema/SchemaViewer/SchemaViewer';
-import Acl from '../Acl/Acl';
+import {Acl} from '../Acl/Acl';
 
 import {
     TenantInfoTabsIds,
@@ -89,7 +89,6 @@ interface ObjectSummaryProps {
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
     isCollapsed: boolean;
-    additionalTenantInfo?: Record<string, unknown>;
 }
 
 export function ObjectSummary({
@@ -98,7 +97,6 @@ export function ObjectSummary({
     onCollapseSummary,
     onExpandSummary,
     isCollapsed,
-    additionalTenantInfo,
 }: ObjectSummaryProps) {
     const dispatch = useDispatch();
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = useReducer(
@@ -216,7 +214,7 @@ export function ObjectSummary({
     const renderTabContent = () => {
         switch (infoTab) {
             case TenantInfoTabsIds.acl: {
-                return <Acl additionalTenantInfo={additionalTenantInfo} />;
+                return <Acl />;
             }
             case TenantInfoTabsIds.schema: {
                 return loadingSchema ? (

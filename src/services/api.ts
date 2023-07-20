@@ -188,7 +188,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {
                 path,
             },
-            {concurrentId: `getSchemaAcl|${path}`},
+            {concurrentId: `getSchemaAcl`},
         );
     }
     getHeatmapData({path}: {path: string}) {

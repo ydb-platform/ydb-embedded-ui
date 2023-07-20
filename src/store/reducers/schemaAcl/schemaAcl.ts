@@ -6,6 +6,7 @@ import {createRequestActionTypes, createApiRequest} from '../../utils';
 import type {SchemaAclAction, SchemaAclState} from './types';
 
 export const FETCH_SCHEMA_ACL = createRequestActionTypes('schemaAcl', 'FETCH_SCHEMA_ACL');
+const SET_ACL_WAS_NOT_LOADED = 'schemaAcl/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {
     loading: false,
@@ -34,10 +35,20 @@ const schemaAcl: Reducer<SchemaAclState, SchemaAclAction> = (state = initialStat
             };
         }
         case FETCH_SCHEMA_ACL.FAILURE: {
+            if (action.error?.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error,
                 loading: false,
+            };
+        }
+        case SET_ACL_WAS_NOT_LOADED: {
+            return {
+                ...state,
+                wasLoaded: false,
             };
         }
         default:
@@ -51,5 +62,11 @@ export function getSchemaAcl({path}: {path: string}) {
         actions: FETCH_SCHEMA_ACL,
     });
 }
+
+export const setAclWasNotLoaded = () => {
+    return {
+        type: SET_ACL_WAS_NOT_LOADED,
+    } as const;
+};
 
 export default schemaAcl;
