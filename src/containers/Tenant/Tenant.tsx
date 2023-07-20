@@ -15,7 +15,7 @@ import {getSchemaAcl} from '../../store/reducers/schemaAcl/schemaAcl';
 import SplitPane from '../../components/SplitPane';
 import {AccessDenied} from '../../components/Errors/403';
 
-import ObjectSummary from './ObjectSummary/ObjectSummary';
+import {ObjectSummary} from './ObjectSummary/ObjectSummary';
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 
 import {

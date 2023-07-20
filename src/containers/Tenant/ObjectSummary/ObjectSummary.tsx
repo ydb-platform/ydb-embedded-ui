@@ -1,17 +1,13 @@
 import React, {ReactNode, useEffect, useReducer} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {Link} from 'react-router-dom';
-import cn from 'bem-cn-lite';
+import {useDispatch} from 'react-redux';
 import {useHistory, useLocation} from 'react-router';
+import {Link} from 'react-router-dom';
 import qs from 'qs';
-import _ from 'lodash';
+import cn from 'bem-cn-lite';
 
-import {Button, HelpPopover, Loader, Tabs} from '@gravity-ui/uikit';
+import {Button, HelpPopover, Tabs} from '@gravity-ui/uikit';
 
 import SplitPane from '../../../components/SplitPane';
-import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
-import Acl from '../Acl/Acl';
-import SchemaViewer from '../Schema/SchemaViewer/SchemaViewer';
 import CopyToClipboard from '../../../components/CopyToClipboard/CopyToClipboard';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import {
@@ -19,36 +15,36 @@ import {
     PersQueueGroupOverview,
 } from '../../../components/InfoViewer/schemaOverview';
 import {Icon} from '../../../components/Icon';
+import {Loader} from '../../../components/Loader';
 
-import {
-    EPathSubType,
-    EPathType,
-    TColumnTableDescription,
-    TDirEntry,
-} from '../../../types/api/schema';
-
+import {EPathSubType, EPathType, TColumnTableDescription} from '../../../types/api/schema';
+import routes, {createHref} from '../../../routes';
 import {formatDateTime} from '../../../utils';
-import {isColumnEntityType, isIndexTable, isTableType} from '../utils/schema';
-
+import {useTypedSelector} from '../../../utils/hooks';
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
 } from '../../../utils/constants';
+import {setShowPreview} from '../../../store/reducers/schema/schema';
+import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
+
+import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
+import SchemaViewer from '../Schema/SchemaViewer/SchemaViewer';
+import Acl from '../Acl/Acl';
+
 import {
     TenantInfoTabsIds,
     TenantTabsGroups,
     TENANT_INFO_TABS,
     TENANT_SCHEMA_TAB,
 } from '../TenantPages';
-import routes, {createHref} from '../../../routes';
 import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
     PaneVisibilityToggleButtons,
 } from '../utils/paneVisibilityToggleHelpers';
-import {setShowPreview} from '../../../store/reducers/schema/schema';
-import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
+import {isColumnEntityType, isIndexTable, isTableType} from '../utils/schema';
 
 import './ObjectSummary.scss';
 
@@ -93,10 +89,17 @@ interface ObjectSummaryProps {
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
     isCollapsed: boolean;
-    additionalTenantInfo?: any;
+    additionalTenantInfo?: Record<string, unknown>;
 }
 
-function ObjectSummary(props: ObjectSummaryProps) {
+export function ObjectSummary({
+    type,
+    subType,
+    onCollapseSummary,
+    onExpandSummary,
+    isCollapsed,
+    additionalTenantInfo,
+}: ObjectSummaryProps) {
     const dispatch = useDispatch();
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED),
@@ -107,7 +110,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
         currentSchemaPath,
         currentSchema: currentItem = {},
         loading: loadingSchema,
-    } = useSelector((state: any) => state.schema);
+    } = useTypedSelector((state) => state.schema);
 
     const location = useLocation();
 
@@ -118,26 +121,22 @@ function ObjectSummary(props: ObjectSummaryProps) {
     });
 
     const {name: tenantName, info: infoTab} = queryParams;
-    const pathData: TDirEntry | undefined = _.get(
-        data[tenantName as string],
-        'PathDescription.Self',
-    );
-    const currentSchemaData: TDirEntry | undefined = _.get(
-        data[currentSchemaPath],
-        'PathDescription.Self',
-    );
+
+    const pathData = tenantName ? data[tenantName.toString()]?.PathDescription?.Self : undefined;
+    const currentObjectData = currentSchemaPath ? data[currentSchemaPath] : undefined;
+    const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
     const tableSchema =
-        currentItem?.PathDescription?.Table || currentItem?.PathDescription?.ColumnTableDescription;
+        currentObjectData?.PathDescription?.Table ||
+        currentObjectData?.PathDescription?.ColumnTableDescription;
 
     const schema =
-        isTableType(props.type) && isColumnEntityType(props.type)
+        isTableType(type) && isColumnEntityType(type)
             ? // process data for ColumnTable
               prepareOlapTableSchema(tableSchema)
             : tableSchema;
 
     useEffect(() => {
-        const {type} = props;
         const isTable = isTableType(type);
 
         if (type && !isTable && !TENANT_INFO_TABS.find((el) => el.id === infoTab)) {
@@ -146,10 +145,10 @@ function ObjectSummary(props: ObjectSummaryProps) {
                 search: qs.stringify({...queryParams, info: TenantInfoTabsIds.overview}),
             });
         }
-    }, [props.type]);
+    }, [type, history, infoTab, location, queryParams]);
 
     const renderTabs = () => {
-        const isTable = isTableType(props.type);
+        const isTable = isTableType(type);
         const tabsItems = isTable ? [...TENANT_INFO_TABS, ...TENANT_SCHEMA_TAB] : TENANT_INFO_TABS;
 
         return (
@@ -188,11 +187,9 @@ function ObjectSummary(props: ObjectSummaryProps) {
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
-            [EPathType.EPathTypeCdcStream]: () => (
-                <CDCStreamOverview data={data[currentSchemaPath]} />
-            ),
+            [EPathType.EPathTypeCdcStream]: () => <CDCStreamOverview data={currentObjectData} />,
             [EPathType.EPathTypePersQueueGroup]: () => (
-                <PersQueueGroupOverview data={data[currentSchemaPath]} />
+                <PersQueueGroupOverview data={currentObjectData} />
             ),
         };
 
@@ -212,10 +209,14 @@ function ObjectSummary(props: ObjectSummaryProps) {
         return <div className={b('overview-wrapper')}>{component}</div>;
     };
 
+    const renderLoader = () => {
+        return <Loader />;
+    };
+
     const renderTabContent = () => {
         switch (infoTab) {
             case TenantInfoTabsIds.acl: {
-                return <Acl additionalTenantInfo={props.additionalTenantInfo} />;
+                return <Acl additionalTenantInfo={additionalTenantInfo} />;
             }
             case TenantInfoTabsIds.schema: {
                 return loadingSchema ? (
@@ -230,14 +231,6 @@ function ObjectSummary(props: ObjectSummaryProps) {
                 return renderObjectOverview();
             }
         }
-    };
-
-    const renderLoader = () => {
-        return (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
-        );
     };
 
     const renderTree = () => {
@@ -278,7 +271,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
     };
 
     const renderCommonInfoControls = () => {
-        const showPreview = isTableType(props.type) && !isIndexTable(props.subType);
+        const showPreview = isTableType(type) && !isIndexTable(subType);
         return (
             <React.Fragment>
                 {showPreview && (
@@ -286,7 +279,9 @@ function ObjectSummary(props: ObjectSummaryProps) {
                         <Icon name="tablePreview" viewBox={'0 0 16 16'} height={16} width={16} />
                     </Button>
                 )}
-                <CopyToClipboard text={currentSchemaPath} title="Copy schema path" />
+                {currentSchemaPath && (
+                    <CopyToClipboard text={currentSchemaPath} title="Copy schema path" />
+                )}
                 <PaneVisibilityToggleButtons
                     onCollapse={onCollapseInfoHandler}
                     onExpand={onExpandInfoHandler}
@@ -298,7 +293,6 @@ function ObjectSummary(props: ObjectSummaryProps) {
     };
 
     const renderEntityTypeBadge = () => {
-        const {type} = props;
         const {Status, Reason} = currentItem;
 
         let message;
@@ -321,7 +315,7 @@ function ObjectSummary(props: ObjectSummaryProps) {
         }
         return (
             <div className={b()}>
-                <div className={b({hidden: props.isCollapsed})}>
+                <div className={b({hidden: isCollapsed})}>
                     <SplitPane
                         direction="vertical"
                         defaultSizePaneKey={DEFAULT_SIZE_TENANT_SUMMARY_KEY}
@@ -350,9 +344,9 @@ function ObjectSummary(props: ObjectSummaryProps) {
                     </SplitPane>
                 </div>
                 <PaneVisibilityToggleButtons
-                    onCollapse={props.onCollapseSummary}
-                    onExpand={props.onExpandSummary}
-                    isCollapsed={props.isCollapsed}
+                    onCollapse={onCollapseSummary}
+                    onExpand={onExpandSummary}
+                    isCollapsed={isCollapsed}
                     initialDirection="left"
                     className={b('action-button')}
                 />
@@ -362,5 +356,3 @@ function ObjectSummary(props: ObjectSummaryProps) {
 
     return renderContent();
 }
-
-export default ObjectSummary;
