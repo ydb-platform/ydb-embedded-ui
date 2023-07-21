@@ -1,10 +1,10 @@
 import {QUERY_ACTIONS, QUERY_MODES} from '../../utils/query';
 
-import type {NetworkError} from '../api/error';
+import type {IResponseError, NetworkError} from '../api/error';
 import type {
     KeyValueRow,
     ColumnType,
-    ErrorResponse,
+    ErrorResponse as QueryErrorResponseData,
     ScriptPlan,
     QueryPlan,
     TKqpStatsQuery,
@@ -24,7 +24,8 @@ export interface QueryRequestParams {
     query: string;
 }
 
-export type QueryError = NetworkError | ErrorResponse;
+export type QueryErrorResponse = IResponseError<QueryErrorResponseData>;
+export type QueryError = NetworkError | QueryErrorResponse;
 
 export type QueryAction = ValueOf<typeof QUERY_ACTIONS>;
 export type QueryMode = ValueOf<typeof QUERY_MODES>;

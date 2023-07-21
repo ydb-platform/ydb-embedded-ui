@@ -7,7 +7,7 @@ import type {
     QueryPlan,
     ScriptPlan,
 } from '../types/api/query';
-import type {IQueryResult} from '../types/store/query';
+import type {IQueryResult, QueryErrorResponse} from '../types/store/query';
 
 export const QUERY_ACTIONS = {
     execute: 'execute',
@@ -169,12 +169,6 @@ export const prepareQueryResponse = (data?: KeyValueRow[]) => {
     });
 };
 
-export function prepareQueryError(error: any) {
-    return (
-        error.data?.error?.message ||
-        error.message ||
-        error.data ||
-        error.statusText ||
-        JSON.stringify(error)
-    );
+export function prepareQueryError(error: QueryErrorResponse) {
+    return error.data?.error?.message || error.statusText;
 }

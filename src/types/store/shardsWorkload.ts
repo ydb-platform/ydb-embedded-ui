@@ -1,7 +1,10 @@
-import {SEND_SHARD_QUERY, setShardsState, setShardsQueryFilters} from '../../store/reducers/shardsWorkload';
+import {
+    SEND_SHARD_QUERY,
+    setShardsState,
+    setShardsQueryFilters,
+} from '../../store/reducers/shardsWorkload';
 import type {ApiRequestAction} from '../../store/utils';
-import type {IResponseError} from '../api/error';
-import type {IQueryResult} from './query';
+import type {IQueryResult, QueryErrorResponse} from './query';
 
 export enum EShardsWorkloadMode {
     Immediate = 'immediate',
@@ -20,12 +23,12 @@ export interface IShardsWorkloadState {
     loading: boolean;
     wasLoaded: boolean;
     data?: IQueryResult;
-    error?: IResponseError;
+    error?: QueryErrorResponse;
     filters: IShardsWorkloadFilters;
 }
 
 export type IShardsWorkloadAction =
-    | ApiRequestAction<typeof SEND_SHARD_QUERY, IQueryResult, IResponseError>
+    | ApiRequestAction<typeof SEND_SHARD_QUERY, IQueryResult, QueryErrorResponse>
     | ReturnType<typeof setShardsState>
     | ReturnType<typeof setShardsQueryFilters>;
 

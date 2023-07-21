@@ -1,10 +1,9 @@
 import type {AxiosError} from 'axios';
 
 import type {IResponseError, NetworkError} from '../types/api/error';
-import type {ErrorResponse as QueryErrorResponse} from '../types/api/query';
-import type {QueryError} from '../types/store/query';
+import type {QueryError, QueryErrorResponse} from '../types/store/query';
 
-type RequestError = NetworkError | IResponseError | AxiosError | QueryErrorResponse | unknown;
+type RequestError = NetworkError | IResponseError | AxiosError | unknown;
 
 const isNetworkError = (error: RequestError): error is NetworkError => {
     return Boolean(

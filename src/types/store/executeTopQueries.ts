@@ -1,7 +1,10 @@
-import {FETCH_TOP_QUERIES, setTopQueriesState, setTopQueriesFilters} from '../../store/reducers/executeTopQueries';
+import {
+    FETCH_TOP_QUERIES,
+    setTopQueriesState,
+    setTopQueriesFilters,
+} from '../../store/reducers/executeTopQueries';
 import type {ApiRequestAction} from '../../store/utils';
-import type {IResponseError} from '../api/error';
-import type {IQueryResult} from './query';
+import type {IQueryResult, QueryErrorResponse} from './query';
 
 export interface ITopQueriesFilters {
     /** ms from epoch */
@@ -15,12 +18,12 @@ export interface ITopQueriesState {
     loading: boolean;
     wasLoaded: boolean;
     data?: IQueryResult;
-    error?: IResponseError;
+    error?: QueryErrorResponse;
     filters: ITopQueriesFilters;
 }
 
 export type ITopQueriesAction =
-    | ApiRequestAction<typeof FETCH_TOP_QUERIES, IQueryResult, IResponseError>
+    | ApiRequestAction<typeof FETCH_TOP_QUERIES, IQueryResult, QueryErrorResponse>
     | ReturnType<typeof setTopQueriesState>
     | ReturnType<typeof setTopQueriesFilters>;
 

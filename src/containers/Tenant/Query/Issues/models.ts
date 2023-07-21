@@ -1,14 +1,3 @@
-export interface IssueType {
-    file?: string;
-    position?: {row: number; column: number};
-    // eslint-disable-next-line camelcase
-    end_position?: {row: number; column: number};
-    message?: string;
-    code?: number;
-    severity?: number;
-    issues?: IssueType[];
-}
-
 export const SEVERITY_LIST = ['S_FATAL', 'S_ERROR', 'S_WARNING', 'S_INFO'] as const;
 
 export type SEVERITY = typeof SEVERITY_LIST[number];
