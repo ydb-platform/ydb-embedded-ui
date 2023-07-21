@@ -4,13 +4,14 @@ import cn from 'bem-cn-lite';
 
 import {Checkbox, Select} from '@gravity-ui/uikit';
 
+import type {IHeatmapMetricValue} from '../../types/store/heatmap';
 import {getTabletsInfo, setHeatmapOptions} from '../../store/reducers/heatmap';
 import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
 import {formatNumber} from '../../utils';
-import {prepareQueryError} from '../../utils/query';
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
+
 import {Loader} from '../../components/Loader';
-import type {IHeatmapMetricValue} from '../../types/store/heatmap';
+import {ResponseError} from '../../components/Errors/ResponseError';
 
 import {COLORS_RANGE_SIZE, getColorRange, getColorIndex, getCurrentMetricLimits} from './util';
 import {HeatmapCanvas} from './HeatmapCanvas/HeatmapCanvas';
@@ -196,7 +197,7 @@ export const Heatmap = ({path}: HeatmapProps) => {
     }
 
     if (error) {
-        return <div>{prepareQueryError(error)}</div>;
+        return <ResponseError error={error} />;
     }
 
     return renderContent();
