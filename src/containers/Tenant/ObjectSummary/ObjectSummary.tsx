@@ -17,7 +17,12 @@ import {
 import {Icon} from '../../../components/Icon';
 import {Loader} from '../../../components/Loader';
 
-import {EPathSubType, EPathType, TColumnTableDescription} from '../../../types/api/schema';
+import {
+    EPathSubType,
+    EPathType,
+    TColumnTableDescription,
+    TTableDescription,
+} from '../../../types/api/schema';
 import routes, {createHref} from '../../../routes';
 import {formatDateTime} from '../../../utils';
 import {useTypedSelector} from '../../../utils/hooks';
@@ -30,7 +35,7 @@ import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant'
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 
 import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
-import SchemaViewer from '../Schema/SchemaViewer/SchemaViewer';
+import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {Acl} from '../Acl/Acl';
 
 import {
@@ -68,7 +73,7 @@ function prepareOlapTableSchema(tableSchema: TColumnTableDescription = {}) {
         const KeyColumnIds = KeyColumnNames?.map((name: string) => {
             const column = Columns?.find((el) => el.Name === name);
             return column?.Id;
-        });
+        }).filter((id): id is number => id !== undefined);
 
         return {
             Columns,
@@ -132,7 +137,7 @@ export function ObjectSummary({
         isTableType(type) && isColumnEntityType(type)
             ? // process data for ColumnTable
               prepareOlapTableSchema(tableSchema)
-            : tableSchema;
+            : (tableSchema as TTableDescription | undefined);
 
     useEffect(() => {
         const isTable = isTableType(type);
@@ -221,7 +226,10 @@ export function ObjectSummary({
                     renderLoader()
                 ) : (
                     <div className={b('schema')}>
-                        <SchemaViewer data={schema} />
+                        <SchemaViewer
+                            keyColumnIds={schema?.KeyColumnIds}
+                            columns={schema?.Columns}
+                        />
                     </div>
                 );
             }
