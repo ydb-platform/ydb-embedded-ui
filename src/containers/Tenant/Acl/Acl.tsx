@@ -13,6 +13,7 @@ import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
 
 import './Acl.scss';
+import i18n from '../i18n';
 
 const b = cn('ydb-acl');
 
@@ -107,7 +108,7 @@ export const Acl = () => {
 
         return (
             <div className={b('owner-container')}>
-                <span className={b('owner-label')}>Owner: </span>
+                <span className={b('owner-label')}>{`${i18n('acl.owner')}: `}</span>
                 {prepareLogin(owner)}
             </div>
         );
@@ -122,7 +123,7 @@ export const Acl = () => {
     }
 
     if (!loading && !acl && !owner) {
-        return <div className={b('message-container')}>Empty</div>;
+        return <div className={b('message-container')}>{i18n('acl.empty')}</div>;
     }
 
     return (

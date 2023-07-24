@@ -52,6 +52,7 @@ import {
 import {isColumnEntityType, isIndexTable, isTableType} from '../utils/schema';
 
 import './ObjectSummary.scss';
+import i18n from '../i18n';
 
 const b = cn('object-summary');
 
@@ -242,7 +243,7 @@ export function ObjectSummary({
     const renderTree = () => {
         return (
             <div className={b('tree-wrapper')}>
-                <div className={b('tree-header')}>Navigation</div>
+                <div className={b('tree-header')}>{i18n('summary.navigation')}</div>
                 <div className={b('tree')}>
                     {pathData && (
                         <SchemaTree
@@ -281,12 +282,16 @@ export function ObjectSummary({
         return (
             <React.Fragment>
                 {showPreview && (
-                    <Button view="flat-secondary" onClick={onOpenPreview} title="Show preview">
+                    <Button
+                        view="flat-secondary"
+                        onClick={onOpenPreview}
+                        title={i18n('summary.showPreview')}
+                    >
                         <Icon name="tablePreview" viewBox={'0 0 16 16'} height={16} width={16} />
                     </Button>
                 )}
                 {currentSchemaPath && (
-                    <CopyToClipboard text={currentSchemaPath} title="Copy schema path" />
+                    <CopyToClipboard text={currentSchemaPath} title={i18n('summary.copySchemaPath')} />
                 )}
                 <PaneVisibilityToggleButtons
                     onCollapse={onCollapseInfoHandler}
