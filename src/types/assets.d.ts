@@ -8,5 +8,4 @@ declare module '*.jpg';
 declare module '*.jpeg';
 declare module '*.ico';
 
-declare type SVGIconData =
-    import('@gravity-ui/uikit/build/esm/components/Icon/types').SVGIconData;
+declare type SVGIconData = import('@gravity-ui/uikit/build/esm/components/Icon/types').SVGIconData;

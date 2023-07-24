@@ -18,7 +18,11 @@ import type {TClusterInfo} from '../../../types/api/cluster';
 import {backend, customBackend} from '../../../store';
 import {formatStorageValues} from '../../../utils';
 import {useSetting, useTypedSelector} from '../../../utils/hooks';
-import {CLUSTER_DEFAULT_TITLE, CLUSTER_INFO_HIDDEN_KEY, DEVELOPER_UI_TITLE} from '../../../utils/constants';
+import {
+    CLUSTER_DEFAULT_TITLE,
+    CLUSTER_INFO_HIDDEN_KEY,
+    DEVELOPER_UI_TITLE,
+} from '../../../utils/constants';
 
 import {VersionsBar} from '../VersionsBar/VersionsBar';
 import {ClusterInfoSkeleton} from '../ClusterInfoSkeleton/ClusterInfoSkeleton';

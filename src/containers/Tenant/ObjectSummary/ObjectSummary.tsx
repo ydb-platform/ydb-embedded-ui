@@ -288,7 +288,10 @@ export function ObjectSummary({
                     </Button>
                 )}
                 {currentSchemaPath && (
-                    <CopyToClipboard text={currentSchemaPath} title={i18n('summary.copySchemaPath')} />
+                    <CopyToClipboard
+                        text={currentSchemaPath}
+                        title={i18n('summary.copySchemaPath')}
+                    />
                 )}
                 <PaneVisibilityToggleButtons
                     onCollapse={onCollapseInfoHandler}

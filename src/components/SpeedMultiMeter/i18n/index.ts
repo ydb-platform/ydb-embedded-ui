@@ -9,5 +9,3 @@ i18n.registerKeyset(Lang.En, COMPONENT, en);
 i18n.registerKeyset(Lang.Ru, COMPONENT, ru);
 
 export default i18n.keyset(COMPONENT);
-
-

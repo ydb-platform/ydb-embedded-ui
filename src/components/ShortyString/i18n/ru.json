@@ -1,10 +1,10 @@
 {
-    "default_collapse_label": "Показать меньше",
-    "default_expand_label": "Показать ещё",
-    "chars_count": [
-        " ({{count}} символ)",
-        " ({{count}} символа)",
-        " ({{count}} символов)",
-        " ({{count}} символов)"
-    ]
+  "default_collapse_label": "Показать меньше",
+  "default_expand_label": "Показать ещё",
+  "chars_count": [
+    " ({{count}} символ)",
+    " ({{count}} символа)",
+    " ({{count}} символов)",
+    " ({{count}} символов)"
+  ]
 }

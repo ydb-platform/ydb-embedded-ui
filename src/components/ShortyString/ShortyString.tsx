@@ -33,18 +33,15 @@ export default function ShortyString({
     const [expanded, setExpanded] = React.useState(false);
 
     const toggleLabelAction = expanded ? collapseLabel : expandLabel;
-    const toggleLabelSymbolsCount = displayLength && !expanded
-        ? i18n('chars_count', {count: value.length})
-        : '';
+    const toggleLabelSymbolsCount =
+        displayLength && !expanded ? i18n('chars_count', {count: value.length}) : '';
     const toggleLabel = toggleLabelAction + toggleLabelSymbolsCount;
 
     // showing toogle button with a label that is longer than the hidden part is pointless,
     // hence compare to limit + length in the not-strict mode
     const hasToggle = value.length > limit + (strict ? 0 : toggleLabel.length);
 
-    const text = expanded || !hasToggle
-        ? value
-        : value.slice(0, limit - 4) + '\u00a0...';
+    const text = expanded || !hasToggle ? value : value.slice(0, limit - 4) + '\u00a0...';
 
     return (
         <div className={block()}>

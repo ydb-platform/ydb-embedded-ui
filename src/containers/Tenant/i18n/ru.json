@@ -1,9 +1,8 @@
 {
-    "acl.owner": "Владелец",
-    "acl.empty": "Нет данных об Acl",
+  "acl.owner": "Владелец",
+  "acl.empty": "Нет данных об Acl",
 
-    "summary.navigation": "Навигация",
-    "summary.showPreview": "Показать превью",
-    "summary.copySchemaPath": "Скопировать путь"
-  
+  "summary.navigation": "Навигация",
+  "summary.showPreview": "Показать превью",
+  "summary.copySchemaPath": "Скопировать путь"
 }

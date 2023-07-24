@@ -1,7 +1,7 @@
 {
-    "empty.default": "No such groups",
-    "empty.out_of_space": "No groups with out of space errors",
-    "empty.degraded": "No degraded groups",
-    "show_all": "Show all groups",
-    "encrypted": "Encrypted group"
+  "empty.default": "No such groups",
+  "empty.out_of_space": "No groups with out of space errors",
+  "empty.degraded": "No degraded groups",
+  "show_all": "Show all groups",
+  "encrypted": "Encrypted group"
 }

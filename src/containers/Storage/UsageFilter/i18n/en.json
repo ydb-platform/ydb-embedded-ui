@@ -1,10 +1,5 @@
 {
-    "label": "Usage:",
-    "default_value": "Any",
-    "groups_count": [
-        "{{count}} group",
-        "{{count}} groups",
-        "{{count}} groups",
-        "No groups"
-    ]
+  "label": "Usage:",
+  "default_value": "Any",
+  "groups_count": ["{{count}} group", "{{count}} groups", "{{count}} groups", "No groups"]
 }
