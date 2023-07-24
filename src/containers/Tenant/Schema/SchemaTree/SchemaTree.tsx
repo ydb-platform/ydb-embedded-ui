@@ -13,7 +13,7 @@ interface SchemaTreeProps {
     rootPath: string;
     rootName: string;
     rootType?: EPathType;
-    currentPath: string;
+    currentPath?: string;
 }
 
 export function SchemaTree(props: SchemaTreeProps) {
@@ -57,7 +57,7 @@ export function SchemaTree(props: SchemaTreeProps) {
 
     useEffect(() => {
         // if the cached path is not in the current tree, show root
-        if (!currentPath.startsWith(rootPath)) {
+        if (!currentPath?.startsWith(rootPath)) {
             handleActivePathUpdate(rootPath);
         }
     }, []);
