@@ -27,7 +27,8 @@ interface ResultIssuesProps {
 export default function ResultIssues({data, className}: ResultIssuesProps) {
     const [showIssues, setShowIssues] = React.useState(false);
 
-    const hasIssues = typeof data === 'string' ? false : Array.isArray(data?.issues);
+    const issues = typeof data === 'string' ? undefined : data?.issues;
+    const hasIssues = Array.isArray(issues) && issues.length > 0;
 
     const renderTitle = () => {
         let content;
@@ -58,9 +59,7 @@ export default function ResultIssues({data, className}: ResultIssuesProps) {
                     </Button>
                 )}
             </div>
-            {hasIssues && showIssues && (
-                <Issues issues={(data as ErrorResponse)?.issues} className={className} />
-            )}
+            {hasIssues && showIssues && <Issues issues={issues} className={className} />}
         </div>
     );
 }
@@ -86,8 +85,10 @@ export function Issues({issues, className}: IssuesProps) {
 function Issue({issue, level = 0}: {issue: IssueMessage; expanded?: boolean; level?: number}) {
     const [isExpand, setIsExpand] = React.useState(true);
     const severity = getSeverity(issue.severity);
-    const hasIssues = Array.isArray(issue.issues) && issue.issues.length > 0;
     const position = getIssuePosition(issue);
+
+    const issues = issue.issues;
+    const hasIssues = Array.isArray(issues) && issues.length > 0;
 
     const arrowDirection = isExpand ? 'bottom' : 'right';
 
@@ -126,11 +127,7 @@ function Issue({issue, level = 0}: {issue: IssueMessage; expanded?: boolean; lev
             </div>
             {hasIssues && isExpand && (
                 <div className={blockIssue('issues')}>
-                    <IssueList
-                        issues={issue.issues as IssueMessage[]}
-                        level={level + 1}
-                        expanded={isExpand}
-                    />
+                    <IssueList issues={issues} level={level + 1} expanded={isExpand} />
                 </div>
             )}
         </div>
