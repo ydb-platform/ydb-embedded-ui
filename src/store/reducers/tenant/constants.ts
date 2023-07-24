@@ -25,3 +25,9 @@ export const TENANT_DIAGNOSTICS_TABS_IDS = {
     consumers: 'consumers',
     partitions: 'partitions',
 } as const;
+
+export const TENANT_SUMMARY_TABS_IDS = {
+    overview: 'overview',
+    acl: 'acl',
+    schema: 'schema',
+} as const;

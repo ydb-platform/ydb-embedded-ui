@@ -51,6 +51,9 @@ const paramSetup = {
         diagnosticsTab: {
             stateKey: 'tenant.diagnosticsTab',
         },
+        summaryTab: {
+            stateKey: 'tenant.summaryTab',
+        },
         shardsMode: {
             stateKey: 'shardsWorkload.filters.mode',
         },

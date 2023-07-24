@@ -1,31 +1,26 @@
 import routes, {createHref} from '../../routes';
+import {TENANT_SUMMARY_TABS_IDS} from '../../store/reducers/tenant/constants';
 
-export enum TenantInfoTabsIds {
-    overview = 'overview',
-    acl = 'acl',
-    schema = 'schema',
-}
-
-export enum TenantTabsGroups {
-    info = 'info',
-    queryTab = 'queryTab',
-    diagnosticsTab = 'diagnosticsTab',
-}
+export const TenantTabsGroups = {
+    summaryTab: 'summaryTab',
+    queryTab: 'queryTab',
+    diagnosticsTab: 'diagnosticsTab',
+} as const;
 
 export const TENANT_INFO_TABS = [
     {
-        id: TenantInfoTabsIds.overview,
+        id: TENANT_SUMMARY_TABS_IDS.overview,
         title: 'Overview',
     },
     {
-        id: TenantInfoTabsIds.acl,
+        id: TENANT_SUMMARY_TABS_IDS.acl,
         title: 'ACL',
     },
 ];
 
 export const TENANT_SCHEMA_TAB = [
     {
-        id: TenantInfoTabsIds.schema,
+        id: TENANT_SUMMARY_TABS_IDS.schema,
         title: 'Schema',
     },
 ];

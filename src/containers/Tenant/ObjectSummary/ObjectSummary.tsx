@@ -1,6 +1,6 @@
 import React, {ReactNode, useEffect, useReducer} from 'react';
 import {useDispatch} from 'react-redux';
-import {useHistory, useLocation} from 'react-router';
+import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
 import qs from 'qs';
 import cn from 'bem-cn-lite';
@@ -31,19 +31,18 @@ import {
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
 } from '../../../utils/constants';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
-import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
+import {setQueryTab, setSummaryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import {
+    TENANT_PAGES_IDS,
+    TENANT_QUERY_TABS_ID,
+    TENANT_SUMMARY_TABS_IDS,
+} from '../../../store/reducers/tenant/constants';
 
 import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {Acl} from '../Acl/Acl';
 
-import {
-    TenantInfoTabsIds,
-    TenantTabsGroups,
-    TENANT_INFO_TABS,
-    TENANT_SCHEMA_TAB,
-} from '../TenantPages';
+import {TenantTabsGroups, TENANT_INFO_TABS, TENANT_SCHEMA_TAB} from '../TenantPages';
 import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
@@ -115,16 +114,17 @@ export function ObjectSummary({
         currentSchema: currentItem = {},
         loading: loadingSchema,
     } = useTypedSelector((state) => state.schema);
+    const {summaryTab = TENANT_SUMMARY_TABS_IDS.overview} = useTypedSelector(
+        (state) => state.tenant,
+    );
 
     const location = useLocation();
-
-    const history = useHistory();
 
     const queryParams = qs.parse(location.search, {
         ignoreQueryPrefix: true,
     });
 
-    const {name: tenantName, info: infoTab} = queryParams;
+    const {name: tenantName} = queryParams;
 
     const pathData = tenantName ? data[tenantName.toString()]?.PathDescription?.Self : undefined;
     const currentObjectData = currentSchemaPath ? data[currentSchemaPath] : undefined;
@@ -143,13 +143,10 @@ export function ObjectSummary({
     useEffect(() => {
         const isTable = isTableType(type);
 
-        if (type && !isTable && !TENANT_INFO_TABS.find((el) => el.id === infoTab)) {
-            history.push({
-                pathname: location.pathname,
-                search: qs.stringify({...queryParams, info: TenantInfoTabsIds.overview}),
-            });
+        if (type && !isTable && !TENANT_INFO_TABS.find((el) => el.id === summaryTab)) {
+            dispatch(setSummaryTab(TENANT_SUMMARY_TABS_IDS.overview));
         }
-    }, [type, history, infoTab, location, queryParams]);
+    }, [dispatch, type, summaryTab]);
 
     const renderTabs = () => {
         const isTable = isTableType(type);
@@ -160,12 +157,12 @@ export function ObjectSummary({
                 <Tabs
                     size="l"
                     items={tabsItems}
-                    activeTab={infoTab as string}
+                    activeTab={summaryTab}
                     wrapTo={({id}, node) => {
                         const path = createHref(routes.tenant, undefined, {
                             ...queryParams,
                             name: tenantName as string,
-                            [TenantTabsGroups.info]: id,
+                            [TenantTabsGroups.summaryTab]: id,
                         });
                         return (
                             <Link to={path} key={id} className={b('tab')}>
@@ -218,11 +215,11 @@ export function ObjectSummary({
     };
 
     const renderTabContent = () => {
-        switch (infoTab) {
-            case TenantInfoTabsIds.acl: {
+        switch (summaryTab) {
+            case TENANT_SUMMARY_TABS_IDS.acl: {
                 return <Acl />;
             }
-            case TenantInfoTabsIds.schema: {
+            case TENANT_SUMMARY_TABS_IDS.schema: {
                 return loadingSchema ? (
                     renderLoader()
                 ) : (
