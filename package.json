@@ -17,6 +17,7 @@
     "@gravity-ui/react-data-table": "^1.0.3",
     "axios": "0.19.2",
     "bem-cn-lite": "4.0.0",
+    "copy-to-clipboard": "^3.3.3",
     "history": "4.10.1",
     "js-cookie": "2.2.1",
     "keymaster": "1.6.2",
