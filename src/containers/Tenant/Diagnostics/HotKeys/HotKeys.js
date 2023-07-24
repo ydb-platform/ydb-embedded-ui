@@ -5,10 +5,10 @@ import {Loader} from '@gravity-ui/uikit';
 import DataTable from '@gravity-ui/react-data-table';
 
 import {Icon} from '../../../../components/Icon';
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 
 import {AutoFetcher} from '../../../../utils/autofetcher';
 import {getHotKeys, setHotKeysOptions} from '../../../../store/reducers/hotKeys';
-import {prepareQueryError} from '../../../../utils/query';
 
 import {isColumnEntityType, isTableType} from '../../utils/schema';
 
@@ -86,7 +86,7 @@ function HotKeys({
                 sortable: false,
                 align: DataTable.RIGHT,
             },
-            ...keyColumnsIds?.map((col, index) => ({
+            ...keyColumnsIds.map((col, index) => ({
                 name: col,
                 header: (
                     <div className={b('primary-key-column')}>
@@ -107,7 +107,7 @@ function HotKeys({
 
     const renderContent = () => {
         if (error) {
-            return prepareQueryError(error);
+            return <ResponseError error={error} />;
         }
         return data !== null ? (
             <div className={b('table-content')}>

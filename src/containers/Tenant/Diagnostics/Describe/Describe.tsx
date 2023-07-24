@@ -6,8 +6,8 @@ import JSONTree from 'react-json-inspector';
 import 'react-json-inspector/json-inspector.css';
 
 import {Loader} from '../../../../components/Loader';
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 
-import {prepareQueryError} from '../../../../utils/query';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {
     getDescribe,
@@ -86,7 +86,7 @@ const Describe = ({tenant, type}: IDescribeProps) => {
     }
 
     if (error) {
-        return <div className={b('message-container', 'error')}>{prepareQueryError(error)}</div>;
+        return <ResponseError error={error} className={b('message-container')} />;
     }
 
     if (!loading && !preparedDescribeData) {

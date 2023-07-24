@@ -205,7 +205,7 @@ export type Actions = ExecuteActions | ExplainActions;
 
 export interface ErrorResponse {
     error?: IssueMessage;
-    issues?: IssueMessage[];
+    issues?: IssueMessage[] | null;
 }
 
 // ==== Explain Responses ====

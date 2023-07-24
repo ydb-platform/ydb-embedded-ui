@@ -1,5 +1,5 @@
-export interface IResponseError {
-    data?: unknown;
+export interface IResponseError<T = unknown> {
+    data?: T;
     status?: number;
     statusText?: string;
     isCancelled?: boolean;

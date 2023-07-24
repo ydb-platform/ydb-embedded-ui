@@ -1,5 +1,7 @@
 {
+    "parser": "@typescript-eslint/parser",
     "extends": "@gravity-ui/eslint-config/client",
+    "plugins": ["@typescript-eslint"],
     "rules": {
         "react/jsx-uses-react": "off",
         "react/react-in-jsx-scope": "off",

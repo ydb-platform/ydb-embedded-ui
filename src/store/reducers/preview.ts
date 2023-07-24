@@ -1,7 +1,7 @@
 import '../../services/api';
 
-import type {ErrorResponse, ExecuteActions} from '../../types/api/query';
-import type {IQueryResult} from '../../types/store/query';
+import type {ExecuteActions} from '../../types/api/query';
+import type {IQueryResult, QueryErrorResponse} from '../../types/store/query';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
 
 import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
@@ -16,7 +16,9 @@ const initialState = {
 
 const preview = (
     state = initialState,
-    action: ApiRequestAction<typeof SEND_QUERY, IQueryResult, ErrorResponse> | ReturnType<typeof setQueryOptions>,
+    action:
+        | ApiRequestAction<typeof SEND_QUERY, IQueryResult, QueryErrorResponse>
+        | ReturnType<typeof setQueryOptions>,
 ) => {
     switch (action.type) {
         case SEND_QUERY.REQUEST: {
@@ -57,7 +59,7 @@ interface SendQueryParams {
     query?: string;
     database?: string;
     action?: ExecuteActions;
-};
+}
 
 export const sendQuery = ({query, database, action}: SendQueryParams) => {
     return createApiRequest({
