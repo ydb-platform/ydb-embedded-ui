@@ -260,6 +260,9 @@ export enum EPathType {
     EPathTypeColumnStore = 'EPathTypeColumnStore',
     EPathTypeColumnTable = 'EPathTypeColumnTable',
     EPathTypeCdcStream = 'EPathTypeCdcStream',
+
+    EPathTypeExternalDataSource = 'EPathTypeExternalDataSource',
+    EPathTypeExternalTable = 'EPathTypeExternalTable',
 }
 
 export enum EPathSubType {

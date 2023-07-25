@@ -15,7 +15,7 @@ import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {QueryResultTable} from '../../../../components/QueryResultTable';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 
-import {isTableType} from '../../utils/schema';
+import {isExternalTable, isTableType} from '../../utils/schema';
 
 import i18n from '../i18n';
 
@@ -56,7 +56,7 @@ export const Preview = ({database, type}: PreviewProps) => {
                 sendQuery({
                     query,
                     database,
-                    action: 'execute-scan',
+                    action: isExternalTable(type) ? 'execute-query' : 'execute-scan',
                 }),
             );
         },
@@ -103,7 +103,7 @@ export const Preview = ({database, type}: PreviewProps) => {
     if (!isTableType(type)) {
         message = <div className={b('message-container')}>{i18n('preview.not-available')}</div>;
     } else if (error) {
-        message = <div className={b('message-container')}>{prepareQueryError(error)}</div>;
+        message = <div className={b('message-container', 'error')}>{prepareQueryError(error)}</div>;
     }
 
     const content = message ?? (
