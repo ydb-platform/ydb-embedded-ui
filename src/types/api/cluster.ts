@@ -31,7 +31,7 @@ export interface TClusterInfo {
     Tenants?: string;
     /** uint64 */
     Tablets?: string;
-    
+
     Balancer?: string; // additional
     Solomon?: string; // additional
 }

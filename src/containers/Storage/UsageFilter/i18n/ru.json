@@ -1,10 +1,5 @@
 {
-    "label": "Использование:",
-    "default_value": "Любое",
-    "groups_count": [
-        "{{count}} группа",
-        "{{count}} группы",
-        "{{count}} групп",
-        "Нет групп"
-    ]
+  "label": "Использование:",
+  "default_value": "Любое",
+  "groups_count": ["{{count}} группа", "{{count}} группы", "{{count}} групп", "Нет групп"]
 }

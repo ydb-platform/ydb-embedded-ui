@@ -4,10 +4,7 @@ import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-component
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import {
-    TENANT_QUERY_TABS_ID,
-    TENANT_PAGES_IDS,
-} from '../../../store/reducers/tenant/constants';
+import {TENANT_QUERY_TABS_ID, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import createToast from '../../../utils/createToast';
 
 const createTableTemplate = (path: string) => {

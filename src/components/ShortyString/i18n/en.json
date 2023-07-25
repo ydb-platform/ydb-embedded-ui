@@ -1,10 +1,10 @@
 {
-    "default_collapse_label": "Show less",
-    "default_expand_label": "Show more",
-    "chars_count": [
-        " ({{count}} symbol)",
-        " ({{count}} symbols)",
-        " ({{count}} symbols)",
-        " ({{count}} symbols)"
-    ]
+  "default_collapse_label": "Show less",
+  "default_expand_label": "Show more",
+  "chars_count": [
+    " ({{count}} symbol)",
+    " ({{count}} symbols)",
+    " ({{count}} symbols)",
+    " ({{count}} symbols)"
+  ]
 }

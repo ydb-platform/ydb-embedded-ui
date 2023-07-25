@@ -11,16 +11,16 @@ interface CellProps {
 }
 
 export const Cell = React.memo(function Cell(props: CellProps) {
-    const {
-        className,
-        value,
-    } = props;
+    const {className, value} = props;
 
     const dispatch = useDispatch();
 
-    useEffect(() => () => {
-        dispatch(hideTooltip());
-    }, [dispatch]);
+    useEffect(
+        () => () => {
+            dispatch(hideTooltip());
+        },
+        [dispatch],
+    );
 
     return (
         <span
@@ -29,5 +29,5 @@ export const Cell = React.memo(function Cell(props: CellProps) {
         >
             {value}
         </span>
-    )
+    );
 });

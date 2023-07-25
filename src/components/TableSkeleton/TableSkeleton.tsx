@@ -1,6 +1,6 @@
-import { FC } from 'react';
+import {FC} from 'react';
 import block from 'bem-cn-lite';
-import { Skeleton } from '@gravity-ui/uikit';
+import {Skeleton} from '@gravity-ui/uikit';
 
 import './TableSkeleton.scss';
 
@@ -11,7 +11,7 @@ interface TableSkeletonProps {
     rows?: number;
 }
 
-export const TableSkeleton: FC<TableSkeletonProps> = ({ rows = 2, className }) => (
+export const TableSkeleton: FC<TableSkeletonProps> = ({rows = 2, className}) => (
     <div className={b(null, className)}>
         <div className={b('row')}>
             <Skeleton className={b('col-1')} />
