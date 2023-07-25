@@ -31,7 +31,7 @@ import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 import {clusterName} from '../../store';
 
-import {TenantTabsGroups, TENANT_INFO_TABS, getTenantPath} from '../Tenant/TenantPages';
+import {getTenantPath} from '../Tenant/TenantPages';
 
 import './Tenants.scss';
 
@@ -80,8 +80,6 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     };
 
     const renderTable = () => {
-        const initialTenantInfoTab = TENANT_INFO_TABS[0].id;
-
         const getTenantBackend = (tenant: PreparedTenant) => {
             const backend = tenant.MonitoringEndpoint ?? tenant.backend;
             return additionalTenantsProps?.prepareTenantBackend?.(backend);
@@ -106,7 +104,6 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                                 path={getTenantPath({
                                     name: row.Name,
                                     backend,
-                                    [TenantTabsGroups.info]: initialTenantInfoTab,
                                 })}
                             />
                             {additionalTenantsProps?.getMonitoringLink?.(row.Name, row.Type)}

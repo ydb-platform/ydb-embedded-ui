@@ -7,6 +7,7 @@ import type {
     TenantPage,
     TenantQueryTab,
     TenantState,
+    TenantSummaryTab,
 } from './types';
 
 import '../../../services/api';
@@ -17,6 +18,7 @@ export const FETCH_TENANT = createRequestActionTypes('tenant', 'FETCH_TENANT');
 const SET_TOP_LEVEL_TAB = 'tenant/SET_TOP_LEVEL_TAB';
 const SET_QUERY_TAB = 'tenant/SET_QUERY_TAB';
 const SET_DIAGNOSTICS_TAB = 'tenant/SET_DIAGNOSTICS_TAB';
+const SET_SUMMARY_TAB = 'tenant/SET_SUMMARY_TAB';
 const CLEAR_TENANT = 'tenant/CLEAR_TENANT';
 
 const initialState = {loading: false, wasLoaded: false};
@@ -75,6 +77,12 @@ const tenantReducer: Reducer<TenantState, TenantAction> = (state = initialState,
                 diagnosticsTab: action.data,
             };
         }
+        case SET_SUMMARY_TAB: {
+            return {
+                ...state,
+                summaryTab: action.data,
+            };
+        }
 
         default:
             return state;
@@ -112,6 +120,13 @@ export function setQueryTab(tab: TenantQueryTab) {
 export function setDiagnosticsTab(tab: TenantDiagnosticsTab) {
     return {
         type: SET_DIAGNOSTICS_TAB,
+        data: tab,
+    } as const;
+}
+
+export function setSummaryTab(tab: TenantSummaryTab) {
+    return {
+        type: SET_SUMMARY_TAB,
         data: tab,
     } as const;
 }
