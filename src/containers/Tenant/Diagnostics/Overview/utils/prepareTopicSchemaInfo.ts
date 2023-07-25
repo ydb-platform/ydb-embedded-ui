@@ -21,9 +21,8 @@ export const prepareTopicSchemaInfo = (data?: TEvDescribeSchemeResult): Array<In
 
     const {Partitions = [], PQTabletConfig = {PartitionConfig: {LifetimeSeconds: 0}}} = pqGroupData;
 
-    const {Codecs, MeteringMode} = pqGroupData?.PQTabletConfig;
-    const {WriteSpeedInBytesPerSecond, StorageLimitBytes} =
-        pqGroupData?.PQTabletConfig?.PartitionConfig;
+    const {Codecs, MeteringMode} = PQTabletConfig;
+    const {WriteSpeedInBytesPerSecond, StorageLimitBytes} = PQTabletConfig.PartitionConfig;
 
     const pqGeneralInfo = formatObject<TPersQueueGroupDescription>(formatPQGroupItem, {
         Partitions,
