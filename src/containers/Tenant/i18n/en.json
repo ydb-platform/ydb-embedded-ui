@@ -4,5 +4,8 @@
 
   "summary.navigation": "Navigation",
   "summary.showPreview": "Show preview",
-  "summary.copySchemaPath": "Copy schema path"
+  "summary.copySchemaPath": "Copy schema path",
+
+  "actions.copied" : "The path is copied to the clipboard",
+  "actions.notCopied" : "Couldn’t copy the path"
 }

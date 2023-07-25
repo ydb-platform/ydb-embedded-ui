@@ -1,4 +1,6 @@
 import {Dispatch} from 'react';
+import copy from 'copy-to-clipboard';
+
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
 import {changeUserInput} from '../../../store/reducers/executeQuery';
@@ -6,6 +8,8 @@ import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import {TENANT_QUERY_TABS_ID, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import createToast from '../../../utils/createToast';
+
+import i18n from '../i18n';
 
 const createTableTemplate = (path: string) => {
     return `CREATE TABLE \`${path}/my_table\`
@@ -48,22 +52,20 @@ const bindActions = (
         selectQuery: inputQuery(selectQueryTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
         copyPath: () => {
-            navigator.clipboard
-                .writeText(path)
-                .then(() => {
-                    createToast({
-                        name: 'Copied',
-                        title: 'The path is copied to the clipboard',
-                        type: 'success',
-                    });
-                })
-                .catch(() => {
-                    createToast({
-                        name: 'Not copied',
-                        title: 'Couldn’t copy the path',
-                        type: 'error',
-                    });
+            try {
+                copy(path);
+                createToast({
+                    name: 'Copied',
+                    title: i18n('actions.copied'),
+                    type: 'success',
                 });
+            } catch {
+                createToast({
+                    name: 'Not copied',
+                    title: i18n('actions.notCopied'),
+                    type: 'error',
+                });
+            }
         },
         openPreview: () => {
             dispatch(setShowPreview(true));
