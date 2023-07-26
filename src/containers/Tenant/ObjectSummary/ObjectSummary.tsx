@@ -218,7 +218,11 @@ export function ObjectSummary({
     };
 
     const renderLoader = () => {
-        return <Loader />;
+        return (
+            <div>
+                <Loader />
+            </div>
+        );
     };
 
     const renderTabContent = () => {
