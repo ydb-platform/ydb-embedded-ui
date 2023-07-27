@@ -1,5 +1,22 @@
 # Changelog
 
+## [4.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.10.1...v4.11.0) (2023-07-27)
+
+
+### Features
+
+* support external objects in schema tree ([#485](https://github.com/ydb-platform/ydb-embedded-ui/issues/485)) ([cf96f9a](https://github.com/ydb-platform/ydb-embedded-ui/commit/cf96f9af02db1352f3990f21f8a84c1282229517))
+
+
+### Bug Fixes
+
+* **ClusterInfo:** change cluster default name ([#478](https://github.com/ydb-platform/ydb-embedded-ui/issues/478)) ([398df6e](https://github.com/ydb-platform/ydb-embedded-ui/commit/398df6e3a5778c245653f61b41ba2e1bd0ea3a51))
+* fix copy schema action ([#483](https://github.com/ydb-platform/ydb-embedded-ui/issues/483)) ([f6b01c3](https://github.com/ydb-platform/ydb-embedded-ui/commit/f6b01c3cc2808337d5597f990f65ff3e7c010b05))
+* **Nodes:** support v2 compute ([#476](https://github.com/ydb-platform/ydb-embedded-ui/issues/476)) ([696d43a](https://github.com/ydb-platform/ydb-embedded-ui/commit/696d43a04109c7fc68986e036e66767593af8d00))
+* **ObjectSummary:** fix issue on object change with active schema tab ([#482](https://github.com/ydb-platform/ydb-embedded-ui/issues/482)) ([b50db5f](https://github.com/ydb-platform/ydb-embedded-ui/commit/b50db5ff742c5c7fc27e292309831b937e5d40bd))
+* **ObjectSummary:** fix wrong tree alignment bug ([#486](https://github.com/ydb-platform/ydb-embedded-ui/issues/486)) ([e8bfe99](https://github.com/ydb-platform/ydb-embedded-ui/commit/e8bfe99657870c735a41d24febaa907ac1383479))
+* **Query:** process null issues error ([#480](https://github.com/ydb-platform/ydb-embedded-ui/issues/480)) ([4c4e684](https://github.com/ydb-platform/ydb-embedded-ui/commit/4c4e6845e539296ecbdefa930bc63d3321f277dc))
+
 ## [4.10.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.10.0...v4.10.1) (2023-07-14)
 
 
