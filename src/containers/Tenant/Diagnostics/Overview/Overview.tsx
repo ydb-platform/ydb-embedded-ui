@@ -124,6 +124,8 @@ function Overview({type, tenantName}: OverviewProps) {
                 <ChangefeedInfo data={data} topic={additionalData?.[0]} />
             ),
             [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={data} />,
+            [EPathType.EPathTypeExternalTable]: undefined,
+            [EPathType.EPathTypeExternalDataSource]: undefined,
         };
 
         return (

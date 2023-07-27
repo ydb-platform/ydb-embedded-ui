@@ -20,8 +20,8 @@ import {Loader} from '../../../components/Loader';
 import {
     EPathSubType,
     EPathType,
+    TColumnDescription,
     TColumnTableDescription,
-    TTableDescription,
 } from '../../../types/api/schema';
 import routes, {createHref} from '../../../routes';
 import {formatDateTime} from '../../../utils';
@@ -48,7 +48,7 @@ import {
     paneVisibilityToggleReducerCreator,
     PaneVisibilityToggleButtons,
 } from '../utils/paneVisibilityToggleHelpers';
-import {isColumnEntityType, isIndexTable, isTableType} from '../utils/schema';
+import {isColumnEntityType, isExternalTable, isIndexTable, isTableType} from '../utils/schema';
 
 import './ObjectSummary.scss';
 import i18n from '../i18n';
@@ -130,15 +130,20 @@ export function ObjectSummary({
     const currentObjectData = currentSchemaPath ? data[currentSchemaPath] : undefined;
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
-    const tableSchema =
-        currentObjectData?.PathDescription?.Table ||
-        currentObjectData?.PathDescription?.ColumnTableDescription;
+    let keyColumnIds: number[] | undefined;
+    let columns: TColumnDescription[] | undefined;
 
-    const schema =
-        isTableType(type) && isColumnEntityType(type)
-            ? // process data for ColumnTable
-              prepareOlapTableSchema(tableSchema)
-            : (tableSchema as TTableDescription | undefined);
+    if (isTableType(type) && isColumnEntityType(type)) {
+        const description = currentObjectData?.PathDescription?.ColumnTableDescription;
+        const columnTableSchema = prepareOlapTableSchema(description);
+        keyColumnIds = columnTableSchema.KeyColumnIds;
+        columns = columnTableSchema.Columns;
+    } else if (isExternalTable(type)) {
+        columns = currentObjectData?.PathDescription?.ExternalTableDescription?.Columns;
+    } else {
+        keyColumnIds = currentObjectData?.PathDescription?.Table?.KeyColumnIds;
+        columns = currentObjectData?.PathDescription?.Table?.Columns;
+    }
 
     useEffect(() => {
         const isTable = isTableType(type);
@@ -192,6 +197,8 @@ export function ObjectSummary({
             [EPathType.EPathTypePersQueueGroup]: () => (
                 <PersQueueGroupOverview data={currentObjectData} />
             ),
+            [EPathType.EPathTypeExternalTable]: undefined,
+            [EPathType.EPathTypeExternalDataSource]: undefined,
         };
 
         let component =
@@ -224,10 +231,7 @@ export function ObjectSummary({
                     renderLoader()
                 ) : (
                     <div className={b('schema')}>
-                        <SchemaViewer
-                            keyColumnIds={schema?.KeyColumnIds}
-                            columns={schema?.Columns}
-                        />
+                        <SchemaViewer keyColumnIds={keyColumnIds} columns={columns} type={type} />
                     </div>
                 );
             }

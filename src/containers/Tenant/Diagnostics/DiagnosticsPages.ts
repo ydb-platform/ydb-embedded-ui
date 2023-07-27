@@ -83,6 +83,9 @@ export const DIR_PAGES = [overview, topShards, nodes, describe];
 export const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, describe];
 export const TOPIC_PAGES = [overview, consumers, partitions, nodes, describe];
 
+export const EXTERNAL_DATA_SOURCE_PAGES = [overview, describe];
+export const EXTERNAL_TABLE_PAGES = [overview, describe];
+
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here
 const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
@@ -101,6 +104,9 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeCdcStream]: CDC_STREAM_PAGES,
 
     [EPathType.EPathTypePersQueueGroup]: TOPIC_PAGES,
+
+    [EPathType.EPathTypeExternalDataSource]: EXTERNAL_DATA_SOURCE_PAGES,
+    [EPathType.EPathTypeExternalTable]: EXTERNAL_TABLE_PAGES,
 };
 
 export const getPagesByType = (type?: EPathType) => (type && pathTypeToPages[type]) || DIR_PAGES;

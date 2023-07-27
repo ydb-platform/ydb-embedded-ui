@@ -2,10 +2,12 @@ import cn from 'bem-cn-lite';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 
-import type {TColumnDescription} from '../../../../types/api/schema';
+import type {EPathType, TColumnDescription} from '../../../../types/api/schema';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 
 import {Icon} from '../../../../components/Icon';
+
+import {isExternalTable} from '../../utils/schema';
 
 import './SchemaViewer.scss';
 
@@ -22,10 +24,11 @@ const SchemaViewerColumns = {
 interface SchemaViewerProps {
     keyColumnIds?: number[];
     columns?: TColumnDescription[];
+    type?: EPathType;
 }
 
-export const SchemaViewer = ({keyColumnIds = [], columns = []}: SchemaViewerProps) => {
-    const dataTableColumns: Column<TColumnDescription>[] = [
+export const SchemaViewer = ({keyColumnIds = [], columns = [], type}: SchemaViewerProps) => {
+    let dataTableColumns: Column<TColumnDescription>[] = [
         {
             name: SchemaViewerColumns.id,
             width: 40,
@@ -64,6 +67,13 @@ export const SchemaViewer = ({keyColumnIds = [], columns = []}: SchemaViewerProp
             },
         },
     ];
+
+    if (isExternalTable(type)) {
+        // External tables don't have key columns
+        dataTableColumns = dataTableColumns.filter(
+            (column) => column.name !== SchemaViewerColumns.key,
+        );
+    }
 
     // Display key columns first
     const tableData = columns.sort((column) => {

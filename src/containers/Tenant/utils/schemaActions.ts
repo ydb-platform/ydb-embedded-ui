@@ -83,23 +83,25 @@ export const getActions =
     (path: string, type: NavigationTreeNodeType) => {
         const actions = bindActions(path, dispatch, setActivePath);
         const copyItem = {text: 'Copy path', action: actions.copyPath};
+        const openPreview = {text: 'Open preview', action: actions.openPreview};
+        const selectQuery = {text: 'Select query...', action: actions.selectQuery};
 
         const DIR_SET: ActionsSet = [
             [copyItem],
             [{text: 'Create table...', action: actions.createTable}],
         ];
         const TABLE_SET: ActionsSet = [
-            [{text: 'Open preview', action: actions.openPreview}, copyItem],
+            [openPreview, copyItem],
             [
                 {text: 'Alter table...', action: actions.alterTable},
-                {text: 'Select query...', action: actions.selectQuery},
+                selectQuery,
                 {text: 'Upsert query...', action: actions.upsertQuery},
             ],
         ];
 
-        const JUST_COPY: ActionsSet = [copyItem];
+        const EXTERNAL_TABLE_SET = [[openPreview, copyItem], [selectQuery]];
 
-        const EMPTY_SET: ActionsSet = [];
+        const JUST_COPY: ActionsSet = [copyItem];
 
         // verbose mapping to guarantee a correct actions set for new node types
         // TS will error when a new type is added in the lib but is not mapped here
@@ -113,7 +115,10 @@ export const getActions =
             index_table: JUST_COPY,
             topic: JUST_COPY,
 
-            index: EMPTY_SET,
+            index: JUST_COPY,
+
+            external_table: EXTERNAL_TABLE_SET,
+            external_data_source: JUST_COPY,
         };
 
         return nodeTypeToActions[type];
