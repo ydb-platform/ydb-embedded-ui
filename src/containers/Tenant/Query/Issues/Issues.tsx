@@ -145,7 +145,7 @@ function IssueList(props: {issues: IssueMessage[]; expanded: boolean; level: num
     );
 }
 
-const severityIcons: Record<SEVERITY, string> = {
+const severityIcons: Record<SEVERITY, SVGIconData> = {
     S_INFO: infoIcon,
     S_WARNING: warningIcon,
     S_ERROR: errorIcon,
