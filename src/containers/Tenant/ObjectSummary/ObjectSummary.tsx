@@ -218,6 +218,7 @@ export function ObjectSummary({
     };
 
     const renderLoader = () => {
+        // If Loader isn't wrapped with div, SplitPane doesn't calculate panes height correctly
         return (
             <div>
                 <Loader />
