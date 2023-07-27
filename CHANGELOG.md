@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.11.0...v4.11.1) (2023-07-27)
+
+
+### Bug Fixes
+
+* **Issues:** fix types ([#488](https://github.com/ydb-platform/ydb-embedded-ui/issues/488)) ([e2fe731](https://github.com/ydb-platform/ydb-embedded-ui/commit/e2fe731ae23db6703f21179668582d5657de9550))
+
 ## [4.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.10.1...v4.11.0) (2023-07-27)
 
 
