@@ -2,8 +2,8 @@
     display: flex;
     justify-content: center;
 
-    width: 18px;
-    height: 18px;
+    width: 23px;
+    height: 23px;
 
     font-size: 10px;
     cursor: pointer;
@@ -26,7 +26,7 @@
     }
 
     &__type {
-        line-height: 17px;
+        line-height: 22px;
 
         color: var(--yc-color-text-complementary);
     }

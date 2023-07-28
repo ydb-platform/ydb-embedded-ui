@@ -51,6 +51,7 @@ export const TABLET_SYMBOLS = {
     BlockStoreVolume: 'BV',
     Console: 'CN',
     TenantSlotBroker: 'TB',
+    BlockStoreDiskRegistry: 'BDR',
 };
 
 const isTabletType = (type: string): type is keyof typeof TABLET_SYMBOLS => type in TABLET_SYMBOLS;
