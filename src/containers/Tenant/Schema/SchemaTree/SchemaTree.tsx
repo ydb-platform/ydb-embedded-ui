@@ -3,8 +3,11 @@ import {useDispatch} from 'react-redux';
 
 import {NavigationTree} from 'ydb-ui-components';
 
-import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema/schema';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import type {QueryMode} from '../../../../types/store/query';
+import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema/schema';
+import {ENABLE_ADDITIONAL_QUERY_MODES, QUERY_INITIAL_MODE_KEY} from '../../../../utils/constants';
+import {useSetting} from '../../../../utils/hooks';
 
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
@@ -20,6 +23,9 @@ export function SchemaTree(props: SchemaTreeProps) {
     const {rootPath, rootName, rootType, currentPath} = props;
 
     const dispatch = useDispatch();
+
+    const [_, setQueryMode] = useSetting<QueryMode>(QUERY_INITIAL_MODE_KEY);
+    const [enableAdditionalQueryModes] = useSetting<boolean>(ENABLE_ADDITIONAL_QUERY_MODES);
 
     const fetchPath = (path: string) =>
         window.api
@@ -71,7 +77,10 @@ export function SchemaTree(props: SchemaTreeProps) {
                 collapsed: false,
             }}
             fetchPath={fetchPath}
-            getActions={getActions(dispatch, handleActivePathUpdate)}
+            getActions={getActions(dispatch, handleActivePathUpdate, {
+                enableAdditionalQueryModes,
+                setQueryMode,
+            })}
             activePath={currentPath}
             onActivePathUpdate={handleActivePathUpdate}
             cache={false}

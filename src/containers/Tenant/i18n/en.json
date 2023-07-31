@@ -6,6 +6,7 @@
   "summary.showPreview": "Show preview",
   "summary.copySchemaPath": "Copy schema path",
 
-  "actions.copied" : "The path is copied to the clipboard",
-  "actions.notCopied" : "Couldn’t copy the path"
+  "actions.copied": "The path is copied to the clipboard",
+  "actions.notCopied": "Couldn’t copy the path",
+  "actions.externalTableSelectUnavailable": "Select query for external tables available only with 'YQL - QueryService' query mode. You need to turn in additional query modes in settings to enable it"
 }

@@ -3,6 +3,7 @@ import copy from 'copy-to-clipboard';
 
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
+import type {QueryMode} from '../../../types/store/query';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
@@ -34,12 +35,22 @@ const upsertQueryTemplate = (path: string) => {
 VALUES ( );`;
 };
 
+interface ActionsOptions {
+    enableAdditionalQueryModes?: boolean;
+    setQueryMode?: (mode: QueryMode) => void;
+}
+
 const bindActions = (
     path: string,
     dispatch: Dispatch<any>,
     setActivePath: (path: string) => void,
+    options?: ActionsOptions,
 ) => {
-    const inputQuery = (tmpl: (path: string) => string) => () => {
+    const inputQuery = (tmpl: (path: string) => string, mode?: QueryMode) => () => {
+        if (mode) {
+            options?.setQueryMode?.(mode);
+        }
+
         dispatch(changeUserInput({input: tmpl(path)}));
         dispatch(setTenantPage(TENANT_PAGES_IDS.query));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
@@ -47,10 +58,21 @@ const bindActions = (
     };
 
     return {
-        createTable: inputQuery(createTableTemplate),
-        alterTable: inputQuery(alterTableTemplate),
+        createTable: inputQuery(createTableTemplate, 'script'),
+        alterTable: inputQuery(alterTableTemplate, 'script'),
         selectQuery: inputQuery(selectQueryTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
+        selectQueryFromExternalTable: () => {
+            if (options?.enableAdditionalQueryModes) {
+                inputQuery(selectQueryTemplate, 'query')();
+            } else {
+                createToast({
+                    name: 'ExternalTableSelectUnavailable',
+                    title: i18n('actions.externalTableSelectUnavailable'),
+                    type: 'error',
+                });
+            }
+        },
         copyPath: () => {
             try {
                 copy(path);
@@ -79,12 +101,11 @@ const bindActions = (
 type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
 
 export const getActions =
-    (dispatch: Dispatch<any>, setActivePath: (path: string) => void) =>
+    (dispatch: Dispatch<any>, setActivePath: (path: string) => void, options?: ActionsOptions) =>
     (path: string, type: NavigationTreeNodeType) => {
-        const actions = bindActions(path, dispatch, setActivePath);
+        const actions = bindActions(path, dispatch, setActivePath, options);
         const copyItem = {text: 'Copy path', action: actions.copyPath};
         const openPreview = {text: 'Open preview', action: actions.openPreview};
-        const selectQuery = {text: 'Select query...', action: actions.selectQuery};
 
         const DIR_SET: ActionsSet = [
             [copyItem],
@@ -94,12 +115,20 @@ export const getActions =
             [openPreview, copyItem],
             [
                 {text: 'Alter table...', action: actions.alterTable},
-                selectQuery,
+                {text: 'Select query...', action: actions.selectQuery},
                 {text: 'Upsert query...', action: actions.upsertQuery},
             ],
         ];
 
-        const EXTERNAL_TABLE_SET = [[openPreview, copyItem], [selectQuery]];
+        const EXTERNAL_TABLE_SET = [
+            [openPreview, copyItem],
+            [
+                {
+                    text: 'Select query...',
+                    action: actions.selectQueryFromExternalTable,
+                },
+            ],
+        ];
 
         const JUST_COPY: ActionsSet = [copyItem];
 
