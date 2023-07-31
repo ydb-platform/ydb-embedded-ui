@@ -104,19 +104,19 @@ export const getActions =
     (dispatch: Dispatch<any>, setActivePath: (path: string) => void, options?: ActionsOptions) =>
     (path: string, type: NavigationTreeNodeType) => {
         const actions = bindActions(path, dispatch, setActivePath, options);
-        const copyItem = {text: 'Copy path', action: actions.copyPath};
-        const openPreview = {text: 'Open preview', action: actions.openPreview};
+        const copyItem = {text: i18n('actions.copyPath'), action: actions.copyPath};
+        const openPreview = {text: i18n('actions.openPreview'), action: actions.openPreview};
 
         const DIR_SET: ActionsSet = [
             [copyItem],
-            [{text: 'Create table...', action: actions.createTable}],
+            [{text: i18n('actions.createTable'), action: actions.createTable}],
         ];
         const TABLE_SET: ActionsSet = [
             [openPreview, copyItem],
             [
-                {text: 'Alter table...', action: actions.alterTable},
-                {text: 'Select query...', action: actions.selectQuery},
-                {text: 'Upsert query...', action: actions.upsertQuery},
+                {text: i18n('actions.alterTable'), action: actions.alterTable},
+                {text: i18n('actions.selectQuery'), action: actions.selectQuery},
+                {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
             ],
         ];
 
@@ -124,7 +124,7 @@ export const getActions =
             [openPreview, copyItem],
             [
                 {
-                    text: 'Select query...',
+                    text: i18n('actions.selectQuery'),
                     action: actions.selectQueryFromExternalTable,
                 },
             ],

@@ -8,5 +8,12 @@
 
   "actions.copied": "The path is copied to the clipboard",
   "actions.notCopied": "Couldn’t copy the path",
-  "actions.externalTableSelectUnavailable": "Select query for external tables available only with 'YQL - QueryService' query mode. You need to turn in additional query modes in settings to enable it"
+  "actions.externalTableSelectUnavailable": "Select query for external tables available only with 'YQL - QueryService' query mode. You need to turn in additional query modes in settings to enable it",
+
+  "actions.copyPath": "Copy path",
+  "actions.openPreview": "Open preview",
+  "actions.createTable": "Create table...",
+  "actions.alterTable": "Alter table...",
+  "actions.selectQuery": "Select query...",
+  "actions.upsertQuery": "Upsert query..."
 }
