@@ -1,12 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './containers/App/App';
 import {Provider} from 'react-redux';
+
+import '@gravity-ui/uikit/styles/styles.scss';
+
+import App from './containers/App/App';
 import configureStore from './store';
 import reportWebVitals from './reportWebVitals';
-import '@gravity-ui/uikit/styles/styles.scss';
 import HistoryContext from './contexts/HistoryContext';
+
+import './styles/constants.scss';
+import './index.css';
 
 const {store, history} = configureStore();
 window.store = store;

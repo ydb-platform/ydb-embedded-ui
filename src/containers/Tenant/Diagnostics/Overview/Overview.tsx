@@ -27,6 +27,9 @@ import {
     isPathTypeWithTopic,
 } from '../../utils/schema';
 
+import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
+import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
+
 import {TopicInfo} from './TopicInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
 import {TableInfo} from './TableInfo';
@@ -124,8 +127,8 @@ function Overview({type, tenantName}: OverviewProps) {
                 <ChangefeedInfo data={data} topic={additionalData?.[0]} />
             ),
             [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={data} />,
-            [EPathType.EPathTypeExternalTable]: undefined,
-            [EPathType.EPathTypeExternalDataSource]: undefined,
+            [EPathType.EPathTypeExternalTable]: () => <ExternalTableInfo data={data} />,
+            [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
         };
 
         return (
