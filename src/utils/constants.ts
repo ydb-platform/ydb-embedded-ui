@@ -1,5 +1,7 @@
 import DataTable from '@gravity-ui/react-data-table';
 
+import {EType} from '../types/api/tablet';
+
 const SECOND = 1000;
 
 export const AUTO_RELOAD_INTERVAL = 10 * SECOND;
@@ -40,17 +42,18 @@ export const TABLET_COLORS = {
 };
 
 export const TABLET_SYMBOLS = {
-    OldTxProxy: 'P',
-    TxProxy: 'P',
-    BSController: 'BS',
-    Dummy: 'DY',
-    RTMRPartition: 'RP',
-    PersQueueReadBalancer: 'PB',
-    Cms: 'CM',
-    BlockStorePartition: 'BP',
-    BlockStoreVolume: 'BV',
-    Console: 'CN',
-    TenantSlotBroker: 'TB',
+    [EType.OldTxProxy]: 'P',
+    [EType.TxProxy]: 'P',
+    [EType.BSController]: 'BS',
+    [EType.Dummy]: 'DY',
+    [EType.RTMRPartition]: 'RP',
+    [EType.PersQueueReadBalancer]: 'PB',
+    [EType.Cms]: 'CM',
+    [EType.BlockStorePartition]: 'BP',
+    [EType.BlockStoreVolume]: 'BV',
+    [EType.Console]: 'CN',
+    [EType.TenantSlotBroker]: 'TB',
+    [EType.BlockStoreDiskRegistry]: 'BDR',
 };
 
 const isTabletType = (type: string): type is keyof typeof TABLET_SYMBOLS => type in TABLET_SYMBOLS;
