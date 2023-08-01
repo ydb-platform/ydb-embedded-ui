@@ -35,20 +35,22 @@ const upsertQueryTemplate = (path: string) => {
 VALUES ( );`;
 };
 
-interface ActionsOptions {
+interface ActionsAdditionalParams {
     enableAdditionalQueryModes?: boolean;
     setQueryMode?: (mode: QueryMode) => void;
+    setActivePath: (path: string) => void;
 }
 
 const bindActions = (
     path: string,
     dispatch: Dispatch<any>,
-    setActivePath: (path: string) => void,
-    options?: ActionsOptions,
+    additionalParams: ActionsAdditionalParams,
 ) => {
+    const {setActivePath, setQueryMode, enableAdditionalQueryModes} = additionalParams;
+
     const inputQuery = (tmpl: (path: string) => string, mode?: QueryMode) => () => {
         if (mode) {
-            options?.setQueryMode?.(mode);
+            setQueryMode?.(mode);
         }
 
         dispatch(changeUserInput({input: tmpl(path)}));
@@ -63,7 +65,7 @@ const bindActions = (
         selectQuery: inputQuery(selectQueryTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
         selectQueryFromExternalTable: () => {
-            if (options?.enableAdditionalQueryModes) {
+            if (enableAdditionalQueryModes) {
                 inputQuery(selectQueryTemplate, 'query')();
             } else {
                 createToast({
@@ -101,9 +103,9 @@ const bindActions = (
 type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
 
 export const getActions =
-    (dispatch: Dispatch<any>, setActivePath: (path: string) => void, options?: ActionsOptions) =>
+    (dispatch: Dispatch<any>, additionalParams: ActionsAdditionalParams) =>
     (path: string, type: NavigationTreeNodeType) => {
-        const actions = bindActions(path, dispatch, setActivePath, options);
+        const actions = bindActions(path, dispatch, additionalParams);
         const copyItem = {text: i18n('actions.copyPath'), action: actions.copyPath};
         const openPreview = {text: i18n('actions.openPreview'), action: actions.openPreview};
 

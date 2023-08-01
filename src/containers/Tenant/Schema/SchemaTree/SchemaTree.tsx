@@ -77,7 +77,8 @@ export function SchemaTree(props: SchemaTreeProps) {
                 collapsed: false,
             }}
             fetchPath={fetchPath}
-            getActions={getActions(dispatch, handleActivePathUpdate, {
+            getActions={getActions(dispatch, {
+                setActivePath: handleActivePathUpdate,
                 enableAdditionalQueryModes,
                 setQueryMode,
             })}
