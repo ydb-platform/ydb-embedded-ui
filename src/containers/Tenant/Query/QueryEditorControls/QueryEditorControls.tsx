@@ -6,6 +6,7 @@ import {useMemo} from 'react';
 import type {QueryAction, QueryMode} from '../../../../types/store/query';
 import {QUERY_MODES} from '../../../../utils/query';
 import {Icon} from '../../../../components/Icon';
+import {LabelWithPopover} from '../../../../components/LabelWithPopover';
 
 import SaveQuery from '../SaveQuery/SaveQuery';
 
@@ -18,16 +19,34 @@ const queryModeSelectorPopupQa = 'query-mode-selector-popup';
 
 const b = block('ydb-query-editor-controls');
 
-const OldQueryModeSelectorTitles = {
-    [QUERY_MODES.script]: 'YQL Script',
-    [QUERY_MODES.scan]: 'Scan',
+const OldQueryModeSelectorOptions = {
+    [QUERY_MODES.script]: {
+        title: 'YQL Script',
+        description: i18n('method-description.script'),
+    },
+    [QUERY_MODES.scan]: {
+        title: 'Scan',
+        description: i18n('method-description.scan'),
+    },
 } as const;
 
-const QueryModeSelectorTitles = {
-    [QUERY_MODES.script]: 'YQL Script',
-    [QUERY_MODES.scan]: 'Scan',
-    [QUERY_MODES.data]: 'Data',
-    [QUERY_MODES.query]: 'YQL - QueryService',
+const QueryModeSelectorOptions = {
+    [QUERY_MODES.script]: {
+        title: 'YQL Script',
+        description: i18n('method-description.script'),
+    },
+    [QUERY_MODES.scan]: {
+        title: 'Scan',
+        description: i18n('method-description.scan'),
+    },
+    [QUERY_MODES.data]: {
+        title: 'Data',
+        description: i18n('method-description.data'),
+    },
+    [QUERY_MODES.query]: {
+        title: 'YQL - QueryService',
+        description: i18n('method-description.query'),
+    },
 } as const;
 
 interface QueryEditorControlsProps {
@@ -58,13 +77,20 @@ export const QueryEditorControls = ({
     enableAdditionalQueryModes,
 }: QueryEditorControlsProps) => {
     const querySelectorMenuItems = useMemo(() => {
-        const titles = enableAdditionalQueryModes
-            ? QueryModeSelectorTitles
-            : OldQueryModeSelectorTitles;
+        const options = enableAdditionalQueryModes
+            ? QueryModeSelectorOptions
+            : OldQueryModeSelectorOptions;
 
-        return Object.entries(titles).map(([mode, title]) => {
+        return Object.entries(options).map(([mode, {title, description}]) => {
             return {
-                text: title,
+                text: (
+                    <LabelWithPopover
+                        className={b('item-with-popover')}
+                        contentClassName={b('popover')}
+                        text={title}
+                        popoverContent={description}
+                    />
+                ),
                 action: () => {
                     onUpdateQueryMode(mode as QueryMode);
                 },
@@ -119,7 +145,7 @@ export const QueryEditorControls = ({
                             <Button className={b('mode-selector__button')} qa={queryModeSelectorQa}>
                                 <span className={b('mode-selector__button-content')}>
                                     {`${i18n('controls.query-mode-selector_type')} ${
-                                        QueryModeSelectorTitles[queryMode]
+                                        QueryModeSelectorOptions[queryMode].title
                                     }`}
                                     <Icon name="chevron-down" width={16} height={16} />
                                 </span>

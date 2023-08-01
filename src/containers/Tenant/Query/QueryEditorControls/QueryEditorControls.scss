@@ -56,4 +56,17 @@
             }
         }
     }
+
+    &__item-with-popover {
+        display: flex;
+        align-items: center;
+
+        height: 24px;
+
+        line-height: initial;
+    }
+
+    &__popover {
+        max-width: 340px;
+    }
 }
