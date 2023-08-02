@@ -1,6 +1,11 @@
 import {useRef, useEffect, useState} from 'react';
+import cn from 'bem-cn-lite';
 
 import {TextInput} from '@gravity-ui/uikit';
+
+import './Search.scss';
+
+const b = cn('ydb-search');
 
 interface SearchProps {
     onChange: (value: string) => void;
@@ -44,7 +49,7 @@ export const Search = ({
         <TextInput
             hasClear
             autoFocus
-            className={className}
+            className={b(null, className)}
             placeholder={placeholder}
             value={searchValue}
             onUpdate={onSearchValueChange}
