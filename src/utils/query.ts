@@ -7,7 +7,7 @@ import type {
     QueryPlan,
     ScriptPlan,
 } from '../types/api/query';
-import type {IQueryResult, QueryErrorResponse} from '../types/store/query';
+import type {IQueryResult, QueryErrorResponse, QueryMode} from '../types/store/query';
 
 export const QUERY_ACTIONS = {
     execute: 'execute',
@@ -20,6 +20,10 @@ export const QUERY_MODES = {
     data: 'data',
     query: 'query',
 } as const;
+
+export const isNewQueryMode = (value: QueryMode) => {
+    return value !== QUERY_MODES.script && value !== QUERY_MODES.scan;
+};
 
 // eslint-disable-next-line complexity
 export const getColumnType = (type: string) => {
