@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.11.1...v4.12.0) (2023-08-02)
+
+
+### Features
+
+* **Query:** add explanation to the query method selector ([#492](https://github.com/ydb-platform/ydb-embedded-ui/issues/492)) ([ce6407c](https://github.com/ydb-platform/ydb-embedded-ui/commit/ce6407c254e9498d5b3bce60298905ea72621766))
+
+
+### Bug Fixes
+
+* fix tablet size ([#490](https://github.com/ydb-platform/ydb-embedded-ui/issues/490)) ([5a9b9d9](https://github.com/ydb-platform/ydb-embedded-ui/commit/5a9b9d955a882b1191502f5bac8eff5cf8638a52))
+* **Search:** add minimum width to Search ([#494](https://github.com/ydb-platform/ydb-embedded-ui/issues/494)) ([2add1dc](https://github.com/ydb-platform/ydb-embedded-ui/commit/2add1dcb3c8a76297ab35600e6d8a8772a411b1d))
+
 ## [4.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.11.0...v4.11.1) (2023-07-27)
 
 
