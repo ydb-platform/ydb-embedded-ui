@@ -13,6 +13,8 @@
   "actions.copyPath": "Copy path",
   "actions.openPreview": "Open preview",
   "actions.createTable": "Create table...",
+  "actions.createExternalTable": "Create external table...",
+  "actions.dropTable": "Drop table...",
   "actions.alterTable": "Alter table...",
   "actions.selectQuery": "Select query...",
   "actions.upsertQuery": "Upsert query..."
