@@ -10,6 +10,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 
 import {getEntityName} from '../../utils';
 
+import i18n from '../i18n';
 import './ExternalDataSource.scss';
 
 const b = block('ydb-external-data-source-info');
@@ -17,7 +18,7 @@ const b = block('ydb-external-data-source-info');
 const prepareExternalDataSourceSummary = (data: TEvDescribeSchemeResult): InfoViewerItem[] => {
     return [
         {
-            label: 'Source Type',
+            label: i18n('external-objects.source-type'),
             value: data.PathDescription?.ExternalDataSourceDescription?.SourceType,
         },
         formatCommonItem('CreateStep', data.PathDescription?.Self?.CreateStep),
@@ -30,7 +31,7 @@ const prepareExternalDataSourceInfo = (data: TEvDescribeSchemeResult): InfoViewe
     return [
         ...prepareExternalDataSourceSummary(data),
         {
-            label: 'Location',
+            label: i18n('external-objects.location'),
             value: (
                 <EntityStatus
                     name={Location}
@@ -41,7 +42,12 @@ const prepareExternalDataSourceInfo = (data: TEvDescribeSchemeResult): InfoViewe
                 />
             ),
         },
-        {label: 'Auth Method', value: Auth?.ServiceAccount ? 'ServiceAccount' : 'None'},
+        {
+            label: i18n('external-objects.auth-method'),
+            value: Auth?.ServiceAccount
+                ? i18n('external-objects.auth-method.service-account')
+                : i18n('external-objects.auth-method.none'),
+        },
     ];
 };
 

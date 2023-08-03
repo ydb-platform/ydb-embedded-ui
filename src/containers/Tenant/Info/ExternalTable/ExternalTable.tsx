@@ -12,6 +12,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 
 import {getEntityName} from '../../utils';
 
+import i18n from '../i18n';
 import './ExternalTable.scss';
 
 const b = block('ydb-external-table-info');
@@ -26,10 +27,10 @@ const prepareExternalTableSummary = (
     const dataSourceName = DataSourcePath?.split('/').pop();
 
     return [
-        {label: 'Source Type', value: SourceType},
+        {label: i18n('external-objects.source-type'), value: SourceType},
         formatCommonItem('CreateStep', CreateStep),
         {
-            label: 'Data Source',
+            label: i18n('external-objects.data-source'),
             value: DataSourcePath && (
                 <span title={DataSourcePath}>
                     <ExternalLinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
@@ -48,7 +49,7 @@ const prepareExternalTableInfo = (
     return [
         ...prepareExternalTableSummary(data, pathToDataSource),
         {
-            label: 'Location',
+            label: i18n('external-objects.location'),
             value: (
                 <EntityStatus
                     name={location}

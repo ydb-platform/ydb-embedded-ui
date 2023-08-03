@@ -1,0 +1,8 @@
+{
+  "external-objects.source-type": "Тип источника",
+  "external-objects.data-source": "Источник",
+  "external-objects.location": "Расположение",
+  "external-objects.auth-method": "Авторизация",
+  "external-objects.auth-method.none": "Нет",
+  "external-objects.auth-method.service-account": "Сервисный аккаунт"
+}
