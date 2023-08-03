@@ -3,8 +3,9 @@ import {useDispatch} from 'react-redux';
 
 import {NavigationTree} from 'ydb-ui-components';
 
-import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema/schema';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema/schema';
+import {useQueryModes} from '../../../../utils/hooks';
 
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
@@ -20,6 +21,8 @@ export function SchemaTree(props: SchemaTreeProps) {
     const {rootPath, rootName, rootType, currentPath} = props;
 
     const dispatch = useDispatch();
+
+    const [_, setQueryMode] = useQueryModes();
 
     const fetchPath = (path: string) =>
         window.api
@@ -71,7 +74,10 @@ export function SchemaTree(props: SchemaTreeProps) {
                 collapsed: false,
             }}
             fetchPath={fetchPath}
-            getActions={getActions(dispatch, handleActivePathUpdate)}
+            getActions={getActions(dispatch, {
+                setActivePath: handleActivePathUpdate,
+                setQueryMode,
+            })}
             activePath={currentPath}
             onActivePathUpdate={handleActivePathUpdate}
             cache={false}

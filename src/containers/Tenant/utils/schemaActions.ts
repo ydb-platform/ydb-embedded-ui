@@ -3,6 +3,8 @@ import copy from 'copy-to-clipboard';
 
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
+import type {QueryMode} from '../../../types/store/query';
+import type {SetQueryModeIfAvailable} from '../../../utils/hooks';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
@@ -34,23 +36,41 @@ const upsertQueryTemplate = (path: string) => {
 VALUES ( );`;
 };
 
+interface ActionsAdditionalEffects {
+    setQueryMode: SetQueryModeIfAvailable;
+    setActivePath: (path: string) => void;
+}
+
 const bindActions = (
     path: string,
     dispatch: Dispatch<any>,
-    setActivePath: (path: string) => void,
+    additionalEffects: ActionsAdditionalEffects,
 ) => {
-    const inputQuery = (tmpl: (path: string) => string) => () => {
-        dispatch(changeUserInput({input: tmpl(path)}));
-        dispatch(setTenantPage(TENANT_PAGES_IDS.query));
-        dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-        setActivePath(path);
-    };
+    const {setActivePath, setQueryMode} = additionalEffects;
+
+    const inputQuery =
+        (tmpl: (path: string) => string, mode?: QueryMode, setQueryModeErrorMessage?: string) =>
+        () => {
+            const isNewQueryModeSet = mode && setQueryMode(mode, setQueryModeErrorMessage);
+
+            if (!mode || isNewQueryModeSet) {
+                dispatch(changeUserInput({input: tmpl(path)}));
+                dispatch(setTenantPage(TENANT_PAGES_IDS.query));
+                dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+                setActivePath(path);
+            }
+        };
 
     return {
-        createTable: inputQuery(createTableTemplate),
-        alterTable: inputQuery(alterTableTemplate),
+        createTable: inputQuery(createTableTemplate, 'script'),
+        alterTable: inputQuery(alterTableTemplate, 'script'),
         selectQuery: inputQuery(selectQueryTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
+        selectQueryFromExternalTable: inputQuery(
+            selectQueryTemplate,
+            'query',
+            i18n('actions.externalTableSelectUnavailable'),
+        ),
         copyPath: () => {
             try {
                 copy(path);
@@ -79,27 +99,34 @@ const bindActions = (
 type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
 
 export const getActions =
-    (dispatch: Dispatch<any>, setActivePath: (path: string) => void) =>
+    (dispatch: Dispatch<any>, additionalEffects: ActionsAdditionalEffects) =>
     (path: string, type: NavigationTreeNodeType) => {
-        const actions = bindActions(path, dispatch, setActivePath);
-        const copyItem = {text: 'Copy path', action: actions.copyPath};
-        const openPreview = {text: 'Open preview', action: actions.openPreview};
-        const selectQuery = {text: 'Select query...', action: actions.selectQuery};
+        const actions = bindActions(path, dispatch, additionalEffects);
+        const copyItem = {text: i18n('actions.copyPath'), action: actions.copyPath};
+        const openPreview = {text: i18n('actions.openPreview'), action: actions.openPreview};
 
         const DIR_SET: ActionsSet = [
             [copyItem],
-            [{text: 'Create table...', action: actions.createTable}],
+            [{text: i18n('actions.createTable'), action: actions.createTable}],
         ];
         const TABLE_SET: ActionsSet = [
             [openPreview, copyItem],
             [
-                {text: 'Alter table...', action: actions.alterTable},
-                selectQuery,
-                {text: 'Upsert query...', action: actions.upsertQuery},
+                {text: i18n('actions.alterTable'), action: actions.alterTable},
+                {text: i18n('actions.selectQuery'), action: actions.selectQuery},
+                {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
             ],
         ];
 
-        const EXTERNAL_TABLE_SET = [[openPreview, copyItem], [selectQuery]];
+        const EXTERNAL_TABLE_SET = [
+            [openPreview, copyItem],
+            [
+                {
+                    text: i18n('actions.selectQuery'),
+                    action: actions.selectQueryFromExternalTable,
+                },
+            ],
+        ];
 
         const JUST_COPY: ActionsSet = [copyItem];
 

@@ -7,5 +7,13 @@
   "summary.copySchemaPath": "Скопировать путь",
 
   "actions.copied": "Путь успешно скопирован",
-  "actions.notCopied": "Не получилось скопировать путь"
+  "actions.notCopied": "Не получилось скопировать путь",
+  "actions.externalTableSelectUnavailable": "Select запрос для внешних таблиц доступен только в режиме 'YQL - QueryService'. Вам необходимо включить дополнительные режимы выполнения запросов в настройках",
+
+  "actions.copyPath": "Скопировать путь",
+  "actions.openPreview": "Открыть превью",
+  "actions.createTable": "Создать таблицу...",
+  "actions.alterTable": "Изменить таблицу...",
+  "actions.selectQuery": "Select запрос...",
+  "actions.upsertQuery": "Upsert запрос..."
 }
