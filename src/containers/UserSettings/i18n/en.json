@@ -15,6 +15,9 @@
   "settings.useNodesEndpoint.title": "Break the Nodes tab in Diagnostics",
   "settings.useNodesEndpoint.popover": "Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on versions before 23-1",
 
+  "settings.useBackendParamsForTables.title": "Offload tables filters and sorting to backend",
+  "settings.useBackendParamsForTables.popover": "Filter and sort Nodes table with request params. May increase performance, but could causes additional fetches and longer loading time on older versions",
+
   "settings.enableAdditionalQueryModes.title": "Enable additional query modes",
   "settings.enableAdditionalQueryModes.popover": "Adds 'Data' and 'YQL - QueryService' modes. May not work on some versions"
 }

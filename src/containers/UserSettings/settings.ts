@@ -7,6 +7,7 @@ import {
     ENABLE_ADDITIONAL_QUERY_MODES,
     INVERTED_DISKS_KEY,
     THEME_KEY,
+    USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
 } from '../../utils/constants';
 
@@ -58,6 +59,11 @@ export const useNodesEndpointSetting: SettingProps = {
     title: i18n('settings.useNodesEndpoint.title'),
     helpPopoverContent: i18n('settings.useNodesEndpoint.popover'),
 };
+export const useBackendParamsForTables: SettingProps = {
+    settingKey: USE_BACKEND_PARAMS_FOR_TABLES_KEY,
+    title: i18n('settings.useBackendParamsForTables.title'),
+    helpPopoverContent: i18n('settings.useBackendParamsForTables.popover'),
+};
 export const enableQueryModesForExplainSetting: SettingProps = {
     settingKey: ENABLE_ADDITIONAL_QUERY_MODES,
     title: i18n('settings.enableAdditionalQueryModes.title'),
@@ -72,7 +78,12 @@ export const generalSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [invertedDisksSetting, useNodesEndpointSetting, enableQueryModesForExplainSetting],
+    settings: [
+        invertedDisksSetting,
+        useNodesEndpointSetting,
+        useBackendParamsForTables,
+        enableQueryModesForExplainSetting,
+    ],
 };
 
 export const generalPage: SettingsPage = {

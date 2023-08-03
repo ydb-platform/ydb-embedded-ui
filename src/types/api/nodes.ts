@@ -101,15 +101,3 @@ enum EConfigState {
     'Consistent' = 'Consistent',
     'Outdated' = 'Outdated',
 }
-
-export enum ESort {
-    NodeId = 'NodeId',
-    Host = 'Host',
-    DC = 'DC',
-    Rack = 'Rack',
-    Version = 'Version',
-    Uptime = 'Uptime',
-    Memory = 'Memory',
-    CPU = 'CPU',
-    LoadAverage = 'LoadAverage',
-}

@@ -1,11 +1,13 @@
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import cn from 'bem-cn-lite';
 import {useDispatch} from 'react-redux';
 
-import DataTable from '@gravity-ui/react-data-table';
+import DataTable, {SortOrder} from '@gravity-ui/react-data-table';
+import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 
 import type {EPathType} from '../../types/api/schema';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
+import type {NodesGeneralRequestParams} from '../../store/reducers/nodes/types';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {Illustration} from '../../components/Illustration';
@@ -16,9 +18,19 @@ import {EntitiesCount} from '../../components/EntitiesCount';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
 
-import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
+import {
+    DEFAULT_TABLE_SETTINGS,
+    HOUR_IN_SECONDS,
+    USE_BACKEND_PARAMS_FOR_TABLES_KEY,
+    USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
+} from '../../utils/constants';
 import {useAutofetcher, useSetting, useTypedSelector} from '../../utils/hooks';
-import {AdditionalNodesInfo, isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
+import {
+    AdditionalNodesInfo,
+    isUnavailableNode,
+    NodesSortValue,
+    NodesUptimeFilterValues,
+} from '../../utils/nodes';
 
 import {
     getNodes,
@@ -26,6 +38,8 @@ import {
     setSearchValue,
     resetNodesState,
     getComputeNodes,
+    setDataWasNotLoaded,
+    setSort,
 } from '../../store/reducers/nodes/nodes';
 import {selectFilteredNodes} from '../../store/reducers/nodes/selectors';
 import {changeFilter, ProblemFilterValues} from '../../store/reducers/settings/settings';
@@ -58,26 +72,87 @@ export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {
         dispatch(resetNodesState());
     }, [dispatch, path]);
 
-    const {wasLoaded, loading, error, nodesUptimeFilter, searchValue, totalNodes} =
-        useTypedSelector((state) => state.nodes);
+    const {
+        wasLoaded,
+        loading,
+        error,
+        nodesUptimeFilter,
+        searchValue,
+        sortOrder = ASCENDING,
+        sortValue = 'NodeId',
+        totalNodes,
+    } = useTypedSelector((state) => state.nodes);
     const problemFilter = useTypedSelector((state) => state.settings.problemFilter);
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
     const nodes = useTypedSelector(selectFilteredNodes);
 
     const [useNodesEndpoint] = useSetting(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY);
+    const [useBackendParamsForTables] = useSetting<boolean>(USE_BACKEND_PARAMS_FOR_TABLES_KEY);
 
-    const fetchNodes = useCallback(() => {
-        // For not DB entities we always use /compute endpoint instead of /nodes
-        // since /nodes can return data only for tenants
-        if (path && (!useNodesEndpoint || !isDatabaseEntityType(type))) {
-            dispatch(getComputeNodes({path}));
-        } else {
-            dispatch(getNodes({tenant: path}));
+    const [requestParams, setRequestParams] = useState<NodesGeneralRequestParams>({});
+
+    // If backend params are enabled, update params value and refetch data on filters change
+    // Otherwise no params will be sent and data will be filtered inside selector
+    useEffect(() => {
+        if (useBackendParamsForTables) {
+            const problemsOnly = problemFilter === ProblemFilterValues.PROBLEMS;
+            const uptime =
+                nodesUptimeFilter === NodesUptimeFilterValues.SmallUptime
+                    ? HOUR_IN_SECONDS
+                    : undefined;
+
+            setRequestParams({
+                filter: searchValue,
+                problems_only: problemsOnly,
+                uptime,
+                sortOrder,
+                sortValue,
+            });
         }
-    }, [dispatch, path, type, useNodesEndpoint]);
+    }, [
+        useBackendParamsForTables,
+        searchValue,
+        problemFilter,
+        nodesUptimeFilter,
+        sortOrder,
+        sortValue,
+    ]);
+
+    const fetchNodes = useCallback(
+        (isBackground) => {
+            if (!isBackground) {
+                dispatch(setDataWasNotLoaded());
+            }
+
+            // For not DB entities we always use /compute endpoint instead of /nodes
+            // since /nodes can return data only for tenants
+            if (path && (!useNodesEndpoint || !isDatabaseEntityType(type))) {
+                dispatch(getComputeNodes({path, ...requestParams}));
+            } else {
+                dispatch(getNodes({tenant: path, ...requestParams}));
+            }
+        },
+        [dispatch, path, type, useNodesEndpoint, requestParams],
+    );
 
     useAutofetcher(fetchNodes, [fetchNodes], isClusterNodes ? true : autorefresh);
+
+    const sort: SortOrder | undefined = useMemo(() => {
+        if (!sortValue) {
+            return undefined;
+        }
+
+        return {
+            columnId: sortValue,
+            order: sortOrder,
+        };
+    }, [sortValue, sortOrder]);
+
+    const handleSort = (rawValue: SortOrder | SortOrder[] | undefined) => {
+        const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
+        dispatch(setSort(value?.columnId as NodesSortValue | undefined, value?.order));
+    };
 
     const handleSearchQueryChange = (value: string) => {
         dispatch(setSearchValue(value));
@@ -132,10 +207,8 @@ export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {
                 data={nodes || []}
                 columns={columns}
                 settings={DEFAULT_TABLE_SETTINGS}
-                initialSortOrder={{
-                    columnId: 'NodeId',
-                    order: DataTable.ASCENDING,
-                }}
+                sortOrder={sort}
+                onSort={handleSort}
                 emptyDataMessage={i18n('empty.default')}
                 rowClassName={(row) => b('node', {unavailable: isUnavailableNode(row)})}
             />

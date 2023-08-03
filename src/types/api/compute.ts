@@ -65,15 +65,3 @@ export enum EVersion {
     v1 = 'v1',
     v2 = 'v2', // only this versions works with sorting
 }
-
-export enum ESort {
-    NodeId = 'NodeId',
-    Host = 'Host',
-    DC = 'DC',
-    Rack = 'Rack',
-    Version = 'Version',
-    Uptime = 'Uptime',
-    Memory = 'Memory',
-    CPU = 'CPU',
-    LoadAverage = 'LoadAverage',
-}
