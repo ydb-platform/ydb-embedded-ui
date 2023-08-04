@@ -13,6 +13,8 @@
   "actions.copyPath": "Скопировать путь",
   "actions.openPreview": "Открыть превью",
   "actions.createTable": "Создать таблицу...",
+  "actions.createExternalTable": "Создать внешнюю таблицу...",
+  "actions.dropTable": "Удалить таблицу...",
   "actions.alterTable": "Изменить таблицу...",
   "actions.selectQuery": "Select запрос...",
   "actions.upsertQuery": "Upsert запрос..."

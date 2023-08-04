@@ -36,6 +36,26 @@ const upsertQueryTemplate = (path: string) => {
 VALUES ( );`;
 };
 
+const dropExternalTableTemplate = (path: string) => {
+    return `DROP EXTERNAL TABLE \`${path}\`;`;
+};
+
+const createExternalTableTemplate = (path: string) => {
+    // Remove data source name from path
+    // to create table in the same folder with data source
+    const targetPath = path.split('/').slice(0, -1).join('/');
+
+    return `CREATE EXTERNAL TABLE \`${targetPath}/my_external_table\` (
+    column1 Int,
+    column2 Int
+) WITH (
+    DATA_SOURCE="${path}",
+    LOCATION="",
+    FORMAT="json_as_string",
+    \`file_pattern\`=""
+);`;
+};
+
 interface ActionsAdditionalEffects {
     setQueryMode: SetQueryModeIfAvailable;
     setActivePath: (path: string) => void;
@@ -66,6 +86,8 @@ const bindActions = (
         alterTable: inputQuery(alterTableTemplate, 'script'),
         selectQuery: inputQuery(selectQueryTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
+        createExternalTable: inputQuery(createExternalTableTemplate, 'script'),
+        dropExternalTable: inputQuery(dropExternalTableTemplate, 'script'),
         selectQueryFromExternalTable: inputQuery(
             selectQueryTemplate,
             'query',
@@ -126,6 +148,12 @@ export const getActions =
                     action: actions.selectQueryFromExternalTable,
                 },
             ],
+            [{text: i18n('actions.dropTable'), action: actions.dropExternalTable}],
+        ];
+
+        const EXTERNAL_DATA_SOURCE_SET = [
+            [copyItem],
+            [{text: i18n('actions.createExternalTable'), action: actions.createExternalTable}],
         ];
 
         const JUST_COPY: ActionsSet = [copyItem];
@@ -145,7 +173,7 @@ export const getActions =
             index: JUST_COPY,
 
             external_table: EXTERNAL_TABLE_SET,
-            external_data_source: JUST_COPY,
+            external_data_source: EXTERNAL_DATA_SOURCE_SET,
         };
 
         return nodeTypeToActions[type];
