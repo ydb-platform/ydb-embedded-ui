@@ -1,5 +1,9 @@
-import nodesRightIcon from '@gravity-ui/icons/svgs/nodes-right.svg';
-import databaseIcon from '@gravity-ui/icons/svgs/database.svg';
+import {
+    NodesRight as NodesRightIcon,
+    Database as DatabaseIcon,
+    Cpu as ComputeNodeIcon,
+    HardDrive as StorageNodeIcon,
+} from '@gravity-ui/icons';
 
 import type {
     BreadcrumbsOptions,
@@ -15,8 +19,9 @@ import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
 } from '../../store/reducers/tenant/constants';
+import {TabletIcon} from '../../components/TabletIcon';
 import routes, {createHref} from '../../routes';
-import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
+import {CLUSTER_DEFAULT_TITLE, getTabletLabel} from '../../utils/constants';
 
 import {getClusterPath} from '../Cluster/utils';
 import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
@@ -29,7 +34,7 @@ const prepareTenantName = (tenantName: string) => {
 export interface RawBreadcrumbItem {
     text: string;
     link?: string;
-    icon?: SVGIconData;
+    icon?: JSX.Element;
 }
 
 const getClusterBreadcrumbs = (
@@ -42,7 +47,7 @@ const getClusterBreadcrumbs = (
         {
             text: clusterName || CLUSTER_DEFAULT_TITLE,
             link: getClusterPath(clusterTab, query),
-            icon: nodesRightIcon,
+            icon: <NodesRightIcon width={16} height={16} />,
         },
     ];
 };
@@ -56,7 +61,10 @@ const getTenantBreadcrumbs = (
     const text = tenantName ? prepareTenantName(tenantName) : 'Tenant';
     const link = tenantName ? getTenantPath({...query, name: tenantName}) : undefined;
 
-    return [...getClusterBreadcrumbs(options, query), {text, link, icon: databaseIcon}];
+    return [
+        ...getClusterBreadcrumbs(options, query),
+        {text, link, icon: <DatabaseIcon width={16} height={16} />},
+    ];
 };
 
 const getNodeBreadcrumbs = (options: NodeBreadcrumbsOptions, query = {}): RawBreadcrumbItem[] => {
@@ -82,7 +90,15 @@ const getNodeBreadcrumbs = (options: NodeBreadcrumbsOptions, query = {}): RawBre
     const text = nodeId ? `Node ${nodeId}` : 'Node';
     const link = nodeId ? getDefaultNodePath(nodeId, query) : undefined;
 
-    breadcrumbs.push({text, link});
+    breadcrumbs.push({
+        text,
+        link,
+        icon: isStorageNode ? (
+            <StorageNodeIcon width={16} height={16} />
+        ) : (
+            <ComputeNodeIcon width={16} height={16} />
+        ),
+    });
 
     return breadcrumbs;
 };
@@ -123,12 +139,13 @@ const getTabletBreadcrubms = (
     options: TabletBreadcrumbsOptions,
     query = {},
 ): RawBreadcrumbItem[] => {
-    const {tabletId} = options;
+    const {tabletId, tabletType} = options;
 
     const breadcrumbs = getTabletsBreadcrubms(options, query);
 
     breadcrumbs.push({
         text: tabletId || 'Tablet',
+        icon: <TabletIcon text={getTabletLabel(tabletType)} />,
     });
 
     return breadcrumbs;

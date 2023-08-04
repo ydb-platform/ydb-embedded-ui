@@ -48,8 +48,9 @@ export const Tablet = () => {
         error,
     } = useTypedSelector((state) => state.tablet);
 
-    const {nodeId: queryNodeId, tenantName: queryTenantName} = parseQuery(location);
+    const {TabletId, Overall, Leader, Type} = tablet;
 
+    const {nodeId: queryNodeId, tenantName: queryTenantName} = parseQuery(location);
     const nodeId = tablet.NodeId?.toString() || queryNodeId?.toString();
     const tenantName = tenantPath || queryTenantName?.toString();
 
@@ -79,9 +80,10 @@ export const Tablet = () => {
                 nodeIds: nodeId ? [nodeId] : [],
                 tenantName,
                 tabletId: id,
+                tabletType: Type,
             }),
         );
-    }, [dispatch, tenantName, id, nodeId]);
+    }, [dispatch, tenantName, id, nodeId, Type]);
 
     const renderExternalLinks = (link: {name: string; path: string}, index: number) => {
         return (
@@ -108,8 +110,6 @@ export const Tablet = () => {
             </div>
         );
     }
-
-    const {TabletId, Overall, Leader} = tablet;
 
     const externalLinks = [
         {
