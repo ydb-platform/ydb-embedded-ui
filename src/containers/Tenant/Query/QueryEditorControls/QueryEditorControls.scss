@@ -67,6 +67,8 @@
     }
 
     &__popover {
-        max-width: 340px;
+        max-width: 350px;
+
+        white-space: pre-wrap;
     }
 }
