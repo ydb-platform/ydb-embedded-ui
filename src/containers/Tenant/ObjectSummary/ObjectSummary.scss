@@ -86,6 +86,10 @@
     &__info-controls {
         display: flex;
         gap: 4px;
+
+        .yc-button__text {
+            margin: 0 6px;
+        }
     }
 
     &__info-action-button {
@@ -147,9 +151,5 @@
 
             background-color: transparent;
         }
-    }
-
-    .yc-button__text {
-        margin: 0 6px;
     }
 }

@@ -41,6 +41,8 @@ import {
 import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {Acl} from '../Acl/Acl';
+import {ExternalTableSummary} from '../Info/ExternalTable/ExternalTable';
+import {ExternalDataSourceSummary} from '../Info/ExternalDataSource/ExternalDataSource';
 
 import {TenantTabsGroups, TENANT_INFO_TABS, TENANT_SCHEMA_TAB} from '../TenantPages';
 import {
@@ -50,8 +52,9 @@ import {
 } from '../utils/paneVisibilityToggleHelpers';
 import {isColumnEntityType, isExternalTable, isIndexTable, isTableType} from '../utils/schema';
 
-import './ObjectSummary.scss';
 import i18n from '../i18n';
+
+import './ObjectSummary.scss';
 
 const b = cn('object-summary');
 
@@ -197,8 +200,12 @@ export function ObjectSummary({
             [EPathType.EPathTypePersQueueGroup]: () => (
                 <PersQueueGroupOverview data={currentObjectData} />
             ),
-            [EPathType.EPathTypeExternalTable]: undefined,
-            [EPathType.EPathTypeExternalDataSource]: undefined,
+            [EPathType.EPathTypeExternalTable]: () => (
+                <ExternalTableSummary data={currentObjectData} />
+            ),
+            [EPathType.EPathTypeExternalDataSource]: () => (
+                <ExternalDataSourceSummary data={currentObjectData} />
+            ),
         };
 
         let component =

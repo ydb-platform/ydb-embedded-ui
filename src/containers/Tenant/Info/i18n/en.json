@@ -1,0 +1,8 @@
+{
+  "external-objects.source-type": "Source Type",
+  "external-objects.data-source": "Data Source",
+  "external-objects.location": "Location",
+  "external-objects.auth-method": "Auth Method",
+  "external-objects.auth-method.none": "None",
+  "external-objects.auth-method.service-account": "Service Account"
+}
