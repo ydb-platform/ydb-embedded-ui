@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.12.0...v4.13.0) (2023-08-04)
+
+
+### Features
+
+* info and summary tabs for external objects ([#493](https://github.com/ydb-platform/ydb-embedded-ui/issues/493)) ([88d9041](https://github.com/ydb-platform/ydb-embedded-ui/commit/88d9041f080f13046aeaf55765609dbc13b87285))
+
+
+### Bug Fixes
+
+* **SchemaTree:** add actions to external objects ([#497](https://github.com/ydb-platform/ydb-embedded-ui/issues/497)) ([5029579](https://github.com/ydb-platform/ydb-embedded-ui/commit/5029579796dd5fb985005f39e9ef8daf142366d0))
+* **SchemaTree:** set required query mode for tree actions ([#491](https://github.com/ydb-platform/ydb-embedded-ui/issues/491)) ([ccd1eda](https://github.com/ydb-platform/ydb-embedded-ui/commit/ccd1edac0d84357cd605c9d131c99890449d8bd8))
+
 ## [4.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.11.1...v4.12.0) (2023-08-02)
 
 
