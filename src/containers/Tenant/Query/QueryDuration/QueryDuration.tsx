@@ -1,6 +1,9 @@
 import block from 'bem-cn-lite';
 
 import {formatDurationToShortTimeFormat, parseUsToMs} from '../../../../utils/timeParsers';
+import {LabelWithPopover} from '../../../../components/LabelWithPopover';
+
+import i18n from '../i18n';
 
 import './QueryDuration.scss';
 
@@ -17,5 +20,14 @@ export const QueryDuration = ({duration}: QueryDurationProps) => {
 
     const parsedDuration = formatDurationToShortTimeFormat(parseUsToMs(duration), 1);
 
-    return <span className={b()}>{parsedDuration}</span>;
+    return (
+        <span className={b()}>
+            <LabelWithPopover
+                className={b('item-with-popover')}
+                contentClassName={b('popover')}
+                text={parsedDuration}
+                popoverContent={i18n('query-duration.description')}
+            />
+        </span>
+    );
 };

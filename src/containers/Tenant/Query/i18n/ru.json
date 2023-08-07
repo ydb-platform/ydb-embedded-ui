@@ -20,5 +20,7 @@
   "method-description.script": "Для скриптов, совмещающих DDL и DML-конструкции.\nAPI call: schema.scripting",
   "method-description.scan": "Только читающие запросы, потенциально читающие много данных.\nAPI call: table.ExecuteScan",
   "method-description.data": "DML-запросы для изменения и выборки данных в режиме изоляции Serializable.\nAPI call: table.executeDataQuery",
-  "method-description.query": "Любые запросы. Экспериментальный перспективный метод, который в будущем заменит все остальные.\nAPI call: query.ExecuteScript"
+  "method-description.query": "Любые запросы. Экспериментальный перспективный метод, который в будущем заменит все остальные.\nAPI call: query.ExecuteScript",
+
+  "query-duration.description": "Время выполнения запроса на стороне сервера"
 }
