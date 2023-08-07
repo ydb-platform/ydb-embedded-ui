@@ -6,6 +6,10 @@
 
     color: var(--yc-color-text-complementary);
 
+    &__item-with-popover {
+        white-space: nowrap;
+    }
+
     &__popover {
         max-width: 300px;
     }
