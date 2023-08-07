@@ -23,7 +23,6 @@ export const QueryDuration = ({duration}: QueryDurationProps) => {
     return (
         <span className={b()}>
             <LabelWithPopover
-                className={b('item-with-popover')}
                 contentClassName={b('popover')}
                 text={parsedDuration}
                 popoverContent={i18n('query-duration.description')}
