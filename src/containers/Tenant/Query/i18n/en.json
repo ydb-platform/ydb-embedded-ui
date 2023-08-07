@@ -17,8 +17,8 @@
   "preview.not-available": "Preview is not available",
   "preview.close": "Close preview",
 
-  "method-description.script": "For YQL-scripts combining DDL and DML. API call: schema.scripting",
-  "method-description.scan": "Read-only queries, potentially reading a lot of data. API call: table.ExecuteScan",
-  "method-description.data": "DML queries for changing and fetching data in serialization mode. API call: table.executeDataQuery",
-  "method-description.query": "Any queries. An experimental API call supposed to replace all existing methods. API Call: query.ExecuteScript"
+  "method-description.script": "For YQL-scripts combining DDL and DML.\nAPI call: schema.scripting",
+  "method-description.scan": "Read-only queries, potentially reading a lot of data.\nAPI call: table.ExecuteScan",
+  "method-description.data": "DML queries for changing and fetching data in serialization mode.\nAPI call: table.executeDataQuery",
+  "method-description.query": "Any queries. An experimental API call supposed to replace all existing methods.\nAPI Call: query.ExecuteScript"
 }
