@@ -5,4 +5,8 @@
     margin-left: 10px;
 
     color: var(--yc-color-text-complementary);
+
+    &__popover {
+        max-width: 300px;
+    }
 }
