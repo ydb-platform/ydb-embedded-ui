@@ -1,6 +1,7 @@
 import {Selector, createSelector} from 'reselect';
 import {getUsage} from '../../../utils/storage';
 
+import type {TStorageGroupInfo} from '../../../types/api/storage';
 import type {TNodeInfo} from '../../../types/api/nodes';
 import {TPDiskState} from '../../../types/api/pdisk';
 import {EVDiskState, TVDiskStateInfo} from '../../../types/api/vdisk';
@@ -11,7 +12,6 @@ import {calcUptime} from '../../../utils';
 import type {
     PreparedStorageGroup,
     PreparedStorageNode,
-    RawStorageGroup,
     StorageStateSlice,
     UsageFilter,
 } from './types';
@@ -26,7 +26,7 @@ const FLAGS_POINTS = {
 };
 
 const prepareStorageGroupData = (
-    group: RawStorageGroup,
+    group: TStorageGroupInfo,
     poolName?: string,
 ): PreparedStorageGroup => {
     let missing = 0;

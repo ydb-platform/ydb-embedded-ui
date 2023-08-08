@@ -1,4 +1,4 @@
-import type {IStoragePoolGroup} from '../../../types/store/storage';
+import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
 import {EFlag} from '../../../types/api/enums';
 
 export * from './constants';
@@ -35,7 +35,7 @@ const degradationEvaluators = {
 const canEvaluateErasureSpecies = (value?: string): value is keyof typeof degradationEvaluators =>
     value !== undefined && value in degradationEvaluators;
 
-export const getDegradedSeverity = (group: IStoragePoolGroup) => {
+export const getDegradedSeverity = (group: PreparedStorageGroup) => {
     const evaluate = canEvaluateErasureSpecies(group.ErasureSpecies)
         ? degradationEvaluators[group.ErasureSpecies]
         : defaultDegradationEvaluator;

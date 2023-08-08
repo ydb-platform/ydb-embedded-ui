@@ -8,7 +8,8 @@ import {TVDiskStateInfo} from './vdisk';
  */
 export interface TStorageInfo {
     Overall?: EFlag;
-    StoragePools?: TStoragePoolInfo[];
+    StoragePools?: TStoragePoolInfo[]; // v1
+    StorageGroups?: TStorageGroupInfo[]; // v2
     /** uint64 */
     TotalGroups?: string;
     /** uint64 */
@@ -19,7 +20,7 @@ interface TStoragePoolInfo {
     Overall?: EFlag;
     Name?: string;
     Kind?: string;
-    Groups?: (TBSGroupStateInfo & THiveStorageGroupStats)[];
+    Groups?: TStorageGroupInfo[];
     /** uint64 */
     AcquiredUnits?: string;
     AcquiredIOPS?: number;
@@ -34,7 +35,9 @@ interface TStoragePoolInfo {
     MaximumSize?: string;
 }
 
-export interface TBSGroupStateInfo {
+export type TStorageGroupInfo = TBSGroupStateInfo & THiveStorageGroupStats;
+
+interface TBSGroupStateInfo {
     GroupID?: number;
     ErasureSpecies?: string;
     VDisks?: TVDiskStateInfo[];
@@ -57,7 +60,7 @@ export interface TBSGroupStateInfo {
     Encryption?: boolean;
 }
 
-export interface THiveStorageGroupStats {
+interface THiveStorageGroupStats {
     GroupID?: number;
     /** uint64 */
     AcquiredUnits?: string;
@@ -75,4 +78,9 @@ export interface THiveStorageGroupStats {
     AllocatedSize?: string;
     /** uint64 */
     AvailableSize?: string;
+}
+
+export enum EVersion {
+    v1 = 'v1',
+    v2 = 'v2', // only this versions works with sorting
 }

@@ -1,11 +1,7 @@
 import type {IResponseError} from '../../../types/api/error';
 import type {TNodesInfo, TSystemStateInfo} from '../../../types/api/nodes';
 import type {TPDiskStateInfo} from '../../../types/api/pdisk';
-import type {
-    TBSGroupStateInfo,
-    THiveStorageGroupStats,
-    TStorageInfo,
-} from '../../../types/api/storage';
+import type {TStorageGroupInfo, TStorageInfo} from '../../../types/api/storage';
 import type {ValueOf} from '../../../types/common';
 import type {NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {ApiRequestAction} from '../../utils';
@@ -33,9 +29,7 @@ export interface PreparedStorageNode extends TSystemStateInfo {
     Uptime: string;
 }
 
-export type RawStorageGroup = TBSGroupStateInfo & THiveStorageGroupStats;
-
-export interface PreparedStorageGroup extends RawStorageGroup {
+export interface PreparedStorageGroup extends TStorageGroupInfo {
     PoolName: string | undefined;
 
     Read: number;
