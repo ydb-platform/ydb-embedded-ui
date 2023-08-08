@@ -85,13 +85,13 @@ function Header({mainPage}: HeaderProps) {
                         items={breadcrumbItems}
                         lastDisplayedItemsCount={1}
                         firstDisplayedItemsCount={1}
-                        renderItemContent={({icon: Icon, text}) => {
-                            if (!Icon) {
+                        renderItemContent={({icon, text}) => {
+                            if (!icon) {
                                 return text;
                             }
                             return (
                                 <span className={b('breadcrumb')}>
-                                    <div className={b('breadcrumb__icon')}>{Icon}</div>
+                                    <div className={b('breadcrumb__icon')}>{icon}</div>
                                     {text}
                                 </span>
                             );

@@ -13,6 +13,7 @@ import {DEVELOPER_UI_TITLE} from '../../utils/constants';
 import '../../services/api';
 import {parseQuery} from '../../routes';
 
+import type {EType} from '../../types/api/tablet';
 import EntityStatus from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Tag} from '../../components/Tag';
@@ -48,11 +49,14 @@ export const Tablet = () => {
         error,
     } = useTypedSelector((state) => state.tablet);
 
-    const {TabletId, Overall, Leader, Type} = tablet;
-
-    const {nodeId: queryNodeId, tenantName: queryTenantName} = parseQuery(location);
+    const {
+        nodeId: queryNodeId,
+        tenantName: queryTenantName,
+        type: queryType,
+    } = parseQuery(location);
     const nodeId = tablet.NodeId?.toString() || queryNodeId?.toString();
     const tenantName = tenantPath || queryTenantName?.toString();
+    const type = (tablet.Type?.toString() as EType) || (queryType?.toString() as EType);
 
     // NOTE: should be reviewed when migrating to React 18
     useEffect(() => {
@@ -80,10 +84,10 @@ export const Tablet = () => {
                 nodeIds: nodeId ? [nodeId] : [],
                 tenantName,
                 tabletId: id,
-                tabletType: Type,
+                tabletType: type,
             }),
         );
-    }, [dispatch, tenantName, id, nodeId, Type]);
+    }, [dispatch, tenantName, id, nodeId, type]);
 
     const renderExternalLinks = (link: {name: string; path: string}, index: number) => {
         return (
@@ -110,6 +114,8 @@ export const Tablet = () => {
             </div>
         );
     }
+
+    const {TabletId, Overall, Leader} = tablet;
 
     const externalLinks = [
         {

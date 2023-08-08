@@ -1,6 +1,6 @@
 import cn from 'bem-cn-lite';
 
-import type {TTabletStateInfo} from '../../types/api/tablet';
+import {type TTabletStateInfo} from '../../types/api/tablet';
 import {getTabletLabel} from '../../utils/constants';
 import routes, {createHref} from '../../routes';
 
@@ -9,6 +9,7 @@ import {InternalLink} from '../InternalLink';
 import {TabletTooltipContent} from '../TooltipsContent';
 
 import './Tablet.scss';
+import {TabletIcon} from '../TabletIcon/TabletIcon';
 
 const b = cn('tablet');
 
@@ -18,10 +19,11 @@ interface TabletProps {
 }
 
 export const Tablet = ({tablet = {}, tenantName}: TabletProps) => {
-    const {TabletId: id, NodeId} = tablet;
+    const {TabletId: id, NodeId, Type} = tablet;
     const status = tablet.Overall?.toLowerCase();
 
-    const tabletPath = id && createHref(routes.tablet, {id}, {nodeId: NodeId, tenantName});
+    const tabletPath =
+        id && createHref(routes.tablet, {id}, {nodeId: NodeId, tenantName, type: Type});
 
     return (
         <ContentWithPopup
@@ -29,9 +31,7 @@ export const Tablet = ({tablet = {}, tenantName}: TabletProps) => {
             content={<TabletTooltipContent data={tablet} className={b('popup-content')} />}
         >
             <InternalLink to={tabletPath}>
-                <div className={b({status})}>
-                    <div className={b('type')}>{[getTabletLabel(tablet.Type)]}</div>
-                </div>
+                <TabletIcon className={b({status})} text={getTabletLabel(tablet.Type)} />
             </InternalLink>
         </ContentWithPopup>
     );

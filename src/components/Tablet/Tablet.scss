@@ -1,17 +1,9 @@
 .tablet {
-    display: flex;
-    justify-content: center;
-
-    width: 23px;
-    height: 18px;
-
-    font-size: 10px;
     cursor: pointer;
     text-transform: uppercase;
 
     color: var(--yc-color-text-complementary);
-    border: 1px solid var(--yc-color-base-generic-medium-hover);
-    border-radius: 4px;
+    border-color: var(--yc-color-base-generic-medium-hover);
 
     &__wrapper {
         margin-right: 2px;
@@ -23,12 +15,6 @@
 
     &__popup-content {
         padding: 10px;
-    }
-
-    &__type {
-        line-height: 17px;
-
-        color: var(--yc-color-text-complementary);
     }
 
     &_status_gray {

@@ -1,5 +1,5 @@
 import type {ClusterTab} from '../../../containers/Cluster/utils';
-import {EType} from '../../../types/api/tablet';
+import type {EType} from '../../../types/api/tablet';
 
 import {setHeaderBreadcrumbs} from './header';
 
