@@ -6,7 +6,14 @@ import '../../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
-import type {StorageAction, StorageState, StorageType, VisibleEntities} from './types';
+import type {NodesApiRequestParams} from '../nodes/types';
+import type {
+    StorageAction,
+    StorageApiRequestParams,
+    StorageState,
+    StorageType,
+    VisibleEntities,
+} from './types';
 import {VISIBLE_ENTITIES, STORAGE_TYPES} from './constants';
 
 export const FETCH_STORAGE = createRequestActionTypes('storage', 'FETCH_STORAGE');
@@ -112,34 +119,27 @@ const storage: Reducer<StorageState, StorageAction> = (state = initialState, act
     }
 };
 
-export function getStorageInfo(
-    {
-        tenant,
-        visibleEntities,
-        nodeId,
-        type,
-    }: {
-        tenant?: string;
-        visibleEntities?: VisibleEntities;
-        nodeId?: string;
-        type?: StorageType;
-    },
+export const getStorageNodesInfo = (
+    {tenant, visibleEntities}: Omit<NodesApiRequestParams, 'type'>,
     {concurrentId}: {concurrentId?: string} = {},
-) {
-    if (type === STORAGE_TYPES.nodes) {
-        return createApiRequest({
-            request: window.api.getNodes({tenant, visibleEntities, type: 'static'}, {concurrentId}),
-            actions: FETCH_STORAGE,
-            dataHandler: (data) => ({nodes: data}),
-        });
-    }
+) => {
+    return createApiRequest({
+        request: window.api.getNodes({tenant, visibleEntities, type: 'static'}, {concurrentId}),
+        actions: FETCH_STORAGE,
+        dataHandler: (data) => ({nodes: data}),
+    });
+};
 
+export const getStorageGroupsInfo = (
+    {tenant, visibleEntities, nodeId}: StorageApiRequestParams,
+    {concurrentId}: {concurrentId?: string} = {},
+) => {
     return createApiRequest({
         request: window.api.getStorageInfo({tenant, visibleEntities, nodeId}, {concurrentId}),
         actions: FETCH_STORAGE,
         dataHandler: (data) => ({groups: data}),
     });
-}
+};
 
 export function setInitialState() {
     return {

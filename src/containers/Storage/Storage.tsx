@@ -13,7 +13,6 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
 import {
-    getStorageInfo,
     setInitialState,
     setVisibleEntities,
     setStorageTextFilter,
@@ -21,6 +20,8 @@ import {
     setStorageType,
     setNodesUptimeFilter,
     setDataWasNotLoaded,
+    getStorageNodesInfo,
+    getStorageGroupsInfo,
 } from '../../store/reducers/storage/storage';
 import {
     selectFilteredGroups,
@@ -92,19 +93,21 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
                 dispatch(setDataWasNotLoaded());
             }
 
-            dispatch(
-                getStorageInfo(
-                    {
-                        tenant,
-                        nodeId,
-                        visibleEntities,
-                        type: storageType,
-                    },
-                    {
-                        concurrentId: 'getStorageInfo',
-                    },
-                ),
-            );
+            if (storageType === STORAGE_TYPES.nodes) {
+                dispatch(
+                    getStorageNodesInfo(
+                        {tenant, visibleEntities},
+                        {concurrentId: 'getStorageInfo'},
+                    ),
+                );
+            } else {
+                dispatch(
+                    getStorageGroupsInfo(
+                        {tenant, visibleEntities, nodeId},
+                        {concurrentId: 'getStorageInfo'},
+                    ),
+                );
+            }
         },
         [dispatch, tenant, nodeId, visibleEntities, storageType],
     );
