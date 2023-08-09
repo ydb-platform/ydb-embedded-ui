@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useMemo} from 'react';
 
 import type {NodesGeneralRequestParams} from '../../store/reducers/nodes/types';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
@@ -23,11 +23,9 @@ export const useNodesRequestParams = ({
 }: NodesRawRequestParams) => {
     const [useBackendParamsForTables] = useSetting<boolean>(USE_BACKEND_PARAMS_FOR_TABLES_KEY);
 
-    const [requestParams, setRequestParams] = useState<NodesGeneralRequestParams>({});
-
     // If backend params are enabled, update params value to use them in fetch request
     // Otherwise no params will be updated, no hooks that depend on requestParams will be triggered
-    useEffect(() => {
+    return useMemo(() => {
         if (useBackendParamsForTables) {
             const problemsOnly = problemFilter === ProblemFilterValues.PROBLEMS;
             const uptime =
@@ -35,15 +33,14 @@ export const useNodesRequestParams = ({
                     ? HOUR_IN_SECONDS
                     : undefined;
 
-            setRequestParams({
+            return {
                 filter,
                 problems_only: problemsOnly,
                 uptime,
                 sortOrder,
                 sortValue,
-            });
+            };
         }
+        return undefined;
     }, [useBackendParamsForTables, filter, problemFilter, nodesUptimeFilter, sortOrder, sortValue]);
-
-    return requestParams;
 };

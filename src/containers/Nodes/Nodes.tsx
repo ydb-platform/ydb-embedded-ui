@@ -99,12 +99,14 @@ export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {
                 dispatch(setDataWasNotLoaded());
             }
 
+            const params = requestParams || {};
+
             // For not DB entities we always use /compute endpoint instead of /nodes
             // since /nodes can return data only for tenants
             if (path && (!useNodesEndpoint || !isDatabaseEntityType(type))) {
-                dispatch(getComputeNodes({path, ...requestParams}));
+                dispatch(getComputeNodes({path, ...params}));
             } else {
-                dispatch(getNodes({tenant: path, ...requestParams}));
+                dispatch(getNodes({tenant: path, ...params}));
             }
         },
         [dispatch, path, type, useNodesEndpoint, requestParams],
