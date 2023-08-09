@@ -169,6 +169,7 @@ export const getActions =
 
             index_table: JUST_COPY,
             topic: JUST_COPY,
+            stream: JUST_COPY,
 
             index: JUST_COPY,
 

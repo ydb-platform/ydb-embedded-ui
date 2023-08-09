@@ -56,6 +56,7 @@ export const getOptions = (
 
         index_table: undefined,
         topic: undefined,
+        stream: undefined,
 
         index: undefined,
 
