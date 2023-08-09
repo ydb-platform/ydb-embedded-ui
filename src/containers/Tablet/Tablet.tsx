@@ -52,11 +52,11 @@ export const Tablet = () => {
     const {
         nodeId: queryNodeId,
         tenantName: queryTenantName,
-        type: queryType,
+        type: queryTabletType,
     } = parseQuery(location);
     const nodeId = tablet.NodeId?.toString() || queryNodeId?.toString();
     const tenantName = tenantPath || queryTenantName?.toString();
-    const type = (tablet.Type?.toString() as EType) || (queryType?.toString() as EType);
+    const type = tablet.Type || (queryTabletType?.toString() as EType | undefined);
 
     // NOTE: should be reviewed when migrating to React 18
     useEffect(() => {
