@@ -6,7 +6,6 @@ import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-component
 import type {QueryMode} from '../../../types/store/query';
 import type {SetQueryModeIfAvailable} from '../../../utils/hooks';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
-import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import {TENANT_QUERY_TABS_ID, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import createToast from '../../../utils/createToast';
@@ -109,12 +108,6 @@ const bindActions = (
                 });
             }
         },
-        openPreview: () => {
-            dispatch(setShowPreview(true));
-            dispatch(setTenantPage(TENANT_PAGES_IDS.query));
-            dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-            setActivePath(path);
-        },
     };
 };
 
@@ -125,14 +118,13 @@ export const getActions =
     (path: string, type: NavigationTreeNodeType) => {
         const actions = bindActions(path, dispatch, additionalEffects);
         const copyItem = {text: i18n('actions.copyPath'), action: actions.copyPath};
-        const openPreview = {text: i18n('actions.openPreview'), action: actions.openPreview};
 
         const DIR_SET: ActionsSet = [
             [copyItem],
             [{text: i18n('actions.createTable'), action: actions.createTable}],
         ];
         const TABLE_SET: ActionsSet = [
-            [openPreview, copyItem],
+            [copyItem],
             [
                 {text: i18n('actions.alterTable'), action: actions.alterTable},
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
@@ -141,7 +133,7 @@ export const getActions =
         ];
 
         const EXTERNAL_TABLE_SET = [
-            [openPreview, copyItem],
+            [copyItem],
             [
                 {
                     text: i18n('actions.selectQuery'),
