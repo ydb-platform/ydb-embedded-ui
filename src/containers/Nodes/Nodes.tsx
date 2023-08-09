@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import cn from 'bem-cn-lite';
 import {useDispatch} from 'react-redux';
 
@@ -7,7 +7,6 @@ import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 
 import type {EPathType} from '../../types/api/schema';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
-import type {NodesGeneralRequestParams} from '../../store/reducers/nodes/types';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {Illustration} from '../../components/Illustration';
@@ -18,13 +17,13 @@ import {EntitiesCount} from '../../components/EntitiesCount';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
 
+import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
 import {
-    DEFAULT_TABLE_SETTINGS,
-    HOUR_IN_SECONDS,
-    USE_BACKEND_PARAMS_FOR_TABLES_KEY,
-    USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
-} from '../../utils/constants';
-import {useAutofetcher, useSetting, useTypedSelector} from '../../utils/hooks';
+    useAutofetcher,
+    useSetting,
+    useTypedSelector,
+    useNodesRequestParams,
+} from '../../utils/hooks';
 import {
     AdditionalNodesInfo,
     isUnavailableNode,
@@ -88,36 +87,14 @@ export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {
     const nodes = useTypedSelector(selectFilteredNodes);
 
     const [useNodesEndpoint] = useSetting(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY);
-    const [useBackendParamsForTables] = useSetting<boolean>(USE_BACKEND_PARAMS_FOR_TABLES_KEY);
 
-    const [requestParams, setRequestParams] = useState<NodesGeneralRequestParams>({});
-
-    // If backend params are enabled, update params value and refetch data on filters change
-    // Otherwise no params will be sent and data will be filtered inside selector
-    useEffect(() => {
-        if (useBackendParamsForTables) {
-            const problemsOnly = problemFilter === ProblemFilterValues.PROBLEMS;
-            const uptime =
-                nodesUptimeFilter === NodesUptimeFilterValues.SmallUptime
-                    ? HOUR_IN_SECONDS
-                    : undefined;
-
-            setRequestParams({
-                filter: searchValue,
-                problems_only: problemsOnly,
-                uptime,
-                sortOrder,
-                sortValue,
-            });
-        }
-    }, [
-        useBackendParamsForTables,
-        searchValue,
+    const requestParams = useNodesRequestParams({
+        filter: searchValue,
         problemFilter,
         nodesUptimeFilter,
         sortOrder,
         sortValue,
-    ]);
+    });
 
     const fetchNodes = useCallback(
         (isBackground) => {
