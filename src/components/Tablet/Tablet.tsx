@@ -1,6 +1,6 @@
 import cn from 'bem-cn-lite';
 
-import {type TTabletStateInfo} from '../../types/api/tablet';
+import type {TTabletStateInfo} from '../../types/api/tablet';
 import {getTabletLabel} from '../../utils/constants';
 import routes, {createHref} from '../../routes';
 
