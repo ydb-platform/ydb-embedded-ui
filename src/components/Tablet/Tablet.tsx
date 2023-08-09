@@ -5,11 +5,11 @@ import {getTabletLabel} from '../../utils/constants';
 import routes, {createHref} from '../../routes';
 
 import {ContentWithPopup} from '../ContentWithPopup/ContentWithPopup';
+import {TabletIcon} from '../TabletIcon/TabletIcon';
 import {InternalLink} from '../InternalLink';
 import {TabletTooltipContent} from '../TooltipsContent';
 
 import './Tablet.scss';
-import {TabletIcon} from '../TabletIcon/TabletIcon';
 
 const b = cn('tablet');
 
