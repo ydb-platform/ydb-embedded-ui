@@ -40,7 +40,7 @@ export const getDegradedSeverity = (group: PreparedStorageGroup) => {
         ? degradationEvaluators[group.ErasureSpecies]
         : defaultDegradationEvaluator;
 
-    return evaluate(group.Missing);
+    return evaluate(group.Degraded);
 };
 
 export const getUsageSeverityForStorageGroup = generateEvaluator(80, 85, [

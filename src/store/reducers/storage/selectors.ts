@@ -1,128 +1,15 @@
 import {Selector, createSelector} from 'reselect';
+
+import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {getUsage} from '../../../utils/storage';
 
-import type {TStorageGroupInfo} from '../../../types/api/storage';
-import type {TNodeInfo} from '../../../types/api/nodes';
-import {TPDiskState} from '../../../types/api/pdisk';
-import {EVDiskState, TVDiskStateInfo} from '../../../types/api/vdisk';
-import {EFlag} from '../../../types/api/enums';
-import {getPDiskType} from '../../../utils/pdisk';
-import {calcUptime} from '../../../utils';
-
+import {filterNodesByUptime} from '../nodes/selectors';
 import type {
     PreparedStorageGroup,
     PreparedStorageNode,
     StorageStateSlice,
     UsageFilter,
 } from './types';
-import {filterNodesByUptime} from '../nodes/selectors';
-
-// ==== Prepare data ====
-const FLAGS_POINTS = {
-    [EFlag.Green]: 1,
-    [EFlag.Yellow]: 100,
-    [EFlag.Orange]: 10_000,
-    [EFlag.Red]: 1_000_000,
-};
-
-const prepareStorageGroupData = (
-    group: TStorageGroupInfo,
-    poolName?: string,
-): PreparedStorageGroup => {
-    let missing = 0;
-    let usedSpaceFlag = 0;
-    let usedSpaceBytes = 0;
-    let limitSizeBytes = 0;
-    let readSpeedBytesPerSec = 0;
-    let writeSpeedBytesPerSec = 0;
-    let mediaType = '';
-
-    if (group.VDisks) {
-        for (const vDisk of group.VDisks) {
-            const {
-                Replicated,
-                VDiskState,
-                AvailableSize,
-                AllocatedSize,
-                PDisk,
-                DiskSpace,
-                ReadThroughput,
-                WriteThroughput,
-            } = vDisk;
-
-            if (
-                !Replicated ||
-                PDisk?.State !== TPDiskState.Normal ||
-                VDiskState !== EVDiskState.OK
-            ) {
-                missing += 1;
-            }
-
-            if (DiskSpace && DiskSpace !== EFlag.Grey) {
-                usedSpaceFlag += FLAGS_POINTS[DiskSpace];
-            }
-
-            const available = Number(AvailableSize ?? PDisk?.AvailableSize) || 0;
-            const allocated = Number(AllocatedSize) || 0;
-
-            usedSpaceBytes += allocated;
-            limitSizeBytes += available + allocated;
-
-            readSpeedBytesPerSec += Number(ReadThroughput) || 0;
-            writeSpeedBytesPerSec += Number(WriteThroughput) || 0;
-
-            const currentType = getPDiskType(PDisk || {});
-            mediaType =
-                currentType && (currentType === mediaType || mediaType === '')
-                    ? currentType
-                    : 'Mixed';
-        }
-    }
-
-    // VDisk doesn't have its own StoragePoolName when located inside StoragePool data
-    const vDisks = group.VDisks?.map((vdisk) => ({
-        ...vdisk,
-        StoragePoolName: poolName,
-        Donors: vdisk.Donors?.map((donor) => ({
-            ...donor,
-            StoragePoolName: poolName,
-        })),
-    }));
-
-    return {
-        ...group,
-        VDisks: vDisks,
-        Read: readSpeedBytesPerSec,
-        Write: writeSpeedBytesPerSec,
-        PoolName: poolName,
-        Used: usedSpaceBytes,
-        Limit: limitSizeBytes,
-        Missing: missing,
-        UsedSpaceFlag: usedSpaceFlag,
-        Type: mediaType || null,
-    };
-};
-
-const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
-    const systemState = node.SystemState ?? {};
-    const missing =
-        node.PDisks?.filter((pDisk) => {
-            return pDisk.State !== TPDiskState.Normal;
-        }).length || 0;
-
-    return {
-        NodeId: node.NodeId,
-        SystemState: systemState.SystemState,
-        DataCenter: systemState.DataCenter,
-        Rack: systemState.Rack,
-        Host: systemState.Host,
-        Endpoints: systemState.Endpoints,
-        Uptime: calcUptime(systemState.StartTime),
-        StartTime: systemState.StartTime,
-        PDisks: node.PDisks,
-        Missing: missing,
-    };
-};
 
 // ==== Filters ====
 
@@ -163,23 +50,20 @@ const filterGroupsByUsage = (entities: PreparedStorageGroup[], usage?: string[])
     }
 
     return entities.filter((entity) => {
-        const entityUsage = getUsage(entity, 5);
+        const entityUsage = entity.Usage;
         return usage.some((val) => Number(val) <= entityUsage && entityUsage < Number(val) + 5);
     });
 };
 
 // ==== Simple selectors ====
 
-export const selectStoragePools = (state: StorageStateSlice) => state.storage.groups?.StoragePools;
-export const selectStorageGroupsCount = (state: StorageStateSlice) => ({
-    total: state.storage.groups?.TotalGroups || 0,
-    found: state.storage.groups?.FoundGroups || 0,
+export const selectEntitiesCount = (state: StorageStateSlice) => ({
+    total: state.storage.total,
+    found: state.storage.found,
 });
-export const selectStorageNodes = (state: StorageStateSlice) => state.storage.nodes?.Nodes;
-export const selectStorageNodesCount = (state: StorageStateSlice) => ({
-    total: state.storage.nodes?.TotalNodes || 0,
-    found: state.storage.nodes?.FoundNodes || 0,
-});
+
+export const selectStorageGroups = (state: StorageStateSlice) => state.storage.groups;
+export const selectStorageNodes = (state: StorageStateSlice) => state.storage.nodes;
 
 export const selectStorageFilter = (state: StorageStateSlice) => state.storage.filter;
 export const selectUsageFilter = (state: StorageStateSlice) => state.storage.usageFilter;
@@ -189,28 +73,6 @@ export const selectNodesUptimeFilter = (state: StorageStateSlice) =>
 export const selectStorageType = (state: StorageStateSlice) => state.storage.type;
 
 // ==== Complex selectors ====
-
-const selectPreparedStorageNodes: Selector<StorageStateSlice, PreparedStorageNode[]> =
-    createSelector(selectStorageNodes, (storageNodes) => {
-        if (!storageNodes) {
-            return [];
-        }
-
-        return storageNodes.map(prepareStorageNodeData);
-    });
-
-export const selectPreparedStorageGroups: Selector<StorageStateSlice, PreparedStorageGroup[]> =
-    createSelector(selectStoragePools, (storagePools) => {
-        const preparedGroups: PreparedStorageGroup[] = [];
-
-        storagePools?.forEach((pool) => {
-            pool.Groups?.forEach((group) => {
-                preparedGroups.push(prepareStorageGroupData(group, pool.Name));
-            });
-        });
-
-        return preparedGroups;
-    });
 
 export const selectVDisksForPDisk: Selector<
     StorageStateSlice,
@@ -232,11 +94,12 @@ export const selectVDisksForPDisk: Selector<
 );
 
 export const selectUsageFilterOptions: Selector<StorageStateSlice, UsageFilter[]> = createSelector(
-    selectPreparedStorageGroups,
+    selectStorageGroups,
     (groups) => {
         const items: Record<number, number> = {};
 
-        groups.forEach((group) => {
+        groups?.forEach((group) => {
+            // Get groups usage with step 5
             const usage = getUsage(group, 5);
 
             if (!Object.prototype.hasOwnProperty.call(items, usage)) {
@@ -256,9 +119,9 @@ export const selectUsageFilterOptions: Selector<StorageStateSlice, UsageFilter[]
 
 export const selectFilteredNodes: Selector<StorageStateSlice, PreparedStorageNode[]> =
     createSelector(
-        [selectPreparedStorageNodes, selectStorageFilter, selectNodesUptimeFilter],
+        [selectStorageNodes, selectStorageFilter, selectNodesUptimeFilter],
         (storageNodes, textFilter, uptimeFilter) => {
-            let result = storageNodes;
+            let result = storageNodes || [];
             result = filterNodesByText(result, textFilter);
             result = filterNodesByUptime(result, uptimeFilter);
 
@@ -268,9 +131,9 @@ export const selectFilteredNodes: Selector<StorageStateSlice, PreparedStorageNod
 
 export const selectFilteredGroups: Selector<StorageStateSlice, PreparedStorageGroup[]> =
     createSelector(
-        [selectPreparedStorageGroups, selectStorageFilter, selectUsageFilter],
+        [selectStorageGroups, selectStorageFilter, selectUsageFilter],
         (storageGroups, textFilter, usageFilter) => {
-            let result = storageGroups;
+            let result = storageGroups || [];
             result = filterGroupsByText(result, textFilter);
             result = filterGroupsByUsage(result, usageFilter);
 

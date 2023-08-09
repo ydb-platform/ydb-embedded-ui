@@ -26,8 +26,7 @@ import {
 import {
     selectFilteredGroups,
     selectFilteredNodes,
-    selectStorageNodesCount,
-    selectStorageGroupsCount,
+    selectEntitiesCount,
     selectUsageFilterOptions,
 } from '../../store/reducers/storage/selectors';
 import {VISIBLE_ENTITIES, STORAGE_TYPES} from '../../store/reducers/storage/constants';
@@ -73,8 +72,7 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
     } = useTypedSelector((state) => state.storage);
     const storageNodes = useTypedSelector(selectFilteredNodes);
     const storageGroups = useTypedSelector(selectFilteredGroups);
-    const nodesCount = useTypedSelector(selectStorageNodesCount);
-    const groupsCount = useTypedSelector(selectStorageGroupsCount);
+    const entitiesCount = useTypedSelector(selectEntitiesCount);
     const nodesMap = useTypedSelector(selectNodesMap);
     const usageFilterOptions = useTypedSelector(selectUsageFilterOptions);
 
@@ -169,7 +167,6 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
 
     const renderEntitiesCount = () => {
         const entityName = storageType === STORAGE_TYPES.groups ? 'Groups' : 'Nodes';
-        const count = storageType === STORAGE_TYPES.groups ? groupsCount : nodesCount;
         const current =
             storageType === STORAGE_TYPES.groups ? storageGroups.length : storageNodes.length;
 
@@ -177,7 +174,7 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
             <EntitiesCount
                 label={entityName}
                 loading={loading && !wasLoaded}
-                total={count.total}
+                total={entitiesCount.total}
                 current={current}
             />
         );

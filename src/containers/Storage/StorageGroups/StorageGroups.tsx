@@ -129,7 +129,7 @@ export function StorageGroups({
             // prettier-ignore
             render: ({row}) => (
                 <>
-                    <Label>{row.Type || '—'}</Label>
+                    <Label>{row.Kind || '—'}</Label>
                     {' '}
                     {row.Encryption && (
                         <Popover
@@ -156,8 +156,8 @@ export function StorageGroups({
             header: tableColumnsNames[TableColumnsIds.Missing],
             width: 100,
             render: ({row}) =>
-                row.Missing ? (
-                    <Label theme={getDegradedSeverity(row)}>Degraded: {row.Missing}</Label>
+                row.Degraded ? (
+                    <Label theme={getDegradedSeverity(row)}>Degraded: {row.Degraded}</Label>
                 ) : (
                     '-'
                 ),
@@ -169,15 +169,14 @@ export function StorageGroups({
             header: tableColumnsNames[TableColumnsIds.UsedPercents],
             width: 100,
             render: ({row}) => {
-                const usage = getUsage(row, 5);
                 // without a limit the usage can be evaluated as 0,
                 // but the absence of a value is more clear
                 return row.Limit ? (
                     <Label
-                        theme={getUsageSeverityForStorageGroup(usage)}
-                        className={b('usage-label', {overload: usage >= 90})}
+                        theme={getUsageSeverityForStorageGroup(row.Usage)}
+                        className={b('usage-label', {overload: row.Usage >= 90})}
                     >
-                        {usage}%
+                        {row.Usage}%
                     </Label>
                 ) : (
                     '-'

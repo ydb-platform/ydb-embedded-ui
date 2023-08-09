@@ -9,7 +9,7 @@ import {TVDiskStateInfo} from './vdisk';
 export interface TStorageInfo {
     Overall?: EFlag;
     StoragePools?: TStoragePoolInfo[]; // v1
-    StorageGroups?: TStorageGroupInfo[]; // v2
+    StorageGroups?: TStorageGroupInfoV2[]; // v2
     /** uint64 */
     TotalGroups?: string;
     /** uint64 */
@@ -33,6 +33,26 @@ interface TStoragePoolInfo {
     MaximumThroughput?: string;
     /** uint64 */
     MaximumSize?: string;
+}
+
+export interface TStorageGroupInfoV2 extends TStorageGroupInfo {
+    PoolName?: string;
+    Kind?: string;
+
+    /** uint64 */
+    Degraded?: string;
+
+    /** uint64 */
+    Used: string;
+    /** uint64 */
+    Limit: string;
+    /** uint64 */
+    Read: string;
+    /** uint64 */
+    Write: string;
+
+    /** uint64 */
+    Usage?: string;
 }
 
 export type TStorageGroupInfo = TBSGroupStateInfo & THiveStorageGroupStats;
