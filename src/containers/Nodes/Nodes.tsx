@@ -1,12 +1,13 @@
-import {useCallback, useEffect, useMemo} from 'react';
+import {useCallback, useEffect} from 'react';
 import cn from 'bem-cn-lite';
 import {useDispatch} from 'react-redux';
 
-import DataTable, {SortOrder} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 
 import type {EPathType} from '../../types/api/schema';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
+import type {NodesSortParams} from '../../store/reducers/nodes/types';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {Illustration} from '../../components/Illustration';
@@ -23,13 +24,9 @@ import {
     useSetting,
     useTypedSelector,
     useNodesRequestParams,
+    useTableSort,
 } from '../../utils/hooks';
-import {
-    AdditionalNodesInfo,
-    isUnavailableNode,
-    NodesSortValue,
-    NodesUptimeFilterValues,
-} from '../../utils/nodes';
+import {AdditionalNodesInfo, isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
 
 import {
     getNodes,
@@ -115,21 +112,9 @@ export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {
 
     useAutofetcher(fetchNodes, [fetchNodes], isClusterNodes ? true : autorefresh);
 
-    const sort: SortOrder | undefined = useMemo(() => {
-        if (!sortValue) {
-            return undefined;
-        }
-
-        return {
-            columnId: sortValue,
-            order: sortOrder,
-        };
-    }, [sortValue, sortOrder]);
-
-    const handleSort = (rawValue: SortOrder | SortOrder[] | undefined) => {
-        const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
-        dispatch(setSort(value?.columnId as NodesSortValue | undefined, value?.order));
-    };
+    const [sort, handleSort] = useTableSort({sortValue, sortOrder}, (sortParams) =>
+        dispatch(setSort(sortParams as NodesSortParams)),
+    );
 
     const handleSearchQueryChange = (value: string) => {
         dispatch(setSearchValue(value));

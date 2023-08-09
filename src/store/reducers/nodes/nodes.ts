@@ -1,9 +1,7 @@
 import type {Reducer} from 'redux';
 
-import type {OrderType} from '@gravity-ui/react-data-table';
-
 import '../../../services/api';
-import {type NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
+import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {EVersion} from '../../../types/api/compute';
 
 import {createRequestActionTypes, createApiRequest} from '../../utils';
@@ -12,6 +10,7 @@ import type {
     ComputeApiRequestParams,
     NodesAction,
     NodesApiRequestParams,
+    NodesSortParams,
     NodesState,
 } from './types';
 import {prepareComputeNodesData, prepareNodesData} from './utils';
@@ -141,13 +140,10 @@ export const setSearchValue = (value: string) => {
     } as const;
 };
 
-export const setSort = (
-    sortValue: NodesSortValue | undefined,
-    sortOrder: OrderType | undefined,
-) => {
+export const setSort = (sortParams: NodesSortParams) => {
     return {
         type: SET_SORT,
-        data: {sortValue, sortOrder},
+        data: sortParams,
     } as const;
 };
 

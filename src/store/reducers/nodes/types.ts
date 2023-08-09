@@ -54,12 +54,15 @@ export interface NodesState {
 
 export type NodeType = 'static' | 'dynamic' | 'any';
 
-export interface NodesGeneralRequestParams {
+export interface NodesSortParams {
+    sortOrder?: OrderType;
+    sortValue?: NodesSortValue;
+}
+
+export interface NodesGeneralRequestParams extends NodesSortParams {
     filter?: string; // NodeId or Host
     uptime?: number; // return nodes with less uptime in seconds
     problems_only?: boolean; // return nodes with SystemState !== EFlag.Green
-    sortOrder?: OrderType;
-    sortValue?: NodesSortValue; // Sort by one of ESort params (may differ for /nodes and /compute)
 
     offser?: number;
     limit?: number;
