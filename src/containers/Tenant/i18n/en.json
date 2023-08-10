@@ -14,8 +14,11 @@
   "actions.openPreview": "Open preview",
   "actions.createTable": "Create table...",
   "actions.createExternalTable": "Create external table...",
+  "actions.createTopic": "Create topic...",
   "actions.dropTable": "Drop table...",
+  "actions.dropTopic": "Drop topic...",
   "actions.alterTable": "Alter table...",
+  "actions.alterTopic": "Alter topic...",
   "actions.selectQuery": "Select query...",
   "actions.upsertQuery": "Upsert query..."
 }

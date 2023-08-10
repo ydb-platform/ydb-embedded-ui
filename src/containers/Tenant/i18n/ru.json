@@ -14,8 +14,11 @@
   "actions.openPreview": "Открыть превью",
   "actions.createTable": "Создать таблицу...",
   "actions.createExternalTable": "Создать внешнюю таблицу...",
+  "actions.createTopic": "Создать топик...",
   "actions.dropTable": "Удалить таблицу...",
+  "actions.dropTopic": "Удалить топик...",
   "actions.alterTable": "Изменить таблицу...",
+  "actions.alterTopic": "Изменить топик...",
   "actions.selectQuery": "Select запрос...",
   "actions.upsertQuery": "Upsert запрос..."
 }

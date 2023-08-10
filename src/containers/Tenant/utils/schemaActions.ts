@@ -55,6 +55,45 @@ const createExternalTableTemplate = (path: string) => {
 );`;
 };
 
+const createTopicTemplate = (path: string) => {
+    return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_topic
+CREATE TOPIC \`${path}/my_topic\` (
+    CONSUMER consumer1,
+    CONSUMER consumer2 WITH (read_from = 0) -- read_from: Sets up the message write time starting from which the consumer will receive data.
+) WITH (
+    min_active_partitions = 5, -- min_active_partitions: Minimum number of topic partitions.
+    partition_count_limit = 10, -- partition_count_limit: Maximum number of active partitions in the topic. 0 is interpreted as unlimited.
+    retention_period = Interval('PT12H'), -- retention_period: Data retention period in the topic.
+    retention_storage_mb = 1, --  retention_storage_mb: Limit on the maximum disk space occupied by the topic data. When this value is exceeded, 
+                              --  the older data is cleared, like under a retention policy. 0 is interpreted as unlimited.
+    partition_write_speed_bytes_per_second = 2097152, -- partition_write_speed_bytes_per_second: Maximum allowed write speed per partition.
+    partition_write_burst_bytes = 2097152 -- partition_write_burst_bytes: Write quota allocated for write bursts. When set to zero, the actual write_burst value is equalled 
+                                          -- to the quota value (this allows write bursts of up to one second).
+);`;
+};
+
+const alterTopicTemplate = (path: string) => {
+    return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/alter_topic
+ALTER TOPIC \`${path}\`
+    ADD CONSUMER new_consumer WITH (read_from = 0), -- read_from: Sets up the message write time starting from which the consumer will receive data.
+    ALTER CONSUMER consumer1 SET (read_from = 1691600896),
+    DROP CONSUMER consumer2,
+    SET (
+        min_active_partitions = 10, -- min_active_partitions: Minimum number of topic partitions.
+        partition_count_limit = 15, -- partition_count_limit: Maximum number of active partitions in the topic. 0 is interpreted as unlimited.
+        retention_period = Interval('PT36H'), -- retention_period: Data retention period in the topic.
+        retention_storage_mb = 10, --  retention_storage_mb: Limit on the maximum disk space occupied by the topic data. When this value is exceeded, 
+                                   --  the older data is cleared, like under a retention policy. 0 is interpreted as unlimited.
+        partition_write_speed_bytes_per_second = 3145728, -- partition_write_speed_bytes_per_second: Maximum allowed write speed per partition.
+        partition_write_burst_bytes = 1048576 -- partition_write_burst_bytes: Write quota allocated for write bursts. When set to zero, the actual write_burst value is equalled 
+                                              -- to the quota value (this allows write bursts of up to one second).
+    );`;
+};
+
+const dropTopicTemplate = (path: string) => {
+    return `DROP TOPIC \`${path}\``;
+};
+
 interface ActionsAdditionalEffects {
     setQueryMode: SetQueryModeIfAvailable;
     setActivePath: (path: string) => void;
@@ -92,6 +131,9 @@ const bindActions = (
             'query',
             i18n('actions.externalTableSelectUnavailable'),
         ),
+        createTopic: inputQuery(createTopicTemplate, 'script'),
+        alterTopic: inputQuery(alterTopicTemplate, 'script'),
+        dropTopic: inputQuery(dropTopicTemplate, 'script'),
         copyPath: () => {
             try {
                 copy(path);
@@ -121,7 +163,10 @@ export const getActions =
 
         const DIR_SET: ActionsSet = [
             [copyItem],
-            [{text: i18n('actions.createTable'), action: actions.createTable}],
+            [
+                {text: i18n('actions.createTable'), action: actions.createTable},
+                {text: i18n('actions.createTopic'), action: actions.createTopic},
+            ],
         ];
         const TABLE_SET: ActionsSet = [
             [copyItem],
@@ -129,6 +174,14 @@ export const getActions =
                 {text: i18n('actions.alterTable'), action: actions.alterTable},
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
+            ],
+        ];
+
+        const TOPIC_SET: ActionsSet = [
+            [copyItem],
+            [
+                {text: i18n('actions.alterTopic'), action: actions.alterTopic},
+                {text: i18n('actions.dropTopic'), action: actions.dropTopic},
             ],
         ];
 
@@ -160,7 +213,7 @@ export const getActions =
             column_table: TABLE_SET,
 
             index_table: JUST_COPY,
-            topic: JUST_COPY,
+            topic: TOPIC_SET,
             stream: JUST_COPY,
 
             index: JUST_COPY,
