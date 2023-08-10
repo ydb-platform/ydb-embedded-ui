@@ -4,19 +4,14 @@ import cn from 'bem-cn-lite';
 import {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
 import {Button} from '@gravity-ui/uikit';
-
-import {SetQueryModeIfAvailable} from '../../../utils/hooks';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
-import {Icon} from '../../../components/Icon';
+import {IconWrapper} from '../../../components/Icon';
 
 import i18n from '../i18n';
 
-import './SchemaControls.scss';
-
 interface ActionsAdditionalEffects {
-    setQueryMode: SetQueryModeIfAvailable;
     setActivePath: (path: string) => void;
 }
 
@@ -53,18 +48,16 @@ export const getControls =
                 title={i18n('actions.openPreview')}
                 size="s"
             >
-                <Icon name="tablePreview" height={16} width={16} />
+                <IconWrapper name="tablePreview" />
             </Button>
         );
-
-        const JUST_OPEN_PREVIEW: Controls = openPreview;
 
         const nodeTypeToControls: Record<NavigationTreeNodeType, Controls> = {
             database: undefined,
             directory: undefined,
 
-            table: JUST_OPEN_PREVIEW,
-            column_table: JUST_OPEN_PREVIEW,
+            table: openPreview,
+            column_table: openPreview,
 
             index_table: undefined,
             topic: undefined,
@@ -72,7 +65,7 @@ export const getControls =
 
             index: undefined,
 
-            external_table: JUST_OPEN_PREVIEW,
+            external_table: openPreview,
             external_data_source: undefined,
         };
 

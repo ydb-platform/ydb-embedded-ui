@@ -81,7 +81,6 @@ export function SchemaTree(props: SchemaTreeProps) {
             })}
             renderAdditionalNodeElements={getControls(dispatch, {
                 setActivePath: handleActivePathUpdate,
-                setQueryMode,
             })}
             activePath={currentPath}
             onActivePathUpdate={handleActivePathUpdate}
