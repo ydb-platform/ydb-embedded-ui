@@ -1,3 +1,5 @@
+import type {OrderType} from '@gravity-ui/react-data-table';
+
 import type {IResponseError} from '../../../types/api/error';
 import type {TEndpoint, TPoolStats} from '../../../types/api/nodes';
 import type {
@@ -9,13 +11,14 @@ import type {EFlag} from '../../../types/api/enums';
 import type {ApiRequestAction} from '../../utils';
 import type {VisibleEntities} from '../storage/types';
 
-import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
 import {
     FETCH_NODES,
     resetNodesState,
     setDataWasNotLoaded,
     setNodesUptimeFilter,
     setSearchValue,
+    setSort,
 } from './nodes';
 
 // Since nodes from different endpoints can have different types,
@@ -42,6 +45,8 @@ export interface NodesState {
     wasLoaded: boolean;
     nodesUptimeFilter: NodesUptimeFilterValues;
     searchValue: string;
+    sortValue?: NodesSortValue;
+    sortOrder?: OrderType;
     data?: NodesPreparedEntity[];
     totalNodes?: number;
     error?: IResponseError;
@@ -49,17 +54,21 @@ export interface NodesState {
 
 export type NodeType = 'static' | 'dynamic' | 'any';
 
-interface RequestParams {
+export interface NodesSortParams {
+    sortOrder?: OrderType;
+    sortValue?: NodesSortValue;
+}
+
+export interface NodesGeneralRequestParams extends NodesSortParams {
     filter?: string; // NodeId or Host
     uptime?: number; // return nodes with less uptime in seconds
     problems_only?: boolean; // return nodes with SystemState !== EFlag.Green
-    sort?: string; // Sort by one of ESort params (may differ for /nodes and /compute)
 
     offser?: number;
     limit?: number;
 }
 
-export interface NodesApiRequestParams extends RequestParams {
+export interface NodesApiRequestParams extends NodesGeneralRequestParams {
     tenant?: string;
     type?: NodeType;
     visibleEntities?: VisibleEntities; // "with" param
@@ -67,7 +76,7 @@ export interface NodesApiRequestParams extends RequestParams {
     tablets?: boolean;
 }
 
-export interface ComputeApiRequestParams extends RequestParams {
+export interface ComputeApiRequestParams extends NodesGeneralRequestParams {
     path: string;
     version?: EVersion; // only v2 works with filters
 }
@@ -90,6 +99,7 @@ export type NodesAction =
           | ReturnType<typeof setDataWasNotLoaded>
           | ReturnType<typeof setNodesUptimeFilter>
           | ReturnType<typeof setSearchValue>
+          | ReturnType<typeof setSort>
           | ReturnType<typeof resetNodesState>
       );
 

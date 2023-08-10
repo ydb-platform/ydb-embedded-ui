@@ -13,6 +13,7 @@ import {
     ENABLE_ADDITIONAL_QUERY_MODES,
     CLUSTER_INFO_HIDDEN_KEY,
     LAST_USED_QUERY_ACTION_KEY,
+    USE_BACKEND_PARAMS_FOR_TABLES_KEY,
 } from '../../../utils/constants';
 import '../../../services/api';
 import {getValueFromLS, parseJson} from '../../../utils/utils';
@@ -76,6 +77,10 @@ export const initialState = {
         [ASIDE_HEADER_COMPACT_KEY]: readSavedSettingsValue(ASIDE_HEADER_COMPACT_KEY, 'true'),
         [PARTITIONS_HIDDEN_COLUMNS_KEY]: readSavedSettingsValue(PARTITIONS_HIDDEN_COLUMNS_KEY),
         [CLUSTER_INFO_HIDDEN_KEY]: readSavedSettingsValue(CLUSTER_INFO_HIDDEN_KEY, 'true'),
+        [USE_BACKEND_PARAMS_FOR_TABLES_KEY]: readSavedSettingsValue(
+            USE_BACKEND_PARAMS_FOR_TABLES_KEY,
+            'false',
+        ),
     },
     systemSettings,
 };

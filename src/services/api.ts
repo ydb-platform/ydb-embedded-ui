@@ -32,6 +32,7 @@ import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/redu
 import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 
 import {backend as BACKEND} from '../store';
+import {prepareSortValue} from '../utils/filters';
 
 const config = {withCredentials: !window.custom_backend};
 
@@ -82,24 +83,35 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         });
     }
     getNodes(
-        {visibleEntities, type = 'any', tablets = true, ...params}: NodesApiRequestParams,
+        {
+            visibleEntities,
+            type = 'any',
+            tablets = true,
+            sortOrder,
+            sortValue,
+            ...params
+        }: NodesApiRequestParams,
         {concurrentId}: AxiosOptions = {},
     ) {
+        const sort = prepareSortValue(sortValue, sortOrder);
+
         return this.get<TNodesInfo>(
             this.getPath('/viewer/json/nodes?enums=true'),
-            {
-                with: visibleEntities,
-                type,
-                tablets,
-                ...params,
-            },
-            {
-                concurrentId,
-            },
+            {with: visibleEntities, type, tablets, sort, ...params},
+            {concurrentId},
         );
     }
-    getCompute(params: ComputeApiRequestParams) {
-        return this.get<TComputeInfo>(this.getPath('/viewer/json/compute?enums=true'), params);
+    getCompute(
+        {sortOrder, sortValue, ...params}: ComputeApiRequestParams,
+        {concurrentId}: AxiosOptions = {},
+    ) {
+        const sort = prepareSortValue(sortValue, sortOrder);
+
+        return this.get<TComputeInfo>(
+            this.getPath('/viewer/json/compute?enums=true'),
+            {sort, ...params},
+            {concurrentId},
+        );
     }
     getStorageInfo(
         {tenant, visibleEntities, nodeId}: StorageApiRequestParams,

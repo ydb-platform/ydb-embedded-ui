@@ -6,26 +6,42 @@ import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
 
-import type {NodeAddress} from '../../utils/nodes';
+import {isSortableNodesProperty, type NodeAddress} from '../../utils/nodes';
 import {formatBytesToGigabyte} from '../../utils/index';
 
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+
+const NODES_COLUMNS_IDS = {
+    NodeId: 'NodeId',
+    Host: 'Host',
+    DC: 'DC',
+    Rack: 'Rack',
+    Version: 'Version',
+    Uptime: 'Uptime',
+    Memory: 'Memory',
+    CPU: 'CPU',
+    LoadAverage: 'LoadAverage',
+    Tablets: 'Tablets',
+};
 
 interface GetNodesColumnsProps {
     tabletsPath?: string;
     getNodeRef?: (node?: NodeAddress) => string | null;
 }
 
-export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps) {
+export function getNodesColumns({
+    tabletsPath,
+    getNodeRef,
+}: GetNodesColumnsProps): Column<NodesPreparedEntity>[] {
     const columns: Column<NodesPreparedEntity>[] = [
         {
-            name: 'NodeId',
+            name: NODES_COLUMNS_IDS.NodeId,
             header: '#',
             width: '80px',
             align: DataTable.RIGHT,
         },
         {
-            name: 'Host',
+            name: NODES_COLUMNS_IDS.Host,
             render: ({row}) => {
                 return <NodeHostWrapper node={row} getNodeRef={getNodeRef} />;
             },
@@ -33,21 +49,21 @@ export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps)
             align: DataTable.LEFT,
         },
         {
-            name: 'DataCenter',
+            name: NODES_COLUMNS_IDS.DC,
             header: 'DC',
             align: DataTable.LEFT,
             render: ({row}) => (row.DataCenter ? row.DataCenter : '—'),
             width: '60px',
         },
         {
-            name: 'Rack',
+            name: NODES_COLUMNS_IDS.Rack,
             header: 'Rack',
             align: DataTable.LEFT,
             render: ({row}) => (row.Rack ? row.Rack : '—'),
             width: '80px',
         },
         {
-            name: 'Version',
+            name: NODES_COLUMNS_IDS.Version,
             width: '200px',
             align: DataTable.LEFT,
             render: ({row}) => {
@@ -55,14 +71,14 @@ export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps)
             },
         },
         {
-            name: 'Uptime',
+            name: NODES_COLUMNS_IDS.Uptime,
             header: 'Uptime',
             sortAccessor: ({StartTime}) => StartTime && -StartTime,
             align: DataTable.RIGHT,
             width: '110px',
         },
         {
-            name: 'MemoryUsed',
+            name: NODES_COLUMNS_IDS.Memory,
             header: 'Memory',
             sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
             defaultOrder: DataTable.DESCENDING,
@@ -77,7 +93,7 @@ export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps)
             width: '120px',
         },
         {
-            name: 'PoolStats',
+            name: NODES_COLUMNS_IDS.CPU,
             header: 'CPU',
             sortAccessor: ({PoolStats = []}) =>
                 PoolStats.reduce((acc, item) => {
@@ -93,7 +109,7 @@ export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps)
             width: '120px',
         },
         {
-            name: 'LoadAverage',
+            name: NODES_COLUMNS_IDS.LoadAverage,
             header: 'Load average',
             sortAccessor: ({LoadAverage = []}) =>
                 LoadAverage.slice(0, 1).reduce((acc, item) => acc + item, 0),
@@ -112,7 +128,7 @@ export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps)
             width: '140px',
         },
         {
-            name: 'Tablets',
+            name: NODES_COLUMNS_IDS.Tablets,
             width: '430px',
             render: ({row}) => {
                 return row.Tablets ? (
@@ -129,5 +145,7 @@ export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps)
         },
     ];
 
-    return columns;
+    return columns.map((column) => {
+        return {...column, sortable: isSortableNodesProperty(column.name)};
+    });
 }

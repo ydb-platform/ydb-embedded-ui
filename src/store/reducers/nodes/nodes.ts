@@ -10,6 +10,7 @@ import type {
     ComputeApiRequestParams,
     NodesAction,
     NodesApiRequestParams,
+    NodesSortParams,
     NodesState,
 } from './types';
 import {prepareComputeNodesData, prepareNodesData} from './utils';
@@ -20,6 +21,7 @@ const RESET_NODES_STATE = 'nodes/RESET_NODES_STATE';
 const SET_NODES_UPTIME_FILTER = 'nodes/SET_NODES_UPTIME_FILTER';
 const SET_DATA_WAS_NOT_LOADED = 'nodes/SET_DATA_WAS_NOT_LOADED';
 const SET_SEARCH_VALUE = 'nodes/SET_SEARCH_VALUE';
+const SET_SORT = 'nodes/SET_SORT';
 
 const initialState = {
     loading: false,
@@ -47,6 +49,10 @@ const nodes: Reducer<NodesState, NodesAction> = (state = initialState, action) =
             };
         }
         case FETCH_NODES.FAILURE: {
+            if (action.error?.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error,
@@ -74,7 +80,13 @@ const nodes: Reducer<NodesState, NodesAction> = (state = initialState, action) =
                 searchValue: action.data,
             };
         }
-
+        case SET_SORT: {
+            return {
+                ...state,
+                sortValue: action.data.sortValue,
+                sortOrder: action.data.sortOrder,
+            };
+        }
         case SET_DATA_WAS_NOT_LOADED: {
             return {
                 ...state,
@@ -85,13 +97,11 @@ const nodes: Reducer<NodesState, NodesAction> = (state = initialState, action) =
             return state;
     }
 };
+const concurrentId = 'getNodes';
 
 export function getNodes({type = 'any', ...params}: NodesApiRequestParams) {
     return createApiRequest({
-        request: window.api.getNodes({
-            type,
-            ...params,
-        }),
+        request: window.api.getNodes({type, ...params}, {concurrentId}),
         actions: FETCH_NODES,
         dataHandler: prepareNodesData,
     });
@@ -99,7 +109,7 @@ export function getNodes({type = 'any', ...params}: NodesApiRequestParams) {
 
 export function getComputeNodes({version = EVersion.v2, ...params}: ComputeApiRequestParams) {
     return createApiRequest({
-        request: window.api.getCompute({version, ...params}),
+        request: window.api.getCompute({version, ...params}, {concurrentId}),
         actions: FETCH_NODES,
         dataHandler: prepareComputeNodesData,
     });
@@ -127,6 +137,13 @@ export const setSearchValue = (value: string) => {
     return {
         type: SET_SEARCH_VALUE,
         data: value,
+    } as const;
+};
+
+export const setSort = (sortParams: NodesSortParams) => {
+    return {
+        type: SET_SORT,
+        data: sortParams,
     } as const;
 };
 

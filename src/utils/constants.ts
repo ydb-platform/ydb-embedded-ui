@@ -119,3 +119,6 @@ export const CLUSTER_INFO_HIDDEN_KEY = 'clusterInfoHidden';
 
 // Remain "tab" in key name for backward compatibility
 export const TENANT_INITIAL_PAGE_KEY = 'saved_tenant_initial_tab';
+
+// Send filters and sort params to backend for Nodes and Storage tables
+export const USE_BACKEND_PARAMS_FOR_TABLES_KEY = 'useBackendParamsForTables';

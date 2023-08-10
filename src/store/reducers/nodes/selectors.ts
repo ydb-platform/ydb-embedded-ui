@@ -1,10 +1,10 @@
 import {Selector, createSelector} from 'reselect';
-import {escapeRegExp} from 'lodash';
 
 import {EFlag} from '../../../types/api/enums';
 import {calcUptimeInSeconds} from '../../../utils';
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {prepareSearchValue} from '../../../utils/filters';
 
 import type {ProblemFilterValue} from '../settings/types';
 import type {NodesPreparedEntity, NodesStateSlice} from './types';
@@ -41,7 +41,7 @@ const filterNodesBySearchValue = (nodesList: NodesPreparedEntity[] = [], searchV
     if (!searchValue) {
         return nodesList;
     }
-    const re = new RegExp(escapeRegExp(searchValue), 'i');
+    const re = prepareSearchValue(searchValue);
 
     return nodesList.filter((node) => {
         return node.Host ? re.test(node.Host) || re.test(String(node.NodeId)) : true;
