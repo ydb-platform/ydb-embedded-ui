@@ -9,6 +9,7 @@ import {useQueryModes} from '../../../../utils/hooks';
 
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
+import {getControls} from '../../utils/schemaControls';
 
 interface SchemaTreeProps {
     rootPath: string;
@@ -77,6 +78,9 @@ export function SchemaTree(props: SchemaTreeProps) {
             getActions={getActions(dispatch, {
                 setActivePath: handleActivePathUpdate,
                 setQueryMode,
+            })}
+            renderAdditionalNodeElements={getControls(dispatch, {
+                setActivePath: handleActivePathUpdate,
             })}
             activePath={currentPath}
             onActivePathUpdate={handleActivePathUpdate}
