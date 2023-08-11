@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.13.0...v4.14.0) (2023-08-11)
+
+
+### Features
+
+* **Nodes:** filter and sort on backend ([#503](https://github.com/ydb-platform/ydb-embedded-ui/issues/503)) ([2e8ab8e](https://github.com/ydb-platform/ydb-embedded-ui/commit/2e8ab8e9965db61ec281f7340b89dd3967b639df))
+* **Query:** add explanation to query duration ([#501](https://github.com/ydb-platform/ydb-embedded-ui/issues/501)) ([a5f5140](https://github.com/ydb-platform/ydb-embedded-ui/commit/a5f5140a23864147d8495e3c6b94709e5e710a9b))
+
+
+### Bug Fixes
+
+* **Header:** add icons for nodes and tablets ([#500](https://github.com/ydb-platform/ydb-embedded-ui/issues/500)) ([862660c](https://github.com/ydb-platform/ydb-embedded-ui/commit/862660c1928c2c2b626e4417cd043f0bd5a65df9))
+* **Query:** fix query method selector help text ([#504](https://github.com/ydb-platform/ydb-embedded-ui/issues/504)) ([65cdf9e](https://github.com/ydb-platform/ydb-embedded-ui/commit/65cdf9ee93277c193cc1ad036b2cb38d2ae15b71))
+* **Query:** transfer API calls to a new line ([#499](https://github.com/ydb-platform/ydb-embedded-ui/issues/499)) ([de3d540](https://github.com/ydb-platform/ydb-embedded-ui/commit/de3d5404310f32ba05598bb99a1afb1b65ab45a1))
+* **SchemaTree:** transfer Show Preview to SchemaTree ([#505](https://github.com/ydb-platform/ydb-embedded-ui/issues/505)) ([46220c4](https://github.com/ydb-platform/ydb-embedded-ui/commit/46220c4b2cd111acf12712b4693744c52aaf7231))
+
 ## [4.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.12.0...v4.13.0) (2023-08-04)
 
 
