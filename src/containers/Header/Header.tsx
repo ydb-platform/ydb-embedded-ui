@@ -3,7 +3,7 @@ import {useHistory, useLocation} from 'react-router';
 import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 
-import {Breadcrumbs, Icon} from '@gravity-ui/uikit';
+import {Breadcrumbs} from '@gravity-ui/uikit';
 
 import {ExternalLinkWithIcon} from '../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
 
@@ -91,12 +91,7 @@ function Header({mainPage}: HeaderProps) {
                             }
                             return (
                                 <span className={b('breadcrumb')}>
-                                    <Icon
-                                        width={16}
-                                        height={16}
-                                        data={icon}
-                                        className={b('breadcrumb__icon')}
-                                    />
+                                    <div className={b('breadcrumb__icon')}>{icon}</div>
                                     {text}
                                 </span>
                             );

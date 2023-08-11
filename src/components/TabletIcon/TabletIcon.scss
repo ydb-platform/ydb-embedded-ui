@@ -1,0 +1,17 @@
+.tablet-icon {
+    display: flex;
+    justify-content: center;
+
+    width: 23px;
+    height: 16px;
+
+    font-size: 10px;
+    text-transform: uppercase;
+
+    border: 1px solid;
+    border-radius: 4px;
+
+    &__type {
+        line-height: 14px;
+    }
+}

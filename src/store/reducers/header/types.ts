@@ -1,4 +1,5 @@
 import type {ClusterTab} from '../../../containers/Cluster/utils';
+import type {EType} from '../../../types/api/tablet';
 
 import {setHeaderBreadcrumbs} from './header';
 
@@ -23,6 +24,7 @@ export interface TabletsBreadcrumbsOptions extends TenantBreadcrumbsOptions {
 
 export interface TabletBreadcrumbsOptions extends TabletsBreadcrumbsOptions {
     tabletId?: string;
+    tabletType?: EType;
 }
 
 export type BreadcrumbsOptions =
