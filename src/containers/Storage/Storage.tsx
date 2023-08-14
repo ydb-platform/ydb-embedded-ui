@@ -31,7 +31,12 @@ import {
 } from '../../store/reducers/storage/selectors';
 import {VISIBLE_ENTITIES, STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
-import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
+import {
+    useAutofetcher,
+    useNodesRequestParams,
+    useStorageRequestParams,
+    useTypedSelector,
+} from '../../utils/hooks';
 import {AdditionalNodesInfo, NodesUptimeFilterValues} from '../../utils/nodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 
@@ -85,29 +90,33 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
         };
     }, [dispatch]);
 
+    const nodesRequestParams = useNodesRequestParams({filter, nodesUptimeFilter});
+    const storageRequestParams = useStorageRequestParams({filter});
+
     const fetchData = useCallback(
         (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded());
             }
 
+            const nodesParams = nodesRequestParams || {};
+            const storageParams = storageRequestParams || {};
+
             if (storageType === STORAGE_TYPES.nodes) {
-                dispatch(
-                    getStorageNodesInfo(
-                        {tenant, visibleEntities},
-                        {concurrentId: 'getStorageInfo'},
-                    ),
-                );
+                dispatch(getStorageNodesInfo({tenant, visibleEntities, ...nodesParams}));
             } else {
-                dispatch(
-                    getStorageGroupsInfo(
-                        {tenant, visibleEntities, nodeId},
-                        {concurrentId: 'getStorageInfo'},
-                    ),
-                );
+                dispatch(getStorageGroupsInfo({tenant, visibleEntities, nodeId, ...storageParams}));
             }
         },
-        [dispatch, tenant, nodeId, visibleEntities, storageType],
+        [
+            dispatch,
+            tenant,
+            nodeId,
+            visibleEntities,
+            storageType,
+            storageRequestParams,
+            nodesRequestParams,
+        ],
     );
 
     const autorefreshEnabled = tenant ? autorefresh : true;

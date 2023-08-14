@@ -55,6 +55,7 @@ export interface StorageApiRequestParams {
     nodeId?: string;
     visibleEntities?: VisibleEntities;
 
+    filter?: string;
     version?: EVersion;
 }
 

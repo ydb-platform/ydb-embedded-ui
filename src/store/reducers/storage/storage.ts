@@ -123,10 +123,13 @@ const storage: Reducer<StorageState, StorageAction> = (state = initialState, act
     }
 };
 
-export const getStorageNodesInfo = (
-    {tenant, visibleEntities, ...params}: Omit<NodesApiRequestParams, 'type'>,
-    {concurrentId}: {concurrentId?: string} = {},
-) => {
+const concurrentId = 'getStorageInfo';
+
+export const getStorageNodesInfo = ({
+    tenant,
+    visibleEntities,
+    ...params
+}: Omit<NodesApiRequestParams, 'type'>) => {
     return createApiRequest({
         request: window.api.getNodes(
             {tenant, visibleEntities, type: 'static', ...params},
@@ -137,10 +140,13 @@ export const getStorageNodesInfo = (
     });
 };
 
-export const getStorageGroupsInfo = (
-    {tenant, visibleEntities, nodeId, version = EVersion.v1, ...params}: StorageApiRequestParams,
-    {concurrentId}: {concurrentId?: string} = {},
-) => {
+export const getStorageGroupsInfo = ({
+    tenant,
+    visibleEntities,
+    nodeId,
+    version = EVersion.v1,
+    ...params
+}: StorageApiRequestParams) => {
     return createApiRequest({
         request: window.api.getStorageInfo(
             {tenant, visibleEntities, nodeId, version, ...params},
