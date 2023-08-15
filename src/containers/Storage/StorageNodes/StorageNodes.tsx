@@ -2,11 +2,13 @@ import cn from 'bem-cn-lite';
 
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 
+import type {ValueOf} from '../../../types/common';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {
     AdditionalNodesInfo,
+    isSortableNodesProperty,
     isUnavailableNode,
     NodesUptimeFilterValues,
 } from '../../../utils/nodes';
@@ -19,18 +21,17 @@ import {PDisk} from '../PDisk';
 import i18n from './i18n';
 import './StorageNodes.scss';
 
-enum TableColumnsIds {
-    NodeId = 'NodeId',
-    FQDN = 'FQDN',
-    DataCenter = 'DataCenter',
-    Rack = 'Rack',
-    Uptime = 'Uptime',
-    PDisks = 'PDisks',
-    Missing = 'Missing',
-}
+const TableColumnsIds = {
+    NodeId: 'NodeId',
+    Host: 'Host',
+    DC: 'DC',
+    Rack: 'Rack',
+    Uptime: 'Uptime',
+    PDisks: 'PDisks',
+    Missing: 'Missing',
+} as const;
 
-type TableColumnsIdsKeys = keyof typeof TableColumnsIds;
-type TableColumnsIdsValues = typeof TableColumnsIds[TableColumnsIdsKeys];
+type TableColumnId = ValueOf<typeof TableColumnsIds>;
 
 interface StorageNodesProps {
     data: PreparedStorageNode[];
@@ -41,10 +42,10 @@ interface StorageNodesProps {
     additionalNodesInfo?: AdditionalNodesInfo;
 }
 
-const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
+const tableColumnsNames: Record<TableColumnId, string> = {
     NodeId: 'Node ID',
-    FQDN: 'FQDN',
-    DataCenter: 'DC',
+    Host: 'Host',
+    DC: 'DC',
     Rack: 'Rack',
     Uptime: 'Uptime',
     PDisks: 'PDisks',
@@ -83,7 +84,7 @@ export function StorageNodes({
 }: StorageNodesProps) {
     const getNodeRef = additionalNodesInfo?.getNodeRef;
 
-    const allColumns: Column<PreparedStorageNode>[] = [
+    const rawColumns: Column<PreparedStorageNode>[] = [
         {
             name: TableColumnsIds.NodeId,
             header: tableColumnsNames[TableColumnsIds.NodeId],
@@ -91,8 +92,8 @@ export function StorageNodes({
             align: DataTable.RIGHT,
         },
         {
-            name: TableColumnsIds.FQDN,
-            header: tableColumnsNames[TableColumnsIds.FQDN],
+            name: TableColumnsIds.Host,
+            header: tableColumnsNames[TableColumnsIds.Host],
             width: 350,
             render: ({row}) => {
                 return <NodeHostWrapper node={row} getNodeRef={getNodeRef} />;
@@ -100,8 +101,8 @@ export function StorageNodes({
             align: DataTable.LEFT,
         },
         {
-            name: TableColumnsIds.DataCenter,
-            header: tableColumnsNames[TableColumnsIds.DataCenter],
+            name: TableColumnsIds.DC,
+            header: tableColumnsNames[TableColumnsIds.DC],
             render: ({row}) => row.DataCenter || '—',
             align: DataTable.LEFT,
         },
@@ -144,10 +145,13 @@ export function StorageNodes({
         },
     ];
 
-    let columns = allColumns;
+    let columns = rawColumns.map((column) => ({
+        ...column,
+        sortable: isSortableNodesProperty(column.name),
+    }));
 
     if (visibleEntities === VISIBLE_ENTITIES.space) {
-        columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
+        columns = columns.filter((col) => col.name !== TableColumnsIds.Missing);
     }
 
     if (!data.length) {
