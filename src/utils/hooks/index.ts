@@ -5,3 +5,4 @@ export * from './useQueryModes';
 export * from './useTableSort';
 
 export * from './useNodesRequestParams';
+export * from './useStorageRequestParams';

@@ -114,7 +114,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getStorageInfo(
-        {tenant, visibleEntities, nodeId}: StorageApiRequestParams,
+        {tenant, visibleEntities, nodeId, ...params}: StorageApiRequestParams,
         {concurrentId}: AxiosOptions = {},
     ) {
         return this.get<TStorageInfo>(
@@ -123,6 +123,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 tenant,
                 node_id: nodeId,
                 with: visibleEntities,
+                ...params,
             },
             {
                 concurrentId,

@@ -1,13 +1,22 @@
 import type {Reducer} from 'redux';
 import _ from 'lodash';
 
+import {EVersion} from '../../../types/api/storage';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import '../../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
-import type {StorageAction, StorageState, StorageType, VisibleEntities} from './types';
+import type {NodesApiRequestParams} from '../nodes/types';
+import type {
+    StorageAction,
+    StorageApiRequestParams,
+    StorageState,
+    StorageType,
+    VisibleEntities,
+} from './types';
 import {VISIBLE_ENTITIES, STORAGE_TYPES} from './constants';
+import {prepareStorageGroupsResponse, prepareStorageNodesResponse} from './utils';
 
 export const FETCH_STORAGE = createRequestActionTypes('storage', 'FETCH_STORAGE');
 
@@ -42,6 +51,8 @@ const storage: Reducer<StorageState, StorageAction> = (state = initialState, act
                 ...state,
                 nodes: action.data.nodes,
                 groups: action.data.groups,
+                total: action.data.total,
+                found: action.data.found,
                 loading: false,
                 wasLoaded: true,
                 error: undefined,
@@ -112,34 +123,39 @@ const storage: Reducer<StorageState, StorageAction> = (state = initialState, act
     }
 };
 
-export function getStorageInfo(
-    {
-        tenant,
-        visibleEntities,
-        nodeId,
-        type,
-    }: {
-        tenant?: string;
-        visibleEntities?: VisibleEntities;
-        nodeId?: string;
-        type?: StorageType;
-    },
-    {concurrentId}: {concurrentId?: string} = {},
-) {
-    if (type === STORAGE_TYPES.nodes) {
-        return createApiRequest({
-            request: window.api.getNodes({tenant, visibleEntities, type: 'static'}, {concurrentId}),
-            actions: FETCH_STORAGE,
-            dataHandler: (data) => ({nodes: data}),
-        });
-    }
+const concurrentId = 'getStorageInfo';
 
+export const getStorageNodesInfo = ({
+    tenant,
+    visibleEntities,
+    ...params
+}: Omit<NodesApiRequestParams, 'type'>) => {
     return createApiRequest({
-        request: window.api.getStorageInfo({tenant, visibleEntities, nodeId}, {concurrentId}),
+        request: window.api.getNodes(
+            {tenant, visibleEntities, type: 'static', ...params},
+            {concurrentId},
+        ),
         actions: FETCH_STORAGE,
-        dataHandler: (data) => ({groups: data}),
+        dataHandler: prepareStorageNodesResponse,
     });
-}
+};
+
+export const getStorageGroupsInfo = ({
+    tenant,
+    visibleEntities,
+    nodeId,
+    version = EVersion.v1,
+    ...params
+}: StorageApiRequestParams) => {
+    return createApiRequest({
+        request: window.api.getStorageInfo(
+            {tenant, visibleEntities, nodeId, version, ...params},
+            {concurrentId},
+        ),
+        actions: FETCH_STORAGE,
+        dataHandler: prepareStorageGroupsResponse,
+    });
+};
 
 export function setInitialState() {
     return {
