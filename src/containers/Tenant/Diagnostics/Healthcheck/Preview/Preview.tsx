@@ -37,9 +37,6 @@ export const Preview = (props: PreviewProps) => {
                 <div className={b('self-check-status-indicator', {[modifier]: true})}>
                     {selfCheckResult}
                 </div>
-                <Button size="s" onClick={onUpdate} loading={loading} view="flat-secondary">
-                    <Icon data={updateArrow} width={20} height={20} />
-                </Button>
             </div>
         );
     };

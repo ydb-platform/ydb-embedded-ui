@@ -35,6 +35,7 @@ export const Healthcheck = (props: HealthcheckProps) => {
 
     const {data, loading, wasLoaded, error} = useTypedSelector((state) => state.healthcheckInfo);
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
+    const issuesTrees = data?.issue_log || [];
 
     const issuesStatistics = useTypedSelector(selectIssuesStatistics);
     const issueTrees = useTypedSelector(selectIssuesTrees);
