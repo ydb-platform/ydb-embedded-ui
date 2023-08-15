@@ -1,0 +1,32 @@
+.database-metrics {
+    display: flex;
+    justify-content: space-between;
+
+    column-gap: 20px;
+
+    row-gap: 20px;
+
+    $_: &;
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        color: var(--yc-color-text-secondary);
+
+        &.selected #{$_}__progress{
+            color: var(--yc-color-text-complementary);
+        }
+    }
+
+    &__progress {
+        font-size: 36px;
+        line-height: 40px;
+        font-weight: 500;
+    }
+
+    &__resources {
+        font-size: var(--yc-text-body-1-font-size);
+    }
+}
