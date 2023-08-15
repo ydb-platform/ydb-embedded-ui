@@ -2,8 +2,6 @@ import {useCallback, useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 
-import DataTable, {Settings} from '@gravity-ui/react-data-table';
-
 import {Search} from '../../components/Search';
 import {UptimeFilter} from '../../components/UptimeFIlter';
 import {AccessDenied} from '../../components/Errors/403';
@@ -11,7 +9,12 @@ import {EntitiesCount} from '../../components/EntitiesCount';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
 
-import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
+import type {
+    StorageSortParams,
+    StorageType,
+    VisibleEntities,
+} from '../../store/reducers/storage/types';
+import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import {
     setInitialState,
     setVisibleEntities,
@@ -22,12 +25,16 @@ import {
     setDataWasNotLoaded,
     getStorageNodesInfo,
     getStorageGroupsInfo,
+    setNodesSortParams,
+    setGroupsSortParams,
 } from '../../store/reducers/storage/storage';
 import {
     selectFilteredGroups,
     selectFilteredNodes,
     selectEntitiesCount,
     selectUsageFilterOptions,
+    selectNodesSortParams,
+    selectGroupsSortParams,
 } from '../../store/reducers/storage/selectors';
 import {VISIBLE_ENTITIES, STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
@@ -35,6 +42,7 @@ import {
     useAutofetcher,
     useNodesRequestParams,
     useStorageRequestParams,
+    useTableSort,
     useTypedSelector,
 } from '../../utils/hooks';
 import {AdditionalNodesInfo, NodesUptimeFilterValues} from '../../utils/nodes';
@@ -49,11 +57,6 @@ import {UsageFilter} from './UsageFilter';
 import './Storage.scss';
 
 const b = cn('global-storage');
-
-const tableSettings: Settings = {
-    ...DEFAULT_TABLE_SETTINGS,
-    defaultOrder: DataTable.DESCENDING,
-};
 
 interface StorageProps {
     additionalNodesInfo?: AdditionalNodesInfo;
@@ -80,6 +83,8 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
     const entitiesCount = useTypedSelector(selectEntitiesCount);
     const nodesMap = useTypedSelector(selectNodesMap);
     const usageFilterOptions = useTypedSelector(selectUsageFilterOptions);
+    const nodesSortParams = useTypedSelector(selectNodesSortParams);
+    const groupsSortParams = useTypedSelector(selectGroupsSortParams);
 
     useEffect(() => {
         dispatch(getNodesList());
@@ -90,8 +95,22 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
         };
     }, [dispatch]);
 
-    const nodesRequestParams = useNodesRequestParams({filter, nodesUptimeFilter});
-    const storageRequestParams = useStorageRequestParams({filter});
+    const nodesRequestParams = useNodesRequestParams({
+        filter,
+        nodesUptimeFilter,
+        ...nodesSortParams,
+    });
+    const storageRequestParams = useStorageRequestParams({
+        filter,
+        ...groupsSortParams,
+    });
+
+    const [nodesSort, handleNodesSort] = useTableSort(nodesSortParams, (params) =>
+        dispatch(setNodesSortParams(params as NodesSortParams)),
+    );
+    const [groupsSort, handleGroupsSort] = useTableSort(groupsSortParams, (params) =>
+        dispatch(setGroupsSortParams(params as StorageSortParams)),
+    );
 
     const fetchData = useCallback(
         (isBackground: boolean) => {
@@ -155,9 +174,11 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
                     <StorageGroups
                         visibleEntities={visibleEntities}
                         data={storageGroups}
-                        tableSettings={tableSettings}
+                        tableSettings={DEFAULT_TABLE_SETTINGS}
                         nodes={nodesMap}
                         onShowAll={() => handleGroupVisibilityChange(VISIBLE_ENTITIES.all)}
+                        sort={groupsSort}
+                        handleSort={handleGroupsSort}
                     />
                 )}
                 {storageType === STORAGE_TYPES.nodes && (
@@ -165,9 +186,11 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
                         visibleEntities={visibleEntities}
                         nodesUptimeFilter={nodesUptimeFilter}
                         data={storageNodes}
-                        tableSettings={tableSettings}
+                        tableSettings={DEFAULT_TABLE_SETTINGS}
                         onShowAll={handleShowAllNodes}
                         additionalNodesInfo={additionalNodesInfo}
+                        sort={nodesSort}
+                        handleSort={handleNodesSort}
                     />
                 )}
             </>

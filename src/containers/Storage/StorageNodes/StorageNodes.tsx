@@ -4,6 +4,7 @@ import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-tab
 
 import type {ValueOf} from '../../../types/common';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {HandleSort} from '../../../utils/hooks/useTableSort';
 
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {
@@ -40,6 +41,8 @@ interface StorageNodesProps {
     nodesUptimeFilter: keyof typeof NodesUptimeFilterValues;
     onShowAll?: VoidFunction;
     additionalNodesInfo?: AdditionalNodesInfo;
+    sort?: SortOrder;
+    handleSort?: HandleSort;
 }
 
 const tableColumnsNames: Record<TableColumnId, string> = {
@@ -54,26 +57,6 @@ const tableColumnsNames: Record<TableColumnId, string> = {
 
 const b = cn('global-storage-nodes');
 
-function setSortOrder(visibleEntities: VisibleEntities): SortOrder | undefined {
-    switch (visibleEntities) {
-        case VISIBLE_ENTITIES.all: {
-            return {
-                columnId: TableColumnsIds.NodeId,
-                order: DataTable.ASCENDING,
-            };
-        }
-        case VISIBLE_ENTITIES.missing: {
-            return {
-                columnId: TableColumnsIds.Missing,
-                order: DataTable.DESCENDING,
-            };
-        }
-        default: {
-            return undefined;
-        }
-    }
-}
-
 export function StorageNodes({
     data,
     tableSettings,
@@ -81,6 +64,8 @@ export function StorageNodes({
     onShowAll,
     nodesUptimeFilter,
     additionalNodesInfo,
+    sort,
+    handleSort,
 }: StorageNodesProps) {
     const getNodeRef = additionalNodesInfo?.getNodeRef;
 
@@ -150,7 +135,7 @@ export function StorageNodes({
         sortable: isSortableNodesProperty(column.name),
     }));
 
-    if (visibleEntities === VISIBLE_ENTITIES.space) {
+    if (visibleEntities !== VISIBLE_ENTITIES.missing) {
         columns = columns.filter((col) => col.name !== TableColumnsIds.Missing);
     }
 
@@ -191,9 +176,10 @@ export function StorageNodes({
                 ...tableSettings,
                 dynamicRenderType: 'variable',
             }}
-            initialSortOrder={setSortOrder(visibleEntities)}
             emptyDataMessage={i18n('empty.default')}
             rowClassName={(row) => b('node', {unavailable: isUnavailableNode(row)})}
+            sortOrder={sort}
+            onSort={handleSort}
         />
     ) : null;
 }

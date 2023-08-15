@@ -1,10 +1,15 @@
 import {useMemo} from 'react';
 
+import type {StorageSortAndFilterParams} from '../../store/reducers/storage/types';
 import {EVersion} from '../../types/api/storage';
 import {USE_BACKEND_PARAMS_FOR_TABLES_KEY} from '../constants';
 import {useSetting} from './useSetting';
 
-export const useStorageRequestParams = ({filter}: {filter?: string}) => {
+export const useStorageRequestParams = ({
+    filter,
+    sortOrder,
+    sortValue,
+}: StorageSortAndFilterParams) => {
     const [useBackendParamsForTables] = useSetting<boolean>(USE_BACKEND_PARAMS_FOR_TABLES_KEY);
 
     // If backend params are enabled, update params value to use them in fetch request
@@ -14,8 +19,10 @@ export const useStorageRequestParams = ({filter}: {filter?: string}) => {
             return {
                 version: EVersion.v2,
                 filter,
+                sortOrder,
+                sortValue,
             };
         }
         return undefined;
-    }, [useBackendParamsForTables, filter]);
+    }, [useBackendParamsForTables, filter, sortOrder, sortValue]);
 };

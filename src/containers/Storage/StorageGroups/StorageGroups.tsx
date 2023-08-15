@@ -6,6 +6,7 @@ import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 import type {ValueOf} from '../../../types/common';
 import type {NodesMap} from '../../../types/store/nodesList';
 import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {HandleSort} from '../../../utils/hooks/useTableSort';
 
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
@@ -46,6 +47,8 @@ interface StorageGroupsProps {
     tableSettings: Settings;
     visibleEntities: VisibleEntities;
     onShowAll?: VoidFunction;
+    sort?: SortOrder;
+    handleSort?: HandleSort;
 }
 
 const tableColumnsNames: Record<TableColumnId, string> = {
@@ -65,38 +68,14 @@ const tableColumnsNames: Record<TableColumnId, string> = {
 
 const b = cn('global-storage-groups');
 
-function setSortOrder(visibleEntities: VisibleEntities): SortOrder | undefined {
-    switch (visibleEntities) {
-        case VISIBLE_ENTITIES.all: {
-            return {
-                columnId: TableColumnsIds.PoolName,
-                order: DataTable.ASCENDING,
-            };
-        }
-        case VISIBLE_ENTITIES.missing: {
-            return {
-                columnId: TableColumnsIds.Degraded,
-                order: DataTable.DESCENDING,
-            };
-        }
-        case VISIBLE_ENTITIES.space: {
-            return {
-                columnId: TableColumnsIds.UsedSpaceFlag,
-                order: DataTable.DESCENDING,
-            };
-        }
-        default: {
-            return undefined;
-        }
-    }
-}
-
 export function StorageGroups({
     data,
     tableSettings,
     visibleEntities,
     nodes,
     onShowAll,
+    sort,
+    handleSort,
 }: StorageGroupsProps) {
     const rawColumns: Column<PreparedStorageGroup>[] = [
         {
@@ -193,6 +172,7 @@ export function StorageGroups({
             render: ({row}) => {
                 return <span className={b('group-id')}>{row.GroupID}</span>;
             },
+            sortAccessor: (row) => Number(row.GroupID),
             align: DataTable.RIGHT,
         },
         {
@@ -344,8 +324,9 @@ export function StorageGroups({
             data={data}
             columns={columns}
             settings={tableSettings}
-            initialSortOrder={setSortOrder(visibleEntities)}
             emptyDataMessage={i18n('empty.default')}
+            sortOrder={sort}
+            onSort={handleSort}
         />
     ) : null;
 }

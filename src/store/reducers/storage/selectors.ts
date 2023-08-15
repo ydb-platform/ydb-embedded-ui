@@ -1,7 +1,11 @@
 import {Selector, createSelector} from 'reselect';
 
+import type {OrderType} from '@gravity-ui/react-data-table';
+import {ASCENDING, DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
+
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
-import {getUsage} from '../../../utils/storage';
+import {NODES_SORT_VALUES, type NodesSortValue} from '../../../utils/nodes';
+import {STORAGE_SORT_VALUES, type StorageSortValue, getUsage} from '../../../utils/storage';
 
 import {filterNodesByUptime} from '../nodes/selectors';
 import type {
@@ -10,6 +14,7 @@ import type {
     StorageStateSlice,
     UsageFilter,
 } from './types';
+import {VISIBLE_ENTITIES} from './constants';
 
 // ==== Filters ====
 
@@ -72,6 +77,38 @@ export const selectNodesUptimeFilter = (state: StorageStateSlice) =>
     state.storage.nodesUptimeFilter;
 export const selectStorageType = (state: StorageStateSlice) => state.storage.type;
 
+// ==== Sort params selectors ====
+export const selectNodesSortParams = (state: StorageStateSlice) => {
+    const defaultSortValue: NodesSortValue = NODES_SORT_VALUES.NodeId;
+    const defaultSortOrder: OrderType = ASCENDING;
+
+    return {
+        sortValue: state.storage.nodesSortValue || defaultSortValue,
+        sortOrder: state.storage.nodesSortOrder || defaultSortOrder,
+    };
+};
+
+export const selectGroupsSortParams = (state: StorageStateSlice) => {
+    const visibleEntities = state.storage.visible;
+
+    let defaultSortValue: StorageSortValue = STORAGE_SORT_VALUES.PoolName;
+    let defaultSortOrder: OrderType = ASCENDING;
+
+    if (visibleEntities === VISIBLE_ENTITIES.missing) {
+        defaultSortValue = STORAGE_SORT_VALUES.Degraded;
+        defaultSortOrder = DESCENDING;
+    }
+
+    if (visibleEntities === VISIBLE_ENTITIES.space) {
+        defaultSortValue = STORAGE_SORT_VALUES.Usage;
+        defaultSortOrder = DESCENDING;
+    }
+
+    return {
+        sortValue: state.storage.groupsSortValue || defaultSortValue,
+        sortOrder: state.storage.groupsSortOrder || defaultSortOrder,
+    };
+};
 // ==== Complex selectors ====
 
 export const selectVDisksForPDisk: Selector<

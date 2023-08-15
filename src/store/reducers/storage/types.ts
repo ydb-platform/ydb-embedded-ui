@@ -1,17 +1,22 @@
+import type {OrderType} from '@gravity-ui/react-data-table';
+
 import type {IResponseError} from '../../../types/api/error';
 import type {TSystemStateInfo} from '../../../types/api/nodes';
 import type {TPDiskStateInfo} from '../../../types/api/pdisk';
 import type {EVersion, TStorageGroupInfo} from '../../../types/api/storage';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import type {ValueOf} from '../../../types/common';
-import type {NodesUptimeFilterValues} from '../../../utils/nodes';
+import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
+import type {StorageSortValue} from '../../../utils/storage';
 import type {ApiRequestAction} from '../../utils';
 
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
 import {
     FETCH_STORAGE,
     setDataWasNotLoaded,
+    setGroupsSortParams,
     setInitialState,
+    setNodesSortParams,
     setNodesUptimeFilter,
     setStorageTextFilter,
     setStorageType,
@@ -50,12 +55,23 @@ export interface UsageFilter {
     count: number;
 }
 
-export interface StorageApiRequestParams {
+export interface StorageSortParams {
+    sortOrder?: OrderType;
+    sortValue?: StorageSortValue;
+}
+
+export interface StorageSortAndFilterParams extends StorageSortParams {
+    filter?: string; // PoolName or GroupId
+
+    offser?: number;
+    limit?: number;
+}
+
+export interface StorageApiRequestParams extends StorageSortAndFilterParams {
     tenant?: string;
     nodeId?: string;
     visibleEntities?: VisibleEntities;
 
-    filter?: string;
     version?: EVersion;
 }
 
@@ -66,6 +82,10 @@ export interface StorageState {
     usageFilter: string[];
     visible: VisibleEntities;
     nodesUptimeFilter: NodesUptimeFilterValues;
+    groupsSortValue?: StorageSortValue;
+    groupsSortOrder?: OrderType;
+    nodesSortValue?: NodesSortValue;
+    nodesSortOrder?: OrderType;
     type: StorageType;
     nodes?: PreparedStorageNode[];
     groups?: PreparedStorageGroup[];
@@ -95,7 +115,9 @@ export type StorageAction =
     | ReturnType<typeof setUsageFilter>
     | ReturnType<typeof setVisibleEntities>
     | ReturnType<typeof setNodesUptimeFilter>
-    | ReturnType<typeof setDataWasNotLoaded>;
+    | ReturnType<typeof setDataWasNotLoaded>
+    | ReturnType<typeof setNodesSortParams>
+    | ReturnType<typeof setGroupsSortParams>;
 
 export interface StorageStateSlice {
     storage: StorageState;

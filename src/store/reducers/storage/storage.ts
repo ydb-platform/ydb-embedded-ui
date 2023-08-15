@@ -7,10 +7,11 @@ import '../../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
-import type {NodesApiRequestParams} from '../nodes/types';
+import type {NodesApiRequestParams, NodesSortParams} from '../nodes/types';
 import type {
     StorageAction,
     StorageApiRequestParams,
+    StorageSortParams,
     StorageState,
     StorageType,
     VisibleEntities,
@@ -27,6 +28,8 @@ const SET_VISIBLE_GROUPS = 'storage/SET_VISIBLE_GROUPS';
 const SET_STORAGE_TYPE = 'storage/SET_STORAGE_TYPE';
 const SET_NODES_UPTIME_FILTER = 'storage/SET_NODES_UPTIME_FILTER';
 const SET_DATA_WAS_NOT_LOADED = 'storage/SET_DATA_WAS_NOT_LOADED';
+const SET_NODES_SORT_PARAMS = 'storage/SET_NODES_SORT_PARAMS';
+const SET_GROUPS_SORT_PARAMS = 'storage/SET_GROUPS_SORT_PARAMS';
 
 const initialState = {
     loading: true,
@@ -91,6 +94,7 @@ const storage: Reducer<StorageState, StorageAction> = (state = initialState, act
             return {
                 ...state,
                 visible: action.data,
+                usageFilter: [],
                 wasLoaded: false,
                 error: undefined,
             };
@@ -116,6 +120,20 @@ const storage: Reducer<StorageState, StorageAction> = (state = initialState, act
             return {
                 ...state,
                 wasLoaded: false,
+            };
+        }
+        case SET_NODES_SORT_PARAMS: {
+            return {
+                ...state,
+                nodesSortValue: action.data.sortValue,
+                nodesSortOrder: action.data.sortOrder,
+            };
+        }
+        case SET_GROUPS_SORT_PARAMS: {
+            return {
+                ...state,
+                groupsSortValue: action.data.sortValue,
+                groupsSortOrder: action.data.sortOrder,
             };
         }
         default:
@@ -201,6 +219,20 @@ export function setNodesUptimeFilter(value: NodesUptimeFilterValues) {
 export const setDataWasNotLoaded = () => {
     return {
         type: SET_DATA_WAS_NOT_LOADED,
+    } as const;
+};
+
+export const setNodesSortParams = (sortParams: NodesSortParams) => {
+    return {
+        type: SET_NODES_SORT_PARAMS,
+        data: sortParams,
+    } as const;
+};
+
+export const setGroupsSortParams = (sortParams: StorageSortParams) => {
+    return {
+        type: SET_GROUPS_SORT_PARAMS,
+        data: sortParams,
     } as const;
 };
 
