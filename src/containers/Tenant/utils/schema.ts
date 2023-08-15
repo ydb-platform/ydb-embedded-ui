@@ -30,7 +30,7 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
 
     [EPathType.EPathTypeColumnTable]: 'column_table',
 
-    [EPathType.EPathTypeCdcStream]: 'topic',
+    [EPathType.EPathTypeCdcStream]: 'stream',
     [EPathType.EPathTypePersQueueGroup]: 'topic',
 
     [EPathType.EPathTypeExternalDataSource]: 'external_data_source',

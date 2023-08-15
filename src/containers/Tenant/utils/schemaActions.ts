@@ -12,48 +12,17 @@ import createToast from '../../../utils/createToast';
 
 import i18n from '../i18n';
 
-const createTableTemplate = (path: string) => {
-    return `CREATE TABLE \`${path}/my_table\`
-(
-    \`id\` Uint64,
-    \`name\` String,
-    PRIMARY KEY (\`id\`)
-);`;
-};
-const alterTableTemplate = (path: string) => {
-    return `ALTER TABLE \`${path}\`
-    ADD COLUMN is_deleted Bool;`;
-};
-const selectQueryTemplate = (path: string) => {
-    return `SELECT *
-    FROM \`${path}\`
-    LIMIT 10;`;
-};
-const upsertQueryTemplate = (path: string) => {
-    return `UPSERT INTO \`${path}\`
-    ( \`id\`, \`name\` )
-VALUES ( );`;
-};
-
-const dropExternalTableTemplate = (path: string) => {
-    return `DROP EXTERNAL TABLE \`${path}\`;`;
-};
-
-const createExternalTableTemplate = (path: string) => {
-    // Remove data source name from path
-    // to create table in the same folder with data source
-    const targetPath = path.split('/').slice(0, -1).join('/');
-
-    return `CREATE EXTERNAL TABLE \`${targetPath}/my_external_table\` (
-    column1 Int,
-    column2 Int
-) WITH (
-    DATA_SOURCE="${path}",
-    LOCATION="",
-    FORMAT="json_as_string",
-    \`file_pattern\`=""
-);`;
-};
+import {
+    alterTableTemplate,
+    alterTopicTemplate,
+    createExternalTableTemplate,
+    createTableTemplate,
+    createTopicTemplate,
+    dropExternalTableTemplate,
+    dropTopicTemplate,
+    selectQueryTemplate,
+    upsertQueryTemplate,
+} from './queryTemplates';
 
 interface ActionsAdditionalEffects {
     setQueryMode: SetQueryModeIfAvailable;
@@ -92,6 +61,9 @@ const bindActions = (
             'query',
             i18n('actions.externalTableSelectUnavailable'),
         ),
+        createTopic: inputQuery(createTopicTemplate, 'script'),
+        alterTopic: inputQuery(alterTopicTemplate, 'script'),
+        dropTopic: inputQuery(dropTopicTemplate, 'script'),
         copyPath: () => {
             try {
                 copy(path);
@@ -121,7 +93,10 @@ export const getActions =
 
         const DIR_SET: ActionsSet = [
             [copyItem],
-            [{text: i18n('actions.createTable'), action: actions.createTable}],
+            [
+                {text: i18n('actions.createTable'), action: actions.createTable},
+                {text: i18n('actions.createTopic'), action: actions.createTopic},
+            ],
         ];
         const TABLE_SET: ActionsSet = [
             [copyItem],
@@ -129,6 +104,14 @@ export const getActions =
                 {text: i18n('actions.alterTable'), action: actions.alterTable},
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
+            ],
+        ];
+
+        const TOPIC_SET: ActionsSet = [
+            [copyItem],
+            [
+                {text: i18n('actions.alterTopic'), action: actions.alterTopic},
+                {text: i18n('actions.dropTopic'), action: actions.dropTopic},
             ],
         ];
 
@@ -160,7 +143,7 @@ export const getActions =
             column_table: TABLE_SET,
 
             index_table: JUST_COPY,
-            topic: JUST_COPY,
+            topic: TOPIC_SET,
             stream: JUST_COPY,
 
             index: JUST_COPY,
