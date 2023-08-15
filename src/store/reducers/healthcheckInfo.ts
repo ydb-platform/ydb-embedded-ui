@@ -121,12 +121,13 @@ export const selectIssuesTrees: Selector<IHealthcheckInfoRootStateSlice, IIssues
         return getInvertedConsequencesTree({data, roots});
     });
 
-export const selectIssuesTreeById: Selector<
+export const selectIssuesTreesByIds: Selector<
     IHealthcheckInfoRootStateSlice,
-    IIssuesTree | undefined,
-    [string | undefined]
-> = createSelector([selectIssuesTrees, (_, id: string | undefined) => id], (issuesTrees = [], id) =>
-    issuesTrees.find((issuesTree) => issuesTree.id === id),
+    IIssuesTree[] | undefined,
+    [string[] | undefined]
+> = createSelector(
+    [selectIssuesTrees, (_, ids: string[] | undefined) => ids],
+    (issuesTrees = [], ids) => issuesTrees.filter((issuesTree) => ids?.includes(issuesTree.id)),
 );
 
 export function getHealthcheckInfo(database: string) {

@@ -13,15 +13,15 @@ import i18n from '../i18n';
 const b = cn('healthcheck');
 
 interface DetailsProps {
-    issueTree?: IIssuesTree;
+    issueTrees?: IIssuesTree[] | undefined;
     loading?: boolean;
     onUpdate: VoidFunction;
 }
 
 export const Details = (props: DetailsProps) => {
-    const {loading, onUpdate, issueTree} = props;
+    const {loading, onUpdate, issueTrees} = props;
 
-    if (!issueTree) {
+    if (!issueTrees) {
         return null;
     }
 
@@ -41,7 +41,10 @@ export const Details = (props: DetailsProps) => {
     const renderHealthcheckIssues = () => {
         return (
             <div className={b('issues-wrapper')}>
-                <IssueTree issueTree={issueTree} />
+                {issueTrees.map((issueTree) => {
+                    if (issueTree) return <IssueTree key={issueTree.id} issueTree={issueTree} />;
+                    return undefined;
+                })}
             </div>
         );
     };

@@ -8,8 +8,7 @@ import {SelfCheckResult} from '../../../../types/api/healthcheck';
 import {useTypedSelector, useAutofetcher} from '../../../../utils/hooks';
 import {
     getHealthcheckInfo,
-    selectIssuesTreeById,
-    selectIssuesTreesRoots,
+    selectIssuesTreesByIds,
     setDataWasNotLoaded,
 } from '../../../../store/reducers/healthcheckInfo';
 
@@ -23,23 +22,23 @@ interface HealthcheckProps {
     tenant: string;
     preview?: boolean;
     fetchData?: boolean;
-    expandedIssueId?: string;
-    showMoreHandler?: (id: string) => void;
+    expandedIssueIds?: string[];
+    showMoreHandler?: (issueIds: string[]) => void;
 }
 
 const b = cn('healthcheck');
 
 export const Healthcheck = (props: HealthcheckProps) => {
-    const {tenant, preview, fetchData = true, showMoreHandler, expandedIssueId} = props;
+    const {tenant, preview, fetchData = true, showMoreHandler, expandedIssueIds} = props;
 
     const dispatch = useDispatch();
 
     const {data, loading, wasLoaded, error} = useTypedSelector((state) => state.healthcheckInfo);
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
+    const issuesTrees = data?.issue_log || [];
 
-    const issuesTreesRoots = useTypedSelector(selectIssuesTreesRoots);
-    const expandedIssueTree = useTypedSelector((state) =>
-        selectIssuesTreeById(state, expandedIssueId),
+    const expandedIssueTrees = useTypedSelector((state) =>
+        selectIssuesTreesByIds(state, expandedIssueIds),
     );
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
@@ -81,7 +80,7 @@ export const Healthcheck = (props: HealthcheckProps) => {
         if (data && data['self_check_result']) {
             return preview ? (
                 <Preview
-                    issuesTrees={issuesTreesRoots}
+                    issuesTrees={issuesTrees}
                     selfCheckResult={selfCheckResult}
                     loading={loading}
                     onShowMore={showMoreHandler}
@@ -89,7 +88,7 @@ export const Healthcheck = (props: HealthcheckProps) => {
                 />
             ) : (
                 <Details
-                    issueTree={expandedIssueTree}
+                    issueTrees={expandedIssueTrees}
                     loading={loading}
                     onUpdate={fetchHealthcheck}
                 />

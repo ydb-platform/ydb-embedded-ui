@@ -1,13 +1,13 @@
 import cn from 'bem-cn-lite';
 
-import {Button, Icon} from '@gravity-ui/uikit';
+import {Link} from '@gravity-ui/uikit';
 
-import updateArrow from '../../../../../assets/icons/update-arrow.svg';
-
-import {SelfCheckResult} from '../../../../../types/api/healthcheck';
+import {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
 import type {IIssuesTree} from '../../../../../types/store/healthcheck';
-
-import {PreviewItem} from './PreviewItem';
+import {useTypedSelector} from '../../../../../utils/hooks';
+import {selectIssuesTreesRoots} from '../../../../../store/reducers/healthcheckInfo';
+import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
+import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 
 import i18n from '../i18n';
 
@@ -17,17 +17,26 @@ interface PreviewProps {
     selfCheckResult: SelfCheckResult;
     issuesTrees?: IIssuesTree[];
     loading?: boolean;
-    onShowMore?: (id: string) => void;
+    onShowMore?: (issueIds: string[]) => void;
     onUpdate: VoidFunction;
 }
 
-export const Preview = (props: PreviewProps) => {
-    const {selfCheckResult, issuesTrees, loading, onShowMore, onUpdate} = props;
-
+export const Preview = ({selfCheckResult, issuesTrees, onShowMore}: PreviewProps) => {
     const isStatusOK = selfCheckResult === SelfCheckResult.GOOD;
+
+    const issuesTreesRoots = useTypedSelector(selectIssuesTreesRoots);
 
     if (!issuesTrees) {
         return null;
+    }
+
+    const issues = {} as Record<StatusFlag, number>;
+
+    for (const issue of issuesTrees) {
+        if (!issues[issue.status]) {
+            issues[issue.status] = 0;
+        }
+        issues[issue.status]++;
     }
 
     const renderStatus = () => {
@@ -39,9 +48,6 @@ export const Preview = (props: PreviewProps) => {
                 <div className={b('self-check-status-indicator', {[modifier]: true})}>
                     {selfCheckResult}
                 </div>
-                <Button size="s" onClick={onUpdate} loading={loading} view="flat-secondary">
-                    <Icon data={updateArrow} width={20} height={20} />
-                </Button>
             </div>
         );
     };
@@ -49,23 +55,39 @@ export const Preview = (props: PreviewProps) => {
     const renderFirstLevelIssues = () => {
         return (
             <div className={b('preview-content')}>
-                {isStatusOK
-                    ? i18n('status_message.ok')
-                    : issuesTrees?.map((issueTree) => (
-                          <PreviewItem
-                              key={issueTree.id}
-                              data={issueTree}
-                              onShowMore={onShowMore}
-                          />
-                      ))}
+                {isStatusOK ? (
+                    i18n('status_message.ok')
+                ) : (
+                    <>
+                        <div>Issues:</div>
+                        <div className={b('issues')}>
+                            {Object.entries(issues).map(([status, count]) => {
+                                return (
+                                    <EntityStatus
+                                        key={status}
+                                        mode="icons"
+                                        status={status}
+                                        label={count.toString()}
+                                        size="l"
+                                    />
+                                );
+                            })}
+                        </div>
+                        <Link
+                            onClick={() => onShowMore?.(issuesTreesRoots.map((issue) => issue.id))}
+                        >
+                            {i18n('label.show-details')}
+                        </Link>
+                    </>
+                )}
             </div>
         );
     };
 
     return (
-        <div className={b('preview')}>
+        <DiagnosticCard className={b('preview')}>
             {renderStatus()}
             {renderFirstLevelIssues()}
-        </div>
+        </DiagnosticCard>
     );
 };
