@@ -13,7 +13,7 @@ import i18n from '../i18n';
 const b = cn('healthcheck');
 
 interface DetailsProps {
-    issueTrees?: IIssuesTree[] | undefined;
+    issueTrees?: IIssuesTree[];
     loading?: boolean;
     onUpdate: VoidFunction;
 }

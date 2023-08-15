@@ -123,7 +123,7 @@ export const selectIssuesTrees: Selector<IHealthcheckInfoRootStateSlice, IIssues
 
 export const selectIssuesTreesByIds: Selector<
     IHealthcheckInfoRootStateSlice,
-    IIssuesTree[] | undefined,
+    IIssuesTree[],
     [string[] | undefined]
 > = createSelector(
     [selectIssuesTrees, (_, ids: string[] | undefined) => ids],

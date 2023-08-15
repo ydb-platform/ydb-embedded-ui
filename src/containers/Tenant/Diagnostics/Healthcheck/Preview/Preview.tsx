@@ -2,7 +2,7 @@ import cn from 'bem-cn-lite';
 
 import {Link} from '@gravity-ui/uikit';
 
-import {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
+import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthcheck';
 import type {IIssuesTree} from '../../../../../types/store/healthcheck';
 import {useTypedSelector} from '../../../../../utils/hooks';
 import {selectIssuesTreesRoots} from '../../../../../store/reducers/healthcheckInfo';
