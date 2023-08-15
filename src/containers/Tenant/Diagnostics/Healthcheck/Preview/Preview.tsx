@@ -61,17 +61,15 @@ export const Preview = ({selfCheckResult, issuesTrees, onShowMore}: PreviewProps
                     <>
                         <div>Issues:</div>
                         <div className={b('issues')}>
-                            {Object.entries(issues).map(([status, count]) => {
-                                return (
-                                    <EntityStatus
-                                        key={status}
-                                        mode="icons"
-                                        status={status}
-                                        label={count.toString()}
-                                        size="l"
-                                    />
-                                );
-                            })}
+                            {Object.entries(issues).map(([status, count]) => (
+                                <EntityStatus
+                                    key={status}
+                                    mode="icons"
+                                    status={status}
+                                    label={count.toString()}
+                                    size="l"
+                                />
+                            ))}
                         </div>
                         <Link
                             onClick={() => onShowMore?.(issuesTreesRoots.map((issue) => issue.id))}
