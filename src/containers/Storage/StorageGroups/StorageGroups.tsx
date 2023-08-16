@@ -3,13 +3,15 @@ import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
+import type {ValueOf} from '../../../types/common';
 import type {NodesMap} from '../../../types/store/nodesList';
 import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {HandleSort} from '../../../utils/hooks/useTableSort';
 
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {stringifyVdiskId} from '../../../utils';
-import {getUsage, isFullVDiskData} from '../../../utils/storage';
+import {getUsage, isFullVDiskData, isSortableStorageProperty} from '../../../utils/storage';
 
 import shieldIcon from '../../../assets/icons/shield.svg';
 import {Stack} from '../../../components/Stack/Stack';
@@ -22,23 +24,22 @@ import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../utils';
 import i18n from './i18n';
 import './StorageGroups.scss';
 
-enum TableColumnsIds {
-    PoolName = 'PoolName',
-    Type = 'Type',
-    ErasureSpecies = 'ErasureSpecies',
-    GroupID = 'GroupID',
-    Used = 'Used',
-    Limit = 'Limit',
-    UsedPercents = 'UsedPercents',
-    UsedSpaceFlag = 'UsedSpaceFlag',
-    Read = 'Read',
-    Write = 'Write',
-    VDisks = 'VDisks',
-    Missing = 'Missing',
-}
+const TableColumnsIds = {
+    PoolName: 'PoolName',
+    Kind: 'Kind',
+    Erasure: 'Erasure',
+    GroupId: 'GroupId',
+    Used: 'Used',
+    Limit: 'Limit',
+    Usage: 'Usage',
+    UsedSpaceFlag: 'UsedSpaceFlag',
+    Read: 'Read',
+    Write: 'Write',
+    VDisks: 'VDisks',
+    Degraded: 'Degraded',
+} as const;
 
-type TableColumnsIdsKeys = keyof typeof TableColumnsIds;
-type TableColumnsIdsValues = typeof TableColumnsIds[TableColumnsIdsKeys];
+type TableColumnId = ValueOf<typeof TableColumnsIds>;
 
 interface StorageGroupsProps {
     data: PreparedStorageGroup[];
@@ -46,50 +47,26 @@ interface StorageGroupsProps {
     tableSettings: Settings;
     visibleEntities: VisibleEntities;
     onShowAll?: VoidFunction;
+    sort?: SortOrder;
+    handleSort?: HandleSort;
 }
 
-const tableColumnsNames: Record<TableColumnsIdsValues, string> = {
+const tableColumnsNames: Record<TableColumnId, string> = {
     PoolName: 'Pool Name',
-    Type: 'Type',
-    ErasureSpecies: 'Erasure',
-    GroupID: 'Group ID',
+    Kind: 'Type',
+    Erasure: 'Erasure',
+    GroupId: 'Group ID',
     Used: 'Used',
     Limit: 'Limit',
     UsedSpaceFlag: 'Space',
-    UsedPercents: 'Usage',
+    Usage: 'Usage',
     Read: 'Read',
     Write: 'Write',
     VDisks: 'VDisks',
-    Missing: 'Degraded',
+    Degraded: 'Degraded',
 };
 
 const b = cn('global-storage-groups');
-
-function setSortOrder(visibleEntities: VisibleEntities): SortOrder | undefined {
-    switch (visibleEntities) {
-        case VISIBLE_ENTITIES.all: {
-            return {
-                columnId: TableColumnsIds.PoolName,
-                order: DataTable.ASCENDING,
-            };
-        }
-        case VISIBLE_ENTITIES.missing: {
-            return {
-                columnId: TableColumnsIds.Missing,
-                order: DataTable.DESCENDING,
-            };
-        }
-        case VISIBLE_ENTITIES.space: {
-            return {
-                columnId: TableColumnsIds.UsedSpaceFlag,
-                order: DataTable.DESCENDING,
-            };
-        }
-        default: {
-            return undefined;
-        }
-    }
-}
 
 export function StorageGroups({
     data,
@@ -97,8 +74,10 @@ export function StorageGroups({
     visibleEntities,
     nodes,
     onShowAll,
+    sort,
+    handleSort,
 }: StorageGroupsProps) {
-    const allColumns: Column<PreparedStorageGroup>[] = [
+    const rawColumns: Column<PreparedStorageGroup>[] = [
         {
             name: TableColumnsIds.PoolName,
             header: tableColumnsNames[TableColumnsIds.PoolName],
@@ -124,8 +103,8 @@ export function StorageGroups({
             align: DataTable.LEFT,
         },
         {
-            name: TableColumnsIds.Type,
-            header: tableColumnsNames[TableColumnsIds.Type],
+            name: TableColumnsIds.Kind,
+            header: tableColumnsNames[TableColumnsIds.Kind],
             // prettier-ignore
             render: ({row}) => (
                 <>
@@ -146,14 +125,14 @@ export function StorageGroups({
             ),
         },
         {
-            name: TableColumnsIds.ErasureSpecies,
-            header: tableColumnsNames[TableColumnsIds.ErasureSpecies],
+            name: TableColumnsIds.Erasure,
+            header: tableColumnsNames[TableColumnsIds.Erasure],
             render: ({row}) => (row.ErasureSpecies ? row.ErasureSpecies : '-'),
             align: DataTable.LEFT,
         },
         {
-            name: TableColumnsIds.Missing,
-            header: tableColumnsNames[TableColumnsIds.Missing],
+            name: TableColumnsIds.Degraded,
+            header: tableColumnsNames[TableColumnsIds.Degraded],
             width: 100,
             render: ({row}) =>
                 row.Degraded ? (
@@ -165,8 +144,8 @@ export function StorageGroups({
             defaultOrder: DataTable.DESCENDING,
         },
         {
-            name: TableColumnsIds.UsedPercents,
-            header: tableColumnsNames[TableColumnsIds.UsedPercents],
+            name: TableColumnsIds.Usage,
+            header: tableColumnsNames[TableColumnsIds.Usage],
             width: 100,
             render: ({row}) => {
                 // without a limit the usage can be evaluated as 0,
@@ -187,12 +166,13 @@ export function StorageGroups({
             align: DataTable.LEFT,
         },
         {
-            name: TableColumnsIds.GroupID,
-            header: tableColumnsNames[TableColumnsIds.GroupID],
+            name: TableColumnsIds.GroupId,
+            header: tableColumnsNames[TableColumnsIds.GroupId],
             width: 130,
             render: ({row}) => {
                 return <span className={b('group-id')}>{row.GroupID}</span>;
             },
+            sortAccessor: (row) => Number(row.GroupID),
             align: DataTable.RIGHT,
         },
         {
@@ -296,18 +276,21 @@ export function StorageGroups({
         },
     ];
 
-    let columns = allColumns;
+    let columns = rawColumns.map((column) => ({
+        ...column,
+        sortable: isSortableStorageProperty(column.name),
+    }));
 
     if (visibleEntities === VISIBLE_ENTITIES.all) {
-        columns = allColumns.filter((col) => {
+        columns = columns.filter((col) => {
             return (
-                col.name !== TableColumnsIds.Missing && col.name !== TableColumnsIds.UsedSpaceFlag
+                col.name !== TableColumnsIds.Degraded && col.name !== TableColumnsIds.UsedSpaceFlag
             );
         });
     }
 
     if (visibleEntities === VISIBLE_ENTITIES.space) {
-        columns = allColumns.filter((col) => col.name !== TableColumnsIds.Missing);
+        columns = columns.filter((col) => col.name !== TableColumnsIds.Degraded);
 
         if (!data.length) {
             return (
@@ -321,7 +304,7 @@ export function StorageGroups({
     }
 
     if (visibleEntities === VISIBLE_ENTITIES.missing) {
-        columns = allColumns.filter((col) => col.name !== TableColumnsIds.UsedSpaceFlag);
+        columns = columns.filter((col) => col.name !== TableColumnsIds.UsedSpaceFlag);
 
         if (!data.length) {
             return (
@@ -341,8 +324,9 @@ export function StorageGroups({
             data={data}
             columns={columns}
             settings={tableSettings}
-            initialSortOrder={setSortOrder(visibleEntities)}
             emptyDataMessage={i18n('empty.default')}
+            sortOrder={sort}
+            onSort={handleSort}
         />
     ) : null;
 }

@@ -114,20 +114,21 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getStorageInfo(
-        {tenant, visibleEntities, nodeId, ...params}: StorageApiRequestParams,
+        {tenant, visibleEntities, nodeId, sortOrder, sortValue, ...params}: StorageApiRequestParams,
         {concurrentId}: AxiosOptions = {},
     ) {
+        const sort = prepareSortValue(sortValue, sortOrder);
+
         return this.get<TStorageInfo>(
             this.getPath(`/viewer/json/storage?enums=true`),
             {
                 tenant,
                 node_id: nodeId,
                 with: visibleEntities,
+                sort,
                 ...params,
             },
-            {
-                concurrentId,
-            },
+            {concurrentId},
         );
     }
     getPdiskInfo(nodeId: string | number, pdiskId: string | number) {

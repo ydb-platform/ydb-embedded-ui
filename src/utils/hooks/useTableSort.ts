@@ -8,7 +8,7 @@ interface SortParams {
     sortOrder: OrderType | undefined;
 }
 
-type HandleSort = (rawValue: SortOrder | SortOrder[] | undefined) => void;
+export type HandleSort = (rawValue: SortOrder | SortOrder[] | undefined) => void;
 
 export const useTableSort = (
     {sortValue, sortOrder = DESCENDING}: SortParams,
