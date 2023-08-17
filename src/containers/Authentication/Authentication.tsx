@@ -5,7 +5,7 @@ import cn from 'bem-cn-lite';
 
 import {Button, TextInput, Icon, Link as ExternalLink} from '@gravity-ui/uikit';
 
-import {authenticate} from '../../store/reducers/authentication';
+import {authenticate} from '../../store/reducers/authentication/authentication';
 import {useTypedSelector} from '../../utils/hooks';
 
 import ydbLogoIcon from '../../assets/icons/ydb.svg';

@@ -1,5 +1,9 @@
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import '../../services/api';
+import type {Reducer} from 'redux';
+
+import '../../../services/api';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
+
+import type {AuthenticationAction, AuthenticationState} from './types';
 
 export const SET_UNAUTHENTICATED = createRequestActionTypes(
     'authentication',
@@ -11,16 +15,19 @@ export const FETCH_USER = createRequestActionTypes('authentication', 'FETCH_USER
 const initialState = {
     isAuthenticated: true,
     user: '',
-    error: '',
+    error: undefined,
 };
 
-const authentication = function (state = initialState, action) {
+const authentication: Reducer<AuthenticationState, AuthenticationAction> = (
+    state = initialState,
+    action,
+) => {
     switch (action.type) {
         case SET_UNAUTHENTICATED.SUCCESS: {
-            return {...state, isAuthenticated: false, user: '', error: ''};
+            return {...state, isAuthenticated: false, user: '', error: undefined};
         }
         case SET_AUTHENTICATED.SUCCESS: {
-            return {...state, isAuthenticated: true, error: ''};
+            return {...state, isAuthenticated: true, error: undefined};
         }
         case SET_AUTHENTICATED.FAILURE: {
             return {...state, error: action.error};
@@ -34,7 +41,7 @@ const authentication = function (state = initialState, action) {
     }
 };
 
-export const authenticate = (user, password) => {
+export const authenticate = (user: string, password: string) => {
     return createApiRequest({
         request: window.api.authenticate(user, password),
         actions: SET_AUTHENTICATED,

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import ContentWrapper, {Content} from './Content';
 import AsideNavigation from '../AsideNavigation/AsideNavigation';
 
-import {getUser} from '../../store/reducers/authentication';
+import {getUser} from '../../store/reducers/authentication/authentication';
 import {registerLanguages} from '../../utils/monaco';
 
 import './App.scss';
