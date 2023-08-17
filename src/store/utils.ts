@@ -3,7 +3,7 @@ import {AxiosResponse} from 'axios';
 
 import createToast from '../utils/createToast';
 
-import {SET_UNAUTHENTICATED} from './reducers/authentication';
+import {SET_UNAUTHENTICATED} from './reducers/authentication/authentication';
 import type {GetState} from './reducers';
 
 export const nop = (result: any) => result;

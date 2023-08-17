@@ -18,3 +18,7 @@ export interface NetworkError {
     number?: unknown;
     stack?: string;
 }
+
+export type AuthErrorResponse = IResponseError<{
+    error?: string;
+}>;

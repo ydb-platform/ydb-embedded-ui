@@ -18,7 +18,7 @@ import userChecked from '../../assets/icons/user-check.svg';
 import settingsIcon from '../../assets/icons/settings.svg';
 import supportIcon from '../../assets/icons/support.svg';
 
-import {logout} from '../../store/reducers/authentication';
+import {logout} from '../../store/reducers/authentication/authentication';
 import {getParsedSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
 import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../store/reducers/tenant/constants';
 import routes, {TENANT, createHref, parseQuery} from '../../routes';
