@@ -37,6 +37,7 @@ interface Window {
     custom_backend?: string;
 
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof import('redux').compose;
+    store?: import('redux').Store;
 
     userSettings?: Record<string, string | undefined>;
     systemSettings?: Record<string, string | undefined>;
