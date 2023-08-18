@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.14.0...v4.15.0) (2023-08-17)
+
+
+### Features
+
+* **SchemaTree:** add actions for topic ([#507](https://github.com/ydb-platform/ydb-embedded-ui/issues/507)) ([6700136](https://github.com/ydb-platform/ydb-embedded-ui/commit/670013629cb68425e670969323a2ef466ef7c018))
+* **Storage:** sort on backend ([#510](https://github.com/ydb-platform/ydb-embedded-ui/issues/510)) ([034a89a](https://github.com/ydb-platform/ydb-embedded-ui/commit/034a89a9844021c5ea3a73c8f6456e35128078c0))
+* **Storage:** v2 api and backend filters ([#506](https://github.com/ydb-platform/ydb-embedded-ui/issues/506)) ([ce4bf6d](https://github.com/ydb-platform/ydb-embedded-ui/commit/ce4bf6d0ef154b87a7b3a44d56281230b2b5b554))
+
 ## [4.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.13.0...v4.14.0) (2023-08-11)
 
 
