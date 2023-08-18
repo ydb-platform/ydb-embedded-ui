@@ -1,13 +1,12 @@
 import cn from 'bem-cn-lite';
 
-import {Link} from '@gravity-ui/uikit';
+import {Button, Icon, Link} from '@gravity-ui/uikit';
+
+import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
 import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthcheck';
-import type {IIssuesTree} from '../../../../../types/store/healthcheck';
-import {useTypedSelector} from '../../../../../utils/hooks';
-import {selectIssuesTreesRoots} from '../../../../../store/reducers/healthcheckInfo';
-import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
+import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 
 import i18n from '../i18n';
 
@@ -15,29 +14,22 @@ const b = cn('healthcheck');
 
 interface PreviewProps {
     selfCheckResult: SelfCheckResult;
-    issuesTrees?: IIssuesTree[];
+    issuesStatistics?: Record<StatusFlag, number>;
     loading?: boolean;
-    onShowMore?: (issueIds: string[]) => void;
+    onShowMore?: VoidFunction;
     onUpdate: VoidFunction;
 }
 
-export const Preview = ({selfCheckResult, issuesTrees, onShowMore}: PreviewProps) => {
+export const Preview = (props: PreviewProps) => {
+    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate} = props;
+
     const isStatusOK = selfCheckResult === SelfCheckResult.GOOD;
 
-    const issuesTreesRoots = useTypedSelector(selectIssuesTreesRoots);
-
-    if (!issuesTrees) {
+    if (!issuesStatistics) {
         return null;
     }
 
-    const issues = {} as Record<StatusFlag, number>;
-
-    for (const issue of issuesTrees) {
-        if (!issues[issue.status]) {
-            issues[issue.status] = 0;
-        }
-        issues[issue.status]++;
-    }
+    const statusFlags = Object.keys(issuesStatistics) as StatusFlag[];
 
     const renderStatus = () => {
         const modifier = selfCheckResult.toLowerCase();
@@ -48,11 +40,14 @@ export const Preview = ({selfCheckResult, issuesTrees, onShowMore}: PreviewProps
                 <div className={b('self-check-status-indicator', {[modifier]: true})}>
                     {selfCheckResult}
                 </div>
+                <Button size="s" onClick={onUpdate} loading={loading} view="flat-secondary">
+                    <Icon data={updateArrow} width={20} height={20} />
+                </Button>
             </div>
         );
     };
 
-    const renderFirstLevelIssues = () => {
+    const renderIssuesStatistics = () => {
         return (
             <div className={b('preview-content')}>
                 {isStatusOK ? (
@@ -60,22 +55,18 @@ export const Preview = ({selfCheckResult, issuesTrees, onShowMore}: PreviewProps
                 ) : (
                     <>
                         <div>Issues:</div>
-                        <div className={b('issues')}>
-                            {Object.entries(issues).map(([status, count]) => (
+                        <div className={b('issues-statistics')}>
+                            {statusFlags.map((status) => (
                                 <EntityStatus
                                     key={status}
                                     mode="icons"
                                     status={status}
-                                    label={count.toString()}
+                                    label={issuesStatistics[status].toString()}
                                     size="l"
                                 />
                             ))}
                         </div>
-                        <Link
-                            onClick={() => onShowMore?.(issuesTreesRoots.map((issue) => issue.id))}
-                        >
-                            {i18n('label.show-details')}
-                        </Link>
+                        <Link onClick={() => onShowMore?.()}>{i18n('label.show-details')}</Link>
                     </>
                 )}
             </div>
@@ -85,7 +76,7 @@ export const Preview = ({selfCheckResult, issuesTrees, onShowMore}: PreviewProps
     return (
         <DiagnosticCard className={b('preview')}>
             {renderStatus()}
-            {renderFirstLevelIssues()}
+            {renderIssuesStatistics()}
         </DiagnosticCard>
     );
 };

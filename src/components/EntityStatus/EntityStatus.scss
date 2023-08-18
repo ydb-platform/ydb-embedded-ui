@@ -48,21 +48,13 @@
 
         color: var(--yc-color-text-complementary);
 
-        &_size_l {
-            font-size: var(--yc-text-header-2-font-size);
+        &_size_m {
+            font-size: var(--yc-text-body-2-font-size);
+            line-height: var(--yc-text-body-2-line-height);
         }
 
-        &_state_blue {
-            color: var(--yc-color-infographics-info-heavy);
-        }
-        &_state_yellow {
-            color: var(--yc-color-infographics-warning-heavy);
-        }
-        &_state_orange {
-            color: var(--yc-color-base-warning-orange);
-        }
-        &_state_red {
-            color: var(--yc-color-infographics-danger-heavy);
+        &_size_l {
+            font-size: var(--yc-text-header-2-font-size);
         }
     }
 
@@ -108,8 +100,6 @@
         }
 
         &_size_l {
-            aspect-ratio: 1;
-
             width: 27px;
             height: 27px;
         }
@@ -139,6 +129,7 @@
         }
     }
 
+    &__label,
     &__status-icon {
         &_state_blue {
             color: var(--yc-color-infographics-info-heavy);

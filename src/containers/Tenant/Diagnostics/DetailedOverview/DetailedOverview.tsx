@@ -1,13 +1,13 @@
+import cn from 'bem-cn-lite';
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import cn from 'bem-cn-lite';
 
 import {Button, Modal} from '@gravity-ui/uikit';
 
-import type {EPathType} from '../../../../types/api/schema';
 import {Icon} from '../../../../components/Icon';
-import Overview from '../Overview/Overview';
+import type {EPathType} from '../../../../types/api/schema';
 import {Healthcheck} from '../Healthcheck';
+import Overview from '../Overview/Overview';
 //@ts-ignore
 import TenantOverview from '../TenantOverview/TenantOverview';
 
@@ -25,12 +25,9 @@ const b = cn('kv-detailed-overview');
 function DetailedOverview(props: DetailedOverviewProps) {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const [expandedIssueIds, setExpandedIssueIds] = useState<string[]>();
-
     const {currentSchemaPath} = useSelector((state: any) => state.schema);
 
-    const openModalHandler = (issueIds: string[]) => {
-        setExpandedIssueIds(issueIds);
+    const openModalHandler = () => {
         setIsModalVisible(true);
     };
 
@@ -41,11 +38,7 @@ function DetailedOverview(props: DetailedOverviewProps) {
     const renderModal = () => {
         return (
             <Modal open={isModalVisible} onClose={closeModalHandler} className={b('modal')}>
-                <Healthcheck
-                    tenant={props.tenantName}
-                    fetchData={false}
-                    expandedIssueIds={expandedIssueIds}
-                />
+                <Healthcheck tenant={props.tenantName} fetchData={false} />
                 <Button
                     className={b('close-modal-button')}
                     onClick={closeModalHandler}

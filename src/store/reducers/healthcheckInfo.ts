@@ -1,17 +1,16 @@
 import _flow from 'lodash/fp/flow';
 import _sortBy from 'lodash/fp/sortBy';
 import _uniqBy from 'lodash/fp/uniqBy';
-import _omit from 'lodash/omit';
 import {createSelector, Selector} from 'reselect';
 import {Reducer} from 'redux';
 
-import {
-    IHealthcheckInfoState,
-    IHealthcheckInfoRootStateSlice,
-    IIssuesTree,
+import type {
     IHealthCheckInfoAction,
+    IHealthcheckInfoRootStateSlice,
+    IHealthcheckInfoState,
+    IIssuesTree,
 } from '../../types/store/healthcheck';
-import {IssueLog, StatusFlag} from '../../types/api/healthcheck';
+import type {IssueLog, StatusFlag} from '../../types/api/healthcheck';
 
 import '../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../utils';
@@ -110,6 +109,26 @@ const getInvertedConsequencesTree = ({
         : [];
 };
 
+const getIssuesMap = (data: IssueLog[]): Record<StatusFlag, number> => {
+    const issuesMap = {} as Record<StatusFlag, number>;
+
+    for (const issue of data) {
+        if (!issuesMap[issue.status]) {
+            issuesMap[issue.status] = 0;
+        }
+        issuesMap[issue.status]++;
+    }
+
+    const sortedStatusFlags: StatusFlag[] = _flow([
+        _sortBy((status: StatusFlag) => mapStatusToPriority[status]),
+    ])(Object.keys(issuesMap));
+
+    return sortedStatusFlags.reduce((obj, key) => {
+        obj[key] = issuesMap[key];
+        return obj;
+    }, {} as Record<StatusFlag, number>);
+};
+
 const getIssuesLog = (state: IHealthcheckInfoRootStateSlice) =>
     state.healthcheckInfo.data?.issue_log;
 
@@ -129,6 +148,11 @@ export const selectIssuesTreesByIds: Selector<
     [selectIssuesTrees, (_, ids: string[] | undefined) => ids],
     (issuesTrees = [], ids) => issuesTrees.filter((issuesTree) => ids?.includes(issuesTree.id)),
 );
+
+export const selectIssuesStatistics: Selector<
+    IHealthcheckInfoRootStateSlice,
+    Record<StatusFlag, number>
+> = createSelector(getIssuesLog, (issues = []) => getIssuesMap(issues));
 
 export function getHealthcheckInfo(database: string) {
     return createApiRequest({

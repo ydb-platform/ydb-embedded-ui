@@ -8,9 +8,11 @@ import {SelfCheckResult} from '../../../../types/api/healthcheck';
 import {useTypedSelector, useAutofetcher} from '../../../../utils/hooks';
 import {
     getHealthcheckInfo,
-    selectIssuesTreesByIds,
+    selectIssuesStatistics,
+    selectIssuesTrees,
     setDataWasNotLoaded,
 } from '../../../../store/reducers/healthcheckInfo';
+import {DiagnosticCard} from '../../../../components/DiagnosticCard/DiagnosticCard';
 
 import {Details} from './Details';
 import {Preview} from './Preview';
@@ -22,25 +24,21 @@ interface HealthcheckProps {
     tenant: string;
     preview?: boolean;
     fetchData?: boolean;
-    expandedIssueIds?: string[];
-    showMoreHandler?: (issueIds: string[]) => void;
+    showMoreHandler?: VoidFunction;
 }
 
 const b = cn('healthcheck');
 
 export const Healthcheck = (props: HealthcheckProps) => {
-    const {tenant, preview, fetchData = true, showMoreHandler, expandedIssueIds} = props;
+    const {tenant, preview, fetchData = true, showMoreHandler} = props;
 
     const dispatch = useDispatch();
 
     const {data, loading, wasLoaded, error} = useTypedSelector((state) => state.healthcheckInfo);
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
-    const issuesTrees = data?.issue_log || [];
 
-    const expandedIssueTrees = useTypedSelector((state) =>
-        selectIssuesTreesByIds(state, expandedIssueIds),
-    );
-
+    const issuesStatistics = useTypedSelector(selectIssuesStatistics);
+    const issueTrees = useTypedSelector(selectIssuesTrees);
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
     const fetchHealthcheck = useCallback(
@@ -71,27 +69,23 @@ export const Healthcheck = (props: HealthcheckProps) => {
 
         if (loading && !wasLoaded) {
             return (
-                <div className={b('loader')}>
+                <DiagnosticCard className={b('loader')}>
                     <Loader size="m" />
-                </div>
+                </DiagnosticCard>
             );
         }
 
         if (data && data['self_check_result']) {
             return preview ? (
                 <Preview
-                    issuesTrees={issuesTrees}
+                    issuesStatistics={issuesStatistics}
                     selfCheckResult={selfCheckResult}
                     loading={loading}
                     onShowMore={showMoreHandler}
                     onUpdate={fetchHealthcheck}
                 />
             ) : (
-                <Details
-                    issueTrees={expandedIssueTrees}
-                    loading={loading}
-                    onUpdate={fetchHealthcheck}
-                />
+                <Details loading={loading} onUpdate={fetchHealthcheck} issueTrees={issueTrees} />
             );
         }
 

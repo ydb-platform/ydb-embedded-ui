@@ -69,15 +69,15 @@
         line-height: 24px;
     }
 
-    &__issues {
+    &__issues-statistics {
         display: flex;
-        align-items: center;
         flex-wrap: wrap;
+        align-items: center;
+
+        margin: 10px 0;
 
         column-gap: 26px;
         row-gap: 16px;
-
-        margin: 10px 0;
     }
 
     &__self-check-status-indicator {
