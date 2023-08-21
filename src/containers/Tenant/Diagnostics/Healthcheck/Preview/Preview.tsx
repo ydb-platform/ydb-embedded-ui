@@ -4,7 +4,7 @@ import {Button, Icon, Link} from '@gravity-ui/uikit';
 
 import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
-import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthcheck';
+import {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
 import type {IResponseError} from '../../../../../types/api/error';
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';

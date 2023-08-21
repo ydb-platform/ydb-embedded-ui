@@ -36,7 +36,7 @@ export const Details = (props: DetailsProps) => {
         );
     };
 
-    const renderHealthcheckIssues = () => {
+    const renderContent = () => {
         if (error) {
             return <div className={b('error')}>{error.statusText || i18n('no-data')}</div>;
         }
@@ -57,7 +57,7 @@ export const Details = (props: DetailsProps) => {
     return (
         <div className={b('details')}>
             {renderHealthcheckHeader()}
-            {renderHealthcheckIssues()}
+            {renderContent()}
         </div>
     );
 };

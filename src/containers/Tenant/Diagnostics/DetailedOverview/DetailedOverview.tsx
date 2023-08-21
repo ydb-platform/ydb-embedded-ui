@@ -1,13 +1,13 @@
-import cn from 'bem-cn-lite';
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
+import cn from 'bem-cn-lite';
 
 import {Button, Modal} from '@gravity-ui/uikit';
 
-import {Icon} from '../../../../components/Icon';
 import type {EPathType} from '../../../../types/api/schema';
-import {Healthcheck} from '../Healthcheck';
+import {Icon} from '../../../../components/Icon';
 import Overview from '../Overview/Overview';
+import {Healthcheck} from '../Healthcheck';
 //@ts-ignore
 import TenantOverview from '../TenantOverview/TenantOverview';
 
