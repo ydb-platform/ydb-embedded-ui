@@ -14,11 +14,17 @@ import type {IQueryResult, QueryError, QueryErrorResponse} from './query';
 
 export type MonacoHotKeyAction = ValueOf<typeof MONACO_HOT_KEY_ACTIONS>;
 
+export interface QueryInHistory {
+    queryText: string;
+    syntax?: string;
+}
+
 export interface ExecuteQueryState {
     loading: boolean;
     input: string;
     history: {
-        queries: string[];
+        // String type for backward compatibility
+        queries: (QueryInHistory | string)[];
         currentIndex: number;
     };
     monacoHotKey: null | MonacoHotKeyAction;
@@ -38,3 +44,7 @@ export type ExecuteQueryAction =
     | ReturnType<typeof saveQueryToHistory>
     | ReturnType<typeof setMonacoHotKey>
     | ReturnType<typeof setTenantPath>;
+
+export interface ExecuteQueryStateSlice {
+    executeQuery: ExecuteQueryState;
+}

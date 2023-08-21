@@ -8,6 +8,8 @@
   "history.empty": "История пуста",
   "saved.empty": "Нет сохраненных запросов",
 
+  "history.cannot-set-mode": "Этот запрос доступен только в режиме '{{mode}}'. Вам необходимо включить дополнительные режимы выполнения запросов в настройках",
+
   "delete-dialog.header": "Удалить запрос",
   "delete-dialog.question": "Вы уверены что хотите удалить запрос",
   "delete-dialog.delete": "Удалить",
@@ -21,6 +23,7 @@
   "method-description.scan": "Только читающие запросы, потенциально читающие много данных.\nAPI call: table.ExecuteScan",
   "method-description.data": "DML-запросы для изменения и выборки данных в режиме изоляции Serializable.\nAPI call: table.executeDataQuery",
   "method-description.query": "Любые запросы. Экспериментальный перспективный метод, который в будущем заменит все остальные.\nAPI call: query.ExecuteScript",
+  "method-description.pg": "Запросы в синтаксисе postgresql.\nAPI call: query.ExecuteScript",
 
   "query-duration.description": "Время выполнения запроса на стороне сервера"
 }

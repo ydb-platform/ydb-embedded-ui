@@ -264,7 +264,7 @@ function QueryEditor(props) {
 
         const {queries, currentIndex} = history;
         if (input !== queries[currentIndex]) {
-            saveQueryToHistory(input);
+            saveQueryToHistory(input, mode);
         }
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };

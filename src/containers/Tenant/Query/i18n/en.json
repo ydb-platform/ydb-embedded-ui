@@ -8,6 +8,8 @@
   "history.empty": "History is empty",
   "saved.empty": "There are no saved queries",
 
+  "history.cannot-set-mode": "This query is available only with '{{mode}}' query mode. You need to turn in additional query modes in settings to enable it",
+
   "delete-dialog.header": "Delete query",
   "delete-dialog.question": "Are you sure you want to delete query",
   "delete-dialog.delete": "Delete",
@@ -21,6 +23,7 @@
   "method-description.scan": "Read-only queries, potentially reading a lot of data.\nAPI call: table.ExecuteScan",
   "method-description.data": "DML queries for changing and fetching data in serialization mode.\nAPI call: table.executeDataQuery",
   "method-description.query": "Any query. An experimental API call supposed to replace all existing methods.\nAPI Call: query.ExecuteScript",
+  "method-description.pg": "Queries in postgresql syntax.\nAPI call: query.ExecuteScript",
 
   "query-duration.description": "Duration of server-side query execution"
 }

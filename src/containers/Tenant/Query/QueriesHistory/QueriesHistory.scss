@@ -9,11 +9,14 @@
     @include flex-container();
     @include table-styles;
 
+    &__table-row {
+        cursor: pointer;
+    }
+
     &__query {
         overflow: hidden;
         flex-grow: 1;
 
-        cursor: pointer;
         white-space: pre;
         text-overflow: ellipsis;
     }

@@ -4,12 +4,14 @@ import type {ExecuteActions} from '../../types/api/query';
 import type {
     ExecuteQueryAction,
     ExecuteQueryState,
+    ExecuteQueryStateSlice,
     MonacoHotKeyAction,
+    QueryInHistory,
 } from '../../types/store/executeQuery';
-import type {QueryRequestParams, QueryMode} from '../../types/store/query';
+import type {QueryRequestParams, QueryMode, QuerySyntax} from '../../types/store/query';
 import {getValueFromLS, parseJson} from '../../utils/utils';
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
-import {parseQueryAPIExecuteResponse} from '../../utils/query';
+import {QUERY_MODES, QUERY_SYNTAX, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {parseQueryError} from '../../utils/error';
 import '../../services/api';
 
@@ -87,8 +89,10 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
         }
 
         case SAVE_QUERY_TO_HISTORY: {
-            const query = action.data;
-            const newQueries = [...state.history.queries, query].slice(
+            const queryText = action.data.queryText;
+            const syntax = action.data.mode === QUERY_MODES.pg ? QUERY_SYNTAX.pg : undefined;
+
+            const newQueries = [...state.history.queries, {queryText, syntax}].slice(
                 state.history.queries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
             );
             window.localStorage.setItem(QUERIES_HISTORY_KEY, JSON.stringify(newQueries));
@@ -151,7 +155,15 @@ interface SendQueryParams extends QueryRequestParams {
 }
 
 export const sendExecuteQuery = ({query, database, mode}: SendQueryParams) => {
-    const action: ExecuteActions = mode ? `execute-${mode}` : 'execute';
+    let action: ExecuteActions = 'execute';
+    let syntax: QuerySyntax = QUERY_SYNTAX.yql;
+
+    if (mode === 'pg') {
+        action = 'execute-query';
+        syntax = QUERY_SYNTAX.pg;
+    } else if (mode) {
+        action = `execute-${mode}`;
+    }
 
     return createApiRequest({
         request: window.api.sendQuery({
@@ -159,6 +171,7 @@ export const sendExecuteQuery = ({query, database, mode}: SendQueryParams) => {
             query,
             database,
             action,
+            syntax,
             stats: 'profile',
         }),
         actions: SEND_QUERY,
@@ -166,10 +179,10 @@ export const sendExecuteQuery = ({query, database, mode}: SendQueryParams) => {
     });
 };
 
-export const saveQueryToHistory = (query: string) => {
+export const saveQueryToHistory = (queryText: string, mode: QueryMode) => {
     return {
         type: SAVE_QUERY_TO_HISTORY,
-        data: query,
+        data: {queryText, mode},
     } as const;
 };
 
@@ -204,6 +217,17 @@ export const setTenantPath = (value: string) => {
         type: SET_TENANT_PATH,
         data: value,
     } as const;
+};
+
+export const selectQueriesHistory = (state: ExecuteQueryStateSlice): QueryInHistory[] => {
+    return state.executeQuery.history.queries.map((rawQuery) => {
+        if (typeof rawQuery === 'string') {
+            return {
+                queryText: rawQuery,
+            };
+        }
+        return rawQuery;
+    });
 };
 
 export default executeQuery;

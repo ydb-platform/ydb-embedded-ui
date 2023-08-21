@@ -4,7 +4,7 @@ import {Button, ButtonView, DropdownMenu} from '@gravity-ui/uikit';
 import {useMemo} from 'react';
 
 import type {QueryAction, QueryMode} from '../../../../types/store/query';
-import {QUERY_MODES} from '../../../../utils/query';
+import {QUERY_MODES, QUERY_MODES_TITLES} from '../../../../utils/query';
 import {Icon} from '../../../../components/Icon';
 import {LabelWithPopover} from '../../../../components/LabelWithPopover';
 
@@ -21,31 +21,35 @@ const b = block('ydb-query-editor-controls');
 
 const OldQueryModeSelectorOptions = {
     [QUERY_MODES.script]: {
-        title: 'YQL Script',
+        title: QUERY_MODES_TITLES[QUERY_MODES.script],
         description: i18n('method-description.script'),
     },
     [QUERY_MODES.scan]: {
-        title: 'Scan',
+        title: QUERY_MODES_TITLES[QUERY_MODES.scan],
         description: i18n('method-description.scan'),
     },
 } as const;
 
 const QueryModeSelectorOptions = {
     [QUERY_MODES.script]: {
-        title: 'YQL Script',
+        title: QUERY_MODES_TITLES[QUERY_MODES.script],
         description: i18n('method-description.script'),
     },
     [QUERY_MODES.scan]: {
-        title: 'Scan',
+        title: QUERY_MODES_TITLES[QUERY_MODES.scan],
         description: i18n('method-description.scan'),
     },
     [QUERY_MODES.data]: {
-        title: 'Data',
+        title: QUERY_MODES_TITLES[QUERY_MODES.data],
         description: i18n('method-description.data'),
     },
     [QUERY_MODES.query]: {
-        title: 'YQL - QueryService',
+        title: QUERY_MODES_TITLES[QUERY_MODES.query],
         description: i18n('method-description.query'),
+    },
+    [QUERY_MODES.pg]: {
+        title: QUERY_MODES_TITLES[QUERY_MODES.pg],
+        description: i18n('method-description.pg'),
     },
 } as const;
 

@@ -28,6 +28,7 @@ import type {DescribeTopicResult} from '../types/api/topic';
 import type {TEvPDiskStateResponse} from '../types/api/pdisk';
 import type {TEvVDiskStateResponse} from '../types/api/vdisk';
 import type {TUserToken} from '../types/api/whoami';
+import type {QuerySyntax} from '../types/store/query';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
 import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 
@@ -281,17 +282,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     }
     sendQuery<Action extends Actions, Schema extends Schemas = undefined>(
         {
-            query,
-            database,
-            action,
-            stats,
             schema,
+            ...params
         }: {
             query?: string;
             database?: string;
             action?: Action;
             stats?: string;
             schema?: Schema;
+            syntax?: QuerySyntax;
         },
         {concurrentId}: AxiosOptions = {},
     ) {
@@ -303,12 +302,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             this.getPath(
                 `/viewer/json/query?timeout=${backendTimeout}${schema ? `&schema=${schema}` : ''}`,
             ),
-            {
-                query,
-                database,
-                action,
-                stats,
-            },
+            params,
             {},
             {
                 concurrentId,
@@ -320,6 +314,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         query: string,
         database: string,
         action: Action,
+        syntax?: QuerySyntax,
     ) {
         return this.post<ExplainResponse<Action>>(
             this.getPath('/viewer/json/query'),
@@ -327,6 +322,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 query,
                 database,
                 action: action || 'explain',
+                syntax,
                 timeout: 600000,
             },
             {},
