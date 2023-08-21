@@ -17,7 +17,6 @@ import {DiagnosticCard} from '../../../../components/DiagnosticCard/DiagnosticCa
 import {Details} from './Details';
 import {Preview} from './Preview';
 
-import i18n from './i18n';
 import './Healthcheck.scss';
 
 interface HealthcheckProps {
@@ -63,10 +62,6 @@ export const Healthcheck = (props: HealthcheckProps) => {
     );
 
     const renderContent = () => {
-        if (error) {
-            return error.statusText;
-        }
-
         if (loading && !wasLoaded) {
             return (
                 <DiagnosticCard className={b('loader')}>
@@ -74,22 +69,23 @@ export const Healthcheck = (props: HealthcheckProps) => {
                 </DiagnosticCard>
             );
         }
-
-        if (data && data['self_check_result']) {
-            return preview ? (
-                <Preview
-                    issuesStatistics={issuesStatistics}
-                    selfCheckResult={selfCheckResult}
-                    loading={loading}
-                    onShowMore={showMoreHandler}
-                    onUpdate={fetchHealthcheck}
-                />
-            ) : (
-                <Details loading={loading} onUpdate={fetchHealthcheck} issueTrees={issueTrees} />
-            );
-        }
-
-        return <div className="error">{i18n('no-data')}</div>;
+        return preview ? (
+            <Preview
+                issuesStatistics={issuesStatistics}
+                selfCheckResult={selfCheckResult}
+                loading={loading}
+                onShowMore={showMoreHandler}
+                onUpdate={fetchHealthcheck}
+                error={error}
+            />
+        ) : (
+            <Details
+                loading={loading}
+                onUpdate={fetchHealthcheck}
+                issueTrees={issueTrees}
+                error={error}
+            />
+        );
     };
 
     return <div className={b({expanded: !preview})}>{renderContent()}</div>;

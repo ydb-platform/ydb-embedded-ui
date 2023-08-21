@@ -48,6 +48,8 @@ const healthcheckInfo: Reducer<IHealthcheckInfoState, IHealthCheckInfoAction> = 
                 ...state,
                 error: action.error,
                 loading: false,
+                wasLoaded: true,
+                data: undefined,
             };
         }
 
@@ -109,7 +111,7 @@ const getInvertedConsequencesTree = ({
         : [];
 };
 
-const getIssuesMap = (data: IssueLog[]): Record<StatusFlag, number> => {
+const getIssuesMap = (data: IssueLog[]): [StatusFlag, number][] => {
     const issuesMap = {} as Record<StatusFlag, number>;
 
     for (const issue of data) {
@@ -119,14 +121,12 @@ const getIssuesMap = (data: IssueLog[]): Record<StatusFlag, number> => {
         issuesMap[issue.status]++;
     }
 
-    const sortedStatusFlags: StatusFlag[] = _flow([
-        _sortBy((status: StatusFlag) => mapStatusToPriority[status]),
-    ])(Object.keys(issuesMap));
+    return (Object.entries(issuesMap) as [StatusFlag, number][]).sort(([aStatus], [bStatus]) => {
+        const bPriority = mapStatusToPriority[bStatus] || 0;
+        const aPriority = mapStatusToPriority[aStatus] || 0;
 
-    return sortedStatusFlags.reduce((obj, key) => {
-        obj[key] = issuesMap[key];
-        return obj;
-    }, {} as Record<StatusFlag, number>);
+        return aPriority - bPriority;
+    });
 };
 
 const getIssuesLog = (state: IHealthcheckInfoRootStateSlice) =>
@@ -140,18 +140,9 @@ export const selectIssuesTrees: Selector<IHealthcheckInfoRootStateSlice, IIssues
         return getInvertedConsequencesTree({data, roots});
     });
 
-export const selectIssuesTreesByIds: Selector<
-    IHealthcheckInfoRootStateSlice,
-    IIssuesTree[],
-    [string[] | undefined]
-> = createSelector(
-    [selectIssuesTrees, (_, ids: string[] | undefined) => ids],
-    (issuesTrees = [], ids) => issuesTrees.filter((issuesTree) => ids?.includes(issuesTree.id)),
-);
-
 export const selectIssuesStatistics: Selector<
     IHealthcheckInfoRootStateSlice,
-    Record<StatusFlag, number>
+    [StatusFlag, number][]
 > = createSelector(getIssuesLog, (issues = []) => getIssuesMap(issues));
 
 export function getHealthcheckInfo(database: string) {

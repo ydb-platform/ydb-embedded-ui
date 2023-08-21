@@ -5,6 +5,7 @@ import {Button, Icon, Link} from '@gravity-ui/uikit';
 import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
 import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthcheck';
+import type {IResponseError} from '../../../../../types/api/error';
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 
@@ -14,23 +15,21 @@ const b = cn('healthcheck');
 
 interface PreviewProps {
     selfCheckResult: SelfCheckResult;
-    issuesStatistics?: Record<StatusFlag, number>;
+    issuesStatistics?: [StatusFlag, number][];
     loading?: boolean;
     onShowMore?: VoidFunction;
     onUpdate: VoidFunction;
+    error?: IResponseError;
 }
 
 export const Preview = (props: PreviewProps) => {
-    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate} = props;
+    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate, error} = props;
 
     const isStatusOK = selfCheckResult === SelfCheckResult.GOOD;
 
     if (!issuesStatistics) {
         return null;
     }
-
-    const statusFlags = Object.keys(issuesStatistics) as StatusFlag[];
-
     const renderStatus = () => {
         const modifier = selfCheckResult.toLowerCase();
 
@@ -47,7 +46,11 @@ export const Preview = (props: PreviewProps) => {
         );
     };
 
-    const renderIssuesStatistics = () => {
+    const renderContent = () => {
+        if (error) {
+            return <div className={b('error')}>{error.statusText || i18n('no-data')}</div>;
+        }
+
         return (
             <div className={b('preview-content')}>
                 {isStatusOK ? (
@@ -56,12 +59,12 @@ export const Preview = (props: PreviewProps) => {
                     <>
                         <div>Issues:</div>
                         <div className={b('issues-statistics')}>
-                            {statusFlags.map((status) => (
+                            {issuesStatistics.map(([status, count]) => (
                                 <EntityStatus
                                     key={status}
                                     mode="icons"
                                     status={status}
-                                    label={issuesStatistics[status].toString()}
+                                    label={count.toString()}
                                     size="l"
                                 />
                             ))}
@@ -76,7 +79,7 @@ export const Preview = (props: PreviewProps) => {
     return (
         <DiagnosticCard className={b('preview')}>
             {renderStatus()}
-            {renderIssuesStatistics()}
+            {renderContent()}
         </DiagnosticCard>
     );
 };

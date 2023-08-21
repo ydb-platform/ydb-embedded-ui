@@ -4,6 +4,7 @@ import {Button, Icon} from '@gravity-ui/uikit';
 
 import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
+import type {IResponseError} from '../../../../../types/api/error';
 import type {IIssuesTree} from '../../../../../types/store/healthcheck';
 
 import IssueTree from '../IssuesViewer/IssueTree';
@@ -16,14 +17,11 @@ interface DetailsProps {
     issueTrees?: IIssuesTree[];
     loading?: boolean;
     onUpdate: VoidFunction;
+    error?: IResponseError;
 }
 
 export const Details = (props: DetailsProps) => {
-    const {loading, onUpdate, issueTrees} = props;
-
-    if (!issueTrees || !issueTrees.length) {
-        return null;
-    }
+    const {loading, onUpdate, issueTrees, error} = props;
 
     const renderHealthcheckHeader = () => {
         return (
@@ -39,6 +37,14 @@ export const Details = (props: DetailsProps) => {
     };
 
     const renderHealthcheckIssues = () => {
+        if (error) {
+            return <div className={b('error')}>{error.statusText || i18n('no-data')}</div>;
+        }
+
+        if (!issueTrees || !issueTrees.length) {
+            return i18n('status_message.ok');
+        }
+
         return (
             <div className={b('issues-wrapper')}>
                 {issueTrees.map((issueTree) => (

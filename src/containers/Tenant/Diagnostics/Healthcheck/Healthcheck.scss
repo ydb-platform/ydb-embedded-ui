@@ -32,6 +32,10 @@
         justify-content: center;
     }
 
+    &__error {
+        color: var(--yc-color-text-danger);
+    }
+
     &__message-container {
         padding: 15px 0;
     }
