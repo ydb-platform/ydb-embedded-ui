@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.15.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.15.0...v4.15.1) (2023-08-21)
+
+
+### Bug Fixes
+
+* **SchemaTree:** update create table template ([#512](https://github.com/ydb-platform/ydb-embedded-ui/issues/512)) ([712b3f3](https://github.com/ydb-platform/ydb-embedded-ui/commit/712b3f3612b09fdc5c850ffc3a984cd86827e5b9))
+
 ## [4.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.14.0...v4.15.0) (2023-08-17)
 
 
