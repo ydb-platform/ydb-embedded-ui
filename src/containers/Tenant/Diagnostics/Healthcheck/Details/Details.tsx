@@ -4,7 +4,9 @@ import {Button, Icon} from '@gravity-ui/uikit';
 
 import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
+import type {IResponseError} from '../../../../../types/api/error';
 import type {IIssuesTree} from '../../../../../types/store/healthcheck';
+import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
 import IssueTree from '../IssuesViewer/IssueTree';
 
@@ -13,17 +15,14 @@ import i18n from '../i18n';
 const b = cn('healthcheck');
 
 interface DetailsProps {
-    issueTree?: IIssuesTree;
+    issueTrees?: IIssuesTree[];
     loading?: boolean;
     onUpdate: VoidFunction;
+    error?: IResponseError;
 }
 
 export const Details = (props: DetailsProps) => {
-    const {loading, onUpdate, issueTree} = props;
-
-    if (!issueTree) {
-        return null;
-    }
+    const {loading, onUpdate, issueTrees, error} = props;
 
     const renderHealthcheckHeader = () => {
         return (
@@ -38,18 +37,28 @@ export const Details = (props: DetailsProps) => {
         );
     };
 
-    const renderHealthcheckIssues = () => {
+    const renderContent = () => {
+        if (error) {
+            return <ResponseError error={error} defaultMessage={i18n('no-data')} />;
+        }
+
+        if (!issueTrees || !issueTrees.length) {
+            return i18n('status_message.ok');
+        }
+
         return (
-            <div className={b('issues-wrapper')}>
-                <IssueTree issueTree={issueTree} />
-            </div>
+            <>
+                {issueTrees.map((issueTree) => (
+                    <IssueTree key={issueTree.id} issueTree={issueTree} />
+                ))}
+            </>
         );
     };
 
     return (
         <div className={b('details')}>
             {renderHealthcheckHeader()}
-            {renderHealthcheckIssues()}
+            <div className={b('details-content-wrapper')}>{renderContent()}</div>
         </div>
     );
 };

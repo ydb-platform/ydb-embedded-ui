@@ -107,13 +107,13 @@ class EntityStatus extends React.Component {
         );
     }
     render() {
-        const {name, label, iconPath, hasClipboardButton, className} = this.props;
+        const {name, label, iconPath, hasClipboardButton, className, size, status} = this.props;
 
         return (
             <div className={b(null, className)} title={name}>
                 {iconPath ? this.renderStatusLink() : this.renderIcon()}
                 {label && (
-                    <span title={label} className={b('label')}>
+                    <span title={label} className={b('label', {size, state: status.toLowerCase()})}>
                         {label}
                     </span>
                 )}

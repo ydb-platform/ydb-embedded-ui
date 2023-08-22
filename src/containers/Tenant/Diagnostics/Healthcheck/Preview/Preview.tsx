@@ -1,13 +1,14 @@
 import cn from 'bem-cn-lite';
 
-import {Button, Icon} from '@gravity-ui/uikit';
+import {Button, Icon, Link} from '@gravity-ui/uikit';
 
 import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
-import {SelfCheckResult} from '../../../../../types/api/healthcheck';
-import type {IIssuesTree} from '../../../../../types/store/healthcheck';
-
-import {PreviewItem} from './PreviewItem';
+import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthcheck';
+import type {IResponseError} from '../../../../../types/api/error';
+import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
+import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
+import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
 import i18n from '../i18n';
 
@@ -15,20 +16,17 @@ const b = cn('healthcheck');
 
 interface PreviewProps {
     selfCheckResult: SelfCheckResult;
-    issuesTrees?: IIssuesTree[];
+    issuesStatistics?: [StatusFlag, number][];
     loading?: boolean;
-    onShowMore?: (id: string) => void;
+    onShowMore?: VoidFunction;
     onUpdate: VoidFunction;
+    error?: IResponseError;
 }
 
 export const Preview = (props: PreviewProps) => {
-    const {selfCheckResult, issuesTrees, loading, onShowMore, onUpdate} = props;
+    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate, error} = props;
 
     const isStatusOK = selfCheckResult === SelfCheckResult.GOOD;
-
-    if (!issuesTrees) {
-        return null;
-    }
 
     const renderStatus = () => {
         const modifier = selfCheckResult.toLowerCase();
@@ -46,26 +44,40 @@ export const Preview = (props: PreviewProps) => {
         );
     };
 
-    const renderFirstLevelIssues = () => {
+    const renderContent = () => {
+        if (error) {
+            return <ResponseError error={error} defaultMessage={i18n('no-data')} />;
+        }
+
         return (
             <div className={b('preview-content')}>
-                {isStatusOK
-                    ? i18n('status_message.ok')
-                    : issuesTrees?.map((issueTree) => (
-                          <PreviewItem
-                              key={issueTree.id}
-                              data={issueTree}
-                              onShowMore={onShowMore}
-                          />
-                      ))}
+                {isStatusOK || !issuesStatistics || !issuesStatistics.length ? (
+                    i18n('status_message.ok')
+                ) : (
+                    <>
+                        <div>Issues:</div>
+                        <div className={b('issues-statistics')}>
+                            {issuesStatistics.map(([status, count]) => (
+                                <EntityStatus
+                                    key={status}
+                                    mode="icons"
+                                    status={status}
+                                    label={count.toString()}
+                                    size="l"
+                                />
+                            ))}
+                        </div>
+                        <Link onClick={() => onShowMore?.()}>{i18n('label.show-details')}</Link>
+                    </>
+                )}
             </div>
         );
     };
 
     return (
-        <div className={b('preview')}>
+        <DiagnosticCard className={b('preview')}>
             {renderStatus()}
-            {renderFirstLevelIssues()}
-        </div>
+            {renderContent()}
+        </DiagnosticCard>
     );
 };

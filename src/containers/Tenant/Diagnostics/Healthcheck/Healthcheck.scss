@@ -3,6 +3,8 @@
 @import '@gravity-ui/uikit/styles/mixins.scss';
 
 .healthcheck {
+    display: flex;
+
     &_expanded {
         // Since most of the inner containers have fixed width, we can set fixed width here as well
         // Thus we will get rid of unneeded layout shift when scrollbar appear
@@ -17,7 +19,7 @@
         margin-bottom: 15px;
     }
 
-    &__issues-wrapper {
+    &__details-content-wrapper {
         overflow-x: hidden;
         overflow-y: auto;
 
@@ -65,6 +67,17 @@
 
     &__preview-content {
         line-height: 24px;
+    }
+
+    &__issues-statistics {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+
+        margin: 10px 0;
+
+        column-gap: 26px;
+        row-gap: 16px;
     }
 
     &__self-check-status-indicator {

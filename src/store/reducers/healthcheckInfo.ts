@@ -1,17 +1,16 @@
 import _flow from 'lodash/fp/flow';
 import _sortBy from 'lodash/fp/sortBy';
 import _uniqBy from 'lodash/fp/uniqBy';
-import _omit from 'lodash/omit';
 import {createSelector, Selector} from 'reselect';
 import {Reducer} from 'redux';
 
-import {
-    IHealthcheckInfoState,
-    IHealthcheckInfoRootStateSlice,
-    IIssuesTree,
+import type {
     IHealthCheckInfoAction,
+    IHealthcheckInfoRootStateSlice,
+    IHealthcheckInfoState,
+    IIssuesTree,
 } from '../../types/store/healthcheck';
-import {IssueLog, StatusFlag} from '../../types/api/healthcheck';
+import type {IssueLog, StatusFlag} from '../../types/api/healthcheck';
 
 import '../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../utils';
@@ -49,6 +48,8 @@ const healthcheckInfo: Reducer<IHealthcheckInfoState, IHealthCheckInfoAction> = 
                 ...state,
                 error: action.error,
                 loading: false,
+                wasLoaded: true,
+                data: undefined,
             };
         }
 
@@ -110,6 +111,24 @@ const getInvertedConsequencesTree = ({
         : [];
 };
 
+const getIssuesStatistics = (data: IssueLog[]): [StatusFlag, number][] => {
+    const issuesMap = {} as Record<StatusFlag, number>;
+
+    for (const issue of data) {
+        if (!issuesMap[issue.status]) {
+            issuesMap[issue.status] = 0;
+        }
+        issuesMap[issue.status]++;
+    }
+
+    return (Object.entries(issuesMap) as [StatusFlag, number][]).sort(([aStatus], [bStatus]) => {
+        const bPriority = mapStatusToPriority[bStatus] || 0;
+        const aPriority = mapStatusToPriority[aStatus] || 0;
+
+        return aPriority - bPriority;
+    });
+};
+
 const getIssuesLog = (state: IHealthcheckInfoRootStateSlice) =>
     state.healthcheckInfo.data?.issue_log;
 
@@ -121,13 +140,10 @@ export const selectIssuesTrees: Selector<IHealthcheckInfoRootStateSlice, IIssues
         return getInvertedConsequencesTree({data, roots});
     });
 
-export const selectIssuesTreeById: Selector<
+export const selectIssuesStatistics: Selector<
     IHealthcheckInfoRootStateSlice,
-    IIssuesTree | undefined,
-    [string | undefined]
-> = createSelector([selectIssuesTrees, (_, id: string | undefined) => id], (issuesTrees = [], id) =>
-    issuesTrees.find((issuesTree) => issuesTree.id === id),
-);
+    [StatusFlag, number][]
+> = createSelector(getIssuesLog, (issues = []) => getIssuesStatistics(issues));
 
 export function getHealthcheckInfo(database: string) {
     return createApiRequest({

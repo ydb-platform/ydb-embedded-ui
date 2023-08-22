@@ -25,12 +25,9 @@ const b = cn('kv-detailed-overview');
 function DetailedOverview(props: DetailedOverviewProps) {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const [expandedIssueId, setExpandedIssueId] = useState<string>();
-
     const {currentSchemaPath} = useSelector((state: any) => state.schema);
 
-    const openModalHandler = (id: string) => {
-        setExpandedIssueId(id);
+    const openModalHandler = () => {
         setIsModalVisible(true);
     };
 
@@ -41,11 +38,7 @@ function DetailedOverview(props: DetailedOverviewProps) {
     const renderModal = () => {
         return (
             <Modal open={isModalVisible} onClose={closeModalHandler} className={b('modal')}>
-                <Healthcheck
-                    tenant={props.tenantName}
-                    fetchData={false}
-                    expandedIssueId={expandedIssueId}
-                />
+                <Healthcheck tenant={props.tenantName} fetchData={false} />
                 <Button
                     className={b('close-modal-button')}
                     onClick={closeModalHandler}
