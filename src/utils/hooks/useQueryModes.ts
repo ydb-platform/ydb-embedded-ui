@@ -1,6 +1,6 @@
 import type {QueryMode} from '../../types/store/query';
 import {ENABLE_ADDITIONAL_QUERY_MODES, QUERY_INITIAL_MODE_KEY} from '../constants';
-import {isNewQueryMode} from '../query';
+import {QUERY_MODES_TITLES, isNewQueryMode} from '../query';
 import createToast from '../createToast';
 import {useSetting} from './useSetting';
 import i18n from './i18n';
@@ -18,7 +18,9 @@ export const useQueryModes = (): [QueryMode, SetQueryModeIfAvailable] => {
         if (isNewQueryMode(value) && !enableAdditionalQueryModes) {
             createToast({
                 name: 'QueryModeCannotBeSet',
-                title: errorMessage ?? i18n('useQueryModes.queryModeCannotBeSet', {mode: value}),
+                title:
+                    errorMessage ??
+                    i18n('useQueryModes.queryModeCannotBeSet', {mode: QUERY_MODES_TITLES[value]}),
                 type: 'error',
             });
 

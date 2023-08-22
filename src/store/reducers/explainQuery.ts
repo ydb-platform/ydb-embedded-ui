@@ -9,10 +9,10 @@ import type {
     ExplainQueryState,
     PreparedExplainResponse,
 } from '../../types/store/explainQuery';
-import type {QueryRequestParams, QueryMode} from '../../types/store/query';
+import type {QueryRequestParams, QueryMode, QuerySyntax} from '../../types/store/query';
 
 import {preparePlan} from '../../utils/prepareQueryExplain';
-import {parseQueryAPIExplainResponse, parseQueryExplainPlan} from '../../utils/query';
+import {QUERY_SYNTAX, parseQueryAPIExplainResponse, parseQueryExplainPlan} from '../../utils/query';
 import {parseQueryError} from '../../utils/error';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
@@ -103,10 +103,18 @@ interface ExplainQueryParams extends QueryRequestParams {
 }
 
 export const getExplainQuery = ({query, database, mode}: ExplainQueryParams) => {
-    const action: ExplainActions = mode ? `explain-${mode}` : 'explain';
+    let action: ExplainActions = 'explain';
+    let syntax: QuerySyntax = QUERY_SYNTAX.yql;
+
+    if (mode === 'pg') {
+        action = 'explain-query';
+        syntax = QUERY_SYNTAX.pg;
+    } else if (mode) {
+        action = `explain-${mode}`;
+    }
 
     return createApiRequest({
-        request: window.api.getExplainQuery(query, database, action),
+        request: window.api.getExplainQuery(query, database, action, syntax),
         actions: GET_EXPLAIN_QUERY,
         dataHandler: (response): PreparedExplainResponse => {
             const {plan: rawPlan, ast} = parseQueryAPIExplainResponse(response);
