@@ -111,7 +111,7 @@ const getInvertedConsequencesTree = ({
         : [];
 };
 
-const getIssuesMap = (data: IssueLog[]): [StatusFlag, number][] => {
+const getIssuesStatistics = (data: IssueLog[]): [StatusFlag, number][] => {
     const issuesMap = {} as Record<StatusFlag, number>;
 
     for (const issue of data) {
@@ -143,7 +143,7 @@ export const selectIssuesTrees: Selector<IHealthcheckInfoRootStateSlice, IIssues
 export const selectIssuesStatistics: Selector<
     IHealthcheckInfoRootStateSlice,
     [StatusFlag, number][]
-> = createSelector(getIssuesLog, (issues = []) => getIssuesMap(issues));
+> = createSelector(getIssuesLog, (issues = []) => getIssuesStatistics(issues));
 
 export function getHealthcheckInfo(database: string) {
     return createApiRequest({

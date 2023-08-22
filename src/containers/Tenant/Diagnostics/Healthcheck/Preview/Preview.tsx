@@ -8,6 +8,7 @@ import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthc
 import type {IResponseError} from '../../../../../types/api/error';
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
+import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
 import i18n from '../i18n';
 
@@ -27,9 +28,6 @@ export const Preview = (props: PreviewProps) => {
 
     const isStatusOK = selfCheckResult === SelfCheckResult.GOOD;
 
-    if (!issuesStatistics) {
-        return null;
-    }
     const renderStatus = () => {
         const modifier = selfCheckResult.toLowerCase();
 
@@ -48,12 +46,12 @@ export const Preview = (props: PreviewProps) => {
 
     const renderContent = () => {
         if (error) {
-            return <div className={b('error')}>{error.statusText || i18n('no-data')}</div>;
+            return <ResponseError error={error} defaultMessage={i18n('no-data')} />;
         }
 
         return (
             <div className={b('preview-content')}>
-                {isStatusOK ? (
+                {isStatusOK || !issuesStatistics || !issuesStatistics.length ? (
                     i18n('status_message.ok')
                 ) : (
                     <>

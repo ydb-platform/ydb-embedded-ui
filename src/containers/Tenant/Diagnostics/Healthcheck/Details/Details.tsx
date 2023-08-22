@@ -6,6 +6,7 @@ import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
 import type {IResponseError} from '../../../../../types/api/error';
 import type {IIssuesTree} from '../../../../../types/store/healthcheck';
+import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
 import IssueTree from '../IssuesViewer/IssueTree';
 
@@ -38,7 +39,7 @@ export const Details = (props: DetailsProps) => {
 
     const renderContent = () => {
         if (error) {
-            return <div className={b('error')}>{error.statusText || i18n('no-data')}</div>;
+            return <ResponseError error={error} defaultMessage={i18n('no-data')} />;
         }
 
         if (!issueTrees || !issueTrees.length) {
@@ -46,18 +47,18 @@ export const Details = (props: DetailsProps) => {
         }
 
         return (
-            <div className={b('issues-wrapper')}>
+            <>
                 {issueTrees.map((issueTree) => (
                     <IssueTree key={issueTree.id} issueTree={issueTree} />
                 ))}
-            </div>
+            </>
         );
     };
 
     return (
         <div className={b('details')}>
             {renderHealthcheckHeader()}
-            {renderContent()}
+            <div className={b('details-content-wrapper')}>{renderContent()}</div>
         </div>
     );
 };
