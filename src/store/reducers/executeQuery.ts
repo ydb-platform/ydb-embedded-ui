@@ -90,6 +90,8 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
 
         case SAVE_QUERY_TO_HISTORY: {
             const queryText = action.data.queryText;
+
+            // Do not save explicit yql syntax value for easier further support (use yql by default)
             const syntax = action.data.mode === QUERY_MODES.pg ? QUERY_SYNTAX.pg : undefined;
 
             const newQueries = [...state.history.queries, {queryText, syntax}].slice(

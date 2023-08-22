@@ -33,12 +33,13 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const onQueryClick = (query: QueryInHistory) => {
         let isQueryModeSet = true;
 
-        if (query.syntax === QUERY_SYNTAX.pg) {
+        if (query.syntax === QUERY_SYNTAX.pg && queryMode !== QUERY_MODES.pg) {
             isQueryModeSet = setQueryMode(
                 QUERY_MODES.pg,
                 i18n('history.cannot-set-mode', {mode: QUERY_MODES_TITLES[QUERY_MODES.pg]}),
             );
-        } else if (query.syntax === QUERY_SYNTAX.yql && queryMode === QUERY_MODES.pg) {
+        } else if (query.syntax !== QUERY_SYNTAX.pg && queryMode === QUERY_MODES.pg) {
+            // Set query mode for queries with yql syntax
             isQueryModeSet = setQueryMode(QUERY_MODES.script);
         }
 
