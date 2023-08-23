@@ -25,7 +25,6 @@ export const TABLET_STATES = {
     TABLET_VOLATILE_STATE_BOOTING: 'booting',
     TABLET_VOLATILE_STATE_STARTING: 'starting',
     TABLET_VOLATILE_STATE_RUNNING: 'running',
-    TABLET_VOLATILE_STATE_BLOCKED: 'blocked',
 };
 
 export const TABLET_COLORS = {
@@ -81,6 +80,7 @@ export const COLORS_PRIORITY = {
 // ==== Titles ====
 export const DEVELOPER_UI_TITLE = 'Developer UI';
 export const CLUSTER_DEFAULT_TITLE = 'Cluster';
+export const TENANT_DEFAULT_TITLE = 'Database';
 
 // ==== Settings ====
 export const THEME_KEY = 'theme';

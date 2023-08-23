@@ -16,6 +16,7 @@ import {
     setQueryTab,
     setSummaryTab,
     setTenantPage,
+    setDataWasNotLoaded,
 } from './tenant';
 
 export type TenantPage = ValueOf<typeof TENANT_PAGES_IDS>;
@@ -41,4 +42,5 @@ export type TenantAction =
     | ReturnType<typeof setTenantPage>
     | ReturnType<typeof setQueryTab>
     | ReturnType<typeof setDiagnosticsTab>
-    | ReturnType<typeof setSummaryTab>;
+    | ReturnType<typeof setSummaryTab>
+    | ReturnType<typeof setDataWasNotLoaded>;

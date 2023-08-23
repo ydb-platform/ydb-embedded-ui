@@ -4,8 +4,8 @@ import cn from 'bem-cn-lite';
 import './InfoViewer.scss';
 
 export interface InfoViewerItem {
-    label: ReactNode;
-    value: ReactNode;
+    label?: ReactNode;
+    value?: ReactNode;
 }
 
 interface InfoViewerProps {
