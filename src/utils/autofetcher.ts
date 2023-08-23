@@ -1,4 +1,11 @@
 export class AutoFetcher {
+    static DEFAULT_TIMEOUT = 30000;
+    static MIN_TIMEOUT = 30000;
+    timeout: number;
+    active: boolean;
+    timer: undefined | ReturnType<typeof setTimeout>;
+    launchCounter: number;
+
     constructor() {
         this.timeout = AutoFetcher.DEFAULT_TIMEOUT;
         this.active = true;
@@ -52,11 +59,4 @@ export class AutoFetcher {
         this.launchCounter++;
         this.active = true;
     }
-
-    static DEFAULT_TIMEOUT = 30000;
-    static MIN_TIMEOUT = 30000;
-    timeout: number;
-    active: boolean;
-    timer: undefined | ReturnType<typeof setTimeout>;
-    launchCounter: number;
 }
