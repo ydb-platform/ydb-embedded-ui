@@ -18,6 +18,7 @@ export interface SettingProps {
     helpPopoverContent?: ReactNode;
     options?: {value: string; content: string}[];
     defaultValue?: unknown;
+    onValueUpdate?: VoidFunction;
 }
 
 export const Setting = ({
@@ -27,8 +28,14 @@ export const Setting = ({
     helpPopoverContent,
     options,
     defaultValue,
+    onValueUpdate,
 }: SettingProps) => {
     const [settingValue, setValue] = useSetting(settingKey, defaultValue);
+
+    const onUpdate = (value: unknown) => {
+        setValue(value);
+        onValueUpdate?.();
+    };
 
     const renderTitleComponent = (value: ReactNode) => {
         if (helpPopoverContent) {
@@ -48,7 +55,7 @@ export const Setting = ({
     const getSettingsElement = (elementType: SettingsElementType) => {
         switch (elementType) {
             case 'switch': {
-                return <Switch checked={Boolean(settingValue)} onUpdate={setValue} />;
+                return <Switch checked={Boolean(settingValue)} onUpdate={onUpdate} />;
             }
 
             case 'radio': {
@@ -57,7 +64,7 @@ export const Setting = ({
                 }
 
                 return (
-                    <RadioButton value={String(settingValue)} onUpdate={setValue}>
+                    <RadioButton value={String(settingValue)} onUpdate={onUpdate}>
                         {options.map(({value, content}) => {
                             return (
                                 <RadioButton.Option value={value} key={value}>

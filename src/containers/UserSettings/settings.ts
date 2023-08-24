@@ -6,10 +6,12 @@ import flaskIcon from '../../assets/icons/flask.svg';
 import {
     ENABLE_ADDITIONAL_QUERY_MODES,
     INVERTED_DISKS_KEY,
+    LANGUAGE_KEY,
     THEME_KEY,
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
 } from '../../utils/constants';
+import {Lang, defaultLang} from '../../utils/i18n';
 
 import type {SettingProps} from './Setting';
 import i18n from './i18n';
@@ -50,6 +52,29 @@ export const themeSetting: SettingProps = {
     type: 'radio',
     options: themeOptions,
 };
+
+const languageOptions = [
+    {
+        value: Lang.Ru,
+        content: i18n('settings.language.option-russian'),
+    },
+    {
+        value: Lang.En,
+        content: i18n('settings.language.option-english'),
+    },
+];
+
+export const languageSetting: SettingProps = {
+    settingKey: LANGUAGE_KEY,
+    title: i18n('settings.language.title'),
+    type: 'radio',
+    options: languageOptions,
+    defaultValue: defaultLang,
+    onValueUpdate: () => {
+        window.location.reload();
+    },
+};
+
 export const invertedDisksSetting: SettingProps = {
     settingKey: INVERTED_DISKS_KEY,
     title: i18n('settings.invertedDisks.title'),

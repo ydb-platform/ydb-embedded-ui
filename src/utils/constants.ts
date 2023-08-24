@@ -84,6 +84,7 @@ export const TENANT_DEFAULT_TITLE = 'Database';
 
 // ==== Settings ====
 export const THEME_KEY = 'theme';
+export const LANGUAGE_KEY = 'language';
 export const INVERTED_DISKS_KEY = 'invertedDisks';
 export const USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY = 'useNodesEndpointInDiagnostics';
 export const ENABLE_ADDITIONAL_QUERY_MODES = 'enableAdditionalQueryModes';
