@@ -98,7 +98,7 @@ export function TenantOverview({tenantName, additionalTenantInfo}: TenantOvervie
                     status={State}
                     name={Name || TENANT_DEFAULT_TITLE}
                     withLeftTrim
-                    hasClipboardButton={!!tenant}
+                    hasClipboardButton={Boolean(tenant)}
                     clipboardButtonAlwaysVisible
                 />
             </div>
