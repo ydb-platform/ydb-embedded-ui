@@ -19,5 +19,5 @@
   "settings.useBackendParamsForTables.popover": "Добавляет фильтрацию и сортировку таблиц Nodes и Storage с использованием параметров запроса. Может улушить производительность, но на старых версиях может привести к дополнительным запросам и большему времени ожидания загрузки",
 
   "settings.enableAdditionalQueryModes.title": "Включить дополнительные режимы выполнения запросов",
-  "settings.enableAdditionalQueryModes.popover": "Добавляет режимы 'Data' и 'YQL - QueryService'. Может работать некорректно на некоторых версиях"
+  "settings.enableAdditionalQueryModes.popover": "Добавляет режимы 'Data', 'YQL - QueryService' и 'PostgreSQL'. Может работать некорректно на некоторых версиях"
 }
