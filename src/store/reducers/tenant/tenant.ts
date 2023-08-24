@@ -44,6 +44,10 @@ const tenantReducer: Reducer<TenantState, TenantAction> = (state = initialState,
         }
 
         case FETCH_TENANT.FAILURE: {
+            if (action.error?.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error,
@@ -99,7 +103,7 @@ const tenantReducer: Reducer<TenantState, TenantAction> = (state = initialState,
 
 export const getTenantInfo = ({path}: {path: string}) => {
     return createApiRequest({
-        request: window.api.getTenantInfo({path}),
+        request: window.api.getTenantInfo({path}, {concurrentId: 'getTenantInfo'}),
         actions: FETCH_TENANT,
         dataHandler: (tenantData): TTenant | undefined => {
             return tenantData.TenantInfo?.[0];

@@ -24,7 +24,7 @@ const filterTenantsByProblems = (tenants: PreparedTenant[], problemFilter: Probl
 const filteredTenantsBySearch = (tenants: PreparedTenant[], searchQuery: string) => {
     return tenants.filter((item) => {
         const re = new RegExp(escapeRegExp(searchQuery), 'i');
-        return re.test(item.Name) || re.test(item.controlPlaneName);
+        return re.test(item.Name || '') || re.test(item.controlPlaneName);
     });
 };
 

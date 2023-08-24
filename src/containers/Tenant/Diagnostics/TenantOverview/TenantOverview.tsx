@@ -8,14 +8,15 @@ import {InfoViewer} from '../../../../components/InfoViewer';
 import {PoolUsage} from '../../../../components/PoolUsage/PoolUsage';
 import {Tablet} from '../../../../components/Tablet';
 import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
-import type {TTenant} from '../../../../types/api/tenant';
 import {formatCPU} from '../../../../utils';
 import {TABLET_STATES, TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {bytesToGB} from '../../../../utils/utils';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {ETabletVolatileState} from '../../../../types/api/tenant';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
 
+import i18n from './i18n';
 import './TenantOverview.scss';
 
 const b = cn('tenant-overview');
@@ -39,13 +40,7 @@ export function TenantOverview({tenantName, additionalTenantInfo}: TenantOvervie
         [dispatch, tenantName],
     );
 
-    useAutofetcher(
-        (isBackground) => {
-            fetchTenant(isBackground);
-        },
-        [fetchTenant],
-        autorefresh,
-    );
+    useAutofetcher(fetchTenant, [fetchTenant], autorefresh);
 
     const {
         Metrics = {},
@@ -53,6 +48,7 @@ export function TenantOverview({tenantName, additionalTenantInfo}: TenantOvervie
         StateStats = [],
         MemoryUsed,
         Name,
+        State,
         CoresUsed,
         StorageGroups,
         StorageAllocatedSize,
@@ -63,14 +59,15 @@ export function TenantOverview({tenantName, additionalTenantInfo}: TenantOvervie
     const tenantType = mapDatabaseTypeToDBName(Type);
     const memoryRaw = MemoryUsed ?? Metrics.Memory;
 
-    const memory = (memoryRaw && bytesToGB(memoryRaw)) || 'no data';
-    const storage = (Metrics.Storage && bytesToGB(Metrics.Storage)) || 'no data';
-    const storageGroups = StorageGroups ?? 'no data';
-    const blobStorage = (StorageAllocatedSize && bytesToGB(StorageAllocatedSize)) || 'no data';
+    const memory = (memoryRaw && bytesToGB(memoryRaw)) || i18n('no-data');
+    const storage = (Metrics.Storage && bytesToGB(Metrics.Storage)) || i18n('no-data');
+    const storageGroups = StorageGroups ?? i18n('no-data');
+    const blobStorage =
+        (StorageAllocatedSize && bytesToGB(StorageAllocatedSize)) || i18n('no-data');
     const storageEfficiency =
         Metrics.Storage && StorageAllocatedSize
             ? `${((parseInt(Metrics.Storage) * 100) / parseInt(StorageAllocatedSize)).toFixed(2)}%`
-            : 'no data';
+            : i18n('no-data');
 
     const cpuRaw = CoresUsed !== undefined ? Number(CoresUsed) * 1_000_000 : Metrics.CPU;
 
@@ -86,21 +83,22 @@ export function TenantOverview({tenantName, additionalTenantInfo}: TenantOvervie
         {label: 'Storage efficiency', value: storageEfficiency},
     ];
 
-    const tabletsInfo = StateStats.map((info) => {
-        if (info.VolatileState)
-            return {label: TABLET_STATES[info.VolatileState], value: info.Count};
-        return {};
+    const tabletsInfo = StateStats.filter(
+        (item): item is {VolatileState: ETabletVolatileState; Count: number} => {
+            return item.VolatileState !== undefined && item.Count !== undefined;
+        },
+    ).map((info) => {
+        return {label: TABLET_STATES[info.VolatileState], value: info.Count};
     });
 
-    const renderName = (tenant?: TTenant) => {
-        const {Name = TENANT_DEFAULT_TITLE, State} = tenant || {};
+    const renderName = () => {
         return (
             <div className={b('tenant-name-wrapper')}>
                 <EntityStatus
                     status={State}
-                    name={Name}
+                    name={Name || TENANT_DEFAULT_TITLE}
                     withLeftTrim
-                    hasClipboardButton={tenant}
+                    hasClipboardButton={!!tenant}
                     clipboardButtonAlwaysVisible
                 />
             </div>
@@ -119,7 +117,7 @@ export function TenantOverview({tenantName, additionalTenantInfo}: TenantOvervie
         <div className={b()}>
             <div className={b('top-label')}>{tenantType}</div>
             <div className={b('top')}>
-                {renderName(tenant)}
+                {renderName()}
                 {tenant && additionalTenantInfo && additionalTenantInfo(tenant.Name, tenant.Type)}
             </div>
             <div className={b('system-tablets')}>
@@ -130,7 +128,7 @@ export function TenantOverview({tenantName, additionalTenantInfo}: TenantOvervie
             </div>
             <div className={b('common-info')}>
                 <div>
-                    <div className={b('section-title')}>Pools</div>
+                    <div className={b('section-title')}>{i18n('title.pools')}</div>
                     {PoolStats ? (
                         <div className={b('section', {pools: true})}>
                             {PoolStats.map((pool, poolIndex) => (
@@ -138,11 +136,11 @@ export function TenantOverview({tenantName, additionalTenantInfo}: TenantOvervie
                             ))}
                         </div>
                     ) : (
-                        <div className="error">no pools data</div>
+                        <div className="error">{i18n('no-pools-data')}</div>
                     )}
                 </div>
                 <InfoViewer
-                    title="Metrics"
+                    title={i18n('title.metrics')}
                     className={b('section', {metrics: true})}
                     info={metricsInfo}
                 />
