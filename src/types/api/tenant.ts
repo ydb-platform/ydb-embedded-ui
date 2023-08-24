@@ -22,38 +22,38 @@ export interface TTenantInfo {
 }
 
 export interface TTenant {
-    Name: string;
-    Id: string;
-    Type: ETenantType;
-    State: State;
+    Name?: string;
+    Id?: string;
+    Type?: ETenantType;
+    State?: State;
     StateStats?: THiveDomainStatsStateCount[];
-    Metrics: TMetrics;
+    Metrics?: TMetrics;
     NodeIds?: number[];
-    AliveNodes: number;
-    Resources: TTenantResources;
+    AliveNodes?: number;
+    Resources?: TTenantResources;
     /** uint64 */
-    CreateTime: string;
-    Owner: string;
+    CreateTime?: string;
+    Owner?: string;
     Users?: string[];
     PoolStats?: TPoolStats[];
-    UserAttributes: Record<string, string>;
-    Overall: EFlag;
+    UserAttributes?: Record<string, string>;
+    Overall?: EFlag;
     SystemTablets?: TTabletStateInfo[];
-    ResourceId: string;
+    ResourceId?: string;
     Tablets?: TTabletStateInfo[];
     /** uint64 */
-    StorageAllocatedSize: string;
+    StorageAllocatedSize?: string;
     /** uint64 */
-    StorageMinAvailableSize: string;
+    StorageMinAvailableSize?: string;
     Nodes?: TSystemStateInfo[];
     /** uint64 */
-    MemoryUsed: string;
+    MemoryUsed?: string;
     /** uint64 */
-    MemoryLimit: string;
+    MemoryLimit?: string;
     /** double */
-    CoresUsed: number;
+    CoresUsed?: number;
     /** uint64 */
-    StorageGroups: string;
+    StorageGroups?: string;
 
     MonitoringEndpoint?: string; // additional
     ControlPlane?: ControlPlane; // additional
@@ -139,11 +139,10 @@ enum State {
     'CONFIGURING' = 'CONFIGURING',
 }
 
-enum ETabletVolatileState {
+export enum ETabletVolatileState {
     'TABLET_VOLATILE_STATE_UNKNOWN' = 'TABLET_VOLATILE_STATE_UNKNOWN',
     'TABLET_VOLATILE_STATE_STOPPED' = 'TABLET_VOLATILE_STATE_STOPPED',
     'TABLET_VOLATILE_STATE_BOOTING' = 'TABLET_VOLATILE_STATE_BOOTING',
     'TABLET_VOLATILE_STATE_STARTING' = 'TABLET_VOLATILE_STATE_STARTING',
     'TABLET_VOLATILE_STATE_RUNNING' = 'TABLET_VOLATILE_STATE_RUNNING',
-    '_TABLET_VOLATILE_STATE_BLOCKED' = '_TABLET_VOLATILE_STATE_BLOCKED',
 }

@@ -2,8 +2,8 @@ import type {TTenant} from '../../../types/api/tenant';
 import {isNumeric} from '../../../utils/utils';
 
 const getControlPlaneValue = (tenant: TTenant) => {
-    const parts = tenant.Name.split('/');
-    const defaultValue = parts.length ? parts[parts.length - 1] : '—';
+    const parts = tenant.Name?.split('/');
+    const defaultValue = parts?.length ? parts[parts.length - 1] : '—';
     const controlPlaneName = tenant.ControlPlane?.name;
 
     return controlPlaneName ?? defaultValue;

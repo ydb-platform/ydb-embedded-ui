@@ -20,6 +20,7 @@ const SET_QUERY_TAB = 'tenant/SET_QUERY_TAB';
 const SET_DIAGNOSTICS_TAB = 'tenant/SET_DIAGNOSTICS_TAB';
 const SET_SUMMARY_TAB = 'tenant/SET_SUMMARY_TAB';
 const CLEAR_TENANT = 'tenant/CLEAR_TENANT';
+const SET_DATA_WAS_NOT_LOADED = 'tenant/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {loading: false, wasLoaded: false};
 
@@ -43,6 +44,10 @@ const tenantReducer: Reducer<TenantState, TenantAction> = (state = initialState,
         }
 
         case FETCH_TENANT.FAILURE: {
+            if (action.error?.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error,
@@ -84,6 +89,13 @@ const tenantReducer: Reducer<TenantState, TenantAction> = (state = initialState,
             };
         }
 
+        case SET_DATA_WAS_NOT_LOADED: {
+            return {
+                ...state,
+                wasLoaded: false,
+            };
+        }
+
         default:
             return state;
     }
@@ -91,7 +103,7 @@ const tenantReducer: Reducer<TenantState, TenantAction> = (state = initialState,
 
 export const getTenantInfo = ({path}: {path: string}) => {
     return createApiRequest({
-        request: window.api.getTenantInfo({path}),
+        request: window.api.getTenantInfo({path}, {concurrentId: 'getTenantInfo'}),
         actions: FETCH_TENANT,
         dataHandler: (tenantData): TTenant | undefined => {
             return tenantData.TenantInfo?.[0];
@@ -130,5 +142,11 @@ export function setSummaryTab(tab: TenantSummaryTab) {
         data: tab,
     } as const;
 }
+
+export const setDataWasNotLoaded = () => {
+    return {
+        type: SET_DATA_WAS_NOT_LOADED,
+    } as const;
+};
 
 export default tenantReducer;
