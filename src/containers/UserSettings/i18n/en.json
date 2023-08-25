@@ -10,6 +10,10 @@
   "settings.theme.option-light": "Light",
   "settings.theme.option-system": "System",
 
+  "settings.language.title": "Interface language",
+  "settings.language.option-russian": "Russian",
+  "settings.language.option-english": "English",
+
   "settings.invertedDisks.title": "Inverted disks space indicators",
 
   "settings.useNodesEndpoint.title": "Break the Nodes tab in Diagnostics",

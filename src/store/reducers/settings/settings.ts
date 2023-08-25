@@ -14,10 +14,12 @@ import {
     CLUSTER_INFO_HIDDEN_KEY,
     LAST_USED_QUERY_ACTION_KEY,
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
+    LANGUAGE_KEY,
 } from '../../../utils/constants';
 import '../../../services/api';
-import {getValueFromLS, parseJson} from '../../../utils/utils';
+import {parseJson} from '../../../utils/utils';
 import {QUERY_ACTIONS, QUERY_MODES} from '../../../utils/query';
+import {readSavedSettingsValue, systemSettings, userSettings} from '../../../utils/settings';
 
 import {TENANT_PAGES_IDS} from '../tenant/constants';
 
@@ -38,20 +40,12 @@ export const ProblemFilterValues = {
     PROBLEMS: 'With problems',
 } as const;
 
-const userSettings = window.userSettings || {};
-const systemSettings = window.systemSettings || {};
-
-export function readSavedSettingsValue(key: string, defaultValue?: string) {
-    const savedValue = window.web_version ? userSettings[key] : getValueFromLS(key);
-
-    return savedValue ?? defaultValue;
-}
-
 export const initialState = {
     problemFilter: ProblemFilterValues.ALL,
     userSettings: {
         ...userSettings,
         [THEME_KEY]: readSavedSettingsValue(THEME_KEY, 'system'),
+        [LANGUAGE_KEY]: readSavedSettingsValue(LANGUAGE_KEY),
         [INVERTED_DISKS_KEY]: readSavedSettingsValue(INVERTED_DISKS_KEY, 'false'),
         [USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY]: readSavedSettingsValue(
             USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
