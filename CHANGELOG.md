@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.15.1...v4.16.0) (2023-08-25)
+
+
+### Features
+
+* add language setting ([#520](https://github.com/ydb-platform/ydb-embedded-ui/issues/520)) ([425c9ae](https://github.com/ydb-platform/ydb-embedded-ui/commit/425c9ae1fed83d7695d2a9288c2ef24c2807d8da))
+* **Diagnostics:** update Healthcheck design ([#509](https://github.com/ydb-platform/ydb-embedded-ui/issues/509)) ([e315ca4](https://github.com/ydb-platform/ydb-embedded-ui/commit/e315ca42ac6c9d1736aaa25e2dd90afc2bcb9a8e))
+* **Query:** support PostgreSQL syntax ([#515](https://github.com/ydb-platform/ydb-embedded-ui/issues/515)) ([0c8346e](https://github.com/ydb-platform/ydb-embedded-ui/commit/0c8346efc3643a8d201137901880f985dc100458))
+
+
+### Bug Fixes
+
+* **UserSettings:** update query mode setting description ([#521](https://github.com/ydb-platform/ydb-embedded-ui/issues/521)) ([c526471](https://github.com/ydb-platform/ydb-embedded-ui/commit/c52647192ff95d8fb9961479a85cc4d5a639d4e6))
+
 ## [4.15.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.15.0...v4.15.1) (2023-08-21)
 
 
