@@ -26,7 +26,7 @@ import {
     useNodesRequestParams,
     useTableSort,
 } from '../../utils/hooks';
-import {AdditionalNodesInfo, isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
+import {isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
 
 import {
     getNodes,
@@ -39,6 +39,7 @@ import {
 } from '../../store/reducers/nodes/nodes';
 import {selectFilteredNodes} from '../../store/reducers/nodes/selectors';
 import {changeFilter, ProblemFilterValues} from '../../store/reducers/settings/settings';
+import type {AdditionalNodesProps} from '../../types/additionalProps';
 
 import {isDatabaseEntityType} from '../Tenant/utils/schema';
 
@@ -53,7 +54,7 @@ const b = cn('ydb-nodes');
 interface NodesProps {
     path?: string;
     type?: EPathType;
-    additionalNodesInfo?: AdditionalNodesInfo;
+    additionalNodesInfo?: AdditionalNodesProps;
 }
 
 export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {

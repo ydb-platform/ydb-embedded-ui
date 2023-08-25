@@ -10,8 +10,8 @@ import type {
     AdditionalClusterProps,
     AdditionalTenantsProps,
     AdditionalVersionsProps,
+    AdditionalNodesProps,
 } from '../../types/additionalProps';
-import type {AdditionalNodesInfo} from '../../utils/nodes';
 import routes from '../../routes';
 
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
@@ -35,7 +35,7 @@ const b = cn('cluster');
 
 interface ClusterProps {
     additionalTenantsProps?: AdditionalTenantsProps;
-    additionalNodesInfo?: AdditionalNodesInfo;
+    additionalNodesInfo?: AdditionalNodesProps;
     additionalClusterProps?: AdditionalClusterProps;
     additionalVersionsProps?: AdditionalVersionsProps;
 }

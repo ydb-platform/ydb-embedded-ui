@@ -3,8 +3,9 @@ import block from 'bem-cn-lite';
 import {Button, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {NodeAddress} from '../../types/additionalProps';
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
-import {isUnavailableNode, NodeAddress} from '../../utils/nodes';
+import {isUnavailableNode} from '../../utils/nodes';
 
 import EntityStatus from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';

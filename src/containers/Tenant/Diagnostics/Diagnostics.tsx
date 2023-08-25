@@ -8,6 +8,7 @@ import {useLocation} from 'react-router';
 import {Switch, Tabs} from '@gravity-ui/uikit';
 
 import type {EPathType} from '../../../types/api/schema';
+import type {AdditionalTenantsProps, AdditionalNodesProps} from '../../../types/additionalProps';
 
 import {useTypedSelector} from '../../../utils/hooks';
 import routes, {createHref} from '../../../routes';
@@ -41,8 +42,8 @@ import './Diagnostics.scss';
 
 interface DiagnosticsProps {
     type?: EPathType;
-    additionalTenantInfo?: any;
-    additionalNodesInfo?: any;
+    additionalTenantInfo?: AdditionalTenantsProps;
+    additionalNodesInfo?: AdditionalNodesProps;
 }
 
 const b = cn('kv-tenant-diagnostics');

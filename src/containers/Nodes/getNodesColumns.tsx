@@ -6,10 +6,12 @@ import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
 
-import {isSortableNodesProperty, type NodeAddress} from '../../utils/nodes';
+import {isSortableNodesProperty} from '../../utils/nodes';
 import {formatBytesToGigabyte} from '../../utils/index';
 
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+
+import type {NodeAddress} from '../../types/additionalProps';
 
 const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',

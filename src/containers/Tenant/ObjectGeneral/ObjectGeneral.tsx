@@ -4,6 +4,7 @@ import cn from 'bem-cn-lite';
 import {useThemeValue} from '@gravity-ui/uikit';
 
 import type {EPathType} from '../../../types/api/schema';
+import type {AdditionalTenantsProps, AdditionalNodesProps} from '../../../types/additionalProps';
 import {TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import {useSetting} from '../../../utils/hooks';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
@@ -18,8 +19,8 @@ const b = cn('object-general');
 
 interface ObjectGeneralProps {
     type?: EPathType;
-    additionalTenantInfo?: any;
-    additionalNodesInfo?: any;
+    additionalTenantInfo?: AdditionalTenantsProps;
+    additionalNodesInfo?: AdditionalNodesProps;
 }
 
 function ObjectGeneral(props: ObjectGeneralProps) {

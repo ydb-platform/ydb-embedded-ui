@@ -1,7 +1,7 @@
 import cn from 'bem-cn-lite';
 
 import type {TSystemStateInfo} from '../../types/api/nodes';
-import type {AdditionalNodesInfo} from '../../utils/nodes';
+import type {AdditionalNodesProps} from '../../types/additionalProps';
 
 import EntityStatus from '../EntityStatus/EntityStatus';
 import {Tags} from '../Tags';
@@ -13,7 +13,7 @@ const b = cn('basic-node-viewer');
 
 interface BasicNodeViewerProps {
     node: TSystemStateInfo;
-    additionalNodesInfo?: AdditionalNodesInfo;
+    additionalNodesInfo?: AdditionalNodesProps;
     className?: string;
 }
 

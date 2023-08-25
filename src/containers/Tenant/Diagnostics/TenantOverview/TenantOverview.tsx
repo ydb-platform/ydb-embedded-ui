@@ -13,7 +13,8 @@ import {TABLET_STATES, TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {bytesToGB} from '../../../../utils/utils';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
-import {ETabletVolatileState} from '../../../../types/api/tenant';
+import type {ETabletVolatileState} from '../../../../types/api/tenant';
+import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
 
 import i18n from './i18n';
@@ -23,7 +24,7 @@ const b = cn('tenant-overview');
 
 interface TenantOverviewProps {
     tenantName: string;
-    additionalTenantInfo?: any;
+    additionalTenantInfo?: AdditionalTenantsProps;
 }
 
 export function TenantOverview({tenantName, additionalTenantInfo}: TenantOverviewProps) {
@@ -118,7 +119,7 @@ export function TenantOverview({tenantName, additionalTenantInfo}: TenantOvervie
             <div className={b('top-label')}>{tenantType}</div>
             <div className={b('top')}>
                 {renderName()}
-                {tenant && additionalTenantInfo && additionalTenantInfo(tenant.Name, tenant.Type)}
+                {additionalTenantInfo?.getMonitoringLink?.(Name, Type)}
             </div>
             <div className={b('system-tablets')}>
                 {SystemTablets &&

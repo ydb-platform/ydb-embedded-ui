@@ -27,7 +27,7 @@ interface PDiskProps {
     unfolded?: boolean;
     id: string;
     selectedVdiskId?: string;
-    nodeHref?: string;
+    nodeHref?: string | null;
 }
 
 enum VDiskTableColumnsIds {
@@ -62,7 +62,7 @@ function getColumns({
 }: {
     pDiskId: number;
     selectedVdiskId?: string;
-    nodeHref?: string;
+    nodeHref?: string | null;
 }) {
     const columns: Column<RowType>[] = [
         {
