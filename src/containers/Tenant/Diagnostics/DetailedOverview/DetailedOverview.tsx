@@ -17,7 +17,7 @@ interface DetailedOverviewProps {
     type?: EPathType;
     className?: string;
     tenantName: string;
-    additionalTenantInfo?: AdditionalTenantsProps;
+    additionalTenantProps?: AdditionalTenantsProps;
 }
 
 const b = cn('kv-detailed-overview');
@@ -52,7 +52,7 @@ function DetailedOverview(props: DetailedOverviewProps) {
     };
 
     const renderContent = () => {
-        const {type, tenantName, additionalTenantInfo} = props;
+        const {type, tenantName, additionalTenantProps} = props;
         const isTenant = tenantName === currentSchemaPath;
         return (
             <div className={b()}>
@@ -61,7 +61,7 @@ function DetailedOverview(props: DetailedOverviewProps) {
                         <div className={b('section')}>
                             <TenantOverview
                                 tenantName={tenantName}
-                                additionalTenantInfo={additionalTenantInfo}
+                                additionalTenantProps={additionalTenantProps}
                             />
                         </div>
                         <div className={b('section')}>

@@ -19,7 +19,7 @@ const b = cn('object-general');
 
 interface ObjectGeneralProps {
     type?: EPathType;
-    additionalTenantInfo?: AdditionalTenantsProps;
+    additionalTenantProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
@@ -33,7 +33,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
     const {name: tenantName, tenantPage = initialPage} = queryParams;
 
     const renderTabContent = () => {
-        const {type, additionalTenantInfo, additionalNodesProps} = props;
+        const {type, additionalTenantProps, additionalNodesProps} = props;
         switch (tenantPage) {
             case TENANT_PAGES_IDS.query: {
                 return <Query path={tenantName as string} theme={theme} type={type} />;
@@ -42,7 +42,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
                 return (
                     <Diagnostics
                         type={type}
-                        additionalTenantInfo={additionalTenantInfo}
+                        additionalTenantProps={additionalTenantProps}
                         additionalNodesProps={additionalNodesProps}
                     />
                 );

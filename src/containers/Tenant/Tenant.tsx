@@ -38,7 +38,7 @@ const initialTenantSummaryState = {
 };
 
 interface TenantProps {
-    additionalTenantInfo?: AdditionalTenantsProps;
+    additionalTenantProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
@@ -125,8 +125,8 @@ function Tenant(props: TenantProps) {
                     />
                     <ObjectGeneral
                         type={preloadedPathType || currentPathType}
-                        additionalTenantInfo={props.additionalTenantInfo}
-                        additionalNodesInfo={props.additionalNodesInfo}
+                        additionalTenantProps={props.additionalTenantProps}
+                        additionalNodesProps={props.additionalNodesProps}
                     />
                 </SplitPane>
             )}

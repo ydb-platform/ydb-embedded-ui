@@ -42,7 +42,7 @@ import './Diagnostics.scss';
 
 interface DiagnosticsProps {
     type?: EPathType;
-    additionalTenantInfo?: AdditionalTenantsProps;
+    additionalTenantProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
@@ -108,7 +108,7 @@ function Diagnostics(props: DiagnosticsProps) {
                     <DetailedOverview
                         type={type}
                         tenantName={tenantNameString}
-                        additionalTenantInfo={props.additionalTenantInfo}
+                        additionalTenantProps={props.additionalTenantProps}
                     />
                 );
             }
