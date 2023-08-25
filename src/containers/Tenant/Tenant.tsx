@@ -39,7 +39,7 @@ const initialTenantSummaryState = {
 
 interface TenantProps {
     additionalTenantInfo?: AdditionalTenantsProps;
-    additionalNodesInfo?: AdditionalNodesProps;
+    additionalNodesProps?: AdditionalNodesProps;
 }
 
 function Tenant(props: TenantProps) {

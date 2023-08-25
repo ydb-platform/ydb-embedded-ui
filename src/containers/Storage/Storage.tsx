@@ -60,12 +60,12 @@ import './Storage.scss';
 const b = cn('global-storage');
 
 interface StorageProps {
-    additionalNodesInfo?: AdditionalNodesProps;
+    additionalNodesProps?: AdditionalNodesProps;
     tenant?: string;
     nodeId?: string;
 }
 
-export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => {
+export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) => {
     const dispatch = useDispatch();
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
@@ -189,7 +189,7 @@ export const Storage = ({additionalNodesInfo, tenant, nodeId}: StorageProps) => 
                         data={storageNodes}
                         tableSettings={DEFAULT_TABLE_SETTINGS}
                         onShowAll={handleShowAllNodes}
-                        additionalNodesInfo={additionalNodesInfo}
+                        additionalNodesProps={additionalNodesProps}
                         sort={nodesSort}
                         handleSort={handleNodesSort}
                     />

@@ -35,7 +35,7 @@ const b = cn('cluster');
 
 interface ClusterProps {
     additionalTenantsProps?: AdditionalTenantsProps;
-    additionalNodesInfo?: AdditionalNodesProps;
+    additionalNodesProps?: AdditionalNodesProps;
     additionalClusterProps?: AdditionalClusterProps;
     additionalVersionsProps?: AdditionalVersionsProps;
 }
@@ -43,7 +43,7 @@ interface ClusterProps {
 function Cluster({
     additionalClusterProps,
     additionalTenantsProps,
-    additionalNodesInfo,
+    additionalNodesProps,
     additionalVersionsProps,
 }: ClusterProps) {
     const dispatch = useDispatch();
@@ -104,10 +104,10 @@ function Cluster({
                 return <Tenants additionalTenantsProps={additionalTenantsProps} />;
             }
             case clusterTabsIds.nodes: {
-                return <Nodes additionalNodesInfo={additionalNodesInfo} />;
+                return <Nodes additionalNodesProps={additionalNodesProps} />;
             }
             case clusterTabsIds.storage: {
-                return <Storage additionalNodesInfo={additionalNodesInfo} />;
+                return <Storage additionalNodesProps={additionalNodesProps} />;
             }
             case clusterTabsIds.versions: {
                 return <Versions versionToColor={versionToColor} />;
