@@ -5,6 +5,7 @@ import cn from 'bem-cn-lite';
 import {Button, Modal} from '@gravity-ui/uikit';
 
 import type {EPathType} from '../../../../types/api/schema';
+import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {Icon} from '../../../../components/Icon';
 import Overview from '../Overview/Overview';
 import {Healthcheck} from '../Healthcheck';
@@ -16,7 +17,7 @@ interface DetailedOverviewProps {
     type?: EPathType;
     className?: string;
     tenantName: string;
-    additionalTenantInfo?: any;
+    additionalTenantInfo?: AdditionalTenantsProps;
 }
 
 const b = cn('kv-detailed-overview');

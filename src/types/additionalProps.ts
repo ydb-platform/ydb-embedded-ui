@@ -20,5 +20,5 @@ export interface AdditionalClusterProps {
 
 export interface AdditionalTenantsProps {
     prepareTenantBackend?: (backend: string | undefined) => string | undefined;
-    getMonitoringLink?: (name: string, type: ETenantType) => ReactNode;
+    getMonitoringLink?: (name?: string, type?: ETenantType) => ReactNode;
 }

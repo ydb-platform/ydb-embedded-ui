@@ -13,6 +13,8 @@ import {selectNodeStructure} from '../../../store/reducers/node/selectors';
 import {AutoFetcher} from '../../../utils/autofetcher';
 import {useTypedSelector} from '../../../utils/hooks';
 
+import type {AdditionalNodesInfo} from '../../../utils/nodes';
+
 import {PDisk} from './Pdisk';
 
 import './NodeStructure.scss';
@@ -30,7 +32,7 @@ function generateId({type, id}: {type: 'pdisk' | 'vdisk'; id: string}) {
 interface NodeStructureProps {
     nodeId: string;
     className?: string;
-    additionalNodesInfo?: any;
+    additionalNodesInfo?: AdditionalNodesInfo;
 }
 
 const autofetcher = new AutoFetcher();

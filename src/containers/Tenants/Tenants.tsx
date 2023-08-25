@@ -106,9 +106,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                                     backend,
                                 })}
                             />
-                            {row.Name &&
-                                row.Type &&
-                                additionalTenantsProps?.getMonitoringLink?.(row.Name, row.Type)}
+                            {additionalTenantsProps?.getMonitoringLink?.(row.Name, row.Type)}
                         </div>
                     );
                 },
