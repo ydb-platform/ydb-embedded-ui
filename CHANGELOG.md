@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.16.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.16.0...v4.16.1) (2023-08-25)
+
+
+### Bug Fixes
+
+* fix types for external props ([#522](https://github.com/ydb-platform/ydb-embedded-ui/issues/522)) ([173081f](https://github.com/ydb-platform/ydb-embedded-ui/commit/173081f2f0d2814b2311757988d91fbffc2a509f))
+
 ## [4.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.15.1...v4.16.0) (2023-08-25)
 
 
