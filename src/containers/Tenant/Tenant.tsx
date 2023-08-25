@@ -5,8 +5,7 @@ import {useLocation} from 'react-router';
 import qs from 'qs';
 
 import type {TEvDescribeSchemeResult} from '../../types/api/schema';
-import type {AdditionalTenantsProps} from '../../types/additionalProps';
-import type {AdditionalNodesInfo} from '../../utils/nodes';
+import type {AdditionalTenantsProps, AdditionalNodesProps} from '../../types/additionalProps';
 
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedSelector} from '../../utils/hooks';
@@ -40,7 +39,7 @@ const initialTenantSummaryState = {
 
 interface TenantProps {
     additionalTenantInfo?: AdditionalTenantsProps;
-    additionalNodesInfo?: AdditionalNodesInfo;
+    additionalNodesInfo?: AdditionalNodesProps;
 }
 
 function Tenant(props: TenantProps) {

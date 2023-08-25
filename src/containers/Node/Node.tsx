@@ -21,7 +21,7 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {AutoFetcher} from '../../utils/autofetcher';
 import {useTypedSelector} from '../../utils/hooks';
 
-import type {AdditionalNodesInfo} from '../../utils/nodes';
+import type {AdditionalNodesProps} from '../../types/additionalProps';
 
 import {clusterTabsIds} from '../Cluster/utils';
 
@@ -34,7 +34,7 @@ export const STORAGE_ROLE = 'Storage';
 const autofetcher = new AutoFetcher();
 
 interface NodeProps {
-    additionalNodesInfo?: AdditionalNodesInfo;
+    additionalNodesInfo?: AdditionalNodesProps;
     className?: string;
 }
 

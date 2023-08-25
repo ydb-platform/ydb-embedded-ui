@@ -5,10 +5,10 @@ import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-tab
 import type {ValueOf} from '../../../types/common';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {HandleSort} from '../../../utils/hooks/useTableSort';
+import type {AdditionalNodesProps} from '../../../types/additionalProps';
 
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {
-    AdditionalNodesInfo,
     isSortableNodesProperty,
     isUnavailableNode,
     NodesUptimeFilterValues,
@@ -40,7 +40,7 @@ interface StorageNodesProps {
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: keyof typeof NodesUptimeFilterValues;
     onShowAll?: VoidFunction;
-    additionalNodesInfo?: AdditionalNodesInfo;
+    additionalNodesInfo?: AdditionalNodesProps;
     sort?: SortOrder;
     handleSort?: HandleSort;
 }

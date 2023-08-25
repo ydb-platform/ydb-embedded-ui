@@ -15,6 +15,7 @@ import type {
     VisibleEntities,
 } from '../../store/reducers/storage/types';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
+import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {
     setInitialState,
     setVisibleEntities,
@@ -45,7 +46,7 @@ import {
     useTableSort,
     useTypedSelector,
 } from '../../utils/hooks';
-import {AdditionalNodesInfo, NodesUptimeFilterValues} from '../../utils/nodes';
+import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 
 import {StorageGroups} from './StorageGroups/StorageGroups';
@@ -59,7 +60,7 @@ import './Storage.scss';
 const b = cn('global-storage');
 
 interface StorageProps {
-    additionalNodesInfo?: AdditionalNodesInfo;
+    additionalNodesInfo?: AdditionalNodesProps;
     tenant?: string;
     nodeId?: string;
 }
