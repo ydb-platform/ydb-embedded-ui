@@ -13,13 +13,13 @@ const b = cn('basic-node-viewer');
 
 interface BasicNodeViewerProps {
     node: TSystemStateInfo;
-    additionalNodesInfo?: AdditionalNodesProps;
+    additionalNodesProps?: AdditionalNodesProps;
     className?: string;
 }
 
-export const BasicNodeViewer = ({node, additionalNodesInfo, className}: BasicNodeViewerProps) => {
-    const nodeHref = additionalNodesInfo?.getNodeRef
-        ? additionalNodesInfo.getNodeRef(node) + 'internal'
+export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNodeViewerProps) => {
+    const nodeHref = additionalNodesProps?.getNodeRef
+        ? additionalNodesProps.getNodeRef(node) + 'internal'
         : undefined;
 
     return (

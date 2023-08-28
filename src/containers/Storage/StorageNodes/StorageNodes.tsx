@@ -40,7 +40,7 @@ interface StorageNodesProps {
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: keyof typeof NodesUptimeFilterValues;
     onShowAll?: VoidFunction;
-    additionalNodesInfo?: AdditionalNodesProps;
+    additionalNodesProps?: AdditionalNodesProps;
     sort?: SortOrder;
     handleSort?: HandleSort;
 }
@@ -63,11 +63,11 @@ export function StorageNodes({
     visibleEntities,
     onShowAll,
     nodesUptimeFilter,
-    additionalNodesInfo,
+    additionalNodesProps,
     sort,
     handleSort,
 }: StorageNodesProps) {
-    const getNodeRef = additionalNodesInfo?.getNodeRef;
+    const getNodeRef = additionalNodesProps?.getNodeRef;
 
     const rawColumns: Column<PreparedStorageNode>[] = [
         {

@@ -24,10 +24,10 @@ const b = cn('tenant-overview');
 
 interface TenantOverviewProps {
     tenantName: string;
-    additionalTenantInfo?: AdditionalTenantsProps;
+    additionalTenantProps?: AdditionalTenantsProps;
 }
 
-export function TenantOverview({tenantName, additionalTenantInfo}: TenantOverviewProps) {
+export function TenantOverview({tenantName, additionalTenantProps}: TenantOverviewProps) {
     const {tenant, loading, wasLoaded} = useTypedSelector((state) => state.tenant);
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const dispatch = useDispatch();
@@ -119,7 +119,7 @@ export function TenantOverview({tenantName, additionalTenantInfo}: TenantOvervie
             <div className={b('top-label')}>{tenantType}</div>
             <div className={b('top')}>
                 {renderName()}
-                {additionalTenantInfo?.getMonitoringLink?.(Name, Type)}
+                {additionalTenantProps?.getMonitoringLink?.(Name, Type)}
             </div>
             <div className={b('system-tablets')}>
                 {SystemTablets &&

@@ -32,12 +32,12 @@ function generateId({type, id}: {type: 'pdisk' | 'vdisk'; id: string}) {
 interface NodeStructureProps {
     nodeId: string;
     className?: string;
-    additionalNodesInfo?: AdditionalNodesProps;
+    additionalNodesProps?: AdditionalNodesProps;
 }
 
 const autofetcher = new AutoFetcher();
 
-function NodeStructure({nodeId, className, additionalNodesInfo}: NodeStructureProps) {
+function NodeStructure({nodeId, className, additionalNodesProps}: NodeStructureProps) {
     const dispatch = useDispatch();
 
     const nodeStructure = useTypedSelector(selectNodeStructure);
@@ -46,10 +46,10 @@ function NodeStructure({nodeId, className, additionalNodesInfo}: NodeStructurePr
     const nodeData = useTypedSelector((state) => state.node?.data?.SystemStateInfo?.[0]);
 
     const nodeHref = useMemo(() => {
-        return additionalNodesInfo?.getNodeRef
-            ? additionalNodesInfo.getNodeRef(nodeData)
+        return additionalNodesProps?.getNodeRef
+            ? additionalNodesProps.getNodeRef(nodeData)
             : undefined;
-    }, [nodeData, additionalNodesInfo]);
+    }, [nodeData, additionalNodesProps]);
 
     const {pdiskId: pdiskIdFromUrl, vdiskId: vdiskIdFromUrl} = url.parse(
         window.location.href,

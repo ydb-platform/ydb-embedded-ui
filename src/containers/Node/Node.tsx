@@ -34,7 +34,7 @@ export const STORAGE_ROLE = 'Storage';
 const autofetcher = new AutoFetcher();
 
 interface NodeProps {
-    additionalNodesInfo?: AdditionalNodesProps;
+    additionalNodesProps?: AdditionalNodesProps;
     className?: string;
 }
 
@@ -115,7 +115,7 @@ function Node(props: NodeProps) {
         );
     };
     const renderTabContent = () => {
-        const {additionalNodesInfo} = props;
+        const {additionalNodesProps} = props;
 
         switch (activeTab) {
             case STORAGE: {
@@ -138,7 +138,7 @@ function Node(props: NodeProps) {
                     <NodeStructure
                         className={b('node-page-wrapper')}
                         nodeId={nodeId}
-                        additionalNodesInfo={additionalNodesInfo}
+                        additionalNodesProps={additionalNodesProps}
                     />
                 );
             }
@@ -157,7 +157,7 @@ function Node(props: NodeProps) {
                 <div className={b(null, props.className)}>
                     <BasicNodeViewer
                         node={node}
-                        additionalNodesInfo={props.additionalNodesInfo}
+                        additionalNodesProps={props.additionalNodesProps}
                         className={b('header')}
                     />
 

@@ -54,10 +54,10 @@ const b = cn('ydb-nodes');
 interface NodesProps {
     path?: string;
     type?: EPathType;
-    additionalNodesInfo?: AdditionalNodesProps;
+    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {
+export const Nodes = ({path, type, additionalNodesProps = {}}: NodesProps) => {
     const dispatch = useDispatch();
 
     const isClusterNodes = !path;
@@ -154,7 +154,7 @@ export const Nodes = ({path, type, additionalNodesInfo = {}}: NodesProps) => {
 
     const renderTable = () => {
         const columns = getNodesColumns({
-            getNodeRef: additionalNodesInfo.getNodeRef,
+            getNodeRef: additionalNodesProps.getNodeRef,
         });
 
         if (nodes && nodes.length === 0) {

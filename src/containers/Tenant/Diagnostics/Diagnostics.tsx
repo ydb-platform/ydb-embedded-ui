@@ -42,8 +42,8 @@ import './Diagnostics.scss';
 
 interface DiagnosticsProps {
     type?: EPathType;
-    additionalTenantInfo?: AdditionalTenantsProps;
-    additionalNodesInfo?: AdditionalNodesProps;
+    additionalTenantProps?: AdditionalTenantsProps;
+    additionalNodesProps?: AdditionalNodesProps;
 }
 
 const b = cn('kv-tenant-diagnostics');
@@ -108,7 +108,7 @@ function Diagnostics(props: DiagnosticsProps) {
                     <DetailedOverview
                         type={type}
                         tenantName={tenantNameString}
-                        additionalTenantInfo={props.additionalTenantInfo}
+                        additionalTenantProps={props.additionalTenantProps}
                     />
                 );
             }
@@ -123,7 +123,7 @@ function Diagnostics(props: DiagnosticsProps) {
                     <Nodes
                         path={currentSchemaPath}
                         type={type}
-                        additionalNodesInfo={props.additionalNodesInfo}
+                        additionalNodesProps={props.additionalNodesProps}
                     />
                 );
             }
