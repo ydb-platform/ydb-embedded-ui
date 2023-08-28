@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.16.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.16.1...v4.16.2) (2023-08-28)
+
+
+### Bug Fixes
+
+* fix topic templates ([#524](https://github.com/ydb-platform/ydb-embedded-ui/issues/524)) ([f593b57](https://github.com/ydb-platform/ydb-embedded-ui/commit/f593b575fb64d0c69b56e743fd4cd6faba1e9d0e))
+* rename additionalInfo params to additionalProps ([#525](https://github.com/ydb-platform/ydb-embedded-ui/issues/525)) ([dd2b040](https://github.com/ydb-platform/ydb-embedded-ui/commit/dd2b04039cd80072fe11744f3490c176fe21b16b))
+
 ## [4.16.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.16.0...v4.16.1) (2023-08-25)
 
 
