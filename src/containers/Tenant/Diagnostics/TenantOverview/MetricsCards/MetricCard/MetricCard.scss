@@ -1,0 +1,31 @@
+@import '../../../../../../styles/mixins.scss';
+
+.metric-card {
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 12px;
+    }
+
+    &__label {
+        @include lead-typography();
+        font-weight: 600;
+    }
+
+    &__content {
+        font-size: 36px;
+        font-weight: 500;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        color: var(--yc-color-text-secondary);
+
+        &.selected {
+            color: var(--yc-color-text-complementary);
+        }
+    }
+}

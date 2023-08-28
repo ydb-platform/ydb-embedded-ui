@@ -1,0 +1,46 @@
+.circular-progress-bar {
+    display: block;
+    max-width: 100%;
+
+    transform: rotate(90deg);
+
+    &__wrapper {
+        position: relative;
+
+        display: inline;
+    }
+    &__content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+
+        transform: translate(-50%, -50%);
+
+        max-width: 100%;
+
+        overflow: hidden;
+    }
+
+    &__circle-bg {
+        stroke: var(--yc-color-base-simple-hover);
+        fill: none;
+
+        &.selected {
+            stroke: var(--yc-color-base-float);
+        }
+    }
+
+    &__circle {
+        fill: none;
+
+        &_status_yellow {
+            stroke: var(--yc-color-private-yellow-550);
+        }
+        &_status_red {
+            stroke: var(--yc-color-private-red-550);
+        }
+        &_status_green {
+            stroke: var(--yc-color-private-green-550);
+        }
+    }
+}

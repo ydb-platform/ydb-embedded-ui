@@ -1,4 +1,6 @@
 import type {TTenant} from '../../../types/api/tenant';
+import {formatBytes} from '../../../utils/bytesParsers';
+import {formatCPU} from '../../../utils/formatCPU/formatCPU';
 import {isNumeric} from '../../../utils/utils';
 
 const getControlPlaneValue = (tenant: TTenant) => {
@@ -18,8 +20,16 @@ const getTenantBackend = (tenant: TTenant) => {
     return node.Host ? `${node.Host}${address ? address : ''}` : undefined;
 };
 
-const calculateTenantMetrics = (tenant: TTenant) => {
-    const {CoresUsed, MemoryUsed, StorageAllocatedSize, Metrics = {}} = tenant;
+export const calculateTenantMetrics = (tenant?: TTenant) => {
+    const {
+        CoresUsed,
+        MemoryUsed,
+        StorageAllocatedSize,
+        CoresLimit,
+        MemoryLimit,
+        StorageLimit,
+        Metrics = {},
+    } = tenant || {};
 
     const cpuFromCores = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
     const cpuFromMetrics = isNumeric(Metrics.CPU) ? Number(Metrics.CPU) : undefined;
@@ -32,7 +42,18 @@ const calculateTenantMetrics = (tenant: TTenant) => {
     const memory = isNumeric(rawMemory) ? Number(rawMemory) : 0;
     const storage = isNumeric(rawStorage) ? Number(rawStorage) : 0;
 
-    return {cpu, memory, storage};
+    const cpuLimit = isNumeric(CoresLimit) ? Number(CoresLimit) : 0;
+    const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : 0;
+    const storageLimit = isNumeric(StorageLimit) ? Number(StorageLimit) : 0;
+
+    return {
+        cpu,
+        memory,
+        storage,
+        cpuLimit,
+        memoryLimit,
+        storageLimit,
+    };
 };
 
 const calculateTenantEntities = (tenant: TTenant) => {
@@ -65,4 +86,64 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean) =>
             groupsCount,
         };
     });
+};
+
+export const calculateUsage = (valueUsed?: number, valueLimit?: number): [number?, string?] => {
+    if (!valueUsed || !valueLimit) {
+        return [];
+    }
+
+    const usage = (valueUsed * 100) / valueLimit;
+    return [usage, `${usage.toFixed(0)}%`];
+};
+
+export enum MetricsTypes {
+    CPU = 'CPU',
+    Storage = 'Storage',
+    Memory = 'Memory',
+}
+
+export enum EMetricStatus {
+    Grey = 'Grey',
+    Green = 'Green',
+    Yellow = 'Yellow',
+    Orange = 'Orange',
+    Red = 'Red',
+}
+
+export const metricsUsageToStatus = (type?: MetricsTypes, usage?: number) => {
+    if (!usage) return EMetricStatus.Grey;
+    switch (type) {
+        case MetricsTypes.CPU:
+            if (usage > 70) return EMetricStatus.Red;
+            if (usage > 60) return EMetricStatus.Yellow;
+            return EMetricStatus.Green;
+        case MetricsTypes.Memory:
+            if (usage > 70) return EMetricStatus.Red;
+            if (usage > 60) return EMetricStatus.Yellow;
+            return EMetricStatus.Green;
+        case MetricsTypes.Storage:
+            if (usage > 85) return EMetricStatus.Red;
+            if (usage > 75) return EMetricStatus.Yellow;
+            return EMetricStatus.Green;
+
+        default:
+            return EMetricStatus.Grey;
+    }
+};
+
+export const formatTenantMetrics = ({
+    cpu,
+    storage,
+    memory,
+}: {
+    cpu?: number;
+    storage?: number;
+    memory?: number;
+}) => {
+    return {
+        cpu: formatCPU(cpu),
+        storage: storage ? formatBytes({value: storage, significantDigits: 2}) : undefined,
+        memory: storage ? formatBytes({value: memory, significantDigits: 2}) : undefined,
+    };
 };

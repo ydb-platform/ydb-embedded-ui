@@ -11,7 +11,7 @@ $section-title-line-height: 24px;
     &__section {
         display: flex;
         overflow-x: hidden;
-        flex: 0 0 calc(50% - 10px);
+        flex: 1 0 calc(50% - 10px);
         flex-direction: column;
 
         min-width: 300px;

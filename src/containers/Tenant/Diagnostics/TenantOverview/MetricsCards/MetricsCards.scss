@@ -1,0 +1,37 @@
+.metrics-tabs {
+    display: flex;
+    gap: 16px;
+
+    margin-bottom: 10px;
+
+    $_: &;
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        color: var(--yc-color-text-secondary);
+
+        font-size: var(--yc-text-header-1-font-size);
+        line-height: var(--yc-text-header-1-line-height);
+
+        text-align: center;
+
+        &.selected #{$_}__progress {
+            color: var(--yc-color-text-complementary);
+        }
+    }
+
+    &__progress {
+        font-size: 36px;
+        line-height: 40px;
+        font-weight: 500;
+
+        text-align: center;
+    }
+
+    &__resources {
+        font-size: var(--yc-text-body-1-font-size);
+    }
+}

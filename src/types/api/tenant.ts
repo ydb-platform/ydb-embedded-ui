@@ -57,6 +57,9 @@ export interface TTenant {
 
     MonitoringEndpoint?: string; // additional
     ControlPlane?: ControlPlane; // additional
+
+    CoresLimit?: string; // check
+    StorageLimit?: string; //check
 }
 
 interface THiveDomainStatsStateCount {
