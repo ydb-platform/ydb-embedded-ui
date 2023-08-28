@@ -5,6 +5,7 @@ import flaskIcon from '../../assets/icons/flask.svg';
 
 import {
     ENABLE_ADDITIONAL_QUERY_MODES,
+    ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     THEME_KEY,
@@ -94,6 +95,11 @@ export const enableQueryModesForExplainSetting: SettingProps = {
     title: i18n('settings.enableAdditionalQueryModes.title'),
     helpPopoverContent: i18n('settings.enableAdditionalQueryModes.popover'),
 };
+export const enableNewTenantDiagnosticsDesign: SettingProps = {
+    settingKey: ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN,
+    title: i18n('settings.tenantDiagnostics.title'),
+    helpPopoverContent: i18n('settings.tenantDiagnostics.popover'),
+};
 
 export const generalSection: SettingsSection = {
     id: 'generalSection',
@@ -108,6 +114,7 @@ export const experimentsSection: SettingsSection = {
         useNodesEndpointSetting,
         useBackendParamsForTables,
         enableQueryModesForExplainSetting,
+        enableNewTenantDiagnosticsDesign,
     ],
 };
 

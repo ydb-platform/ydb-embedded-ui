@@ -6,6 +6,7 @@ import {Loader} from '@gravity-ui/uikit';
 
 import {InfoViewer} from '../../../../components/InfoViewer';
 import {PoolUsage} from '../../../../components/PoolUsage/PoolUsage';
+import {Tablet} from '../../../../components/Tablet';
 import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
 import {formatCPU} from '../../../../utils';
 import {TABLET_STATES, TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
@@ -21,12 +22,12 @@ import './TenantOverview.scss';
 
 const b = cn('tenant-overview');
 
-interface TenantOverviewProps {
+interface OldTenantOverviewProps {
     tenantName: string;
     additionalTenantProps?: AdditionalTenantsProps;
 }
 
-export function TenantOverview({tenantName, additionalTenantProps}: TenantOverviewProps) {
+export function OldTenantOverview({tenantName, additionalTenantProps}: OldTenantOverviewProps) {
     const {tenant, loading, wasLoaded} = useTypedSelector((state) => state.tenant);
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const dispatch = useDispatch();
@@ -53,6 +54,7 @@ export function TenantOverview({tenantName, additionalTenantProps}: TenantOvervi
         StorageGroups,
         StorageAllocatedSize,
         Type,
+        SystemTablets,
     } = tenant || {};
 
     const tenantType = mapDatabaseTypeToDBName(Type);
@@ -118,6 +120,12 @@ export function TenantOverview({tenantName, additionalTenantProps}: TenantOvervi
             <div className={b('top')}>
                 {renderName()}
                 {additionalTenantProps?.getMonitoringLink?.(Name, Type)}
+            </div>
+            <div className={b('system-tablets')}>
+                {SystemTablets &&
+                    SystemTablets.map((tablet, tabletIndex) => (
+                        <Tablet key={tabletIndex} tablet={tablet} tenantName={Name} />
+                    ))}
             </div>
             <div className={b('common-info')}>
                 <div>

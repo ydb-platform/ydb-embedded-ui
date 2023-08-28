@@ -7,9 +7,12 @@ import {Button, Modal} from '@gravity-ui/uikit';
 import type {EPathType} from '../../../../types/api/schema';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {Icon} from '../../../../components/Icon';
+import {useSetting} from '../../../../utils/hooks';
+import {ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN} from '../../../../utils/constants';
 import Overview from '../Overview/Overview';
 import {Healthcheck} from '../Healthcheck';
 import {TenantOverview} from '../TenantOverview/TenantOverview';
+import {OldTenantOverview} from '../TenantOverview/OldTenantOverview';
 
 import './DetailedOverview.scss';
 
@@ -26,6 +29,8 @@ function DetailedOverview(props: DetailedOverviewProps) {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const {currentSchemaPath} = useSelector((state: any) => state.schema);
+
+    const [newTenantDiagnostics] = useSetting(ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN);
 
     const openModalHandler = () => {
         setIsModalVisible(true);
@@ -57,21 +62,30 @@ function DetailedOverview(props: DetailedOverviewProps) {
         return (
             <div className={b()}>
                 {isTenant ? (
-                    <>
+                    newTenantDiagnostics ? (
                         <div className={b('section')}>
                             <TenantOverview
                                 tenantName={tenantName}
                                 additionalTenantProps={additionalTenantProps}
                             />
                         </div>
-                        <div className={b('section')}>
-                            <Healthcheck
-                                tenant={tenantName}
-                                preview={true}
-                                showMoreHandler={openModalHandler}
-                            />
-                        </div>
-                    </>
+                    ) : (
+                        <>
+                            <div className={b('section')}>
+                                <OldTenantOverview
+                                    tenantName={tenantName}
+                                    additionalTenantProps={additionalTenantProps}
+                                />
+                            </div>
+                            <div className={b('section')}>
+                                <Healthcheck
+                                    tenant={tenantName}
+                                    preview={true}
+                                    showMoreHandler={openModalHandler}
+                                />
+                            </div>
+                        </>
+                    )
                 ) : (
                     <Overview type={type} tenantName={tenantName} />
                 )}
