@@ -30,3 +30,17 @@ export type TenantsAction =
 export interface TenantsStateSlice {
     tenants: TenantsState;
 }
+
+export enum MetricsTypes {
+    CPU = 'CPU',
+    Storage = 'Storage',
+    Memory = 'Memory',
+}
+
+export enum EMetricStatus {
+    Grey = 'Grey',
+    Green = 'Green',
+    Yellow = 'Yellow',
+    Orange = 'Orange',
+    Red = 'Red',
+}

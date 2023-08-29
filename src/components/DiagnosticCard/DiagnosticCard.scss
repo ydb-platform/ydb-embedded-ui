@@ -19,5 +19,7 @@
 
         box-shadow: 0px 1px 5px var(--yc-color-sfx-shadow);
     }
-    transition: box-shadow 0.1s;
+
+    transition: all 0.1s;
+    transition-property: box-shadow, background-color, border-color;
 }

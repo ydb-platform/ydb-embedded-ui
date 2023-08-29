@@ -1,31 +1,47 @@
 @import '../../../../../../styles/mixins.scss';
 
-.metric-card {
+.metrics-card {
     &__header {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
 
         margin-bottom: 12px;
     }
 
     &__label {
-        @include lead-typography();
         font-weight: 600;
+        @include lead-typography();
     }
 
     &__content {
-        font-size: 36px;
-        font-weight: 500;
-
         display: flex;
         flex-direction: column;
         align-items: center;
 
+        font-size: var(--yc-text-header-1-font-size);
+        line-height: var(--yc-text-header-1-line-height);
+        text-align: center;
+
         color: var(--yc-color-text-secondary);
 
-        &.selected {
+        transition: color 0.1s;
+
+        &_selected {
             color: var(--yc-color-text-complementary);
         }
+    }
+
+    &__progress {
+        font-size: 36px;
+        font-weight: 500;
+        line-height: 40px;
+        text-align: center;
+    }
+
+    &__resources {
+        font-size: var(--yc-text-body-1-font-size);
+
+        color: var(--yc-color-text-secondary);
     }
 }

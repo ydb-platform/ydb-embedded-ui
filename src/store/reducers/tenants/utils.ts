@@ -2,6 +2,7 @@ import type {TTenant} from '../../../types/api/tenant';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {formatCPU} from '../../../utils/formatCPU/formatCPU';
 import {isNumeric} from '../../../utils/utils';
+import {EMetricStatus, MetricsTypes} from './types';
 
 const getControlPlaneValue = (tenant: TTenant) => {
     const parts = tenant.Name?.split('/');
@@ -88,31 +89,26 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean) =>
     });
 };
 
-export const calculateUsage = (valueUsed?: number, valueLimit?: number): [number?, string?] => {
-    if (!valueUsed || !valueLimit) {
-        return [];
+export const calculateUsage = (valueUsed?: number, valueLimit?: number): number | undefined => {
+    if (valueUsed && valueLimit) {
+        return (valueUsed * 100) / valueLimit;
     }
 
-    const usage = (valueUsed * 100) / valueLimit;
-    return [usage, `${usage.toFixed(0)}%`];
+    return undefined;
 };
 
-export enum MetricsTypes {
-    CPU = 'CPU',
-    Storage = 'Storage',
-    Memory = 'Memory',
-}
+export const formatUsage = (usage?: number) => {
+    if (usage) {
+        return `${usage.toFixed()}%`;
+    }
 
-export enum EMetricStatus {
-    Grey = 'Grey',
-    Green = 'Green',
-    Yellow = 'Yellow',
-    Orange = 'Orange',
-    Red = 'Red',
-}
+    return undefined;
+};
 
 export const metricsUsageToStatus = (type?: MetricsTypes, usage?: number) => {
-    if (!usage) return EMetricStatus.Grey;
+    if (!usage) {
+        return EMetricStatus.Grey;
+    }
     switch (type) {
         case MetricsTypes.CPU:
             if (usage > 70) return EMetricStatus.Red;
@@ -140,10 +136,8 @@ export const formatTenantMetrics = ({
     cpu?: number;
     storage?: number;
     memory?: number;
-}) => {
-    return {
-        cpu: formatCPU(cpu),
-        storage: storage ? formatBytes({value: storage, significantDigits: 2}) : undefined,
-        memory: storage ? formatBytes({value: memory, significantDigits: 2}) : undefined,
-    };
-};
+}) => ({
+    cpu: cpu ? formatCPU(cpu) : undefined,
+    storage: storage ? formatBytes({value: storage, significantDigits: 2}) : undefined,
+    memory: memory ? formatBytes({value: memory, significantDigits: 2}) : undefined,
+});

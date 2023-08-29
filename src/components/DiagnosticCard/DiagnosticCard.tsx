@@ -1,4 +1,4 @@
-import {ReactNode} from 'react';
+import type {ReactNode} from 'react';
 import cn from 'bem-cn-lite';
 
 import {Card} from '@gravity-ui/uikit';

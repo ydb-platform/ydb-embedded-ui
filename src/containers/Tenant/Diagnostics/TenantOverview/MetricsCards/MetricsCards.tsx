@@ -1,22 +1,19 @@
 import cn from 'bem-cn-lite';
 
 import {
-    MetricsTypes,
     calculateUsage,
     metricsUsageToStatus,
     formatTenantMetrics,
 } from '../../../../../store/reducers/tenants/utils';
-import type {TTenant} from '../../../../../types/api/tenant';
+import {MetricsTypes} from '../../../../../store/reducers/tenants/types';
 import {Healthcheck} from '../../Healthcheck';
+
 import {MetricCard} from './MetricCard/MetricCard';
-
-import i18n from '../i18n';
-
 import './MetricsCards.scss';
 
-const b = cn('metrics-tabs');
+const b = cn('metrics-cards');
 
-export interface IMetrics {
+export interface ITenantMetrics {
     memoryUsed?: number;
     memoryLimit?: number;
     cpuUsed?: number;
@@ -25,31 +22,18 @@ export interface IMetrics {
     storageLimit?: number;
 }
 
-interface DatabaseMetricsProps {
+interface MetricsCardsProps {
     tenantName: string;
     showMoreHandler?: VoidFunction;
-    metrics?: IMetrics;
-    tenant?: TTenant;
+    metrics?: ITenantMetrics;
 }
 
-export function DatabaseMetrics({tenantName, metrics, showMoreHandler}: DatabaseMetricsProps) {
+export function MetricsCards({tenantName, metrics, showMoreHandler}: MetricsCardsProps) {
     const {memoryUsed, memoryLimit, cpuUsed, cpuLimit, storageUsed, storageLimit} = metrics || {};
-    const renderContent = (progressText?: string, valueText?: string, isSelected?: boolean) => {
-        return (
-            <div className={b('content', isSelected ? 'selected' : '')}>
-                {progressText ? (
-                    <div className={b('progress')}>{progressText}</div>
-                ) : (
-                    i18n('no-data')
-                )}
-                <div className={b('resources')}>{valueText}</div>
-            </div>
-        );
-    };
 
-    const [cpuUsage, cpuUsageString] = calculateUsage(cpuUsed, cpuLimit);
-    const [storageUsage, storageUsageString] = calculateUsage(storageUsed, storageLimit);
-    const [memoryUsage, memoryUsageString] = calculateUsage(memoryUsed, memoryLimit);
+    const cpuUsage = calculateUsage(cpuUsed, cpuLimit);
+    const storageUsage = calculateUsage(storageUsed, storageLimit);
+    const memoryUsage = calculateUsage(memoryUsed, memoryLimit);
 
     const cpuStatus = metricsUsageToStatus(MetricsTypes.CPU, cpuUsage);
     const storageStatus = metricsUsageToStatus(MetricsTypes.Storage, storageUsage);
@@ -63,19 +47,19 @@ export function DatabaseMetrics({tenantName, metrics, showMoreHandler}: Database
 
     return (
         <div className={b()}>
-            <MetricCard label="CPU" progress={cpuUsage} status={cpuStatus.toLowerCase()}>
-                {renderContent(cpuUsageString, cpu)}
-            </MetricCard>
+            <MetricCard label="CPU" progress={cpuUsage} status={cpuStatus} resourcesUsed={cpu} />
             <MetricCard
                 label="Storage"
                 progress={storageUsage}
-                status={storageStatus.toLowerCase()}
-            >
-                {renderContent(storageUsageString, storage)}
-            </MetricCard>
-            <MetricCard label="Memory" progress={memoryUsage} status={memoryStatus.toLowerCase()}>
-                {renderContent(memoryUsageString, memory)}
-            </MetricCard>
+                status={storageStatus}
+                resourcesUsed={storage}
+            />
+            <MetricCard
+                label="Memory"
+                progress={memoryUsage}
+                status={memoryStatus}
+                resourcesUsed={memory}
+            />
             <Healthcheck tenant={tenantName} preview={true} showMoreHandler={showMoreHandler} />
         </div>
     );

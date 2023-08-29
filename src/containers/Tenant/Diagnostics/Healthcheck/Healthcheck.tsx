@@ -24,21 +24,22 @@ interface HealthcheckProps {
     preview?: boolean;
     fetchData?: boolean;
     showMoreHandler?: VoidFunction;
+    selected?: boolean;
 }
 
 const b = cn('healthcheck');
 
 export const Healthcheck = (props: HealthcheckProps) => {
-    const {tenant, preview, fetchData = true, showMoreHandler} = props;
+    const {tenant, preview, fetchData = true, showMoreHandler, selected} = props;
 
     const dispatch = useDispatch();
 
     const {data, loading, wasLoaded, error} = useTypedSelector((state) => state.healthcheckInfo);
-    const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
-
     const issuesStatistics = useTypedSelector(selectIssuesStatistics);
     const issueTrees = useTypedSelector(selectIssuesTrees);
     const {autorefresh} = useTypedSelector((state) => state.schema);
+
+    const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
 
     const fetchHealthcheck = useCallback(
         (isBackground = true) => {
@@ -77,6 +78,7 @@ export const Healthcheck = (props: HealthcheckProps) => {
                 onShowMore={showMoreHandler}
                 onUpdate={fetchHealthcheck}
                 error={error}
+                selected={selected}
             />
         ) : (
             <Details

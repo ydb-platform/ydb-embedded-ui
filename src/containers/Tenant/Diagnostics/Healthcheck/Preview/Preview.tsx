@@ -21,10 +21,12 @@ interface PreviewProps {
     onShowMore?: VoidFunction;
     onUpdate: VoidFunction;
     error?: IResponseError;
+    selected?: boolean;
 }
 
 export const Preview = (props: PreviewProps) => {
-    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate, error} = props;
+    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate, error, selected} =
+        props;
 
     const isStatusOK = selfCheckResult === SelfCheckResult.GOOD;
 
@@ -75,7 +77,7 @@ export const Preview = (props: PreviewProps) => {
     };
 
     return (
-        <DiagnosticCard className={b('preview')}>
+        <DiagnosticCard className={b('preview')} selected={selected}>
             {renderStatus()}
             {renderContent()}
         </DiagnosticCard>

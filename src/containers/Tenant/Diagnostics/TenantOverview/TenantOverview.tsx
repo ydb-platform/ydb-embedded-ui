@@ -18,7 +18,7 @@ import {
     formatTenantMetrics,
     calculateTenantMetrics,
 } from '../../../../store/reducers/tenants/utils';
-import {DatabaseMetrics, IMetrics} from './MetricsCards/MetricsCards';
+import {MetricsCards, ITenantMetrics} from './MetricsCards/MetricsCards';
 
 import i18n from './i18n';
 import './TenantOverview.scss';
@@ -36,9 +36,11 @@ export function TenantOverview({
     additionalTenantProps,
     showMoreHandler,
 }: TenantOverviewProps) {
+    const dispatch = useDispatch();
+
     const {tenant, loading, wasLoaded} = useTypedSelector((state) => state.tenant);
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const dispatch = useDispatch();
+
     const fetchTenant = useCallback(
         (isBackground = true) => {
             if (!isBackground) {
@@ -67,7 +69,7 @@ export function TenantOverview({
     const {cpu, storage, memory, cpuLimit, storageLimit, memoryLimit} =
         calculateTenantMetrics(tenant);
 
-    const metrics: IMetrics = {
+    const metrics: ITenantMetrics = {
         memoryUsed: memory,
         memoryLimit,
         cpuUsed: cpu,
@@ -133,7 +135,7 @@ export function TenantOverview({
                 {renderName()}
                 {additionalTenantProps?.getMonitoringLink?.(Name, Type)}
             </div>
-            <DatabaseMetrics
+            <MetricsCards
                 tenantName={tenantName}
                 metrics={metrics}
                 showMoreHandler={showMoreHandler}

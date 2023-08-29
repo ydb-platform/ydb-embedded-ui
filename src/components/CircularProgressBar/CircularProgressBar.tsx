@@ -1,7 +1,11 @@
 import cn from 'bem-cn-lite';
+import type {ReactNode} from 'react';
+
+import type {EMetricStatus} from '../../store/reducers/tenants/types';
 
 import './CircularProgressBar.scss';
-import {ReactNode} from 'react';
+
+const b = cn('circular-progress-bar');
 
 interface CircularProgressBarProps {
     size?: number;
@@ -10,18 +14,16 @@ interface CircularProgressBarProps {
     color?: string;
     bgColor?: string;
     content?: ReactNode;
-    isSelected?: boolean;
-    status?: string;
+    selected?: boolean;
+    status?: EMetricStatus;
 }
-
-const b = cn('circular-progress-bar');
 
 export function CircularProgressBar({
     size = 100,
     progress = 0,
     strokeWidth = 10,
     content,
-    isSelected,
+    selected,
     status,
 }: CircularProgressBarProps) {
     const center = size / 2;
@@ -42,14 +44,14 @@ export function CircularProgressBar({
             {content && <div className={b('content')}>{content}</div>}
             <svg className={b()} width={size} height={size}>
                 <circle
-                    className={b('circle-bg', isSelected ? 'selected' : '')}
+                    className={b('circle-bg', {selected})}
                     cx={center}
                     cy={center}
                     r={radius}
                     strokeWidth={strokeWidth}
                 />
                 <circle
-                    className={b('circle', {status})}
+                    className={b('circle', {status: status?.toLocaleLowerCase()})}
                     cx={center}
                     cy={center}
                     r={radius}

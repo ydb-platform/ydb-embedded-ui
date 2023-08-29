@@ -1,5 +1,6 @@
 .circular-progress-bar {
     display: block;
+
     max-width: 100%;
 
     transform: rotate(90deg);
@@ -14,18 +15,21 @@
         top: 50%;
         left: 50%;
 
-        transform: translate(-50%, -50%);
+        overflow: hidden;
 
         max-width: 100%;
 
-        overflow: hidden;
+        transform: translate(-50%, -50%);
     }
 
     &__circle-bg {
         stroke: var(--yc-color-base-simple-hover);
+
         fill: none;
 
-        &.selected {
+        transition: stroke 0.1s;
+
+        &_selected {
             stroke: var(--yc-color-base-float);
         }
     }
