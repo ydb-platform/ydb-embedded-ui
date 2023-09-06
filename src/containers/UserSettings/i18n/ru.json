@@ -26,5 +26,5 @@
   "settings.enableAdditionalQueryModes.popover": "Добавляет режимы 'Data', 'YQL - QueryService' и 'PostgreSQL'. Может работать некорректно на некоторых версиях",
 
   "settings.tenantDiagnostics.title": "Включить новый дизайн для диагностики баз данных",
-  "settings.tenantDiagnostics.popover": "Для некоторых баз могут отображаться неполные данные"
+  "settings.tenantDiagnostics.popover": "Добавляет индикаторы использования ресурсов базы данных. Для некоторых баз могут отображаться неполные данные"
 }

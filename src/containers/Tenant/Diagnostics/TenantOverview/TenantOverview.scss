@@ -1,9 +1,8 @@
 @use '../DetailedOverview/DetailedOverview.scss' as detailedOverview;
 
 .tenant-overview {
-    overflow-x: auto;
-
     padding-bottom: 20px;
+
     &__loader {
         display: flex;
         justify-content: center;

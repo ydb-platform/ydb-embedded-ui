@@ -18,7 +18,7 @@ import {
     formatTenantMetrics,
     calculateTenantMetrics,
 } from '../../../../store/reducers/tenants/utils';
-import {MetricsCards, ITenantMetrics} from './MetricsCards/MetricsCards';
+import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
 
 import i18n from './i18n';
 import './TenantOverview.scss';
@@ -69,7 +69,7 @@ export function TenantOverview({
     const {cpu, storage, memory, cpuLimit, storageLimit, memoryLimit} =
         calculateTenantMetrics(tenant);
 
-    const metrics: ITenantMetrics = {
+    const metrics: TenantMetrics = {
         memoryUsed: memory,
         memoryLimit,
         cpuUsed: cpu,

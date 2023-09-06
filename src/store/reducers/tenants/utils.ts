@@ -2,7 +2,7 @@ import type {TTenant} from '../../../types/api/tenant';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {formatCPU} from '../../../utils/formatCPU/formatCPU';
 import {isNumeric} from '../../../utils/utils';
-import {EMetricStatus, MetricsTypes} from './types';
+import {METRIC_STATUS} from './contants';
 
 const getControlPlaneValue = (tenant: TTenant) => {
     const parts = tenant.Name?.split('/');
@@ -35,17 +35,17 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
     const cpuFromCores = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
     const cpuFromMetrics = isNumeric(Metrics.CPU) ? Number(Metrics.CPU) : undefined;
 
-    const cpu = cpuFromCores ?? cpuFromMetrics ?? 0;
+    const cpu = cpuFromCores ?? cpuFromMetrics ?? undefined;
 
     const rawMemory = MemoryUsed ?? Metrics.Memory;
     const rawStorage = StorageAllocatedSize ?? Metrics.Storage;
 
-    const memory = isNumeric(rawMemory) ? Number(rawMemory) : 0;
-    const storage = isNumeric(rawStorage) ? Number(rawStorage) : 0;
+    const memory = isNumeric(rawMemory) ? Number(rawMemory) : undefined;
+    const storage = isNumeric(rawStorage) ? Number(rawStorage) : undefined;
 
-    const cpuLimit = isNumeric(CoresLimit) ? Number(CoresLimit) : 0;
-    const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : 0;
-    const storageLimit = isNumeric(StorageLimit) ? Number(StorageLimit) : 0;
+    const cpuLimit = isNumeric(CoresLimit) ? Number(CoresLimit) : undefined;
+    const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
+    const storageLimit = isNumeric(StorageLimit) ? Number(StorageLimit) : undefined;
 
     return {
         cpu,
@@ -105,27 +105,48 @@ export const formatUsage = (usage?: number) => {
     return undefined;
 };
 
-export const metricsUsageToStatus = (type?: MetricsTypes, usage?: number) => {
+export const cpuUsageToStatus = (usage?: number) => {
     if (!usage) {
-        return EMetricStatus.Grey;
+        return METRIC_STATUS.Unspecified;
     }
-    switch (type) {
-        case MetricsTypes.CPU:
-            if (usage > 70) return EMetricStatus.Red;
-            if (usage > 60) return EMetricStatus.Yellow;
-            return EMetricStatus.Green;
-        case MetricsTypes.Memory:
-            if (usage > 70) return EMetricStatus.Red;
-            if (usage > 60) return EMetricStatus.Yellow;
-            return EMetricStatus.Green;
-        case MetricsTypes.Storage:
-            if (usage > 85) return EMetricStatus.Red;
-            if (usage > 75) return EMetricStatus.Yellow;
-            return EMetricStatus.Green;
 
-        default:
-            return EMetricStatus.Grey;
+    if (usage > 70) {
+        return METRIC_STATUS.Danger;
     }
+    if (usage > 60) {
+        return METRIC_STATUS.Warning;
+    }
+
+    return METRIC_STATUS.Good;
+};
+export const storageUsageToStatus = (usage?: number) => {
+    if (!usage) {
+        return METRIC_STATUS.Unspecified;
+    }
+
+    if (usage > 85) {
+        return METRIC_STATUS.Danger;
+    }
+    if (usage > 75) {
+        return METRIC_STATUS.Warning;
+    }
+
+    return METRIC_STATUS.Good;
+};
+
+export const memoryUsageToStatus = (usage?: number) => {
+    if (!usage) {
+        return METRIC_STATUS.Unspecified;
+    }
+
+    if (usage > 70) {
+        return METRIC_STATUS.Danger;
+    }
+    if (usage > 60) {
+        return METRIC_STATUS.Warning;
+    }
+
+    return METRIC_STATUS.Good;
 };
 
 export const formatTenantMetrics = ({
@@ -137,7 +158,7 @@ export const formatTenantMetrics = ({
     storage?: number;
     memory?: number;
 }) => ({
-    cpu: cpu ? formatCPU(cpu) : undefined,
-    storage: storage ? formatBytes({value: storage, significantDigits: 2}) : undefined,
-    memory: memory ? formatBytes({value: memory, significantDigits: 2}) : undefined,
+    cpu: formatCPU(cpu),
+    storage: formatBytes({value: storage, significantDigits: 2}) || undefined,
+    memory: formatBytes({value: memory, significantDigits: 2}) || undefined,
 });

@@ -24,13 +24,13 @@ interface HealthcheckProps {
     preview?: boolean;
     fetchData?: boolean;
     showMoreHandler?: VoidFunction;
-    selected?: boolean;
+    active?: boolean;
 }
 
 const b = cn('healthcheck');
 
 export const Healthcheck = (props: HealthcheckProps) => {
-    const {tenant, preview, fetchData = true, showMoreHandler, selected} = props;
+    const {tenant, preview, fetchData = true, showMoreHandler, active} = props;
 
     const dispatch = useDispatch();
 
@@ -78,7 +78,7 @@ export const Healthcheck = (props: HealthcheckProps) => {
                 onShowMore={showMoreHandler}
                 onUpdate={fetchHealthcheck}
                 error={error}
-                selected={selected}
+                active={active}
             />
         ) : (
             <Details

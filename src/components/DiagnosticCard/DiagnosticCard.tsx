@@ -5,17 +5,17 @@ import {Card} from '@gravity-ui/uikit';
 
 import './DiagnosticCard.scss';
 
-const b = cn('diagnostic-card');
+const b = cn('ydb-diagnostic-card');
 
 interface DiagnosticCardProps {
     children?: ReactNode;
     className?: string;
-    selected?: boolean;
+    active?: boolean;
 }
 
-export function DiagnosticCard({children, className, selected}: DiagnosticCardProps) {
+export function DiagnosticCard({children, className, active}: DiagnosticCardProps) {
     return (
-        <Card view="clear" className={b({selected}, className)}>
+        <Card view="clear" className={b({active}, className)}>
             {children}
         </Card>
     );

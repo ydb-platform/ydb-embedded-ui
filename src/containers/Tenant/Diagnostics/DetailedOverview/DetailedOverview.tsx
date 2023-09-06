@@ -26,6 +26,8 @@ interface DetailedOverviewProps {
 const b = cn('kv-detailed-overview');
 
 function DetailedOverview(props: DetailedOverviewProps) {
+    const {type, tenantName, additionalTenantProps} = props;
+
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const {currentSchemaPath} = useSelector((state: any) => state.schema);
@@ -56,37 +58,44 @@ function DetailedOverview(props: DetailedOverviewProps) {
         );
     };
 
+    const renderTenantOverview = () => {
+        if (newTenantDiagnostics) {
+            return (
+                <div className={b('section')}>
+                    <TenantOverview
+                        tenantName={tenantName}
+                        additionalTenantProps={additionalTenantProps}
+                        showMoreHandler={openModalHandler}
+                    />
+                </div>
+            );
+        }
+
+        return (
+            <>
+                <div className={b('section')}>
+                    <OldTenantOverview
+                        tenantName={tenantName}
+                        additionalTenantProps={additionalTenantProps}
+                    />
+                </div>
+                <div className={b('section')}>
+                    <Healthcheck
+                        tenant={tenantName}
+                        preview={true}
+                        showMoreHandler={openModalHandler}
+                    />
+                </div>
+            </>
+        );
+    };
+
     const renderContent = () => {
-        const {type, tenantName, additionalTenantProps} = props;
         const isTenant = tenantName === currentSchemaPath;
         return (
             <div className={b()}>
                 {isTenant ? (
-                    newTenantDiagnostics ? (
-                        <div className={b('section')}>
-                            <TenantOverview
-                                tenantName={tenantName}
-                                additionalTenantProps={additionalTenantProps}
-                                showMoreHandler={openModalHandler}
-                            />
-                        </div>
-                    ) : (
-                        <>
-                            <div className={b('section')}>
-                                <OldTenantOverview
-                                    tenantName={tenantName}
-                                    additionalTenantProps={additionalTenantProps}
-                                />
-                            </div>
-                            <div className={b('section')}>
-                                <Healthcheck
-                                    tenant={tenantName}
-                                    preview={true}
-                                    showMoreHandler={openModalHandler}
-                                />
-                            </div>
-                        </>
-                    )
+                    renderTenantOverview()
                 ) : (
                     <Overview type={type} tenantName={tenantName} />
                 )}

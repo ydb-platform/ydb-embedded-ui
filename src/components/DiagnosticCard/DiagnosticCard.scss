@@ -1,17 +1,19 @@
-.diagnostic-card {
-    min-width: 200px;
-    max-width: 350px;
-    padding: 16px;
-
+.ydb-diagnostic-card {
     flex-shrink: 0;
 
+    width: 206px;
+    padding: 16px;
+    padding-bottom: 28px;
+
     border: 1px solid var(--yc-color-line-generic);
+    background-color: transparent;
 
-    overflow: hidden;
+    transition: all 0.1s;
+    transition-property: box-shadow, background-color, border-color;
 
-    &_selected {
-        background-color: var(--yc-color-base-selection);
+    &_active {
         border-color: var(--yc-color-base-info-heavy);
+        background-color: var(--yc-color-base-selection);
     }
 
     &:hover {
@@ -19,7 +21,4 @@
 
         box-shadow: 0px 1px 5px var(--yc-color-sfx-shadow);
     }
-
-    transition: all 0.1s;
-    transition-property: box-shadow, background-color, border-color;
 }

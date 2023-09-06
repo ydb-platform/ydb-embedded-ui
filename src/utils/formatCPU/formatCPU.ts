@@ -2,14 +2,14 @@ import {configuredNumeral} from '../numeral';
 import i18n from './i18n';
 
 export const formatCPU = (value?: number) => {
-    if (!value) {
-        return '';
+    if (value === undefined) {
+        return undefined;
     }
 
     const rawCores = value / 1000000;
     let cores = rawCores.toPrecision(3);
     if (rawCores >= 1000) {
-        cores = rawCores.toPrecision();
+        cores = rawCores.toFixed();
     }
     if (rawCores < 0.001) {
         cores = '0';

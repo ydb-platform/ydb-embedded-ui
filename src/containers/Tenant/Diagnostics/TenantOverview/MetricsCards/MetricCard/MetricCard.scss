@@ -1,12 +1,14 @@
 @import '../../../../../../styles/mixins.scss';
 
-.metrics-card {
+.ydb-metrics-card {
+
+    $b: &;
     &__header {
         display: flex;
         justify-content: space-between;
         align-items: center;
 
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
 
     &__label {
@@ -26,10 +28,6 @@
         color: var(--yc-color-text-secondary);
 
         transition: color 0.1s;
-
-        &_selected {
-            color: var(--yc-color-text-complementary);
-        }
     }
 
     &__progress {
@@ -43,5 +41,15 @@
         font-size: var(--yc-text-body-1-font-size);
 
         color: var(--yc-color-text-secondary);
+    }
+
+    &_active {
+        #{$b}__content {
+            color: var(--yc-color-text-complementary);
+        }
+
+        #{$b}__progress-bar-circle-bg {
+            stroke: var(--yc-color-base-float);
+        }
     }
 }

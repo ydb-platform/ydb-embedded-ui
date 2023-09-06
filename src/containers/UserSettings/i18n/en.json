@@ -26,5 +26,5 @@
   "settings.enableAdditionalQueryModes.popover": "Adds 'Data', 'YQL - QueryService' and 'PostgreSQL' modes. May not work on some versions",
 
   "settings.tenantDiagnostics.title": "Enable new database diagnostics design",
-  "settings.tenantDiagnostics.popover": "Incomplete data may be displayed for some databases"
+  "settings.tenantDiagnostics.popover": "Adds indicators of database resources usage. Incomplete data may be displayed for some databases"
 }

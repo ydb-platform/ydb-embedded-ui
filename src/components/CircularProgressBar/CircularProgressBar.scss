@@ -1,4 +1,4 @@
-.circular-progress-bar {
+.ydb-circular-progress-bar {
     display: block;
 
     max-width: 100%;
@@ -28,23 +28,19 @@
         fill: none;
 
         transition: stroke 0.1s;
-
-        &_selected {
-            stroke: var(--yc-color-base-float);
-        }
     }
 
     &__circle {
         fill: none;
 
-        &_status_yellow {
+        &_status_good {
+            stroke: var(--yc-color-private-green-550);
+        }
+        &_status_warning {
             stroke: var(--yc-color-private-yellow-550);
         }
-        &_status_red {
+        &_status_danger {
             stroke: var(--yc-color-private-red-550);
-        }
-        &_status_green {
-            stroke: var(--yc-color-private-green-550);
         }
     }
 }

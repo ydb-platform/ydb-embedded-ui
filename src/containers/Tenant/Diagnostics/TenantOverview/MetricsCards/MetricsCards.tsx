@@ -2,10 +2,11 @@ import cn from 'bem-cn-lite';
 
 import {
     calculateUsage,
-    metricsUsageToStatus,
+    cpuUsageToStatus,
+    storageUsageToStatus,
+    memoryUsageToStatus,
     formatTenantMetrics,
 } from '../../../../../store/reducers/tenants/utils';
-import {MetricsTypes} from '../../../../../store/reducers/tenants/types';
 import {Healthcheck} from '../../Healthcheck';
 
 import {MetricCard} from './MetricCard/MetricCard';
@@ -13,7 +14,7 @@ import './MetricsCards.scss';
 
 const b = cn('metrics-cards');
 
-export interface ITenantMetrics {
+export interface TenantMetrics {
     memoryUsed?: number;
     memoryLimit?: number;
     cpuUsed?: number;
@@ -25,7 +26,7 @@ export interface ITenantMetrics {
 interface MetricsCardsProps {
     tenantName: string;
     showMoreHandler?: VoidFunction;
-    metrics?: ITenantMetrics;
+    metrics?: TenantMetrics;
 }
 
 export function MetricsCards({tenantName, metrics, showMoreHandler}: MetricsCardsProps) {
@@ -35,9 +36,9 @@ export function MetricsCards({tenantName, metrics, showMoreHandler}: MetricsCard
     const storageUsage = calculateUsage(storageUsed, storageLimit);
     const memoryUsage = calculateUsage(memoryUsed, memoryLimit);
 
-    const cpuStatus = metricsUsageToStatus(MetricsTypes.CPU, cpuUsage);
-    const storageStatus = metricsUsageToStatus(MetricsTypes.Storage, storageUsage);
-    const memoryStatus = metricsUsageToStatus(MetricsTypes.Memory, memoryUsage);
+    const cpuStatus = cpuUsageToStatus(cpuUsage);
+    const storageStatus = storageUsageToStatus(storageUsage);
+    const memoryStatus = memoryUsageToStatus(memoryUsage);
 
     const {cpu, storage, memory} = formatTenantMetrics({
         cpu: cpuUsed,

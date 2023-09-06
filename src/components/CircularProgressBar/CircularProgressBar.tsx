@@ -1,11 +1,12 @@
 import cn from 'bem-cn-lite';
 import type {ReactNode} from 'react';
 
-import type {EMetricStatus} from '../../store/reducers/tenants/types';
+import type {MetricStatus} from '../../store/reducers/tenants/types';
+import {normalizeProgress} from '../../utils';
 
 import './CircularProgressBar.scss';
 
-const b = cn('circular-progress-bar');
+const b = cn('ydb-circular-progress-bar');
 
 interface CircularProgressBarProps {
     size?: number;
@@ -14,8 +15,8 @@ interface CircularProgressBarProps {
     color?: string;
     bgColor?: string;
     content?: ReactNode;
-    selected?: boolean;
-    status?: EMetricStatus;
+    status?: MetricStatus;
+    circleBgClassName?: string;
 }
 
 export function CircularProgressBar({
@@ -23,28 +24,23 @@ export function CircularProgressBar({
     progress = 0,
     strokeWidth = 10,
     content,
-    selected,
     status,
+    circleBgClassName,
 }: CircularProgressBarProps) {
     const center = size / 2;
 
     const radius = size / 2 - strokeWidth / 2;
     const circumference = 2 * Math.PI * radius;
 
-    if (progress >= 100) {
-        progress = 100;
-    }
-    if (progress <= 0) {
-        progress = 0;
-    }
+    const normalizedProgress = normalizeProgress(progress);
 
-    const offset = ((100 - progress) / 100) * circumference;
+    const offset = ((100 - normalizedProgress) / 100) * circumference;
     return (
         <div className={b('wrapper')}>
             {content && <div className={b('content')}>{content}</div>}
             <svg className={b()} width={size} height={size}>
                 <circle
-                    className={b('circle-bg', {selected})}
+                    className={b('circle-bg', circleBgClassName)}
                     cx={center}
                     cy={center}
                     r={radius}
