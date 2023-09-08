@@ -2,7 +2,7 @@ import cn from 'bem-cn-lite';
 import type {ReactNode} from 'react';
 
 import type {MetricStatus} from '../../store/reducers/tenants/types';
-import {normalizeProgress} from '../../utils';
+import {normalizeProgress} from '../../store/reducers/tenants/utils';
 
 import './CircularProgressBar.scss';
 

@@ -162,3 +162,14 @@ export const formatTenantMetrics = ({
     storage: formatBytes({value: storage, significantDigits: 2}) || undefined,
     memory: formatBytes({value: memory, significantDigits: 2}) || undefined,
 });
+
+export const normalizeProgress = (progress: number) => {
+    if (progress >= 100) {
+        return 100;
+    }
+    if (progress <= 0) {
+        return 0;
+    }
+
+    return progress;
+};

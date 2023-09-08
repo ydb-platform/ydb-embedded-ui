@@ -109,14 +109,3 @@ export const renderExplainNode = (node) => {
     const parts = node.name.split('|');
     return parts.length > 1 ? parts[1] : node.name;
 };
-
-export const normalizeProgress = (progress) => {
-    if (progress >= 100) {
-        return 100;
-    }
-    if (progress <= 0) {
-        return 0;
-    }
-
-    return progress;
-};

@@ -69,7 +69,7 @@ export function TenantOverview({
     const {cpu, storage, memory, cpuLimit, storageLimit, memoryLimit} =
         calculateTenantMetrics(tenant);
 
-    const metrics: TenantMetrics = {
+    const calculatedMetrics: TenantMetrics = {
         memoryUsed: memory,
         memoryLimit,
         cpuUsed: cpu,
@@ -137,7 +137,7 @@ export function TenantOverview({
             </div>
             <MetricsCards
                 tenantName={tenantName}
-                metrics={metrics}
+                metrics={calculatedMetrics}
                 showMoreHandler={showMoreHandler}
             />
             <div className={b('common-info')}>
