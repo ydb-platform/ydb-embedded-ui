@@ -78,7 +78,7 @@ export const Preview = (props: PreviewProps) => {
     };
 
     return (
-        <DiagnosticCard className={b('preview')} active={active}>
+        <DiagnosticCard active={active}>
             {renderHeader()}
             {renderContent()}
         </DiagnosticCard>

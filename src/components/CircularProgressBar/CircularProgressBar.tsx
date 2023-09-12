@@ -12,8 +12,6 @@ interface CircularProgressBarProps {
     size?: number;
     progress?: number;
     strokeWidth?: number;
-    color?: string;
-    bgColor?: string;
     content?: ReactNode;
     status?: MetricStatus;
     circleBgClassName?: string;
