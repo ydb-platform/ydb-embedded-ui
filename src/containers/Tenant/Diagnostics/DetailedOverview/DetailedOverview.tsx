@@ -65,7 +65,6 @@ function DetailedOverview(props: DetailedOverviewProps) {
                     <TenantOverview
                         tenantName={tenantName}
                         additionalTenantProps={additionalTenantProps}
-                        showMoreHandler={openModalHandler}
                     />
                 </div>
             );

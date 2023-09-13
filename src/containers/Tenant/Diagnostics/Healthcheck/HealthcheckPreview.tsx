@@ -1,29 +1,30 @@
 import cn from 'bem-cn-lite';
 
-import {Button, Icon, Link} from '@gravity-ui/uikit';
+import {Button, Icon} from '@gravity-ui/uikit';
 
-import updateArrow from '../../../../../assets/icons/update-arrow.svg';
+import updateArrow from '../../../../assets/icons/update-arrow.svg';
 
-import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthcheck';
-import type {IResponseError} from '../../../../../types/api/error';
-import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
-import {ResponseError} from '../../../../../components/Errors/ResponseError';
+import {SelfCheckResult, type StatusFlag} from '../../../../types/api/healthcheck';
+import type {IResponseError} from '../../../../types/api/error';
+import {DiagnosticCard} from '../../../../components/DiagnosticCard/DiagnosticCard';
+import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 
-import i18n from '../i18n';
+import i18n from './i18n';
 
 const b = cn('healthcheck');
 
-interface PreviewProps {
+interface HealthcheckPreviewProps {
     selfCheckResult: SelfCheckResult;
     issuesStatistics?: [StatusFlag, number][];
     loading?: boolean;
-    onShowMore?: VoidFunction;
     onUpdate: VoidFunction;
     error?: IResponseError;
+    active?: boolean;
 }
 
-export const Preview = (props: PreviewProps) => {
-    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate, error} = props;
+export function HealthcheckPreview(props: HealthcheckPreviewProps) {
+    const {selfCheckResult, issuesStatistics, loading, onUpdate, error, active} = props;
 
     const renderHeader = () => {
         const modifier = selfCheckResult.toLowerCase();
@@ -66,7 +67,6 @@ export const Preview = (props: PreviewProps) => {
                                 />
                             ))}
                         </div>
-                        <Link onClick={() => onShowMore?.()}>{i18n('label.show-details')}</Link>
                     </>
                 )}
             </div>
@@ -74,9 +74,9 @@ export const Preview = (props: PreviewProps) => {
     };
 
     return (
-        <div className={b('old-preview')}>
+        <DiagnosticCard className={b('preview')} active={active}>
             {renderHeader()}
             {renderContent()}
-        </div>
+        </DiagnosticCard>
     );
-};
+}

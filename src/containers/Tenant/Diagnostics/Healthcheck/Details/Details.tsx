@@ -26,9 +26,9 @@ export const Details = (props: DetailsProps) => {
 
     const renderHealthcheckHeader = () => {
         return (
-            <div className={b('details-header')}>
-                <h3 className={b('details-header-title')}>{i18n('title.healthcheck')}</h3>
-                <div className={b('details-header-update')}>
+            <div className={b('old-details-header')}>
+                <h3 className={b('old-details-header-title')}>{i18n('title.healthcheck')}</h3>
+                <div className={b('old-details-header-update')}>
                     <Button size="s" onClick={onUpdate} loading={loading} view="flat-secondary">
                         <Icon data={updateArrow} height={20} width={20} />
                     </Button>
@@ -56,9 +56,9 @@ export const Details = (props: DetailsProps) => {
     };
 
     return (
-        <div className={b('details')}>
+        <div className={b('old-details')}>
             {renderHealthcheckHeader()}
-            <div className={b('details-content-wrapper')}>{renderContent()}</div>
+            <div className={b('old-details-content-wrapper')}>{renderContent()}</div>
         </div>
     );
 };

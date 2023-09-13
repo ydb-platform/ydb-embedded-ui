@@ -8,10 +8,11 @@ import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
-import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedSelector, useHealthcheck} from '../../../../utils/hooks';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
+import {HealthcheckDetails} from '../Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
 
 import i18n from './i18n';
@@ -22,19 +23,28 @@ const b = cn('tenant-overview');
 interface TenantOverviewProps {
     tenantName: string;
     additionalTenantProps?: AdditionalTenantsProps;
-    showMoreHandler?: VoidFunction;
 }
 
-export function TenantOverview({
-    tenantName,
-    additionalTenantProps,
-    showMoreHandler,
-}: TenantOverviewProps) {
+export function TenantOverview({tenantName, additionalTenantProps}: TenantOverviewProps) {
     const dispatch = useDispatch();
 
-    const {tenant, loading, wasLoaded} = useTypedSelector((state) => state.tenant);
+    const {
+        tenant,
+        loading: tenantLoading,
+        wasLoaded: tenantWasLoaded,
+    } = useTypedSelector((state) => state.tenant);
     const {metricsTab} = useTypedSelector((state) => state.tenant);
     const {autorefresh} = useTypedSelector((state) => state.schema);
+
+    const {
+        issueTrees,
+        issuesStatistics,
+        selfCheckResult,
+        fetchHealthcheck,
+        loading: healthcheckLoading,
+        wasLoaded: healthCheckWasLoaded,
+        error: healthcheckError,
+    } = useHealthcheck(tenantName);
 
     const fetchTenant = useCallback(
         (isBackground = true) => {
@@ -46,7 +56,14 @@ export function TenantOverview({
         [dispatch, tenantName],
     );
 
-    useAutofetcher(fetchTenant, [fetchTenant], autorefresh);
+    useAutofetcher(
+        (isBackground) => {
+            fetchTenant(isBackground);
+            fetchHealthcheck(isBackground);
+        },
+        [fetchTenant, fetchHealthcheck],
+        autorefresh,
+    );
 
     const {Name, State, Type} = tenant || {};
 
@@ -90,7 +107,7 @@ export function TenantOverview({
                 return i18n('label.under-development');
             }
             case TENANT_METRICS_TABS_IDS.healthcheck: {
-                return i18n('label.under-development');
+                return <HealthcheckDetails issueTrees={issueTrees} error={healthcheckError} />;
             }
             default: {
                 return undefined;
@@ -98,7 +115,7 @@ export function TenantOverview({
         }
     };
 
-    if (loading && !wasLoaded) {
+    if ((tenantLoading && !tenantWasLoaded) || (healthcheckLoading && !healthCheckWasLoaded)) {
         return (
             <div className={b('loader')}>
                 <Loader size="m" />
@@ -114,9 +131,12 @@ export function TenantOverview({
                 {additionalTenantProps?.getMonitoringLink?.(Name, Type)}
             </div>
             <MetricsCards
-                tenantName={tenantName}
                 metrics={calculatedMetrics}
-                showMoreHandler={showMoreHandler}
+                issuesStatistics={issuesStatistics}
+                selfCheckResult={selfCheckResult}
+                fetchHealthcheck={fetchHealthcheck}
+                healthcheckLoading={healthcheckLoading}
+                healthcheckError={healthcheckError}
             />
             {renderTabContent()}
         </div>

@@ -2,15 +2,7 @@
     display: flex;
     gap: 16px;
 
-    margin-bottom: 10px;
-
-    &__tabs {
-        overflow: visible;
-        flex-wrap: nowrap;
-        align-items: normal;
-
-        box-shadow: none;
-    }
+    margin-bottom: 32px;
 
     &__tab {
         text-decoration: none;

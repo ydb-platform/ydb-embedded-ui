@@ -12,7 +12,6 @@ import {
     selectIssuesTrees,
     setDataWasNotLoaded,
 } from '../../../../store/reducers/healthcheckInfo';
-import {DiagnosticCard} from '../../../../components/DiagnosticCard/DiagnosticCard';
 
 import {Details} from './Details';
 import {Preview} from './Preview';
@@ -24,13 +23,12 @@ interface HealthcheckProps {
     preview?: boolean;
     fetchData?: boolean;
     showMoreHandler?: VoidFunction;
-    active?: boolean;
 }
 
 const b = cn('healthcheck');
 
 export const Healthcheck = (props: HealthcheckProps) => {
-    const {tenant, preview, fetchData = true, showMoreHandler, active} = props;
+    const {tenant, preview, fetchData = true, showMoreHandler} = props;
 
     const dispatch = useDispatch();
 
@@ -65,11 +63,12 @@ export const Healthcheck = (props: HealthcheckProps) => {
     const renderContent = () => {
         if (loading && !wasLoaded) {
             return (
-                <DiagnosticCard className={b('loader')}>
+                <div className={b('old-preview', {loader: true})}>
                     <Loader size="m" />
-                </DiagnosticCard>
+                </div>
             );
         }
+
         return preview ? (
             <Preview
                 issuesStatistics={issuesStatistics}
@@ -78,7 +77,6 @@ export const Healthcheck = (props: HealthcheckProps) => {
                 onShowMore={showMoreHandler}
                 onUpdate={fetchHealthcheck}
                 error={error}
-                active={active}
             />
         ) : (
             <Details

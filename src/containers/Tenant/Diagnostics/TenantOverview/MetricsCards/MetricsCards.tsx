@@ -1,8 +1,7 @@
 import cn from 'bem-cn-lite';
+import qs from 'qs';
 
 import {Link} from 'react-router-dom';
-
-import qs from 'qs';
 
 import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
@@ -16,7 +15,9 @@ import {
     memoryUsageToStatus,
     formatTenantMetrics,
 } from '../../../../../store/reducers/tenants/utils';
-import {Healthcheck} from '../../Healthcheck/Healthcheck';
+import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
+import type {IResponseError} from '../../../../../types/api/error';
+import {HealthcheckPreview} from '../../Healthcheck/HealthcheckPreview';
 import {MetricCard} from './MetricCard/MetricCard';
 
 import './MetricsCards.scss';
@@ -33,12 +34,22 @@ export interface TenantMetrics {
 }
 
 interface MetricsCardsProps {
-    tenantName: string;
-    showMoreHandler?: VoidFunction;
     metrics?: TenantMetrics;
+    issuesStatistics?: [StatusFlag, number][];
+    selfCheckResult: SelfCheckResult;
+    fetchHealthcheck: VoidFunction;
+    healthcheckLoading?: boolean;
+    healthcheckError?: IResponseError;
 }
 
-export function MetricsCards({tenantName, metrics, showMoreHandler}: MetricsCardsProps) {
+export function MetricsCards({
+    metrics,
+    issuesStatistics,
+    selfCheckResult,
+    fetchHealthcheck,
+    healthcheckLoading,
+    healthcheckError,
+}: MetricsCardsProps) {
     const {memoryUsed, memoryLimit, cpuUsed, cpuLimit, storageUsed, storageLimit} = metrics || {};
 
     const {metricsTab} = useTypedSelector((state) => state.tenant);
@@ -110,10 +121,12 @@ export function MetricsCards({tenantName, metrics, showMoreHandler}: MetricsCard
                 />
             </Link>
             <Link to={tabLinks.healthcheck} className={b('tab')}>
-                <Healthcheck
-                    tenant={tenantName}
-                    preview={true}
-                    showMoreHandler={showMoreHandler}
+                <HealthcheckPreview
+                    selfCheckResult={selfCheckResult}
+                    issuesStatistics={issuesStatistics}
+                    onUpdate={fetchHealthcheck}
+                    loading={healthcheckLoading}
+                    error={healthcheckError}
                     active={metricsTab === TENANT_METRICS_TABS_IDS.healthcheck}
                 />
             </Link>
