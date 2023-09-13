@@ -1,17 +1,16 @@
-import {ReactNode} from 'react';
+import type {ReactNode} from 'react';
 import cn from 'bem-cn-lite';
-
-import {Card} from '@gravity-ui/uikit';
 
 import './DiagnosticCard.scss';
 
-const b = cn('diagnostic-card');
+const b = cn('ydb-diagnostic-card');
 
 interface DiagnosticCardProps {
     children?: ReactNode;
     className?: string;
+    active?: boolean;
 }
 
-export function DiagnosticCard({children, className}: DiagnosticCardProps) {
-    return <Card className={b(null, className)}>{children}</Card>;
+export function DiagnosticCard({children, className, active}: DiagnosticCardProps) {
+    return <div className={b({active}, className)}>{children}</div>;
 }

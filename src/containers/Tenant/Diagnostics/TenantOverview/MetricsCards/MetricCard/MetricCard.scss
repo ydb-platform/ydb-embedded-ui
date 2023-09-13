@@ -1,0 +1,55 @@
+@import '../../../../../../styles/mixins.scss';
+
+.ydb-metrics-card {
+
+    $b: &;
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        margin-bottom: 10px;
+    }
+
+    &__label {
+        font-weight: 600;
+        @include lead-typography();
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        font-size: var(--yc-text-header-1-font-size);
+        line-height: var(--yc-text-header-1-line-height);
+        text-align: center;
+
+        color: var(--yc-color-text-secondary);
+
+        transition: color 0.1s;
+    }
+
+    &__progress {
+        font-size: 36px;
+        font-weight: 500;
+        line-height: 40px;
+        text-align: center;
+    }
+
+    &__resources {
+        font-size: var(--yc-text-body-1-font-size);
+
+        color: var(--yc-color-text-secondary);
+    }
+
+    &_active {
+        #{$b}__content {
+            color: var(--yc-color-text-complementary);
+        }
+
+        #{$b}__progress-bar-circle-bg {
+            stroke: var(--yc-color-base-float);
+        }
+    }
+}

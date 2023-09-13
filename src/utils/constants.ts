@@ -88,6 +88,7 @@ export const LANGUAGE_KEY = 'language';
 export const INVERTED_DISKS_KEY = 'invertedDisks';
 export const USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY = 'useNodesEndpointInDiagnostics';
 export const ENABLE_ADDITIONAL_QUERY_MODES = 'enableAdditionalQueryModes';
+export const ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN = 'enableNewTenantDiagnosticsDesign';
 export const SAVED_QUERIES_KEY = 'saved_queries';
 export const ASIDE_HEADER_COMPACT_KEY = 'asideHeaderCompact';
 export const QUERIES_HISTORY_KEY = 'queries_history';

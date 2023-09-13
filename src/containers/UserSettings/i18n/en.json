@@ -23,5 +23,8 @@
   "settings.useBackendParamsForTables.popover": "Filter and sort Nodes and Storage tables with request params. May increase performance, but could causes additional fetches and longer loading time on older versions",
 
   "settings.enableAdditionalQueryModes.title": "Enable additional query modes",
-  "settings.enableAdditionalQueryModes.popover": "Adds 'Data', 'YQL - QueryService' and 'PostgreSQL' modes. May not work on some versions"
+  "settings.enableAdditionalQueryModes.popover": "Adds 'Data', 'YQL - QueryService' and 'PostgreSQL' modes. May not work on some versions",
+
+  "settings.tenantDiagnostics.title": "Enable new database diagnostics design",
+  "settings.tenantDiagnostics.popover": "Adds indicators of database resources usage. Incomplete data may be displayed for some databases"
 }

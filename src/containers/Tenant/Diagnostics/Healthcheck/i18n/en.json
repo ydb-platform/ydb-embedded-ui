@@ -2,6 +2,7 @@
   "title.healthcheck": "Healthcheck",
   "label.update": "Update",
   "label.show-details": "Show details",
-  "status_message.ok": "No issues have been found on this database",
+  "label.issues": "Issues:",
+  "status_message.ok": "No issues",
   "no-data": "no healthcheck data"
 }

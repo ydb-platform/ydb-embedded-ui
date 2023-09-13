@@ -1,5 +1,8 @@
 import type {TTenant} from '../../../types/api/tenant';
+import {formatBytes} from '../../../utils/bytesParsers';
+import {formatCPU} from '../../../utils/formatCPU/formatCPU';
 import {isNumeric} from '../../../utils/utils';
+import {METRIC_STATUS} from './contants';
 
 const getControlPlaneValue = (tenant: TTenant) => {
     const parts = tenant.Name?.split('/');
@@ -18,21 +21,40 @@ const getTenantBackend = (tenant: TTenant) => {
     return node.Host ? `${node.Host}${address ? address : ''}` : undefined;
 };
 
-const calculateTenantMetrics = (tenant: TTenant) => {
-    const {CoresUsed, MemoryUsed, StorageAllocatedSize, Metrics = {}} = tenant;
+export const calculateTenantMetrics = (tenant?: TTenant) => {
+    const {
+        CoresUsed,
+        MemoryUsed,
+        StorageAllocatedSize,
+        CoresLimit,
+        MemoryLimit,
+        StorageLimit,
+        Metrics = {},
+    } = tenant || {};
 
     const cpuFromCores = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
     const cpuFromMetrics = isNumeric(Metrics.CPU) ? Number(Metrics.CPU) : undefined;
 
-    const cpu = cpuFromCores ?? cpuFromMetrics ?? 0;
+    const cpu = cpuFromCores ?? cpuFromMetrics ?? undefined;
 
     const rawMemory = MemoryUsed ?? Metrics.Memory;
     const rawStorage = StorageAllocatedSize ?? Metrics.Storage;
 
-    const memory = isNumeric(rawMemory) ? Number(rawMemory) : 0;
-    const storage = isNumeric(rawStorage) ? Number(rawStorage) : 0;
+    const memory = isNumeric(rawMemory) ? Number(rawMemory) : undefined;
+    const storage = isNumeric(rawStorage) ? Number(rawStorage) : undefined;
 
-    return {cpu, memory, storage};
+    const cpuLimit = isNumeric(CoresLimit) ? Number(CoresLimit) : undefined;
+    const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
+    const storageLimit = isNumeric(StorageLimit) ? Number(StorageLimit) : undefined;
+
+    return {
+        cpu,
+        memory,
+        storage,
+        cpuLimit,
+        memoryLimit,
+        storageLimit,
+    };
 };
 
 const calculateTenantEntities = (tenant: TTenant) => {
@@ -65,4 +87,89 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean) =>
             groupsCount,
         };
     });
+};
+
+export const calculateUsage = (valueUsed?: number, valueLimit?: number): number | undefined => {
+    if (valueUsed && valueLimit) {
+        return (valueUsed * 100) / valueLimit;
+    }
+
+    return undefined;
+};
+
+export const formatUsage = (usage?: number) => {
+    if (usage) {
+        return `${usage.toFixed()}%`;
+    }
+
+    return undefined;
+};
+
+export const cpuUsageToStatus = (usage?: number) => {
+    if (!usage) {
+        return METRIC_STATUS.Unspecified;
+    }
+
+    if (usage > 70) {
+        return METRIC_STATUS.Danger;
+    }
+    if (usage > 60) {
+        return METRIC_STATUS.Warning;
+    }
+
+    return METRIC_STATUS.Good;
+};
+export const storageUsageToStatus = (usage?: number) => {
+    if (!usage) {
+        return METRIC_STATUS.Unspecified;
+    }
+
+    if (usage > 85) {
+        return METRIC_STATUS.Danger;
+    }
+    if (usage > 75) {
+        return METRIC_STATUS.Warning;
+    }
+
+    return METRIC_STATUS.Good;
+};
+
+export const memoryUsageToStatus = (usage?: number) => {
+    if (!usage) {
+        return METRIC_STATUS.Unspecified;
+    }
+
+    if (usage > 70) {
+        return METRIC_STATUS.Danger;
+    }
+    if (usage > 60) {
+        return METRIC_STATUS.Warning;
+    }
+
+    return METRIC_STATUS.Good;
+};
+
+export const formatTenantMetrics = ({
+    cpu,
+    storage,
+    memory,
+}: {
+    cpu?: number;
+    storage?: number;
+    memory?: number;
+}) => ({
+    cpu: formatCPU(cpu),
+    storage: formatBytes({value: storage, significantDigits: 2}) || undefined,
+    memory: formatBytes({value: memory, significantDigits: 2}) || undefined,
+});
+
+export const normalizeProgress = (progress: number) => {
+    if (progress >= 100) {
+        return 100;
+    }
+    if (progress <= 0) {
+        return 0;
+    }
+
+    return progress;
 };

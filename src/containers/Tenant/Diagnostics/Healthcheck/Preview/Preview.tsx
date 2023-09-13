@@ -21,25 +21,28 @@ interface PreviewProps {
     onShowMore?: VoidFunction;
     onUpdate: VoidFunction;
     error?: IResponseError;
+    active?: boolean;
 }
 
 export const Preview = (props: PreviewProps) => {
-    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate, error} = props;
+    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate, error, active} = props;
 
     const isStatusOK = selfCheckResult === SelfCheckResult.GOOD;
 
-    const renderStatus = () => {
+    const renderHeader = () => {
         const modifier = selfCheckResult.toLowerCase();
 
         return (
-            <div className={b('status-wrapper')}>
-                <div className={b('preview-title')}>{i18n('title.healthcheck')}</div>
+            <div className={b('preview-header')}>
+                <div className={b('preview-title-wrapper')}>
+                    <div className={b('preview-title')}>{i18n('title.healthcheck')}</div>
+                    <Button size="s" onClick={onUpdate} loading={loading} view="flat-secondary">
+                        <Icon data={updateArrow} width={20} height={20} />
+                    </Button>
+                </div>
                 <div className={b('self-check-status-indicator', {[modifier]: true})}>
                     {selfCheckResult}
                 </div>
-                <Button size="s" onClick={onUpdate} loading={loading} view="flat-secondary">
-                    <Icon data={updateArrow} width={20} height={20} />
-                </Button>
             </div>
         );
     };
@@ -55,7 +58,7 @@ export const Preview = (props: PreviewProps) => {
                     i18n('status_message.ok')
                 ) : (
                     <>
-                        <div>Issues:</div>
+                        <div>{i18n('label.issues')}</div>
                         <div className={b('issues-statistics')}>
                             {issuesStatistics.map(([status, count]) => (
                                 <EntityStatus
@@ -75,8 +78,8 @@ export const Preview = (props: PreviewProps) => {
     };
 
     return (
-        <DiagnosticCard className={b('preview')}>
-            {renderStatus()}
+        <DiagnosticCard active={active}>
+            {renderHeader()}
             {renderContent()}
         </DiagnosticCard>
     );

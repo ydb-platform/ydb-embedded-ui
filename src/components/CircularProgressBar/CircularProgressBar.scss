@@ -1,0 +1,46 @@
+.ydb-circular-progress-bar {
+    display: block;
+
+    max-width: 100%;
+
+    transform: rotate(90deg);
+
+    &__wrapper {
+        position: relative;
+
+        display: inline;
+    }
+    &__content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+
+        overflow: hidden;
+
+        max-width: 100%;
+
+        transform: translate(-50%, -50%);
+    }
+
+    &__circle-bg {
+        stroke: var(--yc-color-base-simple-hover);
+
+        fill: none;
+
+        transition: stroke 0.1s;
+    }
+
+    &__circle {
+        fill: none;
+
+        &_status_good {
+            stroke: var(--yc-color-private-green-550);
+        }
+        &_status_warning {
+            stroke: var(--yc-color-private-yellow-550);
+        }
+        &_status_danger {
+            stroke: var(--yc-color-private-red-550);
+        }
+    }
+}

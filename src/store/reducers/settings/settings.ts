@@ -15,6 +15,7 @@ import {
     LAST_USED_QUERY_ACTION_KEY,
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     LANGUAGE_KEY,
+    ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN,
 } from '../../../utils/constants';
 import '../../../services/api';
 import {parseJson} from '../../../utils/utils';
@@ -53,6 +54,10 @@ export const initialState = {
         ),
         [ENABLE_ADDITIONAL_QUERY_MODES]: readSavedSettingsValue(
             ENABLE_ADDITIONAL_QUERY_MODES,
+            'false',
+        ),
+        [ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN]: readSavedSettingsValue(
+            ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN,
             'false',
         ),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),

@@ -4,43 +4,33 @@ import {useDispatch} from 'react-redux';
 
 import {Loader} from '@gravity-ui/uikit';
 
-import {formatBytes} from '../../../../utils/bytesParsers';
 import {InfoViewer} from '../../../../components/InfoViewer';
 import {PoolUsage} from '../../../../components/PoolUsage/PoolUsage';
+import {Tablet} from '../../../../components/Tablet';
 import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
+import {formatCPU} from '../../../../utils';
 import {TABLET_STATES, TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
+import {bytesToGB} from '../../../../utils/utils';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import type {ETabletVolatileState} from '../../../../types/api/tenant';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
-import {
-    formatTenantMetrics,
-    calculateTenantMetrics,
-} from '../../../../store/reducers/tenants/utils';
-import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
 
 import i18n from './i18n';
 import './TenantOverview.scss';
 
 const b = cn('tenant-overview');
 
-interface TenantOverviewProps {
+interface OldTenantOverviewProps {
     tenantName: string;
     additionalTenantProps?: AdditionalTenantsProps;
-    showMoreHandler?: VoidFunction;
 }
 
-export function TenantOverview({
-    tenantName,
-    additionalTenantProps,
-    showMoreHandler,
-}: TenantOverviewProps) {
-    const dispatch = useDispatch();
-
+export function OldTenantOverview({tenantName, additionalTenantProps}: OldTenantOverviewProps) {
     const {tenant, loading, wasLoaded} = useTypedSelector((state) => state.tenant);
     const {autorefresh} = useTypedSelector((state) => state.schema);
-
+    const dispatch = useDispatch();
     const fetchTenant = useCallback(
         (isBackground = true) => {
             if (!isBackground) {
@@ -57,44 +47,40 @@ export function TenantOverview({
         Metrics = {},
         PoolStats,
         StateStats = [],
+        MemoryUsed,
         Name,
         State,
+        CoresUsed,
         StorageGroups,
         StorageAllocatedSize,
         Type,
+        SystemTablets,
     } = tenant || {};
 
     const tenantType = mapDatabaseTypeToDBName(Type);
+    const memoryRaw = MemoryUsed ?? Metrics.Memory;
 
-    const {cpu, storage, memory, cpuLimit, storageLimit, memoryLimit} =
-        calculateTenantMetrics(tenant);
-
-    const calculatedMetrics: TenantMetrics = {
-        memoryUsed: memory,
-        memoryLimit,
-        cpuUsed: cpu,
-        cpuLimit,
-        storageUsed: storage,
-        storageLimit,
-    };
-
-    const formattedMetrics = formatTenantMetrics({cpu, storage, memory});
-
+    const memory = (memoryRaw && bytesToGB(memoryRaw)) || i18n('no-data');
+    const storage = (Metrics.Storage && bytesToGB(Metrics.Storage)) || i18n('no-data');
     const storageGroups = StorageGroups ?? i18n('no-data');
-    const tabletStorage =
-        (Metrics.Storage && formatBytes({value: Metrics.Storage})) || i18n('no-data');
+    const blobStorage =
+        (StorageAllocatedSize && bytesToGB(StorageAllocatedSize)) || i18n('no-data');
     const storageEfficiency =
         Metrics.Storage && StorageAllocatedSize
             ? `${((parseInt(Metrics.Storage) * 100) / parseInt(StorageAllocatedSize)).toFixed(2)}%`
             : i18n('no-data');
 
+    const cpuRaw = CoresUsed !== undefined ? Number(CoresUsed) * 1_000_000 : Metrics.CPU;
+
+    const cpu = formatCPU(cpuRaw);
+
     const metricsInfo = [
         {label: 'Type', value: Type},
-        {label: 'Memory', value: formattedMetrics.memory},
-        {label: 'CPU', value: formattedMetrics.cpu},
-        {label: 'Tablet storage', value: tabletStorage},
+        {label: 'Memory', value: memory},
+        {label: 'CPU', value: cpu},
+        {label: 'Tablet storage', value: storage},
         {label: 'Storage groups', value: storageGroups},
-        {label: 'Blob storage', value: formattedMetrics.storage},
+        {label: 'Blob storage', value: blobStorage},
         {label: 'Storage efficiency', value: storageEfficiency},
     ];
 
@@ -135,11 +121,12 @@ export function TenantOverview({
                 {renderName()}
                 {additionalTenantProps?.getMonitoringLink?.(Name, Type)}
             </div>
-            <MetricsCards
-                tenantName={tenantName}
-                metrics={calculatedMetrics}
-                showMoreHandler={showMoreHandler}
-            />
+            <div className={b('system-tablets')}>
+                {SystemTablets &&
+                    SystemTablets.map((tablet, tabletIndex) => (
+                        <Tablet key={tabletIndex} tablet={tablet} tenantName={Name} />
+                    ))}
+            </div>
             <div className={b('common-info')}>
                 <div>
                     <div className={b('section-title')}>{i18n('title.pools')}</div>

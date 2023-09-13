@@ -53,20 +53,27 @@
         margin-left: 10px;
     }
 
-    &__status-wrapper {
-        display: flex;
-
+    &__preview-header {
         margin-bottom: detailedOverview.$section-title-margin;
         gap: 8px;
     }
 
     &__preview-title {
         font-weight: 600;
-        line-height: detailedOverview.$section-title-line-height;
+        @include lead-typography();
     }
 
     &__preview-content {
         line-height: 24px;
+    }
+
+    &__preview-title-wrapper {
+        display: flex;
+        align-items: center;
+
+        margin-bottom: 4px;
+
+        gap: 8px;
     }
 
     &__issues-statistics {
@@ -74,13 +81,14 @@
         flex-wrap: wrap;
         align-items: center;
 
-        margin: 10px 0;
+        margin: 8px 0;
 
-        column-gap: 26px;
-        row-gap: 16px;
+        gap: 10px;
     }
 
     &__self-check-status-indicator {
+        display: inline-block;
+
         padding: 0 8px;
 
         font-size: 13px;

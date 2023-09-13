@@ -1,8 +1,10 @@
 import {FETCH_TENANTS, setSearchValue} from './tenants';
 
+import {ValueOf} from '../../../types/common';
 import type {TTenant} from '../../../types/api/tenant';
 import type {IResponseError} from '../../../types/api/error';
 import type {ApiRequestAction} from '../../utils';
+import {METRIC_STATUS} from './contants';
 
 export interface PreparedTenant extends TTenant {
     backend: string | undefined;
@@ -30,3 +32,5 @@ export type TenantsAction =
 export interface TenantsStateSlice {
     tenants: TenantsState;
 }
+
+export type MetricStatus = ValueOf<typeof METRIC_STATUS>;
