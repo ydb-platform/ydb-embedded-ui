@@ -44,6 +44,10 @@ const healthcheckInfo: Reducer<IHealthcheckInfoState, IHealthCheckInfoAction> = 
             };
         }
         case FETCH_HEALTHCHECK.FAILURE: {
+            if (action.error?.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error,
@@ -147,7 +151,7 @@ export const selectIssuesStatistics: Selector<
 
 export function getHealthcheckInfo(database: string) {
     return createApiRequest({
-        request: window.api.getHealthcheckInfo(database),
+        request: window.api.getHealthcheckInfo(database, {concurrentId: 'getHealthcheckInfo'}),
         actions: FETCH_HEALTHCHECK,
     });
 }

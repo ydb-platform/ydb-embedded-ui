@@ -350,10 +350,12 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             enable_sampling: enableSampling,
         });
     }
-    getHealthcheckInfo(database: string) {
-        return this.get<HealthCheckAPIResponse>(this.getPath('/viewer/json/healthcheck'), {
-            tenant: database,
-        });
+    getHealthcheckInfo(database: string, {concurrentId}: AxiosOptions = {}) {
+        return this.get<HealthCheckAPIResponse>(
+            this.getPath('/viewer/json/healthcheck'),
+            {tenant: database},
+            {concurrentId},
+        );
     }
     killTablet(id?: string) {
         return this.get<string>(this.getPath(`/tablets?KillTabletID=${id}`), {});
