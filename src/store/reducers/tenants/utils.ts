@@ -38,11 +38,11 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
     const cpu = cpuFromCores ?? cpuFromMetrics ?? undefined;
 
     const rawMemory = MemoryUsed ?? Metrics.Memory;
-    const rawStorage = StorageAllocatedSize ?? Metrics.Storage;
 
     const memory = isNumeric(rawMemory) ? Number(rawMemory) : undefined;
-    const storage = isNumeric(rawStorage) ? Number(rawStorage) : undefined;
 
+    // Blob storage - actual database size
+    const storage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
     const cpuLimit = isNumeric(CoresLimit) ? Number(CoresLimit) : undefined;
     const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
     const storageLimit = isNumeric(StorageLimit) ? Number(StorageLimit) : undefined;
