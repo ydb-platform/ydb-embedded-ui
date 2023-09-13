@@ -3,4 +3,18 @@
     gap: 16px;
 
     margin-bottom: 10px;
+
+    &__tabs {
+        overflow: visible;
+        flex-wrap: nowrap;
+        align-items: normal;
+
+        box-shadow: none;
+    }
+
+    &__tab {
+        text-decoration: none;
+
+        color: inherit;
+    }
 }

@@ -54,6 +54,9 @@ const paramSetup = {
         summaryTab: {
             stateKey: 'tenant.summaryTab',
         },
+        metricsTab: {
+            stateKey: 'tenant.metricsTab',
+        },
         shardsMode: {
             stateKey: 'shardsWorkload.filters.mode',
         },

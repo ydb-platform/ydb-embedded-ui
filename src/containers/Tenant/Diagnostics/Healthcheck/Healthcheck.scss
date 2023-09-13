@@ -5,6 +5,8 @@
 .healthcheck {
     display: flex;
 
+    height: 100%;
+
     &_expanded {
         // Since most of the inner containers have fixed width, we can set fixed width here as well
         // Thus we will get rid of unneeded layout shift when scrollbar appear

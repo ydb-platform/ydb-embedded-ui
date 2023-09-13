@@ -4,6 +4,7 @@ import type {TTenant} from '../../../types/api/tenant';
 import type {
     TenantAction,
     TenantDiagnosticsTab,
+    TenantMetricsTab,
     TenantPage,
     TenantQueryTab,
     TenantState,
@@ -19,6 +20,7 @@ const SET_TOP_LEVEL_TAB = 'tenant/SET_TOP_LEVEL_TAB';
 const SET_QUERY_TAB = 'tenant/SET_QUERY_TAB';
 const SET_DIAGNOSTICS_TAB = 'tenant/SET_DIAGNOSTICS_TAB';
 const SET_SUMMARY_TAB = 'tenant/SET_SUMMARY_TAB';
+const SET_METRICS_TAB = 'tenant/SET_METRICS_TAB';
 const CLEAR_TENANT = 'tenant/CLEAR_TENANT';
 const SET_DATA_WAS_NOT_LOADED = 'tenant/SET_DATA_WAS_NOT_LOADED';
 
@@ -88,6 +90,12 @@ const tenantReducer: Reducer<TenantState, TenantAction> = (state = initialState,
                 summaryTab: action.data,
             };
         }
+        case SET_METRICS_TAB: {
+            return {
+                ...state,
+                metricsTab: action.data,
+            };
+        }
 
         case SET_DATA_WAS_NOT_LOADED: {
             return {
@@ -139,6 +147,13 @@ export function setDiagnosticsTab(tab: TenantDiagnosticsTab) {
 export function setSummaryTab(tab: TenantSummaryTab) {
     return {
         type: SET_SUMMARY_TAB,
+        data: tab,
+    } as const;
+}
+
+export function setMetricsTab(tab: TenantMetricsTab) {
+    return {
+        type: SET_METRICS_TAB,
         data: tab,
     } as const;
 }

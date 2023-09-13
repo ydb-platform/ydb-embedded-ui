@@ -3,5 +3,7 @@
   "no-pools-data": "No pools data",
 
   "title.pools": "Pools",
-  "title.metrics": "Metrics"
+  "title.metrics": "Metrics",
+
+  "label.under-development": "This section is under development"
 }
