@@ -76,21 +76,25 @@ const mapStatusToPriority: Partial<Record<StatusFlag, number>> = {
     GREEN: 4,
 };
 
+const sortIssues = (data: IssueLog[]): IssueLog[] => {
+    return data.sort((a, b) => {
+        const aPriority = mapStatusToPriority[a.status] || 0;
+        const bPriority = mapStatusToPriority[b.status] || 0;
+
+        return aPriority - bPriority;
+    });
+};
+
 const getReasonsForIssue = ({issue, data}: {issue: IssueLog; data: IssueLog[]}) => {
-    return data.filter((item) => issue.reason && issue.reason.indexOf(item.id) !== -1);
+    return sortIssues(data.filter((item) => issue.reason && issue.reason.indexOf(item.id) !== -1));
 };
 
 const getRoots = (data: IssueLog[]): IssueLog[] => {
-    let roots = data.filter((item) => {
-        return !data.find((issue) => issue.reason && issue.reason.indexOf(item.id) !== -1);
-    });
-
-    roots = _flow([
-        _uniqBy((item: IssueLog) => item.id),
-        _sortBy(({status}: {status: StatusFlag}) => mapStatusToPriority[status]),
-    ])(roots);
-
-    return roots;
+    return sortIssues(
+        data.filter((item) => {
+            return !data.find((issue) => issue.reason && issue.reason.indexOf(item.id) !== -1);
+        }),
+    );
 };
 
 const getInvertedConsequencesTree = ({
