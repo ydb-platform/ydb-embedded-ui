@@ -8,12 +8,13 @@ import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
-import {useAutofetcher, useTypedSelector, useHealthcheck} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import {HealthcheckDetails} from '../Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
+import {useHealthcheck} from './useHealthcheck';
 
 import i18n from './i18n';
 import './TenantOverview.scss';

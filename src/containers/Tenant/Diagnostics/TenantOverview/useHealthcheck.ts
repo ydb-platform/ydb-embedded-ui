@@ -6,11 +6,11 @@ import {
     selectIssuesStatistics,
     selectIssuesTrees,
     setDataWasNotLoaded,
-} from '../../store/reducers/healthcheckInfo';
-import type {IIssuesTree} from '../../types/store/healthcheck';
-import {type StatusFlag, SelfCheckResult} from '../../types/api/healthcheck';
-import type {IResponseError} from '../../types/api/error';
-import {useTypedSelector} from './useTypedSelector';
+} from '../../../../store/reducers/healthcheckInfo';
+import type {IIssuesTree} from '../../../../types/store/healthcheck';
+import {type StatusFlag, SelfCheckResult} from '../../../../types/api/healthcheck';
+import type {IResponseError} from '../../../../types/api/error';
+import {useTypedSelector} from '../../../../utils/hooks/useTypedSelector';
 
 interface HealthcheckParams {
     issueTrees: IIssuesTree[];
