@@ -2,7 +2,7 @@
 @import '../../../../styles/mixins.scss';
 @import '@gravity-ui/uikit/styles/mixins.scss';
 
-.healthcheck {
+.old-healthcheck {
     display: flex;
 
     &_expanded {
@@ -11,7 +11,7 @@
         min-width: 885px;
     }
 
-    &__old-details {
+    &__details {
         width: 860px;
         padding: 25px 20px 20px;
     }
@@ -20,7 +20,7 @@
         margin-bottom: 15px;
     }
 
-    &__old-details-content-wrapper {
+    &__details-content-wrapper {
         overflow-x: hidden;
         overflow-y: auto;
 
@@ -32,24 +32,24 @@
         padding: 15px 0;
     }
 
-    &__old-details-header {
+    &__details-header {
         display: flex;
         align-items: center;
 
         margin-bottom: 20px;
     }
 
-    &__old-details-header-title {
+    &__details-header-title {
         margin: 0 10px 0 0;
 
         @include text-header-1();
     }
 
-    &__old-details-header-update {
+    &__details-header-update {
         margin-left: 10px;
     }
 
-    &__old-preview {
+    &__preview {
         width: 206px;
         padding: 16px;
         padding-bottom: 28px;
@@ -57,32 +57,6 @@
         border: 1px solid var(--yc-color-line-generic);
         border-radius: 8px;
         background-color: transparent;
-    }
-
-    &__old-preview_loader {
-        display: flex;
-        justify-content: center;
-
-        height: 100%;
-    }
-
-    &__details {
-        width: 872px;
-    }
-
-    &__details-content-wrapper {
-        overflow-x: hidden;
-    }
-
-    &__details-loader {
-        display: flex;
-        justify-content: center;
-
-        width: 872px;
-    }
-
-    &__preview {
-        height: 100%;
     }
 
     &__preview-header {
@@ -106,13 +80,6 @@
         margin-bottom: 4px;
 
         gap: 8px;
-    }
-
-    &__preview-loader {
-        display: flex;
-        justify-content: center;
-
-        height: 100%;
     }
 
     &__issues-statistics {

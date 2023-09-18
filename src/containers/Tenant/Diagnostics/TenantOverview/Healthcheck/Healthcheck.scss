@@ -1,0 +1,110 @@
+@use '../../DetailedOverview/DetailedOverview.scss' as detailedOverview;
+@import '../../../../../styles/mixins.scss';
+@import '@gravity-ui/uikit/styles/mixins.scss';
+
+.healthcheck {
+    display: flex;
+
+    &_expanded {
+        // Since most of the inner containers have fixed width, we can set fixed width here as well
+        // Thus we will get rid of unneeded layout shift when scrollbar appear
+        min-width: 885px;
+    }
+
+    &__issue-preview {
+        margin-bottom: 15px;
+    }
+
+    &__message-container {
+        padding: 15px 0;
+    }
+
+    &__details {
+        width: 872px;
+    }
+
+    &__details-content-wrapper {
+        overflow-x: hidden;
+    }
+
+    &__preview {
+        height: 100%;
+    }
+
+    &__preview-header {
+        margin-bottom: detailedOverview.$section-title-margin;
+        gap: 8px;
+    }
+
+    &__preview-title {
+        font-weight: 600;
+        @include lead-typography();
+    }
+
+    &__preview-content {
+        line-height: 24px;
+    }
+
+    &__preview-title-wrapper {
+        display: flex;
+        align-items: center;
+
+        margin-bottom: 4px;
+
+        gap: 8px;
+    }
+
+    &__issues-statistics {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+
+        margin: 8px 0;
+
+        gap: 10px;
+    }
+
+    &__self-check-status-indicator {
+        display: inline-block;
+
+        padding: 0 8px;
+
+        font-size: 13px;
+        line-height: 24px;
+
+        border-radius: 4px;
+
+        &_good,
+        &_green {
+            color: var(--yc-color-text-positive);
+            background-color: var(--yc-color-base-positive);
+        }
+        &_degraded,
+        &_yellow {
+            color: var(--yc-color-text-warning);
+            background-color: var(--yc-color-base-warning);
+        }
+
+        &_blue {
+            color: var(--yc-color-text-info);
+            background-color: var(--yc-color-base-info);
+        }
+
+        &_emergency,
+        &_red {
+            color: var(--yc-color-text-danger);
+            background-color: var(--yc-color-base-danger);
+        }
+        &_unspecified,
+        &_gray,
+        &_grey {
+            color: var(--yc-color-text-misc);
+            background-color: var(--yc-color-base-misc);
+        }
+        &_maintenance_required,
+        &_orange {
+            color: var(--yc-color-text-warning-heavy);
+            background-color: var(--yc-color-infographics-warning-light);
+        }
+    }
+}

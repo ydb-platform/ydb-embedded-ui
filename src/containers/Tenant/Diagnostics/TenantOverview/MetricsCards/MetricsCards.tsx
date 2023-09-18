@@ -1,13 +1,12 @@
 import cn from 'bem-cn-lite';
-import qs from 'qs';
 
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 
 import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {useTypedSelector} from '../../../../../utils/hooks';
-import routes, {createHref} from '../../../../../routes';
-import {TenantTabsGroups} from '../../../TenantPages';
+import {parseQuery} from '../../../../../routes';
+import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {
     calculateUsage,
     cpuUsageToStatus,
@@ -17,7 +16,7 @@ import {
 } from '../../../../../store/reducers/tenants/utils';
 import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
 import type {IResponseError} from '../../../../../types/api/error';
-import {HealthcheckPreview} from '../../Healthcheck/HealthcheckPreview';
+import {HealthcheckPreview} from '../Healthcheck/HealthcheckPreview';
 import {MetricCard} from './MetricCard/MetricCard';
 
 import './MetricsCards.scss';
@@ -50,6 +49,8 @@ export function MetricsCards({
     healthcheckLoading,
     healthcheckError,
 }: MetricsCardsProps) {
+    const location = useLocation();
+
     const {memoryUsed, memoryLimit, cpuUsed, cpuLimit, storageUsed, storageLimit} = metrics || {};
 
     const {metricsTab} = useTypedSelector((state) => state.tenant);
@@ -68,24 +69,22 @@ export function MetricsCards({
         memory: memoryUsed,
     });
 
-    const queryParams = qs.parse(location.search, {
-        ignoreQueryPrefix: true,
-    });
+    const queryParams = parseQuery(location);
 
     const tabLinks: Record<TenantMetricsTab, string> = {
-        [TENANT_METRICS_TABS_IDS.cpu]: createHref(routes.tenant, undefined, {
+        [TENANT_METRICS_TABS_IDS.cpu]: getTenantPath({
             ...queryParams,
             [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.cpu,
         }),
-        [TENANT_METRICS_TABS_IDS.storage]: createHref(routes.tenant, undefined, {
+        [TENANT_METRICS_TABS_IDS.storage]: getTenantPath({
             ...queryParams,
             [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.storage,
         }),
-        [TENANT_METRICS_TABS_IDS.memory]: createHref(routes.tenant, undefined, {
+        [TENANT_METRICS_TABS_IDS.memory]: getTenantPath({
             ...queryParams,
             [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.memory,
         }),
-        [TENANT_METRICS_TABS_IDS.healthcheck]: createHref(routes.tenant, undefined, {
+        [TENANT_METRICS_TABS_IDS.healthcheck]: getTenantPath({
             ...queryParams,
             [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.healthcheck,
         }),

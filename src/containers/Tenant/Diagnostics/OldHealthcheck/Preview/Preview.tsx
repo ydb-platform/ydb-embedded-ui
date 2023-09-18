@@ -1,30 +1,29 @@
 import cn from 'bem-cn-lite';
 
-import {Button, Icon} from '@gravity-ui/uikit';
+import {Button, Icon, Link} from '@gravity-ui/uikit';
 
-import updateArrow from '../../../../assets/icons/update-arrow.svg';
+import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
-import {SelfCheckResult, type StatusFlag} from '../../../../types/api/healthcheck';
-import type {IResponseError} from '../../../../types/api/error';
-import {DiagnosticCard} from '../../../../components/DiagnosticCard/DiagnosticCard';
-import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
-import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthcheck';
+import type {IResponseError} from '../../../../../types/api/error';
+import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
+import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
-import i18n from './i18n';
+import i18n from '../../TenantOverview/Healthcheck/i18n';
 
-const b = cn('healthcheck');
+const b = cn('old-healthcheck');
 
-interface HealthcheckPreviewProps {
+interface PreviewProps {
     selfCheckResult: SelfCheckResult;
     issuesStatistics?: [StatusFlag, number][];
     loading?: boolean;
+    onShowMore?: VoidFunction;
     onUpdate: VoidFunction;
     error?: IResponseError;
-    active?: boolean;
 }
 
-export function HealthcheckPreview(props: HealthcheckPreviewProps) {
-    const {selfCheckResult, issuesStatistics, loading, onUpdate, error, active} = props;
+export const Preview = (props: PreviewProps) => {
+    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate, error} = props;
 
     const renderHeader = () => {
         const modifier = selfCheckResult.toLowerCase();
@@ -67,6 +66,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
                                 />
                             ))}
                         </div>
+                        <Link onClick={() => onShowMore?.()}>{i18n('label.show-details')}</Link>
                     </>
                 )}
             </div>
@@ -74,9 +74,9 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     };
 
     return (
-        <DiagnosticCard className={b('preview')} active={active}>
+        <div className={b('preview')}>
             {renderHeader()}
             {renderContent()}
-        </DiagnosticCard>
+        </div>
     );
-}
+};

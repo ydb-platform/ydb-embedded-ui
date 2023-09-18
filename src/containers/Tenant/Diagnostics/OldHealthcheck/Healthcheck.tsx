@@ -25,7 +25,7 @@ interface HealthcheckProps {
     showMoreHandler?: VoidFunction;
 }
 
-const b = cn('healthcheck');
+const b = cn('old-healthcheck');
 
 export const Healthcheck = (props: HealthcheckProps) => {
     const {tenant, preview, fetchData = true, showMoreHandler} = props;

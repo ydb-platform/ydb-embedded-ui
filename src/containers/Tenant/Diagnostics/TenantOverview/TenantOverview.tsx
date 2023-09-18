@@ -12,7 +12,7 @@ import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
-import {HealthcheckDetails} from '../Healthcheck/HealthcheckDetails';
+import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
 import {useHealthcheck} from './useHealthcheck';
 
@@ -33,8 +33,8 @@ export function TenantOverview({tenantName, additionalTenantProps}: TenantOvervi
         tenant,
         loading: tenantLoading,
         wasLoaded: tenantWasLoaded,
+        metricsTab,
     } = useTypedSelector((state) => state.tenant);
-    const {metricsTab} = useTypedSelector((state) => state.tenant);
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
     const {

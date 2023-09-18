@@ -7,7 +7,7 @@ import JSONTree from 'react-json-inspector';
 
 import {TreeView} from 'ydb-ui-components';
 
-import {IIssuesTree} from '../../../../../types/store/healthcheck';
+import {IIssuesTree} from '../../../../../../types/store/healthcheck';
 
 import {IssueTreeItem} from './IssueTreeItem';
 

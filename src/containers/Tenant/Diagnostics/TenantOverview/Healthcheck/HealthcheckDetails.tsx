@@ -1,12 +1,13 @@
 import cn from 'bem-cn-lite';
 
-import type {IResponseError} from '../../../../types/api/error';
-import type {IIssuesTree} from '../../../../types/store/healthcheck';
-import {ResponseError} from '../../../../components/Errors/ResponseError';
+import type {IResponseError} from '../../../../../types/api/error';
+import type {IIssuesTree} from '../../../../../types/store/healthcheck';
+import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
 import IssueTree from './IssuesViewer/IssueTree';
 
 import i18n from './i18n';
+import './Healthcheck.scss';
 
 const b = cn('healthcheck');
 

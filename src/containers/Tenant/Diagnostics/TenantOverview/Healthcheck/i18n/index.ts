@@ -1,4 +1,4 @@
-import {i18n, Lang} from '../../../../../utils/i18n';
+import {i18n, Lang} from '../../../../../../utils/i18n';
 
 import en from './en.json';
 import ru from './ru.json';

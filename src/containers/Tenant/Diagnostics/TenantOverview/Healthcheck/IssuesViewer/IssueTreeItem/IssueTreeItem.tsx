@@ -1,6 +1,6 @@
 import cn from 'bem-cn-lite';
 
-import EntityStatus from '../../../../../../components/EntityStatus/EntityStatus';
+import EntityStatus from '../../../../../../../components/EntityStatus/EntityStatus';
 
 import './IssueTreeItem.scss';
 
