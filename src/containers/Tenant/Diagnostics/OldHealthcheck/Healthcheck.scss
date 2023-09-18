@@ -1,4 +1,3 @@
-@use '../DetailedOverview/DetailedOverview.scss' as detailedOverview;
 @import '../../../../styles/mixins.scss';
 @import '@gravity-ui/uikit/styles/mixins.scss';
 
@@ -60,7 +59,7 @@
     }
 
     &__preview-header {
-        margin-bottom: detailedOverview.$section-title-margin;
+        margin-bottom: var(--diagnostics-section-title-margin);
         gap: 8px;
     }
 
