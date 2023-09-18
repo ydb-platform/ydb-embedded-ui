@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.16.2...v4.17.0) (2023-09-18)
+
+
+### Features
+
+* add sorting of issues in issues tree ([#532](https://github.com/ydb-platform/ydb-embedded-ui/issues/532)) ([9f7837c](https://github.com/ydb-platform/ydb-embedded-ui/commit/9f7837c95bd1132dd287011e1aadc96c0819b40d))
+* move healthcheck to tabs ([#531](https://github.com/ydb-platform/ydb-embedded-ui/issues/531)) ([1879d3d](https://github.com/ydb-platform/ydb-embedded-ui/commit/1879d3d8f717a0baaec0d506ad354d81a226fa62))
+* update TenantOverview design ([#527](https://github.com/ydb-platform/ydb-embedded-ui/issues/527)) ([8a752e0](https://github.com/ydb-platform/ydb-embedded-ui/commit/8a752e0def3dc4317fd18519aed210bdc23fefa2))
+
+
+### Bug Fixes
+
+* fix Healthcheck blinking ([#528](https://github.com/ydb-platform/ydb-embedded-ui/issues/528)) ([0fc6c46](https://github.com/ydb-platform/ydb-embedded-ui/commit/0fc6c46eb15aeb73a984ba2c2cbe18ef7116382e))
+* **Tenants:** use blob storage ([#530](https://github.com/ydb-platform/ydb-embedded-ui/issues/530)) ([8a546a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/8a546a1ab2f812acc1523c1c35738f4c605c32a5))
+
 ## [4.16.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.16.1...v4.16.2) (2023-08-28)
 
 
