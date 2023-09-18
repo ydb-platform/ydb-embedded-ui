@@ -1,7 +1,6 @@
 @import '../../../../../../styles/mixins.scss';
 
 .ydb-metrics-card {
-
     $b: &;
     &__header {
         display: flex;
@@ -26,8 +25,6 @@
         text-align: center;
 
         color: var(--yc-color-text-secondary);
-
-        transition: color 0.1s;
     }
 
     &__progress {

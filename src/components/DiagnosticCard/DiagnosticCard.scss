@@ -9,9 +9,6 @@
     border-radius: 8px;
     background-color: transparent;
 
-    transition: all 0.1s;
-    transition-property: box-shadow, background-color, border-color;
-
     &_active {
         border-color: var(--yc-color-base-info-heavy);
         background-color: var(--yc-color-base-selection);
