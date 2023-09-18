@@ -8,11 +8,11 @@ import type {IResponseError} from '../../../../../types/api/error';
 import type {IIssuesTree} from '../../../../../types/store/healthcheck';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
-import IssueTree from '../IssuesViewer/IssueTree';
+import IssueTree from '../../TenantOverview/Healthcheck/IssuesViewer/IssueTree';
 
-import i18n from '../i18n';
+import i18n from '../../TenantOverview/Healthcheck/i18n';
 
-const b = cn('healthcheck');
+const b = cn('old-healthcheck');
 
 interface DetailsProps {
     issueTrees?: IIssuesTree[];

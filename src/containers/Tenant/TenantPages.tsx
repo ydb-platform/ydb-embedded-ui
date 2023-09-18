@@ -5,6 +5,7 @@ export const TenantTabsGroups = {
     summaryTab: 'summaryTab',
     queryTab: 'queryTab',
     diagnosticsTab: 'diagnosticsTab',
+    metricsTab: 'metricsTab',
 } as const;
 
 export const TENANT_INFO_TABS = [

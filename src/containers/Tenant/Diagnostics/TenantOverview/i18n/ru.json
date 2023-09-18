@@ -3,5 +3,7 @@
   "no-pools-data": "Нет данных о пулах",
 
   "title.pools": "Пулы",
-  "title.metrics": "Метрики"
+  "title.metrics": "Метрики",
+
+  "label.under-development": "Этот раздел находится в разработке"
 }

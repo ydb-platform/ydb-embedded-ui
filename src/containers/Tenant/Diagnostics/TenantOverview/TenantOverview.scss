@@ -1,5 +1,3 @@
-@use '../DetailedOverview/DetailedOverview.scss' as detailedOverview;
-
 .tenant-overview {
     padding-bottom: 20px;
 
@@ -23,10 +21,10 @@
     }
 
     &__top-label {
-        margin-bottom: detailedOverview.$section-title-margin;
+        margin-bottom: var(--diagnostics-section-title-margin);
 
         font-weight: 600;
-        line-height: detailedOverview.$section-title-line-height;
+        line-height: 24px;
         gap: 10px;
     }
 
@@ -51,7 +49,6 @@
         font-size: var(--yc-text-body-2-font-size);
         font-weight: 500;
         line-height: var(--yc-text-body-2-line-height);
-        //text-transform: uppercase;
     }
 
     &__section {

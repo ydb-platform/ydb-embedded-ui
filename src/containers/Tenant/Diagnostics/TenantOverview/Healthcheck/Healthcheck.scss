@@ -1,6 +1,4 @@
-@use '../DetailedOverview/DetailedOverview.scss' as detailedOverview;
-@import '../../../../styles/mixins.scss';
-@import '@gravity-ui/uikit/styles/mixins.scss';
+@import '../../../../../styles/mixins.scss';
 
 .healthcheck {
     display: flex;
@@ -11,50 +9,28 @@
         min-width: 885px;
     }
 
-    &__details {
-        padding: 25px 20px 20px;
-    }
-
     &__issue-preview {
         margin-bottom: 15px;
-    }
-
-    &__details-content-wrapper {
-        overflow-x: hidden;
-        overflow-y: auto;
-
-        height: 70vh;
-        max-height: 70vh;
-    }
-
-    &__loader {
-        display: flex;
-        justify-content: center;
     }
 
     &__message-container {
         padding: 15px 0;
     }
 
-    &__details-header {
-        display: flex;
-        align-items: center;
-
-        margin-bottom: 20px;
+    &__details {
+        width: 872px;
     }
 
-    &__details-header-title {
-        margin: 0 10px 0 0;
-
-        @include text-header-1();
+    &__details-content-wrapper {
+        overflow-x: hidden;
     }
 
-    &__details-header-update {
-        margin-left: 10px;
+    &__preview {
+        height: 100%;
     }
 
     &__preview-header {
-        margin-bottom: detailedOverview.$section-title-margin;
+        margin-bottom: var(--diagnostics-section-title-margin);
         gap: 8px;
     }
 

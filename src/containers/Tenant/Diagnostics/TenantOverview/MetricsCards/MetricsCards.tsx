@@ -1,5 +1,12 @@
 import cn from 'bem-cn-lite';
 
+import {Link, useLocation} from 'react-router-dom';
+
+import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
+import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
+import {useTypedSelector} from '../../../../../utils/hooks';
+import {parseQuery} from '../../../../../routes';
+import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {
     calculateUsage,
     cpuUsageToStatus,
@@ -7,9 +14,11 @@ import {
     memoryUsageToStatus,
     formatTenantMetrics,
 } from '../../../../../store/reducers/tenants/utils';
-import {Healthcheck} from '../../Healthcheck';
-
+import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
+import type {IResponseError} from '../../../../../types/api/error';
+import {HealthcheckPreview} from '../Healthcheck/HealthcheckPreview';
 import {MetricCard} from './MetricCard/MetricCard';
+
 import './MetricsCards.scss';
 
 const b = cn('metrics-cards');
@@ -24,13 +33,27 @@ export interface TenantMetrics {
 }
 
 interface MetricsCardsProps {
-    tenantName: string;
-    showMoreHandler?: VoidFunction;
     metrics?: TenantMetrics;
+    issuesStatistics?: [StatusFlag, number][];
+    selfCheckResult: SelfCheckResult;
+    fetchHealthcheck: VoidFunction;
+    healthcheckLoading?: boolean;
+    healthcheckError?: IResponseError;
 }
 
-export function MetricsCards({tenantName, metrics, showMoreHandler}: MetricsCardsProps) {
+export function MetricsCards({
+    metrics,
+    issuesStatistics,
+    selfCheckResult,
+    fetchHealthcheck,
+    healthcheckLoading,
+    healthcheckError,
+}: MetricsCardsProps) {
+    const location = useLocation();
+
     const {memoryUsed, memoryLimit, cpuUsed, cpuLimit, storageUsed, storageLimit} = metrics || {};
+
+    const {metricsTab} = useTypedSelector((state) => state.tenant);
 
     const cpuUsage = calculateUsage(cpuUsed, cpuLimit);
     const storageUsage = calculateUsage(storageUsed, storageLimit);
@@ -46,22 +69,66 @@ export function MetricsCards({tenantName, metrics, showMoreHandler}: MetricsCard
         memory: memoryUsed,
     });
 
+    const queryParams = parseQuery(location);
+
+    const tabLinks: Record<TenantMetricsTab, string> = {
+        [TENANT_METRICS_TABS_IDS.cpu]: getTenantPath({
+            ...queryParams,
+            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.cpu,
+        }),
+        [TENANT_METRICS_TABS_IDS.storage]: getTenantPath({
+            ...queryParams,
+            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.storage,
+        }),
+        [TENANT_METRICS_TABS_IDS.memory]: getTenantPath({
+            ...queryParams,
+            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.memory,
+        }),
+        [TENANT_METRICS_TABS_IDS.healthcheck]: getTenantPath({
+            ...queryParams,
+            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.healthcheck,
+        }),
+    };
+
     return (
         <div className={b()}>
-            <MetricCard label="CPU" progress={cpuUsage} status={cpuStatus} resourcesUsed={cpu} />
-            <MetricCard
-                label="Storage"
-                progress={storageUsage}
-                status={storageStatus}
-                resourcesUsed={storage}
-            />
-            <MetricCard
-                label="Memory"
-                progress={memoryUsage}
-                status={memoryStatus}
-                resourcesUsed={memory}
-            />
-            <Healthcheck tenant={tenantName} preview={true} showMoreHandler={showMoreHandler} />
+            <Link to={tabLinks.cpu} className={b('tab')}>
+                <MetricCard
+                    label="CPU"
+                    progress={cpuUsage}
+                    status={cpuStatus}
+                    resourcesUsed={cpu}
+                    active={metricsTab === TENANT_METRICS_TABS_IDS.cpu}
+                />
+            </Link>
+            <Link to={tabLinks.storage} className={b('tab')}>
+                <MetricCard
+                    label="Storage"
+                    progress={storageUsage}
+                    status={storageStatus}
+                    resourcesUsed={storage}
+                    active={metricsTab === TENANT_METRICS_TABS_IDS.storage}
+                />
+            </Link>
+            <Link to={tabLinks.memory} className={b('tab')}>
+                <MetricCard
+                    label="Memory"
+                    progress={memoryUsage}
+                    status={memoryStatus}
+                    resourcesUsed={memory}
+                    active={metricsTab === TENANT_METRICS_TABS_IDS.memory}
+                />
+            </Link>
+            <Link to={tabLinks.healthcheck} className={b('tab')}>
+                <HealthcheckPreview
+                    selfCheckResult={selfCheckResult}
+                    issuesStatistics={issuesStatistics}
+                    onUpdate={fetchHealthcheck}
+                    loading={healthcheckLoading}
+                    error={healthcheckError}
+                    active={metricsTab === TENANT_METRICS_TABS_IDS.healthcheck}
+                />
+            </Link>
         </div>
     );
 }

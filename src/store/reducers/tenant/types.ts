@@ -8,6 +8,7 @@ import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGES_IDS,
     TENANT_SUMMARY_TABS_IDS,
+    TENANT_METRICS_TABS_IDS,
 } from './constants';
 import {
     FETCH_TENANT,
@@ -15,6 +16,7 @@ import {
     setDiagnosticsTab,
     setQueryTab,
     setSummaryTab,
+    setMetricsTab,
     setTenantPage,
     setDataWasNotLoaded,
 } from './tenant';
@@ -24,6 +26,7 @@ export type TenantPage = ValueOf<typeof TENANT_PAGES_IDS>;
 export type TenantQueryTab = ValueOf<typeof TENANT_QUERY_TABS_ID>;
 export type TenantDiagnosticsTab = ValueOf<typeof TENANT_DIAGNOSTICS_TABS_IDS>;
 export type TenantSummaryTab = ValueOf<typeof TENANT_SUMMARY_TABS_IDS>;
+export type TenantMetricsTab = ValueOf<typeof TENANT_METRICS_TABS_IDS>;
 
 export interface TenantState {
     loading: boolean;
@@ -32,6 +35,7 @@ export interface TenantState {
     queryTab?: TenantQueryTab;
     diagnosticsTab?: TenantDiagnosticsTab;
     summaryTab?: TenantSummaryTab;
+    metricsTab?: TenantMetricsTab;
     tenant?: TTenant;
     error?: IResponseError;
 }
@@ -43,4 +47,5 @@ export type TenantAction =
     | ReturnType<typeof setQueryTab>
     | ReturnType<typeof setDiagnosticsTab>
     | ReturnType<typeof setSummaryTab>
+    | ReturnType<typeof setMetricsTab>
     | ReturnType<typeof setDataWasNotLoaded>;

@@ -6,13 +6,12 @@ import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
 import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthcheck';
 import type {IResponseError} from '../../../../../types/api/error';
-import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
-import i18n from '../i18n';
+import i18n from '../../TenantOverview/Healthcheck/i18n';
 
-const b = cn('healthcheck');
+const b = cn('old-healthcheck');
 
 interface PreviewProps {
     selfCheckResult: SelfCheckResult;
@@ -21,13 +20,10 @@ interface PreviewProps {
     onShowMore?: VoidFunction;
     onUpdate: VoidFunction;
     error?: IResponseError;
-    active?: boolean;
 }
 
 export const Preview = (props: PreviewProps) => {
-    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate, error, active} = props;
-
-    const isStatusOK = selfCheckResult === SelfCheckResult.GOOD;
+    const {selfCheckResult, issuesStatistics, loading, onShowMore, onUpdate, error} = props;
 
     const renderHeader = () => {
         const modifier = selfCheckResult.toLowerCase();
@@ -54,7 +50,7 @@ export const Preview = (props: PreviewProps) => {
 
         return (
             <div className={b('preview-content')}>
-                {isStatusOK || !issuesStatistics || !issuesStatistics.length ? (
+                {!issuesStatistics || !issuesStatistics.length ? (
                     i18n('status_message.ok')
                 ) : (
                     <>
@@ -78,9 +74,9 @@ export const Preview = (props: PreviewProps) => {
     };
 
     return (
-        <DiagnosticCard active={active}>
+        <div className={b('preview')}>
             {renderHeader()}
             {renderContent()}
-        </DiagnosticCard>
+        </div>
     );
 };

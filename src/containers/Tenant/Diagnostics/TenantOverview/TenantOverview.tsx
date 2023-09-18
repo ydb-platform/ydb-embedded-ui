@@ -4,21 +4,17 @@ import {useDispatch} from 'react-redux';
 
 import {Loader} from '@gravity-ui/uikit';
 
-import {formatBytes} from '../../../../utils/bytesParsers';
-import {InfoViewer} from '../../../../components/InfoViewer';
-import {PoolUsage} from '../../../../components/PoolUsage/PoolUsage';
 import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
-import {TABLET_STATES, TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
+import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
+import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
-import type {ETabletVolatileState} from '../../../../types/api/tenant';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
-import {
-    formatTenantMetrics,
-    calculateTenantMetrics,
-} from '../../../../store/reducers/tenants/utils';
+import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
+import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
+import {useHealthcheck} from './useHealthcheck';
 
 import i18n from './i18n';
 import './TenantOverview.scss';
@@ -28,18 +24,28 @@ const b = cn('tenant-overview');
 interface TenantOverviewProps {
     tenantName: string;
     additionalTenantProps?: AdditionalTenantsProps;
-    showMoreHandler?: VoidFunction;
 }
 
-export function TenantOverview({
-    tenantName,
-    additionalTenantProps,
-    showMoreHandler,
-}: TenantOverviewProps) {
+export function TenantOverview({tenantName, additionalTenantProps}: TenantOverviewProps) {
     const dispatch = useDispatch();
 
-    const {tenant, loading, wasLoaded} = useTypedSelector((state) => state.tenant);
+    const {
+        tenant,
+        loading: tenantLoading,
+        wasLoaded: tenantWasLoaded,
+        metricsTab,
+    } = useTypedSelector((state) => state.tenant);
     const {autorefresh} = useTypedSelector((state) => state.schema);
+
+    const {
+        issueTrees,
+        issuesStatistics,
+        selfCheckResult,
+        fetchHealthcheck,
+        loading: healthcheckLoading,
+        wasLoaded: healthCheckWasLoaded,
+        error: healthcheckError,
+    } = useHealthcheck(tenantName);
 
     const fetchTenant = useCallback(
         (isBackground = true) => {
@@ -51,18 +57,16 @@ export function TenantOverview({
         [dispatch, tenantName],
     );
 
-    useAutofetcher(fetchTenant, [fetchTenant], autorefresh);
+    useAutofetcher(
+        (isBackground) => {
+            fetchTenant(isBackground);
+            fetchHealthcheck(isBackground);
+        },
+        [fetchTenant, fetchHealthcheck],
+        autorefresh,
+    );
 
-    const {
-        Metrics = {},
-        PoolStats,
-        StateStats = [],
-        Name,
-        State,
-        StorageGroups,
-        StorageAllocatedSize,
-        Type,
-    } = tenant || {};
+    const {Name, State, Type} = tenant || {};
 
     const tenantType = mapDatabaseTypeToDBName(Type);
 
@@ -78,34 +82,6 @@ export function TenantOverview({
         storageLimit,
     };
 
-    const formattedMetrics = formatTenantMetrics({cpu, storage, memory});
-
-    const storageGroups = StorageGroups ?? i18n('no-data');
-    const tabletStorage =
-        (Metrics.Storage && formatBytes({value: Metrics.Storage})) || i18n('no-data');
-    const storageEfficiency =
-        Metrics.Storage && StorageAllocatedSize
-            ? `${((parseInt(Metrics.Storage) * 100) / parseInt(StorageAllocatedSize)).toFixed(2)}%`
-            : i18n('no-data');
-
-    const metricsInfo = [
-        {label: 'Type', value: Type},
-        {label: 'Memory', value: formattedMetrics.memory},
-        {label: 'CPU', value: formattedMetrics.cpu},
-        {label: 'Tablet storage', value: tabletStorage},
-        {label: 'Storage groups', value: storageGroups},
-        {label: 'Blob storage', value: formattedMetrics.storage},
-        {label: 'Storage efficiency', value: storageEfficiency},
-    ];
-
-    const tabletsInfo = StateStats.filter(
-        (item): item is {VolatileState: ETabletVolatileState; Count: number} => {
-            return item.VolatileState !== undefined && item.Count !== undefined;
-        },
-    ).map((info) => {
-        return {label: TABLET_STATES[info.VolatileState], value: info.Count};
-    });
-
     const renderName = () => {
         return (
             <div className={b('tenant-name-wrapper')}>
@@ -120,7 +96,27 @@ export function TenantOverview({
         );
     };
 
-    if (loading && !wasLoaded) {
+    const renderTabContent = () => {
+        switch (metricsTab) {
+            case TENANT_METRICS_TABS_IDS.cpu: {
+                return i18n('label.under-development');
+            }
+            case TENANT_METRICS_TABS_IDS.storage: {
+                return i18n('label.under-development');
+            }
+            case TENANT_METRICS_TABS_IDS.memory: {
+                return i18n('label.under-development');
+            }
+            case TENANT_METRICS_TABS_IDS.healthcheck: {
+                return <HealthcheckDetails issueTrees={issueTrees} error={healthcheckError} />;
+            }
+            default: {
+                return undefined;
+            }
+        }
+    };
+
+    if ((tenantLoading && !tenantWasLoaded) || (healthcheckLoading && !healthCheckWasLoaded)) {
         return (
             <div className={b('loader')}>
                 <Loader size="m" />
@@ -136,33 +132,14 @@ export function TenantOverview({
                 {additionalTenantProps?.getMonitoringLink?.(Name, Type)}
             </div>
             <MetricsCards
-                tenantName={tenantName}
                 metrics={calculatedMetrics}
-                showMoreHandler={showMoreHandler}
+                issuesStatistics={issuesStatistics}
+                selfCheckResult={selfCheckResult}
+                fetchHealthcheck={fetchHealthcheck}
+                healthcheckLoading={healthcheckLoading}
+                healthcheckError={healthcheckError}
             />
-            <div className={b('common-info')}>
-                <div>
-                    <div className={b('section-title')}>{i18n('title.pools')}</div>
-                    {PoolStats ? (
-                        <div className={b('section', {pools: true})}>
-                            {PoolStats.map((pool, poolIndex) => (
-                                <PoolUsage key={poolIndex} data={pool} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="error">{i18n('no-pools-data')}</div>
-                    )}
-                </div>
-                <InfoViewer
-                    title={i18n('title.metrics')}
-                    className={b('section', {metrics: true})}
-                    info={metricsInfo}
-                />
-
-                <div className={b('section')}>
-                    <InfoViewer info={tabletsInfo} title="Tablets" />
-                </div>
-            </div>
+            {renderTabContent()}
         </div>
     );
 }

@@ -1,0 +1,137 @@
+@import '../../../../styles/mixins.scss';
+@import '@gravity-ui/uikit/styles/mixins.scss';
+
+.old-healthcheck {
+    display: flex;
+
+    &_expanded {
+        // Since most of the inner containers have fixed width, we can set fixed width here as well
+        // Thus we will get rid of unneeded layout shift when scrollbar appear
+        min-width: 885px;
+    }
+
+    &__details {
+        width: 860px;
+        padding: 25px 20px 20px;
+    }
+
+    &__issue-preview {
+        margin-bottom: 15px;
+    }
+
+    &__details-content-wrapper {
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        height: 70vh;
+        max-height: 70vh;
+    }
+
+    &__message-container {
+        padding: 15px 0;
+    }
+
+    &__details-header {
+        display: flex;
+        align-items: center;
+
+        margin-bottom: 20px;
+    }
+
+    &__details-header-title {
+        margin: 0 10px 0 0;
+
+        @include text-header-1();
+    }
+
+    &__details-header-update {
+        margin-left: 10px;
+    }
+
+    &__preview {
+        width: 206px;
+        padding: 16px;
+        padding-bottom: 28px;
+
+        border: 1px solid var(--yc-color-line-generic);
+        border-radius: 8px;
+        background-color: transparent;
+    }
+
+    &__preview-header {
+        margin-bottom: var(--diagnostics-section-title-margin);
+        gap: 8px;
+    }
+
+    &__preview-title {
+        font-weight: 600;
+        @include lead-typography();
+    }
+
+    &__preview-content {
+        line-height: 24px;
+    }
+
+    &__preview-title-wrapper {
+        display: flex;
+        align-items: center;
+
+        margin-bottom: 4px;
+
+        gap: 8px;
+    }
+
+    &__issues-statistics {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+
+        margin: 8px 0;
+
+        gap: 10px;
+    }
+
+    &__self-check-status-indicator {
+        display: inline-block;
+
+        padding: 0 8px;
+
+        font-size: 13px;
+        line-height: 24px;
+
+        border-radius: 4px;
+
+        &_good,
+        &_green {
+            color: var(--yc-color-text-positive);
+            background-color: var(--yc-color-base-positive);
+        }
+        &_degraded,
+        &_yellow {
+            color: var(--yc-color-text-warning);
+            background-color: var(--yc-color-base-warning);
+        }
+
+        &_blue {
+            color: var(--yc-color-text-info);
+            background-color: var(--yc-color-base-info);
+        }
+
+        &_emergency,
+        &_red {
+            color: var(--yc-color-text-danger);
+            background-color: var(--yc-color-base-danger);
+        }
+        &_unspecified,
+        &_gray,
+        &_grey {
+            color: var(--yc-color-text-misc);
+            background-color: var(--yc-color-base-misc);
+        }
+        &_maintenance_required,
+        &_orange {
+            color: var(--yc-color-text-warning-heavy);
+            background-color: var(--yc-color-infographics-warning-light);
+        }
+    }
+}

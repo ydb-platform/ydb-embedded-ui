@@ -10,7 +10,7 @@ import {Icon} from '../../../../components/Icon';
 import {useSetting} from '../../../../utils/hooks';
 import {ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN} from '../../../../utils/constants';
 import Overview from '../Overview/Overview';
-import {Healthcheck} from '../Healthcheck';
+import {Healthcheck} from '../OldHealthcheck';
 import {TenantOverview} from '../TenantOverview/TenantOverview';
 import {OldTenantOverview} from '../TenantOverview/OldTenantOverview';
 
@@ -65,7 +65,6 @@ function DetailedOverview(props: DetailedOverviewProps) {
                     <TenantOverview
                         tenantName={tenantName}
                         additionalTenantProps={additionalTenantProps}
-                        showMoreHandler={openModalHandler}
                     />
                 </div>
             );

@@ -1,4 +1,4 @@
-@import '../../../../../styles/mixins.scss';
+@import '../../../../../../styles/mixins.scss';
 
 .indicator {
     width: 12px;
@@ -37,8 +37,6 @@
 
 .issue-tree {
     display: flex;
-
-    width: 820px;
 
     &__block {
         width: 100%;
