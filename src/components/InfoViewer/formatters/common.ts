@@ -1,5 +1,5 @@
 import type {TDirEntry} from '../../../types/api/schema';
-import {formatDateTime} from '../../../utils';
+import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
 
 import {createInfoFormatter} from '../utils';
 

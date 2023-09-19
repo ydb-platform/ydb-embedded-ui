@@ -3,10 +3,10 @@ import DataTable, {Column} from '@gravity-ui/react-data-table';
 import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
 import {isUnavailableNode} from '../../../utils/nodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
-import {formatBytes} from '../../../utils';
+import {formatBytes} from '../../../utils/dataFormatters/dataFormatters';
 import {getDefaultNodePath} from '../../Node/NodePages';
 
-import ProgressViewer from '../../../components/ProgressViewer/ProgressViewer';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {PoolsGraph} from '../../../components/PoolsGraph/PoolsGraph';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 

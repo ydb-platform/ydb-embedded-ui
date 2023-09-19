@@ -22,7 +22,7 @@ import {EShardsWorkloadMode, IShardsWorkloadFilters} from '../../../../types/sto
 import type {EPathType} from '../../../../types/api/schema';
 import type {CellValue, KeyValueRow} from '../../../../types/api/query';
 
-import {formatDateTime, formatNumber} from '../../../../utils';
+import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';

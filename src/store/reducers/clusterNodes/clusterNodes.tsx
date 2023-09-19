@@ -5,7 +5,7 @@ import {createRequestActionTypes, createApiRequest} from '../../utils';
 import type {ClusterNodesAction, ClusterNodesState, PreparedClusterNode} from './types';
 
 import '../../../services/api';
-import {calcUptime} from '../../../utils';
+import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 
 export const FETCH_CLUSTER_NODES = createRequestActionTypes('cluster', 'FETCH_CLUSTER_NODES');
 

@@ -11,7 +11,7 @@ import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
 import {useTypedSelector} from '../../../../../utils/hooks';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
-import {formatBps, formatBytes} from '../../../../../utils';
+import {formatBps, formatBytes} from '../../../../../utils/dataFormatters/dataFormatters';
 
 import {selectPreparedTopicStats} from '../../../../../store/reducers/topic';
 

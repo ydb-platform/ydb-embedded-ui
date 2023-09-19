@@ -99,7 +99,7 @@ interface TVDiskSatisfactionRank {
     LevelRank?: TRank;
 }
 
-interface TVDiskID {
+export interface TVDiskID {
     GroupID?: number;
     GroupGeneration?: number;
     Ring?: number;

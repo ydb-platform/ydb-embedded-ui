@@ -26,7 +26,11 @@ import {
     ProblemFilterValues,
     selectProblemFilter,
 } from '../../store/reducers/settings/settings';
-import {formatCPU, formatBytesToGigabyte, formatNumber} from '../../utils';
+import {
+    formatBytesToGigabyte,
+    formatCPU,
+    formatNumber,
+} from '../../utils/dataFormatters/dataFormatters';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 import {clusterName} from '../../store';

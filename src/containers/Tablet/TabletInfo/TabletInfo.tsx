@@ -5,7 +5,7 @@ import {Link as UIKitLink} from '@gravity-ui/uikit';
 import {ETabletState, TTabletStateInfo} from '../../../types/api/tablet';
 import {InfoViewer, InfoViewerItem} from '../../../components/InfoViewer';
 import routes, {createHref} from '../../../routes';
-import {calcUptime} from '../../../utils';
+import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 import {getDefaultNodePath} from '../../Node/NodePages';
 
 import {b} from '../Tablet';

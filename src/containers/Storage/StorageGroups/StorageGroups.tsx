@@ -10,7 +10,7 @@ import type {HandleSort} from '../../../utils/hooks/useTableSort';
 
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
-import {stringifyVdiskId} from '../../../utils';
+import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {getUsage, isFullVDiskData, isSortableStorageProperty} from '../../../utils/storage';
 
 import shieldIcon from '../../../assets/icons/shield.svg';

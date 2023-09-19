@@ -9,7 +9,7 @@ import {InfoViewer, InfoViewerItem} from '../../../components/InfoViewer';
 
 import {EFlag} from '../../../types/api/enums';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
-import {stringifyVdiskId} from '../../../utils';
+import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {isFullVDiskData} from '../../../utils/storage';
 

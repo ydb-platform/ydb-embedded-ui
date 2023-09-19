@@ -1,7 +1,7 @@
 import {Selector, createSelector} from 'reselect';
 
 import {EFlag} from '../../../types/api/enums';
-import {calcUptimeInSeconds} from '../../../utils';
+import {calcUptimeInSeconds} from '../../../utils/dataFormatters/dataFormatters';
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {prepareSearchValue} from '../../../utils/filters';

@@ -4,7 +4,7 @@ import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../../components/InternalLink/InternalLink';
 
 import type {ITabletPreparedHistoryItem} from '../../../types/store/tablet';
-import {calcUptime} from '../../../utils';
+import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 import {getDefaultNodePath} from '../../Node/NodePages';
 
 import {b} from '../Tablet';

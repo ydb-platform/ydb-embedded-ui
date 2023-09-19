@@ -9,7 +9,7 @@ import {InfoViewer, InfoViewerItem} from '../../../components/InfoViewer';
 
 import {EFlag} from '../../../types/api/enums';
 import {TPDiskStateInfo} from '../../../types/api/pdisk';
-import {getPDiskId} from '../../../utils';
+import {getPDiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {getPDiskType} from '../../../utils/pdisk';
 import {bytesToGB} from '../../../utils/utils';
 

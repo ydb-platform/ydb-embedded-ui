@@ -3,7 +3,7 @@ import block from 'bem-cn-lite';
 import {Skeleton} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
-import ProgressViewer from '../../../components/ProgressViewer/ProgressViewer';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import InfoViewer, {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {Tags} from '../../../components/Tags';
 import {Tablet} from '../../../components/Tablet';
@@ -16,7 +16,7 @@ import type {AdditionalClusterProps, ClusterLink} from '../../../types/additiona
 import type {VersionValue} from '../../../types/versions';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import {backend, customBackend} from '../../../store';
-import {formatStorageValues} from '../../../utils';
+import {formatStorageValues} from '../../../utils/dataFormatters/dataFormatters';
 import {useSetting, useTypedSelector} from '../../../utils/hooks';
 import {
     CLUSTER_DEFAULT_TITLE,

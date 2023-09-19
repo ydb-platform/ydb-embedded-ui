@@ -1,7 +1,7 @@
 import block from 'bem-cn-lite';
 
 import type {IPreparedTopicStats} from '../../../../../types/store/topic';
-import {formatMsToUptime} from '../../../../../utils';
+import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 
 import './ConsumersTopicStats.scss';

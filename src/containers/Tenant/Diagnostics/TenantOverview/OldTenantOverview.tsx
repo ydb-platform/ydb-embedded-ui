@@ -8,7 +8,7 @@ import {InfoViewer} from '../../../../components/InfoViewer';
 import {PoolUsage} from '../../../../components/PoolUsage/PoolUsage';
 import {Tablet} from '../../../../components/Tablet';
 import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
-import {formatCPU} from '../../../../utils';
+import {formatCPU} from '../../../../utils/dataFormatters/dataFormatters';
 import {TABLET_STATES, TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {bytesToGB} from '../../../../utils/utils';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';

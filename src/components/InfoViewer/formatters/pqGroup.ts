@@ -4,7 +4,7 @@ import {
     TPQPartitionConfig,
     TPQTabletConfig,
 } from '../../../types/api/schema';
-import {formatBps, formatBytes, formatNumber} from '../../../utils';
+import {formatBps, formatBytes, formatNumber} from '../../../utils/dataFormatters/dataFormatters';
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
 
 import {createInfoFormatter} from '../utils';
