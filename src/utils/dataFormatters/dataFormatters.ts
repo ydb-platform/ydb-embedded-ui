@@ -97,7 +97,7 @@ export const formatCPU = (value?: number | string) => {
     return configuredNumeral(normalizeCPU(value)).format('0.[000]');
 };
 
-export const formatCPUWithText = (value?: number) => {
+export const formatCPUWithLabel = (value?: number) => {
     if (value === undefined) {
         return undefined;
     }
