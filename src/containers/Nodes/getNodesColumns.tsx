@@ -120,6 +120,7 @@ export function getNodesColumns({
                 row.LoadAverage && row.LoadAverage.length > 0 ? (
                     <ProgressViewer
                         value={row.LoadAverage[0]}
+                        capacity={100}
                         percents={true}
                         colorizeProgress={true}
                     />

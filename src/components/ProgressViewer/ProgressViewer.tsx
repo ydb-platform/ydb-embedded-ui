@@ -46,7 +46,7 @@ interface ProgressViewerProps {
 
 export function ProgressViewer({
     value,
-    capacity = 100,
+    capacity,
     formatValues,
     percents,
     className,
@@ -84,7 +84,15 @@ export function ProgressViewer({
 
     const text = fillWidth > 60 ? 'contrast0' : 'contrast70';
 
-    if (!isNaN(fillWidth)) {
+    const renderContent = () => {
+        if (!capacity) {
+            return `${formattedValue || valueText}`;
+        }
+
+        return `${formattedValue || valueText} ${divider} ${formattedCapacity || capacityText}`;
+    };
+
+    if (!isNaN(Number(value))) {
         return (
             <div className={b({size}, className)}>
                 <div className={b('line', {bg})} style={lineStyle}></div>

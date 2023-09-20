@@ -42,18 +42,24 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
     const memory = isNumeric(rawMemory) ? Number(rawMemory) : undefined;
 
     // Blob storage - actual database size
-    const storage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
+    const blobStorage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
+    const tableStorage = isNumeric(Metrics.Storage) ? Number(Metrics.Storage) : undefined;
     const cpuLimit = isNumeric(CoresLimit) ? Number(CoresLimit) : undefined;
     const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
-    const storageLimit = isNumeric(StorageLimit) ? Number(StorageLimit) : undefined;
+    const blobStorageLimit = isNumeric(StorageLimit) ? Number(StorageLimit) : undefined;
+    const tableStorageLimit = isNumeric(Metrics.StorageLimit)
+        ? Number(Metrics.StorageLimit)
+        : undefined;
 
     return {
         cpu,
         memory,
-        storage,
+        blobStorage,
+        tableStorage,
         cpuLimit,
         memoryLimit,
-        storageLimit,
+        blobStorageLimit,
+        tableStorageLimit,
     };
 };
 
@@ -71,7 +77,7 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean) =>
         const backend = useNodeAsBackend ? getTenantBackend(tenant) : undefined;
         const sharedTenantName = tenants.find((item) => item.Id === tenant.ResourceId)?.Name;
         const controlPlaneName = getControlPlaneValue(tenant);
-        const {cpu, memory, storage} = calculateTenantMetrics(tenant);
+        const {cpu, memory, blobStorage} = calculateTenantMetrics(tenant);
         const {nodesCount, groupsCount} = calculateTenantEntities(tenant);
 
         return {
@@ -82,7 +88,7 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean) =>
             controlPlaneName,
             cpu,
             memory,
-            storage,
+            storage: blobStorage,
             nodesCount,
             groupsCount,
         };

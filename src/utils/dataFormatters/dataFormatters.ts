@@ -4,6 +4,7 @@ import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
 import {DAY_IN_SECONDS, GIGABYTE, TERABYTE} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
+import {formatBytes as formatBytesCustom} from '../bytesParsers/formatBytes';
 
 import i18n from './i18n';
 
@@ -56,10 +57,15 @@ export const formatMsToUptime = (ms?: number) => {
 };
 
 export const formatStorageValues = (value?: number, total?: number) => {
-    return [
-        value ? String(Math.floor(value / TERABYTE)) : undefined,
-        total ? `${Math.floor(total / TERABYTE)} TB` : undefined,
-    ];
+    let formattedValue;
+    let formattedTotal;
+    if (total) {
+        formattedValue = formatBytesCustom({value, withSizeLabel: false});
+        formattedTotal = formatBytesCustom({value: total});
+    } else {
+        formattedValue = value ? formatBytesCustom({value}) : undefined;
+    }
+    return [formattedValue, formattedTotal];
 };
 export const formatStorageValuesToGb = (value?: number, total?: number): (string | undefined)[] => {
     return [

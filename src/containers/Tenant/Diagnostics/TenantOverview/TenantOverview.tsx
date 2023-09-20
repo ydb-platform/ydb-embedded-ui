@@ -5,15 +5,18 @@ import {useDispatch} from 'react-redux';
 import {Loader} from '@gravity-ui/uikit';
 
 import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
+import {ProgressViewer} from '../../../../components/ProgressViewer/ProgressViewer';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
+import {formatStorageValues} from '../../../../utils/dataFormatters/dataFormatters';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
+import {Storage} from './Storage/Storage';
 import {useHealthcheck} from './useHealthcheck';
 
 import i18n from './i18n';
@@ -70,17 +73,50 @@ export function TenantOverview({tenantName, additionalTenantProps}: TenantOvervi
 
     const tenantType = mapDatabaseTypeToDBName(Type);
 
-    const {cpu, storage, memory, cpuLimit, storageLimit, memoryLimit} =
-        calculateTenantMetrics(tenant);
+    const {
+        cpu,
+        blobStorage,
+        tableStorage,
+        memory,
+        cpuLimit,
+        blobStorageLimit,
+        tableStorageLimit,
+        memoryLimit,
+    } = calculateTenantMetrics(tenant);
 
     const calculatedMetrics: TenantMetrics = {
         memoryUsed: memory,
         memoryLimit,
         cpuUsed: cpu,
         cpuLimit,
-        storageUsed: storage,
-        storageLimit,
+        storageUsed: blobStorage,
+        storageLimit: blobStorageLimit,
     };
+
+    const storageInfo = [
+        {
+            label: 'Database storage',
+            value: (
+                <ProgressViewer
+                    value={blobStorage}
+                    capacity={blobStorageLimit}
+                    formatValues={formatStorageValues}
+                    colorizeProgress={true}
+                />
+            ),
+        },
+        {
+            label: 'Table storage',
+            value: (
+                <ProgressViewer
+                    value={tableStorage}
+                    capacity={tableStorageLimit}
+                    formatValues={formatStorageValues}
+                    colorizeProgress={true}
+                />
+            ),
+        },
+    ];
 
     const renderName = () => {
         return (
@@ -102,7 +138,7 @@ export function TenantOverview({tenantName, additionalTenantProps}: TenantOvervi
                 return i18n('label.under-development');
             }
             case TENANT_METRICS_TABS_IDS.storage: {
-                return i18n('label.under-development');
+                return <Storage info={storageInfo} />;
             }
             case TENANT_METRICS_TABS_IDS.memory: {
                 return i18n('label.under-development');
