@@ -63,7 +63,7 @@ export interface StorageSortParams {
 export interface StorageSortAndFilterParams extends StorageSortParams {
     filter?: string; // PoolName or GroupId
 
-    offser?: number;
+    offset?: number;
     limit?: number;
 }
 

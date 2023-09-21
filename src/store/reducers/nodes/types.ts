@@ -64,7 +64,7 @@ export interface NodesGeneralRequestParams extends NodesSortParams {
     uptime?: number; // return nodes with less uptime in seconds
     problems_only?: boolean; // return nodes with SystemState !== EFlag.Green
 
-    offser?: number;
+    offset?: number;
     limit?: number;
 }
 
