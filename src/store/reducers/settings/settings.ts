@@ -50,7 +50,7 @@ export const initialState = {
         [INVERTED_DISKS_KEY]: readSavedSettingsValue(INVERTED_DISKS_KEY, 'false'),
         [USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY]: readSavedSettingsValue(
             USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
-            'false',
+            'true',
         ),
         [ENABLE_ADDITIONAL_QUERY_MODES]: readSavedSettingsValue(
             ENABLE_ADDITIONAL_QUERY_MODES,
