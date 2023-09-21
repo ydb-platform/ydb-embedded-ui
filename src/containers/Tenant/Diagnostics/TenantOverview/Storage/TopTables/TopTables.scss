@@ -1,0 +1,25 @@
+@import '@gravity-ui/uikit/styles/mixins.scss';
+
+.kv-top-tables {
+    width: 872px;
+
+    &__path-cell-wrapper {
+        display: flex;
+    }
+
+    &__path-cell {
+        overflow: hidden;
+
+        max-width: 772px;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    &__title {
+        margin-bottom: 8px;
+
+        font-weight: 700;
+        @include text-body-2();
+    }
+}

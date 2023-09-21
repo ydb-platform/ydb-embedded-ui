@@ -26,6 +26,7 @@ import nodesList from './nodesList';
 import describe from './describe';
 import schemaAcl from './schemaAcl/schemaAcl';
 import executeTopQueries from './executeTopQueries';
+import executeTopTables from './executeTopTables';
 import healthcheckInfo from './healthcheckInfo';
 import shardsWorkload from './shardsWorkload';
 import hotKeys from './hotKeys';
@@ -65,6 +66,7 @@ export const rootReducer = {
     describe,
     schemaAcl,
     executeTopQueries,
+    executeTopTables,
     healthcheckInfo,
     shardsWorkload,
     hotKeys,

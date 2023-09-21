@@ -4,7 +4,11 @@ import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
 import {DAY_IN_SECONDS, GIGABYTE, TERABYTE} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
-import {formatBytes as formatBytesCustom} from '../bytesParsers/formatBytes';
+import {
+    BytesSizes,
+    formatBytes as formatBytesCustom,
+    getSizeWithSignificantDigits,
+} from '../bytesParsers/formatBytes';
 
 import i18n from './i18n';
 
@@ -56,14 +60,24 @@ export const formatMsToUptime = (ms?: number) => {
     return ms && formatUptime(ms / 1000);
 };
 
-export const formatStorageValues = (value?: number, total?: number) => {
+export const formatStorageValues = (value?: number, total?: number, size?: BytesSizes) => {
     let formattedValue;
     let formattedTotal;
+    let calculatedSize;
     if (total) {
-        formattedValue = formatBytesCustom({value, withSizeLabel: false});
-        formattedTotal = formatBytesCustom({value: total});
-    } else {
-        formattedValue = value ? formatBytesCustom({value}) : undefined;
+        calculatedSize = getSizeWithSignificantDigits(total, 0);
+        formattedValue = formatBytesCustom({
+            value,
+            withSizeLabel: false,
+            size: size || calculatedSize,
+            significantDigits: 2,
+        });
+        formattedTotal = formatBytesCustom({value: total, size});
+    } else if (value) {
+        calculatedSize = getSizeWithSignificantDigits(value, 0);
+        formattedValue = value
+            ? formatBytesCustom({value, size: size || calculatedSize})
+            : undefined;
     }
     return [formattedValue, formattedTotal];
 };
@@ -79,7 +93,7 @@ export const formatNumber = (number?: unknown) => {
         return '';
     }
 
-    return configuredNumeral(number).format();
+    return configuredNumeral(number).format('0,0.[00000]');
 };
 
 const normalizeCPU = (value: number | string) => {
@@ -131,4 +145,15 @@ export const calcUptimeInSeconds = (milliseconds: number | string) => {
 
 export const calcUptime = (milliseconds?: number | string) => {
     return formatUptime(calcUptimeInSeconds(Number(milliseconds)));
+};
+
+export const roundToSignificant = (value: number, precision = 0) => {
+    let [integer] = String(value).split('.');
+    if (value < 1) {
+        integer = '';
+    }
+    if (integer.length >= precision) {
+        return Math.round(value);
+    }
+    return Number(value.toFixed(precision - integer.length));
 };
