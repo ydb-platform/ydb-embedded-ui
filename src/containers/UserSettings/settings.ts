@@ -5,7 +5,7 @@ import flaskIcon from '../../assets/icons/flask.svg';
 
 import {
     ENABLE_ADDITIONAL_QUERY_MODES,
-    ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN,
+    DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     THEME_KEY,
@@ -96,7 +96,7 @@ export const enableQueryModesForExplainSetting: SettingProps = {
     helpPopoverContent: i18n('settings.enableAdditionalQueryModes.popover'),
 };
 export const enableNewTenantDiagnosticsDesign: SettingProps = {
-    settingKey: ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN,
+    settingKey: DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
     title: i18n('settings.tenantDiagnostics.title'),
     helpPopoverContent: i18n('settings.tenantDiagnostics.popover'),
 };

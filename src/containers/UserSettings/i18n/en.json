@@ -25,6 +25,6 @@
   "settings.enableAdditionalQueryModes.title": "Enable additional query modes",
   "settings.enableAdditionalQueryModes.popover": "Adds 'Data', 'YQL - QueryService' and 'PostgreSQL' modes. May not work on some versions",
 
-  "settings.tenantDiagnostics.title": "Enable new database diagnostics design",
+  "settings.tenantDiagnostics.title": "Display metrics cards for database diagnostics",
   "settings.tenantDiagnostics.popover": "Adds indicators of database resources usage. Incomplete data may be displayed for some databases"
 }

@@ -15,7 +15,7 @@ import {
     LAST_USED_QUERY_ACTION_KEY,
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     LANGUAGE_KEY,
-    ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN,
+    DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
 } from '../../../utils/constants';
 import '../../../services/api';
 import {parseJson} from '../../../utils/utils';
@@ -56,8 +56,8 @@ export const initialState = {
             ENABLE_ADDITIONAL_QUERY_MODES,
             'false',
         ),
-        [ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN]: readSavedSettingsValue(
-            ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN,
+        [DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS]: readSavedSettingsValue(
+            DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
             'false',
         ),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),
