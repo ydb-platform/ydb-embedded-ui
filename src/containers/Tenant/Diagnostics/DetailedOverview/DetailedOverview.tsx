@@ -8,7 +8,7 @@ import type {EPathType} from '../../../../types/api/schema';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {Icon} from '../../../../components/Icon';
 import {useSetting} from '../../../../utils/hooks';
-import {ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN} from '../../../../utils/constants';
+import {DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS} from '../../../../utils/constants';
 import Overview from '../Overview/Overview';
 import {Healthcheck} from '../OldHealthcheck';
 import {TenantOverview} from '../TenantOverview/TenantOverview';
@@ -32,7 +32,7 @@ function DetailedOverview(props: DetailedOverviewProps) {
 
     const {currentSchemaPath} = useSelector((state: any) => state.schema);
 
-    const [newTenantDiagnostics] = useSetting(ENABLE_NEW_TENANT_DIAGNOSTICS_DESIGN);
+    const [displayMetricsCards] = useSetting(DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS);
 
     const openModalHandler = () => {
         setIsModalVisible(true);
@@ -59,7 +59,7 @@ function DetailedOverview(props: DetailedOverviewProps) {
     };
 
     const renderTenantOverview = () => {
-        if (newTenantDiagnostics) {
+        if (displayMetricsCards) {
             return (
                 <div className={b('section')}>
                     <TenantOverview
