@@ -352,7 +352,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     }
     getHealthcheckInfo(database: string, {concurrentId}: AxiosOptions = {}) {
         return this.get<HealthCheckAPIResponse>(
-            this.getPath('/viewer/json/healthcheck'),
+            this.getPath('/viewer/json/healthcheck?merge_records=true'),
             {tenant: database},
             {concurrentId},
         );
