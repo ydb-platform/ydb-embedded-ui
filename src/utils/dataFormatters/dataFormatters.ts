@@ -1,6 +1,6 @@
 import {dateTimeParse} from '@gravity-ui/date-utils';
 
-import {TVDiskID, TVSlotId} from '../../types/api/vdisk';
+import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
 import {DAY_IN_SECONDS, GIGABYTE, TERABYTE} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
@@ -36,8 +36,8 @@ export const stringifyVdiskId = (id?: TVDiskID | TVSlotId) => {
     return id ? Object.values(id).join('-') : '';
 };
 
-export const getPDiskId = (info?: {NodeId?: number; PDiskId?: number}) => {
-    return `${info?.NodeId}-${info?.PDiskId}`;
+export const getPDiskId = (info: {NodeId?: number; PDiskId?: number}) => {
+    return info.NodeId && info.PDiskId ? `${info.NodeId}-${info.PDiskId}` : undefined;
 };
 
 export const formatUptime = (seconds: number) => {
@@ -108,7 +108,7 @@ export const formatCPUWithLabel = (value?: number) => {
 };
 
 export const formatDateTime = (value?: number | string) => {
-    if (!isNumeric(value) || !value) {
+    if (!isNumeric(value)) {
         return '';
     }
 
@@ -124,5 +124,5 @@ export const calcUptimeInSeconds = (milliseconds: number | string) => {
 };
 
 export const calcUptime = (milliseconds?: number | string) => {
-    return milliseconds ? formatUptime(calcUptimeInSeconds(milliseconds)) : 'N/A';
+    return formatUptime(calcUptimeInSeconds(Number(milliseconds)));
 };

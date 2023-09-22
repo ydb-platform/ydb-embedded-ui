@@ -1,6 +1,6 @@
 import cn from 'bem-cn-lite';
 
-import {ValueOf} from '../../types/common';
+import type {ValueOf} from '../../types/common';
 
 import './ProgressViewer.scss';
 
@@ -20,20 +20,19 @@ type ProgressViewerSize = ValueOf<typeof PROGRESS_VIEWER_SIZE_IDS>;
 
 /*
 
-Описание props:
-1) value - величина прогресса
-2) capacity - предельно возможный прогресс
-3) formatValues - функция форматирования value и capacity
-4) percents - отображать ли заполненость в виде процентов
-5) className - кастомный класс
-6) colorizeProgress - менять ли цвет полосы прогресса в зависимости от его величины
-7) inverseColorize - инвертировать ли цвета при разукрашивании прогресса
+Props description:
+1) value - the amount of progress
+2) capacity - maximum possible progress value
+3) formatValues - function for formatting the value and capacity
+4) percents - display progress in percents
+5) colorizeProgress - change the color of the progress bar depending on its value
+6) inverseColorize - invert the colors of the progress bar
 */
 
 interface ProgressViewerProps {
     value?: number | string;
     capacity?: number | string;
-    formatValues?: (value?: number, total?: number) => (string | undefined)[];
+    formatValues?: (value?: number, capacity?: number) => (string | undefined)[];
     percents?: boolean;
     className?: string;
     size?: ProgressViewerSize;
@@ -54,13 +53,11 @@ export function ProgressViewer({
     let fillWidth = Math.round((parseFloat(String(value)) / parseFloat(String(capacity))) * 100);
     fillWidth = fillWidth > 100 ? 100 : fillWidth;
 
-    let valueText = String(Math.round(Number(value))),
-        capacityText = capacity,
+    let valueText: number | string | undefined = Math.round(Number(value)),
+        capacityText: number | string | undefined = capacity,
         divider = '/';
-    let formattedValue: string | undefined;
-    let formattedCapacity: string | undefined;
     if (formatValues) {
-        [formattedValue, formattedCapacity] = formatValues(Number(value), Number(capacity));
+        [valueText, capacityText] = formatValues(Number(value), Number(capacity));
     } else if (percents) {
         valueText = fillWidth + '%';
         capacityText = '';
@@ -86,9 +83,9 @@ export function ProgressViewer({
         return (
             <div className={b({size}, className)}>
                 <div className={b('line', {bg})} style={lineStyle}></div>
-                <span className={b('text', {text})}>{`${formattedValue || valueText} ${divider} ${
-                    formattedCapacity || capacityText
-                }`}</span>
+                <span
+                    className={b('text', {text})}
+                >{`${valueText} ${divider} ${capacityText}`}</span>
             </div>
         );
     }
