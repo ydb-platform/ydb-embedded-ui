@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.17.0...v4.18.0) (2023-09-25)
+
+
+### Features
+
+* **ProgressViewer:** add custom threasholds to ProgressViewer ([#540](https://github.com/ydb-platform/ydb-embedded-ui/issues/540)) ([3553065](https://github.com/ydb-platform/ydb-embedded-ui/commit/35530655581357f4a79c277a5bf9846b3befb784))
+
+
+### Bug Fixes
+
+* **Authentication:** enable page redirect ([#539](https://github.com/ydb-platform/ydb-embedded-ui/issues/539)) ([721883c](https://github.com/ydb-platform/ydb-embedded-ui/commit/721883cc7f4ca60e64d4a5f77b939dbb8e960855))
+* **Healthcheck:** add merge_records request param ([#538](https://github.com/ydb-platform/ydb-embedded-ui/issues/538)) ([6a47481](https://github.com/ydb-platform/ydb-embedded-ui/commit/6a474814f71c3318715a8ce638fd522a770d8038))
+* **Nodes:** use nodes endpoint by default ([#535](https://github.com/ydb-platform/ydb-embedded-ui/issues/535)) ([12d4fef](https://github.com/ydb-platform/ydb-embedded-ui/commit/12d4fefde7a6663bb1a11f46b4e94fb24b23e966))
+* rename flag for display metrics cards for database diagnostics ([#536](https://github.com/ydb-platform/ydb-embedded-ui/issues/536)) ([957e1fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/957e1fafbbc43928498ae9e8d0bc119bcda5288d))
+
 ## [4.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.16.2...v4.17.0) (2023-09-18)
 
 
