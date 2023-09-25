@@ -85,20 +85,18 @@ export function ProgressViewer({
     const text = fillWidth > 60 ? 'contrast0' : 'contrast70';
 
     const renderContent = () => {
-        if (!capacity) {
-            return `${formattedValue || valueText}`;
+        if (capacityText) {
+            return `${valueText} ${divider} ${capacityText}`;
         }
 
-        return `${formattedValue || valueText} ${divider} ${formattedCapacity || capacityText}`;
+        return valueText;
     };
 
     if (!isNaN(Number(value))) {
         return (
             <div className={b({size}, className)}>
                 <div className={b('line', {bg})} style={lineStyle}></div>
-                <span
-                    className={b('text', {text})}
-                >{`${valueText} ${divider} ${capacityText}`}</span>
+                <span className={b('text', {text})}>{renderContent()}</span>
             </div>
         );
     }

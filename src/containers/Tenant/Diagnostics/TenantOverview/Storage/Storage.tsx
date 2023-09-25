@@ -7,7 +7,6 @@ import {getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 import {TopTables} from './TopTables/TopTables';
 import {TopGroups} from './TopGroups';
 import './Storage.scss';
-import {useCallback} from 'react';
 
 const b = cn('tenant-overview-storage');
 
@@ -26,17 +25,12 @@ interface StorageProps {
 
 export function Storage({tenantName, metrics}: StorageProps) {
     const {blobStorageUsed, tableStorageUsed, blobStorageLimit, tableStorageLimit} = metrics;
-    const formatValues = useCallback(
-        (value?: number, total?: number) => {
-            const size = getSizeWithSignificantDigits(
-                Number(blobStorageLimit || blobStorageUsed),
-                0,
-            );
+    const formatValues = (value?: number, total?: number) => {
+        const size = getSizeWithSignificantDigits(Number(blobStorageLimit || blobStorageUsed), 0);
 
-            return formatStorageValues(value, total, size);
-        },
-        [blobStorageLimit, blobStorageUsed],
-    );
+        return formatStorageValues(value, total, size);
+    };
+
     const info = [
         {
             label: 'Database storage',
@@ -46,6 +40,8 @@ export function Storage({tenantName, metrics}: StorageProps) {
                     capacity={blobStorageLimit}
                     formatValues={formatValues}
                     colorizeProgress={true}
+                    warningThreshold={75}
+                    dangerThreshold={85}
                 />
             ),
         },
@@ -57,6 +53,8 @@ export function Storage({tenantName, metrics}: StorageProps) {
                     capacity={tableStorageLimit}
                     formatValues={formatValues}
                     colorizeProgress={true}
+                    warningThreshold={75}
+                    dangerThreshold={85}
                 />
             ),
         },

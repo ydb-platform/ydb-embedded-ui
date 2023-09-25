@@ -2,11 +2,11 @@ import type {ThunkAction} from 'redux-thunk';
 import type {AnyAction, Reducer} from 'redux';
 
 import type {IQueryResult} from '../../types/store/query';
-import {createApiRequest, createRequestActionTypes} from '../utils';
-
-import type {RootState} from '.';
-import {TopTablesAction, TopTablesState} from '../../types/store/executeTopTables';
+import type {TopTablesAction, TopTablesState} from '../../types/store/executeTopTables';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
+
+import {createApiRequest, createRequestActionTypes} from '../utils';
+import type {RootState} from '.';
 
 export const FETCH_TOP_TABLES = createRequestActionTypes('top-tables', 'FETCH_TOP_TABLES');
 const SET_TOP_TABLES_STATE = 'top-tables/SET_TOP_TABLES_STATE';

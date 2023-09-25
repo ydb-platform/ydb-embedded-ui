@@ -1,7 +1,7 @@
 import {dateTimeParse} from '@gravity-ui/date-utils';
 
 import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
-import {DAY_IN_SECONDS, GIGABYTE, TERABYTE} from '../constants';
+import {DAY_IN_SECONDS, GIGABYTE} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
 import {
@@ -64,8 +64,8 @@ export const formatStorageValues = (value?: number, total?: number, size?: Bytes
     let formattedValue;
     let formattedTotal;
     let calculatedSize;
-    if (total) {
-        calculatedSize = getSizeWithSignificantDigits(total, 0);
+    if (isNumeric(total)) {
+        calculatedSize = getSizeWithSignificantDigits(Number(total), 0);
         formattedValue = formatBytesCustom({
             value,
             withSizeLabel: false,
@@ -73,9 +73,9 @@ export const formatStorageValues = (value?: number, total?: number, size?: Bytes
             significantDigits: 2,
         });
         formattedTotal = formatBytesCustom({value: total, size});
-    } else if (value) {
-        calculatedSize = getSizeWithSignificantDigits(value, 0);
-        formattedValue = value
+    } else if (isNumeric(value)) {
+        calculatedSize = getSizeWithSignificantDigits(Number(value), 0);
+        formattedValue = isNumeric(value)
             ? formatBytesCustom({value, size: size || calculatedSize})
             : undefined;
     }

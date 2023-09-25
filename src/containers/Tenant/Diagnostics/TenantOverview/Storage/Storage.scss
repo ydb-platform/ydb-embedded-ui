@@ -1,5 +1,3 @@
-@import '@gravity-ui/uikit/styles/mixins.scss';
-
 .tenant-overview-storage {
     &__info {
         margin-bottom: 36px;
@@ -8,7 +6,12 @@
     &__title {
         margin-bottom: 8px;
 
+        font-size: var(--yc-text-body-2-font-size);
         font-weight: 700;
-        @include text-body-2();
+        line-height: var(--yc-text-body-2-line-height);
+    }
+
+    &__top-tables {
+        max-width: 872px;
     }
 }

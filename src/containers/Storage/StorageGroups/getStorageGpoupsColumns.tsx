@@ -51,6 +51,120 @@ const tableColumnsNames: Record<GroupsColumns, string> = {
     Degraded: 'Degraded',
 };
 
+export const getStorageTopGroupsColumns = (): Column<PreparedStorageGroup>[] => {
+    const columns: Column<PreparedStorageGroup>[] = [
+        {
+            name: GROUPS_COLUMNS_IDS.GroupId,
+            header: tableColumnsNames[GROUPS_COLUMNS_IDS.GroupId],
+            width: 200,
+            render: ({row}) => {
+                return <span className={b('group-id')}>{row.GroupID}</span>;
+            },
+            sortAccessor: (row) => Number(row.GroupID),
+            align: DataTable.LEFT,
+            sortable: false,
+        },
+        {
+            name: GROUPS_COLUMNS_IDS.Kind,
+            header: tableColumnsNames[GROUPS_COLUMNS_IDS.Kind],
+            width: 202,
+            // prettier-ignore
+            render: ({row}) => (
+                <>
+                    <Label>{row.Kind || '—'}</Label>
+                    {' '}
+                    {row.Encryption && (
+                        <Popover
+                            content={i18n('encrypted')}
+                            placement="right"
+                            behavior={PopoverBehavior.Immediate}
+                        >
+                            <Label>
+                                <Icon data={shieldIcon} />
+                            </Label>
+                        </Popover>
+                    )}
+                </>
+            ),
+            sortable: false,
+        },
+        {
+            name: GROUPS_COLUMNS_IDS.Erasure,
+            header: tableColumnsNames[GROUPS_COLUMNS_IDS.Erasure],
+            width: 102,
+            render: ({row}) => (row.ErasureSpecies ? row.ErasureSpecies : '-'),
+            align: DataTable.LEFT,
+            sortable: false,
+        },
+        {
+            name: GROUPS_COLUMNS_IDS.Usage,
+            header: tableColumnsNames[GROUPS_COLUMNS_IDS.Usage],
+            width: 100,
+            render: ({row}) => {
+                // without a limit the usage can be evaluated as 0,
+                // but the absence of a value is more clear
+                return row.Limit ? (
+                    <Label
+                        theme={getUsageSeverityForStorageGroup(row.Usage)}
+                        className={b('usage-label', {overload: row.Usage >= 90})}
+                    >
+                        {row.Usage}%
+                    </Label>
+                ) : (
+                    '-'
+                );
+            },
+            // without a limit exclude usage from sort to display at the bottom
+            sortAccessor: (row) => (row.Limit ? getUsage(row) : null),
+            align: DataTable.LEFT,
+            sortable: false,
+        },
+        {
+            name: GROUPS_COLUMNS_IDS.Used,
+            header: tableColumnsNames[GROUPS_COLUMNS_IDS.Used],
+            width: 100,
+            render: ({row}) => {
+                return bytesToGB(row.Used, true);
+            },
+            align: DataTable.RIGHT,
+            sortable: false,
+        },
+        {
+            name: GROUPS_COLUMNS_IDS.Limit,
+            header: tableColumnsNames[GROUPS_COLUMNS_IDS.Limit],
+            width: 100,
+            render: ({row}) => {
+                return bytesToGB(row.Limit);
+            },
+            align: DataTable.RIGHT,
+            sortable: false,
+        },
+        {
+            name: GROUPS_COLUMNS_IDS.UsedSpaceFlag,
+            header: tableColumnsNames[GROUPS_COLUMNS_IDS.UsedSpaceFlag],
+            width: 110,
+            render: ({row}) => {
+                const value = row.UsedSpaceFlag;
+
+                let color = 'Red';
+
+                if (value < 100) {
+                    color = 'Green';
+                } else if (value < 10000) {
+                    color = 'Yellow';
+                } else if (value < 1000000) {
+                    color = 'Orange';
+                }
+                return <EntityStatus status={color} />;
+            },
+            align: DataTable.CENTER,
+            sortable: false,
+        },
+    ];
+
+    return columns;
+};
+
 export const getStorageGroupsColumns = (nodes?: NodesMap): Column<PreparedStorageGroup>[] => {
     const columns: Column<PreparedStorageGroup>[] = [
         {

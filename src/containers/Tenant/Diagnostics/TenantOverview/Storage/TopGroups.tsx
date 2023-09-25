@@ -7,9 +7,8 @@ import DataTable from '@gravity-ui/react-data-table';
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../../utils/constants';
 import {STORAGE_SORT_VALUES} from '../../../../../utils/storage';
-import {selectNodesMap} from '../../../../../store/reducers/nodesList';
 import {selectFilteredGroups} from '../../../../../store/reducers/storage/selectors';
-import {getStorageGroupsColumns} from '../../../../Storage/StorageGroups/getStorageGpoursColumns';
+import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/getStorageGpoupsColumns';
 import {
     getStorageGroupsInfo,
     setDataWasNotLoaded,
@@ -33,9 +32,8 @@ export function TopGroups({tenant}: TopGroupsProps) {
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const {loading, wasLoaded, error} = useTypedSelector((state) => state.storage);
     const storageGroups = useTypedSelector(selectFilteredGroups);
-    const nodesMap = useTypedSelector(selectNodesMap);
 
-    const columns = getStorageGroupsColumns(nodesMap);
+    const columns = getStorageTopGroupsColumns();
 
     useEffect(() => {
         return () => {
@@ -92,7 +90,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
     return (
         <>
             <div className={b('title')}>Top groups by usage</div>
-            {renderContent()}
+            <div className={b('top-tables')}>{renderContent()}</div>
         </>
     );
 }

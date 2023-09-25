@@ -1,6 +1,6 @@
 import {FETCH_TOP_TABLES, setTopTablesState} from '../../store/reducers/executeTopTables';
-import {ApiRequestAction} from '../../store/utils';
-import {IQueryResult, QueryErrorResponse} from './query';
+import type {ApiRequestAction} from '../../store/utils';
+import type {IQueryResult, QueryErrorResponse} from './query';
 
 export interface TopTablesState {
     loading: boolean;
