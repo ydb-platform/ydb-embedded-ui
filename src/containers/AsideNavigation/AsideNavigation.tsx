@@ -50,7 +50,9 @@ function YbdInternalUser({ydbUser, logout}: YbdInternalUserProps) {
     const history = useHistory();
 
     const handleLoginClick = () => {
-        history.push(createHref(routes.auth, undefined, {returnUrl: encodeURI(location.href)}));
+        history.push(
+            createHref(routes.auth, undefined, {returnUrl: encodeURIComponent(location.href)}),
+        );
     };
 
     return (

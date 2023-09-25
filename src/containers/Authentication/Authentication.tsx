@@ -1,12 +1,13 @@
 import {KeyboardEvent, useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
-import {useHistory} from 'react-router';
+import {useHistory, useLocation} from 'react-router';
 import cn from 'bem-cn-lite';
 
 import {Button, TextInput, Icon, Link as ExternalLink} from '@gravity-ui/uikit';
 
 import {authenticate} from '../../store/reducers/authentication/authentication';
 import {useTypedSelector} from '../../utils/hooks';
+import {parseQuery} from '../../routes';
 
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
 import showIcon from '../../assets/icons/show.svg';
@@ -18,13 +19,15 @@ import './Authentication.scss';
 const b = cn('authentication');
 
 interface AuthenticationProps {
-    returnUrl?: string;
     closable?: boolean;
 }
 
-function Authentication({returnUrl, closable = false}: AuthenticationProps) {
+function Authentication({closable = false}: AuthenticationProps) {
     const dispatch = useDispatch();
     const history = useHistory();
+    const location = useLocation();
+
+    const {returnUrl} = parseQuery(location);
 
     const {error} = useTypedSelector((state) => state.authentication);
 
@@ -58,7 +61,14 @@ function Authentication({returnUrl, closable = false}: AuthenticationProps) {
         // typed dispatch required, remove error expectation after adding it
         dispatch(authenticate(login, pass)).then(() => {
             if (returnUrl) {
-                history.replace(decodeURI(returnUrl));
+                const decodedUrl = decodeURIComponent(returnUrl.toString());
+
+                // to prevent page reload we use router history
+                // history navigates relative to origin
+                // so we remove origin to make it work properly
+                const url = new URL(decodedUrl);
+                const path = url.pathname + url.search;
+                history.replace(path);
             }
         });
     };
