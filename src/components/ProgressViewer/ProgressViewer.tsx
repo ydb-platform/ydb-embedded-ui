@@ -27,6 +27,8 @@ Props description:
 4) percents - display progress in percents
 5) colorizeProgress - change the color of the progress bar depending on its value
 6) inverseColorize - invert the colors of the progress bar
+7) warningThreshold - the percentage of fullness at which the color of the progress bar changes to yellow
+8) dangerThreshold - the percentage of fullness at which the color of the progress bar changes to red
 */
 
 interface ProgressViewerProps {
@@ -38,6 +40,8 @@ interface ProgressViewerProps {
     size?: ProgressViewerSize;
     colorizeProgress?: boolean;
     inverseColorize?: boolean;
+    warningThreshold?: number;
+    dangerThreshold?: number;
 }
 
 export function ProgressViewer({
@@ -49,10 +53,11 @@ export function ProgressViewer({
     size = PROGRESS_VIEWER_SIZE_IDS.xs,
     colorizeProgress,
     inverseColorize,
+    warningThreshold = 60,
+    dangerThreshold = 80,
 }: ProgressViewerProps) {
     let fillWidth = Math.round((parseFloat(String(value)) / parseFloat(String(capacity))) * 100);
     fillWidth = fillWidth > 100 ? 100 : fillWidth;
-
     let valueText: number | string | undefined = Math.round(Number(value)),
         capacityText: number | string | undefined = capacity,
         divider = '/';
@@ -66,9 +71,9 @@ export function ProgressViewer({
 
     let bg = inverseColorize ? 'scarlet' : 'apple';
     if (colorizeProgress) {
-        if (fillWidth > 60 && fillWidth <= 80) {
+        if (fillWidth > warningThreshold && fillWidth <= dangerThreshold) {
             bg = 'saffron';
-        } else if (fillWidth > 80) {
+        } else if (fillWidth > dangerThreshold) {
             bg = inverseColorize ? 'apple' : 'scarlet';
         }
     }
