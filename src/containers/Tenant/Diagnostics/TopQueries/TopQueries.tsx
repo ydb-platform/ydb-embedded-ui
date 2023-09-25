@@ -28,7 +28,7 @@ import {
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../../store/reducers/tenant/constants';
-import {formatDateTime, formatNumber} from '../../../../utils';
+import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';

@@ -8,7 +8,7 @@ import type {
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {EPathType} from '../../../../../types/api/schema';
 import {isNumeric} from '../../../../../utils/utils';
-import {formatBytes, formatNumber} from '../../../../../utils';
+import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 import {formatObject, InfoViewerItem} from '../../../../../components/InfoViewer';
 import {

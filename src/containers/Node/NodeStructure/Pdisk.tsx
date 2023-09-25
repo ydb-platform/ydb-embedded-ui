@@ -8,12 +8,12 @@ import DataTable, {Column, Settings} from '@gravity-ui/react-data-table';
 
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
-import ProgressViewer from '../../../components/ProgressViewer/ProgressViewer';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {Icon} from '../../../components/Icon';
 import {Vdisk} from './Vdisk';
 
 import {bytesToGB, pad9} from '../../../utils/utils';
-import {formatStorageValuesToGb} from '../../../utils';
+import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {getPDiskType} from '../../../utils/pdisk';
 
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';

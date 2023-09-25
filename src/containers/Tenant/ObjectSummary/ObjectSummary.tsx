@@ -24,7 +24,7 @@ import {
     TColumnTableDescription,
 } from '../../../types/api/schema';
 import routes, {createHref} from '../../../routes';
-import {formatDateTime} from '../../../utils';
+import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedSelector} from '../../../utils/hooks';
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,

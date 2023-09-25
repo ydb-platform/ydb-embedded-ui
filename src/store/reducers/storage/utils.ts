@@ -9,7 +9,7 @@ import {TPDiskState} from '../../../types/api/pdisk';
 import {EFlag} from '../../../types/api/enums';
 import {getPDiskType} from '../../../utils/pdisk';
 import {getUsage} from '../../../utils/storage';
-import {calcUptime} from '../../../utils';
+import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 
 import type {PreparedStorageGroup, PreparedStorageNode, PreparedStorageResponse} from './types';
 

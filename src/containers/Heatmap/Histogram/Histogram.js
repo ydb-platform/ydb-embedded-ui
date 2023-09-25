@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
 
 import {getColorRange, getCurrentMetricLimits} from '../util';
-import {formatNumber} from '../../../utils';
+import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
 
 import './Histogram.scss';
 

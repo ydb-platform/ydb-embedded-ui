@@ -1,6 +1,11 @@
 import type {TFollowerGroup, TPartitionConfig, TTableStats} from '../../../types/api/schema';
 import type {TMetrics} from '../../../types/api/tenant';
-import {formatCPU, formatNumber, formatBps, formatDateTime} from '../../../utils';
+import {
+    formatBps,
+    formatCPU,
+    formatDateTime,
+    formatNumber,
+} from '../../../utils/dataFormatters/dataFormatters';
 import {toFormattedSize} from '../../FormattedBytes/utils';
 
 import {createInfoFormatter} from '../utils';

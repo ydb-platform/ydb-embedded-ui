@@ -1,6 +1,6 @@
 import type {TTenant} from '../../../types/api/tenant';
 import {formatBytes} from '../../../utils/bytesParsers';
-import {formatCPU} from '../../../utils/formatCPU/formatCPU';
+import {formatCPUWithLabel} from '../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../utils/utils';
 import {METRIC_STATUS} from './contants';
 
@@ -158,7 +158,7 @@ export const formatTenantMetrics = ({
     storage?: number;
     memory?: number;
 }) => ({
-    cpu: formatCPU(cpu),
+    cpu: formatCPUWithLabel(cpu),
     storage: formatBytes({value: storage, significantDigits: 2}) || undefined,
     memory: formatBytes({value: memory, significantDigits: 2}) || undefined,
 });

@@ -7,7 +7,7 @@ import {Stack} from '../../../components/Stack/Stack';
 import routes, {createHref} from '../../../routes';
 import {selectVDisksForPDisk} from '../../../store/reducers/storage/selectors';
 import {TPDiskStateInfo, TPDiskState} from '../../../types/api/pdisk';
-import {stringifyVdiskId} from '../../../utils';
+import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedSelector} from '../../../utils/hooks';
 import {getPDiskType} from '../../../utils/pdisk';
 import {isFullVDiskData} from '../../../utils/storage';

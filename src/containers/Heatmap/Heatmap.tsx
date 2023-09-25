@@ -7,7 +7,7 @@ import {Checkbox, Select} from '@gravity-ui/uikit';
 import type {IHeatmapMetricValue} from '../../types/store/heatmap';
 import {getTabletsInfo, setHeatmapOptions} from '../../store/reducers/heatmap';
 import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
-import {formatNumber} from '../../utils';
+import {formatNumber} from '../../utils/dataFormatters/dataFormatters';
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 
 import {Loader} from '../../components/Loader';

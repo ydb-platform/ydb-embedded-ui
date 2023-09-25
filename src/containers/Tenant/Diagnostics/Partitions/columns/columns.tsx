@@ -4,7 +4,7 @@ import block from 'bem-cn-lite';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 import {getDefaultNodePath} from '../../../../Node/NodePages';
-import {formatBytes, formatMsToUptime} from '../../../../../utils';
+import {formatBytes, formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../../../utils/utils';
 
 import {

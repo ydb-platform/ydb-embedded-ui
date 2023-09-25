@@ -1,6 +1,6 @@
 import type {TComputeInfo, TComputeNodeInfo} from '../../../types/api/compute';
 import type {TNodesInfo} from '../../../types/api/nodes';
-import {calcUptime} from '../../../utils';
+import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 
 import type {NodesHandledResponse, NodesPreparedEntity} from './types';
 

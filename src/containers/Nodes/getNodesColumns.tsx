@@ -2,12 +2,12 @@ import DataTable, {Column} from '@gravity-ui/react-data-table';
 import {Popover} from '@gravity-ui/uikit';
 
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
-import ProgressViewer from '../../components/ProgressViewer/ProgressViewer';
+import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
 
 import {isSortableNodesProperty} from '../../utils/nodes';
-import {formatBytesToGigabyte} from '../../utils/index';
+import {formatBytesToGigabyte} from '../../utils/dataFormatters/dataFormatters';
 
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 

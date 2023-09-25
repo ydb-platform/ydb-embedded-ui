@@ -8,7 +8,7 @@ import {InternalLink} from '../../../components/InternalLink';
 import routes, {createHref} from '../../../routes';
 import {EFlag} from '../../../types/api/enums';
 import {EVDiskState, TVDiskStateInfo} from '../../../types/api/vdisk';
-import {stringifyVdiskId} from '../../../utils';
+import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../../utils/storage';
 
 import {STRUCTURE} from '../../Node/NodePages';

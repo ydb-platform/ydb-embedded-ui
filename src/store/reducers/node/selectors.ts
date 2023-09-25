@@ -1,7 +1,7 @@
 import type {Selector} from 'reselect';
 import {createSelector} from 'reselect';
 
-import {stringifyVdiskId} from '../../../utils';
+import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 
 import type {
     NodeStateSlice,

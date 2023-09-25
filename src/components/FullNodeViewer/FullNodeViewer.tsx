@@ -3,10 +3,10 @@ import cn from 'bem-cn-lite';
 import type {TSystemStateInfo} from '../../types/api/nodes';
 
 import {LOAD_AVERAGE_TIME_INTERVALS} from '../../utils/constants';
-import {calcUptime} from '../../utils';
+import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
 
 import InfoViewer from '../InfoViewer/InfoViewer';
-import ProgressViewer from '../ProgressViewer/ProgressViewer';
+import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {PoolUsage} from '../PoolUsage/PoolUsage';
 
 import './FullNodeViewer.scss';

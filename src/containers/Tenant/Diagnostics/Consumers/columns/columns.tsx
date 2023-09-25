@@ -6,7 +6,7 @@ import type {IPreparedConsumerData} from '../../../../../types/store/topic';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import {InternalLink} from '../../../../../components/InternalLink';
-import {formatMsToUptime} from '../../../../../utils';
+import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
 import routes, {createHref} from '../../../../../routes';
 
 import {TenantTabsGroups} from '../../../TenantPages';

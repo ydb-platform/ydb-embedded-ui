@@ -1,4 +1,4 @@
-import {formatNumber} from '..';
+import {formatNumber} from '../dataFormatters/dataFormatters';
 import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE} from '../constants';
 import {isNumeric} from '../utils';
 

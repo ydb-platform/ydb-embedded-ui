@@ -1,8 +1,11 @@
 import React from 'react';
 import cn from 'bem-cn-lite';
 
-import ProgressViewer from '../../../components/ProgressViewer/ProgressViewer';
-import {formatStorageValuesToGb, stringifyVdiskId} from '../../../utils';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
+import {
+    formatStorageValuesToGb,
+    stringifyVdiskId,
+} from '../../../utils/dataFormatters/dataFormatters';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import {valueIsDefined} from './NodeStructure';
