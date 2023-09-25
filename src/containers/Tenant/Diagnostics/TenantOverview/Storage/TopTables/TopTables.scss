@@ -1,7 +1,8 @@
 @import '@gravity-ui/uikit/styles/mixins.scss';
 
-.kv-top-tables {
+.tenant-overview-top-tables {
     width: 872px;
+    margin-bottom: var(--diagnostics-section-margin);
 
     &__path-cell-wrapper {
         display: flex;

@@ -5,9 +5,11 @@ import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressV
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 import {TopTables} from './TopTables/TopTables';
+import {TopGroups} from './TopGroups';
 import './Storage.scss';
+import {useCallback} from 'react';
 
-const b = cn('storage');
+const b = cn('tenant-overview-storage');
 
 export interface StorageMetrics {
     blobStorageUsed?: number;
@@ -24,11 +26,17 @@ interface StorageProps {
 
 export function Storage({tenantName, metrics}: StorageProps) {
     const {blobStorageUsed, tableStorageUsed, blobStorageLimit, tableStorageLimit} = metrics;
-    const formatValues = (value?: number, total?: number) => {
-        const size = getSizeWithSignificantDigits(Number(blobStorageLimit || blobStorageUsed), 0);
+    const formatValues = useCallback(
+        (value?: number, total?: number) => {
+            const size = getSizeWithSignificantDigits(
+                Number(blobStorageLimit || blobStorageUsed),
+                0,
+            );
 
-        return formatStorageValues(value, total, size);
-    };
+            return formatStorageValues(value, total, size);
+        },
+        [blobStorageLimit, blobStorageUsed],
+    );
     const info = [
         {
             label: 'Database storage',
@@ -57,6 +65,7 @@ export function Storage({tenantName, metrics}: StorageProps) {
         <>
             <InfoViewer className={b('info')} title="Storage details" info={info} />
             <TopTables path={tenantName} />
+            <TopGroups tenant={tenantName} />
         </>
     );
 }

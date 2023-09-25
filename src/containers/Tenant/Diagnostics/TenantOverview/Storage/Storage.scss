@@ -1,5 +1,14 @@
-.storage {
+@import '@gravity-ui/uikit/styles/mixins.scss';
+
+.tenant-overview-storage {
     &__info {
         margin-bottom: 36px;
+    }
+
+    &__title {
+        margin-bottom: 8px;
+
+        font-weight: 700;
+        @include text-body-2();
     }
 }

@@ -16,7 +16,7 @@ import {ResponseError} from '../../../../../../components/Errors/ResponseError';
 
 import './TopTables.scss';
 
-const b = cn('kv-top-tables');
+const b = cn('tenant-overview-top-tables');
 
 interface TopTablesProps {
     path: string;
