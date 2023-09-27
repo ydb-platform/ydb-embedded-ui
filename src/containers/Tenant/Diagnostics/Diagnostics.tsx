@@ -109,6 +109,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         type={type}
                         tenantName={tenantNameString}
                         additionalTenantProps={props.additionalTenantProps}
+                        additionalNodesProps={props.additionalNodesProps}
                     />
                 );
             }

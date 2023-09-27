@@ -1,29 +1,8 @@
 import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
 import {EFlag} from '../../../types/api/enums';
+import {generateEvaluator} from '../../../utils/generateEvaluator';
 
 export * from './constants';
-
-const generateEvaluator =
-    <OkLevel extends string, WarnLevel extends string, CritLevel extends string>(
-        warn: number,
-        crit: number,
-        levels: [OkLevel, WarnLevel, CritLevel],
-    ) =>
-    (value: number) => {
-        if (0 <= value && value < warn) {
-            return levels[0];
-        }
-
-        if (warn <= value && value < crit) {
-            return levels[1];
-        }
-
-        if (crit <= value) {
-            return levels[2];
-        }
-
-        return undefined;
-    };
 
 const defaultDegradationEvaluator = generateEvaluator(1, 2, ['success', 'warning', 'danger']);
 

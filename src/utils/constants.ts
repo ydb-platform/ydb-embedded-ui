@@ -77,6 +77,8 @@ export const COLORS_PRIORITY = {
     grey: 1,
 };
 
+export const TENANT_OVERVIEW_TABLES_LIMIT = 5;
+
 // ==== Titles ====
 export const DEVELOPER_UI_TITLE = 'Developer UI';
 export const CLUSTER_DEFAULT_TITLE = 'Cluster';

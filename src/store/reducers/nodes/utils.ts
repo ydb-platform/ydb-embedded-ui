@@ -1,4 +1,4 @@
-import type {TComputeInfo, TComputeNodeInfo} from '../../../types/api/compute';
+import type {TComputeInfo, TComputeNodeInfo, TComputeTenantInfo} from '../../../types/api/compute';
 import type {TNodesInfo} from '../../../types/api/nodes';
 import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 
@@ -14,22 +14,29 @@ const prepareComputeNode = (node: TComputeNodeInfo, tenantName?: string) => {
     };
 };
 
-export const prepareComputeNodesData = (data: TComputeInfo): NodesHandledResponse => {
+export const prepareComputeNodes = (nodes?: TComputeNodeInfo[], tenants?: TComputeTenantInfo[]) => {
     const preparedNodes: NodesPreparedEntity[] = [];
 
     // First try to parse v2 response in case backend supports it
     // Else parse v1 response
-    if (data.Nodes) {
-        data.Nodes.forEach((node) => {
+
+    if (nodes) {
+        nodes.forEach((node) => {
             preparedNodes.push(prepareComputeNode(node));
         });
-    } else if (data.Tenants) {
-        for (const tenant of data.Tenants) {
+    } else if (tenants) {
+        for (const tenant of tenants) {
             tenant.Nodes?.forEach((node) => {
                 preparedNodes.push(prepareComputeNode(node, tenant.Name));
             });
         }
     }
+
+    return preparedNodes;
+};
+
+export const prepareComputeNodesData = (data: TComputeInfo): NodesHandledResponse => {
+    const preparedNodes = prepareComputeNodes(data.Nodes, data.Tenants);
 
     return {
         Nodes: preparedNodes,

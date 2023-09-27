@@ -20,7 +20,7 @@ export interface TComputeInfo {
     Nodes?: TComputeNodeInfo[]; // v2
 }
 
-interface TComputeTenantInfo {
+export interface TComputeTenantInfo {
     Overall: EFlag;
     Name: string;
     Nodes?: TComputeNodeInfo[];

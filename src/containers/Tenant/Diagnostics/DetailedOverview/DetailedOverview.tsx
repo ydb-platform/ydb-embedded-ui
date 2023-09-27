@@ -5,7 +5,7 @@ import cn from 'bem-cn-lite';
 import {Button, Modal} from '@gravity-ui/uikit';
 
 import type {EPathType} from '../../../../types/api/schema';
-import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
+import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {Icon} from '../../../../components/Icon';
 import {useSetting} from '../../../../utils/hooks';
 import {DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS} from '../../../../utils/constants';
@@ -21,12 +21,13 @@ interface DetailedOverviewProps {
     className?: string;
     tenantName: string;
     additionalTenantProps?: AdditionalTenantsProps;
+    additionalNodesProps?: AdditionalNodesProps;
 }
 
 const b = cn('kv-detailed-overview');
 
 function DetailedOverview(props: DetailedOverviewProps) {
-    const {type, tenantName, additionalTenantProps} = props;
+    const {type, tenantName, additionalTenantProps, additionalNodesProps} = props;
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -65,6 +66,7 @@ function DetailedOverview(props: DetailedOverviewProps) {
                     <TenantOverview
                         tenantName={tenantName}
                         additionalTenantProps={additionalTenantProps}
+                        additionalNodesProps={additionalNodesProps}
                     />
                 </div>
             );
