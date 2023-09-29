@@ -1,4 +1,4 @@
-import {formatNumber, roundToSignificant} from '../dataFormatters/dataFormatters';
+import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
 import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE} from '../constants';
 import {isNumeric} from '../utils';
 
@@ -79,7 +79,7 @@ interface FormatToSizeArgs {
 }
 
 const formatToSize = ({value, size = 'mb', precision = 0}: FormatToSizeArgs) => {
-    const result = roundToSignificant(Number(value) / sizes[size].value, precision);
+    const result = roundToPrecision(Number(value) / sizes[size].value, precision);
 
     return formatNumber(result);
 };
@@ -129,15 +129,4 @@ export const formatBytes = ({
     }
 
     return result;
-};
-
-export const formatArrayOfBytes = (
-    bytesArray: (number | string | undefined | null)[],
-    significantDigits = 0,
-) => {
-    const maxBytes = Math.max(...bytesArray.map(Number));
-
-    const size = getSizeWithSignificantDigits(maxBytes, significantDigits);
-
-    return bytesArray.map((value) => formatBytes({value, size}));
 };

@@ -5,6 +5,7 @@ import cluster from './cluster/cluster';
 import clusterNodes from './clusterNodes/clusterNodes';
 import tenant from './tenant/tenant';
 import storage from './storage/storage';
+import topStorageGroups from './topStorageGroups/topStorageGroups';
 import node from './node/node';
 import tooltip from './tooltip';
 import tablets from './tablets';
@@ -26,7 +27,7 @@ import nodesList from './nodesList';
 import describe from './describe';
 import schemaAcl from './schemaAcl/schemaAcl';
 import executeTopQueries from './executeTopQueries';
-import executeTopTables from './executeTopTables';
+import executeTopTables from './executeTopTables/executeTopTables';
 import healthcheckInfo from './healthcheckInfo';
 import shardsWorkload from './shardsWorkload';
 import hotKeys from './hotKeys';
@@ -44,6 +45,7 @@ export const rootReducer = {
     clusterNodes,
     tenant,
     storage,
+    topStorageGroups,
     node,
     tooltip,
     tablets,

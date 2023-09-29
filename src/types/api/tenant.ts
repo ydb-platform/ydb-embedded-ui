@@ -92,8 +92,6 @@ export interface TMetrics {
 
     GroupReadIops?: TIopsRecord[];
     GroupWriteIops?: TIopsRecord[];
-
-    StorageLimit?: string; // TODO: check correctness in backend protos when fully supported
 }
 
 interface TThroughputRecord {

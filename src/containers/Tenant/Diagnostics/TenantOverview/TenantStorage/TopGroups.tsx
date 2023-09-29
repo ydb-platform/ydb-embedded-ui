@@ -1,5 +1,5 @@
 import cn from 'bem-cn-lite';
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
 import DataTable from '@gravity-ui/react-data-table';
@@ -7,17 +7,15 @@ import DataTable from '@gravity-ui/react-data-table';
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../../utils/constants';
 import {STORAGE_SORT_VALUES} from '../../../../../utils/storage';
-import {selectFilteredGroups} from '../../../../../store/reducers/storage/selectors';
-import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/getStorageGpoupsColumns';
 import {
-    getStorageGroupsInfo,
     setDataWasNotLoaded,
-    setInitialState,
-} from '../../../../../store/reducers/storage/storage';
+    getTopStorageGroups,
+    selectTopStorageGroups,
+} from '../../../../../store/reducers/topStorageGroups/topStorageGroups';
 import {EVersion} from '../../../../../types/api/storage';
-import {AccessDenied} from '../../../../../components/Errors/403';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {TableSkeleton} from '../../../../../components/TableSkeleton/TableSkeleton';
+import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/getStorageGroupsColumns';
 import i18n from '../i18n';
 
 const b = cn('tenant-overview-storage');
@@ -30,17 +28,10 @@ export function TopGroups({tenant}: TopGroupsProps) {
     const dispatch = useDispatch();
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const {loading, wasLoaded, error} = useTypedSelector((state) => state.storage);
-    const storageGroups = useTypedSelector(selectFilteredGroups);
+    const {loading, wasLoaded, error} = useTypedSelector((state) => state.topStorageGroups);
+    const topGroups = useTypedSelector(selectTopStorageGroups);
 
     const columns = getStorageTopGroupsColumns();
-
-    useEffect(() => {
-        return () => {
-            // Clean data on component unmount
-            dispatch(setInitialState());
-        };
-    }, [dispatch]);
 
     const fetchData = useCallback(
         (isBackground: boolean) => {
@@ -49,7 +40,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
             }
 
             dispatch(
-                getStorageGroupsInfo({
+                getTopStorageGroups({
                     tenant,
                     visibleEntities: 'all',
                     limit: 5,
@@ -66,9 +57,6 @@ export function TopGroups({tenant}: TopGroupsProps) {
 
     const renderContent = () => {
         if (error) {
-            if (error.status === 403) {
-                return <AccessDenied />;
-            }
             return <ResponseError error={error} />;
         }
 
@@ -79,9 +67,9 @@ export function TopGroups({tenant}: TopGroupsProps) {
         return (
             <DataTable
                 theme="yandex-cloud"
-                data={storageGroups.slice(0, 5)}
+                data={topGroups || []}
                 columns={columns}
-                settings={DEFAULT_TABLE_SETTINGS}
+                settings={{...DEFAULT_TABLE_SETTINGS, stickyHead: 'fixed', dynamicRender: false}}
                 emptyDataMessage={i18n('top-groups.empty-data')}
             />
         );
@@ -90,7 +78,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
     return (
         <>
             <div className={b('title')}>Top groups by usage</div>
-            <div className={b('top-tables')}>{renderContent()}</div>
+            <div className={b('table')}>{renderContent()}</div>
         </>
     );
 }

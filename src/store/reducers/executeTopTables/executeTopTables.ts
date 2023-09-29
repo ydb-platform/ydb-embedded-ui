@@ -1,12 +1,8 @@
-import type {ThunkAction} from 'redux-thunk';
-import type {AnyAction, Reducer} from 'redux';
+import type {Reducer} from 'redux';
 
-import type {IQueryResult} from '../../types/store/query';
-import type {TopTablesAction, TopTablesState} from '../../types/store/executeTopTables';
-import {parseQueryAPIExecuteResponse} from '../../utils/query';
-
-import {createApiRequest, createRequestActionTypes} from '../utils';
-import type {RootState} from '.';
+import {parseQueryAPIExecuteResponse} from '../../../utils/query';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
+import type {TopTablesAction, TopTablesState} from './types';
 
 export const FETCH_TOP_TABLES = createRequestActionTypes('top-tables', 'FETCH_TOP_TABLES');
 const SET_TOP_TABLES_STATE = 'top-tables/SET_TOP_TABLES_STATE';
@@ -69,39 +65,23 @@ const executeTopTables: Reducer<TopTablesState, TopTablesAction> = (
     }
 };
 
-type FetchTopTables = (params: {
-    database: string;
-}) => ThunkAction<Promise<IQueryResult | undefined>, RootState, unknown, AnyAction>;
-
-export const fetchTopTables: FetchTopTables =
-    ({database}) =>
-    async (dispatch, getState) => {
-        try {
-            return createApiRequest({
-                request: window.api.sendQuery(
-                    {
-                        schema: 'modern',
-                        query: getQueryText(database),
-                        database,
-                        action: 'execute-scan',
-                    },
-                    {
-                        concurrentId: 'executeTopTables',
-                    },
-                ),
-                actions: FETCH_TOP_TABLES,
-                dataHandler: parseQueryAPIExecuteResponse,
-            })(dispatch, getState);
-        } catch (error) {
-            dispatch({
-                type: FETCH_TOP_TABLES.FAILURE,
-                error,
-            });
-
-            throw error;
-        }
-    };
-
+export const fetchTopTables = (database: string) => {
+    return createApiRequest({
+        request: window.api.sendQuery(
+            {
+                schema: 'modern',
+                query: getQueryText(database),
+                database,
+                action: 'execute-scan',
+            },
+            {
+                concurrentId: 'executeTopTables',
+            },
+        ),
+        actions: FETCH_TOP_TABLES,
+        dataHandler: parseQueryAPIExecuteResponse,
+    });
+};
 export function setTopTablesState(state: Partial<TopTablesState>) {
     return {
         type: SET_TOP_TABLES_STATE,

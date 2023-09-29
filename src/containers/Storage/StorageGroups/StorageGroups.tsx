@@ -6,7 +6,7 @@ import type {HandleSort} from '../../../utils/hooks/useTableSort';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {isSortableStorageProperty} from '../../../utils/storage';
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
-import {getStorageGroupsColumns} from './getStorageGpoupsColumns';
+import {getStorageGroupsColumns} from './getStorageGroupsColumns';
 
 import i18n from './i18n';
 import './StorageGroups.scss';

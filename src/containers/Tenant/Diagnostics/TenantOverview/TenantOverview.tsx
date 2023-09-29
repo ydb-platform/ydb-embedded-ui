@@ -14,7 +14,7 @@ import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/ten
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
-import {Storage} from './Storage/Storage';
+import {TenantStorage} from './TenantStorage/TenantStorage';
 import {useHealthcheck} from './useHealthcheck';
 
 import i18n from './i18n';
@@ -118,7 +118,7 @@ export function TenantOverview({tenantName, additionalTenantProps}: TenantOvervi
                 return i18n('label.under-development');
             }
             case TENANT_METRICS_TABS_IDS.storage: {
-                return <Storage tenantName={tenantName} metrics={storageMetrics} />;
+                return <TenantStorage tenantName={tenantName} metrics={storageMetrics} />;
             }
             case TENANT_METRICS_TABS_IDS.memory: {
                 return i18n('label.under-development');

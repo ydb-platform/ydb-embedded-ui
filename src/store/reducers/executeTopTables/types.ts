@@ -1,6 +1,6 @@
-import {FETCH_TOP_TABLES, setTopTablesState} from '../../store/reducers/executeTopTables';
-import type {ApiRequestAction} from '../../store/utils';
-import type {IQueryResult, QueryErrorResponse} from './query';
+import type {IQueryResult, QueryErrorResponse} from '../../../types/store/query';
+import type {ApiRequestAction} from '../../utils';
+import {FETCH_TOP_TABLES, setTopTablesState} from './executeTopTables';
 
 export interface TopTablesState {
     loading: boolean;
@@ -12,7 +12,3 @@ export interface TopTablesState {
 export type TopTablesAction =
     | ApiRequestAction<typeof FETCH_TOP_TABLES, IQueryResult, QueryErrorResponse>
     | ReturnType<typeof setTopTablesState>;
-
-export interface TopTablesRootStateSlice {
-    topTables: TopTablesState;
-}

@@ -1,29 +1,28 @@
 import cn from 'bem-cn-lite';
 
-import InfoViewer, {InfoViewerItem} from '../../../../../components/InfoViewer/InfoViewer';
+import InfoViewer from '../../../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
-import {TopTables} from './TopTables/TopTables';
+import {TopTables} from './TopTables';
 import {TopGroups} from './TopGroups';
-import './Storage.scss';
+import './TenantStorage.scss';
 
 const b = cn('tenant-overview-storage');
 
-export interface StorageMetrics {
+export interface TenantStorageMetrics {
     blobStorageUsed?: number;
     blobStorageLimit?: number;
     tableStorageUsed?: number;
     tableStorageLimit?: number;
 }
 
-interface StorageProps {
+interface TenantStorageProps {
     tenantName: string;
-    info?: InfoViewerItem[];
-    metrics: StorageMetrics;
+    metrics: TenantStorageMetrics;
 }
 
-export function Storage({tenantName, metrics}: StorageProps) {
+export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     const {blobStorageUsed, tableStorageUsed, blobStorageLimit, tableStorageLimit} = metrics;
     const formatValues = (value?: number, total?: number) => {
         const size = getSizeWithSignificantDigits(Number(blobStorageLimit || blobStorageUsed), 0);

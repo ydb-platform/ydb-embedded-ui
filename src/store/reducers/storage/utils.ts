@@ -3,6 +3,7 @@ import type {
     TStorageGroupInfo,
     TStorageGroupInfoV2,
     TStorageInfo,
+    TStoragePoolInfo,
 } from '../../../types/api/storage';
 import {EVDiskState, type TVDiskStateInfo} from '../../../types/api/vdisk';
 import {TPDiskState} from '../../../types/api/pdisk';
@@ -146,6 +147,23 @@ const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedStorageG
     };
 };
 
+export const prepareStorageGroups = (
+    StorageGroups?: TStorageGroupInfoV2[],
+    StoragePools?: TStoragePoolInfo[],
+) => {
+    let preparedGroups: PreparedStorageGroup[] = [];
+    if (StorageGroups) {
+        preparedGroups = StorageGroups.map(prepareStorageGroupDataV2);
+    }
+    StoragePools?.forEach((pool) => {
+        pool.Groups?.forEach((group) => {
+            preparedGroups.push(prepareStorageGroupData(group, pool.Name));
+        });
+    });
+
+    return preparedGroups;
+};
+
 // ==== Prepare nodes ====
 
 const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
@@ -187,17 +205,7 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
 export const prepareStorageGroupsResponse = (data: TStorageInfo): PreparedStorageResponse => {
     const {StoragePools, StorageGroups, TotalGroups, FoundGroups} = data;
 
-    let preparedGroups: PreparedStorageGroup[] = [];
-
-    if (StorageGroups) {
-        preparedGroups = StorageGroups.map(prepareStorageGroupDataV2);
-    } else {
-        StoragePools?.forEach((pool) => {
-            pool.Groups?.forEach((group) => {
-                preparedGroups.push(prepareStorageGroupData(group, pool.Name));
-            });
-        });
-    }
+    const preparedGroups = prepareStorageGroups(StorageGroups, StoragePools);
 
     return {
         groups: preparedGroups,

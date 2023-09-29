@@ -1,22 +1,23 @@
-import {useRef} from 'react';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 import {Popover} from '@gravity-ui/uikit';
 
-import {DEFAULT_TABLE_SETTINGS} from '../../../../../../utils/constants';
-import type {KeyValueRow} from '../../../../../../types/api/query';
-import {useAutofetcher, useTypedSelector} from '../../../../../../utils/hooks';
-import {fetchTopTables, setTopTablesState} from '../../../../../../store/reducers/executeTopTables';
-import {formatBytes, getSizeWithSignificantDigits} from '../../../../../../utils/bytesParsers';
-import {TableSkeleton} from '../../../../../../components/TableSkeleton/TableSkeleton';
-import {AccessDenied} from '../../../../../../components/Errors/403';
-import {ResponseError} from '../../../../../../components/Errors/ResponseError';
+import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
+import {
+    fetchTopTables,
+    setTopTablesState,
+} from '../../../../../store/reducers/executeTopTables/executeTopTables';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../../utils/constants';
+import type {KeyValueRow} from '../../../../../types/api/query';
+import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
+import {TableSkeleton} from '../../../../../components/TableSkeleton/TableSkeleton';
+import {ResponseError} from '../../../../../components/Errors/ResponseError';
 
-import './TopTables.scss';
+import './TenantStorage.scss';
 
-const b = cn('tenant-overview-top-tables');
+const b = cn('tenant-overview-storage');
 
 interface TopTablesProps {
     path: string;
@@ -27,8 +28,6 @@ export function TopTables({path}: TopTablesProps) {
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
-    const preventFetch = useRef(false);
-
     const {
         loading,
         wasLoaded,
@@ -38,22 +37,15 @@ export function TopTables({path}: TopTablesProps) {
 
     useAutofetcher(
         (isBackground) => {
-            if (preventFetch.current) {
-                preventFetch.current = false;
-                return;
-            }
-
             if (!isBackground) {
                 dispatch(
                     setTopTablesState({
-                        loading: true,
                         wasLoaded: false,
-                        data: undefined,
                     }),
                 );
             }
 
-            dispatch(fetchTopTables({database: path}));
+            dispatch(fetchTopTables(path));
         },
         [dispatch, path],
         autorefresh,
@@ -65,20 +57,20 @@ export function TopTables({path}: TopTablesProps) {
         return formatBytes({value, size, precision: 1});
     };
 
-    const COLUMNS: Column<KeyValueRow>[] = [
+    const columns: Column<KeyValueRow>[] = [
         {
             name: 'Size',
             width: 80,
             sortable: false,
             render: ({row}) => formatSize(Number(row.Size)),
+            align: DataTable.RIGHT,
         },
         {
             name: 'Path',
-            width: 792,
             sortable: false,
             render: ({row}) => (
-                <div className={b('path-cell-wrapper')}>
-                    <Popover className={b('path-cell')} content={row.Path}>
+                <div className={b('cell-with-popover-wrapper')}>
+                    <Popover className={b('cell-with-popover')} content={row.Path}>
                         {row.Path}
                     </Popover>
                 </div>
@@ -88,9 +80,6 @@ export function TopTables({path}: TopTablesProps) {
 
     const renderContent = () => {
         if (error) {
-            if (error.status === 403) {
-                return <AccessDenied />;
-            }
             return <ResponseError error={error} />;
         }
 
@@ -100,10 +89,10 @@ export function TopTables({path}: TopTablesProps) {
 
         return (
             <DataTable
-                columns={COLUMNS}
-                data={data || []}
                 theme="yandex-cloud"
-                settings={DEFAULT_TABLE_SETTINGS}
+                columns={columns}
+                settings={{...DEFAULT_TABLE_SETTINGS, stickyHead: undefined, dynamicRender: false}}
+                data={data || []}
             />
         );
     };
@@ -111,7 +100,7 @@ export function TopTables({path}: TopTablesProps) {
     return (
         <>
             <div className={b('title')}>Top tables by size</div>
-            <div className={b()}>{renderContent()}</div>
+            <div className={b('table')}>{renderContent()}</div>
         </>
     );
 }
