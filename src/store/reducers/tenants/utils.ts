@@ -28,8 +28,9 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
         StorageAllocatedSize,
         CoresLimit,
         MemoryLimit,
-        StorageLimit,
+        StorageAllocatedLimit,
         Metrics = {},
+        DatabaseQuotas = {},
     } = tenant || {};
 
     const cpuFromCores = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
@@ -46,9 +47,11 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
     const tableStorage = isNumeric(Metrics.Storage) ? Number(Metrics.Storage) : undefined;
     const cpuLimit = isNumeric(CoresLimit) ? Number(CoresLimit) : undefined;
     const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
-    const blobStorageLimit = isNumeric(StorageLimit) ? Number(StorageLimit) : undefined;
-    const tableStorageLimit = isNumeric(Metrics.StorageLimit)
-        ? Number(Metrics.StorageLimit)
+    const blobStorageLimit = isNumeric(StorageAllocatedLimit)
+        ? Number(StorageAllocatedLimit)
+        : undefined;
+    const tableStorageLimit = isNumeric(DatabaseQuotas.data_size_hard_quota)
+        ? Number(DatabaseQuotas.data_size_hard_quota)
         : undefined;
 
     return {
