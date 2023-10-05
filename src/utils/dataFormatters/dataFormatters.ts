@@ -126,3 +126,14 @@ export const calcUptimeInSeconds = (milliseconds: number | string) => {
 export const calcUptime = (milliseconds?: number | string) => {
     return formatUptime(calcUptimeInSeconds(Number(milliseconds)));
 };
+
+export const roundToPrecision = (value: number | string, precision = 0) => {
+    let [significantDigits] = String(value).split('.');
+    if (Number(value) < 1) {
+        significantDigits = '';
+    }
+    if (significantDigits.length >= precision) {
+        return Math.round(Number(value));
+    }
+    return Number(Number(value).toFixed(precision - significantDigits.length));
+};

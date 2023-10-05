@@ -5,39 +5,37 @@ import cn from 'bem-cn-lite';
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 
-import {InternalLink} from '../../../../components/InternalLink';
-
 import HistoryContext from '../../../../contexts/HistoryContext';
-
-import routes, {createHref} from '../../../../routes';
 
 import {
     sendShardQuery,
     setShardsState,
     setShardsQueryFilters,
-} from '../../../../store/reducers/shardsWorkload';
+} from '../../../../store/reducers/shardsWorkload/shardsWorkload';
 import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema/schema';
-import {EShardsWorkloadMode, IShardsWorkloadFilters} from '../../../../types/store/shardsWorkload';
+import {
+    EShardsWorkloadMode,
+    type IShardsWorkloadFilters,
+} from '../../../../store/reducers/shardsWorkload/types';
 
 import type {EPathType} from '../../../../types/api/schema';
 import type {CellValue, KeyValueRow} from '../../../../types/api/query';
 
-import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
+import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
-
-import {getDefaultNodePath} from '../../../Node/NodePages';
+import {isSortableTopShardsProperty} from '../../../../utils/diagnostics';
 
 import {isColumnEntityType} from '../../utils/schema';
 
 import {Filters} from './Filters';
+import {getShardsWorkloadColumns} from './getTopShardsColumns';
 
 import i18n from './i18n';
 import './TopShards.scss';
 
 export const b = cn('top-shards');
-const bLink = cn('yc-link');
 
 const TABLE_SETTINGS: Settings = {
     ...DEFAULT_TABLE_SETTINGS,
@@ -57,10 +55,6 @@ const tableColumnsNames = {
     InFlightTxCount: 'InFlightTxCount',
     IntervalEnd: 'IntervalEnd',
 };
-
-function prepareCPUWorkloadValue(value: string | number) {
-    return `${(Number(value) * 100).toFixed(2)}%`;
-}
 
 function prepareDateTimeValue(value: CellValue) {
     if (!value) {
@@ -198,73 +192,15 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             };
         };
 
-        const columns: Column<KeyValueRow>[] = [
-            {
-                name: tableColumnsNames.Path,
-                render: ({row}) => {
-                    // row.Path - relative schema path
-                    return (
-                        <span
-                            onClick={onSchemaClick(tenantPath + row.Path)}
-                            className={bLink({view: 'normal'})}
-                        >
-                            {row.Path}
-                        </span>
-                    );
-                },
-                sortable: false,
-            },
-            {
-                name: tableColumnsNames.CPUCores,
-                render: ({row}) => {
-                    return prepareCPUWorkloadValue(row.CPUCores || 0);
-                },
-                align: DataTable.RIGHT,
-            },
-            {
-                name: tableColumnsNames.DataSize,
-                header: 'DataSize (B)',
-                render: ({row}) => {
-                    return formatNumber(row.DataSize);
-                },
-                align: DataTable.RIGHT,
-            },
-            {
-                name: tableColumnsNames.TabletId,
-                render: ({row}) => {
-                    if (!row.TabletId) {
-                        return '–';
-                    }
-                    return (
-                        <InternalLink to={createHref(routes.tablet, {id: row.TabletId})}>
-                            {row.TabletId}
-                        </InternalLink>
-                    );
-                },
-                sortable: false,
-            },
-            {
-                name: tableColumnsNames.NodeId,
-                render: ({row}) => {
-                    if (!row.NodeId) {
-                        return '–';
-                    }
-                    return (
-                        <InternalLink to={getDefaultNodePath(row.NodeId)}>
-                            {row.NodeId}
-                        </InternalLink>
-                    );
-                },
-                align: DataTable.RIGHT,
-                sortable: false,
-            },
-            {
-                name: tableColumnsNames.InFlightTxCount,
-                render: ({row}) => formatNumber(row.InFlightTxCount),
-                align: DataTable.RIGHT,
-                sortable: false,
-            },
-        ];
+        const rawColumns: Column<KeyValueRow>[] = getShardsWorkloadColumns(
+            onSchemaClick,
+            tenantPath,
+        );
+
+        const columns: Column<KeyValueRow>[] = rawColumns.map((column) => ({
+            ...column,
+            sortable: isSortableTopShardsProperty(column.name),
+        }));
 
         if (filters.mode === EShardsWorkloadMode.History) {
             // after NodeId

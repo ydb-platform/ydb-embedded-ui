@@ -24,12 +24,8 @@
             vertical-align: middle;
         }
 
-        &_top-queries {
-            .data-table {
-                &__row {
-                    cursor: pointer;
-                }
-            }
+        &_top-queries tr {
+            cursor: pointer;
         }
     }
 }

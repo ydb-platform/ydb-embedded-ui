@@ -29,7 +29,8 @@ import schemaAcl from './schemaAcl/schemaAcl';
 import executeTopQueries from './executeTopQueries/executeTopQueries';
 import tenantOverviewExecuteTopQueries from './tenantOverview/executeTopQueries/executeTopQueries';
 import healthcheckInfo from './healthcheckInfo';
-import shardsWorkload from './shardsWorkload';
+import shardsWorkload from './shardsWorkload/shardsWorkload';
+import executeTopShards from './tenantOverview/executeTopShards/executeTopShards';
 import hotKeys from './hotKeys';
 import olapStats from './olapStats';
 import authentication from './authentication/authentication';
@@ -71,6 +72,7 @@ export const rootReducer = {
     tenantOverviewExecuteTopQueries,
     healthcheckInfo,
     shardsWorkload,
+    executeTopShards,
     hotKeys,
     authentication,
     header,

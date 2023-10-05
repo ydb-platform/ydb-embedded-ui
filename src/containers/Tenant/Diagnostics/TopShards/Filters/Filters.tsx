@@ -4,8 +4,8 @@ import {DateRange, DateRangeValues} from '../../../../../components/DateRange';
 
 import {
     EShardsWorkloadMode,
-    IShardsWorkloadFilters,
-} from '../../../../../types/store/shardsWorkload';
+    type IShardsWorkloadFilters,
+} from '../../../../../store/reducers/shardsWorkload/types';
 
 import {isEnumMember} from '../../../../../utils/typecheckers';
 
