@@ -5,14 +5,15 @@ import {useDispatch} from 'react-redux';
 import DataTable from '@gravity-ui/react-data-table';
 
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
-import {DEFAULT_TABLE_SETTINGS} from '../../../../../utils/constants';
-import {STORAGE_SORT_VALUES} from '../../../../../utils/storage';
+import {
+    TENANT_OVERVIEW_TABLES_LIMIT,
+    TENANT_OVERVIEW_TABLES_SETTINGS,
+} from '../../../../../utils/constants';
 import {
     setDataWasNotLoaded,
     getTopStorageGroups,
     selectTopStorageGroups,
-} from '../../../../../store/reducers/topStorageGroups/topStorageGroups';
-import {EVersion} from '../../../../../types/api/storage';
+} from '../../../../../store/reducers/tenantOverview/topStorageGroups/topStorageGroups';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {TableSkeleton} from '../../../../../components/TableSkeleton/TableSkeleton';
 import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/getStorageGroupsColumns';
@@ -39,16 +40,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
                 dispatch(setDataWasNotLoaded());
             }
 
-            dispatch(
-                getTopStorageGroups({
-                    tenant,
-                    visibleEntities: 'all',
-                    limit: 5,
-                    sortOrder: -1,
-                    sortValue: STORAGE_SORT_VALUES.Usage,
-                    version: EVersion.v2,
-                }),
-            );
+            dispatch(getTopStorageGroups({tenant}));
         },
         [dispatch, tenant],
     );
@@ -61,7 +53,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
         }
 
         if (loading && !wasLoaded) {
-            return <TableSkeleton rows={5} />;
+            return <TableSkeleton rows={TENANT_OVERVIEW_TABLES_LIMIT} />;
         }
 
         return (
@@ -69,7 +61,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
                 theme="yandex-cloud"
                 data={topGroups || []}
                 columns={columns}
-                settings={{...DEFAULT_TABLE_SETTINGS, stickyHead: 'fixed', dynamicRender: false}}
+                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
                 emptyDataMessage={i18n('top-groups.empty-data')}
             />
         );

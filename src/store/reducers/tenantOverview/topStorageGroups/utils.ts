@@ -1,5 +1,6 @@
-import type {TStorageInfo} from '../../../types/api/storage';
-import {prepareStorageGroups} from '../storage/utils';
+import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
+import type {TStorageInfo} from '../../../../types/api/storage';
+import {prepareStorageGroups} from '../../storage/utils';
 import type {PreparedTopStorageGroupsResponse} from './types';
 
 export const prepareTopStorageGroupsResponse = (
@@ -16,6 +17,6 @@ export const prepareTopStorageGroupsResponse = (
     }
 
     return {
-        groups: sortedGroups.slice(0, 5),
+        groups: sortedGroups.slice(0, TENANT_OVERVIEW_TABLES_LIMIT),
     };
 };

@@ -1,6 +1,6 @@
 import cn from 'bem-cn-lite';
 
-import DataTable, {Column} from '@gravity-ui/react-data-table';
+import DataTable, {type Column} from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import shieldIcon from '../../../assets/icons/shield.svg';

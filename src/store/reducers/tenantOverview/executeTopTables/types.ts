@@ -1,5 +1,5 @@
-import type {IQueryResult, QueryErrorResponse} from '../../../types/store/query';
-import type {ApiRequestAction} from '../../utils';
+import type {IQueryResult, QueryErrorResponse} from '../../../../types/store/query';
+import type {ApiRequestAction} from '../../../utils';
 import {FETCH_TOP_TABLES, setTopTablesState} from './executeTopTables';
 
 export interface TopTablesState {

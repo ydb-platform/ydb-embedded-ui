@@ -1,12 +1,12 @@
-import type {IResponseError} from '../../../types/api/error';
-import type {ApiRequestAction} from '../../utils';
-import type {PreparedStorageGroup} from '../storage/types';
+import type {IResponseError} from '../../../../types/api/error';
+import type {ApiRequestAction} from '../../../utils';
+import type {PreparedStorageGroup} from '../../storage/types';
 import {FETCH_TOP_STORAGE_GROUPS, setDataWasNotLoaded} from './topStorageGroups';
 
 export interface TopStorageGroupsState {
     loading: boolean;
     wasLoaded: boolean;
-    groups?: PreparedStorageGroup[];
+    data?: PreparedStorageGroup[];
     error?: IResponseError;
 }
 

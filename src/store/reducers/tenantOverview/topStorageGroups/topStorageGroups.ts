@@ -1,8 +1,9 @@
 import type {Reducer} from 'redux';
 
-import {EVersion} from '../../../types/api/storage';
-import {createApiRequest, createRequestActionTypes} from '../../utils';
-import type {StorageApiRequestParams} from '../storage/types';
+import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
+import {EVersion} from '../../../../types/api/storage';
+import {createApiRequest, createRequestActionTypes} from '../../../utils';
+import type {StorageApiRequestParams} from '../../storage/types';
 import type {
     TopStorageGroupsAction,
     TopStorageGroupsState,
@@ -11,11 +12,11 @@ import type {
 import {prepareTopStorageGroupsResponse} from './utils';
 
 export const FETCH_TOP_STORAGE_GROUPS = createRequestActionTypes(
-    'storage',
+    'topStorageGroups',
     'FETCH_TOP_STORAGE_GROUPS',
 );
 
-const SET_DATA_WAS_NOT_LOADED = 'storage/SET_TOP_STORAGE_GROUPS_DATA_WAS_NOT_LOADED';
+const SET_DATA_WAS_NOT_LOADED = 'topStorageGroups/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {
     loading: true,
@@ -36,7 +37,7 @@ const topStorageGroups: Reducer<TopStorageGroupsState, TopStorageGroupsAction> =
         case FETCH_TOP_STORAGE_GROUPS.SUCCESS: {
             return {
                 ...state,
-                groups: action.data.groups,
+                data: action.data.groups,
                 loading: false,
                 wasLoaded: true,
                 error: undefined,
@@ -67,14 +68,17 @@ const topStorageGroups: Reducer<TopStorageGroupsState, TopStorageGroupsAction> =
 
 export const getTopStorageGroups = ({
     tenant,
-    visibleEntities,
+    visibleEntities = 'all',
     nodeId,
-    version = EVersion.v1,
+    sortOrder = -1,
+    sortValue = 'Usage',
+    limit = TENANT_OVERVIEW_TABLES_LIMIT,
+    version = EVersion.v2,
     ...params
 }: StorageApiRequestParams) => {
     return createApiRequest({
         request: window.api.getStorageInfo(
-            {tenant, visibleEntities, nodeId, version, ...params},
+            {tenant, visibleEntities, nodeId, version, sortOrder, sortValue, limit, ...params},
             {concurrentId: 'getTopStorageGroups'},
         ),
         actions: FETCH_TOP_STORAGE_GROUPS,
@@ -83,7 +87,7 @@ export const getTopStorageGroups = ({
 };
 
 export const selectTopStorageGroups = (state: TopStorageGroupsStateSlice) =>
-    state.topStorageGroups.groups;
+    state.topStorageGroups.data;
 
 export const setDataWasNotLoaded = () => {
     return {

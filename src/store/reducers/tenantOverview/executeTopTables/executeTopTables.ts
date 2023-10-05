@@ -1,7 +1,8 @@
 import type {Reducer} from 'redux';
 
-import {parseQueryAPIExecuteResponse} from '../../../utils/query';
-import {createApiRequest, createRequestActionTypes} from '../../utils';
+import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
+import {parseQueryAPIExecuteResponse} from '../../../../utils/query';
+import {createApiRequest, createRequestActionTypes} from '../../../utils';
 import type {TopTablesAction, TopTablesState} from './types';
 
 export const FETCH_TOP_TABLES = createRequestActionTypes('top-tables', 'FETCH_TOP_TABLES');
@@ -19,7 +20,7 @@ SELECT
 FROM \`${path}/.sys/partition_stats\`
 GROUP BY Path
     ORDER BY Size DESC
-    LIMIT 5
+    LIMIT ${TENANT_OVERVIEW_TABLES_LIMIT}
 `;
 };
 

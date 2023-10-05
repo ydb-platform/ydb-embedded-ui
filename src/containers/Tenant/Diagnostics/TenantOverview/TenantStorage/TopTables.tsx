@@ -8,8 +8,11 @@ import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {
     fetchTopTables,
     setTopTablesState,
-} from '../../../../../store/reducers/executeTopTables/executeTopTables';
-import {DEFAULT_TABLE_SETTINGS} from '../../../../../utils/constants';
+} from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
+import {
+    TENANT_OVERVIEW_TABLES_LIMIT,
+    TENANT_OVERVIEW_TABLES_SETTINGS,
+} from '../../../../../utils/constants';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 import {TableSkeleton} from '../../../../../components/TableSkeleton/TableSkeleton';
@@ -84,14 +87,14 @@ export function TopTables({path}: TopTablesProps) {
         }
 
         if (loading && !wasLoaded) {
-            return <TableSkeleton rows={5} />;
+            return <TableSkeleton rows={TENANT_OVERVIEW_TABLES_LIMIT} />;
         }
 
         return (
             <DataTable
                 theme="yandex-cloud"
                 columns={columns}
-                settings={{...DEFAULT_TABLE_SETTINGS, stickyHead: undefined, dynamicRender: false}}
+                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
                 data={data || []}
             />
         );
