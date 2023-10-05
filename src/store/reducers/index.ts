@@ -26,7 +26,8 @@ import preview from './preview';
 import nodesList from './nodesList';
 import describe from './describe';
 import schemaAcl from './schemaAcl/schemaAcl';
-import executeTopQueries from './executeTopQueries';
+import executeTopQueries from './executeTopQueries/executeTopQueries';
+import tenantOverviewExecuteTopQueries from './tenantOverview/executeTopQueries/executeTopQueries';
 import healthcheckInfo from './healthcheckInfo';
 import shardsWorkload from './shardsWorkload';
 import hotKeys from './hotKeys';
@@ -67,6 +68,7 @@ export const rootReducer = {
     describe,
     schemaAcl,
     executeTopQueries,
+    tenantOverviewExecuteTopQueries,
     healthcheckInfo,
     shardsWorkload,
     hotKeys,

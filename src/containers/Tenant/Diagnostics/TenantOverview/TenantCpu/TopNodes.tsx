@@ -1,10 +1,13 @@
 import cn from 'bem-cn-lite';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useCallback} from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 
-import {DEFAULT_TABLE_SETTINGS} from '../../../../../utils/constants';
+import {
+    TENANT_OVERVIEW_TABLES_LIMIT,
+    TENANT_OVERVIEW_TABLES_SETTINGS,
+} from '../../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {
     getTopComputeNodes,
@@ -12,32 +15,41 @@ import {
     selectTopNodes,
     setDataWasNotLoaded,
 } from '../../../../../store/reducers/tenantOverview/topNodes/topNodes';
-import type {EPathType} from '../../../../../types/api/schema';
+import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {TableSkeleton} from '../../../../../components/TableSkeleton/TableSkeleton';
-import {Illustration} from '../../../../../components/Illustration';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {getTopNodesColumns} from '../../../../Nodes/getNodesColumns';
 import {isDatabaseEntityType} from '../../../utils/schema';
 
-import './TenantCpu.scss';
 import i18n from '../i18n';
+import './TenantCpu.scss';
 
 const b = cn('tenant-overview-cpu');
 
 interface TopNodesProps {
     path?: string;
-    type?: EPathType;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodes({path, type, additionalNodesProps}: TopNodesProps) {
+export function TopNodes({path, additionalNodesProps}: TopNodesProps) {
     const dispatch = useDispatch();
 
     const {wasLoaded, loading, error} = useTypedSelector((state) => state.topNodes);
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const topNodes = useTypedSelector(selectTopNodes);
     const columns = getTopNodesColumns(additionalNodesProps?.getNodeRef);
+
+    const {currentSchemaPath, currentSchema: currentItem = {}} = useSelector(
+        (state: any) => state.schema,
+    );
+    const {PathType: preloadedPathType} = useSelector(
+        (state: any) => state.schema.data[currentSchemaPath]?.PathDescription?.Self || {},
+    );
+    const {PathType: currentPathType} =
+        (currentItem as TEvDescribeSchemeResult).PathDescription?.Self || {};
+
+    const type: EPathType | undefined = preloadedPathType || currentPathType;
 
     const fetchNodes = useCallback(
         (isBackground) => {
@@ -64,11 +76,7 @@ export function TopNodes({path, type, additionalNodesProps}: TopNodesProps) {
         }
 
         if (loading && !wasLoaded) {
-            return <TableSkeleton rows={5} />;
-        }
-
-        if (topNodes && topNodes.length === 0) {
-            return <Illustration name="thumbsUp" width="200" />;
+            return <TableSkeleton rows={TENANT_OVERVIEW_TABLES_LIMIT} />;
         }
 
         return (
@@ -76,7 +84,7 @@ export function TopNodes({path, type, additionalNodesProps}: TopNodesProps) {
                 theme="yandex-cloud"
                 data={topNodes || []}
                 columns={columns}
-                settings={{...DEFAULT_TABLE_SETTINGS, stickyHead: 'fixed', dynamicRender: false}}
+                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
                 emptyDataMessage={i18n('top-nodes.empty-data')}
             />
         );

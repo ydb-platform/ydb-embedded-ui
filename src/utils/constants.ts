@@ -115,6 +115,12 @@ export const DEFAULT_TABLE_SETTINGS = {
     highlightRows: true,
 } as const;
 
+export const TENANT_OVERVIEW_TABLES_SETTINGS = {
+    ...DEFAULT_TABLE_SETTINGS,
+    stickyHead: 'fixed',
+    dynamicRender: false,
+} as const;
+
 export const QUERY_INITIAL_MODE_KEY = 'query_initial_mode';
 export const LAST_USED_QUERY_ACTION_KEY = 'last_used_query_action';
 

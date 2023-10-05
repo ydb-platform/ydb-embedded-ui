@@ -1,19 +1,14 @@
 import type {AnyAction, Reducer} from 'redux';
 import type {ThunkAction} from 'redux-thunk';
 
-import '../../services/api';
-import {
-    ITopQueriesAction,
-    ITopQueriesFilters,
-    ITopQueriesState,
-} from '../../types/store/executeTopQueries';
-import {IQueryResult} from '../../types/store/query';
+import '../../../services/api';
+import type {IQueryResult} from '../../../types/store/query';
+import {parseQueryAPIExecuteResponse} from '../../../utils/query';
 
-import {parseQueryAPIExecuteResponse} from '../../utils/query';
-
-import {createRequestActionTypes, createApiRequest} from '../utils';
-
-import type {RootState} from '.';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
+import type {RootState} from '..';
+import type {ITopQueriesAction, ITopQueriesFilters, ITopQueriesState} from './types';
+import {getFiltersConditions} from './utils';
 
 export const FETCH_TOP_QUERIES = createRequestActionTypes('top-queries', 'FETCH_TOP_QUERIES');
 const SET_TOP_QUERIES_STATE = 'top-queries/SET_TOP_QUERIES_STATE';
@@ -24,41 +19,6 @@ const initialState = {
     wasLoaded: false,
     filters: {},
 };
-
-const getMaxIntervalSubquery = (path: string) => `(
-    SELECT
-        MAX(IntervalEnd)
-    FROM \`${path}/.sys/top_queries_by_cpu_time_one_hour\`
-)`;
-
-function getFiltersConditions(path: string, filters?: ITopQueriesFilters) {
-    const conditions: string[] = [];
-
-    if (filters?.from && filters?.to && filters.from > filters.to) {
-        throw new Error('Invalid date range');
-    }
-
-    if (filters?.from) {
-        // matching `from` & `to` is an edge case
-        // other cases should not include the starting point, since intervals are stored using the ending time
-        const gt = filters.to === filters.from ? '>=' : '>';
-        conditions.push(`IntervalEnd ${gt} Timestamp('${new Date(filters.from).toISOString()}')`);
-    }
-
-    if (filters?.to) {
-        conditions.push(`IntervalEnd <= Timestamp('${new Date(filters.to).toISOString()}')`);
-    }
-
-    if (!filters?.from && !filters?.to) {
-        conditions.push(`IntervalEnd IN ${getMaxIntervalSubquery(path)}`);
-    }
-
-    if (filters?.text) {
-        conditions.push(`QueryText ILIKE '%${filters.text}%'`);
-    }
-
-    return conditions.join(' AND ');
-}
 
 const getQueryText = (path: string, filters?: ITopQueriesFilters) => {
     const filterConditions = getFiltersConditions(path, filters);
@@ -128,34 +88,22 @@ type FetchTopQueries = (params: {
     filters?: ITopQueriesFilters;
 }) => ThunkAction<Promise<IQueryResult | undefined>, RootState, unknown, AnyAction>;
 
-export const fetchTopQueries: FetchTopQueries =
-    ({database, filters}) =>
-    async (dispatch, getState) => {
-        try {
-            return createApiRequest({
-                request: window.api.sendQuery(
-                    {
-                        schema: 'modern',
-                        query: getQueryText(database, filters),
-                        database,
-                        action: 'execute-scan',
-                    },
-                    {
-                        concurrentId: 'executeTopQueries',
-                    },
-                ),
-                actions: FETCH_TOP_QUERIES,
-                dataHandler: parseQueryAPIExecuteResponse,
-            })(dispatch, getState);
-        } catch (error) {
-            dispatch({
-                type: FETCH_TOP_QUERIES.FAILURE,
-                error,
-            });
-
-            throw error;
-        }
-    };
+export const fetchTopQueries: FetchTopQueries = ({database, filters}) =>
+    createApiRequest({
+        request: window.api.sendQuery(
+            {
+                schema: 'modern',
+                query: getQueryText(database, filters),
+                database,
+                action: 'execute-scan',
+            },
+            {
+                concurrentId: 'executeTopQueries',
+            },
+        ),
+        actions: FETCH_TOP_QUERIES,
+        dataHandler: parseQueryAPIExecuteResponse,
+    });
 
 export function setTopQueriesState(state: Partial<ITopQueriesState>) {
     return {

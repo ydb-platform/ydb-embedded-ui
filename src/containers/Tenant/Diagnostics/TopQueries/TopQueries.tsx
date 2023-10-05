@@ -4,87 +4,41 @@ import {useHistory, useLocation} from 'react-router';
 import qs from 'qs';
 import cn from 'bem-cn-lite';
 
-import DataTable, {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 
 import {DateRange, DateRangeValues} from '../../../../components/DateRange';
 import {Search} from '../../../../components/Search';
-import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 
 import {changeUserInput} from '../../../../store/reducers/executeQuery';
-import {
-    fetchTopQueries,
-    setTopQueriesFilters,
-    setTopQueriesState,
-} from '../../../../store/reducers/executeTopQueries';
 
-import type {KeyValueRow} from '../../../../types/api/query';
 import type {EPathType} from '../../../../types/api/schema';
-import type {ITopQueriesFilters} from '../../../../types/store/executeTopQueries';
 import type {IQueryResult} from '../../../../types/store/query';
+import type {ITopQueriesFilters} from '../../../../store/reducers/executeTopQueries/types';
 
 import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../../store/reducers/tenant/constants';
-import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
+import {
+    setTopQueriesFilters,
+    setTopQueriesState,
+    fetchTopQueries,
+} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import {HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
 
-import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
+import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {isColumnEntityType} from '../../utils/schema';
 import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 
+import {getTopQueriesColumns} from './getTopQueriesColumns';
 import i18n from './i18n';
 import './TopQueries.scss';
 
 const b = cn('kv-top-queries');
-
-const COLUMNS: Column<KeyValueRow>[] = [
-    {
-        name: 'CPUTimeUs',
-        sortAccessor: (row) => Number(row.CPUTimeUs),
-        align: DataTable.RIGHT,
-    },
-    {
-        name: 'QueryText',
-        width: 500,
-        sortable: false,
-        render: ({row}) => (
-            <div className={b('query')}>
-                <TruncatedQuery
-                    value={row.QueryText?.toString()}
-                    maxQueryHeight={MAX_QUERY_HEIGHT}
-                />
-            </div>
-        ),
-    },
-    {
-        name: 'EndTime',
-        render: ({row}) => formatDateTime(new Date(row.EndTime as string).getTime()),
-        align: DataTable.RIGHT,
-    },
-    {
-        name: 'ReadRows',
-        render: ({row}) => formatNumber(row.ReadRows),
-        sortAccessor: (row) => Number(row.ReadRows),
-        align: DataTable.RIGHT,
-    },
-    {
-        name: 'ReadBytes',
-        render: ({row}) => formatNumber(row.ReadBytes),
-        sortAccessor: (row) => Number(row.ReadBytes),
-        align: DataTable.RIGHT,
-    },
-    {
-        name: 'UserSID',
-        render: ({row}) => <div className={b('user-sid')}>{row.UserSID || '–'}</div>,
-        sortAccessor: (row) => String(row.UserSID),
-        align: DataTable.LEFT,
-    },
-];
 
 interface TopQueriesProps {
     path: string;
@@ -105,6 +59,7 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
         data: {result: data = undefined} = {},
         filters: storeFilters,
     } = useTypedSelector((state) => state.executeTopQueries);
+    const columns = getTopQueriesColumns();
 
     const preventFetch = useRef(false);
 
@@ -220,7 +175,7 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
         return (
             <div className={b('table')}>
                 <DataTable
-                    columns={COLUMNS}
+                    columns={columns}
                     data={data}
                     settings={QUERY_TABLE_SETTINGS}
                     onRowClick={handleRowClick}

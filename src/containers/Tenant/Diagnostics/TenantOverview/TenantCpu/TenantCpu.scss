@@ -23,5 +23,13 @@
 
             vertical-align: middle;
         }
+
+        &_top-queries {
+            .data-table {
+                &__row {
+                    cursor: pointer;
+                }
+            }
+        }
     }
 }
