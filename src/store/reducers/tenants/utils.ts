@@ -22,28 +22,20 @@ const getTenantBackend = (tenant: TTenant) => {
 };
 
 export const calculateTenantMetrics = (tenant?: TTenant) => {
-    const {
-        CoresUsed,
-        MemoryUsed,
-        StorageAllocatedSize,
-        CoresLimit,
-        MemoryLimit,
-        StorageLimit,
-        Metrics = {},
-    } = tenant || {};
+    const {CoresUsed, MemoryUsed, StorageAllocatedSize, MemoryLimit, StorageLimit, PoolStats} =
+        tenant || {};
 
-    const cpuFromCores = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
-    const cpuFromMetrics = isNumeric(Metrics.CPU) ? Number(Metrics.CPU) : undefined;
+    const systemPoolUsage = PoolStats?.find(({Name}) => Name === 'System')?.Usage;
+    const userPoolUsage = PoolStats?.find(({Name}) => Name === 'User')?.Usage;
 
-    const cpu = cpuFromCores ?? cpuFromMetrics ?? undefined;
-
-    const rawMemory = MemoryUsed ?? Metrics.Memory;
-
-    const memory = isNumeric(rawMemory) ? Number(rawMemory) : undefined;
-
-    // Blob storage - actual database size
+    const cpu = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
+    const memory = isNumeric(MemoryUsed) ? Number(MemoryUsed) : undefined;
     const storage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
-    const cpuLimit = isNumeric(CoresLimit) ? Number(CoresLimit) : undefined;
+
+    const cpuUsage =
+        isNumeric(systemPoolUsage) || isNumeric(userPoolUsage)
+            ? Math.max(Number(systemPoolUsage), Number(userPoolUsage)) * 100
+            : undefined;
     const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
     const storageLimit = isNumeric(StorageLimit) ? Number(StorageLimit) : undefined;
 
@@ -51,7 +43,7 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
         cpu,
         memory,
         storage,
-        cpuLimit,
+        cpuUsage,
         memoryLimit,
         storageLimit,
     };
