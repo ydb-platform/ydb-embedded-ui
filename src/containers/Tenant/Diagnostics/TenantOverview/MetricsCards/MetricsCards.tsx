@@ -27,7 +27,7 @@ export interface TenantMetrics {
     memoryUsed?: number;
     memoryLimit?: number;
     cpuUsed?: number;
-    cpuLimit?: number;
+    cpuUsage?: number;
     storageUsed?: number;
     storageLimit?: number;
 }
@@ -51,11 +51,10 @@ export function MetricsCards({
 }: MetricsCardsProps) {
     const location = useLocation();
 
-    const {memoryUsed, memoryLimit, cpuUsed, cpuLimit, storageUsed, storageLimit} = metrics || {};
+    const {memoryUsed, memoryLimit, cpuUsed, cpuUsage, storageUsed, storageLimit} = metrics || {};
 
     const {metricsTab} = useTypedSelector((state) => state.tenant);
 
-    const cpuUsage = calculateUsage(cpuUsed, cpuLimit);
     const storageUsage = calculateUsage(storageUsed, storageLimit);
     const memoryUsage = calculateUsage(memoryUsed, memoryLimit);
 

@@ -76,7 +76,7 @@ export function TenantOverview({tenantName, additionalTenantProps}: TenantOvervi
         blobStorage,
         tableStorage,
         memory,
-        cpuLimit,
+        cpuUsage,
         blobStorageLimit,
         tableStorageLimit,
         memoryLimit,
@@ -86,7 +86,7 @@ export function TenantOverview({tenantName, additionalTenantProps}: TenantOvervi
         memoryUsed: memory,
         memoryLimit,
         cpuUsed: cpu,
-        cpuLimit,
+        cpuUsage,
         storageUsed: blobStorage,
         storageLimit: blobStorageLimit,
     };

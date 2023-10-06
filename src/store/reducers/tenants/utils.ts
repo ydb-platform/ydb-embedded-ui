@@ -29,23 +29,25 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
         CoresLimit,
         MemoryLimit,
         StorageAllocatedLimit,
+        PoolStats,
         Metrics = {},
         DatabaseQuotas = {},
     } = tenant || {};
 
-    const cpuFromCores = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
-    const cpuFromMetrics = isNumeric(Metrics.CPU) ? Number(Metrics.CPU) : undefined;
+    const systemPoolUsage = PoolStats?.find(({Name}) => Name === 'System')?.Usage;
+    const userPoolUsage = PoolStats?.find(({Name}) => Name === 'User')?.Usage;
 
-    const cpu = cpuFromCores ?? cpuFromMetrics ?? undefined;
-
-    const rawMemory = MemoryUsed ?? Metrics.Memory;
-
-    const memory = isNumeric(rawMemory) ? Number(rawMemory) : undefined;
-
-    // Blob storage - actual database size
+    const cpu = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
+    const memory = isNumeric(MemoryUsed) ? Number(MemoryUsed) : undefined;
     const blobStorage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
     const tableStorage = isNumeric(Metrics.Storage) ? Number(Metrics.Storage) : undefined;
-    const cpuLimit = isNumeric(CoresLimit) ? Number(CoresLimit) : undefined;
+
+    // We use system pool usage and user pool usage to calculate cpu usage because
+    // only these pools directly indicate resources available to perform user queries
+    const cpuUsage =
+        isNumeric(systemPoolUsage) || isNumeric(userPoolUsage)
+            ? Math.max(Number(systemPoolUsage), Number(userPoolUsage)) * 100
+            : undefined;
     const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
     const blobStorageLimit = isNumeric(StorageAllocatedLimit)
         ? Number(StorageAllocatedLimit)
@@ -59,7 +61,7 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
         memory,
         blobStorage,
         tableStorage,
-        cpuLimit,
+        cpuUsage,
         memoryLimit,
         blobStorageLimit,
         tableStorageLimit,
