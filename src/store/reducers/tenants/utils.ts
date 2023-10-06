@@ -32,6 +32,8 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
     const memory = isNumeric(MemoryUsed) ? Number(MemoryUsed) : undefined;
     const storage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
 
+    // We use system pool usage and user pool usage to calculate cpu usage because
+    // only these pools directly indicate resources available to perform user queries
     const cpuUsage =
         isNumeric(systemPoolUsage) || isNumeric(userPoolUsage)
             ? Math.max(Number(systemPoolUsage), Number(userPoolUsage)) * 100
