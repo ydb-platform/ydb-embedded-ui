@@ -70,14 +70,14 @@ export function TenantOverview({tenantName, additionalTenantProps}: TenantOvervi
 
     const tenantType = mapDatabaseTypeToDBName(Type);
 
-    const {cpu, storage, memory, cpuLimit, storageLimit, memoryLimit} =
+    const {cpu, storage, memory, cpuUsage, storageLimit, memoryLimit} =
         calculateTenantMetrics(tenant);
 
     const calculatedMetrics: TenantMetrics = {
         memoryUsed: memory,
         memoryLimit,
         cpuUsed: cpu,
-        cpuLimit,
+        cpuUsage,
         storageUsed: storage,
         storageLimit,
     };

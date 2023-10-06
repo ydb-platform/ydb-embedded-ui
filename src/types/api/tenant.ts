@@ -42,23 +42,22 @@ export interface TTenant {
     ResourceId?: string;
     Tablets?: TTabletStateInfo[];
     /** uint64 */
-    StorageAllocatedSize?: string;
+    StorageAllocatedSize?: string; // Actual database size
     /** uint64 */
     StorageMinAvailableSize?: string;
     Nodes?: TSystemStateInfo[];
     /** uint64 */
-    MemoryUsed?: string;
+    MemoryUsed?: string; // Actual memory consumption
     /** uint64 */
     MemoryLimit?: string;
     /** double */
-    CoresUsed?: number;
+    CoresUsed?: number; // Actual cpu consumption
     /** uint64 */
     StorageGroups?: string;
 
     MonitoringEndpoint?: string; // additional
     ControlPlane?: ControlPlane; // additional
 
-    CoresLimit?: string; // TODO: check correctness in backend protos when fully supported
     StorageLimit?: string; // TODO: check correctness in backend protos when fully supported
 }
 
@@ -69,15 +68,15 @@ interface THiveDomainStatsStateCount {
 
 export interface TMetrics {
     /** uint64 */
-    CPU?: string;
+    CPU?: string; // Logical cpu consumption
     /** uint64 */
-    Memory?: string;
+    Memory?: string; // Logical memory consumption
     /** uint64 */
     Network?: string;
     /** uint64 */
     Counter?: string;
     /** uint64 */
-    Storage?: string;
+    Storage?: string; // Logical database size
     /** uint64 */
     ReadThroughput?: string;
     /** uint64 */
