@@ -7,7 +7,7 @@ import {Popover} from '@gravity-ui/uikit';
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {
     fetchTopTables,
-    setTopTablesState,
+    setDataWasNotLoaded,
 } from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
@@ -41,11 +41,7 @@ export function TopTables({path}: TopTablesProps) {
     useAutofetcher(
         (isBackground) => {
             if (!isBackground) {
-                dispatch(
-                    setTopTablesState({
-                        wasLoaded: false,
-                    }),
-                );
+                dispatch(setDataWasNotLoaded());
             }
 
             dispatch(fetchTopTables(path));

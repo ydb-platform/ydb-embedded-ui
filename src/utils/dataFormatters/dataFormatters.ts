@@ -97,14 +97,14 @@ export const formatNumber = (number?: unknown) => {
 };
 
 export const roundToPrecision = (value: number | string, precision = 0) => {
-    let [significantDigits] = String(value).split('.');
+    let [digits] = String(value).split('.');
     if (Number(value) < 1) {
-        significantDigits = '';
+        digits = '';
     }
-    if (significantDigits.length >= precision) {
+    if (digits.length >= precision) {
         return Math.round(Number(value));
     }
-    return Number(Number(value).toFixed(precision - significantDigits.length));
+    return Number(Number(value).toFixed(precision - digits.length));
 };
 
 const normalizeCPU = (value: number | string) => {

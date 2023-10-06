@@ -154,12 +154,13 @@ export const prepareStorageGroups = (
     let preparedGroups: PreparedStorageGroup[] = [];
     if (StorageGroups) {
         preparedGroups = StorageGroups.map(prepareStorageGroupDataV2);
-    }
-    StoragePools?.forEach((pool) => {
-        pool.Groups?.forEach((group) => {
-            preparedGroups.push(prepareStorageGroupData(group, pool.Name));
+    } else {
+        StoragePools?.forEach((pool) => {
+            pool.Groups?.forEach((group) => {
+                preparedGroups.push(prepareStorageGroupData(group, pool.Name));
+            });
         });
-    });
+    }
 
     return preparedGroups;
 };

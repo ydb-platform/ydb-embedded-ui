@@ -10,13 +10,11 @@ export const prepareTopStorageGroupsResponse = (
 
     const preparedGroups = prepareStorageGroups(StorageGroups, StoragePools);
 
-    let sortedGroups = preparedGroups;
-
     if (StoragePools) {
-        sortedGroups = preparedGroups.sort((a, b) => b.Usage - a.Usage);
+        preparedGroups.sort((a, b) => b.Usage - a.Usage);
     }
 
     return {
-        groups: sortedGroups.slice(0, TENANT_OVERVIEW_TABLES_LIMIT),
+        groups: preparedGroups.slice(0, TENANT_OVERVIEW_TABLES_LIMIT),
     };
 };

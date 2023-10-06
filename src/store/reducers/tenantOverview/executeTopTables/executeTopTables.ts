@@ -6,7 +6,7 @@ import {createApiRequest, createRequestActionTypes} from '../../../utils';
 import type {TopTablesAction, TopTablesState} from './types';
 
 export const FETCH_TOP_TABLES = createRequestActionTypes('top-tables', 'FETCH_TOP_TABLES');
-const SET_TOP_TABLES_STATE = 'top-tables/SET_TOP_TABLES_STATE';
+const SET_DATA_WAS_NOT_LOADED = 'top-tables/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {
     loading: false,
@@ -56,10 +56,10 @@ const executeTopTables: Reducer<TopTablesState, TopTablesAction> = (
                 loading: false,
             };
         }
-        case SET_TOP_TABLES_STATE:
+        case SET_DATA_WAS_NOT_LOADED:
             return {
                 ...state,
-                ...action.data,
+                wasLoaded: false,
             };
         default:
             return state;
@@ -83,10 +83,10 @@ export const fetchTopTables = (database: string) => {
         dataHandler: parseQueryAPIExecuteResponse,
     });
 };
-export function setTopTablesState(state: Partial<TopTablesState>) {
+
+export function setDataWasNotLoaded() {
     return {
-        type: SET_TOP_TABLES_STATE,
-        data: state,
+        type: SET_DATA_WAS_NOT_LOADED,
     } as const;
 }
 
