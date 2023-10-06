@@ -5,7 +5,7 @@ import type {TSystemStateInfo} from '../../types/api/nodes';
 import {LOAD_AVERAGE_TIME_INTERVALS} from '../../utils/constants';
 import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
 
-import InfoViewer from '../InfoViewer/InfoViewer';
+import InfoViewer, {type InfoViewerItem} from '../InfoViewer/InfoViewer';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {PoolUsage} from '../PoolUsage/PoolUsage';
 
@@ -24,12 +24,19 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
         value: Address,
     }));
 
-    const commonInfo = [
+    const commonInfo: InfoViewerItem[] = [];
+
+    // Do not add DB field for static nodes (they have no Tenants)
+    if (node?.Tenants?.length) {
+        commonInfo.push({label: 'Database', value: node.Tenants[0]});
+    }
+
+    commonInfo.push(
         {label: 'Version', value: node?.Version},
         {label: 'Uptime', value: calcUptime(node?.StartTime)},
         {label: 'DC', value: node?.DataCenterDescription},
         {label: 'Rack', value: node?.Rack},
-    ];
+    );
 
     const averageInfo = node?.LoadAverage?.map((load, loadIndex) => ({
         label: LOAD_AVERAGE_TIME_INTERVALS[loadIndex],
