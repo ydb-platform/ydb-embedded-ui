@@ -16,7 +16,7 @@ export interface TStorageInfo {
     FoundGroups?: string;
 }
 
-interface TStoragePoolInfo {
+export interface TStoragePoolInfo {
     Overall?: EFlag;
     Name?: string;
     Kind?: string;

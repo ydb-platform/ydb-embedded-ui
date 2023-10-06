@@ -28,11 +28,20 @@ describe('formatBytes', () => {
         expect(formatBytes({value: 99_000_000_000_000, significantDigits: 2})).toEqual('99,000 GB');
         expect(formatBytes({value: 100_000_000_000_000, significantDigits: 2})).toEqual('100 TB');
     });
-    it('shoudl return empty string on invalid data', () => {
+    it('should return empty string on invalid data', () => {
         expect(formatBytes({value: undefined})).toEqual('');
         expect(formatBytes({value: null})).toEqual('');
         expect(formatBytes({value: ''})).toEqual('');
         expect(formatBytes({value: 'false'})).toEqual('');
         expect(formatBytes({value: '123qwe'})).toEqual('');
+    });
+    it('should work with precision', () => {
+        expect(formatBytes({value: 123.123, precision: 2})).toBe('123 B');
+        expect(formatBytes({value: 12.123, precision: 2})).toBe('12 B');
+        expect(formatBytes({value: 1.123, precision: 2})).toBe('1.1 B');
+        expect(formatBytes({value: 0.123, precision: 2})).toBe('0.12 B');
+        expect(formatBytes({value: 0.012, precision: 2})).toBe('0.01 B');
+        expect(formatBytes({value: 0.001, precision: 2})).toBe('0 B');
+        expect(formatBytes({value: 0, precision: 2})).toBe('0 B');
     });
 });

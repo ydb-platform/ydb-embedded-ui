@@ -77,6 +77,8 @@ export const COLORS_PRIORITY = {
     grey: 1,
 };
 
+export const TENANT_OVERVIEW_TABLES_LIMIT = 5;
+
 // ==== Titles ====
 export const DEVELOPER_UI_TITLE = 'Developer UI';
 export const CLUSTER_DEFAULT_TITLE = 'Cluster';
@@ -111,6 +113,12 @@ export const DEFAULT_TABLE_SETTINGS = {
     syncHeadOnResize: true,
     dynamicRender: true,
     highlightRows: true,
+} as const;
+
+export const TENANT_OVERVIEW_TABLES_SETTINGS = {
+    ...DEFAULT_TABLE_SETTINGS,
+    stickyHead: 'fixed',
+    dynamicRender: false,
 } as const;
 
 export const QUERY_INITIAL_MODE_KEY = 'query_initial_mode';

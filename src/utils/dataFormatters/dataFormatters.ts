@@ -1,9 +1,14 @@
 import {dateTimeParse} from '@gravity-ui/date-utils';
 
 import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
-import {DAY_IN_SECONDS, GIGABYTE, TERABYTE} from '../constants';
+import {DAY_IN_SECONDS, GIGABYTE} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
+import {
+    BytesSizes,
+    formatBytes as formatBytesCustom,
+    getSizeWithSignificantDigits,
+} from '../bytesParsers/formatBytes';
 
 import i18n from './i18n';
 
@@ -55,11 +60,26 @@ export const formatMsToUptime = (ms?: number) => {
     return ms && formatUptime(ms / 1000);
 };
 
-export const formatStorageValues = (value?: number, total?: number) => {
-    return [
-        value ? String(Math.floor(value / TERABYTE)) : undefined,
-        total ? `${Math.floor(total / TERABYTE)} TB` : undefined,
-    ];
+export const formatStorageValues = (value?: number, total?: number, size?: BytesSizes) => {
+    let calculatedSize = getSizeWithSignificantDigits(Number(value), 0);
+    let valueWithSizeLabel = true;
+    let valuePrecision = 0;
+
+    if (isNumeric(total)) {
+        calculatedSize = getSizeWithSignificantDigits(Number(total), 0);
+        valueWithSizeLabel = false;
+        valuePrecision = 1;
+    }
+
+    const formattedValue = formatBytesCustom({
+        value,
+        withSizeLabel: valueWithSizeLabel,
+        size: size || calculatedSize,
+        precision: valuePrecision,
+    });
+    const formattedTotal = formatBytesCustom({value: total, size: size || calculatedSize});
+
+    return [formattedValue, formattedTotal];
 };
 export const formatStorageValuesToGb = (value?: number, total?: number): (string | undefined)[] => {
     return [
@@ -73,20 +93,24 @@ export const formatNumber = (number?: unknown) => {
         return '';
     }
 
-    return configuredNumeral(number).format();
+    return configuredNumeral(number).format('0,0.[00000]');
+};
+
+export const roundToPrecision = (value: number | string, precision = 0) => {
+    let [digits] = String(value).split('.');
+    if (Number(value) < 1) {
+        digits = '';
+    }
+    if (digits.length >= precision) {
+        return Math.round(Number(value));
+    }
+    return Number(Number(value).toFixed(precision - digits.length));
 };
 
 const normalizeCPU = (value: number | string) => {
     const rawCores = Number(value) / 1000000;
-    let cores = rawCores.toPrecision(3);
-    if (rawCores >= 1000) {
-        cores = rawCores.toFixed();
-    }
-    if (rawCores < 0.001) {
-        cores = '0';
-    }
 
-    return Number(cores);
+    return roundToPrecision(rawCores, 3);
 };
 
 export const formatCPU = (value?: number | string) => {

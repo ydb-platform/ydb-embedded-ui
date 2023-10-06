@@ -58,7 +58,8 @@ export interface TTenant {
     MonitoringEndpoint?: string; // additional
     ControlPlane?: ControlPlane; // additional
 
-    StorageLimit?: string; // TODO: check correctness in backend protos when fully supported
+    StorageAllocatedLimit?: string;
+    DatabaseQuotas?: DatabaseQuotas;
 }
 
 interface THiveDomainStatsStateCount {
@@ -147,4 +148,17 @@ export enum ETabletVolatileState {
     'TABLET_VOLATILE_STATE_BOOTING' = 'TABLET_VOLATILE_STATE_BOOTING',
     'TABLET_VOLATILE_STATE_STARTING' = 'TABLET_VOLATILE_STATE_STARTING',
     'TABLET_VOLATILE_STATE_RUNNING' = 'TABLET_VOLATILE_STATE_RUNNING',
+}
+
+interface DatabaseQuotas {
+    /** uint64 */
+    data_size_hard_quota?: string;
+    /** uint64 */
+    data_size_soft_quota?: string;
+    /** uint64 */
+    data_stream_shards_quota?: string;
+    /** uint64 */
+    data_stream_reserved_storage_quota?: string;
+    /** uint32 */
+    ttl_min_run_internal_seconds?: string;
 }

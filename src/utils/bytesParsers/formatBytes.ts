@@ -1,4 +1,4 @@
-import {formatNumber} from '../dataFormatters/dataFormatters';
+import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
 import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE} from '../constants';
 import {isNumeric} from '../utils';
 
@@ -46,7 +46,7 @@ export type BytesSizes = keyof typeof sizes;
  *
  * significantDigits = 3 - 900 000 mb and 1000 gb
  */
-const getSizeWithSignificantDigits = (value: number, significantDigits: number) => {
+export const getSizeWithSignificantDigits = (value: number, significantDigits: number) => {
     const multiplier = 10 ** significantDigits;
 
     const tbLevel = sizes.tb.value * multiplier;
@@ -79,7 +79,7 @@ interface FormatToSizeArgs {
 }
 
 const formatToSize = ({value, size = 'mb', precision = 0}: FormatToSizeArgs) => {
-    const result = (Number(value) / sizes[size].value).toFixed(precision);
+    const result = roundToPrecision(Number(value) / sizes[size].value, precision);
 
     return formatNumber(result);
 };

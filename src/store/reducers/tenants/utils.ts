@@ -22,15 +22,24 @@ const getTenantBackend = (tenant: TTenant) => {
 };
 
 export const calculateTenantMetrics = (tenant?: TTenant) => {
-    const {CoresUsed, MemoryUsed, StorageAllocatedSize, MemoryLimit, StorageLimit, PoolStats} =
-        tenant || {};
+    const {
+        CoresUsed,
+        MemoryUsed,
+        StorageAllocatedSize,
+        MemoryLimit,
+        StorageAllocatedLimit,
+        PoolStats,
+        Metrics = {},
+        DatabaseQuotas = {},
+    } = tenant || {};
 
     const systemPoolUsage = PoolStats?.find(({Name}) => Name === 'System')?.Usage;
     const userPoolUsage = PoolStats?.find(({Name}) => Name === 'User')?.Usage;
 
     const cpu = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
     const memory = isNumeric(MemoryUsed) ? Number(MemoryUsed) : undefined;
-    const storage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
+    const blobStorage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
+    const tableStorage = isNumeric(Metrics.Storage) ? Number(Metrics.Storage) : undefined;
 
     // We use system pool usage and user pool usage to calculate cpu usage because
     // only these pools directly indicate resources available to perform user queries
@@ -39,15 +48,22 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
             ? Math.max(Number(systemPoolUsage), Number(userPoolUsage)) * 100
             : undefined;
     const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
-    const storageLimit = isNumeric(StorageLimit) ? Number(StorageLimit) : undefined;
+    const blobStorageLimit = isNumeric(StorageAllocatedLimit)
+        ? Number(StorageAllocatedLimit)
+        : undefined;
+    const tableStorageLimit = isNumeric(DatabaseQuotas.data_size_hard_quota)
+        ? Number(DatabaseQuotas.data_size_hard_quota)
+        : undefined;
 
     return {
         cpu,
         memory,
-        storage,
+        blobStorage,
+        tableStorage,
         cpuUsage,
         memoryLimit,
-        storageLimit,
+        blobStorageLimit,
+        tableStorageLimit,
     };
 };
 
@@ -65,7 +81,7 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean) =>
         const backend = useNodeAsBackend ? getTenantBackend(tenant) : undefined;
         const sharedTenantName = tenants.find((item) => item.Id === tenant.ResourceId)?.Name;
         const controlPlaneName = getControlPlaneValue(tenant);
-        const {cpu, memory, storage} = calculateTenantMetrics(tenant);
+        const {cpu, memory, blobStorage} = calculateTenantMetrics(tenant);
         const {nodesCount, groupsCount} = calculateTenantEntities(tenant);
 
         return {
@@ -76,7 +92,7 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean) =>
             controlPlaneName,
             cpu,
             memory,
-            storage,
+            storage: blobStorage,
             nodesCount,
             groupsCount,
         };
