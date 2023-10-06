@@ -26,7 +26,6 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
         CoresUsed,
         MemoryUsed,
         StorageAllocatedSize,
-        CoresLimit,
         MemoryLimit,
         StorageAllocatedLimit,
         PoolStats,
