@@ -94,6 +94,7 @@ const columns: Column<PreparedClusterNode>[] = [
                 <ProgressViewer
                     value={row.LoadAverage[0]}
                     percents={true}
+                    capacity={100}
                     colorizeProgress={true}
                 />
             ) : (
