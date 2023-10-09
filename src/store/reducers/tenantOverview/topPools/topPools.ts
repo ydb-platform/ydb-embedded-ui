@@ -5,26 +5,26 @@ import {EVersion} from '../../../../types/api/compute';
 import {createApiRequest, createRequestActionTypes} from '../../../utils';
 import {prepareNodesData} from '../../nodes/utils';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../../nodes/types';
-import type {TopNodesAction, TopNodesState, TopNodesStateSlice} from './types';
+import type {TopPoolsAction, TopPoolsState, TopPoolsStateSlice} from './types';
 import {prepareTopComputeNodesData} from './utils';
 
-export const FETCH_TOP_NODES = createRequestActionTypes('topNodes', 'FETCH_TOP_NODES');
-const SET_DATA_WAS_NOT_LOADED = 'topNodes/SET_DATA_WAS_NOT_LOADED';
+export const FETCH_TOP_POOLS = createRequestActionTypes('topPools', 'FETCH_TOP_POOLS');
+const SET_DATA_WAS_NOT_LOADED = 'topPools/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {
     loading: false,
     wasLoaded: false,
 };
 
-const topNodes: Reducer<TopNodesState, TopNodesAction> = (state = initialState, action) => {
+const topPools: Reducer<TopPoolsState, TopPoolsAction> = (state = initialState, action) => {
     switch (action.type) {
-        case FETCH_TOP_NODES.REQUEST: {
+        case FETCH_TOP_POOLS.REQUEST: {
             return {
                 ...state,
                 loading: true,
             };
         }
-        case FETCH_TOP_NODES.SUCCESS: {
+        case FETCH_TOP_POOLS.SUCCESS: {
             return {
                 ...state,
                 data: action.data?.Nodes,
@@ -33,7 +33,7 @@ const topNodes: Reducer<TopNodesState, TopNodesAction> = (state = initialState, 
                 error: undefined,
             };
         }
-        case FETCH_TOP_NODES.FAILURE: {
+        case FETCH_TOP_POOLS.FAILURE: {
             if (action.error?.isCancelled) {
                 return state;
             }
@@ -55,12 +55,12 @@ const topNodes: Reducer<TopNodesState, TopNodesAction> = (state = initialState, 
     }
 };
 
-const concurrentId = 'getTopNodes';
+const concurrentId = 'getTopPools';
 
-export function getTopNodesByLoad({
+export function getTopNodesByCpu({
     type = 'any',
     sortOrder = -1,
-    sortValue = 'LoadAverage',
+    sortValue = 'CPU',
     limit = TENANT_OVERVIEW_TABLES_LIMIT,
     ...params
 }: NodesApiRequestParams) {
@@ -69,14 +69,14 @@ export function getTopNodesByLoad({
             {type, sortOrder, sortValue, limit, ...params},
             {concurrentId},
         ),
-        actions: FETCH_TOP_NODES,
+        actions: FETCH_TOP_POOLS,
         dataHandler: prepareNodesData,
     });
 }
 
-export function getTopComputeNodesByLoad({
+export function getTopComputeNodesByCpu({
     sortOrder = -1,
-    sortValue = 'LoadAverage',
+    sortValue = 'CPU',
     limit = TENANT_OVERVIEW_TABLES_LIMIT,
     version = EVersion.v2,
     ...params
@@ -86,12 +86,12 @@ export function getTopComputeNodesByLoad({
             {sortOrder, sortValue, limit, version, ...params},
             {concurrentId},
         ),
-        actions: FETCH_TOP_NODES,
+        actions: FETCH_TOP_POOLS,
         dataHandler: prepareTopComputeNodesData,
     });
 }
 
-export const selectTopNodes = (state: TopNodesStateSlice) => state.topNodes.data;
+export const selectTopPools = (state: TopPoolsStateSlice) => state.topPools.data;
 
 export const setDataWasNotLoaded = () => {
     return {
@@ -99,4 +99,4 @@ export const setDataWasNotLoaded = () => {
     } as const;
 };
 
-export default topNodes;
+export default topPools;

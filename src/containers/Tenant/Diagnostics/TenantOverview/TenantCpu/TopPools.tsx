@@ -10,16 +10,16 @@ import {
 } from '../../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {
-    getTopComputeNodesByLoad,
-    getTopNodesByLoad,
-    selectTopNodes,
+    getTopComputeNodesByCpu,
+    getTopNodesByCpu,
+    selectTopPools,
     setDataWasNotLoaded,
-} from '../../../../../store/reducers/tenantOverview/topNodes/topNodes';
+} from '../../../../../store/reducers/tenantOverview/topPools/topPools';
 import type {EPathType} from '../../../../../types/api/schema';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {TableSkeleton} from '../../../../../components/TableSkeleton/TableSkeleton';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
-import {getTopNodesColumns} from '../../../../Nodes/getNodesColumns';
+import {getTopPoolsColumns} from '../../../../Nodes/getNodesColumns';
 import {isDatabaseEntityType} from '../../../utils/schema';
 
 import i18n from '../i18n';
@@ -33,13 +33,13 @@ interface TopNodesProps {
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodes({path, type, additionalNodesProps}: TopNodesProps) {
+export function TopPools({path, type, additionalNodesProps}: TopNodesProps) {
     const dispatch = useDispatch();
 
-    const {wasLoaded, loading, error} = useTypedSelector((state) => state.topNodes);
+    const {wasLoaded, loading, error} = useTypedSelector((state) => state.topPools);
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const topNodes = useTypedSelector(selectTopNodes);
-    const columns = getTopNodesColumns(additionalNodesProps?.getNodeRef);
+    const topNodes = useTypedSelector(selectTopPools);
+    const columns = getTopPoolsColumns(additionalNodesProps?.getNodeRef);
 
     const fetchNodes = useCallback(
         (isBackground) => {
@@ -50,9 +50,9 @@ export function TopNodes({path, type, additionalNodesProps}: TopNodesProps) {
             // For not DB entities we always use /compute endpoint instead of /nodes
             // since /nodes can return data only for tenants
             if (path && !isDatabaseEntityType(type)) {
-                dispatch(getTopComputeNodesByLoad({path}));
+                dispatch(getTopComputeNodesByCpu({path}));
             } else {
-                dispatch(getTopNodesByLoad({tenant: path}));
+                dispatch(getTopNodesByCpu({tenant: path}));
             }
         },
         [dispatch, path, type],
@@ -82,7 +82,7 @@ export function TopNodes({path, type, additionalNodesProps}: TopNodesProps) {
 
     return (
         <>
-            <div className={b('title')}>Top nodes by load</div>
+            <div className={b('title')}>Top pools by usage</div>
             <div className={b('table')}>{renderContent()}</div>
         </>
     );

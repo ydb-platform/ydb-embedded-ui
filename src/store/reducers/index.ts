@@ -2,6 +2,7 @@ import {combineReducers} from 'redux';
 
 import nodes from './nodes/nodes';
 import topNodes from './tenantOverview/topNodes/topNodes';
+import topPools from './tenantOverview/topPools/topPools';
 import cluster from './cluster/cluster';
 import clusterNodes from './clusterNodes/clusterNodes';
 import tenant from './tenant/tenant';
@@ -43,6 +44,7 @@ export const rootReducer = {
     singleClusterMode,
     nodes,
     topNodes,
+    topPools,
     cluster,
     clusterNodes,
     tenant,

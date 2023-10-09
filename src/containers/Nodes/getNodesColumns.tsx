@@ -105,18 +105,12 @@ const memoryColumn: Column<NodesPreparedEntity> = {
 const cpuColumn: Column<NodesPreparedEntity> = {
     name: NODES_COLUMNS_IDS.CPU,
     header: 'CPU',
-    sortAccessor: ({PoolStats = []}) =>
-        PoolStats.reduce((acc, item) => {
-            if (item.Usage) {
-                return acc + item.Usage;
-            } else {
-                return acc;
-            }
-        }, 0),
+    sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
     defaultOrder: DataTable.DESCENDING,
     render: ({row}) => (row.PoolStats ? <PoolsGraph pools={row.PoolStats} /> : '—'),
     align: DataTable.LEFT,
     width: '120px',
+    sortable: false,
 };
 
 const loadAverageColumn: Column<NodesPreparedEntity> = {
@@ -199,4 +193,10 @@ export function getTopNodesColumns(
     getNodeRef?: (node?: NodeAddress) => string | null,
 ): Column<NodesPreparedEntity>[] {
     return [topNodesLoadAverageColumn, nodeIdColumn, getHostColumn(getNodeRef), versionColumn];
+}
+
+export function getTopPoolsColumns(
+    getNodeRef?: (node?: NodeAddress) => string | null,
+): Column<NodesPreparedEntity>[] {
+    return [cpuColumn, nodeIdColumn, getHostColumn(getNodeRef)];
 }
