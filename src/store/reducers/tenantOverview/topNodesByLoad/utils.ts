@@ -1,9 +1,9 @@
 import type {TComputeInfo} from '../../../../types/api/compute';
 import {generateEvaluator} from '../../../../utils/generateEvaluator';
 import {prepareComputeNodes} from '../../nodes/utils';
-import type {TopNodesHandledResponse} from './types';
+import type {TopNodesByLoadHandledResponse} from './types';
 
-export const prepareTopComputeNodesData = (data: TComputeInfo): TopNodesHandledResponse => {
+export const prepareTopComputeNodesData = (data: TComputeInfo): TopNodesByLoadHandledResponse => {
     const preparedNodes = prepareComputeNodes(data.Nodes, data.Tenants);
 
     let sortedNodes = preparedNodes;

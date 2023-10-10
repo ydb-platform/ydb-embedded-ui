@@ -12,9 +12,9 @@ import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {
     getTopComputeNodesByCpu,
     getTopNodesByCpu,
-    selectTopPools,
+    selectTopNodesByCpu,
     setDataWasNotLoaded,
-} from '../../../../../store/reducers/tenantOverview/topPools/topPools';
+} from '../../../../../store/reducers/tenantOverview/topNodesByCpu/topNodesByCpu';
 import type {EPathType} from '../../../../../types/api/schema';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {TableSkeleton} from '../../../../../components/TableSkeleton/TableSkeleton';
@@ -27,18 +27,18 @@ import './TenantCpu.scss';
 
 const b = cn('tenant-overview-cpu');
 
-interface TopNodesProps {
+interface TopNodesByCpuProps {
     path?: string;
     type?: EPathType;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopPools({path, type, additionalNodesProps}: TopNodesProps) {
+export function TopNodesByCpu({path, type, additionalNodesProps}: TopNodesByCpuProps) {
     const dispatch = useDispatch();
 
-    const {wasLoaded, loading, error} = useTypedSelector((state) => state.topPools);
+    const {wasLoaded, loading, error} = useTypedSelector((state) => state.topNodesByCpu);
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const topNodes = useTypedSelector(selectTopPools);
+    const topNodes = useTypedSelector(selectTopNodesByCpu);
     const columns = getTopPoolsColumns(additionalNodesProps?.getNodeRef);
 
     const fetchNodes = useCallback(
@@ -82,7 +82,7 @@ export function TopPools({path, type, additionalNodesProps}: TopNodesProps) {
 
     return (
         <>
-            <div className={b('title')}>Top pools by usage</div>
+            <div className={b('title')}>Top nodes by pools usage</div>
             <div className={b('table')}>{renderContent()}</div>
         </>
     );

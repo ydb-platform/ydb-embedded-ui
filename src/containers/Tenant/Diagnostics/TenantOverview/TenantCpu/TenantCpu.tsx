@@ -2,8 +2,8 @@ import {useSelector} from 'react-redux';
 
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-import {TopNodes} from './TopNodes';
-import {TopPools} from './TopPools';
+import {TopNodesByLoad} from './TopNodesByLoad';
+import {TopNodesByCpu} from './TopNodesByCpu';
 import {TopShards} from './TopShards';
 import {TopQueries} from './TopQueries';
 
@@ -26,8 +26,8 @@ export function TenantCpu({path, additionalNodesProps}: TenantCpuProps) {
 
     return (
         <>
-            <TopNodes path={path} type={type} additionalNodesProps={additionalNodesProps} />
-            <TopPools path={path} type={type} additionalNodesProps={additionalNodesProps} />
+            <TopNodesByLoad path={path} type={type} additionalNodesProps={additionalNodesProps} />
+            <TopNodesByCpu path={path} type={type} additionalNodesProps={additionalNodesProps} />
             <TopShards path={path} />
             <TopQueries path={path} />
         </>

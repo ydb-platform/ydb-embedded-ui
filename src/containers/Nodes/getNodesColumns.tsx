@@ -10,7 +10,7 @@ import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper'
 import {formatBytesToGigabyte} from '../../utils/dataFormatters/dataFormatters';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {NodeAddress} from '../../types/additionalProps';
-import {getLoadSeverityForNode} from '../../store/reducers/tenantOverview/topNodes/utils';
+import {getLoadSeverityForNode} from '../../store/reducers/tenantOverview/topNodesByLoad/utils';
 
 const b = cn('node');
 
@@ -42,12 +42,13 @@ const nodeIdColumn: Column<NodesPreparedEntity> = {
 
 const getHostColumn = (
     getNodeRef?: (node?: NodeAddress) => string | null,
+    fixedWidth = false,
 ): Column<NodesPreparedEntity> => ({
     name: NODES_COLUMNS_IDS.Host,
     render: ({row}) => {
         return <NodeHostWrapper node={row} getNodeRef={getNodeRef} />;
     },
-    width: '350px',
+    width: fixedWidth ? '350px' : undefined,
     align: DataTable.LEFT,
     sortable: false,
 });
@@ -109,7 +110,7 @@ const cpuColumn: Column<NodesPreparedEntity> = {
     defaultOrder: DataTable.DESCENDING,
     render: ({row}) => (row.PoolStats ? <PoolsGraph pools={row.PoolStats} /> : '—'),
     align: DataTable.LEFT,
-    width: '120px',
+    width: '80px',
     sortable: false,
 };
 
@@ -177,7 +178,7 @@ export function getNodesColumns({
 }: GetNodesColumnsProps): Column<NodesPreparedEntity>[] {
     return [
         nodeIdColumn,
-        getHostColumn(getNodeRef),
+        getHostColumn(getNodeRef, true),
         dataCenterColumn,
         rackColumn,
         versionColumn,

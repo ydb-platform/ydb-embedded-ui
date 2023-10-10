@@ -1,8 +1,8 @@
 import type {TComputeInfo} from '../../../../types/api/compute';
 import {prepareComputeNodes} from '../../nodes/utils';
-import type {TopPoolsHandledResponse} from './types';
+import type {TopNodesByCpuHandledResponse} from './types';
 
-export const prepareTopComputeNodesData = (data: TComputeInfo): TopPoolsHandledResponse => {
+export const prepareTopComputeNodesData = (data: TComputeInfo): TopNodesByCpuHandledResponse => {
     const preparedNodes = prepareComputeNodes(data.Nodes, data.Tenants);
 
     if (!data.Nodes) {
