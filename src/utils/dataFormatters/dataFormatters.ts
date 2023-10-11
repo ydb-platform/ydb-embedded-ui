@@ -86,6 +86,10 @@ export const formatStorageValuesToGb = (value?: number, total?: number) => {
     return formatStorageValues(value, total, 'gb');
 };
 
+export const formatStorageValuesToTb = (value?: number, total?: number) => {
+    return formatStorageValues(value, total, 'tb');
+};
+
 export const formatNumber = (number?: unknown) => {
     if (!isNumeric(number)) {
         return '';
