@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.19.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.18.0...v4.19.0) (2023-10-11)
+
+
+### Features
+
+* **TenantOverview:** add storage tab to tenant diagnostics ([#541](https://github.com/ydb-platform/ydb-embedded-ui/issues/541)) ([c4cdd35](https://github.com/ydb-platform/ydb-embedded-ui/commit/c4cdd354cd9780dfd7dfee80ec225f59d4230625))
+
+
+### Bug Fixes
+
+* add NodeId to NodeAddress type ([#545](https://github.com/ydb-platform/ydb-embedded-ui/issues/545)) ([3df82d3](https://github.com/ydb-platform/ydb-embedded-ui/commit/3df82d39466696ec61e34b915b355dacd0482ebc))
+* display database name in node info ([#543](https://github.com/ydb-platform/ydb-embedded-ui/issues/543)) ([788ad9a](https://github.com/ydb-platform/ydb-embedded-ui/commit/788ad9a7a1a56ffe93ec7e4861ded6cceef72d9c))
+* fix cpu usage calculation ([#542](https://github.com/ydb-platform/ydb-embedded-ui/issues/542)) ([f46b03d](https://github.com/ydb-platform/ydb-embedded-ui/commit/f46b03d6157f19017560d71a9ab6591f045bad96))
+* fix incorrect data display in ProgressViewer ([#546](https://github.com/ydb-platform/ydb-embedded-ui/issues/546)) ([be077b8](https://github.com/ydb-platform/ydb-embedded-ui/commit/be077b83a4b4cf083d506e77abf0f2b6570c87d3))
+
 ## [4.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.17.0...v4.18.0) (2023-09-25)
 
 
