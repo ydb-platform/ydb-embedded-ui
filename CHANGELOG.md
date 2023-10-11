@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.19.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.19.0...v4.19.1) (2023-10-11)
+
+
+### Bug Fixes
+
+* add storage value to tb formatter ([#547](https://github.com/ydb-platform/ydb-embedded-ui/issues/547)) ([f1e4377](https://github.com/ydb-platform/ydb-embedded-ui/commit/f1e4377443be493a7072aca33a62b51e381f6841))
+
 ## [4.19.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.18.0...v4.19.0) (2023-10-11)
 
 
