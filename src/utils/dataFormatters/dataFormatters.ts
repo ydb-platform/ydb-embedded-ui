@@ -5,7 +5,7 @@ import {DAY_IN_SECONDS, GIGABYTE} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
 import {
-    BytesSizes,
+    type BytesSizes,
     formatBytes as formatBytesCustom,
     getSizeWithSignificantDigits,
 } from '../bytesParsers/formatBytes';
@@ -81,11 +81,9 @@ export const formatStorageValues = (value?: number, total?: number, size?: Bytes
 
     return [formattedValue, formattedTotal];
 };
-export const formatStorageValuesToGb = (value?: number, total?: number): (string | undefined)[] => {
-    return [
-        value ? String(Math.floor(value / 1000000000)) : undefined,
-        total ? `${Math.floor(total / 1000000000)} GB` : undefined,
-    ];
+
+export const formatStorageValuesToGb = (value?: number, total?: number) => {
+    return formatStorageValues(value, total, 'gb');
 };
 
 export const formatNumber = (number?: unknown) => {
