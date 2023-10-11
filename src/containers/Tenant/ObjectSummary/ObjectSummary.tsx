@@ -58,14 +58,14 @@ import './ObjectSummary.scss';
 
 const b = cn('object-summary');
 
-const getInitialIsSummaryCollapsed = () => {
-    return Boolean(localStorage.getItem(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED));
-};
+const getTenantCommonInfoState = () => {
+    const collapsed = Boolean(localStorage.getItem(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED));
 
-const initialTenantCommonInfoState = {
-    triggerExpand: false,
-    triggerCollapse: false,
-    collapsed: getInitialIsSummaryCollapsed(),
+    return {
+        triggerExpand: false,
+        triggerCollapse: false,
+        collapsed,
+    };
 };
 
 function prepareOlapTableSchema(tableSchema: TColumnTableDescription = {}) {
@@ -109,7 +109,8 @@ export function ObjectSummary({
     const dispatch = useDispatch();
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED),
-        initialTenantCommonInfoState,
+        undefined,
+        getTenantCommonInfoState,
     );
     const {
         data,
