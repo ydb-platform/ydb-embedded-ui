@@ -36,7 +36,7 @@ const initialState = {
     wasLoaded: false,
     filter: '',
     usageFilter: [],
-    visible: VISIBLE_ENTITIES.missing,
+    visible: VISIBLE_ENTITIES.all,
     nodesUptimeFilter: NodesUptimeFilterValues.All,
     type: STORAGE_TYPES.groups,
 };
