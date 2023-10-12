@@ -42,24 +42,24 @@ export interface TTenant {
     ResourceId?: string;
     Tablets?: TTabletStateInfo[];
     /** uint64 */
-    StorageAllocatedSize?: string;
+    StorageAllocatedSize?: string; // Actual database size
     /** uint64 */
     StorageMinAvailableSize?: string;
     Nodes?: TSystemStateInfo[];
     /** uint64 */
-    MemoryUsed?: string;
+    MemoryUsed?: string; // Actual memory consumption
     /** uint64 */
     MemoryLimit?: string;
     /** double */
-    CoresUsed?: number;
+    CoresUsed?: number; // Actual cpu consumption
     /** uint64 */
     StorageGroups?: string;
 
     MonitoringEndpoint?: string; // additional
     ControlPlane?: ControlPlane; // additional
 
-    CoresLimit?: string; // TODO: check correctness in backend protos when fully supported
-    StorageLimit?: string; // TODO: check correctness in backend protos when fully supported
+    StorageAllocatedLimit?: string;
+    DatabaseQuotas?: DatabaseQuotas;
 }
 
 interface THiveDomainStatsStateCount {
@@ -69,15 +69,15 @@ interface THiveDomainStatsStateCount {
 
 export interface TMetrics {
     /** uint64 */
-    CPU?: string;
+    CPU?: string; // Logical cpu consumption
     /** uint64 */
-    Memory?: string;
+    Memory?: string; // Logical memory consumption
     /** uint64 */
     Network?: string;
     /** uint64 */
     Counter?: string;
     /** uint64 */
-    Storage?: string;
+    Storage?: string; // Logical database size
     /** uint64 */
     ReadThroughput?: string;
     /** uint64 */
@@ -148,4 +148,17 @@ export enum ETabletVolatileState {
     'TABLET_VOLATILE_STATE_BOOTING' = 'TABLET_VOLATILE_STATE_BOOTING',
     'TABLET_VOLATILE_STATE_STARTING' = 'TABLET_VOLATILE_STATE_STARTING',
     'TABLET_VOLATILE_STATE_RUNNING' = 'TABLET_VOLATILE_STATE_RUNNING',
+}
+
+interface DatabaseQuotas {
+    /** uint64 */
+    data_size_hard_quota?: string;
+    /** uint64 */
+    data_size_soft_quota?: string;
+    /** uint64 */
+    data_stream_shards_quota?: string;
+    /** uint64 */
+    data_stream_reserved_storage_quota?: string;
+    /** uint32 */
+    ttl_min_run_internal_seconds?: string;
 }

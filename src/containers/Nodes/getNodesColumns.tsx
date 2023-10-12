@@ -122,7 +122,12 @@ const loadAverageColumn: Column<NodesPreparedEntity> = {
     defaultOrder: DataTable.DESCENDING,
     render: ({row}) =>
         row.LoadAverage && row.LoadAverage.length > 0 ? (
-            <ProgressViewer value={row.LoadAverage[0]} percents={true} colorizeProgress={true} />
+            <ProgressViewer
+                value={row.LoadAverage[0]}
+                percents={true}
+                colorizeProgress={true}
+                capacity={100}
+            />
         ) : (
             '—'
         ),

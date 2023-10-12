@@ -24,7 +24,7 @@ export interface AdditionalTenantsProps {
     getMonitoringLink?: (name?: string, type?: ETenantType) => ReactNode;
 }
 
-export type NodeAddress = Pick<TSystemStateInfo, 'Host' | 'Endpoints'>;
+export type NodeAddress = Pick<TSystemStateInfo, 'Host' | 'Endpoints' | 'NodeId'>;
 
 export interface AdditionalNodesProps extends Record<string, unknown> {
     getNodeRef?: (node?: NodeAddress) => string | null;

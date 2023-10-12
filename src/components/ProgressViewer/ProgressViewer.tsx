@@ -1,6 +1,8 @@
 import cn from 'bem-cn-lite';
 
 import type {ValueOf} from '../../types/common';
+import {isNumeric} from '../../utils/utils';
+import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
 
 import './ProgressViewer.scss';
 
@@ -17,6 +19,14 @@ export const PROGRESS_VIEWER_SIZE_IDS = {
 } as const;
 
 type ProgressViewerSize = ValueOf<typeof PROGRESS_VIEWER_SIZE_IDS>;
+
+const formatValue = (value?: number) => {
+    return formatNumber(roundToPrecision(Number(value), 2));
+};
+
+const defaultFormatValues = (value?: number, total?: number) => {
+    return [formatValue(value), formatValue(total)];
+};
 
 /*
 
@@ -46,8 +56,8 @@ interface ProgressViewerProps {
 
 export function ProgressViewer({
     value,
-    capacity = 100,
-    formatValues,
+    capacity,
+    formatValues = defaultFormatValues,
     percents,
     className,
     size = PROGRESS_VIEWER_SIZE_IDS.xs,
@@ -58,15 +68,15 @@ export function ProgressViewer({
 }: ProgressViewerProps) {
     let fillWidth = Math.round((parseFloat(String(value)) / parseFloat(String(capacity))) * 100);
     fillWidth = fillWidth > 100 ? 100 : fillWidth;
-    let valueText: number | string | undefined = Math.round(Number(value)),
+    let valueText: number | string | undefined = value,
         capacityText: number | string | undefined = capacity,
         divider = '/';
-    if (formatValues) {
-        [valueText, capacityText] = formatValues(Number(value), Number(capacity));
-    } else if (percents) {
+    if (percents) {
         valueText = fillWidth + '%';
         capacityText = '';
         divider = '';
+    } else if (formatValues) {
+        [valueText, capacityText] = formatValues(Number(value), Number(capacity));
     }
 
     let bg = inverseColorize ? 'scarlet' : 'apple';
@@ -84,13 +94,19 @@ export function ProgressViewer({
 
     const text = fillWidth > 60 ? 'contrast0' : 'contrast70';
 
-    if (!isNaN(fillWidth)) {
+    const renderContent = () => {
+        if (isNumeric(capacity)) {
+            return `${valueText} ${divider} ${capacityText}`;
+        }
+
+        return valueText;
+    };
+
+    if (isNumeric(value)) {
         return (
             <div className={b({size}, className)}>
                 <div className={b('line', {bg})} style={lineStyle}></div>
-                <span
-                    className={b('text', {text})}
-                >{`${valueText} ${divider} ${capacityText}`}</span>
+                <span className={b('text', {text})}>{renderContent()}</span>
             </div>
         );
     }

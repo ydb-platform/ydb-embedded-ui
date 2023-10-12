@@ -1,5 +1,50 @@
 # Changelog
 
+## [4.19.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.19.1...v4.19.2) (2023-10-12)
+
+
+### Bug Fixes
+
+* add default data formatter to ProgressViewer ([#552](https://github.com/ydb-platform/ydb-embedded-ui/issues/552)) ([ac372a4](https://github.com/ydb-platform/ydb-embedded-ui/commit/ac372a415e67e7126518d9c5a8d04594b82cf485))
+* **Tenant:** fix tree not fully collapsed bug ([#551](https://github.com/ydb-platform/ydb-embedded-ui/issues/551)) ([8469307](https://github.com/ydb-platform/ydb-embedded-ui/commit/8469307b67d463ed2aafd17b2c0319ea40c1f8d5))
+
+## [4.19.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.19.0...v4.19.1) (2023-10-11)
+
+
+### Bug Fixes
+
+* add storage value to tb formatter ([#547](https://github.com/ydb-platform/ydb-embedded-ui/issues/547)) ([f1e4377](https://github.com/ydb-platform/ydb-embedded-ui/commit/f1e4377443be493a7072aca33a62b51e381f6841))
+
+## [4.19.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.18.0...v4.19.0) (2023-10-11)
+
+
+### Features
+
+* **TenantOverview:** add storage tab to tenant diagnostics ([#541](https://github.com/ydb-platform/ydb-embedded-ui/issues/541)) ([c4cdd35](https://github.com/ydb-platform/ydb-embedded-ui/commit/c4cdd354cd9780dfd7dfee80ec225f59d4230625))
+
+
+### Bug Fixes
+
+* add NodeId to NodeAddress type ([#545](https://github.com/ydb-platform/ydb-embedded-ui/issues/545)) ([3df82d3](https://github.com/ydb-platform/ydb-embedded-ui/commit/3df82d39466696ec61e34b915b355dacd0482ebc))
+* display database name in node info ([#543](https://github.com/ydb-platform/ydb-embedded-ui/issues/543)) ([788ad9a](https://github.com/ydb-platform/ydb-embedded-ui/commit/788ad9a7a1a56ffe93ec7e4861ded6cceef72d9c))
+* fix cpu usage calculation ([#542](https://github.com/ydb-platform/ydb-embedded-ui/issues/542)) ([f46b03d](https://github.com/ydb-platform/ydb-embedded-ui/commit/f46b03d6157f19017560d71a9ab6591f045bad96))
+* fix incorrect data display in ProgressViewer ([#546](https://github.com/ydb-platform/ydb-embedded-ui/issues/546)) ([be077b8](https://github.com/ydb-platform/ydb-embedded-ui/commit/be077b83a4b4cf083d506e77abf0f2b6570c87d3))
+
+## [4.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.17.0...v4.18.0) (2023-09-25)
+
+
+### Features
+
+* **ProgressViewer:** add custom threasholds to ProgressViewer ([#540](https://github.com/ydb-platform/ydb-embedded-ui/issues/540)) ([3553065](https://github.com/ydb-platform/ydb-embedded-ui/commit/35530655581357f4a79c277a5bf9846b3befb784))
+
+
+### Bug Fixes
+
+* **Authentication:** enable page redirect ([#539](https://github.com/ydb-platform/ydb-embedded-ui/issues/539)) ([721883c](https://github.com/ydb-platform/ydb-embedded-ui/commit/721883cc7f4ca60e64d4a5f77b939dbb8e960855))
+* **Healthcheck:** add merge_records request param ([#538](https://github.com/ydb-platform/ydb-embedded-ui/issues/538)) ([6a47481](https://github.com/ydb-platform/ydb-embedded-ui/commit/6a474814f71c3318715a8ce638fd522a770d8038))
+* **Nodes:** use nodes endpoint by default ([#535](https://github.com/ydb-platform/ydb-embedded-ui/issues/535)) ([12d4fef](https://github.com/ydb-platform/ydb-embedded-ui/commit/12d4fefde7a6663bb1a11f46b4e94fb24b23e966))
+* rename flag for display metrics cards for database diagnostics ([#536](https://github.com/ydb-platform/ydb-embedded-ui/issues/536)) ([957e1fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/957e1fafbbc43928498ae9e8d0bc119bcda5288d))
+
 ## [4.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.16.2...v4.17.0) (2023-09-18)
 
 

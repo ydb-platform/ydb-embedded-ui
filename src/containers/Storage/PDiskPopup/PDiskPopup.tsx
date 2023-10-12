@@ -23,7 +23,7 @@ export const preparePDiskData = (data: TPDiskStateInfo, nodes?: NodesMap) => {
     const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Device} = data;
 
     const pdiskData: InfoViewerItem[] = [
-        {label: 'PDisk', value: getPDiskId({NodeId, PDiskId})},
+        {label: 'PDisk', value: getPDiskId({NodeId, PDiskId}) || '-'},
         {label: 'State', value: State || 'not available'},
         {label: 'Type', value: getPDiskType(data) || 'unknown'},
     ];

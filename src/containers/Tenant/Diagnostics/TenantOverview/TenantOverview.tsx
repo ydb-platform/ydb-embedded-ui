@@ -15,6 +15,7 @@ import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import {TenantCpu} from './TenantCpu/TenantCpu';
 import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
+import {TenantStorage} from './TenantStorage/TenantStorage';
 import {useHealthcheck} from './useHealthcheck';
 
 import i18n from './i18n';
@@ -76,16 +77,31 @@ export function TenantOverview({
 
     const tenantType = mapDatabaseTypeToDBName(Type);
 
-    const {cpu, storage, memory, cpuLimit, storageLimit, memoryLimit} =
-        calculateTenantMetrics(tenant);
+    const {
+        cpu,
+        blobStorage,
+        tableStorage,
+        memory,
+        cpuUsage,
+        blobStorageLimit,
+        tableStorageLimit,
+        memoryLimit,
+    } = calculateTenantMetrics(tenant);
 
     const calculatedMetrics: TenantMetrics = {
         memoryUsed: memory,
         memoryLimit,
         cpuUsed: cpu,
-        cpuLimit,
-        storageUsed: storage,
-        storageLimit,
+        cpuUsage,
+        storageUsed: blobStorage,
+        storageLimit: blobStorageLimit,
+    };
+
+    const storageMetrics = {
+        blobStorageUsed: blobStorage,
+        blobStorageLimit,
+        tableStorageUsed: tableStorage,
+        tableStorageLimit,
     };
 
     const renderName = () => {
@@ -108,7 +124,7 @@ export function TenantOverview({
                 return <TenantCpu path={tenantName} additionalNodesProps={additionalNodesProps} />;
             }
             case TENANT_METRICS_TABS_IDS.storage: {
-                return i18n('label.under-development');
+                return <TenantStorage tenantName={tenantName} metrics={storageMetrics} />;
             }
             case TENANT_METRICS_TABS_IDS.memory: {
                 return i18n('label.under-development');

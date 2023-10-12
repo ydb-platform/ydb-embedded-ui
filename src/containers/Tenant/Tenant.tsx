@@ -27,14 +27,14 @@ import './Tenant.scss';
 
 const b = cn('tenant-page');
 
-const getInitialIsSummaryCollapsed = () => {
-    return Boolean(localStorage.getItem(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED));
-};
+const getTenantSummaryState = () => {
+    const collapsed = Boolean(localStorage.getItem(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED));
 
-const initialTenantSummaryState = {
-    triggerExpand: false,
-    triggerCollapse: false,
-    collapsed: getInitialIsSummaryCollapsed(),
+    return {
+        triggerExpand: false,
+        triggerCollapse: false,
+        collapsed,
+    };
 };
 
 interface TenantProps {
@@ -45,7 +45,8 @@ interface TenantProps {
 function Tenant(props: TenantProps) {
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED),
-        initialTenantSummaryState,
+        undefined,
+        getTenantSummaryState,
     );
 
     const {currentSchemaPath, currentSchema: currentItem = {}} = useSelector(

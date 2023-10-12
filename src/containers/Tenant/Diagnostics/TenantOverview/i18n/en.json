@@ -7,5 +7,7 @@
   "title.pools": "Pools",
   "title.metrics": "Metrics",
 
+  "top-groups.empty-data": "No such groups",
+
   "label.under-development": "This section is under development"
 }
