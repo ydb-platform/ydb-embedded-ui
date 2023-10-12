@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.19.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.19.1...v4.19.2) (2023-10-12)
+
+
+### Bug Fixes
+
+* add default data formatter to ProgressViewer ([#552](https://github.com/ydb-platform/ydb-embedded-ui/issues/552)) ([ac372a4](https://github.com/ydb-platform/ydb-embedded-ui/commit/ac372a415e67e7126518d9c5a8d04594b82cf485))
+* **Tenant:** fix tree not fully collapsed bug ([#551](https://github.com/ydb-platform/ydb-embedded-ui/issues/551)) ([8469307](https://github.com/ydb-platform/ydb-embedded-ui/commit/8469307b67d463ed2aafd17b2c0319ea40c1f8d5))
+
 ## [4.19.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.19.0...v4.19.1) (2023-10-11)
 
 
