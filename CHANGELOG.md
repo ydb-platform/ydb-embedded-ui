@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.19.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.19.2...v4.19.3) (2023-10-13)
+
+
+### Bug Fixes
+
+* fix ProgressViewer background ([#556](https://github.com/ydb-platform/ydb-embedded-ui/issues/556)) ([6234462](https://github.com/ydb-platform/ydb-embedded-ui/commit/62344629713059fdfb191d3b8a57742f864dad66))
+* **Storage:** display all groups by default ([#554](https://github.com/ydb-platform/ydb-embedded-ui/issues/554)) ([1da83f1](https://github.com/ydb-platform/ydb-embedded-ui/commit/1da83f19661ed8e49dd7c8a0930ce89a7c8c0185))
+
 ## [4.19.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.19.1...v4.19.2) (2023-10-12)
 
 
