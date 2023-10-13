@@ -5,10 +5,13 @@ import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
-import {formatBytesToGigabyte} from '../../utils/dataFormatters/dataFormatters';
+import {
+    formatBytesToGigabyte,
+    formatStorageValuesToGb,
+} from '../../utils/dataFormatters/dataFormatters';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {GetNodeRefFunc} from '../../types/additionalProps';
-import {getLoadSeverityForNode} from '../../store/reducers/tenantOverview/topNodesByLoad/utils';
+import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import {UsageLabel} from '../../components/UsageLabel/UsageLabel';
 
 const NODES_COLUMNS_IDS = {
@@ -23,6 +26,7 @@ const NODES_COLUMNS_IDS = {
     LoadAverage: 'LoadAverage',
     Tablets: 'Tablets',
     TopNodesLoadAverage: 'TopNodesLoadAverage',
+    TopNodesMemory: 'TopNodesMemory',
 };
 
 interface GetNodesColumnsProps {
@@ -83,6 +87,7 @@ const uptimeColumn: Column<NodesPreparedEntity> = {
     sortAccessor: ({StartTime}) => StartTime && -StartTime,
     align: DataTable.RIGHT,
     width: '110px',
+    sortable: false,
 };
 
 const memoryColumn: Column<NodesPreparedEntity> = {
@@ -149,6 +154,7 @@ const getTabletsColumn = (tabletsPath?: string): Column<NodesPreparedEntity> => 
         );
     },
     align: DataTable.LEFT,
+    sortable: false,
 });
 
 const topNodesLoadAverageColumn: Column<NodesPreparedEntity> = {
@@ -165,6 +171,25 @@ const topNodesLoadAverageColumn: Column<NodesPreparedEntity> = {
         ),
     align: DataTable.LEFT,
     width: '80px',
+    sortable: false,
+};
+
+const topNodesMemoryColumn: Column<NodesPreparedEntity> = {
+    name: NODES_COLUMNS_IDS.TopNodesMemory,
+    header: 'Memory',
+    render: ({row}) =>
+        row.MemoryUsed ? (
+            <ProgressViewer
+                value={row.MemoryUsed}
+                capacity={row.MemoryLimit}
+                formatValues={formatStorageValuesToGb}
+                colorizeProgress={true}
+            />
+        ) : (
+            '—'
+        ),
+    align: DataTable.LEFT,
+    width: '140px',
     sortable: false,
 };
 
@@ -196,4 +221,18 @@ export function getTopNodesByCpuColumns(
     getNodeRef?: GetNodeRefFunc,
 ): Column<NodesPreparedEntity>[] {
     return [cpuColumn, nodeIdColumn, getHostColumn(getNodeRef)];
+}
+
+export function getTopNodesByMemoryColumns({
+    tabletsPath,
+    getNodeRef,
+}: GetNodesColumnsProps): Column<NodesPreparedEntity>[] {
+    return [
+        nodeIdColumn,
+        getHostColumn(getNodeRef, true),
+        uptimeColumn,
+        topNodesMemoryColumn,
+        topNodesLoadAverageColumn,
+        getTabletsColumn(tabletsPath),
+    ];
 }

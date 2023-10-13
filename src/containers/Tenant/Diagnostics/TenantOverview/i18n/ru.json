@@ -7,7 +7,5 @@
   "title.pools": "Пулы",
   "title.metrics": "Метрики",
 
-  "top-groups.empty-data": "Нет групп",
-
-  "label.under-development": "Этот раздел находится в разработке"
+  "top-groups.empty-data": "Нет групп"
 }
