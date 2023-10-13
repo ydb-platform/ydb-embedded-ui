@@ -66,7 +66,8 @@ export function ProgressViewer({
     warningThreshold = 60,
     dangerThreshold = 80,
 }: ProgressViewerProps) {
-    let fillWidth = Math.round((parseFloat(String(value)) / parseFloat(String(capacity))) * 100);
+    let fillWidth =
+        Math.round((parseFloat(String(value)) / parseFloat(String(capacity))) * 100) || 0;
     fillWidth = fillWidth > 100 ? 100 : fillWidth;
     let valueText: number | string | undefined = value,
         capacityText: number | string | undefined = capacity,
