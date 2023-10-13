@@ -1,29 +1,33 @@
 import {useState} from 'react';
 import cn from 'bem-cn-lite';
-import _ from 'lodash';
+import {isEmpty} from 'lodash/fp';
 
 import {ArrowToggle, Button, Popover} from '@gravity-ui/uikit';
 
 import DataTable, {Column, Settings} from '@gravity-ui/react-data-table';
 
-import EntityStatus from '../../../components/EntityStatus/EntityStatus';
-import InfoViewer from '../../../components/InfoViewer/InfoViewer';
-import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
-import {Icon} from '../../../components/Icon';
-import {Vdisk} from './Vdisk';
-
+import type {ValueOf} from '../../../types/common';
+import type {
+    PreparedStructurePDisk,
+    PreparedStructureVDisk,
+} from '../../../store/reducers/node/types';
 import {bytesToGB, pad9} from '../../../utils/utils';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {getPDiskType} from '../../../utils/pdisk';
-
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
+import EntityStatus from '../../../components/EntityStatus/EntityStatus';
+import InfoViewer, {type InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
+import {Icon} from '../../../components/Icon';
+
+import {Vdisk} from './Vdisk';
 import {valueIsDefined} from './NodeStructure';
 import {PDiskTitleBadge} from './PDiskTitleBadge';
 
 const b = cn('kv-node-structure');
 
 interface PDiskProps {
-    data: Record<string, any>;
+    data: PreparedStructurePDisk;
     unfolded?: boolean;
     id: string;
     selectedVdiskId?: string;
@@ -37,8 +41,7 @@ enum VDiskTableColumnsIds {
     Info = 'Info',
 }
 
-type VDiskTableColumnsIdsKeys = keyof typeof VDiskTableColumnsIds;
-type VDiskTableColumnsIdsValues = typeof VDiskTableColumnsIds[VDiskTableColumnsIdsKeys];
+type VDiskTableColumnsIdsValues = ValueOf<typeof VDiskTableColumnsIds>;
 
 const vDiskTableColumnsNames: Record<VDiskTableColumnsIdsValues, string> = {
     VDiskSlotId: 'Slot id',
@@ -47,24 +50,16 @@ const vDiskTableColumnsNames: Record<VDiskTableColumnsIdsValues, string> = {
     Info: '',
 };
 
-interface RowType {
-    id: string;
-    [VDiskTableColumnsIds.slotId]: number;
-    [VDiskTableColumnsIds.VDiskState]: string;
-    AllocatedSize: string;
-    AvailableSize: string;
-}
-
 function getColumns({
     pDiskId,
     selectedVdiskId,
     nodeHref,
 }: {
-    pDiskId: number;
+    pDiskId: number | undefined;
     selectedVdiskId?: string;
     nodeHref?: string | null;
 }) {
-    const columns: Column<RowType>[] = [
+    const columns: Column<PreparedStructureVDisk>[] = [
         {
             name: VDiskTableColumnsIds.slotId as string,
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.slotId],
@@ -72,7 +67,7 @@ function getColumns({
             render: ({value, row}) => {
                 let vdiskInternalViewerLink = '';
 
-                if (nodeHref && value !== undefined) {
+                if (nodeHref && pDiskId !== undefined && value !== undefined) {
                     vdiskInternalViewerLink +=
                         nodeHref + 'actors/vdisks/vdisk' + pad9(pDiskId) + '_' + pad9(value);
                 }
@@ -150,10 +145,31 @@ function getColumns({
     return columns;
 }
 
-export function PDisk(props: PDiskProps) {
-    const [unfolded, setUnfolded] = useState(props.unfolded ?? false);
+export function PDisk({
+    id,
+    data,
+    selectedVdiskId,
+    nodeHref,
+    unfolded: unfoldedFromProps,
+}: PDiskProps) {
+    const [unfolded, setUnfolded] = useState(unfoldedFromProps ?? false);
 
-    const data = props.data ?? {};
+    const {
+        TotalSize = 0,
+        AvailableSize = 0,
+        Device,
+        Guid,
+        PDiskId,
+        Path,
+        Realtime,
+        State,
+        Category,
+        SerialNumber,
+        vDisks,
+    } = data;
+
+    const total = Number(TotalSize);
+    const available = Number(AvailableSize);
 
     const onOpenPDiskDetails = () => {
         setUnfolded(true);
@@ -163,14 +179,11 @@ export function PDisk(props: PDiskProps) {
     };
 
     const renderVDisks = () => {
-        const {selectedVdiskId, data, nodeHref} = props;
-        const {vDisks} = data;
-
         return (
             <DataTable
                 theme="yandex-cloud"
                 data={vDisks}
-                columns={getColumns({nodeHref, pDiskId: data.PDiskId, selectedVdiskId})}
+                columns={getColumns({nodeHref, pDiskId: PDiskId, selectedVdiskId})}
                 settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false} as Settings}
                 rowClassName={(row) => {
                     return row.id === selectedVdiskId ? b('selected-vdisk') : '';
@@ -180,30 +193,16 @@ export function PDisk(props: PDiskProps) {
     };
 
     const renderPDiskDetails = () => {
-        if (_.isEmpty(data)) {
+        if (isEmpty(data)) {
             return <div>No information about PDisk</div>;
         }
-        const {nodeHref} = props;
-        const {
-            TotalSize,
-            AvailableSize,
-            Device,
-            Guid,
-            PDiskId,
-            Path,
-            Realtime,
-            State,
-            Category,
-            SerialNumber,
-        } = data;
-
         let pDiskInternalViewerLink = '';
 
         if (nodeHref) {
             pDiskInternalViewerLink += nodeHref + 'actors/pdisks/pdisk' + pad9(PDiskId);
         }
 
-        const pdiskInfo: any = [
+        const pdiskInfo: InfoViewerItem[] = [
             {
                 label: 'PDisk Id',
                 value: (
@@ -236,19 +235,19 @@ export function PDisk(props: PDiskProps) {
         }
         pdiskInfo.push({
             label: 'Allocated Size',
-            value: bytesToGB(TotalSize - AvailableSize),
+            value: bytesToGB(total - available),
         });
         pdiskInfo.push({
             label: 'Available Size',
-            value: bytesToGB(AvailableSize),
+            value: bytesToGB(available),
         });
-        if (Number(TotalSize) >= 0 && Number(AvailableSize) >= 0) {
+        if (total >= 0 && available >= 0) {
             pdiskInfo.push({
                 label: 'Size',
                 value: (
                     <ProgressViewer
-                        value={TotalSize - AvailableSize}
-                        capacity={TotalSize}
+                        value={total - available}
+                        capacity={total}
                         formatValues={formatStorageValuesToGb}
                         colorizeProgress={true}
                         className={b('size')}
@@ -286,24 +285,24 @@ export function PDisk(props: PDiskProps) {
     };
 
     return (
-        <div className={b('pdisk')} id={props.id}>
+        <div className={b('pdisk')} id={id}>
             <div className={b('pdisk-header')}>
                 <div className={b('pdisk-title-wrapper')}>
-                    <EntityStatus status={data.Device} />
+                    <EntityStatus status={Device} />
                     <PDiskTitleBadge
                         label="PDiskID"
-                        value={data.PDiskId}
+                        value={PDiskId}
                         className={b('pdisk-title-id')}
                     />
                     <PDiskTitleBadge value={getPDiskType(data)} className={b('pdisk-title-type')} />
                     <ProgressViewer
-                        value={data.TotalSize - data.AvailableSize}
-                        capacity={data.TotalSize}
+                        value={total - available}
+                        capacity={total}
                         formatValues={formatStorageValuesToGb}
                         colorizeProgress={true}
                         className={b('pdisk-title-size')}
                     />
-                    <PDiskTitleBadge label="VDisks" value={data.vDisks.length} />
+                    <PDiskTitleBadge label="VDisks" value={vDisks.length} />
                 </div>
                 <Button
                     onClick={unfolded ? onClosePDiskDetails : onOpenPDiskDetails}
