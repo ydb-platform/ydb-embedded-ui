@@ -202,7 +202,7 @@ function AsideNavigation(props: AsideNavigationProps) {
         <React.Fragment>
             <AsideHeader
                 logo={{
-                    text: i18n('logo.title'),
+                    text: 'YDB',
                     icon: ydbLogoIcon,
                     onClick: () => history.push('/'),
                 }}
