@@ -73,7 +73,7 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
         loading,
         wasLoaded,
         error,
-        type: storageType,
+        type,
         visible: visibleEntities,
         filter,
         usageFilter,
@@ -86,6 +86,10 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
     const usageFilterOptions = useTypedSelector(selectUsageFilterOptions);
     const nodesSortParams = useTypedSelector(selectNodesSortParams);
     const groupsSortParams = useTypedSelector(selectGroupsSortParams);
+
+    // Do not display Nodes table for Node page (NodeId present)
+    const isNodePage = nodeId !== undefined;
+    const storageType = isNodePage ? STORAGE_TYPES.groups : type;
 
     useEffect(() => {
         dispatch(getNodesList());
@@ -228,7 +232,10 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
                     />
                 </div>
 
-                <StorageTypeFilter value={storageType} onChange={handleStorageTypeChange} />
+                {!isNodePage && (
+                    <StorageTypeFilter value={storageType} onChange={handleStorageTypeChange} />
+                )}
+
                 <StorageVisibleEntitiesFilter
                     value={visibleEntities}
                     onChange={handleGroupVisibilityChange}
