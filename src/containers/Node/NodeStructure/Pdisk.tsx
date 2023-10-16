@@ -11,6 +11,7 @@ import type {
     PreparedStructurePDisk,
     PreparedStructureVDisk,
 } from '../../../store/reducers/node/types';
+import {EVDiskState} from '../../../types/api/vdisk';
 import {bytesToGB, pad9} from '../../../utils/utils';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {getPDiskType} from '../../../utils/pdisk';
@@ -61,20 +62,24 @@ function getColumns({
 }) {
     const columns: Column<PreparedStructureVDisk>[] = [
         {
-            name: VDiskTableColumnsIds.slotId as string,
+            name: VDiskTableColumnsIds.slotId,
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.slotId],
             width: 100,
-            render: ({value, row}) => {
+            render: ({row}) => {
                 let vdiskInternalViewerLink = '';
 
-                if (nodeHref && pDiskId !== undefined && value !== undefined) {
+                if (nodeHref && pDiskId !== undefined && row.VDiskSlotId !== undefined) {
                     vdiskInternalViewerLink +=
-                        nodeHref + 'actors/vdisks/vdisk' + pad9(pDiskId) + '_' + pad9(value);
+                        nodeHref +
+                        'actors/vdisks/vdisk' +
+                        pad9(pDiskId) +
+                        '_' +
+                        pad9(row.VDiskSlotId);
                 }
 
                 return (
                     <div className={b('vdisk-id', {selected: row.id === selectedVdiskId})}>
-                        <span>{value as number}</span>
+                        <span>{row.VDiskSlotId}</span>
                         {vdiskInternalViewerLink && (
                             <Button
                                 size="s"
@@ -91,17 +96,19 @@ function getColumns({
             align: DataTable.LEFT,
         },
         {
-            name: VDiskTableColumnsIds.VDiskState as string,
+            name: VDiskTableColumnsIds.VDiskState,
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.VDiskState],
             width: 70,
-            render: ({value}) => {
-                return <EntityStatus status={value === 'OK' ? 'green' : 'red'} />;
+            render: ({row}) => {
+                return (
+                    <EntityStatus status={row.VDiskState === EVDiskState.OK ? 'green' : 'red'} />
+                );
             },
-            sortAccessor: (row) => (row[VDiskTableColumnsIds.VDiskState] === 'OK' ? 1 : 0),
+            sortAccessor: (row) => (row.VDiskState === EVDiskState.OK ? 1 : 0),
             align: DataTable.CENTER,
         },
         {
-            name: VDiskTableColumnsIds.Size as string,
+            name: VDiskTableColumnsIds.Size,
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.Size],
             width: 100,
             render: ({row}) => {
@@ -118,7 +125,7 @@ function getColumns({
             align: DataTable.CENTER,
         },
         {
-            name: VDiskTableColumnsIds.Info as string,
+            name: VDiskTableColumnsIds.Info,
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.Info],
             width: 70,
             render: ({row}) => {
