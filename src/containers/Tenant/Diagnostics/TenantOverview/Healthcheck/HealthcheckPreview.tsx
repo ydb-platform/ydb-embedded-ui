@@ -1,6 +1,6 @@
 import cn from 'bem-cn-lite';
 
-import {Button, Icon} from '@gravity-ui/uikit';
+import {Button, Icon, Loader} from '@gravity-ui/uikit';
 
 import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
@@ -19,13 +19,14 @@ interface HealthcheckPreviewProps {
     selfCheckResult: SelfCheckResult;
     issuesStatistics?: [StatusFlag, number][];
     loading?: boolean;
+    wasLoaded?: boolean;
     onUpdate: VoidFunction;
     error?: IResponseError;
     active?: boolean;
 }
 
 export function HealthcheckPreview(props: HealthcheckPreviewProps) {
-    const {selfCheckResult, issuesStatistics, loading, onUpdate, error, active} = props;
+    const {selfCheckResult, issuesStatistics, loading, wasLoaded, onUpdate, error, active} = props;
 
     const renderHeader = () => {
         const modifier = selfCheckResult.toLowerCase();
@@ -73,6 +74,14 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
             </div>
         );
     };
+
+    if (loading && !wasLoaded) {
+        return (
+            <DiagnosticCard className={b('preview-loader')} active={active}>
+                <Loader size="m" />
+            </DiagnosticCard>
+        );
+    }
 
     return (
         <DiagnosticCard className={b('preview')} active={active}>

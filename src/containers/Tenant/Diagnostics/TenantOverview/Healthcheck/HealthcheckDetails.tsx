@@ -1,5 +1,7 @@
 import cn from 'bem-cn-lite';
 
+import {Loader} from '@gravity-ui/uikit';
+
 import type {IResponseError} from '../../../../../types/api/error';
 import type {IIssuesTree} from '../../../../../types/store/healthcheck';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
@@ -13,15 +15,21 @@ const b = cn('healthcheck');
 
 interface HealthcheckDetailsProps {
     issueTrees?: IIssuesTree[];
+    loading?: boolean;
+    wasLoaded?: boolean;
     error?: IResponseError;
 }
 
 export function HealthcheckDetails(props: HealthcheckDetailsProps) {
-    const {issueTrees, error} = props;
+    const {issueTrees, loading, wasLoaded, error} = props;
 
     const renderContent = () => {
         if (error) {
             return <ResponseError error={error} defaultMessage={i18n('no-data')} />;
+        }
+
+        if (loading && !wasLoaded) {
+            return <Loader className={b('details-loader')} size="m" />;
         }
 
         if (!issueTrees || !issueTrees.length) {
