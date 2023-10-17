@@ -1,12 +1,10 @@
 import type {Reducer} from 'redux';
 
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
-import {EVersion} from '../../../../types/api/compute';
 import {createApiRequest, createRequestActionTypes} from '../../../utils';
 import {prepareNodesData} from '../../nodes/utils';
-import type {ComputeApiRequestParams, NodesApiRequestParams} from '../../nodes/types';
+import type {NodesApiRequestParams} from '../../nodes/types';
 import type {TopNodesByLoadAction, TopNodesByLoadState, TopNodesByLoadStateSlice} from './types';
-import {prepareTopComputeNodesData} from './utils';
 
 export const FETCH_TOP_NODES_BY_LOAD = createRequestActionTypes(
     'topNodesByLoad',
@@ -19,7 +17,7 @@ const initialState = {
     wasLoaded: false,
 };
 
-const topNodesByLoad: Reducer<TopNodesByLoadState, TopNodesByLoadAction> = (
+export const topNodesByLoad: Reducer<TopNodesByLoadState, TopNodesByLoadAction> = (
     state = initialState,
     action,
 ) => {
@@ -80,23 +78,6 @@ export function getTopNodesByLoad({
     });
 }
 
-export function getTopComputeNodesByLoad({
-    sortOrder = -1,
-    sortValue = 'LoadAverage',
-    limit = TENANT_OVERVIEW_TABLES_LIMIT,
-    version = EVersion.v2,
-    ...params
-}: ComputeApiRequestParams) {
-    return createApiRequest({
-        request: window.api.getCompute(
-            {sortOrder, sortValue, limit, version, ...params},
-            {concurrentId},
-        ),
-        actions: FETCH_TOP_NODES_BY_LOAD,
-        dataHandler: prepareTopComputeNodesData,
-    });
-}
-
 export const selectTopNodesByLoad = (state: TopNodesByLoadStateSlice) => state.topNodesByLoad.data;
 
 export const setDataWasNotLoaded = () => {
@@ -104,5 +85,3 @@ export const setDataWasNotLoaded = () => {
         type: SET_DATA_WAS_NOT_LOADED,
     } as const;
 };
-
-export default topNodesByLoad;

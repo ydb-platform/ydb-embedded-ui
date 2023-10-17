@@ -4,10 +4,13 @@ import '../../../../services/api';
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../../../utils/query';
 import {createRequestActionTypes, createApiRequest} from '../../../utils';
-import {TopShardsAction, TopShardsState} from './types';
+import {TenantOverviewTopShardsAction, TenantOverviewTopShardsState} from './types';
 
-export const FETCH_TOP_SHARDS = createRequestActionTypes('topShards', 'FETCH_TOP_SHARDS');
-const SET_DATA_WAS_NOT_LOADED = 'topShards/SET_DATA_WAS_NOT_LOADED';
+export const FETCH_TENANT_OVERVIEW_TOP_SHARDS = createRequestActionTypes(
+    'tenantOverviewTopShards',
+    'FETCH_TENANT_OVERVIEW_TOP_SHARDS',
+);
+const SET_DATA_WAS_NOT_LOADED = 'tenantOverviewTopShards/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {
     loading: false,
@@ -33,19 +36,19 @@ LIMIT ${TENANT_OVERVIEW_TABLES_LIMIT}`;
 
 const queryAction = 'execute-scan';
 
-const executeTopShards: Reducer<TopShardsState, TopShardsAction> = (
-    state = initialState,
-    action,
-) => {
+export const tenantOverviewTopShards: Reducer<
+    TenantOverviewTopShardsState,
+    TenantOverviewTopShardsAction
+> = (state = initialState, action) => {
     switch (action.type) {
-        case FETCH_TOP_SHARDS.REQUEST: {
+        case FETCH_TENANT_OVERVIEW_TOP_SHARDS.REQUEST: {
             return {
                 ...state,
                 loading: true,
                 error: undefined,
             };
         }
-        case FETCH_TOP_SHARDS.SUCCESS: {
+        case FETCH_TENANT_OVERVIEW_TOP_SHARDS.SUCCESS: {
             return {
                 ...state,
                 data: action.data,
@@ -55,7 +58,7 @@ const executeTopShards: Reducer<TopShardsState, TopShardsAction> = (
             };
         }
         // 401 Unauthorized error is handled by GenericAPI
-        case FETCH_TOP_SHARDS.FAILURE: {
+        case FETCH_TENANT_OVERVIEW_TOP_SHARDS.FAILURE: {
             if (action.error?.isCancelled) {
                 return state;
             }
@@ -76,7 +79,7 @@ const executeTopShards: Reducer<TopShardsState, TopShardsAction> = (
     }
 };
 
-export const sendTopShardsQuery = (database: string, path = '') =>
+export const sendTenantOverviewTopShardsQuery = (database: string, path = '') =>
     createApiRequest({
         request: window.api.sendQuery(
             {
@@ -89,7 +92,7 @@ export const sendTopShardsQuery = (database: string, path = '') =>
                 concurrentId: 'executeTopShards',
             },
         ),
-        actions: FETCH_TOP_SHARDS,
+        actions: FETCH_TENANT_OVERVIEW_TOP_SHARDS,
         dataHandler: parseQueryAPIExecuteResponse,
     });
 
@@ -98,5 +101,3 @@ export function setDataWasNotLoaded() {
         type: SET_DATA_WAS_NOT_LOADED,
     } as const;
 }
-
-export default executeTopShards;

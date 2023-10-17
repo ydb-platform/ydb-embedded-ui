@@ -5,10 +5,13 @@ import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../../../utils/query';
 
 import {createRequestActionTypes, createApiRequest} from '../../../utils';
-import type {TopQueriesAction, TopQueriesState} from './types';
+import type {TenantOverviewTopQueriesAction, TenantOverviewTopQueriesState} from './types';
 
-export const FETCH_TOP_QUERIES = createRequestActionTypes('topQueries', 'FETCH_TOP_QUERIES');
-const SET_DATA_WAS_NOT_LOADED = 'topQueries/SET_DATA_WAS_NOT_LOADED';
+export const FETCH_TENANT_OVERVIEW_TOP_QUERIES = createRequestActionTypes(
+    'tenantOverviewTopQueries',
+    'FETCH_TOP_QUERIES',
+);
+const SET_DATA_WAS_NOT_LOADED = 'tenantOverviewTopQueries/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {
     loading: false,
@@ -27,19 +30,19 @@ LIMIT ${TENANT_OVERVIEW_TABLES_LIMIT}
 `;
 };
 
-const executeTopQueries: Reducer<TopQueriesState, TopQueriesAction> = (
-    state = initialState,
-    action,
-) => {
+export const tenantOverviewTopQueries: Reducer<
+    TenantOverviewTopQueriesState,
+    TenantOverviewTopQueriesAction
+> = (state = initialState, action) => {
     switch (action.type) {
-        case FETCH_TOP_QUERIES.REQUEST: {
+        case FETCH_TENANT_OVERVIEW_TOP_QUERIES.REQUEST: {
             return {
                 ...state,
                 loading: true,
                 error: undefined,
             };
         }
-        case FETCH_TOP_QUERIES.SUCCESS: {
+        case FETCH_TENANT_OVERVIEW_TOP_QUERIES.SUCCESS: {
             return {
                 ...state,
                 data: action.data,
@@ -49,7 +52,7 @@ const executeTopQueries: Reducer<TopQueriesState, TopQueriesAction> = (
             };
         }
         // 401 Unauthorized error is handled by GenericAPI
-        case FETCH_TOP_QUERIES.FAILURE: {
+        case FETCH_TENANT_OVERVIEW_TOP_QUERIES.FAILURE: {
             return {
                 ...state,
                 error: action.error || 'Unauthorized',
@@ -66,7 +69,7 @@ const executeTopQueries: Reducer<TopQueriesState, TopQueriesAction> = (
     }
 };
 
-export const fetchTopQueries = (database: string) =>
+export const fetchTenantOverviewTopQueries = (database: string) =>
     createApiRequest({
         request: window.api.sendQuery(
             {
@@ -79,7 +82,7 @@ export const fetchTopQueries = (database: string) =>
                 concurrentId: 'executeTopQueries',
             },
         ),
-        actions: FETCH_TOP_QUERIES,
+        actions: FETCH_TENANT_OVERVIEW_TOP_QUERIES,
         dataHandler: parseQueryAPIExecuteResponse,
     });
 
@@ -88,5 +91,3 @@ export function setDataWasNotLoaded() {
         type: SET_DATA_WAS_NOT_LOADED,
     } as const;
 }
-
-export default executeTopQueries;

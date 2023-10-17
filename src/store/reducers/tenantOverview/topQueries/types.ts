@@ -1,18 +1,14 @@
 import type {IQueryResult, QueryErrorResponse} from '../../../../types/store/query';
 import type {ApiRequestAction} from '../../../utils';
-import {FETCH_TOP_SHARDS, setDataWasNotLoaded} from './executeTopShards';
+import {FETCH_TENANT_OVERVIEW_TOP_QUERIES, setDataWasNotLoaded} from './tenantOverviewTopQueries';
 
-export interface TopShardsState {
+export interface TenantOverviewTopQueriesState {
     loading: boolean;
     wasLoaded: boolean;
     data?: IQueryResult;
     error?: QueryErrorResponse;
 }
 
-export type TopShardsAction =
-    | ApiRequestAction<typeof FETCH_TOP_SHARDS, IQueryResult, QueryErrorResponse>
+export type TenantOverviewTopQueriesAction =
+    | ApiRequestAction<typeof FETCH_TENANT_OVERVIEW_TOP_QUERIES, IQueryResult, QueryErrorResponse>
     | ReturnType<typeof setDataWasNotLoaded>;
-
-export interface TopShardsSlice {
-    topShards: TopShardsState;
-}

@@ -1,7 +1,5 @@
-import cn from 'bem-cn-lite';
-
 import DataTable, {type Column} from '@gravity-ui/react-data-table';
-import {Label, Popover} from '@gravity-ui/uikit';
+import {Popover} from '@gravity-ui/uikit';
 
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
@@ -9,10 +7,9 @@ import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
 import {formatBytesToGigabyte} from '../../utils/dataFormatters/dataFormatters';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import type {NodeAddress} from '../../types/additionalProps';
+import type {GetNodeRefFunc} from '../../types/additionalProps';
 import {getLoadSeverityForNode} from '../../store/reducers/tenantOverview/topNodesByLoad/utils';
-
-const b = cn('node');
+import {UsageLabel} from '../../components/UsageLabel/UsageLabel';
 
 const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
@@ -25,11 +22,12 @@ const NODES_COLUMNS_IDS = {
     CPU: 'CPU',
     LoadAverage: 'LoadAverage',
     Tablets: 'Tablets',
+    TopNodesLoadAverage: 'TopNodesLoadAverage',
 };
 
 interface GetNodesColumnsProps {
     tabletsPath?: string;
-    getNodeRef?: (node?: NodeAddress) => string | null;
+    getNodeRef?: GetNodeRefFunc;
 }
 
 const nodeIdColumn: Column<NodesPreparedEntity> = {
@@ -41,7 +39,7 @@ const nodeIdColumn: Column<NodesPreparedEntity> = {
 };
 
 const getHostColumn = (
-    getNodeRef?: (node?: NodeAddress) => string | null,
+    getNodeRef?: GetNodeRefFunc,
     fixedWidth = false,
 ): Column<NodesPreparedEntity> => ({
     name: NODES_COLUMNS_IDS.Host,
@@ -154,26 +152,19 @@ const getTabletsColumn = (tabletsPath?: string): Column<NodesPreparedEntity> => 
 });
 
 const topNodesLoadAverageColumn: Column<NodesPreparedEntity> = {
-    name: NODES_COLUMNS_IDS.LoadAverage,
+    name: NODES_COLUMNS_IDS.TopNodesLoadAverage,
     header: 'Load',
-    sortAccessor: ({LoadAverage = []}) =>
-        LoadAverage.slice(0, 1).reduce((acc, item) => acc + item, 0),
-    defaultOrder: DataTable.DESCENDING,
     render: ({row}) =>
         row.LoadAverage && row.LoadAverage.length > 0 ? (
-            <>
-                <Label
-                    theme={getLoadSeverityForNode(row.LoadAverage[0])}
-                    className={b('usage-label', {overload: row.LoadAverage[0] >= 90})}
-                >
-                    {row.LoadAverage[0].toFixed()}%
-                </Label>
-            </>
+            <UsageLabel
+                value={row.LoadAverage[0].toFixed()}
+                theme={getLoadSeverityForNode(row.LoadAverage[0])}
+            />
         ) : (
             '—'
         ),
     align: DataTable.LEFT,
-    width: 80,
+    width: '80px',
     sortable: false,
 };
 
@@ -195,14 +186,14 @@ export function getNodesColumns({
     ];
 }
 
-export function getTopNodesColumns(
-    getNodeRef?: (node?: NodeAddress) => string | null,
+export function getTopNodesByLoadColumns(
+    getNodeRef?: GetNodeRefFunc,
 ): Column<NodesPreparedEntity>[] {
     return [topNodesLoadAverageColumn, nodeIdColumn, getHostColumn(getNodeRef), versionColumn];
 }
 
-export function getTopPoolsColumns(
-    getNodeRef?: (node?: NodeAddress) => string | null,
+export function getTopNodesByCpuColumns(
+    getNodeRef?: GetNodeRefFunc,
 ): Column<NodesPreparedEntity>[] {
     return [cpuColumn, nodeIdColumn, getHostColumn(getNodeRef)];
 }

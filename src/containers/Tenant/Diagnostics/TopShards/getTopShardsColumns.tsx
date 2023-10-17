@@ -1,20 +1,19 @@
 import cn from 'bem-cn-lite';
 
 import DataTable, {type Column} from '@gravity-ui/react-data-table';
-import {Label} from '@gravity-ui/uikit';
 
 import type {KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import {formatNumber, roundToPrecision} from '../../../../utils/dataFormatters/dataFormatters';
-import {getLoadSeverityForShard} from '../../../../store/reducers/tenantOverview/executeTopShards/utils';
+import {getLoadSeverityForShard} from '../../../../store/reducers/tenantOverview/topShards/utils';
 import {InternalLink} from '../../../../components/InternalLink';
 import routes, {createHref} from '../../../../routes';
 import {getDefaultNodePath} from '../../../Node/NodePages';
+import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 
 import './TopShards.scss';
 
-const b = cn('top-shards');
-const bLink = cn('yc-link');
+const b = cn('yc-link');
 
 const TOP_SHARDS_COLUMNS_IDS = {
     TabletId: 'TabletId',
@@ -53,10 +52,7 @@ const getPathColumn = (
     render: ({row}) => {
         // row.Path - relative schema path
         return (
-            <span
-                onClick={onSchemaClick(tenantPath + row.Path)}
-                className={bLink({view: 'normal'})}
-            >
+            <span onClick={onSchemaClick(tenantPath + row.Path)} className={b({view: 'normal'})}>
                 {row.Path}
             </span>
         );
@@ -115,14 +111,10 @@ const topShardsCpuCoresColumn: Column<KeyValueRow> = {
     header: tableColumnsNames[TOP_SHARDS_COLUMNS_IDS.CPUCores],
     render: ({row}) => {
         return (
-            <>
-                <Label
-                    theme={getLoadSeverityForShard(Number(row.CPUCores) * 100)}
-                    className={b('usage-label', {overload: Number(row.CPUCores) * 100 >= 90})}
-                >
-                    {roundToPrecision(Number(row.CPUCores) * 100, 2)}%
-                </Label>
-            </>
+            <UsageLabel
+                value={roundToPrecision(Number(row.CPUCores) * 100, 2)}
+                theme={getLoadSeverityForShard(Number(row.CPUCores) * 100)}
+            />
         );
     },
     align: DataTable.RIGHT,
