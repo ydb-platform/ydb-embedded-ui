@@ -4,7 +4,7 @@ import {isEmpty} from 'lodash/fp';
 
 import {ArrowToggle, Button, Popover} from '@gravity-ui/uikit';
 
-import DataTable, {Column, Settings} from '@gravity-ui/react-data-table';
+import DataTable, {type Column} from '@gravity-ui/react-data-table';
 
 import type {ValueOf} from '../../../types/common';
 import type {
@@ -191,7 +191,7 @@ export function PDisk({
                 theme="yandex-cloud"
                 data={vDisks}
                 columns={getColumns({nodeHref, pDiskId: PDiskId, selectedVdiskId})}
-                settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false} as Settings}
+                settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
                 rowClassName={(row) => {
                     return row.id === selectedVdiskId ? b('selected-vdisk') : '';
                 }}
