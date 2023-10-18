@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, {type ReactNode, useEffect, useState} from 'react';
+import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import JSONTree from 'react-json-inspector';
 
@@ -11,13 +11,15 @@ import EnableFullscreenButton from '../../../../components/EnableFullscreenButto
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 
+import type {ValueOf} from '../../../../types/common';
+import type {IQueryResult, QueryErrorResponse} from '../../../../types/store/query';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
-
 import {prepareQueryError} from '../../../../utils/query';
+import {useTypedSelector} from '../../../../utils/hooks';
 
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 
-import ResultIssues from '../Issues/Issues';
+import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
 
 import './ExecuteResult.scss';
@@ -27,31 +29,51 @@ const b = cn('ydb-query-execute-result');
 const resultOptionsIds = {
     result: 'result',
     stats: 'stats',
-};
+} as const;
+
+type SectionID = ValueOf<typeof resultOptionsIds>;
 
 const resultOptions = [
     {value: resultOptionsIds.result, content: 'Result'},
     {value: resultOptionsIds.stats, content: 'Stats'},
 ];
 
-export function ExecuteResult(props) {
-    const [activeSection, setActiveSection] = useState(resultOptionsIds.result);
-    const isFullscreen = useSelector((state) => state.fullscreen);
+interface ExecuteResultProps {
+    textResults: string;
+    result: ReactNode;
+    stats: IQueryResult['stats'] | undefined;
+    error: string | QueryErrorResponse | undefined;
+    copyDisabled?: boolean;
+    isResultsCollapsed?: boolean;
+    onCollapseResults: VoidFunction;
+    onExpandResults: VoidFunction;
+}
+
+export function ExecuteResult({
+    textResults,
+    result,
+    stats,
+    error,
+    copyDisabled,
+    isResultsCollapsed,
+    onCollapseResults,
+    onExpandResults,
+}: ExecuteResultProps) {
+    const [activeSection, setActiveSection] = useState<SectionID>(resultOptionsIds.result);
+    const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useDispatch();
 
     useEffect(() => {
         return () => {
             dispatch(disableFullscreen());
         };
-    }, []);
+    }, [dispatch]);
 
-    const onSelectSection = (value) => {
-        setActiveSection(value);
+    const onSelectSection = (value: string) => {
+        setActiveSection(value as SectionID);
     };
 
     const renderClipboardButton = () => {
-        const {textResults, copyDisabled} = props;
-
         return (
             <CopyToClipboard
                 text={textResults}
@@ -65,7 +87,7 @@ export function ExecuteResult(props) {
     const renderStats = () => {
         const content = (
             <JSONTree
-                data={props.stats}
+                data={stats}
                 isExpanded={() => true}
                 className={b('inspector')}
                 searchOptions={{
@@ -86,8 +108,6 @@ export function ExecuteResult(props) {
     };
 
     const renderResult = () => {
-        const {result} = props;
-
         return (
             <React.Fragment>
                 {result}
@@ -101,11 +121,7 @@ export function ExecuteResult(props) {
     };
 
     const renderIssues = () => {
-        const error = props.error;
-
-        const hasIssues = error?.data?.issues && Array.isArray(error.data.issues);
-
-        if (hasIssues) {
+        if (typeof error === 'object' && error?.data?.issues && Array.isArray(error.data.issues)) {
             return (
                 <React.Fragment>
                     <ResultIssues data={error.data} />
@@ -121,19 +137,23 @@ export function ExecuteResult(props) {
         }
 
         if (error) {
-            return <div className={b('error')}>{prepareQueryError(error)}</div>;
+            const parsedError = typeof error === 'string' ? error : prepareQueryError(error);
+
+            return <div className={b('error')}>{parsedError}</div>;
         }
+
+        return null;
     };
 
     return (
         <React.Fragment>
             <div className={b('controls')}>
                 <div className={b('controls-right')}>
-                    <QueryExecutionStatus error={props.error} />
+                    <QueryExecutionStatus error={error} />
 
-                    {props.stats && !props.error && (
+                    {stats && !error && (
                         <React.Fragment>
-                            <QueryDuration duration={props.stats?.DurationUs} />
+                            <QueryDuration duration={stats?.DurationUs} />
                             <Divider />
                             <RadioButton
                                 options={resultOptions}
@@ -147,16 +167,16 @@ export function ExecuteResult(props) {
                     {renderClipboardButton()}
                     <EnableFullscreenButton />
                     <PaneVisibilityToggleButtons
-                        onCollapse={props.onCollapseResults}
-                        onExpand={props.onExpandResults}
-                        isCollapsed={props.isResultsCollapsed}
+                        onCollapse={onCollapseResults}
+                        onExpand={onExpandResults}
+                        isCollapsed={isResultsCollapsed}
                         initialDirection="bottom"
                     />
                 </div>
             </div>
             <div className={b('result')}>
-                {activeSection === resultOptionsIds.result && !props.error && renderResult()}
-                {activeSection === resultOptionsIds.stats && !props.error && renderStats()}
+                {activeSection === resultOptionsIds.result && !error && renderResult()}
+                {activeSection === resultOptionsIds.stats && !error && renderStats()}
                 {renderIssues()}
             </div>
         </React.Fragment>
