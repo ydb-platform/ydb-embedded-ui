@@ -14,6 +14,7 @@ const b = cn('kv-query-execution-status');
 
 interface QueryExecutionStatusProps {
     className?: string;
+    // TODO: Remove Record<string, any> when ECONNABORTED error case is fully typed
     error?: AxiosError | Record<string, any> | string;
 }
 

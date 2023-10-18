@@ -121,7 +121,11 @@ export function ExecuteResult({
     };
 
     const renderIssues = () => {
-        if (typeof error === 'object' && error?.data?.issues && Array.isArray(error.data.issues)) {
+        if (!error) {
+            return null;
+        }
+
+        if (typeof error === 'object' && error.data?.issues && Array.isArray(error.data.issues)) {
             return (
                 <React.Fragment>
                     <ResultIssues data={error.data} />
@@ -136,13 +140,9 @@ export function ExecuteResult({
             );
         }
 
-        if (error) {
-            const parsedError = typeof error === 'string' ? error : prepareQueryError(error);
+        const parsedError = typeof error === 'string' ? error : prepareQueryError(error);
 
-            return <div className={b('error')}>{parsedError}</div>;
-        }
-
-        return null;
+        return <div className={b('error')}>{parsedError}</div>;
     };
 
     return (
