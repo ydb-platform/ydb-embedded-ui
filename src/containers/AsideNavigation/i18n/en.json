@@ -1,0 +1,13 @@
+{
+  "pages.query": "Query",
+  "pages.diagnostics": "Diagnostics",
+
+  "navigation-item.documentation": "Documentation",
+  "navigation-item.settings": "Settings",
+  "navigation-item.account": "Account",
+
+  "account.user": "YDB User",
+
+  "account.login": "Login",
+  "account.logout": "Logout"
+}

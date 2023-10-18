@@ -28,6 +28,7 @@ import {ASIDE_HEADER_COMPACT_KEY, TENANT_INITIAL_PAGE_KEY} from '../../utils/con
 import {getTenantPath} from '../Tenant/TenantPages';
 import {UserSettings} from '../UserSettings/UserSettings';
 
+import i18n from './i18n';
 import './AsideNavigation.scss';
 
 const b = cn('kv-navigation');
@@ -58,15 +59,19 @@ function YbdInternalUser({ydbUser, logout}: YbdInternalUserProps) {
     return (
         <div className={b('internal-user')}>
             <div className={b('user-info-wrapper')}>
-                <div className={b('ydb-internal-user-title')}>YDB user</div>
+                <div className={b('ydb-internal-user-title')}>{i18n('account.user')}</div>
                 {ydbUser && <div className={b('username')}>{ydbUser}</div>}
             </div>
             {ydbUser ? (
-                <Button view="flat-secondary" onClick={logout} title="logout">
+                <Button view="flat-secondary" title={i18n('account.logout')} onClick={logout}>
                     <Icon data={signOutIcon} size={16} />
                 </Button>
             ) : (
-                <Button view="flat-secondary" title="login" onClick={handleLoginClick}>
+                <Button
+                    view="flat-secondary"
+                    title={i18n('account.login')}
+                    onClick={handleLoginClick}
+                >
                     <Icon data={signInIcon} size={16} />
                 </Button>
             )}
@@ -91,7 +96,7 @@ function YdbUserDropdown({isCompact, popupAnchor, ydbUser}: YdbUserDropdownProps
             compact={isCompact}
             item={{
                 id: 'user-popup',
-                title: ydbUser?.login ?? 'Account',
+                title: ydbUser?.login ?? i18n('navigation-item.account'),
                 current: isUserDropdownVisible,
                 icon: iconData,
                 iconSize: 22,
@@ -142,7 +147,7 @@ export const useGetLeftNavigationItems = () => {
         const items: MenuItem[] = [
             {
                 id: TENANT_PAGES_IDS.query,
-                title: 'Query',
+                title: i18n('pages.query'),
                 icon: terminalIcon,
                 iconSize: 20,
                 location: getTenantPath({
@@ -152,7 +157,7 @@ export const useGetLeftNavigationItems = () => {
             },
             {
                 id: TENANT_PAGES_IDS.diagnostics,
-                title: 'Diagnostics',
+                title: i18n('pages.diagnostics'),
                 icon: pulseIcon,
                 iconSize: 20,
                 location: getTenantPath({
@@ -212,7 +217,7 @@ function AsideNavigation(props: AsideNavigationProps) {
                             compact={compact}
                             item={{
                                 id: 'documentation',
-                                title: 'Documentation',
+                                title: i18n('navigation-item.documentation'),
                                 icon: supportIcon,
                                 iconSize: 24,
                                 onItemClick: () => {
@@ -224,7 +229,7 @@ function AsideNavigation(props: AsideNavigationProps) {
                         <FooterItem
                             item={{
                                 id: 'user-settings',
-                                title: 'Settings',
+                                title: i18n('navigation-item.settings'),
                                 icon: settingsIcon,
                                 iconSize: 24,
                                 current: visiblePanel === Panel.UserSettings,
