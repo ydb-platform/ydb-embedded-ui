@@ -1,7 +1,7 @@
 import cn from 'bem-cn-lite';
 
 import DataTable from '@gravity-ui/react-data-table';
-import type {DataTableProps, THEMES} from '@gravity-ui/react-data-table';
+import type {DataTableProps} from '@gravity-ui/react-data-table';
 
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
@@ -14,7 +14,6 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 const b = cn('tenant-overview');
 
 interface TenantOverviewTableLayoutProps<T> extends Omit<DataTableProps<T>, 'theme'> {
-    theme?: THEMES | string;
     title: string;
     loading?: boolean;
     wasLoaded?: boolean;
@@ -26,13 +25,11 @@ interface TenantOverviewTableLayoutProps<T> extends Omit<DataTableProps<T>, 'the
 
 export function TenantOverviewTableLayout<T>({
     title,
-    data,
-    columns,
     error,
     loading,
     wasLoaded,
-    emptyDataMessage,
     tableClassNameModifiers = {},
+    ...props
 }: TenantOverviewTableLayoutProps<T>) {
     const renderContent = () => {
         if (error) {
@@ -44,13 +41,7 @@ export function TenantOverviewTableLayout<T>({
         }
 
         return (
-            <DataTable
-                theme="yandex-cloud"
-                data={data || []}
-                columns={columns}
-                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
-                emptyDataMessage={emptyDataMessage}
-            />
+            <DataTable theme="yandex-cloud" settings={TENANT_OVERVIEW_TABLES_SETTINGS} {...props} />
         );
     };
     return (

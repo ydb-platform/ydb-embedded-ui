@@ -9,9 +9,13 @@ interface UsageLabelProps extends LabelProps {
     overloadThreshold?: number;
 }
 
-export function UsageLabel({value, overloadThreshold = 90, theme}: UsageLabelProps) {
+export function UsageLabel({value, overloadThreshold = 90, theme, ...props}: UsageLabelProps) {
     return (
-        <Label theme={theme} className={b({overload: Number(value) >= overloadThreshold})}>
+        <Label
+            theme={theme}
+            className={b({overload: Number(value) >= overloadThreshold})}
+            {...props}
+        >
             {value || 0}%
         </Label>
     );

@@ -1,7 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {useHistory, useLocation} from 'react-router';
-import qs from 'qs';
 import cn from 'bem-cn-lite';
 
 import DataTable from '@gravity-ui/react-data-table';
@@ -29,12 +28,12 @@ import {
 import {HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
-
+import {parseQuery} from '../../../../routes';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {isColumnEntityType} from '../../utils/schema';
 import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
-
 import {getTopQueriesColumns} from './getTopQueriesColumns';
+
 import i18n from './i18n';
 import './TopQueries.scss';
 
@@ -128,9 +127,7 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
 
             dispatch(changeUserInput({input}));
 
-            const queryParams = qs.parse(location.search, {
-                ignoreQueryPrefix: true,
-            });
+            const queryParams = parseQuery(location);
 
             const queryPath = getTenantPath({
                 ...queryParams,

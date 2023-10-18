@@ -1,10 +1,7 @@
 import {useDispatch} from 'react-redux';
 
-import {type Column} from '@gravity-ui/react-data-table';
-
 import {getSchema, setCurrentSchemaPath} from '../../../../../store/reducers/schema/schema';
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
-import type {KeyValueRow} from '../../../../../types/api/query';
 import {
     sendTenantOverviewTopShardsQuery,
     setDataWasNotLoaded,
@@ -47,7 +44,7 @@ export const TopShards = ({path}: TopShardsProps) => {
         };
     };
 
-    const columns: Column<KeyValueRow>[] = getTopShardsColumns(onSchemaClick, path);
+    const columns = getTopShardsColumns(onSchemaClick, path);
 
     return (
         <TenantOverviewTableLayout
