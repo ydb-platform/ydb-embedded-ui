@@ -25,12 +25,6 @@
         overflow-x: hidden;
     }
 
-    &__details-loader {
-        display: flex;
-
-        justify-content: center;
-    }
-
     &__preview {
         height: 100%;
     }
@@ -56,14 +50,6 @@
         margin-bottom: 4px;
 
         gap: 8px;
-    }
-
-    &__preview-loader {
-        height: 100%;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     &__issues-statistics {

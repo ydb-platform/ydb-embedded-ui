@@ -1,6 +1,6 @@
 import cn from 'bem-cn-lite';
 
-import {Button, Icon, Loader} from '@gravity-ui/uikit';
+import {Button, Icon} from '@gravity-ui/uikit';
 
 import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
@@ -9,6 +9,7 @@ import type {IResponseError} from '../../../../../types/api/error';
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
+import {Loader} from '../../../../../components/Loader';
 
 import i18n from './i18n';
 import './Healthcheck.scss';
@@ -31,6 +32,10 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const renderHeader = () => {
         const modifier = selfCheckResult.toLowerCase();
 
+        if (loading && !wasLoaded) {
+            return null;
+        }
+
         return (
             <div className={b('preview-header')}>
                 <div className={b('preview-title-wrapper')}>
@@ -49,6 +54,10 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const renderContent = () => {
         if (error) {
             return <ResponseError error={error} defaultMessage={i18n('no-data')} />;
+        }
+
+        if (loading && !wasLoaded) {
+            return <Loader size="m" />;
         }
 
         return (
@@ -74,14 +83,6 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
             </div>
         );
     };
-
-    if (loading && !wasLoaded) {
-        return (
-            <DiagnosticCard className={b('preview-loader')} active={active}>
-                <Loader size="m" />
-            </DiagnosticCard>
-        );
-    }
 
     return (
         <DiagnosticCard className={b('preview')} active={active}>

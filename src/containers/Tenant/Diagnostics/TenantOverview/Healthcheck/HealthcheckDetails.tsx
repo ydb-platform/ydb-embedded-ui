@@ -1,10 +1,9 @@
 import cn from 'bem-cn-lite';
 
-import {Loader} from '@gravity-ui/uikit';
-
 import type {IResponseError} from '../../../../../types/api/error';
 import type {IIssuesTree} from '../../../../../types/store/healthcheck';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
+import {Loader} from '../../../../../components/Loader';
 
 import IssueTree from './IssuesViewer/IssueTree';
 
@@ -29,7 +28,7 @@ export function HealthcheckDetails(props: HealthcheckDetailsProps) {
         }
 
         if (loading && !wasLoaded) {
-            return <Loader className={b('details-loader')} size="m" />;
+            return <Loader size="m" />;
         }
 
         if (!issueTrees || !issueTrees.length) {
