@@ -2,8 +2,7 @@ import type {Location} from 'history';
 
 import {Link, type LinkProps} from '@gravity-ui/uikit';
 
-import {parseQuery} from '../../routes';
-import {getTenantPath} from '../../containers/Tenant/TenantPages';
+import {getSchemaObjectPath, parseQuery} from '../../routes';
 
 interface LinkToSchemaObjectProps extends LinkProps {
     path: string;
@@ -12,6 +11,10 @@ interface LinkToSchemaObjectProps extends LinkProps {
 
 export function LinkToSchemaObject({path, location, ...props}: LinkToSchemaObjectProps) {
     const queryParams = parseQuery(location);
+    const pathToSchemaObject = getSchemaObjectPath({
+        ...queryParams,
+        schema: path,
+    });
 
-    return <Link view="normal" href={getTenantPath({...queryParams, schema: path})} {...props} />;
+    return <Link view="normal" href={pathToSchemaObject} {...props} />;
 }

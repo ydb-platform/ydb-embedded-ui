@@ -49,4 +49,9 @@ export function createHref(
     return `${compile(route)(params)}${search}`;
 }
 
+// embedded version could be located in some folder (e.g. host/some_folder/app_router_path)
+// window.location has the full pathname, while location from router ignores path to project
+export const getSchemaObjectPath = (query = {}) =>
+    createHref(window.location.pathname, undefined, query);
+
 export default routes;
