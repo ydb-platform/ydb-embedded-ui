@@ -1,6 +1,7 @@
 import type {TComputeInfo, TComputeNodeInfo, TComputeTenantInfo} from '../../../types/api/compute';
 import type {TNodesInfo} from '../../../types/api/nodes';
 import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
+import {generateEvaluator} from '../../../utils/generateEvaluator';
 
 import type {NodesHandledResponse, NodesPreparedEntity} from './types';
 
@@ -64,3 +65,5 @@ export const prepareNodesData = (data: TNodesInfo): NodesHandledResponse => {
         FoundNodes: Number(data.FoundNodes),
     };
 };
+
+export const getLoadSeverityForNode = generateEvaluator(60, 80, ['success', 'warning', 'danger']);

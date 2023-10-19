@@ -1,6 +1,9 @@
 @import '../../../../styles/mixins.scss';
 
 .tenant-overview {
+    overflow: auto;
+
+    height: 100%;
     padding-bottom: 20px;
 
     &__loader {
@@ -79,6 +82,13 @@
         font-size: var(--yc-text-body-2-font-size);
         font-weight: 600;
         line-height: var(--yc-text-body-2-line-height);
+    }
+
+    &__info {
+        position: sticky;
+        left: 0;
+
+        width: max-content;
     }
 
     &__title {

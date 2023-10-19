@@ -16,9 +16,9 @@ import {TenantCpu} from './TenantCpu/TenantCpu';
 import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
 import {TenantStorage} from './TenantStorage/TenantStorage';
+import {TenantMemory} from './TenantMemory/TenantMemory';
 import {useHealthcheck} from './useHealthcheck';
 
-import i18n from './i18n';
 import './TenantOverview.scss';
 
 const b = cn('tenant-overview');
@@ -127,7 +127,7 @@ export function TenantOverview({
                 return <TenantStorage tenantName={tenantName} metrics={storageMetrics} />;
             }
             case TENANT_METRICS_TABS_IDS.memory: {
-                return i18n('label.under-development');
+                return <TenantMemory path={tenantName} />;
             }
             case TENANT_METRICS_TABS_IDS.healthcheck: {
                 return <HealthcheckDetails issueTrees={issueTrees} error={healthcheckError} />;
@@ -148,19 +148,21 @@ export function TenantOverview({
 
     return (
         <div className={b()}>
-            <div className={b('top-label')}>{tenantType}</div>
-            <div className={b('top')}>
-                {renderName()}
-                {additionalTenantProps?.getMonitoringLink?.(Name, Type)}
+            <div className={b('info')}>
+                <div className={b('top-label')}>{tenantType}</div>
+                <div className={b('top')}>
+                    {renderName()}
+                    {additionalTenantProps?.getMonitoringLink?.(Name, Type)}
+                </div>
+                <MetricsCards
+                    metrics={calculatedMetrics}
+                    issuesStatistics={issuesStatistics}
+                    selfCheckResult={selfCheckResult}
+                    fetchHealthcheck={fetchHealthcheck}
+                    healthcheckLoading={healthcheckLoading}
+                    healthcheckError={healthcheckError}
+                />
             </div>
-            <MetricsCards
-                metrics={calculatedMetrics}
-                issuesStatistics={issuesStatistics}
-                selfCheckResult={selfCheckResult}
-                fetchHealthcheck={fetchHealthcheck}
-                healthcheckLoading={healthcheckLoading}
-                healthcheckError={healthcheckError}
-            />
             {renderTabContent()}
         </div>
     );

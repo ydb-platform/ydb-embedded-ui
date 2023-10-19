@@ -3,6 +3,7 @@ import {combineReducers} from 'redux';
 import nodes from './nodes/nodes';
 import {topNodesByLoad} from './tenantOverview/topNodesByLoad/topNodesByLoad';
 import {topNodesByCpu} from './tenantOverview/topNodesByCpu/topNodesByCpu';
+import {topNodesByMemory} from './tenantOverview/topNodesByMemory/topNodesByMemory';
 import cluster from './cluster/cluster';
 import clusterNodes from './clusterNodes/clusterNodes';
 import tenant from './tenant/tenant';
@@ -47,6 +48,7 @@ export const rootReducer = {
     nodes,
     topNodesByLoad,
     topNodesByCpu,
+    topNodesByMemory,
     cluster,
     clusterNodes,
     tenant,

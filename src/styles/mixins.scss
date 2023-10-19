@@ -177,6 +177,10 @@
             .data-table__table-wrapper {
                 padding-bottom: 20px;
             }
+
+            &_sticky-head_fixed {
+                overflow: initial;
+            }
         }
     }
 }

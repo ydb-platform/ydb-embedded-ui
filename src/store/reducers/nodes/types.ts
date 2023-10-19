@@ -33,6 +33,7 @@ export interface NodesPreparedEntity {
     StartTime?: string;
     Uptime: string;
     MemoryUsed?: string;
+    MemoryLimit?: string;
     PoolStats?: TPoolStats[];
     LoadAverage?: number[];
     Tablets?: TFullTabletStateInfo[] | TComputeTabletStateInfo[];
