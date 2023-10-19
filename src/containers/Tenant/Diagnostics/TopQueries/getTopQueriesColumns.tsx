@@ -5,6 +5,7 @@ import DataTable, {type Column} from '@gravity-ui/react-data-table';
 import type {KeyValueRow} from '../../../../types/api/query';
 import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {TopQueriesTruncatedQuery} from '../../../../components/TruncatedQuery/TopQueriesTruncatedQuery';
 import {MAX_QUERY_HEIGHT} from '../../utils/constants';
 
 import './TopQueries.scss';
@@ -18,6 +19,7 @@ const TOP_QUERIES_COLUMNS_IDS = {
     ReadRows: 'ReadRows',
     ReadBytes: 'ReadBytes',
     UserSID: 'UserSID',
+    TopQueriesQueryText: 'TopQueriesQueryText',
 };
 
 const cpuTimeUsColumn: Column<KeyValueRow> = {
@@ -66,6 +68,12 @@ const userSIDColumn: Column<KeyValueRow> = {
     align: DataTable.LEFT,
 };
 
+const topQueriesQueryTextColumn: Column<KeyValueRow> = {
+    name: TOP_QUERIES_COLUMNS_IDS.TopQueriesQueryText,
+    render: ({row}) => <TopQueriesTruncatedQuery value={row.QueryText?.toString()} />,
+    sortable: false,
+};
+
 export const getTopQueriesColumns = (): Column<KeyValueRow>[] => {
     return [
         cpuTimeUsColumn,
@@ -78,5 +86,5 @@ export const getTopQueriesColumns = (): Column<KeyValueRow>[] => {
 };
 
 export const getTenantOverviewTopQueriesColumns = (): Column<KeyValueRow>[] => {
-    return [queryTextColumn, cpuTimeUsColumn];
+    return [topQueriesQueryTextColumn, cpuTimeUsColumn];
 };

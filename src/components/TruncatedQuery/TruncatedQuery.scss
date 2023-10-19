@@ -14,4 +14,12 @@
             }
         }
     }
+
+    &__popover-content {
+        overflow: hidden;
+
+        max-width: 600px;
+
+        white-space: pre;
+    }
 }

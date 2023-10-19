@@ -30,6 +30,7 @@ import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
 import {parseQuery} from '../../../../routes';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
+import {isSortableTopQueriesProperty} from '../../../../utils/diagnostics';
 import {isColumnEntityType} from '../../utils/schema';
 import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 import {getTopQueriesColumns} from './getTopQueriesColumns';
@@ -58,7 +59,7 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
         data: {result: data = undefined} = {},
         filters: storeFilters,
     } = useTypedSelector((state) => state.executeTopQueries);
-    const columns = getTopQueriesColumns();
+    const rawColumns = getTopQueriesColumns();
 
     const preventFetch = useRef(false);
 
@@ -70,6 +71,11 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
     useEffect(() => {
         dispatch(setTopQueriesFilters(filters));
     }, [dispatch, filters]);
+
+    const columns = rawColumns.map((column) => ({
+        ...column,
+        sortable: isSortableTopQueriesProperty(column.name),
+    }));
 
     const setDefaultFiltersFromResponse = (responseData?: IQueryResult) => {
         const intervalEnd = responseData?.result?.[0]?.IntervalEnd;
