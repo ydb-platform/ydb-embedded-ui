@@ -1,16 +1,10 @@
 import type {Reducer} from 'redux';
 
-import '../../services/api';
-import type {
-    IShardsWorkloadAction,
-    IShardsWorkloadFilters,
-    IShardsWorkloadState,
-} from '../../types/store/shardsWorkload';
-import {EShardsWorkloadMode} from '../../types/store/shardsWorkload';
-
-import {parseQueryAPIExecuteResponse} from '../../utils/query';
-
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import '../../../services/api';
+import {parseQueryAPIExecuteResponse} from '../../../utils/query';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
+import type {IShardsWorkloadAction, IShardsWorkloadFilters, IShardsWorkloadState} from './types';
+import {EShardsWorkloadMode} from './types';
 
 export const SEND_SHARD_QUERY = createRequestActionTypes('query', 'SEND_SHARD_QUERY');
 const SET_SHARD_STATE = 'query/SET_SHARD_STATE';

@@ -2,6 +2,8 @@
   "no-data": "No data",
   "no-pools-data": "No pools data",
 
+  "top-nodes.empty-data": "No such nodes",
+
   "title.pools": "Pools",
   "title.metrics": "Metrics",
 

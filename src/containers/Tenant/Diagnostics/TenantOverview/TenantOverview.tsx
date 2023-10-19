@@ -9,9 +9,10 @@ import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
-import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
+import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
+import {TenantCpu} from './TenantCpu/TenantCpu';
 import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
 import {TenantStorage} from './TenantStorage/TenantStorage';
@@ -25,9 +26,14 @@ const b = cn('tenant-overview');
 interface TenantOverviewProps {
     tenantName: string;
     additionalTenantProps?: AdditionalTenantsProps;
+    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TenantOverview({tenantName, additionalTenantProps}: TenantOverviewProps) {
+export function TenantOverview({
+    tenantName,
+    additionalTenantProps,
+    additionalNodesProps,
+}: TenantOverviewProps) {
     const dispatch = useDispatch();
 
     const {
@@ -115,7 +121,7 @@ export function TenantOverview({tenantName, additionalTenantProps}: TenantOvervi
     const renderTabContent = () => {
         switch (metricsTab) {
             case TENANT_METRICS_TABS_IDS.cpu: {
-                return i18n('label.under-development');
+                return <TenantCpu path={tenantName} additionalNodesProps={additionalNodesProps} />;
             }
             case TENANT_METRICS_TABS_IDS.storage: {
                 return <TenantStorage tenantName={tenantName} metrics={storageMetrics} />;

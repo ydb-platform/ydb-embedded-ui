@@ -1,6 +1,8 @@
 import {combineReducers} from 'redux';
 
 import nodes from './nodes/nodes';
+import {topNodesByLoad} from './tenantOverview/topNodesByLoad/topNodesByLoad';
+import {topNodesByCpu} from './tenantOverview/topNodesByCpu/topNodesByCpu';
 import cluster from './cluster/cluster';
 import clusterNodes from './clusterNodes/clusterNodes';
 import tenant from './tenant/tenant';
@@ -26,10 +28,12 @@ import preview from './preview';
 import nodesList from './nodesList';
 import describe from './describe';
 import schemaAcl from './schemaAcl/schemaAcl';
-import executeTopQueries from './executeTopQueries';
+import executeTopQueries from './executeTopQueries/executeTopQueries';
+import {tenantOverviewTopQueries} from './tenantOverview/topQueries/tenantOverviewTopQueries';
 import executeTopTables from './tenantOverview/executeTopTables/executeTopTables';
 import healthcheckInfo from './healthcheckInfo';
-import shardsWorkload from './shardsWorkload';
+import shardsWorkload from './shardsWorkload/shardsWorkload';
+import {tenantOverviewTopShards} from './tenantOverview/topShards/tenantOverviewTopShards';
 import hotKeys from './hotKeys';
 import olapStats from './olapStats';
 import authentication from './authentication/authentication';
@@ -41,6 +45,8 @@ import singleClusterMode from './singleClusterMode';
 export const rootReducer = {
     singleClusterMode,
     nodes,
+    topNodesByLoad,
+    topNodesByCpu,
     cluster,
     clusterNodes,
     tenant,
@@ -69,8 +75,10 @@ export const rootReducer = {
     schemaAcl,
     executeTopQueries,
     executeTopTables,
+    tenantOverviewTopQueries,
     healthcheckInfo,
     shardsWorkload,
+    tenantOverviewTopShards,
     hotKeys,
     authentication,
     header,

@@ -2,6 +2,8 @@
   "no-data": "Нет данных",
   "no-pools-data": "Нет данных о пулах",
 
+  "top-nodes.empty-data": "Нет узлов",
+
   "title.pools": "Пулы",
   "title.metrics": "Метрики",
 

@@ -26,7 +26,11 @@ import {
     useNodesRequestParams,
     useTableSort,
 } from '../../utils/hooks';
-import {isUnavailableNode, NodesUptimeFilterValues} from '../../utils/nodes';
+import {
+    isSortableNodesProperty,
+    isUnavailableNode,
+    NodesUptimeFilterValues,
+} from '../../utils/nodes';
 
 import {
     getNodes,
@@ -153,8 +157,12 @@ export const Nodes = ({path, type, additionalNodesProps = {}}: NodesProps) => {
     };
 
     const renderTable = () => {
-        const columns = getNodesColumns({
+        const rawColumns = getNodesColumns({
             getNodeRef: additionalNodesProps.getNodeRef,
+        });
+
+        const columns = rawColumns.map((column) => {
+            return {...column, sortable: isSortableNodesProperty(column.name)};
         });
 
         if (nodes && nodes.length === 0) {

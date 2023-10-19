@@ -1,10 +1,6 @@
-import {
-    SEND_SHARD_QUERY,
-    setShardsState,
-    setShardsQueryFilters,
-} from '../../store/reducers/shardsWorkload';
-import type {ApiRequestAction} from '../../store/utils';
-import type {IQueryResult, QueryErrorResponse} from './query';
+import {SEND_SHARD_QUERY, setShardsState, setShardsQueryFilters} from './shardsWorkload';
+import type {ApiRequestAction} from '../../utils';
+import type {IQueryResult, QueryErrorResponse} from '../../../types/store/query';
 
 export enum EShardsWorkloadMode {
     Immediate = 'immediate',
