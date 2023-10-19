@@ -1,6 +1,6 @@
 import {useDispatch} from 'react-redux';
+import {useLocation} from 'react-router';
 
-import {getSchema, setCurrentSchemaPath} from '../../../../../store/reducers/schema/schema';
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {
     sendTenantOverviewTopShardsQuery,
@@ -15,6 +15,7 @@ interface TopShardsProps {
 
 export const TopShards = ({path}: TopShardsProps) => {
     const dispatch = useDispatch();
+    const location = useLocation();
 
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
 
@@ -36,15 +37,7 @@ export const TopShards = ({path}: TopShardsProps) => {
         autorefresh,
     );
 
-    const onSchemaClick = (schemaPath: string) => {
-        return () => {
-            dispatch(setCurrentSchemaPath(schemaPath));
-            dispatch(getSchema({path: schemaPath}));
-            history.go(0);
-        };
-    };
-
-    const columns = getTopShardsColumns(onSchemaClick, path);
+    const columns = getTopShardsColumns(path, location);
 
     return (
         <TenantOverviewTableLayout

@@ -1,18 +1,16 @@
-import {useState, useContext, useEffect, useMemo} from 'react';
+import {useState, useEffect, useMemo} from 'react';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
+import {useLocation} from 'react-router';
 
 import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
-
-import HistoryContext from '../../../../contexts/HistoryContext';
 
 import {
     sendShardQuery,
     setShardsState,
     setShardsQueryFilters,
 } from '../../../../store/reducers/shardsWorkload/shardsWorkload';
-import {setCurrentSchemaPath, getSchema} from '../../../../store/reducers/schema/schema';
 import {
     EShardsWorkloadMode,
     type IShardsWorkloadFilters,
@@ -26,7 +24,6 @@ import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constan
 import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
 import {isSortableTopShardsProperty} from '../../../../utils/diagnostics';
-
 import {isColumnEntityType} from '../../utils/schema';
 
 import {Filters} from './Filters';
@@ -99,6 +96,7 @@ interface TopShardsProps {
 
 export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     const dispatch = useDispatch();
+    const location = useLocation();
 
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
 
@@ -153,8 +151,6 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         );
     }, [dispatch, currentSchemaPath, tenantPath, filters]);
 
-    const history = useContext(HistoryContext);
-
     const onSort = (newSortOrder?: SortOrder | SortOrder[]) => {
         // omit information about sort order to disable ASC order, only DESC makes sense for top shards
         // use a string (and not the DataTable default format) to prevent reference change,
@@ -184,18 +180,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     };
 
     const tableColumns = useMemo(() => {
-        const onSchemaClick = (schemaPath: string) => {
-            return () => {
-                dispatch(setCurrentSchemaPath(schemaPath));
-                dispatch(getSchema({path: schemaPath}));
-                history.go(0);
-            };
-        };
-
-        const rawColumns: Column<KeyValueRow>[] = getShardsWorkloadColumns(
-            onSchemaClick,
-            tenantPath,
-        );
+        const rawColumns: Column<KeyValueRow>[] = getShardsWorkloadColumns(tenantPath, location);
 
         const columns: Column<KeyValueRow>[] = rawColumns.map((column) => ({
             ...column,
@@ -220,7 +205,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         }
 
         return columns;
-    }, [dispatch, filters.mode, history, tenantPath]);
+    }, [filters.mode, tenantPath, location]);
 
     const renderLoader = () => {
         return (
