@@ -70,17 +70,18 @@ export function TopTables({path}: TopTablesProps) {
         {
             name: 'Path',
             sortable: false,
-            render: ({row}) => (
-                <LinkToSchemaObject
-                    className={b('cell-with-popover-wrapper')}
-                    path={row.Path as string}
-                    location={location}
-                >
-                    <Popover className={b('cell-with-popover')} content={row.Path}>
-                        {row.Path}
-                    </Popover>
-                </LinkToSchemaObject>
-            ),
+            render: ({row}) =>
+                row.Path ? (
+                    <LinkToSchemaObject
+                        className={b('cell-with-popover-wrapper')}
+                        path={String(row.Path)}
+                        location={location}
+                    >
+                        <Popover className={b('cell-with-popover')} content={row.Path}>
+                            {row.Path}
+                        </Popover>
+                    </LinkToSchemaObject>
+                ) : null,
         },
     ];
 
