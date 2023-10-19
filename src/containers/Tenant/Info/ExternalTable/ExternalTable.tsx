@@ -3,7 +3,7 @@ import block from 'bem-cn-lite';
 
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {useTypedSelector} from '../../../../utils/hooks';
-import {createHref, parseQuery} from '../../../../routes';
+import {createExternalUILink, parseQuery} from '../../../../routes';
 import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
 import {InfoViewer, InfoViewerItem} from '../../../../components/InfoViewer';
 import {ExternalLinkWithIcon} from '../../../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
@@ -72,9 +72,7 @@ const ExternalTable = ({data, prepareData}: ExternalTableProps) => {
     const location = useLocation();
     const query = parseQuery(location);
 
-    // embedded version could be located in some folder (e.g. host/some_folder/app_router_path)
-    // window.location has the full pathname, while location from router ignores path to project
-    const pathToDataSource = createHref(window.location.pathname, undefined, {
+    const pathToDataSource = createExternalUILink({
         ...query,
         schema: data?.PathDescription?.ExternalTableDescription?.DataSourcePath,
     });
