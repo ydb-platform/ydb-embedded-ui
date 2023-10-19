@@ -2,7 +2,7 @@ import type {Location} from 'history';
 
 import {Link, type LinkProps} from '@gravity-ui/uikit';
 
-import {getSchemaObjectPath, parseQuery} from '../../routes';
+import {createExternalUILink, parseQuery} from '../../routes';
 
 interface LinkToSchemaObjectProps extends LinkProps {
     path: string;
@@ -11,7 +11,7 @@ interface LinkToSchemaObjectProps extends LinkProps {
 
 export function LinkToSchemaObject({path, location, ...props}: LinkToSchemaObjectProps) {
     const queryParams = parseQuery(location);
-    const pathToSchemaObject = getSchemaObjectPath({
+    const pathToSchemaObject = createExternalUILink({
         ...queryParams,
         schema: path,
     });

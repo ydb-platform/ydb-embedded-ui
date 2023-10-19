@@ -3,7 +3,7 @@ import block from 'bem-cn-lite';
 
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {useTypedSelector} from '../../../../utils/hooks';
-import {getSchemaObjectPath, parseQuery} from '../../../../routes';
+import {createExternalUILink, parseQuery} from '../../../../routes';
 import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
 import {InfoViewer, InfoViewerItem} from '../../../../components/InfoViewer';
 import {ExternalLinkWithIcon} from '../../../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
@@ -72,7 +72,7 @@ const ExternalTable = ({data, prepareData}: ExternalTableProps) => {
     const location = useLocation();
     const query = parseQuery(location);
 
-    const pathToDataSource = getSchemaObjectPath({
+    const pathToDataSource = createExternalUILink({
         ...query,
         schema: data?.PathDescription?.ExternalTableDescription?.DataSourcePath,
     });
