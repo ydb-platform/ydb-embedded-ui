@@ -1,43 +1,19 @@
 import React from 'react';
 import cn from 'bem-cn-lite';
 
-import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
+import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {
     formatStorageValuesToGb,
     stringifyVdiskId,
 } from '../../../utils/dataFormatters/dataFormatters';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
-import {valueIsDefined} from './NodeStructure';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
+
+import {valueIsDefined} from './NodeStructure';
 
 const b = cn('kv-node-structure');
-
-interface VdiskProps {
-    AllocatedSize?: string;
-    DiskSpace?: string;
-    FrontQueues?: string;
-    Guid?: string;
-    Replicated?: boolean;
-    VDiskState?: string;
-    VDiskId?: {
-        GroupId: number;
-        GroupGeneration: number;
-        Ring: number;
-        Domain: number;
-        VDisk: number;
-    };
-    VDiskSlotId?: number;
-    Kind?: string;
-    SatisfactionRank?: {FreshRank: {Flag: string}; LevelRank: {Flag: string}};
-    AvailableSize?: string;
-    HasUnreadableBlobs?: boolean;
-    IncarnationGuid?: string;
-    InstanceGuid?: string;
-    StoragePoolName?: string;
-    ReadThroughput?: string;
-    WriteThroughput?: string;
-}
 
 export function Vdisk({
     AllocatedSize,
@@ -57,7 +33,7 @@ export function Vdisk({
     StoragePoolName,
     ReadThroughput,
     WriteThroughput,
-}: VdiskProps) {
+}: TVDiskStateInfo) {
     const vdiskInfo = [];
 
     if (valueIsDefined(VDiskSlotId)) {
@@ -81,16 +57,16 @@ export function Vdisk({
             value: <EntityStatus status={DiskSpace} />,
         });
     }
-    if (valueIsDefined(SatisfactionRank?.FreshRank.Flag)) {
+    if (valueIsDefined(SatisfactionRank?.FreshRank?.Flag)) {
         vdiskInfo.push({
             label: 'Fresh Rank Satisfaction',
-            value: <EntityStatus status={SatisfactionRank?.FreshRank.Flag} />,
+            value: <EntityStatus status={SatisfactionRank?.FreshRank?.Flag} />,
         });
     }
-    if (valueIsDefined(SatisfactionRank?.LevelRank.Flag)) {
+    if (valueIsDefined(SatisfactionRank?.LevelRank?.Flag)) {
         vdiskInfo.push({
             label: 'Level Rank Satisfaction',
-            value: <EntityStatus status={SatisfactionRank?.LevelRank.Flag} />,
+            value: <EntityStatus status={SatisfactionRank?.LevelRank?.Flag} />,
         });
     }
     vdiskInfo.push({label: 'Replicated', value: Replicated ? 'Yes' : 'No'});
