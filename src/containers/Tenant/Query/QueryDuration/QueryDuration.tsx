@@ -8,7 +8,7 @@ import i18n from '../i18n';
 import './QueryDuration.scss';
 
 interface QueryDurationProps {
-    duration?: string;
+    duration?: string | number;
 }
 
 const b = block('ydb-query-duration');

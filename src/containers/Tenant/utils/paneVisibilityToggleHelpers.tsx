@@ -67,7 +67,7 @@ export function paneVisibilityToggleReducerCreator(isPaneCollapsedKey: string) {
 interface ToggleButtonProps {
     onCollapse: VoidFunction;
     onExpand: VoidFunction;
-    isCollapsed: boolean;
+    isCollapsed?: boolean;
     initialDirection?: 'right' | 'left' | 'top' | 'bottom';
     className?: string;
 }

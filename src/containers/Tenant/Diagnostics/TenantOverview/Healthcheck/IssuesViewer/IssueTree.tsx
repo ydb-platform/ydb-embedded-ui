@@ -2,7 +2,6 @@ import {useCallback, useState} from 'react';
 import cn from 'bem-cn-lite';
 import _omit from 'lodash/omit';
 
-// @ts-ignore
 import JSONTree from 'react-json-inspector';
 
 import {TreeView} from 'ydb-ui-components';

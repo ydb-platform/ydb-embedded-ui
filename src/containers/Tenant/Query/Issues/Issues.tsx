@@ -21,10 +21,9 @@ const blockIssue = cn('kv-issue');
 
 interface ResultIssuesProps {
     data: ErrorResponse | string;
-    className: string;
 }
 
-export default function ResultIssues({data, className}: ResultIssuesProps) {
+export function ResultIssues({data}: ResultIssuesProps) {
     const [showIssues, setShowIssues] = React.useState(false);
 
     const issues = typeof data === 'string' ? undefined : data?.issues;
@@ -59,22 +58,21 @@ export default function ResultIssues({data, className}: ResultIssuesProps) {
                     </Button>
                 )}
             </div>
-            {hasIssues && showIssues && <Issues issues={issues} className={className} />}
+            {hasIssues && showIssues && <Issues issues={issues} />}
         </div>
     );
 }
 
 interface IssuesProps {
-    className?: string;
     issues: IssueMessage[] | null | undefined;
 }
-export function Issues({issues, className}: IssuesProps) {
+export function Issues({issues}: IssuesProps) {
     const mostSevereIssue = issues?.reduce((result, issue) => {
         const severity = issue.severity ?? 10;
         return Math.min(result, severity);
     }, 10);
     return (
-        <div className={blockIssues(null, className)}>
+        <div className={blockIssues(null)}>
             {issues?.map((issue, index) => (
                 <Issue key={index} issue={issue} expanded={issue === mostSevereIssue} />
             ))}

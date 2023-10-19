@@ -1,7 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {shallowEqual, useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
-// @ts-ignore
 import JSONTree from 'react-json-inspector';
 import 'react-json-inspector/json-inspector.css';
 
@@ -99,14 +98,14 @@ const Describe = ({tenant, type}: IDescribeProps) => {
                 <JSONTree
                     data={preparedDescribeData}
                     className={b('tree')}
-                    onClick={({path}: {path: string}) => {
+                    onClick={({path}) => {
                         const newValue = !(expandMap.get(path) || false);
                         expandMap.set(path, newValue);
                     }}
                     searchOptions={{
                         debounceTime: 300,
                     }}
-                    isExpanded={(keypath: string) => {
+                    isExpanded={(keypath) => {
                         return expandMap.get(keypath) || false;
                     }}
                 />
