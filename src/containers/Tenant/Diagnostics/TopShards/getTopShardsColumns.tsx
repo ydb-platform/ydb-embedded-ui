@@ -1,4 +1,4 @@
-import cn from 'bem-cn-lite';
+import type {Location} from 'history';
 
 import DataTable, {type Column} from '@gravity-ui/react-data-table';
 
@@ -10,10 +10,7 @@ import {InternalLink} from '../../../../components/InternalLink';
 import routes, {createHref} from '../../../../routes';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
-
-import './TopShards.scss';
-
-const b = cn('yc-link');
+import {LinkToSchemaObject} from '../../../../components/LinkToSchemaObject/LinkToSchemaObject';
 
 const TOP_SHARDS_COLUMNS_IDS = {
     TabletId: 'TabletId',
@@ -43,18 +40,15 @@ function prepareCPUWorkloadValue(value: string | number) {
     return `${roundToPrecision(Number(value) * 100, 2)}%`;
 }
 
-const getPathColumn = (
-    onSchemaClick: (schemaPath: string) => () => void,
-    tenantPath: string,
-): Column<KeyValueRow> => ({
+const getPathColumn = (schemaPath: string, location: Location): Column<KeyValueRow> => ({
     name: TOP_SHARDS_COLUMNS_IDS.Path,
     header: tableColumnsNames[TOP_SHARDS_COLUMNS_IDS.Path],
     render: ({row}) => {
         // row.Path - relative schema path
         return (
-            <span onClick={onSchemaClick(tenantPath + row.Path)} className={b({view: 'normal'})}>
+            <LinkToSchemaObject path={schemaPath + row.Path} location={location}>
                 {row.Path}
-            </span>
+            </LinkToSchemaObject>
         );
     },
     sortable: false,
@@ -128,12 +122,9 @@ const inFlightTxCountColumn: Column<KeyValueRow> = {
     align: DataTable.RIGHT,
 };
 
-export const getShardsWorkloadColumns = (
-    onSchemaClick: (schemaPath: string) => () => void,
-    tenantPath: string,
-) => {
+export const getShardsWorkloadColumns = (schemaPath: string, location: Location) => {
     return [
-        getPathColumn(onSchemaClick, tenantPath),
+        getPathColumn(schemaPath, location),
         cpuCoresColumn,
         dataSizeColumn,
         tabletIdColumn,
@@ -142,9 +133,6 @@ export const getShardsWorkloadColumns = (
     ];
 };
 
-export const getTopShardsColumns = (
-    onSchemaClick: (schemaPath: string) => () => void,
-    tenantPath: string,
-) => {
-    return [tabletIdColumn, getPathColumn(onSchemaClick, tenantPath), topShardsCpuCoresColumn];
+export const getTopShardsColumns = (schemaPath: string, location: Location) => {
+    return [tabletIdColumn, getPathColumn(schemaPath, location), topShardsCpuCoresColumn];
 };
