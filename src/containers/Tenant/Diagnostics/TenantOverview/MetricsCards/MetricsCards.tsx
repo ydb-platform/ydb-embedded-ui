@@ -38,6 +38,7 @@ interface MetricsCardsProps {
     selfCheckResult: SelfCheckResult;
     fetchHealthcheck: VoidFunction;
     healthcheckLoading?: boolean;
+    healthCheckWasLoaded?: boolean;
     healthcheckError?: IResponseError;
 }
 
@@ -47,6 +48,7 @@ export function MetricsCards({
     selfCheckResult,
     fetchHealthcheck,
     healthcheckLoading,
+    healthCheckWasLoaded,
     healthcheckError,
 }: MetricsCardsProps) {
     const location = useLocation();
@@ -124,6 +126,7 @@ export function MetricsCards({
                     issuesStatistics={issuesStatistics}
                     onUpdate={fetchHealthcheck}
                     loading={healthcheckLoading}
+                    wasLoaded={healthCheckWasLoaded}
                     error={healthcheckError}
                     active={metricsTab === TENANT_METRICS_TABS_IDS.healthcheck}
                 />

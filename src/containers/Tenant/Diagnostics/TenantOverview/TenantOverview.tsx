@@ -130,7 +130,14 @@ export function TenantOverview({
                 return <TenantMemory path={tenantName} />;
             }
             case TENANT_METRICS_TABS_IDS.healthcheck: {
-                return <HealthcheckDetails issueTrees={issueTrees} error={healthcheckError} />;
+                return (
+                    <HealthcheckDetails
+                        issueTrees={issueTrees}
+                        loading={healthcheckLoading}
+                        wasLoaded={healthCheckWasLoaded}
+                        error={healthcheckError}
+                    />
+                );
             }
             default: {
                 return undefined;
@@ -138,7 +145,7 @@ export function TenantOverview({
         }
     };
 
-    if ((tenantLoading && !tenantWasLoaded) || (healthcheckLoading && !healthCheckWasLoaded)) {
+    if (tenantLoading && !tenantWasLoaded) {
         return (
             <div className={b('loader')}>
                 <Loader size="m" />
@@ -160,6 +167,7 @@ export function TenantOverview({
                     selfCheckResult={selfCheckResult}
                     fetchHealthcheck={fetchHealthcheck}
                     healthcheckLoading={healthcheckLoading}
+                    healthCheckWasLoaded={healthCheckWasLoaded}
                     healthcheckError={healthcheckError}
                 />
             </div>

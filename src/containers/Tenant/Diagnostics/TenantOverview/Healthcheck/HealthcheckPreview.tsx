@@ -9,6 +9,7 @@ import type {IResponseError} from '../../../../../types/api/error';
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
+import {Loader} from '../../../../../components/Loader';
 
 import i18n from './i18n';
 import './Healthcheck.scss';
@@ -19,16 +20,21 @@ interface HealthcheckPreviewProps {
     selfCheckResult: SelfCheckResult;
     issuesStatistics?: [StatusFlag, number][];
     loading?: boolean;
+    wasLoaded?: boolean;
     onUpdate: VoidFunction;
     error?: IResponseError;
     active?: boolean;
 }
 
 export function HealthcheckPreview(props: HealthcheckPreviewProps) {
-    const {selfCheckResult, issuesStatistics, loading, onUpdate, error, active} = props;
+    const {selfCheckResult, issuesStatistics, loading, wasLoaded, onUpdate, error, active} = props;
 
     const renderHeader = () => {
         const modifier = selfCheckResult.toLowerCase();
+
+        if (loading && !wasLoaded) {
+            return null;
+        }
 
         return (
             <div className={b('preview-header')}>
@@ -48,6 +54,10 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const renderContent = () => {
         if (error) {
             return <ResponseError error={error} defaultMessage={i18n('no-data')} />;
+        }
+
+        if (loading && !wasLoaded) {
+            return <Loader size="m" />;
         }
 
         return (
