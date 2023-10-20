@@ -1,5 +1,4 @@
 import DataTable, {type Column} from '@gravity-ui/react-data-table';
-import {Popover} from '@gravity-ui/uikit';
 
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
@@ -13,6 +12,7 @@ import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {GetNodeRefFunc} from '../../types/additionalProps';
 import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import {UsageLabel} from '../../components/UsageLabel/UsageLabel';
+import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
 
 const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
@@ -76,7 +76,7 @@ const versionColumn: Column<NodesPreparedEntity> = {
     width: '200px',
     align: DataTable.LEFT,
     render: ({row}) => {
-        return <Popover content={row.Version}>{row.Version}</Popover>;
+        return <CellWithPopover content={row.Version}>{row.Version}</CellWithPopover>;
     },
     sortable: false,
 };

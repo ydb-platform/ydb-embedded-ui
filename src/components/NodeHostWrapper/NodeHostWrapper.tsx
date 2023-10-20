@@ -1,6 +1,6 @@
 import block from 'bem-cn-lite';
 
-import {Button, Popover, PopoverBehavior} from '@gravity-ui/uikit';
+import {Button, PopoverBehavior} from '@gravity-ui/uikit';
 
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {NodeAddress} from '../../types/additionalProps';
@@ -10,6 +10,7 @@ import {isUnavailableNode} from '../../utils/nodes';
 import EntityStatus from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 import {IconWrapper} from '../Icon';
+import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 
 import './NodeHostWrapper.scss';
 
@@ -34,33 +35,31 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
         : undefined;
 
     return (
-        <div className={b()}>
-            <Popover
-                disabled={!isNodeAvailable}
-                content={<NodeEndpointsTooltipContent data={node} />}
-                placement={['top', 'bottom']}
-                behavior={PopoverBehavior.Immediate}
-            >
-                <div className={b('host-wrapper')}>
-                    <EntityStatus
-                        name={node.Host}
-                        status={node.SystemState}
-                        path={nodePath}
-                        hasClipboardButton
-                        className={b('host')}
-                    />
-                    {nodeRef && (
-                        <Button
-                            size="s"
-                            href={nodeRef}
-                            className={b('external-button')}
-                            target="_blank"
-                        >
-                            <IconWrapper name="external" />
-                        </Button>
-                    )}
-                </div>
-            </Popover>
-        </div>
+        <CellWithPopover
+            disabled={!isNodeAvailable}
+            content={<NodeEndpointsTooltipContent data={node} />}
+            placement={['top', 'bottom']}
+            behavior={PopoverBehavior.Immediate}
+        >
+            <div className={b('host-wrapper')}>
+                <EntityStatus
+                    name={node.Host}
+                    status={node.SystemState}
+                    path={nodePath}
+                    hasClipboardButton
+                    className={b('host')}
+                />
+                {nodeRef && (
+                    <Button
+                        size="s"
+                        href={nodeRef}
+                        className={b('external-button')}
+                        target="_blank"
+                    >
+                        <IconWrapper name="external" />
+                    </Button>
+                )}
+            </div>
+        </CellWithPopover>
     );
 };
