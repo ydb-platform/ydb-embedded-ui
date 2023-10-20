@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.20.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.19.3...v4.20.0) (2023-10-19)
+
+
+### Features
+
+* add top nodes by memory table ([#562](https://github.com/ydb-platform/ydb-embedded-ui/issues/562)) ([0d4ccf2](https://github.com/ydb-platform/ydb-embedded-ui/commit/0d4ccf2a85251fadad66182ab7d6ccd54a58e6cf))
+* add top tables links ([#564](https://github.com/ydb-platform/ydb-embedded-ui/issues/564)) ([e9b918f](https://github.com/ydb-platform/ydb-embedded-ui/commit/e9b918f0abace890cfafd9d7b219be5b69cac820))
+* **Storage:** hide nodes table for node page ([#557](https://github.com/ydb-platform/ydb-embedded-ui/issues/557)) ([9a25a00](https://github.com/ydb-platform/ydb-embedded-ui/commit/9a25a002b28824f7e616ac8143dbde12de0b0fb7))
+* **TenantOverview:** add cpu tab to tenant diagnostics ([#550](https://github.com/ydb-platform/ydb-embedded-ui/issues/550)) ([3048f84](https://github.com/ydb-platform/ydb-embedded-ui/commit/3048f8478d97249da4f7b66c26ed55f6f21e0f81))
+
+
+### Bug Fixes
+
+* add loader for healthcheck ([#563](https://github.com/ydb-platform/ydb-embedded-ui/issues/563)) ([6caea3d](https://github.com/ydb-platform/ydb-embedded-ui/commit/6caea3dec8f901090b0f8f7c1796880d7dc90a99))
+* **LinkToSchemaObject:** fix schema link ([#566](https://github.com/ydb-platform/ydb-embedded-ui/issues/566)) ([6ca8a70](https://github.com/ydb-platform/ydb-embedded-ui/commit/6ca8a705b6ddacb1f845aabb7761fd22c0c3b4e0))
+
 ## [4.19.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.19.2...v4.19.3) (2023-10-13)
 
 
