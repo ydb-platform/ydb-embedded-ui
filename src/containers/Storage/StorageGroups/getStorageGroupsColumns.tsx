@@ -12,6 +12,7 @@ import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import {Stack} from '../../../components/Stack/Stack';
+import {CellWithPopover} from '../../../components/CellWithPopover/CellWithPopover';
 import {VDisk} from '../VDisk';
 import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../utils';
 import i18n from './i18n';
@@ -58,17 +59,16 @@ const poolNameColumn: Column<PreparedStorageGroup> = {
     render: ({row}) => {
         const splitted = row.PoolName?.split('/');
         return (
-            <div className={b('pool-name-wrapper')}>
-                {splitted && (
-                    <Popover
-                        content={row.PoolName}
-                        placement={['right']}
-                        behavior={PopoverBehavior.Immediate}
-                    >
-                        <span className={b('pool-name')}>{splitted[splitted.length - 1]}</span>
-                    </Popover>
-                )}
-            </div>
+            splitted && (
+                <CellWithPopover
+                    wrapperClassName={b('pool-name-wrapper')}
+                    content={row.PoolName}
+                    placement={['right']}
+                    behavior={PopoverBehavior.Immediate}
+                >
+                    {splitted[splitted.length - 1]}
+                </CellWithPopover>
+            )
         );
     },
     align: DataTable.LEFT,

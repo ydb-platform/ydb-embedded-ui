@@ -28,20 +28,9 @@
         }
     }
     &__pool-name-wrapper {
-        display: flex;
-        align-items: flex-end;
-
         width: 230px;
     }
-    &__pool-name {
-        display: inline-block;
-        overflow: hidden;
 
-        max-width: 230px;
-
-        vertical-align: top;
-        text-overflow: ellipsis;
-    }
     &__usage-label {
         &_overload {
             color: var(--yc-color-text-light-primary);
