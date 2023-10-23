@@ -1,13 +1,13 @@
 .ydb-cell-with-popover {
-    display: inline-block;
-    overflow: hidden;
+    display: flex;
 
-    max-width: 100%;
+    &__popover {
+        display: inline-block;
+        overflow: hidden;
 
-    white-space: nowrap;
-    text-overflow: ellipsis;
+        max-width: 100%;
 
-    &__wrapper {
-        display: flex;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 }

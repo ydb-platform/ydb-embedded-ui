@@ -17,8 +17,8 @@ export function CellWithPopover({
     ...props
 }: CellWithPopoverProps) {
     return (
-        <div className={b('wrapper', wrapperClassName)}>
-            <Popover className={b(null, className)} {...props}>
+        <div className={b(null, wrapperClassName)}>
+            <Popover className={b('popover', className)} {...props}>
                 {children}
             </Popover>
         </div>
