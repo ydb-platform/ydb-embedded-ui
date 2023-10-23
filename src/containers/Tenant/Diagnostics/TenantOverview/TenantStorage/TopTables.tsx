@@ -1,9 +1,7 @@
 import {useDispatch} from 'react-redux';
 import {useLocation} from 'react-router';
-import cn from 'bem-cn-lite';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
-import {Popover} from '@gravity-ui/uikit';
 
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {
@@ -13,11 +11,10 @@ import {
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
+import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 
 import '../TenantOverview.scss';
-
-const b = cn('tenant-overview');
 
 interface TopTablesProps {
     path: string;
@@ -67,15 +64,11 @@ export function TopTables({path}: TopTablesProps) {
             sortable: false,
             render: ({row}) =>
                 row.Path ? (
-                    <LinkToSchemaObject
-                        className={b('cell-with-popover-wrapper')}
-                        path={String(row.Path)}
-                        location={location}
-                    >
-                        <Popover className={b('cell-with-popover')} content={row.Path}>
+                    <CellWithPopover content={row.Path}>
+                        <LinkToSchemaObject path={String(row.Path)} location={location}>
                             {row.Path}
-                        </Popover>
-                    </LinkToSchemaObject>
+                        </LinkToSchemaObject>
+                    </CellWithPopover>
                 ) : null,
         },
     ];
