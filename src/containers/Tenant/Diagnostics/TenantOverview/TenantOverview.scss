@@ -118,4 +118,19 @@
             cursor: pointer;
         }
     }
+
+    &__info {
+        margin-bottom: 36px;
+    }
+
+    &__cell-with-popover-wrapper {
+        display: flex;
+    }
+
+    &__cell-with-popover {
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 }

@@ -4,11 +4,13 @@ import InfoViewer from '../../../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
+
+import '../TenantOverview.scss';
+
 import {TopTables} from './TopTables';
 import {TopGroups} from './TopGroups';
-import './TenantStorage.scss';
 
-const b = cn('tenant-overview-storage');
+const b = cn('tenant-overview');
 
 export interface TenantStorageMetrics {
     blobStorageUsed?: number;

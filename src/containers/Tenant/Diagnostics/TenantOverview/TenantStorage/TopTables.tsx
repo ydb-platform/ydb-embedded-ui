@@ -10,19 +10,14 @@ import {
     fetchTopTables,
     setDataWasNotLoaded,
 } from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
-import {
-    TENANT_OVERVIEW_TABLES_LIMIT,
-    TENANT_OVERVIEW_TABLES_SETTINGS,
-} from '../../../../../utils/constants';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
-import {TableSkeleton} from '../../../../../components/TableSkeleton/TableSkeleton';
-import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
+import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 
-import './TenantStorage.scss';
+import '../TenantOverview.scss';
 
-const b = cn('tenant-overview-storage');
+const b = cn('tenant-overview');
 
 interface TopTablesProps {
     path: string;
@@ -85,29 +80,14 @@ export function TopTables({path}: TopTablesProps) {
         },
     ];
 
-    const renderContent = () => {
-        if (error) {
-            return <ResponseError error={error} />;
-        }
-
-        if (loading && !wasLoaded) {
-            return <TableSkeleton rows={TENANT_OVERVIEW_TABLES_LIMIT} />;
-        }
-
-        return (
-            <DataTable
-                theme="yandex-cloud"
-                columns={columns}
-                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
-                data={data || []}
-            />
-        );
-    };
-
     return (
-        <>
-            <div className={b('title')}>Top tables by size</div>
-            <div className={b('table')}>{renderContent()}</div>
-        </>
+        <TenantOverviewTableLayout
+            data={data || []}
+            columns={columns}
+            title="Top tables by size"
+            loading={loading}
+            wasLoaded={wasLoaded}
+            error={error}
+        />
     );
 }
