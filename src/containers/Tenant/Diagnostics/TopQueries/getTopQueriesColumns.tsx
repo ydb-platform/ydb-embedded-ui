@@ -4,7 +4,6 @@ import cn from 'bem-cn-lite';
 import DataTable, {type Column} from '@gravity-ui/react-data-table';
 
 import type {KeyValueRow} from '../../../../types/api/query';
-import type {ValueOf} from '../../../../types/common';
 import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {
     TruncatedQuery,
@@ -23,21 +22,8 @@ const TOP_QUERIES_COLUMNS_IDS = {
     ReadRows: 'ReadRows',
     ReadBytes: 'ReadBytes',
     UserSID: 'UserSID',
-    TopQueriesQueryText: 'TopQueriesQueryText',
-    QueryId: 'QueryId',
-};
-
-type QueryColumns = ValueOf<typeof TOP_QUERIES_COLUMNS_IDS>;
-
-const tableColumnsNames: Record<QueryColumns, string> = {
-    CPUTimeUs: 'CPUTimeUs',
-    QueryText: 'QueryText',
-    EndTime: 'EndTime',
-    ReadRows: 'ReadRows',
-    ReadBytes: 'ReadBytes',
-    UserSID: 'UserSID',
-    TopQueriesQueryText: 'QueryText',
-    QueryId: 'QueryId',
+    OneLineQueryText: 'OneLineQueryText',
+    QueryHash: 'QueryHash',
 };
 
 const cpuTimeUsColumn: Column<KeyValueRow> = {
@@ -86,15 +72,15 @@ const userSIDColumn: Column<KeyValueRow> = {
     align: DataTable.LEFT,
 };
 
-const topQueriesQueryTextColumn: Column<KeyValueRow> = {
-    name: TOP_QUERIES_COLUMNS_IDS.TopQueriesQueryText,
-    header: tableColumnsNames[TOP_QUERIES_COLUMNS_IDS.TopQueriesQueryText],
+const oneLineQueryTextColumn: Column<KeyValueRow> = {
+    name: TOP_QUERIES_COLUMNS_IDS.OneLineQueryText,
+    header: 'QueryText',
     render: ({row}) => <OneLineQueryWithPopover value={row.QueryText?.toString()} />,
     sortable: false,
 };
 
-const queryIdColumn: Column<KeyValueRow> = {
-    name: TOP_QUERIES_COLUMNS_IDS.QueryId,
+const queryHashColumn: Column<KeyValueRow> = {
+    name: TOP_QUERIES_COLUMNS_IDS.QueryHash,
     render: ({row}) => String(crc32.str(String(row.QueryText))),
     width: 130,
     sortable: false,
@@ -112,5 +98,5 @@ export const getTopQueriesColumns = (): Column<KeyValueRow>[] => {
 };
 
 export const getTenantOverviewTopQueriesColumns = (): Column<KeyValueRow>[] => {
-    return [queryIdColumn, topQueriesQueryTextColumn, cpuTimeUsColumn];
+    return [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
 };
