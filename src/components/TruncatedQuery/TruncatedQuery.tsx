@@ -1,11 +1,13 @@
 import cn from 'bem-cn-lite';
 
+import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
+
 import './TruncatedQuery.scss';
 
 const b = cn('kv-truncated-query');
 
 interface TruncatedQueryProps {
-    value: string | undefined;
+    value?: string;
     maxQueryHeight?: number;
 }
 
@@ -25,4 +27,16 @@ export const TruncatedQuery = ({value = '', maxQueryHeight = 6}: TruncatedQueryP
         );
     }
     return <>{value}</>;
+};
+
+interface OneLineQueryWithPopoverProps {
+    value?: string;
+}
+
+export const OneLineQueryWithPopover = ({value = ''}: OneLineQueryWithPopoverProps) => {
+    return (
+        <CellWithPopover contentClassName={b('popover-content')} content={value}>
+            {value}
+        </CellWithPopover>
+    );
 };

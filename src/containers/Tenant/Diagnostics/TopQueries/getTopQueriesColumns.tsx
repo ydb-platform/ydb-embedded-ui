@@ -4,8 +4,10 @@ import DataTable, {type Column} from '@gravity-ui/react-data-table';
 
 import type {KeyValueRow} from '../../../../types/api/query';
 import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
-import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {TopQueriesTruncatedQuery} from '../../../../components/TruncatedQuery/TopQueriesTruncatedQuery';
+import {
+    TruncatedQuery,
+    OneLineQueryWithPopover,
+} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {MAX_QUERY_HEIGHT} from '../../utils/constants';
 
 import './TopQueries.scss';
@@ -70,7 +72,7 @@ const userSIDColumn: Column<KeyValueRow> = {
 
 const topQueriesQueryTextColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.TopQueriesQueryText,
-    render: ({row}) => <TopQueriesTruncatedQuery value={row.QueryText?.toString()} />,
+    render: ({row}) => <OneLineQueryWithPopover value={row.QueryText?.toString()} />,
     sortable: false,
 };
 
