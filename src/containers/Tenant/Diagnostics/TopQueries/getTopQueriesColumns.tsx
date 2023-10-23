@@ -81,7 +81,10 @@ const oneLineQueryTextColumn: Column<KeyValueRow> = {
 
 const queryHashColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.QueryHash,
-    render: ({row}) => String(crc32.str(String(row.QueryText))),
+    render: ({row}) =>
+        // We use unsigned right shift operator (>>>) to avoid negative values
+        // eslint-disable-next-line no-bitwise
+        (crc32.str(String(row.QueryText)) >>> 0).toString(16).toUpperCase().padStart(8, '0'),
     width: 130,
     sortable: false,
 };
