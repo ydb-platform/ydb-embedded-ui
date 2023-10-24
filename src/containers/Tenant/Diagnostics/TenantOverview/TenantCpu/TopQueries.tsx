@@ -1,4 +1,3 @@
-import qs from 'qs';
 import {useDispatch} from 'react-redux';
 import {useHistory, useLocation} from 'react-router';
 import {useCallback} from 'react';
@@ -14,6 +13,7 @@ import {
 } from '../../../../../store/reducers/tenantOverview/topQueries/tenantOverviewTopQueries';
 import {changeUserInput} from '../../../../../store/reducers/executeQuery';
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
+import {parseQuery} from '../../../../../routes';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {getTenantOverviewTopQueriesColumns} from '../../TopQueries/getTopQueriesColumns';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
@@ -55,9 +55,7 @@ export function TopQueries({path}: TopQueriesProps) {
 
             dispatch(changeUserInput({input}));
 
-            const queryParams = qs.parse(location.search, {
-                ignoreQueryPrefix: true,
-            });
+            const queryParams = parseQuery(location);
 
             const queryPath = getTenantPath({
                 ...queryParams,

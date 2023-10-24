@@ -4,7 +4,11 @@ import DataTable, {type Column} from '@gravity-ui/react-data-table';
 
 import type {KeyValueRow} from '../../../../types/api/query';
 import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
-import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {generateHash} from '../../../../utils/generateHash';
+import {
+    TruncatedQuery,
+    OneLineQueryWithPopover,
+} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {MAX_QUERY_HEIGHT} from '../../utils/constants';
 
 import './TopQueries.scss';
@@ -18,6 +22,8 @@ const TOP_QUERIES_COLUMNS_IDS = {
     ReadRows: 'ReadRows',
     ReadBytes: 'ReadBytes',
     UserSID: 'UserSID',
+    OneLineQueryText: 'OneLineQueryText',
+    QueryHash: 'QueryHash',
 };
 
 const cpuTimeUsColumn: Column<KeyValueRow> = {
@@ -66,6 +72,20 @@ const userSIDColumn: Column<KeyValueRow> = {
     align: DataTable.LEFT,
 };
 
+const oneLineQueryTextColumn: Column<KeyValueRow> = {
+    name: TOP_QUERIES_COLUMNS_IDS.OneLineQueryText,
+    header: 'QueryText',
+    render: ({row}) => <OneLineQueryWithPopover value={row.QueryText?.toString()} />,
+    sortable: false,
+};
+
+const queryHashColumn: Column<KeyValueRow> = {
+    name: TOP_QUERIES_COLUMNS_IDS.QueryHash,
+    render: ({row}) => generateHash(String(row.QueryText)),
+    width: 130,
+    sortable: false,
+};
+
 export const getTopQueriesColumns = (): Column<KeyValueRow>[] => {
     return [
         cpuTimeUsColumn,
@@ -78,5 +98,5 @@ export const getTopQueriesColumns = (): Column<KeyValueRow>[] => {
 };
 
 export const getTenantOverviewTopQueriesColumns = (): Column<KeyValueRow>[] => {
-    return [queryTextColumn, cpuTimeUsColumn];
+    return [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
 };
