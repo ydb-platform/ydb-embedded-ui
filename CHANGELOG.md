@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.20.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.20.0...v4.20.1) (2023-10-24)
+
+
+### Bug Fixes
+
+* fix createExternalUILink ([#571](https://github.com/ydb-platform/ydb-embedded-ui/issues/571)) ([52546f1](https://github.com/ydb-platform/ydb-embedded-ui/commit/52546f17dbfdb255b2429836e880d6812b19d66a))
+* fix incorrect truncate strings with popover ([#567](https://github.com/ydb-platform/ydb-embedded-ui/issues/567)) ([d82e65b](https://github.com/ydb-platform/ydb-embedded-ui/commit/d82e65b925b76dc539a76520eccf601951654e94))
+* fix top queries table row height ([#565](https://github.com/ydb-platform/ydb-embedded-ui/issues/565)) ([b12dceb](https://github.com/ydb-platform/ydb-embedded-ui/commit/b12dcebdb0167fd5852c247bca48844ef6ab35af))
+* refactor metrics storage section ([#568](https://github.com/ydb-platform/ydb-embedded-ui/issues/568)) ([db5d922](https://github.com/ydb-platform/ydb-embedded-ui/commit/db5d922d06b88c9d8a792220d2a178c81806c09e))
+* update @types/react ([#570](https://github.com/ydb-platform/ydb-embedded-ui/issues/570)) ([1e38c5b](https://github.com/ydb-platform/ydb-embedded-ui/commit/1e38c5bb3b4b2139b2141636d6434c2a2ec65772))
+
 ## [4.20.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.19.3...v4.20.0) (2023-10-19)
 
 
