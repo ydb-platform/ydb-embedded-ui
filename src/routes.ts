@@ -25,6 +25,23 @@ export const parseQuery = (location: Location) => {
     });
 };
 
+const prepareRoute = (route: string) => {
+    let preparedRoute = route;
+    const portRegExp = /:\d{4}/;
+    const portMatch = route.match(portRegExp);
+
+    // if port exists in route we escape port to avoid errors in function compile()
+    // compile(preparedRoute) parses prepared root by symbol ":"
+    // if we pass raw route and there is a port in route, compile()
+    // will try to parse the port and throw an error
+    if (portMatch) {
+        const port = portMatch[0];
+        preparedRoute = route.replace(portRegExp, ':\\' + port.slice(1));
+    }
+
+    return preparedRoute;
+};
+
 export type Query = Record<string | number, string | number | string[] | number[] | undefined>;
 
 export function createHref(
@@ -46,7 +63,9 @@ export function createHref(
 
     const search = isEmpty(extendedQuery) ? '' : `?${qs.stringify(extendedQuery, {encode: false})}`;
 
-    return `${compile(route)(params)}${search}`;
+    const preparedRoute = prepareRoute(route);
+
+    return `${compile(preparedRoute)(params)}${search}`;
 }
 
 // embedded version could be located in some folder (e.g. host/some_folder/app_router_path)
