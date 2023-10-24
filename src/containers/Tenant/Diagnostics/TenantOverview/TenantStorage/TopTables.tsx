@@ -1,28 +1,20 @@
 import {useDispatch} from 'react-redux';
 import {useLocation} from 'react-router';
-import cn from 'bem-cn-lite';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
-import {Popover} from '@gravity-ui/uikit';
 
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {
     fetchTopTables,
     setDataWasNotLoaded,
 } from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
-import {
-    TENANT_OVERVIEW_TABLES_LIMIT,
-    TENANT_OVERVIEW_TABLES_SETTINGS,
-} from '../../../../../utils/constants';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
-import {TableSkeleton} from '../../../../../components/TableSkeleton/TableSkeleton';
-import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
+import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
+import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 
-import './TenantStorage.scss';
-
-const b = cn('tenant-overview-storage');
+import '../TenantOverview.scss';
 
 interface TopTablesProps {
     path: string;
@@ -72,42 +64,23 @@ export function TopTables({path}: TopTablesProps) {
             sortable: false,
             render: ({row}) =>
                 row.Path ? (
-                    <LinkToSchemaObject
-                        className={b('cell-with-popover-wrapper')}
-                        path={String(row.Path)}
-                        location={location}
-                    >
-                        <Popover className={b('cell-with-popover')} content={row.Path}>
+                    <CellWithPopover content={row.Path}>
+                        <LinkToSchemaObject path={String(row.Path)} location={location}>
                             {row.Path}
-                        </Popover>
-                    </LinkToSchemaObject>
+                        </LinkToSchemaObject>
+                    </CellWithPopover>
                 ) : null,
         },
     ];
 
-    const renderContent = () => {
-        if (error) {
-            return <ResponseError error={error} />;
-        }
-
-        if (loading && !wasLoaded) {
-            return <TableSkeleton rows={TENANT_OVERVIEW_TABLES_LIMIT} />;
-        }
-
-        return (
-            <DataTable
-                theme="yandex-cloud"
-                columns={columns}
-                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
-                data={data || []}
-            />
-        );
-    };
-
     return (
-        <>
-            <div className={b('title')}>Top tables by size</div>
-            <div className={b('table')}>{renderContent()}</div>
-        </>
+        <TenantOverviewTableLayout
+            data={data || []}
+            columns={columns}
+            title="Top tables by size"
+            loading={loading}
+            wasLoaded={wasLoaded}
+            error={error}
+        />
     );
 }
