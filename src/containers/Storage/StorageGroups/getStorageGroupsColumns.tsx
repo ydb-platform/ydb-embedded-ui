@@ -13,6 +13,7 @@ import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import {Stack} from '../../../components/Stack/Stack';
 import {CellWithPopover} from '../../../components/CellWithPopover/CellWithPopover';
+import {UsageLabel} from '../../../components/UsageLabel/UsageLabel';
 import {VDisk} from '../VDisk';
 import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../utils';
 import i18n from './i18n';
@@ -128,12 +129,7 @@ const usageColumn: Column<PreparedStorageGroup> = {
         // without a limit the usage can be evaluated as 0,
         // but the absence of a value is more clear
         return row.Limit ? (
-            <Label
-                theme={getUsageSeverityForStorageGroup(row.Usage)}
-                className={b('usage-label', {overload: row.Usage >= 90})}
-            >
-                {row.Usage}%
-            </Label>
+            <UsageLabel value={row.Usage} theme={getUsageSeverityForStorageGroup(row.Usage)} />
         ) : (
             '-'
         );
