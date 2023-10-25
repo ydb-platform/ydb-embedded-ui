@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.20.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.20.2...v4.20.3) (2023-10-25)
+
+
+### Bug Fixes
+
+* fix port doesnt match ([#576](https://github.com/ydb-platform/ydb-embedded-ui/issues/576)) ([147a2a9](https://github.com/ydb-platform/ydb-embedded-ui/commit/147a2a919c5fe8ec99f19620da70387ab6c0e519))
+
 ## [4.20.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.20.1...v4.20.2) (2023-10-25)
 
 
