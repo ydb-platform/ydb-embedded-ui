@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.20.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.20.1...v4.20.2) (2023-10-25)
+
+
+### Bug Fixes
+
+* fix diagnostics top queries width ([#574](https://github.com/ydb-platform/ydb-embedded-ui/issues/574)) ([afa17f2](https://github.com/ydb-platform/ydb-embedded-ui/commit/afa17f236331692167a0a37936b090a8baa772df))
+* fix sticky storage info ([#573](https://github.com/ydb-platform/ydb-embedded-ui/issues/573)) ([4b923d1](https://github.com/ydb-platform/ydb-embedded-ui/commit/4b923d1db73c53c63e95f43487127b4c2c1e4cac))
+* use UsageLabel in top groups by usage table ([#572](https://github.com/ydb-platform/ydb-embedded-ui/issues/572)) ([752888d](https://github.com/ydb-platform/ydb-embedded-ui/commit/752888d26ac2cab75307011fb1354830b1cb6db6))
+
 ## [4.20.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.20.0...v4.20.1) (2023-10-24)
 
 
