@@ -2,6 +2,8 @@ import cn from 'bem-cn-lite';
 
 import {Label, type LabelProps} from '@gravity-ui/uikit';
 
+import './UsageLabel.scss';
+
 const b = cn('ydb-usage-label');
 
 interface UsageLabelProps extends LabelProps {
