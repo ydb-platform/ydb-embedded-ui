@@ -27,7 +27,7 @@ export const parseQuery = (location: Location) => {
 
 const prepareRoute = (route: string) => {
     let preparedRoute = route;
-    const portRegExp = /:\d{3, 5}/g;
+    const portRegExp = /:\d{3,5}/g;
     const portMatch = route.match(portRegExp);
 
     // if port exists in route we escape port to avoid errors in function compile()
