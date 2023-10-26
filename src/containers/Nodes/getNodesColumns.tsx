@@ -1,5 +1,6 @@
-import DataTable, {type Column} from '@gravity-ui/react-data-table';
+import DataTable, {type Column as DataTableColumn} from '@gravity-ui/react-data-table';
 
+import type {Column as VirtualTableColumn} from '../../components/VirtualTable';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
@@ -34,46 +35,52 @@ interface GetNodesColumnsProps {
     getNodeRef?: GetNodeRefFunc;
 }
 
-const nodeIdColumn: Column<NodesPreparedEntity> = {
+type NodesColumn = VirtualTableColumn<NodesPreparedEntity> & DataTableColumn<NodesPreparedEntity>;
+
+const nodeIdColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.NodeId,
     header: '#',
-    width: '80px',
+    width: 80,
+    render: ({row}) => row.NodeId,
     align: DataTable.RIGHT,
     sortable: false,
 };
 
-const getHostColumn = (
-    getNodeRef?: GetNodeRefFunc,
-    fixedWidth = false,
-): Column<NodesPreparedEntity> => ({
+const getHostColumn = (getNodeRef?: GetNodeRefFunc): NodesColumn => ({
     name: NODES_COLUMNS_IDS.Host,
     render: ({row}) => {
         return <NodeHostWrapper node={row} getNodeRef={getNodeRef} />;
     },
-    width: fixedWidth ? '350px' : undefined,
+    width: 350,
     align: DataTable.LEFT,
     sortable: false,
 });
 
-const dataCenterColumn: Column<NodesPreparedEntity> = {
+const getHostColumnWithUndefinedWidth = (
+    getNodeRef?: GetNodeRefFunc,
+): DataTableColumn<NodesPreparedEntity> => {
+    return {...getHostColumn(getNodeRef), width: undefined};
+};
+
+const dataCenterColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.DC,
     header: 'DC',
     align: DataTable.LEFT,
     render: ({row}) => (row.DataCenter ? row.DataCenter : '—'),
-    width: '60px',
+    width: 60,
 };
 
-const rackColumn: Column<NodesPreparedEntity> = {
+const rackColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.Rack,
     header: 'Rack',
     align: DataTable.LEFT,
     render: ({row}) => (row.Rack ? row.Rack : '—'),
-    width: '80px',
+    width: 80,
 };
 
-const versionColumn: Column<NodesPreparedEntity> = {
+const versionColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.Version,
-    width: '200px',
+    width: 200,
     align: DataTable.LEFT,
     render: ({row}) => {
         return <CellWithPopover content={row.Version}>{row.Version}</CellWithPopover>;
@@ -81,16 +88,17 @@ const versionColumn: Column<NodesPreparedEntity> = {
     sortable: false,
 };
 
-const uptimeColumn: Column<NodesPreparedEntity> = {
+const uptimeColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.Uptime,
     header: 'Uptime',
     sortAccessor: ({StartTime}) => StartTime && -StartTime,
+    render: ({row}) => row.Uptime,
     align: DataTable.RIGHT,
-    width: '110px',
+    width: 110,
     sortable: false,
 };
 
-const memoryColumn: Column<NodesPreparedEntity> = {
+const memoryColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.Memory,
     header: 'Memory',
     sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
@@ -103,21 +111,21 @@ const memoryColumn: Column<NodesPreparedEntity> = {
         }
     },
     align: DataTable.RIGHT,
-    width: '120px',
+    width: 120,
 };
 
-const cpuColumn: Column<NodesPreparedEntity> = {
+const cpuColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.CPU,
     header: 'CPU',
     sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
     defaultOrder: DataTable.DESCENDING,
     render: ({row}) => (row.PoolStats ? <PoolsGraph pools={row.PoolStats} /> : '—'),
     align: DataTable.LEFT,
-    width: '80px',
+    width: 80,
     sortable: false,
 };
 
-const loadAverageColumn: Column<NodesPreparedEntity> = {
+const loadAverageColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.LoadAverage,
     header: 'Load average',
     sortAccessor: ({LoadAverage = []}) =>
@@ -135,13 +143,13 @@ const loadAverageColumn: Column<NodesPreparedEntity> = {
             '—'
         ),
     align: DataTable.LEFT,
-    width: '140px',
+    width: 140,
     sortable: false,
 };
 
-const getTabletsColumn = (tabletsPath?: string): Column<NodesPreparedEntity> => ({
+const getTabletsColumn = (tabletsPath?: string): NodesColumn => ({
     name: NODES_COLUMNS_IDS.Tablets,
-    width: '430px',
+    width: 430,
     render: ({row}) => {
         return row.Tablets ? (
             <TabletsStatistic
@@ -157,7 +165,7 @@ const getTabletsColumn = (tabletsPath?: string): Column<NodesPreparedEntity> => 
     sortable: false,
 });
 
-const topNodesLoadAverageColumn: Column<NodesPreparedEntity> = {
+const topNodesLoadAverageColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.TopNodesLoadAverage,
     header: 'Load',
     render: ({row}) =>
@@ -170,11 +178,11 @@ const topNodesLoadAverageColumn: Column<NodesPreparedEntity> = {
             '—'
         ),
     align: DataTable.LEFT,
-    width: '80px',
+    width: 80,
     sortable: false,
 };
 
-const topNodesMemoryColumn: Column<NodesPreparedEntity> = {
+const topNodesMemoryColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.TopNodesMemory,
     header: 'Memory',
     render: ({row}) =>
@@ -189,17 +197,14 @@ const topNodesMemoryColumn: Column<NodesPreparedEntity> = {
             '—'
         ),
     align: DataTable.LEFT,
-    width: '140px',
+    width: 140,
     sortable: false,
 };
 
-export function getNodesColumns({
-    tabletsPath,
-    getNodeRef,
-}: GetNodesColumnsProps): Column<NodesPreparedEntity>[] {
+export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps): NodesColumn[] {
     return [
         nodeIdColumn,
-        getHostColumn(getNodeRef, true),
+        getHostColumn(getNodeRef),
         dataCenterColumn,
         rackColumn,
         versionColumn,
@@ -213,23 +218,28 @@ export function getNodesColumns({
 
 export function getTopNodesByLoadColumns(
     getNodeRef?: GetNodeRefFunc,
-): Column<NodesPreparedEntity>[] {
-    return [topNodesLoadAverageColumn, nodeIdColumn, getHostColumn(getNodeRef), versionColumn];
+): DataTableColumn<NodesPreparedEntity>[] {
+    return [
+        topNodesLoadAverageColumn,
+        nodeIdColumn,
+        getHostColumnWithUndefinedWidth(getNodeRef),
+        versionColumn,
+    ];
 }
 
 export function getTopNodesByCpuColumns(
     getNodeRef?: GetNodeRefFunc,
-): Column<NodesPreparedEntity>[] {
-    return [cpuColumn, nodeIdColumn, getHostColumn(getNodeRef)];
+): DataTableColumn<NodesPreparedEntity>[] {
+    return [cpuColumn, nodeIdColumn, getHostColumnWithUndefinedWidth(getNodeRef)];
 }
 
 export function getTopNodesByMemoryColumns({
     tabletsPath,
     getNodeRef,
-}: GetNodesColumnsProps): Column<NodesPreparedEntity>[] {
+}: GetNodesColumnsProps): NodesColumn[] {
     return [
         nodeIdColumn,
-        getHostColumn(getNodeRef, true),
+        getHostColumn(getNodeRef),
         uptimeColumn,
         topNodesMemoryColumn,
         topNodesLoadAverageColumn,

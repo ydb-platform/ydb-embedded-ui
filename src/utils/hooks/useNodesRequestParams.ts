@@ -2,10 +2,9 @@ import {useMemo} from 'react';
 
 import type {NodesGeneralRequestParams} from '../../store/reducers/nodes/types';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
-import {ProblemFilterValues} from '../../store/reducers/settings/settings';
 
-import {HOUR_IN_SECONDS, USE_BACKEND_PARAMS_FOR_TABLES_KEY} from '../constants';
-import {NodesUptimeFilterValues} from '../nodes';
+import {USE_BACKEND_PARAMS_FOR_TABLES_KEY} from '../constants';
+import {NodesUptimeFilterValues, getProblemParamValue, getUptimeParamValue} from '../nodes';
 import {useSetting} from './useSetting';
 
 interface NodesRawRequestParams
@@ -27,11 +26,8 @@ export const useNodesRequestParams = ({
     // Otherwise no params will be updated, no hooks that depend on requestParams will be triggered
     return useMemo(() => {
         if (useBackendParamsForTables) {
-            const problemsOnly = problemFilter === ProblemFilterValues.PROBLEMS;
-            const uptime =
-                nodesUptimeFilter === NodesUptimeFilterValues.SmallUptime
-                    ? HOUR_IN_SECONDS
-                    : undefined;
+            const problemsOnly = getProblemParamValue(problemFilter);
+            const uptime = getUptimeParamValue(nodesUptimeFilter);
 
             return {
                 filter,

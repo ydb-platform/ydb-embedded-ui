@@ -3,7 +3,11 @@ import type {TNodeInfo} from '../types/api/nodesList';
 import type {NodesPreparedEntity} from '../store/reducers/nodes/types';
 import type {NodesMap} from '../types/store/nodesList';
 import type {ValueOf} from '../types/common';
+import type {ProblemFilterValue} from '../store/reducers/settings/types';
+import {ProblemFilterValues} from '../store/reducers/settings/settings';
 import {EFlag} from '../types/api/enums';
+
+import {HOUR_IN_SECONDS} from './constants';
 
 export enum NodesUptimeFilterValues {
     'All' = 'All',
@@ -25,6 +29,14 @@ export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
         }
         return nodesMap;
     }, new Map());
+};
+
+export const getProblemParamValue = (problemFilter: ProblemFilterValue | undefined) => {
+    return problemFilter === ProblemFilterValues.PROBLEMS;
+};
+
+export const getUptimeParamValue = (nodesUptimeFilter: NodesUptimeFilterValues | undefined) => {
+    return nodesUptimeFilter === NodesUptimeFilterValues.SmallUptime ? HOUR_IN_SECONDS : undefined;
 };
 
 /**

@@ -19,13 +19,7 @@ import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/
 import {ResponseError} from '../../components/Errors/ResponseError';
 
 import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
-import {
-    useAutofetcher,
-    useSetting,
-    useTypedSelector,
-    useNodesRequestParams,
-    useTableSort,
-} from '../../utils/hooks';
+import {useAutofetcher, useSetting, useTypedSelector, useTableSort} from '../../utils/hooks';
 import {
     isSortableNodesProperty,
     isUnavailableNode,
@@ -90,31 +84,21 @@ export const Nodes = ({path, type, additionalNodesProps = {}}: NodesProps) => {
 
     const [useNodesEndpoint] = useSetting(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY);
 
-    const requestParams = useNodesRequestParams({
-        filter: searchValue,
-        problemFilter,
-        nodesUptimeFilter,
-        sortOrder,
-        sortValue,
-    });
-
     const fetchNodes = useCallback(
         (isBackground) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded());
             }
 
-            const params = requestParams || {};
-
             // For not DB entities we always use /compute endpoint instead of /nodes
             // since /nodes can return data only for tenants
             if (path && (!useNodesEndpoint || !isDatabaseEntityType(type))) {
-                dispatch(getComputeNodes({path, ...params}));
+                dispatch(getComputeNodes({path}));
             } else {
-                dispatch(getNodes({tenant: path, ...params}));
+                dispatch(getNodes({tenant: path}));
             }
         },
-        [dispatch, path, type, useNodesEndpoint, requestParams],
+        [dispatch, path, type, useNodesEndpoint],
     );
 
     useAutofetcher(fetchNodes, [fetchNodes], isClusterNodes ? true : autorefresh);
