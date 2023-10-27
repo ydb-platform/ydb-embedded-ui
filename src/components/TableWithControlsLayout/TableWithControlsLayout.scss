@@ -25,6 +25,10 @@
         @include sticky-top();
     }
 
+    .ydb-virtual-table__head {
+        top: 62px;
+    }
+
     .data-table__sticky_moving {
         // Place table head right after controls
         top: 62px !important;

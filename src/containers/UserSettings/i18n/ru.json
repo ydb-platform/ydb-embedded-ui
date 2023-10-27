@@ -19,8 +19,8 @@
   "settings.useNodesEndpoint.title": "Сломать вкладку Nodes в диагностике",
   "settings.useNodesEndpoint.popover": "Использовать эндпоинт /viewer/json/nodes для вкладки Nodes в диагностике. Может возвращать некорректные данные на версиях до 23-1",
 
-  "settings.useBackendParamsForTables.title": "Перенести фильтры и сортировку таблиц на бэкенд",
-  "settings.useBackendParamsForTables.popover": "Добавляет фильтрацию и сортировку таблиц Nodes и Storage с использованием параметров запроса. Может улушить производительность, но на старых версиях может привести к дополнительным запросам и большему времени ожидания загрузки",
+  "settings.useBackendParamsForTables.title": "Использовать виртуализированную таблицу для вкладки Nodes кластера",
+  "settings.useBackendParamsForTables.popover": "Использовать таблицу с загрузкой данных по скроллу. Это улучшит производительность, но может работать нестабильно",
 
   "settings.enableAdditionalQueryModes.title": "Включить дополнительные режимы выполнения запросов",
   "settings.enableAdditionalQueryModes.popover": "Добавляет режимы 'Data', 'YQL - QueryService' и 'PostgreSQL'. Может работать некорректно на некоторых версиях",

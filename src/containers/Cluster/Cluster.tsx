@@ -1,4 +1,4 @@
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import {useLocation, useRouteMatch} from 'react-router';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
@@ -18,11 +18,13 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {getClusterInfo} from '../../store/reducers/cluster/cluster';
 import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
 import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../../utils/versions';
-import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
+import {useAutofetcher, useSetting, useTypedSelector} from '../../utils/hooks';
+import {USE_BACKEND_PARAMS_FOR_TABLES_KEY} from '../../utils/constants';
 
 import {InternalLink} from '../../components/InternalLink';
 import {Tenants} from '../Tenants/Tenants';
 import {Nodes} from '../Nodes/Nodes';
+import {VirtualNodes} from '../Nodes/VirtualNodes';
 import {Storage} from '../Storage/Storage';
 import {Versions} from '../Versions/Versions';
 
@@ -46,10 +48,14 @@ function Cluster({
     additionalNodesProps,
     additionalVersionsProps,
 }: ClusterProps) {
+    const container = useRef<HTMLDivElement>(null);
+
     const dispatch = useDispatch();
 
     const match = useRouteMatch<{activeTab: string}>(routes.cluster);
     const {activeTab = clusterTabsIds.tenants} = match?.params || {};
+
+    const [useVirtualNodes] = useSetting<boolean>(USE_BACKEND_PARAMS_FOR_TABLES_KEY);
 
     const location = useLocation();
     const queryParams = qs.parse(location.search, {
@@ -104,7 +110,14 @@ function Cluster({
                 return <Tenants additionalTenantsProps={additionalTenantsProps} />;
             }
             case clusterTabsIds.nodes: {
-                return <Nodes additionalNodesProps={additionalNodesProps} />;
+                return useVirtualNodes ? (
+                    <VirtualNodes
+                        parentContainer={container.current}
+                        additionalNodesProps={additionalNodesProps}
+                    />
+                ) : (
+                    <Nodes additionalNodesProps={additionalNodesProps} />
+                );
             }
             case clusterTabsIds.storage: {
                 return <Storage additionalNodesProps={additionalNodesProps} />;
@@ -119,7 +132,7 @@ function Cluster({
     };
 
     return (
-        <div className={b()}>
+        <div className={b()} ref={container}>
             <ClusterInfo
                 cluster={cluster}
                 versionsValues={versionsValues}
