@@ -150,7 +150,7 @@ export const getStorageNodesInfo = ({
 }: Omit<NodesApiRequestParams, 'type'>) => {
     return createApiRequest({
         request: window.api.getNodes(
-            {tenant, visibleEntities, type: 'static', ...params},
+            {tenant, visibleEntities, storage: true, type: 'static', ...params},
             {concurrentId},
         ),
         actions: FETCH_STORAGE,
