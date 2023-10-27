@@ -4,28 +4,19 @@ import type {Column, OnSort, SortOrderType, SortParams} from './types';
 import {ASCENDING, DEFAULT_SORT_ORDER, DEFAULT_TABLE_ROW_HEIGHT, DESCENDING} from './constants';
 import {b} from './shared';
 
-// Icons similar to original DataTable icons to keep the same tables across diferent pages and tabs
-const ICON_ASC = (
-    <svg className={b('icon')} viewBox="0 0 10 6" width="10" height="6">
-        <path fill="currentColor" d="M0 5h10l-5 -5z" />
-    </svg>
-);
-const ICON_DESC = (
-    <svg className={b('icon')} viewBox="0 0 10 6" width="10" height="6">
-        <path fill="currentColor" d="M0 1h10l-5 5z" />
-    </svg>
-);
-
-function getSortIcon(order?: SortOrderType) {
-    switch (order) {
-        case ASCENDING:
-            return ICON_ASC;
-        case DESCENDING:
-            return ICON_DESC;
-        default:
-            return false;
-    }
-}
+// Icon similar to original DataTable icons to keep the same tables across diferent pages and tabs
+const SortIcon = ({order}: {order?: SortOrderType}) => {
+    return (
+        <svg
+            className={b('icon', {desc: order === DESCENDING})}
+            viewBox="0 0 10 6"
+            width="10"
+            height="6"
+        >
+            <path fill="currentColor" d="M0 5h10l-5 -5z" />
+        </svg>
+    );
+};
 
 interface ColumnSortIconProps {
     sortOrder?: SortOrderType;
@@ -37,7 +28,7 @@ const ColumnSortIcon = ({sortOrder, sortable, defaultSortOrder}: ColumnSortIconP
     if (sortable) {
         return (
             <span className={b('sort-icon', {shadow: !sortOrder})}>
-                {getSortIcon(sortOrder || defaultSortOrder)}
+                <SortIcon order={sortOrder || defaultSortOrder} />
             </span>
         );
     } else {
@@ -117,7 +108,6 @@ export const TableHead = <T,>({
                                     column.className,
                                 )}
                                 style={{
-                                    width: `${column.width}px`,
                                     height: `${rowHeight}px`,
                                 }}
                                 onClick={() => {

@@ -1,6 +1,7 @@
 import {useEffect, useRef} from 'react';
 
 import type {OnEntry, OnLeave} from './types';
+import {DEFAULT_INTERSECTION_OBSERVER_MARGIN} from './constants';
 
 interface UseIntersectionObserverProps {
     onEntry: OnEntry;
@@ -28,7 +29,7 @@ export const useIntersectionObserver = ({
 
         observer.current = new IntersectionObserver(callback, {
             root: parentContainer,
-            rootMargin: '50%',
+            rootMargin: DEFAULT_INTERSECTION_OBSERVER_MARGIN,
         });
 
         return () => {

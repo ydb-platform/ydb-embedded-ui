@@ -1,7 +1,6 @@
 @import '../../styles/mixins.scss';
 
 .ydb-virtual-table {
-
     $block: &;
     $cell-border: 1px solid var(--virtual-table-border-color);
     --virtual-table-cell-vertical-padding: 5px;
@@ -108,6 +107,10 @@
 
     &__icon {
         vertical-align: top;
+
+        &_desc {
+            transform: rotate(180deg);
+        }
     }
 
     &__td {

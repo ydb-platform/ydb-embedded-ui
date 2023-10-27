@@ -8,24 +8,14 @@ import {b} from './shared';
 
 interface TableCellProps {
     height: number;
-    width?: number;
     align?: AlignType;
     children: ReactNode;
     className?: string;
 }
 
-const TableRowCell = ({
-    children,
-    width,
-    className,
-    height,
-    align = DEFAULT_ALIGN,
-}: TableCellProps) => {
+const TableRowCell = ({children, className, height, align = DEFAULT_ALIGN}: TableCellProps) => {
     return (
-        <td
-            className={b('td', {align: align}, className)}
-            style={{width: width ? `${width}px` : undefined, height: `${height}px`}}
-        >
+        <td className={b('td', {align: align}, className)} style={{height: `${height}px`}}>
             {children}
         </td>
     );
@@ -44,7 +34,6 @@ export const LoadingTableRow = <T,>({index, columns, height}: LoadingTableRowPro
                 return (
                     <TableRowCell
                         key={`${column.name}${index}`}
-                        width={column.width}
                         height={height}
                         align={column.align}
                         className={column.className}
@@ -74,7 +63,6 @@ export const TableRow = <T,>({row, index, columns, getRowClassName, height}: Tab
                 return (
                     <TableRowCell
                         key={`${column.name}${index}`}
-                        width={column.width}
                         height={height}
                         align={column.align}
                         className={column.className}
