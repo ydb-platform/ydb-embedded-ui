@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.20.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.20.3...v4.20.4) (2023-10-27)
+
+
+### Bug Fixes
+
+* **Storage:** set storage true for nodes ([#579](https://github.com/ydb-platform/ydb-embedded-ui/issues/579)) ([146d235](https://github.com/ydb-platform/ydb-embedded-ui/commit/146d23563ef50461260f13eedf66ad7da9f76c8a))
+
 ## [4.20.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.20.2...v4.20.3) (2023-10-25)
 
 
