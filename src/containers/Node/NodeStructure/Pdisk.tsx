@@ -12,10 +12,11 @@ import type {
     PreparedStructureVDisk,
 } from '../../../store/reducers/node/types';
 import {EVDiskState} from '../../../types/api/vdisk';
-import {bytesToGB, pad9} from '../../../utils/utils';
+import {bytesToGB} from '../../../utils/utils';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {getPDiskType} from '../../../utils/pdisk';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
+import {createPDiskDeveloperUILink, createVDiskDeveloperUILink} from '../../../utils/developerUI';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import InfoViewer, {type InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
@@ -32,7 +33,7 @@ interface PDiskProps {
     unfolded?: boolean;
     id: string;
     selectedVdiskId?: string;
-    nodeHref?: string | null;
+    nodeId: string | number;
 }
 
 enum VDiskTableColumnsIds {
@@ -54,11 +55,11 @@ const vDiskTableColumnsNames: Record<VDiskTableColumnsIdsValues, string> = {
 function getColumns({
     pDiskId,
     selectedVdiskId,
-    nodeHref,
+    nodeId,
 }: {
     pDiskId: number | undefined;
     selectedVdiskId?: string;
-    nodeHref?: string | null;
+    nodeId?: string | number;
 }) {
     const columns: Column<PreparedStructureVDisk>[] = [
         {
@@ -66,20 +67,24 @@ function getColumns({
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.slotId],
             width: 100,
             render: ({row}) => {
-                let vdiskInternalViewerLink = '';
+                const vDiskSlotId = row.VDiskSlotId;
+                let vdiskInternalViewerLink = null;
 
-                if (nodeHref && pDiskId !== undefined && row.VDiskSlotId !== undefined) {
-                    vdiskInternalViewerLink +=
-                        nodeHref +
-                        'actors/vdisks/vdisk' +
-                        pad9(pDiskId) +
-                        '_' +
-                        pad9(row.VDiskSlotId);
+                if (
+                    valueIsDefined(nodeId) &&
+                    valueIsDefined(pDiskId) &&
+                    valueIsDefined(vDiskSlotId)
+                ) {
+                    vdiskInternalViewerLink = createVDiskDeveloperUILink({
+                        nodeId,
+                        pDiskId,
+                        vDiskSlotId,
+                    });
                 }
 
                 return (
                     <div className={b('vdisk-id', {selected: row.id === selectedVdiskId})}>
-                        <span>{row.VDiskSlotId}</span>
+                        <span>{vDiskSlotId}</span>
                         {vdiskInternalViewerLink && (
                             <Button
                                 size="s"
@@ -156,7 +161,7 @@ export function PDisk({
     id,
     data,
     selectedVdiskId,
-    nodeHref,
+    nodeId,
     unfolded: unfoldedFromProps,
 }: PDiskProps) {
     const [unfolded, setUnfolded] = useState(unfoldedFromProps ?? false);
@@ -190,7 +195,7 @@ export function PDisk({
             <DataTable
                 theme="yandex-cloud"
                 data={vDisks}
-                columns={getColumns({nodeHref, pDiskId: PDiskId, selectedVdiskId})}
+                columns={getColumns({nodeId, pDiskId: PDiskId, selectedVdiskId})}
                 settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
                 rowClassName={(row) => {
                     return row.id === selectedVdiskId ? b('selected-vdisk') : '';
@@ -203,10 +208,13 @@ export function PDisk({
         if (isEmpty(data)) {
             return <div>No information about PDisk</div>;
         }
-        let pDiskInternalViewerLink = '';
+        let pDiskInternalViewerLink = null;
 
-        if (nodeHref) {
-            pDiskInternalViewerLink += nodeHref + 'actors/pdisks/pdisk' + pad9(PDiskId);
+        if (valueIsDefined(PDiskId) && valueIsDefined(nodeId)) {
+            pDiskInternalViewerLink = createPDiskDeveloperUILink({
+                nodeId,
+                pDiskId: PDiskId,
+            });
         }
 
         const pdiskInfo: InfoViewerItem[] = [

@@ -1,4 +1,4 @@
-import {useEffect, useRef, useMemo} from 'react';
+import {useEffect, useRef} from 'react';
 import {useDispatch} from 'react-redux';
 import url from 'url';
 import _ from 'lodash';
@@ -13,15 +13,13 @@ import {selectNodeStructure} from '../../../store/reducers/node/selectors';
 import {AutoFetcher} from '../../../utils/autofetcher';
 import {useTypedSelector} from '../../../utils/hooks';
 
-import type {AdditionalNodesProps} from '../../../types/additionalProps';
-
 import {PDisk} from './Pdisk';
 
 import './NodeStructure.scss';
 
 const b = cn('kv-node-structure');
 
-export function valueIsDefined(value: any) {
+export function valueIsDefined<T>(value: T | null | undefined): value is T {
     return value !== null && value !== undefined;
 }
 
@@ -32,24 +30,16 @@ function generateId({type, id}: {type: 'pdisk' | 'vdisk'; id: string}) {
 interface NodeStructureProps {
     nodeId: string;
     className?: string;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
 const autofetcher = new AutoFetcher();
 
-function NodeStructure({nodeId, className, additionalNodesProps}: NodeStructureProps) {
+function NodeStructure({nodeId, className}: NodeStructureProps) {
     const dispatch = useDispatch();
 
     const nodeStructure = useTypedSelector(selectNodeStructure);
 
     const {loadingStructure, wasLoadedStructure} = useTypedSelector((state) => state.node);
-    const nodeData = useTypedSelector((state) => state.node?.data?.SystemStateInfo?.[0]);
-
-    const nodeHref = useMemo(() => {
-        return additionalNodesProps?.getNodeRef
-            ? additionalNodesProps.getNodeRef(nodeData)
-            : undefined;
-    }, [nodeData, additionalNodesProps]);
 
     const {pdiskId: pdiskIdFromUrl, vdiskId: vdiskIdFromUrl} = url.parse(
         window.location.href,
@@ -136,7 +126,7 @@ function NodeStructure({nodeId, className, additionalNodesProps}: NodeStructureP
                       id={generateId({type: 'pdisk', id: pDiskId})}
                       unfolded={pdiskIdFromUrl === pDiskId}
                       selectedVdiskId={vdiskIdFromUrl as string}
-                      nodeHref={nodeHref}
+                      nodeId={nodeId}
                   />
               ))
             : renderStub();
