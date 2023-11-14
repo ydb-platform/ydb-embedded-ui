@@ -70,6 +70,7 @@ export interface NodesGeneralRequestParams extends NodesSortParams {
 }
 
 export interface NodesApiRequestParams extends NodesGeneralRequestParams {
+    path?: string;
     tenant?: string;
     type?: NodeType;
     visibleEntities?: VisibleEntities; // "with" param

@@ -17,7 +17,7 @@
   "settings.invertedDisks.title": "Inverted disks space indicators",
 
   "settings.useNodesEndpoint.title": "Break the Nodes tab in Diagnostics",
-  "settings.useNodesEndpoint.popover": "Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It returns incorrect data on versions before 23-1",
+  "settings.useNodesEndpoint.popover": "Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It could return incorrect data on some versions",
 
   "settings.useBackendParamsForTables.title": "Use virtual table for cluster Nodes tab",
   "settings.useBackendParamsForTables.popover": "Use table with data load on scroll. It will increase performance, but could work unstable",

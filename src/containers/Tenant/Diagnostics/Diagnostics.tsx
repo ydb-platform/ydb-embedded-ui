@@ -123,7 +123,6 @@ function Diagnostics(props: DiagnosticsProps) {
                 return (
                     <Nodes
                         path={currentSchemaPath}
-                        type={type}
                         additionalNodesProps={props.additionalNodesProps}
                     />
                 );

@@ -17,7 +17,7 @@
   "settings.invertedDisks.title": "Инвертированные индикаторы места на дисках",
 
   "settings.useNodesEndpoint.title": "Сломать вкладку Nodes в диагностике",
-  "settings.useNodesEndpoint.popover": "Использовать эндпоинт /viewer/json/nodes для вкладки Nodes в диагностике. Может возвращать некорректные данные на версиях до 23-1",
+  "settings.useNodesEndpoint.popover": "Использовать эндпоинт /viewer/json/nodes для вкладки Nodes в диагностике. Может возвращать некорректные данные на некоторых версиях",
 
   "settings.useBackendParamsForTables.title": "Использовать виртуализированную таблицу для вкладки Nodes кластера",
   "settings.useBackendParamsForTables.popover": "Использовать таблицу с загрузкой данных по скроллу. Это улучшит производительность, но может работать нестабильно",
