@@ -115,8 +115,6 @@ function Node(props: NodeProps) {
         );
     };
     const renderTabContent = () => {
-        const {additionalNodesProps} = props;
-
         switch (activeTab) {
             case STORAGE: {
                 return (
@@ -134,13 +132,7 @@ function Node(props: NodeProps) {
             }
 
             case STRUCTURE: {
-                return (
-                    <NodeStructure
-                        className={b('node-page-wrapper')}
-                        nodeId={nodeId}
-                        additionalNodesProps={additionalNodesProps}
-                    />
-                );
+                return <NodeStructure className={b('node-page-wrapper')} nodeId={nodeId} />;
             }
             default:
                 return false;
