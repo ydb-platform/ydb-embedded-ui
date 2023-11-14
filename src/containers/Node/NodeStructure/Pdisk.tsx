@@ -22,6 +22,7 @@ import InfoViewer, {type InfoViewerItem} from '../../../components/InfoViewer/In
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {Icon} from '../../../components/Icon';
 
+import i18n from '../i18n';
 import {Vdisk} from './Vdisk';
 import {valueIsDefined} from './NodeStructure';
 import {PDiskTitleBadge} from './PDiskTitleBadge';
@@ -91,6 +92,7 @@ function getColumns({
                                 className={b('external-button', {hidden: true})}
                                 href={vdiskInternalViewerLink}
                                 target="_blank"
+                                title={i18n('vdisk.developer-ui-button-title')}
                             >
                                 <Icon name="external" />
                             </Button>
@@ -230,6 +232,7 @@ export function PDisk({
                                 href={pDiskInternalViewerLink}
                                 target="_blank"
                                 view="flat-secondary"
+                                title={i18n('pdisk.developer-ui-button-title')}
                             >
                                 <Icon name="external" />
                             </Button>
