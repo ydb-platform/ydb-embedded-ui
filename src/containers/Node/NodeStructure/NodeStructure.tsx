@@ -1,7 +1,7 @@
 import {useEffect, useRef} from 'react';
 import {useDispatch} from 'react-redux';
 import url from 'url';
-import _ from 'lodash';
+import {isEmpty} from 'lodash/fp';
 
 import cn from 'bem-cn-lite';
 
@@ -62,7 +62,7 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
                 });
             }
         };
-    }, []);
+    }, [scrollContainer]);
 
     useEffect(() => {
         dispatch(getNodeStructure(nodeId));
@@ -77,10 +77,10 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
     }, [nodeId, dispatch]);
 
     useEffect(() => {
-        if (!_.isEmpty(nodeStructure) && scrollContainer) {
+        if (!isEmpty(nodeStructure) && scrollContainer) {
             isReady.current = true;
         }
-    }, [nodeStructure]);
+    }, [nodeStructure, scrollContainer]);
 
     useEffect(() => {
         if (isReady.current && !scrolled.current && scrollContainer) {
@@ -110,7 +110,7 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
                 scrolled.current = true;
             }
         }
-    }, [nodeStructure, pdiskIdFromUrl, vdiskIdFromUrl]);
+    }, [nodeStructure, pdiskIdFromUrl, vdiskIdFromUrl, scrollContainer]);
 
     const renderStub = () => {
         return 'There is no information about node structure.';
