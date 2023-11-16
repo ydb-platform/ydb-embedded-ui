@@ -34,14 +34,9 @@ interface TabletsProps {
 export const Tablets = ({path, nodeId, className}: TabletsProps) => {
     const dispatch = useDispatch();
 
-    const {
-        data = {},
-        wasLoaded,
-        loading,
-        error,
-        stateFilter,
-        typeFilter,
-    } = useTypedSelector((state) => state.tablets);
+    const {data, wasLoaded, loading, error, stateFilter, typeFilter} = useTypedSelector(
+        (state) => state.tablets,
+    );
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
     const tablets = useMemo(() => data?.TabletStateInfo || [], [data]);
