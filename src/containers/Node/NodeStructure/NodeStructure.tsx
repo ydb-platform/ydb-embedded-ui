@@ -47,22 +47,10 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
     ).query;
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const scrollContainer = scrollContainerRef.current;
 
     const isReady = useRef(false);
 
     const scrolled = useRef(false);
-
-    useEffect(() => {
-        return () => {
-            if (scrollContainer) {
-                scrollContainer.scrollTo({
-                    behavior: 'smooth',
-                    top: 0,
-                });
-            }
-        };
-    }, [scrollContainer]);
 
     useEffect(() => {
         dispatch(getNodeStructure(nodeId));
@@ -77,13 +65,13 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
     }, [nodeId, dispatch]);
 
     useEffect(() => {
-        if (!isEmpty(nodeStructure) && scrollContainer) {
+        if (!isEmpty(nodeStructure) && scrollContainerRef.current) {
             isReady.current = true;
         }
-    }, [nodeStructure, scrollContainer]);
+    }, [nodeStructure]);
 
     useEffect(() => {
-        if (isReady.current && !scrolled.current && scrollContainer) {
+        if (isReady.current && !scrolled.current && scrollContainerRef.current) {
             const element = document.getElementById(
                 generateId({type: 'pdisk', id: pdiskIdFromUrl as string}),
             );
@@ -102,7 +90,7 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
             }
 
             if (element) {
-                scrollContainer.scrollTo({
+                scrollContainerRef.current.scrollTo({
                     behavior: 'smooth',
                     // should subtract 20 to avoid sticking the element to tabs
                     top: scrollToVdisk ? scrollToVdisk : element.offsetTop,
@@ -110,7 +98,7 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
                 scrolled.current = true;
             }
         }
-    }, [nodeStructure, pdiskIdFromUrl, vdiskIdFromUrl, scrollContainer]);
+    }, [nodeStructure, pdiskIdFromUrl, vdiskIdFromUrl]);
 
     const renderStub = () => {
         return 'There is no information about node structure.';
