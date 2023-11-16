@@ -16,7 +16,8 @@
     }
 }
 
-.data-table__row:hover {
+.data-table__row:hover,
+.ydb-virtual-table__row:hover {
     .ydb-node-host-wrapper__external-button {
         display: inline-flex;
     }
