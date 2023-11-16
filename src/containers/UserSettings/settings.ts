@@ -101,16 +101,15 @@ export const enableNewTenantDiagnosticsDesign: SettingProps = {
     helpPopoverContent: i18n('settings.tenantDiagnostics.popover'),
 };
 
-export const generalSection: SettingsSection = {
-    id: 'generalSection',
-    title: i18n('section.general'),
-    settings: [themeSetting],
+export const appearanceSection: SettingsSection = {
+    id: 'appearanceSection',
+    title: i18n('section.appearance'),
+    settings: [themeSetting, invertedDisksSetting],
 };
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
     settings: [
-        invertedDisksSetting,
         useNodesEndpointSetting,
         useBackendParamsForTables,
         enableQueryModesForExplainSetting,
@@ -122,7 +121,7 @@ export const generalPage: SettingsPage = {
     id: 'generalPage',
     title: i18n('page.general'),
     icon: {data: favoriteFilledIcon, height: 14, width: 14},
-    sections: [generalSection],
+    sections: [appearanceSection],
 };
 export const experimentsPage: SettingsPage = {
     id: 'experimentsPage',
