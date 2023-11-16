@@ -175,7 +175,14 @@ export const prepareQueryResponse = (data?: KeyValueRow[]) => {
         for (const field in row) {
             if (Object.prototype.hasOwnProperty.call(row, field)) {
                 const type = typeof row[field];
-                if (type === 'object' || type === 'boolean' || Array.isArray(row[field])) {
+
+                // Although typeof null == 'object'
+                // null result should be preserved
+                if (
+                    (row[field] !== null && type === 'object') ||
+                    type === 'boolean' ||
+                    Array.isArray(row[field])
+                ) {
                     formattedData[field] = JSON.stringify(row[field]);
                 } else {
                     formattedData[field] = row[field];
