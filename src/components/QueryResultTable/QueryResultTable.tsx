@@ -36,10 +36,14 @@ const prepareTypedColumns = (columns: ColumnType[]) => {
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
             sortAccessor: (row) => {
                 const value = row[name];
-                if (value === undefined || value === null) return null;
+
+                if (value === undefined || value === null) {
+                    return null;
+                }
+
                 return columnType === 'number' ? BigInt(value) : value;
             },
-            render: ({value}) => <Cell value={value as string} />,
+            render: ({row}) => <Cell value={String(row[name])} />,
         };
 
         return column;
@@ -56,7 +60,7 @@ const prepareGenericColumns = (data: KeyValueRow[]) => {
             name,
             align: isNumeric(data[0][name]) ? DataTable.RIGHT : DataTable.LEFT,
             sortAccessor: (row) => (isNumeric(row[name]) ? Number(row[name]) : row[name]),
-            render: ({value}) => <Cell value={value as string} />,
+            render: ({row}) => <Cell value={String(row[name])} />,
         };
 
         return column;
