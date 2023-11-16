@@ -54,11 +54,11 @@ export const initialState = {
         ),
         [ENABLE_ADDITIONAL_QUERY_MODES]: readSavedSettingsValue(
             ENABLE_ADDITIONAL_QUERY_MODES,
-            'false',
+            'true',
         ),
         [DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS]: readSavedSettingsValue(
             DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
-            'false',
+            'true',
         ),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),
         [TENANT_INITIAL_PAGE_KEY]: readSavedSettingsValue(
