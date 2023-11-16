@@ -5,7 +5,6 @@ import {useDispatch} from 'react-redux';
 import DataTable from '@gravity-ui/react-data-table';
 import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 
-import type {EPathType} from '../../types/api/schema';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
 
@@ -39,8 +38,6 @@ import {selectFilteredNodes} from '../../store/reducers/nodes/selectors';
 import {changeFilter, ProblemFilterValues} from '../../store/reducers/settings/settings';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 
-import {isDatabaseEntityType} from '../Tenant/utils/schema';
-
 import {getNodesColumns} from './getNodesColumns';
 
 import './Nodes.scss';
@@ -51,11 +48,10 @@ const b = cn('ydb-nodes');
 
 interface NodesProps {
     path?: string;
-    type?: EPathType;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const Nodes = ({path, type, additionalNodesProps = {}}: NodesProps) => {
+export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
     const dispatch = useDispatch();
 
     const isClusterNodes = !path;
@@ -90,15 +86,14 @@ export const Nodes = ({path, type, additionalNodesProps = {}}: NodesProps) => {
                 dispatch(setDataWasNotLoaded());
             }
 
-            // For not DB entities we always use /compute endpoint instead of /nodes
-            // since /nodes can return data only for tenants
-            if (path && (!useNodesEndpoint || !isDatabaseEntityType(type))) {
+            // If there is no path, it's cluster Nodes tab
+            if (path && !useNodesEndpoint) {
                 dispatch(getComputeNodes({path}));
             } else {
-                dispatch(getNodes({tenant: path}));
+                dispatch(getNodes({path}));
             }
         },
-        [dispatch, path, type, useNodesEndpoint],
+        [dispatch, path, useNodesEndpoint],
     );
 
     useAutofetcher(fetchNodes, [fetchNodes], isClusterNodes ? true : autorefresh);

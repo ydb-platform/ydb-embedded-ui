@@ -99,9 +99,9 @@ const nodes: Reducer<NodesState, NodesAction> = (state = initialState, action) =
 };
 const concurrentId = 'getNodes';
 
-export function getNodes({type = 'any', ...params}: NodesApiRequestParams) {
+export function getNodes({type = 'any', storage = false, ...params}: NodesApiRequestParams) {
     return createApiRequest({
-        request: window.api.getNodes({type, ...params}, {concurrentId}),
+        request: window.api.getNodes({type, storage, ...params}, {concurrentId}),
         actions: FETCH_NODES,
         dataHandler: prepareNodesData,
     });
