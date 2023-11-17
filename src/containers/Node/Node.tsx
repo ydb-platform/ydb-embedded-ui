@@ -2,7 +2,6 @@ import * as React from 'react';
 import {useLocation, useRouteMatch} from 'react-router';
 import cn from 'bem-cn-lite';
 import {useDispatch} from 'react-redux';
-import _ from 'lodash';
 
 import {Tabs} from '@gravity-ui/uikit';
 import {Link} from 'react-router-dom';
@@ -52,21 +51,22 @@ function Node(props: NodeProps) {
     const {tenantName: tenantNameFromQuery} = parseQuery(location);
 
     const {activeTabVerified, nodeTabs} = React.useMemo(() => {
-        const hasStorage = _.find(node?.Roles as any[], (el) => el === STORAGE_ROLE);
-        let activeTabVerified = activeTab;
+        const hasStorage = node?.Roles?.find((el) => el === STORAGE_ROLE);
+
+        let actualActiveTab = activeTab;
         if (!hasStorage && activeTab === STORAGE) {
-            activeTabVerified = OVERVIEW;
+            actualActiveTab = OVERVIEW;
         }
         const nodePages = hasStorage ? NODE_PAGES : NODE_PAGES.filter((el) => el.id !== STORAGE);
 
-        const nodeTabs = nodePages.map((page) => {
+        const actualNodeTabs = nodePages.map((page) => {
             return {
                 ...page,
                 title: page.name,
             };
         });
 
-        return {activeTabVerified, nodeTabs};
+        return {activeTabVerified: actualActiveTab, nodeTabs: actualNodeTabs};
     }, [activeTab, node]);
 
     React.useEffect(() => {
@@ -100,13 +100,13 @@ function Node(props: NodeProps) {
                     size="l"
                     items={nodeTabs}
                     activeTab={activeTabVerified}
-                    wrapTo={({id}, node) => (
+                    wrapTo={({id}, tabNode) => (
                         <Link
                             to={createHref(routes.node, {id: nodeId, activeTab: id})}
                             key={id}
                             className={b('tab')}
                         >
-                            {node}
+                            {tabNode}
                         </Link>
                     )}
                     allowNotSelected={true}

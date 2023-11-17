@@ -1,7 +1,7 @@
 import {useEffect, useRef} from 'react';
 import {useDispatch} from 'react-redux';
 import url from 'url';
-import _ from 'lodash';
+import {isEmpty} from 'lodash/fp';
 
 import cn from 'bem-cn-lite';
 
@@ -47,22 +47,10 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
     ).query;
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const scrollContainer = scrollContainerRef.current;
 
     const isReady = useRef(false);
 
     const scrolled = useRef(false);
-
-    useEffect(() => {
-        return () => {
-            if (scrollContainer) {
-                scrollContainer.scrollTo({
-                    behavior: 'smooth',
-                    top: 0,
-                });
-            }
-        };
-    }, []);
 
     useEffect(() => {
         dispatch(getNodeStructure(nodeId));
@@ -77,13 +65,13 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
     }, [nodeId, dispatch]);
 
     useEffect(() => {
-        if (!_.isEmpty(nodeStructure) && scrollContainer) {
+        if (!isEmpty(nodeStructure) && scrollContainerRef.current) {
             isReady.current = true;
         }
     }, [nodeStructure]);
 
     useEffect(() => {
-        if (isReady.current && !scrolled.current && scrollContainer) {
+        if (isReady.current && !scrolled.current && scrollContainerRef.current) {
             const element = document.getElementById(
                 generateId({type: 'pdisk', id: pdiskIdFromUrl as string}),
             );
@@ -102,7 +90,7 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
             }
 
             if (element) {
-                scrollContainer.scrollTo({
+                scrollContainerRef.current.scrollTo({
                     behavior: 'smooth',
                     // should subtract 20 to avoid sticking the element to tabs
                     top: scrollToVdisk ? scrollToVdisk : element.offsetTop,
