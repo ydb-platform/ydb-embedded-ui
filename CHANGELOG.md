@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.21.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.21.0...v4.21.1) (2023-11-17)
+
+
+### Bug Fixes
+
+* move inverted disk space setting to general page ([#589](https://github.com/ydb-platform/ydb-embedded-ui/issues/589)) ([b09345e](https://github.com/ydb-platform/ydb-embedded-ui/commit/b09345e1ebe9e7a47beea5ab2dac4257790232cc))
+* **Nodes:** always use nodes when flag is enabled ([#584](https://github.com/ydb-platform/ydb-embedded-ui/issues/584)) ([6ac6ee2](https://github.com/ydb-platform/ydb-embedded-ui/commit/6ac6ee2516bb2612cc7832e67ffa0bf92615a36c))
+* **QueryResultTable:** fix table error on null cell sort ([#590](https://github.com/ydb-platform/ydb-embedded-ui/issues/590)) ([805a339](https://github.com/ydb-platform/ydb-embedded-ui/commit/805a339b0bba34412bf8e854cf6d24ae7c080539))
+* **Tablets:** reduce rerenders ([#585](https://github.com/ydb-platform/ydb-embedded-ui/issues/585)) ([f1767a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/f1767a143b139de4cd7c0df5c8c243c0224ebd3c))
+* turn on query modes and metrics cards by default ([#588](https://github.com/ydb-platform/ydb-embedded-ui/issues/588)) ([c2f0d74](https://github.com/ydb-platform/ydb-embedded-ui/commit/c2f0d7424cb3182926f125a1e8c16cd4a2d422b9))
+* update links to VDisk and PDisk Developer UI ([#582](https://github.com/ydb-platform/ydb-embedded-ui/issues/582)) ([97dda88](https://github.com/ydb-platform/ydb-embedded-ui/commit/97dda88bd595295eefaed4c0cbcd333e84b047f0))
+* **VirtualNodes:** display developerUI link on hover ([#587](https://github.com/ydb-platform/ydb-embedded-ui/issues/587)) ([ba6c249](https://github.com/ydb-platform/ydb-embedded-ui/commit/ba6c249a9793b0bac45607b0b36f284dea4e0a7a))
+
 ## [4.21.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.20.4...v4.21.0) (2023-10-27)
 
 
