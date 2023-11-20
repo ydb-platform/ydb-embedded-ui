@@ -3,6 +3,7 @@ import {ValueOf} from '../types/common';
 const TOP_SHARDS_SORT_VALUES = {
     CPUCores: 'CPUCores',
     DataSize: 'DataSize',
+    InFlightTxCount: 'InFlightTxCount',
 } as const;
 
 const TOP_QUERIES_SORT_VALUES = {
