@@ -30,15 +30,25 @@ export interface NodesPreparedEntity {
     DataCenter?: string;
     Rack?: string;
     Version?: string;
+    TenantName?: string;
+
     StartTime?: string;
     Uptime: string;
+    DisconnectTime?: string;
+
     MemoryUsed?: string;
+    MemoryUsedInAlloc?: string;
     MemoryLimit?: string;
+
+    SharedCacheUsed?: string;
+    SharedCacheLimit?: string | number;
+
     PoolStats?: TPoolStats[];
     LoadAverage?: number[];
     Tablets?: TFullTabletStateInfo[] | TComputeTabletStateInfo[];
-    TenantName?: string;
     Endpoints?: TEndpoint[];
+
+    TotalSessions?: number;
 }
 
 export interface NodesState {
