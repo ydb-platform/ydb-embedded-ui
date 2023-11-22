@@ -16,7 +16,10 @@ import {bytesToGB} from '../../../utils/utils';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {getPDiskType} from '../../../utils/pdisk';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
-import {createPDiskDeveloperUILink, createVDiskDeveloperUILink} from '../../../utils/developerUI';
+import {
+    createPDiskDeveloperUILink,
+    createVDiskDeveloperUILink,
+} from '../../../utils/developerUI/developerUI';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import InfoViewer, {type InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
