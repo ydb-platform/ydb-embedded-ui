@@ -133,3 +133,6 @@ export const TENANT_INITIAL_PAGE_KEY = 'saved_tenant_initial_tab';
 
 // Send filters and sort params to backend for Nodes and Storage tables
 export const USE_BACKEND_PARAMS_FOR_TABLES_KEY = 'useBackendParamsForTables';
+
+// Enable schema that supports multiple resultsets
+export const QUERY_USE_MULTI_SCHEMA_KEY = 'queryUseMultiSchema';

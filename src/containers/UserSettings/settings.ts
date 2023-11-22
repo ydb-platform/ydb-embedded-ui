@@ -11,6 +11,7 @@ import {
     THEME_KEY,
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
+    QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
 
@@ -95,6 +96,11 @@ export const enableQueryModesForExplainSetting: SettingProps = {
     title: i18n('settings.enableAdditionalQueryModes.title'),
     helpPopoverContent: i18n('settings.enableAdditionalQueryModes.popover'),
 };
+export const queryUseMultiSchemaSetting: SettingProps = {
+    settingKey: QUERY_USE_MULTI_SCHEMA_KEY,
+    title: i18n('settings.queryUseMultiSchema.title'),
+    helpPopoverContent: i18n('settings.queryUseMultiSchema.popover'),
+};
 export const enableNewTenantDiagnosticsDesign: SettingProps = {
     settingKey: DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
     title: i18n('settings.tenantDiagnostics.title'),
@@ -113,6 +119,7 @@ export const experimentsSection: SettingsSection = {
         useNodesEndpointSetting,
         useBackendParamsForTables,
         enableQueryModesForExplainSetting,
+        queryUseMultiSchemaSetting,
         enableNewTenantDiagnosticsDesign,
     ],
 };
