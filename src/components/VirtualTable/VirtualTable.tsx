@@ -1,6 +1,7 @@
 import {useState, useReducer, useRef, useCallback, useEffect} from 'react';
 
 import type {IResponseError} from '../../types/api/error';
+import {getArray} from '../../utils';
 
 import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../Errors/ResponseError';
@@ -31,7 +32,6 @@ import {TableHead} from './TableHead';
 import {TableChunk} from './TableChunk';
 import {EmptyTableRow} from './TableRow';
 import {useIntersectionObserver} from './useIntersectionObserver';
-import {getArray} from './utils';
 import i18n from './i18n';
 import {b} from './shared';
 

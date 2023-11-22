@@ -16,10 +16,11 @@ import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus'
 import {explainVersions} from '../../../../store/reducers/explainQuery';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 
-import {renderExplainNode} from '../../../../utils';
 import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco';
 
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
+
+import {renderExplainNode} from './utils';
 
 import './ExplainResult.scss';
 

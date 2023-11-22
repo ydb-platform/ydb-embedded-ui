@@ -18,6 +18,8 @@ import {changeFilter, ProblemFilterValues} from '../../../../store/reducers/sett
 import {AutoFetcher} from '../../../../utils/autofetcher';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 
+import {getConnectedNodesCount} from './utils';
+
 import './Network.scss';
 
 const b = cn('network');
@@ -145,11 +147,6 @@ class Network extends React.Component {
         );
     };
 
-    getConnectedNodesCount = (peers) => {
-        const res = peers?.reduce((acc, item) => (item.Connected ? acc + 1 : acc), 0);
-        return res;
-    };
-
     renderNodes = (nodes, isRight) => {
         const {showId, showRacks, clickedNode} = this.state;
         let problemNodesCount = 0;
@@ -171,9 +168,7 @@ class Network extends React.Component {
                                           let capacity, connected;
                                           if (!isRight && nodeInfo?.Peers) {
                                               capacity = Object.keys(nodeInfo?.Peers).length;
-                                              connected = this.getConnectedNodesCount(
-                                                  nodeInfo?.Peers,
-                                              );
+                                              connected = getConnectedNodesCount(nodeInfo?.Peers);
                                           }
 
                                           if (
@@ -214,7 +209,7 @@ class Network extends React.Component {
                                   let capacity, connected;
                                   if (!isRight) {
                                       capacity = nodeInfo?.Peers?.length;
-                                      connected = this.getConnectedNodesCount(nodeInfo?.Peers);
+                                      connected = getConnectedNodesCount(nodeInfo?.Peers);
                                   }
 
                                   if (
@@ -234,7 +229,7 @@ class Network extends React.Component {
                                               capacity={nodeInfo?.Peers && nodeInfo?.Peers.length}
                                               connected={
                                                   nodeInfo?.Peers &&
-                                                  this.getConnectedNodesCount(nodeInfo?.Peers)
+                                                  getConnectedNodesCount(nodeInfo?.Peers)
                                               }
                                               onMouseEnter={showTooltip}
                                               onMouseLeave={hideTooltip}
