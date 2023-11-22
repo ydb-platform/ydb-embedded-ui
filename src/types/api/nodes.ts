@@ -26,6 +26,9 @@ export interface TNodeInfo {
     Tablets?: TTabletStateInfo[];
 }
 
+/**
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/node_whiteboard.proto
+ */
 export interface TSystemStateInfo {
     /** uint64 */
     StartTime?: string;
@@ -62,6 +65,20 @@ export interface TSystemStateInfo {
     /** double */
     MaxDiskUsage?: number;
     Location?: TNodeLocation;
+
+    /**
+     * int64
+     *
+     * a positive value means the peer is ahead in time; a negative value means it's behind
+     */
+    MaxClockSkewWithPeerUs?: string;
+    MaxClockSkewPeerId?: number;
+
+    /** uint64 */
+    DisconnectTime?: string;
+
+    SharedCacheStats?: TNodeSharedCache;
+    TotalSessions?: number;
 }
 
 export interface TPoolStats {
@@ -95,6 +112,13 @@ interface TNodeLocation {
     Module?: string;
     Rack?: string;
     Unit?: string;
+}
+
+interface TNodeSharedCache {
+    /** uint64 */
+    UsedBytes: string;
+    /** uint64 */
+    LimitBytes: string;
 }
 
 enum EConfigState {

@@ -50,12 +50,18 @@ export const prepareNodesData = (data: TNodesInfo): NodesHandledResponse => {
     const rawNodes = data.Nodes || [];
 
     const preparedNodes = rawNodes.map((node) => {
+        // 0 limit means that limit is not set, so it should be undefined
+        const sharedCacheLimit = Number(node.SystemState.SharedCacheStats?.LimitBytes) || undefined;
+
         return {
             ...node.SystemState,
             Tablets: node.Tablets,
             NodeId: node.NodeId,
             Uptime: calcUptime(node.SystemState?.StartTime),
             TenantName: node.SystemState?.Tenants?.[0],
+
+            SharedCacheUsed: node.SystemState.SharedCacheStats?.UsedBytes,
+            SharedCacheLimit: sharedCacheLimit,
         };
     });
 

@@ -28,6 +28,9 @@ const NODES_COLUMNS_IDS = {
     Tablets: 'Tablets',
     TopNodesLoadAverage: 'TopNodesLoadAverage',
     TopNodesMemory: 'TopNodesMemory',
+    SharedCacheUsage: 'SharedCacheUsage',
+    MemoryUsedInAlloc: 'MemoryUsedInAlloc',
+    TotalSessions: 'TotalSessions',
 };
 
 interface GetNodesColumnsProps {
@@ -184,20 +187,58 @@ const topNodesLoadAverageColumn: NodesColumn = {
 
 const topNodesMemoryColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.TopNodesMemory,
-    header: 'Memory',
-    render: ({row}) =>
-        row.MemoryUsed ? (
-            <ProgressViewer
-                value={row.MemoryUsed}
-                capacity={row.MemoryLimit}
-                formatValues={formatStorageValuesToGb}
-                colorizeProgress={true}
-            />
-        ) : (
-            '—'
-        ),
+    header: 'Process',
+    render: ({row}) => (
+        <ProgressViewer
+            value={row.MemoryUsed}
+            capacity={row.MemoryLimit}
+            formatValues={formatStorageValuesToGb}
+            colorizeProgress={true}
+        />
+    ),
     align: DataTable.LEFT,
     width: 140,
+    sortable: false,
+};
+
+const sharedCacheUsageColumn: NodesColumn = {
+    name: NODES_COLUMNS_IDS.SharedCacheUsage,
+    header: 'Tablet Cache',
+    render: ({row}) => (
+        <ProgressViewer
+            value={row.SharedCacheUsed}
+            capacity={row.SharedCacheLimit}
+            formatValues={formatStorageValuesToGb}
+            colorizeProgress={true}
+        />
+    ),
+    align: DataTable.LEFT,
+    width: 140,
+    sortable: false,
+};
+
+const memoryUsedInAllocColumn: NodesColumn = {
+    name: NODES_COLUMNS_IDS.MemoryUsedInAlloc,
+    header: 'Query Runtime',
+    render: ({row}) => (
+        <ProgressViewer
+            value={row.MemoryUsedInAlloc}
+            capacity={row.MemoryLimit}
+            formatValues={formatStorageValuesToGb}
+            colorizeProgress={true}
+        />
+    ),
+    align: DataTable.LEFT,
+    width: 140,
+    sortable: false,
+};
+
+const sessionsColumn: NodesColumn = {
+    name: NODES_COLUMNS_IDS.TotalSessions,
+    header: 'Sessions',
+    render: ({row}) => row.TotalSessions ?? '—',
+    align: DataTable.RIGHT,
+    width: 100,
     sortable: false,
 };
 
@@ -241,8 +282,11 @@ export function getTopNodesByMemoryColumns({
         nodeIdColumn,
         getHostColumn(getNodeRef),
         uptimeColumn,
-        topNodesMemoryColumn,
         topNodesLoadAverageColumn,
+        topNodesMemoryColumn,
+        sharedCacheUsageColumn,
+        memoryUsedInAllocColumn,
+        sessionsColumn,
         getTabletsColumn(tabletsPath),
     ];
 }
