@@ -96,7 +96,6 @@ const parseExecuteModernResponse = (data: ExecuteModernResponse): IQueryResult =
     return {
         result: result && columns && parseModernResult(result, columns),
         columns,
-        schema: 'modern',
         ...restData,
     };
 };
@@ -126,7 +125,6 @@ const parseExecuteMultiResponse = (data: ExecuteMultiResponse): IQueryResult => 
 
     return {
         resultSets: parsedResult, // use a separate field to make result compatible
-        schema: 'multi',
         ...restData,
     };
 };

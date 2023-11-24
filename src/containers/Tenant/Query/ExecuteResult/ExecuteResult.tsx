@@ -65,7 +65,8 @@ export function ExecuteResult({
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useDispatch();
 
-    const isMulti = data?.schema === 'multi';
+    const resultsSetsCount = data?.resultSets?.length;
+    const isMulti = resultsSetsCount && resultsSetsCount > 0;
     const currentResult = isMulti ? data?.resultSets?.[selectedResultSet].result : data?.result;
     const currentColumns = isMulti ? data?.resultSets?.[selectedResultSet].columns : data?.columns;
     const textResults = getPreparedResult(currentResult);
@@ -89,15 +90,9 @@ export function ExecuteResult({
     };
 
     const renderContent = () => {
-        const resultsSetsCount = data?.resultSets?.length;
-
-        if (isMulti && !resultsSetsCount) {
-            return null;
-        }
-
         return (
             <>
-                {isMulti && resultsSetsCount && resultsSetsCount > 1 && (
+                {isMulti && resultsSetsCount > 1 && (
                     <div>
                         <Tabs
                             className={b('result-tabs')}
@@ -153,12 +148,14 @@ export function ExecuteResult({
     };
 
     const renderResult = () => {
+        const content = renderContent();
+
         return (
             <React.Fragment>
-                {renderContent()}
+                {content}
                 {isFullscreen && (
                     <Fullscreen>
-                        <div className={b('result-fullscreen-wrapper')}>{renderContent()}</div>
+                        <div className={b('result-fullscreen-wrapper')}>{content}</div>
                     </Fullscreen>
                 )}
             </React.Fragment>
@@ -171,13 +168,15 @@ export function ExecuteResult({
         }
 
         if (typeof error === 'object' && error.data?.issues && Array.isArray(error.data.issues)) {
+            const content = <ResultIssues data={error.data} />;
+
             return (
                 <React.Fragment>
-                    <ResultIssues data={error.data} />
+                    {content}
                     {isFullscreen && (
                         <Fullscreen>
                             <div className={b('result-fullscreen-wrapper', b('result'))}>
-                                <ResultIssues data={error.data} />
+                                {content}
                             </div>
                         </Fullscreen>
                     )}

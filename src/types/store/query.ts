@@ -8,7 +8,6 @@ import type {
     ScriptPlan,
     QueryPlan,
     TKqpStatsQuery,
-    Schemas,
 } from '../api/query';
 import type {ValueOf} from '../common';
 
@@ -24,7 +23,6 @@ export interface IQueryResult {
     stats?: TKqpStatsQuery;
     plan?: ScriptPlan | QueryPlan;
     ast?: string;
-    schema?: Schemas;
 }
 
 export interface QueryRequestParams {
