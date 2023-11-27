@@ -1,0 +1,16 @@
+{
+  "disk-type": "Disk Type",
+  "erasure": "Erasure",
+  "allocated": "Allocated",
+  "available": "Available",
+  "usage": "Usage",
+  "dc": "DC",
+  "tablets": "Tablets",
+  "databases": "Databases",
+  "nodes": "Nodes",
+  "load": "Load",
+  "storage-size": "Storage size",
+  "storage-groups": "Storage groups, {{diskType}}",
+  "links": "Links",
+  "versions": "Versions"
+}

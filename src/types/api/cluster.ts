@@ -32,6 +32,9 @@ export interface TClusterInfo {
     /** uint64 */
     Tablets?: string;
 
+    /** Cluster root database */
+    Domain?: string;
+
     Balancer?: string; // additional
     Solomon?: string; // additional
 }

@@ -49,10 +49,6 @@
         }
     }
 
-    &__metric-field {
-        margin-top: -8px;
-    }
-
     &__system-tablets {
         display: flex;
         flex-wrap: wrap;
@@ -83,12 +79,25 @@
         margin-left: 15px;
         padding: 0 !important;
     }
-
     &__links {
         display: flex;
         flex-flow: row wrap;
 
         gap: 12px;
+    }
+
+    &__storage-groups-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+    }
+
+    &__groups-stats-bar {
+        cursor: pointer;
+    }
+
+    &__groups-stats-popup-content {
+        padding: 12px;
     }
 
     &__clipboard-button {
