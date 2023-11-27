@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.22.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.21.1...v4.22.0) (2023-11-27)
+
+
+### Features
+
+* **Query:** enable queries with multiple resultsets ([#595](https://github.com/ydb-platform/ydb-embedded-ui/issues/595)) ([2eedfb6](https://github.com/ydb-platform/ydb-embedded-ui/commit/2eedfb6ec3be932c7399bb67de901798c0b31b50))
+* **TenantOverview:** add columns to memory table ([#593](https://github.com/ydb-platform/ydb-embedded-ui/issues/593)) ([6379577](https://github.com/ydb-platform/ydb-embedded-ui/commit/6379577782cfa69de9fb39640d2a143f1670be39))
+
+
+### Bug Fixes
+
+* fix disks developer UI links for paths with nodeId ([#594](https://github.com/ydb-platform/ydb-embedded-ui/issues/594)) ([7f5a783](https://github.com/ydb-platform/ydb-embedded-ui/commit/7f5a78393d0c23e584ad73040fd0e73d404e5d01))
+* **TopShards:** sort by InFlightTxCount ([#591](https://github.com/ydb-platform/ydb-embedded-ui/issues/591)) ([eb3592d](https://github.com/ydb-platform/ydb-embedded-ui/commit/eb3592d69a465814de27e8b1e368b34cc60fed2f))
+
 ## [4.21.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.21.0...v4.21.1) (2023-11-17)
 
 
