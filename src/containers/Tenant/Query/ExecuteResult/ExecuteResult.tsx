@@ -1,26 +1,30 @@
-import React, {type ReactNode, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import JSONTree from 'react-json-inspector';
 
-import {RadioButton} from '@gravity-ui/uikit';
+import {RadioButton, Tabs} from '@gravity-ui/uikit';
 
 import CopyToClipboard from '../../../../components/CopyToClipboard/CopyToClipboard';
 import Divider from '../../../../components/Divider/Divider';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
+import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
 
 import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult, QueryErrorResponse} from '../../../../types/store/query';
+import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {prepareQueryError} from '../../../../utils/query';
 import {useTypedSelector} from '../../../../utils/hooks';
+import {getArray} from '../../../../utils';
 
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 
 import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
+import {getPreparedResult} from '../utils/getPreparedResult';
 
 import './ExecuteResult.scss';
 
@@ -39,29 +43,34 @@ const resultOptions = [
 ];
 
 interface ExecuteResultProps {
-    textResults: string;
-    result: ReactNode;
+    data: IQueryResult | undefined;
     stats: IQueryResult['stats'] | undefined;
     error: string | QueryErrorResponse | undefined;
-    copyDisabled?: boolean;
     isResultsCollapsed?: boolean;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
 }
 
 export function ExecuteResult({
-    textResults,
-    result,
+    data,
     stats,
     error,
-    copyDisabled,
     isResultsCollapsed,
     onCollapseResults,
     onExpandResults,
 }: ExecuteResultProps) {
+    const [selectedResultSet, setSelectedResultSet] = useState(0);
     const [activeSection, setActiveSection] = useState<SectionID>(resultOptionsIds.result);
+
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useDispatch();
+
+    const resultsSetsCount = data?.resultSets?.length;
+    const isMulti = resultsSetsCount && resultsSetsCount > 0;
+    const currentResult = isMulti ? data?.resultSets?.[selectedResultSet].result : data?.result;
+    const currentColumns = isMulti ? data?.resultSets?.[selectedResultSet].columns : data?.columns;
+    const textResults = getPreparedResult(currentResult);
+    const copyDisabled = !textResults.length;
 
     useEffect(() => {
         return () => {
@@ -71,6 +80,37 @@ export function ExecuteResult({
 
     const onSelectSection = (value: string) => {
         setActiveSection(value as SectionID);
+    };
+
+    const renderResultTable = (
+        result: KeyValueRow[] | undefined,
+        columns: ColumnType[] | undefined,
+    ) => {
+        return <QueryResultTable data={result} columns={columns} settings={{sortable: false}} />;
+    };
+
+    const renderContent = () => {
+        return (
+            <>
+                {isMulti && resultsSetsCount > 1 && (
+                    <div>
+                        <Tabs
+                            className={b('result-tabs')}
+                            size="l"
+                            items={getArray(resultsSetsCount).map((item) => ({
+                                id: String(item),
+                                title: `Result #${item + 1}`,
+                            }))}
+                            activeTab={String(selectedResultSet)}
+                            onSelectTab={(tabId) => setSelectedResultSet(Number(tabId))}
+                        />
+                    </div>
+                )}
+                <div className={b('result')}>
+                    {renderResultTable(currentResult, currentColumns)}
+                </div>
+            </>
+        );
     };
 
     const renderClipboardButton = () => {
@@ -108,12 +148,14 @@ export function ExecuteResult({
     };
 
     const renderResult = () => {
+        const content = renderContent();
+
         return (
             <React.Fragment>
-                {result}
+                {content}
                 {isFullscreen && (
                     <Fullscreen>
-                        <div className={b('result', {fullscreen: true})}>{result}</div>
+                        <div className={b('result-fullscreen-wrapper')}>{content}</div>
                     </Fullscreen>
                 )}
             </React.Fragment>
@@ -126,13 +168,15 @@ export function ExecuteResult({
         }
 
         if (typeof error === 'object' && error.data?.issues && Array.isArray(error.data.issues)) {
+            const content = <ResultIssues data={error.data} />;
+
             return (
                 <React.Fragment>
-                    <ResultIssues data={error.data} />
+                    {content}
                     {isFullscreen && (
                         <Fullscreen>
-                            <div className={b('result', {fullscreen: true})}>
-                                <ResultIssues data={error.data} />
+                            <div className={b('result-fullscreen-wrapper', b('result'))}>
+                                {content}
                             </div>
                         </Fullscreen>
                     )}
@@ -143,6 +187,19 @@ export function ExecuteResult({
         const parsedError = typeof error === 'string' ? error : prepareQueryError(error);
 
         return <div className={b('error')}>{parsedError}</div>;
+    };
+
+    const renderResultSection = () => {
+        if (activeSection === resultOptionsIds.result && !error) {
+            return renderResult();
+        }
+
+        return (
+            <div className={b('result')}>
+                {activeSection === resultOptionsIds.stats && !error && renderStats()}
+                {renderIssues()}
+            </div>
+        );
     };
 
     return (
@@ -174,11 +231,8 @@ export function ExecuteResult({
                     />
                 </div>
             </div>
-            <div className={b('result')}>
-                {activeSection === resultOptionsIds.result && !error && renderResult()}
-                {activeSection === resultOptionsIds.stats && !error && renderStats()}
-                {renderIssues()}
-            </div>
+
+            {renderResultSection()}
         </React.Fragment>
     );
 }

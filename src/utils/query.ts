@@ -2,7 +2,10 @@ import {YQLType} from '../types';
 import type {
     AnyExecuteResponse,
     AnyExplainResponse,
+    ArrayRow,
+    ColumnType,
     ExecuteModernResponse,
+    ExecuteMultiResponse,
     KeyValueRow,
     QueryPlan,
     ScriptPlan,
@@ -76,22 +79,52 @@ export const getColumnType = (type: string) => {
     }
 };
 
-/** parse response result field from ArrayRow to KeyValueRow */
+/** parse response result from ArrayRow to KeyValueRow */
+const parseModernResult = (rows: ArrayRow[], columns: ColumnType[]) => {
+    return rows.map((row) => {
+        return row.reduce<KeyValueRow>((newRow, cellData, columnIndex) => {
+            const {name} = columns[columnIndex];
+            newRow[name] = cellData;
+            return newRow;
+        }, {});
+    });
+};
+
 const parseExecuteModernResponse = (data: ExecuteModernResponse): IQueryResult => {
     const {result, columns, ...restData} = data;
 
     return {
-        result:
-            result &&
-            columns &&
-            result.map((row) => {
-                return row.reduce((newRow, cellData, columnIndex) => {
-                    const {name} = columns[columnIndex];
-                    newRow[name] = cellData;
-                    return newRow;
-                }, {} as KeyValueRow);
-            }),
+        result: result && columns && parseModernResult(result, columns),
         columns,
+        ...restData,
+    };
+};
+
+const parseExecuteMultiResponse = (data: ExecuteMultiResponse): IQueryResult => {
+    const {result, ...restData} = data;
+
+    const parsedResult = result?.map((resultSet) => {
+        const {rows, columns} = resultSet;
+
+        let parsedRows: KeyValueRow[] | undefined;
+
+        if (columns) {
+            // Result shouldn't be null if there are columns
+            parsedRows = [];
+        }
+
+        if (rows && columns) {
+            parsedRows = parseModernResult(rows, columns);
+        }
+
+        return {
+            columns: columns,
+            result: parsedRows,
+        };
+    });
+
+    return {
+        resultSets: parsedResult, // use a separate field to make result compatible
         ...restData,
     };
 };
@@ -100,8 +133,18 @@ const isModern = (response: AnyExecuteResponse): response is ExecuteModernRespon
     Boolean(
         response &&
             !Array.isArray(response) &&
-            Array.isArray((response as ExecuteModernResponse).result) &&
+            Array.isArray(response.result) &&
             Array.isArray((response as ExecuteModernResponse).columns),
+    );
+
+const isMulti = (response: AnyExecuteResponse): response is ExecuteMultiResponse =>
+    Boolean(
+        response &&
+            !Array.isArray(response) &&
+            Array.isArray(response.result) &&
+            typeof response.result[0] === 'object' &&
+            'rows' in response.result[0] &&
+            'columns' in response.result[0],
     );
 
 type UnsupportedQueryResponseFormat =
@@ -122,11 +165,16 @@ const isUnsupportedType = (
     );
 };
 
+// Although schema is set in request, if schema is not supported default schema for the version will be used
+// So we should additionally parse response
 export const parseQueryAPIExecuteResponse = (
     data: AnyExecuteResponse | UnsupportedQueryResponseFormat,
 ): IQueryResult => {
     if (isUnsupportedType(data)) {
         return {};
+    }
+    if (isMulti(data)) {
+        return parseExecuteMultiResponse(data);
     }
     if (isModern(data)) {
         return parseExecuteModernResponse(data);

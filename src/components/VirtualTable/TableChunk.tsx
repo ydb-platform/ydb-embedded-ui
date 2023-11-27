@@ -1,8 +1,9 @@
 import {useEffect, useRef, memo} from 'react';
 
+import {getArray} from '../../utils';
+
 import type {Column, Chunk, GetRowClassName} from './types';
 import {LoadingTableRow, TableRow} from './TableRow';
-import {getArray} from './utils';
 
 // With original memo generic types are lost
 const typedMemo: <T>(Component: T) => T = memo;

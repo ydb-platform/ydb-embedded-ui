@@ -27,7 +27,7 @@ interface TNetNodeInfo {
     Port: number;
 }
 
-interface TNetNodePeerInfo {
+export interface TNetNodePeerInfo {
     NodeId: number;
     PeerName: string;
     Connected: boolean;

@@ -6,7 +6,6 @@ import _ from 'lodash';
 import MonacoEditor from 'react-monaco-editor';
 
 import SplitPane from '../../../../components/SplitPane';
-import {QueryResultTable} from '../../../../components/QueryResultTable';
 
 import {
     sendExecuteQuery,
@@ -26,6 +25,7 @@ import {
     SAVED_QUERIES_KEY,
     ENABLE_ADDITIONAL_QUERY_MODES,
     LAST_USED_QUERY_ACTION_KEY,
+    QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../../utils/constants';
 import {useSetting, useQueryModes} from '../../../../utils/hooks';
 import {QUERY_ACTIONS, QUERY_MODES, isNewQueryMode} from '../../../../utils/query';
@@ -40,13 +40,7 @@ import {ExecuteResult} from '../ExecuteResult/ExecuteResult';
 import {ExplainResult} from '../ExplainResult/ExplainResult';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 
-import {getPreparedResult} from '../utils/getPreparedResult';
-
 import './QueryEditor.scss';
-
-const TABLE_SETTINGS = {
-    sortable: false,
-};
 
 const EDITOR_OPTIONS = {
     automaticLayout: true,
@@ -92,6 +86,7 @@ function QueryEditor(props) {
     const [isResultLoaded, setIsResultLoaded] = useState(false);
     const [queryMode, setQueryMode] = useQueryModes();
     const [enableAdditionalQueryModes] = useSetting(ENABLE_ADDITIONAL_QUERY_MODES);
+    const [useMultiSchema] = useSetting(QUERY_USE_MULTI_SCHEMA_KEY);
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting(LAST_USED_QUERY_ACTION_KEY);
 
     useEffect(() => {
@@ -256,9 +251,16 @@ function QueryEditor(props) {
             setShowPreview,
         } = props;
 
+        const schema = useMultiSchema ? 'multi' : 'modern';
+
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
         setResultType(RESULT_TYPES.EXECUTE);
-        sendExecuteQuery({query: input, database: path, mode});
+        sendExecuteQuery({
+            query: input,
+            database: path,
+            mode,
+            schema,
+        });
         setIsResultLoaded(true);
         setShowPreview(false);
 
@@ -314,26 +316,11 @@ function QueryEditor(props) {
             executeQuery: {data, error, stats},
         } = props;
 
-        let content;
-        if (data) {
-            content = (
-                <QueryResultTable
-                    data={data.result}
-                    columns={data.columns}
-                    settings={TABLE_SETTINGS}
-                />
-            );
-        }
-        const textResults = getPreparedResult(data);
-        const disabled = !textResults.length || resultType !== RESULT_TYPES.EXECUTE;
-
         return data || error ? (
             <ExecuteResult
-                result={content}
+                data={data}
                 stats={stats}
                 error={error}
-                textResults={textResults}
-                copyDisabled={disabled}
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}

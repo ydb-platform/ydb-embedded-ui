@@ -13,11 +13,19 @@
         & .data-table__table-wrapper {
             padding-bottom: 0;
         }
-        &_fullscreen {
-            width: 100%;
-            margin-top: 10px;
-            padding: 0 10px 10px;
-        }
+    }
+
+    &__result-fullscreen-wrapper {
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+        margin-top: 10px;
+        padding: 0 10px 10px;
+    }
+
+    &__result-tabs {
+        padding-left: 10px;
     }
 
     &__error {

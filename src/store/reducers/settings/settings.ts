@@ -16,6 +16,7 @@ import {
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     LANGUAGE_KEY,
     DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
+    QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../utils/constants';
 import '../../../services/api';
 import {parseJson} from '../../../utils/utils';
@@ -56,6 +57,7 @@ export const initialState = {
             ENABLE_ADDITIONAL_QUERY_MODES,
             'true',
         ),
+        [QUERY_USE_MULTI_SCHEMA_KEY]: readSavedSettingsValue(QUERY_USE_MULTI_SCHEMA_KEY, 'false'),
         [DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS]: readSavedSettingsValue(
             DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
             'true',

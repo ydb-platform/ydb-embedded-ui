@@ -11,7 +11,13 @@ import type {
 } from '../api/query';
 import type {ValueOf} from '../common';
 
+export interface ParsedResultSet {
+    columns?: ColumnType[];
+    result?: KeyValueRow[];
+}
+
 export interface IQueryResult {
+    resultSets?: ParsedResultSet[];
     result?: KeyValueRow[];
     columns?: ColumnType[];
     stats?: TKqpStatsQuery;

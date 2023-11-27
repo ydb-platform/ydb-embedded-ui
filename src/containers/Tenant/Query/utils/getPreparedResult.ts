@@ -1,16 +1,15 @@
 import type {KeyValueRow} from '../../../../types/api/query';
-import type {IQueryResult} from '../../../../types/store/query';
 
-export const getPreparedResult = (data: IQueryResult) => {
+export const getPreparedResult = (data: KeyValueRow[] | undefined) => {
     const columnDivider = '\t';
     const rowDivider = '\n';
 
-    if (!data?.result?.length) {
+    if (!data?.length) {
         return '';
     }
 
-    const columnHeaders = Object.keys(data.result[0]);
-    const rows = Array<string[] | KeyValueRow[]>(columnHeaders).concat(data.result);
+    const columnHeaders = Object.keys(data[0]);
+    const rows = Array<string[] | KeyValueRow[]>(columnHeaders).concat(data);
 
     return rows
         .map((item) => {

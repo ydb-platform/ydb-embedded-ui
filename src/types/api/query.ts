@@ -180,7 +180,7 @@ export interface ColumnType {
 }
 
 /** undefined = 'classic' */
-export type Schemas = 'classic' | 'modern' | 'ydb' | undefined;
+export type Schemas = 'classic' | 'modern' | 'ydb' | 'multi' | undefined;
 
 /** undefined = 'execute' */
 export type ExecuteActions =
@@ -231,16 +231,29 @@ export type ExplainResponse<Action extends ExplainActions> = Action extends 'exp
     ? ExplainScriptResponse
     : ExplainQueryResponse;
 
+// ==== Execute Results ====
+
+interface ModernSchemaResult {
+    result?: ArrayRow[];
+    columns?: ColumnType[];
+}
+interface MultiSchemaResult {
+    result?: {
+        rows?: ArrayRow[] | null;
+        columns?: ColumnType[];
+    }[];
+}
+interface DefaultSchemaResult {
+    result?: KeyValueRow[];
+}
+
 // ==== Execute Responses ====
 
 type ResultFields<Schema extends Schemas> = Schema extends 'modern'
-    ? {
-          result?: ArrayRow[];
-          columns?: ColumnType[];
-      }
-    : {
-          result?: KeyValueRow[];
-      };
+    ? ModernSchemaResult
+    : Schema extends 'multi'
+    ? MultiSchemaResult
+    : DefaultSchemaResult;
 
 /**
  * meta.type = 'query'
@@ -287,6 +300,7 @@ export type AnyExplainResponse = ExplainQueryResponse | ExplainScriptResponse;
 export type ExecuteModernResponse =
     | ExecuteQueryResponse<'modern'>
     | ExecuteScriptResponse<'modern'>;
+export type ExecuteMultiResponse = ExecuteQueryResponse<'multi'> | ExecuteScriptResponse<'multi'>;
 export type ExecuteClassicResponse =
     | ExecuteQueryResponse<'classic'>
     | ExecuteScriptResponse<'classic'>;
@@ -294,5 +308,6 @@ export type ExecuteYdbResponse = ExecuteQueryResponse<'ydb'> | ExecuteScriptResp
 
 export type AnyExecuteResponse =
     | ExecuteModernResponse
+    | ExecuteMultiResponse
     | ExecuteClassicResponse
     | ExecuteYdbResponse;

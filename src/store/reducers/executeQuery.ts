@@ -1,6 +1,6 @@
 import type {Reducer} from 'redux';
 
-import type {ExecuteActions} from '../../types/api/query';
+import type {ExecuteActions, Schemas} from '../../types/api/query';
 import type {
     ExecuteQueryAction,
     ExecuteQueryState,
@@ -154,9 +154,10 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
 
 interface SendQueryParams extends QueryRequestParams {
     mode?: QueryMode;
+    schema?: Schemas;
 }
 
-export const sendExecuteQuery = ({query, database, mode}: SendQueryParams) => {
+export const sendExecuteQuery = ({query, database, mode, schema = 'modern'}: SendQueryParams) => {
     let action: ExecuteActions = 'execute';
     let syntax: QuerySyntax = QUERY_SYNTAX.yql;
 
@@ -169,7 +170,7 @@ export const sendExecuteQuery = ({query, database, mode}: SendQueryParams) => {
 
     return createApiRequest({
         request: window.api.sendQuery({
-            schema: 'modern',
+            schema,
             query,
             database,
             action,
