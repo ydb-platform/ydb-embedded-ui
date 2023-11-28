@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import cn from 'bem-cn-lite';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
@@ -28,6 +29,16 @@ interface SchemaViewerProps {
 }
 
 export const SchemaViewer = ({keyColumnIds = [], columns = [], type}: SchemaViewerProps) => {
+    // Keys should be displayd by their order in keyColumnIds (Primary Key)
+    const keyColumnsOrderValues = useMemo(() => {
+        return keyColumnIds.reduce<Record<number, number>>((result, keyColumnId, index) => {
+            // Put columns with negative values, so they will be the first with ascending sort
+            // Minus keyColumnIds.length for the first key, -1 for the last
+            result[keyColumnId] = index - keyColumnIds.length;
+            return result;
+        }, {});
+    }, [keyColumnIds]);
+
     let dataTableColumns: Column<TColumnDescription>[] = [
         {
             name: SchemaViewerColumns.id,
@@ -36,8 +47,11 @@ export const SchemaViewer = ({keyColumnIds = [], columns = [], type}: SchemaView
         {
             name: SchemaViewerColumns.key,
             width: 40,
+            // Table should start with key columns on sort click
+            defaultOrder: DataTable.ASCENDING,
             sortAccessor: (row) => {
-                return row.Id && keyColumnIds.includes(row.Id) ? 1 : 0;
+                // Values in keyColumnsOrderValues are always negative, so it will be 1 for not key columns
+                return (row.Id && keyColumnsOrderValues[row.Id]) || 1;
             },
             render: ({row}) => {
                 return row.Id && keyColumnIds.includes(row.Id) ? (
@@ -58,6 +72,8 @@ export const SchemaViewer = ({keyColumnIds = [], columns = [], type}: SchemaView
         {
             name: SchemaViewerColumns.notNull,
             width: 100,
+            // Table should start with notNull columns on sort click
+            defaultOrder: DataTable.DESCENDING,
             render: ({row}) => {
                 if (row.NotNull) {
                     return '\u2713';
@@ -75,22 +91,14 @@ export const SchemaViewer = ({keyColumnIds = [], columns = [], type}: SchemaView
         );
     }
 
-    // Display key columns first
-    const tableData = columns.sort((column) => {
-        if (column.Id && keyColumnIds.includes(column.Id)) {
-            return 1;
-        }
-        return -1;
-    });
-
     return (
         <div className={b()}>
             <DataTable
                 theme="yandex-cloud"
-                data={tableData}
+                data={columns}
                 columns={dataTableColumns}
                 settings={DEFAULT_TABLE_SETTINGS}
-                initialSortOrder={{columnId: SchemaViewerColumns.key, order: DataTable.DESCENDING}}
+                initialSortOrder={{columnId: SchemaViewerColumns.key, order: DataTable.ASCENDING}}
             />
         </div>
     );
