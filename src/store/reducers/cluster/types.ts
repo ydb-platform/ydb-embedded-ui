@@ -14,7 +14,7 @@ export interface DiskErasureGroupsStats {
 }
 
 /** Keys - erasure types */
-type DiskGroupsStats = Record<string, DiskErasureGroupsStats>;
+export type DiskGroupsStats = Record<string, DiskErasureGroupsStats>;
 
 /** Keys - PDisks types */
 export type ClusterGroupsStats = Record<string, DiskGroupsStats>;

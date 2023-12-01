@@ -28,6 +28,7 @@ import {
 import type {
     ClusterGroupsStats,
     DiskErasureGroupsStats,
+    DiskGroupsStats,
 } from '../../../store/reducers/cluster/types';
 
 import {VersionsBar} from '../VersionsBar/VersionsBar';
@@ -82,29 +83,35 @@ const GroupsStatsPopupContent = ({stats}: GroupsStatsPopupContentProps) => {
     );
 };
 
+interface DiskGroupsStatsProps {
+    stats: DiskGroupsStats;
+}
+
+const DiskGroupsStatsBars = ({stats}: DiskGroupsStatsProps) => {
+    return (
+        <div className={b('storage-groups-stats')}>
+            {Object.values(stats).map((erasureStats) => (
+                <ContentWithPopup
+                    placement={['right']}
+                    key={erasureStats.erasure}
+                    content={<GroupsStatsPopupContent stats={erasureStats} />}
+                >
+                    <ProgressViewer
+                        className={b('groups-stats-bar')}
+                        value={erasureStats.createdGroups}
+                        capacity={erasureStats.totalGroups}
+                    />
+                </ContentWithPopup>
+            ))}
+        </div>
+    );
+};
+
 const getGroupsStatsFields = (groupsStats: ClusterGroupsStats) => {
     return Object.keys(groupsStats).map((diskType) => {
         return {
             label: i18n('storage-groups', {diskType}),
-            value: (
-                <div className={b('storage-groups-stats')}>
-                    {Object.values(groupsStats[diskType]).map((erasureStats) => {
-                        return (
-                            <ContentWithPopup
-                                placement={['right']}
-                                key={erasureStats.erasure}
-                                content={<GroupsStatsPopupContent stats={erasureStats} />}
-                            >
-                                <ProgressViewer
-                                    className={b('groups-stats-bar')}
-                                    value={erasureStats.createdGroups}
-                                    capacity={erasureStats.totalGroups}
-                                />
-                            </ContentWithPopup>
-                        );
-                    })}
-                </div>
-            ),
+            value: <DiskGroupsStatsBars stats={groupsStats[diskType]} />,
         };
     });
 };
