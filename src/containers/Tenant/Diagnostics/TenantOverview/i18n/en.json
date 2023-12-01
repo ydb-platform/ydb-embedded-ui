@@ -7,5 +7,21 @@
   "title.pools": "Pools",
   "title.metrics": "Metrics",
 
-  "top-groups.empty-data": "No such groups"
+  "top-groups.empty-data": "No such groups",
+
+  "top": "Top",
+
+  "nodes": "nodes",
+  "shards": "shards",
+  "groups": "groups",
+  "queries": "queries",
+  "tables": "tables",
+
+  "by-pools-usage": "by pools usage",
+  "by-cpu-time": "by cpu time",
+  "by-cpu-usage": "by cpu usage",
+  "by-load": "by load",
+  "by-memory": "by memory",
+  "by-usage": "by usage",
+  "by-size": "by size"
 }

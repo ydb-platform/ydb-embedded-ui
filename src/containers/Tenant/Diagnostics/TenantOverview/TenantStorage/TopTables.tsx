@@ -12,7 +12,10 @@ import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
 import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
+
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
+import {getSectionTitle} from '../getSectionTitle';
+import i18n from '../i18n';
 
 import '../TenantOverview.scss';
 
@@ -72,12 +75,16 @@ export function TopTables({path}: TopTablesProps) {
                 ) : null,
         },
     ];
+    const title = getSectionTitle({
+        entity: i18n('tables'),
+        postfix: i18n('by-size'),
+    });
 
     return (
         <TenantOverviewTableLayout
             data={data || []}
             columns={columns}
-            title="Top tables by size"
+            title={title}
             loading={loading}
             wasLoaded={wasLoaded}
             error={error}
