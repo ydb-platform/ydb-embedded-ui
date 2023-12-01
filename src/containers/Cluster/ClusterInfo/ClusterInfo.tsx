@@ -10,6 +10,7 @@ import {Tablet} from '../../../components/Tablet';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {ExternalLinkWithIcon} from '../../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
 import {IconWrapper as Icon} from '../../../components/Icon/Icon';
+import {ContentWithPopup} from '../../../components/ContentWithPopup/ContentWithPopup';
 
 import type {IResponseError} from '../../../types/api/error';
 import type {AdditionalClusterProps, ClusterLink} from '../../../types/additionalProps';
@@ -18,14 +19,21 @@ import type {TClusterInfo} from '../../../types/api/cluster';
 import {backend, customBackend} from '../../../store';
 import {formatStorageValues} from '../../../utils/dataFormatters/dataFormatters';
 import {useSetting, useTypedSelector} from '../../../utils/hooks';
+import {formatBytes, getSizeWithSignificantDigits} from '../../../utils/bytesParsers';
 import {
     CLUSTER_DEFAULT_TITLE,
     CLUSTER_INFO_HIDDEN_KEY,
     DEVELOPER_UI_TITLE,
 } from '../../../utils/constants';
+import type {
+    ClusterGroupsStats,
+    DiskErasureGroupsStats,
+    DiskGroupsStats,
+} from '../../../store/reducers/cluster/types';
 
 import {VersionsBar} from '../VersionsBar/VersionsBar';
 import {ClusterInfoSkeleton} from '../ClusterInfoSkeleton/ClusterInfoSkeleton';
+import i18n from '../i18n';
 
 import {compareTablets} from './utils';
 
@@ -33,9 +41,85 @@ import './ClusterInfo.scss';
 
 const b = block('cluster-info');
 
+interface GroupsStatsPopupContentProps {
+    stats: DiskErasureGroupsStats;
+}
+
+const GroupsStatsPopupContent = ({stats}: GroupsStatsPopupContentProps) => {
+    const {diskType, erasure, allocatedSize, availableSize} = stats;
+
+    const sizeToConvert = getSizeWithSignificantDigits(Math.max(allocatedSize, availableSize), 2);
+
+    const convertedAllocatedSize = formatBytes({value: allocatedSize, size: sizeToConvert});
+    const convertedAvailableSize = formatBytes({value: availableSize, size: sizeToConvert});
+
+    const usage = Math.round((allocatedSize / (allocatedSize + availableSize)) * 100);
+
+    const info = [
+        {
+            label: i18n('disk-type'),
+            value: diskType,
+        },
+        {
+            label: i18n('erasure'),
+            value: erasure,
+        },
+        {
+            label: i18n('allocated'),
+            value: convertedAllocatedSize,
+        },
+        {
+            label: i18n('available'),
+            value: convertedAvailableSize,
+        },
+        {
+            label: i18n('usage'),
+            value: usage + '%',
+        },
+    ];
+
+    return (
+        <InfoViewer dots={true} info={info} className={b('groups-stats-popup-content')} size="s" />
+    );
+};
+
+interface DiskGroupsStatsProps {
+    stats: DiskGroupsStats;
+}
+
+const DiskGroupsStatsBars = ({stats}: DiskGroupsStatsProps) => {
+    return (
+        <div className={b('storage-groups-stats')}>
+            {Object.values(stats).map((erasureStats) => (
+                <ContentWithPopup
+                    placement={['right']}
+                    key={erasureStats.erasure}
+                    content={<GroupsStatsPopupContent stats={erasureStats} />}
+                >
+                    <ProgressViewer
+                        className={b('groups-stats-bar')}
+                        value={erasureStats.createdGroups}
+                        capacity={erasureStats.totalGroups}
+                    />
+                </ContentWithPopup>
+            ))}
+        </div>
+    );
+};
+
+const getGroupsStatsFields = (groupsStats: ClusterGroupsStats) => {
+    return Object.keys(groupsStats).map((diskType) => {
+        return {
+            label: i18n('storage-groups', {diskType}),
+            value: <DiskGroupsStatsBars stats={groupsStats[diskType]} />,
+        };
+    });
+};
+
 const getInfo = (
     cluster: TClusterInfo,
     versionsValues: VersionValue[],
+    groupsStats: ClusterGroupsStats,
     additionalInfo: InfoViewerItem[],
     links: ClusterLink[],
 ) => {
@@ -43,14 +127,14 @@ const getInfo = (
 
     if (cluster.DataCenters) {
         info.push({
-            label: 'DC',
+            label: i18n('dc'),
             value: <Tags tags={cluster.DataCenters} />,
         });
     }
 
     if (cluster.SystemTablets) {
         info.push({
-            label: 'Tablets',
+            label: i18n('tablets'),
             value: (
                 <div className={b('system-tablets')}>
                     {cluster.SystemTablets.sort(compareTablets).map((tablet, tabletIndex) => (
@@ -63,46 +147,40 @@ const getInfo = (
 
     if (cluster.Tenants) {
         info.push({
-            label: 'Databases',
+            label: i18n('databases'),
             value: cluster.Tenants,
         });
     }
 
     info.push(
         {
-            label: 'Nodes',
-            value: (
-                <ProgressViewer
-                    className={b('metric-field')}
-                    value={cluster?.NodesAlive}
-                    capacity={cluster?.NodesTotal}
-                />
-            ),
+            label: i18n('nodes'),
+            value: <ProgressViewer value={cluster?.NodesAlive} capacity={cluster?.NodesTotal} />,
         },
         {
-            label: 'Load',
-            value: (
-                <ProgressViewer
-                    className={b('metric-field')}
-                    value={cluster?.LoadAverage}
-                    capacity={cluster?.NumberOfCpus}
-                />
-            ),
+            label: i18n('load'),
+            value: <ProgressViewer value={cluster?.LoadAverage} capacity={cluster?.NumberOfCpus} />,
         },
         {
-            label: 'Storage',
+            label: i18n('storage-size'),
             value: (
                 <ProgressViewer
-                    className={b('metric-field')}
                     value={cluster?.StorageUsed}
                     capacity={cluster?.StorageTotal}
                     formatValues={formatStorageValues}
                 />
             ),
         },
+    );
+
+    if (Object.keys(groupsStats).length) {
+        info.push(...getGroupsStatsFields(groupsStats));
+    }
+
+    info.push(
         ...additionalInfo,
         {
-            label: 'Links',
+            label: i18n('links'),
             value: (
                 <div className={b('links')}>
                     {links.map(({title, url}) => (
@@ -112,7 +190,7 @@ const getInfo = (
             ),
         },
         {
-            label: 'Versions',
+            label: i18n('versions'),
             value: <VersionsBar versionsValues={versionsValues} />,
         },
     );
@@ -123,6 +201,7 @@ const getInfo = (
 interface ClusterInfoProps {
     cluster?: TClusterInfo;
     versionsValues?: VersionValue[];
+    groupsStats?: ClusterGroupsStats;
     loading?: boolean;
     error?: IResponseError;
     additionalClusterProps?: AdditionalClusterProps;
@@ -131,6 +210,7 @@ interface ClusterInfoProps {
 export const ClusterInfo = ({
     cluster = {},
     versionsValues = [],
+    groupsStats = {},
     loading,
     error,
     additionalClusterProps = {},
@@ -151,7 +231,7 @@ export const ClusterInfo = ({
 
     const {info = [], links = []} = additionalClusterProps;
 
-    const clusterInfo = getInfo(cluster, versionsValues, info, [
+    const clusterInfo = getInfo(cluster, versionsValues, groupsStats, info, [
         {title: DEVELOPER_UI_TITLE, url: internalLink},
         ...links,
     ]);

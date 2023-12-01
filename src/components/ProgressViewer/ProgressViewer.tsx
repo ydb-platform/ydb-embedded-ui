@@ -44,7 +44,7 @@ Props description:
 interface ProgressViewerProps {
     value?: number | string;
     capacity?: number | string;
-    formatValues?: (value?: number, capacity?: number) => (string | undefined)[];
+    formatValues?: (value?: number, capacity?: number) => (string | number | undefined)[];
     percents?: boolean;
     className?: string;
     size?: ProgressViewerSize;

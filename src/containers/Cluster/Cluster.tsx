@@ -68,6 +68,7 @@ function Cluster({
         loading: clusterLoading,
         wasLoaded: clusterWasLoaded,
         error: clusterError,
+        groupsStats,
     } = useTypedSelector((state) => state.cluster);
     const {
         nodes,
@@ -135,6 +136,7 @@ function Cluster({
         <div className={b()} ref={container}>
             <ClusterInfo
                 cluster={cluster}
+                groupsStats={groupsStats}
                 versionsValues={versionsValues}
                 loading={infoLoading}
                 error={clusterError}
