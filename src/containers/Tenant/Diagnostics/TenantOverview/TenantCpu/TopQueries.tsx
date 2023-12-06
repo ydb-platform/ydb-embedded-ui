@@ -3,6 +3,7 @@ import {useHistory, useLocation} from 'react-router';
 import {useCallback} from 'react';
 
 import {
+    TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGE,
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
@@ -14,9 +15,13 @@ import {
 import {changeUserInput} from '../../../../../store/reducers/executeQuery';
 import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
 import {parseQuery} from '../../../../../routes';
+
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {getTenantOverviewTopQueriesColumns} from '../../TopQueries/getTopQueriesColumns';
+
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
+import {getSectionTitle} from '../getSectionTitle';
+import i18n from '../i18n';
 
 interface TopQueriesProps {
     path: string;
@@ -26,6 +31,8 @@ export function TopQueries({path}: TopQueriesProps) {
     const dispatch = useDispatch();
     const location = useLocation();
     const history = useHistory();
+
+    const query = parseQuery(location);
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
@@ -68,12 +75,21 @@ export function TopQueries({path}: TopQueriesProps) {
         [dispatch, history, location],
     );
 
+    const title = getSectionTitle({
+        entity: i18n('queries'),
+        postfix: i18n('by-cpu-time'),
+        link: getTenantPath({
+            ...query,
+            [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.topQueries,
+        }),
+    });
+
     return (
         <TenantOverviewTableLayout
             data={data || []}
             columns={columns}
             onRowClick={handleRowClick}
-            title="Top queries by cpu time"
+            title={title}
             loading={loading}
             wasLoaded={wasLoaded}
             error={error}

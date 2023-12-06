@@ -7,5 +7,21 @@
   "title.pools": "Пулы",
   "title.metrics": "Метрики",
 
-  "top-groups.empty-data": "Нет групп"
+  "top-groups.empty-data": "Нет групп",
+
+  "top": "Топ",
+
+  "nodes": "узлов",
+  "shards": "шардов",
+  "groups": "групп",
+  "queries": "запросов",
+  "tables": "таблиц",
+
+  "by-pools-usage": "по использованию пулов",
+  "by-cpu-time": "по времени cpu",
+  "by-cpu-usage": "по использованию cpu",
+  "by-load": "по нагрузке",
+  "by-memory": "по памяти",
+  "by-usage": "по потреблению",
+  "by-size": "по размеру"
 }

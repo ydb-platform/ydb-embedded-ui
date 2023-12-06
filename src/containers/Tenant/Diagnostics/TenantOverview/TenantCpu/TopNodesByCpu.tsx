@@ -1,16 +1,20 @@
 import {useDispatch} from 'react-redux';
 import {useCallback} from 'react';
 
-import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
+import {useAutofetcher, useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
 import {
     getTopNodesByCpu,
     selectTopNodesByCpu,
     setDataWasNotLoaded,
 } from '../../../../../store/reducers/tenantOverview/topNodesByCpu/topNodesByCpu';
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {getTopNodesByCpuColumns} from '../../../../Nodes/getNodesColumns';
-import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 
+import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+
+import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
+import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
 interface TopNodesByCpuProps {
@@ -20,6 +24,8 @@ interface TopNodesByCpuProps {
 
 export function TopNodesByCpu({path, additionalNodesProps}: TopNodesByCpuProps) {
     const dispatch = useDispatch();
+
+    const query = useSearchQuery();
 
     const {wasLoaded, loading, error} = useTypedSelector((state) => state.topNodesByCpu);
     const {autorefresh} = useTypedSelector((state) => state.schema);
@@ -39,11 +45,20 @@ export function TopNodesByCpu({path, additionalNodesProps}: TopNodesByCpuProps) 
 
     useAutofetcher(fetchNodes, [fetchNodes], autorefresh);
 
+    const title = getSectionTitle({
+        entity: i18n('nodes'),
+        postfix: i18n('by-pools-usage'),
+        link: getTenantPath({
+            ...query,
+            [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
+        }),
+    });
+
     return (
         <TenantOverviewTableLayout
             data={topNodes || []}
             columns={columns}
-            title="Top nodes by pools usage"
+            title={title}
             loading={loading}
             wasLoaded={wasLoaded}
             error={error}
