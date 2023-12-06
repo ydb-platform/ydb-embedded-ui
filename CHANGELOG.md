@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.23.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.22.0...v4.23.0) (2023-12-06)
+
+
+### Features
+
+* **ClusterInfo:** display groups stats ([#598](https://github.com/ydb-platform/ydb-embedded-ui/issues/598)) ([c31d048](https://github.com/ydb-platform/ydb-embedded-ui/commit/c31d0480a1b91cf01a660fd1d9726c6708f7c252))
+* **TenantOverview:** add links to sections titles ([#599](https://github.com/ydb-platform/ydb-embedded-ui/issues/599)) ([30401fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/30401fa354d90943bc4af4ddbf65466ce10381f9))
+
+
+### Bug Fixes
+
+* **Schema:** display keys in right order ([#596](https://github.com/ydb-platform/ydb-embedded-ui/issues/596)) ([c99b7e2](https://github.com/ydb-platform/ydb-embedded-ui/commit/c99b7e2e97acffc1cab450dfbf758c38b8b6e4d5))
+
 ## [4.22.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.21.1...v4.22.0) (2023-11-27)
 
 
