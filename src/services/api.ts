@@ -105,6 +105,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId},
         );
     }
+    /** @deprecated use getNodes instead */
     getCompute(
         {sortOrder, sortValue, ...params}: ComputeApiRequestParams,
         {concurrentId}: AxiosOptions = {},
