@@ -5,7 +5,6 @@ import flaskIcon from '../../assets/icons/flask.svg';
 
 import {
     ENABLE_ADDITIONAL_QUERY_MODES,
-    DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     THEME_KEY,
@@ -101,11 +100,6 @@ export const queryUseMultiSchemaSetting: SettingProps = {
     title: i18n('settings.queryUseMultiSchema.title'),
     helpPopoverContent: i18n('settings.queryUseMultiSchema.popover'),
 };
-export const enableNewTenantDiagnosticsDesign: SettingProps = {
-    settingKey: DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
-    title: i18n('settings.tenantDiagnostics.title'),
-    helpPopoverContent: i18n('settings.tenantDiagnostics.popover'),
-};
 
 export const appearanceSection: SettingsSection = {
     id: 'appearanceSection',
@@ -120,7 +114,6 @@ export const experimentsSection: SettingsSection = {
         useBackendParamsForTables,
         enableQueryModesForExplainSetting,
         queryUseMultiSchemaSetting,
-        enableNewTenantDiagnosticsDesign,
     ],
 };
 

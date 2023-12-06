@@ -15,7 +15,6 @@ import {
     LAST_USED_QUERY_ACTION_KEY,
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     LANGUAGE_KEY,
-    DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
     QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../utils/constants';
 import '../../../services/api';
@@ -63,10 +62,6 @@ export const initialState = {
             'true',
         ),
         [QUERY_USE_MULTI_SCHEMA_KEY]: readSavedSettingsValue(QUERY_USE_MULTI_SCHEMA_KEY, 'false'),
-        [DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS]: readSavedSettingsValue(
-            DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS,
-            'true',
-        ),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),
         [TENANT_INITIAL_PAGE_KEY]: readSavedSettingsValue(
             TENANT_INITIAL_PAGE_KEY,
