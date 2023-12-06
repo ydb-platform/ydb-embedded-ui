@@ -4,7 +4,6 @@ import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
 import type {QueryMode} from '../../../types/store/query';
-import type {SetQueryModeIfAvailable} from '../../../utils/hooks';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import {TENANT_QUERY_TABS_ID, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
@@ -25,7 +24,7 @@ import {
 } from './queryTemplates';
 
 interface ActionsAdditionalEffects {
-    setQueryMode: SetQueryModeIfAvailable;
+    setQueryMode: (mode: QueryMode) => void;
     setActivePath: (path: string) => void;
 }
 
@@ -36,18 +35,16 @@ const bindActions = (
 ) => {
     const {setActivePath, setQueryMode} = additionalEffects;
 
-    const inputQuery =
-        (tmpl: (path: string) => string, mode?: QueryMode, setQueryModeErrorMessage?: string) =>
-        () => {
-            const isNewQueryModeSet = mode && setQueryMode(mode, setQueryModeErrorMessage);
+    const inputQuery = (tmpl: (path: string) => string, mode?: QueryMode) => () => {
+        if (mode) {
+            setQueryMode(mode);
+        }
 
-            if (!mode || isNewQueryModeSet) {
-                dispatch(changeUserInput({input: tmpl(path)}));
-                dispatch(setTenantPage(TENANT_PAGES_IDS.query));
-                dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-                setActivePath(path);
-            }
-        };
+        dispatch(changeUserInput({input: tmpl(path)}));
+        dispatch(setTenantPage(TENANT_PAGES_IDS.query));
+        dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+        setActivePath(path);
+    };
 
     return {
         createTable: inputQuery(createTableTemplate, 'script'),
@@ -56,11 +53,7 @@ const bindActions = (
         upsertQuery: inputQuery(upsertQueryTemplate),
         createExternalTable: inputQuery(createExternalTableTemplate, 'script'),
         dropExternalTable: inputQuery(dropExternalTableTemplate, 'script'),
-        selectQueryFromExternalTable: inputQuery(
-            selectQueryTemplate,
-            'query',
-            i18n('actions.externalTableSelectUnavailable'),
-        ),
+        selectQueryFromExternalTable: inputQuery(selectQueryTemplate, 'query'),
         createTopic: inputQuery(createTopicTemplate, 'script'),
         alterTopic: inputQuery(alterTopicTemplate, 'script'),
         dropTopic: inputQuery(dropTopicTemplate, 'script'),

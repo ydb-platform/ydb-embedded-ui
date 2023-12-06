@@ -22,9 +22,6 @@
   "settings.useBackendParamsForTables.title": "Использовать виртуализированную таблицу для вкладки Nodes кластера",
   "settings.useBackendParamsForTables.popover": "Использовать таблицу с загрузкой данных по скроллу. Это улучшит производительность, но может работать нестабильно",
 
-  "settings.enableAdditionalQueryModes.title": "Включить дополнительные режимы выполнения запросов",
-  "settings.enableAdditionalQueryModes.popover": "Добавляет режимы 'Data', 'YQL - QueryService' и 'PostgreSQL'. Может работать некорректно на некоторых версиях",
-
   "settings.queryUseMultiSchema.title": "Разрешить запросы с несколькими результатами",
   "settings.queryUseMultiSchema.popover": "Использовать для запросов схему 'multi', которая позволяет выполнять запросы с несколькими результатами. На версиях 23-3 и старше результат не возвращается вообще"
 }

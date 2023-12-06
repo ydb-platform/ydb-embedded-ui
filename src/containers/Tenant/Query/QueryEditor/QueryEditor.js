@@ -23,12 +23,11 @@ import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
     SAVED_QUERIES_KEY,
-    ENABLE_ADDITIONAL_QUERY_MODES,
     LAST_USED_QUERY_ACTION_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../../utils/constants';
 import {useSetting, useQueryModes} from '../../../../utils/hooks';
-import {QUERY_ACTIONS, QUERY_MODES, isNewQueryMode} from '../../../../utils/query';
+import {QUERY_ACTIONS} from '../../../../utils/query';
 
 import {
     PaneVisibilityActionTypes,
@@ -85,15 +84,8 @@ function QueryEditor(props) {
 
     const [isResultLoaded, setIsResultLoaded] = useState(false);
     const [queryMode, setQueryMode] = useQueryModes();
-    const [enableAdditionalQueryModes] = useSetting(ENABLE_ADDITIONAL_QUERY_MODES);
     const [useMultiSchema] = useSetting(QUERY_USE_MULTI_SCHEMA_KEY);
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting(LAST_USED_QUERY_ACTION_KEY);
-
-    useEffect(() => {
-        if (isNewQueryMode(queryMode) && !enableAdditionalQueryModes) {
-            setQueryMode(QUERY_MODES.script);
-        }
-    }, [enableAdditionalQueryModes, queryMode, setQueryMode]);
 
     useEffect(() => {
         if (savedPath !== path) {
@@ -470,7 +462,6 @@ function QueryEditor(props) {
                 disabled={!executeQuery.input}
                 onUpdateQueryMode={setQueryMode}
                 queryMode={queryMode}
-                enableAdditionalQueryModes={enableAdditionalQueryModes}
                 highlitedAction={lastUsedQueryAction}
             />
         );
