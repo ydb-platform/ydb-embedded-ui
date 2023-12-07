@@ -19,14 +19,6 @@ export const DAY_IN_SECONDS = 24 * HOUR_IN_SECONDS;
 
 export const MS_IN_NANOSECONDS = 1000000;
 
-export const TABLET_STATES = {
-    TABLET_VOLATILE_STATE_UNKNOWN: 'unknown',
-    TABLET_VOLATILE_STATE_STOPPED: 'stopped',
-    TABLET_VOLATILE_STATE_BOOTING: 'booting',
-    TABLET_VOLATILE_STATE_STARTING: 'starting',
-    TABLET_VOLATILE_STATE_RUNNING: 'running',
-};
-
 export const TABLET_COLORS = {
     Created: 'gray',
     ResolveStateStorage: 'lightgray',
@@ -90,8 +82,6 @@ export const LANGUAGE_KEY = 'language';
 export const INVERTED_DISKS_KEY = 'invertedDisks';
 export const USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY = 'useNodesEndpointInDiagnostics';
 export const ENABLE_ADDITIONAL_QUERY_MODES = 'enableAdditionalQueryModes';
-// Remain key name "enableNewTenantDiagnosticsDesign" for backward compatibility
-export const DISPLAY_METRICS_CARDS_FOR_TENANT_DIAGNOSTICS = 'enableNewTenantDiagnosticsDesign';
 export const SAVED_QUERIES_KEY = 'saved_queries';
 export const ASIDE_HEADER_COMPACT_KEY = 'asideHeaderCompact';
 export const QUERIES_HISTORY_KEY = 'queries_history';
