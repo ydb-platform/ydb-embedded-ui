@@ -127,7 +127,9 @@ export const setSettingValue = (
         if (settingsApi) {
             window.api.postSetting(name, value);
         } else {
-            localStorage.setItem(name, value);
+            try {
+                localStorage.setItem(name, value);
+            } catch {}
         }
     };
 };
