@@ -34,10 +34,9 @@ import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 
 import {backend as BACKEND} from '../store';
 import {prepareSortValue} from '../utils/filters';
+import {settingsApi} from '../utils/settings';
 
 const config = {withCredentials: !window.custom_backend};
-
-const settingsApi = window.web_version ? window.systemSettings?.settingsApi : undefined;
 
 type AxiosOptions = {
     concurrentId?: string;

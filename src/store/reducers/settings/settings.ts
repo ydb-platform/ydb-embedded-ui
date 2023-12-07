@@ -21,7 +21,12 @@ import {
 import '../../../services/api';
 import {parseJson} from '../../../utils/utils';
 import {QUERY_ACTIONS, QUERY_MODES} from '../../../utils/query';
-import {readSavedSettingsValue, systemSettings, userSettings} from '../../../utils/settings';
+import {
+    readSavedSettingsValue,
+    settingsApi,
+    systemSettings,
+    userSettings,
+} from '../../../utils/settings';
 
 import {TENANT_PAGES_IDS} from '../tenant/constants';
 
@@ -115,13 +120,16 @@ export const setSettingValue = (
     name: string,
     value: string,
 ): ThunkAction<void, RootState, unknown, SetSettingValueAction> => {
-    return (dispatch, getState) => {
+    return (dispatch) => {
         dispatch({type: SET_SETTING_VALUE, data: {name, value}});
-        const {singleClusterMode} = getState();
-        if (singleClusterMode) {
-            localStorage.setItem(name, value);
-        } else {
+
+        // If there is no settingsApi, use localStorage
+        if (settingsApi) {
             window.api.postSetting(name, value);
+        } else {
+            try {
+                localStorage.setItem(name, value);
+            } catch {}
         }
     };
 };
