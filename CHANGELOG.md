@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.24.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.23.0...v4.24.0) (2023-12-07)
+
+
+### Features
+
+* always use localStorage if no settingsApi ([#603](https://github.com/ydb-platform/ydb-embedded-ui/issues/603)) ([ff692df](https://github.com/ydb-platform/ydb-embedded-ui/commit/ff692dffa99d278f6b261bbf1aac0ee24c661a6d))
+
 ## [4.23.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.22.0...v4.23.0) (2023-12-06)
 
 
