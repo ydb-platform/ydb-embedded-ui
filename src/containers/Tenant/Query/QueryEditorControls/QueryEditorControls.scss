@@ -27,7 +27,7 @@
         $b: &;
 
         &__button {
-            width: 189px;
+            width: 241px;
             margin-left: 2px;
         }
 
@@ -36,24 +36,11 @@
             justify-content: space-between;
             align-items: center;
 
-            width: 163px;
+            width: 215px;
         }
 
         &__popup {
-            width: 189px;
-
-            &_extended {
-                width: 241px;
-            }
-        }
-
-        &_extended {
-            #{$b}__button {
-                width: 241px;
-            }
-            #{$b}__button-content {
-                width: 215px;
-            }
+            width: 241px;
         }
     }
 

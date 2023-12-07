@@ -38,10 +38,6 @@ export const QUERY_SYNTAX = {
     pg: 'pg',
 } as const;
 
-export const isNewQueryMode = (value: QueryMode) => {
-    return value !== QUERY_MODES.script && value !== QUERY_MODES.scan;
-};
-
 // eslint-disable-next-line complexity
 export const getColumnType = (type: string) => {
     switch (type.replace(/\?$/, '')) {

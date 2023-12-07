@@ -4,7 +4,6 @@ import favoriteFilledIcon from '../../assets/icons/star.svg';
 import flaskIcon from '../../assets/icons/flask.svg';
 
 import {
-    ENABLE_ADDITIONAL_QUERY_MODES,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     THEME_KEY,
@@ -90,11 +89,6 @@ export const useBackendParamsForTables: SettingProps = {
     title: i18n('settings.useBackendParamsForTables.title'),
     helpPopoverContent: i18n('settings.useBackendParamsForTables.popover'),
 };
-export const enableQueryModesForExplainSetting: SettingProps = {
-    settingKey: ENABLE_ADDITIONAL_QUERY_MODES,
-    title: i18n('settings.enableAdditionalQueryModes.title'),
-    helpPopoverContent: i18n('settings.enableAdditionalQueryModes.popover'),
-};
 export const queryUseMultiSchemaSetting: SettingProps = {
     settingKey: QUERY_USE_MULTI_SCHEMA_KEY,
     title: i18n('settings.queryUseMultiSchema.title'),
@@ -109,12 +103,7 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [
-        useNodesEndpointSetting,
-        useBackendParamsForTables,
-        enableQueryModesForExplainSetting,
-        queryUseMultiSchemaSetting,
-    ],
+    settings: [useNodesEndpointSetting, useBackendParamsForTables, queryUseMultiSchemaSetting],
 };
 
 export const generalPage: SettingsPage = {

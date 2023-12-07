@@ -22,9 +22,6 @@
   "settings.useBackendParamsForTables.title": "Use virtual table for cluster Nodes tab",
   "settings.useBackendParamsForTables.popover": "Use table with data load on scroll. It will increase performance, but could work unstable",
 
-  "settings.enableAdditionalQueryModes.title": "Enable additional query modes",
-  "settings.enableAdditionalQueryModes.popover": "Adds 'Data', 'YQL - QueryService' and 'PostgreSQL' modes. May not work on some versions",
-
   "settings.queryUseMultiSchema.title": "Allow queries with multiple result sets",
   "settings.queryUseMultiSchema.popover": "Use 'multi' schema for queries that enables queries with multiple result sets. Returns nothing on versions 23-3 and older"
 }

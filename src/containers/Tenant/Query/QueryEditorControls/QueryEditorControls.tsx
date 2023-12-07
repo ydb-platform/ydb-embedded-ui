@@ -19,17 +19,6 @@ const queryModeSelectorPopupQa = 'query-mode-selector-popup';
 
 const b = block('ydb-query-editor-controls');
 
-const OldQueryModeSelectorOptions = {
-    [QUERY_MODES.script]: {
-        title: QUERY_MODES_TITLES[QUERY_MODES.script],
-        description: i18n('method-description.script'),
-    },
-    [QUERY_MODES.scan]: {
-        title: QUERY_MODES_TITLES[QUERY_MODES.scan],
-        description: i18n('method-description.scan'),
-    },
-} as const;
-
 const QueryModeSelectorOptions = {
     [QUERY_MODES.script]: {
         title: QUERY_MODES_TITLES[QUERY_MODES.script],
@@ -63,7 +52,6 @@ interface QueryEditorControlsProps {
     disabled: boolean;
     onUpdateQueryMode: (mode: QueryMode) => void;
     queryMode: QueryMode;
-    enableAdditionalQueryModes: boolean;
     highlitedAction: QueryAction;
 }
 
@@ -78,14 +66,9 @@ export const QueryEditorControls = ({
     onUpdateQueryMode,
     queryMode,
     highlitedAction,
-    enableAdditionalQueryModes,
 }: QueryEditorControlsProps) => {
     const querySelectorMenuItems = useMemo(() => {
-        const options = enableAdditionalQueryModes
-            ? QueryModeSelectorOptions
-            : OldQueryModeSelectorOptions;
-
-        return Object.entries(options).map(([mode, {title, description}]) => {
+        return Object.entries(QueryModeSelectorOptions).map(([mode, {title, description}]) => {
             return {
                 text: (
                     <LabelWithPopover
@@ -100,7 +83,7 @@ export const QueryEditorControls = ({
                 },
             };
         });
-    }, [onUpdateQueryMode, enableAdditionalQueryModes]);
+    }, [onUpdateQueryMode]);
 
     const runView: ButtonView | undefined = highlitedAction === 'execute' ? 'action' : undefined;
     const explainView: ButtonView | undefined =
@@ -132,17 +115,11 @@ export const QueryEditorControls = ({
                 >
                     Explain
                 </Button>
-                <div
-                    className={b('mode-selector', {
-                        extended: enableAdditionalQueryModes,
-                    })}
-                >
+                <div className={b('mode-selector')}>
                     <DropdownMenu
                         items={querySelectorMenuItems}
                         popupProps={{
-                            className: b('mode-selector__popup', {
-                                extended: enableAdditionalQueryModes,
-                            }),
+                            className: b('mode-selector__popup'),
                             qa: queryModeSelectorPopupQa,
                         }}
                         switcher={

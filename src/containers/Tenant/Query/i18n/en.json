@@ -8,8 +8,6 @@
   "history.empty": "History is empty",
   "saved.empty": "There are no saved queries",
 
-  "history.cannot-set-mode": "This query is available only with '{{mode}}' query mode. You need to turn in additional query modes in settings to enable it",
-
   "delete-dialog.header": "Delete query",
   "delete-dialog.question": "Are you sure you want to delete query",
   "delete-dialog.delete": "Delete",

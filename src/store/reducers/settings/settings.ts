@@ -10,7 +10,6 @@ import {
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     PARTITIONS_HIDDEN_COLUMNS_KEY,
     QUERY_INITIAL_MODE_KEY,
-    ENABLE_ADDITIONAL_QUERY_MODES,
     CLUSTER_INFO_HIDDEN_KEY,
     LAST_USED_QUERY_ACTION_KEY,
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
@@ -56,10 +55,6 @@ export const initialState = {
         [USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY]: readSavedSettingsValue(
             USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
             'false',
-        ),
-        [ENABLE_ADDITIONAL_QUERY_MODES]: readSavedSettingsValue(
-            ENABLE_ADDITIONAL_QUERY_MODES,
-            'true',
         ),
         [QUERY_USE_MULTI_SCHEMA_KEY]: readSavedSettingsValue(QUERY_USE_MULTI_SCHEMA_KEY, 'false'),
         [SAVED_QUERIES_KEY]: readSavedSettingsValue(SAVED_QUERIES_KEY, '[]'),

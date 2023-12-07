@@ -1,3 +1,0 @@
-{
-  "useQueryModes.queryModeCannotBeSet": "Query mode '{{mode}}' cannot be set. You need to turn in additional query modes in settings to enable it"
-}
