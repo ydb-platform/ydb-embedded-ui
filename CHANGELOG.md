@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.25.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.24.0...v4.25.0) (2023-12-07)
+
+
+### Features
+
+* **Diagnostics:** remove tenant diagnostics cards setting ([#602](https://github.com/ydb-platform/ydb-embedded-ui/issues/602)) ([fe61df8](https://github.com/ydb-platform/ydb-embedded-ui/commit/fe61df86048013432c4e4788d1e621298ecb1fb2))
+* **Query:** remove query modes setting ([#600](https://github.com/ydb-platform/ydb-embedded-ui/issues/600)) ([78c63e4](https://github.com/ydb-platform/ydb-embedded-ui/commit/78c63e4a2e60950970914eaba49304b68aad0f80))
+
 ## [4.24.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.23.0...v4.24.0) (2023-12-07)
 
 
