@@ -74,35 +74,35 @@
 
         &_good,
         &_green {
-            color: var(--yc-color-text-positive);
-            background-color: var(--yc-color-base-positive);
+            color: var(--g-color-text-positive);
+            background-color: var(--g-color-base-positive-light);
         }
         &_degraded,
         &_yellow {
-            color: var(--yc-color-text-warning);
-            background-color: var(--yc-color-base-warning);
+            color: var(--g-color-text-warning);
+            background-color: var(--g-color-base-warning-light);
         }
 
         &_blue {
-            color: var(--yc-color-text-info);
-            background-color: var(--yc-color-base-info);
+            color: var(--g-color-text-info);
+            background-color: var(--g-color-base-info-light);
         }
 
         &_emergency,
         &_red {
-            color: var(--yc-color-text-danger);
-            background-color: var(--yc-color-base-danger);
+            color: var(--g-color-text-danger);
+            background-color: var(--g-color-base-danger-light);
         }
         &_unspecified,
         &_gray,
         &_grey {
-            color: var(--yc-color-text-misc);
-            background-color: var(--yc-color-base-misc);
+            color: var(--g-color-text-misc);
+            background-color: var(--g-color-base-misc-light);
         }
         &_maintenance_required,
         &_orange {
-            color: var(--yc-color-text-warning-heavy);
-            background-color: var(--yc-color-infographics-warning-light);
+            color: var(--g-color-text-warning-heavy);
+            background-color: var(--g-color-base-warning-light);
         }
     }
 }

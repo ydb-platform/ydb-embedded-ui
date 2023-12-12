@@ -20,13 +20,13 @@
     }
 
     &_type_normal {
-        border-color: var(--yc-color-infographics-positive-heavy);
+        border-color: var(--ydb-color-status-green);
     }
     &_type_warning {
-        border-color: var(--yc-color-infographics-warning-heavy);
+        border-color: var(--ydb-color-status-yellow);
     }
     &_type_danger {
-        border-color: var(--yc-color-infographics-danger-heavy);
+        border-color: var(--ydb-color-status-red);
     }
 
     &__value {
@@ -37,13 +37,13 @@
         min-height: 1px;
 
         &_type_normal {
-            background-color: var(--yc-color-infographics-positive-heavy);
+            background-color: var(--ydb-color-status-green);
         }
         &_type_warning {
-            background-color: var(--yc-color-infographics-warning-heavy);
+            background-color: var(--ydb-color-status-yellow);
         }
         &_type_danger {
-            background-color: var(--yc-color-infographics-danger-heavy);
+            background-color: var(--ydb-color-status-red);
         }
     }
 }

@@ -1,8 +1,8 @@
 .tablet {
     cursor: pointer;
 
-    color: var(--yc-color-text-complementary);
-    border-color: var(--yc-color-base-generic-medium-hover);
+    color: var(--g-color-text-complementary);
+    border-color: var(--g-color-base-generic-medium-hover);
 
     &__wrapper {
         margin-right: 2px;
@@ -17,24 +17,24 @@
     }
 
     &_status_gray {
-        background-color: var(--yc-color-text-complementary);
+        background-color: var(--ydb-color-status-grey);
     }
     &_status_yellow {
-        background-color: var(--yc-color-base-warning-heavy);
+        background-color: var(--ydb-color-status-yellow);
     }
     &_status_orange {
-        background-color: var(--yc-color-text-warning-heavy);
+        background-color: var(--ydb-color-status-orange);
     }
     &_status_red {
-        background-color: var(--yc-color-base-danger-heavy);
+        background-color: var(--ydb-color-status-red);
     }
     &_status_green {
-        background-color: var(--yc-color-base-positive-heavy);
+        background-color: var(--ydb-color-status-green);
     }
-    &_state_blue {
-        background-color: var(--yc-color-base-info-heavy);
+    &_status_blue {
+        background-color: var(--ydb-color-status-blue);
     }
     &_status_black {
-        background-color: var(--yc-color-text-secondary);
+        background-color: var(--ydb-color-status-black);
     }
 }

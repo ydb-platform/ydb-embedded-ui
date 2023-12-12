@@ -4,11 +4,11 @@
 
     align-items: center;
 
-    color: var(--yc-color-text-complementary);
+    color: var(--g-color-text-complementary);
     &__result-status-icon {
-        color: var(--yc-color-text-positive);
+        color: var(--g-color-text-positive);
         &_error {
-            color: var(--yc-color-text-danger);
+            color: var(--g-color-text-danger);
         }
     }
 }

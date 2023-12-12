@@ -53,7 +53,7 @@ export const NodesTreeTitle = ({
                 {versionsValues ? (
                     <div className={b('version-progress')}>
                         <span className={b('info-label', {margin: 'right'})}>Versions</span>
-                        <Progress view="thin" value={100} stack={versionsValues} />
+                        <Progress size="s" value={100} stack={versionsValues} />
                     </div>
                 ) : null}
             </div>

@@ -21,7 +21,7 @@
     }
 
     &__circle-bg {
-        stroke: var(--yc-color-base-simple-hover);
+        stroke: var(--g-color-base-simple-hover);
 
         fill: none;
     }
@@ -30,13 +30,13 @@
         fill: none;
 
         &_status_good {
-            stroke: var(--yc-color-private-green-550);
+            stroke: var(--ydb-color-status-green);
         }
         &_status_warning {
-            stroke: var(--yc-color-private-yellow-550);
+            stroke: var(--ydb-color-status-yellow);
         }
         &_status_danger {
-            stroke: var(--yc-color-private-red-550);
+            stroke: var(--ydb-color-status-red);
         }
     }
 }

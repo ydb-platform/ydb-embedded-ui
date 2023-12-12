@@ -25,20 +25,18 @@
     }
 
     &__title .entity-status__name {
-        font-size: var(--yc-text-header-1-font-size);
-        font-weight: var(--yc-text-header-font-weight);
-        line-height: var(--yc-text-header-1-line-height);
+        font-weight: var(--g-text-header-font-weight);
+        @include header-1-typography();
     }
 
     &__title-skeleton {
         width: 20%;
         min-width: 200px;
-        height: var(--yc-text-header-1-line-height);
+        height: var(--g-text-header-1-line-height);
     }
 
     &__error {
-        font-size: var(--yc-text-body-2-font-size);
-        line-height: var(--yc-text-body-2-line-height);
+        @include body-2-typography();
     }
 
     &__info {

@@ -1,3 +1,5 @@
+@import '../../styles/mixins.scss';
+
 .empty-state {
     padding: 20px;
 
@@ -31,10 +33,10 @@
 
         margin-right: 60px;
 
-        color: var(--yc-color-base-info-hover);
+        color: var(--g-color-base-info-light-hover);
 
-        .yc-root_theme_dark & {
-            color: var(--yc-color-base-generic);
+        .g-root_theme_dark & {
+            color: var(--g-color-base-generic);
         }
     }
 
@@ -45,21 +47,18 @@
         font-weight: 500;
 
         &_size_s {
-            font-size: var(--yc-text-subheader-3-font-size);
-            line-height: var(--yc-text-subheader-3-line-height);
+            @include lead-typography();
         }
 
         &_size_m {
-            font-size: var(--yc-text-header-2-font-size);
-            line-height: var(--yc-text-header-2-line-height);
+            @include header-2-typography();
         }
     }
 
     &__description {
         grid-area: description;
 
-        font-size: var(--yc-text-body-2-font-size);
-        line-height: var(--yc-text-body-2-line-height);
+        @include body-2-typography();
     }
 
     &__actions {

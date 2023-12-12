@@ -4,10 +4,6 @@
     height: 100%;
     @include query-data-table;
 
-    .yc-button__text {
-        margin: 0 6px;
-    }
-
     &__header {
         position: sticky;
         top: 0;
@@ -19,8 +15,8 @@
         height: 53px;
         padding: 0 20px;
 
-        border-bottom: 1px solid var(--yc-color-line-generic);
-        background-color: var(--yc-color-base-background);
+        border-bottom: 1px solid var(--g-color-line-generic);
+        background-color: var(--g-color-base-background);
     }
 
     &__title {
@@ -30,7 +26,7 @@
     &__table-name {
         margin-left: 4px;
 
-        color: var(--yc-color-text-complementary);
+        color: var(--g-color-text-complementary);
     }
 
     &__controls-left {

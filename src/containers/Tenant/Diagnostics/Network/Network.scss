@@ -9,8 +9,7 @@
     max-width: 1305px;
     height: 100%;
 
-    font-size: var(--yc-text-body-2-font-size);
-    line-height: var(--yc-text-body-2-line-height);
+    @include body-2-typography();
 
     &__nodes-row {
         display: flex;
@@ -36,7 +35,7 @@
     &__left {
         height: 100%;
 
-        border-right: 1px solid var(--yc-color-base-generic-accent);
+        border-right: 1px solid var(--g-color-base-generic-accent);
     }
 
     &__placeholder {
@@ -74,25 +73,24 @@
     &__nodes-title {
         margin: 0 0 15px;
 
-        font-size: var(--yc-text-body-2-font-size);
-        line-height: var(--yc-text-body-2-line-height);
+        color: var(--g-color-text-secondary);
+        border-bottom: 1px solid var(--g-color-base-generic-accent);
 
-        color: var(--yc-color-text-secondary);
-        border-bottom: 1px solid var(--yc-color-base-generic-accent);
+        @include body-2-typography();
     }
 
     &__link {
         text-decoration: none;
 
-        color: var(--yc-color-base-special);
+        color: var(--g-color-base-brand);
     }
 
     &__title {
         margin: 20px 0;
 
-        font-size: var(--yc-text-body-1-font-size);
         font-weight: 500;
-        line-height: var(--yc-text-body-1-line-height);
+
+        @include body-1-typography();
     }
 
     &__checkbox-wrapper {

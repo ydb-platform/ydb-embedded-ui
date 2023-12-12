@@ -12,7 +12,7 @@
 
         padding: 10px 0;
 
-        background-color: var(--yc-color-base-background);
+        background-color: var(--g-color-base-background);
     }
 
     &__error-message-text {
@@ -48,7 +48,7 @@
 
         text-align: left;
 
-        color: var(--yc-color-text-secondary);
+        color: var(--g-color-text-secondary);
     }
 
     &__message {
@@ -57,9 +57,9 @@
         margin-right: auto;
         margin-left: 10px;
 
-        font-family: var(--yc-font-family-monospace);
-        font-size: var(--yc-text-code-2-font-size);
-        line-height: var(--yc-text-header-2-line-height);
+        font-family: var(--g-font-family-monospace);
+        font-size: var(--g-text-code-2-font-size);
+        line-height: var(--g-text-header-2-line-height);
     }
 
     &__message-text {
@@ -79,14 +79,11 @@
 
         font-size: 12px;
 
-        color: var(--yc-color-text-complementary);
+        color: var(--g-color-text-complementary);
     }
 
     &__arrow-toggle {
         margin-right: 5px;
-        .yc-button__text {
-            margin: 0 5px;
-        }
     }
 }
 
@@ -98,19 +95,19 @@
     white-space: nowrap;
 
     &_severity_fatal &__icon {
-        color: var(--yc-color-text-danger);
+        color: var(--g-color-text-danger);
     }
 
     &_severity_error &__icon {
-        color: var(--yc-color-text-danger);
+        color: var(--g-color-text-danger);
     }
 
     &_severity_warning &__icon {
-        color: var(--yc-color-text-warning);
+        color: var(--g-color-text-warning);
     }
 
     &_severity_info &__icon {
-        color: var(--yc-color-text-info);
+        color: var(--g-color-text-info);
     }
 
     &__title {
@@ -118,6 +115,6 @@
 
         text-transform: capitalize;
 
-        color: var(--yc-color-text-complementary);
+        color: var(--g-color-text-complementary);
     }
 }

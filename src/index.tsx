@@ -9,6 +9,7 @@ import configureStore from './store';
 import reportWebVitals from './reportWebVitals';
 import HistoryContext from './contexts/HistoryContext';
 
+import './styles/themes.scss';
 import './styles/constants.scss';
 import './index.css';
 

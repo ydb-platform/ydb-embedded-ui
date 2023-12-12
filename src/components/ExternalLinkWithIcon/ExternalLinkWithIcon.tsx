@@ -2,7 +2,7 @@ import block from 'bem-cn-lite';
 
 import {Link} from '@gravity-ui/uikit';
 
-import {IconWrapper} from '../Icon/Icon';
+import {Icon} from '../Icon/Icon';
 
 import './ExternalLinkWithIcon.scss';
 
@@ -18,7 +18,7 @@ export const ExternalLinkWithIcon = ({title, url}: ExternalLinkWithIconProps) =>
         <Link href={url} target="_blank" className={b()}>
             {title}
             {'\u00a0'}
-            <IconWrapper name="external" viewBox={'0 0 16 16'} width={16} height={16} />
+            <Icon name="external" viewBox={'0 0 16 16'} width={16} height={16} />
         </Link>
     );
 };

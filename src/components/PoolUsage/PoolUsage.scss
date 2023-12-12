@@ -1,6 +1,8 @@
+@import '../../styles/mixins.scss';
+
 .ydb-pool-usage {
-    font-size: var(--yc-text-body-2-font-size);
-    line-height: var(--yc-text-body-2-line-height);
+    @include body-2-typography();
+
     &__info {
         display: flex;
         justify-content: space-between;
@@ -8,7 +10,7 @@
     }
 
     &__pool-name {
-        color: var(--yc-color-text-primary);
+        color: var(--g-color-text-primary);
     }
 
     &__value {
@@ -17,21 +19,17 @@
     }
 
     &__threads {
-        font-size: var(--yc-text-body-1-font-size);
+        font-size: var(--g-text-body-1-font-size);
 
-        color: var(--yc-color-text-hint);
-
-        .yc-root_theme_dark & {
-            color: var(--yc-color-text-hint);
-        }
+        color: var(--g-color-text-hint);
     }
 
     &__percents {
         margin-right: 2px;
 
-        font-size: var(--yc-text-body-1-font-size);
+        font-size: var(--g-text-body-1-font-size);
 
-        color: var(--yc-color-text-primary);
+        color: var(--g-color-text-primary);
     }
 
     &__visual {
@@ -44,10 +42,10 @@
 
         height: 6px;
 
-        font-size: var(--yc-text-body-2-font-size);
+        font-size: var(--g-text-body-2-font-size);
 
         border-radius: 4px;
-        background-color: var(--yc-color-base-generic-accent);
+        background-color: var(--g-color-base-generic-accent);
     }
 
     &__usage-line {
@@ -58,16 +56,16 @@
         height: 100%;
 
         &_type_green {
-            background-color: var(--yc-color-base-positive-heavy);
+            background-color: var(--ydb-color-status-green);
         }
         &_type_blue {
-            background-color: var(--yc-color-base-info-heavy);
+            background-color: var(--ydb-color-status-blue);
         }
         &_type_yellow {
-            background-color: var(--yc-color-text-warning-heavy);
+            background-color: var(--ydb-color-status-yellow);
         }
         &_type_red {
-            background-color: var(--yc-color-base-danger-heavy);
+            background-color: var(--ydb-color-status-red);
         }
     }
 }

@@ -4,7 +4,7 @@
         align-items: flex-start;
 
         & + & {
-            margin-top: var(--yc-text-body-1-line-height);
+            margin-top: var(--g-text-body-1-line-height);
         }
     }
     &__field-title {
@@ -18,7 +18,7 @@
             &::after {
                 content: '*';
 
-                color: var(--yc-color-text-danger);
+                color: var(--g-color-text-danger);
             }
         }
     }
@@ -32,7 +32,7 @@
 
         height: 17px;
 
-        color: var(--yc-color-text-danger);
+        color: var(--g-color-text-danger);
     }
     &__embedded-tooltip {
         display: flex;
@@ -41,11 +41,11 @@
         height: 100%;
         margin-left: -10px;
 
-        color: var(--yc-color-text-secondary);
+        color: var(--g-color-text-secondary);
         &:hover {
             cursor: pointer;
 
-            color: var(--yc-color-text-complementary);
+            color: var(--g-color-text-complementary);
         }
     }
 

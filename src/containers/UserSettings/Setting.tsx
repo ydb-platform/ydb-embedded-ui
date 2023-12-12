@@ -82,7 +82,11 @@ export const Setting = ({
     };
 
     return (
-        <Settings.Item title={title} renderTitleComponent={renderTitleComponent}>
+        <Settings.Item
+            title={title}
+            highlightedTitle={title}
+            renderTitleComponent={renderTitleComponent}
+        >
             {getSettingsElement(type)}
         </Settings.Item>
     );

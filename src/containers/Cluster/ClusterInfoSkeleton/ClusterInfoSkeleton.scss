@@ -9,10 +9,10 @@
         display: flex;
         align-items: flex-start;
 
-        min-height: var(--yc-text-body-2-font-size);
+        min-height: var(--g-text-body-2-font-size);
 
         .yc-skeleton {
-            min-height: var(--yc-text-body-2-font-size);
+            min-height: var(--g-text-body-2-font-size);
         }
     }
 
@@ -31,7 +31,7 @@
             width: 100px;
             margin: 0 2px;
 
-            border-bottom: 1px dotted var(--yc-color-text-secondary);
+            border-bottom: 1px dotted var(--g-color-text-secondary);
         }
     }
 

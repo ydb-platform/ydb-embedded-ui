@@ -23,20 +23,6 @@
 
         padding-bottom: 16px;
 
-        background-color: var(--yc-color-base-background);
-        .yc-staff-card {
-            display: inline-block;
-        }
-    }
-
-    &__text {
-        font-size: var(--yc-text-body-1-font-size);
-        line-height: var(--yc-text-body-1-line-height);
-
-        color: var(--yc-color-text-primary);
-
-        &::first-letter {
-            color: var(--yc-color-text-danger);
-        }
+        background-color: var(--g-color-base-background);
     }
 }

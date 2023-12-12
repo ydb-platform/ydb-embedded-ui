@@ -3,7 +3,6 @@
 .tenant-page {
     overflow: hidden;
 
-    font-size: var(--yc-text-body-2-font-size);
-    line-height: var(--yc-text-body-2-line-height);
+    @include body-2-typography();
     @include flex-container();
 }

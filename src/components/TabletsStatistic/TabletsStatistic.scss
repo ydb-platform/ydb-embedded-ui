@@ -15,33 +15,33 @@
         text-decoration: none;
         text-transform: uppercase;
 
-        color: var(--yc-color-text-secondary);
+        color: var(--g-color-text-secondary);
         border: 1px solid;
         border-radius: 2px;
 
         &_state_green {
-            color: var(--yc-color-text-positive);
-            background-color: var(--yc-color-base-positive);
+            color: var(--g-color-text-positive);
+            background-color: var(--g-color-base-positive-light);
         }
         &_state_yellow {
-            color: var(--yc-color-text-warning);
-            background-color: var(--yc-color-base-warning);
+            color: var(--g-color-text-warning);
+            background-color: var(--g-color-base-warning-light);
         }
         &_state_blue {
-            color: var(--yc-color-text-info);
-            background-color: var(--yc-color-base-info);
+            color: var(--g-color-text-info);
+            background-color: var(--g-color-base-info-light);
         }
         &_state_orange {
-            color: var(--yc-color-text-warning-heavy);
-            background-color: var(--yc-color-infographics-warning-light);
+            color: var(--g-color-text-warning-heavy);
+            background-color: var(--g-color-base-warning-light);
         }
         &_state_red {
-            color: var(--yc-color-text-danger);
-            background: var(--yc-color-base-danger);
+            color: var(--g-color-text-danger);
+            background: var(--g-color-base-danger-light);
         }
         &_state_gray {
-            color: var(--yc-color-text-secondary);
-            border: 1px solid var(--yc-color-line-generic-hover);
+            color: var(--g-color-text-secondary);
+            border: 1px solid var(--g-color-line-generic-hover);
         }
     }
 }

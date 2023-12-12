@@ -17,7 +17,7 @@
     }
 
     &__select-option_empty {
-        color: var(--yc-color-text-hint);
+        color: var(--g-color-text-hint);
     }
 
     &__search {
@@ -28,10 +28,6 @@
         &_general {
             width: 280px;
         }
-    }
-
-    &__table-settings .yc-icon {
-        width: 20px;
     }
 
     &__table-wrapper {

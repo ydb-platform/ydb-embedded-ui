@@ -8,7 +8,7 @@
     flex-direction: column;
     flex-shrink: 0;
     @include flex-container();
-    @include body2-typography();
+    @include body-2-typography();
 
     &__pdisk {
         display: flex;
@@ -18,7 +18,7 @@
         margin-bottom: 8px;
         padding: 0 10px 0 20px;
 
-        border: 1px solid var(--yc-color-line-generic);
+        border: 1px solid var(--g-color-line-generic);
         border-radius: 5px;
     }
 
@@ -54,7 +54,7 @@
         &-label {
             font-weight: 400;
 
-            color: var(--yc-color-text-secondary);
+            color: var(--g-color-text-secondary);
         }
     }
 
@@ -79,7 +79,7 @@
     &__link {
         text-decoration: none;
 
-        color: var(--yc-color-base-special);
+        color: var(--g-color-base-brand);
     }
 
     &__vdisks-header {
@@ -94,6 +94,7 @@
         overflow: auto;
 
         min-width: 200px;
+        max-width: unset;
         max-height: 90vh;
 
         .vdisk-pdisk-node__column {
@@ -109,13 +110,13 @@
         align-items: center;
 
         &_selected {
-            color: var(--yc-color-text-info);
+            color: var(--g-color-text-info);
         }
     }
 
     &__vdisk-details-button {
         &_selected {
-            color: var(--yc-color-text-info);
+            color: var(--g-color-text-info);
         }
     }
 
@@ -126,10 +127,6 @@
         margin-left: 4px;
 
         transform: translateY(-1px);
-
-        .yc-button__text {
-            margin: 0 4px;
-        }
 
         &_hidden {
             visibility: hidden;
@@ -160,15 +157,15 @@
     &__title {
         margin-right: 16px;
 
-        font-size: var(--yc-text-body-2-font-size);
         font-weight: 500;
-        line-height: var(--yc-text-body-2-line-height);
         text-transform: uppercase;
+
+        @include body-2-typography();
     }
 }
 
 @keyframes onSelectedVdiskAnimation {
     0% {
-        background-color: var(--yc-color-base-info-hover);
+        background-color: var(--g-color-base-info-light-hover);
     }
 }

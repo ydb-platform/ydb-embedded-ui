@@ -1,3 +1,5 @@
+@import '../../styles/mixins.scss';
+
 .entity-status {
     display: inline-flex;
     align-items: center;
@@ -5,11 +7,11 @@
     max-width: 100%;
     height: 100%;
 
-    font-size: var(--yc-text-body-2-font-size);
-    line-height: var(--yc-text-body-2-line-height);
+    @include body-2-typography();
 
     &__clipboard-button {
         display: none;
+        justify-content: center;
         align-items: center;
 
         margin-left: 8px;
@@ -33,28 +35,22 @@
     a {
         text-decoration: none;
 
-        color: var(--yc-color-text-link);
+        color: var(--g-color-text-link);
     }
 
     a:hover {
-        color: var(--yc-color-text-link-hover);
+        color: var(--g-color-text-link-hover);
     }
 
     &__label {
         margin-right: 2px;
 
-        font-size: var(--yc-text-body-2-font-size);
-        line-height: var(--yc-text-body-2-line-height);
+        color: var(--g-color-text-complementary);
 
-        color: var(--yc-color-text-complementary);
-
-        &_size_m {
-            font-size: var(--yc-text-body-2-font-size);
-            line-height: var(--yc-text-body-2-line-height);
-        }
+        @include body-2-typography();
 
         &_size_l {
-            font-size: var(--yc-text-header-2-font-size);
+            font-size: var(--g-text-header-2-font-size);
         }
     }
 
@@ -108,45 +104,39 @@
     &__status-color {
         &_state_running,
         &_state_green {
-            background-color: var(--yc-color-infographics-positive-heavy);
+            background-color: var(--ydb-color-status-green);
         }
         &_state_yellow {
-            background-color: var(--yc-color-infographics-warning-heavy);
+            background-color: var(--ydb-color-status-yellow);
         }
         &_state_blue {
-            background-color: var(--yc-color-infographics-info-heavy);
+            background-color: var(--ydb-color-status-blue);
         }
-
         &_state_red {
-            background: var(--yc-color-infographics-danger-heavy);
+            background-color: var(--ydb-color-status-red);
         }
         &_state_gray,
         &_state_grey {
-            background: var(--yc-color-text-complementary);
+            background-color: var(--ydb-color-status-grey);
         }
         &_state_orange {
-            background: var(--yc-color-base-warning-orange);
+            background-color: var(--ydb-color-status-orange);
         }
     }
 
     &__label,
     &__status-icon {
         &_state_blue {
-            color: var(--yc-color-infographics-info-heavy);
+            color: var(--ydb-color-status-blue);
         }
         &_state_yellow {
-            color: var(--yc-color-infographics-warning-heavy);
+            color: var(--ydb-color-status-yellow);
         }
         &_state_orange {
-            color: var(--yc-color-base-warning-orange);
+            color: var(--ydb-color-status-orange);
         }
         &_state_red {
-            color: var(--yc-color-infographics-danger-heavy);
+            color: var(--ydb-color-status-red);
         }
-    }
-
-    &_size_m {
-        font-size: var(--yc-text-body-2-font-size);
-        line-height: var(--yc-text-body-2-line-height);
     }
 }
