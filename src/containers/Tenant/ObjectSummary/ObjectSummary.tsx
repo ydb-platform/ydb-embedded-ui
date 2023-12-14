@@ -5,7 +5,8 @@ import {Link} from 'react-router-dom';
 import qs from 'qs';
 import cn from 'bem-cn-lite';
 
-import {Button, HelpPopover, Tabs} from '@gravity-ui/uikit';
+import {Button, Tabs} from '@gravity-ui/uikit';
+import {HelpPopover} from '@gravity-ui/components';
 
 import SplitPane from '../../../components/SplitPane';
 import CopyToClipboard from '../../../components/CopyToClipboard/CopyToClipboard';

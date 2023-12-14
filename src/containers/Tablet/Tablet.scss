@@ -20,7 +20,7 @@
     }
     &__history-title {
         margin-bottom: 15px;
-        @include body2-typography();
+        @include body-2-typography();
     }
 
     &__placeholder {
@@ -46,10 +46,10 @@
     &__title {
         margin-right: 16px;
 
-        font-size: var(--yc-text-body-2-font-size);
         font-weight: 500;
-        line-height: var(--yc-text-body-2-line-height);
         text-transform: uppercase;
+
+        @include body-2-typography();
     }
 
     &__loader {
@@ -88,10 +88,10 @@
     &__top-label {
         margin-right: 16px;
 
-        font-size: var(--yc-text-body-2-font-size);
         font-weight: 500;
-        line-height: var(--yc-text-body-2-line-height);
         text-transform: uppercase;
+
+        @include body-2-typography();
     }
 
     &__host {

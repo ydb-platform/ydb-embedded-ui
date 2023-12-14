@@ -9,7 +9,7 @@ import {isUnavailableNode} from '../../utils/nodes';
 
 import EntityStatus from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
-import {IconWrapper} from '../Icon';
+import {Icon} from '../Icon';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 
 import './NodeHostWrapper.scss';
@@ -56,7 +56,7 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
                         className={b('external-button')}
                         target="_blank"
                     >
-                        <IconWrapper name="external" />
+                        <Icon name="external" />
                     </Button>
                 )}
             </div>

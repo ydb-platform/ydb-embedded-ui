@@ -6,8 +6,6 @@
     animation: none !important;
 }
 
-.pool-tooltip,
-.tablet-tooltip,
 .node-tootltip,
 .tabletsOverall-tooltip,
 .histogram-tooltip {
@@ -16,7 +14,7 @@
     &__label {
         padding-right: 15px;
 
-        color: var(--yc-color-text-secondary);
+        color: var(--g-color-text-secondary);
     }
 }
 
@@ -53,19 +51,4 @@
     padding: 10px;
 
     word-break: break-word;
-}
-
-.tablet-tooltip {
-    padding: 10px;
-    &__label {
-        padding-right: 15px;
-
-        color: var(--yc-color-text-secondary);
-    }
-
-    &__value {
-        &_blue {
-            color: var(--yc-color-base-special);
-        }
-    }
 }

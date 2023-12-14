@@ -101,19 +101,18 @@ export const SpeedMultiMeter = ({
                 {withValue && (
                     <div className={b('displayed-value')}>{formatValue(valueToDisplay)}</div>
                 )}
-                <div className={b('popover-container')}>
-                    <Popover
-                        content={renderPopoverContent()}
-                        placement={'bottom'}
-                        disabled={!withPopover}
-                        hasArrow={true}
-                        size="s"
-                    >
-                        <div className={b('bars')} onMouseLeave={onLeaveDiagram}>
-                            {renderValues()}
-                        </div>
-                    </Popover>
-                </div>
+                <Popover
+                    content={renderPopoverContent()}
+                    className={b('popover-container')}
+                    placement={'bottom'}
+                    disabled={!withPopover}
+                    hasArrow={true}
+                    size="s"
+                >
+                    <div className={b('bars')} onMouseLeave={onLeaveDiagram}>
+                        {renderValues()}
+                    </div>
+                </Popover>
             </div>
         </div>
     );

@@ -10,14 +10,14 @@
     display: block;
 
     min-width: 50px;
-    height: var(--yc-text-body-3-line-height);
+    height: var(--g-text-body-3-line-height);
 
     text-align: center;
 
-    color: var(--yc-color-text-primary);
-    border: $border-width solid var(--yc-color-infographics-misc-heavy);
+    color: var(--g-color-text-primary);
+    border: $border-width solid var(--g-color-base-misc-heavy);
     border-radius: $outer-border-radius;
-    background-color: var(--yc-color-infographics-misc-light);
+    background-color: var(--g-color-base-misc-light);
 
     &_compact {
         min-width: 0;
@@ -31,16 +31,16 @@
     }
 
     #{$block}__filled {
-        background-color: var(--yc-color-infographics-misc-medium);
+        background-color: var(--g-color-base-misc-medium);
     }
 
     &_green {
-        border-color: var(--yc-color-infographics-positive-heavy);
-        background-color: var(--yc-color-infographics-positive-light);
+        border-color: var(--g-color-base-positive-heavy);
+        background-color: var(--g-color-base-positive-light);
         #{$block}__filled {
-            background-color: var(--yc-color-infographics-positive-medium);
+            background-color: var(--g-color-base-positive-medium);
 
-            .yc-root_theme_dark & {
+            .g-root_theme_dark & {
                 // the common medium green is too bright for this case
                 background-color: rgb(124, 227, 121, 0.4);
             }
@@ -48,33 +48,33 @@
     }
 
     &_blue {
-        border-color: var(--yc-color-infographics-info-heavy);
-        background-color: var(--yc-color-infographics-info-light);
+        border-color: var(--g-color-base-info-heavy);
+        background-color: var(--g-color-base-info-light);
         #{$block}__filled {
-            background-color: var(--yc-color-infographics-info-medium);
+            background-color: var(--g-color-base-info-medium);
         }
     }
 
     &_yellow {
-        border-color: var(--yc-color-infographics-warning-heavy);
-        background-color: var(--yc-color-infographics-yellow-light);
+        border-color: var(--g-color-base-warning-heavy);
+        background-color: var(--g-color-base-yellow-light);
         #{$block}__filled {
-            background-color: var(--yc-color-infographics-yellow-medium);
+            background-color: var(--g-color-base-yellow-medium);
         }
     }
 
     &_orange {
-        border-color: var(--yc-color-base-warning-orange);
-        background-color: var(--yc-color-infographics-warning-light);
+        border-color: var(--ydb-color-status-orange);
+        background-color: var(--g-color-base-warning-light);
         #{$block}__filled {
-            background-color: var(--yc-color-infographics-warning-medium);
+            background-color: var(--g-color-base-warning-medium);
         }
     }
     &_red {
-        border-color: var(--yc-color-infographics-danger-heavy);
-        background-color: var(--yc-color-infographics-danger-light);
+        border-color: var(--g-color-base-danger-heavy);
+        background-color: var(--g-color-base-danger-light);
         #{$block}__filled {
-            background-color: var(--yc-color-infographics-danger-medium);
+            background-color: var(--g-color-base-danger-medium);
         }
     }
 
@@ -98,9 +98,9 @@
         position: relative;
         z-index: 2;
 
-        font-size: var(--yc-text-body-1-font-size);
+        font-size: var(--g-text-body-1-font-size);
         // bar height minus borders
-        line-height: calc(var(--yc-text-body-3-line-height) - #{$border-width * 2});
+        line-height: calc(var(--g-text-body-3-line-height) - #{$border-width * 2});
 
         color: inherit;
     }

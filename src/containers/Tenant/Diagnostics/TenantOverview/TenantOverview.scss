@@ -43,9 +43,9 @@
     &__title {
         margin-bottom: 10px;
 
-        font-size: var(--yc-text-body-2-font-size);
         font-weight: 700;
-        line-height: var(--yc-text-body-2-line-height);
+
+        @include body-2-typography();
     }
 
     &__table {

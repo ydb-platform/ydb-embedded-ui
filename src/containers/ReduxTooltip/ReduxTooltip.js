@@ -43,7 +43,7 @@ function ReduxTooltip(props) {
                 <Popup
                     open={visible}
                     placement={['top', 'bottom', 'left', 'right']}
-                    className={popupClassName}
+                    contentClassName={popupClassName}
                     anchorRef={fakeAnchor}
                     onOutsideClick={hideTooltip}
                 >

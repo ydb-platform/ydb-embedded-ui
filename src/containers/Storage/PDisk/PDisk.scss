@@ -25,7 +25,7 @@
         flex-shrink: 0;
 
         .stack__layer {
-            background: var(--yc-color-base-background);
+            background: var(--g-color-base-background);
 
             .data-table__row:hover & {
                 background: var(--ydb-data-table-color-hover);
@@ -45,9 +45,9 @@
         top: 0;
         right: 4px;
 
-        font-size: var(--yc-text-body-1-font-size);
-        line-height: var(--yc-text-body-3-line-height);
+        font-size: var(--g-text-body-1-font-size);
+        line-height: var(--g-text-body-3-line-height);
 
-        color: var(--yc-color-text-secondary);
+        color: var(--g-color-text-secondary);
     }
 }

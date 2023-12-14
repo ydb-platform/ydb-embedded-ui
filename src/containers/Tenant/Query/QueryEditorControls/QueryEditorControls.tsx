@@ -92,19 +92,17 @@ export const QueryEditorControls = ({
     return (
         <div className={b()}>
             <div className={b('left')}>
-                <div className={b('run')}>
-                    <Button
-                        onClick={() => {
-                            onRunButtonClick(queryMode);
-                        }}
-                        disabled={disabled}
-                        loading={runIsLoading}
-                        view={runView}
-                    >
-                        <Icon name="startPlay" viewBox="0 0 16 16" width={16} height={16} />
-                        {'Run'}
-                    </Button>
-                </div>
+                <Button
+                    onClick={() => {
+                        onRunButtonClick(queryMode);
+                    }}
+                    disabled={disabled}
+                    loading={runIsLoading}
+                    view={runView}
+                >
+                    <Icon name="startPlay" viewBox="0 0 16 16" width={16} height={16} />
+                    {'Run'}
+                </Button>
                 <Button
                     onClick={() => {
                         onExplainButtonClick(queryMode);

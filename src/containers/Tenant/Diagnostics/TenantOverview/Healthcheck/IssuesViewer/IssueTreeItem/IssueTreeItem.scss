@@ -21,10 +21,10 @@
 
             cursor: pointer;
 
-            color: var(--yc-color-text-link);
+            color: var(--g-color-text-link);
 
             &:hover {
-                color: var(--yc-color-text-link-hover);
+                color: var(--g-color-text-link-hover);
             }
         }
         &_message {
@@ -45,6 +45,6 @@
     }
 
     &__field-label {
-        color: var(--yc-color-text-secondary);
+        color: var(--g-color-text-secondary);
     }
 }

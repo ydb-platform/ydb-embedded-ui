@@ -6,7 +6,7 @@
 
         margin-left: 16px;
 
-        line-height: var(--yc-text-body-2-line-height);
+        line-height: var(--g-text-body-2-line-height);
     }
     &__user-info-wrapper {
         display: flex;
@@ -14,9 +14,6 @@
     }
     &__ydb-internal-user-title {
         font-weight: 500;
-    }
-    &__user-icon {
-        color: var(--yc-color-text-misc);
     }
     &__ydb-user-wrapper {
         width: 300px;

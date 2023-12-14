@@ -169,7 +169,6 @@ export const PartitionsControls = ({
                 items={columnsToSelect}
                 showStatus
                 onUpdate={hadleTableColumnsSetupChange}
-                className={b('table-settings')}
             />
         </div>
     );

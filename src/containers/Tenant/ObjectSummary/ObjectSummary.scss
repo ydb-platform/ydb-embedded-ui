@@ -29,7 +29,7 @@
         top: 19px; // centered relative to the heading
         right: 5px; // centered relative to the collapsed panel
 
-        background-color: var(--yc-color-base-background);
+        background-color: var(--g-color-base-background);
         &_hidden {
             visibility: hidden;
         }
@@ -86,14 +86,10 @@
     &__info-controls {
         display: flex;
         gap: 4px;
-
-        .yc-button__text {
-            margin: 0 6px;
-        }
     }
 
     &__info-action-button {
-        background-color: var(--yc-color-base-background);
+        background-color: var(--g-color-base-background);
         &_hidden {
             display: none;
         }
@@ -116,7 +112,7 @@
 
         padding: 12px 12px 10px;
 
-        border-bottom: 1px solid var(--yc-color-line-generic);
+        border-bottom: 1px solid var(--g-color-line-generic);
     }
 
     &__info-title {
@@ -144,7 +140,7 @@
         text-transform: lowercase;
 
         border-radius: 3px;
-        background-color: var(--yc-color-base-generic);
+        background-color: var(--g-color-base-generic);
 
         &_error {
             padding: 3px 0;

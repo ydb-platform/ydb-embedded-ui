@@ -8,11 +8,11 @@
 
     --virtual-table-sort-icon-space: 18px;
 
-    --virtual-table-border-color: var(--yc-color-base-generic-hover);
-    --virtual-table-hover-color: var(--yc-color-base-float-hover);
+    --virtual-table-border-color: var(--g-color-base-generic-hover);
+    --virtual-table-hover-color: var(--g-color-base-float-hover);
 
     width: 100%;
-    @include body2-typography();
+    @include body-2-typography();
 
     &__table {
         width: 100%;

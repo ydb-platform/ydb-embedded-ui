@@ -8,8 +8,7 @@
     &__node {
         overflow: hidden;
 
-        font-size: var(--yc-text-body-1-font-size);
-        line-height: var(--yc-text-body-1-line-height);
+        @include body-1-typography();
     }
 
     &__node-meta {
@@ -18,7 +17,7 @@
         white-space: nowrap;
         text-overflow: ellipsis;
 
-        color: var(--yc-color-text-secondary);
+        color: var(--g-color-text-secondary);
     }
 
     &__items {

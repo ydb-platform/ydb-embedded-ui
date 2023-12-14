@@ -1,3 +1,5 @@
+@import '../../../styles/mixins.scss';
+
 .usage-filter {
     min-width: 100px;
 
@@ -5,10 +7,9 @@
         flex-grow: 1;
 
         &-title {
-            height: var(--yc-text-body-1-line-height);
+            height: var(--g-text-body-1-line-height);
 
-            font-size: var(--yc-text-body-1-font-size);
-            line-height: var(--yc-text-body-1-line-height);
+            @include body-1-typography();
         }
 
         &-meta {
@@ -17,8 +18,8 @@
 
             padding: 0 5px;
 
-            font-size: var(--yc-text-caption-2-font-size);
-            line-height: var(--yc-text-caption-2-line-height);
+            font-size: var(--g-text-caption-2-font-size);
+            line-height: var(--g-text-caption-2-line-height);
 
             border-radius: 3px;
         }
@@ -31,7 +32,7 @@
             left: 0;
 
             border-radius: 3px;
-            background-color: var(--yc-color-infographics-info-medium);
+            background-color: var(--g-color-base-info-medium);
         }
     }
 }

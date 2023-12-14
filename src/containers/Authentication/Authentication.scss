@@ -28,8 +28,8 @@
 
         width: 100%;
 
-        font-size: var(--yc-text-body-1-font-size);
-        line-height: var(--yc-text-header-1-line-height);
+        font-size: var(--g-text-body-1-font-size);
+        line-height: var(--g-text-header-1-line-height);
     }
 
     &__logo {
@@ -45,7 +45,7 @@
         margin: 34px 0 16px;
 
         font-weight: 600;
-        @include title-typography();
+        @include header-2-typography;
     }
 
     &__form-wrapper {
@@ -60,7 +60,7 @@
         padding: 40px;
 
         border-radius: 16px;
-        background-color: var(--yc-color-base-background);
+        background-color: var(--g-color-base-background);
     }
 
     &__field-wrapper {

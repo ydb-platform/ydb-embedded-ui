@@ -6,7 +6,7 @@ import './UsageLabel.scss';
 
 const b = cn('ydb-usage-label');
 
-interface UsageLabelProps extends LabelProps {
+interface UsageLabelProps extends Omit<LabelProps, 'value'> {
     value: number | string;
     overloadThreshold?: number;
 }

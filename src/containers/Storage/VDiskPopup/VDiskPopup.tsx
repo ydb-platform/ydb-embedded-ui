@@ -147,7 +147,7 @@ export const VDiskPopup = ({data, nodes, ...props}: VDiskPopupProps) => {
 
     return (
         <Popup
-            className={b()}
+            contentClassName={b()}
             placement={['top', 'bottom']}
             // bigger offset for easier switching to neighbour nodes
             // matches the default offset for popup with arrow out of a sense of beauty

@@ -1,6 +1,7 @@
+@import '../../../../../styles/mixins.scss';
+
 .ydb-diagnostics-consumers-topic-stats {
-    font-size: var(--yc-text-body-2-font-size);
-    line-height: var(--yc-text-body-2-line-height);
+    @include body-2-typography();
 
     &__wrapper {
         display: flex;
@@ -8,7 +9,7 @@
 
         padding-left: 16px;
 
-        border-left: 1px solid var(--yc-color-line-generic);
+        border-left: 1px solid var(--g-color-line-generic);
     }
 
     &__item {
@@ -20,7 +21,7 @@
     &__label {
         margin-bottom: 4px;
 
-        color: var(--yc-color-text-secondary);
+        color: var(--g-color-text-secondary);
     }
     &__value {
         display: flex;

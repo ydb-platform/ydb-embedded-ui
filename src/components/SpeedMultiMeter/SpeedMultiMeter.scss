@@ -35,7 +35,7 @@
         height: 6px;
 
         &_highlighted {
-            background: var(--yc-color-line-generic);
+            background: var(--g-color-line-generic);
         }
     }
 
@@ -44,11 +44,11 @@
         height: 100%;
 
         &_color_light {
-            background: var(--yc-color-infographics-info-medium);
+            background: var(--g-color-base-info-medium);
         }
 
         &_color_dark {
-            background: var(--yc-color-infographics-info-heavy);
+            background: var(--g-color-base-info-heavy);
         }
     }
 
@@ -82,11 +82,11 @@
         line-height: 18px;
 
         &_color_primary {
-            color: var(--yc-color-text-primary);
+            color: var(--g-color-text-primary);
         }
 
         &_color_secondary {
-            color: var(--yc-color-text-secondary);
+            color: var(--g-color-text-secondary);
         }
     }
 }

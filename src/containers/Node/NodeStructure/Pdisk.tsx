@@ -143,7 +143,7 @@ function getColumns({
                     <Popover
                         placement={['right']}
                         content={<Vdisk {...row} />}
-                        contentClassName={b('vdisk-details')}
+                        tooltipContentClassName={b('vdisk-details')}
                     >
                         <Button
                             view="flat-secondary"

@@ -20,9 +20,7 @@
     &__limits-title {
         margin-right: 5px;
 
-        color: var(--yc-color-text-secondary);
-    }
-    &__limits-value {
+        color: var(--g-color-text-secondary);
     }
 
     &__row {
@@ -42,10 +40,10 @@
     &__label {
         margin-right: 16px;
 
-        font-size: var(--yc-text-body-2-font-size);
         font-weight: 500;
-        line-height: var(--yc-text-body-2-line-height);
         text-transform: uppercase;
+
+        @include body-2-typography();
 
         &_overall {
             margin-right: 15px;

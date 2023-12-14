@@ -5,15 +5,15 @@
     font-size: 12px;
     text-transform: uppercase;
 
-    color: var(--yc-color-text-primary);
+    color: var(--g-color-text-primary);
     border-radius: 3px;
-    background: var(--yc-color-base-generic);
+    background: var(--g-color-base-generic);
 
     &:last-child {
         margin-right: 0;
     }
 
     &_type_blue {
-        background-color: var(--yc-color-celestial-thunder);
+        background-color: var(--g-color-celestial-thunder);
     }
 }

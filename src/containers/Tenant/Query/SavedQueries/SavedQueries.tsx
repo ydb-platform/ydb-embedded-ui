@@ -11,7 +11,7 @@ import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {IconWrapper} from '../../../../components/Icon';
+import {Icon} from '../../../../components/Icon';
 
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 
@@ -110,10 +110,10 @@ export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: Sav
                     </div>
                     <span className={b('controls')}>
                         <Button view="flat-secondary">
-                            <IconWrapper name="pencil" viewBox="0 0 24 24" />
+                            <Icon name="pencil" viewBox="0 0 24 24" />
                         </Button>
                         <Button view="flat-secondary" onClick={onDeleteQueryClick(query.name)}>
-                            <IconWrapper name="trash" viewBox="0 0 24 24" />
+                            <Icon name="trash" viewBox="0 0 24 24" />
                         </Button>
                     </span>
                 </div>

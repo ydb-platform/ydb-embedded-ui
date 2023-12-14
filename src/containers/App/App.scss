@@ -23,30 +23,38 @@ body,
 }
 
 :root {
-    --yc-color-infographics-yellow-light: rgba(255, 199, 0, 0.15);
-    --yc-color-infographics-yellow-medium: rgba(255, 219, 77, 0.4);
-    --yc-color-base-warning-orange: #ff922e;
+    --g-color-base-yellow-light: rgba(255, 199, 0, 0.15);
+    --g-color-base-yellow-medium: rgba(255, 219, 77, 0.4);
 
     --data-table-row-height: 40px;
 }
 
-.yc-root {
-    --ydb-data-table-color-hover: var(--yc-color-base-float-hover);
+.g-root {
+    --ydb-data-table-color-hover: var(--g-color-base-float-hover);
+
+    // Colors for tablets, status icons and progress bars
+    --ydb-color-status-grey: var(--g-color-base-neutral-heavy);
+    --ydb-color-status-green: var(--g-color-base-positive-heavy);
+    --ydb-color-status-yellow: var(--g-color-base-warning-heavy);
+    --ydb-color-status-orange: #ff922e;
+    --ydb-color-status-red: var(--g-color-base-danger-heavy);
+    --ydb-color-status-blue: var(--g-color-base-info-heavy);
+    --ydb-color-status-black: var(--g-color-base-misc-heavy);
 }
 
 :is(#tab, .yc-tabs-item_active .yc-tabs-item__title) {
-    color: var(--yc-color-text-primary) !important;
+    color: var(--g-color-text-primary) !important;
 }
 
 :is(#tab, .yc-tabs-item__title) {
-    color: var(--yc-color-text-secondary);
+    color: var(--g-color-text-secondary);
 }
 
-.ycn-aside-header__pane-container {
+.gn-aside-header__pane-container {
     height: 100%;
 }
 
-.ycn-aside-header__content {
+.gn-aside-header__content {
     position: relative;
 
     display: flex;
@@ -71,7 +79,7 @@ body,
 
     .data-table {
         width: 100%;
-        @include body2-typography();
+        @include body-2-typography();
 
         &__table {
             max-width: 100%;
@@ -105,22 +113,10 @@ body,
         justify-content: center;
         align-items: center;
     }
-
-    // Should be removed after https://github.com/ydb-platform/ydb-embedded-ui/issues/344
-    .yc-button__text {
-        display: flex;
-        align-items: center;
-    }
-
-    .g-select {
-        .yc-button__text {
-            align-items: baseline;
-        }
-    }
 }
 
 .error {
-    color: var(--yc-color-text-danger);
+    color: var(--g-color-text-danger);
 }
 
 .data-table__row:hover .entity-status__clipboard-button,
@@ -128,7 +124,7 @@ body,
     display: flex;
 }
 
-.yc-root .data-table_highlight-rows .data-table__row:hover {
+.g-root .data-table_highlight-rows .data-table__row:hover {
     background: var(--ydb-data-table-color-hover);
 }
 

@@ -8,7 +8,7 @@
         margin-top: 10px;
         margin-bottom: 10px;
 
-        border: 1px solid var(--yc-color-line-generic);
+        border: 1px solid var(--g-color-line-generic);
         border-radius: 10px;
     }
 
@@ -29,8 +29,7 @@
     }
 
     .ydb-tree-view {
-        font-size: var(--yc-text-body-2-font-size);
-        line-height: var(--yc-text-body-2-line-height);
+        @include body-2-typography();
 
         // Apply margin ignoring first element of the tree
         .ydb-tree-view {

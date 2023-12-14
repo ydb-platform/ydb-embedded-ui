@@ -15,26 +15,29 @@
     flex-direction: column;
 }
 
-@mixin body-typography() {
-    font-size: var(--yc-text-body-1-font-size);
-    line-height: var(--yc-text-body-1-line-height);
+@mixin body-1-typography() {
+    font-size: var(--g-text-body-1-font-size);
+    line-height: var(--g-text-body-1-line-height);
 }
-@mixin body2-typography() {
-    font-size: var(--yc-text-body-2-font-size);
-    line-height: var(--yc-text-body-2-line-height);
+@mixin body-2-typography() {
+    font-size: var(--g-text-body-2-font-size);
+    line-height: var(--g-text-body-2-line-height);
 }
-@mixin body3-typography() {
-    font-size: var(--yc-text-body-3-font-size);
-    line-height: var(--yc-text-body-3-line-height);
+@mixin body-3-typography() {
+    font-size: var(--g-text-body-3-font-size);
+    line-height: var(--g-text-body-3-line-height);
 }
 @mixin lead-typography() {
-    font-size: var(--yc-text-subheader-3-font-size);
-    line-height: var(--yc-text-subheader-3-line-height);
+    font-size: var(--g-text-subheader-3-font-size);
+    line-height: var(--g-text-subheader-3-line-height);
 }
-
-@mixin title-typography() {
-    font-size: var(--yc-text-header-2-font-size);
-    line-height: var(--yc-text-header-2-line-height);
+@mixin header-1-typography() {
+    font-size: var(--g-text-header-1-font-size);
+    line-height: var(--g-text-header-1-line-height);
+}
+@mixin header-2-typography() {
+    font-size: var(--g-text-header-2-font-size);
+    line-height: var(--g-text-header-2-line-height);
 }
 
 @mixin sticky-top {
@@ -42,7 +45,7 @@
     top: 0;
     left: 0;
 
-    background-color: var(--yc-color-base-background);
+    background-color: var(--g-color-base-background);
 }
 
 @mixin loader() {
@@ -82,9 +85,8 @@
 @mixin info-viewer-title {
     margin: 15px 0 10px;
 
-    font-size: var(--yc-text-body-2-font-size);
     font-weight: 600;
-    line-height: var(--yc-text-body-2-line-height);
+    @include body-2-typography();
 }
 
 @mixin query-data-table() {
@@ -113,7 +115,7 @@
         }
 
         &__th {
-            box-shadow: inset 0 -1px 0 0 var(--yc-tabs-color-divider);
+            box-shadow: inset 0 -1px 0 0 var(--g-tabs-color-divider);
         }
     }
 }
@@ -121,14 +123,14 @@
 .link {
     text-decoration: none;
 
-    color: var(--yc-color-text-link);
+    color: var(--g-color-text-link);
 
     &_external {
         margin-right: 10px;
     }
 
     &:hover {
-        color: var(--yc-color-text-link-hover);
+        color: var(--g-color-text-link-hover);
     }
 }
 
@@ -143,8 +145,8 @@
         z-index: 2000;
         left: $left;
 
-        border-right: $border-width solid var(--yc-color-line-generic);
-        background-color: var(--yc-color-base-background);
+        border-right: $border-width solid var(--g-color-line-generic);
+        background-color: var(--g-color-base-background);
     }
     .data-table__row:hover .data-table__td:nth-child(#{$nth}) {
         background-color: var(--ydb-data-table-color-hover) !important;
@@ -199,9 +201,9 @@
 
 @mixin json-tree-styles {
     // stylelint-disable
-    font-family: var(--yc-font-family-monospace) !important;
-    font-size: var(--yc-text-code-1-font-size) !important;
-    line-height: var(--yc-text-code-1-line-height) !important;
+    font-family: var(--g-font-family-monospace) !important;
+    font-size: var(--g-text-code-1-font-size) !important;
+    line-height: var(--g-text-code-1-line-height) !important;
     // stylelint-enable
 
     .json-inspector__leaf_composite:before {
@@ -210,7 +212,7 @@
 
         font-size: 9px;
 
-        color: var(--yc-color-text-secondary);
+        color: var(--g-color-text-secondary);
     }
     .json-inspector__leaf_composite.json-inspector__leaf_root:before {
         left: 0;
@@ -224,7 +226,7 @@
 
     & .json-inspector {
         &__key {
-            color: var(--yc-color-text-misc);
+            color: var(--g-color-text-misc);
         }
         &__leaf {
             position: relative;
@@ -241,7 +243,7 @@
             width: 300px;
             margin-bottom: 10px;
 
-            border: 1px solid var(--yc-color-line-generic);
+            border: 1px solid var(--g-color-line-generic);
             border-radius: 4px;
         }
         &__search {
@@ -251,11 +253,11 @@
             margin: 0;
             padding: 0;
 
-            font-family: var(--yc-text-body-font-family);
+            font-family: var(--g-text-body-font-family);
             font-size: 13px;
             vertical-align: top;
 
-            color: var(--yc-color-text-primary);
+            color: var(--g-color-text-primary);
             border: 0 solid transparent;
             border-width: 0 8px;
             border-right-width: 22px;
@@ -264,18 +266,18 @@
         }
         &__value {
             &_helper {
-                color: var(--yc-color-text-secondary);
+                color: var(--g-color-text-secondary);
             }
         }
         &__line:hover:after {
-            background: var(--yc-color-base-simple-hover);
+            background: var(--g-color-base-simple-hover);
         }
         &__show-original:before {
-            color: var(--yc-color-text-secondary);
+            color: var(--g-color-text-secondary);
         }
         &__show-original:hover:after,
         &__show-original:hover:before {
-            color: var(--yc-color-text-primary);
+            color: var(--g-color-text-primary);
         }
     }
 }

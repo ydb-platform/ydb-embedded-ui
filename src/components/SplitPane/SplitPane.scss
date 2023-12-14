@@ -24,7 +24,7 @@
         position: relative;
         z-index: 10;
 
-        background: var(--yc-color-base-background);
+        background: var(--g-color-base-background);
 
         &::after {
             position: absolute;
@@ -35,12 +35,12 @@
 
             content: '';
 
-            background-color: var(--yc-color-base-generic-ultralight);
+            background-color: var(--g-color-base-generic-ultralight);
         }
 
         &.active::after,
         &:hover::after {
-            background-color: var(--yc-color-line-generic-hover);
+            background-color: var(--g-color-line-generic-hover);
 
             transition: background-color 1s ease;
         }
@@ -67,7 +67,7 @@
 
                 border-width: 1px 0;
                 border-style: solid;
-                border-color: var(--yc-color-base-generic-hover);
+                border-color: var(--g-color-base-generic-hover);
 
                 transform: translate(-50%, -50%);
             }
@@ -91,7 +91,7 @@
 
                 border-width: 0 1px;
                 border-style: solid;
-                border-color: var(--yc-color-base-generic-hover);
+                border-color: var(--g-color-base-generic-hover);
 
                 transform: translate(-50%, -50%);
             }

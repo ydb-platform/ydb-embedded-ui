@@ -16,10 +16,6 @@
         @include search();
     }
 
-    &__table-settings .yc-icon {
-        width: 20px;
-    }
-
     &__table-wrapper {
         overflow: auto;
         @include flex-container();

@@ -9,7 +9,7 @@ import {Tags} from '../../../components/Tags';
 import {Tablet} from '../../../components/Tablet';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {ExternalLinkWithIcon} from '../../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
-import {IconWrapper as Icon} from '../../../components/Icon/Icon';
+import {Icon} from '../../../components/Icon/Icon';
 import {ContentWithPopup} from '../../../components/ContentWithPopup/ContentWithPopup';
 
 import type {IResponseError} from '../../../types/api/error';

@@ -15,7 +15,7 @@ interface VersionsBarProps {
 export const VersionsBar = ({versionsValues = []}: VersionsBarProps) => {
     return (
         <div className={b()}>
-            <Progress value={100} stack={versionsValues} view="thin" />
+            <Progress value={100} stack={versionsValues} size="s" />
             <div className={b('versions')}>
                 {versionsValues.map((item, index) => (
                     <div
