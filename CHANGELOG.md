@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.26.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.25.0...v4.26.0) (2023-12-14)
+
+
+### Features
+
+* update to uikit5 ([#607](https://github.com/ydb-platform/ydb-embedded-ui/issues/607)) ([ddd263b](https://github.com/ydb-platform/ydb-embedded-ui/commit/ddd263bd39d4de262e6c891dce6c6ff6ba2a3379))
+
 ## [4.25.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.24.0...v4.25.0) (2023-12-07)
 
 
