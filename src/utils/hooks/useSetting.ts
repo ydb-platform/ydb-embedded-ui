@@ -1,22 +1,21 @@
 import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
-import {getParsedSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
+import {getSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
 
 import {useTypedSelector} from './useTypedSelector';
 
 export const useSetting = <T>(key: string, defaultValue?: T): [T, (value: T) => void] => {
     const dispatch = useDispatch();
 
-    const settingValue: T = useTypedSelector(
-        (state) => getParsedSettingValue(state, key) ?? defaultValue,
-    );
+    const settingValue = useTypedSelector((state) => {
+        // Since we type setter value as T, we assume that received value is also T
+        return (getSettingValue(state, key) ?? defaultValue) as T;
+    });
 
     const setValue = useCallback(
         (value: T) => {
-            const preparedValue = typeof value === 'string' ? value : JSON.stringify(value);
-
-            dispatch(setSettingValue(key, preparedValue));
+            dispatch(setSettingValue(key, value));
         },
         [dispatch, key],
     );

@@ -70,10 +70,7 @@ export const Partitions = ({path}: PartitionsProps) => {
         error: nodesError,
     } = useTypedSelector((state) => state.nodesList);
 
-    const [hiddenColumns, setHiddenColumns] = useSetting<string[]>(
-        PARTITIONS_HIDDEN_COLUMNS_KEY,
-        [],
-    );
+    const [hiddenColumns, setHiddenColumns] = useSetting<string[]>(PARTITIONS_HIDDEN_COLUMNS_KEY);
 
     const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer);
 

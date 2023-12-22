@@ -9,10 +9,10 @@ import type {
     QueryInHistory,
 } from '../../types/store/executeQuery';
 import type {QueryRequestParams, QueryMode, QuerySyntax} from '../../types/store/query';
-import {getValueFromLS, parseJson} from '../../utils/utils';
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
 import {QUERY_MODES, QUERY_SYNTAX, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {parseQueryError} from '../../utils/error';
+import {settingsManager} from '../../utils/settings';
 import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
@@ -28,7 +28,10 @@ const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
 const SET_MONACO_HOT_KEY = 'query/SET_MONACO_HOT_KEY';
 const SET_TENANT_PATH = 'query/SET_TENANT_PATH';
 
-const queriesHistoryInitial: string[] = parseJson(getValueFromLS(QUERIES_HISTORY_KEY, '[]'));
+const queriesHistoryInitial: string[] = settingsManager.readUserSettingsValue(
+    QUERIES_HISTORY_KEY,
+    [],
+);
 
 const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 

@@ -16,8 +16,8 @@ import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
 import Header from '../Header/Header';
 import AppIcons from '../AppIcons/AppIcons';
 
-import {getParsedSettingValue} from '../../store/reducers/settings/settings';
 import {THEME_KEY} from '../../utils/constants';
+import {useSetting} from '../../utils/hooks';
 
 import './App.scss';
 import PropTypes from 'prop-types';
@@ -72,7 +72,10 @@ Content.propTypes = {
 };
 
 function ContentWrapper(props) {
-    const {theme, singleClusterMode, isAuthenticated} = props;
+    const {singleClusterMode, isAuthenticated} = props;
+
+    const [theme] = useSetting(THEME_KEY);
+
     return (
         <HistoryContext.Consumer>
             {(history) => (
@@ -96,7 +99,6 @@ function ContentWrapper(props) {
 }
 
 ContentWrapper.propTypes = {
-    theme: PropTypes.string,
     singleClusterMode: PropTypes.bool,
     isAuthenticated: PropTypes.bool,
     children: PropTypes.node,
@@ -104,7 +106,6 @@ ContentWrapper.propTypes = {
 
 function mapStateToProps(state) {
     return {
-        theme: getParsedSettingValue(state, THEME_KEY),
         isAuthenticated: state.authentication.isAuthenticated,
         singleClusterMode: state.singleClusterMode,
     };
