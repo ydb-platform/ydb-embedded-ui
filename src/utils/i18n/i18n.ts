@@ -3,7 +3,7 @@ import {configure as configureUiKit} from '@gravity-ui/uikit';
 import {configure as configureYdbUiComponents} from 'ydb-ui-components';
 
 import {LANGUAGE_KEY} from '../constants';
-import {settingsManager} from '../settings';
+import {settingsManager} from '../../services/settings';
 
 enum Lang {
     En = 'en',

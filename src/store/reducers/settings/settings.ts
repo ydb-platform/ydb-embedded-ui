@@ -2,7 +2,7 @@ import type {Reducer} from 'redux';
 import type {ThunkAction} from 'redux-thunk';
 
 import '../../../services/api';
-import {settingsManager} from '../../../utils/settings';
+import {settingsManager} from '../../../services/settings';
 
 import type {RootState} from '..';
 import type {

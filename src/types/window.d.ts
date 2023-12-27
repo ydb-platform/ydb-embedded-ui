@@ -39,8 +39,8 @@ interface Window {
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof import('redux').compose;
     store?: import('redux').Store;
 
-    userSettings?: import('../utils/settings').SettingsObject;
-    systemSettings?: import('../utils/settings').SettingsObject;
+    userSettings?: import('../services/settings').SettingsObject;
+    systemSettings?: import('../services/settings').SettingsObject;
 
     api: import('../services/api').YdbEmbeddedAPI;
 }

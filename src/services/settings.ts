@@ -14,9 +14,9 @@ import {
     THEME_KEY,
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
-} from './constants';
-import {QUERY_ACTIONS, QUERY_MODES} from './query';
-import {parseJson} from './utils';
+} from '../utils/constants';
+import {QUERY_ACTIONS, QUERY_MODES} from '../utils/query';
+import {parseJson} from '../utils/utils';
 
 export type SettingsObject = Record<string, unknown>;
 
