@@ -22,7 +22,7 @@ export const ProblemFilterValues = {
 } as const;
 
 const userSettings = settingsManager.getUserSettings();
-const systemSettings = settingsManager.getSystemSettings();
+const systemSettings = window.systemSettings || {};
 
 export const initialState = {
     problemFilter: ProblemFilterValues.ALL,

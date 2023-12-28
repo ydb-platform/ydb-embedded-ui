@@ -67,14 +67,6 @@ class SettingsManager {
     }
 
     /**
-     * System settings are appended to window object by backend if it exists.
-     * They are read only
-     */
-    getSystemSettings() {
-        return window.systemSettings || {};
-    }
-
-    /**
      * Returns parsed settings value.
      * If value cannot be parsed, returns initially stored string.
      * If there is no value, return default value
