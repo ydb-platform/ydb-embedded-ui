@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.27.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.26.0...v4.27.0) (2023-12-28)
+
+
+### Features
+
+* migrate from external settings api ([#621](https://github.com/ydb-platform/ydb-embedded-ui/issues/621)) ([ae2fbbe](https://github.com/ydb-platform/ydb-embedded-ui/commit/ae2fbbef66d9aba150012027baf8b89bf79cd741))
+
 ## [4.26.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.25.0...v4.26.0) (2023-12-14)
 
 
