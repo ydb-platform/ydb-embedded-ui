@@ -10,7 +10,7 @@ const StorageTypesTitles = {
 
 interface StorageTypeFilterProps {
     value: StorageType;
-    onChange: (value: string) => void;
+    onChange: (value: StorageType) => void;
 }
 
 const storageTypeFilterQa = 'storage-type-filter';

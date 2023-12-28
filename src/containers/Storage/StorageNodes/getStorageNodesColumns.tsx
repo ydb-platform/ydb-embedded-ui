@@ -1,0 +1,125 @@
+import DataTable, {type Column as DataTableColumn} from '@gravity-ui/react-data-table';
+
+import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {AdditionalNodesProps} from '../../../types/additionalProps';
+import type {Column as VirtualTableColumn} from '../../../components/VirtualTable';
+import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
+import {NodeHostWrapper} from '../../../components/NodeHostWrapper/NodeHostWrapper';
+import {isSortableNodesProperty} from '../../../utils/nodes';
+
+import {PDisk} from '../PDisk/PDisk';
+import {b} from './shared';
+
+export const STORAGE_NODES_COLUMNS_IDS = {
+    NodeId: 'NodeId',
+    Host: 'Host',
+    DC: 'DC',
+    Rack: 'Rack',
+    Uptime: 'Uptime',
+    PDisks: 'PDisks',
+    Missing: 'Missing',
+} as const;
+
+type StorageGroupsColumn = VirtualTableColumn<PreparedStorageNode> &
+    DataTableColumn<PreparedStorageNode>;
+
+const getStorageNodesColumns = (additionalNodesProps: AdditionalNodesProps | undefined) => {
+    const getNodeRef = additionalNodesProps?.getNodeRef;
+
+    const columns: StorageGroupsColumn[] = [
+        {
+            name: STORAGE_NODES_COLUMNS_IDS.NodeId,
+            header: 'Node ID',
+            width: 100,
+            align: DataTable.RIGHT,
+            render: ({row}) => row.NodeId,
+        },
+        {
+            name: STORAGE_NODES_COLUMNS_IDS.Host,
+            header: 'Host',
+            width: 350,
+            render: ({row}) => {
+                return <NodeHostWrapper node={row} getNodeRef={getNodeRef} />;
+            },
+            align: DataTable.LEFT,
+        },
+        {
+            name: STORAGE_NODES_COLUMNS_IDS.DC,
+            header: 'DC',
+            width: 100,
+            render: ({row}) => row.DataCenter || '—',
+            align: DataTable.LEFT,
+        },
+        {
+            name: STORAGE_NODES_COLUMNS_IDS.Rack,
+            header: 'Rack',
+            width: 100,
+            render: ({row}) => row.Rack || '—',
+            align: DataTable.LEFT,
+        },
+        {
+            name: STORAGE_NODES_COLUMNS_IDS.Uptime,
+            header: 'Uptime',
+            width: 130,
+            sortAccessor: ({StartTime}) => (StartTime ? -StartTime : 0),
+            align: DataTable.RIGHT,
+            render: ({row}) => row.Uptime,
+        },
+        {
+            name: STORAGE_NODES_COLUMNS_IDS.Missing,
+            header: 'Missing',
+            width: 100,
+            align: DataTable.CENTER,
+            defaultOrder: DataTable.DESCENDING,
+            render: ({row}) => row.Missing,
+        },
+        {
+            name: STORAGE_NODES_COLUMNS_IDS.PDisks,
+            className: b('pdisks-column'),
+            header: 'PDisks',
+            render: ({row}) => {
+                return (
+                    <div className={b('pdisks-wrapper')}>
+                        {row.PDisks?.map((pDisk) => {
+                            const vDisks = row.VDisks?.filter(
+                                (vdisk) => vdisk.PDiskId === pDisk.PDiskId,
+                            ).map((data) => ({
+                                ...data,
+                                NodeId: row.NodeId,
+                            }));
+
+                            return (
+                                <div className={b('pdisks-item')} key={pDisk.PDiskId}>
+                                    <PDisk data={pDisk} nodeId={row.NodeId} vDisks={vDisks} />
+                                </div>
+                            );
+                        })}
+                    </div>
+                );
+            },
+            align: DataTable.CENTER,
+            sortable: false,
+            width: 900,
+        },
+    ];
+
+    return columns;
+};
+
+export const getPreparedStorageNodesColumns = (
+    additionalNodesProps: AdditionalNodesProps | undefined,
+    visibleEntities: VisibleEntities,
+) => {
+    const rawColumns = getStorageNodesColumns(additionalNodesProps);
+
+    const sortableColumns = rawColumns.map((column) => ({
+        ...column,
+        sortable: isSortableNodesProperty(column.name),
+    }));
+
+    if (visibleEntities !== VISIBLE_ENTITIES.missing) {
+        return sortableColumns.filter((col) => col.name !== STORAGE_NODES_COLUMNS_IDS.Missing);
+    }
+
+    return sortableColumns;
+};

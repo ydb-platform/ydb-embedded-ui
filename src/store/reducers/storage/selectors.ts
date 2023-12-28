@@ -3,7 +3,6 @@ import {Selector, createSelector} from 'reselect';
 import type {OrderType} from '@gravity-ui/react-data-table';
 import {ASCENDING, DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 
-import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {NODES_SORT_VALUES, type NodesSortValue} from '../../../utils/nodes';
 import {STORAGE_SORT_VALUES, type StorageSortValue, getUsage} from '../../../utils/storage';
 
@@ -110,25 +109,6 @@ export const selectGroupsSortParams = (state: StorageStateSlice) => {
     };
 };
 // ==== Complex selectors ====
-
-export const selectVDisksForPDisk: Selector<
-    StorageStateSlice,
-    TVDiskStateInfo[] | undefined,
-    [number | undefined, number | undefined]
-> = createSelector(
-    [
-        selectStorageNodes,
-        (_state, nodeId: number | undefined) => nodeId,
-        (_state, _nodeId, pdiskId: number | undefined) => pdiskId,
-    ],
-    (storageNodes, nodeId, pdiskId) => {
-        const targetNode = storageNodes?.find((node) => node.NodeId === nodeId);
-        return targetNode?.VDisks?.filter((vdisk) => vdisk.PDiskId === pdiskId).map((data) => ({
-            ...data,
-            NodeId: nodeId,
-        }));
-    },
-);
 
 export const selectUsageFilterOptions: Selector<StorageStateSlice, UsageFilter[]> = createSelector(
     selectStorageGroups,

@@ -11,7 +11,7 @@ export const VisibleEntitiesTitles = {
 
 interface StorageProblemFilterProps {
     value: VisibleEntities;
-    onChange: (value: string) => void;
+    onChange: (value: VisibleEntities) => void;
 }
 
 const storageVisibleEntitiesFilterQa = 'storage-visible-entities-filter';

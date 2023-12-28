@@ -84,10 +84,10 @@ export const useNodesEndpointSetting: SettingProps = {
     title: i18n('settings.useNodesEndpoint.title'),
     helpPopoverContent: i18n('settings.useNodesEndpoint.popover'),
 };
-export const useBackendParamsForTables: SettingProps = {
+export const useVirtualTables: SettingProps = {
     settingKey: USE_BACKEND_PARAMS_FOR_TABLES_KEY,
-    title: i18n('settings.useBackendParamsForTables.title'),
-    helpPopoverContent: i18n('settings.useBackendParamsForTables.popover'),
+    title: i18n('settings.useVirtualTables.title'),
+    helpPopoverContent: i18n('settings.useVirtualTables.popover'),
 };
 export const queryUseMultiSchemaSetting: SettingProps = {
     settingKey: QUERY_USE_MULTI_SCHEMA_KEY,
@@ -103,7 +103,7 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [useNodesEndpointSetting, useBackendParamsForTables, queryUseMultiSchemaSetting],
+    settings: [useNodesEndpointSetting, useVirtualTables, queryUseMultiSchemaSetting],
 };
 
 export const generalPage: SettingsPage = {

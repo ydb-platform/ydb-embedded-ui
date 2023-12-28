@@ -18,14 +18,12 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {getClusterInfo} from '../../store/reducers/cluster/cluster';
 import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
 import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../../utils/versions';
-import {useAutofetcher, useSetting, useTypedSelector} from '../../utils/hooks';
-import {USE_BACKEND_PARAMS_FOR_TABLES_KEY} from '../../utils/constants';
+import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 
 import {InternalLink} from '../../components/InternalLink';
 import {Tenants} from '../Tenants/Tenants';
-import {Nodes} from '../Nodes/Nodes';
-import {VirtualNodes} from '../Nodes/VirtualNodes';
-import {Storage} from '../Storage/Storage';
+import {StorageWrapper} from '../Storage/StorageWrapper';
+import {NodesWrapper} from '../Nodes/NodesWrapper';
 import {Versions} from '../Versions/Versions';
 
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';
@@ -54,8 +52,6 @@ function Cluster({
 
     const match = useRouteMatch<{activeTab: string}>(routes.cluster);
     const {activeTab = clusterTabsIds.tenants} = match?.params || {};
-
-    const [useVirtualNodes] = useSetting<boolean>(USE_BACKEND_PARAMS_FOR_TABLES_KEY);
 
     const location = useLocation();
     const queryParams = qs.parse(location.search, {
@@ -111,17 +107,20 @@ function Cluster({
                 return <Tenants additionalTenantsProps={additionalTenantsProps} />;
             }
             case clusterTabsIds.nodes: {
-                return useVirtualNodes ? (
-                    <VirtualNodes
+                return (
+                    <NodesWrapper
                         parentContainer={container.current}
                         additionalNodesProps={additionalNodesProps}
                     />
-                ) : (
-                    <Nodes additionalNodesProps={additionalNodesProps} />
                 );
             }
             case clusterTabsIds.storage: {
-                return <Storage additionalNodesProps={additionalNodesProps} />;
+                return (
+                    <StorageWrapper
+                        parentContainer={container.current}
+                        additionalNodesProps={additionalNodesProps}
+                    />
+                );
             }
             case clusterTabsIds.versions: {
                 return <Versions versionToColor={versionToColor} />;

@@ -106,12 +106,12 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
         dispatch(setSearchValue(value));
     };
 
-    const handleProblemFilterChange = (value: string) => {
-        dispatch(changeFilter(value as ProblemFilterValue));
+    const handleProblemFilterChange = (value: ProblemFilterValue) => {
+        dispatch(changeFilter(value));
     };
 
-    const handleUptimeFilterChange = (value: string) => {
-        dispatch(setNodesUptimeFilter(value as NodesUptimeFilterValues));
+    const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
+        dispatch(setNodesUptimeFilter(value));
     };
 
     const renderControls = () => {

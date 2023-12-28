@@ -13,18 +13,26 @@ const sizes = {
     l: 350,
 };
 
-interface EmptyStateProps {
+export interface EmptyStateProps {
     title: string;
     image?: ReactNode;
     description?: ReactNode;
     actions?: ReactNode[];
     size?: keyof typeof sizes;
+    centered?: boolean;
 }
 
-export const EmptyState = ({image, title, description, actions, size = 'm'}: EmptyStateProps) => {
+export const EmptyState = ({
+    image,
+    title,
+    description,
+    actions,
+    size = 'm',
+    centered = true,
+}: EmptyStateProps) => {
     return (
         <div className={block({size})}>
-            <div className={block('wrapper', {size})}>
+            <div className={block('wrapper', {size, centered})}>
                 <div className={block('image')}>
                     {image ? (
                         image

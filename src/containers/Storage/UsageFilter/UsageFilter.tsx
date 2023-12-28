@@ -10,7 +10,7 @@ import {getUsageSeverityForEntityStatus} from '../utils';
 import i18n from './i18n';
 import './UsageFilter.scss';
 
-interface UsageFilterItem {
+export interface UsageFilterItem {
     threshold: number;
     count: number;
 }
@@ -21,13 +21,12 @@ interface UsageFilterProps {
     groups?: UsageFilterItem[];
     onChange?: (value: string[]) => void;
     debounce?: number;
-    disabled?: boolean;
 }
 
 const b = cn('usage-filter');
 
 export const UsageFilter = (props: UsageFilterProps) => {
-    const {className, value = [], groups = [], onChange, debounce = 200, disabled} = props;
+    const {className, value = [], groups = [], onChange, debounce = 200} = props;
 
     const [filterValue, setFilterValue] = useState(value);
     const timer = useRef<number>();
@@ -94,7 +93,7 @@ export const UsageFilter = (props: UsageFilterProps) => {
             renderOption={renderOption}
             getOptionHeight={() => 50}
             popupWidth={280}
-            disabled={disabled}
+            disabled={groups.length === 0}
         />
     );
 };

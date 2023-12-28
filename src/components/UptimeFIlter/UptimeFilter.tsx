@@ -4,7 +4,7 @@ import {NodesUptimeFilterValues, NodesUptimeFilterTitles} from '../../utils/node
 
 interface UptimeFilterProps {
     value: NodesUptimeFilterValues;
-    onChange: (value: string) => void;
+    onChange: (value: NodesUptimeFilterValues) => void;
     className?: string;
 }
 

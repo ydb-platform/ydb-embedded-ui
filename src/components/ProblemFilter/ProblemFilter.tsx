@@ -5,7 +5,7 @@ import {ProblemFilterValues} from '../../store/reducers/settings/settings';
 
 interface ProblemFilterProps {
     value: ProblemFilterValue;
-    onChange: (value: string) => void;
+    onChange: (value: ProblemFilterValue) => void;
     className?: string;
 }
 

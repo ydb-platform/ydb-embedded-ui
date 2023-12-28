@@ -19,10 +19,13 @@
         }
 
         &_size_m {
-            position: relative;
-
             width: 800px;
             height: 240px;
+        }
+
+        &_centered {
+            position: relative;
+
             margin: 0 auto;
         }
     }
