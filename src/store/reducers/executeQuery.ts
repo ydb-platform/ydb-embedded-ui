@@ -9,10 +9,10 @@ import type {
     QueryInHistory,
 } from '../../types/store/executeQuery';
 import type {QueryRequestParams, QueryMode, QuerySyntax} from '../../types/store/query';
-import {getValueFromLS, parseJson} from '../../utils/utils';
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
 import {QUERY_MODES, QUERY_SYNTAX, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {parseQueryError} from '../../utils/error';
+import {settingsManager} from '../../services/settings';
 import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
@@ -28,7 +28,10 @@ const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
 const SET_MONACO_HOT_KEY = 'query/SET_MONACO_HOT_KEY';
 const SET_TENANT_PATH = 'query/SET_TENANT_PATH';
 
-const queriesHistoryInitial: string[] = parseJson(getValueFromLS(QUERIES_HISTORY_KEY, '[]'));
+const queriesHistoryInitial = settingsManager.readUserSettingsValue(
+    QUERIES_HISTORY_KEY,
+    [],
+) as string[];
 
 const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
@@ -97,7 +100,7 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
             const newQueries = [...state.history.queries, {queryText, syntax}].slice(
                 state.history.queries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
             );
-            window.localStorage.setItem(QUERIES_HISTORY_KEY, JSON.stringify(newQueries));
+            settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
             const currentIndex = newQueries.length - 1;
 
             return {

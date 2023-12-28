@@ -17,7 +17,6 @@ import {
     setTenantPath,
 } from '../../../../store/reducers/executeQuery';
 import {getExplainQuery, getExplainQueryAst} from '../../../../store/reducers/explainQuery';
-import {getParsedSettingValue, setSettingValue} from '../../../../store/reducers/settings/settings';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
@@ -86,6 +85,7 @@ function QueryEditor(props) {
     const [queryMode, setQueryMode] = useQueryModes();
     const [useMultiSchema] = useSetting(QUERY_USE_MULTI_SCHEMA_KEY);
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting(LAST_USED_QUERY_ACTION_KEY);
+    const [savedQueries, setSavedQueries] = useSetting(SAVED_QUERIES_KEY);
 
     useEffect(() => {
         if (savedPath !== path) {
@@ -417,7 +417,7 @@ function QueryEditor(props) {
 
     const storageEventHandler = (event) => {
         if (event.key === SAVED_QUERIES_KEY) {
-            props.setSettingValue(SAVED_QUERIES_KEY, event.newValue);
+            setSavedQueries(event.newValue);
         }
     };
 
@@ -430,8 +430,6 @@ function QueryEditor(props) {
     const onSaveQueryHandler = (queryName) => {
         const {
             executeQuery: {input},
-            savedQueries = [],
-            setSettingValue,
         } = props;
 
         const queryIndex = savedQueries.findIndex(
@@ -445,11 +443,11 @@ function QueryEditor(props) {
             newSavedQueries.push(newQuery);
         }
 
-        setSettingValue(SAVED_QUERIES_KEY, JSON.stringify(newSavedQueries));
+        setSavedQueries(newSavedQueries);
     };
 
     const renderControls = () => {
-        const {executeQuery, explainQuery, savedQueries} = props;
+        const {executeQuery, explainQuery} = props;
 
         return (
             <QueryEditorControls
@@ -511,7 +509,6 @@ const mapStateToProps = (state) => {
     return {
         executeQuery: state.executeQuery,
         explainQuery: state.explainQuery,
-        savedQueries: getParsedSettingValue(state, SAVED_QUERIES_KEY),
         showPreview: state.schema.showPreview,
         currentSchema: state.schema.currentSchema,
         monacoHotKey: state.executeQuery?.monacoHotKey,
@@ -525,7 +522,6 @@ const mapDispatchToProps = {
     goToNextQuery,
     getExplainQuery,
     getExplainQueryAst,
-    setSettingValue,
     setShowPreview,
     setMonacoHotKey,
     setTenantPath,

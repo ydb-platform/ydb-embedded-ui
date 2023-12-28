@@ -34,7 +34,6 @@ import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 
 import {backend as BACKEND} from '../store';
 import {prepareSortValue} from '../utils/filters';
-import {settingsApi} from '../utils/settings';
 
 const config = {withCredentials: !window.custom_backend};
 
@@ -378,10 +377,12 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             path_id: tenantId?.PathId,
         });
     }
-    postSetting(name: string, value: string) {
+
+    /** @deprecated use localStorage instead */
+    postSetting(settingsApi: string, name: string, value: string) {
         return this.request({
             method: 'PATCH',
-            url: settingsApi || '',
+            url: settingsApi,
             data: {[name]: value},
         });
     }

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {connect} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {useLocation} from 'react-router';
 import {useHistory} from 'react-router-dom';
 import cn from 'bem-cn-lite';
@@ -19,7 +19,6 @@ import settingsIcon from '../../assets/icons/settings.svg';
 import supportIcon from '../../assets/icons/support.svg';
 
 import {logout} from '../../store/reducers/authentication/authentication';
-import {getParsedSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
 import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../store/reducers/tenant/constants';
 import routes, {TENANT, createHref, parseQuery} from '../../routes';
 import {useSetting, useTypedSelector} from '../../utils/hooks';
@@ -117,10 +116,6 @@ function YdbUserDropdown({isCompact, popupAnchor, ydbUser}: YdbUserDropdownProps
 
 interface AsideNavigationProps {
     children: React.ReactNode;
-    ydbUser: string;
-    compact: boolean;
-    logout: VoidFunction;
-    setSettingValue: (name: string, value: string) => void;
 }
 
 enum Panel {
@@ -189,14 +184,18 @@ export const useGetLeftNavigationItems = () => {
 
 function AsideNavigation(props: AsideNavigationProps) {
     const history = useHistory();
+    const dispatch = useDispatch();
 
     const [visiblePanel, setVisiblePanel] = useState<Panel>();
 
-    const setIsCompact = (compact: boolean) => {
-        props.setSettingValue(ASIDE_HEADER_COMPACT_KEY, JSON.stringify(compact));
-    };
+    const {user: ydbUser} = useTypedSelector((state) => state.authentication);
+    const [compact, setIsCompact] = useSetting<boolean>(ASIDE_HEADER_COMPACT_KEY);
 
     const menuItems = useGetLeftNavigationItems();
+
+    const onLogout = () => {
+        dispatch(logout());
+    };
 
     return (
         <React.Fragment>
@@ -207,7 +206,7 @@ function AsideNavigation(props: AsideNavigationProps) {
                     onClick: () => history.push('/'),
                 }}
                 menuItems={menuItems}
-                compact={props.compact}
+                compact={compact}
                 onChangeCompact={setIsCompact}
                 className={b()}
                 renderContent={() => props.children}
@@ -248,8 +247,8 @@ function AsideNavigation(props: AsideNavigationProps) {
                             isCompact={compact}
                             popupAnchor={asideRef}
                             ydbUser={{
-                                login: props.ydbUser,
-                                logout: props.logout,
+                                login: ydbUser,
+                                logout: onLogout,
                             }}
                         />
                     </React.Fragment>
@@ -269,18 +268,4 @@ function AsideNavigation(props: AsideNavigationProps) {
     );
 }
 
-const mapStateToProps = (state: any) => {
-    const {user: ydbUser} = state.authentication;
-
-    return {
-        ydbUser,
-        compact: getParsedSettingValue(state, ASIDE_HEADER_COMPACT_KEY),
-    };
-};
-
-const mapDispatchToProps = {
-    logout,
-    setSettingValue,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(AsideNavigation);
+export default AsideNavigation;

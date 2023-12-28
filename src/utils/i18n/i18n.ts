@@ -3,7 +3,7 @@ import {configure as configureUiKit} from '@gravity-ui/uikit';
 import {configure as configureYdbUiComponents} from 'ydb-ui-components';
 
 import {LANGUAGE_KEY} from '../constants';
-import {readSavedSettingsValue} from '../settings';
+import {settingsManager} from '../../services/settings';
 
 enum Lang {
     En = 'en',
@@ -11,7 +11,7 @@ enum Lang {
 }
 
 const defaultLang = Lang.En;
-const currentLang = readSavedSettingsValue(LANGUAGE_KEY, defaultLang);
+const currentLang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, defaultLang) as Lang;
 
 const i18n = new I18N();
 
