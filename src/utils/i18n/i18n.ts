@@ -11,7 +11,7 @@ enum Lang {
 }
 
 const defaultLang = Lang.En;
-const currentLang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, defaultLang);
+const currentLang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, defaultLang) as Lang;
 
 const i18n = new I18N();
 

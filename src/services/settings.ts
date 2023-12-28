@@ -97,7 +97,7 @@ class SettingsManager {
         }, {});
     };
 
-    private readValueFromLS = (key: string) => {
+    private readValueFromLS = (key: string): unknown => {
         try {
             const value = localStorage.getItem(key);
 
@@ -107,7 +107,7 @@ class SettingsManager {
         }
     };
 
-    private setValueToLS = (key: string, value: unknown) => {
+    private setValueToLS = (key: string, value: unknown): void => {
         try {
             if (typeof value === 'string') {
                 localStorage.setItem(key, value);

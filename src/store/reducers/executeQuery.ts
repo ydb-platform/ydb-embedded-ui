@@ -28,10 +28,10 @@ const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
 const SET_MONACO_HOT_KEY = 'query/SET_MONACO_HOT_KEY';
 const SET_TENANT_PATH = 'query/SET_TENANT_PATH';
 
-const queriesHistoryInitial: string[] = settingsManager.readUserSettingsValue(
+const queriesHistoryInitial = settingsManager.readUserSettingsValue(
     QUERIES_HISTORY_KEY,
     [],
-);
+) as string[];
 
 const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
