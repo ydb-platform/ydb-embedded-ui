@@ -100,7 +100,7 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
             const newQueries = [...state.history.queries, {queryText, syntax}].slice(
                 state.history.queries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
             );
-            window.localStorage.setItem(QUERIES_HISTORY_KEY, JSON.stringify(newQueries));
+            settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
             const currentIndex = newQueries.length - 1;
 
             return {
