@@ -1,6 +1,6 @@
 import type {ValueOf} from '../../../types/common';
 import type {SettingsObject} from '../../../services/settings';
-import {changeFilter, ProblemFilterValues, SET_SETTING_VALUE} from './settings';
+import {changeFilter, setUserSettings, ProblemFilterValues, SET_SETTING_VALUE} from './settings';
 
 export type ProblemFilterValue = ValueOf<typeof ProblemFilterValues>;
 
@@ -15,7 +15,10 @@ export type SetSettingValueAction = {
     data: {name: string; value: unknown};
 };
 
-export type SettingsAction = ReturnType<typeof changeFilter> | SetSettingValueAction;
+export type SettingsAction =
+    | ReturnType<typeof changeFilter>
+    | ReturnType<typeof setUserSettings>
+    | SetSettingValueAction;
 
 export interface SettingsRootStateSlice {
     settings: SettingsState;
