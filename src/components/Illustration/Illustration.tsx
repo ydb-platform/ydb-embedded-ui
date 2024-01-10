@@ -13,10 +13,12 @@ const store: IllustrationStore = {
     light: {
         403: () => import('../../assets/illustrations/light/403.svg'),
         thumbsUp: () => import('../../assets/illustrations/light/thumbsUp.svg'),
+        error: () => import('../../assets/illustrations/light/error.svg'),
     },
     dark: {
         403: () => import('../../assets/illustrations/dark/403.svg'),
-        thumbsUp: () => import('../../assets/illustrations/light/thumbsUp.svg'),
+        thumbsUp: () => import('../../assets/illustrations/dark/thumbsUp.svg'),
+        error: () => import('../../assets/illustrations/dark/error.svg'),
     },
 };
 
