@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.27.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.27.0...v4.27.1) (2024-01-10)
+
+
+### Bug Fixes
+
+* enable extract and set user settings manually ([#629](https://github.com/ydb-platform/ydb-embedded-ui/issues/629)) ([5eecd58](https://github.com/ydb-platform/ydb-embedded-ui/commit/5eecd58249688b4a8b3ecad766564f7b404e839c))
+
 ## [4.27.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.26.0...v4.27.0) (2023-12-28)
 
 
