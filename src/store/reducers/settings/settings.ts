@@ -2,7 +2,7 @@ import type {Reducer} from 'redux';
 import type {ThunkAction} from 'redux-thunk';
 
 import '../../../services/api';
-import {settingsManager} from '../../../services/settings';
+import {DEFAULT_USER_SETTINGS, SettingsObject, settingsManager} from '../../../services/settings';
 
 import type {RootState} from '..';
 import type {
@@ -15,13 +15,14 @@ import type {
 
 const CHANGE_PROBLEM_FILTER = 'settings/CHANGE_PROBLEM_FILTER';
 export const SET_SETTING_VALUE = 'settings/SET_VALUE';
+export const SET_USER_SETTINGS = 'settings/SET_USER_SETTINGS';
 
 export const ProblemFilterValues = {
     ALL: 'All',
     PROBLEMS: 'With problems',
 } as const;
 
-const userSettings = settingsManager.getUserSettings();
+const userSettings = settingsManager.extractSettingsFromLS(DEFAULT_USER_SETTINGS);
 const systemSettings = window.systemSettings || {};
 
 export const initialState = {
@@ -49,7 +50,15 @@ const settings: Reducer<SettingsState, SettingsAction> = (state = initialState, 
                 userSettings: newSettings,
             };
         }
-
+        case SET_USER_SETTINGS: {
+            return {
+                ...state,
+                userSettings: {
+                    ...state.userSettings,
+                    ...action.data,
+                },
+            };
+        }
         default:
             return state;
     }
@@ -64,6 +73,10 @@ export const setSettingValue = (
 
         settingsManager.setUserSettingsValue(name, value);
     };
+};
+
+export const setUserSettings = (data: SettingsObject) => {
+    return {type: SET_USER_SETTINGS, data} as const;
 };
 
 export const getSettingValue = (state: SettingsRootStateSlice, name: string) => {

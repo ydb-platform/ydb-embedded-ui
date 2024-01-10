@@ -23,7 +23,7 @@ export type SettingsObject = Record<string, unknown>;
 const USE_LOCAL_STORAGE_FOR_SETTINGS_KEY = 'useLocalStorageForSettings';
 
 /** User settings keys and their default values */
-const DEFAULT_USER_SETTINGS: SettingsObject = {
+export const DEFAULT_USER_SETTINGS: SettingsObject = {
     [THEME_KEY]: 'system',
     [LANGUAGE_KEY]: undefined,
     [INVERTED_DISKS_KEY]: false,
@@ -60,19 +60,12 @@ class SettingsManager {
     }
 
     /**
-     * User settings - settings stored in LS or external store
-     */
-    getUserSettings() {
-        return this.extractSettingsFromLS();
-    }
-
-    /**
      * Returns parsed settings value.
      * If value cannot be parsed, returns initially stored string.
      * If there is no value, return default value
      */
     readUserSettingsValue(key: string, defaultValue?: unknown) {
-        return this.readValueFromLS(key) ?? defaultValue ?? DEFAULT_USER_SETTINGS[key];
+        return this.readValueFromLS(key) ?? defaultValue;
     }
 
     /**
@@ -82,8 +75,11 @@ class SettingsManager {
         return this.setValueToLS(key, value);
     }
 
-    private extractSettingsFromLS = () => {
-        return Object.entries(DEFAULT_USER_SETTINGS).reduce<SettingsObject>((acc, [key, value]) => {
+    /**
+     * Extract values by provided settings object
+     */
+    extractSettingsFromLS = (settings: SettingsObject) => {
+        return Object.entries(settings).reduce<SettingsObject>((acc, [key, value]) => {
             acc[key] = this.readUserSettingsValue(key, value);
             return acc;
         }, {});
