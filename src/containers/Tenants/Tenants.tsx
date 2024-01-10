@@ -61,8 +61,8 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
         true,
     );
 
-    const handleProblemFilterChange = (value: string) => {
-        dispatch(changeFilter(value as ProblemFilterValue));
+    const handleProblemFilterChange = (value: ProblemFilterValue) => {
+        dispatch(changeFilter(value));
     };
 
     const handleSearchChange = (value: string) => {

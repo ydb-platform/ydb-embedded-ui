@@ -1,11 +1,7 @@
 import {useCallback, useEffect} from 'react';
 import {useDispatch} from 'react-redux';
-import cn from 'bem-cn-lite';
 
-import {Search} from '../../components/Search';
-import {UptimeFilter} from '../../components/UptimeFIlter';
 import {AccessDenied} from '../../components/Errors/403';
-import {EntitiesCount} from '../../components/EntitiesCount';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
 
@@ -51,13 +47,10 @@ import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 
 import {StorageGroups} from './StorageGroups/StorageGroups';
 import {StorageNodes} from './StorageNodes/StorageNodes';
-import {StorageTypeFilter} from './StorageTypeFilter/StorageTypeFilter';
-import {StorageVisibleEntitiesFilter} from './StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
-import {UsageFilter} from './UsageFilter';
+import {StorageControls} from './StorageControls/StorageControls';
+import {b} from './shared';
 
 import './Storage.scss';
-
-const b = cn('global-storage');
 
 interface StorageProps {
     additionalNodesProps?: AdditionalNodesProps;
@@ -155,16 +148,16 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
         dispatch(setStorageTextFilter(value));
     };
 
-    const handleGroupVisibilityChange = (value: string) => {
-        dispatch(setVisibleEntities(value as VisibleEntities));
+    const handleGroupVisibilityChange = (value: VisibleEntities) => {
+        dispatch(setVisibleEntities(value));
     };
 
-    const handleStorageTypeChange = (value: string) => {
-        dispatch(setStorageType(value as StorageType));
+    const handleStorageTypeChange = (value: StorageType) => {
+        dispatch(setStorageType(value));
     };
 
-    const handleUptimeFilterChange = (value: string) => {
-        dispatch(setNodesUptimeFilter(value as NodesUptimeFilterValues));
+    const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
+        dispatch(setNodesUptimeFilter(value));
     };
 
     const handleShowAllNodes = () => {
@@ -202,65 +195,35 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
         );
     };
 
-    const renderEntitiesCount = () => {
-        const entityName = storageType === STORAGE_TYPES.groups ? 'Groups' : 'Nodes';
-        const current =
-            storageType === STORAGE_TYPES.groups ? storageGroups.length : storageNodes.length;
-
-        return (
-            <EntitiesCount
-                label={entityName}
-                loading={loading && !wasLoaded}
-                total={entitiesCount.total}
-                current={current}
-            />
-        );
-    };
-
     const renderControls = () => {
         return (
-            <>
-                <div className={b('search')}>
-                    <Search
-                        placeholder={
-                            storageType === STORAGE_TYPES.groups
-                                ? 'Group ID, Pool name'
-                                : 'Node ID, FQDN'
-                        }
-                        onChange={handleTextFilterChange}
-                        value={filter}
-                    />
-                </div>
-
-                {!isNodePage && (
-                    <StorageTypeFilter value={storageType} onChange={handleStorageTypeChange} />
-                )}
-
-                <StorageVisibleEntitiesFilter
-                    value={visibleEntities}
-                    onChange={handleGroupVisibilityChange}
-                />
-
-                {storageType === STORAGE_TYPES.nodes && (
-                    <UptimeFilter value={nodesUptimeFilter} onChange={handleUptimeFilterChange} />
-                )}
-
-                {storageType === STORAGE_TYPES.groups && (
-                    <UsageFilter
-                        value={usageFilter}
-                        onChange={handleUsageFilterChange}
-                        groups={usageFilterOptions}
-                        disabled={usageFilterOptions.length === 0}
-                    />
-                )}
-                {renderEntitiesCount()}
-            </>
+            <StorageControls
+                searchValue={filter}
+                handleSearchValueChange={handleTextFilterChange}
+                withTypeSelector={!isNodePage}
+                storageType={storageType}
+                handleStorageTypeChange={handleStorageTypeChange}
+                visibleEntities={visibleEntities}
+                handleVisibleEntitiesChange={handleGroupVisibilityChange}
+                nodesUptimeFilter={nodesUptimeFilter}
+                handleNodesUptimeFilterChange={handleUptimeFilterChange}
+                groupsUsageFilter={usageFilter}
+                groupsUsageFilterOptions={usageFilterOptions}
+                handleGroupsUsageFilterChange={handleUsageFilterChange}
+                entitiesCountCurrent={
+                    storageType === STORAGE_TYPES.groups
+                        ? storageGroups.length
+                        : storageNodes.length
+                }
+                entitiesCountTotal={entitiesCount.total}
+                entitiesLoading={loading && !wasLoaded}
+            />
         );
     };
 
     if (error) {
         if (error.status === 403) {
-            return <AccessDenied />;
+            return <AccessDenied position="left" />;
         }
 
         return <ResponseError error={error} />;

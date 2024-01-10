@@ -1,14 +1,13 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
 import cn from 'bem-cn-lite';
 
+import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {InternalLink} from '../../../components/InternalLink';
 import {Stack} from '../../../components/Stack/Stack';
 
 import routes, {createHref} from '../../../routes';
-import {selectVDisksForPDisk} from '../../../store/reducers/storage/selectors';
 import {TPDiskStateInfo, TPDiskState} from '../../../types/api/pdisk';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import {useTypedSelector} from '../../../utils/hooks';
 import {getPDiskType} from '../../../utils/pdisk';
 import {isFullVDiskData} from '../../../utils/storage';
 
@@ -44,6 +43,7 @@ const stateSeverity = {
 interface PDiskProps {
     nodeId: number;
     data?: TPDiskStateInfo;
+    vDisks?: TVDiskStateInfo[];
 }
 
 const isSeverityKey = (key?: TPDiskState): key is keyof typeof stateSeverity =>
@@ -53,11 +53,9 @@ const getStateSeverity = (pDiskState?: TPDiskState) => {
     return isSeverityKey(pDiskState) ? stateSeverity[pDiskState] : NOT_AVAILABLE_SEVERITY;
 };
 
-export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
+export const PDisk = ({nodeId, data: rawData = {}, vDisks}: PDiskProps) => {
     // NodeId in data is required for the popup
     const data = useMemo(() => ({...rawData, NodeId: nodeId}), [rawData, nodeId]);
-
-    const vdisks = useTypedSelector((state) => selectVDisksForPDisk(state, nodeId, data.PDiskId));
 
     const [severity, setSeverity] = useState(getStateSeverity(data.State));
     const [isPopupVisible, setIsPopupVisible] = useState(false);
@@ -100,13 +98,13 @@ export const PDisk = ({nodeId, data: rawData = {}}: PDiskProps) => {
     };
 
     const renderVDisks = () => {
-        if (!vdisks?.length) {
+        if (!vDisks?.length) {
             return null;
         }
 
         return (
             <div className={b('vdisks')}>
-                {vdisks.map((vdisk) => {
+                {vDisks.map((vdisk) => {
                     const donors = vdisk.Donors;
 
                     return (

@@ -15,7 +15,7 @@
     @include body-2-typography();
 
     &__table {
-        width: 100%;
+        width: max-content;
         max-width: 100%;
 
         table-layout: fixed;

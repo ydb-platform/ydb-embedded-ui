@@ -72,27 +72,17 @@ export const VirtualNodes = ({parentContainer, additionalNodesProps}: NodesProps
         return b('node', {unavailable: isUnavailableNode(row)});
     };
 
-    const handleSearchQueryChange = (value: string) => {
-        setSearchValue(value);
-    };
-    const handleProblemFilterChange = (value: string) => {
-        setProblemFilter(value as ProblemFilterValue);
-    };
-    const handleUptimeFilterChange = (value: string) => {
-        setUptimeFilter(value as NodesUptimeFilterValues);
-    };
-
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
             <>
                 <Search
-                    onChange={handleSearchQueryChange}
+                    onChange={setSearchValue}
                     placeholder="Host name"
                     className={b('search')}
                     value={searchValue}
                 />
-                <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
-                <UptimeFilter value={uptimeFilter} onChange={handleUptimeFilterChange} />
+                <ProblemFilter value={problemFilter} onChange={setProblemFilter} />
+                <UptimeFilter value={uptimeFilter} onChange={setUptimeFilter} />
                 <EntitiesCount
                     total={totalEntities}
                     current={foundEntities}
@@ -116,7 +106,7 @@ export const VirtualNodes = ({parentContainer, additionalNodesProps}: NodesProps
 
     const renderErrorMessage: RenderErrorMessage = (error) => {
         if (error && error.status === 403) {
-            return <AccessDenied />;
+            return <AccessDenied position="left" />;
         }
 
         return <ResponseError error={error} />;
