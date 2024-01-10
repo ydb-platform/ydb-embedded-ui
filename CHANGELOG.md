@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.28.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.27.1...v4.28.0) (2024-01-10)
+
+
+### Features
+
+* **Storage:** use VirtualTable ([#628](https://github.com/ydb-platform/ydb-embedded-ui/issues/628)) ([67fd9b0](https://github.com/ydb-platform/ydb-embedded-ui/commit/67fd9b03653dd28be650094c987451b09fcce858))
+
 ## [4.27.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.27.0...v4.27.1) (2024-01-10)
 
 
