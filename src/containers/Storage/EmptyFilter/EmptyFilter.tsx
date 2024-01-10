@@ -20,7 +20,7 @@ export const EmptyFilter = ({
 }: EmptyFilterProps) => (
     <EmptyState
         image={<Illustration name="thumbsUp" />}
-        centered={false}
+        position="left"
         title={title}
         description={message}
         actions={

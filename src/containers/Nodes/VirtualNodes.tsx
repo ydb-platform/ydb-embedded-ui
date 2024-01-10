@@ -106,7 +106,7 @@ export const VirtualNodes = ({parentContainer, additionalNodesProps}: NodesProps
 
     const renderErrorMessage: RenderErrorMessage = (error) => {
         if (error && error.status === 403) {
-            return <AccessDenied />;
+            return <AccessDenied position="left" />;
         }
 
         return <ResponseError error={error} />;

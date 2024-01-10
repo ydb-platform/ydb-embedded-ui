@@ -74,7 +74,7 @@ export const VirtualStorage = ({
 
     const renderErrorMessage: RenderErrorMessage = (error) => {
         if (error.status === 403) {
-            return <AccessDenied centered={false} />;
+            return <AccessDenied position="left" />;
         }
 
         return <ResponseError error={error} />;

@@ -19,7 +19,7 @@ export interface EmptyStateProps {
     description?: ReactNode;
     actions?: ReactNode[];
     size?: keyof typeof sizes;
-    centered?: boolean;
+    position?: 'left' | 'center';
 }
 
 export const EmptyState = ({
@@ -28,11 +28,11 @@ export const EmptyState = ({
     description,
     actions,
     size = 'm',
-    centered = true,
+    position = 'center',
 }: EmptyStateProps) => {
     return (
         <div className={block({size})}>
-            <div className={block('wrapper', {size, centered})}>
+            <div className={block('wrapper', {size, position})}>
                 <div className={block('image')}>
                     {image ? (
                         image
