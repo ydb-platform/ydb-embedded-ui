@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.29.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.28.0...v4.29.0) (2024-01-12)
+
+
+### Features
+
+* add ErrorBoundary ([#549](https://github.com/ydb-platform/ydb-embedded-ui/issues/549)) ([f5ad224](https://github.com/ydb-platform/ydb-embedded-ui/commit/f5ad224b342e0fa25b1bafa3f5e2202ce165ef80))
+
 ## [4.28.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.27.1...v4.28.0) (2024-01-10)
 
 
