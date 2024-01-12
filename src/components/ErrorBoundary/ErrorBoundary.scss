@@ -30,7 +30,11 @@
         border: 1px solid var(--g-color-line-generic);
         background-color: var(--g-color-base-generic-ultralight);
     }
-    &__button {
+    &__actions {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+
         margin-top: 20px;
     }
 }

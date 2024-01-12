@@ -13,16 +13,17 @@ const b = cn('ydb-error-boundary');
 
 interface ErrorBoundaryProps {
     children?: ReactNode;
+    useRetry?: boolean;
     onReportProblem?: (error?: Error) => void;
 }
 
-export const ErrorBoundary = ({children, onReportProblem}: ErrorBoundaryProps) => {
+export const ErrorBoundary = ({children, useRetry = true, onReportProblem}: ErrorBoundaryProps) => {
     return (
         <ErrorBoundaryBase
             onError={(error, info) => {
                 registerError(error, info.componentStack, 'error-boundary');
             }}
-            fallbackRender={({error}) => {
+            fallbackRender={({error, resetErrorBoundary}) => {
                 return (
                     <div className={b(null)}>
                         <Illustration name="error" className={b('illustration')} />
@@ -38,15 +39,18 @@ export const ErrorBoundary = ({children, onReportProblem}: ErrorBoundaryProps) =
                             >
                                 <pre className={b('error-details')}>{error.stack}</pre>
                             </Disclosure>
-                            {onReportProblem && (
-                                <Button
-                                    view="outlined"
-                                    className={b('button')}
-                                    onClick={() => onReportProblem(error)}
-                                >
-                                    {i18n('report-problem')}
-                                </Button>
-                            )}
+                            <div className={b('actions')}>
+                                {useRetry && (
+                                    <Button view="outlined" onClick={resetErrorBoundary}>
+                                        {i18n('button-reset')}
+                                    </Button>
+                                )}
+                                {onReportProblem && (
+                                    <Button view="outlined" onClick={() => onReportProblem(error)}>
+                                        {i18n('report-problem')}
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 );
