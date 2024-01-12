@@ -7,6 +7,7 @@ import AsideNavigation from '../AsideNavigation/AsideNavigation';
 
 import {getUser} from '../../store/reducers/authentication/authentication';
 import {registerLanguages} from '../../utils/monaco';
+import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
 
 import './App.scss';
 
@@ -38,8 +39,10 @@ class App extends React.Component {
         const {singleClusterMode, clusterName} = this.props;
         return (
             <AsideNavigation>
-                <Content singleClusterMode={singleClusterMode} clusterName={clusterName} />
-                <div id="fullscreen-root"></div>
+                <ErrorBoundary>
+                    <Content singleClusterMode={singleClusterMode} clusterName={clusterName} />
+                    <div id="fullscreen-root"></div>
+                </ErrorBoundary>
             </AsideNavigation>
         );
     }

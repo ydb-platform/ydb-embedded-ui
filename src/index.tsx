@@ -8,6 +8,7 @@ import App from './containers/App/App';
 import configureStore from './store';
 import reportWebVitals from './reportWebVitals';
 import HistoryContext from './contexts/HistoryContext';
+import {ErrorBoundary} from './components/ErrorBoundary/ErrorBoundary';
 
 import './styles/themes.scss';
 import './styles/constants.scss';
@@ -18,11 +19,13 @@ window.store = store;
 
 ReactDOM.render(
     <React.StrictMode>
-        <Provider store={store}>
-            <HistoryContext.Provider value={history}>
-                <App />
-            </HistoryContext.Provider>
-        </Provider>
+        <ErrorBoundary>
+            <Provider store={store}>
+                <HistoryContext.Provider value={history}>
+                    <App />
+                </HistoryContext.Provider>
+            </Provider>
+        </ErrorBoundary>
     </React.StrictMode>,
     document.getElementById('root'),
 );

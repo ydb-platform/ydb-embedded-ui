@@ -1,0 +1,40 @@
+@import '../../styles/mixins.scss';
+
+.ydb-error-boundary {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+
+    padding: 20px;
+
+    @include body-2-typography();
+
+    &__illustration {
+        width: 230px;
+        height: 230px;
+        margin-right: 20px;
+    }
+    &__error-title {
+        margin-top: 44px;
+        @include lead-typography();
+    }
+    &__error-description {
+        margin-top: 12px;
+    }
+    &__show-details {
+        margin-top: 8px;
+    }
+    &__error-details {
+        padding: 13px 18px;
+
+        border: 1px solid var(--g-color-line-generic);
+        background-color: var(--g-color-base-generic-ultralight);
+    }
+    &__actions {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+
+        margin-top: 20px;
+    }
+}
