@@ -2,7 +2,8 @@
 
 Local viewer for YDB clusters
 
-[Docs for users](https://ydb.tech/en/docs/maintenance/embedded_monitoring/ydb_monitoring)
+* [Docs for users](https://ydb.tech/en/docs/maintenance/embedded_monitoring/ydb_monitoring)
+* [Project Roadmap](ROADMAP.md)
 
 ## Preview
 
