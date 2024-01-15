@@ -17,10 +17,12 @@
             margin-left: 30px;
         }
     }
+
     &__overview-container {
         display: flex;
         align-items: center;
     }
+
     &__info-label {
         font-weight: 200;
 
@@ -51,5 +53,18 @@
         & .yc-progress {
             width: 200px;
         }
+    }
+
+    &__overview-title {
+        display: flex;
+        align-items: center;
+    }
+
+    &__clipboard-button {
+        visibility: hidden;
+
+        margin-left: 8px;
+
+        color: var(--yc-color-text-secondary);
     }
 }

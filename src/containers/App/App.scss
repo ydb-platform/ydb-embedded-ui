@@ -119,11 +119,15 @@ body,
     color: var(--g-color-text-danger);
 }
 
-.data-table__row:hover .entity-status__clipboard-button,
-.data-table__row:focus-within .entity-status__clipboard-button,
-.ydb-virtual-table__row:hover .entity-status__clipboard-button,
-.ydb-virtual-table__row:focus-within .entity-status__clipboard-button {
-    visibility: visible;
+.data-table__row,
+.ydb-virtual-table__row,
+.ydb-tree-view__item {
+    &:hover,
+    &:focus-within {
+        & .yc-clipboard-button {
+            visibility: visible;
+        }
+    }
 }
 
 .g-root .data-table_highlight-rows .data-table__row:hover {
