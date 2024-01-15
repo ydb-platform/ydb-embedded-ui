@@ -121,7 +121,7 @@ body,
 
 .data-table__row:hover .entity-status__clipboard-button,
 .ydb-virtual-table__row:hover .entity-status__clipboard-button {
-    display: flex;
+    visibility: visible;
 }
 
 .g-root .data-table_highlight-rows .data-table__row:hover {

@@ -10,25 +10,14 @@
     @include body-2-typography();
 
     &__clipboard-button {
-        display: none;
-        justify-content: center;
-        align-items: center;
+        visibility: hidden;
 
         margin-left: 8px;
 
         color: var(--yc-color-text-secondary);
 
-        .yc-button__text {
-            margin: 0;
-        }
-
-        .yc-clipboard-button {
-            width: 24px;
-            height: 24px;
-        }
-
         &_visible {
-            display: inline-flex;
+            visibility: visible;
         }
     }
 
