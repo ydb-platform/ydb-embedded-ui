@@ -1,4 +1,5 @@
 # YDB Embedded UI Roadmap
+
 ## Legend
 We use the following symbols as abbreviations:
 
