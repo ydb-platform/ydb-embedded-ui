@@ -1,5 +1,6 @@
-import {ClipboardButton, Progress} from '@gravity-ui/uikit';
+import {Progress} from '@gravity-ui/uikit';
 import block from 'bem-cn-lite';
+import {ClipboardButton} from '../../../components/ClipboardButton';
 import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
 import type {VersionValue} from '../../../types/versions';
 import type {GroupedNodesItem} from '../types';
@@ -43,7 +44,7 @@ export const NodesTreeTitle = ({
                 {title ? (
                     <span className={b('overview-title')}>
                         {title}
-                        <ClipboardButton text={title} size={16} className={b('clipboard-button')} />
+                        <ClipboardButton text={title} size="s" className={b('clipboard-button')} />
                     </span>
                 ) : null}
             </div>

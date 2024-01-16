@@ -1,4 +1,4 @@
-import {ClipboardButton, Icon, Link as UIKitLink} from '@gravity-ui/uikit';
+import {Icon, Link as UIKitLink} from '@gravity-ui/uikit';
 import cn from 'bem-cn-lite';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -7,6 +7,7 @@ import circleExclamationIcon from '../../assets/icons/circle-exclamation.svg';
 import circleInfoIcon from '../../assets/icons/circle-info.svg';
 import circleTimesIcon from '../../assets/icons/circle-xmark.svg';
 import triangleExclamationIcon from '../../assets/icons/triangle-exclamation.svg';
+import {ClipboardButton} from '../ClipboardButton';
 import './EntityStatus.scss';
 
 const icons = {
@@ -121,7 +122,7 @@ class EntityStatus extends React.Component {
                 {hasClipboardButton && (
                     <ClipboardButton
                         text={name}
-                        size={16}
+                        size="s"
                         className={b('clipboard-button', {
                             visible: this.props.clipboardButtonAlwaysVisible,
                         })}

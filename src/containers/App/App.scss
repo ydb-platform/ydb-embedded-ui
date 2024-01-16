@@ -107,12 +107,6 @@ body,
         border-right: unset;
         border-left: unset;
     }
-
-    .yc-clipboard-button {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-    }
 }
 
 .error {
@@ -124,7 +118,7 @@ body,
 .ydb-tree-view__item {
     &:hover,
     &:focus-within {
-        & .yc-clipboard-button {
+        & .clipboard-button {
             visibility: visible;
         }
     }
