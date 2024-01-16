@@ -26,7 +26,14 @@ function InnerButton({
     ...props
 }: Omit<ClipboardButtonProps, 'text'> & {status: CopyToClipboardStatus}) {
     return (
-        <Tooltip content={status === CopyToClipboardStatus.Success ? 'Copied!' : title || 'Copy'}>
+        <Tooltip
+            content={status === CopyToClipboardStatus.Success ? 'Copied!' : title || 'Copy'}
+            /**
+             * Auto-placement has a bug with text changing.
+             * @link https://github.com/ydb-platform/ydb-embedded-ui/pull/648#discussion_r1453530092
+             */
+            placement="bottom-start"
+        >
             <Button {...props} className={b(null, className)}>
                 <Button.Icon>
                     <ClipboardIcon status={status} size={16} />
