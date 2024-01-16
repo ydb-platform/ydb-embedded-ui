@@ -32,6 +32,11 @@ We use the following symbols as abbreviations:
 1. ㉔ **Support Asyncronous Replication** – basic support for new feature – cluster-to-cluster asyncrounous replication 
 1. ㉔ **Display Keys and Column Families** – add wider schema tab in Diagnostics mode with information about column families, primary and partitioning keys.
 1. ㉔ **Enhance Column Tables support** – display all parameters from `CREATE TABLE` statement on info Tab, add create/alter queries templates
+1. ✅ ㉓ **Support YDB Topics** (add support for viewing metadata of YDB topics, its data, lag, etc)
+1. ✅ ㉓ **Support CDC Streams**
+1. ✅ ㉓ **Support Secondary Indexes**
+1. ✅ ㉓ **Support Read Replicas**
+1. ✅ ㉓ **Support Column-oriented Tables**
 
 ## Appearence 
 
