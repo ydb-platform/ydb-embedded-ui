@@ -1,31 +1,25 @@
-import React, {useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
-import cn from 'bem-cn-lite';
-import JSONTree from 'react-json-inspector';
-
 import {RadioButton, Tabs} from '@gravity-ui/uikit';
-
-import CopyToClipboard from '../../../../components/CopyToClipboard/CopyToClipboard';
+import cn from 'bem-cn-lite';
+import React, {useEffect, useState} from 'react';
+import JSONTree from 'react-json-inspector';
+import {useDispatch} from 'react-redux';
+import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
-
+import {disableFullscreen} from '../../../../store/reducers/fullscreen';
+import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult, QueryErrorResponse} from '../../../../types/store/query';
-import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
-import {disableFullscreen} from '../../../../store/reducers/fullscreen';
-import {prepareQueryError} from '../../../../utils/query';
-import {useTypedSelector} from '../../../../utils/hooks';
 import {getArray} from '../../../../utils';
-
+import {useTypedSelector} from '../../../../utils/hooks';
+import {prepareQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
-
 import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {getPreparedResult} from '../utils/getPreparedResult';
-
 import './ExecuteResult.scss';
 
 const b = cn('ydb-query-execute-result');
@@ -115,10 +109,10 @@ export function ExecuteResult({
 
     const renderClipboardButton = () => {
         return (
-            <CopyToClipboard
+            <ClipboardButton
                 text={textResults}
+                view="flat-secondary"
                 title="Copy results"
-                toastText="Results were copied to clipboard successfully"
                 disabled={copyDisabled}
             />
         );

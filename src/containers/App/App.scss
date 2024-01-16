@@ -107,21 +107,21 @@ body,
         border-right: unset;
         border-left: unset;
     }
-
-    .yc-clipboard-button {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-    }
 }
 
 .error {
     color: var(--g-color-text-danger);
 }
 
-.data-table__row:hover .entity-status__clipboard-button,
-.ydb-virtual-table__row:hover .entity-status__clipboard-button {
-    display: flex;
+.data-table__row,
+.ydb-virtual-table__row,
+.ydb-tree-view__item {
+    &:hover,
+    &:focus-within {
+        & .clipboard-button {
+            visibility: visible;
+        }
+    }
 }
 
 .g-root .data-table_highlight-rows .data-table__row:hover {

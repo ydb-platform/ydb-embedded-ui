@@ -1,60 +1,53 @@
+import {HelpPopover} from '@gravity-ui/components';
+import {Button, Tabs} from '@gravity-ui/uikit';
+import cn from 'bem-cn-lite';
+import qs from 'qs';
 import React, {ReactNode, useEffect, useReducer} from 'react';
 import {useDispatch} from 'react-redux';
 import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
-import qs from 'qs';
-import cn from 'bem-cn-lite';
-
-import {Button, Tabs} from '@gravity-ui/uikit';
-import {HelpPopover} from '@gravity-ui/components';
-
-import SplitPane from '../../../components/SplitPane';
-import CopyToClipboard from '../../../components/CopyToClipboard/CopyToClipboard';
+import {ClipboardButton} from '../../../components/ClipboardButton';
+import {Icon} from '../../../components/Icon';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import {
     CDCStreamOverview,
     PersQueueGroupOverview,
 } from '../../../components/InfoViewer/schemaOverview';
-import {Icon} from '../../../components/Icon';
 import {Loader} from '../../../components/Loader';
-
+import SplitPane from '../../../components/SplitPane';
+import routes, {createHref} from '../../../routes';
+import {setShowPreview} from '../../../store/reducers/schema/schema';
+import {
+    TENANT_PAGES_IDS,
+    TENANT_QUERY_TABS_ID,
+    TENANT_SUMMARY_TABS_IDS,
+} from '../../../store/reducers/tenant/constants';
+import {setQueryTab, setSummaryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import {
     EPathSubType,
     EPathType,
     TColumnDescription,
     TColumnTableDescription,
 } from '../../../types/api/schema';
-import routes, {createHref} from '../../../routes';
-import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
-import {useTypedSelector} from '../../../utils/hooks';
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
 } from '../../../utils/constants';
-import {setShowPreview} from '../../../store/reducers/schema/schema';
-import {setQueryTab, setSummaryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import {
-    TENANT_PAGES_IDS,
-    TENANT_QUERY_TABS_ID,
-    TENANT_SUMMARY_TABS_IDS,
-} from '../../../store/reducers/tenant/constants';
-
+import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
+import {useTypedSelector} from '../../../utils/hooks';
+import {Acl} from '../Acl/Acl';
+import i18n from '../i18n';
+import {ExternalDataSourceSummary} from '../Info/ExternalDataSource/ExternalDataSource';
+import {ExternalTableSummary} from '../Info/ExternalTable/ExternalTable';
 import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
-import {Acl} from '../Acl/Acl';
-import {ExternalTableSummary} from '../Info/ExternalTable/ExternalTable';
-import {ExternalDataSourceSummary} from '../Info/ExternalDataSource/ExternalDataSource';
-
 import {TenantTabsGroups, TENANT_INFO_TABS, TENANT_SCHEMA_TAB} from '../TenantPages';
 import {
     PaneVisibilityActionTypes,
-    paneVisibilityToggleReducerCreator,
     PaneVisibilityToggleButtons,
+    paneVisibilityToggleReducerCreator,
 } from '../utils/paneVisibilityToggleHelpers';
 import {isColumnEntityType, isExternalTable, isIndexTable, isTableType} from '../utils/schema';
-
-import i18n from '../i18n';
-
 import './ObjectSummary.scss';
 
 const b = cn('object-summary');
@@ -306,8 +299,9 @@ export function ObjectSummary({
                     </Button>
                 )}
                 {currentSchemaPath && (
-                    <CopyToClipboard
+                    <ClipboardButton
                         text={currentSchemaPath}
+                        view="flat-secondary"
                         title={i18n('summary.copySchemaPath')}
                     />
                 )}

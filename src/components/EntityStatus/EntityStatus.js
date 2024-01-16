@@ -1,14 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import {Icon, Link as UIKitLink} from '@gravity-ui/uikit';
 import cn from 'bem-cn-lite';
+import PropTypes from 'prop-types';
+import React from 'react';
 import {Link} from 'react-router-dom';
-import {ClipboardButton, Link as UIKitLink, Button, Icon} from '@gravity-ui/uikit';
-
-import circleInfoIcon from '../../assets/icons/circle-info.svg';
 import circleExclamationIcon from '../../assets/icons/circle-exclamation.svg';
-import triangleExclamationIcon from '../../assets/icons/triangle-exclamation.svg';
+import circleInfoIcon from '../../assets/icons/circle-info.svg';
 import circleTimesIcon from '../../assets/icons/circle-xmark.svg';
-
+import triangleExclamationIcon from '../../assets/icons/triangle-exclamation.svg';
+import {ClipboardButton} from '../ClipboardButton';
 import './EntityStatus.scss';
 
 const icons = {
@@ -121,15 +120,13 @@ class EntityStatus extends React.Component {
                     {this.renderLink()}
                 </span>
                 {hasClipboardButton && (
-                    <Button
-                        component="span"
+                    <ClipboardButton
+                        text={name}
                         size="s"
                         className={b('clipboard-button', {
                             visible: this.props.clipboardButtonAlwaysVisible,
                         })}
-                    >
-                        <ClipboardButton text={name} size={16} />
-                    </Button>
+                    />
                 )}
             </div>
         );
