@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.30.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.29.0...v4.30.0) (2024-01-16)
+
+
+### Features
+
+* add clipboard button to nodes tree titles ([#648](https://github.com/ydb-platform/ydb-embedded-ui/issues/648)) ([1411651](https://github.com/ydb-platform/ydb-embedded-ui/commit/141165173189be064e9e9314b42aa3eb7fce9c69))
+
 ## [4.29.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.28.0...v4.29.0) (2024-01-12)
 
 
