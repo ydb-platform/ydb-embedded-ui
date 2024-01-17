@@ -72,22 +72,31 @@ export function MetricsCards({
 
     const queryParams = parseQuery(location);
 
+    // Allow tabs untoggle behaviour
+    const getTabIfNotActive = (tab: TenantMetricsTab) => {
+        if (tab === metricsTab) {
+            return '';
+        }
+
+        return tab;
+    };
+
     const tabLinks: Record<TenantMetricsTab, string> = {
         [TENANT_METRICS_TABS_IDS.cpu]: getTenantPath({
             ...queryParams,
-            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.cpu,
+            [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.cpu),
         }),
         [TENANT_METRICS_TABS_IDS.storage]: getTenantPath({
             ...queryParams,
-            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.storage,
+            [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.storage),
         }),
         [TENANT_METRICS_TABS_IDS.memory]: getTenantPath({
             ...queryParams,
-            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.memory,
+            [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.memory),
         }),
         [TENANT_METRICS_TABS_IDS.healthcheck]: getTenantPath({
             ...queryParams,
-            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.healthcheck,
+            [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.healthcheck),
         }),
     };
 

@@ -10,6 +10,7 @@ import {
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
+    DISPLAY_CHARTS_IN_DB_DIAGNOSTICS_KEY,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
 
@@ -94,6 +95,11 @@ export const queryUseMultiSchemaSetting: SettingProps = {
     title: i18n('settings.queryUseMultiSchema.title'),
     helpPopoverContent: i18n('settings.queryUseMultiSchema.popover'),
 };
+export const displayChartsInDbDiagnosticsSetting: SettingProps = {
+    settingKey: DISPLAY_CHARTS_IN_DB_DIAGNOSTICS_KEY,
+    title: i18n('settings.displayChartsInDbDiagnostics.title'),
+    helpPopoverContent: i18n('settings.displayChartsInDbDiagnostics.popover'),
+};
 
 export const appearanceSection: SettingsSection = {
     id: 'appearanceSection',
@@ -103,7 +109,12 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [useNodesEndpointSetting, useVirtualTables, queryUseMultiSchemaSetting],
+    settings: [
+        useNodesEndpointSetting,
+        useVirtualTables,
+        queryUseMultiSchemaSetting,
+        displayChartsInDbDiagnosticsSetting,
+    ],
 };
 
 export const generalPage: SettingsPage = {

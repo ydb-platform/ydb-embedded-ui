@@ -23,5 +23,11 @@
   "by-load": "by load",
   "by-memory": "by memory",
   "by-usage": "by usage",
-  "by-size": "by size"
+  "by-size": "by size",
+
+  "charts.queries-per-second": "Queries per second",
+  "charts.transaction-latency": "Transactions latencies {{percentile}}",
+  "charts.cpu-usage": "CPU usage",
+  "charts.storage-usage": "Storage usage",
+  "charts.memory-usage": "Memory usage"
 }

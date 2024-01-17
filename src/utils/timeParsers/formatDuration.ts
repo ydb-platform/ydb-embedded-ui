@@ -1,4 +1,5 @@
 import {DAY_IN_SECONDS, HOUR_IN_SECONDS} from '../constants';
+import {formatNumber} from '../dataFormatters/dataFormatters';
 
 import i18n from './i18n';
 
@@ -6,6 +7,8 @@ import i18n from './i18n';
  * Process time difference in ms and returns formated time.
  * By default only two major values are returned (days & hours, hours & minutes, minutes & seconds, etc.).
  * It can be altered with valuesCount arg
+ *
+ * value - duration in ms
  */
 export const formatDurationToShortTimeFormat = (value: number, valuesCount: 1 | 2 = 2) => {
     const ms = value % 1000;
@@ -61,4 +64,11 @@ export const formatDurationToShortTimeFormat = (value: number, valuesCount: 1 | 
     }
 
     return i18n('ms', duration);
+};
+
+/**
+ * Parse ms duration to string
+ */
+export const formatToMs = (value: number) => {
+    return i18n('ms', {ms: formatNumber(value)});
 };
