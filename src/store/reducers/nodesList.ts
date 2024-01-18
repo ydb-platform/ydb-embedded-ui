@@ -5,7 +5,6 @@ import type {
     NodesListAction,
     NodesListRootStateSlice,
 } from '../../types/store/nodesList';
-import '../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../utils';
 import {prepareNodesMap} from '../../utils/nodes';
 

@@ -1,7 +1,6 @@
 import type {Reducer} from 'redux';
 import type {ThunkAction} from 'redux-thunk';
 
-import '../../../services/api';
 import {DEFAULT_USER_SETTINGS, SettingsObject, settingsManager} from '../../../services/settings';
 
 import type {RootState} from '..';

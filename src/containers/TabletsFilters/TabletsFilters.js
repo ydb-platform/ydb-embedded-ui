@@ -26,7 +26,7 @@ import './TabletsFilters.scss';
 
 const b = cn('tablets-filters');
 
-class TabletsFilters extends React.Component {
+export class TabletsFilters extends React.Component {
     static propTypes = {
         wasLoaded: PropTypes.bool,
         loading: PropTypes.bool,

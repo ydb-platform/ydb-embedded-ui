@@ -1,7 +1,5 @@
 import type {Reducer} from 'redux';
 
-import '../../../services/api';
-
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 import type {PartitionsAction, PartitionsState} from './types';

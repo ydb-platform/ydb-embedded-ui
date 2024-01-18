@@ -1,5 +1,4 @@
 import type {Reducer} from 'redux';
-import '../../services/api';
 
 import type {ETabletState, EType} from '../../types/api/tablet';
 import type {

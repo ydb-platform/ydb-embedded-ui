@@ -1,6 +1,5 @@
 import {createSelector} from 'reselect';
 import {createRequestActionTypes, createApiRequest} from '../utils';
-import '../../services/api';
 import {AUTO_RELOAD_INTERVAL} from '../../utils/constants';
 
 const FETCH_TABLETS_FILTERS = createRequestActionTypes('tabletsFilters', 'FETCH_TABLETS_FILTERS');

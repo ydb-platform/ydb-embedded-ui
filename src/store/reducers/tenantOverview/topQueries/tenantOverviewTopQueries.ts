@@ -1,6 +1,5 @@
 import type {Reducer} from 'redux';
 
-import '../../../../services/api';
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../../../utils/query';
 

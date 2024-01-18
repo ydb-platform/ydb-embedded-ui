@@ -8,7 +8,6 @@ import type {
     ITabletPreparedHistoryItem,
     ITabletState,
 } from '../../types/store/tablet';
-import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
 import {prepareNodesMap} from '../../utils/nodes';

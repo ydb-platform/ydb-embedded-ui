@@ -1,6 +1,5 @@
 import {Reducer} from 'redux';
 
-import '../../services/api';
 import type {
     IDescribeState,
     IDescribeAction,

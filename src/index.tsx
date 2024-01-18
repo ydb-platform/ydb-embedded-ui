@@ -1,30 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Provider} from 'react-redux';
 
 import '@gravity-ui/uikit/styles/styles.scss';
 
-import App from './containers/App/App';
-import configureStore from './store';
+import {SingleClusterApp as App, ErrorBoundary, configureStore} from './lib';
 import reportWebVitals from './reportWebVitals';
-import HistoryContext from './contexts/HistoryContext';
-import {ErrorBoundary} from './components/ErrorBoundary/ErrorBoundary';
 
 import './styles/themes.scss';
 import './styles/constants.scss';
 import './index.css';
 
 const {store, history} = configureStore();
-window.store = store;
 
 ReactDOM.render(
     <React.StrictMode>
         <ErrorBoundary>
-            <Provider store={store}>
-                <HistoryContext.Provider value={history}>
-                    <App />
-                </HistoryContext.Provider>
-            </Provider>
+            <App store={store} history={history} />
         </ErrorBoundary>
     </React.StrictMode>,
     document.getElementById('root'),

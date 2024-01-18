@@ -1,4 +1,5 @@
 import AxiosWrapper from '@gravity-ui/axios-wrapper';
+import type {AxiosRequestConfig} from 'axios';
 
 import type {
     Actions,
@@ -32,11 +33,12 @@ import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/ren
 import type {QuerySyntax} from '../types/store/query';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
 import type {StorageApiRequestParams} from '../store/reducers/storage/types';
+import type {MetaCluster, MetaClusters, MetaTenants} from '../types/api/clusters';
 
 import {backend as BACKEND} from '../store';
 import {prepareSortValue} from '../utils/filters';
-
-const config = {withCredentials: !window.custom_backend};
+import {parseMetaCluster} from './parsers/parseMetaCluster';
+import {parseMetaTenants} from './parsers/parseMetaTenants';
 
 type AxiosOptions = {
     concurrentId?: string;
@@ -44,7 +46,7 @@ type AxiosOptions = {
 
 export class YdbEmbeddedAPI extends AxiosWrapper {
     getPath(path: string) {
-        return `${BACKEND}${path}`;
+        return `${BACKEND ?? ''}${path}`;
     }
     getClusterInfo(clusterName?: string, {concurrentId}: AxiosOptions = {}) {
         return this.get<TClusterInfo>(
@@ -420,7 +422,33 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     whoami() {
         return this.get<TUserToken>(this.getPath('/viewer/json/whoami'), {});
     }
+
+    // used if not single cluster mode
+    getClustersList() {
+        return this.get<MetaClusters>('/api/meta/meta/clusters', null);
+    }
 }
 
-const api = new YdbEmbeddedAPI({config: config});
-window.api = api;
+export class YdbWebVersionAPI extends YdbEmbeddedAPI {
+    getClusterInfo(clusterName: string) {
+        return this.get<MetaCluster>(
+            '/api/meta/meta/cluster',
+            {
+                name: clusterName,
+            },
+            {concurrentId: `getCluster${clusterName}`},
+        ).then(parseMetaCluster);
+    }
+
+    getTenants(clusterName: string) {
+        return this.get<MetaTenants>('/api/meta/meta/cp_databases', {
+            cluster_name: clusterName,
+        }).then(parseMetaTenants);
+    }
+}
+
+export function createApi({webVersion = false, withCredentials = false} = {}) {
+    const config: AxiosRequestConfig = {withCredentials};
+    const api = webVersion ? new YdbWebVersionAPI({config}) : new YdbEmbeddedAPI({config});
+    return api;
+}

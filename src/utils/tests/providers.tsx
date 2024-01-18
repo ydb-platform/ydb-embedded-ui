@@ -3,7 +3,7 @@ import {Provider} from 'react-redux';
 import {render} from '@testing-library/react';
 import type {RenderOptions} from '@testing-library/react';
 
-import configureStore from '../../store';
+import {configureStore} from '../../store';
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
     storeConfiguration?: {

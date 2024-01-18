@@ -2,7 +2,6 @@ import type {Reducer} from 'redux';
 
 import type {OverviewState, OverviewAction, OverviewHandledResponse} from './types';
 
-import '../../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 export const FETCH_OVERVIEW = createRequestActionTypes('overview', 'FETCH_OVERVIEW');

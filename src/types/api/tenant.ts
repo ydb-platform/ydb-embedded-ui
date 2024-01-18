@@ -62,7 +62,7 @@ export interface TTenant {
     DatabaseQuotas?: DatabaseQuotas;
 }
 
-interface THiveDomainStatsStateCount {
+export interface THiveDomainStatsStateCount {
     VolatileState?: ETabletVolatileState;
     Count?: number;
 }
@@ -108,12 +108,12 @@ interface TIopsRecord {
     Iops?: string;
 }
 
-interface TTenantResources {
+export interface TTenantResources {
     Required?: TTenantResource[];
     Allocated?: TTenantResource[];
 }
 
-interface TTenantResource {
+export interface TTenantResource {
     Type: string;
     Zone: string;
     Kind: string;
@@ -121,7 +121,7 @@ interface TTenantResource {
 }
 
 /** incomplete */
-interface ControlPlane {
+export interface ControlPlane {
     name?: string;
 }
 
@@ -133,7 +133,7 @@ export enum ETenantType {
     'Serverless' = 'Serverless',
 }
 
-enum State {
+export enum State {
     'STATE_UNSPECIFIED' = 'STATE_UNSPECIFIED',
     'CREATING' = 'CREATING',
     'RUNNING' = 'RUNNING',
@@ -150,7 +150,7 @@ export enum ETabletVolatileState {
     'TABLET_VOLATILE_STATE_RUNNING' = 'TABLET_VOLATILE_STATE_RUNNING',
 }
 
-interface DatabaseQuotas {
+export interface DatabaseQuotas {
     /** uint64 */
     data_size_hard_quota?: string;
     /** uint64 */

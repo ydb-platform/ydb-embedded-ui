@@ -13,7 +13,6 @@ import {QUERIES_HISTORY_KEY} from '../../utils/constants';
 import {QUERY_MODES, QUERY_SYNTAX, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {parseQueryError} from '../../utils/error';
 import {settingsManager} from '../../services/settings';
-import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
 

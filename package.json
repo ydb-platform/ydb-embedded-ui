@@ -144,6 +144,8 @@
     "typescript": "^4.5.5"
   },
   "peerDependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "@gravity-ui/uikit": "^5.24.0"
   }
 }

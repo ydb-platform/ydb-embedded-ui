@@ -1,6 +1,5 @@
 import type {Reducer} from 'redux';
 
-import '../../services/api';
 import type {
     IHeatmapAction,
     IHeatmapApiRequestParams,

@@ -1,6 +1,5 @@
 import type {Reducer} from 'redux';
 
-import '../../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 import type {SchemaAclAction, SchemaAclState} from './types';

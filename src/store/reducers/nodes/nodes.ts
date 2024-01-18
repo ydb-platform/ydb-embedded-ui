@@ -1,6 +1,5 @@
 import type {Reducer} from 'redux';
 
-import '../../../services/api';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {EVersion} from '../../../types/api/compute';
 

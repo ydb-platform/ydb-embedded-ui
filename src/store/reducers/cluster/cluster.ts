@@ -1,6 +1,5 @@
 import type {Reducer} from 'redux';
 
-import '../../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 import type {ClusterAction, ClusterState} from './types';
 import {createSelectClusterGroupsQuery, parseGroupsStatsQueryResponse} from './utils';

@@ -3,7 +3,6 @@ import _ from 'lodash';
 
 import {EVersion} from '../../../types/api/storage';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
-import '../../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
