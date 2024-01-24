@@ -1,5 +1,7 @@
 import React from 'react';
 import {Switch, Route, Redirect, Router, useLocation} from 'react-router-dom';
+import {QueryParamProvider} from 'use-query-params';
+import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 import cn from 'bem-cn-lite';
 import {connect} from 'react-redux';
 
@@ -80,18 +82,20 @@ function ContentWrapper(props) {
         <HistoryContext.Consumer>
             {(history) => (
                 <Router history={history}>
-                    <Switch>
-                        <Route path={routes.auth}>
-                            <Authentication closable />
-                        </Route>
-                        <Route>
-                            <ThemeProvider theme={theme}>
-                                <div className={b({embedded: singleClusterMode})}>
-                                    {isAuthenticated ? props.children : <Authentication />}
-                                </div>
-                            </ThemeProvider>
-                        </Route>
-                    </Switch>
+                    <QueryParamProvider adapter={ReactRouter5Adapter}>
+                        <Switch>
+                            <Route path={routes.auth}>
+                                <Authentication closable />
+                            </Route>
+                            <Route>
+                                <ThemeProvider theme={theme}>
+                                    <div className={b({embedded: singleClusterMode})}>
+                                        {isAuthenticated ? props.children : <Authentication />}
+                                    </div>
+                                </ThemeProvider>
+                            </Route>
+                        </Switch>
+                    </QueryParamProvider>
                 </Router>
             )}
         </HistoryContext.Consumer>

@@ -46,6 +46,7 @@
     "reselect": "4.1.6",
     "sass": "1.32.8",
     "url": "^0.11.0",
+    "use-query-params": "^2.2.1",
     "web-vitals": "1.1.2",
     "ydb-ui-components": "^3.6.0"
   },

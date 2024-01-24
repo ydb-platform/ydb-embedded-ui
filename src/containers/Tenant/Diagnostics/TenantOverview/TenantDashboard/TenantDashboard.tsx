@@ -1,6 +1,7 @@
+import {StringParam, useQueryParam} from 'use-query-params';
+
 import {cn} from '../../../../../utils/cn';
 import type {TimeFrame} from '../../../../../utils/timeframes';
-import {useQueryParam} from '../../../../../utils/hooks/useQueryParam';
 import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
 import {DISPLAY_CHARTS_IN_DB_DIAGNOSTICS_KEY} from '../../../../../utils/constants';
 import {TimeFrameSelector} from '../../../../../components/TimeFrameSelector/TimeFrameSelector';
@@ -28,7 +29,7 @@ interface TenantDashboardProps {
 }
 
 export const TenantDashboard = ({charts}: TenantDashboardProps) => {
-    const [timeFrame, setTimeframe] = useQueryParam('timeframe', '1h');
+    const [timeFrame = '1h', setTimeframe] = useQueryParam('timeframe', StringParam);
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
