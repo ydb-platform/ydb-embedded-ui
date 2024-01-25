@@ -8,15 +8,29 @@ import {b} from './shared';
 
 interface TableCellProps {
     height: number;
+    width: number;
     align?: AlignType;
     children: ReactNode;
     className?: string;
 }
 
-const TableRowCell = ({children, className, height, align = DEFAULT_ALIGN}: TableCellProps) => {
+const TableRowCell = ({
+    children,
+    className,
+    height,
+    width,
+    align = DEFAULT_ALIGN,
+}: TableCellProps) => {
+    // Additional wrapper <div> with explicit width to ensure proper overflow:hidden
+    // since overflow works poorly with <td>
     return (
-        <td className={b('td', {align: align}, className)} style={{height: `${height}px`}}>
-            {children}
+        <td>
+            <div
+                className={b('row-cell', {align: align}, className)}
+                style={{height: `${height}px`, width: `${width}px`}}
+            >
+                {children}
+            </div>
         </td>
     );
 };
@@ -35,6 +49,7 @@ export const LoadingTableRow = <T,>({index, columns, height}: LoadingTableRowPro
                     <TableRowCell
                         key={`${column.name}${index}`}
                         height={height}
+                        width={column.width}
                         align={column.align}
                         className={column.className}
                     >
@@ -64,6 +79,7 @@ export const TableRow = <T,>({row, index, columns, getRowClassName, height}: Tab
                     <TableRowCell
                         key={`${column.name}${index}`}
                         height={height}
+                        width={column.width}
                         align={column.align}
                         className={column.className}
                     >

@@ -1,14 +1,21 @@
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
+
+import type {
+    HandleTableColumnsResize,
+    TableColumnsWidthSetup,
+} from '../../utils/hooks/useTableResize';
 
 import type {Column, OnSort, SortOrderType, SortParams} from './types';
 import {ASCENDING, DEFAULT_SORT_ORDER, DEFAULT_TABLE_ROW_HEIGHT, DESCENDING} from './constants';
 import {b} from './shared';
 
+const COLUMN_NAME_HTML_ATTRIBUTE = 'data-columnname';
+
 // Icon similar to original DataTable icons to keep the same tables across diferent pages and tabs
 const SortIcon = ({order}: {order?: SortOrderType}) => {
     return (
         <svg
-            className={b('icon', {desc: order === DESCENDING})}
+            className={b('sort-icon', {desc: order === DESCENDING})}
             viewBox="0 0 10 6"
             width="10"
             height="6"
@@ -27,7 +34,7 @@ interface ColumnSortIconProps {
 const ColumnSortIcon = ({sortOrder, sortable, defaultSortOrder}: ColumnSortIconProps) => {
     if (sortable) {
         return (
-            <span className={b('sort-icon', {shadow: !sortOrder})}>
+            <span className={b('sort-icon-container', {shadow: !sortOrder})}>
                 <SortIcon order={sortOrder || defaultSortOrder} />
             </span>
         );
@@ -36,9 +43,82 @@ const ColumnSortIcon = ({sortOrder, sortable, defaultSortOrder}: ColumnSortIconP
     }
 };
 
+interface TableHeadCellProps<T> {
+    column: Column<T>;
+    sortOrder?: SortOrderType;
+    defaultSortOrder: SortOrderType;
+    onSort?: (columnName: string) => void;
+    rowHeight: number;
+    resizeObserver?: ResizeObserver;
+}
+
+export const TableHeadCell = <T,>({
+    column,
+    sortOrder,
+    defaultSortOrder,
+    onSort,
+    rowHeight,
+    resizeObserver,
+}: TableHeadCellProps<T>) => {
+    const cellWrapperRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const cellWrapper = cellWrapperRef.current;
+        if (cellWrapper) {
+            resizeObserver?.observe(cellWrapper);
+        }
+        return () => {
+            if (cellWrapper) {
+                resizeObserver?.unobserve(cellWrapper);
+            }
+        };
+    }, [resizeObserver]);
+
+    const content = column.header ?? column.name;
+
+    return (
+        <th>
+            <div
+                ref={cellWrapperRef}
+                className={b('head-cell-wrapper', {
+                    resizeable: column.resizeable,
+                })}
+                style={{
+                    height: `${rowHeight}px`,
+                    width: `${column.width}px`,
+                }}
+                {...{
+                    [COLUMN_NAME_HTML_ATTRIBUTE]: column.name,
+                }}
+            >
+                <div
+                    className={b(
+                        'head-cell',
+                        {align: column.align, sortable: column.sortable},
+                        column.className,
+                    )}
+                    onClick={() => {
+                        if (column.sortable) {
+                            onSort?.(column.name);
+                        }
+                    }}
+                >
+                    <div className={b('head-cell-content')}>{content}</div>
+                    <ColumnSortIcon
+                        sortOrder={sortOrder}
+                        sortable={column.sortable}
+                        defaultSortOrder={defaultSortOrder}
+                    />
+                </div>
+            </div>
+        </th>
+    );
+};
+
 interface TableHeadProps<T> {
     columns: Column<T>[];
     onSort?: OnSort;
+    onColumnsResize?: HandleTableColumnsResize;
     defaultSortOrder?: SortOrderType;
     rowHeight?: number;
 }
@@ -46,10 +126,30 @@ interface TableHeadProps<T> {
 export const TableHead = <T,>({
     columns,
     onSort,
+    onColumnsResize,
     defaultSortOrder = DEFAULT_SORT_ORDER,
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
 }: TableHeadProps<T>) => {
     const [sortParams, setSortParams] = useState<SortParams>({});
+
+    const resizeObserver = useRef<ResizeObserver>();
+    const isTableResizeable = Boolean(onColumnsResize);
+
+    useEffect(() => {
+        if (!isTableResizeable) {
+            return;
+        }
+        resizeObserver.current = new ResizeObserver((entries) => {
+            const columnsWidth: TableColumnsWidthSetup = {};
+            entries.forEach((entry) => {
+                // @ts-ignore ignore custrom property usage
+                const id = entry.target.attributes[COLUMN_NAME_HTML_ATTRIBUTE]?.value;
+                columnsWidth[id] = entry.contentRect.width;
+            });
+
+            onColumnsResize?.(columnsWidth);
+        });
+    }, [onColumnsResize, isTableResizeable]);
 
     const handleSort = (columnId: string) => {
         let newSortParams: SortParams = {};
@@ -95,34 +195,19 @@ export const TableHead = <T,>({
             <thead className={b('head')}>
                 <tr>
                     {columns.map((column) => {
-                        const content = column.header ?? column.name;
                         const sortOrder =
                             sortParams.columnId === column.name ? sortParams.sortOrder : undefined;
 
                         return (
-                            <th
+                            <TableHeadCell
                                 key={column.name}
-                                className={b(
-                                    'th',
-                                    {align: column.align, sortable: column.sortable},
-                                    column.className,
-                                )}
-                                style={{
-                                    height: `${rowHeight}px`,
-                                }}
-                                onClick={() => {
-                                    handleSort(column.name);
-                                }}
-                            >
-                                <div className={b('head-cell')}>
-                                    {content}
-                                    <ColumnSortIcon
-                                        sortOrder={sortOrder}
-                                        sortable={column.sortable}
-                                        defaultSortOrder={defaultSortOrder}
-                                    />
-                                </div>
-                            </th>
+                                column={column}
+                                sortOrder={sortOrder}
+                                defaultSortOrder={defaultSortOrder}
+                                onSort={handleSort}
+                                rowHeight={rowHeight}
+                                resizeObserver={resizeObserver.current}
+                            />
                         );
                     })}
                 </tr>

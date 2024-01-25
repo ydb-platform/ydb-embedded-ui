@@ -1,5 +1,7 @@
 import {useState, useReducer, useRef, useCallback, useEffect} from 'react';
 
+import type {HandleTableColumnsResize} from '../../utils/hooks/useTableResize';
+
 import type {IResponseError} from '../../types/api/error';
 import {getArray} from '../../utils';
 
@@ -45,9 +47,12 @@ interface VirtualTableProps<T> {
     rowHeight?: number;
     parentContainer?: Element | null;
     initialSortParams?: SortParams;
+    onColumnsResize?: HandleTableColumnsResize;
+
     renderControls?: RenderControls;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     renderErrorMessage?: RenderErrorMessage;
+
     dependencyArray?: unknown[]; // Fully reload table on params change
 }
 
@@ -59,6 +64,7 @@ export const VirtualTable = <T,>({
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
     parentContainer,
     initialSortParams,
+    onColumnsResize,
     renderControls,
     renderEmptyDataMessage,
     renderErrorMessage,
@@ -258,7 +264,11 @@ export const VirtualTable = <T,>({
     const renderTable = () => {
         return (
             <table className={b('table')}>
-                <TableHead columns={columns} onSort={handleSort} />
+                <TableHead
+                    columns={columns}
+                    onSort={handleSort}
+                    onColumnsResize={onColumnsResize}
+                />
                 {renderData()}
             </table>
         );
