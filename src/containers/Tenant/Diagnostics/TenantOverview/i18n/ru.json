@@ -23,5 +23,11 @@
   "by-load": "по нагрузке",
   "by-memory": "по памяти",
   "by-usage": "по потреблению",
-  "by-size": "по размеру"
+  "by-size": "по размеру",
+
+  "charts.queries-per-second": "Количество запросов в секунду",
+  "charts.transaction-latency": "Задержка транзакций {{percentile}}",
+  "charts.cpu-usage": "Использование CPU",
+  "charts.storage-usage": "Использование хранилища",
+  "charts.memory-usage": "Использование памяти"
 }

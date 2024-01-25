@@ -28,6 +28,7 @@ import type {DescribeTopicResult} from '../types/api/topic';
 import type {TEvPDiskStateResponse} from '../types/api/pdisk';
 import type {TEvVDiskStateResponse} from '../types/api/vdisk';
 import type {TUserToken} from '../types/api/whoami';
+import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/render';
 import type {QuerySyntax} from '../types/store/query';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
 import type {StorageApiRequestParams} from '../store/reducers/storage/types';
@@ -377,7 +378,24 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             path_id: tenantId?.PathId,
         });
     }
+    getChartData(
+        {target, from, until, maxDataPoints}: JsonRenderRequestParams,
+        {concurrentId}: AxiosOptions = {},
+    ) {
+        const requestString = `${target}&from=${from}&until=${until}&maxDataPoints=${maxDataPoints}&format=json`;
 
+        return this.post<JsonRenderResponse>(
+            this.getPath('/viewer/json/render'),
+            requestString,
+            {},
+            {
+                concurrentId,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            },
+        );
+    }
     /** @deprecated use localStorage instead */
     postSetting(settingsApi: string, name: string, value: string) {
         return this.request({

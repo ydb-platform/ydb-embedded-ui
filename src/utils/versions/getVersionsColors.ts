@@ -9,6 +9,7 @@ export const hashCode = (s: string) => {
     }, 0);
 };
 
+// TODO: colors used in charts as well, need to move to constants
 // 11 distinct colors from https://mokole.com/palette.html
 export const COLORS = [
     '#008000', // green

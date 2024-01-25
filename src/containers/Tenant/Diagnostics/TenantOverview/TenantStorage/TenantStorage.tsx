@@ -7,6 +7,7 @@ import {getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 
 import '../TenantOverview.scss';
 
+import {StorageDashboard} from './StorageDashboard';
 import {TopTables} from './TopTables';
 import {TopGroups} from './TopGroups';
 
@@ -62,6 +63,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     ];
     return (
         <>
+            <StorageDashboard />
             <InfoViewer className={b('storage-info')} title="Storage details" info={info} />
             <TopTables path={tenantName} />
             <TopGroups tenant={tenantName} />

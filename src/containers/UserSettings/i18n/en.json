@@ -23,5 +23,8 @@
   "settings.useVirtualTables.popover": "It will increase performance, but could work unstable",
 
   "settings.queryUseMultiSchema.title": "Allow queries with multiple result sets",
-  "settings.queryUseMultiSchema.popover": "Use 'multi' schema for queries that enables queries with multiple result sets. Returns nothing on versions 23-3 and older"
+  "settings.queryUseMultiSchema.popover": "Use 'multi' schema for queries that enables queries with multiple result sets. Returns nothing on versions 23-3 and older",
+
+  "settings.displayChartsInDbDiagnostics.title": "Display charts in database diagnostics",
+  "settings.displayChartsInDbDiagnostics.popover": "Incorrect data may be displayed (shows data only for the database related to the current node), does not work well on static nodes"
 }

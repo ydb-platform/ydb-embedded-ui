@@ -24,7 +24,12 @@ const SET_METRICS_TAB = 'tenant/SET_METRICS_TAB';
 const CLEAR_TENANT = 'tenant/CLEAR_TENANT';
 const SET_DATA_WAS_NOT_LOADED = 'tenant/SET_DATA_WAS_NOT_LOADED';
 
-const initialState = {loading: false, wasLoaded: false};
+// Tenant diagnostics tab content was requested twice,
+// because requests were sent before state was set as loading and after tenant data is fully loaded
+// So tenant data is considered loading from the start, there is no attempt to load tab content
+// TODO: try fix with 'display: none' for tenant diagnostics tab content while tenant data loading,
+// but with parallel (not sequent) data requests
+const initialState = {loading: true, wasLoaded: false};
 
 const tenantReducer: Reducer<TenantState, TenantAction> = (state = initialState, action) => {
     switch (action.type) {
