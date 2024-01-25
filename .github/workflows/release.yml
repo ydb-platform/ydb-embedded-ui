@@ -2,7 +2,7 @@ on:
   push:
     branches: [main]
 
-name: release
+name: Release
 
 jobs:
   release:
@@ -35,13 +35,13 @@ jobs:
         run: |
           zip -r $ASSET_NAME.zip build
           gh release upload ${{ steps.release.outputs.tag_name }} $ASSET_NAME.zip
-      - name: Release Event Dispatch
+      - name: Refresh Event Dispatch
         if: ${{ steps.release.outputs.release_created }}
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
           repository: ydb-platform/ydb
-          event-type: embedded_ui_release
+          event-type: embedded_ui_refresh
           client-payload: |
             {
               "tag_name": "${{ steps.release.outputs.tag_name }}",
