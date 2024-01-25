@@ -8,8 +8,43 @@ jobs:
   release:
     if: github.repository == 'ydb-platform/ydb-embedded-ui'
     runs-on: ubuntu-latest
+    env:
+      ASSET_NAME: embedded-ui
     steps:
-      - uses: yandex-cloud/ui-release-action@main
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          github-token: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
-          npm-token: ${{ secrets.NODE_AUTH_TOKEN }}
+          node-version: 16
+      - run: npm ci
+      - run: npm test
+      - uses: GoogleCloudPlatform/release-please-action@v3
+        id: release
+        with:
+          token: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
+          release-type: node
+      - run: npm publish
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+      - run: npm run build:embedded
+        if: ${{ steps.release.outputs.release_created }}
+      - name: Release Artifact Upload
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
+        run: |
+          zip -r $ASSET_NAME.zip build
+          gh release upload ${{ steps.release.outputs.tag_name }} $ASSET_NAME.zip
+      - name: Release Event Dispatch
+        if: ${{ steps.release.outputs.release_created }}
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
+          repository: ydb-platform/ydb
+          event-type: embedded_ui_release
+          client-payload: |
+            {
+              "tag_name": "${{ steps.release.outputs.tag_name }}",
+              "asset_name": "${{ env.ASSET_NAME }}",
+              "repository": "${{ github.repository }}"
+            }
