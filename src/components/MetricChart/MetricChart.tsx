@@ -146,7 +146,9 @@ export const MetricChart = ({
                 });
 
                 // Hack to prevent setting value to state, if component unmounted
-                if (!mounted.current) return;
+                if (!mounted.current) {
+                    return;
+                }
 
                 // In some cases error could be in response with 200 status code
                 // It happens when request is OK, but chart data cannot be returned due to some reason
@@ -155,10 +157,14 @@ export const MetricChart = ({
                     const preparedData = convertResponse(response, metrics);
                     dispatch(setChartData(preparedData));
                 } else {
-                    dispatch(setChartError({statusText: response.error}));
+                    const err = {statusText: response.error};
+
+                    throw err;
                 }
             } catch (err) {
-                if (!mounted.current) return;
+                if (!mounted.current) {
+                    return;
+                }
 
                 dispatch(setChartError(err as IResponseError));
             }
