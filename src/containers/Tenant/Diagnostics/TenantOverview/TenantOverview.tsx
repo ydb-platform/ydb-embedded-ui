@@ -17,7 +17,8 @@ import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
 import {TenantStorage} from './TenantStorage/TenantStorage';
 import {TenantMemory} from './TenantMemory/TenantMemory';
-import {DefaultDashboard} from './DefaultDashboard';
+import {TenantDashboard} from './TenantDashboard/TenantDashboard';
+import {defaultDashboardConfig} from './defaultDashboardConfig';
 import {useHealthcheck} from './useHealthcheck';
 
 import './TenantOverview.scss';
@@ -141,7 +142,7 @@ export function TenantOverview({
                 );
             }
             default: {
-                return <DefaultDashboard />;
+                return <TenantDashboard charts={defaultDashboardConfig} />;
             }
         }
     };

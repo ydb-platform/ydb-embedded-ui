@@ -1,7 +1,7 @@
-import {type ChartConfig, TenantDashboard} from '../TenantDashboard/TenantDashboard';
+import type {ChartConfig} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
 
-const memoryDashboardConfig: ChartConfig[] = [
+export const memoryDashboardConfig: ChartConfig[] = [
     {
         title: i18n('charts.memory-usage'),
         metrics: [
@@ -15,7 +15,3 @@ const memoryDashboardConfig: ChartConfig[] = [
         },
     },
 ];
-
-export const MemoryDashboard = () => {
-    return <TenantDashboard charts={memoryDashboardConfig} />;
-};

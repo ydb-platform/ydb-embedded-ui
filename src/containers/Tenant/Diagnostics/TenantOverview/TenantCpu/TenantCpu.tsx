@@ -1,5 +1,6 @@
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
-import {CpuDashboard} from './CpuDashboard';
+import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
+import {cpuDashboardConfig} from './cpuDashboardConfig';
 import {TopNodesByLoad} from './TopNodesByLoad';
 import {TopNodesByCpu} from './TopNodesByCpu';
 import {TopShards} from './TopShards';
@@ -13,7 +14,7 @@ interface TenantCpuProps {
 export function TenantCpu({path, additionalNodesProps}: TenantCpuProps) {
     return (
         <>
-            <CpuDashboard />
+            <TenantDashboard charts={cpuDashboardConfig} />
             <TopNodesByLoad path={path} additionalNodesProps={additionalNodesProps} />
             <TopNodesByCpu path={path} additionalNodesProps={additionalNodesProps} />
             <TopShards path={path} />
