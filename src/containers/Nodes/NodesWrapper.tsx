@@ -6,6 +6,7 @@ import {VirtualNodes} from './VirtualNodes';
 import {Nodes} from './Nodes';
 
 interface NodesWrapperProps {
+    path?: string;
     parentContainer?: Element | null;
     additionalNodesProps?: AdditionalNodesProps;
 }

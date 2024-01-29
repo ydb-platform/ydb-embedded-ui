@@ -38,11 +38,12 @@ import './Nodes.scss';
 const b = cn('ydb-nodes');
 
 interface NodesProps {
+    path?: string;
     parentContainer?: Element | null;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const VirtualNodes = ({parentContainer, additionalNodesProps}: NodesProps) => {
+export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: NodesProps) => {
     const [searchValue, setSearchValue] = useState('');
     const [problemFilter, setProblemFilter] = useState<ProblemFilterValue>(ProblemFilterValues.ALL);
     const [uptimeFilter, setUptimeFilter] = useState<NodesUptimeFilterValues>(
@@ -50,14 +51,15 @@ export const VirtualNodes = ({parentContainer, additionalNodesProps}: NodesProps
     );
 
     const filters = useMemo(() => {
-        return [searchValue, problemFilter, uptimeFilter];
-    }, [searchValue, problemFilter, uptimeFilter]);
+        return [path, searchValue, problemFilter, uptimeFilter];
+    }, [path, searchValue, problemFilter, uptimeFilter]);
 
     const fetchData = useCallback<FetchData<NodesPreparedEntity>>(
         async (limit, offset, {sortOrder, columnId} = {}) => {
             return await getNodes({
                 limit,
                 offset,
+                path,
                 filter: searchValue,
                 problems_only: getProblemParamValue(problemFilter),
                 uptime: getUptimeParamValue(uptimeFilter),
@@ -65,7 +67,7 @@ export const VirtualNodes = ({parentContainer, additionalNodesProps}: NodesProps
                 sortValue: columnId as NodesSortValue,
             });
         },
-        [problemFilter, searchValue, uptimeFilter],
+        [path, problemFilter, searchValue, uptimeFilter],
     );
 
     const getRowClassName: GetRowClassName<NodesPreparedEntity> = (row) => {

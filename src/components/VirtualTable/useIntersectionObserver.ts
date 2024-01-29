@@ -6,6 +6,7 @@ import {DEFAULT_INTERSECTION_OBSERVER_MARGIN} from './constants';
 interface UseIntersectionObserverProps {
     onEntry: OnEntry;
     onLeave: OnLeave;
+    /** Intersection observer calculate margins based on container element properties */
     parentContainer?: Element | null;
 }
 
