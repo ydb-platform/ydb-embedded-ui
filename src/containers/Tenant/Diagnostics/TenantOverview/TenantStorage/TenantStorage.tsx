@@ -1,7 +1,8 @@
-import cn from 'bem-cn-lite';
+import {useState} from 'react';
 
 import InfoViewer from '../../../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
+import {LoadingContainer} from '../../../../../components/LoadingContainer/LoadingContainer';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 
@@ -12,8 +13,7 @@ import '../TenantOverview.scss';
 import {storageDashboardConfig} from './storageDashboardConfig';
 import {TopTables} from './TopTables';
 import {TopGroups} from './TopGroups';
-
-const b = cn('tenant-overview');
+import {b} from '../utils';
 
 export interface TenantStorageMetrics {
     blobStorageUsed?: number;
@@ -28,6 +28,8 @@ interface TenantStorageProps {
 }
 
 export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
+    const [dashboardLoading, setDashboardLoading] = useState<boolean>(true);
+
     const {blobStorageUsed, tableStorageUsed, blobStorageLimit, tableStorageLimit} = metrics;
     const formatValues = (value?: number, total?: number) => {
         const size = getSizeWithSignificantDigits(Number(blobStorageLimit || blobStorageUsed), 0);
@@ -63,12 +65,16 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
             ),
         },
     ];
+
     return (
-        <>
-            <TenantDashboard charts={storageDashboardConfig} />
+        <LoadingContainer loading={dashboardLoading} className={b('loading-container')}>
+            <TenantDashboard
+                charts={storageDashboardConfig}
+                onDashboardLoad={() => setDashboardLoading(false)}
+            />
             <InfoViewer className={b('storage-info')} title="Storage details" info={info} />
             <TopTables path={tenantName} />
             <TopGroups tenant={tenantName} />
-        </>
+        </LoadingContainer>
     );
 }

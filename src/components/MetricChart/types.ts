@@ -30,3 +30,6 @@ export type ChartDataType = 'ms' | 'size';
 export interface ChartOptions {
     dataType?: ChartDataType;
 }
+
+export type ChartDataStatus = 'loading' | 'success' | 'error';
+export type OnChartDataStatusChange = (newStatus: ChartDataStatus) => void;

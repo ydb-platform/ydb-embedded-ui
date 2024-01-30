@@ -1,0 +1,10 @@
+.ydb-loading-container {
+    position: relative;
+
+    &__loader {
+        position: absolute;
+        left: 50%;
+
+        height: max-content;
+    }
+}

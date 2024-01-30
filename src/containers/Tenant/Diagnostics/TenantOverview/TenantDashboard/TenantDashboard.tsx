@@ -1,14 +1,15 @@
+import {useRef, useState} from 'react';
 import {StringParam, useQueryParam} from 'use-query-params';
 
 import {cn} from '../../../../../utils/cn';
 import type {TimeFrame} from '../../../../../utils/timeframes';
-import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
-import {DISPLAY_CHARTS_IN_DB_DIAGNOSTICS_KEY} from '../../../../../utils/constants';
+import {useTypedSelector} from '../../../../../utils/hooks';
 import {TimeFrameSelector} from '../../../../../components/TimeFrameSelector/TimeFrameSelector';
 import {
     type ChartOptions,
     MetricChart,
     type MetricDescription,
+    type ChartDataStatus,
 } from '../../../../../components/MetricChart';
 
 import './TenantDashboard.scss';
@@ -26,16 +27,52 @@ export interface ChartConfig {
 
 interface TenantDashboardProps {
     charts: ChartConfig[];
+    onDashboardLoad?: VoidFunction;
 }
 
-export const TenantDashboard = ({charts}: TenantDashboardProps) => {
+type TenantDashboardStatus = 'success' | 'error' | undefined;
+
+type DashboardsChartsStatuses = Record<string, ChartDataStatus>;
+
+export const TenantDashboard = ({charts, onDashboardLoad}: TenantDashboardProps) => {
+    const [dashboardStatus, setDashboardStatus] = useState<TenantDashboardStatus>();
+    const chartsStatuses = useRef<DashboardsChartsStatuses>({});
+
     const [timeFrame = '1h', setTimeframe] = useQueryParam('timeframe', StringParam);
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
-    const [chartsEnabled] = useSetting(DISPLAY_CHARTS_IN_DB_DIAGNOSTICS_KEY);
+    /**
+     * Charts should be hidden, if they are not enabled:
+     * 1. GraphShard is not enabled
+     * 2. ydb version does not have /viewer/json/render endpoint (400, 404, CORS error, etc.)
+     * @link https://github.com/ydb-platform/ydb-embedded-ui/issues/659
+     * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
+     */
+    const handleChartDataStatusChange = (chartId: string, chartStatus: ChartDataStatus) => {
+        // If status for chart or dashboard is set, doesn't update it
+        // Dashboard should be consistently hidden or shown
+        if (dashboardStatus || chartsStatuses.current[chartId] || chartStatus === 'loading') {
+            return;
+        }
+        chartsStatuses.current[chartId] = chartStatus;
 
-    if (!chartsEnabled) {
+        // Show dashboard, if at least one chart is successfully loaded
+        if (chartStatus === 'success') {
+            setDashboardStatus('success');
+            onDashboardLoad?.();
+            return;
+        }
+
+        // If there is no charts with successfull data load, dashboard shouldn't be shown
+        if (Object.keys(chartsStatuses.current).length === charts.length) {
+            setDashboardStatus('error');
+            onDashboardLoad?.();
+        }
+    };
+
+    // Do not continue render charts if dashboard not valid
+    if (dashboardStatus === 'error') {
         return null;
     }
 
@@ -45,9 +82,10 @@ export const TenantDashboard = ({charts}: TenantDashboardProps) => {
 
     const renderContent = () => {
         return charts.map((chartConfig) => {
+            const chartId = chartConfig.metrics.map(({target}) => target).join('&');
             return (
                 <MetricChart
-                    key={chartConfig.metrics.map(({target}) => target).join('&')}
+                    key={chartId}
                     title={chartConfig.title}
                     metrics={chartConfig.metrics}
                     timeFrame={timeFrame as TimeFrame}
@@ -55,6 +93,9 @@ export const TenantDashboard = ({charts}: TenantDashboardProps) => {
                     autorefresh={autorefresh}
                     width={chartWidth}
                     height={chartHeight}
+                    onChartDataStatusChange={(status) =>
+                        handleChartDataStatusChange(chartId, status)
+                    }
                 />
             );
         });

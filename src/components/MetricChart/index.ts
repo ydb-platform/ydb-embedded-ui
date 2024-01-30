@@ -1,2 +1,2 @@
-export type {MetricDescription, Metric, ChartOptions} from './types';
+export * from './types';
 export {MetricChart} from './MetricChart';

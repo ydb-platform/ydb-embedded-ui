@@ -71,4 +71,8 @@
     &__storage-info {
         margin-bottom: 36px;
     }
+
+    &__loading-container {
+        width: var(--diagnostics-section-table-width);
+    }
 }

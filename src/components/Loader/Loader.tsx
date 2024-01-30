@@ -7,11 +7,12 @@ const b = cn('ydb-loader');
 
 interface LoaderProps {
     size?: LoaderSize;
+    className?: string;
 }
 
-export const Loader = ({size = 'm'}: LoaderProps) => {
+export const Loader = ({size = 'm', className}: LoaderProps) => {
     return (
-        <div className={b()}>
+        <div className={b(null, className)}>
             <KitLoader size={size} />
         </div>
     );

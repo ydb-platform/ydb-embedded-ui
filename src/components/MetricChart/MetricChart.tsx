@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useReducer, useRef} from 'react';
+import {useCallback, useEffect, useReducer, useRef, useState} from 'react';
 
 import {RawSerieData, YagrPlugin, YagrWidgetData} from '@gravity-ui/chartkit/yagr';
 import ChartKit, {settings} from '@gravity-ui/chartkit';
@@ -12,7 +12,13 @@ import {cn} from '../../utils/cn';
 import {Loader} from '../Loader';
 import {ResponseError} from '../Errors/ResponseError';
 
-import type {ChartOptions, MetricDescription, PreparedMetricsData} from './types';
+import type {
+    ChartOptions,
+    ChartDataStatus,
+    MetricDescription,
+    OnChartDataStatusChange,
+    PreparedMetricsData,
+} from './types';
 import {convertResponse} from './convertReponse';
 import {getDefaultDataFormatter} from './getDefaultDataFormatter';
 import {getChartData} from './getChartData';
@@ -102,6 +108,8 @@ interface DiagnosticsChartProps {
     width?: number;
 
     chartOptions?: ChartOptions;
+
+    onChartDataStatusChange?: OnChartDataStatusChange;
 }
 
 export const MetricChart = ({
@@ -112,6 +120,7 @@ export const MetricChart = ({
     width = 400,
     height = width / 1.5,
     chartOptions,
+    onChartDataStatusChange,
 }: DiagnosticsChartProps) => {
     const mounted = useRef(false);
 
@@ -127,9 +136,17 @@ export const MetricChart = ({
         initialChartState,
     );
 
+    const [chartDataStatus, setChartDataStatus] = useState<ChartDataStatus>('loading');
+
+    // Update status in useEffect instead of fetchChartData, so data won't be fetched on callback update
+    useEffect(() => {
+        onChartDataStatusChange?.(chartDataStatus);
+    }, [onChartDataStatusChange, chartDataStatus]);
+
     const fetchChartData = useCallback(
         async (isBackground: boolean) => {
             dispatch(setChartDataLoading());
+            setChartDataStatus('loading');
 
             if (!isBackground) {
                 dispatch(setChartDataWasNotLoaded());
@@ -156,6 +173,7 @@ export const MetricChart = ({
                 if (Array.isArray(response)) {
                     const preparedData = convertResponse(response, metrics);
                     dispatch(setChartData(preparedData));
+                    setChartDataStatus('success');
                 } else {
                     const err = {statusText: response.error};
 
@@ -167,6 +185,7 @@ export const MetricChart = ({
                 }
 
                 dispatch(setChartError(err as IResponseError));
+                setChartDataStatus('error');
             }
         },
         [metrics, timeFrame, width],
