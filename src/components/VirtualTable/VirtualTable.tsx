@@ -76,7 +76,7 @@ export const VirtualTable = <T,>({
 
     const [error, setError] = useState<IResponseError>();
 
-    const [pendingRequests, setPendingRequests] = useState<Record<string, NodeJS.Timeout>>({});
+    const pendingRequests = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
     const fetchChunkData = useCallback(
         async (id: string) => {
@@ -105,10 +105,13 @@ export const VirtualTable = <T,>({
                 }
             }, DEFAULT_REQUEST_TIMEOUT);
 
-            setPendingRequests((reqs) => {
-                reqs[id] = timer;
-                return reqs;
-            });
+            // Chunk data load could be triggered by different events
+            // Cancel previous chunk request, while it is pending (instead of concurrentId)
+            if (pendingRequests.current[id]) {
+                const oldTimer = pendingRequests.current[id];
+                window.clearTimeout(oldTimer);
+            }
+            pendingRequests.current[id] = timer;
         },
         [fetchData, limit, sortParams],
     );
@@ -117,20 +120,17 @@ export const VirtualTable = <T,>({
         dispatch(initChunk(id));
     }, []);
 
-    const onLeave = useCallback<OnLeave>(
-        (id) => {
-            dispatch(removeChunk(id));
+    const onLeave = useCallback<OnLeave>((id) => {
+        dispatch(removeChunk(id));
 
-            // If there is a pending request for the removed chunk, cancel it
-            // It made to prevent excessive requests on fast scroll
-            if (pendingRequests[id]) {
-                const timer = pendingRequests[id];
-                window.clearTimeout(timer);
-                delete pendingRequests[id];
-            }
-        },
-        [pendingRequests],
-    );
+        // If there is a pending request for the removed chunk, cancel it
+        // It made to prevent excessive requests on fast scroll
+        if (pendingRequests.current[id]) {
+            const timer = pendingRequests.current[id];
+            window.clearTimeout(timer);
+            delete pendingRequests.current[id];
+        }
+    }, []);
 
     // Load chunks if they become active
     // This mecanism helps to set chunk active state from different sources, but load data only once
