@@ -7,11 +7,6 @@
 
 * **TenantOverview:** add charts ([#657](https://github.com/ydb-platform/ydb-embedded-ui/issues/657)) ([78daa0b](https://github.com/ydb-platform/ydb-embedded-ui/commit/78daa0bc5a1eb66d0bb0b88ccb559335294e44a7))
 
-
-### Miscellaneous Chores
-
-* fix release version ([#686](https://github.com/ydb-platform/ydb-embedded-ui/issues/686)) ([1a9754e](https://github.com/ydb-platform/ydb-embedded-ui/commit/1a9754ea19097da2d91141642318aa742104f447))
-
 ## [4.30.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.29.0...v4.30.0) (2024-01-16)
 
 
