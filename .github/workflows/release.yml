@@ -23,6 +23,7 @@ jobs:
         with:
           token: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
           release-type: node
+          last-release-sha: f816d60ee3f545b1a08f893c5b7ae809cd15bcb3
       - run: npm publish
         if: ${{ steps.release.outputs.release_created }}
         env:
