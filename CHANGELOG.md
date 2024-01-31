@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.31.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.30.0...v4.31.0) (2024-01-29)
+
+
+### Features
+
+* **TenantOverview:** add charts ([#657](https://github.com/ydb-platform/ydb-embedded-ui/issues/657)) ([78daa0b](https://github.com/ydb-platform/ydb-embedded-ui/commit/78daa0bc5a1eb66d0bb0b88ccb559335294e44a7))
+
 ## [4.30.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.29.0...v4.30.0) (2024-01-16)
 
 
