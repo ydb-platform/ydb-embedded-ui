@@ -15,6 +15,8 @@ docker pull cr.yandex/yc/yandex-docker-local-ydb
 docker run -dp 8765:8765 cr.yandex/yc/yandex-docker-local-ydb
 ```
 
+Open http://localhost:8765 to view it in the browser.
+
 ## Development
 
 1. Run on a machine with Docker installed:
