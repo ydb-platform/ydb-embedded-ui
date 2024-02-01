@@ -15,7 +15,7 @@ export interface MetricDescription {
 }
 
 export interface PreparedMetric extends MetricDescription {
-    data: number[];
+    data: (number | null)[];
 }
 
 export interface PreparedMetricsData {

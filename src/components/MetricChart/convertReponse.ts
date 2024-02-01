@@ -8,11 +8,12 @@ export const convertResponse = (
     const preparedMetrics = data
         .map(({datapoints, target}) => {
             const metricDescription = metrics.find((metric) => metric.target === target);
-            const chartData = datapoints.map((datapoint) => datapoint[0] || 0);
 
             if (!metricDescription) {
                 return undefined;
             }
+
+            const chartData = datapoints.map((datapoint) => datapoint[0]);
 
             return {
                 ...metricDescription,
