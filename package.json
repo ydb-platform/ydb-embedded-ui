@@ -53,9 +53,9 @@
   "scripts": {
     "start": "react-app-rewired start",
     "dev": "DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND=http://localhost:8765 npm start",
-    "build": "DISABLE_ESLINT_PLUGIN=true react-app-rewired build",
+    "build": "rm -rf build && DISABLE_ESLINT_PLUGIN=true react-app-rewired build",
     "//build:embedded": "echo 'PUBLIC_URL is a setting for create-react-app. Embedded version is built and hosted as is on ydb servers, with no way of knowing the final URL pattern. PUBLIC_URL=. keeps paths to all static relative, allowing servers to handle them as needed'",
-    "build:embedded": "rm -rf build && PUBLIC_URL=. REACT_APP_BACKEND=http://localhost:8765 npm run build",
+    "build:embedded": "GENERATE_SOURCEMAP=false PUBLIC_URL=. REACT_APP_BACKEND=http://localhost:8765 npm run build",
     "lint:styles": "stylelint 'src/**/*.scss'",
     "unimported": "npx unimported --no-cache",
     "package": "rm -rf dist && copyfiles -u 1 'src/**/*' dist",
