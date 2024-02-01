@@ -16,17 +16,18 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org
       - run: npm ci
-      - run: npm run build:embedded
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+      - run: npm run build:embedded
       - name: Embedded UI Artifact Upload
         env:
           GITHUB_TOKEN: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
         run: |
           mv build /tmp/$ASSET_NAME
-          zip -r /tmp/$ASSET_NAME.zip /tmp/$ASSET_NAME
-          gh release upload ${{ github.event.release.tag_name }} /tmp/$ASSET_NAME.zip
+          cd /tmp
+          zip -r $ASSET_NAME.zip $ASSET_NAME
+          gh release upload ${{ github.event.release.tag_name }} $ASSET_NAME.zip
       - name: Embedded UI Refresh Event Dispatch
         uses: peter-evans/repository-dispatch@v2
         continue-on-error: true
