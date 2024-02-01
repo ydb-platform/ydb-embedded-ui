@@ -132,6 +132,16 @@ export const VirtualTable = <T,>({
         }
     }, []);
 
+    // Cancel all pending requests on component unmount
+    useEffect(() => {
+        return () => {
+            Object.values(pendingRequests.current).forEach((timer) => {
+                window.clearTimeout(timer);
+            });
+            pendingRequests.current = {};
+        };
+    }, []);
+
     // Load chunks if they become active
     // This mecanism helps to set chunk active state from different sources, but load data only once
     // Only currently active chunks should be in state so iteration by the whole state shouldn't be a problem
