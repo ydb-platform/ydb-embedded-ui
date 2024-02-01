@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.31.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.31.0...v4.31.1) (2024-02-01)
+
+
+### Bug Fixes
+
+* **MetricChart:** do not convert nulls ([#677](https://github.com/ydb-platform/ydb-embedded-ui/issues/677)) ([c51c7aa](https://github.com/ydb-platform/ydb-embedded-ui/commit/c51c7aa1b6fb84342ab38466726175077cd7ef2e))
+
 ## [4.31.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.31.0...v4.31.0) (2024-01-31)
 
 
