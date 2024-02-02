@@ -53,7 +53,11 @@
     "//build:embedded": "echo 'PUBLIC_URL is a setting for create-react-app. Embedded version is built and hosted as is on ydb servers, with no way of knowing the final URL pattern. PUBLIC_URL=. keeps paths to all static relative, allowing servers to handle them as needed'",
     "build:embedded": "GENERATE_SOURCEMAP=false PUBLIC_URL=. REACT_APP_BACKEND=http://localhost:8765 npm run build",
     "build:embedded:archive": "npm run build:embedded && mv build embedded-ui && zip -r embedded-ui.zip embedded-ui && rm -rf embedded-ui",
-    "lint:styles": "stylelint 'src/**/*.scss'",
+    "lint": "run-p lint:*",
+    "lint:js": "eslint  --ext .js,.jsx,.ts,.tsx .",
+    "lint:styles": "stylelint 'src/**/*.{css,scss}'",
+    "lint:other": "npm run prettier -- --check",
+    "prettier": "prettier --check '**/*.{json,yaml,yml,md}'",
     "unimported": "npx unimported --no-cache",
     "package": "rm -rf dist && copyfiles -u 1 'src/**/*' dist",
     "test": "react-app-rewired test",
@@ -65,13 +69,13 @@
     "test:e2e": "npx playwright test --config=playwright.config.ts"
   },
   "lint-staged": {
-    "*.{scss}": [
+    "*.{scss, css}": [
       "stylelint --fix --quiet"
     ],
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix --quiet"
     ],
-    "*.{json}": [
+    "*.{json,yaml,yml,md}": [
       "prettier --write"
     ]
   },

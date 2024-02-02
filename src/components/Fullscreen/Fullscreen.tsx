@@ -22,6 +22,9 @@ interface FullscreenWrapperProps {
 }
 
 class FullscreenWrapper extends React.Component<FullscreenWrapperProps> {
+    modalRoot: null | HTMLElement = null;
+    private el: HTMLElement;
+
     constructor(props: FullscreenWrapperProps) {
         super(props);
         this.el = document.createElement('div');
@@ -43,9 +46,6 @@ class FullscreenWrapper extends React.Component<FullscreenWrapperProps> {
     render() {
         return ReactDOM.createPortal(this.props.children, this.el);
     }
-
-    modalRoot: null | HTMLElement = null;
-    private el: HTMLElement;
 }
 
 function Fullscreen(props: FullscreenProps) {

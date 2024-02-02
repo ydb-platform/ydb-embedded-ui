@@ -12,7 +12,7 @@ export class PageModel extends BaseModel {
     constructor(page: Page, path = '', query: QueryParams = {}) {
         // Use global locator for pages
         super(page, page.locator('body'));
-        
+
         this.path = path;
         this.query = query;
     }
