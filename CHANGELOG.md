@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.31.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.31.1...v4.31.2) (2024-02-01)
+
+
+### Bug Fixes
+
+* **VirtualTable:** optimise requests ([#676](https://github.com/ydb-platform/ydb-embedded-ui/issues/676)) ([9a50a34](https://github.com/ydb-platform/ydb-embedded-ui/commit/9a50a34110eeeeddc0bf83cc5626bca30804ac1a))
+
 ## [4.31.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.31.0...v4.31.1) (2024-02-01)
 
 
