@@ -4,6 +4,7 @@
   "files": [
     "dist"
   ],
+  "main": "dist/lib.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:ydb-platform/ydb-embedded-ui.git"
@@ -59,7 +60,7 @@
     "lint:other": "npm run prettier -- --check",
     "prettier": "prettier --check '**/*.{json,yaml,yml,md}'",
     "unimported": "npx unimported --no-cache",
-    "package": "rm -rf dist && copyfiles -u 1 'src/**/*' dist",
+    "package": "rm -rf dist && tsc -p tsconfig.package.json && copyfiles -u 1 'src/**/*.{css,scss,svg}' dist",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "prepublishOnly": "npm run package",
