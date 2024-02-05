@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import {useLocation, useRouteMatch} from 'react-router';
 import cn from 'bem-cn-lite';
 import {useDispatch} from 'react-redux';
@@ -8,7 +8,7 @@ import {Link} from 'react-router-dom';
 
 import {TABLETS, STORAGE, NODE_PAGES, OVERVIEW, STRUCTURE} from './NodePages';
 import {Tablets} from '../Tablets';
-import {Storage} from '../Storage/Storage';
+import {StorageWrapper} from '../Storage/StorageWrapper';
 import NodeStructure from './NodeStructure/NodeStructure';
 import {Loader} from '../../components/Loader';
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
@@ -38,6 +38,8 @@ interface NodeProps {
 }
 
 function Node(props: NodeProps) {
+    const container = useRef<HTMLDivElement>(null);
+
     const dispatch = useDispatch();
     const location = useLocation();
 
@@ -50,7 +52,7 @@ function Node(props: NodeProps) {
     const {id: nodeId, activeTab} = match.params;
     const {tenantName: tenantNameFromQuery} = parseQuery(location);
 
-    const {activeTabVerified, nodeTabs} = React.useMemo(() => {
+    const {activeTabVerified, nodeTabs} = useMemo(() => {
         const hasStorage = node?.Roles?.find((el) => el === STORAGE_ROLE);
 
         let actualActiveTab = activeTab;
@@ -69,7 +71,7 @@ function Node(props: NodeProps) {
         return {activeTabVerified: actualActiveTab, nodeTabs: actualNodeTabs};
     }, [activeTab, node]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
 
         dispatch(
@@ -81,7 +83,7 @@ function Node(props: NodeProps) {
         );
     }, [dispatch, node, nodeId, tenantNameFromQuery]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchData = () => dispatch(getNodeInfo(nodeId));
         fetchData();
         autofetcher.start();
@@ -119,7 +121,7 @@ function Node(props: NodeProps) {
             case STORAGE: {
                 return (
                     <div className={b('storage')}>
-                        <Storage nodeId={nodeId} />
+                        <StorageWrapper nodeId={nodeId} parentContainer={container.current} />
                     </div>
                 );
             }
@@ -146,7 +148,7 @@ function Node(props: NodeProps) {
     } else {
         if (node) {
             return (
-                <div className={b(null, props.className)}>
+                <div className={b(null, props.className)} ref={container}>
                     <BasicNodeViewer
                         node={node}
                         additionalNodesProps={props.additionalNodesProps}

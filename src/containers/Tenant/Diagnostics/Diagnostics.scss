@@ -45,7 +45,8 @@
                 padding-top: 0;
             }
 
-            .data-table__sticky_moving {
+            .data-table__sticky_moving,
+            .ydb-virtual-table__head {
                 top: 46px !important;
             }
         }

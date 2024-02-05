@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useMemo, useRef} from 'react';
 import qs from 'qs';
 import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
@@ -20,8 +20,8 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/consta
 import {Loader} from '../../../components/Loader';
 
 import {Heatmap} from '../../Heatmap';
-import {Nodes} from '../../Nodes';
-import {Storage} from '../../Storage/Storage';
+import {NodesWrapper} from '../../Nodes/NodesWrapper';
+import {StorageWrapper} from '../../Storage/StorageWrapper';
 import {Tablets} from '../../Tablets';
 
 import Describe from './Describe/Describe';
@@ -49,6 +49,8 @@ interface DiagnosticsProps {
 const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
+    const container = useRef<HTMLDivElement>(null);
+
     const dispatch = useDispatch();
     const {currentSchemaPath, autorefresh, wasLoaded} = useSelector((state: any) => state.schema);
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
@@ -121,9 +123,10 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.nodes: {
                 return (
-                    <Nodes
+                    <NodesWrapper
                         path={currentSchemaPath}
                         additionalNodesProps={props.additionalNodesProps}
+                        parentContainer={container.current}
                     />
                 );
             }
@@ -131,7 +134,9 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Tablets path={currentSchemaPath} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.storage: {
-                return <Storage tenant={tenantNameString} />;
+                return (
+                    <StorageWrapper tenant={tenantNameString} parentContainer={container.current} />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.network: {
                 return <Network path={tenantNameString} />;
@@ -196,7 +201,7 @@ function Diagnostics(props: DiagnosticsProps) {
     }
 
     return (
-        <div className={b()}>
+        <div className={b()} ref={container}>
             {renderTabs()}
             <div className={b('page-wrapper')}>{renderTabContent()}</div>
         </div>

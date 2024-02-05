@@ -19,7 +19,7 @@
   "settings.useNodesEndpoint.title": "Сломать вкладку Nodes в диагностике",
   "settings.useNodesEndpoint.popover": "Использовать эндпоинт /viewer/json/nodes для вкладки Nodes в диагностике. Может возвращать некорректные данные на некоторых версиях",
 
-  "settings.useVirtualTables.title": "Использовать таблицу с загрузкой данных по скроллу для вкладок Nodes и Storage кластера",
+  "settings.useVirtualTables.title": "Использовать таблицу с загрузкой данных по скроллу для вкладок Nodes и Storage",
   "settings.useVirtualTables.popover": "Это улучшит производительность, но может работать нестабильно",
 
   "settings.queryUseMultiSchema.title": "Разрешить запросы с несколькими результатами",
