@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useReducer, useRef, useState} from 'react';
+import {useCallback, useEffect, useReducer, useRef} from 'react';
 
 import {RawSerieData, YagrPlugin, YagrWidgetData} from '@gravity-ui/chartkit/yagr';
 import ChartKit, {settings} from '@gravity-ui/chartkit';
@@ -14,7 +14,6 @@ import {ResponseError} from '../Errors/ResponseError';
 
 import type {
     ChartOptions,
-    ChartDataStatus,
     MetricDescription,
     OnChartDataStatusChange,
     PreparedMetricsData,
@@ -136,17 +135,23 @@ export const MetricChart = ({
         initialChartState,
     );
 
-    const [chartDataStatus, setChartDataStatus] = useState<ChartDataStatus>('loading');
-
-    // Update status in useEffect instead of fetchChartData, so data won't be fetched on callback update
     useEffect(() => {
-        onChartDataStatusChange?.(chartDataStatus);
-    }, [onChartDataStatusChange, chartDataStatus]);
+        if (error) {
+            return onChartDataStatusChange?.('error');
+        }
+        if (loading && !wasLoaded) {
+            return onChartDataStatusChange?.('loading');
+        }
+        if (!loading && wasLoaded) {
+            return onChartDataStatusChange?.('success');
+        }
+
+        return undefined;
+    }, [loading, wasLoaded, error, onChartDataStatusChange]);
 
     const fetchChartData = useCallback(
         async (isBackground: boolean) => {
             dispatch(setChartDataLoading());
-            setChartDataStatus('loading');
 
             if (!isBackground) {
                 dispatch(setChartDataWasNotLoaded());
@@ -173,7 +178,6 @@ export const MetricChart = ({
                 if (Array.isArray(response)) {
                     const preparedData = convertResponse(response, metrics);
                     dispatch(setChartData(preparedData));
-                    setChartDataStatus('success');
                 } else {
                     const err = {statusText: response.error};
 
@@ -185,7 +189,6 @@ export const MetricChart = ({
                 }
 
                 dispatch(setChartError(err as IResponseError));
-                setChartDataStatus('error');
             }
         },
         [metrics, timeFrame, width],
