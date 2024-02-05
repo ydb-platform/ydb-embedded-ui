@@ -21,16 +21,13 @@ const TableRowCell = ({
     width,
     align = DEFAULT_ALIGN,
 }: TableCellProps) => {
-    // Additional wrapper <div> with explicit width to ensure proper overflow:hidden
-    // since overflow works poorly with <td>
+    // Additional maxWidth to ensure overflow hidden for <td>
     return (
-        <td>
-            <div
-                className={b('row-cell', {align: align}, className)}
-                style={{height: `${height}px`, width: `${width}px`}}
-            >
-                {children}
-            </div>
+        <td
+            className={b('row-cell', {align: align}, className)}
+            style={{height: `${height}px`, width: `${width}px`, maxWidth: `${width}px`}}
+        >
+            {children}
         </td>
     );
 };

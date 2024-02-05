@@ -20,8 +20,7 @@
         border-spacing: 0;
         border-collapse: separate;
 
-        th,
-        td {
+        th {
             padding: 0;
         }
     }
@@ -71,8 +70,7 @@
         }
     }
 
-    &__head-cell,
-    &__row-cell {
+    &__head-cell {
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -93,15 +91,6 @@
                 justify-content: right;
             }
         }
-    }
-
-    &__row-cell {
-        overflow-x: hidden;
-
-        white-space: nowrap;
-        text-overflow: ellipsis;
-
-        border-bottom: $cell-border;
     }
 
     &__head-cell {
@@ -127,5 +116,33 @@
 
         white-space: nowrap;
         text-overflow: ellipsis;
+    }
+
+    &__row-cell {
+        display: table-cell;
+        overflow-x: hidden;
+
+        width: 100%;
+        max-width: 100%;
+        padding: var(--virtual-table-cell-vertical-padding)
+            var(--virtual-table-cell-horizontal-padding);
+
+        vertical-align: middle;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        border-bottom: $cell-border;
+
+        &_align {
+            &_left {
+                text-align: left;
+            }
+            &_center {
+                text-align: center;
+            }
+            &_right {
+                text-align: right;
+            }
+        }
     }
 }
