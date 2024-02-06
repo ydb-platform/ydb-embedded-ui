@@ -132,14 +132,15 @@ export const TableHead = <T,>({
 }: TableHeadProps<T>) => {
     const [sortParams, setSortParams] = useState<SortParams>({});
 
-    const resizeObserver = useRef<ResizeObserver>();
+    const [resizeObserver, setResizeObserver] = useState<ResizeObserver | undefined>();
     const isTableResizeable = Boolean(onColumnsResize);
 
     useEffect(() => {
         if (!isTableResizeable) {
             return;
         }
-        resizeObserver.current = new ResizeObserver((entries) => {
+
+        const newResizeObserver = new ResizeObserver((entries) => {
             const columnsWidth: TableColumnsWidthSetup = {};
             entries.forEach((entry) => {
                 // @ts-ignore ignore custrom property usage
@@ -149,6 +150,8 @@ export const TableHead = <T,>({
 
             onColumnsResize?.(columnsWidth);
         });
+
+        setResizeObserver(newResizeObserver);
     }, [onColumnsResize, isTableResizeable]);
 
     const handleSort = (columnId: string) => {
@@ -206,7 +209,7 @@ export const TableHead = <T,>({
                                 defaultSortOrder={defaultSortOrder}
                                 onSort={handleSort}
                                 rowHeight={rowHeight}
-                                resizeObserver={resizeObserver.current}
+                                resizeObserver={resizeObserver}
                             />
                         );
                     })}
