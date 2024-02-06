@@ -1,5 +1,4 @@
 import type {ReactNode} from 'react';
-import cn from 'bem-cn-lite';
 
 import DataTable from '@gravity-ui/react-data-table';
 import type {DataTableProps} from '@gravity-ui/react-data-table';
@@ -11,8 +10,7 @@ import {
 import type {IResponseError} from '../../../../types/api/error';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-
-const b = cn('tenant-overview');
+import {b} from './utils';
 
 interface TenantOverviewTableLayoutProps<T> extends Omit<DataTableProps<T>, 'theme'> {
     title: ReactNode;

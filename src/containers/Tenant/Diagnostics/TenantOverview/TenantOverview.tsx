@@ -1,4 +1,3 @@
-import cn from 'bem-cn-lite';
 import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
@@ -21,8 +20,7 @@ import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewCo
 import {useHealthcheck} from './useHealthcheck';
 
 import './TenantOverview.scss';
-
-const b = cn('tenant-overview');
+import {b} from './utils';
 
 interface TenantOverviewProps {
     tenantName: string;
