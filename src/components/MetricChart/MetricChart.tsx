@@ -5,7 +5,8 @@ import ChartKit, {settings} from '@gravity-ui/chartkit';
 
 import type {IResponseError} from '../../types/api/error';
 import type {TimeFrame} from '../../utils/timeframes';
-import {useAutofetcher} from '../../utils/hooks';
+import {useAutofetcher, useIsElementVisible} from '../../utils/hooks';
+
 import {COLORS} from '../../utils/versions';
 import {cn} from '../../utils/cn';
 
@@ -121,6 +122,12 @@ export const MetricChart = ({
     chartOptions,
     onChartDataStatusChange,
 }: DiagnosticsChartProps) => {
+    // YAGR charts use uplot inside
+    // uplot has the issue, that it doesn't render correctly inside not visible elements
+    // so if chart is used inside component with display:none, it will be empty, when visibility change
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isChartVisible = useIsElementVisible(containerRef);
+
     const mounted = useRef(false);
 
     useEffect(() => {
@@ -203,6 +210,10 @@ export const MetricChart = ({
             return <Loader />;
         }
 
+        if (!isChartVisible) {
+            return null;
+        }
+
         return (
             <div className={b('chart')}>
                 <ChartKit type="yagr" data={convertedData} />
@@ -213,6 +224,7 @@ export const MetricChart = ({
 
     return (
         <div
+            ref={containerRef}
             className={b(null)}
             style={{
                 height,

@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {useState} from 'react';
 import {StringParam, useQueryParam} from 'use-query-params';
 
 import {cn} from '../../../../../utils/cn';
@@ -27,54 +27,31 @@ export interface ChartConfig {
 
 interface TenantDashboardProps {
     charts: ChartConfig[];
-    onDashboardLoad?: VoidFunction;
 }
 
-type TenantDashboardStatus = 'success' | 'error' | undefined;
-
-type DashboardsChartsStatuses = Record<string, ChartDataStatus>;
-
-export const TenantDashboard = ({charts, onDashboardLoad}: TenantDashboardProps) => {
-    const [dashboardStatus, setDashboardStatus] = useState<TenantDashboardStatus>();
-    const chartsStatuses = useRef<DashboardsChartsStatuses>({});
+export const TenantDashboard = ({charts}: TenantDashboardProps) => {
+    const [isDashboardHidden, setIsDashboardHidden] = useState<boolean>(true);
 
     const [timeFrame = '1h', setTimeframe] = useQueryParam('timeframe', StringParam);
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
+    // Refetch data only if dashboard successfully loaded
+    const shouldRefresh = autorefresh && !isDashboardHidden;
+
     /**
      * Charts should be hidden, if they are not enabled:
      * 1. GraphShard is not enabled
      * 2. ydb version does not have /viewer/json/render endpoint (400, 404, CORS error, etc.)
+     * If at least one chart successfully loaded, dashboard should be shown
      * @link https://github.com/ydb-platform/ydb-embedded-ui/issues/659
      * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
      */
-    const handleChartDataStatusChange = (chartId: string, chartStatus: ChartDataStatus) => {
-        // If status for chart or dashboard is set, doesn't update it
-        // Dashboard should be consistently hidden or shown
-        if (dashboardStatus || chartsStatuses.current[chartId] || chartStatus === 'loading') {
-            return;
-        }
-        chartsStatuses.current[chartId] = chartStatus;
-
-        // Show dashboard, if at least one chart is successfully loaded
+    const handleChartDataStatusChange = (chartStatus: ChartDataStatus) => {
         if (chartStatus === 'success') {
-            setDashboardStatus('success');
-            onDashboardLoad?.();
-            return;
-        }
-
-        // If there is no charts with successfull data load, dashboard shouldn't be shown
-        if (Object.keys(chartsStatuses.current).length === charts.length) {
-            setDashboardStatus('error');
-            onDashboardLoad?.();
+            setIsDashboardHidden(false);
         }
     };
-
-    // Do not continue render charts if dashboard not valid
-    if (dashboardStatus === 'error') {
-        return null;
-    }
 
     // If there is only one chart, display it with full width
     const chartWidth = charts.length === 1 ? CHART_WIDTH_FULL : CHART_WIDTH;
@@ -90,19 +67,17 @@ export const TenantDashboard = ({charts, onDashboardLoad}: TenantDashboardProps)
                     metrics={chartConfig.metrics}
                     timeFrame={timeFrame as TimeFrame}
                     chartOptions={chartConfig.options}
-                    autorefresh={autorefresh}
+                    autorefresh={shouldRefresh}
                     width={chartWidth}
                     height={chartHeight}
-                    onChartDataStatusChange={(status) =>
-                        handleChartDataStatusChange(chartId, status)
-                    }
+                    onChartDataStatusChange={handleChartDataStatusChange}
                 />
             );
         });
     };
 
     return (
-        <div className={b(null)}>
+        <div className={b(null)} style={{display: isDashboardHidden ? 'none' : undefined}}>
             <div className={b('controls')}>
                 <TimeFrameSelector value={timeFrame as TimeFrame} onChange={setTimeframe} />
             </div>

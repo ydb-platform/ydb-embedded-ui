@@ -1,8 +1,5 @@
-import {useState} from 'react';
-
 import InfoViewer from '../../../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
-import {LoadingContainer} from '../../../../../components/LoadingContainer/LoadingContainer';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 
@@ -28,8 +25,6 @@ interface TenantStorageProps {
 }
 
 export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
-    const [dashboardLoading, setDashboardLoading] = useState<boolean>(true);
-
     const {blobStorageUsed, tableStorageUsed, blobStorageLimit, tableStorageLimit} = metrics;
     const formatValues = (value?: number, total?: number) => {
         const size = getSizeWithSignificantDigits(Number(blobStorageLimit || blobStorageUsed), 0);
@@ -67,14 +62,11 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     ];
 
     return (
-        <LoadingContainer loading={dashboardLoading} className={b('loading-container')}>
-            <TenantDashboard
-                charts={storageDashboardConfig}
-                onDashboardLoad={() => setDashboardLoading(false)}
-            />
+        <>
+            <TenantDashboard charts={storageDashboardConfig} />
             <InfoViewer className={b('storage-info')} title="Storage details" info={info} />
             <TopTables path={tenantName} />
             <TopGroups tenant={tenantName} />
-        </LoadingContainer>
+        </>
     );
 }
