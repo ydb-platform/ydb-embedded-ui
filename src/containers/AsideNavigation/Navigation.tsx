@@ -2,7 +2,7 @@ import {YdbInternalUser} from './YdbInternalUser/YdbInternalUser';
 import {UserSettings} from '../UserSettings/UserSettings';
 
 import {useNavigationMenuItems} from './useNavigationMenuItems';
-import {useComponent} from '../../components/ComponentProvider/ComponentsProvider';
+import {useComponent} from '../../components/ComponentsProvider/ComponentsProvider';
 
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
 

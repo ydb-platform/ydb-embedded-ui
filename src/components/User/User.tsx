@@ -1,5 +1,5 @@
 import {cn} from '../../utils/cn';
-import {useComponent} from '../ComponentProvider/ComponentsProvider';
+import {useComponent} from '../ComponentsProvider/ComponentsProvider';
 
 import './User.scss';
 

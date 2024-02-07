@@ -10,8 +10,8 @@ import {THEME_KEY} from '../../utils/constants';
 
 import type {Store} from 'redux';
 import type {History} from 'history';
-import {ComponentsProvider} from '../../components/ComponentProvider/ComponentsProvider';
-import {ydbComponentsRegistry} from '../../components/ComponentProvider/ydbComponentsRegistry';
+import {ComponentsProvider} from '../../components/ComponentsProvider/ComponentsProvider';
+import {ydbComponentsRegistry} from '../../components/ComponentsProvider/ydbComponentsRegistry';
 
 interface ProvidersProps {
     store: Store;
