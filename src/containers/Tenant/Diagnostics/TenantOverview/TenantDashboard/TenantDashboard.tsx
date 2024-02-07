@@ -43,6 +43,7 @@ export const TenantDashboard = ({charts}: TenantDashboardProps) => {
      * Charts should be hidden, if they are not enabled:
      * 1. GraphShard is not enabled
      * 2. ydb version does not have /viewer/json/render endpoint (400, 404, CORS error, etc.)
+     *
      * If at least one chart successfully loaded, dashboard should be shown
      * @link https://github.com/ydb-platform/ydb-embedded-ui/issues/659
      * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
@@ -71,6 +72,7 @@ export const TenantDashboard = ({charts}: TenantDashboardProps) => {
                     width={chartWidth}
                     height={chartHeight}
                     onChartDataStatusChange={handleChartDataStatusChange}
+                    isChartVisible={!isDashboardHidden}
                 />
             );
         });
