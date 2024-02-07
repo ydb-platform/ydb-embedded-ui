@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.32.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.31.2...v4.32.0) (2024-02-07)
+
+
+### Features
+
+* use VirtualTable in Nodes and Diagnostics ([#678](https://github.com/ydb-platform/ydb-embedded-ui/issues/678)) ([9158050](https://github.com/ydb-platform/ydb-embedded-ui/commit/91580507abf8dd4ac7d2ce070f83e9838ddd4bda))
+
 ## [4.31.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.31.1...v4.31.2) (2024-02-01)
 
 
