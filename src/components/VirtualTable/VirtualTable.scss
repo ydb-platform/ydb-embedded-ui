@@ -6,8 +6,6 @@
     --virtual-table-cell-vertical-padding: 5px;
     --virtual-table-cell-horizontal-padding: 10px;
 
-    --virtual-table-sort-icon-space: 18px;
-
     --virtual-table-border-color: var(--g-color-base-generic-hover);
     --virtual-table-hover-color: var(--g-color-base-float-hover);
 
@@ -21,6 +19,10 @@
         table-layout: fixed;
         border-spacing: 0;
         border-collapse: separate;
+
+        th {
+            padding: 0;
+        }
     }
 
     &__row {
@@ -40,96 +42,96 @@
         @include sticky-top();
     }
 
-    &__th {
-        position: relative;
-
-        padding: var(--virtual-table-cell-vertical-padding)
-            var(--virtual-table-cell-horizontal-padding);
-
-        font-weight: bold;
-        cursor: default;
-        text-align: left;
-
-        border-bottom: $cell-border;
-
-        &_sortable {
-            cursor: pointer;
-
-            #{$block}__head-cell {
-                padding-right: var(--virtual-table-sort-icon-space);
-            }
-
-            &#{$block}__th_align_right {
-                #{$block}__head-cell {
-                    padding-right: 0;
-                    padding-left: var(--virtual-table-sort-icon-space);
-                }
-
-                #{$block}__sort-icon {
-                    right: auto;
-                    left: 0;
-
-                    transform: translate(0, -50%) scaleX(-1);
-                }
-            }
-        }
-    }
-
-    &__head-cell {
-        position: relative;
-
-        display: inline-block;
-        overflow: hidden;
-
-        box-sizing: border-box;
-        max-width: 100%;
-
-        vertical-align: top;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-
-    &__sort-icon {
-        position: absolute;
-        top: 50%;
-        right: 0;
-
-        display: inline-flex;
+    &__sort-icon-container {
+        display: flex;
+        justify-content: center;
 
         color: inherit;
-
-        transform: translate(0, -50%);
 
         &_shadow {
             opacity: 0.15;
         }
     }
 
-    &__icon {
-        vertical-align: top;
-
+    &__sort-icon {
         &_desc {
             transform: rotate(180deg);
         }
     }
 
-    &__td {
-        overflow: hidden;
+    &__head-cell-wrapper {
+        display: flex;
+        overflow-x: hidden;
 
+        border-bottom: $cell-border;
+
+        &_resizeable {
+            resize: horizontal;
+        }
+    }
+
+    &__head-cell {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        width: 100%;
+        max-width: 100%;
         padding: var(--virtual-table-cell-vertical-padding)
             var(--virtual-table-cell-horizontal-padding);
 
+        &_align {
+            &_left {
+                justify-content: left;
+            }
+            &_center {
+                justify-content: center;
+            }
+            &_right {
+                justify-content: right;
+            }
+        }
+    }
+
+    &__head-cell {
+        gap: 8px;
+
+        font-weight: bold;
+        cursor: default;
+
+        &_sortable {
+            cursor: pointer;
+
+            &#{$block}__head-cell_align_right {
+                flex-direction: row-reverse;
+            }
+        }
+    }
+
+    // Separate head cell content class for correct text ellipsis overflow
+    &__head-cell-content {
+        overflow: hidden;
+
+        width: min-content;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    &__row-cell {
+        display: table-cell;
+        overflow-x: hidden;
+
+        width: 100%;
+        max-width: 100%;
+        padding: var(--virtual-table-cell-vertical-padding)
+            var(--virtual-table-cell-horizontal-padding);
+
+        vertical-align: middle;
         white-space: nowrap;
         text-overflow: ellipsis;
 
         border-bottom: $cell-border;
-    }
-
-    &__td,
-    &__th {
-        height: 40px;
-
-        vertical-align: middle;
 
         &_align {
             &_left {

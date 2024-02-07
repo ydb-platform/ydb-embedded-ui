@@ -28,6 +28,7 @@ export interface Column<T> {
     header?: ReactNode;
     className?: string;
     sortable?: boolean;
+    resizeable?: boolean;
     render: (props: {row: T; index: number}) => ReactNode;
     width: number;
     align: AlignType;

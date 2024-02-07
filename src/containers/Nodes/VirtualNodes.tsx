@@ -13,6 +13,7 @@ import {
     isSortableNodesProperty,
     isUnavailableNode,
 } from '../../utils/nodes';
+import {updateColumnsWidth, useTableResize} from '../../utils/hooks/useTableResize';
 
 import {Search} from '../../components/Search';
 import {ProblemFilter} from '../../components/ProblemFilter';
@@ -49,6 +50,8 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
     const [uptimeFilter, setUptimeFilter] = useState<NodesUptimeFilterValues>(
         NodesUptimeFilterValues.All,
     );
+
+    const [tableColumnsWidthSetup, setTableColumnsWidth] = useTableResize('nodesTableColumnsWidth');
 
     const filters = useMemo(() => {
         return [path, searchValue, problemFilter, uptimeFilter];
@@ -118,7 +121,7 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
         getNodeRef: additionalNodesProps?.getNodeRef,
     });
 
-    const columns = rawColumns.map((column) => {
+    const columns = updateColumnsWidth(rawColumns, tableColumnsWidthSetup).map((column) => {
         return {...column, sortable: isSortableNodesProperty(column.name)};
     });
 
@@ -133,6 +136,7 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
             renderEmptyDataMessage={renderEmptyDataMessage}
             dependencyArray={filters}
             getRowClassName={getRowClassName}
+            onColumnsResize={setTableColumnsWidth}
         />
     );
 };
