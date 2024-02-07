@@ -100,14 +100,14 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
         {label: 'Partitioning by load', value: partitioningByLoad},
         {
             label: 'Min number of partitions',
-            value: PartitioningPolicy.MinPartitionsCount || 0,
+            value: formatNumber(PartitioningPolicy.MinPartitionsCount || 0),
         },
     );
 
     if (PartitioningPolicy.MaxPartitionsCount) {
         generalTableInfo.push({
             label: 'Max number of partitions',
-            value: PartitioningPolicy.MaxPartitionsCount || 0,
+            value: formatNumber(PartitioningPolicy.MaxPartitionsCount),
         });
     }
 
