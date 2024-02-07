@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.33.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.32.0...v4.33.0) (2024-02-07)
+
+
+### Features
+
+* **VirtualTable:** enable columns resize ([#697](https://github.com/ydb-platform/ydb-embedded-ui/issues/697)) ([907b275](https://github.com/ydb-platform/ydb-embedded-ui/commit/907b2751541575cde3effcf5359a19cd9b6adffa))
+
+
+### Bug Fixes
+
+* **TableInfo:** format partitions count ([#704](https://github.com/ydb-platform/ydb-embedded-ui/issues/704)) ([2271535](https://github.com/ydb-platform/ydb-embedded-ui/commit/2271535964e4dcf72a3205f61769abfbb22543d4))
+* **TenantDashboard:** hide if charts not enabled ([#675](https://github.com/ydb-platform/ydb-embedded-ui/issues/675)) ([fe0cad4](https://github.com/ydb-platform/ydb-embedded-ui/commit/fe0cad4e37e6b9dc8b8e9b5aeca882e798ec0cce))
+
 ## [4.32.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.31.2...v4.32.0) (2024-02-07)
 
 
