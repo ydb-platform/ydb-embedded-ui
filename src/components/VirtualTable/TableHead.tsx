@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import type {
     HandleTableColumnsResize,
@@ -134,15 +134,14 @@ export const TableHead = <T,>({
 }: TableHeadProps<T>) => {
     const [sortParams, setSortParams] = useState<SortParams>({});
 
-    const [resizeObserver, setResizeObserver] = useState<ResizeObserver | undefined>();
     const isTableResizeable = Boolean(onColumnsResize);
 
-    useEffect(() => {
+    const resizeObserver: ResizeObserver | undefined = useMemo(() => {
         if (!isTableResizeable) {
-            return;
+            return undefined;
         }
 
-        const newResizeObserver = new ResizeObserver((entries) => {
+        return new ResizeObserver((entries) => {
             const columnsWidth: TableColumnsWidthSetup = {};
             entries.forEach((entry) => {
                 // @ts-ignore ignore custrom property usage
@@ -152,8 +151,6 @@ export const TableHead = <T,>({
 
             onColumnsResize?.(columnsWidth);
         });
-
-        setResizeObserver(newResizeObserver);
     }, [onColumnsResize, isTableResizeable]);
 
     const handleCellMount = useCallback(
