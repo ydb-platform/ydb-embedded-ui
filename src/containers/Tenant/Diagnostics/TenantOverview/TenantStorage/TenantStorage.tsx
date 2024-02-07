@@ -1,17 +1,16 @@
-import cn from 'bem-cn-lite';
-
 import InfoViewer from '../../../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 
+import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
+
 import '../TenantOverview.scss';
 
-import {StorageDashboard} from './StorageDashboard';
+import {storageDashboardConfig} from './storageDashboardConfig';
 import {TopTables} from './TopTables';
 import {TopGroups} from './TopGroups';
-
-const b = cn('tenant-overview');
+import {b} from '../utils';
 
 export interface TenantStorageMetrics {
     blobStorageUsed?: number;
@@ -61,9 +60,10 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
             ),
         },
     ];
+
     return (
         <>
-            <StorageDashboard />
+            <TenantDashboard charts={storageDashboardConfig} />
             <InfoViewer className={b('storage-info')} title="Storage details" info={info} />
             <TopTables path={tenantName} />
             <TopGroups tenant={tenantName} />

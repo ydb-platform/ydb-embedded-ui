@@ -1,7 +1,7 @@
-import {type ChartConfig, TenantDashboard} from '../TenantDashboard/TenantDashboard';
+import type {ChartConfig} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
 
-const cpuDashboardConfig: ChartConfig[] = [
+export const cpuDashboardConfig: ChartConfig[] = [
     {
         title: i18n('charts.cpu-usage'),
         metrics: [
@@ -12,7 +12,3 @@ const cpuDashboardConfig: ChartConfig[] = [
         ],
     },
 ];
-
-export const CpuDashboard = () => {
-    return <TenantDashboard charts={cpuDashboardConfig} />;
-};

@@ -1,4 +1,3 @@
-import cn from 'bem-cn-lite';
 import {useCallback} from 'react';
 import {useDispatch} from 'react-redux';
 
@@ -17,12 +16,11 @@ import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
 import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
 import {TenantStorage} from './TenantStorage/TenantStorage';
 import {TenantMemory} from './TenantMemory/TenantMemory';
-import {DefaultDashboard} from './DefaultDashboard';
+import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
 import {useHealthcheck} from './useHealthcheck';
 
 import './TenantOverview.scss';
-
-const b = cn('tenant-overview');
+import {b} from './utils';
 
 interface TenantOverviewProps {
     tenantName: string;
@@ -141,7 +139,7 @@ export function TenantOverview({
                 );
             }
             default: {
-                return <DefaultDashboard />;
+                return <DefaultOverviewContent />;
             }
         }
     };

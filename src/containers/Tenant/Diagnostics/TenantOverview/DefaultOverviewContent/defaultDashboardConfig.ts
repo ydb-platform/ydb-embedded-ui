@@ -1,7 +1,7 @@
-import {type ChartConfig, TenantDashboard} from './TenantDashboard/TenantDashboard';
-import i18n from './i18n';
+import type {ChartConfig} from '../TenantDashboard/TenantDashboard';
+import i18n from '../i18n';
 
-const defaultDashboardConfig: ChartConfig[] = [
+export const defaultDashboardConfig: ChartConfig[] = [
     {
         title: i18n('charts.queries-per-second'),
         metrics: [
@@ -44,7 +44,3 @@ const defaultDashboardConfig: ChartConfig[] = [
         },
     },
 ];
-
-export const DefaultDashboard = () => {
-    return <TenantDashboard charts={defaultDashboardConfig} />;
-};

@@ -1,7 +1,7 @@
-import {type ChartConfig, TenantDashboard} from '../TenantDashboard/TenantDashboard';
+import type {ChartConfig} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
 
-const storageDashboardConfig: ChartConfig[] = [
+export const storageDashboardConfig: ChartConfig[] = [
     {
         title: i18n('charts.storage-usage'),
         metrics: [
@@ -15,7 +15,3 @@ const storageDashboardConfig: ChartConfig[] = [
         },
     },
 ];
-
-export const StorageDashboard = () => {
-    return <TenantDashboard charts={storageDashboardConfig} />;
-};

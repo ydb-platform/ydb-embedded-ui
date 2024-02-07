@@ -127,5 +127,3 @@ export const USE_BACKEND_PARAMS_FOR_TABLES_KEY = 'useBackendParamsForTables';
 
 // Enable schema that supports multiple resultsets
 export const QUERY_USE_MULTI_SCHEMA_KEY = 'queryUseMultiSchema';
-
-export const DISPLAY_CHARTS_IN_DB_DIAGNOSTICS_KEY = 'displayChartsInDbDiagnostics';

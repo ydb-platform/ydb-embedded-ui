@@ -6,13 +6,19 @@ import ChartKit, {settings} from '@gravity-ui/chartkit';
 import type {IResponseError} from '../../types/api/error';
 import type {TimeFrame} from '../../utils/timeframes';
 import {useAutofetcher} from '../../utils/hooks';
+
 import {COLORS} from '../../utils/versions';
 import {cn} from '../../utils/cn';
 
 import {Loader} from '../Loader';
 import {ResponseError} from '../Errors/ResponseError';
 
-import type {ChartOptions, MetricDescription, PreparedMetricsData} from './types';
+import type {
+    ChartOptions,
+    MetricDescription,
+    OnChartDataStatusChange,
+    PreparedMetricsData,
+} from './types';
 import {convertResponse} from './convertReponse';
 import {getDefaultDataFormatter} from './getDefaultDataFormatter';
 import {getChartData} from './getChartData';
@@ -102,6 +108,15 @@ interface DiagnosticsChartProps {
     width?: number;
 
     chartOptions?: ChartOptions;
+
+    onChartDataStatusChange?: OnChartDataStatusChange;
+
+    /**
+     * YAGR charts don't render correctly inside not visible elements\
+     * So if chart is used inside component with 'display:none', it will be empty, when visibility change\
+     * Pass isChartVisible prop to ensure proper chart render
+     */
+    isChartVisible?: boolean;
 }
 
 export const MetricChart = ({
@@ -112,6 +127,8 @@ export const MetricChart = ({
     width = 400,
     height = width / 1.5,
     chartOptions,
+    onChartDataStatusChange,
+    isChartVisible,
 }: DiagnosticsChartProps) => {
     const mounted = useRef(false);
 
@@ -126,6 +143,20 @@ export const MetricChart = ({
         chartReducer,
         initialChartState,
     );
+
+    useEffect(() => {
+        if (error) {
+            return onChartDataStatusChange?.('error');
+        }
+        if (loading && !wasLoaded) {
+            return onChartDataStatusChange?.('loading');
+        }
+        if (!loading && wasLoaded) {
+            return onChartDataStatusChange?.('success');
+        }
+
+        return undefined;
+    }, [loading, wasLoaded, error, onChartDataStatusChange]);
 
     const fetchChartData = useCallback(
         async (isBackground: boolean) => {
@@ -146,7 +177,9 @@ export const MetricChart = ({
                 });
 
                 // Hack to prevent setting value to state, if component unmounted
-                if (!mounted.current) return;
+                if (!mounted.current) {
+                    return;
+                }
 
                 // In some cases error could be in response with 200 status code
                 // It happens when request is OK, but chart data cannot be returned due to some reason
@@ -155,10 +188,14 @@ export const MetricChart = ({
                     const preparedData = convertResponse(response, metrics);
                     dispatch(setChartData(preparedData));
                 } else {
-                    dispatch(setChartError({statusText: response.error}));
+                    const err = {statusText: response.error};
+
+                    throw err;
                 }
             } catch (err) {
-                if (!mounted.current) return;
+                if (!mounted.current) {
+                    return;
+                }
 
                 dispatch(setChartError(err as IResponseError));
             }
@@ -173,6 +210,10 @@ export const MetricChart = ({
     const renderContent = () => {
         if (loading && !wasLoaded) {
             return <Loader />;
+        }
+
+        if (!isChartVisible) {
+            return null;
         }
 
         return (

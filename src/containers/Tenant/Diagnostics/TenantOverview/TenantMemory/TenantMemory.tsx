@@ -1,4 +1,5 @@
-import {MemoryDashboard} from './MemoryDashboard';
+import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
+import {memoryDashboardConfig} from './memoryDashboardConfig';
 import {TopNodesByMemory} from './TopNodesByMemory';
 
 interface TenantMemoryProps {
@@ -8,7 +9,7 @@ interface TenantMemoryProps {
 export function TenantMemory({path}: TenantMemoryProps) {
     return (
         <>
-            <MemoryDashboard />
+            <TenantDashboard charts={memoryDashboardConfig} />
             <TopNodesByMemory path={path} />
         </>
     );

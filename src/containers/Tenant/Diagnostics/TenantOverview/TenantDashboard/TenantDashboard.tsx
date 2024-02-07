@@ -1,14 +1,15 @@
+import {useState} from 'react';
 import {StringParam, useQueryParam} from 'use-query-params';
 
 import {cn} from '../../../../../utils/cn';
 import type {TimeFrame} from '../../../../../utils/timeframes';
-import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
-import {DISPLAY_CHARTS_IN_DB_DIAGNOSTICS_KEY} from '../../../../../utils/constants';
+import {useTypedSelector} from '../../../../../utils/hooks';
 import {TimeFrameSelector} from '../../../../../components/TimeFrameSelector/TimeFrameSelector';
 import {
     type ChartOptions,
     MetricChart,
     type MetricDescription,
+    type ChartDataStatus,
 } from '../../../../../components/MetricChart';
 
 import './TenantDashboard.scss';
@@ -29,15 +30,29 @@ interface TenantDashboardProps {
 }
 
 export const TenantDashboard = ({charts}: TenantDashboardProps) => {
+    const [isDashboardHidden, setIsDashboardHidden] = useState<boolean>(true);
+
     const [timeFrame = '1h', setTimeframe] = useQueryParam('timeframe', StringParam);
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
-    const [chartsEnabled] = useSetting(DISPLAY_CHARTS_IN_DB_DIAGNOSTICS_KEY);
+    // Refetch data only if dashboard successfully loaded
+    const shouldRefresh = autorefresh && !isDashboardHidden;
 
-    if (!chartsEnabled) {
-        return null;
-    }
+    /**
+     * Charts should be hidden, if they are not enabled:
+     * 1. GraphShard is not enabled
+     * 2. ydb version does not have /viewer/json/render endpoint (400, 404, CORS error, etc.)
+     *
+     * If at least one chart successfully loaded, dashboard should be shown
+     * @link https://github.com/ydb-platform/ydb-embedded-ui/issues/659
+     * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
+     */
+    const handleChartDataStatusChange = (chartStatus: ChartDataStatus) => {
+        if (chartStatus === 'success') {
+            setIsDashboardHidden(false);
+        }
+    };
 
     // If there is only one chart, display it with full width
     const chartWidth = charts.length === 1 ? CHART_WIDTH_FULL : CHART_WIDTH;
@@ -45,23 +60,26 @@ export const TenantDashboard = ({charts}: TenantDashboardProps) => {
 
     const renderContent = () => {
         return charts.map((chartConfig) => {
+            const chartId = chartConfig.metrics.map(({target}) => target).join('&');
             return (
                 <MetricChart
-                    key={chartConfig.metrics.map(({target}) => target).join('&')}
+                    key={chartId}
                     title={chartConfig.title}
                     metrics={chartConfig.metrics}
                     timeFrame={timeFrame as TimeFrame}
                     chartOptions={chartConfig.options}
-                    autorefresh={autorefresh}
+                    autorefresh={shouldRefresh}
                     width={chartWidth}
                     height={chartHeight}
+                    onChartDataStatusChange={handleChartDataStatusChange}
+                    isChartVisible={!isDashboardHidden}
                 />
             );
         });
     };
 
     return (
-        <div className={b(null)}>
+        <div className={b(null)} style={{display: isDashboardHidden ? 'none' : undefined}}>
             <div className={b('controls')}>
                 <TimeFrameSelector value={timeFrame as TimeFrame} onChange={setTimeframe} />
             </div>
