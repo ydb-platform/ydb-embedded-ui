@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import type {
     HandleTableColumnsResize,
@@ -49,7 +49,8 @@ interface TableHeadCellProps<T> {
     defaultSortOrder: SortOrderType;
     onSort?: (columnName: string) => void;
     rowHeight: number;
-    resizeObserver?: ResizeObserver;
+    onCellMount?: (element: Element) => void;
+    onCellUnMount?: (element: Element) => void;
 }
 
 export const TableHeadCell = <T,>({
@@ -58,21 +59,22 @@ export const TableHeadCell = <T,>({
     defaultSortOrder,
     onSort,
     rowHeight,
-    resizeObserver,
+    onCellMount,
+    onCellUnMount,
 }: TableHeadCellProps<T>) => {
     const cellWrapperRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const cellWrapper = cellWrapperRef.current;
         if (cellWrapper) {
-            resizeObserver?.observe(cellWrapper);
+            onCellMount?.(cellWrapper);
         }
         return () => {
             if (cellWrapper) {
-                resizeObserver?.unobserve(cellWrapper);
+                onCellUnMount?.(cellWrapper);
             }
         };
-    }, [resizeObserver]);
+    }, [onCellMount, onCellUnMount]);
 
     const content = column.header ?? column.name;
 
@@ -154,6 +156,19 @@ export const TableHead = <T,>({
         setResizeObserver(newResizeObserver);
     }, [onColumnsResize, isTableResizeable]);
 
+    const handleCellMount = useCallback(
+        (element: Element) => {
+            resizeObserver?.observe(element);
+        },
+        [resizeObserver],
+    );
+    const handleCellUnMount = useCallback(
+        (element: Element) => {
+            resizeObserver?.unobserve(element);
+        },
+        [resizeObserver],
+    );
+
     const handleSort = (columnId: string) => {
         let newSortParams: SortParams = {};
 
@@ -209,7 +224,8 @@ export const TableHead = <T,>({
                                 defaultSortOrder={defaultSortOrder}
                                 onSort={handleSort}
                                 rowHeight={rowHeight}
-                                resizeObserver={resizeObserver}
+                                onCellMount={handleCellMount}
+                                onCellUnMount={handleCellUnMount}
                             />
                         );
                     })}
