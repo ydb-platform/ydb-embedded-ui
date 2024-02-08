@@ -9,9 +9,9 @@ import {
     getMonitoringLink as getMonitoringLinkDefault,
     getMonitoringClusterLink as getMonitoringClusterLinkDefault,
 } from '../../utils/monitoring';
-import {InternalCluster} from './InternalCluster/InternalCluster';
-import {InternalNode} from './InternalNode/InternalNode';
-import {InternalTenant} from './InternalTenant/InternalTenant';
+import {ExtendedCluster} from './ExtendedCluster/ExtendedCluster';
+import {ExtendedNode} from './ExtendedNode/ExtendedNode';
+import {ExtendedTenant} from './ExtendedTenant/ExtendedTenant';
 import {YDBEmbeddedUISettings, settings} from '../UserSettings/settings';
 import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../utils/constants';
 
@@ -48,7 +48,7 @@ export function AppWithClusters({
             <AppSlots.ClusterSlot>
                 {({component}) => {
                     return (
-                        <InternalCluster
+                        <ExtendedCluster
                             component={component}
                             getMonitoringLink={getMonitoringLink}
                             getMonitoringClusterLink={getMonitoringClusterLink}
@@ -58,13 +58,13 @@ export function AppWithClusters({
             </AppSlots.ClusterSlot>
             <AppSlots.NodeSlot>
                 {({component}) => {
-                    return <InternalNode component={component} />;
+                    return <ExtendedNode component={component} />;
                 }}
             </AppSlots.NodeSlot>
             <AppSlots.TenantSlot>
                 {({component}) => {
                     return (
-                        <InternalTenant
+                        <ExtendedTenant
                             component={component}
                             getMonitoringLink={getMonitoringLink}
                         />

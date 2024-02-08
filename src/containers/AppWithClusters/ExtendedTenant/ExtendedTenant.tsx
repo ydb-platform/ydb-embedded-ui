@@ -5,15 +5,15 @@ import {useClusterData} from '../useClusterData';
 
 import {MonitoringButton} from '../../../components/MonitoringButton/MonitoringButton';
 
-export interface InternalTenantProps {
+export interface ExtendedTenantProps {
     component: typeof Tenant;
     getMonitoringLink?: GetMonitoringLink;
 }
 
-export function InternalTenant({
+export function ExtendedTenant({
     component: TenantComponent,
     getMonitoringLink,
-}: InternalTenantProps) {
+}: ExtendedTenantProps) {
     const {additionalNodesProps, cluster, monitoring} = useClusterData();
 
     const additionalTenantProps = {

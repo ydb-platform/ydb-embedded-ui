@@ -1,5 +1,5 @@
 import type {TClusterInfo} from './cluster';
-import {TTenant} from './tenant';
+import type {TTenant} from './tenant';
 
 /**
  * endpoint: /api/meta/meta/clusters

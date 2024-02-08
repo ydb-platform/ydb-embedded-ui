@@ -1,6 +1,6 @@
 import {uniqBy} from 'lodash';
 
-import type {MetaClusterVersion} from '../types/api/clusters';
+import type {MetaClusterVersion} from '../types/api/meta';
 import type {VersionToColorMap} from '../types/versions';
 import {COLORS, GRAY_COLOR, getMinorVersion, hashCode} from './versions';
 

@@ -15,16 +15,16 @@ describe('prepareHost', () => {
 });
 describe('getBackendFromNodeHost', () => {
     it('should prepare correct backend value from node host', () => {
-        const balancer = 'https://viewer.ydb.ru:443/vla-dev02.ydb.net:8765';
-        const nodeHost = 'ydb-vla-dev02-001.search.net:31012';
-        const result = 'https://viewer.ydb.ru:443/ydb-vla-dev02-001.search.net:31012';
+        const balancer = 'https://viewer.ydb.ru:443/dev02.ydb.net:8765';
+        const nodeHost = 'ydb-dev02-001.search.net:31012';
+        const result = 'https://viewer.ydb.ru:443/ydb-dev02-001.search.net:31012';
 
         expect(getBackendFromNodeHost(nodeHost, balancer)).toBe(result);
     });
 });
 describe('getBackendFromRawNodeData', () => {
     it('should prepare correct backend value from raw node data', () => {
-        const balancer = 'https://viewer.ydb.ru:443/vla-dev02.ydb.net:8765';
+        const balancer = 'https://viewer.ydb.ru:443/dev02.ydb.net:8765';
         const node = {
             Host: 'ydb-dev02-000.search.net',
             Endpoints: [

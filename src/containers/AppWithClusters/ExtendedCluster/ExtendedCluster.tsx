@@ -10,7 +10,7 @@ import type {
     AdditionalVersionsProps,
 } from '../../../types/additionalProps';
 import type Cluster from '../../Cluster/Cluster';
-import type {MetaClusterVersion} from '../../../types/api/clusters';
+import type {MetaClusterVersion} from '../../../types/api/meta';
 import type {GetMonitoringLink, GetMonitoringClusterLink} from '../../../utils/monitoring';
 
 import {getVersionColors, getVersionMap} from '../../../utils/clusterVersionColors';
@@ -18,9 +18,9 @@ import {removeViewerPathname, getCleanBalancerValue} from '../../../utils/parseB
 import {getBackendFromNodeHost} from '../../../utils/prepareBackend';
 import {useClusterData} from '../useClusterData';
 
-import './InternalCluster.scss';
+import './ExtendedCluster.scss';
 
-const b = block('internal-cluster');
+const b = block('extended-cluster');
 
 const getAdditionalBalancerInfo = (balancer: string) => {
     const cleanedValue = getCleanBalancerValue(balancer);
@@ -108,16 +108,16 @@ const getAdditionalTenantsProps = (
     return additionalTenantsProps;
 };
 
-interface InternalClusterProps {
+interface ExtendedClusterProps {
     component: typeof Cluster;
     getMonitoringLink?: GetMonitoringLink;
     getMonitoringClusterLink?: GetMonitoringClusterLink;
 }
-export function InternalCluster({
+export function ExtendedCluster({
     component: ClusterComponent,
     getMonitoringLink,
     getMonitoringClusterLink,
-}: InternalClusterProps) {
+}: ExtendedClusterProps) {
     const {
         monitoring,
         balancer,

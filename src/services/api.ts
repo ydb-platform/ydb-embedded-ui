@@ -33,7 +33,7 @@ import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/ren
 import type {QuerySyntax} from '../types/store/query';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
 import type {StorageApiRequestParams} from '../store/reducers/storage/types';
-import type {MetaCluster, MetaClusters, MetaTenants} from '../types/api/clusters';
+import type {MetaCluster, MetaClusters, MetaTenants} from '../types/api/meta';
 
 import {backend as BACKEND} from '../store';
 import {prepareSortValue} from '../utils/filters';

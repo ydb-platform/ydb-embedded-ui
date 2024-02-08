@@ -1,4 +1,4 @@
-import type {MetaClusters} from '../../../types/api/clusters';
+import type {MetaClusters} from '../../../types/api/meta';
 import {
     getVersionColors,
     getVersionMap,

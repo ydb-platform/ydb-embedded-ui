@@ -1,6 +1,6 @@
 import type {ApiRequestAction} from '../../utils';
 
-import type {MetaExtendedClusterInfo} from '../../../types/api/clusters';
+import type {MetaExtendedClusterInfo} from '../../../types/api/meta';
 import type {ExtendedMetaClusterVersion} from '../../../utils/clusterVersionColors';
 import {FETCH_CLUSTERS, changeClustersFilters} from './clusters';
 

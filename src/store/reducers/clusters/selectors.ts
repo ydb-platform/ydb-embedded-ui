@@ -3,7 +3,7 @@ import {escapeRegExp} from 'lodash/fp';
 
 import {getMinorVersion} from '../../../utils/versions';
 
-import type {MetaExtendedClusterInfo} from '../../../types/api/clusters';
+import type {MetaExtendedClusterInfo} from '../../../types/api/meta';
 import type {ClusterDataAggregation, ClustersStateSlice, PreparedCluster} from './types';
 
 // ==== Filters ====
