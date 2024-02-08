@@ -35,7 +35,7 @@ import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/redu
 import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 import type {MetaCluster, MetaClusters, MetaTenants} from '../types/api/meta';
 
-import {backend as BACKEND} from '../store';
+import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
 import {prepareSortValue} from '../utils/filters';
 import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
@@ -425,14 +425,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
 
     // used if not single cluster mode
     getClustersList() {
-        return this.get<MetaClusters>('/api/meta/meta/clusters', null);
+        return this.get<MetaClusters>(`${META_BACKEND || ''}/meta/clusters`, null);
     }
 }
 
 export class YdbWebVersionAPI extends YdbEmbeddedAPI {
     getClusterInfo(clusterName: string) {
         return this.get<MetaCluster>(
-            '/api/meta/meta/cluster',
+            `${META_BACKEND || ''}/meta/cluster`,
             {
                 name: clusterName,
             },
@@ -441,7 +441,7 @@ export class YdbWebVersionAPI extends YdbEmbeddedAPI {
     }
 
     getTenants(clusterName: string) {
-        return this.get<MetaTenants>('/api/meta/meta/cp_databases', {
+        return this.get<MetaTenants>(`${META_BACKEND || ''}/meta/cp_databases`, {
             cluster_name: clusterName,
         }).then(parseMetaTenants);
     }

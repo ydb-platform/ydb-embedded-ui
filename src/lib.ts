@@ -1,5 +1,5 @@
 export {App as SingleClusterApp, AppSlots} from './containers/App';
-export {AppWithClusters as App} from './containers/AppWithClusters/AppWithClusters';
+export {AppWithClusters as MultiClusterApp} from './containers/AppWithClusters/AppWithClusters';
 export {ErrorBoundary} from './components/ErrorBoundary/ErrorBoundary';
 
 export {configureStore, rootReducer} from './store';

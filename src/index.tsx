@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import '@gravity-ui/uikit/styles/styles.scss';
 
-import {SingleClusterApp as App, ErrorBoundary, configureStore} from './lib';
+import {ErrorBoundary, configureStore} from './lib';
 import reportWebVitals from './reportWebVitals';
 
 import './styles/themes.scss';
@@ -12,14 +12,25 @@ import './index.css';
 
 const {store, history} = configureStore();
 
-ReactDOM.render(
-    <React.StrictMode>
-        <ErrorBoundary>
-            <App store={store} history={history} />
-        </ErrorBoundary>
-    </React.StrictMode>,
-    document.getElementById('root'),
-);
+async function render() {
+    let App;
+    if (process.env.REACT_APP_META_BACKEND === undefined) {
+        App = await import('./lib').then(({SingleClusterApp}) => SingleClusterApp);
+    } else {
+        App = await import('./lib').then(({MultiClusterApp}) => MultiClusterApp);
+    }
+
+    ReactDOM.render(
+        <React.StrictMode>
+            <ErrorBoundary>
+                <App store={store} history={history} />
+            </ErrorBoundary>
+        </React.StrictMode>,
+        document.getElementById('root'),
+    );
+}
+
+render();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

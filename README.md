@@ -47,6 +47,20 @@ YDB docker represents a single node cluster with only one version, small amount 
 "dev": "DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND=http://your-cluster-host:8765 npm start"
 ```
 
+### Meta backend in dev mode (multi cluster)
+
+If you have meta backend, you can run the app in dev mode with this backend like this:
+
+```
+DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND= REACT_APP_META_BACKEND=http://your-meta-host:8765 npm start
+```
+
+if you need to connect to the meta backend from a server then run the app like this:
+
+```
+DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND= REACT_APP_META_BACKEND= META_YDB_BACKEND=http://your-meta-host:8765 npm start
+```
+
 ## E2E Tests
 
 For e2e tests we use `@playwright/tests`. Tests configuration is in `playwright.config.ts`. Tests are set up in `tests` dir.

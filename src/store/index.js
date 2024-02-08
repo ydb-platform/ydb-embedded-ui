@@ -23,10 +23,13 @@ function _configureStore(aRootReducer, history, singleClusterMode) {
 
 export const webVersion = window.web_version;
 export const customBackend = window.custom_backend;
+export const metaBackend = window.meta_backend;
+
+const isSingleClusterMode = `${metaBackend}` === 'undefined';
 
 export function configureStore({
     aRootReducer = rootReducer,
-    singleClusterMode = true,
+    singleClusterMode = isSingleClusterMode,
     api = createApi({webVersion, withCredentials: !customBackend}),
 } = {}) {
     ({backend, basename, clusterName} = getUrlData({
