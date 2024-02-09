@@ -2,6 +2,7 @@ import type {ValueOf} from '../../types/common';
 import routes, {createHref} from '../../routes';
 
 export const clusterTabsIds = {
+    overview: 'overview',
     tenants: 'tenants',
     nodes: 'nodes',
     storage: 'storage',
@@ -9,6 +10,11 @@ export const clusterTabsIds = {
 } as const;
 
 export type ClusterTab = ValueOf<typeof clusterTabsIds>;
+
+const overview = {
+    id: clusterTabsIds.overview,
+    title: 'Overview',
+};
 
 const tenants = {
     id: clusterTabsIds.tenants,
@@ -27,7 +33,7 @@ const versions = {
     title: 'Versions',
 };
 
-export const clusterTabs = [tenants, nodes, storage, versions];
+export const clusterTabs = [overview, tenants, nodes, storage, versions];
 
 export const getClusterPath = (activeTab: ClusterTab = clusterTabsIds.tenants, query = {}) => {
     return createHref(routes.cluster, {activeTab}, query);

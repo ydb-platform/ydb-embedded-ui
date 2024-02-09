@@ -2,7 +2,6 @@ import {TENANT_PAGES_IDS} from '../store/reducers/tenant/constants';
 
 import {
     ASIDE_HEADER_COMPACT_KEY,
-    CLUSTER_INFO_HIDDEN_KEY,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     LAST_USED_QUERY_ACTION_KEY,
@@ -36,7 +35,6 @@ export const DEFAULT_USER_SETTINGS: SettingsObject = {
     [LAST_USED_QUERY_ACTION_KEY]: QUERY_ACTIONS.execute,
     [ASIDE_HEADER_COMPACT_KEY]: true,
     [PARTITIONS_HIDDEN_COLUMNS_KEY]: [],
-    [CLUSTER_INFO_HIDDEN_KEY]: true,
     [USE_BACKEND_PARAMS_FOR_TABLES_KEY]: false,
     [USE_CLUSTER_BALANCER_AS_BACKEND_KEY]: true,
 };

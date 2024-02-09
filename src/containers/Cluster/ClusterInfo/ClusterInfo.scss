@@ -1,50 +1,10 @@
 @import '../../../styles/mixins';
 
 .cluster-info {
-    position: sticky;
-    left: 0;
-
-    width: 100%;
     padding-top: 20px;
-
-    &__header {
-        display: flex;
-
-        width: fit-content;
-        margin-bottom: 20px;
-
-        cursor: pointer;
-
-        &__expand-button {
-            margin-left: 6px;
-
-            &_rotate {
-                transform: rotate(180deg);
-            }
-        }
-    }
-
-    &__title .entity-status__name {
-        font-weight: var(--g-text-header-font-weight);
-        @include header-1-typography();
-    }
-
-    &__title-skeleton {
-        width: 20%;
-        min-width: 200px;
-        height: var(--g-text-header-1-line-height);
-    }
 
     &__error {
         @include body-2-typography();
-    }
-
-    &__info {
-        margin-bottom: 20px;
-
-        &_hidden {
-            display: none;
-        }
     }
 
     &__system-tablets {

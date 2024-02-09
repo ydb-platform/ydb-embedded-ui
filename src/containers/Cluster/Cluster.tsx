@@ -4,7 +4,7 @@ import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import qs from 'qs';
 
-import {Tabs} from '@gravity-ui/uikit';
+import {Skeleton, Tabs} from '@gravity-ui/uikit';
 
 import type {
     AdditionalClusterProps,
@@ -25,6 +25,8 @@ import {Tenants} from '../Tenants/Tenants';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {NodesWrapper} from '../Nodes/NodesWrapper';
 import {Versions} from '../Versions/Versions';
+import EntityStatus from '../../components/EntityStatus/EntityStatus';
+import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
 
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';
 import {ClusterTab, clusterTabs, clusterTabsIds, getClusterPath} from './utils';
@@ -103,6 +105,18 @@ function Cluster({
 
     const renderTab = () => {
         switch (activeTab) {
+            case clusterTabsIds.overview: {
+                return (
+                    <ClusterInfo
+                        cluster={cluster}
+                        groupsStats={groupsStats}
+                        versionsValues={versionsValues}
+                        loading={infoLoading}
+                        error={clusterError}
+                        additionalClusterProps={additionalClusterProps}
+                    />
+                );
+            }
             case clusterTabsIds.tenants: {
                 return <Tenants additionalTenantsProps={additionalTenantsProps} />;
             }
@@ -130,18 +144,24 @@ function Cluster({
             }
         }
     };
+    const getClusterTitle = () => {
+        if (infoLoading) {
+            return <Skeleton className={b('title-skeleton')} />;
+        }
+
+        return (
+            <EntityStatus
+                size="m"
+                status={cluster?.Overall}
+                name={cluster?.Name ?? CLUSTER_DEFAULT_TITLE}
+                className={b('title')}
+            />
+        );
+    };
 
     return (
         <div className={b()} ref={container}>
-            <ClusterInfo
-                cluster={cluster}
-                groupsStats={groupsStats}
-                versionsValues={versionsValues}
-                loading={infoLoading}
-                error={clusterError}
-                additionalClusterProps={additionalClusterProps}
-            />
-
+            <div className={b('header')}>{getClusterTitle()}</div>
             <div className={b('tabs')}>
                 <Tabs
                     size="l"

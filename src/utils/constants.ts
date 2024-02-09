@@ -117,8 +117,6 @@ export const LAST_USED_QUERY_ACTION_KEY = 'last_used_query_action';
 
 export const PARTITIONS_HIDDEN_COLUMNS_KEY = 'partitionsHiddenColumns';
 
-export const CLUSTER_INFO_HIDDEN_KEY = 'clusterInfoHidden';
-
 // Remain "tab" in key name for backward compatibility
 export const TENANT_INITIAL_PAGE_KEY = 'saved_tenant_initial_tab';
 
