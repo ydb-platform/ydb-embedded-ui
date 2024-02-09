@@ -2,7 +2,6 @@ import type {Reducer} from 'redux';
 
 import type {OlapStatsAction, OlapStatsState} from '../../types/store/olapStats';
 
-import '../../services/api';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';

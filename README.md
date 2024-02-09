@@ -2,14 +2,15 @@
 
 Local viewer for YDB clusters
 
-* [Docs for users](https://ydb.tech/en/docs/maintenance/embedded_monitoring/ydb_monitoring)
-* [Project Roadmap](ROADMAP.md)
+- [Docs for users](https://ydb.tech/en/docs/maintenance/embedded_monitoring/ydb_monitoring)
+- [Project Roadmap](ROADMAP.md)
 
 ## Preview
 
 You can preview working UI using YDB docker image. It will be UI with the latest stable ydb version.
 
 Run on a machine with Docker installed:
+
 ```
 docker pull cr.yandex/yc/yandex-docker-local-ydb
 docker run -dp 8765:8765 cr.yandex/yc/yandex-docker-local-ydb
@@ -40,9 +41,24 @@ To test new features, you can use ydb version that is currently in testing mode 
 
 ### Custom backend in dev mode
 
-YDB docker represents a single node cluster with only one version, small amount of storage groups, PDisks and VDisks. It may be not enough for development purposes. If you have your own development cluster with sufficient amount of entities, you can run the app in the dev mode with this cluster as backend. To do it, set you host to `REACT_APP_BACKEND` variable in `dev` script. For example: 
+YDB docker represents a single node cluster with only one version, small amount of storage groups, PDisks and VDisks. It may be not enough for development purposes. If you have your own development cluster with sufficient amount of entities, you can run the app in the dev mode with this cluster as backend. To do it, set you host to `REACT_APP_BACKEND` variable in `dev` script. For example:
+
 ```
 "dev": "DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND=http://your-cluster-host:8765 npm start"
+```
+
+### Meta backend in dev mode (multi cluster)
+
+If you have meta backend, you can run the app in dev mode with this backend like this:
+
+```
+DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND= REACT_APP_META_BACKEND=http://your-meta-host:8765 npm start
+```
+
+if you need to connect to the meta backend from a server then run the app like this:
+
+```
+DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND= REACT_APP_META_BACKEND= META_YDB_BACKEND=http://your-meta-host:8765 npm start
 ```
 
 ## E2E Tests

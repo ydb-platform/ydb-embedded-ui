@@ -1,5 +1,3 @@
-import '../../services/api';
-
 import type {ExecuteActions} from '../../types/api/query';
 import type {IQueryResult, QueryErrorResponse} from '../../types/store/query';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';

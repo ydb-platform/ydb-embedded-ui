@@ -1,6 +1,14 @@
 import url from 'url';
 
-export const getUrlData = (href: string, singleClusterMode: boolean) => {
+export const getUrlData = ({
+    href,
+    singleClusterMode,
+    customBackend,
+}: {
+    href: string;
+    singleClusterMode: boolean;
+    customBackend?: string;
+}) => {
     if (!singleClusterMode) {
         const {backend, clusterName} = url.parse(href, true).query;
         return {
@@ -8,11 +16,11 @@ export const getUrlData = (href: string, singleClusterMode: boolean) => {
             backend,
             clusterName,
         };
-    } else if (window.custom_backend) {
+    } else if (customBackend) {
         const {backend} = url.parse(href, true).query;
         return {
             basename: '/',
-            backend: backend || window.custom_backend,
+            backend: backend || customBackend,
         };
     } else {
         const parsedPrefix = window.location.pathname.match(/.*(?=\/monitoring)/) || [];

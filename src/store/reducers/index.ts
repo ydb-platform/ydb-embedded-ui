@@ -42,6 +42,7 @@ import header from './header/header';
 import saveQuery from './saveQuery';
 import fullscreen from './fullscreen';
 import singleClusterMode from './singleClusterMode';
+import clusters from './clusters/clusters';
 
 export const rootReducer = {
     singleClusterMode,
@@ -86,6 +87,7 @@ export const rootReducer = {
     header,
     saveQuery,
     fullscreen,
+    clusters,
 };
 
 const combinedReducer = combineReducers({

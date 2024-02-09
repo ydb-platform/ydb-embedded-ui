@@ -11,7 +11,6 @@ import type {
     TenantSummaryTab,
 } from './types';
 
-import '../../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 export const FETCH_TENANT = createRequestActionTypes('tenant', 'FETCH_TENANT');

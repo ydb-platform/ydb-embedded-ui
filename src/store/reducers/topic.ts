@@ -9,7 +9,6 @@ import type {
     ITopicRootStateSlice,
     ITopicState,
 } from '../../types/store/topic';
-import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
 import {parseLag, parseTimestampToIdleTime} from '../../utils/timeParsers';

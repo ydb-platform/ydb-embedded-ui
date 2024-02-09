@@ -1,0 +1,11 @@
+.kv-monitoring-button {
+    display: none;
+
+    &_visible {
+        display: inline-block;
+    }
+
+    .data-table__row:hover & {
+        display: inline-block;
+    }
+}

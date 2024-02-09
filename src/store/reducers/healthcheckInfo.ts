@@ -12,7 +12,6 @@ import type {
 } from '../../types/store/healthcheck';
 import type {IssueLog, StatusFlag} from '../../types/api/healthcheck';
 
-import '../../services/api';
 import {createRequestActionTypes, createApiRequest} from '../utils';
 
 export const FETCH_HEALTHCHECK = createRequestActionTypes('cluster', 'FETCH_HEALTHCHECK');

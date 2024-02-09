@@ -12,7 +12,6 @@ import type {
     SchemaState,
 } from './types';
 
-import '../../../services/api';
 import {isEntityWithMergedImplementation} from '../../../containers/Tenant/utils/schema';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 

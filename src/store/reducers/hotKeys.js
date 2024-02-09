@@ -1,5 +1,4 @@
 import {createRequestActionTypes, createApiRequest} from '../utils';
-import '../../services/api';
 
 const FETCH_HOT_KEYS = createRequestActionTypes('hot_keys', 'FETCH_HOT_KEYS');
 const SET_HOT_KEYS_OPTIONS = 'hot_keys/SET_HOT_KEYS_OPTIONS';

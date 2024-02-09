@@ -1,7 +1,6 @@
 import type {Reducer} from 'redux';
 
 import type {IHostAction, IHostState} from '../../types/store/host';
-import '../../services/api';
 
 import {createRequestActionTypes, createApiRequest} from '../utils';
 

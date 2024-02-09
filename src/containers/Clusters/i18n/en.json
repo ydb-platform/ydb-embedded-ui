@@ -1,0 +1,17 @@
+{
+  "controls_status-select-label": "Status:",
+  "controls_service-select-label": "Service:",
+  "controls_version-select-label": "Version:",
+
+  "controls_search-placeholder": "Cluster name, version, host",
+  "controls_select-placeholder": "All",
+
+  "statistics_clusters": "Clusters",
+  "statistics_hosts": "Hosts",
+  "statistics_tenants": "Tenants",
+  "statistics_nodes": "Nodes",
+  "statistics_load": "Load",
+  "statistics_storage": "Storage",
+
+  "tooltip_no-cluster-data": "No cluster data"
+}

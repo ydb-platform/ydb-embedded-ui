@@ -10,7 +10,6 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
-import '../../services/api';
 import {parseQuery} from '../../routes';
 
 import type {EType} from '../../types/api/tablet';

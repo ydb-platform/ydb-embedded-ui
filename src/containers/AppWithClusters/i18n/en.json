@@ -1,0 +1,4 @@
+{
+  "settings.useClusterBalancerAsBackend.title": "Use cluster balancer as backend",
+  "settings.useClusterBalancerAsBackend.popover": "By default random cluster node is used as backend. It causes saved links to become invalid after some time, when node is restarted. Using balancer as backend fixes it"
+}

@@ -1,0 +1,14 @@
+.extended-cluster {
+    display: flex;
+
+    height: 100%;
+
+    &__balancer {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    &__clipboard-button {
+        margin-left: 5px;
+    }
+}

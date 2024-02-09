@@ -2,7 +2,6 @@ import type {Reducer} from 'redux';
 import type {ExplainPlanNodeData, GraphNode, Link} from '@gravity-ui/paranoid';
 import _ from 'lodash';
 
-import '../../services/api';
 import type {ExplainActions} from '../../types/api/query';
 import type {
     ExplainQueryAction,
