@@ -12,6 +12,7 @@ const TOP_QUERIES_SORT_VALUES = {
     ReadRows: 'ReadRows',
     ReadBytes: 'ReadBytes',
     UserSID: 'UserSID',
+    Duration: 'Duration',
 } as const;
 
 type TopShardsSortValue = ValueOf<typeof TOP_SHARDS_SORT_VALUES>;
