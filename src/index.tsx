@@ -14,7 +14,10 @@ const {store, history} = configureStore();
 
 async function render() {
     let App;
-    if (process.env.REACT_APP_META_BACKEND === undefined) {
+    if (
+        process.env.REACT_APP_META_BACKEND === undefined ||
+        process.env.REACT_APP_META_BACKEND === 'undefined'
+    ) {
         App = await import('./lib').then(({SingleClusterApp}) => SingleClusterApp);
     } else {
         App = await import('./lib').then(({MultiClusterApp}) => MultiClusterApp);
