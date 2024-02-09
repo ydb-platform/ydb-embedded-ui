@@ -1,10 +1,10 @@
 import React from 'react';
-import {YdbComponentsRegistry} from './ydbComponentsRegistry';
+import type {ComponentsRegistry} from './componentsRegistry';
 
-const componentsStoreContext = React.createContext<YdbComponentsRegistry | undefined>(undefined);
+const componentsStoreContext = React.createContext<ComponentsRegistry | undefined>(undefined);
 
 interface ComponentsProviderProps {
-    registry: YdbComponentsRegistry;
+    registry: ComponentsRegistry;
     children: React.ReactNode;
 }
 export function ComponentsProvider({children, registry}: ComponentsProviderProps) {
@@ -15,7 +15,7 @@ export function ComponentsProvider({children, registry}: ComponentsProviderProps
     );
 }
 
-export function useComponent<T extends Parameters<YdbComponentsRegistry['get']>[0]>(id: T) {
+export function useComponent<T extends Parameters<ComponentsRegistry['get']>[0]>(id: T) {
     const store = React.useContext(componentsStoreContext);
     if (store === undefined) {
         throw new Error('useComponent must be used within ComponentsProvider');

@@ -5,25 +5,26 @@ import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 import {ThemeProvider} from '@gravity-ui/uikit';
 
+import {ComponentsProvider} from '../../components/ComponentsProvider/ComponentsProvider';
+import {componentsRegistry as defaultComponentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 import {useSetting} from '../../utils/hooks';
 import {THEME_KEY} from '../../utils/constants';
 
 import type {Store} from 'redux';
 import type {History} from 'history';
-import {ComponentsProvider} from '../../components/ComponentsProvider/ComponentsProvider';
-import {ydbComponentsRegistry} from '../../components/ComponentsProvider/ydbComponentsRegistry';
+import type {ComponentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 
 interface ProvidersProps {
     store: Store;
     history: History;
-    componentsRegistry?: typeof ydbComponentsRegistry;
+    componentsRegistry?: ComponentsRegistry;
     children: React.ReactNode;
 }
 
 export function Providers({
     store,
     history,
-    componentsRegistry = ydbComponentsRegistry,
+    componentsRegistry = defaultComponentsRegistry,
     children,
 }: ProvidersProps) {
     return (

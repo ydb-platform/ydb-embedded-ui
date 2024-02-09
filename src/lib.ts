@@ -9,7 +9,7 @@ export {settingsManager} from './services/settings';
 export {settings as userSettings} from './containers/UserSettings/settings';
 export {setUserSettings} from './store/reducers/settings/settings';
 
-export {ydbComponentsRegistry} from './components/ComponentsProvider/ydbComponentsRegistry';
+export {componentsRegistry} from './components/ComponentsProvider/componentsRegistry';
 export {useSetting, useTypedSelector} from './utils/hooks';
 export {getMonitoringLink, getMonitoringClusterLink} from './utils/monitoring';
 export {i18n, Lang} from './utils/i18n';

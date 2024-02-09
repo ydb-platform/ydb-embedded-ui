@@ -27,7 +27,7 @@ type ComponentType<T> = T extends React.ComponentType<any>
     ? React.ComponentType<React.ComponentPropsWithoutRef<T>>
     : never;
 
-export interface ComponentsRegistry<T extends Registry, Entities = NonNullable<T['type']>> {
+export interface ComponentsRegistryTemplate<T extends Registry, Entities = NonNullable<T['type']>> {
     set<Id extends keyof Entities>(id: Id, entity: ComponentType<Entities[Id]>): this;
     get<Id extends keyof Entities>(id: Id): ComponentType<Entities[Id]>;
 }
