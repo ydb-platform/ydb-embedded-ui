@@ -3,6 +3,7 @@ import {Reducer} from 'redux';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 import type {NodeAction, NodeState} from './types';
+import {prepareNodeData} from './utils';
 
 export const FETCH_NODE = createRequestActionTypes('node', 'FETCH_NODE');
 export const FETCH_NODE_STRUCTURE = createRequestActionTypes('node', 'FETCH_NODE_STRUCTURE');
@@ -82,6 +83,7 @@ export const getNodeInfo = (id: string) => {
     return createApiRequest({
         request: window.api.getNodeInfo(id),
         actions: FETCH_NODE,
+        dataHandler: prepareNodeData,
     });
 };
 

@@ -32,6 +32,9 @@ export interface PreparedStorageNode extends TSystemStateInfo {
     PDisks: TPDiskStateInfo[] | undefined;
     VDisks: TVDiskStateInfo[] | undefined;
 
+    DC?: string;
+    Rack?: string;
+
     Missing: number;
     Uptime: string;
 }

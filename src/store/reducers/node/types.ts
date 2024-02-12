@@ -1,7 +1,7 @@
 import type {IResponseError} from '../../../types/api/error';
+import type {TSystemStateInfo} from '../../../types/api/nodes';
 import type {TPDiskStateInfo} from '../../../types/api/pdisk';
 import type {TStorageInfo} from '../../../types/api/storage';
-import type {TEvSystemStateResponse} from '../../../types/api/systemState';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import type {ApiRequestAction} from '../../utils';
 
@@ -24,8 +24,13 @@ export interface PreparedStructurePDisk extends TPDiskStateInfo {
 
 export type PreparedNodeStructure = Record<string, PreparedStructurePDisk>;
 
+export interface PreparedNode extends TSystemStateInfo {
+    DC?: string;
+    Rack?: string;
+}
+
 export interface NodeState {
-    data: TEvSystemStateResponse;
+    data: PreparedNode;
     loading: boolean;
     wasLoaded: boolean;
     error?: IResponseError;
@@ -37,7 +42,7 @@ export interface NodeState {
 }
 
 export type NodeAction =
-    | ApiRequestAction<typeof FETCH_NODE, TEvSystemStateResponse, IResponseError>
+    | ApiRequestAction<typeof FETCH_NODE, PreparedNode, IResponseError>
     | ApiRequestAction<typeof FETCH_NODE_STRUCTURE, TStorageInfo, IResponseError>
     | ReturnType<typeof resetNode>;
 
