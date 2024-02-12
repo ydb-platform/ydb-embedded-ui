@@ -80,12 +80,12 @@ export function ProgressViewer({
         [valueText, capacityText] = formatValues(Number(value), Number(capacity));
     }
 
-    let bg = inverseColorize ? 'scarlet' : 'apple';
+    let status = inverseColorize ? 'danger' : 'good';
     if (colorizeProgress) {
         if (fillWidth > warningThreshold && fillWidth <= dangerThreshold) {
-            bg = 'saffron';
+            status = 'warning';
         } else if (fillWidth > dangerThreshold) {
-            bg = inverseColorize ? 'apple' : 'scarlet';
+            status = inverseColorize ? 'good' : 'danger';
         }
     }
 
@@ -106,7 +106,7 @@ export function ProgressViewer({
     if (isNumeric(value)) {
         return (
             <div className={b({size}, className)}>
-                <div className={b('line', {bg})} style={lineStyle}></div>
+                <div className={b('line', {status})} style={lineStyle}></div>
                 <span className={b('text', {text})}>{renderContent()}</span>
             </div>
         );

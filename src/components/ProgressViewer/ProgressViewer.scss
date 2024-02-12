@@ -27,14 +27,14 @@
 
         height: 100%;
 
-        &_bg_scarlet {
-            background: var(--ydb-color-status-red);
-        }
-        &_bg_apple {
+        &_status_good {
             background: var(--ydb-color-status-green);
         }
-        &_bg_saffron {
+        &_status_warning {
             background: var(--ydb-color-status-yellow);
+        }
+        &_status_danger {
+            background: var(--ydb-color-status-red);
         }
     }
 
