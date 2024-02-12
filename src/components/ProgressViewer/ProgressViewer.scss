@@ -1,6 +1,8 @@
 @import '../../styles/mixins.scss';
 
 .progress-viewer {
+    $block: &;
+
     position: relative;
     z-index: 0;
 
@@ -16,9 +18,39 @@
     font-size: var(--g-text-body-2-font-size);
     white-space: nowrap;
 
-    color: var(--g-color-text-light-primary);
+    color: var(--g-color-text-complementary);
     border-radius: 2px;
     background: var(--g-color-base-generic);
+
+    &_theme_dark {
+        color: var(--g-color-text-light-primary);
+
+        // Ensure better contrast with text
+        #{$block}__line {
+            opacity: 0.75;
+        }
+    }
+
+    &_status {
+        &_good {
+            background-color: var(--g-color-base-positive-light);
+            #{$block}__line {
+                background-color: var(--ydb-color-status-green);
+            }
+        }
+        &_warning {
+            background-color: var(--g-color-base-yellow-light);
+            #{$block}__line {
+                background-color: var(--ydb-color-status-yellow);
+            }
+        }
+        &_danger {
+            background-color: var(--g-color-base-danger-light);
+            #{$block}__line {
+                background-color: var(--ydb-color-status-red);
+            }
+        }
+    }
 
     &__line {
         position: absolute;
@@ -26,27 +58,11 @@
         left: 0;
 
         height: 100%;
-
-        &_status_good {
-            background: var(--ydb-color-status-green);
-        }
-        &_status_warning {
-            background: var(--ydb-color-status-yellow);
-        }
-        &_status_danger {
-            background: var(--ydb-color-status-red);
-        }
     }
 
     &__text {
         position: relative;
         z-index: 1;
-        &_text_contrast0 {
-            color: var(--g-color-text-light-primary);
-        }
-        &_text_contrast70 {
-            color: var(--g-color-text-complementary);
-        }
     }
 
     &_size_xs {
