@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.33.0...v5.0.0) (2024-02-13)
+
+
+### Features
+
+* add multi clusters support ([#701](https://github.com/ydb-platform/ydb-embedded-ui/issues/701)) ([429aa0e](https://github.com/ydb-platform/ydb-embedded-ui/commit/429aa0e2138c4635f5c0ab26ba07901ec0d0162d))
+
 ## [4.33.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.32.0...v4.33.0) (2024-02-07)
 
 
