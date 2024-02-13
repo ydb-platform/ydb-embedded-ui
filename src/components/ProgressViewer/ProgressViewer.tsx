@@ -1,4 +1,5 @@
 import cn from 'bem-cn-lite';
+import {useTheme} from '@gravity-ui/uikit';
 
 import type {ValueOf} from '../../types/common';
 import {isNumeric} from '../../utils/utils';
@@ -66,6 +67,8 @@ export function ProgressViewer({
     warningThreshold = 60,
     dangerThreshold = 80,
 }: ProgressViewerProps) {
+    const theme = useTheme();
+
     let fillWidth =
         Math.round((parseFloat(String(value)) / parseFloat(String(capacity))) * 100) || 0;
     fillWidth = fillWidth > 100 ? 100 : fillWidth;
@@ -80,20 +83,18 @@ export function ProgressViewer({
         [valueText, capacityText] = formatValues(Number(value), Number(capacity));
     }
 
-    let bg = inverseColorize ? 'scarlet' : 'apple';
+    let status = inverseColorize ? 'danger' : 'good';
     if (colorizeProgress) {
         if (fillWidth > warningThreshold && fillWidth <= dangerThreshold) {
-            bg = 'saffron';
+            status = 'warning';
         } else if (fillWidth > dangerThreshold) {
-            bg = inverseColorize ? 'apple' : 'scarlet';
+            status = inverseColorize ? 'good' : 'danger';
         }
     }
 
     const lineStyle = {
         width: fillWidth + '%',
     };
-
-    const text = fillWidth > 60 ? 'contrast0' : 'contrast70';
 
     const renderContent = () => {
         if (isNumeric(capacity)) {
@@ -105,9 +106,9 @@ export function ProgressViewer({
 
     if (isNumeric(value)) {
         return (
-            <div className={b({size}, className)}>
-                <div className={b('line', {bg})} style={lineStyle}></div>
-                <span className={b('text', {text})}>{renderContent()}</span>
+            <div className={b({size, theme, status}, className)}>
+                <div className={b('line')} style={lineStyle}></div>
+                <span className={b('text')}>{renderContent()}</span>
             </div>
         );
     }

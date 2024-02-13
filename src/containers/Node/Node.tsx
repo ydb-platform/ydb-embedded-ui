@@ -43,8 +43,7 @@ function Node(props: NodeProps) {
     const dispatch = useDispatch();
     const location = useLocation();
 
-    const {loading, wasLoaded, error, data} = useTypedSelector((state) => state.node);
-    const node = data?.SystemStateInfo?.[0];
+    const {loading, wasLoaded, error, data: node} = useTypedSelector((state) => state.node);
 
     const match =
         useRouteMatch<{id: string; activeTab: string}>(routes.node) ?? Object.create(null);

@@ -35,7 +35,7 @@ import executeTopTables from './tenantOverview/executeTopTables/executeTopTables
 import healthcheckInfo from './healthcheckInfo';
 import shardsWorkload from './shardsWorkload/shardsWorkload';
 import {tenantOverviewTopShards} from './tenantOverview/topShards/tenantOverviewTopShards';
-import hotKeys from './hotKeys';
+import hotKeys from './hotKeys/hotKeys';
 import olapStats from './olapStats';
 import authentication from './authentication/authentication';
 import header from './header/header';

@@ -1,7 +1,7 @@
 import cn from 'bem-cn-lite';
 
-import type {TSystemStateInfo} from '../../types/api/nodes';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
+import type {PreparedNode} from '../../store/reducers/node/types';
 
 import EntityStatus from '../EntityStatus/EntityStatus';
 import {Tags} from '../Tags';
@@ -12,7 +12,7 @@ import './BasicNodeViewer.scss';
 const b = cn('basic-node-viewer');
 
 interface BasicNodeViewerProps {
-    node: TSystemStateInfo;
+    node: PreparedNode;
     additionalNodesProps?: AdditionalNodesProps;
     className?: string;
 }
@@ -44,7 +44,7 @@ export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNo
                         <label>{node.NodeId}</label>
                     </div>
 
-                    {node.DataCenter && <Tags tags={[node.DataCenter]} />}
+                    {node.DC && <Tags tags={[node.DC]} />}
                     {node.Roles && <Tags tags={node.Roles} tagsType="blue" />}
                 </>
             ) : (

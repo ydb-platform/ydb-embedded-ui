@@ -27,7 +27,7 @@ export interface NodesPreparedEntity {
     NodeId: number;
     Host?: string;
     SystemState?: EFlag;
-    DataCenter?: string;
+    DC?: string;
     Rack?: string;
     Version?: string;
     TenantName?: string;

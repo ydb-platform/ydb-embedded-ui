@@ -6,6 +6,7 @@ import type {Column as VirtualTableColumn} from '../../../components/VirtualTabl
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {NodeHostWrapper} from '../../../components/NodeHostWrapper/NodeHostWrapper';
 import {isSortableNodesProperty} from '../../../utils/nodes';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 
 import {PDisk} from '../PDisk/PDisk';
 import {b} from './shared';
@@ -47,7 +48,7 @@ const getStorageNodesColumns = (additionalNodesProps: AdditionalNodesProps | und
             name: STORAGE_NODES_COLUMNS_IDS.DC,
             header: 'DC',
             width: 100,
-            render: ({row}) => row.DataCenter || '—',
+            render: ({row}) => row.DC || EMPTY_DATA_PLACEHOLDER,
             align: DataTable.LEFT,
         },
         {

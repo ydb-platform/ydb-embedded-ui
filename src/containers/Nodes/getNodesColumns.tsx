@@ -14,6 +14,7 @@ import type {GetNodeRefFunc} from '../../types/additionalProps';
 import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import {UsageLabel} from '../../components/UsageLabel/UsageLabel';
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 
 const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
@@ -69,7 +70,7 @@ const dataCenterColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.DC,
     header: 'DC',
     align: DataTable.LEFT,
-    render: ({row}) => (row.DataCenter ? row.DataCenter : '—'),
+    render: ({row}) => row.DC || EMPTY_DATA_PLACEHOLDER,
     width: 60,
 };
 
