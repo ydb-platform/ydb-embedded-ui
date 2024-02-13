@@ -35,6 +35,10 @@ const versions = {
 
 export const clusterTabs = [overview, tenants, nodes, storage, versions];
 
-export const getClusterPath = (activeTab: ClusterTab = clusterTabsIds.tenants, query = {}) => {
-    return createHref(routes.cluster, {activeTab}, query);
+export function isClusterTab(tab: any): tab is ClusterTab {
+    return Object.values(clusterTabsIds).includes(tab);
+}
+
+export const getClusterPath = (activeTab?: ClusterTab, query = {}) => {
+    return createHref(routes.cluster, activeTab ? {activeTab} : undefined, query);
 };

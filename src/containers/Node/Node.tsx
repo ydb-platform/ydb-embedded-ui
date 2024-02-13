@@ -22,8 +22,6 @@ import {useTypedSelector} from '../../utils/hooks';
 
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 
-import {clusterTabsIds} from '../Cluster/utils';
-
 import './Node.scss';
 
 const b = cn('node');
@@ -75,7 +73,6 @@ function Node(props: NodeProps) {
 
         dispatch(
             setHeaderBreadcrumbs('node', {
-                clusterTab: clusterTabsIds.nodes,
                 tenantName,
                 nodeId,
             }),

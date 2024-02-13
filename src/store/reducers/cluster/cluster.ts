@@ -1,12 +1,25 @@
-import type {Reducer} from 'redux';
+import type {Dispatch, Reducer} from 'redux';
 
+import {DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
+import {clusterTabsIds, isClusterTab, ClusterTab} from '../../../containers/Cluster/utils';
 import {createRequestActionTypes, createApiRequest} from '../../utils';
 import type {ClusterAction, ClusterState} from './types';
 import {createSelectClusterGroupsQuery, parseGroupsStatsQueryResponse} from './utils';
 
+const SET_DEFAULT_CLUSTER_TAB = 'cluster/SET_DEFAULT_CLUSTER_TAB';
+
 export const FETCH_CLUSTER = createRequestActionTypes('cluster', 'FETCH_CLUSTER');
 
-const initialState = {loading: true, wasLoaded: false};
+const defaultClusterTabLS = localStorage.getItem(DEFAULT_CLUSTER_TAB_KEY);
+
+let defaultClusterTab;
+if (isClusterTab(defaultClusterTabLS)) {
+    defaultClusterTab = defaultClusterTabLS;
+} else {
+    defaultClusterTab = clusterTabsIds.overview;
+}
+
+const initialState = {loading: true, wasLoaded: false, defaultClusterTab};
 
 const cluster: Reducer<ClusterState, ClusterAction> = (state = initialState, action) => {
     switch (action.type) {
@@ -39,10 +52,32 @@ const cluster: Reducer<ClusterState, ClusterAction> = (state = initialState, act
                 loading: false,
             };
         }
+        case SET_DEFAULT_CLUSTER_TAB: {
+            return {
+                ...state,
+                defaultClusterTab: action.data,
+            };
+        }
         default:
             return state;
     }
 };
+
+export function setDefaultClusterTab(tab: ClusterTab) {
+    return {
+        type: SET_DEFAULT_CLUSTER_TAB,
+        data: tab,
+    } as const;
+}
+
+export function updateDefaultClusterTab(tab: string) {
+    return (dispatch: Dispatch) => {
+        if (isClusterTab(tab)) {
+            localStorage.setItem(DEFAULT_CLUSTER_TAB_KEY, tab);
+            dispatch(setDefaultClusterTab(tab));
+        }
+    };
+}
 
 export function getClusterInfo(clusterName?: string) {
     async function requestClusterData() {

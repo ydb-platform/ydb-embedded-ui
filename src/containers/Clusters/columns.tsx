@@ -26,7 +26,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
 
             const backend = balancer && removeViewerPathname(balancer);
 
-            const clusterPath = getClusterPath(clusterTabsIds.tenants, {backend, clusterName});
+            const clusterPath = getClusterPath(undefined, {backend, clusterName});
 
             const clusterStatus = row.cluster?.Overall;
 

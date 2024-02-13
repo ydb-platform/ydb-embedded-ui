@@ -1,8 +1,9 @@
+import type {ClusterTab} from '../../../containers/Cluster/utils';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
 import type {ApiRequestAction} from '../../utils';
 
-import {FETCH_CLUSTER} from './cluster';
+import type {FETCH_CLUSTER, setDefaultClusterTab} from './cluster';
 
 export interface DiskErasureGroupsStats {
     diskType: string;
@@ -25,6 +26,7 @@ export interface ClusterState {
     data?: TClusterInfo;
     error?: IResponseError;
     groupsStats?: ClusterGroupsStats;
+    defaultClusterTab: ClusterTab;
 }
 
 export interface HandledClusterResponse {
@@ -32,8 +34,6 @@ export interface HandledClusterResponse {
     groupsStats: ClusterGroupsStats;
 }
 
-export type ClusterAction = ApiRequestAction<
-    typeof FETCH_CLUSTER,
-    HandledClusterResponse,
-    IResponseError
->;
+export type ClusterAction =
+    | ApiRequestAction<typeof FETCH_CLUSTER, HandledClusterResponse, IResponseError>
+    | ReturnType<typeof setDefaultClusterTab>;

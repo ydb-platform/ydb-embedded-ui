@@ -3,7 +3,7 @@ import {Switch, Route, Redirect, RedirectProps} from 'react-router-dom';
 import cn from 'bem-cn-lite';
 import {connect, useDispatch} from 'react-redux';
 
-import routes, {createHref} from '../../routes';
+import routes from '../../routes';
 
 import {Clusters} from '../Clusters/Clusters';
 import Cluster from '../Cluster/Cluster';
@@ -15,7 +15,7 @@ import Header from '../Header/Header';
 import Authentication from '../Authentication/Authentication';
 
 import {getUser} from '../../store/reducers/authentication/authentication';
-import {clusterTabsIds} from '../Cluster/utils';
+import {getClusterPath} from '../Cluster/utils';
 import {useSlots} from '../../components/slots';
 import {useTypedSelector} from '../../utils/hooks';
 import {
@@ -108,14 +108,7 @@ export function Content(props: ContentProps) {
 
     const redirect = slots.get(RedirectSlot);
     const redirectProps: RedirectProps =
-        redirect?.props ??
-        (singleClusterMode
-            ? {
-                  to: createHref(routes.cluster, {
-                      activeTab: clusterTabsIds.tenants,
-                  }),
-              }
-            : {to: routes.clusters});
+        redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: routes.clusters});
 
     let mainPage: RawBreadcrumbItem | undefined;
     if (!singleClusterMode) {

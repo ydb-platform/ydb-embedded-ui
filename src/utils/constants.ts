@@ -98,6 +98,8 @@ export const DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED = 'default-is-tenant-common
 
 export const DEFAULT_IS_QUERY_RESULT_COLLAPSED = 'default-is-query-result-collapsed';
 
+export const DEFAULT_CLUSTER_TAB_KEY = 'default-cluster-tab';
+
 export const DEFAULT_TABLE_SETTINGS = {
     displayIndices: false,
     stickyHead: DataTable.MOVING,
