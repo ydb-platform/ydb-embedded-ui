@@ -100,10 +100,10 @@ export const getTopQueriesColumns = (): Column<KeyValueRow>[] => {
         cpuTimeUsColumn,
         queryTextColumn,
         endTimeColumn,
+        durationColumn,
         readRowsColumn,
         readBytesColumn,
         userSIDColumn,
-        durationColumn,
     ];
 };
 
