@@ -12,6 +12,8 @@ const prepareComputeNode = (node: TComputeNodeInfo, tenantName?: string) => {
         TenantName: node.Tenant ?? tenantName,
         SystemState: node?.Overall,
         Uptime: calcUptime(node?.StartTime),
+
+        DC: node.DataCenter,
     };
 };
 
@@ -59,6 +61,9 @@ export const prepareNodesData = (data: TNodesInfo): NodesHandledResponse => {
             NodeId: node.NodeId,
             Uptime: calcUptime(node.SystemState?.StartTime),
             TenantName: node.SystemState?.Tenants?.[0],
+
+            DC: node.SystemState.Location?.DataCenter,
+            Rack: node.SystemState.Location?.Rack,
 
             SharedCacheUsed: node.SystemState.SharedCacheStats?.UsedBytes,
             SharedCacheLimit: sharedCacheLimit,
