@@ -78,14 +78,14 @@ function renderRouteSlot(slots: SlotMap, route: RouteSlot) {
             key={route.path}
             path={route.path}
             exact={route.exact}
-            render={() => {
+            render={(props) => {
                 const slot = slots.get(route.slot);
                 let content;
                 if (!slot) {
                     const Component = route.component;
-                    content = <Component />;
+                    content = <Component {...props} />;
                 } else if (typeof slot.rendered === 'function') {
-                    content = slot.rendered({component: route.component});
+                    content = slot.rendered({component: route.component, ...props});
                 } else {
                     content = slot.rendered;
                 }
