@@ -8,7 +8,7 @@ import {Icon} from '../../../../components/Icon';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 
 import {AutoFetcher} from '../../../../utils/autofetcher';
-import {getHotKeys, setHotKeysOptions} from '../../../../store/reducers/hotKeys';
+import {getHotKeys, setHotKeysState} from '../../../../store/reducers/hotKeys/hotKeys';
 
 import {isColumnEntityType, isTableType} from '../../utils/schema';
 
@@ -151,7 +151,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     getHotKeys,
-    setHotKeysOptions,
+    setHotKeysOptions: setHotKeysState,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HotKeys);
