@@ -77,6 +77,7 @@ export const DATABASE_PAGES = [
 ];
 
 export const TABLE_PAGES = [overview, topShards, nodes, graph, tablets, hotKeys, describe];
+export const COLUMN_TABLE_PAGES = [overview, topShards, nodes, graph, tablets, describe];
 
 export const DIR_PAGES = [overview, topShards, nodes, describe];
 
@@ -96,7 +97,7 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeColumnStore]: DATABASE_PAGES,
 
     [EPathType.EPathTypeTable]: TABLE_PAGES,
-    [EPathType.EPathTypeColumnTable]: TABLE_PAGES,
+    [EPathType.EPathTypeColumnTable]: COLUMN_TABLE_PAGES,
 
     [EPathType.EPathTypeDir]: DIR_PAGES,
     [EPathType.EPathTypeTableIndex]: DIR_PAGES,
