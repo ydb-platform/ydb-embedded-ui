@@ -98,6 +98,8 @@ export const DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED = 'default-is-tenant-common
 
 export const DEFAULT_IS_QUERY_RESULT_COLLAPSED = 'default-is-query-result-collapsed';
 
+export const DEFAULT_CLUSTER_TAB_KEY = 'default-cluster-tab';
+
 export const DEFAULT_TABLE_SETTINGS = {
     displayIndices: false,
     stickyHead: DataTable.MOVING,
@@ -116,8 +118,6 @@ export const QUERY_INITIAL_MODE_KEY = 'query_initial_mode';
 export const LAST_USED_QUERY_ACTION_KEY = 'last_used_query_action';
 
 export const PARTITIONS_HIDDEN_COLUMNS_KEY = 'partitionsHiddenColumns';
-
-export const CLUSTER_INFO_HIDDEN_KEY = 'clusterInfoHidden';
 
 // Remain "tab" in key name for backward compatibility
 export const TENANT_INITIAL_PAGE_KEY = 'saved_tenant_initial_tab';

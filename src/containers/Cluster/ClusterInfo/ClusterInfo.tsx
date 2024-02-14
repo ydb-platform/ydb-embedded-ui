@@ -1,15 +1,11 @@
 import block from 'bem-cn-lite';
 
-import {Skeleton} from '@gravity-ui/uikit';
-
-import EntityStatus from '../../../components/EntityStatus/EntityStatus';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import InfoViewer, {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {Tags} from '../../../components/Tags';
 import {Tablet} from '../../../components/Tablet';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {ExternalLinkWithIcon} from '../../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
-import {Icon} from '../../../components/Icon/Icon';
 import {ContentWithPopup} from '../../../components/ContentWithPopup/ContentWithPopup';
 
 import type {IResponseError} from '../../../types/api/error';
@@ -18,13 +14,9 @@ import type {VersionValue} from '../../../types/versions';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import {backend, customBackend} from '../../../store';
 import {formatStorageValues} from '../../../utils/dataFormatters/dataFormatters';
-import {useSetting, useTypedSelector} from '../../../utils/hooks';
+import {useTypedSelector} from '../../../utils/hooks';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../utils/bytesParsers';
-import {
-    CLUSTER_DEFAULT_TITLE,
-    CLUSTER_INFO_HIDDEN_KEY,
-    DEVELOPER_UI_TITLE,
-} from '../../../utils/constants';
+import {DEVELOPER_UI_TITLE} from '../../../utils/constants';
 import type {
     ClusterGroupsStats,
     DiskErasureGroupsStats,
@@ -217,12 +209,6 @@ export const ClusterInfo = ({
 }: ClusterInfoProps) => {
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
-    const [clusterInfoHidden, setClusterInfoHidden] = useSetting<boolean>(CLUSTER_INFO_HIDDEN_KEY);
-
-    const togleClusterInfoVisibility = () => {
-        setClusterInfoHidden(!clusterInfoHidden);
-    };
-
     let internalLink = backend + '/internal';
 
     if (singleClusterMode && !customBackend) {
@@ -248,33 +234,9 @@ export const ClusterInfo = ({
         return <InfoViewer dots={true} info={clusterInfo} />;
     };
 
-    const getClusterTitle = () => {
-        if (loading) {
-            return <Skeleton className={b('title-skeleton')} />;
-        }
-
-        return (
-            <EntityStatus
-                size="m"
-                status={cluster?.Overall}
-                name={cluster?.Name ?? CLUSTER_DEFAULT_TITLE}
-                className={b('title')}
-            />
-        );
-    };
-
     return (
         <div className={b()}>
-            <div className={b('header')} onClick={togleClusterInfoVisibility}>
-                {getClusterTitle()}
-                <Icon
-                    name="chevron-down"
-                    width={24}
-                    height={24}
-                    className={b('header__expand-button', {rotate: clusterInfoHidden})}
-                />
-            </div>
-            <div className={b('info', {hidden: clusterInfoHidden})}>{getContent()}</div>
+            <div className={b('info')}>{getContent()}</div>
         </div>
     );
 };

@@ -76,4 +76,9 @@ export function createHref(
 export const createExternalUILink = (query = {}) =>
     createHref(window.location.pathname, undefined, query);
 
+export function getLocationObjectFromHref(href: string) {
+    const {pathname, search, hash} = new URL(href, 'http://localhost');
+    return {pathname, search, hash};
+}
+
 export default routes;

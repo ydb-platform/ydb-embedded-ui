@@ -1,10 +1,10 @@
 import {useEffect, useMemo, useRef} from 'react';
-import {useLocation, useRouteMatch} from 'react-router';
+import {Redirect, Switch, Route, useLocation, useRouteMatch} from 'react-router';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import qs from 'qs';
 
-import {Tabs} from '@gravity-ui/uikit';
+import {Skeleton, Tabs} from '@gravity-ui/uikit';
 
 import type {
     AdditionalClusterProps,
@@ -12,10 +12,10 @@ import type {
     AdditionalVersionsProps,
     AdditionalNodesProps,
 } from '../../types/additionalProps';
-import routes from '../../routes';
+import routes, {getLocationObjectFromHref} from '../../routes';
 
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {getClusterInfo} from '../../store/reducers/cluster/cluster';
+import {getClusterInfo, updateDefaultClusterTab} from '../../store/reducers/cluster/cluster';
 import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
 import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../../utils/versions';
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
@@ -25,9 +25,11 @@ import {Tenants} from '../Tenants/Tenants';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {NodesWrapper} from '../Nodes/NodesWrapper';
 import {Versions} from '../Versions/Versions';
+import EntityStatus from '../../components/EntityStatus/EntityStatus';
+import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
 
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';
-import {ClusterTab, clusterTabs, clusterTabsIds, getClusterPath} from './utils';
+import {ClusterTab, clusterTabs, clusterTabsIds, getClusterPath, isClusterTab} from './utils';
 
 import './Cluster.scss';
 
@@ -50,8 +52,7 @@ function Cluster({
 
     const dispatch = useDispatch();
 
-    const match = useRouteMatch<{activeTab: string}>(routes.cluster);
-    const {activeTab = clusterTabsIds.tenants} = match?.params || {};
+    const activeTab = useClusterTab();
 
     const location = useLocation();
     const queryParams = qs.parse(location.search, {
@@ -101,57 +102,40 @@ function Cluster({
         return parseNodesToVersionsValues(nodes, versionToColor);
     }, [nodes, versionToColor]);
 
-    const renderTab = () => {
-        switch (activeTab) {
-            case clusterTabsIds.tenants: {
-                return <Tenants additionalTenantsProps={additionalTenantsProps} />;
-            }
-            case clusterTabsIds.nodes: {
-                return (
-                    <NodesWrapper
-                        parentContainer={container.current}
-                        additionalNodesProps={additionalNodesProps}
-                    />
-                );
-            }
-            case clusterTabsIds.storage: {
-                return (
-                    <StorageWrapper
-                        parentContainer={container.current}
-                        additionalNodesProps={additionalNodesProps}
-                    />
-                );
-            }
-            case clusterTabsIds.versions: {
-                return <Versions versionToColor={versionToColor} />;
-            }
-            default: {
-                return null;
-            }
+    const getClusterTitle = () => {
+        if (infoLoading) {
+            return <Skeleton className={b('title-skeleton')} />;
         }
+
+        return (
+            <EntityStatus
+                size="m"
+                status={cluster?.Overall}
+                name={cluster?.Name ?? CLUSTER_DEFAULT_TITLE}
+                className={b('title')}
+            />
+        );
     };
 
     return (
         <div className={b()} ref={container}>
-            <ClusterInfo
-                cluster={cluster}
-                groupsStats={groupsStats}
-                versionsValues={versionsValues}
-                loading={infoLoading}
-                error={clusterError}
-                additionalClusterProps={additionalClusterProps}
-            />
-
+            <div className={b('header')}>{getClusterTitle()}</div>
             <div className={b('tabs')}>
                 <Tabs
                     size="l"
                     allowNotSelected={true}
-                    activeTab={activeTab as string}
+                    activeTab={activeTab}
                     items={clusterTabs}
                     wrapTo={({id}, node) => {
                         const path = getClusterPath(id as ClusterTab, queryParams);
                         return (
-                            <InternalLink to={path} key={id}>
+                            <InternalLink
+                                to={path}
+                                key={id}
+                                onClick={() => {
+                                    dispatch(updateDefaultClusterTab(id));
+                                }}
+                            >
                                 {node}
                             </InternalLink>
                         );
@@ -159,9 +143,89 @@ function Cluster({
                 />
             </div>
 
-            <div>{renderTab()}</div>
+            <div>
+                <Switch>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.overview))
+                                .pathname
+                        }
+                    >
+                        <ClusterInfo
+                            cluster={cluster}
+                            groupsStats={groupsStats}
+                            versionsValues={versionsValues}
+                            loading={infoLoading}
+                            error={clusterError}
+                            additionalClusterProps={additionalClusterProps}
+                        />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants))
+                                .pathname
+                        }
+                    >
+                        <Tenants additionalTenantsProps={additionalTenantsProps} />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname
+                        }
+                    >
+                        <NodesWrapper
+                            parentContainer={container.current}
+                            additionalNodesProps={additionalNodesProps}
+                        />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage))
+                                .pathname
+                        }
+                    >
+                        <StorageWrapper
+                            parentContainer={container.current}
+                            additionalNodesProps={additionalNodesProps}
+                        />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions))
+                                .pathname
+                        }
+                    >
+                        <Versions versionToColor={versionToColor} />
+                    </Route>
+                    <Redirect to={getLocationObjectFromHref(getClusterPath(activeTab))} />
+                </Switch>
+            </div>
         </div>
     );
+}
+
+function useClusterTab() {
+    const dispatch = useDispatch();
+
+    const defaultTab = useTypedSelector((state) => state.cluster.defaultClusterTab);
+
+    const match = useRouteMatch<{activeTab: string}>(routes.cluster);
+
+    const {activeTab: activeTabFromParams} = match?.params || {};
+    let activeTab: ClusterTab;
+    if (isClusterTab(activeTabFromParams)) {
+        activeTab = activeTabFromParams;
+    } else {
+        activeTab = defaultTab;
+    }
+
+    useEffect(() => {
+        if (activeTab !== defaultTab) {
+            dispatch(updateDefaultClusterTab(activeTab));
+        }
+    }, [activeTab, defaultTab, dispatch]);
+
+    return activeTab;
 }
 
 export default Cluster;

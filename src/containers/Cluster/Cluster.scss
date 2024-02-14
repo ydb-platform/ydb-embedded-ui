@@ -9,6 +9,21 @@
 
     @include flex-container();
 
+    &__header {
+        padding: 20px 0;
+    }
+
+    &__title {
+        font-weight: var(--g-text-header-font-weight);
+        @include header-1-typography();
+    }
+
+    &__title-skeleton {
+        width: 20%;
+        min-width: 200px;
+        height: var(--g-text-header-1-line-height);
+    }
+
     &__tabs {
         position: sticky;
         left: 0;
