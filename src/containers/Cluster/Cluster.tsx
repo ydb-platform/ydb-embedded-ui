@@ -52,7 +52,7 @@ function Cluster({
 
     const dispatch = useDispatch();
 
-    const {activeTab, defaultTab} = useClusterTab();
+    const activeTab = useClusterTab();
 
     const location = useLocation();
     const queryParams = qs.parse(location.search, {
@@ -197,7 +197,7 @@ function Cluster({
                     >
                         <Versions versionToColor={versionToColor} />
                     </Route>
-                    <Redirect to={getLocationObjectFromHref(getClusterPath(defaultTab))} />
+                    <Redirect to={getLocationObjectFromHref(getClusterPath(activeTab))} />
                 </Switch>
             </div>
         </div>
@@ -211,8 +211,11 @@ function useClusterTab() {
 
     const match = useRouteMatch<{activeTab: string}>(routes.cluster);
 
-    let {activeTab = defaultTab} = match?.params || {};
-    if (!isClusterTab(activeTab)) {
+    const {activeTab: activeTabFromParams} = match?.params || {};
+    let activeTab: ClusterTab;
+    if (isClusterTab(activeTabFromParams)) {
+        activeTab = activeTabFromParams;
+    } else {
         activeTab = defaultTab;
     }
 
@@ -222,7 +225,7 @@ function useClusterTab() {
         }
     }, [activeTab, defaultTab, dispatch]);
 
-    return {activeTab, defaultTab};
+    return activeTab;
 }
 
 export default Cluster;
