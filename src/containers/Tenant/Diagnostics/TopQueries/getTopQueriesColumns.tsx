@@ -24,6 +24,7 @@ const TOP_QUERIES_COLUMNS_IDS = {
     UserSID: 'UserSID',
     OneLineQueryText: 'OneLineQueryText',
     QueryHash: 'QueryHash',
+    Duration: 'Duration',
 };
 
 const cpuTimeUsColumn: Column<KeyValueRow> = {
@@ -86,11 +87,20 @@ const queryHashColumn: Column<KeyValueRow> = {
     sortable: false,
 };
 
+const durationColumn: Column<KeyValueRow> = {
+    name: TOP_QUERIES_COLUMNS_IDS.Duration,
+    header: 'Duration, ms',
+    render: ({row}) => formatNumber(row.Duration),
+    sortAccessor: (row) => Number(row.Duration),
+    align: DataTable.RIGHT,
+};
+
 export const getTopQueriesColumns = (): Column<KeyValueRow>[] => {
     return [
         cpuTimeUsColumn,
         queryTextColumn,
         endTimeColumn,
+        durationColumn,
         readRowsColumn,
         readBytesColumn,
         userSIDColumn,
