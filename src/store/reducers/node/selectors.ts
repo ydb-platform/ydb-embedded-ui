@@ -10,7 +10,7 @@ import type {
     RawNodeStructure,
 } from './types';
 
-const selectNodeId = (state: NodeStateSlice) => state.node?.data?.SystemStateInfo?.[0].NodeId;
+const selectNodeId = (state: NodeStateSlice) => state.node?.data?.NodeId;
 
 const selectRawNodeStructure = (state: NodeStateSlice) => state.node?.nodeStructure;
 

@@ -1,7 +1,6 @@
 import cn from 'bem-cn-lite';
 
-import type {TSystemStateInfo} from '../../types/api/nodes';
-
+import type {PreparedNode} from '../../store/reducers/node/types';
 import {LOAD_AVERAGE_TIME_INTERVALS} from '../../utils/constants';
 import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
 
@@ -14,7 +13,7 @@ import './FullNodeViewer.scss';
 const b = cn('full-node-viewer');
 
 interface FullNodeViewerProps {
-    node: TSystemStateInfo | undefined;
+    node: PreparedNode | undefined;
     className?: string;
 }
 
@@ -34,7 +33,7 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
     commonInfo.push(
         {label: 'Version', value: node?.Version},
         {label: 'Uptime', value: calcUptime(node?.StartTime)},
-        {label: 'DC', value: node?.DataCenterDescription},
+        {label: 'DC', value: node?.DataCenterDescription || node?.DC},
         {label: 'Rack', value: node?.Rack},
     );
 

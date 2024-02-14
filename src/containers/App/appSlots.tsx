@@ -1,6 +1,6 @@
 import {createSlot} from '../../components/slots';
 
-import type {RedirectProps} from 'react-router';
+import type {RedirectProps, RouteComponentProps} from 'react-router';
 import type Cluster from '../Cluster/Cluster';
 import type {Clusters} from '../Clusters/Clusters';
 import type Node from '../Node/Node';
@@ -9,22 +9,34 @@ import type TabletsFilters from '../TabletsFilters/TabletsFilters';
 import type Tenant from '../Tenant/Tenant';
 
 export const ClustersSlot = createSlot<{
-    children: React.ReactNode | ((props: {component: typeof Clusters}) => React.ReactNode);
+    children:
+        | React.ReactNode
+        | ((props: {component: typeof Clusters} & RouteComponentProps) => React.ReactNode);
 }>('clusters');
 export const ClusterSlot = createSlot<{
-    children: React.ReactNode | ((props: {component: typeof Cluster}) => React.ReactNode);
+    children:
+        | React.ReactNode
+        | ((props: {component: typeof Cluster} & RouteComponentProps) => React.ReactNode);
 }>('cluster');
 export const TenantSlot = createSlot<{
-    children: React.ReactNode | ((props: {component: typeof Tenant}) => React.ReactNode);
+    children:
+        | React.ReactNode
+        | ((props: {component: typeof Tenant} & RouteComponentProps) => React.ReactNode);
 }>('tenant');
 export const NodeSlot = createSlot<{
-    children: React.ReactNode | ((props: {component: typeof Node}) => React.ReactNode);
+    children:
+        | React.ReactNode
+        | ((props: {component: typeof Node} & RouteComponentProps) => React.ReactNode);
 }>('node');
 export const TabletSlot = createSlot<{
-    children: React.ReactNode | ((props: {component: typeof Tablet}) => React.ReactNode);
+    children:
+        | React.ReactNode
+        | ((props: {component: typeof Tablet} & RouteComponentProps) => React.ReactNode);
 }>('tablet');
 export const TabletsFiltersSlot = createSlot<{
-    children: React.ReactNode | ((props: {component: typeof TabletsFilters}) => React.ReactNode);
+    children:
+        | React.ReactNode
+        | ((props: {component: typeof TabletsFilters} & RouteComponentProps) => React.ReactNode);
 }>('tabletsFilters');
 
 export const RoutesSlot = createSlot('routes');

@@ -14,6 +14,7 @@ export {useSetting, useTypedSelector} from './utils/hooks';
 export {getMonitoringLink, getMonitoringClusterLink} from './utils/monitoring';
 export {i18n, Lang} from './utils/i18n';
 export {toaster} from './utils/createToast';
+export {cn} from './utils/cn';
 export * from './utils/constants';
 
 export {default as reportWebVitals} from './reportWebVitals';
@@ -25,3 +26,4 @@ export type {
     SettingsSection,
 } from './containers/UserSettings/settings';
 export type {SettingProps} from './containers/UserSettings/Setting';
+export type {AsideNavigationProps} from './containers/AsideNavigation/AsideNavigation';
