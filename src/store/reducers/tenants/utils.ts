@@ -1,4 +1,4 @@
-import {TPoolStats} from '../../../types/api/nodes';
+import type {TPoolStats} from '../../../types/api/nodes';
 import type {TTenant} from '../../../types/api/tenant';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {formatCPUWithLabel} from '../../../utils/dataFormatters/dataFormatters';
