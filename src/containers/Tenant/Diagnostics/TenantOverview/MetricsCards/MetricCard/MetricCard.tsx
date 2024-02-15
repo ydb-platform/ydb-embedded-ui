@@ -21,14 +21,14 @@ interface MetricCardProps {
 
 export function MetricCard({active, progress, label, status, resourcesUsed}: MetricCardProps) {
     const renderContent = () => {
+        if (progress === undefined && resourcesUsed === undefined) {
+            return <div className={b('content')}>{i18n('no-data')}</div>;
+        }
+
         return (
             <div className={b('content')}>
                 {progress && <div className={b('progress')}>{formatUsage(progress)}</div>}
-                {resourcesUsed ? (
-                    <div className={b('resources')}>{resourcesUsed}</div>
-                ) : (
-                    i18n('no-data')
-                )}
+                {resourcesUsed && <div className={b('resources')}>{resourcesUsed}</div>}
             </div>
         );
     };
