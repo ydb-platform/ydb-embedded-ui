@@ -1,7 +1,6 @@
 import InfoViewer from '../../../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
-import {getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 
@@ -26,11 +25,6 @@ interface TenantStorageProps {
 
 export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     const {blobStorageUsed, tableStorageUsed, blobStorageLimit, tableStorageLimit} = metrics;
-    const formatValues = (value?: number, total?: number) => {
-        const size = getSizeWithSignificantDigits(Number(blobStorageLimit || blobStorageUsed), 0);
-
-        return formatStorageValues(value, total, size);
-    };
 
     const info = [
         {
@@ -39,7 +33,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                 <ProgressViewer
                     value={blobStorageUsed}
                     capacity={blobStorageLimit}
-                    formatValues={formatValues}
+                    formatValues={formatStorageValues}
                     colorizeProgress={true}
                     warningThreshold={75}
                     dangerThreshold={85}
@@ -52,7 +46,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                 <ProgressViewer
                     value={tableStorageUsed}
                     capacity={tableStorageLimit}
-                    formatValues={formatValues}
+                    formatValues={formatStorageValues}
                     colorizeProgress={true}
                     warningThreshold={75}
                     dangerThreshold={85}
