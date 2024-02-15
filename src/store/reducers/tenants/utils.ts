@@ -1,3 +1,4 @@
+import {TPoolStats} from '../../../types/api/nodes';
 import type {TTenant} from '../../../types/api/tenant';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {formatCPUWithLabel} from '../../../utils/dataFormatters/dataFormatters';
@@ -21,6 +22,20 @@ const getTenantBackend = (tenant: TTenant) => {
     return node.Host ? `${node.Host}${address ? address : ''}` : undefined;
 };
 
+const calculateCpuUsage = (poolsStats: TPoolStats[] | undefined) => {
+    if (!poolsStats) {
+        return undefined;
+    }
+
+    const systemPoolUsage = poolsStats?.find(({Name}) => Name === 'System')?.Usage || 0;
+    const userPoolUsage = poolsStats?.find(({Name}) => Name === 'User')?.Usage || 0;
+    const icPoolUsage = poolsStats?.find(({Name}) => Name === 'IC')?.Usage || 0;
+
+    // We use max of system, user and ic pools usage to calculate cpu usage because
+    // only these pools directly indicate resources available to perform user queries
+    return Math.max(Number(systemPoolUsage), Number(userPoolUsage), Number(icPoolUsage)) * 100;
+};
+
 export const calculateTenantMetrics = (tenant?: TTenant) => {
     const {
         CoresUsed,
@@ -33,20 +48,13 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
         DatabaseQuotas = {},
     } = tenant || {};
 
-    const systemPoolUsage = PoolStats?.find(({Name}) => Name === 'System')?.Usage;
-    const userPoolUsage = PoolStats?.find(({Name}) => Name === 'User')?.Usage;
-
     const cpu = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
     const memory = isNumeric(MemoryUsed) ? Number(MemoryUsed) : undefined;
     const blobStorage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
     const tabletStorage = isNumeric(Metrics.Storage) ? Number(Metrics.Storage) : undefined;
 
-    // We use system pool usage and user pool usage to calculate cpu usage because
-    // only these pools directly indicate resources available to perform user queries
-    const cpuUsage =
-        isNumeric(systemPoolUsage) || isNumeric(userPoolUsage)
-            ? Math.max(Number(systemPoolUsage), Number(userPoolUsage)) * 100
-            : undefined;
+    const cpuUsage = calculateCpuUsage(PoolStats);
+
     const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
     const blobStorageLimit = isNumeric(StorageAllocatedLimit)
         ? Number(StorageAllocatedLimit)
