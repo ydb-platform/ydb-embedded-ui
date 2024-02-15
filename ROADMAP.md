@@ -17,6 +17,7 @@ We use the following symbols as abbreviations:
 1. 🔥 ㉔ **Basic built-in charts** – support for charts display for most popular signals: resource consumption, requests and latency
 1. 🔥 ㉔ **Display Table Hot Keys** – on a tab **Hot Keys** for a [column-oriented](https://ydb.tech/docs/en/concepts/datamodel/table#olap-data-types) and [row-oriented table](https://ydb.tech/docs/en/concepts/datamodel/table#row-orineted_table) display Hot Keys based on query statistics
 1. ㉔ **Network diagnostics** – display signals about cluster network performance and help to discover reasons for potential problems
+1. ㉕ **Tablets Tab** – improved list of tablets in database and cluster with filters and search
 
 ## Cluster Administration
 
@@ -24,6 +25,8 @@ We use the following symbols as abbreviations:
 1. ㉔ **PDisk restart** – easy way to restart PDisk with one click from its page
 1. ㉔ **Display Configuration** – easy way to find out the value of any configuration paramater for a cluster or database
 1. ㉕ **Edit Configuration** – change the value of any configuration paramater for a cluster or database
+1. ㉕ **Storage Nodes with more than 100+ devices** – support storage nodes with multiple storage devices
+1. ㉕ **Easy Cluster Initial Setup** – add support for semiautomatic cluster bootstrap via wizard-like UI
 
 ## Query and Schema Development
 
@@ -32,6 +35,7 @@ We use the following symbols as abbreviations:
 1. ㉔ **Support Asyncronous Replication** – basic support for new feature – cluster-to-cluster asyncrounous replication
 1. ㉔ **Display Keys and Column Families** – add wider schema tab in Diagnostics mode with information about column families, primary and partitioning keys.
 1. ㉔ **Enhance Column Tables support** – display all parameters from `CREATE TABLE` statement on info Tab, add create/alter queries templates
+1. ㉕ **Query Plan Improvements** – add textual representation of the query execution plan and display physical path of the query
 1. ✅ ㉓ **Support YDB Topics** (add support for viewing metadata of YDB topics, its data, lag, etc)
 1. ✅ ㉓ **Support CDC Streams**
 1. ✅ ㉓ **Support Secondary Indexes**
