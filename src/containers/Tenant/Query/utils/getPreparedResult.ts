@@ -1,6 +1,6 @@
 import type {KeyValueRow} from '../../../../types/api/query';
 
-export const getPreparedResult = (data: KeyValueRow[] | undefined) => {
+export function getPreparedResult(data: KeyValueRow[] | undefined) {
     const columnDivider = '\t';
     const rowDivider = '\n';
 
@@ -9,21 +9,22 @@ export const getPreparedResult = (data: KeyValueRow[] | undefined) => {
     }
 
     const columnHeaders = Object.keys(data[0]);
-    const rows = Array<string[] | KeyValueRow[]>(columnHeaders).concat(data);
+    const rows = [columnHeaders.map(escapeValue).join(columnDivider)];
+    for (const row of data) {
+        const value = [];
+        for (const column of columnHeaders) {
+            const v = row[column];
+            value.push(escapeValue(typeof v === 'object' ? JSON.stringify(v) : `${v}`));
+        }
+        rows.push(value.join(columnDivider));
+    }
+    return rows.join(rowDivider);
+}
 
-    return rows
-        .map((item) => {
-            const row = [];
-
-            for (const field in item) {
-                if (typeof item[field] === 'object' || Array.isArray(item[field])) {
-                    row.push(JSON.stringify(item[field]));
-                } else {
-                    row.push(item[field]);
-                }
-            }
-
-            return row.join(columnDivider);
-        })
-        .join(rowDivider);
-};
+function escapeValue(value: string) {
+    return value
+        .replaceAll('\\', '\\\\')
+        .replaceAll('\n', '\\n')
+        .replaceAll('\r', '\\r')
+        .replaceAll('\t', '\\t');
+}
