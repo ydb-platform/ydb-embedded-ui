@@ -15,6 +15,9 @@ const currentLang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, defaultL
 
 const i18n = new I18N();
 
+// Enable keysets with only en lang
+i18n.fallbackLang = Lang.En;
+
 i18n.setLang(currentLang);
 configureYdbUiComponents({lang: currentLang});
 configureUiKit({lang: currentLang});
