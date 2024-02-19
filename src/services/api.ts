@@ -34,6 +34,7 @@ import type {QuerySyntax} from '../types/store/query';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
 import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 import type {MetaCluster, MetaClusters, MetaTenants} from '../types/api/meta';
+import type {JsonHotKeysResponse} from '../types/api/hotkeys';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
 import {prepareSortValue} from '../utils/filters';
@@ -346,11 +347,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {},
         );
     }
-    getHotKeys(path: string, enableSampling: boolean) {
-        return this.get(this.getPath('/viewer/json/hotkeys'), {
-            path,
-            enable_sampling: enableSampling,
-        });
+    getHotKeys(path: string, enableSampling: boolean, {concurrentId}: AxiosOptions = {}) {
+        return this.get<JsonHotKeysResponse>(
+            this.getPath('/viewer/json/hotkeys'),
+            {
+                path,
+                enable_sampling: enableSampling,
+            },
+            {concurrentId: concurrentId || 'getHotKeys'},
+        );
     }
     getHealthcheckInfo(database: string, {concurrentId}: AxiosOptions = {}) {
         return this.get<HealthCheckAPIResponse>(

@@ -25,7 +25,7 @@ import {StorageWrapper} from '../../Storage/StorageWrapper';
 import {Tablets} from '../../Tablets';
 
 import Describe from './Describe/Describe';
-import HotKeys from './HotKeys/HotKeys';
+import {HotKeys} from './HotKeys/HotKeys';
 import Network from './Network/Network';
 import {Partitions} from './Partitions/Partitions';
 import {Consumers} from './Consumers';
@@ -145,7 +145,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Describe tenant={tenantNameString} type={type} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.hotKeys: {
-                return <HotKeys type={type} />;
+                return <HotKeys path={currentSchemaPath} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.graph: {
                 return <Heatmap path={currentSchemaPath} />;
