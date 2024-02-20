@@ -9,6 +9,7 @@ import {
     TruncatedQuery,
     OneLineQueryWithPopover,
 } from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {formatDurationToShortTimeFormat, parseUsToMs} from '../../../../utils/timeParsers';
 import {MAX_QUERY_HEIGHT} from '../../utils/constants';
 
 import './TopQueries.scss';
@@ -90,7 +91,7 @@ const queryHashColumn: Column<KeyValueRow> = {
 const durationColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.Duration,
     header: 'Duration, ms',
-    render: ({row}) => formatNumber(row.Duration),
+    render: ({row}) => formatDurationToShortTimeFormat(parseUsToMs(row.Duration ?? undefined)),
     sortAccessor: (row) => Number(row.Duration),
     align: DataTable.RIGHT,
 };
