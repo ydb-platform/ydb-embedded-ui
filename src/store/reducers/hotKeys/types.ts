@@ -1,7 +1,11 @@
 import type {IResponseError} from '../../../types/api/error';
-import type {HotKey, JsonHotKeysResponse} from '../../../types/api/hotkeys';
-import type {ApiRequestAction} from '../../utils';
-import {FETCH_HOT_KEYS, setHotKeysState} from './hotKeys';
+import type {HotKey} from '../../../types/api/hotkeys';
+import type {
+    setHotKeysData,
+    setHotKeysDataWasNotLoaded,
+    setHotKeysError,
+    setHotKeysLoading,
+} from './hotKeys';
 
 export interface HotKeysState {
     loading: boolean;
@@ -11,5 +15,7 @@ export interface HotKeysState {
 }
 
 export type HotKeysAction =
-    | ApiRequestAction<typeof FETCH_HOT_KEYS, JsonHotKeysResponse, IResponseError>
-    | ReturnType<typeof setHotKeysState>;
+    | ReturnType<typeof setHotKeysDataWasNotLoaded>
+    | ReturnType<typeof setHotKeysLoading>
+    | ReturnType<typeof setHotKeysData>
+    | ReturnType<typeof setHotKeysError>;

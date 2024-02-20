@@ -1,9 +1,13 @@
 import type {Reducer} from 'redux';
-import {createRequestActionTypes, createApiRequest} from '../../utils';
+
+import type {JsonHotKeysResponse} from '../../../types/api/hotkeys';
+import type {IResponseError} from '../../../types/api/error';
+
+import {createRequestActionTypes} from '../../utils';
 import type {HotKeysAction, HotKeysState} from './types';
 
 export const FETCH_HOT_KEYS = createRequestActionTypes('hot_keys', 'FETCH_HOT_KEYS');
-const SET_HOT_KEYS_OPTIONS = 'hot_keys/SET_HOT_KEYS_OPTIONS';
+const SET_DATA_WAS_NOT_LOADED = 'hot_keys/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {loading: true, wasLoaded: false, data: null};
 
@@ -25,33 +29,47 @@ const hotKeys: Reducer<HotKeysState, HotKeysAction> = (state = initialState, act
             };
         }
         case FETCH_HOT_KEYS.FAILURE: {
+            if (action.error?.isCancelled) {
+                return state;
+            }
+
             return {
                 ...state,
                 error: action.error,
                 loading: false,
             };
         }
-        case SET_HOT_KEYS_OPTIONS:
+        case SET_DATA_WAS_NOT_LOADED: {
             return {
                 ...state,
-                ...action.data,
+                wasLoaded: false,
             };
+        }
         default:
             return state;
     }
 };
 
-export function getHotKeys(currentSchemaPath: string, enableSampling: boolean) {
-    return createApiRequest({
-        request: window.api.getHotKeys(currentSchemaPath, enableSampling),
-        actions: FETCH_HOT_KEYS,
-    });
-}
-
-export function setHotKeysState(newState: HotKeysState) {
+export function setHotKeysDataWasNotLoaded() {
     return {
-        type: SET_HOT_KEYS_OPTIONS,
-        data: newState,
+        type: SET_DATA_WAS_NOT_LOADED,
+    } as const;
+}
+export function setHotKeysLoading() {
+    return {
+        type: FETCH_HOT_KEYS.REQUEST,
+    } as const;
+}
+export function setHotKeysData(data: JsonHotKeysResponse) {
+    return {
+        type: FETCH_HOT_KEYS.SUCCESS,
+        data: data,
+    } as const;
+}
+export function setHotKeysError(error: IResponseError) {
+    return {
+        type: FETCH_HOT_KEYS.FAILURE,
+        error: error,
     } as const;
 }
 
