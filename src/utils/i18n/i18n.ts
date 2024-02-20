@@ -1,5 +1,7 @@
 import {I18N} from '@gravity-ui/i18n';
 import {configure as configureUiKit} from '@gravity-ui/uikit';
+import {configure as configureUiKitComponents} from '@gravity-ui/components';
+import {configure as configureUiKitNavigation} from '@gravity-ui/navigation';
 import {configure as configureYdbUiComponents} from 'ydb-ui-components';
 
 import {LANGUAGE_KEY} from '../constants';
@@ -21,5 +23,7 @@ i18n.fallbackLang = Lang.En;
 i18n.setLang(currentLang);
 configureYdbUiComponents({lang: currentLang});
 configureUiKit({lang: currentLang});
+configureUiKitComponents({lang: currentLang});
+configureUiKitNavigation({lang: currentLang});
 
 export {i18n, Lang, currentLang, defaultLang};
