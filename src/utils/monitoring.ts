@@ -72,9 +72,7 @@ export function parseMonitoringData(monitoring: string): ParsedMonitoringData | 
         if (typeof data === 'object' && 'monitoring_url' in data) {
             return data;
         }
-    } catch (error) {
-        console.log(error);
-    }
+    } catch {}
 
     return undefined;
 }
