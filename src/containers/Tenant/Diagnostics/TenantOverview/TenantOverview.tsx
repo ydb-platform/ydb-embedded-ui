@@ -79,19 +79,19 @@ export function TenantOverview({
     const {
         cpu,
         blobStorage,
-        tableStorage,
+        tabletStorage,
         memory,
         cpuUsage,
         blobStorageLimit,
-        tableStorageLimit,
+        tabletStorageLimit,
         memoryLimit,
     } = calculateTenantMetrics(tenant);
 
     // If there is table storage limit (data_size_hard_quota),
     // use it for metric card instead of blob storage
-    const isTableStorageLimitSet = tableStorageLimit && tableStorageLimit > 0;
-    const storageUsed = isTableStorageLimitSet ? tableStorage : blobStorage;
-    const storageLimit = isTableStorageLimitSet ? tableStorageLimit : blobStorageLimit;
+    const isTabletStorageLimitSet = tabletStorageLimit && tabletStorageLimit > 0;
+    const storageUsed = isTabletStorageLimitSet ? tabletStorage : blobStorage;
+    const storageLimit = isTabletStorageLimitSet ? tabletStorageLimit : blobStorageLimit;
 
     const calculatedMetrics: TenantMetrics = {
         memoryUsed: memory,
@@ -105,8 +105,8 @@ export function TenantOverview({
     const storageMetrics = {
         blobStorageUsed: blobStorage,
         blobStorageLimit,
-        tableStorageUsed: tableStorage,
-        tableStorageLimit,
+        tabletStorageUsed: tabletStorage,
+        tabletStorageLimit,
     };
 
     const renderName = () => {

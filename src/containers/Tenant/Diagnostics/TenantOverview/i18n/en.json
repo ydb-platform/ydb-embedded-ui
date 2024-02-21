@@ -3,10 +3,6 @@
   "no-pools-data": "No pools data",
 
   "top-nodes.empty-data": "No such nodes",
-
-  "title.pools": "Pools",
-  "title.metrics": "Metrics",
-
   "top-groups.empty-data": "No such groups",
 
   "top": "Top",
@@ -28,6 +24,11 @@
   "charts.queries-per-second": "Queries per second",
   "charts.transaction-latency": "Transactions latencies {{percentile}}",
   "charts.cpu-usage": "CPU usage",
-  "charts.storage-usage": "Storage usage",
-  "charts.memory-usage": "Memory usage"
+  "charts.storage-usage": "Tablet storage usage",
+  "charts.memory-usage": "Memory usage",
+
+  "storage.tablet-storage-title": "Tablet storage",
+  "storage.tablet-storage-description": "Size of user data and indexes stored in schema objects (tables, topics, etc.)",
+  "storage.db-storage-title": "Database storage",
+  "storage.db-storage-description": "Size of data stored in distributed storage with all overheads for redundancy"
 }

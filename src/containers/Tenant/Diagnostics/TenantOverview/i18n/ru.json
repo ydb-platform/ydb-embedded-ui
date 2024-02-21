@@ -3,10 +3,6 @@
   "no-pools-data": "Нет данных о пулах",
 
   "top-nodes.empty-data": "Нет узлов",
-
-  "title.pools": "Пулы",
-  "title.metrics": "Метрики",
-
   "top-groups.empty-data": "Нет групп",
 
   "top": "Топ",
@@ -28,6 +24,5 @@
   "charts.queries-per-second": "Количество запросов в секунду",
   "charts.transaction-latency": "Задержка транзакций {{percentile}}",
   "charts.cpu-usage": "Использование CPU",
-  "charts.storage-usage": "Использование хранилища",
   "charts.memory-usage": "Использование памяти"
 }
