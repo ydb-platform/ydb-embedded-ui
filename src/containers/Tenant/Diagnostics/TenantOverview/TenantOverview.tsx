@@ -88,7 +88,9 @@ export function TenantOverview({
     } = calculateTenantMetrics(tenant);
 
     // If there is table storage limit (data_size_hard_quota),
-    // use it for metric card instead of blob storage
+    // use it for metric card instead of blob storage limit
+    // When datasize exceeds or equals to quota
+    // all write operations to the database are finished with error
     const isTabletStorageLimitSet = tabletStorageLimit && tabletStorageLimit > 0;
     const storageUsed = isTabletStorageLimitSet ? tabletStorage : blobStorage;
     const storageLimit = isTabletStorageLimitSet ? tabletStorageLimit : blobStorageLimit;
