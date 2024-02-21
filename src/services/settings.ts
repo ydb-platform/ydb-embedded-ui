@@ -20,8 +20,6 @@ import {parseJson} from '../utils/utils';
 
 export type SettingsObject = Record<string, unknown>;
 
-const USE_LOCAL_STORAGE_FOR_SETTINGS_KEY = 'useLocalStorageForSettings';
-
 /** User settings keys and their default values */
 export const DEFAULT_USER_SETTINGS: SettingsObject = {
     [THEME_KEY]: 'system',
@@ -40,25 +38,6 @@ export const DEFAULT_USER_SETTINGS: SettingsObject = {
 };
 
 class SettingsManager {
-    constructor() {
-        // Migrate settings to LS if external API was used before
-        const settingsApi = window.web_version ? window.systemSettings?.settingsApi : undefined;
-
-        const useLocalStorage = this.readUserSettingsValue(USE_LOCAL_STORAGE_FOR_SETTINGS_KEY);
-
-        if (settingsApi && !useLocalStorage) {
-            const externalUserSettings = window.userSettings;
-
-            if (externalUserSettings) {
-                Object.entries(externalUserSettings).forEach(([key, value]) =>
-                    this.setUserSettingsValue(key, value),
-                );
-            }
-
-            this.setUserSettingsValue(USE_LOCAL_STORAGE_FOR_SETTINGS_KEY, true);
-        }
-    }
-
     /**
      * Returns parsed settings value.
      * If value cannot be parsed, returns initially stored string.
