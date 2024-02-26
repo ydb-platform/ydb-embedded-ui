@@ -24,7 +24,7 @@ const saved = {
     title: i18n('tabs.saved'),
 };
 
-const queryEditorTabs = [newQuery, history, saved];
+export const queryEditorTabs = [newQuery, history, saved];
 
 interface QueryEditorTabsProps {
     className?: string;

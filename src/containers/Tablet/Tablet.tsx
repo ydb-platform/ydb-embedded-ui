@@ -3,6 +3,7 @@ import {useLocation, useParams} from 'react-router';
 import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {Link as ExternalLink} from '@gravity-ui/uikit';
+import {Helmet} from 'react-helmet-async';
 
 import {backend} from '../../store';
 import {getTablet, getTabletDescribe, clearTabletData} from '../../store/reducers/tablet';
@@ -52,6 +53,7 @@ export const Tablet = () => {
         nodeId: queryNodeId,
         tenantName: queryTenantName,
         type: queryTabletType,
+        clusterName: queryClusterName,
     } = parseQuery(location);
     const nodeId = tablet.NodeId?.toString() || queryNodeId?.toString();
     const tenantName = tenantPath || queryTenantName?.toString();
@@ -98,57 +100,69 @@ export const Tablet = () => {
         );
     };
 
-    if (loading && id !== tabletId && isFirstDataFetchRef.current) {
-        return <Loader size="l" />;
-    }
+    const renderView = () => {
+        if (loading && id !== tabletId && isFirstDataFetchRef.current) {
+            return <Loader size="l" />;
+        }
 
-    if (error) {
-        return <ResponseError error={error} />;
-    }
+        if (error) {
+            return <ResponseError error={error} />;
+        }
 
-    if (!tablet || !Object.keys(tablet).length) {
+        if (!tablet || !Object.keys(tablet).length) {
+            return (
+                <div className={b('placeholder')}>
+                    <EmptyState title={i18n('emptyState')} />
+                </div>
+            );
+        }
+
+        const {TabletId, Overall, Leader} = tablet;
+
+        const externalLinks = [
+            {
+                name: `${DEVELOPER_UI_TITLE} - tablet`,
+                path: `/tablets?TabletID=${TabletId}`,
+            },
+        ];
+
         return (
-            <div className={b('placeholder')}>
-                <EmptyState title={i18n('emptyState')} />
+            <div className={b()}>
+                <div className={b('pane-wrapper')}>
+                    <div className={b('left-pane')}>
+                        <ul className={b('links')}>{externalLinks.map(renderExternalLinks)}</ul>
+                        <div className={b('row', {header: true})}>
+                            <span className={b('title')}>{i18n('tablet.header')}</span>
+                            <EntityStatus status={Overall} name={TabletId} />
+                            <a
+                                rel="noopener noreferrer"
+                                className={b('link', {external: true})}
+                                href={`${backend}/tablets?TabletID=${TabletId}`}
+                                target="_blank"
+                            >
+                                <Icon name="external" />
+                            </a>
+                            {Leader && <Tag text="Leader" type="blue" />}
+                            <span className={b('loader')}>{loading && <Loader size="s" />}</span>
+                        </div>
+                        <TabletInfo tablet={tablet} tenantPath={tenantName} />
+                        <TabletControls tablet={tablet} fetchData={fetchData} />
+                    </div>
+                    <div className={b('rigth-pane')}>
+                        <TabletTable history={history} />
+                    </div>
+                </div>
             </div>
         );
-    }
-
-    const {TabletId, Overall, Leader} = tablet;
-
-    const externalLinks = [
-        {
-            name: `${DEVELOPER_UI_TITLE} - tablet`,
-            path: `/tablets?TabletID=${TabletId}`,
-        },
-    ];
-
+    };
     return (
-        <div className={b()}>
-            <div className={b('pane-wrapper')}>
-                <div className={b('left-pane')}>
-                    <ul className={b('links')}>{externalLinks.map(renderExternalLinks)}</ul>
-                    <div className={b('row', {header: true})}>
-                        <span className={b('title')}>{i18n('tablet.header')}</span>
-                        <EntityStatus status={Overall} name={TabletId} />
-                        <a
-                            rel="noopener noreferrer"
-                            className={b('link', {external: true})}
-                            href={`${backend}/tablets?TabletID=${TabletId}`}
-                            target="_blank"
-                        >
-                            <Icon name="external" />
-                        </a>
-                        {Leader && <Tag text="Leader" type="blue" />}
-                        <span className={b('loader')}>{loading && <Loader size="s" />}</span>
-                    </div>
-                    <TabletInfo tablet={tablet} tenantPath={tenantName} />
-                    <TabletControls tablet={tablet} fetchData={fetchData} />
-                </div>
-                <div className={b('rigth-pane')}>
-                    <TabletTable history={history} />
-                </div>
-            </div>
-        </div>
+        <>
+            <Helmet>
+                <title>{`${id} - ${
+                    tenantName || queryClusterName || i18n('tablet.header')
+                }`}</title>
+            </Helmet>
+            {renderView()}
+        </>
     );
 };

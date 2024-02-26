@@ -1,11 +1,12 @@
 import {useCallback, useMemo} from 'react';
 import {useDispatch} from 'react-redux';
+import {Helmet} from 'react-helmet-async';
 
 import DataTable from '@gravity-ui/react-data-table';
-
 import {TableColumnSetup, Select} from '@gravity-ui/uikit';
 
 import {Search} from '../../components/Search';
+import {Loader} from '../../components/Loader';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutofetcher} from '../../utils/hooks';
 
@@ -35,10 +36,9 @@ import {ClustersStatistics} from './ClustersStatistics';
 import {CLUSTERS_COLUMNS} from './columns';
 import {useSelectedColumns} from './useSelectedColumns';
 import {b} from './shared';
+import i18n from './i18n';
 
 import './Clusters.scss';
-import {Loader} from '../../components/Loader';
-import i18n from './i18n';
 
 export function Clusters() {
     const dispatch = useDispatch();
@@ -103,6 +103,10 @@ export function Clusters() {
 
     return (
         <div className={b()}>
+            <Helmet>
+                <title>{i18n('page_title')}</title>
+            </Helmet>
+
             <ClustersStatistics stats={aggregation} count={filteredClusters.length} />
             <div className={b('controls')}>
                 <div className={b('control', {wide: true})}>

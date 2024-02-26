@@ -2,6 +2,7 @@ import {useEffect, useMemo, useRef} from 'react';
 import {useLocation, useRouteMatch} from 'react-router';
 import cn from 'bem-cn-lite';
 import {useDispatch} from 'react-redux';
+import {Helmet} from 'react-helmet-async';
 
 import {Tabs} from '@gravity-ui/uikit';
 import {Link} from 'react-router-dom';
@@ -52,10 +53,6 @@ function Node(props: NodeProps) {
     const {activeTabVerified, nodeTabs} = useMemo(() => {
         const hasStorage = node?.Roles?.find((el) => el === STORAGE_ROLE);
 
-        let actualActiveTab = activeTab;
-        if (!hasStorage && activeTab === STORAGE) {
-            actualActiveTab = OVERVIEW;
-        }
         const nodePages = hasStorage ? NODE_PAGES : NODE_PAGES.filter((el) => el.id !== STORAGE);
 
         const actualNodeTabs = nodePages.map((page) => {
@@ -64,6 +61,11 @@ function Node(props: NodeProps) {
                 title: page.name,
             };
         });
+
+        let actualActiveTab = actualNodeTabs.find(({id}) => id === activeTab);
+        if (!actualActiveTab) {
+            actualActiveTab = actualNodeTabs[0];
+        }
 
         return {activeTabVerified: actualActiveTab, nodeTabs: actualNodeTabs};
     }, [activeTab, node]);
@@ -97,7 +99,7 @@ function Node(props: NodeProps) {
                 <Tabs
                     size="l"
                     items={nodeTabs}
-                    activeTab={activeTabVerified}
+                    activeTab={activeTabVerified.id}
                     wrapTo={({id}, tabNode) => (
                         <Link
                             to={createHref(routes.node, {id: nodeId, activeTab: id})}
@@ -113,7 +115,7 @@ function Node(props: NodeProps) {
         );
     };
     const renderTabContent = () => {
-        switch (activeTab) {
+        switch (activeTabVerified.id) {
             case STORAGE: {
                 return (
                     <div className={b('storage')}>
@@ -145,6 +147,13 @@ function Node(props: NodeProps) {
         if (node) {
             return (
                 <div className={b(null, props.className)} ref={container}>
+                    <Helmet
+                        titleTemplate={`${node.Host} - %s - YDB Monitoring`}
+                        defaultTitle={`${node.Host} - YDB Monitoring`}
+                    >
+                        <title>{activeTabVerified.title}</title>
+                    </Helmet>
+
                     <BasicNodeViewer
                         node={node}
                         additionalNodesProps={props.additionalNodesProps}

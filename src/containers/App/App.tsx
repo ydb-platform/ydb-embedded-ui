@@ -1,5 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import {Helmet} from 'react-helmet-async';
 
 import ContentWrapper, {Content} from './Content';
 import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
@@ -30,6 +31,7 @@ export interface AppProps {
 function App({store, history, singleClusterMode, children, userSettings = settings}: AppProps) {
     return (
         <Providers store={store} history={history}>
+            <Helmet defaultTitle="YDB Monitoring" titleTemplate="%s - YDB Monitoring" />
             <ContentWrapper>
                 <Navigation userSettings={userSettings}>
                     <ErrorBoundary>

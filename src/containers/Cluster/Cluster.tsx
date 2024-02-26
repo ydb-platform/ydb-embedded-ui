@@ -1,6 +1,7 @@
 import {useEffect, useMemo, useRef} from 'react';
 import {Redirect, Switch, Route, useLocation, useRouteMatch} from 'react-router';
 import {useDispatch} from 'react-redux';
+import {Helmet} from 'react-helmet-async';
 import cn from 'bem-cn-lite';
 import qs from 'qs';
 
@@ -52,7 +53,7 @@ function Cluster({
 
     const dispatch = useDispatch();
 
-    const activeTab = useClusterTab();
+    const activeTabId = useClusterTab();
 
     const location = useLocation();
     const queryParams = qs.parse(location.search, {
@@ -117,14 +118,23 @@ function Cluster({
         );
     };
 
+    const clusterTitle = cluster?.Name ?? clusterName ?? CLUSTER_DEFAULT_TITLE;
+    const activeTab = useMemo(() => clusterTabs.find(({id}) => id === activeTabId), [activeTabId]);
+
     return (
         <div className={b()} ref={container}>
+            <Helmet
+                defaultTitle={`${clusterTitle} - YDB Monitoring`}
+                titleTemplate={`${clusterTitle} - %s - YDB Monitoring`}
+            >
+                {activeTab ? <title>{activeTab.title}</title> : null}
+            </Helmet>
             <div className={b('header')}>{getClusterTitle()}</div>
             <div className={b('tabs')}>
                 <Tabs
                     size="l"
                     allowNotSelected={true}
-                    activeTab={activeTab}
+                    activeTab={activeTabId}
                     items={clusterTabs}
                     wrapTo={({id}, node) => {
                         const path = getClusterPath(id as ClusterTab, queryParams);
@@ -197,7 +207,7 @@ function Cluster({
                     >
                         <Versions versionToColor={versionToColor} />
                     </Route>
-                    <Redirect to={getLocationObjectFromHref(getClusterPath(activeTab))} />
+                    <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
                 </Switch>
             </div>
         </div>

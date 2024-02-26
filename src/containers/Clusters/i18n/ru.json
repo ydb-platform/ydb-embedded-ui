@@ -13,5 +13,7 @@
   "statistics_load": "Нагрузка",
   "statistics_storage": "Хранилище",
 
-  "tooltip_no-cluster-data": "Нет данных кластера"
+  "tooltip_no-cluster-data": "Нет данных кластера",
+
+  "page_title": "Кластеры"
 }

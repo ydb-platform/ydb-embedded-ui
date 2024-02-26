@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
-import qs from 'qs';
 import _ from 'lodash';
+import {Helmet} from 'react-helmet-async';
 
 import {Loader, Select} from '@gravity-ui/uikit';
 import ReactList from 'react-list';
@@ -21,6 +21,9 @@ import {
     getFilteredTablets,
     getTablets,
 } from '../../store/reducers/tabletsFilters';
+import {parseQuery} from '../../routes';
+import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
+import i18n from './i18n';
 
 import './TabletsFilters.scss';
 
@@ -69,6 +72,7 @@ export class TabletsFilters extends React.Component {
     state = {
         nodeFilter: [],
         tenantPath: '',
+        clusterName: '',
     };
 
     reloadDescriptor = -1;
@@ -76,10 +80,8 @@ export class TabletsFilters extends React.Component {
     componentDidMount() {
         const {setStateFilter, setTypeFilter, setHeaderBreadcrumbs} = this.props;
 
-        const queryParams = qs.parse(this.props.location.search, {
-            ignoreQueryPrefix: true,
-        });
-        const {nodeIds, type, path, state} = queryParams;
+        const queryParams = parseQuery(this.props.location);
+        const {nodeIds, type, path, state, clusterName} = queryParams;
         const nodes = TabletsFilters.parseNodes(nodeIds);
 
         if (state) {
@@ -91,7 +93,7 @@ export class TabletsFilters extends React.Component {
             setTypeFilter([type]);
         }
 
-        this.setState({nodeFilter: nodes, tenantPath: path}, () => {
+        this.setState({nodeFilter: nodes, tenantPath: path, clusterName}, () => {
             this.makeRequest();
         });
 
@@ -216,7 +218,7 @@ export class TabletsFilters extends React.Component {
         );
     };
 
-    render() {
+    renderView = () => {
         const {loading, wasLoaded, error} = this.props;
 
         if (loading && !wasLoaded) {
@@ -230,6 +232,21 @@ export class TabletsFilters extends React.Component {
         } else {
             return this.renderContent();
         }
+    };
+
+    render() {
+        const {tenantPath, clusterName} = this.state;
+
+        return (
+            <>
+                <Helmet>
+                    <title>{`${tenantPath || clusterName || CLUSTER_DEFAULT_TITLE} - ${i18n(
+                        'page.title',
+                    )}`}</title>
+                </Helmet>
+                {this.renderView()}
+            </>
+        );
     }
 }
 

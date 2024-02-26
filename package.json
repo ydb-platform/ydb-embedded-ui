@@ -32,6 +32,7 @@
     "qs": "^6.11.0",
     "react-error-boundary": "^4.0.12",
     "react-json-inspector": "^7.1.1",
+    "react-helmet-async": "2.0.4",
     "react-list": "^0.8.11",
     "react-monaco-editor": "^0.47.0",
     "react-redux": "^7.2.6",
