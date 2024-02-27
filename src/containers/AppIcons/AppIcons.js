@@ -275,19 +275,19 @@ const AppIcons = () => (
                     fillRule="evenodd"
                     clipRule="evenodd"
                     d="M0.253448 19.0301L10.7294 0.712125C11.2724 -0.237375 12.7304 -0.237375 13.2719 0.712125L23.7479 19.0301C24.2609 19.9256 23.5649 21.0071 22.4774 21.0071H1.52545C0.436448 21.0071 -0.258052 19.9256 0.253448 19.0301Z"
-                    fill="var(--yc-color-base-warning-heavy)"
+                    fill="var(--g-color-base-warning-heavy)"
                 />
                 <path
                     fillRule="evenodd"
                     clipRule="evenodd"
                     d="M13.5 13.0074C13.5 13.2836 13.2761 13.5074 13 13.5074H11C10.7239 13.5074 10.5 13.2836 10.5 13.0074V7.39844C10.5 7.1223 10.7239 6.89844 11 6.89844H13C13.2761 6.89844 13.5 7.1223 13.5 7.39844V13.0074Z"
-                    fill="var(--yc-color-text-complementary)"
+                    fill="var(--g-color-text-complementary)"
                 />
                 <path
                     fillRule="evenodd"
                     clipRule="evenodd"
                     d="M13.5 17.548C13.5 17.8241 13.2761 18.048 13 18.048H11C10.7239 18.048 10.5 17.8241 10.5 17.548V15.8555C10.5 15.5793 10.7239 15.3555 11 15.3555H13C13.2761 15.3555 13.5 15.5793 13.5 15.8555V17.548Z"
-                    fill="var(--yc-color-text-complementary)"
+                    fill="var(--g-color-text-complementary)"
                 />
             </g>
             <g

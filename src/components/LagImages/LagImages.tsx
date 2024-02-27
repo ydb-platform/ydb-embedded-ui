@@ -32,7 +32,7 @@ const ArrowLine = ({width}: ArrowLineProps) => (
 );
 
 const WriteLag = () => (
-    <g fill="var(--yc-color-text-primary)" fontSize="12">
+    <g fill="var(--g-color-text-primary)" fontSize="12">
         <g transform={`translate(0, ${HEIGHT / 2})`} stroke={WRITE_FILL}>
             <ArrowLine width={STICK_SPACE * 2.9} />
         </g>
@@ -85,7 +85,7 @@ const WriteLag = () => (
 );
 
 const ReadLag = () => (
-    <g fill="var(--yc-color-text-primary)" fontSize="12">
+    <g fill="var(--g-color-text-primary)" fontSize="12">
         <g transform={`translate(0, ${HEIGHT / 2})`} stroke={READ_FILL}>
             <ArrowLine width={WIDTH} />
         </g>

@@ -25,7 +25,7 @@ export const COLORS = [
     '#b22222', // firebrick
 ];
 
-export const GRAY_COLOR = '#bfbfbf'; // --yc-color-base-neutral-hover
+export const GRAY_COLOR = '#bfbfbf';
 
 export const getVersionsMap = (versions: string[], initialMap: VersionsMap = new Map()) => {
     versions.forEach((version) => {

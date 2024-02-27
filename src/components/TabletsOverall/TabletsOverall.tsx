@@ -12,12 +12,12 @@ import './TabletsOverall.scss';
 const minOverallPercentValue = 3;
 
 const colors = {
-    grey: 'var(--yc-color-base-misc-heavy)',
-    green: 'var(--yc-color-base-positive-heavy)',
-    yellow: ' var(--yc-color-base-warning-heavy)',
-    orange: 'var( --yc-color-base-warning-orange)',
-    red: 'var(--yc-color-base-danger-heavy)',
-    blue: 'var(--yc-color-base-info-heavy)',
+    grey: 'var(--ydb-color-status-grey)',
+    green: 'var(--ydb-color-status-green)',
+    yellow: ' var(--ydb-color-status-yellow)',
+    orange: 'var(--ydb-color-status-orange)',
+    red: 'var(--ydb-color-status-red)',
+    blue: 'var(--ydb-color-status-blue)',
 };
 
 const b = cn('kv-tablets-overall');
