@@ -1,7 +1,7 @@
 import InfoViewer from '../../../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
+import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
-import {getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 
@@ -11,12 +11,13 @@ import {storageDashboardConfig} from './storageDashboardConfig';
 import {TopTables} from './TopTables';
 import {TopGroups} from './TopGroups';
 import {b} from '../utils';
+import i18n from '../i18n';
 
 export interface TenantStorageMetrics {
     blobStorageUsed?: number;
     blobStorageLimit?: number;
-    tableStorageUsed?: number;
-    tableStorageLimit?: number;
+    tabletStorageUsed?: number;
+    tabletStorageLimit?: number;
 }
 
 interface TenantStorageProps {
@@ -25,21 +26,21 @@ interface TenantStorageProps {
 }
 
 export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
-    const {blobStorageUsed, tableStorageUsed, blobStorageLimit, tableStorageLimit} = metrics;
-    const formatValues = (value?: number, total?: number) => {
-        const size = getSizeWithSignificantDigits(Number(blobStorageLimit || blobStorageUsed), 0);
-
-        return formatStorageValues(value, total, size);
-    };
+    const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
 
     const info = [
         {
-            label: 'Database storage',
+            label: (
+                <LabelWithPopover
+                    text={i18n('storage.tablet-storage-title')}
+                    popoverContent={i18n('storage.tablet-storage-description')}
+                />
+            ),
             value: (
                 <ProgressViewer
-                    value={blobStorageUsed}
-                    capacity={blobStorageLimit}
-                    formatValues={formatValues}
+                    value={tabletStorageUsed}
+                    capacity={tabletStorageLimit}
+                    formatValues={formatStorageValues}
                     colorizeProgress={true}
                     warningThreshold={75}
                     dangerThreshold={85}
@@ -47,12 +48,17 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
             ),
         },
         {
-            label: 'Table storage',
+            label: (
+                <LabelWithPopover
+                    text={i18n('storage.db-storage-title')}
+                    popoverContent={i18n('storage.db-storage-description')}
+                />
+            ),
             value: (
                 <ProgressViewer
-                    value={tableStorageUsed}
-                    capacity={tableStorageLimit}
-                    formatValues={formatValues}
+                    value={blobStorageUsed}
+                    capacity={blobStorageLimit}
+                    formatValues={formatStorageValues}
                     colorizeProgress={true}
                     warningThreshold={75}
                     dangerThreshold={85}

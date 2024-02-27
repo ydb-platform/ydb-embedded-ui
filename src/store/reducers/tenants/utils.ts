@@ -39,7 +39,7 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
     const cpu = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
     const memory = isNumeric(MemoryUsed) ? Number(MemoryUsed) : undefined;
     const blobStorage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
-    const tableStorage = isNumeric(Metrics.Storage) ? Number(Metrics.Storage) : undefined;
+    const tabletStorage = isNumeric(Metrics.Storage) ? Number(Metrics.Storage) : undefined;
 
     // We use system pool usage and user pool usage to calculate cpu usage because
     // only these pools directly indicate resources available to perform user queries
@@ -51,7 +51,7 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
     const blobStorageLimit = isNumeric(StorageAllocatedLimit)
         ? Number(StorageAllocatedLimit)
         : undefined;
-    const tableStorageLimit = isNumeric(DatabaseQuotas.data_size_hard_quota)
+    const tabletStorageLimit = isNumeric(DatabaseQuotas.data_size_hard_quota)
         ? Number(DatabaseQuotas.data_size_hard_quota)
         : undefined;
 
@@ -59,11 +59,11 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
         cpu,
         memory,
         blobStorage,
-        tableStorage,
+        tabletStorage,
         cpuUsage,
         memoryLimit,
         blobStorageLimit,
-        tableStorageLimit,
+        tabletStorageLimit,
     };
 };
 
