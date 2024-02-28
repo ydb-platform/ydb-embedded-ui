@@ -13,5 +13,7 @@
   "statistics_load": "Load",
   "statistics_storage": "Storage",
 
-  "tooltip_no-cluster-data": "No cluster data"
+  "tooltip_no-cluster-data": "No cluster data",
+
+  "page_title": "Clusters"
 }

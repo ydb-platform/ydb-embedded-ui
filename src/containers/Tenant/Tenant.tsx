@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
 import qs from 'qs';
+import {Helmet} from 'react-helmet-async';
 
 import type {TEvDescribeSchemeResult} from '../../types/api/schema';
 import type {AdditionalTenantsProps, AdditionalNodesProps} from '../../types/additionalProps';
@@ -22,6 +23,7 @@ import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
 } from './utils/paneVisibilityToggleHelpers';
+import i18n from './i18n';
 
 import './Tenant.scss';
 
@@ -104,8 +106,13 @@ function Tenant(props: TenantProps) {
 
     const showBlockingError = schemaStatus === 403;
 
+    const title = currentSchemaPath || tenantName || i18n('page.title');
     return (
         <div className={b()}>
+            <Helmet
+                defaultTitle={`${title} — YDB Monitoring`}
+                titleTemplate={`%s — ${title} — YDB Monitoring`}
+            />
             {showBlockingError ? (
                 <AccessDenied />
             ) : (

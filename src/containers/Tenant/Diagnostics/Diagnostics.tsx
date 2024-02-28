@@ -4,6 +4,7 @@ import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {useLocation} from 'react-router';
+import {Helmet} from 'react-helmet-async';
 
 import {Switch, Tabs} from '@gravity-ui/uikit';
 
@@ -80,13 +81,14 @@ function Diagnostics(props: DiagnosticsProps) {
     };
     const activeTab = useMemo(() => {
         if (wasLoaded) {
-            if (pages.find((el) => el.id === diagnosticsTab)) {
-                return diagnosticsTab;
-            } else {
-                const newPage = pages[0].id;
-                forwardToDiagnosticTab(newPage);
-                return newPage;
+            let page = pages.find((el) => el.id === diagnosticsTab);
+            if (!page) {
+                page = pages[0];
             }
+            if (page && page.id !== diagnosticsTab) {
+                forwardToDiagnosticTab(page.id);
+            }
+            return page;
         }
         return undefined;
     }, [pages, diagnosticsTab, wasLoaded]);
@@ -104,7 +106,7 @@ function Diagnostics(props: DiagnosticsProps) {
 
         const tenantNameString = tenantName as string;
 
-        switch (diagnosticsTab) {
+        switch (activeTab?.id) {
             case TENANT_DIAGNOSTICS_TABS_IDS.overview: {
                 return (
                     <DetailedOverview
@@ -168,7 +170,7 @@ function Diagnostics(props: DiagnosticsProps) {
                     <Tabs
                         size="l"
                         items={pages}
-                        activeTab={activeTab as string}
+                        activeTab={activeTab?.id as string}
                         wrapTo={({id}, node) => {
                             const path = createHref(routes.tenant, undefined, {
                                 ...queryParams,
@@ -202,6 +204,11 @@ function Diagnostics(props: DiagnosticsProps) {
 
     return (
         <div className={b()} ref={container}>
+            {activeTab ? (
+                <Helmet>
+                    <title>{activeTab.title}</title>
+                </Helmet>
+            ) : null}
             {renderTabs()}
             <div className={b('page-wrapper')}>{renderTabContent()}</div>
         </div>
