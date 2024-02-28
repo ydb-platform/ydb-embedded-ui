@@ -240,9 +240,9 @@ export class TabletsFilters extends React.Component {
         return (
             <>
                 <Helmet>
-                    <title>{`${tenantPath || clusterName || CLUSTER_DEFAULT_TITLE} - ${i18n(
-                        'page.title',
-                    )}`}</title>
+                    <title>{`${i18n('page.title')} — ${
+                        tenantPath || clusterName || CLUSTER_DEFAULT_TITLE
+                    }`}</title>
                 </Helmet>
                 {this.renderView()}
             </>

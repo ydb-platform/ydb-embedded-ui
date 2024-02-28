@@ -148,8 +148,8 @@ function Node(props: NodeProps) {
             return (
                 <div className={b(null, props.className)} ref={container}>
                     <Helmet
-                        titleTemplate={`${node.Host} - %s - YDB Monitoring`}
-                        defaultTitle={`${node.Host} - YDB Monitoring`}
+                        titleTemplate={`%s — ${node.Host} — YDB Monitoring`}
+                        defaultTitle={`${node.Host} — YDB Monitoring`}
                     >
                         <title>{activeTabVerified.title}</title>
                     </Helmet>

@@ -124,8 +124,8 @@ function Cluster({
     return (
         <div className={b()} ref={container}>
             <Helmet
-                defaultTitle={`${clusterTitle} - YDB Monitoring`}
-                titleTemplate={`${clusterTitle} - %s - YDB Monitoring`}
+                defaultTitle={`${clusterTitle} — YDB Monitoring`}
+                titleTemplate={`%s — ${clusterTitle} — YDB Monitoring`}
             >
                 {activeTab ? <title>{activeTab.title}</title> : null}
             </Helmet>

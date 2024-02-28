@@ -10,7 +10,7 @@ import {getTablet, getTabletDescribe, clearTabletData} from '../../store/reducer
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 
 import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
-import {DEVELOPER_UI_TITLE} from '../../utils/constants';
+import {CLUSTER_DEFAULT_TITLE, DEVELOPER_UI_TITLE} from '../../utils/constants';
 import {parseQuery} from '../../routes';
 
 import type {EType} from '../../types/api/tablet';
@@ -158,8 +158,8 @@ export const Tablet = () => {
     return (
         <>
             <Helmet>
-                <title>{`${id} - ${
-                    tenantName || queryClusterName || i18n('tablet.header')
+                <title>{`${id} — ${i18n('tablet.header')} — ${
+                    tenantName || queryClusterName || CLUSTER_DEFAULT_TITLE
                 }`}</title>
             </Helmet>
             {renderView()}

@@ -110,8 +110,8 @@ function Tenant(props: TenantProps) {
     return (
         <div className={b()}>
             <Helmet
-                defaultTitle={`${title} - YDB Monitoring`}
-                titleTemplate={`${title} - %s - YDB Monitoring`}
+                defaultTitle={`${title} — YDB Monitoring`}
+                titleTemplate={`%s — ${title} — YDB Monitoring`}
             />
             {showBlockingError ? (
                 <AccessDenied />

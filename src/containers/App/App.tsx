@@ -31,7 +31,7 @@ export interface AppProps {
 function App({store, history, singleClusterMode, children, userSettings = settings}: AppProps) {
     return (
         <Providers store={store} history={history}>
-            <Helmet defaultTitle="YDB Monitoring" titleTemplate="%s - YDB Monitoring" />
+            <Helmet defaultTitle="YDB Monitoring" titleTemplate="%s — YDB Monitoring" />
             <ContentWrapper>
                 <Navigation userSettings={userSettings}>
                     <ErrorBoundary>
