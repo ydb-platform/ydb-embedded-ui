@@ -18,6 +18,7 @@ export interface PreparedExplainResponse {
 
 export interface ExplainQueryState {
     loading: boolean;
+    loadingAst?: boolean;
     data?: PreparedExplainResponse['plan'];
     dataAst?: PreparedExplainResponse['ast'];
     error?: string | QueryErrorResponse;

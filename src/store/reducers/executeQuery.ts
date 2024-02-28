@@ -5,7 +5,6 @@ import type {
     ExecuteQueryAction,
     ExecuteQueryState,
     ExecuteQueryStateSlice,
-    MonacoHotKeyAction,
     QueryInHistory,
 } from '../../types/store/executeQuery';
 import type {QueryRequestParams, QueryMode, QuerySyntax} from '../../types/store/query';
@@ -24,7 +23,6 @@ const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
 const GO_TO_PREVIOUS_QUERY = 'query/GO_TO_PREVIOUS_QUERY';
 const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
-const SET_MONACO_HOT_KEY = 'query/SET_MONACO_HOT_KEY';
 const SET_TENANT_PATH = 'query/SET_TENANT_PATH';
 
 const queriesHistoryInitial = settingsManager.readUserSettingsValue(
@@ -34,23 +32,18 @@ const queriesHistoryInitial = settingsManager.readUserSettingsValue(
 
 const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
-export const MONACO_HOT_KEY_ACTIONS = {
-    sendQuery: 'sendQuery',
-    goPrev: 'goPrev',
-    goNext: 'goNext',
-} as const;
-
 const initialState = {
     loading: false,
     input: '',
     history: {
-        queries: queriesHistoryInitial.slice(sliceLimit < 0 ? 0 : sliceLimit),
+        queries: queriesHistoryInitial
+            .slice(sliceLimit < 0 ? 0 : sliceLimit)
+            .map(getQueryInHistory),
         currentIndex:
             queriesHistoryInitial.length > MAXIMUM_QUERIES_IN_HISTORY
                 ? MAXIMUM_QUERIES_IN_HISTORY - 1
                 : queriesHistoryInitial.length - 1,
     },
-    monacoHotKey: null,
 };
 
 const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
@@ -112,7 +105,12 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
         }
 
         case GO_TO_PREVIOUS_QUERY: {
-            const newCurrentIndex = Math.max(0, state.history.currentIndex - 1);
+            const currentIndex = state.history.currentIndex;
+            if (currentIndex <= 0) {
+                return state;
+            }
+            const newCurrentIndex = currentIndex - 1;
+            const query = state.history.queries[newCurrentIndex];
 
             return {
                 ...state,
@@ -120,12 +118,18 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
                     ...state.history,
                     currentIndex: newCurrentIndex,
                 },
+                input: query.queryText,
             };
         }
 
         case GO_TO_NEXT_QUERY: {
             const lastIndexInHistory = state.history.queries.length - 1;
-            const newCurrentIndex = Math.min(lastIndexInHistory, state.history.currentIndex + 1);
+            const currentIndex = state.history.currentIndex;
+            if (currentIndex >= lastIndexInHistory) {
+                return state;
+            }
+            const newCurrentIndex = currentIndex + 1;
+            const query = state.history.queries[newCurrentIndex];
 
             return {
                 ...state,
@@ -133,15 +137,10 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
                     ...state.history,
                     currentIndex: newCurrentIndex,
                 },
+                input: query.queryText,
             };
         }
 
-        case SET_MONACO_HOT_KEY: {
-            return {
-                ...state,
-                monacoHotKey: action.data,
-            };
-        }
         case SET_TENANT_PATH: {
             return {
                 ...state,
@@ -210,13 +209,6 @@ export const changeUserInput = ({input}: {input: string}) => {
     } as const;
 };
 
-export const setMonacoHotKey = (value: MonacoHotKeyAction | null) => {
-    return {
-        type: SET_MONACO_HOT_KEY,
-        data: value,
-    } as const;
-};
-
 export const setTenantPath = (value: string) => {
     return {
         type: SET_TENANT_PATH,
@@ -225,14 +217,16 @@ export const setTenantPath = (value: string) => {
 };
 
 export const selectQueriesHistory = (state: ExecuteQueryStateSlice): QueryInHistory[] => {
-    return state.executeQuery.history.queries.map((rawQuery) => {
-        if (typeof rawQuery === 'string') {
-            return {
-                queryText: rawQuery,
-            };
-        }
-        return rawQuery;
-    });
+    return state.executeQuery.history.queries;
 };
+
+function getQueryInHistory(rawQuery: string | QueryInHistory) {
+    if (typeof rawQuery === 'string') {
+        return {
+            queryText: rawQuery,
+        };
+    }
+    return rawQuery;
+}
 
 export default executeQuery;

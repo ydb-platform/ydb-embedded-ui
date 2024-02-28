@@ -52,7 +52,7 @@ interface QueryEditorControlsProps {
     disabled: boolean;
     onUpdateQueryMode: (mode: QueryMode) => void;
     queryMode: QueryMode;
-    highlitedAction: QueryAction;
+    highlightedAction: QueryAction;
 }
 
 export const QueryEditorControls = ({
@@ -65,7 +65,7 @@ export const QueryEditorControls = ({
     disabled,
     onUpdateQueryMode,
     queryMode,
-    highlitedAction,
+    highlightedAction,
 }: QueryEditorControlsProps) => {
     const querySelectorMenuItems = useMemo(() => {
         return Object.entries(QueryModeSelectorOptions).map(([mode, {title, description}]) => {
@@ -85,9 +85,9 @@ export const QueryEditorControls = ({
         });
     }, [onUpdateQueryMode]);
 
-    const runView: ButtonView | undefined = highlitedAction === 'execute' ? 'action' : undefined;
+    const runView: ButtonView | undefined = highlightedAction === 'execute' ? 'action' : undefined;
     const explainView: ButtonView | undefined =
-        highlitedAction === 'explain' ? 'action' : undefined;
+        highlightedAction === 'explain' ? 'action' : undefined;
 
     return (
         <div className={b()}>
