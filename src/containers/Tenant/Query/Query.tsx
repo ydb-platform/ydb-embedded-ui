@@ -21,8 +21,8 @@ const b = block('ydb-query');
 
 interface QueryProps {
     theme: string;
-    path?: string;
-    type?: EPathType;
+    path: string;
+    type: EPathType;
 }
 
 export const Query = (props: QueryProps) => {
