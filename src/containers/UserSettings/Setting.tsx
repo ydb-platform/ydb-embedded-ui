@@ -14,6 +14,7 @@ export type SettingsElementType = 'switch' | 'radio';
 export interface SettingProps {
     type?: SettingsElementType;
     title: string;
+    description?: ReactNode;
     settingKey: string;
     helpPopoverContent?: ReactNode;
     options?: {value: string; content: string}[];
@@ -25,6 +26,7 @@ export const Setting = ({
     type = 'switch',
     settingKey,
     title,
+    description,
     helpPopoverContent,
     options,
     defaultValue,
@@ -85,6 +87,7 @@ export const Setting = ({
         <Settings.Item
             title={title}
             highlightedTitle={title}
+            description={description}
             renderTitleComponent={renderTitleComponent}
         >
             {getSettingsElement(type)}

@@ -14,6 +14,9 @@
   "settings.language.option-russian": "Русский",
   "settings.language.option-english": "English",
 
+  "settings.binaryDataInPlainTextDisplay.title": "Отображение двоичных данных в виде обычного текста",
+  "settings.binaryDataInPlainTextDisplay.description": "Доступно, начиная с версии 24.1",
+
   "settings.invertedDisks.title": "Инвертированные индикаторы места на дисках",
 
   "settings.useNodesEndpoint.title": "Сломать вкладку Nodes в диагностике",
