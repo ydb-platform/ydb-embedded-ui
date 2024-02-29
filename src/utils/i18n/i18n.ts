@@ -15,12 +15,13 @@ enum Lang {
 const defaultLang = Lang.En;
 const currentLang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, defaultLang) as Lang;
 
-const i18n = new I18N();
+const i18n = new I18N({
+    lang: currentLang,
 
-// Enable keysets with only en lang
-i18n.fallbackLang = Lang.En;
+    // Enable keysets with only en lang
+    fallbackLang: Lang.En,
+});
 
-i18n.setLang(currentLang);
 configureYdbUiComponents({lang: currentLang});
 configureUiKit({lang: currentLang});
 configureUiKitComponents({lang: currentLang});
