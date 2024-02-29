@@ -1,5 +1,30 @@
 # Changelog
 
+## [5.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.0.0...v5.1.0) (2024-02-29)
+
+
+### Features
+
+* **Cluster:** move cluster info to overview tab ([#710](https://github.com/ydb-platform/ydb-embedded-ui/issues/710)) ([7abcbc1](https://github.com/ydb-platform/ydb-embedded-ui/commit/7abcbc1148a981bd26240caec0809c45b06c3b98))
+* do not use external settings ([#725](https://github.com/ydb-platform/ydb-embedded-ui/issues/725)) ([8af45b0](https://github.com/ydb-platform/ydb-embedded-ui/commit/8af45b073d986b3e6bbd25a0823df7fe78622f09))
+* **HotKeys:** revive ([#722](https://github.com/ydb-platform/ydb-embedded-ui/issues/722)) ([8047fe4](https://github.com/ydb-platform/ydb-embedded-ui/commit/8047fe431733f3838021fc0e4074179a8a8a75c4))
+* **QueryEditor:** execute query with selected text ([#737](https://github.com/ydb-platform/ydb-embedded-ui/issues/737)) ([122a006](https://github.com/ydb-platform/ydb-embedded-ui/commit/122a0069ba96857cd0377a76cbf744735d287c45))
+* show different page titles on different pages ([#733](https://github.com/ydb-platform/ydb-embedded-ui/issues/733)) ([4881f09](https://github.com/ydb-platform/ydb-embedded-ui/commit/4881f090f1c808b3bd0baf2cbf2e71373bb5d641))
+* **TopQueries:** add Duration column ([#711](https://github.com/ydb-platform/ydb-embedded-ui/issues/711)) ([3f6a892](https://github.com/ydb-platform/ydb-embedded-ui/commit/3f6a892e42a12a5575253e6e93078195a7212a57))
+
+
+### Bug Fixes
+
+* configure i18n for libs ([#724](https://github.com/ydb-platform/ydb-embedded-ui/issues/724)) ([c0b7c7d](https://github.com/ydb-platform/ydb-embedded-ui/commit/c0b7c7d21048a35462cf1c4f27a5348e2a9692b1))
+* **ExecuteResults:** escape values in table cells when copy as tsv ([#720](https://github.com/ydb-platform/ydb-embedded-ui/issues/720)) ([de40fe6](https://github.com/ydb-platform/ydb-embedded-ui/commit/de40fe611da78fd7f38f429c1f175aed110874b7))
+* pass route component props to slot ([#716](https://github.com/ydb-platform/ydb-embedded-ui/issues/716)) ([51e7872](https://github.com/ydb-platform/ydb-embedded-ui/commit/51e7872908f691ef6e84995425b1d169045ebddd))
+* **ProgressViewer:** make text more contrast ([#714](https://github.com/ydb-platform/ydb-embedded-ui/issues/714)) ([e09ec79](https://github.com/ydb-platform/ydb-embedded-ui/commit/e09ec792a99df38e7f742defe03bcc8850967abe))
+* remove console log on monitoring data parsing error ([#723](https://github.com/ydb-platform/ydb-embedded-ui/issues/723)) ([f73dbc8](https://github.com/ydb-platform/ydb-embedded-ui/commit/f73dbc8a735179e8466d6fbd08325cdf76790e1d))
+* **TopQueries:** use EndTime ([#727](https://github.com/ydb-platform/ydb-embedded-ui/issues/727)) ([5e708ca](https://github.com/ydb-platform/ydb-embedded-ui/commit/5e708cad9c98530e64dbebd195edb43fea360830))
+* update tenant cpu ([#736](https://github.com/ydb-platform/ydb-embedded-ui/issues/736)) ([775bacf](https://github.com/ydb-platform/ydb-embedded-ui/commit/775bacfda549e5cea09ea03069908a59c12c0c3e))
+* update tenant storage ([#726](https://github.com/ydb-platform/ydb-embedded-ui/issues/726)) ([dc0df8a](https://github.com/ydb-platform/ydb-embedded-ui/commit/dc0df8ab09d6a3953279d6be52d245a64c78680c))
+* use DC and Rack from Location for nodes ([#713](https://github.com/ydb-platform/ydb-embedded-ui/issues/713)) ([e64c3b0](https://github.com/ydb-platform/ydb-embedded-ui/commit/e64c3b065dd07f8c2b1b7f131e52ed01e2f579fb))
+
 ## [5.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v4.33.0...v5.0.0) (2024-02-13)
 
 
