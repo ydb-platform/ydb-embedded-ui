@@ -81,8 +81,10 @@ export interface TSystemStateInfo {
     TotalSessions?: number;
 }
 
+export type PoolName = 'System' | 'User' | 'Batch' | 'IO' | 'IC';
+
 export interface TPoolStats {
-    Name?: string;
+    Name?: PoolName;
     /** double */
     Usage?: number;
     Threads?: number;

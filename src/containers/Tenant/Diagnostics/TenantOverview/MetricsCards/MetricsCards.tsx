@@ -53,7 +53,7 @@ export function MetricsCards({
 }: MetricsCardsProps) {
     const location = useLocation();
 
-    const {memoryUsed, memoryLimit, cpuUsed, cpuUsage, storageUsed, storageLimit} = metrics || {};
+    const {memoryUsed, memoryLimit, cpuUsage, storageUsed, storageLimit} = metrics || {};
 
     const {metricsTab} = useTypedSelector((state) => state.tenant);
 
@@ -64,8 +64,7 @@ export function MetricsCards({
     const storageStatus = storageUsageToStatus(storageUsage);
     const memoryStatus = memoryUsageToStatus(memoryUsage);
 
-    const {cpu, storage, memory} = formatTenantMetrics({
-        cpu: cpuUsed,
+    const {storage, memory} = formatTenantMetrics({
         storage: storageUsed,
         memory: memoryUsed,
     });
@@ -107,7 +106,6 @@ export function MetricsCards({
                     label="CPU"
                     progress={cpuUsage}
                     status={cpuStatus}
-                    resourcesUsed={cpu}
                     active={metricsTab === TENANT_METRICS_TABS_IDS.cpu}
                 />
             </Link>
