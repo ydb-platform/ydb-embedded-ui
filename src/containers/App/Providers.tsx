@@ -4,6 +4,7 @@ import {Router} from 'react-router';
 import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 import {ThemeProvider} from '@gravity-ui/uikit';
+import {HelmetProvider} from 'react-helmet-async';
 
 import {ComponentsProvider} from '../../components/ComponentsProvider/ComponentsProvider';
 import {componentsRegistry as defaultComponentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
@@ -28,17 +29,19 @@ export function Providers({
     children,
 }: ProvidersProps) {
     return (
-        <Provider store={store}>
-            <Router history={history}>
-                <QueryParamProvider adapter={ReactRouter5Adapter}>
-                    <Theme>
-                        <ComponentsProvider registry={componentsRegistry}>
-                            {children}
-                        </ComponentsProvider>
-                    </Theme>
-                </QueryParamProvider>
-            </Router>
-        </Provider>
+        <HelmetProvider>
+            <Provider store={store}>
+                <Router history={history}>
+                    <QueryParamProvider adapter={ReactRouter5Adapter}>
+                        <Theme>
+                            <ComponentsProvider registry={componentsRegistry}>
+                                {children}
+                            </ComponentsProvider>
+                        </Theme>
+                    </QueryParamProvider>
+                </Router>
+            </Provider>
+        </HelmetProvider>
     );
 }
 

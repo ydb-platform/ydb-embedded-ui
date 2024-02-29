@@ -1,4 +1,6 @@
+import React from 'react';
 import {useDispatch} from 'react-redux';
+import {Helmet} from 'react-helmet-async';
 import block from 'bem-cn-lite';
 
 import type {EPathType} from '../../../types/api/schema';
@@ -8,7 +10,7 @@ import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {useSetting, useTypedSelector} from '../../../utils/hooks';
 import {SAVED_QUERIES_KEY} from '../../../utils/constants';
 
-import {QueryTabs} from './QueryTabs/QueryTabs';
+import {QueryTabs, queryEditorTabs} from './QueryTabs/QueryTabs';
 import {SavedQueries} from './SavedQueries/SavedQueries';
 import QueriesHistory from './QueriesHistory/QueriesHistory';
 import QueryEditor from './QueryEditor/QueryEditor';
@@ -41,6 +43,11 @@ export const Query = (props: QueryProps) => {
         dispatch(changeUserInput(value));
     };
 
+    const activeTab = React.useMemo(
+        () => queryEditorTabs.find(({id}) => id === queryTab),
+        [queryTab],
+    );
+
     const renderContent = () => {
         switch (queryTab) {
             case TENANT_QUERY_TABS_ID.newQuery: {
@@ -66,6 +73,11 @@ export const Query = (props: QueryProps) => {
 
     return (
         <div className={b()}>
+            {activeTab ? (
+                <Helmet>
+                    <title>{activeTab.title}</title>
+                </Helmet>
+            ) : null}
             <QueryTabs className={b('tabs')} activeTab={queryTab} />
             <div className={b('content')}>{renderContent()}</div>
         </div>
