@@ -44,6 +44,7 @@ import type {ExplainQueryState} from '../../../../types/store/explainQuery';
 import type {ValueOf} from '../../../../types/common';
 import type {EPathType} from '../../../../types/api/schema';
 import type {RootState} from '../../../../store';
+import i18n from '../i18n';
 
 import './QueryEditor.scss';
 
@@ -282,7 +283,7 @@ function QueryEditor(props: QueryEditorProps) {
         editor.focus();
         editor.addAction({
             id: 'sendQuery',
-            label: 'Send query',
+            label: i18n('action.send-query'),
             keybindings: [
                 // eslint-disable-next-line no-bitwise
                 monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
@@ -308,7 +309,7 @@ function QueryEditor(props: QueryEditorProps) {
         });
         editor.addAction({
             id: 'sendSelectedQuery',
-            label: 'Send selected query',
+            label: i18n('action.send-selected-query'),
             keybindings: [
                 // eslint-disable-next-line no-bitwise
                 monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter,
@@ -321,7 +322,7 @@ function QueryEditor(props: QueryEditorProps) {
 
         editor.addAction({
             id: 'previous-query',
-            label: 'Previous query',
+            label: i18n('action.previous-query'),
             keybindings: [
                 // eslint-disable-next-line no-bitwise
                 monaco.KeyMod.CtrlCmd | monaco.KeyCode.UpArrow,
@@ -334,7 +335,7 @@ function QueryEditor(props: QueryEditorProps) {
         });
         editor.addAction({
             id: 'next-query',
-            label: 'Next query',
+            label: i18n('action.next-query'),
             keybindings: [
                 // eslint-disable-next-line no-bitwise
                 monaco.KeyMod.CtrlCmd | monaco.KeyCode.DownArrow,
