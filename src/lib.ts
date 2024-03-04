@@ -1,8 +1,12 @@
 export {App as SingleClusterApp, AppSlots} from './containers/App';
 export {AppWithClusters as MultiClusterApp} from './containers/AppWithClusters/AppWithClusters';
-export {ErrorBoundary} from './components/ErrorBoundary/ErrorBoundary';
+export {
+    ErrorBoundaryInner as ErrorBoundary,
+    ErrorBoundaryFallback,
+} from './components/ErrorBoundary/ErrorBoundary';
 
 export {configureStore, rootReducer} from './store';
+export {default as appRoutes} from './routes';
 
 export {createApi, YdbEmbeddedAPI, YdbWebVersionAPI} from './services/api';
 export {settingsManager} from './services/settings';
