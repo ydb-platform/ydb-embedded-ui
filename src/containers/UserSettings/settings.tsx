@@ -10,11 +10,13 @@ import {
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
+    BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
 
 import type {SettingProps} from './Setting';
 import i18n from './i18n';
+import {ClusterModeGuard} from '../ClusterModeGuard';
 
 export interface SettingsSection {
     id: string;
@@ -75,6 +77,16 @@ export const languageSetting: SettingProps = {
     },
 };
 
+export const binaryDataInPlainTextDisplay: SettingProps = {
+    settingKey: BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+    title: i18n('settings.binaryDataInPlainTextDisplay.title'),
+    description: (
+        <ClusterModeGuard mode="multi">
+            {i18n('settings.binaryDataInPlainTextDisplay.description')}
+        </ClusterModeGuard>
+    ),
+};
+
 export const invertedDisksSetting: SettingProps = {
     settingKey: INVERTED_DISKS_KEY,
     title: i18n('settings.invertedDisks.title'),
@@ -98,7 +110,7 @@ export const queryUseMultiSchemaSetting: SettingProps = {
 export const appearanceSection: SettingsSection = {
     id: 'appearanceSection',
     title: i18n('section.appearance'),
-    settings: [themeSetting, invertedDisksSetting],
+    settings: [themeSetting, invertedDisksSetting, binaryDataInPlainTextDisplay],
 };
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',

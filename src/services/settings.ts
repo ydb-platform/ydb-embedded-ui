@@ -14,6 +14,7 @@ import {
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
+    BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
 } from '../utils/constants';
 import {QUERY_ACTIONS, QUERY_MODES} from '../utils/query';
 import {parseJson} from '../utils/utils';
@@ -27,6 +28,7 @@ export const DEFAULT_USER_SETTINGS: SettingsObject = {
     [INVERTED_DISKS_KEY]: false,
     [USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY]: false,
     [QUERY_USE_MULTI_SCHEMA_KEY]: false,
+    [BINARY_DATA_IN_PLAIN_TEXT_DISPLAY]: true,
     [SAVED_QUERIES_KEY]: [],
     [TENANT_INITIAL_PAGE_KEY]: TENANT_PAGES_IDS.query,
     [QUERY_INITIAL_MODE_KEY]: QUERY_MODES.script,
