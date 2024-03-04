@@ -84,10 +84,7 @@ const getStorageNodesColumns = (additionalNodesProps: AdditionalNodesProps | und
                         {row.PDisks?.map((pDisk) => {
                             const vDisks = row.VDisks?.filter(
                                 (vdisk) => vdisk.PDiskId === pDisk.PDiskId,
-                            ).map((data) => ({
-                                ...data,
-                                NodeId: row.NodeId,
-                            }));
+                            );
 
                             return (
                                 <div className={b('pdisks-item')} key={pDisk.PDiskId}>

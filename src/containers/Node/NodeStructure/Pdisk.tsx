@@ -14,7 +14,6 @@ import type {
 import {EVDiskState} from '../../../types/api/vdisk';
 import {bytesToGB} from '../../../utils/utils';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
-import {getPDiskType} from '../../../utils/pdisk';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {
     createPDiskDeveloperUILink,
@@ -181,6 +180,7 @@ export function PDisk({
         Realtime,
         State,
         Category,
+        Type,
         SerialNumber,
         vDisks,
     } = data;
@@ -252,7 +252,7 @@ export function PDisk({
         }
         if (valueIsDefined(Category)) {
             pdiskInfo.push({label: 'Category', value: Category});
-            pdiskInfo.push({label: 'Type', value: getPDiskType(data)});
+            pdiskInfo.push({label: 'Type', value: Type});
         }
         pdiskInfo.push({
             label: 'Allocated Size',
@@ -315,7 +315,7 @@ export function PDisk({
                         value={PDiskId}
                         className={b('pdisk-title-id')}
                     />
-                    <PDiskTitleBadge value={getPDiskType(data)} className={b('pdisk-title-type')} />
+                    <PDiskTitleBadge value={Type} className={b('pdisk-title-type')} />
                     <ProgressViewer
                         value={total - available}
                         capacity={total}

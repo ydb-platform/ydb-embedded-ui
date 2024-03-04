@@ -1,6 +1,7 @@
 import React from 'react';
 import cn from 'bem-cn-lite';
 
+import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../../utils/disks/constants';
 import {INVERTED_DISKS_KEY} from '../../../utils/constants';
 import {useSetting} from '../../../utils/hooks';
 
@@ -8,24 +9,17 @@ import './DiskStateProgressBar.scss';
 
 const b = cn('storage-disk-progress-bar');
 
-// numeric enum to allow ordinal comparison
-export enum EDiskStateSeverity {
-    Grey = 0,
-    Green = 1,
-    Blue = 2,
-    Yellow = 3,
-    Orange = 4,
-    Red = 5,
-}
+type Color = keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY;
 
-const severityToColor = Object.entries(EDiskStateSeverity).reduce(
-    (acc, [color, severity]) => ({...acc, [severity]: color}),
-    {} as Record<EDiskStateSeverity, keyof typeof EDiskStateSeverity>,
-);
+type SeverityToColor = Record<number, keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY>;
+
+const severityToColor = Object.entries(
+    DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
+).reduce<SeverityToColor>((acc, [color, severity]) => ({...acc, [severity]: color as Color}), {});
 
 interface DiskStateProgressBarProps {
     diskAllocatedPercent?: number;
-    severity?: EDiskStateSeverity;
+    severity?: number;
     compact?: boolean;
 }
 

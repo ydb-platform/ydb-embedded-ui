@@ -8,7 +8,7 @@ import type {
 import {EVDiskState, type TVDiskStateInfo} from '../../../types/api/vdisk';
 import {TPDiskState} from '../../../types/api/pdisk';
 import {EFlag} from '../../../types/api/enums';
-import {getPDiskType} from '../../../utils/pdisk';
+import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
 import {getUsage} from '../../../utils/storage';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 
@@ -26,11 +26,13 @@ const FLAGS_POINTS = {
 // ==== Prepare groups ====
 
 const prepareVDisk = (vDisk: TVDiskStateInfo, poolName: string | undefined) => {
+    const preparedVDisk = prepareVDiskData(vDisk);
+
     // VDisk doesn't have its own StoragePoolName when located inside StoragePool data
     return {
-        ...vDisk,
+        ...preparedVDisk,
         StoragePoolName: poolName,
-        Donors: vDisk.Donors?.map((donor) => ({
+        Donors: preparedVDisk?.Donors?.map((donor) => ({
             ...donor,
             StoragePoolName: poolName,
         })),
@@ -62,11 +64,13 @@ const prepareStorageGroupData = (
                 WriteThroughput,
             } = vDisk;
 
-            if (
-                !Replicated ||
-                PDisk?.State !== TPDiskState.Normal ||
-                VDiskState !== EVDiskState.OK
-            ) {
+            const {
+                Type: PDiskType,
+                State: PDiskState,
+                AvailableSize: PDiskAvailableSize,
+            } = preparePDiskData(PDisk);
+
+            if (!Replicated || PDiskState !== TPDiskState.Normal || VDiskState !== EVDiskState.OK) {
                 missing += 1;
             }
 
@@ -74,7 +78,7 @@ const prepareStorageGroupData = (
                 usedSpaceFlag += FLAGS_POINTS[DiskSpace];
             }
 
-            const available = Number(AvailableSize ?? PDisk?.AvailableSize) || 0;
+            const available = Number(AvailableSize ?? PDiskAvailableSize) || 0;
             const allocated = Number(AllocatedSize) || 0;
 
             usedSpaceBytes += allocated;
@@ -83,11 +87,8 @@ const prepareStorageGroupData = (
             readSpeedBytesPerSec += Number(ReadThroughput) || 0;
             writeSpeedBytesPerSec += Number(WriteThroughput) || 0;
 
-            const currentType = getPDiskType(PDisk || {});
             mediaType =
-                currentType && (currentType === mediaType || mediaType === '')
-                    ? currentType
-                    : 'Mixed';
+                PDiskType && (PDiskType === mediaType || mediaType === '') ? PDiskType : 'Mixed';
         }
     }
 
@@ -173,11 +174,24 @@ const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
             return pDisk.State !== TPDiskState.Normal;
         }).length || 0;
 
+    const pDisks = node.PDisks?.map((pDisk) => {
+        return {
+            ...preparePDiskData(pDisk),
+            NodeId: node.NodeId,
+        };
+    });
+    const vDisks = node.VDisks?.map((vDisk) => {
+        return {
+            ...prepareVDiskData(vDisk),
+            NodeId: node.NodeId,
+        };
+    });
+
     return {
         ...prepareNodeSystemState(node.SystemState),
         NodeId: node.NodeId,
-        PDisks: node.PDisks,
-        VDisks: node.VDisks,
+        PDisks: pDisks,
+        VDisks: vDisks,
         Missing: missing,
     };
 };

@@ -2,6 +2,7 @@ import type {Selector} from 'reselect';
 import {createSelector} from 'reselect';
 
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
+import {preparePDiskData} from '../../../utils/disks/prepareDisks';
 
 import type {
     NodeStateSlice,
@@ -26,9 +27,10 @@ export const selectNodeStructure: Selector<NodeStateSlice, PreparedNodeStructure
                 const vDisks = group.VDisks?.filter((el) => el.NodeId === nodeId);
                 vDisks?.forEach((vd) => {
                     const vDiskId = stringifyVdiskId(vd.VDiskId);
-                    const pDiskId = vd.PDisk?.PDiskId;
+                    const preparedPDisk = preparePDiskData(vd.PDisk);
+                    const pDiskId = preparedPDisk.PDiskId;
                     if (!structure[String(pDiskId)]) {
-                        structure[String(pDiskId)] = {vDisks: {}, ...vd.PDisk};
+                        structure[String(pDiskId)] = {vDisks: {}, ...preparedPDisk};
                     }
                     structure[String(pDiskId)].vDisks[vDiskId] = {
                         ...vd,

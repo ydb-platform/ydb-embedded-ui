@@ -1,93 +1,35 @@
-import React, {useEffect, useState, useRef, useMemo} from 'react';
+import React, {useState, useRef} from 'react';
 import cn from 'bem-cn-lite';
 
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {InternalLink} from '../../../components/InternalLink';
 import {Stack} from '../../../components/Stack/Stack';
 
+import type {PreparedPDisk} from '../../../utils/disks/types';
 import routes, {createHref} from '../../../routes';
-import {TPDiskStateInfo, TPDiskState} from '../../../types/api/pdisk';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import {getPDiskType} from '../../../utils/pdisk';
-import {isFullVDiskData} from '../../../utils/storage';
+import {isFullVDiskData} from '../../../utils/disks/helpers';
 
 import {STRUCTURE} from '../../Node/NodePages';
 
-import {DiskStateProgressBar, EDiskStateSeverity} from '../DiskStateProgressBar';
+import {DiskStateProgressBar} from '../DiskStateProgressBar';
 import {PDiskPopup} from '../PDiskPopup';
 import {VDisk} from '../VDisk';
-
-import {getUsageSeverityForPDisk, NOT_AVAILABLE_SEVERITY} from '../utils';
 
 import './PDisk.scss';
 
 const b = cn('pdisk-storage');
 
-const stateSeverity = {
-    [TPDiskState.Initial]: EDiskStateSeverity.Grey,
-    [TPDiskState.Normal]: EDiskStateSeverity.Green,
-    [TPDiskState.InitialFormatRead]: EDiskStateSeverity.Yellow,
-    [TPDiskState.InitialSysLogRead]: EDiskStateSeverity.Yellow,
-    [TPDiskState.InitialCommonLogRead]: EDiskStateSeverity.Yellow,
-    [TPDiskState.InitialFormatReadError]: EDiskStateSeverity.Red,
-    [TPDiskState.InitialSysLogReadError]: EDiskStateSeverity.Red,
-    [TPDiskState.InitialSysLogParseError]: EDiskStateSeverity.Red,
-    [TPDiskState.InitialCommonLogReadError]: EDiskStateSeverity.Red,
-    [TPDiskState.InitialCommonLogParseError]: EDiskStateSeverity.Red,
-    [TPDiskState.CommonLoggerInitError]: EDiskStateSeverity.Red,
-    [TPDiskState.OpenFileError]: EDiskStateSeverity.Red,
-    [TPDiskState.ChunkQuotaError]: EDiskStateSeverity.Red,
-    [TPDiskState.DeviceIoError]: EDiskStateSeverity.Red,
-};
-
 interface PDiskProps {
     nodeId: number;
-    data?: TPDiskStateInfo;
+    data?: PreparedPDisk;
     vDisks?: TVDiskStateInfo[];
 }
 
-const isSeverityKey = (key?: TPDiskState): key is keyof typeof stateSeverity =>
-    key !== undefined && key in stateSeverity;
-
-const getStateSeverity = (pDiskState?: TPDiskState) => {
-    return isSeverityKey(pDiskState) ? stateSeverity[pDiskState] : NOT_AVAILABLE_SEVERITY;
-};
-
-export const PDisk = ({nodeId, data: rawData = {}, vDisks}: PDiskProps) => {
-    // NodeId in data is required for the popup
-    const data = useMemo(() => ({...rawData, NodeId: nodeId}), [rawData, nodeId]);
-
-    const [severity, setSeverity] = useState(getStateSeverity(data.State));
+export const PDisk = ({nodeId, data = {}, vDisks}: PDiskProps) => {
     const [isPopupVisible, setIsPopupVisible] = useState(false);
 
     const anchor = useRef(null);
-
-    const pdiskAllocatedPercent = useMemo(() => {
-        const {AvailableSize, TotalSize} = data;
-
-        if (!AvailableSize || !TotalSize) {
-            return undefined;
-        }
-
-        return !isNaN(Number(AvailableSize)) && !isNaN(Number(TotalSize))
-            ? Math.round(((Number(TotalSize) - Number(AvailableSize)) * 100) / Number(TotalSize))
-            : undefined;
-    }, [data]);
-
-    useEffect(() => {
-        const newStateSeverity = getStateSeverity(data.State);
-        const newSpaceSeverityFlag = getUsageSeverityForPDisk(pdiskAllocatedPercent || 0);
-
-        let newSeverity: number;
-
-        if (newStateSeverity === NOT_AVAILABLE_SEVERITY || !newSpaceSeverityFlag) {
-            newSeverity = newStateSeverity;
-        } else {
-            newSeverity = Math.max(newStateSeverity, EDiskStateSeverity[newSpaceSeverityFlag]);
-        }
-
-        setSeverity(newSeverity);
-    }, [data.State, pdiskAllocatedPercent]);
 
     const showPopup = () => {
         setIsPopupVisible(true);
@@ -129,9 +71,7 @@ export const PDisk = ({nodeId, data: rawData = {}, vDisks}: PDiskProps) => {
                                         return (
                                             <VDisk
                                                 compact
-                                                data={
-                                                    isFullData ? donor : {...donor, DonorMode: true}
-                                                }
+                                                data={donor}
                                                 key={stringifyVdiskId(
                                                     isFullData ? donor.VDiskId : donor,
                                                 )}
@@ -165,10 +105,10 @@ export const PDisk = ({nodeId, data: rawData = {}, vDisks}: PDiskProps) => {
                     onMouseLeave={hidePopup}
                 >
                     <DiskStateProgressBar
-                        diskAllocatedPercent={pdiskAllocatedPercent}
-                        severity={severity}
+                        diskAllocatedPercent={data.AllocatedPercent}
+                        severity={data.Severity}
                     />
-                    <div className={b('media-type')}>{getPDiskType(data)}</div>
+                    <div className={b('media-type')}>{data.Type}</div>
                 </InternalLink>
             </div>
         </React.Fragment>

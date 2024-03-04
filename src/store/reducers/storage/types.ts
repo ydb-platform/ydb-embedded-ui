@@ -2,9 +2,8 @@ import type {OrderType} from '@gravity-ui/react-data-table';
 
 import type {IResponseError} from '../../../types/api/error';
 import type {TSystemStateInfo} from '../../../types/api/nodes';
-import type {TPDiskStateInfo} from '../../../types/api/pdisk';
 import type {EVersion, TStorageGroupInfo} from '../../../types/api/storage';
-import type {TVDiskStateInfo} from '../../../types/api/vdisk';
+import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {ValueOf} from '../../../types/common';
 import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {StorageSortValue} from '../../../utils/storage';
@@ -29,8 +28,8 @@ export type StorageType = ValueOf<typeof STORAGE_TYPES>;
 
 export interface PreparedStorageNode extends TSystemStateInfo {
     NodeId: number;
-    PDisks: TPDiskStateInfo[] | undefined;
-    VDisks: TVDiskStateInfo[] | undefined;
+    PDisks?: PreparedPDisk[];
+    VDisks?: PreparedVDisk[];
 
     DC?: string;
     Rack?: string;
@@ -48,9 +47,11 @@ export interface PreparedStorageGroup extends TStorageGroupInfo {
     Used: number;
     Limit: number;
     Degraded: number;
-    Kind: string | undefined;
+    Kind?: string;
 
     UsedSpaceFlag: number;
+
+    VDisks?: PreparedVDisk[];
 }
 
 export interface UsageFilter {

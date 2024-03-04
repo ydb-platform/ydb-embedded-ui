@@ -8,7 +8,8 @@ import shieldIcon from '../../../assets/icons/shield.svg';
 import type {NodesMap} from '../../../types/store/nodesList';
 import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import {getUsage, isFullVDiskData, isSortableStorageProperty} from '../../../utils/storage';
+import {isSortableStorageProperty} from '../../../utils/storage';
+import {isFullVDiskData} from '../../../utils/disks/helpers';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import EntityStatus from '../../../components/EntityStatus/EntityStatus';
@@ -124,7 +125,7 @@ const usageColumn: StorageGroupsColumn = {
         );
     },
     // without a limit exclude usage from sort to display at the bottom
-    sortAccessor: (row) => (row.Limit ? getUsage(row) : null),
+    sortAccessor: (row) => (row.Limit ? row.Usage : null),
     align: DataTable.LEFT,
     sortable: false,
 };
@@ -221,7 +222,7 @@ const getVdiscksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
 
                             return (
                                 <VDisk
-                                    data={isFullData ? donor : {...donor, DonorMode: true}}
+                                    data={donor}
                                     // donor and acceptor are always in the same group
                                     nodes={nodes}
                                     key={stringifyVdiskId(isFullData ? donor.VDiskId : donor)}

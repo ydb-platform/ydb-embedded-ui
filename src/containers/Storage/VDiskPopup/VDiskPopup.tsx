@@ -11,7 +11,7 @@ import {EFlag} from '../../../types/api/enums';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
-import {isFullVDiskData} from '../../../utils/storage';
+import {isFullVDiskData} from '../../../utils/disks/helpers';
 
 import type {UnavailableDonor} from '../utils/types';
 
