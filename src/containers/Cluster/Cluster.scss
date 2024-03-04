@@ -10,6 +10,9 @@
     @include flex-container();
 
     &__header {
+        position: sticky;
+        left: 0;
+
         padding: 20px 0;
     }
 
