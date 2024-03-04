@@ -38,8 +38,10 @@ import type {JsonHotKeysResponse} from '../types/api/hotkeys';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
 import {prepareSortValue} from '../utils/filters';
+import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../utils/constants';
 import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
+import {settingsManager} from './settings';
 
 type AxiosOptions = {
     concurrentId?: string;
@@ -305,9 +307,20 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         const uiTimeout = 9 * 60 * 1000;
         const backendTimeout = 10 * 60 * 1000;
 
+        /**
+         * Return strings using base64 encoding.
+         * @link https://github.com/ydb-platform/ydb/pull/647
+         */
+        const base64 = !settingsManager.readUserSettingsValue(
+            BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+            true,
+        );
+
         return this.post<QueryAPIResponse<Action, Schema>>(
             this.getPath(
-                `/viewer/json/query?timeout=${backendTimeout}${schema ? `&schema=${schema}` : ''}`,
+                `/viewer/json/query?timeout=${backendTimeout}&base64=${base64}${
+                    schema ? `&schema=${schema}` : ''
+                }`,
             ),
             params,
             {},

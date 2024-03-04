@@ -87,6 +87,7 @@ export const SAVED_QUERIES_KEY = 'saved_queries';
 export const ASIDE_HEADER_COMPACT_KEY = 'asideHeaderCompact';
 export const QUERIES_HISTORY_KEY = 'queries_history';
 export const DATA_QA_TUNE_COLUMNS_POPUP = 'tune-columns-popup';
+export const BINARY_DATA_IN_PLAIN_TEXT_DISPLAY = 'binaryDataInPlainTextDisplay';
 
 export const DEFAULT_SIZE_RESULT_PANE_KEY = 'default-size-result-pane';
 export const DEFAULT_SIZE_TENANT_SUMMARY_KEY = 'default-size-tenant-summary-pane';
