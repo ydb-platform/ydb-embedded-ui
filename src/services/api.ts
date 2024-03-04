@@ -307,6 +307,10 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         const uiTimeout = 9 * 60 * 1000;
         const backendTimeout = 10 * 60 * 1000;
 
+        /**
+         * Return strings using base64 encoding.
+         * @link https://github.com/ydb-platform/ydb/pull/647
+         */
         const base64 = !settingsManager.readUserSettingsValue(
             BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
             true,
