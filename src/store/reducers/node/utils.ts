@@ -1,4 +1,5 @@
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
+import {prepareNodeSystemState} from '../../../utils/nodes';
 import type {PreparedNode} from './types';
 
 export const prepareNodeData = (data: TEvSystemStateResponse): PreparedNode => {
@@ -8,9 +9,5 @@ export const prepareNodeData = (data: TEvSystemStateResponse): PreparedNode => {
 
     const nodeData = data.SystemStateInfo[0];
 
-    return {
-        ...nodeData,
-        DC: nodeData.Location?.DataCenter,
-        Rack: nodeData.Location?.Rack,
-    };
+    return prepareNodeSystemState(nodeData);
 };
