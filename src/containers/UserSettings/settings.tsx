@@ -16,6 +16,7 @@ import {Lang, defaultLang} from '../../utils/i18n';
 
 import type {SettingProps} from './Setting';
 import i18n from './i18n';
+import {ClusterModeGuard} from '../ClusterModeGuard';
 
 export interface SettingsSection {
     id: string;
@@ -79,11 +80,11 @@ export const languageSetting: SettingProps = {
 export const binaryDataInPlainTextDisplay: SettingProps = {
     settingKey: BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     title: i18n('settings.binaryDataInPlainTextDisplay.title'),
-    description:
-        process.env.REACT_APP_META_BACKEND === undefined ||
-        process.env.REACT_APP_META_BACKEND === 'undefined'
-            ? undefined
-            : i18n('settings.binaryDataInPlainTextDisplay.description'),
+    description: (
+        <ClusterModeGuard mode="multi">
+            {i18n('settings.binaryDataInPlainTextDisplay.description')}
+        </ClusterModeGuard>
+    ),
 };
 
 export const invertedDisksSetting: SettingProps = {
