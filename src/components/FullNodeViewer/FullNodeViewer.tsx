@@ -2,7 +2,6 @@ import cn from 'bem-cn-lite';
 
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {LOAD_AVERAGE_TIME_INTERVALS} from '../../utils/constants';
-import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
 
 import InfoViewer, {type InfoViewerItem} from '../InfoViewer/InfoViewer';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
@@ -32,7 +31,7 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
 
     commonInfo.push(
         {label: 'Version', value: node?.Version},
-        {label: 'Uptime', value: calcUptime(node?.StartTime)},
+        {label: 'Uptime', value: node?.Uptime},
         {label: 'DC', value: node?.DataCenterDescription || node?.DC},
         {label: 'Rack', value: node?.Rack},
     );

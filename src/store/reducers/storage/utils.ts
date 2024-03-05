@@ -10,7 +10,7 @@ import {TPDiskState} from '../../../types/api/pdisk';
 import {EFlag} from '../../../types/api/enums';
 import {getPDiskType} from '../../../utils/pdisk';
 import {getUsage} from '../../../utils/storage';
-import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
+import {prepareNodeSystemState} from '../../../utils/nodes';
 
 import type {PreparedStorageGroup, PreparedStorageNode, PreparedStorageResponse} from './types';
 
@@ -168,21 +168,14 @@ export const prepareStorageGroups = (
 // ==== Prepare nodes ====
 
 const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
-    const systemState = node.SystemState ?? {};
     const missing =
         node.PDisks?.filter((pDisk) => {
             return pDisk.State !== TPDiskState.Normal;
         }).length || 0;
 
     return {
+        ...prepareNodeSystemState(node.SystemState),
         NodeId: node.NodeId,
-        SystemState: systemState.SystemState,
-        DC: systemState.Location?.DataCenter,
-        Rack: systemState.Location?.Rack,
-        Host: systemState.Host,
-        Endpoints: systemState.Endpoints,
-        Uptime: calcUptime(systemState.StartTime),
-        StartTime: systemState.StartTime,
         PDisks: node.PDisks,
         VDisks: node.VDisks,
         Missing: missing,

@@ -1,8 +1,8 @@
 import type {IResponseError} from '../../../types/api/error';
-import type {TSystemStateInfo} from '../../../types/api/nodes';
 import type {TPDiskStateInfo} from '../../../types/api/pdisk';
 import type {TStorageInfo} from '../../../types/api/storage';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
+import type {PreparedNodeSystemState} from '../../../utils/nodes';
 import type {ApiRequestAction} from '../../utils';
 
 import {FETCH_NODE, FETCH_NODE_STRUCTURE, resetNode} from './node';
@@ -24,10 +24,7 @@ export interface PreparedStructurePDisk extends TPDiskStateInfo {
 
 export type PreparedNodeStructure = Record<string, PreparedStructurePDisk>;
 
-export interface PreparedNode extends TSystemStateInfo {
-    DC?: string;
-    Rack?: string;
-}
+export interface PreparedNode extends Partial<PreparedNodeSystemState> {}
 
 export interface NodeState {
     data: PreparedNode;

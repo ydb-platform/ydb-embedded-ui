@@ -7,6 +7,7 @@ import type {ProblemFilterValue} from '../store/reducers/settings/types';
 import {ProblemFilterValues} from '../store/reducers/settings/settings';
 import {EFlag} from '../types/api/enums';
 
+import {calcUptime} from './dataFormatters/dataFormatters';
 import {HOUR_IN_SECONDS} from './constants';
 
 export enum NodesUptimeFilterValues {
@@ -29,6 +30,29 @@ export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
         }
         return nodesMap;
     }, new Map());
+};
+
+export interface PreparedNodeSystemState extends TSystemStateInfo {
+    Rack?: string;
+    DC?: string;
+    Uptime: string;
+}
+
+export const prepareNodeSystemState = (
+    systemState: TSystemStateInfo = {},
+): PreparedNodeSystemState => {
+    // There is no Rack in Location field for din nodes
+    const Rack = systemState.Location?.Rack || systemState.Rack;
+    const DC = systemState.Location?.DataCenter || systemState.DataCenter;
+
+    const Uptime = calcUptime(systemState.StartTime);
+
+    return {
+        ...systemState,
+        Rack,
+        DC,
+        Uptime,
+    };
 };
 
 export const getProblemParamValue = (problemFilter: ProblemFilterValue | undefined) => {

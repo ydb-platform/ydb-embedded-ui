@@ -2,6 +2,7 @@ import type {TComputeInfo, TComputeNodeInfo, TComputeTenantInfo} from '../../../
 import type {TNodesInfo} from '../../../types/api/nodes';
 import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
+import {prepareNodeSystemState} from '../../../utils/nodes';
 
 import type {NodesHandledResponse, NodesPreparedEntity} from './types';
 
@@ -56,15 +57,10 @@ export const prepareNodesData = (data: TNodesInfo): NodesHandledResponse => {
         const sharedCacheLimit = Number(node.SystemState.SharedCacheStats?.LimitBytes) || undefined;
 
         return {
-            ...node.SystemState,
+            ...prepareNodeSystemState(node.SystemState),
             Tablets: node.Tablets,
             NodeId: node.NodeId,
-            Uptime: calcUptime(node.SystemState?.StartTime),
             TenantName: node.SystemState?.Tenants?.[0],
-
-            DC: node.SystemState.Location?.DataCenter,
-            Rack: node.SystemState.Location?.Rack,
-
             SharedCacheUsed: node.SystemState.SharedCacheStats?.UsedBytes,
             SharedCacheLimit: sharedCacheLimit,
         };
