@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.1.0...v5.2.0) (2024-03-04)
+
+
+### Features
+
+* add binary data in plain text display ([#739](https://github.com/ydb-platform/ydb-embedded-ui/issues/739)) ([dd126b0](https://github.com/ydb-platform/ydb-embedded-ui/commit/dd126b0c03bef61110362596a15b5d069644c232))
+* allow replace ErrorBoundary compponent ([#744](https://github.com/ydb-platform/ydb-embedded-ui/issues/744)) ([588c1f1](https://github.com/ydb-platform/ydb-embedded-ui/commit/588c1f165ced6087afc85f535abf3cd08733648d))
+
 ## [5.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.0.0...v5.1.0) (2024-02-29)
 
 
