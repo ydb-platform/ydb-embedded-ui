@@ -1,5 +1,14 @@
 # Changelog
 
+## [5.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.2.0...v5.2.1) (2024-03-05)
+
+
+### Bug Fixes
+
+* **Cluster:** make cluster title sticky ([#743](https://github.com/ydb-platform/ydb-embedded-ui/issues/743)) ([823709d](https://github.com/ydb-platform/ydb-embedded-ui/commit/823709d3d12992db86254ccdb4941ead1dc30295))
+* display rack for din nodes ([#742](https://github.com/ydb-platform/ydb-embedded-ui/issues/742)) ([54384dd](https://github.com/ydb-platform/ydb-embedded-ui/commit/54384dd2447465109008f4053ba748241a1fa133))
+* **QueryEditor:** rename actions ([#741](https://github.com/ydb-platform/ydb-embedded-ui/issues/741)) ([784c5b3](https://github.com/ydb-platform/ydb-embedded-ui/commit/784c5b3ca45aa9be77a25f253b5aae2bb4ecc88b))
+
 ## [5.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.1.0...v5.2.0) (2024-03-04)
 
 
