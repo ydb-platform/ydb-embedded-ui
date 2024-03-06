@@ -1,4 +1,4 @@
-import {createSelector} from 'reselect';
+import {createSelector} from '@reduxjs/toolkit';
 import {createRequestActionTypes, createApiRequest} from '../utils';
 import {AUTO_RELOAD_INTERVAL} from '../../utils/constants';
 

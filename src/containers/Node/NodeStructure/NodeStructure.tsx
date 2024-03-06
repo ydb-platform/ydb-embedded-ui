@@ -1,5 +1,4 @@
 import {useEffect, useRef} from 'react';
-import {useDispatch} from 'react-redux';
 import url from 'url';
 import {isEmpty} from 'lodash/fp';
 
@@ -11,7 +10,7 @@ import {getNodeStructure} from '../../../store/reducers/node/node';
 import {selectNodeStructure} from '../../../store/reducers/node/selectors';
 
 import {AutoFetcher} from '../../../utils/autofetcher';
-import {useTypedSelector} from '../../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../../utils/hooks';
 
 import {PDisk} from './Pdisk';
 
@@ -35,7 +34,7 @@ interface NodeStructureProps {
 const autofetcher = new AutoFetcher();
 
 function NodeStructure({nodeId, className}: NodeStructureProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const nodeStructure = useTypedSelector(selectNodeStructure);
 

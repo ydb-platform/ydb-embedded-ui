@@ -1,4 +1,4 @@
-import type {Dispatch, Reducer} from 'redux';
+import type {Dispatch, Reducer} from '@reduxjs/toolkit';
 
 import {DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
 import {clusterTabsIds, isClusterTab, ClusterTab} from '../../../containers/Cluster/utils';

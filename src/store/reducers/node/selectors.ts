@@ -1,5 +1,5 @@
-import type {Selector} from 'reselect';
-import {createSelector} from 'reselect';
+import type {Selector} from '@reduxjs/toolkit';
+import {createSelector} from '@reduxjs/toolkit';
 
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {preparePDiskData} from '../../../utils/disks/prepareDisks';

@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
-import {shallowEqual, useDispatch} from 'react-redux';
+import {shallowEqual} from 'react-redux';
 import cn from 'bem-cn-lite';
 import JSONTree from 'react-json-inspector';
 import 'react-json-inspector/json-inspector.css';
@@ -7,7 +7,7 @@ import 'react-json-inspector/json-inspector.css';
 import {Loader} from '../../../../components/Loader';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 
-import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
 import {
     getDescribe,
     setDataWasNotLoaded,
@@ -31,7 +31,7 @@ interface IDescribeProps {
 }
 
 const Describe = ({tenant, type}: IDescribeProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {currentDescribe, error, loading, wasLoaded} = useTypedSelector(
         (state) => state.describe,

@@ -1,5 +1,6 @@
 export * from './useAutofetcher';
 export * from './useTypedSelector';
+export * from './useTypedDispatch';
 export * from './useSetting';
 export * from './useQueryModes';
 export * from './useTableSort';

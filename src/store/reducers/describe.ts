@@ -1,4 +1,4 @@
-import {Reducer} from 'redux';
+import type {Reducer} from '@reduxjs/toolkit';
 
 import type {
     IDescribeState,

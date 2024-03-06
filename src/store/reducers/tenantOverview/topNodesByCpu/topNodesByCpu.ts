@@ -1,4 +1,4 @@
-import type {Reducer} from 'redux';
+import type {Reducer} from '@reduxjs/toolkit';
 
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {createApiRequest, createRequestActionTypes} from '../../../utils';

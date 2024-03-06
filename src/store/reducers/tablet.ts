@@ -1,4 +1,4 @@
-import type {Reducer} from 'redux';
+import type {Reducer} from '@reduxjs/toolkit';
 
 import type {TDomainKey} from '../../types/api/tablet';
 import type {

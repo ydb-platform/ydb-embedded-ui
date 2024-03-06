@@ -1,5 +1,4 @@
 import {useCallback, useMemo} from 'react';
-import {useDispatch} from 'react-redux';
 import {Helmet} from 'react-helmet-async';
 
 import DataTable from '@gravity-ui/react-data-table';
@@ -8,9 +7,7 @@ import {TableColumnSetup, Select} from '@gravity-ui/uikit';
 import {Search} from '../../components/Search';
 import {Loader} from '../../components/Loader';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {useAutofetcher} from '../../utils/hooks';
-
-import {useTypedSelector} from '../../utils/hooks/useTypedSelector';
+import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 
 import {fetchClustersList, changeClustersFilters} from '../../store/reducers/clusters/clusters';
 import {
@@ -41,7 +38,7 @@ import i18n from './i18n';
 import './Clusters.scss';
 
 export function Clusters() {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const loading = useTypedSelector(selectLoadingFlag);
     const clusters = useTypedSelector(selectClustersList);

@@ -1,5 +1,5 @@
 import {Button} from '@gravity-ui/uikit';
-import {useDispatch} from 'react-redux';
+import {useTypedDispatch} from '../../utils/hooks';
 import {enableFullscreen} from '../../store/reducers/fullscreen';
 import {Icon} from '../Icon';
 
@@ -8,7 +8,7 @@ interface EnableFullscreenButtonProps {
 }
 
 function EnableFullscreenButton({disabled}: EnableFullscreenButtonProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const onEnableFullscreen = () => {
         dispatch(enableFullscreen());
     };

@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
 
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import type {RenderControls, RenderErrorMessage} from '../../components/VirtualTable';
@@ -9,7 +8,7 @@ import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {AccessDenied} from '../../components/Errors/403/AccessDenied';
 import {ResponseError} from '../../components/Errors/ResponseError/ResponseError';
 import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
-import {useTypedSelector} from '../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 
 import {StorageControls} from './StorageControls/StorageControls';
 import {VirtualStorageGroups} from './StorageGroups/VirtualStorageGroups';
@@ -28,7 +27,7 @@ export const VirtualStorage = ({
     parentContainer,
     additionalNodesProps,
 }: VirtualStorageProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const [searchValue, setSearchValue] = useState('');
     const [storageType, setStorageType] = useState<StorageType>(STORAGE_TYPES.groups);

@@ -1,5 +1,4 @@
 import {useCallback} from 'react';
-import {useDispatch} from 'react-redux';
 
 import {
     getHealthcheckInfo,
@@ -10,7 +9,7 @@ import {
 import type {IIssuesTree} from '../../../../types/store/healthcheck';
 import {type StatusFlag, SelfCheckResult} from '../../../../types/api/healthcheck';
 import type {IResponseError} from '../../../../types/api/error';
-import {useTypedSelector} from '../../../../utils/hooks/useTypedSelector';
+import {useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
 
 interface HealthcheckParams {
     issueTrees: IIssuesTree[];
@@ -23,7 +22,7 @@ interface HealthcheckParams {
 }
 
 export const useHealthcheck = (tenantName: string): HealthcheckParams => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {data, loading, wasLoaded, error} = useTypedSelector((state) => state.healthcheckInfo);
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;

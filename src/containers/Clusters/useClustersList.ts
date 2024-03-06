@@ -1,9 +1,9 @@
 import React from 'react';
-import {useDispatch} from 'react-redux';
+import {useTypedDispatch} from '../../utils/hooks';
 import {fetchClustersList} from '../../store/reducers/clusters/clusters';
 
 export function useClustersList() {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     React.useEffect(() => {
         dispatch(fetchClustersList());

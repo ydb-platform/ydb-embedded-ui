@@ -2,7 +2,6 @@ import {useMemo, useRef} from 'react';
 import qs from 'qs';
 import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
-import {useDispatch, useSelector} from 'react-redux';
 import {useLocation} from 'react-router';
 import {Helmet} from 'react-helmet-async';
 
@@ -11,7 +10,7 @@ import {Switch, Tabs} from '@gravity-ui/uikit';
 import type {EPathType} from '../../../types/api/schema';
 import type {AdditionalTenantsProps, AdditionalNodesProps} from '../../../types/additionalProps';
 
-import {useTypedSelector} from '../../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../../utils/hooks';
 import routes, {createHref} from '../../../routes';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema/schema';
@@ -52,8 +51,8 @@ const b = cn('kv-tenant-diagnostics');
 function Diagnostics(props: DiagnosticsProps) {
     const container = useRef<HTMLDivElement>(null);
 
-    const dispatch = useDispatch();
-    const {currentSchemaPath, autorefresh, wasLoaded} = useSelector((state: any) => state.schema);
+    const dispatch = useTypedDispatch();
+    const {currentSchemaPath, autorefresh, wasLoaded} = useTypedSelector((state) => state.schema);
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
     );
@@ -147,12 +146,15 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Describe tenant={tenantNameString} type={type} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.hotKeys: {
+                // @ts-expect-error
                 return <HotKeys path={currentSchemaPath} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.graph: {
+                // @ts-expect-error
                 return <Heatmap path={currentSchemaPath} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.consumers: {
+                // @ts-expect-error
                 return <Consumers path={currentSchemaPath} type={type} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.partitions: {

@@ -1,8 +1,8 @@
 import _flow from 'lodash/fp/flow';
 import _sortBy from 'lodash/fp/sortBy';
 import _uniqBy from 'lodash/fp/uniqBy';
-import {createSelector, Selector} from 'reselect';
-import {Reducer} from 'redux';
+import {createSelector} from '@reduxjs/toolkit';
+import type {Reducer, Selector} from '@reduxjs/toolkit';
 
 import type {
     IHealthCheckInfoAction,

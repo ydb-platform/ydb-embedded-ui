@@ -1,7 +1,11 @@
-import {useDispatch} from 'react-redux';
 import {useCallback} from 'react';
 
-import {useAutofetcher, useTypedSelector, useSearchQuery} from '../../../../../utils/hooks';
+import {
+    useAutofetcher,
+    useTypedSelector,
+    useSearchQuery,
+    useTypedDispatch,
+} from '../../../../../utils/hooks';
 import {
     getTopNodesByMemory,
     selectTopNodesByMemory,
@@ -23,7 +27,7 @@ interface TopNodesByMemoryProps {
 }
 
 export function TopNodesByMemory({path, additionalNodesProps}: TopNodesByMemoryProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const query = useSearchQuery();
 

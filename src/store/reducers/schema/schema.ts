@@ -1,7 +1,6 @@
-import type {Reducer} from 'redux';
-import type {Selector} from 'reselect';
+import type {Selector, Reducer} from '@reduxjs/toolkit';
 
-import {createSelector} from 'reselect';
+import {createSelector} from '@reduxjs/toolkit';
 
 import type {EPathType} from '../../../types/api/schema';
 import type {

@@ -1,10 +1,10 @@
-import type {Dispatch} from 'redux';
+import type {Dispatch} from '@reduxjs/toolkit';
 import {AxiosResponse} from 'axios';
 
 import createToast from '../utils/createToast';
 
 import {SET_UNAUTHENTICATED} from './reducers/authentication/authentication';
-import type {GetState} from './reducers';
+import type {GetState} from '.';
 
 export const nop = (result: any) => result;
 

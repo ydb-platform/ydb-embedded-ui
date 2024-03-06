@@ -1,5 +1,4 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import ReactList from 'react-list';
 
@@ -9,7 +8,7 @@ import {Tablet} from '../../components/Tablet';
 import TabletsOverall from '../../components/TabletsOverall/TabletsOverall';
 import {Loader} from '../../components/Loader';
 
-import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
+import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 import {ETabletState, EType, TTabletStateInfo} from '../../types/api/tablet';
 
 import {
@@ -32,7 +31,7 @@ interface TabletsProps {
 }
 
 export const Tablets = ({path, nodeId, className}: TabletsProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {data, wasLoaded, loading, error, stateFilter, typeFilter} = useTypedSelector(
         (state) => state.tablets,

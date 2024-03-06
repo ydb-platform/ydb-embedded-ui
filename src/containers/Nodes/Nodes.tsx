@@ -1,6 +1,5 @@
 import {useCallback, useEffect} from 'react';
 import cn from 'bem-cn-lite';
-import {useDispatch} from 'react-redux';
 
 import DataTable from '@gravity-ui/react-data-table';
 import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
@@ -18,7 +17,13 @@ import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/
 import {ResponseError} from '../../components/Errors/ResponseError';
 
 import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
-import {useAutofetcher, useSetting, useTypedSelector, useTableSort} from '../../utils/hooks';
+import {
+    useAutofetcher,
+    useSetting,
+    useTypedSelector,
+    useTableSort,
+    useTypedDispatch,
+} from '../../utils/hooks';
 import {
     isSortableNodesProperty,
     isUnavailableNode,
@@ -52,7 +57,7 @@ interface NodesProps {
 }
 
 export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const isClusterNodes = !path;
 

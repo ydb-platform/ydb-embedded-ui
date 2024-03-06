@@ -144,7 +144,7 @@ export const TableHead = <T,>({
         return new ResizeObserver((entries) => {
             const columnsWidth: TableColumnsWidthSetup = {};
             entries.forEach((entry) => {
-                // @ts-ignore ignore custrom property usage
+                // @ts-expect-error ignore custrom property usage
                 const id = entry.target.attributes[COLUMN_NAME_HTML_ATTRIBUTE]?.value;
                 columnsWidth[id] = entry.contentRect.width;
             });

@@ -1,6 +1,5 @@
 import {useEffect, useMemo, useRef} from 'react';
 import {Redirect, Switch, Route, useLocation, useRouteMatch} from 'react-router';
-import {useDispatch} from 'react-redux';
 import {Helmet} from 'react-helmet-async';
 import cn from 'bem-cn-lite';
 import qs from 'qs';
@@ -19,7 +18,7 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {getClusterInfo, updateDefaultClusterTab} from '../../store/reducers/cluster/cluster';
 import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
 import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../../utils/versions';
-import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
+import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 
 import {InternalLink} from '../../components/InternalLink';
 import {Tenants} from '../Tenants/Tenants';
@@ -51,7 +50,7 @@ function Cluster({
 }: ClusterProps) {
     const container = useRef<HTMLDivElement>(null);
 
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const activeTabId = useClusterTab();
 
@@ -215,7 +214,7 @@ function Cluster({
 }
 
 function useClusterTab() {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const defaultTab = useTypedSelector((state) => state.cluster.defaultClusterTab);
 

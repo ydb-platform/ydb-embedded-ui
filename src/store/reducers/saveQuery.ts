@@ -1,4 +1,4 @@
-import {Reducer} from 'redux';
+import type {Reducer} from '@reduxjs/toolkit';
 
 const SET_QUERY_NAME_TO_EDIT = 'SET_QUERY_NAME_TO_EDIT';
 const CLEAR_QUERY_NAME_TO_EDIT = 'CLEAR_QUERY_NAME_TO_EDIT';

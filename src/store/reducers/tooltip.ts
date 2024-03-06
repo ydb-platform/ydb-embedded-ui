@@ -1,7 +1,5 @@
 import isEqual from 'lodash/isEqual';
-import type {Reducer} from 'redux';
-
-import {tooltipTemplates} from '../../utils/tooltip';
+import type {Reducer} from '@reduxjs/toolkit';
 
 import {
     ITooltipAction,
@@ -11,14 +9,13 @@ import {
 } from '../../types/store/tooltip';
 
 const HIDE_TOOLTIP = 'tooltip/HIDE_TOOLTIP';
-const UPDATE_REF = 'tooltip/UPDATE_REF';
+export const UPDATE_REF = 'tooltip/UPDATE_REF';
 
 const initialState: ITooltipState = {
     toolTipVisible: false,
     currentHoveredRef: undefined,
     data: undefined,
     templateType: 'pool',
-    template: tooltipTemplates['pool'],
 };
 
 const tooltip: Reducer<ITooltipState, ITooltipAction> = (state = initialState, action) => {
@@ -48,7 +45,6 @@ const tooltip: Reducer<ITooltipState, ITooltipAction> = (state = initialState, a
                 data: action.data,
                 additionalData: action.additionalData,
                 templateType: action.templateType,
-                template: tooltipTemplates[action.templateType],
             };
         }
         default: {

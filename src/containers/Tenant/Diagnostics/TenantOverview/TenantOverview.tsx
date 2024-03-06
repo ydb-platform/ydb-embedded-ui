@@ -1,5 +1,4 @@
 import {useCallback} from 'react';
-import {useDispatch} from 'react-redux';
 
 import {Loader} from '@gravity-ui/uikit';
 
@@ -7,7 +6,7 @@ import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
-import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
@@ -33,7 +32,7 @@ export function TenantOverview({
     additionalTenantProps,
     additionalNodesProps,
 }: TenantOverviewProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {
         tenant,

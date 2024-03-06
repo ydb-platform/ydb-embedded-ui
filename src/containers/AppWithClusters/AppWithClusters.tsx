@@ -1,7 +1,7 @@
 import {App, AppSlots} from '../App';
 
 import type {History} from 'history';
-import type {Store} from 'redux';
+import type {Store} from '@reduxjs/toolkit';
 
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../utils/monitoring';
 

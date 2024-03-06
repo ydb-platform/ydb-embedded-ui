@@ -1,4 +1,3 @@
-import {useDispatch} from 'react-redux';
 import {useHistory, useLocation} from 'react-router';
 import {useCallback} from 'react';
 
@@ -13,7 +12,7 @@ import {
     setDataWasNotLoaded,
 } from '../../../../../store/reducers/tenantOverview/topQueries/tenantOverviewTopQueries';
 import {changeUserInput} from '../../../../../store/reducers/executeQuery';
-import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {parseQuery} from '../../../../../routes';
 
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
@@ -28,7 +27,7 @@ interface TopQueriesProps {
 }
 
 export function TopQueries({path}: TopQueriesProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const location = useLocation();
     const history = useHistory();
 

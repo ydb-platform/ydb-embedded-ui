@@ -1,9 +1,9 @@
-import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 
 import {Progress} from '@gravity-ui/uikit';
 
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
+import {useTypedDispatch} from '../../utils/hooks';
 import {COLORS_PRIORITY} from '../../utils/constants';
 
 import './TabletsOverall.scss';
@@ -29,17 +29,17 @@ interface TabletsOverallProps {
 }
 
 function TabletsOverall({tablets}: TabletsOverallProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const tabletsCount = tablets.length;
 
-    const substractPercentsFromMaxPercents = (
+    const subtractPercentsFromMaxPercents = (
         statesForOverallProgress: Record<Color, number>,
-        substractValue: number,
+        subtractValue: number,
     ) => {
         Object.keys(statesForOverallProgress).some((key) => {
             if (statesForOverallProgress[key as Color] > 10) {
-                statesForOverallProgress[key as Color] -= minOverallPercentValue - substractValue;
+                statesForOverallProgress[key as Color] -= minOverallPercentValue - subtractValue;
                 return true;
             }
             return false;
@@ -71,7 +71,7 @@ function TabletsOverall({tablets}: TabletsOverallProps) {
     // replace percents which are smaller then 3 to 3.
     Object.keys(statesForOverallProgress).forEach((key) => {
         if (statesForOverallProgress[key] < minOverallPercentValue) {
-            substractPercentsFromMaxPercents(
+            subtractPercentsFromMaxPercents(
                 statesForOverallProgress,
                 statesForOverallProgress[key],
             );

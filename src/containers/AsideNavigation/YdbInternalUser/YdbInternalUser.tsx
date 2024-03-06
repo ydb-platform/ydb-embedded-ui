@@ -1,10 +1,9 @@
 import {useHistory} from 'react-router';
-import {useDispatch} from 'react-redux';
 
 import {Button, Icon} from '@gravity-ui/uikit';
 
 import routes, {createHref} from '../../../routes';
-import {useTypedSelector} from '../../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../../utils/hooks';
 import {logout} from '../../../store/reducers/authentication/authentication';
 import {cn} from '../../../utils/cn';
 
@@ -27,7 +26,7 @@ export function YdbInternalUser() {
         );
     };
 
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const handleLogout = () => {
         dispatch(logout);
     };

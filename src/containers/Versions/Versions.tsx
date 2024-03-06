@@ -1,11 +1,10 @@
 import {useState} from 'react';
-import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 
 import {Checkbox, RadioButton} from '@gravity-ui/uikit';
 
 import type {VersionToColorMap} from '../../types/versions';
-import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
 import {Loader} from '../../components/Loader';
 
@@ -22,7 +21,7 @@ interface VersionsProps {
 }
 
 export const Versions = ({versionToColor}: VersionsProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {nodes = [], loading, wasLoaded} = useTypedSelector((state) => state.clusterNodes);
 

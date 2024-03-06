@@ -1,7 +1,7 @@
 import React from 'react';
 import {Switch, Route, Redirect, RedirectProps} from 'react-router-dom';
 import cn from 'bem-cn-lite';
-import {connect, useDispatch} from 'react-redux';
+import {connect} from 'react-redux';
 
 import routes from '../../routes';
 
@@ -17,7 +17,7 @@ import Authentication from '../Authentication/Authentication';
 import {getUser} from '../../store/reducers/authentication/authentication';
 import {getClusterPath} from '../Cluster/utils';
 import {useSlots} from '../../components/slots';
-import {useTypedSelector} from '../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 import {
     ClusterSlot,
     ClustersSlot,
@@ -32,6 +32,7 @@ import {
 import type {SlotComponent} from '../../components/slots/types';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {RawBreadcrumbItem} from '../Header/breadcrumbs';
+import type {RootState} from '../../store';
 
 import i18n from './i18n';
 import './App.scss';
@@ -142,7 +143,7 @@ export function Content(props: ContentProps) {
 }
 
 function GetUser() {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const {isAuthenticated, isInternalUser} = useTypedSelector((state) => ({
         isAuthenticated: state.authentication.isAuthenticated,
         isInternalUser: Boolean(state.authentication.user),
@@ -180,7 +181,7 @@ function ContentWrapper(props: ContentWrapperProps) {
     );
 }
 
-function mapStateToProps(state: any) {
+function mapStateToProps(state: RootState) {
     return {
         isAuthenticated: state.authentication.isAuthenticated,
         singleClusterMode: state.singleClusterMode,

@@ -9,6 +9,6 @@ export const getAdditionalNodesProps = (
 ): AdditionalNodesProps => {
     return {
         getNodeRef: (node: NodeAddress = {}) =>
-            getBackendFromRawNodeData(node, balancer, useClusterBalancerAsBackend),
+            getBackendFromRawNodeData(node, balancer ?? '', useClusterBalancerAsBackend),
     };
 };

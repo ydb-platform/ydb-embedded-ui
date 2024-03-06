@@ -1,4 +1,4 @@
-import type {Reducer} from 'redux';
+import type {Reducer} from '@reduxjs/toolkit';
 
 import type {HeaderAction, HeaderState, Page, PageBreadcrumbsOptions} from './types';
 

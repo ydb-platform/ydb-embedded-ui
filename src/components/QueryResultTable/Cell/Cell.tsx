@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
-import {useDispatch} from 'react-redux';
 
+import {useTypedDispatch} from '../../../utils/hooks';
 import {showTooltip, hideTooltip} from '../../../store/reducers/tooltip';
 
 import {b} from '../QueryResultTable';
@@ -13,7 +13,7 @@ interface CellProps {
 export const Cell = React.memo(function Cell(props: CellProps) {
     const {className, value} = props;
 
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     useEffect(
         () => () => {

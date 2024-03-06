@@ -1,10 +1,14 @@
 import block from 'bem-cn-lite';
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {useDispatch} from 'react-redux';
 
 import DataTable from '@gravity-ui/react-data-table';
 
-import {useAutofetcher, useTypedSelector, useSetting} from '../../../../utils/hooks';
+import {
+    useAutofetcher,
+    useTypedSelector,
+    useTypedDispatch,
+    useSetting,
+} from '../../../../utils/hooks';
 import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
 
 import {getNodesList, selectNodesMap} from '../../../../store/reducers/nodesList';
@@ -39,7 +43,7 @@ interface PartitionsProps {
 }
 
 export const Partitions = ({path}: PartitionsProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     // Manual path control to ensure that topic state will be reset before data fetch
     // so no request with wrong params will be sent

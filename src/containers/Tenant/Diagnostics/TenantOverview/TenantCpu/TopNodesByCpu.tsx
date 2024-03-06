@@ -1,7 +1,11 @@
-import {useDispatch} from 'react-redux';
 import {useCallback} from 'react';
 
-import {useAutofetcher, useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
+import {
+    useAutofetcher,
+    useSearchQuery,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../../../../utils/hooks';
 import {
     getTopNodesByCpu,
     selectTopNodesByCpu,
@@ -23,7 +27,7 @@ interface TopNodesByCpuProps {
 }
 
 export function TopNodesByCpu({path, additionalNodesProps}: TopNodesByCpuProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const query = useSearchQuery();
 

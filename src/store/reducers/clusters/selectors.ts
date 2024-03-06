@@ -1,4 +1,4 @@
-import {type Selector, createSelector} from 'reselect';
+import {type Selector, createSelector} from '@reduxjs/toolkit';
 import {escapeRegExp} from 'lodash/fp';
 
 import {getMinorVersion} from '../../../utils/versions';

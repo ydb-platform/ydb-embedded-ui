@@ -1,4 +1,3 @@
-import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
@@ -8,7 +7,7 @@ import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQue
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {selectQueriesHistory} from '../../../../store/reducers/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
-import {useQueryModes, useTypedSelector} from '../../../../utils/hooks';
+import {useQueryModes, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {QUERY_MODES, QUERY_SYNTAX} from '../../../../utils/query';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 
@@ -23,7 +22,7 @@ interface QueriesHistoryProps {
 }
 
 function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const [queryMode, setQueryMode] = useQueryModes();
 

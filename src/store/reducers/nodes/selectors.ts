@@ -1,4 +1,4 @@
-import {Selector, createSelector} from 'reselect';
+import {Selector, createSelector} from '@reduxjs/toolkit';
 
 import {EFlag} from '../../../types/api/enums';
 import {calcUptimeInSeconds} from '../../../utils/dataFormatters/dataFormatters';

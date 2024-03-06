@@ -1,5 +1,4 @@
 import {useCallback, useEffect} from 'react';
-import {useDispatch} from 'react-redux';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
@@ -41,6 +40,7 @@ import {
     useStorageRequestParams,
     useTableSort,
     useTypedSelector,
+    useTypedDispatch,
 } from '../../utils/hooks';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
@@ -59,7 +59,7 @@ interface StorageProps {
 }
 
 export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const {

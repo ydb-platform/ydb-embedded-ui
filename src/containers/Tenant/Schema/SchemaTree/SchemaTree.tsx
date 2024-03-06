@@ -1,11 +1,10 @@
 import {useEffect} from 'react';
-import {useDispatch} from 'react-redux';
 
 import {NavigationTree} from 'ydb-ui-components';
 
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema/schema';
-import {useQueryModes} from '../../../../utils/hooks';
+import {useQueryModes, useTypedDispatch} from '../../../../utils/hooks';
 
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
@@ -21,7 +20,7 @@ interface SchemaTreeProps {
 export function SchemaTree(props: SchemaTreeProps) {
     const {rootPath, rootName, rootType, currentPath} = props;
 
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const [_, setQueryMode] = useQueryModes();
 

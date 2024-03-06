@@ -1,11 +1,11 @@
-import type {AnyAction, Reducer} from 'redux';
+import type {AnyAction, Reducer} from '@reduxjs/toolkit';
 import type {ThunkAction} from 'redux-thunk';
 
 import type {IQueryResult} from '../../../types/store/query';
 import {parseQueryAPIExecuteResponse} from '../../../utils/query';
 
 import {createRequestActionTypes, createApiRequest} from '../../utils';
-import type {RootState} from '..';
+import type {RootState} from '../..';
 import type {ITopQueriesAction, ITopQueriesFilters, ITopQueriesState} from './types';
 import {getFiltersConditions} from './utils';
 

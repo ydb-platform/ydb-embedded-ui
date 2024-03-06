@@ -1,4 +1,4 @@
-import type {Reducer} from 'redux';
+import type {Reducer} from '@reduxjs/toolkit';
 import _ from 'lodash';
 
 import {EVersion} from '../../../types/api/storage';
