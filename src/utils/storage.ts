@@ -1,8 +1,4 @@
-import type {TVSlotId, TVDiskStateInfo} from '../types/api/vdisk';
 import type {ValueOf} from '../types/common';
-
-export const isFullVDiskData = (disk: TVDiskStateInfo | TVSlotId): disk is TVDiskStateInfo =>
-    'VDiskId' in disk;
 
 interface EntityWithUsage {
     Used: number;
