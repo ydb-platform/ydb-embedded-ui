@@ -26,10 +26,11 @@ export interface ChartConfig {
 }
 
 interface TenantDashboardProps {
+    database: string;
     charts: ChartConfig[];
 }
 
-export const TenantDashboard = ({charts}: TenantDashboardProps) => {
+export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const [isDashboardHidden, setIsDashboardHidden] = useState<boolean>(true);
 
     const [timeFrame = '1h', setTimeframe] = useQueryParam('timeframe', StringParam);
@@ -64,6 +65,7 @@ export const TenantDashboard = ({charts}: TenantDashboardProps) => {
             return (
                 <MetricChart
                     key={chartId}
+                    database={database}
                     title={chartConfig.title}
                     metrics={chartConfig.metrics}
                     timeFrame={timeFrame as TimeFrame}

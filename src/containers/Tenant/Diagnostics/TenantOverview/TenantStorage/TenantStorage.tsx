@@ -69,7 +69,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
 
     return (
         <>
-            <TenantDashboard charts={storageDashboardConfig} />
+            <TenantDashboard database={tenantName} charts={storageDashboardConfig} />
             <InfoViewer className={b('storage-info')} title="Storage details" info={info} />
             <TopTables path={tenantName} />
             <TopGroups tenant={tenantName} />

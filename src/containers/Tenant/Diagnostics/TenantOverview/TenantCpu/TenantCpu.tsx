@@ -14,7 +14,7 @@ interface TenantCpuProps {
 export function TenantCpu({path, additionalNodesProps}: TenantCpuProps) {
     return (
         <>
-            <TenantDashboard charts={cpuDashboardConfig} />
+            <TenantDashboard database={path} charts={cpuDashboardConfig} />
             <TopNodesByLoad path={path} additionalNodesProps={additionalNodesProps} />
             <TopNodesByCpu path={path} additionalNodesProps={additionalNodesProps} />
             <TopShards path={path} />
