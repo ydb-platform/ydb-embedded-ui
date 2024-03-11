@@ -30,6 +30,7 @@ import {
     setChartDataWasNotLoaded,
     setChartError,
 } from './reducer';
+import i18n from './i18n';
 
 import './MetricChart.scss';
 
@@ -181,14 +182,18 @@ export const MetricChart = ({
                     return;
                 }
 
-                // In some cases error could be in response with 200 status code
+                // Response could be a plain html for ydb versions without charts support
+                // Or there could be an error in response with 200 status code
                 // It happens when request is OK, but chart data cannot be returned due to some reason
                 // Example: charts are not enabled in the DB ('GraphShard is not enabled' error)
                 if (Array.isArray(response)) {
                     const preparedData = convertResponse(response, metrics);
                     dispatch(setChartData(preparedData));
                 } else {
-                    const err = {statusText: response.error};
+                    const err = {
+                        statusText:
+                            typeof response === 'string' ? i18n('not-supported') : response.error,
+                    };
 
                     throw err;
                 }
