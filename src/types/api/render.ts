@@ -4,12 +4,15 @@
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/json_render.h
  */
 
-export type JsonRenderResponse =
+export type JsonRenderResponse = JsonRenderErrorResponse | MetricData[];
+
+/** Response could be a plain html with 404 on ydb versions without charts support */
+type JsonRenderErrorResponse =
     | {
           error?: string;
           status?: string;
       }
-    | MetricData[];
+    | string;
 
 export interface MetricData {
     datapoints: MetricDatapoint[];
