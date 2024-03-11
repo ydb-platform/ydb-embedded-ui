@@ -1,5 +1,4 @@
 import {useCallback} from 'react';
-import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 
 import {Loader, Button} from '@gravity-ui/uikit';
@@ -8,7 +7,7 @@ import type {EPathType} from '../../../../types/api/schema';
 import {sendQuery, setQueryOptions} from '../../../../store/reducers/preview';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import {prepareQueryError} from '../../../../utils/query';
-import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import {Icon} from '../../../../components/Icon';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
@@ -29,7 +28,7 @@ interface PreviewProps {
 }
 
 export const Preview = ({database, type}: PreviewProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {data = {}, loading, error, wasLoaded} = useTypedSelector((state) => state.preview);
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);

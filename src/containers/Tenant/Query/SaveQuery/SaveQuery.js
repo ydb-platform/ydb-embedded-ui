@@ -1,23 +1,23 @@
 import React, {useState} from 'react';
 import _ from 'lodash';
 import cn from 'bem-cn-lite';
-import {useDispatch, useSelector} from 'react-redux';
 import {Dialog, DropdownMenu, TextInput, Button} from '@gravity-ui/uikit';
 
 import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import './SaveQuery.scss';
 
 const b = cn('kv-save-query');
 
 function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
-    const singleClusterMode = useSelector((state) => state.singleClusterMode);
+    const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const [isDialogVisible, setIsDialogVisible] = useState(false);
     const [queryName, setQueryName] = useState('');
     const [validationError, setValidationError] = useState(null);
 
-    const queryNameToEdit = useSelector((state) => state.saveQuery);
-    const dispatch = useDispatch();
+    const queryNameToEdit = useTypedSelector((state) => state.saveQuery);
+    const dispatch = useTypedDispatch();
 
     const onSaveQueryClick = () => {
         setIsDialogVisible(true);

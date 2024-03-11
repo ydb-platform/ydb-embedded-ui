@@ -1,5 +1,4 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {useDispatch} from 'react-redux';
 import {useHistory, useLocation} from 'react-router';
 import cn from 'bem-cn-lite';
 
@@ -26,7 +25,7 @@ import {
     fetchTopQueries,
 } from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import {HOUR_IN_SECONDS} from '../../../../utils/constants';
-import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
 import {parseQuery} from '../../../../routes';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
@@ -46,7 +45,7 @@ interface TopQueriesProps {
 }
 
 export const TopQueries = ({path, type}: TopQueriesProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const location = useLocation();
     const history = useHistory();
 
@@ -117,8 +116,6 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
                 );
             }
 
-            // @ts-expect-error
-            // typed dispatch required, remove error expectation after adding it
             dispatch(fetchTopQueries({database: path, filters})).then(
                 setDefaultFiltersFromResponse,
             );

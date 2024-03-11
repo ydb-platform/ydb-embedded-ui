@@ -1,9 +1,9 @@
-import {Selector, createSelector} from 'reselect';
+import {Selector, createSelector} from '@reduxjs/toolkit';
 import {escapeRegExp} from 'lodash';
 
 import {EFlag} from '../../../types/api/enums';
 
-import type {RootState} from '..';
+import type {RootState} from '../..';
 import type {ProblemFilterValue} from '../settings/types';
 import {ProblemFilterValues, selectProblemFilter} from '../settings/settings';
 

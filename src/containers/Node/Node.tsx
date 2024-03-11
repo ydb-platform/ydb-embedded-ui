@@ -1,7 +1,6 @@
 import {useEffect, useMemo, useRef} from 'react';
 import {useLocation, useRouteMatch} from 'react-router';
 import cn from 'bem-cn-lite';
-import {useDispatch} from 'react-redux';
 import {Helmet} from 'react-helmet-async';
 
 import {Tabs} from '@gravity-ui/uikit';
@@ -19,7 +18,7 @@ import {getNodeInfo, resetNode} from '../../store/reducers/node/node';
 import routes, {createHref, parseQuery} from '../../routes';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {AutoFetcher} from '../../utils/autofetcher';
-import {useTypedSelector} from '../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 
@@ -39,7 +38,7 @@ interface NodeProps {
 function Node(props: NodeProps) {
     const container = useRef<HTMLDivElement>(null);
 
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const location = useLocation();
 
     const {loading, wasLoaded, error, data: node} = useTypedSelector((state) => state.node);

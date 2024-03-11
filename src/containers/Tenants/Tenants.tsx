@@ -1,5 +1,4 @@
 import cn from 'bem-cn-lite';
-import {useDispatch} from 'react-redux';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 import {Button} from '@gravity-ui/uikit';
@@ -32,7 +31,7 @@ import {
     formatNumber,
 } from '../../utils/dataFormatters/dataFormatters';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {clusterName} from '../../store';
 
 import {getTenantPath} from '../Tenant/TenantPages';
@@ -46,7 +45,7 @@ interface TenantsProps {
 }
 
 export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {error, loading, wasLoaded} = useTypedSelector((state) => state.tenants);
     const searchValue = useTypedSelector(selectTenantsSearchValue);

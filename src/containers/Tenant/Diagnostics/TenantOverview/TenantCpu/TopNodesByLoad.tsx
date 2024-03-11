@@ -1,7 +1,11 @@
-import {useDispatch} from 'react-redux';
 import {useCallback} from 'react';
 
-import {useAutofetcher, useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
+import {
+    useAutofetcher,
+    useSearchQuery,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../../../../utils/hooks';
 import {
     getTopNodesByLoad,
     selectTopNodesByLoad,
@@ -23,7 +27,7 @@ interface TopNodesByLoadProps {
 }
 
 export function TopNodesByLoad({path, additionalNodesProps}: TopNodesByLoadProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const query = useSearchQuery();
 

@@ -3,7 +3,6 @@ import {Button, Tabs} from '@gravity-ui/uikit';
 import cn from 'bem-cn-lite';
 import qs from 'qs';
 import React, {ReactNode, useEffect, useReducer} from 'react';
-import {useDispatch} from 'react-redux';
 import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
 import {ClipboardButton} from '../../../components/ClipboardButton';
@@ -34,7 +33,7 @@ import {
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
 } from '../../../utils/constants';
 import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
-import {useTypedSelector} from '../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Acl} from '../Acl/Acl';
 import i18n from '../i18n';
 import {ExternalDataSourceSummary} from '../Info/ExternalDataSource/ExternalDataSource';
@@ -100,7 +99,7 @@ export function ObjectSummary({
     onExpandSummary,
     isCollapsed,
 }: ObjectSummaryProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED),
         undefined,

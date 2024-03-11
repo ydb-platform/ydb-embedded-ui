@@ -11,7 +11,7 @@ import {componentsRegistry as defaultComponentsRegistry} from '../../components/
 import {useSetting} from '../../utils/hooks';
 import {THEME_KEY} from '../../utils/constants';
 
-import type {Store} from 'redux';
+import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
 import type {ComponentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 

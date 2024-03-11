@@ -31,13 +31,11 @@ interface Window {
         Rum?: RumCounter;
     };
 
-    // eslint-disable-next-line
     web_version?: boolean;
-    // eslint-disable-next-line
     custom_backend?: string;
+    meta_backend?: string;
 
-    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof import('redux').compose;
-    store?: import('redux').Store;
+    store?: import('@reduxjs/toolkit').Store;
 
     userSettings?: import('../services/settings').SettingsObject;
     systemSettings?: import('../services/settings').SettingsObject;

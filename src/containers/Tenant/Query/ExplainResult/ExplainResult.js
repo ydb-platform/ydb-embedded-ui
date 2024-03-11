@@ -1,5 +1,4 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 import MonacoEditor from 'react-monaco-editor';
 import JSONTree from 'react-json-inspector';
@@ -17,6 +16,7 @@ import {explainVersions} from '../../../../store/reducers/explainQuery';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 
 import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 
@@ -92,10 +92,10 @@ function GraphRoot(props) {
 }
 
 export function ExplainResult(props) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const [activeOption, setActiveOption] = useState(ExplainOptionIds.schema);
 
-    const isFullscreen = useSelector((state) => state.fullscreen);
+    const isFullscreen = useTypedSelector((state) => state.fullscreen);
 
     useEffect(() => {
         return () => {

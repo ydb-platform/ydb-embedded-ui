@@ -1,4 +1,3 @@
-import {useDispatch} from 'react-redux';
 import {useEffect} from 'react';
 import cn from 'bem-cn-lite';
 
@@ -6,7 +5,7 @@ import DataTable, {Column} from '@gravity-ui/react-data-table';
 
 import type {TACE} from '../../../types/api/acl';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
-import {useTypedSelector} from '../../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../../utils/hooks';
 import {getSchemaAcl, setAclWasNotLoaded} from '../../../store/reducers/schemaAcl/schemaAcl';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
@@ -70,7 +69,7 @@ const columns: Column<TACE>[] = [
 ];
 
 export const Acl = () => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {currentSchemaPath} = useTypedSelector((state) => state.schema);
     const {loading, error, acl, owner, wasLoaded} = useTypedSelector((state) => state.schemaAcl);

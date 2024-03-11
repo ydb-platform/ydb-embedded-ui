@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import type {Reducer} from 'redux';
-import {createSelector, Selector} from 'reselect';
+import type {Reducer, Selector} from '@reduxjs/toolkit';
+import {createSelector} from '@reduxjs/toolkit';
 
 import type {
     IPreparedConsumerData,

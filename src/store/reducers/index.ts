@@ -1,4 +1,4 @@
-import {combineReducers} from 'redux';
+import {combineReducers} from '@reduxjs/toolkit';
 
 import nodes from './nodes/nodes';
 import {topNodesByLoad} from './tenantOverview/topNodesByLoad/topNodesByLoad';
@@ -93,9 +93,5 @@ export const rootReducer = {
 const combinedReducer = combineReducers({
     ...rootReducer,
 });
-
-export type RootReducer = typeof combinedReducer;
-export type RootState = ReturnType<RootReducer>;
-export type GetState = () => RootState;
 
 export default combinedReducer;

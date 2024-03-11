@@ -20,6 +20,7 @@
     "@gravity-ui/paranoid": "^1.4.0",
     "@gravity-ui/react-data-table": "^1.2.0",
     "@gravity-ui/uikit": "^5.30.1",
+    "@reduxjs/toolkit": "^2.2.1",
     "axios": "^0.21.2",
     "bem-cn-lite": "^4.1.0",
     "copy-to-clipboard": "^3.3.3",
@@ -31,18 +32,16 @@
     "path-to-regexp": "^3.0.0",
     "qs": "^6.11.0",
     "react-error-boundary": "^4.0.12",
-    "react-json-inspector": "^7.1.1",
     "react-helmet-async": "2.0.4",
+    "react-json-inspector": "^7.1.1",
     "react-list": "^0.8.11",
     "react-monaco-editor": "^0.47.0",
     "react-redux": "^7.2.6",
     "react-router": "^5.2.1",
     "react-router-dom": "^5.3.0",
     "react-split": "^2.0.14",
-    "redux": "^4.0.1",
-    "redux-location-state": "^2.6.0",
-    "redux-thunk": "^2.3.0",
-    "reselect": "^4.1.6",
+    "redux": "^5.0.1",
+    "redux-location-state": "^2.8.2",
     "url": "^0.11.0",
     "use-query-params": "^2.2.1",
     "web-vitals": "^1.1.2",
@@ -157,6 +156,6 @@
   "overrides": {
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "redux": "^4.0.1"
+    "redux": "^5.0.1"
   }
 }

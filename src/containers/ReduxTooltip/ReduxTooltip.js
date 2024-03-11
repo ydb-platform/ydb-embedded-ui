@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import {Popup, useVirtualElementRef} from '@gravity-ui/uikit';
 
 import {hideTooltip} from '../../store/reducers/tooltip';
+import {tooltipTemplates} from '../../utils/tooltip';
 
 import './ReduxTooltip.scss';
 
@@ -87,7 +88,7 @@ function ReduxTooltip(props) {
 }
 
 const mapStateToProps = (state) => {
-    const {toolTipVisible, currentHoveredRef, data, template, additionalData, positions} =
+    const {toolTipVisible, currentHoveredRef, data, templateType, additionalData, positions} =
         state.tooltip;
 
     const {popupClassName} = additionalData || {};
@@ -96,7 +97,7 @@ const mapStateToProps = (state) => {
         toolTipVisible,
         currentHoveredRef,
         data,
-        template,
+        template: tooltipTemplates[templateType],
         additionalData,
         positions,
         popupClassName,

@@ -1,12 +1,11 @@
 import {useEffect, useMemo, useRef} from 'react';
-import {useDispatch} from 'react-redux';
 import DataTable, {type Column} from '@gravity-ui/react-data-table';
 
 import type {HotKey} from '../../../../types/api/hotkeys';
 import type {IResponseError} from '../../../../types/api/error';
 import {Icon} from '../../../../components/Icon';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-import {useTypedSelector} from '../../../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {
@@ -57,7 +56,7 @@ interface HotKeysProps {
 }
 
 export function HotKeys({path}: HotKeysProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const collectSamplesTimerRef = useRef<ReturnType<typeof setTimeout>>();
 

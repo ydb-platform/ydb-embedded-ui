@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useRef} from 'react';
 import {useLocation, useParams} from 'react-router';
-import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {Link as ExternalLink} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
@@ -9,7 +8,7 @@ import {backend} from '../../store';
 import {getTablet, getTabletDescribe, clearTabletData} from '../../store/reducers/tablet';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 
-import {useAutofetcher, useTypedSelector} from '../../utils/hooks';
+import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 import {CLUSTER_DEFAULT_TITLE, DEVELOPER_UI_TITLE} from '../../utils/constants';
 import {parseQuery} from '../../routes';
 
@@ -34,7 +33,7 @@ export const b = cn('tablet-page');
 export const Tablet = () => {
     const isFirstDataFetchRef = useRef(true);
 
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const location = useLocation();
 
     const params = useParams<{id: string}>();

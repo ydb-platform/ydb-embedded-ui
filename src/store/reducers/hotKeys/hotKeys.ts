@@ -1,4 +1,4 @@
-import type {Reducer} from 'redux';
+import type {Reducer} from '@reduxjs/toolkit';
 
 import type {JsonHotKeysResponse} from '../../../types/api/hotkeys';
 import type {IResponseError} from '../../../types/api/error';

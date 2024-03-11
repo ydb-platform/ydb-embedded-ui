@@ -1,12 +1,12 @@
 import {ReactNode, useCallback} from 'react';
-import {shallowEqual, useDispatch} from 'react-redux';
+import {shallowEqual} from 'react-redux';
 
 import {Loader} from '../../../../components/Loader';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 
 import {EPathType} from '../../../../types/api/schema';
-import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
 import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import {getTopic} from '../../../../store/reducers/topic';
 import {
@@ -40,7 +40,7 @@ interface OverviewProps {
 }
 
 function Overview({type, tenantName}: OverviewProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
     const {

@@ -1,5 +1,4 @@
 import {useEffect, useReducer} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
 import qs from 'qs';
@@ -9,7 +8,7 @@ import type {TEvDescribeSchemeResult} from '../../types/api/schema';
 import type {AdditionalTenantsProps, AdditionalNodesProps} from '../../types/additionalProps';
 
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
-import {useTypedSelector} from '../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {disableAutorefresh, getSchema} from '../../store/reducers/schema/schema';
 
@@ -51,12 +50,15 @@ function Tenant(props: TenantProps) {
         getTenantSummaryState,
     );
 
-    const {currentSchemaPath, currentSchema: currentItem = {}} = useSelector(
-        (state: any) => state.schema,
+    const {currentSchemaPath, currentSchema: currentItem = {}} = useTypedSelector(
+        (state) => state.schema,
     );
 
-    const {PathType: preloadedPathType, PathSubType: preloadedPathSubType} = useSelector(
-        (state: any) => state.schema.data[currentSchemaPath]?.PathDescription?.Self || {},
+    const {PathType: preloadedPathType, PathSubType: preloadedPathSubType} = useTypedSelector(
+        (state) =>
+            currentSchemaPath
+                ? state.schema.data[currentSchemaPath]?.PathDescription?.Self || {}
+                : {},
     );
 
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
@@ -64,7 +66,7 @@ function Tenant(props: TenantProps) {
 
     const {error: {status: schemaStatus = 200} = {}} = useTypedSelector((state) => state.schema);
 
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const location = useLocation();
 
@@ -80,7 +82,9 @@ function Tenant(props: TenantProps) {
     }, [tenantName, dispatch]);
 
     useEffect(() => {
-        dispatch(getSchema({path: currentSchemaPath}));
+        if (currentSchemaPath) {
+            dispatch(getSchema({path: currentSchemaPath}));
+        }
     }, [currentSchemaPath, dispatch]);
 
     useEffect(() => {
@@ -132,6 +136,7 @@ function Tenant(props: TenantProps) {
                         isCollapsed={summaryVisibilityState.collapsed}
                     />
                     <ObjectGeneral
+                        // @ts-expect-error
                         type={preloadedPathType || currentPathType}
                         additionalTenantProps={props.additionalTenantProps}
                         additionalNodesProps={props.additionalNodesProps}

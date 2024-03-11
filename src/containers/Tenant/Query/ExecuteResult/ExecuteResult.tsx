@@ -2,7 +2,6 @@ import {RadioButton, Tabs} from '@gravity-ui/uikit';
 import cn from 'bem-cn-lite';
 import React, {useEffect, useState} from 'react';
 import JSONTree from 'react-json-inspector';
-import {useDispatch} from 'react-redux';
 import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
@@ -14,7 +13,7 @@ import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult, QueryErrorResponse} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
-import {useTypedSelector} from '../../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {ResultIssues} from '../Issues/Issues';
@@ -57,7 +56,7 @@ export function ExecuteResult({
     const [activeSection, setActiveSection] = useState<SectionID>(resultOptionsIds.result);
 
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const resultsSetsCount = data?.resultSets?.length;
     const isMulti = resultsSetsCount && resultsSetsCount > 0;

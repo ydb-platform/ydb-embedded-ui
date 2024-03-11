@@ -1,9 +1,9 @@
-import type {Reducer} from 'redux';
+import type {Reducer} from '@reduxjs/toolkit';
 import type {ThunkAction} from 'redux-thunk';
 
 import {DEFAULT_USER_SETTINGS, SettingsObject, settingsManager} from '../../../services/settings';
 
-import type {RootState} from '..';
+import type {RootState} from '../..';
 import type {
     ProblemFilterValue,
     SetSettingValueAction,

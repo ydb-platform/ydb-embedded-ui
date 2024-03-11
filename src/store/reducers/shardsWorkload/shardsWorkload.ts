@@ -1,4 +1,4 @@
-import type {Reducer} from 'redux';
+import type {Reducer} from '@reduxjs/toolkit';
 
 import {parseQueryAPIExecuteResponse} from '../../../utils/query';
 import {createRequestActionTypes, createApiRequest} from '../../utils';

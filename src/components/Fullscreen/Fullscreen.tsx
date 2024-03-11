@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import {Button} from '@gravity-ui/uikit';
 import cn from 'bem-cn-lite';
 
-import {useDispatch} from 'react-redux';
+import {useTypedDispatch} from '../../utils/hooks';
 import {disableFullscreen} from '../../store/reducers/fullscreen';
 import {Icon} from '../Icon';
 
@@ -49,22 +49,24 @@ class FullscreenWrapper extends React.Component<FullscreenWrapperProps> {
 }
 
 function Fullscreen(props: FullscreenProps) {
-    const dispatch = useDispatch();
-    const escFunction = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-            onDisableFullScreen();
-        }
-    };
+    const dispatch = useTypedDispatch();
+
+    const onDisableFullScreen = React.useCallback(() => {
+        dispatch(disableFullscreen());
+    }, [dispatch]);
+
     useEffect(() => {
+        const escFunction = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onDisableFullScreen();
+            }
+        };
+
         document.addEventListener('keydown', escFunction, false);
         return () => {
             document.removeEventListener('keydown', escFunction, false);
         };
-    }, []);
-
-    const onDisableFullScreen = () => {
-        dispatch(disableFullscreen());
-    };
+    }, [onDisableFullScreen]);
 
     return (
         <FullscreenWrapper>

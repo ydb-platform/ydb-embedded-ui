@@ -1,7 +1,11 @@
 import {useCallback} from 'react';
-import {useDispatch} from 'react-redux';
 
-import {useAutofetcher, useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
+import {
+    useAutofetcher,
+    useSearchQuery,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../../../../utils/hooks';
 import {
     setDataWasNotLoaded,
     getTopStorageGroups,
@@ -21,7 +25,7 @@ interface TopGroupsProps {
 }
 
 export function TopGroups({tenant}: TopGroupsProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const query = useSearchQuery();
 

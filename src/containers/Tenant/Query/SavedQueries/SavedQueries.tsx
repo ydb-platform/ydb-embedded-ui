@@ -1,5 +1,4 @@
 import {MouseEvent, useState} from 'react';
-import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 
 import {Dialog, Button} from '@gravity-ui/uikit';
@@ -13,6 +12,7 @@ import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants'
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {Icon} from '../../../../components/Icon';
 
+import {useTypedDispatch} from '../../../../utils/hooks';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 
 import i18n from '../i18n';
@@ -59,7 +59,7 @@ interface SavedQueriesProps {
 }
 
 export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: SavedQueriesProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
     const [queryNameToDelete, setQueryNameToDelete] = useState<string>('');

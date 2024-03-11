@@ -1,4 +1,4 @@
-import {Selector, createSelector} from 'reselect';
+import {Selector, createSelector} from '@reduxjs/toolkit';
 
 import type {OrderType} from '@gravity-ui/react-data-table';
 import {ASCENDING, DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';

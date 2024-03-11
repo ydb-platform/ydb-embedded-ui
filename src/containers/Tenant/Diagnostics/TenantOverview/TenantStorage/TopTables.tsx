@@ -1,9 +1,8 @@
-import {useDispatch} from 'react-redux';
 import {useLocation} from 'react-router';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 
-import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {
     fetchTopTables,
     setDataWasNotLoaded,
@@ -24,7 +23,7 @@ interface TopTablesProps {
 }
 
 export function TopTables({path}: TopTablesProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const location = useLocation();
 
     const {autorefresh} = useTypedSelector((state) => state.schema);

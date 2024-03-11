@@ -12,9 +12,10 @@ import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
 import {settings} from '../UserSettings/settings';
 import {Providers} from './Providers';
 
-import type {Store} from 'redux';
+import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
+import type {RootState} from '../../store';
 
 import './App.scss';
 
@@ -46,7 +47,7 @@ function App({store, history, singleClusterMode, children, userSettings = settin
     );
 }
 
-function mapStateToProps(state: any) {
+function mapStateToProps(state: RootState) {
     return {
         singleClusterMode: state.singleClusterMode,
     };

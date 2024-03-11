@@ -3,14 +3,13 @@ import ReactDOM from 'react-dom';
 
 import '@gravity-ui/uikit/styles/styles.scss';
 
-import {ErrorBoundary, configureStore} from './lib';
+import {ErrorBoundary} from './lib';
+import {store, history} from './store/defaultStore';
 import reportWebVitals from './reportWebVitals';
 
 import './styles/themes.scss';
 import './styles/constants.scss';
 import './index.css';
-
-const {store, history} = configureStore();
 
 async function render() {
     let App;

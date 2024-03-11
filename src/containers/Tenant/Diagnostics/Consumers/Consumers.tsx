@@ -1,5 +1,4 @@
 import {useCallback, useMemo, useState} from 'react';
-import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 import {escapeRegExp} from 'lodash/fp';
 
@@ -11,7 +10,7 @@ import {Loader} from '../../../../components/Loader';
 import {Search} from '../../../../components/Search';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 
-import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 
 import {
@@ -40,7 +39,7 @@ interface ConsumersProps {
 export const Consumers = ({path, type}: ConsumersProps) => {
     const isCdcStream = isCdcStreamEntityType(type);
 
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const [searchValue, setSearchValue] = useState('');
 

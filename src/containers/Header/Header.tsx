@@ -1,6 +1,5 @@
 import {useEffect, useMemo} from 'react';
 import {useHistory, useLocation} from 'react-router';
-import {useDispatch} from 'react-redux';
 import block from 'bem-cn-lite';
 
 import {Breadcrumbs} from '@gravity-ui/uikit';
@@ -9,7 +8,7 @@ import {ExternalLinkWithIcon} from '../../components/ExternalLinkWithIcon/Extern
 
 import {backend, customBackend} from '../../store';
 import {getClusterInfo} from '../../store/reducers/cluster/cluster';
-import {useTypedSelector} from '../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
 import {parseQuery} from '../../routes';
 
@@ -32,7 +31,7 @@ interface HeaderProps {
 }
 
 function Header({mainPage}: HeaderProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const history = useHistory();
     const location = useLocation();
 

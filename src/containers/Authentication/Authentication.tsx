@@ -1,12 +1,11 @@
 import {KeyboardEvent, useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
 import {useHistory, useLocation} from 'react-router';
 import cn from 'bem-cn-lite';
 
 import {Button, TextInput, Icon, Link as ExternalLink} from '@gravity-ui/uikit';
 
 import {authenticate} from '../../store/reducers/authentication/authentication';
-import {useTypedSelector} from '../../utils/hooks';
+import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 import {parseQuery} from '../../routes';
 
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
@@ -23,7 +22,7 @@ interface AuthenticationProps {
 }
 
 function Authentication({closable = false}: AuthenticationProps) {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const history = useHistory();
     const location = useLocation();
 
@@ -57,8 +56,6 @@ function Authentication({closable = false}: AuthenticationProps) {
     };
 
     const onLoginClick = () => {
-        // @ts-expect-error
-        // typed dispatch required, remove error expectation after adding it
         dispatch(authenticate(login, pass)).then(() => {
             if (returnUrl) {
                 const decodedUrl = decodeURIComponent(returnUrl.toString());

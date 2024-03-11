@@ -1,4 +1,4 @@
-import type {Reducer} from 'redux';
+import type {Reducer} from '@reduxjs/toolkit';
 
 import type {ExecuteActions, Schemas} from '../../types/api/query';
 import type {

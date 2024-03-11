@@ -1,7 +1,6 @@
-import {useDispatch} from 'react-redux';
 import {useLocation} from 'react-router';
 
-import {useAutofetcher, useTypedSelector} from '../../../../../utils/hooks';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {parseQuery} from '../../../../../routes';
 
 import {
@@ -22,7 +21,7 @@ interface TopShardsProps {
 }
 
 export const TopShards = ({path}: TopShardsProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const location = useLocation();
 
     const query = parseQuery(location);

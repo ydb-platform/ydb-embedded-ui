@@ -1,5 +1,4 @@
 import React from 'react';
-import {useDispatch} from 'react-redux';
 import {Helmet} from 'react-helmet-async';
 import block from 'bem-cn-lite';
 
@@ -7,7 +6,7 @@ import type {EPathType} from '../../../types/api/schema';
 import type {SavedQuery} from '../../../types/store/query';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
-import {useSetting, useTypedSelector} from '../../../utils/hooks';
+import {useSetting, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {SAVED_QUERIES_KEY} from '../../../utils/constants';
 
 import {QueryTabs, queryEditorTabs} from './QueryTabs/QueryTabs';
@@ -26,7 +25,7 @@ interface QueryProps {
 }
 
 export const Query = (props: QueryProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
 
     const {queryTab = TENANT_QUERY_TABS_ID.newQuery} = useTypedSelector((state) => state.tenant);
 

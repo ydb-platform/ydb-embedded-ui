@@ -1,5 +1,4 @@
 import {useState, useEffect, useMemo} from 'react';
-import {useDispatch} from 'react-redux';
 import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
 
@@ -21,7 +20,7 @@ import type {CellValue, KeyValueRow} from '../../../../types/api/query';
 
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
-import {useAutofetcher, useTypedSelector} from '../../../../utils/hooks';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
 import {isSortableTopShardsProperty} from '../../../../utils/diagnostics';
 import {isColumnEntityType} from '../../utils/schema';
@@ -95,7 +94,7 @@ interface TopShardsProps {
 }
 
 export const TopShards = ({tenantPath, type}: TopShardsProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useTypedDispatch();
     const location = useLocation();
 
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
