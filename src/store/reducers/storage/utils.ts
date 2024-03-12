@@ -16,7 +16,11 @@ import type {PreparedStorageGroup, PreparedStorageNode, PreparedStorageResponse}
 
 // ==== Constants  ====
 
-const FLAGS_POINTS = {
+// Do not count Grey and Blue statuses in used space severity calculations
+const FLAGS_POINTS: Record<EFlag, number> = {
+    [EFlag.Grey]: 0,
+    [EFlag.Blue]: 0,
+
     [EFlag.Green]: 1,
     [EFlag.Yellow]: 100,
     [EFlag.Orange]: 10_000,
@@ -74,7 +78,7 @@ const prepareStorageGroupData = (
                 missing += 1;
             }
 
-            if (DiskSpace && DiskSpace !== EFlag.Grey) {
+            if (DiskSpace) {
                 usedSpaceFlag += FLAGS_POINTS[DiskSpace];
             }
 

@@ -3,7 +3,7 @@ import {TPDiskState} from '../../types/api/pdisk';
 import {EVDiskState} from '../../types/api/vdisk';
 
 // state to numbers to allow ordinal comparison
-export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag | 'Blue', number> = {
+export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
     Grey: 0,
     Green: 1,
     Blue: 2,
