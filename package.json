@@ -99,7 +99,8 @@
     ],
     "testEnvironment": "jsdom",
     "moduleNameMapper": {
-      "\\.(css|less|scss|sass)$": "jest-transform-css"
+      "\\.(css|less|scss|sass)$": "jest-transform-css",
+      "^axios$": "axios/dist/node/axios.cjs"
     }
   },
   "browserslist": {
