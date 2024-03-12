@@ -34,4 +34,5 @@ export interface JsonRenderRequestParams {
     from: number;
     until: number;
     maxDataPoints: number;
+    database: string;
 }

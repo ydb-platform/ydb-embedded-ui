@@ -399,13 +399,13 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         });
     }
     getChartData(
-        {target, from, until, maxDataPoints}: JsonRenderRequestParams,
+        {target, from, until, maxDataPoints, database}: JsonRenderRequestParams,
         {concurrentId}: AxiosOptions = {},
     ) {
         const requestString = `${target}&from=${from}&until=${until}&maxDataPoints=${maxDataPoints}&format=json`;
 
         return this.post<JsonRenderResponse>(
-            this.getPath('/viewer/json/render'),
+            this.getPath(`/viewer/json/render?database=${database}`),
             requestString,
             {},
             {

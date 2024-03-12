@@ -99,6 +99,8 @@ const prepareWidgetData = (
 };
 
 interface DiagnosticsChartProps {
+    database: string;
+
     title?: string;
     metrics: MetricDescription[];
     timeFrame?: TimeFrame;
@@ -121,6 +123,7 @@ interface DiagnosticsChartProps {
 }
 
 export const MetricChart = ({
+    database,
     title,
     metrics,
     timeFrame = '1h',
@@ -172,6 +175,7 @@ export const MetricChart = ({
                 // should be width > maxDataPoints to prevent points that cannot be selected
                 // more px per dataPoint - easier to select, less - chart is smoother
                 const response = await getChartData({
+                    database,
                     metrics,
                     timeFrame,
                     maxDataPoints: width / 2,

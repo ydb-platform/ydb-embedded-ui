@@ -9,7 +9,7 @@ interface TenantMemoryProps {
 export function TenantMemory({path}: TenantMemoryProps) {
     return (
         <>
-            <TenantDashboard charts={memoryDashboardConfig} />
+            <TenantDashboard database={path} charts={memoryDashboardConfig} />
             <TopNodesByMemory path={path} />
         </>
     );

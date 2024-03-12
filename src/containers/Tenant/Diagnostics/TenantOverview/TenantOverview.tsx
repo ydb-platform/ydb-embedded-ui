@@ -146,7 +146,7 @@ export function TenantOverview({
                 );
             }
             default: {
-                return <DefaultOverviewContent />;
+                return <DefaultOverviewContent database={tenantName} />;
             }
         }
     };
