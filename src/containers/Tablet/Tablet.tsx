@@ -73,7 +73,7 @@ export const Tablet = () => {
     }, [dispatch, tablet]);
 
     const fetchData = useCallback(() => {
-        dispatch(getTablet(id));
+        return dispatch(getTablet(id));
     }, [dispatch, id]);
 
     useAutofetcher(fetchData, [fetchData], true);
