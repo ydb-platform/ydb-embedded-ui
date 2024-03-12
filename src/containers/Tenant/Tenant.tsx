@@ -1,4 +1,4 @@
-import {useEffect, useReducer} from 'react';
+import {useEffect, useReducer, useRef} from 'react';
 import cn from 'bem-cn-lite';
 import {useLocation} from 'react-router';
 import qs from 'qs';
@@ -11,6 +11,7 @@ import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../.
 import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {disableAutorefresh, getSchema} from '../../store/reducers/schema/schema';
+import {registerYQLCompletionItemProvider} from '../../utils/monaco';
 
 import SplitPane from '../../components/SplitPane';
 import {AccessDenied} from '../../components/Errors/403';
@@ -49,6 +50,7 @@ function Tenant(props: TenantProps) {
         undefined,
         getTenantSummaryState,
     );
+    const previousTenant = useRef<string>();
 
     const {currentSchemaPath, currentSchema: currentItem = {}} = useTypedSelector(
         (state) => state.schema,
@@ -76,6 +78,11 @@ function Tenant(props: TenantProps) {
 
     const {name} = queryParams;
     const tenantName = name as string;
+
+    if (tenantName && typeof tenantName === 'string' && previousTenant.current !== tenantName) {
+        registerYQLCompletionItemProvider(tenantName);
+        previousTenant.current = tenantName;
+    }
 
     useEffect(() => {
         dispatch(getSchema({path: tenantName}));
@@ -140,6 +147,7 @@ function Tenant(props: TenantProps) {
                         type={preloadedPathType || currentPathType}
                         additionalTenantProps={props.additionalTenantProps}
                         additionalNodesProps={props.additionalNodesProps}
+                        tenantName={tenantName}
                     />
                 </SplitPane>
             )}
