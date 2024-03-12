@@ -1,6 +1,6 @@
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 
-import EntityStatus from '../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../../components/InternalLink/InternalLink';
 
 import type {ITabletPreparedHistoryItem} from '../../../types/store/tablet';

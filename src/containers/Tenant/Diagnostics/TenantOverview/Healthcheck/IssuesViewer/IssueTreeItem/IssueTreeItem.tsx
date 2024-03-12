@@ -1,13 +1,14 @@
 import cn from 'bem-cn-lite';
 
-import EntityStatus from '../../../../../../../components/EntityStatus/EntityStatus';
+import type {EFlag} from '../../../../../../../types/api/enums';
+import {EntityStatus} from '../../../../../../../components/EntityStatus/EntityStatus';
 
 import './IssueTreeItem.scss';
 
 const b = cn('issue-tree-item');
 
 interface IssueRowProps {
-    status: string;
+    status: EFlag;
     message: string;
     type: string;
     onClick?: VoidFunction;

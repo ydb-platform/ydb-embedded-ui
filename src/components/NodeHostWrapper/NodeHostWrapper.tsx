@@ -7,7 +7,7 @@ import type {NodeAddress} from '../../types/additionalProps';
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import {isUnavailableNode} from '../../utils/nodes';
 
-import EntityStatus from '../EntityStatus/EntityStatus';
+import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 import {Icon} from '../Icon';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';

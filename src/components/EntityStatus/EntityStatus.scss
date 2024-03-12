@@ -91,7 +91,6 @@
     }
 
     &__status-color {
-        &_state_running,
         &_state_green {
             background-color: var(--ydb-color-status-green);
         }
@@ -104,7 +103,6 @@
         &_state_red {
             background-color: var(--ydb-color-status-red);
         }
-        &_state_gray,
         &_state_grey {
             background-color: var(--ydb-color-status-grey);
         }

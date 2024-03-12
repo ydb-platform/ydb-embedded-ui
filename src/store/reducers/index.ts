@@ -32,7 +32,7 @@ import schemaAcl from './schemaAcl/schemaAcl';
 import executeTopQueries from './executeTopQueries/executeTopQueries';
 import {tenantOverviewTopQueries} from './tenantOverview/topQueries/tenantOverviewTopQueries';
 import executeTopTables from './tenantOverview/executeTopTables/executeTopTables';
-import healthcheckInfo from './healthcheckInfo';
+import healthcheckInfo from './healthcheckInfo/healthcheckInfo';
 import shardsWorkload from './shardsWorkload/shardsWorkload';
 import {tenantOverviewTopShards} from './tenantOverview/topShards/tenantOverviewTopShards';
 import hotKeys from './hotKeys/hotKeys';

@@ -8,7 +8,7 @@ import {getDefaultNodePath} from '../../Node/NodePages';
 
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {PoolsGraph} from '../../../components/PoolsGraph/PoolsGraph';
-import EntityStatus from '../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 
 const columns: Column<PreparedClusterNode>[] = [
     {

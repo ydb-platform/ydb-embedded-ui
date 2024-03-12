@@ -86,7 +86,7 @@ function TabletsOverall({tablets}: TabletsOverallProps) {
         value: statesForOverallProgress[key],
     }));
 
-    // sort stack to achieve order "green, orange, yellow, red, blue, gray"
+    // sort stack to achieve order "green, orange, yellow, red, blue, grey"
     stack.sort((a, b) => COLORS_PRIORITY[b.colorKey] - COLORS_PRIORITY[a.colorKey]);
 
     return (

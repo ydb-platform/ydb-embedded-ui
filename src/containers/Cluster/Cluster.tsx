@@ -25,7 +25,7 @@ import {Tenants} from '../Tenants/Tenants';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {NodesWrapper} from '../Nodes/NodesWrapper';
 import {Versions} from '../Versions/Versions';
-import EntityStatus from '../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
 
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';

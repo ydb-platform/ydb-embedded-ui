@@ -3,6 +3,7 @@ import cn from 'bem-cn-lite';
 import DataTable, {type Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
+import {EFlag} from '../../../types/api/enums';
 import type {Column as VirtualTableColumn} from '../../../components/VirtualTable';
 import shieldIcon from '../../../assets/icons/shield.svg';
 import type {NodesMap} from '../../../types/store/nodesList';
@@ -12,7 +13,7 @@ import {isSortableStorageProperty} from '../../../utils/storage';
 import {isFullVDiskData} from '../../../utils/disks/helpers';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import EntityStatus from '../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {Stack} from '../../../components/Stack/Stack';
 import {CellWithPopover} from '../../../components/CellWithPopover/CellWithPopover';
 import {UsageLabel} from '../../../components/UsageLabel/UsageLabel';
@@ -171,14 +172,14 @@ const usedSpaceFlagColumn: StorageGroupsColumn = {
     render: ({row}) => {
         const value = row.UsedSpaceFlag;
 
-        let color = 'Red';
+        let color = EFlag.Red;
 
         if (value < 100) {
-            color = 'Green';
+            color = EFlag.Green;
         } else if (value < 10000) {
-            color = 'Yellow';
+            color = EFlag.Yellow;
         } else if (value < 1000000) {
-            color = 'Orange';
+            color = EFlag.Orange;
         }
         return <EntityStatus status={color} />;
     },

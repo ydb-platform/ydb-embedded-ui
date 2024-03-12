@@ -170,7 +170,7 @@ export const TableHead = <T,>({
         let newSortParams: SortParams = {};
 
         // Order is changed in following order:
-        // 1. Inactive Sort Order - gray icon of default order
+        // 1. Inactive Sort Order - grey icon of default order
         // 2. Active default order
         // 3. Active not default order
         if (columnId === sortParams.columnId) {

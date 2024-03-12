@@ -5,14 +5,14 @@ import {createSelector} from '@reduxjs/toolkit';
 import type {Reducer, Selector} from '@reduxjs/toolkit';
 
 import type {
-    IHealthCheckInfoAction,
-    IHealthcheckInfoRootStateSlice,
-    IHealthcheckInfoState,
-    IIssuesTree,
-} from '../../types/store/healthcheck';
-import type {IssueLog, StatusFlag} from '../../types/api/healthcheck';
+    HealthCheckInfoAction,
+    HealthcheckInfoRootStateSlice,
+    HealthcheckInfoState,
+    IssuesTree,
+} from './types';
+import type {IssueLog, StatusFlag} from '../../../types/api/healthcheck';
 
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 export const FETCH_HEALTHCHECK = createRequestActionTypes('cluster', 'FETCH_HEALTHCHECK');
 
@@ -20,7 +20,7 @@ const SET_DATA_WAS_NOT_LOADED = 'healthcheckInfo/SET_DATA_WAS_NOT_LOADED';
 
 const initialState = {loading: false, wasLoaded: false};
 
-const healthcheckInfo: Reducer<IHealthcheckInfoState, IHealthCheckInfoAction> = function (
+const healthcheckInfo: Reducer<HealthcheckInfoState, HealthCheckInfoAction> = function (
     state = initialState,
     action,
 ) {
@@ -102,7 +102,7 @@ const getInvertedConsequencesTree = ({
 }: {
     data: IssueLog[];
     roots?: IssueLog[];
-}): IIssuesTree[] => {
+}): IssuesTree[] => {
     return roots
         ? roots.map((issue) => {
               const reasonsItems = getInvertedConsequencesTree({
@@ -136,19 +136,19 @@ const getIssuesStatistics = (data: IssueLog[]): [StatusFlag, number][] => {
     });
 };
 
-const getIssuesLog = (state: IHealthcheckInfoRootStateSlice) =>
+const getIssuesLog = (state: HealthcheckInfoRootStateSlice) =>
     state.healthcheckInfo.data?.issue_log;
 
-export const selectIssuesTreesRoots: Selector<IHealthcheckInfoRootStateSlice, IssueLog[]> =
+export const selectIssuesTreesRoots: Selector<HealthcheckInfoRootStateSlice, IssueLog[]> =
     createSelector(getIssuesLog, (issues = []) => getRoots(issues));
 
-export const selectIssuesTrees: Selector<IHealthcheckInfoRootStateSlice, IIssuesTree[]> =
+export const selectIssuesTrees: Selector<HealthcheckInfoRootStateSlice, IssuesTree[]> =
     createSelector([getIssuesLog, selectIssuesTreesRoots], (data = [], roots = []) => {
         return getInvertedConsequencesTree({data, roots});
     });
 
 export const selectIssuesStatistics: Selector<
-    IHealthcheckInfoRootStateSlice,
+    HealthcheckInfoRootStateSlice,
     [StatusFlag, number][]
 > = createSelector(getIssuesLog, (issues = []) => getIssuesStatistics(issues));
 

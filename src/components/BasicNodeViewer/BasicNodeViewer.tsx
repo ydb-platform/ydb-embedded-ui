@@ -3,7 +3,7 @@ import cn from 'bem-cn-lite';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import type {PreparedNode} from '../../store/reducers/node/types';
 
-import EntityStatus from '../EntityStatus/EntityStatus';
+import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {Tags} from '../Tags';
 import {Icon} from '../Icon';
 

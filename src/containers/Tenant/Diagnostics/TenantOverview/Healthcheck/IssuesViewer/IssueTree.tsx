@@ -6,7 +6,8 @@ import JSONTree from 'react-json-inspector';
 
 import {TreeView} from 'ydb-ui-components';
 
-import {IIssuesTree} from '../../../../../../types/store/healthcheck';
+import {IssuesTree} from '../../../../../../store/reducers/healthcheckInfo/types';
+import {hcStatusToColorFlag} from '../../../../../../store/reducers/healthcheckInfo/utils';
 
 import {IssueTreeItem} from './IssueTreeItem';
 
@@ -15,14 +16,14 @@ import './IssueTree.scss';
 const b = cn('issue-tree');
 
 interface IssuesViewerProps {
-    issueTree: IIssuesTree;
+    issueTree: IssuesTree;
 }
 
 const IssueTree = ({issueTree}: IssuesViewerProps) => {
     const [collapsedIssues, setCollapsedIssues] = useState<Record<string, boolean>>({});
 
     const renderTree = useCallback(
-        (data: IIssuesTree[]) => {
+        (data: IssuesTree[]) => {
             return data.map((item) => {
                 const {id} = item;
                 const {status, message, type, reasonsItems, level, ...rest} = item;
@@ -40,7 +41,13 @@ const IssueTree = ({issueTree}: IssuesViewerProps) => {
                 return (
                     <TreeView
                         key={id}
-                        name={<IssueTreeItem status={status} message={message} type={type} />}
+                        name={
+                            <IssueTreeItem
+                                status={hcStatusToColorFlag[status]}
+                                message={message}
+                                type={type}
+                            />
+                        }
                         collapsed={isCollapsed}
                         hasArrow={true}
                         onClick={toggleCollapsed}
