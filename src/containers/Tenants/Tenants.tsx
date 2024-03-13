@@ -3,7 +3,7 @@ import cn from 'bem-cn-lite';
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 import {Button} from '@gravity-ui/uikit';
 
-import EntityStatus from '../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {ProblemFilter} from '../../components/ProblemFilter';

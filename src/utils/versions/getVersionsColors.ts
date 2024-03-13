@@ -25,7 +25,7 @@ export const COLORS = [
     '#b22222', // firebrick
 ];
 
-export const GRAY_COLOR = '#bfbfbf';
+export const GREY_COLOR = '#bfbfbf';
 
 export const getVersionsMap = (versions: string[], initialMap: VersionsMap = new Map()) => {
     versions.forEach((version) => {
@@ -88,7 +88,7 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
                         versionToColor.set(minor.version, versionColor);
                     });
             } else {
-                versionToColor.set(item.version, GRAY_COLOR);
+                versionToColor.set(item.version, GREY_COLOR);
             }
         });
     return versionToColor;

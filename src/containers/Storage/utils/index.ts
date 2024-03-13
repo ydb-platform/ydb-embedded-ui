@@ -1,4 +1,5 @@
 import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
+import {EFlag} from '../../../types/api/enums';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 
 const defaultDegradationEvaluator = generateEvaluator(1, 2, ['success', 'warning', 'danger']);
@@ -25,7 +26,7 @@ export const getUsageSeverityForStorageGroup = generateEvaluator(80, 85, [
     'danger',
 ]);
 export const getUsageSeverityForEntityStatus = generateEvaluator(80, 85, [
-    'Green',
-    'Yellow',
-    'Red',
+    EFlag.Green,
+    EFlag.Yellow,
+    EFlag.Red,
 ]);

@@ -1,7 +1,7 @@
 import cn from 'bem-cn-lite';
 
 import type {IResponseError} from '../../../../../types/api/error';
-import type {IIssuesTree} from '../../../../../types/store/healthcheck';
+import type {IssuesTree} from '../../../../../store/reducers/healthcheckInfo/types';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
 
@@ -13,7 +13,7 @@ import './Healthcheck.scss';
 const b = cn('healthcheck');
 
 interface HealthcheckDetailsProps {
-    issueTrees?: IIssuesTree[];
+    issueTrees?: IssuesTree[];
     loading?: boolean;
     wasLoaded?: boolean;
     error?: IResponseError;

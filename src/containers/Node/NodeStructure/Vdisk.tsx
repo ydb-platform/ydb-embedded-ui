@@ -1,13 +1,14 @@
 import React from 'react';
 import cn from 'bem-cn-lite';
 
-import type {TVDiskStateInfo} from '../../../types/api/vdisk';
+import {EVDiskState, type TVDiskStateInfo} from '../../../types/api/vdisk';
+import {EFlag} from '../../../types/api/enums';
 import {
     formatStorageValuesToGb,
     stringifyVdiskId,
 } from '../../../utils/dataFormatters/dataFormatters';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
-import EntityStatus from '../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 
@@ -119,7 +120,7 @@ export function Vdisk({
             <div className={b('row')}>
                 <span className={b('title')}>VDisk </span>
                 <EntityStatus
-                    status={VDiskState === 'OK' ? 'green' : 'red'}
+                    status={VDiskState === EVDiskState.OK ? EFlag.Green : EFlag.Red}
                     name={stringifyVdiskId(VDiskId)}
                 />
             </div>

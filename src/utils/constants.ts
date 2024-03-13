@@ -20,10 +20,10 @@ export const DAY_IN_SECONDS = 24 * HOUR_IN_SECONDS;
 export const MS_IN_NANOSECONDS = 1000000;
 
 export const TABLET_COLORS = {
-    Created: 'gray',
-    ResolveStateStorage: 'lightgray',
-    Candidate: 'lightgray',
-    BlockBlobStorage: 'lightgray',
+    Created: 'grey',
+    ResolveStateStorage: 'lightgrey',
+    Candidate: 'lightgrey',
+    BlockBlobStorage: 'lightgrey',
     RebuildGraph: 'yellow',
     Restored: 'yellow',
     Discover: 'orange',

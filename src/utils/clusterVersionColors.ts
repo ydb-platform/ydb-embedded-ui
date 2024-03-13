@@ -2,7 +2,7 @@ import {uniqBy} from 'lodash';
 
 import type {MetaClusterVersion} from '../types/api/meta';
 import type {VersionToColorMap} from '../types/versions';
-import {COLORS, GRAY_COLOR, getMinorVersion, hashCode} from './versions';
+import {COLORS, GREY_COLOR, getMinorVersion, hashCode} from './versions';
 
 const UNDEFINED_COLOR_INDEX = '__no_color__';
 
@@ -34,7 +34,7 @@ export const getVersionColors = (versionMap: VersionsMap) => {
             .sort((a, b) => hashCode(b) - hashCode(a))
             .forEach((minor, minorIndex) => {
                 if (baseColorIndex === UNDEFINED_COLOR_INDEX) {
-                    versionToColor.set(minor, GRAY_COLOR);
+                    versionToColor.set(minor, GREY_COLOR);
                 } else {
                     // baseColorIndex is numeric as we check if it is UNDEFINED_COLOR_INDEX before
                     const currentColorIndex = Number(baseColorIndex) % COLORS.length;

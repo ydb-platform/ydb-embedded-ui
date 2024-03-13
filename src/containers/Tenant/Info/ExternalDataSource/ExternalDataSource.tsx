@@ -5,7 +5,7 @@ import {useTypedSelector} from '../../../../utils/hooks';
 
 import {InfoViewer, InfoViewerItem} from '../../../../components/InfoViewer';
 import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
-import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 
 import {getEntityName} from '../../utils';

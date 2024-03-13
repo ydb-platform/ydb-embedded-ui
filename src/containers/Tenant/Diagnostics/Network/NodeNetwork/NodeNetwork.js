@@ -1,19 +1,23 @@
 import React from 'react';
 import cn from 'bem-cn-lite';
 import PropTypes from 'prop-types';
+
+import {EFlag} from '../../../../../types/api/enums';
+
 import './NodeNetwork.scss';
+
 const b = cn('node-network');
 
 const getNodeModifier = (connected, capacity) => {
     const percents = Math.floor((connected / capacity) * 100);
     if (percents === 100) {
-        return 'green';
+        return EFlag.Green;
     } else if (percents >= 70) {
-        return 'yellow';
+        return EFlag.Yellow;
     } else if (percents >= 1) {
-        return 'red';
+        return EFlag.Red;
     } else {
-        return 'gray';
+        return EFlag.Grey;
     }
 };
 
@@ -50,11 +54,14 @@ export class NodeNetwork extends React.Component {
 
     render() {
         const {nodeId, connected, capacity, status, onClick, showID, isBlurred} = this.props;
+
+        const color = status || getNodeModifier(connected, capacity);
+
         return (
             <div
                 ref={this.node}
                 className={b({
-                    [status?.toLowerCase() || getNodeModifier(connected, capacity)]: true,
+                    [color.toLowerCase()]: true,
                     id: showID,
                     blur: isBlurred,
                 })}

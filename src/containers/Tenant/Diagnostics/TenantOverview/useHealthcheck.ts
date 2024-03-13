@@ -5,14 +5,14 @@ import {
     selectIssuesStatistics,
     selectIssuesTrees,
     setDataWasNotLoaded,
-} from '../../../../store/reducers/healthcheckInfo';
-import type {IIssuesTree} from '../../../../types/store/healthcheck';
+} from '../../../../store/reducers/healthcheckInfo/healthcheckInfo';
+import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
 import {type StatusFlag, SelfCheckResult} from '../../../../types/api/healthcheck';
 import type {IResponseError} from '../../../../types/api/error';
 import {useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
 
 interface HealthcheckParams {
-    issueTrees: IIssuesTree[];
+    issueTrees: IssuesTree[];
     issuesStatistics: [StatusFlag, number][];
     fetchHealthcheck: (isBackground?: boolean) => void;
     loading: boolean;

@@ -6,8 +6,9 @@ import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
 import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthcheck';
 import type {IResponseError} from '../../../../../types/api/error';
+import {hcStatusToColorFlag} from '../../../../../store/reducers/healthcheckInfo/utils';
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
-import EntityStatus from '../../../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
 
@@ -72,7 +73,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
                                 <EntityStatus
                                     key={status}
                                     mode="icons"
-                                    status={status}
+                                    status={hcStatusToColorFlag[status]}
                                     label={count.toString()}
                                     size="l"
                                 />

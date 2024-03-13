@@ -3,7 +3,7 @@ import cn from 'bem-cn-lite';
 
 import {Select, SelectOption} from '@gravity-ui/uikit';
 
-import EntityStatus from '../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 
 import {getUsageSeverityForEntityStatus} from '../utils';
 

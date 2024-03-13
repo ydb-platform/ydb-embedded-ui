@@ -24,7 +24,7 @@ export const HeatmapCanvas = (props) => {
             const rectX = (index % columnsCount) * (TABLET_SIZE + TABLET_PADDING);
             const rectY = Math.floor(index / columnsCount) * (TABLET_SIZE + TABLET_PADDING);
 
-            ctx.fillStyle = tablet.color || 'gray';
+            ctx.fillStyle = tablet.color || 'grey';
             ctx.fillRect(rectX, rectY, TABLET_SIZE, TABLET_SIZE);
         };
     }

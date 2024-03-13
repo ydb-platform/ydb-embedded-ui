@@ -7,6 +7,7 @@ import {ArrowToggle, Button, Popover} from '@gravity-ui/uikit';
 import DataTable, {type Column} from '@gravity-ui/react-data-table';
 
 import type {ValueOf} from '../../../types/common';
+import {EFlag} from '../../../types/api/enums';
 import type {
     PreparedStructurePDisk,
     PreparedStructureVDisk,
@@ -19,7 +20,7 @@ import {
     createPDiskDeveloperUILink,
     createVDiskDeveloperUILink,
 } from '../../../utils/developerUI/developerUI';
-import EntityStatus from '../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import InfoViewer, {type InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {Icon} from '../../../components/Icon';
@@ -110,7 +111,9 @@ function getColumns({
             width: 70,
             render: ({row}) => {
                 return (
-                    <EntityStatus status={row.VDiskState === EVDiskState.OK ? 'green' : 'red'} />
+                    <EntityStatus
+                        status={row.VDiskState === EVDiskState.OK ? EFlag.Green : EFlag.Red}
+                    />
                 );
             },
             sortAccessor: (row) => (row.VDiskState === EVDiskState.OK ? 1 : 0),

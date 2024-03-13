@@ -2,7 +2,7 @@ import {useCallback} from 'react';
 
 import {Loader} from '@gravity-ui/uikit';
 
-import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
@@ -71,7 +71,7 @@ export function TenantOverview({
         autorefresh,
     );
 
-    const {Name, State, Type} = tenant || {};
+    const {Name, Type, Overall} = tenant || {};
 
     const tenantType = mapDatabaseTypeToDBName(Type);
 
@@ -114,7 +114,7 @@ export function TenantOverview({
         return (
             <div className={b('tenant-name-wrapper')}>
                 <EntityStatus
-                    status={State}
+                    status={Overall}
                     name={Name || TENANT_DEFAULT_TITLE}
                     withLeftTrim
                     hasClipboardButton={Boolean(tenant)}

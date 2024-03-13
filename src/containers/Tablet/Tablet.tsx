@@ -13,7 +13,7 @@ import {CLUSTER_DEFAULT_TITLE, DEVELOPER_UI_TITLE} from '../../utils/constants';
 import {parseQuery} from '../../routes';
 
 import type {EType} from '../../types/api/tablet';
-import EntityStatus from '../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Tag} from '../../components/Tag';
 import {Icon} from '../../components/Icon';

@@ -7,7 +7,7 @@ import {createExternalUILink, parseQuery} from '../../../../routes';
 import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
 import {InfoViewer, InfoViewerItem} from '../../../../components/InfoViewer';
 import {ExternalLinkWithIcon} from '../../../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
-import EntityStatus from '../../../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 
 import {getEntityName} from '../../utils';
