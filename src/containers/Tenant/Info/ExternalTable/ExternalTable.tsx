@@ -6,7 +6,7 @@ import {useTypedSelector} from '../../../../utils/hooks';
 import {createExternalUILink, parseQuery} from '../../../../routes';
 import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
 import {InfoViewer, InfoViewerItem} from '../../../../components/InfoViewer';
-import {ExternalLinkWithIcon} from '../../../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
+import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 
@@ -33,7 +33,7 @@ const prepareExternalTableSummary = (
             label: i18n('external-objects.data-source'),
             value: DataSourcePath && (
                 <span title={DataSourcePath}>
-                    <ExternalLinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
+                    <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
                 </span>
             ),
         },

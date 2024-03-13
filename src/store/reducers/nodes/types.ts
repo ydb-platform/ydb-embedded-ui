@@ -80,6 +80,7 @@ export interface NodesGeneralRequestParams extends NodesSortParams {
 }
 
 export interface NodesApiRequestParams extends NodesGeneralRequestParams {
+    node_id?: number | string; // get only specific node
     path?: string;
     tenant?: string;
     type?: NodeType;

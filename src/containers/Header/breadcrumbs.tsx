@@ -9,6 +9,7 @@ import type {
     BreadcrumbsOptions,
     ClusterBreadcrumbsOptions,
     NodeBreadcrumbsOptions,
+    PDiskBreadcrumbsOptions,
     Page,
     TabletBreadcrumbsOptions,
     TabletsBreadcrumbsOptions,
@@ -20,12 +21,13 @@ import {
     TENANT_PAGES_IDS,
 } from '../../store/reducers/tenant/constants';
 import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
-import routes, {createHref} from '../../routes';
+import routes, {createHref, getPDiskPagePath} from '../../routes';
 import {CLUSTER_DEFAULT_TITLE, getTabletLabel} from '../../utils/constants';
 
 import {getClusterPath} from '../Cluster/utils';
 import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
 import {getDefaultNodePath} from '../Node/NodePages';
+import {headerKeyset} from './i18n';
 
 const prepareTenantName = (tenantName: string) => {
     return tenantName.startsWith('/') ? tenantName.slice(1) : tenantName;
@@ -58,7 +60,7 @@ const getTenantBreadcrumbs = (
 ): RawBreadcrumbItem[] => {
     const {tenantName} = options;
 
-    const text = tenantName ? prepareTenantName(tenantName) : 'Tenant';
+    const text = tenantName ? prepareTenantName(tenantName) : headerKeyset('breadcrumbs.tenant');
     const link = tenantName ? getTenantPath({...query, name: tenantName}) : undefined;
 
     return [...getClusterBreadcrumbs(options, query), {text, link, icon: <DatabaseIcon />}];
@@ -84,7 +86,9 @@ const getNodeBreadcrumbs = (options: NodeBreadcrumbsOptions, query = {}): RawBre
         breadcrumbs = getTenantBreadcrumbs(options, newQuery);
     }
 
-    const text = nodeId ? `Node ${nodeId}` : 'Node';
+    const text = nodeId
+        ? `${headerKeyset('breadcrumbs.node')} ${nodeId}`
+        : headerKeyset('breadcrumbs.node');
     const link = nodeId ? getDefaultNodePath(nodeId, query) : undefined;
     const icon = isStorageNode ? <StorageNodeIcon /> : <ComputeNodeIcon />;
 
@@ -92,6 +96,28 @@ const getNodeBreadcrumbs = (options: NodeBreadcrumbsOptions, query = {}): RawBre
         text,
         link,
         icon,
+    });
+
+    return breadcrumbs;
+};
+
+const getPDiskBreadcrumbs = (options: PDiskBreadcrumbsOptions, query = {}) => {
+    const {nodeId, pDiskId} = options;
+
+    const breadcrumbs = getNodeBreadcrumbs({
+        // PDisks relate to storage Nodes, they don't have tenant name
+        tenantName: undefined,
+        nodeId: nodeId,
+    });
+
+    const text = pDiskId
+        ? `${headerKeyset('breadcrumbs.pDisk')} ${pDiskId}`
+        : headerKeyset('breadcrumbs.pDisk');
+    const link = pDiskId && nodeId ? getPDiskPagePath(pDiskId, nodeId, query) : undefined;
+
+    breadcrumbs.push({
+        text,
+        link,
     });
 
     return breadcrumbs;
@@ -124,7 +150,7 @@ const getTabletsBreadcrubms = (
         path: tenantName,
     });
 
-    breadcrumbs.push({text: 'Tablets', link});
+    breadcrumbs.push({text: headerKeyset('breadcrumbs.tablets'), link});
 
     return breadcrumbs;
 };
@@ -138,7 +164,7 @@ const getTabletBreadcrubms = (
     const breadcrumbs = getTabletsBreadcrubms(options, query);
 
     breadcrumbs.push({
-        text: tabletId || 'Tablet',
+        text: tabletId || headerKeyset('breadcrumbs.tablet'),
         icon: <TabletIcon text={getTabletLabel(tabletType)} />,
     });
 
@@ -160,6 +186,9 @@ export const getBreadcrumbs = (
         }
         case 'node': {
             return [...rawBreadcrumbs, ...getNodeBreadcrumbs(options, query)];
+        }
+        case 'pDisk': {
+            return [...rawBreadcrumbs, ...getPDiskBreadcrumbs(options, query)];
         }
         case 'tablets': {
             return [...rawBreadcrumbs, ...getTabletsBreadcrubms(options, query)];

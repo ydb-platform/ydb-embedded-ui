@@ -1,9 +1,7 @@
-.ydb-cluster-info-skeleton {
+.ydb-info-viewer-skeleton {
     display: flex;
     flex-direction: column;
     gap: 16px;
-
-    margin-top: 5px;
 
     &__row {
         display: flex;
@@ -38,11 +36,5 @@
     &__value {
         min-width: 200px;
         max-width: 20%;
-    }
-
-    &__versions {
-        min-width: 400px;
-        max-width: 40%;
-        height: 36px;
     }
 }

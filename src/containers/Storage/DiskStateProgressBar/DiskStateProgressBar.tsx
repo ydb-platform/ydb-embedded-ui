@@ -1,21 +1,13 @@
 import React from 'react';
 import cn from 'bem-cn-lite';
 
-import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../../utils/disks/constants';
 import {INVERTED_DISKS_KEY} from '../../../utils/constants';
 import {useSetting} from '../../../utils/hooks';
+import {getSeverityColor} from '../../../utils/disks/helpers';
 
 import './DiskStateProgressBar.scss';
 
 const b = cn('storage-disk-progress-bar');
-
-type Color = keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY;
-
-type SeverityToColor = Record<number, keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY>;
-
-const severityToColor = Object.entries(
-    DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
-).reduce<SeverityToColor>((acc, [color, severity]) => ({...acc, [severity]: color as Color}), {});
 
 interface DiskStateProgressBarProps {
     diskAllocatedPercent?: number;
@@ -56,7 +48,7 @@ export function DiskStateProgressBar({
 
     const mods: Record<string, boolean | undefined> = {inverted, compact};
 
-    const color = severity !== undefined && severityToColor[severity];
+    const color = severity !== undefined && getSeverityColor(severity);
     if (color) {
         mods[color.toLocaleLowerCase()] = true;
     }

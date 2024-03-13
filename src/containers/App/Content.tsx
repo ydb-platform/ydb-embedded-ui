@@ -9,6 +9,7 @@ import {Clusters} from '../Clusters/Clusters';
 import Cluster from '../Cluster/Cluster';
 import Tenant from '../Tenant/Tenant';
 import Node from '../Node/Node';
+import {PDisk} from '../PDisk/PDisk';
 import {Tablet} from '../Tablet';
 import TabletsFilters from '../TabletsFilters/TabletsFilters';
 import Header from '../Header/Header';
@@ -22,6 +23,7 @@ import {
     ClusterSlot,
     ClustersSlot,
     NodeSlot,
+    PDiskSlot,
     RedirectSlot,
     RoutesSlot,
     TabletSlot,
@@ -60,6 +62,11 @@ const routesSlots: RouteSlot[] = [
         path: routes.node,
         slot: NodeSlot,
         component: Node,
+    },
+    {
+        path: routes.pDisk,
+        slot: PDiskSlot,
+        component: PDisk,
     },
     {
         path: routes.tablet,

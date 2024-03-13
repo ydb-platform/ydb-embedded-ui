@@ -1,0 +1,10 @@
+@import '../../styles//mixins.scss';
+
+.ydb-page-meta {
+    display: flex;
+    flex-flow: row nowrap;
+
+    color: var(--g-color-text-primary);
+
+    @include body-2-typography();
+}

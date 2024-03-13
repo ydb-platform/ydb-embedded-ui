@@ -3,7 +3,7 @@ import type {EType} from '../../../types/api/tablet';
 
 import {setHeaderBreadcrumbs} from './header';
 
-export type Page = 'cluster' | 'tenant' | 'node' | 'tablets' | 'tablet' | undefined;
+export type Page = 'cluster' | 'tenant' | 'node' | 'pDisk' | 'tablets' | 'tablet' | undefined;
 
 export interface ClusterBreadcrumbsOptions {
     clusterName?: string;
@@ -16,6 +16,10 @@ export interface TenantBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
 
 export interface NodeBreadcrumbsOptions extends TenantBreadcrumbsOptions {
     nodeId?: string | number;
+}
+
+export interface PDiskBreadcrumbsOptions extends Omit<NodeBreadcrumbsOptions, 'tenantName'> {
+    pDiskId?: string | number;
 }
 
 export interface TabletsBreadcrumbsOptions extends TenantBreadcrumbsOptions {

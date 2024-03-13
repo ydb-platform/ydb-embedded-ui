@@ -247,6 +247,19 @@ export const getStorageTopGroupsColumns = (): StorageGroupsColumn[] => {
     return [groupIdColumn, kindColumn, erasureColumn, usageColumn, usedColumn, limitColumn];
 };
 
+export const getPDiskStorageColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {
+    return [
+        poolNameColumn,
+        kindColumn,
+        erasureColumn,
+        degradedColumn,
+        groupIdColumn,
+        usageColumn,
+        usedColumn,
+        getVdiscksColumn(nodes),
+    ];
+};
+
 const getStorageGroupsColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {
     return [
         poolNameColumn,

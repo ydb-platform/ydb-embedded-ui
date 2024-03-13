@@ -8,7 +8,7 @@ export interface InfoViewerItem {
     value: ReactNode;
 }
 
-interface InfoViewerProps {
+export interface InfoViewerProps {
     title?: string;
     info?: InfoViewerItem[];
     dots?: boolean;
@@ -20,7 +20,7 @@ interface InfoViewerProps {
 
 const b = cn('info-viewer');
 
-const InfoViewer = ({
+export const InfoViewer = ({
     title,
     info,
     dots = true,

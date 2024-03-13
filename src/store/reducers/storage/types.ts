@@ -73,7 +73,7 @@ export interface StorageSortAndFilterParams extends StorageSortParams {
 
 export interface StorageApiRequestParams extends StorageSortAndFilterParams {
     tenant?: string;
-    nodeId?: string;
+    nodeId?: string | number;
     visibleEntities?: VisibleEntities;
 
     version?: EVersion;

@@ -1,22 +1,12 @@
 import {Link} from 'react-router-dom';
 import cn from 'bem-cn-lite';
 
-import {Icon, Link as UIKitLink} from '@gravity-ui/uikit';
+import {Link as UIKitLink} from '@gravity-ui/uikit';
 
 import {EFlag} from '../../types/api/enums';
-import circleExclamationIcon from '../../assets/icons/circle-exclamation.svg';
-import circleInfoIcon from '../../assets/icons/circle-info.svg';
-import circleTimesIcon from '../../assets/icons/circle-xmark.svg';
-import triangleExclamationIcon from '../../assets/icons/triangle-exclamation.svg';
+import {StatusIcon, type StatusIconMode, type StatusIconSize} from '../StatusIcon/StatusIcon';
 import {ClipboardButton} from '../ClipboardButton';
 import './EntityStatus.scss';
-
-const icons = {
-    [EFlag.Blue]: circleInfoIcon,
-    [EFlag.Yellow]: circleExclamationIcon,
-    [EFlag.Orange]: triangleExclamationIcon,
-    [EFlag.Red]: circleTimesIcon,
-};
 
 const b = cn('entity-status');
 
@@ -27,8 +17,8 @@ interface EntityStatusProps {
     path?: string;
     iconPath?: string;
 
-    size?: 'xs' | 's' | 'm' | 'l';
-    mode?: 'color' | 'icons';
+    size?: StatusIconSize;
+    mode?: StatusIconMode;
 
     showStatus?: boolean;
     externalLink?: boolean;
@@ -64,18 +54,7 @@ export function EntityStatus({
             return null;
         }
 
-        const modifiers = {state: status.toLowerCase(), size};
-
-        if (mode === 'icons' && status in icons) {
-            return (
-                <Icon
-                    className={b('status-icon', modifiers)}
-                    data={icons[status as keyof typeof icons]}
-                />
-            );
-        }
-
-        return <div className={b('status-color', modifiers)} />;
+        return <StatusIcon status={status} size={size} mode={mode} />;
     };
     const renderStatusLink = () => {
         return (
