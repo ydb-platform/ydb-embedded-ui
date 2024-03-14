@@ -28,6 +28,9 @@ export function SchemaTree(props: SchemaTreeProps) {
         window.api
             .getSchema({path}, {concurrentId: `NavigationTree.getSchema|${path}`})
             .then((data) => {
+                if (!data) {
+                    throw new Error(`no describe data about path ${path}`);
+                }
                 const {PathDescription: {Children = []} = {}} = data;
 
                 const preloadedData: Record<string, TEvDescribeSchemeResult> = {

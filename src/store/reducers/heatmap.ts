@@ -63,10 +63,10 @@ export function getTabletsInfo({nodes, path}: IHeatmapApiRequestParams) {
             window.api.getHeatmapData({path}),
         ]),
         actions: FETCH_HEATMAP,
-        dataHandler: ([tabletsData = {}, describe = {}]) => {
+        dataHandler: ([tabletsData = {}, describe]) => {
             const {TabletStateInfo: tablets = []} = tabletsData;
             const TabletsMap: Map<string, IHeatmapTabletData> = new Map();
-            const {PathDescription = {}} = describe;
+            const {PathDescription = {}} = describe ?? {};
             const {
                 TablePartitions = [],
                 TablePartitionStats = [],

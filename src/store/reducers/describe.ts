@@ -96,7 +96,7 @@ export function getDescribe({path}: {path: string}) {
         request,
         actions: FETCH_DESCRIBE,
         dataHandler: (data): IDescribeHandledResponse => {
-            const dataPath = data.Path;
+            const dataPath = data?.Path;
             const currentDescribe: IDescribeData = {};
             const newData: IDescribeData = {};
 
@@ -126,14 +126,14 @@ export function getDescribeBatched(paths: string[]) {
             const newData: IDescribeData = {};
 
             data.forEach((dataItem) => {
-                if (dataItem.Path) {
+                if (dataItem?.Path) {
                     newData[dataItem.Path] = dataItem;
                     currentDescribe[dataItem.Path] = dataItem;
                 }
             });
 
             return {
-                path: data[0].Path,
+                path: data[0]?.Path,
                 currentDescribe,
                 data: newData,
             };

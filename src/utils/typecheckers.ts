@@ -3,3 +3,5 @@
  */
 export const isEnumMember = <T extends Object>(object: T, value: any): value is T[keyof T] =>
     Object.values(object).includes(value);
+
+export type Nullable<T> = T | null;

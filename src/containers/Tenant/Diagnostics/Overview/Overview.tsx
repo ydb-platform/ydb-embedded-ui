@@ -44,7 +44,7 @@ function Overview({type, tenantName}: OverviewProps) {
 
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
     const {
-        data,
+        data: rawData,
         additionalData,
         loading: overviewLoading,
         wasLoaded: overviewWasLoaded,
@@ -112,6 +112,7 @@ function Overview({type, tenantName}: OverviewProps) {
     useAutofetcher(fetchData, [fetchData], autorefresh);
 
     const renderContent = () => {
+        const data = rawData ?? undefined;
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
         const pathTypeToComponent: Record<EPathType, (() => ReactNode) | undefined> = {
@@ -124,7 +125,7 @@ function Overview({type, tenantName}: OverviewProps) {
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
             [EPathType.EPathTypeCdcStream]: () => (
-                <ChangefeedInfo data={data} topic={additionalData?.[0]} />
+                <ChangefeedInfo data={data} topic={additionalData?.[0] ?? undefined} />
             ),
             [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={data} />,
             [EPathType.EPathTypeExternalTable]: () => <ExternalTableInfo data={data} />,
