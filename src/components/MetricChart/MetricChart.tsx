@@ -1,13 +1,12 @@
 import {useCallback, useEffect, useReducer, useRef} from 'react';
 
-import {RawSerieData, YagrPlugin, YagrWidgetData} from '@gravity-ui/chartkit/yagr';
+import {YagrPlugin, YagrSeriesData, YagrWidgetData} from '@gravity-ui/chartkit/yagr';
 import ChartKit, {settings} from '@gravity-ui/chartkit';
 
 import type {IResponseError} from '../../types/api/error';
 import type {TimeFrame} from '../../utils/timeframes';
 import {useAutofetcher} from '../../utils/hooks';
 
-import {COLORS} from '../../utils/versions';
 import {cn} from '../../utils/cn';
 
 import {Loader} from '../Loader';
@@ -30,6 +29,7 @@ import {
     setChartDataWasNotLoaded,
     setChartError,
 } from './reducer';
+import {colorHexToRGBA, colors} from './colors';
 import i18n from './i18n';
 
 import './MetricChart.scss';
@@ -47,13 +47,19 @@ const prepareWidgetData = (
 
     const isDataEmpty = !data.metrics.length;
 
-    const graphs: RawSerieData[] = data.metrics.map((metric, index) => {
+    const graphs: YagrSeriesData[] = data.metrics.map((metric, index) => {
+        const lineColor = metric.color || colors[index];
+        const color = colorHexToRGBA(lineColor, 0.1);
+
         return {
             id: metric.target,
             name: metric.title || metric.target,
-            color: metric.color || COLORS[index],
             data: metric.data,
             formatter: defaultDataFormatter,
+
+            lineColor,
+            color,
+            legendColorKey: 'lineColor',
         };
     });
 
@@ -71,7 +77,8 @@ const prepareWidgetData = (
                     padding: isDataEmpty ? [10, 0, 10, 0] : undefined,
                 },
                 series: {
-                    type: 'line',
+                    type: 'area',
+                    lineWidth: 1.5,
                 },
                 select: {
                     zoom: false,
@@ -209,7 +216,7 @@ export const MetricChart = ({
                 dispatch(setChartError(err as IResponseError));
             }
         },
-        [metrics, timeFrame, width],
+        [database, metrics, timeFrame, width],
     );
 
     useAutofetcher(fetchChartData, [fetchChartData], autorefresh);
