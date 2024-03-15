@@ -1,43 +1,87 @@
 import {FormEvent, useState} from 'react';
 import cn from 'bem-cn-lite';
 import {Dialog} from '@gravity-ui/uikit';
+import {CircleXmarkFill} from '@gravity-ui/icons';
 
+import type {IResponseError} from '../../types/api/error';
 import {Icon} from '../Icon';
+import {criticalActionDialogKeyset} from './i18n';
 
 import './CriticalActionDialog.scss';
 
 const b = cn('ydb-critical-dialog');
 
-interface CriticalActionDialogProps {
+const parseError = (error: IResponseError) => {
+    if (error.status === 403) {
+        return criticalActionDialogKeyset('no-rights-error');
+    }
+    if (error.statusText) {
+        return error.statusText;
+    }
+
+    return criticalActionDialogKeyset('default-error');
+};
+
+interface CriticalActionDialogProps<T> {
     visible: boolean;
     text: string;
     onClose: VoidFunction;
-    onConfirm: () => Promise<unknown>;
-    onConfirmActionFinish: VoidFunction;
+    onConfirm: () => Promise<T>;
+    onConfirmActionSuccess: VoidFunction;
+    onConfirmActionError: VoidFunction;
 }
 
-export const CriticalActionDialog = ({
+export function CriticalActionDialog<T>({
     visible,
     text,
     onClose,
     onConfirm,
-    onConfirmActionFinish,
-}: CriticalActionDialogProps) => {
+    onConfirmActionSuccess,
+    onConfirmActionError,
+}: CriticalActionDialogProps<T>) {
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<IResponseError>();
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
-        return onConfirm().then(() => {
-            onConfirmActionFinish();
-            setIsLoading(false);
-            onClose();
-        });
+        return onConfirm()
+            .then(() => {
+                onConfirmActionSuccess();
+                onClose();
+            })
+            .catch((err) => {
+                onConfirmActionError();
+                setError(err);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     };
 
-    return (
-        <Dialog open={visible} hasCloseButton={false} className={b()} size="s" onClose={onClose}>
+    const renderDialogContent = () => {
+        if (error) {
+            return (
+                <>
+                    <Dialog.Body className={b('body')}>
+                        <span className={b('error-icon')}>
+                            <CircleXmarkFill width="24" height="22" />
+                        </span>
+                        {parseError(error)}
+                    </Dialog.Body>
+
+                    <Dialog.Footer
+                        loading={false}
+                        preset="default"
+                        textButtonCancel={criticalActionDialogKeyset('button-close')}
+                        onClickButtonCancel={onClose}
+                    />
+                </>
+            );
+        }
+
+        return (
             <form onSubmit={onSubmit}>
                 <Dialog.Body className={b('body')}>
                     <span className={b('warning-icon')}>
@@ -49,13 +93,26 @@ export const CriticalActionDialog = ({
                 <Dialog.Footer
                     loading={isLoading}
                     preset="default"
-                    textButtonApply="Confirm"
-                    textButtonCancel="Cancel"
+                    textButtonApply={criticalActionDialogKeyset('button-confirm')}
+                    textButtonCancel={criticalActionDialogKeyset('button-cancel')}
                     propsButtonApply={{type: 'submit'}}
                     onClickButtonCancel={onClose}
                     onClickButtonApply={() => {}}
                 />
             </form>
+        );
+    };
+
+    return (
+        <Dialog
+            open={visible}
+            hasCloseButton={false}
+            className={b()}
+            size="s"
+            onClose={onClose}
+            onTransitionExited={() => setError(undefined)}
+        >
+            {renderDialogContent()}
         </Dialog>
     );
-};
+}

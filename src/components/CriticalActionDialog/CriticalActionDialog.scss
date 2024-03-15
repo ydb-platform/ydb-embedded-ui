@@ -1,8 +1,15 @@
 .ydb-critical-dialog {
-    width: 252px !important;
+    width: 400px;
 
     &__warning-icon {
         margin-right: 16px;
+    }
+
+    &__error-icon {
+        height: 24px;
+        margin-right: 16px;
+
+        color: var(--ydb-color-status-red);
     }
 
     &__body {
@@ -10,23 +17,5 @@
         align-items: center;
 
         padding: 16px 16px 0;
-    }
-
-    & .yc-dialog-footer {
-        padding: 20px 4px 4px;
-    }
-
-    & .yc-dialog-footer__children {
-        display: none;
-    }
-
-    & .yc-dialog-footer__button {
-        box-sizing: border-box;
-        min-width: 120px;
-        margin: 0;
-    }
-
-    & .yc-dialog-footer__button_action_cancel {
-        margin-right: 4px;
     }
 }
