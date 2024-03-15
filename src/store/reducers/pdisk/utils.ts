@@ -32,23 +32,21 @@ export function preparePDiskStorageResponse(
 ) {
     const preparedGroups: PreparedStorageGroup[] = [];
 
-    data.StoragePools?.forEach((pool) => {
-        pool.Groups?.filter((group) => {
-            if (!group?.VDisks) {
-                return false;
-            }
+    data.StoragePools?.forEach((pool) =>
+        pool.Groups?.forEach((group) => {
+            const groupHasPDiskVDisks = group.VDisks?.some((vdisk) => {
+                // If VDisk has PDisk inside, PDiskId and NodeId fields could be only inside PDisk and vice versa
+                const groupPDiskId = vdisk.PDiskId ?? vdisk.PDisk?.PDiskId;
+                const groupNodeId = vdisk.NodeId ?? vdisk.PDisk?.NodeId;
 
-            return (
-                group.VDisks.filter(
-                    (vdisk) =>
-                        (vdisk.PDiskId === pDiskId || vdisk.PDisk?.PDiskId === Number(pDiskId)) &&
-                        vdisk.PDisk?.NodeId === Number(nodeId),
-                ).length > 0
-            );
-        }).forEach((group) => {
-            preparedGroups.push(prepareStorageGroupData(group, pool.Name));
-        });
-    });
+                return groupPDiskId === Number(pDiskId) && groupNodeId === Number(nodeId);
+            });
+
+            if (groupHasPDiskVDisks) {
+                preparedGroups.push(prepareStorageGroupData(group, pool.Name));
+            }
+        }),
+    );
 
     return preparedGroups;
 }

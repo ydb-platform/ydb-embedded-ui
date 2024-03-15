@@ -1,9 +1,10 @@
 import {Icon} from '@gravity-ui/uikit';
 
-import circleExclamationIcon from '../../assets/icons/circle-exclamation.svg';
-import circleInfoIcon from '../../assets/icons/circle-info.svg';
-import circleTimesIcon from '../../assets/icons/circle-xmark.svg';
-import triangleExclamationIcon from '../../assets/icons/triangle-exclamation.svg';
+import CircleExclamationFillIcon from '@gravity-ui/icons/svgs/circle-exclamation-fill.svg';
+import CircleInfoFillIcon from '@gravity-ui/icons/svgs/circle-info-fill.svg';
+import CircleXmarkFillIcon from '@gravity-ui/icons/svgs/circle-xmark-fill.svg';
+import TriangleExclamationFillIcon from '@gravity-ui/icons/svgs/triangle-exclamation-fill.svg';
+
 import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
 import './StatusIcon.scss';
@@ -11,10 +12,10 @@ import './StatusIcon.scss';
 const b = cn('ydb-status-icon');
 
 const icons = {
-    [EFlag.Blue]: circleInfoIcon,
-    [EFlag.Yellow]: circleExclamationIcon,
-    [EFlag.Orange]: triangleExclamationIcon,
-    [EFlag.Red]: circleTimesIcon,
+    [EFlag.Blue]: CircleInfoFillIcon,
+    [EFlag.Yellow]: CircleExclamationFillIcon,
+    [EFlag.Orange]: TriangleExclamationFillIcon,
+    [EFlag.Red]: CircleXmarkFillIcon,
 };
 
 export type StatusIconMode = 'color' | 'icons';
