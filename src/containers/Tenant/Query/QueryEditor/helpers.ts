@@ -15,12 +15,14 @@ export const EDITOR_OPTIONS: EditorOptions = {
 export function useEditorOptions() {
     const [enableAutocomplete] = useSetting(ENABLE_AUTOCOMPLETE);
 
-    const options = useMemo<EditorOptions>(
-        () => ({
-            quickSuggestions: Boolean(enableAutocomplete),
-        }),
-        [enableAutocomplete],
-    );
+    const options = useMemo<EditorOptions>(() => {
+        const useAutocomplete = Boolean(enableAutocomplete);
+        return {
+            quickSuggestions: useAutocomplete,
+            suggestOnTriggerCharacters: useAutocomplete,
+            ...EDITOR_OPTIONS,
+        };
+    }, [enableAutocomplete]);
 
-    return useMemo(() => ({...options, ...EDITOR_OPTIONS}), [options]);
+    return options;
 }
