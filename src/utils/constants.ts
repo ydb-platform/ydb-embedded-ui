@@ -130,3 +130,5 @@ export const USE_BACKEND_PARAMS_FOR_TABLES_KEY = 'useBackendParamsForTables';
 export const QUERY_USE_MULTI_SCHEMA_KEY = 'queryUseMultiSchema';
 
 export const USE_CLUSTER_BALANCER_AS_BACKEND_KEY = 'useClusterBalancerAsBacked';
+
+export const ENABLE_AUTOCOMPLETE = 'enableAutocomplete';

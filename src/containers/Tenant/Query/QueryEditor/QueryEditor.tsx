@@ -26,6 +26,7 @@ import {
 import {useSetting, useQueryModes} from '../../../../utils/hooks';
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import {parseJson} from '../../../../utils/utils';
+import {useEditorOptions} from './helpers';
 
 import {
     InitialPaneState,
@@ -47,14 +48,6 @@ import type {RootState} from '../../../../store';
 import i18n from '../i18n';
 
 import './QueryEditor.scss';
-
-const EDITOR_OPTIONS = {
-    automaticLayout: true,
-    selectOnLineNumbers: true,
-    minimap: {
-        enabled: false,
-    },
-};
 
 const CONTEXT_MENU_GROUP_ID = 'navigation';
 const RESULT_TYPES = {
@@ -93,6 +86,7 @@ interface QueryEditorProps {
 }
 
 function QueryEditor(props: QueryEditorProps) {
+    const editorOptions = useEditorOptions();
     const {
         path,
         setTenantPath: setPath,
@@ -422,7 +416,7 @@ function QueryEditor(props: QueryEditorProps) {
                             <MonacoEditor
                                 language="sql"
                                 value={executeQuery.input}
-                                options={EDITOR_OPTIONS}
+                                options={editorOptions}
                                 onChange={onChange}
                                 editorDidMount={editorDidMount}
                                 theme={`vs-${theme}`}
