@@ -1,7 +1,6 @@
 import type {IconProps} from '@gravity-ui/uikit';
 
-import favoriteFilledIcon from '../../assets/icons/star.svg';
-import flaskIcon from '../../assets/icons/flask.svg';
+import {PencilToSquare, Flask, StarFill} from '@gravity-ui/icons';
 
 import {
     INVERTED_DISKS_KEY,
@@ -11,6 +10,7 @@ import {
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+    ENABLE_AUTOCOMPLETE,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
 
@@ -107,6 +107,12 @@ export const queryUseMultiSchemaSetting: SettingProps = {
     helpPopoverContent: i18n('settings.queryUseMultiSchema.popover'),
 };
 
+export const enableAutocompleteSetting: SettingProps = {
+    settingKey: ENABLE_AUTOCOMPLETE,
+    title: i18n('settings.editor.autocomplete.title'),
+    description: i18n('settings.editor.autocomplete.description'),
+};
+
 export const appearanceSection: SettingsSection = {
     id: 'appearanceSection',
     title: i18n('section.appearance'),
@@ -117,18 +123,29 @@ export const experimentsSection: SettingsSection = {
     title: i18n('section.experiments'),
     settings: [useNodesEndpointSetting, useVirtualTables, queryUseMultiSchemaSetting],
 };
+export const devSettingsSection: SettingsSection = {
+    id: 'devSettingsSection',
+    title: i18n('section.dev-setting'),
+    settings: [enableAutocompleteSetting],
+};
 
 export const generalPage: SettingsPage = {
     id: 'generalPage',
     title: i18n('page.general'),
-    icon: {data: favoriteFilledIcon, height: 14, width: 14},
+    icon: {data: StarFill, height: 14, width: 14},
     sections: [appearanceSection],
 };
 export const experimentsPage: SettingsPage = {
     id: 'experimentsPage',
     title: i18n('page.experiments'),
-    icon: {data: flaskIcon},
+    icon: {data: Flask},
     sections: [experimentsSection],
 };
+export const editorPage: SettingsPage = {
+    id: 'editorPage',
+    title: i18n('page.editor'),
+    icon: {data: PencilToSquare},
+    sections: [devSettingsSection],
+};
 
-export const settings: YDBEmbeddedUISettings = [generalPage, experimentsPage];
+export const settings: YDBEmbeddedUISettings = [generalPage, editorPage, experimentsPage];

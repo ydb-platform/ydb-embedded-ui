@@ -15,6 +15,7 @@ import {
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+    ENABLE_AUTOCOMPLETE,
 } from '../utils/constants';
 import {QUERY_ACTIONS, QUERY_MODES} from '../utils/query';
 import {parseJson} from '../utils/utils';
@@ -37,6 +38,7 @@ export const DEFAULT_USER_SETTINGS: SettingsObject = {
     [PARTITIONS_HIDDEN_COLUMNS_KEY]: [],
     [USE_BACKEND_PARAMS_FOR_TABLES_KEY]: false,
     [USE_CLUSTER_BALANCER_AS_BACKEND_KEY]: true,
+    [ENABLE_AUTOCOMPLETE]: false,
 };
 
 class SettingsManager {

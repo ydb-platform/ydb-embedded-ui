@@ -29,7 +29,7 @@ export interface AppWithClustersProps {
 
 const defaultUserSettings = settings;
 
-defaultUserSettings[1].sections[0].settings.push({
+defaultUserSettings[2].sections[0].settings.push({
     title: i18n('settings.useClusterBalancerAsBackend.title'),
     helpPopoverContent: i18n('settings.useClusterBalancerAsBackend.popover'),
     settingKey: USE_CLUSTER_BALANCER_AS_BACKEND_KEY,

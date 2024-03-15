@@ -89,15 +89,8 @@ export const SimpleFunctions = [
     'Unwrap',
     'Nothing',
     'Callable',
-    'Pickle',
-    'StablePickle',
-    'Unpickle',
     'StaticMap',
     'StaticZip',
-    'AggregationFactory',
-    'AggregateTransformInput',
-    'AggregateTransformOutput',
-    'AggregateFlatten',
     'ListCreate',
     'AsListStrict',
     'ListLength',
@@ -380,10 +373,6 @@ const RawUdfs = {
         'UnescapeC',
     ],
 
-    Compress: ['BZip2', 'Brotli', 'Gzip', 'Lzma', 'Snappy', 'Zlib', 'Zstd'],
-
-    TryDecompress: ['BZip2', 'Brotli', 'Gzip', 'Lzma', 'Snappy', 'Xz', 'Zlib', 'Zstd'],
-
     Unicode: [
         'Find',
         'Fold',
@@ -658,8 +647,6 @@ const RawUdfs = {
         'Replace',
     ],
 
-    Protobuf: ['Parse', 'Serialize', 'TryParse'],
-
     Digest: [
         'Argon2',
         'Blake2B',
@@ -692,8 +679,6 @@ const RawUdfs = {
         'XXH3_128',
     ],
 
-    Decompress: ['BZip2', 'Brotli', 'Gzip', 'Lzma', 'Snappy', 'Xz', 'Zlib', 'Zstd'],
-
     Histogram: [
         'CalcLowerBound',
         'CalcLowerBoundSafe',
@@ -724,47 +709,6 @@ export const WindowFunctions = [
     'SessionState',
 ];
 
-export const TableFunction = [
-    'CONCAT',
-    'EACH',
-    'RANGE',
-    'LIKE',
-    'REGEXP',
-    'CONCAT_STRICT',
-    'RANGE_STRICT',
-    'FILTER',
-    'FOLDER',
-    'WalkFolders',
-];
+export const TableFunction = [];
 
-export const Pragmas = [
-    'TablePathPrefix',
-    'AnsiInForEmptyOrNullableItemsCollections',
-    'File',
-    'Folder',
-    'Library',
-    'Warning',
-    'package',
-    'override_library',
-    'AutoCommit',
-    'DqEngine',
-    'SimpleColumns',
-    'DisableSimpleColumns',
-    'CoalesceJoinKeysOnQualifiedAll',
-    'StrictJoinKeyTypes',
-    'AnsiRankForNullableKeys',
-    'AnsiCurrentRow',
-    'AnsiOrderByLimitInUnionAll',
-    'OrderedColumns',
-    'DisableOrderedColumns',
-    'PositionalUnionAll',
-    'RegexUseRe2',
-    'ClassicDivision',
-    'AllowDotInAlias',
-    'WarnUnnamedColumns',
-    'GroupByLimit',
-    'GroupByCubeLimit',
-    'config.flags',
-    'kikimr.IsolationLevel',
-    'Kikimr.ScanQuery',
-];
+export const Pragmas = ['TablePathPrefix', 'Warning'];

@@ -1,4 +1,4 @@
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import type Monaco from 'monaco-editor';
 import {CursorPosition, parseYqlQuery} from '@gravity-ui/websql-autocomplete';
 
 import {
@@ -17,10 +17,10 @@ import {
 
 export function createProvideSuggestionsFunction(database: string) {
     return async (
-        model: monaco.editor.ITextModel,
-        monacoCursorPosition: monaco.Position,
-        _context: monaco.languages.CompletionContext,
-        _token: monaco.CancellationToken,
+        model: Monaco.editor.ITextModel,
+        monacoCursorPosition: Monaco.Position,
+        _context: Monaco.languages.CompletionContext,
+        _token: Monaco.CancellationToken,
     ) => {
         const cursorPosition: CursorPosition = {
             line: monacoCursorPosition.lineNumber,
@@ -40,20 +40,20 @@ export function createProvideSuggestionsFunction(database: string) {
 }
 
 async function getSuggestions(
-    model: monaco.editor.ITextModel,
+    model: Monaco.editor.ITextModel,
     cursorPosition: CursorPosition,
-    rangeToInsertSuggestion: monaco.IRange,
+    rangeToInsertSuggestion: Monaco.IRange,
     database: string,
-): Promise<monaco.languages.CompletionItem[]> {
+): Promise<Monaco.languages.CompletionItem[]> {
     const parseResult = parseYqlQuery(model.getValue(), cursorPosition);
-    let entitiesSuggestions: monaco.languages.CompletionItem[] = [];
-    let functionsSuggestions: monaco.languages.CompletionItem[] = [];
-    let aggregateFunctionsSuggestions: monaco.languages.CompletionItem[] = [];
-    let windowFunctionsSuggestions: monaco.languages.CompletionItem[] = [];
-    let tableFunctionsSuggestions: monaco.languages.CompletionItem[] = [];
-    let udfsSuggestions: monaco.languages.CompletionItem[] = [];
-    let simpleTypesSuggestions: monaco.languages.CompletionItem[] = [];
-    let pragmasSuggestions: monaco.languages.CompletionItem[] = [];
+    let entitiesSuggestions: Monaco.languages.CompletionItem[] = [];
+    let functionsSuggestions: Monaco.languages.CompletionItem[] = [];
+    let aggregateFunctionsSuggestions: Monaco.languages.CompletionItem[] = [];
+    let windowFunctionsSuggestions: Monaco.languages.CompletionItem[] = [];
+    let tableFunctionsSuggestions: Monaco.languages.CompletionItem[] = [];
+    let udfsSuggestions: Monaco.languages.CompletionItem[] = [];
+    let simpleTypesSuggestions: Monaco.languages.CompletionItem[] = [];
+    let pragmasSuggestions: Monaco.languages.CompletionItem[] = [];
 
     if (parseResult.suggestEntity) {
         entitiesSuggestions = await generateEntitiesSuggestion(rangeToInsertSuggestion);
@@ -100,7 +100,7 @@ async function getSuggestions(
         parseResult.suggestKeywords,
     );
 
-    const suggestions: monaco.languages.CompletionItem[] = [
+    const suggestions: Monaco.languages.CompletionItem[] = [
         ...entitiesSuggestions,
         ...functionsSuggestions,
         ...windowFunctionsSuggestions,
@@ -118,12 +118,12 @@ async function getSuggestions(
 }
 
 function getRangeToInsertSuggestion(
-    model: monaco.editor.ITextModel,
-    cursorPosition: monaco.Position,
-): monaco.IRange {
+    model: Monaco.editor.ITextModel,
+    cursorPosition: Monaco.Position,
+): Monaco.IRange {
     const {startColumn: lastWordStartColumn, endColumn: lastWordEndColumn} =
         model.getWordUntilPosition(cursorPosition);
-    // https://github.com/microsoft/monaco-editor/discussions/3639#discussioncomment-5190373 if user already typed "$" sign, it should not be duplicated
+    // https://github.com/microsoft/Monaco-editor/discussions/3639#discussioncomment-5190373 if user already typed "$" sign, it should not be duplicated
     const dollarBeforeLastWordStart =
         model.getLineContent(cursorPosition.lineNumber)[lastWordStartColumn - 2] === '$' ? 1 : 0;
     return {

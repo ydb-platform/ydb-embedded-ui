@@ -5,6 +5,12 @@
   "page.experiments": "Experiments",
   "section.experiments": "Experiments",
 
+  "page.editor": "Editor",
+  "section.dev-setting": "Development settings",
+
+  "settings.editor.autocomplete.title": "Enable autocomplete",
+  "settings.editor.autocomplete.description": "You’re always able to get suggestions by pressing Ctrl+Space.",
+
   "settings.theme.title": "Interface theme",
   "settings.theme.option-dark": "Dark",
   "settings.theme.option-light": "Light",
