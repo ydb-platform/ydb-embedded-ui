@@ -4,6 +4,7 @@ import type {RedirectProps, RouteComponentProps} from 'react-router';
 import type Cluster from '../Cluster/Cluster';
 import type {Clusters} from '../Clusters/Clusters';
 import type Node from '../Node/Node';
+import type {PDisk} from '../PDisk/PDisk';
 import type {Tablet} from '../Tablet';
 import type TabletsFilters from '../TabletsFilters/TabletsFilters';
 import type Tenant from '../Tenant/Tenant';
@@ -28,6 +29,11 @@ export const NodeSlot = createSlot<{
         | React.ReactNode
         | ((props: {component: typeof Node} & RouteComponentProps) => React.ReactNode);
 }>('node');
+export const PDiskSlot = createSlot<{
+    children:
+        | React.ReactNode
+        | ((props: {component: typeof PDisk} & RouteComponentProps) => React.ReactNode);
+}>('pDisk');
 export const TabletSlot = createSlot<{
     children:
         | React.ReactNode

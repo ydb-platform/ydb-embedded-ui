@@ -13,21 +13,17 @@ import type {
     PreparedStructureVDisk,
 } from '../../../store/reducers/node/types';
 import {EVDiskState} from '../../../types/api/vdisk';
-import {bytesToGB} from '../../../utils/utils';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
-import {
-    createPDiskDeveloperUILink,
-    createVDiskDeveloperUILink,
-} from '../../../utils/developerUI/developerUI';
+import {valueIsDefined} from '../../../utils';
+import {createVDiskDeveloperUILink} from '../../../utils/developerUI/developerUI';
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
-import InfoViewer, {type InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {Icon} from '../../../components/Icon';
+import {PDiskInfo} from '../../../components/PDiskInfo/PDiskInfo';
 
 import i18n from '../i18n';
 import {Vdisk} from './Vdisk';
-import {valueIsDefined} from './NodeStructure';
 import {PDiskTitleBadge} from './PDiskTitleBadge';
 
 const b = cn('kv-node-structure');
@@ -173,20 +169,7 @@ export function PDisk({
 }: PDiskProps) {
     const [unfolded, setUnfolded] = useState(unfoldedFromProps ?? false);
 
-    const {
-        TotalSize = 0,
-        AvailableSize = 0,
-        Device,
-        Guid,
-        PDiskId,
-        Path,
-        Realtime,
-        State,
-        Category,
-        Type,
-        SerialNumber,
-        vDisks,
-    } = data;
+    const {TotalSize = 0, AvailableSize = 0, Device, PDiskId, Type, vDisks} = data;
 
     const total = Number(TotalSize);
     const available = Number(AvailableSize);
@@ -216,90 +199,10 @@ export function PDisk({
         if (isEmpty(data)) {
             return <div>No information about PDisk</div>;
         }
-        let pDiskInternalViewerLink = null;
 
-        if (valueIsDefined(PDiskId) && valueIsDefined(nodeId)) {
-            pDiskInternalViewerLink = createPDiskDeveloperUILink({
-                nodeId,
-                pDiskId: PDiskId,
-            });
-        }
-
-        const pdiskInfo: InfoViewerItem[] = [
-            {
-                label: 'PDisk Id',
-                value: (
-                    <div className={b('pdisk-id')}>
-                        {PDiskId}
-                        {pDiskInternalViewerLink && (
-                            <Button
-                                size="s"
-                                className={b('external-button')}
-                                href={pDiskInternalViewerLink}
-                                target="_blank"
-                                view="flat-secondary"
-                                title={i18n('pdisk.developer-ui-button-title')}
-                            >
-                                <Icon name="external" />
-                            </Button>
-                        )}
-                    </div>
-                ),
-            },
-        ];
-        if (valueIsDefined(Path)) {
-            pdiskInfo.push({label: 'Path', value: Path});
-        }
-        if (valueIsDefined(Guid)) {
-            pdiskInfo.push({label: 'GUID', value: Guid});
-        }
-        if (valueIsDefined(Category)) {
-            pdiskInfo.push({label: 'Category', value: Category});
-            pdiskInfo.push({label: 'Type', value: Type});
-        }
-        pdiskInfo.push({
-            label: 'Allocated Size',
-            value: bytesToGB(total - available),
-        });
-        pdiskInfo.push({
-            label: 'Available Size',
-            value: bytesToGB(available),
-        });
-        if (total >= 0 && available >= 0) {
-            pdiskInfo.push({
-                label: 'Size',
-                value: (
-                    <ProgressViewer
-                        value={total - available}
-                        capacity={total}
-                        formatValues={formatStorageValuesToGb}
-                        colorizeProgress={true}
-                        className={b('size')}
-                    />
-                ),
-            });
-        }
-        if (valueIsDefined(State)) {
-            pdiskInfo.push({label: 'State', value: State});
-        }
-        if (valueIsDefined(Device)) {
-            pdiskInfo.push({
-                label: 'Device',
-                value: <EntityStatus status={Device} />,
-            });
-        }
-        if (valueIsDefined(Realtime)) {
-            pdiskInfo.push({
-                label: 'Realtime',
-                value: <EntityStatus status={Realtime} />,
-            });
-        }
-        if (valueIsDefined(SerialNumber)) {
-            pdiskInfo.push({label: 'SerialNumber', value: SerialNumber});
-        }
         return (
             <div>
-                <InfoViewer className={b('pdisk-details')} info={pdiskInfo} />
+                <PDiskInfo pDisk={data} nodeId={nodeId} className={b('pdisk-details')} />
                 <div className={b('vdisks-container')}>
                     <div className={b('vdisks-header')}>VDisks</div>
                     {renderVDisks()}

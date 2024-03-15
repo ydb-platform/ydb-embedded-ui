@@ -1,0 +1,15 @@
+{
+  "path": "Path",
+  "guid": "GUID",
+  "category": "Category",
+  "type": "Type",
+  "size": "Size",
+  "state": "State",
+  "device": "Device",
+  "realtime": "Realtime",
+  "serial-number": "SerialNumber",
+  "links": "Links",
+
+  "developer-ui": "Developer UI",
+  "pdisk-page": "PDisk page"
+}

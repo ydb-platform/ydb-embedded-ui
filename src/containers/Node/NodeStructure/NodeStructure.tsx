@@ -18,10 +18,6 @@ import './NodeStructure.scss';
 
 const b = cn('kv-node-structure');
 
-export function valueIsDefined<T>(value: T | null | undefined): value is T {
-    return value !== null && value !== undefined;
-}
-
 function generateId({type, id}: {type: 'pdisk' | 'vdisk'; id: string}) {
     return `${type}-${id}`;
 }

@@ -8,11 +8,10 @@ import {
     stringifyVdiskId,
 } from '../../../utils/dataFormatters/dataFormatters';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
+import {valueIsDefined} from '../../../utils';
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
-
-import {valueIsDefined} from './NodeStructure';
 
 const b = cn('kv-node-structure');
 

@@ -125,7 +125,7 @@ export const getTabletDescribe = (tenantId: TDomainKey = {}) => {
         actions: FETCH_TABLET_DESCRIBE,
         dataHandler: (tabletDescribe): ITabletDescribeHandledResponse => {
             const {SchemeShard, PathId} = tenantId;
-            const tenantPath = tabletDescribe.Path || `${SchemeShard}:${PathId}`;
+            const tenantPath = tabletDescribe?.Path || `${SchemeShard}:${PathId}`;
 
             return {tenantPath};
         },

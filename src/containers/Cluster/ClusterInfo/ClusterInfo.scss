@@ -3,6 +3,10 @@
 .cluster-info {
     padding-top: 20px;
 
+    &__skeleton {
+        margin-top: 5px;
+    }
+
     &__error {
         @include body-2-typography();
     }

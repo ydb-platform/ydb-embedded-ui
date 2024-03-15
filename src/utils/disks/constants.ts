@@ -12,7 +12,15 @@ export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
     Red: 5,
 };
 
+type SeverityToColor = Record<number, keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY>;
+
+export const DISK_NUMERIC_SEVERITY_TO_STATE_COLOR = Object.entries(
+    DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
+).reduce<SeverityToColor>((acc, [color, severity]) => ({...acc, [severity]: color as EFlag}), {});
+
 export const NOT_AVAILABLE_SEVERITY = DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey;
+export const NOT_AVAILABLE_SEVERITY_COLOR =
+    DISK_NUMERIC_SEVERITY_TO_STATE_COLOR[NOT_AVAILABLE_SEVERITY];
 
 export const VDISK_STATE_SEVERITY: Record<EVDiskState, number> = {
     [EVDiskState.Initial]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,

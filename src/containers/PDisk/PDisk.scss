@@ -1,0 +1,41 @@
+@import '../../styles//mixins.scss';
+
+.ydb-pdisk-page {
+    position: relative;
+
+    display: flex;
+    overflow: auto;
+    flex-direction: column;
+
+    height: 100%;
+    padding-top: 20px;
+    padding-left: 20px;
+
+    gap: 20px;
+
+    &__meta,
+    &__title,
+    &__info,
+    &__groups-title {
+        position: sticky;
+        left: 0;
+    }
+
+    &__title {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: baseline;
+
+        @include header-2-typography();
+
+        &__prefix {
+            margin-right: 6px;
+
+            color: var(--g-color-text-secondary);
+        }
+    }
+
+    &__groups-title {
+        @include header-1-typography();
+    }
+}

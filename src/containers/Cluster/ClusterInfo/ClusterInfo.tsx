@@ -5,8 +5,9 @@ import InfoViewer, {InfoViewerItem} from '../../../components/InfoViewer/InfoVie
 import {Tags} from '../../../components/Tags';
 import {Tablet} from '../../../components/Tablet';
 import {ResponseError} from '../../../components/Errors/ResponseError';
-import {ExternalLinkWithIcon} from '../../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
+import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {ContentWithPopup} from '../../../components/ContentWithPopup/ContentWithPopup';
+import {InfoViewerSkeleton} from '../../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 
 import type {IResponseError} from '../../../types/api/error';
 import type {AdditionalClusterProps, ClusterLink} from '../../../types/additionalProps';
@@ -24,7 +25,6 @@ import type {
 } from '../../../store/reducers/cluster/types';
 
 import {VersionsBar} from '../VersionsBar/VersionsBar';
-import {ClusterInfoSkeleton} from '../ClusterInfoSkeleton/ClusterInfoSkeleton';
 import i18n from '../i18n';
 
 import {compareTablets} from './utils';
@@ -176,7 +176,7 @@ const getInfo = (
             value: (
                 <div className={b('links')}>
                     {links.map(({title, url}) => (
-                        <ExternalLinkWithIcon key={title} title={title} url={url} />
+                        <LinkWithIcon key={title} title={title} url={url} />
                     ))}
                 </div>
             ),
@@ -224,7 +224,7 @@ export const ClusterInfo = ({
 
     const getContent = () => {
         if (loading) {
-            return <ClusterInfoSkeleton />;
+            return <InfoViewerSkeleton className={b('skeleton')} rows={9} />;
         }
 
         if (error) {

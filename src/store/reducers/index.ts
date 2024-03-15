@@ -21,6 +21,7 @@ import tenants from './tenants/tenants';
 import tablet from './tablet';
 import topic from './topic';
 import partitions from './partitions/partitions';
+import pDisk from './pdisk/pdisk';
 import executeQuery from './executeQuery';
 import explainQuery from './explainQuery';
 import tabletsFilters from './tabletsFilters';
@@ -67,6 +68,7 @@ export const rootReducer = {
     tablet,
     topic,
     partitions,
+    pDisk,
     executeQuery,
     explainQuery,
     tabletsFilters,
