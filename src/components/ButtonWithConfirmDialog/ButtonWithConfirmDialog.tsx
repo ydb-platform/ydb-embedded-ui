@@ -26,9 +26,10 @@ export function ButtonWithConfirmDialog<T, K>({
     const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
     const [buttonLoading, setButtonLoading] = useState(false);
 
-    const handleConfirmAction = () => {
+    const handleConfirmAction = async () => {
         setButtonLoading(true);
-        return onConfirmAction();
+        await onConfirmAction();
+        setButtonLoading(false);
     };
 
     const handleConfirmActionSuccess = async () => {
