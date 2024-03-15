@@ -4,7 +4,7 @@ import block from 'bem-cn-lite';
 
 import {Breadcrumbs} from '@gravity-ui/uikit';
 
-import {ExternalLinkWithIcon} from '../../components/ExternalLinkWithIcon/ExternalLinkWithIcon';
+import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
 
 import {backend, customBackend} from '../../store';
 import {getClusterInfo} from '../../store/reducers/cluster/cluster';
@@ -98,10 +98,7 @@ function Header({mainPage}: HeaderProps) {
                     />
                 </div>
 
-                <ExternalLinkWithIcon
-                    title={DEVELOPER_UI_TITLE}
-                    url={getInternalLink(singleClusterMode)}
-                />
+                <LinkWithIcon title={DEVELOPER_UI_TITLE} url={getInternalLink(singleClusterMode)} />
             </header>
         );
     };

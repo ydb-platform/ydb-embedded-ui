@@ -9,6 +9,7 @@ export const CLUSTERS = 'clusters';
 export const CLUSTER = 'cluster';
 export const TENANT = 'tenant';
 export const NODE = 'node';
+export const PDISK = 'pDisk';
 export const TABLET = 'tablet';
 
 const routes = {
@@ -16,10 +17,13 @@ const routes = {
     cluster: `/${CLUSTER}/:activeTab?`,
     tenant: `/${TENANT}`,
     node: `/${NODE}/:id/:activeTab?`,
+    pDisk: `/${PDISK}`,
     tablet: `/${TABLET}/:id`,
     tabletsFilters: `/tabletsFilters`,
     auth: `/auth`,
 } as const;
+
+export default routes;
 
 export const parseQuery = (location: Location) => {
     return qs.parse(location.search, {
@@ -81,4 +85,10 @@ export function getLocationObjectFromHref(href: string) {
     return {pathname, search, hash};
 }
 
-export default routes;
+export function getPDiskPagePath(
+    pDiskId: string | number,
+    nodeId: string | number,
+    query: Query = {},
+) {
+    return createHref(routes.pDisk, undefined, {...query, nodeId, pDiskId});
+}

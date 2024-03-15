@@ -1,0 +1,8 @@
+.ydb-pdisk-info {
+    &__links {
+        display: flex;
+        flex-flow: row wrap;
+
+        gap: 12px;
+    }
+}

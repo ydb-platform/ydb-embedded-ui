@@ -2,9 +2,9 @@ import block from 'bem-cn-lite';
 
 import {Skeleton} from '@gravity-ui/uikit';
 
-import './ClusterInfoSkeleton.scss';
+import './InfoViewerSkeleton.scss';
 
-const b = block('ydb-cluster-info-skeleton');
+const b = block('ydb-info-viewer-skeleton');
 
 const SkeletonLabel = () => (
     <div className={b('label')}>
@@ -13,12 +13,12 @@ const SkeletonLabel = () => (
     </div>
 );
 
-interface ClusterInfoSkeletonProps {
+interface InfoViewerSkeletonProps {
     className?: string;
     rows?: number;
 }
 
-export const ClusterInfoSkeleton = ({rows = 8, className}: ClusterInfoSkeletonProps) => (
+export const InfoViewerSkeleton = ({rows = 8, className}: InfoViewerSkeletonProps) => (
     <div className={b(null, className)}>
         {[...new Array(rows)].map((_, index) => (
             <div className={b('row')} key={`skeleton-row-${index}`}>
@@ -26,9 +26,5 @@ export const ClusterInfoSkeleton = ({rows = 8, className}: ClusterInfoSkeletonPr
                 <Skeleton className={b('value')} />
             </div>
         ))}
-        <div className={b('row')} key="versions">
-            <SkeletonLabel />
-            <Skeleton className={b('versions')} />
-        </div>
     </div>
 );
