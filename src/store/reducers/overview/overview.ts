@@ -22,7 +22,7 @@ const schema: Reducer<OverviewState, OverviewAction> = (state = initialState, ac
             };
         }
         case FETCH_OVERVIEW.SUCCESS: {
-            if (action.data.data.Path !== state.currentOverviewPath) {
+            if (action.data.data?.Path !== state.currentOverviewPath) {
                 return state;
             }
 

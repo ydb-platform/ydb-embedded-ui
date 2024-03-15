@@ -42,6 +42,7 @@ import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../utils/constants';
 import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
+import {Nullable} from '../utils/typecheckers';
 
 type AxiosOptions = {
     concurrentId?: string;
@@ -179,7 +180,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         });
     }
     getSchema({path}: {path: string}, {concurrentId}: AxiosOptions = {}) {
-        return this.get<TEvDescribeSchemeResult>(
+        return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
                 path,
@@ -195,7 +196,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getDescribe({path}: {path: string}, {concurrentId}: AxiosOptions = {}) {
-        return this.get<TEvDescribeSchemeResult>(
+        return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
                 path,
@@ -216,7 +217,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getHeatmapData({path}: {path: string}) {
-        return this.get<TEvDescribeSchemeResult>(this.getPath('/viewer/json/describe'), {
+        return this.get<Nullable<TEvDescribeSchemeResult>>(this.getPath('/viewer/json/describe'), {
             path,
             enums: true,
             backup: false,
@@ -393,7 +394,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getTabletDescribe(tenantId: TDomainKey) {
-        return this.get<TEvDescribeSchemeResult>(this.getPath('/viewer/json/describe'), {
+        return this.get<Nullable<TEvDescribeSchemeResult>>(this.getPath('/viewer/json/describe'), {
             schemeshard_id: tenantId?.SchemeShard,
             path_id: tenantId?.PathId,
         });

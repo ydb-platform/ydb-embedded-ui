@@ -125,12 +125,12 @@ export function getSchema({path}: {path: string}) {
         actions: FETCH_SCHEMA,
         dataHandler: (data): SchemaHandledResponse => {
             const newData: SchemaData = {};
-            if (data.Path) {
+            if (data?.Path) {
                 newData[data.Path] = data;
             }
             return {
-                path: data.Path,
-                currentSchema: data,
+                path: data?.Path,
+                currentSchema: data ?? undefined,
                 data: newData,
             };
         },
