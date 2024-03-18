@@ -1,5 +1,26 @@
 # Changelog
 
+## [5.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.2.1...v5.3.0) (2024-03-15)
+
+
+### Features
+
+* add PDisk page ([#759](https://github.com/ydb-platform/ydb-embedded-ui/issues/759)) ([c1d3f99](https://github.com/ydb-platform/ydb-embedded-ui/commit/c1d3f996f5b0f1c23cd7ba5e717fad3680ba63af))
+* add setting to enable autocomplete, fix constants for completion ([#765](https://github.com/ydb-platform/ydb-embedded-ui/issues/765)) ([88cfc52](https://github.com/ydb-platform/ydb-embedded-ui/commit/88cfc5258eaf64a1b2e5ff6c1403f827e71ed54a))
+* add YQL autocomplete ([#755](https://github.com/ydb-platform/ydb-embedded-ui/issues/755)) ([799a05f](https://github.com/ydb-platform/ydb-embedded-ui/commit/799a05fe3301d4be05c33bce8a44eb3018a199c7))
+* **MetricChart:** make charts database specific ([#750](https://github.com/ydb-platform/ydb-embedded-ui/issues/750)) ([fa98a22](https://github.com/ydb-platform/ydb-embedded-ui/commit/fa98a2222e5be1d0fe83b90f99d73207eb93fc71))
+* use rtk to init store and add typed dispatch ([#749](https://github.com/ydb-platform/ydb-embedded-ui/issues/749)) ([323cb6b](https://github.com/ydb-platform/ydb-embedded-ui/commit/323cb6b5de9204e40af2c2b80ca436edcddb686d))
+
+
+### Bug Fixes
+
+* add absent deps, update axios ([#756](https://github.com/ydb-platform/ydb-embedded-ui/issues/756)) ([ee723cd](https://github.com/ydb-platform/ydb-embedded-ui/commit/ee723cd8f7122949f388a8380ee05fe96c624ff3))
+* add Blue status to EFlag ([#754](https://github.com/ydb-platform/ydb-embedded-ui/issues/754)) ([9a0b867](https://github.com/ydb-platform/ydb-embedded-ui/commit/9a0b867b45262919baaa7032f73cf44d415d3f27))
+* fix status colors ([#757](https://github.com/ydb-platform/ydb-embedded-ui/issues/757)) ([9928ee2](https://github.com/ydb-platform/ydb-embedded-ui/commit/9928ee23ee55959eb2162de5c948c321ed849fe7))
+* **MetricChart:** explicitly process error with html ([#752](https://github.com/ydb-platform/ydb-embedded-ui/issues/752)) ([6d8a0ba](https://github.com/ydb-platform/ydb-embedded-ui/commit/6d8a0ba454061db4edff948af86731bc6873a356))
+* **Tablet:** correctly process error in dialog action ([#758](https://github.com/ydb-platform/ydb-embedded-ui/issues/758)) ([b6bcd68](https://github.com/ydb-platform/ydb-embedded-ui/commit/b6bcd686df4e092019da0d39e9da384930cf4a0a))
+* **TEvDescribeSchemeResult:** support null value ([#762](https://github.com/ydb-platform/ydb-embedded-ui/issues/762)) ([72ce541](https://github.com/ydb-platform/ydb-embedded-ui/commit/72ce54159b237f607f971159d0bba4879dfea73c))
+
 ## [5.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.2.0...v5.2.1) (2024-03-05)
 
 
