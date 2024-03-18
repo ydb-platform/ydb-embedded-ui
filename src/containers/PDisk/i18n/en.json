@@ -2,5 +2,8 @@
   "fqdn": "FQDN",
   "pdisk": "PDisk",
   "groups": "Groups",
-  "node": "Node"
+  "node": "Node",
+
+  "restart-pdisk-button": "Restart PDisk",
+  "restart-pdisk-dialog": "PDisk will be restarted. Do you want to proceed?"
 }

@@ -38,6 +38,7 @@ import type {JsonHotKeysResponse} from '../types/api/hotkeys';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
 import {prepareSortValue} from '../utils/filters';
+import {createPDiskDeveloperUILink} from '../utils/developerUI/developerUI';
 import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../utils/constants';
 import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
@@ -376,6 +377,24 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             this.getPath('/viewer/json/healthcheck?merge_records=true'),
             {tenant: database},
             {concurrentId},
+        );
+    }
+    restartPDisk(nodeId: number | string, pDiskId: number | string) {
+        const pDiskPath = createPDiskDeveloperUILink({
+            nodeId,
+            pDiskId,
+            host: this.getPath(''),
+        });
+
+        return this.post(
+            pDiskPath,
+            'restartPDisk=',
+            {},
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                },
+            },
         );
     }
     killTablet(id?: string) {
