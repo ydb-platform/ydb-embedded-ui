@@ -13,6 +13,7 @@ export const TENANT_QUERY_TABS_ID = {
 
 export const TENANT_DIAGNOSTICS_TABS_IDS = {
     overview: 'overview',
+    schema: 'schema',
     topQueries: 'topQueries',
     topShards: 'topShards',
     nodes: 'nodes',

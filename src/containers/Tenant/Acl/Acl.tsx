@@ -118,11 +118,11 @@ export const Acl = () => {
     }
 
     if (error) {
-        return <ResponseError error={error} className={b('message-container')} />;
+        return <ResponseError error={error} />;
     }
 
     if (!loading && !acl && !owner) {
-        return <div className={b('message-container')}>{i18n('acl.empty')}</div>;
+        return <>{i18n('acl.empty')}</>;
     }
 
     return (

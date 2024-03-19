@@ -19,8 +19,9 @@ import {Heatmap} from '../../Heatmap';
 import {NodesWrapper} from '../../Nodes/NodesWrapper';
 import {StorageWrapper} from '../../Storage/StorageWrapper';
 import {Tablets} from '../../Tablets';
-import {TenantTabsGroups} from '../TenantPages';
 import {isDatabaseEntityType} from '../utils/schema';
+import {TenantTabsGroups} from '../TenantPages';
+import SchemaViewer from '../Schema/SchemaViewer/SchemaViewer';
 
 import {AutorefreshControl} from './Autorefresh/AutorefreshControl';
 import {Consumers} from './Consumers';
@@ -102,6 +103,9 @@ function Diagnostics(props: DiagnosticsProps) {
                         additionalNodesProps={props.additionalNodesProps}
                     />
                 );
+            }
+            case TENANT_DIAGNOSTICS_TABS_IDS.schema: {
+                return <SchemaViewer path={currentSchemaPath} type={type} withFamilies />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topQueries: {
                 return <TopQueries path={tenantNameString} type={type} />;
