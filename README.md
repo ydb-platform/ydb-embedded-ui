@@ -22,11 +22,14 @@ Open http://localhost:8765 to view it in the browser.
 
 1. Run on a machine with Docker installed:
    ```
-   docker pull cr.yandex/yc/yandex-docker-local-ydb
-   docker run --hostname localhost -e YDB_ALLOW_ORIGIN="http://localhost:3000" -dp 2135:2135 -dp 8765:8765 cr.yandex/yc/yandex-docker-local-ydb
+   docker run --rm -ti --name ydb-local -h localhost \
+      -p 2135:2135 -p 2136:2136 -p 8765:8765 \
+      -v $(pwd)/ydb_certs:/ydb_certs -v $(pwd)/ydb_data:/ydb_data \
+      -e GRPC_TLS_PORT=2135 -e GRPC_PORT=2136 -e MON_PORT=8765 \
+      cr.yandex/yc/yandex-docker-local-ydb:latest
    ```
 2. Run the frontend app in the development mode, via invoking `npm run dev`
-3. Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.\
+3. Open [localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.\
    You will also see any lint errors in the console.
 
 For API reference, open Swagger UI on http://localhost:8765/viewer/api/.
@@ -37,7 +40,9 @@ For API reference, open Swagger UI on http://localhost:8765/viewer/api/.
 
 Image `cr.yandex/yc/yandex-docker-local-ydb` corresponds to `:latest` tag. It's the latest stable ydb version.
 
-To test new features, you can use ydb version that is currently in testing mode with `cr.yandex/yc/yandex-docker-local-ydb:edge` image. Also you can set specific version like `cr.yandex/yc/yandex-docker-local-ydb:23.1`
+To test new features, you can use ydb version that is currently in testing mode with `cr.yandex/yc/yandex-docker-local-ydb:edge` image
+or use a build from `main` brunch with `ghcr.io/ydb-platform/local-ydb:trunk` image.
+Also you can set specific version like `cr.yandex/yc/yandex-docker-local-ydb:23.1`
 
 ### Custom backend in dev mode
 
