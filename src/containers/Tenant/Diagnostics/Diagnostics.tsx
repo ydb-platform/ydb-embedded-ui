@@ -36,6 +36,7 @@ import DetailedOverview from './DetailedOverview/DetailedOverview';
 import {isDatabaseEntityType} from '../utils/schema';
 
 import {TenantTabsGroups} from '../TenantPages';
+import SchemaViewer from '../Schema/SchemaViewer/SchemaViewer';
 import {DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
 
 import './Diagnostics.scss';
@@ -115,6 +116,9 @@ function Diagnostics(props: DiagnosticsProps) {
                         additionalNodesProps={props.additionalNodesProps}
                     />
                 );
+            }
+            case TENANT_DIAGNOSTICS_TABS_IDS.schema: {
+                return <SchemaViewer path={currentSchemaPath} type={type} withFamilies />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topQueries: {
                 return <TopQueries path={tenantNameString} type={type} />;

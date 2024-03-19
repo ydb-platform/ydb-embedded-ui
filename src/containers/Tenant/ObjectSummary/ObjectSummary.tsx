@@ -22,12 +22,7 @@ import {
     TENANT_SUMMARY_TABS_IDS,
 } from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setSummaryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import {
-    EPathSubType,
-    EPathType,
-    TColumnDescription,
-    TColumnTableDescription,
-} from '../../../types/api/schema';
+import {EPathSubType, EPathType} from '../../../types/api/schema';
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
@@ -46,7 +41,7 @@ import {
     PaneVisibilityToggleButtons,
     paneVisibilityToggleReducerCreator,
 } from '../utils/paneVisibilityToggleHelpers';
-import {isColumnEntityType, isExternalTable, isIndexTable, isTableType} from '../utils/schema';
+import {isIndexTable, isTableType} from '../utils/schema';
 import './ObjectSummary.scss';
 
 const b = cn('object-summary');
@@ -60,29 +55,6 @@ const getTenantCommonInfoState = () => {
         collapsed,
     };
 };
-
-function prepareOlapTableSchema(tableSchema: TColumnTableDescription = {}) {
-    const {Name, Schema} = tableSchema;
-
-    if (Schema) {
-        const {Columns, KeyColumnNames} = Schema;
-        const KeyColumnIds = KeyColumnNames?.map((name: string) => {
-            const column = Columns?.find((el) => el.Name === name);
-            return column?.Id;
-        }).filter((id): id is number => id !== undefined);
-
-        return {
-            Columns,
-            KeyColumnNames,
-            Name,
-            KeyColumnIds,
-        };
-    }
-
-    return {
-        Name,
-    };
-}
 
 interface ObjectSummaryProps {
     type?: EPathType;
@@ -109,7 +81,6 @@ export function ObjectSummary({
         data,
         currentSchemaPath,
         currentSchema: currentItem = {},
-        loading: loadingSchema,
     } = useTypedSelector((state) => state.schema);
     const {summaryTab = TENANT_SUMMARY_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
@@ -126,21 +97,6 @@ export function ObjectSummary({
     const pathData = tenantName ? data[tenantName.toString()]?.PathDescription?.Self : undefined;
     const currentObjectData = currentSchemaPath ? data[currentSchemaPath] : undefined;
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
-
-    let keyColumnIds: number[] | undefined;
-    let columns: TColumnDescription[] | undefined;
-
-    if (isTableType(type) && isColumnEntityType(type)) {
-        const description = currentObjectData?.PathDescription?.ColumnTableDescription;
-        const columnTableSchema = prepareOlapTableSchema(description);
-        keyColumnIds = columnTableSchema.KeyColumnIds;
-        columns = columnTableSchema.Columns;
-    } else if (isExternalTable(type)) {
-        columns = currentObjectData?.PathDescription?.ExternalTableDescription?.Columns;
-    } else {
-        keyColumnIds = currentObjectData?.PathDescription?.Table?.KeyColumnIds;
-        columns = currentObjectData?.PathDescription?.Table?.Columns;
-    }
 
     useEffect(() => {
         const isTable = isTableType(type);
@@ -215,7 +171,7 @@ export function ObjectSummary({
             component = <InfoViewer info={[{label: 'Create time', value: createTime}]} />;
         }
 
-        return <div className={b('overview-wrapper')}>{component}</div>;
+        return component;
     };
 
     const renderLoader = () => {
@@ -233,12 +189,8 @@ export function ObjectSummary({
                 return <Acl />;
             }
             case TENANT_SUMMARY_TABS_IDS.schema: {
-                return loadingSchema ? (
-                    renderLoader()
-                ) : (
-                    <div className={b('schema')}>
-                        <SchemaViewer keyColumnIds={keyColumnIds} columns={columns} type={type} />
-                    </div>
+                return (
+                    <SchemaViewer className={b('schema')} type={type} path={currentSchemaPath} />
                 );
             }
             default: {
@@ -361,7 +313,7 @@ export function ObjectSummary({
                                 </div>
                                 {renderTabs()}
                             </div>
-                            {renderTabContent()}
+                            <div className={b('overview-wrapper')}>{renderTabContent()}</div>
                         </div>
                     </SplitPane>
                 </div>

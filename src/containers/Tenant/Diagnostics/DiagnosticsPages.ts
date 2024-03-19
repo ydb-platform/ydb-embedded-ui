@@ -12,6 +12,11 @@ const overview = {
     title: 'Info',
 };
 
+const schema = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.schema,
+    title: 'Schema',
+};
+
 const topQueries = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.topQueries,
     title: 'Top queries',
@@ -76,8 +81,8 @@ export const DATABASE_PAGES = [
     describe,
 ];
 
-export const TABLE_PAGES = [overview, topShards, nodes, graph, tablets, hotKeys, describe];
-export const COLUMN_TABLE_PAGES = [overview, topShards, nodes, graph, tablets, describe];
+export const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe];
+export const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, describe];
 
 export const DIR_PAGES = [overview, topShards, nodes, describe];
 
