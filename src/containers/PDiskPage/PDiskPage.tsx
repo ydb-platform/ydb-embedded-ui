@@ -11,27 +11,29 @@ import {
     setPDiskDataWasNotLoaded,
 } from '../../store/reducers/pdisk/pdisk';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
 
+import {valueIsDefined} from '../../utils';
 import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {getSeverityColor} from '../../utils/disks/helpers';
 
 import {PageMeta} from '../../components/PageMeta/PageMeta';
-import {StatusIcon} from '../../components/StatusIcon/StatusIcon';
 import {PDiskInfo} from '../../components/PDiskInfo/PDiskInfo';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
+import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+
+import {useClusterNodesMap} from '../../contexts/ClusterNodesMapContext/ClusterNodesMapContext';
 
 import {PDiskGroups} from './PDiskGroups';
 import {pdiskPageCn} from './shared';
 import {pDiskPageKeyset} from './i18n';
 
-import './PDisk.scss';
+import './PDiskPage.scss';
 
-export function PDisk() {
+export function PDiskPage() {
     const dispatch = useTypedDispatch();
 
-    const nodesMap = useTypedSelector(selectNodesMap);
+    const nodesMap = useClusterNodesMap();
     const {pDiskData, groupsData, pDiskLoading, pDiskWasLoaded, groupsLoading, groupsWasLoaded} =
         useTypedSelector((state) => state.pDisk);
     const {NodeHost, NodeId, NodeType, NodeDC, Severity} = pDiskData;
@@ -45,17 +47,13 @@ export function PDisk() {
         dispatch(setHeaderBreadcrumbs('pDisk', {nodeId, pDiskId}));
     }, [dispatch, nodeId, pDiskId]);
 
-    useEffect(() => {
-        dispatch(getNodesList());
-    }, [dispatch]);
-
     const fetchData = useCallback(
         async (isBackground?: boolean) => {
             if (!isBackground) {
                 dispatch(setPDiskDataWasNotLoaded());
             }
 
-            if (nodeId && pDiskId) {
+            if (valueIsDefined(nodeId) && valueIsDefined(pDiskId)) {
                 return Promise.all([
                     dispatch(getPDiskData({nodeId, pDiskId})),
                     dispatch(getPDiskStorage({nodeId, pDiskId})),
@@ -70,7 +68,7 @@ export function PDisk() {
     useAutofetcher(fetchData, [fetchData], true);
 
     const handleRestart = async () => {
-        if (nodeId && pDiskId) {
+        if (valueIsDefined(nodeId) && valueIsDefined(pDiskId)) {
             return window.api.restartPDisk(nodeId, pDiskId);
         }
 
@@ -103,6 +101,7 @@ export function PDisk() {
         return (
             <PageMeta
                 className={pdiskPageCn('meta')}
+                loading={pDiskLoading && !pDiskWasLoaded}
                 items={[hostItem, nodeIdItem, NodeType, NodeDC]}
             />
         );
@@ -110,11 +109,12 @@ export function PDisk() {
 
     const renderPageTitle = () => {
         return (
-            <div className={pdiskPageCn('title')}>
-                <span className={pdiskPageCn('title__prefix')}>{pDiskPageKeyset('pdisk')}</span>
-                <StatusIcon status={getSeverityColor(Severity)} size="s" />
-                {pDiskId}
-            </div>
+            <DiskPageTitle
+                entityName={pDiskPageKeyset('pdisk')}
+                status={getSeverityColor(Severity)}
+                id={pDiskId}
+                className={pdiskPageCn('title')}
+            />
         );
     };
 

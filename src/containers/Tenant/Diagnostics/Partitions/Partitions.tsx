@@ -11,7 +11,6 @@ import {
 } from '../../../../utils/hooks';
 import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
 
-import {getNodesList, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {
     cleanTopicData,
     getTopic,
@@ -26,6 +25,7 @@ import {
 
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {useClusterNodesMap} from '../../../../contexts/ClusterNodesMapContext/ClusterNodesMapContext';
 
 import type {PreparedPartitionDataWithHosts} from './utils/types';
 import {addHostToPartitions} from './utils';
@@ -53,8 +53,9 @@ export const Partitions = ({path}: PartitionsProps) => {
         [],
     );
 
+    const nodesMap = useClusterNodesMap();
+
     const consumers = useTypedSelector(selectConsumersNames);
-    const nodesMap = useTypedSelector(selectNodesMap);
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const {
         loading: partitionsLoading,
@@ -82,7 +83,6 @@ export const Partitions = ({path}: PartitionsProps) => {
         dispatch(cleanTopicData());
         dispatch(setTopicDataWasNotLoaded());
 
-        dispatch(getNodesList());
         dispatch(getTopic(path));
 
         setComponentCurrentPath(path);

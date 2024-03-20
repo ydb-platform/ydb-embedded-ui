@@ -3,6 +3,7 @@ import {useCallback, useEffect} from 'react';
 import {AccessDenied} from '../../components/Errors/403';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
+import {useClusterNodesMap} from '../../contexts/ClusterNodesMapContext/ClusterNodesMapContext';
 
 import type {
     StorageSortParams,
@@ -33,7 +34,6 @@ import {
     selectGroupsSortParams,
 } from '../../store/reducers/storage/selectors';
 import {VISIBLE_ENTITIES, STORAGE_TYPES} from '../../store/reducers/storage/constants';
-import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
 import {
     useAutofetcher,
     useNodesRequestParams,
@@ -75,18 +75,17 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
     const storageNodes = useTypedSelector(selectFilteredNodes);
     const storageGroups = useTypedSelector(selectFilteredGroups);
     const entitiesCount = useTypedSelector(selectEntitiesCount);
-    const nodesMap = useTypedSelector(selectNodesMap);
     const usageFilterOptions = useTypedSelector(selectUsageFilterOptions);
     const nodesSortParams = useTypedSelector(selectNodesSortParams);
     const groupsSortParams = useTypedSelector(selectGroupsSortParams);
+
+    const nodesMap = useClusterNodesMap();
 
     // Do not display Nodes table for Node page (NodeId present)
     const isNodePage = nodeId !== undefined;
     const storageType = isNodePage ? STORAGE_TYPES.groups : type;
 
     useEffect(() => {
-        dispatch(getNodesList());
-
         return () => {
             // Clean data on component unmount
             dispatch(setInitialState());
