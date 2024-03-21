@@ -14,6 +14,9 @@ export const getDefaultDataFormatter = (dataType?: ChartDataType) => {
         case 'size': {
             return formatChartValueToSize;
         }
+        case 'percent': {
+            return formatChartValueToPercent;
+        }
         default:
             return undefined;
     }
@@ -33,6 +36,12 @@ function formatChartValueToSize(value: ChartValue) {
         return EMPTY_DATA_PLACEHOLDER;
     }
     return formatBytes({value: convertToNumber(value), precision: 3});
+}
+function formatChartValueToPercent(value: ChartValue) {
+    if (value === null) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+    return Math.round(convertToNumber(value) * 100) + '%';
 }
 
 // Numeric values expected, not numeric value should be displayd as 0

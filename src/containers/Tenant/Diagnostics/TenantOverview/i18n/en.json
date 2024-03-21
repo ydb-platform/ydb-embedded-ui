@@ -23,7 +23,7 @@
 
   "charts.queries-per-second": "Queries per second",
   "charts.transaction-latency": "Transactions latencies {{percentile}}",
-  "charts.cpu-usage": "CPU cores used",
+  "charts.cpu-usage": "CPU usage by pool",
   "charts.storage-usage": "Tablet storage usage",
   "charts.memory-usage": "Memory usage",
 

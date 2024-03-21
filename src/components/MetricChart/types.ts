@@ -1,12 +1,17 @@
+import type {PoolName} from '../../types/api/nodes';
+
+type Percentile = 'p50' | 'p75' | 'p90' | 'p99';
+type QueriesLatenciesMetric = `queries.latencies.${Percentile}`;
+
+type PoolUsageMetric = `resources.cpu.${PoolName}.usage`;
+
 export type Metric =
     | 'queries.requests'
-    | 'queries.latencies.p50'
-    | 'queries.latencies.p75'
-    | 'queries.latencies.p90'
-    | 'queries.latencies.p99'
-    | 'resources.cpu.usage'
     | 'resources.memory.used_bytes'
-    | 'resources.storage.used_bytes';
+    | 'resources.storage.used_bytes'
+    | 'resources.cpu.usage'
+    | PoolUsageMetric
+    | QueriesLatenciesMetric;
 
 export interface MetricDescription {
     target: Metric;
@@ -25,7 +30,7 @@ export interface PreparedMetricsData {
 
 export type ChartValue = number | string | null;
 
-export type ChartDataType = 'ms' | 'size';
+export type ChartDataType = 'ms' | 'size' | 'percent';
 
 export interface ChartOptions {
     dataType?: ChartDataType;
