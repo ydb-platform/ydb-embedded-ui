@@ -2,6 +2,9 @@ import {useCallback, useEffect} from 'react';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {Helmet} from 'react-helmet-async';
 
+import {Icon} from '@gravity-ui/uikit';
+import ArrowRotateLeftIcon from '@gravity-ui/icons/svgs/arrow-rotate-left.svg';
+
 import {
     getPDiskData,
     getPDiskStorage,
@@ -17,6 +20,7 @@ import {PageMeta} from '../../components/PageMeta/PageMeta';
 import {StatusIcon} from '../../components/StatusIcon/StatusIcon';
 import {PDiskInfo} from '../../components/PDiskInfo/PDiskInfo';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
+import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 
 import {PDiskGroups} from './PDiskGroups';
 import {pdiskPageCn} from './shared';
@@ -46,19 +50,36 @@ export function PDisk() {
     }, [dispatch]);
 
     const fetchData = useCallback(
-        (isBackground: boolean) => {
+        async (isBackground?: boolean) => {
             if (!isBackground) {
                 dispatch(setPDiskDataWasNotLoaded());
             }
+
             if (nodeId && pDiskId) {
-                dispatch(getPDiskData({nodeId, pDiskId}));
-                dispatch(getPDiskStorage({nodeId, pDiskId}));
+                return Promise.all([
+                    dispatch(getPDiskData({nodeId, pDiskId})),
+                    dispatch(getPDiskStorage({nodeId, pDiskId})),
+                ]);
             }
+
+            return undefined;
         },
         [dispatch, nodeId, pDiskId],
     );
 
     useAutofetcher(fetchData, [fetchData], true);
+
+    const handleRestart = async () => {
+        if (nodeId && pDiskId) {
+            return window.api.restartPDisk(nodeId, pDiskId);
+        }
+
+        return undefined;
+    };
+
+    const handleAfterRestart = async () => {
+        return fetchData(true);
+    };
 
     const renderHelmet = () => {
         const pDiskPagePart = pDiskId
@@ -97,6 +118,23 @@ export function PDisk() {
         );
     };
 
+    const renderControls = () => {
+        return (
+            <div className={pdiskPageCn('controls')}>
+                <ButtonWithConfirmDialog
+                    onConfirmAction={handleRestart}
+                    onConfirmActionSuccess={handleAfterRestart}
+                    buttonDisabled={!nodeId || !pDiskId}
+                    buttonView="normal"
+                    dialogContent={pDiskPageKeyset('restart-pdisk-dialog')}
+                >
+                    <Icon data={ArrowRotateLeftIcon} />
+                    {pDiskPageKeyset('restart-pdisk-button')}
+                </ButtonWithConfirmDialog>
+            </div>
+        );
+    };
+
     const renderInfo = () => {
         if (pDiskLoading && !pDiskWasLoaded) {
             return <InfoViewerSkeleton className={pdiskPageCn('info')} rows={10} />;
@@ -126,6 +164,7 @@ export function PDisk() {
             {renderHelmet()}
             {renderPageMeta()}
             {renderPageTitle()}
+            {renderControls()}
             {renderInfo()}
             {renderGroupsTable()}
         </div>
