@@ -50,7 +50,7 @@ export function PDisk() {
     }, [dispatch]);
 
     const fetchData = useCallback(
-        (isBackground?: boolean) => {
+        async (isBackground?: boolean) => {
             if (!isBackground) {
                 dispatch(setPDiskDataWasNotLoaded());
             }
