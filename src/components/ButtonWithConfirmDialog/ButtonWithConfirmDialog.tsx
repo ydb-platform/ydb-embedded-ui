@@ -6,8 +6,8 @@ import {CriticalActionDialog} from '../CriticalActionDialog';
 
 interface ButtonWithConfirmDialogProps<T, K> {
     children: ReactNode;
-    onConfirmAction: () => Promise<T> | undefined;
-    onConfirmActionSuccess?: (() => Promise<K> | undefined) | VoidFunction;
+    onConfirmAction: () => Promise<T>;
+    onConfirmActionSuccess?: (() => Promise<K>) | VoidFunction;
     dialogContent: string;
     buttonDisabled?: ButtonProps['disabled'];
     buttonView?: ButtonProps['view'];

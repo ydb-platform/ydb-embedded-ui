@@ -69,7 +69,7 @@ export function PDisk() {
 
     useAutofetcher(fetchData, [fetchData], true);
 
-    const handleRestart = () => {
+    const handleRestart = async () => {
         if (nodeId && pDiskId) {
             return window.api.restartPDisk(nodeId, pDiskId);
         }
@@ -77,7 +77,7 @@ export function PDisk() {
         return undefined;
     };
 
-    const handleAfterRestart = () => {
+    const handleAfterRestart = async () => {
         return fetchData(true);
     };
 
