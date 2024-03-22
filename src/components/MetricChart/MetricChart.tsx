@@ -29,7 +29,7 @@ import {
     setChartDataWasNotLoaded,
     setChartError,
 } from './reducer';
-import {colorHexToRGBA, colors} from './colors';
+import {colorToRGBA, colors} from './colors';
 import i18n from './i18n';
 
 import './MetricChart.scss';
@@ -49,7 +49,7 @@ const prepareWidgetData = (
 
     const graphs: YagrSeriesData[] = data.metrics.map((metric, index) => {
         const lineColor = metric.color || colors[index];
-        const color = colorHexToRGBA(lineColor, 0.1);
+        const color = colorToRGBA(lineColor, 0.1);
 
         return {
             id: metric.target,

@@ -1,3 +1,5 @@
+import {colord} from 'colord';
+
 // Grafana classic palette
 export const colors = [
     '#7EB26D', // 0: pale green
@@ -12,16 +14,10 @@ export const colors = [
     '#CCA300', // 9: dark sand
 ];
 
-export function colorHexToRGBA(htmlColor: string, opacity: number) {
-    const COLOR_REGEX = /^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/;
-    const arrRGB = htmlColor.match(COLOR_REGEX);
-    if (arrRGB === null) {
-        throw new Error(
-            'Invalid color passed, the color should be in the html format. Example: #ff0033',
-        );
+export function colorToRGBA(initialColor: string, opacity: number) {
+    const color = colord(initialColor);
+    if (!color.isValid()) {
+        throw new Error('Invalid color is passed');
     }
-    const red = parseInt(arrRGB[1], 16);
-    const green = parseInt(arrRGB[2], 16);
-    const blue = parseInt(arrRGB[3], 16);
-    return `rgba(${[red, green, blue, opacity].join(',')})`;
+    return color.alpha(opacity).toRgbString();
 }

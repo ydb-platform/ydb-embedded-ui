@@ -24,6 +24,7 @@
     "@reduxjs/toolkit": "^2.2.1",
     "axios": "^1.6.7",
     "bem-cn-lite": "^4.1.0",
+    "colord": "^2.9.3",
     "copy-to-clipboard": "^3.3.3",
     "crc-32": "^1.2.2",
     "history": "^4.10.1",
