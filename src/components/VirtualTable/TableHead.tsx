@@ -6,7 +6,13 @@ import type {
 } from '../../utils/hooks/useTableResize';
 
 import type {Column, OnSort, SortOrderType, SortParams} from './types';
-import {ASCENDING, DEFAULT_SORT_ORDER, DEFAULT_TABLE_ROW_HEIGHT, DESCENDING} from './constants';
+import {
+    ASCENDING,
+    DEFAULT_RESIZEABLE,
+    DEFAULT_SORT_ORDER,
+    DEFAULT_TABLE_ROW_HEIGHT,
+    DESCENDING,
+} from './constants';
 import {b} from './shared';
 
 const COLUMN_NAME_HTML_ATTRIBUTE = 'data-columnname';
@@ -45,6 +51,7 @@ const ColumnSortIcon = ({sortOrder, sortable, defaultSortOrder}: ColumnSortIconP
 
 interface TableHeadCellProps<T> {
     column: Column<T>;
+    resizeable?: boolean;
     sortOrder?: SortOrderType;
     defaultSortOrder: SortOrderType;
     onSort?: (columnName: string) => void;
@@ -55,6 +62,7 @@ interface TableHeadCellProps<T> {
 
 export const TableHeadCell = <T,>({
     column,
+    resizeable,
     sortOrder,
     defaultSortOrder,
     onSort,
@@ -82,9 +90,7 @@ export const TableHeadCell = <T,>({
         <th>
             <div
                 ref={cellWrapperRef}
-                className={b('head-cell-wrapper', {
-                    resizeable: column.resizeable,
-                })}
+                className={b('head-cell-wrapper', {resizeable})}
                 style={{
                     height: `${rowHeight}px`,
                     width: `${column.width}px`,
@@ -213,10 +219,14 @@ export const TableHead = <T,>({
                         const sortOrder =
                             sortParams.columnId === column.name ? sortParams.sortOrder : undefined;
 
+                        const resizeable =
+                            onColumnsResize && (column.resizeable ?? DEFAULT_RESIZEABLE);
+
                         return (
                             <TableHeadCell
                                 key={column.name}
                                 column={column}
+                                resizeable={resizeable}
                                 sortOrder={sortOrder}
                                 defaultSortOrder={defaultSortOrder}
                                 onSort={handleSort}

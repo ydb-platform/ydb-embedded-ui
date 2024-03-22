@@ -1,6 +1,6 @@
 import {useCallback, useState} from 'react';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
-import type {Column as VirtualTableColumn} from '../../components/VirtualTable';
+import {DEFAULT_RESIZEABLE, type Column as VirtualTableColumn} from '../../components/VirtualTable';
 import {settingsManager} from '../../services/settings';
 
 export type Column<T> = VirtualTableColumn<T> & DataTableColumn<T>;
@@ -14,7 +14,9 @@ export const updateColumnsWidth = <T>(
     columnsWidthSetup: TableColumnsWidthSetup,
 ) => {
     return columns.map((column) => {
-        if (!column.resizeable) {
+        const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
+
+        if (!resizeable) {
             return column;
         }
         return {...column, width: columnsWidthSetup[column.name] ?? column.width};

@@ -3,6 +3,7 @@ export const CENTER = 'center';
 export const RIGHT = 'right';
 
 export const DEFAULT_ALIGN = LEFT;
+export const DEFAULT_RESIZEABLE = true;
 
 export const ASCENDING = 1;
 export const DESCENDING = -1;

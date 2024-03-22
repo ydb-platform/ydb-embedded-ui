@@ -90,7 +90,6 @@ const versionColumn: NodesColumn = {
         return <CellWithPopover content={row.Version}>{row.Version}</CellWithPopover>;
     },
     sortable: false,
-    resizeable: true,
 };
 
 const uptimeColumn: NodesColumn = {
