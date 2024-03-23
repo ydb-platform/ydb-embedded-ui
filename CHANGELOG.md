@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.3.0...v5.4.0) (2024-03-23)
+
+
+### Features
+
+* **MetricChart:** display per pool cpu usage ([#769](https://github.com/ydb-platform/ydb-embedded-ui/issues/769)) ([6902afa](https://github.com/ydb-platform/ydb-embedded-ui/commit/6902afab43a635fa70f25aa9149e5c6802ec489b))
+* **PDisk:** add restart button ([#766](https://github.com/ydb-platform/ydb-embedded-ui/issues/766)) ([7239727](https://github.com/ydb-platform/ydb-embedded-ui/commit/723972712a3aabfb519ec29a4c191096887d5a1b))
+
+
+### Bug Fixes
+
+* **MetricChart:** draw area charts ([#764](https://github.com/ydb-platform/ydb-embedded-ui/issues/764)) ([51eb1bf](https://github.com/ydb-platform/ydb-embedded-ui/commit/51eb1bf2a37805012630907774bee8f9b00affff))
+
 ## [5.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.2.1...v5.3.0) (2024-03-15)
 
 
