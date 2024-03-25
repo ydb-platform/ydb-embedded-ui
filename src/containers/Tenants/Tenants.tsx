@@ -8,6 +8,7 @@ import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {Illustration} from '../../components/Illustration';
+import {EntitiesCount} from '../../components/EntitiesCount';
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -47,7 +48,7 @@ interface TenantsProps {
 export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     const dispatch = useTypedDispatch();
 
-    const {error, loading, wasLoaded} = useTypedSelector((state) => state.tenants);
+    const {error, loading, wasLoaded, tenants} = useTypedSelector((state) => state.tenants);
     const searchValue = useTypedSelector(selectTenantsSearchValue);
     const filteredTenants = useTypedSelector(selectFilteredTenants);
     const problemFilter = useTypedSelector(selectProblemFilter);
@@ -78,6 +79,12 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                     className={b('search')}
                 />
                 <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
+                <EntitiesCount
+                    total={tenants.length}
+                    current={filteredTenants?.length || 0}
+                    label={'Databases'}
+                    loading={loading && !wasLoaded}
+                />
             </>
         );
     };
