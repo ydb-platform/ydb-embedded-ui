@@ -18,7 +18,7 @@ import {isColumnEntityType, isExternalTable, isRowTable, isTableType} from '../.
 
 import './SchemaViewer.scss';
 import {useTypedSelector} from '../../../../utils/hooks';
-import {Skeleton} from '@gravity-ui/uikit';
+import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 
 const b = cn('schema-viewer');
 
@@ -188,11 +188,7 @@ export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewer
     return (
         <div className={b(null, className)}>
             {loading ? (
-                <div className={b('skeleton')}>
-                    <Skeleton className={b('skeleton-item')} />
-                    <Skeleton className={b('skeleton-item')} />
-                    <Skeleton className={b('skeleton-item')} />
-                </div>
+                <TableSkeleton />
             ) : (
                 <DataTable
                     theme="yandex-cloud"

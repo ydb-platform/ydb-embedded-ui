@@ -4,14 +4,6 @@
         align-items: center;
     }
 
-    &__skeleton {
-        display: flex;
-        flex-direction: column;
-
-        width: 100%;
-        gap: 8px;
-    }
-
     &__skeleton-item {
         height: 40px;
     }
