@@ -1,7 +1,8 @@
 import React from 'react';
 
-import type {Column} from '@gravity-ui/react-data-table';
+import {Skeleton} from '@gravity-ui/uikit';
 import DataTable from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
 
 import {Icon} from '../../../../components/Icon';
 import type {
@@ -12,11 +13,10 @@ import type {
 } from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {isColumnEntityType, isExternalTable, isTableType} from '../../utils/schema';
+import {isColumnEntityType, isExternalTable, isRowTable, isTableType} from '../../utils/schema';
 
 import './SchemaViewer.scss';
 import {useTypedSelector} from '../../../../utils/hooks';
-import {Skeleton} from '@gravity-ui/uikit';
 
 const b = cn('schema-viewer');
 
@@ -150,7 +150,7 @@ export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewer
         },
     );
 
-    if (withFamilies) {
+    if (withFamilies && isRowTable(type)) {
         dataTableColumns.push(
             {
                 name: SchemaViewerColumns.familyName,
