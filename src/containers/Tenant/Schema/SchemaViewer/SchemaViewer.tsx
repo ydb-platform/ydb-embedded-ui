@@ -5,6 +5,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 
 import {Icon} from '../../../../components/Icon';
+import {EColumnCodec} from '../../../../types/api/schema';
 import type {
     EPathType,
     TColumnDescription,
@@ -26,9 +27,9 @@ const SchemaViewerColumns = {
     key: 'Key',
     type: 'Type',
     notNull: 'NotNull',
-    familyName: 'FamilyName',
-    preferredPoolKind: 'PreferredPoolKind',
-    columnCodec: 'ColumnCodec',
+    familyName: 'Family',
+    preferredPoolKind: 'Media',
+    columnCodec: 'Compression',
 };
 
 interface SchemaViewerProps {
@@ -59,6 +60,12 @@ function prepareOlapTableSchema(tableSchema: TColumnTableDescription = {}) {
     return {
         Name,
     };
+}
+
+function formatColumnCodec(codec?: EColumnCodec) {
+    if (!codec) return null;
+    if (codec === EColumnCodec.ColumnCodecPlain) return 'None';
+    return codec.replace('ColumnCodec', '').toLocaleLowerCase();
 }
 
 export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewerProps) => {
@@ -171,7 +178,8 @@ export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewer
                 name: SchemaViewerColumns.columnCodec,
                 width: 100,
                 sortable: false,
-                render: ({row}) => (row.Family ? families[row.Family].ColumnCodec : undefined),
+                render: ({row}) =>
+                    row.Family ? formatColumnCodec(families[row.Family].ColumnCodec) : undefined,
             },
         );
     }
