@@ -23,9 +23,8 @@ Open http://localhost:8765 to view it in the browser.
 1. Run on a machine with Docker installed:
    ```
    docker run --rm -ti --name ydb-local -h localhost \
-      -p 2135:2135 -p 2136:2136 -p 8765:8765 \
-      -v $(pwd)/ydb_certs:/ydb_certs -v $(pwd)/ydb_data:/ydb_data \
-      -e GRPC_TLS_PORT=2135 -e GRPC_PORT=2136 -e MON_PORT=8765 \
+      -p 8765:8765 \
+      -e MON_PORT=8765 \
       cr.yandex/yc/yandex-docker-local-ydb:latest
    ```
 2. Run the frontend app in the development mode, via invoking `npm run dev`
