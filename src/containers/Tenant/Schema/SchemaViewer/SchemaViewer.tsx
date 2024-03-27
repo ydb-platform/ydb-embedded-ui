@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {Skeleton} from '@gravity-ui/uikit';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 
@@ -14,10 +13,11 @@ import type {
 } from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
+import {useTypedSelector} from '../../../../utils/hooks';
 import {isColumnEntityType, isExternalTable, isRowTable, isTableType} from '../../utils/schema';
 
 import './SchemaViewer.scss';
-import {useTypedSelector} from '../../../../utils/hooks';
 
 const b = cn('schema-viewer');
 
@@ -187,11 +187,7 @@ export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewer
     return (
         <div className={b(null, className)}>
             {loading ? (
-                <div className={b('skeleton')}>
-                    <Skeleton className={b('skeleton-item')} />
-                    <Skeleton className={b('skeleton-item')} />
-                    <Skeleton className={b('skeleton-item')} />
-                </div>
+                <TableSkeleton />
             ) : (
                 <DataTable
                     theme="yandex-cloud"
