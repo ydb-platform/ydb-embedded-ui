@@ -36,7 +36,7 @@ import DetailedOverview from './DetailedOverview/DetailedOverview';
 import {isDatabaseEntityType} from '../utils/schema';
 
 import {TenantTabsGroups} from '../TenantPages';
-import SchemaViewer from '../Schema/SchemaViewer/SchemaViewer';
+import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
 
 import './Diagnostics.scss';
