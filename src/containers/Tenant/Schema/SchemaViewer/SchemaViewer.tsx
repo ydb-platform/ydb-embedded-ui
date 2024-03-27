@@ -13,7 +13,7 @@ import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 
 import {Icon} from '../../../../components/Icon';
 
-import {isColumnEntityType, isExternalTable, isTableType} from '../../utils/schema';
+import {isColumnEntityType, isExternalTable, isRowTable, isTableType} from '../../utils/schema';
 
 import './SchemaViewer.scss';
 import {useTypedSelector} from '../../../../utils/hooks';
@@ -151,7 +151,7 @@ export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewer
         },
     );
 
-    if (withFamilies) {
+    if (withFamilies && isRowTable(type)) {
         dataTableColumns.push(
             {
                 name: SchemaViewerColumns.familyName,

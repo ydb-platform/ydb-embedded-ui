@@ -245,3 +245,4 @@ export const isPathTypeWithTopic = (type?: EPathType) =>
 // ====================
 
 export const isExternalTable = (type?: EPathType) => type === EPathType.EPathTypeExternalTable;
+export const isRowTable = (type?: EPathType) => type === EPathType.EPathTypeTable;
