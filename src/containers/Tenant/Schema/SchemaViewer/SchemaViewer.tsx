@@ -68,6 +68,14 @@ function formatColumnCodec(codec?: EColumnCodec) {
     return codec.replace('ColumnCodec', '').toLocaleLowerCase();
 }
 
+function comparePossiblyEmptyStrings(a?: string, b?: string): number {
+    if (a === undefined && b === undefined) return 0;
+    if (a === undefined) return 1;
+    if (b === undefined) return -1;
+
+    return a.localeCompare(b);
+}
+
 export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewerProps) => {
     const {data, loading} = useTypedSelector((state) => state.schema);
     const currentObjectData = path ? data[path] : undefined;
@@ -119,10 +127,8 @@ export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewer
             width: 40,
             // Table should start with key columns on sort click
             defaultOrder: DataTable.ASCENDING,
-            sortAccessor: (row) => {
-                // Values in keyColumnsOrderValues are always negative, so it will be 1 for not key columns
-                return (row.Id && keyColumnsOrderValues[row.Id]) || 1;
-            },
+            // Values in keyColumnsOrderValues are always negative, so it will be 1 for not key columns
+            sortAccessor: (row) => (row.Id && keyColumnsOrderValues[row.Id]) || 1,
             render: ({row}) => {
                 return row.Id && keyColumnIds.includes(row.Id) ? (
                     <div className={b('key-icon')}>
@@ -162,24 +168,40 @@ export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewer
             {
                 name: SchemaViewerColumns.familyName,
                 width: 100,
-                sortable: false,
                 render: ({row}) => (row.Family ? families[row.Family].Name : undefined),
+                sortAscending: ({row: rowA}, {row: rowB}) =>
+                    comparePossiblyEmptyStrings(
+                        rowA.Family ? families[rowA.Family].Name : undefined,
+                        rowB.Family ? families[rowB.Family].Name : undefined,
+                    ),
             },
             {
                 name: SchemaViewerColumns.preferredPoolKind,
                 width: 100,
-                sortable: false,
                 render: ({row}) =>
                     row.Family
                         ? families[row.Family].StorageConfig?.Data?.PreferredPoolKind
                         : undefined,
+                sortAscending: ({row: rowA}, {row: rowB}) =>
+                    comparePossiblyEmptyStrings(
+                        rowA.Family
+                            ? families[rowA.Family].StorageConfig?.Data?.PreferredPoolKind
+                            : undefined,
+                        rowB.Family
+                            ? families[rowB.Family].StorageConfig?.Data?.PreferredPoolKind
+                            : undefined,
+                    ),
             },
             {
                 name: SchemaViewerColumns.columnCodec,
                 width: 100,
-                sortable: false,
                 render: ({row}) =>
                     row.Family ? formatColumnCodec(families[row.Family].ColumnCodec) : undefined,
+                sortAscending: ({row: rowA}, {row: rowB}) =>
+                    comparePossiblyEmptyStrings(
+                        rowA.Family ? families[rowA.Family].ColumnCodec : undefined,
+                        rowB.Family ? families[rowB.Family].ColumnCodec : undefined,
+                    ),
             },
         );
     }
