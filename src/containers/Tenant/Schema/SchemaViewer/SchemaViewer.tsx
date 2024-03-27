@@ -207,5 +207,3 @@ export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewer
         </div>
     );
 };
-
-export default SchemaViewer;

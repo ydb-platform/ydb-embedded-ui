@@ -21,7 +21,7 @@ import {StorageWrapper} from '../../Storage/StorageWrapper';
 import {Tablets} from '../../Tablets';
 import {isDatabaseEntityType} from '../utils/schema';
 import {TenantTabsGroups} from '../TenantPages';
-import SchemaViewer from '../Schema/SchemaViewer/SchemaViewer';
+import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 
 import {AutorefreshControl} from './Autorefresh/AutorefreshControl';
 import {Consumers} from './Consumers';
