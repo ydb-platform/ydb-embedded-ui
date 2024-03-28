@@ -1,7 +1,7 @@
 import type {IProtobufTimeObject} from '../../types/api/common';
 
 import {isNumeric} from '../utils';
-import {parseProtobufDurationToMs, parseProtobufTimestampToMs} from '.';
+import {parseProtobufDurationToMs, parseProtobufTimestampToMs} from './protobufParsers';
 
 export const parseLag = (value: string | IProtobufTimeObject | undefined) =>
     value ? parseProtobufDurationToMs(value) : 0;

@@ -11,7 +11,6 @@ import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../.
 import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {disableAutorefresh, getSchema} from '../../store/reducers/schema/schema';
-import {registerYQLCompletionItemProvider} from '../../utils/monaco';
 
 import SplitPane from '../../components/SplitPane';
 import {AccessDenied} from '../../components/Errors/403';
@@ -79,10 +78,18 @@ function Tenant(props: TenantProps) {
     const {name} = queryParams;
     const tenantName = name as string;
 
-    if (tenantName && typeof tenantName === 'string' && previousTenant.current !== tenantName) {
-        registerYQLCompletionItemProvider(tenantName);
-        previousTenant.current = tenantName;
-    }
+    useEffect(() => {
+        if (tenantName && typeof tenantName === 'string' && previousTenant.current !== tenantName) {
+            const register = async () => {
+                const {registerYQLCompletionItemProvider} = await import(
+                    '../../utils/monaco/yqlSuggestions/registerCompletionItemProvider'
+                );
+                registerYQLCompletionItemProvider(tenantName);
+            };
+            register().catch(console.error);
+            previousTenant.current = tenantName;
+        }
+    }, [tenantName]);
 
     useEffect(() => {
         dispatch(getSchema({path: tenantName}));

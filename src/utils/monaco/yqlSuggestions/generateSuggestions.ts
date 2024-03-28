@@ -1,5 +1,5 @@
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import {
+import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import type {
     ColumnAliasSuggestion,
     KeywordSuggestion,
     YqlAutocompleteResult,
@@ -14,6 +14,39 @@ import {
     Udfs,
     WindowFunctions,
 } from './constants';
+
+const CompletionItemKind: {
+    [K in keyof typeof monaco.languages.CompletionItemKind]: typeof monaco.languages.CompletionItemKind[K];
+} = {
+    Method: 0,
+    Function: 1,
+    Constructor: 2,
+    Field: 3,
+    Variable: 4,
+    Class: 5,
+    Struct: 6,
+    Interface: 7,
+    Module: 8,
+    Property: 9,
+    Event: 10,
+    Operator: 11,
+    Unit: 12,
+    Value: 13,
+    Constant: 14,
+    Enum: 15,
+    EnumMember: 16,
+    Keyword: 17,
+    Text: 18,
+    Color: 19,
+    File: 20,
+    Reference: 21,
+    Customcolor: 22,
+    Folder: 23,
+    TypeParameter: 24,
+    User: 25,
+    Issue: 26,
+    Snippet: 27,
+};
 
 const re = /[\s'"-/@]/;
 
@@ -152,7 +185,7 @@ export async function generateColumnsSuggestion(
             suggestions.push({
                 label: columnNameSuggestion,
                 insertText: columnNameSuggestion,
-                kind: monaco.languages.CompletionItemKind.Field,
+                kind: CompletionItemKind.Field,
                 detail: 'Column',
                 range: rangeToInsertSuggestion,
                 sortText: suggestionIndexToWeight(getSuggestionIndex('suggestColumns')),
@@ -172,7 +205,7 @@ export function generateColumnAliasesSuggestion(
     return suggestColumnAliases?.map((columnAliasSuggestion) => ({
         label: columnAliasSuggestion.name,
         insertText: columnAliasSuggestion.name,
-        kind: monaco.languages.CompletionItemKind.Field,
+        kind: CompletionItemKind.Field,
         detail: 'Column alias',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestColumnAliases')),
@@ -188,7 +221,7 @@ export function generateKeywordsSuggestion(
     return suggestKeywords?.map((keywordSuggestion) => ({
         label: keywordSuggestion.value,
         insertText: keywordSuggestion.value,
-        kind: monaco.languages.CompletionItemKind.Keyword,
+        kind: CompletionItemKind.Keyword,
         detail: 'Keyword',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestKeywords')),
@@ -207,7 +240,7 @@ export async function generateSimpleFunctionsSuggestion(
     return functions.map((el) => ({
         label: el,
         insertText: el,
-        kind: monaco.languages.CompletionItemKind.Function,
+        kind: CompletionItemKind.Function,
         detail: 'Function',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestFunctions')),
@@ -220,7 +253,7 @@ export async function generateSimpleTypesSuggestion(
     return simpleTypes.map((el) => ({
         label: el,
         insertText: el,
-        kind: monaco.languages.CompletionItemKind.TypeParameter,
+        kind: CompletionItemKind.TypeParameter,
         detail: 'Type',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestSimpleTypes')),
@@ -233,7 +266,7 @@ export async function generateUdfSuggestion(
     return udfs.map((el) => ({
         label: el,
         insertText: el,
-        kind: monaco.languages.CompletionItemKind.Function,
+        kind: CompletionItemKind.Function,
         detail: 'UDF',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestUdfs')),
@@ -246,7 +279,7 @@ export async function generateWindowFunctionsSuggestion(
     return windowFunctions.map((el) => ({
         label: el,
         insertText: el,
-        kind: monaco.languages.CompletionItemKind.Function,
+        kind: CompletionItemKind.Function,
         detail: 'Window function',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestWindowFunctions')),
@@ -259,7 +292,7 @@ export async function generateTableFunctionsSuggestion(
     return tableFunctions.map((el) => ({
         label: el,
         insertText: el,
-        kind: monaco.languages.CompletionItemKind.Function,
+        kind: CompletionItemKind.Function,
         detail: 'Table function',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestTableFunctions')),
@@ -272,7 +305,7 @@ export async function generateAggregateFunctionsSuggestion(
     return aggreagteFunctions.map((el) => ({
         label: el,
         insertText: el,
-        kind: monaco.languages.CompletionItemKind.Function,
+        kind: CompletionItemKind.Function,
         detail: 'Aggregate function',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestAggregateFunctions')),
@@ -285,7 +318,7 @@ export async function generatePragmasSuggestion(
     return pragmas.map((el) => ({
         label: el,
         insertText: el,
-        kind: monaco.languages.CompletionItemKind.Module,
+        kind: CompletionItemKind.Module,
         detail: 'Pragma',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestPragmas')),

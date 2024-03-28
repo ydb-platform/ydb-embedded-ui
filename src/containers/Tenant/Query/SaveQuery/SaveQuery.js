@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import _ from 'lodash';
+import some from 'lodash/some';
 import cn from 'bem-cn-lite';
 import {Dialog, DropdownMenu, TextInput, Button} from '@gravity-ui/uikit';
 
@@ -36,7 +36,7 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
     };
 
     const validateQueryName = (value) => {
-        if (_.some(savedQueries, (q) => q.name.toLowerCase() === value.trim().toLowerCase())) {
+        if (some(savedQueries, (q) => q.name.toLowerCase() === value.trim().toLowerCase())) {
             return 'This name already exists';
         }
         return null;

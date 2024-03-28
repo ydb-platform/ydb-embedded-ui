@@ -1,8 +1,8 @@
 import {useEffect, useReducer, useRef, useState} from 'react';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
-import _ from 'lodash';
-import MonacoEditor from 'react-monaco-editor';
+import throttle from 'lodash/throttle';
+import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import type Monaco from 'monaco-editor';
 
 import SplitPane from '../../../../components/SplitPane';
@@ -135,7 +135,7 @@ function QueryEditor(props: QueryEditorProps) {
             }
         };
 
-        const onChangeWindow = _.throttle(() => {
+        const onChangeWindow = throttle(() => {
             updateEditor();
         }, 100);
 
@@ -419,6 +419,8 @@ function QueryEditor(props: QueryEditorProps) {
                                 options={editorOptions}
                                 onChange={onChange}
                                 editorDidMount={editorDidMount}
+                                // pass noop otherwise it will throw error
+                                editorWillUnmount={() => {}}
                                 theme={`vs-${theme}`}
                             />
                         </div>

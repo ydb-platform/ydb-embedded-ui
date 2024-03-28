@@ -1,9 +1,7 @@
 import * as monaco from 'monaco-editor';
-import {createProvideSuggestionsFunction} from './yqlSuggestions/yqlSuggestions';
+import {LANGUAGE_S_EXPRESSION_ID} from './constants';
 
-export const LANGUAGE_S_EXPRESSION_ID = 's-expression';
-
-function registerSExpressionLanguage() {
+export function registerSExpressionLanguage() {
     monaco.languages.register({id: LANGUAGE_S_EXPRESSION_ID});
     monaco.languages.setMonarchTokensProvider(LANGUAGE_S_EXPRESSION_ID, {
         defaultToken: 'text',
@@ -63,24 +61,4 @@ function registerSExpressionLanguage() {
             ],
         },
     });
-}
-
-let completionProvider: monaco.IDisposable | undefined;
-
-function disableCodeSuggestions(): void {
-    if (completionProvider) {
-        completionProvider.dispose();
-    }
-}
-
-export function registerYQLCompletionItemProvider(database: string) {
-    disableCodeSuggestions();
-    completionProvider = monaco.languages.registerCompletionItemProvider('sql', {
-        triggerCharacters: [' ', '\n', '', ',', '.', '`', '('],
-        provideCompletionItems: createProvideSuggestionsFunction(database),
-    });
-}
-
-export function registerLanguages() {
-    registerSExpressionLanguage();
 }

@@ -1,5 +1,4 @@
 import cn from 'bem-cn-lite';
-import _ from 'lodash';
 import React, {useEffect, useState} from 'react';
 
 import SplitPaneLib, {SplitProps} from 'react-split';

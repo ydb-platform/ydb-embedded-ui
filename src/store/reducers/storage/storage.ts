@@ -1,5 +1,4 @@
 import type {Reducer} from '@reduxjs/toolkit';
-import _ from 'lodash';
 
 import {EVersion} from '../../../types/api/storage';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';

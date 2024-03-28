@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import cn from 'bem-cn-lite';
-import MonacoEditor from 'react-monaco-editor';
+import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import JSONTree from 'react-json-inspector';
 import 'react-json-inspector/json-inspector.css';
 
@@ -15,7 +15,7 @@ import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus'
 import {explainVersions} from '../../../../store/reducers/explainQuery';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 
-import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco';
+import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco/s-expression/constants';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
@@ -162,6 +162,8 @@ export function ExplainResult(props) {
                     value={props.ast}
                     options={EDITOR_OPTIONS}
                     wrappingIndent="indent"
+                    // pass noop otherwise it will throw error
+                    editorWillUnmount={() => {}}
                 />
             </div>
         );

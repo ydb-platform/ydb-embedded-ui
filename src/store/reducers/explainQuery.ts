@@ -1,6 +1,5 @@
 import type {Reducer} from '@reduxjs/toolkit';
 import type {ExplainPlanNodeData, GraphNode, Link} from '@gravity-ui/paranoid';
-import _ from 'lodash';
 
 import type {ExplainActions} from '../../types/api/query';
 import type {

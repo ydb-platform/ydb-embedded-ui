@@ -1,6 +1,8 @@
 import {LocationWithQuery, ParamSetup, createReduxLocationActions} from 'redux-location-state';
 import qs from 'qs';
-import _ from 'lodash';
+import each from 'lodash/each';
+import keys from 'lodash/keys';
+import merge from 'lodash/merge';
 import {stateToParams} from 'redux-location-state/lib/stateToParams';
 import {parseQuery} from 'redux-location-state/lib/parseQuery';
 import {LOCATION_PUSH, LOCATION_POP} from 'redux-location-state/lib/constants';
@@ -86,7 +88,7 @@ const paramSetup: ParamSetup = {
 };
 
 function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'query'>): S {
-    return _.merge({}, state, location.query);
+    return merge({}, state, location.query);
 }
 
 function restoreUnknownParams(location: Location, prevLocation: Location) {
@@ -98,11 +100,11 @@ function restoreUnknownParams(location: Location, prevLocation: Location) {
     const entries = declaredPath && paramSetup[declaredPath];
 
     // remove params which are mapped for this page
-    _.each(_.keys(entries), (param) => {
+    each(keys(entries), (param) => {
         delete params[param];
     });
     // and globally
-    _.each(_.keys(paramSetup.global || {}), (param) => {
+    each(keys(paramSetup.global || {}), (param) => {
         delete params[param];
     });
 

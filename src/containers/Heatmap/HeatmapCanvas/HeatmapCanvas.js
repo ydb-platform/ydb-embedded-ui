@@ -1,7 +1,7 @@
 import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
 import cn from 'bem-cn-lite';
-import _ from 'lodash';
+import throttle from 'lodash/throttle';
 
 import {basename as appBasename} from '../../../store/index';
 import routes, {createHref} from '../../../routes';
@@ -118,7 +118,7 @@ export const HeatmapCanvas = (props) => {
             props.hideTooltip();
         }, 40);
     };
-    const _onCanvasMouseMove = _.throttle((x, y) => {
+    const _onCanvasMouseMove = throttle((x, y) => {
         //this is needed to force ReduxPopup rerender
         const event = new CustomEvent('scroll');
         window.dispatchEvent(event);
