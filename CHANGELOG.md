@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.4.0...v5.5.0) (2024-03-28)
+
+
+### Features
+
+* add databases label ([#774](https://github.com/ydb-platform/ydb-embedded-ui/issues/774)) ([7b8e473](https://github.com/ydb-platform/ydb-embedded-ui/commit/7b8e473845e0769575e3e35a3cd525fdfcdf02b9))
+
+
+### Bug Fixes
+
+* initial bundle size ([#776](https://github.com/ydb-platform/ydb-embedded-ui/issues/776)) ([b13344d](https://github.com/ydb-platform/ydb-embedded-ui/commit/b13344d3da2a91a6c76733100d34fb3bc3c0f8fa))
+* **VirtualTable:** make table resizeable by default ([#772](https://github.com/ydb-platform/ydb-embedded-ui/issues/772)) ([fe6ad27](https://github.com/ydb-platform/ydb-embedded-ui/commit/fe6ad27e5b598191d8a3b5c3aeba94ff3377a164))
+
 ## [5.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.3.0...v5.4.0) (2024-03-23)
 
 
