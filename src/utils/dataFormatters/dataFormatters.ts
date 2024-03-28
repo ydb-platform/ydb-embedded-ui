@@ -95,7 +95,22 @@ export const formatNumber = (number?: unknown) => {
         return '';
     }
 
-    return configuredNumeral(number).format('0,0.[00000]');
+    const formatted = configuredNumeral(number).format('0.[00000]');
+    // eslint-disable-next-line prefer-const
+    let [whole, frac = ''] = formatted.split('.');
+
+    if (whole.length > 3) {
+        const chars = [];
+        for (let i = 0; i < whole.length; i++) {
+            chars.push(whole[whole.length - i - 1]);
+            if (i % 3 === 2) {
+                chars.push(' ');
+            }
+        }
+        whole = chars.reverse().join('');
+    }
+
+    return frac ? [whole, frac].join('.') : whole;
 };
 
 export const roundToPrecision = (value: number | string, precision = 0) => {
