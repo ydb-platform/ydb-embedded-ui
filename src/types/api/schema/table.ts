@@ -334,7 +334,7 @@ interface TPipelineConfig {
     EnableSoftUpdates?: boolean;
 }
 
-interface TFamilyDescription {
+export interface TFamilyDescription {
     Id?: number;
     Room?: number;
     /** @deprecated use ColumnCodec */

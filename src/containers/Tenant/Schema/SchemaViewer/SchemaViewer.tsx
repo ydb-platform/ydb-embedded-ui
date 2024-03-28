@@ -3,14 +3,22 @@ import cn from 'bem-cn-lite';
 
 import DataTable, {Column} from '@gravity-ui/react-data-table';
 
-import type {EPathType, TColumnDescription} from '../../../../types/api/schema';
+import {
+    EColumnCodec,
+    EPathType,
+    TColumnDescription,
+    TColumnTableDescription,
+    TFamilyDescription,
+} from '../../../../types/api/schema';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 
 import {Icon} from '../../../../components/Icon';
 
-import {isExternalTable} from '../../utils/schema';
+import {isColumnEntityType, isExternalTable, isRowTable, isTableType} from '../../utils/schema';
 
 import './SchemaViewer.scss';
+import {useTypedSelector} from '../../../../utils/hooks';
+import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 
 const b = cn('schema-viewer');
 
@@ -20,15 +28,82 @@ const SchemaViewerColumns = {
     key: 'Key',
     type: 'Type',
     notNull: 'NotNull',
+    familyName: 'Family',
+    preferredPoolKind: 'Media',
+    columnCodec: 'Compression',
 };
 
 interface SchemaViewerProps {
-    keyColumnIds?: number[];
-    columns?: TColumnDescription[];
+    className?: string;
     type?: EPathType;
+    path?: string;
+    withFamilies?: boolean;
 }
 
-export const SchemaViewer = ({keyColumnIds = [], columns = [], type}: SchemaViewerProps) => {
+function prepareOlapTableSchema(tableSchema: TColumnTableDescription = {}) {
+    const {Name, Schema} = tableSchema;
+
+    if (Schema) {
+        const {Columns, KeyColumnNames} = Schema;
+        const KeyColumnIds = KeyColumnNames?.map((name: string) => {
+            const column = Columns?.find((el) => el.Name === name);
+            return column?.Id;
+        }).filter((id): id is number => id !== undefined);
+
+        return {
+            Columns,
+            KeyColumnNames,
+            Name,
+            KeyColumnIds,
+        };
+    }
+
+    return {
+        Name,
+    };
+}
+
+function formatColumnCodec(codec?: EColumnCodec) {
+    if (!codec) return null;
+    if (codec === EColumnCodec.ColumnCodecPlain) return 'None';
+    return codec.replace('ColumnCodec', '').toLocaleLowerCase();
+}
+
+function comparePossiblyEmptyStrings(a?: string, b?: string): number {
+    if (a === undefined && b === undefined) return 0;
+    if (a === undefined) return 1;
+    if (b === undefined) return -1;
+
+    return a.localeCompare(b);
+}
+
+export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewerProps) => {
+    const {data, loading} = useTypedSelector((state) => state.schema);
+    const currentObjectData = path ? data[path] : undefined;
+
+    let keyColumnIds: number[] = [];
+    let columns: TColumnDescription[] = [];
+
+    if (isTableType(type) && isColumnEntityType(type)) {
+        const description = currentObjectData?.PathDescription?.ColumnTableDescription;
+        const columnTableSchema = prepareOlapTableSchema(description);
+        keyColumnIds = columnTableSchema.KeyColumnIds ?? [];
+        columns = columnTableSchema.Columns ?? [];
+    } else if (isExternalTable(type)) {
+        columns = currentObjectData?.PathDescription?.ExternalTableDescription?.Columns ?? [];
+    } else {
+        keyColumnIds = currentObjectData?.PathDescription?.Table?.KeyColumnIds ?? [];
+        columns = currentObjectData?.PathDescription?.Table?.Columns ?? [];
+    }
+
+    const families =
+        currentObjectData?.PathDescription?.Table?.PartitionConfig?.ColumnFamilies?.reduce<
+            Record<number, TFamilyDescription>
+        >((acc, family) => {
+            if (family.Id) acc[family.Id] = family;
+            return acc;
+        }, {}) ?? {};
+
     // Keys should be displayd by their order in keyColumnIds (Primary Key)
     const keyColumnsOrderValues = useMemo(() => {
         return keyColumnIds.reduce<Record<number, number>>((result, keyColumnId, index) => {
@@ -39,20 +114,22 @@ export const SchemaViewer = ({keyColumnIds = [], columns = [], type}: SchemaView
         }, {});
     }, [keyColumnIds]);
 
-    let dataTableColumns: Column<TColumnDescription>[] = [
+    const dataTableColumns: Column<TColumnDescription>[] = [
         {
             name: SchemaViewerColumns.id,
             width: 40,
         },
-        {
+    ];
+
+    if (!isExternalTable(type)) {
+        // External tables don't have key columns
+        dataTableColumns.push({
             name: SchemaViewerColumns.key,
             width: 40,
             // Table should start with key columns on sort click
             defaultOrder: DataTable.ASCENDING,
-            sortAccessor: (row) => {
-                // Values in keyColumnsOrderValues are always negative, so it will be 1 for not key columns
-                return (row.Id && keyColumnsOrderValues[row.Id]) || 1;
-            },
+            // Values in keyColumnsOrderValues are always negative, so it will be 1 for not key columns
+            sortAccessor: (row) => (row.Id && keyColumnsOrderValues[row.Id]) || 1,
             render: ({row}) => {
                 return row.Id && keyColumnIds.includes(row.Id) ? (
                     <div className={b('key-icon')}>
@@ -60,7 +137,10 @@ export const SchemaViewer = ({keyColumnIds = [], columns = [], type}: SchemaView
                     </div>
                 ) : null;
             },
-        },
+        });
+    }
+
+    dataTableColumns.push(
         {
             name: SchemaViewerColumns.name,
             width: 100,
@@ -82,26 +162,67 @@ export const SchemaViewer = ({keyColumnIds = [], columns = [], type}: SchemaView
                 return undefined;
             },
         },
-    ];
+    );
 
-    if (isExternalTable(type)) {
-        // External tables don't have key columns
-        dataTableColumns = dataTableColumns.filter(
-            (column) => column.name !== SchemaViewerColumns.key,
+    if (withFamilies && isRowTable(type)) {
+        dataTableColumns.push(
+            {
+                name: SchemaViewerColumns.familyName,
+                width: 100,
+                render: ({row}) => (row.Family ? families[row.Family].Name : undefined),
+                sortAscending: ({row: rowA}, {row: rowB}) =>
+                    comparePossiblyEmptyStrings(
+                        rowA.Family ? families[rowA.Family].Name : undefined,
+                        rowB.Family ? families[rowB.Family].Name : undefined,
+                    ),
+            },
+            {
+                name: SchemaViewerColumns.preferredPoolKind,
+                width: 100,
+                render: ({row}) =>
+                    row.Family
+                        ? families[row.Family].StorageConfig?.Data?.PreferredPoolKind
+                        : undefined,
+                sortAscending: ({row: rowA}, {row: rowB}) =>
+                    comparePossiblyEmptyStrings(
+                        rowA.Family
+                            ? families[rowA.Family].StorageConfig?.Data?.PreferredPoolKind
+                            : undefined,
+                        rowB.Family
+                            ? families[rowB.Family].StorageConfig?.Data?.PreferredPoolKind
+                            : undefined,
+                    ),
+            },
+            {
+                name: SchemaViewerColumns.columnCodec,
+                width: 100,
+                render: ({row}) =>
+                    row.Family ? formatColumnCodec(families[row.Family].ColumnCodec) : undefined,
+                sortAscending: ({row: rowA}, {row: rowB}) =>
+                    comparePossiblyEmptyStrings(
+                        rowA.Family ? families[rowA.Family].ColumnCodec : undefined,
+                        rowB.Family ? families[rowB.Family].ColumnCodec : undefined,
+                    ),
+            },
         );
     }
 
     return (
-        <div className={b()}>
-            <DataTable
-                theme="yandex-cloud"
-                data={columns}
-                columns={dataTableColumns}
-                settings={DEFAULT_TABLE_SETTINGS}
-                initialSortOrder={{columnId: SchemaViewerColumns.key, order: DataTable.ASCENDING}}
-            />
+        <div className={b(null, className)}>
+            {loading ? (
+                <TableSkeleton />
+            ) : (
+                <DataTable
+                    theme="yandex-cloud"
+                    data={columns}
+                    columns={dataTableColumns}
+                    settings={DEFAULT_TABLE_SETTINGS}
+                    initialSortOrder={{
+                        columnId: SchemaViewerColumns.key,
+                        order: DataTable.ASCENDING,
+                    }}
+                />
+            )}
         </div>
     );
 };
-
-export default SchemaViewer;
