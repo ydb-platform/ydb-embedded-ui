@@ -1,4 +1,4 @@
-import {escapeRegExp} from 'lodash';
+import escapeRegExp from 'lodash/escapeRegExp';
 
 import type {OrderType} from '@gravity-ui/react-data-table';
 import {DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';

@@ -2,7 +2,7 @@ import React from 'react';
 import cn from 'bem-cn-lite';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import _ from 'lodash';
+import reduce from 'lodash/reduce';
 
 import {Link} from 'react-router-dom';
 import {Loader, Checkbox} from '@gravity-ui/uikit';
@@ -133,7 +133,7 @@ class Network extends React.Component {
     };
 
     groupNodesByField = (nodes, field) => {
-        return _.reduce(
+        return reduce(
             nodes,
             (acc, node) => {
                 if (!acc[node[field]]) {

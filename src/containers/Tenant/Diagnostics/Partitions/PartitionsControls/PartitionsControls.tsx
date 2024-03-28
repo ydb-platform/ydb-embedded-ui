@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
-import {escapeRegExp} from 'lodash/fp';
+import escapeRegExp from 'lodash/escapeRegExp';
 
 import {TableColumnSetupItem} from '@gravity-ui/uikit/build/esm/components/Table/hoc/withTableSettings/withTableSettings';
 import {Select, SelectOption, TableColumnSetup} from '@gravity-ui/uikit';

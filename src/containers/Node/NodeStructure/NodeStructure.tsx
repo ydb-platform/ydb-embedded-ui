@@ -1,6 +1,6 @@
 import {useEffect, useRef} from 'react';
 import url from 'url';
-import {isEmpty} from 'lodash/fp';
+import isEmpty from 'lodash/isEmpty';
 
 import cn from 'bem-cn-lite';
 

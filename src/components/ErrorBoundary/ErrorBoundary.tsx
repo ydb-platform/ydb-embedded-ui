@@ -52,7 +52,7 @@ export function ErrorBoundaryInner({
 interface ErrorBoundaryFallbackProps {
     error: Error;
     useRetry?: boolean;
-    resetErrorBoundary: () => void;
+    resetErrorBoundary?: () => void;
     onReportProblem?: (error?: Error) => void;
 }
 export function ErrorBoundaryFallback({

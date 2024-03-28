@@ -1,5 +1,5 @@
 import type Monaco from 'monaco-editor';
-import {CursorPosition, parseYqlQuery} from '@gravity-ui/websql-autocomplete';
+import type {CursorPosition} from '@gravity-ui/websql-autocomplete';
 
 import {
     generateAggregateFunctionsSuggestion,
@@ -45,6 +45,7 @@ async function getSuggestions(
     rangeToInsertSuggestion: Monaco.IRange,
     database: string,
 ): Promise<Monaco.languages.CompletionItem[]> {
+    const {parseYqlQuery} = await import('@gravity-ui/websql-autocomplete');
     const parseResult = parseYqlQuery(model.getValue(), cursorPosition);
     let entitiesSuggestions: Monaco.languages.CompletionItem[] = [];
     let functionsSuggestions: Monaco.languages.CompletionItem[] = [];

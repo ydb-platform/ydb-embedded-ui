@@ -1,5 +1,5 @@
 import {Selector, createSelector} from '@reduxjs/toolkit';
-import {escapeRegExp} from 'lodash';
+import escapeRegExp from 'lodash/escapeRegExp';
 
 import {EFlag} from '../../../types/api/enums';
 

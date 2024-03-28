@@ -7,7 +7,6 @@ import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
 import AppIcons from '../AppIcons/AppIcons';
 import {Navigation} from '../AsideNavigation/Navigation';
 
-import {registerLanguages} from '../../utils/monaco';
 import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
 import {settings} from '../UserSettings/settings';
 import {Providers} from './Providers';
@@ -18,8 +17,6 @@ import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
 import type {RootState} from '../../store';
 
 import './App.scss';
-
-registerLanguages();
 
 export interface AppProps {
     store: Store;

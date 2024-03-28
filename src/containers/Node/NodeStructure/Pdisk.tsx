@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import cn from 'bem-cn-lite';
-import {isEmpty} from 'lodash/fp';
+import isEmpty from 'lodash/isEmpty';
 
 import {ArrowToggle, Button, Popover} from '@gravity-ui/uikit';
 

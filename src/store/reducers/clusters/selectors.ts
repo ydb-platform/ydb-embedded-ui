@@ -1,5 +1,5 @@
 import {type Selector, createSelector} from '@reduxjs/toolkit';
-import {escapeRegExp} from 'lodash/fp';
+import escapeRegExp from 'lodash/escapeRegExp';
 
 import {getMinorVersion} from '../../../utils/versions';
 

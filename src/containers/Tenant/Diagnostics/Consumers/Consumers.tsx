@@ -1,6 +1,6 @@
 import {useCallback, useMemo, useState} from 'react';
 import block from 'bem-cn-lite';
-import {escapeRegExp} from 'lodash/fp';
+import escapeRegExp from 'lodash/escapeRegExp';
 
 import DataTable from '@gravity-ui/react-data-table';
 

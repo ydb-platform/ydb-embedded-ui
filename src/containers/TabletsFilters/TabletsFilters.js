@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import cn from 'bem-cn-lite';
-import _ from 'lodash';
+import map from 'lodash/map';
+import isEqual from 'lodash/isEqual';
 import {Helmet} from 'react-helmet-async';
 
 import {Loader, Select} from '@gravity-ui/uikit';
@@ -169,12 +170,12 @@ export class TabletsFilters extends React.Component {
         const {tablets, filteredTablets, nodes, stateFilter, typeFilter, error} = this.props;
 
         const states = tabletStates.map((item) => ({value: item, content: item}));
-        const types = Array.from(new Set(...[_.map(tablets, (tblt) => tblt.Type)])).map((item) => ({
+        const types = Array.from(new Set(...[map(tablets, (tblt) => tblt.Type)])).map((item) => ({
             value: item,
             content: item,
         }));
 
-        const nodesForSelect = _.map(nodes, (node) => ({
+        const nodesForSelect = map(nodes, (node) => ({
             content: node.Id,
             value: node.Id,
             meta: node.Host,
@@ -332,9 +333,9 @@ Filters.propTypes = {
 
 const MemoizedFilters = React.memo(Filters, (prevProps, nextProps) => {
     return (
-        _.isEqual(prevProps.nodeFilter, nextProps.nodeFilter) &&
-        _.isEqual(prevProps.stateFilter, nextProps.stateFilter) &&
-        _.isEqual(prevProps.typeFilter, nextProps.typeFilter)
+        isEqual(prevProps.nodeFilter, nextProps.nodeFilter) &&
+        isEqual(prevProps.stateFilter, nextProps.stateFilter) &&
+        isEqual(prevProps.typeFilter, nextProps.typeFilter)
     );
 });
 
