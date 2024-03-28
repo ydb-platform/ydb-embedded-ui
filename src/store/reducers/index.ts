@@ -44,6 +44,7 @@ import saveQuery from './saveQuery';
 import fullscreen from './fullscreen';
 import singleClusterMode from './singleClusterMode';
 import clusters from './clusters/clusters';
+import vDisk from './vdisk/vdisk';
 
 export const rootReducer = {
     singleClusterMode,
@@ -90,6 +91,7 @@ export const rootReducer = {
     saveQuery,
     fullscreen,
     clusters,
+    vDisk,
 };
 
 const combinedReducer = combineReducers({

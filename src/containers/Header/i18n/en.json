@@ -2,6 +2,7 @@
   "breadcrumbs.tenant": "Tenant",
   "breadcrumbs.node": "Node",
   "breadcrumbs.pDisk": "PDisk",
+  "breadcrumbs.vDisk": "VDisk",
   "breadcrumbs.tablet": "Tablet",
   "breadcrumbs.tablets": "Tablets"
 }

@@ -1,9 +1,9 @@
 import React from 'react';
 import cn from 'bem-cn-lite';
 
-import {INVERTED_DISKS_KEY} from '../../../utils/constants';
-import {useSetting} from '../../../utils/hooks';
-import {getSeverityColor} from '../../../utils/disks/helpers';
+import {INVERTED_DISKS_KEY} from '../../utils/constants';
+import {useSetting} from '../../utils/hooks';
+import {getSeverityColor} from '../../utils/disks/helpers';
 
 import './DiskStateProgressBar.scss';
 

@@ -3,18 +3,15 @@ import cn from 'bem-cn-lite';
 
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {InternalLink} from '../../../components/InternalLink';
-import {Stack} from '../../../components/Stack/Stack';
+import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
+import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
+import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 
 import type {PreparedPDisk} from '../../../utils/disks/types';
 import routes, {createHref} from '../../../routes';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import {isFullVDiskData} from '../../../utils/disks/helpers';
 
 import {STRUCTURE} from '../../Node/NodePages';
-
-import {DiskStateProgressBar} from '../DiskStateProgressBar';
-import {PDiskPopup} from '../PDiskPopup';
-import {VDisk} from '../VDisk';
 
 import './PDisk.scss';
 
@@ -47,8 +44,6 @@ export const PDisk = ({nodeId, data = {}, vDisks}: PDiskProps) => {
         return (
             <div className={b('vdisks')}>
                 {vDisks.map((vdisk) => {
-                    const donors = vdisk.Donors;
-
                     return (
                         <div
                             key={stringifyVdiskId(vdisk.VDiskId)}
@@ -59,29 +54,11 @@ export const PDisk = ({nodeId, data = {}, vDisks}: PDiskProps) => {
                                 flexGrow: Number(vdisk.AllocatedSize) || 1,
                             }}
                         >
-                            {donors && donors.length ? (
-                                <Stack
-                                    className={b('donors-stack')}
-                                    key={stringifyVdiskId(vdisk.VDiskId)}
-                                >
-                                    <VDisk data={vdisk} compact />
-                                    {donors.map((donor) => {
-                                        const isFullData = isFullVDiskData(donor);
-
-                                        return (
-                                            <VDisk
-                                                compact
-                                                data={donor}
-                                                key={stringifyVdiskId(
-                                                    isFullData ? donor.VDiskId : donor,
-                                                )}
-                                            />
-                                        );
-                                    })}
-                                </Stack>
-                            ) : (
-                                <VDisk data={vdisk} compact />
-                            )}
+                            <VDiskWithDonorsStack
+                                data={vdisk}
+                                compact={true}
+                                stackClassName={b('donors-stack')}
+                            />
                         </div>
                     );
                 })}

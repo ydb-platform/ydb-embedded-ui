@@ -14,6 +14,7 @@ import type {
     TabletBreadcrumbsOptions,
     TabletsBreadcrumbsOptions,
     TenantBreadcrumbsOptions,
+    VDiskBreadcrumbsOptions,
 } from '../../store/reducers/header/types';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
@@ -123,6 +124,20 @@ const getPDiskBreadcrumbs = (options: PDiskBreadcrumbsOptions, query = {}) => {
     return breadcrumbs;
 };
 
+const getVDiskBreadcrumbs = (options: VDiskBreadcrumbsOptions, query = {}) => {
+    const {vDiskSlotId} = options;
+
+    const breadcrumbs = getPDiskBreadcrumbs(options, query);
+
+    const text = vDiskSlotId
+        ? `${headerKeyset('breadcrumbs.vDisk')} ${vDiskSlotId}`
+        : headerKeyset('breadcrumbs.vDisk');
+
+    breadcrumbs.push({text});
+
+    return breadcrumbs;
+};
+
 const getTabletsBreadcrubms = (
     options: TabletsBreadcrumbsOptions,
     query = {},
@@ -189,6 +204,9 @@ export const getBreadcrumbs = (
         }
         case 'pDisk': {
             return [...rawBreadcrumbs, ...getPDiskBreadcrumbs(options, query)];
+        }
+        case 'vDisk': {
+            return [...rawBreadcrumbs, ...getVDiskBreadcrumbs(options, query)];
         }
         case 'tablets': {
             return [...rawBreadcrumbs, ...getTabletsBreadcrubms(options, query)];

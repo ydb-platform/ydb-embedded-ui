@@ -9,11 +9,14 @@ import {Clusters} from '../Clusters/Clusters';
 import Cluster from '../Cluster/Cluster';
 import Tenant from '../Tenant/Tenant';
 import Node from '../Node/Node';
-import {PDisk} from '../PDisk/PDisk';
+import {PDiskPage} from '../PDiskPage/PDiskPage';
+import {VDiskPage} from '../VDiskPage/VDiskPage';
 import {Tablet} from '../Tablet';
 import TabletsFilters from '../TabletsFilters/TabletsFilters';
 import Header from '../Header/Header';
 import Authentication from '../Authentication/Authentication';
+
+import {ClusterNodesMapContextProvider} from '../../contexts/ClusterNodesMapContext/ClusterNodesMapContext';
 
 import {getUser} from '../../store/reducers/authentication/authentication';
 import {getClusterPath} from '../Cluster/utils';
@@ -23,7 +26,8 @@ import {
     ClusterSlot,
     ClustersSlot,
     NodeSlot,
-    PDiskSlot,
+    PDiskPageSlot,
+    VDiskPageSlot,
     RedirectSlot,
     RoutesSlot,
     TabletSlot,
@@ -65,8 +69,13 @@ const routesSlots: RouteSlot[] = [
     },
     {
         path: routes.pDisk,
-        slot: PDiskSlot,
-        component: PDisk,
+        slot: PDiskPageSlot,
+        component: PDiskPage,
+    },
+    {
+        path: routes.vDisk,
+        slot: VDiskPageSlot,
+        component: VDiskPage,
     },
     {
         path: routes.tablet,
@@ -136,14 +145,16 @@ export function Content(props: ContentProps) {
             {additionalRoutes?.rendered}
             {/* Single cluster routes */}
             <Route key="single-cluster">
-                <GetUser />
-                <Header mainPage={mainPage} />
-                <Switch>
-                    {routesSlots.map((route) => {
-                        return renderRouteSlot(slots, route);
-                    })}
-                    <Redirect {...redirectProps} />
-                </Switch>
+                <ClusterNodesMapContextProvider>
+                    <GetUser />
+                    <Header mainPage={mainPage} />
+                    <Switch>
+                        {routesSlots.map((route) => {
+                            return renderRouteSlot(slots, route);
+                        })}
+                        <Redirect {...redirectProps} />
+                    </Switch>
+                </ClusterNodesMapContextProvider>
             </Route>
         </Switch>
     );

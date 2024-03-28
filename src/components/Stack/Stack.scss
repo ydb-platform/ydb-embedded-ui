@@ -8,6 +8,8 @@
     position: relative;
 
     &__layer {
+        background: var(--g-color-base-background);
+
         transition: transform 0.1s ease-out;
 
         &:first-child {

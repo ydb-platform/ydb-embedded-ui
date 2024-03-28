@@ -1,23 +1,22 @@
 import React, {useState, useRef} from 'react';
 import cn from 'bem-cn-lite';
 
-import type {NodesMap} from '../../../types/store/nodesList';
+import type {NodesMap} from '../../types/store/nodesList';
 
-import {InternalLink} from '../../../components/InternalLink';
+import type {PreparedVDisk} from '../../utils/disks/types';
+import routes, {createHref} from '../../routes';
+import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {isFullVDiskData} from '../../utils/disks/helpers';
 
-import type {PreparedVDisk} from '../../../utils/disks/types';
-import routes, {createHref} from '../../../routes';
-import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import {isFullVDiskData} from '../../../utils/disks/helpers';
+import {STRUCTURE} from '../../containers/Node/NodePages';
 
-import {STRUCTURE} from '../../Node/NodePages';
-
-import {DiskStateProgressBar} from '../DiskStateProgressBar';
-import {VDiskPopup} from '../VDiskPopup';
+import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
+import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
+import {InternalLink} from '../InternalLink';
 
 import './VDisk.scss';
 
-const b = cn('vdisk-storage');
+const b = cn('ydb-vdisk-component');
 
 interface VDiskProps {
     data?: PreparedVDisk;

@@ -10,14 +10,12 @@ import type {NodesMap} from '../../../types/store/nodesList';
 import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import {isSortableStorageProperty} from '../../../utils/storage';
-import {isFullVDiskData} from '../../../utils/disks/helpers';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
-import {Stack} from '../../../components/Stack/Stack';
 import {CellWithPopover} from '../../../components/CellWithPopover/CellWithPopover';
 import {UsageLabel} from '../../../components/UsageLabel/UsageLabel';
-import {VDisk} from '../VDisk';
+import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../utils';
 import i18n from './i18n';
 import './StorageGroups.scss';
@@ -213,28 +211,13 @@ const getVdiscksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
     render: ({row}) => (
         <div className={b('vdisks-wrapper')}>
             {row.VDisks?.map((vDisk) => {
-                const donors = vDisk.Donors;
-
-                return donors && donors.length > 0 ? (
-                    <Stack className={b('vdisks-item')} key={stringifyVdiskId(vDisk.VDiskId)}>
-                        <VDisk data={vDisk} nodes={nodes} />
-                        {donors.map((donor) => {
-                            const isFullData = isFullVDiskData(donor);
-
-                            return (
-                                <VDisk
-                                    data={donor}
-                                    // donor and acceptor are always in the same group
-                                    nodes={nodes}
-                                    key={stringifyVdiskId(isFullData ? donor.VDiskId : donor)}
-                                />
-                            );
-                        })}
-                    </Stack>
-                ) : (
-                    <div className={b('vdisks-item')} key={stringifyVdiskId(vDisk.VDiskId)}>
-                        <VDisk data={vDisk} nodes={nodes} />
-                    </div>
+                return (
+                    <VDiskWithDonorsStack
+                        key={stringifyVdiskId(vDisk.VDiskId)}
+                        data={vDisk}
+                        nodes={nodes}
+                        className={b('vdisks-item')}
+                    />
                 );
             })}
         </div>

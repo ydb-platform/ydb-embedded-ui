@@ -1,5 +1,5 @@
 import type {TPDiskStateInfo} from '../../types/api/pdisk';
-import type {TVDiskStateInfo} from '../../types/api/vdisk';
+import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import type {ValueOf} from '../../types/common';
 import type {PDISK_TYPES} from './getPDiskType';
 
@@ -16,3 +16,8 @@ export interface PreparedVDisk extends TVDiskStateInfo {
 }
 
 export type PDiskType = ValueOf<typeof PDISK_TYPES>;
+
+export interface UnavailableDonor extends TVSlotId {
+    DonorMode?: boolean;
+    StoragePoolName?: string;
+}

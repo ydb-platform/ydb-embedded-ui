@@ -1,0 +1,31 @@
+{
+  "slot-id": "VDisk Slot Id",
+  "pool-name": "Storage Pool Name",
+  "kind": "Kind",
+
+  "guid": "GUID",
+  "incarnation-guid": "Incarnation GUID",
+  "instance-guid": "Instance GUID",
+
+  "replication-status": "Replicated",
+  "state-status": "VDisk State",
+  "space-status": "Disk Space",
+
+  "fresh-rank-satisfaction": "Fresh Rank Satisfaction",
+  "level-rank-satisfaction": "Level Rank Satisfaction",
+
+  "front-queues": "Front Queues",
+  "has-unreadable-blobs": "Has Unreadable Blobs",
+
+  "size": "Size",
+
+  "read-throughput": "Read Throughput",
+  "write-throughput": "Write Throughput",
+
+  "links": "Links",
+  "vdisk-page": "VDisk Page",
+  "developer-ui": "Developer UI",
+
+  "yes": "Yes",
+  "no": "No"
+}

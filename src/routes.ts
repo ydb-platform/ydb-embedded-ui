@@ -10,6 +10,7 @@ export const CLUSTER = 'cluster';
 export const TENANT = 'tenant';
 export const NODE = 'node';
 export const PDISK = 'pDisk';
+export const VDISK = 'vDisk';
 export const TABLET = 'tablet';
 
 const routes = {
@@ -18,6 +19,7 @@ const routes = {
     tenant: `/${TENANT}`,
     node: `/${NODE}/:id/:activeTab?`,
     pDisk: `/${PDISK}`,
+    vDisk: `/${VDISK}`,
     tablet: `/${TABLET}/:id`,
     tabletsFilters: `/tabletsFilters`,
     auth: `/auth`,
@@ -91,4 +93,13 @@ export function getPDiskPagePath(
     query: Query = {},
 ) {
     return createHref(routes.pDisk, undefined, {...query, nodeId, pDiskId});
+}
+
+export function getVDiskPagePath(
+    vDiskSlotId: string | number,
+    pDiskId: string | number,
+    nodeId: string | number,
+    query: Query = {},
+) {
+    return createHref(routes.vDisk, undefined, {...query, nodeId, pDiskId, vDiskSlotId});
 }

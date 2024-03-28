@@ -126,7 +126,16 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getStorageInfo(
-        {tenant, visibleEntities, nodeId, sortOrder, sortValue, ...params}: StorageApiRequestParams,
+        {
+            tenant,
+            visibleEntities,
+            nodeId,
+            poolName,
+            groupId,
+            sortOrder,
+            sortValue,
+            ...params
+        }: StorageApiRequestParams,
         {concurrentId}: AxiosOptions = {},
     ) {
         const sort = prepareSortValue(sortValue, sortOrder);
@@ -136,6 +145,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {
                 tenant,
                 node_id: nodeId,
+                pool: poolName,
+                group_id: groupId,
                 with: visibleEntities,
                 sort,
                 ...params,
@@ -149,16 +160,17 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         });
     }
     getVdiskInfo({
-        vdiskId,
-        pdiskId,
+        vDiskSlotId,
+        pDiskId,
         nodeId,
     }: {
-        vdiskId: string | number;
-        pdiskId: string | number;
+        vDiskSlotId: string | number;
+        pDiskId: string | number;
         nodeId: string | number;
     }) {
         return this.get<TEvVDiskStateResponse>(this.getPath('/viewer/json/vdiskinfo?enums=true'), {
-            filter: `(VDiskId=${vdiskId ?? ''};PDiskId=${pdiskId ?? ''};NodeId=${nodeId ?? ''})`,
+            node_id: nodeId,
+            filter: `(PDiskId=${pDiskId};VDiskSlotId=${vDiskSlotId})`,
         });
     }
     getGroupInfo(groupId: string | number) {
@@ -377,6 +389,45 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             this.getPath('/viewer/json/healthcheck?merge_records=true'),
             {tenant: database},
             {concurrentId},
+        );
+    }
+    evictVDisk({
+        groupId,
+        groupGeneration,
+        failRealmIdx,
+        failDomainIdx,
+        vDiskIdx,
+    }: {
+        groupId: string | number;
+        groupGeneration: string | number;
+        failRealmIdx: string | number;
+        failDomainIdx: string | number;
+        vDiskIdx: string | number;
+    }) {
+        // BSC Id is constant for all ydb clusters
+        const BSC_TABLET_ID = '72057594037932033';
+
+        return this.post(
+            this.getPath(`/tablets/app?TabletID=${BSC_TABLET_ID}&exec=1`),
+            {
+                Command: {
+                    ReassignGroupDisk: {
+                        GroupId: groupId,
+                        GroupGeneration: groupGeneration,
+                        FailRealmIdx: failRealmIdx,
+                        FailDomainIdx: failDomainIdx,
+                        VDiskIdx: vDiskIdx,
+                    },
+                },
+            },
+            {},
+            {
+                headers: {
+                    // This handler requires exactly this string
+                    // Automatic headers may not suit
+                    Accept: 'application/json',
+                },
+            },
         );
     }
     restartPDisk(nodeId: number | string, pDiskId: number | string) {
