@@ -95,6 +95,7 @@ export const formatNumber = (number?: unknown) => {
         return '';
     }
 
+    // "," in format is delimiter sign, not delimiter itself
     return configuredNumeral(number).format('0,0.[00000]');
 };
 

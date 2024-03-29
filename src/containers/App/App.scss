@@ -4,6 +4,9 @@
 * {
     // FIXME: this is an overkill, potentially could break external components, needs refactoring
     box-sizing: border-box;
+
+    // Make all digits in the app monospace
+    font-variant-numeric: tabular-nums;
 }
 
 .yc-select-popup__tick-icon {
