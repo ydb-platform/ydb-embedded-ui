@@ -27,6 +27,8 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
         return HiveId && HiveId !== '0';
     };
 
+    const isDisabledRestart = tablet.State === ETabletState.Stopped;
+
     const isDisabledResume =
         tablet.State !== ETabletState.Stopped && tablet.State !== ETabletState.Dead;
 
@@ -40,6 +42,7 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                 onConfirmAction={_onKillClick}
                 onConfirmActionSuccess={fetchData}
                 buttonClassName={b('control')}
+                buttonDisabled={isDisabledRestart}
             >
                 {i18n('controls.kill')}
             </ButtonWithConfirmDialog>
