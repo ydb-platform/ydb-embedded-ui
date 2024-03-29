@@ -45,7 +45,7 @@ const prepareVDisk = (vDisk: TVDiskStateInfo, poolName: string | undefined) => {
 
 export const prepareStorageGroupData = (
     group: TStorageGroupInfo,
-    poolName?: string,
+    pool: TStoragePoolInfo,
 ): PreparedStorageGroup => {
     let missing = 0;
     let usedSpaceFlag = 0;
@@ -53,7 +53,9 @@ export const prepareStorageGroupData = (
     let limitSizeBytes = 0;
     let readSpeedBytesPerSec = 0;
     let writeSpeedBytesPerSec = 0;
-    let mediaType = '';
+    let mediaType: string | undefined;
+
+    const {Name: poolName, MediaType: poolMediaType} = pool;
 
     if (group.VDisks) {
         for (const vDisk of group.VDisks) {
@@ -91,8 +93,7 @@ export const prepareStorageGroupData = (
             readSpeedBytesPerSec += Number(ReadThroughput) || 0;
             writeSpeedBytesPerSec += Number(WriteThroughput) || 0;
 
-            mediaType =
-                PDiskType && (PDiskType === mediaType || mediaType === '') ? PDiskType : 'Mixed';
+            mediaType = PDiskType && (PDiskType === mediaType || !mediaType) ? PDiskType : 'Mixed';
         }
     }
 
@@ -110,7 +111,7 @@ export const prepareStorageGroupData = (
         Limit: limitSizeBytes,
         Degraded: missing,
         UsedSpaceFlag: usedSpaceFlag,
-        Kind: mediaType || undefined,
+        MediaType: poolMediaType || mediaType || undefined,
     };
 };
 
@@ -125,6 +126,7 @@ export const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedS
         Limit = 0,
         Degraded = 0,
         Kind,
+        MediaType,
     } = group;
 
     const UsedSpaceFlag = VDisks.reduce((acc, {DiskSpace}) => {
@@ -141,7 +143,7 @@ export const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedS
         ...group,
         UsedSpaceFlag,
         PoolName,
-        Kind,
+        MediaType: MediaType || Kind,
         VDisks: vDisks,
         Usage: usage,
         Read: Number(Read),
@@ -162,7 +164,7 @@ export const prepareStorageGroups = (
     } else {
         StoragePools?.forEach((pool) => {
             pool.Groups?.forEach((group) => {
-                preparedGroups.push(prepareStorageGroupData(group, pool.Name));
+                preparedGroups.push(prepareStorageGroupData(group, pool));
             });
         });
     }

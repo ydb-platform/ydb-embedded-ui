@@ -43,7 +43,7 @@ export function preparePDiskStorageResponse(
             });
 
             if (groupHasPDiskVDisks) {
-                preparedGroups.push(prepareStorageGroupData(group, pool.Name));
+                preparedGroups.push(prepareStorageGroupData(group, pool));
             }
         }),
     );

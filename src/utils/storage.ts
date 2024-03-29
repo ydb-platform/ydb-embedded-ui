@@ -20,6 +20,7 @@ export const getUsage = <T extends EntityWithUsage>(data: T, step = 1) => {
 export const STORAGE_SORT_VALUES = {
     PoolName: 'PoolName',
     Kind: 'Kind',
+    MediaType: 'MediaType',
     Erasure: 'Erasure',
     Degraded: 'Degraded',
     Usage: 'Usage',
