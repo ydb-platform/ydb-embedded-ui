@@ -70,7 +70,6 @@ const dataSizeColumn: Column<KeyValueRow> = {
         return formatNumber(row.DataSize);
     },
     align: DataTable.RIGHT,
-    customStyle: () => ({fontFamily: 'var(--g-font-family-monospace)'}),
 };
 
 const tabletIdColumn: Column<KeyValueRow> = {
