@@ -3,7 +3,7 @@ import 'numeral/locales'; // Without this numeral will throw an error when using
 
 import {Lang, i18n} from './i18n';
 
-// Set space delimeter for all locales possible in project
+// Set space delimiter for all locales possible in project
 Object.values(Lang).forEach((value) => {
     if (numeral.locales[value]) {
         numeral.locales[value].delimiters.thousands = ' ';
