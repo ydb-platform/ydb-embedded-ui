@@ -16,9 +16,8 @@ import TabletsFilters from '../TabletsFilters/TabletsFilters';
 import Header from '../Header/Header';
 import Authentication from '../Authentication/Authentication';
 
-import {ClusterNodesMapContextProvider} from '../../contexts/ClusterNodesMapContext/ClusterNodesMapContext';
-
 import {getUser} from '../../store/reducers/authentication/authentication';
+import {getNodesList} from '../../store/reducers/nodesList';
 import {getClusterPath} from '../Cluster/utils';
 import {useSlots} from '../../components/slots';
 import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
@@ -145,16 +144,15 @@ export function Content(props: ContentProps) {
             {additionalRoutes?.rendered}
             {/* Single cluster routes */}
             <Route key="single-cluster">
-                <ClusterNodesMapContextProvider>
-                    <GetUser />
-                    <Header mainPage={mainPage} />
-                    <Switch>
-                        {routesSlots.map((route) => {
-                            return renderRouteSlot(slots, route);
-                        })}
-                        <Redirect {...redirectProps} />
-                    </Switch>
-                </ClusterNodesMapContextProvider>
+                <GetUser />
+                <GetNodesList />
+                <Header mainPage={mainPage} />
+                <Switch>
+                    {routesSlots.map((route) => {
+                        return renderRouteSlot(slots, route);
+                    })}
+                    <Redirect {...redirectProps} />
+                </Switch>
             </Route>
         </Switch>
     );
@@ -172,6 +170,16 @@ function GetUser() {
             dispatch(getUser());
         }
     }, [dispatch, isAuthenticated, isInternalUser]);
+
+    return null;
+}
+
+function GetNodesList() {
+    const dispatch = useTypedDispatch();
+
+    React.useEffect(() => {
+        dispatch(getNodesList());
+    }, [dispatch]);
 
     return null;
 }

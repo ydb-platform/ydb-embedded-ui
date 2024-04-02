@@ -11,6 +11,7 @@ import {
     setPDiskDataWasNotLoaded,
 } from '../../store/reducers/pdisk/pdisk';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
+import {selectNodesMap} from '../../store/reducers/nodesList';
 
 import {valueIsDefined} from '../../utils';
 import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
@@ -22,8 +23,6 @@ import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewer
 import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 
-import {useClusterNodesMap} from '../../contexts/ClusterNodesMapContext/ClusterNodesMapContext';
-
 import {PDiskGroups} from './PDiskGroups';
 import {pdiskPageCn} from './shared';
 import {pDiskPageKeyset} from './i18n';
@@ -33,7 +32,7 @@ import './PDiskPage.scss';
 export function PDiskPage() {
     const dispatch = useTypedDispatch();
 
-    const nodesMap = useClusterNodesMap();
+    const nodesMap = useTypedSelector(selectNodesMap);
     const {pDiskData, groupsData, pDiskLoading, pDiskWasLoaded, groupsLoading, groupsWasLoaded} =
         useTypedSelector((state) => state.pDisk);
     const {NodeHost, NodeId, NodeType, NodeDC, Severity} = pDiskData;

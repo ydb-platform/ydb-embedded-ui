@@ -12,6 +12,7 @@ import {valueIsDefined} from '../../utils';
 import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {getVDiskData, setVDiskDataWasNotLoaded} from '../../store/reducers/vdisk/vdisk';
+import {selectNodesMap} from '../../store/reducers/nodesList';
 
 import {PageMeta} from '../../components/PageMeta/PageMeta';
 import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
@@ -20,8 +21,6 @@ import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {VDiskWithDonorsStack} from '../../components/VDisk/VDiskWithDonorsStack';
-
-import {useClusterNodesMap} from '../../contexts/ClusterNodesMapContext/ClusterNodesMapContext';
 
 import {vDiskPageKeyset} from './i18n';
 
@@ -32,7 +31,7 @@ const vDiskPageCn = cn('ydb-vdisk-page');
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
 
-    const nodesMap = useClusterNodesMap();
+    const nodesMap = useTypedSelector(selectNodesMap);
     const {vDiskData, groupData, loading, wasLoaded} = useTypedSelector((state) => state.vDisk);
     const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} = vDiskData;
 

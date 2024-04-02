@@ -7,11 +7,12 @@ import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/cons
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {AccessDenied} from '../../components/Errors/403/AccessDenied';
 import {ResponseError} from '../../components/Errors/ResponseError/ResponseError';
+import {selectNodesMap} from '../../store/reducers/nodesList';
+import {useTypedSelector} from '../../utils/hooks';
 
 import {StorageControls} from './StorageControls/StorageControls';
 import {VirtualStorageGroups} from './StorageGroups/VirtualStorageGroups';
 import {VirtualStorageNodes} from './StorageNodes/VirtualStorageNodes';
-import {useClusterNodesMap} from '../../contexts/ClusterNodesMapContext/ClusterNodesMapContext';
 
 interface VirtualStorageProps {
     tenant?: string;
@@ -33,7 +34,7 @@ export const VirtualStorage = ({
         NodesUptimeFilterValues.All,
     );
 
-    const nodesMap = useClusterNodesMap();
+    const nodesMap = useTypedSelector(selectNodesMap);
 
     const handleShowAllGroups = () => {
         setVisibleEntities(VISIBLE_ENTITIES.all);
