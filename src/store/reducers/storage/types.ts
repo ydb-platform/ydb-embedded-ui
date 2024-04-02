@@ -47,7 +47,7 @@ export interface PreparedStorageGroup extends TStorageGroupInfo {
     Used: number;
     Limit: number;
     Degraded: number;
-    Kind?: string;
+    MediaType?: string;
 
     UsedSpaceFlag: number;
 

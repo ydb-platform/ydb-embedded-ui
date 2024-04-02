@@ -33,11 +33,13 @@ export interface TStoragePoolInfo {
     MaximumThroughput?: string;
     /** uint64 */
     MaximumSize?: string;
+    MediaType?: string;
 }
 
 export interface TStorageGroupInfoV2 extends TStorageGroupInfo {
     PoolName?: string;
     Kind?: string;
+    MediaType?: string;
 
     /** uint64 */
     Degraded?: string;

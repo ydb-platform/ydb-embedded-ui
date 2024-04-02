@@ -29,7 +29,7 @@ type StorageGroupsColumn = VirtualTableColumn<PreparedStorageGroup> &
 
 export const GROUPS_COLUMNS_IDS = {
     PoolName: 'PoolName',
-    Kind: 'Kind',
+    MediaType: 'MediaType',
     Erasure: 'Erasure',
     GroupId: 'GroupId',
     Used: 'Used',
@@ -64,14 +64,14 @@ const poolNameColumn: StorageGroupsColumn = {
     align: DataTable.LEFT,
 };
 
-const kindColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.Kind,
+const typeColumn: StorageGroupsColumn = {
+    name: GROUPS_COLUMNS_IDS.MediaType,
     header: 'Type',
     width: 100,
     align: DataTable.LEFT,
     render: ({row}) => (
         <>
-            <Label>{row.Kind || '—'}</Label>
+            <Label>{row.MediaType || '—'}</Label>
             {'\u00a0'}
             {row.Encryption && (
                 <Popover
@@ -244,13 +244,13 @@ const getVdiscksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
 });
 
 export const getStorageTopGroupsColumns = (): StorageGroupsColumn[] => {
-    return [groupIdColumn, kindColumn, erasureColumn, usageColumn, usedColumn, limitColumn];
+    return [groupIdColumn, typeColumn, erasureColumn, usageColumn, usedColumn, limitColumn];
 };
 
 export const getPDiskStorageColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {
     return [
         poolNameColumn,
-        kindColumn,
+        typeColumn,
         erasureColumn,
         degradedColumn,
         groupIdColumn,
@@ -263,7 +263,7 @@ export const getPDiskStorageColumns = (nodes?: NodesMap): StorageGroupsColumn[] 
 const getStorageGroupsColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {
     return [
         poolNameColumn,
-        kindColumn,
+        typeColumn,
         erasureColumn,
         degradedColumn,
         usageColumn,
