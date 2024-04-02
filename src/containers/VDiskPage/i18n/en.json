@@ -1,0 +1,10 @@
+{
+  "fqdn": "FQDN",
+  "node": "Node",
+  "pdisk": "PDisk",
+  "vdisk": "VDisk",
+  "group": "Group",
+
+  "evict-vdisk-button": "Evict VDisk",
+  "evict-vdisk-dialog": "VDisk will be evicted. Do you want to proceed?"
+}

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import type {RenderControls, RenderErrorMessage} from '../../components/VirtualTable';
@@ -7,8 +7,8 @@ import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/cons
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {AccessDenied} from '../../components/Errors/403/AccessDenied';
 import {ResponseError} from '../../components/Errors/ResponseError/ResponseError';
-import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
-import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
+import {selectNodesMap} from '../../store/reducers/nodesList';
+import {useTypedSelector} from '../../utils/hooks';
 
 import {StorageControls} from './StorageControls/StorageControls';
 import {VirtualStorageGroups} from './StorageGroups/VirtualStorageGroups';
@@ -27,8 +27,6 @@ export const VirtualStorage = ({
     parentContainer,
     additionalNodesProps,
 }: VirtualStorageProps) => {
-    const dispatch = useTypedDispatch();
-
     const [searchValue, setSearchValue] = useState('');
     const [storageType, setStorageType] = useState<StorageType>(STORAGE_TYPES.groups);
     const [visibleEntities, setVisibleEntities] = useState<VisibleEntities>(VISIBLE_ENTITIES.all);
@@ -37,10 +35,6 @@ export const VirtualStorage = ({
     );
 
     const nodesMap = useTypedSelector(selectNodesMap);
-
-    useEffect(() => {
-        dispatch(getNodesList());
-    }, [dispatch]);
 
     const handleShowAllGroups = () => {
         setVisibleEntities(VISIBLE_ENTITIES.all);

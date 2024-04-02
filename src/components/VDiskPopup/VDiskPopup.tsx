@@ -3,19 +3,17 @@ import cn from 'bem-cn-lite';
 
 import {Label, Popup, PopupProps} from '@gravity-ui/uikit';
 
-import type {NodesMap} from '../../../types/store/nodesList';
+import type {NodesMap} from '../../types/store/nodesList';
+import {EFlag} from '../../types/api/enums';
+import type {TVDiskStateInfo} from '../../types/api/vdisk';
+import type {UnavailableDonor} from '../../utils/disks/types';
+import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {bytesToGB, bytesToSpeed} from '../../utils/utils';
+import {isFullVDiskData} from '../../utils/disks/helpers';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 
-import {InfoViewer, InfoViewerItem} from '../../../components/InfoViewer';
-
-import {EFlag} from '../../../types/api/enums';
-import type {TVDiskStateInfo} from '../../../types/api/vdisk';
-import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
-import {isFullVDiskData} from '../../../utils/disks/helpers';
-
-import type {UnavailableDonor} from '../utils/types';
-
-import {preparePDiskData} from '../PDiskPopup';
+import {preparePDiskData} from '../PDiskPopup/PDiskPopup';
+import {InfoViewer, InfoViewerItem} from '../InfoViewer';
 
 import './VDiskPopup.scss';
 
@@ -31,9 +29,9 @@ const prepareUnavailableVDiskData = (data: UnavailableDonor) => {
     }
 
     vdiskData.push(
-        {label: 'NodeId', value: NodeId ?? '–'},
-        {label: 'PDiskId', value: PDiskId ?? '–'},
-        {label: 'VSlotId', value: VSlotId ?? '–'},
+        {label: 'NodeId', value: NodeId ?? EMPTY_DATA_PLACEHOLDER},
+        {label: 'PDiskId', value: PDiskId ?? EMPTY_DATA_PLACEHOLDER},
+        {label: 'VSlotId', value: VSlotId ?? EMPTY_DATA_PLACEHOLDER},
     );
 
     return vdiskData;

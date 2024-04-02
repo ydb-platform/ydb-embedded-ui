@@ -34,6 +34,8 @@ export const selectNodeStructure: Selector<NodeStateSlice, PreparedNodeStructure
                     }
                     structure[String(pDiskId)].vDisks[vDiskId] = {
                         ...vd,
+                        PDiskId: pDiskId,
+                        NodeId: nodeId,
                         // VDisk doesn't have its own StoragePoolName when located inside StoragePool data
                         StoragePoolName: pool.Name,
                     };

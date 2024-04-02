@@ -33,7 +33,7 @@ import {
     selectGroupsSortParams,
 } from '../../store/reducers/storage/selectors';
 import {VISIBLE_ENTITIES, STORAGE_TYPES} from '../../store/reducers/storage/constants';
-import {getNodesList, selectNodesMap} from '../../store/reducers/nodesList';
+import {selectNodesMap} from '../../store/reducers/nodesList';
 import {
     useAutofetcher,
     useNodesRequestParams,
@@ -85,8 +85,6 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
     const storageType = isNodePage ? STORAGE_TYPES.groups : type;
 
     useEffect(() => {
-        dispatch(getNodesList());
-
         return () => {
             // Clean data on component unmount
             dispatch(setInitialState());

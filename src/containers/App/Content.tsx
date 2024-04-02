@@ -9,13 +9,15 @@ import {Clusters} from '../Clusters/Clusters';
 import Cluster from '../Cluster/Cluster';
 import Tenant from '../Tenant/Tenant';
 import Node from '../Node/Node';
-import {PDisk} from '../PDisk/PDisk';
+import {PDiskPage} from '../PDiskPage/PDiskPage';
+import {VDiskPage} from '../VDiskPage/VDiskPage';
 import {Tablet} from '../Tablet';
 import TabletsFilters from '../TabletsFilters/TabletsFilters';
 import Header from '../Header/Header';
 import Authentication from '../Authentication/Authentication';
 
 import {getUser} from '../../store/reducers/authentication/authentication';
+import {getNodesList} from '../../store/reducers/nodesList';
 import {getClusterPath} from '../Cluster/utils';
 import {useSlots} from '../../components/slots';
 import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
@@ -23,7 +25,8 @@ import {
     ClusterSlot,
     ClustersSlot,
     NodeSlot,
-    PDiskSlot,
+    PDiskPageSlot,
+    VDiskPageSlot,
     RedirectSlot,
     RoutesSlot,
     TabletSlot,
@@ -65,8 +68,13 @@ const routesSlots: RouteSlot[] = [
     },
     {
         path: routes.pDisk,
-        slot: PDiskSlot,
-        component: PDisk,
+        slot: PDiskPageSlot,
+        component: PDiskPage,
+    },
+    {
+        path: routes.vDisk,
+        slot: VDiskPageSlot,
+        component: VDiskPage,
     },
     {
         path: routes.tablet,
@@ -137,6 +145,7 @@ export function Content(props: ContentProps) {
             {/* Single cluster routes */}
             <Route key="single-cluster">
                 <GetUser />
+                <GetNodesList />
                 <Header mainPage={mainPage} />
                 <Switch>
                     {routesSlots.map((route) => {
@@ -161,6 +170,16 @@ function GetUser() {
             dispatch(getUser());
         }
     }, [dispatch, isAuthenticated, isInternalUser]);
+
+    return null;
+}
+
+function GetNodesList() {
+    const dispatch = useTypedDispatch();
+
+    React.useEffect(() => {
+        dispatch(getNodesList());
+    }, [dispatch]);
 
     return null;
 }

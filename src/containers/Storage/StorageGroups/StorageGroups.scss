@@ -6,6 +6,7 @@
     &__vdisks-wrapper {
         display: flex;
         justify-content: center;
+        gap: 10px;
 
         min-width: 500px;
     }
@@ -13,15 +14,8 @@
         flex-grow: 1;
 
         max-width: 200px;
-        margin-right: 10px;
-
-        &:last-child {
-            margin-right: 0px;
-        }
 
         .stack__layer {
-            background: var(--g-color-base-background);
-
             .data-table__row:hover & {
                 background: var(--ydb-data-table-color-hover);
             }

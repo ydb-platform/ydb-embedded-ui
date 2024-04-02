@@ -11,7 +11,7 @@ import {
 } from '../../../../utils/hooks';
 import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
 
-import {getNodesList, selectNodesMap} from '../../../../store/reducers/nodesList';
+import {selectNodesMap} from '../../../../store/reducers/nodesList';
 import {
     cleanTopicData,
     getTopic,
@@ -82,7 +82,6 @@ export const Partitions = ({path}: PartitionsProps) => {
         dispatch(cleanTopicData());
         dispatch(setTopicDataWasNotLoaded());
 
-        dispatch(getNodesList());
         dispatch(getTopic(path));
 
         setComponentCurrentPath(path);

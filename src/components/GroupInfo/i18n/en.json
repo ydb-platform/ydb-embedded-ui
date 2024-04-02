@@ -1,0 +1,6 @@
+{
+  "group-id": "Group ID",
+  "pool-name": "Storage Pool Name",
+  "size": "Size",
+  "erasure": "Erasure"
+}

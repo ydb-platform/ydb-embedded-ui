@@ -3,14 +3,14 @@ import cn from 'bem-cn-lite';
 
 import {Popup, PopupProps} from '@gravity-ui/uikit';
 
-import type {NodesMap} from '../../../types/store/nodesList';
+import type {NodesMap} from '../../types/store/nodesList';
+import {EFlag} from '../../types/api/enums';
+import type {PreparedPDisk} from '../../utils/disks/types';
+import {getPDiskId} from '../../utils/dataFormatters/dataFormatters';
+import {bytesToGB} from '../../utils/utils';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 
-import {InfoViewer, InfoViewerItem} from '../../../components/InfoViewer';
-
-import {EFlag} from '../../../types/api/enums';
-import type {PreparedPDisk} from '../../../utils/disks/types';
-import {getPDiskId} from '../../../utils/dataFormatters/dataFormatters';
-import {bytesToGB} from '../../../utils/utils';
+import {InfoViewer, InfoViewerItem} from '../InfoViewer';
 
 import './PDiskPopup.scss';
 
@@ -22,7 +22,7 @@ export const preparePDiskData = (data: PreparedPDisk, nodes?: NodesMap) => {
     const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Type, Device} = data;
 
     const pdiskData: InfoViewerItem[] = [
-        {label: 'PDisk', value: getPDiskId({NodeId, PDiskId}) || '-'},
+        {label: 'PDisk', value: getPDiskId({NodeId, PDiskId}) || EMPTY_DATA_PLACEHOLDER},
         {label: 'State', value: State || 'not available'},
         {label: 'Type', value: Type || 'unknown'},
     ];

@@ -22,20 +22,6 @@
         left: 0;
     }
 
-    &__title {
-        display: flex;
-        flex-flow: row nowrap;
-        align-items: baseline;
-
-        @include header-2-typography();
-
-        &__prefix {
-            margin-right: 6px;
-
-            color: var(--g-color-text-secondary);
-        }
-    }
-
     &__groups-title {
         @include header-1-typography();
     }

@@ -1,0 +1,32 @@
+@import '../../styles//mixins.scss';
+
+.ydb-vdisk-page {
+    position: relative;
+
+    display: flex;
+    overflow: auto;
+    flex-direction: column;
+
+    height: 100%;
+    padding-top: 20px;
+    padding-left: 20px;
+
+    gap: 20px;
+
+    &__group-title {
+        @include header-1-typography();
+    }
+
+    &__group-disks {
+        display: flex;
+        flex-grow: 1;
+        flex-flow: row wrap;
+
+        margin-top: 20px;
+        gap: 10px;
+    }
+
+    &__group-disk {
+        width: 150px;
+    }
+}
