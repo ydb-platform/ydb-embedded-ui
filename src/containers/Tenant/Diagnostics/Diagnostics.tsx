@@ -1,42 +1,37 @@
-import {useMemo, useRef} from 'react';
-import qs from 'qs';
-import cn from 'bem-cn-lite';
-import {Link} from 'react-router-dom';
-import {useLocation} from 'react-router';
-import {Helmet} from 'react-helmet-async';
+import React from 'react';
 
 import {Switch, Tabs} from '@gravity-ui/uikit';
-
-import type {EPathType} from '../../../types/api/schema';
-import type {AdditionalTenantsProps, AdditionalNodesProps} from '../../../types/additionalProps';
-
-import {useTypedSelector, useTypedDispatch} from '../../../utils/hooks';
-import routes, {createHref} from '../../../routes';
-import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
-import {enableAutorefresh, disableAutorefresh} from '../../../store/reducers/schema/schema';
-import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
-import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
+import qs from 'qs';
+import {Helmet} from 'react-helmet-async';
+import {useLocation} from 'react-router';
+import {Link} from 'react-router-dom';
 
 import {Loader} from '../../../components/Loader';
-
+import routes, {createHref} from '../../../routes';
+import {disableAutorefresh, enableAutorefresh} from '../../../store/reducers/schema/schema';
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
+import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
+import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
+import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
+import type {EPathType} from '../../../types/api/schema';
+import {cn} from '../../../utils/cn';
+import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Heatmap} from '../../Heatmap';
 import {NodesWrapper} from '../../Nodes/NodesWrapper';
 import {StorageWrapper} from '../../Storage/StorageWrapper';
 import {Tablets} from '../../Tablets';
+import {TenantTabsGroups} from '../TenantPages';
+import {isDatabaseEntityType} from '../utils/schema';
 
+import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
+import DetailedOverview from './DetailedOverview/DetailedOverview';
+import {DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
 import {HotKeys} from './HotKeys/HotKeys';
 import Network from './Network/Network';
 import {Partitions} from './Partitions/Partitions';
-import {Consumers} from './Consumers';
 import {TopQueries} from './TopQueries';
 import {TopShards} from './TopShards';
-import DetailedOverview from './DetailedOverview/DetailedOverview';
-
-import {isDatabaseEntityType} from '../utils/schema';
-
-import {TenantTabsGroups} from '../TenantPages';
-import {DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
 
 import './Diagnostics.scss';
 
@@ -49,7 +44,7 @@ interface DiagnosticsProps {
 const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
-    const container = useRef<HTMLDivElement>(null);
+    const container = React.useRef<HTMLDivElement>(null);
 
     const dispatch = useTypedDispatch();
     const {currentSchemaPath, autorefresh, wasLoaded} = useTypedSelector((state) => state.schema);
@@ -67,7 +62,7 @@ function Diagnostics(props: DiagnosticsProps) {
     const tenantName = isDatabaseEntityType(props.type) ? currentSchemaPath : rootTenantName;
     const isDatabase = isDatabaseEntityType(props.type) || currentSchemaPath === rootTenantName;
 
-    const pages = useMemo(() => {
+    const pages = React.useMemo(() => {
         if (isDatabase) {
             return DATABASE_PAGES;
         }
@@ -78,7 +73,7 @@ function Diagnostics(props: DiagnosticsProps) {
     const forwardToDiagnosticTab = (tab: TenantDiagnosticsTab) => {
         dispatch(setDiagnosticsTab(tab));
     };
-    const activeTab = useMemo(() => {
+    const activeTab = React.useMemo(() => {
         if (wasLoaded) {
             let page = pages.find((el) => el.id === diagnosticsTab);
             if (!page) {

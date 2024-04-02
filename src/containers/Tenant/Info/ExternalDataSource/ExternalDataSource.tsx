@@ -1,19 +1,17 @@
-import block from 'bem-cn-lite';
-
-import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {useTypedSelector} from '../../../../utils/hooks';
-
-import {InfoViewer, InfoViewerItem} from '../../../../components/InfoViewer';
-import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-
+import type {InfoViewerItem} from '../../../../components/InfoViewer';
+import {InfoViewer} from '../../../../components/InfoViewer';
+import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
+import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
+import {useTypedSelector} from '../../../../utils/hooks';
 import {getEntityName} from '../../utils';
-
 import i18n from '../i18n';
+
 import './ExternalDataSource.scss';
 
-const b = block('ydb-external-data-source-info');
+const b = cn('ydb-external-data-source-info');
 
 const prepareExternalDataSourceSummary = (data: TEvDescribeSchemeResult): InfoViewerItem[] => {
     return [

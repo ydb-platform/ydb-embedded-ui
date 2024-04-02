@@ -1,40 +1,40 @@
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import DataTable, {Column} from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 import {Button} from '@gravity-ui/uikit';
 
-import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
-import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
-import {TabletsStatistic} from '../../components/TabletsStatistic';
-import {ProblemFilter} from '../../components/ProblemFilter';
-import {Illustration} from '../../components/Illustration';
 import {EntitiesCount} from '../../components/EntitiesCount';
+import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
+import {ResponseError} from '../../components/Errors/ResponseError';
+import {Illustration} from '../../components/Illustration';
+import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
+import {ProblemFilter} from '../../components/ProblemFilter';
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {ResponseError} from '../../components/Errors/ResponseError';
-
-import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import {TabletsStatistic} from '../../components/TabletsStatistic';
+import {clusterName} from '../../store';
+import {
+    ProblemFilterValues,
+    changeFilter,
+    selectProblemFilter,
+} from '../../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
-import type {PreparedTenant} from '../../store/reducers/tenants/types';
-import {getTenantsInfo, setSearchValue} from '../../store/reducers/tenants/tenants';
 import {
     selectFilteredTenants,
     selectTenantsSearchValue,
 } from '../../store/reducers/tenants/selectors';
-import {
-    changeFilter,
-    ProblemFilterValues,
-    selectProblemFilter,
-} from '../../store/reducers/settings/settings';
+import {getTenantsInfo, setSearchValue} from '../../store/reducers/tenants/tenants';
+import type {PreparedTenant} from '../../store/reducers/tenants/types';
+import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import {cn} from '../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
     formatBytesToGigabyte,
     formatCPU,
     formatNumber,
 } from '../../utils/dataFormatters/dataFormatters';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {clusterName} from '../../store';
-
 import {getTenantPath} from '../Tenant/TenantPages';
 
 import './Tenants.scss';
@@ -71,7 +71,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
 
     const renderControls = () => {
         return (
-            <>
+            <React.Fragment>
                 <Search
                     value={searchValue}
                     onChange={handleSearchChange}
@@ -85,7 +85,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                     label={'Databases'}
                     loading={loading && !wasLoaded}
                 />
-            </>
+            </React.Fragment>
         );
     };
 

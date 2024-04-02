@@ -1,11 +1,12 @@
-import {useState, type ReactNode} from 'react';
+import React from 'react';
 
-import {Button, type ButtonProps} from '@gravity-ui/uikit';
+import {Button} from '@gravity-ui/uikit';
+import type {ButtonProps} from '@gravity-ui/uikit';
 
 import {CriticalActionDialog} from '../CriticalActionDialog';
 
 interface ButtonWithConfirmDialogProps<T, K> {
-    children: ReactNode;
+    children: React.ReactNode;
     onConfirmAction: () => Promise<T>;
     onConfirmActionSuccess?: (() => Promise<K>) | VoidFunction;
     dialogContent: string;
@@ -23,8 +24,8 @@ export function ButtonWithConfirmDialog<T, K>({
     buttonView = 'action',
     buttonClassName,
 }: ButtonWithConfirmDialogProps<T, K>) {
-    const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
-    const [buttonLoading, setButtonLoading] = useState(false);
+    const [isConfirmDialogVisible, setIsConfirmDialogVisible] = React.useState(false);
+    const [buttonLoading, setButtonLoading] = React.useState(false);
 
     const handleConfirmAction = async () => {
         setButtonLoading(true);
@@ -50,7 +51,7 @@ export function ButtonWithConfirmDialog<T, K>({
     };
 
     return (
-        <>
+        <React.Fragment>
             <CriticalActionDialog
                 visible={isConfirmDialogVisible}
                 text={dialogContent}
@@ -70,6 +71,6 @@ export function ButtonWithConfirmDialog<T, K>({
             >
                 {children}
             </Button>
-        </>
+        </React.Fragment>
     );
 }

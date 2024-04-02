@@ -1,8 +1,7 @@
 .kv-query-execution-status {
     display: flex;
-    gap: 4px;
-
     align-items: center;
+    gap: 4px;
 
     color: var(--g-color-text-complementary);
     &__result-status-icon {

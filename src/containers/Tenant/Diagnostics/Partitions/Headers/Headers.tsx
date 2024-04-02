@@ -1,15 +1,12 @@
-import block from 'bem-cn-lite';
-
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
-
-import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITILES} from '../utils/constants';
-
+import {cn} from '../../../../../utils/cn';
 import i18n from '../i18n';
+import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITILES} from '../utils/constants';
 
 import './Headers.scss';
 
-const b = block('ydb-diagnostics-partitions-columns-header');
+const b = cn('ydb-diagnostics-partitions-columns-header');
 
 interface MultilineHeaderProps {
     title: string;

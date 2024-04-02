@@ -1,5 +1,4 @@
 import type {TPoolStats} from '../../../types/api/nodes';
-
 import {InfoViewer, createInfoFormatter, formatObject} from '../../InfoViewer';
 
 const formatPool = createInfoFormatter<TPoolStats>({

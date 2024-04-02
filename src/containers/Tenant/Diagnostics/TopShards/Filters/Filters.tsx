@@ -1,16 +1,12 @@
 import {RadioButton} from '@gravity-ui/uikit';
 
-import {DateRange, DateRangeValues} from '../../../../../components/DateRange';
-
-import {
-    EShardsWorkloadMode,
-    type IShardsWorkloadFilters,
-} from '../../../../../store/reducers/shardsWorkload/types';
-
+import type {DateRangeValues} from '../../../../../components/DateRange';
+import {DateRange} from '../../../../../components/DateRange';
+import {EShardsWorkloadMode} from '../../../../../store/reducers/shardsWorkload/types';
+import type {IShardsWorkloadFilters} from '../../../../../store/reducers/shardsWorkload/types';
 import {isEnumMember} from '../../../../../utils/typecheckers';
-
-import i18n from '../i18n';
 import {b} from '../TopShards';
+import i18n from '../i18n';
 
 import './Filters.scss';
 

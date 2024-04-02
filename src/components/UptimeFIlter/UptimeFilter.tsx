@@ -1,6 +1,6 @@
 import {RadioButton} from '@gravity-ui/uikit';
 
-import {NodesUptimeFilterValues, NodesUptimeFilterTitles} from '../../utils/nodes';
+import {NodesUptimeFilterTitles, NodesUptimeFilterValues} from '../../utils/nodes';
 
 interface UptimeFilterProps {
     value: NodesUptimeFilterValues;

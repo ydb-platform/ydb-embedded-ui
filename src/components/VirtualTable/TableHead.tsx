@@ -1,11 +1,10 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React from 'react';
 
 import type {
     HandleTableColumnsResize,
     TableColumnsWidthSetup,
 } from '../../utils/hooks/useTableResize';
 
-import type {Column, OnSort, SortOrderType, SortParams} from './types';
 import {
     ASCENDING,
     DEFAULT_RESIZEABLE,
@@ -14,6 +13,7 @@ import {
     DESCENDING,
 } from './constants';
 import {b} from './shared';
+import type {Column, OnSort, SortOrderType, SortParams} from './types';
 
 const COLUMN_NAME_HTML_ATTRIBUTE = 'data-columnname';
 
@@ -70,9 +70,9 @@ export const TableHeadCell = <T,>({
     onCellMount,
     onCellUnMount,
 }: TableHeadCellProps<T>) => {
-    const cellWrapperRef = useRef<HTMLDivElement>(null);
+    const cellWrapperRef = React.useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const cellWrapper = cellWrapperRef.current;
         if (cellWrapper) {
             onCellMount?.(cellWrapper);
@@ -138,11 +138,11 @@ export const TableHead = <T,>({
     defaultSortOrder = DEFAULT_SORT_ORDER,
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
 }: TableHeadProps<T>) => {
-    const [sortParams, setSortParams] = useState<SortParams>({});
+    const [sortParams, setSortParams] = React.useState<SortParams>({});
 
     const isTableResizeable = Boolean(onColumnsResize);
 
-    const resizeObserver: ResizeObserver | undefined = useMemo(() => {
+    const resizeObserver: ResizeObserver | undefined = React.useMemo(() => {
         if (!isTableResizeable) {
             return undefined;
         }
@@ -159,13 +159,13 @@ export const TableHead = <T,>({
         });
     }, [onColumnsResize, isTableResizeable]);
 
-    const handleCellMount = useCallback(
+    const handleCellMount = React.useCallback(
         (element: Element) => {
             resizeObserver?.observe(element);
         },
         [resizeObserver],
     );
-    const handleCellUnMount = useCallback(
+    const handleCellUnMount = React.useCallback(
         (element: Element) => {
             resizeObserver?.unobserve(element);
         },
@@ -242,9 +242,9 @@ export const TableHead = <T,>({
     };
 
     return (
-        <>
+        <React.Fragment>
             {renderTableColGroups()}
             {renderTableHead()}
-        </>
+        </React.Fragment>
     );
 };

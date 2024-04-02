@@ -1,18 +1,18 @@
-import {LocationWithQuery, ParamSetup, createReduxLocationActions} from 'redux-location-state';
-import qs from 'qs';
+import type {Action, Reducer, UnknownAction} from '@reduxjs/toolkit';
+import type {History, Location} from 'history';
 import each from 'lodash/each';
 import keys from 'lodash/keys';
 import merge from 'lodash/merge';
-import {stateToParams} from 'redux-location-state/lib/stateToParams';
-import {parseQuery} from 'redux-location-state/lib/parseQuery';
-import {LOCATION_PUSH, LOCATION_POP} from 'redux-location-state/lib/constants';
+import qs from 'qs';
+import type {LocationWithQuery, ParamSetup} from 'redux-location-state';
+import {createReduxLocationActions} from 'redux-location-state';
+import {LOCATION_POP, LOCATION_PUSH} from 'redux-location-state/lib/constants';
 import {getMatchingDeclaredPath} from 'redux-location-state/lib/helpers';
+import {parseQuery} from 'redux-location-state/lib/parseQuery';
+import {stateToParams} from 'redux-location-state/lib/stateToParams';
 
-import {initialState as initialSettingsState} from './reducers/settings/settings';
 import {initialState as initialHeatmapState} from './reducers/heatmap';
-
-import type {History, Location} from 'history';
-import type {Action, Reducer, UnknownAction} from '@reduxjs/toolkit';
+import {initialState as initialSettingsState} from './reducers/settings/settings';
 
 const paramSetup: ParamSetup = {
     global: {

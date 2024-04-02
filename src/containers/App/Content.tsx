@@ -1,45 +1,45 @@
 import React from 'react';
-import {Switch, Route, Redirect, RedirectProps} from 'react-router-dom';
-import cn from 'bem-cn-lite';
-import {connect} from 'react-redux';
 
+import {connect, shallowEqual} from 'react-redux';
+import type {RedirectProps} from 'react-router-dom';
+import {Redirect, Route, Switch} from 'react-router-dom';
+
+import {useSlots} from '../../components/slots';
+import type {SlotMap} from '../../components/slots/SlotMap';
+import type {SlotComponent} from '../../components/slots/types';
 import routes from '../../routes';
-
-import {Clusters} from '../Clusters/Clusters';
-import Cluster from '../Cluster/Cluster';
-import Tenant from '../Tenant/Tenant';
-import Node from '../Node/Node';
-import {PDiskPage} from '../PDiskPage/PDiskPage';
-import {VDiskPage} from '../VDiskPage/VDiskPage';
-import {Tablet} from '../Tablet';
-import TabletsFilters from '../TabletsFilters/TabletsFilters';
-import Header from '../Header/Header';
-import Authentication from '../Authentication/Authentication';
-
+import type {RootState} from '../../store';
 import {getUser} from '../../store/reducers/authentication/authentication';
 import {getNodesList} from '../../store/reducers/nodesList';
+import {cn} from '../../utils/cn';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import Authentication from '../Authentication/Authentication';
+import Cluster from '../Cluster/Cluster';
 import {getClusterPath} from '../Cluster/utils';
-import {useSlots} from '../../components/slots';
-import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
+import {Clusters} from '../Clusters/Clusters';
+import Header from '../Header/Header';
+import type {RawBreadcrumbItem} from '../Header/breadcrumbs';
+import Node from '../Node/Node';
+import {PDiskPage} from '../PDiskPage/PDiskPage';
+import {Tablet} from '../Tablet';
+import TabletsFilters from '../TabletsFilters/TabletsFilters';
+import Tenant from '../Tenant/Tenant';
+import {VDiskPage} from '../VDiskPage/VDiskPage';
+
 import {
     ClusterSlot,
     ClustersSlot,
     NodeSlot,
     PDiskPageSlot,
-    VDiskPageSlot,
     RedirectSlot,
     RoutesSlot,
     TabletSlot,
     TabletsFiltersSlot,
     TenantSlot,
+    VDiskPageSlot,
 } from './appSlots';
-
-import type {SlotComponent} from '../../components/slots/types';
-import type {SlotMap} from '../../components/slots/SlotMap';
-import type {RawBreadcrumbItem} from '../Header/breadcrumbs';
-import type {RootState} from '../../store';
-
 import i18n from './i18n';
+
 import './App.scss';
 
 const b = cn('app');
@@ -160,10 +160,13 @@ export function Content(props: ContentProps) {
 
 function GetUser() {
     const dispatch = useTypedDispatch();
-    const {isAuthenticated, isInternalUser} = useTypedSelector((state) => ({
-        isAuthenticated: state.authentication.isAuthenticated,
-        isInternalUser: Boolean(state.authentication.user),
-    }));
+    const {isAuthenticated, isInternalUser} = useTypedSelector(
+        (state) => ({
+            isAuthenticated: state.authentication.isAuthenticated,
+            isInternalUser: Boolean(state.authentication.user),
+        }),
+        shallowEqual,
+    );
 
     React.useEffect(() => {
         if (isAuthenticated && !isInternalUser) {

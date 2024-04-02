@@ -1,13 +1,13 @@
-import {DependencyList, useEffect, useRef} from 'react';
+import React from 'react';
 
 import {AutoFetcher} from '../autofetcher';
 
 export const useAutofetcher = (
     fetchData: (isBackground: boolean) => void,
-    deps: DependencyList,
+    deps: React.DependencyList,
     enabled = true,
 ) => {
-    const ref = useRef<AutoFetcher | null>(null);
+    const ref = React.useRef<AutoFetcher | null>(null);
 
     if (ref.current === null) {
         ref.current = new AutoFetcher();
@@ -16,11 +16,11 @@ export const useAutofetcher = (
     const autofetcher = ref.current;
 
     // initial fetch
-    useEffect(() => {
+    React.useEffect(() => {
         fetchData(false);
     }, deps); // eslint-disable-line react-hooks/exhaustive-deps
 
-    useEffect(() => {
+    React.useEffect(() => {
         autofetcher.stop();
 
         if (enabled) {

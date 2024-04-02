@@ -1,10 +1,9 @@
-import block from 'bem-cn-lite';
-
+import {cn} from '../../utils/cn';
 import {ReadLagImage, WriteLagImage} from '../LagImages';
 
 import './LagPopoverContent.scss';
 
-const b = block('ydb-lag-popover-content');
+const b = cn('ydb-lag-popover-content');
 
 interface LagPopoverContentProps {
     text: string;

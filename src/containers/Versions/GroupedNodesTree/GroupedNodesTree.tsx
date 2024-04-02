@@ -1,14 +1,13 @@
-import {useState, useEffect} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
 import {TreeView} from 'ydb-ui-components';
 
 import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
 import type {VersionValue} from '../../../types/versions';
-
-import type {GroupedNodesItem} from '../types';
-import {NodesTreeTitle} from '../NodesTreeTitle/NodesTreeTitle';
+import {cn} from '../../../utils/cn';
 import {NodesTable} from '../NodesTable/NodesTable';
+import {NodesTreeTitle} from '../NodesTreeTitle/NodesTreeTitle';
+import type {GroupedNodesItem} from '../types';
 
 import './GroupedNodesTree.scss';
 
@@ -33,9 +32,9 @@ export const GroupedNodesTree = ({
     versionsValues,
     level = 0,
 }: GroupedNodesTreeProps) => {
-    const [isOpened, toggleBlock] = useState(false);
+    const [isOpened, toggleBlock] = React.useState(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         toggleBlock(expanded);
     }, [expanded]);
 

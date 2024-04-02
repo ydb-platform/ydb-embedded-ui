@@ -1,8 +1,8 @@
 import {useSelector} from 'react-redux';
-import cn from 'bem-cn-lite';
 
-import type {EPathType} from '../../../../types/api/schema';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
+import type {EPathType} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
 import Overview from '../Overview/Overview';
 import {TenantOverview} from '../TenantOverview/TenantOverview';
 

@@ -1,16 +1,16 @@
+import DataTable from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
 import type {Location} from 'history';
 
-import DataTable, {type Column} from '@gravity-ui/react-data-table';
-
+import {InternalLink} from '../../../../components/InternalLink';
+import {LinkToSchemaObject} from '../../../../components/LinkToSchemaObject/LinkToSchemaObject';
+import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
+import routes, {createHref} from '../../../../routes';
+import {getLoadSeverityForShard} from '../../../../store/reducers/tenantOverview/topShards/utils';
 import type {KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import {formatNumber, roundToPrecision} from '../../../../utils/dataFormatters/dataFormatters';
-import {getLoadSeverityForShard} from '../../../../store/reducers/tenantOverview/topShards/utils';
-import {InternalLink} from '../../../../components/InternalLink';
-import routes, {createHref} from '../../../../routes';
 import {getDefaultNodePath} from '../../../Node/NodePages';
-import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
-import {LinkToSchemaObject} from '../../../../components/LinkToSchemaObject/LinkToSchemaObject';
 
 const TOP_SHARDS_COLUMNS_IDS = {
     TabletId: 'TabletId',

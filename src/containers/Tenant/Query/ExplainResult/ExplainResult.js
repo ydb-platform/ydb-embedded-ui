@@ -1,28 +1,25 @@
-import React, {useEffect, useRef, useState} from 'react';
-import cn from 'bem-cn-lite';
-import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
-import JSONTree from 'react-json-inspector';
-import 'react-json-inspector/json-inspector.css';
+import React from 'react';
 
-import {TextOverflow, getYdbPlanNodeShape, getTopology} from '@gravity-ui/paranoid';
+import {TextOverflow, getTopology, getYdbPlanNodeShape} from '@gravity-ui/paranoid';
 import {Loader, RadioButton} from '@gravity-ui/uikit';
+import JSONTree from 'react-json-inspector';
 
 import Divider from '../../../../components/Divider/Divider';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
-
 import {explainVersions} from '../../../../store/reducers/explainQuery';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
-
-import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco/s-expression/constants';
+import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-
+import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco/s-expression/constants';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 
-import {renderExplainNode} from './utils';
+import {getColors, renderExplainNode} from './utils';
 
 import './ExplainResult.scss';
+import 'react-json-inspector/json-inspector.css';
 
 const b = cn('ydb-query-explain-result');
 
@@ -49,30 +46,11 @@ const explainOptions = [
 ];
 
 function GraphRoot(props) {
-    const paranoid = useRef();
+    const paranoid = React.useRef();
 
     const {data, opts, shapes, theme} = props;
 
-    const [componentTheme, updateComponentTheme] = useState(theme);
-
-    useEffect(() => {
-        updateComponentTheme(theme);
-    }, [theme]);
-
-    const render = () => {
-        paranoid.current = getTopology('graphRoot', data, opts, shapes);
-        paranoid.current.render();
-    };
-
-    useEffect(() => {
-        render();
-
-        return () => {
-            paranoid.current = undefined;
-        };
-    }, []);
-
-    useEffect(() => {
+    React.useEffect(() => {
         const graphRoot = document.getElementById('graphRoot');
 
         if (!graphRoot) {
@@ -81,10 +59,14 @@ function GraphRoot(props) {
 
         graphRoot.innerHTML = '';
 
-        render();
-    }, [componentTheme]);
+        paranoid.current = getTopology('graphRoot', data, {...opts, colors: getColors()}, shapes);
+        paranoid.current.render();
+        return () => {
+            paranoid.current = undefined;
+        };
+    }, [theme]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         paranoid.current?.updateData?.(props.data);
     }, [props.data]);
 
@@ -93,15 +75,15 @@ function GraphRoot(props) {
 
 export function ExplainResult(props) {
     const dispatch = useTypedDispatch();
-    const [activeOption, setActiveOption] = useState(ExplainOptionIds.schema);
+    const [activeOption, setActiveOption] = React.useState(ExplainOptionIds.schema);
 
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
 
-    useEffect(() => {
+    React.useEffect(() => {
         return () => {
             dispatch(disableFullscreen());
         };
-    }, []);
+    }, [dispatch]);
 
     const onSelectOption = (tabId) => {
         setActiveOption(tabId);
@@ -162,8 +144,6 @@ export function ExplainResult(props) {
                     value={props.ast}
                     options={EDITOR_OPTIONS}
                     wrappingIndent="indent"
-                    // pass noop otherwise it will throw error
-                    editorWillUnmount={() => {}}
                 />
             </div>
         );

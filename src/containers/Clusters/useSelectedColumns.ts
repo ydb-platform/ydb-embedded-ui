@@ -1,5 +1,5 @@
-import {type Column} from '@gravity-ui/react-data-table';
-import {type TableColumnSetupItem} from '@gravity-ui/uikit/build/esm/components/Table/hoc/withTableSettings/withTableSettings';
+import type {Column} from '@gravity-ui/react-data-table';
+import type {TableColumnSetupItem, TableColumnSetupProps} from '@gravity-ui/uikit';
 
 import {useSetting} from '../../utils/hooks';
 
@@ -30,8 +30,8 @@ export const useSelectedColumns = <T>(
         };
     });
 
-    const setColumns = (value: TableColumnSetupItem[]) => {
-        const selectedColumns = value.filter((el) => el.selected).map((el) => el.id);
+    const setColumns: TableColumnSetupProps['onUpdate'] = (value) => {
+        const selectedColumns = value.filter((el) => el.isSelected).map((el) => el.id);
 
         setSelectedColumnsIds(selectedColumns);
     };

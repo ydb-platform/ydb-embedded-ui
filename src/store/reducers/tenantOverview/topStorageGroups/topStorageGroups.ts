@@ -1,9 +1,10 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
-import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {EVersion} from '../../../../types/api/storage';
+import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {createApiRequest, createRequestActionTypes} from '../../../utils';
 import type {StorageApiRequestParams} from '../../storage/types';
+
 import type {
     TopStorageGroupsAction,
     TopStorageGroupsState,

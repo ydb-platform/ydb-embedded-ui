@@ -1,9 +1,9 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
-import type {JsonHotKeysResponse} from '../../../types/api/hotkeys';
 import type {IResponseError} from '../../../types/api/error';
-
+import type {JsonHotKeysResponse} from '../../../types/api/hotkeys';
 import {createRequestActionTypes} from '../../utils';
+
 import type {HotKeysAction, HotKeysState} from './types';
 
 export const FETCH_HOT_KEYS = createRequestActionTypes('hot_keys', 'FETCH_HOT_KEYS');

@@ -1,10 +1,10 @@
-import block from 'bem-cn-lite';
-
 import {Skeleton} from '@gravity-ui/uikit';
+
+import {cn} from '../../utils/cn';
 
 import './InfoViewerSkeleton.scss';
 
-const b = block('ydb-info-viewer-skeleton');
+const b = cn('ydb-info-viewer-skeleton');
 
 const SkeletonLabel = () => (
     <div className={b('label')}>

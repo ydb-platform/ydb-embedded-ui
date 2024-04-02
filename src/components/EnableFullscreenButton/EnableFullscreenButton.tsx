@@ -1,6 +1,7 @@
 import {Button} from '@gravity-ui/uikit';
-import {useTypedDispatch} from '../../utils/hooks';
+
 import {enableFullscreen} from '../../store/reducers/fullscreen';
+import {useTypedDispatch} from '../../utils/hooks';
 import {Icon} from '../Icon';
 
 interface EnableFullscreenButtonProps {

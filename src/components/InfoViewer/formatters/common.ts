@@ -1,9 +1,7 @@
 import type {TDirEntry} from '../../../types/api/schema';
 import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
-
-import {createInfoFormatter} from '../utils';
-
 import i18n from '../i18n';
+import {createInfoFormatter} from '../utils';
 
 export const formatCommonItem = createInfoFormatter<TDirEntry>({
     values: {

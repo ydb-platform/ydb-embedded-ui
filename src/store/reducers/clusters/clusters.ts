@@ -1,6 +1,6 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
-import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
 
 import type {ClustersAction, ClustersFilters, ClustersState} from './types';
 import {prepareClustersData} from './utils';

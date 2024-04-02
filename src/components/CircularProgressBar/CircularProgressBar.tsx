@@ -1,8 +1,6 @@
-import cn from 'bem-cn-lite';
-import type {ReactNode} from 'react';
-
 import type {MetricStatus} from '../../store/reducers/tenants/types';
 import {normalizeProgress} from '../../store/reducers/tenants/utils';
+import {cn} from '../../utils/cn';
 
 import './CircularProgressBar.scss';
 
@@ -12,7 +10,7 @@ interface CircularProgressBarProps {
     size?: number;
     progress?: number;
     strokeWidth?: number;
-    content?: ReactNode;
+    content?: React.ReactNode;
     status?: MetricStatus;
     circleBgClassName?: string;
 }

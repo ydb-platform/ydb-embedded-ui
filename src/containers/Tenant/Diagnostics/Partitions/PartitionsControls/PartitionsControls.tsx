@@ -1,17 +1,15 @@
-import {useEffect, useMemo, useState} from 'react';
+import React from 'react';
+
+import type {SelectOption, TableColumnSetupProps} from '@gravity-ui/uikit';
+import {Select, TableColumnSetup} from '@gravity-ui/uikit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
-import {TableColumnSetupItem} from '@gravity-ui/uikit/build/esm/components/Table/hoc/withTableSettings/withTableSettings';
-import {Select, SelectOption, TableColumnSetup} from '@gravity-ui/uikit';
-
-import type {ValueOf} from '../../../../../types/common';
-
 import {Search} from '../../../../../components/Search/Search';
-
-import type {PreparedPartitionDataWithHosts} from '../utils/types';
-import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITILES} from '../utils/constants';
-import i18n from '../i18n';
+import type {ValueOf} from '../../../../../types/common';
 import {b} from '../Partitions';
+import i18n from '../i18n';
+import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITILES} from '../utils/constants';
+import type {PreparedPartitionDataWithHosts} from '../utils/types';
 
 interface PartitionsControlsProps {
     consumers: string[] | undefined;
@@ -36,10 +34,10 @@ export const PartitionsControls = ({
     onHiddenColumnsChange,
     initialColumnsIds,
 }: PartitionsControlsProps) => {
-    const [generalSearchValue, setGeneralSearchValue] = useState('');
-    const [partitionIdSearchValue, setPartitionIdSearchValue] = useState('');
+    const [generalSearchValue, setGeneralSearchValue] = React.useState('');
+    const [partitionIdSearchValue, setPartitionIdSearchValue] = React.useState('');
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (!partitions) {
             return;
         }
@@ -80,7 +78,7 @@ export const PartitionsControls = ({
         onSearchChange(filteredPartitions);
     }, [partitionIdSearchValue, generalSearchValue, partitions, onSearchChange]);
 
-    const consumersToSelect = useMemo(() => {
+    const consumersToSelect = React.useMemo(() => {
         const options =
             consumers && consumers.length
                 ? consumers.map((consumer) => ({
@@ -92,7 +90,7 @@ export const PartitionsControls = ({
         return [{value: '', content: i18n('controls.consumerSelector.emptyOption')}, ...options];
     }, [consumers]);
 
-    const columnsToSelect = useMemo(() => {
+    const columnsToSelect = React.useMemo(() => {
         return initialColumnsIds.map((id) => {
             return {
                 title: PARTITIONS_COLUMNS_TITILES[id as ValueOf<typeof PARTITIONS_COLUMNS_IDS>],
@@ -115,16 +113,16 @@ export const PartitionsControls = ({
         setGeneralSearchValue(value);
     };
 
-    const hadleTableColumnsSetupChange = (value: TableColumnSetupItem[]) => {
+    const handleTableColumnsSetupChange: TableColumnSetupProps['onUpdate'] = (value) => {
         const result = [...hiddenColumns];
 
         // Process current set of columns
         // This way we do not remove from hidden these columns, that are not displayed currently
         // The reasons: set of columns differs for partitions with and without consumers
         value.forEach((el) => {
-            if (!el.selected && !hiddenColumns.includes(el.id)) {
+            if (!el.isSelected && !hiddenColumns.includes(el.id)) {
                 result.push(el.id);
-            } else if (el.selected && hiddenColumns.includes(el.id)) {
+            } else if (el.isSelected && hiddenColumns.includes(el.id)) {
                 result.splice(hiddenColumns.indexOf(el.id));
             }
         });
@@ -165,10 +163,10 @@ export const PartitionsControls = ({
             />
             <TableColumnSetup
                 key="TableColumnSetup"
-                popupWidth="242px"
+                popupWidth={242}
                 items={columnsToSelect}
-                showStatus
-                onUpdate={hadleTableColumnsSetupChange}
+                // showStatus
+                onUpdate={handleTableColumnsSetupChange}
             />
         </div>
     );

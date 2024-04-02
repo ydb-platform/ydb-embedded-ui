@@ -1,31 +1,30 @@
-import {useCallback, useEffect} from 'react';
-import {StringParam, useQueryParams} from 'use-query-params';
-import {Helmet} from 'react-helmet-async';
+import React from 'react';
 
 import {Icon} from '@gravity-ui/uikit';
-import ArrowRotateLeftIcon from '@gravity-ui/icons/svgs/arrow-rotate-left.svg';
+import {Helmet} from 'react-helmet-async';
+import {StringParam, useQueryParams} from 'use-query-params';
 
+import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
+import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
+import {PDiskInfo} from '../../components/PDiskInfo/PDiskInfo';
+import {PageMeta} from '../../components/PageMeta/PageMeta';
+import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
+import {selectNodesMap} from '../../store/reducers/nodesList';
 import {
     getPDiskData,
     getPDiskStorage,
     setPDiskDataWasNotLoaded,
 } from '../../store/reducers/pdisk/pdisk';
-import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {selectNodesMap} from '../../store/reducers/nodesList';
-
 import {valueIsDefined} from '../../utils';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {getSeverityColor} from '../../utils/disks/helpers';
-
-import {PageMeta} from '../../components/PageMeta/PageMeta';
-import {PDiskInfo} from '../../components/PDiskInfo/PDiskInfo';
-import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
-import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
-import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import {PDiskGroups} from './PDiskGroups';
-import {pdiskPageCn} from './shared';
 import {pDiskPageKeyset} from './i18n';
+import {pdiskPageCn} from './shared';
+
+import ArrowRotateLeftIcon from '@gravity-ui/icons/svgs/arrow-rotate-left.svg';
 
 import './PDiskPage.scss';
 
@@ -42,11 +41,11 @@ export function PDiskPage() {
         pDiskId: StringParam,
     });
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('pDisk', {nodeId, pDiskId}));
     }, [dispatch, nodeId, pDiskId]);
 
-    const fetchData = useCallback(
+    const fetchData = React.useCallback(
         async (isBackground?: boolean) => {
             if (!isBackground) {
                 dispatch(setPDiskDataWasNotLoaded());

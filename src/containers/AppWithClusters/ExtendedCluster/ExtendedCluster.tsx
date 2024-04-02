@@ -1,26 +1,24 @@
-import block from 'bem-cn-lite';
-
 import {ClipboardButton} from '@gravity-ui/uikit';
-import {MonitoringButton} from '../../../components/MonitoringButton/MonitoringButton';
 
-import type {ETenantType} from '../../../types/api/tenant';
+import {MonitoringButton} from '../../../components/MonitoringButton/MonitoringButton';
 import type {
     AdditionalClusterProps,
     AdditionalTenantsProps,
     AdditionalVersionsProps,
 } from '../../../types/additionalProps';
-import type Cluster from '../../Cluster/Cluster';
 import type {MetaClusterVersion} from '../../../types/api/meta';
-import type {GetMonitoringLink, GetMonitoringClusterLink} from '../../../utils/monitoring';
-
+import type {ETenantType} from '../../../types/api/tenant';
 import {getVersionColors, getVersionMap} from '../../../utils/clusterVersionColors';
-import {removeViewerPathname, getCleanBalancerValue} from '../../../utils/parseBalancer';
+import {cn} from '../../../utils/cn';
+import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../../utils/monitoring';
+import {getCleanBalancerValue, removeViewerPathname} from '../../../utils/parseBalancer';
 import {getBackendFromNodeHost} from '../../../utils/prepareBackend';
+import type Cluster from '../../Cluster/Cluster';
 import {useClusterData} from '../useClusterData';
 
 import './ExtendedCluster.scss';
 
-const b = block('extended-cluster');
+const b = cn('extended-cluster');
 
 const getAdditionalBalancerInfo = (balancer: string) => {
     const cleanedValue = getCleanBalancerValue(balancer);
@@ -30,7 +28,7 @@ const getAdditionalBalancerInfo = (balancer: string) => {
         value: (
             <div className={b('balancer')}>
                 {cleanedValue}
-                <ClipboardButton text={cleanedValue} size={14} className={b('clipboard-button')} />
+                <ClipboardButton text={cleanedValue} size="s" className={b('clipboard-button')} />
             </div>
         ),
     };

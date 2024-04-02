@@ -1,21 +1,18 @@
-import {useCallback} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import {Loader, Button} from '@gravity-ui/uikit';
+import {Button, Loader} from '@gravity-ui/uikit';
 
-import type {EPathType} from '../../../../types/api/schema';
+import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {Icon} from '../../../../components/Icon';
+import {QueryResultTable} from '../../../../components/QueryResultTable';
 import {sendQuery, setQueryOptions} from '../../../../store/reducers/preview';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
-import {prepareQueryError} from '../../../../utils/query';
+import type {EPathType} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
 import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-
-import {Icon} from '../../../../components/Icon';
-import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
-import {QueryResultTable} from '../../../../components/QueryResultTable';
-import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
-
+import {prepareQueryError} from '../../../../utils/query';
 import {isExternalTable, isTableType} from '../../utils/schema';
-
 import i18n from '../i18n';
 
 import './Preview.scss';
@@ -34,8 +31,8 @@ export const Preview = ({database, type}: PreviewProps) => {
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
 
-    const sendQueryForPreview = useCallback(
-        (isBackground) => {
+    const sendQueryForPreview = React.useCallback(
+        (isBackground: boolean) => {
             if (!isTableType(type)) {
                 return;
             }

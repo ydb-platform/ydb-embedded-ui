@@ -1,15 +1,13 @@
-import {useMemo} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-import type {KeyValueRow} from '../../../../../types/api/query';
 import {InfoViewer} from '../../../../../components/InfoViewer';
-
+import type {KeyValueRow} from '../../../../../types/api/query';
+import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
+import {cn} from '../../../../../utils/cn';
 import {getEntityName} from '../../../utils';
 
-import {prepareTableInfo} from './prepareTableInfo';
-
 import i18n from './i18n';
+import {prepareTableInfo} from './prepareTableInfo';
 
 import './TableInfo.scss';
 
@@ -29,7 +27,7 @@ export const TableInfo = ({data, type, olapStats}: TableInfoProps) => {
         tableStatsInfo = [],
         tabletMetricsInfo = [],
         partitionConfigInfo = [],
-    } = useMemo(() => prepareTableInfo(data, type, olapStats), [data, type, olapStats]);
+    } = React.useMemo(() => prepareTableInfo(data, type, olapStats), [data, type, olapStats]);
 
     return (
         <div className={b()}>

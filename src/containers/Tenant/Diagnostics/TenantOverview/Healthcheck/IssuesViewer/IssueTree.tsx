@@ -1,13 +1,12 @@
-import {useCallback, useState} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
+
 import _omit from 'lodash/omit';
-
 import JSONTree from 'react-json-inspector';
-
 import {TreeView} from 'ydb-ui-components';
 
-import {IssuesTree} from '../../../../../../store/reducers/healthcheckInfo/types';
+import type {IssuesTree} from '../../../../../../store/reducers/healthcheckInfo/types';
 import {hcStatusToColorFlag} from '../../../../../../store/reducers/healthcheckInfo/utils';
+import {cn} from '../../../../../../utils/cn';
 
 import {IssueTreeItem} from './IssueTreeItem';
 
@@ -20,9 +19,26 @@ interface IssuesViewerProps {
 }
 
 const IssueTree = ({issueTree}: IssuesViewerProps) => {
-    const [collapsedIssues, setCollapsedIssues] = useState<Record<string, boolean>>({});
+    const [collapsedIssues, setCollapsedIssues] = React.useState<Record<string, boolean>>({});
 
-    const renderTree = useCallback(
+    const renderInfoPanel = React.useCallback((info?: object) => {
+        if (!info) {
+            return null;
+        }
+
+        return (
+            <div className={b('info-panel')}>
+                <JSONTree
+                    data={info}
+                    search={false}
+                    isExpanded={() => true}
+                    className={b('inspector')}
+                />
+            </div>
+        );
+    }, []);
+
+    const renderTree = React.useCallback(
         (data: IssuesTree[]) => {
             return data.map((item) => {
                 const {id} = item;
@@ -60,27 +76,7 @@ const IssueTree = ({issueTree}: IssuesViewerProps) => {
                 );
             });
         },
-        [issueTree, collapsedIssues],
-    );
-
-    const renderInfoPanel = useCallback(
-        (info) => {
-            if (!info) {
-                return null;
-            }
-
-            return (
-                <div className={b('info-panel')}>
-                    <JSONTree
-                        data={info}
-                        search={false}
-                        isExpanded={() => true}
-                        className={b('inspector')}
-                    />
-                </div>
-            );
-        },
-        [issueTree],
+        [collapsedIssues, renderInfoPanel],
     );
 
     return (

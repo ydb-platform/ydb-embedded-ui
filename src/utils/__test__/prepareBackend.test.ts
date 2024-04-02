@@ -1,4 +1,4 @@
-import {prepareHost, getBackendFromNodeHost, getBackendFromRawNodeData} from '../prepareBackend';
+import {getBackendFromNodeHost, getBackendFromRawNodeData, prepareHost} from '../prepareBackend';
 
 describe('prepareHost', () => {
     it('should add vm prefix to cloud din nodes', () => {

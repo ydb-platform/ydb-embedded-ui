@@ -1,11 +1,11 @@
-import {Selector, createSelector} from '@reduxjs/toolkit';
+import type {Selector} from '@reduxjs/toolkit';
+import {createSelector} from '@reduxjs/toolkit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
-import {EFlag} from '../../../types/api/enums';
-
 import type {RootState} from '../..';
-import type {ProblemFilterValue} from '../settings/types';
+import {EFlag} from '../../../types/api/enums';
 import {ProblemFilterValues, selectProblemFilter} from '../settings/settings';
+import type {ProblemFilterValue} from '../settings/types';
 
 import type {PreparedTenant, TenantsStateSlice} from './types';
 

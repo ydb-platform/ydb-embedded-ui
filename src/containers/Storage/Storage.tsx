@@ -1,53 +1,52 @@
-import {useCallback, useEffect} from 'react';
+import React from 'react';
 
 import {AccessDenied} from '../../components/Errors/403';
-import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {ResponseError} from '../../components/Errors/ResponseError';
-
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import type {NodesSortParams} from '../../store/reducers/nodes/types';
+import {selectNodesMap} from '../../store/reducers/nodesList';
+import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
+import {
+    selectEntitiesCount,
+    selectFilteredGroups,
+    selectFilteredNodes,
+    selectGroupsSortParams,
+    selectNodesSortParams,
+    selectUsageFilterOptions,
+} from '../../store/reducers/storage/selectors';
+import {
+    getStorageGroupsInfo,
+    getStorageNodesInfo,
+    setDataWasNotLoaded,
+    setGroupsSortParams,
+    setInitialState,
+    setNodesSortParams,
+    setNodesUptimeFilter,
+    setStorageTextFilter,
+    setStorageType,
+    setUsageFilter,
+    setVisibleEntities,
+} from '../../store/reducers/storage/storage';
 import type {
     StorageSortParams,
     StorageType,
     VisibleEntities,
 } from '../../store/reducers/storage/types';
-import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import {
-    setInitialState,
-    setVisibleEntities,
-    setStorageTextFilter,
-    setUsageFilter,
-    setStorageType,
-    setNodesUptimeFilter,
-    setDataWasNotLoaded,
-    getStorageNodesInfo,
-    getStorageGroupsInfo,
-    setNodesSortParams,
-    setGroupsSortParams,
-} from '../../store/reducers/storage/storage';
-import {
-    selectFilteredGroups,
-    selectFilteredNodes,
-    selectEntitiesCount,
-    selectUsageFilterOptions,
-    selectNodesSortParams,
-    selectGroupsSortParams,
-} from '../../store/reducers/storage/selectors';
-import {VISIBLE_ENTITIES, STORAGE_TYPES} from '../../store/reducers/storage/constants';
-import {selectNodesMap} from '../../store/reducers/nodesList';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
     useAutofetcher,
     useNodesRequestParams,
     useStorageRequestParams,
     useTableSort,
-    useTypedSelector,
     useTypedDispatch,
+    useTypedSelector,
 } from '../../utils/hooks';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 
+import {StorageControls} from './StorageControls/StorageControls';
 import {StorageGroups} from './StorageGroups/StorageGroups';
 import {StorageNodes} from './StorageNodes/StorageNodes';
-import {StorageControls} from './StorageControls/StorageControls';
 import {b} from './shared';
 
 import './Storage.scss';
@@ -84,7 +83,7 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
     const isNodePage = nodeId !== undefined;
     const storageType = isNodePage ? STORAGE_TYPES.groups : type;
 
-    useEffect(() => {
+    React.useEffect(() => {
         return () => {
             // Clean data on component unmount
             dispatch(setInitialState());
@@ -108,7 +107,7 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
         dispatch(setGroupsSortParams(params as StorageSortParams)),
     );
 
-    const fetchData = useCallback(
+    const fetchData = React.useCallback(
         (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded());
@@ -165,7 +164,7 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
 
     const renderDataTable = () => {
         return (
-            <>
+            <React.Fragment>
                 {storageType === STORAGE_TYPES.groups && (
                     <StorageGroups
                         visibleEntities={visibleEntities}
@@ -189,7 +188,7 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
                         handleSort={handleNodesSort}
                     />
                 )}
-            </>
+            </React.Fragment>
         );
     };
 

@@ -1,6 +1,6 @@
 import type {TCdcStreamDescription} from './cdcStream';
-import type {TIndexDescription} from './tableIndex';
 import type {EColumnCodec, EUnit, TColumnDescription, TPathID, TStorageSettings} from './shared';
+import type {TIndexDescription} from './tableIndex';
 
 export interface TTableDescription {
     Name?: string;

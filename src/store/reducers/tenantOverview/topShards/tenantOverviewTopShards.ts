@@ -2,8 +2,9 @@ import type {Reducer} from '@reduxjs/toolkit';
 
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../../../utils/query';
-import {createRequestActionTypes, createApiRequest} from '../../../utils';
-import {TenantOverviewTopShardsAction, TenantOverviewTopShardsState} from './types';
+import {createApiRequest, createRequestActionTypes} from '../../../utils';
+
+import type {TenantOverviewTopShardsAction, TenantOverviewTopShardsState} from './types';
 
 export const FETCH_TENANT_OVERVIEW_TOP_SHARDS = createRequestActionTypes(
     'tenantOverviewTopShards',

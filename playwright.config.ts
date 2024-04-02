@@ -1,4 +1,5 @@
-import {PlaywrightTestConfig, devices} from '@playwright/test';
+import type {PlaywrightTestConfig} from '@playwright/test';
+import {devices} from '@playwright/test';
 
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL;
 

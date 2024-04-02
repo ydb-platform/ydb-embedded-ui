@@ -1,7 +1,8 @@
 import {Button} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
-import {TIMEFRAMES, type TimeFrame} from '../../utils/timeframes';
+import {TIMEFRAMES} from '../../utils/timeframes';
+import type {TimeFrame} from '../../utils/timeframes';
 
 import './TimeFrameSelector.scss';
 

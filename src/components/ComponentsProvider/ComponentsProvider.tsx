@@ -1,4 +1,5 @@
 import React from 'react';
+
 import type {ComponentsRegistry} from './componentsRegistry';
 
 const componentsStoreContext = React.createContext<ComponentsRegistry | undefined>(undefined);

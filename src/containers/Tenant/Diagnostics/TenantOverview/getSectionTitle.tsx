@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {InternalLink} from '../../../../components/InternalLink/InternalLink';
 
 import i18n from './i18n';
@@ -18,9 +20,9 @@ export const getSectionTitle = ({
 }: GetSectionTitleParams) => {
     if (link) {
         return (
-            <>
+            <React.Fragment>
                 {prefix} <InternalLink to={link}>{entity}</InternalLink> {postfix}
-            </>
+            </React.Fragment>
         );
     }
 

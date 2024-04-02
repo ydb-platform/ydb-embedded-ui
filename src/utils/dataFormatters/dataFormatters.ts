@@ -1,14 +1,14 @@
 import {dateTimeParse} from '@gravity-ui/date-utils';
 
 import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
-import {DAY_IN_SECONDS, GIGABYTE} from '../constants';
-import {configuredNumeral} from '../numeral';
-import {isNumeric} from '../utils';
 import {
-    type BytesSizes,
     formatBytes as formatBytesCustom,
     getSizeWithSignificantDigits,
 } from '../bytesParsers/formatBytes';
+import type {BytesSizes} from '../bytesParsers/formatBytes';
+import {DAY_IN_SECONDS, GIGABYTE} from '../constants';
+import {configuredNumeral} from '../numeral';
+import {isNumeric} from '../utils';
 
 import i18n from './i18n';
 

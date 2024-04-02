@@ -1,11 +1,12 @@
-import {ReactNode, useRef, useState} from 'react';
+import React from 'react';
 
-import {Popup, PopupProps} from '@gravity-ui/uikit';
+import type {PopupProps} from '@gravity-ui/uikit';
+import {Popup} from '@gravity-ui/uikit';
 
 interface ContentWithPopupProps extends PopupProps {
-    content: ReactNode;
+    content: React.ReactNode;
     className?: string;
-    children?: ReactNode;
+    children?: React.ReactNode;
 }
 
 export const ContentWithPopup = ({
@@ -16,8 +17,8 @@ export const ContentWithPopup = ({
     placement = ['top', 'bottom'],
     ...props
 }: ContentWithPopupProps) => {
-    const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const anchor = useRef(null);
+    const [isPopupVisible, setIsPopupVisible] = React.useState(false);
+    const anchor = React.useRef(null);
 
     const showPopup = () => {
         setIsPopupVisible(true);
@@ -28,7 +29,7 @@ export const ContentWithPopup = ({
     };
 
     return (
-        <>
+        <React.Fragment>
             <Popup
                 anchorRef={anchor}
                 open={isPopupVisible}
@@ -46,6 +47,6 @@ export const ContentWithPopup = ({
             >
                 {children}
             </span>
-        </>
+        </React.Fragment>
     );
 };

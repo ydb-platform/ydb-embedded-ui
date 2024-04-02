@@ -1,12 +1,13 @@
 import {Icon} from '@gravity-ui/uikit';
 
+import {EFlag} from '../../types/api/enums';
+import {cn} from '../../utils/cn';
+
 import CircleExclamationFillIcon from '@gravity-ui/icons/svgs/circle-exclamation-fill.svg';
 import CircleInfoFillIcon from '@gravity-ui/icons/svgs/circle-info-fill.svg';
 import CircleXmarkFillIcon from '@gravity-ui/icons/svgs/circle-xmark-fill.svg';
 import TriangleExclamationFillIcon from '@gravity-ui/icons/svgs/triangle-exclamation-fill.svg';
 
-import {EFlag} from '../../types/api/enums';
-import {cn} from '../../utils/cn';
 import './StatusIcon.scss';
 
 const b = cn('ydb-status-icon');

@@ -1,10 +1,12 @@
-import {FormEvent, useState} from 'react';
-import cn from 'bem-cn-lite';
-import {Dialog} from '@gravity-ui/uikit';
+import React from 'react';
+
 import {CircleXmarkFill} from '@gravity-ui/icons';
+import {Dialog} from '@gravity-ui/uikit';
 
 import type {IResponseError} from '../../types/api/error';
+import {cn} from '../../utils/cn';
 import {Icon} from '../Icon';
+
 import {criticalActionDialogKeyset} from './i18n';
 
 import './CriticalActionDialog.scss';
@@ -39,10 +41,10 @@ export function CriticalActionDialog<T>({
     onConfirmActionSuccess,
     onConfirmActionError,
 }: CriticalActionDialogProps<T>) {
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<IResponseError>();
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [error, setError] = React.useState<IResponseError>();
 
-    const onSubmit = async (e: FormEvent) => {
+    const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
@@ -63,7 +65,7 @@ export function CriticalActionDialog<T>({
     const renderDialogContent = () => {
         if (error) {
             return (
-                <>
+                <React.Fragment>
                     <Dialog.Body className={b('body')}>
                         <span className={b('error-icon')}>
                             <CircleXmarkFill width="24" height="22" />
@@ -77,7 +79,7 @@ export function CriticalActionDialog<T>({
                         textButtonCancel={criticalActionDialogKeyset('button-close')}
                         onClickButtonCancel={onClose}
                     />
-                </>
+                </React.Fragment>
             );
         }
 

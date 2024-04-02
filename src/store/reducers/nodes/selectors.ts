@@ -1,14 +1,15 @@
-import {Selector, createSelector} from '@reduxjs/toolkit';
+import type {Selector} from '@reduxjs/toolkit';
+import {createSelector} from '@reduxjs/toolkit';
 
 import {EFlag} from '../../../types/api/enums';
-import {calcUptimeInSeconds} from '../../../utils/dataFormatters/dataFormatters';
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
-import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {calcUptimeInSeconds} from '../../../utils/dataFormatters/dataFormatters';
 import {prepareSearchValue} from '../../../utils/filters';
-
-import type {ProblemFilterValue} from '../settings/types';
-import type {NodesPreparedEntity, NodesStateSlice} from './types';
+import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {ProblemFilterValues} from '../settings/settings';
+import type {ProblemFilterValue} from '../settings/types';
+
+import type {NodesPreparedEntity, NodesStateSlice} from './types';
 
 // ==== Filters ====
 

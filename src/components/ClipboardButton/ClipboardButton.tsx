@@ -1,12 +1,12 @@
+import type {ButtonProps, CopyToClipboardStatus} from '@gravity-ui/uikit';
 import {
     Button,
-    ButtonProps,
     ClipboardIcon,
     CopyToClipboard as CopyToClipboardUiKit,
-    CopyToClipboardStatus,
     Tooltip,
 } from '@gravity-ui/uikit';
-import cn from 'bem-cn-lite';
+
+import {cn} from '../../utils/cn';
 
 const b = cn('clipboard-button');
 
@@ -27,7 +27,7 @@ function InnerButton({
 }: Omit<ClipboardButtonProps, 'text'> & {status: CopyToClipboardStatus}) {
     return (
         <Tooltip
-            content={status === CopyToClipboardStatus.Success ? 'Copied!' : title || 'Copy'}
+            content={status === 'success' ? 'Copied!' : title || 'Copy'}
             /**
              * Auto-placement has a bug with text changing.
              * @link https://github.com/ydb-platform/ydb-embedded-ui/pull/648#discussion_r1453530092

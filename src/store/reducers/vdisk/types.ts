@@ -2,6 +2,7 @@ import type {IResponseError} from '../../../types/api/error';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import type {ApiRequestAction} from '../../utils';
 import type {PreparedStorageGroup} from '../storage/types';
+
 import type {FETCH_VDISK, setVDiskDataWasNotLoaded} from './vdisk';
 
 export type VDiskGroup = Partial<PreparedStorageGroup>;

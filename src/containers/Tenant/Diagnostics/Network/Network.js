@@ -1,23 +1,22 @@
 import React from 'react';
-import cn from 'bem-cn-lite';
+
+import {Checkbox, Loader} from '@gravity-ui/uikit';
+import reduce from 'lodash/reduce';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import reduce from 'lodash/reduce';
-
 import {Link} from 'react-router-dom';
-import {Loader, Checkbox} from '@gravity-ui/uikit';
 
-import NodeNetwork from './NodeNetwork/NodeNetwork';
 import {Icon} from '../../../../components/Icon';
-import {ProblemFilter} from '../../../../components/ProblemFilter';
 import {Illustration} from '../../../../components/Illustration';
-
+import {ProblemFilter} from '../../../../components/ProblemFilter';
 import {getNetworkInfo, setDataWasNotLoaded} from '../../../../store/reducers/network/network';
+import {ProblemFilterValues, changeFilter} from '../../../../store/reducers/settings/settings';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
-import {changeFilter, ProblemFilterValues} from '../../../../store/reducers/settings/settings';
 import {AutoFetcher} from '../../../../utils/autofetcher';
+import {cn} from '../../../../utils/cn';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 
+import NodeNetwork from './NodeNetwork/NodeNetwork';
 import {getConnectedNodesCount} from './utils';
 
 import './Network.scss';

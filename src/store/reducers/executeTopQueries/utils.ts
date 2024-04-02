@@ -1,4 +1,4 @@
-import {ITopQueriesFilters} from './types';
+import type {ITopQueriesFilters} from './types';
 
 const endTimeColumn = 'EndTime';
 const intervalEndColumn = 'IntervalEnd';

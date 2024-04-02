@@ -1,5 +1,4 @@
 import type {TClusterInfo} from '../../types/api/cluster';
-
 import type {MetaCluster} from '../../types/api/meta';
 
 export const parseMetaCluster = (data: MetaCluster): TClusterInfo => {

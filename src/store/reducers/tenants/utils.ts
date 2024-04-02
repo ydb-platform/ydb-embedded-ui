@@ -3,6 +3,7 @@ import type {TTenant} from '../../../types/api/tenant';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {formatCPUWithLabel} from '../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../utils/utils';
+
 import {METRIC_STATUS} from './contants';
 
 const getControlPlaneValue = (tenant: TTenant) => {

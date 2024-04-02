@@ -1,35 +1,34 @@
-import {useEffect, useMemo, useRef} from 'react';
-import {Redirect, Switch, Route, useLocation, useRouteMatch} from 'react-router';
-import {Helmet} from 'react-helmet-async';
-import cn from 'bem-cn-lite';
-import qs from 'qs';
+import React from 'react';
 
 import {Skeleton, Tabs} from '@gravity-ui/uikit';
+import qs from 'qs';
+import {Helmet} from 'react-helmet-async';
+import {Redirect, Route, Switch, useLocation, useRouteMatch} from 'react-router';
 
-import type {
-    AdditionalClusterProps,
-    AdditionalTenantsProps,
-    AdditionalVersionsProps,
-    AdditionalNodesProps,
-} from '../../types/additionalProps';
+import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
+import {InternalLink} from '../../components/InternalLink';
 import routes, {getLocationObjectFromHref} from '../../routes';
-
-import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {getClusterInfo, updateDefaultClusterTab} from '../../store/reducers/cluster/cluster';
 import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
-import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../../utils/versions';
-import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../utils/hooks';
-
-import {InternalLink} from '../../components/InternalLink';
-import {Tenants} from '../Tenants/Tenants';
-import {StorageWrapper} from '../Storage/StorageWrapper';
-import {NodesWrapper} from '../Nodes/NodesWrapper';
-import {Versions} from '../Versions/Versions';
-import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
+import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
+import type {
+    AdditionalClusterProps,
+    AdditionalNodesProps,
+    AdditionalTenantsProps,
+    AdditionalVersionsProps,
+} from '../../types/additionalProps';
+import {cn} from '../../utils/cn';
 import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../../utils/versions';
+import {NodesWrapper} from '../Nodes/NodesWrapper';
+import {StorageWrapper} from '../Storage/StorageWrapper';
+import {Tenants} from '../Tenants/Tenants';
+import {Versions} from '../Versions/Versions';
 
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';
-import {ClusterTab, clusterTabs, clusterTabsIds, getClusterPath, isClusterTab} from './utils';
+import type {ClusterTab} from './utils';
+import {clusterTabs, clusterTabsIds, getClusterPath, isClusterTab} from './utils';
 
 import './Cluster.scss';
 
@@ -48,7 +47,7 @@ function Cluster({
     additionalNodesProps,
     additionalVersionsProps,
 }: ClusterProps) {
-    const container = useRef<HTMLDivElement>(null);
+    const container = React.useRef<HTMLDivElement>(null);
 
     const dispatch = useTypedDispatch();
 
@@ -77,7 +76,7 @@ function Cluster({
 
     const infoLoading = (clusterLoading && !clusterWasLoaded) || (nodesLoading && !nodesWasLoaded);
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(getClusterNodes());
     }, [dispatch]);
 
@@ -87,18 +86,18 @@ function Cluster({
         true,
     );
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('cluster', {}));
     }, [dispatch, Name]);
 
-    const versionToColor = useMemo(() => {
+    const versionToColor = React.useMemo(() => {
         if (additionalVersionsProps?.getVersionToColorMap) {
             return additionalVersionsProps?.getVersionToColorMap();
         }
         return parseVersionsToVersionToColorMap(cluster?.Versions);
     }, [additionalVersionsProps, cluster]);
 
-    const versionsValues = useMemo(() => {
+    const versionsValues = React.useMemo(() => {
         return parseNodesToVersionsValues(nodes, versionToColor);
     }, [nodes, versionToColor]);
 
@@ -118,7 +117,10 @@ function Cluster({
     };
 
     const clusterTitle = cluster?.Name ?? clusterName ?? CLUSTER_DEFAULT_TITLE;
-    const activeTab = useMemo(() => clusterTabs.find(({id}) => id === activeTabId), [activeTabId]);
+    const activeTab = React.useMemo(
+        () => clusterTabs.find(({id}) => id === activeTabId),
+        [activeTabId],
+    );
 
     return (
         <div className={b()} ref={container}>
@@ -228,7 +230,7 @@ function useClusterTab() {
         activeTab = defaultTab;
     }
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (activeTab !== defaultTab) {
             dispatch(updateDefaultClusterTab(activeTab));
         }

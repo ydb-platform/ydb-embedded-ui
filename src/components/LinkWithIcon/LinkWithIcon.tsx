@@ -1,13 +1,14 @@
-import block from 'bem-cn-lite';
-
-import {Link} from '@gravity-ui/uikit';
+import React from 'react';
 
 import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
+import {Link} from '@gravity-ui/uikit';
 
+import {cn} from '../../utils/cn';
 import {InternalLink} from '../InternalLink';
+
 import './LinkWithIcon.scss';
 
-const b = block('ydb-link-with-icon');
+const b = cn('ydb-link-with-icon');
 
 interface ExternalLinkWithIconProps {
     title: string;
@@ -17,11 +18,11 @@ interface ExternalLinkWithIconProps {
 
 export const LinkWithIcon = ({title, url, external = true}: ExternalLinkWithIconProps) => {
     const linkContent = (
-        <>
+        <React.Fragment>
             {title}
             {'\u00a0'}
             <ArrowUpRightFromSquare />
-        </>
+        </React.Fragment>
     );
 
     if (external) {

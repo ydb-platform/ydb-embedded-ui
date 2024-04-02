@@ -1,8 +1,10 @@
 import type {Dispatch, Reducer} from '@reduxjs/toolkit';
 
+import type {ClusterTab} from '../../../containers/Cluster/utils';
+import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
 import {DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
-import {clusterTabsIds, isClusterTab, ClusterTab} from '../../../containers/Cluster/utils';
-import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
+
 import type {ClusterAction, ClusterState} from './types';
 import {createSelectClusterGroupsQuery, parseGroupsStatsQueryResponse} from './utils';
 

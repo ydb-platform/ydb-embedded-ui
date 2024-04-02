@@ -1,3 +1,3 @@
-import cn from 'bem-cn-lite';
+import {cn} from '../../utils/cn';
 
 export const b = cn('ydb-virtual-table');

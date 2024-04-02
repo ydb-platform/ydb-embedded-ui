@@ -2,10 +2,10 @@ import type {Reducer} from '@reduxjs/toolkit';
 
 import {EVersion} from '../../../types/api/storage';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
-
-import {createRequestActionTypes, createApiRequest} from '../../utils';
-
+import {createApiRequest, createRequestActionTypes} from '../../utils';
 import type {NodesApiRequestParams, NodesSortParams} from '../nodes/types';
+
+import {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
 import type {
     StorageAction,
     StorageApiRequestParams,
@@ -14,7 +14,6 @@ import type {
     StorageType,
     VisibleEntities,
 } from './types';
-import {VISIBLE_ENTITIES, STORAGE_TYPES} from './constants';
 import {prepareStorageGroupsResponse, prepareStorageNodesResponse} from './utils';
 
 export const FETCH_STORAGE = createRequestActionTypes('storage', 'FETCH_STORAGE');

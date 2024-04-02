@@ -1,21 +1,21 @@
 import {useLocation} from 'react-router';
-import block from 'bem-cn-lite';
 
-import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {useTypedSelector} from '../../../../utils/hooks';
-import {createExternalUILink, parseQuery} from '../../../../routes';
-import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
-import {InfoViewer, InfoViewerItem} from '../../../../components/InfoViewer';
-import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-
+import type {InfoViewerItem} from '../../../../components/InfoViewer';
+import {InfoViewer} from '../../../../components/InfoViewer';
+import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
+import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
+import {createExternalUILink, parseQuery} from '../../../../routes';
+import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
+import {useTypedSelector} from '../../../../utils/hooks';
 import {getEntityName} from '../../utils';
-
 import i18n from '../i18n';
+
 import './ExternalTable.scss';
 
-const b = block('ydb-external-table-info');
+const b = cn('ydb-external-table-info');
 
 const prepareExternalTableSummary = (
     data: TEvDescribeSchemeResult,

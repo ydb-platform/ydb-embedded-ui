@@ -1,19 +1,21 @@
-import {Selector, createSelector} from '@reduxjs/toolkit';
-
 import type {OrderType} from '@gravity-ui/react-data-table';
 import {ASCENDING, DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
+import type {Selector} from '@reduxjs/toolkit';
+import {createSelector} from '@reduxjs/toolkit';
 
-import {NODES_SORT_VALUES, type NodesSortValue} from '../../../utils/nodes';
-import {STORAGE_SORT_VALUES, type StorageSortValue, getUsage} from '../../../utils/storage';
-
+import {NODES_SORT_VALUES} from '../../../utils/nodes';
+import type {NodesSortValue} from '../../../utils/nodes';
+import {STORAGE_SORT_VALUES, getUsage} from '../../../utils/storage';
+import type {StorageSortValue} from '../../../utils/storage';
 import {filterNodesByUptime} from '../nodes/selectors';
+
+import {VISIBLE_ENTITIES} from './constants';
 import type {
     PreparedStorageGroup,
     PreparedStorageNode,
     StorageStateSlice,
     UsageFilter,
 } from './types';
-import {VISIBLE_ENTITIES} from './constants';
 
 // ==== Filters ====
 

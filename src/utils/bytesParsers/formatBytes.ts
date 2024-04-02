@@ -1,5 +1,5 @@
-import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
 import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE} from '../constants';
+import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
 import {isNumeric} from '../utils';
 
 import i18n from './i18n';

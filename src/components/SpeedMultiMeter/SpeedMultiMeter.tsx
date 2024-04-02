@@ -1,12 +1,14 @@
-import {useState} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
+
 import {Popover} from '@gravity-ui/uikit';
 
-import {formatBytes, BytesSizes, ProcessSpeedStats} from '../../utils/bytesParsers';
-
-import './SpeedMultiMeter.scss';
+import type {BytesSizes, ProcessSpeedStats} from '../../utils/bytesParsers';
+import {formatBytes} from '../../utils/bytesParsers';
+import {cn} from '../../utils/cn';
 
 import i18n from './i18n';
+
+import './SpeedMultiMeter.scss';
 
 const b = cn('speed-multimeter');
 
@@ -35,11 +37,11 @@ export const SpeedMultiMeter = ({
         {value: formatValue(perDay), label: i18n('perDay')},
     ];
 
-    const [valueToDisplay, setValueToDisplay] = useState(perMinute);
-    const [highlightedValueIndex, setHighlightedValueIndex] = useState(withValue ? 0 : undefined);
-    const [highlightedContainerIndex, setHighlightedContainerIndex] = useState<
-        number | undefined
-    >();
+    const [valueToDisplay, setValueToDisplay] = React.useState(perMinute);
+    const [highlightedValueIndex, setHighlightedValueIndex] = React.useState(
+        withValue ? 0 : undefined,
+    );
+    const [highlightedContainerIndex, setHighlightedContainerIndex] = React.useState<number>();
 
     const onEnterDiagram = (values: number[], index: number) => {
         setValueToDisplay(values[index]);

@@ -26,7 +26,7 @@ export function bytesToSize(bytes) {
         return '';
     }
     if (bytes < base) return String(bytes);
-    let i = parseInt(Math.floor(Math.log(bytes) / Math.log(base)));
+    let i = parseInt(Math.floor(Math.log(bytes) / Math.log(base)), 10);
     if (i >= sizes.length) {
         i = sizes.length - 1;
     }

@@ -4,11 +4,11 @@ import type {
     PartitionStats,
 } from '../../../types/api/consumer';
 import type {PartitionInfo as TopicPartitionInfo} from '../../../types/api/topic';
-
 import {convertBytesObjectToSpeed} from '../../../utils/bytesParsers';
 import {parseLag, parseTimestampToIdleTime} from '../../../utils/timeParsers';
 import {isNumeric} from '../../../utils/utils';
-import {PreparedPartitionData} from './types';
+
+import type {PreparedPartitionData} from './types';
 
 const prepareGeneralPartitionStats = (partitionStats: PartitionStats | undefined) => {
     const {

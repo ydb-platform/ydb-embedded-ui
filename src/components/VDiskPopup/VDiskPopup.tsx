@@ -1,19 +1,20 @@
-import {useMemo} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import {Label, Popup, PopupProps} from '@gravity-ui/uikit';
+import type {PopupProps} from '@gravity-ui/uikit';
+import {Label, Popup} from '@gravity-ui/uikit';
 
-import type {NodesMap} from '../../types/store/nodesList';
 import {EFlag} from '../../types/api/enums';
 import type {TVDiskStateInfo} from '../../types/api/vdisk';
-import type {UnavailableDonor} from '../../utils/disks/types';
-import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
-import {bytesToGB, bytesToSpeed} from '../../utils/utils';
-import {isFullVDiskData} from '../../utils/disks/helpers';
+import type {NodesMap} from '../../types/store/nodesList';
+import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-
+import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {isFullVDiskData} from '../../utils/disks/helpers';
+import type {UnavailableDonor} from '../../utils/disks/types';
+import {bytesToGB, bytesToSpeed} from '../../utils/utils';
+import type {InfoViewerItem} from '../InfoViewer';
+import {InfoViewer} from '../InfoViewer';
 import {preparePDiskData} from '../PDiskPopup/PDiskPopup';
-import {InfoViewer, InfoViewerItem} from '../InfoViewer';
 
 import './VDiskPopup.scss';
 
@@ -134,11 +135,11 @@ interface VDiskPopupProps extends PopupProps {
 export const VDiskPopup = ({data, nodes, ...props}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
 
-    const vdiskInfo = useMemo(
+    const vdiskInfo = React.useMemo(
         () => (isFullData ? prepareVDiskData(data) : prepareUnavailableVDiskData(data)),
         [data, isFullData],
     );
-    const pdiskInfo = useMemo(
+    const pdiskInfo = React.useMemo(
         () => isFullData && data.PDisk && preparePDiskData(data.PDisk, nodes),
         [data, nodes, isFullData],
     );

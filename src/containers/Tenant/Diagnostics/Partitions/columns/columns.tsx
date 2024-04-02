@@ -1,12 +1,20 @@
-import DataTable, {Column} from '@gravity-ui/react-data-table';
-import block from 'bem-cn-lite';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
-import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
-import {getDefaultNodePath} from '../../../../Node/NodePages';
+import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {cn} from '../../../../../utils/cn';
 import {formatBytes, formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../../../utils/utils';
-
+import {getDefaultNodePath} from '../../../../Node/NodePages';
+import {
+    MultilineHeader,
+    ReadLagsHeader,
+    ReadSessionHeader,
+    UncommitedMessagesHeader,
+    UnreadMessagesHeader,
+    WriteLagsHeader,
+} from '../Headers';
 import {
     PARTITIONS_COLUMNS_IDS,
     PARTITIONS_COLUMNS_TITILES,
@@ -18,18 +26,9 @@ import {
 } from '../utils/constants';
 import type {PreparedPartitionDataWithHosts} from '../utils/types';
 
-import {
-    MultilineHeader,
-    ReadLagsHeader,
-    ReadSessionHeader,
-    UncommitedMessagesHeader,
-    UnreadMessagesHeader,
-    WriteLagsHeader,
-} from '../Headers';
-
 import './Columns.scss';
 
-const b = block('ydb-diagnostics-partitions-columns');
+const b = cn('ydb-diagnostics-partitions-columns');
 
 export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
@@ -250,6 +249,6 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
 // These columns will be empty and should not be displayed
 export const generalColumns = allColumns.filter((column) => {
     return generalPartitionColumnsIds.includes(
-        column.name as typeof generalPartitionColumnsIds[number],
+        column.name as (typeof generalPartitionColumnsIds)[number],
     );
 });

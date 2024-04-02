@@ -1,8 +1,8 @@
-import {test, expect} from '@playwright/test';
+import {expect, test} from '@playwright/test';
 
 import {tenantName} from '../../../utils/constants';
-
 import {TenantPage} from '../TenantPage';
+
 import {QueryEditor} from './QueryEditor';
 
 test.describe('Test Query Editor', async () => {

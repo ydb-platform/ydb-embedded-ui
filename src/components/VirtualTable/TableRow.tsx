@@ -1,16 +1,14 @@
-import {type ReactNode} from 'react';
-
 import {Skeleton} from '@gravity-ui/uikit';
 
-import type {AlignType, Column, GetRowClassName} from './types';
 import {DEFAULT_ALIGN} from './constants';
 import {b} from './shared';
+import type {AlignType, Column, GetRowClassName} from './types';
 
 interface TableCellProps {
     height: number;
     width: number;
     align?: AlignType;
-    children: ReactNode;
+    children: React.ReactNode;
     className?: string;
 }
 
@@ -90,7 +88,7 @@ export const TableRow = <T,>({row, index, columns, getRowClassName, height}: Tab
 
 interface EmptyTableRowProps<T> {
     columns: Column<T>[];
-    children?: ReactNode;
+    children?: React.ReactNode;
 }
 
 export const EmptyTableRow = <T,>({columns, children}: EmptyTableRowProps<T>) => {

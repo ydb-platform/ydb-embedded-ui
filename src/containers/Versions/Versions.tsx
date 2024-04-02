@@ -1,20 +1,20 @@
-import {useState} from 'react';
-import block from 'bem-cn-lite';
+import React from 'react';
 
 import {Checkbox, RadioButton} from '@gravity-ui/uikit';
 
-import type {VersionToColorMap} from '../../types/versions';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
 import {Loader} from '../../components/Loader';
+import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
+import type {VersionToColorMap} from '../../types/versions';
+import {cn} from '../../utils/cn';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
-import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
 import {GroupedNodesTree} from './GroupedNodesTree/GroupedNodesTree';
+import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
 import {GroupByValue} from './types';
 
 import './Versions.scss';
 
-const b = block('ydb-versions');
+const b = cn('ydb-versions');
 
 interface VersionsProps {
     versionToColor?: VersionToColorMap;
@@ -27,8 +27,8 @@ export const Versions = ({versionToColor}: VersionsProps) => {
 
     useAutofetcher(() => dispatch(getClusterNodes()), [dispatch], true);
 
-    const [groupByValue, setGroupByValue] = useState<GroupByValue>(GroupByValue.VERSION);
-    const [expanded, setExpanded] = useState(false);
+    const [groupByValue, setGroupByValue] = React.useState<GroupByValue>(GroupByValue.VERSION);
+    const [expanded, setExpanded] = React.useState(false);
 
     const handleGroupByValueChange = (value: string) => {
         setGroupByValue(value as GroupByValue);
@@ -72,7 +72,7 @@ export const Versions = ({versionToColor}: VersionsProps) => {
     const storageNodes = getGroupedStorageNodes(nodes, versionToColor);
     const otherNodes = getOtherNodes(nodes, versionToColor);
     const storageNodesContent = storageNodes?.length ? (
-        <>
+        <React.Fragment>
             <h3>Storage nodes</h3>
             {storageNodes.map(({title, nodes: itemNodes, items, versionColor}) => (
                 <GroupedNodesTree
@@ -83,10 +83,10 @@ export const Versions = ({versionToColor}: VersionsProps) => {
                     versionColor={versionColor}
                 />
             ))}
-        </>
+        </React.Fragment>
     ) : null;
     const tenantNodesContent = tenantNodes?.length ? (
-        <>
+        <React.Fragment>
             <h3>Database nodes</h3>
             {renderControls()}
             {tenantNodes.map(({title, nodes: itemNodes, items, versionColor, versionsValues}) => (
@@ -100,10 +100,10 @@ export const Versions = ({versionToColor}: VersionsProps) => {
                     versionsValues={versionsValues}
                 />
             ))}
-        </>
+        </React.Fragment>
     ) : null;
     const otherNodesContent = otherNodes?.length ? (
-        <>
+        <React.Fragment>
             <h3>Other nodes</h3>
             {otherNodes.map(({title, nodes: itemNodes, items, versionColor, versionsValues}) => (
                 <GroupedNodesTree
@@ -115,7 +115,7 @@ export const Versions = ({versionToColor}: VersionsProps) => {
                     versionsValues={versionsValues}
                 />
             ))}
-        </>
+        </React.Fragment>
     ) : null;
 
     return (

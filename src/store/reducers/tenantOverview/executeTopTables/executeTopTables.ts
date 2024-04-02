@@ -3,6 +3,7 @@ import type {Reducer} from '@reduxjs/toolkit';
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../../../utils/query';
 import {createApiRequest, createRequestActionTypes} from '../../../utils';
+
 import type {TopTablesAction, TopTablesState} from './types';
 
 export const FETCH_TOP_TABLES = createRequestActionTypes('top-tables', 'FETCH_TOP_TABLES');

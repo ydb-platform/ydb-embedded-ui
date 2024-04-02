@@ -1,6 +1,8 @@
-import type {TEvDescribeSchemeResult, TCdcStreamDescription} from '../../../types/api/schema';
+import React from 'react';
 
-import {InfoViewer, InfoViewerItem} from '..';
+import type {InfoViewerItem} from '..';
+import {InfoViewer} from '..';
+import type {TCdcStreamDescription, TEvDescribeSchemeResult} from '../../../types/api/schema';
 import {formatCdcStreamItem, formatCommonItem} from '../formatters';
 
 const DISPLAYED_FIELDS: Set<keyof TCdcStreamDescription> = new Set(['Mode', 'Format']);
@@ -23,9 +25,14 @@ export const CDCStreamOverview = ({data}: CDCStreamOverviewProps) => {
     let key: keyof TCdcStreamDescription;
     for (key in TableIndex) {
         if (DISPLAYED_FIELDS.has(key)) {
+            //@ts-expect-error
             info.push(formatCdcStreamItem(key, TableIndex?.[key]));
         }
     }
 
-    return <>{info.length ? <InfoViewer info={info}></InfoViewer> : <>Empty</>}</>;
+    return (
+        <React.Fragment>
+            {info.length ? <InfoViewer info={info}></InfoViewer> : 'Empty'}
+        </React.Fragment>
+    );
 };

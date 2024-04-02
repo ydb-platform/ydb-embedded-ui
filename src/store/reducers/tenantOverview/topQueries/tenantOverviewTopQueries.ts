@@ -2,8 +2,8 @@ import type {Reducer} from '@reduxjs/toolkit';
 
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../../../utils/query';
+import {createApiRequest, createRequestActionTypes} from '../../../utils';
 
-import {createRequestActionTypes, createApiRequest} from '../../../utils';
 import type {TenantOverviewTopQueriesAction, TenantOverviewTopQueriesState} from './types';
 
 export const FETCH_TENANT_OVERVIEW_TOP_QUERIES = createRequestActionTypes(

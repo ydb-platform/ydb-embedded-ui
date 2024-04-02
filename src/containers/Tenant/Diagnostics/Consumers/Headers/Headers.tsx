@@ -1,15 +1,12 @@
-import block from 'bem-cn-lite';
-
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
-
-import {CONSUMERS_COLUMNS_IDS, CONSUMERS_COLUMNS_TITILES} from '../utils/constants';
-
+import {cn} from '../../../../../utils/cn';
 import i18n from '../i18n';
+import {CONSUMERS_COLUMNS_IDS, CONSUMERS_COLUMNS_TITILES} from '../utils/constants';
 
 import './Headers.scss';
 
-const b = block('ydb-diagnostics-consumers-columns-header');
+const b = cn('ydb-diagnostics-consumers-columns-header');
 
 export const ReadLagsHeader = () => (
     <LabelWithPopover

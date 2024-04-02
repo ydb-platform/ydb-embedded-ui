@@ -1,11 +1,10 @@
-import {useEffect} from 'react';
+import React from 'react';
 
 import {NavigationTree} from 'ydb-ui-components';
 
+import {preloadSchemas, setCurrentSchemaPath} from '../../../../store/reducers/schema/schema';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {setCurrentSchemaPath, preloadSchemas} from '../../../../store/reducers/schema/schema';
 import {useQueryModes, useTypedDispatch} from '../../../../utils/hooks';
-
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 import {getControls} from '../../utils/schemaControls';
@@ -61,7 +60,7 @@ export function SchemaTree(props: SchemaTreeProps) {
         dispatch(setCurrentSchemaPath(activePath));
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         // if the cached path is not in the current tree, show root
         if (!currentPath?.startsWith(rootPath)) {
             handleActivePathUpdate(rootPath);

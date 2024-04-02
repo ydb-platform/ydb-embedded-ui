@@ -1,18 +1,15 @@
-import React, {useState, useRef} from 'react';
-import cn from 'bem-cn-lite';
-
-import type {NodesMap} from '../../types/store/nodesList';
-
-import type {PreparedVDisk} from '../../utils/disks/types';
-import routes, {createHref} from '../../routes';
-import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
-import {isFullVDiskData} from '../../utils/disks/helpers';
+import React from 'react';
 
 import {STRUCTURE} from '../../containers/Node/NodePages';
-
-import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
+import routes, {createHref} from '../../routes';
+import type {NodesMap} from '../../types/store/nodesList';
+import {cn} from '../../utils/cn';
+import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {isFullVDiskData} from '../../utils/disks/helpers';
+import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {InternalLink} from '../InternalLink';
+import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
 
 import './VDisk.scss';
 
@@ -27,9 +24,9 @@ interface VDiskProps {
 export const VDisk = ({data = {}, nodes, compact}: VDiskProps) => {
     const isFullData = isFullVDiskData(data);
 
-    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    const [isPopupVisible, setIsPopupVisible] = React.useState(false);
 
-    const anchor = useRef(null);
+    const anchor = React.useRef(null);
 
     const showPopup = () => {
         setIsPopupVisible(true);

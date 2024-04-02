@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+
 import {LANGUAGE_S_EXPRESSION_ID} from './constants';
 
 export function registerSExpressionLanguage() {

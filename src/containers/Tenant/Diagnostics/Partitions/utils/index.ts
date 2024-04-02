@@ -1,5 +1,6 @@
 import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
 import type {NodesMap} from '../../../../../types/store/nodesList';
+
 import type {PreparedPartitionDataWithHosts} from './types';
 
 export const addHostToPartitions = (

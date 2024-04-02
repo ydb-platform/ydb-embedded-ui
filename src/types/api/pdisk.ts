@@ -1,4 +1,4 @@
-import {EFlag} from './enums';
+import type {EFlag} from './enums';
 
 /**
  * endpoint: /viewer/json/pdiskinfo

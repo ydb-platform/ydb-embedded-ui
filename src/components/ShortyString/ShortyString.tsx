@@ -1,9 +1,11 @@
-import * as React from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
 import {Link} from '@gravity-ui/uikit';
 
+import {cn} from '../../utils/cn';
+
 import i18n from './i18n';
+
 import './ShortyString.scss';
 
 const block = cn('kv-shorty-string');
@@ -49,8 +51,10 @@ export default function ShortyString({
             {hasToggle ? (
                 <Link
                     className={block('toggle')}
+                    href="#"
                     onClick={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         setExpanded((v) => !v);
                         onToggle?.();
                     }}

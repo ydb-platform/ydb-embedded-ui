@@ -1,8 +1,8 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
-import type {OverviewState, OverviewAction, OverviewHandledResponse} from './types';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
 
-import {createRequestActionTypes, createApiRequest} from '../../utils';
+import type {OverviewAction, OverviewHandledResponse, OverviewState} from './types';
 
 export const FETCH_OVERVIEW = createRequestActionTypes('overview', 'FETCH_OVERVIEW');
 const SET_CURRENT_OVERVIEW_PATH = 'overview/SET_CURRENT_OVERVIEW_PATH';

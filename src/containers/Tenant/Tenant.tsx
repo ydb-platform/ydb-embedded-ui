@@ -1,28 +1,26 @@
-import {useEffect, useReducer, useRef} from 'react';
-import cn from 'bem-cn-lite';
-import {useLocation} from 'react-router';
+import React from 'react';
+
 import qs from 'qs';
 import {Helmet} from 'react-helmet-async';
+import {useLocation} from 'react-router';
 
-import type {TEvDescribeSchemeResult} from '../../types/api/schema';
-import type {AdditionalTenantsProps, AdditionalNodesProps} from '../../types/additionalProps';
-
-import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
-import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
+import {AccessDenied} from '../../components/Errors/403';
+import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {disableAutorefresh, getSchema} from '../../store/reducers/schema/schema';
+import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
+import type {TEvDescribeSchemeResult} from '../../types/api/schema';
+import {cn} from '../../utils/cn';
+import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
-import SplitPane from '../../components/SplitPane';
-import {AccessDenied} from '../../components/Errors/403';
-
-import {ObjectSummary} from './ObjectSummary/ObjectSummary';
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
-
+import {ObjectSummary} from './ObjectSummary/ObjectSummary';
+import i18n from './i18n';
 import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
 } from './utils/paneVisibilityToggleHelpers';
-import i18n from './i18n';
 
 import './Tenant.scss';
 
@@ -44,23 +42,23 @@ interface TenantProps {
 }
 
 function Tenant(props: TenantProps) {
-    const [summaryVisibilityState, dispatchSummaryVisibilityAction] = useReducer(
+    const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED),
         undefined,
         getTenantSummaryState,
     );
-    const previousTenant = useRef<string>();
+    const previousTenant = React.useRef<string>();
 
     const {currentSchemaPath, currentSchema: currentItem = {}} = useTypedSelector(
         (state) => state.schema,
     );
 
-    const {PathType: preloadedPathType, PathSubType: preloadedPathSubType} = useTypedSelector(
-        (state) =>
+    const {PathType: preloadedPathType, PathSubType: preloadedPathSubType} =
+        useTypedSelector((state) =>
             currentSchemaPath
-                ? state.schema.data[currentSchemaPath]?.PathDescription?.Self || {}
-                : {},
-    );
+                ? state.schema.data[currentSchemaPath]?.PathDescription?.Self
+                : undefined,
+        ) || {};
 
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
         (currentItem as TEvDescribeSchemeResult).PathDescription?.Self || {};
@@ -78,7 +76,7 @@ function Tenant(props: TenantProps) {
     const {name} = queryParams;
     const tenantName = name as string;
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (tenantName && typeof tenantName === 'string' && previousTenant.current !== tenantName) {
             const register = async () => {
                 const {registerYQLCompletionItemProvider} = await import(
@@ -91,21 +89,21 @@ function Tenant(props: TenantProps) {
         }
     }, [tenantName]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(getSchema({path: tenantName}));
     }, [tenantName, dispatch]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (currentSchemaPath) {
             dispatch(getSchema({path: currentSchemaPath}));
         }
     }, [currentSchemaPath, dispatch]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(disableAutorefresh());
     }, [currentSchemaPath, tenantName, dispatch]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (tenantName) {
             dispatch(setHeaderBreadcrumbs('tenant', {tenantName}));
         }

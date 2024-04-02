@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+
 import {createProvideSuggestionsFunction} from './yqlSuggestions';
 
 let completionProvider: monaco.IDisposable | undefined;

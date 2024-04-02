@@ -1,9 +1,9 @@
-import type {ApiRequestAction} from '../../utils';
 import type {IResponseError} from '../../../types/api/error';
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
+import type {Nullable} from '../../../utils/typecheckers';
+import type {ApiRequestAction} from '../../utils';
 
-import {FETCH_OVERVIEW, setDataWasNotLoaded, setCurrentOverviewPath} from './overview';
-import {Nullable} from '../../../utils/typecheckers';
+import type {FETCH_OVERVIEW, setCurrentOverviewPath, setDataWasNotLoaded} from './overview';
 
 export interface OverviewState {
     loading: boolean;

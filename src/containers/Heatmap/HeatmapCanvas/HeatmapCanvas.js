@@ -1,10 +1,11 @@
-import {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import PropTypes from 'prop-types';
-import cn from 'bem-cn-lite';
-import throttle from 'lodash/throttle';
+import React from 'react';
 
-import {basename as appBasename} from '../../../store/index';
+import throttle from 'lodash/throttle';
+import PropTypes from 'prop-types';
+
 import routes, {createHref} from '../../../routes';
+import {basename as appBasename} from '../../../store/index';
+import {cn} from '../../../utils/cn';
 
 const b = cn('heatmap');
 const defaultDimensions = {width: 0, height: 0};
@@ -13,10 +14,10 @@ const TABLET_SIZE = 10;
 const TABLET_PADDING = 2;
 
 export const HeatmapCanvas = (props) => {
-    const [dimensions, setDimensions] = useState(defaultDimensions);
+    const [dimensions, setDimensions] = React.useState(defaultDimensions);
     const {tablets} = props;
-    const canvasRef = useRef(null);
-    const containerRef = useRef(null);
+    const canvasRef = React.useRef(null);
+    const containerRef = React.useRef(null);
 
     function drawTablet(ctx) {
         return (tablet, index) => {
@@ -29,7 +30,7 @@ export const HeatmapCanvas = (props) => {
         };
     }
 
-    useEffect(() => {
+    React.useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
 
@@ -37,7 +38,7 @@ export const HeatmapCanvas = (props) => {
         tablets.map(drawTablet(ctx));
     });
 
-    useLayoutEffect(() => {
+    React.useLayoutEffect(() => {
         const container = containerRef.current;
 
         if (container) {

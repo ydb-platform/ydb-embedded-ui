@@ -1,7 +1,13 @@
 /* eslint-disable camelcase */
 
-import {IProtobufTimeObject} from './common';
-import {Consumer, Entry, MultipleWindowsStat, PartitionStats, SupportedCodecs} from './consumer';
+import type {IProtobufTimeObject} from './common';
+import type {
+    Consumer,
+    Entry,
+    MultipleWindowsStat,
+    PartitionStats,
+    SupportedCodecs,
+} from './consumer';
 
 /**
  * endpoint: /json/describe_topic

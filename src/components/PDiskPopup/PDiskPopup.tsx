@@ -1,16 +1,17 @@
-import {useMemo} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import {Popup, PopupProps} from '@gravity-ui/uikit';
+import type {PopupProps} from '@gravity-ui/uikit';
+import {Popup} from '@gravity-ui/uikit';
 
-import type {NodesMap} from '../../types/store/nodesList';
 import {EFlag} from '../../types/api/enums';
-import type {PreparedPDisk} from '../../utils/disks/types';
-import {getPDiskId} from '../../utils/dataFormatters/dataFormatters';
-import {bytesToGB} from '../../utils/utils';
+import type {NodesMap} from '../../types/store/nodesList';
+import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-
-import {InfoViewer, InfoViewerItem} from '../InfoViewer';
+import {getPDiskId} from '../../utils/dataFormatters/dataFormatters';
+import type {PreparedPDisk} from '../../utils/disks/types';
+import {bytesToGB} from '../../utils/utils';
+import type {InfoViewerItem} from '../InfoViewer';
+import {InfoViewer} from '../InfoViewer';
 
 import './PDiskPopup.scss';
 
@@ -61,7 +62,7 @@ interface PDiskPopupProps extends PopupProps {
 }
 
 export const PDiskPopup = ({data, nodes, ...props}: PDiskPopupProps) => {
-    const info = useMemo(() => preparePDiskData(data, nodes), [data, nodes]);
+    const info = React.useMemo(() => preparePDiskData(data, nodes), [data, nodes]);
 
     return (
         <Popup

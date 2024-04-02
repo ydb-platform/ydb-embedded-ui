@@ -1,6 +1,12 @@
-import type {ValueOf} from '../../../types/common';
 import type {SettingsObject} from '../../../services/settings';
-import {changeFilter, setUserSettings, ProblemFilterValues, SET_SETTING_VALUE} from './settings';
+import type {ValueOf} from '../../../types/common';
+
+import type {
+    ProblemFilterValues,
+    SET_SETTING_VALUE,
+    changeFilter,
+    setUserSettings,
+} from './settings';
 
 export type ProblemFilterValue = ValueOf<typeof ProblemFilterValues>;
 

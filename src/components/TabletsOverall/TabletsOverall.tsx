@@ -1,10 +1,9 @@
-import cn from 'bem-cn-lite';
-
 import {Progress} from '@gravity-ui/uikit';
 
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
-import {useTypedDispatch} from '../../utils/hooks';
+import {cn} from '../../utils/cn';
 import {COLORS_PRIORITY} from '../../utils/constants';
+import {useTypedDispatch} from '../../utils/hooks';
 
 import './TabletsOverall.scss';
 
@@ -47,16 +46,19 @@ function TabletsOverall({tablets}: TabletsOverallProps) {
     };
 
     // determine how many tablets of what color are in "tablets"
-    const statesForOverallProgress: Record<string, number> = tablets.reduce((acc, tablet) => {
-        const color = tablet.Overall?.toLowerCase();
-        if (color && !acc[color]) {
-            acc[color] = 1;
-        } else if (color) {
-            acc[color]++;
-        }
+    const statesForOverallProgress: Record<string, number> = tablets.reduce(
+        (acc, tablet) => {
+            const color = tablet.Overall?.toLowerCase();
+            if (color && !acc[color]) {
+                acc[color] = 1;
+            } else if (color) {
+                acc[color]++;
+            }
 
-        return acc;
-    }, {} as Record<string, number>);
+            return acc;
+        },
+        {} as Record<string, number>,
+    );
 
     const tooltipData: {color: string; percents: number; value: number; total: number}[] = [];
 

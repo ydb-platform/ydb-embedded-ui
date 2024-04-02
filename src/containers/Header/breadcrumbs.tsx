@@ -1,10 +1,12 @@
 import {
     NodesRight as ClusterIcon,
-    Database as DatabaseIcon,
     Cpu as ComputeNodeIcon,
+    Database as DatabaseIcon,
     HardDrive as StorageNodeIcon,
 } from '@gravity-ui/icons';
 
+import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
+import routes, {createHref, getPDiskPagePath} from '../../routes';
 import type {
     BreadcrumbsOptions,
     ClusterBreadcrumbsOptions,
@@ -21,13 +23,11 @@ import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
 } from '../../store/reducers/tenant/constants';
-import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
-import routes, {createHref, getPDiskPagePath} from '../../routes';
 import {CLUSTER_DEFAULT_TITLE, getTabletLabel} from '../../utils/constants';
-
 import {getClusterPath} from '../Cluster/utils';
-import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
 import {getDefaultNodePath} from '../Node/NodePages';
+import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
+
 import {headerKeyset} from './i18n';
 
 const prepareTenantName = (tenantName: string) => {

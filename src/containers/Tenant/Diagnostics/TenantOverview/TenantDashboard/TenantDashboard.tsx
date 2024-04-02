@@ -1,16 +1,17 @@
-import {useState} from 'react';
+import React from 'react';
+
 import {StringParam, useQueryParam} from 'use-query-params';
 
-import {cn} from '../../../../../utils/cn';
-import type {TimeFrame} from '../../../../../utils/timeframes';
-import {useTypedSelector} from '../../../../../utils/hooks';
-import {TimeFrameSelector} from '../../../../../components/TimeFrameSelector/TimeFrameSelector';
-import {
-    type ChartOptions,
-    MetricChart,
-    type MetricDescription,
-    type ChartDataStatus,
+import {MetricChart} from '../../../../../components/MetricChart';
+import type {
+    ChartDataStatus,
+    ChartOptions,
+    MetricDescription,
 } from '../../../../../components/MetricChart';
+import {TimeFrameSelector} from '../../../../../components/TimeFrameSelector/TimeFrameSelector';
+import {cn} from '../../../../../utils/cn';
+import {useTypedSelector} from '../../../../../utils/hooks';
+import type {TimeFrame} from '../../../../../utils/timeframes';
 
 import './TenantDashboard.scss';
 
@@ -31,7 +32,7 @@ interface TenantDashboardProps {
 }
 
 export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
-    const [isDashboardHidden, setIsDashboardHidden] = useState<boolean>(true);
+    const [isDashboardHidden, setIsDashboardHidden] = React.useState<boolean>(true);
 
     const [timeFrame = '1h', setTimeframe] = useQueryParam('timeframe', StringParam);
 

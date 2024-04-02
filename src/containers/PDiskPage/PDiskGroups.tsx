@@ -1,18 +1,15 @@
-import {useMemo} from 'react';
+import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 
+import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import type {NodesMap} from '../../types/store/nodesList';
-
-import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
-
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-
 import {getPDiskStorageColumns} from '../Storage/StorageGroups/getStorageGroupsColumns';
 
-import {pdiskPageCn} from './shared';
 import {pDiskPageKeyset} from './i18n';
+import {pdiskPageCn} from './shared';
 
 interface PDiskGroupsProps {
     data: PreparedStorageGroup[];
@@ -21,7 +18,7 @@ interface PDiskGroupsProps {
 }
 
 export function PDiskGroups({data, nodesMap, loading}: PDiskGroupsProps) {
-    const pDiskStorageColumns = useMemo(() => {
+    const pDiskStorageColumns = React.useMemo(() => {
         return getPDiskStorageColumns(nodesMap);
     }, [nodesMap]);
 
@@ -41,9 +38,9 @@ export function PDiskGroups({data, nodesMap, loading}: PDiskGroupsProps) {
     };
 
     return (
-        <>
+        <React.Fragment>
             <div className={pdiskPageCn('groups-title')}>{pDiskPageKeyset('groups')}</div>
             <div>{renderContent()}</div>
-        </>
+        </React.Fragment>
     );
 }

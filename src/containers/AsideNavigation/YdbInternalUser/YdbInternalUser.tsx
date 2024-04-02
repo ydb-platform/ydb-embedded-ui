@@ -1,16 +1,14 @@
+import {Button, Icon} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router';
 
-import {Button, Icon} from '@gravity-ui/uikit';
-
 import routes, {createHref} from '../../../routes';
-import {useTypedSelector, useTypedDispatch} from '../../../utils/hooks';
 import {logout} from '../../../store/reducers/authentication/authentication';
 import {cn} from '../../../utils/cn';
+import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import i18n from '../i18n';
 
 import signOutIcon from '@gravity-ui/icons/svgs/arrow-right-from-square.svg';
 import signInIcon from '@gravity-ui/icons/svgs/arrow-right-to-square.svg';
-
-import i18n from '../i18n';
 
 import './YdbInternalUser.scss';
 

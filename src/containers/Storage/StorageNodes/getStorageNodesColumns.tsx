@@ -1,14 +1,15 @@
-import DataTable, {type Column as DataTableColumn} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
+import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 
-import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
-import type {AdditionalNodesProps} from '../../../types/additionalProps';
+import {NodeHostWrapper} from '../../../components/NodeHostWrapper/NodeHostWrapper';
 import type {Column as VirtualTableColumn} from '../../../components/VirtualTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import {NodeHostWrapper} from '../../../components/NodeHostWrapper/NodeHostWrapper';
-import {isSortableNodesProperty} from '../../../utils/nodes';
+import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {AdditionalNodesProps} from '../../../types/additionalProps';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
-
+import {isSortableNodesProperty} from '../../../utils/nodes';
 import {PDisk} from '../PDisk/PDisk';
+
 import {b} from './shared';
 
 export const STORAGE_NODES_COLUMNS_IDS = {

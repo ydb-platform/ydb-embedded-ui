@@ -2,7 +2,7 @@ import type {IResponseError} from '../../../types/api/error';
 import type {TNetInfo} from '../../../types/api/netInfo';
 import type {ApiRequestAction} from '../../utils';
 
-import {FETCH_ALL_NODES_NETWORK, setDataWasNotLoaded} from './network';
+import type {FETCH_ALL_NODES_NETWORK, setDataWasNotLoaded} from './network';
 
 export interface NetworkState {
     loading: boolean;

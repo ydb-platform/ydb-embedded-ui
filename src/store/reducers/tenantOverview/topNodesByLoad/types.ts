@@ -1,7 +1,8 @@
 import type {IResponseError} from '../../../../types/api/error';
 import type {ApiRequestAction} from '../../../utils';
 import type {NodesPreparedEntity} from '../../nodes/types';
-import {FETCH_TOP_NODES_BY_LOAD, setDataWasNotLoaded} from './topNodesByLoad';
+
+import type {FETCH_TOP_NODES_BY_LOAD, setDataWasNotLoaded} from './topNodesByLoad';
 
 export interface TopNodesByLoadState {
     loading: boolean;

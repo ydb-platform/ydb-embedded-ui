@@ -1,12 +1,11 @@
-import {QUERY_ACTIONS, QUERY_MODES, QUERY_SYNTAX} from '../../utils/query';
-
+import type {QUERY_ACTIONS, QUERY_MODES, QUERY_SYNTAX} from '../../utils/query';
 import type {IResponseError, NetworkError} from '../api/error';
 import type {
-    KeyValueRow,
     ColumnType,
+    KeyValueRow,
     ErrorResponse as QueryErrorResponseData,
-    ScriptPlan,
     QueryPlan,
+    ScriptPlan,
     TKqpStatsQuery,
 } from '../api/query';
 import type {ValueOf} from '../common';

@@ -1,25 +1,27 @@
-import {useCallback} from 'react';
+import React from 'react';
 
 import {Loader} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
-import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
-import {mapDatabaseTypeToDBName} from '../../utils/schema';
-import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
-import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
-import {TenantCpu} from './TenantCpu/TenantCpu';
-import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
-import {MetricsCards, type TenantMetrics} from './MetricsCards/MetricsCards';
-import {TenantStorage} from './TenantStorage/TenantStorage';
-import {TenantMemory} from './TenantMemory/TenantMemory';
+import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
+import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {mapDatabaseTypeToDBName} from '../../utils/schema';
+
 import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
+import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
+import {MetricsCards} from './MetricsCards/MetricsCards';
+import type {TenantMetrics} from './MetricsCards/MetricsCards';
+import {TenantCpu} from './TenantCpu/TenantCpu';
+import {TenantMemory} from './TenantMemory/TenantMemory';
+import {TenantStorage} from './TenantStorage/TenantStorage';
 import {useHealthcheck} from './useHealthcheck';
+import {b} from './utils';
 
 import './TenantOverview.scss';
-import {b} from './utils';
 
 interface TenantOverviewProps {
     tenantName: string;
@@ -52,7 +54,7 @@ export function TenantOverview({
         error: healthcheckError,
     } = useHealthcheck(tenantName);
 
-    const fetchTenant = useCallback(
+    const fetchTenant = React.useCallback(
         (isBackground = true) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded());

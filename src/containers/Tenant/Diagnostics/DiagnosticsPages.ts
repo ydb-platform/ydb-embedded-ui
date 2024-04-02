@@ -1,5 +1,5 @@
-import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
+import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathType} from '../../../types/api/schema';
 
 type Page = {

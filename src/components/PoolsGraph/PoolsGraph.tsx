@@ -1,12 +1,10 @@
-import block from 'bem-cn-lite';
-
 import type {TPoolStats} from '../../types/api/nodes';
-
+import {cn} from '../../utils/cn';
 import {PoolBar} from '../PoolBar/PoolBar';
 
 import './PoolsGraph.scss';
 
-const b = block('ydb-pools-graph');
+const b = cn('ydb-pools-graph');
 
 interface PoolsGraphProps {
     pools?: TPoolStats[];

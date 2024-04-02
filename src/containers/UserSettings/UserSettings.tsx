@@ -1,9 +1,10 @@
-import cn from 'bem-cn-lite';
-
 import {Settings} from '@gravity-ui/navigation';
 
-import {YDBEmbeddedUISettings, settings} from './settings';
+import {cn} from '../../utils/cn';
+
 import {Setting} from './Setting';
+import type {YDBEmbeddedUISettings} from './settings';
+import {settings} from './settings';
 
 import './UserSettings.scss';
 

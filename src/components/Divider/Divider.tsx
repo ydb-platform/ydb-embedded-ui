@@ -1,4 +1,4 @@
-import cn from 'bem-cn-lite';
+import {cn} from '../../utils/cn';
 
 import './Divider.scss';
 

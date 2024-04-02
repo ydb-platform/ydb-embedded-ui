@@ -1,7 +1,8 @@
-import React, {useEffect} from 'react';
+import React from 'react';
+
+import {Popup, useVirtualElementRef} from '@gravity-ui/uikit';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Popup, useVirtualElementRef} from '@gravity-ui/uikit';
 
 import {hideTooltip} from '../../store/reducers/tooltip';
 import {tooltipTemplates} from '../../utils/tooltip';
@@ -22,7 +23,7 @@ function ReduxTooltip(props) {
         rect: {top: props.positions?.top, left: props.positions?.left},
     });
 
-    useEffect(() => {
+    React.useEffect(() => {
         window.addEventListener('scroll', handleScroll, true);
         return () => {
             window.removeEventListener('scroll', handleScroll);

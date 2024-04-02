@@ -1,12 +1,11 @@
-import block from 'bem-cn-lite';
-
 import type {TSystemStateInfo} from '../../../types/api/nodes';
-
-import {InfoViewer, InfoViewerItem} from '../../InfoViewer';
+import {cn} from '../../../utils/cn';
+import type {InfoViewerItem} from '../../InfoViewer';
+import {InfoViewer} from '../../InfoViewer';
 
 import './NodeEndpointsTooltipContent.scss';
 
-const b = block('ydb-node-endpoints-tooltip-content');
+const b = cn('ydb-node-endpoints-tooltip-content');
 
 interface NodeEdpointsTooltipProps {
     data?: TSystemStateInfo;

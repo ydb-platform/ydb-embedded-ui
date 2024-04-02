@@ -1,10 +1,10 @@
 import type {
-    Link,
-    GraphNode,
-    TopologyNodeDataStats,
-    TopologyNodeDataStatsSection,
     ExplainPlanNodeData,
+    GraphNode,
+    Link,
+    TopologyNodeDataStats,
     TopologyNodeDataStatsItem,
+    TopologyNodeDataStatsSection,
 } from '@gravity-ui/paranoid';
 
 import type {PlanNode} from '../types/api/query';

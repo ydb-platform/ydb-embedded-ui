@@ -1,22 +1,22 @@
-import {useEffect, useMemo} from 'react';
-import {useHistory, useLocation} from 'react-router';
-import block from 'bem-cn-lite';
+import React from 'react';
 
 import {Breadcrumbs} from '@gravity-ui/uikit';
+import {useHistory, useLocation} from 'react-router';
 
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
-
+import {parseQuery} from '../../routes';
 import {backend, customBackend} from '../../store';
 import {getClusterInfo} from '../../store/reducers/cluster/cluster';
-import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
+import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
-import {parseQuery} from '../../routes';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
-import {RawBreadcrumbItem, getBreadcrumbs} from './breadcrumbs';
+import type {RawBreadcrumbItem} from './breadcrumbs';
+import {getBreadcrumbs} from './breadcrumbs';
 
 import './Header.scss';
 
-const b = block('header');
+const b = cn('header');
 
 const getInternalLink = (singleClusterMode: boolean) => {
     if (singleClusterMode && !customBackend) {
@@ -45,11 +45,11 @@ function Header({mainPage}: HeaderProps) {
 
     const clusterNameFinal = data?.Name || clusterNameFromQuery;
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(getClusterInfo(clusterNameFromQuery));
     }, [dispatch, clusterNameFromQuery]);
 
-    const breadcrumbItems = useMemo(() => {
+    const breadcrumbItems = React.useMemo(() => {
         const rawBreadcrumbs: RawBreadcrumbItem[] = [];
         let options = pageBreadcrumbsOptions;
 

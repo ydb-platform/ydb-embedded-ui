@@ -1,4 +1,5 @@
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
+
 import {defaultDashboardConfig} from './defaultDashboardConfig';
 
 interface DefaultOverviewContentProps {

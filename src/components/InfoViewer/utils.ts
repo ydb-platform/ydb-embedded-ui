@@ -1,13 +1,13 @@
-import type {ReactNode} from 'react';
+import type React from 'react';
 
-import {InfoViewerItem} from './InfoViewer';
+import type {InfoViewerItem} from './InfoViewer';
 
 type LabelMap<T> = {
     [label in keyof T]?: string;
 };
 
 type ValueFormatters<T> = {
-    [label in keyof T]?: (value: T[label]) => ReactNode;
+    [label in keyof T]?: (value: T[label]) => React.ReactNode;
 };
 
 function formatLabel<Shape>(label: keyof Shape, map: LabelMap<Shape>) {
@@ -18,7 +18,7 @@ function formatValue<Shape, Key extends keyof Shape>(
     label: Key,
     value: Shape[Key],
     formatters: ValueFormatters<Shape>,
-    defaultFormatter?: (value: Shape[Key]) => ReactNode,
+    defaultFormatter?: (value: Shape[Key]) => React.ReactNode,
 ) {
     const formatter = formatters[label] || defaultFormatter;
     const formattedValue = formatter ? formatter(value) : value;
@@ -29,7 +29,7 @@ function formatValue<Shape, Key extends keyof Shape>(
 interface CreateInfoFormatterOptions<Shape> {
     values?: ValueFormatters<Shape>;
     labels?: LabelMap<Shape>;
-    defaultValueFormatter?: (value: Shape[keyof Shape]) => ReactNode;
+    defaultValueFormatter?: (value: Shape[keyof Shape]) => React.ReactNode;
 }
 
 export function createInfoFormatter<Shape extends Record<string, any>>({

@@ -1,9 +1,10 @@
-import {type Selector, createSelector} from '@reduxjs/toolkit';
+import {createSelector} from '@reduxjs/toolkit';
+import type {Selector} from '@reduxjs/toolkit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
+import type {MetaExtendedClusterInfo} from '../../../types/api/meta';
 import {getMinorVersion} from '../../../utils/versions';
 
-import type {MetaExtendedClusterInfo} from '../../../types/api/meta';
 import type {ClusterDataAggregation, ClustersStateSlice, PreparedCluster} from './types';
 
 // ==== Filters ====

@@ -1,6 +1,6 @@
-import {EFlag} from './enums';
-import {TEndpoint, TLegacyNodeLocation, TPoolStats} from './nodes';
-import {TMetrics} from './tenant';
+import type {EFlag} from './enums';
+import type {TEndpoint, TLegacyNodeLocation, TPoolStats} from './nodes';
+import type {TMetrics} from './tenant';
 
 /**
  * endpoint: viewer/json/compute

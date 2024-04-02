@@ -1,4 +1,4 @@
-import {Locator} from '@playwright/test';
+import type {Locator} from '@playwright/test';
 
 // react-data-table has 2 table elements - for header and for the content
 // so we select content table that is wrapped with .data-table__box

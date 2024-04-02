@@ -1,11 +1,10 @@
-import {ReactNode} from 'react';
-import cn from 'bem-cn-lite';
+import {cn} from '../../../utils/cn';
 
 const b = cn('kv-node-structure');
 
 interface PDiskTitleBadgeProps {
     label?: string;
-    value: ReactNode;
+    value: React.ReactNode;
     className?: string;
 }
 

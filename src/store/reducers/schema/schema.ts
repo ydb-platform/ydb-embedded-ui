@@ -1,18 +1,17 @@
-import type {Selector, Reducer} from '@reduxjs/toolkit';
-
+import type {Reducer, Selector} from '@reduxjs/toolkit';
 import {createSelector} from '@reduxjs/toolkit';
 
+import {isEntityWithMergedImplementation} from '../../../containers/Tenant/utils/schema';
 import type {EPathType} from '../../../types/api/schema';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
+
 import type {
     SchemaAction,
     SchemaData,
     SchemaHandledResponse,
-    SchemaStateSlice,
     SchemaState,
+    SchemaStateSlice,
 } from './types';
-
-import {isEntityWithMergedImplementation} from '../../../containers/Tenant/utils/schema';
-import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 export const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
 const PRELOAD_SCHEMAS = 'schema/PRELOAD_SCHEMAS';

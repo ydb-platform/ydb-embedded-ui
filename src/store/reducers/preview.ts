@@ -1,8 +1,8 @@
 import type {ExecuteActions} from '../../types/api/query';
 import type {IQueryResult, QueryErrorResponse} from '../../types/store/query';
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
-
-import {createRequestActionTypes, createApiRequest, ApiRequestAction} from '../utils';
+import type {ApiRequestAction} from '../utils';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 const SEND_QUERY = createRequestActionTypes('preview', 'SEND_QUERY');
 const SET_QUERY_OPTIONS = 'preview/SET_QUERY_OPTIONS';

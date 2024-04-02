@@ -1,9 +1,9 @@
 import type {NodesMap} from '../../types/store/nodesList';
-import type {PreparedVDisk} from '../../utils/disks/types';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
-
+import type {PreparedVDisk} from '../../utils/disks/types';
 import {Stack} from '../Stack/Stack';
+
 import {VDisk} from './VDisk';
 
 interface VDiskWithDonorsStackProps {

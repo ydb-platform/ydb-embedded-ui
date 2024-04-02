@@ -1,8 +1,7 @@
-import type {ReactNode} from 'react';
-
 import type {InfoViewerItem} from '../components/InfoViewer';
-import type {ETenantType} from './api/tenant';
+
 import type {TSystemStateInfo} from './api/nodes';
+import type {ETenantType} from './api/tenant';
 import type {VersionToColorMap} from './versions';
 
 export interface AdditionalVersionsProps {
@@ -21,7 +20,7 @@ export interface AdditionalClusterProps {
 
 export interface AdditionalTenantsProps {
     prepareTenantBackend?: (backend: string | undefined) => string | undefined;
-    getMonitoringLink?: (name?: string, type?: ETenantType) => ReactNode;
+    getMonitoringLink?: (name?: string, type?: ETenantType) => React.ReactNode;
 }
 
 export type NodeAddress = Pick<TSystemStateInfo, 'Host' | 'Endpoints' | 'NodeId'>;

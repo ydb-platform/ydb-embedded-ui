@@ -1,6 +1,7 @@
-import cn from 'bem-cn-lite';
+import {Popover} from '@gravity-ui/uikit';
+import type {PopoverProps} from '@gravity-ui/uikit';
 
-import {Popover, type PopoverProps} from '@gravity-ui/uikit';
+import {cn} from '../../utils/cn';
 
 import './CellWithPopover.scss';
 

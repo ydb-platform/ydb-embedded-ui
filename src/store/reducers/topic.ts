@@ -9,10 +9,9 @@ import type {
     ITopicRootStateSlice,
     ITopicState,
 } from '../../types/store/topic';
-
-import {createRequestActionTypes, createApiRequest} from '../utils';
-import {parseLag, parseTimestampToIdleTime} from '../../utils/timeParsers';
 import {convertBytesObjectToSpeed} from '../../utils/bytesParsers';
+import {parseLag, parseTimestampToIdleTime} from '../../utils/timeParsers';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 export const FETCH_TOPIC = createRequestActionTypes('topic', 'FETCH_TOPIC');
 

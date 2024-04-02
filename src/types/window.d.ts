@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 enum RumErrorLevel {
     DEBUG = 'debug',
     ERROR = 'error',
@@ -34,8 +35,6 @@ interface Window {
     web_version?: boolean;
     custom_backend?: string;
     meta_backend?: string;
-
-    store?: import('@reduxjs/toolkit').Store;
 
     userSettings?: import('../services/settings').SettingsObject;
     systemSettings?: import('../services/settings').SettingsObject;

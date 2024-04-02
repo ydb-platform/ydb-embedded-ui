@@ -1,6 +1,9 @@
-import {useCallback, useState} from 'react';
+import React from 'react';
+
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
-import {DEFAULT_RESIZEABLE, type Column as VirtualTableColumn} from '../../components/VirtualTable';
+
+import {DEFAULT_RESIZEABLE} from '../../components/VirtualTable';
+import type {Column as VirtualTableColumn} from '../../components/VirtualTable';
 import {settingsManager} from '../../services/settings';
 
 export type Column<T> = VirtualTableColumn<T> & DataTableColumn<T>;
@@ -26,16 +29,18 @@ export const updateColumnsWidth = <T>(
 export const useTableResize = (
     localStorageKey: string,
 ): [TableColumnsWidthSetup, HandleTableColumnsResize] => {
-    const [tableColumnsWidthSetup, setTableColumnsWidth] = useState<TableColumnsWidthSetup>(() => {
-        const setupFromLS = settingsManager.readUserSettingsValue(
-            localStorageKey,
-            {},
-        ) as TableColumnsWidthSetup;
+    const [tableColumnsWidthSetup, setTableColumnsWidth] = React.useState<TableColumnsWidthSetup>(
+        () => {
+            const setupFromLS = settingsManager.readUserSettingsValue(
+                localStorageKey,
+                {},
+            ) as TableColumnsWidthSetup;
 
-        return setupFromLS;
-    });
+            return setupFromLS;
+        },
+    );
 
-    const handleSetupChange: HandleTableColumnsResize = useCallback(
+    const handleSetupChange: HandleTableColumnsResize = React.useCallback(
         (newSetup) => {
             setTableColumnsWidth((previousSetup) => {
                 // ResizeObserver callback may be triggered only for currently resized column

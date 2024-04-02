@@ -1,4 +1,5 @@
-import routes, {Query, createHref} from '../../routes';
+import type {Query} from '../../routes';
+import routes, {createHref} from '../../routes';
 
 export const STORAGE = 'storage';
 export const TABLETS = 'tablets';

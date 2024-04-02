@@ -1,25 +1,18 @@
-import {useCallback, useMemo} from 'react';
+import React from 'react';
 
-import type {AdditionalNodesProps} from '../../../types/additionalProps';
-import {
-    getUptimeParamValue,
-    NodesUptimeFilterValues,
-    type NodesSortValue,
-} from '../../../utils/nodes';
-import {
-    VirtualTable,
-    type FetchData,
-    type RenderControls,
-    type RenderErrorMessage,
-} from '../../../components/VirtualTable';
-import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
+import {VirtualTable} from '../../../components/VirtualTable';
+import type {FetchData, RenderControls, RenderErrorMessage} from '../../../components/VirtualTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
+import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {AdditionalNodesProps} from '../../../types/additionalProps';
+import {NodesUptimeFilterValues, getUptimeParamValue} from '../../../utils/nodes';
+import type {NodesSortValue} from '../../../utils/nodes';
 
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
-import {getPreparedStorageNodesColumns} from './getStorageNodesColumns';
 import {getStorageNodes} from './getNodes';
-import {getRowUnavailableClassName} from './shared';
+import {getPreparedStorageNodesColumns} from './getStorageNodesColumns';
 import i18n from './i18n';
+import {getRowUnavailableClassName} from './shared';
 
 interface VirtualStorageNodesProps {
     searchValue: string;
@@ -46,11 +39,11 @@ export const VirtualStorageNodes = ({
     renderControls,
     renderErrorMessage,
 }: VirtualStorageNodesProps) => {
-    const filters = useMemo(() => {
+    const filters = React.useMemo(() => {
         return [searchValue, visibleEntities, nodesUptimeFilter, tenant];
     }, [searchValue, visibleEntities, nodesUptimeFilter, tenant]);
 
-    const fetchData = useCallback<FetchData<PreparedStorageNode>>(
+    const fetchData = React.useCallback<FetchData<PreparedStorageNode>>(
         async (limit, offset, {sortOrder, columnId} = {}) => {
             return await getStorageNodes({
                 limit,
@@ -67,7 +60,7 @@ export const VirtualStorageNodes = ({
         [nodesUptimeFilter, searchValue, tenant, visibleEntities],
     );
 
-    const columns = useMemo(() => {
+    const columns = React.useMemo(() => {
         return getPreparedStorageNodesColumns(additionalNodesProps, visibleEntities);
     }, [additionalNodesProps, visibleEntities]);
 

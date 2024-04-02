@@ -8,9 +8,8 @@ import type {
     ITabletPreparedHistoryItem,
     ITabletState,
 } from '../../types/store/tablet';
-
-import {createRequestActionTypes, createApiRequest} from '../utils';
 import {prepareNodesMap} from '../../utils/nodes';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 export const FETCH_TABLET = createRequestActionTypes('TABLET', 'FETCH_TABLET');
 export const FETCH_TABLET_DESCRIBE = createRequestActionTypes('TABLET', 'FETCH_TABLET_DESCRIBE');

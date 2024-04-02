@@ -1,6 +1,7 @@
-import type {VisibleEntities} from '../../../store/reducers/storage/types';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
+import type {VisibleEntities} from '../../../store/reducers/storage/types';
 import {EmptyFilter} from '../EmptyFilter/EmptyFilter';
+
 import i18n from './i18n';
 
 interface StorageNodesEmptyDataMessageProps {

@@ -1,51 +1,49 @@
-import {useEffect, useReducer, useRef, useState} from 'react';
-import {connect} from 'react-redux';
-import cn from 'bem-cn-lite';
+import React from 'react';
+
 import throttle from 'lodash/throttle';
-import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import type Monaco from 'monaco-editor';
+import {connect} from 'react-redux';
 
+import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import SplitPane from '../../../../components/SplitPane';
-
+import type {RootState} from '../../../../store';
 import {
-    sendExecuteQuery,
-    saveQueryToHistory,
-    goToPreviousQuery,
     goToNextQuery,
+    goToPreviousQuery,
+    saveQueryToHistory,
+    sendExecuteQuery,
     setTenantPath,
 } from '../../../../store/reducers/executeQuery';
 import {getExplainQuery, getExplainQueryAst} from '../../../../store/reducers/explainQuery';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
+import type {EPathType} from '../../../../types/api/schema';
+import type {ValueOf} from '../../../../types/common';
+import type {ExecuteQueryState} from '../../../../types/store/executeQuery';
+import type {ExplainQueryState} from '../../../../types/store/explainQuery';
+import type {QueryAction, QueryMode, SavedQuery} from '../../../../types/store/query';
+import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
-    SAVED_QUERIES_KEY,
     LAST_USED_QUERY_ACTION_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
+    SAVED_QUERIES_KEY,
 } from '../../../../utils/constants';
-import {useSetting, useQueryModes} from '../../../../utils/hooks';
+import {useQueryModes, useSetting} from '../../../../utils/hooks';
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import {parseJson} from '../../../../utils/utils';
-import {useEditorOptions} from './helpers';
-
+import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
-    InitialPaneState,
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
 } from '../../utils/paneVisibilityToggleHelpers';
-import {Preview} from '../Preview/Preview';
-
 import {ExecuteResult} from '../ExecuteResult/ExecuteResult';
 import {ExplainResult} from '../ExplainResult/ExplainResult';
+import {Preview} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
-
-import type {QueryAction, QueryMode, SavedQuery} from '../../../../types/store/query';
-import type {ExecuteQueryState} from '../../../../types/store/executeQuery';
-import type {ExplainQueryState} from '../../../../types/store/explainQuery';
-import type {ValueOf} from '../../../../types/common';
-import type {EPathType} from '../../../../types/api/schema';
-import type {RootState} from '../../../../store';
 import i18n from '../i18n';
+
+import {useEditorOptions} from './helpers';
 
 import './QueryEditor.scss';
 
@@ -99,20 +97,20 @@ function QueryEditor(props: QueryEditorProps) {
     } = props;
     const {tenantPath: savedPath} = executeQuery;
 
-    const [resultType, setResultType] = useState(RESULT_TYPES.EXECUTE);
+    const [resultType, setResultType] = React.useState(RESULT_TYPES.EXECUTE);
 
-    const [isResultLoaded, setIsResultLoaded] = useState(false);
+    const [isResultLoaded, setIsResultLoaded] = React.useState(false);
     const [queryMode, setQueryMode] = useQueryModes();
     const [useMultiSchema] = useSetting(QUERY_USE_MULTI_SCHEMA_KEY);
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting<QueryAction>(
         LAST_USED_QUERY_ACTION_KEY,
     );
     const [savedQueries, setSavedQueries] = useSetting<SavedQuery[]>(SAVED_QUERIES_KEY);
-    const [monacoHotKey, setMonacoHotKey] = useState<ValueOf<typeof MONACO_HOT_KEY_ACTIONS> | null>(
-        null,
-    );
+    const [monacoHotKey, setMonacoHotKey] = React.useState<ValueOf<
+        typeof MONACO_HOT_KEY_ACTIONS
+    > | null>(null);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (savedPath !== path) {
             if (savedPath) {
                 changeUserInput({input: ''});
@@ -121,14 +119,14 @@ function QueryEditor(props: QueryEditorProps) {
         }
     }, [changeUserInput, setPath, path, savedPath]);
 
-    const [resultVisibilityState, dispatchResultVisibilityState] = useReducer(
+    const [resultVisibilityState, dispatchResultVisibilityState] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
         initialTenantCommonInfoState,
     );
 
-    const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor>();
+    const editorRef = React.useRef<Monaco.editor.IStandaloneCodeEditor>();
 
-    useEffect(() => {
+    React.useEffect(() => {
         const updateEditor = () => {
             if (editorRef.current) {
                 editorRef.current.layout();
@@ -147,7 +145,7 @@ function QueryEditor(props: QueryEditorProps) {
         };
     }, []);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const storageEventHandler = (event: StorageEvent) => {
             if (event.key === SAVED_QUERIES_KEY) {
                 const v = parseJson(event.newValue);
@@ -161,11 +159,11 @@ function QueryEditor(props: QueryEditorProps) {
         };
     }, [setSavedQueries]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
     }, []);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (props.showPreview || isResultLoaded) {
             dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
         } else {
@@ -173,7 +171,7 @@ function QueryEditor(props: QueryEditorProps) {
         }
     }, [props.showPreview, isResultLoaded]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const {input, history} = executeQuery;
 
         const hasUnsavedInput = input
@@ -240,7 +238,7 @@ function QueryEditor(props: QueryEditorProps) {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (monacoHotKey === null) {
             return;
         }
@@ -293,7 +291,7 @@ function QueryEditor(props: QueryEditorProps) {
             run: () => setMonacoHotKey(MONACO_HOT_KEY_ACTIONS.sendQuery),
         });
 
-        const canSendSelectedText = editor.createContextKey('canSendSelectedText', false);
+        const canSendSelectedText = editor.createContextKey<boolean>('canSendSelectedText', false);
         editor.onDidChangeCursorSelection(({selection, secondarySelections}) => {
             const notEmpty =
                 selection.selectionStartLineNumber !== selection.positionLineNumber ||
@@ -419,8 +417,6 @@ function QueryEditor(props: QueryEditorProps) {
                                 options={editorOptions}
                                 onChange={onChange}
                                 editorDidMount={editorDidMount}
-                                // pass noop otherwise it will throw error
-                                editorWillUnmount={() => {}}
                                 theme={`vs-${theme}`}
                             />
                         </div>

@@ -1,7 +1,8 @@
-import React, {PropsWithChildren} from 'react';
-import {Provider} from 'react-redux';
+import React from 'react';
+
 import {render} from '@testing-library/react';
 import type {RenderOptions} from '@testing-library/react';
+import {Provider} from 'react-redux';
 
 import {configureStore} from '../../store';
 
@@ -18,7 +19,7 @@ export const renderWithStore = (
 ) => {
     const {store} = storeConfiguration;
 
-    function Wrapper({children}: PropsWithChildren<{}>) {
+    function Wrapper({children}: {children?: React.ReactNode}) {
         return <Provider store={store}>{children}</Provider>;
     }
 

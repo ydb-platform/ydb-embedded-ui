@@ -1,12 +1,11 @@
-import DataTable, {Column} from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../../components/InternalLink/InternalLink';
-
 import type {ITabletPreparedHistoryItem} from '../../../types/store/tablet';
 import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 import {getDefaultNodePath} from '../../Node/NodePages';
-
 import {b} from '../Tablet';
 
 const columns: Column<ITabletPreparedHistoryItem>[] = [

@@ -1,20 +1,20 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {Helmet} from 'react-helmet-async';
-
-import ContentWrapper, {Content} from './Content';
-import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
-import AppIcons from '../AppIcons/AppIcons';
-import {Navigation} from '../AsideNavigation/Navigation';
-
-import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
-import {settings} from '../UserSettings/settings';
-import {Providers} from './Providers';
 
 import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
-import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
+import {Helmet} from 'react-helmet-async';
+import {connect} from 'react-redux';
+
+import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
 import type {RootState} from '../../store';
+import AppIcons from '../AppIcons/AppIcons';
+import {Navigation} from '../AsideNavigation/Navigation';
+import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
+import {settings} from '../UserSettings/settings';
+import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
+
+import ContentWrapper, {Content} from './Content';
+import {Providers} from './Providers';
 
 import './App.scss';
 

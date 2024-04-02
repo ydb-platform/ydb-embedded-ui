@@ -1,6 +1,9 @@
-import {useHistory, useLocation} from 'react-router';
-import {useCallback} from 'react';
+import React from 'react';
 
+import {useHistory, useLocation} from 'react-router';
+
+import {parseQuery} from '../../../../../routes';
+import {changeUserInput} from '../../../../../store/reducers/executeQuery';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGE,
@@ -11,13 +14,9 @@ import {
     fetchTenantOverviewTopQueries,
     setDataWasNotLoaded,
 } from '../../../../../store/reducers/tenantOverview/topQueries/tenantOverviewTopQueries';
-import {changeUserInput} from '../../../../../store/reducers/executeQuery';
 import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
-import {parseQuery} from '../../../../../routes';
-
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {getTenantOverviewTopQueriesColumns} from '../../TopQueries/getTopQueriesColumns';
-
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
@@ -55,8 +54,8 @@ export function TopQueries({path}: TopQueriesProps) {
         autorefresh,
     );
 
-    const handleRowClick = useCallback(
-        (row) => {
+    const handleRowClick = React.useCallback(
+        (row: any) => {
             const {QueryText: input} = row;
 
             dispatch(changeUserInput({input}));

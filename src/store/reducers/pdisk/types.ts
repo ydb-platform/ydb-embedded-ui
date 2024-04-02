@@ -2,6 +2,7 @@ import type {IResponseError} from '../../../types/api/error';
 import type {PreparedPDisk} from '../../../utils/disks/types';
 import type {ApiRequestAction} from '../../utils';
 import type {PreparedStorageGroup} from '../storage/types';
+
 import type {FETCH_PDISK, FETCH_PDISK_GROUPS, setPDiskDataWasNotLoaded} from './pdisk';
 
 interface PDiskData extends PreparedPDisk {

@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import React from 'react';
 
 import {
     getHealthcheckInfo,
@@ -7,9 +7,10 @@ import {
     setDataWasNotLoaded,
 } from '../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
-import {type StatusFlag, SelfCheckResult} from '../../../../types/api/healthcheck';
 import type {IResponseError} from '../../../../types/api/error';
-import {useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
+import {SelfCheckResult} from '../../../../types/api/healthcheck';
+import type {StatusFlag} from '../../../../types/api/healthcheck';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 interface HealthcheckParams {
     issueTrees: IssuesTree[];
@@ -29,7 +30,7 @@ export const useHealthcheck = (tenantName: string): HealthcheckParams => {
     const issuesStatistics = useTypedSelector(selectIssuesStatistics);
     const issueTrees = useTypedSelector(selectIssuesTrees);
 
-    const fetchHealthcheck = useCallback(
+    const fetchHealthcheck = React.useCallback(
         (isBackground = true) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded());

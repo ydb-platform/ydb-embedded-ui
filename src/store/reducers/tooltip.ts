@@ -1,7 +1,7 @@
-import isEqual from 'lodash/isEqual';
 import type {Reducer} from '@reduxjs/toolkit';
+import isEqual from 'lodash/isEqual';
 
-import {
+import type {
     ITooltipAction,
     ITooltipPositions,
     ITooltipState,

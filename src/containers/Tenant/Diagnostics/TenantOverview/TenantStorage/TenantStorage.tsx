@@ -1,17 +1,18 @@
-import InfoViewer from '../../../../../components/InfoViewer/InfoViewer';
-import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
-import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
-import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
+import React from 'react';
 
+import InfoViewer from '../../../../../components/InfoViewer/InfoViewer';
+import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
+import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
+import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
+import i18n from '../i18n';
+import {b} from '../utils';
+
+import {TopGroups} from './TopGroups';
+import {TopTables} from './TopTables';
+import {storageDashboardConfig} from './storageDashboardConfig';
 
 import '../TenantOverview.scss';
-
-import {storageDashboardConfig} from './storageDashboardConfig';
-import {TopTables} from './TopTables';
-import {TopGroups} from './TopGroups';
-import {b} from '../utils';
-import i18n from '../i18n';
 
 export interface TenantStorageMetrics {
     blobStorageUsed?: number;
@@ -68,11 +69,11 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     ];
 
     return (
-        <>
+        <React.Fragment>
             <TenantDashboard database={tenantName} charts={storageDashboardConfig} />
             <InfoViewer className={b('storage-info')} title="Storage details" info={info} />
             <TopTables path={tenantName} />
             <TopGroups tenant={tenantName} />
-        </>
+        </React.Fragment>
     );
 }

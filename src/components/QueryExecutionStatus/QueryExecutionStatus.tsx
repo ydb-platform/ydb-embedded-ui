@@ -1,9 +1,7 @@
-import type {ReactNode} from 'react';
-import type {AxiosError} from 'axios';
-import cn from 'bem-cn-lite';
-
 import {Icon as UiKitIcon} from '@gravity-ui/uikit';
+import type {AxiosError} from 'axios';
 
+import {cn} from '../../utils/cn';
 import {Icon} from '../Icon';
 
 import questionIcon from '../../assets/icons/question.svg';
@@ -19,7 +17,7 @@ interface QueryExecutionStatusProps {
 }
 
 export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusProps) => {
-    let icon: ReactNode;
+    let icon: React.ReactNode;
     let label: string;
 
     if (typeof error === 'object' && error?.code === 'ECONNABORTED') {

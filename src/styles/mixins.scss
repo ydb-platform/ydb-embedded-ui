@@ -19,22 +19,27 @@
     font-size: var(--g-text-body-1-font-size);
     line-height: var(--g-text-body-1-line-height);
 }
+
 @mixin body-2-typography() {
     font-size: var(--g-text-body-2-font-size);
     line-height: var(--g-text-body-2-line-height);
 }
+
 @mixin body-3-typography() {
     font-size: var(--g-text-body-3-font-size);
     line-height: var(--g-text-body-3-line-height);
 }
+
 @mixin lead-typography() {
     font-size: var(--g-text-subheader-3-font-size);
     line-height: var(--g-text-subheader-3-line-height);
 }
+
 @mixin header-1-typography() {
     font-size: var(--g-text-header-1-font-size);
     line-height: var(--g-text-header-1-line-height);
 }
+
 @mixin header-2-typography() {
     font-size: var(--g-text-header-2-font-size);
     line-height: var(--g-text-header-2-line-height);
@@ -152,6 +157,7 @@
         background-color: var(--ydb-data-table-color-hover) !important;
     }
 
+    /* stylelint-disable-next-line order/order */
     @for $i from 0 through $nth {
         & .data-table__td:nth-child(#{$i}),
         & .data-table__head-row:first-child .data-table__th:nth-child(#{$i}) {

@@ -1,10 +1,11 @@
-import {useMemo} from 'react';
+import React from 'react';
 
 import type {NodesGeneralRequestParams} from '../../store/reducers/nodes/types';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
-
 import {USE_BACKEND_PARAMS_FOR_TABLES_KEY} from '../constants';
-import {NodesUptimeFilterValues, getProblemParamValue, getUptimeParamValue} from '../nodes';
+import type {NodesUptimeFilterValues} from '../nodes';
+import {getProblemParamValue, getUptimeParamValue} from '../nodes';
+
 import {useSetting} from './useSetting';
 
 interface NodesRawRequestParams
@@ -24,7 +25,7 @@ export const useNodesRequestParams = ({
 
     // If backend params are enabled, update params value to use them in fetch request
     // Otherwise no params will be updated, no hooks that depend on requestParams will be triggered
-    return useMemo(() => {
+    return React.useMemo(() => {
         if (useBackendParamsForTables) {
             const problemsOnly = getProblemParamValue(problemFilter);
             const uptime = getUptimeParamValue(nodesUptimeFilter);

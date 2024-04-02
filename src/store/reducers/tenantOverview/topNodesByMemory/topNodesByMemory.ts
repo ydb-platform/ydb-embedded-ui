@@ -2,9 +2,10 @@ import type {Reducer} from '@reduxjs/toolkit';
 
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {createApiRequest, createRequestActionTypes} from '../../../utils';
-import {prepareNodesData} from '../../nodes/utils';
 import type {NodesApiRequestParams} from '../../nodes/types';
-import type {TopNodesByMemoryAction, TopNodesByMemoryState, TopNodesByMemorySlice} from './types';
+import {prepareNodesData} from '../../nodes/utils';
+
+import type {TopNodesByMemoryAction, TopNodesByMemorySlice, TopNodesByMemoryState} from './types';
 
 export const FETCH_TOP_NODES_BY_MEMORY = createRequestActionTypes(
     'topNodesByMemory',

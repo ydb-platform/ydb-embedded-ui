@@ -1,6 +1,7 @@
 import {EFlag} from '../../types/api/enums';
 import type {TPDiskState, TPDiskStateInfo} from '../../types/api/pdisk';
 import {generateEvaluator} from '../generateEvaluator';
+
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     NOT_AVAILABLE_SEVERITY,

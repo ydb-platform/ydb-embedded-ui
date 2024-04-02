@@ -1,8 +1,9 @@
-import {ReactNode} from 'react';
+import React from 'react';
+
 import {useTypedSelector} from '../../lib';
 
 export interface ClusterModeGuardProps {
-    children: ReactNode;
+    children: React.ReactNode;
     mode: 'single' | 'multi';
 }
 
@@ -11,5 +12,5 @@ export function ClusterModeGuard({children, mode}: ClusterModeGuardProps) {
         mode === 'single' ? state.singleClusterMode : !state.singleClusterMode,
     );
 
-    return shouldRender ? <>{children}</> : null;
+    return shouldRender ? <React.Fragment>{children}</React.Fragment> : null;
 }

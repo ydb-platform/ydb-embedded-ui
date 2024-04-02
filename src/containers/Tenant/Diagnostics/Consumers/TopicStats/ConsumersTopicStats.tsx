@@ -1,12 +1,11 @@
-import block from 'bem-cn-lite';
-
-import type {IPreparedTopicStats} from '../../../../../types/store/topic';
-import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import type {IPreparedTopicStats} from '../../../../../types/store/topic';
+import {cn} from '../../../../../utils/cn';
+import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
 
 import './ConsumersTopicStats.scss';
 
-const b = block('ydb-diagnostics-consumers-topic-stats');
+const b = cn('ydb-diagnostics-consumers-topic-stats');
 
 interface ConsumersTopicStatsProps {
     data?: IPreparedTopicStats;

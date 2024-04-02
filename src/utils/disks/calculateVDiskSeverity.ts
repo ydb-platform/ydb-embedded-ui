@@ -1,5 +1,6 @@
 import type {EFlag} from '../../types/api/enums';
-import {EVDiskState, type TVDiskStateInfo} from '../../types/api/vdisk';
+import type {EVDiskState, TVDiskStateInfo} from '../../types/api/vdisk';
+
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     NOT_AVAILABLE_SEVERITY,

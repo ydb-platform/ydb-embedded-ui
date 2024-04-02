@@ -7,7 +7,6 @@ import {
     formatNumber,
 } from '../../../utils/dataFormatters/dataFormatters';
 import {toFormattedSize} from '../../FormattedBytes/utils';
-
 import {createInfoFormatter} from '../utils';
 
 export const formatTabletMetricsItem = createInfoFormatter<TMetrics>({

@@ -1,11 +1,12 @@
-import {Link} from 'react-router-dom';
-import cn from 'bem-cn-lite';
-
 import {Link as UIKitLink} from '@gravity-ui/uikit';
+import {Link} from 'react-router-dom';
 
 import {EFlag} from '../../types/api/enums';
-import {StatusIcon, type StatusIconMode, type StatusIconSize} from '../StatusIcon/StatusIcon';
+import {cn} from '../../utils/cn';
 import {ClipboardButton} from '../ClipboardButton';
+import {StatusIcon} from '../StatusIcon/StatusIcon';
+import type {StatusIconMode, StatusIconSize} from '../StatusIcon/StatusIcon';
+
 import './EntityStatus.scss';
 
 const b = cn('entity-status');
@@ -56,33 +57,34 @@ export function EntityStatus({
 
         return <StatusIcon status={status} size={size} mode={mode} />;
     };
-    const renderStatusLink = () => {
+    const renderStatusLink = (href: string) => {
         return (
-            <UIKitLink target="_blank" href={iconPath}>
+            <UIKitLink target="_blank" href={href}>
                 {renderIcon()}
             </UIKitLink>
         );
     };
     const renderLink = () => {
-        if (externalLink) {
+        if (path) {
+            if (externalLink) {
+                return (
+                    <UIKitLink className={b('name')} href={path}>
+                        {name}
+                    </UIKitLink>
+                );
+            }
+
             return (
-                <UIKitLink className={b('name')} href={path}>
+                <Link className={b('name')} to={path}>
                     {name}
-                </UIKitLink>
+                </Link>
             );
         }
-
-        return path ? (
-            <Link className={b('name')} to={path}>
-                {name}
-            </Link>
-        ) : (
-            name && <span className={b('name')}>{name}</span>
-        );
+        return name && <span className={b('name')}>{name}</span>;
     };
     return (
         <div className={b(null, className)} title={name}>
-            {iconPath ? renderStatusLink() : renderIcon()}
+            {iconPath ? renderStatusLink(iconPath) : renderIcon()}
             {label && (
                 <span title={label} className={b('label', {size, state: status.toLowerCase()})}>
                     {label}

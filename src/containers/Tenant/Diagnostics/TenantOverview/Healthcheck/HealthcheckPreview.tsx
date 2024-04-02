@@ -1,18 +1,20 @@
-import cn from 'bem-cn-lite';
+import React from 'react';
 
 import {Button, Icon} from '@gravity-ui/uikit';
 
-import updateArrow from '../../../../../assets/icons/update-arrow.svg';
-
-import {SelfCheckResult, type StatusFlag} from '../../../../../types/api/healthcheck';
-import type {IResponseError} from '../../../../../types/api/error';
-import {hcStatusToColorFlag} from '../../../../../store/reducers/healthcheckInfo/utils';
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
+import {hcStatusToColorFlag} from '../../../../../store/reducers/healthcheckInfo/utils';
+import type {IResponseError} from '../../../../../types/api/error';
+import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
+import {cn} from '../../../../../utils/cn';
 
 import i18n from './i18n';
+
+import updateArrow from '../../../../../assets/icons/update-arrow.svg';
+
 import './Healthcheck.scss';
 
 const b = cn('healthcheck');
@@ -66,7 +68,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
                 {!issuesStatistics || !issuesStatistics.length ? (
                     i18n('status_message.ok')
                 ) : (
-                    <>
+                    <React.Fragment>
                         <div>{i18n('label.issues')}</div>
                         <div className={b('issues-statistics')}>
                             {issuesStatistics.map(([status, count]) => (
@@ -79,7 +81,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
                                 />
                             ))}
                         </div>
-                    </>
+                    </React.Fragment>
                 )}
             </div>
         );

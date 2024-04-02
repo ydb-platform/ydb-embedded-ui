@@ -1,18 +1,18 @@
 import type {OrderType} from '@gravity-ui/react-data-table';
 
-import type {IResponseError} from '../../../types/api/error';
-import type {TEndpoint, TPoolStats} from '../../../types/api/nodes';
 import type {
     EVersion,
     TTabletStateInfo as TComputeTabletStateInfo,
 } from '../../../types/api/compute';
-import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
 import type {EFlag} from '../../../types/api/enums';
+import type {IResponseError} from '../../../types/api/error';
+import type {TEndpoint, TPoolStats} from '../../../types/api/nodes';
+import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
+import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {ApiRequestAction} from '../../utils';
 import type {VisibleEntities} from '../storage/types';
 
-import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
-import {
+import type {
     FETCH_NODES,
     resetNodesState,
     setDataWasNotLoaded,

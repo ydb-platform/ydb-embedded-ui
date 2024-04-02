@@ -1,13 +1,12 @@
-import type {ApiRequestAction} from '../../store/utils';
-import {
-    clearWasLoadingFlag,
+import type {
     FETCH_TABLETS,
+    clearWasLoadingFlag,
     setStateFilter,
     setTypeFilter,
 } from '../../store/reducers/tablets';
-
+import type {ApiRequestAction} from '../../store/utils';
 import type {IResponseError} from '../api/error';
-import type {TEvTabletStateResponse, EType, ETabletState} from '../api/tablet';
+import type {ETabletState, EType, TEvTabletStateResponse} from '../api/tablet';
 
 export interface ITabletsState {
     loading: boolean;

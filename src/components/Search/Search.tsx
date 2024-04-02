@@ -1,7 +1,8 @@
-import {useRef, useEffect, useState} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
 import {TextInput} from '@gravity-ui/uikit';
+
+import {cn} from '../../utils/cn';
 
 import './Search.scss';
 
@@ -22,11 +23,11 @@ export const Search = ({
     debounce = 200,
     placeholder,
 }: SearchProps) => {
-    const [searchValue, setSearchValue] = useState<string>(value);
+    const [searchValue, setSearchValue] = React.useState<string>(value);
 
-    const timer = useRef<number>();
+    const timer = React.useRef<number>();
 
-    useEffect(() => {
+    React.useEffect(() => {
         setSearchValue((prevValue) => {
             if (prevValue !== value) {
                 return value;

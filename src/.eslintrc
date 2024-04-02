@@ -1,28 +1,26 @@
 {
-    "parser": "@typescript-eslint/parser",
     "extends": "@gravity-ui/eslint-config/client",
-    "plugins": ["@typescript-eslint"],
     "rules": {
         "react/jsx-uses-react": "off",
         "react/react-in-jsx-scope": "off",
         "react-hooks/exhaustive-deps": [
             "warn",
             {
-                "additionalHooks": "(useAutofetcher)"
-            }
+                "additionalHooks": "(useAutofetcher)",
+            },
         ],
         "valid-jsdoc": "off",
-        "@typescript-eslint/naming-convention": [
-            "warn",
+        "react/jsx-fragments": ["error", "element"],
+        "no-restricted-syntax": [
+            "error",
             {
-                "selector": "typeLike",
-                "format": ["PascalCase"],
-                "leadingUnderscore": "forbid",
-                "custom": {
-                    "regex": "^I[A-Z]",
-                    "match": false
-                }
-            }
-        ]
-    }
+                "selector": "ImportDeclaration[source.value='react'] :matches(ImportNamespaceSpecifier, ImportSpecifier)",
+                "message": "Please use import React from 'react' instead.",
+            },
+            {
+                "selector": "TSTypeReference>TSQualifiedName[left.name='React'][right.name='FC']",
+                "message": "Don't use React.FC",
+            },
+        ],
+    },
 }

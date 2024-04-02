@@ -1,10 +1,7 @@
-import type {ReactNode} from 'react';
-
-import {RadioButton, Switch} from '@gravity-ui/uikit';
 import {Settings} from '@gravity-ui/navigation';
+import {RadioButton, Switch} from '@gravity-ui/uikit';
 
 import {LabelWithPopover} from '../../components/LabelWithPopover/LabelWithPopover';
-
 import {useSetting} from '../../utils/hooks';
 
 import {b} from './UserSettings';
@@ -14,9 +11,9 @@ export type SettingsElementType = 'switch' | 'radio';
 export interface SettingProps {
     type?: SettingsElementType;
     title: string;
-    description?: ReactNode;
+    description?: React.ReactNode;
     settingKey: string;
-    helpPopoverContent?: ReactNode;
+    helpPopoverContent?: React.ReactNode;
     options?: {value: string; content: string}[];
     defaultValue?: unknown;
     onValueUpdate?: VoidFunction;
@@ -39,7 +36,7 @@ export const Setting = ({
         onValueUpdate?.();
     };
 
-    const renderTitleComponent = (value: ReactNode) => {
+    const renderTitleComponent = (value: React.ReactNode) => {
         if (helpPopoverContent) {
             return (
                 <LabelWithPopover

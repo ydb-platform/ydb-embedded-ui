@@ -1,6 +1,10 @@
 import type {IQueryResult, QueryErrorResponse} from '../../../../types/store/query';
 import type {ApiRequestAction} from '../../../utils';
-import {FETCH_TENANT_OVERVIEW_TOP_SHARDS, setDataWasNotLoaded} from './tenantOverviewTopShards';
+
+import type {
+    FETCH_TENANT_OVERVIEW_TOP_SHARDS,
+    setDataWasNotLoaded,
+} from './tenantOverviewTopShards';
 
 export interface TenantOverviewTopShardsState {
     loading: boolean;

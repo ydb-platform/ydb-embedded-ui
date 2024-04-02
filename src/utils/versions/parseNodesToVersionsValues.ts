@@ -1,5 +1,6 @@
 import type {TSystemStateInfo} from '../../types/api/nodes';
 import type {VersionToColorMap, VersionValue} from '../../types/versions';
+
 import {getMinorVersion} from './parseVersion';
 
 export const parseNodesToVersionsValues = (

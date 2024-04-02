@@ -1,12 +1,11 @@
-import type {ReactNode} from 'react';
-import cn from 'bem-cn-lite';
+import {cn} from '../../utils/cn';
 
 import './DiagnosticCard.scss';
 
 const b = cn('ydb-diagnostic-card');
 
 interface DiagnosticCardProps {
-    children?: ReactNode;
+    children?: React.ReactNode;
     className?: string;
     active?: boolean;
 }

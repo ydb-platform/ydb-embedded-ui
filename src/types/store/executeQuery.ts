@@ -1,12 +1,13 @@
-import {
+import type {
     SEND_QUERY,
     changeUserInput,
-    saveQueryToHistory,
-    goToPreviousQuery,
     goToNextQuery,
+    goToPreviousQuery,
+    saveQueryToHistory,
     setTenantPath,
 } from '../../store/reducers/executeQuery';
 import type {ApiRequestAction} from '../../store/utils';
+
 import type {IQueryResult, QueryError, QueryErrorResponse} from './query';
 
 export interface QueryInHistory {

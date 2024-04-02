@@ -1,5 +1,4 @@
 import type {IResponseError} from '../../../types/api/error';
-
 import i18n from '../i18n';
 
 interface ResponseErrorProps {

@@ -3,11 +3,10 @@
     flex: 0 0 40px;
     justify-content: space-between;
     align-items: flex-end;
+    gap: 24px;
 
     min-height: 40px;
     padding: 5px 0px;
-
-    gap: 24px;
 
     &__left {
         display: flex;

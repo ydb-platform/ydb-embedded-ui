@@ -1,7 +1,7 @@
 import type {AuthErrorResponse} from '../../../types/api/error';
 import type {ApiRequestAction} from '../../utils';
 
-import {FETCH_USER, SET_AUTHENTICATED, SET_UNAUTHENTICATED} from './authentication';
+import type {FETCH_USER, SET_AUTHENTICATED, SET_UNAUTHENTICATED} from './authentication';
 
 export interface AuthenticationState {
     isAuthenticated: boolean;

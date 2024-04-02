@@ -1,5 +1,7 @@
 import {Skeleton} from '@gravity-ui/uikit';
+
 import {cn} from '../../utils/cn';
+
 import './PageMeta.scss';
 
 const b = cn('ydb-page-meta');

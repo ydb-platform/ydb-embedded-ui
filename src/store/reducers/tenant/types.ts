@@ -3,22 +3,22 @@ import type {TTenant} from '../../../types/api/tenant';
 import type {ValueOf} from '../../../types/common';
 import type {ApiRequestAction} from '../../utils';
 
-import {
-    TENANT_QUERY_TABS_ID,
+import type {
     TENANT_DIAGNOSTICS_TABS_IDS,
-    TENANT_PAGES_IDS,
-    TENANT_SUMMARY_TABS_IDS,
     TENANT_METRICS_TABS_IDS,
+    TENANT_PAGES_IDS,
+    TENANT_QUERY_TABS_ID,
+    TENANT_SUMMARY_TABS_IDS,
 } from './constants';
-import {
+import type {
     FETCH_TENANT,
     clearTenant,
+    setDataWasNotLoaded,
     setDiagnosticsTab,
+    setMetricsTab,
     setQueryTab,
     setSummaryTab,
-    setMetricsTab,
     setTenantPage,
-    setDataWasNotLoaded,
 } from './tenant';
 
 export type TenantPage = ValueOf<typeof TENANT_PAGES_IDS>;

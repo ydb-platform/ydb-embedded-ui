@@ -1,14 +1,14 @@
-import {useState} from 'react';
+import React from 'react';
 
-import type {AdditionalNodesProps} from '../../types/additionalProps';
-import type {RenderControls, RenderErrorMessage} from '../../components/VirtualTable';
-import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
-import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
-import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {AccessDenied} from '../../components/Errors/403/AccessDenied';
 import {ResponseError} from '../../components/Errors/ResponseError/ResponseError';
+import type {RenderControls, RenderErrorMessage} from '../../components/VirtualTable';
 import {selectNodesMap} from '../../store/reducers/nodesList';
+import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
+import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
+import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {useTypedSelector} from '../../utils/hooks';
+import {NodesUptimeFilterValues} from '../../utils/nodes';
 
 import {StorageControls} from './StorageControls/StorageControls';
 import {VirtualStorageGroups} from './StorageGroups/VirtualStorageGroups';
@@ -27,10 +27,12 @@ export const VirtualStorage = ({
     parentContainer,
     additionalNodesProps,
 }: VirtualStorageProps) => {
-    const [searchValue, setSearchValue] = useState('');
-    const [storageType, setStorageType] = useState<StorageType>(STORAGE_TYPES.groups);
-    const [visibleEntities, setVisibleEntities] = useState<VisibleEntities>(VISIBLE_ENTITIES.all);
-    const [nodesUptimeFilter, setNodesUptimeFilter] = useState<NodesUptimeFilterValues>(
+    const [searchValue, setSearchValue] = React.useState('');
+    const [storageType, setStorageType] = React.useState<StorageType>(STORAGE_TYPES.groups);
+    const [visibleEntities, setVisibleEntities] = React.useState<VisibleEntities>(
+        VISIBLE_ENTITIES.all,
+    );
+    const [nodesUptimeFilter, setNodesUptimeFilter] = React.useState<NodesUptimeFilterValues>(
         NodesUptimeFilterValues.All,
     );
 

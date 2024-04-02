@@ -1,22 +1,22 @@
-import cn from 'bem-cn-lite';
-
 import {Link, useLocation} from 'react-router-dom';
 
-import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
-import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {useTypedSelector} from '../../../../../utils/hooks';
 import {parseQuery} from '../../../../../routes';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
+import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
 import {
     calculateUsage,
     cpuUsageToStatus,
-    storageUsageToStatus,
-    memoryUsageToStatus,
     formatTenantMetrics,
+    memoryUsageToStatus,
+    storageUsageToStatus,
 } from '../../../../../store/reducers/tenants/utils';
-import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
 import type {IResponseError} from '../../../../../types/api/error';
+import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
+import {cn} from '../../../../../utils/cn';
+import {useTypedSelector} from '../../../../../utils/hooks';
+import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {HealthcheckPreview} from '../Healthcheck/HealthcheckPreview';
+
 import {MetricCard} from './MetricCard/MetricCard';
 
 import './MetricsCards.scss';

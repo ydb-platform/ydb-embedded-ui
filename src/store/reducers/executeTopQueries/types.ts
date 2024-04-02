@@ -1,6 +1,11 @@
-import {FETCH_TOP_QUERIES, setTopQueriesState, setTopQueriesFilters} from './executeTopQueries';
-import type {ApiRequestAction} from '../../utils';
 import type {IQueryResult, QueryErrorResponse} from '../../../types/store/query';
+import type {ApiRequestAction} from '../../utils';
+
+import type {
+    FETCH_TOP_QUERIES,
+    setTopQueriesFilters,
+    setTopQueriesState,
+} from './executeTopQueries';
 
 export interface ITopQueriesFilters {
     /** ms from epoch */

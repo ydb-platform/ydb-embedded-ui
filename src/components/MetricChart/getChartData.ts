@@ -1,4 +1,6 @@
-import {TIMEFRAMES, type TimeFrame} from '../../utils/timeframes';
+import {TIMEFRAMES} from '../../utils/timeframes';
+import type {TimeFrame} from '../../utils/timeframes';
+
 import type {MetricDescription} from './types';
 
 interface GetChartDataParams {

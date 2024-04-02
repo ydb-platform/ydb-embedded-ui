@@ -1,17 +1,17 @@
-import DataTable, {Settings, SortOrder} from '@gravity-ui/react-data-table';
-
-import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
-import type {HandleSort} from '../../../utils/hooks/useTableSort';
-import type {AdditionalNodesProps} from '../../../types/additionalProps';
+import type {Settings, SortOrder} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
+import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {AdditionalNodesProps} from '../../../types/additionalProps';
+import type {HandleSort} from '../../../utils/hooks/useTableSort';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 
-import {getPreparedStorageNodesColumns} from './getStorageNodesColumns';
-
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
-import {getRowUnavailableClassName} from './shared';
+import {getPreparedStorageNodesColumns} from './getStorageNodesColumns';
 import i18n from './i18n';
+import {getRowUnavailableClassName} from './shared';
+
 import './StorageNodes.scss';
 
 interface StorageNodesProps {

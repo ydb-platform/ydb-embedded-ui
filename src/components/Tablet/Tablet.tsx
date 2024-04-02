@@ -1,12 +1,10 @@
-import cn from 'bem-cn-lite';
-
-import type {TTabletStateInfo} from '../../types/api/tablet';
-import {getTabletLabel} from '../../utils/constants';
 import routes, {createHref} from '../../routes';
-
+import type {TTabletStateInfo} from '../../types/api/tablet';
+import {cn} from '../../utils/cn';
+import {getTabletLabel} from '../../utils/constants';
 import {ContentWithPopup} from '../ContentWithPopup/ContentWithPopup';
-import {TabletIcon} from '../TabletIcon/TabletIcon';
 import {InternalLink} from '../InternalLink';
+import {TabletIcon} from '../TabletIcon/TabletIcon';
 import {TabletTooltipContent} from '../TooltipsContent';
 
 import './Tablet.scss';

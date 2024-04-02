@@ -1,29 +1,27 @@
-import {useCallback, useEffect, useRef} from 'react';
-import {useLocation, useParams} from 'react-router';
-import cn from 'bem-cn-lite';
+import React from 'react';
+
 import {Link as ExternalLink} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
+import {useLocation, useParams} from 'react-router';
 
-import {backend} from '../../store';
-import {getTablet, getTabletDescribe, clearTabletData} from '../../store/reducers/tablet';
-import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-
-import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../utils/hooks';
-import {CLUSTER_DEFAULT_TITLE, DEVELOPER_UI_TITLE} from '../../utils/constants';
-import {parseQuery} from '../../routes';
-
-import type {EType} from '../../types/api/tablet';
+import {EmptyState} from '../../components/EmptyState';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {Tag} from '../../components/Tag';
 import {Icon} from '../../components/Icon';
-import {EmptyState} from '../../components/EmptyState';
 import {Loader} from '../../components/Loader';
+import {Tag} from '../../components/Tag';
+import {parseQuery} from '../../routes';
+import {backend} from '../../store';
+import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
+import {clearTabletData, getTablet, getTabletDescribe} from '../../store/reducers/tablet';
+import type {EType} from '../../types/api/tablet';
+import {cn} from '../../utils/cn';
+import {CLUSTER_DEFAULT_TITLE, DEVELOPER_UI_TITLE} from '../../utils/constants';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
-import {TabletTable} from './TabletTable';
-import {TabletInfo} from './TabletInfo';
 import {TabletControls} from './TabletControls';
-
+import {TabletInfo} from './TabletInfo';
+import {TabletTable} from './TabletTable';
 import i18n from './i18n';
 
 import './Tablet.scss';
@@ -31,7 +29,7 @@ import './Tablet.scss';
 export const b = cn('tablet-page');
 
 export const Tablet = () => {
-    const isFirstDataFetchRef = useRef(true);
+    const isFirstDataFetchRef = React.useRef(true);
 
     const dispatch = useTypedDispatch();
     const location = useLocation();
@@ -59,26 +57,26 @@ export const Tablet = () => {
     const type = tablet.Type || (queryTabletType?.toString() as EType | undefined);
 
     // NOTE: should be reviewed when migrating to React 18
-    useEffect(() => {
+    React.useEffect(() => {
         return () => {
             dispatch(clearTabletData());
         };
     }, [dispatch]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (isFirstDataFetchRef.current && tablet && tablet.TenantId) {
             dispatch(getTabletDescribe(tablet.TenantId));
             isFirstDataFetchRef.current = false;
         }
     }, [dispatch, tablet]);
 
-    const fetchData = useCallback(() => {
+    const fetchData = React.useCallback(() => {
         return dispatch(getTablet(id));
     }, [dispatch, id]);
 
     useAutofetcher(fetchData, [fetchData], true);
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(
             setHeaderBreadcrumbs('tablet', {
                 nodeIds: nodeId ? [nodeId] : [],
@@ -155,13 +153,13 @@ export const Tablet = () => {
         );
     };
     return (
-        <>
+        <React.Fragment>
             <Helmet>
                 <title>{`${id} — ${i18n('tablet.header')} — ${
                     tenantName || queryClusterName || CLUSTER_DEFAULT_TITLE
                 }`}</title>
             </Helmet>
             {renderView()}
-        </>
+        </React.Fragment>
     );
 };

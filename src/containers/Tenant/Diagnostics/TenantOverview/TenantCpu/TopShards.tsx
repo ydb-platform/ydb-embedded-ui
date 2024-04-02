@@ -1,17 +1,14 @@
 import {useLocation} from 'react-router';
 
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {parseQuery} from '../../../../../routes';
-
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {
     sendTenantOverviewTopShardsQuery,
     setDataWasNotLoaded,
 } from '../../../../../store/reducers/tenantOverview/topShards/tenantOverviewTopShards';
-import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {getTopShardsColumns} from '../../TopShards/getTopShardsColumns';
-
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-
+import {getTopShardsColumns} from '../../TopShards/getTopShardsColumns';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';

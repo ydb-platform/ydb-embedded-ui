@@ -1,3 +1,6 @@
-import cn from 'bem-cn-lite';
+import {withNaming} from '@bem-react/classname';
 
-export {cn};
+export const cn = withNaming({
+    e: '__',
+    m: '_',
+});

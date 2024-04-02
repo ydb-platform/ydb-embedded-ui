@@ -30,8 +30,9 @@
     }
 
     &__preview-header {
-        margin-bottom: var(--diagnostics-section-title-margin);
         gap: 8px;
+
+        margin-bottom: var(--diagnostics-section-title-margin);
     }
 
     &__preview-title {
@@ -46,20 +47,18 @@
     &__preview-title-wrapper {
         display: flex;
         align-items: center;
+        gap: 8px;
 
         margin-bottom: 4px;
-
-        gap: 8px;
     }
 
     &__issues-statistics {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
+        gap: 10px;
 
         margin: 8px 0;
-
-        gap: 10px;
     }
 
     &__self-check-status-indicator {

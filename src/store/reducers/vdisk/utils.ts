@@ -5,6 +5,7 @@ import type {TEvVDiskStateResponse} from '../../../types/api/vdisk';
 import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 import {prepareStorageGroupData} from '../storage/utils';
+
 import type {VDiskData} from './types';
 
 export function prepareVDiskDataResponse([vDiskResponse, pDiskResponse, nodeResponse]: [

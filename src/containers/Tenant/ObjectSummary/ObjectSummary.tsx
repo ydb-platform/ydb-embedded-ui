@@ -1,10 +1,11 @@
+import React from 'react';
+
 import {HelpPopover} from '@gravity-ui/components';
 import {Button, Tabs} from '@gravity-ui/uikit';
-import cn from 'bem-cn-lite';
 import qs from 'qs';
-import React, {ReactNode, useEffect, useReducer} from 'react';
 import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
+
 import {ClipboardButton} from '../../../components/ClipboardButton';
 import {Icon} from '../../../components/Icon';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
@@ -22,12 +23,13 @@ import {
     TENANT_SUMMARY_TABS_IDS,
 } from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setSummaryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import {
+import type {
     EPathSubType,
-    EPathType,
     TColumnDescription,
     TColumnTableDescription,
 } from '../../../types/api/schema';
+import {EPathType} from '../../../types/api/schema';
+import {cn} from '../../../utils/cn';
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
@@ -35,18 +37,19 @@ import {
 import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Acl} from '../Acl/Acl';
-import i18n from '../i18n';
 import {ExternalDataSourceSummary} from '../Info/ExternalDataSource/ExternalDataSource';
 import {ExternalTableSummary} from '../Info/ExternalTable/ExternalTable';
 import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
-import {TenantTabsGroups, TENANT_INFO_TABS, TENANT_SCHEMA_TAB} from '../TenantPages';
+import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
+import i18n from '../i18n';
 import {
     PaneVisibilityActionTypes,
     PaneVisibilityToggleButtons,
     paneVisibilityToggleReducerCreator,
 } from '../utils/paneVisibilityToggleHelpers';
 import {isColumnEntityType, isExternalTable, isIndexTable, isTableType} from '../utils/schema';
+
 import './ObjectSummary.scss';
 
 const b = cn('object-summary');
@@ -100,7 +103,7 @@ export function ObjectSummary({
     isCollapsed,
 }: ObjectSummaryProps) {
     const dispatch = useTypedDispatch();
-    const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = useReducer(
+    const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED),
         undefined,
         getTenantCommonInfoState,
@@ -142,7 +145,7 @@ export function ObjectSummary({
         columns = currentObjectData?.PathDescription?.Table?.Columns;
     }
 
-    useEffect(() => {
+    React.useEffect(() => {
         const isTable = isTableType(type);
 
         if (type && !isTable && !TENANT_INFO_TABS.find((el) => el.id === summaryTab)) {
@@ -181,7 +184,7 @@ export function ObjectSummary({
     const renderObjectOverview = () => {
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
-        const pathTypeToComponent: Record<EPathType, (() => ReactNode) | undefined> = {
+        const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeTable]: undefined,

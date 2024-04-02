@@ -1,8 +1,9 @@
 import React from 'react';
+
 import {Button} from '@gravity-ui/uikit';
-import cn from 'bem-cn-lite';
 
 import {Icon} from '../../../components/Icon';
+import {cn} from '../../../utils/cn';
 
 import './ToggleButton.scss';
 

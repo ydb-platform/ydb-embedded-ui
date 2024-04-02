@@ -1,5 +1,4 @@
-import {FETCH_HOST} from '../../store/reducers/host';
-
+import type {FETCH_HOST} from '../../store/reducers/host';
 import type {ApiRequestAction} from '../../store/utils';
 import type {IResponseError} from '../api/error';
 import type {TSystemStateInfo} from '../api/nodes';

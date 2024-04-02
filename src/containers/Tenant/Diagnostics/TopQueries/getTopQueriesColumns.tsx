@@ -1,14 +1,14 @@
-import cn from 'bem-cn-lite';
+import DataTable from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
 
-import DataTable, {type Column} from '@gravity-ui/react-data-table';
-
+import {
+    OneLineQueryWithPopover,
+    TruncatedQuery,
+} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import type {KeyValueRow} from '../../../../types/api/query';
+import {cn} from '../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {generateHash} from '../../../../utils/generateHash';
-import {
-    TruncatedQuery,
-    OneLineQueryWithPopover,
-} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {parseUsToMs} from '../../../../utils/timeParsers';
 import {MAX_QUERY_HEIGHT} from '../../utils/constants';
 

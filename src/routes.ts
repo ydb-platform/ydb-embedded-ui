@@ -1,7 +1,7 @@
 import type {Location} from 'history';
-import qs from 'qs';
-import {compile} from 'path-to-regexp';
 import isEmpty from 'lodash/isEmpty';
+import {compile} from 'path-to-regexp';
+import qs from 'qs';
 
 import {backend, clusterName, webVersion} from './store';
 

@@ -1,10 +1,8 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
 import type {OlapStatsAction, OlapStatsState} from '../../types/store/olapStats';
-
 import {parseQueryAPIExecuteResponse} from '../../utils/query';
-
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 export const FETCH_OLAP_STATS = createRequestActionTypes('query', 'SEND_OLAP_STATS_QUERY');
 const RESET_LOADING_STATE = 'olapStats/RESET_LOADING_STATE';

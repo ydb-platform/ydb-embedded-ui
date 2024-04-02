@@ -1,14 +1,12 @@
-import type {ReactNode} from 'react';
-import block from 'bem-cn-lite';
-
+import {cn} from '../../utils/cn';
 import {TableSkeleton} from '../TableSkeleton/TableSkeleton';
 
 import './TableWithControlsLayout.scss';
 
-const b = block('ydb-table-with-controls-layout');
+const b = cn('ydb-table-with-controls-layout');
 
 interface TableWithControlsLayoutItemProps {
-    children: ReactNode;
+    children: React.ReactNode;
     className?: string;
 }
 

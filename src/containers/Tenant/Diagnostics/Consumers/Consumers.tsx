@@ -1,35 +1,30 @@
-import {useCallback, useMemo, useState} from 'react';
-import block from 'bem-cn-lite';
-import escapeRegExp from 'lodash/escapeRegExp';
+import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
+import escapeRegExp from 'lodash/escapeRegExp';
 
-import type {EPathType} from '../../../../types/api/schema';
-
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
 import {Search} from '../../../../components/Search';
-import {ResponseError} from '../../../../components/Errors/ResponseError';
-
-import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
-import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-
 import {
+    getTopic,
     selectPreparedConsumersData,
     selectPreparedTopicStats,
-    getTopic,
     setDataWasNotLoaded,
 } from '../../../../store/reducers/topic';
-
+import type {EPathType} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {isCdcStreamEntityType} from '../../utils/schema';
 
 import {ConsumersTopicStats} from './TopicStats';
 import {columns} from './columns';
-
 import i18n from './i18n';
 
 import './Consumers.scss';
 
-const b = block('ydb-diagnostics-consumers');
+const b = cn('ydb-diagnostics-consumers');
 
 interface ConsumersProps {
     path: string;
@@ -41,7 +36,7 @@ export const Consumers = ({path, type}: ConsumersProps) => {
 
     const dispatch = useTypedDispatch();
 
-    const [searchValue, setSearchValue] = useState('');
+    const [searchValue, setSearchValue] = React.useState('');
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const {loading, wasLoaded, error} = useTypedSelector((state) => state.topic);
@@ -49,8 +44,8 @@ export const Consumers = ({path, type}: ConsumersProps) => {
     const consumers = useTypedSelector((state) => selectPreparedConsumersData(state));
     const topic = useTypedSelector((state) => selectPreparedTopicStats(state));
 
-    const fetchData = useCallback(
-        (isBackground) => {
+    const fetchData = React.useCallback(
+        (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded);
             }
@@ -62,7 +57,7 @@ export const Consumers = ({path, type}: ConsumersProps) => {
 
     useAutofetcher(fetchData, [fetchData], autorefresh);
 
-    const dataToRender = useMemo(() => {
+    const dataToRender = React.useMemo(() => {
         if (!consumers) {
             return [];
         }

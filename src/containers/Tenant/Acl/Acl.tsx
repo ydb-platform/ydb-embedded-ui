@@ -1,18 +1,18 @@
-import {useEffect} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import DataTable, {Column} from '@gravity-ui/react-data-table';
-
-import type {TACE} from '../../../types/api/acl';
-import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
-import {useTypedSelector, useTypedDispatch} from '../../../utils/hooks';
-import {getSchemaAcl, setAclWasNotLoaded} from '../../../store/reducers/schemaAcl/schemaAcl';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
+import {getSchemaAcl, setAclWasNotLoaded} from '../../../store/reducers/schemaAcl/schemaAcl';
+import type {TACE} from '../../../types/api/acl';
+import {cn} from '../../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
+import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import i18n from '../i18n';
 
 import './Acl.scss';
-import i18n from '../i18n';
 
 const b = cn('ydb-acl');
 
@@ -74,7 +74,7 @@ export const Acl = () => {
     const {currentSchemaPath} = useTypedSelector((state) => state.schema);
     const {loading, error, acl, owner, wasLoaded} = useTypedSelector((state) => state.schemaAcl);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (currentSchemaPath) {
             dispatch(getSchemaAcl({path: currentSchemaPath}));
         }

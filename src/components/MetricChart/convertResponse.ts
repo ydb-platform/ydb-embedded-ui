@@ -1,4 +1,5 @@
 import type {MetricData} from '../../types/api/render';
+
 import type {MetricDescription, PreparedMetric, PreparedMetricsData} from './types';
 
 export const convertResponse = (

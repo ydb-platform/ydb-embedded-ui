@@ -1,6 +1,6 @@
-import {useMemo} from 'react';
+import React from 'react';
 
-import {OrderType, SortOrder} from '@gravity-ui/react-data-table';
+import type {OrderType, SortOrder} from '@gravity-ui/react-data-table';
 import {DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 
 interface SortParams {
@@ -14,7 +14,7 @@ export const useTableSort = (
     {sortValue, sortOrder = DESCENDING}: SortParams,
     onSort: (params: SortParams) => void,
 ): [SortOrder | undefined, HandleSort] => {
-    const sort: SortOrder | undefined = useMemo(() => {
+    const sort: SortOrder | undefined = React.useMemo(() => {
         if (!sortValue) {
             return undefined;
         }

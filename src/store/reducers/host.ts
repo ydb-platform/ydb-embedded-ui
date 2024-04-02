@@ -1,8 +1,7 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
 import type {IHostAction, IHostState} from '../../types/store/host';
-
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 export const FETCH_HOST = createRequestActionTypes('host', 'FETCH_HOST');
 

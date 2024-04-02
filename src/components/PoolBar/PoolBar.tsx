@@ -1,13 +1,11 @@
-import block from 'bem-cn-lite';
-
 import type {TPoolStats} from '../../types/api/nodes';
-
+import {cn} from '../../utils/cn';
 import {ContentWithPopup} from '../ContentWithPopup/ContentWithPopup';
 import {PoolTooltipContent} from '../TooltipsContent';
 
 import './PoolBar.scss';
 
-const b = block('ydb-pool-bar');
+const b = cn('ydb-pool-bar');
 
 const getBarType = (usage: number) => {
     if (usage >= 75) {

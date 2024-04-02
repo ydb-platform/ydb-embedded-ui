@@ -1,19 +1,20 @@
-import type {ReactNode} from 'react';
+import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 import type {DataTableProps} from '@gravity-ui/react-data-table';
 
+import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
+import type {IResponseError} from '../../../../types/api/error';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
     TENANT_OVERVIEW_TABLES_SETTINGS,
 } from '../../../../utils/constants';
-import type {IResponseError} from '../../../../types/api/error';
-import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import {ResponseError} from '../../../../components/Errors/ResponseError';
+
 import {b} from './utils';
 
 interface TenantOverviewTableLayoutProps<T> extends Omit<DataTableProps<T>, 'theme'> {
-    title: ReactNode;
+    title: React.ReactNode;
     loading?: boolean;
     wasLoaded?: boolean;
     error?: IResponseError;
@@ -44,9 +45,9 @@ export function TenantOverviewTableLayout<T>({
         );
     };
     return (
-        <>
+        <React.Fragment>
             <div className={b('title')}>{title}</div>
             <div className={b('table', tableClassNameModifiers)}>{renderContent()}</div>
-        </>
+        </React.Fragment>
     );
 }
