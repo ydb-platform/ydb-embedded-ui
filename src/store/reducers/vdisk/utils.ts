@@ -47,7 +47,7 @@ export function prepareVDiskGroupResponse(data: TStorageInfo, poolName: string, 
     const rawGroupData = rawPoolData?.Groups?.find((group) => group.GroupID === groupId);
 
     if (rawGroupData) {
-        return prepareStorageGroupData(rawGroupData, rawPoolData?.Name);
+        return prepareStorageGroupData(rawGroupData, rawPoolData);
     }
 
     return undefined;
