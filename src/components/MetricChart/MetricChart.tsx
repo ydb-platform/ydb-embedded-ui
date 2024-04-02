@@ -42,7 +42,7 @@ const prepareWidgetData = (
     data: PreparedMetricsData,
     options: ChartOptions = {},
 ): YagrWidgetData => {
-    const {dataType} = options;
+    const {dataType, scaleRange} = options;
     const defaultDataFormatter = getDefaultDataFormatter(dataType);
 
     const isDataEmpty = !data.metrics.length;
@@ -88,6 +88,8 @@ const prepareWidgetData = (
                 y: {
                     type: 'linear',
                     range: 'nice',
+                    min: scaleRange?.min || 0,
+                    max: scaleRange?.max,
                 },
             },
             axes: {

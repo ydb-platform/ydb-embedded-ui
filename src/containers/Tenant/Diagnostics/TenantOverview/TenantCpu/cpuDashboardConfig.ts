@@ -18,6 +18,10 @@ export const cpuDashboardConfig: ChartConfig[] = [
         metrics: pools.map(getPoolMetricConfig),
         options: {
             dataType: 'percent',
+            scaleRange: {
+                min: 0,
+                max: 1,
+            },
         },
     },
 ];

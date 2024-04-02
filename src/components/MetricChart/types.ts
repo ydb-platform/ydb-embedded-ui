@@ -34,6 +34,10 @@ export type ChartDataType = 'ms' | 'size' | 'percent';
 
 export interface ChartOptions {
     dataType?: ChartDataType;
+    scaleRange?: {
+        min?: number;
+        max?: number;
+    };
 }
 
 export type ChartDataStatus = 'loading' | 'success' | 'error';
