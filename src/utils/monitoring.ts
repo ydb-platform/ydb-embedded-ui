@@ -2,8 +2,10 @@ import {ETenantType} from '../types/api/tenant';
 
 export type ParsedMonitoringData = {
     monitoring_url: string;
-    serverless_dashboard: string;
-    dedicated_dashboard: string;
+
+    serverless_dashboard?: string;
+    dedicated_dashboard?: string;
+    cluster_dashboard?: string;
 
     host?: string;
     slot?: string;
@@ -18,10 +20,6 @@ export interface GetMonitoringLinkProps {
     clusterName?: string;
 }
 
-const isMonitoring = (link: string) => {
-    return link.startsWith('https://monitoring');
-};
-
 export type GetMonitoringLink = typeof getMonitoringLink;
 
 export function getMonitoringLink({
@@ -31,7 +29,7 @@ export function getMonitoringLink({
     clusterName,
 }: GetMonitoringLinkProps) {
     const data = parseMonitoringData(monitoring);
-    let href = '';
+
     if (data) {
         const monitoringUrl = data.monitoring_url;
 
@@ -45,23 +43,28 @@ export function getMonitoringLink({
 
         const finalClusterName = data.cluster_name || clusterName || '';
 
-        if (isMonitoring(monitoringUrl)) {
-            href = `${monitoringUrl}/${dashboard}?p.cluster=${finalClusterName}&p.host=${host}&p.slot=${slot}&p.database=${dbName}`;
-        } else {
-            href = `${monitoringUrl}&host=${host}&slot=${slot}&database=${dbName}&dashboard=${dashboard}`;
-        }
-        href = encodeURI(href);
+        const href = `${monitoringUrl}/${dashboard}?p.cluster=${finalClusterName}&p.host=${host}&p.slot=${slot}&p.database=${dbName}`;
+
+        return encodeURI(href);
     }
 
-    return href;
+    return '';
 }
 
 export type GetMonitoringClusterLink = typeof getMonitoringClusterLink;
 
-export function getMonitoringClusterLink(monitoring: string) {
+export function getMonitoringClusterLink(monitoring: string, clusterName?: string) {
     const data = parseMonitoringData(monitoring);
+
     if (data) {
-        return data.monitoring_url;
+        const monitoringUrl = data.monitoring_url;
+        const clusterDashboard = data.cluster_dashboard;
+
+        const finalClusterName = data.cluster_name ?? clusterName;
+
+        if (clusterDashboard && finalClusterName) {
+            return `${monitoringUrl}/${clusterDashboard}/view?p.cluster=${finalClusterName}&p.database=-`;
+        }
     }
     return '';
 }
