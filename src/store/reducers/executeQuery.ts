@@ -1,5 +1,6 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
+import {settingsManager} from '../../services/settings';
 import type {ExecuteActions, Schemas} from '../../types/api/query';
 import type {
     ExecuteQueryAction,
@@ -7,13 +8,11 @@ import type {
     ExecuteQueryStateSlice,
     QueryInHistory,
 } from '../../types/store/executeQuery';
-import type {QueryRequestParams, QueryMode, QuerySyntax} from '../../types/store/query';
+import type {QueryMode, QueryRequestParams, QuerySyntax} from '../../types/store/query';
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
-import {QUERY_MODES, QUERY_SYNTAX, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {parseQueryError} from '../../utils/error';
-import {settingsManager} from '../../services/settings';
-
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import {QUERY_MODES, QUERY_SYNTAX, parseQueryAPIExecuteResponse} from '../../utils/query';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 

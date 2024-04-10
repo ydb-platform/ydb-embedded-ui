@@ -1,5 +1,5 @@
-import {EFlag} from './enums';
-import {TPDiskStateInfo} from './pdisk';
+import type {EFlag} from './enums';
+import type {TPDiskStateInfo} from './pdisk';
 
 /**
  * endpoint: /viewer/json/vdiskinfo

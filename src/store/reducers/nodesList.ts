@@ -1,12 +1,12 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
 import type {
-    NodesListState,
     NodesListAction,
     NodesListRootStateSlice,
+    NodesListState,
 } from '../../types/store/nodesList';
-import {createRequestActionTypes, createApiRequest} from '../utils';
 import {prepareNodesMap} from '../../utils/nodes';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 export const FETCH_NODES_LIST = createRequestActionTypes('nodesList', 'FETCH_NODES_LIST');
 

@@ -1,11 +1,11 @@
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import type {AdditionalNodesProps} from '../../types/additionalProps';
 import type {PreparedNode} from '../../store/reducers/node/types';
-
+import type {AdditionalNodesProps} from '../../types/additionalProps';
+import {cn} from '../../utils/cn';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
-import {Tags} from '../Tags';
 import {Icon} from '../Icon';
+import {Tags} from '../Tags';
 
 import './BasicNodeViewer.scss';
 
@@ -25,7 +25,7 @@ export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNo
     return (
         <div className={b(null, className)}>
             {node ? (
-                <>
+                <React.Fragment>
                     <div className={b('title')}>Node</div>
                     <EntityStatus status={node.SystemState} name={node.Host} />
                     {nodeHref && (
@@ -46,7 +46,7 @@ export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNo
 
                     {node.DC && <Tags tags={[node.DC]} />}
                     {node.Roles && <Tags tags={node.Roles} tagsType="blue" />}
-                </>
+                </React.Fragment>
             ) : (
                 <div className="error">no data</div>
             )}

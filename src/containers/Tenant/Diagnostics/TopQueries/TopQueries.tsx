@@ -1,40 +1,39 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {useHistory, useLocation} from 'react-router';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
+import {useHistory, useLocation} from 'react-router';
 
-import {DateRange, DateRangeValues} from '../../../../components/DateRange';
+import type {DateRangeValues} from '../../../../components/DateRange';
+import {DateRange} from '../../../../components/DateRange';
 import {Search} from '../../../../components/Search';
-
+import {parseQuery} from '../../../../routes';
 import {changeUserInput} from '../../../../store/reducers/executeQuery';
-
-import type {EPathType} from '../../../../types/api/schema';
-import type {IQueryResult} from '../../../../types/store/query';
+import {
+    fetchTopQueries,
+    setTopQueriesFilters,
+    setTopQueriesState,
+} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import type {ITopQueriesFilters} from '../../../../store/reducers/executeTopQueries/types';
-
 import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../../store/reducers/tenant/constants';
-import {
-    setTopQueriesFilters,
-    setTopQueriesState,
-    fetchTopQueries,
-} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
+import type {EPathType} from '../../../../types/api/schema';
+import type {IQueryResult} from '../../../../types/store/query';
+import {cn} from '../../../../utils/cn';
 import {HOUR_IN_SECONDS} from '../../../../utils/constants';
+import {isSortableTopQueriesProperty} from '../../../../utils/diagnostics';
 import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
-import {parseQuery} from '../../../../routes';
-import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
-import {isSortableTopQueriesProperty} from '../../../../utils/diagnostics';
-import {isColumnEntityType} from '../../utils/schema';
 import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
-import {getTopQueriesColumns} from './getTopQueriesColumns';
+import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
+import {isColumnEntityType} from '../../utils/schema';
 
+import {getTopQueriesColumns} from './getTopQueriesColumns';
 import i18n from './i18n';
+
 import './TopQueries.scss';
 
 const b = cn('kv-top-queries');
@@ -60,14 +59,14 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
     } = useTypedSelector((state) => state.executeTopQueries);
     const rawColumns = getTopQueriesColumns();
 
-    const preventFetch = useRef(false);
+    const preventFetch = React.useRef(false);
 
     // some filters sync between redux state and URL
     // component state is for default values,
     // default values are determined from the query response, and should not propagate to URL
-    const [filters, setFilters] = useState<ITopQueriesFilters>(storeFilters);
+    const [filters, setFilters] = React.useState<ITopQueriesFilters>(storeFilters);
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(setTopQueriesFilters(filters));
     }, [dispatch, filters]);
 
@@ -124,8 +123,8 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
         autorefresh,
     );
 
-    const handleRowClick = useCallback(
-        (row) => {
+    const handleRowClick = React.useCallback(
+        (row: any) => {
             const {QueryText: input} = row;
 
             dispatch(changeUserInput({input}));

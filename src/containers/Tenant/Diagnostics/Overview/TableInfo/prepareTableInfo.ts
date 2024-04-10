@@ -1,3 +1,12 @@
+import type {InfoViewerItem} from '../../../../../components/InfoViewer';
+import {formatObject} from '../../../../../components/InfoViewer';
+import {
+    formatFollowerGroupItem,
+    formatPartitionConfigItem,
+    formatTableStatsItem,
+    formatTabletMetricsItem,
+} from '../../../../../components/InfoViewer/formatters';
+import type {KeyValueRow} from '../../../../../types/api/query';
 import type {
     TColumnDataLifeCycle,
     TColumnTableDescription,
@@ -5,18 +14,10 @@ import type {
     TPartitionConfig,
     TTTLSettings,
 } from '../../../../../types/api/schema';
-import type {KeyValueRow} from '../../../../../types/api/query';
 import {EPathType} from '../../../../../types/api/schema';
-import {isNumeric} from '../../../../../utils/utils';
 import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
-import {formatObject, InfoViewerItem} from '../../../../../components/InfoViewer';
-import {
-    formatFollowerGroupItem,
-    formatPartitionConfigItem,
-    formatTableStatsItem,
-    formatTabletMetricsItem,
-} from '../../../../../components/InfoViewer/formatters';
+import {isNumeric} from '../../../../../utils/utils';
 
 const isInStoreColumnTable = (table: TColumnTableDescription) => {
     // SchemaPresetId could be 0
@@ -234,6 +235,7 @@ export const prepareTableInfo = (
         ];
     }
 
+    //@ts-expect-error
     const tabletMetricsInfo = formatObject(formatTabletMetricsItem, TabletMetrics);
 
     let partitionConfigInfo: InfoViewerItem[] = [];

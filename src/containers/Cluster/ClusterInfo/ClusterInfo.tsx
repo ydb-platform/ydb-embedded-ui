@@ -1,29 +1,27 @@
-import block from 'bem-cn-lite';
-
-import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
-import InfoViewer, {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
-import {Tags} from '../../../components/Tags';
-import {Tablet} from '../../../components/Tablet';
-import {ResponseError} from '../../../components/Errors/ResponseError';
-import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {ContentWithPopup} from '../../../components/ContentWithPopup/ContentWithPopup';
+import {ResponseError} from '../../../components/Errors/ResponseError';
+import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
+import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import {InfoViewerSkeleton} from '../../../components/InfoViewerSkeleton/InfoViewerSkeleton';
-
-import type {IResponseError} from '../../../types/api/error';
-import type {AdditionalClusterProps, ClusterLink} from '../../../types/additionalProps';
-import type {VersionValue} from '../../../types/versions';
-import type {TClusterInfo} from '../../../types/api/cluster';
+import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
+import {Tablet} from '../../../components/Tablet';
+import {Tags} from '../../../components/Tags';
 import {backend, customBackend} from '../../../store';
-import {formatStorageValues} from '../../../utils/dataFormatters/dataFormatters';
-import {useTypedSelector} from '../../../utils/hooks';
-import {formatBytes, getSizeWithSignificantDigits} from '../../../utils/bytesParsers';
-import {DEVELOPER_UI_TITLE} from '../../../utils/constants';
 import type {
     ClusterGroupsStats,
     DiskErasureGroupsStats,
     DiskGroupsStats,
 } from '../../../store/reducers/cluster/types';
-
+import type {AdditionalClusterProps, ClusterLink} from '../../../types/additionalProps';
+import type {TClusterInfo} from '../../../types/api/cluster';
+import type {IResponseError} from '../../../types/api/error';
+import type {VersionValue} from '../../../types/versions';
+import {formatBytes, getSizeWithSignificantDigits} from '../../../utils/bytesParsers';
+import {cn} from '../../../utils/cn';
+import {DEVELOPER_UI_TITLE} from '../../../utils/constants';
+import {formatStorageValues} from '../../../utils/dataFormatters/dataFormatters';
+import {useTypedSelector} from '../../../utils/hooks';
 import {VersionsBar} from '../VersionsBar/VersionsBar';
 import i18n from '../i18n';
 
@@ -31,7 +29,7 @@ import {compareTablets} from './utils';
 
 import './ClusterInfo.scss';
 
-const b = block('cluster-info');
+const b = cn('cluster-info');
 
 interface GroupsStatsPopupContentProps {
     stats: DiskErasureGroupsStats;

@@ -1,7 +1,8 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
 import {parseQueryAPIExecuteResponse} from '../../../utils/query';
-import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
+
 import type {IShardsWorkloadAction, IShardsWorkloadFilters, IShardsWorkloadState} from './types';
 import {EShardsWorkloadMode} from './types';
 

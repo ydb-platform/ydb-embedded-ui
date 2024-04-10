@@ -1,28 +1,28 @@
-import {useCallback, useEffect} from 'react';
-import {StringParam, useQueryParams} from 'use-query-params';
-import {Helmet} from 'react-helmet-async';
+import React from 'react';
 
 import {Icon} from '@gravity-ui/uikit';
-import ArrowsOppositeToDotsIcon from '@gravity-ui/icons/svgs/arrows-opposite-to-dots.svg';
+import {Helmet} from 'react-helmet-async';
+import {StringParam, useQueryParams} from 'use-query-params';
 
-import {cn} from '../../utils/cn';
-import {getSeverityColor} from '../../utils/disks/helpers';
-import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
-import {valueIsDefined} from '../../utils';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {getVDiskData, setVDiskDataWasNotLoaded} from '../../store/reducers/vdisk/vdisk';
-import {selectNodesMap} from '../../store/reducers/nodesList';
-
-import {PageMeta} from '../../components/PageMeta/PageMeta';
+import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
 import {GroupInfo} from '../../components/GroupInfo/GroupInfo';
-import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
-import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
+import {PageMeta} from '../../components/PageMeta/PageMeta';
 import {VDiskWithDonorsStack} from '../../components/VDisk/VDiskWithDonorsStack';
+import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
+import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
+import {selectNodesMap} from '../../store/reducers/nodesList';
+import {getVDiskData, setVDiskDataWasNotLoaded} from '../../store/reducers/vdisk/vdisk';
+import {valueIsDefined} from '../../utils';
+import {cn} from '../../utils/cn';
+import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {getSeverityColor} from '../../utils/disks/helpers';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import {vDiskPageKeyset} from './i18n';
+
+import ArrowsOppositeToDotsIcon from '@gravity-ui/icons/svgs/arrows-opposite-to-dots.svg';
 
 import './VDiskPage.scss';
 
@@ -41,11 +41,11 @@ export function VDiskPage() {
         vDiskSlotId: StringParam,
     });
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('vDisk', {nodeId, pDiskId, vDiskSlotId}));
     }, [dispatch, nodeId, pDiskId, vDiskSlotId]);
 
-    const fetchData = useCallback(
+    const fetchData = React.useCallback(
         async (isBackground?: boolean) => {
             if (!isBackground) {
                 dispatch(setVDiskDataWasNotLoaded());
@@ -152,7 +152,7 @@ export function VDiskPage() {
     const renderGroupInfo = () => {
         if (groupData) {
             return (
-                <>
+                <React.Fragment>
                     <div className={vDiskPageCn('group-title')}>{vDiskPageKeyset('group')}</div>
                     <GroupInfo data={groupData} />
                     <div className={vDiskPageCn('group-disks')}>
@@ -167,7 +167,7 @@ export function VDiskPage() {
                             );
                         })}
                     </div>
-                </>
+                </React.Fragment>
             );
         }
 
@@ -180,10 +180,10 @@ export function VDiskPage() {
         }
 
         return (
-            <>
+            <React.Fragment>
                 {renderInfo()}
                 {renderGroupInfo()}
-            </>
+            </React.Fragment>
         );
     };
 

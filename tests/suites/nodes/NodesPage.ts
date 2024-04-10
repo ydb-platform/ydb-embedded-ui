@@ -1,8 +1,8 @@
-import {Locator, Page} from '@playwright/test';
+import type {Locator, Page} from '@playwright/test';
 
+import {PageModel} from '../../models/PageModel';
 import {nodesPage} from '../../utils/constants';
 import {selectContentTable} from '../../utils/selectContentTable';
-import {PageModel} from '../../models/PageModel';
 
 export class NodesPage extends PageModel {
     readonly table: Locator;

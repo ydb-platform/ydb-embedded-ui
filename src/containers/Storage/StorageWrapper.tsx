@@ -2,8 +2,8 @@ import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {USE_BACKEND_PARAMS_FOR_TABLES_KEY} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
 
-import {VirtualStorage} from './VirtualStorage';
 import {Storage} from './Storage';
+import {VirtualStorage} from './VirtualStorage';
 
 interface StorageWrapperProps {
     tenant?: string;

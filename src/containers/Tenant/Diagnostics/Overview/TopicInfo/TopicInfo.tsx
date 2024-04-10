@@ -1,14 +1,9 @@
-import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-
 import {InfoViewer} from '../../../../../components/InfoViewer';
-
+import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {useTypedSelector} from '../../../../../utils/hooks';
-
 import {getEntityName} from '../../../utils';
-
-import {prepareTopicSchemaInfo} from '../utils';
-
 import {TopicStats} from '../TopicStats';
+import {prepareTopicSchemaInfo} from '../utils';
 
 interface TopicInfoProps {
     data?: TEvDescribeSchemeResult;

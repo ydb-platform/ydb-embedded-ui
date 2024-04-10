@@ -9,7 +9,7 @@
     font-variant-numeric: tabular-nums;
 }
 
-.yc-select-popup__tick-icon {
+.g-select-popup__tick-icon {
     // this is a local fix, remove after the refactoring
     box-sizing: content-box;
 }
@@ -45,11 +45,11 @@ body,
     --ydb-color-status-black: var(--g-color-base-misc-heavy);
 }
 
-:is(#tab, .yc-tabs-item_active .yc-tabs-item__title) {
+:is(#tab, .g-tabs-item_active .g-tabs-item__title) {
     color: var(--g-color-text-primary) !important;
 }
 
-:is(#tab, .yc-tabs-item__title) {
+:is(#tab, .g-tabs-item__title) {
     color: var(--g-color-text-secondary);
 }
 
@@ -131,7 +131,7 @@ body,
     background: var(--ydb-data-table-color-hover);
 }
 
-.yc-table-column-setup__item {
+.g-table-column-setup__item {
     /* stylelint-disable-next-line declaration-no-important*/
     padding: 0 8px 0 32px !important;
     /* stylelint-disable-next-line declaration-no-important*/
@@ -142,6 +142,6 @@ body,
     font-family: 'Rubik', sans-serif;
 }
 
-.yc-popup {
+.g-popup {
     max-width: 500px;
 }

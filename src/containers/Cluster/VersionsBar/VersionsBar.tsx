@@ -1,12 +1,11 @@
-import block from 'bem-cn-lite';
-
 import {Progress} from '@gravity-ui/uikit';
 
 import type {VersionValue} from '../../../types/versions';
+import {cn} from '../../../utils/cn';
 
 import './VersionsBar.scss';
 
-const b = block('ydb-cluster-versions-bar');
+const b = cn('ydb-cluster-versions-bar');
 
 interface VersionsBarProps {
     versionsValues?: VersionValue[];

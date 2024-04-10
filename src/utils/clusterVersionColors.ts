@@ -2,6 +2,7 @@ import uniqBy from 'lodash/uniqBy';
 
 import type {MetaClusterVersion} from '../types/api/meta';
 import type {VersionToColorMap} from '../types/versions';
+
 import {COLORS, GREY_COLOR, getMinorVersion, hashCode} from './versions';
 
 const UNDEFINED_COLOR_INDEX = '__no_color__';

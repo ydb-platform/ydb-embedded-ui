@@ -1,26 +1,24 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
-import cn from 'bem-cn-lite';
-import ReactList from 'react-list';
+import React from 'react';
 
 import {Select} from '@gravity-ui/uikit';
+import ReactList from 'react-list';
 
+import {Loader} from '../../components/Loader';
 import {Tablet} from '../../components/Tablet';
 import TabletsOverall from '../../components/TabletsOverall/TabletsOverall';
-import {Loader} from '../../components/Loader';
-
-import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../utils/hooks';
-import {ETabletState, EType, TTabletStateInfo} from '../../types/api/tablet';
-
 import {
-    getTabletsInfo,
     clearWasLoadingFlag,
+    getTabletsInfo,
     setStateFilter,
     setTypeFilter,
 } from '../../store/reducers/tablets';
-
-import './Tablets.scss';
+import type {ETabletState, EType, TTabletStateInfo} from '../../types/api/tablet';
+import {cn} from '../../utils/cn';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import i18n from './i18n';
+
+import './Tablets.scss';
 
 const b = cn('tablets');
 
@@ -38,10 +36,10 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
     );
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
-    const tablets = useMemo(() => data?.TabletStateInfo || [], [data]);
+    const tablets = React.useMemo(() => data?.TabletStateInfo || [], [data]);
 
-    const fetchData = useCallback(
-        (isBackground) => {
+    const fetchData = React.useCallback(
+        (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(clearWasLoadingFlag());
             }
@@ -56,9 +54,9 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
 
     useAutofetcher(fetchData, [fetchData], autorefresh);
 
-    const [tabletsToRender, setTabletsToRender] = useState<TTabletStateInfo[]>([]);
+    const [tabletsToRender, setTabletsToRender] = React.useState<TTabletStateInfo[]>([]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         let filteredTablets = tablets;
 
         if (typeFilter.length > 0) {

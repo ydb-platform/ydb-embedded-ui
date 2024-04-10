@@ -1,5 +1,4 @@
-import {ChangeEventHandler} from 'react';
-import cn from 'bem-cn-lite';
+import {cn} from '../../utils/cn';
 
 import './DateRange.scss';
 
@@ -28,7 +27,7 @@ const toTimezonelessISOString = (timestamp?: number) => {
 };
 
 export const DateRange = ({from, to, className, onChange}: DateRangeProps) => {
-    const handleFromChange: ChangeEventHandler<HTMLInputElement> = ({target: {value}}) => {
+    const handleFromChange: React.ChangeEventHandler<HTMLInputElement> = ({target: {value}}) => {
         let newFrom = value ? new Date(value).getTime() : undefined;
 
         // some browsers allow selecting time after the boundary specified in `max`
@@ -39,7 +38,7 @@ export const DateRange = ({from, to, className, onChange}: DateRangeProps) => {
         onChange?.({from: newFrom, to});
     };
 
-    const handleToChange: ChangeEventHandler<HTMLInputElement> = ({target: {value}}) => {
+    const handleToChange: React.ChangeEventHandler<HTMLInputElement> = ({target: {value}}) => {
         let newTo = value ? new Date(value).getTime() : undefined;
 
         // some browsers allow selecting time before the boundary specified in `min`

@@ -1,22 +1,22 @@
-import {App, AppSlots} from '../App';
+import React from 'react';
 
-import type {History} from 'history';
 import type {Store} from '@reduxjs/toolkit';
+import type {History} from 'history';
 
+import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../utils/constants';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../utils/monitoring';
-
 import {
-    getMonitoringLink as getMonitoringLinkDefault,
     getMonitoringClusterLink as getMonitoringClusterLinkDefault,
+    getMonitoringLink as getMonitoringLinkDefault,
 } from '../../utils/monitoring';
+import {App, AppSlots} from '../App';
+import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
+import {settings} from '../UserSettings/settings';
+
 import {ExtendedCluster} from './ExtendedCluster/ExtendedCluster';
 import {ExtendedNode} from './ExtendedNode/ExtendedNode';
 import {ExtendedTenant} from './ExtendedTenant/ExtendedTenant';
-import {YDBEmbeddedUISettings, settings} from '../UserSettings/settings';
-import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../utils/constants';
-
 import i18n from './i18n';
-import React from 'react';
 
 export interface AppWithClustersProps {
     store: Store;

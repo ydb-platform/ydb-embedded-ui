@@ -1,5 +1,3 @@
-import type {Reducer} from 'react';
-
 import type {IResponseError} from '../../types/api/error';
 
 import type {Chunk} from './types';
@@ -73,7 +71,7 @@ type VirtualTableAction<T> =
 
 // Reducer wrapped in additional function to pass generic type
 export const createVirtualTableReducer =
-    <T>(): Reducer<VirtualTableState<T>, VirtualTableAction<T>> =>
+    <T>(): React.Reducer<VirtualTableState<T>, VirtualTableAction<T>> =>
     (state, action) => {
         switch (action.type) {
             case SET_CHUNK_DATA: {

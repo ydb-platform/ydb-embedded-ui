@@ -5,7 +5,7 @@ import type {PreparedPDisk} from '../../../utils/disks/types';
 import type {PreparedNodeSystemState} from '../../../utils/nodes';
 import type {ApiRequestAction} from '../../utils';
 
-import {FETCH_NODE, FETCH_NODE_STRUCTURE, resetNode} from './node';
+import type {FETCH_NODE, FETCH_NODE_STRUCTURE, resetNode} from './node';
 
 interface RawStructurePDisk extends PreparedPDisk {
     vDisks: Record<string, TVDiskStateInfo>;

@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import {IProtobufTimeObject} from './common';
+import type {IProtobufTimeObject} from './common';
 
 /**
  * endpoint: /json/describe_consumer

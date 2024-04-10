@@ -1,11 +1,11 @@
-import React, {useEffect} from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
 
 import {Button} from '@gravity-ui/uikit';
-import cn from 'bem-cn-lite';
+import ReactDOM from 'react-dom';
 
-import {useTypedDispatch} from '../../utils/hooks';
 import {disableFullscreen} from '../../store/reducers/fullscreen';
+import {cn} from '../../utils/cn';
+import {useTypedDispatch} from '../../utils/hooks';
 import {Icon} from '../Icon';
 
 import './Fullscreen.scss';
@@ -55,7 +55,7 @@ function Fullscreen(props: FullscreenProps) {
         dispatch(disableFullscreen());
     }, [dispatch]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const escFunction = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onDisableFullScreen();

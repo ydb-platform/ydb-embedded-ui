@@ -1,7 +1,7 @@
 import type {ClusterTab} from '../../../containers/Cluster/utils';
 import type {EType} from '../../../types/api/tablet';
 
-import {setHeaderBreadcrumbs} from './header';
+import type {setHeaderBreadcrumbs} from './header';
 
 export type Page =
     | 'cluster'
@@ -53,14 +53,14 @@ export type BreadcrumbsOptions =
 export type PageBreadcrumbsOptions<T extends Page = undefined> = T extends 'cluster'
     ? ClusterBreadcrumbsOptions
     : T extends 'tenant'
-    ? TenantBreadcrumbsOptions
-    : T extends 'node'
-    ? NodeBreadcrumbsOptions
-    : T extends 'tablets'
-    ? TabletsBreadcrumbsOptions
-    : T extends 'tablet'
-    ? TabletBreadcrumbsOptions
-    : {};
+      ? TenantBreadcrumbsOptions
+      : T extends 'node'
+        ? NodeBreadcrumbsOptions
+        : T extends 'tablets'
+          ? TabletsBreadcrumbsOptions
+          : T extends 'tablet'
+            ? TabletBreadcrumbsOptions
+            : {};
 
 export interface HeaderState {
     page?: Page;

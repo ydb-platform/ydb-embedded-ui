@@ -1,13 +1,14 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import {Select, SelectOption} from '@gravity-ui/uikit';
+import type {SelectOption} from '@gravity-ui/uikit';
+import {Select} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
-
+import {cn} from '../../../utils/cn';
 import {getUsageSeverityForEntityStatus} from '../utils';
 
 import i18n from './i18n';
+
 import './UsageFilter.scss';
 
 export interface UsageFilterItem {
@@ -28,10 +29,10 @@ const b = cn('usage-filter');
 export const UsageFilter = (props: UsageFilterProps) => {
     const {className, value = [], groups = [], onChange, debounce = 200} = props;
 
-    const [filterValue, setFilterValue] = useState(value);
-    const timer = useRef<number>();
+    const [filterValue, setFilterValue] = React.useState(value);
+    const timer = React.useRef<number>();
 
-    useEffect(() => {
+    React.useEffect(() => {
         // sync inner state with external value
         setFilterValue((prevValue) => {
             if (prevValue.join(',') !== value.join(',')) {
@@ -42,7 +43,7 @@ export const UsageFilter = (props: UsageFilterProps) => {
         });
     }, [value]);
 
-    const options = useMemo(
+    const options = React.useMemo(
         () =>
             groups.map(({threshold, count}) => ({
                 value: String(threshold),

@@ -1,42 +1,39 @@
-import block from 'bem-cn-lite';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 
-import {
-    useAutofetcher,
-    useTypedSelector,
-    useTypedDispatch,
-    useSetting,
-} from '../../../../utils/hooks';
-import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
-
+import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {selectNodesMap} from '../../../../store/reducers/nodesList';
+import {
+    getPartitions,
+    setDataWasNotLoaded as setPartitionsDataWasNotLoaded,
+    setSelectedConsumer,
+} from '../../../../store/reducers/partitions/partitions';
 import {
     cleanTopicData,
     getTopic,
     selectConsumersNames,
     setDataWasNotLoaded as setTopicDataWasNotLoaded,
 } from '../../../../store/reducers/topic';
+import {cn} from '../../../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
 import {
-    getPartitions,
-    setDataWasNotLoaded as setPartitionsDataWasNotLoaded,
-    setSelectedConsumer,
-} from '../../../../store/reducers/partitions/partitions';
+    useAutofetcher,
+    useSetting,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../../../utils/hooks';
 
-import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import {ResponseError} from '../../../../components/Errors/ResponseError';
-
-import type {PreparedPartitionDataWithHosts} from './utils/types';
-import {addHostToPartitions} from './utils';
 import {PartitionsControls} from './PartitionsControls/PartitionsControls';
-import {useGetPartitionsColumns} from './utils/useGetPartitionsColumns';
-
 import i18n from './i18n';
+import {addHostToPartitions} from './utils';
+import type {PreparedPartitionDataWithHosts} from './utils/types';
+import {useGetPartitionsColumns} from './utils/useGetPartitionsColumns';
 
 import './Partitions.scss';
 
-export const b = block('ydb-diagnostics-partitions');
+export const b = cn('ydb-diagnostics-partitions');
 
 interface PartitionsProps {
     path?: string;
@@ -47,11 +44,11 @@ export const Partitions = ({path}: PartitionsProps) => {
 
     // Manual path control to ensure that topic state will be reset before data fetch
     // so no request with wrong params will be sent
-    const [componentCurrentPath, setComponentCurrentPath] = useState(path);
+    const [componentCurrentPath, setComponentCurrentPath] = React.useState(path);
 
-    const [partitionsToRender, setPartitionsToRender] = useState<PreparedPartitionDataWithHosts[]>(
-        [],
-    );
+    const [partitionsToRender, setPartitionsToRender] = React.useState<
+        PreparedPartitionDataWithHosts[]
+    >([]);
 
     const consumers = useTypedSelector(selectConsumersNames);
     const nodesMap = useTypedSelector(selectNodesMap);
@@ -78,7 +75,7 @@ export const Partitions = ({path}: PartitionsProps) => {
 
     const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer);
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(cleanTopicData());
         dispatch(setTopicDataWasNotLoaded());
 
@@ -87,11 +84,11 @@ export const Partitions = ({path}: PartitionsProps) => {
         setComponentCurrentPath(path);
     }, [dispatch, path]);
 
-    const partitionsWithHosts = useMemo(() => {
+    const partitionsWithHosts = React.useMemo(() => {
         return addHostToPartitions(rawPartitions, nodesMap);
     }, [rawPartitions, nodesMap]);
 
-    const fetchData = useCallback(
+    const fetchData = React.useCallback(
         (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(setPartitionsDataWasNotLoaded());
@@ -107,7 +104,7 @@ export const Partitions = ({path}: PartitionsProps) => {
 
     // Wrong consumer could be passed in search query
     // Reset consumer if it doesn't exist for current topic
-    useEffect(() => {
+    React.useEffect(() => {
         const isTopicWithoutConsumers = topicWasLoaded && !consumers;
         const wrongSelectedConsumer =
             selectedConsumer && consumers && !consumers.includes(selectedConsumer);
@@ -117,7 +114,7 @@ export const Partitions = ({path}: PartitionsProps) => {
         }
     }, [dispatch, topicWasLoaded, selectedConsumer, consumers]);
 
-    const columnsToShow = useMemo(() => {
+    const columnsToShow = React.useMemo(() => {
         return columns.filter((column) => !hiddenColumns.includes(column.name));
     }, [columns, hiddenColumns]);
 

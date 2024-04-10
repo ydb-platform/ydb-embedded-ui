@@ -1,12 +1,14 @@
 import {Progress} from '@gravity-ui/uikit';
-import block from 'bem-cn-lite';
+
 import {ClipboardButton} from '../../../components/ClipboardButton';
 import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
 import type {VersionValue} from '../../../types/versions';
+import {cn} from '../../../utils/cn';
 import type {GroupedNodesItem} from '../types';
+
 import './NodesTreeTitle.scss';
 
-const b = block('ydb-versions-nodes-tree-title');
+const b = cn('ydb-versions-nodes-tree-title');
 
 interface NodesTreeTitleProps {
     title?: string;

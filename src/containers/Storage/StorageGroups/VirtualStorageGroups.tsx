@@ -1,19 +1,15 @@
-import {useCallback, useMemo} from 'react';
+import React from 'react';
 
+import {VirtualTable} from '../../../components/VirtualTable';
+import type {FetchData, RenderControls, RenderErrorMessage} from '../../../components/VirtualTable';
+import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
+import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesMap} from '../../../types/store/nodesList';
 import type {StorageSortValue} from '../../../utils/storage';
-import {
-    VirtualTable,
-    type FetchData,
-    type RenderControls,
-    type RenderErrorMessage,
-} from '../../../components/VirtualTable';
-import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
-import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
-import {getPreparedStorageGroupsColumns} from './getStorageGroupsColumns';
 import {getStorageGroups} from './getGroups';
+import {getPreparedStorageGroupsColumns} from './getStorageGroupsColumns';
 import i18n from './i18n';
 
 interface VirtualStorageGroupsProps {
@@ -41,11 +37,11 @@ export const VirtualStorageGroups = ({
     renderControls,
     renderErrorMessage,
 }: VirtualStorageGroupsProps) => {
-    const filters = useMemo(() => {
+    const filters = React.useMemo(() => {
         return [searchValue, visibleEntities, tenant, nodeId];
     }, [searchValue, visibleEntities, tenant, nodeId]);
 
-    const fetchData = useCallback<FetchData<PreparedStorageGroup>>(
+    const fetchData = React.useCallback<FetchData<PreparedStorageGroup>>(
         async (limit, offset, {sortOrder, columnId} = {}) => {
             return await getStorageGroups({
                 limit,
@@ -62,7 +58,7 @@ export const VirtualStorageGroups = ({
         [nodeId, searchValue, tenant, visibleEntities],
     );
 
-    const columns = useMemo(() => {
+    const columns = React.useMemo(() => {
         return getPreparedStorageGroupsColumns(nodesMap, visibleEntities);
     }, [nodesMap, visibleEntities]);
 

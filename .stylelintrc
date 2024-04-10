@@ -5,7 +5,6 @@
         "@gravity-ui/stylelint-config/prettier"
     ],
     "rules": {
-        "declaration-colon-space-after": "always-single-line",
         "declaration-no-important": null
     }
 }

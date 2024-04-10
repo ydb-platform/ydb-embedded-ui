@@ -1,11 +1,12 @@
-import cn from 'bem-cn-lite';
 import JSONTree from 'react-json-inspector';
 
 import {
     NodeEndpointsTooltipContent,
-    TabletTooltipContent,
     PoolTooltipContent,
+    TabletTooltipContent,
 } from '../components/TooltipsContent';
+
+import {cn} from './cn';
 
 const nodeB = cn('node-tootltip');
 

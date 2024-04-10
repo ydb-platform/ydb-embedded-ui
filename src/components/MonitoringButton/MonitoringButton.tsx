@@ -1,6 +1,6 @@
-import cn from 'bem-cn-lite';
-
 import {Button} from '@gravity-ui/uikit';
+
+import {cn} from '../../utils/cn';
 import {Icon} from '../Icon';
 
 import './MonitoringButton.scss';

@@ -1,10 +1,10 @@
-import {FETCH_TENANTS, setSearchValue} from './tenants';
-
-import {ValueOf} from '../../../types/common';
-import type {TTenant} from '../../../types/api/tenant';
 import type {IResponseError} from '../../../types/api/error';
+import type {TTenant} from '../../../types/api/tenant';
+import type {ValueOf} from '../../../types/common';
 import type {ApiRequestAction} from '../../utils';
-import {METRIC_STATUS} from './contants';
+
+import type {METRIC_STATUS} from './contants';
+import type {FETCH_TENANTS, setSearchValue} from './tenants';
 
 export interface PreparedTenant extends TTenant {
     backend: string | undefined;

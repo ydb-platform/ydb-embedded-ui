@@ -1,4 +1,5 @@
 import type {FormatBytesArgs} from '../../utils/bytesParsers';
+
 import {FormattedBytes} from './FormattedBytes';
 
 export const toFormattedSize = (

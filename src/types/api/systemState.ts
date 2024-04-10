@@ -1,4 +1,4 @@
-import {TSystemStateInfo} from './nodes';
+import type {TSystemStateInfo} from './nodes';
 
 /**
  * endpoint: /viewer/json/sysinfo

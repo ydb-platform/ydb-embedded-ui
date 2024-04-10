@@ -3,14 +3,14 @@ import type {OrderType} from '@gravity-ui/react-data-table';
 import type {IResponseError} from '../../../types/api/error';
 import type {TSystemStateInfo} from '../../../types/api/nodes';
 import type {EVersion, TStorageGroupInfo} from '../../../types/api/storage';
-import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {ValueOf} from '../../../types/common';
+import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {StorageSortValue} from '../../../utils/storage';
 import type {ApiRequestAction} from '../../utils';
 
-import {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
-import {
+import type {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
+import type {
     FETCH_STORAGE,
     setDataWasNotLoaded,
     setGroupsSortParams,

@@ -1,8 +1,8 @@
-import {Locator, Page} from '@playwright/test';
+import type {Locator, Page} from '@playwright/test';
 
+import {PageModel} from '../../models/PageModel';
 import {storagePage} from '../../utils/constants';
 import {selectContentTable} from '../../utils/selectContentTable';
-import {PageModel} from '../../models/PageModel';
 
 type EntityType = 'Groups' | 'Nodes';
 type VisibleEntityType = 'Degraded' | 'Out of space' | 'All';

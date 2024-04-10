@@ -4,7 +4,7 @@ import type {SlotComponent} from './types';
 
 export function isSlotElement<P = {}, Type = never>(
     node: React.ReactNode,
-): node is React.ReactElement<P, SlotComponent<P>> & React.RefAttributes<Type> {
+): node is React.ReactElement<P, SlotComponent<P>> & {ref?: React.Ref<Type>} {
     return React.isValidElement(node) && isSlotComponent(node.type);
 }
 

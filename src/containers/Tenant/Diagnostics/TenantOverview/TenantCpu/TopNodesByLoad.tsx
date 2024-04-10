@@ -1,22 +1,20 @@
-import {useCallback} from 'react';
+import React from 'react';
 
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
+import {
+    getTopNodesByLoad,
+    selectTopNodesByLoad,
+    setDataWasNotLoaded,
+} from '../../../../../store/reducers/tenantOverview/topNodesByLoad/topNodesByLoad';
+import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {
     useAutofetcher,
     useSearchQuery,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../../utils/hooks';
-import {
-    getTopNodesByLoad,
-    selectTopNodesByLoad,
-    setDataWasNotLoaded,
-} from '../../../../../store/reducers/tenantOverview/topNodesByLoad/topNodesByLoad';
-import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {getTopNodesByLoadColumns} from '../../../../Nodes/getNodesColumns';
-
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
@@ -36,8 +34,8 @@ export function TopNodesByLoad({path, additionalNodesProps}: TopNodesByLoadProps
     const topNodes = useTypedSelector(selectTopNodesByLoad);
     const columns = getTopNodesByLoadColumns(additionalNodesProps?.getNodeRef);
 
-    const fetchNodes = useCallback(
-        (isBackground) => {
+    const fetchNodes = React.useCallback(
+        (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded());
             }

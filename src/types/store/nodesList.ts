@@ -1,5 +1,4 @@
-import {FETCH_NODES_LIST} from '../../store/reducers/nodesList';
-
+import type {FETCH_NODES_LIST} from '../../store/reducers/nodesList';
 import type {ApiRequestAction} from '../../store/utils';
 import type {IResponseError} from '../api/error';
 import type {TEvNodesInfo} from '../api/nodesList';

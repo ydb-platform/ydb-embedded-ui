@@ -1,10 +1,9 @@
 import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
+import type {ClusterDataAggregation} from '../../store/reducers/clusters/types';
 import {formatStorageValues} from '../../utils/dataFormatters/dataFormatters';
 
-import type {ClusterDataAggregation} from '../../store/reducers/clusters/types';
-
-import {b} from './shared';
 import i18n from './i18n';
+import {b} from './shared';
 
 interface ClustersStatisticsProps {
     count: number;

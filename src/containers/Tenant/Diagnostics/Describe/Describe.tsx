@@ -1,25 +1,24 @@
-import {useCallback, useEffect, useState} from 'react';
-import {shallowEqual} from 'react-redux';
-import cn from 'bem-cn-lite';
+import React from 'react';
+
 import JSONTree from 'react-json-inspector';
-import 'react-json-inspector/json-inspector.css';
+import {shallowEqual} from 'react-redux';
 
-import {Loader} from '../../../../components/Loader';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-
-import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
+import {Loader} from '../../../../components/Loader';
 import {
     getDescribe,
-    setDataWasNotLoaded,
-    setCurrentDescribePath,
     getDescribeBatched,
+    setCurrentDescribePath,
+    setDataWasNotLoaded,
 } from '../../../../store/reducers/describe';
 import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
-
+import {cn} from '../../../../utils/cn';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {isEntityWithMergedImplementation} from '../../utils/schema';
 
 import './Describe.scss';
+import 'react-json-inspector/json-inspector.css';
 
 const b = cn('kv-describe');
 
@@ -37,9 +36,9 @@ const Describe = ({tenant, type}: IDescribeProps) => {
         (state) => state.describe,
     );
 
-    const [preparedDescribeData, setPreparedDescribeData] = useState<Object>();
+    const [preparedDescribeData, setPreparedDescribeData] = React.useState<Object>();
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (currentDescribe) {
             const paths = Object.keys(currentDescribe);
 
@@ -60,7 +59,7 @@ const Describe = ({tenant, type}: IDescribeProps) => {
         shallowEqual,
     );
 
-    const fetchData = useCallback(
+    const fetchData = React.useCallback(
         (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded());

@@ -1,5 +1,3 @@
-import type {ReactNode} from 'react';
-
 import type {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
@@ -9,9 +7,9 @@ import './DiskPageTitle.scss';
 const b = cn('ydb-disk-page-title');
 
 interface DiskPageTitleProps {
-    entityName: ReactNode;
+    entityName: React.ReactNode;
     status: EFlag;
-    id: ReactNode;
+    id: React.ReactNode;
     className?: string;
 }
 

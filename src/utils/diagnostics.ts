@@ -1,4 +1,4 @@
-import {ValueOf} from '../types/common';
+import type {ValueOf} from '../types/common';
 
 const TOP_SHARDS_SORT_VALUES = {
     CPUCores: 'CPUCores',

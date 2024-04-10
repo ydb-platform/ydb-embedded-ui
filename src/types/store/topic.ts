@@ -1,4 +1,4 @@
-import {FETCH_TOPIC, cleanTopicData, setDataWasNotLoaded} from '../../store/reducers/topic';
+import type {FETCH_TOPIC, cleanTopicData, setDataWasNotLoaded} from '../../store/reducers/topic';
 import type {ApiRequestAction} from '../../store/utils';
 import type {ProcessSpeedStats} from '../../utils/bytesParsers';
 import type {IResponseError} from '../api/error';

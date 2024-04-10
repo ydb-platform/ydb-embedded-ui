@@ -1,5 +1,4 @@
 import type {IProtobufTimeObject} from '../../types/api/common';
-
 import {MS_IN_NANOSECONDS} from '../constants';
 
 /**

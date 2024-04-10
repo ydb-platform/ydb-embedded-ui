@@ -1,6 +1,7 @@
 import React from 'react';
-import {useTypedDispatch} from '../../utils/hooks';
+
 import {fetchClustersList} from '../../store/reducers/clusters/clusters';
+import {useTypedDispatch} from '../../utils/hooks';
 
 export function useClustersList() {
     const dispatch = useTypedDispatch();

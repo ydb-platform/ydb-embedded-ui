@@ -1,5 +1,6 @@
 import type {IResponseError} from '../../../types/api/error';
 import type {HotKey} from '../../../types/api/hotkeys';
+
 import type {
     setHotKeysData,
     setHotKeysDataWasNotLoaded,

@@ -1,4 +1,5 @@
-import {TPathDescription} from '../../../types/api/schema';
+import type {TPathDescription} from '../../../types/api/schema';
+
 import {mapPathTypeToEntityName} from './schema';
 
 export const getEntityName = (pathDescription?: TPathDescription) => {

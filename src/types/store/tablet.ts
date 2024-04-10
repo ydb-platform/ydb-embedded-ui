@@ -1,8 +1,11 @@
+import type {
+    FETCH_TABLET,
+    FETCH_TABLET_DESCRIBE,
+    clearTabletData,
+} from '../../store/reducers/tablet';
 import type {ApiRequestAction} from '../../store/utils';
 import type {IResponseError} from '../api/error';
 import type {ETabletState, TTabletStateInfo} from '../api/tablet';
-
-import {FETCH_TABLET, FETCH_TABLET_DESCRIBE, clearTabletData} from '../../store/reducers/tablet';
 
 export interface ITabletPreparedHistoryItem {
     nodeId: string;

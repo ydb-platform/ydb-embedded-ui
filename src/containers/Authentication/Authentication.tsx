@@ -1,17 +1,17 @@
-import {KeyboardEvent, useEffect, useState} from 'react';
+import React from 'react';
+
+import {Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router';
-import cn from 'bem-cn-lite';
 
-import {Button, TextInput, Icon, Link as ExternalLink} from '@gravity-ui/uikit';
-
-import {authenticate} from '../../store/reducers/authentication/authentication';
-import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
 import {parseQuery} from '../../routes';
+import {authenticate} from '../../store/reducers/authentication/authentication';
+import {cn} from '../../utils/cn';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
-import ydbLogoIcon from '../../assets/icons/ydb.svg';
-import showIcon from '../../assets/icons/show.svg';
-import hideIcon from '../../assets/icons/hide.svg';
 import closeIcon from '../../assets/icons/close.svg';
+import hideIcon from '../../assets/icons/hide.svg';
+import showIcon from '../../assets/icons/show.svg';
+import ydbLogoIcon from '../../assets/icons/ydb.svg';
 
 import './Authentication.scss';
 
@@ -30,13 +30,13 @@ function Authentication({closable = false}: AuthenticationProps) {
 
     const {error} = useTypedSelector((state) => state.authentication);
 
-    const [login, setLogin] = useState('');
-    const [pass, setPass] = useState('');
-    const [loginError, setLoginError] = useState('');
-    const [passwordError, setPasswordError] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
+    const [login, setLogin] = React.useState('');
+    const [pass, setPass] = React.useState('');
+    const [loginError, setLoginError] = React.useState('');
+    const [passwordError, setPasswordError] = React.useState('');
+    const [showPassword, setShowPassword] = React.useState(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (error?.data?.error?.includes('user')) {
             setLoginError(error.data.error);
         }
@@ -70,7 +70,7 @@ function Authentication({closable = false}: AuthenticationProps) {
         });
     };
 
-    const onEnterClick = (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const onEnterClick = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         if (e.keyCode === 13) {
             onLoginClick();
         }

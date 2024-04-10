@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {isSlotComponent, isSlotElement} from './utils';
 import type {SlotComponent, SlotItem} from './types';
+import {isSlotComponent, isSlotElement} from './utils';
 
 export class SlotMap {
     readonly children?: React.ReactNode = null;

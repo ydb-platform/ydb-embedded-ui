@@ -1,17 +1,17 @@
-import {useMemo} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column, DataTableProps, Settings} from '@gravity-ui/react-data-table';
 
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
+import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {getColumnType, prepareQueryResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
 
 import {Cell} from './Cell';
-
 import i18n from './i18n';
+
 import './QueryResultTable.scss';
 
 const TABLE_SETTINGS: Settings = {
@@ -78,11 +78,11 @@ interface QueryResultTableProps
 export const QueryResultTable = (props: QueryResultTableProps) => {
     const {columns: rawColumns, data: rawData, settings: settingsMix, ...restProps} = props;
 
-    const data = useMemo(() => prepareQueryResponse(rawData), [rawData]);
-    const columns = useMemo(() => {
+    const data = React.useMemo(() => prepareQueryResponse(rawData), [rawData]);
+    const columns = React.useMemo(() => {
         return rawColumns ? prepareTypedColumns(rawColumns) : prepareGenericColumns(data);
     }, [data, rawColumns]);
-    const settings = useMemo(
+    const settings = React.useMemo(
         () => ({
             ...TABLE_SETTINGS,
             ...settingsMix,

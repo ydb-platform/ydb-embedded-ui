@@ -1,12 +1,11 @@
 .kv-tablets-overall {
     &__row {
         display: flex;
+        align-items: center;
         gap: 8px;
 
-        align-items: center;
-
         &_overall {
-            .yc-progress {
+            .g-progress {
                 width: 166px;
                 margin: 0;
             }

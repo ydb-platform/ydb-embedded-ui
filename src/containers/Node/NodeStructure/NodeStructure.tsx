@@ -1,16 +1,15 @@
-import {useEffect, useRef} from 'react';
 import url from 'url';
+
+import React from 'react';
+
 import isEmpty from 'lodash/isEmpty';
 
-import cn from 'bem-cn-lite';
-
 import {Loader} from '../.././../components/Loader';
-
 import {getNodeStructure} from '../../../store/reducers/node/node';
 import {selectNodeStructure} from '../../../store/reducers/node/selectors';
-
 import {AutoFetcher} from '../../../utils/autofetcher';
-import {useTypedSelector, useTypedDispatch} from '../../../utils/hooks';
+import {cn} from '../../../utils/cn';
+import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 
 import {PDisk} from './Pdisk';
 
@@ -41,13 +40,13 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
         true,
     ).query;
 
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
-    const isReady = useRef(false);
+    const isReady = React.useRef(false);
 
-    const scrolled = useRef(false);
+    const scrolled = React.useRef(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(getNodeStructure(nodeId));
         autofetcher.start();
         autofetcher.fetch(() => dispatch(getNodeStructure(nodeId)));
@@ -59,13 +58,13 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
         };
     }, [nodeId, dispatch]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (!isEmpty(nodeStructure) && scrollContainerRef.current) {
             isReady.current = true;
         }
     }, [nodeStructure]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (isReady.current && !scrolled.current && scrollContainerRef.current) {
             const element = document.getElementById(
                 generateId({type: 'pdisk', id: pdiskIdFromUrl as string}),

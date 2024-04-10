@@ -1,18 +1,20 @@
-import DataTable, {type Column} from '@gravity-ui/react-data-table';
-import {Link as ExternalLink, Progress, ClipboardButton} from '@gravity-ui/uikit';
+import React from 'react';
+
 import {HelpPopover} from '@gravity-ui/components';
+import DataTable from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
+import {ClipboardButton, Link as ExternalLink, Progress} from '@gravity-ui/uikit';
 
-import {UserCard} from '../../components/User/User';
 import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
-import {clusterTabsIds, getClusterPath} from '../Cluster/utils';
-import {formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
-
+import {UserCard} from '../../components/User/User';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
-import {removeViewerPathname, getCleanBalancerValue} from '../../utils/parseBalancer';
+import {formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
+import {getCleanBalancerValue, removeViewerPathname} from '../../utils/parseBalancer';
+import {clusterTabsIds, getClusterPath} from '../Cluster/utils';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
-import {b} from './shared';
 import i18n from './i18n';
+import {b} from './shared';
 
 const EMPTY_CELL = <span className={b('empty-cell')}>—</span>;
 
@@ -99,7 +101,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
                         className={b('cluster-versions')}
                         href={getClusterPath(clusterTabsIds.versions, {backend, clusterName})}
                     >
-                        <>
+                        <React.Fragment>
                             {preparedVersions.map((item, index) => (
                                 <div
                                     className={b('cluster-version')}
@@ -111,7 +113,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
                                 </div>
                             ))}
                             {<Progress size="s" value={100} stack={versionsValues} />}
-                        </>
+                        </React.Fragment>
                     </ExternalLink>
                 )
             );
@@ -264,7 +266,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             return (
                 <div className={b('balancer-cell')}>
                     <div className={b('balancer-text')}>{cleanedValue}</div>
-                    <ClipboardButton size={14} text={cleanedValue} className={b('balancer-icon')} />
+                    <ClipboardButton size="s" text={cleanedValue} className={b('balancer-icon')} />
                 </div>
             );
         },

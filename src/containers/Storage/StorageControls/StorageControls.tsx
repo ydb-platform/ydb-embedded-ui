@@ -1,14 +1,15 @@
+import React from 'react';
+
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {Search} from '../../../components/Search/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
-
-import type {StorageType, VisibleEntities} from '../../../store/reducers/storage/types';
 import {STORAGE_TYPES} from '../../../store/reducers/storage/constants';
-import {NodesUptimeFilterValues} from '../../../utils/nodes';
-
-import {UsageFilter, type UsageFilterItem} from '../UsageFilter/UsageFilter';
+import type {StorageType, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
 import {StorageVisibleEntitiesFilter} from '../StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
+import {UsageFilter} from '../UsageFilter/UsageFilter';
+import type {UsageFilterItem} from '../UsageFilter/UsageFilter';
 import i18n from '../i18n';
 import {b} from '../shared';
 
@@ -63,7 +64,7 @@ export const StorageControls = ({
     const entityName = isNodes ? i18n('nodes') : i18n('groups');
 
     return (
-        <>
+        <React.Fragment>
             <Search
                 value={searchValue}
                 onChange={handleSearchValueChange}
@@ -99,6 +100,6 @@ export const StorageControls = ({
                 total={entitiesCountTotal}
                 current={entitiesCountCurrent}
             />
-        </>
+        </React.Fragment>
     );
 };

@@ -1,4 +1,5 @@
-import {FormatBytesArgs, formatBytes} from '../../utils/bytesParsers';
+import type {FormatBytesArgs} from '../../utils/bytesParsers';
+import {formatBytes} from '../../utils/bytesParsers';
 
 type FormattedBytesProps = FormatBytesArgs;
 

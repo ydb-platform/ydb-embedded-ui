@@ -1,6 +1,7 @@
-import cn from 'bem-cn-lite';
+import {Label} from '@gravity-ui/uikit';
+import type {LabelProps} from '@gravity-ui/uikit';
 
-import {Label, type LabelProps} from '@gravity-ui/uikit';
+import {cn} from '../../utils/cn';
 
 import './UsageLabel.scss';
 

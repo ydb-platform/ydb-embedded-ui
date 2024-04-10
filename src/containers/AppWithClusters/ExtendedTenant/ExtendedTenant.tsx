@@ -1,9 +1,7 @@
-import type Tenant from '../../Tenant/Tenant';
-import type {GetMonitoringLink} from '../../../utils/monitoring';
-
-import {useClusterData} from '../useClusterData';
-
 import {MonitoringButton} from '../../../components/MonitoringButton/MonitoringButton';
+import type {GetMonitoringLink} from '../../../utils/monitoring';
+import type Tenant from '../../Tenant/Tenant';
+import {useClusterData} from '../useClusterData';
 
 export interface ExtendedTenantProps {
     component: typeof Tenant;

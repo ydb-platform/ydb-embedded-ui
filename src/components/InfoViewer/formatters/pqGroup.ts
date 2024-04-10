@@ -1,12 +1,11 @@
-import {
-    EMeteringMode,
-    TPersQueueGroupDescription,
+import type {
     TPQPartitionConfig,
     TPQTabletConfig,
+    TPersQueueGroupDescription,
 } from '../../../types/api/schema';
-import {formatBps, formatBytes, formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import {EMeteringMode} from '../../../types/api/schema';
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
-
+import {formatBps, formatBytes, formatNumber} from '../../../utils/dataFormatters/dataFormatters';
 import {createInfoFormatter} from '../utils';
 
 const EMeteringModeToNames: Record<EMeteringMode, string> = {

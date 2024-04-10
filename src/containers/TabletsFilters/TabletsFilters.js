@@ -1,29 +1,29 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import cn from 'bem-cn-lite';
-import map from 'lodash/map';
-import isEqual from 'lodash/isEqual';
-import {Helmet} from 'react-helmet-async';
 
 import {Loader, Select} from '@gravity-ui/uikit';
+import isEqual from 'lodash/isEqual';
+import map from 'lodash/map';
+import PropTypes from 'prop-types';
+import {Helmet} from 'react-helmet-async';
 import ReactList from 'react-list';
+import {connect} from 'react-redux';
 
-import {Tablet} from '../../components/Tablet';
 import {AccessDenied} from '../../components/Errors/403';
-
+import {Tablet} from '../../components/Tablet';
+import {parseQuery} from '../../routes';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {tabletColorToTabletState, tabletStates} from '../../utils/tablet';
 import {
-    getTabletsInfo,
     clearWasLoadingFlag,
-    setStateFilter,
-    setTypeFilter,
     getFilteredTablets,
     getTablets,
+    getTabletsInfo,
+    setStateFilter,
+    setTypeFilter,
 } from '../../store/reducers/tabletsFilters';
-import {parseQuery} from '../../routes';
+import {cn} from '../../utils/cn';
 import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
+import {tabletColorToTabletState, tabletStates} from '../../utils/tablet';
+
 import i18n from './i18n';
 
 import './TabletsFilters.scss';
@@ -185,9 +185,9 @@ export class TabletsFilters extends React.Component {
             <div className={b()}>
                 {tenantPath ? (
                     <div className={b('tenant')}>
-                        <>
+                        <React.Fragment>
                             <span className={b('label')}>Database: </span> {tenantPath}
-                        </>
+                        </React.Fragment>
                     </div>
                 ) : null}
                 <MemoizedFilters
@@ -239,14 +239,14 @@ export class TabletsFilters extends React.Component {
         const {tenantPath, clusterName} = this.state;
 
         return (
-            <>
+            <React.Fragment>
                 <Helmet>
                     <title>{`${i18n('page.title')} — ${
                         tenantPath || clusterName || CLUSTER_DEFAULT_TITLE
                     }`}</title>
                 </Helmet>
                 {this.renderView()}
-            </>
+            </React.Fragment>
         );
     }
 }

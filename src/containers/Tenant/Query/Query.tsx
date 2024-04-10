@@ -1,22 +1,23 @@
 import React from 'react';
-import {Helmet} from 'react-helmet-async';
-import block from 'bem-cn-lite';
 
-import type {EPathType} from '../../../types/api/schema';
-import type {SavedQuery} from '../../../types/store/query';
+import {Helmet} from 'react-helmet-async';
+
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
-import {useSetting, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import type {EPathType} from '../../../types/api/schema';
+import type {SavedQuery} from '../../../types/store/query';
+import {cn} from '../../../utils/cn';
 import {SAVED_QUERIES_KEY} from '../../../utils/constants';
+import {useSetting, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 
-import {QueryTabs, queryEditorTabs} from './QueryTabs/QueryTabs';
-import {SavedQueries} from './SavedQueries/SavedQueries';
 import QueriesHistory from './QueriesHistory/QueriesHistory';
 import QueryEditor from './QueryEditor/QueryEditor';
+import {QueryTabs, queryEditorTabs} from './QueryTabs/QueryTabs';
+import {SavedQueries} from './SavedQueries/SavedQueries';
 
 import './Query.scss';
 
-const b = block('ydb-query');
+const b = cn('ydb-query');
 
 interface QueryProps {
     theme: string;

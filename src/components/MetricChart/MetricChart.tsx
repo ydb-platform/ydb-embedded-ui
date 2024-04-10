@@ -1,26 +1,21 @@
-import {useCallback, useEffect, useReducer, useRef} from 'react';
+import React from 'react';
 
-import {YagrPlugin, YagrSeriesData, YagrWidgetData} from '@gravity-ui/chartkit/yagr';
 import ChartKit, {settings} from '@gravity-ui/chartkit';
+import type {YagrSeriesData, YagrWidgetData} from '@gravity-ui/chartkit/yagr';
+import {YagrPlugin} from '@gravity-ui/chartkit/yagr';
 
 import type {IResponseError} from '../../types/api/error';
-import type {TimeFrame} from '../../utils/timeframes';
-import {useAutofetcher} from '../../utils/hooks';
-
 import {cn} from '../../utils/cn';
-
-import {Loader} from '../Loader';
+import {useAutofetcher} from '../../utils/hooks';
+import type {TimeFrame} from '../../utils/timeframes';
 import {ResponseError} from '../Errors/ResponseError';
+import {Loader} from '../Loader';
 
-import type {
-    ChartOptions,
-    MetricDescription,
-    OnChartDataStatusChange,
-    PreparedMetricsData,
-} from './types';
-import {convertResponse} from './convertReponse';
-import {getDefaultDataFormatter} from './getDefaultDataFormatter';
+import {colorToRGBA, colors} from './colors';
+import {convertResponse} from './convertResponse';
 import {getChartData} from './getChartData';
+import {getDefaultDataFormatter} from './getDefaultDataFormatter';
+import i18n from './i18n';
 import {
     chartReducer,
     initialChartState,
@@ -29,8 +24,12 @@ import {
     setChartDataWasNotLoaded,
     setChartError,
 } from './reducer';
-import {colorToRGBA, colors} from './colors';
-import i18n from './i18n';
+import type {
+    ChartOptions,
+    MetricDescription,
+    OnChartDataStatusChange,
+    PreparedMetricsData,
+} from './types';
 
 import './MetricChart.scss';
 
@@ -143,21 +142,21 @@ export const MetricChart = ({
     onChartDataStatusChange,
     isChartVisible,
 }: DiagnosticsChartProps) => {
-    const mounted = useRef(false);
+    const mounted = React.useRef(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         mounted.current = true;
         return () => {
             mounted.current = false;
         };
     }, []);
 
-    const [{loading, wasLoaded, data, error}, dispatch] = useReducer(
+    const [{loading, wasLoaded, data, error}, dispatch] = React.useReducer(
         chartReducer,
         initialChartState,
     );
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (error) {
             return onChartDataStatusChange?.('error');
         }
@@ -171,7 +170,7 @@ export const MetricChart = ({
         return undefined;
     }, [loading, wasLoaded, error, onChartDataStatusChange]);
 
-    const fetchChartData = useCallback(
+    const fetchChartData = React.useCallback(
         async (isBackground: boolean) => {
             dispatch(setChartDataLoading());
 

@@ -1,7 +1,8 @@
+import React from 'react';
+
 import {RadioButton, Tabs} from '@gravity-ui/uikit';
-import cn from 'bem-cn-lite';
-import React, {useEffect, useState} from 'react';
 import JSONTree from 'react-json-inspector';
+
 import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
@@ -13,12 +14,14 @@ import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult, QueryErrorResponse} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
+import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {getPreparedResult} from '../utils/getPreparedResult';
+
 import './ExecuteResult.scss';
 
 const b = cn('ydb-query-execute-result');
@@ -52,8 +55,8 @@ export function ExecuteResult({
     onCollapseResults,
     onExpandResults,
 }: ExecuteResultProps) {
-    const [selectedResultSet, setSelectedResultSet] = useState(0);
-    const [activeSection, setActiveSection] = useState<SectionID>(resultOptionsIds.result);
+    const [selectedResultSet, setSelectedResultSet] = React.useState(0);
+    const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
 
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
@@ -65,7 +68,7 @@ export function ExecuteResult({
     const textResults = getPreparedResult(currentResult);
     const copyDisabled = !textResults.length;
 
-    useEffect(() => {
+    React.useEffect(() => {
         return () => {
             dispatch(disableFullscreen());
         };
@@ -84,7 +87,7 @@ export function ExecuteResult({
 
     const renderContent = () => {
         return (
-            <>
+            <React.Fragment>
                 {isMulti && resultsSetsCount > 1 && (
                     <div>
                         <Tabs
@@ -102,7 +105,7 @@ export function ExecuteResult({
                 <div className={b('result')}>
                     {renderResultTable(currentResult, currentColumns)}
                 </div>
-            </>
+            </React.Fragment>
         );
     };
 

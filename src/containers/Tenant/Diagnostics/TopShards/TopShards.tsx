@@ -1,34 +1,31 @@
-import {useState, useEffect, useMemo} from 'react';
-import cn from 'bem-cn-lite';
-import {useLocation} from 'react-router';
+import React from 'react';
 
-import DataTable, {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
+import type {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
+import {useLocation} from 'react-router';
 
 import {
     sendShardQuery,
-    setShardsState,
     setShardsQueryFilters,
+    setShardsState,
 } from '../../../../store/reducers/shardsWorkload/shardsWorkload';
-import {
-    EShardsWorkloadMode,
-    type IShardsWorkloadFilters,
-} from '../../../../store/reducers/shardsWorkload/types';
-
-import type {EPathType} from '../../../../types/api/schema';
+import {EShardsWorkloadMode} from '../../../../store/reducers/shardsWorkload/types';
+import type {IShardsWorkloadFilters} from '../../../../store/reducers/shardsWorkload/types';
 import type {CellValue, KeyValueRow} from '../../../../types/api/query';
-
-import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
+import type {EPathType} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
+import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
+import {isSortableTopShardsProperty} from '../../../../utils/diagnostics';
 import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
-import {isSortableTopShardsProperty} from '../../../../utils/diagnostics';
 import {isColumnEntityType} from '../../utils/schema';
 
 import {Filters} from './Filters';
 import {getShardsWorkloadColumns} from './getTopShardsColumns';
-
 import i18n from './i18n';
+
 import './TopShards.scss';
 
 export const b = cn('top-shards');
@@ -109,7 +106,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
 
     // default filters shouldn't propagate into URL until user interacts with the control
     // redux initial value can't be used, as it synchronizes with URL
-    const [filters, setFilters] = useState<IShardsWorkloadFilters>(() => {
+    const [filters, setFilters] = React.useState<IShardsWorkloadFilters>(() => {
         const defaultValue = {...storeFilters};
 
         if (!defaultValue.mode) {
@@ -123,7 +120,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         return defaultValue;
     });
 
-    const [sortOrder, setSortOrder] = useState(tableColumnsNames.CPUCores);
+    const [sortOrder, setSortOrder] = React.useState(tableColumnsNames.CPUCores);
 
     useAutofetcher(
         () => {
@@ -141,7 +138,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     );
 
     // don't show loader for requests triggered by table sort, only for path change
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(
             setShardsState({
                 wasLoaded: false,
@@ -178,7 +175,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         setFilters((state) => ({...state, ...newStateValue}));
     };
 
-    const tableColumns = useMemo(() => {
+    const tableColumns = React.useMemo(() => {
         const rawColumns: Column<KeyValueRow>[] = getShardsWorkloadColumns(tenantPath, location);
 
         const columns: Column<KeyValueRow>[] = rawColumns.map((column) => ({

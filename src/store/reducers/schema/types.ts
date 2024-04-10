@@ -1,11 +1,11 @@
-import type {ApiRequestAction} from '../../utils';
 import type {IResponseError} from '../../../types/api/error';
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
+import type {ApiRequestAction} from '../../utils';
 
-import {
+import type {
+    FETCH_SCHEMA,
     disableAutorefresh,
     enableAutorefresh,
-    FETCH_SCHEMA,
     preloadSchemas,
     resetLoadingState,
     setCurrentSchemaPath,

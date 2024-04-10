@@ -1,20 +1,19 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
 import {Checkbox, Select} from '@gravity-ui/uikit';
 
-import type {IHeatmapMetricValue} from '../../types/store/heatmap';
-import {getTabletsInfo, setHeatmapOptions} from '../../store/reducers/heatmap';
-import {showTooltip, hideTooltip} from '../../store/reducers/tooltip';
-import {formatNumber} from '../../utils/dataFormatters/dataFormatters';
-import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../utils/hooks';
-
-import {Loader} from '../../components/Loader';
 import {ResponseError} from '../../components/Errors/ResponseError';
+import {Loader} from '../../components/Loader';
+import {getTabletsInfo, setHeatmapOptions} from '../../store/reducers/heatmap';
+import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
+import type {IHeatmapMetricValue} from '../../types/store/heatmap';
+import {cn} from '../../utils/cn';
+import {formatNumber} from '../../utils/dataFormatters/dataFormatters';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
-import {COLORS_RANGE_SIZE, getColorRange, getColorIndex, getCurrentMetricLimits} from './util';
 import {HeatmapCanvas} from './HeatmapCanvas/HeatmapCanvas';
 import {Histogram} from './Histogram/Histogram';
+import {COLORS_RANGE_SIZE, getColorIndex, getColorRange, getCurrentMetricLimits} from './util';
 
 import './Heatmap.scss';
 
@@ -42,9 +41,9 @@ export const Heatmap = ({path}: HeatmapProps) => {
         data: tablets = [],
     } = useTypedSelector((state) => state.heatmap);
 
-    const [selectedMetric, setSelectedMetric] = useState(['']);
+    const [selectedMetric, setSelectedMetric] = React.useState(['']);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (!currentMetric && metrics && metrics.length) {
             dispatch(
                 setHeatmapOptions({
@@ -57,7 +56,7 @@ export const Heatmap = ({path}: HeatmapProps) => {
         }
     }, [currentMetric, metrics, dispatch]);
 
-    const fetchData = useCallback(
+    const fetchData = React.useCallback(
         (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(setHeatmapOptions({wasLoaded: false}));

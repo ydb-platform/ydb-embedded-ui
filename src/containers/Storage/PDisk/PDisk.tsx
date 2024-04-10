@@ -1,16 +1,14 @@
-import React, {useState, useRef} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import type {TVDiskStateInfo} from '../../../types/api/vdisk';
-import {InternalLink} from '../../../components/InternalLink';
-import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
+import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
-
-import type {PreparedPDisk} from '../../../utils/disks/types';
+import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import routes, {createHref} from '../../../routes';
+import type {TVDiskStateInfo} from '../../../types/api/vdisk';
+import {cn} from '../../../utils/cn';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-
+import type {PreparedPDisk} from '../../../utils/disks/types';
 import {STRUCTURE} from '../../Node/NodePages';
 
 import './PDisk.scss';
@@ -24,9 +22,9 @@ interface PDiskProps {
 }
 
 export const PDisk = ({nodeId, data = {}, vDisks}: PDiskProps) => {
-    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    const [isPopupVisible, setIsPopupVisible] = React.useState(false);
 
-    const anchor = useRef(null);
+    const anchor = React.useRef(null);
 
     const showPopup = () => {
         setIsPopupVisible(true);

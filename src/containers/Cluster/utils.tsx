@@ -1,5 +1,5 @@
-import type {ValueOf} from '../../types/common';
 import routes, {createHref} from '../../routes';
+import type {ValueOf} from '../../types/common';
 
 export const clusterTabsIds = {
     overview: 'overview',

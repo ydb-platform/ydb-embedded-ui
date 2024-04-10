@@ -1,14 +1,15 @@
 import {configureStore as configureReduxStore} from '@reduxjs/toolkit';
-import {History, createBrowserHistory} from 'history';
+import type {Action, Reducer, UnknownAction} from '@reduxjs/toolkit';
+import type {History} from 'history';
+import {createBrowserHistory} from 'history';
 import {listenForHistoryChange} from 'redux-location-state';
 
-import {getUrlData} from './getUrlData';
-import getLocationMiddleware from './state-url-mapping';
-import rootReducer from './reducers';
 import {createApi} from '../services/api';
 
-import type {Action, Reducer, UnknownAction} from '@reduxjs/toolkit';
+import {getUrlData} from './getUrlData';
+import rootReducer from './reducers';
 import {UPDATE_REF} from './reducers/tooltip';
+import getLocationMiddleware from './state-url-mapping';
 
 export let backend: string | undefined, basename: string, clusterName: string | undefined;
 
@@ -77,7 +78,6 @@ export function configureStore({
     );
 
     window.api = api;
-    window.store = store; // TODO: check is it really needed
 
     return {history, store};
 }

@@ -1,16 +1,17 @@
-import {useRef} from 'react';
-import PropTypes from 'prop-types';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import {getColorRange, getCurrentMetricLimits} from '../util';
+import PropTypes from 'prop-types';
+
+import {cn} from '../../../utils/cn';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import {getColorRange, getCurrentMetricLimits} from '../util';
 
 import './Histogram.scss';
 
 const b = cn('histogram');
 
 const HistogramBar = (props) => {
-    const barRef = useRef();
+    const barRef = React.useRef();
     const {data = {}, maxCount} = props;
     const {count, leftBound, rightBound, color} = data;
     const height = (count / maxCount) * 100;

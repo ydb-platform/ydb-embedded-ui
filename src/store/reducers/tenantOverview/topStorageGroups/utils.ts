@@ -1,6 +1,7 @@
-import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import type {TStorageInfo} from '../../../../types/api/storage';
+import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {prepareStorageGroups} from '../../storage/utils';
+
 import type {PreparedTopStorageGroupsResponse} from './types';
 
 export const prepareTopStorageGroupsResponse = (

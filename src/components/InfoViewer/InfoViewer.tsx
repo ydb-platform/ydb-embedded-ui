@@ -1,11 +1,12 @@
-import type {ReactNode} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
+
+import {cn} from '../../utils/cn';
 
 import './InfoViewer.scss';
 
 export interface InfoViewerItem {
-    label: ReactNode;
-    value: ReactNode;
+    label: React.ReactNode;
+    value: React.ReactNode;
 }
 
 export interface InfoViewerProps {
@@ -15,7 +16,7 @@ export interface InfoViewerProps {
     size?: 's';
     className?: string;
     multilineLabels?: boolean;
-    renderEmptyState?: (props?: Pick<InfoViewerProps, 'title' | 'size'>) => ReactNode;
+    renderEmptyState?: (props?: Pick<InfoViewerProps, 'title' | 'size'>) => React.ReactNode;
 }
 
 const b = cn('info-viewer');
@@ -30,7 +31,7 @@ export const InfoViewer = ({
     renderEmptyState,
 }: InfoViewerProps) => {
     if ((!info || !info.length) && renderEmptyState) {
-        return <>{renderEmptyState({title, size})}</>;
+        return <React.Fragment>{renderEmptyState({title, size})}</React.Fragment>;
     }
 
     return (
@@ -52,7 +53,7 @@ export const InfoViewer = ({
                     ))}
                 </div>
             ) : (
-                <>No {title} data</>
+                <React.Fragment>No {title} data</React.Fragment>
             )}
         </div>
     );

@@ -1,9 +1,11 @@
-import {ETabletState, type TTabletStateInfo} from '../../../types/api/tablet';
-import type {ITabletHandledResponse} from '../../../types/store/tablet';
-import {ButtonWithConfirmDialog} from '../../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+import React from 'react';
 
-import i18n from '../i18n';
+import {ButtonWithConfirmDialog} from '../../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+import {ETabletState} from '../../../types/api/tablet';
+import type {TTabletStateInfo} from '../../../types/api/tablet';
+import type {ITabletHandledResponse} from '../../../types/store/tablet';
 import {b} from '../Tablet';
+import i18n from '../i18n';
 
 interface TabletControlsProps {
     tablet: TTabletStateInfo;
@@ -47,7 +49,7 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                 {i18n('controls.kill')}
             </ButtonWithConfirmDialog>
             {hasHiveId() ? (
-                <>
+                <React.Fragment>
                     <ButtonWithConfirmDialog
                         dialogContent={i18n('dialog.stop')}
                         onConfirmAction={_onStopClick}
@@ -66,7 +68,7 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                     >
                         {i18n('controls.resume')}
                     </ButtonWithConfirmDialog>
-                </>
+                </React.Fragment>
             ) : null}
         </div>
     );

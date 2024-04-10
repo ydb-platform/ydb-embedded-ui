@@ -1,7 +1,7 @@
 import {RadioButton} from '@gravity-ui/uikit';
 
-import type {StorageType} from '../../../store/reducers/storage/types';
 import {STORAGE_TYPES} from '../../../store/reducers/storage/constants';
+import type {StorageType} from '../../../store/reducers/storage/types';
 
 const StorageTypesTitles = {
     [STORAGE_TYPES.groups]: 'Groups',

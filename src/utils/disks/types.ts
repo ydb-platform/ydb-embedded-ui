@@ -1,6 +1,7 @@
 import type {TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import type {ValueOf} from '../../types/common';
+
 import type {PDISK_TYPES} from './getPDiskType';
 
 export interface PreparedPDisk extends TPDiskStateInfo {

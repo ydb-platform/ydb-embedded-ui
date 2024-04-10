@@ -1,6 +1,5 @@
 import type {TIndexDescription} from '../../../types/api/schema';
 import {toFormattedSize} from '../../FormattedBytes/utils';
-
 import {createInfoFormatter} from '../utils';
 
 export const formatTableIndexItem = createInfoFormatter<TIndexDescription>({

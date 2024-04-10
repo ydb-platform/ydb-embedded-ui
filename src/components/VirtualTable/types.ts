@@ -1,8 +1,6 @@
-import type {ReactNode} from 'react';
-
 import type {IResponseError} from '../../types/api/error';
 
-import {ASCENDING, CENTER, DESCENDING, LEFT, RIGHT} from './constants';
+import type {ASCENDING, CENTER, DESCENDING, LEFT, RIGHT} from './constants';
 
 export interface Chunk<T> {
     active: boolean;
@@ -25,11 +23,11 @@ export type OnSort = (params: SortParams) => void;
 
 export interface Column<T> {
     name: string;
-    header?: ReactNode;
+    header?: React.ReactNode;
     className?: string;
     sortable?: boolean;
     resizeable?: boolean;
-    render: (props: {row: T; index: number}) => ReactNode;
+    render: (props: {row: T; index: number}) => React.ReactNode;
     width: number;
     align: AlignType;
 }
@@ -54,8 +52,8 @@ interface ControlsParams {
     inited: boolean;
 }
 
-export type RenderControls = (params: ControlsParams) => ReactNode;
-export type RenderEmptyDataMessage = () => ReactNode;
-export type RenderErrorMessage = (error: IResponseError) => ReactNode;
+export type RenderControls = (params: ControlsParams) => React.ReactNode;
+export type RenderEmptyDataMessage = () => React.ReactNode;
+export type RenderErrorMessage = (error: IResponseError) => React.ReactNode;
 
 export type GetRowClassName<T> = (row: T) => string | undefined;

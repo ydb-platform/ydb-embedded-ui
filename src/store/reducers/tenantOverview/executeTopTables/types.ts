@@ -1,6 +1,7 @@
 import type {IQueryResult, QueryErrorResponse} from '../../../../types/store/query';
 import type {ApiRequestAction} from '../../../utils';
-import {FETCH_TOP_TABLES, setDataWasNotLoaded} from './executeTopTables';
+
+import type {FETCH_TOP_TABLES, setDataWasNotLoaded} from './executeTopTables';
 
 export interface TopTablesState {
     loading: boolean;

@@ -1,7 +1,9 @@
-import {Link, LinkProps} from 'react-router-dom';
-import cn from 'bem-cn-lite';
+import type {LinkProps} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
-const bLink = cn('yc-link');
+import {cn} from '../../utils/cn';
+
+const bLink = cn('g-link');
 
 interface InternalLinkProps extends Omit<LinkProps, 'to'> {
     to?: LinkProps['to'];

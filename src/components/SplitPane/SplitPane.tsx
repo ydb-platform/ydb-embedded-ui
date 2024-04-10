@@ -1,7 +1,9 @@
-import cn from 'bem-cn-lite';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
-import SplitPaneLib, {SplitProps} from 'react-split';
+import type {SplitProps} from 'react-split';
+import SplitPaneLib from 'react-split';
+
+import {cn} from '../../utils/cn';
 
 import './SplitPane.scss';
 
@@ -25,7 +27,7 @@ const minSizeDefaultInner = [0, 100];
 const sizesDefaultInner = [50, 50];
 
 function SplitPane(props: SplitPaneProps) {
-    const [innerSizes, setInnerSizes] = useState<number[]>();
+    const [innerSizes, setInnerSizes] = React.useState<number[]>();
 
     const getDefaultSizePane = () => {
         const {defaultSizePaneKey, defaultSizes = sizesDefaultInner, initialSizes} = props;
@@ -55,7 +57,7 @@ function SplitPane(props: SplitPaneProps) {
         setInnerSizes(undefined);
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         const {collapsedSizes, triggerCollapse} = props;
         if (triggerCollapse) {
             const newSizes = collapsedSizes || minSizeDefaultInner;
@@ -64,7 +66,7 @@ function SplitPane(props: SplitPaneProps) {
         }
     }, [props.triggerCollapse]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const {triggerExpand, defaultSizes} = props;
         const newSizes = defaultSizes || sizesDefaultInner;
         if (triggerExpand) {

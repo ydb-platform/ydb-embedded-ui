@@ -1,25 +1,16 @@
-import {useState, useReducer, useRef, useCallback, useEffect} from 'react';
-
-import type {HandleTableColumnsResize} from '../../utils/hooks/useTableResize';
+import React from 'react';
 
 import type {IResponseError} from '../../types/api/error';
 import {getArray} from '../../utils';
-
-import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
+import type {HandleTableColumnsResize} from '../../utils/hooks/useTableResize';
 import {ResponseError} from '../Errors/ResponseError';
+import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
 
-import type {
-    Column,
-    OnSort,
-    FetchData,
-    SortParams,
-    RenderControls,
-    OnEntry,
-    OnLeave,
-    GetRowClassName,
-    RenderEmptyDataMessage,
-    RenderErrorMessage,
-} from './types';
+import {TableChunk} from './TableChunk';
+import {TableHead} from './TableHead';
+import {EmptyTableRow} from './TableRow';
+import {DEFAULT_REQUEST_TIMEOUT, DEFAULT_TABLE_ROW_HEIGHT} from './constants';
+import i18n from './i18n';
 import {
     createVirtualTableReducer,
     initChunk,
@@ -29,13 +20,20 @@ import {
     setChunkError,
     setChunkLoading,
 } from './reducer';
-import {DEFAULT_REQUEST_TIMEOUT, DEFAULT_TABLE_ROW_HEIGHT} from './constants';
-import {TableHead} from './TableHead';
-import {TableChunk} from './TableChunk';
-import {EmptyTableRow} from './TableRow';
-import {useIntersectionObserver} from './useIntersectionObserver';
-import i18n from './i18n';
 import {b} from './shared';
+import type {
+    Column,
+    FetchData,
+    GetRowClassName,
+    OnEntry,
+    OnLeave,
+    OnSort,
+    RenderControls,
+    RenderEmptyDataMessage,
+    RenderErrorMessage,
+    SortParams,
+} from './types';
+import {useIntersectionObserver} from './useIntersectionObserver';
 
 import './VirtualTable.scss';
 
@@ -70,21 +68,21 @@ export const VirtualTable = <T,>({
     renderErrorMessage,
     dependencyArray,
 }: VirtualTableProps<T>) => {
-    const inited = useRef(false);
-    const tableContainer = useRef<HTMLDivElement>(null);
+    const inited = React.useRef(false);
+    const tableContainer = React.useRef<HTMLDivElement>(null);
 
-    const [state, dispatch] = useReducer(createVirtualTableReducer<T>(), {});
+    const [state, dispatch] = React.useReducer(createVirtualTableReducer<T>(), {});
 
-    const [sortParams, setSortParams] = useState<SortParams | undefined>(initialSortParams);
+    const [sortParams, setSortParams] = React.useState<SortParams | undefined>(initialSortParams);
 
-    const [totalEntities, setTotalEntities] = useState(limit);
-    const [foundEntities, setFoundEntities] = useState(0);
+    const [totalEntities, setTotalEntities] = React.useState(limit);
+    const [foundEntities, setFoundEntities] = React.useState(0);
 
-    const [error, setError] = useState<IResponseError>();
+    const [error, setError] = React.useState<IResponseError>();
 
-    const pendingRequests = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+    const pendingRequests = React.useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
-    const fetchChunkData = useCallback(
+    const fetchChunkData = React.useCallback(
         async (id: string) => {
             dispatch(setChunkLoading(id));
 
@@ -122,11 +120,11 @@ export const VirtualTable = <T,>({
         [fetchData, limit, sortParams],
     );
 
-    const onEntry = useCallback<OnEntry>((id) => {
+    const onEntry = React.useCallback<OnEntry>((id) => {
         dispatch(initChunk(id));
     }, []);
 
-    const onLeave = useCallback<OnLeave>((id) => {
+    const onLeave = React.useCallback<OnLeave>((id) => {
         dispatch(removeChunk(id));
 
         // If there is a pending request for the removed chunk, cancel it
@@ -139,7 +137,7 @@ export const VirtualTable = <T,>({
     }, []);
 
     // Cancel all pending requests on component unmount
-    useEffect(() => {
+    React.useEffect(() => {
         return () => {
             Object.values(pendingRequests.current).forEach((timer) => {
                 window.clearTimeout(timer);
@@ -151,7 +149,7 @@ export const VirtualTable = <T,>({
     // Load chunks if they become active
     // This mecanism helps to set chunk active state from different sources, but load data only once
     // Only currently active chunks should be in state so iteration by the whole state shouldn't be a problem
-    useEffect(() => {
+    React.useEffect(() => {
         for (const id of Object.keys(state)) {
             const chunk = state[Number(id)];
 
@@ -162,7 +160,7 @@ export const VirtualTable = <T,>({
     }, [fetchChunkData, state]);
 
     // Reset table on filters change
-    useEffect(() => {
+    React.useEffect(() => {
         // Reset counts, so table unmount unneeded chunks
         setTotalEntities(limit);
         setFoundEntities(0);

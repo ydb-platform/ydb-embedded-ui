@@ -1,22 +1,25 @@
-import {useEffect, useMemo, useRef} from 'react';
-import DataTable, {type Column} from '@gravity-ui/react-data-table';
+import React from 'react';
 
-import type {HotKey} from '../../../../types/api/hotkeys';
-import type {IResponseError} from '../../../../types/api/error';
-import {Icon} from '../../../../components/Icon';
+import DataTable from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
+
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-import {useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
-import {cn} from '../../../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {Icon} from '../../../../components/Icon';
 import {
     setHotKeysData,
     setHotKeysDataWasNotLoaded,
     setHotKeysError,
     setHotKeysLoading,
 } from '../../../../store/reducers/hotKeys/hotKeys';
+import type {IResponseError} from '../../../../types/api/error';
+import type {HotKey} from '../../../../types/api/hotkeys';
+import {cn} from '../../../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+
+import i18n from './i18n';
 
 import './HotKeys.scss';
-import i18n from './i18n';
 
 const b = cn('ydb-hot-keys');
 
@@ -58,18 +61,18 @@ interface HotKeysProps {
 export function HotKeys({path}: HotKeysProps) {
     const dispatch = useTypedDispatch();
 
-    const collectSamplesTimerRef = useRef<ReturnType<typeof setTimeout>>();
+    const collectSamplesTimerRef = React.useRef<ReturnType<typeof setTimeout>>();
 
     const {loading, wasLoaded, data, error} = useTypedSelector((state) => state.hotKeys);
     const {loading: schemaLoading, data: schemaData} = useTypedSelector((state) => state.schema);
 
     const keyColumnsIds = schemaData[path]?.PathDescription?.Table?.KeyColumnNames;
 
-    const tableColumns = useMemo(() => {
+    const tableColumns = React.useMemo(() => {
         return getHotKeysColumns(keyColumnsIds);
     }, [keyColumnsIds]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const fetchHotkeys = async (enableSampling: boolean) => {
             // Set hotkeys error, but not data, since data is set conditionally
             try {

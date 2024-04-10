@@ -1,5 +1,5 @@
 export interface SlotComponent<Props = {}, Type = never>
-    extends React.FC<Props & React.RefAttributes<Type>> {
+    extends React.FC<Props & {ref?: React.Ref<Type>}> {
     /**
      * @internal
      */
@@ -16,5 +16,5 @@ export interface SlotItem<Props = {}, Type = unknown> {
 type ExtractChildrenType<Props> = Props extends {children: infer Children}
     ? Children
     : Props extends {children?: infer Children}
-    ? Children | undefined
-    : never;
+      ? Children | undefined
+      : never;

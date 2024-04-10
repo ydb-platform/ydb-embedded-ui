@@ -1,20 +1,21 @@
-import DataTable, {type Column as DataTableColumn} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
+import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 
-import type {Column as VirtualTableColumn} from '../../components/VirtualTable';
+import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
+import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
-import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
+import {UsageLabel} from '../../components/UsageLabel/UsageLabel';
+import type {Column as VirtualTableColumn} from '../../components/VirtualTable';
+import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
+import type {GetNodeRefFunc} from '../../types/additionalProps';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {
     formatBytesToGigabyte,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import type {GetNodeRefFunc} from '../../types/additionalProps';
-import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
-import {UsageLabel} from '../../components/UsageLabel/UsageLabel';
-import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 
 const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',

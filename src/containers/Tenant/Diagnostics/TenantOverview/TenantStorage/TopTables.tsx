@@ -1,17 +1,16 @@
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 import {useLocation} from 'react-router';
 
-import DataTable, {Column} from '@gravity-ui/react-data-table';
-
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
+import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
 import {
     fetchTopTables,
     setDataWasNotLoaded,
 } from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
-import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
-import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
-
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';

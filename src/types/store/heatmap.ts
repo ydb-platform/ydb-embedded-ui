@@ -1,9 +1,8 @@
+import type {FETCH_HEATMAP, setHeatmapOptions} from '../../store/reducers/heatmap';
 import type {ApiRequestAction} from '../../store/utils';
-import {FETCH_HEATMAP, setHeatmapOptions} from '../../store/reducers/heatmap';
-
 import type {IResponseError} from '../api/error';
-import type {TTabletStateInfo} from '../api/tablet';
 import type {TTableStats} from '../api/schema';
+import type {TTabletStateInfo} from '../api/tablet';
 import type {TMetrics} from '../api/tenant';
 
 export interface IHeatmapTabletData extends TTabletStateInfo {

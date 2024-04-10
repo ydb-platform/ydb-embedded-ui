@@ -1,22 +1,21 @@
+import {Flask, PencilToSquare, StarFill} from '@gravity-ui/icons';
 import type {IconProps} from '@gravity-ui/uikit';
 
-import {PencilToSquare, Flask, StarFill} from '@gravity-ui/icons';
-
 import {
+    BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+    ENABLE_AUTOCOMPLETE,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
+    QUERY_USE_MULTI_SCHEMA_KEY,
     THEME_KEY,
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
-    QUERY_USE_MULTI_SCHEMA_KEY,
-    BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
-    ENABLE_AUTOCOMPLETE,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
+import {ClusterModeGuard} from '../ClusterModeGuard';
 
 import type {SettingProps} from './Setting';
 import i18n from './i18n';
-import {ClusterModeGuard} from '../ClusterModeGuard';
 
 export interface SettingsSection {
     id: string;

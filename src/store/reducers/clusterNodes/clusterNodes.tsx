@@ -1,10 +1,9 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
-import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
 
 import type {ClusterNodesAction, ClusterNodesState, PreparedClusterNode} from './types';
-
-import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 
 export const FETCH_CLUSTER_NODES = createRequestActionTypes('cluster', 'FETCH_CLUSTER_NODES');
 

@@ -6,12 +6,11 @@
     display: flex;
     overflow: auto;
     flex-direction: column;
+    gap: 20px;
 
     height: 100%;
     padding-top: 20px;
     padding-left: 20px;
-
-    gap: 20px;
 
     &__group-title {
         @include header-1-typography();
@@ -21,9 +20,9 @@
         display: flex;
         flex-grow: 1;
         flex-flow: row wrap;
+        gap: 10px;
 
         margin-top: 20px;
-        gap: 10px;
     }
 
     &__group-disk {

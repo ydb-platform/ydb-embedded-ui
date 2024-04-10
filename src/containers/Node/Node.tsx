@@ -1,26 +1,25 @@
-import {useEffect, useMemo, useRef} from 'react';
-import {useLocation, useRouteMatch} from 'react-router';
-import cn from 'bem-cn-lite';
-import {Helmet} from 'react-helmet-async';
+import React from 'react';
 
 import {Tabs} from '@gravity-ui/uikit';
+import {Helmet} from 'react-helmet-async';
+import {useLocation, useRouteMatch} from 'react-router';
 import {Link} from 'react-router-dom';
 
-import {TABLETS, STORAGE, NODE_PAGES, OVERVIEW, STRUCTURE} from './NodePages';
-import {Tablets} from '../Tablets';
-import {StorageWrapper} from '../Storage/StorageWrapper';
-import NodeStructure from './NodeStructure/NodeStructure';
-import {Loader} from '../../components/Loader';
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
-
-import {getNodeInfo, resetNode} from '../../store/reducers/node/node';
+import {Loader} from '../../components/Loader';
 import routes, {createHref, parseQuery} from '../../routes';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {AutoFetcher} from '../../utils/autofetcher';
-import {useTypedSelector, useTypedDispatch} from '../../utils/hooks';
-
+import {getNodeInfo, resetNode} from '../../store/reducers/node/node';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
+import {AutoFetcher} from '../../utils/autofetcher';
+import {cn} from '../../utils/cn';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {StorageWrapper} from '../Storage/StorageWrapper';
+import {Tablets} from '../Tablets';
+
+import {NODE_PAGES, OVERVIEW, STORAGE, STRUCTURE, TABLETS} from './NodePages';
+import NodeStructure from './NodeStructure/NodeStructure';
 
 import './Node.scss';
 
@@ -36,7 +35,7 @@ interface NodeProps {
 }
 
 function Node(props: NodeProps) {
-    const container = useRef<HTMLDivElement>(null);
+    const container = React.useRef<HTMLDivElement>(null);
 
     const dispatch = useTypedDispatch();
     const location = useLocation();
@@ -49,7 +48,7 @@ function Node(props: NodeProps) {
     const {id: nodeId, activeTab} = match.params;
     const {tenantName: tenantNameFromQuery} = parseQuery(location);
 
-    const {activeTabVerified, nodeTabs} = useMemo(() => {
+    const {activeTabVerified, nodeTabs} = React.useMemo(() => {
         const hasStorage = node?.Roles?.find((el) => el === STORAGE_ROLE);
 
         const nodePages = hasStorage ? NODE_PAGES : NODE_PAGES.filter((el) => el.id !== STORAGE);
@@ -69,7 +68,7 @@ function Node(props: NodeProps) {
         return {activeTabVerified: actualActiveTab, nodeTabs: actualNodeTabs};
     }, [activeTab, node]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
 
         dispatch(
@@ -80,7 +79,7 @@ function Node(props: NodeProps) {
         );
     }, [dispatch, node, nodeId, tenantNameFromQuery]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const fetchData = () => dispatch(getNodeInfo(nodeId));
         fetchData();
         autofetcher.start();

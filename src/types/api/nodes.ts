@@ -1,7 +1,7 @@
-import {EFlag} from './enums';
-import {TPDiskStateInfo} from './pdisk';
-import {TTabletStateInfo} from './tablet';
-import {TVDiskStateInfo} from './vdisk';
+import type {EFlag} from './enums';
+import type {TPDiskStateInfo} from './pdisk';
+import type {TTabletStateInfo} from './tablet';
+import type {TVDiskStateInfo} from './vdisk';
 
 /**
  * endpoint: /viewer/json/nodes

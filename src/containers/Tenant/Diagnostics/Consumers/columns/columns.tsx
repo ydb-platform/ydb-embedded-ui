@@ -1,16 +1,16 @@
-import DataTable, {Column} from '@gravity-ui/react-data-table';
-import block from 'bem-cn-lite';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 import qs from 'qs';
 
-import type {IPreparedConsumerData} from '../../../../../types/store/topic';
-import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import {InternalLink} from '../../../../../components/InternalLink';
-import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
+import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import routes, {createHref} from '../../../../../routes';
-
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
+import type {IPreparedConsumerData} from '../../../../../types/store/topic';
+import {cn} from '../../../../../utils/cn';
+import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {TenantTabsGroups} from '../../../TenantPages';
-
+import {ReadLagsHeader} from '../Headers';
 import {
     CONSUMERS_COLUMNS_IDS,
     CONSUMERS_COLUMNS_TITILES,
@@ -18,11 +18,9 @@ import {
     CONSUMERS_READ_LAGS_SUB_COLUMNS_TITLES,
 } from '../utils/constants';
 
-import {ReadLagsHeader} from '../Headers';
-
 import './Columns.scss';
 
-const b = block('ydb-diagnostics-consumers-columns');
+const b = cn('ydb-diagnostics-consumers-columns');
 
 export const columns: Column<IPreparedConsumerData>[] = [
     {

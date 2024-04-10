@@ -1,13 +1,13 @@
+import {Link as UIKitLink} from '@gravity-ui/uikit';
 import {Link} from 'react-router-dom';
 
-import {Link as UIKitLink} from '@gravity-ui/uikit';
-
-import {ETabletState, TTabletStateInfo} from '../../../types/api/tablet';
-import {InfoViewer, InfoViewerItem} from '../../../components/InfoViewer';
+import type {InfoViewerItem} from '../../../components/InfoViewer';
+import {InfoViewer} from '../../../components/InfoViewer';
 import routes, {createHref} from '../../../routes';
+import {ETabletState} from '../../../types/api/tablet';
+import type {TTabletStateInfo} from '../../../types/api/tablet';
 import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 import {getDefaultNodePath} from '../../Node/NodePages';
-
 import {b} from '../Tablet';
 
 interface TabletInfoProps {

@@ -2,7 +2,8 @@ import type {Reducer} from '@reduxjs/toolkit';
 
 import {EVersion} from '../../../types/api/storage';
 import {valueIsDefined} from '../../../utils';
-import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
+
 import type {VDiskAction, VDiskGroup, VDiskState} from './types';
 import {prepareVDiskDataResponse, prepareVDiskGroupResponse} from './utils';
 

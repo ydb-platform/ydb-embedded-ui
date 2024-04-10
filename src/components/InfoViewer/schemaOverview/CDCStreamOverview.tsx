@@ -1,9 +1,9 @@
-import type {TEvDescribeSchemeResult, TCdcStreamDescription} from '../../../types/api/schema';
+import React from 'react';
 
-import {InfoViewer, InfoViewerItem} from '..';
+import type {InfoViewerItem} from '..';
+import {InfoViewer, formatObject} from '..';
+import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
 import {formatCdcStreamItem, formatCommonItem} from '../formatters';
-
-const DISPLAYED_FIELDS: Set<keyof TCdcStreamDescription> = new Set(['Mode', 'Format']);
 
 interface CDCStreamOverviewProps {
     data?: TEvDescribeSchemeResult;
@@ -20,12 +20,12 @@ export const CDCStreamOverview = ({data}: CDCStreamOverviewProps) => {
     info.push(formatCommonItem('PathType', data.PathDescription?.Self?.PathType));
     info.push(formatCommonItem('CreateStep', data.PathDescription?.Self?.CreateStep));
 
-    let key: keyof TCdcStreamDescription;
-    for (key in TableIndex) {
-        if (DISPLAYED_FIELDS.has(key)) {
-            info.push(formatCdcStreamItem(key, TableIndex?.[key]));
-        }
-    }
+    const {Mode, Format} = TableIndex || {};
+    info.push(...formatObject(formatCdcStreamItem, {Mode, Format}));
 
-    return <>{info.length ? <InfoViewer info={info}></InfoViewer> : <>Empty</>}</>;
+    return (
+        <React.Fragment>
+            {info.length ? <InfoViewer info={info}></InfoViewer> : 'Empty'}
+        </React.Fragment>
+    );
 };

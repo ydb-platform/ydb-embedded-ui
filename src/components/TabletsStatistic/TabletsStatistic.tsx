@@ -1,12 +1,11 @@
-import cn from 'bem-cn-lite';
 import {Link} from 'react-router-dom';
 
+import routes, {createHref} from '../../routes';
+import type {TTabletStateInfo as TComputeTabletStateInfo} from '../../types/api/compute';
+import type {TTabletStateInfo as TFullTabletStateInfo} from '../../types/api/tablet';
+import {cn} from '../../utils/cn';
 import {getTabletLabel} from '../../utils/constants';
 import {mapTabletStateToColorState} from '../../utils/tablet';
-import routes, {createHref} from '../../routes';
-
-import type {TTabletStateInfo as TFullTabletStateInfo} from '../../types/api/tablet';
-import type {TTabletStateInfo as TComputeTabletStateInfo} from '../../types/api/compute';
 
 import './TabletsStatistic.scss';
 

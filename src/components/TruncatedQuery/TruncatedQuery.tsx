@@ -1,5 +1,6 @@
-import cn from 'bem-cn-lite';
+import React from 'react';
 
+import {cn} from '../../utils/cn';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 
 import './TruncatedQuery.scss';
@@ -20,13 +21,13 @@ export const TruncatedQuery = ({value = '', maxQueryHeight = 6}: TruncatedQueryP
         const message =
             '\n...\nThe request was truncated. Click on the line to show the full query on the query tab';
         return (
-            <>
+            <React.Fragment>
                 <span className={b()}>{content}</span>
                 <span className={b('message', {color: 'secondary'})}>{message}</span>
-            </>
+            </React.Fragment>
         );
     }
-    return <>{value}</>;
+    return <React.Fragment>{value}</React.Fragment>;
 };
 
 interface OneLineQueryWithPopoverProps {

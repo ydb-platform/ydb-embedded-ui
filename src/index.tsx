@@ -1,11 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+/* eslint-disable import/order */
+import ReactDOM from 'react-dom/client';
 
 import '@gravity-ui/uikit/styles/styles.scss';
 
 import {ErrorBoundary} from './lib';
-import {store, history} from './store/defaultStore';
 import reportWebVitals from './reportWebVitals';
+import {history, store} from './store/defaultStore';
 
 import './styles/themes.scss';
 import './styles/constants.scss';
@@ -22,13 +22,15 @@ async function render() {
         App = await import('./lib').then(({MultiClusterApp}) => MultiClusterApp);
     }
 
-    ReactDOM.render(
-        <React.StrictMode>
-            <ErrorBoundary>
-                <App store={store} history={history} />
-            </ErrorBoundary>
-        </React.StrictMode>,
-        document.getElementById('root'),
+    const container = document.getElementById('root');
+    if (!container) {
+        throw new Error("Can't find root element");
+    }
+    const root = ReactDOM.createRoot(container);
+    root.render(
+        <ErrorBoundary>
+            <App store={store} history={history} />
+        </ErrorBoundary>,
     );
 }
 

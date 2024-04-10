@@ -19,19 +19,20 @@
     &__top {
         display: flex;
         align-items: center;
+        gap: 4px;
 
         margin-bottom: 10px;
 
         line-height: 24px;
-        gap: 4px;
     }
 
     &__top-label {
+        gap: 10px;
+
         margin-bottom: var(--diagnostics-section-title-margin);
 
         font-weight: 600;
         line-height: 24px;
-        gap: 10px;
     }
 
     &__info {

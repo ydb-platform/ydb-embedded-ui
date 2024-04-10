@@ -1,6 +1,7 @@
 import type {TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo} from '../../types/api/vdisk';
 import {isNumeric} from '../utils';
+
 import {calculatePDiskSeverity} from './calculatePDiskSeverity';
 import {calculateVDiskSeverity} from './calculateVDiskSeverity';
 import {getPDiskType} from './getPDiskType';

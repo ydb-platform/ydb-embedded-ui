@@ -1,5 +1,5 @@
+import type {Page} from '@playwright/test';
 import qs from 'qs';
-import {Page} from '@playwright/test';
 
 import {BaseModel} from './BaseModel';
 

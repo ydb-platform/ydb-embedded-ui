@@ -1,5 +1,4 @@
 import type {MultipleWindowsStat} from '../../types/api/consumer';
-
 import {DAY_IN_SECONDS, HOUR_IN_SECONDS, MINUTE_IN_SECONDS} from '../constants';
 
 export interface ProcessSpeedStats {

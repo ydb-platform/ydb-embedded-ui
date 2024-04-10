@@ -2,7 +2,7 @@ import type {TACE, TMetaInfo} from '../../../types/api/acl';
 import type {IResponseError} from '../../../types/api/error';
 import type {ApiRequestAction} from '../../utils';
 
-import {FETCH_SCHEMA_ACL, setAclWasNotLoaded} from './schemaAcl';
+import type {FETCH_SCHEMA_ACL, setAclWasNotLoaded} from './schemaAcl';
 
 export interface SchemaAclState {
     loading: boolean;

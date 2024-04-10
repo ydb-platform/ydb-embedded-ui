@@ -252,8 +252,8 @@ interface DefaultSchemaResult {
 type ResultFields<Schema extends Schemas> = Schema extends 'modern'
     ? ModernSchemaResult
     : Schema extends 'multi'
-    ? MultiSchemaResult
-    : DefaultSchemaResult;
+      ? MultiSchemaResult
+      : DefaultSchemaResult;
 
 /**
  * meta.type = 'query'
@@ -291,8 +291,8 @@ export type QueryAPIResponse<
 > = Action extends ExplainActions
     ? ExplainResponse<Action>
     : Action extends ExecuteActions
-    ? ExecuteResponse<Action, Schema>
-    : unknown;
+      ? ExecuteResponse<Action, Schema>
+      : unknown;
 
 // ==== types to use in query result preparation ====
 export type AnyExplainResponse = ExplainQueryResponse | ExplainScriptResponse;

@@ -1,6 +1,6 @@
-import cn from 'bem-cn-lite';
-
-import {Tag, TagType} from '../Tag';
+import {cn} from '../../utils/cn';
+import type {TagType} from '../Tag';
+import {Tag} from '../Tag';
 
 import './Tags.scss';
 

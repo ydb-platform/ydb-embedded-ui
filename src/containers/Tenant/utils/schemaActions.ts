@@ -1,14 +1,11 @@
-import {Dispatch} from 'react';
 import copy from 'copy-to-clipboard';
-
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
-import type {QueryMode} from '../../../types/store/query';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
+import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import {TENANT_QUERY_TABS_ID, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
+import type {QueryMode} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
-
 import i18n from '../i18n';
 
 import {
@@ -30,7 +27,7 @@ interface ActionsAdditionalEffects {
 
 const bindActions = (
     path: string,
-    dispatch: Dispatch<any>,
+    dispatch: React.Dispatch<any>,
     additionalEffects: ActionsAdditionalEffects,
 ) => {
     const {setActivePath, setQueryMode} = additionalEffects;
@@ -79,7 +76,7 @@ const bindActions = (
 type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
 
 export const getActions =
-    (dispatch: Dispatch<any>, additionalEffects: ActionsAdditionalEffects) =>
+    (dispatch: React.Dispatch<any>, additionalEffects: ActionsAdditionalEffects) =>
     (path: string, type: NavigationTreeNodeType) => {
         const actions = bindActions(path, dispatch, additionalEffects);
         const copyItem = {text: i18n('actions.copyPath'), action: actions.copyPath};

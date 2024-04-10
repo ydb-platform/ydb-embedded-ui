@@ -1,10 +1,10 @@
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import {valueIsDefined} from '../../utils';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
-
-import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {InfoViewer} from '../InfoViewer';
+import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
+
 import {groupInfoKeyset} from './i18n';
 
 interface GroupInfoProps<T extends Partial<PreparedStorageGroup>>

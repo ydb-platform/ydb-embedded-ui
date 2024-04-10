@@ -1,9 +1,9 @@
-import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import type {
     ColumnAliasSuggestion,
     KeywordSuggestion,
     YqlAutocompleteResult,
 } from '@gravity-ui/websql-autocomplete';
+import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 import {
     AggregateFunctions,
@@ -16,7 +16,7 @@ import {
 } from './constants';
 
 const CompletionItemKind: {
-    [K in keyof typeof monaco.languages.CompletionItemKind]: typeof monaco.languages.CompletionItemKind[K];
+    [K in keyof typeof monaco.languages.CompletionItemKind]: (typeof monaco.languages.CompletionItemKind)[K];
 } = {
     Method: 0,
     Function: 1,

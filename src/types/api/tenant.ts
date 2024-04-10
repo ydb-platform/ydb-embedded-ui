@@ -1,6 +1,6 @@
-import {EFlag} from './enums';
-import {TPoolStats, TSystemStateInfo} from './nodes';
-import {TTabletStateInfo} from './tablet';
+import type {EFlag} from './enums';
+import type {TPoolStats, TSystemStateInfo} from './nodes';
+import type {TTabletStateInfo} from './tablet';
 
 /**
  * endpoint: /viewer/json/tenants

@@ -1,12 +1,12 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
 import type {
-    IDescribeState,
     IDescribeAction,
-    IDescribeHandledResponse,
     IDescribeData,
+    IDescribeHandledResponse,
+    IDescribeState,
 } from '../../types/store/describe';
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 export const FETCH_DESCRIBE = createRequestActionTypes('describe', 'FETCH_DESCRIBE');
 const SET_CURRENT_DESCRIBE_PATH = 'describe/SET_CURRENT_DESCRIBE_PATH';

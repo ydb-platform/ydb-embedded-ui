@@ -6,8 +6,7 @@ import type {
     ITabletsApiRequestParams,
     ITabletsState,
 } from '../../types/store/tablets';
-
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 export const FETCH_TABLETS = createRequestActionTypes('tablets', 'FETCH_TABLETS');
 
@@ -87,7 +86,7 @@ export const setTypeFilter = (typeFilter: EType[]) => {
 export const clearWasLoadingFlag = () =>
     ({
         type: CLEAR_WAS_LOADING_TABLETS,
-    } as const);
+    }) as const;
 
 export function getTabletsInfo(data: ITabletsApiRequestParams) {
     return createApiRequest({

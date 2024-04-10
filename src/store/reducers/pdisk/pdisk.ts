@@ -1,7 +1,8 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
 import {EVersion} from '../../../types/api/storage';
-import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
+
 import type {PDiskAction, PDiskState} from './types';
 import {preparePDiksDataResponse, preparePDiskStorageResponse} from './utils';
 

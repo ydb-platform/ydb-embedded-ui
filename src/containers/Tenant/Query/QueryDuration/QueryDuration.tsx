@@ -1,8 +1,6 @@
-import block from 'bem-cn-lite';
-
-import {formatDurationToShortTimeFormat, parseUsToMs} from '../../../../utils/timeParsers';
 import {LabelWithPopover} from '../../../../components/LabelWithPopover';
-
+import {cn} from '../../../../utils/cn';
+import {formatDurationToShortTimeFormat, parseUsToMs} from '../../../../utils/timeParsers';
 import i18n from '../i18n';
 
 import './QueryDuration.scss';
@@ -11,7 +9,7 @@ interface QueryDurationProps {
     duration?: string | number;
 }
 
-const b = block('ydb-query-duration');
+const b = cn('ydb-query-duration');
 
 export const QueryDuration = ({duration}: QueryDurationProps) => {
     if (!duration) {

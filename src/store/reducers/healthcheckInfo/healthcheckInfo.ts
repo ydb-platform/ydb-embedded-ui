@@ -1,15 +1,15 @@
 import {createSelector} from '@reduxjs/toolkit';
 import type {Reducer, Selector} from '@reduxjs/toolkit';
 
+import type {IssueLog, StatusFlag} from '../../../types/api/healthcheck';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
+
 import type {
     HealthCheckInfoAction,
     HealthcheckInfoRootStateSlice,
     HealthcheckInfoState,
     IssuesTree,
 } from './types';
-import type {IssueLog, StatusFlag} from '../../../types/api/healthcheck';
-
-import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 export const FETCH_HEALTHCHECK = createRequestActionTypes('cluster', 'FETCH_HEALTHCHECK');
 

@@ -1,24 +1,24 @@
-import type {ReactNode} from 'react';
-import {ErrorBoundary as ErrorBoundaryBase} from 'react-error-boundary';
-import cn from 'bem-cn-lite';
-
 import {Button, Disclosure} from '@gravity-ui/uikit';
+import {ErrorBoundary as ErrorBoundaryBase} from 'react-error-boundary';
 
+import {cn} from '../../utils/cn';
 import {registerError} from '../../utils/registerError';
-import {Illustration} from '../Illustration';
 import {useComponent} from '../ComponentsProvider/ComponentsProvider';
+import {Illustration} from '../Illustration';
+
 import i18n from './i18n';
+
 import './ErrorBoundary.scss';
 
 const b = cn('ydb-error-boundary');
 
-export function ErrorBoundary({children}: {children?: ReactNode}) {
+export function ErrorBoundary({children}: {children?: React.ReactNode}) {
     const ErrorBoundaryComponent = useComponent('ErrorBoundary');
     return <ErrorBoundaryComponent>{children}</ErrorBoundaryComponent>;
 }
 
 interface ErrorBoundaryProps {
-    children?: ReactNode;
+    children?: React.ReactNode;
     useRetry?: boolean;
     onReportProblem?: (error?: Error) => void;
 }
@@ -31,7 +31,7 @@ export function ErrorBoundaryInner({
     return (
         <ErrorBoundaryBase
             onError={(error, info) => {
-                registerError(error, info.componentStack, 'error-boundary');
+                registerError(error, info.componentStack ?? undefined, 'error-boundary');
             }}
             fallbackRender={({error, resetErrorBoundary}) => {
                 return (

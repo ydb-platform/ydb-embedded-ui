@@ -1,10 +1,9 @@
-import {YdbInternalUser} from './YdbInternalUser/YdbInternalUser';
-import {UserSettings} from '../UserSettings/UserSettings';
-
-import {useNavigationMenuItems} from './useNavigationMenuItems';
 import {useComponent} from '../../components/ComponentsProvider/ComponentsProvider';
-
+import {UserSettings} from '../UserSettings/UserSettings';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
+
+import {YdbInternalUser} from './YdbInternalUser/YdbInternalUser';
+import {useNavigationMenuItems} from './useNavigationMenuItems';
 
 interface NavigationProps {
     userSettings?: YDBEmbeddedUISettings;

@@ -1,39 +1,38 @@
-import {useCallback, useMemo} from 'react';
-import {Helmet} from 'react-helmet-async';
+import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
-import {TableColumnSetup, Select} from '@gravity-ui/uikit';
+import {Select, TableColumnSetup} from '@gravity-ui/uikit';
+import {Helmet} from 'react-helmet-async';
 
-import {Search} from '../../components/Search';
 import {Loader} from '../../components/Loader';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../utils/hooks';
-
-import {fetchClustersList, changeClustersFilters} from '../../store/reducers/clusters/clusters';
+import {Search} from '../../components/Search';
+import {changeClustersFilters, fetchClustersList} from '../../store/reducers/clusters/clusters';
 import {
-    selectClustersList,
-    selectLoadingFlag,
     selectClusterNameFilter,
-    selectStatusFilter,
+    selectClustersAggregation,
+    selectClustersList,
+    selectFilteredClusters,
+    selectLoadingFlag,
     selectServiceFilter,
+    selectStatusFilter,
     selectVersionFilter,
     selectVersions,
-    selectFilteredClusters,
-    selectClustersAggregation,
 } from '../../store/reducers/clusters/selectors';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
+import {ClustersStatistics} from './ClustersStatistics';
+import {CLUSTERS_COLUMNS} from './columns';
 import {
+    CLUSTER_STATUSES,
     COLUMNS_NAMES,
     COLUMNS_TITLES,
-    CLUSTER_STATUSES,
     DEFAULT_COLUMNS,
     SELECTED_COLUMNS_KEY,
 } from './constants';
-import {ClustersStatistics} from './ClustersStatistics';
-import {CLUSTERS_COLUMNS} from './columns';
-import {useSelectedColumns} from './useSelectedColumns';
-import {b} from './shared';
 import i18n from './i18n';
+import {b} from './shared';
+import {useSelectedColumns} from './useSelectedColumns';
 
 import './Clusters.scss';
 
@@ -50,7 +49,7 @@ export function Clusters() {
     const version = useTypedSelector(selectVersionFilter);
     const versions = useTypedSelector(selectVersions);
 
-    const fetchData = useCallback(() => {
+    const fetchData = React.useCallback(() => {
         dispatch(fetchClustersList());
     }, [dispatch]);
 
@@ -77,7 +76,7 @@ export function Clusters() {
         [COLUMNS_NAMES.TITLE],
     );
 
-    const servicesToSelect = useMemo(() => {
+    const servicesToSelect = React.useMemo(() => {
         const clustersServices = new Set<string>();
 
         clusters.forEach((cluster) => {
@@ -153,16 +152,14 @@ export function Clusters() {
                     />
                 </div>
                 <div className={b('control')}>
-                    <div>
-                        <TableColumnSetup
-                            key="TableColumnSetup"
-                            popupWidth="242px"
-                            items={columnsToSelect}
-                            showStatus
-                            onUpdate={setColumns}
-                            className={b('table-settings')}
-                        />
-                    </div>
+                    <TableColumnSetup
+                        key="TableColumnSetup"
+                        popupWidth={242}
+                        items={columnsToSelect}
+                        showStatus
+                        onUpdate={setColumns}
+                        sortable={false}
+                    />
                 </div>
             </div>
             <div className={b('table-wrapper')}>

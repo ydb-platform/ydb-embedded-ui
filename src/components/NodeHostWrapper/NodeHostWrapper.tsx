@@ -1,20 +1,18 @@
-import block from 'bem-cn-lite';
-
 import {Button, PopoverBehavior} from '@gravity-ui/uikit';
 
+import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {NodeAddress} from '../../types/additionalProps';
-import {getDefaultNodePath} from '../../containers/Node/NodePages';
+import {cn} from '../../utils/cn';
 import {isUnavailableNode} from '../../utils/nodes';
-
-import {EntityStatus} from '../EntityStatus/EntityStatus';
-import {NodeEndpointsTooltipContent} from '../TooltipsContent';
-import {Icon} from '../Icon';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
+import {EntityStatus} from '../EntityStatus/EntityStatus';
+import {Icon} from '../Icon';
+import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 
 import './NodeHostWrapper.scss';
 
-const b = block('ydb-node-host-wrapper');
+const b = cn('ydb-node-host-wrapper');
 
 interface NodeHostWrapperProps {
     node: NodesPreparedEntity;

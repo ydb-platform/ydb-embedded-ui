@@ -6,8 +6,7 @@ import type {
     IHeatmapState,
     IHeatmapTabletData,
 } from '../../types/store/heatmap';
-
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 export const FETCH_HEATMAP = createRequestActionTypes('heatmap', 'FETCH_HEATMAP');
 

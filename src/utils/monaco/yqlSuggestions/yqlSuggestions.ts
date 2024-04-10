@@ -1,5 +1,5 @@
-import type Monaco from 'monaco-editor';
 import type {CursorPosition} from '@gravity-ui/websql-autocomplete';
+import type Monaco from 'monaco-editor';
 
 import {
     generateAggregateFunctionsSuggestion,
@@ -63,14 +63,12 @@ async function getSuggestions(
         functionsSuggestions = await generateSimpleFunctionsSuggestion(rangeToInsertSuggestion);
     }
     if (parseResult.suggestAggregateFunctions) {
-        aggregateFunctionsSuggestions = await generateAggregateFunctionsSuggestion(
-            rangeToInsertSuggestion,
-        );
+        aggregateFunctionsSuggestions =
+            await generateAggregateFunctionsSuggestion(rangeToInsertSuggestion);
     }
     if (parseResult.suggestWindowFunctions) {
-        windowFunctionsSuggestions = await generateWindowFunctionsSuggestion(
-            rangeToInsertSuggestion,
-        );
+        windowFunctionsSuggestions =
+            await generateWindowFunctionsSuggestion(rangeToInsertSuggestion);
     }
     if (parseResult.suggestTableFunctions) {
         tableFunctionsSuggestions = await generateTableFunctionsSuggestion(rangeToInsertSuggestion);

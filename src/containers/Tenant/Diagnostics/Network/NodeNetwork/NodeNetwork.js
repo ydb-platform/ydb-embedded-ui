@@ -1,8 +1,9 @@
 import React from 'react';
-import cn from 'bem-cn-lite';
+
 import PropTypes from 'prop-types';
 
 import {EFlag} from '../../../../../types/api/enums';
+import {cn} from '../../../../../utils/cn';
 
 import './NodeNetwork.scss';
 

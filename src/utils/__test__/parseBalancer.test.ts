@@ -1,9 +1,9 @@
 import {
-    removeViewerPathname,
-    removeProtocol,
-    removePort,
     getCleanBalancerValue,
     parseBalancer,
+    removePort,
+    removeProtocol,
+    removeViewerPathname,
 } from '../parseBalancer';
 
 describe('parseBalancer', () => {

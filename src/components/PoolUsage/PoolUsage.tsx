@@ -1,10 +1,9 @@
-import block from 'bem-cn-lite';
-
 import type {TPoolStats} from '../../types/api/nodes';
+import {cn} from '../../utils/cn';
 
 import './PoolUsage.scss';
 
-const b = block('ydb-pool-usage');
+const b = cn('ydb-pool-usage');
 
 const getLineType = (fillWidth: number) => {
     let fillColor = 'green';

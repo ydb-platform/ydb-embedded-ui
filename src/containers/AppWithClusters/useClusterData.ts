@@ -1,10 +1,11 @@
 import {useLocation} from 'react-router';
-import {useClustersList} from '../Clusters/useClustersList';
+
 import {parseQuery} from '../../routes';
-import {useSetting, useTypedSelector} from '../../utils/hooks';
 import {selectClusterInfo} from '../../store/reducers/clusters/selectors';
-import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../utils/constants';
 import {getAdditionalNodesProps} from '../../utils/additionalProps';
+import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../utils/constants';
+import {useSetting, useTypedSelector} from '../../utils/hooks';
+import {useClustersList} from '../Clusters/useClustersList';
 
 export function useClusterData() {
     useClustersList();

@@ -1,21 +1,19 @@
-import {useCallback} from 'react';
+import React from 'react';
 
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
+import {
+    getTopStorageGroups,
+    selectTopStorageGroups,
+    setDataWasNotLoaded,
+} from '../../../../../store/reducers/tenantOverview/topStorageGroups/topStorageGroups';
 import {
     useAutofetcher,
     useSearchQuery,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../../utils/hooks';
-import {
-    setDataWasNotLoaded,
-    getTopStorageGroups,
-    selectTopStorageGroups,
-} from '../../../../../store/reducers/tenantOverview/topStorageGroups/topStorageGroups';
-import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/getStorageGroupsColumns';
-
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
@@ -35,7 +33,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
 
     const columns = getStorageTopGroupsColumns();
 
-    const fetchData = useCallback(
+    const fetchData = React.useCallback(
         (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded());

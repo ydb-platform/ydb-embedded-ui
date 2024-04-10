@@ -1,13 +1,12 @@
-import {useMemo} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import DataTable, {Column} from '@gravity-ui/react-data-table';
-
-import type {EPathType, TColumnDescription} from '../../../../types/api/schema';
-import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
 import {Icon} from '../../../../components/Icon';
-
+import type {EPathType, TColumnDescription} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {isExternalTable} from '../../utils/schema';
 
 import './SchemaViewer.scss';
@@ -30,7 +29,7 @@ interface SchemaViewerProps {
 
 export const SchemaViewer = ({keyColumnIds = [], columns = [], type}: SchemaViewerProps) => {
     // Keys should be displayd by their order in keyColumnIds (Primary Key)
-    const keyColumnsOrderValues = useMemo(() => {
+    const keyColumnsOrderValues = React.useMemo(() => {
         return keyColumnIds.reduce<Record<number, number>>((result, keyColumnId, index) => {
             // Put columns with negative values, so they will be the first with ascending sort
             // Minus keyColumnIds.length for the first key, -1 for the last

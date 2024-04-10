@@ -1,6 +1,6 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
-import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
 
 import type {TenantsAction, TenantsState} from './types';
 import {prepareTenants} from './utils';

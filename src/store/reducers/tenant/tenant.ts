@@ -1,6 +1,8 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
 import type {TTenant} from '../../../types/api/tenant';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
+
 import type {
     TenantAction,
     TenantDiagnosticsTab,
@@ -10,8 +12,6 @@ import type {
     TenantState,
     TenantSummaryTab,
 } from './types';
-
-import {createRequestActionTypes, createApiRequest} from '../../utils';
 
 export const FETCH_TENANT = createRequestActionTypes('tenant', 'FETCH_TENANT');
 

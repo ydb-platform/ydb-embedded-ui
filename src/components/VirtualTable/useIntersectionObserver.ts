@@ -1,7 +1,7 @@
-import {useEffect, useRef} from 'react';
+import React from 'react';
 
-import type {OnEntry, OnLeave} from './types';
 import {DEFAULT_INTERSECTION_OBSERVER_MARGIN} from './constants';
+import type {OnEntry, OnLeave} from './types';
 
 interface UseIntersectionObserverProps {
     onEntry: OnEntry;
@@ -15,9 +15,9 @@ export const useIntersectionObserver = ({
     onLeave,
     parentContainer,
 }: UseIntersectionObserverProps) => {
-    const observer = useRef<IntersectionObserver>();
+    const observer = React.useRef<IntersectionObserver>();
 
-    useEffect(() => {
+    React.useEffect(() => {
         const callback = (entries: IntersectionObserverEntry[]) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {

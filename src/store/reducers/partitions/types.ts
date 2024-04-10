@@ -2,7 +2,7 @@ import type {IResponseError} from '../../../types/api/error';
 import type {ProcessSpeedStats} from '../../../utils/bytesParsers';
 import type {ApiRequestAction} from '../../utils';
 
-import {FETCH_PARTITIONS, setDataWasNotLoaded, setSelectedConsumer} from './partitions';
+import type {FETCH_PARTITIONS, setDataWasNotLoaded, setSelectedConsumer} from './partitions';
 
 // Fields that could be undefined corresponds to partitions without consumers
 export interface PreparedPartitionData {

@@ -1,10 +1,8 @@
-import type {ReactNode} from 'react';
-
 import {HelpPopover} from '@gravity-ui/components';
 
 interface LabelWithPopoverProps {
-    text: ReactNode;
-    popoverContent: ReactNode;
+    text: React.ReactNode;
+    popoverContent: React.ReactNode;
     className?: string;
     contentClassName?: string;
 }

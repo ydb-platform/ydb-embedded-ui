@@ -1,10 +1,8 @@
-import cn from 'bem-cn-lite';
-
 import {CircularProgressBar} from '../../../../../../components/CircularProgressBar/CircularProgressBar';
 import {DiagnosticCard} from '../../../../../../components/DiagnosticCard/DiagnosticCard';
-import {formatUsage} from '../../../../../../store/reducers/tenants/utils';
 import type {MetricStatus} from '../../../../../../store/reducers/tenants/types';
-
+import {formatUsage} from '../../../../../../store/reducers/tenants/utils';
+import {cn} from '../../../../../../utils/cn';
 import i18n from '../../i18n';
 
 import './MetricCard.scss';

@@ -1,5 +1,5 @@
-import type {VersionValue} from '../../types/versions';
 import type {PreparedClusterNode} from '../../store/reducers/clusterNodes/types';
+import type {VersionValue} from '../../types/versions';
 
 export interface GroupedNodesItem {
     title?: string;

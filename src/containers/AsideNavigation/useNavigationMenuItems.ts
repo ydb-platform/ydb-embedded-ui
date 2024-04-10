@@ -1,24 +1,24 @@
 import React from 'react';
-import {useHistory, useLocation} from 'react-router';
-
-import {useSetting, useTypedSelector} from '../../utils/hooks';
-import routes, {parseQuery} from '../../routes';
-import {getTenantPath} from '../Tenant/TenantPages';
-
-import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../store/reducers/tenant/constants';
-import {TENANT_INITIAL_PAGE_KEY} from '../../utils/constants';
 
 import type {MenuItem as AsideHeaderMenuItem} from '@gravity-ui/navigation';
+import type {IconData} from '@gravity-ui/uikit';
+import {useHistory, useLocation} from 'react-router';
 
-import terminalIcon from '@gravity-ui/icons/svgs/terminal.svg';
-import pulseIcon from '@gravity-ui/icons/svgs/pulse.svg';
+import routes, {parseQuery} from '../../routes';
+import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../store/reducers/tenant/constants';
+import {TENANT_INITIAL_PAGE_KEY} from '../../utils/constants';
+import {useSetting, useTypedSelector} from '../../utils/hooks';
+import {getTenantPath} from '../Tenant/TenantPages';
 
 import i18n from './i18n';
+
+import pulseIcon from '@gravity-ui/icons/svgs/pulse.svg';
+import terminalIcon from '@gravity-ui/icons/svgs/terminal.svg';
 
 interface MenuItem {
     id: string;
     title: string;
-    icon: SVGIconData;
+    icon: IconData;
     iconSize: string | number;
     location: string;
     locationKeys?: string[];

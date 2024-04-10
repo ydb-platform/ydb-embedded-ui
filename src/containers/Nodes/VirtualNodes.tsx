@@ -1,37 +1,36 @@
-import {useCallback, useMemo, useState} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import type {AdditionalNodesProps} from '../../types/additionalProps';
-import type {ProblemFilterValue} from '../../store/reducers/settings/types';
+import {EntitiesCount} from '../../components/EntitiesCount';
+import {AccessDenied} from '../../components/Errors/403';
+import {ResponseError} from '../../components/Errors/ResponseError';
+import {Illustration} from '../../components/Illustration';
+import {ProblemFilter} from '../../components/ProblemFilter';
+import {Search} from '../../components/Search';
+import {UptimeFilter} from '../../components/UptimeFIlter';
+import {VirtualTable} from '../../components/VirtualTable';
+import type {
+    FetchData,
+    GetRowClassName,
+    RenderControls,
+    RenderErrorMessage,
+} from '../../components/VirtualTable';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {ProblemFilterValues} from '../../store/reducers/settings/settings';
+import type {ProblemFilterValue} from '../../store/reducers/settings/types';
+import type {AdditionalNodesProps} from '../../types/additionalProps';
+import {cn} from '../../utils/cn';
+import {updateColumnsWidth, useTableResize} from '../../utils/hooks/useTableResize';
 import {
-    NodesSortValue,
     NodesUptimeFilterValues,
     getProblemParamValue,
     getUptimeParamValue,
     isSortableNodesProperty,
     isUnavailableNode,
 } from '../../utils/nodes';
-import {updateColumnsWidth, useTableResize} from '../../utils/hooks/useTableResize';
+import type {NodesSortValue} from '../../utils/nodes';
 
-import {Search} from '../../components/Search';
-import {ProblemFilter} from '../../components/ProblemFilter';
-import {UptimeFilter} from '../../components/UptimeFIlter';
-import {EntitiesCount} from '../../components/EntitiesCount';
-import {AccessDenied} from '../../components/Errors/403';
-import {ResponseError} from '../../components/Errors/ResponseError';
-import {Illustration} from '../../components/Illustration';
-import {
-    type FetchData,
-    type RenderControls,
-    type RenderErrorMessage,
-    VirtualTable,
-    GetRowClassName,
-} from '../../components/VirtualTable';
-
-import {getNodesColumns} from './getNodesColumns';
 import {getNodes} from './getNodes';
+import {getNodesColumns} from './getNodesColumns';
 import i18n from './i18n';
 
 import './Nodes.scss';
@@ -45,19 +44,21 @@ interface NodesProps {
 }
 
 export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: NodesProps) => {
-    const [searchValue, setSearchValue] = useState('');
-    const [problemFilter, setProblemFilter] = useState<ProblemFilterValue>(ProblemFilterValues.ALL);
-    const [uptimeFilter, setUptimeFilter] = useState<NodesUptimeFilterValues>(
+    const [searchValue, setSearchValue] = React.useState('');
+    const [problemFilter, setProblemFilter] = React.useState<ProblemFilterValue>(
+        ProblemFilterValues.ALL,
+    );
+    const [uptimeFilter, setUptimeFilter] = React.useState<NodesUptimeFilterValues>(
         NodesUptimeFilterValues.All,
     );
 
     const [tableColumnsWidthSetup, setTableColumnsWidth] = useTableResize('nodesTableColumnsWidth');
 
-    const filters = useMemo(() => {
+    const filters = React.useMemo(() => {
         return [path, searchValue, problemFilter, uptimeFilter];
     }, [path, searchValue, problemFilter, uptimeFilter]);
 
-    const fetchData = useCallback<FetchData<NodesPreparedEntity>>(
+    const fetchData = React.useCallback<FetchData<NodesPreparedEntity>>(
         async (limit, offset, {sortOrder, columnId} = {}) => {
             return await getNodes({
                 limit,
@@ -79,7 +80,7 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
-            <>
+            <React.Fragment>
                 <Search
                     onChange={setSearchValue}
                     placeholder="Host name"
@@ -94,7 +95,7 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
                     label={'Nodes'}
                     loading={!inited}
                 />
-            </>
+            </React.Fragment>
         );
     };
 

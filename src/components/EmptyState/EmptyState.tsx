@@ -1,6 +1,4 @@
-import {ReactNode} from 'react';
-import cn from 'bem-cn-lite';
-
+import {cn} from '../../utils/cn';
 import {Icon} from '../Icon';
 
 import './EmptyState.scss';
@@ -15,9 +13,9 @@ const sizes = {
 
 export interface EmptyStateProps {
     title: string;
-    image?: ReactNode;
-    description?: ReactNode;
-    actions?: ReactNode[];
+    image?: React.ReactNode;
+    description?: React.ReactNode;
+    actions?: React.ReactNode[];
     size?: keyof typeof sizes;
     position?: 'left' | 'center';
 }

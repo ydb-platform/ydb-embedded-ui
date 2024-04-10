@@ -1,6 +1,8 @@
+import React from 'react';
+
 import type Monaco from 'monaco-editor';
+
 import {ENABLE_AUTOCOMPLETE, useSetting} from '../../../../lib';
-import {useMemo} from 'react';
 
 export type EditorOptions = Monaco.editor.IEditorOptions & Monaco.editor.IGlobalEditorOptions;
 
@@ -15,7 +17,7 @@ export const EDITOR_OPTIONS: EditorOptions = {
 export function useEditorOptions() {
     const [enableAutocomplete] = useSetting(ENABLE_AUTOCOMPLETE);
 
-    const options = useMemo<EditorOptions>(() => {
+    const options = React.useMemo<EditorOptions>(() => {
         const useAutocomplete = Boolean(enableAutocomplete);
         return {
             quickSuggestions: useAutocomplete,

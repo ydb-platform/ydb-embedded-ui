@@ -1,8 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 
 import {Loader} from '@gravity-ui/uikit';
-import {ErrorBoundaryFallback} from '../components/ErrorBoundary/ErrorBoundary';
+
 import {useComponent} from '../components/ComponentsProvider/ComponentsProvider';
+import {ErrorBoundaryFallback} from '../components/ErrorBoundary/ErrorBoundary';
 
 export function lazyComponent<TExports extends {[key: string]: any}, TKey extends keyof TExports>(
     moduleLoader: () => Promise<TExports>,

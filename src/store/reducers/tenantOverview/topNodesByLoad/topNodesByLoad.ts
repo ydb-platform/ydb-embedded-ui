@@ -2,8 +2,9 @@ import type {Reducer} from '@reduxjs/toolkit';
 
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {createApiRequest, createRequestActionTypes} from '../../../utils';
-import {prepareNodesData} from '../../nodes/utils';
 import type {NodesApiRequestParams} from '../../nodes/types';
+import {prepareNodesData} from '../../nodes/utils';
+
 import type {TopNodesByLoadAction, TopNodesByLoadState, TopNodesByLoadStateSlice} from './types';
 
 export const FETCH_TOP_NODES_BY_LOAD = createRequestActionTypes(

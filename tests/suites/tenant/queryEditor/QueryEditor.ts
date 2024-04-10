@@ -1,4 +1,4 @@
-import {Locator, Page} from '@playwright/test';
+import type {Locator, Page} from '@playwright/test';
 
 import {BaseModel} from '../../../models/BaseModel';
 import {selectContentTable} from '../../../utils/selectContentTable';
@@ -63,7 +63,7 @@ export class QueryEditor extends BaseModel {
     }
 
     protected async selectExplainResultType(type: ExplainResultType) {
-        const radio = this.selector.locator('.ydb-query-explain-result__controls .yc-radio-button');
+        const radio = this.selector.locator('.ydb-query-explain-result__controls .g-radio-button');
         await radio.getByLabel(type).click();
     }
 

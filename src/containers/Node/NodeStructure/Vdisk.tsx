@@ -1,12 +1,12 @@
 import React from 'react';
-import cn from 'bem-cn-lite';
 
-import type {PreparedStructureVDisk} from '../../../store/reducers/node/types';
-import {EVDiskState} from '../../../types/api/vdisk';
-import {EFlag} from '../../../types/api/enums';
-import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {VDiskInfo} from '../../../components/VDiskInfo/VDiskInfo';
+import type {PreparedStructureVDisk} from '../../../store/reducers/node/types';
+import {EFlag} from '../../../types/api/enums';
+import {EVDiskState} from '../../../types/api/vdisk';
+import {cn} from '../../../utils/cn';
+import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 
 const b = cn('kv-node-structure');
 

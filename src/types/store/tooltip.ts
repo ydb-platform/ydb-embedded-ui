@@ -1,5 +1,5 @@
-import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
-import {tooltipTemplates} from '../../utils/tooltip';
+import type {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
+import type {tooltipTemplates} from '../../utils/tooltip';
 
 export type ITooltipTemplateType = keyof typeof tooltipTemplates;
 

@@ -1,11 +1,11 @@
-import {
+import type {
     FETCH_DESCRIBE,
     setCurrentDescribePath,
     setDataWasNotLoaded,
 } from '../../store/reducers/describe';
-import {ApiRequestAction} from '../../store/utils';
-import {IResponseError} from '../api/error';
-import {TEvDescribeSchemeResult} from '../api/schema';
+import type {ApiRequestAction} from '../../store/utils';
+import type {IResponseError} from '../api/error';
+import type {TEvDescribeSchemeResult} from '../api/schema';
 
 export type IDescribeData = Record<string, TEvDescribeSchemeResult>;
 

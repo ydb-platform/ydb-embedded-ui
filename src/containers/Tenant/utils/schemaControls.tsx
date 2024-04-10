@@ -1,13 +1,10 @@
-import {Dispatch} from 'react';
-
-import {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 import {Button} from '@gravity-ui/uikit';
+import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
-import {setShowPreview} from '../../../store/reducers/schema/schema';
-import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {Icon} from '../../../components/Icon';
-
+import {setShowPreview} from '../../../store/reducers/schema/schema';
+import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
+import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import i18n from '../i18n';
 
 interface ControlsAdditionalEffects {
@@ -16,7 +13,7 @@ interface ControlsAdditionalEffects {
 
 const bindActions = (
     path: string,
-    dispatch: Dispatch<any>,
+    dispatch: React.Dispatch<any>,
     additionalEffects: ControlsAdditionalEffects,
 ) => {
     const {setActivePath} = additionalEffects;
@@ -34,7 +31,7 @@ const bindActions = (
 type Controls = ReturnType<Required<NavigationTreeProps>['renderAdditionalNodeElements']>;
 
 export const getControls =
-    (dispatch: Dispatch<any>, additionalEffects: ControlsAdditionalEffects) =>
+    (dispatch: React.Dispatch<any>, additionalEffects: ControlsAdditionalEffects) =>
     (path: string, type: NavigationTreeNodeType) => {
         const options = bindActions(path, dispatch, additionalEffects);
         const openPreview = (

@@ -1,21 +1,20 @@
-import block from 'bem-cn-lite';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
-import DataTable, {Column} from '@gravity-ui/react-data-table';
-
-import type {QueryInHistory} from '../../../../types/store/executeQuery';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {selectQueriesHistory} from '../../../../store/reducers/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
+import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
+import type {QueryInHistory} from '../../../../types/store/executeQuery';
+import {cn} from '../../../../utils/cn';
 import {useQueryModes, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {QUERY_MODES, QUERY_SYNTAX} from '../../../../utils/query';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
-
 import i18n from '../i18n';
 
 import './QueriesHistory.scss';
 
-const b = block('ydb-queries-history');
+const b = cn('ydb-queries-history');
 
 interface QueriesHistoryProps {
     changeUserInput: (value: {input: string}) => void;

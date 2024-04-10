@@ -1,15 +1,14 @@
-import block from 'bem-cn-lite';
+import React from 'react';
 
-import {Button, ButtonView, DropdownMenu} from '@gravity-ui/uikit';
-import {useMemo} from 'react';
+import type {ButtonView} from '@gravity-ui/uikit';
+import {Button, DropdownMenu} from '@gravity-ui/uikit';
 
-import type {QueryAction, QueryMode} from '../../../../types/store/query';
-import {QUERY_MODES, QUERY_MODES_TITLES} from '../../../../utils/query';
 import {Icon} from '../../../../components/Icon';
 import {LabelWithPopover} from '../../../../components/LabelWithPopover';
-
+import type {QueryAction, QueryMode} from '../../../../types/store/query';
+import {cn} from '../../../../utils/cn';
+import {QUERY_MODES, QUERY_MODES_TITLES} from '../../../../utils/query';
 import SaveQuery from '../SaveQuery/SaveQuery';
-
 import i18n from '../i18n';
 
 import './QueryEditorControls.scss';
@@ -17,7 +16,7 @@ import './QueryEditorControls.scss';
 const queryModeSelectorQa = 'query-mode-selector';
 const queryModeSelectorPopupQa = 'query-mode-selector-popup';
 
-const b = block('ydb-query-editor-controls');
+const b = cn('ydb-query-editor-controls');
 
 const QueryModeSelectorOptions = {
     [QUERY_MODES.script]: {
@@ -67,7 +66,7 @@ export const QueryEditorControls = ({
     queryMode,
     highlightedAction,
 }: QueryEditorControlsProps) => {
-    const querySelectorMenuItems = useMemo(() => {
+    const querySelectorMenuItems = React.useMemo(() => {
         return Object.entries(QueryModeSelectorOptions).map(([mode, {title, description}]) => {
             return {
                 text: (

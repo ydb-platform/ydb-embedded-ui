@@ -1,6 +1,5 @@
-import cn from 'bem-cn-lite';
-
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
+import {cn} from '../../../utils/cn';
 import {isUnavailableNode} from '../../../utils/nodes';
 
 export const b = cn('global-storage-nodes');

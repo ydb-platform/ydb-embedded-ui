@@ -1,5 +1,7 @@
-import cn from 'bem-cn-lite';
-import {Loader as KitLoader, LoaderSize} from '@gravity-ui/uikit';
+import type {LoaderSize} from '@gravity-ui/uikit';
+import {Loader as KitLoader} from '@gravity-ui/uikit';
+
+import {cn} from '../../utils/cn';
 
 import './Loader.scss';
 

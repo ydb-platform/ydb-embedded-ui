@@ -2,8 +2,8 @@ import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {USE_BACKEND_PARAMS_FOR_TABLES_KEY} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
 
-import {VirtualNodes} from './VirtualNodes';
 import {Nodes} from './Nodes';
+import {VirtualNodes} from './VirtualNodes';
 
 interface NodesWrapperProps {
     path?: string;

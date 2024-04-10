@@ -1,9 +1,8 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
-import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {EVersion} from '../../../types/api/compute';
-
-import {createRequestActionTypes, createApiRequest} from '../../utils';
+import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {createApiRequest, createRequestActionTypes} from '../../utils';
 
 import type {
     ComputeApiRequestParams,
@@ -124,7 +123,7 @@ export const setNodesUptimeFilter = (value: NodesUptimeFilterValues) =>
     ({
         type: SET_NODES_UPTIME_FILTER,
         data: value,
-    } as const);
+    }) as const;
 
 export const setDataWasNotLoaded = () => {
     return {

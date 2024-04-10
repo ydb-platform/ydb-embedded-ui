@@ -1,7 +1,6 @@
-import cn from 'bem-cn-lite';
-
-import type {EFlag} from '../../../../../../../types/api/enums';
 import {EntityStatus} from '../../../../../../../components/EntityStatus/EntityStatus';
+import type {EFlag} from '../../../../../../../types/api/enums';
+import {cn} from '../../../../../../../utils/cn';
 
 import './IssueTreeItem.scss';
 

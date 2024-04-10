@@ -1,25 +1,23 @@
-import {MouseEvent, useState} from 'react';
-import block from 'bem-cn-lite';
+import React from 'react';
 
-import {Dialog, Button} from '@gravity-ui/uikit';
-import DataTable, {Column} from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
+import {Button, Dialog} from '@gravity-ui/uikit';
 
-import type {SavedQuery} from '../../../../types/store/query';
-import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
-import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
-import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
-
-import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {Icon} from '../../../../components/Icon';
-
+import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
+import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
+import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
+import type {SavedQuery} from '../../../../types/store/query';
+import {cn} from '../../../../utils/cn';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
-
 import i18n from '../i18n';
 
 import './SavedQueries.scss';
 
-const b = block('ydb-saved-queries');
+const b = cn('ydb-saved-queries');
 
 interface DeleteDialogProps {
     visible: boolean;
@@ -61,8 +59,8 @@ interface SavedQueriesProps {
 export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: SavedQueriesProps) => {
     const dispatch = useTypedDispatch();
 
-    const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
-    const [queryNameToDelete, setQueryNameToDelete] = useState<string>('');
+    const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
+    const [queryNameToDelete, setQueryNameToDelete] = React.useState<string>('');
 
     const closeDeleteDialog = () => {
         setIsDeleteDialogVisible(false);
@@ -86,7 +84,7 @@ export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: Sav
     };
 
     const onDeleteQueryClick = (queryName: string) => {
-        return (event: MouseEvent) => {
+        return (event: React.MouseEvent) => {
             event.stopPropagation();
             setIsDeleteDialogVisible(true);
             setQueryNameToDelete(queryName);
@@ -123,7 +121,7 @@ export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: Sav
     ];
 
     return (
-        <>
+        <React.Fragment>
             <div className={b()}>
                 <DataTable
                     theme="yandex-cloud"
@@ -145,6 +143,6 @@ export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: Sav
                 onCancelClick={onCancelDeleteClick}
                 onConfirmClick={onConfirmDeleteClick}
             />
-        </>
+        </React.Fragment>
     );
 };

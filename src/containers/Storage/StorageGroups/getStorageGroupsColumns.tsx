@@ -1,23 +1,28 @@
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import DataTable, {type Column as DataTableColumn} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
+import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
-import {EFlag} from '../../../types/api/enums';
-import type {Column as VirtualTableColumn} from '../../../components/VirtualTable';
-import shieldIcon from '../../../assets/icons/shield.svg';
-import type {NodesMap} from '../../../types/store/nodesList';
-import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
-import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import {isSortableStorageProperty} from '../../../utils/storage';
-import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
-import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {CellWithPopover} from '../../../components/CellWithPopover/CellWithPopover';
+import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {UsageLabel} from '../../../components/UsageLabel/UsageLabel';
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
+import type {Column as VirtualTableColumn} from '../../../components/VirtualTable';
+import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
+import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
+import {EFlag} from '../../../types/api/enums';
+import type {NodesMap} from '../../../types/store/nodesList';
+import {cn} from '../../../utils/cn';
+import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
+import {isSortableStorageProperty} from '../../../utils/storage';
+import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../utils';
+
 import i18n from './i18n';
+
+import shieldIcon from '../../../assets/icons/shield.svg';
+
 import './StorageGroups.scss';
 
 const b = cn('global-storage-groups');
@@ -68,7 +73,7 @@ const typeColumn: StorageGroupsColumn = {
     width: 100,
     align: DataTable.LEFT,
     render: ({row}) => (
-        <>
+        <React.Fragment>
             <Label>{row.MediaType || '—'}</Label>
             {'\u00a0'}
             {row.Encryption && (
@@ -82,7 +87,7 @@ const typeColumn: StorageGroupsColumn = {
                     </Label>
                 </Popover>
             )}
-        </>
+        </React.Fragment>
     ),
     sortable: false,
 };

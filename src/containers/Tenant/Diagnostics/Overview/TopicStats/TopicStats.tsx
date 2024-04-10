@@ -1,19 +1,16 @@
-import cn from 'bem-cn-lite';
-
-import type {IPreparedTopicStats} from '../../../../../types/store/topic';
-
-import {Loader} from '../../../../../components/Loader';
-import {InfoViewerItem, InfoViewer} from '../../../../../components/InfoViewer';
-import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {ResponseError} from '../../../../../components/Errors/ResponseError';
+import type {InfoViewerItem} from '../../../../../components/InfoViewer';
+import {InfoViewer} from '../../../../../components/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
-import {ResponseError} from '../../../../../components/Errors/ResponseError';
-
+import {Loader} from '../../../../../components/Loader';
+import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {selectPreparedTopicStats} from '../../../../../store/reducers/topic';
+import type {IPreparedTopicStats} from '../../../../../types/store/topic';
+import {cn} from '../../../../../utils/cn';
+import {formatBps, formatBytes} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useTypedSelector} from '../../../../../utils/hooks';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
-import {formatBps, formatBytes} from '../../../../../utils/dataFormatters/dataFormatters';
-
-import {selectPreparedTopicStats} from '../../../../../store/reducers/topic';
 
 import i18n from './i18n';
 

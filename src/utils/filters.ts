@@ -1,7 +1,6 @@
-import escapeRegExp from 'lodash/escapeRegExp';
-
 import type {OrderType} from '@gravity-ui/react-data-table';
 import {DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
+import escapeRegExp from 'lodash/escapeRegExp';
 
 export const prepareSortValue = (
     sortValue: string | undefined,

@@ -1,17 +1,15 @@
-import {useLocation} from 'react-router';
-import cn from 'bem-cn-lite';
-
 import {useThemeValue} from '@gravity-ui/uikit';
+import {useLocation} from 'react-router';
 
-import type {EPathType} from '../../../types/api/schema';
-import type {AdditionalTenantsProps, AdditionalNodesProps} from '../../../types/additionalProps';
-import {TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
-import {useSetting} from '../../../utils/hooks';
-import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {parseQuery} from '../../../routes';
-
-import {Query} from '../Query/Query';
+import {TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
+import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
+import type {EPathType} from '../../../types/api/schema';
+import {cn} from '../../../utils/cn';
+import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
+import {useSetting} from '../../../utils/hooks';
 import Diagnostics from '../Diagnostics/Diagnostics';
+import {Query} from '../Query/Query';
 
 import './ObjectGeneral.scss';
 

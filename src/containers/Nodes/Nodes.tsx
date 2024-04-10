@@ -1,53 +1,49 @@
-import {useCallback, useEffect} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 
-import type {ProblemFilterValue} from '../../store/reducers/settings/types';
-import type {NodesSortParams} from '../../store/reducers/nodes/types';
-
-import {AccessDenied} from '../../components/Errors/403';
-import {Illustration} from '../../components/Illustration';
-import {Search} from '../../components/Search';
-import {ProblemFilter} from '../../components/ProblemFilter';
-import {UptimeFilter} from '../../components/UptimeFIlter';
 import {EntitiesCount} from '../../components/EntitiesCount';
-import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {AccessDenied} from '../../components/Errors/403';
 import {ResponseError} from '../../components/Errors/ResponseError';
-
+import {Illustration} from '../../components/Illustration';
+import {ProblemFilter} from '../../components/ProblemFilter';
+import {Search} from '../../components/Search';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {UptimeFilter} from '../../components/UptimeFIlter';
+import {
+    getComputeNodes,
+    getNodes,
+    resetNodesState,
+    setDataWasNotLoaded,
+    setNodesUptimeFilter,
+    setSearchValue,
+    setSort,
+} from '../../store/reducers/nodes/nodes';
+import {selectFilteredNodes} from '../../store/reducers/nodes/selectors';
+import type {NodesSortParams} from '../../store/reducers/nodes/types';
+import {ProblemFilterValues, changeFilter} from '../../store/reducers/settings/settings';
+import type {ProblemFilterValue} from '../../store/reducers/settings/types';
+import type {AdditionalNodesProps} from '../../types/additionalProps';
+import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
 import {
     useAutofetcher,
     useSetting,
-    useTypedSelector,
     useTableSort,
     useTypedDispatch,
+    useTypedSelector,
 } from '../../utils/hooks';
 import {
+    NodesUptimeFilterValues,
     isSortableNodesProperty,
     isUnavailableNode,
-    NodesUptimeFilterValues,
 } from '../../utils/nodes';
 
-import {
-    getNodes,
-    setNodesUptimeFilter,
-    setSearchValue,
-    resetNodesState,
-    getComputeNodes,
-    setDataWasNotLoaded,
-    setSort,
-} from '../../store/reducers/nodes/nodes';
-import {selectFilteredNodes} from '../../store/reducers/nodes/selectors';
-import {changeFilter, ProblemFilterValues} from '../../store/reducers/settings/settings';
-import type {AdditionalNodesProps} from '../../types/additionalProps';
-
 import {getNodesColumns} from './getNodesColumns';
+import i18n from './i18n';
 
 import './Nodes.scss';
-
-import i18n from './i18n';
 
 const b = cn('ydb-nodes');
 
@@ -64,7 +60,7 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
     // Since Nodes component is used in several places,
     // we need to reset filters, searchValue and loading state
     // in nodes reducer when path changes
-    useEffect(() => {
+    React.useEffect(() => {
         dispatch(resetNodesState());
     }, [dispatch, path]);
 
@@ -85,8 +81,8 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
 
     const [useNodesEndpoint] = useSetting(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY);
 
-    const fetchNodes = useCallback(
-        (isBackground) => {
+    const fetchNodes = React.useCallback(
+        (isBackground: boolean) => {
             if (!isBackground) {
                 dispatch(setDataWasNotLoaded());
             }
@@ -121,7 +117,7 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
 
     const renderControls = () => {
         return (
-            <>
+            <React.Fragment>
                 <Search
                     onChange={handleSearchQueryChange}
                     placeholder="Host name"
@@ -136,7 +132,7 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
                     label={'Nodes'}
                     loading={loading && !wasLoaded}
                 />
-            </>
+            </React.Fragment>
         );
     };
 

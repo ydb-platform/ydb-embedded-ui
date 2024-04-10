@@ -1,10 +1,11 @@
 import groupBy from 'lodash/groupBy';
 
-import type {VersionToColorMap} from '../../types/versions';
 import type {PreparedClusterNode} from '../../store/reducers/clusterNodes/types';
+import type {VersionToColorMap} from '../../types/versions';
 import {getMinorVersion, parseNodesToVersionsValues} from '../../utils/versions';
 
-import {GroupByValue, GroupedNodesItem} from './types';
+import type {GroupedNodesItem} from './types';
+import {GroupByValue} from './types';
 
 const sortByTitle = (a: GroupedNodesItem, b: GroupedNodesItem) =>
     a.title?.localeCompare(b.title || '') || -1;

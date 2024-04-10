@@ -1,16 +1,17 @@
+import {EFlag} from '../../../types/api/enums';
 import type {TNodeInfo, TNodesInfo} from '../../../types/api/nodes';
+import {TPDiskState} from '../../../types/api/pdisk';
 import type {
     TStorageGroupInfo,
     TStorageGroupInfoV2,
     TStorageInfo,
     TStoragePoolInfo,
 } from '../../../types/api/storage';
-import {EVDiskState, type TVDiskStateInfo} from '../../../types/api/vdisk';
-import {TPDiskState} from '../../../types/api/pdisk';
-import {EFlag} from '../../../types/api/enums';
+import {EVDiskState} from '../../../types/api/vdisk';
+import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
-import {getUsage} from '../../../utils/storage';
 import {prepareNodeSystemState} from '../../../utils/nodes';
+import {getUsage} from '../../../utils/storage';
 
 import type {PreparedStorageGroup, PreparedStorageNode, PreparedStorageResponse} from './types';
 

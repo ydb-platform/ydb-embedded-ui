@@ -1,15 +1,17 @@
-import {useMemo} from 'react';
+import React from 'react';
 
-import DataTable, {Settings, SortOrder} from '@gravity-ui/react-data-table';
+import type {Settings, SortOrder} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
-import type {NodesMap} from '../../../types/store/nodesList';
-import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
-import type {HandleSort} from '../../../utils/hooks/useTableSort';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import {getPreparedStorageGroupsColumns} from './getStorageGroupsColumns';
-import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
+import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {NodesMap} from '../../../types/store/nodesList';
+import type {HandleSort} from '../../../utils/hooks/useTableSort';
 
+import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
+import {getPreparedStorageGroupsColumns} from './getStorageGroupsColumns';
 import i18n from './i18n';
+
 import './StorageGroups.scss';
 
 interface StorageGroupsProps {
@@ -31,7 +33,7 @@ export function StorageGroups({
     sort,
     handleSort,
 }: StorageGroupsProps) {
-    const columns = useMemo(() => {
+    const columns = React.useMemo(() => {
         return getPreparedStorageGroupsColumns(nodes, visibleEntities);
     }, [nodes, visibleEntities]);
 

@@ -1,6 +1,7 @@
-import type {HealthCheckAPIResponse, IssueLog} from '../../../types/api/healthcheck';
 import type {IResponseError} from '../../../types/api/error';
+import type {HealthCheckAPIResponse, IssueLog} from '../../../types/api/healthcheck';
 import type {ApiRequestAction} from '../../utils';
+
 import type {FETCH_HEALTHCHECK, setDataWasNotLoaded} from './healthcheckInfo';
 
 export interface IssuesTree extends IssueLog {

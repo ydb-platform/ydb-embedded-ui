@@ -1,5 +1,5 @@
-import {EFlag} from './enums';
-import {TVDiskStateInfo} from './vdisk';
+import type {EFlag} from './enums';
+import type {TVDiskStateInfo} from './vdisk';
 
 /**
  * endpoint: /viewer/json/storage

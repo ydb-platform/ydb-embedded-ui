@@ -1,12 +1,12 @@
-import {useEffect, useRef, memo} from 'react';
+import React from 'react';
 
 import {getArray} from '../../utils';
 
-import type {Column, Chunk, GetRowClassName} from './types';
 import {LoadingTableRow, TableRow} from './TableRow';
+import type {Chunk, Column, GetRowClassName} from './types';
 
 // With original memo generic types are lost
-const typedMemo: <T>(Component: T) => T = memo;
+const typedMemo: <T>(Component: T) => T = React.memo;
 
 interface TableChunkProps<T> {
     id: number;
@@ -28,9 +28,9 @@ export const TableChunk = typedMemo(function TableChunk<T>({
     observer,
     getRowClassName,
 }: TableChunkProps<T>) {
-    const ref = useRef<HTMLTableSectionElement>(null);
+    const ref = React.useRef<HTMLTableSectionElement>(null);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const el = ref.current;
         if (el) {
             observer.observe(el);

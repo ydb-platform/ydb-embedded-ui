@@ -1,8 +1,8 @@
-import type {ApiRequestAction} from '../../utils';
-
 import type {MetaExtendedClusterInfo} from '../../../types/api/meta';
 import type {ExtendedMetaClusterVersion} from '../../../utils/clusterVersionColors';
-import {FETCH_CLUSTERS, changeClustersFilters} from './clusters';
+import type {ApiRequestAction} from '../../utils';
+
+import type {FETCH_CLUSTERS, changeClustersFilters} from './clusters';
 
 export interface PreparedCluster extends MetaExtendedClusterInfo {
     preparedVersions: ExtendedMetaClusterVersion[];

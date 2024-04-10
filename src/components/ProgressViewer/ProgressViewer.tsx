@@ -1,9 +1,9 @@
-import cn from 'bem-cn-lite';
 import {useTheme} from '@gravity-ui/uikit';
 
 import type {ValueOf} from '../../types/common';
-import {isNumeric} from '../../utils/utils';
+import {cn} from '../../utils/cn';
 import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
+import {isNumeric} from '../../utils/utils';
 
 import './ProgressViewer.scss';
 

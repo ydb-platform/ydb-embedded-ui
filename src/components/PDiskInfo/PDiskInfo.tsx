@@ -1,16 +1,17 @@
-import type {PreparedPDisk} from '../../utils/disks/types';
-import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
-import {cn} from '../../utils/cn';
-import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
-import {valueIsDefined} from '../../utils';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {getPDiskPagePath} from '../../routes';
-
-import type {InfoViewerItem} from '../InfoViewer';
-import {InfoViewer, type InfoViewerProps} from '../InfoViewer/InfoViewer';
+import {valueIsDefined} from '../../utils';
+import {cn} from '../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import type {PreparedPDisk} from '../../utils/disks/types';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
+import type {InfoViewerItem} from '../InfoViewer';
+import {InfoViewer} from '../InfoViewer/InfoViewer';
+import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
+
 import {pDiskInfoKeyset} from './i18n';
 
 import './PDiskInfo.scss';

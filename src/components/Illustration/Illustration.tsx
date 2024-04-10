@@ -1,8 +1,10 @@
-import {ImgHTMLAttributes, useEffect, useState} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
+
 import {useThemeValue} from '@gravity-ui/uikit';
 
-export interface IllustrationProps extends ImgHTMLAttributes<HTMLImageElement> {
+import {cn} from '../../utils/cn';
+
+export interface IllustrationProps extends React.ImgHTMLAttributes<HTMLImageElement> {
     name: string;
     className?: string;
 }
@@ -26,10 +28,10 @@ const b = cn('kv-illustration');
 
 export const Illustration = ({name, className, ...props}: IllustrationProps) => {
     const theme = useThemeValue();
-    const [src, setSrc] = useState('');
+    const [src, setSrc] = React.useState('');
     const srcGetter = store[theme] && store[theme][name];
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (typeof srcGetter === 'function') {
             srcGetter()
                 .then((svg) => setSrc(svg.default))

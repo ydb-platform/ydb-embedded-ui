@@ -1,14 +1,10 @@
-import {ReactNode, useCallback} from 'react';
+import React from 'react';
+
 import {shallowEqual} from 'react-redux';
 
-import {Loader} from '../../../../components/Loader';
-import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-
-import {EPathType} from '../../../../types/api/schema';
-import {useAutofetcher, useTypedSelector, useTypedDispatch} from '../../../../utils/hooks';
-import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
-import {getTopic} from '../../../../store/reducers/topic';
+import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
+import {Loader} from '../../../../components/Loader';
 import {
     getOlapStats,
     resetLoadingState as resetOlapLoadingState,
@@ -19,20 +15,22 @@ import {
     setCurrentOverviewPath,
     setDataWasNotLoaded,
 } from '../../../../store/reducers/overview/overview';
-
+import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
+import {getTopic} from '../../../../store/reducers/topic';
+import {EPathType} from '../../../../types/api/schema';
+import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
+import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
 import {
-    isEntityWithMergedImplementation,
     isColumnEntityType,
-    isTableType,
+    isEntityWithMergedImplementation,
     isPathTypeWithTopic,
+    isTableType,
 } from '../../utils/schema';
 
-import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
-import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
-
-import {TopicInfo} from './TopicInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
 import {TableInfo} from './TableInfo';
+import {TopicInfo} from './TopicInfo';
 
 interface OverviewProps {
     type?: EPathType;
@@ -68,7 +66,7 @@ function Overview({type, tenantName}: OverviewProps) {
         (overviewLoading && !overviewWasLoaded) || (olapStatsLoading && !olapStatsWasLoaded);
     const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
 
-    const fetchData = useCallback(
+    const fetchData = React.useCallback(
         (isBackground: boolean) => {
             const schemaPath = currentSchemaPath || tenantName;
 
@@ -115,7 +113,7 @@ function Overview({type, tenantName}: OverviewProps) {
         const data = rawData ?? undefined;
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
-        const pathTypeToComponent: Record<EPathType, (() => ReactNode) | undefined> = {
+        const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeTable]: undefined,

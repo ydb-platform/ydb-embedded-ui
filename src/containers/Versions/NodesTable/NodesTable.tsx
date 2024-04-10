@@ -1,14 +1,14 @@
-import DataTable, {Column} from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
+import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
+import {PoolsGraph} from '../../../components/PoolsGraph/PoolsGraph';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
-import {isUnavailableNode} from '../../../utils/nodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {formatBytes} from '../../../utils/dataFormatters/dataFormatters';
+import {isUnavailableNode} from '../../../utils/nodes';
 import {getDefaultNodePath} from '../../Node/NodePages';
-
-import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
-import {PoolsGraph} from '../../../components/PoolsGraph/PoolsGraph';
-import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 
 const columns: Column<PreparedClusterNode>[] = [
     {

@@ -1,19 +1,21 @@
-import React, {useState} from 'react';
+import React from 'react';
+
+import type {MenuItem} from '@gravity-ui/navigation';
+import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
 import {useHistory} from 'react-router-dom';
-import cn from 'bem-cn-lite';
 
-import {AsideHeader, FooterItem, MenuItem} from '@gravity-ui/navigation';
-
-import ydbLogoIcon from '../../assets/icons/ydb.svg';
-import userSecret from '../../assets/icons/user-secret.svg';
-import userChecked from '../../assets/icons/user-check.svg';
-import settingsIcon from '../../assets/icons/settings.svg';
-import supportIcon from '../../assets/icons/support.svg';
-
-import {useSetting, useTypedSelector} from '../../utils/hooks';
+import {cn} from '../../utils/cn';
 import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
+import {useSetting, useTypedSelector} from '../../utils/hooks';
 
 import i18n from './i18n';
+
+import settingsIcon from '../../assets/icons/settings.svg';
+import supportIcon from '../../assets/icons/support.svg';
+import userChecked from '../../assets/icons/user-check.svg';
+import userSecret from '../../assets/icons/user-secret.svg';
+import ydbLogoIcon from '../../assets/icons/ydb.svg';
+
 import './AsideNavigation.scss';
 
 const b = cn('kv-navigation');
@@ -28,7 +30,7 @@ interface YdbUserDropdownProps {
 }
 
 function YdbUserDropdown({isCompact, popupAnchor, ydbUser, children}: YdbUserDropdownProps) {
-    const [isUserDropdownVisible, setIsUserDropdownVisible] = useState(false);
+    const [isUserDropdownVisible, setIsUserDropdownVisible] = React.useState(false);
     const iconData = ydbUser.login ? userChecked : userSecret;
     return (
         <FooterItem
@@ -64,7 +66,7 @@ enum Panel {
 export function AsideNavigation(props: AsideNavigationProps) {
     const history = useHistory();
 
-    const [visiblePanel, setVisiblePanel] = useState<Panel>();
+    const [visiblePanel, setVisiblePanel] = React.useState<Panel>();
 
     const {user: ydbUser} = useTypedSelector((state) => state.authentication);
     const [compact, setIsCompact] = useSetting<boolean>(ASIDE_HEADER_COMPACT_KEY);

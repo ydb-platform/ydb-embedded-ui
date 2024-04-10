@@ -1,17 +1,19 @@
-import * as React from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
 
-import {Button, Icon, ArrowToggle} from '@gravity-ui/uikit';
+import type {IconData} from '@gravity-ui/uikit';
+import {ArrowToggle, Button, Icon} from '@gravity-ui/uikit';
+
 import ShortyString from '../../../../components/ShortyString/ShortyString';
-
 import type {ErrorResponse, IssueMessage} from '../../../../types/api/query';
+import {cn} from '../../../../utils/cn';
 
-import fatalIcon from '../../../../assets/icons/circle-xmark.svg';
-import errorIcon from '../../../../assets/icons/triangle-exclamation.svg';
+import type {SEVERITY} from './models';
+import {getSeverity} from './models';
+
 import warningIcon from '../../../../assets/icons/circle-exclamation.svg';
 import infoIcon from '../../../../assets/icons/circle-info.svg';
-
-import {SEVERITY, getSeverity} from './models';
+import fatalIcon from '../../../../assets/icons/circle-xmark.svg';
+import errorIcon from '../../../../assets/icons/triangle-exclamation.svg';
 
 import './Issues.scss';
 
@@ -143,7 +145,7 @@ function IssueList(props: {issues: IssueMessage[]; expanded: boolean; level: num
     );
 }
 
-const severityIcons: Record<SEVERITY, SVGIconData> = {
+const severityIcons: Record<SEVERITY, IconData> = {
     S_INFO: infoIcon,
     S_WARNING: warningIcon,
     S_ERROR: errorIcon,

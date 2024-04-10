@@ -1,17 +1,13 @@
-import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-
-import {formatObject, InfoViewer, InfoViewerItem} from '../../../../../components/InfoViewer';
+import type {InfoViewerItem} from '../../../../../components/InfoViewer';
+import {InfoViewer, formatObject} from '../../../../../components/InfoViewer';
 import {
     formatCdcStreamItem,
     formatCommonItem,
 } from '../../../../../components/InfoViewer/formatters';
-
+import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {useTypedSelector} from '../../../../../utils/hooks';
-
 import {getEntityName} from '../../../utils';
-
 import {TopicStats} from '../TopicStats';
-
 import {prepareTopicSchemaInfo} from '../utils';
 
 const prepareChangefeedInfo = (

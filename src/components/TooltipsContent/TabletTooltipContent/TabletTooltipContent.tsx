@@ -1,5 +1,4 @@
 import type {TTabletStateInfo} from '../../../types/api/tablet';
-
 import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 import {InfoViewer, createInfoFormatter, formatObject} from '../../InfoViewer';
 

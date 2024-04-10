@@ -1,6 +1,6 @@
 export const SEVERITY_LIST = ['S_FATAL', 'S_ERROR', 'S_WARNING', 'S_INFO'] as const;
 
-export type SEVERITY = typeof SEVERITY_LIST[number];
+export type SEVERITY = (typeof SEVERITY_LIST)[number];
 
 // Severity values from ydb/library/yql/public/issue/protos/issue_severity.proto
 // FATAL = 0;

@@ -1,14 +1,14 @@
+import type {NodesPreparedEntity} from '../store/reducers/nodes/types';
+import {ProblemFilterValues} from '../store/reducers/settings/settings';
+import type {ProblemFilterValue} from '../store/reducers/settings/types';
+import {EFlag} from '../types/api/enums';
 import type {TSystemStateInfo} from '../types/api/nodes';
 import type {TNodeInfo} from '../types/api/nodesList';
-import type {NodesPreparedEntity} from '../store/reducers/nodes/types';
-import type {NodesMap} from '../types/store/nodesList';
 import type {ValueOf} from '../types/common';
-import type {ProblemFilterValue} from '../store/reducers/settings/types';
-import {ProblemFilterValues} from '../store/reducers/settings/settings';
-import {EFlag} from '../types/api/enums';
+import type {NodesMap} from '../types/store/nodesList';
 
-import {calcUptime} from './dataFormatters/dataFormatters';
 import {HOUR_IN_SECONDS} from './constants';
+import {calcUptime} from './dataFormatters/dataFormatters';
 
 export enum NodesUptimeFilterValues {
     'All' = 'All',

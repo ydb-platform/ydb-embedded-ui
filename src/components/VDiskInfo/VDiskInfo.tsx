@@ -1,16 +1,16 @@
-import type {PreparedVDisk} from '../../utils/disks/types';
-import {valueIsDefined} from '../../utils';
-import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
-import {bytesToSpeed} from '../../utils/utils';
-import {cn} from '../../utils/cn';
-import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getVDiskPagePath} from '../../routes';
-
-import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
-import {InfoViewer} from '../InfoViewer';
+import {valueIsDefined} from '../../utils';
+import {cn} from '../../utils/cn';
+import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import type {PreparedVDisk} from '../../utils/disks/types';
+import {bytesToSpeed} from '../../utils/utils';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
+import {InfoViewer} from '../InfoViewer';
+import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
+
 import {vDiskInfoKeyset} from './i18n';
 
 import './VDiskInfo.scss';

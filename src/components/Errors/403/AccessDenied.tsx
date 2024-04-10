@@ -1,6 +1,6 @@
-import {EmptyState, type EmptyStateProps} from '../../EmptyState';
+import {EmptyState} from '../../EmptyState';
+import type {EmptyStateProps} from '../../EmptyState';
 import {Illustration} from '../../Illustration';
-
 import i18n from '../i18n';
 
 interface AccessDeniedProps extends Omit<EmptyStateProps, 'image' | 'title' | 'description'> {

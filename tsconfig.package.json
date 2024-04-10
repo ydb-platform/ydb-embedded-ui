@@ -6,5 +6,6 @@
     "noEmit": false,
     "importHelpers": true
   },
+  "include": ["src/**/*"],
   "exclude": ["src/setup*", "src/index.tsx", "**/__tests__", "**/tests"]
 }

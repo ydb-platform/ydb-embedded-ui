@@ -1,5 +1,5 @@
-import type {Reducer} from '@reduxjs/toolkit';
 import type {ExplainPlanNodeData, GraphNode, Link} from '@gravity-ui/paranoid';
+import type {Reducer} from '@reduxjs/toolkit';
 
 import type {ExplainActions} from '../../types/api/query';
 import type {
@@ -7,13 +7,11 @@ import type {
     ExplainQueryState,
     PreparedExplainResponse,
 } from '../../types/store/explainQuery';
-import type {QueryRequestParams, QueryMode, QuerySyntax} from '../../types/store/query';
-
+import type {QueryMode, QueryRequestParams, QuerySyntax} from '../../types/store/query';
+import {parseQueryError} from '../../utils/error';
 import {preparePlan} from '../../utils/prepareQueryExplain';
 import {QUERY_SYNTAX, parseQueryAPIExplainResponse, parseQueryExplainPlan} from '../../utils/query';
-import {parseQueryError} from '../../utils/error';
-
-import {createRequestActionTypes, createApiRequest} from '../utils';
+import {createApiRequest, createRequestActionTypes} from '../utils';
 
 export const GET_EXPLAIN_QUERY = createRequestActionTypes('query', 'GET_EXPLAIN_QUERY');
 export const GET_EXPLAIN_QUERY_AST = createRequestActionTypes('query', 'GET_EXPLAIN_QUERY_AST');

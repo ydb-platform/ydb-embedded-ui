@@ -1,8 +1,8 @@
-import type {TEvDescribeSchemeResult, TIndexDescription} from '../../../types/api/schema';
+import type {InfoViewerItem} from '..';
+import {InfoViewer} from '..';
 import {getEntityName} from '../../../containers/Tenant/utils';
-
+import type {TEvDescribeSchemeResult, TIndexDescription} from '../../../types/api/schema';
 import {formatTableIndexItem} from '../formatters';
-import {InfoViewer, InfoViewerItem} from '..';
 
 const DISPLAYED_FIELDS: Set<keyof TIndexDescription> = new Set([
     'Type',

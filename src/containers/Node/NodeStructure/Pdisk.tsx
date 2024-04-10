@@ -1,30 +1,30 @@
-import {useState} from 'react';
-import cn from 'bem-cn-lite';
+import React from 'react';
+
+import DataTable from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
+import {ArrowToggle, Button, Popover} from '@gravity-ui/uikit';
 import isEmpty from 'lodash/isEmpty';
 
-import {ArrowToggle, Button, Popover} from '@gravity-ui/uikit';
-
-import DataTable, {type Column} from '@gravity-ui/react-data-table';
-
-import type {ValueOf} from '../../../types/common';
-import {EFlag} from '../../../types/api/enums';
+import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
+import {Icon} from '../../../components/Icon';
+import {PDiskInfo} from '../../../components/PDiskInfo/PDiskInfo';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import type {
     PreparedStructurePDisk,
     PreparedStructureVDisk,
 } from '../../../store/reducers/node/types';
+import {EFlag} from '../../../types/api/enums';
 import {EVDiskState} from '../../../types/api/vdisk';
-import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
-import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
+import type {ValueOf} from '../../../types/common';
 import {valueIsDefined} from '../../../utils';
+import {cn} from '../../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
+import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../../utils/developerUI/developerUI';
-import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
-import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
-import {Icon} from '../../../components/Icon';
-import {PDiskInfo} from '../../../components/PDiskInfo/PDiskInfo';
-
 import i18n from '../i18n';
-import {Vdisk} from './Vdisk';
+
 import {PDiskTitleBadge} from './PDiskTitleBadge';
+import {Vdisk} from './Vdisk';
 
 const b = cn('kv-node-structure');
 
@@ -167,7 +167,7 @@ export function PDisk({
     nodeId,
     unfolded: unfoldedFromProps,
 }: PDiskProps) {
-    const [unfolded, setUnfolded] = useState(unfoldedFromProps ?? false);
+    const [unfolded, setUnfolded] = React.useState(unfoldedFromProps ?? false);
 
     const {TotalSize = 0, AvailableSize = 0, Device, PDiskId, Type, vDisks} = data;
 

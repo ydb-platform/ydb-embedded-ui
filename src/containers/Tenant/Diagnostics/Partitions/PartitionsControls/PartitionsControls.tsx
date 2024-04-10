@@ -1,17 +1,15 @@
-import {useEffect, useMemo, useState} from 'react';
+import React from 'react';
+
+import type {SelectOption, TableColumnSetupItem, TableColumnSetupProps} from '@gravity-ui/uikit';
+import {Select, TableColumnSetup} from '@gravity-ui/uikit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
-import {TableColumnSetupItem} from '@gravity-ui/uikit/build/esm/components/Table/hoc/withTableSettings/withTableSettings';
-import {Select, SelectOption, TableColumnSetup} from '@gravity-ui/uikit';
-
-import type {ValueOf} from '../../../../../types/common';
-
 import {Search} from '../../../../../components/Search/Search';
-
-import type {PreparedPartitionDataWithHosts} from '../utils/types';
-import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITILES} from '../utils/constants';
-import i18n from '../i18n';
+import type {ValueOf} from '../../../../../types/common';
 import {b} from '../Partitions';
+import i18n from '../i18n';
+import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITLES} from '../utils/constants';
+import type {PreparedPartitionDataWithHosts} from '../utils/types';
 
 interface PartitionsControlsProps {
     consumers: string[] | undefined;
@@ -36,10 +34,10 @@ export const PartitionsControls = ({
     onHiddenColumnsChange,
     initialColumnsIds,
 }: PartitionsControlsProps) => {
-    const [generalSearchValue, setGeneralSearchValue] = useState('');
-    const [partitionIdSearchValue, setPartitionIdSearchValue] = useState('');
+    const [generalSearchValue, setGeneralSearchValue] = React.useState('');
+    const [partitionIdSearchValue, setPartitionIdSearchValue] = React.useState('');
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (!partitions) {
             return;
         }
@@ -80,7 +78,7 @@ export const PartitionsControls = ({
         onSearchChange(filteredPartitions);
     }, [partitionIdSearchValue, generalSearchValue, partitions, onSearchChange]);
 
-    const consumersToSelect = useMemo(() => {
+    const consumersToSelect = React.useMemo(() => {
         const options =
             consumers && consumers.length
                 ? consumers.map((consumer) => ({
@@ -92,15 +90,24 @@ export const PartitionsControls = ({
         return [{value: '', content: i18n('controls.consumerSelector.emptyOption')}, ...options];
     }, [consumers]);
 
-    const columnsToSelect = useMemo(() => {
-        return initialColumnsIds.map((id) => {
-            return {
-                title: PARTITIONS_COLUMNS_TITILES[id as ValueOf<typeof PARTITIONS_COLUMNS_IDS>],
+    const columnsToSelect = React.useMemo(() => {
+        const columns: TableColumnSetupItem[] = [];
+        for (const id of initialColumnsIds) {
+            const isId = id === PARTITIONS_COLUMNS_IDS.PARTITION_ID;
+            const column: TableColumnSetupItem = {
+                title: PARTITIONS_COLUMNS_TITLES[id as ValueOf<typeof PARTITIONS_COLUMNS_IDS>],
                 selected: Boolean(!hiddenColumns.includes(id)),
                 id: id,
-                required: id === PARTITIONS_COLUMNS_IDS.PARTITION_ID,
+                required: isId,
+                sticky: isId ? 'start' : undefined,
             };
-        });
+            if (isId) {
+                columns.unshift(column);
+            } else {
+                columns.push(column);
+            }
+        }
+        return columns;
     }, [initialColumnsIds, hiddenColumns]);
 
     const handleConsumerSelectChange = (value: string[]) => {
@@ -115,7 +122,7 @@ export const PartitionsControls = ({
         setGeneralSearchValue(value);
     };
 
-    const hadleTableColumnsSetupChange = (value: TableColumnSetupItem[]) => {
+    const handleTableColumnsSetupChange: TableColumnSetupProps['onUpdate'] = (value) => {
         const result = [...hiddenColumns];
 
         // Process current set of columns
@@ -165,10 +172,11 @@ export const PartitionsControls = ({
             />
             <TableColumnSetup
                 key="TableColumnSetup"
-                popupWidth="242px"
+                popupWidth={242}
                 items={columnsToSelect}
                 showStatus
-                onUpdate={hadleTableColumnsSetupChange}
+                onUpdate={handleTableColumnsSetupChange}
+                sortable={false}
             />
         </div>
     );

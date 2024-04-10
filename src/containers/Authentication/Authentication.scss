@@ -17,7 +17,7 @@
         radial-gradient(at 110% 100%, rgba(0, 102, 255, 0.15) 20%, rgba(247, 247, 247, 0) 40%);
     background-blend-mode: normal;
 
-    .yc-text-input {
+    .g-text-input {
         display: flex;
     }
 
@@ -35,10 +35,10 @@
     &__logo {
         display: flex;
         align-items: center;
+        gap: 8px;
 
         font-size: 16px;
         font-weight: 600;
-        gap: 8px;
     }
 
     &__title {
@@ -70,7 +70,7 @@
 
         width: 320px;
         margin-bottom: 16px;
-        .yc-text-input_state_error {
+        .g-text-input_state_error {
             flex-direction: column;
         }
     }

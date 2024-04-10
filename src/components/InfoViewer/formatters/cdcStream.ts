@@ -1,5 +1,4 @@
-import {TCdcStreamDescription} from '../../../types/api/schema';
-
+import type {TCdcStreamDescription} from '../../../types/api/schema';
 import {createInfoFormatter} from '../utils';
 
 export const formatCdcStreamItem = createInfoFormatter<TCdcStreamDescription>({

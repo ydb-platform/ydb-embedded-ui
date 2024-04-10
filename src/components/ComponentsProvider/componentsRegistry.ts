@@ -1,8 +1,9 @@
-import {StaffCard} from '../User/StaffCard';
 import {AsideNavigation} from '../../containers/AsideNavigation/AsideNavigation';
-
-import {ComponentsRegistryTemplate, Registry} from './registry';
 import {ErrorBoundaryInner} from '../ErrorBoundary/ErrorBoundary';
+import {StaffCard} from '../User/StaffCard';
+
+import type {ComponentsRegistryTemplate} from './registry';
+import {Registry} from './registry';
 
 const componentsRegistryInner = new Registry()
     .register('StaffCard', StaffCard)
