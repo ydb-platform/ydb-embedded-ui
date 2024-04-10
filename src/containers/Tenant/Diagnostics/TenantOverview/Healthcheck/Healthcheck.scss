@@ -37,6 +37,9 @@
 
     &__preview-title {
         font-weight: 600;
+
+        color: var(--g-color-text-link);
+
         @include lead-typography();
     }
 

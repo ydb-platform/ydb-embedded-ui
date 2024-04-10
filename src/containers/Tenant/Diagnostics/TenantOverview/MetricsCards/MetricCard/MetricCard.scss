@@ -2,6 +2,9 @@
 
 .ydb-metrics-card {
     $b: &;
+
+    min-height: 252px;
+
     &__header {
         display: flex;
         justify-content: space-between;
@@ -12,41 +15,26 @@
 
     &__label {
         font-weight: 600;
+
+        color: var(--g-color-text-link);
         @include lead-typography();
     }
 
     &__content {
         display: flex;
         flex-direction: column;
-        align-items: center;
-
-        text-align: center;
+        gap: 10px;
 
         color: var(--g-color-text-secondary);
-
-        @include header-1-typography();
     }
 
-    &__progress {
-        font-size: 36px;
-        font-weight: 500;
-        line-height: 40px;
-        text-align: center;
-    }
-
-    &__resources {
-        font-size: var(--g-text-body-1-font-size);
-
-        color: var(--g-color-text-secondary);
+    &__metric-title {
+        height: var(--g-text-body-2-line-height);
     }
 
     &_active {
         #{$b}__content {
             color: var(--g-color-text-complementary);
-        }
-
-        #{$b}__progress-bar-circle-bg {
-            stroke: var(--g-color-base-float);
         }
     }
 }

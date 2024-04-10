@@ -1,46 +1,61 @@
-import {CircularProgressBar} from '../../../../../../components/CircularProgressBar/CircularProgressBar';
 import {DiagnosticCard} from '../../../../../../components/DiagnosticCard/DiagnosticCard';
+import {ProgressViewer} from '../../../../../../components/ProgressViewer/ProgressViewer';
+import type {ProgressViewerProps} from '../../../../../../components/ProgressViewer/ProgressViewer';
+import {StatusIcon} from '../../../../../../components/StatusIcon/StatusIcon';
 import type {MetricStatus} from '../../../../../../store/reducers/tenants/types';
-import {formatUsage} from '../../../../../../store/reducers/tenants/utils';
+import {EFlag} from '../../../../../../types/api/enums';
 import {cn} from '../../../../../../utils/cn';
-import i18n from '../../i18n';
 
 import './MetricCard.scss';
 
 const b = cn('ydb-metrics-card');
 
-interface MetricCardProps {
-    active?: boolean;
-    progress?: number;
-    label?: string;
-    status?: MetricStatus;
-    resourcesUsed?: string;
+const getStatusIcon = (status?: MetricStatus) => {
+    let colorStatus: EFlag | undefined;
+
+    if (status === 'Warning') {
+        colorStatus = EFlag.Yellow;
+    }
+    if (status === 'Danger') {
+        colorStatus = EFlag.Red;
+    }
+
+    if (colorStatus) {
+        return <StatusIcon status={colorStatus} mode="icons" size="l" />;
+    }
+
+    return null;
+};
+
+export interface DiagnosticsCardMetric extends ProgressViewerProps {
+    title?: React.ReactNode;
 }
 
-export function MetricCard({active, progress, label, status, resourcesUsed}: MetricCardProps) {
-    const renderContent = () => {
-        if (progress === undefined && resourcesUsed === undefined) {
-            return <div className={b('content')}>{i18n('no-data')}</div>;
-        }
+interface MetricCardProps {
+    active?: boolean;
+    label?: string;
+    status?: MetricStatus;
+    metrics: DiagnosticsCardMetric[];
+}
 
-        return (
-            <div className={b('content')}>
-                {progress && <div className={b('progress')}>{formatUsage(progress)}</div>}
-                {resourcesUsed && <div className={b('resources')}>{resourcesUsed}</div>}
-            </div>
-        );
+export function MetricCard({active, label, status, metrics}: MetricCardProps) {
+    const renderContent = () => {
+        return metrics.map(({title, ...progressViewerProps}, index) => {
+            return (
+                <div key={index} className={b('metric')}>
+                    <div className={b('metric-title')}>{title}</div>
+                    <ProgressViewer size="xs" colorizeProgress={true} {...progressViewerProps} />
+                </div>
+            );
+        });
     };
     return (
         <DiagnosticCard className={b({active})} active={active}>
-            <div className={b('header')}>{label && <div className={b('label')}>{label}</div>}</div>
-            <CircularProgressBar
-                size={172}
-                strokeWidth={11}
-                progress={progress || 0}
-                content={renderContent()}
-                status={status}
-                circleBgClassName={b('progress-bar-circle-bg')}
-            />
+            <div className={b('header')}>
+                {label && <div className={b('label')}>{label}</div>}
+                {getStatusIcon(status)}
+            </div>
+            <div className={b('content')}>{renderContent()}</div>
         </DiagnosticCard>
     );
 }

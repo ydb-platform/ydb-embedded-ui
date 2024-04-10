@@ -60,6 +60,9 @@ export interface TTenant {
 
     StorageAllocatedLimit?: string;
     DatabaseQuotas?: DatabaseQuotas;
+
+    StorageUsage?: TStorageUsage[];
+    QuotaUsage?: TStorageUsage[];
 }
 
 export interface THiveDomainStatsStateCount {
@@ -161,4 +164,18 @@ export interface DatabaseQuotas {
     data_stream_reserved_storage_quota?: string;
     /** uint32 */
     ttl_min_run_internal_seconds?: string;
+}
+
+interface TStorageUsage {
+    Type: EType;
+    /** uint64 */
+    Size?: string;
+    /** uint64 */
+    Limit?: string;
+}
+
+export enum EType {
+    None = 'None',
+    HDD = 'HDD',
+    SSD = 'SSD',
 }

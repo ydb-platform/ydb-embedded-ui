@@ -1,6 +1,5 @@
 import {useTheme} from '@gravity-ui/uikit';
 
-import type {ValueOf} from '../../types/common';
 import {cn} from '../../utils/cn';
 import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../utils/utils';
@@ -9,23 +8,20 @@ import './ProgressViewer.scss';
 
 const b = cn('progress-viewer');
 
-export const PROGRESS_VIEWER_SIZE_IDS = {
-    xs: 'xs',
-    s: 's',
-    ns: 'ns',
-    m: 'm',
-    n: 'n',
-    l: 'l',
-    head: 'head',
-} as const;
+type ProgressViewerSize = 'xs' | 's' | 'ns' | 'm' | 'n' | 'l' | 'head';
 
-type ProgressViewerSize = ValueOf<typeof PROGRESS_VIEWER_SIZE_IDS>;
+type ProgressViewerStatus = 'good' | 'warning' | 'danger';
+
+type FormatProgressViewerValues = (
+    value?: number,
+    capacity?: number,
+) => (string | number | undefined)[];
 
 const formatValue = (value?: number) => {
     return formatNumber(roundToPrecision(Number(value), 2));
 };
 
-const defaultFormatValues = (value?: number, total?: number) => {
+const defaultFormatValues: FormatProgressViewerValues = (value, total) => {
     return [formatValue(value), formatValue(total)];
 };
 
@@ -42,10 +38,10 @@ Props description:
 8) dangerThreshold - the percentage of fullness at which the color of the progress bar changes to red
 */
 
-interface ProgressViewerProps {
+export interface ProgressViewerProps {
     value?: number | string;
     capacity?: number | string;
-    formatValues?: (value?: number, capacity?: number) => (string | number | undefined)[];
+    formatValues?: FormatProgressViewerValues;
     percents?: boolean;
     className?: string;
     size?: ProgressViewerSize;
@@ -61,7 +57,7 @@ export function ProgressViewer({
     formatValues = defaultFormatValues,
     percents,
     className,
-    size = PROGRESS_VIEWER_SIZE_IDS.xs,
+    size = 'xs',
     colorizeProgress,
     inverseColorize,
     warningThreshold = 60,
@@ -83,7 +79,7 @@ export function ProgressViewer({
         [valueText, capacityText] = formatValues(Number(value), Number(capacity));
     }
 
-    let status = inverseColorize ? 'danger' : 'good';
+    let status: ProgressViewerStatus = inverseColorize ? 'danger' : 'good';
     if (colorizeProgress) {
         if (fillWidth > warningThreshold && fillWidth <= dangerThreshold) {
             status = 'warning';

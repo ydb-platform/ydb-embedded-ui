@@ -1,5 +1,6 @@
-import type {TPoolStats} from '../../../types/api/nodes';
+import type {PoolName, TPoolStats} from '../../../types/api/nodes';
 import type {TTenant} from '../../../types/api/tenant';
+import {EType} from '../../../types/api/tenant';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {formatCPUWithLabel} from '../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../utils/utils';
@@ -23,21 +24,40 @@ const getTenantBackend = (tenant: TTenant) => {
     return node.Host ? `${node.Host}${address ? address : ''}` : undefined;
 };
 
-const calculateCpuUsage = (poolsStats: TPoolStats[] | undefined) => {
+export interface TenantMetricStats<T = string> {
+    name: T;
+    usage?: number;
+    limit?: number;
+    used?: number;
+}
+
+export type TenantPoolsStats = TenantMetricStats<PoolName>;
+export type TenantStorageStats = TenantMetricStats<EType>;
+
+const calculatePoolsStats = (
+    poolsStats: TPoolStats[] | undefined,
+): TenantPoolsStats[] | undefined => {
     if (!poolsStats) {
         return undefined;
     }
 
-    const systemPoolUsage = poolsStats?.find(({Name}) => Name === 'System')?.Usage || 0;
-    const userPoolUsage = poolsStats?.find(({Name}) => Name === 'User')?.Usage || 0;
-    const icPoolUsage = poolsStats?.find(({Name}) => Name === 'IC')?.Usage || 0;
+    return poolsStats
+        .map<Partial<TenantPoolsStats | undefined>>((pool) => {
+            if (pool.Name) {
+                const usage = Number(pool.Usage);
+                const limit = Number(pool.Threads);
+                const used = limit * usage;
 
-    // We use max of system, user and ic pools usage to calculate cpu usage because
-    // only these pools directly indicate resources available to perform user queries
-    return Math.max(Number(systemPoolUsage), Number(userPoolUsage), Number(icPoolUsage)) * 100;
+                // Multiply usage by 100 to match with usage to status checkers
+                return {name: pool.Name, usage: usage * 100, limit, used};
+            }
+
+            return undefined;
+        })
+        .filter((stats): stats is TenantPoolsStats => stats !== undefined);
 };
 
-export const calculateTenantMetrics = (tenant?: TTenant) => {
+export const calculateTenantMetrics = (tenant: TTenant = {}) => {
     const {
         CoresUsed,
         MemoryUsed,
@@ -47,14 +67,15 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
         PoolStats,
         Metrics = {},
         DatabaseQuotas = {},
-    } = tenant || {};
+        StorageUsage,
+        QuotaUsage,
+    } = tenant;
 
     const cpu = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
+
     const memory = isNumeric(MemoryUsed) ? Number(MemoryUsed) : undefined;
     const blobStorage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
     const tabletStorage = isNumeric(Metrics.Storage) ? Number(Metrics.Storage) : undefined;
-
-    const cpuUsage = calculateCpuUsage(PoolStats);
 
     const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
     const blobStorageLimit = isNumeric(StorageAllocatedLimit)
@@ -64,15 +85,83 @@ export const calculateTenantMetrics = (tenant?: TTenant) => {
         ? Number(DatabaseQuotas.data_size_hard_quota)
         : undefined;
 
+    const poolsStats = calculatePoolsStats(PoolStats);
+
+    let blobStorageStats: TenantStorageStats[];
+    let tabletStorageStats: TenantStorageStats[] | undefined;
+
+    if (StorageUsage) {
+        blobStorageStats = StorageUsage.map((value) => {
+            const {Type, Size, Limit} = value;
+
+            const used = Number(Size);
+            const limit = Number(Limit);
+
+            return {
+                name: Type,
+                used,
+                limit,
+                usage: calculateUsage(used, limit),
+            };
+        });
+    } else {
+        blobStorageStats = [
+            {
+                name: EType.SSD,
+                used: blobStorage,
+                limit: blobStorageLimit,
+                usage: calculateUsage(blobStorage, blobStorageLimit),
+            },
+        ];
+    }
+
+    if (QuotaUsage) {
+        tabletStorageStats = QuotaUsage.map((value) => {
+            const {Type, Size, Limit} = value;
+
+            const used = Number(Size);
+            const limit = Number(Limit);
+
+            return {
+                name: Type,
+                used,
+                limit,
+                usage: calculateUsage(used, limit),
+            };
+        });
+    } else if (tabletStorage !== undefined && tabletStorageLimit) {
+        tabletStorageStats = [
+            {
+                name: EType.SSD,
+                used: tabletStorage,
+                limit: tabletStorageLimit,
+                usage: calculateUsage(tabletStorage, tabletStorageLimit),
+            },
+        ];
+    }
+
+    const memoryStats: TenantMetricStats[] = [
+        {
+            name: 'Process',
+            used: memory,
+            limit: memoryLimit,
+            usage: calculateUsage(memory, memoryLimit),
+        },
+    ];
+
     return {
-        cpu,
         memory,
         blobStorage,
         tabletStorage,
-        cpuUsage,
         memoryLimit,
         blobStorageLimit,
         tabletStorageLimit,
+
+        cpu,
+        poolsStats,
+        memoryStats,
+        blobStorageStats,
+        tabletStorageStats,
     };
 };
 
@@ -108,13 +197,13 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean) =>
     });
 };
 
-export const calculateUsage = (valueUsed?: number, valueLimit?: number): number | undefined => {
+export function calculateUsage(valueUsed?: number, valueLimit?: number): number | undefined {
     if (valueUsed && valueLimit) {
         return (valueUsed * 100) / valueLimit;
     }
 
     return undefined;
-};
+}
 
 export const formatUsage = (usage?: number) => {
     if (usage) {
@@ -124,15 +213,24 @@ export const formatUsage = (usage?: number) => {
     return undefined;
 };
 
+export const TENANT_CPU_DANGER_TRESHOLD = 70;
+export const TENANT_CPU_WARNING_TRESHOLD = 60;
+
+export const TENANT_STORAGE_DANGER_TRESHOLD = 85;
+export const TENANT_STORAGE_WARNING_TRESHOLD = 75;
+
+export const TENANT_MEMORY_DANGER_TRESHOLD = 70;
+export const TENANT_MEMORY_WARNING_TRESHOLD = 60;
+
 export const cpuUsageToStatus = (usage?: number) => {
     if (!usage) {
         return METRIC_STATUS.Unspecified;
     }
 
-    if (usage > 70) {
+    if (usage > TENANT_CPU_DANGER_TRESHOLD) {
         return METRIC_STATUS.Danger;
     }
-    if (usage > 60) {
+    if (usage > TENANT_CPU_WARNING_TRESHOLD) {
         return METRIC_STATUS.Warning;
     }
 
@@ -143,10 +241,10 @@ export const storageUsageToStatus = (usage?: number) => {
         return METRIC_STATUS.Unspecified;
     }
 
-    if (usage > 85) {
+    if (usage > TENANT_STORAGE_DANGER_TRESHOLD) {
         return METRIC_STATUS.Danger;
     }
-    if (usage > 75) {
+    if (usage > TENANT_STORAGE_WARNING_TRESHOLD) {
         return METRIC_STATUS.Warning;
     }
 
@@ -158,10 +256,10 @@ export const memoryUsageToStatus = (usage?: number) => {
         return METRIC_STATUS.Unspecified;
     }
 
-    if (usage > 70) {
+    if (usage > TENANT_MEMORY_DANGER_TRESHOLD) {
         return METRIC_STATUS.Danger;
     }
-    if (usage > 60) {
+    if (usage > TENANT_MEMORY_WARNING_TRESHOLD) {
         return METRIC_STATUS.Warning;
     }
 
