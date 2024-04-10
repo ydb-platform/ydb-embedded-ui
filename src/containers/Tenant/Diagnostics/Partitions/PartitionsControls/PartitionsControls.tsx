@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type {SelectOption, TableColumnSetupProps} from '@gravity-ui/uikit';
+import type {SelectOption, TableColumnSetupItem, TableColumnSetupProps} from '@gravity-ui/uikit';
 import {Select, TableColumnSetup} from '@gravity-ui/uikit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
@@ -8,7 +8,7 @@ import {Search} from '../../../../../components/Search/Search';
 import type {ValueOf} from '../../../../../types/common';
 import {b} from '../Partitions';
 import i18n from '../i18n';
-import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITILES} from '../utils/constants';
+import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITLES} from '../utils/constants';
 import type {PreparedPartitionDataWithHosts} from '../utils/types';
 
 interface PartitionsControlsProps {
@@ -91,14 +91,23 @@ export const PartitionsControls = ({
     }, [consumers]);
 
     const columnsToSelect = React.useMemo(() => {
-        return initialColumnsIds.map((id) => {
-            return {
-                title: PARTITIONS_COLUMNS_TITILES[id as ValueOf<typeof PARTITIONS_COLUMNS_IDS>],
+        const columns: TableColumnSetupItem[] = [];
+        for (const id of initialColumnsIds) {
+            const isId = id === PARTITIONS_COLUMNS_IDS.PARTITION_ID;
+            const column: TableColumnSetupItem = {
+                title: PARTITIONS_COLUMNS_TITLES[id as ValueOf<typeof PARTITIONS_COLUMNS_IDS>],
                 selected: Boolean(!hiddenColumns.includes(id)),
                 id: id,
-                required: id === PARTITIONS_COLUMNS_IDS.PARTITION_ID,
+                required: isId,
+                sticky: isId ? 'start' : undefined,
             };
-        });
+            if (isId) {
+                columns.unshift(column);
+            } else {
+                columns.push(column);
+            }
+        }
+        return columns;
     }, [initialColumnsIds, hiddenColumns]);
 
     const handleConsumerSelectChange = (value: string[]) => {
@@ -120,9 +129,9 @@ export const PartitionsControls = ({
         // This way we do not remove from hidden these columns, that are not displayed currently
         // The reasons: set of columns differs for partitions with and without consumers
         value.forEach((el) => {
-            if (!el.isSelected && !hiddenColumns.includes(el.id)) {
+            if (!el.selected && !hiddenColumns.includes(el.id)) {
                 result.push(el.id);
-            } else if (el.isSelected && hiddenColumns.includes(el.id)) {
+            } else if (el.selected && hiddenColumns.includes(el.id)) {
                 result.splice(hiddenColumns.indexOf(el.id));
             }
         });
@@ -165,7 +174,7 @@ export const PartitionsControls = ({
                 key="TableColumnSetup"
                 popupWidth={242}
                 items={columnsToSelect}
-                // showStatus
+                showStatus
                 onUpdate={handleTableColumnsSetupChange}
             />
         </div>

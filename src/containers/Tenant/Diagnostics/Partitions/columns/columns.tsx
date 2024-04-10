@@ -17,7 +17,7 @@ import {
 } from '../Headers';
 import {
     PARTITIONS_COLUMNS_IDS,
-    PARTITIONS_COLUMNS_TITILES,
+    PARTITIONS_COLUMNS_TITLES,
     PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS,
     PARTITIONS_READ_LAGS_SUB_COLUMNS_TITLES,
     PARTITIONS_WRITE_LAGS_SUB_COLUMNS_IDS,
@@ -35,7 +35,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         name: PARTITIONS_COLUMNS_IDS.PARTITION_ID,
         header: (
             <MultilineHeader
-                title={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.PARTITION_ID]}
+                title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.PARTITION_ID]}
             />
         ),
         sortAccessor: (row) => isNumeric(row.partitionId) && Number(row.partitionId),
@@ -45,23 +45,21 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.STORE_SIZE,
         header: (
-            <MultilineHeader
-                title={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.STORE_SIZE]}
-            />
+            <MultilineHeader title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.STORE_SIZE]} />
         ),
         align: DataTable.RIGHT,
         render: ({row}) => formatBytes(row.storeSize),
     },
     {
         name: PARTITIONS_COLUMNS_IDS.WRITE_SPEED,
-        header: PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.WRITE_SPEED],
+        header: PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.WRITE_SPEED],
         align: DataTable.LEFT,
         sortAccessor: (row) => row.writeSpeed.perMinute,
         render: ({row}) => <SpeedMultiMeter data={row.writeSpeed} />,
     },
     {
         name: PARTITIONS_COLUMNS_IDS.READ_SPEED,
-        header: PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.READ_SPEED],
+        header: PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.READ_SPEED],
         align: DataTable.LEFT,
         sortAccessor: (row) => row.readSpeed?.perMinute,
         render: ({row}) => <SpeedMultiMeter data={row.readSpeed} />,
@@ -136,7 +134,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         name: PARTITIONS_COLUMNS_IDS.START_OFFSET,
         header: (
             <MultilineHeader
-                title={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.START_OFFSET]}
+                title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.START_OFFSET]}
             />
         ),
         sortAccessor: (row) => isNumeric(row.startOffset) && Number(row.startOffset),
@@ -146,9 +144,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.END_OFFSET,
         header: (
-            <MultilineHeader
-                title={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.END_OFFSET]}
-            />
+            <MultilineHeader title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.END_OFFSET]} />
         ),
         sortAccessor: (row) => isNumeric(row.endOffset) && Number(row.endOffset),
         align: DataTable.RIGHT,
@@ -158,7 +154,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         name: PARTITIONS_COLUMNS_IDS.COMMITED_OFFSET,
         header: (
             <MultilineHeader
-                title={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.COMMITED_OFFSET]}
+                title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.COMMITED_OFFSET]}
             />
         ),
         sortAccessor: (row) => isNumeric(row.commitedOffset) && Number(row.commitedOffset),
@@ -185,7 +181,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         name: PARTITIONS_COLUMNS_IDS.READER_NAME,
         header: (
             <MultilineHeader
-                title={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.READER_NAME]}
+                title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.READER_NAME]}
             />
         ),
         align: DataTable.LEFT,
@@ -205,7 +201,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         name: PARTITIONS_COLUMNS_IDS.PARTITION_HOST,
         header: (
             <MultilineHeader
-                title={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.PARTITION_HOST]}
+                title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.PARTITION_HOST]}
             />
         ),
         align: DataTable.LEFT,
@@ -226,7 +222,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         name: PARTITIONS_COLUMNS_IDS.CONNECTION_HOST,
         header: (
             <MultilineHeader
-                title={PARTITIONS_COLUMNS_TITILES[PARTITIONS_COLUMNS_IDS.CONNECTION_HOST]}
+                title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.CONNECTION_HOST]}
             />
         ),
         align: DataTable.LEFT,

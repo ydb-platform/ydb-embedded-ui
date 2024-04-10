@@ -157,6 +157,7 @@ export function Clusters() {
                             key="TableColumnSetup"
                             popupWidth={242}
                             items={columnsToSelect}
+                            showStatus
                             onUpdate={setColumns}
                         />
                     </div>

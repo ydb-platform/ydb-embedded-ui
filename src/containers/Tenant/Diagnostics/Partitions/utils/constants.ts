@@ -23,7 +23,7 @@ export const PARTITIONS_COLUMNS_IDS = {
     CONNECTION_HOST: 'connectionHost',
 } as const;
 
-export const PARTITIONS_COLUMNS_TITILES = {
+export const PARTITIONS_COLUMNS_TITLES = {
     [PARTITIONS_COLUMNS_IDS.PARTITION_ID]: 'Partition ID',
 
     [PARTITIONS_COLUMNS_IDS.STORE_SIZE]: 'Store size',

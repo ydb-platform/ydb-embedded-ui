@@ -22,16 +22,18 @@ export const useSelectedColumns = <T>(
     );
 
     const columnsToSelect: TableColumnSetupItem[] = columnsIds.map((id) => {
+        const isRequired = requiredColumnsIds?.includes(id);
         return {
             id,
             title: columnsTitles[id],
             selected: selectedColumnsIds.includes(id),
-            required: requiredColumnsIds?.includes(id),
+            required: isRequired,
+            sticky: isRequired ? 'start' : undefined,
         };
     });
 
     const setColumns: TableColumnSetupProps['onUpdate'] = (value) => {
-        const selectedColumns = value.filter((el) => el.isSelected).map((el) => el.id);
+        const selectedColumns = value.filter((el) => el.selected).map((el) => el.id);
 
         setSelectedColumnsIds(selectedColumns);
     };

@@ -1,6 +1,4 @@
 /* eslint-disable import/order */
-import React from 'react';
-
 import ReactDOM from 'react-dom/client';
 
 import '@gravity-ui/uikit/styles/styles.scss';
@@ -30,11 +28,9 @@ async function render() {
     }
     const root = ReactDOM.createRoot(container);
     root.render(
-        <React.StrictMode>
-            <ErrorBoundary>
-                <App store={store} history={history} />
-            </ErrorBoundary>
-        </React.StrictMode>,
+        <ErrorBoundary>
+            <App store={store} history={history} />
+        </ErrorBoundary>,
     );
 }
 
