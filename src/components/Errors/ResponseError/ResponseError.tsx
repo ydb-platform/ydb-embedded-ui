@@ -1,8 +1,7 @@
-import type {IResponseError} from '../../../types/api/error';
 import i18n from '../i18n';
 
 interface ResponseErrorProps {
-    error?: IResponseError;
+    error?: unknown;
     className?: string;
     defaultMessage?: string;
 }
@@ -12,5 +11,13 @@ export const ResponseError = ({
     className,
     defaultMessage = i18n('responseError.defaultMessage'),
 }: ResponseErrorProps) => {
-    return <div className={`error ${className}`}>{error?.statusText || defaultMessage}</div>;
+    let statusText = '';
+    if (error && typeof error === 'object') {
+        if ('statusText' in error && typeof error.statusText === 'string') {
+            statusText = error.statusText;
+        } else if ('message' in error && typeof error.message === 'string') {
+            statusText = error.message;
+        }
+    }
+    return <div className={`error ${className}`}>{statusText || defaultMessage}</div>;
 };

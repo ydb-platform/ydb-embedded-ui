@@ -1,5 +1,6 @@
 import {combineReducers} from '@reduxjs/toolkit';
 
+import {api} from './api';
 import authentication from './authentication/authentication';
 import cluster from './cluster/cluster';
 import clusterNodes from './clusterNodes/clusterNodes';
@@ -47,6 +48,7 @@ import topic from './topic';
 import vDisk from './vdisk/vdisk';
 
 export const rootReducer = {
+    [api.reducerPath]: api.reducer,
     singleClusterMode,
     nodes,
     topNodesByLoad,

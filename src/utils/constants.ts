@@ -5,6 +5,7 @@ import {EType} from '../types/api/tablet';
 const SECOND = 1000;
 
 export const AUTO_RELOAD_INTERVAL = 10 * SECOND;
+export const DEFAULT_POLLING_INTERVAL = 30 * SECOND;
 // by agreement, display all byte values in decimal scale
 // values in data are always in bytes, never in higher units,
 // therefore there is no issue arbitrary converting them in UI

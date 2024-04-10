@@ -1,5 +1,5 @@
 import {configureStore as configureReduxStore} from '@reduxjs/toolkit';
-import type {Action, Reducer, UnknownAction} from '@reduxjs/toolkit';
+import type {Action, Dispatch, Middleware, Reducer, UnknownAction} from '@reduxjs/toolkit';
 import type {History} from 'history';
 import {createBrowserHistory} from 'history';
 import {listenForHistoryChange} from 'redux-location-state';
@@ -8,16 +8,18 @@ import {createApi} from '../services/api';
 
 import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
+import {api as storeApi} from './reducers/api';
 import {UPDATE_REF} from './reducers/tooltip';
 import getLocationMiddleware from './state-url-mapping';
 
 export let backend: string | undefined, basename: string, clusterName: string | undefined;
 
-function _configureStore<S = any, A extends Action = UnknownAction, P = S>(
-    aRootReducer: Reducer<S, A, P>,
-    history: History,
-    preloadedState: P,
-) {
+function _configureStore<
+    S = any,
+    A extends Action = UnknownAction,
+    P = S,
+    M extends Middleware<{}, S, Dispatch> = any,
+>(aRootReducer: Reducer<S, A, P>, history: History, preloadedState: P, middleware: M[]) {
     const {locationMiddleware, reducersWithLocation} = getLocationMiddleware(history, aRootReducer);
 
     const store = configureReduxStore({
@@ -30,7 +32,7 @@ function _configureStore<S = any, A extends Action = UnknownAction, P = S>(
                     ignoredPaths: ['tooltip.currentHoveredRef'],
                     ignoredActions: [UPDATE_REF],
                 },
-            }).concat(locationMiddleware),
+            }).concat(locationMiddleware, ...middleware),
     });
 
     return store;
@@ -54,7 +56,9 @@ export function configureStore({
     }));
     const history = createBrowserHistory({basename});
 
-    const store = _configureStore(aRootReducer, history, {singleClusterMode});
+    const store = _configureStore(aRootReducer, history, {singleClusterMode}, [
+        storeApi.middleware,
+    ]);
     listenForHistoryChange(store, history);
 
     // Interceptor to process OIDC auth

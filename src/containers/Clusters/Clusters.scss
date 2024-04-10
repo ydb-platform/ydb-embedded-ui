@@ -1,12 +1,12 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .clusters {
     overflow: auto;
 
     padding-top: 15px;
 
-    @include body-2-typography();
-    @include flex-container();
+    @include mixins.body-2-typography();
+    @include mixins.flex-container();
 
     &__cluster {
         display: flex;
@@ -128,7 +128,7 @@
 
     &__text {
         color: var(--g-color-text-primary);
-        @include body-2-typography();
+        @include mixins.body-2-typography();
 
         &::first-letter {
             color: var(--g-color-text-danger);
@@ -145,13 +145,13 @@
         overflow: auto;
 
         padding-left: 5px;
-        @include flex-container();
+        @include mixins.flex-container();
     }
 
     &__table-content {
         overflow: auto;
 
-        @include freeze-nth-column(1);
+        @include mixins.freeze-nth-column(1);
     }
     &__balancer-cell {
         display: flex;
@@ -172,5 +172,9 @@
     &__balancer-icon {
         display: flex;
         align-items: center;
+    }
+
+    &__error {
+        @include mixins.body-2-typography();
     }
 }

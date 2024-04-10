@@ -4,22 +4,21 @@ import DataTable from '@gravity-ui/react-data-table';
 import {Select, TableColumnSetup} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 
+import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
 import {Search} from '../../components/Search';
-import {changeClustersFilters, fetchClustersList} from '../../store/reducers/clusters/clusters';
+import {changeClustersFilters, clustersApi} from '../../store/reducers/clusters/clusters';
 import {
+    aggregateClustersInfo,
+    filterClusters,
     selectClusterNameFilter,
-    selectClustersAggregation,
-    selectClustersList,
-    selectFilteredClusters,
-    selectLoadingFlag,
     selectServiceFilter,
     selectStatusFilter,
     selectVersionFilter,
-    selectVersions,
 } from '../../store/reducers/clusters/selectors';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {DEFAULT_POLLING_INTERVAL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {getMinorVersion} from '../../utils/versions';
 
 import {ClustersStatistics} from './ClustersStatistics';
 import {CLUSTERS_COLUMNS} from './columns';
@@ -37,23 +36,16 @@ import {useSelectedColumns} from './useSelectedColumns';
 import './Clusters.scss';
 
 export function Clusters() {
+    const query = clustersApi.useGetClustersListQuery(undefined, {
+        pollingInterval: DEFAULT_POLLING_INTERVAL,
+    });
+
     const dispatch = useTypedDispatch();
 
-    const loading = useTypedSelector(selectLoadingFlag);
-    const clusters = useTypedSelector(selectClustersList);
-    const filteredClusters = useTypedSelector(selectFilteredClusters);
-    const aggregation = useTypedSelector(selectClustersAggregation);
     const clusterName = useTypedSelector(selectClusterNameFilter);
     const status = useTypedSelector(selectStatusFilter);
     const service = useTypedSelector(selectServiceFilter);
     const version = useTypedSelector(selectVersionFilter);
-    const versions = useTypedSelector(selectVersions);
-
-    const fetchData = React.useCallback(() => {
-        dispatch(fetchClustersList());
-    }, [dispatch]);
-
-    useAutofetcher(fetchData, [fetchData], true);
 
     const changeStatus = (value: string[]) => {
         dispatch(changeClustersFilters({status: value}));
@@ -76,24 +68,41 @@ export function Clusters() {
         [COLUMNS_NAMES.TITLE],
     );
 
-    const servicesToSelect = React.useMemo(() => {
-        const clustersServices = new Set<string>();
+    const clusters = query.data;
 
-        clusters.forEach((cluster) => {
+    const {servicesToSelect, versions} = React.useMemo(() => {
+        const clustersServices = new Set<string>();
+        const uniqVersions = new Set<string>();
+
+        const clusterList = clusters ?? [];
+        clusterList.forEach((cluster) => {
             if (cluster.service) {
                 clustersServices.add(cluster.service);
             }
+            cluster.cluster?.Versions?.forEach((v) => {
+                uniqVersions.add(getMinorVersion(v));
+            });
         });
 
-        return Array.from(clustersServices).map((clusterService) => {
-            return {
-                value: clusterService,
-                content: clusterService,
-            };
-        });
+        return {
+            servicesToSelect: Array.from(clustersServices).map((value) => ({
+                value,
+                content: value,
+            })),
+            versions: Array.from(uniqVersions).map((value) => ({value, content: value})),
+        };
     }, [clusters]);
 
-    if (loading && !clusters.length) {
+    const filteredClusters = React.useMemo(() => {
+        return filterClusters(clusters ?? [], {clusterName, status, service, version});
+    }, [clusterName, clusters, service, status, version]);
+
+    const aggregation = React.useMemo(
+        () => aggregateClustersInfo(filteredClusters),
+        [filteredClusters],
+    );
+
+    if (query.isLoading) {
         return <Loader size="l" />;
     }
 
@@ -162,6 +171,7 @@ export function Clusters() {
                     />
                 </div>
             </div>
+            {query.isError ? <ResponseError error={query.error} className={b('error')} /> : null}
             <div className={b('table-wrapper')}>
                 <div className={b('table-content')}>
                     <DataTable
