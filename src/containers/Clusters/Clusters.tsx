@@ -152,15 +152,14 @@ export function Clusters() {
                     />
                 </div>
                 <div className={b('control')}>
-                    <div>
-                        <TableColumnSetup
-                            key="TableColumnSetup"
-                            popupWidth={242}
-                            items={columnsToSelect}
-                            showStatus
-                            onUpdate={setColumns}
-                        />
-                    </div>
+                    <TableColumnSetup
+                        key="TableColumnSetup"
+                        popupWidth={242}
+                        items={columnsToSelect}
+                        showStatus
+                        onUpdate={setColumns}
+                        sortable={false}
+                    />
                 </div>
             </div>
             <div className={b('table-wrapper')}>

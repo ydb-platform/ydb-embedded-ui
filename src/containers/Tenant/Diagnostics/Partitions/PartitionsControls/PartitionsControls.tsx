@@ -176,6 +176,7 @@ export const PartitionsControls = ({
                 items={columnsToSelect}
                 showStatus
                 onUpdate={handleTableColumnsSetupChange}
+                sortable={false}
             />
         </div>
     );

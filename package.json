@@ -20,7 +20,7 @@
     "@gravity-ui/navigation": "^2.7.0",
     "@gravity-ui/paranoid": "^1.4.1",
     "@gravity-ui/react-data-table": "^2.0.1",
-    "@gravity-ui/uikit": "^6.10.0",
+    "@gravity-ui/uikit": "^6.10.2",
     "@gravity-ui/websql-autocomplete": "^8.0.2",
     "@reduxjs/toolkit": "^2.2.3",
     "axios": "^1.6.8",
