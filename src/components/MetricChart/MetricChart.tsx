@@ -77,6 +77,7 @@ const prepareWidgetData = (
                 },
                 series: {
                     type: 'area',
+                    spanGaps: true,
                     lineWidth: 1.5,
                 },
                 select: {
