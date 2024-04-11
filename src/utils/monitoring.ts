@@ -65,6 +65,8 @@ export function getMonitoringClusterLink(monitoring: string, clusterName?: strin
         if (clusterDashboard && finalClusterName) {
             return `${monitoringUrl}/${clusterDashboard}/view?p.cluster=${finalClusterName}&p.database=-`;
         }
+
+        return monitoringUrl;
     }
     return '';
 }
