@@ -28,25 +28,36 @@ export function getMonitoringLink({
     dbType,
     clusterName,
 }: GetMonitoringLinkProps) {
-    const data = parseMonitoringData(monitoring);
+    try {
+        const data = parseMonitoringData(monitoring);
 
-    if (data) {
-        const monitoringUrl = data.monitoring_url;
+        if (data) {
+            const host = data.host ?? 'cluster';
+            const slot = data.slot ?? 'static';
 
-        const dashboard =
-            dbType === ETenantType.Serverless
-                ? data.serverless_dashboard
-                : data.dedicated_dashboard;
+            const finalClusterName = data.cluster_name || clusterName || '';
 
-        const host = data.host ?? 'cluster';
-        const slot = data.slot ?? 'static';
+            const url = new URL(data.monitoring_url);
 
-        const finalClusterName = data.cluster_name || clusterName || '';
+            if (!url.search) {
+                const dashboard =
+                    dbType === ETenantType.Serverless
+                        ? data.serverless_dashboard
+                        : data.dedicated_dashboard;
 
-        const href = `${monitoringUrl}/${dashboard}?p.cluster=${finalClusterName}&p.host=${host}&p.slot=${slot}&p.database=${dbName}`;
+                url.pathname += `/${dashboard}`;
+            }
 
-        return encodeURI(href);
-    }
+            if (!url.searchParams.has('p.cluster')) {
+                url.searchParams.set('p.cluster', finalClusterName);
+            }
+            url.searchParams.set('p.host', host);
+            url.searchParams.set('p.slot', slot);
+            url.searchParams.set('p.database', dbName);
+
+            return url.toString();
+        }
+    } catch {}
 
     return '';
 }
@@ -54,20 +65,29 @@ export function getMonitoringLink({
 export type GetMonitoringClusterLink = typeof getMonitoringClusterLink;
 
 export function getMonitoringClusterLink(monitoring: string, clusterName?: string) {
-    const data = parseMonitoringData(monitoring);
+    try {
+        const data = parseMonitoringData(monitoring);
 
-    if (data) {
-        const monitoringUrl = data.monitoring_url;
-        const clusterDashboard = data.cluster_dashboard;
+        if (data) {
+            const clusterDashboard = data.cluster_dashboard;
+            const finalClusterName = data.cluster_name || clusterName || '';
 
-        const finalClusterName = data.cluster_name ?? clusterName;
+            const url = new URL(data.monitoring_url);
 
-        if (clusterDashboard && finalClusterName) {
-            return `${monitoringUrl}/${clusterDashboard}/view?p.cluster=${finalClusterName}&p.database=-`;
+            if (!url.search && clusterDashboard) {
+                url.pathname += `/${clusterDashboard}/view`;
+            }
+
+            if (!url.searchParams.has('p.cluster')) {
+                url.searchParams.set('p.cluster', finalClusterName);
+            }
+
+            url.searchParams.set('p.database', '-');
+
+            return url.toString();
         }
+    } catch {}
 
-        return monitoringUrl;
-    }
     return '';
 }
 

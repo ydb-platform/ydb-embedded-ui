@@ -13,11 +13,11 @@ describe('getMonitoringLink', () => {
             getMonitoringLink({
                 monitoring: solomonString,
                 clusterName: 'global',
-                dbName: '/global/audit-trails',
+                dbName: 'database',
                 dbType: 'Database',
             }),
         ).toBe(
-            'https://monitoring.test.ai/projects/yc.ydb.ydbaas-cloud/dashboards/aol34hftdn7o4fls50sv?p.cluster=global&p.host=cluster&p.slot=static&p.database=/global/audit-trails',
+            'https://monitoring.test.ai/projects/yc.ydb.ydbaas-cloud/dashboards/aol34hftdn7o4fls50sv?p.cluster=global&p.host=cluster&p.slot=static&p.database=database',
         );
     });
     it('should create cluster monitoring link from JSON', () => {
@@ -29,6 +29,36 @@ describe('getMonitoringLink', () => {
 
         expect(getMonitoringClusterLink(solomonString, 'clusterName')).toBe(
             'https://monitoring.test.ai/projects/yc.ydb.ydbaas-cloud/dashboards/aol34hftdn7o4fls50sv/view?p.cluster=clusterName&p.database=-',
+        );
+    });
+    it('should not parse ready to use database monitoring link', () => {
+        const solomonRaw = {
+            monitoring_url:
+                'https://monitoring.test.ai/projects/ydbaas/dashboards/aol34hftdn7o4fls50sv?p.cluster=cluster_name&a=',
+        };
+
+        const solomonString = JSON.stringify(solomonRaw);
+
+        expect(
+            getMonitoringLink({
+                monitoring: solomonString,
+                dbName: 'database',
+                dbType: 'Dedicated',
+            }),
+        ).toBe(
+            'https://monitoring.test.ai/projects/ydbaas/dashboards/aol34hftdn7o4fls50sv?p.cluster=cluster_name&a=&p.host=cluster&p.slot=static&p.database=database',
+        );
+    });
+    it('should not parse ready to use cluster monitoring link', () => {
+        const solomonRaw = {
+            monitoring_url:
+                'https://monitoring.test.ai/projects/ydbaas/dashboards/aol34hftdn7o4fls50sv/view?p.cluster=cluster_name&a=',
+        };
+
+        const solomonString = JSON.stringify(solomonRaw);
+
+        expect(getMonitoringClusterLink(solomonString)).toBe(
+            'https://monitoring.test.ai/projects/ydbaas/dashboards/aol34hftdn7o4fls50sv/view?p.cluster=cluster_name&a=&p.database=-',
         );
     });
 });
