@@ -35,6 +35,7 @@ const getAdditionalBalancerInfo = (balancer: string) => {
 };
 
 const getAdditionalClusterProps = (
+    clusterName: string | undefined,
     monitoring: string | undefined,
     balancer: string | undefined,
     getMonitoringClusterLink?: GetMonitoringClusterLink,
@@ -42,7 +43,7 @@ const getAdditionalClusterProps = (
     const additionalClusterProps: AdditionalClusterProps = {};
 
     if (monitoring && getMonitoringClusterLink) {
-        const clusterLink = getMonitoringClusterLink(monitoring);
+        const clusterLink = getMonitoringClusterLink(monitoring, clusterName);
 
         if (clusterLink) {
             additionalClusterProps.links = [{title: 'Monitoring', url: clusterLink}];
@@ -129,6 +130,7 @@ export function ExtendedCluster({
         <div className={b()}>
             <ClusterComponent
                 additionalClusterProps={getAdditionalClusterProps(
+                    cluster?.Name,
                     monitoring,
                     balancer,
                     getMonitoringClusterLink,
