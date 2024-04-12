@@ -1,11 +1,18 @@
-import {createSelector} from '@reduxjs/toolkit';
-import type {Selector} from '@reduxjs/toolkit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
-import type {MetaExtendedClusterInfo} from '../../../types/api/meta';
-import {getMinorVersion} from '../../../utils/versions';
+import type {
+    ClusterDataAggregation,
+    ClustersFilters,
+    ClustersStateSlice,
+    PreparedCluster,
+} from './types';
 
-import type {ClusterDataAggregation, ClustersStateSlice, PreparedCluster} from './types';
+// ==== Simple selectors ====
+
+export const selectClusterNameFilter = (state: ClustersStateSlice) => state.clusters.clusterName;
+export const selectStatusFilter = (state: ClustersStateSlice) => state.clusters.status;
+export const selectServiceFilter = (state: ClustersStateSlice) => state.clusters.service;
+export const selectVersionFilter = (state: ClustersStateSlice) => state.clusters.version;
 
 // ==== Filters ====
 
@@ -66,100 +73,48 @@ const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') =>
     return filteredByName || filteredByVersion || filteredByHost;
 };
 
-// ==== Simple selectors ====
+export function filterClusters(clusters: PreparedCluster[], filters: ClustersFilters) {
+    return clusters.filter((cluster) => {
+        return (
+            isMatchesByStatus(cluster, filters.status) &&
+            isMatchesByService(cluster, filters.service) &&
+            isMatchesByVersion(cluster, filters.version) &&
+            isMatchesByTextQuery(cluster, filters.clusterName)
+        );
+    });
+}
 
-export const selectLoadingFlag = (state: ClustersStateSlice) => state.clusters.loading;
-export const selectClustersList = (state: ClustersStateSlice) => state.clusters.list;
-export const selectClusterNameFilter = (state: ClustersStateSlice) => state.clusters.clusterName;
-export const selectStatusFilter = (state: ClustersStateSlice) => state.clusters.status;
-export const selectServiceFilter = (state: ClustersStateSlice) => state.clusters.service;
-export const selectVersionFilter = (state: ClustersStateSlice) => state.clusters.version;
+export function aggregateClustersInfo(clusters: PreparedCluster[]): ClusterDataAggregation {
+    let NodesTotal = 0,
+        NodesAlive = 0,
+        LoadAverage = 0,
+        NumberOfCpus = 0,
+        StorageUsed = 0,
+        StorageTotal = 0,
+        Tenants = 0;
+    const Hosts = new Set();
 
-// ==== Complex selectors ====
+    const filteredClusters = clusters.filter(({cluster}) => !cluster?.error);
 
-export const selectVersions: Selector<ClustersStateSlice, {value: string; content: string}[]> =
-    createSelector(selectClustersList, (clusters) => {
-        const uniqVersions = new Set<string>();
-
-        clusters
-            .map(({cluster}) => cluster?.Versions)
-            .forEach((clusterVersions) =>
-                clusterVersions?.forEach((version) => {
-                    uniqVersions.add(getMinorVersion(version));
-                }),
-            );
-
-        return Array.from(uniqVersions).map((version) => ({
-            value: version,
-            content: version,
-        }));
+    filteredClusters.forEach(({cluster, hosts = {}}) => {
+        NodesTotal += cluster?.NodesTotal || 0;
+        NodesAlive += cluster?.NodesAlive || 0;
+        Object.keys(hosts).forEach((host) => Hosts.add(host));
+        Tenants += Number(cluster?.Tenants) || 0;
+        LoadAverage += Number(cluster?.LoadAverage) || 0;
+        NumberOfCpus += cluster?.NumberOfCpus || 0;
+        StorageUsed += cluster?.StorageUsed ? Math.floor(parseInt(cluster.StorageUsed, 10)) : 0;
+        StorageTotal += cluster?.StorageTotal ? Math.floor(parseInt(cluster.StorageTotal, 10)) : 0;
     });
 
-export const selectFilteredClusters: Selector<ClustersStateSlice, PreparedCluster[]> =
-    createSelector(
-        [
-            selectClustersList,
-            selectClusterNameFilter,
-            selectStatusFilter,
-            selectServiceFilter,
-            selectVersionFilter,
-        ],
-        (clusters, textSearchQuery, selectedStatuses, selectedServices, selectedVersions) => {
-            return clusters.filter((cluster) => {
-                return (
-                    isMatchesByStatus(cluster, selectedStatuses) &&
-                    isMatchesByService(cluster, selectedServices) &&
-                    isMatchesByVersion(cluster, selectedVersions) &&
-                    isMatchesByTextQuery(cluster, textSearchQuery)
-                );
-            });
-        },
-    );
-
-export const selectClustersAggregation: Selector<ClustersStateSlice, ClusterDataAggregation> =
-    createSelector(selectFilteredClusters, (clusters) => {
-        let NodesTotal = 0,
-            NodesAlive = 0,
-            LoadAverage = 0,
-            NumberOfCpus = 0,
-            StorageUsed = 0,
-            StorageTotal = 0,
-            Tenants = 0;
-        const Hosts = new Set();
-
-        const filteredClusters = clusters.filter(({cluster}) => !cluster?.error);
-
-        filteredClusters.forEach(({cluster, hosts = {}}) => {
-            NodesTotal += cluster?.NodesTotal || 0;
-            NodesAlive += cluster?.NodesAlive || 0;
-            Object.keys(hosts).forEach((host) => Hosts.add(host));
-            Tenants += Number(cluster?.Tenants) || 0;
-            LoadAverage += Number(cluster?.LoadAverage) || 0;
-            NumberOfCpus += cluster?.NumberOfCpus || 0;
-            StorageUsed += cluster?.StorageUsed ? Math.floor(parseInt(cluster.StorageUsed, 10)) : 0;
-            StorageTotal += cluster?.StorageTotal
-                ? Math.floor(parseInt(cluster.StorageTotal, 10))
-                : 0;
-        });
-
-        return {
-            NodesTotal,
-            NodesAlive,
-            Hosts: Hosts.size,
-            Tenants,
-            LoadAverage,
-            NumberOfCpus,
-            StorageUsed,
-            StorageTotal,
-        };
-    });
-
-export const selectClusterInfo = createSelector(
-    selectClustersList,
-    (_: unknown, clusterName: string) => clusterName,
-    (clusters, clusterName) => {
-        const info: MetaExtendedClusterInfo =
-            clusters.filter((item) => item.name === clusterName)[0] || {};
-        return info;
-    },
-);
+    return {
+        NodesTotal,
+        NodesAlive,
+        Hosts: Hosts.size,
+        Tenants,
+        LoadAverage,
+        NumberOfCpus,
+        StorageUsed,
+        StorageTotal,
+    };
+}

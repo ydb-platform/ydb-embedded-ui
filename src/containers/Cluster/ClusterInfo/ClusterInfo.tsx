@@ -123,11 +123,12 @@ const getInfo = (
     }
 
     if (cluster.SystemTablets) {
+        const tablets = cluster.SystemTablets.slice(0).sort(compareTablets);
         info.push({
             label: i18n('tablets'),
             value: (
                 <div className={b('system-tablets')}>
-                    {cluster.SystemTablets.sort(compareTablets).map((tablet, tabletIndex) => (
+                    {tablets.map((tablet, tabletIndex) => (
                         <Tablet key={tabletIndex} tablet={tablet} />
                     ))}
                 </div>
@@ -226,7 +227,7 @@ export const ClusterInfo = ({
         }
 
         if (error) {
-            <ResponseError error={error} className={b('error')} />;
+            return <ResponseError error={error} className={b('error')} />;
         }
 
         return <InfoViewer dots={true} info={clusterInfo} />;

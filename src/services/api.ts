@@ -513,8 +513,10 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     }
 
     // used if not single cluster mode
-    getClustersList() {
-        return this.get<MetaClusters>(`${META_BACKEND || ''}/meta/clusters`, null);
+    getClustersList(_?: never, {signal}: {signal?: AbortSignal} = {}) {
+        return this.get<MetaClusters>(`${META_BACKEND || ''}/meta/clusters`, null, {
+            requestConfig: {signal},
+        });
     }
 }
 

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-duplicate-imports */
 declare module 'redux-location-state' {
-    import type {Middleware, Reducer, Store} from '@reduxjs/toolkit';
+    import type {Dispatch, Middleware, PayloadAction, Reducer, Store} from '@reduxjs/toolkit';
     import type {History, Location} from 'history';
+    import type {LOCATION_POP, LOCATION_PUSH} from 'redux-location-state/lib/constants';
 
     export function listenForHistoryChange(store: Store, history: History): void;
 
@@ -37,7 +38,14 @@ declare module 'redux-location-state' {
             location: Location,
         ) => {location: Location; shouldPush: boolean},
     ): {
-        locationMiddleware: Middleware;
+        locationMiddleware: Middleware<
+            {},
+            S,
+            Dispatch<
+                | PayloadAction<Location, typeof LOCATION_PUSH>
+                | PayloadAction<Location, typeof LOCATION_POP>
+            >
+        >;
     };
 }
 

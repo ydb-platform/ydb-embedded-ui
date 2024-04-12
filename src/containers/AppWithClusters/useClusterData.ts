@@ -1,28 +1,25 @@
+import React from 'react';
+
 import {useLocation} from 'react-router';
 
 import {parseQuery} from '../../routes';
-import {selectClusterInfo} from '../../store/reducers/clusters/selectors';
+import {clustersApi} from '../../store/reducers/clusters/clusters';
 import {getAdditionalNodesProps} from '../../utils/additionalProps';
 import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../utils/constants';
-import {useSetting, useTypedSelector} from '../../utils/hooks';
-import {useClustersList} from '../Clusters/useClustersList';
+import {useSetting} from '../../utils/hooks';
 
 export function useClusterData() {
-    useClustersList();
     const location = useLocation();
+    const {clusterName} = parseQuery(location);
 
-    const queryParams = parseQuery(location);
+    const {data} = clustersApi.useGetClustersListQuery(undefined);
 
-    const {clusterName} = queryParams;
+    const info = React.useMemo(() => {
+        const clusters = data || [];
+        return clusters.find((cluster) => cluster.name === clusterName);
+    }, [data, clusterName]);
 
-    const {
-        solomon: monitoring,
-        balancer,
-        versions,
-        cluster,
-    } = useTypedSelector((state) =>
-        selectClusterInfo(state, typeof clusterName === 'string' ? clusterName : ''),
-    );
+    const {solomon: monitoring, balancer, versions, cluster} = info || {};
 
     const [useClusterBalancerAsBackend] = useSetting<boolean>(USE_CLUSTER_BALANCER_AS_BACKEND_KEY);
 
