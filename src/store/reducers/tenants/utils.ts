@@ -42,7 +42,7 @@ const calculatePoolsStats = (
     }
 
     return poolsStats
-        .map<Partial<TenantPoolsStats | undefined>>((pool) => {
+        .map<TenantPoolsStats | undefined>((pool) => {
             if (pool.Name) {
                 const usage = Number(pool.Usage);
                 const limit = Number(pool.Threads);
