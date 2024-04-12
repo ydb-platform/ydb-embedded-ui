@@ -17,7 +17,7 @@ export function DiskPageTitle({entityName, status, id, className}: DiskPageTitle
     return (
         <div className={b(null, className)}>
             <span className={b('prefix')}>{entityName}</span>
-            <StatusIcon status={status} size="s" />
+            <StatusIcon className={b('icon')} status={status} size="s" />
             {id}
         </div>
     );

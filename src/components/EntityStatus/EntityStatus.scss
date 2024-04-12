@@ -9,6 +9,10 @@
 
     @include body-2-typography();
 
+    &__icon {
+        margin-right: 8px;
+    }
+
     &__clipboard-button {
         visibility: hidden;
 

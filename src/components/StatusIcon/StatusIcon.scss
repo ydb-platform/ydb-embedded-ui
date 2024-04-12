@@ -39,8 +39,6 @@
     &__status-icon {
         flex-shrink: 0;
 
-        margin-right: 8px;
-
         border-radius: 3px;
         &_size_xs {
             aspect-ratio: 1;
@@ -62,8 +60,8 @@
         }
 
         &_size_l {
-            width: 27px;
-            height: 27px;
+            width: 24px;
+            height: 24px;
         }
     }
 }

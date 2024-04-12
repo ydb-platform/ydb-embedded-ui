@@ -55,7 +55,7 @@ export function EntityStatus({
             return null;
         }
 
-        return <StatusIcon status={status} size={size} mode={mode} />;
+        return <StatusIcon className={b('icon')} status={status} size={size} mode={mode} />;
     };
     const renderStatusLink = (href: string) => {
         return (

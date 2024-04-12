@@ -14,7 +14,6 @@ import {mapDatabaseTypeToDBName} from '../../utils/schema';
 import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
 import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
 import {MetricsCards} from './MetricsCards/MetricsCards';
-import type {TenantMetrics} from './MetricsCards/MetricsCards';
 import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
 import {TenantStorage} from './TenantStorage/TenantStorage';
@@ -78,32 +77,16 @@ export function TenantOverview({
     const tenantType = mapDatabaseTypeToDBName(Type);
 
     const {
-        cpu,
         blobStorage,
         tabletStorage,
-        memory,
-        cpuUsage,
         blobStorageLimit,
         tabletStorageLimit,
-        memoryLimit,
+
+        poolsStats,
+        memoryStats,
+        blobStorageStats,
+        tabletStorageStats,
     } = calculateTenantMetrics(tenant);
-
-    // If there is table storage limit (data_size_hard_quota),
-    // use it for metric card instead of blob storage limit
-    // When datasize exceeds or equals to quota
-    // all write operations to the database are finished with error
-    const isTabletStorageLimitSet = tabletStorageLimit && tabletStorageLimit > 0;
-    const storageUsed = isTabletStorageLimitSet ? tabletStorage : blobStorage;
-    const storageLimit = isTabletStorageLimitSet ? tabletStorageLimit : blobStorageLimit;
-
-    const calculatedMetrics: TenantMetrics = {
-        memoryUsed: memory,
-        memoryLimit,
-        cpuUsed: cpu,
-        cpuUsage,
-        storageUsed,
-        storageLimit,
-    };
 
     const storageMetrics = {
         blobStorageUsed: blobStorage,
@@ -170,7 +153,10 @@ export function TenantOverview({
                     {additionalTenantProps?.getMonitoringLink?.(Name, Type)}
                 </div>
                 <MetricsCards
-                    metrics={calculatedMetrics}
+                    poolsCpuStats={poolsStats}
+                    memoryStats={memoryStats}
+                    blobStorageStats={blobStorageStats}
+                    tabletStorageStats={tabletStorageStats}
                     issuesStatistics={issuesStatistics}
                     selfCheckResult={selfCheckResult}
                     fetchHealthcheck={fetchHealthcheck}

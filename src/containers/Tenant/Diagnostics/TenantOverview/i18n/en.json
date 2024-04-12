@@ -21,6 +21,10 @@
   "by-usage": "by usage",
   "by-size": "by size",
 
+  "cards.cpu-label": "CPU",
+  "cards.storage-label": "Storage",
+  "cards.memory-label": "Memory",
+
   "charts.queries-per-second": "Queries per second",
   "charts.transaction-latency": "Transactions latencies {{percentile}}",
   "charts.cpu-usage": "CPU usage by pool",
