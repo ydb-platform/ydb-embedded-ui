@@ -23,13 +23,6 @@ export interface ClustersFilters {
     clusterName: string;
 }
 
-export interface ClustersState extends ClustersFilters {
-    loading: boolean;
-    error?: unknown;
-
-    list: PreparedCluster[];
-}
-
 export interface ClustersStateSlice {
     clusters: ClustersFilters;
 }

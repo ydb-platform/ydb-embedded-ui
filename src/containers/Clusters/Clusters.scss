@@ -175,6 +175,7 @@
     }
 
     &__error {
+        margin-left: 15px;
         @include mixins.body-2-typography();
     }
 }
