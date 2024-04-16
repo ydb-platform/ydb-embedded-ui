@@ -4,6 +4,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 
 import {Icon} from '../../../../components/Icon';
+import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {EColumnCodec} from '../../../../types/api/schema';
 import type {
     EPathType,
@@ -13,7 +14,6 @@ import type {
 } from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {isColumnEntityType, isExternalTable, isRowTable, isTableType} from '../../utils/schema';
 

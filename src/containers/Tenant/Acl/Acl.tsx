@@ -122,7 +122,7 @@ export const Acl = () => {
     }
 
     if (!loading && !acl && !owner) {
-        return <>{i18n('acl.empty')}</>;
+        return <React.Fragment>{i18n('acl.empty')}</React.Fragment>;
     }
 
     return (
