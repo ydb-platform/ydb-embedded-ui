@@ -85,6 +85,20 @@ const paramSetup: ParamSetup = {
             stateKey: 'partitions.selectedConsumer',
         },
     },
+    '/cluster/storage': {
+        storageType: {
+            stateKey: 'storage.type',
+        },
+        storageVisibleType: {
+            stateKey: 'storage.visible',
+        },
+        storageNodesUptime: {
+            stateKey: 'storage.nodesUptimeFilter',
+        },
+        storageFilter: {
+            stateKey: 'storage.filter',
+        },
+    },
 };
 
 function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'query'>): S {
