@@ -1,3 +1,4 @@
+import {createSelector} from '@reduxjs/toolkit';
 import type {Reducer} from '@reduxjs/toolkit';
 
 import type {
@@ -48,7 +49,9 @@ export function getNodesList() {
     });
 }
 
-export const selectNodesMap = (state: NodesListRootStateSlice) =>
-    prepareNodesMap(state.nodesList.data);
+export const selectNodesMap = createSelector(
+    (state: NodesListRootStateSlice) => state.nodesList.data,
+    (nodes) => prepareNodesMap(nodes),
+);
 
 export default nodesList;

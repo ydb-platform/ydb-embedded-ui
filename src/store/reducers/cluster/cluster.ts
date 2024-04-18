@@ -1,131 +1,94 @@
-import type {Dispatch, Reducer} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
+import type {Dispatch, PayloadAction} from '@reduxjs/toolkit';
 
 import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
+import type {TClusterInfo} from '../../../types/api/cluster';
 import {DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
-import {createApiRequest, createRequestActionTypes} from '../../utils';
+import {api} from '../api';
 
-import type {ClusterAction, ClusterState} from './types';
+import type {ClusterGroupsStats, ClusterState} from './types';
 import {createSelectClusterGroupsQuery, parseGroupsStatsQueryResponse} from './utils';
-
-const SET_DEFAULT_CLUSTER_TAB = 'cluster/SET_DEFAULT_CLUSTER_TAB';
-
-export const FETCH_CLUSTER = createRequestActionTypes('cluster', 'FETCH_CLUSTER');
 
 const defaultClusterTabLS = localStorage.getItem(DEFAULT_CLUSTER_TAB_KEY);
 
-let defaultClusterTab;
+let defaultClusterTab: ClusterTab;
 if (isClusterTab(defaultClusterTabLS)) {
     defaultClusterTab = defaultClusterTabLS;
 } else {
     defaultClusterTab = clusterTabsIds.overview;
 }
 
-const initialState = {loading: true, wasLoaded: false, defaultClusterTab};
-
-const cluster: Reducer<ClusterState, ClusterAction> = (state = initialState, action) => {
-    switch (action.type) {
-        case FETCH_CLUSTER.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-            };
-        }
-        case FETCH_CLUSTER.SUCCESS: {
-            const {clusterData, groupsStats} = action.data;
-
-            return {
-                ...state,
-                data: clusterData,
-                groupsStats,
-                loading: false,
-                wasLoaded: true,
-                error: undefined,
-            };
-        }
-        case FETCH_CLUSTER.FAILURE: {
-            if (action.error?.isCancelled) {
-                return state;
-            }
-
-            return {
-                ...state,
-                error: action.error,
-                loading: false,
-            };
-        }
-        case SET_DEFAULT_CLUSTER_TAB: {
-            return {
-                ...state,
-                defaultClusterTab: action.data,
-            };
-        }
-        default:
-            return state;
-    }
+const initialState: ClusterState = {
+    defaultClusterTab,
 };
-
-export function setDefaultClusterTab(tab: ClusterTab) {
-    return {
-        type: SET_DEFAULT_CLUSTER_TAB,
-        data: tab,
-    } as const;
-}
+const clusterSlice = createSlice({
+    name: 'cluster',
+    initialState,
+    reducers: {
+        setDefaultClusterTab(state, action: PayloadAction<ClusterTab>) {
+            state.defaultClusterTab = action.payload;
+        },
+    },
+});
 
 export function updateDefaultClusterTab(tab: string) {
     return (dispatch: Dispatch) => {
         if (isClusterTab(tab)) {
             localStorage.setItem(DEFAULT_CLUSTER_TAB_KEY, tab);
-            dispatch(setDefaultClusterTab(tab));
+            dispatch(clusterSlice.actions.setDefaultClusterTab(tab));
         }
     };
 }
 
-export function getClusterInfo(clusterName?: string) {
-    async function requestClusterData() {
-        // Error here is handled by createApiRequest
-        const clusterData = await window.api.getClusterInfo(clusterName);
+export default clusterSlice.reducer;
 
-        try {
-            const clusterRoot = clusterData.Domain;
+export const clusterApi = api.injectEndpoints({
+    endpoints: (builder) => ({
+        getClusterInfo: builder.query({
+            queryFn: async (
+                clusterName = '',
+                {signal},
+            ): Promise<
+                | {data: {clusterData: TClusterInfo; groupsStats?: ClusterGroupsStats}}
+                | {error: unknown}
+            > => {
+                try {
+                    const clusterData = await window.api.getClusterInfo(clusterName, {signal});
+                    const clusterRoot = clusterData.Domain;
 
-            // Without domain we cannot get stats from system tables
-            if (!clusterRoot) {
-                return {
-                    clusterData,
-                };
-            }
+                    // Without domain we cannot get stats from system tables
+                    if (!clusterRoot) {
+                        return {data: {clusterData}};
+                    }
 
-            const query = createSelectClusterGroupsQuery(clusterRoot);
+                    try {
+                        const query = createSelectClusterGroupsQuery(clusterRoot);
 
-            // Normally query request should be fulfilled within 300-400ms even on very big clusters
-            // Table with stats is supposed to be very small (less than 10 rows)
-            // So we batch this request with cluster request to prevent possible layout shifts, if data is missing
-            const groupsStatsResponse = await window.api.sendQuery({
-                schema: 'modern',
-                query: query,
-                database: clusterRoot,
-                action: 'execute-scan',
-            });
+                        // Normally query request should be fulfilled within 300-400ms even on very big clusters
+                        // Table with stats is supposed to be very small (less than 10 rows)
+                        // So we batch this request with cluster request to prevent possible layout shifts, if data is missing
+                        const groupsStatsResponse = await window.api.sendQuery({
+                            schema: 'modern',
+                            query: query,
+                            database: clusterRoot,
+                            action: 'execute-scan',
+                        });
 
-            return {
-                clusterData,
-                groupsStats: parseGroupsStatsQueryResponse(groupsStatsResponse),
-            };
-        } catch {
-            // Doesn't return groups stats on error
-            // It could happen if user doesn't have access rights
-            // Or there are no system tables in cluster root
-            return {
-                clusterData,
-            };
-        }
-    }
-
-    return createApiRequest({
-        request: requestClusterData(),
-        actions: FETCH_CLUSTER,
-    });
-}
-
-export default cluster;
+                        return {
+                            data: {
+                                clusterData,
+                                groupsStats: parseGroupsStatsQueryResponse(groupsStatsResponse),
+                            },
+                        };
+                    } catch {
+                        return {data: {clusterData}};
+                    }
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+});

@@ -1,6 +1,6 @@
 import groupBy from 'lodash/groupBy';
 
-import type {PreparedClusterNode} from '../../store/reducers/clusterNodes/types';
+import type {PreparedClusterNode} from '../../store/reducers/clusterNodes/clusterNodes';
 import type {VersionToColorMap} from '../../types/versions';
 import {getMinorVersion, parseNodesToVersionsValues} from '../../utils/versions';
 

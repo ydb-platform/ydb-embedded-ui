@@ -1,27 +1,13 @@
 import type {OrderType} from '@gravity-ui/react-data-table';
 
-import type {IResponseError} from '../../../types/api/error';
 import type {TSystemStateInfo} from '../../../types/api/nodes';
 import type {EVersion, TStorageGroupInfo} from '../../../types/api/storage';
 import type {ValueOf} from '../../../types/common';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {StorageSortValue} from '../../../utils/storage';
-import type {ApiRequestAction} from '../../utils';
 
 import type {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
-import type {
-    FETCH_STORAGE,
-    setDataWasNotLoaded,
-    setGroupsSortParams,
-    setInitialState,
-    setNodesSortParams,
-    setNodesUptimeFilter,
-    setStorageTextFilter,
-    setStorageType,
-    setUsageFilter,
-    setVisibleEntities,
-} from './storage';
 
 export type VisibleEntities = ValueOf<typeof VISIBLE_ENTITIES>;
 export type StorageType = ValueOf<typeof STORAGE_TYPES>;
@@ -82,22 +68,15 @@ export interface StorageApiRequestParams extends StorageSortAndFilterParams {
 }
 
 export interface StorageState {
-    loading: boolean;
-    wasLoaded: boolean;
     filter: string;
     usageFilter: string[];
     visible: VisibleEntities;
-    nodesUptimeFilter: NodesUptimeFilterValues;
+    uptimeFilter: NodesUptimeFilterValues;
     groupsSortValue?: StorageSortValue;
     groupsSortOrder?: OrderType;
     nodesSortValue?: NodesSortValue;
     nodesSortOrder?: OrderType;
     type: StorageType;
-    nodes?: PreparedStorageNode[];
-    groups?: PreparedStorageGroup[];
-    found?: number;
-    total?: number;
-    error?: IResponseError;
 }
 
 export interface PreparedStorageResponse {
@@ -106,24 +85,6 @@ export interface PreparedStorageResponse {
     found: number | undefined;
     total: number | undefined;
 }
-
-type GetStorageInfoApiRequestAction = ApiRequestAction<
-    typeof FETCH_STORAGE,
-    PreparedStorageResponse,
-    IResponseError
->;
-
-export type StorageAction =
-    | GetStorageInfoApiRequestAction
-    | ReturnType<typeof setInitialState>
-    | ReturnType<typeof setStorageType>
-    | ReturnType<typeof setStorageTextFilter>
-    | ReturnType<typeof setUsageFilter>
-    | ReturnType<typeof setVisibleEntities>
-    | ReturnType<typeof setNodesUptimeFilter>
-    | ReturnType<typeof setDataWasNotLoaded>
-    | ReturnType<typeof setNodesSortParams>
-    | ReturnType<typeof setGroupsSortParams>;
 
 export interface StorageStateSlice {
     storage: StorageState;

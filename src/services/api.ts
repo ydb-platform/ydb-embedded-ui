@@ -47,20 +47,21 @@ import {settingsManager} from './settings';
 
 type AxiosOptions = {
     concurrentId?: string;
+    signal?: AbortSignal;
 };
 
 export class YdbEmbeddedAPI extends AxiosWrapper {
     getPath(path: string) {
         return `${BACKEND ?? ''}${path}`;
     }
-    getClusterInfo(clusterName?: string, {concurrentId}: AxiosOptions = {}) {
+    getClusterInfo(clusterName?: string, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TClusterInfo>(
             this.getPath('/viewer/json/cluster'),
             {
                 name: clusterName,
                 tablets: true,
             },
-            {concurrentId: concurrentId || `getClusterInfo`},
+            {concurrentId: concurrentId || `getClusterInfo`, requestConfig: {signal}},
         );
     }
     getClusterNodes({concurrentId}: AxiosOptions = {}) {
@@ -102,14 +103,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             sortValue,
             ...params
         }: NodesApiRequestParams,
-        {concurrentId}: AxiosOptions = {},
+        {concurrentId, signal}: AxiosOptions = {},
     ) {
         const sort = prepareSortValue(sortValue, sortOrder);
 
         return this.get<TNodesInfo>(
             this.getPath('/viewer/json/nodes?enums=true'),
             {with: visibleEntities, type, tablets, sort, ...params},
-            {concurrentId},
+            {concurrentId, requestConfig: {signal}},
         );
     }
     /** @deprecated use getNodes instead */
@@ -521,13 +522,13 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
 }
 
 export class YdbWebVersionAPI extends YdbEmbeddedAPI {
-    getClusterInfo(clusterName: string) {
+    getClusterInfo(clusterName: string, {signal}: AxiosOptions = {}) {
         return this.get<MetaCluster>(
             `${META_BACKEND || ''}/meta/cluster`,
             {
                 name: clusterName,
             },
-            {concurrentId: `getCluster${clusterName}`},
+            {concurrentId: `getCluster${clusterName}`, requestConfig: {signal}},
         ).then(parseMetaCluster);
     }
 

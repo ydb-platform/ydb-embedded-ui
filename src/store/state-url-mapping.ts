@@ -89,14 +89,22 @@ const paramSetup: ParamSetup = {
         storageType: {
             stateKey: 'storage.type',
         },
-        storageVisibleType: {
+        visible: {
             stateKey: 'storage.visible',
         },
-        storageNodesUptime: {
-            stateKey: 'storage.nodesUptimeFilter',
+        uptimeFilter: {
+            stateKey: 'storage.uptimeFilter',
         },
-        storageFilter: {
+        search: {
             stateKey: 'storage.filter',
+        },
+    },
+    '/cluster/nodes': {
+        uptimeFilter: {
+            stateKey: 'nodes.uptimeFilter',
+        },
+        search: {
+            stateKey: 'nodes.searchValue',
         },
     },
 };

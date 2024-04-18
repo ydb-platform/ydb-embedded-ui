@@ -1,7 +1,7 @@
 import {Progress} from '@gravity-ui/uikit';
 
 import {ClipboardButton} from '../../../components/ClipboardButton';
-import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
+import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/clusterNodes';
 import type {VersionValue} from '../../../types/versions';
 import {cn} from '../../../utils/cn';
 import type {GroupedNodesItem} from '../types';

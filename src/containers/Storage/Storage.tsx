@@ -7,25 +7,22 @@ import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
 import {
-    selectEntitiesCount,
-    selectFilteredGroups,
-    selectFilteredNodes,
+    filterGroups,
+    filterNodes,
+    getUsageFilterOptions,
     selectGroupsSortParams,
     selectNodesSortParams,
-    selectUsageFilterOptions,
 } from '../../store/reducers/storage/selectors';
 import {
-    getStorageGroupsInfo,
-    getStorageNodesInfo,
-    setDataWasNotLoaded,
     setGroupsSortParams,
     setInitialState,
     setNodesSortParams,
-    setNodesUptimeFilter,
     setStorageTextFilter,
     setStorageType,
+    setUptimeFilter,
     setUsageFilter,
     setVisibleEntities,
+    storageApi,
 } from '../../store/reducers/storage/storage';
 import type {
     StorageSortParams,
@@ -33,9 +30,8 @@ import type {
     VisibleEntities,
 } from '../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {DEFAULT_POLLING_INTERVAL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
-    useAutofetcher,
     useNodesRequestParams,
     useStorageRequestParams,
     useTableSort,
@@ -62,26 +58,67 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const {
-        loading,
-        wasLoaded,
-        error,
         type,
         visible: visibleEntities,
         filter,
         usageFilter,
-        nodesUptimeFilter,
+        uptimeFilter,
     } = useTypedSelector((state) => state.storage);
-    const storageNodes = useTypedSelector(selectFilteredNodes);
-    const storageGroups = useTypedSelector(selectFilteredGroups);
-    const entitiesCount = useTypedSelector(selectEntitiesCount);
+
     const nodesMap = useTypedSelector(selectNodesMap);
-    const usageFilterOptions = useTypedSelector(selectUsageFilterOptions);
     const nodesSortParams = useTypedSelector(selectNodesSortParams);
     const groupsSortParams = useTypedSelector(selectGroupsSortParams);
 
     // Do not display Nodes table for Node page (NodeId present)
     const isNodePage = nodeId !== undefined;
     const storageType = isNodePage ? STORAGE_TYPES.groups : type;
+
+    const nodesRequestParams = useNodesRequestParams({
+        filter,
+        nodesUptimeFilter: uptimeFilter,
+        ...nodesSortParams,
+    });
+    const storageRequestParams = useStorageRequestParams({
+        filter,
+        ...groupsSortParams,
+    });
+
+    const autoRefreshEnabled = tenant ? autorefresh : true;
+
+    const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
+        {tenant, visibleEntities, ...nodesRequestParams},
+        {
+            skip: storageType !== STORAGE_TYPES.nodes,
+            pollingInterval: autoRefreshEnabled ? DEFAULT_POLLING_INTERVAL : 0,
+        },
+    );
+    const groupsQuery = storageApi.useGetStorageGroupsInfoQuery(
+        {tenant, visibleEntities, nodeId, ...storageRequestParams},
+        {
+            skip: storageType !== STORAGE_TYPES.groups,
+            pollingInterval: autoRefreshEnabled ? DEFAULT_POLLING_INTERVAL : 0,
+        },
+    );
+
+    const {currentData, isFetching, error} =
+        storageType === STORAGE_TYPES.nodes ? nodesQuery : groupsQuery;
+
+    const {currentData: {nodes = []} = {}} = nodesQuery;
+    const {currentData: {groups = []} = {}} = groupsQuery;
+    const {nodes: _, groups: __, ...entitiesCount} = currentData ?? {found: 0, total: 0};
+
+    const isLoading = currentData === undefined && isFetching;
+
+    const storageNodes = React.useMemo(
+        () => filterNodes(nodes, filter, uptimeFilter),
+        [filter, nodes, uptimeFilter],
+    );
+    const storageGroups = React.useMemo(
+        () => filterGroups(groups, filter, usageFilter),
+        [filter, groups, usageFilter],
+    );
+
+    const usageFilterOptions = React.useMemo(() => getUsageFilterOptions(groups), [groups]);
 
     React.useEffect(() => {
         return () => {
@@ -90,52 +127,12 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
         };
     }, [dispatch]);
 
-    const nodesRequestParams = useNodesRequestParams({
-        filter,
-        nodesUptimeFilter,
-        ...nodesSortParams,
-    });
-    const storageRequestParams = useStorageRequestParams({
-        filter,
-        ...groupsSortParams,
-    });
-
     const [nodesSort, handleNodesSort] = useTableSort(nodesSortParams, (params) =>
         dispatch(setNodesSortParams(params as NodesSortParams)),
     );
     const [groupsSort, handleGroupsSort] = useTableSort(groupsSortParams, (params) =>
         dispatch(setGroupsSortParams(params as StorageSortParams)),
     );
-
-    const fetchData = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-
-            const nodesParams = nodesRequestParams || {};
-            const storageParams = storageRequestParams || {};
-
-            if (storageType === STORAGE_TYPES.nodes) {
-                dispatch(getStorageNodesInfo({tenant, visibleEntities, ...nodesParams}));
-            } else {
-                dispatch(getStorageGroupsInfo({tenant, visibleEntities, nodeId, ...storageParams}));
-            }
-        },
-        [
-            dispatch,
-            tenant,
-            nodeId,
-            visibleEntities,
-            storageType,
-            storageRequestParams,
-            nodesRequestParams,
-        ],
-    );
-
-    const autorefreshEnabled = tenant ? autorefresh : true;
-
-    useAutofetcher(fetchData, [fetchData], autorefreshEnabled);
 
     const handleUsageFilterChange = (value: string[]) => {
         dispatch(setUsageFilter(value));
@@ -154,7 +151,7 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
     };
 
     const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
-        dispatch(setNodesUptimeFilter(value));
+        dispatch(setUptimeFilter(value));
     };
 
     const handleShowAllNodes = () => {
@@ -167,6 +164,7 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
             <React.Fragment>
                 {storageType === STORAGE_TYPES.groups && (
                     <StorageGroups
+                        key="groups"
                         visibleEntities={visibleEntities}
                         data={storageGroups}
                         tableSettings={DEFAULT_TABLE_SETTINGS}
@@ -178,8 +176,9 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
                 )}
                 {storageType === STORAGE_TYPES.nodes && (
                     <StorageNodes
+                        key="nodes"
                         visibleEntities={visibleEntities}
-                        nodesUptimeFilter={nodesUptimeFilter}
+                        nodesUptimeFilter={uptimeFilter}
                         data={storageNodes}
                         tableSettings={DEFAULT_TABLE_SETTINGS}
                         onShowAll={handleShowAllNodes}
@@ -202,7 +201,7 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
                 handleStorageTypeChange={handleStorageTypeChange}
                 visibleEntities={visibleEntities}
                 handleVisibleEntitiesChange={handleGroupVisibilityChange}
-                nodesUptimeFilter={nodesUptimeFilter}
+                nodesUptimeFilter={uptimeFilter}
                 handleNodesUptimeFilterChange={handleUptimeFilterChange}
                 groupsUsageFilter={usageFilter}
                 groupsUsageFilterOptions={usageFilterOptions}
@@ -213,13 +212,13 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
                         : storageNodes.length
                 }
                 entitiesCountTotal={entitiesCount.total}
-                entitiesLoading={loading && !wasLoaded}
+                entitiesLoading={isLoading}
             />
         );
     };
 
     if (error) {
-        if (error.status === 403) {
+        if ((error as any).status === 403) {
             return <AccessDenied position="left" />;
         }
 
@@ -229,7 +228,7 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            <TableWithControlsLayout.Table loading={loading && !wasLoaded} className={b('table')}>
+            <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
                 {renderDataTable()}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>

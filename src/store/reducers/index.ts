@@ -3,7 +3,6 @@ import {combineReducers} from '@reduxjs/toolkit';
 import {api} from './api';
 import authentication from './authentication/authentication';
 import cluster from './cluster/cluster';
-import clusterNodes from './clusterNodes/clusterNodes';
 import clusters from './clusters/clusters';
 import describe from './describe';
 import executeQuery from './executeQuery';
@@ -55,7 +54,6 @@ export const rootReducer = {
     topNodesByCpu,
     topNodesByMemory,
     cluster,
-    clusterNodes,
     tenant,
     storage,
     topStorageGroups,

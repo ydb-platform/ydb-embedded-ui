@@ -8,6 +8,7 @@ import {Link} from 'react-router-dom';
 
 import {Loader} from '../../../components/Loader';
 import routes, {createHref} from '../../../routes';
+import {api} from '../../../store/reducers/api';
 import {disableAutorefresh, enableAutorefresh} from '../../../store/reducers/schema/schema';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
@@ -89,6 +90,7 @@ function Diagnostics(props: DiagnosticsProps) {
 
     const onAutorefreshToggle = (value: boolean) => {
         if (value) {
+            dispatch(api.util.invalidateTags(['All']));
             dispatch(enableAutorefresh());
         } else {
             dispatch(disableAutorefresh());

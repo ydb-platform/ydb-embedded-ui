@@ -5,21 +5,10 @@ import type {
     TTabletStateInfo as TComputeTabletStateInfo,
 } from '../../../types/api/compute';
 import type {EFlag} from '../../../types/api/enums';
-import type {IResponseError} from '../../../types/api/error';
 import type {TEndpoint, TPoolStats} from '../../../types/api/nodes';
 import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
 import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
-import type {ApiRequestAction} from '../../utils';
 import type {VisibleEntities} from '../storage/types';
-
-import type {
-    FETCH_NODES,
-    resetNodesState,
-    setDataWasNotLoaded,
-    setNodesUptimeFilter,
-    setSearchValue,
-    setSort,
-} from './nodes';
 
 // Since nodes from different endpoints can have different types,
 // This type describes fields, that are expected by tables with nodes
@@ -52,15 +41,10 @@ export interface NodesPreparedEntity {
 }
 
 export interface NodesState {
-    loading: boolean;
-    wasLoaded: boolean;
-    nodesUptimeFilter: NodesUptimeFilterValues;
+    uptimeFilter: NodesUptimeFilterValues;
     searchValue: string;
     sortValue?: NodesSortValue;
     sortOrder?: OrderType;
-    data?: NodesPreparedEntity[];
-    totalNodes?: number;
-    error?: IResponseError;
 }
 
 export type NodeType = 'static' | 'dynamic' | 'any';
@@ -99,22 +83,6 @@ export interface NodesHandledResponse {
     TotalNodes: number;
     FoundNodes?: number;
 }
-
-type NodesApiRequestAction = ApiRequestAction<
-    typeof FETCH_NODES,
-    NodesHandledResponse,
-    IResponseError
->;
-
-export type NodesAction =
-    | NodesApiRequestAction
-    | (
-          | ReturnType<typeof setDataWasNotLoaded>
-          | ReturnType<typeof setNodesUptimeFilter>
-          | ReturnType<typeof setSearchValue>
-          | ReturnType<typeof setSort>
-          | ReturnType<typeof resetNodesState>
-      );
 
 export interface NodesStateSlice {
     nodes: NodesState;

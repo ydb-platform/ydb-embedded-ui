@@ -1,66 +1,30 @@
-import type {Reducer} from '@reduxjs/toolkit';
-
+import type {TSystemStateInfo} from '../../../types/api/nodes';
 import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
-import {createApiRequest, createRequestActionTypes} from '../../utils';
+import {api} from '../api';
 
-import type {ClusterNodesAction, ClusterNodesState, PreparedClusterNode} from './types';
-
-export const FETCH_CLUSTER_NODES = createRequestActionTypes('cluster', 'FETCH_CLUSTER_NODES');
-
-const initialState = {loading: false, wasLoaded: false};
-
-const clusterNodes: Reducer<ClusterNodesState, ClusterNodesAction> = (
-    state = initialState,
-    action,
-) => {
-    switch (action.type) {
-        case FETCH_CLUSTER_NODES.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-            };
-        }
-        case FETCH_CLUSTER_NODES.SUCCESS: {
-            const {data = []} = action;
-
-            return {
-                ...state,
-                nodes: data,
-                loading: false,
-                wasLoaded: true,
-                error: undefined,
-            };
-        }
-        case FETCH_CLUSTER_NODES.FAILURE: {
-            if (action.error?.isCancelled) {
-                return state;
-            }
-
-            return {
-                ...state,
-                error: action.error,
-                loading: false,
-            };
-        }
-        default:
-            return state;
-    }
-};
-
-export function getClusterNodes() {
-    return createApiRequest({
-        request: window.api.getClusterNodes(),
-        actions: FETCH_CLUSTER_NODES,
-        dataHandler: (data): PreparedClusterNode[] => {
-            const {SystemStateInfo: nodes = []} = data;
-            return nodes.map((node) => {
-                return {
-                    ...node,
-                    uptime: calcUptime(node.StartTime),
-                };
-            });
-        },
-    });
+export interface PreparedClusterNode extends TSystemStateInfo {
+    uptime: string;
 }
 
-export default clusterNodes;
+export const clusterNodesApi = api.injectEndpoints({
+    endpoints: (builder) => ({
+        getClusterNodes: builder.query({
+            queryFn: async () => {
+                try {
+                    const result = await window.api.getClusterNodes();
+                    const {SystemStateInfo: nodes = []} = result;
+                    const data: PreparedClusterNode[] = nodes.map((node) => {
+                        return {
+                            ...node,
+                            uptime: calcUptime(node.StartTime),
+                        };
+                    });
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+});

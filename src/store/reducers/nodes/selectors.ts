@@ -1,6 +1,3 @@
-import type {Selector} from '@reduxjs/toolkit';
-import {createSelector} from '@reduxjs/toolkit';
-
 import {EFlag} from '../../../types/api/enums';
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
 import {calcUptimeInSeconds} from '../../../utils/dataFormatters/dataFormatters';
@@ -9,7 +6,7 @@ import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {ProblemFilterValues} from '../settings/settings';
 import type {ProblemFilterValue} from '../settings/types';
 
-import type {NodesPreparedEntity, NodesStateSlice} from './types';
+import type {NodesPreparedEntity} from './types';
 
 // ==== Filters ====
 
@@ -49,27 +46,21 @@ const filterNodesBySearchValue = (nodesList: NodesPreparedEntity[] = [], searchV
     });
 };
 
-// ==== Simple selectors ====
+export function filterNodes(
+    nodesList: NodesPreparedEntity[] = [],
+    {
+        uptimeFilter,
+        searchValue,
+        problemFilter,
+    }: {
+        uptimeFilter: NodesUptimeFilterValues;
+        searchValue: string;
+        problemFilter: ProblemFilterValue;
+    },
+) {
+    let result = filterNodesByUptime(nodesList, uptimeFilter);
+    result = filterNodesByProblemsStatus(result, problemFilter);
+    result = filterNodesBySearchValue(result, searchValue);
 
-const selectNodesUptimeFilter = (state: NodesStateSlice) => state.nodes.nodesUptimeFilter;
-const selectSearchValue = (state: NodesStateSlice) => state.nodes.searchValue;
-const selectNodesList = (state: NodesStateSlice) => state.nodes.data;
-
-// ==== Complex selectors ====
-
-export const selectFilteredNodes: Selector<NodesStateSlice, NodesPreparedEntity[] | undefined> =
-    createSelector(
-        [
-            selectNodesList,
-            selectNodesUptimeFilter,
-            selectSearchValue,
-            (state) => state.settings.problemFilter,
-        ],
-        (nodesList, uptimeFilter, searchValue, problemFilter) => {
-            let result = filterNodesByUptime(nodesList, uptimeFilter);
-            result = filterNodesByProblemsStatus(result, problemFilter);
-            result = filterNodesBySearchValue(result, searchValue);
-
-            return result;
-        },
-    );
+    return result;
+}

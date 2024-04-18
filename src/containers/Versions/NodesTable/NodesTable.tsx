@@ -4,7 +4,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {PoolsGraph} from '../../../components/PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
-import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
+import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/clusterNodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {formatBytes} from '../../../utils/dataFormatters/dataFormatters';
 import {isUnavailableNode} from '../../../utils/nodes';

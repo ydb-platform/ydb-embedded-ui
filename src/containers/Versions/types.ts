@@ -1,4 +1,4 @@
-import type {PreparedClusterNode} from '../../store/reducers/clusterNodes/types';
+import type {PreparedClusterNode} from '../../store/reducers/clusterNodes/clusterNodes';
 import type {VersionValue} from '../../types/versions';
 
 export interface GroupedNodesItem {
