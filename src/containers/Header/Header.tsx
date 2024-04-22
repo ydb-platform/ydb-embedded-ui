@@ -40,7 +40,7 @@ function Header({mainPage}: HeaderProps) {
     const queryParams = parseQuery(location);
 
     const clusterNameFromQuery = queryParams.clusterName?.toString();
-    const {data: {clusterData: data} = {}} =
+    const {currentData: {clusterData: data} = {}} =
         clusterApi.useGetClusterInfoQuery(clusterNameFromQuery);
 
     const clusterNameFinal = data?.Name || clusterNameFromQuery;

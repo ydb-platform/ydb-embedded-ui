@@ -6,6 +6,7 @@ import {Loader} from '../../components/Loader';
 import {clusterNodesApi} from '../../store/reducers/clusterNodes/clusterNodes';
 import type {VersionToColorMap} from '../../types/versions';
 import {cn} from '../../utils/cn';
+import {DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
 
 import {GroupedNodesTree} from './GroupedNodesTree/GroupedNodesTree';
 import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
@@ -22,7 +23,7 @@ interface VersionsProps {
 export const Versions = ({versionToColor}: VersionsProps) => {
     const {data: nodes = [], isLoading: isNodesLoading} = clusterNodesApi.useGetClusterNodesQuery(
         undefined,
-        {pollingInterval: 30_000},
+        {pollingInterval: DEFAULT_POLLING_INTERVAL},
     );
 
     const [groupByValue, setGroupByValue] = React.useState<GroupByValue>(GroupByValue.VERSION);
