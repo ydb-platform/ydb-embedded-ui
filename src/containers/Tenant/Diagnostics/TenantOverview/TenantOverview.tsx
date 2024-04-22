@@ -47,11 +47,10 @@ export function TenantOverview({
         issueTrees,
         issuesStatistics,
         selfCheckResult,
-        fetchHealthcheck,
         loading: healthcheckLoading,
-        wasLoaded: healthCheckWasLoaded,
         error: healthcheckError,
-    } = useHealthcheck(tenantName);
+        refetch: fetchHealthcheck,
+    } = useHealthcheck(tenantName, {autorefresh});
 
     const fetchTenant = React.useCallback(
         (isBackground = true) => {
@@ -66,9 +65,8 @@ export function TenantOverview({
     useAutofetcher(
         (isBackground) => {
             fetchTenant(isBackground);
-            fetchHealthcheck(isBackground);
         },
-        [fetchTenant, fetchHealthcheck],
+        [fetchTenant],
         autorefresh,
     );
 
@@ -125,7 +123,6 @@ export function TenantOverview({
                     <HealthcheckDetails
                         issueTrees={issueTrees}
                         loading={healthcheckLoading}
-                        wasLoaded={healthCheckWasLoaded}
                         error={healthcheckError}
                     />
                 );
@@ -161,7 +158,6 @@ export function TenantOverview({
                     selfCheckResult={selfCheckResult}
                     fetchHealthcheck={fetchHealthcheck}
                     healthcheckLoading={healthcheckLoading}
-                    healthCheckWasLoaded={healthCheckWasLoaded}
                     healthcheckError={healthcheckError}
                 />
             </div>

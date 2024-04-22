@@ -1,68 +1,26 @@
 import {createSelector} from '@reduxjs/toolkit';
-import type {Reducer, Selector} from '@reduxjs/toolkit';
 
 import type {IssueLog, StatusFlag} from '../../../types/api/healthcheck';
-import {createApiRequest, createRequestActionTypes} from '../../utils';
+import type {RootState} from '../../defaultStore';
+import {api} from '../api';
 
-import type {
-    HealthCheckInfoAction,
-    HealthcheckInfoRootStateSlice,
-    HealthcheckInfoState,
-    IssuesTree,
-} from './types';
+import type {IssuesTree} from './types';
 
-export const FETCH_HEALTHCHECK = createRequestActionTypes('cluster', 'FETCH_HEALTHCHECK');
-
-const SET_DATA_WAS_NOT_LOADED = 'healthcheckInfo/SET_DATA_WAS_NOT_LOADED';
-
-const initialState = {loading: false, wasLoaded: false};
-
-const healthcheckInfo: Reducer<HealthcheckInfoState, HealthCheckInfoAction> = function (
-    state = initialState,
-    action,
-) {
-    switch (action.type) {
-        case FETCH_HEALTHCHECK.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-            };
-        }
-        case FETCH_HEALTHCHECK.SUCCESS: {
-            const {data} = action;
-
-            return {
-                ...state,
-                data,
-                wasLoaded: true,
-                loading: false,
-                error: undefined,
-            };
-        }
-        case FETCH_HEALTHCHECK.FAILURE: {
-            if (action.error?.isCancelled) {
-                return state;
-            }
-
-            return {
-                ...state,
-                error: action.error,
-                loading: false,
-                wasLoaded: true,
-                data: undefined,
-            };
-        }
-
-        case SET_DATA_WAS_NOT_LOADED: {
-            return {
-                ...state,
-                wasLoaded: false,
-            };
-        }
-        default:
-            return state;
-    }
-};
+export const healthcheckApi = api.injectEndpoints({
+    endpoints: (builder) => ({
+        getHealthcheckInfo: builder.query({
+            queryFn: async (database: string, {signal}) => {
+                try {
+                    const data = await window.api.getHealthcheckInfo(database, {signal});
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+});
 
 const mapStatusToPriority: Partial<Record<StatusFlag, number>> = {
     RED: 0,
@@ -133,33 +91,28 @@ const getIssuesStatistics = (data: IssueLog[]): [StatusFlag, number][] => {
     });
 };
 
-const getIssuesLog = (state: HealthcheckInfoRootStateSlice) =>
-    state.healthcheckInfo.data?.issue_log;
+const createGetHealthcheckInfoSelector = createSelector(
+    (database: string) => database,
+    (database) => healthcheckApi.endpoints.getHealthcheckInfo.select(database),
+);
 
-export const selectIssuesTreesRoots: Selector<HealthcheckInfoRootStateSlice, IssueLog[]> =
-    createSelector(getIssuesLog, (issues = []) => getRoots(issues));
+const getIssuesLog = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, database: string) => createGetHealthcheckInfoSelector(database),
+    (state: RootState, selectGetPost) => selectGetPost(state).data?.issue_log || [],
+);
 
-export const selectIssuesTrees: Selector<HealthcheckInfoRootStateSlice, IssuesTree[]> =
-    createSelector([getIssuesLog, selectIssuesTreesRoots], (data = [], roots = []) => {
+export const selectIssuesTreesRoots = createSelector(getIssuesLog, (issues = []) =>
+    getRoots(issues),
+);
+
+export const selectIssuesTrees = createSelector(
+    [getIssuesLog, selectIssuesTreesRoots],
+    (data = [], roots = []) => {
         return getInvertedConsequencesTree({data, roots});
-    });
+    },
+);
 
-export const selectIssuesStatistics: Selector<
-    HealthcheckInfoRootStateSlice,
-    [StatusFlag, number][]
-> = createSelector(getIssuesLog, (issues = []) => getIssuesStatistics(issues));
-
-export function getHealthcheckInfo(database: string) {
-    return createApiRequest({
-        request: window.api.getHealthcheckInfo(database, {concurrentId: 'getHealthcheckInfo'}),
-        actions: FETCH_HEALTHCHECK,
-    });
-}
-
-export const setDataWasNotLoaded = () => {
-    return {
-        type: SET_DATA_WAS_NOT_LOADED,
-    } as const;
-};
-
-export default healthcheckInfo;
+export const selectIssuesStatistics = createSelector(getIssuesLog, (issues = []) =>
+    getIssuesStatistics(issues),
+);

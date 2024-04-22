@@ -385,11 +385,11 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId: concurrentId || 'getHotKeys'},
         );
     }
-    getHealthcheckInfo(database: string, {concurrentId}: AxiosOptions = {}) {
+    getHealthcheckInfo(database: string, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<HealthCheckAPIResponse>(
             this.getPath('/viewer/json/healthcheck?merge_records=true'),
             {tenant: database},
-            {concurrentId},
+            {concurrentId, requestConfig: {signal}},
         );
     }
     evictVDisk({

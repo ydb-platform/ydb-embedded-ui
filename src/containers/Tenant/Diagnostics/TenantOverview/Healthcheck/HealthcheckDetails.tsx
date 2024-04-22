@@ -3,7 +3,6 @@ import React from 'react';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
 import type {IssuesTree} from '../../../../../store/reducers/healthcheckInfo/types';
-import type {IResponseError} from '../../../../../types/api/error';
 import {cn} from '../../../../../utils/cn';
 
 import IssueTree from './IssuesViewer/IssueTree';
@@ -16,19 +15,18 @@ const b = cn('healthcheck');
 interface HealthcheckDetailsProps {
     issueTrees?: IssuesTree[];
     loading?: boolean;
-    wasLoaded?: boolean;
-    error?: IResponseError;
+    error?: unknown;
 }
 
 export function HealthcheckDetails(props: HealthcheckDetailsProps) {
-    const {issueTrees, loading, wasLoaded, error} = props;
+    const {issueTrees, loading, error} = props;
 
     const renderContent = () => {
         if (error) {
             return <ResponseError error={error} defaultMessage={i18n('no-data')} />;
         }
 
-        if (loading && !wasLoaded) {
+        if (loading) {
             return <Loader size="m" />;
         }
 
