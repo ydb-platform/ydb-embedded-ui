@@ -29,7 +29,7 @@ function _configureStore<
             getDefaultMiddleware({
                 immutableCheck: {ignoredPaths: ['tooltip.currentHoveredRef']},
                 serializableCheck: {
-                    ignoredPaths: ['tooltip.currentHoveredRef'],
+                    ignoredPaths: ['tooltip.currentHoveredRef', 'api'],
                     ignoredActions: [UPDATE_REF],
                 },
             }).concat(locationMiddleware, ...middleware),
