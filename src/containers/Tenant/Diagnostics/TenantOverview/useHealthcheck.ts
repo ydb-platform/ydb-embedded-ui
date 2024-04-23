@@ -1,4 +1,3 @@
-import {DEFAULT_POLLING_INTERVAL} from '../../../../lib';
 import {
     healthcheckApi,
     selectIssuesStatistics,
@@ -7,6 +6,7 @@ import {
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
 import {SelfCheckResult} from '../../../../types/api/healthcheck';
 import type {StatusFlag} from '../../../../types/api/healthcheck';
+import {DEFAULT_POLLING_INTERVAL} from '../../../../utils/constants';
 import {useTypedSelector} from '../../../../utils/hooks';
 
 interface HealthcheckParams {

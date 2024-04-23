@@ -41,7 +41,16 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
             <div className={b('preview-header')}>
                 <div className={b('preview-title-wrapper')}>
                     <div className={b('preview-title')}>{i18n('title.healthcheck')}</div>
-                    <Button size="s" onClick={onUpdate} loading={loading} view="flat-secondary">
+                    <Button
+                        size="s"
+                        onClick={(event) => {
+                            // FIXME: refactor card to remove the button from the anchor link.
+                            event.preventDefault();
+                            onUpdate();
+                        }}
+                        loading={loading}
+                        view="flat-secondary"
+                    >
                         <Icon data={updateArrow} width={20} height={20} />
                     </Button>
                 </div>

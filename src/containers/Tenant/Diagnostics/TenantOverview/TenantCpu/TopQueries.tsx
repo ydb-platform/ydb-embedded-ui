@@ -10,11 +10,9 @@ import {
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../../../store/reducers/tenant/constants';
-import {
-    fetchTenantOverviewTopQueries,
-    setDataWasNotLoaded,
-} from '../../../../../store/reducers/tenantOverview/topQueries/tenantOverviewTopQueries';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {topQueriesApi} from '../../../../../store/reducers/tenantOverview/topQueries/tenantOverviewTopQueries';
+import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
+import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {getTenantOverviewTopQueriesColumns} from '../../TopQueries/getTopQueriesColumns';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
@@ -33,26 +31,15 @@ export function TopQueries({path}: TopQueriesProps) {
     const query = parseQuery(location);
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
-
-    const {
-        loading,
-        wasLoaded,
-        error,
-        data: {result: data = undefined} = {},
-    } = useTypedSelector((state) => state.tenantOverviewTopQueries);
     const columns = getTenantOverviewTopQueriesColumns();
 
-    useAutofetcher(
-        (isBackground) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-
-            dispatch(fetchTenantOverviewTopQueries(path));
-        },
-        [dispatch, path],
-        autorefresh,
+    const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
+        {database: path},
+        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
     );
+
+    const loading = isFetching && currentData === undefined;
+    const {result: data} = currentData || {};
 
     const handleRowClick = React.useCallback(
         (row: any) => {
@@ -89,7 +76,6 @@ export function TopQueries({path}: TopQueriesProps) {
             onRowClick={handleRowClick}
             title={title}
             loading={loading}
-            wasLoaded={wasLoaded}
             error={error}
             tableClassNameModifiers={{'top-queries': true}}
         />
