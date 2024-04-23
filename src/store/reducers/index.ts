@@ -10,7 +10,6 @@ import executeTopQueries from './executeTopQueries/executeTopQueries';
 import explainQuery from './explainQuery';
 import fullscreen from './fullscreen';
 import header from './header/header';
-import healthcheckInfo from './healthcheckInfo/healthcheckInfo';
 import heatmap from './heatmap';
 import host from './host';
 import hotKeys from './hotKeys/hotKeys';
@@ -82,7 +81,6 @@ export const rootReducer = {
     executeTopQueries,
     executeTopTables,
     tenantOverviewTopQueries,
-    healthcheckInfo,
     shardsWorkload,
     tenantOverviewTopShards,
     hotKeys,

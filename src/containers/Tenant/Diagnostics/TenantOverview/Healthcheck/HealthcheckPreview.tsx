@@ -7,7 +7,6 @@ import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus'
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
 import {hcStatusToColorFlag} from '../../../../../store/reducers/healthcheckInfo/utils';
-import type {IResponseError} from '../../../../../types/api/error';
 import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
 
@@ -23,19 +22,18 @@ interface HealthcheckPreviewProps {
     selfCheckResult: SelfCheckResult;
     issuesStatistics?: [StatusFlag, number][];
     loading?: boolean;
-    wasLoaded?: boolean;
     onUpdate: VoidFunction;
-    error?: IResponseError;
+    error?: unknown;
     active?: boolean;
 }
 
 export function HealthcheckPreview(props: HealthcheckPreviewProps) {
-    const {selfCheckResult, issuesStatistics, loading, wasLoaded, onUpdate, error, active} = props;
+    const {selfCheckResult, issuesStatistics, loading, onUpdate, error, active} = props;
 
     const renderHeader = () => {
         const modifier = selfCheckResult.toLowerCase();
 
-        if (loading && !wasLoaded) {
+        if (loading) {
             return null;
         }
 
@@ -59,7 +57,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
             return <ResponseError error={error} defaultMessage={i18n('no-data')} />;
         }
 
-        if (loading && !wasLoaded) {
+        if (loading) {
             return <Loader size="m" />;
         }
 
