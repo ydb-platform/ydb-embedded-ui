@@ -1,17 +1,7 @@
-import React from 'react';
-
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {
-    getTopStorageGroups,
-    selectTopStorageGroups,
-    setDataWasNotLoaded,
-} from '../../../../../store/reducers/tenantOverview/topStorageGroups/topStorageGroups';
-import {
-    useAutofetcher,
-    useSearchQuery,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../../utils/hooks';
+import {topStorageGroupsApi} from '../../../../../store/reducers/tenantOverview/topStorageGroups/topStorageGroups';
+import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
+import {useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
 import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/getStorageGroupsColumns';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
@@ -23,28 +13,18 @@ interface TopGroupsProps {
 }
 
 export function TopGroups({tenant}: TopGroupsProps) {
-    const dispatch = useTypedDispatch();
-
     const query = useSearchQuery();
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const {loading, wasLoaded, error} = useTypedSelector((state) => state.topStorageGroups);
-    const topGroups = useTypedSelector(selectTopStorageGroups);
 
     const columns = getStorageTopGroupsColumns();
 
-    const fetchData = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-
-            dispatch(getTopStorageGroups({tenant}));
-        },
-        [dispatch, tenant],
+    const {currentData, isFetching, error} = topStorageGroupsApi.useGetTopStorageGroupsQuery(
+        {tenant},
+        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
     );
-
-    useAutofetcher(fetchData, [fetchData], autorefresh);
+    const loading = isFetching && currentData === undefined;
+    const topGroups = currentData;
 
     const title = getSectionTitle({
         entity: i18n('groups'),
@@ -61,7 +41,6 @@ export function TopGroups({tenant}: TopGroupsProps) {
             columns={columns}
             title={title}
             loading={loading}
-            wasLoaded={wasLoaded}
             error={error}
         />
     );

@@ -33,13 +33,6 @@ import tablet from './tablet';
 import tablets from './tablets';
 import tabletsFilters from './tabletsFilters';
 import tenant from './tenant/tenant';
-import executeTopTables from './tenantOverview/executeTopTables/executeTopTables';
-import {topNodesByCpu} from './tenantOverview/topNodesByCpu/topNodesByCpu';
-import {topNodesByLoad} from './tenantOverview/topNodesByLoad/topNodesByLoad';
-import {topNodesByMemory} from './tenantOverview/topNodesByMemory/topNodesByMemory';
-import {tenantOverviewTopQueries} from './tenantOverview/topQueries/tenantOverviewTopQueries';
-import {tenantOverviewTopShards} from './tenantOverview/topShards/tenantOverviewTopShards';
-import topStorageGroups from './tenantOverview/topStorageGroups/topStorageGroups';
 import tenants from './tenants/tenants';
 import tooltip from './tooltip';
 import topic from './topic';
@@ -49,13 +42,9 @@ export const rootReducer = {
     [api.reducerPath]: api.reducer,
     singleClusterMode,
     nodes,
-    topNodesByLoad,
-    topNodesByCpu,
-    topNodesByMemory,
     cluster,
     tenant,
     storage,
-    topStorageGroups,
     node,
     tooltip,
     tablets,
@@ -79,10 +68,7 @@ export const rootReducer = {
     describe,
     schemaAcl,
     executeTopQueries,
-    executeTopTables,
-    tenantOverviewTopQueries,
     shardsWorkload,
-    tenantOverviewTopShards,
     hotKeys,
     authentication,
     header,
