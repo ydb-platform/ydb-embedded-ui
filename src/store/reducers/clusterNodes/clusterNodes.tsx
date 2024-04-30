@@ -27,4 +27,5 @@ export const clusterNodesApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
     }),
+    overrideExisting: 'throw',
 });

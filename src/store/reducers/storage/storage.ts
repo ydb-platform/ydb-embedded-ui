@@ -101,4 +101,5 @@ export const storageApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
     }),
+    overrideExisting: 'throw',
 });

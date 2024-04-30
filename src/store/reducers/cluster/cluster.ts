@@ -91,4 +91,5 @@ export const clusterApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
     }),
+    overrideExisting: 'throw',
 });

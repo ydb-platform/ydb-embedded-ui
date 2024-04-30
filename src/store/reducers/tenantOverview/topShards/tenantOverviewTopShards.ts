@@ -43,4 +43,5 @@ export const topShardsApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
     }),
+    overrideExisting: 'throw',
 });

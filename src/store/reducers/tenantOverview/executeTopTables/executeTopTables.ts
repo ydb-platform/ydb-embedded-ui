@@ -35,4 +35,5 @@ export const topTablesApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
     }),
+    overrideExisting: 'throw',
 });

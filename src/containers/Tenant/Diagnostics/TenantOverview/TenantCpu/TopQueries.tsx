@@ -33,7 +33,7 @@ export function TopQueries({path}: TopQueriesProps) {
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const columns = getTenantOverviewTopQueriesColumns();
 
-    const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
+    const {currentData, isFetching, error} = topQueriesApi.useGetOverviewTopQueriesQuery(
         {database: path},
         {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
     );
