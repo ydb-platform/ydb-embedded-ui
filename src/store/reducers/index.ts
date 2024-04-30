@@ -15,7 +15,6 @@ import hotKeys from './hotKeys/hotKeys';
 import network from './network/network';
 import node from './node/node';
 import nodes from './nodes/nodes';
-import overview from './overview/overview';
 import partitions from './partitions/partitions';
 import saveQuery from './saveQuery';
 import schema from './schema/schema';
@@ -41,7 +40,6 @@ export const rootReducer = {
     tooltip,
     tablets,
     schema,
-    overview,
     host,
     network,
     tenants,
