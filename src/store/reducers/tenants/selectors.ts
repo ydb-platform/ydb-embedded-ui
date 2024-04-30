@@ -1,4 +1,3 @@
-import type {Selector} from '@reduxjs/toolkit';
 import {createSelector} from '@reduxjs/toolkit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
@@ -7,6 +6,7 @@ import {EFlag} from '../../../types/api/enums';
 import {ProblemFilterValues, selectProblemFilter} from '../settings/settings';
 import type {ProblemFilterValue} from '../settings/types';
 
+import {tenantsApi} from './tenants';
 import type {PreparedTenant, TenantsStateSlice} from './types';
 
 // ==== Filters ====
@@ -29,13 +29,22 @@ const filteredTenantsBySearch = (tenants: PreparedTenant[], searchQuery: string)
 };
 
 // ==== Simple selectors ====
+const createGetTenantsInfoSelector = createSelector(
+    (clusterName: string | undefined) => clusterName,
+    (clusterName) => tenantsApi.endpoints.getTenantsInfo.select({clusterName}),
+);
 
-export const selectTenants = (state: TenantsStateSlice) => state.tenants.tenants;
+export const selectTenants = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, clusterName: string | undefined) =>
+        createGetTenantsInfoSelector(clusterName),
+    (state: RootState, selectTenantsInfo) => selectTenantsInfo(state).data ?? [],
+);
 export const selectTenantsSearchValue = (state: TenantsStateSlice) => state.tenants.searchValue;
 
 // ==== Complex selectors ====
 
-export const selectFilteredTenants: Selector<RootState, PreparedTenant[]> = createSelector(
+export const selectFilteredTenants = createSelector(
     [selectTenants, selectProblemFilter, selectTenantsSearchValue],
     (tenants, problemFilter, searchQuery) => {
         let result = filterTenantsByProblems(tenants, problemFilter);

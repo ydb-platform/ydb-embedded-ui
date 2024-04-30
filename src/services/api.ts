@@ -76,12 +76,16 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             node_id: id,
         });
     }
-    getTenants(clusterName?: string) {
-        return this.get<TTenantInfo>(this.getPath('/viewer/json/tenantinfo'), {
-            tablets: 1,
-            storage: 1,
-            cluster_name: clusterName,
-        });
+    getTenants(clusterName?: string, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<TTenantInfo>(
+            this.getPath('/viewer/json/tenantinfo'),
+            {
+                tablets: 1,
+                storage: 1,
+                cluster_name: clusterName,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
     }
     getTenantInfo({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TTenantInfo>(
