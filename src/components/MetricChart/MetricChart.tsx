@@ -4,26 +4,14 @@ import ChartKit, {settings} from '@gravity-ui/chartkit';
 import type {YagrSeriesData, YagrWidgetData} from '@gravity-ui/chartkit/yagr';
 import {YagrPlugin} from '@gravity-ui/chartkit/yagr';
 
-import type {IResponseError} from '../../types/api/error';
 import {cn} from '../../utils/cn';
-import {useAutofetcher} from '../../utils/hooks';
 import type {TimeFrame} from '../../utils/timeframes';
 import {ResponseError} from '../Errors/ResponseError';
 import {Loader} from '../Loader';
 
 import {colorToRGBA, colors} from './colors';
-import {convertResponse} from './convertResponse';
-import {getChartData} from './getChartData';
 import {getDefaultDataFormatter} from './getDefaultDataFormatter';
-import i18n from './i18n';
-import {
-    chartReducer,
-    initialChartState,
-    setChartData,
-    setChartDataLoading,
-    setChartDataWasNotLoaded,
-    setChartError,
-} from './reducer';
+import {chartApi} from './reducer';
 import type {
     ChartOptions,
     MetricDescription,
@@ -107,6 +95,8 @@ const prepareWidgetData = (
     };
 };
 
+const emptyChartData: PreparedMetricsData = {timeline: [], metrics: []};
+
 interface DiagnosticsChartProps {
     database: string;
 
@@ -114,7 +104,7 @@ interface DiagnosticsChartProps {
     metrics: MetricDescription[];
     timeFrame?: TimeFrame;
 
-    autorefresh?: boolean;
+    autorefresh?: number;
 
     height?: number;
     width?: number;
@@ -143,90 +133,26 @@ export const MetricChart = ({
     onChartDataStatusChange,
     isChartVisible,
 }: DiagnosticsChartProps) => {
-    const mounted = React.useRef(false);
-
-    React.useEffect(() => {
-        mounted.current = true;
-        return () => {
-            mounted.current = false;
-        };
-    }, []);
-
-    const [{loading, wasLoaded, data, error}, dispatch] = React.useReducer(
-        chartReducer,
-        initialChartState,
-    );
-
-    React.useEffect(() => {
-        if (error) {
-            return onChartDataStatusChange?.('error');
-        }
-        if (loading && !wasLoaded) {
-            return onChartDataStatusChange?.('loading');
-        }
-        if (!loading && wasLoaded) {
-            return onChartDataStatusChange?.('success');
-        }
-
-        return undefined;
-    }, [loading, wasLoaded, error, onChartDataStatusChange]);
-
-    const fetchChartData = React.useCallback(
-        async (isBackground: boolean) => {
-            dispatch(setChartDataLoading());
-
-            if (!isBackground) {
-                dispatch(setChartDataWasNotLoaded());
-            }
-
-            try {
-                // maxDataPoints param is calculated based on width
-                // should be width > maxDataPoints to prevent points that cannot be selected
-                // more px per dataPoint - easier to select, less - chart is smoother
-                const response = await getChartData({
-                    database,
-                    metrics,
-                    timeFrame,
-                    maxDataPoints: width / 2,
-                });
-
-                // Hack to prevent setting value to state, if component unmounted
-                if (!mounted.current) {
-                    return;
-                }
-
-                // Response could be a plain html for ydb versions without charts support
-                // Or there could be an error in response with 200 status code
-                // It happens when request is OK, but chart data cannot be returned due to some reason
-                // Example: charts are not enabled in the DB ('GraphShard is not enabled' error)
-                if (Array.isArray(response)) {
-                    const preparedData = convertResponse(response, metrics);
-                    dispatch(setChartData(preparedData));
-                } else {
-                    const err = {
-                        statusText:
-                            typeof response === 'string' ? i18n('not-supported') : response.error,
-                    };
-
-                    throw err;
-                }
-            } catch (err) {
-                if (!mounted.current) {
-                    return;
-                }
-
-                dispatch(setChartError(err as IResponseError));
-            }
+    const {currentData, error, isFetching, status} = chartApi.useGetChertDataQuery(
+        {
+            database,
+            metrics,
+            timeFrame,
+            maxDataPoints: width / 2,
         },
-        [database, metrics, timeFrame, width],
+        {pollingInterval: autorefresh},
     );
 
-    useAutofetcher(fetchChartData, [fetchChartData], autorefresh);
+    const loading = isFetching && !currentData;
 
-    const convertedData = prepareWidgetData(data, chartOptions);
+    React.useEffect(() => {
+        return onChartDataStatusChange?.(status === 'fulfilled' ? 'success' : 'loading');
+    }, [status, onChartDataStatusChange]);
+
+    const convertedData = prepareWidgetData(currentData || emptyChartData, chartOptions);
 
     const renderContent = () => {
-        if (loading && !wasLoaded) {
+        if (loading) {
             return <Loader />;
         }
 
@@ -237,7 +163,7 @@ export const MetricChart = ({
         return (
             <div className={b('chart')}>
                 <ChartKit type="yagr" data={convertedData} />
-                {error && <ResponseError className={b('error')} error={error} />}
+                {error ? <ResponseError className={b('error')} error={error} /> : null}
             </div>
         );
     };
