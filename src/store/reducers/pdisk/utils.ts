@@ -6,10 +6,12 @@ import {prepareNodeSystemState} from '../../../utils/nodes';
 import type {PreparedStorageGroup} from '../storage/types';
 import {prepareStorageGroupData} from '../storage/utils';
 
-export function preparePDiksDataResponse([pdiskResponse, nodeResponse]: [
+import type {PDiskData} from './types';
+
+export function preparePDiskDataResponse([pdiskResponse, nodeResponse]: [
     TEvPDiskStateResponse,
     TEvSystemStateResponse,
-]) {
+]): PDiskData {
     const rawPDisk = pdiskResponse.PDiskStateInfo?.[0];
     const preparedPDisk = preparePDiskData(rawPDisk);
 
