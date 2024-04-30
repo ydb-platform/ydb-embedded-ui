@@ -19,7 +19,6 @@ import nodes from './nodes/nodes';
 import nodesList from './nodesList';
 import overview from './overview/overview';
 import partitions from './partitions/partitions';
-import preview from './preview';
 import saveQuery from './saveQuery';
 import schema from './schema/schema';
 import schemaAcl from './schemaAcl/schemaAcl';
@@ -54,7 +53,6 @@ export const rootReducer = {
     tabletsFilters,
     heatmap,
     settings,
-    preview,
     nodesList,
     describe,
     schemaAcl,

@@ -1,16 +1,14 @@
-import React from 'react';
-
 import {Button, Loader} from '@gravity-ui/uikit';
 
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {Icon} from '../../../../components/Icon';
 import {QueryResultTable} from '../../../../components/QueryResultTable';
-import {sendQuery, setQueryOptions} from '../../../../store/reducers/preview';
+import {previewApi} from '../../../../store/reducers/preview';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
 import {isExternalTable, isTableType} from '../../utils/schema';
 import i18n from '../i18n';
@@ -27,39 +25,16 @@ interface PreviewProps {
 export const Preview = ({database, type}: PreviewProps) => {
     const dispatch = useTypedDispatch();
 
-    const {data = {}, loading, error, wasLoaded} = useTypedSelector((state) => state.preview);
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
 
-    const sendQueryForPreview = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isTableType(type)) {
-                return;
-            }
-
-            if (!isBackground) {
-                dispatch(
-                    setQueryOptions({
-                        wasLoaded: false,
-                        data: undefined,
-                    }),
-                );
-            }
-
-            const query = `--!syntax_v1\nselect * from \`${currentSchemaPath}\` limit 32`;
-
-            dispatch(
-                sendQuery({
-                    query,
-                    database,
-                    action: isExternalTable(type) ? 'execute-query' : 'execute-scan',
-                }),
-            );
-        },
-        [dispatch, database, currentSchemaPath, type],
+    const query = `--!syntax_v1\nselect * from \`${currentSchemaPath}\` limit 32`;
+    const {currentData, isFetching, error} = previewApi.useSendQueryQuery(
+        {database, query, action: isExternalTable(type) ? 'execute-query' : 'execute-scan'},
+        {pollingInterval: autorefresh},
     );
-
-    useAutofetcher(sendQueryForPreview, [sendQueryForPreview], autorefresh);
+    const loading = isFetching && currentData === undefined;
+    const data = currentData ?? {};
 
     const handleClosePreview = () => {
         dispatch(setShowPreview(false));
@@ -86,7 +61,7 @@ export const Preview = ({database, type}: PreviewProps) => {
         );
     };
 
-    if (loading && !wasLoaded) {
+    if (loading) {
         return (
             <div className={b('loader-container')}>
                 <Loader size="m" />
