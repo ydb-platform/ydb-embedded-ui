@@ -5,7 +5,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import {selectNodesMap} from '../../../../store/reducers/nodesList';
+import {nodesListApi} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
 import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
 import {cn} from '../../../../utils/cn';
@@ -38,15 +38,8 @@ export const Partitions = ({path}: PartitionsProps) => {
     >([]);
 
     const consumers = useTypedSelector((state) => selectConsumersNames(state, path));
-    const nodesMap = useTypedSelector(selectNodesMap);
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const {
-        // loading: partitionsLoading,
-        // wasLoaded: partitionsWasLoaded,
-        // error: partitionsError,
-        // partitions: rawPartitions,
-        selectedConsumer,
-    } = useTypedSelector((state) => state.partitions);
+    const {selectedConsumer} = useTypedSelector((state) => state.partitions);
     const {
         currentData: topicData,
         isFetching: topicIsFetching,
@@ -54,10 +47,11 @@ export const Partitions = ({path}: PartitionsProps) => {
     } = topicApi.useGetTopicQuery({path});
     const topicLoading = topicIsFetching && topicData === undefined;
     const {
-        loading: nodesLoading,
-        wasLoaded: nodesWasLoaded,
+        currentData: nodesMap,
+        isFetching: nodesIsFetching,
         error: nodesError,
-    } = useTypedSelector((state) => state.nodesList);
+    } = nodesListApi.useGetNodesListQuery(undefined);
+    const nodesLoading = nodesIsFetching && nodesMap === undefined;
 
     const [hiddenColumns, setHiddenColumns] = useSetting<string[]>(PARTITIONS_HIDDEN_COLUMNS_KEY);
 
@@ -107,7 +101,7 @@ export const Partitions = ({path}: PartitionsProps) => {
         dispatch(setSelectedConsumer(value));
     };
 
-    const loading = topicLoading || (nodesLoading && !nodesWasLoaded) || partitionsLoading;
+    const loading = topicLoading || nodesLoading || partitionsLoading;
 
     const error = nodesError || topicError || partitionsError;
 

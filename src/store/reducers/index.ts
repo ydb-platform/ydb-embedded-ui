@@ -16,7 +16,6 @@ import hotKeys from './hotKeys/hotKeys';
 import network from './network/network';
 import node from './node/node';
 import nodes from './nodes/nodes';
-import nodesList from './nodesList';
 import overview from './overview/overview';
 import partitions from './partitions/partitions';
 import saveQuery from './saveQuery';
@@ -53,7 +52,6 @@ export const rootReducer = {
     tabletsFilters,
     heatmap,
     settings,
-    nodesList,
     describe,
     schemaAcl,
     executeTopQueries,

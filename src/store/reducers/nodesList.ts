@@ -1,57 +1,30 @@
 import {createSelector} from '@reduxjs/toolkit';
-import type {Reducer} from '@reduxjs/toolkit';
 
-import type {
-    NodesListAction,
-    NodesListRootStateSlice,
-    NodesListState,
-} from '../../types/store/nodesList';
 import {prepareNodesMap} from '../../utils/nodes';
-import {createApiRequest, createRequestActionTypes} from '../utils';
+import type {RootState} from '../defaultStore';
 
-export const FETCH_NODES_LIST = createRequestActionTypes('nodesList', 'FETCH_NODES_LIST');
+import {api} from './api';
 
-const initialState = {loading: true, wasLoaded: false, data: []};
+export const nodesListApi = api.injectEndpoints({
+    endpoints: (build) => ({
+        getNodesList: build.query({
+            queryFn: async (_, {signal}) => {
+                try {
+                    const data = await window.api.getNodesList({signal});
+                    return {data: prepareNodesMap(data)};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+    overrideExisting: 'throw',
+});
 
-const nodesList: Reducer<NodesListState, NodesListAction> = (state = initialState, action) => {
-    switch (action.type) {
-        case FETCH_NODES_LIST.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-            };
-        }
-        case FETCH_NODES_LIST.SUCCESS: {
-            return {
-                ...state,
-                data: action.data,
-                loading: false,
-                wasLoaded: true,
-                error: undefined,
-            };
-        }
-        case FETCH_NODES_LIST.FAILURE: {
-            return {
-                ...state,
-                error: action.error,
-                loading: false,
-            };
-        }
-        default:
-            return state;
-    }
-};
-
-export function getNodesList() {
-    return createApiRequest({
-        request: window.api.getNodesList(),
-        actions: FETCH_NODES_LIST,
-    });
-}
+const selectNodesList = nodesListApi.endpoints.getNodesList.select(undefined);
 
 export const selectNodesMap = createSelector(
-    (state: NodesListRootStateSlice) => state.nodesList.data,
-    (nodes) => prepareNodesMap(nodes),
+    (state: RootState) => selectNodesList(state),
+    (nodes) => nodes.data,
 );
-
-export default nodesList;
