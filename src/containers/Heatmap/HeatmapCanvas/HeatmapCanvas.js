@@ -165,5 +165,4 @@ HeatmapCanvas.propTypes = {
     parentRef: PropTypes.object,
     showTooltip: PropTypes.func,
     hideTooltip: PropTypes.func,
-    currentMetric: PropTypes.string,
 };

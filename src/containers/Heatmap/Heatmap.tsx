@@ -4,12 +4,12 @@ import {Checkbox, Select} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
-import {getTabletsInfo, setHeatmapOptions} from '../../store/reducers/heatmap';
+import {heatmapApi, setHeatmapOptions} from '../../store/reducers/heatmap';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import type {IHeatmapMetricValue} from '../../types/store/heatmap';
 import {cn} from '../../utils/cn';
 import {formatNumber} from '../../utils/dataFormatters/dataFormatters';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import {HeatmapCanvas} from './HeatmapCanvas/HeatmapCanvas';
 import {Histogram} from './Histogram/Histogram';
@@ -30,43 +30,16 @@ export const Heatmap = ({path}: HeatmapProps) => {
     const itemsContainer = React.createRef<HTMLDivElement>();
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const {
-        loading,
-        wasLoaded,
-        error,
-        sort,
-        heatmap,
-        metrics,
-        currentMetric,
-        data: tablets = [],
-    } = useTypedSelector((state) => state.heatmap);
 
-    const [selectedMetric, setSelectedMetric] = React.useState(['']);
-
-    React.useEffect(() => {
-        if (!currentMetric && metrics && metrics.length) {
-            dispatch(
-                setHeatmapOptions({
-                    currentMetric: metrics[0].value,
-                }),
-            );
-        }
-        if (currentMetric) {
-            setSelectedMetric([currentMetric]);
-        }
-    }, [currentMetric, metrics, dispatch]);
-
-    const fetchData = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(setHeatmapOptions({wasLoaded: false}));
-            }
-            dispatch(getTabletsInfo({path}));
-        },
-        [path, dispatch],
+    const {currentData, isFetching, error} = heatmapApi.useGetHeatmapTabletsInfoQuery(
+        {path},
+        {pollingInterval: autorefresh},
     );
 
-    useAutofetcher(fetchData, [fetchData], autorefresh);
+    const loading = isFetching && currentData === undefined;
+
+    const {tablets = [], metrics} = currentData || {};
+    const {sort, heatmap, currentMetric} = useTypedSelector((state) => state.heatmap);
 
     const onShowTooltip = (...args: Parameters<typeof showTooltip>) => {
         dispatch(showTooltip(...args));
@@ -137,7 +110,6 @@ export const Heatmap = ({path}: HeatmapProps) => {
                     parentRef={itemsContainer}
                     showTooltip={onShowTooltip}
                     hideTooltip={onHideTooltip}
-                    currentMetric={currentMetric}
                 />
             </div>
         );
@@ -151,7 +123,7 @@ export const Heatmap = ({path}: HeatmapProps) => {
                 <div className={b('filters')}>
                     <Select
                         className={b('heatmap-select')}
-                        value={selectedMetric}
+                        value={currentMetric ? [currentMetric] : []}
                         options={metrics}
                         onUpdate={handleMetricChange}
                         width={200}
@@ -190,7 +162,7 @@ export const Heatmap = ({path}: HeatmapProps) => {
         );
     };
 
-    if (loading && !wasLoaded) {
+    if (loading) {
         return <Loader />;
     }
 
