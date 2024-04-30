@@ -20,7 +20,6 @@ import nodesList from './nodesList';
 import olapStats from './olapStats';
 import overview from './overview/overview';
 import partitions from './partitions/partitions';
-import pDisk from './pdisk/pdisk';
 import preview from './preview';
 import saveQuery from './saveQuery';
 import schema from './schema/schema';
@@ -35,8 +34,6 @@ import tabletsFilters from './tabletsFilters';
 import tenant from './tenant/tenant';
 import tenants from './tenants/tenants';
 import tooltip from './tooltip';
-import topic from './topic';
-import vDisk from './vdisk/vdisk';
 
 export const rootReducer = {
     [api.reducerPath]: api.reducer,
@@ -55,9 +52,7 @@ export const rootReducer = {
     network,
     tenants,
     tablet,
-    topic,
     partitions,
-    pDisk,
     executeQuery,
     explainQuery,
     tabletsFilters,
@@ -75,7 +70,6 @@ export const rootReducer = {
     saveQuery,
     fullscreen,
     clusters,
-    vDisk,
 };
 
 const combinedReducer = combineReducers({
