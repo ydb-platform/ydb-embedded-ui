@@ -16,7 +16,6 @@ import {
     setDataWasNotLoaded,
 } from '../../../../store/reducers/overview/overview';
 import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
-import {getTopic} from '../../../../store/reducers/topic';
 import {EPathType} from '../../../../types/api/schema';
 import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
@@ -24,7 +23,6 @@ import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
 import {
     isColumnEntityType,
     isEntityWithMergedImplementation,
-    isPathTypeWithTopic,
     isTableType,
 } from '../../utils/schema';
 
@@ -92,10 +90,6 @@ function Overview({type, tenantName}: OverviewProps) {
                 }
                 dispatch(getOlapStats({path: schemaPath}));
             }
-
-            if (isPathTypeWithTopic(type)) {
-                dispatch(getTopic(currentSchemaPath));
-            }
         },
         [
             tenantName,
@@ -107,7 +101,7 @@ function Overview({type, tenantName}: OverviewProps) {
         ],
     );
 
-    useAutofetcher(fetchData, [fetchData], autorefresh);
+    useAutofetcher(fetchData, [fetchData], autorefresh > 0);
 
     const renderContent = () => {
         const data = rawData ?? undefined;

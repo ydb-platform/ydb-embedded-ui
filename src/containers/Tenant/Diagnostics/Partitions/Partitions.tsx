@@ -10,12 +10,7 @@ import {
     setDataWasNotLoaded as setPartitionsDataWasNotLoaded,
     setSelectedConsumer,
 } from '../../../../store/reducers/partitions/partitions';
-import {
-    cleanTopicData,
-    getTopic,
-    selectConsumersNames,
-    setDataWasNotLoaded as setTopicDataWasNotLoaded,
-} from '../../../../store/reducers/topic';
+import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
 import {
@@ -50,7 +45,7 @@ export const Partitions = ({path}: PartitionsProps) => {
         PreparedPartitionDataWithHosts[]
     >([]);
 
-    const consumers = useTypedSelector(selectConsumersNames);
+    const consumers = useTypedSelector((state) => selectConsumersNames(state, path));
     const nodesMap = useTypedSelector(selectNodesMap);
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const {
@@ -61,10 +56,11 @@ export const Partitions = ({path}: PartitionsProps) => {
         selectedConsumer,
     } = useTypedSelector((state) => state.partitions);
     const {
-        loading: topicLoading,
-        wasLoaded: topicWasLoaded,
+        currentData: topicData,
+        isFetching: topicIsFetching,
         error: topicError,
-    } = useTypedSelector((state) => state.topic);
+    } = topicApi.useGetTopicQuery({path});
+    const topicLoading = topicIsFetching && topicData === undefined;
     const {
         loading: nodesLoading,
         wasLoaded: nodesWasLoaded,
@@ -76,11 +72,6 @@ export const Partitions = ({path}: PartitionsProps) => {
     const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer);
 
     React.useEffect(() => {
-        dispatch(cleanTopicData());
-        dispatch(setTopicDataWasNotLoaded());
-
-        dispatch(getTopic(path));
-
         setComponentCurrentPath(path);
     }, [dispatch, path]);
 
@@ -93,26 +84,26 @@ export const Partitions = ({path}: PartitionsProps) => {
             if (!isBackground) {
                 dispatch(setPartitionsDataWasNotLoaded());
             }
-            if (topicWasLoaded && componentCurrentPath) {
+            if (!topicLoading && componentCurrentPath) {
                 dispatch(getPartitions(componentCurrentPath, selectedConsumer));
             }
         },
-        [dispatch, selectedConsumer, componentCurrentPath, topicWasLoaded],
+        [dispatch, selectedConsumer, componentCurrentPath, topicLoading],
     );
 
-    useAutofetcher(fetchData, [fetchData], autorefresh);
+    useAutofetcher(fetchData, [fetchData], autorefresh > 0);
 
     // Wrong consumer could be passed in search query
     // Reset consumer if it doesn't exist for current topic
     React.useEffect(() => {
-        const isTopicWithoutConsumers = topicWasLoaded && !consumers;
+        const isTopicWithoutConsumers = !topicLoading && !consumers;
         const wrongSelectedConsumer =
             selectedConsumer && consumers && !consumers.includes(selectedConsumer);
 
         if (isTopicWithoutConsumers || wrongSelectedConsumer) {
             dispatch(setSelectedConsumer(''));
         }
-    }, [dispatch, topicWasLoaded, selectedConsumer, consumers]);
+    }, [dispatch, topicLoading, selectedConsumer, consumers]);
 
     const columnsToShow = React.useMemo(() => {
         return columns.filter((column) => !hiddenColumns.includes(column.name));
@@ -127,7 +118,7 @@ export const Partitions = ({path}: PartitionsProps) => {
     };
 
     const loading =
-        (topicLoading && !topicWasLoaded) ||
+        topicLoading ||
         (nodesLoading && !nodesWasLoaded) ||
         (partitionsLoading && !partitionsWasLoaded);
 
