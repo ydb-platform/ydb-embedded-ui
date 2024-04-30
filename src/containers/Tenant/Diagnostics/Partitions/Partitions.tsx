@@ -1,24 +1,16 @@
 import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
+import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {selectNodesMap} from '../../../../store/reducers/nodesList';
-import {
-    getPartitions,
-    setDataWasNotLoaded as setPartitionsDataWasNotLoaded,
-    setSelectedConsumer,
-} from '../../../../store/reducers/partitions/partitions';
+import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
 import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
-import {
-    useAutofetcher,
-    useSetting,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../utils/hooks';
+import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import {PartitionsControls} from './PartitionsControls/PartitionsControls';
 import i18n from './i18n';
@@ -49,10 +41,10 @@ export const Partitions = ({path}: PartitionsProps) => {
     const nodesMap = useTypedSelector(selectNodesMap);
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const {
-        loading: partitionsLoading,
-        wasLoaded: partitionsWasLoaded,
-        error: partitionsError,
-        partitions: rawPartitions,
+        // loading: partitionsLoading,
+        // wasLoaded: partitionsWasLoaded,
+        // error: partitionsError,
+        // partitions: rawPartitions,
         selectedConsumer,
     } = useTypedSelector((state) => state.partitions);
     const {
@@ -75,23 +67,21 @@ export const Partitions = ({path}: PartitionsProps) => {
         setComponentCurrentPath(path);
     }, [dispatch, path]);
 
+    const params =
+        !topicLoading && componentCurrentPath
+            ? {path: componentCurrentPath, consumerName: selectedConsumer}
+            : skipToken;
+    const {
+        currentData: partitionsData,
+        isFetching: partitionsIsFetching,
+        error: partitionsError,
+    } = partitionsApi.useGetPartitionsQuery(params, {pollingInterval: autorefresh});
+    const partitionsLoading = partitionsIsFetching && partitionsData === undefined;
+    const rawPartitions = partitionsData;
+
     const partitionsWithHosts = React.useMemo(() => {
         return addHostToPartitions(rawPartitions, nodesMap);
     }, [rawPartitions, nodesMap]);
-
-    const fetchData = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(setPartitionsDataWasNotLoaded());
-            }
-            if (!topicLoading && componentCurrentPath) {
-                dispatch(getPartitions(componentCurrentPath, selectedConsumer));
-            }
-        },
-        [dispatch, selectedConsumer, componentCurrentPath, topicLoading],
-    );
-
-    useAutofetcher(fetchData, [fetchData], autorefresh > 0);
 
     // Wrong consumer could be passed in search query
     // Reset consumer if it doesn't exist for current topic
@@ -117,10 +107,7 @@ export const Partitions = ({path}: PartitionsProps) => {
         dispatch(setSelectedConsumer(value));
     };
 
-    const loading =
-        topicLoading ||
-        (nodesLoading && !nodesWasLoaded) ||
-        (partitionsLoading && !partitionsWasLoaded);
+    const loading = topicLoading || (nodesLoading && !nodesWasLoaded) || partitionsLoading;
 
     const error = nodesError || topicError || partitionsError;
 
