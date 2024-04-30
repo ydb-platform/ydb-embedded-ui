@@ -4,7 +4,6 @@ import {api} from './api';
 import authentication from './authentication/authentication';
 import cluster from './cluster/cluster';
 import clusters from './clusters/clusters';
-import describe from './describe';
 import executeQuery from './executeQuery';
 import executeTopQueries from './executeTopQueries/executeTopQueries';
 import explainQuery from './explainQuery';
@@ -52,7 +51,6 @@ export const rootReducer = {
     tabletsFilters,
     heatmap,
     settings,
-    describe,
     schemaAcl,
     executeTopQueries,
     shardsWorkload,

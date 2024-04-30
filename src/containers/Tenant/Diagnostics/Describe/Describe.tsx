@@ -1,20 +1,14 @@
-import React from 'react';
-
+import {skipToken} from '@reduxjs/toolkit/query';
 import JSONTree from 'react-json-inspector';
 import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
-import {
-    getDescribe,
-    getDescribeBatched,
-    setCurrentDescribePath,
-    setDataWasNotLoaded,
-} from '../../../../store/reducers/describe';
+import {describeApi} from '../../../../store/reducers/describe';
 import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedSelector} from '../../../../utils/hooks';
 import {isEntityWithMergedImplementation} from '../../utils/schema';
 
 import './Describe.scss';
@@ -30,26 +24,6 @@ interface IDescribeProps {
 }
 
 const Describe = ({tenant, type}: IDescribeProps) => {
-    const dispatch = useTypedDispatch();
-
-    const {currentDescribe, error, loading, wasLoaded} = useTypedSelector(
-        (state) => state.describe,
-    );
-
-    const [preparedDescribeData, setPreparedDescribeData] = React.useState<Object>();
-
-    React.useEffect(() => {
-        if (currentDescribe) {
-            const paths = Object.keys(currentDescribe);
-
-            if (paths.length === 1) {
-                setPreparedDescribeData(currentDescribe[paths[0]]);
-            } else {
-                setPreparedDescribeData(currentDescribe);
-            }
-        }
-    }, [currentDescribe]);
-
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
@@ -59,27 +33,30 @@ const Describe = ({tenant, type}: IDescribeProps) => {
         shallowEqual,
     );
 
-    const fetchData = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
+    const path = currentSchemaPath || tenant;
+    let paths: string[] | typeof skipToken = skipToken;
+    if (!isEntityWithMergedImpl) {
+        paths = [path];
+    } else if (mergedChildrenPaths) {
+        paths = [path, ...mergedChildrenPaths];
+    }
+    const {currentData, isFetching, error} = describeApi.useGetDescribeQuery(paths, {
+        pollingInterval: autorefresh,
+    });
+    const loading = isFetching && currentData === undefined;
+    const currentDescribe = currentData;
 
-            const path = currentSchemaPath || tenant;
-            dispatch(setCurrentDescribePath(path));
+    let preparedDescribeData: Object | undefined;
+    if (currentDescribe) {
+        const paths = Object.keys(currentDescribe);
+        if (paths.length === 1) {
+            preparedDescribeData = currentDescribe[paths[0]];
+        } else {
+            preparedDescribeData = currentDescribe;
+        }
+    }
 
-            if (!isEntityWithMergedImpl) {
-                dispatch(getDescribe({path}));
-            } else if (mergedChildrenPaths) {
-                dispatch(getDescribeBatched([path, ...mergedChildrenPaths]));
-            }
-        },
-        [currentSchemaPath, tenant, mergedChildrenPaths, isEntityWithMergedImpl, dispatch],
-    );
-
-    useAutofetcher(fetchData, [fetchData], autorefresh);
-
-    if ((loading && !wasLoaded) || (isEntityWithMergedImpl && !mergedChildrenPaths)) {
+    if (loading || (isEntityWithMergedImpl && !mergedChildrenPaths)) {
         return <Loader size="m" />;
     }
 
