@@ -51,6 +51,7 @@ export const tabletApi = api.injectEndpoints({
                     return {error};
                 }
             },
+            providesTags: ['All'],
         }),
         getTabletDescribe: build.query({
             queryFn: async ({tenantId}: {tenantId: TDomainKey}, {signal}) => {
@@ -64,6 +65,7 @@ export const tabletApi = api.injectEndpoints({
                     return {error};
                 }
             },
+            providesTags: ['All'],
         }),
     }),
     overrideExisting: 'throw',

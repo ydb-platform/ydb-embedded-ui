@@ -17,7 +17,6 @@ import network from './network/network';
 import node from './node/node';
 import nodes from './nodes/nodes';
 import nodesList from './nodesList';
-import olapStats from './olapStats';
 import overview from './overview/overview';
 import partitions from './partitions/partitions';
 import preview from './preview';
@@ -46,7 +45,6 @@ export const rootReducer = {
     tablets,
     schema,
     overview,
-    olapStats,
     host,
     network,
     tenants,

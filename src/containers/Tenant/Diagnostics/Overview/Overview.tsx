@@ -1,14 +1,12 @@
 import React from 'react';
 
+import {skipToken} from '@reduxjs/toolkit/query';
 import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
-import {
-    getOlapStats,
-    resetLoadingState as resetOlapLoadingState,
-} from '../../../../store/reducers/olapStats';
+import {olapApi} from '../../../../store/reducers/olapStats';
 import {
     getOverview,
     getOverviewBatched,
@@ -46,11 +44,16 @@ function Overview({type, tenantName}: OverviewProps) {
         wasLoaded: overviewWasLoaded,
         error: overviewError,
     } = useTypedSelector((state) => state.overview);
-    const {
-        data: {result: olapStats} = {result: undefined},
-        loading: olapStatsLoading,
-        wasLoaded: olapStatsWasLoaded,
-    } = useTypedSelector((state) => state.olapStats);
+
+    const schemaPath = currentSchemaPath || tenantName;
+    const olapParams =
+        isTableType(type) && isColumnEntityType(type) ? {path: schemaPath} : skipToken;
+    const {currentData: olapData, isFetching: olapIsFetching} = olapApi.useGetOlapStatsQuery(
+        olapParams,
+        {pollingInterval: autorefresh},
+    );
+    const olapStatsLoading = olapIsFetching && olapData === undefined;
+    const {result: olapStats} = olapData || {result: undefined};
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
@@ -60,14 +63,11 @@ function Overview({type, tenantName}: OverviewProps) {
         shallowEqual,
     );
 
-    const entityLoading =
-        (overviewLoading && !overviewWasLoaded) || (olapStatsLoading && !olapStatsWasLoaded);
+    const entityLoading = (overviewLoading && !overviewWasLoaded) || olapStatsLoading;
     const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
 
     const fetchData = React.useCallback(
         (isBackground: boolean) => {
-            const schemaPath = currentSchemaPath || tenantName;
-
             if (!schemaPath) {
                 return;
             }
@@ -83,22 +83,8 @@ function Overview({type, tenantName}: OverviewProps) {
             } else if (mergedChildrenPaths) {
                 dispatch(getOverviewBatched([schemaPath, ...mergedChildrenPaths]));
             }
-
-            if (isTableType(type) && isColumnEntityType(type)) {
-                if (!isBackground) {
-                    dispatch(resetOlapLoadingState());
-                }
-                dispatch(getOlapStats({path: schemaPath}));
-            }
         },
-        [
-            tenantName,
-            currentSchemaPath,
-            type,
-            isEntityWithMergedImpl,
-            mergedChildrenPaths,
-            dispatch,
-        ],
+        [schemaPath, isEntityWithMergedImpl, mergedChildrenPaths, dispatch],
     );
 
     useAutofetcher(fetchData, [fetchData], autorefresh > 0);
