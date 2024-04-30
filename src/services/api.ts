@@ -64,17 +64,21 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId: concurrentId || `getClusterInfo`, requestConfig: {signal}},
         );
     }
-    getClusterNodes({concurrentId}: AxiosOptions = {}) {
+    getClusterNodes({concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TEvSystemStateResponse>(
             this.getPath('/viewer/json/sysinfo'),
             {},
-            {concurrentId: concurrentId || `getClusterNodes`},
+            {concurrentId: concurrentId || `getClusterNodes`, requestConfig: {signal}},
         );
     }
-    getNodeInfo(id?: string | number) {
-        return this.get<TEvSystemStateResponse>(this.getPath('/viewer/json/sysinfo?enums=true'), {
-            node_id: id,
-        });
+    getNodeInfo(id?: string | number, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<TEvSystemStateResponse>(
+            this.getPath('/viewer/json/sysinfo?enums=true'),
+            {
+                node_id: id,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
     }
     getTenants(clusterName?: string, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TTenantInfo>(
@@ -120,14 +124,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     /** @deprecated use getNodes instead */
     getCompute(
         {sortOrder, sortValue, ...params}: ComputeApiRequestParams,
-        {concurrentId}: AxiosOptions = {},
+        {concurrentId, signal}: AxiosOptions = {},
     ) {
         const sort = prepareSortValue(sortValue, sortOrder);
 
         return this.get<TComputeInfo>(
             this.getPath('/viewer/json/compute?enums=true'),
             {sort, ...params},
-            {concurrentId},
+            {concurrentId, requestConfig: {signal}},
         );
     }
     getStorageInfo(
@@ -159,45 +163,70 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId, requestConfig: {signal}},
         );
     }
-    getPdiskInfo(nodeId: string | number, pdiskId: string | number) {
-        return this.get<TEvPDiskStateResponse>(this.getPath('/viewer/json/pdiskinfo?enums=true'), {
-            filter: `(NodeId=${nodeId}${pdiskId ? `;PDiskId=${pdiskId}` : ''})`,
-        });
-    }
-    getVdiskInfo({
-        vDiskSlotId,
-        pDiskId,
-        nodeId,
-    }: {
-        vDiskSlotId: string | number;
-        pDiskId: string | number;
-        nodeId: string | number;
-    }) {
-        return this.get<TEvVDiskStateResponse>(this.getPath('/viewer/json/vdiskinfo?enums=true'), {
-            node_id: nodeId,
-            filter: `(PDiskId=${pDiskId};VDiskSlotId=${vDiskSlotId})`,
-        });
-    }
-    getGroupInfo(groupId: string | number) {
-        return this.get<TStorageInfo>(this.getPath('/viewer/json/storage?enums=true'), {
-            group_id: groupId,
-        });
-    }
-    getHostInfo() {
-        return this.get<TEvSystemStateResponse>(
-            this.getPath('/viewer/json/sysinfo?node_id=.&enums=true'),
-            {},
+    getPDiskInfo(
+        {nodeId, pDiskId}: {nodeId: string | number; pDiskId: string | number},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<TEvPDiskStateResponse>(
+            this.getPath('/viewer/json/pdiskinfo?enums=true'),
+            {
+                filter: `(NodeId=${nodeId}${pDiskId ? `;PDiskId=${pDiskId}` : ''})`,
+            },
+            {concurrentId, requestConfig: {signal}},
         );
     }
-    getTabletsInfo({nodes = [], path}: {nodes?: string[]; path?: string}) {
-        const filter = nodes.length > 0 && `(NodeId=[${nodes.join(',')}])`;
-        return this.get<TEvTabletStateResponse>(this.getPath('/viewer/json/tabletinfo'), {
-            filter,
-            path,
-            enums: true,
-        });
+    getVDiskInfo(
+        {
+            vDiskSlotId,
+            pDiskId,
+            nodeId,
+        }: {
+            vDiskSlotId: string | number;
+            pDiskId: string | number;
+            nodeId: string | number;
+        },
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<TEvVDiskStateResponse>(
+            this.getPath('/viewer/json/vdiskinfo?enums=true'),
+            {
+                node_id: nodeId,
+                filter: `(PDiskId=${pDiskId};VDiskSlotId=${vDiskSlotId})`,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
     }
-    getSchema({path}: {path: string}, {concurrentId}: AxiosOptions = {}) {
+    getGroupInfo(groupId: string | number, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<TStorageInfo>(
+            this.getPath('/viewer/json/storage?enums=true'),
+            {
+                group_id: groupId,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+    getHostInfo({concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<TEvSystemStateResponse>(
+            this.getPath('/viewer/json/sysinfo?node_id=.&enums=true'),
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+    getTabletsInfo(
+        {nodes = [], path}: {nodes?: string[]; path?: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        const filter = nodes.length > 0 && `(NodeId=[${nodes.join(',')}])`;
+        return this.get<TEvTabletStateResponse>(
+            this.getPath('/viewer/json/tabletinfo'),
+            {
+                filter,
+                path,
+                enums: true,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+    getSchema({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
@@ -210,10 +239,10 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 partitioning_info: true,
                 subs: 1,
             },
-            {concurrentId: concurrentId || `getSchema|${path}`},
+            {concurrentId: concurrentId || `getSchema|${path}`, requestConfig: {signal}},
         );
     }
-    getDescribe({path}: {path: string}, {concurrentId}: AxiosOptions = {}) {
+    getDescribe({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
@@ -222,35 +251,43 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 partition_stats: true,
                 subs: 0,
             },
-            {concurrentId: concurrentId || `getDescribe|${path}`},
+            {concurrentId: concurrentId || `getDescribe|${path}`, requestConfig: {signal}},
         );
     }
-    getSchemaAcl({path}: {path: string}) {
+    getSchemaAcl({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TMetaInfo>(
             this.getPath('/viewer/json/acl'),
             {
                 path,
             },
-            {concurrentId: `getSchemaAcl`},
+            {concurrentId: concurrentId || `getSchemaAcl`, requestConfig: {signal}},
         );
     }
-    getHeatmapData({path}: {path: string}) {
-        return this.get<Nullable<TEvDescribeSchemeResult>>(this.getPath('/viewer/json/describe'), {
-            path,
-            enums: true,
-            backup: false,
-            children: false,
-            partition_config: false,
-            partition_stats: true,
-        });
+    getHeatmapData({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<Nullable<TEvDescribeSchemeResult>>(
+            this.getPath('/viewer/json/describe'),
+            {
+                path,
+                enums: true,
+                backup: false,
+                children: false,
+                partition_config: false,
+                partition_stats: true,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
     }
-    getNetwork(path: string) {
-        return this.get<TNetInfo>(this.getPath('/viewer/json/netinfo'), {
-            enums: true,
-            path,
-        });
+    getNetwork(path: string, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<TNetInfo>(
+            this.getPath('/viewer/json/netinfo'),
+            {
+                enums: true,
+                path,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
     }
-    getTopic({path}: {path?: string}, {concurrentId}: AxiosOptions = {}) {
+    getTopic({path}: {path?: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<DescribeTopicResult>(
             this.getPath('/viewer/json/describe_topic'),
             {
@@ -258,12 +295,12 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 include_stats: true,
                 path,
             },
-            {concurrentId: concurrentId || 'getTopic'},
+            {concurrentId, requestConfig: {signal}},
         );
     }
     getConsumer(
         {path, consumer}: {path: string; consumer: string},
-        {concurrentId}: AxiosOptions = {},
+        {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<DescribeConsumerResult>(
             this.getPath('/viewer/json/describe_consumer'),
@@ -273,40 +310,68 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 path,
                 consumer,
             },
-            {concurrentId: concurrentId || 'getConsumer'},
+            {concurrentId: concurrentId || 'getConsumer', requestConfig: {signal}},
         );
     }
-    getPoolInfo(poolName: string) {
-        return this.get<TStorageInfo>(this.getPath('/viewer/json/storage'), {
-            pool: poolName,
-            enums: true,
-        });
+    getPoolInfo(poolName: string, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<TStorageInfo>(
+            this.getPath('/viewer/json/storage'),
+            {
+                pool: poolName,
+                enums: true,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
     }
-    getTablet({id}: {id?: string}) {
+    getTablet({id}: {id?: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TEvTabletStateResponse>(
             this.getPath(`/viewer/json/tabletinfo?filter=(TabletId=${id})`),
             {
                 enums: true,
             },
+            {
+                concurrentId,
+                requestConfig: {signal},
+            },
         );
     }
-    getTabletHistory({id}: {id?: string}) {
+    getTabletHistory({id}: {id?: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<UnmergedTEvTabletStateResponse>(
             this.getPath(`/viewer/json/tabletinfo?filter=(TabletId=${id})`),
             {
                 enums: true,
                 merge: false,
             },
+            {
+                concurrentId,
+                requestConfig: {signal},
+            },
         );
     }
-    getNodesList() {
-        return this.get<TEvNodesInfo>(this.getPath('/viewer/json/nodelist'), {enums: true});
+    getNodesList({concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<TEvNodesInfo>(
+            this.getPath('/viewer/json/nodelist'),
+            {
+                enums: true,
+            },
+            {
+                concurrentId,
+                requestConfig: {signal},
+            },
+        );
     }
-    getTenantsList() {
-        return this.get<TTenants>(this.getPath('/viewer/json/tenants'), {
-            enums: true,
-            state: 0,
-        });
+    getTenantsList({concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<TTenants>(
+            this.getPath('/viewer/json/tenants'),
+            {
+                enums: true,
+                state: 0,
+            },
+            {
+                concurrentId,
+                requestConfig: {signal},
+            },
+        );
     }
     sendQuery<Action extends Actions, Schema extends Schemas = undefined>(
         {
@@ -380,14 +445,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {},
         );
     }
-    getHotKeys(path: string, enableSampling: boolean, {concurrentId}: AxiosOptions = {}) {
+    getHotKeys(path: string, enableSampling: boolean, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<JsonHotKeysResponse>(
             this.getPath('/viewer/json/hotkeys'),
             {
                 path,
                 enable_sampling: enableSampling,
             },
-            {concurrentId: concurrentId || 'getHotKeys'},
+            {concurrentId: concurrentId || 'getHotKeys', requestConfig: {signal}},
         );
     }
     getHealthcheckInfo(database: string, {concurrentId, signal}: AxiosOptions = {}) {
@@ -469,15 +534,19 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {},
         );
     }
-    getTabletDescribe(tenantId: TDomainKey) {
-        return this.get<Nullable<TEvDescribeSchemeResult>>(this.getPath('/viewer/json/describe'), {
-            schemeshard_id: tenantId?.SchemeShard,
-            path_id: tenantId?.PathId,
-        });
+    getTabletDescribe(tenantId: TDomainKey, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<Nullable<TEvDescribeSchemeResult>>(
+            this.getPath('/viewer/json/describe'),
+            {
+                schemeshard_id: tenantId?.SchemeShard,
+                path_id: tenantId?.PathId,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
     }
     getChartData(
         {target, from, until, maxDataPoints, database}: JsonRenderRequestParams,
-        {concurrentId}: AxiosOptions = {},
+        {concurrentId, signal}: AxiosOptions = {},
     ) {
         const requestString = `${target}&from=${from}&until=${until}&maxDataPoints=${maxDataPoints}&format=json`;
 
@@ -490,6 +559,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
+                requestConfig: {signal},
             },
         );
     }
@@ -537,10 +607,14 @@ export class YdbWebVersionAPI extends YdbEmbeddedAPI {
         ).then(parseMetaCluster);
     }
 
-    getTenants(clusterName: string) {
-        return this.get<MetaTenants>(`${META_BACKEND || ''}/meta/cp_databases`, {
-            cluster_name: clusterName,
-        }).then(parseMetaTenants);
+    getTenants(clusterName: string, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<MetaTenants>(
+            `${META_BACKEND || ''}/meta/cp_databases`,
+            {
+                cluster_name: clusterName,
+            },
+            {concurrentId, requestConfig: {signal}},
+        ).then(parseMetaTenants);
     }
 }
 
