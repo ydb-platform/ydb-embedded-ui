@@ -28,7 +28,6 @@ import settings from './settings/settings';
 import shardsWorkload from './shardsWorkload/shardsWorkload';
 import singleClusterMode from './singleClusterMode';
 import storage from './storage/storage';
-import tablet from './tablet';
 import tablets from './tablets';
 import tabletsFilters from './tabletsFilters';
 import tenant from './tenant/tenant';
@@ -51,7 +50,6 @@ export const rootReducer = {
     host,
     network,
     tenants,
-    tablet,
     partitions,
     executeQuery,
     explainQuery,

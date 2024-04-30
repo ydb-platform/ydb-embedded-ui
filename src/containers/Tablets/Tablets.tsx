@@ -4,6 +4,7 @@ import {Select} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import ReactList from 'react-list';
 
+import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
 import {Tablet} from '../../components/Tablet';
 import TabletsOverall from '../../components/TabletsOverall/TabletsOverall';
@@ -124,7 +125,7 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
     if (loading) {
         return <Loader />;
     } else if (error) {
-        return <div className="error">{error.statusText}</div>;
+        return <ResponseError error={error} />;
     } else {
         return tablets.length > 0 ? (
             renderContent()
