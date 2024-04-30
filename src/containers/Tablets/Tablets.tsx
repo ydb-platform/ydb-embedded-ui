@@ -1,20 +1,17 @@
 import React from 'react';
 
 import {Select} from '@gravity-ui/uikit';
+import {skipToken} from '@reduxjs/toolkit/query';
 import ReactList from 'react-list';
 
 import {Loader} from '../../components/Loader';
 import {Tablet} from '../../components/Tablet';
 import TabletsOverall from '../../components/TabletsOverall/TabletsOverall';
-import {
-    clearWasLoadingFlag,
-    getTabletsInfo,
-    setStateFilter,
-    setTypeFilter,
-} from '../../store/reducers/tablets';
-import type {ETabletState, EType, TTabletStateInfo} from '../../types/api/tablet';
+import {setStateFilter, setTypeFilter, tabletsApi} from '../../store/reducers/tablets';
+import type {ETabletState, EType} from '../../types/api/tablet';
+import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import {cn} from '../../utils/cn';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -31,32 +28,23 @@ interface TabletsProps {
 export const Tablets = ({path, nodeId, className}: TabletsProps) => {
     const dispatch = useTypedDispatch();
 
-    const {data, wasLoaded, loading, error, stateFilter, typeFilter} = useTypedSelector(
-        (state) => state.tablets,
-    );
+    const {stateFilter, typeFilter} = useTypedSelector((state) => state.tablets);
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
-    const tablets = React.useMemo(() => data?.TabletStateInfo || [], [data]);
+    let params: TabletsApiRequestParams | typeof skipToken = skipToken;
+    if (nodeId) {
+        params = {nodes: [String(nodeId)]};
+    } else if (path) {
+        params = {path};
+    }
+    const {currentData, isFetching, error} = tabletsApi.useGetTabletsInfoQuery(params, {
+        pollingInterval: autorefresh,
+    });
 
-    const fetchData = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(clearWasLoadingFlag());
-            }
-            if (nodeId) {
-                dispatch(getTabletsInfo({nodes: [String(nodeId)]}));
-            } else if (path) {
-                dispatch(getTabletsInfo({path}));
-            }
-        },
-        [path, nodeId, dispatch],
-    );
+    const loading = isFetching && currentData === undefined;
+    const tablets = React.useMemo(() => currentData?.TabletStateInfo || [], [currentData]);
 
-    useAutofetcher(fetchData, [fetchData], autorefresh);
-
-    const [tabletsToRender, setTabletsToRender] = React.useState<TTabletStateInfo[]>([]);
-
-    React.useEffect(() => {
+    const tabletsToRender = React.useMemo(() => {
         let filteredTablets = tablets;
 
         if (typeFilter.length > 0) {
@@ -69,7 +57,7 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
                 stateFilter.some((filter) => tablet.State === filter),
             );
         }
-        setTabletsToRender(filteredTablets);
+        return filteredTablets;
     }, [tablets, stateFilter, typeFilter]);
 
     const handleStateFilterChange = (value: string[]) => {
@@ -133,7 +121,7 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
         );
     };
 
-    if (loading && !wasLoaded) {
+    if (loading) {
         return <Loader />;
     } else if (error) {
         return <div className="error">{error.statusText}</div>;
