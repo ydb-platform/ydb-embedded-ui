@@ -12,7 +12,6 @@ import header from './header/header';
 import heatmap from './heatmap';
 import host from './host';
 import hotKeys from './hotKeys/hotKeys';
-import network from './network/network';
 import node from './node/node';
 import nodes from './nodes/nodes';
 import partitions from './partitions/partitions';
@@ -41,7 +40,6 @@ export const rootReducer = {
     tablets,
     schema,
     host,
-    network,
     tenants,
     partitions,
     executeQuery,
