@@ -6,15 +6,16 @@ import {useLocation, useRouteMatch} from 'react-router';
 import {Link} from 'react-router-dom';
 
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
+import {ResponseError} from '../../components/Errors/ResponseError';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {Loader} from '../../components/Loader';
 import routes, {createHref, parseQuery} from '../../routes';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {getNodeInfo, resetNode} from '../../store/reducers/node/node';
+import {nodeApi} from '../../store/reducers/node/node';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import {AutoFetcher} from '../../utils/autofetcher';
 import {cn} from '../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
+import {useTypedDispatch} from '../../utils/hooks';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {Tablets} from '../Tablets';
 
@@ -27,8 +28,6 @@ const b = cn('node');
 
 export const STORAGE_ROLE = 'Storage';
 
-const autofetcher = new AutoFetcher();
-
 interface NodeProps {
     additionalNodesProps?: AdditionalNodesProps;
     className?: string;
@@ -40,13 +39,18 @@ function Node(props: NodeProps) {
     const dispatch = useTypedDispatch();
     const location = useLocation();
 
-    const {loading, wasLoaded, error, data: node} = useTypedSelector((state) => state.node);
-
     const match =
         useRouteMatch<{id: string; activeTab: string}>(routes.node) ?? Object.create(null);
 
     const {id: nodeId, activeTab} = match.params;
     const {tenantName: tenantNameFromQuery} = parseQuery(location);
+
+    const {currentData, isFetching, error} = nodeApi.useGetNodeInfoQuery(
+        {nodeId},
+        {pollingInterval: DEFAULT_POLLING_INTERVAL},
+    );
+    const loading = isFetching && currentData === undefined;
+    const node = currentData;
 
     const {activeTabVerified, nodeTabs} = React.useMemo(() => {
         const hasStorage = node?.Roles?.find((el) => el === STORAGE_ROLE);
@@ -78,18 +82,6 @@ function Node(props: NodeProps) {
             }),
         );
     }, [dispatch, node, nodeId, tenantNameFromQuery]);
-
-    React.useEffect(() => {
-        const fetchData = () => dispatch(getNodeInfo(nodeId));
-        fetchData();
-        autofetcher.start();
-        autofetcher.fetch(() => fetchData());
-
-        return () => {
-            autofetcher.stop();
-            dispatch(resetNode());
-        };
-    }, [dispatch, nodeId]);
 
     const renderTabs = () => {
         return (
@@ -137,10 +129,10 @@ function Node(props: NodeProps) {
         }
     };
 
-    if (loading && !wasLoaded) {
+    if (loading) {
         return <Loader size="l" />;
     } else if (error) {
-        return <div>{error.statusText}</div>;
+        return <ResponseError error={error} />;
     } else {
         if (node) {
             return (

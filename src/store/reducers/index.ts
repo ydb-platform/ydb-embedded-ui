@@ -12,7 +12,6 @@ import header from './header/header';
 import heatmap from './heatmap';
 import host from './host';
 import hotKeys from './hotKeys/hotKeys';
-import node from './node/node';
 import nodes from './nodes/nodes';
 import partitions from './partitions/partitions';
 import saveQuery from './saveQuery';
@@ -35,7 +34,6 @@ export const rootReducer = {
     cluster,
     tenant,
     storage,
-    node,
     tooltip,
     tablets,
     schema,

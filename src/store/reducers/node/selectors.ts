@@ -1,22 +1,26 @@
-import type {Selector} from '@reduxjs/toolkit';
 import {createSelector} from '@reduxjs/toolkit';
 
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {preparePDiskData} from '../../../utils/disks/prepareDisks';
+import type {RootState} from '../../defaultStore';
 
-import type {
-    NodeStateSlice,
-    PreparedNodeStructure,
-    PreparedStructureVDisk,
-    RawNodeStructure,
-} from './types';
+import {nodeApi} from './node';
+import type {PreparedNodeStructure, PreparedStructureVDisk, RawNodeStructure} from './types';
 
-const selectNodeId = (state: NodeStateSlice) => state.node?.data?.NodeId;
+const getNodeStructureSelector = createSelector(
+    (nodeId: string) => nodeId,
+    (nodeId) => nodeApi.endpoints.getNodeStructure.select({nodeId}),
+);
 
-const selectRawNodeStructure = (state: NodeStateSlice) => state.node?.nodeStructure;
+const selectGetNodeStructureData = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, nodeId: string) => getNodeStructureSelector(nodeId),
+    (state, selectGetNodeStructure) => selectGetNodeStructure(state).data,
+);
 
-export const selectNodeStructure: Selector<NodeStateSlice, PreparedNodeStructure> = createSelector(
-    [selectNodeId, selectRawNodeStructure],
+export const selectNodeStructure = createSelector(
+    (_state: RootState, nodeId: string) => Number(nodeId),
+    (state: RootState, nodeId: string) => selectGetNodeStructureData(state, nodeId),
     (nodeId, storageInfo) => {
         const pools = storageInfo?.StoragePools;
         const structure: RawNodeStructure = {};
@@ -43,7 +47,7 @@ export const selectNodeStructure: Selector<NodeStateSlice, PreparedNodeStructure
             });
         });
 
-        const structureWithVdisksArray = Object.keys(structure).reduce<PreparedNodeStructure>(
+        const structureWithVDisksArray = Object.keys(structure).reduce<PreparedNodeStructure>(
             (preparedStructure, el) => {
                 const vDisks = structure[el].vDisks;
                 const vDisksArray = Object.keys(vDisks).reduce<PreparedStructureVDisk[]>(
@@ -58,6 +62,6 @@ export const selectNodeStructure: Selector<NodeStateSlice, PreparedNodeStructure
             },
             {},
         );
-        return structureWithVdisksArray;
+        return structureWithVDisksArray;
     },
 );

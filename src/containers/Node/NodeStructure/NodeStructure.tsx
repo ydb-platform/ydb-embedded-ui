@@ -5,11 +5,12 @@ import React from 'react';
 import isEmpty from 'lodash/isEmpty';
 
 import {Loader} from '../.././../components/Loader';
-import {getNodeStructure} from '../../../store/reducers/node/node';
+import {ResponseError} from '../../../components/Errors/ResponseError';
+import {nodeApi} from '../../../store/reducers/node/node';
 import {selectNodeStructure} from '../../../store/reducers/node/selectors';
-import {AutoFetcher} from '../../../utils/autofetcher';
 import {cn} from '../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {DEFAULT_POLLING_INTERVAL} from '../../../utils/constants';
+import {useTypedSelector} from '../../../utils/hooks';
 
 import {PDisk} from './Pdisk';
 
@@ -26,14 +27,15 @@ interface NodeStructureProps {
     className?: string;
 }
 
-const autofetcher = new AutoFetcher();
-
 function NodeStructure({nodeId, className}: NodeStructureProps) {
-    const dispatch = useTypedDispatch();
+    const nodeStructure = useTypedSelector((state) => selectNodeStructure(state, nodeId));
 
-    const nodeStructure = useTypedSelector(selectNodeStructure);
+    const {currentData, isFetching, error} = nodeApi.useGetNodeStructureQuery(
+        {nodeId},
+        {pollingInterval: DEFAULT_POLLING_INTERVAL},
+    );
 
-    const {loadingStructure, wasLoadedStructure} = useTypedSelector((state) => state.node);
+    const loadingStructure = isFetching && currentData === undefined;
 
     const {pdiskId: pdiskIdFromUrl, vdiskId: vdiskIdFromUrl} = url.parse(
         window.location.href,
@@ -42,30 +44,10 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
 
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
-    const isReady = React.useRef(false);
-
     const scrolled = React.useRef(false);
 
     React.useEffect(() => {
-        dispatch(getNodeStructure(nodeId));
-        autofetcher.start();
-        autofetcher.fetch(() => dispatch(getNodeStructure(nodeId)));
-
-        return () => {
-            scrolled.current = false;
-            isReady.current = false;
-            autofetcher.stop();
-        };
-    }, [nodeId, dispatch]);
-
-    React.useEffect(() => {
-        if (!isEmpty(nodeStructure) && scrollContainerRef.current) {
-            isReady.current = true;
-        }
-    }, [nodeStructure]);
-
-    React.useEffect(() => {
-        if (isReady.current && !scrolled.current && scrollContainerRef.current) {
+        if (!isEmpty(nodeStructure) && !scrolled.current && scrollContainerRef.current) {
             const element = document.getElementById(
                 generateId({type: 'pdisk', id: pdiskIdFromUrl as string}),
             );
@@ -115,8 +97,11 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
     };
 
     const renderContent = () => {
-        if (loadingStructure && !wasLoadedStructure) {
+        if (loadingStructure) {
             return <Loader size="m" />;
+        }
+        if (error) {
+            return <ResponseError error={error} />;
         }
         return renderStructure();
     };
