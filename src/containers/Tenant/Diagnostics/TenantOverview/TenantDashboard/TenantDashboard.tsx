@@ -39,7 +39,7 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
     // Refetch data only if dashboard successfully loaded
-    const shouldRefresh = autorefresh && !isDashboardHidden;
+    const shouldRefresh = isDashboardHidden ? 0 : autorefresh;
 
     /**
      * Charts should be hidden, if they are not enabled:

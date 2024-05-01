@@ -83,20 +83,20 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
         ...groupsSortParams,
     });
 
-    const autoRefreshEnabled = tenant ? autorefresh : true;
+    const autoRefreshInterval = tenant ? autorefresh : DEFAULT_POLLING_INTERVAL;
 
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
         {tenant, visibleEntities, ...nodesRequestParams},
         {
             skip: storageType !== STORAGE_TYPES.nodes,
-            pollingInterval: autoRefreshEnabled ? DEFAULT_POLLING_INTERVAL : 0,
+            pollingInterval: autoRefreshInterval,
         },
     );
     const groupsQuery = storageApi.useGetStorageGroupsInfoQuery(
         {tenant, visibleEntities, nodeId, ...storageRequestParams},
         {
             skip: storageType !== STORAGE_TYPES.groups,
-            pollingInterval: autoRefreshEnabled ? DEFAULT_POLLING_INTERVAL : 0,
+            pollingInterval: autoRefreshInterval,
         },
     );
 

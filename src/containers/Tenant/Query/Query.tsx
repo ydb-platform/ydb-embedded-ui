@@ -22,7 +22,7 @@ const b = cn('ydb-query');
 interface QueryProps {
     theme: string;
     path: string;
-    type: EPathType;
+    type?: EPathType;
 }
 
 export const Query = (props: QueryProps) => {

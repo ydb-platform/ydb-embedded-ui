@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Switch, Tabs} from '@gravity-ui/uikit';
+import {Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
 import {Helmet} from 'react-helmet-async';
 import {useLocation} from 'react-router';
@@ -8,8 +8,6 @@ import {Link} from 'react-router-dom';
 
 import {Loader} from '../../../components/Loader';
 import routes, {createHref} from '../../../routes';
-import {api} from '../../../store/reducers/api';
-import {disableAutorefresh, enableAutorefresh} from '../../../store/reducers/schema/schema';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
@@ -24,12 +22,13 @@ import {Tablets} from '../../Tablets';
 import {TenantTabsGroups} from '../TenantPages';
 import {isDatabaseEntityType} from '../utils/schema';
 
+import {AutorefreshControl} from './Autorefresh/AutorefreshControl';
 import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
 import {DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
 import {HotKeys} from './HotKeys/HotKeys';
-import Network from './Network/Network';
+import {Network} from './Network/Network';
 import {Partitions} from './Partitions/Partitions';
 import {TopQueries} from './TopQueries';
 import {TopShards} from './TopShards';
@@ -48,7 +47,7 @@ function Diagnostics(props: DiagnosticsProps) {
     const container = React.useRef<HTMLDivElement>(null);
 
     const dispatch = useTypedDispatch();
-    const {currentSchemaPath, autorefresh, wasLoaded} = useTypedSelector((state) => state.schema);
+    const {currentSchemaPath, wasLoaded} = useTypedSelector((state) => state.schema);
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
     );
@@ -87,15 +86,6 @@ function Diagnostics(props: DiagnosticsProps) {
         }
         return undefined;
     }, [pages, diagnosticsTab, wasLoaded]);
-
-    const onAutorefreshToggle = (value: boolean) => {
-        if (value) {
-            dispatch(api.util.invalidateTags(['All']));
-            dispatch(enableAutorefresh());
-        } else {
-            dispatch(disableAutorefresh());
-        }
-    };
 
     const renderTabContent = () => {
         const {type} = props;
@@ -184,11 +174,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         }}
                         allowNotSelected={true}
                     />
-                    <Switch
-                        checked={autorefresh}
-                        onUpdate={onAutorefreshToggle}
-                        content="Autorefresh"
-                    />
+                    <AutorefreshControl />
                 </div>
             </div>
         );

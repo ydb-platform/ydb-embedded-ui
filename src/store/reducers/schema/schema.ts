@@ -17,8 +17,7 @@ export const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
 const PRELOAD_SCHEMAS = 'schema/PRELOAD_SCHEMAS';
 const SET_SCHEMA = 'schema/SET_SCHEMA';
 const SET_SHOW_PREVIEW = 'schema/SET_SHOW_PREVIEW';
-const ENABLE_AUTOREFRESH = 'schema/ENABLE_AUTOREFRESH';
-const DISABLE_AUTOREFRESH = 'schema/DISABLE_AUTOREFRESH';
+const SET_AUTOREFRESH_INTERVAL = 'schema/SET_AUTOREFRESH_INTERVAL';
 const RESET_LOADING_STATE = 'schema/RESET_LOADING_STATE';
 
 export const initialState = {
@@ -26,7 +25,7 @@ export const initialState = {
     wasLoaded: false,
     data: {},
     currentSchemaPath: undefined,
-    autorefresh: false,
+    autorefresh: 0,
     showPreview: false,
 };
 
@@ -88,16 +87,10 @@ const schema: Reducer<SchemaState, SchemaAction> = (state = initialState, action
                 currentSchemaPath: action.data,
             };
         }
-        case ENABLE_AUTOREFRESH: {
+        case SET_AUTOREFRESH_INTERVAL: {
             return {
                 ...state,
-                autorefresh: true,
-            };
-        }
-        case DISABLE_AUTOREFRESH: {
-            return {
-                ...state,
-                autorefresh: false,
+                autorefresh: action.data,
             };
         }
         case SET_SHOW_PREVIEW: {
@@ -142,14 +135,10 @@ export function setCurrentSchemaPath(currentSchemaPath: string) {
         data: currentSchemaPath,
     } as const;
 }
-export function enableAutorefresh() {
+export function setAutorefreshInterval(interval: number) {
     return {
-        type: ENABLE_AUTOREFRESH,
-    } as const;
-}
-export function disableAutorefresh() {
-    return {
-        type: DISABLE_AUTOREFRESH,
+        type: SET_AUTOREFRESH_INTERVAL,
+        data: interval,
     } as const;
 }
 export function setShowPreview(value: boolean) {

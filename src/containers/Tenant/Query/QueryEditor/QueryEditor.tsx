@@ -77,7 +77,7 @@ interface QueryEditorProps {
     executeQuery: ExecuteQueryState;
     explainQuery: ExplainQueryState;
     theme: string;
-    type: EPathType;
+    type?: EPathType;
     showPreview: boolean;
     setShowPreview: (...args: Parameters<typeof setShowPreview>) => void;
     saveQueryToHistory: (...args: Parameters<typeof saveQueryToHistory>) => void;
@@ -470,7 +470,7 @@ interface ResultProps {
     resultVisibilityState: InitialPaneState;
     onExpandResultHandler: () => void;
     onCollapseResultHandler: () => void;
-    type: EPathType;
+    type?: EPathType;
     handleAstQuery: () => void;
     theme: string;
     resultType: ValueOf<typeof RESULT_TYPES> | undefined;

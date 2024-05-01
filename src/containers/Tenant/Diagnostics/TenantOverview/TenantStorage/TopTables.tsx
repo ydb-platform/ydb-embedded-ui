@@ -7,7 +7,6 @@ import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/L
 import {topTablesApi} from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
-import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
 import {useTypedSelector} from '../../../../../utils/hooks';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
@@ -26,7 +25,7 @@ export function TopTables({path}: TopTablesProps) {
 
     const {currentData, error, isFetching} = topTablesApi.useGetTopTablesQuery(
         {path},
-        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
+        {pollingInterval: autorefresh},
     );
     const loading = isFetching && currentData === undefined;
 
