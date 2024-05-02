@@ -130,12 +130,6 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     const loading = isFetching && result === undefined;
     const {result: data} = result ?? {};
 
-    // don't show loader for requests triggered by table sort, only for path change
-    // React.useEffect(() => {
-    //     dispatch(shardApi.util.resetApiState());
-    //     dispatch(shardApi.util.invalidateTags(['All']));
-    // }, [dispatch, currentSchemaPath, tenantPath, filters]);
-
     const onSort = (newSortOrder?: SortOrder | SortOrder[]) => {
         // omit information about sort order to disable ASC order, only DESC makes sense for top shards
         // use a string (and not the DataTable default format) to prevent reference change,

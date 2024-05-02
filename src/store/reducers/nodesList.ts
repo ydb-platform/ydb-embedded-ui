@@ -11,7 +11,7 @@ export const nodesListApi = api.injectEndpoints({
             queryFn: async (_, {signal}) => {
                 try {
                     const data = await window.api.getNodesList({signal});
-                    return {data: prepareNodesMap(data)};
+                    return {data};
                 } catch (error) {
                     return {error};
                 }
@@ -25,6 +25,6 @@ export const nodesListApi = api.injectEndpoints({
 const selectNodesList = nodesListApi.endpoints.getNodesList.select(undefined);
 
 export const selectNodesMap = createSelector(
-    (state: RootState) => selectNodesList(state),
-    (nodes) => nodes.data,
+    (state: RootState) => selectNodesList(state).data,
+    (data) => prepareNodesMap(data),
 );

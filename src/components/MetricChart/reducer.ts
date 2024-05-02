@@ -7,7 +7,7 @@ import i18n from './i18n';
 
 export const chartApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getChertData: builder.query({
+        getChartData: builder.query({
             queryFn: async (params: GetChartDataParams, {signal}) => {
                 try {
                     const response = await getChartData(params, {signal});

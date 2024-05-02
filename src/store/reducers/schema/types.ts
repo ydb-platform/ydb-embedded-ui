@@ -4,9 +4,9 @@ import type {ApiRequestAction} from '../../utils';
 
 import type {
     FETCH_SCHEMA,
+    SET_AUTOREFRESH_INTERVAL,
     preloadSchemas,
     resetLoadingState,
-    setAutorefreshInterval,
     setCurrentSchemaPath,
     setShowPreview,
 } from './schema';
@@ -40,7 +40,7 @@ export type SchemaAction =
     | SchemaApiRequestAction
     | (
           | ReturnType<typeof setCurrentSchemaPath>
-          | ReturnType<typeof setAutorefreshInterval>
+          | {type: typeof SET_AUTOREFRESH_INTERVAL; data: number}
           | ReturnType<typeof setShowPreview>
           | ReturnType<typeof preloadSchemas>
           | ReturnType<typeof resetLoadingState>

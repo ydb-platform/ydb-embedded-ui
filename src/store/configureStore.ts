@@ -27,10 +27,12 @@ function _configureStore<
         preloadedState,
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
-                immutableCheck: {ignoredPaths: ['tooltip.currentHoveredRef']},
+                immutableCheck: {
+                    ignoredPaths: ['tooltip.currentHoveredRef'],
+                },
                 serializableCheck: {
                     ignoredPaths: ['tooltip.currentHoveredRef', 'api'],
-                    ignoredActions: [UPDATE_REF],
+                    ignoredActions: [UPDATE_REF, 'api/executeQuery/rejected'],
                 },
             }).concat(locationMiddleware, ...middleware),
     });

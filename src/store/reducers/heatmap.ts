@@ -1,12 +1,15 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
+import type {TEvDescribeSchemeResult} from '../../types/api/schema';
+import type {TEvTabletStateResponse} from '../../types/api/tablet';
 import type {
     IHeatmapApiRequestParams,
     IHeatmapMetricValue,
     IHeatmapState,
     IHeatmapTabletData,
 } from '../../types/store/heatmap';
+import type {Nullable} from '../../utils/typecheckers';
 import type {RootState} from '../defaultStore';
 
 import {api} from './api';
@@ -71,8 +74,8 @@ export const heatmapApi = api.injectEndpoints({
 });
 
 function transformResponse([tabletsData, describe]: [
-    Awaited<ReturnType<typeof window.api.getTabletsInfo>>,
-    Awaited<ReturnType<typeof window.api.getHeatmapData>>,
+    TEvTabletStateResponse,
+    Nullable<TEvDescribeSchemeResult>,
 ]) {
     const {TabletStateInfo: tablets = []} = tabletsData;
     const TabletsMap: Map<string, IHeatmapTabletData> = new Map();

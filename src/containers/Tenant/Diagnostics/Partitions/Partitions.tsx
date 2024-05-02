@@ -5,7 +5,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import {nodesListApi} from '../../../../store/reducers/nodesList';
+import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
 import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
 import {cn} from '../../../../utils/cn';
@@ -47,11 +47,12 @@ export const Partitions = ({path}: PartitionsProps) => {
     } = topicApi.useGetTopicQuery({path});
     const topicLoading = topicIsFetching && topicData === undefined;
     const {
-        currentData: nodesMap,
+        currentData: nodesData,
         isFetching: nodesIsFetching,
         error: nodesError,
     } = nodesListApi.useGetNodesListQuery(undefined);
-    const nodesLoading = nodesIsFetching && nodesMap === undefined;
+    const nodesLoading = nodesIsFetching && nodesData === undefined;
+    const nodesMap = useTypedSelector(selectNodesMap);
 
     const [hiddenColumns, setHiddenColumns] = useSetting<string[]>(PARTITIONS_HIDDEN_COLUMNS_KEY);
 

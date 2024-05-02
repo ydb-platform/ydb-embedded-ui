@@ -133,7 +133,10 @@ export const MetricChart = ({
     onChartDataStatusChange,
     isChartVisible,
 }: DiagnosticsChartProps) => {
-    const {currentData, error, isFetching, status} = chartApi.useGetChertDataQuery(
+    const {currentData, error, isFetching, status} = chartApi.useGetChartDataQuery(
+        // maxDataPoints param is calculated based on width
+        // should be width > maxDataPoints to prevent points that cannot be selected
+        // more px per dataPoint - easier to select, less - chart is smoother
         {
             database,
             metrics,
