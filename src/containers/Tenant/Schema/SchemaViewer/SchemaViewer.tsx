@@ -5,17 +5,13 @@ import type {Column} from '@gravity-ui/react-data-table';
 
 import {Icon} from '../../../../components/Icon';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import {EColumnCodec} from '../../../../types/api/schema';
-import type {
-    EPathType,
-    TColumnDescription,
-    TColumnTableDescription,
-    TFamilyDescription,
-} from '../../../../types/api/schema';
+import type {EPathType, TColumnDescription, TFamilyDescription} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {isColumnEntityType, isExternalTable, isRowTable, isTableType} from '../../utils/schema';
+
+import {formatColumnCodec, prepareOlapTableSchema} from './helpers';
 
 import './SchemaViewer.scss';
 
@@ -37,35 +33,6 @@ interface SchemaViewerProps {
     type?: EPathType;
     path?: string;
     withFamilies?: boolean;
-}
-
-function prepareOlapTableSchema(tableSchema: TColumnTableDescription = {}) {
-    const {Name, Schema} = tableSchema;
-
-    if (Schema) {
-        const {Columns, KeyColumnNames} = Schema;
-        const KeyColumnIds = KeyColumnNames?.map((name: string) => {
-            const column = Columns?.find((el) => el.Name === name);
-            return column?.Id;
-        }).filter((id): id is number => id !== undefined);
-
-        return {
-            Columns,
-            KeyColumnNames,
-            Name,
-            KeyColumnIds,
-        };
-    }
-
-    return {
-        Name,
-    };
-}
-
-function formatColumnCodec(codec?: EColumnCodec) {
-    if (!codec) return null;
-    if (codec === EColumnCodec.ColumnCodecPlain) return 'None';
-    return codec.replace('ColumnCodec', '').toLocaleLowerCase();
 }
 
 export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewerProps) => {
@@ -91,7 +58,9 @@ export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewer
         currentObjectData?.PathDescription?.Table?.PartitionConfig?.ColumnFamilies?.reduce<
             Record<number, TFamilyDescription>
         >((acc, family) => {
-            if (family.Id) acc[family.Id] = family;
+            if (family.Id) {
+                acc[family.Id] = family;
+            }
             return acc;
         }, {}) ?? {};
 
