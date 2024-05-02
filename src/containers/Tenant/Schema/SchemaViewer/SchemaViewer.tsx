@@ -65,14 +65,15 @@ export const SchemaViewer = ({className, type, path, withFamilies}: SchemaViewer
         }, {}) ?? {};
 
     // Keys should be displayd by their order in keyColumnIds (Primary Key)
-    const keyColumnsOrderValues = React.useMemo(() => {
-        return keyColumnIds.reduce<Record<number, number>>((result, keyColumnId, index) => {
+    const keyColumnsOrderValues = keyColumnIds.reduce<Record<number, number>>(
+        (result, keyColumnId, index) => {
             // Put columns with negative values, so they will be the first with ascending sort
             // Minus keyColumnIds.length for the first key, -1 for the last
             result[keyColumnId] = index - keyColumnIds.length;
             return result;
-        }, {});
-    }, [keyColumnIds]);
+        },
+        {},
+    );
 
     const dataTableColumns: Column<TColumnDescription>[] = [
         {
