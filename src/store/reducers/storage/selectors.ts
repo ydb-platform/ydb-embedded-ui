@@ -1,10 +1,8 @@
 import type {OrderType} from '@gravity-ui/react-data-table';
 import {ASCENDING, DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
-import type {Selector} from '@reduxjs/toolkit';
-import {createSelector} from '@reduxjs/toolkit';
 
 import {NODES_SORT_VALUES} from '../../../utils/nodes';
-import type {NodesSortValue} from '../../../utils/nodes';
+import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
 import {STORAGE_SORT_VALUES, getUsage} from '../../../utils/storage';
 import type {StorageSortValue} from '../../../utils/storage';
 import {filterNodesByUptime} from '../nodes/selectors';
@@ -61,21 +59,35 @@ const filterGroupsByUsage = (entities: PreparedStorageGroup[], usage?: string[])
     });
 };
 
+export function filterNodes(
+    storageNodes: PreparedStorageNode[],
+    textFilter: string,
+    uptimeFilter: NodesUptimeFilterValues,
+) {
+    let result = storageNodes || [];
+    result = filterNodesByText(result, textFilter);
+    result = filterNodesByUptime(result, uptimeFilter);
+
+    return result;
+}
+
+export function filterGroups(
+    storageGroups: PreparedStorageGroup[],
+    textFilter: string,
+    usageFilter: string[],
+) {
+    let result = storageGroups || [];
+    result = filterGroupsByText(result, textFilter);
+    result = filterGroupsByUsage(result, usageFilter);
+
+    return result;
+}
+
 // ==== Simple selectors ====
-
-export const selectEntitiesCount = (state: StorageStateSlice) => ({
-    total: state.storage.total,
-    found: state.storage.found,
-});
-
-export const selectStorageGroups = (state: StorageStateSlice) => state.storage.groups;
-export const selectStorageNodes = (state: StorageStateSlice) => state.storage.nodes;
-
 export const selectStorageFilter = (state: StorageStateSlice) => state.storage.filter;
 export const selectUsageFilter = (state: StorageStateSlice) => state.storage.usageFilter;
 export const selectVisibleEntities = (state: StorageStateSlice) => state.storage.visible;
-export const selectNodesUptimeFilter = (state: StorageStateSlice) =>
-    state.storage.nodesUptimeFilter;
+export const selectNodesUptimeFilter = (state: StorageStateSlice) => state.storage.uptimeFilter;
 export const selectStorageType = (state: StorageStateSlice) => state.storage.type;
 
 // ==== Sort params selectors ====
@@ -112,50 +124,21 @@ export const selectGroupsSortParams = (state: StorageStateSlice) => {
 };
 // ==== Complex selectors ====
 
-export const selectUsageFilterOptions: Selector<StorageStateSlice, UsageFilter[]> = createSelector(
-    selectStorageGroups,
-    (groups) => {
-        const items: Record<number, number> = {};
+export function getUsageFilterOptions(groups: PreparedStorageGroup[]): UsageFilter[] {
+    const items: Record<number, number> = {};
 
-        groups?.forEach((group) => {
-            // Get groups usage with step 5
-            const usage = getUsage(group, 5);
+    groups?.forEach((group) => {
+        // Get groups usage with step 5
+        const usage = getUsage(group, 5);
 
-            if (!Object.prototype.hasOwnProperty.call(items, usage)) {
-                items[usage] = 0;
-            }
+        if (!Object.prototype.hasOwnProperty.call(items, usage)) {
+            items[usage] = 0;
+        }
 
-            items[usage] += 1;
-        });
+        items[usage] += 1;
+    });
 
-        return Object.entries(items)
-            .map(([threshold, count]) => ({threshold: Number(threshold), count}))
-            .sort((a, b) => b.threshold - a.threshold);
-    },
-);
-
-// ==== Complex selectors with filters ====
-
-export const selectFilteredNodes: Selector<StorageStateSlice, PreparedStorageNode[]> =
-    createSelector(
-        [selectStorageNodes, selectStorageFilter, selectNodesUptimeFilter],
-        (storageNodes, textFilter, uptimeFilter) => {
-            let result = storageNodes || [];
-            result = filterNodesByText(result, textFilter);
-            result = filterNodesByUptime(result, uptimeFilter);
-
-            return result;
-        },
-    );
-
-export const selectFilteredGroups: Selector<StorageStateSlice, PreparedStorageGroup[]> =
-    createSelector(
-        [selectStorageGroups, selectStorageFilter, selectUsageFilter],
-        (storageGroups, textFilter, usageFilter) => {
-            let result = storageGroups || [];
-            result = filterGroupsByText(result, textFilter);
-            result = filterGroupsByUsage(result, usageFilter);
-
-            return result;
-        },
-    );
+    return Object.entries(items)
+        .map(([threshold, count]) => ({threshold: Number(threshold), count}))
+        .sort((a, b) => b.threshold - a.threshold);
+}

@@ -1,13 +1,13 @@
-import type {Reducer} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {EVersion} from '../../../types/api/storage';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
-import {createApiRequest, createRequestActionTypes} from '../../utils';
+import {api} from '../api';
 import type {NodesApiRequestParams, NodesSortParams} from '../nodes/types';
 
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
 import type {
-    StorageAction,
     StorageApiRequestParams,
     StorageSortParams,
     StorageState,
@@ -16,221 +16,89 @@ import type {
 } from './types';
 import {prepareStorageGroupsResponse, prepareStorageNodesResponse} from './utils';
 
-export const FETCH_STORAGE = createRequestActionTypes('storage', 'FETCH_STORAGE');
-
-const SET_INITIAL = 'storage/SET_INITIAL';
-const SET_FILTER = 'storage/SET_FILTER';
-const SET_USAGE_FILTER = 'storage/SET_USAGE_FILTER';
-const SET_VISIBLE_GROUPS = 'storage/SET_VISIBLE_GROUPS';
-const SET_STORAGE_TYPE = 'storage/SET_STORAGE_TYPE';
-const SET_NODES_UPTIME_FILTER = 'storage/SET_NODES_UPTIME_FILTER';
-const SET_DATA_WAS_NOT_LOADED = 'storage/SET_DATA_WAS_NOT_LOADED';
-const SET_NODES_SORT_PARAMS = 'storage/SET_NODES_SORT_PARAMS';
-const SET_GROUPS_SORT_PARAMS = 'storage/SET_GROUPS_SORT_PARAMS';
-
-const initialState = {
-    loading: true,
-    wasLoaded: false,
+const initialState: StorageState = {
     filter: '',
     usageFilter: [],
     visible: VISIBLE_ENTITIES.all,
-    nodesUptimeFilter: NodesUptimeFilterValues.All,
+    uptimeFilter: NodesUptimeFilterValues.All,
     type: STORAGE_TYPES.groups,
 };
 
-const storage: Reducer<StorageState, StorageAction> = (state = initialState, action) => {
-    switch (action.type) {
-        case FETCH_STORAGE.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-            };
-        }
-        case FETCH_STORAGE.SUCCESS: {
-            return {
-                ...state,
-                nodes: action.data.nodes,
-                groups: action.data.groups,
-                total: action.data.total,
-                found: action.data.found,
-                loading: false,
-                wasLoaded: true,
-                error: undefined,
-            };
-        }
-        case FETCH_STORAGE.FAILURE: {
-            if (action.error?.isCancelled) {
-                return state;
-            }
+const slice = createSlice({
+    name: 'storage',
+    initialState,
+    reducers: {
+        setUptimeFilter: (state, action: PayloadAction<NodesUptimeFilterValues>) => {
+            state.uptimeFilter = action.payload;
+        },
+        setStorageType: (state, action: PayloadAction<StorageType>) => {
+            state.type = action.payload;
+        },
+        setStorageTextFilter: (state, action: PayloadAction<string>) => {
+            state.filter = action.payload;
+        },
+        setUsageFilter: (state, action: PayloadAction<string[]>) => {
+            state.usageFilter = action.payload;
+        },
+        setVisibleEntities: (state, action: PayloadAction<VisibleEntities>) => {
+            state.visible = action.payload;
+        },
+        setNodesSortParams: (state, action: PayloadAction<NodesSortParams>) => {
+            state.nodesSortValue = action.payload.sortValue;
+            state.nodesSortOrder = action.payload.sortOrder;
+        },
+        setGroupsSortParams: (state, action: PayloadAction<StorageSortParams>) => {
+            state.groupsSortValue = action.payload.sortValue;
+            state.groupsSortOrder = action.payload.sortOrder;
+        },
+        setInitialState: () => {
+            return initialState;
+        },
+    },
+});
 
-            return {
-                ...state,
-                error: action.error,
-                loading: false,
-                wasLoaded: true,
-            };
-        }
-        case SET_INITIAL: {
-            return {
-                ...initialState,
-            };
-        }
-        case SET_FILTER: {
-            return {
-                ...state,
-                filter: action.data,
-            };
-        }
-        case SET_USAGE_FILTER: {
-            return {
-                ...state,
-                usageFilter: action.data,
-            };
-        }
-        case SET_VISIBLE_GROUPS: {
-            return {
-                ...state,
-                visible: action.data,
-                usageFilter: [],
-                wasLoaded: false,
-                error: undefined,
-            };
-        }
+export default slice.reducer;
 
-        case SET_NODES_UPTIME_FILTER: {
-            return {
-                ...state,
-                nodesUptimeFilter: action.data,
-            };
-        }
-        case SET_STORAGE_TYPE: {
-            return {
-                ...state,
-                type: action.data,
-                filter: '',
-                usageFilter: [],
-                wasLoaded: false,
-                error: undefined,
-            };
-        }
-        case SET_DATA_WAS_NOT_LOADED: {
-            return {
-                ...state,
-                wasLoaded: false,
-            };
-        }
-        case SET_NODES_SORT_PARAMS: {
-            return {
-                ...state,
-                nodesSortValue: action.data.sortValue,
-                nodesSortOrder: action.data.sortOrder,
-            };
-        }
-        case SET_GROUPS_SORT_PARAMS: {
-            return {
-                ...state,
-                groupsSortValue: action.data.sortValue,
-                groupsSortOrder: action.data.sortOrder,
-            };
-        }
-        default:
-            return state;
-    }
-};
+export const {
+    setInitialState,
+    setStorageTextFilter,
+    setUsageFilter,
+    setVisibleEntities,
+    setStorageType,
+    setUptimeFilter,
+    setNodesSortParams,
+    setGroupsSortParams,
+} = slice.actions;
 
-const concurrentId = 'getStorageInfo';
-
-export const getStorageNodesInfo = ({
-    tenant,
-    visibleEntities,
-    ...params
-}: Omit<NodesApiRequestParams, 'type'>) => {
-    return createApiRequest({
-        request: window.api.getNodes(
-            {tenant, visibleEntities, storage: true, type: 'static', ...params},
-            {concurrentId},
-        ),
-        actions: FETCH_STORAGE,
-        dataHandler: prepareStorageNodesResponse,
-    });
-};
-
-export const getStorageGroupsInfo = ({
-    tenant,
-    visibleEntities,
-    nodeId,
-    version = EVersion.v1,
-    ...params
-}: StorageApiRequestParams) => {
-    return createApiRequest({
-        request: window.api.getStorageInfo(
-            {tenant, visibleEntities, nodeId, version, ...params},
-            {concurrentId},
-        ),
-        actions: FETCH_STORAGE,
-        dataHandler: prepareStorageGroupsResponse,
-    });
-};
-
-export function setInitialState() {
-    return {
-        type: SET_INITIAL,
-    } as const;
-}
-
-export function setStorageType(value: StorageType) {
-    return {
-        type: SET_STORAGE_TYPE,
-        data: value,
-    } as const;
-}
-
-export function setStorageTextFilter(value: string) {
-    return {
-        type: SET_FILTER,
-        data: value,
-    } as const;
-}
-
-export function setUsageFilter(value: string[]) {
-    return {
-        type: SET_USAGE_FILTER,
-        data: value,
-    } as const;
-}
-
-export function setVisibleEntities(value: VisibleEntities) {
-    return {
-        type: SET_VISIBLE_GROUPS,
-        data: value,
-    } as const;
-}
-
-export function setNodesUptimeFilter(value: NodesUptimeFilterValues) {
-    return {
-        type: SET_NODES_UPTIME_FILTER,
-        data: value,
-    } as const;
-}
-
-export const setDataWasNotLoaded = () => {
-    return {
-        type: SET_DATA_WAS_NOT_LOADED,
-    } as const;
-};
-
-export const setNodesSortParams = (sortParams: NodesSortParams) => {
-    return {
-        type: SET_NODES_SORT_PARAMS,
-        data: sortParams,
-    } as const;
-};
-
-export const setGroupsSortParams = (sortParams: StorageSortParams) => {
-    return {
-        type: SET_GROUPS_SORT_PARAMS,
-        data: sortParams,
-    } as const;
-};
-
-export default storage;
+export const storageApi = api.injectEndpoints({
+    endpoints: (builder) => ({
+        getStorageNodesInfo: builder.query({
+            queryFn: async (params: Omit<NodesApiRequestParams, 'type'>, {signal}) => {
+                try {
+                    const result = await window.api.getNodes(
+                        {storage: true, type: 'static', ...params},
+                        {signal},
+                    );
+                    return {data: prepareStorageNodesResponse(result)};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+        getStorageGroupsInfo: builder.query({
+            queryFn: async (params: StorageApiRequestParams, {signal}) => {
+                try {
+                    const result = await window.api.getStorageInfo(
+                        {version: EVersion.v1, ...params},
+                        {signal},
+                    );
+                    return {data: prepareStorageGroupsResponse(result)};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+});

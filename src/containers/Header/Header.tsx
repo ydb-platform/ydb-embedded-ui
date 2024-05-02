@@ -6,10 +6,10 @@ import {useHistory, useLocation} from 'react-router';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
 import {parseQuery} from '../../routes';
 import {backend, customBackend} from '../../store';
-import {getClusterInfo} from '../../store/reducers/cluster/cluster';
+import {clusterApi} from '../../store/reducers/cluster/cluster';
 import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useTypedSelector} from '../../utils/hooks';
 
 import type {RawBreadcrumbItem} from './breadcrumbs';
 import {getBreadcrumbs} from './breadcrumbs';
@@ -31,23 +31,19 @@ interface HeaderProps {
 }
 
 function Header({mainPage}: HeaderProps) {
-    const dispatch = useTypedDispatch();
     const history = useHistory();
     const location = useLocation();
 
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
-    const {data} = useTypedSelector((state) => state.cluster);
 
     const queryParams = parseQuery(location);
 
     const clusterNameFromQuery = queryParams.clusterName?.toString();
+    const {currentData: {clusterData: data} = {}} =
+        clusterApi.useGetClusterInfoQuery(clusterNameFromQuery);
 
     const clusterNameFinal = data?.Name || clusterNameFromQuery;
-
-    React.useEffect(() => {
-        dispatch(getClusterInfo(clusterNameFromQuery));
-    }, [dispatch, clusterNameFromQuery]);
 
     const breadcrumbItems = React.useMemo(() => {
         const rawBreadcrumbs: RawBreadcrumbItem[] = [];

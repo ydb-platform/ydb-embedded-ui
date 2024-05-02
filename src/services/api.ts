@@ -47,20 +47,21 @@ import {settingsManager} from './settings';
 
 type AxiosOptions = {
     concurrentId?: string;
+    signal?: AbortSignal;
 };
 
 export class YdbEmbeddedAPI extends AxiosWrapper {
     getPath(path: string) {
         return `${BACKEND ?? ''}${path}`;
     }
-    getClusterInfo(clusterName?: string, {concurrentId}: AxiosOptions = {}) {
+    getClusterInfo(clusterName?: string, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TClusterInfo>(
             this.getPath('/viewer/json/cluster'),
             {
                 name: clusterName,
                 tablets: true,
             },
-            {concurrentId: concurrentId || `getClusterInfo`},
+            {concurrentId: concurrentId || `getClusterInfo`, requestConfig: {signal}},
         );
     }
     getClusterNodes({concurrentId}: AxiosOptions = {}) {
@@ -82,7 +83,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             cluster_name: clusterName,
         });
     }
-    getTenantInfo({path}: {path: string}, {concurrentId}: AxiosOptions = {}) {
+    getTenantInfo({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TTenantInfo>(
             this.getPath('/viewer/json/tenantinfo'),
             {
@@ -90,7 +91,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 tablets: true,
                 storage: true,
             },
-            {concurrentId: concurrentId || `getTenantInfo|${path}`},
+            {concurrentId: concurrentId || `getTenantInfo|${path}`, requestConfig: {signal}},
         );
     }
     getNodes(
@@ -102,14 +103,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             sortValue,
             ...params
         }: NodesApiRequestParams,
-        {concurrentId}: AxiosOptions = {},
+        {concurrentId, signal}: AxiosOptions = {},
     ) {
         const sort = prepareSortValue(sortValue, sortOrder);
 
         return this.get<TNodesInfo>(
             this.getPath('/viewer/json/nodes?enums=true'),
             {with: visibleEntities, type, tablets, sort, ...params},
-            {concurrentId},
+            {concurrentId, requestConfig: {signal}},
         );
     }
     /** @deprecated use getNodes instead */
@@ -136,7 +137,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             sortValue,
             ...params
         }: StorageApiRequestParams,
-        {concurrentId}: AxiosOptions = {},
+        {concurrentId, signal}: AxiosOptions = {},
     ) {
         const sort = prepareSortValue(sortValue, sortOrder);
 
@@ -151,7 +152,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 sort,
                 ...params,
             },
-            {concurrentId},
+            {concurrentId, requestConfig: {signal}},
         );
     }
     getPdiskInfo(nodeId: string | number, pdiskId: string | number) {
@@ -315,7 +316,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             schema?: Schema;
             syntax?: QuerySyntax;
         },
-        {concurrentId}: AxiosOptions = {},
+        {concurrentId, signal}: AxiosOptions = {},
     ) {
         // Time difference to ensure that timeout from ui will be shown rather than backend error
         const uiTimeout = 9 * 60 * 1000;
@@ -341,6 +342,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {
                 concurrentId,
                 timeout: uiTimeout,
+                requestConfig: {signal},
             },
         );
     }
@@ -384,11 +386,11 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId: concurrentId || 'getHotKeys'},
         );
     }
-    getHealthcheckInfo(database: string, {concurrentId}: AxiosOptions = {}) {
+    getHealthcheckInfo(database: string, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<HealthCheckAPIResponse>(
             this.getPath('/viewer/json/healthcheck?merge_records=true'),
             {tenant: database},
-            {concurrentId},
+            {concurrentId, requestConfig: {signal}},
         );
     }
     evictVDisk({
@@ -521,13 +523,13 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
 }
 
 export class YdbWebVersionAPI extends YdbEmbeddedAPI {
-    getClusterInfo(clusterName: string) {
+    getClusterInfo(clusterName: string, {signal}: AxiosOptions = {}) {
         return this.get<MetaCluster>(
             `${META_BACKEND || ''}/meta/cluster`,
             {
                 name: clusterName,
             },
-            {concurrentId: `getCluster${clusterName}`},
+            {concurrentId: `getCluster${clusterName}`, requestConfig: {signal}},
         ).then(parseMetaCluster);
     }
 

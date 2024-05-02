@@ -42,5 +42,5 @@ export const Illustration = ({name, className, ...props}: IllustrationProps) => 
         }
     }, [srcGetter]);
 
-    return <img alt={name} src={src} className={b(null, className)} {...props} />;
+    return src ? <img alt={name} src={src} className={b(null, className)} {...props} /> : null;
 };

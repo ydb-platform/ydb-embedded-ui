@@ -3,10 +3,10 @@ import React from 'react';
 import {Checkbox, RadioButton} from '@gravity-ui/uikit';
 
 import {Loader} from '../../components/Loader';
-import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
+import {clusterNodesApi} from '../../store/reducers/clusterNodes/clusterNodes';
 import type {VersionToColorMap} from '../../types/versions';
 import {cn} from '../../utils/cn';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
 
 import {GroupedNodesTree} from './GroupedNodesTree/GroupedNodesTree';
 import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
@@ -21,11 +21,10 @@ interface VersionsProps {
 }
 
 export const Versions = ({versionToColor}: VersionsProps) => {
-    const dispatch = useTypedDispatch();
-
-    const {nodes = [], loading, wasLoaded} = useTypedSelector((state) => state.clusterNodes);
-
-    useAutofetcher(() => dispatch(getClusterNodes()), [dispatch], true);
+    const {data: nodes = [], isLoading: isNodesLoading} = clusterNodesApi.useGetClusterNodesQuery(
+        undefined,
+        {pollingInterval: DEFAULT_POLLING_INTERVAL},
+    );
 
     const [groupByValue, setGroupByValue] = React.useState<GroupByValue>(GroupByValue.VERSION);
     const [expanded, setExpanded] = React.useState(false);
@@ -64,7 +63,7 @@ export const Versions = ({versionToColor}: VersionsProps) => {
         );
     };
 
-    if (loading && !wasLoaded) {
+    if (isNodesLoading) {
         return <Loader />;
     }
 

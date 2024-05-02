@@ -5,7 +5,6 @@ import type {DataTableProps} from '@gravity-ui/react-data-table';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import type {IResponseError} from '../../../../types/api/error';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
     TENANT_OVERVIEW_TABLES_SETTINGS,
@@ -16,8 +15,7 @@ import {b} from './utils';
 interface TenantOverviewTableLayoutProps<T> extends Omit<DataTableProps<T>, 'theme'> {
     title: React.ReactNode;
     loading?: boolean;
-    wasLoaded?: boolean;
-    error?: IResponseError;
+    error?: unknown;
     tableClassNameModifiers?: {
         [name: string]: string | boolean | undefined;
     };
@@ -27,7 +25,6 @@ export function TenantOverviewTableLayout<T>({
     title,
     error,
     loading,
-    wasLoaded,
     tableClassNameModifiers = {},
     ...props
 }: TenantOverviewTableLayoutProps<T>) {
@@ -36,7 +33,7 @@ export function TenantOverviewTableLayout<T>({
             return <ResponseError error={error} />;
         }
 
-        if (loading && !wasLoaded) {
+        if (loading) {
             return <TableSkeleton rows={TENANT_OVERVIEW_TABLES_LIMIT} />;
         }
 

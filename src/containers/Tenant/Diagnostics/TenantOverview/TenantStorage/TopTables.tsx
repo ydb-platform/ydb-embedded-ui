@@ -4,13 +4,11 @@ import {useLocation} from 'react-router';
 
 import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
-import {
-    fetchTopTables,
-    setDataWasNotLoaded,
-} from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
+import {topTablesApi} from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
+import {useTypedSelector} from '../../../../../utils/hooks';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
@@ -22,29 +20,17 @@ interface TopTablesProps {
 }
 
 export function TopTables({path}: TopTablesProps) {
-    const dispatch = useTypedDispatch();
     const location = useLocation();
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
-    const {
-        loading,
-        wasLoaded,
-        error,
-        data: {result: data = undefined} = {},
-    } = useTypedSelector((state) => state.executeTopTables);
-
-    useAutofetcher(
-        (isBackground) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-
-            dispatch(fetchTopTables(path));
-        },
-        [dispatch, path],
-        autorefresh,
+    const {currentData, error, isFetching} = topTablesApi.useGetTopTablesQuery(
+        {path},
+        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
     );
+    const loading = isFetching && currentData === undefined;
+
+    const {result: data} = currentData || {};
 
     const formatSize = (value?: number) => {
         const size = getSizeWithSignificantDigits(data?.length ? Number(data[0].Size) : 0, 0);
@@ -84,7 +70,6 @@ export function TopTables({path}: TopTablesProps) {
             columns={columns}
             title={title}
             loading={loading}
-            wasLoaded={wasLoaded}
             error={error}
         />
     );

@@ -1,14 +1,12 @@
-import React from 'react';
-
 import {Loader} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
-import {getTenantInfo, setDataWasNotLoaded} from '../../../../store/reducers/tenant/tenant';
+import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
-import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {DEFAULT_POLLING_INTERVAL, TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
+import {useTypedSelector} from '../../../../utils/hooks';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
 import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
@@ -33,45 +31,25 @@ export function TenantOverview({
     additionalTenantProps,
     additionalNodesProps,
 }: TenantOverviewProps) {
-    const dispatch = useTypedDispatch();
-
-    const {
-        tenant,
-        loading: tenantLoading,
-        wasLoaded: tenantWasLoaded,
-        metricsTab,
-    } = useTypedSelector((state) => state.tenant);
+    const {metricsTab} = useTypedSelector((state) => state.tenant);
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
     const {
         issueTrees,
         issuesStatistics,
         selfCheckResult,
-        fetchHealthcheck,
         loading: healthcheckLoading,
-        wasLoaded: healthCheckWasLoaded,
         error: healthcheckError,
-    } = useHealthcheck(tenantName);
+        refetch: fetchHealthcheck,
+    } = useHealthcheck(tenantName, {autorefresh});
 
-    const fetchTenant = React.useCallback(
-        (isBackground = true) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-            dispatch(getTenantInfo({path: tenantName}));
+    const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
+        {path: tenantName},
+        {
+            pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0,
         },
-        [dispatch, tenantName],
     );
-
-    useAutofetcher(
-        (isBackground) => {
-            fetchTenant(isBackground);
-            fetchHealthcheck(isBackground);
-        },
-        [fetchTenant, fetchHealthcheck],
-        autorefresh,
-    );
-
+    const tenantLoading = isFetching && tenant === undefined;
     const {Name, Type, Overall} = tenant || {};
 
     const tenantType = mapDatabaseTypeToDBName(Type);
@@ -86,7 +64,7 @@ export function TenantOverview({
         memoryStats,
         blobStorageStats,
         tabletStorageStats,
-    } = calculateTenantMetrics(tenant);
+    } = calculateTenantMetrics(tenant ?? undefined);
 
     const storageMetrics = {
         blobStorageUsed: blobStorage,
@@ -125,7 +103,6 @@ export function TenantOverview({
                     <HealthcheckDetails
                         issueTrees={issueTrees}
                         loading={healthcheckLoading}
-                        wasLoaded={healthCheckWasLoaded}
                         error={healthcheckError}
                     />
                 );
@@ -136,7 +113,7 @@ export function TenantOverview({
         }
     };
 
-    if (tenantLoading && !tenantWasLoaded) {
+    if (tenantLoading) {
         return (
             <div className={b('loader')}>
                 <Loader size="m" />
@@ -161,7 +138,6 @@ export function TenantOverview({
                     selfCheckResult={selfCheckResult}
                     fetchHealthcheck={fetchHealthcheck}
                     healthcheckLoading={healthcheckLoading}
-                    healthCheckWasLoaded={healthCheckWasLoaded}
                     healthcheckError={healthcheckError}
                 />
             </div>

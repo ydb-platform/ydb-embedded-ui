@@ -1,53 +1,45 @@
-import React from 'react';
-
 import {
-    getHealthcheckInfo,
+    healthcheckApi,
     selectIssuesStatistics,
     selectIssuesTrees,
-    setDataWasNotLoaded,
 } from '../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
-import type {IResponseError} from '../../../../types/api/error';
 import {SelfCheckResult} from '../../../../types/api/healthcheck';
 import type {StatusFlag} from '../../../../types/api/healthcheck';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {DEFAULT_POLLING_INTERVAL} from '../../../../utils/constants';
+import {useTypedSelector} from '../../../../utils/hooks';
 
 interface HealthcheckParams {
     issueTrees: IssuesTree[];
     issuesStatistics: [StatusFlag, number][];
-    fetchHealthcheck: (isBackground?: boolean) => void;
     loading: boolean;
-    wasLoaded: boolean;
-    error?: IResponseError;
+    error?: unknown;
+    refetch: () => void;
     selfCheckResult: SelfCheckResult;
 }
 
-export const useHealthcheck = (tenantName: string): HealthcheckParams => {
-    const dispatch = useTypedDispatch();
-
-    const {data, loading, wasLoaded, error} = useTypedSelector((state) => state.healthcheckInfo);
+export const useHealthcheck = (
+    tenantName: string,
+    {autorefresh}: {autorefresh?: boolean} = {},
+): HealthcheckParams => {
+    const {
+        currentData: data,
+        isFetching,
+        error,
+        refetch,
+    } = healthcheckApi.useGetHealthcheckInfoQuery(tenantName, {
+        pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0,
+    });
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
-    const issuesStatistics = useTypedSelector(selectIssuesStatistics);
-    const issueTrees = useTypedSelector(selectIssuesTrees);
-
-    const fetchHealthcheck = React.useCallback(
-        (isBackground = true) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-
-            dispatch(getHealthcheckInfo(tenantName));
-        },
-        [dispatch, tenantName],
-    );
+    const issuesStatistics = useTypedSelector((state) => selectIssuesStatistics(state, tenantName));
+    const issueTrees = useTypedSelector((state) => selectIssuesTrees(state, tenantName));
 
     return {
         issueTrees,
         issuesStatistics,
-        fetchHealthcheck,
-        loading,
-        wasLoaded,
+        loading: data === undefined && isFetching,
         error,
+        refetch,
         selfCheckResult,
     };
 };

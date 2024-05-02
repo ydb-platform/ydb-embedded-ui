@@ -8,6 +8,8 @@ export const api = createApi({
      * which is why no endpoints are shown below.
      */
     endpoints: () => ({}),
+    refetchOnMountOrArgChange: true,
+    tagTypes: ['All'],
 });
 
 export const _NEVER = Symbol();

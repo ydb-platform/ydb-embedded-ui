@@ -8,8 +8,8 @@ import {Redirect, Route, Switch, useLocation, useRouteMatch} from 'react-router'
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import routes, {getLocationObjectFromHref} from '../../routes';
-import {getClusterInfo, updateDefaultClusterTab} from '../../store/reducers/cluster/cluster';
-import {getClusterNodes} from '../../store/reducers/clusterNodes/clusterNodes';
+import {clusterApi, updateDefaultClusterTab} from '../../store/reducers/cluster/cluster';
+import {clusterNodesApi} from '../../store/reducers/clusterNodes/clusterNodes';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import type {
     AdditionalClusterProps,
@@ -18,8 +18,8 @@ import type {
     AdditionalVersionsProps,
 } from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {CLUSTER_DEFAULT_TITLE, DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../../utils/versions';
 import {NodesWrapper} from '../Nodes/NodesWrapper';
 import {StorageWrapper} from '../Storage/StorageWrapper';
@@ -57,34 +57,24 @@ function Cluster({
     const queryParams = qs.parse(location.search, {
         ignoreQueryPrefix: true,
     });
-    const {clusterName} = queryParams;
+    const {clusterName, backend} = queryParams;
 
     const {
-        data: cluster = {},
-        loading: clusterLoading,
-        wasLoaded: clusterWasLoaded,
-        error: clusterError,
-        groupsStats,
-    } = useTypedSelector((state) => state.cluster);
-    const {
-        nodes,
-        loading: nodesLoading,
-        wasLoaded: nodesWasLoaded,
-    } = useTypedSelector((state) => state.clusterNodes);
+        data: {clusterData: cluster = {}, groupsStats} = {},
+        isLoading: isClusterLoading,
+        error,
+    } = clusterApi.useGetClusterInfoQuery(clusterName ? String(clusterName) : undefined, {
+        pollingInterval: DEFAULT_POLLING_INTERVAL,
+    });
+
+    const clusterError = error && typeof error === 'object' ? error : undefined;
+
+    const {data: nodes = [], isLoading: isNodesLoading} =
+        clusterNodesApi.useGetClusterNodesQuery(undefined);
+
+    const infoLoading = isClusterLoading || isNodesLoading;
 
     const {Name} = cluster;
-
-    const infoLoading = (clusterLoading && !clusterWasLoaded) || (nodesLoading && !nodesWasLoaded);
-
-    React.useEffect(() => {
-        dispatch(getClusterNodes());
-    }, [dispatch]);
-
-    useAutofetcher(
-        () => dispatch(getClusterInfo(clusterName ? String(clusterName) : undefined)),
-        [dispatch, clusterName],
-        true,
-    );
 
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('cluster', {}));
@@ -138,7 +128,7 @@ function Cluster({
                     activeTab={activeTabId}
                     items={clusterTabs}
                     wrapTo={({id}, node) => {
-                        const path = getClusterPath(id as ClusterTab, queryParams);
+                        const path = getClusterPath(id as ClusterTab, {clusterName, backend});
                         return (
                             <InternalLink
                                 to={path}

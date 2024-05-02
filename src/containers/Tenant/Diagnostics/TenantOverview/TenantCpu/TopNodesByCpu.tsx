@@ -1,18 +1,8 @@
-import React from 'react';
-
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {
-    getTopNodesByCpu,
-    selectTopNodesByCpu,
-    setDataWasNotLoaded,
-} from '../../../../../store/reducers/tenantOverview/topNodesByCpu/topNodesByCpu';
+import {topNodesApi} from '../../../../../store/reducers/tenantOverview/topNodes/topNodes';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
-import {
-    useAutofetcher,
-    useSearchQuery,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../../utils/hooks';
+import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
+import {useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
 import {getTopNodesByCpuColumns} from '../../../../Nodes/getNodesColumns';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
@@ -25,27 +15,18 @@ interface TopNodesByCpuProps {
 }
 
 export function TopNodesByCpu({path, additionalNodesProps}: TopNodesByCpuProps) {
-    const dispatch = useTypedDispatch();
-
     const query = useSearchQuery();
 
-    const {wasLoaded, loading, error} = useTypedSelector((state) => state.topNodesByCpu);
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const topNodes = useTypedSelector(selectTopNodesByCpu);
     const columns = getTopNodesByCpuColumns(additionalNodesProps?.getNodeRef);
 
-    const fetchNodes = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-
-            dispatch(getTopNodesByCpu({tenant: path}));
-        },
-        [dispatch, path],
+    const {currentData, isFetching, error} = topNodesApi.useGetTopNodesQuery(
+        {tenant: path, sortValue: 'CPU'},
+        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
     );
 
-    useAutofetcher(fetchNodes, [fetchNodes], autorefresh);
+    const loading = isFetching && currentData === undefined;
+    const topNodes = currentData;
 
     const title = getSectionTitle({
         entity: i18n('nodes'),
@@ -62,7 +43,6 @@ export function TopNodesByCpu({path, additionalNodesProps}: TopNodesByCpuProps) 
             columns={columns}
             title={title}
             loading={loading}
-            wasLoaded={wasLoaded}
             error={error}
             emptyDataMessage={i18n('top-nodes.empty-data')}
         />

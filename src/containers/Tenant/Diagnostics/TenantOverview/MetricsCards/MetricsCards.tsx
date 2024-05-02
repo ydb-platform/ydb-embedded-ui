@@ -24,7 +24,6 @@ import {
     memoryUsageToStatus,
     storageUsageToStatus,
 } from '../../../../../store/reducers/tenants/utils';
-import type {IResponseError} from '../../../../../types/api/error';
 import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -60,7 +59,7 @@ interface MetricsCardsProps {
     fetchHealthcheck: VoidFunction;
     healthcheckLoading?: boolean;
     healthCheckWasLoaded?: boolean;
-    healthcheckError?: IResponseError;
+    healthcheckError?: unknown;
 }
 
 export function MetricsCards({
@@ -72,7 +71,6 @@ export function MetricsCards({
     selfCheckResult,
     fetchHealthcheck,
     healthcheckLoading,
-    healthCheckWasLoaded,
     healthcheckError,
 }: MetricsCardsProps) {
     const location = useLocation();
@@ -136,7 +134,6 @@ export function MetricsCards({
                     issuesStatistics={issuesStatistics}
                     onUpdate={fetchHealthcheck}
                     loading={healthcheckLoading}
-                    wasLoaded={healthCheckWasLoaded}
                     error={healthcheckError}
                     active={metricsTab === TENANT_METRICS_TABS_IDS.healthcheck}
                 />

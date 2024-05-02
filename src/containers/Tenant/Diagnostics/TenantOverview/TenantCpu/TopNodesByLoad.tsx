@@ -1,18 +1,8 @@
-import React from 'react';
-
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {
-    getTopNodesByLoad,
-    selectTopNodesByLoad,
-    setDataWasNotLoaded,
-} from '../../../../../store/reducers/tenantOverview/topNodesByLoad/topNodesByLoad';
+import {topNodesApi} from '../../../../../store/reducers/tenantOverview/topNodes/topNodes';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
-import {
-    useAutofetcher,
-    useSearchQuery,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../../utils/hooks';
+import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
+import {useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
 import {getTopNodesByLoadColumns} from '../../../../Nodes/getNodesColumns';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
@@ -25,27 +15,18 @@ interface TopNodesByLoadProps {
 }
 
 export function TopNodesByLoad({path, additionalNodesProps}: TopNodesByLoadProps) {
-    const dispatch = useTypedDispatch();
-
     const query = useSearchQuery();
 
-    const {wasLoaded, loading, error} = useTypedSelector((state) => state.topNodesByLoad);
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const topNodes = useTypedSelector(selectTopNodesByLoad);
     const columns = getTopNodesByLoadColumns(additionalNodesProps?.getNodeRef);
 
-    const fetchNodes = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-
-            dispatch(getTopNodesByLoad({tenant: path}));
-        },
-        [dispatch, path],
+    const {currentData, isFetching, error} = topNodesApi.useGetTopNodesQuery(
+        {tenant: path, sortValue: 'LoadAverage'},
+        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
     );
 
-    useAutofetcher(fetchNodes, [fetchNodes], autorefresh);
+    const loading = isFetching && currentData === undefined;
+    const topNodes = currentData;
 
     const title = getSectionTitle({
         entity: i18n('nodes'),
@@ -62,7 +43,6 @@ export function TopNodesByLoad({path, additionalNodesProps}: TopNodesByLoadProps
             columns={columns}
             title={title}
             loading={loading}
-            wasLoaded={wasLoaded}
             error={error}
             emptyDataMessage={i18n('top-nodes.empty-data')}
         />

@@ -2,7 +2,7 @@ import React from 'react';
 
 import {TreeView} from 'ydb-ui-components';
 
-import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/types';
+import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/clusterNodes';
 import type {VersionValue} from '../../../types/versions';
 import {cn} from '../../../utils/cn';
 import {NodesTable} from '../NodesTable/NodesTable';

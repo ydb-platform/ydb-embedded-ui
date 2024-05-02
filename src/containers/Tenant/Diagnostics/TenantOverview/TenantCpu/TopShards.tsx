@@ -2,11 +2,9 @@ import {useLocation} from 'react-router';
 
 import {parseQuery} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {
-    sendTenantOverviewTopShardsQuery,
-    setDataWasNotLoaded,
-} from '../../../../../store/reducers/tenantOverview/topShards/tenantOverviewTopShards';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {topShardsApi} from '../../../../../store/reducers/tenantOverview/topShards/tenantOverviewTopShards';
+import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
+import {useTypedSelector} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {getTopShardsColumns} from '../../TopShards/getTopShardsColumns';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
@@ -18,30 +16,19 @@ interface TopShardsProps {
 }
 
 export const TopShards = ({path}: TopShardsProps) => {
-    const dispatch = useTypedDispatch();
     const location = useLocation();
 
     const query = parseQuery(location);
 
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
 
-    const {
-        loading,
-        data: {result: data = undefined} = {},
-        error,
-        wasLoaded,
-    } = useTypedSelector((state) => state.tenantOverviewTopShards);
-
-    useAutofetcher(
-        (isBackground) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-            dispatch(sendTenantOverviewTopShardsQuery(path, currentSchemaPath));
-        },
-        [dispatch, path, currentSchemaPath],
-        autorefresh,
+    const {currentData, isFetching, error} = topShardsApi.useGetTopShardsQuery(
+        {database: path, path: currentSchemaPath},
+        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
     );
+
+    const loading = isFetching && currentData === undefined;
+    const {result: data} = currentData || {};
 
     const columns = getTopShardsColumns(path, location);
 
@@ -60,7 +47,6 @@ export const TopShards = ({path}: TopShardsProps) => {
             columns={columns}
             title={title}
             loading={loading}
-            wasLoaded={wasLoaded}
             error={error}
             tableClassNameModifiers={{'top-queries': true}}
         />
