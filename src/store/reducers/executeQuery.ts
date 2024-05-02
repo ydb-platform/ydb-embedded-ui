@@ -175,7 +175,7 @@ export const sendExecuteQuery = ({query, database, mode, schema = 'modern'}: Sen
             database,
             action,
             syntax,
-            stats: 'profile',
+            stats: 'full',
         }),
         actions: SEND_QUERY,
         dataHandler: parseQueryAPIExecuteResponse,
