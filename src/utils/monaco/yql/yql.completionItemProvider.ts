@@ -14,7 +14,7 @@ function disableCodeSuggestions(): void {
 export function registerYQLCompletionItemProvider(database: string) {
     disableCodeSuggestions();
     completionProvider = monaco.languages.registerCompletionItemProvider(LANGUAGE_YQL_ID, {
-        triggerCharacters: [' ', '\n', '', ',', '.', '`', '(', '/'],
+        triggerCharacters: [' ', '', ',', '.', '`', '(', '/'],
         provideCompletionItems: createProvideSuggestionsFunction(database),
     });
 }

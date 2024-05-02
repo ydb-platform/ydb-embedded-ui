@@ -35,6 +35,20 @@ export function createProvideSuggestionsFunction(database: string) {
     };
 }
 
+function getEntityNameAtCursor(model: Monaco.editor.ITextModel, cursorPosition: Monaco.Position) {
+    const prevWord = model.findPreviousMatch(
+        '\\s(`?[^\\s]*)',
+        cursorPosition,
+        true,
+        false,
+        null,
+        true,
+    );
+    const nextWord = model.findNextMatch('([^\\s]*)`?', cursorPosition, true, false, null, true);
+
+    return `${prevWord?.matches?.[1] ?? ''}${nextWord?.matches?.[1] ?? ''}`;
+}
+
 async function getSuggestions(
     model: Monaco.editor.ITextModel,
     cursorPosition: Monaco.Position,
@@ -57,7 +71,14 @@ async function getSuggestions(
     let pragmasSuggestions: Monaco.languages.CompletionItem[] = [];
 
     if (parseResult.suggestEntity) {
-        entitiesSuggestions = await generateEntitiesSuggestion(rangeToInsertSuggestion);
+        const entityNamePrefix = getEntityNameAtCursor(model, cursorPosition);
+
+        entitiesSuggestions = await generateEntitiesSuggestion(
+            rangeToInsertSuggestion,
+            parseResult.suggestEntity,
+            database,
+            entityNamePrefix,
+        );
     }
     if (parseResult.suggestFunctions) {
         functionsSuggestions = await generateSimpleFunctionsSuggestion(rangeToInsertSuggestion);

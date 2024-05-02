@@ -1,9 +1,12 @@
 import type {
     ColumnAliasSuggestion,
     KeywordSuggestion,
+    YQLEntity,
     YqlAutocompleteResult,
 } from '@gravity-ui/websql-autocomplete';
-import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+
+import type {AutocompleteEntityType, TAutocompleteEntity} from '../../../types/api/autocomplete';
 
 import {
     AggregateFunctions,
@@ -50,6 +53,33 @@ const CompletionItemKind: {
 
 const re = /[\s'"-/@]/;
 
+const suggestionEntityToAutocomplete: Partial<Record<YQLEntity, AutocompleteEntityType[]>> = {
+    externalDataSource: ['external_data_source'],
+    replication: ['replication'],
+    table: ['table'],
+    tableStore: ['column_store'],
+    topic: ['pers_queue_group'],
+    view: ['view'],
+    //TODO: add after websql-autocomplete support indexex
+    // index: ['table_index', 'index'],
+};
+
+const commonSuggestionEntities: AutocompleteEntityType[] = ['dir', 'unknown'];
+
+function filterAutocompleteEntities(
+    autocompleteEntities: TAutocompleteEntity[],
+    suggestions: YQLEntity[],
+) {
+    const suggestionsSet = suggestions.reduce((acc, el) => {
+        const autocompleteEntity = suggestionEntityToAutocomplete[el];
+        if (autocompleteEntity) {
+            autocompleteEntity.forEach((el) => acc.add(el));
+        }
+        return acc;
+    }, new Set(commonSuggestionEntities));
+    return autocompleteEntities.filter(({Type}) => suggestionsSet.has(Type));
+}
+
 function wrapStringToBackticks(value: string) {
     let result = value;
     if (value.match(re)) {
@@ -59,11 +89,31 @@ function wrapStringToBackticks(value: string) {
 }
 
 function removeBackticks(value: string) {
-    let normalizedValue = value;
+    let sliceStart = 0;
+    let sliceEnd = value.length;
     if (value.startsWith('`')) {
-        normalizedValue = value.slice(1, -1);
+        sliceStart = 1;
     }
-    return normalizedValue;
+    if (value.endsWith('`')) {
+        sliceEnd = -1;
+    }
+    return value.slice(sliceStart, sliceEnd);
+}
+
+function removeStartSlash(value: string) {
+    if (value.startsWith('/')) {
+        return value.slice(1);
+    }
+    return value;
+}
+
+function normalizeEntityPrefix(value = '', database: string) {
+    let cleanedValue = removeStartSlash(removeBackticks(value));
+    const cleanedDatabase = removeStartSlash(database);
+    if (cleanedValue.startsWith(cleanedDatabase)) {
+        cleanedValue = cleanedValue.slice(cleanedDatabase.length);
+    }
+    return removeStartSlash(cleanedValue);
 }
 
 type SuggestionType = keyof Omit<YqlAutocompleteResult, 'errors' | 'suggestDatabases'>;
@@ -82,53 +132,6 @@ const SuggestionsWeight: Record<SuggestionType, number> = {
     suggestUdfs: 10,
     suggestSimpleTypes: 11,
 };
-
-const KEEP_CACHE_MILLIS = 5 * 60 * 1000;
-
-function getColumnsWithCache() {
-    const cache = new Map<string, string[]>();
-    return async (path: string) => {
-        const normalizedPath = removeBackticks(path);
-        const existed = cache.get(path);
-        if (existed) {
-            return existed;
-        }
-        const columns = [];
-        const data = await window.api.getDescribe({path: normalizedPath});
-        if (data?.Status === 'StatusSuccess') {
-            const desc = data.PathDescription;
-            if (desc?.Table?.Columns) {
-                for (const c of desc.Table.Columns) {
-                    if (c.Name) {
-                        columns.push(c.Name);
-                    }
-                }
-            }
-            if (desc?.ColumnTableDescription?.Schema?.Columns) {
-                for (const c of desc.ColumnTableDescription.Schema.Columns) {
-                    if (c.Name) {
-                        columns.push(c.Name);
-                    }
-                }
-            }
-            if (desc?.ExternalTableDescription?.Columns) {
-                for (const c of desc.ExternalTableDescription.Columns) {
-                    if (c.Name) {
-                        columns.push(c.Name);
-                    }
-                }
-            }
-        }
-
-        cache.set(path, columns);
-        setTimeout(() => {
-            cache.delete(path);
-        }, KEEP_CACHE_MILLIS);
-        return columns;
-    };
-}
-
-const getColumns = getColumnsWithCache();
 
 function getSuggestionIndex(suggestionType: SuggestionType) {
     return SuggestionsWeight[suggestionType];
@@ -166,21 +169,68 @@ export async function generateColumnsSuggestion(
     }
     const suggestions: monaco.languages.CompletionItem[] = [];
     const multi = suggestColumns.tables.length > 1;
-    for (const entity of suggestColumns.tables ?? []) {
-        let normalizedEntityName = removeBackticks(entity.name);
-        // if it's relative entity path
-        if (!normalizedEntityName.startsWith('/')) {
-            normalizedEntityName = `${database}/${normalizedEntityName}`;
-        }
-        const fields = await getColumns(normalizedEntityName);
-        fields.forEach((columnName: string) => {
-            const normalizedName = wrapStringToBackticks(columnName);
-            let columnNameSuggestion = normalizedName;
+
+    const normalizedTableNames =
+        suggestColumns.tables?.map((entity) => {
+            let normalizedEntityName = removeBackticks(entity.name);
+            if (!normalizedEntityName.endsWith('/')) {
+                normalizedEntityName = `${normalizedEntityName}/`;
+            }
+            return normalizeEntityPrefix(normalizedEntityName, database);
+        }) ?? [];
+
+    // remove duplicates if any
+    const filteredTableNames = Array.from(new Set(normalizedTableNames));
+
+    const autocompleteResponse = await window.api.autocomplete({
+        database,
+        table: filteredTableNames,
+        limit: 1000,
+    });
+    if (!autocompleteResponse.Success) {
+        return [];
+    }
+
+    const tableNameToAliasMap = suggestColumns.tables?.reduce(
+        (acc, entity) => {
+            const normalizedEntityName = normalizeEntityPrefix(
+                removeBackticks(entity.name),
+                database,
+            );
+            const aliases = acc[normalizedEntityName] ?? [];
             if (entity.alias) {
-                columnNameSuggestion = `${entity.alias}.${normalizedName}`;
-            } else if (multi) {
-                // no need to wrap entity.name to backticks, because it's already with them if needed
-                columnNameSuggestion = `${entity.name}.${normalizedName}`;
+                aliases.push(entity.alias);
+            }
+            acc[normalizedEntityName] = aliases;
+            return acc;
+        },
+        {} as Record<string, string[]>,
+    );
+
+    autocompleteResponse.Result.Entities.forEach((col) => {
+        if (col.Type !== 'column') {
+            return;
+        }
+        const normalizedName = wrapStringToBackticks(col.Name);
+
+        const normalizedParentName = normalizeEntityPrefix(col.Parent, database);
+        const aliases = tableNameToAliasMap[normalizedParentName];
+        if (aliases?.length) {
+            aliases.forEach((a) => {
+                const columnNameSuggestion = `${a}.${normalizedName}`;
+                suggestions.push({
+                    label: columnNameSuggestion,
+                    insertText: columnNameSuggestion,
+                    kind: CompletionItemKind.Field,
+                    detail: 'Column',
+                    range: rangeToInsertSuggestion,
+                    sortText: suggestionIndexToWeight(getSuggestionIndex('suggestColumns')),
+                });
+            });
+        } else {
+            let columnNameSuggestion = normalizedName;
+            if (multi) {
+                columnNameSuggestion = `${wrapStringToBackticks(normalizedParentName)}.${normalizedName}`;
             }
             suggestions.push({
                 label: columnNameSuggestion,
@@ -190,8 +240,8 @@ export async function generateColumnsSuggestion(
                 range: rangeToInsertSuggestion,
                 sortText: suggestionIndexToWeight(getSuggestionIndex('suggestColumns')),
             });
-        });
-    }
+        }
+    });
     return suggestions;
 }
 
@@ -229,8 +279,40 @@ export function generateKeywordsSuggestion(
 }
 
 export async function generateEntitiesSuggestion(
-    _rangeToInsertSuggestion: monaco.IRange,
+    rangeToInsertSuggestion: monaco.IRange,
+    suggestEntities: YQLEntity[],
+    database: string,
+    prefix?: string,
 ): Promise<monaco.languages.CompletionItem[]> {
+    const normalizedPrefix = normalizeEntityPrefix(prefix, database);
+    const data = await window.api.autocomplete({database, prefix: normalizedPrefix, limit: 100});
+    const withBackticks = prefix?.startsWith('`');
+    if (data.Success) {
+        const filteredEntities = filterAutocompleteEntities(data.Result.Entities, suggestEntities);
+        return filteredEntities.reduce((acc, {Name, Type}) => {
+            const isDir = Type === 'dir';
+            const label = isDir ? `${Name}/` : Name;
+            let labelAsSnippet;
+            if (isDir && !withBackticks) {
+                labelAsSnippet = `\`${label}$0\``;
+            }
+            acc.push({
+                label,
+                insertText: labelAsSnippet ?? label,
+                kind: isDir ? CompletionItemKind.Folder : CompletionItemKind.Text,
+                insertTextRules: labelAsSnippet
+                    ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                    : monaco.languages.CompletionItemInsertTextRule.None,
+                detail: Type,
+                range: rangeToInsertSuggestion,
+                command: label.endsWith('/')
+                    ? {id: 'editor.action.triggerSuggest', title: ''}
+                    : undefined,
+                sortText: suggestionIndexToWeight(getSuggestionIndex('suggestEntity')),
+            });
+            return acc;
+        }, [] as monaco.languages.CompletionItem[]);
+    }
     return [];
 }
 export async function generateSimpleFunctionsSuggestion(

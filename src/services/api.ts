@@ -5,6 +5,7 @@ import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
 import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 import type {TMetaInfo} from '../types/api/acl';
+import type {TQueryAutocomplete} from '../types/api/autocomplete';
 import type {TClusterInfo} from '../types/api/cluster';
 import type {TComputeInfo} from '../types/api/compute';
 import type {DescribeConsumerResult} from '../types/api/consumer';
@@ -586,6 +587,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     }
     whoami() {
         return this.get<TUserToken>(this.getPath('/viewer/json/whoami'), {});
+    }
+    autocomplete(params: {database: string; prefix?: string; limit?: number; table?: string[]}) {
+        const {table, ...rest} = params;
+        const tablesParam = table?.join(',');
+        return this.get<TQueryAutocomplete>(
+            this.getPath('/viewer/json/autocomplete'),
+            {...rest, table: tablesParam},
+            {concurrentId: 'sql-autocomplete'},
+        );
     }
 
     // used if not single cluster mode
