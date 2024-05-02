@@ -1,5 +1,3 @@
-import React from 'react';
-
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 
