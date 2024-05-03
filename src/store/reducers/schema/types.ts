@@ -4,8 +4,7 @@ import type {ApiRequestAction} from '../../utils';
 
 import type {
     FETCH_SCHEMA,
-    disableAutorefresh,
-    enableAutorefresh,
+    SET_AUTOREFRESH_INTERVAL,
     preloadSchemas,
     resetLoadingState,
     setCurrentSchemaPath,
@@ -20,7 +19,7 @@ export interface SchemaState {
     data: SchemaData;
     currentSchema?: TEvDescribeSchemeResult;
     currentSchemaPath?: string;
-    autorefresh: boolean;
+    autorefresh: number;
     showPreview: boolean;
     error?: IResponseError;
 }
@@ -41,8 +40,7 @@ export type SchemaAction =
     | SchemaApiRequestAction
     | (
           | ReturnType<typeof setCurrentSchemaPath>
-          | ReturnType<typeof enableAutorefresh>
-          | ReturnType<typeof disableAutorefresh>
+          | {type: typeof SET_AUTOREFRESH_INTERVAL; data: number}
           | ReturnType<typeof setShowPreview>
           | ReturnType<typeof preloadSchemas>
           | ReturnType<typeof resetLoadingState>

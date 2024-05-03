@@ -6,6 +6,7 @@ import {formatCPUWithLabel} from '../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../utils/utils';
 
 import {METRIC_STATUS} from './contants';
+import type {PreparedTenant} from './types';
 
 const getControlPlaneValue = (tenant: TTenant) => {
     const parts = tenant.Name?.split('/');
@@ -174,7 +175,7 @@ const calculateTenantEntities = (tenant: TTenant) => {
     return {nodesCount, groupsCount};
 };
 
-export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean) => {
+export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean): PreparedTenant[] => {
     return tenants.map((tenant) => {
         const backend = useNodeAsBackend ? getTenantBackend(tenant) : undefined;
         const sharedTenantName = tenants.find((item) => item.Id === tenant.ResourceId)?.Name;

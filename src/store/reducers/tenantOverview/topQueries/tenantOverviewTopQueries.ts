@@ -15,7 +15,7 @@ LIMIT ${TENANT_OVERVIEW_TABLES_LIMIT}
 
 export const topQueriesApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getTopQueries: builder.query({
+        getOverviewTopQueries: builder.query({
             queryFn: async ({database}: {database: string}, {signal}) => {
                 try {
                     const data = await window.api.sendQuery(
@@ -35,4 +35,5 @@ export const topQueriesApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
     }),
+    overrideExisting: 'throw',
 });

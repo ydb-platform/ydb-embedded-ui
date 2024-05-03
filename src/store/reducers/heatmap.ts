@@ -1,118 +1,117 @@
-import type {Reducer} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
 
+import type {TEvDescribeSchemeResult} from '../../types/api/schema';
+import type {TEvTabletStateResponse} from '../../types/api/tablet';
 import type {
-    IHeatmapAction,
     IHeatmapApiRequestParams,
+    IHeatmapMetricValue,
     IHeatmapState,
     IHeatmapTabletData,
 } from '../../types/store/heatmap';
-import {createApiRequest, createRequestActionTypes} from '../utils';
+import type {Nullable} from '../../utils/typecheckers';
+import type {RootState} from '../defaultStore';
 
-export const FETCH_HEATMAP = createRequestActionTypes('heatmap', 'FETCH_HEATMAP');
+import {api} from './api';
 
-const SET_HEATMAP_OPTIONS = 'heatmap/SET_HEATMAP_OPTIONS';
-
-export const initialState = {
-    loading: false,
-    wasLoaded: false,
+export const initialState: IHeatmapState = {
     currentMetric: undefined,
     sort: false,
     heatmap: false,
 };
 
-const heatmap: Reducer<IHeatmapState, IHeatmapAction> = (state = initialState, action) => {
-    switch (action.type) {
-        case FETCH_HEATMAP.REQUEST: {
+const slice = createSlice({
+    name: 'heatmap',
+    initialState,
+    reducers: {
+        setHeatmapOptions: (state, action: PayloadAction<Partial<IHeatmapState>>) => {
             return {
                 ...state,
-                loading: true,
+                ...action.payload,
             };
-        }
-        case FETCH_HEATMAP.SUCCESS: {
-            return {
-                ...state,
-                ...action.data,
-                loading: false,
-                wasLoaded: true,
-                error: undefined,
-            };
-        }
-        case FETCH_HEATMAP.FAILURE: {
-            return {
-                ...state,
-                error: action.error,
-                loading: false,
-                wasLoaded: false,
-            };
-        }
-        case SET_HEATMAP_OPTIONS:
-            return {
-                ...state,
-                ...action.data,
-            };
-        default:
-            return state;
-    }
-};
-
-export function getTabletsInfo({nodes, path}: IHeatmapApiRequestParams) {
-    return createApiRequest({
-        request: Promise.all([
-            window.api.getTabletsInfo({nodes, path}),
-            window.api.getHeatmapData({path}),
-        ]),
-        actions: FETCH_HEATMAP,
-        dataHandler: ([tabletsData = {}, describe]) => {
-            const {TabletStateInfo: tablets = []} = tabletsData;
-            const TabletsMap: Map<string, IHeatmapTabletData> = new Map();
-            const {PathDescription = {}} = describe ?? {};
-            const {
-                TablePartitions = [],
-                TablePartitionStats = [],
-                TablePartitionMetrics = [],
-            } = PathDescription;
-
-            tablets.forEach((item) => {
-                if (item.TabletId) {
-                    TabletsMap.set(item.TabletId, item);
-                }
-            });
-
-            TablePartitions.forEach((item, index) => {
-                const metrics = Object.assign(
-                    {},
-                    TablePartitionStats[index],
-                    TablePartitionMetrics[index],
-                );
-                if (item.DatashardId) {
-                    TabletsMap.set(item.DatashardId, {
-                        ...TabletsMap.get(item.DatashardId),
-                        metrics,
-                    });
-                }
-            });
-
-            const preparedTablets = Array.from(TabletsMap.values());
-            const selectMetrics =
-                preparedTablets[0] &&
-                preparedTablets[0].metrics &&
-                Object.keys(preparedTablets[0].metrics).map((item) => {
-                    return {
-                        value: item,
-                        content: item,
-                    };
-                });
-
-            return {data: preparedTablets, metrics: selectMetrics};
         },
+    },
+});
+
+export default slice.reducer;
+
+export const {setHeatmapOptions} = slice.actions;
+
+export const heatmapApi = api.injectEndpoints({
+    endpoints: (builder) => ({
+        getHeatmapTabletsInfo: builder.query({
+            queryFn: async (
+                {nodes, path}: IHeatmapApiRequestParams,
+                {signal, getState, dispatch},
+            ) => {
+                try {
+                    const response = await Promise.all([
+                        window.api.getTabletsInfo({nodes, path}, {signal}),
+                        window.api.getHeatmapData({path}, {signal}),
+                    ]);
+                    const data = transformResponse(response);
+
+                    if (data.metrics?.length) {
+                        const state = getState() as RootState;
+                        const currentMetric = state.heatmap.currentMetric;
+                        if (
+                            !currentMetric ||
+                            !data.metrics.find((item) => item.value === currentMetric)
+                        ) {
+                            dispatch(setHeatmapOptions({currentMetric: data.metrics[0].value}));
+                        }
+                    }
+
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+    overrideExisting: 'throw',
+});
+
+function transformResponse([tabletsData, describe]: [
+    TEvTabletStateResponse,
+    Nullable<TEvDescribeSchemeResult>,
+]) {
+    const {TabletStateInfo: tablets = []} = tabletsData;
+    const TabletsMap: Map<string, IHeatmapTabletData> = new Map();
+    const {PathDescription = {}} = describe ?? {};
+    const {
+        TablePartitions = [],
+        TablePartitionStats = [],
+        TablePartitionMetrics = [],
+    } = PathDescription;
+
+    tablets.forEach((item) => {
+        if (item.TabletId) {
+            TabletsMap.set(item.TabletId, item);
+        }
     });
-}
 
-export function setHeatmapOptions(options: Partial<IHeatmapState>) {
-    return {
-        type: SET_HEATMAP_OPTIONS,
-        data: options,
-    } as const;
-}
+    TablePartitions.forEach((item, index) => {
+        const metrics = Object.assign({}, TablePartitionStats[index], TablePartitionMetrics[index]);
+        if (item.DatashardId) {
+            TabletsMap.set(item.DatashardId, {
+                ...TabletsMap.get(item.DatashardId),
+                metrics,
+            });
+        }
+    });
 
-export default heatmap;
+    const preparedTablets = Array.from(TabletsMap.values());
+    const selectMetrics =
+        preparedTablets[0] &&
+        preparedTablets[0].metrics &&
+        (Object.keys(preparedTablets[0].metrics).map((item) => {
+            return {
+                value: item,
+                content: item,
+            };
+        }) as {value: IHeatmapMetricValue; content: IHeatmapMetricValue}[]);
+
+    return {tablets: preparedTablets, metrics: selectMetrics};
+}

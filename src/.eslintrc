@@ -3,12 +3,6 @@
     "rules": {
         "react/jsx-uses-react": "off",
         "react/react-in-jsx-scope": "off",
-        "react-hooks/exhaustive-deps": [
-            "warn",
-            {
-                "additionalHooks": "(useAutofetcher)",
-            },
-        ],
         "valid-jsdoc": "off",
         "react/jsx-fragments": ["error", "element"],
         "no-restricted-syntax": [

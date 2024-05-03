@@ -63,22 +63,22 @@ const paramSetup: ParamSetup = {
             stateKey: 'tenant.metricsTab',
         },
         shardsMode: {
-            stateKey: 'shardsWorkload.filters.mode',
+            stateKey: 'shardsWorkload.mode',
         },
         shardsDateFrom: {
-            stateKey: 'shardsWorkload.filters.from',
+            stateKey: 'shardsWorkload.from',
             type: 'number',
         },
         shardsDateTo: {
-            stateKey: 'shardsWorkload.filters.to',
+            stateKey: 'shardsWorkload.to',
             type: 'number',
         },
         topQueriesDateFrom: {
-            stateKey: 'executeTopQueries.filters.from',
+            stateKey: 'executeTopQueries.from',
             type: 'number',
         },
         topQueriesDateTo: {
-            stateKey: 'executeTopQueries.filters.to',
+            stateKey: 'executeTopQueries.to',
             type: 'number',
         },
         selectedConsumer: {
@@ -105,6 +105,11 @@ const paramSetup: ParamSetup = {
         },
         search: {
             stateKey: 'nodes.searchValue',
+        },
+    },
+    '/cluster/tenants': {
+        search: {
+            stateKey: 'tenants.searchValue',
         },
     },
 };

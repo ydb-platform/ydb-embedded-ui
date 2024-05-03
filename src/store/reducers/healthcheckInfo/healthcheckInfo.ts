@@ -20,6 +20,7 @@ export const healthcheckApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
     }),
+    overrideExisting: 'throw',
 });
 
 const mapStatusToPriority: Partial<Record<StatusFlag, number>> = {

@@ -16,7 +16,7 @@ interface TNetTenantInfo {
     Nodes?: TNetNodeInfo[];
 }
 
-interface TNetNodeInfo {
+export interface TNetNodeInfo {
     NodeId: number;
     Overall: EFlag;
     Peers?: TNetNodePeerInfo[];

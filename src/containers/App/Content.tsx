@@ -10,7 +10,7 @@ import type {SlotComponent} from '../../components/slots/types';
 import routes from '../../routes';
 import type {RootState} from '../../store';
 import {getUser} from '../../store/reducers/authentication/authentication';
-import {getNodesList} from '../../store/reducers/nodesList';
+import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import Authentication from '../Authentication/Authentication';
@@ -178,12 +178,7 @@ function GetUser() {
 }
 
 function GetNodesList() {
-    const dispatch = useTypedDispatch();
-
-    React.useEffect(() => {
-        dispatch(getNodesList());
-    }, [dispatch]);
-
+    nodesListApi.useGetNodesListQuery(undefined);
     return null;
 }
 

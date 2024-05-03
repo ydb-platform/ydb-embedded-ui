@@ -1,14 +1,9 @@
-import type {IQueryResult, QueryErrorResponse} from '../../../types/store/query';
-import type {ApiRequestAction} from '../../utils';
-
-import type {SEND_SHARD_QUERY, setShardsQueryFilters, setShardsState} from './shardsWorkload';
-
 export enum EShardsWorkloadMode {
     Immediate = 'immediate',
     History = 'history',
 }
 
-export interface IShardsWorkloadFilters {
+export interface ShardsWorkloadFilters {
     /** ms from epoch */
     from?: number;
     /** ms from epoch */
@@ -16,19 +11,6 @@ export interface IShardsWorkloadFilters {
     mode?: EShardsWorkloadMode;
 }
 
-export interface IShardsWorkloadState {
-    loading: boolean;
-    wasLoaded: boolean;
-    data?: IQueryResult;
-    error?: QueryErrorResponse;
-    filters: IShardsWorkloadFilters;
-}
-
-export type IShardsWorkloadAction =
-    | ApiRequestAction<typeof SEND_SHARD_QUERY, IQueryResult, QueryErrorResponse>
-    | ReturnType<typeof setShardsState>
-    | ReturnType<typeof setShardsQueryFilters>;
-
-export interface IShardsWorkloadRootStateSlice {
-    shardsWorkload: IShardsWorkloadState;
+export interface ShardsWorkloadRootStateSlice {
+    shardsWorkload: ShardsWorkloadFilters;
 }

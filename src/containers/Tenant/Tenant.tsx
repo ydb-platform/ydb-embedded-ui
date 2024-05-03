@@ -7,7 +7,7 @@ import {useLocation} from 'react-router';
 import {AccessDenied} from '../../components/Errors/403';
 import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {disableAutorefresh, getSchema} from '../../store/reducers/schema/schema';
+import {getSchema} from '../../store/reducers/schema/schema';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
 import type {TEvDescribeSchemeResult} from '../../types/api/schema';
 import {cn} from '../../utils/cn';
@@ -100,10 +100,6 @@ function Tenant(props: TenantProps) {
     }, [currentSchemaPath, dispatch]);
 
     React.useEffect(() => {
-        dispatch(disableAutorefresh());
-    }, [currentSchemaPath, tenantName, dispatch]);
-
-    React.useEffect(() => {
         if (tenantName) {
             dispatch(setHeaderBreadcrumbs('tenant', {tenantName}));
         }
@@ -148,7 +144,6 @@ function Tenant(props: TenantProps) {
                         isCollapsed={summaryVisibilityState.collapsed}
                     />
                     <ObjectGeneral
-                        // @ts-expect-error
                         type={preloadedPathType || currentPathType}
                         additionalTenantProps={props.additionalTenantProps}
                         additionalNodesProps={props.additionalNodesProps}

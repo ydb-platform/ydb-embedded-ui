@@ -1,30 +1,21 @@
 import React from 'react';
 
+import {skipToken} from '@reduxjs/toolkit/query';
 import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
-import {
-    getOlapStats,
-    resetLoadingState as resetOlapLoadingState,
-} from '../../../../store/reducers/olapStats';
-import {
-    getOverview,
-    getOverviewBatched,
-    setCurrentOverviewPath,
-    setDataWasNotLoaded,
-} from '../../../../store/reducers/overview/overview';
+import {olapApi} from '../../../../store/reducers/olapStats';
+import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
-import {getTopic} from '../../../../store/reducers/topic';
 import {EPathType} from '../../../../types/api/schema';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedSelector} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
 import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
 import {
     isColumnEntityType,
     isEntityWithMergedImplementation,
-    isPathTypeWithTopic,
     isTableType,
 } from '../../utils/schema';
 
@@ -38,21 +29,17 @@ interface OverviewProps {
 }
 
 function Overview({type, tenantName}: OverviewProps) {
-    const dispatch = useTypedDispatch();
-
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
-    const {
-        data: rawData,
-        additionalData,
-        loading: overviewLoading,
-        wasLoaded: overviewWasLoaded,
-        error: overviewError,
-    } = useTypedSelector((state) => state.overview);
-    const {
-        data: {result: olapStats} = {result: undefined},
-        loading: olapStatsLoading,
-        wasLoaded: olapStatsWasLoaded,
-    } = useTypedSelector((state) => state.olapStats);
+
+    const schemaPath = currentSchemaPath || tenantName;
+    const olapParams =
+        isTableType(type) && isColumnEntityType(type) ? {path: schemaPath} : skipToken;
+    const {currentData: olapData, isFetching: olapIsFetching} = olapApi.useGetOlapStatsQuery(
+        olapParams,
+        {pollingInterval: autorefresh},
+    );
+    const olapStatsLoading = olapIsFetching && olapData === undefined;
+    const {result: olapStats} = olapData || {result: undefined};
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
@@ -62,52 +49,27 @@ function Overview({type, tenantName}: OverviewProps) {
         shallowEqual,
     );
 
-    const entityLoading =
-        (overviewLoading && !overviewWasLoaded) || (olapStatsLoading && !olapStatsWasLoaded);
+    let paths: string[] | typeof skipToken = skipToken;
+    if (schemaPath) {
+        if (!isEntityWithMergedImpl) {
+            paths = [schemaPath];
+        } else if (mergedChildrenPaths) {
+            paths = [schemaPath, ...mergedChildrenPaths];
+        }
+    }
+
+    const {
+        currentData,
+        isFetching,
+        error: overviewError,
+    } = overviewApi.useGetOverviewQuery(paths, {
+        pollingInterval: autorefresh,
+    });
+    const overviewLoading = isFetching && currentData === undefined;
+    const {data: rawData, additionalData} = currentData || {};
+
+    const entityLoading = overviewLoading || olapStatsLoading;
     const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
-
-    const fetchData = React.useCallback(
-        (isBackground: boolean) => {
-            const schemaPath = currentSchemaPath || tenantName;
-
-            if (!schemaPath) {
-                return;
-            }
-
-            dispatch(setCurrentOverviewPath(schemaPath));
-
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded());
-            }
-
-            if (!isEntityWithMergedImpl) {
-                dispatch(getOverview({path: schemaPath}));
-            } else if (mergedChildrenPaths) {
-                dispatch(getOverviewBatched([schemaPath, ...mergedChildrenPaths]));
-            }
-
-            if (isTableType(type) && isColumnEntityType(type)) {
-                if (!isBackground) {
-                    dispatch(resetOlapLoadingState());
-                }
-                dispatch(getOlapStats({path: schemaPath}));
-            }
-
-            if (isPathTypeWithTopic(type)) {
-                dispatch(getTopic(currentSchemaPath));
-            }
-        },
-        [
-            tenantName,
-            currentSchemaPath,
-            type,
-            isEntityWithMergedImpl,
-            mergedChildrenPaths,
-            dispatch,
-        ],
-    );
-
-    useAutofetcher(fetchData, [fetchData], autorefresh);
 
     const renderContent = () => {
         const data = rawData ?? undefined;

@@ -7,15 +7,14 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
 import {Search} from '../../../../components/Search';
 import {
-    getTopic,
     selectPreparedConsumersData,
     selectPreparedTopicStats,
-    setDataWasNotLoaded,
+    topicApi,
 } from '../../../../store/reducers/topic';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedSelector} from '../../../../utils/hooks';
 import {isCdcStreamEntityType} from '../../utils/schema';
 
 import {ConsumersTopicStats} from './TopicStats';
@@ -34,28 +33,16 @@ interface ConsumersProps {
 export const Consumers = ({path, type}: ConsumersProps) => {
     const isCdcStream = isCdcStreamEntityType(type);
 
-    const dispatch = useTypedDispatch();
-
     const [searchValue, setSearchValue] = React.useState('');
 
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const {loading, wasLoaded, error} = useTypedSelector((state) => state.topic);
-
-    const consumers = useTypedSelector((state) => selectPreparedConsumersData(state));
-    const topic = useTypedSelector((state) => selectPreparedTopicStats(state));
-
-    const fetchData = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(setDataWasNotLoaded);
-            }
-
-            dispatch(getTopic(path));
-        },
-        [dispatch, path],
+    const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
+        {path},
+        {pollingInterval: autorefresh},
     );
-
-    useAutofetcher(fetchData, [fetchData], autorefresh);
+    const loading = isFetching && currentData === undefined;
+    const consumers = useTypedSelector((state) => selectPreparedConsumersData(state, path));
+    const topic = useTypedSelector((state) => selectPreparedTopicStats(state, path));
 
     const dataToRender = React.useMemo(() => {
         if (!consumers) {
@@ -73,7 +60,7 @@ export const Consumers = ({path, type}: ConsumersProps) => {
         setSearchValue(value);
     };
 
-    if (loading && !wasLoaded) {
+    if (loading) {
         return <Loader size="m" />;
     }
 

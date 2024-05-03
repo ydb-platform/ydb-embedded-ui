@@ -1,41 +1,15 @@
-import type {
-    FETCH_TABLETS,
-    clearWasLoadingFlag,
-    setStateFilter,
-    setTypeFilter,
-} from '../../store/reducers/tablets';
-import type {ApiRequestAction} from '../../store/utils';
-import type {IResponseError} from '../api/error';
-import type {ETabletState, EType, TEvTabletStateResponse} from '../api/tablet';
+import type {ETabletState, EType} from '../api/tablet';
 
-export interface ITabletsState {
-    loading: boolean;
-    wasLoaded: boolean;
+export interface TabletsState {
     stateFilter: ETabletState[];
     typeFilter: EType[];
-    data?: TEvTabletStateResponse;
-    error?: IResponseError;
 }
 
-export interface ITabletsApiRequestParams {
+export interface TabletsApiRequestParams {
     nodes?: string[];
     path?: string;
 }
 
-type ITabletsApiRequestAction = ApiRequestAction<
-    typeof FETCH_TABLETS,
-    TEvTabletStateResponse,
-    IResponseError
->;
-
-export type ITabletsAction =
-    | ITabletsApiRequestAction
-    | (
-          | ReturnType<typeof clearWasLoadingFlag>
-          | ReturnType<typeof setStateFilter>
-          | ReturnType<typeof setTypeFilter>
-      );
-
-export interface ITabletsRootStateSlice {
-    tablets: ITabletsState;
+export interface TabletsRootStateSlice {
+    tablets: TabletsState;
 }

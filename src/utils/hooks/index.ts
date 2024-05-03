@@ -1,4 +1,3 @@
-export * from './useAutofetcher';
 export * from './useTypedSelector';
 export * from './useTypedDispatch';
 export * from './useSetting';

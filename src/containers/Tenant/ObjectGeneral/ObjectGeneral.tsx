@@ -16,7 +16,7 @@ import './ObjectGeneral.scss';
 const b = cn('object-general');
 
 interface ObjectGeneralProps {
-    type: EPathType;
+    type?: EPathType;
     tenantName: string;
     additionalTenantProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;

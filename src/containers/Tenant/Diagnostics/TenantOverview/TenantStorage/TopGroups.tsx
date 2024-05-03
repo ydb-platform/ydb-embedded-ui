@@ -1,6 +1,5 @@
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topStorageGroupsApi} from '../../../../../store/reducers/tenantOverview/topStorageGroups/topStorageGroups';
-import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
 import {useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
 import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/getStorageGroupsColumns';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
@@ -21,7 +20,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
 
     const {currentData, isFetching, error} = topStorageGroupsApi.useGetTopStorageGroupsQuery(
         {tenant},
-        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
+        {pollingInterval: autorefresh},
     );
     const loading = isFetching && currentData === undefined;
     const topGroups = currentData;

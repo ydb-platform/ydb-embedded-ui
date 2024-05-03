@@ -6,7 +6,6 @@ import {
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
 import {SelfCheckResult} from '../../../../types/api/healthcheck';
 import type {StatusFlag} from '../../../../types/api/healthcheck';
-import {DEFAULT_POLLING_INTERVAL} from '../../../../utils/constants';
 import {useTypedSelector} from '../../../../utils/hooks';
 
 interface HealthcheckParams {
@@ -20,7 +19,7 @@ interface HealthcheckParams {
 
 export const useHealthcheck = (
     tenantName: string,
-    {autorefresh}: {autorefresh?: boolean} = {},
+    {autorefresh}: {autorefresh?: number} = {},
 ): HealthcheckParams => {
     const {
         currentData: data,
@@ -28,7 +27,7 @@ export const useHealthcheck = (
         error,
         refetch,
     } = healthcheckApi.useGetHealthcheckInfoQuery(tenantName, {
-        pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0,
+        pollingInterval: autorefresh,
     });
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
     const issuesStatistics = useTypedSelector((state) => selectIssuesStatistics(state, tenantName));

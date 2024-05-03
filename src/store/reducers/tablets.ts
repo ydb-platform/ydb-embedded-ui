@@ -1,98 +1,45 @@
-import type {Reducer} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
 
 import type {ETabletState, EType} from '../../types/api/tablet';
-import type {
-    ITabletsAction,
-    ITabletsApiRequestParams,
-    ITabletsState,
-} from '../../types/store/tablets';
-import {createApiRequest, createRequestActionTypes} from '../utils';
+import type {TabletsApiRequestParams, TabletsState} from '../../types/store/tablets';
 
-export const FETCH_TABLETS = createRequestActionTypes('tablets', 'FETCH_TABLETS');
+import {api} from './api';
 
-const CLEAR_WAS_LOADING_TABLETS = 'tablets/CLEAR_WAS_LOADING_TABLETS';
-const SET_STATE_FILTER = 'tablets/SET_STATE_FILTER';
-const SET_TYPE_FILTER = 'tablets/SET_TYPE_FILTER';
-
-const initialState = {
-    loading: true,
-    wasLoaded: false,
+const initialState: TabletsState = {
     stateFilter: [],
     typeFilter: [],
 };
 
-const tablets: Reducer<ITabletsState, ITabletsAction> = (state = initialState, action) => {
-    switch (action.type) {
-        case FETCH_TABLETS.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-            };
-        }
-        case FETCH_TABLETS.SUCCESS: {
-            return {
-                ...state,
-                data: action.data,
-                loading: false,
-                error: undefined,
-                wasLoaded: true,
-            };
-        }
-        case FETCH_TABLETS.FAILURE: {
-            return {
-                ...state,
-                error: action.error,
-                loading: false,
-            };
-        }
-        case CLEAR_WAS_LOADING_TABLETS: {
-            return {
-                ...state,
-                wasLoaded: false,
-                loading: true,
-            };
-        }
-        case SET_STATE_FILTER: {
-            return {
-                ...state,
-                stateFilter: action.data,
-            };
-        }
-        case SET_TYPE_FILTER: {
-            return {
-                ...state,
-                typeFilter: action.data,
-            };
-        }
-        default:
-            return state;
-    }
-};
+const slice = createSlice({
+    name: 'tablets',
+    initialState,
+    reducers: {
+        setStateFilter: (state, action: PayloadAction<ETabletState[]>) => {
+            state.stateFilter = action.payload;
+        },
+        setTypeFilter: (state, action: PayloadAction<EType[]>) => {
+            state.typeFilter = action.payload;
+        },
+    },
+});
 
-export const setStateFilter = (stateFilter: ETabletState[]) => {
-    return {
-        type: SET_STATE_FILTER,
-        data: stateFilter,
-    } as const;
-};
+export const {setStateFilter, setTypeFilter} = slice.actions;
+export default slice.reducer;
 
-export const setTypeFilter = (typeFilter: EType[]) => {
-    return {
-        type: SET_TYPE_FILTER,
-        data: typeFilter,
-    } as const;
-};
-
-export const clearWasLoadingFlag = () =>
-    ({
-        type: CLEAR_WAS_LOADING_TABLETS,
-    }) as const;
-
-export function getTabletsInfo(data: ITabletsApiRequestParams) {
-    return createApiRequest({
-        request: window.api.getTabletsInfo(data),
-        actions: FETCH_TABLETS,
-    });
-}
-
-export default tablets;
+export const tabletsApi = api.injectEndpoints({
+    endpoints: (build) => ({
+        getTabletsInfo: build.query({
+            queryFn: async (params: TabletsApiRequestParams, {signal}) => {
+                try {
+                    const data = await window.api.getTabletsInfo(params, {signal});
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+    overrideExisting: 'throw',
+});

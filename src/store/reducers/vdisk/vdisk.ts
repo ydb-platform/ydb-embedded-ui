@@ -1,64 +1,9 @@
-import type {Reducer} from '@reduxjs/toolkit';
-
 import {EVersion} from '../../../types/api/storage';
 import {valueIsDefined} from '../../../utils';
-import {createApiRequest, createRequestActionTypes} from '../../utils';
+import {api} from '../api';
 
-import type {VDiskAction, VDiskGroup, VDiskState} from './types';
+import type {VDiskGroup} from './types';
 import {prepareVDiskDataResponse, prepareVDiskGroupResponse} from './utils';
-
-export const FETCH_VDISK = createRequestActionTypes('vdisk', 'FETCH_VDISK');
-const SET_VDISK_DATA_WAS_NOT_LOADED = 'vdisk/SET_VDISK_DATA_WAS_NOT_LOADED';
-
-const initialState = {
-    loading: false,
-    wasLoaded: false,
-    vDiskData: {},
-};
-
-const vdisk: Reducer<VDiskState, VDiskAction> = (state = initialState, action) => {
-    switch (action.type) {
-        case FETCH_VDISK.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-            };
-        }
-        case FETCH_VDISK.SUCCESS: {
-            const {vDiskData, groupData} = action.data;
-
-            return {
-                ...state,
-                vDiskData,
-                groupData,
-                loading: false,
-                wasLoaded: true,
-                error: undefined,
-            };
-        }
-        case FETCH_VDISK.FAILURE: {
-            return {
-                ...state,
-                error: action.error,
-                loading: false,
-            };
-        }
-        case SET_VDISK_DATA_WAS_NOT_LOADED: {
-            return {
-                ...state,
-                wasLoaded: false,
-            };
-        }
-        default:
-            return state;
-    }
-};
-
-export const setVDiskDataWasNotLoaded = () => {
-    return {
-        type: SET_VDISK_DATA_WAS_NOT_LOADED,
-    } as const;
-};
 
 interface VDiskDataRequestParams {
     nodeId: number | string;
@@ -66,11 +11,35 @@ interface VDiskDataRequestParams {
     vDiskSlotId: number | string;
 }
 
-const requestVDiskData = async ({nodeId, pDiskId, vDiskSlotId}: VDiskDataRequestParams) => {
+export const vDiskApi = api.injectEndpoints({
+    endpoints: (build) => ({
+        getVDiskData: build.query({
+            queryFn: async ({nodeId, pDiskId, vDiskSlotId}) => {
+                try {
+                    const {vDiskData, groupData} = await requestVDiskData({
+                        nodeId,
+                        pDiskId,
+                        vDiskSlotId,
+                    });
+                    return {data: {vDiskData, groupData}};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+    overrideExisting: 'throw',
+});
+
+async function requestVDiskData(
+    {nodeId, pDiskId, vDiskSlotId}: VDiskDataRequestParams,
+    {signal}: {signal?: AbortSignal} = {},
+) {
     const vDiskDataResponse = await Promise.all([
-        window.api.getVdiskInfo({nodeId, pDiskId, vDiskSlotId}),
-        window.api.getPdiskInfo(nodeId, pDiskId),
-        window.api.getNodeInfo(nodeId),
+        window.api.getVDiskInfo({nodeId, pDiskId, vDiskSlotId}, {signal}),
+        window.api.getPDiskInfo({nodeId, pDiskId}, {signal}),
+        window.api.getNodeInfo(nodeId, {signal}),
     ]);
 
     const vDiskData = prepareVDiskDataResponse(vDiskDataResponse);
@@ -81,23 +50,17 @@ const requestVDiskData = async ({nodeId, pDiskId, vDiskSlotId}: VDiskDataRequest
     let groupData: VDiskGroup | undefined;
 
     if (valueIsDefined(StoragePoolName) && valueIsDefined(GroupID)) {
-        const groupResponse = await window.api.getStorageInfo({
-            nodeId,
-            poolName: StoragePoolName,
-            groupId: GroupID,
-            version: EVersion.v1,
-        });
+        const groupResponse = await window.api.getStorageInfo(
+            {
+                nodeId,
+                poolName: StoragePoolName,
+                groupId: GroupID,
+                version: EVersion.v1,
+            },
+            {signal},
+        );
         groupData = prepareVDiskGroupResponse(groupResponse, StoragePoolName, GroupID);
     }
 
     return {vDiskData, groupData};
-};
-
-export const getVDiskData = (params: VDiskDataRequestParams) => {
-    return createApiRequest({
-        request: requestVDiskData(params),
-        actions: FETCH_VDISK,
-    });
-};
-
-export default vdisk;
+}

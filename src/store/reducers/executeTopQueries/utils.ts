@@ -1,4 +1,4 @@
-import type {ITopQueriesFilters} from './types';
+import type {TopQueriesFilters} from './types';
 
 const endTimeColumn = 'EndTime';
 const intervalEndColumn = 'IntervalEnd';
@@ -9,7 +9,7 @@ const getMaxIntervalSubquery = (path: string) => `(
     FROM \`${path}/.sys/top_queries_by_cpu_time_one_hour\`
 )`;
 
-export function getFiltersConditions(path: string, filters?: ITopQueriesFilters) {
+export function getFiltersConditions(path: string, filters?: TopQueriesFilters) {
     const conditions: string[] = [];
 
     if (filters?.from && filters?.to && filters.from > filters.to) {

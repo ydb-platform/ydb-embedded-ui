@@ -1,29 +1,16 @@
 import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
+import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import {selectNodesMap} from '../../../../store/reducers/nodesList';
-import {
-    getPartitions,
-    setDataWasNotLoaded as setPartitionsDataWasNotLoaded,
-    setSelectedConsumer,
-} from '../../../../store/reducers/partitions/partitions';
-import {
-    cleanTopicData,
-    getTopic,
-    selectConsumersNames,
-    setDataWasNotLoaded as setTopicDataWasNotLoaded,
-} from '../../../../store/reducers/topic';
+import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
+import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
+import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
-import {
-    useAutofetcher,
-    useSetting,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../utils/hooks';
+import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import {PartitionsControls} from './PartitionsControls/PartitionsControls';
 import i18n from './i18n';
@@ -50,69 +37,58 @@ export const Partitions = ({path}: PartitionsProps) => {
         PreparedPartitionDataWithHosts[]
     >([]);
 
-    const consumers = useTypedSelector(selectConsumersNames);
-    const nodesMap = useTypedSelector(selectNodesMap);
+    const consumers = useTypedSelector((state) => selectConsumersNames(state, path));
     const {autorefresh} = useTypedSelector((state) => state.schema);
+    const {selectedConsumer} = useTypedSelector((state) => state.partitions);
     const {
-        loading: partitionsLoading,
-        wasLoaded: partitionsWasLoaded,
-        error: partitionsError,
-        partitions: rawPartitions,
-        selectedConsumer,
-    } = useTypedSelector((state) => state.partitions);
-    const {
-        loading: topicLoading,
-        wasLoaded: topicWasLoaded,
+        currentData: topicData,
+        isFetching: topicIsFetching,
         error: topicError,
-    } = useTypedSelector((state) => state.topic);
+    } = topicApi.useGetTopicQuery({path});
+    const topicLoading = topicIsFetching && topicData === undefined;
     const {
-        loading: nodesLoading,
-        wasLoaded: nodesWasLoaded,
+        currentData: nodesData,
+        isFetching: nodesIsFetching,
         error: nodesError,
-    } = useTypedSelector((state) => state.nodesList);
+    } = nodesListApi.useGetNodesListQuery(undefined);
+    const nodesLoading = nodesIsFetching && nodesData === undefined;
+    const nodesMap = useTypedSelector(selectNodesMap);
 
     const [hiddenColumns, setHiddenColumns] = useSetting<string[]>(PARTITIONS_HIDDEN_COLUMNS_KEY);
 
     const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer);
 
     React.useEffect(() => {
-        dispatch(cleanTopicData());
-        dispatch(setTopicDataWasNotLoaded());
-
-        dispatch(getTopic(path));
-
         setComponentCurrentPath(path);
     }, [dispatch, path]);
+
+    const params =
+        !topicLoading && componentCurrentPath
+            ? {path: componentCurrentPath, consumerName: selectedConsumer}
+            : skipToken;
+    const {
+        currentData: partitionsData,
+        isFetching: partitionsIsFetching,
+        error: partitionsError,
+    } = partitionsApi.useGetPartitionsQuery(params, {pollingInterval: autorefresh});
+    const partitionsLoading = partitionsIsFetching && partitionsData === undefined;
+    const rawPartitions = partitionsData;
 
     const partitionsWithHosts = React.useMemo(() => {
         return addHostToPartitions(rawPartitions, nodesMap);
     }, [rawPartitions, nodesMap]);
 
-    const fetchData = React.useCallback(
-        (isBackground: boolean) => {
-            if (!isBackground) {
-                dispatch(setPartitionsDataWasNotLoaded());
-            }
-            if (topicWasLoaded && componentCurrentPath) {
-                dispatch(getPartitions(componentCurrentPath, selectedConsumer));
-            }
-        },
-        [dispatch, selectedConsumer, componentCurrentPath, topicWasLoaded],
-    );
-
-    useAutofetcher(fetchData, [fetchData], autorefresh);
-
     // Wrong consumer could be passed in search query
     // Reset consumer if it doesn't exist for current topic
     React.useEffect(() => {
-        const isTopicWithoutConsumers = topicWasLoaded && !consumers;
+        const isTopicWithoutConsumers = !topicLoading && !consumers;
         const wrongSelectedConsumer =
             selectedConsumer && consumers && !consumers.includes(selectedConsumer);
 
         if (isTopicWithoutConsumers || wrongSelectedConsumer) {
             dispatch(setSelectedConsumer(''));
         }
-    }, [dispatch, topicWasLoaded, selectedConsumer, consumers]);
+    }, [dispatch, topicLoading, selectedConsumer, consumers]);
 
     const columnsToShow = React.useMemo(() => {
         return columns.filter((column) => !hiddenColumns.includes(column.name));
@@ -126,10 +102,7 @@ export const Partitions = ({path}: PartitionsProps) => {
         dispatch(setSelectedConsumer(value));
     };
 
-    const loading =
-        (topicLoading && !topicWasLoaded) ||
-        (nodesLoading && !nodesWasLoaded) ||
-        (partitionsLoading && !partitionsWasLoaded);
+    const loading = topicLoading || nodesLoading || partitionsLoading;
 
     const error = nodesError || topicError || partitionsError;
 

@@ -9,6 +9,7 @@ export const api = createApi({
      */
     endpoints: () => ({}),
     refetchOnMountOrArgChange: true,
+    invalidationBehavior: 'immediately',
     tagTypes: ['All'],
 });
 

@@ -29,4 +29,5 @@ export const topStorageGroupsApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
     }),
+    overrideExisting: 'throw',
 });

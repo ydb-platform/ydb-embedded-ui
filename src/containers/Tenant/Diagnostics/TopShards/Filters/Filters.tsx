@@ -3,7 +3,7 @@ import {RadioButton} from '@gravity-ui/uikit';
 import type {DateRangeValues} from '../../../../../components/DateRange';
 import {DateRange} from '../../../../../components/DateRange';
 import {EShardsWorkloadMode} from '../../../../../store/reducers/shardsWorkload/types';
-import type {IShardsWorkloadFilters} from '../../../../../store/reducers/shardsWorkload/types';
+import type {ShardsWorkloadFilters} from '../../../../../store/reducers/shardsWorkload/types';
 import {isEnumMember} from '../../../../../utils/typecheckers';
 import {b} from '../TopShards';
 import i18n from '../i18n';
@@ -11,8 +11,8 @@ import i18n from '../i18n';
 import './Filters.scss';
 
 interface FiltersProps {
-    value: IShardsWorkloadFilters;
-    onChange: (value: Partial<IShardsWorkloadFilters>) => void;
+    value: ShardsWorkloadFilters;
+    onChange: (value: Partial<ShardsWorkloadFilters>) => void;
     className?: string;
 }
 

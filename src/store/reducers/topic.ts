@@ -1,112 +1,56 @@
 /* eslint-disable camelcase */
-import type {Reducer, Selector} from '@reduxjs/toolkit';
 import {createSelector} from '@reduxjs/toolkit';
 
-import type {
-    IPreparedConsumerData,
-    IPreparedTopicStats,
-    ITopicAction,
-    ITopicRootStateSlice,
-    ITopicState,
-} from '../../types/store/topic';
 import {convertBytesObjectToSpeed} from '../../utils/bytesParsers';
 import {parseLag, parseTimestampToIdleTime} from '../../utils/timeParsers';
-import {createApiRequest, createRequestActionTypes} from '../utils';
+import type {RootState} from '../defaultStore';
 
-export const FETCH_TOPIC = createRequestActionTypes('topic', 'FETCH_TOPIC');
+import {api} from './api';
 
-const SET_DATA_WAS_NOT_LOADED = 'topic/SET_DATA_WAS_NOT_LOADED';
-const CLEAN_TOPIC_DATA = 'topic/CLEAN_TOPIC_DATA';
+export const topicApi = api.injectEndpoints({
+    endpoints: (build) => ({
+        getTopic: build.query({
+            queryFn: async (params: {path?: string}) => {
+                try {
+                    const data = await window.api.getTopic(params);
+                    // On older version it can return HTML page of Developer UI with an error
+                    if (typeof data !== 'object') {
+                        return {error: {}};
+                    }
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+    overrideExisting: 'throw',
+});
 
-const initialState = {
-    loading: true,
-    wasLoaded: false,
-    data: undefined,
-};
+const createGetTopicSelector = createSelector(
+    (path?: string) => path,
+    (path) => topicApi.endpoints.getTopic.select({path}),
+);
 
-const topic: Reducer<ITopicState, ITopicAction> = (state = initialState, action) => {
-    switch (action.type) {
-        case FETCH_TOPIC.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-            };
-        }
-        case FETCH_TOPIC.SUCCESS: {
-            // On older version it can return HTML page of Developer UI with an error
-            if (typeof action.data !== 'object') {
-                return {...state, loading: false, error: {}};
-            }
+const selectTopicStats = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, path?: string) => createGetTopicSelector(path),
+    (state, selectGetTopic) => selectGetTopic(state).data?.topic_stats,
+);
+const selectConsumers = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, path?: string) => createGetTopicSelector(path),
+    (state, selectGetTopic) => selectGetTopic(state).data?.consumers,
+);
 
-            return {
-                ...state,
-                data: action.data,
-                loading: false,
-                wasLoaded: true,
-                error: undefined,
-            };
-        }
-        case FETCH_TOPIC.FAILURE: {
-            if (action.error?.isCancelled) {
-                return state;
-            }
+export const selectConsumersNames = createSelector(selectConsumers, (consumers) => {
+    return consumers
+        ?.map((consumer) => consumer?.name)
+        .filter((consumer): consumer is string => consumer !== undefined);
+});
 
-            return {
-                ...state,
-                error: action.error,
-                loading: false,
-            };
-        }
-        case SET_DATA_WAS_NOT_LOADED: {
-            return {
-                ...state,
-                wasLoaded: false,
-            };
-        }
-        case CLEAN_TOPIC_DATA: {
-            return {
-                ...state,
-                data: undefined,
-            };
-        }
-        default:
-            return state;
-    }
-};
-
-export const setDataWasNotLoaded = () => {
-    return {
-        type: SET_DATA_WAS_NOT_LOADED,
-    } as const;
-};
-
-export const cleanTopicData = () => {
-    return {
-        type: CLEAN_TOPIC_DATA,
-    } as const;
-};
-
-export function getTopic(path?: string) {
-    return createApiRequest({
-        request: window.api.getTopic({path}),
-        actions: FETCH_TOPIC,
-    });
-}
-
-const selectTopicStats = (state: ITopicRootStateSlice) => state.topic.data?.topic_stats;
-const selectConsumers = (state: ITopicRootStateSlice) => state.topic.data?.consumers;
-
-export const selectConsumersNames: Selector<ITopicRootStateSlice, string[] | undefined> =
-    createSelector([selectConsumers], (consumers) => {
-        return consumers
-            ?.map((consumer) => consumer?.name)
-            .filter((consumer): consumer is string => consumer !== undefined);
-    });
-
-export const selectPreparedTopicStats: Selector<
-    ITopicRootStateSlice,
-    IPreparedTopicStats | undefined
-> = createSelector([selectTopicStats], (rawTopicStats) => {
+export const selectPreparedTopicStats = createSelector(selectTopicStats, (rawTopicStats) => {
     if (!rawTopicStats) {
         return undefined;
     }
@@ -126,10 +70,7 @@ export const selectPreparedTopicStats: Selector<
     };
 });
 
-export const selectPreparedConsumersData: Selector<
-    ITopicRootStateSlice,
-    IPreparedConsumerData[] | undefined
-> = createSelector([selectConsumers], (consumers) => {
+export const selectPreparedConsumersData = createSelector(selectConsumers, (consumers) => {
     return consumers?.map((consumer) => {
         const {name, consumer_stats} = consumer || {};
 
@@ -146,5 +87,3 @@ export const selectPreparedConsumersData: Selector<
         };
     });
 });
-
-export default topic;

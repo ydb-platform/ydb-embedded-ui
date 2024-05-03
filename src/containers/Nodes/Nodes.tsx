@@ -65,14 +65,14 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
 
     const [useNodesEndpoint] = useSetting(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY);
 
-    const useAutoRefresh = isClusterNodes ? true : autorefresh;
+    const autoRefreshInterval = isClusterNodes ? DEFAULT_POLLING_INTERVAL : autorefresh;
     // If there is no path, it's cluster Nodes tab
     const useGetComputeNodes = path && !useNodesEndpoint;
     const nodesQuery = nodesApi.useGetNodesQuery(useGetComputeNodes ? skipToken : {path}, {
-        pollingInterval: useAutoRefresh ? DEFAULT_POLLING_INTERVAL : 0,
+        pollingInterval: autoRefreshInterval,
     });
     const computeQuery = nodesApi.useGetComputeNodesQuery(useGetComputeNodes ? {path} : skipToken, {
-        pollingInterval: useAutoRefresh ? DEFAULT_POLLING_INTERVAL : 0,
+        pollingInterval: autoRefreshInterval,
     });
 
     const {currentData: data, isLoading, error} = useGetComputeNodes ? computeQuery : nodesQuery;

@@ -11,7 +11,6 @@ import {
     TENANT_QUERY_TABS_ID,
 } from '../../../../../store/reducers/tenant/constants';
 import {topQueriesApi} from '../../../../../store/reducers/tenantOverview/topQueries/tenantOverviewTopQueries';
-import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {getTenantOverviewTopQueriesColumns} from '../../TopQueries/getTopQueriesColumns';
@@ -33,9 +32,9 @@ export function TopQueries({path}: TopQueriesProps) {
     const {autorefresh} = useTypedSelector((state) => state.schema);
     const columns = getTenantOverviewTopQueriesColumns();
 
-    const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
+    const {currentData, isFetching, error} = topQueriesApi.useGetOverviewTopQueriesQuery(
         {database: path},
-        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
+        {pollingInterval: autorefresh},
     );
 
     const loading = isFetching && currentData === undefined;

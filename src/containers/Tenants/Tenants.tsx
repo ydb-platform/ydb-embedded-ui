@@ -24,17 +24,17 @@ import {
     selectFilteredTenants,
     selectTenantsSearchValue,
 } from '../../store/reducers/tenants/selectors';
-import {getTenantsInfo, setSearchValue} from '../../store/reducers/tenants/tenants';
+import {setSearchValue, tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {DEFAULT_POLLING_INTERVAL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
     formatBytesToGigabyte,
     formatCPU,
     formatNumber,
 } from '../../utils/dataFormatters/dataFormatters';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {getTenantPath} from '../Tenant/TenantPages';
 
 import './Tenants.scss';
@@ -48,18 +48,16 @@ interface TenantsProps {
 export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     const dispatch = useTypedDispatch();
 
-    const {error, loading, wasLoaded, tenants} = useTypedSelector((state) => state.tenants);
-    const searchValue = useTypedSelector(selectTenantsSearchValue);
-    const filteredTenants = useTypedSelector(selectFilteredTenants);
-    const problemFilter = useTypedSelector(selectProblemFilter);
-
-    useAutofetcher(
-        () => {
-            dispatch(getTenantsInfo(clusterName));
-        },
-        [dispatch],
-        true,
+    const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
+        {clusterName},
+        {pollingInterval: DEFAULT_POLLING_INTERVAL},
     );
+    const loading = isFetching && currentData === undefined;
+    const tenants = currentData ?? [];
+
+    const searchValue = useTypedSelector(selectTenantsSearchValue);
+    const filteredTenants = useTypedSelector((state) => selectFilteredTenants(state, clusterName));
+    const problemFilter = useTypedSelector(selectProblemFilter);
 
     const handleProblemFilterChange = (value: ProblemFilterValue) => {
         dispatch(changeFilter(value));
@@ -83,7 +81,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                     total={tenants.length}
                     current={filteredTenants?.length || 0}
                     label={'Databases'}
-                    loading={loading && !wasLoaded}
+                    loading={loading}
                 />
             </React.Fragment>
         );
@@ -167,7 +165,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                 width: 80,
                 render: ({row}) => {
                     // Don't show values below 0.01 when formatted
-                    if (row.cpu > 10_000) {
+                    if (row.cpu && row.cpu > 10_000) {
                         return formatCPU(row.cpu);
                     }
                     return '—';
@@ -261,7 +259,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            <TableWithControlsLayout.Table loading={loading && !wasLoaded} className={b('table')}>
+            <TableWithControlsLayout.Table loading={loading} className={b('table')}>
                 {renderTable()}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>

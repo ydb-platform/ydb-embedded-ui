@@ -1,7 +1,6 @@
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topNodesApi} from '../../../../../store/reducers/tenantOverview/topNodes/topNodes';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
-import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
 import {useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
 import {getTopNodesByLoadColumns} from '../../../../Nodes/getNodesColumns';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
@@ -22,7 +21,7 @@ export function TopNodesByLoad({path, additionalNodesProps}: TopNodesByLoadProps
 
     const {currentData, isFetching, error} = topNodesApi.useGetTopNodesQuery(
         {tenant: path, sortValue: 'LoadAverage'},
-        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
+        {pollingInterval: autorefresh},
     );
 
     const loading = isFetching && currentData === undefined;

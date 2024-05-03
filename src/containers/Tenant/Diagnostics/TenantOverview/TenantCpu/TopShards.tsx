@@ -3,7 +3,6 @@ import {useLocation} from 'react-router';
 import {parseQuery} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topShardsApi} from '../../../../../store/reducers/tenantOverview/topShards/tenantOverviewTopShards';
-import {DEFAULT_POLLING_INTERVAL} from '../../../../../utils/constants';
 import {useTypedSelector} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {getTopShardsColumns} from '../../TopShards/getTopShardsColumns';
@@ -24,7 +23,7 @@ export const TopShards = ({path}: TopShardsProps) => {
 
     const {currentData, isFetching, error} = topShardsApi.useGetTopShardsQuery(
         {database: path, path: currentSchemaPath},
-        {pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0},
+        {pollingInterval: autorefresh},
     );
 
     const loading = isFetching && currentData === undefined;

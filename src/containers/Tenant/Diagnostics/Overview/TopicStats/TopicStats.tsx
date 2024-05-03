@@ -5,7 +5,7 @@ import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
 import {Loader} from '../../../../../components/Loader';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
-import {selectPreparedTopicStats} from '../../../../../store/reducers/topic';
+import {selectPreparedTopicStats, topicApi} from '../../../../../store/reducers/topic';
 import type {IPreparedTopicStats} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
 import {formatBps, formatBytes} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -70,11 +70,15 @@ const prepareBytesWrittenInfo = (data: IPreparedTopicStats): Array<InfoViewerIte
 };
 
 export const TopicStats = () => {
-    const {error, loading, wasLoaded} = useTypedSelector((state) => state.topic);
+    const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
+    const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
+        {path: currentSchemaPath},
+        {pollingInterval: autorefresh},
+    );
+    const loading = isFetching && currentData === undefined;
+    const data = useTypedSelector((state) => selectPreparedTopicStats(state, currentSchemaPath));
 
-    const data = useTypedSelector(selectPreparedTopicStats);
-
-    if (loading && !wasLoaded) {
+    if (loading) {
         return (
             <div className={b()}>
                 <Loader size="s" />

@@ -1,20 +1,13 @@
-import type {Reducer} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {parseQueryAPIExecuteResponse} from '../../../utils/query';
-import {createApiRequest, createRequestActionTypes} from '../../utils';
+import {api} from '../api';
 
-import type {IShardsWorkloadAction, IShardsWorkloadFilters, IShardsWorkloadState} from './types';
+import type {ShardsWorkloadFilters} from './types';
 import {EShardsWorkloadMode} from './types';
 
-export const SEND_SHARD_QUERY = createRequestActionTypes('query', 'SEND_SHARD_QUERY');
-const SET_SHARD_STATE = 'query/SET_SHARD_STATE';
-const SET_SHARD_QUERY_FILTERS = 'shardsWorkload/SET_SHARD_QUERY_FILTERS';
-
-const initialState = {
-    loading: false,
-    wasLoaded: false,
-    filters: {},
-};
+const initialState: ShardsWorkloadFilters = {};
 
 export interface SortOrder {
     columnId: string;
@@ -25,7 +18,7 @@ function formatSortOrder({columnId, order}: SortOrder) {
     return `${columnId} ${order}`;
 }
 
-function getFiltersConditions(filters?: IShardsWorkloadFilters) {
+function getFiltersConditions(filters?: ShardsWorkloadFilters) {
     const conditions: string[] = [];
 
     if (filters?.from && filters?.to && filters.from > filters.to) {
@@ -48,7 +41,7 @@ function getFiltersConditions(filters?: IShardsWorkloadFilters) {
 
 function createShardQueryHistorical(
     path: string,
-    filters?: IShardsWorkloadFilters,
+    filters?: ShardsWorkloadFilters,
     sortOrder?: SortOrder[],
     tenantName?: string,
 ) {
@@ -104,104 +97,64 @@ LIMIT 20`;
 
 const queryAction = 'execute-scan';
 
-const shardsWorkload: Reducer<IShardsWorkloadState, IShardsWorkloadAction> = (
-    state = initialState,
-    action,
-) => {
-    switch (action.type) {
-        case SEND_SHARD_QUERY.REQUEST: {
+const slice = createSlice({
+    name: 'shardsWorkload',
+    initialState,
+    reducers: {
+        setShardsQueryFilters: (state, action: PayloadAction<ShardsWorkloadFilters>) => {
             return {
                 ...state,
-                loading: true,
-                error: undefined,
+                ...action.payload,
             };
-        }
-        case SEND_SHARD_QUERY.SUCCESS: {
-            return {
-                ...state,
-                data: action.data,
-                loading: false,
-                error: undefined,
-                wasLoaded: true,
-            };
-        }
-        // 401 Unauthorized error is handled by GenericAPI
-        case SEND_SHARD_QUERY.FAILURE: {
-            if (action.error?.isCancelled) {
-                return state;
-            }
+        },
+    },
+});
 
-            return {
-                ...state,
-                error: action.error || 'Unauthorized',
-                loading: false,
-            };
-        }
-        case SET_SHARD_STATE:
-            return {
-                ...state,
-                ...action.data,
-            };
-        case SET_SHARD_QUERY_FILTERS:
-            return {
-                ...state,
-                filters: {
-                    ...state.filters,
-                    ...action.filters,
-                },
-            };
-        default:
-            return state;
-    }
-};
+export const {setShardsQueryFilters} = slice.actions;
+export default slice.reducer;
 
 interface SendShardQueryParams {
     database?: string;
     path?: string;
     sortOrder?: SortOrder[];
-    filters?: IShardsWorkloadFilters;
+    filters?: ShardsWorkloadFilters;
 }
 
-export const sendShardQuery = ({database, path = '', sortOrder, filters}: SendShardQueryParams) => {
-    try {
-        return createApiRequest({
-            request: window.api.sendQuery(
-                {
-                    schema: 'modern',
-                    query:
-                        filters?.mode === EShardsWorkloadMode.Immediate
-                            ? createShardQueryImmediate(path, sortOrder, database)
-                            : createShardQueryHistorical(path, filters, sortOrder, database),
-                    database,
-                    action: queryAction,
-                },
-                {
-                    concurrentId: 'shardsWorkload',
-                },
-            ),
-            actions: SEND_SHARD_QUERY,
-            dataHandler: parseQueryAPIExecuteResponse,
-        });
-    } catch (error) {
-        return {
-            type: SEND_SHARD_QUERY.FAILURE,
-            error,
-        };
-    }
-};
-
-export function setShardsState(options: Partial<IShardsWorkloadState>) {
-    return {
-        type: SET_SHARD_STATE,
-        data: options,
-    } as const;
-}
-
-export function setShardsQueryFilters(filters: Partial<IShardsWorkloadFilters>) {
-    return {
-        type: SET_SHARD_QUERY_FILTERS,
-        filters,
-    } as const;
-}
-
-export default shardsWorkload;
+export const shardApi = api.injectEndpoints({
+    endpoints: (build) => ({
+        sendShardQuery: build.query({
+            queryFn: async (
+                {database, path = '', sortOrder, filters}: SendShardQueryParams,
+                {signal},
+            ) => {
+                try {
+                    const response = await window.api.sendQuery(
+                        {
+                            schema: 'modern',
+                            query:
+                                filters?.mode === EShardsWorkloadMode.Immediate
+                                    ? createShardQueryImmediate(path, sortOrder, database)
+                                    : createShardQueryHistorical(
+                                          path,
+                                          filters,
+                                          sortOrder,
+                                          database,
+                                      ),
+                            database,
+                            action: queryAction,
+                        },
+                        {
+                            signal,
+                        },
+                    );
+                    const data = parseQueryAPIExecuteResponse(response);
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+    overrideExisting: 'throw',
+});

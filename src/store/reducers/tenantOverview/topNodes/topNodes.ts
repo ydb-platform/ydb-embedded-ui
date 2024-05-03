@@ -26,4 +26,5 @@ export const topNodesApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
     }),
+    overrideExisting: 'throw',
 });

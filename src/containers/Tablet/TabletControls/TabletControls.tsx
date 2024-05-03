@@ -3,13 +3,12 @@ import React from 'react';
 import {ButtonWithConfirmDialog} from '../../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {ETabletState} from '../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
-import type {ITabletHandledResponse} from '../../../types/store/tablet';
 import {b} from '../Tablet';
 import i18n from '../i18n';
 
 interface TabletControlsProps {
     tablet: TTabletStateInfo;
-    fetchData: () => Promise<ITabletHandledResponse | undefined>;
+    fetchData: () => Promise<unknown>;
 }
 
 export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {

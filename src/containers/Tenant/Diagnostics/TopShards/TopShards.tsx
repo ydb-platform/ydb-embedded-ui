@@ -6,19 +6,18 @@ import {Loader} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router';
 
 import {
-    sendShardQuery,
     setShardsQueryFilters,
-    setShardsState,
+    shardApi,
 } from '../../../../store/reducers/shardsWorkload/shardsWorkload';
 import {EShardsWorkloadMode} from '../../../../store/reducers/shardsWorkload/types';
-import type {IShardsWorkloadFilters} from '../../../../store/reducers/shardsWorkload/types';
+import type {ShardsWorkloadFilters} from '../../../../store/reducers/shardsWorkload/types';
 import type {CellValue, KeyValueRow} from '../../../../types/api/query';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {isSortableTopShardsProperty} from '../../../../utils/diagnostics';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
 import {isColumnEntityType} from '../../utils/schema';
 
@@ -79,7 +78,7 @@ function dataTableToStringSortOrder(value: SortOrder | SortOrder[] = []) {
     return sortOrders.map(({columnId}) => columnId).join(',');
 }
 
-function fillDateRangeFor(value: IShardsWorkloadFilters) {
+function fillDateRangeFor(value: ShardsWorkloadFilters) {
     value.to = Date.now();
     value.from = value.to - HOUR_IN_SECONDS * 1000;
     return value;
@@ -96,17 +95,11 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
 
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
 
-    const {
-        loading,
-        data: {result: data = undefined} = {},
-        filters: storeFilters,
-        error,
-        wasLoaded,
-    } = useTypedSelector((state) => state.shardsWorkload);
+    const storeFilters = useTypedSelector((state) => state.shardsWorkload);
 
     // default filters shouldn't propagate into URL until user interacts with the control
     // redux initial value can't be used, as it synchronizes with URL
-    const [filters, setFilters] = React.useState<IShardsWorkloadFilters>(() => {
+    const [filters, setFilters] = React.useState<ShardsWorkloadFilters>(() => {
         const defaultValue = {...storeFilters};
 
         if (!defaultValue.mode) {
@@ -121,31 +114,21 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     });
 
     const [sortOrder, setSortOrder] = React.useState(tableColumnsNames.CPUCores);
-
-    useAutofetcher(
-        () => {
-            dispatch(
-                sendShardQuery({
-                    database: tenantPath,
-                    path: currentSchemaPath,
-                    sortOrder: stringToQuerySortOrder(sortOrder),
-                    filters,
-                }),
-            );
+    const {
+        data: result,
+        isFetching,
+        error,
+    } = shardApi.useSendShardQueryQuery(
+        {
+            database: tenantPath,
+            path: currentSchemaPath,
+            sortOrder: stringToQuerySortOrder(sortOrder),
+            filters,
         },
-        [dispatch, tenantPath, currentSchemaPath, sortOrder, filters],
-        autorefresh,
+        {pollingInterval: autorefresh},
     );
-
-    // don't show loader for requests triggered by table sort, only for path change
-    React.useEffect(() => {
-        dispatch(
-            setShardsState({
-                wasLoaded: false,
-                data: undefined,
-            }),
-        );
-    }, [dispatch, currentSchemaPath, tenantPath, filters]);
+    const loading = isFetching && result === undefined;
+    const {result: data} = result ?? {};
 
     const onSort = (newSortOrder?: SortOrder | SortOrder[]) => {
         // omit information about sort order to disable ASC order, only DESC makes sense for top shards
@@ -154,7 +137,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         setSortOrder(dataTableToStringSortOrder(newSortOrder));
     };
 
-    const handleFiltersChange = (value: Partial<IShardsWorkloadFilters>) => {
+    const handleFiltersChange = (value: Partial<ShardsWorkloadFilters>) => {
         const newStateValue = {...value};
         const isDateRangePristine =
             !storeFilters.from && !storeFilters.to && !value.from && !value.to;
@@ -212,11 +195,11 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     };
 
     const renderContent = () => {
-        if (loading && !wasLoaded) {
+        if (loading) {
             return renderLoader();
         }
 
-        if (error && !error.isCancelled) {
+        if (error && typeof error === 'object' && !(error as any).isCancelled) {
             return <div className="error">{prepareQueryError(error)}</div>;
         }
 

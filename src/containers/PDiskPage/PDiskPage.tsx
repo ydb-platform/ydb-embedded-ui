@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {Icon} from '@gravity-ui/uikit';
+import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
@@ -11,14 +12,11 @@ import {PDiskInfo} from '../../components/PDiskInfo/PDiskInfo';
 import {PageMeta} from '../../components/PageMeta/PageMeta';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {selectNodesMap} from '../../store/reducers/nodesList';
-import {
-    getPDiskData,
-    getPDiskStorage,
-    setPDiskDataWasNotLoaded,
-} from '../../store/reducers/pdisk/pdisk';
+import {pDiskApi} from '../../store/reducers/pdisk/pdisk';
 import {valueIsDefined} from '../../utils';
+import {DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
 import {getSeverityColor} from '../../utils/disks/helpers';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import {PDiskGroups} from './PDiskGroups';
 import {pDiskPageKeyset} from './i18n';
@@ -32,9 +30,6 @@ export function PDiskPage() {
     const dispatch = useTypedDispatch();
 
     const nodesMap = useTypedSelector(selectNodesMap);
-    const {pDiskData, groupsData, pDiskLoading, pDiskWasLoaded, groupsLoading, groupsWasLoaded} =
-        useTypedSelector((state) => state.pDisk);
-    const {NodeHost, NodeId, NodeType, NodeDC, Severity} = pDiskData;
 
     const [{nodeId, pDiskId}] = useQueryParams({
         nodeId: StringParam,
@@ -45,25 +40,21 @@ export function PDiskPage() {
         dispatch(setHeaderBreadcrumbs('pDisk', {nodeId, pDiskId}));
     }, [dispatch, nodeId, pDiskId]);
 
-    const fetchData = React.useCallback(
-        async (isBackground?: boolean) => {
-            if (!isBackground) {
-                dispatch(setPDiskDataWasNotLoaded());
-            }
+    const params =
+        valueIsDefined(nodeId) && valueIsDefined(pDiskId) ? {nodeId, pDiskId} : skipToken;
+    const pdiskDataQuery = pDiskApi.useGetPdiskInfoQuery(params, {
+        pollingInterval: DEFAULT_POLLING_INTERVAL,
+    });
+    const pDiskLoading = pdiskDataQuery.isFetching && pdiskDataQuery.currentData === undefined;
+    const pDiskData = pdiskDataQuery.currentData || {};
+    const {NodeHost, NodeId, NodeType, NodeDC, Severity} = pDiskData;
 
-            if (valueIsDefined(nodeId) && valueIsDefined(pDiskId)) {
-                return Promise.all([
-                    dispatch(getPDiskData({nodeId, pDiskId})),
-                    dispatch(getPDiskStorage({nodeId, pDiskId})),
-                ]);
-            }
-
-            return undefined;
-        },
-        [dispatch, nodeId, pDiskId],
-    );
-
-    useAutofetcher(fetchData, [fetchData], true);
+    const pDiskStorageQuery = pDiskApi.useGetStorageInfoQuery(params, {
+        pollingInterval: DEFAULT_POLLING_INTERVAL,
+    });
+    const groupsLoading =
+        pDiskStorageQuery.isFetching && pDiskStorageQuery.currentData === undefined;
+    const groupsData = pDiskStorageQuery.currentData ?? [];
 
     const handleRestart = async () => {
         if (valueIsDefined(nodeId) && valueIsDefined(pDiskId)) {
@@ -74,7 +65,7 @@ export function PDiskPage() {
     };
 
     const handleAfterRestart = async () => {
-        return fetchData(true);
+        return Promise.all([pdiskDataQuery.refetch(), pDiskStorageQuery.refetch()]);
     };
 
     const renderHelmet = () => {
@@ -99,7 +90,7 @@ export function PDiskPage() {
         return (
             <PageMeta
                 className={pdiskPageCn('meta')}
-                loading={pDiskLoading && !pDiskWasLoaded}
+                loading={pDiskLoading}
                 items={[hostItem, nodeIdItem, NodeType, NodeDC]}
             />
         );
@@ -134,7 +125,7 @@ export function PDiskPage() {
     };
 
     const renderInfo = () => {
-        if (pDiskLoading && !pDiskWasLoaded) {
+        if (pDiskLoading) {
             return <InfoViewerSkeleton className={pdiskPageCn('info')} rows={10} />;
         }
         return (
@@ -148,13 +139,7 @@ export function PDiskPage() {
     };
 
     const renderGroupsTable = () => {
-        return (
-            <PDiskGroups
-                data={groupsData}
-                nodesMap={nodesMap}
-                loading={groupsLoading && !groupsWasLoaded}
-            />
-        );
+        return <PDiskGroups data={groupsData} nodesMap={nodesMap} loading={groupsLoading} />;
     };
 
     return (

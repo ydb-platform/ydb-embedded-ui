@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {Icon} from '@gravity-ui/uikit';
+import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
@@ -13,12 +14,13 @@ import {VDiskWithDonorsStack} from '../../components/VDisk/VDiskWithDonorsStack'
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {selectNodesMap} from '../../store/reducers/nodesList';
-import {getVDiskData, setVDiskDataWasNotLoaded} from '../../store/reducers/vdisk/vdisk';
+import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
+import {DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {getSeverityColor} from '../../utils/disks/helpers';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import {vDiskPageKeyset} from './i18n';
 
@@ -32,8 +34,6 @@ export function VDiskPage() {
     const dispatch = useTypedDispatch();
 
     const nodesMap = useTypedSelector(selectNodesMap);
-    const {vDiskData, groupData, loading, wasLoaded} = useTypedSelector((state) => state.vDisk);
-    const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} = vDiskData;
 
     const [{nodeId, pDiskId, vDiskSlotId}] = useQueryParams({
         nodeId: StringParam,
@@ -45,20 +45,16 @@ export function VDiskPage() {
         dispatch(setHeaderBreadcrumbs('vDisk', {nodeId, pDiskId, vDiskSlotId}));
     }, [dispatch, nodeId, pDiskId, vDiskSlotId]);
 
-    const fetchData = React.useCallback(
-        async (isBackground?: boolean) => {
-            if (!isBackground) {
-                dispatch(setVDiskDataWasNotLoaded());
-            }
-            if (valueIsDefined(nodeId) && valueIsDefined(pDiskId) && valueIsDefined(vDiskSlotId)) {
-                return dispatch(getVDiskData({nodeId, pDiskId, vDiskSlotId}));
-            }
-            return undefined;
-        },
-        [dispatch, nodeId, pDiskId, vDiskSlotId],
-    );
-
-    useAutofetcher(fetchData, [fetchData], true);
+    const params =
+        valueIsDefined(nodeId) && valueIsDefined(pDiskId) && valueIsDefined(vDiskSlotId)
+            ? {nodeId, pDiskId, vDiskSlotId}
+            : skipToken;
+    const {currentData, isFetching, refetch} = vDiskApi.useGetVDiskDataQuery(params, {
+        pollingInterval: DEFAULT_POLLING_INTERVAL,
+    });
+    const loading = isFetching && currentData === undefined;
+    const {vDiskData = {}, groupData} = currentData || {};
+    const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} = vDiskData;
 
     const handleEvictVDisk = async () => {
         const {GroupID, GroupGeneration, Ring, Domain, VDisk} = VDiskId || {};
@@ -83,7 +79,7 @@ export function VDiskPage() {
     };
 
     const handleAfterEvictVDisk = async () => {
-        return fetchData(true);
+        return refetch();
     };
 
     const renderHelmet = () => {
@@ -112,7 +108,7 @@ export function VDiskPage() {
 
         return (
             <PageMeta
-                loading={loading && !wasLoaded}
+                loading={loading}
                 items={[hostItem, nodeIdItem, NodeType, NodeDC, pDiskIdItem, PDiskType]}
             />
         );
@@ -175,7 +171,7 @@ export function VDiskPage() {
     };
 
     const renderContent = () => {
-        if (loading && !wasLoaded) {
+        if (loading) {
             return <InfoViewerSkeleton rows={20} />;
         }
 

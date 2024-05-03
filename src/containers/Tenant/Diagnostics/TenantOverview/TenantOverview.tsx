@@ -5,7 +5,7 @@ import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constan
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
-import {DEFAULT_POLLING_INTERVAL, TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
+import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
@@ -46,7 +46,7 @@ export function TenantOverview({
     const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
         {path: tenantName},
         {
-            pollingInterval: autorefresh ? DEFAULT_POLLING_INTERVAL : 0,
+            pollingInterval: autorefresh,
         },
     );
     const tenantLoading = isFetching && tenant === undefined;

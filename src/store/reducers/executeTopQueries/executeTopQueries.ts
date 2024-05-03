@@ -1,24 +1,29 @@
-import type {AnyAction, Reducer, ThunkAction} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
 
-import type {RootState} from '../..';
-import type {IQueryResult} from '../../../types/store/query';
+import {HOUR_IN_SECONDS} from '../../../utils/constants';
 import {parseQueryAPIExecuteResponse} from '../../../utils/query';
-import {createApiRequest, createRequestActionTypes} from '../../utils';
+import {api} from '../api';
 
-import type {ITopQueriesAction, ITopQueriesFilters, ITopQueriesState} from './types';
+import type {TopQueriesFilters} from './types';
 import {getFiltersConditions} from './utils';
 
-export const FETCH_TOP_QUERIES = createRequestActionTypes('top-queries', 'FETCH_TOP_QUERIES');
-const SET_TOP_QUERIES_STATE = 'top-queries/SET_TOP_QUERIES_STATE';
-const SET_TOP_QUERIES_FILTERS = 'top-queries/SET_TOP_QUERIES_FILTERS';
+const initialState: TopQueriesFilters = {};
 
-const initialState = {
-    loading: false,
-    wasLoaded: false,
-    filters: {},
-};
+const slice = createSlice({
+    name: 'executeTopQueries',
+    initialState,
+    reducers: {
+        setTopQueriesFilters: (state, action: PayloadAction<TopQueriesFilters>) => {
+            return {...state, ...action.payload};
+        },
+    },
+});
 
-const getQueryText = (path: string, filters?: ITopQueriesFilters) => {
+export const {setTopQueriesFilters} = slice.actions;
+export default slice.reducer;
+
+const getQueryText = (path: string, filters?: TopQueriesFilters) => {
     const filterConditions = getFiltersConditions(path, filters);
     return `
 SELECT
@@ -35,87 +40,39 @@ WHERE ${filterConditions || 'true'}
 `;
 };
 
-const executeTopQueries: Reducer<ITopQueriesState, ITopQueriesAction> = (
-    state = initialState,
-    action,
-) => {
-    switch (action.type) {
-        case FETCH_TOP_QUERIES.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-                error: undefined,
-            };
-        }
-        case FETCH_TOP_QUERIES.SUCCESS: {
-            return {
-                ...state,
-                data: action.data,
-                loading: false,
-                error: undefined,
-                wasLoaded: true,
-            };
-        }
-        // 401 Unauthorized error is handled by GenericAPI
-        case FETCH_TOP_QUERIES.FAILURE: {
-            return {
-                ...state,
-                error: action.error || 'Unauthorized',
-                loading: false,
-            };
-        }
-        case SET_TOP_QUERIES_STATE:
-            return {
-                ...state,
-                ...action.data,
-            };
-        case SET_TOP_QUERIES_FILTERS:
-            return {
-                ...state,
-                filters: {
-                    ...state.filters,
-                    ...action.filters,
-                },
-            };
-        default:
-            return state;
-    }
-};
-
-type FetchTopQueries = (params: {
-    database: string;
-    filters?: ITopQueriesFilters;
-}) => ThunkAction<Promise<IQueryResult | undefined>, RootState, unknown, AnyAction>;
-
-export const fetchTopQueries: FetchTopQueries = ({database, filters}) =>
-    createApiRequest({
-        request: window.api.sendQuery(
-            {
-                schema: 'modern',
-                query: getQueryText(database, filters),
-                database,
-                action: 'execute-scan',
+export const topQueriesApi = api.injectEndpoints({
+    endpoints: (build) => ({
+        getTopQueries: build.query({
+            queryFn: async (
+                {database, filters}: {database: string; filters?: TopQueriesFilters},
+                {signal, dispatch},
+            ) => {
+                try {
+                    const response = await window.api.sendQuery(
+                        {
+                            schema: 'modern',
+                            query: getQueryText(database, filters),
+                            database,
+                            action: 'execute-scan',
+                        },
+                        {signal},
+                    );
+                    const data = parseQueryAPIExecuteResponse(response);
+                    // FIXME: do we really need this?
+                    if (!filters?.from && !filters?.to) {
+                        const intervalEnd = data?.result?.[0]?.IntervalEnd;
+                        if (intervalEnd) {
+                            const to = new Date(intervalEnd).getTime();
+                            const from = new Date(to - HOUR_IN_SECONDS * 1000).getTime();
+                            dispatch(setTopQueriesFilters({from, to}));
+                        }
+                    }
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
             },
-            {
-                concurrentId: 'executeTopQueries',
-            },
-        ),
-        actions: FETCH_TOP_QUERIES,
-        dataHandler: parseQueryAPIExecuteResponse,
-    });
-
-export function setTopQueriesState(state: Partial<ITopQueriesState>) {
-    return {
-        type: SET_TOP_QUERIES_STATE,
-        data: state,
-    } as const;
-}
-
-export function setTopQueriesFilters(filters: Partial<ITopQueriesFilters>) {
-    return {
-        type: SET_TOP_QUERIES_FILTERS,
-        filters,
-    } as const;
-}
-
-export default executeTopQueries;
+        }),
+    }),
+    overrideExisting: 'throw',
+});

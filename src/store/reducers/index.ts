@@ -4,7 +4,6 @@ import {api} from './api';
 import authentication from './authentication/authentication';
 import cluster from './cluster/cluster';
 import clusters from './clusters/clusters';
-import describe from './describe';
 import executeQuery from './executeQuery';
 import executeTopQueries from './executeTopQueries/executeTopQueries';
 import explainQuery from './explainQuery';
@@ -13,15 +12,8 @@ import header from './header/header';
 import heatmap from './heatmap';
 import host from './host';
 import hotKeys from './hotKeys/hotKeys';
-import network from './network/network';
-import node from './node/node';
 import nodes from './nodes/nodes';
-import nodesList from './nodesList';
-import olapStats from './olapStats';
-import overview from './overview/overview';
 import partitions from './partitions/partitions';
-import pDisk from './pdisk/pdisk';
-import preview from './preview';
 import saveQuery from './saveQuery';
 import schema from './schema/schema';
 import schemaAcl from './schemaAcl/schemaAcl';
@@ -29,14 +21,11 @@ import settings from './settings/settings';
 import shardsWorkload from './shardsWorkload/shardsWorkload';
 import singleClusterMode from './singleClusterMode';
 import storage from './storage/storage';
-import tablet from './tablet';
 import tablets from './tablets';
 import tabletsFilters from './tabletsFilters';
 import tenant from './tenant/tenant';
 import tenants from './tenants/tenants';
 import tooltip from './tooltip';
-import topic from './topic';
-import vDisk from './vdisk/vdisk';
 
 export const rootReducer = {
     [api.reducerPath]: api.reducer,
@@ -45,27 +34,17 @@ export const rootReducer = {
     cluster,
     tenant,
     storage,
-    node,
     tooltip,
     tablets,
     schema,
-    overview,
-    olapStats,
     host,
-    network,
     tenants,
-    tablet,
-    topic,
     partitions,
-    pDisk,
     executeQuery,
     explainQuery,
     tabletsFilters,
     heatmap,
     settings,
-    preview,
-    nodesList,
-    describe,
     schemaAcl,
     executeTopQueries,
     shardsWorkload,
@@ -75,7 +54,6 @@ export const rootReducer = {
     saveQuery,
     fullscreen,
     clusters,
-    vDisk,
 };
 
 const combinedReducer = combineReducers({

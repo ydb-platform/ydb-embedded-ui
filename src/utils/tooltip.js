@@ -25,14 +25,14 @@ const NodeTooltip = (props) => {
                             <td className={nodeB('label')}>Rack</td>
                             <td className={nodeB('value')}>{data.rack || '?'}</td>
                         </tr>
-                        {data.connected && data.capacity && (
+                        {data.connected && data.capacity ? (
                             <tr>
                                 <td className={nodeB('label')}>Net</td>
                                 <td className={nodeB('value')}>
                                     {`${data.connected} / ${data.capacity}`}
                                 </td>
                             </tr>
-                        )}
+                        ) : null}
                     </tbody>
                 </table>
             </div>

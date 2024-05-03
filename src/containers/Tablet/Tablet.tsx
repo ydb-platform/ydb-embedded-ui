@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {Link as ExternalLink} from '@gravity-ui/uikit';
+import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useLocation, useParams} from 'react-router';
 
@@ -13,11 +14,15 @@ import {Tag} from '../../components/Tag';
 import {parseQuery} from '../../routes';
 import {backend} from '../../store';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {clearTabletData, getTablet, getTabletDescribe} from '../../store/reducers/tablet';
+import {tabletApi} from '../../store/reducers/tablet';
 import type {EType} from '../../types/api/tablet';
 import {cn} from '../../utils/cn';
-import {CLUSTER_DEFAULT_TITLE, DEVELOPER_UI_TITLE} from '../../utils/constants';
-import {useAutofetcher, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {
+    CLUSTER_DEFAULT_TITLE,
+    DEFAULT_POLLING_INTERVAL,
+    DEVELOPER_UI_TITLE,
+} from '../../utils/constants';
+import {useTypedDispatch} from '../../utils/hooks';
 
 import {TabletControls} from './TabletControls';
 import {TabletInfo} from './TabletInfo';
@@ -38,43 +43,27 @@ export const Tablet = () => {
     const {id} = params;
 
     const {
-        data: tablet = {},
-        loading,
-        id: tabletId,
-        history = [],
-        tenantPath,
-        error,
-    } = useTypedSelector((state) => state.tablet);
-
-    const {
         nodeId: queryNodeId,
         tenantName: queryTenantName,
         type: queryTabletType,
         clusterName: queryClusterName,
     } = parseQuery(location);
+
+    const {currentData, isFetching, error, refetch} = tabletApi.useGetTabletQuery(
+        {id},
+        {pollingInterval: DEFAULT_POLLING_INTERVAL},
+    );
+
+    const loading = isFetching && currentData === undefined;
+    const {id: tabletId, data: tablet = {}, history = []} = currentData || {};
+
+    const {currentData: tenantPath} = tabletApi.useGetTabletDescribeQuery(
+        tablet.TenantId ? {tenantId: tablet.TenantId} : skipToken,
+    );
+
     const nodeId = tablet.NodeId?.toString() || queryNodeId?.toString();
     const tenantName = tenantPath || queryTenantName?.toString();
     const type = tablet.Type || (queryTabletType?.toString() as EType | undefined);
-
-    // NOTE: should be reviewed when migrating to React 18
-    React.useEffect(() => {
-        return () => {
-            dispatch(clearTabletData());
-        };
-    }, [dispatch]);
-
-    React.useEffect(() => {
-        if (isFirstDataFetchRef.current && tablet && tablet.TenantId) {
-            dispatch(getTabletDescribe(tablet.TenantId));
-            isFirstDataFetchRef.current = false;
-        }
-    }, [dispatch, tablet]);
-
-    const fetchData = React.useCallback(() => {
-        return dispatch(getTablet(id));
-    }, [dispatch, id]);
-
-    useAutofetcher(fetchData, [fetchData], true);
 
     React.useEffect(() => {
         dispatch(
@@ -143,7 +132,7 @@ export const Tablet = () => {
                             <span className={b('loader')}>{loading && <Loader size="s" />}</span>
                         </div>
                         <TabletInfo tablet={tablet} tenantPath={tenantName} />
-                        <TabletControls tablet={tablet} fetchData={fetchData} />
+                        <TabletControls tablet={tablet} fetchData={refetch} />
                     </div>
                     <div className={b('rigth-pane')}>
                         <TabletTable history={history} />
