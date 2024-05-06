@@ -1,5 +1,31 @@
 # Changelog
 
+## [6.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.5.0...v6.0.0) (2024-05-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* update to uikit 6 ([#789](https://github.com/ydb-platform/ydb-embedded-ui/issues/789))
+
+### Features
+
+* auto refresh with advanced control ([#804](https://github.com/ydb-platform/ydb-embedded-ui/issues/804)) ([bfbd3d0](https://github.com/ydb-platform/ydb-embedded-ui/commit/bfbd3d01083270a362b8db3f858f7b7c2df4fbcd))
+* **Cluster:** persist nodes filter in URL ([#797](https://github.com/ydb-platform/ydb-embedded-ui/issues/797)) ([32ef8d6](https://github.com/ydb-platform/ydb-embedded-ui/commit/32ef8d65f53a887a871cff7ef13760bbde6935d6))
+* **Diagnostics:** add Schema tab with column family info ([#767](https://github.com/ydb-platform/ydb-embedded-ui/issues/767)) ([504468b](https://github.com/ydb-platform/ydb-embedded-ui/commit/504468bfac2f95ea61d0941058d685ea343f8a9c))
+* **healthcheck:** use rtk query ([#800](https://github.com/ydb-platform/ydb-embedded-ui/issues/800)) ([65e25f8](https://github.com/ydb-platform/ydb-embedded-ui/commit/65e25f8c1008cf6e714ada6baa601cd6a876c9ac))
+* move some pages to rtk query ([#799](https://github.com/ydb-platform/ydb-embedded-ui/issues/799)) ([876510c](https://github.com/ydb-platform/ydb-embedded-ui/commit/876510ccfd68d99bfae056476a526561101f825a))
+* **TenantOverview:** bars instead of circles ([#792](https://github.com/ydb-platform/ydb-embedded-ui/issues/792)) ([05fbeff](https://github.com/ydb-platform/ydb-embedded-ui/commit/05fbeffa9407694bc885b34e36899be32b936382))
+* **Tenant:** use rtk query ([#802](https://github.com/ydb-platform/ydb-embedded-ui/issues/802)) ([19487b1](https://github.com/ydb-platform/ydb-embedded-ui/commit/19487b16990dd571c9c21ec9e66609183c7c4de1))
+* update to uikit 6 ([#789](https://github.com/ydb-platform/ydb-embedded-ui/issues/789)) ([1a3154d](https://github.com/ydb-platform/ydb-embedded-ui/commit/1a3154de595e6254fe25049373200d40cc41d751))
+* use rtk query ([#795](https://github.com/ydb-platform/ydb-embedded-ui/issues/795)) ([9f82408](https://github.com/ydb-platform/ydb-embedded-ui/commit/9f82408e9185a988128ff9f2d6d600cfd6e6325c))
+
+
+### Bug Fixes
+
+* add cluster dashboard to monitoring link object ([#793](https://github.com/ydb-platform/ydb-embedded-ui/issues/793)) ([b021fe0](https://github.com/ydb-platform/ydb-embedded-ui/commit/b021fe013460328a00f152484947af32ab46e4ee))
+* **MetricChart:** spanGaps ([#796](https://github.com/ydb-platform/ydb-embedded-ui/issues/796)) ([33687fb](https://github.com/ydb-platform/ydb-embedded-ui/commit/33687fb5b237347ae1be86192b152b1140dadbb4))
+* **QueryEditor:** use `full` stats mode instead of `profile` ([#791](https://github.com/ydb-platform/ydb-embedded-ui/issues/791)) ([6488896](https://github.com/ydb-platform/ydb-embedded-ui/commit/64888960c171934d8ee0a080fb731a7abae79e2c))
+
 ## [5.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.4.0...v5.5.0) (2024-04-02)
 
 
