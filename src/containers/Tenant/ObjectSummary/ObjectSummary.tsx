@@ -193,9 +193,7 @@ export function ObjectSummary({
                 return <Acl />;
             }
             case TENANT_SUMMARY_TABS_IDS.schema: {
-                return (
-                    <SchemaViewer className={b('schema')} type={type} path={currentSchemaPath} />
-                );
+                return <SchemaViewer type={type} path={currentSchemaPath} />;
             }
             default: {
                 return renderObjectOverview();

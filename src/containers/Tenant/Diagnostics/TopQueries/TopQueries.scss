@@ -8,38 +8,16 @@
 
     @include query-data-table;
 
-    &__loader {
-        display: flex;
-        justify-content: center;
-    }
-
-    &__controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 16px;
-
-        margin-bottom: 10px;
-    }
-
     &__search {
         @include search();
     }
 
-    &__table {
-        overflow: auto;
-        flex-grow: 1;
-
-        .data-table {
-            &__row {
-                cursor: pointer;
-            }
-        }
+    &__row {
+        cursor: pointer;
     }
 
     &__query {
         overflow: hidden;
-
-        width: 500px;
 
         vertical-align: top;
         white-space: pre-wrap;

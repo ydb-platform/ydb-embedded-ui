@@ -30,6 +30,8 @@ import './Columns.scss';
 
 const b = cn('ydb-diagnostics-partitions-columns');
 
+export const PARTITIONS_COLUMNS_WIDTH_LS_KEY = 'partitionsColumnsWidth';
+
 export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.PARTITION_ID,
@@ -54,6 +56,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         name: PARTITIONS_COLUMNS_IDS.WRITE_SPEED,
         header: PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.WRITE_SPEED],
         align: DataTable.LEFT,
+        resizeMinWidth: 140,
         sortAccessor: (row) => row.writeSpeed.perMinute,
         render: ({row}) => <SpeedMultiMeter data={row.writeSpeed} />,
     },
@@ -61,6 +64,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         name: PARTITIONS_COLUMNS_IDS.READ_SPEED,
         header: PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.READ_SPEED],
         align: DataTable.LEFT,
+        resizeMinWidth: 140,
         sortAccessor: (row) => row.readSpeed?.perMinute,
         render: ({row}) => <SpeedMultiMeter data={row.readSpeed} />,
     },
@@ -165,14 +169,10 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         name: PARTITIONS_COLUMNS_IDS.READ_SESSION_ID,
         header: <ReadSessionHeader />,
         align: DataTable.LEFT,
+        width: 150,
         render: ({row}) =>
             row.readSessionId ? (
-                <EntityStatus
-                    name={row.readSessionId}
-                    showStatus={false}
-                    hasClipboardButton
-                    className={b('string-with-copy')}
-                />
+                <EntityStatus name={row.readSessionId} showStatus={false} hasClipboardButton />
             ) : (
                 '–'
             ),
@@ -185,14 +185,10 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             />
         ),
         align: DataTable.LEFT,
+        width: 150,
         render: ({row}) =>
             row.readerName ? (
-                <EntityStatus
-                    name={row.readerName}
-                    showStatus={false}
-                    hasClipboardButton
-                    className={b('string-with-copy')}
-                />
+                <EntityStatus name={row.readerName} showStatus={false} hasClipboardButton />
             ) : (
                 '–'
             ),
@@ -205,6 +201,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             />
         ),
         align: DataTable.LEFT,
+        width: 200,
         render: ({row}) =>
             row.partitionNodeId && row.partitionHost ? (
                 <EntityStatus
@@ -212,7 +209,6 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     path={getDefaultNodePath(row.partitionNodeId)}
                     showStatus={false}
                     hasClipboardButton
-                    className={b('string-with-copy')}
                 />
             ) : (
                 '–'
@@ -226,6 +222,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             />
         ),
         align: DataTable.LEFT,
+        width: 200,
         render: ({row}) =>
             row.connectionNodeId && row.connectionHost ? (
                 <EntityStatus
@@ -233,7 +230,6 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     path={getDefaultNodePath(row.connectionNodeId)}
                     showStatus={false}
                     hasClipboardButton
-                    className={b('string-with-copy')}
                 />
             ) : (
                 '–'

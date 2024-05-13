@@ -146,7 +146,7 @@ export const PartitionsControls = ({
     };
 
     return (
-        <div className={b('controls')}>
+        <React.Fragment>
             <Select
                 className={b('consumer-select')}
                 label={i18n('controls.consumerSelector')}
@@ -178,6 +178,6 @@ export const PartitionsControls = ({
                 onUpdate={handleTableColumnsSetupChange}
                 sortable={false}
             />
-        </div>
+        </React.Fragment>
     );
 };

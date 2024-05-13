@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {RadioButton} from '@gravity-ui/uikit';
 
 import type {DateRangeValues} from '../../../../../components/DateRange';
@@ -5,10 +7,7 @@ import {DateRange} from '../../../../../components/DateRange';
 import {EShardsWorkloadMode} from '../../../../../store/reducers/shardsWorkload/types';
 import type {ShardsWorkloadFilters} from '../../../../../store/reducers/shardsWorkload/types';
 import {isEnumMember} from '../../../../../utils/typecheckers';
-import {b} from '../TopShards';
 import i18n from '../i18n';
-
-import './Filters.scss';
 
 interface FiltersProps {
     value: ShardsWorkloadFilters;
@@ -16,7 +15,7 @@ interface FiltersProps {
     className?: string;
 }
 
-export const Filters = ({value, onChange, className}: FiltersProps) => {
+export const Filters = ({value, onChange}: FiltersProps) => {
     const handleModeChange = (mode: string) => {
         if (!isEnumMember(EShardsWorkloadMode, mode)) {
             const values = Object.values(EShardsWorkloadMode).join(', ');
@@ -37,7 +36,7 @@ export const Filters = ({value, onChange, className}: FiltersProps) => {
     const to = value.mode === EShardsWorkloadMode.Immediate ? undefined : value.to;
 
     return (
-        <div className={b('filters', className)}>
+        <React.Fragment>
             <RadioButton value={value.mode} onUpdate={handleModeChange}>
                 <RadioButton.Option value={EShardsWorkloadMode.Immediate}>
                     {i18n('filters.mode.immediate')}
@@ -47,6 +46,6 @@ export const Filters = ({value, onChange, className}: FiltersProps) => {
                 </RadioButton.Option>
             </RadioButton>
             <DateRange from={from} to={to} onChange={handleDateRangeChange} />
-        </div>
+        </React.Fragment>
     );
 };

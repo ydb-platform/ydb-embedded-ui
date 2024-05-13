@@ -3,10 +3,12 @@ import DataTable from '@gravity-ui/react-data-table';
 
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../../components/InternalLink/InternalLink';
+import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
 import type {ITabletPreparedHistoryItem} from '../../../types/store/tablet';
 import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 import {getDefaultNodePath} from '../../Node/NodePages';
-import {b} from '../Tablet';
+
+const TABLET_COLUMNS_WIDTH_LS_KEY = 'tabletTableColumnsWidth';
 
 const columns: Column<ITabletPreparedHistoryItem>[] = [
     {
@@ -43,15 +45,12 @@ const columns: Column<ITabletPreparedHistoryItem>[] = [
     {
         name: 'Node FQDN',
         sortable: false,
+        width: 300,
         render: ({row}) => {
             if (!row.fqdn) {
                 return <span>—</span>;
             }
-            return (
-                <div className={b('host')}>
-                    <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />
-                </div>
-            );
+            return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
         },
     },
 ];
@@ -66,8 +65,8 @@ interface TabletTableProps {
 
 export const TabletTable = ({history}: TabletTableProps) => {
     return (
-        <DataTable
-            theme="yandex-cloud"
+        <ResizeableDataTable
+            columnsWidthLSKey={TABLET_COLUMNS_WIDTH_LS_KEY}
             data={history}
             columns={columns}
             settings={TABLE_SETTINGS}

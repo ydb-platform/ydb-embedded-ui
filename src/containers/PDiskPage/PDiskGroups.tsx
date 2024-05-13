@@ -1,12 +1,14 @@
 import React from 'react';
 
-import DataTable from '@gravity-ui/react-data-table';
-
+import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import type {NodesMap} from '../../types/store/nodesList';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {getPDiskStorageColumns} from '../Storage/StorageGroups/getStorageGroupsColumns';
+import {
+    STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
+    getPDiskStorageColumns,
+} from '../Storage/StorageGroups/getStorageGroupsColumns';
 
 import {pDiskPageKeyset} from './i18n';
 import {pdiskPageCn} from './shared';
@@ -28,8 +30,8 @@ export function PDiskGroups({data, nodesMap, loading}: PDiskGroupsProps) {
         }
 
         return (
-            <DataTable
-                theme="yandex-cloud"
+            <ResizeableDataTable
+                columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
                 data={data}
                 columns={pDiskStorageColumns}
                 settings={DEFAULT_TABLE_SETTINGS}

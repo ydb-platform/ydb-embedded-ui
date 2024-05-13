@@ -5,6 +5,7 @@ import type {Column} from '@gravity-ui/react-data-table';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Icon} from '../../../../components/Icon';
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {
     setHotKeysData,
     setHotKeysDataWasNotLoaded,
@@ -129,17 +130,15 @@ export function HotKeys({path}: HotKeysProps) {
     }
 
     return (
-        <div className={b('table-content')}>
-            <DataTable
-                columns={tableColumns}
-                data={data}
-                settings={DEFAULT_TABLE_SETTINGS}
-                theme="yandex-cloud"
-                initialSortOrder={{
-                    columnId: tableColumnsIds.accessSample,
-                    order: DataTable.DESCENDING,
-                }}
-            />
-        </div>
+        <ResizeableDataTable
+            wrapperClassName={b('table')}
+            columns={tableColumns}
+            data={data}
+            settings={DEFAULT_TABLE_SETTINGS}
+            initialSortOrder={{
+                columnId: tableColumnsIds.accessSample,
+                order: DataTable.DESCENDING,
+            }}
+        />
     );
 }

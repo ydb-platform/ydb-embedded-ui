@@ -7,19 +7,18 @@ import {Illustration} from '../../components/Illustration';
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {Search} from '../../components/Search';
 import {UptimeFilter} from '../../components/UptimeFIlter';
-import {VirtualTable} from '../../components/VirtualTable';
 import type {
     FetchData,
     GetRowClassName,
     RenderControls,
     RenderErrorMessage,
 } from '../../components/VirtualTable';
+import {ResizeableVirtualTable} from '../../components/VirtualTable/ResizeableVirtualTable';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {ProblemFilterValues} from '../../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {updateColumnsWidth, useTableResize} from '../../utils/hooks/useTableResize';
 import {
     NodesUptimeFilterValues,
     getProblemParamValue,
@@ -30,7 +29,7 @@ import {
 import type {NodesSortValue} from '../../utils/nodes';
 
 import {getNodes} from './getNodes';
-import {getNodesColumns} from './getNodesColumns';
+import {NODES_COLUMNS_WIDTH_LS_KEY, getNodesColumns} from './getNodesColumns';
 import i18n from './i18n';
 
 import './Nodes.scss';
@@ -51,8 +50,6 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
     const [uptimeFilter, setUptimeFilter] = React.useState<NodesUptimeFilterValues>(
         NodesUptimeFilterValues.All,
     );
-
-    const [tableColumnsWidthSetup, setTableColumnsWidth] = useTableResize('nodesTableColumnsWidth');
 
     const filters = React.useMemo(() => {
         return [path, searchValue, problemFilter, uptimeFilter];
@@ -122,12 +119,13 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
         getNodeRef: additionalNodesProps?.getNodeRef,
     });
 
-    const columns = updateColumnsWidth(rawColumns, tableColumnsWidthSetup).map((column) => {
+    const columns = rawColumns.map((column) => {
         return {...column, sortable: isSortableNodesProperty(column.name)};
     });
 
     return (
-        <VirtualTable
+        <ResizeableVirtualTable
+            columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
             parentContainer={parentContainer}
             columns={columns}
             fetchData={fetchData}
@@ -137,7 +135,6 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
             renderEmptyDataMessage={renderEmptyDataMessage}
             dependencyArray={filters}
             getRowClassName={getRowClassName}
-            onColumnsResize={setTableColumnsWidth}
         />
     );
 };

@@ -10,6 +10,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {Illustration} from '../../components/Illustration';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProblemFilter} from '../../components/ProblemFilter';
+import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
@@ -40,6 +41,8 @@ import {getTenantPath} from '../Tenant/TenantPages';
 import './Tenants.scss';
 
 const b = cn('tenants');
+
+const DATABASES_COLUMNS_WIDTH_LS_KEY = 'databasesTableColumnsWidth';
 
 interface TenantsProps {
     additionalTenantsProps?: AdditionalTenantsProps;
@@ -135,6 +138,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
             {
                 name: 'Type',
                 width: 200,
+                resizeMinWidth: 150,
                 render: ({row}) => {
                     if (row.Type !== 'Serverless') {
                         return row.Type;
@@ -209,6 +213,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                 name: 'PoolStats',
                 header: 'Pools',
                 width: 100,
+                resizeMinWidth: 60,
                 sortAccessor: ({PoolStats = []}) =>
                     PoolStats.reduce((acc, item) => acc + (item.Usage || 0), 0),
                 defaultOrder: DataTable.DESCENDING,
@@ -219,7 +224,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                 name: 'Tablets',
                 header: 'Tablets States',
                 sortable: false,
-                width: 430,
+                width: 500,
                 render: ({row}) => {
                     const backend = getTenantBackend(row);
 
@@ -242,8 +247,8 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
         }
 
         return (
-            <DataTable
-                theme="yandex-cloud"
+            <ResizeableDataTable
+                columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
                 data={filteredTenants}
                 columns={columns}
                 settings={DEFAULT_TABLE_SETTINGS}
@@ -259,7 +264,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            <TableWithControlsLayout.Table loading={loading} className={b('table')}>
+            <TableWithControlsLayout.Table loading={loading}>
                 {renderTable()}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>

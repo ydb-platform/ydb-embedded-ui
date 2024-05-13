@@ -12,6 +12,8 @@ import {PDisk} from '../PDisk/PDisk';
 
 import {b} from './shared';
 
+export const STORAGE_NODES_COLUMNS_WIDTH_LS_KEY = 'storageNodesColumnsWidth';
+
 export const STORAGE_NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
     Host: 'Host',
@@ -99,6 +101,7 @@ const getStorageNodesColumns = (additionalNodesProps: AdditionalNodesProps | und
             align: DataTable.CENTER,
             sortable: false,
             width: 900,
+            resizeable: false,
         },
     ];
 

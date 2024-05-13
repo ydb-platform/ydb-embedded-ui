@@ -23,8 +23,6 @@
 
         @include freeze-nth-column(1);
         @include freeze-nth-column(2, 80px);
-
-        @include table-styles;
     }
 
     .ydb-tree-view {

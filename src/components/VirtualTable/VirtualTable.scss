@@ -60,14 +60,12 @@
     }
 
     &__head-cell-wrapper {
+        position: relative;
+
         display: flex;
         overflow-x: hidden;
 
         border-bottom: $cell-border;
-
-        &_resizeable {
-            resize: horizontal;
-        }
     }
 
     &__head-cell {
@@ -144,5 +142,27 @@
                 text-align: right;
             }
         }
+    }
+
+    &__resize-handler {
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        visibility: hidden;
+
+        width: 6px;
+        height: 100%;
+
+        cursor: col-resize;
+
+        background-color: var(--g-color-base-generic);
+
+        &_resizing {
+            visibility: visible;
+        }
+    }
+    &__head-cell-wrapper:hover > &__resize-handler {
+        visibility: visible;
     }
 }

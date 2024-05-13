@@ -39,7 +39,9 @@
         overflow: auto;
 
         height: 100%;
+    }
 
+    &__table {
         @include freeze-nth-column(1);
     }
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import DataTable from '@gravity-ui/react-data-table';
 import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 import {skipToken} from '@reduxjs/toolkit/query';
 
@@ -9,6 +8,7 @@ import {AccessDenied} from '../../components/Errors/403';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Illustration} from '../../components/Illustration';
 import {ProblemFilter} from '../../components/ProblemFilter';
+import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {UptimeFilter} from '../../components/UptimeFIlter';
@@ -37,7 +37,7 @@ import {
     isUnavailableNode,
 } from '../../utils/nodes';
 
-import {getNodesColumns} from './getNodesColumns';
+import {NODES_COLUMNS_WIDTH_LS_KEY, getNodesColumns} from './getNodesColumns';
 import i18n from './i18n';
 
 import './Nodes.scss';
@@ -149,8 +149,8 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
         }
 
         return (
-            <DataTable
-                theme="yandex-cloud"
+            <ResizeableDataTable
+                columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
                 data={nodes || []}
                 columns={columns}
                 settings={DEFAULT_TABLE_SETTINGS}
@@ -172,7 +172,7 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
+            <TableWithControlsLayout.Table loading={isLoading}>
                 {renderTable()}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>

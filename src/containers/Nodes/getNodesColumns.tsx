@@ -17,6 +17,8 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 
+export const NODES_COLUMNS_WIDTH_LS_KEY = 'nodesTableColumnsWidth';
+
 const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
     Host: 'Host',
@@ -127,6 +129,7 @@ const cpuColumn: NodesColumn = {
     render: ({row}) => (row.PoolStats ? <PoolsGraph pools={row.PoolStats} /> : '—'),
     align: DataTable.LEFT,
     width: 80,
+    resizeMinWidth: 60,
     sortable: false,
 };
 
@@ -149,6 +152,7 @@ const loadAverageColumn: NodesColumn = {
         ),
     align: DataTable.LEFT,
     width: 140,
+    resizeMinWidth: 140,
     sortable: false,
 };
 
@@ -184,6 +188,7 @@ const topNodesLoadAverageColumn: NodesColumn = {
         ),
     align: DataTable.LEFT,
     width: 80,
+    resizeMinWidth: 70,
     sortable: false,
 };
 
@@ -200,6 +205,7 @@ const topNodesMemoryColumn: NodesColumn = {
     ),
     align: DataTable.LEFT,
     width: 140,
+    resizeMinWidth: 140,
     sortable: false,
 };
 
@@ -216,6 +222,7 @@ const sharedCacheUsageColumn: NodesColumn = {
     ),
     align: DataTable.LEFT,
     width: 140,
+    resizeMinWidth: 140,
     sortable: false,
 };
 
@@ -232,6 +239,7 @@ const memoryUsedInAllocColumn: NodesColumn = {
     ),
     align: DataTable.LEFT,
     width: 140,
+    resizeMinWidth: 140,
     sortable: false,
 };
 

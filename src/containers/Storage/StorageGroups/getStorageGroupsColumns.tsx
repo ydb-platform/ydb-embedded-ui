@@ -27,6 +27,8 @@ import './StorageGroups.scss';
 
 const b = cn('global-storage-groups');
 
+export const STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY = 'storageGroupsColumnsWidth';
+
 type StorageGroupsColumn = VirtualTableColumn<PreparedStorageGroup> &
     DataTableColumn<PreparedStorageGroup>;
 
@@ -71,6 +73,7 @@ const typeColumn: StorageGroupsColumn = {
     name: GROUPS_COLUMNS_IDS.MediaType,
     header: 'Type',
     width: 100,
+    resizeMinWidth: 100,
     align: DataTable.LEFT,
     render: ({row}) => (
         <React.Fragment>
@@ -119,6 +122,7 @@ const usageColumn: StorageGroupsColumn = {
     name: GROUPS_COLUMNS_IDS.Usage,
     header: 'Usage',
     width: 100,
+    resizeMinWidth: 70,
     render: ({row}) => {
         // without a limit the usage can be evaluated as 0,
         // but the absence of a value is more clear
@@ -209,7 +213,7 @@ const writeColumn: StorageGroupsColumn = {
     align: DataTable.RIGHT,
 };
 
-const getVdiscksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
+const getVDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
     name: GROUPS_COLUMNS_IDS.VDisks,
     className: b('vdisks-column'),
     header: 'VDisks',
@@ -229,6 +233,7 @@ const getVdiscksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
     ),
     align: DataTable.CENTER,
     width: 900,
+    resizeable: false,
 });
 
 export const getStorageTopGroupsColumns = (): StorageGroupsColumn[] => {
@@ -244,7 +249,7 @@ export const getPDiskStorageColumns = (nodes?: NodesMap): StorageGroupsColumn[] 
         groupIdColumn,
         usageColumn,
         usedColumn,
-        getVdiscksColumn(nodes),
+        getVDisksColumn(nodes),
     ];
 };
 
@@ -261,7 +266,7 @@ const getStorageGroupsColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {
         usedSpaceFlagColumn,
         readColumn,
         writeColumn,
-        getVdiscksColumn(nodes),
+        getVDisksColumn(nodes),
     ];
 };
 

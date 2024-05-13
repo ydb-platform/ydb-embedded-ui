@@ -21,6 +21,8 @@ export type SortOrderType = typeof ASCENDING | typeof DESCENDING;
 export type SortParams = {columnId?: string; sortOrder?: SortOrderType};
 export type OnSort = (params: SortParams) => void;
 
+export type HandleTableColumnsResize = (columnId: string, width: number) => void;
+
 export interface Column<T> {
     name: string;
     header?: React.ReactNode;
@@ -29,6 +31,8 @@ export interface Column<T> {
     resizeable?: boolean;
     render: (props: {row: T; index: number}) => React.ReactNode;
     width: number;
+    resizeMaxWidth?: number;
+    resizeMinWidth?: number;
     align: AlignType;
 }
 

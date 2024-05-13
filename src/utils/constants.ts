@@ -1,4 +1,5 @@
 import DataTable from '@gravity-ui/react-data-table';
+import type {Settings} from '@gravity-ui/react-data-table';
 
 import {EType} from '../types/api/tablet';
 
@@ -103,7 +104,7 @@ export const DEFAULT_IS_QUERY_RESULT_COLLAPSED = 'default-is-query-result-collap
 
 export const DEFAULT_CLUSTER_TAB_KEY = 'default-cluster-tab';
 
-export const DEFAULT_TABLE_SETTINGS = {
+export const DEFAULT_TABLE_SETTINGS: Settings = {
     displayIndices: false,
     stickyHead: DataTable.MOVING,
     syncHeadOnResize: true,

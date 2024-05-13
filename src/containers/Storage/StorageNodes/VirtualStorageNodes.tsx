@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {VirtualTable} from '../../../components/VirtualTable';
 import type {FetchData, RenderControls, RenderErrorMessage} from '../../../components/VirtualTable';
+import {ResizeableVirtualTable} from '../../../components/VirtualTable/ResizeableVirtualTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../../types/additionalProps';
@@ -10,7 +10,10 @@ import type {NodesSortValue} from '../../../utils/nodes';
 
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
 import {getStorageNodes} from './getNodes';
-import {getPreparedStorageNodesColumns} from './getStorageNodesColumns';
+import {
+    STORAGE_NODES_COLUMNS_WIDTH_LS_KEY,
+    getPreparedStorageNodesColumns,
+} from './getStorageNodesColumns';
 import i18n from './i18n';
 import {getRowUnavailableClassName} from './shared';
 
@@ -82,7 +85,8 @@ export const VirtualStorageNodes = ({
     };
 
     return (
-        <VirtualTable
+        <ResizeableVirtualTable
+            columnsWidthLSKey={STORAGE_NODES_COLUMNS_WIDTH_LS_KEY}
             parentContainer={parentContainer}
             columns={columns}
             fetchData={fetchData}

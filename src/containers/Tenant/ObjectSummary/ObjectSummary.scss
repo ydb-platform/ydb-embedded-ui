@@ -77,12 +77,6 @@
         flex-direction: column;
     }
 
-    &__schema {
-        display: flex;
-        overflow: auto;
-        flex-grow: 1;
-    }
-
     &__info-controls {
         display: flex;
         gap: 4px;

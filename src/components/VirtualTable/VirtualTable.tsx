@@ -2,7 +2,6 @@ import React from 'react';
 
 import type {IResponseError} from '../../types/api/error';
 import {getArray} from '../../utils';
-import type {HandleTableColumnsResize} from '../../utils/hooks/useTableResize';
 import {ResponseError} from '../Errors/ResponseError';
 import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
 
@@ -25,6 +24,7 @@ import type {
     Column,
     FetchData,
     GetRowClassName,
+    HandleTableColumnsResize,
     OnEntry,
     OnLeave,
     OnSort,
@@ -37,7 +37,7 @@ import {useIntersectionObserver} from './useIntersectionObserver';
 
 import './VirtualTable.scss';
 
-interface VirtualTableProps<T> {
+export interface VirtualTableProps<T> {
     limit: number;
     fetchData: FetchData<T>;
     columns: Column<T>[];

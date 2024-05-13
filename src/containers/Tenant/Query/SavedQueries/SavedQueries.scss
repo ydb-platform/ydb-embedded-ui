@@ -9,7 +9,6 @@
     padding: 0 16px;
 
     @include flex-container();
-    @include table-styles;
 
     &__row {
         cursor: pointer;

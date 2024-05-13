@@ -1,10 +1,10 @@
 import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
-import DataTable from '@gravity-ui/react-data-table';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
+import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
 import {getSchemaAcl, setAclWasNotLoaded} from '../../../store/reducers/schemaAcl/schemaAcl';
 import type {TACE} from '../../../types/api/acl';
 import {cn} from '../../../utils/cn';
@@ -15,6 +15,8 @@ import i18n from '../i18n';
 import './Acl.scss';
 
 const b = cn('ydb-acl');
+
+const ACL_COLUMNS_WIDTH_LS_KEY = 'aclTableColumnsWidth';
 
 const TABLE_SETTINGS = {
     ...DEFAULT_TABLE_SETTINGS,
@@ -91,8 +93,8 @@ export const Acl = () => {
         }
 
         return (
-            <DataTable
-                theme="yandex-cloud"
+            <ResizeableDataTable
+                columnsWidthLSKey={ACL_COLUMNS_WIDTH_LS_KEY}
                 columns={columns}
                 data={acl}
                 settings={TABLE_SETTINGS}

@@ -1,10 +1,10 @@
 import React from 'react';
 
-import DataTable from '@gravity-ui/react-data-table';
 import escapeRegExp from 'lodash/escapeRegExp';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {
     selectPreparedConsumersData,
@@ -18,7 +18,7 @@ import {useTypedSelector} from '../../../../utils/hooks';
 import {isCdcStreamEntityType} from '../../utils/schema';
 
 import {ConsumersTopicStats} from './TopicStats';
-import {columns} from './columns';
+import {CONSUMERS_COLUMNS_WIDTH_LS_KEY, columns} from './columns';
 import i18n from './i18n';
 
 import './Consumers.scss';
@@ -85,8 +85,9 @@ export const Consumers = ({path, type}: ConsumersProps) => {
             </div>
             <div className={b('table-wrapper')}>
                 <div className={b('table-content')}>
-                    <DataTable
-                        theme="yandex-cloud"
+                    <ResizeableDataTable
+                        columnsWidthLSKey={CONSUMERS_COLUMNS_WIDTH_LS_KEY}
+                        wrapperClassName={b('table')}
                         data={dataToRender}
                         columns={columns}
                         settings={DEFAULT_TABLE_SETTINGS}

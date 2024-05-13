@@ -12,6 +12,8 @@ import type {ValueOf} from '../../../../types/common';
 import {formatNumber, roundToPrecision} from '../../../../utils/dataFormatters/dataFormatters';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 
+export const TOP_SHARDS_COLUMNS_WIDTH_LS_KEY = 'topShardsColumnsWidth';
+
 const TOP_SHARDS_COLUMNS_IDS = {
     TabletId: 'TabletId',
     CPUCores: 'CPUCores',
@@ -52,6 +54,7 @@ const getPathColumn = (schemaPath: string, location: Location): Column<KeyValueR
         );
     },
     sortable: false,
+    width: 300,
 });
 
 const cpuCoresColumn: Column<KeyValueRow> = {
@@ -86,6 +89,7 @@ const tabletIdColumn: Column<KeyValueRow> = {
         );
     },
     sortable: false,
+    width: 190,
 };
 
 const nodeIdColumn: Column<KeyValueRow> = {
@@ -113,6 +117,8 @@ const topShardsCpuCoresColumn: Column<KeyValueRow> = {
     },
     align: DataTable.RIGHT,
     sortable: false,
+    width: 140,
+    resizeMinWidth: 140,
 };
 
 const inFlightTxCountColumn: Column<KeyValueRow> = {

@@ -25,20 +25,28 @@
         }
     }
 
-    &__table {
-        @include table-styles;
+    &__type {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
     }
 
     &__type-value {
-        margin-right: 10px;
+        overflow: hidden;
+
+        width: min-content;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     &__type-button {
-        visibility: hidden;
+        display: none;
     }
 
     .data-table__row:hover &__type-button {
-        visibility: visible;
+        display: block;
     }
 
     &__name-wrapper {

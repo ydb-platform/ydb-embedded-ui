@@ -2,7 +2,10 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/
 import {topNodesApi} from '../../../../../store/reducers/tenantOverview/topNodes/topNodes';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
-import {getTopNodesByLoadColumns} from '../../../../Nodes/getNodesColumns';
+import {
+    NODES_COLUMNS_WIDTH_LS_KEY,
+    getTopNodesByLoadColumns,
+} from '../../../../Nodes/getNodesColumns';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
@@ -38,6 +41,7 @@ export function TopNodesByLoad({path, additionalNodesProps}: TopNodesByLoadProps
 
     return (
         <TenantOverviewTableLayout
+            columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
             data={topNodes || []}
             columns={columns}
             title={title}
