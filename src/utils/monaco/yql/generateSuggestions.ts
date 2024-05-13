@@ -285,7 +285,7 @@ export async function generateEntitiesSuggestion(
     prefix?: string,
 ): Promise<monaco.languages.CompletionItem[]> {
     const normalizedPrefix = normalizeEntityPrefix(prefix, database);
-    const data = await window.api.autocomplete({database, prefix: normalizedPrefix, limit: 100});
+    const data = await window.api.autocomplete({database, prefix: normalizedPrefix, limit: 1000});
     const withBackticks = prefix?.startsWith('`');
     if (data.Success) {
         const filteredEntities = filterAutocompleteEntities(data.Result.Entities, suggestEntities);
