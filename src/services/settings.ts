@@ -1,6 +1,7 @@
 import {TENANT_PAGES_IDS} from '../store/reducers/tenant/constants';
 import {
     ASIDE_HEADER_COMPACT_KEY,
+    AUTOCOMPLETE_ON_ENTER,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     ENABLE_AUTOCOMPLETE,
     INVERTED_DISKS_KEY,
@@ -38,6 +39,7 @@ export const DEFAULT_USER_SETTINGS: SettingsObject = {
     [USE_BACKEND_PARAMS_FOR_TABLES_KEY]: false,
     [USE_CLUSTER_BALANCER_AS_BACKEND_KEY]: true,
     [ENABLE_AUTOCOMPLETE]: false,
+    [AUTOCOMPLETE_ON_ENTER]: true,
 };
 
 class SettingsManager {

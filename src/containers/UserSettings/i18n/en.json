@@ -11,6 +11,9 @@
   "settings.editor.autocomplete.title": "Enable autocomplete",
   "settings.editor.autocomplete.description": "You’re always able to get suggestions by pressing Ctrl+Space.",
 
+  "settings.editor.autocomplete-on-enter.title": "Accept suggestion on Enter",
+  "settings.editor.autocomplete-on-enter.description": "Controls whether suggestions should be accepted on Enter, in addition to Tab. Helps to avoid ambiguity between inserting new lines or accepting suggestions.",
+
   "settings.theme.title": "Interface theme",
   "settings.theme.option-dark": "Dark",
   "settings.theme.option-light": "Light",
