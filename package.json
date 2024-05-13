@@ -70,7 +70,7 @@
     "prepublishOnly": "npm run package",
     "typecheck": "tsc --noEmit",
     "prepare": "husky",
-    "test:e2e:install": "npx playwright install --with-deps chromium",
+    "test:e2e:install": "npx playwright install --with-deps",
     "test:e2e": "npx playwright test --config=playwright.config.ts"
   },
   "lint-staged": {
