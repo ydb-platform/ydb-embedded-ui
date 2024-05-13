@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.0.0...v6.0.1) (2024-05-13)
+
+
+### Bug Fixes
+
+* fix monaco bug in safari ([#812](https://github.com/ydb-platform/ydb-embedded-ui/issues/812)) ([075c5db](https://github.com/ydb-platform/ydb-embedded-ui/commit/075c5db1eea7c73ebea8db3a78ed3253485d564a))
+
 ## [6.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v5.5.0...v6.0.0) (2024-05-03)
 
 
