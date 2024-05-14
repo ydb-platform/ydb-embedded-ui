@@ -1,5 +1,16 @@
 # Changelog
 
+## [6.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.0.1...v6.0.2) (2024-05-14)
+
+
+### Features
+
+* improve autocomplete ([#814](https://github.com/ydb-platform/ydb-embedded-ui/issues/814)) ([2615f7e](https://github.com/ydb-platform/ydb-embedded-ui/commit/2615f7e1709ab8280fd1fcd1135f1641d669eaf3))
+
+### Bug Fixes
+
+* **PDiskPage:** explicit error on failed restart ([#821](https://github.com/ydb-platform/ydb-embedded-ui/issues/821)) ([fb81b29](https://github.com/ydb-platform/ydb-embedded-ui/commit/fb81b295073034ac400f08fe7bd26023b1b8a8d8))
+
 ## [6.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.0.0...v6.0.1) (2024-05-13)
 
 
