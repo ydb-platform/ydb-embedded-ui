@@ -24,6 +24,7 @@ import type {
     Schemas,
 } from '../types/api/query';
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/render';
+import type {RestartPDiskResponse} from '../types/api/restartPDisk';
 import type {TEvDescribeSchemeResult} from '../types/api/schema';
 import type {TStorageInfo} from '../types/api/storage';
 import type {TEvSystemStateResponse} from '../types/api/systemState';
@@ -509,7 +510,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             host: this.getPath(''),
         });
 
-        return this.post(
+        return this.post<RestartPDiskResponse>(
             pDiskPath,
             'restartPDisk=',
             {},
