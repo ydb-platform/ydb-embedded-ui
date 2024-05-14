@@ -22,15 +22,11 @@ export function createProvideSuggestionsFunction(database: string) {
         _context: Monaco.languages.CompletionContext,
         _token: Monaco.CancellationToken,
     ) => {
-        const cursorPosition: CursorPosition = {
-            line: monacoCursorPosition.lineNumber,
-            column: monacoCursorPosition.column,
-        };
         const rangeToInsertSuggestion = getRangeToInsertSuggestion(model, monacoCursorPosition);
 
         const suggestions = await getSuggestions(
             model,
-            cursorPosition,
+            monacoCursorPosition,
             rangeToInsertSuggestion,
             database,
         );
@@ -39,14 +35,32 @@ export function createProvideSuggestionsFunction(database: string) {
     };
 }
 
+function getEntityNameAtCursor(model: Monaco.editor.ITextModel, cursorPosition: Monaco.Position) {
+    const prevWord = model.findPreviousMatch(
+        '\\s(`?[^\\s]*)',
+        cursorPosition,
+        true,
+        false,
+        null,
+        true,
+    );
+    const nextWord = model.findNextMatch('([^\\s]*)`?', cursorPosition, true, false, null, true);
+
+    return `${prevWord?.matches?.[1] ?? ''}${nextWord?.matches?.[1] ?? ''}`;
+}
+
 async function getSuggestions(
     model: Monaco.editor.ITextModel,
-    cursorPosition: CursorPosition,
+    cursorPosition: Monaco.Position,
     rangeToInsertSuggestion: Monaco.IRange,
     database: string,
 ): Promise<Monaco.languages.CompletionItem[]> {
     const {parseYqlQuery} = await import('@gravity-ui/websql-autocomplete');
-    const parseResult = parseYqlQuery(model.getValue(), cursorPosition);
+    const cursorForParsing: CursorPosition = {
+        line: cursorPosition.lineNumber,
+        column: cursorPosition.column,
+    };
+    const parseResult = parseYqlQuery(model.getValue(), cursorForParsing);
     let entitiesSuggestions: Monaco.languages.CompletionItem[] = [];
     let functionsSuggestions: Monaco.languages.CompletionItem[] = [];
     let aggregateFunctionsSuggestions: Monaco.languages.CompletionItem[] = [];
@@ -57,7 +71,14 @@ async function getSuggestions(
     let pragmasSuggestions: Monaco.languages.CompletionItem[] = [];
 
     if (parseResult.suggestEntity) {
-        entitiesSuggestions = await generateEntitiesSuggestion(rangeToInsertSuggestion);
+        const entityNamePrefix = getEntityNameAtCursor(model, cursorPosition);
+
+        entitiesSuggestions = await generateEntitiesSuggestion(
+            rangeToInsertSuggestion,
+            parseResult.suggestEntity,
+            database,
+            entityNamePrefix,
+        );
     }
     if (parseResult.suggestFunctions) {
         functionsSuggestions = await generateSimpleFunctionsSuggestion(rangeToInsertSuggestion);

@@ -2,6 +2,7 @@ import {Flask, PencilToSquare, StarFill} from '@gravity-ui/icons';
 import type {IconProps} from '@gravity-ui/uikit';
 
 import {
+    AUTOCOMPLETE_ON_ENTER,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     ENABLE_AUTOCOMPLETE,
     INVERTED_DISKS_KEY,
@@ -112,6 +113,12 @@ export const enableAutocompleteSetting: SettingProps = {
     description: i18n('settings.editor.autocomplete.description'),
 };
 
+export const autocompleteOnEnterSetting: SettingProps = {
+    settingKey: AUTOCOMPLETE_ON_ENTER,
+    title: i18n('settings.editor.autocomplete-on-enter.title'),
+    description: i18n('settings.editor.autocomplete-on-enter.description'),
+};
+
 export const appearanceSection: SettingsSection = {
     id: 'appearanceSection',
     title: i18n('section.appearance'),
@@ -125,7 +132,7 @@ export const experimentsSection: SettingsSection = {
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',
     title: i18n('section.dev-setting'),
-    settings: [enableAutocompleteSetting],
+    settings: [enableAutocompleteSetting, autocompleteOnEnterSetting],
 };
 
 export const generalPage: SettingsPage = {

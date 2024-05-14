@@ -1,3 +1,5 @@
+export const LANGUAGE_YQL_ID = 'yql';
+
 export const SimpleTypes = [
     'String',
     'Bool',

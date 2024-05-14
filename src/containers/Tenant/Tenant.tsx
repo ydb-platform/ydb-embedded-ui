@@ -80,7 +80,7 @@ function Tenant(props: TenantProps) {
         if (tenantName && typeof tenantName === 'string' && previousTenant.current !== tenantName) {
             const register = async () => {
                 const {registerYQLCompletionItemProvider} = await import(
-                    '../../utils/monaco/yqlSuggestions/registerCompletionItemProvider'
+                    '../../utils/monaco/yql/yql.completionItemProvider'
                 );
                 registerYQLCompletionItemProvider(tenantName);
             };
