@@ -58,7 +58,12 @@ export function PDiskPage() {
 
     const handleRestart = async () => {
         if (valueIsDefined(nodeId) && valueIsDefined(pDiskId)) {
-            return window.api.restartPDisk(nodeId, pDiskId);
+            return window.api.restartPDisk(nodeId, pDiskId).then((res) => {
+                if (res?.result === false) {
+                    const err = {statusText: res.error};
+                    throw err;
+                }
+            });
         }
 
         return undefined;
