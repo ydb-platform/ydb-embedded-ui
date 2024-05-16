@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {useTypedSelector} from '../../lib';
+import {useTypedSelector} from '../../utils/hooks';
 
 export interface ClusterModeGuardProps {
     children: React.ReactNode;

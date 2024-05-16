@@ -225,6 +225,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                 header: 'Tablets States',
                 sortable: false,
                 width: 500,
+                resizeMinWidth: 500,
                 render: ({row}) => {
                     const backend = getTenantBackend(row);
 

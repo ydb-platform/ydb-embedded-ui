@@ -1,7 +1,7 @@
 import type {DataTableProps, Settings} from '@gravity-ui/react-data-table';
 import DataTable, {updateColumnsWidth} from '@gravity-ui/react-data-table';
 
-import {cn} from '../..//utils/cn';
+import {cn} from '../../utils/cn';
 import {useTableResize} from '../../utils/hooks/useTableResize';
 
 import './ResizeableDataTable.scss';

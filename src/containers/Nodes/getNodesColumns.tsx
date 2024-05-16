@@ -158,7 +158,8 @@ const loadAverageColumn: NodesColumn = {
 
 const getTabletsColumn = (tabletsPath?: string): NodesColumn => ({
     name: NODES_COLUMNS_IDS.Tablets,
-    width: 430,
+    width: 500,
+    resizeMinWidth: 500,
     render: ({row}) => {
         return row.Tablets ? (
             <TabletsStatistic
