@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {TextOverflow, getTopology, getYdbPlanNodeShape} from '@gravity-ui/paranoid';
+import {getTopology, getYdbPlanNodeShape} from '@gravity-ui/paranoid';
 import {Loader, RadioButton} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
 
@@ -16,7 +16,7 @@ import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco/s-expression/constants';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 
-import {getColors, renderExplainNode} from './utils';
+import {renderExplainNode} from './utils';
 
 import './ExplainResult.scss';
 import 'react-json-inspector/json-inspector.css';
@@ -59,7 +59,7 @@ function GraphRoot(props) {
 
         graphRoot.innerHTML = '';
 
-        paranoid.current = getTopology('graphRoot', data, {...opts, colors: getColors()}, shapes);
+        paranoid.current = getTopology('graphRoot', data, opts, shapes);
         paranoid.current.render();
         return () => {
             paranoid.current = undefined;
@@ -174,7 +174,7 @@ export function ExplainResult(props) {
                         data={{links, nodes}}
                         opts={{
                             renderNodeTitle: renderExplainNode,
-                            textOverflow: TextOverflow.Normal,
+                            textOverflow: 'normal',
                             initialZoomFitsCanvas: true,
                         }}
                         shapes={{
