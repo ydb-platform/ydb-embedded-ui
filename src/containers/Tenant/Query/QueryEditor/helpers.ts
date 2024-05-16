@@ -2,7 +2,8 @@ import React from 'react';
 
 import type Monaco from 'monaco-editor';
 
-import {AUTOCOMPLETE_ON_ENTER, ENABLE_AUTOCOMPLETE, useSetting} from '../../../../lib';
+import {AUTOCOMPLETE_ON_ENTER, ENABLE_AUTOCOMPLETE} from '../../../../utils/constants';
+import {useSetting} from '../../../../utils/hooks';
 
 export type EditorOptions = Monaco.editor.IEditorOptions & Monaco.editor.IGlobalEditorOptions;
 

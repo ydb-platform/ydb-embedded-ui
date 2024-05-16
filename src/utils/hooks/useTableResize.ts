@@ -1,60 +1,31 @@
 import React from 'react';
 
-import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
+import type {
+    ColumnWidthByName,
+    GetSavedColumnWidthByName,
+    HandleResize,
+    SaveColumnWidthByName,
+} from '@gravity-ui/react-data-table';
+import {useTableResize as libUseTableResize} from '@gravity-ui/react-data-table';
 
-import {DEFAULT_RESIZEABLE} from '../../components/VirtualTable';
-import type {Column as VirtualTableColumn} from '../../components/VirtualTable';
 import {settingsManager} from '../../services/settings';
 
-export type Column<T> = VirtualTableColumn<T> & DataTableColumn<T>;
-
-export type TableColumnsWidthSetup = Record<string, number>;
-
-export type HandleTableColumnsResize = (newSetup: TableColumnsWidthSetup) => void;
-
-export const updateColumnsWidth = <T>(
-    columns: Column<T>[],
-    columnsWidthSetup: TableColumnsWidthSetup,
-) => {
-    return columns.map((column) => {
-        const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
-
-        if (!resizeable) {
-            return column;
+export const useTableResize = (localStorageKey?: string): [ColumnWidthByName, HandleResize] => {
+    const getSizes: GetSavedColumnWidthByName = React.useCallback(() => {
+        if (!localStorageKey) {
+            return {};
         }
-        return {...column, width: columnsWidthSetup[column.name] ?? column.width};
-    });
-};
+        return settingsManager.readUserSettingsValue(localStorageKey, {}) as ColumnWidthByName;
+    }, [localStorageKey]);
 
-export const useTableResize = (
-    localStorageKey: string,
-): [TableColumnsWidthSetup, HandleTableColumnsResize] => {
-    const [tableColumnsWidthSetup, setTableColumnsWidth] = React.useState<TableColumnsWidthSetup>(
-        () => {
-            const setupFromLS = settingsManager.readUserSettingsValue(
-                localStorageKey,
-                {},
-            ) as TableColumnsWidthSetup;
-
-            return setupFromLS;
-        },
-    );
-
-    const handleSetupChange: HandleTableColumnsResize = React.useCallback(
-        (newSetup) => {
-            setTableColumnsWidth((previousSetup) => {
-                // ResizeObserver callback may be triggered only for currently resized column
-                // or for the whole set of columns
-                const setup = {
-                    ...previousSetup,
-                    ...newSetup,
-                };
-                settingsManager.setUserSettingsValue(localStorageKey, setup);
-                return setup;
-            });
+    const saveSizes: SaveColumnWidthByName = React.useCallback(
+        (value) => {
+            if (localStorageKey) {
+                settingsManager.setUserSettingsValue(localStorageKey, value);
+            }
         },
         [localStorageKey],
     );
 
-    return [tableColumnsWidthSetup, handleSetupChange];
+    return libUseTableResize({saveSizes, getSizes});
 };

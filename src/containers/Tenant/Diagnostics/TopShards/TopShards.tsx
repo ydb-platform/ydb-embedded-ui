@@ -2,9 +2,10 @@ import React from 'react';
 
 import type {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import {Loader} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router';
 
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
     setShardsQueryFilters,
     shardApi,
@@ -22,12 +23,12 @@ import {prepareQueryError} from '../../../../utils/query';
 import {isColumnEntityType} from '../../utils/schema';
 
 import {Filters} from './Filters';
-import {getShardsWorkloadColumns} from './getTopShardsColumns';
+import {TOP_SHARDS_COLUMNS_WIDTH_LS_KEY, getShardsWorkloadColumns} from './getTopShardsColumns';
 import i18n from './i18n';
 
 import './TopShards.scss';
 
-export const b = cn('top-shards');
+const b = cn('top-shards');
 
 const TABLE_SETTINGS: Settings = {
     ...DEFAULT_TABLE_SETTINGS,
@@ -186,19 +187,11 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         return columns;
     }, [filters.mode, tenantPath, location]);
 
-    const renderLoader = () => {
-        return (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
-        );
+    const renderControls = () => {
+        return <Filters value={filters} onChange={handleFiltersChange} />;
     };
 
     const renderContent = () => {
-        if (loading) {
-            return renderLoader();
-        }
-
         if (error && typeof error === 'object' && !(error as any).isCancelled) {
             return <div className="error">{prepareQueryError(error)}</div>;
         }
@@ -208,24 +201,28 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         }
 
         return (
-            <div className={b('table')}>
-                <DataTable
-                    columns={tableColumns}
-                    data={data}
-                    settings={TABLE_SETTINGS}
-                    theme="yandex-cloud"
-                    onSort={onSort}
-                    sortOrder={stringToDataTableSortOrder(sortOrder)}
-                />
-            </div>
+            <ResizeableDataTable
+                columnsWidthLSKey={TOP_SHARDS_COLUMNS_WIDTH_LS_KEY}
+                columns={tableColumns}
+                data={data}
+                settings={TABLE_SETTINGS}
+                onSort={onSort}
+                sortOrder={stringToDataTableSortOrder(sortOrder)}
+            />
         );
     };
 
     return (
-        <div className={b()}>
-            <Filters value={filters} onChange={handleFiltersChange} />
-            {filters.mode === EShardsWorkloadMode.History && <div>{i18n('description')}</div>}
-            {renderContent()}
-        </div>
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+
+            {filters.mode === EShardsWorkloadMode.History && (
+                <div className={b('hint')}>{i18n('description')}</div>
+            )}
+
+            <TableWithControlsLayout.Table loading={loading}>
+                {renderContent()}
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };

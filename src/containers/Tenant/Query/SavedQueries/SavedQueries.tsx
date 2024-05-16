@@ -5,6 +5,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {Button, Dialog} from '@gravity-ui/uikit';
 
 import {Icon} from '../../../../components/Icon';
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
@@ -49,6 +50,8 @@ const DeleteDialog = ({visible, queryName, onCancelClick, onConfirmClick}: Delet
         </Dialog>
     );
 };
+
+const SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY = 'savedQueriesTableColumnsWidth';
 
 interface SavedQueriesProps {
     savedQueries: SavedQuery[];
@@ -117,14 +120,15 @@ export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: Sav
                 </div>
             ),
             sortable: false,
+            resizeMinWidth: 650,
         },
     ];
 
     return (
         <React.Fragment>
             <div className={b()}>
-                <DataTable
-                    theme="yandex-cloud"
+                <ResizeableDataTable
+                    columnsWidthLSKey={SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY}
                     columns={columns}
                     data={savedQueries}
                     settings={QUERY_TABLE_SETTINGS}

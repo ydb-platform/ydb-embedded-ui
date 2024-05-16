@@ -1,9 +1,8 @@
 import React from 'react';
 
-import DataTable from '@gravity-ui/react-data-table';
-import type {DataTableProps} from '@gravity-ui/react-data-table';
-
 import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import type {ResizeableDataTableProps} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
@@ -12,7 +11,7 @@ import {
 
 import {b} from './utils';
 
-interface TenantOverviewTableLayoutProps<T> extends Omit<DataTableProps<T>, 'theme'> {
+interface TenantOverviewTableLayoutProps<T> extends ResizeableDataTableProps<T> {
     title: React.ReactNode;
     loading?: boolean;
     error?: unknown;
@@ -37,9 +36,7 @@ export function TenantOverviewTableLayout<T>({
             return <TableSkeleton rows={TENANT_OVERVIEW_TABLES_LIMIT} />;
         }
 
-        return (
-            <DataTable theme="yandex-cloud" settings={TENANT_OVERVIEW_TABLES_SETTINGS} {...props} />
-        );
+        return <ResizeableDataTable settings={TENANT_OVERVIEW_TABLES_SETTINGS} {...props} />;
     };
     return (
         <React.Fragment>

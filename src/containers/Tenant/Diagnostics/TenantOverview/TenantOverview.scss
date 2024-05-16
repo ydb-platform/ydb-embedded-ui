@@ -51,10 +51,6 @@
     }
 
     &__table {
-        width: var(--diagnostics-section-table-width);
-
-        @include table-styles();
-
         &:not(:last-child) {
             margin-bottom: var(--diagnostics-section-margin);
         }
@@ -64,10 +60,10 @@
 
             vertical-align: middle;
         }
+    }
 
-        &_top-queries tr {
-            cursor: pointer;
-        }
+    &__top-queries-row {
+        cursor: pointer;
     }
 
     &__storage-info {

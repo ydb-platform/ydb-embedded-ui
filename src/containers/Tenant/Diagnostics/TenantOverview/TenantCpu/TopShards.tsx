@@ -5,7 +5,10 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/
 import {topShardsApi} from '../../../../../store/reducers/tenantOverview/topShards/tenantOverviewTopShards';
 import {useTypedSelector} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-import {getTopShardsColumns} from '../../TopShards/getTopShardsColumns';
+import {
+    TOP_SHARDS_COLUMNS_WIDTH_LS_KEY,
+    getTopShardsColumns,
+} from '../../TopShards/getTopShardsColumns';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
@@ -42,12 +45,12 @@ export const TopShards = ({path}: TopShardsProps) => {
 
     return (
         <TenantOverviewTableLayout
+            columnsWidthLSKey={TOP_SHARDS_COLUMNS_WIDTH_LS_KEY}
             data={data || []}
             columns={columns}
             title={title}
             loading={loading}
             error={error}
-            tableClassNameModifiers={{'top-queries': true}}
         />
     );
 };

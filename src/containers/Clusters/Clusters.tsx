@@ -6,6 +6,7 @@ import {Helmet} from 'react-helmet-async';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
+import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
 import {changeClustersFilters, clustersApi} from '../../store/reducers/clusters/clusters';
 import {
@@ -21,7 +22,7 @@ import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {getMinorVersion} from '../../utils/versions';
 
 import {ClustersStatistics} from './ClustersStatistics';
-import {CLUSTERS_COLUMNS} from './columns';
+import {CLUSTERS_COLUMNS, CLUSTERS_COLUMNS_WIDTH_LS_KEY} from './columns';
 import {
     CLUSTER_STATUSES,
     COLUMNS_NAMES,
@@ -174,8 +175,9 @@ export function Clusters() {
             {query.isError ? <ResponseError error={query.error} className={b('error')} /> : null}
             <div className={b('table-wrapper')}>
                 <div className={b('table-content')}>
-                    <DataTable
-                        theme="yandex-cloud"
+                    <ResizeableDataTable
+                        columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
+                        wrapperClassName={b('table')}
                         data={filteredClusters}
                         columns={columnsToShow}
                         settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}

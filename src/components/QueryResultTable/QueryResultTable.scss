@@ -2,6 +2,7 @@
 
 .ydb-query-result-table {
     &__cell {
+        width: 100%;
         @include cell-container;
     }
 

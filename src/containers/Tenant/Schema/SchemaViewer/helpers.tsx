@@ -94,6 +94,8 @@ export function prepareFamilies(
     );
 }
 
+export const SCHEMA_COLUMNS_WIDTH_LS_KEY = 'schemaTableColumnsWidth';
+
 export function prepareSchemaTableColumns(options: {
     type?: EPathType;
     b: ClassNameFormatter;
@@ -114,7 +116,7 @@ export function prepareSchemaTableColumns(options: {
     const columns: Column<TColumnDescription>[] = [
         {
             name: SchemaViewerColumns.id,
-            width: 40,
+            width: 60,
         },
     ];
 
@@ -122,7 +124,8 @@ export function prepareSchemaTableColumns(options: {
         // External tables don't have key columns
         columns.push({
             name: SchemaViewerColumns.key,
-            width: 40,
+            width: 70,
+            resizeMinWidth: 70,
             // Table should start with key columns on sort click
             defaultOrder: DataTable.ASCENDING,
             // Values in keyColumnsOrderValues are always negative, so it will be 1 for not key columns

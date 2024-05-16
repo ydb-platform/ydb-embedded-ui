@@ -1,10 +1,6 @@
 import React from 'react';
 
-import type {
-    HandleTableColumnsResize,
-    TableColumnsWidthSetup,
-} from '../../utils/hooks/useTableResize';
-
+import {ResizeHandler} from './ResizeHandler';
 import {
     ASCENDING,
     DEFAULT_RESIZEABLE,
@@ -13,9 +9,7 @@ import {
     DESCENDING,
 } from './constants';
 import {b} from './shared';
-import type {Column, OnSort, SortOrderType, SortParams} from './types';
-
-const COLUMN_NAME_HTML_ATTRIBUTE = 'data-columnname';
+import type {Column, HandleTableColumnsResize, OnSort, SortOrderType, SortParams} from './types';
 
 // Icon similar to original DataTable icons to keep the same tables across diferent pages and tabs
 const SortIcon = ({order}: {order?: SortOrderType}) => {
@@ -58,6 +52,7 @@ interface TableHeadCellProps<T> {
     rowHeight: number;
     onCellMount?: (element: Element) => void;
     onCellUnMount?: (element: Element) => void;
+    onColumnsResize?: HandleTableColumnsResize;
 }
 
 export const TableHeadCell = <T,>({
@@ -69,6 +64,7 @@ export const TableHeadCell = <T,>({
     rowHeight,
     onCellMount,
     onCellUnMount,
+    onColumnsResize,
 }: TableHeadCellProps<T>) => {
     const cellWrapperRef = React.useRef<HTMLDivElement>(null);
 
@@ -84,19 +80,27 @@ export const TableHeadCell = <T,>({
         };
     }, [onCellMount, onCellUnMount]);
 
+    const getCurrentColumnWidth = React.useCallback(() => {
+        return cellWrapperRef.current?.getBoundingClientRect().width;
+    }, []);
+
+    const handleResize = React.useCallback(
+        (newWidth: number) => {
+            onColumnsResize?.(column.name, newWidth);
+        },
+        [onColumnsResize, column.name],
+    );
+
     const content = column.header ?? column.name;
 
     return (
         <th>
             <div
                 ref={cellWrapperRef}
-                className={b('head-cell-wrapper', {resizeable})}
+                className={b('head-cell-wrapper')}
                 style={{
                     height: `${rowHeight}px`,
                     width: `${column.width}px`,
-                }}
-                {...{
-                    [COLUMN_NAME_HTML_ATTRIBUTE]: column.name,
                 }}
             >
                 <div
@@ -118,6 +122,14 @@ export const TableHeadCell = <T,>({
                         defaultSortOrder={defaultSortOrder}
                     />
                 </div>
+                {resizeable ? (
+                    <ResizeHandler
+                        maxWidth={column.resizeMaxWidth}
+                        minWidth={column.resizeMinWidth}
+                        getCurrentColumnWidth={getCurrentColumnWidth}
+                        onResize={handleResize}
+                    />
+                ) : null}
             </div>
         </th>
     );
@@ -139,38 +151,6 @@ export const TableHead = <T,>({
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
 }: TableHeadProps<T>) => {
     const [sortParams, setSortParams] = React.useState<SortParams>({});
-
-    const isTableResizeable = Boolean(onColumnsResize);
-
-    const resizeObserver: ResizeObserver | undefined = React.useMemo(() => {
-        if (!isTableResizeable) {
-            return undefined;
-        }
-
-        return new ResizeObserver((entries) => {
-            const columnsWidth: TableColumnsWidthSetup = {};
-            entries.forEach((entry) => {
-                // @ts-expect-error ignore custrom property usage
-                const id = entry.target.attributes[COLUMN_NAME_HTML_ATTRIBUTE]?.value;
-                columnsWidth[id] = entry.contentRect.width;
-            });
-
-            onColumnsResize?.(columnsWidth);
-        });
-    }, [onColumnsResize, isTableResizeable]);
-
-    const handleCellMount = React.useCallback(
-        (element: Element) => {
-            resizeObserver?.observe(element);
-        },
-        [resizeObserver],
-    );
-    const handleCellUnMount = React.useCallback(
-        (element: Element) => {
-            resizeObserver?.unobserve(element);
-        },
-        [resizeObserver],
-    );
 
     const handleSort = (columnId: string) => {
         let newSortParams: SortParams = {};
@@ -231,8 +211,7 @@ export const TableHead = <T,>({
                                 defaultSortOrder={defaultSortOrder}
                                 onSort={handleSort}
                                 rowHeight={rowHeight}
-                                onCellMount={handleCellMount}
-                                onCellUnMount={handleCellUnMount}
+                                onColumnsResize={onColumnsResize}
                             />
                         );
                     })}

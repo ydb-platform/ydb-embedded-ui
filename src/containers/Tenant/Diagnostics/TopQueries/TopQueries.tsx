@@ -1,12 +1,12 @@
 import React from 'react';
 
-import DataTable from '@gravity-ui/react-data-table';
-import {Loader} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
 import {DateRange} from '../../../../components/DateRange';
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
+import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {parseQuery} from '../../../../routes';
 import {changeUserInput} from '../../../../store/reducers/executeQuery';
 import {
@@ -27,7 +27,7 @@ import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {isColumnEntityType} from '../../utils/schema';
 
-import {getTopQueriesColumns} from './getTopQueriesColumns';
+import {TOP_QUERIES_COLUMNS_WIDTH_LS_KEY, getTopQueriesColumns} from './getTopQueriesColumns';
 import i18n from './i18n';
 
 import './TopQueries.scss';
@@ -90,19 +90,7 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
         dispatch(setTopQueriesFilters(value));
     };
 
-    const renderLoader = () => {
-        return (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
-        );
-    };
-
     const renderContent = () => {
-        if (loading) {
-            return renderLoader();
-        }
-
         if (error && typeof error === 'object' && !(error as any).isCancelled) {
             return <div className="error">{prepareQueryError(error)}</div>;
         }
@@ -112,21 +100,20 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
         }
 
         return (
-            <div className={b('table')}>
-                <DataTable
-                    columns={columns}
-                    data={data}
-                    settings={QUERY_TABLE_SETTINGS}
-                    onRowClick={handleRowClick}
-                    theme="yandex-cloud"
-                />
-            </div>
+            <ResizeableDataTable
+                columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
+                columns={columns}
+                data={data}
+                settings={QUERY_TABLE_SETTINGS}
+                onRowClick={handleRowClick}
+                rowClassName={() => b('row')}
+            />
         );
     };
 
-    return (
-        <div className={b()}>
-            <div className={b('controls')}>
+    const renderControls = () => {
+        return (
+            <React.Fragment>
                 <Search
                     value={filters.text}
                     onChange={handleTextSearchUpdate}
@@ -134,8 +121,16 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
                     className={b('search')}
                 />
                 <DateRange from={filters.from} to={filters.to} onChange={handleDateRangeChange} />
-            </div>
-            {renderContent()}
-        </div>
+            </React.Fragment>
+        );
+    };
+
+    return (
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Table loading={loading}>
+                {renderContent()}
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };

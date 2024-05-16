@@ -1,19 +1,8 @@
 .top-shards {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    &__hint {
+        position: sticky;
+        left: 0;
 
-    height: 100%;
-
-    background-color: var(--g-color-base-background);
-
-    &__loader {
-        display: flex;
-        justify-content: center;
-    }
-
-    &__table {
-        overflow: auto;
-        flex-grow: 1;
+        width: max-content;
     }
 }

@@ -18,6 +18,8 @@ interface TopTablesProps {
     path: string;
 }
 
+const TOP_TABLES_COLUMNS_WIDTH_LS_KEY = 'topTablesTableColumnsWidth';
+
 export function TopTables({path}: TopTablesProps) {
     const location = useLocation();
 
@@ -40,13 +42,14 @@ export function TopTables({path}: TopTablesProps) {
     const columns: Column<KeyValueRow>[] = [
         {
             name: 'Size',
-            width: 80,
+            width: 100,
             sortable: false,
             render: ({row}) => formatSize(Number(row.Size)),
             align: DataTable.RIGHT,
         },
         {
             name: 'Path',
+            width: 700,
             sortable: false,
             render: ({row}) =>
                 row.Path ? (
@@ -65,6 +68,7 @@ export function TopTables({path}: TopTablesProps) {
 
     return (
         <TenantOverviewTableLayout
+            columnsWidthLSKey={TOP_TABLES_COLUMNS_WIDTH_LS_KEY}
             data={data || []}
             columns={columns}
             title={title}

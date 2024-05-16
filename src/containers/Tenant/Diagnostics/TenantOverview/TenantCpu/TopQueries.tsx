@@ -13,10 +13,14 @@ import {
 import {topQueriesApi} from '../../../../../store/reducers/tenantOverview/topQueries/tenantOverviewTopQueries';
 import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-import {getTenantOverviewTopQueriesColumns} from '../../TopQueries/getTopQueriesColumns';
+import {
+    TOP_QUERIES_COLUMNS_WIDTH_LS_KEY,
+    getTenantOverviewTopQueriesColumns,
+} from '../../TopQueries/getTopQueriesColumns';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
+import {b} from '../utils';
 
 interface TopQueriesProps {
     path: string;
@@ -70,13 +74,14 @@ export function TopQueries({path}: TopQueriesProps) {
 
     return (
         <TenantOverviewTableLayout
+            columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
             data={data || []}
             columns={columns}
             onRowClick={handleRowClick}
             title={title}
             loading={loading}
             error={error}
-            tableClassNameModifiers={{'top-queries': true}}
+            rowClassName={() => b('top-queries-row')}
         />
     );
 }

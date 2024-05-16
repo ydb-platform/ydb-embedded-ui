@@ -16,6 +16,8 @@ import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
 
+export const CLUSTERS_COLUMNS_WIDTH_LS_KEY = 'clustersTableColumnsWidth';
+
 const EMPTY_CELL = <span className={b('empty-cell')}>—</span>;
 
 export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
@@ -144,7 +146,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
     {
         name: COLUMNS_NAMES.NODES,
         header: COLUMNS_TITLES[COLUMNS_NAMES.NODES],
-        width: 150,
+        resizeMinWidth: 140,
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({cluster = {}}) => {
             const {NodesTotal = 0} = cluster;
@@ -164,7 +166,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
     {
         name: COLUMNS_NAMES.LOAD,
         header: COLUMNS_TITLES[COLUMNS_NAMES.LOAD],
-        width: 150,
+        resizeMinWidth: 140,
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({cluster}) => {
             return cluster?.NumberOfCpus;
@@ -182,7 +184,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
     {
         name: COLUMNS_NAMES.STORAGE,
         header: COLUMNS_TITLES[COLUMNS_NAMES.STORAGE],
-        width: 150,
+        resizeMinWidth: 140,
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({cluster}) => {
             return Number(cluster?.StorageTotal);

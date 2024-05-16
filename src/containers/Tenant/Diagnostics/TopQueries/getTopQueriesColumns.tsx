@@ -16,6 +16,8 @@ import './TopQueries.scss';
 
 const b = cn('kv-top-queries');
 
+export const TOP_QUERIES_COLUMNS_WIDTH_LS_KEY = 'topQueriesColumnsWidth';
+
 const TOP_QUERIES_COLUMNS_IDS = {
     CPUTimeUs: 'CPUTimeUs',
     QueryText: 'QueryText',
@@ -45,12 +47,14 @@ const queryTextColumn: Column<KeyValueRow> = {
         </div>
     ),
     sortable: false,
+    width: 500,
 };
 
 const endTimeColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.EndTime,
     render: ({row}) => formatDateTime(new Date(row.EndTime as string).getTime()),
     align: DataTable.RIGHT,
+    width: 200,
 };
 
 const readRowsColumn: Column<KeyValueRow> = {
@@ -58,6 +62,7 @@ const readRowsColumn: Column<KeyValueRow> = {
     render: ({row}) => formatNumber(row.ReadRows),
     sortAccessor: (row) => Number(row.ReadRows),
     align: DataTable.RIGHT,
+    width: 150,
 };
 
 const readBytesColumn: Column<KeyValueRow> = {
@@ -65,6 +70,7 @@ const readBytesColumn: Column<KeyValueRow> = {
     render: ({row}) => formatNumber(row.ReadBytes),
     sortAccessor: (row) => Number(row.ReadBytes),
     align: DataTable.RIGHT,
+    width: 150,
 };
 
 const userSIDColumn: Column<KeyValueRow> = {
@@ -79,6 +85,7 @@ const oneLineQueryTextColumn: Column<KeyValueRow> = {
     header: 'QueryText',
     render: ({row}) => <OneLineQueryWithPopover value={row.QueryText?.toString()} />,
     sortable: false,
+    width: 500,
 };
 
 const queryHashColumn: Column<KeyValueRow> = {
@@ -94,6 +101,7 @@ const durationColumn: Column<KeyValueRow> = {
     render: ({row}) => formatNumber(parseUsToMs(row.Duration ?? undefined)),
     sortAccessor: (row) => Number(row.Duration),
     align: DataTable.RIGHT,
+    width: 150,
 };
 
 export const getTopQueriesColumns = (): Column<KeyValueRow>[] => {

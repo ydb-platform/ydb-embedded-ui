@@ -22,6 +22,8 @@ import './Columns.scss';
 
 const b = cn('ydb-diagnostics-consumers-columns');
 
+export const CONSUMERS_COLUMNS_WIDTH_LS_KEY = 'consumersColumnsWidth';
+
 export const columns: Column<IPreparedConsumerData>[] = [
     {
         name: CONSUMERS_COLUMNS_IDS.CONSUMER,
@@ -53,6 +55,7 @@ export const columns: Column<IPreparedConsumerData>[] = [
         name: CONSUMERS_COLUMNS_IDS.READ_SPEED,
         header: CONSUMERS_COLUMNS_TITILES[CONSUMERS_COLUMNS_IDS.READ_SPEED],
         align: DataTable.RIGHT,
+        resizeMinWidth: 140,
         sortAccessor: (row) => row.readSpeed.perMinute,
         render: ({row}) => <SpeedMultiMeter data={row.readSpeed} />,
     },

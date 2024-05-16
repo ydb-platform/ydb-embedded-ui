@@ -39,25 +39,18 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
             placement={['top', 'bottom']}
             behavior={PopoverBehavior.Immediate}
         >
-            <div className={b('host-wrapper')}>
-                <EntityStatus
-                    name={node.Host}
-                    status={node.SystemState}
-                    path={nodePath}
-                    hasClipboardButton
-                    className={b('host')}
-                />
-                {nodeRef && (
-                    <Button
-                        size="s"
-                        href={nodeRef}
-                        className={b('external-button')}
-                        target="_blank"
-                    >
-                        <Icon name="external" />
-                    </Button>
-                )}
-            </div>
+            <EntityStatus
+                name={node.Host}
+                status={node.SystemState}
+                path={nodePath}
+                hasClipboardButton
+                className={b('host')}
+            />
+            {nodeRef && (
+                <Button size="s" href={nodeRef} className={b('external-button')} target="_blank">
+                    <Icon name="external" />
+                </Button>
+            )}
         </CellWithPopover>
     );
 };

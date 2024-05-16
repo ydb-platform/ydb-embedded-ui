@@ -1,11 +1,7 @@
 @import '../../../../styles/mixins.scss';
 
 .ydb-hot-keys {
-    &__table-content {
-        overflow: auto;
-
-        width: 100%;
-        height: 100%;
+    &__table {
         @include freeze-nth-column(1);
     }
 

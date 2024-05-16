@@ -1,13 +1,15 @@
 import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
-import type {Column, DataTableProps, Settings} from '@gravity-ui/react-data-table';
+import type {Column, Settings} from '@gravity-ui/react-data-table';
 
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {getColumnType, prepareQueryResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
+import type {ResizeableDataTableProps} from '../ResizeableDataTable/ResizeableDataTable';
+import {ResizeableDataTable} from '../ResizeableDataTable/ResizeableDataTable';
 
 import {Cell} from './Cell';
 import i18n from './i18n';
@@ -70,7 +72,7 @@ const prepareGenericColumns = (data: KeyValueRow[]) => {
 const getRowIndex = (_: unknown, index: number) => index;
 
 interface QueryResultTableProps
-    extends Omit<DataTableProps<KeyValueRow>, 'data' | 'columns' | 'theme'> {
+    extends Omit<ResizeableDataTableProps<KeyValueRow>, 'data' | 'columns'> {
     data?: KeyValueRow[];
     columns?: ColumnType[];
 }
@@ -101,8 +103,7 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
     }
 
     return (
-        <DataTable
-            theme="yandex-cloud"
+        <ResizeableDataTable
             data={data}
             columns={columns}
             settings={settings}

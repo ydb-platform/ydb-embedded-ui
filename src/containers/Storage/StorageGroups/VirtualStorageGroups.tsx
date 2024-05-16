@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {VirtualTable} from '../../../components/VirtualTable';
 import type {FetchData, RenderControls, RenderErrorMessage} from '../../../components/VirtualTable';
+import {ResizeableVirtualTable} from '../../../components/VirtualTable/ResizeableVirtualTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesMap} from '../../../types/store/nodesList';
@@ -9,7 +9,10 @@ import type {StorageSortValue} from '../../../utils/storage';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {getStorageGroups} from './getGroups';
-import {getPreparedStorageGroupsColumns} from './getStorageGroupsColumns';
+import {
+    STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
+    getPreparedStorageGroupsColumns,
+} from './getStorageGroupsColumns';
 import i18n from './i18n';
 
 interface VirtualStorageGroupsProps {
@@ -76,7 +79,8 @@ export const VirtualStorageGroups = ({
     };
 
     return (
-        <VirtualTable
+        <ResizeableVirtualTable
+            columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
             parentContainer={parentContainer}
             columns={columns}
             fetchData={fetchData}

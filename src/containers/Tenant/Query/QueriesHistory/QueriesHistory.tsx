@@ -1,6 +1,6 @@
 import type {Column} from '@gravity-ui/react-data-table';
-import DataTable from '@gravity-ui/react-data-table';
 
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {selectQueriesHistory} from '../../../../store/reducers/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
@@ -15,6 +15,8 @@ import i18n from '../i18n';
 import './QueriesHistory.scss';
 
 const b = cn('ydb-queries-history');
+
+const QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY = 'queriesHistoryTableColumnsWidth';
 
 interface QueriesHistoryProps {
     changeUserInput: (value: {input: string}) => void;
@@ -52,6 +54,7 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
                 );
             },
             sortable: false,
+            width: 600,
         },
         {
             name: 'syntax',
@@ -66,8 +69,8 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
 
     return (
         <div className={b()}>
-            <DataTable
-                theme="yandex-cloud"
+            <ResizeableDataTable
+                columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
                 columns={columns}
                 data={reversedHistory}
                 settings={QUERY_TABLE_SETTINGS}

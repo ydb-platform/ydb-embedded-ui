@@ -1,5 +1,6 @@
 import DataTable from '@gravity-ui/react-data-table';
 
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
@@ -7,6 +8,7 @@ import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useTypedSelector} from '../../../../utils/hooks';
 
 import {
+    SCHEMA_COLUMNS_WIDTH_LS_KEY,
     SchemaViewerColumns,
     prepareColumnDescriptions,
     prepareFamilies,
@@ -18,13 +20,12 @@ import './SchemaViewer.scss';
 const b = cn('schema-viewer');
 
 interface SchemaViewerProps {
-    className?: string;
     type?: EPathType;
     path?: string;
     withFamilies?: boolean;
 }
 
-export const SchemaViewer = ({className, type, path, withFamilies = false}: SchemaViewerProps) => {
+export const SchemaViewer = ({type, path, withFamilies = false}: SchemaViewerProps) => {
     const {data, loading} = useTypedSelector((state) => state.schema);
     const currentObjectData = path ? data[path] : undefined;
 
@@ -32,12 +33,12 @@ export const SchemaViewer = ({className, type, path, withFamilies = false}: Sche
     const families = prepareFamilies(currentObjectData);
 
     return (
-        <div className={b(null, className)}>
+        <div className={b(null)}>
             {loading ? (
                 <TableSkeleton />
             ) : (
-                <DataTable
-                    theme="yandex-cloud"
+                <ResizeableDataTable
+                    columnsWidthLSKey={SCHEMA_COLUMNS_WIDTH_LS_KEY}
                     data={columns}
                     columns={prepareSchemaTableColumns({
                         type,

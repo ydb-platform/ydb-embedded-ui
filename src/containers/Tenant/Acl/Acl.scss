@@ -1,12 +1,6 @@
 @import '../../../styles/mixins.scss';
 
 .ydb-acl {
-    display: flex;
-    overflow: auto;
-    flex-grow: 1;
-
-    @include query-data-table;
-
     &__result {
         align-self: flex-start;
     }

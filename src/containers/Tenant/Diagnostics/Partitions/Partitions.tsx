@@ -1,9 +1,9 @@
 import React from 'react';
 
-import DataTable from '@gravity-ui/react-data-table';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
@@ -13,6 +13,7 @@ import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../..
 import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import {PartitionsControls} from './PartitionsControls/PartitionsControls';
+import {PARTITIONS_COLUMNS_WIDTH_LS_KEY} from './columns';
 import i18n from './i18n';
 import {addHostToPartitions} from './utils';
 import type {PreparedPartitionDataWithHosts} from './utils/types';
@@ -106,27 +107,8 @@ export const Partitions = ({path}: PartitionsProps) => {
 
     const error = nodesError || topicError || partitionsError;
 
-    const getContent = () => {
-        if (loading) {
-            return <TableSkeleton className={b('loader')} />;
-        }
-        if (error) {
-            return <ResponseError error={error} />;
-        }
-
+    const renderControls = () => {
         return (
-            <DataTable
-                theme="yandex-cloud"
-                data={partitionsToRender}
-                columns={columnsToShow}
-                settings={DEFAULT_TABLE_SETTINGS}
-                emptyDataMessage={i18n('table.emptyDataMessage')}
-            />
-        );
-    };
-
-    return (
-        <div className={b()}>
             <PartitionsControls
                 consumers={consumers}
                 selectedConsumer={selectedConsumer}
@@ -138,8 +120,34 @@ export const Partitions = ({path}: PartitionsProps) => {
                 onHiddenColumnsChange={hadleTableColumnsSetupChange}
                 initialColumnsIds={columnsIdsForSelector}
             />
+        );
+    };
+
+    const renderContent = () => {
+        if (loading) {
+            return <TableSkeleton className={b('loader')} />;
+        }
+        if (error) {
+            return <ResponseError error={error} />;
+        }
+
+        return (
+            <ResizeableDataTable
+                columnsWidthLSKey={PARTITIONS_COLUMNS_WIDTH_LS_KEY}
+                wrapperClassName={b('table')}
+                data={partitionsToRender}
+                columns={columnsToShow}
+                settings={DEFAULT_TABLE_SETTINGS}
+                emptyDataMessage={i18n('table.emptyDataMessage')}
+            />
+        );
+    };
+
+    return (
+        <div className={b()}>
+            <div className={b('controls')}>{renderControls()}</div>
             <div className={b('table-wrapper')}>
-                <div className={b('table-content')}>{getContent()}</div>
+                <div className={b('table-content')}>{renderContent()}</div>
             </div>
         </div>
     );

@@ -151,8 +151,13 @@
     &__table-content {
         overflow: auto;
 
+        height: 100%;
+    }
+
+    &__table {
         @include mixins.freeze-nth-column(1);
     }
+
     &__balancer-cell {
         display: flex;
         flex-direction: row;

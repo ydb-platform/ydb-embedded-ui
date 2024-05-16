@@ -1,8 +1,9 @@
-@import '../../../../styles/mixins.scss';
+@use '../../../../styles/mixins.scss';
 
 .kv-preview {
     height: 100%;
-    @include query-data-table;
+    @include mixins.flex-container();
+    @include mixins.query-data-table();
 
     &__header {
         position: sticky;
@@ -48,9 +49,11 @@
     &__result {
         overflow: auto;
 
+        width: 100%;
+
         // This fixes last row display for ordinary preview (not fullscreen)
         height: calc(100% - 40px);
-        padding: 0 10px;
+        padding-left: 10px;
 
         // Fix white space footer block for fullscreen preview
         .kv-fullscreen & {

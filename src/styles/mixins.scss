@@ -96,13 +96,6 @@
 
 @mixin query-data-table() {
     & .data-table {
-        $_: &;
-
-        &__table {
-            border-spacing: 0;
-            border-collapse: separate;
-        }
-
         &__th,
         &__td {
             vertical-align: middle;
@@ -112,11 +105,6 @@
             .data-table__table-wrapper {
                 padding-bottom: 20px;
             }
-        }
-
-        &__row,
-        &__sticky th {
-            height: 40px;
         }
 
         &__th {
@@ -167,41 +155,6 @@
                 border-right: unset;
             }
         }
-    }
-}
-
-@mixin table-styles {
-    & .data-table {
-        &__table {
-            width: 100%;
-        }
-
-        &__row,
-        &__sticky th {
-            height: 40px;
-        }
-
-        &__box {
-            .data-table__table-wrapper {
-                padding-bottom: 20px;
-            }
-
-            &_sticky-head_fixed {
-                overflow: initial;
-            }
-        }
-    }
-}
-
-@mixin table-sticky-styles {
-    & .data-table {
-        &__th {
-            height: auto;
-        }
-    }
-
-    & {
-        padding-bottom: 20px;
     }
 }
 

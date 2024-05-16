@@ -1,7 +1,10 @@
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topStorageGroupsApi} from '../../../../../store/reducers/tenantOverview/topStorageGroups/topStorageGroups';
 import {useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
-import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/getStorageGroupsColumns';
+import {
+    STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
+    getStorageTopGroupsColumns,
+} from '../../../../Storage/StorageGroups/getStorageGroupsColumns';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
@@ -36,6 +39,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
 
     return (
         <TenantOverviewTableLayout
+            columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
             data={topGroups || []}
             columns={columns}
             title={title}
