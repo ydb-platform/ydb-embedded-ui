@@ -144,6 +144,7 @@ export function ExplainResult(props) {
                     value={props.ast}
                     options={EDITOR_OPTIONS}
                     wrappingIndent="indent"
+                    theme={`vs-${props.theme}`}
                 />
             </div>
         );
