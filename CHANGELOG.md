@@ -1,5 +1,13 @@
 # Changelog
 
+## [6.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.1.0...v6.2.0) (2024-05-17)
+
+
+### Features
+
+* make tables resizeable ([#823](https://github.com/ydb-platform/ydb-embedded-ui/issues/823)) ([ff27390](https://github.com/ydb-platform/ydb-embedded-ui/commit/ff2739033437a069892d4ddf203e98a53ee3a934))
+* update deps ([#826](https://github.com/ydb-platform/ydb-embedded-ui/issues/826)) ([e3f08cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/e3f08cf9365587b4fbcd6c151d340b6967622756))
+
 ## [6.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.0.1...v6.0.2) (2024-05-14)
 
 
