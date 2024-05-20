@@ -32,6 +32,12 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
           })
         : undefined;
 
+    const additionalControls = nodeRef ? (
+        <Button size="s" href={nodeRef} className={b('external-button')} target="_blank">
+            <Icon name="external" />
+        </Button>
+    ) : null;
+
     return (
         <CellWithPopover
             disabled={!isNodeAvailable}
@@ -44,13 +50,8 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
                 status={node.SystemState}
                 path={nodePath}
                 hasClipboardButton
-                className={b('host')}
+                additionalControls={additionalControls}
             />
-            {nodeRef && (
-                <Button size="s" href={nodeRef} className={b('external-button')} target="_blank">
-                    <Icon name="external" />
-                </Button>
-            )}
         </CellWithPopover>
     );
 };

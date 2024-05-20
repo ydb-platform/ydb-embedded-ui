@@ -29,6 +29,8 @@ interface EntityStatusProps {
     clipboardButtonAlwaysVisible?: boolean;
 
     className?: string;
+
+    additionalControls?: React.ReactNode;
 }
 
 export function EntityStatus({
@@ -49,6 +51,8 @@ export function EntityStatus({
     clipboardButtonAlwaysVisible = false,
 
     className,
+
+    additionalControls,
 }: EntityStatusProps) {
     const renderIcon = () => {
         if (!showStatus) {
@@ -100,6 +104,7 @@ export function EntityStatus({
                     })}
                 />
             )}
+            {additionalControls}
         </div>
     );
 }
