@@ -25,13 +25,15 @@ interface PreviewProps {
 export const Preview = ({database, type}: PreviewProps) => {
     const dispatch = useTypedDispatch();
 
+    const isPreviewAvailable = isTableType(type);
+
     const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
 
     const query = `--!syntax_v1\nselect * from \`${currentSchemaPath}\` limit 32`;
     const {currentData, isFetching, error} = previewApi.useSendQueryQuery(
         {database, query, action: isExternalTable(type) ? 'execute-query' : 'execute-scan'},
-        {pollingInterval: autorefresh},
+        {pollingInterval: autorefresh, skip: !isPreviewAvailable},
     );
     const loading = isFetching && currentData === undefined;
     const data = currentData ?? {};
@@ -71,7 +73,7 @@ export const Preview = ({database, type}: PreviewProps) => {
 
     let message;
 
-    if (!isTableType(type)) {
+    if (!isPreviewAvailable) {
         message = <div className={b('message-container')}>{i18n('preview.not-available')}</div>;
     } else if (error) {
         message = <div className={b('message-container', 'error')}>{prepareQueryError(error)}</div>;
