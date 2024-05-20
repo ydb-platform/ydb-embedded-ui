@@ -90,6 +90,7 @@ function Overview({type, tenantName}: OverviewProps) {
             [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={data} />,
             [EPathType.EPathTypeExternalTable]: () => <ExternalTableInfo data={data} />,
             [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
+            [EPathType.EPathTypeView]: undefined,
         };
 
         return (

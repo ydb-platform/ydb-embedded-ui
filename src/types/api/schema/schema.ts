@@ -7,6 +7,7 @@ import type {TExternalTableDescription} from './externalTable';
 import type {TPersQueueGroupDescription} from './persQueueGroup';
 import type {TTableDescription, TTableStats} from './table';
 import type {TIndexDescription} from './tableIndex';
+import type {TViewDescription} from './view';
 
 /**
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/flat_tx_scheme.proto
@@ -81,6 +82,8 @@ export interface TPathDescription {
 
     ExternalTableDescription?: TExternalTableDescription;
     ExternalDataSourceDescription?: TExternalDataSourceDescription;
+
+    ViewDescription?: TViewDescription;
 }
 
 export interface TDirEntry {
@@ -263,6 +266,7 @@ export enum EPathType {
 
     EPathTypeExternalDataSource = 'EPathTypeExternalDataSource',
     EPathTypeExternalTable = 'EPathTypeExternalTable',
+    EPathTypeView = 'EPathTypeView',
 }
 
 export enum EPathSubType {
