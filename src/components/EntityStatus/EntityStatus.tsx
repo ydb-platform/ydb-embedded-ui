@@ -1,9 +1,9 @@
 import {Link as UIKitLink} from '@gravity-ui/uikit';
-import {Link} from 'react-router-dom';
 
 import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
 import {ClipboardButton} from '../ClipboardButton';
+import {InternalLink} from '../InternalLink/InternalLink';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {StatusIconMode, StatusIconSize} from '../StatusIcon/StatusIcon';
 
@@ -29,6 +29,8 @@ interface EntityStatusProps {
     clipboardButtonAlwaysVisible?: boolean;
 
     className?: string;
+
+    additionalControls?: React.ReactNode;
 }
 
 export function EntityStatus({
@@ -49,6 +51,8 @@ export function EntityStatus({
     clipboardButtonAlwaysVisible = false,
 
     className,
+
+    additionalControls,
 }: EntityStatusProps) {
     const renderIcon = () => {
         if (!showStatus) {
@@ -75,9 +79,9 @@ export function EntityStatus({
             }
 
             return (
-                <Link className={b('name')} to={path}>
+                <InternalLink className={b('name')} to={path}>
                     {name}
-                </Link>
+                </InternalLink>
             );
         }
         return name && <span className={b('name')}>{name}</span>;
@@ -100,6 +104,7 @@ export function EntityStatus({
                     })}
                 />
             )}
+            {additionalControls}
         </div>
     );
 }

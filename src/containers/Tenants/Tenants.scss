@@ -49,10 +49,8 @@
         display: block;
     }
 
-    &__name-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 4px;
+    &__monitoring-button {
+        margin-left: 4px;
     }
 
     &__name {

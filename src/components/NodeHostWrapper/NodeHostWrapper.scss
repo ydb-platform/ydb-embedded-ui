@@ -1,10 +1,7 @@
 .ydb-node-host-wrapper {
-    &__host {
-        overflow: hidden;
-    }
-
     &__external-button {
         display: none;
+        flex-shrink: 0;
 
         margin-left: 4px;
     }

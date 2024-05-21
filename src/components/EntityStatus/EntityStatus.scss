@@ -14,7 +14,9 @@
     }
 
     &__clipboard-button {
+        display: flex;
         visibility: hidden;
+        flex-shrink: 0;
 
         margin-left: 8px;
 
@@ -23,16 +25,6 @@
         &_visible {
             visibility: visible;
         }
-    }
-
-    a {
-        text-decoration: none;
-
-        color: var(--g-color-text-link);
-    }
-
-    a:hover {
-        color: var(--g-color-text-link-hover);
     }
 
     &__label {

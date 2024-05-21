@@ -104,21 +104,26 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                     const backend = getTenantBackend(row);
                     const isExternalLink = Boolean(backend);
                     return (
-                        <div className={b('name-wrapper')}>
-                            <EntityStatus
-                                externalLink={isExternalLink}
-                                className={b('name')}
-                                name={row.Name || 'unknown database'}
-                                withLeftTrim={true}
-                                status={row.Overall}
-                                hasClipboardButton
-                                path={getTenantPath({
-                                    name: row.Name,
-                                    backend,
-                                })}
-                            />
-                            {additionalTenantsProps?.getMonitoringLink?.(row.Name, row.Type)}
-                        </div>
+                        <EntityStatus
+                            externalLink={isExternalLink}
+                            className={b('name')}
+                            name={row.Name || 'unknown database'}
+                            withLeftTrim={true}
+                            status={row.Overall}
+                            hasClipboardButton
+                            path={getTenantPath({
+                                name: row.Name,
+                                backend,
+                            })}
+                            additionalControls={
+                                <span className={b('monitoring-button')}>
+                                    {additionalTenantsProps?.getMonitoringLink?.(
+                                        row.Name,
+                                        row.Type,
+                                    )}
+                                </span>
+                            }
+                        />
                     );
                 },
                 width: 440,
