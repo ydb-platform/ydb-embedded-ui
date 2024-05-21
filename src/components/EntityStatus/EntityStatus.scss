@@ -44,16 +44,6 @@
 
         white-space: nowrap;
         text-overflow: ellipsis;
-
-        a {
-            text-decoration: none;
-
-            color: var(--g-color-text-link);
-        }
-
-        a:hover {
-            color: var(--g-color-text-link-hover);
-        }
     }
 
     &__link_with-left-trim {
