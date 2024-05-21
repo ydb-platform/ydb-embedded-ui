@@ -1,9 +1,9 @@
 import React from 'react';
 
+import {ChevronDown, PlayFill} from '@gravity-ui/icons';
 import type {ButtonView} from '@gravity-ui/uikit';
-import {Button, DropdownMenu} from '@gravity-ui/uikit';
+import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
 
-import {Icon} from '../../../../components/Icon';
 import {LabelWithPopover} from '../../../../components/LabelWithPopover';
 import type {QueryAction, QueryMode} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
@@ -99,7 +99,7 @@ export const QueryEditorControls = ({
                     loading={runIsLoading}
                     view={runView}
                 >
-                    <Icon name="startPlay" viewBox="0 0 16 16" width={16} height={16} />
+                    <Icon data={PlayFill} size={14} />
                     {'Run'}
                 </Button>
                 <Button
@@ -125,7 +125,7 @@ export const QueryEditorControls = ({
                                     {`${i18n('controls.query-mode-selector_type')} ${
                                         QueryModeSelectorOptions[queryMode].title
                                     }`}
-                                    <Icon name="chevron-down" width={16} height={16} />
+                                    <Icon data={ChevronDown} />
                                 </span>
                             </Button>
                         }

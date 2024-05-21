@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {ArrowRotateLeft} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
@@ -21,8 +22,6 @@ import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {PDiskGroups} from './PDiskGroups';
 import {pDiskPageKeyset} from './i18n';
 import {pdiskPageCn} from './shared';
-
-import ArrowRotateLeftIcon from '@gravity-ui/icons/svgs/arrow-rotate-left.svg';
 
 import './PDiskPage.scss';
 
@@ -122,7 +121,7 @@ export function PDiskPage() {
                     buttonView="normal"
                     dialogContent={pDiskPageKeyset('restart-pdisk-dialog')}
                 >
-                    <Icon data={ArrowRotateLeftIcon} />
+                    <Icon data={ArrowRotateLeft} />
                     {pDiskPageKeyset('restart-pdisk-button')}
                 </ButtonWithConfirmDialog>
             </div>

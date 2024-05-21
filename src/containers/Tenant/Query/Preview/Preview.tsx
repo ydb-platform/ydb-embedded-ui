@@ -1,8 +1,8 @@
-import {Button, Loader} from '@gravity-ui/uikit';
+import {Xmark} from '@gravity-ui/icons';
+import {Button, Icon, Loader} from '@gravity-ui/uikit';
 
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
-import {Icon} from '../../../../components/Icon';
 import {QueryResultTable} from '../../../../components/QueryResultTable';
 import {previewApi} from '../../../../store/reducers/preview';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
@@ -56,7 +56,7 @@ export const Preview = ({database, type}: PreviewProps) => {
                         onClick={handleClosePreview}
                         title={i18n('preview.close')}
                     >
-                        <Icon name="close" viewBox={'0 0 16 16'} width={16} height={16} />
+                        <Icon data={Xmark} size={18} />
                     </Button>
                 </div>
             </div>

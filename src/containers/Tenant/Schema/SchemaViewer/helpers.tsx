@@ -1,8 +1,8 @@
 import type {ClassNameFormatter} from '@bem-react/classname';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
+import {Icon} from '@gravity-ui/uikit';
 
-import {Icon} from '../../../../components/Icon';
 import type {
     EPathType,
     TColumnDescription,
@@ -17,6 +17,8 @@ import {
     isRowTableType,
     isTableType,
 } from '../../utils/schema';
+
+import keyIcon from '../../../../assets/icons/key.svg';
 
 export const SchemaViewerColumns = {
     id: 'Id',
@@ -138,7 +140,7 @@ export function prepareSchemaTableColumns(options: {
             render: ({row}) => {
                 return row.Id && options.keyColumnIds.includes(row.Id) ? (
                     <div className={options.b('key-icon')}>
-                        <Icon name="key" viewBox="0 0 12 7" width={12} height={7} />
+                        <Icon data={keyIcon} width={12} height={7} />
                     </div>
                 ) : null;
             },

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {Link as ExternalLink} from '@gravity-ui/uikit';
+import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
+import {Link as ExternalLink, Icon} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useLocation, useParams} from 'react-router';
@@ -8,7 +9,6 @@ import {useLocation, useParams} from 'react-router';
 import {EmptyState} from '../../components/EmptyState';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {Icon} from '../../components/Icon';
 import {Loader} from '../../components/Loader';
 import {Tag} from '../../components/Tag';
 import {parseQuery} from '../../routes';
@@ -126,7 +126,7 @@ export const Tablet = () => {
                                 href={`${backend}/tablets?TabletID=${TabletId}`}
                                 target="_blank"
                             >
-                                <Icon name="external" />
+                                <Icon data={ArrowUpRightFromSquare} />
                             </a>
                             {Leader && <Tag text="Leader" type="blue" />}
                             <span className={b('loader')}>{loading && <Loader size="s" />}</span>

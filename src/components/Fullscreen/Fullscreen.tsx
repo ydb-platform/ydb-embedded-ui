@@ -1,12 +1,13 @@
 import React from 'react';
 
-import {Button} from '@gravity-ui/uikit';
+import {Button, Icon} from '@gravity-ui/uikit';
 import ReactDOM from 'react-dom';
 
 import {disableFullscreen} from '../../store/reducers/fullscreen';
 import {cn} from '../../utils/cn';
 import {useTypedDispatch} from '../../utils/hooks';
-import {Icon} from '../Icon';
+
+import disableFullscreenIcon from '../../assets/icons/disableFullscreen.svg';
 
 import './Fullscreen.scss';
 
@@ -72,7 +73,7 @@ function Fullscreen(props: FullscreenProps) {
         <FullscreenWrapper>
             <div className={b(null, props.className)}>
                 <Button onClick={onDisableFullScreen} view="raised" className={b('close-button')}>
-                    <Icon name="disableFullscreen" viewBox={'0 0 16 16 '} width={16} height={16} />
+                    <Icon data={disableFullscreenIcon} />
                 </Button>
                 {props.children}
             </div>

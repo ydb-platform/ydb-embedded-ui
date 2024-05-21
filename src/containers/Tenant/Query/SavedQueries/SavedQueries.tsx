@@ -1,10 +1,10 @@
 import React from 'react';
 
+import {Pencil, TrashBin} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import {Button, Dialog} from '@gravity-ui/uikit';
+import {Button, Dialog, Icon} from '@gravity-ui/uikit';
 
-import {Icon} from '../../../../components/Icon';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
@@ -111,10 +111,10 @@ export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: Sav
                     </div>
                     <span className={b('controls')}>
                         <Button view="flat-secondary">
-                            <Icon name="pencil" viewBox="0 0 24 24" />
+                            <Icon data={Pencil} />
                         </Button>
                         <Button view="flat-secondary" onClick={onDeleteQueryClick(query.name)}>
-                            <Icon name="trash" viewBox="0 0 24 24" />
+                            <Icon data={TrashBin} />
                         </Button>
                     </span>
                 </div>

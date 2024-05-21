@@ -1,7 +1,8 @@
-import {Button} from '@gravity-ui/uikit';
+import {Button, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
-import {Icon} from '../Icon';
+
+import monitoringIcon from '../../assets/icons/monitoring.svg';
 
 import './MonitoringButton.scss';
 
@@ -22,7 +23,7 @@ export function MonitoringButton({href, visible = false, className}: MonitoringB
             size="s"
             title="Monitoring dashboard"
         >
-            <Icon name="monitoring" viewBox="0 0 16 16" width={16} height={16} />
+            <Icon data={monitoringIcon} />
         </Button>
     );
 }

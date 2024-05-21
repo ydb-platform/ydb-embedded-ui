@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {ShieldKeyhole} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
@@ -20,8 +21,6 @@ import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
 import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../utils';
 
 import i18n from './i18n';
-
-import shieldIcon from '../../../assets/icons/shield.svg';
 
 import './StorageGroups.scss';
 
@@ -86,7 +85,7 @@ const typeColumn: StorageGroupsColumn = {
                     behavior={PopoverBehavior.Immediate}
                 >
                     <Label>
-                        <Icon data={shieldIcon} />
+                        <Icon data={ShieldKeyhole} size={18} />
                     </Label>
                 </Popover>
             )}

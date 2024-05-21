@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {Pulse, Terminal} from '@gravity-ui/icons';
 import type {MenuItem as AsideHeaderMenuItem} from '@gravity-ui/navigation';
 import type {IconData} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router';
@@ -11,9 +12,6 @@ import {useSetting, useTypedSelector} from '../../utils/hooks';
 import {getTenantPath} from '../Tenant/TenantPages';
 
 import i18n from './i18n';
-
-import pulseIcon from '@gravity-ui/icons/svgs/pulse.svg';
-import terminalIcon from '@gravity-ui/icons/svgs/terminal.svg';
 
 interface MenuItem {
     id: string;
@@ -45,7 +43,7 @@ export function useNavigationMenuItems() {
             {
                 id: TENANT_PAGES_IDS.query,
                 title: i18n('pages.query'),
-                icon: terminalIcon,
+                icon: Terminal,
                 iconSize: 20,
                 location: getTenantPath({
                     ...queryParams,
@@ -55,7 +53,7 @@ export function useNavigationMenuItems() {
             {
                 id: TENANT_PAGES_IDS.diagnostics,
                 title: i18n('pages.diagnostics'),
-                icon: pulseIcon,
+                icon: Pulse,
                 iconSize: 20,
                 location: getTenantPath({
                     ...queryParams,

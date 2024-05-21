@@ -1,12 +1,12 @@
 import React from 'react';
 
+import {ArrowUpRightFromSquare, CircleInfoFill} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
-import {ArrowToggle, Button, Popover} from '@gravity-ui/uikit';
+import {ArrowToggle, Button, Icon, Popover} from '@gravity-ui/uikit';
 import isEmpty from 'lodash/isEmpty';
 
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
-import {Icon} from '../../../components/Icon';
 import {PDiskInfo} from '../../../components/PDiskInfo/PDiskInfo';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import type {
@@ -93,7 +93,7 @@ function getColumns({
                                 target="_blank"
                                 title={i18n('vdisk.developer-ui-button-title')}
                             >
-                                <Icon name="external" />
+                                <Icon data={ArrowUpRightFromSquare} />
                             </Button>
                         )}
                     </div>
@@ -149,7 +149,7 @@ function getColumns({
                                 selected: row.id === selectedVdiskId,
                             })}
                         >
-                            <Icon name="information" viewBox="0 0 512 512" height={16} width={16} />
+                            <Icon data={CircleInfoFill} size={18} />
                         </Button>
                     </Popover>
                 );

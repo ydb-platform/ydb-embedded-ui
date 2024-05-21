@@ -1,8 +1,8 @@
-import {Button} from '@gravity-ui/uikit';
+import {SquareDashed} from '@gravity-ui/icons';
+import {Button, Icon} from '@gravity-ui/uikit';
 
 import {enableFullscreen} from '../../store/reducers/fullscreen';
 import {useTypedDispatch} from '../../utils/hooks';
-import {Icon} from '../Icon';
 
 interface EnableFullscreenButtonProps {
     disabled?: boolean;
@@ -20,7 +20,7 @@ function EnableFullscreenButton({disabled}: EnableFullscreenButtonProps) {
             disabled={disabled}
             title="Fullscreen"
         >
-            <Icon name="enableFullscreen" viewBox={'0 0 16 16'} height={16} width={16} />
+            <Icon data={SquareDashed} />
         </Button>
     );
 }

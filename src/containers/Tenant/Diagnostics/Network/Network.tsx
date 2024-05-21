@@ -1,10 +1,9 @@
 import React from 'react';
 
-import {Checkbox, Loader} from '@gravity-ui/uikit';
+import {Checkbox, Icon, Loader} from '@gravity-ui/uikit';
 import {Link} from 'react-router-dom';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-import {Icon} from '../../../../components/Icon';
 import {Illustration} from '../../../../components/Illustration';
 import {ProblemFilter} from '../../../../components/ProblemFilter';
 import {networkApi} from '../../../../store/reducers/network/network';
@@ -21,6 +20,8 @@ import {getDefaultNodePath} from '../../../Node/NodePages';
 
 import {NodeNetwork} from './NodeNetwork/NodeNetwork';
 import {getConnectedNodesCount} from './utils';
+
+import networkIcon from '../../../../assets/icons/network.svg';
 
 import './Network.scss';
 
@@ -136,12 +137,7 @@ export function Network({path}: NetworkProps) {
                         ) : (
                             <div className={b('placeholder')}>
                                 <div className={b('placeholder-img')}>
-                                    <Icon
-                                        name="network-placeholder"
-                                        viewBox="0 0 221 204"
-                                        width={221}
-                                        height={204}
-                                    />
+                                    <Icon data={networkIcon} width={221} height={204} />
                                 </div>
 
                                 <div className={b('placeholder-text')}>

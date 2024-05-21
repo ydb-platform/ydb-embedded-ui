@@ -1,11 +1,10 @@
 import React from 'react';
 
-import {CircleXmarkFill} from '@gravity-ui/icons';
-import {Dialog} from '@gravity-ui/uikit';
+import {CircleXmarkFill, TriangleExclamationFill} from '@gravity-ui/icons';
+import {Dialog, Icon} from '@gravity-ui/uikit';
 
 import type {IResponseError} from '../../types/api/error';
 import {cn} from '../../utils/cn';
-import {Icon} from '../Icon';
 
 import {criticalActionDialogKeyset} from './i18n';
 
@@ -87,7 +86,7 @@ export function CriticalActionDialog<T>({
             <form onSubmit={onSubmit}>
                 <Dialog.Body className={b('body')}>
                     <span className={b('warning-icon')}>
-                        <Icon name="dialog-warning" width="24" height="22" viewBox="0 0 24 22" />
+                        <Icon data={TriangleExclamationFill} size={24} />
                     </span>
                     {text}
                 </Dialog.Body>

@@ -2,9 +2,9 @@ import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
+import {Icon} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-import {Icon} from '../../../../components/Icon';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {
     setHotKeysData,
@@ -20,6 +20,8 @@ import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import i18n from './i18n';
 
+import keyIcon from '../../../../assets/icons/key.svg';
+
 import './HotKeys.scss';
 
 const b = cn('ydb-hot-keys');
@@ -34,7 +36,7 @@ const getHotKeysColumns = (keyColumnsIds: string[] = []): Column<HotKey>[] => {
         name: col,
         header: (
             <div className={b('primary-key-column')}>
-                <Icon name="key" viewBox="0 0 12 7" width={12} height={7} />
+                <Icon data={keyIcon} width={12} height={7} />
                 {col}
             </div>
         ),
