@@ -82,8 +82,8 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
     const blobStorageLimit = isNumeric(StorageAllocatedLimit)
         ? Number(StorageAllocatedLimit)
         : undefined;
-    const tabletStorageLimit = isNumeric(DatabaseQuotas.data_size_hard_quota)
-        ? Number(DatabaseQuotas.data_size_hard_quota)
+    const tabletStorageLimit = isNumeric(DatabaseQuotas.data_size_soft_quota)
+        ? Number(DatabaseQuotas.data_size_soft_quota)
         : undefined;
 
     const poolsStats = calculatePoolsStats(PoolStats);
