@@ -483,10 +483,13 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId: concurrentId || 'getHotKeys', requestConfig: {signal}},
         );
     }
-    getHealthcheckInfo(database: string, {concurrentId, signal}: AxiosOptions = {}) {
+    getHealthcheckInfo(
+        {database, maxLevel}: {database: string; maxLevel?: number},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<HealthCheckAPIResponse>(
             this.getPath('/viewer/json/healthcheck?merge_records=true'),
-            {tenant: database},
+            {tenant: database, max_level: maxLevel},
             {concurrentId, requestConfig: {signal}},
         );
     }

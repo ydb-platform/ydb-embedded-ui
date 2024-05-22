@@ -2,8 +2,9 @@ import React from 'react';
 
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
-import type {IssuesTree} from '../../../../../store/reducers/healthcheckInfo/types';
 import {cn} from '../../../../../utils/cn';
+import {useTypedSelector} from '../../../../../utils/hooks';
+import {useHealthcheck} from '../useHealthcheck';
 
 import IssueTree from './IssuesViewer/IssueTree';
 import i18n from './i18n';
@@ -13,13 +14,12 @@ import './Healthcheck.scss';
 const b = cn('healthcheck');
 
 interface HealthcheckDetailsProps {
-    issueTrees?: IssuesTree[];
-    loading?: boolean;
-    error?: unknown;
+    tenantName: string;
 }
 
-export function HealthcheckDetails(props: HealthcheckDetailsProps) {
-    const {issueTrees, loading, error} = props;
+export function HealthcheckDetails({tenantName}: HealthcheckDetailsProps) {
+    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const {issueTrees, loading, error} = useHealthcheck(tenantName, {autorefresh});
 
     const renderContent = () => {
         if (error) {
