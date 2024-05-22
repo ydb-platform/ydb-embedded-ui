@@ -119,8 +119,7 @@ body,
 .data-table__row,
 .ydb-virtual-table__row,
 .ydb-tree-view__item {
-    &:hover,
-    &:focus-within {
+    &:hover {
         & .clipboard-button {
             visibility: visible;
         }
