@@ -1,5 +1,13 @@
 # Changelog
 
+## [6.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.2.0...v6.2.1) (2024-05-21)
+
+
+### Bug Fixes
+
+* fix buttons incorrect align in Nodes and Tenants tables ([#830](https://github.com/ydb-platform/ydb-embedded-ui/issues/830)) ([f97c082](https://github.com/ydb-platform/ydb-embedded-ui/commit/f97c08214c9afce731bc76f6513abbd33101b912))
+* **Preview:** send request only for tables ([#832](https://github.com/ydb-platform/ydb-embedded-ui/issues/832)) ([62d8ec9](https://github.com/ydb-platform/ydb-embedded-ui/commit/62d8ec962c281727bd04db5be9b0a12d279f726c))
+
 ## [6.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.1.0...v6.2.0) (2024-05-17)
 
 
