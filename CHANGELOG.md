@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.2.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.2.1...v6.2.2) (2024-05-23)
+
+
+### Bug Fixes
+
+* fix copy button not hidden after copy ([#838](https://github.com/ydb-platform/ydb-embedded-ui/issues/838)) ([a8d0524](https://github.com/ydb-platform/ydb-embedded-ui/commit/a8d052489d21f5a16ad79d119a7025df3e49c111))
+
 ## [6.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.2.0...v6.2.1) (2024-05-21)
 
 
