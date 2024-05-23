@@ -121,7 +121,7 @@ body,
 .ydb-tree-view__item {
     &:hover {
         & .clipboard-button {
-            visibility: visible;
+            opacity: 1;
         }
     }
 }

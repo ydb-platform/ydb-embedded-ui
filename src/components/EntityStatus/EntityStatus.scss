@@ -15,15 +15,16 @@
 
     &__clipboard-button {
         display: flex;
-        visibility: hidden;
         flex-shrink: 0;
 
         margin-left: 8px;
 
+        opacity: 0;
         color: var(--g-color-text-secondary);
 
-        &_visible {
-            visibility: visible;
+        &_visible,
+        &:focus-visible {
+            opacity: 1;
         }
     }
 
