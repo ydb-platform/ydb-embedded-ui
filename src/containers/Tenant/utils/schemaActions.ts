@@ -14,8 +14,10 @@ import {
     createExternalTableTemplate,
     createTableTemplate,
     createTopicTemplate,
+    createViewTemplate,
     dropExternalTableTemplate,
     dropTopicTemplate,
+    dropViewTemplate,
     selectQueryTemplate,
     upsertQueryTemplate,
 } from './queryTemplates';
@@ -54,6 +56,8 @@ const bindActions = (
         createTopic: inputQuery(createTopicTemplate, 'script'),
         alterTopic: inputQuery(alterTopicTemplate, 'script'),
         dropTopic: inputQuery(dropTopicTemplate, 'script'),
+        createView: inputQuery(createViewTemplate, 'script'),
+        dropView: inputQuery(dropViewTemplate, 'script'),
         copyPath: () => {
             try {
                 copy(path);
@@ -86,6 +90,7 @@ export const getActions =
             [
                 {text: i18n('actions.createTable'), action: actions.createTable},
                 {text: i18n('actions.createTopic'), action: actions.createTopic},
+                {text: i18n('actions.createView'), action: actions.createView},
             ],
         ];
         const TABLE_SET: ActionsSet = [
@@ -121,6 +126,12 @@ export const getActions =
             [{text: i18n('actions.createExternalTable'), action: actions.createExternalTable}],
         ];
 
+        const VIEW_SET = [
+            [copyItem],
+            [{text: i18n('actions.selectQuery'), action: actions.selectQuery}],
+            [{text: i18n('actions.dropView'), action: actions.dropView}],
+        ];
+
         const JUST_COPY: ActionsSet = [copyItem];
 
         // verbose mapping to guarantee a correct actions set for new node types
@@ -140,6 +151,8 @@ export const getActions =
 
             external_table: EXTERNAL_TABLE_SET,
             external_data_source: EXTERNAL_DATA_SOURCE_SET,
+
+            view: VIEW_SET,
         };
 
         return nodeTypeToActions[type];

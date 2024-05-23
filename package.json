@@ -48,7 +48,7 @@
     "url": "^0.11.3",
     "use-query-params": "^2.2.1",
     "web-vitals": "^1.1.2",
-    "ydb-ui-components": "^4.0.0"
+    "ydb-ui-components": "^4.1.0"
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",

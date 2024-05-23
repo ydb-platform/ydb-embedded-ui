@@ -10,7 +10,7 @@ import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {prepareQueryError} from '../../../../utils/query';
-import {isExternalTable, isTableType} from '../../utils/schema';
+import {isExternalTableType, isTableType} from '../../utils/schema';
 import i18n from '../i18n';
 
 import './Preview.scss';
@@ -32,7 +32,7 @@ export const Preview = ({database, type}: PreviewProps) => {
 
     const query = `--!syntax_v1\nselect * from \`${currentSchemaPath}\` limit 32`;
     const {currentData, isFetching, error} = previewApi.useSendQueryQuery(
-        {database, query, action: isExternalTable(type) ? 'execute-query' : 'execute-scan'},
+        {database, query, action: isExternalTableType(type) ? 'execute-query' : 'execute-scan'},
         {pollingInterval: autorefresh, skip: !isPreviewAvailable},
     );
     const loading = isFetching && currentData === undefined;

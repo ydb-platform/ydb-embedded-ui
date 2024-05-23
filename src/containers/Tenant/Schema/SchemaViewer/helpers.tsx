@@ -11,7 +11,12 @@ import type {
     TFamilyDescription,
 } from '../../../../types/api/schema';
 import {EColumnCodec} from '../../../../types/api/schema';
-import {isColumnEntityType, isExternalTable, isRowTable, isTableType} from '../../utils/schema';
+import {
+    isColumnEntityType,
+    isExternalTableType,
+    isRowTableType,
+    isTableType,
+} from '../../utils/schema';
 
 export const SchemaViewerColumns = {
     id: 'Id',
@@ -69,7 +74,7 @@ export function prepareColumnDescriptions(
         const columnTableSchema = prepareOlapTableSchema(description);
         keyColumnIds = columnTableSchema.KeyColumnIds ?? [];
         columns = columnTableSchema.Columns ?? [];
-    } else if (isExternalTable(type)) {
+    } else if (isExternalTableType(type)) {
         columns = scheme?.PathDescription?.ExternalTableDescription?.Columns ?? [];
     } else {
         keyColumnIds = scheme?.PathDescription?.Table?.KeyColumnIds ?? [];
@@ -120,7 +125,7 @@ export function prepareSchemaTableColumns(options: {
         },
     ];
 
-    if (!isExternalTable(options.type)) {
+    if (!isExternalTableType(options.type)) {
         // External tables don't have key columns
         columns.push({
             name: SchemaViewerColumns.key,
@@ -164,7 +169,7 @@ export function prepareSchemaTableColumns(options: {
         },
     );
 
-    if (options.withFamilies && isRowTable(options.type)) {
+    if (options.withFamilies && isRowTableType(options.type)) {
         columns.push(
             {
                 name: SchemaViewerColumns.familyName,

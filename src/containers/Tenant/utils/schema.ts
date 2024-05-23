@@ -35,6 +35,8 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
 
     [EPathType.EPathTypeExternalDataSource]: 'external_data_source',
     [EPathType.EPathTypeExternalTable]: 'external_table',
+
+    [EPathType.EPathTypeView]: 'view',
 };
 
 export const mapPathTypeToNavigationTreeType = (
@@ -67,8 +69,11 @@ const pathTypeToEntityName: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeColumnTable]: 'Columntable',
     [EPathType.EPathTypeCdcStream]: 'Changefeed',
     [EPathType.EPathTypePersQueueGroup]: 'Topic',
+
     [EPathType.EPathTypeExternalDataSource]: 'External Data Source',
     [EPathType.EPathTypeExternalTable]: 'External Table',
+
+    [EPathType.EPathTypeView]: 'View',
 };
 
 export const mapPathTypeToEntityName = (
@@ -97,6 +102,8 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
 
     [EPathType.EPathTypeExternalTable]: true,
 
+    [EPathType.EPathTypeView]: true,
+
     [EPathType.EPathTypeInvalid]: false,
     [EPathType.EPathTypeDir]: false,
     [EPathType.EPathTypeSubDomain]: false,
@@ -121,7 +128,7 @@ const pathSubTypeToIsIndexImpl: Record<EPathSubType, boolean> = {
     [EPathSubType.EPathSubTypeEmpty]: false,
 };
 
-export const isIndexTable = (subType?: EPathSubType) =>
+export const isIndexTableType = (subType?: EPathSubType) =>
     (subType && pathSubTypeToIsIndexImpl[subType]) ?? false;
 
 // ====================
@@ -138,8 +145,11 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypeExtSubDomain]: false,
     [EPathType.EPathTypeCdcStream]: false,
     [EPathType.EPathTypePersQueueGroup]: false,
+
     [EPathType.EPathTypeExternalDataSource]: false,
     [EPathType.EPathTypeExternalTable]: false,
+
+    [EPathType.EPathTypeView]: false,
 };
 
 export const isColumnEntityType = (type?: EPathType) => (type && pathTypeToIsColumn[type]) ?? false;
@@ -158,8 +168,11 @@ const pathTypeToIsDatabase: Record<EPathType, boolean> = {
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeCdcStream]: false,
     [EPathType.EPathTypePersQueueGroup]: false,
+
     [EPathType.EPathTypeExternalDataSource]: false,
     [EPathType.EPathTypeExternalTable]: false,
+
+    [EPathType.EPathTypeView]: false,
 };
 
 export const isDatabaseEntityType = (type?: EPathType) =>
@@ -183,8 +196,11 @@ const pathTypeToEntityWithMergedImplementation: Record<EPathType, boolean> = {
     [EPathType.EPathTypeSubDomain]: false,
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeExtSubDomain]: false,
+
     [EPathType.EPathTypeExternalDataSource]: false,
     [EPathType.EPathTypeExternalTable]: false,
+
+    [EPathType.EPathTypeView]: false,
 };
 
 export const isEntityWithMergedImplementation = (type?: EPathType) =>
@@ -206,6 +222,8 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
 
     [EPathType.EPathTypeExternalDataSource]: true,
     [EPathType.EPathTypeExternalTable]: true,
+
+    [EPathType.EPathTypeView]: true,
 
     [EPathType.EPathTypeInvalid]: false,
     [EPathType.EPathTypeColumnStore]: false,
@@ -237,6 +255,8 @@ const mapPathTypeToIsWithTopic: Record<EPathType, boolean> = {
 
     [EPathType.EPathTypeExternalDataSource]: false,
     [EPathType.EPathTypeExternalTable]: false,
+
+    [EPathType.EPathTypeView]: false,
 };
 
 export const isPathTypeWithTopic = (type?: EPathType) =>
@@ -244,5 +264,6 @@ export const isPathTypeWithTopic = (type?: EPathType) =>
 
 // ====================
 
-export const isExternalTable = (type?: EPathType) => type === EPathType.EPathTypeExternalTable;
-export const isRowTable = (type?: EPathType) => type === EPathType.EPathTypeTable;
+export const isExternalTableType = (type?: EPathType) => type === EPathType.EPathTypeExternalTable;
+export const isRowTableType = (type?: EPathType) => type === EPathType.EPathTypeTable;
+export const isViewType = (type?: EPathType) => type === EPathType.EPathTypeView;

@@ -60,6 +60,8 @@ export const getControls =
 
             external_table: openPreview,
             external_data_source: undefined,
+
+            view: openPreview,
         };
 
         return nodeTypeToControls[type];

@@ -10,15 +10,16 @@
 
   "actions.copied": "The path is copied to the clipboard",
   "actions.notCopied": "Couldn’t copy the path",
-  "actions.externalTableSelectUnavailable": "Select query for external tables available only with 'YQL - QueryService' query mode. You need to turn in additional query modes in settings to enable it",
 
   "actions.copyPath": "Copy path",
   "actions.openPreview": "Open preview",
   "actions.createTable": "Create table...",
   "actions.createExternalTable": "Create external table...",
   "actions.createTopic": "Create topic...",
+  "actions.createView": "Create view...",
   "actions.dropTable": "Drop table...",
   "actions.dropTopic": "Drop topic...",
+  "actions.dropView": "Drop view...",
   "actions.alterTable": "Alter table...",
   "actions.alterTopic": "Alter topic...",
   "actions.selectQuery": "Select query...",

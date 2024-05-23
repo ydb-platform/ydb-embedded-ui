@@ -111,3 +111,11 @@ ALTER TOPIC \`${path}\`
 export const dropTopicTemplate = (path: string) => {
     return `DROP TOPIC \`${path}\`;`;
 };
+
+export const createViewTemplate = (path: string) => {
+    return `CREATE VIEW \`${path}/my_view\` WITH (security_invoker = TRUE) AS SELECT 1;`;
+};
+
+export const dropViewTemplate = (path: string) => {
+    return `DROP VIEW \`${path}\`;`;
+};

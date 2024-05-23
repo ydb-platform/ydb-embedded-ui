@@ -44,7 +44,7 @@ import {
     PaneVisibilityToggleButtons,
     paneVisibilityToggleReducerCreator,
 } from '../utils/paneVisibilityToggleHelpers';
-import {isIndexTable, isTableType} from '../utils/schema';
+import {isIndexTableType, isTableType, isViewType} from '../utils/schema';
 
 import './ObjectSummary.scss';
 
@@ -103,7 +103,8 @@ export function ObjectSummary({
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
     React.useEffect(() => {
-        const isTable = isTableType(type);
+        // TODO: enable schema tab for view when supported
+        const isTable = isTableType(type) && !isViewType(type);
 
         if (type && !isTable && !TENANT_INFO_TABS.find((el) => el.id === summaryTab)) {
             dispatch(setSummaryTab(TENANT_SUMMARY_TABS_IDS.overview));
@@ -111,7 +112,8 @@ export function ObjectSummary({
     }, [dispatch, type, summaryTab]);
 
     const renderTabs = () => {
-        const isTable = isTableType(type);
+        // TODO: enable schema tab for view when supported
+        const isTable = isTableType(type) && !isViewType(type);
         const tabsItems = isTable ? [...TENANT_INFO_TABS, ...TENANT_SCHEMA_TAB] : TENANT_INFO_TABS;
 
         return (
@@ -160,6 +162,7 @@ export function ObjectSummary({
             [EPathType.EPathTypeExternalDataSource]: () => (
                 <ExternalDataSourceSummary data={currentObjectData} />
             ),
+            [EPathType.EPathTypeView]: undefined,
         };
 
         let component =
@@ -239,7 +242,7 @@ export function ObjectSummary({
     };
 
     const renderCommonInfoControls = () => {
-        const showPreview = isTableType(type) && !isIndexTable(subType);
+        const showPreview = isTableType(type) && !isIndexTableType(subType);
         return (
             <React.Fragment>
                 {showPreview && (
