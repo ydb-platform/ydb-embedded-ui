@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.2.2...v6.3.0) (2024-05-24)
+
+
+### Features
+
+* add view to schema ([#834](https://github.com/ydb-platform/ydb-embedded-ui/issues/834)) ([fbeea1a](https://github.com/ydb-platform/ydb-embedded-ui/commit/fbeea1afab22803b6df87fe996b67e3c4e6ba94d))
+
+
+### Bug Fixes
+
+* @gravity-ui/components -&gt; 3.4.1 ([#845](https://github.com/ydb-platform/ydb-embedded-ui/issues/845)) ([96299d4](https://github.com/ydb-platform/ydb-embedded-ui/commit/96299d4e70281b3535f9d8d8a6ef82c89a257230))
+
 ## [6.2.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.2.1...v6.2.2) (2024-05-23)
 
 
