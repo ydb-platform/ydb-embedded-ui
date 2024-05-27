@@ -27,8 +27,9 @@ Open http://localhost:8765 to view it in the browser.
       -e MON_PORT=8765 \
       cr.yandex/yc/yandex-docker-local-ydb:latest
    ```
-2. Run the frontend app in the development mode, via invoking `npm run dev`
-3. Open [localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.\
+2. Install dependencies with `npm ci`
+3. Run the frontend app in the development mode, via invoking `npm run dev`
+4. Open [localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.\
    You will also see any lint errors in the console.
 
 For API reference, open Swagger UI on http://localhost:8765/viewer/api/.
@@ -43,26 +44,45 @@ To test new features, you can use ydb version that is currently in testing mode 
 or use a build from `main` brunch with `ghcr.io/ydb-platform/local-ydb:trunk` image.
 Also you can set specific version like `cr.yandex/yc/yandex-docker-local-ydb:23.1`
 
-### Custom backend in dev mode
+### Custom configuration in dev mode with .env file
 
-YDB docker represents a single node cluster with only one version, small amount of storage groups, PDisks and VDisks. It may be not enough for development purposes. If you have your own development cluster with sufficient amount of entities, you can run the app in the dev mode with this cluster as backend. To do it, set you host to `REACT_APP_BACKEND` variable in `dev` script. For example:
+You can run the app with your own params by adding `.env` file to project root. There is an example in `.env.example`.
 
-```
-"dev": "DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND=http://your-cluster-host:8765 npm start"
-```
+1. Add `.env` file to project root by copying example
 
-### Meta backend in dev mode (multi cluster)
-
-If you have meta backend, you can run the app in dev mode with this backend like this:
-
-```
-DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND= REACT_APP_META_BACKEND=http://your-meta-host:8765 npm start
+```shell script
+cp .env.example .env
 ```
 
-if you need to connect to the meta backend from a server then run the app like this:
+2. Set your own set of params in `.env`
+3. Run `npm run start`. Your custom params from `.env` file will be applied
+
+#### Custom backend in dev mode
+
+YDB docker represents a single node cluster with only one version, small amount of storage groups, PDisks and VDisks. It may be not enough for development purposes. If you have your own development cluster with sufficient amount of entities, you can run the app in the dev mode with this cluster as backend. To do it, alter `REACT_APP_BACKEND` param in your `.env` file:
 
 ```
-DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND= REACT_APP_META_BACKEND= META_YDB_BACKEND=http://your-meta-host:8765 npm start
+REACT_APP_BACKEND=http://your-cluster-host:8765
+REACT_APP_META_BACKEND=undefined
+META_YDB_BACKEND=undefined
+```
+
+#### Meta backend in dev mode (multi cluster)
+
+If you have meta backend for multi cluster version, you can run the app in dev mode with this backend by setting `REACT_APP_META_BACKEND` param in `.env`:
+
+```
+REACT_APP_BACKEND=undefined
+REACT_APP_META_BACKEND=http://your-meta-host:8765
+META_YDB_BACKEND=undefined
+```
+
+If you need to connect to the meta backend from a server, you need to set `META_YDB_BACKEND` param in `.env`:
+
+```
+REACT_APP_BACKEND=undefined
+REACT_APP_META_BACKEND=undefined
+META_YDB_BACKEND=http://your-meta-host:8765
 ```
 
 ## E2E Tests
@@ -96,9 +116,10 @@ The build is minified and the filenames include the hashes.
 
 To test production bundle with latest YDB backend release, do the following:
 
-1. Build a production bundle with a few tweaks for embedded version: `npm run build:embedded`.
-2. Invoke `docker run -it --hostname localhost -dp 2135:2135 -p 8765:8765 -v ~/projects/ydb-embedded-ui/build:/ydb_data/node_1/contentmonitoring cr.yandex/yc/yandex-docker-local-ydb:latest`
-3. Open [embedded YDB UI](http://localhost:8765/monitoring) to view it in the browser.
+1. Install dependencies with `npm ci`
+2. Build a production bundle with a few tweaks for embedded version: `npm run build:embedded`.
+3. Invoke `docker run -it --hostname localhost -dp 2135:2135 -p 8765:8765 -v ~/projects/ydb-embedded-ui/build:/ydb_data/node_1/contentmonitoring cr.yandex/yc/yandex-docker-local-ydb:latest`
+4. Open [embedded YDB UI](http://localhost:8765/monitoring) to view it in the browser.
 
 ### Testing production bundle with specific cluster host
 
@@ -106,8 +127,9 @@ If you want to test embedded version in production mode, but YDB docker is not e
 
 It also could be usefull for development purposes, because some operations, that are not 'read-only', like some update queries or tablets restart could be allowed by CORS only for the same origin and so could not be executed in dev mode.
 
-1. Create production bundle with `npm run build:embedded`
-2. Copy your build files from `build` folder to `/contentmonitoring` folder on desired cluster host
-3. Open `http://your-cluster-host:8765/monitoring` to see updated UI
+1. Install dependencies with `npm ci`
+2. Create production bundle with `npm run build:embedded`
+3. Copy your build files from `build` folder to `/contentmonitoring` folder on desired cluster host
+4. Open `http://your-cluster-host:8765/monitoring` to see updated UI
 
 It's assumed, that you have all the necessary access rights to update files on the host.
