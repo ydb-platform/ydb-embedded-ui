@@ -6,6 +6,7 @@ on:
 
 jobs:
   commitlint:
+    name: Commit Naming
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,7 +18,8 @@ jobs:
       - run: npm ci
       - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
-  typecheck:
+  verify_files:
+    name: Verify Files
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,11 +28,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: npm
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
+      - run: npm run build:embedded # check that build works
 
   unit_tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +48,7 @@ jobs:
       - run: npm test
 
   e2e_tests:
+    name: Playwright Tests
     runs-on: ubuntu-latest
 
     services:
@@ -60,6 +66,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
