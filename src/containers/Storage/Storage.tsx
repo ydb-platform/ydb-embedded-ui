@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {useHistory, useLocation} from 'react-router';
+
 import {AccessDenied} from '../../components/Errors/403';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
@@ -10,20 +12,9 @@ import {
     filterGroups,
     filterNodes,
     getUsageFilterOptions,
-    selectGroupsSortParams,
-    selectNodesSortParams,
 } from '../../store/reducers/storage/selectors';
-import {
-    setGroupsSortParams,
-    setInitialState,
-    setNodesSortParams,
-    setStorageTextFilter,
-    setStorageType,
-    setUptimeFilter,
-    setUsageFilter,
-    setVisibleEntities,
-    storageApi,
-} from '../../store/reducers/storage/storage';
+import {storageApi} from '../../store/reducers/storage/storage';
+import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
 import type {
     StorageSortParams,
     StorageType,
@@ -35,15 +26,15 @@ import {
     useNodesRequestParams,
     useStorageRequestParams,
     useTableSort,
-    useTypedDispatch,
     useTypedSelector,
 } from '../../utils/hooks';
-import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
 import {StorageControls} from './StorageControls/StorageControls';
 import {StorageGroups} from './StorageGroups/StorageGroups';
 import {StorageNodes} from './StorageNodes/StorageNodes';
 import {b} from './shared';
+import {defaultSortNode, getDefaultSortGroup} from './utils';
 
 import './Storage.scss';
 
@@ -54,20 +45,29 @@ interface StorageProps {
 }
 
 export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) => {
-    const dispatch = useTypedDispatch();
-
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const {
-        type,
-        visible: visibleEntities,
-        filter,
-        usageFilter,
-        uptimeFilter,
-    } = useTypedSelector((state) => state.storage);
+    const location = useLocation();
+    const history = useHistory();
+    const queryParams = new URLSearchParams(location.search);
+    const type = storageTypeSchema.parse(queryParams.get('type'));
+    const visibleEntities = visibleEntitiesSchema.parse(queryParams.get('visible'));
+    const filter = queryParams.get('search') ?? '';
+    const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.get('uptimeFilter'));
+    const usageFilter = queryParams.getAll('usageFilter');
 
     const nodesMap = useTypedSelector(selectNodesMap);
-    const nodesSortParams = useTypedSelector(selectNodesSortParams);
-    const groupsSortParams = useTypedSelector(selectGroupsSortParams);
+
+    const [nodeSort, setNodeSort] = React.useState<NodesSortParams>({
+        sortOrder: undefined,
+        sortValue: undefined,
+    });
+    const nodesSortParams = nodeSort.sortValue ? nodeSort : defaultSortNode; // useTypedSelector(selectNodesSortParams);
+
+    const [groupSort, setGroupSort] = React.useState<StorageSortParams>({
+        sortOrder: undefined,
+        sortValue: undefined,
+    });
+    const groupsSortParams = groupSort.sortOrder ? groupSort : getDefaultSortGroup(visibleEntities);
 
     // Do not display Nodes table for Node page (NodeId present)
     const isNodePage = nodeId !== undefined;
@@ -120,38 +120,43 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
 
     const usageFilterOptions = React.useMemo(() => getUsageFilterOptions(groups), [groups]);
 
-    React.useEffect(() => {
-        return () => {
-            // Clean data on component unmount
-            dispatch(setInitialState());
-        };
-    }, [dispatch]);
-
     const [nodesSort, handleNodesSort] = useTableSort(nodesSortParams, (params) =>
-        dispatch(setNodesSortParams(params as NodesSortParams)),
+        setNodeSort(params as NodesSortParams),
     );
     const [groupsSort, handleGroupsSort] = useTableSort(groupsSortParams, (params) =>
-        dispatch(setGroupsSortParams(params as StorageSortParams)),
+        setGroupSort(params as StorageSortParams),
     );
 
     const handleUsageFilterChange = (value: string[]) => {
-        dispatch(setUsageFilter(value));
+        queryParams.delete('usageFilter');
+        for (const item of value) {
+            queryParams.append('usageFilter', item);
+        }
+        history.push({search: queryParams.toString()});
     };
 
     const handleTextFilterChange = (value: string) => {
-        dispatch(setStorageTextFilter(value));
+        if (value) {
+            queryParams.set('search', value);
+        } else {
+            queryParams.delete('search');
+        }
+        history.push({search: queryParams.toString()});
     };
 
     const handleGroupVisibilityChange = (value: VisibleEntities) => {
-        dispatch(setVisibleEntities(value));
+        queryParams.set('visible', value);
+        history.push({search: queryParams.toString()});
     };
 
     const handleStorageTypeChange = (value: StorageType) => {
-        dispatch(setStorageType(value));
+        queryParams.set('type', value);
+        history.push({search: queryParams.toString()});
     };
 
     const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
-        dispatch(setUptimeFilter(value));
+        queryParams.set('uptimeFilter', value);
+        history.push({search: queryParams.toString()});
     };
 
     const handleShowAllNodes = () => {

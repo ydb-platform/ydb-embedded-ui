@@ -7,7 +7,7 @@ import type {
 import type {EFlag} from '../../../types/api/enums';
 import type {TEndpoint, TPoolStats} from '../../../types/api/nodes';
 import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
-import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
+import type {NodesSortValue} from '../../../utils/nodes';
 import type {VisibleEntities} from '../storage/types';
 
 // Since nodes from different endpoints can have different types,
@@ -40,21 +40,14 @@ export interface NodesPreparedEntity {
     TotalSessions?: number;
 }
 
-export interface NodesState {
-    uptimeFilter: NodesUptimeFilterValues;
-    searchValue: string;
-    sortValue?: NodesSortValue;
-    sortOrder?: OrderType;
-}
-
 export type NodeType = 'static' | 'dynamic' | 'any';
 
 export interface NodesSortParams {
-    sortOrder?: OrderType;
-    sortValue?: NodesSortValue;
+    sortOrder: OrderType | undefined;
+    sortValue: NodesSortValue | undefined;
 }
 
-export interface NodesGeneralRequestParams extends NodesSortParams {
+export interface NodesGeneralRequestParams extends Partial<NodesSortParams> {
     filter?: string; // NodeId or Host
     uptime?: number; // return nodes with less uptime in seconds
     problems_only?: boolean; // return nodes with SystemState !== EFlag.Green
@@ -82,8 +75,4 @@ export interface NodesHandledResponse {
     Nodes?: NodesPreparedEntity[];
     TotalNodes: number;
     FoundNodes?: number;
-}
-
-export interface NodesStateSlice {
-    nodes: NodesState;
 }

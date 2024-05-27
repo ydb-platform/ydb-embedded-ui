@@ -1,3 +1,5 @@
+import {z} from 'zod';
+
 import type {NodesPreparedEntity} from '../store/reducers/nodes/types';
 import {ProblemFilterValues} from '../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../store/reducers/settings/types';
@@ -14,6 +16,10 @@ export enum NodesUptimeFilterValues {
     'All' = 'All',
     'SmallUptime' = 'SmallUptime',
 }
+
+export const nodesUptimeFilterValuesSchema = z
+    .nativeEnum(NodesUptimeFilterValues)
+    .catch(NodesUptimeFilterValues.All);
 
 export const NodesUptimeFilterTitles = {
     [NodesUptimeFilterValues.All]: 'All',

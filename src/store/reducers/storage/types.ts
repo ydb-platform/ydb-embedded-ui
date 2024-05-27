@@ -1,16 +1,17 @@
 import type {OrderType} from '@gravity-ui/react-data-table';
+import {z} from 'zod';
 
 import type {TSystemStateInfo} from '../../../types/api/nodes';
 import type {EVersion, TStorageGroupInfo} from '../../../types/api/storage';
-import type {ValueOf} from '../../../types/common';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
-import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {StorageSortValue} from '../../../utils/storage';
 
-import type {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
+import {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
 
-export type VisibleEntities = ValueOf<typeof VISIBLE_ENTITIES>;
-export type StorageType = ValueOf<typeof STORAGE_TYPES>;
+export const visibleEntitiesSchema = z.nativeEnum(VISIBLE_ENTITIES).catch(VISIBLE_ENTITIES.all);
+export type VisibleEntities = z.infer<typeof visibleEntitiesSchema>;
+export const storageTypeSchema = z.nativeEnum(STORAGE_TYPES).catch(STORAGE_TYPES.groups);
+export type StorageType = z.infer<typeof storageTypeSchema>;
 
 export interface PreparedStorageNode extends TSystemStateInfo {
     NodeId: number;
@@ -46,11 +47,11 @@ export interface UsageFilter {
 }
 
 export interface StorageSortParams {
-    sortOrder?: OrderType;
-    sortValue?: StorageSortValue;
+    sortOrder: OrderType | undefined;
+    sortValue: StorageSortValue | undefined;
 }
 
-export interface StorageSortAndFilterParams extends StorageSortParams {
+export interface StorageSortAndFilterParams extends Partial<StorageSortParams> {
     filter?: string; // PoolName or GroupId
 
     offset?: number;
@@ -67,25 +68,9 @@ export interface StorageApiRequestParams extends StorageSortAndFilterParams {
     version?: EVersion;
 }
 
-export interface StorageState {
-    filter: string;
-    usageFilter: string[];
-    visible: VisibleEntities;
-    uptimeFilter: NodesUptimeFilterValues;
-    groupsSortValue?: StorageSortValue;
-    groupsSortOrder?: OrderType;
-    nodesSortValue?: NodesSortValue;
-    nodesSortOrder?: OrderType;
-    type: StorageType;
-}
-
 export interface PreparedStorageResponse {
     nodes?: PreparedStorageNode[];
     groups?: PreparedStorageGroup[];
     found: number | undefined;
     total: number | undefined;
-}
-
-export interface StorageStateSlice {
-    storage: StorageState;
 }
