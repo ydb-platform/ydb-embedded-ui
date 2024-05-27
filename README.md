@@ -46,7 +46,7 @@ Also you can set specific version like `cr.yandex/yc/yandex-docker-local-ydb:23.
 
 ### Custom configuration in dev mode with .env file
 
-You can run the app with your own params by adding `.env` file to project root.
+You can run the app with your own params by adding `.env` file to project root. There is an example in `.env.example`.
 
 1. Add `.env` file to project root.
 
@@ -65,8 +65,6 @@ META_YDB_BACKEND=undefined
 YDB docker represents a single node cluster with only one version, small amount of storage groups, PDisks and VDisks. It may be not enough for development purposes. If you have your own development cluster with sufficient amount of entities, you can run the app in the dev mode with this cluster as backend. To do it, alter `REACT_APP_BACKEND` param in your `.env` file:
 
 ```
-DISABLE_ESLINT_PLUGIN=true
-TSC_COMPILE_ON_ERROR=true
 REACT_APP_BACKEND=http://your-cluster-host:8765
 REACT_APP_META_BACKEND=undefined
 META_YDB_BACKEND=undefined
@@ -77,18 +75,14 @@ META_YDB_BACKEND=undefined
 If you have meta backend for multi cluster version, you can run the app in dev mode with this backend by setting `REACT_APP_META_BACKEND` param in `.env`:
 
 ```
-DISABLE_ESLINT_PLUGIN=true
-TSC_COMPILE_ON_ERROR=true
 REACT_APP_BACKEND=undefined
 REACT_APP_META_BACKEND=http://your-meta-host:8765
 META_YDB_BACKEND=undefined
 ```
 
-If you need to connect to the meta backend from a server, you need to set `META_YDB_BACKEND ` param in `.env`:
+If you need to connect to the meta backend from a server, you need to set `META_YDB_BACKEND` param in `.env`:
 
 ```
-DISABLE_ESLINT_PLUGIN=true
-TSC_COMPILE_ON_ERROR=true
 REACT_APP_BACKEND=undefined
 REACT_APP_META_BACKEND=undefined
 META_YDB_BACKEND=http://your-meta-host:8765
