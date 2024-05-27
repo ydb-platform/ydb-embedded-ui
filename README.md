@@ -48,17 +48,14 @@ Also you can set specific version like `cr.yandex/yc/yandex-docker-local-ydb:23.
 
 You can run the app with your own params by adding `.env` file to project root. There is an example in `.env.example`.
 
-1. Add `.env` file to project root.
+1. Add `.env` file to project root by copying example
 
-```
-DISABLE_ESLINT_PLUGIN=true
-TSC_COMPILE_ON_ERROR=true
-REACT_APP_BACKEND=http://localhost:8765
-REACT_APP_META_BACKEND=undefined
-META_YDB_BACKEND=undefined
+```shell script
+cp .env.example .env
 ```
 
-2. Run `npm run start`. Your custom params from `.env` file will be applied
+2. Set your own set of params in `.env`
+3. Run `npm run start`. Your custom params from `.env` file will be applied
 
 #### Custom backend in dev mode
 
