@@ -7,8 +7,8 @@ import {ButtonWithConfirmDialog} from '../../../../components/ButtonWithConfirmD
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {InternalLink} from '../../../../components/InternalLink';
-import {Loader} from '../../../../components/Loader';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import routes, {createHref} from '../../../../routes';
 import {selectTabletsWithFqdn, tabletsApi} from '../../../../store/reducers/tablets';
 import {ETabletState} from '../../../../types/api/tablet';
@@ -100,6 +100,7 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
             return calcUptime(row.ChangeTime);
         },
         sortAccessor: (row) => -Number(row.ChangeTime),
+        align: 'right',
     },
     {
         name: 'Actions',
@@ -152,7 +153,7 @@ export function Tablets({path, className}: TabletsProps) {
     const tablets = useTypedSelector((state) => selectTabletsWithFqdn(state, path || ''));
 
     if (loading) {
-        return <Loader />;
+        return <TableSkeleton />;
     }
     if (error) {
         return <ResponseError error={error} />;

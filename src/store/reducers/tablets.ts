@@ -54,7 +54,7 @@ const getTabletsInfoSelector = createSelector(
 const selectGetTabletsInfo = createSelector(
     (state: RootState) => state,
     (_state: RootState, path: string) => getTabletsInfoSelector(path),
-    (state, selectGetNodeStructure) => selectGetNodeStructure(state).data,
+    (state, selectTabletsInfo) => selectTabletsInfo(state).data,
 );
 
 export const selectTabletsWithFqdn = createSelector(
@@ -65,7 +65,7 @@ export const selectTabletsWithFqdn = createSelector(
             return [];
         }
         if (!nodesMap) {
-            return data as any;
+            return data.TabletStateInfo;
         }
         return data.TabletStateInfo.map((tablet) => {
             const fqdn = tablet.NodeId === undefined ? undefined : nodesMap.get(tablet.NodeId);
