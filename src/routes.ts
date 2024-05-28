@@ -50,20 +50,10 @@ const prepareRoute = (route: string) => {
     return preparedRoute;
 };
 
-export type Query = Record<string | number, string | number | string[] | number[] | undefined>;
-
-export function enrichQueryParams(queryParams: URLSearchParams) {
-    const enrichedQueryParams = new URLSearchParams(queryParams);
-    if (backend && webVersion && !queryParams.get('backend')) {
-        enrichedQueryParams.set('backend', backend);
-    }
-
-    if (clusterName && webVersion && !queryParams.get('clusterName')) {
-        enrichedQueryParams.set('clusterName', clusterName);
-    }
-
-    return enrichedQueryParams;
-}
+export type Query = Record<
+    string | number,
+    string | number | string[] | number[] | undefined | null
+>;
 
 export function createHref(
     route: string,

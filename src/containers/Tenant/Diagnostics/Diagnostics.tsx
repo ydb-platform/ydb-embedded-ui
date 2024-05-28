@@ -2,11 +2,11 @@ import React from 'react';
 
 import {Tabs} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
-import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {Loader} from '../../../components/Loader';
-import {enrichQueryParams} from '../../../routes';
+import routes, {createHref} from '../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
@@ -43,8 +43,6 @@ interface DiagnosticsProps {
 
 const b = cn('kv-tenant-diagnostics');
 
-const pagesQueryParams = ['search', 'uptimeFilter', 'usageFilter', 'type', 'visible'];
-
 function Diagnostics(props: DiagnosticsProps) {
     const container = React.useRef<HTMLDivElement>(null);
 
@@ -54,14 +52,13 @@ function Diagnostics(props: DiagnosticsProps) {
         (state) => state.tenant,
     );
 
-    const location = useLocation();
+    const [queryParams] = useQueryParams({
+        name: StringParam,
+        backend: StringParam,
+        clusterName: StringParam,
+    });
 
-    const queryParams = new URLSearchParams(location.search);
-    for (const key of pagesQueryParams) {
-        queryParams.delete(key);
-    }
-
-    const rootTenantName = queryParams.get('name');
+    const rootTenantName = queryParams.name;
     const tenantName = isDatabaseEntityType(props.type) ? currentSchemaPath : rootTenantName;
     const isDatabase = isDatabaseEntityType(props.type) || currentSchemaPath === rootTenantName;
 
@@ -167,14 +164,13 @@ function Diagnostics(props: DiagnosticsProps) {
                         items={pages}
                         activeTab={activeTab?.id as string}
                         wrapTo={({id}, node) => {
-                            const q = enrichQueryParams(queryParams);
-                            q.set(TenantTabsGroups.diagnosticsTab, id);
+                            const href = createHref(
+                                routes.tenant,
+                                {activeTab: id},
+                                {...queryParams, [TenantTabsGroups.diagnosticsTab]: id},
+                            );
                             return (
-                                <Link
-                                    to={{...location, search: q.toString()}}
-                                    key={id}
-                                    className={b('tab')}
-                                >
+                                <Link to={href} key={id} className={b('tab')}>
                                     {node}
                                 </Link>
                             );

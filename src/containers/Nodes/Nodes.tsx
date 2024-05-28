@@ -2,7 +2,7 @@ import React from 'react';
 
 import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 import {skipToken} from '@reduxjs/toolkit/query';
-import {useHistory, useLocation} from 'react-router';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {AccessDenied} from '../../components/Errors/403';
@@ -46,12 +46,12 @@ interface NodesProps {
 }
 
 export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
-    const location = useLocation();
-    const history = useHistory();
-
-    const queryParams = new URLSearchParams(location.search);
-    const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.get('uptimeFilter'));
-    const searchValue = queryParams.get('search') ?? '';
+    const [queryParams, setQueryParams] = useQueryParams({
+        uptimeFilter: StringParam,
+        search: StringParam,
+    });
+    const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
+    const searchValue = queryParams.search ?? '';
 
     const dispatch = useTypedDispatch();
 
@@ -83,12 +83,7 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
     });
 
     const handleSearchQueryChange = (value: string) => {
-        if (value) {
-            queryParams.set('search', value);
-        } else {
-            queryParams.delete('search');
-        }
-        history.push({search: queryParams.toString()});
+        setQueryParams({search: value || undefined}, 'replaceIn');
     };
 
     const handleProblemFilterChange = (value: ProblemFilterValue) => {
@@ -96,8 +91,7 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
     };
 
     const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
-        queryParams.set('uptimeFilter', value);
-        history.push({search: queryParams.toString()});
+        setQueryParams({uptimeFilter: value}, 'replaceIn');
     };
 
     const nodes = React.useMemo(() => {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {useHistory, useLocation} from 'react-router';
+import {ArrayParam, StringParam, useQueryParams, withDefault} from 'use-query-params';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -38,6 +38,23 @@ import {defaultSortNode, getDefaultSortGroup} from './utils';
 
 import './Storage.scss';
 
+const UsageFilterParam = withDefault(
+    {
+        encode: ArrayParam.encode,
+        decode: (input) => {
+            if (input === null || input === undefined) {
+                return input;
+            }
+
+            if (!Array.isArray(input)) {
+                return input ? [input] : [];
+            }
+            return input.filter(Boolean) as string[];
+        },
+    },
+    [],
+);
+
 interface StorageProps {
     additionalNodesProps?: AdditionalNodesProps;
     tenant?: string;
@@ -46,14 +63,18 @@ interface StorageProps {
 
 export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) => {
     const {autorefresh} = useTypedSelector((state) => state.schema);
-    const location = useLocation();
-    const history = useHistory();
-    const queryParams = new URLSearchParams(location.search);
-    const type = storageTypeSchema.parse(queryParams.get('type'));
-    const visibleEntities = visibleEntitiesSchema.parse(queryParams.get('visible'));
-    const filter = queryParams.get('search') ?? '';
-    const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.get('uptimeFilter'));
-    const usageFilter = queryParams.getAll('usageFilter');
+    const [queryParams, setQueryParams] = useQueryParams({
+        type: StringParam,
+        visible: StringParam,
+        search: StringParam,
+        uptimeFilter: StringParam,
+        usageFilter: UsageFilterParam,
+    });
+    const type = storageTypeSchema.parse(queryParams.type);
+    const visibleEntities = visibleEntitiesSchema.parse(queryParams.visible);
+    const filter = queryParams.search ?? '';
+    const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
+    const usageFilter = queryParams.usageFilter;
 
     const nodesMap = useTypedSelector(selectNodesMap);
 
@@ -61,7 +82,7 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
         sortOrder: undefined,
         sortValue: undefined,
     });
-    const nodesSortParams = nodeSort.sortValue ? nodeSort : defaultSortNode; // useTypedSelector(selectNodesSortParams);
+    const nodesSortParams = nodeSort.sortValue ? nodeSort : defaultSortNode;
 
     const [groupSort, setGroupSort] = React.useState<StorageSortParams>({
         sortOrder: undefined,
@@ -128,35 +149,23 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
     );
 
     const handleUsageFilterChange = (value: string[]) => {
-        queryParams.delete('usageFilter');
-        for (const item of value) {
-            queryParams.append('usageFilter', item);
-        }
-        history.push({search: queryParams.toString()});
+        setQueryParams({usageFilter: value.length ? value : undefined}, 'replaceIn');
     };
 
     const handleTextFilterChange = (value: string) => {
-        if (value) {
-            queryParams.set('search', value);
-        } else {
-            queryParams.delete('search');
-        }
-        history.push({search: queryParams.toString()});
+        setQueryParams({search: value || undefined}, 'replaceIn');
     };
 
     const handleGroupVisibilityChange = (value: VisibleEntities) => {
-        queryParams.set('visible', value);
-        history.push({search: queryParams.toString()});
+        setQueryParams({visible: value}, 'replaceIn');
     };
 
     const handleStorageTypeChange = (value: StorageType) => {
-        queryParams.set('type', value);
-        history.push({search: queryParams.toString()});
+        setQueryParams({type: value}, 'replaceIn');
     };
 
     const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
-        queryParams.set('uptimeFilter', value);
-        history.push({search: queryParams.toString()});
+        setQueryParams({uptimeFilter: value}, 'replaceIn');
     };
 
     const handleShowAllNodes = () => {
