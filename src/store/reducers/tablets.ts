@@ -1,10 +1,12 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import type {ETabletState, EType} from '../../types/api/tablet';
+import type {ETabletState, EType, TTabletStateInfo} from '../../types/api/tablet';
 import type {TabletsApiRequestParams, TabletsState} from '../../types/store/tablets';
+import type {RootState} from '../defaultStore';
 
 import {api} from './api';
+import {selectNodesMap} from './nodesList';
 
 const initialState: TabletsState = {
     stateFilter: [],
@@ -43,3 +45,31 @@ export const tabletsApi = api.injectEndpoints({
     }),
     overrideExisting: 'throw',
 });
+
+const getTabletsInfoSelector = createSelector(
+    (path: string) => path,
+    (path) => tabletsApi.endpoints.getTabletsInfo.select({path}),
+);
+
+const selectGetTabletsInfo = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, path: string) => getTabletsInfoSelector(path),
+    (state, selectGetNodeStructure) => selectGetNodeStructure(state).data,
+);
+
+export const selectTabletsWithFqdn = createSelector(
+    (state: RootState, path: string) => selectGetTabletsInfo(state, path),
+    (state: RootState) => selectNodesMap(state),
+    (data, nodesMap): (TTabletStateInfo & {fqdn?: string})[] => {
+        if (!data?.TabletStateInfo) {
+            return [];
+        }
+        if (!nodesMap) {
+            return data as any;
+        }
+        return data.TabletStateInfo.map((tablet) => {
+            const fqdn = tablet.NodeId === undefined ? undefined : nodesMap.get(tablet.NodeId);
+            return {...tablet, fqdn};
+        });
+    },
+);

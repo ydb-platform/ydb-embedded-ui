@@ -1,3 +1,5 @@
+import type {LabelProps} from '@gravity-ui/uikit';
+
 import {EFlag} from '../types/api/enums';
 import {ETabletState} from '../types/api/tablet';
 
@@ -52,3 +54,18 @@ export const mapTabletStateToColorState = (state?: ETabletState | EFlag): EFlag 
 
     return tabletStateToColorState[state];
 };
+
+export function mapTabletStateToLabelTheme(state?: ETabletState): LabelProps['theme'] {
+    if (!state) {
+        return 'unknown';
+    }
+    switch (state) {
+        case ETabletState.Dead:
+            return 'danger';
+        case ETabletState.Active:
+        case ETabletState.Deleted:
+            return 'success';
+        default:
+            return 'warning';
+    }
+}

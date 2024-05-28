@@ -1,0 +1,171 @@
+import {ArrowsRotateRight} from '@gravity-ui/icons';
+import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
+import {Icon, Label, Text} from '@gravity-ui/uikit';
+import {skipToken} from '@reduxjs/toolkit/query';
+
+import {ButtonWithConfirmDialog} from '../../../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {InternalLink} from '../../../../components/InternalLink';
+import {Loader} from '../../../../components/Loader';
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import routes, {createHref} from '../../../../routes';
+import {selectTabletsWithFqdn, tabletsApi} from '../../../../store/reducers/tablets';
+import {ETabletState} from '../../../../types/api/tablet';
+import type {TTabletStateInfo} from '../../../../types/api/tablet';
+import type {TabletsApiRequestParams} from '../../../../types/store/tablets';
+import {cn} from '../../../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {calcUptime} from '../../../../utils/dataFormatters/dataFormatters';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {mapTabletStateToLabelTheme} from '../../../../utils/tablet';
+import {getDefaultNodePath} from '../../../Node/NodePages';
+
+import i18n from './i18n';
+
+const b = cn('tablets-table');
+
+const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
+    {
+        name: 'Type',
+        get header() {
+            return i18n('Type');
+        },
+        render: ({row}) => {
+            return (
+                <span>
+                    {row.Type} {row.Leader ? <Text color="secondary">leader</Text> : ''}
+                </span>
+            );
+        },
+    },
+    {
+        name: 'TabletId',
+        get header() {
+            return i18n('Tablet');
+        },
+        render: ({row}) => {
+            const tabletPath =
+                row.TabletId &&
+                createHref(routes.tablet, {id: row.TabletId}, {nodeId: row.NodeId, type: row.Type});
+
+            return <InternalLink to={tabletPath}>{row.TabletId}</InternalLink>;
+        },
+    },
+    {
+        name: 'State',
+        get header() {
+            return i18n('State');
+        },
+        render: ({row}) => {
+            return <Label theme={mapTabletStateToLabelTheme(row.State)}>{row.State}</Label>;
+        },
+    },
+    {
+        name: 'NodeId',
+        get header() {
+            return i18n('Node ID');
+        },
+        render: ({row}) => {
+            const nodePath = row.NodeId === undefined ? undefined : getDefaultNodePath(row.NodeId);
+            return <InternalLink to={nodePath}>{row.NodeId}</InternalLink>;
+        },
+        align: 'right',
+    },
+    {
+        name: 'FQDN',
+        get header() {
+            return i18n('Node FQDN');
+        },
+        render: ({row}) => {
+            if (!row.fqdn) {
+                return <span>—</span>;
+            }
+            return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
+        },
+    },
+    {
+        name: 'Generation',
+        get header() {
+            return i18n('Generation');
+        },
+        align: 'right',
+    },
+    {
+        name: 'Uptime',
+        get header() {
+            return i18n('Uptime');
+        },
+        render: ({row}) => {
+            return calcUptime(row.ChangeTime);
+        },
+        sortAccessor: (row) => -Number(row.ChangeTime),
+    },
+    {
+        name: 'Actions',
+        sortable: false,
+        resizeable: false,
+        header: '',
+        render: ({row}) => {
+            return <TabletActions {...row} />;
+        },
+    },
+];
+
+function TabletActions(tablet: TTabletStateInfo) {
+    const isDisabledRestart = tablet.State === ETabletState.Stopped;
+    const dispatch = useTypedDispatch();
+    return (
+        <ButtonWithConfirmDialog
+            buttonView="outlined"
+            dialogContent={i18n('dialog.kill')}
+            onConfirmAction={() => {
+                return window.api.killTablet(tablet.TabletId);
+            }}
+            onConfirmActionSuccess={() => {
+                dispatch(tabletsApi.util.invalidateTags(['All']));
+            }}
+            buttonDisabled={isDisabledRestart}
+        >
+            <Icon data={ArrowsRotateRight} />
+        </ButtonWithConfirmDialog>
+    );
+}
+
+interface TabletsProps {
+    path?: string;
+    className?: string;
+}
+
+export function Tablets({path, className}: TabletsProps) {
+    const {autorefresh} = useTypedSelector((state) => state.schema);
+
+    let params: TabletsApiRequestParams | typeof skipToken = skipToken;
+    if (path) {
+        params = {path};
+    }
+    const {currentData, isFetching, error} = tabletsApi.useGetTabletsInfoQuery(params, {
+        pollingInterval: autorefresh,
+    });
+
+    const loading = isFetching && currentData === undefined;
+    const tablets = useTypedSelector((state) => selectTabletsWithFqdn(state, path || ''));
+
+    if (loading) {
+        return <Loader />;
+    }
+    if (error) {
+        return <ResponseError error={error} />;
+    }
+
+    return (
+        <div className={b(null, className)}>
+            <ResizeableDataTable
+                columns={columns}
+                data={tablets}
+                settings={DEFAULT_TABLE_SETTINGS}
+                emptyDataMessage={i18n('noTabletsData')}
+            />
+        </div>
+    );
+}
