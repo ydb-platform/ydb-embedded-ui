@@ -58,7 +58,7 @@ function Diagnostics(props: DiagnosticsProps) {
         clusterName: StringParam,
     });
 
-    const rootTenantName = queryParams.name;
+    const {name: rootTenantName} = queryParams;
     const tenantName = isDatabaseEntityType(props.type) ? currentSchemaPath : rootTenantName;
     const isDatabase = isDatabaseEntityType(props.type) || currentSchemaPath === rootTenantName;
 
@@ -164,13 +164,13 @@ function Diagnostics(props: DiagnosticsProps) {
                         items={pages}
                         activeTab={activeTab?.id as string}
                         wrapTo={({id}, node) => {
-                            const href = createHref(
-                                routes.tenant,
-                                {activeTab: id},
-                                {...queryParams, [TenantTabsGroups.diagnosticsTab]: id},
-                            );
+                            const path = createHref(routes.tenant, undefined, {
+                                ...queryParams,
+                                [TenantTabsGroups.diagnosticsTab]: id,
+                            });
+
                             return (
-                                <Link to={href} key={id} className={b('tab')}>
+                                <Link to={path} key={id} className={b('tab')}>
                                     {node}
                                 </Link>
                             );
