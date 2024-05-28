@@ -45,7 +45,7 @@ const calculatePoolsStats = (
     return poolsStats
         .map<TenantPoolsStats | undefined>((pool) => {
             if (pool.Name) {
-                const usage = Number(pool.Usage);
+                const usage = Number(pool.Usage) || 0;
                 const limit = Number(pool.Threads);
                 const used = limit * usage;
 
@@ -72,11 +72,11 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         QuotaUsage,
     } = tenant;
 
-    const cpu = isNumeric(CoresUsed) ? Number(CoresUsed) * 1_000_000 : undefined;
+    const cpu = Number(CoresUsed) * 1_000_000 || 0;
 
-    const memory = isNumeric(MemoryUsed) ? Number(MemoryUsed) : undefined;
-    const blobStorage = isNumeric(StorageAllocatedSize) ? Number(StorageAllocatedSize) : undefined;
-    const tabletStorage = isNumeric(Metrics.Storage) ? Number(Metrics.Storage) : undefined;
+    const memory = Number(MemoryUsed) || 0;
+    const blobStorage = Number(StorageAllocatedSize) || 0;
+    const tabletStorage = Number(Metrics.Storage) || 0;
 
     const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
     const blobStorageLimit = isNumeric(StorageAllocatedLimit)
@@ -130,7 +130,7 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
                 usage: calculateUsage(used, limit),
             };
         });
-    } else if (tabletStorage !== undefined && tabletStorageLimit) {
+    } else if (tabletStorageLimit) {
         tabletStorageStats = [
             {
                 name: EType.SSD,
