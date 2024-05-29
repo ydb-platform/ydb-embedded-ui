@@ -37,6 +37,8 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeExternalTable]: 'external_table',
 
     [EPathType.EPathTypeView]: 'view',
+
+    [EPathType.EPathTypeReplication]: 'async_replication',
 };
 
 export const mapPathTypeToNavigationTreeType = (
@@ -74,6 +76,8 @@ const pathTypeToEntityName: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeExternalTable]: 'External Table',
 
     [EPathType.EPathTypeView]: 'View',
+
+    [EPathType.EPathTypeReplication]: 'Async Replication',
 };
 
 export const mapPathTypeToEntityName = (
@@ -113,6 +117,7 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypeCdcStream]: false,
     [EPathType.EPathTypePersQueueGroup]: false,
     [EPathType.EPathTypeExternalDataSource]: false,
+    [EPathType.EPathTypeReplication]: false,
 };
 
 export const isTableType = (pathType?: EPathType) =>
@@ -150,6 +155,8 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypeExternalTable]: false,
 
     [EPathType.EPathTypeView]: false,
+
+    [EPathType.EPathTypeReplication]: false,
 };
 
 export const isColumnEntityType = (type?: EPathType) => (type && pathTypeToIsColumn[type]) ?? false;
@@ -173,6 +180,8 @@ const pathTypeToIsDatabase: Record<EPathType, boolean> = {
     [EPathType.EPathTypeExternalTable]: false,
 
     [EPathType.EPathTypeView]: false,
+
+    [EPathType.EPathTypeReplication]: false,
 };
 
 export const isDatabaseEntityType = (type?: EPathType) =>
@@ -201,6 +210,8 @@ const pathTypeToEntityWithMergedImplementation: Record<EPathType, boolean> = {
     [EPathType.EPathTypeExternalTable]: false,
 
     [EPathType.EPathTypeView]: false,
+
+    [EPathType.EPathTypeReplication]: false,
 };
 
 export const isEntityWithMergedImplementation = (type?: EPathType) =>
@@ -224,6 +235,8 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
     [EPathType.EPathTypeExternalTable]: true,
 
     [EPathType.EPathTypeView]: true,
+
+    [EPathType.EPathTypeReplication]: true,
 
     [EPathType.EPathTypeInvalid]: false,
     [EPathType.EPathTypeColumnStore]: false,
@@ -257,6 +270,8 @@ const mapPathTypeToIsWithTopic: Record<EPathType, boolean> = {
     [EPathType.EPathTypeExternalTable]: false,
 
     [EPathType.EPathTypeView]: false,
+
+    [EPathType.EPathTypeReplication]: false,
 };
 
 export const isPathTypeWithTopic = (type?: EPathType) =>

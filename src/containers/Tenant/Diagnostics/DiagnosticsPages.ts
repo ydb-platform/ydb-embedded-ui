@@ -117,6 +117,8 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeExternalTable]: EXTERNAL_TABLE_PAGES,
 
     [EPathType.EPathTypeView]: VIEW_PAGES,
+
+    [EPathType.EPathTypeReplication]: VIEW_PAGES,
 };
 
 export const getPagesByType = (type?: EPathType) => (type && pathTypeToPages[type]) || DIR_PAGES;
