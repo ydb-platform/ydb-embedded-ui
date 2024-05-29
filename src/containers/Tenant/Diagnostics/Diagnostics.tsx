@@ -17,6 +17,7 @@ import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Heatmap} from '../../Heatmap';
 import {NodesWrapper} from '../../Nodes/NodesWrapper';
 import {StorageWrapper} from '../../Storage/StorageWrapper';
+import {Tablets} from '../../Tablets';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {TenantTabsGroups} from '../TenantPages';
 import {isDatabaseEntityType} from '../utils/schema';
@@ -29,7 +30,6 @@ import {DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
 import {HotKeys} from './HotKeys/HotKeys';
 import {Network} from './Network/Network';
 import {Partitions} from './Partitions/Partitions';
-import {Tablets} from './Tablets/Tablets';
 import {TopQueries} from './TopQueries';
 import {TopShards} from './TopShards';
 

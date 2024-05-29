@@ -1,6 +1,11 @@
 {
-  "controls.type": "Type",
-  "controls.state": "State",
-  "controls.allItems": "All items",
-  "noTabletsData": "No tablets data"
+  "noTabletsData": "No tablets data",
+  "Type": "Type",
+  "Tablet": "Tablet",
+  "State": "State",
+  "Node ID": "Node ID",
+  "Node FQDN": "Node FQDN",
+  "Generation": "Generation",
+  "Uptime": "Uptime",
+  "dialog.kill": "The tablet will be restarted. Do you want to proceed?"
 }
