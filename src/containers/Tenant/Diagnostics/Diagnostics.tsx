@@ -1,10 +1,9 @@
 import React from 'react';
 
 import {Tabs} from '@gravity-ui/uikit';
-import qs from 'qs';
 import {Helmet} from 'react-helmet-async';
-import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {Loader} from '../../../components/Loader';
 import routes, {createHref} from '../../../routes';
@@ -53,10 +52,10 @@ function Diagnostics(props: DiagnosticsProps) {
         (state) => state.tenant,
     );
 
-    const location = useLocation();
-
-    const queryParams = qs.parse(location.search, {
-        ignoreQueryPrefix: true,
+    const [queryParams] = useQueryParams({
+        name: StringParam,
+        backend: StringParam,
+        clusterName: StringParam,
     });
 
     const {name: rootTenantName} = queryParams;

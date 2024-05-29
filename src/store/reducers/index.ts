@@ -12,7 +12,6 @@ import header from './header/header';
 import heatmap from './heatmap';
 import host from './host';
 import hotKeys from './hotKeys/hotKeys';
-import nodes from './nodes/nodes';
 import partitions from './partitions/partitions';
 import saveQuery from './saveQuery';
 import schema from './schema/schema';
@@ -20,7 +19,6 @@ import schemaAcl from './schemaAcl/schemaAcl';
 import settings from './settings/settings';
 import shardsWorkload from './shardsWorkload/shardsWorkload';
 import singleClusterMode from './singleClusterMode';
-import storage from './storage/storage';
 import tablets from './tablets';
 import tabletsFilters from './tabletsFilters';
 import tenant from './tenant/tenant';
@@ -30,10 +28,8 @@ import tooltip from './tooltip';
 export const rootReducer = {
     [api.reducerPath]: api.reducer,
     singleClusterMode,
-    nodes,
     cluster,
     tenant,
-    storage,
     tooltip,
     tablets,
     schema,

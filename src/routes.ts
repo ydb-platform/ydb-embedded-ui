@@ -50,7 +50,10 @@ const prepareRoute = (route: string) => {
     return preparedRoute;
 };
 
-export type Query = Record<string | number, string | number | string[] | number[] | undefined>;
+export type Query = Record<
+    string | number,
+    string | number | string[] | number[] | undefined | null
+>;
 
 export function createHref(
     route: string,

@@ -85,28 +85,6 @@ const paramSetup: ParamSetup = {
             stateKey: 'partitions.selectedConsumer',
         },
     },
-    '/cluster/storage': {
-        storageType: {
-            stateKey: 'storage.type',
-        },
-        visible: {
-            stateKey: 'storage.visible',
-        },
-        uptimeFilter: {
-            stateKey: 'storage.uptimeFilter',
-        },
-        search: {
-            stateKey: 'storage.filter',
-        },
-    },
-    '/cluster/nodes': {
-        uptimeFilter: {
-            stateKey: 'nodes.uptimeFilter',
-        },
-        search: {
-            stateKey: 'nodes.searchValue',
-        },
-    },
     '/cluster/tenants': {
         search: {
             stateKey: 'tenants.searchValue',

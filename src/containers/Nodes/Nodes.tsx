@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 import {skipToken} from '@reduxjs/toolkit/query';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {AccessDenied} from '../../components/Errors/403';
@@ -12,13 +13,7 @@ import {ResizeableDataTable} from '../../components/ResizeableDataTable/Resizeab
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {UptimeFilter} from '../../components/UptimeFIlter';
-import {
-    nodesApi,
-    setInitialState,
-    setSearchValue,
-    setSort,
-    setUptimeFilter,
-} from '../../store/reducers/nodes/nodes';
+import {nodesApi} from '../../store/reducers/nodes/nodes';
 import {filterNodes} from '../../store/reducers/nodes/selectors';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import {ProblemFilterValues, changeFilter} from '../../store/reducers/settings/settings';
@@ -35,6 +30,7 @@ import {
     NodesUptimeFilterValues,
     isSortableNodesProperty,
     isUnavailableNode,
+    nodesUptimeFilterValuesSchema,
 } from '../../utils/nodes';
 
 import {NODES_COLUMNS_WIDTH_LS_KEY, getNodesColumns} from './getNodesColumns';
@@ -50,16 +46,17 @@ interface NodesProps {
 }
 
 export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
+    const [queryParams, setQueryParams] = useQueryParams({
+        uptimeFilter: StringParam,
+        search: StringParam,
+    });
+    const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
+    const searchValue = queryParams.search ?? '';
+
     const dispatch = useTypedDispatch();
 
     const isClusterNodes = !path;
 
-    const {
-        uptimeFilter,
-        searchValue,
-        sortOrder = ASCENDING,
-        sortValue = 'NodeId',
-    } = useTypedSelector((state) => state.nodes);
     const problemFilter = useTypedSelector((state) => state.settings.problemFilter);
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
@@ -77,12 +74,16 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
 
     const {currentData: data, isLoading, error} = useGetComputeNodes ? computeQuery : nodesQuery;
 
-    const [sort, handleSort] = useTableSort({sortValue, sortOrder}, (sortParams) =>
-        dispatch(setSort(sortParams as NodesSortParams)),
-    );
+    const [sortValue, setSortValue] = React.useState<NodesSortParams>({
+        sortValue: 'NodeId',
+        sortOrder: ASCENDING,
+    });
+    const [sort, handleSort] = useTableSort(sortValue, (sortParams) => {
+        setSortValue(sortParams as NodesSortParams);
+    });
 
     const handleSearchQueryChange = (value: string) => {
-        dispatch(setSearchValue(value));
+        setQueryParams({search: value || undefined}, 'replaceIn');
     };
 
     const handleProblemFilterChange = (value: ProblemFilterValue) => {
@@ -90,18 +91,8 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
     };
 
     const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
-        dispatch(setUptimeFilter(value));
+        setQueryParams({uptimeFilter: value}, 'replaceIn');
     };
-
-    // Since Nodes component is used in several places,
-    // we need to reset filters, searchValue
-    // in nodes reducer when path changes
-    React.useEffect(() => {
-        return () => {
-            // Clean data on component unmount
-            dispatch(setInitialState());
-        };
-    }, [dispatch, path]);
 
     const nodes = React.useMemo(() => {
         return filterNodes(data?.Nodes, {searchValue, uptimeFilter, problemFilter});

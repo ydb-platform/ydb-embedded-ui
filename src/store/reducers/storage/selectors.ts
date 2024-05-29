@@ -1,19 +1,8 @@
-import type {OrderType} from '@gravity-ui/react-data-table';
-import {ASCENDING, DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
-
-import {NODES_SORT_VALUES} from '../../../utils/nodes';
-import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
-import {STORAGE_SORT_VALUES, getUsage} from '../../../utils/storage';
-import type {StorageSortValue} from '../../../utils/storage';
+import type {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {getUsage} from '../../../utils/storage';
 import {filterNodesByUptime} from '../nodes/selectors';
 
-import {VISIBLE_ENTITIES} from './constants';
-import type {
-    PreparedStorageGroup,
-    PreparedStorageNode,
-    StorageStateSlice,
-    UsageFilter,
-} from './types';
+import type {PreparedStorageGroup, PreparedStorageNode, UsageFilter} from './types';
 
 // ==== Filters ====
 
@@ -83,45 +72,6 @@ export function filterGroups(
     return result;
 }
 
-// ==== Simple selectors ====
-export const selectStorageFilter = (state: StorageStateSlice) => state.storage.filter;
-export const selectUsageFilter = (state: StorageStateSlice) => state.storage.usageFilter;
-export const selectVisibleEntities = (state: StorageStateSlice) => state.storage.visible;
-export const selectNodesUptimeFilter = (state: StorageStateSlice) => state.storage.uptimeFilter;
-export const selectStorageType = (state: StorageStateSlice) => state.storage.type;
-
-// ==== Sort params selectors ====
-export const selectNodesSortParams = (state: StorageStateSlice) => {
-    const defaultSortValue: NodesSortValue = NODES_SORT_VALUES.NodeId;
-    const defaultSortOrder: OrderType = ASCENDING;
-
-    return {
-        sortValue: state.storage.nodesSortValue || defaultSortValue,
-        sortOrder: state.storage.nodesSortOrder || defaultSortOrder,
-    };
-};
-
-export const selectGroupsSortParams = (state: StorageStateSlice) => {
-    const visibleEntities = state.storage.visible;
-
-    let defaultSortValue: StorageSortValue = STORAGE_SORT_VALUES.PoolName;
-    let defaultSortOrder: OrderType = ASCENDING;
-
-    if (visibleEntities === VISIBLE_ENTITIES.missing) {
-        defaultSortValue = STORAGE_SORT_VALUES.Degraded;
-        defaultSortOrder = DESCENDING;
-    }
-
-    if (visibleEntities === VISIBLE_ENTITIES.space) {
-        defaultSortValue = STORAGE_SORT_VALUES.Usage;
-        defaultSortOrder = DESCENDING;
-    }
-
-    return {
-        sortValue: state.storage.groupsSortValue || defaultSortValue,
-        sortOrder: state.storage.groupsSortOrder || defaultSortOrder,
-    };
-};
 // ==== Complex selectors ====
 
 export function getUsageFilterOptions(groups: PreparedStorageGroup[]): UsageFilter[] {

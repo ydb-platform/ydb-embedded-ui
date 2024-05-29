@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {StringParam, useQueryParams} from 'use-query-params';
+
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {AccessDenied} from '../../components/Errors/403';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -15,16 +17,18 @@ import type {
 } from '../../components/VirtualTable';
 import {ResizeableVirtualTable} from '../../components/VirtualTable/ResizeableVirtualTable';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import {ProblemFilterValues} from '../../store/reducers/settings/settings';
+import {ProblemFilterValues, changeFilter} from '../../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {
     NodesUptimeFilterValues,
     getProblemParamValue,
     getUptimeParamValue,
     isSortableNodesProperty,
     isUnavailableNode,
+    nodesUptimeFilterValuesSchema,
 } from '../../utils/nodes';
 import type {NodesSortValue} from '../../utils/nodes';
 
@@ -43,13 +47,16 @@ interface NodesProps {
 }
 
 export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: NodesProps) => {
-    const [searchValue, setSearchValue] = React.useState('');
-    const [problemFilter, setProblemFilter] = React.useState<ProblemFilterValue>(
-        ProblemFilterValues.ALL,
-    );
-    const [uptimeFilter, setUptimeFilter] = React.useState<NodesUptimeFilterValues>(
-        NodesUptimeFilterValues.All,
-    );
+    const [queryParams, setQueryParams] = useQueryParams({
+        uptimeFilter: StringParam,
+        search: StringParam,
+    });
+    const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
+    const searchValue = queryParams.search ?? '';
+
+    const dispatch = useTypedDispatch();
+
+    const problemFilter = useTypedSelector((state) => state.settings.problemFilter);
 
     const filters = React.useMemo(() => {
         return [path, searchValue, problemFilter, uptimeFilter];
@@ -76,16 +83,28 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
     };
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
+        const handleSearchQueryChange = (value: string) => {
+            setQueryParams({search: value || undefined}, 'replaceIn');
+        };
+
+        const handleProblemFilterChange = (value: ProblemFilterValue) => {
+            dispatch(changeFilter(value));
+        };
+
+        const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
+            setQueryParams({uptimeFilter: value}, 'replaceIn');
+        };
+
         return (
             <React.Fragment>
                 <Search
-                    onChange={setSearchValue}
+                    onChange={handleSearchQueryChange}
                     placeholder="Host name"
                     className={b('search')}
                     value={searchValue}
                 />
-                <ProblemFilter value={problemFilter} onChange={setProblemFilter} />
-                <UptimeFilter value={uptimeFilter} onChange={setUptimeFilter} />
+                <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
+                <UptimeFilter value={uptimeFilter} onChange={handleUptimeFilterChange} />
                 <EntitiesCount
                     total={totalEntities}
                     current={foundEntities}
