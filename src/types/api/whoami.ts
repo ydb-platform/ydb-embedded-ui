@@ -8,6 +8,13 @@ export interface TUserToken {
     GroupSIDs?: TProtoHashTable;
     OriginalUserToken?: string;
     AuthType?: string;
+
+    /** Is user allowed to view data */
+    IsViewerAllowed?: boolean;
+    /** Is user allowed to view deeper and make simple changes */
+    IsMonitoringAllowed?: boolean;
+    /** Is user allowed to do unrestricted changes in the system */
+    IsAdministrationAllowed?: boolean;
 }
 
 interface TProtoHashTable {

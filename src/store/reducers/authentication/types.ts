@@ -5,6 +5,7 @@ import type {FETCH_USER, SET_AUTHENTICATED, SET_UNAUTHENTICATED} from './authent
 
 export interface AuthenticationState {
     isAuthenticated: boolean;
+    isUserAllowedToMakeChanges?: boolean;
     user: string | undefined;
     error: AuthErrorResponse | undefined;
 }
@@ -12,4 +13,8 @@ export interface AuthenticationState {
 export type AuthenticationAction =
     | ApiRequestAction<typeof SET_UNAUTHENTICATED, unknown, unknown>
     | ApiRequestAction<typeof SET_AUTHENTICATED, unknown, AuthErrorResponse>
-    | ApiRequestAction<typeof FETCH_USER, string | undefined, unknown>;
+    | ApiRequestAction<
+          typeof FETCH_USER,
+          {user: string | undefined; isUserAllowedToMakeChanges: boolean},
+          unknown
+      >;

@@ -29,6 +29,7 @@ export function PDiskPage() {
     const dispatch = useTypedDispatch();
 
     const nodesMap = useTypedSelector(selectNodesMap);
+    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
 
     const [{nodeId, pDiskId}] = useQueryParams({
         nodeId: StringParam,
@@ -117,7 +118,7 @@ export function PDiskPage() {
                 <ButtonWithConfirmDialog
                     onConfirmAction={handleRestart}
                     onConfirmActionSuccess={handleAfterRestart}
-                    buttonDisabled={!nodeId || !pDiskId}
+                    buttonDisabled={!nodeId || !pDiskId || !isUserAllowedToMakeChanges}
                     buttonView="normal"
                     dialogContent={pDiskPageKeyset('restart-pdisk-dialog')}
                 >
