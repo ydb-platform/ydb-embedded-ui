@@ -1,14 +1,15 @@
-import React from 'react';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AccessDenied} from '../../components/Errors/403/AccessDenied';
 import {ResponseError} from '../../components/Errors/ResponseError/ResponseError';
 import type {RenderControls, RenderErrorMessage} from '../../components/VirtualTable';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
+import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {useTypedSelector} from '../../utils/hooks';
-import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
 import {StorageControls} from './StorageControls/StorageControls';
 import {VirtualStorageGroups} from './StorageGroups/VirtualStorageGroups';
@@ -27,38 +28,61 @@ export const VirtualStorage = ({
     parentContainer,
     additionalNodesProps,
 }: VirtualStorageProps) => {
-    const [searchValue, setSearchValue] = React.useState('');
-    const [storageType, setStorageType] = React.useState<StorageType>(STORAGE_TYPES.groups);
-    const [visibleEntities, setVisibleEntities] = React.useState<VisibleEntities>(
-        VISIBLE_ENTITIES.all,
-    );
-    const [nodesUptimeFilter, setNodesUptimeFilter] = React.useState<NodesUptimeFilterValues>(
-        NodesUptimeFilterValues.All,
-    );
+    const [queryParams, setQueryParams] = useQueryParams({
+        type: StringParam,
+        visible: StringParam,
+        search: StringParam,
+        uptimeFilter: StringParam,
+    });
+    const storageType = storageTypeSchema.parse(queryParams.type);
+    const visibleEntities = visibleEntitiesSchema.parse(queryParams.visible);
+    const searchValue = queryParams.search ?? '';
+    const nodesUptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
+
+    const handleTextFilterChange = (value: string) => {
+        setQueryParams({search: value || undefined}, 'replaceIn');
+    };
+
+    const handleGroupVisibilityChange = (value: VisibleEntities) => {
+        setQueryParams({visible: value}, 'replaceIn');
+    };
+
+    const handleStorageTypeChange = (value: StorageType) => {
+        setQueryParams({type: value}, 'replaceIn');
+    };
+
+    const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
+        setQueryParams({uptimeFilter: value}, 'replaceIn');
+    };
 
     const nodesMap = useTypedSelector(selectNodesMap);
 
     const handleShowAllGroups = () => {
-        setVisibleEntities(VISIBLE_ENTITIES.all);
+        handleGroupVisibilityChange(VISIBLE_ENTITIES.all);
     };
 
     const handleShowAllNodes = () => {
-        setVisibleEntities(VISIBLE_ENTITIES.all);
-        setNodesUptimeFilter(NodesUptimeFilterValues.All);
+        setQueryParams(
+            {
+                visible: VISIBLE_ENTITIES.all,
+                uptimeFilter: NodesUptimeFilterValues.All,
+            },
+            'replaceIn',
+        );
     };
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
             <StorageControls
                 searchValue={searchValue}
-                handleSearchValueChange={setSearchValue}
+                handleSearchValueChange={handleTextFilterChange}
                 withTypeSelector={!nodeId}
                 storageType={storageType}
-                handleStorageTypeChange={setStorageType}
+                handleStorageTypeChange={handleStorageTypeChange}
                 visibleEntities={visibleEntities}
-                handleVisibleEntitiesChange={setVisibleEntities}
+                handleVisibleEntitiesChange={handleGroupVisibilityChange}
                 nodesUptimeFilter={nodesUptimeFilter}
-                handleNodesUptimeFilterChange={setNodesUptimeFilter}
+                handleNodesUptimeFilterChange={handleUptimeFilterChange}
                 withGroupsUsageFilter={false}
                 entitiesCountCurrent={foundEntities}
                 entitiesCountTotal={totalEntities}
