@@ -1,5 +1,11 @@
 import React from 'react';
 
+import {
+    CircleExclamationFill,
+    CircleInfoFill,
+    CircleXmarkFill,
+    TriangleExclamationFill,
+} from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
 import {ArrowToggle, Button, Icon} from '@gravity-ui/uikit';
 
@@ -9,11 +15,6 @@ import {cn} from '../../../../utils/cn';
 
 import type {SEVERITY} from './models';
 import {getSeverity} from './models';
-
-import warningIcon from '../../../../assets/icons/circle-exclamation.svg';
-import infoIcon from '../../../../assets/icons/circle-info.svg';
-import fatalIcon from '../../../../assets/icons/circle-xmark.svg';
-import errorIcon from '../../../../assets/icons/triangle-exclamation.svg';
 
 import './Issues.scss';
 
@@ -146,17 +147,17 @@ function IssueList(props: {issues: IssueMessage[]; expanded: boolean; level: num
 }
 
 const severityIcons: Record<SEVERITY, IconData> = {
-    S_INFO: infoIcon,
-    S_WARNING: warningIcon,
-    S_ERROR: errorIcon,
-    S_FATAL: fatalIcon,
+    S_INFO: CircleInfoFill,
+    S_WARNING: CircleExclamationFill,
+    S_ERROR: TriangleExclamationFill,
+    S_FATAL: CircleXmarkFill,
 };
 const blockIssueSeverity = cn('yql-issue-severity');
 function IssueSeverity({severity}: {severity: SEVERITY}) {
     const shortenSeverity = severity.slice(2).toLowerCase();
     return (
         <span className={blockIssueSeverity({severity: shortenSeverity})}>
-            <Icon className={blockIssueSeverity('icon')} data={severityIcons[severity]} size={16} />
+            <Icon className={blockIssueSeverity('icon')} data={severityIcons[severity]} />
             <span className={blockIssueSeverity('title')}>{shortenSeverity}</span>
         </span>
     );

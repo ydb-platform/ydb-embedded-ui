@@ -1,5 +1,8 @@
+import {Icon} from '@gravity-ui/uikit';
+
 import {cn} from '../../utils/cn';
-import {Icon} from '../Icon';
+
+import emptyStateIcon from '../../assets/icons/emptyState.svg';
 
 import './EmptyState.scss';
 
@@ -35,12 +38,7 @@ export const EmptyState = ({
                     {image ? (
                         image
                     ) : (
-                        <Icon
-                            viewBox="0 0 383 396"
-                            name="emptyState"
-                            width={sizes[size]}
-                            height={sizes[size]}
-                        />
+                        <Icon data={emptyStateIcon} width={sizes[size]} height={sizes[size]} />
                     )}
                 </div>
 

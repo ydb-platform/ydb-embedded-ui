@@ -1,10 +1,12 @@
 import React from 'react';
 
+import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
+import {Icon} from '@gravity-ui/uikit';
+
 import type {PreparedNode} from '../../store/reducers/node/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
-import {Icon} from '../Icon';
 import {Tags} from '../Tags';
 
 import './BasicNodeViewer.scss';
@@ -35,7 +37,7 @@ export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNo
                             href={nodeHref}
                             target="_blank"
                         >
-                            <Icon name="external" />
+                            <Icon data={ArrowUpRightFromSquare} />
                         </a>
                     )}
 

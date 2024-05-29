@@ -1,3 +1,4 @@
+import {ArrowRightFromSquare, ArrowRightToSquare} from '@gravity-ui/icons';
 import {Button, Icon} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router';
 
@@ -6,9 +7,6 @@ import {logout} from '../../../store/reducers/authentication/authentication';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import i18n from '../i18n';
-
-import signOutIcon from '@gravity-ui/icons/svgs/arrow-right-from-square.svg';
-import signInIcon from '@gravity-ui/icons/svgs/arrow-right-to-square.svg';
 
 import './YdbInternalUser.scss';
 
@@ -37,7 +35,7 @@ export function YdbInternalUser() {
             </div>
             {ydbUser ? (
                 <Button view="flat-secondary" title={i18n('account.logout')} onClick={handleLogout}>
-                    <Icon data={signOutIcon} size={16} />
+                    <Icon data={ArrowRightFromSquare} />
                 </Button>
             ) : (
                 <Button
@@ -45,7 +43,7 @@ export function YdbInternalUser() {
                     title={i18n('account.login')}
                     onClick={handleLoginClick}
                 >
-                    <Icon data={signInIcon} size={16} />
+                    <Icon data={ArrowRightToSquare} />
                 </Button>
             )}
         </div>

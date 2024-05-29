@@ -1,4 +1,5 @@
-import {Button, PopoverBehavior} from '@gravity-ui/uikit';
+import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
+import {Button, Icon, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
@@ -7,7 +8,6 @@ import {cn} from '../../utils/cn';
 import {isUnavailableNode} from '../../utils/nodes';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
-import {Icon} from '../Icon';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 
 import './NodeHostWrapper.scss';
@@ -34,7 +34,7 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
 
     const additionalControls = nodeRef ? (
         <Button size="s" href={nodeRef} className={b('external-button')} target="_blank">
-            <Icon name="external" />
+            <Icon data={ArrowUpRightFromSquare} />
         </Button>
     ) : null;
 

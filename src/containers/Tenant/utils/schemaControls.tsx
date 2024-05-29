@@ -1,7 +1,7 @@
-import {Button} from '@gravity-ui/uikit';
+import {LayoutHeaderCellsLargeFill} from '@gravity-ui/icons';
+import {Button, Icon} from '@gravity-ui/uikit';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
-import {Icon} from '../../../components/Icon';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
@@ -41,7 +41,7 @@ export const getControls =
                 title={i18n('actions.openPreview')}
                 size="s"
             >
-                <Icon name="tablePreview" />
+                <Icon data={LayoutHeaderCellsLargeFill} />
             </Button>
         );
 

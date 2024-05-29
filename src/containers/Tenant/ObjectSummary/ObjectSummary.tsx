@@ -1,13 +1,13 @@
 import React from 'react';
 
 import {HelpPopover} from '@gravity-ui/components';
-import {Button, Tabs} from '@gravity-ui/uikit';
+import {LayoutHeaderCellsLargeFill} from '@gravity-ui/icons';
+import {Button, Icon, Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
 import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
 
 import {ClipboardButton} from '../../../components/ClipboardButton';
-import {Icon} from '../../../components/Icon';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import {
     CDCStreamOverview,
@@ -251,7 +251,7 @@ export function ObjectSummary({
                         onClick={onOpenPreview}
                         title={i18n('summary.showPreview')}
                     >
-                        <Icon name="tablePreview" viewBox={'0 0 16 16'} height={16} width={16} />
+                        <Icon data={LayoutHeaderCellsLargeFill} />
                     </Button>
                 )}
                 {currentSchemaPath && (

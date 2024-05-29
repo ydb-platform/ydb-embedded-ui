@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {ArrowsRotateRight} from '@gravity-ui/icons';
 import {Button, Icon} from '@gravity-ui/uikit';
 
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
@@ -11,8 +12,6 @@ import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthc
 import {cn} from '../../../../../utils/cn';
 
 import i18n from './i18n';
-
-import updateArrow from '../../../../../assets/icons/update-arrow.svg';
 
 import './Healthcheck.scss';
 
@@ -51,7 +50,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
                         loading={loading}
                         view="flat-secondary"
                     >
-                        <Icon data={updateArrow} width={20} height={20} />
+                        <Icon data={ArrowsRotateRight} size={20} />
                     </Button>
                 </div>
                 <div className={b('self-check-status-indicator', {[modifier]: true})}>

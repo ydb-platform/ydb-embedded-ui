@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {ArrowsOppositeToDots} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
@@ -23,8 +24,6 @@ import {getSeverityColor} from '../../utils/disks/helpers';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import {vDiskPageKeyset} from './i18n';
-
-import ArrowsOppositeToDotsIcon from '@gravity-ui/icons/svgs/arrows-opposite-to-dots.svg';
 
 import './VDiskPage.scss';
 
@@ -134,7 +133,7 @@ export function VDiskPage() {
                     buttonView="normal"
                     dialogContent={vDiskPageKeyset('evict-vdisk-dialog')}
                 >
-                    <Icon data={ArrowsOppositeToDotsIcon} />
+                    <Icon data={ArrowsOppositeToDots} />
                     {vDiskPageKeyset('evict-vdisk-button')}
                 </ButtonWithConfirmDialog>
             </div>

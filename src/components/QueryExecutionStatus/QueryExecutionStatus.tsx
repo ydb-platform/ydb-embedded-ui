@@ -1,10 +1,8 @@
-import {Icon as UiKitIcon} from '@gravity-ui/uikit';
+import {CircleCheck, CircleQuestionFill, CircleXmark} from '@gravity-ui/icons';
+import {Icon} from '@gravity-ui/uikit';
 import type {AxiosError} from 'axios';
 
 import {cn} from '../../utils/cn';
-import {Icon} from '../Icon';
-
-import questionIcon from '../../assets/icons/question.svg';
 
 import './QueryExecutionStatus.scss';
 
@@ -21,16 +19,13 @@ export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusPro
     let label: string;
 
     if (typeof error === 'object' && error?.code === 'ECONNABORTED') {
-        icon = <UiKitIcon data={questionIcon} size={16} />;
+        icon = <Icon data={CircleQuestionFill} />;
         label = 'Connection aborted';
     } else {
         const hasError = Boolean(error);
         icon = (
             <Icon
-                name={hasError ? 'failure' : 'success'}
-                viewBox={hasError ? '0 0 512 512' : '0 0 16 16'}
-                width={16}
-                height={16}
+                data={hasError ? CircleXmark : CircleCheck}
                 className={b('result-status-icon', {error: hasError})}
             />
         );

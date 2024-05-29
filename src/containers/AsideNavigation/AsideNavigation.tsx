@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {CircleQuestion, Gear, Person} from '@gravity-ui/icons';
 import type {MenuItem} from '@gravity-ui/navigation';
 import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
 import {useHistory} from 'react-router-dom';
@@ -10,9 +11,6 @@ import {useSetting, useTypedSelector} from '../../utils/hooks';
 
 import i18n from './i18n';
 
-import settingsIcon from '../../assets/icons/settings.svg';
-import supportIcon from '../../assets/icons/support.svg';
-import userChecked from '../../assets/icons/user-check.svg';
 import userSecret from '../../assets/icons/user-secret.svg';
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
 
@@ -31,7 +29,7 @@ interface YdbUserDropdownProps {
 
 function YdbUserDropdown({isCompact, popupAnchor, ydbUser, children}: YdbUserDropdownProps) {
     const [isUserDropdownVisible, setIsUserDropdownVisible] = React.useState(false);
-    const iconData = ydbUser.login ? userChecked : userSecret;
+    const iconData = ydbUser.login ? Person : userSecret;
     return (
         <FooterItem
             compact={isCompact}
@@ -40,7 +38,6 @@ function YdbUserDropdown({isCompact, popupAnchor, ydbUser, children}: YdbUserDro
                 title: ydbUser.login ? ydbUser.login : i18n('navigation-item.account'),
                 current: isUserDropdownVisible,
                 icon: iconData,
-                iconSize: 22,
                 onItemClick: () => setIsUserDropdownVisible(true),
             }}
             enableTooltip={!isUserDropdownVisible}
@@ -91,8 +88,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
                             item={{
                                 id: 'documentation',
                                 title: i18n('navigation-item.documentation'),
-                                icon: supportIcon,
-                                iconSize: 24,
+                                icon: CircleQuestion,
                                 onItemClick: () => {
                                     window.open('https://ydb.tech/docs', '_blank', 'noreferrer');
                                 },
@@ -103,8 +99,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
                             item={{
                                 id: 'user-settings',
                                 title: i18n('navigation-item.settings'),
-                                icon: settingsIcon,
-                                iconSize: 24,
+                                icon: Gear,
                                 current: visiblePanel === Panel.UserSettings,
                                 onItemClick: () => {
                                     setVisiblePanel(

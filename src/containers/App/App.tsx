@@ -7,7 +7,6 @@ import {connect} from 'react-redux';
 
 import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
 import type {RootState} from '../../store';
-import AppIcons from '../AppIcons/AppIcons';
 import {Navigation} from '../AsideNavigation/Navigation';
 import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
 import {settings} from '../UserSettings/settings';
@@ -39,7 +38,6 @@ function App({store, history, singleClusterMode, children, userSettings = settin
                 </Navigation>
             </ContentWrapper>
             <ReduxTooltip />
-            <AppIcons />
         </Providers>
     );
 }

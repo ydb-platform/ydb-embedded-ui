@@ -1,8 +1,8 @@
 import React from 'react';
 
-import {Button} from '@gravity-ui/uikit';
+import {ChevronsUp} from '@gravity-ui/icons';
+import {Button, Icon} from '@gravity-ui/uikit';
 
-import {Icon} from '../../../components/Icon';
 import {cn} from '../../../utils/cn';
 
 import './ToggleButton.scss';
@@ -95,13 +95,7 @@ export function PaneVisibilityToggleButtons({
                 )}
                 title="Collapse"
             >
-                <Icon
-                    name="collapse"
-                    viewBox="0 0 384 512"
-                    width={14}
-                    height={14}
-                    className={b({[initialDirection]: true})}
-                />
+                <Icon data={ChevronsUp} className={b({[initialDirection]: true})} />
             </Button>
             <Button
                 view="flat-secondary"
@@ -114,13 +108,7 @@ export function PaneVisibilityToggleButtons({
                 )}
                 title="Expand"
             >
-                <Icon
-                    name="collapse"
-                    viewBox="0 0 384 512"
-                    width={14}
-                    height={14}
-                    className={b({[initialDirection]: true}, 'rotate')}
-                />
+                <Icon data={ChevronsUp} className={b({[initialDirection]: true}, 'rotate')} />
             </Button>
         </React.Fragment>
     );

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {Eye, EyeSlash, Xmark} from '@gravity-ui/icons';
 import {Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router';
 
@@ -8,9 +9,6 @@ import {authenticate} from '../../store/reducers/authentication/authentication';
 import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
-import closeIcon from '../../assets/icons/close.svg';
-import hideIcon from '../../assets/icons/hide.svg';
-import showIcon from '../../assets/icons/show.svg';
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
 
 import './Authentication.scss';
@@ -123,7 +121,7 @@ function Authentication({closable = false}: AuthenticationProps) {
                         size="l"
                         className={b('show-password-button')}
                     >
-                        <Icon data={showPassword ? hideIcon : showIcon} size={16} />
+                        <Icon data={showPassword ? EyeSlash : Eye} size={16} />
                     </Button>
                 </div>
                 <Button
@@ -139,7 +137,7 @@ function Authentication({closable = false}: AuthenticationProps) {
             </form>
             {closable && history.length > 1 && (
                 <Button onClick={onClose} className={b('close')}>
-                    <Icon data={closeIcon} size={24} />
+                    <Icon data={Xmark} size={24} />
                 </Button>
             )}
         </section>
