@@ -23,7 +23,7 @@ import {parseJson} from '../utils/utils';
 export type SettingsObject = Record<string, unknown>;
 
 /** User settings keys and their default values */
-export const DEFAULT_USER_SETTINGS: SettingsObject = {
+export const DEFAULT_USER_SETTINGS = {
     [THEME_KEY]: 'system',
     [LANGUAGE_KEY]: undefined,
     [INVERTED_DISKS_KEY]: false,
@@ -40,7 +40,7 @@ export const DEFAULT_USER_SETTINGS: SettingsObject = {
     [USE_CLUSTER_BALANCER_AS_BACKEND_KEY]: true,
     [ENABLE_AUTOCOMPLETE]: false,
     [AUTOCOMPLETE_ON_ENTER]: true,
-};
+} as const satisfies SettingsObject;
 
 class SettingsManager {
     /**
