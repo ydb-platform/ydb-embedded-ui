@@ -1,24 +1,137 @@
-import React from 'react';
-
-import {Select} from '@gravity-ui/uikit';
+import {ArrowsRotateRight} from '@gravity-ui/icons';
+import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
+import {Icon, Label, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
-import ReactList from 'react-list';
 
+import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {Loader} from '../../components/Loader';
-import {Tablet} from '../../components/Tablet';
-import TabletsOverall from '../../components/TabletsOverall/TabletsOverall';
-import {setStateFilter, setTypeFilter, tabletsApi} from '../../store/reducers/tablets';
-import type {ETabletState, EType} from '../../types/api/tablet';
+import {InternalLink} from '../../components/InternalLink';
+import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
+import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
+import routes, {createHref} from '../../routes';
+import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
+import {ETabletState} from '../../types/api/tablet';
+import type {TTabletStateInfo} from '../../types/api/tablet';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import {cn} from '../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {mapTabletStateToLabelTheme} from '../../utils/tablet';
+import {getDefaultNodePath} from '../Node/NodePages';
 
 import i18n from './i18n';
 
-import './Tablets.scss';
-
 const b = cn('tablets');
+
+const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
+    {
+        name: 'Type',
+        get header() {
+            return i18n('Type');
+        },
+        render: ({row}) => {
+            return (
+                <span>
+                    {row.Type} {row.Leader ? <Text color="secondary">leader</Text> : ''}
+                </span>
+            );
+        },
+    },
+    {
+        name: 'TabletId',
+        get header() {
+            return i18n('Tablet');
+        },
+        render: ({row}) => {
+            const tabletPath =
+                row.TabletId &&
+                createHref(routes.tablet, {id: row.TabletId}, {nodeId: row.NodeId, type: row.Type});
+
+            return <InternalLink to={tabletPath}>{row.TabletId}</InternalLink>;
+        },
+    },
+    {
+        name: 'State',
+        get header() {
+            return i18n('State');
+        },
+        render: ({row}) => {
+            return <Label theme={mapTabletStateToLabelTheme(row.State)}>{row.State}</Label>;
+        },
+    },
+    {
+        name: 'NodeId',
+        get header() {
+            return i18n('Node ID');
+        },
+        render: ({row}) => {
+            const nodePath = row.NodeId === undefined ? undefined : getDefaultNodePath(row.NodeId);
+            return <InternalLink to={nodePath}>{row.NodeId}</InternalLink>;
+        },
+        align: 'right',
+    },
+    {
+        name: 'FQDN',
+        get header() {
+            return i18n('Node FQDN');
+        },
+        render: ({row}) => {
+            if (!row.fqdn) {
+                return <span>—</span>;
+            }
+            return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
+        },
+    },
+    {
+        name: 'Generation',
+        get header() {
+            return i18n('Generation');
+        },
+        align: 'right',
+    },
+    {
+        name: 'Uptime',
+        get header() {
+            return i18n('Uptime');
+        },
+        render: ({row}) => {
+            return calcUptime(row.ChangeTime);
+        },
+        sortAccessor: (row) => -Number(row.ChangeTime),
+        align: 'right',
+    },
+    {
+        name: 'Actions',
+        sortable: false,
+        resizeable: false,
+        header: '',
+        render: ({row}) => {
+            return <TabletActions {...row} />;
+        },
+    },
+];
+
+function TabletActions(tablet: TTabletStateInfo) {
+    const isDisabledRestart = tablet.State === ETabletState.Stopped;
+    const dispatch = useTypedDispatch();
+    return (
+        <ButtonWithConfirmDialog
+            buttonView="outlined"
+            dialogContent={i18n('dialog.kill')}
+            onConfirmAction={() => {
+                return window.api.killTablet(tablet.TabletId);
+            }}
+            onConfirmActionSuccess={() => {
+                dispatch(tabletsApi.util.invalidateTags(['All']));
+            }}
+            buttonDisabled={isDisabledRestart}
+        >
+            <Icon data={ArrowsRotateRight} />
+        </ButtonWithConfirmDialog>
+    );
+}
 
 interface TabletsProps {
     path?: string;
@@ -26,15 +139,13 @@ interface TabletsProps {
     className?: string;
 }
 
-export const Tablets = ({path, nodeId, className}: TabletsProps) => {
-    const dispatch = useTypedDispatch();
-
-    const {stateFilter, typeFilter} = useTypedSelector((state) => state.tablets);
+export function Tablets({nodeId, path, className}: TabletsProps) {
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
     let params: TabletsApiRequestParams | typeof skipToken = skipToken;
-    if (nodeId) {
-        params = {nodes: [String(nodeId)]};
+    const node = nodeId === undefined ? undefined : String(nodeId);
+    if (node !== undefined) {
+        params = {nodes: [String(node)]};
     } else if (path) {
         params = {path};
     }
@@ -43,94 +154,23 @@ export const Tablets = ({path, nodeId, className}: TabletsProps) => {
     });
 
     const loading = isFetching && currentData === undefined;
-    const tablets = React.useMemo(() => currentData?.TabletStateInfo || [], [currentData]);
-
-    const tabletsToRender = React.useMemo(() => {
-        let filteredTablets = tablets;
-
-        if (typeFilter.length > 0) {
-            filteredTablets = filteredTablets.filter((tablet) =>
-                typeFilter.some((filter) => tablet.Type === filter),
-            );
-        }
-        if (stateFilter.length > 0) {
-            filteredTablets = filteredTablets.filter((tablet) =>
-                stateFilter.some((filter) => tablet.State === filter),
-            );
-        }
-        return filteredTablets;
-    }, [tablets, stateFilter, typeFilter]);
-
-    const handleStateFilterChange = (value: string[]) => {
-        dispatch(setStateFilter(value as ETabletState[]));
-    };
-
-    const handleTypeFilterChange = (value: string[]) => {
-        dispatch(setTypeFilter(value as EType[]));
-    };
-
-    const renderTablet = (tabletIndex: number) => {
-        return <Tablet tablet={tabletsToRender[tabletIndex]} key={tabletIndex} />;
-    };
-
-    const renderContent = () => {
-        const states = Array.from(new Set(tablets.map((tablet) => tablet.State)))
-            .filter((state): state is ETabletState => state !== undefined)
-            .map((item) => ({
-                value: item,
-                content: item,
-            }));
-        const types = Array.from(new Set(tablets.map((tablet) => tablet.Type)))
-            .filter((type): type is EType => type !== undefined)
-            .map((item) => ({
-                value: item,
-                content: item,
-            }));
-
-        return (
-            <div className={b(null, className)}>
-                <div className={b('header')}>
-                    <Select
-                        className={b('filter-control')}
-                        multiple
-                        placeholder={i18n('controls.allItems')}
-                        label={`${i18n('controls.state')}:`}
-                        options={states}
-                        value={stateFilter}
-                        onUpdate={handleStateFilterChange}
-                    />
-                    <Select
-                        className={b('filter-control')}
-                        multiple
-                        placeholder={i18n('controls.allItems')}
-                        label={`${i18n('controls.type')}:`}
-                        options={types}
-                        value={typeFilter}
-                        onUpdate={handleTypeFilterChange}
-                    />
-                    <TabletsOverall tablets={tablets} />
-                </div>
-
-                <div className={b('items')}>
-                    <ReactList
-                        itemRenderer={renderTablet}
-                        length={tabletsToRender.length}
-                        type="uniform"
-                    />
-                </div>
-            </div>
-        );
-    };
+    const tablets = useTypedSelector((state) => selectTabletsWithFqdn(state, node, path));
 
     if (loading) {
-        return <Loader />;
-    } else if (error) {
-        return <ResponseError error={error} />;
-    } else {
-        return tablets.length > 0 ? (
-            renderContent()
-        ) : (
-            <div className="error">{i18n('noTabletsData')}</div>
-        );
+        return <TableSkeleton />;
     }
-};
+    if (error) {
+        return <ResponseError error={error} />;
+    }
+
+    return (
+        <div className={b(null, className)}>
+            <ResizeableDataTable
+                columns={columns}
+                data={tablets}
+                settings={DEFAULT_TABLE_SETTINGS}
+                emptyDataMessage={i18n('noTabletsData')}
+            />
+        </div>
+    );
+}

@@ -47,18 +47,23 @@ export const tabletsApi = api.injectEndpoints({
 });
 
 const getTabletsInfoSelector = createSelector(
-    (path: string) => path,
-    (path) => tabletsApi.endpoints.getTabletsInfo.select({path}),
+    (nodeId: string | undefined, path: string | undefined) => ({nodeId, path}),
+    ({nodeId, path}) =>
+        tabletsApi.endpoints.getTabletsInfo.select(
+            nodeId === undefined ? {path} : {nodes: [nodeId]},
+        ),
 );
 
 const selectGetTabletsInfo = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path: string) => getTabletsInfoSelector(path),
+    (_state: RootState, nodeId: string | undefined, path: string | undefined) =>
+        getTabletsInfoSelector(nodeId, path),
     (state, selectTabletsInfo) => selectTabletsInfo(state).data,
 );
 
 export const selectTabletsWithFqdn = createSelector(
-    (state: RootState, path: string) => selectGetTabletsInfo(state, path),
+    (state: RootState, nodeId: string | undefined, path: string | undefined) =>
+        selectGetTabletsInfo(state, nodeId, path),
     (state: RootState) => selectNodesMap(state),
     (data, nodesMap): (TTabletStateInfo & {fqdn?: string})[] => {
         if (!data?.TabletStateInfo) {
