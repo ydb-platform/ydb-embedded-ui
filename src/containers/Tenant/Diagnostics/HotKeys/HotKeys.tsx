@@ -1,8 +1,9 @@
 import React from 'react';
 
+import {Xmark} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
-import {Icon} from '@gravity-ui/uikit';
+import {Button, Card, Icon} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
@@ -15,8 +16,8 @@ import {
 import type {IResponseError} from '../../../../types/api/error';
 import type {HotKey} from '../../../../types/api/hotkeys';
 import {cn} from '../../../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {DEFAULT_TABLE_SETTINGS, IS_HOTKEYS_HELP_HIDDDEN_KEY} from '../../../../utils/constants';
+import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -46,6 +47,7 @@ const getHotKeysColumns = (keyColumnsIds: string[] = []): Column<HotKey>[] => {
     }));
 
     return [
+        ...keysColumns,
         {
             name: tableColumnsIds.accessSample,
             header: 'Samples',
@@ -53,7 +55,6 @@ const getHotKeysColumns = (keyColumnsIds: string[] = []): Column<HotKey>[] => {
             align: DataTable.RIGHT,
             sortable: false,
         },
-        ...keysColumns,
     ];
 };
 
@@ -63,6 +64,8 @@ interface HotKeysProps {
 
 export function HotKeys({path}: HotKeysProps) {
     const dispatch = useTypedDispatch();
+
+    const [helpHidden, setHelpHidden] = useSetting(IS_HOTKEYS_HELP_HIDDDEN_KEY);
 
     const collectSamplesTimerRef = React.useRef<ReturnType<typeof setTimeout>>();
 
@@ -118,29 +121,57 @@ export function HotKeys({path}: HotKeysProps) {
         fetchData();
     }, [dispatch, path]);
 
-    // It takes a while to collect hot keys. Display explicit status message, while collecting
-    if ((loading && !wasLoaded) || schemaLoading) {
-        return <div>{i18n('hot-keys-collecting')}</div>;
-    }
+    const renderContent = () => {
+        // It takes a while to collect hot keys. Display explicit status message, while collecting
+        if ((loading && !wasLoaded) || schemaLoading) {
+            return <div>{i18n('hot-keys-collecting')}</div>;
+        }
 
-    if (error) {
-        return <ResponseError error={error} />;
-    }
+        if (error) {
+            return <ResponseError error={error} />;
+        }
 
-    if (!data) {
-        return <div>{i18n('no-data')}</div>;
-    }
+        if (!data) {
+            return <div>{i18n('no-data')}</div>;
+        }
+
+        return (
+            <ResizeableDataTable
+                wrapperClassName={b('table')}
+                columns={tableColumns}
+                data={data}
+                settings={DEFAULT_TABLE_SETTINGS}
+                initialSortOrder={{
+                    columnId: tableColumnsIds.accessSample,
+                    order: DataTable.DESCENDING,
+                }}
+            />
+        );
+    };
+
+    const renderHelpCard = () => {
+        if (helpHidden) {
+            return null;
+        }
+
+        return (
+            <Card theme="info" view="filled" type="container" className={b('help-card')}>
+                {i18n('help')}
+                <Button
+                    className={b('help-card__close-button')}
+                    view="flat"
+                    onClick={() => setHelpHidden(true)}
+                >
+                    <Icon data={Xmark} size={18} />
+                </Button>
+            </Card>
+        );
+    };
 
     return (
-        <ResizeableDataTable
-            wrapperClassName={b('table')}
-            columns={tableColumns}
-            data={data}
-            settings={DEFAULT_TABLE_SETTINGS}
-            initialSortOrder={{
-                columnId: tableColumnsIds.accessSample,
-                order: DataTable.DESCENDING,
-            }}
-        />
+        <React.Fragment>
+            {renderHelpCard()}
+            {renderContent()}
+        </React.Fragment>
     );
 }

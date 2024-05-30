@@ -1,4 +1,6 @@
 {
   "hot-keys-collecting": "Please wait a little while we are collecting hot keys samples...",
-  "no-data": "No information about hot keys"
+  "no-data": "No information about hot keys",
+
+  "help": "Hot keys contains a list of table primary key values that are accessed most often. Sample is collected upon request to the tab during 5s time interval. Samples column indicates how many requests to the particular key value were registered during collection phase."
 }

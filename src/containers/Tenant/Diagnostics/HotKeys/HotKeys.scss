@@ -1,13 +1,23 @@
 @import '../../../../styles/mixins.scss';
 
 .ydb-hot-keys {
-    &__table {
-        @include freeze-nth-column(1);
-    }
-
     &__primary-key-column {
         display: flex;
         align-items: center;
         gap: 5px;
+    }
+
+    &__help-card {
+        position: sticky;
+        left: 0;
+
+        margin-bottom: 20px;
+        padding: 20px 40px 20px 20px;
+
+        &__close-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+        }
     }
 }

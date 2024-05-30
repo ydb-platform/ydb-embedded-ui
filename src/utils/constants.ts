@@ -137,3 +137,5 @@ export const USE_CLUSTER_BALANCER_AS_BACKEND_KEY = 'useClusterBalancerAsBacked';
 export const ENABLE_AUTOCOMPLETE = 'enableAutocomplete';
 
 export const AUTOCOMPLETE_ON_ENTER = 'autocompleteOnEnter';
+
+export const IS_HOTKEYS_HELP_HIDDDEN_KEY = 'isHotKeysHelpHidden';
