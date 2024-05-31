@@ -714,3 +714,15 @@ export const WindowFunctions = [
 export const TableFunction = [];
 
 export const Pragmas = ['TablePathPrefix', 'Warning'];
+
+export const TableSettings = [
+    'AUTO_PARTITIONING_BY_SIZE',
+    'AUTO_PARTITIONING_PARTITION_SIZE_MB',
+    'AUTO_PARTITIONING_BY_LOAD',
+    'AUTO_PARTITIONING_MIN_PARTITIONS_COUNT',
+    'AUTO_PARTITIONING_MAX_PARTITIONS_COUNT',
+    'UNIFORM_PARTITIONS',
+    'READ_REPLICAS_SETTINGS',
+    'TTL',
+    'KEY_BLOOM_FILTER',
+];

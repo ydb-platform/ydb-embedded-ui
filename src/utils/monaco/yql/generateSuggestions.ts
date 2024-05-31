@@ -14,6 +14,7 @@ import {
     SimpleFunctions,
     SimpleTypes,
     TableFunction,
+    TableSettings,
     Udfs,
     WindowFunctions,
 } from './constants';
@@ -55,13 +56,13 @@ const re = /[\s'"-/@]/;
 
 const suggestionEntityToAutocomplete: Partial<Record<YQLEntity, AutocompleteEntityType[]>> = {
     externalDataSource: ['external_data_source'],
+    externalTable: ['external_table'],
     replication: ['replication'],
     table: ['table'],
     tableStore: ['column_store'],
     topic: ['pers_queue_group'],
     view: ['view'],
-    //TODO: add after websql-autocomplete support indexex
-    // index: ['table_index', 'index'],
+    tableIndex: ['table_index', 'index'],
 };
 
 const commonSuggestionEntities: AutocompleteEntityType[] = ['dir', 'unknown'];
@@ -124,13 +125,16 @@ const SuggestionsWeight: Record<SuggestionType, number> = {
     suggestEntity: 2,
     suggestColumns: 3,
     suggestColumnAliases: 4,
-    suggestKeywords: 5,
-    suggestAggregateFunctions: 6,
-    suggestTableFunctions: 7,
-    suggestWindowFunctions: 8,
-    suggestFunctions: 9,
-    suggestUdfs: 10,
-    suggestSimpleTypes: 11,
+    suggestTableIndexes: 5,
+    suggestTableHints: 6,
+    suggestTableSettings: 7,
+    suggestSimpleTypes: 8,
+    suggestKeywords: 9,
+    suggestAggregateFunctions: 10,
+    suggestTableFunctions: 11,
+    suggestWindowFunctions: 12,
+    suggestFunctions: 13,
+    suggestUdfs: 14,
 };
 
 function getSuggestionIndex(suggestionType: SuggestionType) {
@@ -151,6 +155,9 @@ async function getAggregateFunctions() {
 }
 async function getPragmas() {
     return Pragmas;
+}
+async function getTableSettings() {
+    return TableSettings;
 }
 async function getUdfs() {
     return Udfs;
@@ -404,6 +411,19 @@ export async function generatePragmasSuggestion(
         detail: 'Pragma',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestPragmas')),
+    }));
+}
+export async function generateTableSettingsSuggestion(
+    rangeToInsertSuggestion: monaco.IRange,
+): Promise<monaco.languages.CompletionItem[]> {
+    const tableHints = await getTableSettings();
+    return tableHints.map((el) => ({
+        label: el,
+        insertText: el,
+        kind: CompletionItemKind.Property,
+        detail: 'Setting',
+        range: rangeToInsertSuggestion,
+        sortText: suggestionIndexToWeight(getSuggestionIndex('suggestTableSettings')),
     }));
 }
 
