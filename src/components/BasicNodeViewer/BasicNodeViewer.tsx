@@ -6,6 +6,7 @@ import {Icon} from '@gravity-ui/uikit';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
+import {createDeveloperUILinkWithNodeId} from '../../utils/developerUI/developerUI';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {Tags} from '../Tags';
 
@@ -20,9 +21,13 @@ interface BasicNodeViewerProps {
 }
 
 export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNodeViewerProps) => {
-    const nodeHref = additionalNodesProps?.getNodeRef
-        ? additionalNodesProps.getNodeRef(node) + 'internal'
-        : undefined;
+    let nodeHref: string | undefined;
+
+    if (additionalNodesProps?.getNodeRef) {
+        nodeHref = additionalNodesProps.getNodeRef(node) + 'internal';
+    } else if (node.NodeId) {
+        nodeHref = createDeveloperUILinkWithNodeId(node.NodeId) + 'internal';
+    }
 
     return (
         <div className={b(null, className)}>
