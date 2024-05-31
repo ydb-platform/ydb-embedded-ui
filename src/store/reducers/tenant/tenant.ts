@@ -1,8 +1,11 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
+import {DEFAULT_USER_SETTINGS, settingsManager} from '../../../services/settings';
+import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {api} from '../api';
 
+import {tenantPageSchema} from './types';
 import type {
     TenantDiagnosticsTab,
     TenantMetricsTab,
@@ -12,9 +15,17 @@ import type {
     TenantSummaryTab,
 } from './types';
 
+const tenantPage = tenantPageSchema
+    .catch(DEFAULT_USER_SETTINGS[TENANT_INITIAL_PAGE_KEY])
+    .parse(settingsManager.readUserSettingsValue(TENANT_INITIAL_PAGE_KEY));
+
+const initialState: TenantState = {
+    tenantPage,
+};
+
 const slice = createSlice({
     name: 'tenant',
-    initialState: {} as TenantState,
+    initialState,
     reducers: {
         setTenantPage: (state, action: PayloadAction<TenantPage>) => {
             state.tenantPage = action.payload;

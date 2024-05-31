@@ -1,13 +1,10 @@
 import {useThemeValue} from '@gravity-ui/uikit';
-import {useLocation} from 'react-router';
 
-import {parseQuery} from '../../../routes';
 import {TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
-import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
-import {useSetting} from '../../../utils/hooks';
+import {useTypedSelector} from '../../../utils/hooks';
 import Diagnostics from '../Diagnostics/Diagnostics';
 import {Query} from '../Query/Query';
 
@@ -23,13 +20,9 @@ interface ObjectGeneralProps {
 }
 
 function ObjectGeneral(props: ObjectGeneralProps) {
-    const location = useLocation();
     const theme = useThemeValue();
 
-    const [initialPage] = useSetting<string>(TENANT_INITIAL_PAGE_KEY);
-
-    const queryParams = parseQuery(location);
-    const {tenantPage = initialPage} = queryParams;
+    const {tenantPage} = useTypedSelector((state) => state.tenant);
 
     const renderTabContent = () => {
         const {type, additionalTenantProps, additionalNodesProps, tenantName} = props;

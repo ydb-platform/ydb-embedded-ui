@@ -26,8 +26,8 @@ export function useNavigationMenuItems() {
     const location = useLocation();
     const history = useHistory();
 
-    const [initialTenantPage, setInitialTenantPage] = useSetting<string>(TENANT_INITIAL_PAGE_KEY);
-    const {tenantPage = initialTenantPage} = useTypedSelector((state) => state.tenant);
+    const [, setInitialTenantPage] = useSetting<string>(TENANT_INITIAL_PAGE_KEY);
+    const {tenantPage} = useTypedSelector((state) => state.tenant);
 
     const {pathname} = location;
     const queryParams = parseQuery(location);
