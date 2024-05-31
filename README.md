@@ -118,7 +118,7 @@ To test production bundle with latest YDB backend release, do the following:
 
 1. Install dependencies with `npm ci`
 2. Build a production bundle with a few tweaks for embedded version: `npm run build:embedded`.
-3. Invoke `docker run -it --hostname localhost -dp 2135:2135 -p 8765:8765 -v ~/projects/ydb-embedded-ui/build:/ydb_data/node_1/contentmonitoring cr.yandex/yc/yandex-docker-local-ydb:latest`
+3. Invoke `docker run -it --hostname localhost -dp 2135:2135 -p 8765:8765 -v ~/projects/ydb-embedded-ui/build:/ydb_data/node_1/content/monitoring cr.yandex/yc/yandex-docker-local-ydb:latest`
 4. Open [embedded YDB UI](http://localhost:8765/monitoring) to view it in the browser.
 
 ### Testing production bundle with specific cluster host
@@ -129,7 +129,7 @@ It also could be usefull for development purposes, because some operations, that
 
 1. Install dependencies with `npm ci`
 2. Create production bundle with `npm run build:embedded`
-3. Copy your build files from `build` folder to `/contentmonitoring` folder on desired cluster host
+3. Copy your build files from `build` folder to `/content/monitoring` folder on desired cluster host
 4. Open `http://your-cluster-host:8765/monitoring` to see updated UI
 
 It's assumed, that you have all the necessary access rights to update files on the host.
