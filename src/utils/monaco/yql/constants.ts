@@ -1,3 +1,5 @@
+import type {YQLEntity} from '@gravity-ui/websql-autocomplete';
+
 export const LANGUAGE_YQL_ID = 'yql';
 
 export const SimpleTypes = [
@@ -715,14 +717,35 @@ export const TableFunction = [];
 
 export const Pragmas = ['TablePathPrefix', 'Warning'];
 
-export const TableSettings = [
-    'AUTO_PARTITIONING_BY_SIZE',
-    'AUTO_PARTITIONING_PARTITION_SIZE_MB',
-    'AUTO_PARTITIONING_BY_LOAD',
-    'AUTO_PARTITIONING_MIN_PARTITIONS_COUNT',
-    'AUTO_PARTITIONING_MAX_PARTITIONS_COUNT',
-    'UNIFORM_PARTITIONS',
-    'READ_REPLICAS_SETTINGS',
-    'TTL',
-    'KEY_BLOOM_FILTER',
-];
+export const EntitySettings: Record<YQLEntity, string[]> = {
+    table: [
+        'AUTO_PARTITIONING_BY_SIZE',
+        'AUTO_PARTITIONING_PARTITION_SIZE_MB',
+        'AUTO_PARTITIONING_BY_LOAD',
+        'AUTO_PARTITIONING_MIN_PARTITIONS_COUNT',
+        'AUTO_PARTITIONING_MAX_PARTITIONS_COUNT',
+        'UNIFORM_PARTITIONS',
+        'READ_REPLICAS_SETTINGS',
+        'TTL',
+        'KEY_BLOOM_FILTER',
+        'STORE',
+    ],
+    view: ['security_invoker'],
+    topic: [
+        'min_active_partitions',
+        'partition_count_limit',
+        'retention_period',
+        'retention_storage_mb',
+        'partition_write_speed_bytes_per_second',
+        'partition_write_burst_bytes',
+        'metering_mode',
+    ],
+    object: [],
+    user: [],
+    group: [],
+    externalDataSource: [],
+    externalTable: [],
+    tableStore: [],
+    replication: [],
+    tableIndex: [],
+};

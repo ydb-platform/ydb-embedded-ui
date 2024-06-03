@@ -1,4 +1,4 @@
-import type {CursorPosition} from '@gravity-ui/websql-autocomplete';
+import type {CursorPosition, YQLEntity} from '@gravity-ui/websql-autocomplete';
 import type Monaco from 'monaco-editor';
 
 import {
@@ -6,12 +6,12 @@ import {
     generateColumnAliasesSuggestion,
     generateColumnsSuggestion,
     generateEntitiesSuggestion,
+    generateEntitySettingsSuggestion,
     generateKeywordsSuggestion,
     generatePragmasSuggestion,
     generateSimpleFunctionsSuggestion,
     generateSimpleTypesSuggestion,
     generateTableFunctionsSuggestion,
-    generateTableSettingsSuggestion,
     generateUdfSuggestion,
     generateWindowFunctionsSuggestion,
 } from './generateSuggestions';
@@ -34,6 +34,23 @@ export function createProvideSuggestionsFunction(database: string) {
 
         return {suggestions};
     };
+}
+
+function getEntityType(stmt: string): YQLEntity | undefined {
+    switch (stmt) {
+        case 'create_table_stmt':
+            return 'table';
+        case 'create_view_stmt':
+            return 'view';
+        case 'create_topic_stmt':
+            return 'topic';
+        case 'create_replication_stmt':
+            return 'replication';
+        case 'create_external_data_source_stmt':
+            return 'externalDataSource';
+        default:
+            return undefined;
+    }
 }
 
 function getEntityNameAtCursor(model: Monaco.editor.ITextModel, cursorPosition: Monaco.Position) {
@@ -70,7 +87,7 @@ async function getSuggestions(
     let udfsSuggestions: Monaco.languages.CompletionItem[] = [];
     let simpleTypesSuggestions: Monaco.languages.CompletionItem[] = [];
     let pragmasSuggestions: Monaco.languages.CompletionItem[] = [];
-    let tableSettingsSuggestions: Monaco.languages.CompletionItem[] = [];
+    let entitySettingsSuggestions: Monaco.languages.CompletionItem[] = [];
 
     if (parseResult.suggestEntity) {
         const entityNamePrefix = getEntityNameAtCursor(model, cursorPosition);
@@ -106,7 +123,13 @@ async function getSuggestions(
         pragmasSuggestions = await generatePragmasSuggestion(rangeToInsertSuggestion);
     }
     if (parseResult.suggestTableSettings) {
-        tableSettingsSuggestions = await generateTableSettingsSuggestion(rangeToInsertSuggestion);
+        const entityType = getEntityType(parseResult.suggestTableSettings);
+        if (entityType) {
+            entitySettingsSuggestions = await generateEntitySettingsSuggestion(
+                rangeToInsertSuggestion,
+                entityType,
+            );
+        }
     }
 
     const columnAliasSuggestion = await generateColumnAliasesSuggestion(
@@ -137,7 +160,7 @@ async function getSuggestions(
         ...columnsSuggestions,
         ...keywordsSuggestions,
         ...aggregateFunctionsSuggestions,
-        ...tableSettingsSuggestions,
+        ...entitySettingsSuggestions,
     ];
 
     return suggestions;

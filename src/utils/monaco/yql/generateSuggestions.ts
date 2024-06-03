@@ -10,11 +10,11 @@ import type {AutocompleteEntityType, TAutocompleteEntity} from '../../../types/a
 
 import {
     AggregateFunctions,
+    EntitySettings,
     Pragmas,
     SimpleFunctions,
     SimpleTypes,
     TableFunction,
-    TableSettings,
     Udfs,
     WindowFunctions,
 } from './constants';
@@ -58,7 +58,7 @@ const suggestionEntityToAutocomplete: Partial<Record<YQLEntity, AutocompleteEnti
     externalDataSource: ['external_data_source'],
     externalTable: ['external_table'],
     replication: ['replication'],
-    table: ['table'],
+    table: ['table', 'column_table'],
     tableStore: ['column_store'],
     topic: ['pers_queue_group'],
     view: ['view'],
@@ -156,8 +156,8 @@ async function getAggregateFunctions() {
 async function getPragmas() {
     return Pragmas;
 }
-async function getTableSettings() {
-    return TableSettings;
+async function getEntitySettings(entityType: YQLEntity) {
+    return EntitySettings[entityType];
 }
 async function getUdfs() {
     return Udfs;
@@ -413,10 +413,11 @@ export async function generatePragmasSuggestion(
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestPragmas')),
     }));
 }
-export async function generateTableSettingsSuggestion(
+export async function generateEntitySettingsSuggestion(
     rangeToInsertSuggestion: monaco.IRange,
+    entityType: YQLEntity,
 ): Promise<monaco.languages.CompletionItem[]> {
-    const tableHints = await getTableSettings();
+    const tableHints = await getEntitySettings(entityType);
     return tableHints.map((el) => ({
         label: el,
         insertText: el,
