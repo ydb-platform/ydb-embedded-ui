@@ -129,7 +129,7 @@ function TabletActions(tablet: TTabletStateInfo) {
                 dispatch(tabletsApi.util.invalidateTags(['All']));
             }}
             buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
-            withPopover={true}
+            withPopover
             popoverContent={i18n('controls.kill-not-allowed')}
             popoverDisabled={isUserAllowedToMakeChanges}
         >
