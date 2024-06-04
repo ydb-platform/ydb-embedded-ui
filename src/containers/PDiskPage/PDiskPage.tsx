@@ -121,6 +121,9 @@ export function PDiskPage() {
                     buttonDisabled={!nodeId || !pDiskId || !isUserAllowedToMakeChanges}
                     buttonView="normal"
                     dialogContent={pDiskPageKeyset('restart-pdisk-dialog')}
+                    withPopover={true}
+                    popoverContent={pDiskPageKeyset('restart-pdisk-not-allowed')}
+                    popoverDisabled={isUserAllowedToMakeChanges}
                 >
                     <Icon data={ArrowRotateLeft} />
                     {pDiskPageKeyset('restart-pdisk-button')}

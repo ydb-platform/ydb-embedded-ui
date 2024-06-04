@@ -47,6 +47,10 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                 onConfirmActionSuccess={fetchData}
                 buttonClassName={b('control')}
                 buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
+                withPopover={true}
+                popoverContent={i18n('controls.kill-not-allowed')}
+                popoverPlacement={'bottom'}
+                popoverDisabled={isUserAllowedToMakeChanges}
             >
                 {i18n('controls.kill')}
             </ButtonWithConfirmDialog>
@@ -58,6 +62,10 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                         onConfirmActionSuccess={fetchData}
                         buttonClassName={b('control')}
                         buttonDisabled={isDisabledStop || !isUserAllowedToMakeChanges}
+                        withPopover={true}
+                        popoverContent={i18n('controls.stop-not-allowed')}
+                        popoverPlacement={'bottom'}
+                        popoverDisabled={isUserAllowedToMakeChanges}
                     >
                         {i18n('controls.stop')}
                     </ButtonWithConfirmDialog>
@@ -67,6 +75,10 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                         onConfirmActionSuccess={fetchData}
                         buttonClassName={b('control')}
                         buttonDisabled={isDisabledResume || !isUserAllowedToMakeChanges}
+                        withPopover={true}
+                        popoverContent={i18n('controls.resume-not-allowed')}
+                        popoverPlacement={'bottom'}
+                        popoverDisabled={isUserAllowedToMakeChanges}
                     >
                         {i18n('controls.resume')}
                     </ButtonWithConfirmDialog>

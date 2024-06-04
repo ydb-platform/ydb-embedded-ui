@@ -133,6 +133,9 @@ export function VDiskPage() {
                     buttonDisabled={!VDiskId || !isUserAllowedToMakeChanges}
                     buttonView="normal"
                     dialogContent={vDiskPageKeyset('evict-vdisk-dialog')}
+                    withPopover={true}
+                    popoverContent={vDiskPageKeyset('evict-vdisk-not-allowed')}
+                    popoverDisabled={isUserAllowedToMakeChanges}
                 >
                     <Icon data={ArrowsOppositeToDots} />
                     {vDiskPageKeyset('evict-vdisk-button')}

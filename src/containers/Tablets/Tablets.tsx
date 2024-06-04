@@ -129,6 +129,9 @@ function TabletActions(tablet: TTabletStateInfo) {
                 dispatch(tabletsApi.util.invalidateTags(['All']));
             }}
             buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
+            withPopover={true}
+            popoverContent={i18n('controls.kill-not-allowed')}
+            popoverDisabled={isUserAllowedToMakeChanges}
         >
             <Icon data={ArrowsRotateRight} />
         </ButtonWithConfirmDialog>
