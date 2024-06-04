@@ -6,6 +6,7 @@ import {
     generateColumnAliasesSuggestion,
     generateColumnsSuggestion,
     generateEntitiesSuggestion,
+    generateEntitySettingsSuggestion,
     generateKeywordsSuggestion,
     generatePragmasSuggestion,
     generateSimpleFunctionsSuggestion,
@@ -69,6 +70,7 @@ async function getSuggestions(
     let udfsSuggestions: Monaco.languages.CompletionItem[] = [];
     let simpleTypesSuggestions: Monaco.languages.CompletionItem[] = [];
     let pragmasSuggestions: Monaco.languages.CompletionItem[] = [];
+    let entitySettingsSuggestions: Monaco.languages.CompletionItem[] = [];
 
     if (parseResult.suggestEntity) {
         const entityNamePrefix = getEntityNameAtCursor(model, cursorPosition);
@@ -103,6 +105,12 @@ async function getSuggestions(
     if (parseResult.suggestPragmas) {
         pragmasSuggestions = await generatePragmasSuggestion(rangeToInsertSuggestion);
     }
+    if (parseResult.suggestEntitySettings) {
+        entitySettingsSuggestions = await generateEntitySettingsSuggestion(
+            rangeToInsertSuggestion,
+            parseResult.suggestEntitySettings,
+        );
+    }
 
     const columnAliasSuggestion = await generateColumnAliasesSuggestion(
         rangeToInsertSuggestion,
@@ -132,6 +140,7 @@ async function getSuggestions(
         ...columnsSuggestions,
         ...keywordsSuggestions,
         ...aggregateFunctionsSuggestions,
+        ...entitySettingsSuggestions,
     ];
 
     return suggestions;
