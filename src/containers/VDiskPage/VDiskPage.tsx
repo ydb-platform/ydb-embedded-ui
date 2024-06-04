@@ -33,6 +33,7 @@ export function VDiskPage() {
     const dispatch = useTypedDispatch();
 
     const nodesMap = useTypedSelector(selectNodesMap);
+    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
 
     const [{nodeId, pDiskId, vDiskSlotId}] = useQueryParams({
         nodeId: StringParam,
@@ -129,9 +130,12 @@ export function VDiskPage() {
                 <ButtonWithConfirmDialog
                     onConfirmAction={handleEvictVDisk}
                     onConfirmActionSuccess={handleAfterEvictVDisk}
-                    buttonDisabled={!VDiskId}
+                    buttonDisabled={!VDiskId || !isUserAllowedToMakeChanges}
                     buttonView="normal"
                     dialogContent={vDiskPageKeyset('evict-vdisk-dialog')}
+                    withPopover
+                    popoverContent={vDiskPageKeyset('evict-vdisk-not-allowed')}
+                    popoverDisabled={isUserAllowedToMakeChanges}
                 >
                     <Icon data={ArrowsOppositeToDots} />
                     {vDiskPageKeyset('evict-vdisk-button')}

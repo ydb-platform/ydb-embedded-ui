@@ -7,5 +7,6 @@
   "Node FQDN": "Node FQDN",
   "Generation": "Generation",
   "Uptime": "Uptime",
-  "dialog.kill": "The tablet will be restarted. Do you want to proceed?"
+  "dialog.kill": "The tablet will be restarted. Do you want to proceed?",
+  "controls.kill-not-allowed": "You don't have enough rights to restart tablet"
 }
