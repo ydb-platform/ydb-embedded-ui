@@ -127,7 +127,7 @@ const SuggestionsWeight: Record<SuggestionType, number> = {
     suggestColumnAliases: 4,
     suggestTableIndexes: 5,
     suggestTableHints: 6,
-    suggestTableSettings: 7,
+    suggestEntitySettings: 7,
     suggestSimpleTypes: 8,
     suggestKeywords: 9,
     suggestAggregateFunctions: 10,
@@ -424,7 +424,7 @@ export async function generateEntitySettingsSuggestion(
         kind: CompletionItemKind.Property,
         detail: 'Setting',
         range: rangeToInsertSuggestion,
-        sortText: suggestionIndexToWeight(getSuggestionIndex('suggestTableSettings')),
+        sortText: suggestionIndexToWeight(getSuggestionIndex('suggestEntitySettings')),
     }));
 }
 

@@ -1,4 +1,4 @@
-import type {CursorPosition, YQLEntity} from '@gravity-ui/websql-autocomplete';
+import type {CursorPosition} from '@gravity-ui/websql-autocomplete';
 import type Monaco from 'monaco-editor';
 
 import {
@@ -34,23 +34,6 @@ export function createProvideSuggestionsFunction(database: string) {
 
         return {suggestions};
     };
-}
-
-function getEntityType(stmt: string): YQLEntity | undefined {
-    switch (stmt) {
-        case 'create_table_stmt':
-            return 'table';
-        case 'create_view_stmt':
-            return 'view';
-        case 'create_topic_stmt':
-            return 'topic';
-        case 'create_replication_stmt':
-            return 'replication';
-        case 'create_external_data_source_stmt':
-            return 'externalDataSource';
-        default:
-            return undefined;
-    }
 }
 
 function getEntityNameAtCursor(model: Monaco.editor.ITextModel, cursorPosition: Monaco.Position) {
@@ -122,14 +105,11 @@ async function getSuggestions(
     if (parseResult.suggestPragmas) {
         pragmasSuggestions = await generatePragmasSuggestion(rangeToInsertSuggestion);
     }
-    if (parseResult.suggestTableSettings) {
-        const entityType = getEntityType(parseResult.suggestTableSettings);
-        if (entityType) {
-            entitySettingsSuggestions = await generateEntitySettingsSuggestion(
-                rangeToInsertSuggestion,
-                entityType,
-            );
-        }
+    if (parseResult.suggestEntitySettings) {
+        entitySettingsSuggestions = await generateEntitySettingsSuggestion(
+            rangeToInsertSuggestion,
+            parseResult.suggestEntitySettings,
+        );
     }
 
     const columnAliasSuggestion = await generateColumnAliasesSuggestion(
