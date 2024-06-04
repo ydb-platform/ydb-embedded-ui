@@ -116,6 +116,8 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
 function TabletActions(tablet: TTabletStateInfo) {
     const isDisabledRestart = tablet.State === ETabletState.Stopped;
     const dispatch = useTypedDispatch();
+    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
+
     return (
         <ButtonWithConfirmDialog
             buttonView="outlined"
@@ -126,7 +128,10 @@ function TabletActions(tablet: TTabletStateInfo) {
             onConfirmActionSuccess={() => {
                 dispatch(tabletsApi.util.invalidateTags(['All']));
             }}
-            buttonDisabled={isDisabledRestart}
+            buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
+            withPopover
+            popoverContent={i18n('controls.kill-not-allowed')}
+            popoverDisabled={isUserAllowedToMakeChanges}
         >
             <Icon data={ArrowsRotateRight} />
         </ButtonWithConfirmDialog>

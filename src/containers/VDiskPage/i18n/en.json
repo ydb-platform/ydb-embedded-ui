@@ -6,5 +6,6 @@
   "group": "Group",
 
   "evict-vdisk-button": "Evict VDisk",
-  "evict-vdisk-dialog": "VDisk will be evicted. Do you want to proceed?"
+  "evict-vdisk-dialog": "VDisk will be evicted. Do you want to proceed?",
+  "evict-vdisk-not-allowed": "You don't have enough rights to evict VDisk"
 }

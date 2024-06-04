@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {Button} from '@gravity-ui/uikit';
-import type {ButtonProps} from '@gravity-ui/uikit';
+import {Button, Popover} from '@gravity-ui/uikit';
+import type {ButtonProps, PopoverProps} from '@gravity-ui/uikit';
 
 import {CriticalActionDialog} from '../CriticalActionDialog';
 
@@ -13,6 +13,10 @@ interface ButtonWithConfirmDialogProps<T, K> {
     buttonDisabled?: ButtonProps['disabled'];
     buttonView?: ButtonProps['view'];
     buttonClassName?: ButtonProps['className'];
+    withPopover?: boolean;
+    popoverContent?: PopoverProps['content'];
+    popoverPlacement?: PopoverProps['placement'];
+    popoverDisabled?: PopoverProps['disabled'];
 }
 
 export function ButtonWithConfirmDialog<T, K>({
@@ -23,6 +27,10 @@ export function ButtonWithConfirmDialog<T, K>({
     buttonDisabled = false,
     buttonView = 'action',
     buttonClassName,
+    withPopover = false,
+    popoverContent,
+    popoverPlacement = 'right',
+    popoverDisabled = true,
 }: ButtonWithConfirmDialogProps<T, K>) {
     const [isConfirmDialogVisible, setIsConfirmDialogVisible] = React.useState(false);
     const [buttonLoading, setButtonLoading] = React.useState(false);
@@ -50,6 +58,36 @@ export function ButtonWithConfirmDialog<T, K>({
         setButtonLoading(false);
     };
 
+    const renderButton = () => {
+        return (
+            <Button
+                onClick={() => setIsConfirmDialogVisible(true)}
+                view={buttonView}
+                disabled={buttonDisabled}
+                loading={!buttonDisabled && buttonLoading}
+                className={buttonClassName}
+            >
+                {children}
+            </Button>
+        );
+    };
+
+    const renderContent = () => {
+        if (withPopover) {
+            return (
+                <Popover
+                    content={popoverContent}
+                    placement={popoverPlacement}
+                    disabled={popoverDisabled}
+                >
+                    {renderButton()}
+                </Popover>
+            );
+        }
+
+        return renderButton();
+    };
+
     return (
         <React.Fragment>
             <CriticalActionDialog
@@ -62,15 +100,7 @@ export function ButtonWithConfirmDialog<T, K>({
                     setIsConfirmDialogVisible(false);
                 }}
             />
-            <Button
-                onClick={() => setIsConfirmDialogVisible(true)}
-                view={buttonView}
-                disabled={buttonDisabled}
-                loading={!buttonDisabled && buttonLoading}
-                className={buttonClassName}
-            >
-                {children}
-            </Button>
+            {renderContent()}
         </React.Fragment>
     );
 }

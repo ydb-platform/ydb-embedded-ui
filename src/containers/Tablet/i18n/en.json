@@ -1,10 +1,17 @@
 {
   "tablet.header": "Tablet",
+
   "controls.kill": "Restart",
   "controls.stop": "Stop",
   "controls.resume": "Resume",
+
+  "controls.kill-not-allowed": "You don't have enough rights to restart tablet",
+  "controls.stop-not-allowed": "You don't have enough rights to stop tablet",
+  "controls.resume-not-allowed": "You don't have enough rights to resume tablet",
+
   "dialog.kill": "The tablet will be restarted. Do you want to proceed?",
   "dialog.stop": "The tablet will be stopped. Do you want to proceed?",
   "dialog.resume": "The tablet will be resumed. Do you want to proceed?",
+
   "emptyState": "The tablet was not found"
 }

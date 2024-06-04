@@ -32,7 +32,13 @@ const authentication: Reducer<AuthenticationState, AuthenticationAction> = (
             return {...state, error: action.error};
         }
         case FETCH_USER.SUCCESS: {
-            return {...state, user: action.data};
+            const {user, isUserAllowedToMakeChanges} = action.data;
+
+            return {
+                ...state,
+                user,
+                isUserAllowedToMakeChanges,
+            };
         }
 
         default:
@@ -59,8 +65,15 @@ export const getUser = () => {
         request: window.api.whoami(),
         actions: FETCH_USER,
         dataHandler: (data) => {
-            const {UserSID, AuthType} = data;
-            return AuthType === 'Login' ? UserSID : undefined;
+            const {UserSID, AuthType, IsMonitoringAllowed} = data;
+            return {
+                user: AuthType === 'Login' ? UserSID : undefined,
+                // If ydb version supports this feature,
+                // There should be explicit flag in whoami response
+                // Otherwise every user is allowed to make changes
+                // Anyway there will be guards on backend
+                isUserAllowedToMakeChanges: IsMonitoringAllowed !== false,
+            };
         },
     });
 };

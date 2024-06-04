@@ -3,6 +3,7 @@ import React from 'react';
 import {ButtonWithConfirmDialog} from '../../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {ETabletState} from '../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
+import {useTypedSelector} from '../../../utils/hooks';
 import {b} from '../Tablet';
 import i18n from '../i18n';
 
@@ -13,6 +14,8 @@ interface TabletControlsProps {
 
 export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
     const {TabletId, HiveId} = tablet;
+
+    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
 
     const _onKillClick = () => {
         return window.api.killTablet(TabletId);
@@ -43,7 +46,11 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                 onConfirmAction={_onKillClick}
                 onConfirmActionSuccess={fetchData}
                 buttonClassName={b('control')}
-                buttonDisabled={isDisabledRestart}
+                buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
+                withPopover
+                popoverContent={i18n('controls.kill-not-allowed')}
+                popoverPlacement={'bottom'}
+                popoverDisabled={isUserAllowedToMakeChanges}
             >
                 {i18n('controls.kill')}
             </ButtonWithConfirmDialog>
@@ -54,7 +61,11 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                         onConfirmAction={_onStopClick}
                         onConfirmActionSuccess={fetchData}
                         buttonClassName={b('control')}
-                        buttonDisabled={isDisabledStop}
+                        buttonDisabled={isDisabledStop || !isUserAllowedToMakeChanges}
+                        withPopover
+                        popoverContent={i18n('controls.stop-not-allowed')}
+                        popoverPlacement={'bottom'}
+                        popoverDisabled={isUserAllowedToMakeChanges}
                     >
                         {i18n('controls.stop')}
                     </ButtonWithConfirmDialog>
@@ -63,7 +74,11 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                         onConfirmAction={_onResumeClick}
                         onConfirmActionSuccess={fetchData}
                         buttonClassName={b('control')}
-                        buttonDisabled={isDisabledResume}
+                        buttonDisabled={isDisabledResume || !isUserAllowedToMakeChanges}
+                        withPopover
+                        popoverContent={i18n('controls.resume-not-allowed')}
+                        popoverPlacement={'bottom'}
+                        popoverDisabled={isUserAllowedToMakeChanges}
                     >
                         {i18n('controls.resume')}
                     </ButtonWithConfirmDialog>

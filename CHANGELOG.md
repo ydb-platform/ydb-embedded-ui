@@ -1,5 +1,24 @@
 # Changelog
 
+## [6.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.3.0...v6.4.0) (2024-05-31)
+
+
+### Features
+
+* add Nodes and Storage filters to url ([#849](https://github.com/ydb-platform/ydb-embedded-ui/issues/849)) ([5a789d5](https://github.com/ydb-platform/ydb-embedded-ui/commit/5a789d50d86df2e4fd1918d3bb2e3eb87a1d26dc))
+* delete icons sprite, use gravity icons ([#853](https://github.com/ydb-platform/ydb-embedded-ui/issues/853)) ([be1d6c3](https://github.com/ydb-platform/ydb-embedded-ui/commit/be1d6c39ba6818844163aba5267f138150a12a75))
+* **Diagnostics:** display tablets as table ([#852](https://github.com/ydb-platform/ydb-embedded-ui/issues/852)) ([7915463](https://github.com/ydb-platform/ydb-embedded-ui/commit/7915463ac0fdeac4266667e5b64f9ed4afa2c174))
+* **Node:** add developer ui link for embedded version ([#863](https://github.com/ydb-platform/ydb-embedded-ui/issues/863)) ([163b104](https://github.com/ydb-platform/ydb-embedded-ui/commit/163b10410f54fade05b925cabd932ea597741423))
+* **Node:** display tablets as a table ([#855](https://github.com/ydb-platform/ydb-embedded-ui/issues/855)) ([10018ae](https://github.com/ydb-platform/ydb-embedded-ui/commit/10018ae9e2a389f910b4a12f3974af69f05f36d8))
+
+
+### Bug Fixes
+
+* fix ast always light theme ([#827](https://github.com/ydb-platform/ydb-embedded-ui/issues/827)) ([45084a6](https://github.com/ydb-platform/ydb-embedded-ui/commit/45084a6ea373b8489d1520600303eb1583186fff))
+* set 0 for tenant metrics if consumption undefined ([#850](https://github.com/ydb-platform/ydb-embedded-ui/issues/850)) ([313d130](https://github.com/ydb-platform/ydb-embedded-ui/commit/313d1305d1a279f803a77e911ead5006164501db))
+* **Tenant:** always set tenantPage in the url ([#859](https://github.com/ydb-platform/ydb-embedded-ui/issues/859)) ([0ee9127](https://github.com/ydb-platform/ydb-embedded-ui/commit/0ee9127596f002e667b5acd1aa7f2ff12149be3d))
+* use soft quota for tenant storage ([#837](https://github.com/ydb-platform/ydb-embedded-ui/issues/837)) ([5aa5b68](https://github.com/ydb-platform/ydb-embedded-ui/commit/5aa5b68a619ade6e7b7683d82891d26a36a84ee9))
+
 ## [6.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.2.2...v6.3.0) (2024-05-24)
 
 
