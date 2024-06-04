@@ -417,8 +417,8 @@ export async function generateEntitySettingsSuggestion(
     rangeToInsertSuggestion: monaco.IRange,
     entityType: YQLEntity,
 ): Promise<monaco.languages.CompletionItem[]> {
-    const tableHints = await getEntitySettings(entityType);
-    return tableHints.map((el) => ({
+    const entitySettings = await getEntitySettings(entityType);
+    return entitySettings.map((el) => ({
         label: el,
         insertText: el,
         kind: CompletionItemKind.Property,
