@@ -7,6 +7,7 @@ import qs from 'qs';
 import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
 
+import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {ClipboardButton} from '../../../components/ClipboardButton';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import {
@@ -32,7 +33,6 @@ import {
 } from '../../../utils/constants';
 import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
-import {AsyncReplicationState} from '../../AsyncReplicationState';
 import {Acl} from '../Acl/Acl';
 import {ExternalDataSourceSummary} from '../Info/ExternalDataSource/ExternalDataSource';
 import {ExternalTableSummary} from '../Info/ExternalTable/ExternalTable';

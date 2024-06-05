@@ -1,9 +1,9 @@
 import {Flex, Text} from '@gravity-ui/uikit';
 
+import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
 import {InfoViewer} from '../../../../../components/InfoViewer';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {useTypedSelector} from '../../../../../utils/hooks';
-import {AsyncReplicationState} from '../../../../AsyncReplicationState';
 import {getEntityName} from '../../../utils';
 import {AsyncReplicationPaths} from '../AsyncReplicationPaths';
 
