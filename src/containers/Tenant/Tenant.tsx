@@ -94,10 +94,11 @@ function Tenant(props: TenantProps) {
     }, [tenantName, dispatch]);
 
     React.useEffect(() => {
-        if (currentSchemaPath) {
+        //TODO: should be refactored when move to @reduxjs/toolkit/query
+        if (currentSchemaPath && currentSchemaPath !== tenantName) {
             dispatch(getSchema({path: currentSchemaPath}));
         }
-    }, [currentSchemaPath, dispatch]);
+    }, [currentSchemaPath, dispatch, tenantName]);
 
     React.useEffect(() => {
         if (tenantName) {
