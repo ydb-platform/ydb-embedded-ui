@@ -1,0 +1,7 @@
+@import '../../../../../styles/mixins.scss';
+
+.ydb-async-replication-paths {
+    &__title {
+        @include info-viewer-title();
+    }
+}

@@ -7,6 +7,7 @@ import qs from 'qs';
 import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
 
+import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {ClipboardButton} from '../../../components/ClipboardButton';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import {
@@ -141,6 +142,12 @@ export function ObjectSummary({
     };
 
     const renderObjectOverview = () => {
+        const startTimeInMilliseconds = Number(currentSchemaData?.CreateStep);
+        const createdAt = startTimeInMilliseconds
+            ? formatDateTime(startTimeInMilliseconds)
+            : 'unknown';
+        const createdAtLabel = 'Created At';
+
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
         const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
@@ -163,19 +170,34 @@ export function ObjectSummary({
                 <ExternalDataSourceSummary data={currentObjectData} />
             ),
             [EPathType.EPathTypeView]: undefined,
+            [EPathType.EPathTypeReplication]: () => (
+                <InfoViewer
+                    info={[
+                        {
+                            label: createdAtLabel,
+                            value: createdAt,
+                        },
+                        {
+                            label: 'State',
+                            value: (
+                                <AsyncReplicationState
+                                    state={
+                                        currentObjectData?.PathDescription?.ReplicationDescription
+                                            ?.State
+                                    }
+                                />
+                            ),
+                        },
+                    ]}
+                />
+            ),
         };
 
         let component =
             currentSchemaData?.PathType && pathTypeToComponent[currentSchemaData.PathType]?.();
 
         if (!component) {
-            const startTimeInMilliseconds = Number(currentSchemaData?.CreateStep);
-            let createTime = '';
-            if (startTimeInMilliseconds) {
-                createTime = formatDateTime(startTimeInMilliseconds);
-            }
-
-            component = <InfoViewer info={[{label: 'Create time', value: createTime}]} />;
+            component = <InfoViewer info={[{label: createdAtLabel, value: createdAt}]} />;
         }
 
         return component;

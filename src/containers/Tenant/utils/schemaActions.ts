@@ -137,6 +137,8 @@ export const getActions =
         // verbose mapping to guarantee a correct actions set for new node types
         // TS will error when a new type is added in the lib but is not mapped here
         const nodeTypeToActions: Record<NavigationTreeNodeType, ActionsSet> = {
+            async_replication: JUST_COPY,
+
             database: DIR_SET,
             directory: DIR_SET,
 

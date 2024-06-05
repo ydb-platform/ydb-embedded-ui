@@ -1,0 +1,7 @@
+{
+  "credentials.label": "Credentials",
+  "noData": "No data for entity:",
+  "srcConnection.database.label": "Source Database Path",
+  "srcConnection.endpoint.label": "Source Cluster Endpoint",
+  "state.label": "State"
+}

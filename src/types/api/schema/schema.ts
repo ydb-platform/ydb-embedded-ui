@@ -5,6 +5,7 @@ import type {TColumnStoreDescription, TColumnTableDescription} from './columnEnt
 import type {TExternalDataSourceDescription} from './externalDataSource';
 import type {TExternalTableDescription} from './externalTable';
 import type {TPersQueueGroupDescription} from './persQueueGroup';
+import type {TReplicationDescription} from './replication';
 import type {TTableDescription, TTableStats} from './table';
 import type {TIndexDescription} from './tableIndex';
 import type {TViewDescription} from './view';
@@ -84,6 +85,8 @@ export interface TPathDescription {
     ExternalDataSourceDescription?: TExternalDataSourceDescription;
 
     ViewDescription?: TViewDescription;
+
+    ReplicationDescription?: TReplicationDescription;
 }
 
 export interface TDirEntry {
@@ -267,6 +270,8 @@ export enum EPathType {
     EPathTypeExternalDataSource = 'EPathTypeExternalDataSource',
     EPathTypeExternalTable = 'EPathTypeExternalTable',
     EPathTypeView = 'EPathTypeView',
+
+    EPathTypeReplication = 'EPathTypeReplication',
 }
 
 export enum EPathSubType {

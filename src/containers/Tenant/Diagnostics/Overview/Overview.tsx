@@ -19,6 +19,7 @@ import {
     isTableType,
 } from '../../utils/schema';
 
+import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
 import {TableInfo} from './TableInfo';
 import {TopicInfo} from './TopicInfo';
@@ -91,6 +92,7 @@ function Overview({type, tenantName}: OverviewProps) {
             [EPathType.EPathTypeExternalTable]: () => <ExternalTableInfo data={data} />,
             [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
             [EPathType.EPathTypeView]: undefined,
+            [EPathType.EPathTypeReplication]: () => <AsyncReplicationInfo data={data} />,
         };
 
         return (

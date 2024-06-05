@@ -70,6 +70,8 @@ const partitions = {
     title: 'Partitions',
 };
 
+export const ASYNC_REPLICATION_PAGES = [overview, describe];
+
 export const DATABASE_PAGES = [
     overview,
     topQueries,
@@ -117,6 +119,8 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeExternalTable]: EXTERNAL_TABLE_PAGES,
 
     [EPathType.EPathTypeView]: VIEW_PAGES,
+
+    [EPathType.EPathTypeReplication]: ASYNC_REPLICATION_PAGES,
 };
 
 export const getPagesByType = (type?: EPathType) => (type && pathTypeToPages[type]) || DIR_PAGES;

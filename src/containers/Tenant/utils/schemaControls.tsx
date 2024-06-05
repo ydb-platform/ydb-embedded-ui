@@ -46,6 +46,8 @@ export const getControls =
         );
 
         const nodeTypeToControls: Record<NavigationTreeNodeType, Controls> = {
+            async_replication: undefined,
+
             database: undefined,
             directory: undefined,
 
