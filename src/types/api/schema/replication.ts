@@ -2,26 +2,17 @@ import type {IssueMessage} from '../query';
 
 import type {TPathID} from './shared';
 
-/**
- * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/replication.proto
- */
 interface TStaticCredentials {
     User?: string;
     Password?: string;
     PasswordSecretName?: string;
 }
 
-/**
- * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/replication.proto
- */
 interface TOAuthToken {
     Token?: string;
     TokenSecretName?: string;
 }
 
-/**
- * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/replication.proto
- */
 export interface TConnectionParams {
     Endpoint?: string;
     Database?: string;
@@ -29,17 +20,17 @@ export interface TConnectionParams {
     OAuthToken?: TOAuthToken;
 }
 
-interface TReplicationConfigTTargetEverything {
+interface TTargetEverything {
     DstPrefix?: string;
 }
 
-export interface TReplicationConfigTTargetSpecificTTarget {
+export interface TTarget {
     SrcPath?: string;
     DstPath?: string;
 }
 
-interface TReplicationConfigTTargetSpecific {
-    Targets: TReplicationConfigTTargetSpecificTTarget[];
+interface TTargetSpecific {
+    Targets: TTarget[];
 }
 
 /**
@@ -47,25 +38,25 @@ interface TReplicationConfigTTargetSpecific {
  */
 export interface TReplicationConfig {
     SrcConnectionParams?: TConnectionParams;
-    Everything?: TReplicationConfigTTargetEverything;
-    Specific?: TReplicationConfigTTargetSpecific;
+    Everything?: TTargetEverything;
+    Specific?: TTargetSpecific;
     InitialSync?: boolean;
 }
 
-interface TReplicationStateTStandBy {}
-interface TReplicationStateTPaused {}
+interface TStandBy {}
+interface TPaused {}
 
-enum TReplicationStateTDoneEFailoverMode {
+enum EFailoverMode {
     FAILOVER_MODE_UNSPECIFIED = 0,
     FAILOVER_MODE_CONSISTENT = 1,
     FAILOVER_MODE_FORCE = 2,
 }
 
-interface TReplicationStateTDone {
-    FailoverMode?: TReplicationStateTDoneEFailoverMode;
+interface TDone {
+    FailoverMode?: EFailoverMode;
 }
 
-interface TReplicationStateTError {
+interface TError {
     IssueMessage: IssueMessage[];
 }
 
@@ -73,10 +64,10 @@ interface TReplicationStateTError {
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/replication.proto
  */
 export interface TReplicationState {
-    StandBy?: TReplicationStateTStandBy;
-    Paused?: TReplicationStateTPaused;
-    Done?: TReplicationStateTDone;
-    Error?: TReplicationStateTError;
+    StandBy?: TStandBy;
+    Paused?: TPaused;
+    Done?: TDone;
+    Error?: TError;
 }
 
 /**

@@ -2,10 +2,7 @@ import type {Column} from '@gravity-ui/react-data-table';
 import {Text} from '@gravity-ui/uikit';
 
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
-import type {
-    TReplicationConfig,
-    TReplicationConfigTTargetSpecificTTarget,
-} from '../../../../../types/api/schema/replication';
+import type {TReplicationConfig, TTarget} from '../../../../../types/api/schema/replication';
 import {cn} from '../../../../../utils/cn';
 import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 
@@ -19,7 +16,7 @@ interface AsyncReplicationPathsProps {
     config?: TReplicationConfig;
 }
 
-const columns: Column<TReplicationConfigTTargetSpecificTTarget>[] = [
+const columns: Column<TTarget>[] = [
     {
         name: i18n('column.srcPath.name'),
         render: ({row}) => row.SrcPath,
