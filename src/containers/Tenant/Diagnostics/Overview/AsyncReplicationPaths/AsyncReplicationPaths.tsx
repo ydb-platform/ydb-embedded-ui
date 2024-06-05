@@ -1,4 +1,4 @@
-import type {Column, Settings} from '@gravity-ui/react-data-table';
+import type {Column} from '@gravity-ui/react-data-table';
 import {Text} from '@gravity-ui/uikit';
 
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
@@ -7,6 +7,7 @@ import type {
     TReplicationConfigTTargetSpecificTTarget,
 } from '../../../../../types/api/schema/replication';
 import {cn} from '../../../../../utils/cn';
+import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 
 import './AsyncReplicationPaths.scss';
 
@@ -15,10 +16,6 @@ const b = cn('ydb-async-replication-paths');
 interface AsyncReplicationPathsProps {
     config?: TReplicationConfig;
 }
-
-const settins: Settings = {
-    displayIndices: false,
-};
 
 const columns: Column<TReplicationConfigTTargetSpecificTTarget>[] = [
     {
@@ -53,7 +50,7 @@ export function AsyncReplicationPaths({config}: AsyncReplicationPathsProps) {
         content = (
             <ResizeableDataTable
                 data={config.Specific.Targets}
-                settings={settins}
+                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
                 columns={columns}
             />
         );
