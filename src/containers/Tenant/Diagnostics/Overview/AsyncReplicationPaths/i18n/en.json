@@ -1,0 +1,7 @@
+{
+  "column.dstPath.name": "Dist",
+  "column.srcPath.name": "Source",
+  "everythingWithPrefix": "Everything with prefix:",
+  "noData": "No data.",
+  "title": "Replicated Paths"
+}

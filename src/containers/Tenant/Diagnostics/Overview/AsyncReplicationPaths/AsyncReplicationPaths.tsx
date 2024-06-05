@@ -9,6 +9,8 @@ import type {
 import {cn} from '../../../../../utils/cn';
 import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 
+import i18n from './i18n';
+
 import './AsyncReplicationPaths.scss';
 
 const b = cn('ydb-async-replication-paths');
@@ -19,12 +21,12 @@ interface AsyncReplicationPathsProps {
 
 const columns: Column<TReplicationConfigTTargetSpecificTTarget>[] = [
     {
-        name: 'Source',
+        name: i18n('column.srcPath.name'),
         render: ({row}) => row.SrcPath,
         sortAccessor: (row) => row.SrcPath,
     },
     {
-        name: 'Dist',
+        name: i18n('column.dstPath.name'),
         render: ({row}) => row.DstPath,
         sortAccessor: (row) => row.DstPath,
     },
@@ -35,13 +37,12 @@ export function AsyncReplicationPaths({config}: AsyncReplicationPathsProps) {
         return null;
     }
 
-    let content: React.ReactNode = 'No data.';
+    let content: React.ReactNode = i18n('noData');
     if (config.Everything) {
         content = (
             <span>
-                Everything with{' '}
-                <Text variant="code-inline-2">{config.Everything?.DstPrefix ?? 'undefined'}</Text>{' '}
-                prefix.
+                {i18n('everythingWithPrefix')}{' '}
+                <Text variant="code-inline-2">{config.Everything?.DstPrefix ?? 'undefined'}</Text>.
             </span>
         );
     }
@@ -58,7 +59,7 @@ export function AsyncReplicationPaths({config}: AsyncReplicationPathsProps) {
 
     return (
         <div className={b()}>
-            <div className={b('title')}>Replicated Paths</div>
+            <div className={b('title')}>{i18n('title')}</div>
             {content}
         </div>
     );

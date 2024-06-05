@@ -8,6 +8,7 @@ import {getEntityName} from '../../../utils';
 import {AsyncReplicationPaths} from '../AsyncReplicationPaths';
 
 import {Credentials} from './Credentials';
+import i18n from './i18n';
 
 interface AsyncReplicationProps {
     data?: TEvDescribeSchemeResult;
@@ -24,7 +25,11 @@ export function AsyncReplicationInfo({data}: AsyncReplicationProps) {
     }
 
     if (!data) {
-        return <div className="error">No {entityName} data</div>;
+        return (
+            <div className="error">
+                {i18n('noData')} {entityName}
+            </div>
+        );
     }
 
     return (
@@ -33,11 +38,7 @@ export function AsyncReplicationInfo({data}: AsyncReplicationProps) {
                 title={entityName}
                 info={[
                     {
-                        label: 'Name',
-                        value: data.PathDescription?.ReplicationDescription?.Name,
-                    },
-                    {
-                        label: 'State',
+                        label: i18n('state.label'),
                         value: (
                             <AsyncReplicationState
                                 state={data.PathDescription?.ReplicationDescription?.State}
@@ -45,7 +46,7 @@ export function AsyncReplicationInfo({data}: AsyncReplicationProps) {
                         ),
                     },
                     {
-                        label: 'Source Cluster Endpoint',
+                        label: i18n('srcConnection.endpoint.label'),
                         value: (
                             <Text variant="code-inline-2">
                                 {
@@ -56,7 +57,7 @@ export function AsyncReplicationInfo({data}: AsyncReplicationProps) {
                         ),
                     },
                     {
-                        label: 'Source Database Path',
+                        label: i18n('srcConnection.database.label'),
                         value: (
                             <Text variant="code-inline-2">
                                 {
@@ -67,7 +68,7 @@ export function AsyncReplicationInfo({data}: AsyncReplicationProps) {
                         ),
                     },
                     {
-                        label: 'Credentials',
+                        label: i18n('credentials.label'),
                         value: (
                             <Credentials
                                 connection={
