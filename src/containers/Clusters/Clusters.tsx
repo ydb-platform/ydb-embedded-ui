@@ -23,13 +23,7 @@ import {getMinorVersion} from '../../utils/versions';
 
 import {ClustersStatistics} from './ClustersStatistics';
 import {CLUSTERS_COLUMNS, CLUSTERS_COLUMNS_WIDTH_LS_KEY} from './columns';
-import {
-    CLUSTER_STATUSES,
-    COLUMNS_NAMES,
-    COLUMNS_TITLES,
-    DEFAULT_COLUMNS,
-    SELECTED_COLUMNS_KEY,
-} from './constants';
+import {COLUMNS_NAMES, COLUMNS_TITLES, DEFAULT_COLUMNS, SELECTED_COLUMNS_KEY} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
 import {useSelectedColumns} from './useSelectedColumns';
@@ -103,6 +97,16 @@ export function Clusters() {
         [filteredClusters],
     );
 
+    const statuses = React.useMemo(() => {
+        return Array.from(
+            new Set(
+                (clusters ?? []).map((cluster) => cluster.status).filter(Boolean),
+            ) as Set<string>,
+        )
+            .sort()
+            .map((el) => ({value: el, content: el}));
+    }, [clusters]);
+
     if (query.isLoading) {
         return <Loader size="l" />;
     }
@@ -130,7 +134,7 @@ export function Clusters() {
                         placeholder={i18n('controls_select-placeholder')}
                         label={i18n('controls_status-select-label')}
                         value={status}
-                        options={CLUSTER_STATUSES}
+                        options={statuses}
                         onUpdate={changeStatus}
                         width="max"
                     />

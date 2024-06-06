@@ -1,5 +1,3 @@
-import type {SelectOption} from '@gravity-ui/uikit';
-
 export const SELECTED_COLUMNS_KEY = 'selectedColumns';
 
 export const COLUMNS_NAMES = {
@@ -47,22 +45,3 @@ export const COLUMNS_TITLES = {
     [COLUMNS_NAMES.DESCRIPTION]: 'Description',
     [COLUMNS_NAMES.BALANCER]: 'Balancer',
 } as const;
-
-export const CLUSTER_STATUSES: SelectOption[] = [
-    {
-        value: 'production',
-        content: 'Production',
-    },
-    {
-        value: 'preprod',
-        content: 'Preprod',
-    },
-    {
-        value: 'testing',
-        content: 'Testing',
-    },
-    {
-        value: 'development',
-        content: 'Development',
-    },
-];
