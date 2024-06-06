@@ -1,5 +1,22 @@
 # Changelog
 
+## [6.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.4.0...v6.5.0) (2024-06-06)
+
+
+### Features
+
+* disable controls for users with viewer rights ([#848](https://github.com/ydb-platform/ydb-embedded-ui/issues/848)) ([a15e87c](https://github.com/ydb-platform/ydb-embedded-ui/commit/a15e87c6ceaf5220f23c63dfb6b3b24a02519c96))
+* **HotKeys:** add help card ([#861](https://github.com/ydb-platform/ydb-embedded-ui/issues/861)) ([3124bdb](https://github.com/ydb-platform/ydb-embedded-ui/commit/3124bdba5c0186d03f86ceb88d55a2f2c902caec))
+* suggest views and table settings ([#864](https://github.com/ydb-platform/ydb-embedded-ui/issues/864)) ([496514b](https://github.com/ydb-platform/ydb-embedded-ui/commit/496514b2e80f2513575a2c5d53bda6b01525f385))
+* support async replications ([#856](https://github.com/ydb-platform/ydb-embedded-ui/issues/856)) ([2cecddd](https://github.com/ydb-platform/ydb-embedded-ui/commit/2cecddd837f3864bee300cfd8200291dbd6044bd))
+* use existing clusters statuses in filter ([#884](https://github.com/ydb-platform/ydb-embedded-ui/issues/884)) ([bb8cdce](https://github.com/ydb-platform/ydb-embedded-ui/commit/bb8cdcefcaa614ce2b79d324ec08473811ad0417))
+
+
+### Bug Fixes
+
+* **Query:** parse 200 error response ([#883](https://github.com/ydb-platform/ydb-embedded-ui/issues/883)) ([c4cd541](https://github.com/ydb-platform/ydb-embedded-ui/commit/c4cd541d405da2311ef8292347826bdbeeb808e1))
+* **Tenant:** should not duplicate api requests ([#879](https://github.com/ydb-platform/ydb-embedded-ui/issues/879)) ([3bd1e5d](https://github.com/ydb-platform/ydb-embedded-ui/commit/3bd1e5dc26d1535ae7d75eb88548427f6f9aaa45))
+
 ## [6.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.3.0...v6.4.0) (2024-05-31)
 
 
