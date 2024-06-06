@@ -2,7 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {HOUR_IN_SECONDS} from '../../../utils/constants';
-import {parseQueryAPIExecuteResponse} from '../../../utils/query';
+import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../../utils/query';
 import {api} from '../api';
 
 import type {TopQueriesFilters} from './types';
@@ -57,6 +57,11 @@ export const topQueriesApi = api.injectEndpoints({
                         },
                         {signal},
                     );
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response};
+                    }
+
                     const data = parseQueryAPIExecuteResponse(response);
                     // FIXME: do we really need this?
                     if (!filters?.from && !filters?.to) {

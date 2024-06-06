@@ -12,6 +12,7 @@ import {
 } from '../../../../../store/reducers/tenant/constants';
 import {topQueriesApi} from '../../../../../store/reducers/tenantOverview/topQueries/tenantOverviewTopQueries';
 import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {
     TOP_QUERIES_COLUMNS_WIDTH_LS_KEY,
@@ -80,7 +81,7 @@ export function TopQueries({path}: TopQueriesProps) {
             onRowClick={handleRowClick}
             title={title}
             loading={loading}
-            error={error}
+            error={parseQueryErrorToString(error)}
             rowClassName={() => b('top-queries-row')}
         />
     );

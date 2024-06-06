@@ -22,7 +22,7 @@ import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {isSortableTopQueriesProperty} from '../../../../utils/diagnostics';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {prepareQueryError} from '../../../../utils/query';
+import {parseQueryErrorToString} from '../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {isColumnEntityType} from '../../utils/schema';
@@ -91,8 +91,8 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
     };
 
     const renderContent = () => {
-        if (error && typeof error === 'object' && !(error as any).isCancelled) {
-            return <div className="error">{prepareQueryError(error)}</div>;
+        if (error) {
+            return <div className="error">{parseQueryErrorToString(error)}</div>;
         }
 
         if (!data || isColumnEntityType(type)) {

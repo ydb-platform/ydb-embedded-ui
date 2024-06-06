@@ -1,4 +1,4 @@
-import {parseQueryAPIExecuteResponse} from '../../utils/query';
+import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
 
 import {api} from './api';
 
@@ -22,6 +22,11 @@ export const olapApi = api.injectEndpoints({
                         },
                         {signal},
                     );
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response};
+                    }
+
                     return {data: parseQueryAPIExecuteResponse(response)};
                 } catch (error) {
                     return {error: error || new Error('Unauthorized')};

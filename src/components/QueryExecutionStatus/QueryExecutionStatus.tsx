@@ -1,6 +1,6 @@
 import {CircleCheck, CircleQuestionFill, CircleXmark} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
-import type {AxiosError} from 'axios';
+import {isAxiosError} from 'axios';
 
 import {cn} from '../../utils/cn';
 
@@ -10,15 +10,14 @@ const b = cn('kv-query-execution-status');
 
 interface QueryExecutionStatusProps {
     className?: string;
-    // TODO: Remove Record<string, any> when ECONNABORTED error case is fully typed
-    error?: AxiosError | Record<string, any> | string;
+    error?: unknown;
 }
 
 export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusProps) => {
     let icon: React.ReactNode;
     let label: string;
 
-    if (typeof error === 'object' && error?.code === 'ECONNABORTED') {
+    if (isAxiosError(error) && error.code === 'ECONNABORTED') {
         icon = <Icon data={CircleQuestionFill} />;
         label = 'Connection aborted';
     } else {

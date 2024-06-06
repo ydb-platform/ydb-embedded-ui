@@ -8,11 +8,22 @@ import type {
     ExecuteQueryStateSlice,
     QueryInHistory,
 } from '../../types/store/executeQuery';
-import type {QueryMode, QueryRequestParams, QuerySyntax} from '../../types/store/query';
+import type {
+    IQueryResult,
+    QueryMode,
+    QueryRequestParams,
+    QuerySyntax,
+} from '../../types/store/query';
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
-import {parseQueryError} from '../../utils/error';
-import {QUERY_MODES, QUERY_SYNTAX, parseQueryAPIExecuteResponse} from '../../utils/query';
-import {createApiRequest, createRequestActionTypes} from '../utils';
+import {
+    QUERY_MODES,
+    QUERY_SYNTAX,
+    isQueryErrorResponse,
+    parseQueryAPIExecuteResponse,
+} from '../../utils/query';
+import {createRequestActionTypes} from '../utils';
+
+import {api} from './api';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
@@ -50,31 +61,6 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
     action,
 ) => {
     switch (action.type) {
-        case SEND_QUERY.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-                data: undefined,
-                error: undefined,
-            };
-        }
-        case SEND_QUERY.SUCCESS: {
-            return {
-                ...state,
-                data: action.data,
-                stats: action.data.stats,
-                loading: false,
-                error: undefined,
-            };
-        }
-        case SEND_QUERY.FAILURE: {
-            return {
-                ...state,
-                error: parseQueryError(action.error),
-                loading: false,
-            };
-        }
-
         case CHANGE_USER_INPUT: {
             return {
                 ...state,
@@ -157,30 +143,44 @@ interface SendQueryParams extends QueryRequestParams {
     schema?: Schemas;
 }
 
-export const sendExecuteQuery = ({query, database, mode, schema = 'modern'}: SendQueryParams) => {
-    let action: ExecuteActions = 'execute';
-    let syntax: QuerySyntax = QUERY_SYNTAX.yql;
+export const executeQueryApi = api.injectEndpoints({
+    endpoints: (build) => ({
+        executeQuery: build.mutation<IQueryResult, SendQueryParams>({
+            queryFn: async ({query, database, mode, schema = 'modern'}) => {
+                let action: ExecuteActions = 'execute';
+                let syntax: QuerySyntax = QUERY_SYNTAX.yql;
 
-    if (mode === 'pg') {
-        action = 'execute-query';
-        syntax = QUERY_SYNTAX.pg;
-    } else if (mode) {
-        action = `execute-${mode}`;
-    }
+                if (mode === 'pg') {
+                    action = 'execute-query';
+                    syntax = QUERY_SYNTAX.pg;
+                } else if (mode) {
+                    action = `execute-${mode}`;
+                }
 
-    return createApiRequest({
-        request: window.api.sendQuery({
-            schema,
-            query,
-            database,
-            action,
-            syntax,
-            stats: 'full',
+                try {
+                    const response = await window.api.sendQuery({
+                        schema,
+                        query,
+                        database,
+                        action,
+                        syntax,
+                        stats: 'full',
+                    });
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response};
+                    }
+
+                    const data = parseQueryAPIExecuteResponse(response);
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
         }),
-        actions: SEND_QUERY,
-        dataHandler: parseQueryAPIExecuteResponse,
-    });
-};
+    }),
+    overrideExisting: 'throw',
+});
 
 export const saveQueryToHistory = (queryText: string, mode: QueryMode) => {
     return {

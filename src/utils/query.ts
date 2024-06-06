@@ -4,13 +4,16 @@ import type {
     AnyExplainResponse,
     ArrayRow,
     ColumnType,
+    ErrorResponse,
     ExecuteModernResponse,
     ExecuteMultiResponse,
     KeyValueRow,
     QueryPlan,
     ScriptPlan,
 } from '../types/api/query';
-import type {IQueryResult, QueryErrorResponse, QueryMode} from '../types/store/query';
+import type {IQueryResult, QueryMode} from '../types/store/query';
+
+import {isAxiosResponse, isNetworkError} from './response';
 
 export const QUERY_ACTIONS = {
     execute: 'execute',
@@ -161,6 +164,10 @@ const isUnsupportedType = (
     );
 };
 
+export function isQueryErrorResponse(data: unknown): data is ErrorResponse {
+    return Boolean(data && typeof data === 'object' && 'error' in data && 'issues' in data);
+}
+
 // Although schema is set in request, if schema is not supported default schema for the version will be used
 // So we should additionally parse response
 export const parseQueryAPIExecuteResponse = (
@@ -238,6 +245,32 @@ export const prepareQueryResponse = (data?: KeyValueRow[]) => {
     });
 };
 
-export function prepareQueryError(error: QueryErrorResponse) {
-    return error.data?.error?.message || error.statusText;
-}
+export const parseQueryError = (error: unknown): ErrorResponse | string | undefined => {
+    if (typeof error === 'string' || isQueryErrorResponse(error)) {
+        return error;
+    }
+
+    if (isNetworkError(error)) {
+        return error.message;
+    }
+
+    if (isAxiosResponse(error)) {
+        if ('data' in error && isQueryErrorResponse(error.data)) {
+            return error.data;
+        }
+
+        return error.statusText;
+    }
+
+    return undefined;
+};
+
+export const parseQueryErrorToString = (error: unknown) => {
+    const parsedError = parseQueryError(error);
+
+    if (typeof parsedError === 'string') {
+        return parsedError;
+    }
+
+    return parsedError?.error?.message;
+};

@@ -4,6 +4,7 @@ import {parseQuery} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topShardsApi} from '../../../../../store/reducers/tenantOverview/topShards/tenantOverviewTopShards';
 import {useTypedSelector} from '../../../../../utils/hooks';
+import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {
     TOP_SHARDS_COLUMNS_WIDTH_LS_KEY,
@@ -50,7 +51,7 @@ export const TopShards = ({path}: TopShardsProps) => {
             columns={columns}
             title={title}
             loading={loading}
-            error={error}
+            error={parseQueryErrorToString(error)}
         />
     );
 };

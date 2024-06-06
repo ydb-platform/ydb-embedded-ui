@@ -1,11 +1,9 @@
-import type {Dispatch} from '@reduxjs/toolkit';
-import type {AxiosResponse} from 'axios';
-
 import createToast from '../utils/createToast';
+import {isAxiosResponse} from '../utils/response';
 
 import {SET_UNAUTHENTICATED} from './reducers/authentication/authentication';
 
-import type {GetState} from '.';
+import type {AppDispatch, GetState} from '.';
 
 export const nop = (result: any) => result;
 
@@ -19,9 +17,6 @@ export function createRequestActionTypes<Prefix extends string, Type extends str
         FAILURE: `${prefix}/${type}_FAILURE`,
     } as const;
 }
-
-const isAxiosResponse = (response: any): response is AxiosResponse =>
-    response && 'status' in response;
 
 type CreateApiRequestParams<Actions, Response, HandledResponse> = {
     actions: Actions;
@@ -38,7 +33,7 @@ export function createApiRequest<
     request,
     dataHandler = nop,
 }: CreateApiRequestParams<Actions, Response, HandledResponse>) {
-    const doRequest = async function (dispatch: Dispatch, getState: GetState) {
+    const doRequest = async function (dispatch: AppDispatch, getState: GetState) {
         dispatch({
             type: actions.REQUEST,
         });

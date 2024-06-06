@@ -1,5 +1,5 @@
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
-import {parseQueryAPIExecuteResponse} from '../../../../utils/query';
+import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../../../utils/query';
 import {api} from '../../api';
 
 const getQueryText = (path: string) => {
@@ -18,7 +18,7 @@ export const topQueriesApi = api.injectEndpoints({
         getOverviewTopQueries: builder.query({
             queryFn: async ({database}: {database: string}, {signal}) => {
                 try {
-                    const data = await window.api.sendQuery(
+                    const response = await window.api.sendQuery(
                         {
                             schema: 'modern',
                             query: getQueryText(database),
@@ -27,7 +27,12 @@ export const topQueriesApi = api.injectEndpoints({
                         },
                         {signal},
                     );
-                    return {data: parseQueryAPIExecuteResponse(data)};
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response};
+                    }
+
+                    return {data: parseQueryAPIExecuteResponse(response)};
                 } catch (error) {
                     return {error: error || new Error('Unauthorized')};
                 }

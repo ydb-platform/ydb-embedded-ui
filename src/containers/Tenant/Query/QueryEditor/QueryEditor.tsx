@@ -8,19 +8,19 @@ import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import SplitPane from '../../../../components/SplitPane';
 import type {RootState} from '../../../../store';
 import {
+    executeQueryApi,
     goToNextQuery,
     goToPreviousQuery,
     saveQueryToHistory,
-    sendExecuteQuery,
     setTenantPath,
 } from '../../../../store/reducers/executeQuery';
-import {getExplainQuery, getExplainQueryAst} from '../../../../store/reducers/explainQuery';
+import {explainQueryApi} from '../../../../store/reducers/explainQuery/explainQuery';
+import type {PreparedExplainResponse} from '../../../../store/reducers/explainQuery/types';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import type {ValueOf} from '../../../../types/common';
 import type {ExecuteQueryState} from '../../../../types/store/executeQuery';
-import type {ExplainQueryState} from '../../../../types/store/explainQuery';
-import type {QueryAction, QueryMode, SavedQuery} from '../../../../types/store/query';
+import type {IQueryResult, QueryAction, QueryMode, SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
@@ -68,15 +68,11 @@ const initialTenantCommonInfoState = {
 
 interface QueryEditorProps {
     path: string;
-    sendExecuteQuery: (...args: Parameters<typeof sendExecuteQuery>) => void;
-    getExplainQuery: (...args: Parameters<typeof getExplainQuery>) => void;
-    getExplainQueryAst: (...args: Parameters<typeof getExplainQueryAst>) => void;
     changeUserInput: (arg: {input: string}) => void;
     goToNextQuery: (...args: Parameters<typeof goToNextQuery>) => void;
     goToPreviousQuery: (...args: Parameters<typeof goToPreviousQuery>) => void;
     setTenantPath: (...args: Parameters<typeof setTenantPath>) => void;
     executeQuery: ExecuteQueryState;
-    explainQuery: ExplainQueryState;
     theme: string;
     type?: EPathType;
     showPreview: boolean;
@@ -90,7 +86,6 @@ function QueryEditor(props: QueryEditorProps) {
         path,
         setTenantPath: setPath,
         executeQuery,
-        explainQuery,
         type,
         theme,
         changeUserInput,
@@ -110,6 +105,9 @@ function QueryEditor(props: QueryEditorProps) {
     const [monacoHotKey, setMonacoHotKey] = React.useState<ValueOf<
         typeof MONACO_HOT_KEY_ACTIONS
     > | null>(null);
+
+    const [sendExecuteQuery, executeQueryResult] = executeQueryApi.useExecuteQueryMutation();
+    const [sendExplainQuery, explainQueryResult] = explainQueryApi.useExplainQueryMutation();
 
     React.useEffect(() => {
         if (savedPath !== path) {
@@ -205,7 +203,7 @@ function QueryEditor(props: QueryEditorProps) {
 
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
         setResultType(RESULT_TYPES.EXECUTE);
-        props.sendExecuteQuery({
+        sendExecuteQuery({
             query,
             database: path,
             mode,
@@ -229,7 +227,7 @@ function QueryEditor(props: QueryEditorProps) {
 
         setLastUsedQueryAction(QUERY_ACTIONS.explain);
         setResultType(RESULT_TYPES.EXPLAIN);
-        props.getExplainQuery({
+        sendExplainQuery({
             query: input,
             database: path,
             mode: mode,
@@ -345,10 +343,6 @@ function QueryEditor(props: QueryEditorProps) {
         props.changeUserInput({input: newValue});
     };
 
-    const handleAstQuery = () => {
-        props.getExplainQueryAst({query: executeQuery.input, database: path});
-    };
-
     const onCollapseResultHandler = () => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
     };
@@ -381,9 +375,9 @@ function QueryEditor(props: QueryEditorProps) {
         return (
             <QueryEditorControls
                 onRunButtonClick={handleSendExecuteClick}
-                runIsLoading={executeQuery.loading}
+                runIsLoading={executeQueryResult.isLoading}
                 onExplainButtonClick={handleGetExplainQueryClick}
-                explainIsLoading={explainQuery.loading}
+                explainIsLoading={explainQueryResult.isLoading}
                 onSaveQueryClick={onSaveQueryHandler}
                 savedQueries={savedQueries}
                 disabled={!executeQuery.input}
@@ -426,13 +420,15 @@ function QueryEditor(props: QueryEditorProps) {
                 </div>
                 <div className={b('pane-wrapper')}>
                     <Result
-                        executeQuery={executeQuery}
-                        explainQuery={explainQuery}
+                        executeQueryData={executeQueryResult.data}
+                        executeQueryError={executeQueryResult.error}
+                        explainQueryData={explainQueryResult.data}
+                        explainQueryError={explainQueryResult.error}
+                        explainQueryLoading={explainQueryResult.isLoading}
                         resultVisibilityState={resultVisibilityState}
                         onExpandResultHandler={onExpandResultHandler}
                         onCollapseResultHandler={onCollapseResultHandler}
                         type={type}
-                        handleAstQuery={handleAstQuery}
                         theme={theme}
                         resultType={resultType}
                         path={path}
@@ -447,18 +443,14 @@ function QueryEditor(props: QueryEditorProps) {
 const mapStateToProps = (state: RootState) => {
     return {
         executeQuery: state.executeQuery,
-        explainQuery: state.explainQuery,
         showPreview: state.schema.showPreview,
     };
 };
 
 const mapDispatchToProps = {
-    sendExecuteQuery,
     saveQueryToHistory,
     goToPreviousQuery,
     goToNextQuery,
-    getExplainQuery,
-    getExplainQueryAst,
     setShowPreview,
     setTenantPath,
 };
@@ -466,26 +458,30 @@ const mapDispatchToProps = {
 export default connect(mapStateToProps, mapDispatchToProps)(QueryEditor);
 
 interface ResultProps {
-    executeQuery: ExecuteQueryState;
-    explainQuery: ExplainQueryState;
+    executeQueryData?: IQueryResult;
+    executeQueryError?: unknown;
+    explainQueryData?: PreparedExplainResponse;
+    explainQueryError?: unknown;
+    explainQueryLoading?: boolean;
     resultVisibilityState: InitialPaneState;
     onExpandResultHandler: () => void;
     onCollapseResultHandler: () => void;
     type?: EPathType;
-    handleAstQuery: () => void;
     theme: string;
     resultType: ValueOf<typeof RESULT_TYPES> | undefined;
     path: string;
     showPreview?: boolean;
 }
 function Result({
-    executeQuery,
-    explainQuery,
+    executeQueryData,
+    executeQueryError,
+    explainQueryData,
+    explainQueryError,
+    explainQueryLoading,
     resultVisibilityState,
     onExpandResultHandler,
     onCollapseResultHandler,
     type,
-    handleAstQuery,
     theme,
     resultType,
     path,
@@ -496,30 +492,33 @@ function Result({
     }
 
     if (resultType === RESULT_TYPES.EXECUTE) {
-        const {data, error, stats} = executeQuery;
-        return data || error ? (
-            <ExecuteResult
-                data={data}
-                stats={stats}
-                error={error}
-                isResultsCollapsed={resultVisibilityState.collapsed}
-                onExpandResults={onExpandResultHandler}
-                onCollapseResults={onCollapseResultHandler}
-            />
-        ) : null;
+        if (executeQueryData || executeQueryError) {
+            const {stats, ...data} = executeQueryData || {};
+
+            return (
+                <ExecuteResult
+                    data={data}
+                    stats={stats}
+                    error={executeQueryError}
+                    isResultsCollapsed={resultVisibilityState.collapsed}
+                    onExpandResults={onExpandResultHandler}
+                    onCollapseResults={onCollapseResultHandler}
+                />
+            );
+        }
+
+        return null;
     }
 
     if (resultType === RESULT_TYPES.EXPLAIN) {
-        const {data, dataAst, error, loading, loadingAst} = explainQuery;
+        const {plan, ast} = explainQueryData || {};
 
         return (
             <ExplainResult
-                error={error}
-                explain={data}
-                astQuery={handleAstQuery}
-                ast={dataAst}
-                loading={loading}
-                loadingAst={loadingAst}
+                error={explainQueryError}
+                explain={plan}
+                ast={ast}
+                loading={explainQueryLoading}
                 theme={theme}
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 onExpandResults={onExpandResultHandler}

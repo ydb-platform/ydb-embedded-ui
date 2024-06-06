@@ -5,6 +5,7 @@ import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import {DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
+import {isQueryErrorResponse} from '../../../utils/query';
 import {api} from '../api';
 
 import type {ClusterGroupsStats, ClusterState} from './types';
@@ -74,6 +75,10 @@ export const clusterApi = api.injectEndpoints({
                             database: clusterRoot,
                             action: 'execute-scan',
                         });
+
+                        if (isQueryErrorResponse(groupsStatsResponse)) {
+                            return {data: {clusterData}};
+                        }
 
                         return {
                             data: {

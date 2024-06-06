@@ -1,14 +1,10 @@
 import type {
-    SEND_QUERY,
     changeUserInput,
     goToNextQuery,
     goToPreviousQuery,
     saveQueryToHistory,
     setTenantPath,
 } from '../../store/reducers/executeQuery';
-import type {ApiRequestAction} from '../../store/utils';
-
-import type {IQueryResult, QueryError, QueryErrorResponse} from './query';
 
 export interface QueryInHistory {
     queryText: string;
@@ -24,15 +20,9 @@ export interface ExecuteQueryState {
         currentIndex: number;
     };
     tenantPath?: string;
-    data?: IQueryResult;
-    stats?: IQueryResult['stats'];
-    error?: string | QueryErrorResponse;
 }
 
-type SendQueryAction = ApiRequestAction<typeof SEND_QUERY, IQueryResult, QueryError>;
-
 export type ExecuteQueryAction =
-    | SendQueryAction
     | ReturnType<typeof goToNextQuery>
     | ReturnType<typeof goToPreviousQuery>
     | ReturnType<typeof changeUserInput>
