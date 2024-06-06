@@ -19,7 +19,7 @@ import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constan
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {isSortableTopShardsProperty} from '../../../../utils/diagnostics';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {prepareQueryError} from '../../../../utils/query';
+import {parseQueryErrorToString} from '../../../../utils/query';
 import {isColumnEntityType} from '../../utils/schema';
 
 import {Filters} from './Filters';
@@ -192,8 +192,8 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     };
 
     const renderContent = () => {
-        if (error && typeof error === 'object' && !(error as any).isCancelled) {
-            return <div className="error">{prepareQueryError(error)}</div>;
+        if (error) {
+            return <div className="error">{parseQueryErrorToString(error)}</div>;
         }
 
         if (!data || isColumnEntityType(type)) {

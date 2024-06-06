@@ -9,7 +9,7 @@ import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {prepareQueryError} from '../../../../utils/query';
+import {parseQueryErrorToString} from '../../../../utils/query';
 import {isExternalTableType, isTableType} from '../../utils/schema';
 import i18n from '../i18n';
 
@@ -76,7 +76,9 @@ export const Preview = ({database, type}: PreviewProps) => {
     if (!isPreviewAvailable) {
         message = <div className={b('message-container')}>{i18n('preview.not-available')}</div>;
     } else if (error) {
-        message = <div className={b('message-container', 'error')}>{prepareQueryError(error)}</div>;
+        message = (
+            <div className={b('message-container', 'error')}>{parseQueryErrorToString(error)}</div>
+        );
     }
 
     const content = message ?? (

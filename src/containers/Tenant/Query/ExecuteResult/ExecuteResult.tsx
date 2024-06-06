@@ -12,11 +12,11 @@ import {QueryResultTable} from '../../../../components/QueryResultTable/QueryRes
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
-import type {IQueryResult, QueryErrorResponse} from '../../../../types/store/query';
+import type {IQueryResult} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {prepareQueryError} from '../../../../utils/query';
+import {parseQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
@@ -41,7 +41,7 @@ const resultOptions = [
 interface ExecuteResultProps {
     data: IQueryResult | undefined;
     stats: IQueryResult['stats'] | undefined;
-    error: string | QueryErrorResponse | undefined;
+    error: unknown;
     isResultsCollapsed?: boolean;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
@@ -67,6 +67,8 @@ export function ExecuteResult({
     const currentColumns = isMulti ? data?.resultSets?.[selectedResultSet].columns : data?.columns;
     const textResults = getPreparedResult(currentResult);
     const copyDisabled = !textResults.length;
+
+    const parsedError = parseQueryError(error);
 
     React.useEffect(() => {
         return () => {
@@ -159,12 +161,12 @@ export function ExecuteResult({
     };
 
     const renderIssues = () => {
-        if (!error) {
+        if (!parsedError) {
             return null;
         }
 
-        if (typeof error === 'object' && error.data?.issues && Array.isArray(error.data.issues)) {
-            const content = <ResultIssues data={error.data} />;
+        if (typeof parsedError === 'object') {
+            const content = <ResultIssues data={parsedError} />;
 
             return (
                 <React.Fragment>
@@ -179,8 +181,6 @@ export function ExecuteResult({
                 </React.Fragment>
             );
         }
-
-        const parsedError = typeof error === 'string' ? error : prepareQueryError(error);
 
         return <div className={b('error')}>{parsedError}</div>;
     };

@@ -9,11 +9,12 @@ import EnableFullscreenButton from '../../../../components/EnableFullscreenButto
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
-import {explainVersions} from '../../../../store/reducers/explainQuery';
+import {explainVersions} from '../../../../store/reducers/explainQuery/utils';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco/s-expression/constants';
+import {parseQueryErrorToString} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 
 import {renderExplainNode} from './utils';
@@ -193,22 +194,12 @@ export function ExplainResult(props) {
     };
 
     const renderError = () => {
-        const {error} = props;
-
-        let message;
-
-        if (error.data) {
-            message = typeof error.data === 'string' ? error.data : error.data.error?.message;
-        } else {
-            message = error;
-        }
-
-        return <div className={b('text-message')}>{message}</div>;
+        return <div className={b('text-message')}>{parseQueryErrorToString(props.error)}</div>;
     };
 
     const renderContent = () => {
-        const {error, loading, loadingAst} = props;
-        if (loading || loadingAst) {
+        const {error, loading} = props;
+        if (loading) {
             return renderLoader();
         }
 

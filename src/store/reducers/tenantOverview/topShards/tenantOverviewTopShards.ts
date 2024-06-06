@@ -1,5 +1,5 @@
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
-import {parseQueryAPIExecuteResponse} from '../../../../utils/query';
+import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../../../utils/query';
 import {api} from '../../api';
 
 function createShardQuery(path: string, tenantName?: string) {
@@ -26,7 +26,7 @@ export const topShardsApi = api.injectEndpoints({
         getTopShards: builder.query({
             queryFn: async ({database, path = ''}: {database: string; path?: string}, {signal}) => {
                 try {
-                    const data = await window.api.sendQuery(
+                    const response = await window.api.sendQuery(
                         {
                             schema: 'modern',
                             query: createShardQuery(path, database),
@@ -35,7 +35,12 @@ export const topShardsApi = api.injectEndpoints({
                         },
                         {signal},
                     );
-                    return {data: parseQueryAPIExecuteResponse(data)};
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response};
+                    }
+
+                    return {data: parseQueryAPIExecuteResponse(response)};
                 } catch (error) {
                     return {error: error || new Error('Unauthorized')};
                 }

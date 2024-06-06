@@ -18,6 +18,7 @@ import type {TEvNodesInfo} from '../types/api/nodesList';
 import type {TEvPDiskStateResponse} from '../types/api/pdisk';
 import type {
     Actions,
+    ErrorResponse,
     ExplainActions,
     ExplainResponse,
     QueryAPIResponse,
@@ -402,7 +403,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             true,
         );
 
-        return this.post<QueryAPIResponse<Action, Schema>>(
+        return this.post<QueryAPIResponse<Action, Schema> | ErrorResponse>(
             this.getPath(
                 `/viewer/json/query?timeout=${backendTimeout}&base64=${base64}${
                     schema ? `&schema=${schema}` : ''
@@ -423,7 +424,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         action: Action,
         syntax?: QuerySyntax,
     ) {
-        return this.post<ExplainResponse<Action>>(
+        return this.post<ExplainResponse<Action> | ErrorResponse>(
             this.getPath('/viewer/json/query'),
             {
                 query,

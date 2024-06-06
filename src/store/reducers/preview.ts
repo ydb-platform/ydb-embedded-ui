@@ -1,5 +1,5 @@
 import type {ExecuteActions} from '../../types/api/query';
-import {parseQueryAPIExecuteResponse} from '../../utils/query';
+import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
 
 import {api} from './api';
 
@@ -18,6 +18,11 @@ export const previewApi = api.injectEndpoints({
                         {schema: 'modern', query, database, action},
                         {signal},
                     );
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response};
+                    }
+
                     return {data: parseQueryAPIExecuteResponse(response)};
                 } catch (error) {
                     return {error: error || new Error('Unauthorized')};

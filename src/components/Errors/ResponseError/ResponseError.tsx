@@ -12,6 +12,10 @@ export const ResponseError = ({
     defaultMessage = i18n('responseError.defaultMessage'),
 }: ResponseErrorProps) => {
     let statusText = '';
+
+    if (error && typeof error === 'string') {
+        statusText = error;
+    }
     if (error && typeof error === 'object') {
         if ('statusText' in error && typeof error.statusText === 'string') {
             statusText = error.statusText;

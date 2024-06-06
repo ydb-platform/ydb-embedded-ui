@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {parseQueryAPIExecuteResponse} from '../../../utils/query';
+import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../../utils/query';
 import {api} from '../api';
 
 import type {ShardsWorkloadFilters} from './types';
@@ -147,6 +147,11 @@ export const shardApi = api.injectEndpoints({
                             signal,
                         },
                     );
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response};
+                    }
+
                     const data = parseQueryAPIExecuteResponse(response);
                     return {data};
                 } catch (error) {

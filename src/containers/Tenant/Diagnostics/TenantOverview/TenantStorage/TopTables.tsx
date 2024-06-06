@@ -8,6 +8,7 @@ import {topTablesApi} from '../../../../../store/reducers/tenantOverview/execute
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 import {useTypedSelector} from '../../../../../utils/hooks';
+import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
@@ -73,7 +74,7 @@ export function TopTables({path}: TopTablesProps) {
             columns={columns}
             title={title}
             loading={loading}
-            error={error}
+            error={parseQueryErrorToString(error)}
         />
     );
 }

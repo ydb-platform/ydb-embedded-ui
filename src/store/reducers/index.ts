@@ -6,7 +6,6 @@ import cluster from './cluster/cluster';
 import clusters from './clusters/clusters';
 import executeQuery from './executeQuery';
 import executeTopQueries from './executeTopQueries/executeTopQueries';
-import explainQuery from './explainQuery';
 import fullscreen from './fullscreen';
 import header from './header/header';
 import heatmap from './heatmap';
@@ -37,7 +36,6 @@ export const rootReducer = {
     tenants,
     partitions,
     executeQuery,
-    explainQuery,
     tabletsFilters,
     heatmap,
     settings,
