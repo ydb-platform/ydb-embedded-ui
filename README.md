@@ -41,7 +41,7 @@ For API reference, open Swagger UI on http://localhost:8765/viewer/api/.
 Image `cr.yandex/yc/yandex-docker-local-ydb` corresponds to `:latest` tag. It's the latest stable ydb version.
 
 To test new features, you can use ydb version that is currently in testing mode with `cr.yandex/yc/yandex-docker-local-ydb:edge` image
-or use a build from `main` brunch with `ghcr.io/ydb-platform/local-ydb:trunk` image.
+or use a build from `main` brunch with `ghcr.io/ydb-platform/local-ydb:nightly` image.
 Also you can set specific version like `cr.yandex/yc/yandex-docker-local-ydb:23.1`
 
 ### Custom configuration in dev mode with .env file
