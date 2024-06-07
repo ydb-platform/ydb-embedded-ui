@@ -65,7 +65,7 @@ function Header({mainPage}: HeaderProps) {
         return breadcrumbs.map((item) => {
             const action = () => {
                 if (item.link) {
-                    history.push(item.link);
+                    window.open(item.link, '_blank');
                 }
             };
             return {...item, action};
