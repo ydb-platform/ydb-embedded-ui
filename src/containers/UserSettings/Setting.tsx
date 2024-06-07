@@ -91,3 +91,18 @@ export const Setting = ({
         </Settings.Item>
     );
 };
+
+export interface SettingsInfoFieldProps {
+    type: 'info';
+    title: string;
+    description?: React.ReactNode;
+    content: React.ReactNode;
+}
+
+export const SettingsInfoField = ({title, description, content}: SettingsInfoFieldProps) => {
+    return (
+        <Settings.Item title={title} highlightedTitle={title} description={description}>
+            {content}
+        </Settings.Item>
+    );
+};
