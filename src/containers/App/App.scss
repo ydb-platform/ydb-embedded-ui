@@ -28,8 +28,6 @@ body,
 :root {
     --g-color-base-yellow-light: rgba(255, 199, 0, 0.15);
     --g-color-base-yellow-medium: rgba(255, 219, 77, 0.4);
-
-    --data-table-row-height: 40px;
 }
 
 .g-root {
@@ -74,41 +72,11 @@ body,
 .app {
     height: 100%;
     @include flex-container();
+    @include data-table-styles();
 
     &__main {
         overflow: auto;
         @include flex-container();
-    }
-
-    .data-table {
-        width: 100%;
-        @include body-2-typography();
-
-        &__table {
-            max-width: 100%;
-
-            border-spacing: 0;
-            border-collapse: separate;
-        }
-    }
-
-    .data-table__th {
-        font-weight: bold;
-
-        border-top: unset;
-        border-right: unset;
-        border-left: unset;
-    }
-
-    .data-table__sticky .data-table__th,
-    .data-table__td {
-        height: var(--data-table-row-height);
-
-        vertical-align: middle;
-
-        border-top: unset;
-        border-right: unset;
-        border-left: unset;
     }
 }
 
