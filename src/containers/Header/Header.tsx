@@ -1,6 +1,5 @@
 import React from 'react';
 
-import type {BreadcrumbsItem} from '@gravity-ui/uikit';
 import {Breadcrumbs} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router';
 
@@ -64,17 +63,7 @@ function Header({mainPage}: HeaderProps) {
         const breadcrumbs = getBreadcrumbs(page, options, rawBreadcrumbs, queryParams);
 
         return breadcrumbs.map((item) => {
-            const action: BreadcrumbsItem['action'] = (event) => {
-                if (!item.link) return;
-                event.preventDefault();
-                event.stopPropagation();
-
-                // should we handle it for Windows ctrl key? (meta is CMD for mac and is WIN key for windows)
-                if (event.metaKey) {
-                    window.open(item.link, '_blank');
-                } else history.push(item.link);
-            };
-            return {...item, action};
+            return {...item, href: item.link};
         });
     }, [clusterNameFinal, mainPage, history, queryParams, page, pageBreadcrumbsOptions]);
 
