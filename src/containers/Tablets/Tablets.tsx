@@ -1,6 +1,6 @@
 import {ArrowsRotateRight} from '@gravity-ui/icons';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
-import {Icon, Label} from '@gravity-ui/uikit';
+import {Icon, Label, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
@@ -32,7 +32,11 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
             return i18n('Type');
         },
         render: ({row}) => {
-            return <span>{row.Type}</span>;
+            return (
+                <span>
+                    {row.Type} {!row.Leader ? <Text color="secondary">follower</Text> : ''}
+                </span>
+            );
         },
     },
     {
