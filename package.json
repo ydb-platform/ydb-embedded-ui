@@ -110,9 +110,7 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "extends @gravity-ui/browserslist-config"
     ],
     "development": [
       "last 1 chrome version",
@@ -123,6 +121,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.2.1",
     "@commitlint/config-conventional": "^19.1.0",
+    "@gravity-ui/browserslist-config": "^4.3.0",
     "@gravity-ui/eslint-config": "^3.2.0",
     "@gravity-ui/prettier-config": "^1.1.0",
     "@gravity-ui/stylelint-config": "^4.0.1",
