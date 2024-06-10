@@ -54,12 +54,6 @@
         &:not(:last-child) {
             margin-bottom: var(--diagnostics-section-margin);
         }
-
-        th {
-            height: 40px;
-
-            vertical-align: middle;
-        }
     }
 
     &__top-queries-row {
