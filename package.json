@@ -21,7 +21,7 @@
     "@gravity-ui/paranoid": "^2.0.1",
     "@gravity-ui/react-data-table": "^2.1.1",
     "@gravity-ui/uikit": "^6.15.0",
-    "@gravity-ui/websql-autocomplete": "^9.0.0",
+    "@gravity-ui/websql-autocomplete": "^9.1.0",
     "@reduxjs/toolkit": "^2.2.3",
     "axios": "^1.6.8",
     "colord": "^2.9.3",

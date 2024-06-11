@@ -128,12 +128,12 @@ const SuggestionsWeight: Record<SuggestionType, number> = {
     suggestTableIndexes: 5,
     suggestTableHints: 6,
     suggestEntitySettings: 7,
-    suggestSimpleTypes: 8,
-    suggestKeywords: 9,
-    suggestAggregateFunctions: 10,
-    suggestTableFunctions: 11,
-    suggestWindowFunctions: 12,
-    suggestFunctions: 13,
+    suggestKeywords: 8,
+    suggestAggregateFunctions: 9,
+    suggestTableFunctions: 10,
+    suggestWindowFunctions: 11,
+    suggestFunctions: 12,
+    suggestSimpleTypes: 13,
     suggestUdfs: 14,
 };
 
