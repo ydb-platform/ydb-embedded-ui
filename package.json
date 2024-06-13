@@ -108,16 +108,9 @@
       "^@gravity-ui/uikit/toaster-singleton-react-18$": "@gravity-ui/uikit/build/cjs/toaster-singleton-react-18.js"
     }
   },
-  "browserslist": {
-    "production": [
-      "extends @gravity-ui/browserslist-config"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
+  "browserslist": [
+    "extends @gravity-ui/browserslist-config"
+  ],
   "devDependencies": {
     "@commitlint/cli": "^19.2.1",
     "@commitlint/config-conventional": "^19.1.0",
