@@ -3,6 +3,7 @@ import React from 'react';
 import {Breadcrumbs} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router';
 
+import {InternalLink} from '../../components/InternalLink';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
 import {parseQuery} from '../../routes';
 import {backend, customBackend} from '../../store';
@@ -80,15 +81,22 @@ function Header({mainPage}: HeaderProps) {
                         items={breadcrumbItems}
                         lastDisplayedItemsCount={1}
                         firstDisplayedItemsCount={1}
-                        renderItemContent={({icon, text}) => {
-                            if (!icon) {
-                                return text;
-                            }
-                            return (
+                        renderItem={({item, isCurrent}) => {
+                            const {icon, text, link} = item;
+
+                            const content = icon ? (
                                 <span className={b('breadcrumb')}>
                                     <div className={b('breadcrumb__icon')}>{icon}</div>
                                     {text}
                                 </span>
+                            ) : (
+                                text
+                            );
+
+                            return (
+                                <InternalLink to={isCurrent ? undefined : link}>
+                                    {content}
+                                </InternalLink>
                             );
                         }}
                     />
