@@ -104,7 +104,14 @@ function Diagnostics(props: DiagnosticsProps) {
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.schema: {
-                return <SchemaViewer path={currentSchemaPath} type={type} withFamilies />;
+                return (
+                    <SchemaViewer
+                        path={currentSchemaPath}
+                        tenantName={tenantName}
+                        type={type}
+                        extended
+                    />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topQueries: {
                 return <TopQueries path={tenantNameString} type={type} />;

@@ -95,6 +95,7 @@ interface TOlapColumnDescription {
     Id?: number;
     Name?: string;
     Type?: string;
+    NotNull?: boolean;
     TypeId?: number;
     TypeInfo?: TTypeInfo;
 }
