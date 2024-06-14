@@ -1,5 +1,22 @@
 # Changelog
 
+## [6.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.5.0...v6.6.0) (2024-06-14)
+
+### Features
+
+* @gravity-ui/websql-autocomplete -&gt; 9.1.0, enable autocomplete by default ([#904](https://github.com/ydb-platform/ydb-embedded-ui/issues/904)) ([e71fad9](https://github.com/ydb-platform/ydb-embedded-ui/commit/e71fad97fe16ec56dd3ee14e2e1f9ac76eb1bed9))
+* **Diagnostics:** add tablets tab to all entities with tablets ([#892](https://github.com/ydb-platform/ydb-embedded-ui/issues/892)) ([e94d53a](https://github.com/ydb-platform/ydb-embedded-ui/commit/e94d53a1fb293119dc3383add220da5f0cf601c3))
+* **Overview:** add view info ([#912](https://github.com/ydb-platform/ydb-embedded-ui/issues/912)) ([02e0cd6](https://github.com/ydb-platform/ydb-embedded-ui/commit/02e0cd66739b442eed649c9edd257ac1de87dcae))
+* **SchemaViewer:** refactor, add view schema ([#910](https://github.com/ydb-platform/ydb-embedded-ui/issues/910)) ([3a10460](https://github.com/ydb-platform/ydb-embedded-ui/commit/3a1046031b0ced98494c821b8dc5bf13b87081c4))
+* **UserSettings:** display app version ([#889](https://github.com/ydb-platform/ydb-embedded-ui/issues/889)) ([e52639e](https://github.com/ydb-platform/ydb-embedded-ui/commit/e52639e84dc5e1ca2707bb38ed917cd613a9c395))
+
+
+### Bug Fixes
+
+* **AsyncReplication:** fix table styles ([#891](https://github.com/ydb-platform/ydb-embedded-ui/issues/891)) ([f879369](https://github.com/ydb-platform/ydb-embedded-ui/commit/f87936951e28e18823c8743b3634f6f7d0d18b55))
+* **TenantOverview:** increase section margin ([#916](https://github.com/ydb-platform/ydb-embedded-ui/issues/916)) ([d8f97f0](https://github.com/ydb-platform/ydb-embedded-ui/commit/d8f97f0de7d452a5f741cca023e233968be97bfa))
+* revert release, fix package ([#920](https://github.com/ydb-platform/ydb-embedded-ui/issues/920)) ([5d3a7c6](https://github.com/ydb-platform/ydb-embedded-ui/commit/5d3a7c6cb347c6943a84e2938d836fca4da47328))
+
 ## [6.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.4.0...v6.5.0) (2024-06-06)
 
 
