@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.6.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.6.0...v6.6.1) (2024-06-14)
+
+
+### Bug Fixes
+
+* fix npm package ([#925](https://github.com/ydb-platform/ydb-embedded-ui/issues/925)) ([6a3a594](https://github.com/ydb-platform/ydb-embedded-ui/commit/6a3a5949ccccbe053e063276648ad4322ff9c063))
+
 ## [6.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.5.0...v6.6.0) (2024-06-14)
 
 ### Features
