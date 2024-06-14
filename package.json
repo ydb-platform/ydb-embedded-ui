@@ -13,7 +13,7 @@
     "@bem-react/classname": "^1.6.0",
     "@gravity-ui/axios-wrapper": "^1.4.1",
     "@gravity-ui/chartkit": "^5.5.0",
-    "@gravity-ui/components": "^3.4.1",
+    "@gravity-ui/components": "^3.6.2",
     "@gravity-ui/date-utils": "^2.4.0",
     "@gravity-ui/i18n": "^1.5.0",
     "@gravity-ui/icons": "^2.9.1",
