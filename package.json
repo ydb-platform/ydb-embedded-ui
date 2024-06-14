@@ -1,10 +1,10 @@
 {
   "name": "ydb-embedded-ui",
-  "version": "6.6.0",
+  "version": "6.5.0",
   "files": [
     "dist"
   ],
-  "main": "dist/lib.js",
+  "main": "dist/src/lib.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:ydb-platform/ydb-embedded-ui.git"
@@ -65,7 +65,7 @@
     "lint:other": "npm run prettier -- --check",
     "prettier": "prettier '**/*.{json,yaml,yml,md}'",
     "unimported": "npx unimported --no-cache",
-    "package": "rm -rf dist && tsc -p tsconfig.package.json && copyfiles -u 1 'src/**/*.{css,scss,svg}' dist",
+    "package": "rm -rf dist && tsc -p tsconfig.package.json && copyfiles -u 1 'src/**/*.{css,scss,svg}' dist/src",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "prepublishOnly": "npm run package",

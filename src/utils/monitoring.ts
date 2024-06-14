@@ -1,4 +1,4 @@
-import {ETenantType} from '../types/api/tenant';
+import type {ETenantType} from '../types/api/tenant';
 
 export type ParsedMonitoringData = {
     monitoring_url: string;
@@ -16,7 +16,7 @@ export type ParsedMonitoringData = {
 export interface GetMonitoringLinkProps {
     monitoring: string;
     dbName: string;
-    dbType: string;
+    dbType: ETenantType;
     clusterName?: string;
 }
 
@@ -41,9 +41,7 @@ export function getMonitoringLink({
 
             if (!url.search) {
                 const dashboard =
-                    dbType === ETenantType.Serverless
-                        ? data.serverless_dashboard
-                        : data.dedicated_dashboard;
+                    dbType === 'Serverless' ? data.serverless_dashboard : data.dedicated_dashboard;
 
                 url.pathname += `/${dashboard}`;
             }

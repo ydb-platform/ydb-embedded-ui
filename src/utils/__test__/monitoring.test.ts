@@ -14,7 +14,7 @@ describe('getMonitoringLink', () => {
                 monitoring: solomonString,
                 clusterName: 'global',
                 dbName: 'database',
-                dbType: 'Database',
+                dbType: 'Dedicated',
             }),
         ).toBe(
             'https://monitoring.test.ai/projects/yc.ydb.ydbaas-cloud/dashboards/aol34hftdn7o4fls50sv?p.cluster=global&p.host=cluster&p.slot=static&p.database=database',
