@@ -132,8 +132,12 @@ export function getColumnTableColumns(): SchemaColumn[] {
 export function getRowTableColumns(extended: boolean, hasAutoIncrement: boolean): SchemaColumn[] {
     const rowTableColumns = [idColumn, keyColumn, nameColumn, typeColumn, notNullColumn];
 
-    if (extended) rowTableColumns.push(familyColumn, mediaColumn, compressionColumn);
-    if (hasAutoIncrement) rowTableColumns.push(autoIncrementColumn);
+    if (extended) {
+        rowTableColumns.push(familyColumn, mediaColumn, compressionColumn);
+    }
+    if (hasAutoIncrement) {
+        rowTableColumns.push(autoIncrementColumn);
+    }
 
     return rowTableColumns;
 }
