@@ -15,6 +15,7 @@ export const SCHEMA_TABLE_COLUMS_IDS = {
     isKeyColumn: 'isKeyColumn',
     type: 'type',
     notNull: 'notNull',
+    autoIncrement: 'autoIncrement',
     familyName: 'familyName',
     prefferedPoolKind: 'prefferedPoolKind',
     columnCodec: 'columnCodec',
@@ -78,6 +79,22 @@ const notNullColumn: SchemaColumn = {
         return undefined;
     },
 };
+const autoIncrementColumn: SchemaColumn = {
+    name: SCHEMA_TABLE_COLUMS_IDS.autoIncrement,
+    get header() {
+        return i18n('column-title.autoIncrement');
+    },
+    width: 100,
+    // Table should start with notNull columns on sort click
+    defaultOrder: DataTable.DESCENDING,
+    render: ({row}) => {
+        if (row.autoIncrement) {
+            return '\u2713';
+        }
+
+        return undefined;
+    },
+};
 const familyColumn: SchemaColumn = {
     name: SCHEMA_TABLE_COLUMS_IDS.familyName,
     get header() {
@@ -112,11 +129,14 @@ export function getExternalTableColumns(): SchemaColumn[] {
 export function getColumnTableColumns(): SchemaColumn[] {
     return [idColumn, keyColumn, nameColumn, typeColumn, notNullColumn];
 }
-export function getRowTableColumns(extended: boolean): SchemaColumn[] {
+export function getRowTableColumns(extended: boolean, hasAutoIncrement: boolean): SchemaColumn[] {
     const rowTableColumns = [idColumn, keyColumn, nameColumn, typeColumn, notNullColumn];
 
     if (extended) {
-        return rowTableColumns.concat(familyColumn, mediaColumn, compressionColumn);
+        rowTableColumns.push(familyColumn, mediaColumn, compressionColumn);
+    }
+    if (hasAutoIncrement) {
+        rowTableColumns.push(autoIncrementColumn);
     }
 
     return rowTableColumns;
