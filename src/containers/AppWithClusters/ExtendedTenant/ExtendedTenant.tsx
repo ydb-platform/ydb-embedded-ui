@@ -1,4 +1,5 @@
 import {MonitoringButton} from '../../../components/MonitoringButton/MonitoringButton';
+import type {ETenantType} from '../../../types/api/tenant';
 import type {GetMonitoringLink} from '../../../utils/monitoring';
 import type Tenant from '../../Tenant/Tenant';
 import {useClusterData} from '../useClusterData';
@@ -15,7 +16,7 @@ export function ExtendedTenant({
     const {additionalNodesProps, cluster, monitoring} = useClusterData();
 
     const additionalTenantProps = {
-        getMonitoringLink: (dbName?: string, dbType?: string) => {
+        getMonitoringLink: (dbName?: string, dbType?: ETenantType) => {
             if (monitoring && dbName && dbType && getMonitoringLink) {
                 const href = getMonitoringLink({
                     monitoring,

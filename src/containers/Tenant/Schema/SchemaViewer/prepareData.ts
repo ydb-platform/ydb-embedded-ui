@@ -61,7 +61,7 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
     const keyAccessorsMap = getKeyColumnsSortAccessorMap(KeyColumnIds);
 
     const preparedColumns = Columns?.map((column) => {
-        const {Id, Name, NotNull, Type, Family} = column;
+        const {Id, Name, NotNull, Type, Family, DefaultFromSequence} = column;
 
         const isKeyColumn = Boolean(KeyColumnIds?.find((keyColumnId) => keyColumnId === Id));
         // Values in keyAccessorsMap are always negative, so it will be 1 for not key columns
@@ -80,6 +80,7 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
             keyAccessor,
             type: Type,
             notNull: NotNull,
+            autoIncrement: Boolean(DefaultFromSequence),
             familyName,
             prefferedPoolKind,
             columnCodec,

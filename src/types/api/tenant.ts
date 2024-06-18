@@ -128,13 +128,7 @@ export interface ControlPlane {
     name?: string;
 }
 
-export enum ETenantType {
-    'UnknownTenantType' = 'UnknownTenantType',
-    'Domain' = 'Domain',
-    'Dedicated' = 'Dedicated',
-    'Shared' = 'Shared',
-    'Serverless' = 'Serverless',
-}
+export type ETenantType = 'UnknownTenantType' | 'Domain' | 'Dedicated' | 'Shared' | 'Serverless';
 
 export enum State {
     'STATE_UNSPECIFIED' = 'STATE_UNSPECIFIED',

@@ -28,6 +28,11 @@ body,
 :root {
     --g-color-base-yellow-light: rgba(255, 199, 0, 0.15);
     --g-color-base-yellow-medium: rgba(255, 219, 77, 0.4);
+
+    --tenant-object-info-max-value-width: 300px;
+    --diagnostics-section-title-margin: 20px;
+    --diagnostics-section-margin: 30px;
+    --diagnostics-section-table-width: 872px;
 }
 
 .g-root {

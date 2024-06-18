@@ -1,7 +1,7 @@
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import {EPathSubType, EPathType} from '../../../types/api/schema';
-import {ETenantType} from '../../../types/api/tenant';
+import type {ETenantType} from '../../../types/api/tenant';
 
 // this file contains verbose mappings that are typed in a way that ensures
 // correctness when a new node type or a new path type is added
@@ -89,11 +89,11 @@ export const mapPathTypeToEntityName = (
 // ====================
 
 const databaseTypeToDBName: Record<ETenantType, string | undefined> = {
-    [ETenantType.UnknownTenantType]: 'Database',
-    [ETenantType.Domain]: 'Cluster Root',
-    [ETenantType.Dedicated]: 'Dedicated Database',
-    [ETenantType.Shared]: 'Shared Database',
-    [ETenantType.Serverless]: 'Serverless Database',
+    UnknownTenantType: 'Database',
+    Domain: 'Cluster Root',
+    Dedicated: 'Dedicated Database',
+    Shared: 'Shared Database',
+    Serverless: 'Serverless Database',
 };
 
 export const mapDatabaseTypeToDBName = (type?: ETenantType) => type && databaseTypeToDBName[type];
