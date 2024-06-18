@@ -34,7 +34,7 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
         render: ({row}) => {
             return (
                 <span>
-                    {row.Type} {row.Leader ? <Text color="secondary">leader</Text> : ''}
+                    {row.Type} {row.Leader ? '' : <Text color="secondary">follower</Text>}
                 </span>
             );
         },
