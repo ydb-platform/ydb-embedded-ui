@@ -8,6 +8,7 @@ export interface SchemaData {
     keyAccessor?: number;
     type?: string;
     notNull?: boolean;
+    autoIncrement?: boolean;
     familyName?: string;
     prefferedPoolKind?: string;
     columnCodec?: string;
