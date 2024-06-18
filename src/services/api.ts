@@ -1,5 +1,7 @@
 import AxiosWrapper from '@gravity-ui/axios-wrapper';
+import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import type {AxiosRequestConfig} from 'axios';
+import axiosRetry from 'axios-retry';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
@@ -54,6 +56,29 @@ type AxiosOptions = {
 };
 
 export class YdbEmbeddedAPI extends AxiosWrapper {
+    constructor(options?: AxiosWrapperOptions) {
+        super(options);
+
+        axiosRetry(this._axios, {
+            retries: 3,
+            retryDelay: axiosRetry.exponentialDelay,
+        });
+
+        // Interceptor to process OIDC auth
+        this._axios.interceptors.response.use(null, function (error) {
+            const response = error.response;
+
+            // OIDC proxy returns 401 response with authUrl in it
+            // authUrl - external auth service link, after successful auth additional cookies will be appended
+            // that will allow access to clusters where OIDC proxy is a balancer
+            if (response && response.status === 401 && response.data?.authUrl) {
+                return window.location.assign(response.data.authUrl);
+            }
+
+            return Promise.reject(error);
+        });
+    }
+
     getPath(path: string) {
         return `${BACKEND ?? ''}${path}`;
     }

@@ -63,26 +63,6 @@ export function configureStore({
     ]);
     listenForHistoryChange(store, history);
 
-    // Interceptor to process OIDC auth
-    // @ts-expect-error
-    api._axios.interceptors.response.use(
-        function (response) {
-            return Promise.resolve(response);
-        },
-        function (error) {
-            const response = error.response;
-
-            // OIDC proxy returns 401 response with authUrl in it
-            // authUrl - external auth service link, after successful auth additional cookies will be appended
-            // that will allow access to clusters where OIDC proxy is a balancer
-            if (response && response.status === 401 && response.data?.authUrl) {
-                return window.location.assign(response.data.authUrl);
-            }
-
-            return Promise.reject(error);
-        },
-    );
-
     window.api = api;
 
     return {history, store};
