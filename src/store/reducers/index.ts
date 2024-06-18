@@ -9,7 +9,6 @@ import executeTopQueries from './executeTopQueries/executeTopQueries';
 import fullscreen from './fullscreen';
 import header from './header/header';
 import heatmap from './heatmap';
-import host from './host';
 import hotKeys from './hotKeys/hotKeys';
 import partitions from './partitions/partitions';
 import saveQuery from './saveQuery';
@@ -32,7 +31,6 @@ export const rootReducer = {
     tooltip,
     tablets,
     schema,
-    host,
     tenants,
     partitions,
     executeQuery,

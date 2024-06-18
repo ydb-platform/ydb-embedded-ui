@@ -8,7 +8,6 @@ export const api = createApi({
      * which is why no endpoints are shown below.
      */
     endpoints: () => ({}),
-    refetchOnMountOrArgChange: true,
     invalidationBehavior: 'immediately',
     tagTypes: ['All'],
 });
