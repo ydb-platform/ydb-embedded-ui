@@ -20,4 +20,16 @@
             margin-right: 3px;
         }
     }
+
+    .g-breadcrumbs {
+        color: var(--g-color-text-primary);
+
+        .g-link {
+            color: var(--g-color-text-secondary);
+
+            &:hover {
+                color: var(--g-color-text-complementary);
+            }
+        }
+    }
 }

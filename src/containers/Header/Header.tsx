@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {Breadcrumbs} from '@gravity-ui/uikit';
+import _ from 'lodash';
 import {useHistory, useLocation} from 'react-router';
 
 import {InternalLink} from '../../components/InternalLink';
@@ -34,44 +35,32 @@ interface HeaderProps {
 function Header({mainPage}: HeaderProps) {
     const history = useHistory();
     const location = useLocation();
+    const queryParams = parseQuery(location);
 
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
 
-    const queryParams = parseQuery(location);
+    const clusterInfo = clusterApi.useGetClusterInfoQuery(queryParams.clusterName);
 
-    const clusterNameFromQuery = queryParams.clusterName?.toString();
-    const {currentData: {clusterData: data} = {}} =
-        clusterApi.useGetClusterInfoQuery(clusterNameFromQuery);
-
-    const clusterNameFinal = data?.Name || clusterNameFromQuery;
+    const clusterName = _.get(
+        clusterInfo,
+        ['currentData', 'clusterData', 'Name'],
+        queryParams.clusterName,
+    );
 
     const breadcrumbItems = React.useMemo(() => {
         const rawBreadcrumbs: RawBreadcrumbItem[] = [];
-        let options = pageBreadcrumbsOptions;
+        const options = pageBreadcrumbsOptions;
 
-        if (mainPage) {
-            rawBreadcrumbs.push(mainPage);
-        }
-
-        if (clusterNameFinal) {
-            options = {
-                ...pageBreadcrumbsOptions,
-                clusterName: clusterNameFinal,
-            };
-        }
+        if (mainPage) rawBreadcrumbs.push(mainPage);
+        if (clusterName) options.clusterName = clusterName;
 
         const breadcrumbs = getBreadcrumbs(page, options, rawBreadcrumbs, queryParams);
 
         return breadcrumbs.map((item) => {
-            const action = () => {
-                if (item.link) {
-                    history.push(item.link);
-                }
-            };
-            return {...item, action};
+            return {...item, action: () => {}};
         });
-    }, [clusterNameFinal, mainPage, history, queryParams, page, pageBreadcrumbsOptions]);
+    }, [clusterName, mainPage, history, queryParams, page, pageBreadcrumbsOptions]);
 
     const renderHeader = () => {
         return (
