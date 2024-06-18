@@ -12,6 +12,7 @@ import {ArrowToggle, Button, Icon} from '@gravity-ui/uikit';
 import ShortyString from '../../../../components/ShortyString/ShortyString';
 import type {ErrorResponse, IssueMessage} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
+import {isNumeric} from '../../../../utils/utils';
 
 import type {SEVERITY} from './models';
 import {getSeverity} from './models';
@@ -163,14 +164,13 @@ function IssueSeverity({severity}: {severity: SEVERITY}) {
     );
 }
 
-function getIssuePosition(issue: IssueMessage) {
-    const {position = {}} = issue;
-
-    if (!position) {
-        return false;
+function getIssuePosition(issue: IssueMessage): string {
+    const {position} = issue;
+    if (typeof position !== 'object' || position === null || !isNumeric(position.row)) {
+        return '';
     }
 
-    const {file, row, column} = position;
+    const {row, column} = position;
 
-    return `${file ? 'file:' : ''}${row}:${column}`;
+    return isNumeric(column) ? `${row}:${column}` : `line ${row}`;
 }
