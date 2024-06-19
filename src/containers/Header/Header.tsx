@@ -70,31 +70,27 @@ function Header({mainPage}: HeaderProps) {
     const renderHeader = () => {
         return (
             <header className={b()}>
-                <div>
-                    <Breadcrumbs
-                        items={breadcrumbItems}
-                        lastDisplayedItemsCount={1}
-                        firstDisplayedItemsCount={1}
-                        renderItem={({item, isCurrent}) => {
-                            const {icon, text, link} = item;
+                <Breadcrumbs
+                    items={breadcrumbItems}
+                    lastDisplayedItemsCount={1}
+                    firstDisplayedItemsCount={1}
+                    className={b('breadcrumbs')}
+                    renderItem={({item, isCurrent}) => {
+                        const {icon, text, link} = item;
 
-                            const content = icon ? (
-                                <span className={b('breadcrumb')}>
-                                    <div className={b('breadcrumb__icon')}>{icon}</div>
-                                    {text}
-                                </span>
-                            ) : (
-                                text
-                            );
-
-                            return (
-                                <InternalLink to={isCurrent ? undefined : link}>
-                                    {content}
-                                </InternalLink>
-                            );
-                        }}
-                    />
-                </div>
+                        return (
+                            <InternalLink
+                                className={b('breadcrumbs_item', {current: isCurrent})}
+                                to={isCurrent ? undefined : link}
+                            >
+                                {icon ? (
+                                    <span className={b('breadcrumbs_item_icon')}>{icon}</span>
+                                ) : null}
+                                <span className={b('breadcrumbs_item_text')}>{text}</span>
+                            </InternalLink>
+                        );
+                    }}
+                />
 
                 <LinkWithIcon title={DEVELOPER_UI_TITLE} url={getInternalLink(singleClusterMode)} />
             </header>
