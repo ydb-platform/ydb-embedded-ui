@@ -8,7 +8,16 @@
 
     padding: 0 20px 0 12px;
 
+    color: var(--g-color-text-primary);
     border-bottom: 1px solid var(--g-color-line-generic);
+
+    a {
+        color: var(--g-color-text-secondary);
+
+        &:hover {
+            color: var(--g-color-text-complementary);
+        }
+    }
 
     &__breadcrumb {
         display: flex;
@@ -18,18 +27,6 @@
             display: flex;
 
             margin-right: 3px;
-        }
-    }
-
-    .g-breadcrumbs {
-        color: var(--g-color-text-primary);
-
-        .g-link {
-            color: var(--g-color-text-secondary);
-
-            &:hover {
-                color: var(--g-color-text-complementary);
-            }
         }
     }
 }
