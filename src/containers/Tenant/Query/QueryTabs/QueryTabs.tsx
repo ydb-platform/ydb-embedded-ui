@@ -20,8 +20,11 @@ const saved = {
     id: TENANT_QUERY_TABS_ID.saved,
     title: i18n('tabs.saved'),
 };
-
-export const queryEditorTabs = [newQuery, history, saved];
+const diagnostics = {
+    id: TENANT_QUERY_TABS_ID.diagnostics,
+    title: i18n('tabs.diagnostics'),
+};
+export const queryEditorTabs = [newQuery, history, saved, diagnostics];
 
 interface QueryEditorTabsProps {
     className?: string;
