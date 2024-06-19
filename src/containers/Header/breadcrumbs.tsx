@@ -202,8 +202,7 @@ export const getBreadcrumbs = (
 
     const getter = mapPageToGetter[page];
 
-    return [...rawBreadcrumbs, ...getter(options, query)].map((item) => ({
-        ...item,
-        action: () => {},
-    }));
+    const pageBreadcrumbs = getter(options, query);
+
+    return [...rawBreadcrumbs, ...pageBreadcrumbs];
 };
