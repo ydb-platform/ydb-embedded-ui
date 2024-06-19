@@ -80,13 +80,16 @@ function Header({mainPage}: HeaderProps) {
 
                         return (
                             <InternalLink
-                                className={b('breadcrumbs_item', {current: isCurrent})}
+                                className={b('breadcrumbs-item', {
+                                    active: isCurrent,
+                                    link: !isCurrent,
+                                })}
                                 to={isCurrent ? undefined : link}
                             >
                                 {icon ? (
-                                    <span className={b('breadcrumbs_item_icon')}>{icon}</span>
+                                    <span className={b('breadcrumbs-icon')}>{icon}</span>
                                 ) : null}
-                                <span className={b('breadcrumbs_item_text')}>{text}</span>
+                                <span>{text}</span>
                             </InternalLink>
                         );
                     }}
