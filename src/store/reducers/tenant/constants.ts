@@ -9,7 +9,6 @@ export const TENANT_QUERY_TABS_ID = {
     newQuery: 'newQuery',
     history: 'history',
     saved: 'saved',
-    diagnostics: 'diagnostics',
 } as const;
 
 export const TENANT_DIAGNOSTICS_TABS_IDS = {

@@ -4,7 +4,6 @@
   "tabs.newQuery": "Query",
   "tabs.history": "History",
   "tabs.saved": "Saved",
-  "tabs.diagnostics": "Diagnostics",
 
   "history.empty": "History is empty",
   "saved.empty": "There are no saved queries",
