@@ -87,7 +87,9 @@ const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, que
         : getTenantBreadcrumbs(options, {...query, ...tenantQuery});
 
     let text = headerKeyset('breadcrumbs.node');
-    if (nodeId) text += ` ${nodeId}`;
+    if (nodeId) {
+        text += ` ${nodeId}`;
+    }
 
     const lastItem = {
         text,
@@ -108,7 +110,9 @@ const getPDiskBreadcrumbs: GetBreadcrumbs<PDiskBreadcrumbsOptions> = (options, q
     });
 
     let text = headerKeyset('breadcrumbs.pDisk');
-    if (pDiskId) text += ` ${pDiskId}`;
+    if (pDiskId) {
+        text += ` ${pDiskId}`;
+    }
 
     const hasLink = pDiskId && nodeId;
     const link = hasLink ? getPDiskPagePath(pDiskId, nodeId, query) : undefined;
@@ -128,7 +132,9 @@ const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, q
     const breadcrumbs = getPDiskBreadcrumbs(options, query);
 
     let text = headerKeyset('breadcrumbs.vDisk');
-    if (vDiskSlotId) text += ` ${vDiskSlotId}`;
+    if (vDiskSlotId) {
+        text += ` ${vDiskSlotId}`;
+    }
 
     const lastItem = {
         text,
@@ -190,7 +196,9 @@ export const getBreadcrumbs = (
     rawBreadcrumbs: RawBreadcrumbItem[] = [],
     query = {},
 ) => {
-    if (!page) return rawBreadcrumbs;
+    if (!page) {
+        return rawBreadcrumbs;
+    }
 
     const getter = mapPageToGetter[page];
 

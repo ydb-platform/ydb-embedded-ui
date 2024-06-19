@@ -52,8 +52,13 @@ function Header({mainPage}: HeaderProps) {
         const rawBreadcrumbs: RawBreadcrumbItem[] = [];
         const options = pageBreadcrumbsOptions;
 
-        if (mainPage) rawBreadcrumbs.push(mainPage);
-        if (clusterName) options.clusterName = clusterName;
+        if (mainPage) {
+            rawBreadcrumbs.push(mainPage);
+        }
+
+        if (clusterName) {
+            options.clusterName = clusterName;
+        }
 
         const breadcrumbs = getBreadcrumbs(page, options, rawBreadcrumbs, queryParams);
 
