@@ -1,5 +1,4 @@
 import {
-    ArrowsRotateRight,
     CircleCheck,
     CircleInfo,
     CircleQuestion,
@@ -7,7 +6,7 @@ import {
     TriangleExclamationFill,
 } from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
-import {Button, Icon} from '@gravity-ui/uikit';
+import {Icon} from '@gravity-ui/uikit';
 
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
@@ -43,7 +42,6 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
         currentData: data,
         isFetching,
         error,
-        refetch,
     } = healthcheckApi.useGetHealthcheckInfoQuery(
         {database: tenantName, maxLevel: 1},
         {
@@ -58,18 +56,6 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
             <div className={b('preview-header')}>
                 <div className={b('preview-title-wrapper')}>
                     <div className={b('preview-title')}>{i18n('title.healthcheck')}</div>
-                    <Button
-                        size="s"
-                        onClick={(event) => {
-                            // FIXME: refactor card to remove the button from the anchor link.
-                            event.preventDefault();
-                            refetch();
-                        }}
-                        loading={isFetching}
-                        view="flat-secondary"
-                    >
-                        <Icon data={ArrowsRotateRight} size={20} />
-                    </Button>
                 </div>
             </div>
         );
