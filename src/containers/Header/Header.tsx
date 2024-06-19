@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Breadcrumbs} from '@gravity-ui/uikit';
-import _ from 'lodash';
+import {get} from 'lodash';
 import {useHistory, useLocation} from 'react-router';
 
 import {InternalLink} from '../../components/InternalLink';
@@ -42,7 +42,7 @@ function Header({mainPage}: HeaderProps) {
 
     const clusterInfo = clusterApi.useGetClusterInfoQuery(queryParams.clusterName);
 
-    const clusterName = _.get(
+    const clusterName = get(
         clusterInfo,
         ['currentData', 'clusterData', 'Name'],
         queryParams.clusterName,
