@@ -1,8 +1,10 @@
 import React from 'react';
 
 import {Breadcrumbs} from '@gravity-ui/uikit';
+import {get} from 'lodash';
 import {useHistory, useLocation} from 'react-router';
 
+import {InternalLink} from '../../components/InternalLink';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
 import {parseQuery} from '../../routes';
 import {backend, customBackend} from '../../store';
@@ -33,66 +35,65 @@ interface HeaderProps {
 function Header({mainPage}: HeaderProps) {
     const history = useHistory();
     const location = useLocation();
+    const queryParams = parseQuery(location);
 
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
 
-    const queryParams = parseQuery(location);
+    const clusterInfo = clusterApi.useGetClusterInfoQuery(queryParams.clusterName);
 
-    const clusterNameFromQuery = queryParams.clusterName?.toString();
-    const {currentData: {clusterData: data} = {}} =
-        clusterApi.useGetClusterInfoQuery(clusterNameFromQuery);
-
-    const clusterNameFinal = data?.Name || clusterNameFromQuery;
+    const clusterName = get(
+        clusterInfo,
+        ['currentData', 'clusterData', 'Name'],
+        queryParams.clusterName,
+    );
 
     const breadcrumbItems = React.useMemo(() => {
         const rawBreadcrumbs: RawBreadcrumbItem[] = [];
-        let options = pageBreadcrumbsOptions;
+        const options = pageBreadcrumbsOptions;
 
         if (mainPage) {
             rawBreadcrumbs.push(mainPage);
         }
 
-        if (clusterNameFinal) {
-            options = {
-                ...pageBreadcrumbsOptions,
-                clusterName: clusterNameFinal,
-            };
+        if (clusterName) {
+            options.clusterName = clusterName;
         }
 
         const breadcrumbs = getBreadcrumbs(page, options, rawBreadcrumbs, queryParams);
 
         return breadcrumbs.map((item) => {
-            const action = () => {
-                if (item.link) {
-                    history.push(item.link);
-                }
-            };
-            return {...item, action};
+            return {...item, action: () => {}};
         });
-    }, [clusterNameFinal, mainPage, history, queryParams, page, pageBreadcrumbsOptions]);
+    }, [clusterName, mainPage, history, queryParams, page, pageBreadcrumbsOptions]);
 
     const renderHeader = () => {
         return (
             <header className={b()}>
-                <div>
-                    <Breadcrumbs
-                        items={breadcrumbItems}
-                        lastDisplayedItemsCount={1}
-                        firstDisplayedItemsCount={1}
-                        renderItemContent={({icon, text}) => {
-                            if (!icon) {
-                                return text;
-                            }
-                            return (
-                                <span className={b('breadcrumb')}>
-                                    <div className={b('breadcrumb__icon')}>{icon}</div>
-                                    {text}
-                                </span>
-                            );
-                        }}
-                    />
-                </div>
+                <Breadcrumbs
+                    items={breadcrumbItems}
+                    lastDisplayedItemsCount={1}
+                    firstDisplayedItemsCount={1}
+                    className={b('breadcrumbs')}
+                    renderItem={({item, isCurrent}) => {
+                        const {icon, text, link} = item;
+
+                        return (
+                            <InternalLink
+                                className={b('breadcrumbs-item', {
+                                    active: isCurrent,
+                                    link: !isCurrent,
+                                })}
+                                to={isCurrent ? undefined : link}
+                            >
+                                {icon ? (
+                                    <span className={b('breadcrumbs-icon')}>{icon}</span>
+                                ) : null}
+                                <span>{text}</span>
+                            </InternalLink>
+                        );
+                    }}
+                />
 
                 <LinkWithIcon title={DEVELOPER_UI_TITLE} url={getInternalLink(singleClusterMode)} />
             </header>
