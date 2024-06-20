@@ -43,7 +43,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
         isFetching,
         error,
     } = healthcheckApi.useGetHealthcheckInfoQuery(
-        {database: tenantName, maxLevel: 1},
+        {database: tenantName},
         {
             pollingInterval: autorefresh,
         },
