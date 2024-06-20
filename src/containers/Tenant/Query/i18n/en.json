@@ -1,7 +1,10 @@
 {
   "controls.query-mode-selector_type": "Query type:",
 
-  "tabs.newQuery": "Query",
+  "sections.query": "Query",
+  "sections.diagnostics": "Diagnostics",
+
+  "tabs.newQuery": "Editor",
   "tabs.history": "History",
   "tabs.saved": "Saved",
 

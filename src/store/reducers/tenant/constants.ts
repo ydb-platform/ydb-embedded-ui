@@ -5,6 +5,11 @@ export const TENANT_PAGES_IDS = {
     diagnostics: 'diagnostics',
 } as const;
 
+export enum TenantPageTabs {
+    QUERY,
+    DIAGNOSTICS,
+}
+
 export const TENANT_QUERY_TABS_ID = {
     newQuery: 'newQuery',
     history: 'history',

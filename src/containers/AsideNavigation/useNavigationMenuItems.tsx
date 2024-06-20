@@ -1,8 +1,6 @@
 import React from 'react';
 
 import {Pulse, Terminal} from '@gravity-ui/icons';
-import type {MenuItem as AsideHeaderMenuItem} from '@gravity-ui/navigation';
-import type {IconData} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router';
 
 import routes, {parseQuery} from '../../routes';
@@ -13,12 +11,15 @@ import {getTenantPath} from '../Tenant/TenantPages';
 
 import i18n from './i18n';
 
+type IconComponent = (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
+
 interface MenuItem {
     id: string;
     title: string;
-    icon: IconData;
+    icon: IconComponent;
     iconSize: string | number;
-    location: string;
+    path: string;
+    current?: boolean;
     locationKeys?: string[];
 }
 
@@ -34,7 +35,7 @@ export function useNavigationMenuItems() {
 
     const isTenantPage = pathname === routes.tenant;
 
-    const menuItems: AsideHeaderMenuItem[] = React.useMemo(() => {
+    const menuItems = React.useMemo(() => {
         if (!isTenantPage) {
             return [];
         }
@@ -45,7 +46,7 @@ export function useNavigationMenuItems() {
                 title: i18n('pages.query'),
                 icon: Terminal,
                 iconSize: 20,
-                location: getTenantPath({
+                path: getTenantPath({
                     ...queryParams,
                     [TENANT_PAGE]: TENANT_PAGES_IDS.query,
                 }),
@@ -55,28 +56,22 @@ export function useNavigationMenuItems() {
                 title: i18n('pages.diagnostics'),
                 icon: Pulse,
                 iconSize: 20,
-                location: getTenantPath({
+                path: getTenantPath({
                     ...queryParams,
                     [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
                 }),
             },
         ];
 
-        return items.map((item) => {
-            const current = item.id === tenantPage;
-
-            return {
-                id: item.id,
-                title: item.title,
-                icon: item.icon,
-                iconSize: item.iconSize,
-                current,
-                onItemClick: () => {
-                    setInitialTenantPage(item.id);
-                    history.push(item.location);
-                },
-            };
-        });
+        return items.map(({path, ...item}) => ({
+            ...item,
+            iconSize: 20,
+            current: item.id === tenantPage,
+            onItemClick: () => {
+                setInitialTenantPage(item.id);
+                history.push(path);
+            },
+        }));
     }, [tenantPage, isTenantPage, setInitialTenantPage, history, queryParams]);
 
     return menuItems;
