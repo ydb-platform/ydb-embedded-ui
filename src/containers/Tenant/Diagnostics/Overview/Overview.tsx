@@ -13,6 +13,7 @@ import {EPathType} from '../../../../types/api/schema';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
 import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
+import {ViewInfo} from '../../Info/View/View';
 import {
     isColumnEntityType,
     isEntityWithMergedImplementation,
@@ -91,7 +92,7 @@ function Overview({type, tenantName}: OverviewProps) {
             [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={data} />,
             [EPathType.EPathTypeExternalTable]: () => <ExternalTableInfo data={data} />,
             [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
-            [EPathType.EPathTypeView]: undefined,
+            [EPathType.EPathTypeView]: () => <ViewInfo data={data} />,
             [EPathType.EPathTypeReplication]: () => <AsyncReplicationInfo data={data} />,
         };
 
@@ -110,7 +111,7 @@ function Overview({type, tenantName}: OverviewProps) {
         return <ResponseError error={overviewError} />;
     }
 
-    return <div>{renderContent()}</div>;
+    return renderContent();
 }
 
 export default Overview;

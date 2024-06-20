@@ -1,4 +1,4 @@
-import {Flask, PencilToSquare, StarFill} from '@gravity-ui/icons';
+import {CircleInfo, Flask, PencilToSquare, StarFill} from '@gravity-ui/icons';
 import type {IconProps} from '@gravity-ui/uikit';
 
 import {
@@ -15,13 +15,15 @@ import {
 import {Lang, defaultLang} from '../../utils/i18n';
 import {ClusterModeGuard} from '../ClusterModeGuard';
 
-import type {SettingProps} from './Setting';
+import type {SettingProps, SettingsInfoFieldProps} from './Setting';
 import i18n from './i18n';
+
+import packageJson from '../../../package.json';
 
 export interface SettingsSection {
     id: string;
     title: string;
-    settings: SettingProps[];
+    settings: (SettingProps | SettingsInfoFieldProps)[];
 }
 
 export interface SettingsPage {
@@ -119,6 +121,12 @@ export const autocompleteOnEnterSetting: SettingProps = {
     description: i18n('settings.editor.autocomplete-on-enter.description'),
 };
 
+export const interfaceVersionInfoField: SettingsInfoFieldProps = {
+    title: i18n('settings.about.interfaceVersionInfoField.title'),
+    type: 'info',
+    content: packageJson.version,
+};
+
 export const appearanceSection: SettingsSection = {
     id: 'appearanceSection',
     title: i18n('section.appearance'),
@@ -133,6 +141,12 @@ export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',
     title: i18n('section.dev-setting'),
     settings: [enableAutocompleteSetting, autocompleteOnEnterSetting],
+};
+
+export const aboutSettingsSection: SettingsSection = {
+    id: 'aboutSettingsSection',
+    title: i18n('section.about'),
+    settings: [interfaceVersionInfoField],
 };
 
 export const generalPage: SettingsPage = {
@@ -154,4 +168,16 @@ export const editorPage: SettingsPage = {
     sections: [devSettingsSection],
 };
 
-export const settings: YDBEmbeddedUISettings = [generalPage, editorPage, experimentsPage];
+export const aboutPage: SettingsPage = {
+    id: 'aboutPage',
+    title: i18n('page.about'),
+    icon: {data: CircleInfo},
+    sections: [aboutSettingsSection],
+};
+
+export const settings: YDBEmbeddedUISettings = [
+    generalPage,
+    editorPage,
+    experimentsPage,
+    aboutPage,
+];

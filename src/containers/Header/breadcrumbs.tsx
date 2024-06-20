@@ -40,10 +40,16 @@ export interface RawBreadcrumbItem {
     icon?: JSX.Element;
 }
 
-const getClusterBreadcrumbs = (
-    options: ClusterBreadcrumbsOptions,
-    query = {},
-): RawBreadcrumbItem[] => {
+interface GetBreadcrumbs<T, U = AnyRecord> {
+    (options: T, query?: U): RawBreadcrumbItem[];
+}
+
+const getQueryForTenant = (type: 'nodes' | 'tablets') => ({
+    [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
+    [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS[type],
+});
+
+const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (options, query = {}) => {
     const {clusterName, clusterTab} = options;
 
     return [
@@ -55,109 +61,97 @@ const getClusterBreadcrumbs = (
     ];
 };
 
-const getTenantBreadcrumbs = (
-    options: TenantBreadcrumbsOptions,
-    query = {},
-): RawBreadcrumbItem[] => {
+const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options, query = {}) => {
     const {tenantName} = options;
+
+    const breadcrumbs = getClusterBreadcrumbs(options, query);
 
     const text = tenantName ? prepareTenantName(tenantName) : headerKeyset('breadcrumbs.tenant');
     const link = tenantName ? getTenantPath({...query, name: tenantName}) : undefined;
 
-    return [...getClusterBreadcrumbs(options, query), {text, link, icon: <DatabaseIcon />}];
-};
-
-const getNodeBreadcrumbs = (options: NodeBreadcrumbsOptions, query = {}): RawBreadcrumbItem[] => {
-    const {tenantName, nodeId} = options;
-
-    let breadcrumbs: RawBreadcrumbItem[];
-
-    // Compute nodes have tenantName, storage nodes doesn't
-    const isStorageNode = !tenantName;
-
-    const newQuery = {
-        ...query,
-        [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
-        [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
-    };
-
-    if (isStorageNode) {
-        breadcrumbs = getClusterBreadcrumbs(options, query);
-    } else {
-        breadcrumbs = getTenantBreadcrumbs(options, newQuery);
-    }
-
-    const text = nodeId
-        ? `${headerKeyset('breadcrumbs.node')} ${nodeId}`
-        : headerKeyset('breadcrumbs.node');
-    const link = nodeId ? getDefaultNodePath(nodeId, query) : undefined;
-    const icon = isStorageNode ? <StorageNodeIcon /> : <ComputeNodeIcon />;
-
-    breadcrumbs.push({
-        text,
-        link,
-        icon,
-    });
+    const lastItem = {text, link, icon: <DatabaseIcon />};
+    breadcrumbs.push(lastItem);
 
     return breadcrumbs;
 };
 
-const getPDiskBreadcrumbs = (options: PDiskBreadcrumbsOptions, query = {}) => {
+const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, query = {}) => {
+    const {tenantName, nodeId} = options;
+    // Compute nodes have tenantName, storage nodes doesn't
+    const isStorage = !tenantName;
+
+    const tenantQuery = getQueryForTenant('nodes');
+
+    const breadcrumbs = isStorage
+        ? getClusterBreadcrumbs(options, query)
+        : getTenantBreadcrumbs(options, {...query, ...tenantQuery});
+
+    let text = headerKeyset('breadcrumbs.node');
+    if (nodeId) {
+        text += ` ${nodeId}`;
+    }
+
+    const lastItem = {
+        text,
+        link: nodeId ? getDefaultNodePath(nodeId, query) : undefined,
+        icon: isStorage ? <StorageNodeIcon /> : <ComputeNodeIcon />,
+    };
+
+    breadcrumbs.push(lastItem);
+
+    return breadcrumbs;
+};
+
+const getPDiskBreadcrumbs: GetBreadcrumbs<PDiskBreadcrumbsOptions> = (options, query = {}) => {
     const {nodeId, pDiskId} = options;
 
     const breadcrumbs = getNodeBreadcrumbs({
-        // PDisks relate to storage Nodes, they don't have tenant name
-        tenantName: undefined,
-        nodeId: nodeId,
+        nodeId,
     });
 
-    const text = pDiskId
-        ? `${headerKeyset('breadcrumbs.pDisk')} ${pDiskId}`
-        : headerKeyset('breadcrumbs.pDisk');
-    const link = pDiskId && nodeId ? getPDiskPagePath(pDiskId, nodeId, query) : undefined;
+    let text = headerKeyset('breadcrumbs.pDisk');
+    if (pDiskId) {
+        text += ` ${pDiskId}`;
+    }
 
-    breadcrumbs.push({
+    const hasLink = pDiskId && nodeId;
+    const link = hasLink ? getPDiskPagePath(pDiskId, nodeId, query) : undefined;
+
+    const lastItem = {
         text,
         link,
-    });
+    };
+    breadcrumbs.push(lastItem);
 
     return breadcrumbs;
 };
 
-const getVDiskBreadcrumbs = (options: VDiskBreadcrumbsOptions, query = {}) => {
+const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, query = {}) => {
     const {vDiskSlotId} = options;
 
     const breadcrumbs = getPDiskBreadcrumbs(options, query);
 
-    const text = vDiskSlotId
-        ? `${headerKeyset('breadcrumbs.vDisk')} ${vDiskSlotId}`
-        : headerKeyset('breadcrumbs.vDisk');
+    let text = headerKeyset('breadcrumbs.vDisk');
+    if (vDiskSlotId) {
+        text += ` ${vDiskSlotId}`;
+    }
 
-    breadcrumbs.push({text});
+    const lastItem = {
+        text,
+    };
+    breadcrumbs.push(lastItem);
 
     return breadcrumbs;
 };
 
-const getTabletsBreadcrubms = (
-    options: TabletsBreadcrumbsOptions,
-    query = {},
-): RawBreadcrumbItem[] => {
+const getTabletsBreadcrumbs: GetBreadcrumbs<TabletsBreadcrumbsOptions> = (options, query = {}) => {
     const {tenantName, nodeIds} = options;
 
-    const newQuery = {
-        ...query,
-        [TENANT_PAGE]: TENANT_PAGES_IDS.diagnostics,
-        [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.tablets,
-    };
+    const tenantQuery = getQueryForTenant('tablets');
 
-    let breadcrumbs: RawBreadcrumbItem[];
-
-    // Cluster system tablets don't have tenantName
-    if (tenantName) {
-        breadcrumbs = getTenantBreadcrumbs(options, newQuery);
-    } else {
-        breadcrumbs = getClusterBreadcrumbs(options, query);
-    }
+    const breadcrumbs = tenantName
+        ? getTenantBreadcrumbs(options, {...query, ...tenantQuery})
+        : getClusterBreadcrumbs(options, query);
 
     const link = createHref(routes.tabletsFilters, undefined, {
         ...query,
@@ -165,26 +159,36 @@ const getTabletsBreadcrubms = (
         path: tenantName,
     });
 
-    breadcrumbs.push({text: headerKeyset('breadcrumbs.tablets'), link});
+    const lastItem = {text: headerKeyset('breadcrumbs.tablets'), link};
+    breadcrumbs.push(lastItem);
 
     return breadcrumbs;
 };
 
-const getTabletBreadcrubms = (
-    options: TabletBreadcrumbsOptions,
-    query = {},
-): RawBreadcrumbItem[] => {
+const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options, query = {}) => {
     const {tabletId, tabletType} = options;
 
-    const breadcrumbs = getTabletsBreadcrubms(options, query);
+    const breadcrumbs = getTabletsBreadcrumbs(options, query);
 
-    breadcrumbs.push({
+    const lastItem = {
         text: tabletId || headerKeyset('breadcrumbs.tablet'),
         icon: <TabletIcon text={getTabletLabel(tabletType)} />,
-    });
+    };
+
+    breadcrumbs.push(lastItem);
 
     return breadcrumbs;
 };
+
+const mapPageToGetter = {
+    cluster: getClusterBreadcrumbs,
+    node: getNodeBreadcrumbs,
+    pDisk: getPDiskBreadcrumbs,
+    tablet: getTabletBreadcrumbs,
+    tablets: getTabletsBreadcrumbs,
+    tenant: getTenantBreadcrumbs,
+    vDisk: getVDiskBreadcrumbs,
+} as const;
 
 export const getBreadcrumbs = (
     page: Page,
@@ -192,30 +196,13 @@ export const getBreadcrumbs = (
     rawBreadcrumbs: RawBreadcrumbItem[] = [],
     query = {},
 ) => {
-    switch (page) {
-        case 'cluster': {
-            return [...rawBreadcrumbs, ...getClusterBreadcrumbs(options, query)];
-        }
-        case 'tenant': {
-            return [...rawBreadcrumbs, ...getTenantBreadcrumbs(options, query)];
-        }
-        case 'node': {
-            return [...rawBreadcrumbs, ...getNodeBreadcrumbs(options, query)];
-        }
-        case 'pDisk': {
-            return [...rawBreadcrumbs, ...getPDiskBreadcrumbs(options, query)];
-        }
-        case 'vDisk': {
-            return [...rawBreadcrumbs, ...getVDiskBreadcrumbs(options, query)];
-        }
-        case 'tablets': {
-            return [...rawBreadcrumbs, ...getTabletsBreadcrubms(options, query)];
-        }
-        case 'tablet': {
-            return [...rawBreadcrumbs, ...getTabletBreadcrubms(options, query)];
-        }
-        default: {
-            return rawBreadcrumbs;
-        }
+    if (!page) {
+        return rawBreadcrumbs;
     }
+
+    const getter = mapPageToGetter[page];
+
+    const pageBreadcrumbs = getter(options, query);
+
+    return [...rawBreadcrumbs, ...pageBreadcrumbs];
 };

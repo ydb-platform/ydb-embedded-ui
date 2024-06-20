@@ -6,6 +6,6 @@
     "noEmit": false,
     "importHelpers": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "package.json"],
   "exclude": ["src/setup*", "src/index.tsx", "**/__tests__", "**/tests"]
 }

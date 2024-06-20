@@ -45,7 +45,7 @@ import {
     PaneVisibilityToggleButtons,
     paneVisibilityToggleReducerCreator,
 } from '../utils/paneVisibilityToggleHelpers';
-import {isIndexTableType, isTableType, isViewType} from '../utils/schema';
+import {isIndexTableType, isTableType} from '../utils/schema';
 
 import './ObjectSummary.scss';
 
@@ -64,6 +64,7 @@ const getTenantCommonInfoState = () => {
 interface ObjectSummaryProps {
     type?: EPathType;
     subType?: EPathSubType;
+    tenantName?: string;
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
     isCollapsed: boolean;
@@ -72,6 +73,7 @@ interface ObjectSummaryProps {
 export function ObjectSummary({
     type,
     subType,
+    tenantName,
     onCollapseSummary,
     onExpandSummary,
     isCollapsed,
@@ -97,15 +99,12 @@ export function ObjectSummary({
         ignoreQueryPrefix: true,
     });
 
-    const {name: tenantName} = queryParams;
-
     const pathData = tenantName ? data[tenantName.toString()]?.PathDescription?.Self : undefined;
     const currentObjectData = currentSchemaPath ? data[currentSchemaPath] : undefined;
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
     React.useEffect(() => {
-        // TODO: enable schema tab for view when supported
-        const isTable = isTableType(type) && !isViewType(type);
+        const isTable = isTableType(type);
 
         if (type && !isTable && !TENANT_INFO_TABS.find((el) => el.id === summaryTab)) {
             dispatch(setSummaryTab(TENANT_SUMMARY_TABS_IDS.overview));
@@ -113,8 +112,7 @@ export function ObjectSummary({
     }, [dispatch, type, summaryTab]);
 
     const renderTabs = () => {
-        // TODO: enable schema tab for view when supported
-        const isTable = isTableType(type) && !isViewType(type);
+        const isTable = isTableType(type);
         const tabsItems = isTable ? [...TENANT_INFO_TABS, ...TENANT_SCHEMA_TAB] : TENANT_INFO_TABS;
 
         return (
@@ -126,7 +124,7 @@ export function ObjectSummary({
                     wrapTo={({id}, node) => {
                         const path = createHref(routes.tenant, undefined, {
                             ...queryParams,
-                            name: tenantName as string,
+                            name: tenantName,
                             [TenantTabsGroups.summaryTab]: id,
                         });
                         return (
@@ -218,7 +216,9 @@ export function ObjectSummary({
                 return <Acl />;
             }
             case TENANT_SUMMARY_TABS_IDS.schema: {
-                return <SchemaViewer type={type} path={currentSchemaPath} />;
+                return (
+                    <SchemaViewer type={type} path={currentSchemaPath} tenantName={tenantName} />
+                );
             }
             default: {
                 return renderObjectOverview();

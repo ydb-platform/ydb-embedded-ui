@@ -140,6 +140,7 @@ function Tenant(props: TenantProps) {
                     <ObjectSummary
                         type={preloadedPathType || currentPathType}
                         subType={preloadedPathSubType || currentPathSubType}
+                        tenantName={tenantName}
                         onCollapseSummary={onCollapseSummaryHandler}
                         onExpandSummary={onExpandSummaryHandler}
                         isCollapsed={summaryVisibilityState.collapsed}

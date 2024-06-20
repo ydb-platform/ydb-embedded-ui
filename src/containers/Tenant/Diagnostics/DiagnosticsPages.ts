@@ -70,7 +70,7 @@ const partitions = {
     title: 'Partitions',
 };
 
-export const ASYNC_REPLICATION_PAGES = [overview, describe];
+export const ASYNC_REPLICATION_PAGES = [overview, tablets, describe];
 
 export const DATABASE_PAGES = [
     overview,
@@ -88,8 +88,8 @@ export const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, graph, ta
 
 export const DIR_PAGES = [overview, topShards, nodes, describe];
 
-export const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, describe];
-export const TOPIC_PAGES = [overview, consumers, partitions, nodes, describe];
+export const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, tablets, describe];
+export const TOPIC_PAGES = [overview, consumers, partitions, nodes, tablets, describe];
 
 export const EXTERNAL_DATA_SOURCE_PAGES = [overview, describe];
 export const EXTERNAL_TABLE_PAGES = [overview, describe];

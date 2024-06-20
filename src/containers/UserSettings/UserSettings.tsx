@@ -2,7 +2,7 @@ import {Settings} from '@gravity-ui/navigation';
 
 import {cn} from '../../utils/cn';
 
-import {Setting} from './Setting';
+import {Setting, SettingsInfoField} from './Setting';
 import type {YDBEmbeddedUISettings} from './settings';
 import {settings} from './settings';
 
@@ -28,6 +28,14 @@ export const UserSettings = ({settings: userSettings = settings}: UserSettingsPr
                             return (
                                 <Settings.Section key={id} title={sectionTitle}>
                                     {sectionSettings.map((setting) => {
+                                        if (setting.type === 'info') {
+                                            return (
+                                                <SettingsInfoField
+                                                    key={setting.title}
+                                                    {...setting}
+                                                />
+                                            );
+                                        }
                                         return <Setting key={setting.settingKey} {...setting} />;
                                     })}
                                 </Settings.Section>

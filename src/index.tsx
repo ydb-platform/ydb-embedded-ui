@@ -8,7 +8,6 @@ import reportWebVitals from './reportWebVitals';
 import {history, store} from './store/defaultStore';
 
 import './styles/themes.scss';
-import './styles/constants.scss';
 import './index.css';
 
 async function render() {

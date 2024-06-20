@@ -39,7 +39,7 @@ export const DEFAULT_USER_SETTINGS = {
     [PARTITIONS_HIDDEN_COLUMNS_KEY]: [],
     [USE_BACKEND_PARAMS_FOR_TABLES_KEY]: false,
     [USE_CLUSTER_BALANCER_AS_BACKEND_KEY]: true,
-    [ENABLE_AUTOCOMPLETE]: false,
+    [ENABLE_AUTOCOMPLETE]: true,
     [AUTOCOMPLETE_ON_ENTER]: true,
     [IS_HOTKEYS_HELP_HIDDDEN_KEY]: false,
 } as const satisfies SettingsObject;

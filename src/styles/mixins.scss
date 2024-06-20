@@ -94,13 +94,45 @@
     @include body-2-typography();
 }
 
-@mixin query-data-table() {
-    & .data-table {
+@mixin data-table-styles {
+    --data-table-row-height: 40px;
+    --data-table-cell-align: middle;
+    --data-table-head-align: middle;
+
+    .data-table {
+        @include body-2-typography();
+
         &__th,
         &__td {
-            vertical-align: middle;
+            height: var(--data-table-row-height);
+
+            border-top: unset;
+            border-right: unset;
+            border-left: unset;
         }
 
+        &__th {
+            font-weight: bold;
+        }
+
+        &__table {
+            border-spacing: 0;
+            border-collapse: separate;
+        }
+    }
+
+    // DataTable with moving head is actually made of two separate tables
+    // The second table has header with zero height, so it's actually invisible
+    // There should not be any height set for this header
+    .data-table__box_sticky-head_moving {
+        .data-table__th {
+            height: unset;
+        }
+    }
+}
+
+@mixin query-data-table() {
+    & .data-table {
         &__box {
             .data-table__table-wrapper {
                 padding-bottom: 20px;
