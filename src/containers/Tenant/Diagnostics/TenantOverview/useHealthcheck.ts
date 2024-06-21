@@ -26,9 +26,12 @@ export const useHealthcheck = (
         isFetching,
         error,
         refetch,
-    } = healthcheckApi.useGetHealthcheckInfoQuery(tenantName, {
-        pollingInterval: autorefresh,
-    });
+    } = healthcheckApi.useGetHealthcheckInfoQuery(
+        {database: tenantName},
+        {
+            pollingInterval: autorefresh,
+        },
+    );
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
     const issuesStatistics = useTypedSelector((state) => selectIssuesStatistics(state, tenantName));
     const issueTrees = useTypedSelector((state) => selectIssuesTrees(state, tenantName));

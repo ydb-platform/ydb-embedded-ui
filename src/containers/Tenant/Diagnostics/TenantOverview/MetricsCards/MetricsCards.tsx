@@ -24,7 +24,6 @@ import {
     memoryUsageToStatus,
     storageUsageToStatus,
 } from '../../../../../store/reducers/tenants/utils';
-import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useTypedSelector} from '../../../../../utils/hooks';
@@ -53,13 +52,7 @@ interface MetricsCardsProps {
     memoryStats?: TenantMetricStats[];
     blobStorageStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
-
-    issuesStatistics?: [StatusFlag, number][];
-    selfCheckResult: SelfCheckResult;
-    fetchHealthcheck: VoidFunction;
-    healthcheckLoading?: boolean;
-    healthCheckWasLoaded?: boolean;
-    healthcheckError?: unknown;
+    tenantName: string;
 }
 
 export function MetricsCards({
@@ -67,11 +60,7 @@ export function MetricsCards({
     memoryStats,
     blobStorageStats,
     tabletStorageStats,
-    issuesStatistics,
-    selfCheckResult,
-    fetchHealthcheck,
-    healthcheckLoading,
-    healthcheckError,
+    tenantName,
 }: MetricsCardsProps) {
     const location = useLocation();
 
@@ -130,11 +119,7 @@ export function MetricsCards({
             </Link>
             <Link to={tabLinks.healthcheck} className={b('tab')}>
                 <HealthcheckPreview
-                    selfCheckResult={selfCheckResult}
-                    issuesStatistics={issuesStatistics}
-                    onUpdate={fetchHealthcheck}
-                    loading={healthcheckLoading}
-                    error={healthcheckError}
+                    tenantName={tenantName}
                     active={metricsTab === TENANT_METRICS_TABS_IDS.healthcheck}
                 />
             </Link>
