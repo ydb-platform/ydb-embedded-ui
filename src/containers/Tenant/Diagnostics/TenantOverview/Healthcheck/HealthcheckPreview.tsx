@@ -1,15 +1,20 @@
-import React from 'react';
-
-import {ArrowsRotateRight} from '@gravity-ui/icons';
-import {Button, Icon} from '@gravity-ui/uikit';
+import {
+    CircleCheck,
+    CircleInfo,
+    CircleQuestion,
+    CircleXmark,
+    TriangleExclamationFill,
+} from '@gravity-ui/icons';
+import type {IconData} from '@gravity-ui/uikit';
+import {Icon} from '@gravity-ui/uikit';
 
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
-import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
-import {hcStatusToColorFlag} from '../../../../../store/reducers/healthcheckInfo/utils';
-import type {SelfCheckResult, StatusFlag} from '../../../../../types/api/healthcheck';
+import {healthcheckApi} from '../../../../../store/reducers/healthcheckInfo/healthcheckInfo';
+import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
+import {useTypedSelector} from '../../../../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -18,43 +23,39 @@ import './Healthcheck.scss';
 const b = cn('healthcheck');
 
 interface HealthcheckPreviewProps {
-    selfCheckResult: SelfCheckResult;
-    issuesStatistics?: [StatusFlag, number][];
-    loading?: boolean;
-    onUpdate: VoidFunction;
-    error?: unknown;
+    tenantName: string;
     active?: boolean;
 }
 
+const icons: Record<SelfCheckResult, IconData> = {
+    [SelfCheckResult.UNSPECIFIED]: CircleQuestion,
+    [SelfCheckResult.GOOD]: CircleCheck,
+    [SelfCheckResult.DEGRADED]: CircleInfo,
+    [SelfCheckResult.MAINTENANCE_REQUIRED]: CircleXmark,
+    [SelfCheckResult.EMERGENCY]: TriangleExclamationFill,
+};
+
 export function HealthcheckPreview(props: HealthcheckPreviewProps) {
-    const {selfCheckResult, issuesStatistics, loading, onUpdate, error, active} = props;
+    const {tenantName, active} = props;
+    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const {
+        currentData: data,
+        isFetching,
+        error,
+    } = healthcheckApi.useGetHealthcheckInfoQuery(
+        {database: tenantName},
+        {
+            pollingInterval: autorefresh,
+        },
+    );
+
+    const loading = isFetching && data === undefined;
 
     const renderHeader = () => {
-        const modifier = selfCheckResult.toLowerCase();
-
-        if (loading) {
-            return null;
-        }
-
         return (
             <div className={b('preview-header')}>
                 <div className={b('preview-title-wrapper')}>
                     <div className={b('preview-title')}>{i18n('title.healthcheck')}</div>
-                    <Button
-                        size="s"
-                        onClick={(event) => {
-                            // FIXME: refactor card to remove the button from the anchor link.
-                            event.preventDefault();
-                            onUpdate();
-                        }}
-                        loading={loading}
-                        view="flat-secondary"
-                    >
-                        <Icon data={ArrowsRotateRight} size={20} />
-                    </Button>
-                </div>
-                <div className={b('self-check-status-indicator', {[modifier]: true})}>
-                    {selfCheckResult}
                 </div>
             </div>
         );
@@ -69,26 +70,16 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
             return <Loader size="m" />;
         }
 
+        const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
+        const modifier = selfCheckResult.toLowerCase();
         return (
             <div className={b('preview-content')}>
-                {!issuesStatistics || !issuesStatistics.length ? (
-                    i18n('status_message.ok')
-                ) : (
-                    <React.Fragment>
-                        <div>{i18n('label.issues')}</div>
-                        <div className={b('issues-statistics')}>
-                            {issuesStatistics.map(([status, count]) => (
-                                <EntityStatus
-                                    key={status}
-                                    mode="icons"
-                                    status={hcStatusToColorFlag[status]}
-                                    label={count.toString()}
-                                    size="l"
-                                />
-                            ))}
-                        </div>
-                    </React.Fragment>
-                )}
+                <div className={b('preview-issue', {[modifier]: true})}>
+                    <Icon className={b('preview-status-icon')} data={icons[selfCheckResult]} />
+                    <div className={b('self-check-status-indicator')}>
+                        {selfCheckResult.replace(/_/g, ' ')}
+                    </div>
+                </div>
             </div>
         );
     };
