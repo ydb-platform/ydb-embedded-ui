@@ -1,15 +1,16 @@
 import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
+import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
-import {getSchemaAcl, setAclWasNotLoaded} from '../../../store/reducers/schemaAcl/schemaAcl';
+import {schemaAclApi} from '../../../store/reducers/schemaAcl/schemaAcl';
 import type {TACE} from '../../../types/api/acl';
 import {cn} from '../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
-import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useTypedSelector} from '../../../utils/hooks';
 import i18n from '../i18n';
 
 import './Acl.scss';
@@ -71,21 +72,13 @@ const columns: Column<TACE>[] = [
 ];
 
 export const Acl = () => {
-    const dispatch = useTypedDispatch();
-
     const {currentSchemaPath} = useTypedSelector((state) => state.schema);
-    const {loading, error, acl, owner, wasLoaded} = useTypedSelector((state) => state.schemaAcl);
+    const {currentData, isFetching, error} = schemaAclApi.useGetSchemaAclQuery(
+        currentSchemaPath ? {path: currentSchemaPath} : skipToken,
+    );
 
-    React.useEffect(() => {
-        if (currentSchemaPath) {
-            dispatch(getSchemaAcl({path: currentSchemaPath}));
-        }
-
-        return () => {
-            // Ensures correct acl on path change
-            dispatch(setAclWasNotLoaded());
-        };
-    }, [currentSchemaPath, dispatch]);
+    const loading = isFetching && !currentData;
+    const {acl, owner} = currentData || {};
 
     const renderTable = () => {
         if (!acl || !acl.length) {
@@ -115,7 +108,7 @@ export const Acl = () => {
         );
     };
 
-    if (loading && !wasLoaded) {
+    if (loading) {
         return <Loader />;
     }
 
@@ -123,7 +116,7 @@ export const Acl = () => {
         return <ResponseError error={error} />;
     }
 
-    if (!loading && !acl && !owner) {
+    if (!acl && !owner) {
         return <React.Fragment>{i18n('acl.empty')}</React.Fragment>;
     }
 
