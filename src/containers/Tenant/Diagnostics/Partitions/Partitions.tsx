@@ -5,6 +5,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
+import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
 import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
@@ -39,7 +40,7 @@ export const Partitions = ({path}: PartitionsProps) => {
     >([]);
 
     const consumers = useTypedSelector((state) => selectConsumersNames(state, path));
-    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
     const {selectedConsumer} = useTypedSelector((state) => state.partitions);
     const {
         currentData: topicData,
@@ -71,7 +72,7 @@ export const Partitions = ({path}: PartitionsProps) => {
         currentData: partitionsData,
         isFetching: partitionsIsFetching,
         error: partitionsError,
-    } = partitionsApi.useGetPartitionsQuery(params, {pollingInterval: autorefresh});
+    } = partitionsApi.useGetPartitionsQuery(params, {pollingInterval: autoRefreshInterval});
     const partitionsLoading = partitionsIsFetching && partitionsData === undefined;
     const rawPartitions = partitionsData;
 
