@@ -28,5 +28,6 @@
   "action.send-query": "Send query",
   "action.send-selected-query": "Send selected query",
   "action.previous-query": "Previous query in history",
-  "action.next-query": "Next query in history"
+  "action.next-query": "Next query in history",
+  "action.save-query": "Save query"
 }
