@@ -2,7 +2,7 @@ import {combineReducers} from '@reduxjs/toolkit';
 
 import {api} from './api';
 import authentication from './authentication/authentication';
-import {atoRefreshControlSlice} from './autoRefreshControl';
+import {autoRefreshControlSlice} from './autoRefreshControl';
 import cluster from './cluster/cluster';
 import clusters from './clusters/clusters';
 import executeQuery from './executeQuery';
@@ -23,7 +23,7 @@ import tooltip from './tooltip';
 
 export const rootReducer = {
     [api.reducerPath]: api.reducer,
-    [atoRefreshControlSlice.reducerPath]: atoRefreshControlSlice.reducer,
+    [autoRefreshControlSlice.reducerPath]: autoRefreshControlSlice.reducer,
     singleClusterMode,
     cluster,
     tenant,

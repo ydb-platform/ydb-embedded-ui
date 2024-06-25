@@ -6,7 +6,7 @@ import {AUTO_REFRESH_INTERVAL} from '../../utils/constants';
 
 const autoRefreshLS = Number(settingsManager.readUserSettingsValue(AUTO_REFRESH_INTERVAL, 0));
 
-export const atoRefreshControlSlice = createSlice({
+export const autoRefreshControlSlice = createSlice({
     name: 'autoRefreshControl',
     initialState: {
         autoRefreshInterval: isNaN(autoRefreshLS) ? 0 : autoRefreshLS,
@@ -24,8 +24,8 @@ export const atoRefreshControlSlice = createSlice({
 export function setAutoRefreshInterval(interval: number) {
     return (dispatch: Dispatch) => {
         settingsManager.setUserSettingsValue(AUTO_REFRESH_INTERVAL, interval);
-        dispatch(atoRefreshControlSlice.actions.setAutoRefreshInterval(interval));
+        dispatch(autoRefreshControlSlice.actions.setAutoRefreshInterval(interval));
     };
 }
 
-export const {selectAutoRefreshInterval} = atoRefreshControlSlice.selectors;
+export const {selectAutoRefreshInterval} = autoRefreshControlSlice.selectors;
