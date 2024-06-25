@@ -5,7 +5,7 @@ import type {ButtonView} from '@gravity-ui/uikit';
 import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
 
 import {LabelWithPopover} from '../../../../components/LabelWithPopover';
-import type {QueryAction, QueryMode} from '../../../../types/store/query';
+import type {QueryAction, QueryMode, SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {QUERY_MODES, QUERY_MODES_TITLES} from '../../../../utils/query';
 import SaveQuery from '../SaveQuery/SaveQuery';
@@ -46,8 +46,8 @@ interface QueryEditorControlsProps {
     runIsLoading: boolean;
     onExplainButtonClick: (mode?: QueryMode) => void;
     explainIsLoading: boolean;
-    onSaveQueryClick: (queryName: string) => void;
-    savedQueries: unknown;
+    onSaveQueryClick: (queryName: string | null) => void;
+    savedQueries: SavedQuery[];
     disabled: boolean;
     onUpdateQueryMode: (mode: QueryMode) => void;
     queryMode: QueryMode;
@@ -135,7 +135,7 @@ export const QueryEditorControls = ({
             <SaveQuery
                 savedQueries={savedQueries}
                 onSaveQuery={onSaveQueryClick}
-                saveButtonDisabled={disabled}
+                isSaveButtonDisabled={disabled}
             />
         </div>
     );
