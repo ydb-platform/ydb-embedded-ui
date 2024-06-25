@@ -1,0 +1,15 @@
+.tenant-navigation {
+    padding: 13px 16px 0px;
+
+    &-body__item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        font-size: 15px;
+    }
+
+    &-body__icon {
+        display: flex;
+    }
+}

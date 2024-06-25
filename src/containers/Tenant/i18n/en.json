@@ -1,6 +1,9 @@
 {
   "page.title": "Database",
 
+  "pages.query": "Query",
+  "pages.diagnostics": "Diagnostics",
+
   "acl.owner": "Owner",
   "acl.empty": "No Acl data",
 

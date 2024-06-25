@@ -1,6 +1,5 @@
 import {useThemeValue} from '@gravity-ui/uikit';
 
-import {InlineNavigation} from '../../../containers/AsideNavigation/InlineNavigation';
 import {TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {EPathType} from '../../../types/api/schema';
@@ -8,6 +7,7 @@ import {cn} from '../../../utils/cn';
 import {useTypedSelector} from '../../../utils/hooks';
 import Diagnostics from '../Diagnostics/Diagnostics';
 import {Query} from '../Query/Query';
+import {TenantNavigation} from '../TenantNavigation/TenantNavigation';
 
 import './ObjectGeneral.scss';
 
@@ -50,7 +50,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
         }
         return (
             <div className={b()}>
-                <InlineNavigation />
+                <TenantNavigation />
                 {renderTabContent()}
             </div>
         );
