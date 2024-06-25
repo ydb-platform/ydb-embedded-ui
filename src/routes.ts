@@ -69,7 +69,9 @@ export function createHref(
         extendedQuery = {...extendedQuery, clusterName};
     }
 
-    const search = isEmpty(extendedQuery) ? '' : `?${qs.stringify(extendedQuery, {encode: false})}`;
+    const search = isEmpty(extendedQuery)
+        ? ''
+        : `?${qs.stringify(extendedQuery, {encode: false, arrayFormat: 'repeat'})}`;
 
     const preparedRoute = prepareRoute(route);
 

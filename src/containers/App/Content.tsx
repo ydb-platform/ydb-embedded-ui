@@ -22,7 +22,7 @@ import type {RawBreadcrumbItem} from '../Header/breadcrumbs';
 import Node from '../Node/Node';
 import {PDiskPage} from '../PDiskPage/PDiskPage';
 import {Tablet} from '../Tablet';
-import TabletsFilters from '../TabletsFilters/TabletsFilters';
+import {TabletsFilters} from '../TabletsFilters/TabletsFilters';
 import Tenant from '../Tenant/Tenant';
 import {VDiskPage} from '../VDiskPage/VDiskPage';
 

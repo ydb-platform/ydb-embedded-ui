@@ -147,19 +147,22 @@ interface TabletsProps {
 export function Tablets({nodeId, path, className}: TabletsProps) {
     const {autorefresh} = useTypedSelector((state) => state.schema);
 
-    let params: TabletsApiRequestParams | typeof skipToken = skipToken;
+    let params: TabletsApiRequestParams = {};
     const node = nodeId === undefined ? undefined : String(nodeId);
     if (node !== undefined) {
         params = {nodes: [String(node)]};
     } else if (path) {
         params = {path};
     }
-    const {currentData, isFetching, error} = tabletsApi.useGetTabletsInfoQuery(params, {
-        pollingInterval: autorefresh,
-    });
+    const {currentData, isFetching, error} = tabletsApi.useGetTabletsInfoQuery(
+        Object.keys(params).length === 0 ? skipToken : params,
+        {
+            pollingInterval: autorefresh,
+        },
+    );
 
     const loading = isFetching && currentData === undefined;
-    const tablets = useTypedSelector((state) => selectTabletsWithFqdn(state, node, path));
+    const tablets = useTypedSelector((state) => selectTabletsWithFqdn(state, params));
 
     if (loading) {
         return <TableSkeleton />;
