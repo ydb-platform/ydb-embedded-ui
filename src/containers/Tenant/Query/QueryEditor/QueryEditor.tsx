@@ -43,7 +43,9 @@ import {Preview} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import i18n from '../i18n';
 
+import {SaveQueryDialog} from './SaveQueryDialog';
 import {useEditorOptions} from './helpers';
+import {keybindings} from './keybindings';
 
 import './QueryEditor.scss';
 
@@ -106,6 +108,12 @@ function QueryEditor(props: QueryEditorProps) {
     const [monacoHotKey, setMonacoHotKey] = React.useState<ValueOf<
         typeof MONACO_HOT_KEY_ACTIONS
     > | null>(null);
+
+    const [isSaveQueryDialogVisible, setIsSaveQueryDialogVisible] = React.useState(false);
+
+    const handleCloseSaveQueryDialog = () => {
+        setIsSaveQueryDialogVisible(false);
+    };
 
     const [sendExecuteQuery, executeQueryResult] = executeQueryApi.useExecuteQueryMutation();
     const [sendExplainQuery, explainQueryResult] = explainQueryApi.useExplainQueryMutation();
@@ -256,16 +264,16 @@ function QueryEditor(props: QueryEditorProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [monacoHotKey]);
 
-    const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
+    const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor) => {
         editorRef.current = editor;
         editor.focus();
+
+        const canSendSelectedText = editor.createContextKey<boolean>('canSendSelectedText', false);
+
         editor.addAction({
             id: 'sendQuery',
             label: i18n('action.send-query'),
-            keybindings: [
-                // eslint-disable-next-line no-bitwise
-                monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
-            ],
+            keybindings: [keybindings.sendQuery],
             // A precondition for this action.
             precondition: undefined,
             // A rule to evaluate on top of the precondition in order to dispatch the keybindings.
@@ -277,21 +285,19 @@ function QueryEditor(props: QueryEditorProps) {
             run: () => setMonacoHotKey(MONACO_HOT_KEY_ACTIONS.sendQuery),
         });
 
-        const canSendSelectedText = editor.createContextKey<boolean>('canSendSelectedText', false);
         editor.onDidChangeCursorSelection(({selection, secondarySelections}) => {
             const notEmpty =
                 selection.selectionStartLineNumber !== selection.positionLineNumber ||
                 selection.selectionStartColumn !== selection.positionColumn;
+
             const hasMultipleSelections = secondarySelections.length > 0;
+
             canSendSelectedText.set(notEmpty && !hasMultipleSelections);
         });
         editor.addAction({
             id: 'sendSelectedQuery',
             label: i18n('action.send-selected-query'),
-            keybindings: [
-                // eslint-disable-next-line no-bitwise
-                monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter,
-            ],
+            keybindings: [keybindings.sendSelectedQuery],
             precondition: 'canSendSelectedText',
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 1,
@@ -301,10 +307,7 @@ function QueryEditor(props: QueryEditorProps) {
         editor.addAction({
             id: 'previous-query',
             label: i18n('action.previous-query'),
-            keybindings: [
-                // eslint-disable-next-line no-bitwise
-                monaco.KeyMod.CtrlCmd | monaco.KeyCode.UpArrow,
-            ],
+            keybindings: [keybindings.selectPreviousQuery],
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 2,
             run: () => {
@@ -314,14 +317,19 @@ function QueryEditor(props: QueryEditorProps) {
         editor.addAction({
             id: 'next-query',
             label: i18n('action.next-query'),
-            keybindings: [
-                // eslint-disable-next-line no-bitwise
-                monaco.KeyMod.CtrlCmd | monaco.KeyCode.DownArrow,
-            ],
+            keybindings: [keybindings.selectNextQuery],
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 3,
             run: () => {
                 props.goToNextQuery();
+            },
+        });
+        editor.addAction({
+            id: 'save-query',
+            label: i18n('action.save-query'),
+            keybindings: [keybindings.saveQuery],
+            run: () => {
+                setIsSaveQueryDialogVisible(true);
             },
         });
     };
@@ -341,21 +349,25 @@ function QueryEditor(props: QueryEditorProps) {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.clear);
     };
 
-    const onSaveQueryHandler = (queryName: string) => {
-        const {input} = executeQuery;
-
-        const queryIndex = savedQueries.findIndex(
-            (el) => el.name.toLowerCase() === queryName.toLowerCase(),
-        );
-        const newSavedQueries = [...savedQueries];
-        const newQuery = {name: queryName, body: input};
-        if (queryIndex === -1) {
-            newSavedQueries.push(newQuery);
-        } else {
-            newSavedQueries[queryIndex] = newQuery;
+    const handleSaveQuery = (queryName: string | null) => {
+        if (queryName === null) {
+            return;
         }
 
-        setSavedQueries(newSavedQueries);
+        const {input} = executeQuery;
+        const nextSavedQueries = [...savedQueries];
+
+        const query = nextSavedQueries.find(
+            (el) => el.name.toLowerCase() === queryName.toLowerCase(),
+        );
+
+        if (query) {
+            query.body = input;
+        } else {
+            nextSavedQueries.push({name: queryName, body: input});
+        }
+
+        setSavedQueries(nextSavedQueries);
     };
 
     const renderControls = () => {
@@ -365,7 +377,7 @@ function QueryEditor(props: QueryEditorProps) {
                 runIsLoading={executeQueryResult.isLoading}
                 onExplainButtonClick={handleGetExplainQueryClick}
                 explainIsLoading={explainQueryResult.isLoading}
-                onSaveQueryClick={onSaveQueryHandler}
+                onSaveQueryClick={handleSaveQuery}
                 savedQueries={savedQueries}
                 disabled={!executeQuery.input}
                 onUpdateQueryMode={setQueryMode}
@@ -377,6 +389,11 @@ function QueryEditor(props: QueryEditorProps) {
 
     return (
         <div className={b()}>
+            <SaveQueryDialog
+                open={isSaveQueryDialogVisible}
+                onCloseDialog={handleCloseSaveQueryDialog}
+                onSaveQuery={handleSaveQuery}
+            />
             <SplitPane
                 direction="vertical"
                 defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
