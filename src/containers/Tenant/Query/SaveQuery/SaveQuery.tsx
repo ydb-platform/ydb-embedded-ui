@@ -3,7 +3,8 @@ import React from 'react';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 import some from 'lodash/some';
 
-import {setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
+import {clearQueryNameToEdit, setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
+import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
@@ -11,18 +12,28 @@ import './SaveQuery.scss';
 
 const b = cn('kv-save-query');
 
-function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
+interface SaveQueryProps {
+    savedQueries: SavedQuery[];
+    onSaveQuery: (name: string | null) => void;
+    isSaveButtonDisabled: boolean;
+}
+
+function SaveQuery({
+    savedQueries,
+    onSaveQuery,
+    isSaveButtonDisabled: saveButtonDisabled,
+}: SaveQueryProps) {
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const [isDialogVisible, setIsDialogVisible] = React.useState(false);
     const [queryName, setQueryName] = React.useState('');
-    const [validationError, setValidationError] = React.useState(null);
+    const [validationError, setValidationError] = React.useState<string | null>(null);
 
     const queryNameToEdit = useTypedSelector((state) => state.saveQuery);
     const dispatch = useTypedDispatch();
 
     const onSaveQueryClick = () => {
         setIsDialogVisible(true);
-        dispatch(setQueryNameToEdit(null));
+        dispatch(clearQueryNameToEdit());
     };
 
     const onCloseDialog = () => {
@@ -31,16 +42,16 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
         setValidationError(null);
     };
 
-    const onQueryNameChange = (value) => {
-        setQueryName(value);
-        setValidationError(validateQueryName(value));
-    };
-
-    const validateQueryName = (value) => {
+    const validateQueryName = (value: string) => {
         if (some(savedQueries, (q) => q.name.toLowerCase() === value.trim().toLowerCase())) {
             return 'This name already exists';
         }
         return null;
+    };
+
+    const onQueryNameChange = (value: string) => {
+        setQueryName(value);
+        setValidationError(validateQueryName(value));
     };
 
     const onSaveClick = () => {
@@ -103,9 +114,9 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
         );
     };
 
-    const renderSaveButton = (onClick) => {
+    const renderSaveButton = () => {
         return (
-            <Button onClick={onClick} disabled={saveButtonDisabled}>
+            <Button onClick={onSaveQueryClick} disabled={saveButtonDisabled}>
                 {queryNameToEdit ? 'Edit query' : 'Save query'}
             </Button>
         );
@@ -123,13 +134,17 @@ function SaveQuery({savedQueries, onSaveQuery, saveButtonDisabled}) {
             },
         ];
         return (
-            <DropdownMenu items={items} switcher={renderSaveButton()} popupPlacement={['top']} />
+            <DropdownMenu
+                items={items}
+                renderSwitcher={renderSaveButton}
+                popupProps={{placement: 'top'}}
+            />
         );
     };
 
     return (
         <React.Fragment>
-            {queryNameToEdit ? renderSaveDropdownMenu() : renderSaveButton(onSaveQueryClick)}
+            {queryNameToEdit ? renderSaveDropdownMenu() : renderSaveButton()}
             {isDialogVisible && renderDialog()}
         </React.Fragment>
     );

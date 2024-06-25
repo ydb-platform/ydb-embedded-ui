@@ -20,7 +20,7 @@ const saveQuery: Reducer<ISaveQueryState, IAction> = function (state = initialSt
     }
 };
 
-export function setQueryNameToEdit(name: string) {
+export function setQueryNameToEdit(name: ISaveQueryState) {
     return {
         type: SET_QUERY_NAME_TO_EDIT,
         data: name,
