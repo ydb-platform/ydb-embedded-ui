@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
+import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {cn} from '../../../../../utils/cn';
 import {useTypedSelector} from '../../../../../utils/hooks';
 import {useHealthcheck} from '../useHealthcheck';
@@ -18,8 +19,10 @@ interface HealthcheckDetailsProps {
 }
 
 export function HealthcheckDetails({tenantName}: HealthcheckDetailsProps) {
-    const {autorefresh} = useTypedSelector((state) => state.schema);
-    const {issueTrees, loading, error} = useHealthcheck(tenantName, {autorefresh});
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const {issueTrees, loading, error} = useHealthcheck(tenantName, {
+        autorefresh: autoRefreshInterval,
+    });
 
     const renderContent = () => {
         if (error) {

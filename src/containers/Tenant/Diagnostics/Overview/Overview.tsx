@@ -6,6 +6,7 @@ import {shallowEqual} from 'react-redux';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
+import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {olapApi} from '../../../../store/reducers/olapStats';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
@@ -31,14 +32,15 @@ interface OverviewProps {
 }
 
 function Overview({type, tenantName}: OverviewProps) {
-    const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
 
     const schemaPath = currentSchemaPath || tenantName;
     const olapParams =
         isTableType(type) && isColumnEntityType(type) ? {path: schemaPath} : skipToken;
     const {currentData: olapData, isFetching: olapIsFetching} = olapApi.useGetOlapStatsQuery(
         olapParams,
-        {pollingInterval: autorefresh},
+        {pollingInterval: autoRefreshInterval},
     );
     const olapStatsLoading = olapIsFetching && olapData === undefined;
     const {result: olapStats} = olapData || {result: undefined};
@@ -65,7 +67,7 @@ function Overview({type, tenantName}: OverviewProps) {
         isFetching,
         error: overviewError,
     } = overviewApi.useGetOverviewQuery(paths, {
-        pollingInterval: autorefresh,
+        pollingInterval: autoRefreshInterval,
     });
     const overviewLoading = isFetching && currentData === undefined;
     const {data: rawData, additionalData} = currentData || {};
