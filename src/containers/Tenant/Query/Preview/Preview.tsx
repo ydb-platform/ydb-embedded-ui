@@ -4,6 +4,7 @@ import {Button, Icon, Loader} from '@gravity-ui/uikit';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {QueryResultTable} from '../../../../components/QueryResultTable';
+import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {previewApi} from '../../../../store/reducers/preview';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
@@ -27,13 +28,14 @@ export const Preview = ({database, type}: PreviewProps) => {
 
     const isPreviewAvailable = isTableType(type);
 
-    const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
 
     const query = `--!syntax_v1\nselect * from \`${currentSchemaPath}\` limit 32`;
     const {currentData, isFetching, error} = previewApi.useSendQueryQuery(
         {database, query, action: isExternalTableType(type) ? 'execute-query' : 'execute-scan'},
-        {pollingInterval: autorefresh, skip: !isPreviewAvailable},
+        {pollingInterval: autoRefreshInterval, skip: !isPreviewAvailable},
     );
     const loading = isFetching && currentData === undefined;
     const data = currentData ?? {};

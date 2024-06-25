@@ -1,21 +1,7 @@
 @import '../../../../../styles/mixins.scss';
 
 .healthcheck {
-    display: flex;
-
-    &_expanded {
-        // Since most of the inner containers have fixed width, we can set fixed width here as well
-        // Thus we will get rid of unneeded layout shift when scrollbar appear
-        min-width: 885px;
-    }
-
-    &__issue-preview {
-        margin-bottom: 15px;
-    }
-
-    &__message-container {
-        padding: 15px 0;
-    }
+    $block: &;
 
     &__details {
         width: 872px;
@@ -26,13 +12,10 @@
     }
 
     &__preview {
+        display: flex;
+        flex-direction: column;
+
         height: 100%;
-    }
-
-    &__preview-header {
-        gap: 8px;
-
-        margin-bottom: var(--diagnostics-section-title-margin);
     }
 
     &__preview-title {
@@ -44,7 +27,14 @@
     }
 
     &__preview-content {
+        margin: auto;
+
         line-height: 24px;
+    }
+
+    &__preview-status-icon {
+        width: 64px;
+        height: 64px;
     }
 
     &__preview-title-wrapper {
@@ -55,13 +45,45 @@
         margin-bottom: 4px;
     }
 
-    &__issues-statistics {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 10px;
+    &__preview-issue {
+        position: relative;
+        top: -8px;
 
-        margin: 8px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+
+        &_good {
+            color: var(--g-color-text-positive);
+            & #{$block}__self-check-status-indicator {
+                background-color: var(--g-color-base-positive-light);
+            }
+        }
+        &_degraded {
+            color: var(--g-color-text-info);
+            & #{$block}__self-check-status-indicator {
+                background-color: var(--g-color-base-info-light);
+            }
+        }
+        &_emergency {
+            color: var(--g-color-text-danger);
+            & #{$block}__self-check-status-indicator {
+                background-color: var(--g-color-base-danger-light);
+            }
+        }
+        &_unspecified {
+            color: var(--g-color-text-misc);
+            & #{$block}__self-check-status-indicator {
+                background-color: var(--g-color-base-misc-light);
+            }
+        }
+        &_maintenance_required {
+            color: var(--g-color-text-warning-heavy);
+            & #{$block}__self-check-status-indicator {
+                background-color: var(--g-color-base-warning-light);
+            }
+        }
     }
 
     &__self-check-status-indicator {
@@ -71,39 +93,8 @@
 
         font-size: 13px;
         line-height: 24px;
+        text-wrap: nowrap;
 
         border-radius: 4px;
-
-        &_good,
-        &_green {
-            color: var(--g-color-text-positive);
-            background-color: var(--g-color-base-positive-light);
-        }
-        &_degraded,
-        &_yellow {
-            color: var(--g-color-text-warning);
-            background-color: var(--g-color-base-warning-light);
-        }
-
-        &_blue {
-            color: var(--g-color-text-info);
-            background-color: var(--g-color-base-info-light);
-        }
-
-        &_emergency,
-        &_red {
-            color: var(--g-color-text-danger);
-            background-color: var(--g-color-base-danger-light);
-        }
-        &_unspecified,
-        &_grey {
-            color: var(--g-color-text-misc);
-            background-color: var(--g-color-base-misc-light);
-        }
-        &_maintenance_required,
-        &_orange {
-            color: var(--g-color-text-warning-heavy);
-            background-color: var(--g-color-base-warning-light);
-        }
     }
 }

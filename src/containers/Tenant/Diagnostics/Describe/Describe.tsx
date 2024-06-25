@@ -4,6 +4,7 @@ import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
+import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {describeApi} from '../../../../store/reducers/describe';
 import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
@@ -24,7 +25,8 @@ interface IDescribeProps {
 }
 
 const Describe = ({tenant, type}: IDescribeProps) => {
-    const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
@@ -41,7 +43,7 @@ const Describe = ({tenant, type}: IDescribeProps) => {
         paths = [path, ...mergedChildrenPaths];
     }
     const {currentData, isFetching, error} = describeApi.useGetDescribeQuery(paths, {
-        pollingInterval: autorefresh,
+        pollingInterval: autoRefreshInterval,
     });
     const loading = isFetching && currentData === undefined;
     const currentDescribe = currentData;

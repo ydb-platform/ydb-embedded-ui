@@ -10,6 +10,7 @@ import {InternalLink} from '../../components/InternalLink';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import routes, {createHref} from '../../routes';
+import {selectAutoRefreshInterval} from '../../store/reducers/autoRefreshControl';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
@@ -145,21 +146,24 @@ interface TabletsProps {
 }
 
 export function Tablets({nodeId, path, className}: TabletsProps) {
-    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
 
-    let params: TabletsApiRequestParams | typeof skipToken = skipToken;
+    let params: TabletsApiRequestParams = {};
     const node = nodeId === undefined ? undefined : String(nodeId);
     if (node !== undefined) {
         params = {nodes: [String(node)]};
     } else if (path) {
         params = {path};
     }
-    const {currentData, isFetching, error} = tabletsApi.useGetTabletsInfoQuery(params, {
-        pollingInterval: autorefresh,
-    });
+    const {currentData, isFetching, error} = tabletsApi.useGetTabletsInfoQuery(
+        Object.keys(params).length === 0 ? skipToken : params,
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
 
     const loading = isFetching && currentData === undefined;
-    const tablets = useTypedSelector((state) => selectTabletsWithFqdn(state, node, path));
+    const tablets = useTypedSelector((state) => selectTabletsWithFqdn(state, params));
 
     if (loading) {
         return <TableSkeleton />;

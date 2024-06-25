@@ -9,6 +9,7 @@ import type {
     MetricDescription,
 } from '../../../../../components/MetricChart';
 import {TimeFrameSelector} from '../../../../../components/TimeFrameSelector/TimeFrameSelector';
+import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {cn} from '../../../../../utils/cn';
 import {useTypedSelector} from '../../../../../utils/hooks';
 import type {TimeFrame} from '../../../../../utils/timeframes';
@@ -36,10 +37,10 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
 
     const [timeFrame = '1h', setTimeframe] = useQueryParam('timeframe', StringParam);
 
-    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
 
     // Refetch data only if dashboard successfully loaded
-    const shouldRefresh = isDashboardHidden ? 0 : autorefresh;
+    const shouldRefresh = isDashboardHidden ? 0 : autoRefreshInterval;
 
     /**
      * Charts should be hidden, if they are not enabled:

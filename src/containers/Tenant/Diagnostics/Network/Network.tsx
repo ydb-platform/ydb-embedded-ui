@@ -6,6 +6,7 @@ import {Link} from 'react-router-dom';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Illustration} from '../../../../components/Illustration';
 import {ProblemFilter} from '../../../../components/ProblemFilter';
+import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {networkApi} from '../../../../store/reducers/network/network';
 import {
     ProblemFilterValues,
@@ -31,7 +32,7 @@ interface NetworkProps {
     path: string;
 }
 export function Network({path}: NetworkProps) {
-    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
     const filter = useTypedSelector(selectProblemFilter);
     const dispatch = useTypedDispatch();
 
@@ -40,7 +41,7 @@ export function Network({path}: NetworkProps) {
     const [showRacks, setShowRacks] = React.useState(false);
 
     const {currentData, isFetching, error} = networkApi.useGetNetworkInfoQuery(path, {
-        pollingInterval: autorefresh,
+        pollingInterval: autoRefreshInterval,
     });
     const loading = isFetching && currentData === undefined;
 

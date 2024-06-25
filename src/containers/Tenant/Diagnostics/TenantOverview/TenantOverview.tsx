@@ -1,6 +1,7 @@
 import {Loader} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
@@ -15,7 +16,6 @@ import {MetricsCards} from './MetricsCards/MetricsCards';
 import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
 import {TenantStorage} from './TenantStorage/TenantStorage';
-import {useHealthcheck} from './useHealthcheck';
 import {b} from './utils';
 
 import './TenantOverview.scss';
@@ -32,21 +32,12 @@ export function TenantOverview({
     additionalNodesProps,
 }: TenantOverviewProps) {
     const {metricsTab} = useTypedSelector((state) => state.tenant);
-    const {autorefresh} = useTypedSelector((state) => state.schema);
-
-    const {
-        issueTrees,
-        issuesStatistics,
-        selfCheckResult,
-        loading: healthcheckLoading,
-        error: healthcheckError,
-        refetch: fetchHealthcheck,
-    } = useHealthcheck(tenantName, {autorefresh});
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
 
     const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
         {path: tenantName},
         {
-            pollingInterval: autorefresh,
+            pollingInterval: autoRefreshInterval,
         },
     );
     const tenantLoading = isFetching && tenant === undefined;
@@ -99,13 +90,7 @@ export function TenantOverview({
                 return <TenantMemory path={tenantName} />;
             }
             case TENANT_METRICS_TABS_IDS.healthcheck: {
-                return (
-                    <HealthcheckDetails
-                        issueTrees={issueTrees}
-                        loading={healthcheckLoading}
-                        error={healthcheckError}
-                    />
-                );
+                return <HealthcheckDetails tenantName={tenantName} />;
             }
             default: {
                 return <DefaultOverviewContent database={tenantName} />;
@@ -134,11 +119,7 @@ export function TenantOverview({
                     memoryStats={memoryStats}
                     blobStorageStats={blobStorageStats}
                     tabletStorageStats={tabletStorageStats}
-                    issuesStatistics={issuesStatistics}
-                    selfCheckResult={selfCheckResult}
-                    fetchHealthcheck={fetchHealthcheck}
-                    healthcheckLoading={healthcheckLoading}
-                    healthcheckError={healthcheckError}
+                    tenantName={tenantName}
                 />
             </div>
             {renderTabContent()}

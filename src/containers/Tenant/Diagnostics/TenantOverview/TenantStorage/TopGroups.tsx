@@ -1,3 +1,4 @@
+import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topStorageGroupsApi} from '../../../../../store/reducers/tenantOverview/topStorageGroups/topStorageGroups';
 import {useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
@@ -17,13 +18,13 @@ interface TopGroupsProps {
 export function TopGroups({tenant}: TopGroupsProps) {
     const query = useSearchQuery();
 
-    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
 
     const columns = getStorageTopGroupsColumns();
 
     const {currentData, isFetching, error} = topStorageGroupsApi.useGetTopStorageGroupsQuery(
         {tenant},
-        {pollingInterval: autorefresh},
+        {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
     const topGroups = currentData;

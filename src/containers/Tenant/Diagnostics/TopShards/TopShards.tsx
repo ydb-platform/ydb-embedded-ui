@@ -6,6 +6,7 @@ import {useLocation} from 'react-router';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {
     setShardsQueryFilters,
     shardApi,
@@ -94,7 +95,8 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     const dispatch = useTypedDispatch();
     const location = useLocation();
 
-    const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
 
     const storeFilters = useTypedSelector((state) => state.shardsWorkload);
 
@@ -126,7 +128,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
             sortOrder: stringToQuerySortOrder(sortOrder),
             filters,
         },
-        {pollingInterval: autorefresh},
+        {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && result === undefined;
     const {result: data} = result ?? {};

@@ -9,9 +9,15 @@ import type {IssuesTree} from './types';
 export const healthcheckApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getHealthcheckInfo: builder.query({
-            queryFn: async (database: string, {signal}) => {
+            queryFn: async (
+                {database, maxLevel}: {database: string; maxLevel?: number},
+                {signal},
+            ) => {
                 try {
-                    const data = await window.api.getHealthcheckInfo(database, {signal});
+                    const data = await window.api.getHealthcheckInfo(
+                        {database, maxLevel},
+                        {signal},
+                    );
                     return {data};
                 } catch (error) {
                     return {error};
@@ -94,7 +100,7 @@ const getIssuesStatistics = (data: IssueLog[]): [StatusFlag, number][] => {
 
 const createGetHealthcheckInfoSelector = createSelector(
     (database: string) => database,
-    (database) => healthcheckApi.endpoints.getHealthcheckInfo.select(database),
+    (database) => healthcheckApi.endpoints.getHealthcheckInfo.select({database}),
 );
 
 const getIssuesLog = createSelector(

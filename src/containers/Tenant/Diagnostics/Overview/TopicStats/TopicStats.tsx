@@ -5,6 +5,7 @@ import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
 import {Loader} from '../../../../../components/Loader';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {selectPreparedTopicStats, topicApi} from '../../../../../store/reducers/topic';
 import type {IPreparedTopicStats} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
@@ -70,10 +71,11 @@ const prepareBytesWrittenInfo = (data: IPreparedTopicStats): Array<InfoViewerIte
 };
 
 export const TopicStats = () => {
-    const {autorefresh, currentSchemaPath} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
     const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
         {path: currentSchemaPath},
-        {pollingInterval: autorefresh},
+        {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
     const data = useTypedSelector((state) => selectPreparedTopicStats(state, currentSchemaPath));

@@ -6,6 +6,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
+import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {
     selectPreparedConsumersData,
     selectPreparedTopicStats,
@@ -35,10 +36,10 @@ export const Consumers = ({path, type}: ConsumersProps) => {
 
     const [searchValue, setSearchValue] = React.useState('');
 
-    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
     const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
         {path},
-        {pollingInterval: autorefresh},
+        {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
     const consumers = useTypedSelector((state) => selectPreparedConsumersData(state, path));

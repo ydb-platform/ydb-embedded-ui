@@ -1,3 +1,4 @@
+import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topNodesApi} from '../../../../../store/reducers/tenantOverview/topNodes/topNodes';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
@@ -19,12 +20,12 @@ interface TopNodesByCpuProps {
 export function TopNodesByCpu({path, additionalNodesProps}: TopNodesByCpuProps) {
     const query = useSearchQuery();
 
-    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
     const columns = getTopNodesByCpuColumns(additionalNodesProps?.getNodeRef);
 
     const {currentData, isFetching, error} = topNodesApi.useGetTopNodesQuery(
         {tenant: path, sortValue: 'CPU'},
-        {pollingInterval: autorefresh},
+        {pollingInterval: autoRefreshInterval},
     );
 
     const loading = isFetching && currentData === undefined;

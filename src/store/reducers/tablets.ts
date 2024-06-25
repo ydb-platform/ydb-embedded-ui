@@ -1,5 +1,6 @@
-import {createSelector, createSlice} from '@reduxjs/toolkit';
+import {createSelector, createSlice, lruMemoize} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
+import isEqual from 'lodash/isEqual';
 
 import type {ETabletState, EType, TTabletStateInfo} from '../../types/api/tablet';
 import type {TabletsApiRequestParams, TabletsState} from '../../types/store/tablets';
@@ -47,23 +48,22 @@ export const tabletsApi = api.injectEndpoints({
 });
 
 const getTabletsInfoSelector = createSelector(
-    (nodeId: string | undefined, path: string | undefined) => ({nodeId, path}),
-    ({nodeId, path}) =>
-        tabletsApi.endpoints.getTabletsInfo.select(
-            nodeId === undefined ? {path} : {nodes: [nodeId]},
-        ),
+    (params: TabletsApiRequestParams) => params,
+    (params) => tabletsApi.endpoints.getTabletsInfo.select(params),
+    {
+        argsMemoize: lruMemoize,
+        argsMemoizeOptions: {equalityCheck: isEqual},
+    },
 );
 
-const selectGetTabletsInfo = createSelector(
+export const selectGetTabletsInfo = createSelector(
     (state: RootState) => state,
-    (_state: RootState, nodeId: string | undefined, path: string | undefined) =>
-        getTabletsInfoSelector(nodeId, path),
+    (_state: RootState, params: TabletsApiRequestParams) => getTabletsInfoSelector(params),
     (state, selectTabletsInfo) => selectTabletsInfo(state).data,
 );
 
 export const selectTabletsWithFqdn = createSelector(
-    (state: RootState, nodeId: string | undefined, path: string | undefined) =>
-        selectGetTabletsInfo(state, nodeId, path),
+    (state: RootState, params: TabletsApiRequestParams) => selectGetTabletsInfo(state, params),
     (state: RootState) => selectNodesMap(state),
     (data, nodesMap): (TTabletStateInfo & {fqdn?: string})[] => {
         if (!data?.TabletStateInfo) {
