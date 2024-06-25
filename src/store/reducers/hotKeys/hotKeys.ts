@@ -1,76 +1,39 @@
-import type {Reducer} from '@reduxjs/toolkit';
+import type {HotKey} from '../../../types/api/hotkeys';
+import {api} from '../api';
 
-import type {IResponseError} from '../../../types/api/error';
-import type {JsonHotKeysResponse} from '../../../types/api/hotkeys';
-import {createRequestActionTypes} from '../../utils';
+export const hotKeysApi = api.injectEndpoints({
+    endpoints: (builder) => ({
+        getHotKeys: builder.query<HotKey[] | null, {path: string}>({
+            queryFn: async ({path}, {signal}) => {
+                try {
+                    // Send request that will trigger hot keys sampling (enable_sampling = true)
+                    const initialResponse = await window.api.getHotKeys(path, true, {signal});
 
-import type {HotKeysAction, HotKeysState} from './types';
+                    // If there are hotkeys in the initial request (hotkeys was collected before)
+                    // we could just use colleted samples (collected hotkeys are stored only for 30 seconds)
+                    if (Array.isArray(initialResponse.hotkeys)) {
+                        return {data: initialResponse.hotkeys};
+                    }
 
-export const FETCH_HOT_KEYS = createRequestActionTypes('hot_keys', 'FETCH_HOT_KEYS');
-const SET_DATA_WAS_NOT_LOADED = 'hot_keys/SET_DATA_WAS_NOT_LOADED';
+                    // Else wait for 5 seconds, while hot keys are being collected
+                    await Promise.race([
+                        new Promise((resolve) => {
+                            setTimeout(resolve, 5000);
+                        }),
+                        new Promise((_, reject) => {
+                            signal.addEventListener('abort', reject);
+                        }),
+                    ]);
 
-const initialState = {loading: true, wasLoaded: false, data: null};
-
-const hotKeys: Reducer<HotKeysState, HotKeysAction> = (state = initialState, action) => {
-    switch (action.type) {
-        case FETCH_HOT_KEYS.REQUEST: {
-            return {
-                ...state,
-                loading: true,
-            };
-        }
-        case FETCH_HOT_KEYS.SUCCESS: {
-            return {
-                ...state,
-                data: action.data.hotkeys,
-                loading: false,
-                error: undefined,
-                wasLoaded: true,
-            };
-        }
-        case FETCH_HOT_KEYS.FAILURE: {
-            if (action.error?.isCancelled) {
-                return state;
-            }
-
-            return {
-                ...state,
-                error: action.error,
-                loading: false,
-            };
-        }
-        case SET_DATA_WAS_NOT_LOADED: {
-            return {
-                ...state,
-                wasLoaded: false,
-            };
-        }
-        default:
-            return state;
-    }
-};
-
-export function setHotKeysDataWasNotLoaded() {
-    return {
-        type: SET_DATA_WAS_NOT_LOADED,
-    } as const;
-}
-export function setHotKeysLoading() {
-    return {
-        type: FETCH_HOT_KEYS.REQUEST,
-    } as const;
-}
-export function setHotKeysData(data: JsonHotKeysResponse) {
-    return {
-        type: FETCH_HOT_KEYS.SUCCESS,
-        data: data,
-    } as const;
-}
-export function setHotKeysError(error: IResponseError) {
-    return {
-        type: FETCH_HOT_KEYS.FAILURE,
-        error: error,
-    } as const;
-}
-
-export default hotKeys;
+                    // And request these samples (enable_sampling = false)
+                    const response = await window.api.getHotKeys(path, false, {signal});
+                    return {data: response.hotkeys ?? null};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+    }),
+    overrideExisting: 'throw',
+});

@@ -6,7 +6,7 @@ import type {Clusters} from '../Clusters/Clusters';
 import type Node from '../Node/Node';
 import type {PDiskPage} from '../PDiskPage/PDiskPage';
 import type {Tablet} from '../Tablet';
-import type TabletsFilters from '../TabletsFilters/TabletsFilters';
+import type {TabletsFilters} from '../TabletsFilters/TabletsFilters';
 import type Tenant from '../Tenant/Tenant';
 import type {VDiskPage} from '../VDiskPage/VDiskPage';
 

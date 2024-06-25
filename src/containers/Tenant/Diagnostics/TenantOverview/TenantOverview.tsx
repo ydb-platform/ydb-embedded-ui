@@ -1,6 +1,7 @@
 import {Loader} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
@@ -31,12 +32,12 @@ export function TenantOverview({
     additionalNodesProps,
 }: TenantOverviewProps) {
     const {metricsTab} = useTypedSelector((state) => state.tenant);
-    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
 
     const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
         {path: tenantName},
         {
-            pollingInterval: autorefresh,
+            pollingInterval: autoRefreshInterval,
         },
     );
     const tenantLoading = isFetching && tenant === undefined;

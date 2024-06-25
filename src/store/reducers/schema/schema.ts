@@ -1,10 +1,8 @@
-import type {Dispatch, Reducer, Selector} from '@reduxjs/toolkit';
+import type {Reducer, Selector} from '@reduxjs/toolkit';
 import {createSelector} from '@reduxjs/toolkit';
 
 import {isEntityWithMergedImplementation} from '../../../containers/Tenant/utils/schema';
-import {settingsManager} from '../../../services/settings';
 import type {EPathType} from '../../../types/api/schema';
-import {AUTO_REFRESH_INTERVAL} from '../../../utils/constants';
 import {createApiRequest, createRequestActionTypes} from '../../utils';
 
 import type {
@@ -19,17 +17,13 @@ export const FETCH_SCHEMA = createRequestActionTypes('schema', 'FETCH_SCHEMA');
 const PRELOAD_SCHEMAS = 'schema/PRELOAD_SCHEMAS';
 const SET_SCHEMA = 'schema/SET_SCHEMA';
 const SET_SHOW_PREVIEW = 'schema/SET_SHOW_PREVIEW';
-export const SET_AUTOREFRESH_INTERVAL = 'schema/SET_AUTOREFRESH_INTERVAL';
 const RESET_LOADING_STATE = 'schema/RESET_LOADING_STATE';
-
-const autoRefreshLS = Number(settingsManager.readUserSettingsValue(AUTO_REFRESH_INTERVAL, 0));
 
 export const initialState = {
     loading: true,
     wasLoaded: false,
     data: {},
     currentSchemaPath: undefined,
-    autorefresh: isNaN(autoRefreshLS) ? 0 : autoRefreshLS,
     showPreview: false,
 };
 
@@ -91,12 +85,6 @@ const schema: Reducer<SchemaState, SchemaAction> = (state = initialState, action
                 currentSchemaPath: action.data,
             };
         }
-        case SET_AUTOREFRESH_INTERVAL: {
-            return {
-                ...state,
-                autorefresh: action.data,
-            };
-        }
         case SET_SHOW_PREVIEW: {
             return {
                 ...state,
@@ -139,15 +127,7 @@ export function setCurrentSchemaPath(currentSchemaPath: string) {
         data: currentSchemaPath,
     } as const;
 }
-export function setAutorefreshInterval(interval: number) {
-    return (dispatch: Dispatch) => {
-        settingsManager.setUserSettingsValue(AUTO_REFRESH_INTERVAL, interval);
-        dispatch({
-            type: SET_AUTOREFRESH_INTERVAL,
-            data: interval,
-        } as const);
-    };
-}
+
 export function setShowPreview(value: boolean) {
     return {
         type: SET_SHOW_PREVIEW,

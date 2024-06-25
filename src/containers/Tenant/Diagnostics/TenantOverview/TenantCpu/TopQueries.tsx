@@ -3,6 +3,7 @@ import React from 'react';
 import {useHistory, useLocation} from 'react-router';
 
 import {parseQuery} from '../../../../../routes';
+import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {changeUserInput} from '../../../../../store/reducers/executeQuery';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
@@ -34,12 +35,12 @@ export function TopQueries({path}: TopQueriesProps) {
 
     const query = parseQuery(location);
 
-    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
     const columns = getTenantOverviewTopQueriesColumns();
 
     const {currentData, isFetching, error} = topQueriesApi.useGetOverviewTopQueriesQuery(
         {database: path},
-        {pollingInterval: autorefresh},
+        {pollingInterval: autoRefreshInterval},
     );
 
     const loading = isFetching && currentData === undefined;

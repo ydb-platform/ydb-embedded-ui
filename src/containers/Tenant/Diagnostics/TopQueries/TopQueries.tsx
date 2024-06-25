@@ -8,6 +8,7 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {parseQuery} from '../../../../routes';
+import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {changeUserInput} from '../../../../store/reducers/executeQuery';
 import {
     setTopQueriesFilters,
@@ -44,7 +45,7 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
     const location = useLocation();
     const history = useHistory();
 
-    const {autorefresh} = useTypedSelector((state) => state.schema);
+    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
 
     const filters = useTypedSelector((state) => state.executeTopQueries);
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
@@ -52,7 +53,7 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
             database: path,
             filters,
         },
-        {pollingInterval: autorefresh},
+        {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
     const {result: data} = currentData || {};
