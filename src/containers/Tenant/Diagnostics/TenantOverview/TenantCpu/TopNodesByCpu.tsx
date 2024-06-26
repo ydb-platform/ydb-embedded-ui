@@ -13,18 +13,18 @@ import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
 interface TopNodesByCpuProps {
-    path: string;
+    tenantName: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByCpu({path, additionalNodesProps}: TopNodesByCpuProps) {
+export function TopNodesByCpu({tenantName, additionalNodesProps}: TopNodesByCpuProps) {
     const query = useSearchQuery();
 
     const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
     const columns = getTopNodesByCpuColumns(additionalNodesProps?.getNodeRef);
 
     const {currentData, isFetching, error} = topNodesApi.useGetTopNodesQuery(
-        {tenant: path, sortValue: 'CPU'},
+        {tenant: tenantName, sortValue: 'CPU'},
         {pollingInterval: autoRefreshInterval},
     );
 

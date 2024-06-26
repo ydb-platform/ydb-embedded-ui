@@ -13,18 +13,18 @@ import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
 interface TopNodesByLoadProps {
-    path: string;
+    tenantName: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByLoad({path, additionalNodesProps}: TopNodesByLoadProps) {
+export function TopNodesByLoad({tenantName, additionalNodesProps}: TopNodesByLoadProps) {
     const query = useSearchQuery();
 
     const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
     const columns = getTopNodesByLoadColumns(additionalNodesProps?.getNodeRef);
 
     const {currentData, isFetching, error} = topNodesApi.useGetTopNodesQuery(
-        {tenant: path, sortValue: 'LoadAverage'},
+        {tenant: tenantName, sortValue: 'LoadAverage'},
         {pollingInterval: autoRefreshInterval},
     );
 

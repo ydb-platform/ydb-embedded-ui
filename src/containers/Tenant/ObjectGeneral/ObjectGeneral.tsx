@@ -7,6 +7,7 @@ import {cn} from '../../../utils/cn';
 import {useTypedSelector} from '../../../utils/hooks';
 import Diagnostics from '../Diagnostics/Diagnostics';
 import {Query} from '../Query/Query';
+import {TenantNavigation} from '../TenantNavigation/TenantNavigation';
 
 import './ObjectGeneral.scss';
 
@@ -15,6 +16,7 @@ const b = cn('object-general');
 interface ObjectGeneralProps {
     type?: EPathType;
     tenantName: string;
+    path: string;
     additionalTenantProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;
 }
@@ -24,16 +26,18 @@ function ObjectGeneral(props: ObjectGeneralProps) {
 
     const {tenantPage} = useTypedSelector((state) => state.tenant);
 
-    const renderTabContent = () => {
-        const {type, additionalTenantProps, additionalNodesProps, tenantName} = props;
+    const renderPageContent = () => {
+        const {type, additionalTenantProps, additionalNodesProps, tenantName, path} = props;
         switch (tenantPage) {
             case TENANT_PAGES_IDS.query: {
-                return <Query path={tenantName} theme={theme} type={type} />;
+                return <Query tenantName={tenantName} path={path} theme={theme} type={type} />;
             }
             default: {
                 return (
                     <Diagnostics
                         type={type}
+                        tenantName={tenantName}
+                        path={path}
                         additionalTenantProps={additionalTenantProps}
                         additionalNodesProps={additionalNodesProps}
                     />
@@ -42,15 +46,12 @@ function ObjectGeneral(props: ObjectGeneralProps) {
         }
     };
 
-    const renderContent = () => {
-        const {tenantName} = props;
-        if (!tenantName) {
-            return null;
-        }
-        return <div className={b()}>{renderTabContent()}</div>;
-    };
-
-    return renderContent();
+    return (
+        <div className={b()}>
+            <TenantNavigation />
+            {renderPageContent()}
+        </div>
+    );
 }
 
 export default ObjectGeneral;

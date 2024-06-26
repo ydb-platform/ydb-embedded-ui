@@ -5,10 +5,10 @@ import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
+import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {viewSchemaApi} from '../../../../store/reducers/viewSchema/viewSchema';
 import type {EPathType} from '../../../../types/api/schema';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {useTypedSelector} from '../../../../utils/hooks';
 import {
     isColumnEntityType,
     isExternalTableType,
@@ -31,17 +31,18 @@ import './SchemaViewer.scss';
 
 interface SchemaViewerProps {
     type?: EPathType;
-    path?: string;
-    tenantName?: string | null;
+    path: string;
+    tenantName: string;
     extended?: boolean;
 }
 
 export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaViewerProps) => {
-    const {data: schemaData, loading} = useTypedSelector((state) => state.schema);
-    const currentObjectData = path ? schemaData[path] : undefined;
+    const {currentData: schemaData, isFetching} = schemaApi.endpoints.getSchema.useQueryState({
+        path,
+    });
+    const loading = isFetching && schemaData === undefined;
 
-    const viewSchemaRequestParams =
-        isViewType(type) && path && tenantName ? {path, database: tenantName} : skipToken;
+    const viewSchemaRequestParams = isViewType(type) ? {path, database: tenantName} : skipToken;
 
     const {data: viewColumnsData, isLoading: isViewSchemaLoading} =
         viewSchemaApi.useGetViewSchemaQuery(viewSchemaRequestParams);
@@ -51,8 +52,8 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
             return prepareViewSchema(viewColumnsData);
         }
 
-        return prepareSchemaData(type, currentObjectData);
-    }, [currentObjectData, type, viewColumnsData]);
+        return prepareSchemaData(type, schemaData);
+    }, [schemaData, type, viewColumnsData]);
 
     const hasAutoIncrement = React.useMemo(() => {
         return tableData.some((i) => i.autoIncrement);

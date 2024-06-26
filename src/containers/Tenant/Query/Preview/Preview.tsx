@@ -20,19 +20,19 @@ const b = cn('kv-preview');
 
 interface PreviewProps {
     database: string;
+    path: string;
     type: EPathType | undefined;
 }
 
-export const Preview = ({database, type}: PreviewProps) => {
+export const Preview = ({database, path, type}: PreviewProps) => {
     const dispatch = useTypedDispatch();
 
     const isPreviewAvailable = isTableType(type);
 
     const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
-    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
 
-    const query = `--!syntax_v1\nselect * from \`${currentSchemaPath}\` limit 32`;
+    const query = `--!syntax_v1\nselect * from \`${path}\` limit 32`;
     const {currentData, isFetching, error} = previewApi.useSendQueryQuery(
         {database, query, action: isExternalTableType(type) ? 'execute-query' : 'execute-scan'},
         {pollingInterval: autoRefreshInterval, skip: !isPreviewAvailable},
@@ -48,8 +48,7 @@ export const Preview = ({database, type}: PreviewProps) => {
         return (
             <div className={b('header')}>
                 <div className={b('title')}>
-                    {i18n('preview.title')}{' '}
-                    <div className={b('table-name')}>{currentSchemaPath}</div>
+                    {i18n('preview.title')} <div className={b('table-name')}>{path}</div>
                 </div>
                 <div className={b('controls-left')}>
                     <EnableFullscreenButton disabled={Boolean(error)} />

@@ -21,6 +21,7 @@ const b = cn('ydb-query');
 
 interface QueryProps {
     theme: string;
+    tenantName: string;
     path: string;
     type?: EPathType;
 }

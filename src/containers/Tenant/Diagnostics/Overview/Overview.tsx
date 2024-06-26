@@ -9,7 +9,7 @@ import {Loader} from '../../../../components/Loader';
 import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {olapApi} from '../../../../store/reducers/olapStats';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
-import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
+import {schemaApi, selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import {EPathType} from '../../../../types/api/schema';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
@@ -28,16 +28,13 @@ import {TopicInfo} from './TopicInfo';
 
 interface OverviewProps {
     type?: EPathType;
-    tenantName?: string;
+    path: string;
 }
 
-function Overview({type, tenantName}: OverviewProps) {
+function Overview({type, path}: OverviewProps) {
     const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
-    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
 
-    const schemaPath = currentSchemaPath || tenantName;
-    const olapParams =
-        isTableType(type) && isColumnEntityType(type) ? {path: schemaPath} : skipToken;
+    const olapParams = isTableType(type) && isColumnEntityType(type) ? {path} : skipToken;
     const {currentData: olapData, isFetching: olapIsFetching} = olapApi.useGetOlapStatsQuery(
         olapParams,
         {pollingInterval: autoRefreshInterval},
@@ -47,19 +44,17 @@ function Overview({type, tenantName}: OverviewProps) {
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
-    // shalloEqual prevents rerenders when new schema data is loaded
+    // shallowEqual prevents rerenders when new schema data is loaded
     const mergedChildrenPaths = useTypedSelector(
-        (state) => selectSchemaMergedChildrenPaths(state, currentSchemaPath, type),
+        (state) => selectSchemaMergedChildrenPaths(state, path, type),
         shallowEqual,
     );
 
     let paths: string[] | typeof skipToken = skipToken;
-    if (schemaPath) {
-        if (!isEntityWithMergedImpl) {
-            paths = [schemaPath];
-        } else if (mergedChildrenPaths) {
-            paths = [schemaPath, ...mergedChildrenPaths];
-        }
+    if (!isEntityWithMergedImpl) {
+        paths = [path];
+    } else if (mergedChildrenPaths) {
+        paths = [path, ...mergedChildrenPaths];
     }
 
     const {
@@ -71,6 +66,8 @@ function Overview({type, tenantName}: OverviewProps) {
     });
     const overviewLoading = isFetching && currentData === undefined;
     const {data: rawData, additionalData} = currentData || {};
+
+    const {error: schemaError} = schemaApi.endpoints.getSchema.useQueryState({path});
 
     const entityLoading = overviewLoading || olapStatsLoading;
     const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
@@ -89,9 +86,9 @@ function Overview({type, tenantName}: OverviewProps) {
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
             [EPathType.EPathTypeCdcStream]: () => (
-                <ChangefeedInfo data={data} topic={additionalData?.[0] ?? undefined} />
+                <ChangefeedInfo path={path} data={data} topic={additionalData?.[0] ?? undefined} />
             ),
-            [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={data} />,
+            [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={data} path={path} />,
             [EPathType.EPathTypeExternalTable]: () => <ExternalTableInfo data={data} />,
             [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
             [EPathType.EPathTypeView]: () => <ViewInfo data={data} />,
@@ -109,8 +106,8 @@ function Overview({type, tenantName}: OverviewProps) {
         return <Loader size="m" />;
     }
 
-    if (overviewError) {
-        return <ResponseError error={overviewError} />;
+    if (schemaError || overviewError) {
+        return <ResponseError error={schemaError || overviewError} />;
     }
 
     return renderContent();

@@ -2,10 +2,8 @@ import type {DefinitionListItem} from '@gravity-ui/components';
 import {DefinitionList} from '@gravity-ui/components';
 import {Text} from '@gravity-ui/uikit';
 
-import {ResponseError} from '../../../../components/Errors/ResponseError';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
-import {useTypedSelector} from '../../../../utils/hooks';
 import {getEntityName} from '../../utils';
 import i18n from '../i18n';
 
@@ -35,12 +33,6 @@ interface ViewInfoProps {
 
 export function ViewInfo({data}: ViewInfoProps) {
     const entityName = getEntityName(data?.PathDescription);
-
-    const {error: schemaError} = useTypedSelector((state) => state.schema);
-
-    if (schemaError) {
-        return <ResponseError error={schemaError} />;
-    }
 
     if (!data) {
         return <div className="error">No {entityName} data</div>;

@@ -6,14 +6,14 @@ import {TopNodesByMemory} from './TopNodesByMemory';
 import {memoryDashboardConfig} from './memoryDashboardConfig';
 
 interface TenantMemoryProps {
-    path: string;
+    tenantName: string;
 }
 
-export function TenantMemory({path}: TenantMemoryProps) {
+export function TenantMemory({tenantName}: TenantMemoryProps) {
     return (
         <React.Fragment>
-            <TenantDashboard database={path} charts={memoryDashboardConfig} />
-            <TopNodesByMemory path={path} />
+            <TenantDashboard database={tenantName} charts={memoryDashboardConfig} />
+            <TopNodesByMemory tenantName={tenantName} />
         </React.Fragment>
     );
 }

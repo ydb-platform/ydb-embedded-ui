@@ -6,6 +6,7 @@ import {Button, Icon, Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
 import {useLocation} from 'react-router';
 import {Link} from 'react-router-dom';
+import {StringParam, useQueryParam} from 'use-query-params';
 
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {ClipboardButton} from '../../../components/ClipboardButton';
@@ -17,7 +18,7 @@ import {
 import {Loader} from '../../../components/Loader';
 import SplitPane from '../../../components/SplitPane';
 import routes, {createHref} from '../../../routes';
-import {setShowPreview} from '../../../store/reducers/schema/schema';
+import {schemaApi, setShowPreview} from '../../../store/reducers/schema/schema';
 import {
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
@@ -64,7 +65,8 @@ const getTenantCommonInfoState = () => {
 interface ObjectSummaryProps {
     type?: EPathType;
     subType?: EPathSubType;
-    tenantName?: string;
+    tenantName: string;
+    path: string;
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
     isCollapsed: boolean;
@@ -74,6 +76,7 @@ export function ObjectSummary({
     type,
     subType,
     tenantName,
+    path,
     onCollapseSummary,
     onExpandSummary,
     isCollapsed,
@@ -84,11 +87,6 @@ export function ObjectSummary({
         undefined,
         getTenantCommonInfoState,
     );
-    const {
-        data,
-        currentSchemaPath,
-        currentSchema: currentItem = {},
-    } = useTypedSelector((state) => state.schema);
     const {summaryTab = TENANT_SUMMARY_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
     );
@@ -99,8 +97,7 @@ export function ObjectSummary({
         ignoreQueryPrefix: true,
     });
 
-    const pathData = tenantName ? data[tenantName.toString()]?.PathDescription?.Self : undefined;
-    const currentObjectData = currentSchemaPath ? data[currentSchemaPath] : undefined;
+    const {currentData: currentObjectData} = schemaApi.endpoints.getSchema.useQueryState({path});
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
     React.useEffect(() => {
@@ -201,49 +198,18 @@ export function ObjectSummary({
         return component;
     };
 
-    const renderLoader = () => {
-        // If Loader isn't wrapped with div, SplitPane doesn't calculate panes height correctly
-        return (
-            <div>
-                <Loader />
-            </div>
-        );
-    };
-
     const renderTabContent = () => {
         switch (summaryTab) {
             case TENANT_SUMMARY_TABS_IDS.acl: {
-                return <Acl />;
+                return <Acl path={path} />;
             }
             case TENANT_SUMMARY_TABS_IDS.schema: {
-                return (
-                    <SchemaViewer type={type} path={currentSchemaPath} tenantName={tenantName} />
-                );
+                return <SchemaViewer type={type} path={path} tenantName={tenantName} />;
             }
             default: {
                 return renderObjectOverview();
             }
         }
-    };
-
-    const renderTree = () => {
-        return (
-            <div className={b('tree-wrapper')}>
-                <div className={b('tree-header')}>{i18n('summary.navigation')}</div>
-                <div className={b('tree')}>
-                    {pathData && (
-                        <SchemaTree
-                            rootPath={tenantName as string}
-                            // for the root pathData.Name contains the same string as tenantName,
-                            // but without the leading slash
-                            rootName={pathData.Name || String(tenantName)}
-                            rootType={pathData.PathType}
-                            currentPath={currentSchemaPath}
-                        />
-                    )}
-                </div>
-            </div>
-        );
     };
 
     const onCollapseInfoHandler = () => {
@@ -276,13 +242,11 @@ export function ObjectSummary({
                         <Icon data={LayoutHeaderCellsLargeFill} />
                     </Button>
                 )}
-                {currentSchemaPath && (
-                    <ClipboardButton
-                        text={currentSchemaPath}
-                        view="flat-secondary"
-                        title={i18n('summary.copySchemaPath')}
-                    />
-                )}
+                <ClipboardButton
+                    text={path}
+                    view="flat-secondary"
+                    title={i18n('summary.copySchemaPath')}
+                />
                 <PaneVisibilityToggleButtons
                     onCollapse={onCollapseInfoHandler}
                     onExpand={onExpandInfoHandler}
@@ -294,7 +258,7 @@ export function ObjectSummary({
     };
 
     const renderEntityTypeBadge = () => {
-        const {Status, Reason} = currentItem;
+        const {Status, Reason} = currentObjectData ?? {};
 
         let message;
         if (!type && Status && Reason) {
@@ -311,9 +275,6 @@ export function ObjectSummary({
     };
 
     const renderContent = () => {
-        if (!tenantName) {
-            return null;
-        }
         return (
             <div className={b()}>
                 <div className={b({hidden: isCollapsed})}>
@@ -326,13 +287,13 @@ export function ObjectSummary({
                         minSize={[200, 52]}
                         collapsedSizes={[100, 0]}
                     >
-                        {currentSchemaPath ? renderTree() : renderLoader()}
+                        <ObjectTree tenantName={tenantName} path={path} />
                         <div className={b('info')}>
                             <div className={b('sticky-top')}>
                                 <div className={b('info-header')}>
                                     <div className={b('info-title')}>
                                         {renderEntityTypeBadge()}
-                                        <div className={b('path-name')}>{currentSchemaPath}</div>
+                                        <div className={b('path-name')}>{path}</div>
                                     </div>
                                     <div className={b('info-controls')}>
                                         {renderCommonInfoControls()}
@@ -356,4 +317,41 @@ export function ObjectSummary({
     };
 
     return renderContent();
+}
+
+function ObjectTree({tenantName, path}: {tenantName: string; path?: string}) {
+    const {currentData: tenantData = {}, isFetching} = schemaApi.useGetSchemaQuery({
+        path: tenantName,
+    });
+    const pathData = tenantData?.PathDescription?.Self;
+
+    const [, setCurrentPath] = useQueryParam('schema', StringParam);
+
+    if (!pathData && isFetching) {
+        // If Loader isn't wrapped with div, SplitPane doesn't calculate panes height correctly
+        return (
+            <div>
+                <Loader />
+            </div>
+        );
+    }
+
+    return (
+        <div className={b('tree-wrapper')}>
+            <div className={b('tree-header')}>{i18n('summary.navigation')}</div>
+            <div className={b('tree')}>
+                {pathData ? (
+                    <SchemaTree
+                        rootPath={tenantName}
+                        // for the root pathData.Name contains the same string as tenantName,
+                        // but without the leading slash
+                        rootName={pathData.Name || tenantName}
+                        rootType={pathData.PathType}
+                        currentPath={path}
+                        onActivePathUpdate={setCurrentPath}
+                    />
+                ) : null}
+            </div>
+        </div>
+    );
 }
