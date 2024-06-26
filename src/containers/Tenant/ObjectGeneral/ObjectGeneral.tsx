@@ -7,6 +7,7 @@ import {cn} from '../../../utils/cn';
 import {useTypedSelector} from '../../../utils/hooks';
 import Diagnostics from '../Diagnostics/Diagnostics';
 import {Query} from '../Query/Query';
+import {TenantNavigation} from '../TenantNavigation/TenantNavigation';
 
 import './ObjectGeneral.scss';
 
@@ -24,7 +25,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
 
     const {tenantPage} = useTypedSelector((state) => state.tenant);
 
-    const renderTabContent = () => {
+    const renderPageContent = () => {
         const {type, additionalTenantProps, additionalNodesProps, tenantName} = props;
         switch (tenantPage) {
             case TENANT_PAGES_IDS.query: {
@@ -47,7 +48,12 @@ function ObjectGeneral(props: ObjectGeneralProps) {
         if (!tenantName) {
             return null;
         }
-        return <div className={b()}>{renderTabContent()}</div>;
+        return (
+            <div className={b()}>
+                <TenantNavigation />
+                {renderPageContent()}
+            </div>
+        );
     };
 
     return renderContent();
