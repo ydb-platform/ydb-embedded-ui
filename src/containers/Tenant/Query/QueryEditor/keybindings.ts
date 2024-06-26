@@ -1,19 +1,19 @@
-/* eslint-disable no-bitwise */
-import {monaco} from 'react-monaco-editor';
+import type Monaco from 'monaco-editor';
 
-import {getUserOS} from '../../../../utils/getUserOS';
+import {userOs} from '../../../../utils/getUserOS';
 
-const {KeyMod, KeyCode} = monaco;
+export function getKeyBindings(monaco: typeof Monaco) {
+    const {KeyMod, KeyCode} = monaco;
 
-const getCtrlKey = () => {
-    return getUserOS() === 'mac' ? KeyMod.CtrlCmd : KeyMod.WinCtrl;
-};
+    const ctrlKey = userOs === 'mac' ? KeyMod.CtrlCmd : KeyMod.WinCtrl;
 
-export const keybindings = {
-    sendQuery: getCtrlKey() | KeyCode.Enter,
-    sendSelectedQuery: getCtrlKey() | KeyMod.Shift | monaco.KeyCode.Enter,
-    selectPreviousQuery: getCtrlKey() | KeyCode.UpArrow,
-    selectNextQuery: getCtrlKey() | KeyCode.DownArrow,
-    saveQuery: getCtrlKey() | KeyCode.KeyS,
-    saveSelectedQuery: getCtrlKey() | KeyMod.Shift | KeyCode.KeyS,
-};
+    /* eslint-disable no-bitwise */
+    return {
+        sendQuery: ctrlKey | KeyCode.Enter,
+        sendSelectedQuery: ctrlKey | KeyMod.Shift | monaco.KeyCode.Enter,
+        selectPreviousQuery: ctrlKey | KeyCode.UpArrow,
+        selectNextQuery: ctrlKey | KeyCode.DownArrow,
+        saveQuery: ctrlKey | KeyCode.KeyS,
+        saveSelectedQuery: ctrlKey | KeyMod.Shift | KeyCode.KeyS,
+    };
+}

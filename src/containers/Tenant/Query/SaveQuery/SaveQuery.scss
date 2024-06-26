@@ -1,4 +1,4 @@
-.kv-save-query {
+.ydb-save-query {
     &__dialog-row {
         display: flex;
         align-items: flex-start;
@@ -33,29 +33,5 @@
         height: 17px;
 
         color: var(--g-color-text-danger);
-    }
-    &__embedded-tooltip {
-        display: flex;
-        align-items: center;
-
-        height: 100%;
-        margin-left: -10px;
-
-        color: var(--g-color-text-secondary);
-        &:hover {
-            cursor: pointer;
-
-            color: var(--g-color-text-complementary);
-        }
-    }
-
-    &__embedded-popup {
-        max-width: 150px !important;
-        padding: 10px;
-
-        border-radius: 5px;
-        &::before {
-            border-radius: 5px;
-        }
     }
 }

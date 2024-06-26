@@ -14,6 +14,7 @@ import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
+import {useDeleteQuery, useSavedQueries} from '../QueryContext';
 import i18n from '../i18n';
 
 import './SavedQueries.scss';
@@ -54,12 +55,12 @@ const DeleteDialog = ({visible, queryName, onCancelClick, onConfirmClick}: Delet
 const SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY = 'savedQueriesTableColumnsWidth';
 
 interface SavedQueriesProps {
-    savedQueries: SavedQuery[];
     changeUserInput: (value: {input: string}) => void;
-    onDeleteQuery: (queryName: string) => void;
 }
 
-export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: SavedQueriesProps) => {
+export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
+    const savedQueries = useSavedQueries();
+    const handleDeleteQuery = useDeleteQuery();
     const dispatch = useTypedDispatch();
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
@@ -76,7 +77,7 @@ export const SavedQueries = ({savedQueries, changeUserInput, onDeleteQuery}: Sav
 
     const onConfirmDeleteClick = () => {
         closeDeleteDialog();
-        onDeleteQuery(queryNameToDelete);
+        handleDeleteQuery(queryNameToDelete);
         setQueryNameToDelete('');
     };
 

@@ -20,14 +20,13 @@ import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import type {ValueOf} from '../../../../types/common';
 import type {ExecuteQueryState} from '../../../../types/store/executeQuery';
-import type {IQueryResult, QueryAction, QueryMode, SavedQuery} from '../../../../types/store/query';
+import type {IQueryResult, QueryAction, QueryMode} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
     LAST_USED_QUERY_ACTION_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
-    SAVED_QUERIES_KEY,
 } from '../../../../utils/constants';
 import {useQueryModes, useSetting} from '../../../../utils/hooks';
 import {LANGUAGE_YQL_ID} from '../../../../utils/monaco/yql/constants';
@@ -40,12 +39,13 @@ import {
 import {ExecuteResult} from '../ExecuteResult/ExecuteResult';
 import {ExplainResult} from '../ExplainResult/ExplainResult';
 import {Preview} from '../Preview/Preview';
+import {useSaveQuery, useSetQueryAction} from '../QueryContext';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
+import {SaveQueryDialog} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
 
-import {SaveQueryDialog} from './SaveQueryDialog';
 import {useEditorOptions} from './helpers';
-import {keybindings} from './keybindings';
+import {getKeyBindings} from './keybindings';
 
 import './QueryEditor.scss';
 
@@ -84,6 +84,8 @@ interface QueryEditorProps {
 
 function QueryEditor(props: QueryEditorProps) {
     const editorOptions = useEditorOptions();
+    const saveQuery = useSaveQuery();
+    const setQueryAction = useSetQueryAction();
     const {
         tenantName,
         path,
@@ -104,16 +106,9 @@ function QueryEditor(props: QueryEditorProps) {
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting<QueryAction>(
         LAST_USED_QUERY_ACTION_KEY,
     );
-    const [savedQueries, setSavedQueries] = useSetting<SavedQuery[]>(SAVED_QUERIES_KEY);
     const [monacoHotKey, setMonacoHotKey] = React.useState<ValueOf<
         typeof MONACO_HOT_KEY_ACTIONS
     > | null>(null);
-
-    const [isSaveQueryDialogVisible, setIsSaveQueryDialogVisible] = React.useState(false);
-
-    const handleCloseSaveQueryDialog = () => {
-        setIsSaveQueryDialogVisible(false);
-    };
 
     const [sendExecuteQuery, executeQueryResult] = executeQueryApi.useExecuteQueryMutation();
     const [sendExplainQuery, explainQueryResult] = explainQueryApi.useExplainQueryMutation();
@@ -264,12 +259,10 @@ function QueryEditor(props: QueryEditorProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [monacoHotKey]);
 
-    const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor) => {
+    const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
+        const keybindings = getKeyBindings(monaco);
         editorRef.current = editor;
         editor.focus();
-
-        const canSendSelectedText = editor.createContextKey<boolean>('canSendSelectedText', false);
-
         editor.addAction({
             id: 'sendQuery',
             label: i18n('action.send-query'),
@@ -285,13 +278,12 @@ function QueryEditor(props: QueryEditorProps) {
             run: () => setMonacoHotKey(MONACO_HOT_KEY_ACTIONS.sendQuery),
         });
 
+        const canSendSelectedText = editor.createContextKey<boolean>('canSendSelectedText', false);
         editor.onDidChangeCursorSelection(({selection, secondarySelections}) => {
             const notEmpty =
                 selection.selectionStartLineNumber !== selection.positionLineNumber ||
                 selection.selectionStartColumn !== selection.positionColumn;
-
             const hasMultipleSelections = secondarySelections.length > 0;
-
             canSendSelectedText.set(notEmpty && !hasMultipleSelections);
         });
         editor.addAction({
@@ -329,7 +321,7 @@ function QueryEditor(props: QueryEditorProps) {
             label: i18n('action.save-query'),
             keybindings: [keybindings.saveQuery],
             run: () => {
-                setIsSaveQueryDialogVisible(true);
+                setQueryAction('save');
             },
         });
     };
@@ -350,24 +342,8 @@ function QueryEditor(props: QueryEditorProps) {
     };
 
     const handleSaveQuery = (queryName: string | null) => {
-        if (queryName === null) {
-            return;
-        }
-
         const {input} = executeQuery;
-        const nextSavedQueries = [...savedQueries];
-
-        const query = nextSavedQueries.find(
-            (el) => el.name.toLowerCase() === queryName.toLowerCase(),
-        );
-
-        if (query) {
-            query.body = input;
-        } else {
-            nextSavedQueries.push({name: queryName, body: input});
-        }
-
-        setSavedQueries(nextSavedQueries);
+        saveQuery(queryName, input);
     };
 
     const renderControls = () => {
@@ -378,7 +354,6 @@ function QueryEditor(props: QueryEditorProps) {
                 onExplainButtonClick={handleGetExplainQueryClick}
                 explainIsLoading={explainQueryResult.isLoading}
                 onSaveQueryClick={handleSaveQuery}
-                savedQueries={savedQueries}
                 disabled={!executeQuery.input}
                 onUpdateQueryMode={setQueryMode}
                 queryMode={queryMode}
@@ -389,11 +364,6 @@ function QueryEditor(props: QueryEditorProps) {
 
     return (
         <div className={b()}>
-            <SaveQueryDialog
-                open={isSaveQueryDialogVisible}
-                onCloseDialog={handleCloseSaveQueryDialog}
-                onSaveQuery={handleSaveQuery}
-            />
             <SplitPane
                 direction="vertical"
                 defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
@@ -441,6 +411,7 @@ function QueryEditor(props: QueryEditorProps) {
                     />
                 </div>
             </SplitPane>
+            <SaveQueryDialog onSaveQuery={handleSaveQuery} />
         </div>
     );
 }

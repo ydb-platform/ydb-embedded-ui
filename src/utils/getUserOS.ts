@@ -2,7 +2,7 @@ interface GetUserOS {
     (): 'mac' | 'windows' | 'linux' | 'unknown' | string;
 }
 
-export const getUserOS: GetUserOS = () => {
+const getUserOS: GetUserOS = () => {
     if (!globalThis.navigator) {
         console.error(
             'Navigator is missing in globalThis! It seems the function has called from non-browser',
@@ -35,3 +35,5 @@ export const getUserOS: GetUserOS = () => {
 
     return 'unknown';
 };
+
+export const userOs = getUserOS();
