@@ -1,8 +1,6 @@
 @import '../../../../../styles/mixins.scss';
 
 .ydb-diagnostics-table-info {
-    overflow: auto;
-
     &__title {
         @include info-viewer-title();
     }
