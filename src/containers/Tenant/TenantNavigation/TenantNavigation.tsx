@@ -1,41 +1,37 @@
-import React from 'react';
-
-import {cn} from '@bem-react/classname';
 import type {RadioButtonOption} from '@gravity-ui/uikit';
-import {RadioButton} from '@gravity-ui/uikit';
+import {Icon, RadioButton} from '@gravity-ui/uikit';
 
-import {useTenantNavigation} from '../hooks/useTenantNavigation';
+import {cn} from '../../../utils/cn';
+
+import {useTenantNavigation} from './useTenantNavigation';
 
 import './TenantNavigation.scss';
 
-const b = cn('tenant-navigation');
+const b = cn('ydb-tenant-navigation');
 
 type MenuItem = ReturnType<typeof useTenantNavigation>[0];
+
+const transformItemToOption = ({id, title, icon}: MenuItem): RadioButtonOption => {
+    const content = (
+        <span className={b('item')}>
+            <Icon data={icon} size={16} className={b('icon')} />
+            <span className={b('text')}>{title}</span>
+        </span>
+    );
+
+    return {value: id, content};
+};
 
 export const TenantNavigation = () => {
     const navigationItems = useTenantNavigation();
 
-    const handleUpdate = React.useCallback(
-        (value: string) => {
-            const nextItem = navigationItems.find((item) => item.id === value);
+    const handleUpdate = (value: string) => {
+        const nextItem = navigationItems.find((item) => item.id === value);
 
-            nextItem?.onForward();
-        },
-        [navigationItems],
-    );
+        nextItem?.onForward();
+    };
 
     const getCurrentItem = () => navigationItems.find((item) => item.current) || navigationItems[0];
-
-    const transformItemToOption = ({id, title, icon: Icon}: MenuItem): RadioButtonOption => {
-        const content = (
-            <span className={b('body__item')}>
-                <span className={b('body__icon')}>{Icon}</span>
-                {title}
-            </span>
-        );
-
-        return {value: id, content};
-    };
 
     return (
         <div className={b()}>

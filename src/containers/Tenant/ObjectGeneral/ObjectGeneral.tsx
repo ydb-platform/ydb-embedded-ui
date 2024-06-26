@@ -25,7 +25,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
 
     const {tenantPage} = useTypedSelector((state) => state.tenant);
 
-    const renderTabContent = () => {
+    const renderPageContent = () => {
         const {type, additionalTenantProps, additionalNodesProps, tenantName} = props;
         switch (tenantPage) {
             case TENANT_PAGES_IDS.query: {
@@ -51,7 +51,7 @@ function ObjectGeneral(props: ObjectGeneralProps) {
         return (
             <div className={b()}>
                 <TenantNavigation />
-                {renderTabContent()}
+                {renderPageContent()}
             </div>
         );
     };

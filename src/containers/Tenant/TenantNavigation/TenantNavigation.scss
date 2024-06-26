@@ -1,15 +1,18 @@
-.tenant-navigation {
-    padding: 13px 16px 0px;
+.ydb-tenant-navigation {
+    padding: 12px 16px 8px;
 
-    &-body__item {
+    &__item {
         display: flex;
         align-items: center;
         gap: 5px;
-
-        font-size: 15px;
     }
 
-    &-body__icon {
-        display: flex;
+    &__icon {
+        flex-shrink: 0;
+    }
+    &__text {
+        overflow: hidden;
+
+        text-overflow: ellipsis;
     }
 }

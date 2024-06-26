@@ -1,8 +1,6 @@
 import React from 'react';
 
 import {Pulse, Terminal} from '@gravity-ui/icons';
-import type {IconData} from '@gravity-ui/uikit';
-import {Icon} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router';
 
 import routes, {parseQuery} from '../../../routes';
@@ -16,7 +14,7 @@ type TenantPages = keyof typeof TENANT_PAGES_IDS;
 
 const pagesList: Array<TenantPages> = ['query', 'diagnostics'];
 
-const mapPageToIcon: Record<TenantPages, IconData> = {
+const mapPageToIcon = {
     query: Terminal,
     diagnostics: Pulse,
 };
@@ -42,7 +40,7 @@ export function useTenantNavigation() {
             const nextItem = {
                 id: pageId,
                 title: i18n(`pages.${key}`),
-                icon: <Icon data={mapPageToIcon[key]} size={20} />,
+                icon: mapPageToIcon[key],
                 path: pagePath,
                 current: tenantPage === pageId,
                 onForward: () => {
