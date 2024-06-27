@@ -267,7 +267,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 partitioning_info: true,
                 subs: 1,
             },
-            {concurrentId: concurrentId || `getSchema|${path}`, requestConfig: {signal}},
+            {concurrentId, requestConfig: {signal}},
         );
     }
     getDescribe({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {

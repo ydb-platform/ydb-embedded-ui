@@ -81,13 +81,18 @@ export function TenantOverview({
     const renderTabContent = () => {
         switch (metricsTab) {
             case TENANT_METRICS_TABS_IDS.cpu: {
-                return <TenantCpu path={tenantName} additionalNodesProps={additionalNodesProps} />;
+                return (
+                    <TenantCpu
+                        tenantName={tenantName}
+                        additionalNodesProps={additionalNodesProps}
+                    />
+                );
             }
             case TENANT_METRICS_TABS_IDS.storage: {
                 return <TenantStorage tenantName={tenantName} metrics={storageMetrics} />;
             }
             case TENANT_METRICS_TABS_IDS.memory: {
-                return <TenantMemory path={tenantName} />;
+                return <TenantMemory tenantName={tenantName} />;
             }
             case TENANT_METRICS_TABS_IDS.healthcheck: {
                 return <HealthcheckDetails tenantName={tenantName} />;

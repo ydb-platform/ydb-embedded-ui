@@ -2,8 +2,8 @@ import React from 'react';
 
 import {NavigationTree} from 'ydb-ui-components';
 
-import {preloadSchemas, setCurrentSchemaPath} from '../../../../store/reducers/schema/schema';
-import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {schemaApi} from '../../../../store/reducers/schema/schema';
+import type {EPathType} from '../../../../types/api/schema';
 import {useQueryModes, useTypedDispatch} from '../../../../utils/hooks';
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
@@ -14,58 +14,48 @@ interface SchemaTreeProps {
     rootName: string;
     rootType?: EPathType;
     currentPath?: string;
+    onActivePathUpdate: (path: string) => void;
 }
 
 export function SchemaTree(props: SchemaTreeProps) {
-    const {rootPath, rootName, rootType, currentPath} = props;
+    const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
 
     const dispatch = useTypedDispatch();
 
     const [_, setQueryMode] = useQueryModes();
 
-    const fetchPath = (path: string) =>
-        window.api
-            .getSchema({path}, {concurrentId: `NavigationTree.getSchema|${path}`})
-            .then((data) => {
-                if (!data) {
-                    throw new Error(`no describe data about path ${path}`);
-                }
-                const {PathDescription: {Children = []} = {}} = data;
+    const fetchPath = async (path: string) => {
+        const promise = dispatch(
+            schemaApi.endpoints.getSchema.initiate({path}, {forceRefetch: true}),
+        );
+        const {data} = await promise;
+        promise.unsubscribe();
+        if (!data) {
+            throw new Error(`no describe data about path ${path}`);
+        }
+        const {PathDescription: {Children = []} = {}} = data;
 
-                const preloadedData: Record<string, TEvDescribeSchemeResult> = {
-                    [path]: data,
-                };
+        const childItems = Children.map((childData) => {
+            const {Name = '', PathType, PathSubType} = childData;
 
-                const childItems = Children.map((childData) => {
-                    const {Name = '', PathType, PathSubType} = childData;
+            return {
+                name: Name,
+                type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
+                // FIXME: should only be explicitly set to true for tables with indexes
+                // at the moment of writing there is no property to determine this, fix later
+                expandable: !isChildlessPathType(PathType, PathSubType),
+            };
+        });
 
-                    // not full data, but it contains PathType, which ensures seamless switch between nodes
-                    preloadedData[`${path}/${Name}`] = {PathDescription: {Self: childData}};
-
-                    return {
-                        name: Name,
-                        type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
-                        // FIXME: should only be explicitly set to true for tables with indexes
-                        // at the moment of writing there is no property to determine this, fix later
-                        expandable: !isChildlessPathType(PathType, PathSubType),
-                    };
-                });
-
-                dispatch(preloadSchemas(preloadedData));
-
-                return childItems;
-            });
-
-    const handleActivePathUpdate = (activePath: string) => {
-        dispatch(setCurrentSchemaPath(activePath));
+        return childItems;
     };
 
     React.useEffect(() => {
         // if the cached path is not in the current tree, show root
         if (!currentPath?.startsWith(rootPath)) {
-            handleActivePathUpdate(rootPath);
+            onActivePathUpdate(rootPath);
         }
-    }, []);
+    }, [currentPath, onActivePathUpdate, rootPath]);
 
     return (
         <NavigationTree
@@ -77,14 +67,14 @@ export function SchemaTree(props: SchemaTreeProps) {
             }}
             fetchPath={fetchPath}
             getActions={getActions(dispatch, {
-                setActivePath: handleActivePathUpdate,
+                setActivePath: onActivePathUpdate,
                 setQueryMode,
             })}
             renderAdditionalNodeElements={getControls(dispatch, {
-                setActivePath: handleActivePathUpdate,
+                setActivePath: onActivePathUpdate,
             })}
             activePath={currentPath}
-            onActivePathUpdate={handleActivePathUpdate}
+            onActivePathUpdate={onActivePathUpdate}
             cache={false}
             virtualize
         />

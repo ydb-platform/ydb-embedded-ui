@@ -16,26 +16,26 @@ import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
 interface TopShardsProps {
+    tenantName: string;
     path: string;
 }
 
-export const TopShards = ({path}: TopShardsProps) => {
+export const TopShards = ({tenantName, path}: TopShardsProps) => {
     const location = useLocation();
 
     const query = parseQuery(location);
 
     const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
-    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
 
     const {currentData, isFetching, error} = topShardsApi.useGetTopShardsQuery(
-        {database: path, path: currentSchemaPath},
+        {database: tenantName, path},
         {pollingInterval: autoRefreshInterval},
     );
 
     const loading = isFetching && currentData === undefined;
     const {result: data} = currentData || {};
 
-    const columns = getTopShardsColumns(path, location);
+    const columns = getTopShardsColumns(tenantName, location);
 
     const title = getSectionTitle({
         entity: i18n('shards'),

@@ -13,11 +13,11 @@ import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
 interface TopNodesByMemoryProps {
-    path: string;
+    tenantName: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByMemory({path, additionalNodesProps}: TopNodesByMemoryProps) {
+export function TopNodesByMemory({tenantName, additionalNodesProps}: TopNodesByMemoryProps) {
     const query = useSearchQuery();
 
     const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
@@ -26,7 +26,7 @@ export function TopNodesByMemory({path, additionalNodesProps}: TopNodesByMemoryP
     });
 
     const {currentData, isFetching, error} = topNodesApi.useGetTopNodesQuery(
-        {tenant: path, sortValue: 'Memory'},
+        {tenant: tenantName, sortValue: 'Memory'},
         {pollingInterval: autoRefreshInterval},
     );
 

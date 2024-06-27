@@ -25,10 +25,10 @@ import i18n from '../i18n';
 import {b} from '../utils';
 
 interface TopQueriesProps {
-    path: string;
+    tenantName: string;
 }
 
-export function TopQueries({path}: TopQueriesProps) {
+export function TopQueries({tenantName}: TopQueriesProps) {
     const dispatch = useTypedDispatch();
     const location = useLocation();
     const history = useHistory();
@@ -39,7 +39,7 @@ export function TopQueries({path}: TopQueriesProps) {
     const columns = getTenantOverviewTopQueriesColumns();
 
     const {currentData, isFetching, error} = topQueriesApi.useGetOverviewTopQueriesQuery(
-        {database: path},
+        {database: tenantName},
         {pollingInterval: autoRefreshInterval},
     );
 
