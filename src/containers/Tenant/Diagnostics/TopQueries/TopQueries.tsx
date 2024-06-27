@@ -8,7 +8,6 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {parseQuery} from '../../../../routes';
-import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {changeUserInput} from '../../../../store/reducers/executeQuery';
 import {
     setTopQueriesFilters,
@@ -22,7 +21,7 @@ import {
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {isSortableTopQueriesProperty} from '../../../../utils/diagnostics';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
@@ -45,7 +44,7 @@ export const TopQueries = ({tenantName, type}: TopQueriesProps) => {
     const location = useLocation();
     const history = useHistory();
 
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const filters = useTypedSelector((state) => state.executeTopQueries);
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(

@@ -1,13 +1,12 @@
 import {Loader} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
-import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
-import {useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
 import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
@@ -32,7 +31,7 @@ export function TenantOverview({
     additionalNodesProps,
 }: TenantOverviewProps) {
     const {metricsTab} = useTypedSelector((state) => state.tenant);
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
         {path: tenantName},

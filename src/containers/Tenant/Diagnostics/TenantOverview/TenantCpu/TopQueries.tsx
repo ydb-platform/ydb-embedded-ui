@@ -3,7 +3,6 @@ import React from 'react';
 import {useHistory, useLocation} from 'react-router';
 
 import {parseQuery} from '../../../../../routes';
-import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {changeUserInput} from '../../../../../store/reducers/executeQuery';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
@@ -12,7 +11,7 @@ import {
     TENANT_QUERY_TABS_ID,
 } from '../../../../../store/reducers/tenant/constants';
 import {topQueriesApi} from '../../../../../store/reducers/tenantOverview/topQueries/tenantOverviewTopQueries';
-import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {
@@ -35,7 +34,7 @@ export function TopQueries({tenantName}: TopQueriesProps) {
 
     const query = parseQuery(location);
 
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const columns = getTenantOverviewTopQueriesColumns();
 
     const {currentData, isFetching, error} = topQueriesApi.useGetOverviewTopQueriesQuery(

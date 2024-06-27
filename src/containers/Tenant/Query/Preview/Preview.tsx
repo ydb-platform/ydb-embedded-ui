@@ -4,12 +4,11 @@ import {Button, Icon, Loader} from '@gravity-ui/uikit';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {QueryResultTable} from '../../../../components/QueryResultTable';
-import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {previewApi} from '../../../../store/reducers/preview';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {isExternalTableType, isTableType} from '../../utils/schema';
 import i18n from '../i18n';
@@ -29,7 +28,7 @@ export const Preview = ({database, path, type}: PreviewProps) => {
 
     const isPreviewAvailable = isTableType(type);
 
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
 
     const query = `--!syntax_v1\nselect * from \`${path}\` limit 32`;
