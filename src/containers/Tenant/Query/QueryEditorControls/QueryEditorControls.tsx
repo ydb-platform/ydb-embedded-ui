@@ -7,6 +7,7 @@ import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
 import {LabelWithPopover} from '../../../../components/LabelWithPopover';
 import type {QueryAction, QueryMode} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {CtrlCmd, formatShortcut} from '../../../../utils/keyboard';
 import {QUERY_MODES, QUERY_MODES_TITLES} from '../../../../utils/query';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
@@ -46,7 +47,6 @@ interface QueryEditorControlsProps {
     runIsLoading: boolean;
     onExplainButtonClick: (mode?: QueryMode) => void;
     explainIsLoading: boolean;
-    onSaveQueryClick: (queryName: string | null) => void;
     disabled: boolean;
     onUpdateQueryMode: (mode: QueryMode) => void;
     queryMode: QueryMode;
@@ -58,7 +58,6 @@ export const QueryEditorControls = ({
     runIsLoading,
     onExplainButtonClick,
     explainIsLoading,
-    onSaveQueryClick,
     disabled,
     onUpdateQueryMode,
     queryMode,
@@ -96,6 +95,7 @@ export const QueryEditorControls = ({
                     disabled={disabled}
                     loading={runIsLoading}
                     view={runView}
+                    title={`Run query [${formatShortcut([CtrlCmd, 'Enter'])}]`}
                 >
                     <Icon data={PlayFill} size={14} />
                     {'Run'}
@@ -130,7 +130,7 @@ export const QueryEditorControls = ({
                     />
                 </div>
             </div>
-            <SaveQuery onSaveQuery={onSaveQueryClick} isSaveButtonDisabled={disabled} />
+            <SaveQuery isSaveButtonDisabled={disabled} />
         </div>
     );
 };

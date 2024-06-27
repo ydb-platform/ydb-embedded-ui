@@ -1,11 +1,9 @@
 import type Monaco from 'monaco-editor';
 
-import {userOs} from '../../../../utils/getUserOS';
-
 export function getKeyBindings(monaco: typeof Monaco) {
     const {KeyMod, KeyCode} = monaco;
 
-    const ctrlKey = userOs === 'mac' ? KeyMod.CtrlCmd : KeyMod.WinCtrl;
+    const ctrlKey = KeyMod.CtrlCmd;
 
     /* eslint-disable no-bitwise */
     return {

@@ -16,6 +16,7 @@ import {
 } from '../../../../store/reducers/executeQuery';
 import {explainQueryApi} from '../../../../store/reducers/explainQuery/explainQuery';
 import type {PreparedExplainResponse} from '../../../../store/reducers/explainQuery/types';
+import {setQueryAction} from '../../../../store/reducers/queryActions';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import type {ValueOf} from '../../../../types/common';
@@ -28,7 +29,7 @@ import {
     LAST_USED_QUERY_ACTION_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../../utils/constants';
-import {useQueryModes, useSetting} from '../../../../utils/hooks';
+import {useQueryModes, useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {LANGUAGE_YQL_ID} from '../../../../utils/monaco/yql/constants';
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
@@ -39,7 +40,6 @@ import {
 import {ExecuteResult} from '../ExecuteResult/ExecuteResult';
 import {ExplainResult} from '../ExplainResult/ExplainResult';
 import {Preview} from '../Preview/Preview';
-import {useSaveQuery, useSetQueryAction} from '../QueryContext';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import {SaveQueryDialog} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
@@ -83,9 +83,8 @@ interface QueryEditorProps {
 }
 
 function QueryEditor(props: QueryEditorProps) {
+    const dispatch = useTypedDispatch();
     const editorOptions = useEditorOptions();
-    const saveQuery = useSaveQuery();
-    const setQueryAction = useSetQueryAction();
     const {
         tenantName,
         path,
@@ -321,7 +320,7 @@ function QueryEditor(props: QueryEditorProps) {
             label: i18n('action.save-query'),
             keybindings: [keybindings.saveQuery],
             run: () => {
-                setQueryAction('save');
+                dispatch(setQueryAction('save'));
             },
         });
     };
@@ -341,11 +340,6 @@ function QueryEditor(props: QueryEditorProps) {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.clear);
     };
 
-    const handleSaveQuery = (queryName: string | null) => {
-        const {input} = executeQuery;
-        saveQuery(queryName, input);
-    };
-
     const renderControls = () => {
         return (
             <QueryEditorControls
@@ -353,7 +347,6 @@ function QueryEditor(props: QueryEditorProps) {
                 runIsLoading={executeQueryResult.isLoading}
                 onExplainButtonClick={handleGetExplainQueryClick}
                 explainIsLoading={explainQueryResult.isLoading}
-                onSaveQueryClick={handleSaveQuery}
                 disabled={!executeQuery.input}
                 onUpdateQueryMode={setQueryMode}
                 queryMode={queryMode}
@@ -411,7 +404,7 @@ function QueryEditor(props: QueryEditorProps) {
                     />
                 </div>
             </SplitPane>
-            <SaveQueryDialog onSaveQuery={handleSaveQuery} />
+            <SaveQueryDialog />
         </div>
     );
 }

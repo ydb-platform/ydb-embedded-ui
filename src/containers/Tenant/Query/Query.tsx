@@ -9,7 +9,6 @@ import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 
 import QueriesHistory from './QueriesHistory/QueriesHistory';
-import {QueryActionsProvider} from './QueryContext';
 import QueryEditor from './QueryEditor/QueryEditor';
 import {QueryTabs, queryEditorTabs} from './QueryTabs/QueryTabs';
 import {SavedQueries} from './SavedQueries/SavedQueries';
@@ -64,9 +63,7 @@ export const Query = (props: QueryProps) => {
                 </Helmet>
             ) : null}
             <QueryTabs className={b('tabs')} activeTab={queryTab} />
-            <QueryActionsProvider>
-                <div className={b('content')}>{renderContent()}</div>
-            </QueryActionsProvider>
+            <div className={b('content')}>{renderContent()}</div>
         </div>
     );
 };

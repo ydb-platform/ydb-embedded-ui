@@ -2,10 +2,16 @@ import React from 'react';
 
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
-import {clearQueryNameToEdit, setQueryNameToEdit} from '../../../../store/reducers/saveQuery';
+import {
+    clearQueryNameToEdit,
+    selectQueryAction,
+    selectQueryName,
+    setQueryAction,
+} from '../../../../store/reducers/queryActions';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {useQueryAction, useSavedQueries, useSetQueryAction} from '../QueryContext';
+import {CtrlCmd, formatShortcut} from '../../../../utils/keyboard';
+import {useSaveQuery, useSavedQueries} from '../utils/queryActions';
 
 import i18n from './i18n';
 
@@ -14,28 +20,32 @@ import './SaveQuery.scss';
 const b = cn('ydb-save-query');
 
 interface SaveQueryProps {
-    onSaveQuery: (name: string | null) => void;
     isSaveButtonDisabled?: boolean;
 }
 
-export function SaveQuery({onSaveQuery, isSaveButtonDisabled}: SaveQueryProps) {
-    const setQueryAction = useSetQueryAction();
-    const queryNameToEdit = useTypedSelector((state) => state.saveQuery);
+export function SaveQuery({isSaveButtonDisabled}: SaveQueryProps) {
     const dispatch = useTypedDispatch();
+    const queryNameToEdit = useTypedSelector(selectQueryName);
+
+    const saveQuery = useSaveQuery();
 
     const onSaveQueryClick = () => {
-        setQueryAction('save');
+        dispatch(setQueryAction('save'));
         dispatch(clearQueryNameToEdit());
     };
 
     const onEditQueryClick = () => {
-        onSaveQuery(queryNameToEdit);
-        dispatch(setQueryNameToEdit(null));
+        saveQuery(queryNameToEdit);
+        dispatch(clearQueryNameToEdit());
     };
 
     const renderSaveButton = () => {
         return (
-            <Button onClick={onSaveQueryClick} disabled={isSaveButtonDisabled}>
+            <Button
+                onClick={onSaveQueryClick}
+                disabled={isSaveButtonDisabled}
+                title={`Save query [${formatShortcut([CtrlCmd, 'S'])}]`}
+            >
                 {i18n('action.save')}
             </Button>
         );
@@ -68,15 +78,12 @@ export function SaveQuery({onSaveQuery, isSaveButtonDisabled}: SaveQueryProps) {
     return queryNameToEdit ? renderSaveDropdownMenu() : renderSaveButton();
 }
 
-interface SaveQueryDialogProps {
-    onSaveQuery: (name: string | null) => void;
-}
-
-export function SaveQueryDialog({onSaveQuery}: SaveQueryDialogProps) {
+export function SaveQueryDialog() {
     const savedQueries = useSavedQueries();
+    const saveQuery = useSaveQuery();
+    const dispatch = useTypedDispatch();
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
-    const queryAction = useQueryAction();
-    const setQueryAction = useSetQueryAction();
+    const queryAction = useTypedSelector(selectQueryAction);
     const [queryName, setQueryName] = React.useState('');
     const [validationError, setValidationError] = React.useState<string | null>(null);
 
@@ -88,7 +95,7 @@ export function SaveQueryDialog({onSaveQuery}: SaveQueryDialogProps) {
     };
 
     const onCloseDialog = () => {
-        setQueryAction('idle');
+        dispatch(setQueryAction('idle'));
         setQueryName('');
         setValidationError(null);
     };
@@ -103,7 +110,7 @@ export function SaveQueryDialog({onSaveQuery}: SaveQueryDialogProps) {
             return;
         }
 
-        onSaveQuery(queryName);
+        saveQuery(queryName);
         onCloseDialog();
     };
 
