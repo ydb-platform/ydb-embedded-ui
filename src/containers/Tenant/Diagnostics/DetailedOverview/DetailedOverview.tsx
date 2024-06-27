@@ -1,5 +1,3 @@
-import {useSelector} from 'react-redux';
-
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
@@ -12,6 +10,7 @@ interface DetailedOverviewProps {
     type?: EPathType;
     className?: string;
     tenantName: string;
+    path: string;
     additionalTenantProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;
 }
@@ -19,9 +18,7 @@ interface DetailedOverviewProps {
 const b = cn('kv-detailed-overview');
 
 function DetailedOverview(props: DetailedOverviewProps) {
-    const {type, tenantName, additionalTenantProps, additionalNodesProps} = props;
-
-    const {currentSchemaPath} = useSelector((state: any) => state.schema);
+    const {type, tenantName, path, additionalTenantProps, additionalNodesProps} = props;
 
     const renderTenantOverview = () => {
         return (
@@ -35,11 +32,11 @@ function DetailedOverview(props: DetailedOverviewProps) {
         );
     };
 
-    const isTenant = tenantName === currentSchemaPath;
+    const isTenant = tenantName === path;
 
     return (
         <div className={b()}>
-            {isTenant ? renderTenantOverview() : <Overview type={type} tenantName={tenantName} />}
+            {isTenant ? renderTenantOverview() : <Overview type={type} path={path} />}
         </div>
     );
 }

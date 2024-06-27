@@ -29,9 +29,9 @@ import './Network.scss';
 const b = cn('network');
 
 interface NetworkProps {
-    path: string;
+    tenantName: string;
 }
-export function Network({path}: NetworkProps) {
+export function Network({tenantName}: NetworkProps) {
     const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
     const filter = useTypedSelector(selectProblemFilter);
     const dispatch = useTypedDispatch();
@@ -40,7 +40,7 @@ export function Network({path}: NetworkProps) {
     const [showId, setShowId] = React.useState(false);
     const [showRacks, setShowRacks] = React.useState(false);
 
-    const {currentData, isFetching, error} = networkApi.useGetNetworkInfoQuery(path, {
+    const {currentData, isFetching, error} = networkApi.useGetNetworkInfoQuery(tenantName, {
         pollingInterval: autoRefreshInterval,
     });
     const loading = isFetching && currentData === undefined;

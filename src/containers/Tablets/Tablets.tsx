@@ -74,7 +74,7 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
         align: 'right',
     },
     {
-        name: 'FQDN',
+        name: 'fqdn',
         get header() {
             return i18n('Node FQDN');
         },

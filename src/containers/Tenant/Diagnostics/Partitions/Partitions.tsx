@@ -31,10 +31,6 @@ interface PartitionsProps {
 export const Partitions = ({path}: PartitionsProps) => {
     const dispatch = useTypedDispatch();
 
-    // Manual path control to ensure that topic state will be reset before data fetch
-    // so no request with wrong params will be sent
-    const [componentCurrentPath, setComponentCurrentPath] = React.useState(path);
-
     const [partitionsToRender, setPartitionsToRender] = React.useState<
         PreparedPartitionDataWithHosts[]
     >([]);
@@ -60,14 +56,7 @@ export const Partitions = ({path}: PartitionsProps) => {
 
     const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer);
 
-    React.useEffect(() => {
-        setComponentCurrentPath(path);
-    }, [dispatch, path]);
-
-    const params =
-        !topicLoading && componentCurrentPath
-            ? {path: componentCurrentPath, consumerName: selectedConsumer}
-            : skipToken;
+    const params = !topicLoading && path ? {path, consumerName: selectedConsumer} : skipToken;
     const {
         currentData: partitionsData,
         isFetching: partitionsIsFetching,

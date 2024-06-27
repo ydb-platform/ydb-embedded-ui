@@ -3,7 +3,6 @@ import {Flex, Text} from '@gravity-ui/uikit';
 import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
 import {InfoViewer} from '../../../../../components/InfoViewer';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
-import {useTypedSelector} from '../../../../../utils/hooks';
 import {getEntityName} from '../../../utils';
 import {AsyncReplicationPaths} from '../AsyncReplicationPaths';
 
@@ -17,12 +16,6 @@ interface AsyncReplicationProps {
 /** Displays overview for Replication EPathType */
 export function AsyncReplicationInfo({data}: AsyncReplicationProps) {
     const entityName = getEntityName(data?.PathDescription);
-
-    const {error: schemaError} = useTypedSelector((state) => state.schema);
-
-    if (schemaError) {
-        return <div className="error">{schemaError.statusText}</div>;
-    }
 
     if (!data) {
         return (
