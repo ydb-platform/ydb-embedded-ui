@@ -31,7 +31,7 @@ WITH (
 )`;
 };
 export const createColumnTableTemplate = (path: string) => {
-    return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_table
+    return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_table#olap-tables
 CREATE TABLE \`${path}/ydb_column_table\` (
     id Int64 NOT NULL,
     author Text,
