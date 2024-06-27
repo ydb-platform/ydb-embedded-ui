@@ -36,11 +36,11 @@ import './TopQueries.scss';
 const b = cn('kv-top-queries');
 
 interface TopQueriesProps {
-    path: string;
+    tenantName: string;
     type?: EPathType;
 }
 
-export const TopQueries = ({path, type}: TopQueriesProps) => {
+export const TopQueries = ({tenantName, type}: TopQueriesProps) => {
     const dispatch = useTypedDispatch();
     const location = useLocation();
     const history = useHistory();
@@ -50,7 +50,7 @@ export const TopQueries = ({path, type}: TopQueriesProps) => {
     const filters = useTypedSelector((state) => state.executeTopQueries);
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
         {
-            database: path,
+            database: tenantName,
             filters,
         },
         {pollingInterval: autoRefreshInterval},

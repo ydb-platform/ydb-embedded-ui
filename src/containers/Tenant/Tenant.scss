@@ -5,4 +5,8 @@
 
     @include body-2-typography();
     @include flex-container();
+
+    &__main {
+        flex-grow: 1;
+    }
 }

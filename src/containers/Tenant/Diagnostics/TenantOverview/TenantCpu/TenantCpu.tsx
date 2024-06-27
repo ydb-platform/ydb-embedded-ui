@@ -10,18 +10,18 @@ import {TopShards} from './TopShards';
 import {cpuDashboardConfig} from './cpuDashboardConfig';
 
 interface TenantCpuProps {
-    path: string;
+    tenantName: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TenantCpu({path, additionalNodesProps}: TenantCpuProps) {
+export function TenantCpu({tenantName, additionalNodesProps}: TenantCpuProps) {
     return (
         <React.Fragment>
-            <TenantDashboard database={path} charts={cpuDashboardConfig} />
-            <TopNodesByLoad path={path} additionalNodesProps={additionalNodesProps} />
-            <TopNodesByCpu path={path} additionalNodesProps={additionalNodesProps} />
-            <TopShards path={path} />
-            <TopQueries path={path} />
+            <TenantDashboard database={tenantName} charts={cpuDashboardConfig} />
+            <TopNodesByLoad tenantName={tenantName} additionalNodesProps={additionalNodesProps} />
+            <TopNodesByCpu tenantName={tenantName} additionalNodesProps={additionalNodesProps} />
+            <TopShards tenantName={tenantName} path={tenantName} />
+            <TopQueries tenantName={tenantName} />
         </React.Fragment>
     );
 }

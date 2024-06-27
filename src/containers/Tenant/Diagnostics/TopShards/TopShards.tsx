@@ -87,16 +87,16 @@ function fillDateRangeFor(value: ShardsWorkloadFilters) {
 }
 
 interface TopShardsProps {
-    tenantPath: string;
+    tenantName: string;
+    path: string;
     type?: EPathType;
 }
 
-export const TopShards = ({tenantPath, type}: TopShardsProps) => {
+export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
     const dispatch = useTypedDispatch();
     const location = useLocation();
 
     const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
-    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
 
     const storeFilters = useTypedSelector((state) => state.shardsWorkload);
 
@@ -123,8 +123,8 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         error,
     } = shardApi.useSendShardQueryQuery(
         {
-            database: tenantPath,
-            path: currentSchemaPath,
+            database: tenantName,
+            path: path,
             sortOrder: stringToQuerySortOrder(sortOrder),
             filters,
         },
@@ -162,7 +162,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
     };
 
     const tableColumns = React.useMemo(() => {
-        const rawColumns: Column<KeyValueRow>[] = getShardsWorkloadColumns(tenantPath, location);
+        const rawColumns: Column<KeyValueRow>[] = getShardsWorkloadColumns(tenantName, location);
 
         const columns: Column<KeyValueRow>[] = rawColumns.map((column) => ({
             ...column,
@@ -187,7 +187,7 @@ export const TopShards = ({tenantPath, type}: TopShardsProps) => {
         }
 
         return columns;
-    }, [filters.mode, tenantPath, location]);
+    }, [filters.mode, location, tenantName]);
 
     const renderControls = () => {
         return <Filters value={filters} onChange={handleFiltersChange} />;

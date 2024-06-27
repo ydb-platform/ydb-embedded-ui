@@ -20,22 +20,20 @@ const b = cn('kv-describe');
 const expandMap = new Map();
 
 interface IDescribeProps {
-    tenant: string;
+    path: string;
     type?: EPathType;
 }
 
-const Describe = ({tenant, type}: IDescribeProps) => {
+const Describe = ({path, type}: IDescribeProps) => {
     const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
-    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
     const mergedChildrenPaths = useTypedSelector(
-        (state) => selectSchemaMergedChildrenPaths(state, currentSchemaPath, type),
+        (state) => selectSchemaMergedChildrenPaths(state, path, type),
         shallowEqual,
     );
 
-    const path = currentSchemaPath || tenant;
     let paths: string[] | typeof skipToken = skipToken;
     if (!isEntityWithMergedImpl) {
         paths = [path];
