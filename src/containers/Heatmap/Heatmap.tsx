@@ -4,13 +4,12 @@ import {Checkbox, Select} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
-import {selectAutoRefreshInterval} from '../../store/reducers/autoRefreshControl';
 import {heatmapApi, setHeatmapOptions} from '../../store/reducers/heatmap';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import type {IHeatmapMetricValue} from '../../types/store/heatmap';
 import {cn} from '../../utils/cn';
 import {formatNumber} from '../../utils/dataFormatters/dataFormatters';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import {HeatmapCanvas} from './HeatmapCanvas/HeatmapCanvas';
 import {Histogram} from './Histogram/Histogram';
@@ -30,7 +29,7 @@ export const Heatmap = ({path}: HeatmapProps) => {
 
     const itemsContainer = React.createRef<HTMLDivElement>();
 
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = heatmapApi.useGetHeatmapTabletsInfoQuery(
         {path},

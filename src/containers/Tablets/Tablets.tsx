@@ -10,7 +10,6 @@ import {InternalLink} from '../../components/InternalLink';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import routes, {createHref} from '../../routes';
-import {selectAutoRefreshInterval} from '../../store/reducers/autoRefreshControl';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
@@ -18,7 +17,7 @@ import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {mapTabletStateToLabelTheme} from '../../utils/tablet';
 import {getDefaultNodePath} from '../Node/NodePages';
 
@@ -146,7 +145,7 @@ interface TabletsProps {
 }
 
 export function Tablets({nodeId, path, className}: TabletsProps) {
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     let params: TabletsApiRequestParams = {};
     const node = nodeId === undefined ? undefined : String(nodeId);

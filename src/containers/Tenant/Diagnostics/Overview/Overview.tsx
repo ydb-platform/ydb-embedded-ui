@@ -6,12 +6,11 @@ import {shallowEqual} from 'react-redux';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
-import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {olapApi} from '../../../../store/reducers/olapStats';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {schemaApi, selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import {EPathType} from '../../../../types/api/schema';
-import {useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
 import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
 import {ViewInfo} from '../../Info/View/View';
@@ -32,7 +31,7 @@ interface OverviewProps {
 }
 
 function Overview({type, path}: OverviewProps) {
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const olapParams = isTableType(type) && isColumnEntityType(type) ? {path} : skipToken;
     const {currentData: olapData, isFetching: olapIsFetching} = olapApi.useGetOlapStatsQuery(

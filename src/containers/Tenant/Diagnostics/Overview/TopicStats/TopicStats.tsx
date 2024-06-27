@@ -5,12 +5,11 @@ import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
 import {Loader} from '../../../../../components/Loader';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
-import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {selectPreparedTopicStats, topicApi} from '../../../../../store/reducers/topic';
 import type {IPreparedTopicStats} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
 import {formatBps, formatBytes} from '../../../../../utils/dataFormatters/dataFormatters';
-import {useTypedSelector} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedSelector} from '../../../../../utils/hooks';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 
 import i18n from './i18n';
@@ -71,7 +70,7 @@ const prepareBytesWrittenInfo = (data: IPreparedTopicStats): Array<InfoViewerIte
 };
 
 export const TopicStats = ({path}: {path: string}) => {
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
         {path},
         {pollingInterval: autoRefreshInterval},

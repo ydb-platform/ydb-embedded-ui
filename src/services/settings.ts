@@ -2,6 +2,7 @@ import {TENANT_PAGES_IDS} from '../store/reducers/tenant/constants';
 import {
     ASIDE_HEADER_COMPACT_KEY,
     AUTOCOMPLETE_ON_ENTER,
+    AUTO_REFRESH_INTERVAL,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     ENABLE_AUTOCOMPLETE,
     INVERTED_DISKS_KEY,
@@ -42,6 +43,7 @@ export const DEFAULT_USER_SETTINGS = {
     [ENABLE_AUTOCOMPLETE]: true,
     [AUTOCOMPLETE_ON_ENTER]: true,
     [IS_HOTKEYS_HELP_HIDDEN_KEY]: false,
+    [AUTO_REFRESH_INTERVAL]: 0,
 } as const satisfies SettingsObject;
 
 class SettingsManager {

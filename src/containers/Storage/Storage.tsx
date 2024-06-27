@@ -5,7 +5,6 @@ import {ArrayParam, StringParam, useQueryParams, withDefault} from 'use-query-pa
 import {AccessDenied} from '../../components/Errors/403';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {selectAutoRefreshInterval} from '../../store/reducers/autoRefreshControl';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
@@ -24,6 +23,7 @@ import type {
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {DEFAULT_POLLING_INTERVAL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
+    useAutoRefreshInterval,
     useNodesRequestParams,
     useStorageRequestParams,
     useTableSort,
@@ -63,7 +63,7 @@ interface StorageProps {
 }
 
 export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) => {
-    const autorefresh = useTypedSelector(selectAutoRefreshInterval);
+    const [autorefresh] = useAutoRefreshInterval();
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
         visible: StringParam,
