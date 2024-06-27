@@ -1,27 +1,18 @@
 import React from 'react';
 
-import type {Column} from '@gravity-ui/react-data-table';
+import type {DefinitionListItem} from '@gravity-ui/components';
+import {DefinitionList} from '@gravity-ui/components';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
-import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
 import {schemaAclApi} from '../../../store/reducers/schemaAcl/schemaAcl';
 import type {TACE} from '../../../types/api/acl';
 import {cn} from '../../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import i18n from '../i18n';
 
 import './Acl.scss';
 
 const b = cn('ydb-acl');
-
-const ACL_COLUMNS_WIDTH_LS_KEY = 'aclTableColumnsWidth';
-
-const TABLE_SETTINGS = {
-    ...DEFAULT_TABLE_SETTINGS,
-    dynamicRender: false,
-    stickyTop: 36,
-};
 
 const prepareLogin = (value: string | undefined) => {
     if (value && value.endsWith('@staff') && !value.startsWith('svc_')) {
@@ -32,42 +23,38 @@ const prepareLogin = (value: string | undefined) => {
     return value;
 };
 
-const columns: Column<TACE>[] = [
-    {
-        name: 'AccessType',
-        header: 'Access Type',
-        sortable: false,
-        render: ({row}) => row.AccessType,
-    },
-    {
-        name: 'AccessRights',
-        header: 'Access Rights',
-        render: ({row}) => {
-            return row.AccessRights?.map((item, index) => {
-                return <div key={index}>{item}</div>;
-            });
-        },
-        sortable: false,
-    },
-    {
-        name: 'Subject',
-        sortable: false,
-        render: ({row}) => {
-            return prepareLogin(row.Subject);
-        },
-        width: 140,
-    },
-    {
-        name: 'InheritanceType',
-        header: 'Inheritance Type',
-        render: ({row}) => {
-            return row.InheritanceType?.map((item, index) => {
-                return <div key={index}>{item}</div>;
-            });
-        },
-        sortable: false,
-    },
-];
+const aclParams = ['access', 'type', 'inheritance'] as const;
+
+const aclParamToName: Record<(typeof aclParams)[number], string> = {
+    access: 'Access',
+    type: 'Access type',
+    inheritance: 'Inheritance type',
+};
+
+const defaultInheritanceType = new Set(['Object', 'Container']);
+
+function normalizeAcl(acl: TACE[]) {
+    return acl.map((ace) => {
+        const {AccessRules = [], AccessRights = [], AccessType, InheritanceType, Subject} = ace;
+        const access = AccessRules.concat(AccessRights);
+        //"Allow" is default access type. We want to show it only if it isn't default
+        const type = AccessType === 'Allow' ? undefined : AccessType;
+        let inheritance;
+        // ['Object', 'Container'] - is default inheritance type. We want to show it only if it isn't default
+        if (
+            InheritanceType?.length !== defaultInheritanceType.size ||
+            InheritanceType.some((t) => !defaultInheritanceType.has(t))
+        ) {
+            inheritance = InheritanceType;
+        }
+        return {
+            access,
+            type,
+            inheritance,
+            Subject,
+        };
+    });
+}
 
 export const Acl = ({path}: {path: string}) => {
     const {currentData, isFetching, error} = schemaAclApi.useGetSchemaAclQuery({path});
@@ -80,14 +67,34 @@ export const Acl = ({path}: {path: string}) => {
             return null;
         }
 
-        return (
-            <ResizeableDataTable
-                columnsWidthLSKey={ACL_COLUMNS_WIDTH_LS_KEY}
-                columns={columns}
-                data={acl}
-                settings={TABLE_SETTINGS}
-            />
-        );
+        const normalizedAcl = normalizeAcl(acl);
+
+        const items = normalizedAcl.map(({Subject, ...data}) => {
+            return {
+                label: Subject,
+                items: aclParams
+                    .map((key) => {
+                        const value = data[key];
+                        if (!value) {
+                            return undefined;
+                        }
+                        const normalizedValue = typeof value === 'string' ? [value] : value;
+                        return {
+                            name: aclParamToName[key],
+                            content: (
+                                <div className={b('definition-content')}>
+                                    {normalizedValue.map((el) => (
+                                        <span key={el}>{el}</span>
+                                    ))}
+                                </div>
+                            ),
+                        };
+                    })
+                    .filter(Boolean),
+            };
+        }) as DefinitionListItem[];
+
+        return <DefinitionList items={items} nameMaxWidth={200} />;
     };
 
     const renderOwner = () => {

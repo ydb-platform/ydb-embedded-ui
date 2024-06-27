@@ -287,6 +287,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             this.getPath('/viewer/json/acl'),
             {
                 path,
+                merge_rules: true,
             },
             {concurrentId: concurrentId || `getSchemaAcl`, requestConfig: {signal}},
         );
