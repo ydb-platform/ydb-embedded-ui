@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {HelpPopover} from '@gravity-ui/components';
-import {dateTimeParse} from '@gravity-ui/date-utils';
 import {LayoutHeaderCellsLargeFill} from '@gravity-ui/icons';
 import {Button, Icon, Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
@@ -29,11 +28,9 @@ import {cn} from '../../../utils/cn';
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
-    HOUR_IN_SECONDS,
 } from '../../../utils/constants';
-import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import {formatDateTime, formatSecondsToHours} from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
-import {isNumeric} from '../../../utils/utils';
 import {Acl} from '../Acl/Acl';
 import {ExternalDataSourceSummary} from '../Info/ExternalDataSource/ExternalDataSource';
 import {ExternalTableSummary} from '../Info/ExternalTable/ExternalTable';
@@ -137,72 +134,62 @@ export function ObjectSummary({
     };
 
     const renderObjectOverview = () => {
-        if (!currentSchemaData) return undefined;
+        if (!currentSchemaData) {
+            return undefined;
+        }
         const {CreateStep, PathType, PathSubType, PathId, PathVersion} = currentSchemaData;
 
         const overview: InfoViewerItem[] = [];
 
-        // for any schema type
-        overview.push({label: 'Type', value: PathType?.replace(/^EPathType/, '')});
+        overview.push({label: i18n('summary.type'), value: PathType?.replace(/^EPathType/, '')});
 
-        // show SubType if it's not EPathSubTypeEmpty
         if (PathSubType !== EPathSubType.EPathSubTypeEmpty) {
-            overview.push({label: 'SubType', value: PathSubType?.replace(/^EPathSubType/, '')});
-        }
-
-        // show PathId
-        // if you get 18446744073709551615 = ffffffff = 2n ** 64n - 1n =-1 в ui64
-        // you need to ask @xeno0904 for help
-        overview.push({label: 'Id', value: PathId});
-
-        // show PathVersion
-        overview.push({label: 'Version', value: PathVersion});
-
-        // show created time if it's not 0
-        if (isNumeric(CreateStep) && Number(CreateStep)) {
             overview.push({
-                label: 'Created',
-                value: dateTimeParse(Number(CreateStep))?.format('YYYY-MM-DD HH:mm'),
+                label: i18n('summary.subtype'),
+                value: PathSubType?.replace(/^EPathSubType/, ''),
             });
         }
+
+        overview.push({label: i18n('summary.id'), value: PathId});
+
+        overview.push({label: i18n('summary.version'), value: PathVersion});
+
+        overview.push({
+            label: i18n('summary.created'),
+            value: formatDateTime(CreateStep),
+        });
 
         const {PathDescription} = currentObjectData;
         const title = getEntityName(PathDescription);
 
-        // Table: show Partitions count = len(TablePartitions)
         if (PathType === EPathType.EPathTypeTable) {
             overview.push({
-                label: 'Partitions count',
+                label: i18n('summary.partitions'),
                 value: PathDescription?.TablePartitions?.length,
             });
         }
 
-        // ColumnTable: show Partitions count = len(ColumnTableDescription.Sharding.ColumnShards)
         if (PathType === EPathType.EPathTypeColumnTable) {
             overview.push({
-                label: 'Partitions count',
+                label: i18n('summary.partitions'),
                 value: PathDescription?.ColumnTableDescription?.Sharding?.ColumnShards?.length,
             });
         }
 
-        // ColumnStore: show Partitions count = len(ColumnStoreDescription.ColumnShards)
         if (PathType === EPathType.EPathTypeColumnStore) {
             overview.push({
-                label: 'Partitions count',
+                label: i18n('summary.partitions'),
                 value: PathDescription?.ColumnStoreDescription?.ColumnShards?.length,
             });
         }
 
-        // ExtSubDomain: (database)
-        // show Paths (DomainDescription.PathsInside)
-        // show Shards (DomainDescription.ShardsInside)
         if (PathType === EPathType.EPathTypeExtSubDomain) {
             overview.push({
-                label: 'Paths count',
+                label: i18n('summary.paths'),
                 value: PathDescription?.DomainDescription?.PathsInside?.length,
             });
             overview.push({
-                label: 'Shards count',
+                label: i18n('summary.shards'),
                 value: PathDescription?.DomainDescription?.ShardsInside?.length,
             });
         }
@@ -210,29 +197,35 @@ export function ObjectSummary({
         if (PathType === EPathType.EPathTypeReplication) {
             const state = PathDescription?.ReplicationDescription?.State;
             if (state) {
-                overview.push({label: 'State', value: <AsyncReplicationState state={state} />});
+                overview.push({
+                    label: i18n('summary.state'),
+                    value: <AsyncReplicationState state={state} />,
+                });
             }
         }
 
         if (PathType === EPathType.EPathTypeCdcStream) {
             const {Mode, Format} = PathDescription?.CdcStreamDescription || {};
 
-            overview.push({label: 'Mode', value: Mode?.replace(/^ECdcStreamMode/, '')});
             overview.push({
-                label: 'Format',
+                label: i18n('summary.mode'),
+                value: Mode?.replace(/^ECdcStreamMode/, ''),
+            });
+            overview.push({
+                label: i18n('summary.format'),
                 value: Format?.replace(/^ECdcStreamFormat/, ''),
             });
         }
         if (PathType === EPathType.EPathTypePersQueueGroup) {
             const pqGroup = PathDescription?.PersQueueGroup;
 
-            overview.push({label: 'Partitions count', value: pqGroup?.Partitions?.length});
+            overview.push({label: i18n('summary.partitions'), value: pqGroup?.Partitions?.length});
 
             const value = pqGroup?.PQTabletConfig?.PartitionConfig?.LifetimeSeconds;
-            if (value) {
-                const hours = (value / HOUR_IN_SECONDS).toFixed(2);
-                overview.push({label: 'Retention', value: `${formatNumber(hours)} hours`});
-            }
+            overview.push({
+                label: i18n('summary.retention'),
+                value: value && formatSecondsToHours(value),
+            });
         }
 
         if (PathType === EPathType.EPathTypeExternalTable) {
