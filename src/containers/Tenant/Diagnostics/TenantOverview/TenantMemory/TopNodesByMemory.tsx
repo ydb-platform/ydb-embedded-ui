@@ -1,8 +1,7 @@
-import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topNodesApi} from '../../../../../store/reducers/tenantOverview/topNodes/topNodes';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
-import {useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
 import {
     NODES_COLUMNS_WIDTH_LS_KEY,
     getTopNodesByMemoryColumns,
@@ -20,7 +19,7 @@ interface TopNodesByMemoryProps {
 export function TopNodesByMemory({tenantName, additionalNodesProps}: TopNodesByMemoryProps) {
     const query = useSearchQuery();
 
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const columns = getTopNodesByMemoryColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
     });

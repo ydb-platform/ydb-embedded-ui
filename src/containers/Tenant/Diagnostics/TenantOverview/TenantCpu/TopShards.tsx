@@ -1,10 +1,9 @@
 import {useLocation} from 'react-router';
 
 import {parseQuery} from '../../../../../routes';
-import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topShardsApi} from '../../../../../store/reducers/tenantOverview/topShards/tenantOverviewTopShards';
-import {useTypedSelector} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {
@@ -25,7 +24,7 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
 
     const query = parseQuery(location);
 
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = topShardsApi.useGetTopShardsQuery(
         {database: tenantName, path},
