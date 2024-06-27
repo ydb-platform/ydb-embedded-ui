@@ -30,6 +30,18 @@ WITH (
                                -- if some keys are missing in a table when making multiple single queries by the primary key.
 )`;
 };
+export const createColumnTableTemplate = (path: string) => {
+    return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_table
+CREATE TABLE \`${path}/ydb_column_table\` (
+    id Int64 NOT NULL,
+    author Text,
+    title Text,
+    body Text,
+    PRIMARY KEY (id)
+)
+PARTITION BY HASH(id)
+WITH (STORE = COLUMN)`;
+};
 export const alterTableTemplate = (path: string) => {
     return `ALTER TABLE \`${path}\`
     ADD COLUMN is_deleted Bool;`;
