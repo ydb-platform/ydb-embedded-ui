@@ -6,7 +6,6 @@ import {Link} from 'react-router-dom';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Illustration} from '../../../../components/Illustration';
 import {ProblemFilter} from '../../../../components/ProblemFilter';
-import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {networkApi} from '../../../../store/reducers/network/network';
 import {
     ProblemFilterValues,
@@ -16,7 +15,7 @@ import {
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
 import type {TNetNodeInfo, TNetNodePeerInfo} from '../../../../types/api/netInfo';
 import {cn} from '../../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 
 import {NodeNetwork} from './NodeNetwork/NodeNetwork';
@@ -32,7 +31,7 @@ interface NetworkProps {
     tenantName: string;
 }
 export function Network({tenantName}: NetworkProps) {
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const filter = useTypedSelector(selectProblemFilter);
     const dispatch = useTypedDispatch();
 

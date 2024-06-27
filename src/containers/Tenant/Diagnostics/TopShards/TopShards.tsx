@@ -6,7 +6,6 @@ import {useLocation} from 'react-router';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {
     setShardsQueryFilters,
     shardApi,
@@ -19,7 +18,7 @@ import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {isSortableTopShardsProperty} from '../../../../utils/diagnostics';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {isColumnEntityType} from '../../utils/schema';
 
@@ -96,7 +95,7 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
     const dispatch = useTypedDispatch();
     const location = useLocation();
 
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const storeFilters = useTypedSelector((state) => state.shardsWorkload);
 

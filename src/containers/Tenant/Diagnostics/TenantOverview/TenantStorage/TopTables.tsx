@@ -4,11 +4,10 @@ import {useLocation} from 'react-router';
 
 import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
-import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {topTablesApi} from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
-import {useTypedSelector} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
@@ -25,7 +24,7 @@ const TOP_TABLES_COLUMNS_WIDTH_LS_KEY = 'topTablesTableColumnsWidth';
 export function TopTables({path}: TopTablesProps) {
     const location = useLocation();
 
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, error, isFetching} = topTablesApi.useGetTopTablesQuery(
         {path},

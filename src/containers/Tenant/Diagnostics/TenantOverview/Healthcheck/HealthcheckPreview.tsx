@@ -11,11 +11,10 @@ import {Icon} from '@gravity-ui/uikit';
 import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
-import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {healthcheckApi} from '../../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
-import {useTypedSelector} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -38,7 +37,7 @@ const icons: Record<SelfCheckResult, IconData> = {
 
 export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const {tenantName, active} = props;
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const {
         currentData: data,
         isFetching,

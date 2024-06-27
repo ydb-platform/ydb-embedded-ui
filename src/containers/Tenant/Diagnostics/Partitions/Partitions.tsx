@@ -5,13 +5,17 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
 import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
-import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {
+    useAutoRefreshInterval,
+    useSetting,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../../../utils/hooks';
 
 import {PartitionsControls} from './PartitionsControls/PartitionsControls';
 import {PARTITIONS_COLUMNS_WIDTH_LS_KEY} from './columns';
@@ -36,7 +40,7 @@ export const Partitions = ({path}: PartitionsProps) => {
     >([]);
 
     const consumers = useTypedSelector((state) => selectConsumersNames(state, path));
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const {selectedConsumer} = useTypedSelector((state) => state.partitions);
     const {
         currentData: topicData,

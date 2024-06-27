@@ -4,12 +4,11 @@ import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
-import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {describeApi} from '../../../../store/reducers/describe';
 import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
-import {useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {isEntityWithMergedImplementation} from '../../utils/schema';
 
 import './Describe.scss';
@@ -25,7 +24,7 @@ interface IDescribeProps {
 }
 
 const Describe = ({path, type}: IDescribeProps) => {
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
