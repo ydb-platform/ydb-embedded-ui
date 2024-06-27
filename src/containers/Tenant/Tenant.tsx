@@ -125,17 +125,19 @@ function Tenant(props: TenantProps) {
                         onExpandSummary={onExpandSummaryHandler}
                         isCollapsed={summaryVisibilityState.collapsed}
                     />
-                    {isLoading ? (
-                        <Loader size="l" />
-                    ) : (
-                        <ObjectGeneral
-                            type={currentPathType}
-                            additionalTenantProps={props.additionalTenantProps}
-                            additionalNodesProps={props.additionalNodesProps}
-                            tenantName={tenantName}
-                            path={path}
-                        />
-                    )}
+                    <div className={b('main')}>
+                        {isLoading ? (
+                            <Loader size="l" />
+                        ) : (
+                            <ObjectGeneral
+                                type={currentPathType}
+                                additionalTenantProps={props.additionalTenantProps}
+                                additionalNodesProps={props.additionalNodesProps}
+                                tenantName={tenantName}
+                                path={path}
+                            />
+                        )}
+                    </div>
                 </SplitPane>
             )}
         </div>
