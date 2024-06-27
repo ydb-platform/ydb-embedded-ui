@@ -9,6 +9,7 @@ import {createApi} from '../services/api';
 import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
+import {syncUserSettingsFromLS} from './reducers/settings/settings';
 import {UPDATE_REF} from './reducers/tooltip';
 import getLocationMiddleware from './state-url-mapping';
 
@@ -36,6 +37,8 @@ function _configureStore<
                 },
             }).concat(locationMiddleware, ...middleware),
     });
+
+    syncUserSettingsFromLS(store);
 
     return store;
 }

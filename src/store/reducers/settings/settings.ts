@@ -1,20 +1,11 @@
-import type {Reducer, ThunkAction} from '@reduxjs/toolkit';
+import type {Store} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 
-import type {RootState} from '../..';
-import type {SettingsObject} from '../../../services/settings';
 import {DEFAULT_USER_SETTINGS, settingsManager} from '../../../services/settings';
+import {parseJson} from '../../../utils/utils';
+import type {AppDispatch} from '../../defaultStore';
 
-import type {
-    ProblemFilterValue,
-    SetSettingValueAction,
-    SettingsAction,
-    SettingsRootStateSlice,
-    SettingsState,
-} from './types';
-
-const CHANGE_PROBLEM_FILTER = 'settings/CHANGE_PROBLEM_FILTER';
-export const SET_SETTING_VALUE = 'settings/SET_VALUE';
-export const SET_USER_SETTINGS = 'settings/SET_USER_SETTINGS';
+import type {ProblemFilterValue, SettingsState} from './types';
 
 export const ProblemFilterValues = {
     ALL: 'All',
@@ -24,71 +15,60 @@ export const ProblemFilterValues = {
 const userSettings = settingsManager.extractSettingsFromLS(DEFAULT_USER_SETTINGS);
 const systemSettings = window.systemSettings || {};
 
-export const initialState = {
+export const initialState: SettingsState = {
     problemFilter: ProblemFilterValues.ALL,
     userSettings,
     systemSettings,
 };
 
-const settings: Reducer<SettingsState, SettingsAction> = (state = initialState, action) => {
-    switch (action.type) {
-        case CHANGE_PROBLEM_FILTER:
-            return {
-                ...state,
-                problemFilter: action.data,
-            };
+const settingsSlice = createSlice({
+    name: 'settings',
+    initialState,
+    reducers: (create) => ({
+        changeFilter: create.reducer<ProblemFilterValue>((state, action) => {
+            state.problemFilter = action.payload;
+        }),
+        setSettingValue: create.reducer<{name: string; value: unknown}>((state, action) => {
+            state.userSettings[action.payload.name] = action.payload.value;
+        }),
+    }),
+    selectors: {
+        getSettingValue: (state, name: string) => state.userSettings[name],
+        selectProblemFilter: (state) => state.problemFilter,
+    },
+});
 
-        case SET_SETTING_VALUE: {
-            const newSettings = {
-                ...state.userSettings,
-                [action.data.name]: action.data.value,
-            };
+export const {changeFilter} = settingsSlice.actions;
+export const {getSettingValue, selectProblemFilter} = settingsSlice.selectors;
 
-            return {
-                ...state,
-                userSettings: newSettings,
-            };
-        }
-        case SET_USER_SETTINGS: {
-            return {
-                ...state,
-                userSettings: {
-                    ...state.userSettings,
-                    ...action.data,
-                },
-            };
-        }
-        default:
-            return state;
-    }
-};
-
-export const setSettingValue = (
-    name: string,
-    value: unknown,
-): ThunkAction<void, RootState, unknown, SetSettingValueAction> => {
-    return (dispatch) => {
-        dispatch({type: SET_SETTING_VALUE, data: {name, value}});
+export const setSettingValue = (name: string, value: unknown) => {
+    return (dispatch: AppDispatch) => {
+        dispatch(settingsSlice.actions.setSettingValue({name, value}));
 
         settingsManager.setUserSettingsValue(name, value);
     };
 };
 
-export const setUserSettings = (data: SettingsObject) => {
-    return {type: SET_USER_SETTINGS, data} as const;
-};
+export function syncUserSettingsFromLS(store: Store) {
+    if (typeof window === 'undefined') {
+        return;
+    }
 
-export const getSettingValue = (state: SettingsRootStateSlice, name: string) => {
-    return state.settings.userSettings[name];
-};
+    window.addEventListener('storage', (event) => {
+        if (event.key && event.key in DEFAULT_USER_SETTINGS) {
+            const name = event.key as keyof typeof DEFAULT_USER_SETTINGS;
+            let value = DEFAULT_USER_SETTINGS[name];
+            if (event.newValue !== null) {
+                value = parseJson(event.newValue);
+            }
+            store.dispatch(
+                settingsSlice.actions.setSettingValue({
+                    name,
+                    value,
+                }),
+            );
+        }
+    });
+}
 
-export const changeFilter = (filter: ProblemFilterValue) => {
-    return {
-        type: CHANGE_PROBLEM_FILTER,
-        data: filter,
-    } as const;
-};
-
-export const selectProblemFilter = (state: SettingsRootStateSlice) => state.settings.problemFilter;
-
-export default settings;
+export default settingsSlice.reducer;

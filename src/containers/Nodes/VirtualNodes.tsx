@@ -17,7 +17,11 @@ import type {
 } from '../../components/VirtualTable';
 import {ResizeableVirtualTable} from '../../components/VirtualTable/ResizeableVirtualTable';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import {ProblemFilterValues, changeFilter} from '../../store/reducers/settings/settings';
+import {
+    ProblemFilterValues,
+    changeFilter,
+    selectProblemFilter,
+} from '../../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
@@ -56,7 +60,7 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
 
     const dispatch = useTypedDispatch();
 
-    const problemFilter = useTypedSelector((state) => state.settings.problemFilter);
+    const problemFilter = useTypedSelector(selectProblemFilter);
 
     const filters = React.useMemo(() => {
         return [path, searchValue, problemFilter, uptimeFilter];
