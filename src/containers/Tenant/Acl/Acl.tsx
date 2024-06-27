@@ -1,7 +1,6 @@
 import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
-import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
@@ -10,7 +9,6 @@ import {schemaAclApi} from '../../../store/reducers/schemaAcl/schemaAcl';
 import type {TACE} from '../../../types/api/acl';
 import {cn} from '../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
-import {useTypedSelector} from '../../../utils/hooks';
 import i18n from '../i18n';
 
 import './Acl.scss';
@@ -71,11 +69,8 @@ const columns: Column<TACE>[] = [
     },
 ];
 
-export const Acl = () => {
-    const {currentSchemaPath} = useTypedSelector((state) => state.schema);
-    const {currentData, isFetching, error} = schemaAclApi.useGetSchemaAclQuery(
-        currentSchemaPath ? {path: currentSchemaPath} : skipToken,
-    );
+export const Acl = ({path}: {path: string}) => {
+    const {currentData, isFetching, error} = schemaAclApi.useGetSchemaAclQuery({path});
 
     const loading = isFetching && !currentData;
     const {acl, owner} = currentData || {};

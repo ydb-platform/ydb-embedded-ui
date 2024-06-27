@@ -36,9 +36,6 @@ const paramSetup: ParamSetup = {
             stateKey: 'heatmap.currentMetric',
             initialState: initialHeatmapState.currentMetric,
         },
-        schema: {
-            stateKey: 'schema.currentSchemaPath',
-        },
         stateFilter: {
             stateKey: 'tablets.stateFilter',
             type: 'array',

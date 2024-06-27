@@ -67,6 +67,7 @@ const initialTenantCommonInfoState = {
 };
 
 interface QueryEditorProps {
+    tenantName: string;
     path: string;
     changeUserInput: (arg: {input: string}) => void;
     goToNextQuery: (...args: Parameters<typeof goToNextQuery>) => void;
@@ -83,6 +84,7 @@ interface QueryEditorProps {
 function QueryEditor(props: QueryEditorProps) {
     const editorOptions = useEditorOptions();
     const {
+        tenantName,
         path,
         setTenantPath: setPath,
         executeQuery,
@@ -110,13 +112,13 @@ function QueryEditor(props: QueryEditorProps) {
     const [sendExplainQuery, explainQueryResult] = explainQueryApi.useExplainQueryMutation();
 
     React.useEffect(() => {
-        if (savedPath !== path) {
+        if (savedPath !== tenantName) {
             if (savedPath) {
                 changeUserInput({input: ''});
             }
-            setPath(path);
+            setPath(tenantName);
         }
-    }, [changeUserInput, setPath, path, savedPath]);
+    }, [changeUserInput, setPath, tenantName, savedPath]);
 
     const [resultVisibilityState, dispatchResultVisibilityState] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
@@ -205,7 +207,7 @@ function QueryEditor(props: QueryEditorProps) {
         setResultType(RESULT_TYPES.EXECUTE);
         sendExecuteQuery({
             query,
-            database: path,
+            database: tenantName,
             mode,
             schema,
         });
@@ -229,7 +231,7 @@ function QueryEditor(props: QueryEditorProps) {
         setResultType(RESULT_TYPES.EXPLAIN);
         sendExplainQuery({
             query: input,
-            database: path,
+            database: tenantName,
             mode: mode,
         });
         setIsResultLoaded(true);
@@ -431,6 +433,7 @@ function QueryEditor(props: QueryEditorProps) {
                         type={type}
                         theme={theme}
                         resultType={resultType}
+                        tenantName={tenantName}
                         path={path}
                         showPreview={showPreview}
                     />
@@ -469,6 +472,7 @@ interface ResultProps {
     type?: EPathType;
     theme: string;
     resultType: ValueOf<typeof RESULT_TYPES> | undefined;
+    tenantName: string;
     path: string;
     showPreview?: boolean;
 }
@@ -484,11 +488,12 @@ function Result({
     type,
     theme,
     resultType,
+    tenantName,
     path,
     showPreview,
 }: ResultProps) {
     if (showPreview) {
-        return <Preview database={path} type={type} />;
+        return <Preview database={tenantName} path={path} type={type} />;
     }
 
     if (resultType === RESULT_TYPES.EXECUTE) {

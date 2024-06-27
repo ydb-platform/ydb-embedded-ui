@@ -1,18 +1,17 @@
 import React from 'react';
 
-import qs from 'qs';
 import {Helmet} from 'react-helmet-async';
-import {useLocation} from 'react-router';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AccessDenied} from '../../components/Errors/403';
+import {Loader} from '../../components/Loader';
 import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {getSchema} from '../../store/reducers/schema/schema';
+import {schemaApi} from '../../store/reducers/schema/schema';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
-import type {TEvDescribeSchemeResult} from '../../types/api/schema';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useTypedDispatch} from '../../utils/hooks';
 
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
@@ -47,37 +46,16 @@ function Tenant(props: TenantProps) {
         undefined,
         getTenantSummaryState,
     );
+
+    const [{name: tenantName, schema}] = useQueryParams({name: StringParam, schema: StringParam});
+
+    if (!tenantName) {
+        throw new Error('Tenant name is not defined');
+    }
+
     const previousTenant = React.useRef<string>();
-
-    const {currentSchemaPath, currentSchema: currentItem = {}} = useTypedSelector(
-        (state) => state.schema,
-    );
-
-    const {PathType: preloadedPathType, PathSubType: preloadedPathSubType} =
-        useTypedSelector((state) =>
-            currentSchemaPath
-                ? state.schema.data[currentSchemaPath]?.PathDescription?.Self
-                : undefined,
-        ) || {};
-
-    const {PathType: currentPathType, PathSubType: currentPathSubType} =
-        (currentItem as TEvDescribeSchemeResult).PathDescription?.Self || {};
-
-    const {error: {status: schemaStatus = 200} = {}} = useTypedSelector((state) => state.schema);
-
-    const dispatch = useTypedDispatch();
-
-    const location = useLocation();
-
-    const queryParams = qs.parse(location.search, {
-        ignoreQueryPrefix: true,
-    });
-
-    const {name} = queryParams;
-    const tenantName = name as string;
-
     React.useEffect(() => {
-        if (tenantName && typeof tenantName === 'string' && previousTenant.current !== tenantName) {
+        if (previousTenant.current !== tenantName) {
             const register = async () => {
                 const {registerYQLCompletionItemProvider} = await import(
                     '../../utils/monaco/yql/yql.completionItemProvider'
@@ -89,22 +67,25 @@ function Tenant(props: TenantProps) {
         }
     }, [tenantName]);
 
+    const dispatch = useTypedDispatch();
     React.useEffect(() => {
-        dispatch(getSchema({path: tenantName}));
+        dispatch(setHeaderBreadcrumbs('tenant', {tenantName}));
     }, [tenantName, dispatch]);
 
-    React.useEffect(() => {
-        //TODO: should be refactored when move to @reduxjs/toolkit/query
-        if (currentSchemaPath && currentSchemaPath !== tenantName) {
-            dispatch(getSchema({path: currentSchemaPath}));
-        }
-    }, [currentSchemaPath, dispatch, tenantName]);
+    const path = schema ?? tenantName;
 
-    React.useEffect(() => {
-        if (tenantName) {
-            dispatch(setHeaderBreadcrumbs('tenant', {tenantName}));
-        }
-    }, [tenantName, dispatch]);
+    const {
+        currentData: currentItem,
+        error,
+        isLoading,
+    } = schemaApi.useGetSchemaQuery({path}, {refetchOnMountOrArgChange: true});
+    const {PathType: currentPathType, PathSubType: currentPathSubType} =
+        currentItem?.PathDescription?.Self || {};
+
+    let showBlockingError = false;
+    if (error && typeof error === 'object' && 'status' in error) {
+        showBlockingError = error.status === 403;
+    }
 
     const onCollapseSummaryHandler = () => {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
@@ -117,9 +98,7 @@ function Tenant(props: TenantProps) {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.clear);
     };
 
-    const showBlockingError = schemaStatus === 403;
-
-    const title = currentSchemaPath || tenantName || i18n('page.title');
+    const title = path || i18n('page.title');
     return (
         <div className={b()}>
             <Helmet
@@ -138,19 +117,27 @@ function Tenant(props: TenantProps) {
                     onSplitStartDragAdditional={onSplitStartDragAdditional}
                 >
                     <ObjectSummary
-                        type={preloadedPathType || currentPathType}
-                        subType={preloadedPathSubType || currentPathSubType}
+                        type={currentPathType}
+                        subType={currentPathSubType}
                         tenantName={tenantName}
+                        path={path}
                         onCollapseSummary={onCollapseSummaryHandler}
                         onExpandSummary={onExpandSummaryHandler}
                         isCollapsed={summaryVisibilityState.collapsed}
                     />
-                    <ObjectGeneral
-                        type={preloadedPathType || currentPathType}
-                        additionalTenantProps={props.additionalTenantProps}
-                        additionalNodesProps={props.additionalNodesProps}
-                        tenantName={tenantName}
-                    />
+                    <div className={b('main')}>
+                        {isLoading ? (
+                            <Loader size="l" />
+                        ) : (
+                            <ObjectGeneral
+                                type={currentPathType}
+                                additionalTenantProps={props.additionalTenantProps}
+                                additionalNodesProps={props.additionalNodesProps}
+                                tenantName={tenantName}
+                                path={path}
+                            />
+                        )}
+                    </div>
                 </SplitPane>
             )}
         </div>
