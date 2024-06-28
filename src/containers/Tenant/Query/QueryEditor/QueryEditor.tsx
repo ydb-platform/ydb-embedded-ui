@@ -29,7 +29,7 @@ import {
     LAST_USED_QUERY_ACTION_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../../utils/constants';
-import {useQueryModes, useSetting, useTypedDispatch} from '../../../../utils/hooks';
+import {useQueryModes, useSetting} from '../../../../utils/hooks';
 import {LANGUAGE_YQL_ID} from '../../../../utils/monaco/yql/constants';
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
@@ -74,6 +74,7 @@ interface QueryEditorProps {
     goToNextQuery: (...args: Parameters<typeof goToNextQuery>) => void;
     goToPreviousQuery: (...args: Parameters<typeof goToPreviousQuery>) => void;
     setTenantPath: (...args: Parameters<typeof setTenantPath>) => void;
+    setQueryAction: (...args: Parameters<typeof setQueryAction>) => void;
     executeQuery: ExecuteQueryState;
     theme: string;
     type?: EPathType;
@@ -83,12 +84,12 @@ interface QueryEditorProps {
 }
 
 function QueryEditor(props: QueryEditorProps) {
-    const dispatch = useTypedDispatch();
     const editorOptions = useEditorOptions();
     const {
         tenantName,
         path,
         setTenantPath: setPath,
+        setQueryAction,
         executeQuery,
         type,
         theme,
@@ -320,7 +321,7 @@ function QueryEditor(props: QueryEditorProps) {
             label: i18n('action.save-query'),
             keybindings: [keybindings.saveQuery],
             run: () => {
-                dispatch(setQueryAction('save'));
+                setQueryAction('save');
             },
         });
     };
@@ -422,6 +423,7 @@ const mapDispatchToProps = {
     goToNextQuery,
     setShowPreview,
     setTenantPath,
+    setQueryAction,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryEditor);

@@ -4,6 +4,7 @@ import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
 import {
     clearQueryNameToEdit,
+    saveQuery,
     selectQueryAction,
     selectQueryName,
     setQueryAction,
@@ -11,7 +12,7 @@ import {
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {CtrlCmd, formatShortcut} from '../../../../utils/keyboard';
-import {useSaveQuery, useSavedQueries} from '../utils/queryActions';
+import {useSavedQueries} from '../utils/useSavedQueries';
 
 import i18n from './i18n';
 
@@ -27,15 +28,13 @@ export function SaveQuery({isSaveButtonDisabled}: SaveQueryProps) {
     const dispatch = useTypedDispatch();
     const queryNameToEdit = useTypedSelector(selectQueryName);
 
-    const saveQuery = useSaveQuery();
-
     const onSaveQueryClick = () => {
         dispatch(setQueryAction('save'));
         dispatch(clearQueryNameToEdit());
     };
 
     const onEditQueryClick = () => {
-        saveQuery(queryNameToEdit);
+        dispatch(saveQuery(queryNameToEdit));
         dispatch(clearQueryNameToEdit());
     };
 
@@ -80,7 +79,6 @@ export function SaveQuery({isSaveButtonDisabled}: SaveQueryProps) {
 
 export function SaveQueryDialog() {
     const savedQueries = useSavedQueries();
-    const saveQuery = useSaveQuery();
     const dispatch = useTypedDispatch();
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const queryAction = useTypedSelector(selectQueryAction);
@@ -110,7 +108,7 @@ export function SaveQueryDialog() {
             return;
         }
 
-        saveQuery(queryName);
+        dispatch(saveQuery(queryName));
         onCloseDialog();
     };
 

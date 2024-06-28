@@ -7,7 +7,7 @@ import {Button, Dialog, Icon} from '@gravity-ui/uikit';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {setQueryNameToEdit} from '../../../../store/reducers/queryActions';
+import {deleteSavedQuery, setQueryNameToEdit} from '../../../../store/reducers/queryActions';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {SavedQuery} from '../../../../types/store/query';
@@ -15,7 +15,7 @@ import {cn} from '../../../../utils/cn';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
-import {useDeleteSavedQuery, useSavedQueries} from '../utils/queryActions';
+import {useSavedQueries} from '../utils/useSavedQueries';
 
 import './SavedQueries.scss';
 
@@ -60,7 +60,6 @@ interface SavedQueriesProps {
 
 export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
     const savedQueries = useSavedQueries();
-    const handleDeleteQuery = useDeleteSavedQuery();
     const dispatch = useTypedDispatch();
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
@@ -77,7 +76,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
 
     const onConfirmDeleteClick = () => {
         closeDeleteDialog();
-        handleDeleteQuery(queryNameToDelete);
+        dispatch(deleteSavedQuery(queryNameToDelete));
         setQueryNameToDelete('');
     };
 
