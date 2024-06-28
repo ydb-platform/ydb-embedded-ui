@@ -1,7 +1,7 @@
 import type {PayloadAction} from '@reduxjs/toolkit';
 import {createSlice} from '@reduxjs/toolkit';
 
-import {SAVED_QUERIES_KEY} from '../../lib';
+import {SAVED_QUERIES_KEY} from '../../../src/utils/constants';
 import type {SavedQuery} from '../../types/store/query';
 import type {AppDispatch, GetState} from '../defaultStore';
 
