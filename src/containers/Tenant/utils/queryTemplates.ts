@@ -42,6 +42,17 @@ CREATE TABLE \`${path}/ydb_column_table\` (
 PARTITION BY HASH(id)
 WITH (STORE = COLUMN)`;
 };
+export const createAsyncReplicationTemplate = () => {
+    return `CREATE ASYNC REPLICATION my_replication
+FOR <remote_table_name> AS <local_table_name> [, <remote_table_name> AS <local_table_name> ...]
+WITH (
+    ENDPOINT=<endpoint>, -- endpoint, e.g. grpcs://mydb.ydb.tech:2135/
+    DATABASE=<path_to_database>, --/cluster/dynamo
+    USER=<user>,
+    PASSWORD=<pwd>,
+    ...
+);`;
+};
 export const alterTableTemplate = (path: string) => {
     return `ALTER TABLE \`${path}\`
     ADD COLUMN is_deleted Bool;`;
