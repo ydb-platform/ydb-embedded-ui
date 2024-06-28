@@ -139,14 +139,14 @@ export const formatCPUWithLabel = (value?: number) => {
     return `${localizedCores} ${i18n('format-cpu.cores', {count: cores})}`;
 };
 
-export const formatDateTime = (value?: number | string) => {
+export const formatDateTime = (value?: number | string, defaultValue = 'N/A') => {
     if (!isNumeric(value)) {
         return '';
     }
 
     const formattedData = dateTimeParse(Number(value))?.format('YYYY-MM-DD HH:mm');
 
-    return Number(value) > 0 && formattedData ? formattedData : 'N/A';
+    return Number(value) > 0 && formattedData ? formattedData : defaultValue;
 };
 
 export const calcUptimeInSeconds = (milliseconds: number | string) => {

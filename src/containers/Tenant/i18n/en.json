@@ -6,6 +6,8 @@
   "acl.empty": "No Acl data",
   "summary.navigation": "Navigation",
   "summary.showPreview": "Show preview",
+  "summary.source-type": "Source Type",
+  "summary.data-source": "Data Source",
   "summary.copySchemaPath": "Copy schema path",
   "summary.type": "Type",
   "summary.subtype": "SubType",
