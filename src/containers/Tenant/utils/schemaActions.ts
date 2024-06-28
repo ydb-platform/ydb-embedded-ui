@@ -11,6 +11,7 @@ import i18n from '../i18n';
 import {
     alterTableTemplate,
     alterTopicTemplate,
+    createColumnTableTemplate,
     createExternalTableTemplate,
     createTableTemplate,
     createTopicTemplate,
@@ -47,6 +48,7 @@ const bindActions = (
 
     return {
         createTable: inputQuery(createTableTemplate, 'script'),
+        createColumnTable: inputQuery(createColumnTableTemplate, 'script'),
         alterTable: inputQuery(alterTableTemplate, 'script'),
         selectQuery: inputQuery(selectQueryTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
@@ -89,6 +91,7 @@ export const getActions =
             [copyItem],
             [
                 {text: i18n('actions.createTable'), action: actions.createTable},
+                {text: i18n('actions.createColumnTable'), action: actions.createColumnTable},
                 {text: i18n('actions.createTopic'), action: actions.createTopic},
                 {text: i18n('actions.createView'), action: actions.createView},
             ],

@@ -19,6 +19,7 @@
   "actions.createTable": "Create table...",
   "actions.createExternalTable": "Create external table...",
   "actions.createTopic": "Create topic...",
+  "actions.createColumnTable": "Create column table...",
   "actions.createView": "Create view...",
   "actions.dropTable": "Drop table...",
   "actions.dropTopic": "Drop topic...",
