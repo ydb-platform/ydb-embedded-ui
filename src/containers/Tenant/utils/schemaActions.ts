@@ -99,8 +99,8 @@ export const getActions =
 
         const DIR_SET: ActionsSet = [
             [copyItem],
+            [{text: i18n('actions.createDirectory'), action: actions.createDirectory}],
             [
-                {text: i18n('actions.createDirectory'), action: actions.createDirectory},
                 {text: i18n('actions.createTable'), action: actions.createTable},
                 {text: i18n('actions.createColumnTable'), action: actions.createColumnTable},
                 {

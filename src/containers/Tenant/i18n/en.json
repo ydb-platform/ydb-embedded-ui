@@ -41,7 +41,7 @@
   "actions.upsertQuery": "Upsert query...",
   "actions.alterReplication": "Alter async replicaton...",
   "actions.dropReplication": "Drop async replicaton...",
-  "actions.createDirectory": "Create directory...",
+  "actions.createDirectory": "Create directory",
   "schema.tree.dialog.placeholder": "Relative path",
   "schema.tree.dialog.header": "Create directory",
   "schema.tree.dialog.description": "Inside directory",
