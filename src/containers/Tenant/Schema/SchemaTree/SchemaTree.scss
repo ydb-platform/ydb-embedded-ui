@@ -1,0 +1,14 @@
+@import '../../../../styles/mixins.scss';
+
+.ydb-schema-tree {
+    &__modal {
+        max-height: 100%;
+        @include flex-container();
+    }
+    &__label {
+        margin-bottom: 10px;
+    }
+    &__description {
+        opacity: 0.6;
+    }
+}

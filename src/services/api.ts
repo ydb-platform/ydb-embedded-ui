@@ -635,6 +635,20 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             requestConfig: {signal},
         });
     }
+
+    createSchemaDirectory(database: string, path: string, {signal}: {signal?: AbortSignal} = {}) {
+        return this.post<{test: string}>(
+            this.getPath('/scheme/directory'),
+            {},
+            {
+                database,
+                path,
+            },
+            {
+                requestConfig: {signal},
+            },
+        );
+    }
 }
 
 export class YdbWebVersionAPI extends YdbEmbeddedAPI {

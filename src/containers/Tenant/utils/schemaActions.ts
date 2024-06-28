@@ -29,6 +29,7 @@ import {
 interface ActionsAdditionalEffects {
     setQueryMode: (mode: QueryMode) => void;
     setActivePath: (path: string) => void;
+    showCreateDirectoryDialog: (path: string) => void;
 }
 
 const bindActions = (
@@ -36,7 +37,7 @@ const bindActions = (
     dispatch: React.Dispatch<any>,
     additionalEffects: ActionsAdditionalEffects,
 ) => {
-    const {setActivePath, setQueryMode} = additionalEffects;
+    const {setActivePath, setQueryMode, showCreateDirectoryDialog} = additionalEffects;
 
     const inputQuery = (tmpl: (path: string) => string, mode?: QueryMode) => () => {
         if (mode) {
@@ -50,6 +51,9 @@ const bindActions = (
     };
 
     return {
+        createDirectory: () => {
+            showCreateDirectoryDialog(path);
+        },
         createTable: inputQuery(createTableTemplate, 'script'),
         createColumnTable: inputQuery(createColumnTableTemplate, 'script'),
         createAsyncReplication: inputQuery(createAsyncReplicationTemplate, 'script'),
@@ -96,6 +100,7 @@ export const getActions =
         const DIR_SET: ActionsSet = [
             [copyItem],
             [
+                {text: i18n('actions.createDirectory'), action: actions.createDirectory},
                 {text: i18n('actions.createTable'), action: actions.createTable},
                 {text: i18n('actions.createColumnTable'), action: actions.createColumnTable},
                 {
