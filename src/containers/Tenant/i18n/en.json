@@ -1,19 +1,28 @@
 {
   "page.title": "Database",
-
   "pages.query": "Query",
   "pages.diagnostics": "Diagnostics",
-
   "acl.owner": "Owner",
   "acl.empty": "No Acl data",
-
   "summary.navigation": "Navigation",
   "summary.showPreview": "Show preview",
+  "summary.source-type": "Source Type",
+  "summary.data-source": "Data Source",
   "summary.copySchemaPath": "Copy schema path",
-
+  "summary.type": "Type",
+  "summary.subtype": "SubType",
+  "summary.id": "Id",
+  "summary.version": "Version",
+  "summary.created": "Created",
+  "summary.partitions": "Partitions count",
+  "summary.paths": "Paths",
+  "summary.shards": "Shards",
+  "summary.state": "State",
+  "summary.mode": "Mode",
+  "summary.format": "Format",
+  "summary.retention": "Retention",
   "actions.copied": "The path is copied to the clipboard",
   "actions.notCopied": "Couldn’t copy the path",
-
   "actions.copyPath": "Copy path",
   "actions.openPreview": "Open preview",
   "actions.createTable": "Create table...",

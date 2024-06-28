@@ -11,13 +11,12 @@ import {StringParam, useQueryParam} from 'use-query-params';
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {ClipboardButton} from '../../../components/ClipboardButton';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
-import {
-    CDCStreamOverview,
-    PersQueueGroupOverview,
-} from '../../../components/InfoViewer/schemaOverview';
+import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
+import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {Loader} from '../../../components/Loader';
 import SplitPane from '../../../components/SplitPane';
-import routes, {createHref} from '../../../routes';
+import {getEntityName} from '../../../containers/Tenant/utils';
+import routes, {createExternalUILink, createHref} from '../../../routes';
 import {schemaApi, setShowPreview} from '../../../store/reducers/schema/schema';
 import {
     TENANT_PAGES_IDS,
@@ -25,18 +24,15 @@ import {
     TENANT_SUMMARY_TABS_IDS,
 } from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setSummaryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import type {EPathSubType} from '../../../types/api/schema';
-import {EPathType} from '../../../types/api/schema';
+import {EPathSubType, EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
 } from '../../../utils/constants';
-import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
+import {formatDateTime, formatSecondsToHours} from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Acl} from '../Acl/Acl';
-import {ExternalDataSourceSummary} from '../Info/ExternalDataSource/ExternalDataSource';
-import {ExternalTableSummary} from '../Info/ExternalTable/ExternalTable';
 import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
@@ -137,65 +133,148 @@ export function ObjectSummary({
     };
 
     const renderObjectOverview = () => {
-        const startTimeInMilliseconds = Number(currentSchemaData?.CreateStep);
-        const createdAt = startTimeInMilliseconds
-            ? formatDateTime(startTimeInMilliseconds)
-            : 'unknown';
-        const createdAtLabel = 'Created At';
+        if (!currentSchemaData) {
+            return undefined;
+        }
+        const {CreateStep, PathType, PathSubType, PathId, PathVersion} = currentSchemaData;
 
-        // verbose mapping to guarantee a correct render for new path types
-        // TS will error when a new type is added but not mapped here
-        const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
-            [EPathType.EPathTypeInvalid]: undefined,
-            [EPathType.EPathTypeDir]: undefined,
-            [EPathType.EPathTypeTable]: undefined,
-            [EPathType.EPathTypeSubDomain]: undefined,
-            [EPathType.EPathTypeTableIndex]: undefined,
-            [EPathType.EPathTypeExtSubDomain]: undefined,
-            [EPathType.EPathTypeColumnStore]: undefined,
-            [EPathType.EPathTypeColumnTable]: undefined,
-            [EPathType.EPathTypeCdcStream]: () => <CDCStreamOverview data={currentObjectData} />,
-            [EPathType.EPathTypePersQueueGroup]: () => (
-                <PersQueueGroupOverview data={currentObjectData} />
-            ),
-            [EPathType.EPathTypeExternalTable]: () => (
-                <ExternalTableSummary data={currentObjectData} />
-            ),
-            [EPathType.EPathTypeExternalDataSource]: () => (
-                <ExternalDataSourceSummary data={currentObjectData} />
-            ),
-            [EPathType.EPathTypeView]: undefined,
-            [EPathType.EPathTypeReplication]: () => (
-                <InfoViewer
-                    info={[
-                        {
-                            label: createdAtLabel,
-                            value: createdAt,
-                        },
-                        {
-                            label: 'State',
-                            value: (
-                                <AsyncReplicationState
-                                    state={
-                                        currentObjectData?.PathDescription?.ReplicationDescription
-                                            ?.State
-                                    }
-                                />
-                            ),
-                        },
-                    ]}
-                />
-            ),
-        };
+        const overview: InfoViewerItem[] = [];
 
-        let component =
-            currentSchemaData?.PathType && pathTypeToComponent[currentSchemaData.PathType]?.();
+        overview.push({label: i18n('summary.type'), value: PathType?.replace(/^EPathType/, '')});
 
-        if (!component) {
-            component = <InfoViewer info={[{label: createdAtLabel, value: createdAt}]} />;
+        if (PathSubType !== EPathSubType.EPathSubTypeEmpty) {
+            overview.push({
+                label: i18n('summary.subtype'),
+                value: PathSubType?.replace(/^EPathSubType/, ''),
+            });
         }
 
-        return component;
+        overview.push({label: i18n('summary.id'), value: PathId});
+
+        overview.push({label: i18n('summary.version'), value: PathVersion});
+
+        overview.push({
+            label: i18n('summary.created'),
+            value: formatDateTime(CreateStep, ''),
+        });
+
+        const {PathDescription} = currentObjectData;
+        const title = getEntityName(PathDescription);
+
+        const getPathTypeOverview: Record<EPathType, (() => InfoViewerItem[]) | undefined> = {
+            [EPathType.EPathTypeInvalid]: undefined,
+            [EPathType.EPathTypeDir]: undefined,
+            [EPathType.EPathTypeTable]: () => [
+                {
+                    label: i18n('summary.partitions'),
+                    value: PathDescription?.TablePartitions?.length,
+                },
+            ],
+            [EPathType.EPathTypeSubDomain]: undefined,
+            [EPathType.EPathTypeTableIndex]: undefined,
+            [EPathType.EPathTypeExtSubDomain]: () => [
+                {
+                    label: i18n('summary.paths'),
+                    value: PathDescription?.DomainDescription?.PathsInside,
+                },
+                {
+                    label: i18n('summary.shards'),
+                    value: PathDescription?.DomainDescription?.ShardsInside,
+                },
+            ],
+            [EPathType.EPathTypeColumnStore]: () => [
+                {
+                    label: i18n('summary.partitions'),
+                    value: PathDescription?.ColumnStoreDescription?.ColumnShards?.length,
+                },
+            ],
+            [EPathType.EPathTypeColumnTable]: () => [
+                {
+                    label: i18n('summary.partitions'),
+                    value: PathDescription?.ColumnTableDescription?.Sharding?.ColumnShards?.length,
+                },
+            ],
+            [EPathType.EPathTypeCdcStream]: () => {
+                const {Mode, Format} = PathDescription?.CdcStreamDescription || {};
+
+                return [
+                    {
+                        label: i18n('summary.mode'),
+                        value: Mode?.replace(/^ECdcStreamMode/, ''),
+                    },
+                    {
+                        label: i18n('summary.format'),
+                        value: Format?.replace(/^ECdcStreamFormat/, ''),
+                    },
+                ];
+            },
+            [EPathType.EPathTypePersQueueGroup]: () => {
+                const pqGroup = PathDescription?.PersQueueGroup;
+                const value = pqGroup?.PQTabletConfig?.PartitionConfig?.LifetimeSeconds;
+
+                return [
+                    {
+                        label: i18n('summary.partitions'),
+                        value: pqGroup?.Partitions?.length,
+                    },
+                    {
+                        label: i18n('summary.retention'),
+                        value: value && formatSecondsToHours(value),
+                    },
+                ];
+            },
+            [EPathType.EPathTypeExternalTable]: () => {
+                const pathToDataSource = createExternalUILink({
+                    ...queryParams,
+                    schema: PathDescription?.ExternalTableDescription?.DataSourcePath,
+                });
+
+                const {SourceType, DataSourcePath} =
+                    PathDescription?.ExternalTableDescription || {};
+
+                const dataSourceName = DataSourcePath?.match(/([^/]*)\/*$/)?.[1] || '';
+
+                return [
+                    {label: i18n('summary.source-type'), value: SourceType},
+                    {
+                        label: i18n('summary.data-source'),
+                        value: DataSourcePath && (
+                            <span title={DataSourcePath}>
+                                <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
+                            </span>
+                        ),
+                    },
+                ];
+            },
+            [EPathType.EPathTypeExternalDataSource]: () => [
+                {
+                    label: i18n('summary.source-type'),
+                    value: PathDescription?.ExternalDataSourceDescription?.SourceType,
+                },
+            ],
+            [EPathType.EPathTypeView]: undefined,
+            [EPathType.EPathTypeReplication]: () => {
+                const state = PathDescription?.ReplicationDescription?.State;
+
+                if (!state) {
+                    return [];
+                }
+
+                return [
+                    {
+                        label: i18n('summary.state'),
+                        value: <AsyncReplicationState state={state} />,
+                    },
+                ];
+            },
+        };
+
+        const pathTypeOverview = (PathType && getPathTypeOverview[PathType]?.()) || [];
+        overview.push(...pathTypeOverview);
+
+        // filter all empty values in according this requirement
+        // https://github.com/ydb-platform/ydb-embedded-ui/issues/906
+        return <InfoViewer title={title} info={overview.filter((i) => i.value)} />;
     };
 
     const renderTabContent = () => {
