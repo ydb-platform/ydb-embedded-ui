@@ -175,11 +175,11 @@ export function ObjectSummary({
             [EPathType.EPathTypeExtSubDomain]: () => [
                 {
                     label: i18n('summary.paths'),
-                    value: PathDescription?.DomainDescription?.PathsInside?.length,
+                    value: PathDescription?.DomainDescription?.PathsInside,
                 },
                 {
                     label: i18n('summary.shards'),
-                    value: PathDescription?.DomainDescription?.ShardsInside?.length,
+                    value: PathDescription?.DomainDescription?.ShardsInside,
                 },
             ],
             [EPathType.EPathTypeColumnStore]: () => [
