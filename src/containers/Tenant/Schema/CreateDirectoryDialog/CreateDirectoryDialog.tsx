@@ -11,22 +11,42 @@ const b = cn('ydb-schema-create-directory-dialog');
 interface SchemaTreeProps {
     open: boolean;
     parent: string;
+    isLoading: boolean;
     onClose: () => void;
     onSubmit: (value: string) => void;
+    onUpdate: (value: string) => void;
+    error: string;
 }
 
 export function CreateDirectoryDialog(props: SchemaTreeProps) {
-    const {open, parent, onClose, onSubmit} = props;
+    const {open, parent, isLoading, onClose, onSubmit, onUpdate, error} = props;
     const [child, setChild] = React.useState('');
 
     const handleClose = () => {
-        setChild('');
         onClose();
     };
+
     const handleSubmit = () => {
-        setChild('');
         onSubmit(child);
     };
+
+    const handleUpdate = (value: string) => {
+        setChild(value);
+    };
+
+    React.useEffect(() => {
+        if (!open) {
+            setChild('');
+        }
+    }, [open]);
+
+    React.useEffect(() => {
+        onUpdate(child);
+    }, [onUpdate, child]);
+
+    const invalid = React.useMemo(() => {
+        return /\s/.test(child);
+    }, [child]);
 
     return (
         <Dialog open={open} onClose={handleClose} onEnterKeyDown={handleSubmit}>
@@ -39,12 +59,16 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
                 <TextInput
                     placeholder={i18n('schema.tree.dialog.placeholder')}
                     value={child}
-                    onUpdate={setChild}
+                    onUpdate={handleUpdate}
                     autoFocus
                     hasClear
+                    disabled={isLoading}
+                    validationState={error || invalid ? 'invalid' : undefined}
                 />
+                {error && <div className={b('error')}>{error}</div>}
             </Dialog.Body>
             <Dialog.Footer
+                loading={isLoading}
                 textButtonApply={i18n('schema.tree.dialog.buttonApply')}
                 textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
                 onClickButtonCancel={handleClose}

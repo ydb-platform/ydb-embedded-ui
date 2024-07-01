@@ -1,14 +1,13 @@
-@import '../../../../styles/mixins.scss';
-
 .ydb-schema-create-directory-dialog {
-    &__modal {
-        max-height: 100%;
-        @include flex-container();
-    }
     &__label {
         margin-bottom: 10px;
     }
     &__description {
         color: var(--g-color-text-secondary);
+    }
+    &__error {
+        margin-top: 10px;
+
+        color: var(--g-color-private-red-450);
     }
 }

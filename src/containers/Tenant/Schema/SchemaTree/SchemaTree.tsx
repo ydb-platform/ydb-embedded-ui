@@ -28,18 +28,19 @@ export function SchemaTree(props: SchemaTreeProps) {
     const [_, setQueryMode] = useQueryModes();
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parent, setParent] = React.useState<string>('');
+    const [child, setChild] = React.useState<string>('');
     const [navigationTreeKey, setNavigationTreeKey] = React.useState('');
+    const [error, setError] = React.useState<string>('');
+    const [createDirectory, createDirectoryResult] = schemaApi.useCreateDirectoryMutation();
 
-    const [createDirectory, {isSuccess, requestId}] = schemaApi.useCreateDirectoryMutation();
-
-    const fetchPath = async (path: string) => {
+    const fetchPath = async (value: string) => {
         const promise = dispatch(
-            schemaApi.endpoints.getSchema.initiate({path}, {forceRefetch: true}),
+            schemaApi.endpoints.getSchema.initiate({path: value}, {forceRefetch: true}),
         );
         const {data} = await promise;
         promise.unsubscribe();
         if (!data) {
-            throw new Error(`no describe data about path ${path}`);
+            throw new Error(`no describe data about path ${value}`);
         }
         const {PathDescription: {Children = []} = {}} = data;
 
@@ -59,10 +60,20 @@ export function SchemaTree(props: SchemaTreeProps) {
     };
 
     React.useEffect(() => {
-        if (isSuccess) {
-            setNavigationTreeKey(requestId);
+        if (createDirectoryResult.isSuccess) {
+            setNavigationTreeKey(createDirectoryResult.requestId);
+            onActivePathUpdate(`${parent}/${child}`);
+            setCreateDirectoryOpen(false);
         }
-    }, [isSuccess, requestId]);
+    }, [createDirectoryResult, onActivePathUpdate, parent, child]);
+
+    React.useEffect(() => {
+        if (createDirectoryResult.isError) {
+            const errorMessage =
+                (createDirectoryResult.error as {data: string})?.data || ' Unknown error';
+            setError(errorMessage);
+        }
+    }, [createDirectoryResult]);
 
     React.useEffect(() => {
         // if the cached path is not in the current tree, show root
@@ -75,18 +86,19 @@ export function SchemaTree(props: SchemaTreeProps) {
         setCreateDirectoryOpen(false);
     };
 
-    const handleCreateDirectorySubmit = (child: string) => {
-        createDirectory({database: parent, path: `${parent}/${child}`});
-
-        onActivePathUpdate(`${parent}/${child}`);
-
-        setCreateDirectoryOpen(false);
+    const handleCreateDirectorySubmit = (value: string) => {
+        setChild(value);
+        createDirectory({database: parent, path: `${parent}/${value}`});
     };
 
-    const handleOpenCreateDirectoryDialog = (path: string) => {
-        setParent(path);
+    const handleOpenCreateDirectoryDialog = (value: string) => {
+        setParent(value);
         setCreateDirectoryOpen(true);
     };
+
+    const handleCreateDirectoryUpdate = React.useCallback(() => {
+        setError('');
+    }, []);
 
     return (
         <React.Fragment>
@@ -95,6 +107,9 @@ export function SchemaTree(props: SchemaTreeProps) {
                 parent={parent}
                 onClose={handleCreateDirectoryClose}
                 onSubmit={handleCreateDirectorySubmit}
+                onUpdate={handleCreateDirectoryUpdate}
+                isLoading={createDirectoryResult.isLoading}
+                error={error}
             />
             <NavigationTree
                 key={navigationTreeKey}
