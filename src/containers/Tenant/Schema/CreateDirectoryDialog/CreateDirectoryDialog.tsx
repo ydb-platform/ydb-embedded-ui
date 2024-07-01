@@ -29,7 +29,7 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
     };
 
     return (
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose} onEnterKeyDown={handleSubmit}>
             <Dialog.Header caption={i18n('schema.tree.dialog.header')} />
             <Dialog.Body className={b('modal')}>
                 <div className={b('label')}>
