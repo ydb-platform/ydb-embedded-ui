@@ -27,11 +27,8 @@ export function SchemaTree(props: SchemaTreeProps) {
 
     const [_, setQueryMode] = useQueryModes();
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
-    const [parent, setParent] = React.useState<string>('');
-    const [child, setChild] = React.useState<string>('');
-    const [navigationTreeKey, setNavigationTreeKey] = React.useState('');
-    const [error, setError] = React.useState<string>('');
-    const [createDirectory, createDirectoryResult] = schemaApi.useCreateDirectoryMutation();
+    const [parentPath, setParentPath] = React.useState('');
+    const [path, setPath] = React.useState('');
 
     const fetchPath = async (value: string) => {
         const promise = dispatch(
@@ -58,23 +55,6 @@ export function SchemaTree(props: SchemaTreeProps) {
 
         return childItems;
     };
-
-    React.useEffect(() => {
-        if (createDirectoryResult.isSuccess) {
-            setNavigationTreeKey(createDirectoryResult.requestId);
-            onActivePathUpdate(`${parent}/${child}`);
-            setCreateDirectoryOpen(false);
-        }
-    }, [createDirectoryResult, onActivePathUpdate, parent, child]);
-
-    React.useEffect(() => {
-        if (createDirectoryResult.isError) {
-            const errorMessage =
-                (createDirectoryResult.error as {data: string})?.data || ' Unknown error';
-            setError(errorMessage);
-        }
-    }, [createDirectoryResult]);
-
     React.useEffect(() => {
         // if the cached path is not in the current tree, show root
         if (!currentPath?.startsWith(rootPath)) {
@@ -82,37 +62,26 @@ export function SchemaTree(props: SchemaTreeProps) {
         }
     }, [currentPath, onActivePathUpdate, rootPath]);
 
-    const handleCreateDirectoryClose = () => {
-        setCreateDirectoryOpen(false);
-    };
-
-    const handleCreateDirectorySubmit = (value: string) => {
-        setChild(value);
-        createDirectory({database: parent, path: `${parent}/${value}`});
+    const handleSubmit = (relativePath: string) => {
+        const newPath = `${parentPath}/${relativePath}`;
+        onActivePathUpdate(newPath);
+        setPath(newPath);
     };
 
     const handleOpenCreateDirectoryDialog = (value: string) => {
-        setParent(value);
+        setParentPath(value);
         setCreateDirectoryOpen(true);
     };
-
-    const handleCreateDirectoryUpdate = React.useCallback(() => {
-        setError('');
-    }, []);
-
     return (
         <React.Fragment>
             <CreateDirectoryDialog
                 open={createDirectoryOpen}
-                parent={parent}
-                onClose={handleCreateDirectoryClose}
-                onSubmit={handleCreateDirectorySubmit}
-                onUpdate={handleCreateDirectoryUpdate}
-                isLoading={createDirectoryResult.isLoading}
-                error={error}
+                onOpen={setCreateDirectoryOpen}
+                parentPath={parentPath}
+                onSubmit={handleSubmit}
             />
             <NavigationTree
-                key={navigationTreeKey}
+                key={path}
                 rootState={{
                     path: rootPath,
                     name: rootName,

@@ -2,6 +2,8 @@ import React from 'react';
 
 import {Dialog, TextInput} from '@gravity-ui/uikit';
 
+import {schemaApi} from '../../../../store/reducers/schema/schema';
+import type {IResponseError} from '../../../../types/api/error';
 import {cn} from '../../../../utils/cn';
 import i18n from '../../i18n';
 
@@ -10,65 +12,71 @@ const b = cn('ydb-schema-create-directory-dialog');
 
 interface SchemaTreeProps {
     open: boolean;
-    parent: string;
-    isLoading: boolean;
-    onClose: () => void;
+    onOpen: (value: boolean) => void;
+    parentPath: string;
     onSubmit: (value: string) => void;
-    onUpdate: (value: string) => void;
-    error: string;
 }
 
 export function CreateDirectoryDialog(props: SchemaTreeProps) {
-    const {open, parent, isLoading, onClose, onSubmit, onUpdate, error} = props;
-    const [child, setChild] = React.useState('');
+    const [error, setError] = React.useState('');
+    const [relativePath, setRelativePath] = React.useState('');
+    const [create, response] = schemaApi.useCreateDirectoryMutation();
 
     const invalid = React.useMemo(() => {
-        return /\s/.test(child);
-    }, [child]);
+        return /\s/.test(relativePath);
+    }, [relativePath]);
 
     const disabled = React.useMemo(() => {
         return Boolean(error) || invalid;
     }, [error, invalid]);
 
+    React.useEffect(() => {
+        props.onOpen(props.open);
+    }, [props]);
+
     const handleClose = () => {
-        onClose();
+        props.onOpen(false);
+        setRelativePath('');
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!disabled) {
-            onSubmit(child);
+            const path = `${props.parentPath}/${relativePath}`;
+            try {
+                await create({
+                    database: props.parentPath,
+                    path: `${props.parentPath}/${relativePath}`,
+                }).unwrap();
+                props.onOpen(false);
+                props.onSubmit(path);
+                setRelativePath('');
+            } catch (e) {
+                const errorMessage = (e as IResponseError<string>)?.data || ' Unknown error';
+                setError(errorMessage);
+            }
         }
     };
 
-    const handleUpdate = (value: string) => {
-        setChild(value);
+    const handleUpdate = (updated: string) => {
+        setRelativePath(updated);
+        setError('');
     };
-
-    React.useEffect(() => {
-        if (!open) {
-            setChild('');
-        }
-    }, [open]);
-
-    React.useEffect(() => {
-        onUpdate(child);
-    }, [onUpdate, child]);
 
     return (
-        <Dialog open={open} onClose={handleClose} onEnterKeyDown={handleSubmit}>
+        <Dialog open={props.open} onClose={handleClose} onEnterKeyDown={handleSubmit}>
             <Dialog.Header caption={i18n('schema.tree.dialog.header')} />
             <Dialog.Body className={b('modal')}>
                 <div className={b('label')}>
                     <div className={b('description')}>{i18n('schema.tree.dialog.description')}</div>
-                    <div>{`${parent}/`}</div>
+                    <div>{`${props.parentPath}/`}</div>
                 </div>
                 <TextInput
                     placeholder={i18n('schema.tree.dialog.placeholder')}
-                    value={child}
+                    value={relativePath}
                     onUpdate={handleUpdate}
                     autoFocus
                     hasClear
-                    disabled={isLoading}
+                    disabled={response.isLoading}
                     validationState={disabled ? 'invalid' : undefined}
                 />
                 {Boolean(error) && <div className={b('error')}>{error}</div>}
@@ -77,7 +85,7 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
                 )}
             </Dialog.Body>
             <Dialog.Footer
-                loading={isLoading}
+                loading={response.isLoading}
                 textButtonApply={i18n('schema.tree.dialog.buttonApply')}
                 textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
                 onClickButtonCancel={handleClose}
