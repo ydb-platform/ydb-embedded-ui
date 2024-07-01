@@ -106,7 +106,7 @@ const erasureColumn: StorageGroupsColumn = {
 const degradedColumn: StorageGroupsColumn = {
     name: GROUPS_COLUMNS_IDS.Degraded,
     header: 'Degraded',
-    width: 100,
+    width: 110,
     render: ({row}) =>
         row.Degraded ? (
             <Label theme={getDegradedSeverity(row)}>Degraded: {row.Degraded}</Label>
