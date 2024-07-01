@@ -22,9 +22,13 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
     const {open, parent, isLoading, onClose, onSubmit, onUpdate, error} = props;
     const [child, setChild] = React.useState('');
 
+    const invalid = React.useMemo(() => {
+        return /\s/.test(child);
+    }, [child]);
+
     const disabled = React.useMemo(() => {
-        return Boolean(error) || /\s/.test(child);
-    }, [error, child]);
+        return Boolean(error) || invalid;
+    }, [error, invalid]);
 
     const handleClose = () => {
         onClose();
@@ -67,7 +71,10 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
                     disabled={isLoading}
                     validationState={disabled ? 'invalid' : undefined}
                 />
-                {error && <div className={b('error')}>{error}</div>}
+                {Boolean(error) && <div className={b('error')}>{error}</div>}
+                {!error && invalid && (
+                    <div className={b('invalid')}>{i18n('schema.tree.dialog.invalid')}</div>
+                )}
             </Dialog.Body>
             <Dialog.Footer
                 loading={isLoading}

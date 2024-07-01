@@ -1,4 +1,9 @@
 .ydb-schema-create-directory-dialog {
+    &__modal {
+        position: relative;
+
+        padding-bottom: 20px;
+    }
     &__label {
         margin-bottom: 10px;
     }
@@ -7,6 +12,11 @@
     }
     &__error {
         margin-top: 10px;
+
+        color: var(--g-color-private-red-450);
+    }
+    &__invalid {
+        position: absolute;
 
         color: var(--g-color-private-red-450);
     }
