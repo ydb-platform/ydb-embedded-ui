@@ -28,8 +28,9 @@ export function SchemaTree(props: SchemaTreeProps) {
     const [_, setQueryMode] = useQueryModes();
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parent, setParent] = React.useState<string>('');
+    const [navigationTreeKey, setNavigationTreeKey] = React.useState('');
 
-    const [createDirectory, {requestId}] = schemaApi.useCreateDirectoryMutation();
+    const [createDirectory, {isSuccess, requestId}] = schemaApi.useCreateDirectoryMutation();
 
     const fetchPath = async (path: string) => {
         const promise = dispatch(
@@ -56,6 +57,12 @@ export function SchemaTree(props: SchemaTreeProps) {
 
         return childItems;
     };
+
+    React.useEffect(() => {
+        if (isSuccess) {
+            setNavigationTreeKey(requestId);
+        }
+    }, [isSuccess, requestId]);
 
     React.useEffect(() => {
         // if the cached path is not in the current tree, show root
@@ -90,7 +97,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 onSubmit={handleCreateDirectorySubmit}
             />
             <NavigationTree
-                key={requestId}
+                key={navigationTreeKey}
                 rootState={{
                     path: rootPath,
                     name: rootName,

@@ -6,7 +6,7 @@ import {cn} from '../../../../utils/cn';
 import i18n from '../../i18n';
 
 import './CreateDirectoryDialog.scss';
-const b = cn('ydb-schema-tree');
+const b = cn('ydb-schema-create-directory-dialog');
 
 interface SchemaTreeProps {
     open: boolean;
@@ -40,6 +40,8 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
                     placeholder={i18n('schema.tree.dialog.placeholder')}
                     value={child}
                     onUpdate={setChild}
+                    autoFocus
+                    hasClear
                 />
             </Dialog.Body>
             <Dialog.Footer
