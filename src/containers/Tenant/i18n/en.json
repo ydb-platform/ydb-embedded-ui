@@ -37,5 +37,7 @@
   "actions.alterTable": "Alter table...",
   "actions.alterTopic": "Alter topic...",
   "actions.selectQuery": "Select query...",
-  "actions.upsertQuery": "Upsert query..."
+  "actions.upsertQuery": "Upsert query...",
+  "actions.alterReplication": "Alter async replicaton...",
+  "actions.dropReplication": "Drop async replicaton..."
 }

@@ -142,3 +142,10 @@ export const createViewTemplate = (path: string) => {
 export const dropViewTemplate = (path: string) => {
     return `DROP VIEW \`${path}\`;`;
 };
+export const dropAsyncReplicationTemplate = (path: string) => {
+    return `DROP ASYNC REPLICATION \`${path}\`;`;
+};
+
+export const alterAsyncReplicationTemplate = (path: string) => {
+    return `ALTER ASYNC REPLICATION \`${path}\` SET (STATE = "DONE", FAILOVER_MODE = "FORCE");`;
+};
