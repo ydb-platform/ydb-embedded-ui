@@ -3,20 +3,15 @@
 // In this case we can store state of tree - uploaded entities, opened nodes, selected entity and so on
 import React from 'react';
 
-import {Dialog, TextInput} from '@gravity-ui/uikit';
 import {NavigationTree} from 'ydb-ui-components';
 
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
-import {cn} from '../../../../utils/cn';
 import {useQueryModes, useTypedDispatch} from '../../../../utils/hooks';
-import i18n from '../../i18n';
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 import {getControls} from '../../utils/schemaControls';
-
-import './SchemaTree.scss';
-const b = cn('ydb-schema-tree');
+import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
 
 interface SchemaTreeProps {
     rootPath: string;
@@ -31,9 +26,8 @@ export function SchemaTree(props: SchemaTreeProps) {
     const dispatch = useTypedDispatch();
 
     const [_, setQueryMode] = useQueryModes();
-    const [open, setOpen] = React.useState(false);
+    const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parent, setParent] = React.useState<string>('');
-    const [child, setChild] = React.useState('');
 
     const [createDirectory, {requestId}] = schemaApi.useCreateDirectoryMutation();
 
@@ -71,47 +65,30 @@ export function SchemaTree(props: SchemaTreeProps) {
     }, [currentPath, onActivePathUpdate, rootPath]);
 
     const handleCreateDirectoryClose = () => {
-        setChild('');
-        setOpen(false);
+        setCreateDirectoryOpen(false);
     };
 
-    const handleCreateDirectory = () => {
+    const handleCreateDirectorySubmit = (child: string) => {
         createDirectory({database: parent, path: `${parent}/${child}`});
 
         onActivePathUpdate(`${parent}/${child}`);
 
-        handleCreateDirectoryClose();
+        setCreateDirectoryOpen(false);
     };
 
     const handleOpenCreateDirectoryDialog = (path: string) => {
         setParent(path);
-        setOpen(true);
+        setCreateDirectoryOpen(true);
     };
 
     return (
         <React.Fragment>
-            <Dialog open={open} onClose={handleCreateDirectoryClose}>
-                <Dialog.Header caption={i18n('schema.tree.dialog.header')} />
-                <Dialog.Body className={b('modal')}>
-                    <div className={b('label')}>
-                        <div className={b('description')}>
-                            {i18n('schema.tree.dialog.description')}
-                        </div>
-                        <div>{`${parent}/`}</div>
-                    </div>
-                    <TextInput
-                        placeholder={i18n('schema.tree.dialog.placeholder')}
-                        value={child}
-                        onUpdate={setChild}
-                    />
-                </Dialog.Body>
-                <Dialog.Footer
-                    textButtonApply={i18n('schema.tree.dialog.buttonApply')}
-                    textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
-                    onClickButtonCancel={handleCreateDirectoryClose}
-                    onClickButtonApply={handleCreateDirectory}
-                />
-            </Dialog>
+            <CreateDirectoryDialog
+                open={createDirectoryOpen}
+                parent={parent}
+                onClose={handleCreateDirectoryClose}
+                onSubmit={handleCreateDirectorySubmit}
+            />
             <NavigationTree
                 key={requestId}
                 rootState={{

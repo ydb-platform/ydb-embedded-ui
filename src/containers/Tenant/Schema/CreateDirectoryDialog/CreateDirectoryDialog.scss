@@ -1,6 +1,6 @@
 @import '../../../../styles/mixins.scss';
 
-.ydb-schema-tree {
+.ydb-schema-create-directory-dialog {
     &__modal {
         max-height: 100%;
         @include flex-container();

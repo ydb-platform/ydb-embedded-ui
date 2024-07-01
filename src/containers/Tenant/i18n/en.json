@@ -44,7 +44,7 @@
   "actions.createDirectory": "Create directory",
   "schema.tree.dialog.placeholder": "Relative path",
   "schema.tree.dialog.header": "Create directory",
-  "schema.tree.dialog.description": "Inside directory",
+  "schema.tree.dialog.description": "Inside",
   "schema.tree.dialog.buttonCancel": "Cancel",
   "schema.tree.dialog.buttonApply": "Create"
 }
