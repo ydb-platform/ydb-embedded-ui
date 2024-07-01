@@ -22,12 +22,18 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
     const {open, parent, isLoading, onClose, onSubmit, onUpdate, error} = props;
     const [child, setChild] = React.useState('');
 
+    const disabled = React.useMemo(() => {
+        return Boolean(error) || /\s/.test(child);
+    }, [error, child]);
+
     const handleClose = () => {
         onClose();
     };
 
     const handleSubmit = () => {
-        onSubmit(child);
+        if (!disabled) {
+            onSubmit(child);
+        }
     };
 
     const handleUpdate = (value: string) => {
@@ -44,10 +50,6 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
         onUpdate(child);
     }, [onUpdate, child]);
 
-    const invalid = React.useMemo(() => {
-        return /\s/.test(child);
-    }, [child]);
-
     return (
         <Dialog open={open} onClose={handleClose} onEnterKeyDown={handleSubmit}>
             <Dialog.Header caption={i18n('schema.tree.dialog.header')} />
@@ -63,7 +65,7 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
                     autoFocus
                     hasClear
                     disabled={isLoading}
-                    validationState={error || invalid ? 'invalid' : undefined}
+                    validationState={disabled ? 'invalid' : undefined}
                 />
                 {error && <div className={b('error')}>{error}</div>}
             </Dialog.Body>
@@ -73,6 +75,7 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
                 textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
                 onClickButtonCancel={handleClose}
                 onClickButtonApply={handleSubmit}
+                propsButtonApply={{disabled}}
             />
         </Dialog>
     );
