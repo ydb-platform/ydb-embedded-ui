@@ -2,6 +2,9 @@
 
 .ydb-acl {
     width: 100%;
+    &__owner-container {
+        padding-bottom: 25px;
+    }
     &__result {
         padding-bottom: 16px;
     }

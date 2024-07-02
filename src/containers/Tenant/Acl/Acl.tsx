@@ -151,11 +151,16 @@ export const Acl = ({path}: {path: string}) => {
 
     return (
         <div className={b()}>
-            <DefinitionList
-                items={ownerItem.concat(aclListItems)}
-                nameMaxWidth={200}
-                className={b('result')}
-            />
+            {ownerItem.length && (
+                <DefinitionList
+                    items={ownerItem}
+                    nameMaxWidth={200}
+                    className={b('owner-container')}
+                />
+            )}
+            {aclListItems.length && (
+                <DefinitionList items={aclListItems} nameMaxWidth={200} className={b('result')} />
+            )}
         </div>
     );
 };
