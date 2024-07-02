@@ -75,7 +75,6 @@ export function SaveQuery({isSaveButtonDisabled}: SaveQueryProps) {
 export function SaveQueryDialog() {
     const savedQueries = useSavedQueries();
     const dispatch = useTypedDispatch();
-    const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const queryAction = useTypedSelector(selectQueryAction);
     const [queryName, setQueryName] = React.useState('');
     const [validationError, setValidationError] = React.useState<string | null>(null);
@@ -117,7 +116,7 @@ export function SaveQueryDialog() {
         >
             <Dialog.Header caption={i18n('action.save')} />
             <Dialog.Body className={b('dialog-body')}>
-                {singleClusterMode && <div className={b('dialog-row')}>{i18n('description')}</div>}
+                <div className={b('dialog-row')}>{i18n('description')}</div>
                 <div className={b('dialog-row')}>
                     <label htmlFor="queryName" className={b('field-title', 'required')}>
                         {i18n('input-label')}
