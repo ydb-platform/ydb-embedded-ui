@@ -54,7 +54,6 @@ WITH (
     -- DATABASE=\`/remote_database\`,
     -- USER="user",
     -- PASSWORD_SECRET_NAME="your_password"
-    ...
 );`;
 };
 export const alterTableTemplate = (path: string) => {
