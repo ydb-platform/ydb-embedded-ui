@@ -90,10 +90,9 @@ export const Acl = ({path}: {path: string}) => {
         const normalizedAcl = normalizeAcl(acl);
 
         const items = normalizedAcl.map(({Subject, ...data}) => {
-            const definedDataEntries = Object.entries(data).filter(([_key, value]) => value) as [
-                AclParameter,
-                string | string[],
-            ][];
+            const definedDataEntries = Object.entries(data).filter(([_key, value]) =>
+                Boolean(value),
+            ) as [AclParameter, string | string[]][];
 
             if (definedDataEntries.length === 1 && definedDataEntries[0][0] === 'access') {
                 return {
@@ -101,16 +100,18 @@ export const Acl = ({path}: {path: string}) => {
                     content: <DefinitionValue value={definedDataEntries[0][1]} />,
                 };
             }
-            const definedData = Object.fromEntries(definedDataEntries);
             return {
                 label: Subject,
                 items: aclParams
                     .map((key) => {
-                        const value = definedData[key];
-                        return {
-                            name: aclParamToName[key],
-                            content: <DefinitionValue value={value} />,
-                        };
+                        const value = data[key];
+                        if (value) {
+                            return {
+                                name: aclParamToName[key],
+                                content: <DefinitionValue value={value} />,
+                            };
+                        }
+                        return undefined;
                     })
                     .filter(Boolean),
             };
