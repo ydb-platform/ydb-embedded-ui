@@ -10,7 +10,7 @@ export interface InfoViewerItem {
 }
 
 export interface InfoViewerProps {
-    title?: string;
+    title?: React.ReactNode;
     info?: InfoViewerItem[];
     dots?: boolean;
     size?: 's';
@@ -53,7 +53,7 @@ export const InfoViewer = ({
                     ))}
                 </div>
             ) : (
-                <React.Fragment>No {title} data</React.Fragment>
+                <React.Fragment>No data</React.Fragment>
             )}
         </div>
     );

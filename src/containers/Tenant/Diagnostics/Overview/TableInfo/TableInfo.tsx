@@ -4,7 +4,7 @@ import {InfoViewer} from '../../../../../components/InfoViewer';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
-import {getEntityName} from '../../../utils';
+import {EntityTitle} from '../../../EntityTitle/EntityTitle';
 
 import i18n from './i18n';
 import {prepareTableInfo} from './prepareTableInfo';
@@ -20,7 +20,7 @@ interface TableInfoProps {
 }
 
 export const TableInfo = ({data, type, olapStats}: TableInfoProps) => {
-    const entityName = getEntityName(data?.PathDescription);
+    const title = <EntityTitle data={data?.PathDescription} />;
 
     const {
         generalInfo = [],
@@ -33,9 +33,9 @@ export const TableInfo = ({data, type, olapStats}: TableInfoProps) => {
         <div className={b()}>
             <InfoViewer
                 info={generalInfo}
-                title={entityName}
+                title={title}
                 className={b('info-block')}
-                renderEmptyState={() => <div className={b('title')}>{entityName}</div>}
+                renderEmptyState={() => <div className={b('title')}>{title}</div>}
             />
             <div className={b('row')}>
                 <div className={b('col')}>

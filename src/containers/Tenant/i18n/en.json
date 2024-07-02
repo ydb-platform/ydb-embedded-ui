@@ -21,6 +21,7 @@
   "summary.mode": "Mode",
   "summary.format": "Format",
   "summary.retention": "Retention",
+  "label.read-only": "ReadOnly",
   "actions.copied": "The path is copied to the clipboard",
   "actions.notCopied": "Couldn’t copy the path",
   "actions.copyPath": "Copy path",
