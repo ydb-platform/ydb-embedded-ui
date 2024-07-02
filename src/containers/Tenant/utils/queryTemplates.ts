@@ -42,16 +42,16 @@ CREATE TABLE \`${path}/ydb_column_table\` (
 PARTITION BY HASH(id)
 WITH (STORE = COLUMN)`;
 };
-export const createAsyncReplicationTemplate = (path: string) => {
+export const createAsyncReplicationTemplate = () => {
     return `CREATE OBJECT secret_name (TYPE SECRET) WITH value="secret_value";
 
 CREATE ASYNC REPLICATION my_replication
-FOR \`${path}/remote_table_name\` AS "local_table_name" --[, "another_remote_table_name" AS "another_local_table_name" ...]
+FOR \`/remote_database/table_name\` AS "local_table_name" --[, \`/remote_database/another_table_name\` AS "another_local_table_name" ...]
 WITH (
-    CONNECTION_STRING="grpcs://mydb.ydb.tech:2135/?database=${path}",
+    CONNECTION_STRING=\`grpcs://mydb.ydb.tech:2135/?database=/remote_database\`,
     TOKEN_SECRET_NAME = "secret_name",
-    -- ENDPOINT="grpcs://mydb.ydb.tech:2135/",
-    -- DATABASE="${path}",
+    -- ENDPOINT="mydb.ydb.tech:2135",
+    -- DATABASE=\`/remote_database\`,
     -- USER="user",
     -- PASSWORD_SECRET_NAME="your_password"
     ...
