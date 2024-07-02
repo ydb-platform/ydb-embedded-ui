@@ -48,7 +48,7 @@ function normalizeAcl(acl: TACE[]) {
             inheritance = InheritanceType;
         }
         return {
-            access,
+            access: access.length ? access : undefined,
             type,
             inheritance,
             Subject,
