@@ -2,6 +2,8 @@ import React from 'react';
 
 import type {DefinitionListItem} from '@gravity-ui/components';
 import {DefinitionList} from '@gravity-ui/components';
+//TODO: fix import
+import type {DefinitionListSingleItem} from '@gravity-ui/components/build/esm/components/DefinitionList/types';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
@@ -76,58 +78,64 @@ function DefinitionValue({value}: DefinitionValueProps) {
     );
 }
 
+function getAclListItems(acl?: TACE[]): DefinitionListItem[] {
+    if (!acl || !acl.length) {
+        return [];
+    }
+
+    const normalizedAcl = normalizeAcl(acl);
+
+    return normalizedAcl.map(({Subject, ...data}) => {
+        const definedDataEntries = Object.entries(data).filter(([_key, value]) =>
+            Boolean(value),
+        ) as [AclParameter, string | string[]][];
+
+        if (definedDataEntries.length === 1 && definedDataEntries[0][0] === 'access') {
+            return {
+                name: Subject,
+                content: <DefinitionValue value={definedDataEntries[0][1]} />,
+            };
+        }
+        return {
+            label: Subject,
+            items: aclParams
+                .map((key) => {
+                    const value = data[key];
+                    if (value) {
+                        return {
+                            name: aclParamToName[key],
+                            content: <DefinitionValue value={value} />,
+                        };
+                    }
+                    return undefined;
+                })
+                .filter(Boolean) as DefinitionListSingleItem[],
+        };
+    });
+}
+
+function getOwnerItem(owner?: string) {
+    const preparedOwner = prepareLogin(owner);
+    if (!preparedOwner) {
+        return [];
+    }
+    return [
+        {
+            name: <span className={b('owner')}>{preparedOwner}</span>,
+            content: <span className={b('owner')}>{i18n('acl.owner')}</span>,
+        },
+    ] as DefinitionListItem[];
+}
+
 export const Acl = ({path}: {path: string}) => {
     const {currentData, isFetching, error} = schemaAclApi.useGetSchemaAclQuery({path});
 
     const loading = isFetching && !currentData;
     const {acl, owner} = currentData || {};
 
-    const renderTable = () => {
-        if (!acl || !acl.length) {
-            return null;
-        }
+    const aclListItems = getAclListItems(acl);
 
-        const normalizedAcl = normalizeAcl(acl);
-
-        const items = normalizedAcl.map(({Subject, ...data}) => {
-            const definedDataEntries = Object.entries(data).filter(([_key, value]) =>
-                Boolean(value),
-            ) as [AclParameter, string | string[]][];
-
-            if (definedDataEntries.length === 1 && definedDataEntries[0][0] === 'access') {
-                return {
-                    name: Subject,
-                    content: <DefinitionValue value={definedDataEntries[0][1]} />,
-                };
-            }
-            return {
-                label: Subject,
-                items: aclParams
-                    .map((key) => {
-                        const value = data[key];
-                        if (value) {
-                            return {
-                                name: aclParamToName[key],
-                                content: <DefinitionValue value={value} />,
-                            };
-                        }
-                        return undefined;
-                    })
-                    .filter(Boolean),
-            };
-        }) as DefinitionListItem[];
-
-        const preparedOwner = prepareLogin(owner);
-
-        if (preparedOwner) {
-            items.unshift({
-                name: <span className={b('owner')}>{preparedOwner}</span>,
-                content: <span className={b('owner')}>{i18n('acl.owner')}</span>,
-            });
-        }
-
-        return <DefinitionList items={items} nameMaxWidth={200} />;
-    };
+    const ownerItem = getOwnerItem(owner);
 
     if (loading) {
         return <Loader />;
@@ -143,7 +151,11 @@ export const Acl = ({path}: {path: string}) => {
 
     return (
         <div className={b()}>
-            <div className={b('result')}>{renderTable()}</div>
+            <DefinitionList
+                items={ownerItem.concat(aclListItems)}
+                nameMaxWidth={200}
+                className={b('result')}
+            />
         </div>
     );
 };
