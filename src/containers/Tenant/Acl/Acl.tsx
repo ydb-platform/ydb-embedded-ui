@@ -97,7 +97,7 @@ function getAclListItems(acl?: TACE[]): DefinitionListItem[] {
             };
         }
         return {
-            label: Subject,
+            label: <span className={b('group-label')}>{Subject}</span>,
             items: aclParams
                 .map((key) => {
                     const value = data[key];
