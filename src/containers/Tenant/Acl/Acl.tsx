@@ -25,25 +25,30 @@ const prepareLogin = (value: string | undefined) => {
 
 const aclParams = ['access', 'type', 'inheritance'] as const;
 
-const aclParamToName: Record<(typeof aclParams)[number], string> = {
+type AclParameter = (typeof aclParams)[number];
+
+const aclParamToName: Record<AclParameter, string> = {
     access: 'Access',
     type: 'Access type',
     inheritance: 'Inheritance type',
 };
 
-const defaultInheritanceType = new Set(['Object', 'Container']);
+const defaultInheritanceType = ['Object', 'Container'];
+const defaultAccessType = 'Allow';
+
+const defaultInheritanceTypeSet = new Set(defaultInheritanceType);
 
 function normalizeAcl(acl: TACE[]) {
     return acl.map((ace) => {
         const {AccessRules = [], AccessRights = [], AccessType, InheritanceType, Subject} = ace;
         const access = AccessRules.concat(AccessRights);
         //"Allow" is default access type. We want to show it only if it isn't default
-        const type = AccessType === 'Allow' ? undefined : AccessType;
+        const type = AccessType === defaultAccessType ? undefined : AccessType;
         let inheritance;
         // ['Object', 'Container'] - is default inheritance type. We want to show it only if it isn't default
         if (
-            InheritanceType?.length !== defaultInheritanceType.size ||
-            InheritanceType.some((t) => !defaultInheritanceType.has(t))
+            InheritanceType?.length !== defaultInheritanceTypeSet.size ||
+            InheritanceType.some((t) => !defaultInheritanceTypeSet.has(t))
         ) {
             inheritance = InheritanceType;
         }
@@ -54,6 +59,21 @@ function normalizeAcl(acl: TACE[]) {
             Subject,
         };
     });
+}
+
+interface DefinitionValueProps {
+    value: string | string[];
+}
+
+function DefinitionValue({value}: DefinitionValueProps) {
+    const normalizedValue = typeof value === 'string' ? [value] : value;
+    return (
+        <div className={b('definition-content')}>
+            {normalizedValue.map((el) => (
+                <span key={el}>{el}</span>
+            ))}
+        </div>
+    );
 }
 
 export const Acl = ({path}: {path: string}) => {
@@ -70,44 +90,42 @@ export const Acl = ({path}: {path: string}) => {
         const normalizedAcl = normalizeAcl(acl);
 
         const items = normalizedAcl.map(({Subject, ...data}) => {
+            const definedDataEntries = Object.entries(data).filter(([_key, value]) => value) as [
+                AclParameter,
+                string | string[],
+            ][];
+
+            if (definedDataEntries.length === 1 && definedDataEntries[0][0] === 'access') {
+                return {
+                    name: Subject,
+                    content: <DefinitionValue value={definedDataEntries[0][1]} />,
+                };
+            }
+            const definedData = Object.fromEntries(definedDataEntries);
             return {
                 label: Subject,
                 items: aclParams
                     .map((key) => {
-                        const value = data[key];
-                        if (!value) {
-                            return undefined;
-                        }
-                        const normalizedValue = typeof value === 'string' ? [value] : value;
+                        const value = definedData[key];
                         return {
                             name: aclParamToName[key],
-                            content: (
-                                <div className={b('definition-content')}>
-                                    {normalizedValue.map((el) => (
-                                        <span key={el}>{el}</span>
-                                    ))}
-                                </div>
-                            ),
+                            content: <DefinitionValue value={value} />,
                         };
                     })
                     .filter(Boolean),
             };
         }) as DefinitionListItem[];
 
-        return <DefinitionList items={items} nameMaxWidth={200} />;
-    };
+        const preparedOwner = prepareLogin(owner);
 
-    const renderOwner = () => {
-        if (!owner) {
-            return null;
+        if (preparedOwner) {
+            items.unshift({
+                name: <span className={b('owner')}>{preparedOwner}</span>,
+                content: <span className={b('owner')}>{i18n('acl.owner')}</span>,
+            });
         }
 
-        return (
-            <div className={b('owner-container')}>
-                <span className={b('owner-label')}>{`${i18n('acl.owner')}: `}</span>
-                {prepareLogin(owner)}
-            </div>
-        );
+        return <DefinitionList items={items} nameMaxWidth={200} />;
     };
 
     if (loading) {
@@ -124,10 +142,7 @@ export const Acl = ({path}: {path: string}) => {
 
     return (
         <div className={b()}>
-            <div className={b('result')}>
-                {renderOwner()}
-                {renderTable()}
-            </div>
+            <div className={b('result')}>{renderTable()}</div>
         </div>
     );
 };

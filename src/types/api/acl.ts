@@ -22,5 +22,5 @@ export interface TACE {
     AccessRules?: string[];
     Subject: string;
     InheritanceType?: string[];
-    AccessRule: string;
+    AccessRule?: string;
 }

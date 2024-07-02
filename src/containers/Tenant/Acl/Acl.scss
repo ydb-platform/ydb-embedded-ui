@@ -6,15 +6,8 @@
         padding-bottom: 16px;
     }
 
-    &__owner-container {
-        position: sticky;
-        z-index: 2;
-        top: 0;
-
-        width: 100%;
-        padding-bottom: 16px;
-
-        background-color: var(--g-color-base-background);
+    &__owner {
+        font-weight: 600;
     }
     &__definition-content {
         display: flex;
