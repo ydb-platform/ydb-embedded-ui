@@ -46,10 +46,10 @@ export const createAsyncReplicationTemplate = () => {
     return `CREATE OBJECT secret_name (TYPE SECRET) WITH value="secret_value";
 
 CREATE ASYNC REPLICATION my_replication
-FOR \`/remote_database/table_name\` AS "local_table_name" --[, \`/remote_database/another_table_name\` AS "another_local_table_name" ...]
+FOR \`/remote_database/table_name\` AS \`local_table_name\` --[, \`/remote_database/another_table_name\` AS \`another_local_table_name\` ...]
 WITH (
-    CONNECTION_STRING=\`grpcs://mydb.ydb.tech:2135/?database=/remote_database\`,
-    TOKEN_SECRET_NAME = "secret_name",
+    CONNECTION_STRING="grpcs://mydb.ydb.tech:2135/?database=/remote_database",
+    TOKEN_SECRET_NAME = "secret_name"
     -- ENDPOINT="mydb.ydb.tech:2135",
     -- DATABASE=\`/remote_database\`,
     -- USER="user",
