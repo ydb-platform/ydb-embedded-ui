@@ -96,17 +96,17 @@ export const invertedDisksSetting: SettingProps = {
 export const useNodesEndpointSetting: SettingProps = {
     settingKey: USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     title: i18n('settings.useNodesEndpoint.title'),
-    helpPopoverContent: i18n('settings.useNodesEndpoint.popover'),
+    description: i18n('settings.useNodesEndpoint.popover'),
 };
 export const useVirtualTables: SettingProps = {
     settingKey: USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     title: i18n('settings.useVirtualTables.title'),
-    helpPopoverContent: i18n('settings.useVirtualTables.popover'),
+    description: i18n('settings.useVirtualTables.popover'),
 };
 export const queryUseMultiSchemaSetting: SettingProps = {
     settingKey: QUERY_USE_MULTI_SCHEMA_KEY,
     title: i18n('settings.queryUseMultiSchema.title'),
-    helpPopoverContent: i18n('settings.queryUseMultiSchema.popover'),
+    description: i18n('settings.queryUseMultiSchema.popover'),
 };
 
 export const enableAutocompleteSetting: SettingProps = {
