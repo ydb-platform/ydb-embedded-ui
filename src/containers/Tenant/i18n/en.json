@@ -44,6 +44,7 @@
   "actions.createDirectory": "Create directory",
   "schema.tree.dialog.placeholder": "Relative path",
   "schema.tree.dialog.invalid": "Invalid path",
+  "schema.tree.dialog.whitespace": "Whitespace is not allowed",
   "schema.tree.dialog.header": "Create directory",
   "schema.tree.dialog.description": "Inside",
   "schema.tree.dialog.buttonCancel": "Cancel",

@@ -30,14 +30,14 @@ export function SchemaTree(props: SchemaTreeProps) {
     const [parentPath, setParentPath] = React.useState('');
     const [path, setPath] = React.useState('');
 
-    const fetchPath = async (value: string) => {
+    const fetchPath = async (path: string) => {
         const promise = dispatch(
-            schemaApi.endpoints.getSchema.initiate({path: value}, {forceRefetch: true}),
+            schemaApi.endpoints.getSchema.initiate({path}, {forceRefetch: true}),
         );
         const {data} = await promise;
         promise.unsubscribe();
         if (!data) {
-            throw new Error(`no describe data about path ${value}`);
+            throw new Error(`no describe data about path ${path}`);
         }
         const {PathDescription: {Children = []} = {}} = data;
 
@@ -62,10 +62,14 @@ export function SchemaTree(props: SchemaTreeProps) {
         }
     }, [currentPath, onActivePathUpdate, rootPath]);
 
-    const handleSubmit = (relativePath: string) => {
+    const handleSuccessSubmit = (relativePath: string) => {
         const newPath = `${parentPath}/${relativePath}`;
         onActivePathUpdate(newPath);
         setPath(newPath);
+    };
+
+    const handleCloseDialog = () => {
+        setCreateDirectoryOpen(false);
     };
 
     const handleOpenCreateDirectoryDialog = (value: string) => {
@@ -75,10 +79,10 @@ export function SchemaTree(props: SchemaTreeProps) {
     return (
         <React.Fragment>
             <CreateDirectoryDialog
+                onClose={handleCloseDialog}
                 open={createDirectoryOpen}
-                onOpen={setCreateDirectoryOpen}
                 parentPath={parentPath}
-                onSubmit={handleSubmit}
+                onSuccess={handleSuccessSubmit}
             />
             <NavigationTree
                 key={path}

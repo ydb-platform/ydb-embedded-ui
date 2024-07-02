@@ -2,73 +2,68 @@ import React from 'react';
 
 import {Dialog, TextInput} from '@gravity-ui/uikit';
 
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
-import type {IResponseError} from '../../../../types/api/error';
 import {cn} from '../../../../utils/cn';
 import i18n from '../../i18n';
 
 import './CreateDirectoryDialog.scss';
+
 const b = cn('ydb-schema-create-directory-dialog');
 
 interface SchemaTreeProps {
     open: boolean;
-    onOpen: (value: boolean) => void;
+    onClose: VoidFunction;
     parentPath: string;
-    onSubmit: (value: string) => void;
+    onSuccess: (value: string) => void;
 }
 
-export function CreateDirectoryDialog(props: SchemaTreeProps) {
-    const [error, setError] = React.useState('');
+function validateRelativePath(value: string) {
+    if (value && /\s/.test(value)) {
+        return i18n('schema.tree.dialog.whitespace');
+    }
+    return '';
+}
+
+export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: SchemaTreeProps) {
+    const [error, setError] = React.useState<unknown>('');
     const [relativePath, setRelativePath] = React.useState('');
     const [create, response] = schemaApi.useCreateDirectoryMutation();
 
-    const invalid = React.useMemo(() => {
-        return /\s/.test(relativePath);
-    }, [relativePath]);
-
-    const disabled = React.useMemo(() => {
-        return Boolean(error) || invalid;
-    }, [error, invalid]);
-
-    React.useEffect(() => {
-        props.onOpen(props.open);
-    }, [props]);
-
-    const handleClose = () => {
-        props.onOpen(false);
-        setRelativePath('');
-    };
-
-    const handleSubmit = async () => {
-        if (!disabled) {
-            const path = `${props.parentPath}/${relativePath}`;
-            try {
-                await create({
-                    database: props.parentPath,
-                    path: `${props.parentPath}/${relativePath}`,
-                }).unwrap();
-                props.onOpen(false);
-                props.onSubmit(path);
-                setRelativePath('');
-            } catch (e) {
-                const errorMessage = (e as IResponseError<string>)?.data || ' Unknown error';
-                setError(errorMessage);
-            }
-        }
-    };
-
     const handleUpdate = (updated: string) => {
         setRelativePath(updated);
+        setError(validateRelativePath(updated));
+    };
+
+    const handleClose = () => {
+        onClose();
+        setRelativePath('');
         setError('');
     };
 
+    const handleSubmit = async () => {
+        try {
+            const path = `${parentPath}/${relativePath}`;
+            await create({
+                database: parentPath,
+                path,
+            }).unwrap();
+            handleClose();
+            onSuccess(relativePath);
+        } catch (e) {
+            setError(e);
+        }
+    };
+
+    const hasError = Boolean(error);
+
     return (
-        <Dialog open={props.open} onClose={handleClose} onEnterKeyDown={handleSubmit}>
+        <Dialog open={open} onClose={handleClose} onEnterKeyDown={handleSubmit}>
             <Dialog.Header caption={i18n('schema.tree.dialog.header')} />
-            <Dialog.Body className={b('modal')}>
+            <Dialog.Body>
                 <div className={b('label')}>
                     <div className={b('description')}>{i18n('schema.tree.dialog.description')}</div>
-                    <div>{`${props.parentPath}/`}</div>
+                    <div>{`${parentPath}/`}</div>
                 </div>
                 <TextInput
                     placeholder={i18n('schema.tree.dialog.placeholder')}
@@ -77,12 +72,16 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
                     autoFocus
                     hasClear
                     disabled={response.isLoading}
-                    validationState={disabled ? 'invalid' : undefined}
+                    error={hasError}
                 />
-                {Boolean(error) && <div className={b('error')}>{error}</div>}
-                {!error && invalid && (
-                    <div className={b('invalid')}>{i18n('schema.tree.dialog.invalid')}</div>
-                )}
+                <div className={b('error-wrapper')}>
+                    {hasError && (
+                        <ResponseError
+                            error={error}
+                            defaultMessage={i18n('schema.tree.dialog.invalid')}
+                        />
+                    )}
+                </div>
             </Dialog.Body>
             <Dialog.Footer
                 loading={response.isLoading}
@@ -90,7 +89,7 @@ export function CreateDirectoryDialog(props: SchemaTreeProps) {
                 textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
                 onClickButtonCancel={handleClose}
                 onClickButtonApply={handleSubmit}
-                propsButtonApply={{disabled}}
+                propsButtonApply={{disabled: hasError}}
             />
         </Dialog>
     );
