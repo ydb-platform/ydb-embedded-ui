@@ -11,7 +11,6 @@ import {
 } from '../../../../store/reducers/queryActions';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {CtrlCmd, formatShortcut} from '../../../../utils/keyboard';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
 import i18n from './i18n';
@@ -40,11 +39,7 @@ export function SaveQuery({isSaveButtonDisabled}: SaveQueryProps) {
 
     const renderSaveButton = () => {
         return (
-            <Button
-                onClick={onSaveQueryClick}
-                disabled={isSaveButtonDisabled}
-                title={`Save query [${formatShortcut([CtrlCmd, 'S'])}]`}
-            >
+            <Button onClick={onSaveQueryClick} disabled={isSaveButtonDisabled}>
                 {i18n('action.save')}
             </Button>
         );
