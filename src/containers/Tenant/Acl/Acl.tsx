@@ -2,13 +2,12 @@ import React from 'react';
 
 import type {DefinitionListItem} from '@gravity-ui/components';
 import {DefinitionList} from '@gravity-ui/components';
-//TODO: fix import
-import type {DefinitionListSingleItem} from '@gravity-ui/components/build/esm/components/DefinitionList/types';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
 import {schemaAclApi} from '../../../store/reducers/schemaAcl/schemaAcl';
 import type {TACE} from '../../../types/api/acl';
+import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import i18n from '../i18n';
 
@@ -109,7 +108,7 @@ function getAclListItems(acl?: TACE[]): DefinitionListItem[] {
                     }
                     return undefined;
                 })
-                .filter(Boolean) as DefinitionListSingleItem[],
+                .filter(valueIsDefined),
         };
     });
 }
