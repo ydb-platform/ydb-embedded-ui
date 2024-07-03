@@ -35,6 +35,11 @@
     line-height: var(--g-text-subheader-3-line-height);
 }
 
+@mixin subheader-2-typography() {
+    font-size: var(--g-text-subheader-2-font-size);
+    line-height: var(--g-text-subheader-2-line-height);
+}
+
 @mixin header-1-typography() {
     font-size: var(--g-text-header-1-font-size);
     line-height: var(--g-text-header-1-line-height);
