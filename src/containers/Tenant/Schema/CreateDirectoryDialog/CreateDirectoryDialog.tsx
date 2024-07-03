@@ -27,18 +27,24 @@ function validateRelativePath(value: string) {
 
 export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: SchemaTreeProps) {
     const [error, setError] = React.useState<unknown>('');
+    const [validationError, setValidationError] = React.useState('');
     const [relativePath, setRelativePath] = React.useState('');
     const [create, response] = schemaApi.useCreateDirectoryMutation();
 
+    const resetErrors = () => {
+        setValidationError('');
+        setError('');
+    };
+
     const handleUpdate = (updated: string) => {
         setRelativePath(updated);
-        setError(validateRelativePath(updated));
+        resetErrors();
     };
 
     const handleClose = () => {
         onClose();
         setRelativePath('');
-        setError('');
+        resetErrors();
     };
 
     const handleSubmit = async () => {
@@ -56,41 +62,55 @@ export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: Sc
     };
 
     const hasError = Boolean(error);
+    const hasValidationError = Boolean(validationError);
 
     return (
-        <Dialog open={open} onClose={handleClose} onEnterKeyDown={handleSubmit}>
+        <Dialog open={open} onClose={handleClose} size="s">
             <Dialog.Header caption={i18n('schema.tree.dialog.header')} />
-            <Dialog.Body>
-                <div className={b('label')}>
-                    <div className={b('description')}>{i18n('schema.tree.dialog.description')}</div>
-                    <div>{`${parentPath}/`}</div>
-                </div>
-                <TextInput
-                    placeholder={i18n('schema.tree.dialog.placeholder')}
-                    value={relativePath}
-                    onUpdate={handleUpdate}
-                    autoFocus
-                    hasClear
-                    disabled={response.isLoading}
-                    error={hasError}
-                />
-                <div className={b('error-wrapper')}>
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    const validationError = validateRelativePath(relativePath);
+                    setValidationError(validationError);
+                    if (!validationError) {
+                        handleSubmit();
+                    }
+                }}
+            >
+                <Dialog.Body>
+                    <div className={b('label')}>
+                        <div className={b('description')}>
+                            {i18n('schema.tree.dialog.description')}
+                        </div>
+                        <div>{`${parentPath}/`}</div>
+                    </div>
+                    <TextInput
+                        placeholder={i18n('schema.tree.dialog.placeholder')}
+                        value={relativePath}
+                        onUpdate={handleUpdate}
+                        autoFocus
+                        hasClear
+                        disabled={response.isLoading}
+                        error={hasValidationError}
+                    />
+                    <div className={b('error-wrapper')}>
+                        {hasValidationError && <ResponseError error={validationError} />}
+                    </div>
                     {hasError && (
                         <ResponseError
                             error={error}
                             defaultMessage={i18n('schema.tree.dialog.invalid')}
                         />
                     )}
-                </div>
-            </Dialog.Body>
-            <Dialog.Footer
-                loading={response.isLoading}
-                textButtonApply={i18n('schema.tree.dialog.buttonApply')}
-                textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
-                onClickButtonCancel={handleClose}
-                onClickButtonApply={handleSubmit}
-                propsButtonApply={{disabled: hasError}}
-            />
+                </Dialog.Body>
+                <Dialog.Footer
+                    loading={response.isLoading}
+                    textButtonApply={i18n('schema.tree.dialog.buttonApply')}
+                    textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
+                    onClickButtonCancel={handleClose}
+                    propsButtonApply={{disabled: hasValidationError, type: 'submit'}}
+                />
+            </form>
         </Dialog>
     );
 }

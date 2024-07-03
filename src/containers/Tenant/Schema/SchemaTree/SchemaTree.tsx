@@ -28,7 +28,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const [_, setQueryMode] = useQueryModes();
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parentPath, setParentPath] = React.useState('');
-    const [path, setPath] = React.useState('');
+    const [schemaTreeKey, setSchemaTreeKey] = React.useState('');
 
     const fetchPath = async (path: string) => {
         const promise = dispatch(
@@ -65,7 +65,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const handleSuccessSubmit = (relativePath: string) => {
         const newPath = `${parentPath}/${relativePath}`;
         onActivePathUpdate(newPath);
-        setPath(newPath);
+        setSchemaTreeKey(newPath);
     };
 
     const handleCloseDialog = () => {
@@ -85,7 +85,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 onSuccess={handleSuccessSubmit}
             />
             <NavigationTree
-                key={path}
+                key={schemaTreeKey}
                 rootState={{
                     path: rootPath,
                     name: rootName,

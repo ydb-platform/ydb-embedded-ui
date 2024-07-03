@@ -17,7 +17,9 @@ export const ResponseError = ({
         statusText = error;
     }
     if (error && typeof error === 'object') {
-        if ('statusText' in error && typeof error.statusText === 'string') {
+        if ('data' in error && typeof error.data === 'string') {
+            statusText = error.data;
+        } else if ('statusText' in error && typeof error.statusText === 'string') {
             statusText = error.statusText;
         } else if ('message' in error && typeof error.message === 'string') {
             statusText = error.message;
