@@ -13,11 +13,14 @@ import {ResizeableDataTable} from '../../components/ResizeableDataTable/Resizeab
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {UptimeFilter} from '../../components/UptimeFIlter';
-import {selectAutoRefreshInterval} from '../../store/reducers/autoRefreshControl';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
 import {filterNodes} from '../../store/reducers/nodes/selectors';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
-import {ProblemFilterValues, changeFilter} from '../../store/reducers/settings/settings';
+import {
+    ProblemFilterValues,
+    changeFilter,
+    selectProblemFilter,
+} from '../../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
@@ -26,7 +29,13 @@ import {
     DEFAULT_TABLE_SETTINGS,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
 } from '../../utils/constants';
-import {useSetting, useTableSort, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {
+    useAutoRefreshInterval,
+    useSetting,
+    useTableSort,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../utils/hooks';
 import {
     NodesUptimeFilterValues,
     isSortableNodesProperty,
@@ -58,8 +67,8 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
 
     const isClusterNodes = !path;
 
-    const problemFilter = useTypedSelector((state) => state.settings.problemFilter);
-    const autorefresh = useTypedSelector(selectAutoRefreshInterval);
+    const problemFilter = useTypedSelector(selectProblemFilter);
+    const [autorefresh] = useAutoRefreshInterval();
 
     const [useNodesEndpoint] = useSetting(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY);
 

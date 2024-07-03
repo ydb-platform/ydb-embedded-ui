@@ -11,7 +11,7 @@ import {hotKeysApi} from '../../../../store/reducers/hotKeys/hotKeys';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import type {HotKey} from '../../../../types/api/hotkeys';
 import {cn} from '../../../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS, IS_HOTKEYS_HELP_HIDDDEN_KEY} from '../../../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, IS_HOTKEYS_HELP_HIDDEN_KEY} from '../../../../utils/constants';
 import {useSetting} from '../../../../utils/hooks';
 
 import i18n from './i18n';
@@ -108,7 +108,7 @@ export function HotKeys({path}: HotKeysProps) {
 }
 
 function HelpCard() {
-    const [helpHidden, setHelpHidden] = useSetting(IS_HOTKEYS_HELP_HIDDDEN_KEY);
+    const [helpHidden, setHelpHidden] = useSetting(IS_HOTKEYS_HELP_HIDDEN_KEY);
 
     if (helpHidden) {
         return null;

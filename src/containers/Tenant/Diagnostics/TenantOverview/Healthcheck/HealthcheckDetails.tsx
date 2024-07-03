@@ -2,9 +2,8 @@ import React from 'react';
 
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
-import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {cn} from '../../../../../utils/cn';
-import {useTypedSelector} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {useHealthcheck} from '../useHealthcheck';
 
 import IssueTree from './IssuesViewer/IssueTree';
@@ -19,7 +18,7 @@ interface HealthcheckDetailsProps {
 }
 
 export function HealthcheckDetails({tenantName}: HealthcheckDetailsProps) {
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const {issueTrees, loading, error} = useHealthcheck(tenantName, {
         autorefresh: autoRefreshInterval,
     });

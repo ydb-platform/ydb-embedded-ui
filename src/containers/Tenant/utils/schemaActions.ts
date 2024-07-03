@@ -9,12 +9,16 @@ import createToast from '../../../utils/createToast';
 import i18n from '../i18n';
 
 import {
+    alterAsyncReplicationTemplate,
     alterTableTemplate,
     alterTopicTemplate,
+    createAsyncReplicationTemplate,
+    createColumnTableTemplate,
     createExternalTableTemplate,
     createTableTemplate,
     createTopicTemplate,
     createViewTemplate,
+    dropAsyncReplicationTemplate,
     dropExternalTableTemplate,
     dropTopicTemplate,
     dropViewTemplate,
@@ -47,6 +51,10 @@ const bindActions = (
 
     return {
         createTable: inputQuery(createTableTemplate, 'script'),
+        createColumnTable: inputQuery(createColumnTableTemplate, 'script'),
+        createAsyncReplication: inputQuery(createAsyncReplicationTemplate, 'script'),
+        alterAsyncReplication: inputQuery(alterAsyncReplicationTemplate, 'script'),
+        dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate, 'script'),
         alterTable: inputQuery(alterTableTemplate, 'script'),
         selectQuery: inputQuery(selectQueryTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
@@ -89,6 +97,11 @@ export const getActions =
             [copyItem],
             [
                 {text: i18n('actions.createTable'), action: actions.createTable},
+                {text: i18n('actions.createColumnTable'), action: actions.createColumnTable},
+                {
+                    text: i18n('actions.createAsyncReplication'),
+                    action: actions.createAsyncReplication,
+                },
                 {text: i18n('actions.createTopic'), action: actions.createTopic},
                 {text: i18n('actions.createView'), action: actions.createView},
             ],
@@ -132,12 +145,20 @@ export const getActions =
             [{text: i18n('actions.dropView'), action: actions.dropView}],
         ];
 
+        const ASYNC_REPLICATION_SET: ActionsSet = [
+            [copyItem],
+            [
+                {text: i18n('actions.alterReplication'), action: actions.alterAsyncReplication},
+                {text: i18n('actions.dropReplication'), action: actions.dropAsyncReplication},
+            ],
+        ];
+
         const JUST_COPY: ActionsSet = [copyItem];
 
         // verbose mapping to guarantee a correct actions set for new node types
         // TS will error when a new type is added in the lib but is not mapped here
         const nodeTypeToActions: Record<NavigationTreeNodeType, ActionsSet> = {
-            async_replication: JUST_COPY,
+            async_replication: ASYNC_REPLICATION_SET,
 
             database: DIR_SET,
             directory: DIR_SET,

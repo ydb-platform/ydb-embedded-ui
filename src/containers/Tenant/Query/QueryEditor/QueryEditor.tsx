@@ -32,7 +32,6 @@ import {
 import {useQueryModes, useSetting} from '../../../../utils/hooks';
 import {LANGUAGE_YQL_ID} from '../../../../utils/monaco/yql/constants';
 import {QUERY_ACTIONS} from '../../../../utils/query';
-import {parseJson} from '../../../../utils/utils';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
     PaneVisibilityActionTypes,
@@ -145,20 +144,6 @@ function QueryEditor(props: QueryEditorProps) {
             window.removeEventListener('resize', onChangeWindow);
         };
     }, []);
-
-    React.useEffect(() => {
-        const storageEventHandler = (event: StorageEvent) => {
-            if (event.key === SAVED_QUERIES_KEY) {
-                const v = parseJson(event.newValue);
-                setSavedQueries(v);
-            }
-        };
-
-        window.addEventListener('storage', storageEventHandler);
-        return () => {
-            window.removeEventListener('storage', storageEventHandler);
-        };
-    }, [setSavedQueries]);
 
     React.useEffect(() => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);

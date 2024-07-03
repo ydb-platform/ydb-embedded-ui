@@ -2,12 +2,8 @@ import {ArrowsRotateLeft} from '@gravity-ui/icons';
 import {Button, Select} from '@gravity-ui/uikit';
 
 import {api} from '../../../../store/reducers/api';
-import {
-    selectAutoRefreshInterval,
-    setAutoRefreshInterval,
-} from '../../../../store/reducers/autoRefreshControl';
 import {cn} from '../../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -21,7 +17,7 @@ interface AutorefreshControlProps {
 
 export function AutorefreshControl({className}: AutorefreshControlProps) {
     const dispatch = useTypedDispatch();
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval, setAutoRefreshInterval] = useAutoRefreshInterval();
     return (
         <div className={b(null, className)}>
             <Button
@@ -38,7 +34,7 @@ export function AutorefreshControl({className}: AutorefreshControlProps) {
             <Select
                 value={[String(autoRefreshInterval)]}
                 onUpdate={(v) => {
-                    dispatch(setAutoRefreshInterval(Number(v)));
+                    setAutoRefreshInterval(Number(v));
                 }}
                 width={85}
             >

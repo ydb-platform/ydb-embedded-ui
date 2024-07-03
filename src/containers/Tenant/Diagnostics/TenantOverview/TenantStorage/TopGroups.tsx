@@ -1,7 +1,6 @@
-import {selectAutoRefreshInterval} from '../../../../../store/reducers/autoRefreshControl';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topStorageGroupsApi} from '../../../../../store/reducers/tenantOverview/topStorageGroups/topStorageGroups';
-import {useSearchQuery, useTypedSelector} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
 import {
     STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
     getStorageTopGroupsColumns,
@@ -18,7 +17,7 @@ interface TopGroupsProps {
 export function TopGroups({tenant}: TopGroupsProps) {
     const query = useSearchQuery();
 
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const columns = getStorageTopGroupsColumns();
 

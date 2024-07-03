@@ -11,7 +11,7 @@ export {default as appRoutes} from './routes';
 export {createApi, YdbEmbeddedAPI, YdbWebVersionAPI} from './services/api';
 export {settingsManager} from './services/settings';
 export {settings as userSettings} from './containers/UserSettings/settings';
-export {setUserSettings} from './store/reducers/settings/settings';
+export {setSettingValue, getSettingValue} from './store/reducers/settings/settings';
 
 export {componentsRegistry} from './components/ComponentsProvider/componentsRegistry';
 export {useSetting, useTypedSelector} from './utils/hooks';

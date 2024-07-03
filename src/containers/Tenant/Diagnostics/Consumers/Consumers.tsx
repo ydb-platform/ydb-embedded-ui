@@ -6,7 +6,6 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
-import {selectAutoRefreshInterval} from '../../../../store/reducers/autoRefreshControl';
 import {
     selectPreparedConsumersData,
     selectPreparedTopicStats,
@@ -15,7 +14,7 @@ import {
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {isCdcStreamEntityType} from '../../utils/schema';
 
 import {ConsumersTopicStats} from './TopicStats';
@@ -36,7 +35,7 @@ export const Consumers = ({path, type}: ConsumersProps) => {
 
     const [searchValue, setSearchValue] = React.useState('');
 
-    const autoRefreshInterval = useTypedSelector(selectAutoRefreshInterval);
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
         {path},
         {pollingInterval: autoRefreshInterval},

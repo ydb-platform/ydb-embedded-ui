@@ -1,24 +1,36 @@
 {
   "page.title": "Database",
-
   "pages.query": "Query",
   "pages.diagnostics": "Diagnostics",
-
   "acl.owner": "Owner",
   "acl.empty": "No Acl data",
-
   "summary.navigation": "Navigation",
   "summary.showPreview": "Show preview",
+  "summary.source-type": "Source Type",
+  "summary.data-source": "Data Source",
   "summary.copySchemaPath": "Copy schema path",
-
+  "summary.type": "Type",
+  "summary.subtype": "SubType",
+  "summary.id": "Id",
+  "summary.version": "Version",
+  "summary.created": "Created",
+  "summary.partitions": "Partitions count",
+  "summary.paths": "Paths",
+  "summary.shards": "Shards",
+  "summary.state": "State",
+  "summary.mode": "Mode",
+  "summary.format": "Format",
+  "summary.retention": "Retention",
+  "label.read-only": "ReadOnly",
   "actions.copied": "The path is copied to the clipboard",
   "actions.notCopied": "Couldn’t copy the path",
-
   "actions.copyPath": "Copy path",
   "actions.openPreview": "Open preview",
   "actions.createTable": "Create table...",
   "actions.createExternalTable": "Create external table...",
   "actions.createTopic": "Create topic...",
+  "actions.createColumnTable": "Create column table...",
+  "actions.createAsyncReplication": "Create async replication...",
   "actions.createView": "Create view...",
   "actions.dropTable": "Drop table...",
   "actions.dropTopic": "Drop topic...",
@@ -26,5 +38,7 @@
   "actions.alterTable": "Alter table...",
   "actions.alterTopic": "Alter topic...",
   "actions.selectQuery": "Select query...",
-  "actions.upsertQuery": "Upsert query..."
+  "actions.upsertQuery": "Upsert query...",
+  "actions.alterReplication": "Alter async replicaton...",
+  "actions.dropReplication": "Drop async replicaton..."
 }

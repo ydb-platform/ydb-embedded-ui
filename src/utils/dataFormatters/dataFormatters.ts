@@ -6,7 +6,7 @@ import {
     getSizeWithSignificantDigits,
 } from '../bytesParsers/formatBytes';
 import type {BytesSizes} from '../bytesParsers/formatBytes';
-import {DAY_IN_SECONDS, GIGABYTE} from '../constants';
+import {DAY_IN_SECONDS, GIGABYTE, HOUR_IN_SECONDS} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
 
@@ -99,6 +99,11 @@ export const formatNumber = (number?: unknown) => {
     return configuredNumeral(number).format('0,0.[00000]');
 };
 
+export const formatSecondsToHours = (seconds: number) => {
+    const hours = (seconds / HOUR_IN_SECONDS).toFixed(2);
+    return `${formatNumber(hours)} hours`;
+};
+
 export const roundToPrecision = (value: number | string, precision = 0) => {
     let [digits] = String(value).split('.');
     if (Number(value) < 1) {
@@ -134,14 +139,14 @@ export const formatCPUWithLabel = (value?: number) => {
     return `${localizedCores} ${i18n('format-cpu.cores', {count: cores})}`;
 };
 
-export const formatDateTime = (value?: number | string) => {
+export const formatDateTime = (value?: number | string, defaultValue = 'N/A') => {
     if (!isNumeric(value)) {
         return '';
     }
 
     const formattedData = dateTimeParse(Number(value))?.format('YYYY-MM-DD HH:mm');
 
-    return Number(value) > 0 && formattedData ? formattedData : 'N/A';
+    return Number(value) > 0 && formattedData ? formattedData : defaultValue;
 };
 
 export const calcUptimeInSeconds = (milliseconds: number | string) => {
