@@ -7,3 +7,9 @@ export const getEntityName = (pathDescription?: TPathDescription) => {
 
     return mapPathTypeToEntityName(PathType, PathSubType);
 };
+
+export const isReadOnlyTable = (pathDescription?: TPathDescription) => {
+    return pathDescription?.UserAttributes?.some(({Key, Value}) => {
+        return Key === '__async_replica' && Value === 'true';
+    });
+};
