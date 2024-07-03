@@ -23,7 +23,15 @@
     }
 
     &__tabs {
+        --g-tabs-border-width: 0;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
         padding: 0 20px;
+
+        box-shadow: inset 0 -1px 0 0 var(--g-color-line-generic);
     }
 
     &__tab {

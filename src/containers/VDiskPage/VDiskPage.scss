@@ -12,6 +12,12 @@
     padding-top: 20px;
     padding-left: 20px;
 
+    &__controls {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-2);
+    }
+
     &__group-title {
         @include header-1-typography();
     }

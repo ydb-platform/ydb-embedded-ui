@@ -6,6 +6,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
+import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
 import {GroupInfo} from '../../components/GroupInfo/GroupInfo';
@@ -18,10 +19,9 @@ import {selectNodesMap} from '../../store/reducers/nodesList';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {getSeverityColor} from '../../utils/disks/helpers';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import {vDiskPageKeyset} from './i18n';
 
@@ -45,12 +45,13 @@ export function VDiskPage() {
         dispatch(setHeaderBreadcrumbs('vDisk', {nodeId, pDiskId, vDiskSlotId}));
     }, [dispatch, nodeId, pDiskId, vDiskSlotId]);
 
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const params =
         valueIsDefined(nodeId) && valueIsDefined(pDiskId) && valueIsDefined(vDiskSlotId)
             ? {nodeId, pDiskId, vDiskSlotId}
             : skipToken;
     const {currentData, isFetching, refetch} = vDiskApi.useGetVDiskDataQuery(params, {
-        pollingInterval: DEFAULT_POLLING_INTERVAL,
+        pollingInterval: autoRefreshInterval,
     });
     const loading = isFetching && currentData === undefined;
     const {vDiskData = {}, groupData} = currentData || {};
@@ -126,7 +127,7 @@ export function VDiskPage() {
 
     const renderControls = () => {
         return (
-            <div>
+            <div className={vDiskPageCn('controls')}>
                 <ButtonWithConfirmDialog
                     onConfirmAction={handleEvictVDisk}
                     onConfirmActionSuccess={handleAfterEvictVDisk}
@@ -140,6 +141,7 @@ export function VDiskPage() {
                     <Icon data={ArrowsOppositeToDots} />
                     {vDiskPageKeyset('evict-vdisk-button')}
                 </ButtonWithConfirmDialog>
+                <AutoRefreshControl />
             </div>
         );
     };

@@ -29,13 +29,13 @@ import {setSearchValue, tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {DEFAULT_POLLING_INTERVAL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
     formatBytesToGigabyte,
     formatCPU,
     formatNumber,
 } from '../../utils/dataFormatters/dataFormatters';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {getTenantPath} from '../Tenant/TenantPages';
 
 import './Tenants.scss';
@@ -51,9 +51,10 @@ interface TenantsProps {
 export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     const dispatch = useTypedDispatch();
 
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
         {clusterName},
-        {pollingInterval: DEFAULT_POLLING_INTERVAL},
+        {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
     const tenants = currentData ?? [];

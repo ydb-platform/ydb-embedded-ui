@@ -9,8 +9,7 @@ import {ResponseError} from '../../../components/Errors/ResponseError';
 import {nodeApi} from '../../../store/reducers/node/node';
 import {selectNodeStructure} from '../../../store/reducers/node/selectors';
 import {cn} from '../../../utils/cn';
-import {DEFAULT_POLLING_INTERVAL} from '../../../utils/constants';
-import {useTypedSelector} from '../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedSelector} from '../../../utils/hooks';
 
 import {PDisk} from './Pdisk';
 
@@ -30,9 +29,10 @@ interface NodeStructureProps {
 function NodeStructure({nodeId, className}: NodeStructureProps) {
     const nodeStructure = useTypedSelector((state) => selectNodeStructure(state, nodeId));
 
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = nodeApi.useGetNodeStructureQuery(
         {nodeId},
-        {pollingInterval: DEFAULT_POLLING_INTERVAL},
+        {pollingInterval: autoRefreshInterval},
     );
 
     const loadingStructure = isFetching && currentData === undefined;

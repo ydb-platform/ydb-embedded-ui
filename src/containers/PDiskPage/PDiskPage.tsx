@@ -6,6 +6,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
+import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
@@ -15,9 +16,8 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {pDiskApi} from '../../store/reducers/pdisk/pdisk';
 import {valueIsDefined} from '../../utils';
-import {DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
 import {getSeverityColor} from '../../utils/disks/helpers';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import {PDiskGroups} from './PDiskGroups';
 import {pDiskPageKeyset} from './i18n';
@@ -40,17 +40,18 @@ export function PDiskPage() {
         dispatch(setHeaderBreadcrumbs('pDisk', {nodeId, pDiskId}));
     }, [dispatch, nodeId, pDiskId]);
 
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const params =
         valueIsDefined(nodeId) && valueIsDefined(pDiskId) ? {nodeId, pDiskId} : skipToken;
     const pdiskDataQuery = pDiskApi.useGetPdiskInfoQuery(params, {
-        pollingInterval: DEFAULT_POLLING_INTERVAL,
+        pollingInterval: autoRefreshInterval,
     });
     const pDiskLoading = pdiskDataQuery.isFetching && pdiskDataQuery.currentData === undefined;
     const pDiskData = pdiskDataQuery.currentData || {};
     const {NodeHost, NodeId, NodeType, NodeDC, Severity} = pDiskData;
 
     const pDiskStorageQuery = pDiskApi.useGetStorageInfoQuery(params, {
-        pollingInterval: DEFAULT_POLLING_INTERVAL,
+        pollingInterval: autoRefreshInterval,
     });
     const groupsLoading =
         pDiskStorageQuery.isFetching && pDiskStorageQuery.currentData === undefined;
@@ -128,6 +129,7 @@ export function PDiskPage() {
                     <Icon data={ArrowRotateLeft} />
                     {pDiskPageKeyset('restart-pdisk-button')}
                 </ButtonWithConfirmDialog>
+                <AutoRefreshControl />
             </div>
         );
     };

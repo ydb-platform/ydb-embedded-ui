@@ -24,4 +24,10 @@
     &__groups-title {
         @include header-1-typography();
     }
+
+    &__controls {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-2);
+    }
 }
