@@ -151,16 +151,16 @@ export const Acl = ({path}: {path: string}) => {
 
     return (
         <div className={b()}>
-            {ownerItem.length && (
+            {ownerItem.length ? (
                 <DefinitionList
                     items={ownerItem}
                     nameMaxWidth={200}
                     className={b('owner-container')}
                 />
-            )}
-            {aclListItems.length && (
+            ) : null}
+            {aclListItems.length ? (
                 <DefinitionList items={aclListItems} nameMaxWidth={200} className={b('result')} />
-            )}
+            ) : null}
         </div>
     );
 };
