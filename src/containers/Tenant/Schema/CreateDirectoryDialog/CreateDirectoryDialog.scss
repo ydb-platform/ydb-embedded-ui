@@ -1,11 +1,14 @@
 .ydb-schema-create-directory-dialog {
     &__label {
-        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+
+        margin-bottom: 8px;
     }
     &__description {
         color: var(--g-color-text-secondary);
     }
     &__error-wrapper {
-        height: var(--g-text-body-1-line-height);
+        min-height: var(--g-text-body-1-line-height);
     }
 }

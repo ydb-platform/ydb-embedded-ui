@@ -11,6 +11,8 @@ import './CreateDirectoryDialog.scss';
 
 const b = cn('ydb-schema-create-directory-dialog');
 
+const relativePathInputName = 'relativePath';
+
 interface SchemaTreeProps {
     open: boolean;
     onClose: VoidFunction;
@@ -26,14 +28,14 @@ function validateRelativePath(value: string) {
 }
 
 export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: SchemaTreeProps) {
-    const [error, setError] = React.useState<unknown>('');
+    const [showResponseError, setShowResponseError] = React.useState(false);
     const [validationError, setValidationError] = React.useState('');
     const [relativePath, setRelativePath] = React.useState('');
     const [create, response] = schemaApi.useCreateDirectoryMutation();
 
     const resetErrors = () => {
         setValidationError('');
-        setError('');
+        setShowResponseError(false);
     };
 
     const handleUpdate = (updated: string) => {
@@ -47,21 +49,20 @@ export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: Sc
         resetErrors();
     };
 
-    const handleSubmit = async () => {
-        try {
-            const path = `${parentPath}/${relativePath}`;
-            await create({
-                database: parentPath,
-                path,
-            }).unwrap();
-            handleClose();
-            onSuccess(relativePath);
-        } catch (e) {
-            setError(e);
-        }
+    const handleSubmit = () => {
+        setShowResponseError(true);
+        const path = `${parentPath}/${relativePath}`;
+        create({
+            database: parentPath,
+            path,
+        })
+            .unwrap()
+            .then(() => {
+                handleClose();
+                onSuccess(relativePath);
+            });
     };
 
-    const hasError = Boolean(error);
     const hasValidationError = Boolean(validationError);
 
     return (
@@ -78,27 +79,29 @@ export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: Sc
                 }}
             >
                 <Dialog.Body>
-                    <div className={b('label')}>
-                        <div className={b('description')}>
+                    <label htmlFor={relativePathInputName} className={b('label')}>
+                        <span className={b('description')}>
                             {i18n('schema.tree.dialog.description')}
-                        </div>
-                        <div>{`${parentPath}/`}</div>
-                    </div>
+                        </span>
+                        {`${parentPath}/`}
+                    </label>
                     <TextInput
                         placeholder={i18n('schema.tree.dialog.placeholder')}
                         value={relativePath}
                         onUpdate={handleUpdate}
                         autoFocus
                         hasClear
+                        autoComplete={false}
                         disabled={response.isLoading}
-                        error={hasValidationError}
+                        validationState={validationError ? 'invalid' : undefined}
+                        name={relativePathInputName}
                     />
                     <div className={b('error-wrapper')}>
                         {hasValidationError && <ResponseError error={validationError} />}
                     </div>
-                    {hasError && (
+                    {showResponseError && response.isError && (
                         <ResponseError
-                            error={error}
+                            error={response.error}
                             defaultMessage={i18n('schema.tree.dialog.invalid')}
                         />
                     )}
@@ -108,7 +111,7 @@ export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: Sc
                     textButtonApply={i18n('schema.tree.dialog.buttonApply')}
                     textButtonCancel={i18n('schema.tree.dialog.buttonCancel')}
                     onClickButtonCancel={handleClose}
-                    propsButtonApply={{disabled: hasValidationError, type: 'submit'}}
+                    propsButtonApply={{type: 'submit'}}
                 />
             </form>
         </Dialog>
