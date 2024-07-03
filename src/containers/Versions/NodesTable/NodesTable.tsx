@@ -51,12 +51,12 @@ const columns: Column<PreparedClusterNode>[] = [
         align: DataTable.LEFT,
     },
     {
-        name: 'uptime',
+        name: 'Uptime',
         header: 'Uptime',
         sortAccessor: ({StartTime}) => StartTime && -StartTime,
         width: 120,
         align: DataTable.LEFT,
-        render: ({row}) => row.uptime,
+        render: ({row}) => row.Uptime,
     },
     {
         name: 'MemoryUsed',
@@ -90,15 +90,14 @@ const columns: Column<PreparedClusterNode>[] = [
     {
         name: 'LoadAverage',
         header: 'Load average',
-        sortAccessor: ({LoadAverage = []}) =>
-            LoadAverage.slice(0, 1).reduce((acc, item) => acc + item, 0),
+        sortAccessor: ({LoadAveragePercents = []}) => LoadAveragePercents[0],
         defaultOrder: DataTable.DESCENDING,
         width: 140,
         resizeMinWidth: 140,
         render: ({row}) =>
-            row.LoadAverage && row.LoadAverage.length > 0 ? (
+            row.LoadAveragePercents && row.LoadAveragePercents.length > 0 ? (
                 <ProgressViewer
-                    value={row.LoadAverage[0]}
+                    value={row.LoadAveragePercents[0]}
                     percents={true}
                     capacity={100}
                     colorizeProgress={true}

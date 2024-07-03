@@ -3,6 +3,7 @@ import {z} from 'zod';
 import type {NodesPreparedEntity} from '../store/reducers/nodes/types';
 import {ProblemFilterValues} from '../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../store/reducers/settings/types';
+import type {TComputeNodeInfo} from '../types/api/compute';
 import {EFlag} from '../types/api/enums';
 import type {TSystemStateInfo} from '../types/api/nodes';
 import type {TNodeInfo} from '../types/api/nodesList';
@@ -11,6 +12,8 @@ import type {NodesMap} from '../types/store/nodesList';
 
 import {HOUR_IN_SECONDS} from './constants';
 import {calcUptime} from './dataFormatters/dataFormatters';
+
+import {valueIsDefined} from '.';
 
 export enum NodesUptimeFilterValues {
     'All' = 'All',
@@ -38,9 +41,22 @@ export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
     }, new Map());
 };
 
+export function calculateLoadAveragePercents(node: TSystemStateInfo | TComputeNodeInfo = {}) {
+    const {LoadAverage, NumberOfCpus} = node;
+
+    if (!valueIsDefined(LoadAverage) || !valueIsDefined(NumberOfCpus)) {
+        return undefined;
+    }
+
+    return LoadAverage.map((value) => {
+        return (value * 100) / NumberOfCpus;
+    });
+}
+
 export interface PreparedNodeSystemState extends TSystemStateInfo {
     Rack?: string;
     DC?: string;
+    LoadAveragePercents?: number[];
     Uptime: string;
 }
 
@@ -53,11 +69,14 @@ export const prepareNodeSystemState = (
 
     const Uptime = calcUptime(systemState.StartTime);
 
+    const LoadAveragePercents = calculateLoadAveragePercents(systemState);
+
     return {
         ...systemState,
         Rack,
         DC,
         Uptime,
+        LoadAveragePercents,
     };
 };
 
