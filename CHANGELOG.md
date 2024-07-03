@@ -1,5 +1,23 @@
 # Changelog
 
+## [6.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.7.0...v6.8.0) (2024-07-03)
+
+
+### Features
+
+* **Acl:** improve view ([#955](https://github.com/ydb-platform/ydb-embedded-ui/issues/955)) ([46aff45](https://github.com/ydb-platform/ydb-embedded-ui/commit/46aff451d7768a44d50d4fe56ff4cedb0be505b0))
+* add action "Create async replication" ([#959](https://github.com/ydb-platform/ydb-embedded-ui/issues/959)) ([75b0fa8](https://github.com/ydb-platform/ydb-embedded-ui/commit/75b0fa8532a2a051f3e7042f97d98ca0125a93ae))
+* add ReadOnly label to replicated tables ([#970](https://github.com/ydb-platform/ydb-embedded-ui/issues/970)) ([669f7f0](https://github.com/ydb-platform/ydb-embedded-ui/commit/669f7f00e0dc8d0dcbac6f54cf854915a2ca1ac0))
+
+
+### Bug Fixes
+
+* expand the column 'degraded' width ([#962](https://github.com/ydb-platform/ydb-embedded-ui/issues/962)) ([0d13d53](https://github.com/ydb-platform/ydb-embedded-ui/commit/0d13d53810f4ccbc5aa2545911021126274fbaf8))
+* fix replication template ([#973](https://github.com/ydb-platform/ydb-embedded-ui/issues/973)) ([071b0a7](https://github.com/ydb-platform/ydb-embedded-ui/commit/071b0a76b46c860015018c59c961c0dbb7ea3459))
+* **TenantNavigation:** fix radio button value ([#969](https://github.com/ydb-platform/ydb-embedded-ui/issues/969)) ([7d85393](https://github.com/ydb-platform/ydb-embedded-ui/commit/7d85393f42e96e567fc670e122d8e94a0f4b6c7b))
+* update deps ([#975](https://github.com/ydb-platform/ydb-embedded-ui/issues/975)) ([89703da](https://github.com/ydb-platform/ydb-embedded-ui/commit/89703da7276aaf50b5bd1058ee786210a5867d7d))
+* **UserSettings:** fix highlight on search ([#972](https://github.com/ydb-platform/ydb-embedded-ui/issues/972)) ([6fbd52c](https://github.com/ydb-platform/ydb-embedded-ui/commit/6fbd52c2725c1c5313f04b92217356e749ab7fe6))
+
 ## [6.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.6.1...v6.7.0) (2024-06-28)
 
 
