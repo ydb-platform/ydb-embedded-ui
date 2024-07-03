@@ -1,6 +1,4 @@
-import React from 'react';
-
-import {Label} from '@gravity-ui/uikit';
+import {Flex, Label} from '@gravity-ui/uikit';
 
 import type {TPathDescription} from '../../../types/api/schema';
 import i18n from '../i18n';
@@ -15,11 +13,11 @@ export function EntityTitle({data}: EntityTitleProps) {
 
     if (isReadOnlyTable(data)) {
         return (
-            <React.Fragment>
+            <Flex gap={1} wrap={'nowrap'}>
                 {entityName} <Label>{i18n('label.read-only')}</Label>
-            </React.Fragment>
+            </Flex>
         );
     }
 
-    return <React.Fragment>{entityName}</React.Fragment>;
+    return entityName;
 }

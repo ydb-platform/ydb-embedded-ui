@@ -2,6 +2,8 @@ import React from 'react';
 
 import {cn} from '../../utils/cn';
 
+import i18n from './i18n';
+
 import './InfoViewer.scss';
 
 export interface InfoViewerItem {
@@ -53,7 +55,7 @@ export const InfoViewer = ({
                     ))}
                 </div>
             ) : (
-                <React.Fragment>No data</React.Fragment>
+                i18n('no-data')
             )}
         </div>
     );
