@@ -136,13 +136,12 @@ const cpuColumn: NodesColumn = {
 const loadAverageColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.LoadAverage,
     header: 'Load average',
-    sortAccessor: ({LoadAverage = []}) =>
-        LoadAverage.slice(0, 1).reduce((acc, item) => acc + item, 0),
+    sortAccessor: ({LoadAveragePercents = []}) => LoadAveragePercents[0],
     defaultOrder: DataTable.DESCENDING,
     render: ({row}) =>
-        row.LoadAverage && row.LoadAverage.length > 0 ? (
+        row.LoadAveragePercents && row.LoadAveragePercents.length > 0 ? (
             <ProgressViewer
-                value={row.LoadAverage[0]}
+                value={row.LoadAveragePercents[0]}
                 percents={true}
                 colorizeProgress={true}
                 capacity={100}
@@ -179,10 +178,10 @@ const topNodesLoadAverageColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.TopNodesLoadAverage,
     header: 'Load',
     render: ({row}) =>
-        row.LoadAverage && row.LoadAverage.length > 0 ? (
+        row.LoadAveragePercents && row.LoadAveragePercents.length > 0 ? (
             <UsageLabel
-                value={row.LoadAverage[0].toFixed()}
-                theme={getLoadSeverityForNode(row.LoadAverage[0])}
+                value={row.LoadAveragePercents[0].toFixed()}
+                theme={getLoadSeverityForNode(row.LoadAveragePercents[0])}
             />
         ) : (
             '—'
