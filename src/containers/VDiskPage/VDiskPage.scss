@@ -9,8 +9,7 @@
     gap: 20px;
 
     height: 100%;
-    padding-top: 20px;
-    padding-left: 20px;
+    padding: 20px;
 
     &__controls {
         display: flex;
@@ -33,5 +32,9 @@
 
     &__group-disk {
         width: 150px;
+    }
+
+    &__auto-refresh-control {
+        margin-inline-start: auto;
     }
 }

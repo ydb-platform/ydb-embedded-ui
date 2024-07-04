@@ -129,7 +129,7 @@ export function PDiskPage() {
                     <Icon data={ArrowRotateLeft} />
                     {pDiskPageKeyset('restart-pdisk-button')}
                 </ButtonWithConfirmDialog>
-                <AutoRefreshControl />
+                <AutoRefreshControl className={pdiskPageCn('auto-refresh-control')} />
             </div>
         );
     };

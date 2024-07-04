@@ -141,7 +141,7 @@ export function VDiskPage() {
                     <Icon data={ArrowsOppositeToDots} />
                     {vDiskPageKeyset('evict-vdisk-button')}
                 </ButtonWithConfirmDialog>
-                <AutoRefreshControl />
+                <AutoRefreshControl className={vDiskPageCn('auto-refresh-control')} />
             </div>
         );
     };
