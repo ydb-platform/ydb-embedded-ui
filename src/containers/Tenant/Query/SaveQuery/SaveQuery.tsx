@@ -77,31 +77,30 @@ export function SaveQueryDialog() {
     const dispatch = useTypedDispatch();
     const queryAction = useTypedSelector(selectQueryAction);
     const [queryName, setQueryName] = React.useState('');
-    const [validationError, setValidationError] = React.useState<string | null>(null);
+    const [validationError, setValidationError] = React.useState<string>();
 
     const validateQueryName = (value: string) => {
+        if (!value) {
+            return i18n('error.name-not-empty');
+        }
         if (savedQueries.some((q) => q.name.toLowerCase() === value.trim().toLowerCase())) {
             return i18n('error.name-exists');
         }
-        return null;
+        return undefined;
     };
 
     const onCloseDialog = () => {
         dispatch(setQueryAction('idle'));
         setQueryName('');
-        setValidationError(null);
+        setValidationError(undefined);
     };
 
     const handleQueryNameChange = (value: string) => {
         setQueryName(value);
-        setValidationError(validateQueryName(value));
+        setValidationError(undefined);
     };
 
     const onSaveClick = () => {
-        if (!queryName || validationError) {
-            return;
-        }
-
         dispatch(saveQuery(queryName));
         onCloseDialog();
     };
@@ -112,39 +111,48 @@ export function SaveQueryDialog() {
             hasCloseButton={false}
             size="s"
             onClose={onCloseDialog}
-            onEnterKeyDown={onSaveClick}
         >
             <Dialog.Header caption={i18n('action.save')} />
-            <Dialog.Body className={b('dialog-body')}>
-                <div className={b('dialog-row')}>{i18n('description')}</div>
-                <div className={b('dialog-row')}>
-                    <label htmlFor="queryName" className={b('field-title', 'required')}>
-                        {i18n('input-label')}
-                    </label>
-                    <div className={b('control-wrapper')}>
-                        <TextInput
-                            id="queryName"
-                            placeholder={i18n('input-placeholder')}
-                            value={queryName}
-                            onUpdate={handleQueryNameChange}
-                            hasClear
-                            autoFocus
-                            error={Boolean(validationError)}
-                            autoComplete={false}
-                        />
-                        <span className={b('error')}>{validationError}</span>
-                    </div>
-                </div>
-            </Dialog.Body>
-            <Dialog.Footer
-                textButtonApply={i18n('button-apply')}
-                textButtonCancel={i18n('button-cancel')}
-                onClickButtonCancel={onCloseDialog}
-                onClickButtonApply={onSaveClick}
-                propsButtonApply={{
-                    disabled: !queryName || Boolean(validationError),
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    const validationError = validateQueryName(queryName);
+                    setValidationError(validationError);
+                    if (!validationError) {
+                        onSaveClick();
+                    }
                 }}
-            />
+            >
+                <Dialog.Body className={b('dialog-body')}>
+                    <div className={b('dialog-row')}>{i18n('description')}</div>
+                    <div className={b('dialog-row')}>
+                        <label htmlFor="queryName" className={b('field-title', 'required')}>
+                            {i18n('input-label')}
+                        </label>
+                        <div className={b('control-wrapper')}>
+                            <TextInput
+                                id="queryName"
+                                placeholder={i18n('input-placeholder')}
+                                value={queryName}
+                                onUpdate={handleQueryNameChange}
+                                hasClear
+                                autoFocus
+                                autoComplete={false}
+                                validationState={validationError ? 'invalid' : undefined}
+                                errorMessage={validationError}
+                            />
+                        </div>
+                    </div>
+                </Dialog.Body>
+                <Dialog.Footer
+                    textButtonApply={i18n('button-apply')}
+                    textButtonCancel={i18n('button-cancel')}
+                    onClickButtonCancel={onCloseDialog}
+                    propsButtonApply={{
+                        type: 'submit',
+                    }}
+                />
+            </form>
         </Dialog>
     );
 }

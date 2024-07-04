@@ -8,5 +8,6 @@
   "input-placeholder": "Enter query name",
   "button-apply": "Save",
   "button-cancel": "Cancel",
-  "error.name-exists": "This name already exists"
+  "error.name-exists": "This name already exists",
+  "error.name-not-empty": "Name should not be empty"
 }

@@ -25,13 +25,7 @@
     &__control-wrapper {
         display: flex;
         flex-grow: 1;
-        flex-direction: column;
-    }
-    &__error {
-        display: inline-block;
 
-        height: 17px;
-
-        color: var(--g-color-text-danger);
+        min-height: 48px;
     }
 }
