@@ -4,6 +4,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {Select, TableColumnSetup} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 
+import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
@@ -17,8 +18,8 @@ import {
     selectStatusFilter,
     selectVersionFilter,
 } from '../../store/reducers/clusters/selectors';
-import {DEFAULT_POLLING_INTERVAL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {getMinorVersion} from '../../utils/versions';
 
 import {ClustersStatistics} from './ClustersStatistics';
@@ -31,8 +32,9 @@ import {useSelectedColumns} from './useSelectedColumns';
 import './Clusters.scss';
 
 export function Clusters() {
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const query = clustersApi.useGetClustersListQuery(undefined, {
-        pollingInterval: DEFAULT_POLLING_INTERVAL,
+        pollingInterval: autoRefreshInterval,
     });
 
     const dispatch = useTypedDispatch();
@@ -107,10 +109,6 @@ export function Clusters() {
             .map((el) => ({value: el, content: el}));
     }, [clusters]);
 
-    if (query.isLoading) {
-        return <Loader size="l" />;
-    }
-
     return (
         <div className={b()}>
             <Helmet>
@@ -175,23 +173,27 @@ export function Clusters() {
                         sortable={false}
                     />
                 </div>
+                <AutoRefreshControl />
             </div>
             {query.isError ? <ResponseError error={query.error} className={b('error')} /> : null}
-            <div className={b('table-wrapper')}>
-                <div className={b('table-content')}>
-                    <ResizeableDataTable
-                        columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
-                        wrapperClassName={b('table')}
-                        data={filteredClusters}
-                        columns={columnsToShow}
-                        settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
-                        initialSortOrder={{
-                            columnId: COLUMNS_NAMES.TITLE,
-                            order: DataTable.ASCENDING,
-                        }}
-                    />
+            {query.isLoading ? <Loader size="l" /> : null}
+            {query.fulfilledTimeStamp ? (
+                <div className={b('table-wrapper')}>
+                    <div className={b('table-content')}>
+                        <ResizeableDataTable
+                            columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
+                            wrapperClassName={b('table')}
+                            data={filteredClusters}
+                            columns={columnsToShow}
+                            settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
+                            initialSortOrder={{
+                                columnId: COLUMNS_NAMES.TITLE,
+                                order: DataTable.ASCENDING,
+                            }}
+                        />
+                    </div>
                 </div>
-            </div>
+            ) : null}
         </div>
     );
 }

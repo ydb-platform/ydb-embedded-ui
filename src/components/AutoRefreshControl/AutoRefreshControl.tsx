@@ -1,21 +1,21 @@
 import {ArrowsRotateLeft} from '@gravity-ui/icons';
 import {Button, Select} from '@gravity-ui/uikit';
 
-import {api} from '../../../../store/reducers/api';
-import {cn} from '../../../../utils/cn';
-import {useAutoRefreshInterval, useTypedDispatch} from '../../../../utils/hooks';
+import {api} from '../../store/reducers/api';
+import {cn} from '../../utils/cn';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 
 import i18n from './i18n';
 
-import './AutorefreshControl.scss';
+import './AutoRefreshControl.scss';
 
-const b = cn('autorefresh-control');
+const b = cn('auto-refresh-control');
 
-interface AutorefreshControlProps {
+interface AutoRefreshControlProps {
     className?: string;
 }
 
-export function AutorefreshControl({className}: AutorefreshControlProps) {
+export function AutoRefreshControl({className}: AutoRefreshControlProps) {
     const dispatch = useTypedDispatch();
     const [autoRefreshInterval, setAutoRefreshInterval] = useAutoRefreshInterval();
     return (

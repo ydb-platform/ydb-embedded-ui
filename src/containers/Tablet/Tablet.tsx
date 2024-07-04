@@ -4,7 +4,7 @@ import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
 import {Link as ExternalLink, Icon} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
-import {useLocation, useParams} from 'react-router';
+import {useLocation, useParams} from 'react-router-dom';
 
 import {EmptyState} from '../../components/EmptyState';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
@@ -17,12 +17,8 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {tabletApi} from '../../store/reducers/tablet';
 import type {EType} from '../../types/api/tablet';
 import {cn} from '../../utils/cn';
-import {
-    CLUSTER_DEFAULT_TITLE,
-    DEFAULT_POLLING_INTERVAL,
-    DEVELOPER_UI_TITLE,
-} from '../../utils/constants';
-import {useTypedDispatch} from '../../utils/hooks';
+import {CLUSTER_DEFAULT_TITLE, DEVELOPER_UI_TITLE} from '../../utils/constants';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 
 import {TabletControls} from './TabletControls';
 import {TabletInfo} from './TabletInfo';
@@ -49,9 +45,10 @@ export const Tablet = () => {
         clusterName: queryClusterName,
     } = parseQuery(location);
 
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error, refetch} = tabletApi.useGetTabletQuery(
         {id},
-        {pollingInterval: DEFAULT_POLLING_INTERVAL},
+        {pollingInterval: autoRefreshInterval},
     );
 
     const loading = isFetching && currentData === undefined;

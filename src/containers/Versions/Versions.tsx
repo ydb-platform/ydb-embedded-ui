@@ -6,7 +6,7 @@ import {Loader} from '../../components/Loader';
 import {clusterNodesApi} from '../../store/reducers/clusterNodes/clusterNodes';
 import type {VersionToColorMap} from '../../types/versions';
 import {cn} from '../../utils/cn';
-import {DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
+import {useAutoRefreshInterval} from '../../utils/hooks';
 
 import {GroupedNodesTree} from './GroupedNodesTree/GroupedNodesTree';
 import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
@@ -21,9 +21,10 @@ interface VersionsProps {
 }
 
 export const Versions = ({versionToColor}: VersionsProps) => {
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const {data: nodes = [], isLoading: isNodesLoading} = clusterNodesApi.useGetClusterNodesQuery(
         undefined,
-        {pollingInterval: DEFAULT_POLLING_INTERVAL},
+        {pollingInterval: autoRefreshInterval},
     );
 
     const [groupByValue, setGroupByValue] = React.useState<GroupByValue>(GroupByValue.VERSION);

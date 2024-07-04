@@ -9,8 +9,7 @@
     gap: 20px;
 
     height: 100%;
-    padding-top: 20px;
-    padding-left: 20px;
+    padding: 20px;
 
     &__meta,
     &__title,
@@ -23,5 +22,15 @@
 
     &__groups-title {
         @include header-1-typography();
+    }
+
+    &__controls {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-2);
+    }
+
+    &__auto-refresh-control {
+        margin-inline-start: auto;
     }
 }

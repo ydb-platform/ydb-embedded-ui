@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Breadcrumbs} from '@gravity-ui/uikit';
 import {get} from 'lodash';
-import {useHistory, useLocation} from 'react-router';
+import {useLocation} from 'react-router-dom';
 
 import {InternalLink} from '../../components/InternalLink';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
@@ -33,14 +33,15 @@ interface HeaderProps {
 }
 
 function Header({mainPage}: HeaderProps) {
-    const history = useHistory();
     const location = useLocation();
     const queryParams = parseQuery(location);
 
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
 
-    const clusterInfo = clusterApi.useGetClusterInfoQuery(queryParams.clusterName);
+    const clusterInfo = clusterApi.useGetClusterInfoQuery(
+        queryParams.clusterName ? String(queryParams.clusterName) : undefined,
+    );
 
     const clusterName = get(
         clusterInfo,
@@ -65,7 +66,7 @@ function Header({mainPage}: HeaderProps) {
         return breadcrumbs.map((item) => {
             return {...item, action: () => {}};
         });
-    }, [clusterName, mainPage, history, queryParams, page, pageBreadcrumbsOptions]);
+    }, [clusterName, mainPage, queryParams, page, pageBreadcrumbsOptions]);
 
     const renderHeader = () => {
         return (
