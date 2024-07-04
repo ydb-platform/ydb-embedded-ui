@@ -8,7 +8,7 @@
     &__description {
         color: var(--g-color-text-secondary);
     }
-    &__error-wrapper {
-        min-height: var(--g-text-body-1-line-height);
+    &__input-wrapper {
+        min-height: 48px;
     }
 }

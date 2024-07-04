@@ -11,7 +11,7 @@ import './CreateDirectoryDialog.scss';
 
 const b = cn('ydb-schema-create-directory-dialog');
 
-const relativePathInputName = 'relativePath';
+const relativePathInputId = 'relativePath';
 
 interface SchemaTreeProps {
     open: boolean;
@@ -28,14 +28,13 @@ function validateRelativePath(value: string) {
 }
 
 export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: SchemaTreeProps) {
-    const [showResponseError, setShowResponseError] = React.useState(false);
     const [validationError, setValidationError] = React.useState('');
     const [relativePath, setRelativePath] = React.useState('');
     const [create, response] = schemaApi.useCreateDirectoryMutation();
 
     const resetErrors = () => {
         setValidationError('');
-        setShowResponseError(false);
+        response.reset();
     };
 
     const handleUpdate = (updated: string) => {
@@ -50,7 +49,6 @@ export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: Sc
     };
 
     const handleSubmit = () => {
-        setShowResponseError(true);
         const path = `${parentPath}/${relativePath}`;
         create({
             database: parentPath,
@@ -62,8 +60,6 @@ export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: Sc
                 onSuccess(relativePath);
             });
     };
-
-    const hasValidationError = Boolean(validationError);
 
     return (
         <Dialog open={open} onClose={handleClose} size="s">
@@ -79,27 +75,27 @@ export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: Sc
                 }}
             >
                 <Dialog.Body>
-                    <label htmlFor={relativePathInputName} className={b('label')}>
+                    <label htmlFor={relativePathInputId} className={b('label')}>
                         <span className={b('description')}>
                             {i18n('schema.tree.dialog.description')}
                         </span>
                         {`${parentPath}/`}
                     </label>
-                    <TextInput
-                        placeholder={i18n('schema.tree.dialog.placeholder')}
-                        value={relativePath}
-                        onUpdate={handleUpdate}
-                        autoFocus
-                        hasClear
-                        autoComplete={false}
-                        disabled={response.isLoading}
-                        validationState={validationError ? 'invalid' : undefined}
-                        name={relativePathInputName}
-                    />
-                    <div className={b('error-wrapper')}>
-                        {hasValidationError && <ResponseError error={validationError} />}
+                    <div className={b('input-wrapper')}>
+                        <TextInput
+                            placeholder={i18n('schema.tree.dialog.placeholder')}
+                            value={relativePath}
+                            onUpdate={handleUpdate}
+                            autoFocus
+                            hasClear
+                            autoComplete={false}
+                            disabled={response.isLoading}
+                            validationState={validationError ? 'invalid' : undefined}
+                            id={relativePathInputId}
+                            errorMessage={validationError}
+                        />
                     </div>
-                    {showResponseError && response.isError && (
+                    {response.isError && (
                         <ResponseError
                             error={response.error}
                             defaultMessage={i18n('schema.tree.dialog.invalid')}
