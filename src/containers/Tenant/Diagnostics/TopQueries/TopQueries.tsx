@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {useHistory, useLocation} from 'react-router';
+import {useHistory, useLocation} from 'react-router-dom';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
 import {DateRange} from '../../../../components/DateRange';

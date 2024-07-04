@@ -1,4 +1,4 @@
-import {useLocation} from 'react-router';
+import {useLocation} from 'react-router-dom';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import type {InfoViewerItem} from '../../../../components/InfoViewer';

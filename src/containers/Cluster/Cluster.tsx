@@ -41,7 +41,7 @@ interface ClusterProps {
     additionalVersionsProps?: AdditionalVersionsProps;
 }
 
-function Cluster({
+export function Cluster({
     additionalClusterProps,
     additionalTenantsProps,
     additionalNodesProps,
@@ -198,7 +198,11 @@ function Cluster({
                     >
                         <Versions versionToColor={versionToColor} />
                     </Route>
-                    <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
+                    <Route
+                        render={() => (
+                            <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
+                        )}
+                    />
                 </Switch>
             </div>
         </div>
@@ -228,5 +232,3 @@ function useClusterTab() {
 
     return activeTab;
 }
-
-export default Cluster;

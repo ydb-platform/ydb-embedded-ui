@@ -1,6 +1,6 @@
 import {ArrowRightFromSquare, ArrowRightToSquare} from '@gravity-ui/icons';
 import {Button, Icon} from '@gravity-ui/uikit';
-import {useHistory} from 'react-router';
+import {useHistory} from 'react-router-dom';
 
 import routes, {createHref} from '../../../routes';
 import {logout} from '../../../store/reducers/authentication/authentication';
