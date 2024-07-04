@@ -21,7 +21,10 @@ interface SchemaTreeProps {
 }
 
 function validateRelativePath(value: string) {
-    if (value && /\s/.test(value)) {
+    if (!value) {
+        return i18n('schema.tree.dialog.empty');
+    }
+    if (/\s/.test(value)) {
         return i18n('schema.tree.dialog.whitespace');
     }
     return '';
