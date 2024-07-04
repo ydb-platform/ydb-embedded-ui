@@ -4,8 +4,7 @@ import {HelpPopover} from '@gravity-ui/components';
 import {LayoutHeaderCellsLargeFill} from '@gravity-ui/icons';
 import {Button, Icon, Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
-import {useLocation} from 'react-router';
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import {StringParam, useQueryParam} from 'use-query-params';
 
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';

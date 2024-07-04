@@ -1,4 +1,4 @@
-import {useLocation} from 'react-router';
+import {useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';

@@ -2,7 +2,7 @@ import React from 'react';
 
 import type {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import {useLocation} from 'react-router';
+import {useLocation} from 'react-router-dom';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';

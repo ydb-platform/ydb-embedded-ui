@@ -33,7 +33,7 @@ interface NodeProps {
     className?: string;
 }
 
-function Node(props: NodeProps) {
+export function Node(props: NodeProps) {
     const container = React.useRef<HTMLDivElement>(null);
 
     const dispatch = useTypedDispatch();
@@ -159,5 +159,3 @@ function Node(props: NodeProps) {
         return <div className="error">no node data</div>;
     }
 }
-
-export default Node;

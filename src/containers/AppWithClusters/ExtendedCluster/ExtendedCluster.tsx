@@ -13,7 +13,7 @@ import {cn} from '../../../utils/cn';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../../utils/monitoring';
 import {getCleanBalancerValue, removeViewerPathname} from '../../../utils/parseBalancer';
 import {getBackendFromNodeHost} from '../../../utils/prepareBackend';
-import type Cluster from '../../Cluster/Cluster';
+import type {Cluster} from '../../Cluster/Cluster';
 import {useClusterData} from '../useClusterData';
 
 import './ExtendedCluster.scss';

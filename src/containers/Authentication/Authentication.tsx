@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Eye, EyeSlash, Xmark} from '@gravity-ui/icons';
 import {Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
-import {useHistory, useLocation} from 'react-router';
+import {useHistory, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../routes';
 import {authenticate} from '../../store/reducers/authentication/authentication';

@@ -13,18 +13,11 @@ import {getUser} from '../../store/reducers/authentication/authentication';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {lazyComponent} from '../../utils/lazyComponent';
 import Authentication from '../Authentication/Authentication';
-import Cluster from '../Cluster/Cluster';
 import {getClusterPath} from '../Cluster/utils';
-import {Clusters} from '../Clusters/Clusters';
 import Header from '../Header/Header';
 import type {RawBreadcrumbItem} from '../Header/breadcrumbs';
-import Node from '../Node/Node';
-import {PDiskPage} from '../PDiskPage/PDiskPage';
-import {Tablet} from '../Tablet';
-import {TabletsFilters} from '../TabletsFilters/TabletsFilters';
-import Tenant from '../Tenant/Tenant';
-import {VDiskPage} from '../VDiskPage/VDiskPage';
 
 import {
     ClusterSlot,
@@ -54,39 +47,44 @@ const routesSlots: RouteSlot[] = [
     {
         path: routes.cluster,
         slot: ClusterSlot,
-        component: Cluster,
+        component: lazyComponent(() => import('../Cluster/Cluster'), 'Cluster'),
     },
     {
         path: routes.tenant,
         slot: TenantSlot,
-        component: Tenant,
+        component: lazyComponent(() => import('../Tenant/Tenant'), 'Tenant'),
     },
     {
         path: routes.node,
         slot: NodeSlot,
-        component: Node,
+        component: lazyComponent(() => import('../Node/Node'), 'Node'),
     },
     {
         path: routes.pDisk,
         slot: PDiskPageSlot,
-        component: PDiskPage,
+        component: lazyComponent(() => import('../PDiskPage/PDiskPage'), 'PDiskPage'),
     },
     {
         path: routes.vDisk,
         slot: VDiskPageSlot,
-        component: VDiskPage,
+        component: lazyComponent(() => import('../VDiskPage/VDiskPage'), 'VDiskPage'),
     },
     {
         path: routes.tablet,
         slot: TabletSlot,
-        component: Tablet,
+        component: lazyComponent(() => import('../Tablet'), 'Tablet'),
     },
     {
         path: routes.tabletsFilters,
         slot: TabletsFiltersSlot,
-        component: TabletsFilters,
+        component: lazyComponent(
+            () => import('../TabletsFilters/TabletsFilters'),
+            'TabletsFilters',
+        ),
     },
 ];
+
+const Clusters = lazyComponent(() => import('../Clusters/Clusters'), 'Clusters');
 
 function renderRouteSlot(slots: SlotMap, route: RouteSlot) {
     return (
@@ -151,7 +149,12 @@ export function Content(props: ContentProps) {
                     {routesSlots.map((route) => {
                         return renderRouteSlot(slots, route);
                     })}
-                    <Redirect {...redirectProps} />
+                    <Route
+                        path={redirectProps.from || redirectProps.path}
+                        exact={redirectProps.exact}
+                        strict={redirectProps.strict}
+                        render={() => <Redirect to={redirectProps.to} push={redirectProps.push} />}
+                    />
                 </Switch>
             </Route>
         </Switch>

@@ -5,7 +5,7 @@ import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
 import {HelmetProvider} from 'react-helmet-async';
 import {Provider} from 'react-redux';
-import {Router} from 'react-router';
+import {Router} from 'react-router-dom';
 import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
