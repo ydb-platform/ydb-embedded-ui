@@ -41,6 +41,16 @@ export default schema;
 
 export const schemaApi = api.injectEndpoints({
     endpoints: (builder) => ({
+        createDirectory: builder.mutation<unknown, {database: string; path: string}>({
+            queryFn: async ({database, path}, {signal}) => {
+                try {
+                    const data = await window.api.createSchemaDirectory(database, path, {signal});
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+        }),
         getSchema: builder.query<TEvDescribeSchemeResult & {partial?: boolean}, {path: string}>({
             queryFn: async ({path}, {signal}) => {
                 try {
