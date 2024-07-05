@@ -1,5 +1,22 @@
 # Changelog
 
+## [6.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.8.0...v6.9.0) (2024-07-05)
+
+
+### Features
+
+* add creating directory through context menu in navigation tree ([#958](https://github.com/ydb-platform/ydb-embedded-ui/issues/958)) ([d1902d4](https://github.com/ydb-platform/ydb-embedded-ui/commit/d1902d49f2703ec91b56a6d48d2510533ebbf1a9))
+* **AutoRefresh:** use auto refresh control on other pages ([#976](https://github.com/ydb-platform/ydb-embedded-ui/issues/976)) ([6ec3d33](https://github.com/ydb-platform/ydb-embedded-ui/commit/6ec3d333e59a358e6db6045dd6942c91de910f8f))
+* prepare for react-router 6, lazy load routes ([#980](https://github.com/ydb-platform/ydb-embedded-ui/issues/980)) ([459a3dd](https://github.com/ydb-platform/ydb-embedded-ui/commit/459a3dde10208a15c7eb6e9fa32f3ed57674aee9))
+
+
+### Bug Fixes
+
+* **CreateDirectoryDialog:** check path is not empty ([#981](https://github.com/ydb-platform/ydb-embedded-ui/issues/981)) ([5794dcd](https://github.com/ydb-platform/ydb-embedded-ui/commit/5794dcddb8d1908bd3de6c1a67c98011f5568333))
+* fix node LoadAverage calculation ([#978](https://github.com/ydb-platform/ydb-embedded-ui/issues/978)) ([191ac71](https://github.com/ydb-platform/ydb-embedded-ui/commit/191ac71f247c9a77765b709365874deefb804af1))
+* package update ([#977](https://github.com/ydb-platform/ydb-embedded-ui/issues/977)) ([761b29e](https://github.com/ydb-platform/ydb-embedded-ui/commit/761b29e858be6d60adb438b1e4333be9b0b4ec82))
+* **UserSettings:** change default settings values ([#983](https://github.com/ydb-platform/ydb-embedded-ui/issues/983)) ([4dcbb2e](https://github.com/ydb-platform/ydb-embedded-ui/commit/4dcbb2e34316e0714189a085d547b192fb2dc83c))
+
 ## [6.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.7.0...v6.8.0) (2024-07-03)
 
 
