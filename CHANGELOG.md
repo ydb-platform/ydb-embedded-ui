@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.9.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.9.1...v6.9.2) (2024-07-05)
+
+
+### Bug Fixes
+
+* **Header:** fix state mutation ([#987](https://github.com/ydb-platform/ydb-embedded-ui/issues/987)) ([12ba9c0](https://github.com/ydb-platform/ydb-embedded-ui/commit/12ba9c078ce820267e74f4dc3c290bb989d19e2c))
+
 ## [6.9.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.9.0...v6.9.1) (2024-07-05)
 
 
