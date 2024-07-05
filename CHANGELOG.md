@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.9.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.9.0...v6.9.1) (2024-07-05)
+
+
+### Bug Fixes
+
+* fix package ([#985](https://github.com/ydb-platform/ydb-embedded-ui/issues/985)) ([8eaa897](https://github.com/ydb-platform/ydb-embedded-ui/commit/8eaa897ac9e601d32311490820f3617200c4baf7))
+
 ## [6.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.8.0...v6.9.0) (2024-07-05)
 
 
