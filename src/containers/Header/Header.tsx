@@ -51,14 +51,17 @@ function Header({mainPage}: HeaderProps) {
 
     const breadcrumbItems = React.useMemo(() => {
         const rawBreadcrumbs: RawBreadcrumbItem[] = [];
-        const options = pageBreadcrumbsOptions;
+        let options = pageBreadcrumbsOptions;
 
         if (mainPage) {
             rawBreadcrumbs.push(mainPage);
         }
 
         if (clusterName) {
-            options.clusterName = clusterName;
+            options = {
+                ...options,
+                clusterName,
+            };
         }
 
         const breadcrumbs = getBreadcrumbs(page, options, rawBreadcrumbs, queryParams);
