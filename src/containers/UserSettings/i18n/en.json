@@ -40,5 +40,8 @@
   "settings.queryUseMultiSchema.title": "Allow queries with multiple result sets",
   "settings.queryUseMultiSchema.popover": "Use 'multi' schema for queries. It enables queries with multiple result sets. It returns nothing on versions 23-3 and older",
 
+  "settings.useClusterBalancerAsBackend.title": "Use cluster balancer as backend",
+  "settings.useClusterBalancerAsBackend.popover": "By default random cluster node is used as backend. It causes saved links to become invalid after some time, when node is restarted. Using balancer as backend fixes it",
+
   "settings.about.interfaceVersionInfoField.title": "Interface version"
 }

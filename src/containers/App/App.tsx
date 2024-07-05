@@ -9,7 +9,7 @@ import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
 import type {RootState} from '../../store';
 import {Navigation} from '../AsideNavigation/Navigation';
 import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
-import {settings} from '../UserSettings/settings';
+import {getUserSettings} from '../UserSettings/settings';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
 
 import ContentWrapper, {Content} from './Content';
@@ -25,7 +25,13 @@ export interface AppProps {
     children?: React.ReactNode;
 }
 
-function App({store, history, singleClusterMode, children, userSettings = settings}: AppProps) {
+function App({
+    store,
+    history,
+    singleClusterMode,
+    children,
+    userSettings = getUserSettings({singleClusterMode}),
+}: AppProps) {
     return (
         <Providers store={store} history={history}>
             <Helmet defaultTitle="YDB Monitoring" titleTemplate="%s — YDB Monitoring" />

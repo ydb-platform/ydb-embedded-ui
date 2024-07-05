@@ -2,13 +2,12 @@ import {Settings} from '@gravity-ui/navigation';
 
 import {Setting} from './Setting';
 import type {YDBEmbeddedUISettings} from './settings';
-import {settings} from './settings';
 
 interface UserSettingsProps {
-    settings?: YDBEmbeddedUISettings;
+    settings: YDBEmbeddedUISettings;
 }
 
-export const UserSettings = ({settings: userSettings = settings}: UserSettingsProps) => {
+export const UserSettings = ({settings: userSettings}: UserSettingsProps) => {
     return (
         <Settings>
             {userSettings.map((page) => {
