@@ -1,5 +1,80 @@
 # Changelog
 
+## [6.9.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.9.1...v6.9.2) (2024-07-05)
+
+
+### Bug Fixes
+
+* **Header:** fix state mutation ([#987](https://github.com/ydb-platform/ydb-embedded-ui/issues/987)) ([12ba9c0](https://github.com/ydb-platform/ydb-embedded-ui/commit/12ba9c078ce820267e74f4dc3c290bb989d19e2c))
+
+## [6.9.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.9.0...v6.9.1) (2024-07-05)
+
+
+### Bug Fixes
+
+* fix package ([#985](https://github.com/ydb-platform/ydb-embedded-ui/issues/985)) ([8eaa897](https://github.com/ydb-platform/ydb-embedded-ui/commit/8eaa897ac9e601d32311490820f3617200c4baf7))
+
+## [6.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.8.0...v6.9.0) (2024-07-05)
+
+
+### Features
+
+* add creating directory through context menu in navigation tree ([#958](https://github.com/ydb-platform/ydb-embedded-ui/issues/958)) ([d1902d4](https://github.com/ydb-platform/ydb-embedded-ui/commit/d1902d49f2703ec91b56a6d48d2510533ebbf1a9))
+* **AutoRefresh:** use auto refresh control on other pages ([#976](https://github.com/ydb-platform/ydb-embedded-ui/issues/976)) ([6ec3d33](https://github.com/ydb-platform/ydb-embedded-ui/commit/6ec3d333e59a358e6db6045dd6942c91de910f8f))
+* prepare for react-router 6, lazy load routes ([#980](https://github.com/ydb-platform/ydb-embedded-ui/issues/980)) ([459a3dd](https://github.com/ydb-platform/ydb-embedded-ui/commit/459a3dde10208a15c7eb6e9fa32f3ed57674aee9))
+
+
+### Bug Fixes
+
+* **CreateDirectoryDialog:** check path is not empty ([#981](https://github.com/ydb-platform/ydb-embedded-ui/issues/981)) ([5794dcd](https://github.com/ydb-platform/ydb-embedded-ui/commit/5794dcddb8d1908bd3de6c1a67c98011f5568333))
+* fix node LoadAverage calculation ([#978](https://github.com/ydb-platform/ydb-embedded-ui/issues/978)) ([191ac71](https://github.com/ydb-platform/ydb-embedded-ui/commit/191ac71f247c9a77765b709365874deefb804af1))
+* package update ([#977](https://github.com/ydb-platform/ydb-embedded-ui/issues/977)) ([761b29e](https://github.com/ydb-platform/ydb-embedded-ui/commit/761b29e858be6d60adb438b1e4333be9b0b4ec82))
+* **UserSettings:** change default settings values ([#983](https://github.com/ydb-platform/ydb-embedded-ui/issues/983)) ([4dcbb2e](https://github.com/ydb-platform/ydb-embedded-ui/commit/4dcbb2e34316e0714189a085d547b192fb2dc83c))
+
+## [6.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.7.0...v6.8.0) (2024-07-03)
+
+
+### Features
+
+* **Acl:** improve view ([#955](https://github.com/ydb-platform/ydb-embedded-ui/issues/955)) ([46aff45](https://github.com/ydb-platform/ydb-embedded-ui/commit/46aff451d7768a44d50d4fe56ff4cedb0be505b0))
+* add action "Create async replication" ([#959](https://github.com/ydb-platform/ydb-embedded-ui/issues/959)) ([75b0fa8](https://github.com/ydb-platform/ydb-embedded-ui/commit/75b0fa8532a2a051f3e7042f97d98ca0125a93ae))
+* add ReadOnly label to replicated tables ([#970](https://github.com/ydb-platform/ydb-embedded-ui/issues/970)) ([669f7f0](https://github.com/ydb-platform/ydb-embedded-ui/commit/669f7f00e0dc8d0dcbac6f54cf854915a2ca1ac0))
+
+
+### Bug Fixes
+
+* expand the column 'degraded' width ([#962](https://github.com/ydb-platform/ydb-embedded-ui/issues/962)) ([0d13d53](https://github.com/ydb-platform/ydb-embedded-ui/commit/0d13d53810f4ccbc5aa2545911021126274fbaf8))
+* fix replication template ([#973](https://github.com/ydb-platform/ydb-embedded-ui/issues/973)) ([071b0a7](https://github.com/ydb-platform/ydb-embedded-ui/commit/071b0a76b46c860015018c59c961c0dbb7ea3459))
+* **TenantNavigation:** fix radio button value ([#969](https://github.com/ydb-platform/ydb-embedded-ui/issues/969)) ([7d85393](https://github.com/ydb-platform/ydb-embedded-ui/commit/7d85393f42e96e567fc670e122d8e94a0f4b6c7b))
+* update deps ([#975](https://github.com/ydb-platform/ydb-embedded-ui/issues/975)) ([89703da](https://github.com/ydb-platform/ydb-embedded-ui/commit/89703da7276aaf50b5bd1058ee786210a5867d7d))
+* **UserSettings:** fix highlight on search ([#972](https://github.com/ydb-platform/ydb-embedded-ui/issues/972)) ([6fbd52c](https://github.com/ydb-platform/ydb-embedded-ui/commit/6fbd52c2725c1c5313f04b92217356e749ab7fe6))
+
+## [6.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.6.1...v6.7.0) (2024-06-28)
+
+
+### Features
+
+* add "Create column table" action ([#957](https://github.com/ydb-platform/ydb-embedded-ui/issues/957)) ([6cb3e2b](https://github.com/ydb-platform/ydb-embedded-ui/commit/6cb3e2b65bd8ed3d9de723fa03ce33848c3f7f05))
+* add auto-increment for raw table type ([#929](https://github.com/ydb-platform/ydb-embedded-ui/issues/929)) ([87e22cd](https://github.com/ydb-platform/ydb-embedded-ui/commit/87e22cd2f490f14cdb03a24dd45e6712018ec234))
+* **api:** add retries on errors ([#934](https://github.com/ydb-platform/ydb-embedded-ui/issues/934)) ([86faa42](https://github.com/ydb-platform/ydb-embedded-ui/commit/86faa42c49c9c757c5aa75eb65567eae0a34e260))
+* **autoRefresh:** move auto refresh to separate reducer ([#943](https://github.com/ydb-platform/ydb-embedded-ui/issues/943)) ([a391e94](https://github.com/ydb-platform/ydb-embedded-ui/commit/a391e9408595d7c6ac3903a13244644475d10ece))
+* **autoRefresh:** use user settings to store auto refresh interval ([#956](https://github.com/ydb-platform/ydb-embedded-ui/issues/956)) ([99a24ce](https://github.com/ydb-platform/ydb-embedded-ui/commit/99a24ceadda3623e59743a9c510810994b0c0a42))
+* **Header:** use InternalLink for breadcrumb items ([#913](https://github.com/ydb-platform/ydb-embedded-ui/issues/913)) ([cdf36da](https://github.com/ydb-platform/ydb-embedded-ui/commit/cdf36daab24e9a558e5c80f6a8672afd1e84e668))
+* **HealthCheck:** show aggregated status in preview ([#839](https://github.com/ydb-platform/ydb-embedded-ui/issues/839)) ([71d316c](https://github.com/ydb-platform/ydb-embedded-ui/commit/71d316c111cdbec2f417fcb54c54144377d326e6))
+* **Navigation:** relocate tenant nav to main space ([#936](https://github.com/ydb-platform/ydb-embedded-ui/issues/936)) ([6161d97](https://github.com/ydb-platform/ydb-embedded-ui/commit/6161d97c3c6a7aa0108cb1af8945ada9f039ec00))
+* **schema:** use rtk-query ([#948](https://github.com/ydb-platform/ydb-embedded-ui/issues/948)) ([524e815](https://github.com/ydb-platform/ydb-embedded-ui/commit/524e815bc593c60381aa78135bf02b3c2f2b8103))
+* **store:** rewrite some reducers to rtk-query ([#942](https://github.com/ydb-platform/ydb-embedded-ui/issues/942)) ([59d41f2](https://github.com/ydb-platform/ydb-embedded-ui/commit/59d41f2868633ae5934d68de44aa538013f9a4ae))
+* **user-settings:** sync user settings with LS ([#951](https://github.com/ydb-platform/ydb-embedded-ui/issues/951)) ([9919358](https://github.com/ydb-platform/ydb-embedded-ui/commit/99193580050336b80a6e65544c0d8fcc9294796e))
+
+
+### Bug Fixes
+
+* handle with undefined value of row and column in issue position ([#932](https://github.com/ydb-platform/ydb-embedded-ui/issues/932)) ([2cb27c5](https://github.com/ydb-platform/ydb-embedded-ui/commit/2cb27c575b9f307e6fe164f7e18a3328b4d5a487))
+* rework overview pane in schema browser ([#954](https://github.com/ydb-platform/ydb-embedded-ui/issues/954)) ([ed46a5f](https://github.com/ydb-platform/ydb-embedded-ui/commit/ed46a5f74480813d1eeb3567fae699f4193bd8c7))
+* **TableInfo:** scroll ([#946](https://github.com/ydb-platform/ydb-embedded-ui/issues/946)) ([190992e](https://github.com/ydb-platform/ydb-embedded-ui/commit/190992e25fc422e79f8feb68b6a653b24043aa66))
+* **Tablets:** enable sort by fqdn ([#947](https://github.com/ydb-platform/ydb-embedded-ui/issues/947)) ([e33dc72](https://github.com/ydb-platform/ydb-embedded-ui/commit/e33dc724045340b2492a6b75325147887582fb7d))
+* typo in prettier ([#931](https://github.com/ydb-platform/ydb-embedded-ui/issues/931)) ([e08a36a](https://github.com/ydb-platform/ydb-embedded-ui/commit/e08a36ac67d42691311b9c7ae709f54016ff945d))
+
 ## [6.6.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.6.0...v6.6.1) (2024-06-14)
 
 

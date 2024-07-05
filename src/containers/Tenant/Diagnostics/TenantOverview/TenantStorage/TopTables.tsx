@@ -1,6 +1,6 @@
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import {useLocation} from 'react-router';
+import {useLocation} from 'react-router-dom';
 
 import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';

@@ -5,6 +5,7 @@ import {Helmet} from 'react-helmet-async';
 import {Link} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
+import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
 import routes, {createHref} from '../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
@@ -20,7 +21,6 @@ import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {TenantTabsGroups} from '../TenantPages';
 import {isDatabaseEntityType} from '../utils/schema';
 
-import {AutorefreshControl} from './Autorefresh/AutorefreshControl';
 import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
@@ -157,7 +157,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         }}
                         allowNotSelected={true}
                     />
-                    <AutorefreshControl />
+                    <AutoRefreshControl />
                 </div>
             </div>
         );

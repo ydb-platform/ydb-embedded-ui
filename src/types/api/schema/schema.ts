@@ -61,6 +61,7 @@ export interface TPathDescription {
     /** info about the path itself */
     Self?: TDirEntry;
     DomainDescription?: TDomainDescription;
+    UserAttributes?: TUserAttribute[];
 
     // for directory
     Children?: TDirEntry[];
@@ -308,4 +309,9 @@ interface TTablePartition {
     IsInclusive?: boolean;
     /** uint64 */
     DatashardId?: string;
+}
+
+interface TUserAttribute {
+    Key?: string;
+    Value?: string;
 }

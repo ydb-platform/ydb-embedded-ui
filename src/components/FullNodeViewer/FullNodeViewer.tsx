@@ -35,7 +35,7 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
         {label: 'Rack', value: node?.Rack},
     );
 
-    const averageInfo = node?.LoadAverage?.map((load, loadIndex) => ({
+    const averageInfo = node?.LoadAveragePercents?.map((load, loadIndex) => ({
         label: LOAD_AVERAGE_TIME_INTERVALS[loadIndex],
         value: (
             <ProgressViewer value={load} percents={true} colorizeProgress={true} capacity={100} />

@@ -46,14 +46,14 @@ export default clusterSlice.reducer;
 
 export const clusterApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getClusterInfo: builder.query({
-            queryFn: async (
-                clusterName = '',
-                {signal},
-            ): Promise<
-                | {data: {clusterData: TClusterInfo; groupsStats?: ClusterGroupsStats}}
-                | {error: unknown}
-            > => {
+        getClusterInfo: builder.query<
+            {
+                clusterData: TClusterInfo;
+                groupsStats?: ClusterGroupsStats;
+            },
+            string | undefined
+        >({
+            queryFn: async (clusterName, {signal}) => {
                 try {
                     const clusterData = await window.api.getClusterInfo(clusterName, {signal});
                     const clusterRoot = clusterData.Domain;

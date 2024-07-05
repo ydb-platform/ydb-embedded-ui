@@ -40,7 +40,7 @@ interface TenantProps {
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-function Tenant(props: TenantProps) {
+export function Tenant(props: TenantProps) {
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED),
         undefined,
@@ -143,5 +143,3 @@ function Tenant(props: TenantProps) {
         </div>
     );
 }
-
-export default Tenant;

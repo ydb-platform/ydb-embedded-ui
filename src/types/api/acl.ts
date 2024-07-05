@@ -19,7 +19,8 @@ export interface TMetaCommonInfo {
 export interface TACE {
     AccessType: string;
     AccessRights?: string[];
+    AccessRules?: string[];
     Subject: string;
     InheritanceType?: string[];
-    AccessRule: string;
+    AccessRule?: string;
 }

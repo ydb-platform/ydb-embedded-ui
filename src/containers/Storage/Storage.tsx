@@ -21,7 +21,7 @@ import type {
     VisibleEntities,
 } from '../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import {DEFAULT_POLLING_INTERVAL, DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
     useAutoRefreshInterval,
     useNodesRequestParams,
@@ -63,7 +63,7 @@ interface StorageProps {
 }
 
 export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) => {
-    const [autorefresh] = useAutoRefreshInterval();
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
         visible: StringParam,
@@ -104,8 +104,6 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
         filter,
         ...groupsSortParams,
     });
-
-    const autoRefreshInterval = tenant ? autorefresh : DEFAULT_POLLING_INTERVAL;
 
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
         {tenant, visibleEntities, ...nodesRequestParams},

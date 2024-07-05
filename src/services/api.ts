@@ -287,6 +287,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             this.getPath('/viewer/json/acl'),
             {
                 path,
+                merge_rules: true,
             },
             {concurrentId: concurrentId || `getSchemaAcl`, requestConfig: {signal}},
         );
@@ -633,6 +634,20 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         return this.get<MetaClusters>(`${META_BACKEND || ''}/meta/clusters`, null, {
             requestConfig: {signal},
         });
+    }
+
+    createSchemaDirectory(database: string, path: string, {signal}: {signal?: AbortSignal} = {}) {
+        return this.post<{test: string}>(
+            this.getPath('/scheme/directory'),
+            {},
+            {
+                database,
+                path,
+            },
+            {
+                requestConfig: {signal},
+            },
+        );
     }
 }
 

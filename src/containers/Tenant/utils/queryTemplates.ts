@@ -42,6 +42,20 @@ CREATE TABLE \`${path}/ydb_column_table\` (
 PARTITION BY HASH(id)
 WITH (STORE = COLUMN)`;
 };
+export const createAsyncReplicationTemplate = () => {
+    return `CREATE OBJECT secret_name (TYPE SECRET) WITH value="secret_value";
+
+CREATE ASYNC REPLICATION my_replication
+FOR \`/remote_database/table_name\` AS \`local_table_name\` --[, \`/remote_database/another_table_name\` AS \`another_local_table_name\` ...]
+WITH (
+    CONNECTION_STRING="grpcs://mydb.ydb.tech:2135/?database=/remote_database",
+    TOKEN_SECRET_NAME = "secret_name"
+    -- ENDPOINT="mydb.ydb.tech:2135",
+    -- DATABASE=\`/remote_database\`,
+    -- USER="user",
+    -- PASSWORD_SECRET_NAME="your_password"
+);`;
+};
 export const alterTableTemplate = (path: string) => {
     return `ALTER TABLE \`${path}\`
     ADD COLUMN is_deleted Bool;`;
@@ -130,4 +144,11 @@ export const createViewTemplate = (path: string) => {
 
 export const dropViewTemplate = (path: string) => {
     return `DROP VIEW \`${path}\`;`;
+};
+export const dropAsyncReplicationTemplate = (path: string) => {
+    return `DROP ASYNC REPLICATION \`${path}\`;`;
+};
+
+export const alterAsyncReplicationTemplate = (path: string) => {
+    return `ALTER ASYNC REPLICATION \`${path}\` SET (STATE = "DONE", FAILOVER_MODE = "FORCE");`;
 };

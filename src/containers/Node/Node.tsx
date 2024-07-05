@@ -2,9 +2,9 @@ import React from 'react';
 
 import {Tabs} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
-import {useLocation, useRouteMatch} from 'react-router';
-import {Link} from 'react-router-dom';
+import {Link, useLocation, useRouteMatch} from 'react-router-dom';
 
+import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
@@ -14,8 +14,7 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {nodeApi} from '../../store/reducers/node/node';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
-import {useTypedDispatch} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {Tablets} from '../Tablets';
 
@@ -33,7 +32,7 @@ interface NodeProps {
     className?: string;
 }
 
-function Node(props: NodeProps) {
+export function Node(props: NodeProps) {
     const container = React.useRef<HTMLDivElement>(null);
 
     const dispatch = useTypedDispatch();
@@ -45,9 +44,10 @@ function Node(props: NodeProps) {
     const {id: nodeId, activeTab} = match.params;
     const {tenantName: tenantNameFromQuery} = parseQuery(location);
 
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = nodeApi.useGetNodeInfoQuery(
         {nodeId},
-        {pollingInterval: DEFAULT_POLLING_INTERVAL},
+        {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
     const node = currentData;
@@ -101,6 +101,7 @@ function Node(props: NodeProps) {
                     )}
                     allowNotSelected={true}
                 />
+                <AutoRefreshControl />
             </div>
         );
     };
@@ -159,5 +160,3 @@ function Node(props: NodeProps) {
         return <div className="error">no node data</div>;
     }
 }
-
-export default Node;

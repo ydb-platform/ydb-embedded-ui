@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Pulse, Terminal} from '@gravity-ui/icons';
-import {useHistory, useLocation} from 'react-router';
+import {useHistory, useLocation} from 'react-router-dom';
 
 import routes, {parseQuery} from '../../../routes';
 import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';

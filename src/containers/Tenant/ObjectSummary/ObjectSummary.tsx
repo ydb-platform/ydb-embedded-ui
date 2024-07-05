@@ -4,8 +4,7 @@ import {HelpPopover} from '@gravity-ui/components';
 import {LayoutHeaderCellsLargeFill} from '@gravity-ui/icons';
 import {Button, Icon, Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
-import {useLocation} from 'react-router';
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import {StringParam, useQueryParam} from 'use-query-params';
 
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
@@ -15,7 +14,6 @@ import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {Loader} from '../../../components/Loader';
 import SplitPane from '../../../components/SplitPane';
-import {getEntityName} from '../../../containers/Tenant/utils';
 import routes, {createExternalUILink, createHref} from '../../../routes';
 import {schemaApi, setShowPreview} from '../../../store/reducers/schema/schema';
 import {
@@ -33,6 +31,7 @@ import {
 import {formatDateTime, formatSecondsToHours} from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Acl} from '../Acl/Acl';
+import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
@@ -159,7 +158,8 @@ export function ObjectSummary({
         });
 
         const {PathDescription} = currentObjectData;
-        const title = getEntityName(PathDescription);
+
+        const title = <EntityTitle data={PathDescription} />;
 
         const getPathTypeOverview: Record<EPathType, (() => InfoViewerItem[]) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,

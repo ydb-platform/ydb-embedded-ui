@@ -24,11 +24,7 @@ import {
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {
-    DEFAULT_POLLING_INTERVAL,
-    DEFAULT_TABLE_SETTINGS,
-    USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
-} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
 import {
     useAutoRefreshInterval,
     useSetting,
@@ -65,14 +61,11 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
 
     const dispatch = useTypedDispatch();
 
-    const isClusterNodes = !path;
-
     const problemFilter = useTypedSelector(selectProblemFilter);
-    const [autorefresh] = useAutoRefreshInterval();
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const [useNodesEndpoint] = useSetting(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY);
 
-    const autoRefreshInterval = isClusterNodes ? DEFAULT_POLLING_INTERVAL : autorefresh;
     // If there is no path, it's cluster Nodes tab
     const useGetComputeNodes = path && !useNodesEndpoint;
     const nodesQuery = nodesApi.useGetNodesQuery(useGetComputeNodes ? skipToken : {path}, {

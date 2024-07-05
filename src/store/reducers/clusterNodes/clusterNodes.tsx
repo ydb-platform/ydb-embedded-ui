@@ -1,10 +1,8 @@
-import type {TSystemStateInfo} from '../../../types/api/nodes';
-import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
+import type {PreparedNodeSystemState} from '../../../utils/nodes';
+import {prepareNodeSystemState} from '../../../utils/nodes';
 import {api} from '../api';
 
-export interface PreparedClusterNode extends TSystemStateInfo {
-    uptime: string;
-}
+export type PreparedClusterNode = PreparedNodeSystemState;
 
 export const clusterNodesApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -13,12 +11,7 @@ export const clusterNodesApi = api.injectEndpoints({
                 try {
                     const result = await window.api.getClusterNodes();
                     const {SystemStateInfo: nodes = []} = result;
-                    const data: PreparedClusterNode[] = nodes.map((node) => {
-                        return {
-                            ...node,
-                            uptime: calcUptime(node.StartTime),
-                        };
-                    });
+                    const data: PreparedClusterNode[] = nodes.map(prepareNodeSystemState);
                     return {data};
                 } catch (error) {
                     return {error};

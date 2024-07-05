@@ -34,6 +34,7 @@ export interface NodesPreparedEntity {
 
     PoolStats?: TPoolStats[];
     LoadAverage?: number[];
+    LoadAveragePercents?: number[];
     Tablets?: TFullTabletStateInfo[] | TComputeTabletStateInfo[];
     Endpoints?: TEndpoint[];
 

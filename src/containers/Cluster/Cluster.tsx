@@ -1,10 +1,11 @@
 import React from 'react';
 
 import {Skeleton, Tabs} from '@gravity-ui/uikit';
-import qs from 'qs';
 import {Helmet} from 'react-helmet-async';
-import {Redirect, Route, Switch, useLocation, useRouteMatch} from 'react-router';
+import {Redirect, Route, Switch, useRouteMatch} from 'react-router-dom';
+import {StringParam, useQueryParams} from 'use-query-params';
 
+import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import routes, {getLocationObjectFromHref} from '../../routes';
@@ -18,8 +19,8 @@ import type {
     AdditionalVersionsProps,
 } from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {CLUSTER_DEFAULT_TITLE, DEFAULT_POLLING_INTERVAL} from '../../utils/constants';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../../utils/versions';
 import {NodesWrapper} from '../Nodes/NodesWrapper';
 import {StorageWrapper} from '../Storage/StorageWrapper';
@@ -41,7 +42,7 @@ interface ClusterProps {
     additionalVersionsProps?: AdditionalVersionsProps;
 }
 
-function Cluster({
+export function Cluster({
     additionalClusterProps,
     additionalTenantsProps,
     additionalNodesProps,
@@ -53,18 +54,19 @@ function Cluster({
 
     const activeTabId = useClusterTab();
 
-    const location = useLocation();
-    const queryParams = qs.parse(location.search, {
-        ignoreQueryPrefix: true,
+    const [{clusterName, backend}] = useQueryParams({
+        clusterName: StringParam,
+        backend: StringParam,
     });
-    const {clusterName, backend} = queryParams;
+
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {
         data: {clusterData: cluster = {}, groupsStats} = {},
         isLoading: isClusterLoading,
         error,
-    } = clusterApi.useGetClusterInfoQuery(clusterName ? String(clusterName) : undefined, {
-        pollingInterval: DEFAULT_POLLING_INTERVAL,
+    } = clusterApi.useGetClusterInfoQuery(clusterName ?? undefined, {
+        pollingInterval: autoRefreshInterval,
     });
 
     const clusterError = error && typeof error === 'object' ? error : undefined;
@@ -142,6 +144,7 @@ function Cluster({
                         );
                     }}
                 />
+                <AutoRefreshControl />
             </div>
 
             <div>
@@ -198,7 +201,11 @@ function Cluster({
                     >
                         <Versions versionToColor={versionToColor} />
                     </Route>
-                    <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
+                    <Route
+                        render={() => (
+                            <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
+                        )}
+                    />
                 </Switch>
             </div>
         </div>
@@ -228,5 +235,3 @@ function useClusterTab() {
 
     return activeTab;
 }
-
-export default Cluster;

@@ -2,17 +2,18 @@ import type {TComputeInfo, TComputeNodeInfo, TComputeTenantInfo} from '../../../
 import type {TNodesInfo} from '../../../types/api/nodes';
 import {calcUptime} from '../../../utils/dataFormatters/dataFormatters';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
-import {prepareNodeSystemState} from '../../../utils/nodes';
+import {calculateLoadAveragePercents, prepareNodeSystemState} from '../../../utils/nodes';
 
 import type {NodesHandledResponse, NodesPreparedEntity} from './types';
 
-const prepareComputeNode = (node: TComputeNodeInfo, tenantName?: string) => {
+const prepareComputeNode = (node: TComputeNodeInfo, tenantName?: string): NodesPreparedEntity => {
     return {
         ...node,
         // v2 response has tenant name, v1 - doesn't
         TenantName: node.Tenant ?? tenantName,
         SystemState: node?.Overall,
         Uptime: calcUptime(node?.StartTime),
+        LoadAveragePercents: calculateLoadAveragePercents(node),
 
         DC: node.DataCenter,
     };

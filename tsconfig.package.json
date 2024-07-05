@@ -2,10 +2,11 @@
   "extends": "./tsconfig",
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": "src",
     "declaration": true,
     "noEmit": false,
     "importHelpers": true
   },
-  "include": ["src/**/*", "package.json"],
+  "include": ["src/**/*"],
   "exclude": ["src/setup*", "src/index.tsx", "**/__tests__", "**/tests"]
 }

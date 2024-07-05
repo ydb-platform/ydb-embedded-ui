@@ -40,7 +40,7 @@ export const TenantNavigation = () => {
                 onUpdate={handleUpdate}
                 size="l"
                 className={b('body')}
-                defaultValue={getCurrentItem().id}
+                value={getCurrentItem().id}
                 options={navigationItems.map(transformItemToOption)}
             />
         </div>

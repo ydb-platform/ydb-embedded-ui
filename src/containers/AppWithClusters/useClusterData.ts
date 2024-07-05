@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {useLocation} from 'react-router';
+import {useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../routes';
 import {clustersApi} from '../../store/reducers/clusters/clusters';

@@ -32,13 +32,13 @@
   "settings.invertedDisks.title": "Inverted disks space indicators",
 
   "settings.useNodesEndpoint.title": "Break the Nodes tab in Diagnostics",
-  "settings.useNodesEndpoint.popover": "Use /viewer/json/nodes endpoint for Nodes Tab in diagnostics. It could return incorrect data on some versions",
+  "settings.useNodesEndpoint.popover": "Use /viewer/json/nodes endpoint for Nodes tab in diagnostics. It could return incorrect data on versions before 24-1",
 
   "settings.useVirtualTables.title": "Use table with data load on scroll for Nodes and Storage tabs",
   "settings.useVirtualTables.popover": "It will increase performance, but could work unstable",
 
   "settings.queryUseMultiSchema.title": "Allow queries with multiple result sets",
-  "settings.queryUseMultiSchema.popover": "Use 'multi' schema for queries that enables queries with multiple result sets. Returns nothing on versions 23-3 and older",
+  "settings.queryUseMultiSchema.popover": "Use 'multi' schema for queries. It enables queries with multiple result sets. It returns nothing on versions 23-3 and older",
 
   "settings.about.interfaceVersionInfoField.title": "Interface version"
 }

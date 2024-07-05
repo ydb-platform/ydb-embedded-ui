@@ -106,7 +106,8 @@ const erasureColumn: StorageGroupsColumn = {
 const degradedColumn: StorageGroupsColumn = {
     name: GROUPS_COLUMNS_IDS.Degraded,
     header: 'Degraded',
-    width: 100,
+    width: 110,
+    resizeMinWidth: 110,
     render: ({row}) =>
         row.Degraded ? (
             <Label theme={getDegradedSeverity(row)}>Degraded: {row.Degraded}</Label>
@@ -120,8 +121,8 @@ const degradedColumn: StorageGroupsColumn = {
 const usageColumn: StorageGroupsColumn = {
     name: GROUPS_COLUMNS_IDS.Usage,
     header: 'Usage',
-    width: 100,
-    resizeMinWidth: 70,
+    width: 75,
+    resizeMinWidth: 75,
     render: ({row}) => {
         // without a limit the usage can be evaluated as 0,
         // but the absence of a value is more clear

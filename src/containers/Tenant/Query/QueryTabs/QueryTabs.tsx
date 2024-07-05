@@ -1,5 +1,5 @@
 import {Tabs} from '@gravity-ui/uikit';
-import {useLocation} from 'react-router';
+import {useLocation} from 'react-router-dom';
 
 import {InternalLink} from '../../../../components/InternalLink/InternalLink';
 import {parseQuery} from '../../../../routes';

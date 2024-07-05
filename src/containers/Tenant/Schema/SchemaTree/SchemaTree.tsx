@@ -1,3 +1,6 @@
+// todo: tableTree is very smart, so it is impossible to update it without re-render
+// It is need change NavigationTree to dump component and pass props from parent component
+// In this case we can store state of tree - uploaded entities, opened nodes, selected entity and so on
 import React from 'react';
 
 import {NavigationTree} from 'ydb-ui-components';
@@ -8,6 +11,7 @@ import {useQueryModes, useTypedDispatch} from '../../../../utils/hooks';
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 import {getControls} from '../../utils/schemaControls';
+import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
 
 interface SchemaTreeProps {
     rootPath: string;
@@ -19,10 +23,12 @@ interface SchemaTreeProps {
 
 export function SchemaTree(props: SchemaTreeProps) {
     const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
-
     const dispatch = useTypedDispatch();
 
     const [_, setQueryMode] = useQueryModes();
+    const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
+    const [parentPath, setParentPath] = React.useState('');
+    const [schemaTreeKey, setSchemaTreeKey] = React.useState('');
 
     const fetchPath = async (path: string) => {
         const promise = dispatch(
@@ -49,7 +55,6 @@ export function SchemaTree(props: SchemaTreeProps) {
 
         return childItems;
     };
-
     React.useEffect(() => {
         // if the cached path is not in the current tree, show root
         if (!currentPath?.startsWith(rootPath)) {
@@ -57,26 +62,50 @@ export function SchemaTree(props: SchemaTreeProps) {
         }
     }, [currentPath, onActivePathUpdate, rootPath]);
 
+    const handleSuccessSubmit = (relativePath: string) => {
+        const newPath = `${parentPath}/${relativePath}`;
+        onActivePathUpdate(newPath);
+        setSchemaTreeKey(newPath);
+    };
+
+    const handleCloseDialog = () => {
+        setCreateDirectoryOpen(false);
+    };
+
+    const handleOpenCreateDirectoryDialog = (value: string) => {
+        setParentPath(value);
+        setCreateDirectoryOpen(true);
+    };
     return (
-        <NavigationTree
-            rootState={{
-                path: rootPath,
-                name: rootName,
-                type: mapPathTypeToNavigationTreeType(rootType),
-                collapsed: false,
-            }}
-            fetchPath={fetchPath}
-            getActions={getActions(dispatch, {
-                setActivePath: onActivePathUpdate,
-                setQueryMode,
-            })}
-            renderAdditionalNodeElements={getControls(dispatch, {
-                setActivePath: onActivePathUpdate,
-            })}
-            activePath={currentPath}
-            onActivePathUpdate={onActivePathUpdate}
-            cache={false}
-            virtualize
-        />
+        <React.Fragment>
+            <CreateDirectoryDialog
+                onClose={handleCloseDialog}
+                open={createDirectoryOpen}
+                parentPath={parentPath}
+                onSuccess={handleSuccessSubmit}
+            />
+            <NavigationTree
+                key={schemaTreeKey}
+                rootState={{
+                    path: rootPath,
+                    name: rootName,
+                    type: mapPathTypeToNavigationTreeType(rootType),
+                    collapsed: false,
+                }}
+                fetchPath={fetchPath}
+                getActions={getActions(dispatch, {
+                    setActivePath: onActivePathUpdate,
+                    setQueryMode,
+                    showCreateDirectoryDialog: handleOpenCreateDirectoryDialog,
+                })}
+                renderAdditionalNodeElements={getControls(dispatch, {
+                    setActivePath: onActivePathUpdate,
+                })}
+                activePath={currentPath}
+                onActivePathUpdate={onActivePathUpdate}
+                cache={false}
+                virtualize
+            />
+        </React.Fragment>
     );
 }
