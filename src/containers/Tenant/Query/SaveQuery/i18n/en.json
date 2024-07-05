@@ -1,0 +1,13 @@
+{
+  "action.save": "Save query",
+  "action.edit": "Edit query",
+  "action.save-as-new": "Save as new",
+  "action.edit-existing": "Edit existing",
+  "description": "The query will be saved in your browser",
+  "input-label": "Query name",
+  "input-placeholder": "Enter query name",
+  "button-apply": "Save",
+  "button-cancel": "Cancel",
+  "error.name-exists": "This name already exists",
+  "error.name-not-empty": "Name should not be empty"
+}

@@ -5,10 +5,8 @@ import {Helmet} from 'react-helmet-async';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import type {EPathType} from '../../../types/api/schema';
-import type {SavedQuery} from '../../../types/store/query';
 import {cn} from '../../../utils/cn';
-import {SAVED_QUERIES_KEY} from '../../../utils/constants';
-import {useSetting, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 
 import QueriesHistory from './QueriesHistory/QueriesHistory';
 import QueryEditor from './QueryEditor/QueryEditor';
@@ -31,15 +29,6 @@ export const Query = (props: QueryProps) => {
 
     const {queryTab = TENANT_QUERY_TABS_ID.newQuery} = useTypedSelector((state) => state.tenant);
 
-    const [savedQueries, setSavedQueries] = useSetting<SavedQuery[]>(SAVED_QUERIES_KEY, []);
-
-    const handleDeleteQuery = (queryName: string) => {
-        const newSavedQueries = savedQueries.filter(
-            (el) => el.name.toLowerCase() !== queryName.toLowerCase(),
-        );
-        setSavedQueries(newSavedQueries);
-    };
-
     const handleUserInputChange = (value: {input: string}) => {
         dispatch(changeUserInput(value));
     };
@@ -58,13 +47,7 @@ export const Query = (props: QueryProps) => {
                 return <QueriesHistory changeUserInput={handleUserInputChange} />;
             }
             case TENANT_QUERY_TABS_ID.saved: {
-                return (
-                    <SavedQueries
-                        changeUserInput={handleUserInputChange}
-                        savedQueries={savedQueries}
-                        onDeleteQuery={handleDeleteQuery}
-                    />
-                );
+                return <SavedQueries changeUserInput={handleUserInputChange} />;
             }
             default: {
                 return null;

@@ -8,7 +8,7 @@ import {LabelWithPopover} from '../../../../components/LabelWithPopover';
 import type {QueryAction, QueryMode} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {QUERY_MODES, QUERY_MODES_TITLES} from '../../../../utils/query';
-import SaveQuery from '../SaveQuery/SaveQuery';
+import {SaveQuery} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
 
 import './QueryEditorControls.scss';
@@ -46,8 +46,6 @@ interface QueryEditorControlsProps {
     runIsLoading: boolean;
     onExplainButtonClick: (mode?: QueryMode) => void;
     explainIsLoading: boolean;
-    onSaveQueryClick: (queryName: string) => void;
-    savedQueries: unknown;
     disabled: boolean;
     onUpdateQueryMode: (mode: QueryMode) => void;
     queryMode: QueryMode;
@@ -59,8 +57,6 @@ export const QueryEditorControls = ({
     runIsLoading,
     onExplainButtonClick,
     explainIsLoading,
-    onSaveQueryClick,
-    savedQueries,
     disabled,
     onUpdateQueryMode,
     queryMode,
@@ -132,11 +128,7 @@ export const QueryEditorControls = ({
                     />
                 </div>
             </div>
-            <SaveQuery
-                savedQueries={savedQueries}
-                onSaveQuery={onSaveQueryClick}
-                saveButtonDisabled={disabled}
-            />
+            <SaveQuery isSaveButtonDisabled={disabled} />
         </div>
     );
 };
