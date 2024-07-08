@@ -3,7 +3,6 @@ import React from 'react';
 import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
 
-import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../utils/constants';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../utils/monitoring';
 import {
     getMonitoringClusterLink as getMonitoringClusterLinkDefault,
@@ -11,12 +10,10 @@ import {
 } from '../../utils/monitoring';
 import {App, AppSlots} from '../App';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
-import {settings} from '../UserSettings/settings';
 
 import {ExtendedCluster} from './ExtendedCluster/ExtendedCluster';
 import {ExtendedNode} from './ExtendedNode/ExtendedNode';
 import {ExtendedTenant} from './ExtendedTenant/ExtendedTenant';
-import i18n from './i18n';
 
 export interface AppWithClustersProps {
     store: Store;
@@ -27,20 +24,12 @@ export interface AppWithClustersProps {
     children?: React.ReactNode;
 }
 
-const defaultUserSettings = settings;
-
-defaultUserSettings[2].sections[0].settings.push({
-    title: i18n('settings.useClusterBalancerAsBackend.title'),
-    description: i18n('settings.useClusterBalancerAsBackend.popover'),
-    settingKey: USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
-});
-
 export function AppWithClusters({
     store,
     history,
     getMonitoringLink = getMonitoringLinkDefault,
     getMonitoringClusterLink = getMonitoringClusterLinkDefault,
-    userSettings = defaultUserSettings,
+    userSettings,
     children,
 }: AppWithClustersProps) {
     return (

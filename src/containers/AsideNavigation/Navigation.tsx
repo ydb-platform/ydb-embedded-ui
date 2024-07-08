@@ -5,7 +5,7 @@ import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
 import {YdbInternalUser} from './YdbInternalUser/YdbInternalUser';
 
 interface NavigationProps {
-    userSettings?: YDBEmbeddedUISettings;
+    userSettings: YDBEmbeddedUISettings;
     children: React.ReactNode;
 }
 export function Navigation({children, userSettings}: NavigationProps) {

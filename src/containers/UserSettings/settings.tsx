@@ -1,5 +1,6 @@
 import {CircleInfo, Flask, PencilToSquare, StarFill} from '@gravity-ui/icons';
 import type {IconProps} from '@gravity-ui/uikit';
+import {createNextState} from '@reduxjs/toolkit';
 
 import {
     AUTOCOMPLETE_ON_ENTER,
@@ -10,6 +11,7 @@ import {
     QUERY_USE_MULTI_SCHEMA_KEY,
     THEME_KEY,
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
+    USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
@@ -109,6 +111,12 @@ export const queryUseMultiSchemaSetting: SettingProps = {
     description: i18n('settings.queryUseMultiSchema.popover'),
 };
 
+export const useClusterBalancerAsBackendSetting: SettingProps = {
+    settingKey: USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
+    title: i18n('settings.useClusterBalancerAsBackend.title'),
+    description: i18n('settings.useClusterBalancerAsBackend.popover'),
+};
+
 export const enableAutocompleteSetting: SettingProps = {
     settingKey: ENABLE_AUTOCOMPLETE,
     title: i18n('settings.editor.autocomplete.title'),
@@ -175,9 +183,14 @@ export const aboutPage: SettingsPage = {
     sections: [aboutSettingsSection],
 };
 
-export const settings: YDBEmbeddedUISettings = [
-    generalPage,
-    editorPage,
-    experimentsPage,
-    aboutPage,
-];
+export function getUserSettings({singleClusterMode}: {singleClusterMode: boolean}) {
+    const experiments = singleClusterMode
+        ? experimentsPage
+        : createNextState(experimentsPage, (draft) => {
+              draft.sections[0].settings.push(useClusterBalancerAsBackendSetting);
+          });
+
+    const settings: YDBEmbeddedUISettings = [generalPage, editorPage, experiments, aboutPage];
+
+    return settings;
+}
