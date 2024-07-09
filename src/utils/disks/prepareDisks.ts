@@ -11,6 +11,8 @@ export function prepareVDiskData(vdiskState: TVDiskStateInfo = {}): PreparedVDis
     // Prepare PDisk only if it is present
     const PDisk = vdiskState.PDisk ? preparePDiskData(vdiskState.PDisk) : undefined;
 
+    const PDiskId = vdiskState.PDiskId ?? PDisk?.PDiskId;
+
     const AllocatedPercent = calculateVDiskAllocatedPercent(
         vdiskState.AllocatedSize,
         vdiskState.AvailableSize,
@@ -26,6 +28,7 @@ export function prepareVDiskData(vdiskState: TVDiskStateInfo = {}): PreparedVDis
     return {
         ...vdiskState,
         PDisk,
+        PDiskId,
         AllocatedPercent,
         Donors,
         Severity,
