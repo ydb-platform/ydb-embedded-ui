@@ -3,11 +3,11 @@ import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
 import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
+import type {Column as PaginatedTableColumn} from '../../components/PaginatedTable';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {UsageLabel} from '../../components/UsageLabel/UsageLabel';
-import type {Column as VirtualTableColumn} from '../../components/VirtualTable';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import type {GetNodeRefFunc} from '../../types/additionalProps';
@@ -42,7 +42,7 @@ interface GetNodesColumnsProps {
     getNodeRef?: GetNodeRefFunc;
 }
 
-type NodesColumn = VirtualTableColumn<NodesPreparedEntity> & DataTableColumn<NodesPreparedEntity>;
+type NodesColumn = PaginatedTableColumn<NodesPreparedEntity> & DataTableColumn<NodesPreparedEntity>;
 
 const nodeIdColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.NodeId,

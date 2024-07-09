@@ -1,7 +1,11 @@
 import React from 'react';
 
-import type {FetchData, RenderControls, RenderErrorMessage} from '../../../components/VirtualTable';
-import {ResizeableVirtualTable} from '../../../components/VirtualTable/ResizeableVirtualTable';
+import type {
+    FetchData,
+    RenderControls,
+    RenderErrorMessage,
+} from '../../../components/PaginatedTable';
+import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../../types/additionalProps';
@@ -17,7 +21,7 @@ import {
 import i18n from './i18n';
 import {getRowUnavailableClassName} from './shared';
 
-interface VirtualStorageNodesProps {
+interface PaginatedStorageNodesProps {
     searchValue: string;
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: NodesUptimeFilterValues;
@@ -31,7 +35,7 @@ interface VirtualStorageNodesProps {
     renderErrorMessage: RenderErrorMessage;
 }
 
-export const VirtualStorageNodes = ({
+export const PaginatedStorageNodes = ({
     searchValue,
     visibleEntities,
     nodesUptimeFilter,
@@ -41,7 +45,7 @@ export const VirtualStorageNodes = ({
     parentContainer,
     renderControls,
     renderErrorMessage,
-}: VirtualStorageNodesProps) => {
+}: PaginatedStorageNodesProps) => {
     const filters = React.useMemo(() => {
         return [searchValue, visibleEntities, nodesUptimeFilter, tenant];
     }, [searchValue, visibleEntities, nodesUptimeFilter, tenant]);
@@ -85,7 +89,7 @@ export const VirtualStorageNodes = ({
     };
 
     return (
-        <ResizeableVirtualTable
+        <ResizeablePaginatedTable
             columnsWidthLSKey={STORAGE_NODES_COLUMNS_WIDTH_LS_KEY}
             parentContainer={parentContainer}
             columns={columns}

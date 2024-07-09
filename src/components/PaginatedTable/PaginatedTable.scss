@@ -1,13 +1,13 @@
 @import '../../styles/mixins.scss';
 
-.ydb-virtual-table {
+.ydb-paginated-table {
     $block: &;
-    $cell-border: 1px solid var(--virtual-table-border-color);
-    --virtual-table-cell-vertical-padding: 5px;
-    --virtual-table-cell-horizontal-padding: 10px;
+    $cell-border: 1px solid var(--paginated-table-border-color);
+    --paginated-table-cell-vertical-padding: 5px;
+    --paginated-table-cell-horizontal-padding: 10px;
 
-    --virtual-table-border-color: var(--g-color-base-generic-hover);
-    --virtual-table-hover-color: var(--g-color-base-float-hover);
+    --paginated-table-border-color: var(--g-color-base-generic-hover);
+    --paginated-table-hover-color: var(--g-color-base-float-hover);
 
     width: 100%;
     @include body-2-typography();
@@ -27,7 +27,7 @@
 
     &__row {
         &:hover {
-            background: var(--virtual-table-hover-color);
+            background: var(--paginated-table-hover-color);
         }
 
         &_empty {
@@ -75,8 +75,8 @@
 
         width: 100%;
         max-width: 100%;
-        padding: var(--virtual-table-cell-vertical-padding)
-            var(--virtual-table-cell-horizontal-padding);
+        padding: var(--paginated-table-cell-vertical-padding)
+            var(--paginated-table-cell-horizontal-padding);
 
         &_align {
             &_left {
@@ -122,8 +122,8 @@
 
         width: 100%;
         max-width: 100%;
-        padding: var(--virtual-table-cell-vertical-padding)
-            var(--virtual-table-cell-horizontal-padding);
+        padding: var(--paginated-table-cell-vertical-padding)
+            var(--paginated-table-cell-horizontal-padding);
 
         vertical-align: middle;
         white-space: nowrap;

@@ -2,8 +2,8 @@ import type {ColumnWidthByName} from '@gravity-ui/react-data-table';
 
 import {useTableResize} from '../../utils/hooks/useTableResize';
 
-import type {VirtualTableProps} from './VirtualTable';
-import {VirtualTable} from './VirtualTable';
+import type {PaginatedTableProps} from './PaginatedTable';
+import {PaginatedTable} from './PaginatedTable';
 import type {Column} from './types';
 
 function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWidthByName) {
@@ -12,20 +12,24 @@ function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWi
     });
 }
 
-interface ResizeableVirtualTableProps<T> extends Omit<VirtualTableProps<T>, 'onColumnsResize'> {
+interface ResizeablePaginatedTableProps<T> extends Omit<PaginatedTableProps<T>, 'onColumnsResize'> {
     columnsWidthLSKey: string;
 }
 
-export function ResizeableVirtualTable<T>({
+export function ResizeablePaginatedTable<T>({
     columnsWidthLSKey,
     columns,
     ...props
-}: ResizeableVirtualTableProps<T>) {
+}: ResizeablePaginatedTableProps<T>) {
     const [tableColumnsWidth, setTableColumnsWidth] = useTableResize(columnsWidthLSKey);
 
     const updatedColumns = updateColumnsWidth(columns, tableColumnsWidth);
 
     return (
-        <VirtualTable columns={updatedColumns} onColumnsResize={setTableColumnsWidth} {...props} />
+        <PaginatedTable
+            columns={updatedColumns}
+            onColumnsResize={setTableColumnsWidth}
+            {...props}
+        />
     );
 }

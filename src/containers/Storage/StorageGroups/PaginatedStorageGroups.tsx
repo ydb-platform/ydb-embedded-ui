@@ -1,7 +1,11 @@
 import React from 'react';
 
-import type {FetchData, RenderControls, RenderErrorMessage} from '../../../components/VirtualTable';
-import {ResizeableVirtualTable} from '../../../components/VirtualTable/ResizeableVirtualTable';
+import type {
+    FetchData,
+    RenderControls,
+    RenderErrorMessage,
+} from '../../../components/PaginatedTable';
+import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesMap} from '../../../types/store/nodesList';
@@ -15,7 +19,7 @@ import {
 } from './getStorageGroupsColumns';
 import i18n from './i18n';
 
-interface VirtualStorageGroupsProps {
+interface PaginatedStorageGroupsProps {
     searchValue: string;
     visibleEntities: VisibleEntities;
     tenant?: string;
@@ -29,7 +33,7 @@ interface VirtualStorageGroupsProps {
     renderErrorMessage: RenderErrorMessage;
 }
 
-export const VirtualStorageGroups = ({
+export const PaginatedStorageGroups = ({
     searchValue,
     visibleEntities,
     tenant,
@@ -39,7 +43,7 @@ export const VirtualStorageGroups = ({
     parentContainer,
     renderControls,
     renderErrorMessage,
-}: VirtualStorageGroupsProps) => {
+}: PaginatedStorageGroupsProps) => {
     const filters = React.useMemo(() => {
         return [searchValue, visibleEntities, tenant, nodeId];
     }, [searchValue, visibleEntities, tenant, nodeId]);
@@ -79,7 +83,7 @@ export const VirtualStorageGroups = ({
     };
 
     return (
-        <ResizeableVirtualTable
+        <ResizeablePaginatedTable
             columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
             parentContainer={parentContainer}
             columns={columns}

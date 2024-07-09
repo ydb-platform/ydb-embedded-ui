@@ -2,7 +2,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AccessDenied} from '../../components/Errors/403/AccessDenied';
 import {ResponseError} from '../../components/Errors/ResponseError/ResponseError';
-import type {RenderControls, RenderErrorMessage} from '../../components/VirtualTable';
+import type {RenderControls, RenderErrorMessage} from '../../components/PaginatedTable';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
 import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
@@ -12,22 +12,22 @@ import {useTypedSelector} from '../../utils/hooks';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
 import {StorageControls} from './StorageControls/StorageControls';
-import {VirtualStorageGroups} from './StorageGroups/VirtualStorageGroups';
-import {VirtualStorageNodes} from './StorageNodes/VirtualStorageNodes';
+import {PaginatedStorageGroups} from './StorageGroups/PaginatedStorageGroups';
+import {PaginatedStorageNodes} from './StorageNodes/PaginatedStorageNodes';
 
-interface VirtualStorageProps {
+interface PaginatedStorageProps {
     tenant?: string;
     nodeId?: string;
     parentContainer?: Element | null;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const VirtualStorage = ({
+export const PaginatedStorage = ({
     tenant,
     nodeId,
     parentContainer,
     additionalNodesProps,
-}: VirtualStorageProps) => {
+}: PaginatedStorageProps) => {
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
         visible: StringParam,
@@ -101,7 +101,7 @@ export const VirtualStorage = ({
 
     if (storageType === STORAGE_TYPES.nodes) {
         return (
-            <VirtualStorageNodes
+            <PaginatedStorageNodes
                 searchValue={searchValue}
                 visibleEntities={visibleEntities}
                 nodesUptimeFilter={nodesUptimeFilter}
@@ -116,7 +116,7 @@ export const VirtualStorage = ({
     }
 
     return (
-        <VirtualStorageGroups
+        <PaginatedStorageGroups
             searchValue={searchValue}
             visibleEntities={visibleEntities}
             tenant={tenant}

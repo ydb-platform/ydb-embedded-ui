@@ -36,7 +36,7 @@ export interface Column<T> {
     align: AlignType;
 }
 
-export interface VirtualTableData<T> {
+export interface PaginatedTableData<T> {
     data: T[];
     total: number;
     found: number;
@@ -46,7 +46,7 @@ export type FetchData<T> = (
     limit: number,
     offset: number,
     sortParams?: SortParams,
-) => Promise<VirtualTableData<T>>;
+) => Promise<PaginatedTableData<T>>;
 
 export type OnError = (error?: IResponseError) => void;
 
