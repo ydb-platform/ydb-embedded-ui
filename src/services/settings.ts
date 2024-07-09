@@ -18,6 +18,7 @@ import {
     USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
+    USE_SEPARATE_DISKS_PAGES_KEY,
 } from '../utils/constants';
 import {QUERY_ACTIONS, QUERY_MODES} from '../utils/query';
 import {parseJson} from '../utils/utils';
@@ -40,6 +41,7 @@ export const DEFAULT_USER_SETTINGS = {
     [PARTITIONS_HIDDEN_COLUMNS_KEY]: [],
     [USE_BACKEND_PARAMS_FOR_TABLES_KEY]: false,
     [USE_CLUSTER_BALANCER_AS_BACKEND_KEY]: true,
+    [USE_SEPARATE_DISKS_PAGES_KEY]: false,
     [ENABLE_AUTOCOMPLETE]: true,
     [AUTOCOMPLETE_ON_ENTER]: true,
     [IS_HOTKEYS_HELP_HIDDEN_KEY]: false,
