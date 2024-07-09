@@ -11,7 +11,7 @@ import {EmptyTableRow} from './TableRow';
 import {DEFAULT_REQUEST_TIMEOUT, DEFAULT_TABLE_ROW_HEIGHT} from './constants';
 import i18n from './i18n';
 import {
-    createVirtualTableReducer,
+    createPaginatedTableReducer,
     initChunk,
     removeChunk,
     resetChunks,
@@ -35,9 +35,9 @@ import type {
 } from './types';
 import {useIntersectionObserver} from './useIntersectionObserver';
 
-import './VirtualTable.scss';
+import './PaginatedTable.scss';
 
-export interface VirtualTableProps<T> {
+export interface PaginatedTableProps<T> {
     limit: number;
     fetchData: FetchData<T>;
     columns: Column<T>[];
@@ -54,7 +54,7 @@ export interface VirtualTableProps<T> {
     dependencyArray?: unknown[]; // Fully reload table on params change
 }
 
-export const VirtualTable = <T,>({
+export const PaginatedTable = <T,>({
     limit,
     fetchData,
     columns,
@@ -67,11 +67,11 @@ export const VirtualTable = <T,>({
     renderEmptyDataMessage,
     renderErrorMessage,
     dependencyArray,
-}: VirtualTableProps<T>) => {
+}: PaginatedTableProps<T>) => {
     const inited = React.useRef(false);
     const tableContainer = React.useRef<HTMLDivElement>(null);
 
-    const [state, dispatch] = React.useReducer(createVirtualTableReducer<T>(), {});
+    const [state, dispatch] = React.useReducer(createPaginatedTableReducer<T>(), {});
 
     const [sortParams, setSortParams] = React.useState<SortParams | undefined>(initialSortParams);
 

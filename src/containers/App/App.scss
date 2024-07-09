@@ -90,7 +90,7 @@ body,
 }
 
 .data-table__row,
-.ydb-virtual-table__row,
+.ydb-paginated-table__row,
 .ydb-tree-view__item {
     &:hover {
         & .clipboard-button {

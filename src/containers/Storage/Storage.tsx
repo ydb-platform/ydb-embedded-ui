@@ -22,13 +22,7 @@ import type {
 } from '../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {
-    useAutoRefreshInterval,
-    useNodesRequestParams,
-    useStorageRequestParams,
-    useTableSort,
-    useTypedSelector,
-} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTableSort, useTypedSelector} from '../../utils/hooks';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
 import {StorageControls} from './StorageControls/StorageControls';
@@ -95,25 +89,15 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
     const isNodePage = nodeId !== undefined;
     const storageType = isNodePage ? STORAGE_TYPES.groups : type;
 
-    const nodesRequestParams = useNodesRequestParams({
-        filter,
-        nodesUptimeFilter: uptimeFilter,
-        ...nodesSortParams,
-    });
-    const storageRequestParams = useStorageRequestParams({
-        filter,
-        ...groupsSortParams,
-    });
-
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
-        {tenant, visibleEntities, ...nodesRequestParams},
+        {tenant, visibleEntities},
         {
             skip: storageType !== STORAGE_TYPES.nodes,
             pollingInterval: autoRefreshInterval,
         },
     );
     const groupsQuery = storageApi.useGetStorageGroupsInfoQuery(
-        {tenant, visibleEntities, nodeId, ...storageRequestParams},
+        {tenant, visibleEntities, nodeId},
         {
             skip: storageType !== STORAGE_TYPES.groups,
             pollingInterval: autoRefreshInterval,

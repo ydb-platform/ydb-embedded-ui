@@ -9,7 +9,7 @@ const SET_CHUNK_DATA = 'infiniteTable/SET_CHUNK_DATA';
 const SET_CHUNK_ERROR = 'infiniteTable/SET_CHUNK_ERROR';
 const RESET_CHUNKS = 'infiniteTable/RESET_CHUNKS';
 
-type VirtualTableState<T> = Record<string, Chunk<T> | undefined>;
+type PaginatedTableState<T> = Record<string, Chunk<T> | undefined>;
 
 // Intermediary type to pass to ReducerAction (because ReturnType cannot correctly convert generics)
 interface SetChunkDataAction<T> {
@@ -61,7 +61,7 @@ export const resetChunks = () => {
     } as const;
 };
 
-type VirtualTableAction<T> =
+type PaginatedTableAction<T> =
     | SetChunkDataAction<T>
     | ReturnType<typeof setChunkError>
     | ReturnType<typeof initChunk>
@@ -70,8 +70,8 @@ type VirtualTableAction<T> =
     | ReturnType<typeof resetChunks>;
 
 // Reducer wrapped in additional function to pass generic type
-export const createVirtualTableReducer =
-    <T>(): React.Reducer<VirtualTableState<T>, VirtualTableAction<T>> =>
+export const createPaginatedTableReducer =
+    <T>(): React.Reducer<PaginatedTableState<T>, PaginatedTableAction<T>> =>
     (state, action) => {
         switch (action.type) {
             case SET_CHUNK_DATA: {

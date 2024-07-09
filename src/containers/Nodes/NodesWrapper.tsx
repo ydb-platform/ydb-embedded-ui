@@ -1,9 +1,9 @@
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import {USE_BACKEND_PARAMS_FOR_TABLES_KEY} from '../../utils/constants';
+import {USE_PAGINATED_TABLES_KEY} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
 
 import {Nodes} from './Nodes';
-import {VirtualNodes} from './VirtualNodes';
+import {PaginatedNodes} from './PaginatedNodes';
 
 interface NodesWrapperProps {
     path?: string;
@@ -12,10 +12,10 @@ interface NodesWrapperProps {
 }
 
 export const NodesWrapper = ({parentContainer, ...props}: NodesWrapperProps) => {
-    const [useVirtualTable] = useSetting<boolean>(USE_BACKEND_PARAMS_FOR_TABLES_KEY);
+    const [usePaginatedTables] = useSetting<boolean>(USE_PAGINATED_TABLES_KEY);
 
-    if (useVirtualTable) {
-        return <VirtualNodes parentContainer={parentContainer} {...props} />;
+    if (usePaginatedTables) {
+        return <PaginatedNodes parentContainer={parentContainer} {...props} />;
     }
 
     return <Nodes {...props} />;

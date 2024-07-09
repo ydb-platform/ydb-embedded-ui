@@ -7,9 +7,9 @@ import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {CellWithPopover} from '../../../components/CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
+import type {Column as PaginatedTableColumn} from '../../../components/PaginatedTable';
 import {UsageLabel} from '../../../components/UsageLabel/UsageLabel';
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
-import type {Column as VirtualTableColumn} from '../../../components/VirtualTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
 import {EFlag} from '../../../types/api/enums';
@@ -28,7 +28,7 @@ const b = cn('global-storage-groups');
 
 export const STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY = 'storageGroupsColumnsWidth';
 
-type StorageGroupsColumn = VirtualTableColumn<PreparedStorageGroup> &
+type StorageGroupsColumn = PaginatedTableColumn<PreparedStorageGroup> &
     DataTableColumn<PreparedStorageGroup>;
 
 export const GROUPS_COLUMNS_IDS = {

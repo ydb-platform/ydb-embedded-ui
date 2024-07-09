@@ -2,7 +2,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 
 import {NodeHostWrapper} from '../../../components/NodeHostWrapper/NodeHostWrapper';
-import type {Column as VirtualTableColumn} from '../../../components/VirtualTable';
+import type {Column as PaginatedTableColumn} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../../types/additionalProps';
@@ -24,7 +24,7 @@ export const STORAGE_NODES_COLUMNS_IDS = {
     Missing: 'Missing',
 } as const;
 
-type StorageGroupsColumn = VirtualTableColumn<PreparedStorageNode> &
+type StorageGroupsColumn = PaginatedTableColumn<PreparedStorageNode> &
     DataTableColumn<PreparedStorageNode>;
 
 const getStorageNodesColumns = (additionalNodesProps: AdditionalNodesProps | undefined) => {

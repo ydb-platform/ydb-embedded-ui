@@ -6,16 +6,16 @@ import {EntitiesCount} from '../../components/EntitiesCount';
 import {AccessDenied} from '../../components/Errors/403';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Illustration} from '../../components/Illustration';
-import {ProblemFilter} from '../../components/ProblemFilter';
-import {Search} from '../../components/Search';
-import {UptimeFilter} from '../../components/UptimeFIlter';
+import {ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import type {
     FetchData,
     GetRowClassName,
     RenderControls,
     RenderErrorMessage,
-} from '../../components/VirtualTable';
-import {ResizeableVirtualTable} from '../../components/VirtualTable/ResizeableVirtualTable';
+} from '../../components/PaginatedTable';
+import {ProblemFilter} from '../../components/ProblemFilter';
+import {Search} from '../../components/Search';
+import {UptimeFilter} from '../../components/UptimeFIlter';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {
     ProblemFilterValues,
@@ -50,7 +50,7 @@ interface NodesProps {
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: NodesProps) => {
+export const PaginatedNodes = ({path, parentContainer, additionalNodesProps}: NodesProps) => {
     const [queryParams, setQueryParams] = useQueryParams({
         uptimeFilter: StringParam,
         search: StringParam,
@@ -147,7 +147,7 @@ export const VirtualNodes = ({path, parentContainer, additionalNodesProps}: Node
     });
 
     return (
-        <ResizeableVirtualTable
+        <ResizeablePaginatedTable
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
             parentContainer={parentContainer}
             columns={columns}

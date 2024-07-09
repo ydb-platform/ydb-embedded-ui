@@ -10,9 +10,9 @@ import {
     LANGUAGE_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
     THEME_KEY,
-    USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
+    USE_PAGINATED_TABLES_KEY,
     USE_SEPARATE_DISKS_PAGES_KEY,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
@@ -101,10 +101,10 @@ export const useNodesEndpointSetting: SettingProps = {
     title: i18n('settings.useNodesEndpoint.title'),
     description: i18n('settings.useNodesEndpoint.description'),
 };
-export const useVirtualTables: SettingProps = {
-    settingKey: USE_BACKEND_PARAMS_FOR_TABLES_KEY,
-    title: i18n('settings.useVirtualTables.title'),
-    description: i18n('settings.useVirtualTables.description'),
+export const usePaginatedTables: SettingProps = {
+    settingKey: USE_PAGINATED_TABLES_KEY,
+    title: i18n('settings.usePaginatedTables.title'),
+    description: i18n('settings.usePaginatedTables.description'),
 };
 export const queryUseMultiSchemaSetting: SettingProps = {
     settingKey: QUERY_USE_MULTI_SCHEMA_KEY,
@@ -152,7 +152,7 @@ export const experimentsSection: SettingsSection = {
     title: i18n('section.experiments'),
     settings: [
         useNodesEndpointSetting,
-        useVirtualTables,
+        usePaginatedTables,
         queryUseMultiSchemaSetting,
         useSeparateDisksPagesSetting,
     ],
