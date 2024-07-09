@@ -99,17 +99,17 @@ export const invertedDisksSetting: SettingProps = {
 export const useNodesEndpointSetting: SettingProps = {
     settingKey: USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     title: i18n('settings.useNodesEndpoint.title'),
-    description: i18n('settings.useNodesEndpoint.popover'),
+    description: i18n('settings.useNodesEndpoint.description'),
 };
 export const useVirtualTables: SettingProps = {
     settingKey: USE_BACKEND_PARAMS_FOR_TABLES_KEY,
     title: i18n('settings.useVirtualTables.title'),
-    description: i18n('settings.useVirtualTables.popover'),
+    description: i18n('settings.useVirtualTables.description'),
 };
 export const queryUseMultiSchemaSetting: SettingProps = {
     settingKey: QUERY_USE_MULTI_SCHEMA_KEY,
     title: i18n('settings.queryUseMultiSchema.title'),
-    description: i18n('settings.queryUseMultiSchema.popover'),
+    description: i18n('settings.queryUseMultiSchema.description'),
 };
 
 export const useSeparateDisksPagesSetting: SettingProps = {
@@ -121,7 +121,7 @@ export const useSeparateDisksPagesSetting: SettingProps = {
 export const useClusterBalancerAsBackendSetting: SettingProps = {
     settingKey: USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     title: i18n('settings.useClusterBalancerAsBackend.title'),
-    description: i18n('settings.useClusterBalancerAsBackend.popover'),
+    description: i18n('settings.useClusterBalancerAsBackend.description'),
 };
 
 export const enableAutocompleteSetting: SettingProps = {
