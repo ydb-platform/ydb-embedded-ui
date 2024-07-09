@@ -1,5 +1,5 @@
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import {USE_BACKEND_PARAMS_FOR_TABLES_KEY} from '../../utils/constants';
+import {USE_PAGINATED_TABLES_KEY} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
 
 import {Storage} from './Storage';
@@ -13,7 +13,7 @@ interface StorageWrapperProps {
 }
 
 export const StorageWrapper = ({parentContainer, ...props}: StorageWrapperProps) => {
-    const [useVirtualTable] = useSetting<boolean>(USE_BACKEND_PARAMS_FOR_TABLES_KEY);
+    const [useVirtualTable] = useSetting<boolean>(USE_PAGINATED_TABLES_KEY);
 
     if (useVirtualTable) {
         return <VirtualStorage parentContainer={parentContainer} {...props} />;

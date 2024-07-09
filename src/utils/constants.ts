@@ -126,8 +126,9 @@ export const PARTITIONS_HIDDEN_COLUMNS_KEY = 'partitionsHiddenColumns';
 // Remain "tab" in key name for backward compatibility
 export const TENANT_INITIAL_PAGE_KEY = 'saved_tenant_initial_tab';
 
-// Send filters and sort params to backend for Nodes and Storage tables
-export const USE_BACKEND_PARAMS_FOR_TABLES_KEY = 'useBackendParamsForTables';
+// Setting to use paginated tables
+// Old key value for backward compatibility
+export const USE_PAGINATED_TABLES_KEY = 'useBackendParamsForTables';
 
 // Enable schema that supports multiple resultsets
 export const QUERY_USE_MULTI_SCHEMA_KEY = 'queryUseMultiSchema';
