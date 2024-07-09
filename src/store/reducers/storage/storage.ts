@@ -11,7 +11,7 @@ export const storageApi = api.injectEndpoints({
             queryFn: async (params: Omit<NodesApiRequestParams, 'type'>, {signal}) => {
                 try {
                     const result = await window.api.getNodes(
-                        {storage: true, type: 'static', ...params},
+                        {storage: true, type: 'static', tablets: false, ...params},
                         {signal},
                     );
                     return {data: prepareStorageNodesResponse(result)};
