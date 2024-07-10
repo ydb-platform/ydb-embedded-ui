@@ -196,6 +196,10 @@
 }
 
 @mixin json-tree-styles {
+    width: 100%;
+
+    word-wrap: break-word;
+
     // stylelint-disable
     font-family: var(--g-font-family-monospace) !important;
     font-size: var(--g-text-code-1-font-size) !important;
@@ -275,5 +279,9 @@
         &__show-original:hover:before {
             color: var(--g-color-text-primary);
         }
+    }
+
+    & .json-inspector__leaf.json-inspector__leaf_root.json-inspector__leaf_composite {
+        max-width: calc(100% - 50px);
     }
 }
