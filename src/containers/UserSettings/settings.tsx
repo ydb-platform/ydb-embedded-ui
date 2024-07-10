@@ -11,6 +11,7 @@ import {
     QUERY_USE_MULTI_SCHEMA_KEY,
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
+    USE_DIRECTORY_OPERATIONS,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     USE_PAGINATED_TABLES_KEY,
     USE_SEPARATE_DISKS_PAGES_KEY,
@@ -118,6 +119,11 @@ export const useSeparateDisksPagesSetting: SettingProps = {
     description: i18n('settings.useSeparateDisksPages.description'),
 };
 
+export const useDirectoryActionsSetting: SettingProps = {
+    settingKey: USE_DIRECTORY_OPERATIONS,
+    title: i18n('settings.useDirectoryOperations.title'),
+};
+
 export const useClusterBalancerAsBackendSetting: SettingProps = {
     settingKey: USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     title: i18n('settings.useClusterBalancerAsBackend.title'),
@@ -155,6 +161,7 @@ export const experimentsSection: SettingsSection = {
         usePaginatedTables,
         queryUseMultiSchemaSetting,
         useSeparateDisksPagesSetting,
+        useDirectoryActionsSetting,
     ],
 };
 export const devSettingsSection: SettingsSection = {

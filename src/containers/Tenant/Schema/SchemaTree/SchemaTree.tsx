@@ -5,9 +5,10 @@ import React from 'react';
 
 import {NavigationTree} from 'ydb-ui-components';
 
+import {USE_DIRECTORY_OPERATIONS} from '../../../../lib';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
-import {useQueryModes, useTypedDispatch} from '../../../../utils/hooks';
+import {useQueryModes, useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 import {getControls} from '../../utils/schemaControls';
@@ -22,6 +23,7 @@ interface SchemaTreeProps {
 }
 
 export function SchemaTree(props: SchemaTreeProps) {
+    const [useDirectoryActions] = useSetting<boolean>(USE_DIRECTORY_OPERATIONS);
     const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
     const dispatch = useTypedDispatch();
 
@@ -96,7 +98,9 @@ export function SchemaTree(props: SchemaTreeProps) {
                 getActions={getActions(dispatch, {
                     setActivePath: onActivePathUpdate,
                     setQueryMode,
-                    showCreateDirectoryDialog: handleOpenCreateDirectoryDialog,
+                    showCreateDirectoryDialog: useDirectoryActions
+                        ? handleOpenCreateDirectoryDialog
+                        : undefined,
                 })}
                 renderAdditionalNodeElements={getControls(dispatch, {
                     setActivePath: onActivePathUpdate,
