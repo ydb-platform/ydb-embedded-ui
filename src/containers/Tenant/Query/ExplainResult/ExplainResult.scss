@@ -47,12 +47,8 @@
     &__inspector {
         overflow-y: auto;
 
-        width: 100%;
         padding: 15px 20px;
         @include json-tree-styles();
-        & .json-inspector__leaf.json-inspector__leaf_root.json-inspector__leaf_composite {
-            max-width: calc(100% - 50px);
-        }
 
         &_fullscreen {
             padding: 10px;
