@@ -1,5 +1,31 @@
 # Changelog
 
+## [6.10.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.10.0...v6.10.1) (2024-07-10)
+
+
+### Bug Fixes
+
+* store types should be stored separately ([#1005](https://github.com/ydb-platform/ydb-embedded-ui/issues/1005)) ([8c2949e](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c2949e81662602d62cf3336546f3093056f46aa))
+
+## [6.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.9.2...v6.10.0) (2024-07-10)
+
+
+### Features
+
+* add setting to enable actions with directories from UI ([#997](https://github.com/ydb-platform/ydb-embedded-ui/issues/997)) ([d1fd058](https://github.com/ydb-platform/ydb-embedded-ui/commit/d1fd05855de40fefc1079c1b4bb2d3f7131a89c3))
+* **QueryEditor:** save query on Cmd/Ctrl + S ([#944](https://github.com/ydb-platform/ydb-embedded-ui/issues/944)) ([1077e2e](https://github.com/ydb-platform/ydb-embedded-ui/commit/1077e2e2b9e4c83e31633391b0e6f294b80b9f66))
+* **UserSettings:** add setting for separate disks pages ([#993](https://github.com/ydb-platform/ydb-embedded-ui/issues/993)) ([18253bd](https://github.com/ydb-platform/ydb-embedded-ui/commit/18253bda3c16b114aa8a7fc5c0575be292d27710))
+
+
+### Bug Fixes
+
+* **Graph:** fix broken tab for column tables ([#1004](https://github.com/ydb-platform/ydb-embedded-ui/issues/1004)) ([0ac18ea](https://github.com/ydb-platform/ydb-embedded-ui/commit/0ac18ea3915c5d9d36c1fbcbdf59b6f9769d3f51))
+* **Query:** fix query layout ([#999](https://github.com/ydb-platform/ydb-embedded-ui/issues/999)) ([2ee3e79](https://github.com/ydb-platform/ydb-embedded-ui/commit/2ee3e79c281bf133ee10dec7f8a463e074098461))
+* rename VirtualTable to PaginatedTable, remove old hooks ([#995](https://github.com/ydb-platform/ydb-embedded-ui/issues/995)) ([a9c37d9](https://github.com/ydb-platform/ydb-embedded-ui/commit/a9c37d922b0f2edbb987ff4db4dd6db37631d43b))
+* **Settings:** do not display balancer setting in embedded version ([#990](https://github.com/ydb-platform/ydb-embedded-ui/issues/990)) ([9b91080](https://github.com/ydb-platform/ydb-embedded-ui/commit/9b910808e4dbc3a49f3e9a83b179015ba8afb4c4))
+* **Storage:** do not request tablets for nodes ([#992](https://github.com/ydb-platform/ydb-embedded-ui/issues/992)) ([b33c1ea](https://github.com/ydb-platform/ydb-embedded-ui/commit/b33c1eae22be46910e5ae08a0e2c16a0d92ea79b))
+* **Versions:** return lost copy button ([#1003](https://github.com/ydb-platform/ydb-embedded-ui/issues/1003)) ([a06f1df](https://github.com/ydb-platform/ydb-embedded-ui/commit/a06f1df4416ab71f4fd80797de5734567a3c453b))
+
 ## [6.9.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.9.1...v6.9.2) (2024-07-05)
 
 

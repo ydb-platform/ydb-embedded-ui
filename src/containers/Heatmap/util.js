@@ -91,7 +91,7 @@ export const getCurrentMetricLimits = (metric, tablets) => {
     const limitedMetric = LIMITED_METRICS[metric] || {};
 
     tablets.forEach((tablet) => {
-        limits.add(Number(tablet.metrics[metric]));
+        limits.add(Number(tablet.metrics?.[metric]));
     });
 
     if (Number.isInteger(limitedMetric.min)) {

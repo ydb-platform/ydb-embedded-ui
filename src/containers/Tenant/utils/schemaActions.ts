@@ -29,7 +29,7 @@ import {
 interface ActionsAdditionalEffects {
     setQueryMode: (mode: QueryMode) => void;
     setActivePath: (path: string) => void;
-    showCreateDirectoryDialog: (path: string) => void;
+    showCreateDirectoryDialog?: (path: string) => void;
 }
 
 const bindActions = (
@@ -51,9 +51,11 @@ const bindActions = (
     };
 
     return {
-        createDirectory: () => {
-            showCreateDirectoryDialog(path);
-        },
+        createDirectory: showCreateDirectoryDialog
+            ? () => {
+                  showCreateDirectoryDialog(path);
+              }
+            : undefined,
         createTable: inputQuery(createTableTemplate, 'script'),
         createColumnTable: inputQuery(createColumnTableTemplate, 'script'),
         createAsyncReplication: inputQuery(createAsyncReplicationTemplate, 'script'),
@@ -99,7 +101,6 @@ export const getActions =
 
         const DIR_SET: ActionsSet = [
             [copyItem],
-            [{text: i18n('actions.createDirectory'), action: actions.createDirectory}],
             [
                 {text: i18n('actions.createTable'), action: actions.createTable},
                 {text: i18n('actions.createColumnTable'), action: actions.createColumnTable},
@@ -111,6 +112,11 @@ export const getActions =
                 {text: i18n('actions.createView'), action: actions.createView},
             ],
         ];
+        if (actions.createDirectory) {
+            DIR_SET.splice(1, 0, [
+                {text: i18n('actions.createDirectory'), action: actions.createDirectory},
+            ]);
+        }
         const TABLE_SET: ActionsSet = [
             [copyItem],
             [
