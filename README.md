@@ -25,7 +25,7 @@ Open http://localhost:8765 to view it in the browser.
    docker run --rm -ti --name ydb-local -h localhost \
       -p 8765:8765 \
       -e MON_PORT=8765 \
-      cr.yandex/yc/yandex-docker-local-ydb:latest
+      ghcr.io/ydb-platform/local-ydb:nightly
    ```
 2. Install dependencies with `npm ci`
 3. Run the frontend app in the development mode, via invoking `npm run dev`
