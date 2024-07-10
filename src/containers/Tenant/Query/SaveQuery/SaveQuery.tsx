@@ -8,7 +8,7 @@ import {
     selectQueryAction,
     selectQueryName,
     setQueryAction,
-} from '../../../../store/reducers/queryActions';
+} from '../../../../store/reducers/queryActions/queryActions';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useSavedQueries} from '../utils/useSavedQueries';

@@ -10,7 +10,7 @@ import fullscreen from './fullscreen';
 import header from './header/header';
 import heatmap from './heatmap';
 import partitions from './partitions/partitions';
-import queryActions from './queryActions';
+import queryActions from './queryActions/queryActions';
 import schema from './schema/schema';
 import settings from './settings/settings';
 import shardsWorkload from './shardsWorkload/shardsWorkload';
