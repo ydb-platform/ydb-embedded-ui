@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.10.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.10.0...v6.10.1) (2024-07-10)
+
+
+### Bug Fixes
+
+* store types should be stored separately ([#1005](https://github.com/ydb-platform/ydb-embedded-ui/issues/1005)) ([8c2949e](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c2949e81662602d62cf3336546f3093056f46aa))
+
 ## [6.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.9.2...v6.10.0) (2024-07-10)
 
 
