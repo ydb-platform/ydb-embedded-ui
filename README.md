@@ -12,8 +12,8 @@ You can preview working UI using YDB docker image. It will be UI with the latest
 Run on a machine with Docker installed:
 
 ```
-docker pull ghcr.io/ydb-platform/local-ydb:latest
-docker run -dp 8765:8765 ghcr.io/ydb-platform/local-ydb:latest
+docker pull ghcr.io/ydb-platform/local-ydb:nightly
+docker run -dp 8765:8765 ghcr.io/ydb-platform/local-ydb:nightly
 ```
 
 Open http://localhost:8765 to view it in the browser.
@@ -37,8 +37,6 @@ For API reference, open Swagger UI on http://localhost:8765/viewer/api/.
 ### YDB docker images
 
 [Docs on YDB docker images](https://ydb.tech/en/docs/getting_started/self_hosted/ydb_docker)
-
-Image `ghcr.io/ydb-platform/local-ydb:latest` corresponds to `:latest` tag. It's the latest stable ydb version.
 
 To test new features, you can use ydb version built from `main` brunch with `ghcr.io/ydb-platform/local-ydb:nightly` image.
 Also you can set specific version like `ghcr.io/ydb-platform/local-ydb:24.1`
@@ -117,7 +115,7 @@ To test production bundle with latest YDB backend release, do the following:
 
 1. Install dependencies with `npm ci`
 2. Build a production bundle with a few tweaks for embedded version: `npm run build:embedded`.
-3. Invoke `docker run -it --hostname localhost -dp 2135:2135 -p 8765:8765 -v ~/projects/ydb-embedded-ui/build:/ydb_data/node_1/content/monitoring ghcr.io/ydb-platform/local-ydb:latest`
+3. Invoke `docker run -it --hostname localhost -dp 2135:2135 -p 8765:8765 -v ~/projects/ydb-embedded-ui/build:/ydb_data/node_1/content/monitoring ghcr.io/ydb-platform/local-ydb:nightly`
 4. Open [embedded YDB UI](http://localhost:8765/monitoring) to view it in the browser.
 
 ### Testing production bundle with specific cluster host
