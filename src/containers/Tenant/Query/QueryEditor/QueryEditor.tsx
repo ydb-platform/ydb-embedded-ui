@@ -16,7 +16,7 @@ import {
 } from '../../../../store/reducers/executeQuery';
 import {explainQueryApi} from '../../../../store/reducers/explainQuery/explainQuery';
 import type {PreparedExplainResponse} from '../../../../store/reducers/explainQuery/types';
-import {setQueryAction} from '../../../../store/reducers/queryActions';
+import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import type {ValueOf} from '../../../../types/common';
