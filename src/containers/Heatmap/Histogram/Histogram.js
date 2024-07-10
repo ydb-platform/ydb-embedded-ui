@@ -63,7 +63,7 @@ export const Histogram = (props) => {
     });
     let maxCount = 0;
     tablets.forEach((tablet) => {
-        const value = currentMetric && Number(tablet.metrics[currentMetric]);
+        const value = currentMetric && Number(tablet.metrics?.[currentMetric]);
         const bucketIndex = Math.floor(value / step);
         const nextCountValue = histogramRange[bucketIndex]?.count + 1;
 
