@@ -7,7 +7,10 @@ import {Button, Dialog, Icon} from '@gravity-ui/uikit';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {deleteSavedQuery, setQueryNameToEdit} from '../../../../store/reducers/queryActions';
+import {
+    deleteSavedQuery,
+    setQueryNameToEdit,
+} from '../../../../store/reducers/queryActions/queryActions';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {SavedQuery} from '../../../../types/store/query';

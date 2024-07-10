@@ -1,18 +1,12 @@
 import type {PayloadAction} from '@reduxjs/toolkit';
 import {createSlice} from '@reduxjs/toolkit';
 
-import {SAVED_QUERIES_KEY} from '../../../src/utils/constants';
-import type {SavedQuery} from '../../types/store/query';
-import type {AppDispatch, GetState} from '../defaultStore';
+import type {SavedQuery} from '../../../types/store/query';
+import {SAVED_QUERIES_KEY} from '../../../utils/constants';
+import type {AppDispatch, GetState} from '../../defaultStore';
+import {getSettingValue, setSettingValue} from '../settings/settings';
 
-import {getSettingValue, setSettingValue} from './settings/settings';
-
-type QueryActions = 'save' | 'idle';
-
-interface QueryActionsState {
-    queryName: string | null;
-    queryAction: QueryActions;
-}
+import type {QueryActions, QueryActionsState} from './types';
 
 const initialState: QueryActionsState = {
     queryName: null,
