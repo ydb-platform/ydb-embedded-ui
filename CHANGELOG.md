@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.10.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.10.1...v6.10.2) (2024-07-10)
+
+
+### Bug Fixes
+
+* json inspector styles ([#1008](https://github.com/ydb-platform/ydb-embedded-ui/issues/1008)) ([bba245f](https://github.com/ydb-platform/ydb-embedded-ui/commit/bba245fcc4e98252347743fc3807cb15d3aaf836))
+
 ## [6.10.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.10.0...v6.10.1) (2024-07-10)
 
 
