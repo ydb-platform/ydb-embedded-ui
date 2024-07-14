@@ -4,4 +4,10 @@
         flex-flow: row wrap;
         gap: 12px;
     }
+
+    &__title {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+    }
 }

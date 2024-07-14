@@ -1,7 +1,7 @@
 import {createSelector} from '@reduxjs/toolkit';
 
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import {preparePDiskData} from '../../../utils/disks/prepareDisks';
+import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
 import type {RootState} from '../../defaultStore';
 
 import {nodeApi} from './node';
@@ -28,7 +28,9 @@ export const selectNodeStructure = createSelector(
         pools?.forEach((pool) => {
             const groups = pool.Groups;
             groups?.forEach((group) => {
-                const vDisks = group.VDisks?.filter((el) => el.NodeId === nodeId);
+                const vDisks = group.VDisks?.filter((el) => el.NodeId === nodeId).map(
+                    prepareVDiskData,
+                );
                 vDisks?.forEach((vd) => {
                     const vDiskId = stringifyVdiskId(vd.VDiskId);
                     const preparedPDisk = preparePDiskData(vd.PDisk);

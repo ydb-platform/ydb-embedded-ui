@@ -142,26 +142,6 @@
     &__selected-vdisk {
         animation: onSelectedVdiskAnimation 4s;
     }
-
-    &__row {
-        display: flex;
-    }
-
-    &__column {
-        display: flex;
-        flex-direction: column;
-
-        margin-bottom: 15px;
-    }
-
-    &__title {
-        margin-right: 16px;
-
-        font-weight: 500;
-        text-transform: uppercase;
-
-        @include body-2-typography();
-    }
 }
 
 @keyframes onSelectedVdiskAnimation {

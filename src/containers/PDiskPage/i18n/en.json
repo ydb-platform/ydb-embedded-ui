@@ -1,8 +1,15 @@
 {
   "fqdn": "FQDN",
   "pdisk": "PDisk",
-  "groups": "Groups",
   "node": "Node",
+
+  "groups": "Groups",
+  "disk-distribution": "Disk distribution",
+
+  "empty-slot": "Empty slot",
+  "log": "Log",
+
+  "no-slots-data": "No slots data",
 
   "restart-pdisk-button": "Restart PDisk",
   "restart-pdisk-dialog": "PDisk will be restarted. Do you want to proceed?",

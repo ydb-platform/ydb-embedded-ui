@@ -30,7 +30,7 @@ export const PDISK_TYPES = {
     HDD: 'HDD', // ROT (Rotation?) = HDD
     SSD: 'SSD',
     MVME: 'NVME',
-};
+} as const;
 
 // Bear with me.
 // Disk type is determined by the field Category.

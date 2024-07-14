@@ -1,0 +1,52 @@
+.ydb-pdisk-space-distribution {
+    .storage-disk-progress-bar {
+        height: 100%;
+    }
+
+    &__pdisk-bar {
+        display: flex;
+        flex-grow: 1;
+        flex-direction: column;
+        gap: 10px;
+
+        min-width: 500px;
+        max-width: 800px;
+        padding: 5px;
+    }
+
+    &__slot-wrapper {
+        z-index: 1;
+
+        background-color: var(--g-color-base-background);
+    }
+
+    &__slot {
+        display: flex;
+
+        width: 100%;
+    }
+
+    &__slot-content {
+        z-index: 1;
+
+        display: flex;
+        flex-grow: 1;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        padding: 0 10px;
+
+        line-height: 13px;
+    }
+
+    &__slot-id {
+        margin-right: 10px;
+
+        font-weight: 600;
+    }
+
+    &__vdisk-popup {
+        padding: 10px;
+    }
+}

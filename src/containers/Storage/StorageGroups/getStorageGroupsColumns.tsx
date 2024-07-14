@@ -98,9 +98,9 @@ const erasureColumn: StorageGroupsColumn = {
     name: GROUPS_COLUMNS_IDS.Erasure,
     header: 'Erasure',
     width: 100,
+    sortAccessor: (row) => row.ErasureSpecies,
     render: ({row}) => (row.ErasureSpecies ? row.ErasureSpecies : '-'),
     align: DataTable.LEFT,
-    sortable: false,
 };
 
 const degradedColumn: StorageGroupsColumn = {
@@ -135,7 +135,6 @@ const usageColumn: StorageGroupsColumn = {
     // without a limit exclude usage from sort to display at the bottom
     sortAccessor: (row) => (row.Limit ? row.Usage : null),
     align: DataTable.LEFT,
-    sortable: false,
 };
 
 const groupIdColumn: StorageGroupsColumn = {
@@ -147,7 +146,6 @@ const groupIdColumn: StorageGroupsColumn = {
     },
     sortAccessor: (row) => Number(row.GroupID),
     align: DataTable.RIGHT,
-    sortable: false,
 };
 
 const usedColumn: StorageGroupsColumn = {
@@ -158,7 +156,6 @@ const usedColumn: StorageGroupsColumn = {
         return bytesToGB(row.Used, true);
     },
     align: DataTable.RIGHT,
-    sortable: false,
 };
 
 const limitColumn: StorageGroupsColumn = {
@@ -169,7 +166,6 @@ const limitColumn: StorageGroupsColumn = {
         return bytesToGB(row.Limit);
     },
     align: DataTable.RIGHT,
-    sortable: false,
 };
 
 const usedSpaceFlagColumn: StorageGroupsColumn = {
@@ -234,10 +230,25 @@ const getVDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
     align: DataTable.CENTER,
     width: 900,
     resizeable: false,
+    sortable: false,
 });
 
 export const getStorageTopGroupsColumns = (): StorageGroupsColumn[] => {
-    return [groupIdColumn, typeColumn, erasureColumn, usageColumn, usedColumn, limitColumn];
+    const columns = [
+        groupIdColumn,
+        typeColumn,
+        erasureColumn,
+        usageColumn,
+        usedColumn,
+        limitColumn,
+    ];
+
+    return columns.map((column) => {
+        return {
+            ...column,
+            sortable: false,
+        };
+    });
 };
 
 export const getPDiskStorageColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {

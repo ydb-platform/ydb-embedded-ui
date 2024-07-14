@@ -9,6 +9,7 @@ import isEmpty from 'lodash/isEmpty';
 import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {PDiskInfo} from '../../../components/PDiskInfo/PDiskInfo';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
+import {VDiskInfo} from '../../../components/VDiskInfo/VDiskInfo';
 import type {
     PreparedStructurePDisk,
     PreparedStructureVDisk,
@@ -24,7 +25,6 @@ import {createVDiskDeveloperUILink} from '../../../utils/developerUI/developerUI
 import i18n from '../i18n';
 
 import {PDiskTitleBadge} from './PDiskTitleBadge';
-import {Vdisk} from './Vdisk';
 
 const b = cn('kv-node-structure');
 
@@ -140,7 +140,7 @@ function getColumns({
                 return (
                     <Popover
                         placement={['right']}
-                        content={<Vdisk data={row} />}
+                        content={<VDiskInfo data={row} withTitle />}
                         tooltipContentClassName={b('vdisk-details')}
                     >
                         <Button

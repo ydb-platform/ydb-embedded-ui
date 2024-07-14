@@ -1,6 +1,5 @@
 import type {TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo} from '../../types/api/vdisk';
-import {isNumeric} from '../utils';
 
 import {calculatePDiskSeverity} from './calculatePDiskSeverity';
 import {calculateVDiskSeverity} from './calculateVDiskSeverity';
@@ -13,11 +12,10 @@ export function prepareVDiskData(vdiskState: TVDiskStateInfo = {}): PreparedVDis
 
     const PDiskId = vdiskState.PDiskId ?? PDisk?.PDiskId;
 
-    const AllocatedPercent = calculateVDiskAllocatedPercent(
-        vdiskState.AllocatedSize,
-        vdiskState.AvailableSize,
-        PDisk?.AvailableSize,
-    );
+    const available = Number(vdiskState.AvailableSize ?? PDisk?.AvailableSize);
+    const allocated = Number(vdiskState.AllocatedSize);
+    const total = allocated + available;
+    const allocatedPercent = Math.round((allocated * 100) / total);
 
     const Donors = vdiskState.Donors?.map((donor) => {
         return prepareVDiskData({...donor, DonorMode: true});
@@ -29,9 +27,11 @@ export function prepareVDiskData(vdiskState: TVDiskStateInfo = {}): PreparedVDis
         ...vdiskState,
         PDisk,
         PDiskId,
-        AllocatedPercent,
         Donors,
         Severity,
+
+        TotalSize: total,
+        AllocatedPercent: allocatedPercent,
     };
 }
 
@@ -40,36 +40,19 @@ export function preparePDiskData(pdiskState: TPDiskStateInfo = {}): PreparedPDis
 
     const Type = getPDiskType(Category);
 
-    const AllocatedPercent = calculatePDiskAllocatedPercent(AvailableSize, TotalSize);
+    const available = Number(AvailableSize);
+    const total = Number(TotalSize);
+    const allocated = total - available;
+    const allocatedPercent = Math.round((allocated * 100) / total);
 
-    const Severity = calculatePDiskSeverity(pdiskState, AllocatedPercent);
+    const Severity = calculatePDiskSeverity(pdiskState, allocatedPercent);
 
     return {
         ...pdiskState,
         Type,
-        AllocatedPercent,
         Severity,
+
+        AllocatedSize: allocated,
+        AllocatedPercent: allocatedPercent,
     };
-}
-
-function calculatePDiskAllocatedPercent(available: string | undefined, total: string | undefined) {
-    if (!isNumeric(available) || !isNumeric(total)) {
-        return undefined;
-    }
-
-    return Math.round(((Number(total) - Number(available)) * 100) / Number(total));
-}
-
-function calculateVDiskAllocatedPercent(
-    allocated: string | undefined,
-    availableOnVDisk: string | undefined,
-    availableOnPDisk: string | undefined,
-) {
-    const available = availableOnVDisk ?? availableOnPDisk;
-
-    if (!isNumeric(allocated) || !isNumeric(available)) {
-        return undefined;
-    }
-
-    return Math.round((Number(allocated) * 100) / (Number(allocated) + Number(available)));
 }
