@@ -7,7 +7,7 @@ import {NavigationTree} from 'ydb-ui-components';
 
 import {USE_DIRECTORY_OPERATIONS} from '../../../../lib';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
-import type {EPathType} from '../../../../types/api/schema';
+import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {useQueryModes, useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
@@ -33,15 +33,26 @@ export function SchemaTree(props: SchemaTreeProps) {
     const [schemaTreeKey, setSchemaTreeKey] = React.useState('');
 
     const fetchPath = async (path: string) => {
-        const promise = dispatch(
-            schemaApi.endpoints.getSchema.initiate({path}, {forceRefetch: true}),
-        );
-        const {data} = await promise;
-        promise.unsubscribe();
-        if (!data?.[path]) {
+        let schemaData: TEvDescribeSchemeResult | undefined;
+        do {
+            const promise = dispatch(
+                schemaApi.endpoints.getSchema.initiate({path}, {forceRefetch: true}),
+            );
+            const {data, originalArgs} = await promise;
+            promise.unsubscribe();
+            // Check if the result from the current request is received. rtk-query may skip the current request and
+            // return data from a parallel request, due to the same cache key.
+            if (originalArgs?.path === path) {
+                schemaData = data?.[path];
+                break;
+            }
+            // eslint-disable-next-line no-constant-condition
+        } while (true);
+
+        if (!schemaData) {
             throw new Error(`no describe data about path ${path}`);
         }
-        const {PathDescription: {Children = []} = {}} = data[path];
+        const {PathDescription: {Children = []} = {}} = schemaData;
 
         const childItems = Children.map((childData) => {
             const {Name = '', PathType, PathSubType} = childData;

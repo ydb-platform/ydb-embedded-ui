@@ -7,7 +7,7 @@ import {AccessDenied} from '../../components/Errors/403';
 import {Loader} from '../../components/Loader';
 import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {schemaApi} from '../../store/reducers/schema/schema';
+import {useGetSchemaQuery} from '../../store/reducers/schema/schema';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
@@ -74,13 +74,9 @@ export function Tenant(props: TenantProps) {
 
     const path = schema ?? tenantName;
 
-    const {
-        currentData: currentItem,
-        error,
-        isLoading,
-    } = schemaApi.useGetSchemaQuery({path}, {refetchOnMountOrArgChange: true});
+    const {data: currentItem, error, isLoading} = useGetSchemaQuery({path});
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
-        currentItem?.[path]?.PathDescription?.Self || {};
+        currentItem?.PathDescription?.Self || {};
 
     let showBlockingError = false;
     if (error && typeof error === 'object' && 'status' in error) {

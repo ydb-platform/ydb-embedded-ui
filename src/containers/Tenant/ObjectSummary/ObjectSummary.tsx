@@ -15,7 +15,7 @@ import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {Loader} from '../../../components/Loader';
 import SplitPane from '../../../components/SplitPane';
 import routes, {createExternalUILink, createHref} from '../../../routes';
-import {schemaApi, setShowPreview} from '../../../store/reducers/schema/schema';
+import {setShowPreview, useGetSchemaQuery} from '../../../store/reducers/schema/schema';
 import {
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
@@ -92,8 +92,8 @@ export function ObjectSummary({
         ignoreQueryPrefix: true,
     });
 
-    const {currentData: currentObjectData} = schemaApi.endpoints.getSchema.useQueryState({path});
-    const currentSchemaData = currentObjectData?.[path]?.PathDescription?.Self;
+    const {data: currentObjectData} = useGetSchemaQuery({path});
+    const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
     React.useEffect(() => {
         const isTable = isTableType(type);
@@ -157,7 +157,7 @@ export function ObjectSummary({
             value: formatDateTime(CreateStep, ''),
         });
 
-        const {PathDescription} = currentObjectData[path];
+        const {PathDescription} = currentObjectData;
 
         const title = <EntityTitle data={PathDescription} />;
 
@@ -399,14 +399,14 @@ export function ObjectSummary({
 }
 
 function ObjectTree({tenantName, path}: {tenantName: string; path?: string}) {
-    const {currentData: tenantData = {}, isFetching} = schemaApi.useGetSchemaQuery({
+    const {data: tenantData = {}, isLoading} = useGetSchemaQuery({
         path: tenantName,
     });
-    const pathData = tenantData?.[tenantName]?.PathDescription?.Self;
+    const pathData = tenantData?.PathDescription?.Self;
 
     const [, setCurrentPath] = useQueryParam('schema', StringParam);
 
-    if (!pathData && isFetching) {
+    if (!pathData && isLoading) {
         // If Loader isn't wrapped with div, SplitPane doesn't calculate panes height correctly
         return (
             <div>

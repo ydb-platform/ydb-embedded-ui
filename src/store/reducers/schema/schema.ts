@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type {Reducer, Selector} from '@reduxjs/toolkit';
 import {createSelector} from '@reduxjs/toolkit';
 
@@ -51,7 +53,10 @@ export const schemaApi = api.injectEndpoints({
                 }
             },
         }),
-        getSchema: builder.query<{[path: string]: TEvDescribeSchemeResult}, {path: string}>({
+        getSchema: builder.query<
+            {[path: string]: TEvDescribeSchemeResult & {partial?: boolean}},
+            {path: string}
+        >({
             queryFn: async ({path}, {signal}) => {
                 try {
                     const data = await window.api.getSchema({path}, {signal});
@@ -76,21 +81,18 @@ export const schemaApi = api.injectEndpoints({
                 }
                 return existing;
             },
-            forceRefetch: ({currentArg, previousArg}) => {
-                return currentArg?.path !== previousArg?.path;
-            },
         }),
     }),
     overrideExisting: 'throw',
 });
 
 function getSchemaChildren(data: TEvDescribeSchemeResult) {
-    const children: {[path: string]: TEvDescribeSchemeResult} = {};
+    const children: {[path: string]: TEvDescribeSchemeResult & {partial?: boolean}} = {};
     const {PathDescription: {Children = []} = {}, Path: path} = data;
     for (const child of Children) {
         const {Name = ''} = child;
         const childPath = `${path}/${Name}`;
-        children[childPath] = {PathDescription: {Self: child}, Path: childPath};
+        children[childPath] = {PathDescription: {Self: child}, Path: childPath, partial: true};
     }
     return children;
 }
@@ -126,3 +128,19 @@ export const selectSchemaMergedChildrenPaths: Selector<
             : undefined;
     },
 );
+
+export function useGetSchemaQuery({path}: {path: string}) {
+    const {currentData, isFetching, error, refetch} = schemaApi.useGetSchemaQuery({path});
+
+    const data = currentData?.[path];
+    const isLoading = isFetching && data === undefined;
+
+    const shouldLoad = !isLoading && ((!data && !error) || data?.partial);
+    React.useEffect(() => {
+        if (shouldLoad) {
+            refetch();
+        }
+    }, [refetch, path, shouldLoad]);
+
+    return {data, isLoading, error};
+}

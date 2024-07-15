@@ -8,7 +8,10 @@ import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
 import {olapApi} from '../../../../store/reducers/olapStats';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
-import {schemaApi, selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
+import {
+    selectSchemaMergedChildrenPaths,
+    useGetSchemaQuery,
+} from '../../../../store/reducers/schema/schema';
 import {EPathType} from '../../../../types/api/schema';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
@@ -66,7 +69,7 @@ function Overview({type, path}: OverviewProps) {
     const overviewLoading = isFetching && currentData === undefined;
     const {data: rawData, additionalData} = currentData || {};
 
-    const {error: schemaError} = schemaApi.endpoints.getSchema.useQueryState({path});
+    const {error: schemaError} = useGetSchemaQuery({path});
 
     const entityLoading = overviewLoading || olapStatsLoading;
     const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;

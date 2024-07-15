@@ -8,7 +8,7 @@ import {Button, Card, Icon} from '@gravity-ui/uikit';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {hotKeysApi} from '../../../../store/reducers/hotKeys/hotKeys';
-import {schemaApi} from '../../../../store/reducers/schema/schema';
+import {useGetSchemaQuery} from '../../../../store/reducers/schema/schema';
 import type {HotKey} from '../../../../types/api/hotkeys';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, IS_HOTKEYS_HELP_HIDDEN_KEY} from '../../../../utils/constants';
@@ -61,11 +61,9 @@ export function HotKeys({path}: HotKeysProps) {
     const {currentData: data, isFetching, error} = hotKeysApi.useGetHotKeysQuery({path});
     const loading = isFetching && data === undefined;
 
-    const {currentData: schemaData, isFetching: schemaIsFetching} =
-        schemaApi.endpoints.getSchema.useQueryState({path});
-    const schemaLoading = schemaIsFetching && schemaData === undefined;
+    const {data: schemaData, isLoading: schemaLoading} = useGetSchemaQuery({path});
 
-    const keyColumnsIds = schemaData?.[path]?.PathDescription?.Table?.KeyColumnNames;
+    const keyColumnsIds = schemaData?.PathDescription?.Table?.KeyColumnNames;
 
     const tableColumns = React.useMemo(() => {
         return getHotKeysColumns(keyColumnsIds);
