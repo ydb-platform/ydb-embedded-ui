@@ -65,7 +65,7 @@ export function HotKeys({path}: HotKeysProps) {
         schemaApi.endpoints.getSchema.useQueryState({path});
     const schemaLoading = schemaIsFetching && schemaData === undefined;
 
-    const keyColumnsIds = schemaData?.PathDescription?.Table?.KeyColumnNames;
+    const keyColumnsIds = schemaData?.[path]?.PathDescription?.Table?.KeyColumnNames;
 
     const tableColumns = React.useMemo(() => {
         return getHotKeysColumns(keyColumnsIds);

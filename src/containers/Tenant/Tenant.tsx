@@ -80,7 +80,7 @@ export function Tenant(props: TenantProps) {
         isLoading,
     } = schemaApi.useGetSchemaQuery({path}, {refetchOnMountOrArgChange: true});
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
-        currentItem?.PathDescription?.Self || {};
+        currentItem?.[path]?.PathDescription?.Self || {};
 
     let showBlockingError = false;
     if (error && typeof error === 'object' && 'status' in error) {

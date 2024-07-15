@@ -38,10 +38,10 @@ export function SchemaTree(props: SchemaTreeProps) {
         );
         const {data} = await promise;
         promise.unsubscribe();
-        if (!data) {
+        if (!data?.[path]) {
             throw new Error(`no describe data about path ${path}`);
         }
-        const {PathDescription: {Children = []} = {}} = data;
+        const {PathDescription: {Children = []} = {}} = data[path];
 
         const childItems = Children.map((childData) => {
             const {Name = '', PathType, PathSubType} = childData;

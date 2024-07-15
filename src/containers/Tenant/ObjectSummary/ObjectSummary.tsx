@@ -93,7 +93,7 @@ export function ObjectSummary({
     });
 
     const {currentData: currentObjectData} = schemaApi.endpoints.getSchema.useQueryState({path});
-    const currentSchemaData = currentObjectData?.PathDescription?.Self;
+    const currentSchemaData = currentObjectData?.[path]?.PathDescription?.Self;
 
     React.useEffect(() => {
         const isTable = isTableType(type);
@@ -157,7 +157,7 @@ export function ObjectSummary({
             value: formatDateTime(CreateStep, ''),
         });
 
-        const {PathDescription} = currentObjectData;
+        const {PathDescription} = currentObjectData[path];
 
         const title = <EntityTitle data={PathDescription} />;
 
@@ -402,7 +402,7 @@ function ObjectTree({tenantName, path}: {tenantName: string; path?: string}) {
     const {currentData: tenantData = {}, isFetching} = schemaApi.useGetSchemaQuery({
         path: tenantName,
     });
-    const pathData = tenantData?.PathDescription?.Self;
+    const pathData = tenantData?.[tenantName]?.PathDescription?.Self;
 
     const [, setCurrentPath] = useQueryParam('schema', StringParam);
 
