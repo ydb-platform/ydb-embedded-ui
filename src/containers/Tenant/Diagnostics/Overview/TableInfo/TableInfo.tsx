@@ -23,8 +23,8 @@ export const TableInfo = ({data, type, olapStats}: TableInfoProps) => {
     const title = <EntityTitle data={data?.PathDescription} />;
 
     const {
-        generalInfo = [],
-        tableStatsInfo = [],
+        generalInfo,
+        tableStatsInfo,
         tabletMetricsInfo = [],
         partitionConfigInfo = [],
     } = React.useMemo(() => prepareTableInfo(data, type, olapStats), [data, type, olapStats]);
@@ -38,17 +38,19 @@ export const TableInfo = ({data, type, olapStats}: TableInfoProps) => {
                 renderEmptyState={() => <div className={b('title')}>{title}</div>}
             />
             <div className={b('row')}>
-                <div className={b('col')}>
-                    {tableStatsInfo.map((info, index) => (
-                        <InfoViewer
-                            key={index}
-                            info={info}
-                            title={index === 0 ? i18n('tableStats') : undefined}
-                            className={b('info-block')}
-                            renderEmptyState={() => null}
-                        />
-                    ))}
-                </div>
+                {tableStatsInfo ? (
+                    <div className={b('col')}>
+                        {tableStatsInfo.map((info, index) => (
+                            <InfoViewer
+                                key={index}
+                                info={info}
+                                title={index === 0 ? i18n('tableStats') : undefined}
+                                className={b('info-block')}
+                                renderEmptyState={() => null}
+                            />
+                        ))}
+                    </div>
+                ) : null}
                 {tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0 ? (
                     <div className={b('col')}>
                         <InfoViewer
