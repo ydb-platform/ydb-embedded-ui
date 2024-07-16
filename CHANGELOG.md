@@ -1,5 +1,13 @@
 # Changelog
 
+## [6.10.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.10.2...v6.10.3) (2024-07-16)
+
+
+### Bug Fixes
+
+* **Overview:** disable column tables stats request ([#1024](https://github.com/ydb-platform/ydb-embedded-ui/issues/1024)) ([a453d0a](https://github.com/ydb-platform/ydb-embedded-ui/commit/a453d0ab11c055846022c6731480812a0356fd2a))
+* **schema:** use one cache entree for tenant path schemas ([#1016](https://github.com/ydb-platform/ydb-embedded-ui/issues/1016)) ([7f283a0](https://github.com/ydb-platform/ydb-embedded-ui/commit/7f283a0f595d587eac3921428d14fe659cf6ee9c))
+
 ## [6.10.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.10.1...v6.10.2) (2024-07-10)
 
 
