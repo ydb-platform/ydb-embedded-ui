@@ -24,7 +24,7 @@ const isInStoreColumnTable = (table: TColumnTableDescription) => {
     return table.SchemaPresetName && table.SchemaPresetId !== undefined;
 };
 
-const prepareOlapStats = (olapStats?: KeyValueRow[]) => {
+const prepareOlapStats = (olapStats: KeyValueRow[]) => {
     const Bytes = olapStats?.reduce((acc, el) => {
         const value = isNumeric(el.Bytes) ? Number(el.Bytes) : 0;
         return acc + value;
@@ -199,12 +199,14 @@ export const prepareTableInfo = (
         }
     }
 
-    let tableStatsInfo: InfoViewerItem[][];
+    let tableStatsInfo: InfoViewerItem[][] | undefined;
 
     // There is no TableStats and TabletMetrics for ColumnTables inside ColumnStore
     // Therefore we parse olapStats
     if (type === EPathType.EPathTypeColumnTable && isInStoreColumnTable(ColumnTableDescription)) {
-        tableStatsInfo = [prepareOlapStats(olapStats)];
+        if (olapStats) {
+            tableStatsInfo = [prepareOlapStats(olapStats)];
+        }
     } else {
         tableStatsInfo = [
             formatObject(formatTableStatsItem, {
