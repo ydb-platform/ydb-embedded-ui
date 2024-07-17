@@ -8,8 +8,9 @@ import {
 import type {KeyValueRow} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
+import {TOP_QUERIES_COLUMNS_IDS} from '../../../../utils/diagnostics';
 import {generateHash} from '../../../../utils/generateHash';
-import {parseUsToMs} from '../../../../utils/timeParsers';
+import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
 import {MAX_QUERY_HEIGHT} from '../../utils/constants';
 
 import './TopQueries.scss';
@@ -18,21 +19,10 @@ const b = cn('kv-top-queries');
 
 export const TOP_QUERIES_COLUMNS_WIDTH_LS_KEY = 'topQueriesColumnsWidth';
 
-const TOP_QUERIES_COLUMNS_IDS = {
-    CPUTimeUs: 'CPUTimeUs',
-    QueryText: 'QueryText',
-    EndTime: 'EndTime',
-    ReadRows: 'ReadRows',
-    ReadBytes: 'ReadBytes',
-    UserSID: 'UserSID',
-    OneLineQueryText: 'OneLineQueryText',
-    QueryHash: 'QueryHash',
-    Duration: 'Duration',
-};
-
 const cpuTimeUsColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.CPUTimeUs,
     sortAccessor: (row) => Number(row.CPUTimeUs),
+    render: ({row}) => formatToMs(parseUsToMs(row.CPUTimeUs ?? undefined)),
     width: 120,
     align: DataTable.RIGHT,
     sortable: false,
@@ -97,8 +87,8 @@ const queryHashColumn: Column<KeyValueRow> = {
 
 const durationColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.Duration,
-    header: 'Duration, ms',
-    render: ({row}) => formatNumber(parseUsToMs(row.Duration ?? undefined)),
+    header: 'Duration',
+    render: ({row}) => formatToMs(parseUsToMs(row.Duration ?? undefined)),
     sortAccessor: (row) => Number(row.Duration),
     align: DataTable.RIGHT,
     width: 150,

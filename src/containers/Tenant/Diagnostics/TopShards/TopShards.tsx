@@ -17,7 +17,7 @@ import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
-import {isSortableTopShardsProperty} from '../../../../utils/diagnostics';
+import {TOP_SHARD_COLUMNS_IDS, isSortableTopShardsProperty} from '../../../../utils/diagnostics';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {isColumnEntityType} from '../../utils/schema';
@@ -36,17 +36,6 @@ const TABLE_SETTINGS: Settings = {
     externalSort: true,
     disableSortReset: true,
     defaultOrder: DataTable.DESCENDING,
-};
-
-const tableColumnsNames = {
-    TabletId: 'TabletId',
-    CPUCores: 'CPUCores',
-    DataSize: 'DataSize',
-    Path: 'Path',
-    NodeId: 'NodeId',
-    PeakTime: 'PeakTime',
-    InFlightTxCount: 'InFlightTxCount',
-    IntervalEnd: 'IntervalEnd',
 };
 
 function prepareDateTimeValue(value: CellValue) {
@@ -115,7 +104,7 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
         return defaultValue;
     });
 
-    const [sortOrder, setSortOrder] = React.useState(tableColumnsNames.CPUCores);
+    const [sortOrder, setSortOrder] = React.useState(TOP_SHARD_COLUMNS_IDS.CPUCores);
     const {
         data: result,
         isFetching,
@@ -171,14 +160,14 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
         if (filters.mode === EShardsWorkloadMode.History) {
             // after NodeId
             columns.splice(5, 0, {
-                name: tableColumnsNames.PeakTime,
+                name: TOP_SHARD_COLUMNS_IDS.PeakTime,
                 render: ({row}) => {
                     return prepareDateTimeValue(row.PeakTime);
                 },
                 sortable: false,
             });
             columns.push({
-                name: tableColumnsNames.IntervalEnd,
+                name: TOP_SHARD_COLUMNS_IDS.IntervalEnd,
                 render: ({row}) => {
                     return prepareDateTimeValue(row.IntervalEnd);
                 },
