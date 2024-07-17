@@ -6,8 +6,8 @@ export interface TColumnTableDescription {
     Schema?: TColumnTableSchema;
     TtlSettings?: TColumnDataLifeCycle;
 
-    SchemaPresetId?: number;
-    SchemaPresetName?: string;
+    SchemaPresetId?: number; // For in-store column tables, could be 0
+    SchemaPresetName?: string; // For in-store column tables
 
     ColumnStorePathId?: TPathID;
 

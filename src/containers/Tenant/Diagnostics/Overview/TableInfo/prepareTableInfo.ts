@@ -6,7 +6,6 @@ import {
     formatTableStatsItem,
     formatTabletMetricsItem,
 } from '../../../../../components/InfoViewer/formatters';
-import type {KeyValueRow} from '../../../../../types/api/query';
 import type {
     TColumnDataLifeCycle,
     TColumnTableDescription,
@@ -17,32 +16,10 @@ import type {
 import {EPathType} from '../../../../../types/api/schema';
 import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
-import {isNumeric} from '../../../../../utils/utils';
 
 const isInStoreColumnTable = (table: TColumnTableDescription) => {
     // SchemaPresetId could be 0
     return table.SchemaPresetName && table.SchemaPresetId !== undefined;
-};
-
-const prepareOlapStats = (olapStats: KeyValueRow[]) => {
-    const Bytes = olapStats?.reduce((acc, el) => {
-        const value = isNumeric(el.Bytes) ? Number(el.Bytes) : 0;
-        return acc + value;
-    }, 0);
-    const Rows = olapStats?.reduce((acc, el) => {
-        const value = isNumeric(el.Rows) ? Number(el.Rows) : 0;
-        return acc + value;
-    }, 0);
-    const tabletIds = olapStats?.reduce((acc, el) => {
-        acc.add(el.TabletId);
-        return acc;
-    }, new Set());
-
-    return [
-        {label: 'PartCount', value: tabletIds?.size ?? 0},
-        {label: 'RowCount', value: formatNumber(Rows) ?? 0},
-        {label: 'DataSize', value: formatBytes(Bytes) ?? 0},
-    ];
 };
 
 const prepareTTL = (ttl: TTTLSettings | TColumnDataLifeCycle) => {
@@ -143,11 +120,7 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
 };
 
 /** Prepares data for Table, ColumnTable and ColumnStore */
-export const prepareTableInfo = (
-    data?: TEvDescribeSchemeResult,
-    type?: EPathType,
-    olapStats?: KeyValueRow[],
-) => {
+export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathType) => {
     if (!data) {
         return {};
     }
@@ -199,43 +172,33 @@ export const prepareTableInfo = (
         }
     }
 
-    let tableStatsInfo: InfoViewerItem[][] | undefined;
-
-    // There is no TableStats and TabletMetrics for ColumnTables inside ColumnStore
-    // Therefore we parse olapStats
-    if (type === EPathType.EPathTypeColumnTable && isInStoreColumnTable(ColumnTableDescription)) {
-        if (olapStats) {
-            tableStatsInfo = [prepareOlapStats(olapStats)];
-        }
-    } else {
-        tableStatsInfo = [
-            formatObject(formatTableStatsItem, {
-                PartCount,
-                RowCount,
-                DataSize,
-                IndexSize,
-            }),
-            formatObject(formatTableStatsItem, {
-                LastAccessTime,
-                LastUpdateTime,
-            }),
-            formatObject(formatTableStatsItem, {
-                ImmediateTxCompleted,
-                PlannedTxCompleted,
-                TxRejectedByOverload,
-                TxRejectedBySpace,
-                TxCompleteLagMsec,
-                InFlightTxCount,
-            }),
-            formatObject(formatTableStatsItem, {
-                RowUpdates,
-                RowDeletes,
-                RowReads,
-                RangeReads,
-                RangeReadRows,
-            }),
-        ];
-    }
+    const tableStatsInfo = [
+        formatObject(formatTableStatsItem, {
+            PartCount,
+            RowCount,
+            DataSize,
+            IndexSize,
+        }),
+        formatObject(formatTableStatsItem, {
+            LastAccessTime,
+            LastUpdateTime,
+        }),
+        formatObject(formatTableStatsItem, {
+            ImmediateTxCompleted,
+            PlannedTxCompleted,
+            TxRejectedByOverload,
+            TxRejectedBySpace,
+            TxCompleteLagMsec,
+            InFlightTxCount,
+        }),
+        formatObject(formatTableStatsItem, {
+            RowUpdates,
+            RowDeletes,
+            RowReads,
+            RangeReads,
+            RangeReadRows,
+        }),
+    ];
 
     //@ts-expect-error
     const tabletMetricsInfo = formatObject(formatTabletMetricsItem, TabletMetrics);
