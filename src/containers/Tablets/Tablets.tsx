@@ -4,12 +4,14 @@ import {Icon, Label, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+import {DeveloperUiLink} from '../../components/DeveloperUiLink/DeveloperUiLink';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InternalLink} from '../../components/InternalLink';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import routes, {createHref} from '../../routes';
+import {backend} from '../../store';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
@@ -41,6 +43,7 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
     },
     {
         name: 'TabletId',
+        width: 230,
         get header() {
             return i18n('Tablet');
         },
@@ -49,7 +52,17 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
                 row.TabletId &&
                 createHref(routes.tablet, {id: row.TabletId}, {nodeId: row.NodeId, type: row.Type});
 
-            return <InternalLink to={tabletPath}>{row.TabletId}</InternalLink>;
+            return (
+                <EntityStatus
+                    name={row.TabletId?.toString()}
+                    path={tabletPath}
+                    hasClipboardButton
+                    showStatus={false}
+                    additionalControls={
+                        <DeveloperUiLink href={`${backend}/tablets?TabletID=${row.TabletId}`} />
+                    }
+                />
+            );
         },
     },
     {
