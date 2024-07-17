@@ -37,6 +37,7 @@ SELECT
     Duration
 FROM \`${path}/.sys/top_queries_by_cpu_time_one_hour\`
 WHERE ${filterConditions || 'true'}
+ORDER BY CPUTimeUs DESC
 `;
 };
 
