@@ -31,18 +31,6 @@ interface OverviewProps {
 function Overview({type, path}: OverviewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    // FIXME: The request is too heavy, stats table may have millions of items
-    // Disabled until fixed
-    // https://github.com/ydb-platform/ydb-embedded-ui/issues/907
-    // https://github.com/ydb-platform/ydb-embedded-ui/issues/908
-    // const olapParams = isTableType(type) && isColumnEntityType(type) ? {path} : skipToken;
-    // const {currentData: olapData, isFetching: olapIsFetching} = olapApi.useGetOlapStatsQuery(
-    //     olapParams,
-    //     {pollingInterval: autoRefreshInterval},
-    // );
-    // const olapStatsLoading = olapIsFetching && olapData === undefined;
-    // const {result: olapStats} = olapData || {result: undefined};
-
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
     // shallowEqual prevents rerenders when new schema data is loaded
@@ -70,7 +58,6 @@ function Overview({type, path}: OverviewProps) {
 
     const {error: schemaError} = useGetSchemaQuery({path});
 
-    // overviewLoading || olapStatsLoading
     const entityLoading = overviewLoading;
     const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
 
@@ -97,15 +84,7 @@ function Overview({type, path}: OverviewProps) {
             [EPathType.EPathTypeReplication]: () => <AsyncReplicationInfo data={data} />,
         };
 
-        return (
-            (type && pathTypeToComponent[type]?.()) || (
-                <TableInfo
-                    data={data}
-                    type={type}
-                    // olapStats={olapStats}
-                />
-            )
-        );
+        return (type && pathTypeToComponent[type]?.()) || <TableInfo data={data} type={type} />;
     };
 
     if (entityLoading || entityNotReady) {

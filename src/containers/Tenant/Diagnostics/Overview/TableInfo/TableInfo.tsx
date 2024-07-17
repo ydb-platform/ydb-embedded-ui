@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {InfoViewer} from '../../../../../components/InfoViewer';
-import type {KeyValueRow} from '../../../../../types/api/query';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import {EntityTitle} from '../../../EntityTitle/EntityTitle';
@@ -16,10 +15,9 @@ const b = cn('ydb-diagnostics-table-info');
 interface TableInfoProps {
     data?: TEvDescribeSchemeResult;
     type?: EPathType;
-    olapStats?: KeyValueRow[];
 }
 
-export const TableInfo = ({data, type, olapStats}: TableInfoProps) => {
+export const TableInfo = ({data, type}: TableInfoProps) => {
     const title = <EntityTitle data={data?.PathDescription} />;
 
     const {
@@ -27,7 +25,7 @@ export const TableInfo = ({data, type, olapStats}: TableInfoProps) => {
         tableStatsInfo,
         tabletMetricsInfo = [],
         partitionConfigInfo = [],
-    } = React.useMemo(() => prepareTableInfo(data, type, olapStats), [data, type, olapStats]);
+    } = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
 
     return (
         <div className={b()}>
