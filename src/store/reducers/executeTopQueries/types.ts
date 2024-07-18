@@ -1,8 +1,8 @@
 export interface TopQueriesFilters {
     /** ms from epoch */
-    from?: number;
+    from?: string;
     /** ms from epoch */
-    to?: number;
+    to?: string;
     text?: string;
 }
 

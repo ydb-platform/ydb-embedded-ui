@@ -14,6 +14,7 @@
     "@gravity-ui/axios-wrapper": "^1.4.1",
     "@gravity-ui/chartkit": "^5.9.0",
     "@gravity-ui/components": "^3.7.0",
+    "@gravity-ui/date-components": "^2.8.0",
     "@gravity-ui/date-utils": "^2.5.3",
     "@gravity-ui/i18n": "^1.5.1",
     "@gravity-ui/icons": "^2.10.0",
