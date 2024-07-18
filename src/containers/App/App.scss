@@ -117,3 +117,7 @@ body,
 .g-popup {
     max-width: 500px;
 }
+
+.gc-definition-list__title {
+    @include subheader-2-typography();
+}

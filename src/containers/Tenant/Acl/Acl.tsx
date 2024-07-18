@@ -1,7 +1,7 @@
 import React from 'react';
 
-import type {DefinitionListItem} from '@gravity-ui/components';
 import {DefinitionList} from '@gravity-ui/components';
+import type {DefinitionListItem} from '@gravity-ui/components';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
@@ -9,7 +9,8 @@ import {schemaAclApi} from '../../../store/reducers/schemaAcl/schemaAcl';
 import type {TACE} from '../../../types/api/acl';
 import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
-import i18n from '../i18n';
+
+import i18n from './i18n';
 
 import './Acl.scss';
 
@@ -121,18 +122,20 @@ function getOwnerItem(owner?: string) {
     return [
         {
             name: <span className={b('owner')}>{preparedOwner}</span>,
-            content: <span className={b('owner')}>{i18n('acl.owner')}</span>,
+            content: <span className={b('owner')}>{i18n('title_owner')}</span>,
         },
-    ] as DefinitionListItem[];
+    ];
 }
 
 export const Acl = ({path}: {path: string}) => {
     const {currentData, isFetching, error} = schemaAclApi.useGetSchemaAclQuery({path});
 
     const loading = isFetching && !currentData;
-    const {acl, owner} = currentData || {};
+
+    const {acl, effectiveAcl, owner} = currentData || {};
 
     const aclListItems = getAclListItems(acl);
+    const effectiveAclListItems = getAclListItems(effectiveAcl);
 
     const ownerItem = getOwnerItem(owner);
 
@@ -145,7 +148,7 @@ export const Acl = ({path}: {path: string}) => {
     }
 
     if (!acl && !owner) {
-        return <React.Fragment>{i18n('acl.empty')}</React.Fragment>;
+        return <React.Fragment>{i18n('description_empty')}</React.Fragment>;
     }
 
     return (
@@ -158,7 +161,24 @@ export const Acl = ({path}: {path: string}) => {
                 />
             ) : null}
             {aclListItems.length ? (
-                <DefinitionList items={aclListItems} nameMaxWidth={200} className={b('result')} />
+                <React.Fragment>
+                    <div className={b('list-title')}>{i18n('title_rights')}</div>
+                    <DefinitionList
+                        items={aclListItems}
+                        nameMaxWidth={200}
+                        className={b('result')}
+                    />
+                </React.Fragment>
+            ) : null}
+            {effectiveAclListItems.length ? (
+                <React.Fragment>
+                    <div className={b('list-title')}>{i18n('title_effective-rights')}</div>
+                    <DefinitionList
+                        items={effectiveAclListItems}
+                        nameMaxWidth={200}
+                        className={b('result')}
+                    />
+                </React.Fragment>
             ) : null}
         </div>
     );
