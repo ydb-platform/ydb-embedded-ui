@@ -1,4 +1,4 @@
-export function parseJson(value) {
+export function parseJson(value?: string | null) {
     if (!value) {
         return undefined;
     }
@@ -9,7 +9,7 @@ export function parseJson(value) {
     }
 }
 
-export function getValueFromLS(key, defaultValue) {
+export function getValueFromLS(key: string, defaultValue: string) {
     try {
         return localStorage.getItem(key) ?? defaultValue;
     } catch (err) {
@@ -21,14 +21,14 @@ export function getValueFromLS(key, defaultValue) {
 const sizes = [' B', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB'];
 const base = 1000;
 
-export function bytesToSize(bytes) {
+export function bytesToSize(bytes: number) {
     if (isNaN(bytes)) {
         return '';
     }
     if (bytes < base) {
         return String(bytes);
     }
-    let i = parseInt(Math.floor(Math.log(bytes) / Math.log(base)), 10);
+    let i = parseInt(String(Math.floor(Math.log(bytes) / Math.log(base))), 10);
     if (i >= sizes.length) {
         i = sizes.length - 1;
     }
@@ -40,11 +40,12 @@ export function bytesToSize(bytes) {
     return val.toPrecision(3) + sizes[i];
 }
 
-function bytesToMB(bytes) {
-    if (isNaN(bytes)) {
+function bytesToMB(bytes?: number | string) {
+    const bytesNumber = Number(bytes);
+    if (isNaN(bytesNumber)) {
         return '';
     }
-    const val = bytes / base ** 2;
+    const val = bytesNumber / base ** 2;
     if (val < 10) {
         return val.toFixed(2) + sizes[2];
     } else if (val < 100) {
@@ -54,15 +55,16 @@ function bytesToMB(bytes) {
     }
 }
 
-export function bytesToSpeed(bytes) {
+export function bytesToSpeed(bytes?: number | string) {
     return `${bytesToMB(bytes)}${bytes ? 'ps' : ''}`;
 }
 
-export function bytesToGB(bytes, shouldRound) {
-    if (isNaN(bytes)) {
+export function bytesToGB(bytes?: number | string, shouldRound?: boolean) {
+    const bytesNumber = Number(bytes);
+    if (isNaN(bytesNumber)) {
         return 'N/A';
     }
-    const val = bytes / 1000000000;
+    const val = bytesNumber / 1000000000;
     if (shouldRound) {
         return val.toFixed() + sizes[3];
     }
@@ -75,18 +77,25 @@ export function bytesToGB(bytes, shouldRound) {
     }
 }
 
-export function pad9(val) {
-    const len = String(val).length;
-    let result = val;
+export function pad9(val: number | string) {
+    const stringifiedVal = String(val);
+    const len = stringifiedVal.length;
+    let result = stringifiedVal;
     for (let i = len; i < 9; i++) {
         result = '0' + result;
     }
     return result;
 }
 
-export function isNumeric(value) {
-    // need both isNaN and isNaN(parseFloat):
-    // - isNaN treats true/false/''/etc. as numbers, parseFloat fixes this
-    // - parseFloat treats '123qwe' as number, isNaN fixes this
-    return !isNaN(value) && !isNaN(parseFloat(value));
+export function isNumeric(value?: unknown) {
+    if (typeof value === 'number') {
+        return !isNaN(value);
+    }
+    if (typeof value === 'string') {
+        // need both isNaN and isNaN(parseFloat):
+        // - isNaN treats true/false/''/etc. as numbers, parseFloat fixes this
+        // - parseFloat treats '123qwe' as number, isNaN fixes this
+        return !isNaN(Number(value)) && !isNaN(parseFloat(value));
+    }
+    return false;
 }
