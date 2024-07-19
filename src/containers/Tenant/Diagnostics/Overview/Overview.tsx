@@ -6,19 +6,17 @@ import {shallowEqual} from 'react-redux';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
-import {olapApi} from '../../../../store/reducers/olapStats';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
-import {schemaApi, selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
+import {
+    selectSchemaMergedChildrenPaths,
+    useGetSchemaQuery,
+} from '../../../../store/reducers/schema/schema';
 import {EPathType} from '../../../../types/api/schema';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
 import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
 import {ViewInfo} from '../../Info/View/View';
-import {
-    isColumnEntityType,
-    isEntityWithMergedImplementation,
-    isTableType,
-} from '../../utils/schema';
+import {isEntityWithMergedImplementation} from '../../utils/schema';
 
 import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
@@ -32,14 +30,6 @@ interface OverviewProps {
 
 function Overview({type, path}: OverviewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-
-    const olapParams = isTableType(type) && isColumnEntityType(type) ? {path} : skipToken;
-    const {currentData: olapData, isFetching: olapIsFetching} = olapApi.useGetOlapStatsQuery(
-        olapParams,
-        {pollingInterval: autoRefreshInterval},
-    );
-    const olapStatsLoading = olapIsFetching && olapData === undefined;
-    const {result: olapStats} = olapData || {result: undefined};
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
@@ -66,9 +56,9 @@ function Overview({type, path}: OverviewProps) {
     const overviewLoading = isFetching && currentData === undefined;
     const {data: rawData, additionalData} = currentData || {};
 
-    const {error: schemaError} = schemaApi.endpoints.getSchema.useQueryState({path});
+    const {error: schemaError} = useGetSchemaQuery({path});
 
-    const entityLoading = overviewLoading || olapStatsLoading;
+    const entityLoading = overviewLoading;
     const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
 
     const renderContent = () => {
@@ -94,11 +84,7 @@ function Overview({type, path}: OverviewProps) {
             [EPathType.EPathTypeReplication]: () => <AsyncReplicationInfo data={data} />,
         };
 
-        return (
-            (type && pathTypeToComponent[type]?.()) || (
-                <TableInfo data={data} type={type} olapStats={olapStats} />
-            )
-        );
+        return (type && pathTypeToComponent[type]?.()) || <TableInfo data={data} type={type} />;
     };
 
     if (entityLoading || entityNotReady) {

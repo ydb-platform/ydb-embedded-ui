@@ -5,6 +5,7 @@ import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {NodeAddress} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
+import {createDeveloperUILinkWithNodeId} from '../../utils/developerUI/developerUI';
 import {isUnavailableNode} from '../../utils/nodes';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
@@ -25,15 +26,22 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
     }
 
     const isNodeAvailable = !isUnavailableNode(node);
-    const nodeRef = isNodeAvailable && getNodeRef ? getNodeRef(node) + 'internal' : undefined;
+
+    let nodeHref: string | undefined;
+    if (getNodeRef) {
+        nodeHref = getNodeRef(node) + 'internal';
+    } else if (node.NodeId) {
+        nodeHref = createDeveloperUILinkWithNodeId(node.NodeId) + 'internal';
+    }
+
     const nodePath = isNodeAvailable
         ? getDefaultNodePath(node.NodeId, {
               tenantName: node.TenantName,
           })
         : undefined;
 
-    const additionalControls = nodeRef ? (
-        <Button size="s" href={nodeRef} className={b('external-button')} target="_blank">
+    const additionalControls = nodeHref ? (
+        <Button size="s" href={nodeHref} className={b('external-button')} target="_blank">
             <Icon data={ArrowUpRightFromSquare} />
         </Button>
     ) : null;

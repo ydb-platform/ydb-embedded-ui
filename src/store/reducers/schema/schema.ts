@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type {Reducer, Selector} from '@reduxjs/toolkit';
 import {createSelector} from '@reduxjs/toolkit';
 
@@ -51,51 +53,49 @@ export const schemaApi = api.injectEndpoints({
                 }
             },
         }),
-        getSchema: builder.query<TEvDescribeSchemeResult & {partial?: boolean}, {path: string}>({
+        getSchema: builder.query<
+            {[path: string]: TEvDescribeSchemeResult & {partial?: boolean}},
+            {path: string}
+        >({
             queryFn: async ({path}, {signal}) => {
                 try {
                     const data = await window.api.getSchema({path}, {signal});
-                    return {data: data ?? {}};
+                    return {data: data ? {[path]: data, ...getSchemaChildren(data)} : {}};
                 } catch (error) {
                     return {error};
                 }
             },
             keepUnusedDataFor: Infinity,
-            forceRefetch: ({endpointState}) => {
-                const data = endpointState?.data;
-                if (data && typeof data === 'object' && 'partial' in data && data.partial) {
-                    return true;
-                }
-                return false;
+            serializeQueryArgs: ({queryArgs: {path}}) => {
+                const parts = path.split('/');
+                return {path: parts[0] || parts[1]};
             },
-            onQueryStarted: async ({path}, {dispatch, getState, queryFulfilled}) => {
-                const {data} = await queryFulfilled;
+            merge: (existing, incoming, {arg: {path}}) => {
+                const {[path]: data, ...children} = incoming;
                 if (data) {
-                    const state = getState();
-                    const {PathDescription: {Children = []} = {}} = data;
-                    for (const child of Children) {
-                        const {Name = ''} = child;
-                        const childPath = `${path}/${Name}`;
-                        const cachedData = schemaApi.endpoints.getSchema.select({path: childPath})(
-                            state,
-                        ).data;
-                        if (!cachedData) {
-                            // not full data, but it contains PathType, which ensures seamless switch between nodes
-                            dispatch(
-                                schemaApi.util.upsertQueryData(
-                                    'getSchema',
-                                    {path: childPath},
-                                    {PathDescription: {Self: child}, partial: true},
-                                ),
-                            );
-                        }
-                    }
+                    return {
+                        ...children,
+                        ...existing,
+                        [path]: data,
+                    };
                 }
+                return existing;
             },
         }),
     }),
     overrideExisting: 'throw',
 });
+
+function getSchemaChildren(data: TEvDescribeSchemeResult) {
+    const children: {[path: string]: TEvDescribeSchemeResult & {partial?: boolean}} = {};
+    const {PathDescription: {Children = []} = {}, Path: path} = data;
+    for (const child of Children) {
+        const {Name = ''} = child;
+        const childPath = `${path}/${Name}`;
+        children[childPath] = {PathDescription: {Self: child}, Path: childPath, partial: true};
+    }
+    return children;
+}
 
 const getSchemaSelector = createSelector(
     (path: string) => path,
@@ -104,8 +104,9 @@ const getSchemaSelector = createSelector(
 
 const selectGetSchema = createSelector(
     (state: RootState) => state,
+    (_state: RootState, path: string) => path,
     (_state: RootState, path: string) => getSchemaSelector(path),
-    (state, selectTabletsInfo) => selectTabletsInfo(state).data,
+    (state, path, selectTabletsInfo) => selectTabletsInfo(state).data?.[path],
 );
 
 const selectSchemaChildren = (state: RootState, path: string) =>
@@ -127,3 +128,19 @@ export const selectSchemaMergedChildrenPaths: Selector<
             : undefined;
     },
 );
+
+export function useGetSchemaQuery({path}: {path: string}) {
+    const {currentData, isFetching, error, refetch} = schemaApi.useGetSchemaQuery({path});
+
+    const data = currentData?.[path];
+    const isLoading = isFetching && data === undefined;
+
+    const shouldLoad = !isLoading && ((!data && !error) || data?.partial);
+    React.useEffect(() => {
+        if (shouldLoad) {
+            refetch();
+        }
+    }, [refetch, path, shouldLoad]);
+
+    return {data, isLoading, error};
+}
