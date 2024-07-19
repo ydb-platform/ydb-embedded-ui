@@ -177,9 +177,32 @@ interface TDomainState {
 
 interface TDiskSpaceUsage {
     Tables?: TTables;
+    Topics?: TTopics;
+    TStoragePoolUsage?: TStoragePoolUsage[];
 }
 
 interface TTables {
+    /** uint64 */
+    TotalSize?: string;
+    /** uint64 */
+    DataSize?: string;
+    /** uint64 */
+    IndexSize?: string;
+}
+
+interface TTopics {
+    /** uint64 */
+    ReserveSize?: string;
+    /** uint64 */
+    AccountSize?: string;
+    /** uint64 */
+    DataSize?: string;
+    /** uint64 */
+    UsedReserveSize?: string;
+}
+
+interface TStoragePoolUsage {
+    PoolKind?: string;
     /** uint64 */
     TotalSize?: string;
     /** uint64 */

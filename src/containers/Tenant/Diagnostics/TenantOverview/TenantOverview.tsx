@@ -1,6 +1,7 @@
 import {Loader} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {useGetSchemaQuery} from '../../../../store/reducers/schema/schema';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
@@ -44,6 +45,35 @@ export function TenantOverview({
 
     const tenantType = mapDatabaseTypeToDBName(Type);
 
+    // FIXME: remove after correct data is added to tenantInfo
+    const {data: tenantSchemaData} = useGetSchemaQuery({path: tenantName});
+    const {Tables, Topics} =
+        tenantSchemaData?.PathDescription?.DomainDescription?.DiskSpaceUsage || {};
+
+    const usedTabletStorage = [
+        Tables?.TotalSize,
+        Topics?.AccountSize,
+        Topics?.DataSize,
+        Topics?.ReserveSize,
+        Topics?.UsedReserveSize,
+    ].reduce((sum, current) => {
+        if (current) {
+            return sum + Number(current);
+        }
+
+        return sum;
+    }, 0);
+
+    const tenantData = {
+        ...tenant,
+        Metrics: {
+            ...tenant?.Metrics,
+            // Replace incorrect tenant metric with correct value
+            Storage: String(usedTabletStorage),
+        },
+    };
+    // === === ===
+
     const {
         blobStorage,
         tabletStorage,
@@ -54,7 +84,7 @@ export function TenantOverview({
         memoryStats,
         blobStorageStats,
         tabletStorageStats,
-    } = calculateTenantMetrics(tenant ?? undefined);
+    } = calculateTenantMetrics(tenantData);
 
     const storageMetrics = {
         blobStorageUsed: blobStorage,
