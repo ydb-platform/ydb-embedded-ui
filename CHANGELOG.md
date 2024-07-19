@@ -1,5 +1,20 @@
 # Changelog
 
+## [6.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.10.3...v6.11.0) (2024-07-19)
+
+
+### Features
+
+* add data sorting to TopQueries table ([#1028](https://github.com/ydb-platform/ydb-embedded-ui/issues/1028)) ([03608f1](https://github.com/ydb-platform/ydb-embedded-ui/commit/03608f11142a5ef50e140f18bc56cd265553bd4a))
+* show developer ui links for hosts and tablets ([#1017](https://github.com/ydb-platform/ydb-embedded-ui/issues/1017)) ([9d198c5](https://github.com/ydb-platform/ydb-embedded-ui/commit/9d198c5477117a8f428acd8a214bf5767166320b))
+
+
+### Bug Fixes
+
+* **Overview:** use stats from describe for all column tables ([#1026](https://github.com/ydb-platform/ydb-embedded-ui/issues/1026)) ([e1c8f83](https://github.com/ydb-platform/ydb-embedded-ui/commit/e1c8f836be0f577c043121c5c5cb7cbb1f6798e8))
+* reduce autocomplete triggers ([#1030](https://github.com/ydb-platform/ydb-embedded-ui/issues/1030)) ([89b4782](https://github.com/ydb-platform/ydb-embedded-ui/commit/89b47823f038a51f63b5c41eae61088e8976df7f))
+* **TenantOverview:** add correct tablet storage value ([#1040](https://github.com/ydb-platform/ydb-embedded-ui/issues/1040)) ([c8f3182](https://github.com/ydb-platform/ydb-embedded-ui/commit/c8f3182fc776fac7200d23ce8f34f0b506a95ab3))
+
 ## [6.10.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.10.2...v6.10.3) (2024-07-16)
 
 
