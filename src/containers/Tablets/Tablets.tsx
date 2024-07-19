@@ -4,21 +4,21 @@ import {Icon, Label, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
-import {DeveloperUiLink} from '../../components/DeveloperUiLink/DeveloperUiLink';
+import {DeveloperUILinkButton} from '../../components/DeveloperUILinkButton/DeveloperUILinkButton';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InternalLink} from '../../components/InternalLink';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import routes, {createHref} from '../../routes';
-import {backend} from '../../store';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import {cn} from '../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
+import {createTabletDeveloperUIHref} from '../../utils/developerUI/developerUI';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {mapTabletStateToLabelTheme} from '../../utils/tablet';
 import {getDefaultNodePath} from '../Node/NodePages';
@@ -43,14 +43,20 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
     },
     {
         name: 'TabletId',
-        width: 230,
+        width: 220,
         get header() {
             return i18n('Tablet');
         },
         render: ({row}) => {
-            const tabletPath =
-                row.TabletId &&
-                createHref(routes.tablet, {id: row.TabletId}, {nodeId: row.NodeId, type: row.Type});
+            if (!row.TabletId) {
+                return EMPTY_DATA_PLACEHOLDER;
+            }
+
+            const tabletPath = createHref(
+                routes.tablet,
+                {id: row.TabletId},
+                {nodeId: row.NodeId, type: row.Type},
+            );
 
             return (
                 <EntityStatus
@@ -59,7 +65,7 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
                     hasClipboardButton
                     showStatus={false}
                     additionalControls={
-                        <DeveloperUiLink href={`${backend}/tablets?TabletID=${row.TabletId}`} />
+                        <DeveloperUILinkButton href={createTabletDeveloperUIHref(row.TabletId)} />
                     }
                 />
             );
