@@ -1,13 +1,25 @@
 import {ContentWithPopup} from '../../../components/ContentWithPopup/ContentWithPopup';
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
+import type {InfoViewerItem} from '../../../components/InfoViewer';
+import {InfoViewer} from '../../../components/InfoViewer';
 import {InternalLink} from '../../../components/InternalLink';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {VDiskInfo} from '../../../components/VDiskInfo/VDiskInfo';
 import {getVDiskPagePath} from '../../../routes';
-import type {PDiskData, SlotItem} from '../../../store/reducers/pdisk/types';
+import type {
+    EmptySlotData,
+    LogSlotData,
+    PDiskData,
+    SlotItem,
+    SlotItemType,
+} from '../../../store/reducers/pdisk/types';
 import {valueIsDefined} from '../../../utils';
+import {formatBytes} from '../../../utils/bytesParsers';
 import {cn} from '../../../utils/cn';
-import {formatStorageValues} from '../../../utils/dataFormatters/dataFormatters';
+import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {pDiskPageKeyset} from '../i18n';
+
+import {isEmptySlot, isLogSlot, isVDiskSlot} from './utils';
 
 import './PDiskSpaceDistribution.scss';
 
@@ -55,71 +67,94 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
     );
 }
 
-interface SlotProps {
-    item: SlotItem;
+interface SlotProps<T extends SlotItemType> {
+    item: SlotItem<T>;
 
     pDiskId?: string | number;
     nodeId?: string | number;
 }
 
-function Slot({item, pDiskId, nodeId}: SlotProps) {
-    const {SlotType, Id, Title, Severity, Used, Total, UsagePercent, VDiskData} = item;
-
+function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
     const renderContent = () => {
-        if (SlotType === 'vDisk') {
+        if (isVDiskSlot(item)) {
             const vDiskPagePath =
-                valueIsDefined(VDiskData?.VDiskSlotId) &&
+                valueIsDefined(item.SlotData?.VDiskSlotId) &&
                 valueIsDefined(pDiskId) &&
                 valueIsDefined(nodeId)
-                    ? getVDiskPagePath(VDiskData.VDiskSlotId, pDiskId, nodeId)
+                    ? getVDiskPagePath(item.SlotData.VDiskSlotId, pDiskId, nodeId)
                     : undefined;
 
             return (
                 <ContentWithPopup
-                    content={<VDiskInfo data={VDiskData} withTitle />}
+                    content={<VDiskInfo data={item.SlotData} withTitle />}
                     contentClassName={b('vdisk-popup')}
-                    placement={['right']}
+                    placement={['right', 'top']}
                 >
                     <InternalLink to={vDiskPagePath}>
                         <DiskStateProgressBar
                             className={b('slot')}
-                            severity={Severity}
-                            diskAllocatedPercent={UsagePercent}
+                            severity={item.Severity}
+                            diskAllocatedPercent={item.UsagePercent}
                             content={
-                                <SlotContent id={Id} title={Title} used={Used} total={Total} />
+                                <SlotContent
+                                    id={item.Id}
+                                    title={item.Title}
+                                    used={item.Used}
+                                    total={item.Total}
+                                />
                             }
                         />
                     </InternalLink>
                 </ContentWithPopup>
             );
         }
-        if (item.SlotType === 'log') {
+        if (isLogSlot(item)) {
             return (
-                <DiskStateProgressBar
-                    className={b('slot')}
-                    severity={1}
-                    diskAllocatedPercent={UsagePercent}
-                    content={
-                        <SlotContent title={pDiskPageKeyset('log')} used={Used} total={Total} />
-                    }
-                />
+                <ContentWithPopup
+                    content={<LogInfo data={item.SlotData} />}
+                    contentClassName={b('vdisk-popup')}
+                    placement={['right', 'top']}
+                >
+                    <DiskStateProgressBar
+                        className={b('slot')}
+                        severity={item.Severity}
+                        diskAllocatedPercent={item.UsagePercent}
+                        content={
+                            <SlotContent
+                                title={pDiskPageKeyset('log')}
+                                used={item.Used}
+                                total={item.Total}
+                            />
+                        }
+                    />
+                </ContentWithPopup>
             );
         }
 
-        return (
-            <DiskStateProgressBar
-                className={b('slot')}
-                severity={1}
-                empty
-                content={
-                    <SlotContent
-                        title={pDiskPageKeyset('empty-slot')}
-                        // Empty slots have only total size
-                        used={Total}
+        if (isEmptySlot(item)) {
+            return (
+                <ContentWithPopup
+                    content={<EmptySlotInfo data={item.SlotData} />}
+                    contentClassName={b('vdisk-popup')}
+                    placement={['right', 'top']}
+                >
+                    <DiskStateProgressBar
+                        className={b('slot')}
+                        severity={item.Severity}
+                        empty
+                        content={
+                            <SlotContent
+                                title={pDiskPageKeyset('empty-slot')}
+                                // Empty slots have only total size
+                                used={item.Total}
+                            />
+                        }
                     />
-                }
-            />
-        );
+                </ContentWithPopup>
+            );
+        }
+
+        return null;
     };
 
     return (
@@ -138,7 +173,7 @@ interface SlotContentProps {
 
 function SlotContent({id, title, used, total}: SlotContentProps) {
     const renderSize = () => {
-        const [formattedUsed, formattedTotal] = formatStorageValues(used, total, 'gb');
+        const [formattedUsed, formattedTotal] = formatStorageValuesToGb(used, total);
 
         if (!total) {
             return formattedUsed;
@@ -156,4 +191,51 @@ function SlotContent({id, title, used, total}: SlotContentProps) {
             <span className={b('slot-size')}>{renderSize()}</span>
         </div>
     );
+}
+
+interface LogInfoProps {
+    data: LogSlotData;
+}
+
+function LogInfo({data}: LogInfoProps) {
+    const {LogTotalSize, LogUsedSize, SystemSize} = data;
+
+    const info: InfoViewerItem[] = [
+        {
+            label: pDiskPageKeyset('label.log-size'),
+            value: (
+                <ProgressViewer
+                    value={LogUsedSize}
+                    capacity={LogTotalSize}
+                    formatValues={formatStorageValuesToGb}
+                />
+            ),
+        },
+    ];
+
+    if (valueIsDefined(SystemSize)) {
+        info.push({
+            label: pDiskPageKeyset('label.system-size'),
+            value: formatBytes({value: SystemSize}),
+        });
+    }
+
+    return <InfoViewer title={pDiskPageKeyset('log')} info={info} />;
+}
+
+interface EmptySlotInfoProps {
+    data: EmptySlotData;
+}
+
+function EmptySlotInfo({data}: EmptySlotInfoProps) {
+    const {Size} = data;
+
+    const info: InfoViewerItem[] = [
+        {
+            label: pDiskPageKeyset('label.slot-size'),
+            value: formatBytes({value: Size}),
+        },
+    ];
+
+    return <InfoViewer title={pDiskPageKeyset('empty-slot')} info={info} />;
 }

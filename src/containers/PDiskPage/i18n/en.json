@@ -9,6 +9,10 @@
   "empty-slot": "Empty slot",
   "log": "Log",
 
+  "label.log-size": "System Size",
+  "label.system-size": "System Size",
+  "label.slot-size": "Slot Size",
+
   "no-slots-data": "No slots data",
 
   "restart-pdisk-button": "Restart PDisk",

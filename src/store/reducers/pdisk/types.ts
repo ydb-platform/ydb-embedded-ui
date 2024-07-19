@@ -5,11 +5,11 @@ export interface PDiskData extends PreparedPDisk {
     NodeHost?: string;
     NodeType?: string;
     NodeDC?: string;
-    SlotItems?: SlotItem[];
+    SlotItems?: (SlotItem<'vDisk'> | SlotItem<'log'> | SlotItem<'empty'>)[];
 }
 
-export interface SlotItem {
-    SlotType: SlotItemType;
+export interface SlotItem<T extends SlotItemType> {
+    SlotType: T;
     Id?: string | number;
     Title?: string;
     Severity?: number;
@@ -17,7 +17,19 @@ export interface SlotItem {
     Total?: number;
     UsagePercent?: number;
 
-    VDiskData?: PreparedVDisk;
+    SlotData: T extends 'vDisk'
+        ? PreparedVDisk
+        : T extends 'log'
+          ? LogSlotData
+          : T extends 'empty'
+            ? EmptySlotData
+            : undefined;
 }
+
+export type LogSlotData = Pick<PDiskData, 'LogUsedSize' | 'LogTotalSize' | 'SystemSize'>;
+
+export type EmptySlotData = {
+    Size: number;
+};
 
 export type SlotItemType = 'vDisk' | 'log' | 'empty';

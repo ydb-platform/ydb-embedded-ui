@@ -59,8 +59,6 @@
     }
 
     &_faded {
-        // Fill color is medium variant, use it instead of heavy to make border less bright
-        border-color: var(--progress-bar-fill-color);
         background-color: unset;
     }
 

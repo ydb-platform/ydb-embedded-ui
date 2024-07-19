@@ -22,18 +22,26 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
 
     const preparedPDisk = preparePDiskData(WhiteboardPDiskData);
 
-    const {LogUsedSize, LogTotalSize, TotalSize: PDiskTotalSize} = preparedPDisk;
+    const {LogUsedSize, LogTotalSize, TotalSize: PDiskTotalSize, SystemSize} = preparedPDisk;
 
-    const logSlot: SlotItem = {
+    const logSlot: SlotItem<'log'> = {
         SlotType: 'log',
         Used: Number(LogUsedSize),
         Total: Number(LogTotalSize),
         UsagePercent: (Number(LogUsedSize) * 100) / Number(LogTotalSize),
+        Severity: 1,
+        SlotData: {
+            LogUsedSize,
+            LogTotalSize,
+            SystemSize,
+        },
     };
 
-    const preparedVDisks = WhiteboardVDisksData.map(prepareVDiskData);
+    const preparedVDisks = WhiteboardVDisksData.map(prepareVDiskData).sort(
+        (disk1, disk2) => Number(disk2.VDiskSlotId) - Number(disk1.VDiskSlotId),
+    );
 
-    const vdisksSlots: SlotItem[] = preparedVDisks.map((preparedVDisk) => {
+    const vdisksSlots: SlotItem<'vDisk'>[] = preparedVDisks.map((preparedVDisk) => {
         return {
             SlotType: 'vDisk',
             Id: preparedVDisk.VDiskId?.GroupID,
@@ -43,11 +51,11 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
             Total: Number(preparedVDisk.TotalSize),
             UsagePercent: preparedVDisk.AllocatedPercent,
 
-            VDiskData: preparedVDisk,
+            SlotData: preparedVDisk,
         };
     });
 
-    const diskSlots = [...vdisksSlots, logSlot];
+    let emptySlots: SlotItem<'empty'>[] = [];
 
     if (ExpectedSlotCount && ExpectedSlotCount > vdisksSlots.length) {
         const emptySlotsCount = ExpectedSlotCount - vdisksSlots.length;
@@ -62,15 +70,19 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
                 (Number(PDiskTotalSize) - vDisksTotalSize - Number(LogTotalSize)) / emptySlotsCount;
         }
 
-        diskSlots.push(
-            ...getArray(emptySlotsCount).map((): SlotItem => {
-                return {
-                    SlotType: 'empty',
-                    Total: emptySlotSize,
-                };
-            }),
-        );
+        emptySlots = getArray(emptySlotsCount).map((): SlotItem<'empty'> => {
+            return {
+                SlotType: 'empty',
+                Total: emptySlotSize,
+                Severity: 1,
+                SlotData: {
+                    Size: emptySlotSize,
+                },
+            };
+        });
     }
+
+    const diskSlots = [logSlot, ...vdisksSlots, ...emptySlots];
 
     const rawNode = nodeResponse.SystemStateInfo?.[0];
     const preparedNode = prepareNodeSystemState(rawNode);
