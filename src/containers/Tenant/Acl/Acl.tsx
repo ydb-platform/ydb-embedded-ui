@@ -114,7 +114,7 @@ function getAclListItems(acl?: TACE[]): DefinitionListItem[] {
     });
 }
 
-function getOwnerItem(owner?: string) {
+function getOwnerItem(owner?: string): DefinitionListItem[] {
     const preparedOwner = prepareLogin(owner);
     if (!preparedOwner) {
         return [];
@@ -147,24 +147,19 @@ export const Acl = ({path}: {path: string}) => {
         return <ResponseError error={error} />;
     }
 
-    if (!acl && !owner) {
+    if (!acl && !owner && !effectiveAcl) {
         return <React.Fragment>{i18n('description_empty')}</React.Fragment>;
     }
 
+    const accessRightsItems = ownerItem.concat(aclListItems);
+
     return (
         <div className={b()}>
-            {ownerItem.length ? (
-                <DefinitionList
-                    items={ownerItem}
-                    nameMaxWidth={200}
-                    className={b('owner-container')}
-                />
-            ) : null}
-            {aclListItems.length ? (
+            {accessRightsItems.length ? (
                 <React.Fragment>
                     <div className={b('list-title')}>{i18n('title_rights')}</div>
                     <DefinitionList
-                        items={aclListItems}
+                        items={accessRightsItems}
                         nameMaxWidth={200}
                         className={b('result')}
                     />
