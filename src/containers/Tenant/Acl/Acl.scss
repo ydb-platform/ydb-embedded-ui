@@ -12,6 +12,11 @@
     }
     &__list-title {
         margin: var(--g-spacing-3) 0 var(--g-spacing-5);
-        @include subheader-3-typography();
+
+        font-weight: 600;
+        @include subheader-2-typography();
+    }
+    &__group-label {
+        @include subheader-2-typography();
     }
 }
