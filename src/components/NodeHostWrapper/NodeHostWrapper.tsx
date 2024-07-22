@@ -1,19 +1,14 @@
-import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
-import {Button, Icon, PopoverBehavior} from '@gravity-ui/uikit';
+import {PopoverBehavior} from '@gravity-ui/uikit';
 
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {NodeAddress} from '../../types/additionalProps';
-import {cn} from '../../utils/cn';
 import {createDeveloperUILinkWithNodeId} from '../../utils/developerUI/developerUI';
 import {isUnavailableNode} from '../../utils/nodes';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
+import {DeveloperUILinkButton} from '../DeveloperUILinkButton/DeveloperUILinkButton';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
-
-import './NodeHostWrapper.scss';
-
-const b = cn('ydb-node-host-wrapper');
 
 interface NodeHostWrapperProps {
     node: NodesPreparedEntity;
@@ -40,11 +35,7 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
           })
         : undefined;
 
-    const additionalControls = nodeHref ? (
-        <Button size="s" href={nodeHref} className={b('external-button')} target="_blank">
-            <Icon data={ArrowUpRightFromSquare} />
-        </Button>
-    ) : null;
+    const additionalControls = nodeHref ? <DeveloperUILinkButton href={nodeHref} /> : null;
 
     return (
         <CellWithPopover

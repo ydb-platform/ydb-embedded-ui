@@ -2,17 +2,17 @@ import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 import type {Location} from 'history';
 
-import {DeveloperUiLink} from '../../../../components/DeveloperUiLink/DeveloperUiLink';
+import {DeveloperUILinkButton} from '../../../../components/DeveloperUILinkButton/DeveloperUILinkButton';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../../../components/InternalLink';
 import {LinkToSchemaObject} from '../../../../components/LinkToSchemaObject/LinkToSchemaObject';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import routes, {createHref} from '../../../../routes';
-import {backend} from '../../../../store';
 import {getLoadSeverityForShard} from '../../../../store/reducers/tenantOverview/topShards/utils';
 import type {KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import {formatNumber, roundToPrecision} from '../../../../utils/dataFormatters/dataFormatters';
+import {createTabletDeveloperUIHref} from '../../../../utils/developerUI/developerUI';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 
 export const TOP_SHARDS_COLUMNS_WIDTH_LS_KEY = 'topShardsColumnsWidth';
@@ -92,13 +92,13 @@ const tabletIdColumn: Column<KeyValueRow> = {
                 hasClipboardButton
                 showStatus={false}
                 additionalControls={
-                    <DeveloperUiLink href={`${backend}/tablets?TabletID=${row.TabletId}`} />
+                    <DeveloperUILinkButton href={createTabletDeveloperUIHref(row.TabletId)} />
                 }
             />
         );
     },
     sortable: false,
-    width: 190,
+    width: 220,
 };
 
 const nodeIdColumn: Column<KeyValueRow> = {

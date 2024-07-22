@@ -3,9 +3,9 @@ import {Button, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 
-import './DeveloperUiLink.scss';
+import './DeveloperUILinkButton.scss';
 
-const b = cn('developer-ui-link');
+const b = cn('developer-ui-link-button');
 
 interface DeveloperUiLinkProps {
     className?: string;
@@ -13,7 +13,7 @@ interface DeveloperUiLinkProps {
     href: string;
 }
 
-export function DeveloperUiLink({href, visible = false, className}: DeveloperUiLinkProps) {
+export function DeveloperUILinkButton({href, visible = false, className}: DeveloperUiLinkProps) {
     return (
         <Button size="s" href={href} className={b({visible}, className)} target="_blank">
             <Icon data={ArrowUpRightFromSquare} />

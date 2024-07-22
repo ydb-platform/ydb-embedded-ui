@@ -10,14 +10,14 @@
     @include body-2-typography();
 
     &__icon {
-        margin-right: 8px;
+        margin-right: var(--g-spacing-2);
     }
 
     &__clipboard-button {
         display: flex;
         flex-shrink: 0;
 
-        margin-left: 8px;
+        margin-left: var(--g-spacing-2);
 
         opacity: 0;
         color: var(--g-color-text-secondary);
@@ -26,6 +26,10 @@
         &:focus-visible {
             opacity: 1;
         }
+    }
+
+    &__additional-controls {
+        margin-left: var(--g-spacing-1);
     }
 
     &__label {

@@ -104,7 +104,9 @@ export function EntityStatus({
                     })}
                 />
             )}
-            {additionalControls}
+            {additionalControls && (
+                <span className={b('additional-controls ')}>{additionalControls}</span>
+            )}
         </div>
     );
 }

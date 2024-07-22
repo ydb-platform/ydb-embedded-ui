@@ -116,14 +116,10 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                                 name: row.Name,
                                 backend,
                             })}
-                            additionalControls={
-                                <span className={b('monitoring-button')}>
-                                    {additionalTenantsProps?.getMonitoringLink?.(
-                                        row.Name,
-                                        row.Type,
-                                    )}
-                                </span>
-                            }
+                            additionalControls={additionalTenantsProps?.getMonitoringLink?.(
+                                row.Name,
+                                row.Type,
+                            )}
                         />
                     );
                 },

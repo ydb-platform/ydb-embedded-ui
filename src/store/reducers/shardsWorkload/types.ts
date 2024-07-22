@@ -5,9 +5,9 @@ export enum EShardsWorkloadMode {
 
 export interface ShardsWorkloadFilters {
     /** ms from epoch */
-    from?: number;
+    from?: string;
     /** ms from epoch */
-    to?: number;
+    to?: string;
     mode?: EShardsWorkloadMode;
 }
 

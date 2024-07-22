@@ -64,19 +64,15 @@ const paramSetup: ParamSetup = {
         },
         shardsDateFrom: {
             stateKey: 'shardsWorkload.from',
-            type: 'number',
         },
         shardsDateTo: {
             stateKey: 'shardsWorkload.to',
-            type: 'number',
         },
         topQueriesDateFrom: {
             stateKey: 'executeTopQueries.from',
-            type: 'number',
         },
         topQueriesDateTo: {
             stateKey: 'executeTopQueries.to',
-            type: 'number',
         },
         selectedConsumer: {
             stateKey: 'partitions.selectedConsumer',

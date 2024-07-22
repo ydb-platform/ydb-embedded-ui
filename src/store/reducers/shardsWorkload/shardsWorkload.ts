@@ -1,3 +1,4 @@
+import {dateTimeParse, isLikeRelative} from '@gravity-ui/date-utils';
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
@@ -20,20 +21,22 @@ function formatSortOrder({columnId, order}: SortOrder) {
 
 function getFiltersConditions(filters?: ShardsWorkloadFilters) {
     const conditions: string[] = [];
+    const to = dateTimeParse(Number(filters?.to) || filters?.to)?.valueOf();
+    const from = dateTimeParse(Number(filters?.from) || filters?.from)?.valueOf();
 
-    if (filters?.from && filters?.to && filters.from > filters.to) {
+    if (from && to && from > to) {
         throw new Error('Invalid date range');
     }
 
-    if (filters?.from) {
+    if (from) {
         // matching `from` & `to` is an edge case
         // other cases should not include the starting point, since intervals are stored using the ending time
-        const gt = filters.to === filters.from ? '>=' : '>';
-        conditions.push(`IntervalEnd ${gt} Timestamp('${new Date(filters.from).toISOString()}')`);
+        const gt = to === from ? '>=' : '>';
+        conditions.push(`IntervalEnd ${gt} Timestamp('${new Date(from).toISOString()}')`);
     }
 
-    if (filters?.to) {
-        conditions.push(`IntervalEnd <= Timestamp('${new Date(filters.to).toISOString()}')`);
+    if (to) {
+        conditions.push(`IntervalEnd <= Timestamp('${new Date(to).toISOString()}')`);
     }
 
     return conditions.join(' AND ');
@@ -159,6 +162,20 @@ export const shardApi = api.injectEndpoints({
                 }
             },
             providesTags: ['All'],
+            forceRefetch: ({currentArg}) => {
+                if (currentArg?.filters?.mode === 'immediate') {
+                    return true;
+                }
+
+                if (
+                    isLikeRelative(currentArg?.filters?.from) ||
+                    isLikeRelative(currentArg?.filters?.to)
+                ) {
+                    return true;
+                }
+
+                return false;
+            },
         }),
     }),
     overrideExisting: 'throw',
