@@ -1,8 +1,9 @@
 import {getVDiskPagePath} from '../../routes';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {formatStorageValuesToGb, stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {bytesToSpeed} from '../../utils/utils';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
@@ -18,14 +19,16 @@ import './VDiskInfo.scss';
 const b = cn('ydb-vdisk-info');
 
 interface VDiskInfoProps<T extends PreparedVDisk> extends Omit<InfoViewerProps, 'info'> {
-    data: T;
+    data?: T;
     isVDiskPage?: boolean;
+    withTitle?: boolean;
 }
 
 // eslint-disable-next-line complexity
 export function VDiskInfo<T extends PreparedVDisk>({
     data,
-    isVDiskPage = false,
+    isVDiskPage,
+    withTitle,
     ...infoViewerProps
 }: VDiskInfoProps<T>) {
     const {
@@ -47,7 +50,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
         WriteThroughput,
         PDiskId,
         NodeId,
-    } = data;
+    } = data || {};
 
     const vdiskInfo = [];
 
@@ -164,5 +167,23 @@ export function VDiskInfo<T extends PreparedVDisk>({
         });
     }
 
-    return <InfoViewer info={vdiskInfo} {...infoViewerProps} />;
+    const title = data && withTitle ? <VDiskTitle data={data} /> : null;
+
+    return <InfoViewer info={vdiskInfo} title={title} {...infoViewerProps} />;
+}
+
+interface VDiskTitleProps<T extends PreparedVDisk> {
+    data: T;
+}
+
+function VDiskTitle<T extends PreparedVDisk>({data}: VDiskTitleProps<T>) {
+    return (
+        <div className={b('title')}>
+            {vDiskInfoKeyset('vdiks-title')}
+            <EntityStatus
+                status={getSeverityColor(data.Severity)}
+                name={stringifyVdiskId(data.VDiskId)}
+            />
+        </div>
+    );
 }

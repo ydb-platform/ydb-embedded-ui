@@ -38,7 +38,7 @@ async function requestVDiskData(
 ) {
     const vDiskDataResponse = await Promise.all([
         window.api.getVDiskInfo({nodeId, pDiskId, vDiskSlotId}, {signal}),
-        window.api.getPDiskInfo({nodeId, pDiskId}, {signal}),
+        window.api.getNodeWhiteboardPDiskInfo({nodeId, pDiskId}, {signal}),
         window.api.getNodeInfo(nodeId, {signal}),
     ]);
 

@@ -1,4 +1,5 @@
 import {EVersion} from '../../../types/api/storage';
+import {getPDiskId} from '../../../utils/disks/helpers';
 import {api} from '../api';
 
 import {preparePDiskDataResponse, preparePDiskStorageResponse} from './utils';
@@ -23,7 +24,13 @@ export const pDiskApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: (_result, _error, arg) => [
+                'All',
+                {
+                    type: 'PDiskData',
+                    id: getPDiskId(arg.nodeId, arg.pDiskId),
+                },
+            ],
         }),
         getStorageInfo: build.query({
             queryFn: async ({nodeId, pDiskId}: PDiskParams, {signal}) => {
@@ -38,7 +45,13 @@ export const pDiskApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: (_result, _error, arg) => [
+                'All',
+                {
+                    type: 'PDiskData',
+                    id: getPDiskId(arg.nodeId, arg.pDiskId),
+                },
+            ],
         }),
     }),
     overrideExisting: 'throw',

@@ -5,10 +5,12 @@
     $outer-border-radius: 4px;
     $inner-border-radius: $outer-border-radius - $border-width;
 
+    --progress-bar-border-color: var(--g-color-base-misc-heavy);
+    --progress-bar-background-color: var(--g-color-base-misc-light);
+    --progress-bar-fill-color: var(--g-color-base-misc-medium);
+
     position: relative;
     z-index: 0;
-
-    display: block;
 
     min-width: 50px;
     height: var(--g-text-body-3-line-height);
@@ -16,70 +18,57 @@
     text-align: center;
 
     color: var(--g-color-text-primary);
-    border: $border-width solid var(--g-color-base-misc-heavy);
+    border: $border-width solid var(--progress-bar-border-color);
     border-radius: $outer-border-radius;
-    background-color: var(--g-color-base-misc-light);
+    background-color: var(--progress-bar-background-color);
 
     &_compact {
         min-width: 0;
         height: 12px;
 
         border-radius: 2px;
-
-        #{$block}__filled {
-            border-radius: 1px;
-        }
-    }
-
-    #{$block}__filled {
-        background-color: var(--g-color-base-misc-medium);
     }
 
     &_green {
-        border-color: var(--g-color-base-positive-heavy);
-        background-color: var(--g-color-base-positive-light);
-        #{$block}__filled {
-            background-color: var(--g-color-base-positive-medium);
-
-            .g-root_theme_dark & {
-                // the common medium green is too bright for this case
-                background-color: rgb(124, 227, 121, 0.4);
-            }
-        }
+        --progress-bar-border-color: var(--g-color-base-positive-heavy);
+        --progress-bar-background-color: var(--g-color-base-positive-light);
+        --progress-bar-fill-color: var(--g-color-base-positive-medium);
     }
 
     &_blue {
-        border-color: var(--g-color-base-info-heavy);
-        background-color: var(--g-color-base-info-light);
-        #{$block}__filled {
-            background-color: var(--g-color-base-info-medium);
-        }
+        --progress-bar-border-color: var(--g-color-base-info-heavy);
+        --progress-bar-background-color: var(--g-color-base-info-light);
+        --progress-bar-fill-color: var(--g-color-base-info-medium);
     }
 
     &_yellow {
-        border-color: var(--g-color-base-warning-heavy);
-        background-color: var(--g-color-base-yellow-light);
-        #{$block}__filled {
-            background-color: var(--g-color-base-yellow-medium);
-        }
+        --progress-bar-border-color: var(--g-color-base-warning-heavy);
+        --progress-bar-background-color: var(--g-color-base-yellow-light);
+        --progress-bar-fill-color: var(--g-color-base-yellow-medium);
     }
 
     &_orange {
-        border-color: var(--ydb-color-status-orange);
-        background-color: var(--g-color-base-warning-light);
-        #{$block}__filled {
-            background-color: var(--g-color-base-warning-medium);
-        }
+        --progress-bar-border-color: var(--ydb-color-status-orange);
+        --progress-bar-background-color: var(--g-color-base-warning-light);
+        --progress-bar-fill-color: var(--g-color-base-warning-medium);
     }
     &_red {
-        border-color: var(--g-color-base-danger-heavy);
-        background-color: var(--g-color-base-danger-light);
-        #{$block}__filled {
-            background-color: var(--g-color-base-danger-medium);
-        }
+        --progress-bar-border-color: var(--g-color-base-danger-heavy);
+        --progress-bar-background-color: var(--g-color-base-danger-light);
+        --progress-bar-fill-color: var(--g-color-base-danger-medium);
     }
 
-    &__filled {
+    &_faded {
+        background-color: unset;
+    }
+
+    &_empty {
+        color: var(--g-color-text-hint);
+        border-style: dashed;
+        background-color: unset;
+    }
+
+    &__fill-bar {
         position: absolute;
         top: 0;
         left: 0;
@@ -87,15 +76,26 @@
         height: 100%;
 
         border-radius: $inner-border-radius 0 0 $inner-border-radius;
+        background-color: var(--progress-bar-fill-color);
 
-        #{$block}_inverted & {
+        &_faded {
+            // Bg color is light variant, use it to make bar less bright
+            background-color: var(--progress-bar-background-color);
+        }
+
+        &_compact {
+            border-radius: 1px;
+        }
+
+        &_inverted {
             right: 0;
             left: auto;
 
             border-radius: 0 $inner-border-radius $inner-border-radius 0;
         }
     }
-    &__filled-title {
+
+    &__title {
         position: relative;
         z-index: 2;
 
