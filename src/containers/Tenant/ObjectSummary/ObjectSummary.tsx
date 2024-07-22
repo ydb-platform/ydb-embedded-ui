@@ -154,7 +154,7 @@ export function ObjectSummary({
 
         overview.push({
             label: i18n('summary.created'),
-            value: formatDateTime(CreateStep, ''),
+            value: formatDateTime(CreateStep),
         });
 
         const {PathDescription} = currentObjectData;

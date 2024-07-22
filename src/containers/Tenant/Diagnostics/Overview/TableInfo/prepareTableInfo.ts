@@ -1,3 +1,5 @@
+import omit from 'lodash/omit';
+
 import type {InfoViewerItem} from '../../../../../components/InfoViewer';
 import {formatObject} from '../../../../../components/InfoViewer';
 import {
@@ -200,8 +202,15 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         }),
     ];
 
-    //@ts-expect-error
-    const tabletMetricsInfo = formatObject(formatTabletMetricsItem, TabletMetrics);
+    const tabletMetricsInfo = formatObject(
+        formatTabletMetricsItem,
+        omit(TabletMetrics, [
+            'GroupReadIops',
+            'GroupReadThroughput',
+            'GroupWriteIops',
+            'GroupWriteThroughput',
+        ]),
+    );
 
     let partitionConfigInfo: InfoViewerItem[] = [];
 
