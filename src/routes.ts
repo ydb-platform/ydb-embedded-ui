@@ -59,12 +59,12 @@ export function createHref(
 ) {
     let extendedQuery = query;
 
-    const isBackendInQuery = Boolean(query.backend);
+    const isBackendInQuery = 'backend' in query && Boolean(query.backend);
     if (backend && !isBackendInQuery && webVersion) {
         extendedQuery = {...query, backend};
     }
 
-    const isClusterNameInQuery = Boolean(query.clusterName);
+    const isClusterNameInQuery = 'clusterName' in query && Boolean(query.clusterName);
     if (clusterName && !isClusterNameInQuery && webVersion) {
         extendedQuery = {...extendedQuery, clusterName};
     }
