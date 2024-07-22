@@ -1,11 +1,12 @@
-.developer-ui-link {
+.developer-ui-link-button {
     display: none;
 
     &_visible {
         display: inline-block;
     }
 
-    .data-table__row:hover & {
+    .data-table__row:hover &,
+    .ydb-paginated-table__row:hover & {
         display: inline-block;
     }
 }

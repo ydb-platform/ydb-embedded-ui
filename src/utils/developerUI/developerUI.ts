@@ -40,3 +40,7 @@ export const createVDiskDeveloperUILink = ({
 
     return createDeveloperUILinkWithNodeId(nodeId, host) + vdiskPath;
 };
+
+export function createTabletDeveloperUIHref(tabletId: number | string, host = backend) {
+    return `${host}/tablets?TabletID=${tabletId}`;
+}
