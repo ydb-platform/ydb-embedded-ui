@@ -41,6 +41,7 @@ import {ExecuteResult} from '../ExecuteResult/ExecuteResult';
 import {ExplainResult} from '../ExplainResult/ExplainResult';
 import {Preview} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
+import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
 import {SaveQueryDialog} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
 
@@ -212,6 +213,11 @@ function QueryEditor(props: QueryEditorProps) {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
 
+    const handleSettingsClick = () => {
+        setQueryAction('settings');
+        props.setShowPreview(false);
+    };
+
     const handleGetExplainQueryClick = (mode: QueryMode | undefined) => {
         const {input} = executeQuery;
 
@@ -345,6 +351,7 @@ function QueryEditor(props: QueryEditorProps) {
         return (
             <QueryEditorControls
                 onRunButtonClick={handleSendExecuteClick}
+                onSettingsButtonClick={handleSettingsClick}
                 runIsLoading={executeQueryResult.isLoading}
                 onExplainButtonClick={handleGetExplainQueryClick}
                 explainIsLoading={explainQueryResult.isLoading}
@@ -406,6 +413,7 @@ function QueryEditor(props: QueryEditorProps) {
                 </div>
             </SplitPane>
             <SaveQueryDialog />
+            <QuerySettingsDialog />
         </div>
     );
 }

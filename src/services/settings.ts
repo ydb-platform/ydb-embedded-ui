@@ -11,6 +11,7 @@ import {
     LAST_USED_QUERY_ACTION_KEY,
     PARTITIONS_HIDDEN_COLUMNS_KEY,
     QUERY_INITIAL_MODE_KEY,
+    QUERY_SETTINGS,
     QUERY_USE_MULTI_SCHEMA_KEY,
     SAVED_QUERIES_KEY,
     TENANT_INITIAL_PAGE_KEY,
@@ -48,6 +49,7 @@ export const DEFAULT_USER_SETTINGS = {
     [IS_HOTKEYS_HELP_HIDDEN_KEY]: false,
     [AUTO_REFRESH_INTERVAL]: 0,
     [USE_DIRECTORY_OPERATIONS]: false,
+    [QUERY_SETTINGS]: false,
 } as const satisfies SettingsObject;
 
 class SettingsManager {
