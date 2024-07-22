@@ -1,7 +1,7 @@
+import {isLikeRelative} from '@gravity-ui/date-utils';
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {HOUR_IN_SECONDS} from '../../../utils/constants';
 import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../../utils/query';
 import {api} from '../api';
 
@@ -64,19 +64,24 @@ export const topQueriesApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
-                    // FIXME: do we really need this?
+
                     if (!filters?.from && !filters?.to) {
-                        const intervalEnd = data?.result?.[0]?.IntervalEnd;
-                        if (intervalEnd) {
-                            const to = new Date(intervalEnd).getTime();
-                            const from = new Date(to - HOUR_IN_SECONDS * 1000).getTime();
-                            dispatch(setTopQueriesFilters({from, to}));
-                        }
+                        dispatch(setTopQueriesFilters({from: 'now-1h', to: 'now'}));
                     }
                     return {data};
                 } catch (error) {
                     return {error};
                 }
+            },
+            forceRefetch: ({currentArg}) => {
+                if (
+                    isLikeRelative(currentArg?.filters?.from) ||
+                    isLikeRelative(currentArg?.filters?.to)
+                ) {
+                    return true;
+                }
+
+                return false;
             },
         }),
     }),

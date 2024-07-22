@@ -1,3 +1,5 @@
+import {dateTimeParse} from '@gravity-ui/date-utils';
+
 import type {TopQueriesFilters} from './types';
 
 const endTimeColumn = 'EndTime';
@@ -11,26 +13,26 @@ const getMaxIntervalSubquery = (path: string) => `(
 
 export function getFiltersConditions(path: string, filters?: TopQueriesFilters) {
     const conditions: string[] = [];
+    const to = dateTimeParse(Number(filters?.to) || filters?.to)?.valueOf();
+    const from = dateTimeParse(Number(filters?.from) || filters?.from)?.valueOf();
 
-    if (filters?.from && filters?.to && filters.from > filters.to) {
+    if (from && to && from > to) {
         throw new Error('Invalid date range');
     }
 
-    if (filters?.from) {
+    if (from) {
         // matching `from` & `to` is an edge case
         // other cases should not include the starting point, since intervals are stored using the ending time
-        const gt = filters.to === filters.from ? '>=' : '>';
-        conditions.push(
-            `${endTimeColumn} ${gt} Timestamp('${new Date(filters.from).toISOString()}')`,
-        );
+        const gt = to === from ? '>=' : '>';
+        conditions.push(`${endTimeColumn} ${gt} Timestamp('${new Date(from).toISOString()}')`);
     }
 
-    if (filters?.to) {
-        conditions.push(`${endTimeColumn} <= Timestamp('${new Date(filters.to).toISOString()}')`);
+    if (to) {
+        conditions.push(`${endTimeColumn} <= Timestamp('${new Date(to).toISOString()}')`);
     }
 
     // If there is no filters, return queries, that were executed in the last hour
-    if (!filters?.from && !filters?.to) {
+    if (!from && !to) {
         conditions.push(`${intervalEndColumn} IN ${getMaxIntervalSubquery(path)}`);
     }
 

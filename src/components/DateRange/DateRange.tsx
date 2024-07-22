@@ -1,14 +1,22 @@
+import React from 'react';
+
+import type {RelativeRangeDatePickerProps} from '@gravity-ui/date-components';
+import {RelativeRangeDatePicker} from '@gravity-ui/date-components';
+
 import {cn} from '../../utils/cn';
+
+import i18n from './i18n';
+import {fromDateRangeValues, getdatePickerSize, toDateRangeValues} from './utils';
 
 import './DateRange.scss';
 
 const b = cn('date-range');
 
 export interface DateRangeValues {
-    /** ms from epoch */
-    from?: number;
-    /** ms from epoch */
-    to?: number;
+    /** ms from epoch or special values like now, 1h, 1m, etc*/
+    from?: string;
+    /** ms from epoch or special values like now, 1h, 1m, etc*/
+    to?: string;
 }
 
 interface DateRangeProps extends DateRangeValues {
@@ -16,58 +24,34 @@ interface DateRangeProps extends DateRangeValues {
     onChange?: (value: DateRangeValues) => void;
 }
 
-const toTimezonelessISOString = (timestamp?: number) => {
-    if (!timestamp || isNaN(timestamp)) {
-        return undefined;
-    }
-
-    // shift by local offset to treat toISOString output as local time
-    const shiftedTimestamp = timestamp - new Date().getTimezoneOffset() * 60 * 1000;
-    return new Date(shiftedTimestamp).toISOString().substring(0, 'yyyy-MM-DDThh:mm'.length);
-};
-
 export const DateRange = ({from, to, className, onChange}: DateRangeProps) => {
-    const handleFromChange: React.ChangeEventHandler<HTMLInputElement> = ({target: {value}}) => {
-        let newFrom = value ? new Date(value).getTime() : undefined;
+    const handleUpdate = React.useCallback<NonNullable<RelativeRangeDatePickerProps['onUpdate']>>(
+        (pickerValue) => onChange?.(toDateRangeValues(pickerValue)),
+        [onChange],
+    );
 
-        // some browsers allow selecting time after the boundary specified in `max`
-        if (newFrom && to && newFrom > to) {
-            newFrom = to;
+    const value = React.useMemo(() => {
+        if (!from && !to) {
+            return undefined;
         }
+        return fromDateRangeValues({from, to});
+    }, [from, to]);
 
-        onChange?.({from: newFrom, to});
-    };
-
-    const handleToChange: React.ChangeEventHandler<HTMLInputElement> = ({target: {value}}) => {
-        let newTo = value ? new Date(value).getTime() : undefined;
-
-        // some browsers allow selecting time before the boundary specified in `min`
-        if (from && newTo && from > newTo) {
-            newTo = from;
-        }
-
-        onChange?.({from, to: newTo});
-    };
-
-    const startISO = toTimezonelessISOString(from);
-    const endISO = toTimezonelessISOString(to);
-
+    // eslint-disable-next-line new-cap
+    const timeZoneString = Intl.DateTimeFormat().resolvedOptions().timeZone;
     return (
         <div className={b(null, className)}>
-            <input
-                type="datetime-local"
-                value={startISO || ''}
-                max={endISO}
-                onChange={handleFromChange}
-                className={b('input')}
-            />
-            —
-            <input
-                type="datetime-local"
-                min={startISO}
-                value={endISO || ''}
-                onChange={handleToChange}
-                className={b('input')}
+            <RelativeRangeDatePicker
+                withPresets
+                className={b('range-input', {[getdatePickerSize(value)]: true})}
+                timeZone={timeZoneString}
+                value={value || null}
+                allowNullableValues
+                size="m"
+                format={i18n('date-time-format')}
+                onUpdate={handleUpdate}
+                placeholder={`${i18n('date-time-format')} - ${i18n('date-time-format')}`}
+                withApplyButton
             />
         </div>
     );

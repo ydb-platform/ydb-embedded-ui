@@ -15,7 +15,7 @@ import type {ShardsWorkloadFilters} from '../../../../store/reducers/shardsWorkl
 import type {CellValue, KeyValueRow} from '../../../../types/api/query';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS, HOUR_IN_SECONDS} from '../../../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {TOP_SHARD_COLUMNS_IDS, isSortableTopShardsProperty} from '../../../../utils/diagnostics';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
@@ -69,8 +69,8 @@ function dataTableToStringSortOrder(value: SortOrder | SortOrder[] = []) {
 }
 
 function fillDateRangeFor(value: ShardsWorkloadFilters) {
-    value.to = Date.now();
-    value.from = value.to - HOUR_IN_SECONDS * 1000;
+    value.to = 'now';
+    value.from = 'now-1h';
     return value;
 }
 
