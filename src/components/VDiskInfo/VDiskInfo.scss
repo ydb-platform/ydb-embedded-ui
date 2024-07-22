@@ -2,12 +2,12 @@
     &__links {
         display: flex;
         flex-flow: row wrap;
-        gap: 12px;
+        gap: var(--g-spacing-2);
     }
 
     &__title {
         display: flex;
         flex-direction: row;
-        gap: 8px;
+        gap: var(--g-spacing-2);
     }
 }

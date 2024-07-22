@@ -44,7 +44,7 @@
     &__links {
         display: flex;
         flex-flow: row wrap;
-        gap: 12px;
+        gap: var(--g-spacing-2);
     }
 
     &__storage-groups-stats {
