@@ -68,7 +68,7 @@ const pathTypeToEntityName: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeTable]: 'Table',
     [EPathType.EPathTypeTableIndex]: 'Secondary Index',
     [EPathType.EPathTypeColumnStore]: 'Tablestore',
-    [EPathType.EPathTypeColumnTable]: 'Columntable',
+    [EPathType.EPathTypeColumnTable]: 'Column-oriented table',
     [EPathType.EPathTypeCdcStream]: 'Changefeed',
     [EPathType.EPathTypePersQueueGroup]: 'Topic',
 
