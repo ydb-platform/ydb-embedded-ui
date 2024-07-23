@@ -120,11 +120,10 @@ export function PDiskPage() {
         const nodeIdItem = NodeId ? `${pDiskPageKeyset('node')}: ${NodeId}` : undefined;
 
         return (
-            <PageMeta
-                className={pdiskPageCn('meta')}
-                loading={pDiskLoading}
-                items={[hostItem, nodeIdItem, NodeType, NodeDC]}
-            />
+            <div className={pdiskPageCn('meta')}>
+                <PageMeta loading={pDiskLoading} items={[hostItem, nodeIdItem, NodeType, NodeDC]} />
+                <AutoRefreshControl />
+            </div>
         );
     };
 
@@ -155,7 +154,6 @@ export function PDiskPage() {
                     <Icon data={ArrowRotateLeft} />
                     {pDiskPageKeyset('restart-pdisk-button')}
                 </ButtonWithConfirmDialog>
-                <AutoRefreshControl className={pdiskPageCn('auto-refresh-control')} />
             </div>
         );
     };
