@@ -14,6 +14,7 @@ export interface TMetaCommonInfo {
     Path: string;
     Owner?: string;
     ACL?: TACE[];
+    EffectiveACL?: TACE[];
 }
 
 export interface TACE {
