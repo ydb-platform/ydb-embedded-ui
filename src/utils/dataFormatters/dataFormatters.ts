@@ -41,10 +41,6 @@ export const stringifyVdiskId = (id?: TVDiskID | TVSlotId) => {
     return id ? Object.values(id).join('-') : '';
 };
 
-export const getPDiskId = (info: {NodeId?: number; PDiskId?: number}) => {
-    return info.NodeId && info.PDiskId ? `${info.NodeId}-${info.PDiskId}` : undefined;
-};
-
 export const formatUptime = (seconds: number) => {
     const days = Math.floor(seconds / DAY_IN_SECONDS);
     const remain = seconds % DAY_IN_SECONDS;

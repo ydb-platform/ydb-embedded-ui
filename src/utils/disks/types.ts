@@ -6,14 +6,18 @@ import type {PDISK_TYPES} from './getPDiskType';
 
 export interface PreparedPDisk extends TPDiskStateInfo {
     Type?: PDiskType;
-    AllocatedPercent?: number;
     Severity?: number;
+
+    AllocatedSize?: number;
+    AllocatedPercent?: number;
 }
 
 export interface PreparedVDisk extends TVDiskStateInfo {
     PDisk?: PreparedPDisk;
-    AllocatedPercent?: number;
     Severity?: number;
+
+    TotalSize?: number;
+    AllocatedPercent?: number;
 }
 
 export type PDiskType = ValueOf<typeof PDISK_TYPES>;

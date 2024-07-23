@@ -17,7 +17,7 @@ import type {MetaCluster, MetaClusters, MetaTenants} from '../types/api/meta';
 import type {TNetInfo} from '../types/api/netInfo';
 import type {TNodesInfo} from '../types/api/nodes';
 import type {TEvNodesInfo} from '../types/api/nodesList';
-import type {TEvPDiskStateResponse} from '../types/api/pdisk';
+import type {TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
 import type {
     Actions,
     ErrorResponse,
@@ -191,7 +191,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId, requestConfig: {signal}},
         );
     }
-    getPDiskInfo(
+    getNodeWhiteboardPDiskInfo(
         {nodeId, pDiskId}: {nodeId: string | number; pDiskId: string | number},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
@@ -199,6 +199,19 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             this.getPath('/viewer/json/pdiskinfo?enums=true'),
             {
                 filter: `(NodeId=${nodeId}${pDiskId ? `;PDiskId=${pDiskId}` : ''})`,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+    getPDiskInfo(
+        {nodeId, pDiskId}: {nodeId: string | number; pDiskId: string | number},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<TPDiskInfoResponse>(
+            this.getPath('/pdisk/info'),
+            {
+                node_id: nodeId,
+                pdisk_id: pDiskId,
             },
             {concurrentId, requestConfig: {signal}},
         );

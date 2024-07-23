@@ -19,7 +19,7 @@ import './PDiskInfo.scss';
 const b = cn('ydb-pdisk-info');
 
 interface PDiskInfoProps<T extends PreparedPDisk> extends Omit<InfoViewerProps, 'info'> {
-    pDisk: T;
+    pDisk?: T;
     nodeId?: number | string | null;
     isPDiskPage?: boolean;
 }
@@ -41,11 +41,8 @@ export function PDiskInfo<T extends PreparedPDisk>({
         State,
         SerialNumber,
         TotalSize,
-        AvailableSize,
-    } = pDisk;
-
-    const total = Number(TotalSize);
-    const available = Number(AvailableSize);
+        AllocatedSize,
+    } = pDisk || {};
 
     const pdiskInfo: InfoViewerItem[] = [];
 
@@ -59,19 +56,17 @@ export function PDiskInfo<T extends PreparedPDisk>({
         pdiskInfo.push({label: pDiskInfoKeyset('category'), value: Category});
         pdiskInfo.push({label: pDiskInfoKeyset('type'), value: Type});
     }
-    if (total >= 0 && available >= 0) {
-        pdiskInfo.push({
-            label: pDiskInfoKeyset('size'),
-            value: (
-                <ProgressViewer
-                    value={total - available}
-                    capacity={total}
-                    formatValues={formatStorageValuesToGb}
-                    colorizeProgress={true}
-                />
-            ),
-        });
-    }
+    pdiskInfo.push({
+        label: pDiskInfoKeyset('size'),
+        value: (
+            <ProgressViewer
+                value={AllocatedSize}
+                capacity={TotalSize}
+                formatValues={formatStorageValuesToGb}
+                colorizeProgress={true}
+            />
+        ),
+    });
     if (valueIsDefined(State)) {
         pdiskInfo.push({label: pDiskInfoKeyset('state'), value: State});
     }

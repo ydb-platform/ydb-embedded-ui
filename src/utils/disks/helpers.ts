@@ -13,3 +13,7 @@ export function getSeverityColor(severity: number | undefined) {
 
     return DISK_NUMERIC_SEVERITY_TO_STATE_COLOR[severity] || NOT_AVAILABLE_SEVERITY_COLOR;
 }
+
+export function getPDiskId(nodeId: string | number, pDiskId: string | number) {
+    return `${nodeId}-${pDiskId}`;
+}

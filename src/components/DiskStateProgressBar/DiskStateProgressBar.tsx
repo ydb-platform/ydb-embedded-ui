@@ -13,49 +13,59 @@ interface DiskStateProgressBarProps {
     diskAllocatedPercent?: number;
     severity?: number;
     compact?: boolean;
+    faded?: boolean;
+    empty?: boolean;
+    content?: React.ReactNode;
+    className?: string;
 }
 
 export function DiskStateProgressBar({
     diskAllocatedPercent = -1,
     severity,
     compact,
+    faded,
+    empty,
+    content,
+    className,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(INVERTED_DISKS_KEY);
 
-    const renderAllocatedPercent = () => {
-        if (compact) {
-            return <div className={b('filled')} style={{width: '100%'}} />;
-        }
-
-        return (
-            diskAllocatedPercent >= 0 && (
-                <React.Fragment>
-                    <div
-                        className={b('filled')}
-                        style={{
-                            width: `${
-                                inverted ? 100 - diskAllocatedPercent : diskAllocatedPercent
-                            }%`,
-                        }}
-                    />
-                    <div className={b('filled-title')}>
-                        {`${Math.round(diskAllocatedPercent)}%`}
-                    </div>
-                </React.Fragment>
-            )
-        );
-    };
-
-    const mods: Record<string, boolean | undefined> = {inverted, compact};
+    const mods: Record<string, boolean | undefined> = {inverted, compact, faded, empty};
 
     const color = severity !== undefined && getSeverityColor(severity);
     if (color) {
         mods[color.toLocaleLowerCase()] = true;
     }
 
+    const renderAllocatedPercent = () => {
+        if (compact) {
+            return <div className={b('fill-bar', mods)} style={{width: '100%'}} />;
+        }
+
+        const fillWidth = inverted ? 100 - diskAllocatedPercent : diskAllocatedPercent;
+
+        if (diskAllocatedPercent >= 0) {
+            return <div className={b('fill-bar', mods)} style={{width: `${fillWidth}%`}} />;
+        }
+
+        return null;
+    };
+
+    const renderContent = () => {
+        if (content) {
+            return content;
+        }
+
+        if (!compact && diskAllocatedPercent >= 0) {
+            return <div className={b('title')}>{`${Math.round(diskAllocatedPercent)}%`}</div>;
+        }
+
+        return null;
+    };
+
     return (
         <div
-            className={b(mods)}
+            className={b(mods, className)}
             role="meter"
             aria-label="Disk allocated space"
             aria-valuemin={0}
@@ -63,6 +73,7 @@ export function DiskStateProgressBar({
             aria-valuenow={diskAllocatedPercent}
         >
             {renderAllocatedPercent()}
+            {renderContent()}
         </div>
     );
 }

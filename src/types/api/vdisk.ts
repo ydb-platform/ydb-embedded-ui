@@ -3,8 +3,6 @@ import type {TPDiskStateInfo} from './pdisk';
 
 /**
  * endpoint: /viewer/json/vdiskinfo
- *
- * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/node_whiteboard.proto
  */
 export interface TEvVDiskStateResponse {
     VDiskStateInfo?: TVDiskStateInfo[];
@@ -12,6 +10,11 @@ export interface TEvVDiskStateResponse {
     ResponseDuration?: number;
 }
 
+/**
+ * Node whiteboard VDisk data
+ *
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/node_whiteboard.proto
+ */
 export interface TVDiskStateInfo {
     VDiskId?: TVDiskID;
     /** uint64 */
@@ -42,6 +45,9 @@ export interface TVDiskStateInfo {
     UnreplicatedPhantoms?: boolean;
     /** The same for the non-phantom-like blobs. */
     UnreplicatedNonPhantoms?: boolean;
+    /** Replication progress (0 to 1) */
+    ReplicationProgress?: number;
+    ReplicationSecondsRemaining?: number;
     /**
      * uint64
      * How many unsynced VDisks from current BlobStorage group we see
@@ -130,3 +136,36 @@ export enum EVDiskState {
     OK = 'OK',
     PDiskError = 'PDiskError',
 }
+
+/**
+ * BSC VDisk data
+ *
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/sys_view.proto
+ */
+export interface TVSlotEntry {
+    Key?: TVSlotKey;
+    Info?: TVSlotInfo;
+}
+
+type TVSlotKey = TVSlotId;
+
+export interface TVSlotInfo {
+    GroupId?: number;
+    GroupGeneration?: number;
+    FailRealm?: number;
+    FailDomain?: number;
+    VDisk?: number;
+    /** uint64 */
+    AllocatedSize?: string;
+    /** uint64 */
+    AvailableSize?: string;
+    StatusV2?: EVDiskStatus;
+    Kind?: string;
+    IsBeingDeleted?: boolean;
+}
+
+type EVDiskStatus =
+    | 'ERROR' // the disk is not operational at all
+    | 'INIT_PENDING' // initialization in process
+    | 'REPLICATING' // the disk accepts queries, but not all the data was replicated
+    | 'READY'; // the disk is fully operational and does not affect group fault tolerance
