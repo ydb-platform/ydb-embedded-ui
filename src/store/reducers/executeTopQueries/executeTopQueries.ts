@@ -46,13 +46,19 @@ export const topQueriesApi = api.injectEndpoints({
         getTopQueries: build.query({
             queryFn: async (
                 {database, filters}: {database: string; filters?: TopQueriesFilters},
-                {signal, dispatch},
+                {signal},
             ) => {
+                const preparedFilters = {
+                    ...filters,
+                    from: filters?.from || 'now-1h',
+                    to: filters?.to || 'now',
+                };
+
                 try {
                     const response = await window.api.sendQuery(
                         {
                             schema: 'modern',
-                            query: getQueryText(database, filters),
+                            query: getQueryText(database, preparedFilters),
                             database,
                             action: 'execute-scan',
                         },
@@ -64,10 +70,6 @@ export const topQueriesApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
-
-                    if (!filters?.from && !filters?.to) {
-                        dispatch(setTopQueriesFilters({from: 'now-1h', to: 'now'}));
-                    }
                     return {data};
                 } catch (error) {
                     return {error};
@@ -75,6 +77,8 @@ export const topQueriesApi = api.injectEndpoints({
             },
             forceRefetch: ({currentArg}) => {
                 if (
+                    !currentArg?.filters?.from ||
+                    !currentArg?.filters?.to ||
                     isLikeRelative(currentArg?.filters?.from) ||
                     isLikeRelative(currentArg?.filters?.to)
                 ) {

@@ -94,18 +94,18 @@ const durationColumn: Column<KeyValueRow> = {
     width: 150,
 };
 
-export const getTopQueriesColumns = (): Column<KeyValueRow>[] => {
-    return [
-        cpuTimeUsColumn,
-        queryTextColumn,
-        endTimeColumn,
-        durationColumn,
-        readRowsColumn,
-        readBytesColumn,
-        userSIDColumn,
-    ];
-};
+export const TOP_QUERIES_COLUMNS = [
+    cpuTimeUsColumn,
+    queryTextColumn,
+    endTimeColumn,
+    durationColumn,
+    readRowsColumn,
+    readBytesColumn,
+    userSIDColumn,
+];
 
-export const getTenantOverviewTopQueriesColumns = (): Column<KeyValueRow>[] => {
-    return [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
-};
+export const TENANT_OVERVIEW_TOP_QUERUES_COLUMNS = [
+    queryHashColumn,
+    oneLineQueryTextColumn,
+    cpuTimeUsColumn,
+];

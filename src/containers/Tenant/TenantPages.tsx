@@ -1,5 +1,18 @@
 import routes, {createHref} from '../../routes';
 import {TENANT_SUMMARY_TABS_IDS} from '../../store/reducers/tenant/constants';
+import type {paramSetup} from '../../store/state-url-mapping';
+import type {ExtractType} from '../../types/common';
+
+type TenantQueryParams = {
+    [K in keyof (typeof paramSetup)['/tenant']]?: ExtractType<(typeof paramSetup)['/tenant'][K]>;
+};
+
+type AdditionalQueryParams = {
+    name?: string;
+    backend?: string;
+};
+
+type TenantQuery = TenantQueryParams | AdditionalQueryParams;
 
 export const TenantTabsGroups = {
     summaryTab: 'summaryTab',
@@ -26,6 +39,6 @@ export const TENANT_SCHEMA_TAB = [
     },
 ];
 
-export const getTenantPath = (query = {}) => {
+export const getTenantPath = (query: TenantQuery) => {
     return createHref(routes.tenant, undefined, query);
 };
