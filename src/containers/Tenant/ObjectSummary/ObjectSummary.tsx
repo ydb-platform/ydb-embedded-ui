@@ -9,6 +9,7 @@ import {StringParam, useQueryParam} from 'use-query-params';
 
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {ClipboardButton} from '../../../components/ClipboardButton';
+import {toFormattedSize} from '../../../components/FormattedBytes/utils';
 import InfoViewer from '../../../components/InfoViewer/InfoViewer';
 import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
@@ -28,7 +29,11 @@ import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
 } from '../../../utils/constants';
-import {formatDateTime, formatSecondsToHours} from '../../../utils/dataFormatters/dataFormatters';
+import {
+    formatDateTime,
+    formatNumber,
+    formatSecondsToHours,
+} from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Acl} from '../Acl/Acl';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
@@ -158,6 +163,21 @@ export function ObjectSummary({
         });
 
         const {PathDescription} = currentObjectData;
+
+        if (PathDescription?.TableStats) {
+            const {DataSize, RowCount} = PathDescription.TableStats;
+
+            overview.push(
+                {
+                    label: i18n('summary.data-size'),
+                    value: toFormattedSize(DataSize),
+                },
+                {
+                    label: i18n('summary.row-count'),
+                    value: formatNumber(RowCount),
+                },
+            );
+        }
 
         const title = <EntityTitle data={PathDescription} />;
 

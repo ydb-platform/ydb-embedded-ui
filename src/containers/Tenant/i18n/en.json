@@ -12,6 +12,8 @@
   "summary.id": "Id",
   "summary.version": "Version",
   "summary.created": "Created",
+  "summary.data-size": "Data size",
+  "summary.row-count": "Row count",
   "summary.partitions": "Partitions count",
   "summary.paths": "Paths",
   "summary.shards": "Shards",
