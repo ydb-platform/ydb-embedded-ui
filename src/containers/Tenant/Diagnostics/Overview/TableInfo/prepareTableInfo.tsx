@@ -1,3 +1,4 @@
+import {Text} from '@gravity-ui/uikit';
 import omit from 'lodash/omit';
 
 import type {InfoViewerItem} from '../../../../../components/InfoViewer';
@@ -47,8 +48,18 @@ function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescription) {
         value: String(!isInStoreColumnTable(columnTable)),
     });
 
-    if (columnTable.Sharding && columnTable.Sharding.HashSharding) {
-        columnTableGeneralInfo.push({label: 'Sharding', value: 'hash'});
+    if (columnTable.Sharding?.HashSharding?.Columns) {
+        const columns = columnTable.Sharding.HashSharding.Columns.join(', ');
+        const content = `PARTITION BY HASH(${columns})`;
+
+        columnTableGeneralInfo.push({
+            label: 'Partitioning',
+            value: (
+                <Text variant="code-2" wordBreak="break-word">
+                    {content}
+                </Text>
+            ),
+        });
     }
 
     if (columnTable.TtlSettings) {
