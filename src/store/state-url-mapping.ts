@@ -14,7 +14,7 @@ import {stateToParams} from 'redux-location-state/lib/stateToParams';
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialSettingsState} from './reducers/settings/settings';
 
-const paramSetup: ParamSetup = {
+export const paramSetup = {
     global: {
         problemFilter: {
             stateKey: 'settings.problemFilter',
@@ -83,7 +83,7 @@ const paramSetup: ParamSetup = {
             stateKey: 'tenants.searchValue',
         },
     },
-};
+} as const;
 
 function mergeLocationToState<S>(state: S, location: Pick<LocationWithQuery, 'query'>): S {
     return merge({}, state, location.query);
@@ -95,7 +95,7 @@ function restoreUnknownParams(location: Location, prevLocation: Location) {
 
     // figure out which path key inside paramSetup matches location.pathname
     const declaredPath = getMatchingDeclaredPath(paramSetup, location);
-    const entries = declaredPath && paramSetup[declaredPath];
+    const entries = declaredPath && paramSetup[declaredPath as keyof typeof paramSetup];
 
     // remove params which are mapped for this page
     each(keys(entries), (param) => {

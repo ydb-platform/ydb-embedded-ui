@@ -9,6 +9,7 @@ interface GetSectionTitleParams {
     postfix: string;
     prefix?: string;
     link?: string;
+    onClick?: () => void;
 }
 
 // Titles are formed by the principle "Top entities by parameter"
@@ -17,11 +18,16 @@ export const getSectionTitle = ({
     entity,
     postfix,
     link,
+    onClick,
 }: GetSectionTitleParams) => {
     if (link) {
         return (
             <React.Fragment>
-                {prefix} <InternalLink to={link}>{entity}</InternalLink> {postfix}
+                {prefix}{' '}
+                <InternalLink to={link} onClick={onClick}>
+                    {entity}
+                </InternalLink>{' '}
+                {postfix}
             </React.Fragment>
         );
     }

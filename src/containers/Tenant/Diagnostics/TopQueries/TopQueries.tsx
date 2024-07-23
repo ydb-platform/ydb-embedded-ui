@@ -27,7 +27,7 @@ import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {isColumnEntityType} from '../../utils/schema';
 
-import {TOP_QUERIES_COLUMNS_WIDTH_LS_KEY, getTopQueriesColumns} from './getTopQueriesColumns';
+import {TOP_QUERIES_COLUMNS, TOP_QUERIES_COLUMNS_WIDTH_LS_KEY} from './getTopQueriesColumns';
 import i18n from './i18n';
 
 import './TopQueries.scss';
@@ -57,7 +57,7 @@ export const TopQueries = ({tenantName, type}: TopQueriesProps) => {
     const loading = isFetching && currentData === undefined;
     const {result: data} = currentData || {};
 
-    const rawColumns = getTopQueriesColumns();
+    const rawColumns = TOP_QUERIES_COLUMNS;
     const columns = rawColumns.map((column) => ({
         ...column,
         sortable: isSortableTopQueriesProperty(column.name),

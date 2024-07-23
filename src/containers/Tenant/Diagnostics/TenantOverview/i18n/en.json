@@ -14,7 +14,7 @@
   "tables": "tables",
 
   "by-pools-usage": "by pools usage",
-  "by-cpu-time": "by cpu time",
+  "by-cpu-time": "by cpu time, {{executionPeriod}}",
   "by-cpu-usage": "by cpu usage",
   "by-load": "by load",
   "by-memory": "by memory",
@@ -34,5 +34,7 @@
   "storage.tablet-storage-title": "Tablet storage",
   "storage.tablet-storage-description": "Size of user data and indexes stored in schema objects (tables, topics, etc.)",
   "storage.db-storage-title": "Database storage",
-  "storage.db-storage-description": "Size of data stored in distributed storage with all overheads for redundancy"
+  "storage.db-storage-description": "Size of data stored in distributed storage with all overheads for redundancy",
+
+  "executed-last-hour": "executed in the last hour"
 }
