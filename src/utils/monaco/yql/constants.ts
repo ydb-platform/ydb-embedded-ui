@@ -1,7 +1,5 @@
 import type {YQLEntity} from '@gravity-ui/websql-autocomplete';
 
-export const LANGUAGE_YQL_ID = 'yql';
-
 export const SimpleTypes = [
     'String',
     'Bool',

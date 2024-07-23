@@ -30,7 +30,6 @@ import {
     QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../../utils/constants';
 import {useQueryModes, useSetting} from '../../../../utils/hooks';
-import {LANGUAGE_YQL_ID} from '../../../../utils/monaco/yql/constants';
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
@@ -375,7 +374,7 @@ function QueryEditor(props: QueryEditorProps) {
                     <div className={b('monaco-wrapper')}>
                         <div className={b('monaco')}>
                             <MonacoEditor
-                                language={LANGUAGE_YQL_ID}
+                                language={'yql'}
                                 value={executeQuery.input}
                                 options={editorOptions}
                                 onChange={onChange}

@@ -2,6 +2,7 @@ import React from 'react';
 
 import {getTopology, getYdbPlanNodeShape} from '@gravity-ui/paranoid';
 import {Loader, RadioButton} from '@gravity-ui/uikit';
+import {LANGUAGE_ID} from 'monaco-yql-languages/build/s-expressions/s-expressions';
 import JSONTree from 'react-json-inspector';
 
 import Divider from '../../../../components/Divider/Divider';
@@ -13,7 +14,6 @@ import {explainVersions} from '../../../../store/reducers/explainQuery/utils';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco/s-expression/constants';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 
@@ -141,7 +141,7 @@ export function ExplainResult(props) {
         const content = (
             <div className={b('ast')}>
                 <MonacoEditor
-                    language={LANGUAGE_S_EXPRESSION_ID}
+                    language={LANGUAGE_ID}
                     value={props.ast}
                     options={EDITOR_OPTIONS}
                     wrappingIndent="indent"
