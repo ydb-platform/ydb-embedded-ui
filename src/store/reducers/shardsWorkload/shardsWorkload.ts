@@ -148,6 +148,7 @@ export const shardApi = api.injectEndpoints({
                         },
                         {
                             signal,
+                            withRetries: true,
                         },
                     );
 

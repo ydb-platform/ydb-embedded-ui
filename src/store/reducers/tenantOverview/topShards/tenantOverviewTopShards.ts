@@ -33,7 +33,7 @@ export const topShardsApi = api.injectEndpoints({
                             database,
                             action: queryAction,
                         },
-                        {signal},
+                        {signal, withRetries: true},
                     );
 
                     if (isQueryErrorResponse(response)) {

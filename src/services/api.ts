@@ -18,14 +18,7 @@ import type {TNetInfo} from '../types/api/netInfo';
 import type {TNodesInfo} from '../types/api/nodes';
 import type {TEvNodesInfo} from '../types/api/nodesList';
 import type {TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
-import type {
-    Actions,
-    ErrorResponse,
-    ExplainActions,
-    ExplainResponse,
-    QueryAPIResponse,
-    Schemas,
-} from '../types/api/query';
+import type {Actions, ErrorResponse, QueryAPIResponse, Schemas} from '../types/api/query';
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/render';
 import type {RestartPDiskResponse} from '../types/api/restartPDisk';
 import type {TEvDescribeSchemeResult} from '../types/api/schema';
@@ -53,14 +46,17 @@ import {settingsManager} from './settings';
 type AxiosOptions = {
     concurrentId?: string;
     signal?: AbortSignal;
+    withRetries?: boolean;
 };
 
 export class YdbEmbeddedAPI extends AxiosWrapper {
+    DEFAULT_RETRIES_COUNT = 3;
+
     constructor(options?: AxiosWrapperOptions) {
         super(options);
 
         axiosRetry(this._axios, {
-            retries: 3,
+            retries: this.DEFAULT_RETRIES_COUNT,
             retryDelay: axiosRetry.exponentialDelay,
         });
 
@@ -442,7 +438,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             schema?: Schema;
             syntax?: QuerySyntax;
         },
-        {concurrentId, signal}: AxiosOptions = {},
+        {concurrentId, signal, withRetries}: AxiosOptions = {},
     ) {
         // Time difference to ensure that timeout from ui will be shown rather than backend error
         const uiTimeout = 9 * 60 * 1000;
@@ -468,38 +464,11 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {
                 concurrentId,
                 timeout: uiTimeout,
-                requestConfig: {signal},
+                requestConfig: {
+                    signal,
+                    'axios-retry': {retries: withRetries ? this.DEFAULT_RETRIES_COUNT : 0},
+                },
             },
-        );
-    }
-    getExplainQuery<Action extends ExplainActions>(
-        query: string,
-        database: string,
-        action: Action,
-        syntax?: QuerySyntax,
-    ) {
-        return this.post<ExplainResponse<Action> | ErrorResponse>(
-            this.getPath('/viewer/json/query'),
-            {
-                query,
-                database,
-                action: action || 'explain',
-                syntax,
-                timeout: 600000,
-            },
-            {},
-        );
-    }
-    getExplainQueryAst(query: string, database: string) {
-        return this.post<ExplainResponse<'explain-ast'>>(
-            this.getPath('/viewer/json/query'),
-            {
-                query,
-                database,
-                action: 'explain-ast',
-                timeout: 600000,
-            },
-            {},
         );
     }
     getHotKeys(
@@ -562,6 +531,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                     // Automatic headers may not suit
                     Accept: 'application/json',
                 },
+                requestConfig: {'axios-retry': {retries: 0}},
             },
         );
     }
@@ -580,22 +550,29 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                 },
+                requestConfig: {'axios-retry': {retries: 0}},
             },
         );
     }
     killTablet(id?: string) {
-        return this.get<string>(this.getPath(`/tablets?KillTabletID=${id}`), {});
+        return this.get<string>(
+            this.getPath(`/tablets?KillTabletID=${id}`),
+            {},
+            {requestConfig: {'axios-retry': {retries: 0}}},
+        );
     }
     stopTablet(id?: string, hiveId?: string) {
         return this.get<string>(
             this.getPath(`/tablets/app?TabletID=${hiveId}&page=StopTablet&tablet=${id}`),
             {},
+            {requestConfig: {'axios-retry': {retries: 0}}},
         );
     }
     resumeTablet(id?: string, hiveId?: string) {
         return this.get<string>(
             this.getPath(`/tablets/app?TabletID=${hiveId}&page=ResumeTablet&tablet=${id}`),
             {},
+            {requestConfig: {'axios-retry': {retries: 0}}},
         );
     }
     getTabletDescribe(tenantId: TDomainKey, {concurrentId, signal}: AxiosOptions = {}) {

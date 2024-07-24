@@ -16,7 +16,7 @@ export const previewApi = api.injectEndpoints({
                 try {
                     const response = await window.api.sendQuery(
                         {schema: 'modern', query, database, action},
-                        {signal},
+                        {signal, withRetries: true},
                     );
 
                     if (isQueryErrorResponse(response)) {
