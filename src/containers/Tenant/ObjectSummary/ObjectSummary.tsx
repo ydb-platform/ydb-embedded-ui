@@ -161,6 +161,17 @@ export function ObjectSummary({
 
         const title = <EntityTitle data={PathDescription} />;
 
+        const getDatabaseOverview = () => [
+            {
+                label: i18n('summary.paths'),
+                value: PathDescription?.DomainDescription?.PathsInside,
+            },
+            {
+                label: i18n('summary.shards'),
+                value: PathDescription?.DomainDescription?.ShardsInside,
+            },
+        ];
+
         const getPathTypeOverview: Record<EPathType, (() => InfoViewerItem[]) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
@@ -170,18 +181,9 @@ export function ObjectSummary({
                     value: PathDescription?.TablePartitions?.length,
                 },
             ],
-            [EPathType.EPathTypeSubDomain]: undefined,
+            [EPathType.EPathTypeSubDomain]: getDatabaseOverview,
             [EPathType.EPathTypeTableIndex]: undefined,
-            [EPathType.EPathTypeExtSubDomain]: () => [
-                {
-                    label: i18n('summary.paths'),
-                    value: PathDescription?.DomainDescription?.PathsInside,
-                },
-                {
-                    label: i18n('summary.shards'),
-                    value: PathDescription?.DomainDescription?.ShardsInside,
-                },
-            ],
+            [EPathType.EPathTypeExtSubDomain]: getDatabaseOverview,
             [EPathType.EPathTypeColumnStore]: () => [
                 {
                     label: i18n('summary.partitions'),
