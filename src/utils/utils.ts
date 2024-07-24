@@ -87,7 +87,7 @@ export function pad9(val: number | string) {
     return result;
 }
 
-export function isNumeric(value?: unknown) {
+export function isNumeric(value?: unknown): value is number | string {
     if (typeof value === 'number') {
         return !isNaN(value);
     }
@@ -98,4 +98,8 @@ export function isNumeric(value?: unknown) {
         return !isNaN(Number(value)) && !isNaN(parseFloat(value));
     }
     return false;
+}
+
+export function toExponential(value?: string | number, precision?: number) {
+    return isNumeric(value) ? Number(value).toExponential(precision) : undefined;
 }

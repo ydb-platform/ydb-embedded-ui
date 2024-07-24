@@ -7,7 +7,8 @@ import type {
     TopologyNodeDataStatsSection,
 } from '@gravity-ui/paranoid';
 
-import type {PlanNode} from '../types/api/query';
+import type {SimplifiedPlanItem} from '../store/reducers/explainQuery/types';
+import type {PlanNode, SimplifiedNode} from '../types/api/query';
 
 const CONNECTION_NODE_META_FIELDS = new Set(['PlanNodeId', 'PlanNodeType', 'Node Type', 'Plans']);
 
@@ -131,4 +132,50 @@ export function preparePlan(plan: PlanNode) {
         nodes,
         links,
     };
+}
+
+function getChildren(plans?: SimplifiedNode[]) {
+    const children: SimplifiedPlanItem[] = [];
+    plans?.forEach((p) => {
+        children.push(...prepareSimplifiedPlan([p]));
+    });
+    return children;
+}
+
+export function prepareSimplifiedPlan(plans: SimplifiedNode[]) {
+    const nodes: SimplifiedPlanItem[] = [];
+
+    plans.forEach((node) => {
+        const plans = node['Plans'];
+        const operator = node['Operators']?.[0];
+
+        const children = getChildren(plans);
+
+        if (operator) {
+            const {
+                ['A-Cpu']: aCpu,
+                ['A-Rows']: aRows,
+                ['E-Cost']: eCost,
+                ['E-Rows']: eRows,
+                ['E-Size']: eSize,
+                ['SsaProgram']: _ssaProgram,
+                ['Name']: name,
+                ...rest
+            } = operator;
+
+            nodes.push({
+                name,
+                operationParams: rest,
+                aCpu,
+                aRows,
+                eCost,
+                eRows,
+                eSize,
+                children,
+            });
+        } else {
+            nodes.push(...children);
+        }
+    });
+    return nodes;
 }

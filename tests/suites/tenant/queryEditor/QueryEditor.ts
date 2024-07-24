@@ -4,7 +4,7 @@ import {BaseModel} from '../../../models/BaseModel';
 import {selectContentTable} from '../../../utils/selectContentTable';
 
 type QueryMode = 'YQL Script' | 'Scan';
-type ExplainResultType = 'Schema' | 'JSON' | 'AST';
+type ExplainResultType = 'Schema' | 'Simplified' | 'JSON' | 'AST';
 
 const queryModeSelectorQa = 'query-mode-selector';
 const queryModeSelectorPopupQa = 'query-mode-selector-popup';
@@ -44,11 +44,14 @@ export class QueryEditor extends BaseModel {
             case 'Schema': {
                 return resultArea.locator('.canvas-container');
             }
+            case 'Simplified': {
+                return resultArea.locator('.ydb-query-explain-simplified-plan');
+            }
             case 'JSON': {
                 return resultArea.locator('.json-inspector');
             }
             case 'AST': {
-                return resultArea.locator('.ydb-query-explain-result__ast');
+                return resultArea.locator('.ydb-query-explain-ast');
             }
         }
     }

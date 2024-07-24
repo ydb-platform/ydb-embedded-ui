@@ -490,12 +490,13 @@ function Result({
     }
 
     if (resultType === RESULT_TYPES.EXPLAIN) {
-        const {plan, ast} = explainQueryData || {};
+        const {plan, ast, simplifiedPlan} = explainQueryData || {};
 
         return (
             <ExplainResult
                 error={explainQueryError}
                 explain={plan}
+                simplifiedPlan={simplifiedPlan}
                 ast={ast}
                 loading={explainQueryLoading}
                 theme={theme}

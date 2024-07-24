@@ -137,22 +137,42 @@ interface PlanNodeOperator {
     Iterator?: string;
 }
 
-export interface PlanNode {
+interface CommonPlanNode {
     PlanNodeId?: number;
     'Node Type'?: string;
-    Plans?: PlanNode[];
+    PlanNodeType?: string;
+}
+
+export interface PlanNode extends CommonPlanNode {
     Operators?: PlanNodeOperator[];
     Tables?: string[];
-    PlanNodeType?: string;
+    Plans?: PlanNode[];
     Stats?: PlanNodeStats;
     'CTE Name'?: string;
     'Subplan Name'?: string;
     'Parent Relationship'?: string;
 }
 
+export interface SimlifiedPlanOperatorOtherParams {
+    [key: string]: string | number | string[] | Record<string, unknown> | undefined;
+}
+interface SimlifiedPlanOperator extends SimlifiedPlanOperatorOtherParams {
+    'E-Rows'?: string;
+    'A-Rows'?: number;
+    'A-Cpu'?: number;
+    Name: string;
+    'E-Size'?: string;
+    'E-Cost'?: string;
+}
+export interface SimplifiedNode extends CommonPlanNode {
+    Plans?: SimplifiedNode[];
+    Operators?: [SimlifiedPlanOperator];
+}
+
 export interface ScriptPlan {
     queries?: {
         Plan?: PlanNode;
+        SimplifiedPlan?: SimplifiedNode;
         tables?: PlanTable[];
     }[];
     meta: PlanMeta;
@@ -160,6 +180,7 @@ export interface ScriptPlan {
 
 export interface QueryPlan {
     Plan?: PlanNode;
+    SimplifiedPlan?: SimplifiedNode;
     tables?: PlanTable[];
     meta: PlanMeta;
 }
