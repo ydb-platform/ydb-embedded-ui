@@ -32,7 +32,7 @@ const ExplainOptionIds = {
 
 const explainOptions = [
     {value: ExplainOptionIds.schema, content: 'Schema'},
-    {value: ExplainOptionIds.simplified, content: 'Simplified Plan'},
+    {value: ExplainOptionIds.simplified, content: 'Explain Plan'},
     {value: ExplainOptionIds.json, content: 'JSON'},
     {value: ExplainOptionIds.ast, content: 'AST'},
 ];
