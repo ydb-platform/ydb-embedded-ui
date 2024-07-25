@@ -119,15 +119,19 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId, requestConfig: {signal}},
         );
     }
-    getTenantInfo({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
+    getTenantInfo(
+        {path, database = path}: {path: string; database?: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<TTenantInfo>(
             this.getPath('/viewer/json/tenantinfo'),
             {
+                database,
                 path,
                 tablets: true,
                 storage: true,
             },
-            {concurrentId: concurrentId || `getTenantInfo|${path}`, requestConfig: {signal}},
+            {concurrentId, requestConfig: {signal}},
         );
     }
     getNodes(
@@ -145,7 +149,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
 
         return this.get<TNodesInfo>(
             this.getPath('/viewer/json/nodes?enums=true'),
-            {with: visibleEntities, type, tablets, sort, ...params},
+            {with: visibleEntities, type, tablets, sort, database: params.tenant, ...params},
             {concurrentId, requestConfig: {signal}},
         );
     }
@@ -180,6 +184,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         return this.get<TStorageInfo>(
             this.getPath(`/viewer/json/storage?enums=true`),
             {
+                database: tenant,
                 tenant,
                 node_id: nodeId,
                 pool: poolName,
@@ -246,20 +251,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId, requestConfig: {signal}},
         );
     }
-    getHostInfo({concurrentId, signal}: AxiosOptions = {}) {
-        return this.get<TEvSystemStateResponse>(
-            this.getPath('/viewer/json/sysinfo?node_id=.&enums=true'),
-            {concurrentId, requestConfig: {signal}},
-        );
-    }
     getTabletsInfo(
-        {nodes = [], path}: {nodes?: string[]; path?: string},
+        {nodes = [], path, database}: {nodes?: string[]; path?: string; database?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         const filter = nodes.length > 0 && `(NodeId=[${nodes.join(',')}])`;
         return this.get<TEvTabletStateResponse>(
             this.getPath('/viewer/json/tabletinfo'),
             {
+                database,
                 filter,
                 path,
                 enums: true,
@@ -267,10 +267,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId, requestConfig: {signal}},
         );
     }
-    getSchema({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
+    getSchema(
+        {path, database}: {path: string; database: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
+                database,
                 path,
                 enums: true,
                 backup: false,
@@ -283,10 +287,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId, requestConfig: {signal}},
         );
     }
-    getDescribe({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
+    getDescribe(
+        {path, database}: {path: string; database: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
+                database,
                 path,
                 enums: true,
                 partition_stats: true,
@@ -295,20 +303,28 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId: concurrentId || `getDescribe|${path}`, requestConfig: {signal}},
         );
     }
-    getSchemaAcl({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
+    getSchemaAcl(
+        {path, database}: {path: string; database: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<TMetaInfo>(
             this.getPath('/viewer/json/acl'),
             {
+                database,
                 path,
                 merge_rules: true,
             },
-            {concurrentId: concurrentId || `getSchemaAcl`, requestConfig: {signal}},
+            {concurrentId, requestConfig: {signal}},
         );
     }
-    getHeatmapData({path}: {path: string}, {concurrentId, signal}: AxiosOptions = {}) {
+    getHeatmapData(
+        {path, database}: {path: string; database: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
+                database,
                 path,
                 enums: true,
                 backup: false,
@@ -319,29 +335,37 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId, requestConfig: {signal}},
         );
     }
-    getNetwork(path: string, {concurrentId, signal}: AxiosOptions = {}) {
+    getNetwork(
+        {path, database}: {path: string; database: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<TNetInfo>(
             this.getPath('/viewer/json/netinfo'),
             {
                 enums: true,
+                database,
                 path,
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
-    getTopic({path}: {path?: string}, {concurrentId, signal}: AxiosOptions = {}) {
+    getTopic(
+        {path, database}: {path?: string; database?: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<DescribeTopicResult>(
             this.getPath('/viewer/json/describe_topic'),
             {
                 enums: true,
                 include_stats: true,
+                database,
                 path,
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
     getConsumer(
-        {path, consumer}: {path: string; consumer: string},
+        {path, consumer, database}: {path: string; consumer: string; database?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<DescribeConsumerResult>(
@@ -349,20 +373,11 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {
                 enums: true,
                 include_stats: true,
+                database,
                 path,
                 consumer,
             },
             {concurrentId: concurrentId || 'getConsumer', requestConfig: {signal}},
-        );
-    }
-    getPoolInfo(poolName: string, {concurrentId, signal}: AxiosOptions = {}) {
-        return this.get<TStorageInfo>(
-            this.getPath('/viewer/json/storage'),
-            {
-                pool: poolName,
-                enums: true,
-            },
-            {concurrentId, requestConfig: {signal}},
         );
     }
     getTablet({id}: {id?: string}, {concurrentId, signal}: AxiosOptions = {}) {
@@ -487,10 +502,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {},
         );
     }
-    getHotKeys(path: string, enableSampling: boolean, {concurrentId, signal}: AxiosOptions = {}) {
+    getHotKeys(
+        {path, database, enableSampling}: {path: string; database: string; enableSampling: boolean},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<JsonHotKeysResponse>(
             this.getPath('/viewer/json/hotkeys'),
             {
+                database,
                 path,
                 enable_sampling: enableSampling,
             },
@@ -503,7 +522,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     ) {
         return this.get<HealthCheckAPIResponse>(
             this.getPath('/viewer/json/healthcheck?merge_records=true'),
-            {tenant: database, max_level: maxLevel},
+            {database, tenant: database, max_level: maxLevel},
             {concurrentId, requestConfig: {signal}},
         );
     }
@@ -608,14 +627,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
-    /** @deprecated use localStorage instead */
-    postSetting(settingsApi: string, name: string, value: string) {
-        return this.request({
-            method: 'PATCH',
-            url: settingsApi,
-            data: {[name]: value},
-        });
-    }
     authenticate(user: string, password: string) {
         return this.post(
             this.getPath('/login'),
@@ -649,7 +660,10 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         });
     }
 
-    createSchemaDirectory(database: string, path: string, {signal}: {signal?: AbortSignal} = {}) {
+    createSchemaDirectory(
+        {database, path}: {database: string; path: string},
+        {signal}: {signal?: AbortSignal} = {},
+    ) {
         return this.post<{test: string}>(
             this.getPath('/scheme/directory'),
             {},

@@ -41,13 +41,13 @@ export const heatmapApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getHeatmapTabletsInfo: builder.query({
             queryFn: async (
-                {nodes, path}: IHeatmapApiRequestParams,
+                {nodes, path, database}: IHeatmapApiRequestParams,
                 {signal, getState, dispatch},
             ) => {
                 try {
                     const response = await Promise.all([
-                        window.api.getTabletsInfo({nodes, path}, {signal}),
-                        window.api.getHeatmapData({path}, {signal}),
+                        window.api.getTabletsInfo({nodes, path, database}, {signal}),
+                        window.api.getHeatmapData({path, database}, {signal}),
                     ]);
                     const data = transformResponse(response);
 

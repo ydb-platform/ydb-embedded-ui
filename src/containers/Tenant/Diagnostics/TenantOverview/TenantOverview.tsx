@@ -46,7 +46,7 @@ export function TenantOverview({
     const tenantType = mapDatabaseTypeToDBName(Type);
 
     // FIXME: remove after correct data is added to tenantInfo
-    const {data: tenantSchemaData} = useGetSchemaQuery({path: tenantName});
+    const {data: tenantSchemaData} = useGetSchemaQuery({path: tenantName, database: tenantName});
     const {Tables, Topics} =
         tenantSchemaData?.PathDescription?.DomainDescription?.DiskSpaceUsage || {};
 

@@ -116,13 +116,13 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Network tenantName={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.describe: {
-                return <Describe path={path} type={type} />;
+                return <Describe path={path} database={tenantName} type={type} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.hotKeys: {
-                return <HotKeys path={path} />;
+                return <HotKeys path={path} database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.graph: {
-                return <Heatmap path={path} />;
+                return <Heatmap path={path} database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.consumers: {
                 return <Consumers path={path} type={type} />;

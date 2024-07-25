@@ -36,7 +36,10 @@ export function SchemaTree(props: SchemaTreeProps) {
         let schemaData: TEvDescribeSchemeResult | undefined;
         do {
             const promise = dispatch(
-                schemaApi.endpoints.getSchema.initiate({path}, {forceRefetch: true}),
+                schemaApi.endpoints.getSchema.initiate(
+                    {path, database: rootPath},
+                    {forceRefetch: true},
+                ),
             );
             const {data, originalArgs} = await promise;
             promise.unsubscribe();
@@ -94,6 +97,7 @@ export function SchemaTree(props: SchemaTreeProps) {
             <CreateDirectoryDialog
                 onClose={handleCloseDialog}
                 open={createDirectoryOpen}
+                database={rootPath}
                 parentPath={parentPath}
                 onSuccess={handleSuccessSubmit}
             />

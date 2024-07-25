@@ -92,7 +92,7 @@ export function ObjectSummary({
         ignoreQueryPrefix: true,
     });
 
-    const {data: currentObjectData} = useGetSchemaQuery({path});
+    const {data: currentObjectData} = useGetSchemaQuery({path, database: tenantName});
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
     React.useEffect(() => {
@@ -280,7 +280,7 @@ export function ObjectSummary({
     const renderTabContent = () => {
         switch (summaryTab) {
             case TENANT_SUMMARY_TABS_IDS.acl: {
-                return <Acl path={path} />;
+                return <Acl path={path} database={tenantName} />;
             }
             case TENANT_SUMMARY_TABS_IDS.schema: {
                 return <SchemaViewer type={type} path={path} tenantName={tenantName} />;
@@ -401,6 +401,7 @@ export function ObjectSummary({
 function ObjectTree({tenantName, path}: {tenantName: string; path?: string}) {
     const {data: tenantData = {}, isLoading} = useGetSchemaQuery({
         path: tenantName,
+        database: tenantName,
     });
     const pathData = tenantData?.PathDescription?.Self;
 

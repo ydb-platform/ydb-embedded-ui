@@ -54,14 +54,15 @@ const getHotKeysColumns = (keyColumnsIds: string[] = []): Column<HotKey>[] => {
 };
 
 interface HotKeysProps {
+    database: string;
     path: string;
 }
 
-export function HotKeys({path}: HotKeysProps) {
-    const {currentData: data, isFetching, error} = hotKeysApi.useGetHotKeysQuery({path});
+export function HotKeys({path, database}: HotKeysProps) {
+    const {currentData: data, isFetching, error} = hotKeysApi.useGetHotKeysQuery({path, database});
     const loading = isFetching && data === undefined;
 
-    const {data: schemaData, isLoading: schemaLoading} = useGetSchemaQuery({path});
+    const {data: schemaData, isLoading: schemaLoading} = useGetSchemaQuery({path, database});
 
     const keyColumnsIds = schemaData?.PathDescription?.Table?.KeyColumnNames;
 
