@@ -1,5 +1,7 @@
 const path = require('path');
 
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+
 const srcRoot = path.resolve(__dirname, 'src');
 const uiKitRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/uikit');
 const uiKitIconsRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/icons');
@@ -21,6 +23,16 @@ module.exports = {
         if (env === 'production') {
             config.output.path = path.resolve(__dirname, 'build/');
         }
+        config.plugins.push(
+            new MonacoWebpackPlugin({
+                customLanguages: [
+                    {
+                        label: 'yql',
+                        entry: 'monaco-yql-languages/build/monaco.contribution',
+                    },
+                ],
+            }),
+        );
 
         return config;
     },
