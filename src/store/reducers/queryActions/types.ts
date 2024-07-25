@@ -1,4 +1,4 @@
-export type QueryActions = 'save' | 'idle';
+export type QueryActions = 'save' | 'idle' | 'settings';
 
 export interface QueryActionsState {
     queryName: string | null;

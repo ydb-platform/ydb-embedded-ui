@@ -15,19 +15,22 @@
     &__title,
     &__info,
     &__controls,
-    &__groups-title {
+    &__tabs {
         position: sticky;
         left: 0;
+    }
+
+    &__meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--g-spacing-4);
     }
 
     &__controls {
         display: flex;
         align-items: center;
         gap: var(--g-spacing-2);
-    }
-
-    &__auto-refresh-control {
-        margin-inline-start: auto;
     }
 
     &__tabs {

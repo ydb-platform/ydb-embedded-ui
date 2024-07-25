@@ -5,18 +5,21 @@ import {useHistory, useLocation} from 'react-router-dom';
 import {parseQuery} from '../../../../../routes';
 import {changeUserInput} from '../../../../../store/reducers/executeQuery';
 import {
+    setTopQueriesFilters,
+    topQueriesApi,
+} from '../../../../../store/reducers/executeTopQueries/executeTopQueries';
+import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGE,
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../../../store/reducers/tenant/constants';
-import {topQueriesApi} from '../../../../../store/reducers/tenantOverview/topQueries/tenantOverviewTopQueries';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {
+    TENANT_OVERVIEW_TOP_QUERUES_COLUMNS,
     TOP_QUERIES_COLUMNS_WIDTH_LS_KEY,
-    getTenantOverviewTopQueriesColumns,
 } from '../../TopQueries/getTopQueriesColumns';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
@@ -35,9 +38,9 @@ export function TopQueries({tenantName}: TopQueriesProps) {
     const query = parseQuery(location);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const columns = getTenantOverviewTopQueriesColumns();
+    const columns = TENANT_OVERVIEW_TOP_QUERUES_COLUMNS;
 
-    const {currentData, isFetching, error} = topQueriesApi.useGetOverviewTopQueriesQuery(
+    const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
         {database: tenantName},
         {pollingInterval: autoRefreshInterval},
     );
@@ -66,7 +69,10 @@ export function TopQueries({tenantName}: TopQueriesProps) {
 
     const title = getSectionTitle({
         entity: i18n('queries'),
-        postfix: i18n('by-cpu-time'),
+        postfix: i18n('by-cpu-time', {executionPeriod: i18n('executed-last-hour')}),
+        onClick: () => {
+            dispatch(setTopQueriesFilters({from: undefined, to: undefined}));
+        },
         link: getTenantPath({
             ...query,
             [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.topQueries,

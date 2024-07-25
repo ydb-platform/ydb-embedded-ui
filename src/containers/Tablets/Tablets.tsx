@@ -34,9 +34,10 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
             return i18n('Type');
         },
         render: ({row}) => {
+            const isFollower = row.Leader === false;
             return (
                 <span>
-                    {row.Type} {row.Leader ? '' : <Text color="secondary">follower</Text>}
+                    {row.Type} {isFollower ? <Text color="secondary">follower</Text> : ''}
                 </span>
             );
         },

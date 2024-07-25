@@ -19,6 +19,17 @@ export interface DateRangeValues {
     to?: string;
 }
 
+const DEFAULT_VALUE = {
+    start: {
+        value: 'now-1h',
+        type: 'relative',
+    },
+    end: {
+        value: 'now',
+        type: 'relative',
+    },
+} as const;
+
 interface DateRangeProps extends DateRangeValues {
     className?: string;
     onChange?: (value: DateRangeValues) => void;
@@ -45,7 +56,7 @@ export const DateRange = ({from, to, className, onChange}: DateRangeProps) => {
                 withPresets
                 className={b('range-input', {[getdatePickerSize(value)]: true})}
                 timeZone={timeZoneString}
-                value={value || null}
+                value={value || DEFAULT_VALUE}
                 allowNullableValues
                 size="m"
                 format={i18n('date-time-format')}
