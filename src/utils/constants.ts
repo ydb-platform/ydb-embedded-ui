@@ -144,3 +144,5 @@ export const IS_HOTKEYS_HELP_HIDDEN_KEY = 'isHotKeysHelpHidden';
 export const USE_SEPARATE_DISKS_PAGES_KEY = 'useSeparateDisksPages';
 
 export const USE_DIRECTORY_OPERATIONS = 'useDirectoryOperations';
+
+export const QUERY_SETTINGS = 'query_settings';

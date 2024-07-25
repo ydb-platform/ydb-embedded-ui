@@ -1,10 +1,11 @@
 import React from 'react';
 
-import {ChevronDown, PlayFill} from '@gravity-ui/icons';
+import {ChevronDown, Gear, PlayFill} from '@gravity-ui/icons';
 import type {ButtonView} from '@gravity-ui/uikit';
 import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
 
 import {LabelWithPopover} from '../../../../components/LabelWithPopover';
+import {QUERY_SETTINGS, useSetting} from '../../../../lib';
 import type {QueryAction, QueryMode} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {QUERY_MODES, QUERY_MODES_TITLES} from '../../../../utils/query';
@@ -43,6 +44,7 @@ const QueryModeSelectorOptions = {
 
 interface QueryEditorControlsProps {
     onRunButtonClick: (mode?: QueryMode) => void;
+    onSettingsButtonClick: () => void;
     runIsLoading: boolean;
     onExplainButtonClick: (mode?: QueryMode) => void;
     explainIsLoading: boolean;
@@ -54,14 +56,20 @@ interface QueryEditorControlsProps {
 
 export const QueryEditorControls = ({
     onRunButtonClick,
+    onSettingsButtonClick,
+    onUpdateQueryMode,
     runIsLoading,
     onExplainButtonClick,
     explainIsLoading,
     disabled,
-    onUpdateQueryMode,
     queryMode,
     highlightedAction,
 }: QueryEditorControlsProps) => {
+    const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
+    const runView: ButtonView | undefined = highlightedAction === 'execute' ? 'action' : undefined;
+    const explainView: ButtonView | undefined =
+        highlightedAction === 'explain' ? 'action' : undefined;
+
     const querySelectorMenuItems = React.useMemo(() => {
         return Object.entries(QueryModeSelectorOptions).map(([mode, {title, description}]) => {
             return {
@@ -80,10 +88,6 @@ export const QueryEditorControls = ({
         });
     }, [onUpdateQueryMode]);
 
-    const runView: ButtonView | undefined = highlightedAction === 'execute' ? 'action' : undefined;
-    const explainView: ButtonView | undefined =
-        highlightedAction === 'explain' ? 'action' : undefined;
-
     return (
         <div className={b()}>
             <div className={b('left')}>
@@ -94,6 +98,7 @@ export const QueryEditorControls = ({
                     disabled={disabled}
                     loading={runIsLoading}
                     view={runView}
+                    className={b('run-button')}
                 >
                     <Icon data={PlayFill} size={14} />
                     {'Run'}
@@ -108,25 +113,38 @@ export const QueryEditorControls = ({
                 >
                     Explain
                 </Button>
-                <div className={b('mode-selector')}>
-                    <DropdownMenu
-                        items={querySelectorMenuItems}
-                        popupProps={{
-                            className: b('mode-selector__popup'),
-                            qa: queryModeSelectorPopupQa,
-                        }}
-                        switcher={
-                            <Button className={b('mode-selector__button')} qa={queryModeSelectorQa}>
-                                <span className={b('mode-selector__button-content')}>
-                                    {`${i18n('controls.query-mode-selector_type')} ${
-                                        QueryModeSelectorOptions[queryMode].title
-                                    }`}
-                                    <Icon data={ChevronDown} />
-                                </span>
-                            </Button>
-                        }
-                    />
-                </div>
+                {useQuerySettings ? (
+                    <Button
+                        onClick={onSettingsButtonClick}
+                        loading={runIsLoading}
+                        className={b('gear-button')}
+                    >
+                        <Icon data={Gear} size={16} />
+                    </Button>
+                ) : (
+                    <div className={b('mode-selector')}>
+                        <DropdownMenu
+                            items={querySelectorMenuItems}
+                            popupProps={{
+                                className: b('mode-selector__popup'),
+                                qa: queryModeSelectorPopupQa,
+                            }}
+                            switcher={
+                                <Button
+                                    className={b('mode-selector__button')}
+                                    qa={queryModeSelectorQa}
+                                >
+                                    <span className={b('mode-selector__button-content')}>
+                                        {`${i18n('controls.query-mode-selector_type')} ${
+                                            QueryModeSelectorOptions[queryMode].title
+                                        }`}
+                                        <Icon data={ChevronDown} />
+                                    </span>
+                                </Button>
+                            }
+                        />
+                    </div>
+                )}
             </div>
             <SaveQuery isSaveButtonDisabled={disabled} />
         </div>

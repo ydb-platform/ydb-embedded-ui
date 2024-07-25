@@ -13,7 +13,7 @@ import {explainVersions} from '../../../../store/reducers/explainQuery/utils';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {LANGUAGE_S_EXPRESSION_ID} from '../../../../utils/monaco/s-expression/constants';
+import {S_EXPRESSION_LANGUAGE_ID} from '../../../../utils/monaco/constats';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 
@@ -141,7 +141,7 @@ export function ExplainResult(props) {
         const content = (
             <div className={b('ast')}>
                 <MonacoEditor
-                    language={LANGUAGE_S_EXPRESSION_ID}
+                    language={S_EXPRESSION_LANGUAGE_ID}
                     value={props.ast}
                     options={EDITOR_OPTIONS}
                     wrappingIndent="indent"

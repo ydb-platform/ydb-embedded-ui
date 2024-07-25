@@ -11,9 +11,61 @@ import type {
     QueryPlan,
     ScriptPlan,
 } from '../types/api/query';
-import type {IQueryResult, QueryMode} from '../types/store/query';
+import type {
+    IQueryResult,
+    IsolationLevel,
+    QueryMode,
+    StatisticsMode,
+    TracingLevel,
+} from '../types/store/query';
 
 import {isAxiosResponse, isNetworkError} from './response';
+
+export const ISOLATION_LEVELS = {
+    serializable: 'serializable-read-write',
+    stalero: 'stale-read-only',
+    onlinero: 'online-read-only',
+    snapshot: 'snapshot-read-only',
+} as const;
+
+export const ISOLATION_LEVELS_TITLES: Record<IsolationLevel, string> = {
+    [ISOLATION_LEVELS.serializable]: 'Serializable',
+    [ISOLATION_LEVELS.stalero]: 'Stale Read-Only',
+    [ISOLATION_LEVELS.onlinero]: 'Online Read-Only',
+    [ISOLATION_LEVELS.snapshot]: 'Snapshot Read-Only',
+} as const;
+
+export const STATISTICS_MODES = {
+    none: 'none',
+    basic: 'basic',
+    full: 'full',
+    profile: 'profile',
+} as const;
+
+export const STATISTICS_MODES_TITLES: Record<StatisticsMode, string> = {
+    [STATISTICS_MODES.none]: 'None',
+    [STATISTICS_MODES.full]: 'Full',
+    [STATISTICS_MODES.basic]: 'Basic',
+    [STATISTICS_MODES.profile]: 'Profile',
+} as const;
+
+export const TRACING_LEVELS = {
+    off: 'off',
+    toplevel: 'toplevel',
+    basic: 'basic',
+    detailed: 'detailed',
+    diagnostic: 'diagnostic',
+    trace: 'trace',
+} as const;
+
+export const TRACING_LEVELS_TITLES: Record<TracingLevel, string> = {
+    [TRACING_LEVELS.off]: 'Off',
+    [TRACING_LEVELS.toplevel]: 'TopLevel',
+    [TRACING_LEVELS.basic]: 'Basic',
+    [TRACING_LEVELS.detailed]: 'Detailed',
+    [TRACING_LEVELS.diagnostic]: 'Diagnostic',
+    [TRACING_LEVELS.trace]: 'Trace',
+} as const;
 
 export const QUERY_ACTIONS = {
     execute: 'execute',

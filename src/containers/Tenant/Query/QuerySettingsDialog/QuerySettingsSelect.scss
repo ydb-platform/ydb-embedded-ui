@@ -1,0 +1,19 @@
+.ydb-query-settings-select {
+    &__selector {
+        width: 100%;
+    }
+
+    &__popup {
+        max-width: 320px;
+    }
+
+    &__item-description {
+        white-space: pre-wrap;
+
+        color: var(--g-color-text-secondary);
+    }
+
+    &__item {
+        padding: var(--g-spacing-1) 0;
+    }
+}
