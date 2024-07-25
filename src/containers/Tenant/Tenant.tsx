@@ -74,7 +74,7 @@ export function Tenant(props: TenantProps) {
 
     const path = schema ?? tenantName;
 
-    const {data: currentItem, error, isLoading} = useGetSchemaQuery({path});
+    const {data: currentItem, error, isLoading} = useGetSchemaQuery({path, database: tenantName});
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
         currentItem?.PathDescription?.Self || {};
 

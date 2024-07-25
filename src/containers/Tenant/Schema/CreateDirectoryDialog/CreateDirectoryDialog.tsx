@@ -13,9 +13,10 @@ const b = cn('ydb-schema-create-directory-dialog');
 
 const relativePathInputId = 'relativePath';
 
-interface SchemaTreeProps {
+interface CreateDirectoryDialogProps {
     open: boolean;
     onClose: VoidFunction;
+    database: string;
     parentPath: string;
     onSuccess: (value: string) => void;
 }
@@ -30,7 +31,13 @@ function validateRelativePath(value: string) {
     return '';
 }
 
-export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: SchemaTreeProps) {
+export function CreateDirectoryDialog({
+    open,
+    onClose,
+    database,
+    parentPath,
+    onSuccess,
+}: CreateDirectoryDialogProps) {
     const [validationError, setValidationError] = React.useState('');
     const [relativePath, setRelativePath] = React.useState('');
     const [create, response] = schemaApi.useCreateDirectoryMutation();
@@ -54,7 +61,7 @@ export function CreateDirectoryDialog({open, onClose, parentPath, onSuccess}: Sc
     const handleSubmit = () => {
         const path = `${parentPath}/${relativePath}`;
         create({
-            database: parentPath,
+            database,
             path,
         })
             .unwrap()

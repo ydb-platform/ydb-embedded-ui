@@ -26,20 +26,21 @@ import {TopicInfo} from './TopicInfo';
 interface OverviewProps {
     type?: EPathType;
     path: string;
+    database: string;
 }
 
-function Overview({type, path}: OverviewProps) {
+function Overview({type, path, database}: OverviewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
     // shallowEqual prevents rerenders when new schema data is loaded
     const mergedChildrenPaths = useTypedSelector(
-        (state) => selectSchemaMergedChildrenPaths(state, path, type),
+        (state) => selectSchemaMergedChildrenPaths(state, path, type, database),
         shallowEqual,
     );
 
-    let paths: string[] | typeof skipToken = skipToken;
+    let paths: string[] = [];
     if (!isEntityWithMergedImpl) {
         paths = [path];
     } else if (mergedChildrenPaths) {
@@ -50,13 +51,13 @@ function Overview({type, path}: OverviewProps) {
         currentData,
         isFetching,
         error: overviewError,
-    } = overviewApi.useGetOverviewQuery(paths, {
+    } = overviewApi.useGetOverviewQuery(paths.length ? {paths, database} : skipToken, {
         pollingInterval: autoRefreshInterval,
     });
     const overviewLoading = isFetching && currentData === undefined;
     const {data: rawData, additionalData} = currentData || {};
 
-    const {error: schemaError} = useGetSchemaQuery({path});
+    const {error: schemaError} = useGetSchemaQuery({path, database});
 
     const entityLoading = overviewLoading;
     const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;

@@ -20,28 +20,32 @@ const expandMap = new Map();
 
 interface IDescribeProps {
     path: string;
+    database: string;
     type?: EPathType;
 }
 
-const Describe = ({path, type}: IDescribeProps) => {
+const Describe = ({path, database, type}: IDescribeProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
 
     const mergedChildrenPaths = useTypedSelector(
-        (state) => selectSchemaMergedChildrenPaths(state, path, type),
+        (state) => selectSchemaMergedChildrenPaths(state, path, type, database),
         shallowEqual,
     );
 
-    let paths: string[] | typeof skipToken = skipToken;
+    let paths: string[] = [];
     if (!isEntityWithMergedImpl) {
         paths = [path];
     } else if (mergedChildrenPaths) {
         paths = [path, ...mergedChildrenPaths];
     }
-    const {currentData, isFetching, error} = describeApi.useGetDescribeQuery(paths, {
-        pollingInterval: autoRefreshInterval,
-    });
+    const {currentData, isFetching, error} = describeApi.useGetDescribeQuery(
+        paths.length ? {paths, database} : skipToken,
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
     const loading = isFetching && currentData === undefined;
     const currentDescribe = currentData;
 

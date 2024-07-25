@@ -36,7 +36,11 @@ function DetailedOverview(props: DetailedOverviewProps) {
 
     return (
         <div className={b()}>
-            {isTenant ? renderTenantOverview() : <Overview type={type} path={path} />}
+            {isTenant ? (
+                renderTenantOverview()
+            ) : (
+                <Overview type={type} path={path} database={tenantName} />
+            )}
         </div>
     );
 }

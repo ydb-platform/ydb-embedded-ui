@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type {Reducer, Selector} from '@reduxjs/toolkit';
+import type {Reducer} from '@reduxjs/toolkit';
 import {createSelector} from '@reduxjs/toolkit';
 
 import {isEntityWithMergedImplementation} from '../../../containers/Tenant/utils/schema';
@@ -46,7 +46,7 @@ export const schemaApi = api.injectEndpoints({
         createDirectory: builder.mutation<unknown, {database: string; path: string}>({
             queryFn: async ({database, path}, {signal}) => {
                 try {
-                    const data = await window.api.createSchemaDirectory(database, path, {signal});
+                    const data = await window.api.createSchemaDirectory({database, path}, {signal});
                     return {data};
                 } catch (error) {
                     return {error};
@@ -55,20 +55,19 @@ export const schemaApi = api.injectEndpoints({
         }),
         getSchema: builder.query<
             {[path: string]: TEvDescribeSchemeResult & {partial?: boolean}},
-            {path: string}
+            {path: string; database: string}
         >({
-            queryFn: async ({path}, {signal}) => {
+            queryFn: async ({path, database}, {signal}) => {
                 try {
-                    const data = await window.api.getSchema({path}, {signal});
+                    const data = await window.api.getSchema({path, database}, {signal});
                     return {data: data ? {[path]: data, ...getSchemaChildren(data)} : {}};
                 } catch (error) {
                     return {error};
                 }
             },
             keepUnusedDataFor: Infinity,
-            serializeQueryArgs: ({queryArgs: {path}}) => {
-                const parts = path.split('/');
-                return {path: parts[0] || parts[1]};
+            serializeQueryArgs: ({queryArgs: {database}}) => {
+                return {database};
             },
             merge: (existing, incoming, {arg: {path}}) => {
                 const {[path]: data, ...children} = incoming;
@@ -99,28 +98,25 @@ function getSchemaChildren(data: TEvDescribeSchemeResult) {
 
 const getSchemaSelector = createSelector(
     (path: string) => path,
-    (path) => schemaApi.endpoints.getSchema.select({path}),
+    (_path: string, database: string) => database,
+    (path, database) => schemaApi.endpoints.getSchema.select({path, database}),
 );
 
 const selectGetSchema = createSelector(
     (state: RootState) => state,
     (_state: RootState, path: string) => path,
-    (_state: RootState, path: string) => getSchemaSelector(path),
+    (_state: RootState, path: string, database: string) => getSchemaSelector(path, database),
     (state, path, selectTabletsInfo) => selectTabletsInfo(state).data?.[path],
 );
 
-const selectSchemaChildren = (state: RootState, path: string) =>
-    selectGetSchema(state, path)?.PathDescription?.Children;
+const selectSchemaChildren = (state: RootState, path: string, database: string) =>
+    selectGetSchema(state, path, database)?.PathDescription?.Children;
 
-export const selectSchemaMergedChildrenPaths: Selector<
-    RootState,
-    string[] | undefined,
-    [string | undefined, EPathType | undefined]
-> = createSelector(
+export const selectSchemaMergedChildrenPaths = createSelector(
     [
         (_, path: string) => path,
         (_, _path, type: EPathType | undefined) => type,
-        selectSchemaChildren,
+        (state, path, _type, database: string) => selectSchemaChildren(state, path, database),
     ],
     (path, type, children) => {
         return isEntityWithMergedImplementation(type)
@@ -129,8 +125,8 @@ export const selectSchemaMergedChildrenPaths: Selector<
     },
 );
 
-export function useGetSchemaQuery({path}: {path: string}) {
-    const {currentData, isFetching, error, refetch} = schemaApi.useGetSchemaQuery({path});
+export function useGetSchemaQuery({path, database}: {path: string; database: string}) {
+    const {currentData, isFetching, error, refetch} = schemaApi.useGetSchemaQuery({path, database});
 
     const data = currentData?.[path];
     const isLoading = isFetching && data === undefined;

@@ -37,7 +37,7 @@ interface SchemaViewerProps {
 }
 
 export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaViewerProps) => {
-    const {data: schemaData, isLoading: loading} = useGetSchemaQuery({path});
+    const {data: schemaData, isLoading: loading} = useGetSchemaQuery({path, database: tenantName});
 
     const viewSchemaRequestParams = isViewType(type) ? {path, database: tenantName} : skipToken;
 

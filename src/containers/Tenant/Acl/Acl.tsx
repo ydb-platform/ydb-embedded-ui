@@ -127,8 +127,8 @@ function getOwnerItem(owner?: string): DefinitionListItem[] {
     ];
 }
 
-export const Acl = ({path}: {path: string}) => {
-    const {currentData, isFetching, error} = schemaAclApi.useGetSchemaAclQuery({path});
+export const Acl = ({path, database}: {path: string; database: string}) => {
+    const {currentData, isFetching, error} = schemaAclApi.useGetSchemaAclQuery({path, database});
 
     const loading = isFetching && !currentData;
 
