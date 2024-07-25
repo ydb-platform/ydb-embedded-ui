@@ -5,6 +5,7 @@ import {cn} from '../../utils/cn';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
+import {useTypedSelector} from '../../utils/hooks';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer/InfoViewer';
@@ -21,12 +22,15 @@ interface GetPDiskInfoOptions<T extends PreparedPDisk> {
     pDisk?: T;
     nodeId?: number | string | null;
     isPDiskPage?: boolean;
+    isUserAllowedToMakeChanges?: boolean;
 }
 
+// eslint-disable-next-line complexity
 function getPDiskInfo<T extends PreparedPDisk>({
     pDisk,
     nodeId,
     isPDiskPage = false,
+    isUserAllowedToMakeChanges,
 }: GetPDiskInfoOptions<T>) {
     const {
         PDiskId,
@@ -142,7 +146,12 @@ function getPDiskInfo<T extends PreparedPDisk>({
 
     const additionalInfo: InfoViewerItem[] = [];
 
-    if (valueIsDefined(PDiskId) && valueIsDefined(nodeId)) {
+    const shouldDisplayLinks =
+        (!isPDiskPage || isUserAllowedToMakeChanges) &&
+        valueIsDefined(PDiskId) &&
+        valueIsDefined(nodeId);
+
+    if (shouldDisplayLinks) {
         const pDiskPagePath = getPDiskPagePath(PDiskId, nodeId);
         const pDiskInternalViewerPath = createPDiskDeveloperUILink({
             nodeId,
@@ -160,10 +169,12 @@ function getPDiskInfo<T extends PreparedPDisk>({
                             external={false}
                         />
                     )}
-                    <LinkWithIcon
-                        title={pDiskInfoKeyset('developer-ui')}
-                        url={pDiskInternalViewerPath}
-                    />
+                    {isUserAllowedToMakeChanges && (
+                        <LinkWithIcon
+                            title={pDiskInfoKeyset('developer-ui')}
+                            url={pDiskInternalViewerPath}
+                        />
+                    )}
                 </span>
             ),
         });
@@ -182,21 +193,24 @@ export function PDiskInfo<T extends PreparedPDisk>({
     isPDiskPage = false,
     className,
 }: PDiskInfoProps<T>) {
+    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
+
     const [generalInfo, statusInfo, spaceInfo, additionalInfo] = getPDiskInfo({
         pDisk,
         nodeId,
         isPDiskPage,
+        isUserAllowedToMakeChanges,
     });
 
     return (
         <div className={b('wrapper', className)}>
             <div className={b('col')}>
-                <InfoViewer info={generalInfo} />
-                <InfoViewer info={spaceInfo} />
+                <InfoViewer info={generalInfo} renderEmptyState={() => null} />
+                <InfoViewer info={spaceInfo} renderEmptyState={() => null} />
             </div>
             <div className={b('col')}>
-                <InfoViewer info={statusInfo} />
-                <InfoViewer info={additionalInfo} />
+                <InfoViewer info={statusInfo} renderEmptyState={() => null} />
+                <InfoViewer info={additionalInfo} renderEmptyState={() => null} />
             </div>
         </div>
     );
