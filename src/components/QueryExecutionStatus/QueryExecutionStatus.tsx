@@ -1,8 +1,13 @@
-import {CircleCheck, CircleQuestionFill, CircleXmark} from '@gravity-ui/icons';
-import {Icon} from '@gravity-ui/uikit';
+import React from 'react';
+
+import {CircleCheck, CircleInfo, CircleQuestionFill, CircleXmark} from '@gravity-ui/icons';
+import {Icon, Tooltip} from '@gravity-ui/uikit';
 import {isAxiosError} from 'axios';
 
+import i18n from '../../containers/Tenant/Query/i18n';
+import {QUERY_SETTINGS, useSetting} from '../../lib';
 import {cn} from '../../utils/cn';
+import {useChangedQuerySettingsIndicator} from '../../utils/hooks/useChangedQuerySettingsIndicator';
 
 import './QueryExecutionStatus.scss';
 
@@ -16,6 +21,9 @@ interface QueryExecutionStatusProps {
 export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusProps) => {
     let icon: React.ReactNode;
     let label: string;
+
+    const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
+    const {isIndicatorShown, changedSettingsDescription} = useChangedQuerySettingsIndicator();
 
     if (isAxiosError(error) && error.code === 'ECONNABORTED') {
         icon = <Icon data={CircleQuestionFill} />;
@@ -35,6 +43,22 @@ export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusPro
         <div className={b(null, className)}>
             {icon}
             {label}
+            {isIndicatorShown && useQuerySettings ? (
+                <Tooltip
+                    openDelay={0}
+                    content={
+                        <div
+                            dangerouslySetInnerHTML={{
+                                __html: i18n('banner.query-settings.message', {
+                                    message: changedSettingsDescription,
+                                }),
+                            }}
+                        />
+                    }
+                >
+                    <Icon data={CircleInfo} className={b('query-settings-icon')} />
+                </Tooltip>
+            ) : null}
         </div>
     );
 };

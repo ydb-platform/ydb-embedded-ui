@@ -2,6 +2,9 @@ import DataTable from '@gravity-ui/react-data-table';
 import type {Settings} from '@gravity-ui/react-data-table';
 
 import {EType} from '../types/api/tablet';
+import type {QuerySettings} from '../types/store/query';
+
+import {ISOLATION_LEVELS, QUERY_MODES, STATISTICS_MODES, TRACING_LEVELS} from './query';
 
 const SECOND = 1000;
 
@@ -18,6 +21,7 @@ export const TERABYTE = 1_000_000_000_000;
 export const MINUTE_IN_SECONDS = 60;
 export const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
 export const DAY_IN_SECONDS = 24 * HOUR_IN_SECONDS;
+export const WEEK_IN_SECONDS = 7 * DAY_IN_SECONDS;
 
 export const MS_IN_NANOSECONDS = 1000000;
 
@@ -118,7 +122,18 @@ export const TENANT_OVERVIEW_TABLES_SETTINGS = {
     dynamicRender: false,
 } as const;
 
-export const QUERY_INITIAL_MODE_KEY = 'query_initial_mode';
+export const DEFAULT_QUERY_SETTINGS: QuerySettings = {
+    queryMode: QUERY_MODES.script,
+    isolationLevel: ISOLATION_LEVELS.serializable,
+    timeout: '60',
+    statisticsMode: STATISTICS_MODES.none,
+    tracingLevel: TRACING_LEVELS.detailed,
+};
+
+export const QUERY_EXECUTION_SETTINGS_KEY = 'queryExecutionSettings';
+export const LAST_QUERY_EXECUTION_SETTINGS_KEY = 'last_query_execution_settings';
+export const QUERY_SETTINGS_BANNER_LAST_CLOSED_KEY = 'querySettingsBannerLastClosed';
+
 export const LAST_USED_QUERY_ACTION_KEY = 'last_used_query_action';
 
 export const PARTITIONS_HIDDEN_COLUMNS_KEY = 'partitionsHiddenColumns';

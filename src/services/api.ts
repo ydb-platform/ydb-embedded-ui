@@ -18,7 +18,16 @@ import type {TNetInfo} from '../types/api/netInfo';
 import type {TNodesInfo} from '../types/api/nodes';
 import type {TEvNodesInfo} from '../types/api/nodesList';
 import type {TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
-import type {Actions, ErrorResponse, QueryAPIResponse, Schemas} from '../types/api/query';
+import type {
+    Actions,
+    ErrorResponse,
+    QueryAPIResponse,
+    Schemas,
+    Stats,
+    Timeout,
+    TracingLevel,
+    TransactionMode,
+} from '../types/api/query';
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/render';
 import type {RestartPDiskResponse} from '../types/api/restartPDisk';
 import type {TEvDescribeSchemeResult} from '../types/api/schema';
@@ -434,9 +443,12 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             query?: string;
             database?: string;
             action?: Action;
-            stats?: string;
             schema?: Schema;
             syntax?: QuerySyntax;
+            stats?: Stats;
+            tracingLevel?: TracingLevel;
+            transaction_mode?: TransactionMode;
+            timeout?: Timeout;
         },
         {concurrentId, signal, withRetries}: AxiosOptions = {},
     ) {
@@ -468,6 +480,11 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                     signal,
                     'axios-retry': {retries: withRetries ? this.DEFAULT_RETRIES_COUNT : 0},
                 },
+                headers: params.tracingLevel
+                ? {
+                      'X-Trace-Verbosity': params.tracingLevel,
+                  }
+                : undefined,
             },
         );
     }

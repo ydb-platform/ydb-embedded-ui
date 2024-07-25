@@ -1,10 +1,11 @@
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
+import {DEFAULT_QUERY_SETTINGS} from '../../../lib';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import type {QueryMode} from '../../../types/store/query';
+import type {QueryMode, QuerySettings} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
 import i18n from '../i18n';
 
@@ -27,7 +28,7 @@ import {
 } from './queryTemplates';
 
 interface ActionsAdditionalEffects {
-    setQueryMode: (mode: QueryMode) => void;
+    setQueryExecutionSettings: (settings: QuerySettings) => void;
     setActivePath: (path: string) => void;
     showCreateDirectoryDialog?: (path: string) => void;
 }
@@ -37,11 +38,11 @@ const bindActions = (
     dispatch: React.Dispatch<any>,
     additionalEffects: ActionsAdditionalEffects,
 ) => {
-    const {setActivePath, setQueryMode, showCreateDirectoryDialog} = additionalEffects;
+    const {setActivePath, setQueryExecutionSettings, showCreateDirectoryDialog} = additionalEffects;
 
     const inputQuery = (tmpl: (path: string) => string, mode?: QueryMode) => () => {
         if (mode) {
-            setQueryMode(mode);
+            setQueryExecutionSettings({...DEFAULT_QUERY_SETTINGS, queryMode: mode});
         }
 
         dispatch(changeUserInput({input: tmpl(path)}));

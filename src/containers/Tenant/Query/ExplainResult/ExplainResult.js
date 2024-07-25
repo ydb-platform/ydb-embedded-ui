@@ -9,19 +9,20 @@ import EnableFullscreenButton from '../../../../components/EnableFullscreenButto
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
+import {QUERY_SETTINGS} from '../../../../lib';
 import {explainVersions} from '../../../../store/reducers/explainQuery/utils';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {cn} from '../../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {S_EXPRESSION_LANGUAGE_ID} from '../../../../utils/monaco/constats';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
+import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 
 import {renderExplainNode} from './utils';
 
 import './ExplainResult.scss';
 import 'react-json-inspector/json-inspector.css';
-
 const b = cn('ydb-query-explain-result');
 
 const EDITOR_OPTIONS = {
@@ -77,8 +78,9 @@ function GraphRoot(props) {
 export function ExplainResult(props) {
     const dispatch = useTypedDispatch();
     const [activeOption, setActiveOption] = React.useState(ExplainOptionIds.schema);
-
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
+
+    const [useQuerySettings] = useSetting(QUERY_SETTINGS);
 
     React.useEffect(() => {
         return () => {
@@ -258,6 +260,7 @@ export function ExplainResult(props) {
                     </React.Fragment>
                 )}
             </div>
+            {useQuerySettings ? <QuerySettingsBanner /> : null}
             <div className={b('result')}>{renderContent()}</div>
         </React.Fragment>
     );

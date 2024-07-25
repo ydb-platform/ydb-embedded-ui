@@ -8,7 +8,7 @@ import {NavigationTree} from 'ydb-ui-components';
 import {USE_DIRECTORY_OPERATIONS} from '../../../../lib';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {useQueryModes, useSetting, useTypedDispatch} from '../../../../utils/hooks';
+import {useQueryExecutionSettings, useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 import {getControls} from '../../utils/schemaControls';
@@ -27,7 +27,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
     const dispatch = useTypedDispatch();
 
-    const [_, setQueryMode] = useQueryModes();
+    const [_, setQueryExecutionSettings] = useQueryExecutionSettings();
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parentPath, setParentPath] = React.useState('');
     const [schemaTreeKey, setSchemaTreeKey] = React.useState('');
@@ -112,7 +112,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 fetchPath={fetchPath}
                 getActions={getActions(dispatch, {
                     setActivePath: onActivePathUpdate,
-                    setQueryMode,
+                    setQueryExecutionSettings,
                     showCreateDirectoryDialog: useDirectoryActions
                         ? handleOpenCreateDirectoryDialog
                         : undefined,

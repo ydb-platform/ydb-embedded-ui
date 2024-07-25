@@ -2,15 +2,19 @@ import React from 'react';
 
 import {ChevronDown, Gear, PlayFill} from '@gravity-ui/icons';
 import type {ButtonView} from '@gravity-ui/uikit';
-import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
+import {Button, DropdownMenu, Icon, Tooltip} from '@gravity-ui/uikit';
 
 import {LabelWithPopover} from '../../../../components/LabelWithPopover';
-import {QUERY_SETTINGS, useSetting} from '../../../../lib';
-import type {QueryAction, QueryMode} from '../../../../types/store/query';
+import {DEFAULT_QUERY_SETTINGS, QUERY_SETTINGS, useSetting} from '../../../../lib';
+import type {QueryAction, QueryMode, QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {useQueryExecutionSettings} from '../../../../utils/hooks';
 import {QUERY_MODES, QUERY_MODES_TITLES} from '../../../../utils/query';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
+
+import getChangedQueryExecutionSettings from './utils/getChangedQueryExecutionSettings';
+import getChangedQueryExecutionSettingsDescription from './utils/getChangedQueryExecutionSettingsDescription';
 
 import './QueryEditorControls.scss';
 
@@ -43,14 +47,14 @@ const QueryModeSelectorOptions = {
 } as const;
 
 interface QueryEditorControlsProps {
-    onRunButtonClick: (mode?: QueryMode) => void;
+    onRunButtonClick: (querySettings: QuerySettings) => void;
     onSettingsButtonClick: () => void;
     runIsLoading: boolean;
-    onExplainButtonClick: (mode?: QueryMode) => void;
+    onExplainButtonClick: (querySettings: QuerySettings) => void;
     explainIsLoading: boolean;
     disabled: boolean;
     onUpdateQueryMode: (mode: QueryMode) => void;
-    queryMode: QueryMode;
+    querySettings: QuerySettings;
     highlightedAction: QueryAction;
 }
 
@@ -62,10 +66,23 @@ export const QueryEditorControls = ({
     onExplainButtonClick,
     explainIsLoading,
     disabled,
-    queryMode,
+    querySettings,
     highlightedAction,
 }: QueryEditorControlsProps) => {
     const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
+    const [queryExecutionSettings] = useQueryExecutionSettings();
+
+    const changedSettings = React.useMemo(() => {
+        return getChangedQueryExecutionSettings(queryExecutionSettings, DEFAULT_QUERY_SETTINGS);
+    }, [queryExecutionSettings]);
+
+    const changedSettingsDescription = React.useMemo(() => {
+        return getChangedQueryExecutionSettingsDescription({
+            currentSettings: queryExecutionSettings,
+            defaultSettings: DEFAULT_QUERY_SETTINGS,
+        });
+    }, [queryExecutionSettings]);
+
     const runView: ButtonView | undefined = highlightedAction === 'execute' ? 'action' : undefined;
     const explainView: ButtonView | undefined =
         highlightedAction === 'explain' ? 'action' : undefined;
@@ -88,12 +105,20 @@ export const QueryEditorControls = ({
         });
     }, [onUpdateQueryMode]);
 
+    const extraGearProps =
+        changedSettings.length > 0
+            ? ({
+                  view: 'outlined-info',
+                  selected: true,
+              } as const)
+            : {};
+
     return (
         <div className={b()}>
             <div className={b('left')}>
                 <Button
                     onClick={() => {
-                        onRunButtonClick(queryMode);
+                        onRunButtonClick(querySettings);
                     }}
                     disabled={disabled}
                     loading={runIsLoading}
@@ -105,7 +130,7 @@ export const QueryEditorControls = ({
                 </Button>
                 <Button
                     onClick={() => {
-                        onExplainButtonClick(queryMode);
+                        onExplainButtonClick(querySettings);
                     }}
                     disabled={disabled}
                     loading={explainIsLoading}
@@ -114,13 +139,34 @@ export const QueryEditorControls = ({
                     Explain
                 </Button>
                 {useQuerySettings ? (
-                    <Button
-                        onClick={onSettingsButtonClick}
-                        loading={runIsLoading}
-                        className={b('gear-button')}
+                    <Tooltip
+                        disabled={changedSettings.length === 0}
+                        content={
+                            <span
+                                dangerouslySetInnerHTML={{
+                                    __html: i18n('gear.tooltip', {
+                                        changesText: changedSettingsDescription,
+                                    }),
+                                }}
+                            />
+                        }
+                        openDelay={0}
+                        placement={['top-start']}
                     >
-                        <Icon data={Gear} size={16} />
-                    </Button>
+                        <Button
+                            onClick={onSettingsButtonClick}
+                            loading={runIsLoading}
+                            className={b('gear-button')}
+                            {...extraGearProps}
+                        >
+                            <Icon data={Gear} size={16} />
+                            {changedSettings.length > 0 ? (
+                                <div className={b('changed-settings')}>
+                                    ({changedSettings.length})
+                                </div>
+                            ) : null}
+                        </Button>
+                    </Tooltip>
                 ) : (
                     <div className={b('mode-selector')}>
                         <DropdownMenu
@@ -136,7 +182,7 @@ export const QueryEditorControls = ({
                                 >
                                     <span className={b('mode-selector__button-content')}>
                                         {`${i18n('controls.query-mode-selector_type')} ${
-                                            QueryModeSelectorOptions[queryMode].title
+                                            QueryModeSelectorOptions[querySettings.queryMode].title
                                         }`}
                                         <Icon data={ChevronDown} />
                                     </span>

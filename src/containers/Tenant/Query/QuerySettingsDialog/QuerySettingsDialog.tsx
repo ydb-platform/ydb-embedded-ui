@@ -7,65 +7,43 @@ import {
     selectQueryAction,
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
-import type {
-    IsolationLevel,
-    QueryMode,
-    StatisticsMode,
-    TracingLevel,
-} from '../../../../types/store/query';
+import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {
-    ISOLATION_LEVELS,
-    QUERY_MODES,
-    STATISTICS_MODES,
-    TRACING_LEVELS,
-} from '../../../../utils/query';
+    useQueryExecutionSettings,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../../../utils/hooks';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
-import {
-    ISOLATION_LEVEL_SELECT_OPTIONS,
-    QUERY_MODE_SELECT_OPTIONS,
-    STATISTICS_MODE_SELECT_OPTIONS,
-    TRACING_LEVEL_SELECT_OPTIONS,
-} from './constants';
+import {QUERY_SETTINGS_FIELD_SETTINGS} from './constants';
 import i18n from './i18n';
 
 import './QuerySettingsDialog.scss';
 
 const b = cn('ydb-query-settings-dialog');
 
-type FormValues = {
-    queryMode: QueryMode;
-    timeout: string;
-    isolationLevel: IsolationLevel;
-    statisticsMode: StatisticsMode;
-    tracingLevel: TracingLevel;
-};
-
 export function QuerySettingsDialog() {
     const dispatch = useTypedDispatch();
     const queryAction = useTypedSelector(selectQueryAction);
-    const {control, handleSubmit, reset} = useForm<FormValues>({
-        defaultValues: {
-            queryMode: QUERY_MODES.script,
-            timeout: '60',
-            isolationLevel: ISOLATION_LEVELS.serializable,
-            statisticsMode: STATISTICS_MODES.none,
-            tracingLevel: TRACING_LEVELS.detailed,
-        },
+    const [querySettings, setQuerySettings] = useQueryExecutionSettings();
+    const {control, handleSubmit, reset} = useForm<QuerySettings>({
+        defaultValues: querySettings,
     });
 
-    const onCloseDialog = () => {
+    const onCloseDialog = React.useCallback(() => {
         dispatch(setQueryAction('idle'));
         reset();
-    };
+    }, [dispatch, reset]);
 
-    const onSaveClick = (data: FormValues) => {
-        console.log('Form Data:', data);
-        // dispatch(saveQuerySettings(data));
-        onCloseDialog();
-    };
+    const onSaveClick = React.useCallback(
+        (data: QuerySettings) => {
+            setQuerySettings(data);
+            reset(data);
+            onCloseDialog();
+        },
+        [onCloseDialog, reset, setQuerySettings],
+    );
 
     return (
         <Dialog
@@ -80,7 +58,7 @@ export function QuerySettingsDialog() {
                 <Dialog.Body className={b('dialog-body')}>
                     <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                         <label htmlFor="queryMode" className={b('field-title')}>
-                            {i18n('form.query-mode')}
+                            {QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title}
                         </label>
                         <div className={b('control-wrapper')}>
                             <Controller
@@ -90,7 +68,9 @@ export function QuerySettingsDialog() {
                                     <QuerySettingsSelect
                                         setting={field.value}
                                         onUpdateSetting={field.onChange}
-                                        settingOptions={QUERY_MODE_SELECT_OPTIONS}
+                                        settingOptions={
+                                            QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options
+                                        }
                                     />
                                 )}
                             />
@@ -98,7 +78,7 @@ export function QuerySettingsDialog() {
                     </Flex>
                     <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                         <label htmlFor="timeout" className={b('field-title')}>
-                            {i18n('form.timeout')}
+                            {QUERY_SETTINGS_FIELD_SETTINGS.timeout.title}
                         </label>
                         <div className={b('control-wrapper')}>
                             <Controller
@@ -122,7 +102,7 @@ export function QuerySettingsDialog() {
                     </Flex>
                     <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                         <label htmlFor="tracingLevel" className={b('field-title')}>
-                            {i18n('form.tracing-level')}
+                            {QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title}
                         </label>
                         <div className={b('control-wrapper')}>
                             <Controller
@@ -132,7 +112,9 @@ export function QuerySettingsDialog() {
                                     <QuerySettingsSelect
                                         setting={field.value}
                                         onUpdateSetting={field.onChange}
-                                        settingOptions={TRACING_LEVEL_SELECT_OPTIONS}
+                                        settingOptions={
+                                            QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.options
+                                        }
                                     />
                                 )}
                             />
@@ -140,7 +122,7 @@ export function QuerySettingsDialog() {
                     </Flex>
                     <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                         <label htmlFor="isolationLevel" className={b('field-title')}>
-                            {i18n('form.isolation-level')}
+                            {QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.title}
                         </label>
                         <div className={b('control-wrapper')}>
                             <Controller
@@ -150,7 +132,9 @@ export function QuerySettingsDialog() {
                                     <QuerySettingsSelect
                                         setting={field.value}
                                         onUpdateSetting={field.onChange}
-                                        settingOptions={ISOLATION_LEVEL_SELECT_OPTIONS}
+                                        settingOptions={
+                                            QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.options
+                                        }
                                     />
                                 )}
                             />
@@ -158,7 +142,7 @@ export function QuerySettingsDialog() {
                     </Flex>
                     <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                         <label htmlFor="statisticsMode" className={b('field-title')}>
-                            {i18n('form.statistics-mode')}
+                            {QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title}
                         </label>
                         <div className={b('control-wrapper')}>
                             <Controller
@@ -168,7 +152,9 @@ export function QuerySettingsDialog() {
                                     <QuerySettingsSelect
                                         setting={field.value}
                                         onUpdateSetting={field.onChange}
-                                        settingOptions={STATISTICS_MODE_SELECT_OPTIONS}
+                                        settingOptions={
+                                            QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options
+                                        }
                                     />
                                 )}
                             />
