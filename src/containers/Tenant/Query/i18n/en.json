@@ -23,6 +23,23 @@
   "method-description.query": "Any query. An experimental API call supposed to replace all existing methods.\nAPI Call: query.ExecuteScript",
   "method-description.pg": "Queries in postgresql syntax.\nAPI call: query.ExecuteScript",
 
+  "isolation-level-description.serializable": "Provides the strictest isolation level for custom transactions",
+  "isolation-level-description.onlinero": "Each read operation in the transaction is reading the data that is most recent at execution time",
+  "isolation-level-description.stalero": "Read operations within a transaction may return results that are slightly out-of-date (lagging by fractions of a second)",
+  "isolation-level-description.snapshot": "All the read operations within a transaction access the database snapshot. All the data reads are consistent",
+
+  "tracing-level-description.basic": "Spans of main component operations",
+  "tracing-level-description.detailed": "Highest detail applicable for diagnosing problems in production",
+  "tracing-level-description.diagnostic": "Detailed debugging information for developers",
+  "tracing-level-description.off": "No tracing",
+  "tracing-level-description.toplevel": "Lowest detail, no more than two spans per request to the component",
+  "tracing-level-description.trace": "Very detailed debugging information",
+
+  "statistics-mode-description.none": "Don't collect statistics",
+  "statistics-mode-description.basic": "Collect statistics",
+  "statistics-mode-description.full": "Collect statistics and query plan",
+  "statistics-mode-description.profile": "Collect statistics for individual tasks",
+
   "query-duration.description": "Duration of server-side query execution",
 
   "action.send-query": "Send query",

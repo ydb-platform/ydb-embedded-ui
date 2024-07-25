@@ -1,0 +1,63 @@
+.ydb-query-settings-dialog {
+    &__dialog-row {
+        & + & {
+            margin-top: var(--g-text-body-1-line-height);
+        }
+    }
+
+    &__field-title {
+        flex: 4;
+
+        margin-right: var(--g-spacing-3);
+
+        font-weight: 500;
+        line-height: var(--g-text-header-2-line-height);
+        white-space: nowrap;
+    }
+
+    .g-dialog-footer__bts-wrapper {
+        width: 100%;
+    }
+
+    &__dialog-body {
+        padding-top: var(--g-spacing-6);
+    }
+
+    &__control-wrapper {
+        display: flex;
+        flex: 6;
+    }
+
+    &__timeout {
+        width: 33.3%;
+        margin-right: var(--g-spacing-2);
+    }
+
+    &__timeout-suffix {
+        display: flex;
+        align-items: center;
+
+        color: var(--g-color-text-secondary);
+    }
+
+    &__documentation-link {
+        display: flex;
+        align-items: center;
+
+        margin-left: var(--g-spacing-4);
+
+        color: var(--g-color-text-secondary);
+    }
+
+    &__buttons-container {
+        display: flex;
+        justify-content: space-between;
+
+        width: 100%;
+    }
+
+    &__main-buttons {
+        display: flex;
+        gap: 10px;
+    }
+}
