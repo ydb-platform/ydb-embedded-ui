@@ -2,12 +2,13 @@ import React from 'react';
 
 import {ChevronDown, Gear, PlayFill} from '@gravity-ui/icons';
 import type {ButtonView} from '@gravity-ui/uikit';
-import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
+import {Button, DropdownMenu, Icon, Tooltip} from '@gravity-ui/uikit';
 
 import {LabelWithPopover} from '../../../../components/LabelWithPopover';
 import {QUERY_SETTINGS, useSetting} from '../../../../lib';
-import type {QueryAction, QueryMode} from '../../../../types/store/query';
+import type {QueryAction, QueryMode, QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {QUERY_MODES, QUERY_MODES_TITLES} from '../../../../utils/query';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
@@ -42,15 +43,60 @@ const QueryModeSelectorOptions = {
     },
 } as const;
 
+interface SettingsButtonProps {
+    onClick: () => void;
+    runIsLoading: boolean;
+}
+
+const SettingsButton = ({onClick, runIsLoading}: SettingsButtonProps) => {
+    const {changedCurrentSettings, changedCurrentSettingsDescriptions} = useChangedQuerySettings();
+
+    const extraGearProps =
+        changedCurrentSettings.length > 0
+            ? ({view: 'outlined-info', selected: true} as const)
+            : null;
+
+    return (
+        <Tooltip
+            disabled={changedCurrentSettings.length === 0}
+            content={
+                <div className={b('message')}>
+                    {i18n('gear.tooltip')}
+                    {changedCurrentSettingsDescriptions.map((description, index, arr) => (
+                        <span key={index} className={b('description-item')}>
+                            {description}
+                            {index < arr.length - 1 ? ', ' : null}
+                        </span>
+                    ))}
+                </div>
+            }
+            openDelay={0}
+            placement={['top-start']}
+        >
+            <Button
+                onClick={onClick}
+                loading={runIsLoading}
+                className={b('gear-button')}
+                {...extraGearProps}
+            >
+                <Icon data={Gear} size={16} />
+                {extraGearProps ? (
+                    <div className={b('changed-settings')}>({changedCurrentSettings.length})</div>
+                ) : null}
+            </Button>
+        </Tooltip>
+    );
+};
+
 interface QueryEditorControlsProps {
-    onRunButtonClick: (mode?: QueryMode) => void;
+    onRunButtonClick: (querySettings: QuerySettings) => void;
     onSettingsButtonClick: () => void;
     runIsLoading: boolean;
-    onExplainButtonClick: (mode?: QueryMode) => void;
+    onExplainButtonClick: (querySettings: QuerySettings) => void;
     explainIsLoading: boolean;
     disabled: boolean;
     onUpdateQueryMode: (mode: QueryMode) => void;
-    queryMode: QueryMode;
+    querySettings: QuerySettings;
     highlightedAction: QueryAction;
 }
 
@@ -62,10 +108,11 @@ export const QueryEditorControls = ({
     onExplainButtonClick,
     explainIsLoading,
     disabled,
-    queryMode,
+    querySettings,
     highlightedAction,
 }: QueryEditorControlsProps) => {
     const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
+
     const runView: ButtonView | undefined = highlightedAction === 'execute' ? 'action' : undefined;
     const explainView: ButtonView | undefined =
         highlightedAction === 'explain' ? 'action' : undefined;
@@ -93,7 +140,7 @@ export const QueryEditorControls = ({
             <div className={b('left')}>
                 <Button
                     onClick={() => {
-                        onRunButtonClick(queryMode);
+                        onRunButtonClick(querySettings);
                     }}
                     disabled={disabled}
                     loading={runIsLoading}
@@ -105,7 +152,7 @@ export const QueryEditorControls = ({
                 </Button>
                 <Button
                     onClick={() => {
-                        onExplainButtonClick(queryMode);
+                        onExplainButtonClick(querySettings);
                     }}
                     disabled={disabled}
                     loading={explainIsLoading}
@@ -114,13 +161,7 @@ export const QueryEditorControls = ({
                     Explain
                 </Button>
                 {useQuerySettings ? (
-                    <Button
-                        onClick={onSettingsButtonClick}
-                        loading={runIsLoading}
-                        className={b('gear-button')}
-                    >
-                        <Icon data={Gear} size={16} />
-                    </Button>
+                    <SettingsButton onClick={onSettingsButtonClick} runIsLoading={runIsLoading} />
                 ) : (
                     <div className={b('mode-selector')}>
                         <DropdownMenu
@@ -136,7 +177,7 @@ export const QueryEditorControls = ({
                                 >
                                     <span className={b('mode-selector__button-content')}>
                                         {`${i18n('controls.query-mode-selector_type')} ${
-                                            QueryModeSelectorOptions[queryMode].title
+                                            QueryModeSelectorOptions[querySettings.queryMode].title
                                         }`}
                                         <Icon data={ChevronDown} />
                                     </span>

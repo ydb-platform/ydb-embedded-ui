@@ -46,5 +46,8 @@
   "action.send-selected-query": "Send selected query",
   "action.previous-query": "Previous query in history",
   "action.next-query": "Next query in history",
-  "action.save-query": "Save query"
+  "action.save-query": "Save query",
+
+  "gear.tooltip": "Query execution settings have been changed for ",
+  "banner.query-settings.message": "Query results are displayed for "
 }

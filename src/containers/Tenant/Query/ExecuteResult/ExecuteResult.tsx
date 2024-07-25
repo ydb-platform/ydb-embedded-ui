@@ -11,17 +11,19 @@ import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {YDBGraph} from '../../../../components/Graph/Graph';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
+import {QUERY_SETTINGS} from '../../../../lib';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
+import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {getPreparedResult} from '../utils/getPreparedResult';
 
 import {getPlan} from './utils';
@@ -57,9 +59,9 @@ export function ExecuteResult({
 }: ExecuteResultProps) {
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
-
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
+    const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
 
     const stats = data?.stats;
     const resultsSetsCount = data?.resultSets?.length;
@@ -238,7 +240,6 @@ export function ExecuteResult({
             <div className={b('controls')}>
                 <div className={b('controls-right')}>
                     <QueryExecutionStatus error={error} />
-
                     {stats && !error && (
                         <React.Fragment>
                             <QueryDuration duration={stats?.DurationUs} />
@@ -262,7 +263,7 @@ export function ExecuteResult({
                     />
                 </div>
             </div>
-
+            {useQuerySettings && <QuerySettingsBanner />}
             {renderResultSection()}
         </React.Fragment>
     );

@@ -10,6 +10,8 @@ import {
 } from '../../../../utils/query';
 import i18n from '../i18n';
 
+import formI18n from './i18n';
+
 export const ISOLATION_LEVEL_SELECT_OPTIONS = [
     {
         value: ISOLATION_LEVELS.serializable,
@@ -89,6 +91,16 @@ export const STATISTICS_MODE_SELECT_OPTIONS = [
 
 export const TRACING_LEVEL_SELECT_OPTIONS = [
     {
+        value: TRACING_LEVELS.off,
+        content: TRACING_LEVELS_TITLES[TRACING_LEVELS.off],
+        text: i18n('tracing-level-description.off'),
+    },
+    {
+        value: TRACING_LEVELS.toplevel,
+        content: TRACING_LEVELS_TITLES[TRACING_LEVELS.toplevel],
+        text: i18n('tracing-level-description.toplevel'),
+    },
+    {
         value: TRACING_LEVELS.basic,
         content: TRACING_LEVELS_TITLES[TRACING_LEVELS.basic],
         text: i18n('tracing-level-description.basic'),
@@ -105,18 +117,30 @@ export const TRACING_LEVEL_SELECT_OPTIONS = [
         text: i18n('tracing-level-description.diagnostic'),
     },
     {
-        value: TRACING_LEVELS.off,
-        content: TRACING_LEVELS_TITLES[TRACING_LEVELS.off],
-        text: i18n('tracing-level-description.off'),
-    },
-    {
-        value: TRACING_LEVELS.toplevel,
-        content: TRACING_LEVELS_TITLES[TRACING_LEVELS.toplevel],
-        text: i18n('tracing-level-description.toplevel'),
-    },
-    {
         value: TRACING_LEVELS.trace,
         content: TRACING_LEVELS_TITLES[TRACING_LEVELS.trace],
         text: i18n('tracing-level-description.trace'),
     },
 ];
+
+export const QUERY_SETTINGS_FIELD_SETTINGS = {
+    isolationLevel: {
+        title: formI18n('form.isolation-level'),
+        options: ISOLATION_LEVEL_SELECT_OPTIONS,
+    },
+    queryMode: {
+        title: formI18n('form.query-mode'),
+        options: QUERY_MODE_SELECT_OPTIONS,
+    },
+    statisticsMode: {
+        title: formI18n('form.statistics-mode'),
+        options: STATISTICS_MODE_SELECT_OPTIONS,
+    },
+    tracingLevel: {
+        title: formI18n('form.tracing-level'),
+        options: TRACING_LEVEL_SELECT_OPTIONS,
+    },
+    timeout: {
+        title: formI18n('form.timeout'),
+    },
+} as const;

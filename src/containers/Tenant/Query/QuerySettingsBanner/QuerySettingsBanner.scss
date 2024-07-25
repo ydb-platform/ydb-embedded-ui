@@ -1,0 +1,10 @@
+.ydb-query-settings-banner {
+    margin: var(--g-spacing-1) var(--g-spacing-5);
+
+    &__message {
+        display: flex;
+        flex-wrap: wrap;
+
+        white-space: pre;
+    }
+}

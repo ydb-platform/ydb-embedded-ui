@@ -1,3 +1,6 @@
+import {TRACING_LEVELS} from '../../utils/query';
+import type {IsolationLevel, StatisticsMode} from '../store/query';
+
 // ==== types from backend protos ====
 interface Position {
     row?: number;
@@ -199,6 +202,27 @@ export interface ColumnType {
     name: string;
     type: string;
 }
+
+export const TracingLevelNumber = {
+    [TRACING_LEVELS.off]: 0,
+    [TRACING_LEVELS.toplevel]: 4,
+    [TRACING_LEVELS.basic]: 9,
+    [TRACING_LEVELS.detailed]: 13,
+    [TRACING_LEVELS.diagnostic]: 14,
+    [TRACING_LEVELS.trace]: 15,
+};
+
+/** undefined = 'none' */
+export type Stats = StatisticsMode;
+
+/** undefined = '60000' */
+export type Timeout = number;
+
+/** undefined = 'serializable-read-write' */
+export type TransactionMode = IsolationLevel;
+
+/** undefined = '15' */
+export type TracingLevel = number;
 
 /** undefined = 'classic' */
 export type Schemas = 'classic' | 'modern' | 'ydb' | 'multi' | undefined;

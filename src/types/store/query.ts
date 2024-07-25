@@ -36,6 +36,14 @@ export interface QueryRequestParams {
     query: string;
 }
 
+export interface QuerySettings {
+    queryMode: QueryMode;
+    isolationLevel: IsolationLevel;
+    timeout?: string;
+    statisticsMode?: StatisticsMode;
+    tracingLevel?: TracingLevel;
+}
+
 export type QueryErrorResponse = IResponseError<QueryErrorResponseData>;
 export type QueryError = NetworkError | QueryErrorResponse;
 

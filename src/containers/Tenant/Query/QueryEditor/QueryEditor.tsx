@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {isEqual} from 'lodash';
 import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 import {connect} from 'react-redux';
@@ -21,15 +22,18 @@ import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import type {ValueOf} from '../../../../types/common';
 import type {ExecuteQueryState} from '../../../../types/store/executeQuery';
-import type {IQueryResult, QueryAction, QueryMode} from '../../../../types/store/query';
+import type {IQueryResult, QueryAction, QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
     LAST_USED_QUERY_ACTION_KEY,
+    QUERY_SETTINGS,
     QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../../utils/constants';
-import {useQueryModes, useSetting} from '../../../../utils/hooks';
+import {useQueryExecutionSettings, useSetting} from '../../../../utils/hooks';
+import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
+import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
 import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
@@ -91,6 +95,8 @@ function QueryEditor(props: QueryEditorProps) {
         path,
         setTenantPath: setPath,
         setQueryAction,
+        saveQueryToHistory,
+        setShowPreview,
         executeQuery,
         type,
         theme,
@@ -100,9 +106,13 @@ function QueryEditor(props: QueryEditorProps) {
     const {tenantPath: savedPath} = executeQuery;
 
     const [resultType, setResultType] = React.useState(RESULT_TYPES.EXECUTE);
-
+    const [querySettingsFlag] = useSetting<boolean>(QUERY_SETTINGS);
     const [isResultLoaded, setIsResultLoaded] = React.useState(false);
-    const [queryMode, setQueryMode] = useQueryModes();
+    const [querySettings, setQuerySettings] = useQueryExecutionSettings();
+    const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
+        useLastQueryExecutionSettings();
+    const {resetBanner} = useChangedQuerySettings();
+
     const [useMultiSchema] = useSetting(QUERY_USE_MULTI_SCHEMA_KEY);
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting<QueryAction>(
         LAST_USED_QUERY_ACTION_KEY,
@@ -182,56 +192,106 @@ function QueryEditor(props: QueryEditorProps) {
         };
     }, [executeQuery]);
 
-    const handleSendExecuteClick = (mode: QueryMode | undefined, text?: string) => {
-        if (!mode) {
-            return;
-        }
-        const {input, history} = executeQuery;
+    const handleSendExecuteClick = React.useCallback(
+        (settings: QuerySettings, text?: string) => {
+            const {input, history} = executeQuery;
 
-        const schema = useMultiSchema ? 'multi' : 'modern';
+            const schema = useMultiSchema ? 'multi' : 'modern';
 
-        const query = text ?? input;
+            const query = text ?? input;
 
-        setLastUsedQueryAction(QUERY_ACTIONS.execute);
-        setResultType(RESULT_TYPES.EXECUTE);
-        sendExecuteQuery({
-            query,
-            database: tenantName,
-            mode,
-            schema,
-        });
-        setIsResultLoaded(true);
-        props.setShowPreview(false);
-
-        // Don't save partial queries in history
-        if (!text) {
-            const {queries, currentIndex} = history;
-            if (query !== queries[currentIndex]?.queryText) {
-                props.saveQueryToHistory(input, mode);
+            setLastUsedQueryAction(QUERY_ACTIONS.execute);
+            if (!isEqual(lastQueryExecutionSettings, settings)) {
+                resetBanner();
+                setLastQueryExecutionSettings(settings);
             }
-        }
-        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
-    };
+
+            const executeQuerySettings = querySettingsFlag
+                ? querySettings
+                : {
+                      queryMode: querySettings.queryMode,
+                  };
+
+            setResultType(RESULT_TYPES.EXECUTE);
+            sendExecuteQuery({
+                query,
+                database: tenantName,
+                querySettings: executeQuerySettings,
+                schema,
+            });
+            setIsResultLoaded(true);
+            setShowPreview(false);
+
+            // Don't save partial queries in history
+            if (!text) {
+                const {queries, currentIndex} = history;
+                if (query !== queries[currentIndex]?.queryText) {
+                    saveQueryToHistory(input, querySettings.queryMode);
+                }
+            }
+            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        },
+        [
+            executeQuery,
+            useMultiSchema,
+            setLastUsedQueryAction,
+            lastQueryExecutionSettings,
+            querySettingsFlag,
+            querySettings,
+            sendExecuteQuery,
+            saveQueryToHistory,
+            setShowPreview,
+            tenantName,
+            resetBanner,
+            setLastQueryExecutionSettings,
+        ],
+    );
 
     const handleSettingsClick = () => {
         setQueryAction('settings');
         props.setShowPreview(false);
     };
 
-    const handleGetExplainQueryClick = (mode: QueryMode | undefined) => {
-        const {input} = executeQuery;
+    const handleGetExplainQueryClick = React.useCallback(
+        (settings: QuerySettings) => {
+            const {input} = executeQuery;
 
-        setLastUsedQueryAction(QUERY_ACTIONS.explain);
-        setResultType(RESULT_TYPES.EXPLAIN);
-        sendExplainQuery({
-            query: input,
-            database: tenantName,
-            mode: mode,
-        });
-        setIsResultLoaded(true);
-        props.setShowPreview(false);
-        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
-    };
+            setLastUsedQueryAction(QUERY_ACTIONS.explain);
+
+            if (!isEqual(lastQueryExecutionSettings, settings)) {
+                resetBanner();
+                setLastQueryExecutionSettings(settings);
+            }
+
+            const explainQuerySettings = querySettingsFlag
+                ? querySettings
+                : {
+                      queryMode: querySettings.queryMode,
+                  };
+
+            setResultType(RESULT_TYPES.EXPLAIN);
+            sendExplainQuery({
+                query: input,
+                database: tenantName,
+                querySettings: explainQuerySettings,
+            });
+            setIsResultLoaded(true);
+            setShowPreview(false);
+            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        },
+        [
+            executeQuery,
+            lastQueryExecutionSettings,
+            querySettings,
+            querySettingsFlag,
+            resetBanner,
+            sendExplainQuery,
+            setLastQueryExecutionSettings,
+            setLastUsedQueryAction,
+            setShowPreview,
+            tenantName,
+        ],
+    );
 
     React.useEffect(() => {
         if (monacoHotKey === null) {
@@ -241,9 +301,9 @@ function QueryEditor(props: QueryEditorProps) {
         switch (monacoHotKey) {
             case MONACO_HOT_KEY_ACTIONS.sendQuery: {
                 if (lastUsedQueryAction === QUERY_ACTIONS.explain) {
-                    handleGetExplainQueryClick(queryMode);
+                    handleGetExplainQueryClick(querySettings);
                 } else {
-                    handleSendExecuteClick(queryMode);
+                    handleSendExecuteClick(querySettings);
                 }
                 break;
             }
@@ -257,13 +317,13 @@ function QueryEditor(props: QueryEditorProps) {
                         endLineNumber: selection.getPosition().lineNumber,
                         endColumn: selection.getPosition().column,
                     });
-                    handleSendExecuteClick(queryMode, text);
+                    handleSendExecuteClick(querySettings, text);
                 }
                 break;
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [monacoHotKey]);
+    }, [monacoHotKey, handleSendExecuteClick, handleGetExplainQueryClick]);
 
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
         const keybindings = getKeyBindings(monaco);
@@ -356,8 +416,8 @@ function QueryEditor(props: QueryEditorProps) {
                 onExplainButtonClick={handleGetExplainQueryClick}
                 explainIsLoading={explainQueryResult.isLoading}
                 disabled={!executeQuery.input}
-                onUpdateQueryMode={setQueryMode}
-                queryMode={queryMode}
+                onUpdateQueryMode={(queryMode) => setQuerySettings({...querySettings, queryMode})}
+                querySettings={querySettings}
                 highlightedAction={lastUsedQueryAction}
             />
         );
