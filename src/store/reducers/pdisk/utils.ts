@@ -18,11 +18,16 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
     const {PDisk: WhiteboardPDiskData = {}, VDisks: WhiteboardVDisksData = []} = Whiteboard;
     const {PDisk: BSCPDiskData = {}} = BSC;
 
-    const {ExpectedSlotCount, EnforcedDynamicSlotSize} = BSCPDiskData;
+    const preparedPDisk = preparePDiskData(WhiteboardPDiskData, BSCPDiskData);
 
-    const preparedPDisk = preparePDiskData(WhiteboardPDiskData);
-
-    const {LogUsedSize, LogTotalSize, TotalSize: PDiskTotalSize, SystemSize} = preparedPDisk;
+    const {
+        LogUsedSize,
+        LogTotalSize,
+        TotalSize: PDiskTotalSize,
+        SystemSize,
+        ExpectedSlotCount,
+        EnforcedDynamicSlotSize,
+    } = preparedPDisk;
 
     const logSlot: SlotItem<'log'> = {
         SlotType: 'log',

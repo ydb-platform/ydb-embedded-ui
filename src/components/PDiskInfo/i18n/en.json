@@ -1,15 +1,25 @@
 {
+  "decomission-status": "Decomission Status",
+  "type": "Type",
   "path": "Path",
   "guid": "GUID",
-  "category": "Category",
-  "type": "Type",
-  "size": "Size",
+  "serial-number": "Serial Number",
+  "shared-with-os": "SharedWithOs",
+
+  "drive-status": "Drive Status",
   "state": "State",
   "device": "Device",
   "realtime": "Realtime",
-  "serial-number": "SerialNumber",
+
+  "space": "Space",
+  "slots": "Slots",
+  "log-size": "Log Size",
+  "system-size": "System Size",
+
   "links": "Links",
 
   "developer-ui": "Developer UI",
-  "pdisk-page": "PDisk page"
+  "pdisk-page": "PDisk page",
+
+  "yes": "Yes"
 }

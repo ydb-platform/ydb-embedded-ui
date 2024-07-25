@@ -1,16 +1,17 @@
-import type {TPDiskStateInfo} from '../../types/api/pdisk';
+import type {TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import type {ValueOf} from '../../types/common';
 
 import type {PDISK_TYPES} from './getPDiskType';
 
-export interface PreparedPDisk extends TPDiskStateInfo {
-    Type?: PDiskType;
-    Severity?: number;
+export type PreparedPDisk = TPDiskStateInfo &
+    Omit<Partial<TPDiskInfo>, 'Type'> & {
+        Type?: PDiskType;
+        Severity?: number;
 
-    AllocatedSize?: number;
-    AllocatedPercent?: number;
-}
+        AllocatedSize?: number;
+        AllocatedPercent?: number;
+    };
 
 export interface PreparedVDisk extends TVDiskStateInfo {
     PDisk?: PreparedPDisk;
