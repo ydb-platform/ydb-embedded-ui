@@ -1,7 +1,7 @@
 import type {TPDiskInfoResponse} from '../../../types/api/pdisk';
 import type {TStorageInfo} from '../../../types/api/storage';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
-import {getArray} from '../../../utils';
+import {getArray, valueIsDefined} from '../../../utils';
 import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 import type {PreparedStorageGroup} from '../storage/types';
@@ -18,24 +18,33 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
     const {PDisk: WhiteboardPDiskData = {}, VDisks: WhiteboardVDisksData = []} = Whiteboard;
     const {PDisk: BSCPDiskData = {}} = BSC;
 
-    const {ExpectedSlotCount, EnforcedDynamicSlotSize} = BSCPDiskData;
+    const preparedPDisk = preparePDiskData(WhiteboardPDiskData, BSCPDiskData);
 
-    const preparedPDisk = preparePDiskData(WhiteboardPDiskData);
+    const {
+        LogUsedSize,
+        LogTotalSize,
+        TotalSize: PDiskTotalSize,
+        SystemSize,
+        ExpectedSlotCount,
+        EnforcedDynamicSlotSize,
+    } = preparedPDisk;
 
-    const {LogUsedSize, LogTotalSize, TotalSize: PDiskTotalSize, SystemSize} = preparedPDisk;
+    let logSlot: SlotItem<'log'> | undefined;
 
-    const logSlot: SlotItem<'log'> = {
-        SlotType: 'log',
-        Used: Number(LogUsedSize),
-        Total: Number(LogTotalSize),
-        UsagePercent: (Number(LogUsedSize) * 100) / Number(LogTotalSize),
-        Severity: 1,
-        SlotData: {
-            LogUsedSize,
-            LogTotalSize,
-            SystemSize,
-        },
-    };
+    if (valueIsDefined(LogTotalSize)) {
+        logSlot = {
+            SlotType: 'log',
+            Used: Number(LogUsedSize),
+            Total: Number(LogTotalSize),
+            UsagePercent: (Number(LogUsedSize) * 100) / Number(LogTotalSize),
+            Severity: 1,
+            SlotData: {
+                LogUsedSize,
+                LogTotalSize,
+                SystemSize,
+            },
+        };
+    }
 
     const preparedVDisks = WhiteboardVDisksData.map(prepareVDiskData).sort(
         (disk1, disk2) => Number(disk2.VDiskSlotId) - Number(disk1.VDiskSlotId),
@@ -82,7 +91,11 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         });
     }
 
-    const diskSlots = [logSlot, ...vdisksSlots, ...emptySlots];
+    const diskSlots: PDiskData['SlotItems'] = [...vdisksSlots, ...emptySlots];
+
+    if (logSlot) {
+        diskSlots.unshift(logSlot);
+    }
 
     const rawNode = nodeResponse.SystemStateInfo?.[0];
     const preparedNode = prepareNodeSystemState(rawNode);

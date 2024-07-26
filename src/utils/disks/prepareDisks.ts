@@ -1,4 +1,4 @@
-import type {TPDiskStateInfo} from '../../types/api/pdisk';
+import type {TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo} from '../../types/api/vdisk';
 
 import {calculatePDiskSeverity} from './calculatePDiskSeverity';
@@ -35,7 +35,10 @@ export function prepareVDiskData(vdiskState: TVDiskStateInfo = {}): PreparedVDis
     };
 }
 
-export function preparePDiskData(pdiskState: TPDiskStateInfo = {}): PreparedPDisk {
+export function preparePDiskData(
+    pdiskState: TPDiskStateInfo = {},
+    bscPDiskInfo: TPDiskInfo = {},
+): PreparedPDisk {
     const {AvailableSize, TotalSize, Category} = pdiskState;
 
     const Type = getPDiskType(Category);
@@ -48,6 +51,7 @@ export function preparePDiskData(pdiskState: TPDiskStateInfo = {}): PreparedPDis
     const Severity = calculatePDiskSeverity(pdiskState, allocatedPercent);
 
     return {
+        ...bscPDiskInfo,
         ...pdiskState,
         Type,
         Severity,

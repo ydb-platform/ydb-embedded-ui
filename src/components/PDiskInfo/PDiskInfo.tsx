@@ -1,14 +1,14 @@
 import {getPDiskPagePath} from '../../routes';
 import {valueIsDefined} from '../../utils';
+import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
+import {useTypedSelector} from '../../utils/hooks';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer/InfoViewer';
-import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 
@@ -18,18 +18,20 @@ import './PDiskInfo.scss';
 
 const b = cn('ydb-pdisk-info');
 
-interface PDiskInfoProps<T extends PreparedPDisk> extends Omit<InfoViewerProps, 'info'> {
+interface GetPDiskInfoOptions<T extends PreparedPDisk> {
     pDisk?: T;
     nodeId?: number | string | null;
     isPDiskPage?: boolean;
+    isUserAllowedToMakeChanges?: boolean;
 }
 
-export function PDiskInfo<T extends PreparedPDisk>({
+// eslint-disable-next-line complexity
+function getPDiskInfo<T extends PreparedPDisk>({
     pDisk,
     nodeId,
     isPDiskPage = false,
-    ...infoViewerProps
-}: PDiskInfoProps<T>) {
+    isUserAllowedToMakeChanges,
+}: GetPDiskInfoOptions<T>) {
     const {
         PDiskId,
         Path,
@@ -42,22 +44,72 @@ export function PDiskInfo<T extends PreparedPDisk>({
         SerialNumber,
         TotalSize,
         AllocatedSize,
+        DecommitStatus,
+        StatusV2,
+        NumActiveSlots,
+        ExpectedSlotCount,
+        LogUsedSize,
+        LogTotalSize,
+        SystemSize,
+        SharedWithOs,
     } = pDisk || {};
 
-    const pdiskInfo: InfoViewerItem[] = [];
+    const generalInfo: InfoViewerItem[] = [];
 
-    if (valueIsDefined(Path)) {
-        pdiskInfo.push({label: pDiskInfoKeyset('path'), value: Path});
-    }
-    if (valueIsDefined(Guid)) {
-        pdiskInfo.push({label: pDiskInfoKeyset('guid'), value: Guid});
+    if (valueIsDefined(DecommitStatus)) {
+        generalInfo.push({
+            label: pDiskInfoKeyset('decomission-status'),
+            value: DecommitStatus.replace('DECOMMIT_', ''),
+        });
     }
     if (valueIsDefined(Category)) {
-        pdiskInfo.push({label: pDiskInfoKeyset('category'), value: Category});
-        pdiskInfo.push({label: pDiskInfoKeyset('type'), value: Type});
+        generalInfo.push({label: pDiskInfoKeyset('type'), value: Type});
     }
-    pdiskInfo.push({
-        label: pDiskInfoKeyset('size'),
+    if (valueIsDefined(Path)) {
+        generalInfo.push({label: pDiskInfoKeyset('path'), value: Path});
+    }
+    if (valueIsDefined(Guid)) {
+        generalInfo.push({label: pDiskInfoKeyset('guid'), value: Guid});
+    }
+    // SerialNumber could be an empty string ""
+    if (SerialNumber) {
+        generalInfo.push({
+            label: pDiskInfoKeyset('serial-number'),
+            value: SerialNumber,
+        });
+    }
+    if (valueIsDefined(SharedWithOs)) {
+        generalInfo.push({
+            label: pDiskInfoKeyset('shared-with-os'),
+            value: pDiskInfoKeyset('yes'),
+        });
+    }
+
+    const statusInfo: InfoViewerItem[] = [];
+
+    if (valueIsDefined(StatusV2)) {
+        statusInfo.push({label: pDiskInfoKeyset('drive-status'), value: StatusV2});
+    }
+    if (valueIsDefined(State)) {
+        statusInfo.push({label: pDiskInfoKeyset('state'), value: State});
+    }
+    if (valueIsDefined(Device)) {
+        statusInfo.push({
+            label: pDiskInfoKeyset('device'),
+            value: <EntityStatus status={Device} />,
+        });
+    }
+    if (valueIsDefined(Realtime)) {
+        statusInfo.push({
+            label: pDiskInfoKeyset('realtime'),
+            value: <EntityStatus status={Realtime} />,
+        });
+    }
+
+    const spaceInfo: InfoViewerItem[] = [];
+
+    spaceInfo.push({
+        label: pDiskInfoKeyset('space'),
         value: (
             <ProgressViewer
                 value={AllocatedSize}
@@ -67,36 +119,46 @@ export function PDiskInfo<T extends PreparedPDisk>({
             />
         ),
     });
-    if (valueIsDefined(State)) {
-        pdiskInfo.push({label: pDiskInfoKeyset('state'), value: State});
-    }
-    if (valueIsDefined(Device)) {
-        pdiskInfo.push({
-            label: pDiskInfoKeyset('device'),
-            value: <EntityStatus status={Device} />,
+    if (valueIsDefined(NumActiveSlots) && valueIsDefined(ExpectedSlotCount)) {
+        spaceInfo.push({
+            label: pDiskInfoKeyset('slots'),
+            value: <ProgressViewer value={NumActiveSlots} capacity={ExpectedSlotCount} />,
         });
     }
-    if (valueIsDefined(Realtime)) {
-        pdiskInfo.push({
-            label: pDiskInfoKeyset('realtime'),
-            value: <EntityStatus status={Realtime} />,
+    if (valueIsDefined(LogUsedSize) && valueIsDefined(LogTotalSize)) {
+        spaceInfo.push({
+            label: pDiskInfoKeyset('log-size'),
+            value: (
+                <ProgressViewer
+                    value={LogUsedSize}
+                    capacity={LogTotalSize}
+                    formatValues={formatStorageValuesToGb}
+                />
+            ),
         });
     }
-    if (valueIsDefined(SerialNumber)) {
-        pdiskInfo.push({
-            label: pDiskInfoKeyset('serial-number'),
-            value: SerialNumber || EMPTY_DATA_PLACEHOLDER,
+    if (valueIsDefined(SystemSize)) {
+        spaceInfo.push({
+            label: pDiskInfoKeyset('system-size'),
+            value: formatBytes({value: SystemSize}),
         });
     }
 
-    if (valueIsDefined(PDiskId) && valueIsDefined(nodeId)) {
+    const additionalInfo: InfoViewerItem[] = [];
+
+    const shouldDisplayLinks =
+        (!isPDiskPage || isUserAllowedToMakeChanges) &&
+        valueIsDefined(PDiskId) &&
+        valueIsDefined(nodeId);
+
+    if (shouldDisplayLinks) {
         const pDiskPagePath = getPDiskPagePath(PDiskId, nodeId);
         const pDiskInternalViewerPath = createPDiskDeveloperUILink({
             nodeId,
             pDiskId: PDiskId,
         });
 
-        pdiskInfo.push({
+        additionalInfo.push({
             label: pDiskInfoKeyset('links'),
             value: (
                 <span className={b('links')}>
@@ -107,14 +169,49 @@ export function PDiskInfo<T extends PreparedPDisk>({
                             external={false}
                         />
                     )}
-                    <LinkWithIcon
-                        title={pDiskInfoKeyset('developer-ui')}
-                        url={pDiskInternalViewerPath}
-                    />
+                    {isUserAllowedToMakeChanges && (
+                        <LinkWithIcon
+                            title={pDiskInfoKeyset('developer-ui')}
+                            url={pDiskInternalViewerPath}
+                        />
+                    )}
                 </span>
             ),
         });
     }
 
-    return <InfoViewer info={pdiskInfo} {...infoViewerProps} />;
+    return [generalInfo, statusInfo, spaceInfo, additionalInfo];
+}
+
+interface PDiskInfoProps<T extends PreparedPDisk> extends GetPDiskInfoOptions<T> {
+    className?: string;
+}
+
+export function PDiskInfo<T extends PreparedPDisk>({
+    pDisk,
+    nodeId,
+    isPDiskPage = false,
+    className,
+}: PDiskInfoProps<T>) {
+    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
+
+    const [generalInfo, statusInfo, spaceInfo, additionalInfo] = getPDiskInfo({
+        pDisk,
+        nodeId,
+        isPDiskPage,
+        isUserAllowedToMakeChanges,
+    });
+
+    return (
+        <div className={b('wrapper', className)}>
+            <div className={b('col')}>
+                <InfoViewer info={generalInfo} renderEmptyState={() => null} />
+                <InfoViewer info={spaceInfo} renderEmptyState={() => null} />
+            </div>
+            <div className={b('col')}>
+                <InfoViewer info={statusInfo} renderEmptyState={() => null} />
+                <InfoViewer info={additionalInfo} renderEmptyState={() => null} />
+            </div>
+        </div>
+    );
 }
