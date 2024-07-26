@@ -1,3 +1,6 @@
+import {Text} from '@gravity-ui/uikit';
+import omit from 'lodash/omit';
+
 import type {InfoViewerItem} from '../../../../../components/InfoViewer';
 import {formatObject} from '../../../../../components/InfoViewer';
 import {
@@ -17,6 +20,8 @@ import {EPathType} from '../../../../../types/api/schema';
 import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 
+import i18n from './i18n';
+
 const isInStoreColumnTable = (table: TColumnTableDescription) => {
     // SchemaPresetId could be 0
     return table.SchemaPresetName && table.SchemaPresetId !== undefined;
@@ -25,14 +30,12 @@ const isInStoreColumnTable = (table: TColumnTableDescription) => {
 const prepareTTL = (ttl: TTTLSettings | TColumnDataLifeCycle) => {
     // ExpireAfterSeconds could be 0
     if (ttl.Enabled && ttl.Enabled.ColumnName && ttl.Enabled.ExpireAfterSeconds !== undefined) {
-        const value = `column: '${
-            ttl.Enabled.ColumnName
-        }', expire after: ${formatDurationToShortTimeFormat(
-            ttl.Enabled.ExpireAfterSeconds * 1000,
-            1,
-        )}`;
+        const value = i18n('value.ttl', {
+            columnName: ttl.Enabled.ColumnName,
+            expireTime: formatDurationToShortTimeFormat(ttl.Enabled.ExpireAfterSeconds * 1000, 1),
+        });
 
-        return {label: 'TTL for rows', value};
+        return {label: i18n('label.ttl'), value};
     }
     return undefined;
 };
@@ -41,12 +44,22 @@ function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescription) {
     const columnTableGeneralInfo: InfoViewerItem[] = [];
 
     columnTableGeneralInfo.push({
-        label: 'Standalone',
+        label: i18n('label.standalone'),
         value: String(!isInStoreColumnTable(columnTable)),
     });
 
-    if (columnTable.Sharding && columnTable.Sharding.HashSharding) {
-        columnTableGeneralInfo.push({label: 'Sharding', value: 'hash'});
+    if (columnTable.Sharding?.HashSharding?.Columns) {
+        const columns = columnTable.Sharding.HashSharding.Columns.join(', ');
+        const content = `PARTITION BY HASH(${columns})`;
+
+        columnTableGeneralInfo.push({
+            label: i18n('label.partitioning'),
+            value: (
+                <Text variant="code-2" wordBreak="break-word">
+                    {content}
+                </Text>
+            ),
+        });
     }
 
     if (columnTable.TtlSettings) {
@@ -66,25 +79,27 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
 
     const partitioningBySize =
         PartitioningPolicy.SizeToSplit && Number(PartitioningPolicy.SizeToSplit) > 0
-            ? `Enabled, split size: ${formatBytes(PartitioningPolicy.SizeToSplit)}`
-            : 'Disabled';
+            ? i18n('value.partitioning-by-size.enabled', {
+                  size: formatBytes(PartitioningPolicy.SizeToSplit),
+              })
+            : i18n('disabled');
 
     const partitioningByLoad = PartitioningPolicy.SplitByLoadSettings?.Enabled
-        ? 'Enabled'
-        : 'Disabled';
+        ? i18n('enabled')
+        : i18n('disabled');
 
     generalTableInfo.push(
-        {label: 'Partitioning by size', value: partitioningBySize},
-        {label: 'Partitioning by load', value: partitioningByLoad},
+        {label: i18n('label.partitioning-by-size'), value: partitioningBySize},
+        {label: i18n('label.partitioning-by-load'), value: partitioningByLoad},
         {
-            label: 'Min number of partitions',
+            label: i18n('label.partitions-min'),
             value: formatNumber(PartitioningPolicy.MinPartitionsCount || 0),
         },
     );
 
     if (PartitioningPolicy.MaxPartitionsCount) {
         generalTableInfo.push({
-            label: 'Max number of partitions',
+            label: i18n('label.partitions-max'),
             value: formatNumber(PartitioningPolicy.MaxPartitionsCount),
         });
     }
@@ -101,7 +116,7 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
             readReplicasConfig = `ANY_AZ: ${FollowerCount}`;
         }
 
-        generalTableInfo.push({label: 'Read replicas (followers)', value: readReplicasConfig});
+        generalTableInfo.push({label: i18n('label.read-replicas'), value: readReplicasConfig});
     }
 
     if (TTLSettings) {
@@ -112,8 +127,8 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
     }
 
     generalTableInfo.push({
-        label: 'Bloom filter',
-        value: EnableFilterByKey ? 'Enabled' : 'Disabled',
+        label: i18n('label.bloom-filter'),
+        value: EnableFilterByKey ? i18n('enabled') : i18n('disabled'),
     });
 
     return generalTableInfo;
@@ -200,8 +215,15 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         }),
     ];
 
-    //@ts-expect-error
-    const tabletMetricsInfo = formatObject(formatTabletMetricsItem, TabletMetrics);
+    const tabletMetricsInfo = formatObject(
+        formatTabletMetricsItem,
+        omit(TabletMetrics, [
+            'GroupReadIops',
+            'GroupReadThroughput',
+            'GroupWriteIops',
+            'GroupWriteThroughput',
+        ]),
+    );
 
     let partitionConfigInfo: InfoViewerItem[] = [];
 

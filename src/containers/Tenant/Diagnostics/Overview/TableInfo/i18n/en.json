@@ -1,5 +1,20 @@
 {
   "tableStats": "Table Stats",
   "tabletMetrics": "Tablet Metrics",
-  "partitionConfig": "Partition Config"
+  "partitionConfig": "Partition Config",
+
+  "label.ttl": "TTL for rows",
+  "value.ttl": "column: '{{columnName}}', expire after: {{expireTime}}",
+  "label.standalone": "Standalone",
+  "label.partitioning": "Partitioning",
+  "label.partitioning-by-size": "Partitioning by size",
+  "value.partitioning-by-size.enabled": "Enabled, split size: {{size}}",
+  "label.partitioning-by-load": "Partitioning by load",
+  "label.partitions-min": "Min number of partitions",
+  "label.partitions-max": "Max number of partitions",
+  "label.read-replicas": "Read replicas (followers)",
+  "label.bloom-filter": "Bloom filter",
+
+  "enabled": "Enabled",
+  "disabled": "Disabled"
 }
