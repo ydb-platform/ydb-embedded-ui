@@ -474,16 +474,14 @@ function Result({
 
     if (resultType === RESULT_TYPES.EXECUTE) {
         if (executeQueryData || executeQueryError) {
-            const {stats, ...data} = executeQueryData || {};
-
             return (
                 <ExecuteResult
-                    data={data}
-                    stats={stats}
+                    data={executeQueryData}
                     error={executeQueryError}
                     isResultsCollapsed={resultVisibilityState.collapsed}
                     onExpandResults={onExpandResultHandler}
                     onCollapseResults={onCollapseResultHandler}
+                    theme={theme}
                 />
             );
         }

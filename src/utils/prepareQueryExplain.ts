@@ -25,7 +25,7 @@ function prepareStats(plan: PlanNode) {
                     continue;
                 }
 
-                const value = Array.isArray(data) ? data.join(', ') : data;
+                const value = typeof data === 'string' ? data : JSON.stringify(data);
                 section.items.push({name, value});
             }
 
@@ -46,7 +46,10 @@ function prepareStats(plan: PlanNode) {
                 continue;
             }
 
-            attrStats.push({name: key, value: String(value)});
+            attrStats.push({
+                name: key,
+                value: typeof value === 'string' ? value : JSON.stringify(value),
+            });
         }
 
         if (attrStats.length > 0) {
@@ -55,6 +58,22 @@ function prepareStats(plan: PlanNode) {
                 stats: attrStats,
             });
         }
+    }
+
+    if (plan.Stats) {
+        const attrStats: TopologyNodeDataStatsItem[] = [];
+
+        for (const [key, value] of Object.entries(plan.Stats)) {
+            attrStats.push({
+                name: key,
+                value: typeof value === 'string' ? value : JSON.stringify(value),
+            });
+        }
+
+        stats.push({
+            group: 'Stats',
+            stats: attrStats,
+        });
     }
 
     return stats;
