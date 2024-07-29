@@ -108,7 +108,7 @@ function QueryEditor(props: QueryEditorProps) {
     const [resultType, setResultType] = React.useState(RESULT_TYPES.EXECUTE);
     const [querySettingsFlag] = useSetting<boolean>(QUERY_SETTINGS);
     const [isResultLoaded, setIsResultLoaded] = React.useState(false);
-    const [querySettings, setQuerySettings] = useQueryExecutionSettings();
+    const [querySettings] = useQueryExecutionSettings();
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
         useLastQueryExecutionSettings();
     const {resetBanner} = useChangedQuerySettingsIndicator();
@@ -226,7 +226,7 @@ function QueryEditor(props: QueryEditorProps) {
             if (!text) {
                 const {queries, currentIndex} = history;
                 if (query !== queries[currentIndex]?.queryText) {
-                    saveQueryToHistory(input, querySettings.queryMode);
+                    saveQueryToHistory(input);
                 }
             }
             dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
@@ -416,7 +416,6 @@ function QueryEditor(props: QueryEditorProps) {
                 onExplainButtonClick={handleGetExplainQueryClick}
                 explainIsLoading={explainQueryResult.isLoading}
                 disabled={!executeQuery.input}
-                onUpdateQueryMode={(queryMode) => setQuerySettings({...querySettings, queryMode})}
                 querySettings={querySettings}
                 highlightedAction={lastUsedQueryAction}
             />

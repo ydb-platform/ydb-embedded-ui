@@ -11,18 +11,12 @@ import type {
 } from '../../types/store/executeQuery';
 import type {
     IQueryResult,
-    QueryMode,
     QueryRequestParams,
     QuerySettings,
     QuerySyntax,
 } from '../../types/store/query';
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
-import {
-    QUERY_MODES,
-    QUERY_SYNTAX,
-    isQueryErrorResponse,
-    parseQueryAPIExecuteResponse,
-} from '../../utils/query';
+import {QUERY_SYNTAX, isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
 import {createRequestActionTypes} from '../utils';
 
@@ -72,12 +66,9 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
         }
 
         case SAVE_QUERY_TO_HISTORY: {
-            const queryText = action.data.queryText;
+            const queryText = action.data;
 
-            // Do not save explicit yql syntax value for easier further support (use yql by default)
-            const syntax = action.data.mode === QUERY_MODES.pg ? QUERY_SYNTAX.pg : undefined;
-
-            const newQueries = [...state.history.queries, {queryText, syntax}].slice(
+            const newQueries = [...state.history.queries, {queryText}].slice(
                 state.history.queries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
             );
             settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
@@ -192,10 +183,10 @@ export const executeQueryApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
-export const saveQueryToHistory = (queryText: string, mode: QueryMode) => {
+export const saveQueryToHistory = (queryText: string) => {
     return {
         type: SAVE_QUERY_TO_HISTORY,
-        data: {queryText, mode},
+        data: queryText,
     } as const;
 };
 
