@@ -481,10 +481,10 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                     'axios-retry': {retries: withRetries ? this.DEFAULT_RETRIES_COUNT : 0},
                 },
                 headers: params.tracingLevel
-                ? {
-                      'X-Trace-Verbosity': params.tracingLevel,
-                  }
-                : undefined,
+                    ? {
+                          'X-Trace-Verbosity': params.tracingLevel,
+                      }
+                    : undefined,
             },
         );
     }
