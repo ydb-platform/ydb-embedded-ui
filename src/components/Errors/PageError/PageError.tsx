@@ -15,10 +15,7 @@ interface PageErrorProps extends Omit<EmptyStateProps, 'image' | 'title' | 'desc
 }
 
 export function PageError({title, description, error, children, ...restProps}: PageErrorProps) {
-    const isAccessError = Boolean(
-        error && typeof error === 'object' && 'status' in error && error.status === 403,
-    );
-    if (isAccessError) {
+    if (isAccessError(error)) {
         return <AccessDenied title={title} description={description} {...restProps} />;
     }
 
@@ -34,4 +31,8 @@ export function PageError({title, description, error, children, ...restProps}: P
     }
 
     return <React.Fragment>{children}</React.Fragment>;
+}
+
+export function isAccessError(error: unknown) {
+    return Boolean(error && typeof error === 'object' && 'status' in error && error.status === 403);
 }

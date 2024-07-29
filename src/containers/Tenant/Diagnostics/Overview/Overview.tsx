@@ -92,11 +92,14 @@ function Overview({type, path, database}: OverviewProps) {
         return <Loader size="m" />;
     }
 
-    if (schemaError || overviewError) {
-        return <ResponseError error={schemaError || overviewError} />;
-    }
-
-    return renderContent();
+    return (
+        <React.Fragment>
+            {schemaError || overviewError ? (
+                <ResponseError error={schemaError || overviewError} />
+            ) : null}
+            {renderContent()}
+        </React.Fragment>
+    );
 }
 
 export default Overview;
