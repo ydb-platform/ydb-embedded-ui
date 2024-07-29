@@ -10,12 +10,15 @@ export const viewSchemaApi = api.injectEndpoints({
         getViewSchema: build.query({
             queryFn: async ({database, path}: {database: string; path: string}) => {
                 try {
-                    const response = await window.api.sendQuery({
-                        schema: 'modern',
-                        query: createViewSchemaQuery(path),
-                        database,
-                        action: 'execute-scan',
-                    });
+                    const response = await window.api.sendQuery(
+                        {
+                            schema: 'modern',
+                            query: createViewSchemaQuery(path),
+                            database,
+                            action: 'execute-scan',
+                        },
+                        {withRetries: true},
+                    );
 
                     if (isQueryErrorResponse(response)) {
                         return {error: response};

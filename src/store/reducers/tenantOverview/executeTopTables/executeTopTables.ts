@@ -25,7 +25,7 @@ export const topTablesApi = api.injectEndpoints({
                             database: path,
                             action: 'execute-scan',
                         },
-                        {signal},
+                        {signal, withRetries: true},
                     );
 
                     if (isQueryErrorResponse(response)) {

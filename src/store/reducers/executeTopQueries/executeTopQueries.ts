@@ -62,7 +62,7 @@ export const topQueriesApi = api.injectEndpoints({
                             database,
                             action: 'execute-scan',
                         },
-                        {signal},
+                        {signal, withRetries: true},
                     );
 
                     if (isQueryErrorResponse(response)) {

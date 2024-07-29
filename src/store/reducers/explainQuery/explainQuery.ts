@@ -25,12 +25,12 @@ export const explainQueryApi = api.injectEndpoints({
                 }
 
                 try {
-                    const response = await window.api.getExplainQuery(
+                    const response = await window.api.sendQuery({
                         query,
                         database,
                         action,
                         syntax,
-                    );
+                    });
 
                     if (isQueryErrorResponse(response)) {
                         return {error: response};
