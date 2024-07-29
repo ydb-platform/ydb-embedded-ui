@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type {LoaderSize} from '@gravity-ui/uikit';
 import {Loader as KitLoader} from '@gravity-ui/uikit';
 
@@ -19,3 +21,22 @@ export const Loader = ({size = 'm', className}: LoaderProps) => {
         </div>
     );
 };
+
+interface LoaderWrapperProps {
+    isLoading?: boolean;
+    children?: React.ReactNode;
+    size?: LoaderSize;
+    loaderClassName?: string;
+}
+export function LoaderWrapper({
+    isLoading,
+    children,
+    size = 'm',
+    loaderClassName,
+}: LoaderWrapperProps) {
+    if (isLoading) {
+        return <Loader size={size} className={loaderClassName} />;
+    }
+
+    return <React.Fragment>{children}</React.Fragment>;
+}

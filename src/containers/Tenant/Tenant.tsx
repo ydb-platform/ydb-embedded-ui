@@ -3,8 +3,8 @@ import React from 'react';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
-import {AccessDenied} from '../../components/Errors/403';
-import {Loader} from '../../components/Loader';
+import {PageError} from '../../components/Errors/PageError/PageError';
+import {LoaderWrapper} from '../../components/Loader';
 import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {useGetSchemaQuery} from '../../store/reducers/schema/schema';
@@ -78,10 +78,7 @@ export function Tenant(props: TenantProps) {
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
         currentItem?.PathDescription?.Self || {};
 
-    let showBlockingError = false;
-    if (error && typeof error === 'object' && 'status' in error) {
-        showBlockingError = error.status === 403;
-    }
+    const showBlockingError = Boolean(error && !currentItem);
 
     const onCollapseSummaryHandler = () => {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
@@ -101,30 +98,26 @@ export function Tenant(props: TenantProps) {
                 defaultTitle={`${title} — YDB Monitoring`}
                 titleTemplate={`%s — ${title} — YDB Monitoring`}
             />
-            {showBlockingError ? (
-                <AccessDenied />
-            ) : (
-                <SplitPane
-                    defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                    defaultSizes={[25, 75]}
-                    triggerCollapse={summaryVisibilityState.triggerCollapse}
-                    triggerExpand={summaryVisibilityState.triggerExpand}
-                    minSize={[36, 200]}
-                    onSplitStartDragAdditional={onSplitStartDragAdditional}
-                >
-                    <ObjectSummary
-                        type={currentPathType}
-                        subType={currentPathSubType}
-                        tenantName={tenantName}
-                        path={path}
-                        onCollapseSummary={onCollapseSummaryHandler}
-                        onExpandSummary={onExpandSummaryHandler}
-                        isCollapsed={summaryVisibilityState.collapsed}
-                    />
-                    <div className={b('main')}>
-                        {isLoading ? (
-                            <Loader size="l" />
-                        ) : (
+            <PageError error={showBlockingError ? error : undefined}>
+                <LoaderWrapper isLoading={isLoading} size="l">
+                    <SplitPane
+                        defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                        defaultSizes={[25, 75]}
+                        triggerCollapse={summaryVisibilityState.triggerCollapse}
+                        triggerExpand={summaryVisibilityState.triggerExpand}
+                        minSize={[36, 200]}
+                        onSplitStartDragAdditional={onSplitStartDragAdditional}
+                    >
+                        <ObjectSummary
+                            type={currentPathType}
+                            subType={currentPathSubType}
+                            tenantName={tenantName}
+                            path={path}
+                            onCollapseSummary={onCollapseSummaryHandler}
+                            onExpandSummary={onExpandSummaryHandler}
+                            isCollapsed={summaryVisibilityState.collapsed}
+                        />
+                        <div className={b('main')}>
                             <ObjectGeneral
                                 type={currentPathType}
                                 additionalTenantProps={props.additionalTenantProps}
@@ -132,10 +125,10 @@ export function Tenant(props: TenantProps) {
                                 tenantName={tenantName}
                                 path={path}
                             />
-                        )}
-                    </div>
-                </SplitPane>
-            )}
+                        </div>
+                    </SplitPane>
+                </LoaderWrapper>
+            </PageError>
         </div>
     );
 }

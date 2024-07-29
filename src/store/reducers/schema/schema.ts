@@ -60,7 +60,10 @@ export const schemaApi = api.injectEndpoints({
             queryFn: async ({path, database}, {signal}) => {
                 try {
                     const data = await window.api.getSchema({path, database}, {signal});
-                    return {data: data ? {[path]: data, ...getSchemaChildren(data)} : {}};
+                    if (!data) {
+                        return {error: new Error('Schema is not available')};
+                    }
+                    return {data: {[path]: data, ...getSchemaChildren(data)}};
                 } catch (error) {
                     return {error};
                 }
