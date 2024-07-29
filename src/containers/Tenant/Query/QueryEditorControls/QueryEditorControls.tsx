@@ -19,10 +19,10 @@ import './QueryEditorControls.scss';
 const b = cn('ydb-query-editor-controls');
 
 interface QueryEditorControlsProps {
-    onRunButtonClick: (querySettings: QuerySettings) => void;
+    onRunButtonClick: () => void;
     onSettingsButtonClick: () => void;
     runIsLoading: boolean;
-    onExplainButtonClick: (querySettings: QuerySettings) => void;
+    onExplainButtonClick: () => void;
     explainIsLoading: boolean;
     disabled: boolean;
     querySettings: QuerySettings;
@@ -36,7 +36,6 @@ export const QueryEditorControls = ({
     onExplainButtonClick,
     explainIsLoading,
     disabled,
-    querySettings,
     highlightedAction,
 }: QueryEditorControlsProps) => {
     const [queryExecutionSettings] = useQueryExecutionSettings();
@@ -68,9 +67,7 @@ export const QueryEditorControls = ({
         <div className={b()}>
             <div className={b('left')}>
                 <Button
-                    onClick={() => {
-                        onRunButtonClick(querySettings);
-                    }}
+                    onClick={onRunButtonClick}
                     disabled={disabled}
                     loading={runIsLoading}
                     view={runView}
@@ -80,9 +77,7 @@ export const QueryEditorControls = ({
                     {'Run'}
                 </Button>
                 <Button
-                    onClick={() => {
-                        onExplainButtonClick(querySettings);
-                    }}
+                    onClick={onExplainButtonClick}
                     disabled={disabled}
                     loading={explainIsLoading}
                     view={explainView}

@@ -9,14 +9,13 @@ import EnableFullscreenButton from '../../../../components/EnableFullscreenButto
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
-import {QUERY_SETTINGS} from '../../../../lib';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
-import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {ResultIssues} from '../Issues/Issues';
@@ -61,7 +60,6 @@ export function ExecuteResult({
     const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
-    const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
 
     const resultsSetsCount = data?.resultSets?.length;
     const isMulti = resultsSetsCount && resultsSetsCount > 0;
@@ -228,7 +226,7 @@ export function ExecuteResult({
                     />
                 </div>
             </div>
-            {useQuerySettings ? <QuerySettingsBanner /> : null}
+            <QuerySettingsBanner />
             {renderResultSection()}
         </React.Fragment>
     );

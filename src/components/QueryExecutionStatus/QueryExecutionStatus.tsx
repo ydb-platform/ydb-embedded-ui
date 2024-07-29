@@ -5,7 +5,6 @@ import {Icon, Tooltip} from '@gravity-ui/uikit';
 import {isAxiosError} from 'axios';
 
 import i18n from '../../containers/Tenant/Query/i18n';
-import {QUERY_SETTINGS, useSetting} from '../../lib';
 import {cn} from '../../utils/cn';
 import {useChangedQuerySettingsIndicator} from '../../utils/hooks/useChangedQuerySettingsIndicator';
 
@@ -22,7 +21,6 @@ export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusPro
     let icon: React.ReactNode;
     let label: string;
 
-    const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
     const {isIndicatorShown, changedSettingsDescription} = useChangedQuerySettingsIndicator();
 
     if (isAxiosError(error) && error.code === 'ECONNABORTED') {
@@ -43,7 +41,7 @@ export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusPro
         <div className={b(null, className)}>
             {icon}
             {label}
-            {isIndicatorShown && useQuerySettings ? (
+            {isIndicatorShown ? (
                 <Tooltip
                     openDelay={0}
                     content={

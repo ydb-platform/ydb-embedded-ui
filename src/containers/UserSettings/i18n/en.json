@@ -37,9 +37,6 @@
   "settings.usePaginatedTables.title": "Use paginated tables",
   "settings.usePaginatedTables.description": " Use table with data load on scroll for Nodes and Storage tabs. It will increase performance, but could work unstable",
 
-  "settings.useQuerySettings.title": "Use query settings",
-  "settings.useQuerySettings.description": "Use query settings",
-
   "settings.queryUseMultiSchema.title": "Allow queries with multiple result sets",
   "settings.queryUseMultiSchema.description": "Use 'multi' schema for queries. It enables queries with multiple result sets. It returns nothing on versions 23-3 and older",
 

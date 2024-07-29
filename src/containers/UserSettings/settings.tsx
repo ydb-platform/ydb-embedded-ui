@@ -8,7 +8,6 @@ import {
     ENABLE_AUTOCOMPLETE,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
-    QUERY_SETTINGS,
     QUERY_USE_MULTI_SCHEMA_KEY,
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
@@ -107,12 +106,6 @@ export const usePaginatedTables: SettingProps = {
     settingKey: USE_PAGINATED_TABLES_KEY,
     title: i18n('settings.usePaginatedTables.title'),
     description: i18n('settings.usePaginatedTables.description'),
-};
-
-export const useQuerySettings: SettingProps = {
-    settingKey: QUERY_SETTINGS,
-    title: i18n('settings.useQuerySettings.title'),
-    description: i18n('settings.useQuerySettings.description'),
 };
 
 export const queryUseMultiSchemaSetting: SettingProps = {

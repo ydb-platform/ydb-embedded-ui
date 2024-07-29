@@ -22,13 +22,12 @@ import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import type {ValueOf} from '../../../../types/common';
 import type {ExecuteQueryState} from '../../../../types/store/executeQuery';
-import type {IQueryResult, QueryAction, QuerySettings} from '../../../../types/store/query';
+import type {IQueryResult, QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
     LAST_USED_QUERY_ACTION_KEY,
-    QUERY_SETTINGS,
     QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../../utils/constants';
 import {useQueryExecutionSettings, useSetting} from '../../../../utils/hooks';
@@ -106,7 +105,6 @@ function QueryEditor(props: QueryEditorProps) {
     const {tenantPath: savedPath} = executeQuery;
 
     const [resultType, setResultType] = React.useState(RESULT_TYPES.EXECUTE);
-    const [querySettingsFlag] = useSetting<boolean>(QUERY_SETTINGS);
     const [isResultLoaded, setIsResultLoaded] = React.useState(false);
     const [querySettings] = useQueryExecutionSettings();
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
@@ -193,7 +191,7 @@ function QueryEditor(props: QueryEditorProps) {
     }, [executeQuery]);
 
     const handleSendExecuteClick = React.useCallback(
-        (settings: QuerySettings, text?: string) => {
+        (text?: string) => {
             const {input, history} = executeQuery;
 
             const schema = useMultiSchema ? 'multi' : 'modern';
@@ -201,22 +199,16 @@ function QueryEditor(props: QueryEditorProps) {
             const query = text ?? input;
 
             setLastUsedQueryAction(QUERY_ACTIONS.execute);
-            if (!isEqual(lastQueryExecutionSettings, settings)) {
+            if (!isEqual(lastQueryExecutionSettings, querySettings)) {
                 resetBanner();
-                setLastQueryExecutionSettings(settings);
+                setLastQueryExecutionSettings(querySettings);
             }
-
-            const executeQuerySettings = querySettingsFlag
-                ? querySettings
-                : {
-                      queryMode: querySettings.queryMode,
-                  };
 
             setResultType(RESULT_TYPES.EXECUTE);
             sendExecuteQuery({
                 query,
                 database: tenantName,
-                querySettings: executeQuerySettings,
+                querySettings,
                 schema,
             });
             setIsResultLoaded(true);
@@ -236,7 +228,6 @@ function QueryEditor(props: QueryEditorProps) {
             useMultiSchema,
             setLastUsedQueryAction,
             lastQueryExecutionSettings,
-            querySettingsFlag,
             querySettings,
             sendExecuteQuery,
             saveQueryToHistory,
@@ -252,46 +243,36 @@ function QueryEditor(props: QueryEditorProps) {
         props.setShowPreview(false);
     };
 
-    const handleGetExplainQueryClick = React.useCallback(
-        (settings: QuerySettings) => {
-            const {input} = executeQuery;
+    const handleGetExplainQueryClick = React.useCallback(() => {
+        const {input} = executeQuery;
 
-            setLastUsedQueryAction(QUERY_ACTIONS.explain);
+        setLastUsedQueryAction(QUERY_ACTIONS.explain);
 
-            if (!isEqual(lastQueryExecutionSettings, settings)) {
-                resetBanner();
-                setLastQueryExecutionSettings(settings);
-            }
+        if (!isEqual(lastQueryExecutionSettings, querySettings)) {
+            resetBanner();
+            setLastQueryExecutionSettings(querySettings);
+        }
 
-            const explainQuerySettings = querySettingsFlag
-                ? querySettings
-                : {
-                      queryMode: querySettings.queryMode,
-                  };
-
-            setResultType(RESULT_TYPES.EXPLAIN);
-            sendExplainQuery({
-                query: input,
-                database: tenantName,
-                querySettings: explainQuerySettings,
-            });
-            setIsResultLoaded(true);
-            setShowPreview(false);
-            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
-        },
-        [
-            executeQuery,
-            lastQueryExecutionSettings,
+        setResultType(RESULT_TYPES.EXPLAIN);
+        sendExplainQuery({
+            query: input,
+            database: tenantName,
             querySettings,
-            querySettingsFlag,
-            resetBanner,
-            sendExplainQuery,
-            setLastQueryExecutionSettings,
-            setLastUsedQueryAction,
-            setShowPreview,
-            tenantName,
-        ],
-    );
+        });
+        setIsResultLoaded(true);
+        setShowPreview(false);
+        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+    }, [
+        executeQuery,
+        lastQueryExecutionSettings,
+        querySettings,
+        resetBanner,
+        sendExplainQuery,
+        setLastQueryExecutionSettings,
+        setLastUsedQueryAction,
+        setShowPreview,
+        tenantName,
+    ]);
 
     React.useEffect(() => {
         if (monacoHotKey === null) {
@@ -301,9 +282,9 @@ function QueryEditor(props: QueryEditorProps) {
         switch (monacoHotKey) {
             case MONACO_HOT_KEY_ACTIONS.sendQuery: {
                 if (lastUsedQueryAction === QUERY_ACTIONS.explain) {
-                    handleGetExplainQueryClick(querySettings);
+                    handleGetExplainQueryClick();
                 } else {
-                    handleSendExecuteClick(querySettings);
+                    handleSendExecuteClick();
                 }
                 break;
             }
@@ -317,7 +298,7 @@ function QueryEditor(props: QueryEditorProps) {
                         endLineNumber: selection.getPosition().lineNumber,
                         endColumn: selection.getPosition().column,
                     });
-                    handleSendExecuteClick(querySettings, text);
+                    handleSendExecuteClick(text);
                 }
                 break;
             }
