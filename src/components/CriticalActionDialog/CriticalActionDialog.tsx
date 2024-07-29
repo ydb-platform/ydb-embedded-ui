@@ -26,15 +26,19 @@ const parseError = (error: IResponseError) => {
 interface CriticalActionDialogProps<T> {
     visible: boolean;
     text: string;
+    withRetry?: boolean;
+    retryButtonText?: string;
     onClose: VoidFunction;
-    onConfirm: () => Promise<T>;
+    onConfirm: (isRetry?: boolean) => Promise<T>;
     onConfirmActionSuccess: VoidFunction;
-    onConfirmActionError: VoidFunction;
+    onConfirmActionError: (error: unknown) => void;
 }
 
 export function CriticalActionDialog<T>({
     visible,
     text,
+    withRetry,
+    retryButtonText,
     onClose,
     onConfirm,
     onConfirmActionSuccess,
@@ -43,17 +47,16 @@ export function CriticalActionDialog<T>({
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<IResponseError>();
 
-    const onSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const onApply = async (isRetry?: boolean) => {
         setIsLoading(true);
 
-        return onConfirm()
+        return onConfirm(isRetry)
             .then(() => {
                 onConfirmActionSuccess();
                 onClose();
             })
             .catch((err) => {
-                onConfirmActionError();
+                onConfirmActionError(err);
                 setError(err);
             })
             .finally(() => {
@@ -75,7 +78,13 @@ export function CriticalActionDialog<T>({
                     <Dialog.Footer
                         loading={false}
                         preset="default"
+                        textButtonApply={
+                            withRetry
+                                ? retryButtonText || criticalActionDialogKeyset('button-retry')
+                                : undefined
+                        }
                         textButtonCancel={criticalActionDialogKeyset('button-close')}
+                        onClickButtonApply={() => onApply(true)}
                         onClickButtonCancel={onClose}
                     />
                 </React.Fragment>
@@ -83,7 +92,7 @@ export function CriticalActionDialog<T>({
         }
 
         return (
-            <form onSubmit={onSubmit}>
+            <React.Fragment>
                 <Dialog.Body className={b('body')}>
                     <span className={b('warning-icon')}>
                         <Icon data={TriangleExclamationFill} size={24} />
@@ -98,9 +107,9 @@ export function CriticalActionDialog<T>({
                     textButtonCancel={criticalActionDialogKeyset('button-cancel')}
                     propsButtonApply={{type: 'submit'}}
                     onClickButtonCancel={onClose}
-                    onClickButtonApply={() => {}}
+                    onClickButtonApply={() => onApply()}
                 />
-            </form>
+            </React.Fragment>
         );
     };
 

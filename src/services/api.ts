@@ -35,7 +35,6 @@ import type {TEvVDiskStateResponse} from '../types/api/vdisk';
 import type {TUserToken} from '../types/api/whoami';
 import type {QuerySyntax} from '../types/store/query';
 import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../utils/constants';
-import {createPDiskDeveloperUILink} from '../utils/developerUI/developerUI';
 import {prepareSortValue} from '../utils/filters';
 import type {Nullable} from '../utils/typecheckers';
 
@@ -535,21 +534,20 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
-    restartPDisk(nodeId: number | string, pDiskId: number | string) {
-        const pDiskPath = createPDiskDeveloperUILink({
-            nodeId,
-            pDiskId,
-            host: this.getPath(''),
-        });
-
+    restartPDisk({
+        nodeId,
+        pDiskId,
+        force,
+    }: {
+        nodeId: number | string;
+        pDiskId: number | string;
+        force?: boolean;
+    }) {
         return this.post<RestartPDiskResponse>(
-            pDiskPath,
-            'restartPDisk=',
+            this.getPath(`/pdisk/restart?node_id=${nodeId}&pdisk_id=${pDiskId}&force=${force}`),
+            {},
             {},
             {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                },
                 requestConfig: {'axios-retry': {retries: 0}},
             },
         );
