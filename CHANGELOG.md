@@ -1,5 +1,30 @@
 # Changelog
 
+## [6.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.11.0...v6.12.0) (2024-07-29)
+
+
+### Features
+
+* add effective ACL ([#1036](https://github.com/ydb-platform/ydb-embedded-ui/issues/1036)) ([bce4e92](https://github.com/ydb-platform/ydb-embedded-ui/commit/bce4e926d6395dcfc53d14e6ea373073ef724145))
+* cpu info toggle – display top queries for last hour ([#1049](https://github.com/ydb-platform/ydb-embedded-ui/issues/1049)) ([1fb9078](https://github.com/ydb-platform/ydb-embedded-ui/commit/1fb9078c8ea76c237a5397f74397663eb0b0f7d3))
+* **PDiskPage:** add disk space distribution ([#1029](https://github.com/ydb-platform/ydb-embedded-ui/issues/1029)) ([82375c3](https://github.com/ydb-platform/ydb-embedded-ui/commit/82375c39b67a23046e673e4172aa29bbde659ab5))
+* **PDiskPage:** add pdisk attributes, display in 2 columns ([#1069](https://github.com/ydb-platform/ydb-embedded-ui/issues/1069)) ([d3b3d9b](https://github.com/ydb-platform/ydb-embedded-ui/commit/d3b3d9bf77dbbe7966bbc072d64cb4c4b5c3d0c4))
+* use date pickers from date-components ([#1031](https://github.com/ydb-platform/ydb-embedded-ui/issues/1031)) ([dbb5ba7](https://github.com/ydb-platform/ydb-embedded-ui/commit/dbb5ba797870d738423ebf2f7bfd688d9a9b6d75))
+* use monaco-yql-languages for syntax highlight ([#1063](https://github.com/ydb-platform/ydb-embedded-ui/issues/1063)) ([96976aa](https://github.com/ydb-platform/ydb-embedded-ui/commit/96976aaa4f13a3287e3ee8283db77c96703e268e))
+
+
+### Bug Fixes
+
+* add margin for developer ui button ([#1041](https://github.com/ydb-platform/ydb-embedded-ui/issues/1041)) ([6fa1e0b](https://github.com/ydb-platform/ydb-embedded-ui/commit/6fa1e0bddaa40a972d2160959fba80773d567830))
+* do not retry requests by user ([#1059](https://github.com/ydb-platform/ydb-embedded-ui/issues/1059)) ([f4af922](https://github.com/ydb-platform/ydb-embedded-ui/commit/f4af922491faf34e08022dd1e3c9af007a6765d1))
+* mark follower is Leader is false ([#1055](https://github.com/ydb-platform/ydb-embedded-ui/issues/1055)) ([c668f52](https://github.com/ydb-platform/ydb-embedded-ui/commit/c668f52171bfc34db4c724341edc9c63a0498aa7))
+* **ObjectSummary:** treat EPathTypeSubDomain as EPathTypeExtSubDomain ([#1064](https://github.com/ydb-platform/ydb-embedded-ui/issues/1064)) ([ce0c03e](https://github.com/ydb-platform/ydb-embedded-ui/commit/ce0c03ecfefdc752101b67ae2052e9c1f984ef96))
+* pass database param to all handlers inside DB ([#1066](https://github.com/ydb-platform/ydb-embedded-ui/issues/1066)) ([4b34e05](https://github.com/ydb-platform/ydb-embedded-ui/commit/4b34e05ae53ce5c5cab811d37f3a7062ff2f7718))
+* **PDiskPage:** move autorefresh to meta level ([#1058](https://github.com/ydb-platform/ydb-embedded-ui/issues/1058)) ([248e57d](https://github.com/ydb-platform/ydb-embedded-ui/commit/248e57de68684e86bb8aa688ac6cceeae45edc7d))
+* **PDiskSpaceDistribution:** increase slot height, display 0 id ([#1071](https://github.com/ydb-platform/ydb-embedded-ui/issues/1071)) ([7b9adda](https://github.com/ydb-platform/ydb-embedded-ui/commit/7b9adda65395855625bbcd6a1bd08c0ece81f79b))
+* ru.json for datepicker ([#1044](https://github.com/ydb-platform/ydb-embedded-ui/issues/1044)) ([f2dfacb](https://github.com/ydb-platform/ydb-embedded-ui/commit/f2dfacbf5f183dd3ffdb410d9d13acbc59009e74))
+* **TableInfo:** update column table info ([#1056](https://github.com/ydb-platform/ydb-embedded-ui/issues/1056)) ([3305cdb](https://github.com/ydb-platform/ydb-embedded-ui/commit/3305cdbcef990ab846a953ae6cf06a88526c0cd3))
+
 ## [6.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.10.3...v6.11.0) (2024-07-19)
 
 
