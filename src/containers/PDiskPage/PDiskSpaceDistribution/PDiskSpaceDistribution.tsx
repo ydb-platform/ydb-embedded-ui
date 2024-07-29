@@ -185,7 +185,7 @@ function SlotContent({id, title, used, total}: SlotContentProps) {
     return (
         <div className={b('slot-content')}>
             <span>
-                {id ? <span className={b('slot-id')}>{id}</span> : null}
+                {valueIsDefined(id) ? <span className={b('slot-id')}>{id}</span> : null}
                 {title}
             </span>
             <span className={b('slot-size')}>{renderSize()}</span>
