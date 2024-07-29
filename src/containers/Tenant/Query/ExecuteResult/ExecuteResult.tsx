@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {ControlGroupOption} from '@gravity-ui/uikit';
 import {RadioButton, Tabs} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
 
@@ -7,6 +8,7 @@ import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {YDBGraph} from '../../../../components/Graph/Graph';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
@@ -22,6 +24,8 @@ import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {getPreparedResult} from '../utils/getPreparedResult';
 
+import {getPlan} from './utils';
+
 import './ExecuteResult.scss';
 
 const b = cn('ydb-query-execute-result');
@@ -29,31 +33,27 @@ const b = cn('ydb-query-execute-result');
 const resultOptionsIds = {
     result: 'result',
     stats: 'stats',
+    schema: 'schema',
 } as const;
 
 type SectionID = ValueOf<typeof resultOptionsIds>;
 
-const resultOptions = [
-    {value: resultOptionsIds.result, content: 'Result'},
-    {value: resultOptionsIds.stats, content: 'Stats'},
-];
-
 interface ExecuteResultProps {
     data: IQueryResult | undefined;
-    stats: IQueryResult['stats'] | undefined;
     error: unknown;
     isResultsCollapsed?: boolean;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
+    theme?: string;
 }
 
 export function ExecuteResult({
     data,
-    stats,
     error,
     isResultsCollapsed,
     onCollapseResults,
     onExpandResults,
+    theme,
 }: ExecuteResultProps) {
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
@@ -61,12 +61,22 @@ export function ExecuteResult({
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
 
+    const stats = data?.stats;
     const resultsSetsCount = data?.resultSets?.length;
     const isMulti = resultsSetsCount && resultsSetsCount > 0;
     const currentResult = isMulti ? data?.resultSets?.[selectedResultSet].result : data?.result;
     const currentColumns = isMulti ? data?.resultSets?.[selectedResultSet].columns : data?.columns;
     const textResults = getPreparedResult(currentResult);
     const copyDisabled = !textResults.length;
+    const plan = React.useMemo(() => getPlan(data), [data]);
+
+    const resultOptions: ControlGroupOption<SectionID>[] = [
+        {value: resultOptionsIds.result, content: 'Result'},
+        {value: resultOptionsIds.stats, content: 'Stats'},
+    ];
+    if (plan) {
+        resultOptions.push({value: resultOptionsIds.schema, content: 'Schema'});
+    }
 
     const parsedError = parseQueryError(error);
 
@@ -145,6 +155,27 @@ export function ExecuteResult({
         );
     };
 
+    const renderSchema = () => {
+        const isEnoughDataForGraph = plan?.links && plan?.nodes && plan?.nodes.length;
+
+        const content = isEnoughDataForGraph ? (
+            <div className={b('explain-canvas-container')}>
+                <YDBGraph key={theme} data={plan} />
+            </div>
+        ) : null;
+
+        return (
+            <React.Fragment>
+                {!isFullscreen && content}
+                {isFullscreen && (
+                    <Fullscreen>
+                        <div className={b('result-fullscreen-wrapper')}>{content}</div>
+                    </Fullscreen>
+                )}
+            </React.Fragment>
+        );
+    };
+
     const renderResult = () => {
         const content = renderContent();
 
@@ -188,6 +219,10 @@ export function ExecuteResult({
     const renderResultSection = () => {
         if (activeSection === resultOptionsIds.result && !error) {
             return renderResult();
+        }
+
+        if (activeSection === resultOptionsIds.schema && !error) {
+            return renderSchema();
         }
 
         return (
