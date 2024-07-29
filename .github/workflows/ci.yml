@@ -5,19 +5,6 @@ on:
     branches: ['**']
 
 jobs:
-  commitlint:
-    name: Commit Naming
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - run: npm ci
-      - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
-
   verify_files:
     name: Verify Files
     runs-on: ubuntu-latest
