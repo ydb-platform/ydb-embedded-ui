@@ -1,5 +1,6 @@
 {
   "403.title": "Доступ запрещен",
   "403.description": "У вас недостаточно прав для просмотра данной страницы.",
-  "responseError.defaultMessage": "Ошибка запроса"
+  "responseError.defaultMessage": "Ошибка запроса",
+  "error.title": "Ошибка"
 }

@@ -60,7 +60,10 @@ export const schemaApi = api.injectEndpoints({
             queryFn: async ({path, database}, {signal}) => {
                 try {
                     const data = await window.api.getSchema({path, database}, {signal});
-                    return {data: data ? {[path]: data, ...getSchemaChildren(data)} : {}};
+                    if (!data) {
+                        return {error: new Error('Schema is not available')};
+                    }
+                    return {data: {[path]: data, ...getSchemaChildren(data)}};
                 } catch (error) {
                     return {error};
                 }
@@ -126,10 +129,14 @@ export const selectSchemaMergedChildrenPaths = createSelector(
 );
 
 export function useGetSchemaQuery({path, database}: {path: string; database: string}) {
-    const {currentData, isFetching, error, refetch} = schemaApi.useGetSchemaQuery({path, database});
+    const {currentData, isFetching, error, refetch, originalArgs} = schemaApi.useGetSchemaQuery({
+        path,
+        database,
+    });
 
     const data = currentData?.[path];
     const isLoading = isFetching && data === undefined;
+    const currentPathError = originalArgs?.path === path ? error : undefined;
 
     const shouldLoad = !isLoading && ((!data && !error) || data?.partial);
     React.useEffect(() => {
@@ -138,5 +145,5 @@ export function useGetSchemaQuery({path, database}: {path: string; database: str
         }
     }, [refetch, path, shouldLoad]);
 
-    return {data, isLoading, error};
+    return {data, isLoading, error: currentPathError};
 }
