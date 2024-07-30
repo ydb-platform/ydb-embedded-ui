@@ -7,9 +7,10 @@ import {CriticalActionDialog} from '../CriticalActionDialog';
 
 interface ButtonWithConfirmDialogProps<T, K> {
     children: React.ReactNode;
-    onConfirmAction: () => Promise<T>;
+    onConfirmAction: (isRetry?: boolean) => Promise<T>;
     onConfirmActionSuccess?: (() => Promise<K>) | VoidFunction;
     dialogContent: string;
+    retryButtonText?: string;
     buttonDisabled?: ButtonProps['disabled'];
     buttonView?: ButtonProps['view'];
     buttonClassName?: ButtonProps['className'];
@@ -24,6 +25,7 @@ export function ButtonWithConfirmDialog<T, K>({
     onConfirmAction,
     onConfirmActionSuccess,
     dialogContent,
+    retryButtonText,
     buttonDisabled = false,
     buttonView = 'action',
     buttonClassName,
@@ -34,14 +36,17 @@ export function ButtonWithConfirmDialog<T, K>({
 }: ButtonWithConfirmDialogProps<T, K>) {
     const [isConfirmDialogVisible, setIsConfirmDialogVisible] = React.useState(false);
     const [buttonLoading, setButtonLoading] = React.useState(false);
+    const [withRetry, setWithRetry] = React.useState(false);
 
-    const handleConfirmAction = async () => {
+    const handleConfirmAction = async (isRetry?: boolean) => {
         setButtonLoading(true);
-        await onConfirmAction();
+        await onConfirmAction(isRetry);
         setButtonLoading(false);
     };
 
     const handleConfirmActionSuccess = async () => {
+        setWithRetry(false);
+
         if (onConfirmActionSuccess) {
             setButtonLoading(true);
 
@@ -54,7 +59,11 @@ export function ButtonWithConfirmDialog<T, K>({
         }
     };
 
-    const handleConfirmActionError = () => {
+    const handleConfirmActionError = (error: unknown) => {
+        const isWithRetry = Boolean(
+            error && typeof error === 'object' && 'retryPossible' in error && error.retryPossible,
+        );
+        setWithRetry(isWithRetry);
         setButtonLoading(false);
     };
 
@@ -93,6 +102,8 @@ export function ButtonWithConfirmDialog<T, K>({
             <CriticalActionDialog
                 visible={isConfirmDialogVisible}
                 text={dialogContent}
+                withRetry={withRetry}
+                retryButtonText={retryButtonText}
                 onConfirm={handleConfirmAction}
                 onConfirmActionSuccess={handleConfirmActionSuccess}
                 onConfirmActionError={handleConfirmActionError}

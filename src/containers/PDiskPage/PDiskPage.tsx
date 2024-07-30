@@ -79,11 +79,11 @@ export function PDiskPage() {
     const pDiskData = pdiskDataQuery.currentData;
     const {NodeHost, NodeId, NodeType, NodeDC, Severity} = pDiskData || {};
 
-    const handleRestart = async () => {
+    const handleRestart = async (isRetry?: boolean) => {
         if (pDiskParamsDefined) {
-            return window.api.restartPDisk(nodeId, pDiskId).then((res) => {
+            return window.api.restartPDisk({nodeId, pDiskId, force: isRetry}).then((res) => {
                 if (res?.result === false) {
-                    const err = {statusText: res.error};
+                    const err = {statusText: res.error, retryPossible: res.forceRetryPossible};
                     throw err;
                 }
             });
@@ -147,6 +147,7 @@ export function PDiskPage() {
                     buttonDisabled={!nodeId || !pDiskId || !isUserAllowedToMakeChanges}
                     buttonView="normal"
                     dialogContent={pDiskPageKeyset('restart-pdisk-dialog')}
+                    retryButtonText={pDiskPageKeyset('force-restart-pdisk-button')}
                     withPopover
                     popoverContent={pDiskPageKeyset('restart-pdisk-not-allowed')}
                     popoverDisabled={isUserAllowedToMakeChanges}

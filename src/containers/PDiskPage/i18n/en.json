@@ -16,6 +16,7 @@
   "no-slots-data": "No slots data",
 
   "restart-pdisk-button": "Restart PDisk",
+  "force-restart-pdisk-button": "Restart anyway",
   "restart-pdisk-dialog": "PDisk will be restarted. Do you want to proceed?",
   "restart-pdisk-not-allowed": "You don't have enough rights to restart PDisk"
 }
