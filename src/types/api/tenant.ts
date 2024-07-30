@@ -1,5 +1,5 @@
 import type {EFlag} from './enums';
-import type {TPoolStats, TSystemStateInfo} from './nodes';
+import type {TMemoryStats, TPoolStats, TSystemStateInfo} from './nodes';
 import type {TTabletStateInfo} from './tablet';
 
 /**
@@ -63,6 +63,8 @@ export interface TTenant {
 
     StorageUsage?: TStorageUsage[];
     QuotaUsage?: TStorageUsage[];
+
+    MemoryStats?: TMemoryStats;
 }
 
 export interface THiveDomainStatsStateCount {

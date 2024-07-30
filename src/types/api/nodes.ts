@@ -102,6 +102,31 @@ export interface TLegacyNodeLocation {
     Body?: number;
 }
 
+export interface TMemoryStats {
+    AnonRss?: number;
+    CGroupLimit?: number;
+    MemTotal?: number;
+    MemAvailable?: number;
+
+    AllocatedMemory?: number;
+    AllocatorCachesMemory?: number;
+
+    HardLimit?: number;
+    SoftLimit?: number;
+    TargetUtilization?: number;
+
+    ConsumersConsumption?: number;
+    ConsumersLimit?: number;
+    OtherConsumption?: number;
+    ExternalConsumption?: number;
+
+    SharedCacheConsumption?: number;
+    SharedCacheLimit?: number;
+
+    MemTableConsumption?: number;
+    MemTableLimit?: number;
+}
+
 interface TNodeLocation {
     // compatibility section -- will be removed in future versions
     DataCenterNum?: number; // deprecated
