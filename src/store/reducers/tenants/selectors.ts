@@ -2,7 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
 import type {RootState} from '../..';
-import {USE_HIDE_DOMAIN_DATABASE_KEY} from '../../../lib';
+import {HIDE_DOMAIN_DATABASE_KEY} from '../../../lib';
 import {EFlag} from '../../../types/api/enums';
 import {ProblemFilterValues, getSettingValue, selectProblemFilter} from '../settings/settings';
 import type {ProblemFilterValue} from '../settings/types';
@@ -44,7 +44,7 @@ export const selectTenants = createSelector(
 export const selectTenantsSearchValue = (state: TenantsStateSlice) => state.tenants.searchValue;
 
 export const selectUseHideDomainDatabase = (state: RootState) =>
-    getSettingValue(state, USE_HIDE_DOMAIN_DATABASE_KEY);
+    getSettingValue(state, HIDE_DOMAIN_DATABASE_KEY);
 
 // ==== Complex selectors ====
 

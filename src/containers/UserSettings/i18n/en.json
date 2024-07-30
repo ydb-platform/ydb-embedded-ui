@@ -37,8 +37,8 @@
   "settings.usePaginatedTables.title": "Use paginated tables",
   "settings.usePaginatedTables.description": " Use table with data load on scroll for Nodes and Storage tabs. It will increase performance, but could work unstable",
 
-  "settings.useHideDomainDatabase.title": "Use hide domain database",
-  "settings.useHideDomainDatabase.description": "Hide root domain on database list",
+  "settings.hideDomainDatabase.title": "Hide root domain",
+  "settings.hideDomainDatabase.description": "Hide root domain on database list",
 
   "settings.useQuerySettings.title": "Use query settings",
   "settings.useQuerySettings.description": "Use query settings",

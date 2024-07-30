@@ -131,7 +131,7 @@ export const TENANT_INITIAL_PAGE_KEY = 'saved_tenant_initial_tab';
 export const USE_PAGINATED_TABLES_KEY = 'useBackendParamsForTables';
 
 // Setting to hide domain in database list
-export const USE_HIDE_DOMAIN_DATABASE_KEY = 'useHideDomainDatabase';
+export const HIDE_DOMAIN_DATABASE_KEY = 'hideDomainDatabase';
 
 // Enable schema that supports multiple resultsets
 export const QUERY_USE_MULTI_SCHEMA_KEY = 'queryUseMultiSchema';
