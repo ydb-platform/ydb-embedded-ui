@@ -6,11 +6,11 @@ import {
     AUTOCOMPLETE_ON_ENTER,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     ENABLE_AUTOCOMPLETE,
-    HIDE_DOMAIN_DATABASE_KEY,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     QUERY_SETTINGS,
     QUERY_USE_MULTI_SCHEMA_KEY,
+    SHOW_DOMAIN_DATABASE_KEY,
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_DIRECTORY_OPERATIONS,
@@ -110,10 +110,9 @@ export const usePaginatedTables: SettingProps = {
     description: i18n('settings.usePaginatedTables.description'),
 };
 
-export const hideDomainDatabase: SettingProps = {
-    settingKey: HIDE_DOMAIN_DATABASE_KEY,
-    title: i18n('settings.hideDomainDatabase.title'),
-    description: i18n('settings.hideDomainDatabase.description'),
+export const showDomainDatabase: SettingProps = {
+    settingKey: SHOW_DOMAIN_DATABASE_KEY,
+    title: i18n('settings.showDomainDatabase.title'),
 };
 
 export const useQuerySettings: SettingProps = {
@@ -166,7 +165,12 @@ export const interfaceVersionInfoField: SettingsInfoFieldProps = {
 export const appearanceSection: SettingsSection = {
     id: 'appearanceSection',
     title: i18n('section.appearance'),
-    settings: [themeSetting, invertedDisksSetting, binaryDataInPlainTextDisplay],
+    settings: [
+        themeSetting,
+        invertedDisksSetting,
+        binaryDataInPlainTextDisplay,
+        showDomainDatabase,
+    ],
 };
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
@@ -174,7 +178,6 @@ export const experimentsSection: SettingsSection = {
     settings: [
         useNodesEndpointSetting,
         usePaginatedTables,
-        hideDomainDatabase,
         queryUseMultiSchemaSetting,
         useSeparateDisksPagesSetting,
         useDirectoryActionsSetting,

@@ -2,7 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
 import type {RootState} from '../..';
-import {HIDE_DOMAIN_DATABASE_KEY} from '../../../lib';
+import {SHOW_DOMAIN_DATABASE_KEY} from '../../../lib';
 import {EFlag} from '../../../types/api/enums';
 import {ProblemFilterValues, getSettingValue, selectProblemFilter} from '../settings/settings';
 import type {ProblemFilterValue} from '../settings/types';
@@ -43,18 +43,18 @@ export const selectTenants = createSelector(
 );
 export const selectTenantsSearchValue = (state: TenantsStateSlice) => state.tenants.searchValue;
 
-export const selectUseHideDomainDatabase = (state: RootState) =>
-    getSettingValue(state, HIDE_DOMAIN_DATABASE_KEY);
+export const selectShowDomainDatabase = (state: RootState) =>
+    getSettingValue(state, SHOW_DOMAIN_DATABASE_KEY);
 
 // ==== Complex selectors ====
 
 export const selectFilteredTenants = createSelector(
-    [selectTenants, selectProblemFilter, selectTenantsSearchValue, selectUseHideDomainDatabase],
-    (tenants, problemFilter, searchQuery, useHideDomainDatabase) => {
+    [selectTenants, selectProblemFilter, selectTenantsSearchValue, selectShowDomainDatabase],
+    (tenants, problemFilter, searchQuery, showDomainDatabase) => {
         let result = filterTenantsByProblems(tenants, problemFilter);
         result = filteredTenantsBySearch(result, searchQuery);
         result =
-            useHideDomainDatabase && result.length > 1
+            !showDomainDatabase && result.length > 1
                 ? result.filter((item) => item.Type !== 'Domain')
                 : result;
 
