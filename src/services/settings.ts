@@ -14,6 +14,7 @@ import {
     QUERY_SETTINGS,
     QUERY_USE_MULTI_SCHEMA_KEY,
     SAVED_QUERIES_KEY,
+    SHOW_DOMAIN_DATABASE_KEY,
     TENANT_INITIAL_PAGE_KEY,
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
@@ -50,6 +51,7 @@ export const DEFAULT_USER_SETTINGS = {
     [AUTO_REFRESH_INTERVAL]: 0,
     [USE_DIRECTORY_OPERATIONS]: false,
     [QUERY_SETTINGS]: false,
+    [SHOW_DOMAIN_DATABASE_KEY]: false,
 } as const satisfies SettingsObject;
 
 class SettingsManager {
