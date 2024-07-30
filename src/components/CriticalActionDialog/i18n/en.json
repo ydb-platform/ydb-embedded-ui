@@ -3,6 +3,7 @@
   "no-rights-error": "You don't have enough rights to complete the operation",
 
   "button-confirm": "Confirm",
+  "button-retry": "Retry",
   "button-cancel": "Cancel",
   "button-close": "Close"
 }
