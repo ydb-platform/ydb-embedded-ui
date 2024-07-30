@@ -13,6 +13,7 @@ import {
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_DIRECTORY_OPERATIONS,
+    USE_HIDE_DOMAIN_DATABASE_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     USE_PAGINATED_TABLES_KEY,
     USE_SEPARATE_DISKS_PAGES_KEY,
@@ -109,6 +110,12 @@ export const usePaginatedTables: SettingProps = {
     description: i18n('settings.usePaginatedTables.description'),
 };
 
+export const useHideDomainDatabase: SettingProps = {
+    settingKey: USE_HIDE_DOMAIN_DATABASE_KEY,
+    title: i18n('settings.useHideDomainDatabase.title'),
+    description: i18n('settings.useHideDomainDatabase.description'),
+};
+
 export const useQuerySettings: SettingProps = {
     settingKey: QUERY_SETTINGS,
     title: i18n('settings.useQuerySettings.title'),
@@ -167,6 +174,7 @@ export const experimentsSection: SettingsSection = {
     settings: [
         useNodesEndpointSetting,
         usePaginatedTables,
+        useHideDomainDatabase,
         queryUseMultiSchemaSetting,
         useSeparateDisksPagesSetting,
         useDirectoryActionsSetting,
