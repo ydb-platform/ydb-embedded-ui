@@ -81,9 +81,12 @@ export function PDiskPage() {
 
     const handleRestart = async (isRetry?: boolean) => {
         if (pDiskParamsDefined) {
-            return window.api.restartPDisk({nodeId, pDiskId, force: isRetry}).then((res) => {
-                if (res?.result === false) {
-                    const err = {statusText: res.error, retryPossible: res.forceRetryPossible};
+            return window.api.restartPDisk({nodeId, pDiskId, force: isRetry}).then((response) => {
+                if (response?.result === false) {
+                    const err = {
+                        statusText: response.error,
+                        retryPossible: response.forceRetryPossible && !isRetry,
+                    };
                     throw err;
                 }
             });

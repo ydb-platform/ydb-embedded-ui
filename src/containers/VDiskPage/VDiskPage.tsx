@@ -56,24 +56,34 @@ export function VDiskPage() {
     const loading = isFetching && currentData === undefined;
     const {vDiskData = {}, groupData} = currentData || {};
     const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} = vDiskData;
+    const {GroupID, GroupGeneration, Ring, Domain, VDisk} = VDiskId || {};
+    const vDiskIdParamsDefined =
+        valueIsDefined(GroupID) &&
+        valueIsDefined(GroupGeneration) &&
+        valueIsDefined(Ring) &&
+        valueIsDefined(Domain) &&
+        valueIsDefined(VDisk);
 
-    const handleEvictVDisk = async () => {
-        const {GroupID, GroupGeneration, Ring, Domain, VDisk} = VDiskId || {};
-
-        if (
-            valueIsDefined(GroupID) &&
-            valueIsDefined(GroupGeneration) &&
-            valueIsDefined(Ring) &&
-            valueIsDefined(Domain) &&
-            valueIsDefined(VDisk)
-        ) {
-            return window.api.evictVDisk({
-                groupId: GroupID,
-                groupGeneration: GroupGeneration,
-                failRealmIdx: Ring,
-                failDomainIdx: Domain,
-                vDiskIdx: VDisk,
-            });
+    const handleEvictVDisk = async (isRetry?: boolean) => {
+        if (vDiskIdParamsDefined) {
+            return window.api
+                .evictVDisk({
+                    groupId: GroupID,
+                    groupGeneration: GroupGeneration,
+                    failRealmIdx: Ring,
+                    failDomainIdx: Domain,
+                    vDiskIdx: VDisk,
+                    force: isRetry,
+                })
+                .then((response) => {
+                    if (response?.result === false) {
+                        const err = {
+                            statusText: response.error,
+                            retryPossible: response.forceRetryPossible && !isRetry,
+                        };
+                        throw err;
+                    }
+                });
         }
 
         return undefined;
@@ -131,9 +141,10 @@ export function VDiskPage() {
                 <ButtonWithConfirmDialog
                     onConfirmAction={handleEvictVDisk}
                     onConfirmActionSuccess={handleAfterEvictVDisk}
-                    buttonDisabled={!VDiskId || !isUserAllowedToMakeChanges}
+                    buttonDisabled={!vDiskIdParamsDefined || !isUserAllowedToMakeChanges}
                     buttonView="normal"
                     dialogContent={vDiskPageKeyset('evict-vdisk-dialog')}
+                    retryButtonText={vDiskPageKeyset('force-evict-vdisk-button')}
                     withPopover
                     popoverContent={vDiskPageKeyset('evict-vdisk-not-allowed')}
                     popoverDisabled={isUserAllowedToMakeChanges}
