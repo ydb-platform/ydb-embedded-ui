@@ -4,41 +4,46 @@ import {Table, useTable} from '@gravity-ui/table';
 import type {CellContext, ColumnDef, ExpandedState} from '@tanstack/react-table';
 
 import type {SimplifiedPlanItem} from '../../../../../../store/reducers/explainQuery/types';
+import {configuredNumeral} from '../../../../../../utils/numeral';
+import {formatToMs} from '../../../../../../utils/timeParsers';
+import {toExponential} from '../../../../../../utils/utils';
 
 import {MetricsCell} from './MetricsCell';
 import {OperationCell} from './OperationCell';
-import {block} from './utils';
+import type {ExtendedSimplifiesPlanItem} from './types';
+import {block, getExtendedTreeNodes, getTreeNodesCoordinates} from './utils';
 
 import './SimplifiedPlan.scss';
 
-function getTreeNodesCoordinates(items?: SimplifiedPlanItem[], prefix = '') {
-    const result: string[] = [];
-    items?.forEach((item, index) => {
-        let newPrefix = `${prefix}.${index}`;
-        if (!prefix) {
-            newPrefix = String(index);
-        }
-        result.push(newPrefix);
-        const childrenCoords = getTreeNodesCoordinates(item.children, newPrefix);
-        result.push(...childrenCoords);
-    });
-    return result;
+function nameAccessorFn(row: ExtendedSimplifiesPlanItem) {
+    return {name: row.name, operationParams: row.operationParams, lines: row.lines};
 }
 
-function nameAccessorFn(row: SimplifiedPlanItem) {
-    return {name: row.name, operationParams: row.operationParams};
+function metricsCell(info: CellContext<ExtendedSimplifiesPlanItem, unknown>) {
+    const formatter = (value: number) =>
+        value < 1e8 ? configuredNumeral(value).format() : toExponential(value, 1);
+
+    return <MetricsCell value={info.getValue()} formatter={formatter} />;
+}
+function cpuCell(info: CellContext<ExtendedSimplifiesPlanItem, unknown>) {
+    const formatter = (value: number) => formatToMs(Math.round(value));
+    return <MetricsCell value={info.getValue()} formatter={formatter} />;
 }
 
-function metricsCell(info: CellContext<SimplifiedPlanItem, unknown>) {
-    return <MetricsCell value={info.getValue()} />;
+interface ColumnHeaderProps {
+    name: string;
 }
 
-const columns: ColumnDef<SimplifiedPlanItem>[] = [
+function ColumnHeader({name}: ColumnHeaderProps) {
+    return <div className={block('table-header-content')}>{name}</div>;
+}
+
+const columns: ColumnDef<ExtendedSimplifiesPlanItem>[] = [
     {
         accessorKey: 'name',
         accessorFn: nameAccessorFn,
-        header: 'Operation',
-        size: 400,
+        header: () => <ColumnHeader name="Operation" />,
+        size: 600,
         cell: (info) => (
             <OperationCell
                 row={info.row}
@@ -47,11 +52,46 @@ const columns: ColumnDef<SimplifiedPlanItem>[] = [
             />
         ),
     },
-    {accessorKey: 'aCpu', header: 'A-Cpu', size: 50, cell: metricsCell},
-    {accessorKey: 'aRows', header: 'A-Rows', size: 50, cell: metricsCell},
-    {accessorKey: 'eCost', header: 'E-Cost', size: 50, cell: metricsCell},
-    {accessorKey: 'eRows', header: 'E-Rows', size: 50, cell: metricsCell},
-    {accessorKey: 'eSize', header: 'E-Size', size: 50, cell: metricsCell},
+    {
+        accessorKey: 'aCpu',
+        header: () => <ColumnHeader name="A-Cpu" />,
+        size: 90,
+        minSize: 100,
+        cell: cpuCell,
+        meta: {align: 'right', verticalAlign: 'top'},
+    },
+    {
+        accessorKey: 'aRows',
+        header: () => <ColumnHeader name="A-Rows" />,
+        size: 90,
+        minSize: 100,
+        cell: metricsCell,
+        meta: {align: 'right', verticalAlign: 'top'},
+    },
+    {
+        accessorKey: 'eCost',
+        header: () => <ColumnHeader name="E-Cost" />,
+        size: 90,
+        minSize: 100,
+        cell: metricsCell,
+        meta: {align: 'right', verticalAlign: 'top'},
+    },
+    {
+        accessorKey: 'eRows',
+        header: () => <ColumnHeader name="E-Rows" />,
+        size: 90,
+        minSize: 100,
+        cell: metricsCell,
+        meta: {align: 'right', verticalAlign: 'top'},
+    },
+    {
+        accessorKey: 'eSize',
+        header: () => <ColumnHeader name="E-Size" />,
+        size: 90,
+        minSize: 100,
+        cell: metricsCell,
+        meta: {align: 'right', verticalAlign: 'top'},
+    },
 ];
 
 interface SimplifiedPlanProps {
@@ -59,6 +99,7 @@ interface SimplifiedPlanProps {
 }
 
 export function SimplifiedPlan({plan}: SimplifiedPlanProps) {
+    const planWithLinesInfo = React.useMemo(() => getExtendedTreeNodes(plan), [plan]);
     const [expanded, setExpanded] = React.useState<ExpandedState>(() => {
         const coordinates = getTreeNodesCoordinates(plan);
         return Object.fromEntries(coordinates.map((id) => [id, true]));
@@ -66,7 +107,7 @@ export function SimplifiedPlan({plan}: SimplifiedPlanProps) {
 
     const table = useTable({
         columns,
-        data: plan,
+        data: planWithLinesInfo,
         getSubRows: (item) => item.children,
         enableExpanding: true,
         onExpandedChange: setExpanded,
@@ -79,10 +120,17 @@ export function SimplifiedPlan({plan}: SimplifiedPlanProps) {
         <div className={block()}>
             <Table
                 table={table}
-                headerCellClassName={block('table-header-cell')}
-                cellClassName={block('table-cell')}
-                headerCellContentClassName={block('table-header-content')}
+                headerCellClassName={({column}) => {
+                    const align = column.columnDef.meta?.align;
+                    return block('table-header-cell', {align});
+                }}
+                cellClassName={(cell) => {
+                    const align = cell?.column.columnDef.meta?.align;
+                    const verticalAlign = cell?.column.columnDef.meta?.verticalAlign;
+                    return block('table-cell', {align, 'vertical-align': verticalAlign});
+                }}
                 className={block('table')}
+                stickyHeader
             />
         </div>
     );

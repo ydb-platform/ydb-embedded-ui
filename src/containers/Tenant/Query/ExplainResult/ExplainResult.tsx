@@ -5,10 +5,11 @@ import {RadioButton} from '@gravity-ui/uikit';
 import Divider from '../../../../components/Divider/Divider';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
-import {Loader} from '../../../../components/Loader';
+import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import type {PreparedExplainResponse} from '../../../../store/reducers/explainQuery/types';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
+import type {ValueOf} from '../../../../types/common';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
@@ -18,23 +19,36 @@ import {Ast} from './components/Ast/Ast';
 import {Graph} from './components/Graph/Graph';
 import {SimplifiedPlan} from './components/SimplifiedPlan/SimplifiedPlan';
 import {TextExplain} from './components/TextExplain/TextExplain';
+import i18n from './i18n';
 
 import './ExplainResult.scss';
 
 const b = cn('ydb-query-explain-result');
 
-const ExplainOptionIds = {
+const EXPLAIN_OPTIONS_IDS = {
     schema: 'schema',
     json: 'json',
     ast: 'ast',
     simplified: 'simplified',
+} as const;
+
+export type QueryExplainTab = ValueOf<typeof EXPLAIN_OPTIONS_IDS>;
+
+const EXPLAIN_OPTIONS_NAMES: Record<QueryExplainTab, string> = {
+    [EXPLAIN_OPTIONS_IDS.schema]: i18n('action.schema'),
+    [EXPLAIN_OPTIONS_IDS.json]: i18n('action.json'),
+    [EXPLAIN_OPTIONS_IDS.ast]: i18n('action.ast'),
+    [EXPLAIN_OPTIONS_IDS.simplified]: i18n('action.explain-plan'),
 };
 
 const explainOptions = [
-    {value: ExplainOptionIds.schema, content: 'Schema'},
-    {value: ExplainOptionIds.simplified, content: 'Explain Plan'},
-    {value: ExplainOptionIds.json, content: 'JSON'},
-    {value: ExplainOptionIds.ast, content: 'AST'},
+    {value: EXPLAIN_OPTIONS_IDS.schema, content: EXPLAIN_OPTIONS_NAMES[EXPLAIN_OPTIONS_IDS.schema]},
+    {
+        value: EXPLAIN_OPTIONS_IDS.simplified,
+        content: EXPLAIN_OPTIONS_NAMES[EXPLAIN_OPTIONS_IDS.simplified],
+    },
+    {value: EXPLAIN_OPTIONS_IDS.json, content: EXPLAIN_OPTIONS_NAMES[EXPLAIN_OPTIONS_IDS.json]},
+    {value: EXPLAIN_OPTIONS_IDS.ast, content: EXPLAIN_OPTIONS_NAMES[EXPLAIN_OPTIONS_IDS.ast]},
 ];
 
 interface ExplainResultProps {
@@ -61,7 +75,9 @@ export function ExplainResult({
     simplifiedPlan,
 }: ExplainResultProps) {
     const dispatch = useTypedDispatch();
-    const [activeOption, setActiveOption] = React.useState(ExplainOptionIds.schema);
+    const [activeOption, setActiveOption] = React.useState<QueryExplainTab>(
+        EXPLAIN_OPTIONS_IDS.schema,
+    );
     const [isPending, startTransition] = React.useTransition();
 
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
@@ -74,40 +90,40 @@ export function ExplainResult({
 
     const renderStub = () => {
         return (
-            <div className={b('text-message')}>{`There is no ${activeOption} for the request`}</div>
+            <div className={b('text-message')}>
+                {i18n('description.empty-result', {
+                    activeOption: EXPLAIN_OPTIONS_NAMES[activeOption],
+                })}
+            </div>
         );
     };
 
     const renderContent = () => {
-        if (loading || isPending) {
-            return <Loader size="m" />;
-        }
-
         if (error) {
             return <div className={b('text-message')}>{parseQueryErrorToString(error)}</div>;
         }
 
         switch (activeOption) {
-            case ExplainOptionIds.json: {
+            case EXPLAIN_OPTIONS_IDS.json: {
                 if (!explain?.pristine) {
                     return renderStub();
                 }
                 return <TextExplain explain={explain.pristine} />;
             }
-            case ExplainOptionIds.ast: {
+            case EXPLAIN_OPTIONS_IDS.ast: {
                 if (!ast) {
                     return renderStub();
                 }
                 return <Ast ast={ast} theme={theme} />;
             }
-            case ExplainOptionIds.schema: {
+            case EXPLAIN_OPTIONS_IDS.schema: {
                 if (!explain?.nodes?.length) {
                     return renderStub();
                 }
                 return <Graph theme={theme} explain={explain} />;
             }
-            case ExplainOptionIds.simplified: {
-                if (!simplifiedPlan) {
+            case EXPLAIN_OPTIONS_IDS.simplified: {
+                if (!simplifiedPlan?.length) {
                     return renderStub();
                 }
                 return <SimplifiedPlan plan={simplifiedPlan} />;
@@ -149,11 +165,13 @@ export function ExplainResult({
                     </React.Fragment>
                 )}
             </div>
-            {/* this is a hack: only one Graph component may be in DOM because of it's canvas id */}
-            {activeOption === ExplainOptionIds.schema && isFullscreen ? null : (
-                <div className={b('result')}>{renderContent()}</div>
-            )}
-            {isFullscreen && <Fullscreen>{renderContent()}</Fullscreen>}
+            <LoaderWrapper loading={loading || isPending}>
+                {/* this is a hack: only one Graph component may be in DOM because of it's canvas id */}
+                {activeOption === EXPLAIN_OPTIONS_IDS.schema && isFullscreen ? null : (
+                    <div className={b('result')}>{renderContent()}</div>
+                )}
+                {isFullscreen && <Fullscreen>{renderContent()}</Fullscreen>}
+            </LoaderWrapper>
         </React.Fragment>
     );
 }

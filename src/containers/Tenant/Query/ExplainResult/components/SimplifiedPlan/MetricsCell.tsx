@@ -1,19 +1,19 @@
-import {isNumeric, toExponential} from '../../../../../../utils/utils';
+import {isNumeric} from '../../../../../../utils/utils';
 
 import {block} from './utils';
 
 interface MetricsCellProps {
     value: unknown;
+    formatter: (value: number) => string;
 }
 
-export function MetricsCell({value}: MetricsCellProps) {
+export function MetricsCell({value, formatter}: MetricsCellProps) {
     if (!isNumeric(value)) {
         return undefined;
     }
 
     const numberValue = Number(value);
-    const content =
-        numberValue < 1e8 ? Math.round(numberValue).toLocaleString() : toExponential(value, 3);
+    const content = formatter(numberValue);
 
     return <div className={block('metrics-cell')}>{content}</div>;
 }

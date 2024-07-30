@@ -1,9 +1,8 @@
-import React from 'react';
-
 import type {LoaderSize} from '@gravity-ui/uikit';
 import {Loader as KitLoader} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
+import {useDelayed} from '../../utils/hooks/useDelayed';
 
 import './Loader.scss';
 
@@ -16,7 +15,7 @@ interface LoaderProps {
 }
 
 export const Loader = ({size = 'm', delay = 600, className}: LoaderProps) => {
-    const show = useDelay(delay);
+    const show = useDelayed(delay);
     if (!show) {
         return null;
     }
@@ -26,18 +25,3 @@ export const Loader = ({size = 'm', delay = 600, className}: LoaderProps) => {
         </div>
     );
 };
-
-function useDelay(delay = 600) {
-    const [show, setShow] = React.useState(false);
-
-    React.useEffect(() => {
-        const timerId = setTimeout(() => {
-            setShow(true);
-        }, delay);
-        return () => {
-            clearTimeout(timerId);
-        };
-    }, []);
-
-    return show;
-}

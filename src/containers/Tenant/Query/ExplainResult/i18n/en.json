@@ -1,0 +1,8 @@
+{
+  "description.empty-result": "There is no {{activeOption}} for the request",
+  "description.graph-is-not-supported": "Graph can not be rendered",
+  "action.schema": "Schema",
+  "action.explain-plan": "Explain Plan",
+  "action.json": "JSON",
+  "action.ast": "AST"
+}

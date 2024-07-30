@@ -100,6 +100,6 @@ export function isNumeric(value?: unknown): value is number | string {
     return false;
 }
 
-export function toExponential(value?: string | number, precision?: number) {
-    return isNumeric(value) ? Number(value).toExponential(precision) : undefined;
+export function toExponential(value: number, precision?: number) {
+    return Number(value).toExponential(precision);
 }

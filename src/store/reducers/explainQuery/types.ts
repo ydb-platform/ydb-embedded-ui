@@ -20,7 +20,7 @@ export interface PreparedExplainResponse {
 }
 
 export interface SimplifiedPlanItem {
-    parentId?: string | undefined;
+    parentId?: string;
     name: string;
     operationParams: SimlifiedPlanOperatorOtherParams;
     aCpu?: number;

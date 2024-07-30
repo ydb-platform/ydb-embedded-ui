@@ -1,7 +1,7 @@
 import MonacoEditor from 'react-monaco-editor';
 
 import {cn} from '../../../../../../utils/cn';
-import {LANGUAGE_S_EXPRESSION_ID} from '../../../../../../utils/monaco/s-expression/constants';
+import {S_EXPRESSION_LANGUAGE_ID} from '../../../../../../utils/monaco/constats';
 
 import './Ast.scss';
 
@@ -26,7 +26,7 @@ export function Ast({ast, theme}: AstProps) {
     return (
         <div className={b()}>
             <MonacoEditor
-                language={LANGUAGE_S_EXPRESSION_ID}
+                language={S_EXPRESSION_LANGUAGE_ID}
                 value={ast}
                 options={EDITOR_OPTIONS}
                 theme={`vs-${theme}`}

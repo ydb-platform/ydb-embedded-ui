@@ -1,52 +1,12 @@
-import React from 'react';
-
-import type {
-    ExplainPlanNodeData,
-    GraphNode,
-    Link,
-    Options,
-    Shapes,
-    Topology,
-} from '@gravity-ui/paranoid';
-import {getTopology, getYdbPlanNodeShape} from '@gravity-ui/paranoid';
-
+import {YDBGraph} from '../../../../../../components/Graph/Graph';
 import type {PreparedExplainResponse} from '../../../../../../store/reducers/explainQuery/types';
 import {explainVersions} from '../../../../../../store/reducers/explainQuery/utils';
 import {cn} from '../../../../../../utils/cn';
-
-import {renderExplainNode} from './utils';
+import i18n from '../../i18n';
 
 import './Graph.scss';
 
 const b = cn('ydb-query-explain-graph');
-
-interface GraphRootProps {
-    data: {links: Link[]; nodes: GraphNode<ExplainPlanNodeData>[]};
-    opts: Options;
-    shapes: Shapes;
-    theme: string;
-}
-
-function GraphRoot({data, opts, shapes, theme}: GraphRootProps) {
-    const paranoid = React.useRef<Topology>();
-    React.useEffect(() => {
-        const graphRoot = document.getElementById('graphRoot');
-
-        if (!graphRoot) {
-            throw new Error("Can't find element with id #graphRoot");
-        }
-
-        graphRoot.innerHTML = '';
-
-        paranoid.current = getTopology('graphRoot', data, opts, shapes);
-        paranoid.current.render();
-        return () => {
-            paranoid.current = undefined;
-        };
-    }, [theme]);
-
-    return <div id="graphRoot" style={{height: '100vh'}} />;
-}
 
 interface GraphProps {
     explain: PreparedExplainResponse['plan'];
@@ -62,19 +22,10 @@ export function Graph({explain, theme}: GraphProps) {
     const content =
         isSupportedVersion && isEnoughDataForGraph ? (
             <div className={b('canvas-container')}>
-                <GraphRoot
-                    theme={theme}
-                    data={{links, nodes}}
-                    opts={{
-                        renderNodeTitle: renderExplainNode,
-                        textOverflow: 'normal',
-                        initialZoomFitsCanvas: true,
-                    }}
-                    shapes={{
-                        node: getYdbPlanNodeShape,
-                    }}
-                />
+                <YDBGraph key={theme} data={{links, nodes}} />
             </div>
-        ) : null;
+        ) : (
+            <div className={b('text-message')}>{i18n('description.graph-is-not-supported')}</div>
+        );
     return content;
 }

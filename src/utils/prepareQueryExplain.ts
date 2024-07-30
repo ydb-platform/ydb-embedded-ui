@@ -134,22 +134,19 @@ export function preparePlan(plan: PlanNode) {
     };
 }
 
-function getChildren(plans?: SimplifiedNode[]) {
-    const children: SimplifiedPlanItem[] = [];
-    plans?.forEach((p) => {
-        children.push(...prepareSimplifiedPlan([p]));
-    });
-    return children;
-}
+export function prepareSimplifiedPlan(plans: SimplifiedNode[]): SimplifiedPlanItem[] {
+    const result: SimplifiedPlanItem[] = [];
+    const stack: {
+        node: SimplifiedNode;
+        subNodes?: SimplifiedPlanItem[];
+    }[] = plans.map((plan) => ({node: plan}));
 
-export function prepareSimplifiedPlan(plans: SimplifiedNode[]) {
-    const nodes: SimplifiedPlanItem[] = [];
-
-    plans.forEach((node) => {
+    while (stack.length > 0) {
+        const {node, subNodes} = stack.pop()!;
         const plans = node['Plans'];
         const operator = node['Operators']?.[0];
 
-        const children = getChildren(plans);
+        const children = subNodes || result;
 
         if (operator) {
             const {
@@ -163,7 +160,7 @@ export function prepareSimplifiedPlan(plans: SimplifiedNode[]) {
                 ...rest
             } = operator;
 
-            nodes.push({
+            const newNode: SimplifiedPlanItem = {
                 name,
                 operationParams: rest,
                 aCpu,
@@ -171,11 +168,22 @@ export function prepareSimplifiedPlan(plans: SimplifiedNode[]) {
                 eCost,
                 eRows,
                 eSize,
-                children,
-            });
-        } else {
-            nodes.push(...children);
+                children: [],
+            };
+
+            children.push(newNode);
+
+            if (plans) {
+                for (let i = plans.length - 1; i >= 0; i--) {
+                    stack.push({node: plans[i], subNodes: newNode.children});
+                }
+            }
+        } else if (plans) {
+            for (let i = plans.length - 1; i >= 0; i--) {
+                stack.push({node: plans[i], subNodes: children});
+            }
         }
-    });
-    return nodes;
+    }
+
+    return result;
 }
