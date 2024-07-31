@@ -52,13 +52,9 @@ export function Network({tenantName}: NetworkProps) {
         );
     }
 
-    if (error) {
-        return <ResponseError error={error} />;
-    }
-
     const netWorkInfo = currentData;
     const nodes = (netWorkInfo?.Tenants && netWorkInfo.Tenants[0].Nodes) ?? [];
-    if (nodes.length === 0) {
+    if (!error && nodes.length === 0) {
         return <div className="error">no nodes data</div>;
     }
 
@@ -67,87 +63,90 @@ export function Network({tenantName}: NetworkProps) {
 
     return (
         <div className={b()}>
-            <div className={b('inner')}>
-                <div className={b('nodes-row')}>
-                    <div className={b('left')}>
-                        <div className={b('controls-wrapper')}>
-                            <div className={b('controls')}>
-                                <ProblemFilter
-                                    value={filter}
-                                    onChange={(v) => {
-                                        dispatch(changeFilter(v));
-                                    }}
-                                    className={b('problem-filter')}
-                                />
-                                <div className={b('checkbox-wrapper')}>
-                                    <Checkbox
-                                        onUpdate={() => {
-                                            setShowId(!showId);
+            {error ? <ResponseError error={error} /> : null}
+            {nodes.length > 0 ? (
+                <div className={b('inner')}>
+                    <div className={b('nodes-row')}>
+                        <div className={b('left')}>
+                            <div className={b('controls-wrapper')}>
+                                <div className={b('controls')}>
+                                    <ProblemFilter
+                                        value={filter}
+                                        onChange={(v) => {
+                                            dispatch(changeFilter(v));
                                         }}
-                                        checked={showId}
-                                    >
-                                        ID
-                                    </Checkbox>
-                                </div>
-                                <div className={b('checkbox-wrapper')}>
-                                    <Checkbox
-                                        onUpdate={() => {
-                                            setShowRacks(!showRacks);
-                                        }}
-                                        checked={showRacks}
-                                    >
-                                        Racks
-                                    </Checkbox>
-                                </div>
-                            </div>
-                        </div>
-                        <Nodes
-                            nodes={nodesGroupedByType}
-                            showId={showId}
-                            showRacks={showRacks}
-                            clickedNode={clickedNode}
-                            onClickNode={setClickedNode}
-                        />
-                    </div>
-
-                    <div className={b('right')}>
-                        {clickedNode ? (
-                            <div>
-                                <div className={b('label')}>
-                                    Connectivity of node{' '}
-                                    <Link
-                                        className={b('link')}
-                                        to={getDefaultNodePath(clickedNode.NodeId)}
-                                    >
-                                        {clickedNode.NodeId}
-                                    </Link>{' '}
-                                    to other nodes
-                                </div>
-                                <div className={b('nodes-row')}>
-                                    <Nodes
-                                        nodes={rightNodes}
-                                        isRight
-                                        showId={showId}
-                                        showRacks={showRacks}
-                                        clickedNode={clickedNode}
-                                        onClickNode={setClickedNode}
+                                        className={b('problem-filter')}
                                     />
+                                    <div className={b('checkbox-wrapper')}>
+                                        <Checkbox
+                                            onUpdate={() => {
+                                                setShowId(!showId);
+                                            }}
+                                            checked={showId}
+                                        >
+                                            ID
+                                        </Checkbox>
+                                    </div>
+                                    <div className={b('checkbox-wrapper')}>
+                                        <Checkbox
+                                            onUpdate={() => {
+                                                setShowRacks(!showRacks);
+                                            }}
+                                            checked={showRacks}
+                                        >
+                                            Racks
+                                        </Checkbox>
+                                    </div>
                                 </div>
                             </div>
-                        ) : (
-                            <div className={b('placeholder')}>
-                                <div className={b('placeholder-img')}>
-                                    <Icon data={networkIcon} width={221} height={204} />
-                                </div>
+                            <Nodes
+                                nodes={nodesGroupedByType}
+                                showId={showId}
+                                showRacks={showRacks}
+                                clickedNode={clickedNode}
+                                onClickNode={setClickedNode}
+                            />
+                        </div>
 
-                                <div className={b('placeholder-text')}>
-                                    Select node to see its connectivity to other nodes
+                        <div className={b('right')}>
+                            {clickedNode ? (
+                                <div>
+                                    <div className={b('label')}>
+                                        Connectivity of node{' '}
+                                        <Link
+                                            className={b('link')}
+                                            to={getDefaultNodePath(clickedNode.NodeId)}
+                                        >
+                                            {clickedNode.NodeId}
+                                        </Link>{' '}
+                                        to other nodes
+                                    </div>
+                                    <div className={b('nodes-row')}>
+                                        <Nodes
+                                            nodes={rightNodes}
+                                            isRight
+                                            showId={showId}
+                                            showRacks={showRacks}
+                                            clickedNode={clickedNode}
+                                            onClickNode={setClickedNode}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            ) : (
+                                <div className={b('placeholder')}>
+                                    <div className={b('placeholder-img')}>
+                                        <Icon data={networkIcon} width={221} height={204} />
+                                    </div>
+
+                                    <div className={b('placeholder-text')}>
+                                        Select node to see its connectivity to other nodes
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
+            ) : null}
         </div>
     );
 }

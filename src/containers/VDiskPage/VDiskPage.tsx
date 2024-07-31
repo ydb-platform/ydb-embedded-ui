@@ -9,6 +9,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
+import {ResponseError} from '../../components/Errors/ResponseError';
 import {GroupInfo} from '../../components/GroupInfo/GroupInfo';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {PageMeta} from '../../components/PageMeta/PageMeta';
@@ -50,7 +51,7 @@ export function VDiskPage() {
         valueIsDefined(nodeId) && valueIsDefined(pDiskId) && valueIsDefined(vDiskSlotId)
             ? {nodeId, pDiskId, vDiskSlotId}
             : skipToken;
-    const {currentData, isFetching, refetch} = vDiskApi.useGetVDiskDataQuery(params, {
+    const {currentData, isFetching, refetch, error} = vDiskApi.useGetVDiskDataQuery(params, {
         pollingInterval: autoRefreshInterval,
     });
     const loading = isFetching && currentData === undefined;
@@ -193,6 +194,7 @@ export function VDiskPage() {
 
         return (
             <React.Fragment>
+                {error ? <ResponseError error={error} /> : null}
                 {renderInfo()}
                 {renderGroupInfo()}
             </React.Fragment>

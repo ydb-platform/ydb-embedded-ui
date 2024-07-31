@@ -64,11 +64,7 @@ export const Consumers = ({path, type}: ConsumersProps) => {
         return <Loader size="m" />;
     }
 
-    if (error) {
-        return <ResponseError error={error} />;
-    }
-
-    if (!consumers || !consumers.length) {
+    if (!error && (!consumers || !consumers.length)) {
         return <div>{i18n(`noConsumersMessage.${isCdcStream ? 'stream' : 'topic'}`)}</div>;
     }
 
@@ -83,18 +79,21 @@ export const Consumers = ({path, type}: ConsumersProps) => {
                 />
                 {topic && <ConsumersTopicStats data={topic} />}
             </div>
-            <div className={b('table-wrapper')}>
-                <div className={b('table-content')}>
-                    <ResizeableDataTable
-                        columnsWidthLSKey={CONSUMERS_COLUMNS_WIDTH_LS_KEY}
-                        wrapperClassName={b('table')}
-                        data={dataToRender}
-                        columns={columns}
-                        settings={DEFAULT_TABLE_SETTINGS}
-                        emptyDataMessage={i18n('table.emptyDataMessage')}
-                    />
+            {error ? <ResponseError error={error} /> : null}
+            {consumers ? (
+                <div className={b('table-wrapper')}>
+                    <div className={b('table-content')}>
+                        <ResizeableDataTable
+                            columnsWidthLSKey={CONSUMERS_COLUMNS_WIDTH_LS_KEY}
+                            wrapperClassName={b('table')}
+                            data={dataToRender}
+                            columns={columns}
+                            settings={DEFAULT_TABLE_SETTINGS}
+                            emptyDataMessage={i18n('table.emptyDataMessage')}
+                        />
+                    </div>
                 </div>
-            </div>
+            ) : null}
         </div>
     );
 };

@@ -4,6 +4,7 @@ import type {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import {useLocation} from 'react-router-dom';
 
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
@@ -182,8 +183,8 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
     };
 
     const renderContent = () => {
-        if (error) {
-            return <div className="error">{parseQueryErrorToString(error)}</div>;
+        if (error && !data) {
+            return null;
         }
 
         if (!data || isColumnEntityType(type)) {
@@ -210,6 +211,7 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
                 <div className={b('hint')}>{i18n('description')}</div>
             )}
 
+            {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
             <TableWithControlsLayout.Table loading={loading}>
                 {renderContent()}
             </TableWithControlsLayout.Table>

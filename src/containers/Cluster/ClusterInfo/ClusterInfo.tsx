@@ -199,7 +199,7 @@ interface ClusterInfoProps {
 }
 
 export const ClusterInfo = ({
-    cluster = {},
+    cluster,
     versionsValues = [],
     groupsStats = {},
     loading,
@@ -216,7 +216,7 @@ export const ClusterInfo = ({
 
     const {info = [], links = []} = additionalClusterProps;
 
-    const clusterInfo = getInfo(cluster, versionsValues, groupsStats, info, [
+    const clusterInfo = getInfo(cluster ?? {}, versionsValues, groupsStats, info, [
         {title: DEVELOPER_UI_TITLE, url: internalLink},
         ...links,
     ]);
@@ -226,8 +226,8 @@ export const ClusterInfo = ({
             return <InfoViewerSkeleton className={b('skeleton')} rows={9} />;
         }
 
-        if (error) {
-            return <ResponseError error={error} className={b('error')} />;
+        if (error && !cluster) {
+            return null;
         }
 
         return <InfoViewer dots={true} info={clusterInfo} />;
@@ -235,6 +235,7 @@ export const ClusterInfo = ({
 
     return (
         <div className={b()}>
+            {error ? <ResponseError error={error} className={b('error')} /> : null}
             <div className={b('info')}>{getContent()}</div>
         </div>
     );

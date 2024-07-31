@@ -63,32 +63,31 @@ const Describe = ({path, database, type}: IDescribeProps) => {
         return <Loader size="m" />;
     }
 
-    if (error) {
-        return <ResponseError error={error} className={b('message-container')} />;
-    }
-
-    if (!loading && !preparedDescribeData) {
+    if (!preparedDescribeData && !error) {
         return <div className={b('message-container')}>Empty</div>;
     }
 
     return (
         <div className={b()}>
-            <div className={b('result')}>
-                <JSONTree
-                    data={preparedDescribeData}
-                    className={b('tree')}
-                    onClick={({path}) => {
-                        const newValue = !(expandMap.get(path) || false);
-                        expandMap.set(path, newValue);
-                    }}
-                    searchOptions={{
-                        debounceTime: 300,
-                    }}
-                    isExpanded={(keypath) => {
-                        return expandMap.get(keypath) || false;
-                    }}
-                />
-            </div>
+            {error ? <ResponseError error={error} /> : null}
+            {preparedDescribeData ? (
+                <div className={b('result')}>
+                    <JSONTree
+                        data={preparedDescribeData}
+                        className={b('tree')}
+                        onClick={({path}) => {
+                            const newValue = !(expandMap.get(path) || false);
+                            expandMap.set(path, newValue);
+                        }}
+                        searchOptions={{
+                            debounceTime: 300,
+                        }}
+                        isExpanded={(keypath) => {
+                            return expandMap.get(keypath) || false;
+                        }}
+                    />
+                </div>
+            ) : null}
         </div>
     );
 };

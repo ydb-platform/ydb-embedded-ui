@@ -88,7 +88,7 @@ export const Tablet = () => {
             return <Loader size="l" />;
         }
 
-        if (error) {
+        if (error && !currentData) {
             return <ResponseError error={error} />;
         }
 
@@ -111,6 +111,7 @@ export const Tablet = () => {
 
         return (
             <div className={b()}>
+                {error ? <ResponseError error={error} /> : null}
                 <div className={b('pane-wrapper')}>
                     <div className={b('left-pane')}>
                         <ul className={b('links')}>{externalLinks.map(renderExternalLinks)}</ul>

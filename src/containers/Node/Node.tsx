@@ -132,31 +132,33 @@ export function Node(props: NodeProps) {
 
     if (loading) {
         return <Loader size="l" />;
-    } else if (error) {
-        return <ResponseError error={error} />;
-    } else {
-        if (node) {
-            return (
-                <div className={b(null, props.className)} ref={container}>
-                    <Helmet
-                        titleTemplate={`%s — ${node.Host} — YDB Monitoring`}
-                        defaultTitle={`${node.Host} — YDB Monitoring`}
-                    >
-                        <title>{activeTabVerified.title}</title>
-                    </Helmet>
-
-                    <BasicNodeViewer
-                        node={node}
-                        additionalNodesProps={props.additionalNodesProps}
-                        className={b('header')}
-                    />
-
-                    {renderTabs()}
-
-                    <div className={b('content')}>{renderTabContent()}</div>
-                </div>
-            );
-        }
-        return <div className="error">no node data</div>;
     }
+
+    if (node) {
+        return (
+            <div className={b(null, props.className)} ref={container}>
+                <Helmet
+                    titleTemplate={`%s — ${node.Host} — YDB Monitoring`}
+                    defaultTitle={`${node.Host} — YDB Monitoring`}
+                >
+                    <title>{activeTabVerified.title}</title>
+                </Helmet>
+
+                <BasicNodeViewer
+                    node={node}
+                    additionalNodesProps={props.additionalNodesProps}
+                    className={b('header')}
+                />
+                {error ? <ResponseError error={error} className={b('error')} /> : null}
+                {renderTabs()}
+                <div className={b('content')}>{renderTabContent()}</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return <ResponseError error={error} />;
+    }
+
+    return <div className="error">no node data</div>;
 }

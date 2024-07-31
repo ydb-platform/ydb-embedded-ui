@@ -28,8 +28,8 @@ export function TenantOverviewTableLayout<T>({
     ...props
 }: TenantOverviewTableLayoutProps<T>) {
     const renderContent = () => {
-        if (error) {
-            return <ResponseError error={error} />;
+        if (error && props.data.length === 0) {
+            return null;
         }
 
         if (loading) {
@@ -41,6 +41,7 @@ export function TenantOverviewTableLayout<T>({
     return (
         <React.Fragment>
             <div className={b('title')}>{title}</div>
+            {error ? <ResponseError error={error} /> : null}
             <div className={b('table', tableClassNameModifiers)}>{renderContent()}</div>
         </React.Fragment>
     );

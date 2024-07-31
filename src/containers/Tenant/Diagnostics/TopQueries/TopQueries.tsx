@@ -4,6 +4,7 @@ import {useHistory, useLocation} from 'react-router-dom';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
 import {DateRange} from '../../../../components/DateRange';
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
@@ -91,8 +92,8 @@ export const TopQueries = ({tenantName, type}: TopQueriesProps) => {
     };
 
     const renderContent = () => {
-        if (error) {
-            return <div className="error">{parseQueryErrorToString(error)}</div>;
+        if (error && !data) {
+            return null;
         }
 
         if (!data || isColumnEntityType(type)) {
@@ -128,6 +129,7 @@ export const TopQueries = ({tenantName, type}: TopQueriesProps) => {
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
             <TableWithControlsLayout.Table loading={loading}>
                 {renderContent()}
             </TableWithControlsLayout.Table>

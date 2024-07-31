@@ -187,18 +187,18 @@ export function Tablets({nodeId, path, className}: TabletsProps) {
     if (loading) {
         return <TableSkeleton />;
     }
-    if (error) {
-        return <ResponseError error={error} />;
-    }
 
     return (
         <div className={b(null, className)}>
-            <ResizeableDataTable
-                columns={columns}
-                data={tablets}
-                settings={DEFAULT_TABLE_SETTINGS}
-                emptyDataMessage={i18n('noTabletsData')}
-            />
+            {error ? <ResponseError error={error} /> : null}
+            {currentData ? (
+                <ResizeableDataTable
+                    columns={columns}
+                    data={tablets}
+                    settings={DEFAULT_TABLE_SETTINGS}
+                    emptyDataMessage={i18n('noTabletsData')}
+                />
+            ) : null}
         </div>
     );
 }
