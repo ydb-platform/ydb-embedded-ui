@@ -1,5 +1,3 @@
-@import '../../../../styles/mixins.scss';
-
 .ydb-query-explain-result {
     &__result {
         display: flex;
@@ -34,34 +32,6 @@
     &__controls-left {
         display: flex;
         gap: 4px;
-    }
-    &__explain-canvas-container {
-        overflow-y: auto;
-
-        width: 100%;
-        height: 100%;
-        &_hidden {
-            display: none;
-        }
-    }
-    &__inspector {
-        overflow-y: auto;
-
-        padding: 15px 20px;
-        @include json-tree-styles();
-
-        &_fullscreen {
-            padding: 10px;
-        }
-    }
-
-    &__ast {
-        overflow: hidden;
-
-        width: 100%;
-        height: 100%;
-
-        white-space: pre-wrap;
     }
     &__loader {
         display: flex;

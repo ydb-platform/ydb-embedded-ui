@@ -1,4 +1,10 @@
-import type {PlanMeta, PlanNode, PlanTable, TKqpStatsQuery} from '../types/api/query';
+import type {
+    PlanMeta,
+    PlanNode,
+    PlanTable,
+    SimplifiedNode,
+    TKqpStatsQuery,
+} from '../types/api/query';
 
 import {
     parseQueryAPIExecuteResponse,
@@ -148,6 +154,7 @@ describe('API utils', () => {
         describe('parseQueryExplainPlan', () => {
             it('should parse explain script plan to explain scan', () => {
                 const plan: PlanNode = {};
+                const simplifiedPlan: SimplifiedNode = {};
                 const tables: PlanTable[] = [];
                 const meta: PlanMeta = {version: '0.2', type: 'script'};
 
@@ -156,12 +163,14 @@ describe('API utils', () => {
                         {
                             Plan: plan,
                             tables,
+                            SimplifiedPlan: simplifiedPlan,
                         },
                     ],
                     meta,
                 };
                 const parsedPlan = parseQueryExplainPlan(rawPlan);
                 expect(parsedPlan.Plan).toEqual(plan);
+                expect(parsedPlan.SimplifiedPlan).toEqual(simplifiedPlan);
                 expect(parsedPlan.tables).toBe(tables);
                 expect(parsedPlan.meta).toEqual(meta);
             });

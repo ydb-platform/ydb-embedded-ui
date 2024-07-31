@@ -7,7 +7,8 @@ import type {
     TopologyNodeDataStatsSection,
 } from '@gravity-ui/paranoid';
 
-import type {PlanNode} from '../types/api/query';
+import type {SimplifiedPlanItem} from '../store/reducers/explainQuery/types';
+import type {PlanNode, SimplifiedNode} from '../types/api/query';
 
 const CONNECTION_NODE_META_FIELDS = new Set(['PlanNodeId', 'PlanNodeType', 'Node Type', 'Plans']);
 
@@ -131,4 +132,58 @@ export function preparePlan(plan: PlanNode) {
         nodes,
         links,
     };
+}
+
+export function prepareSimplifiedPlan(plans: SimplifiedNode[]): SimplifiedPlanItem[] {
+    const result: SimplifiedPlanItem[] = [];
+    const stack: {
+        node: SimplifiedNode;
+        subNodes?: SimplifiedPlanItem[];
+    }[] = plans.map((plan) => ({node: plan}));
+
+    while (stack.length > 0) {
+        const {node, subNodes} = stack.pop()!;
+        const plans = node['Plans'];
+        const operator = node['Operators']?.[0];
+
+        const children = subNodes || result;
+
+        if (operator) {
+            const {
+                ['A-Cpu']: aCpu,
+                ['A-Rows']: aRows,
+                ['E-Cost']: eCost,
+                ['E-Rows']: eRows,
+                ['E-Size']: eSize,
+                ['SsaProgram']: _ssaProgram,
+                ['Name']: name,
+                ...rest
+            } = operator;
+
+            const newNode: SimplifiedPlanItem = {
+                name,
+                operationParams: rest,
+                aCpu,
+                aRows,
+                eCost,
+                eRows,
+                eSize,
+                children: [],
+            };
+
+            children.push(newNode);
+
+            if (plans) {
+                for (let i = plans.length - 1; i >= 0; i--) {
+                    stack.push({node: plans[i], subNodes: newNode.children});
+                }
+            }
+        } else if (plans) {
+            for (let i = plans.length - 1; i >= 0; i--) {
+                stack.push({node: plans[i], subNodes: children});
+            }
+        }
+    }
+
+    return result;
 }

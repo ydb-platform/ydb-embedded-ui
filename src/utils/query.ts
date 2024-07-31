@@ -261,6 +261,7 @@ export const parseQueryExplainPlan = (plan: ScriptPlan | QueryPlan): QueryPlan =
             Plan: plan.queries[0].Plan,
             tables: plan.queries[0].tables,
             meta: plan.meta,
+            SimplifiedPlan: plan.queries[0].SimplifiedPlan,
         };
     }
 
