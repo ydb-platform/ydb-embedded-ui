@@ -5,13 +5,12 @@ import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import routes, {createHref, getPDiskPagePath} from '../../../routes';
+import {useDiskPagesAvailable} from '../../../store/reducers/capabilities/hooks';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
-import {USE_SEPARATE_DISKS_PAGES_KEY} from '../../../utils/constants';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import type {PreparedPDisk} from '../../../utils/disks/types';
-import {useSetting} from '../../../utils/hooks';
 import {STRUCTURE} from '../../Node/NodePages';
 
 import './PDisk.scss';
@@ -27,7 +26,7 @@ interface PDiskProps {
 export const PDisk = ({nodeId, data = {}, vDisks}: PDiskProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
 
-    const [useSeparateDisksPages] = useSetting(USE_SEPARATE_DISKS_PAGES_KEY);
+    const diskPagesAvailable = useDiskPagesAvailable();
 
     const anchor = React.useRef(null);
 
@@ -75,7 +74,7 @@ export const PDisk = ({nodeId, data = {}, vDisks}: PDiskProps) => {
         {pdiskId: data.PDiskId || ''},
     );
 
-    if (useSeparateDisksPages && valueIsDefined(data.PDiskId)) {
+    if (diskPagesAvailable && valueIsDefined(data.PDiskId)) {
         pDiskPath = getPDiskPagePath(data.PDiskId, nodeId);
     }
 

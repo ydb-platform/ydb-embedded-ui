@@ -140,7 +140,7 @@ function getColumns({
                 return (
                     <Popover
                         placement={['right']}
-                        content={<VDiskInfo data={row} withTitle />}
+                        content={<VDiskInfo data={row} withTitle withVDiskPageLink />}
                         tooltipContentClassName={b('vdisk-details')}
                     >
                         <Button
@@ -202,7 +202,12 @@ export function PDisk({
 
         return (
             <div>
-                <PDiskInfo pDisk={data} nodeId={nodeId} className={b('pdisk-details')} />
+                <PDiskInfo
+                    pDisk={data}
+                    nodeId={nodeId}
+                    className={b('pdisk-details')}
+                    withPDiskPageLink
+                />
                 <div className={b('vdisks-container')}>
                     <div className={b('vdisks-header')}>VDisks</div>
                     {renderVDisks()}

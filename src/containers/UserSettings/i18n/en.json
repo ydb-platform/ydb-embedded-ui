@@ -45,11 +45,6 @@
   "settings.queryUseMultiSchema.title": "Allow queries with multiple result sets",
   "settings.queryUseMultiSchema.description": "Use 'multi' schema for queries. It enables queries with multiple result sets. It returns nothing on versions 23-3 and older",
 
-  "settings.useSeparateDisksPages.title": "Use separate PDisk and VDisk pages",
-  "settings.useSeparateDisksPages.description": "Use separate pages instead of node structure tab",
-
-  "settings.useDirectoryOperations.title": "Enable operations with directories",
-
   "settings.useClusterBalancerAsBackend.title": "Use cluster balancer as backend",
   "settings.useClusterBalancerAsBackend.description": "By default random cluster node is used as backend. It causes saved links to become invalid after some time, when node is restarted. Using balancer as backend fixes it",
 
