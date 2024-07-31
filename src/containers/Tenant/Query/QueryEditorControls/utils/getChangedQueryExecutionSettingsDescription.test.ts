@@ -1,9 +1,13 @@
 import type {QuerySettings} from '../../../../../types/store/query';
 import {
     ISOLATION_LEVELS,
+    ISOLATION_LEVELS_TITLES,
     QUERY_MODES,
+    QUERY_MODES_TITLES,
     STATISTICS_MODES,
+    STATISTICS_MODES_TITLES,
     TRACING_LEVELS,
+    TRACING_LEVELS_TITLES,
 } from '../../../../../utils/query';
 import {QUERY_SETTINGS_FIELD_SETTINGS} from '../../QuerySettingsDialog/constants';
 
@@ -65,23 +69,12 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
         });
 
         expect(result).toEqual({
-            [QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title]:
-                QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options.find(
-                    (option) => option.value === QUERY_MODES.data,
-                )?.content,
+            [QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title]: QUERY_MODES_TITLES.data,
             [QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.title]:
-                QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.options.find(
-                    (option) => option.value === ISOLATION_LEVELS.snapshot,
-                )?.content,
+                ISOLATION_LEVELS_TITLES['snapshot-read-only'],
             [QUERY_SETTINGS_FIELD_SETTINGS.timeout.title]: '120',
-            [QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title]:
-                QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options.find(
-                    (option) => option.value === STATISTICS_MODES.profile,
-                )?.content,
-            [QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title]:
-                QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.options.find(
-                    (option) => option.value === TRACING_LEVELS.diagnostic,
-                )?.content,
+            [QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title]: STATISTICS_MODES_TITLES.profile,
+            [QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title]: TRACING_LEVELS_TITLES.diagnostic,
         });
     });
 });

@@ -28,35 +28,31 @@ export function QuerySettingsDialog() {
     const queryAction = useTypedSelector(selectQueryAction);
     const [querySettings, setQuerySettings] = useQueryExecutionSettings();
 
-    const onCloseDialog = React.useCallback(() => {
+    const onClose = React.useCallback(() => {
         dispatch(setQueryAction('idle'));
     }, [dispatch]);
 
-    const onSaveClick = React.useCallback(
+    const onSubmit = React.useCallback(
         (data: QuerySettings) => {
             setQuerySettings(data);
-            onCloseDialog();
+            onClose();
         },
-        [onCloseDialog, setQuerySettings],
+        [onClose, setQuerySettings],
     );
-
-    // key to reinitialize dialog on open
-    const formKey = React.useMemo(() => JSON.stringify(querySettings), [querySettings]);
 
     return (
         <Dialog
             open={queryAction === 'settings'}
             size="s"
-            onClose={onCloseDialog}
+            onClose={onClose}
             className={b()}
             hasCloseButton={false}
         >
             <Dialog.Header caption={i18n('action.settings')} />
             <QuerySettingsForm
-                key={formKey}
                 initialValues={querySettings}
-                onSubmit={onSaveClick}
-                onCancel={onCloseDialog}
+                onSubmit={onSubmit}
+                onClose={onClose}
             />
         </Dialog>
     );
@@ -65,13 +61,17 @@ export function QuerySettingsDialog() {
 interface QuerySettingsFormProps {
     initialValues: QuerySettings;
     onSubmit: (data: QuerySettings) => void;
-    onCancel: () => void;
+    onClose: () => void;
 }
 
-function QuerySettingsForm({initialValues, onSubmit, onCancel}: QuerySettingsFormProps) {
-    const {control, handleSubmit} = useForm<QuerySettings>({
+function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsFormProps) {
+    const {control, handleSubmit, reset} = useForm<QuerySettings>({
         defaultValues: initialValues,
     });
+
+    React.useEffect(() => {
+        reset(initialValues);
+    }, [initialValues, reset]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -182,7 +182,7 @@ function QuerySettingsForm({initialValues, onSubmit, onCancel}: QuerySettingsFor
             <Dialog.Footer
                 textButtonApply={i18n('button-done')}
                 textButtonCancel={i18n('button-cancel')}
-                onClickButtonCancel={onCancel}
+                onClickButtonCancel={onClose}
                 propsButtonApply={{
                     type: 'submit',
                 }}
