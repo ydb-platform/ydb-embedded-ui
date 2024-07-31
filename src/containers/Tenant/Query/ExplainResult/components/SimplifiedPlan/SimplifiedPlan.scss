@@ -55,7 +55,6 @@
     &__table-cell {
         height: 30px;
         padding: 0;
-        // border-bottom: 1px solid var(--g-color-line-generic);
         @include text-body-2();
         &_align_right {
             text-align: right;
@@ -122,8 +121,6 @@
         flex-grow: 1;
 
         height: 100%;
-        // padding: var(--g-spacing-1) 0;
-        // border-bottom: 1px solid var(--g-color-line-generic);
     }
     .gt-table__cell_id_name {
         border: unset;
