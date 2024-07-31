@@ -1,8 +1,14 @@
-import {CircleCheck, CircleQuestionFill, CircleXmark} from '@gravity-ui/icons';
-import {Icon} from '@gravity-ui/uikit';
+import React from 'react';
+
+import {CircleCheck, CircleInfo, CircleQuestionFill, CircleXmark} from '@gravity-ui/icons';
+import {Icon, Tooltip} from '@gravity-ui/uikit';
 import {isAxiosError} from 'axios';
 
+import i18n from '../../containers/Tenant/Query/i18n';
+import {QUERY_SETTINGS, useSetting} from '../../lib';
 import {cn} from '../../utils/cn';
+import {useChangedQuerySettings} from '../../utils/hooks/useChangedQuerySettings';
+import QuerySettingsDescription from '../QuerySettingsDescription/QuerySettingsDescription';
 
 import './QueryExecutionStatus.scss';
 
@@ -12,6 +18,29 @@ interface QueryExecutionStatusProps {
     className?: string;
     error?: unknown;
 }
+
+const QuerySettingsIndicator = () => {
+    const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
+    const {isIndicatorShown, changedLastExecutionSettingsDescriptions} = useChangedQuerySettings();
+
+    if (!isIndicatorShown || !useQuerySettings) {
+        return null;
+    }
+
+    return (
+        <Tooltip
+            openDelay={0}
+            content={
+                <QuerySettingsDescription
+                    prefix={i18n('banner.query-settings.message')}
+                    querySettings={changedLastExecutionSettingsDescriptions}
+                />
+            }
+        >
+            <Icon data={CircleInfo} className={b('query-settings-icon')} />
+        </Tooltip>
+    );
+};
 
 export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusProps) => {
     let icon: React.ReactNode;
@@ -35,6 +64,7 @@ export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusPro
         <div className={b(null, className)}>
             {icon}
             {label}
+            <QuerySettingsIndicator />
         </div>
     );
 };

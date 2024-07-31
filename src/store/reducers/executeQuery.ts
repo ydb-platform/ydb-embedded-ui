@@ -1,6 +1,7 @@
 import type {Reducer} from '@reduxjs/toolkit';
 
 import {settingsManager} from '../../services/settings';
+import {TracingLevelNumber} from '../../types/api/query';
 import type {ExecuteActions, Schemas} from '../../types/api/query';
 import type {
     ExecuteQueryAction,
@@ -12,6 +13,7 @@ import type {
     IQueryResult,
     QueryMode,
     QueryRequestParams,
+    QuerySettings,
     QuerySyntax,
 } from '../../types/store/query';
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
@@ -21,6 +23,7 @@ import {
     isQueryErrorResponse,
     parseQueryAPIExecuteResponse,
 } from '../../utils/query';
+import {isNumeric} from '../../utils/utils';
 import {createRequestActionTypes} from '../utils';
 
 import {api} from './api';
@@ -139,22 +142,22 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
 };
 
 interface SendQueryParams extends QueryRequestParams {
-    mode?: QueryMode;
+    querySettings?: Partial<QuerySettings>;
     schema?: Schemas;
 }
 
 export const executeQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
         executeQuery: build.mutation<IQueryResult, SendQueryParams>({
-            queryFn: async ({query, database, mode, schema = 'modern'}) => {
+            queryFn: async ({query, database, querySettings, schema = 'modern'}) => {
                 let action: ExecuteActions = 'execute';
                 let syntax: QuerySyntax = QUERY_SYNTAX.yql;
 
-                if (mode === 'pg') {
+                if (querySettings?.queryMode === 'pg') {
                     action = 'execute-query';
                     syntax = QUERY_SYNTAX.pg;
-                } else if (mode) {
-                    action = `execute-${mode}`;
+                } else if (querySettings?.queryMode) {
+                    action = `execute-${querySettings?.queryMode}`;
                 }
 
                 try {
@@ -164,7 +167,14 @@ export const executeQueryApi = api.injectEndpoints({
                         database,
                         action,
                         syntax,
-                        stats: 'full',
+                        stats: querySettings?.statisticsMode,
+                        tracingLevel: querySettings?.tracingLevel
+                            ? TracingLevelNumber[querySettings?.tracingLevel]
+                            : undefined,
+                        transaction_mode: querySettings?.isolationLevel,
+                        timeout: isNumeric(querySettings?.timeout)
+                            ? Number(querySettings?.timeout) * 1000
+                            : undefined,
                     });
 
                     if (isQueryErrorResponse(response)) {

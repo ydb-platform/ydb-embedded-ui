@@ -7,7 +7,11 @@ import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants'
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {QueryInHistory} from '../../../../types/store/executeQuery';
 import {cn} from '../../../../utils/cn';
-import {useQueryModes, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {
+    useQueryExecutionSettings,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../../../utils/hooks';
 import {QUERY_MODES, QUERY_SYNTAX} from '../../../../utils/query';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
@@ -25,17 +29,17 @@ interface QueriesHistoryProps {
 function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
 
-    const [queryMode, setQueryMode] = useQueryModes();
+    const [settings, setQuerySettings] = useQueryExecutionSettings();
 
     const queriesHistory = useTypedSelector(selectQueriesHistory);
     const reversedHistory = [...queriesHistory].reverse();
 
     const onQueryClick = (query: QueryInHistory) => {
-        if (query.syntax === QUERY_SYNTAX.pg && queryMode !== QUERY_MODES.pg) {
-            setQueryMode(QUERY_MODES.pg);
-        } else if (query.syntax !== QUERY_SYNTAX.pg && queryMode === QUERY_MODES.pg) {
+        if (query.syntax === QUERY_SYNTAX.pg && settings.queryMode !== QUERY_MODES.pg) {
+            setQuerySettings({...settings, queryMode: QUERY_MODES.pg});
+        } else if (query.syntax !== QUERY_SYNTAX.pg && settings.queryMode === QUERY_MODES.pg) {
             // Set query mode for queries with yql syntax
-            setQueryMode(QUERY_MODES.script);
+            setQuerySettings({...settings, queryMode: QUERY_MODES.script});
         }
 
         changeUserInput({input: query.queryText});

@@ -7,10 +7,21 @@
     color: var(--g-color-text-complementary);
 
     &__item-with-popover {
+        display: flex;
+
         white-space: nowrap;
     }
 
     &__popover {
+        display: flex;
+        align-items: center;
+    }
+
+    &__popover-content {
         max-width: 300px;
+    }
+
+    &__popover-button {
+        display: flex;
     }
 }

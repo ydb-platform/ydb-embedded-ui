@@ -20,7 +20,16 @@ import type {TNetInfo} from '../types/api/netInfo';
 import type {TNodesInfo} from '../types/api/nodes';
 import type {TEvNodesInfo} from '../types/api/nodesList';
 import type {TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
-import type {Actions, ErrorResponse, QueryAPIResponse, Schemas} from '../types/api/query';
+import type {
+    Actions,
+    ErrorResponse,
+    QueryAPIResponse,
+    Schemas,
+    Stats,
+    Timeout,
+    TracingLevel,
+    TransactionMode,
+} from '../types/api/query';
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/render';
 import type {TEvDescribeSchemeResult} from '../types/api/schema';
 import type {TStorageInfo} from '../types/api/storage';
@@ -427,23 +436,19 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     sendQuery<Action extends Actions, Schema extends Schemas = undefined>(
-        {
-            schema,
-            ...params
-        }: {
+        params: {
             query?: string;
             database?: string;
             action?: Action;
-            stats?: string;
             schema?: Schema;
             syntax?: QuerySyntax;
+            stats?: Stats;
+            tracingLevel?: TracingLevel;
+            transaction_mode?: TransactionMode;
+            timeout?: Timeout;
         },
         {concurrentId, signal, withRetries}: AxiosOptions = {},
     ) {
-        // Time difference to ensure that timeout from ui will be shown rather than backend error
-        const uiTimeout = 9 * 60 * 1000;
-        const backendTimeout = 10 * 60 * 1000;
-
         /**
          * Return strings using base64 encoding.
          * @link https://github.com/ydb-platform/ydb/pull/647
@@ -454,20 +459,21 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
 
         return this.post<QueryAPIResponse<Action, Schema> | ErrorResponse>(
-            this.getPath(
-                `/viewer/json/query?timeout=${backendTimeout}&base64=${base64}${
-                    schema ? `&schema=${schema}` : ''
-                }`,
-            ),
-            params,
+            this.getPath('/viewer/json/query'),
+            {...params, base64},
             {},
             {
                 concurrentId,
-                timeout: uiTimeout,
+                timeout: params.timeout,
                 requestConfig: {
                     signal,
                     'axios-retry': {retries: withRetries ? this.DEFAULT_RETRIES_COUNT : 0},
                 },
+                headers: params.tracingLevel
+                    ? {
+                          'X-Trace-Verbosity': params.tracingLevel,
+                      }
+                    : undefined,
             },
         );
     }
