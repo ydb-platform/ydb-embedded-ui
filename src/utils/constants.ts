@@ -20,6 +20,7 @@ export const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
 export const DAY_IN_SECONDS = 24 * HOUR_IN_SECONDS;
 
 export const MS_IN_NANOSECONDS = 1000000;
+export const MS_IN_SECOND = 1000;
 
 export const TABLET_COLORS = {
     Created: 'grey',

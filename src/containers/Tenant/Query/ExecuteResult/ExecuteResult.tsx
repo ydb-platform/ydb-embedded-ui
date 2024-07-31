@@ -6,6 +6,7 @@ import JSONTree from 'react-json-inspector';
 
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {YDBGraph} from '../../../../components/Graph/Graph';
+import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ColumnType, KeyValueRow, TKqpStatsQuery} from '../../../../types/api/query';
@@ -221,22 +222,21 @@ export function ExecuteResult({
 
     return (
         <React.Fragment>
-            {!loading && (
-                <ResultControls<SectionID>
-                    error={error}
-                    stats={stats ? {DurationUs: stats.DurationUs} : undefined}
-                    activeSection={activeSection}
-                    onSelectSection={onSelectSection}
-                    sectionOptions={resultOptions}
-                    clipboardText={textResults}
-                    isClipboardDisabled={copyDisabled}
-                    isResultsCollapsed={isResultsCollapsed}
-                    onCollapseResults={onCollapseResults}
-                    onExpandResults={onExpandResults}
-                    isFullscreenDisabled={Boolean(error)}
-                />
-            )}
-            {renderResultSection()}
+            <ResultControls<SectionID>
+                error={error}
+                stats={stats ? {DurationUs: stats.DurationUs} : undefined}
+                activeSection={activeSection}
+                onSelectSection={onSelectSection}
+                sectionOptions={resultOptions}
+                clipboardText={textResults}
+                isClipboardDisabled={copyDisabled}
+                isResultsCollapsed={isResultsCollapsed}
+                onCollapseResults={onCollapseResults}
+                onExpandResults={onExpandResults}
+                isFullscreenDisabled={Boolean(error)}
+                loading={loading}
+            />
+            <LoaderWrapper loading={loading}>{renderResultSection()}</LoaderWrapper>
         </React.Fragment>
     );
 }

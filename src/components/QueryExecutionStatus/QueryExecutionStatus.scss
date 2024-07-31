@@ -4,10 +4,15 @@
     gap: 4px;
 
     color: var(--g-color-text-complementary);
+
     &__result-status-icon {
         color: var(--g-color-text-positive);
         &_error {
             color: var(--g-color-text-danger);
         }
+    }
+
+    &__elapsed-label {
+        margin-left: var(--g-spacing-3);
     }
 }

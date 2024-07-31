@@ -24,6 +24,7 @@ interface ResultControlsProps<T extends string> {
     error: unknown;
     stats?: Stats;
     activeSection?: T;
+    loading?: boolean;
     onSelectSection?: (value: T) => void;
     sectionOptions?: ControlGroupOption<T>[];
     clipboardText?: string;
@@ -38,6 +39,7 @@ export function ResultControls<T extends string>({
     error,
     stats,
     activeSection,
+    loading,
     onSelectSection,
     sectionOptions,
     clipboardText,
@@ -50,9 +52,9 @@ export function ResultControls<T extends string>({
     return (
         <div className={b('controls')}>
             <div className={b('controls-right')}>
-                <QueryExecutionStatus error={error} />
+                <QueryExecutionStatus error={error} loading={loading} />
 
-                {!error && (
+                {!error && !loading && (
                     <React.Fragment>
                         {stats?.DurationUs !== undefined && (
                             <QueryDuration duration={Number(stats.DurationUs)} />

@@ -475,7 +475,7 @@ function Result({
     }
 
     if (resultType === RESULT_TYPES.EXECUTE) {
-        if (executeQueryData || executeQueryError) {
+        if (executeQueryData || executeQueryError || executeResultLoading) {
             return (
                 <ExecuteResult
                     data={executeQueryData}

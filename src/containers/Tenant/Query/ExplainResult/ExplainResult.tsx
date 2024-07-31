@@ -130,20 +130,19 @@ export function ExplainResult({
 
     return (
         <React.Fragment>
-            {!loading && (
-                <ResultControls<QueryExplainTab>
-                    error={error}
-                    activeSection={activeOption}
-                    onSelectSection={(tabId) => {
-                        startTransition(() => setActiveOption(tabId));
-                    }}
-                    sectionOptions={explainOptions}
-                    isResultsCollapsed={isResultsCollapsed}
-                    onCollapseResults={onCollapseResults}
-                    onExpandResults={onExpandResults}
-                    isFullscreenDisabled={Boolean(error)}
-                />
-            )}
+            <ResultControls<QueryExplainTab>
+                error={error}
+                activeSection={activeOption}
+                onSelectSection={(tabId) => {
+                    startTransition(() => setActiveOption(tabId));
+                }}
+                sectionOptions={explainOptions}
+                isResultsCollapsed={isResultsCollapsed}
+                onCollapseResults={onCollapseResults}
+                onExpandResults={onExpandResults}
+                isFullscreenDisabled={Boolean(error)}
+                loading={loading}
+            />
             <LoaderWrapper loading={loading || isPending}>
                 {/* this is a hack: only one Graph component may be in DOM because of it's canvas id */}
                 {activeOption === EXPLAIN_OPTIONS_IDS.schema && isFullscreen ? null : (
