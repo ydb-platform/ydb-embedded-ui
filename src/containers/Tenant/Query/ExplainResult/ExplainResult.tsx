@@ -1,19 +1,14 @@
 import React from 'react';
 
-import {RadioButton} from '@gravity-ui/uikit';
-
-import Divider from '../../../../components/Divider/Divider';
-import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
-import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import type {PreparedExplainResponse} from '../../../../store/reducers/explainQuery/types';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ValueOf} from '../../../../types/common';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
-import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
+import {ResultControls} from '../ResultControls/ResultControls';
 
 import {Ast} from './components/Ast/Ast';
 import {Graph} from './components/Graph/Graph';
@@ -135,36 +130,20 @@ export function ExplainResult({
 
     return (
         <React.Fragment>
-            <div className={b('controls')}>
-                {!loading && (
-                    <React.Fragment>
-                        <div className={b('controls-right')}>
-                            <QueryExecutionStatus error={error} />
-                            {!error && (
-                                <React.Fragment>
-                                    <Divider />
-                                    <RadioButton
-                                        options={explainOptions}
-                                        value={activeOption}
-                                        onUpdate={(tabId) => {
-                                            startTransition(() => setActiveOption(tabId));
-                                        }}
-                                    />
-                                </React.Fragment>
-                            )}
-                        </div>
-                        <div className={b('controls-left')}>
-                            <EnableFullscreenButton disabled={Boolean(error)} />
-                            <PaneVisibilityToggleButtons
-                                onCollapse={onCollapseResults}
-                                onExpand={onExpandResults}
-                                isCollapsed={isResultsCollapsed}
-                                initialDirection="bottom"
-                            />
-                        </div>
-                    </React.Fragment>
-                )}
-            </div>
+            {!loading && (
+                <ResultControls<QueryExplainTab>
+                    error={error}
+                    activeSection={activeOption}
+                    onSelectSection={(tabId) => {
+                        startTransition(() => setActiveOption(tabId));
+                    }}
+                    sectionOptions={explainOptions}
+                    isResultsCollapsed={isResultsCollapsed}
+                    onCollapseResults={onCollapseResults}
+                    onExpandResults={onExpandResults}
+                    isFullscreenDisabled={Boolean(error)}
+                />
+            )}
             <LoaderWrapper loading={loading || isPending}>
                 {/* this is a hack: only one Graph component may be in DOM because of it's canvas id */}
                 {activeOption === EXPLAIN_OPTIONS_IDS.schema && isFullscreen ? null : (

@@ -1,27 +1,22 @@
 import React from 'react';
 
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {RadioButton, Tabs} from '@gravity-ui/uikit';
+import {Tabs} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
 
-import {ClipboardButton} from '../../../../components/ClipboardButton';
-import Divider from '../../../../components/Divider/Divider';
-import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {YDBGraph} from '../../../../components/Graph/Graph';
-import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
-import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
+import type {ColumnType, KeyValueRow, TKqpStatsQuery} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
-import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {ResultIssues} from '../Issues/Issues';
-import {QueryDuration} from '../QueryDuration/QueryDuration';
+import {ResultControls} from '../ResultControls/ResultControls';
 import {getPreparedResult} from '../utils/getPreparedResult';
 
 import {getPlan} from './utils';
@@ -45,6 +40,7 @@ interface ExecuteResultProps {
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
     theme?: string;
+    loading?: boolean;
 }
 
 export function ExecuteResult({
@@ -54,6 +50,7 @@ export function ExecuteResult({
     onCollapseResults,
     onExpandResults,
     theme,
+    loading,
 }: ExecuteResultProps) {
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
@@ -61,7 +58,7 @@ export function ExecuteResult({
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
 
-    const stats = data?.stats;
+    const stats: TKqpStatsQuery | undefined = data?.stats;
     const resultsSetsCount = data?.resultSets?.length;
     const isMulti = resultsSetsCount && resultsSetsCount > 0;
     const currentResult = isMulti ? data?.resultSets?.[selectedResultSet].result : data?.result;
@@ -86,8 +83,8 @@ export function ExecuteResult({
         };
     }, [dispatch]);
 
-    const onSelectSection = (value: string) => {
-        setActiveSection(value as SectionID);
+    const onSelectSection = (value: SectionID) => {
+        setActiveSection(value);
     };
 
     const renderResultTable = (
@@ -118,17 +115,6 @@ export function ExecuteResult({
                     {renderResultTable(currentResult, currentColumns)}
                 </div>
             </React.Fragment>
-        );
-    };
-
-    const renderClipboardButton = () => {
-        return (
-            <ClipboardButton
-                text={textResults}
-                view="flat-secondary"
-                title="Copy results"
-                disabled={copyDisabled}
-            />
         );
     };
 
@@ -235,34 +221,21 @@ export function ExecuteResult({
 
     return (
         <React.Fragment>
-            <div className={b('controls')}>
-                <div className={b('controls-right')}>
-                    <QueryExecutionStatus error={error} />
-
-                    {stats && !error && (
-                        <React.Fragment>
-                            <QueryDuration duration={stats?.DurationUs} />
-                            <Divider />
-                            <RadioButton
-                                options={resultOptions}
-                                value={activeSection}
-                                onUpdate={onSelectSection}
-                            />
-                        </React.Fragment>
-                    )}
-                </div>
-                <div className={b('controls-left')}>
-                    {renderClipboardButton()}
-                    <EnableFullscreenButton />
-                    <PaneVisibilityToggleButtons
-                        onCollapse={onCollapseResults}
-                        onExpand={onExpandResults}
-                        isCollapsed={isResultsCollapsed}
-                        initialDirection="bottom"
-                    />
-                </div>
-            </div>
-
+            {!loading && (
+                <ResultControls<SectionID>
+                    error={error}
+                    stats={stats ? {DurationUs: stats.DurationUs} : undefined}
+                    activeSection={activeSection}
+                    onSelectSection={onSelectSection}
+                    sectionOptions={resultOptions}
+                    clipboardText={textResults}
+                    isClipboardDisabled={copyDisabled}
+                    isResultsCollapsed={isResultsCollapsed}
+                    onCollapseResults={onCollapseResults}
+                    onExpandResults={onExpandResults}
+                    isFullscreenDisabled={Boolean(error)}
+                />
+            )}
             {renderResultSection()}
         </React.Fragment>
     );

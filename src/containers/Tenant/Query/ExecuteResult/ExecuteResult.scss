@@ -30,32 +30,6 @@
         padding: 15px 10px;
     }
 
-    &__controls {
-        position: sticky;
-        z-index: 2;
-        top: 0;
-
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        height: 53px;
-        padding: 12px 20px;
-
-        border-bottom: 1px solid var(--g-color-line-generic);
-        background-color: var(--g-color-base-background);
-    }
-
-    &__controls-right {
-        display: flex;
-        gap: 12px;
-
-        height: 100%;
-    }
-    &__controls-left {
-        display: flex;
-        gap: 4px;
-    }
     &__inspector {
         padding: 15px 10px;
         @include json-tree-styles();

@@ -352,9 +352,8 @@ function QueryEditor(props: QueryEditorProps) {
             <QueryEditorControls
                 onRunButtonClick={handleSendExecuteClick}
                 onSettingsButtonClick={handleSettingsClick}
-                runIsLoading={executeQueryResult.isLoading}
                 onExplainButtonClick={handleGetExplainQueryClick}
-                explainIsLoading={explainQueryResult.isLoading}
+                isLoading={explainQueryResult.isLoading || executeQueryResult.isLoading}
                 disabled={!executeQuery.input}
                 onUpdateQueryMode={setQueryMode}
                 queryMode={queryMode}
@@ -400,6 +399,7 @@ function QueryEditor(props: QueryEditorProps) {
                         explainQueryData={explainQueryResult.data}
                         explainQueryError={explainQueryResult.error}
                         explainQueryLoading={explainQueryResult.isLoading}
+                        executeResultLoading={executeQueryResult.isLoading}
                         resultVisibilityState={resultVisibilityState}
                         onExpandResultHandler={onExpandResultHandler}
                         onCollapseResultHandler={onCollapseResultHandler}
@@ -442,6 +442,7 @@ interface ResultProps {
     explainQueryData?: PreparedExplainResponse;
     explainQueryError?: unknown;
     explainQueryLoading?: boolean;
+    executeResultLoading?: boolean;
     resultVisibilityState: InitialPaneState;
     onExpandResultHandler: () => void;
     onCollapseResultHandler: () => void;
@@ -458,6 +459,7 @@ function Result({
     explainQueryData,
     explainQueryError,
     explainQueryLoading,
+    executeResultLoading,
     resultVisibilityState,
     onExpandResultHandler,
     onCollapseResultHandler,
@@ -482,6 +484,7 @@ function Result({
                     onExpandResults={onExpandResultHandler}
                     onCollapseResults={onCollapseResultHandler}
                     theme={theme}
+                    loading={executeResultLoading}
                 />
             );
         }

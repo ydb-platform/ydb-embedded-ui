@@ -5,40 +5,8 @@
         flex-grow: 1;
         flex-direction: column;
     }
+
     &__text-message {
         padding: 15px 20px;
-    }
-    &__controls {
-        position: sticky;
-        z-index: 2;
-        top: 0;
-
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        height: 53px;
-        padding: 12px 20px;
-
-        border-bottom: 1px solid var(--g-color-line-generic);
-        background-color: var(--g-color-base-background);
-    }
-    &__controls-right {
-        display: flex;
-        gap: 12px;
-
-        height: 100%;
-    }
-    &__controls-left {
-        display: flex;
-        gap: 4px;
-    }
-    &__loader {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        width: 100%;
-        margin-top: 20px;
     }
 }
