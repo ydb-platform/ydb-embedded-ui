@@ -10,6 +10,7 @@ import {
     LANGUAGE_KEY,
     QUERY_SETTINGS,
     QUERY_USE_MULTI_SCHEMA_KEY,
+    SHOW_DOMAIN_DATABASE_KEY,
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_DIRECTORY_OPERATIONS,
@@ -109,6 +110,11 @@ export const usePaginatedTables: SettingProps = {
     description: i18n('settings.usePaginatedTables.description'),
 };
 
+export const showDomainDatabase: SettingProps = {
+    settingKey: SHOW_DOMAIN_DATABASE_KEY,
+    title: i18n('settings.showDomainDatabase.title'),
+};
+
 export const useQuerySettings: SettingProps = {
     settingKey: QUERY_SETTINGS,
     title: i18n('settings.useQuerySettings.title'),
@@ -159,7 +165,12 @@ export const interfaceVersionInfoField: SettingsInfoFieldProps = {
 export const appearanceSection: SettingsSection = {
     id: 'appearanceSection',
     title: i18n('section.appearance'),
-    settings: [themeSetting, invertedDisksSetting, binaryDataInPlainTextDisplay],
+    settings: [
+        themeSetting,
+        invertedDisksSetting,
+        binaryDataInPlainTextDisplay,
+        showDomainDatabase,
+    ],
 };
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
