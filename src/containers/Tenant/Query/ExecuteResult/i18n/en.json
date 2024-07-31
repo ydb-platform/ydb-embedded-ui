@@ -1,0 +1,7 @@
+{
+  "description.graph-is-not-supported": "Graph can not be rendered",
+  "action.result": "Result",
+  "action.stats": "Stats",
+  "action.schema": "Schema",
+  "action.explain-plan": "Explain Plan"
+}

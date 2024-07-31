@@ -1,20 +1,28 @@
 .kv-fullscreen {
-    // should expand to fill the content area, keeping aside navigation visible
-    // counts on .gn-aside-header__content to have position: relative, it is set in App.scss
-    position: absolute;
-    z-index: 10;
-    inset: 0;
-
     display: flex;
     overflow: hidden;
     flex-grow: 1;
 
-    background-color: var(--g-color-base-background);
+    &_fullscreen {
+        // should expand to fill the content area, keeping aside navigation visible
+        // counts on .gn-aside-header__content to have position: relative, it is set in App.scss
+        position: absolute;
+        z-index: 10;
+        inset: 0;
+
+        background-color: var(--g-color-base-background);
+    }
 
     &__close-button {
         position: fixed;
         z-index: 11;
         top: 8px;
         right: 20px;
+
+        display: none;
+    }
+
+    &_fullscreen &__close-button {
+        display: block;
     }
 }

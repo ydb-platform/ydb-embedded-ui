@@ -43,25 +43,18 @@ function reorderParamsEntries(params: Record<string, unknown>) {
 
 function getOperationParams(params: Record<string, unknown> = {}) {
     const result = [];
-    const paramsEntries = Object.entries(params);
-    if (paramsEntries.length === 1) {
-        const value = paramsEntries[0][1];
-        const color = getOperatorPropertyColor(paramsEntries[0][0]);
-        result.push(<span style={{color}}>{prepareValue(value)}</span>);
-    } else {
-        const reorderedParamsEntries = reorderParamsEntries(params);
-        for (let i = 0; i < reorderedParamsEntries.length; i++) {
-            const [key, value] = reorderedParamsEntries[i];
-            const color = getOperatorPropertyColor(key);
-            if (i > 0) {
-                result.push(<span>, </span>);
-            }
-            result.push(
-                <span style={{color}}>
-                    {key}: {prepareValue(value)}
-                </span>,
-            );
+    const reorderedParamsEntries = reorderParamsEntries(params);
+    for (let i = 0; i < reorderedParamsEntries.length; i++) {
+        const [key, value] = reorderedParamsEntries[i];
+        const color = getOperatorPropertyColor(key);
+        if (i > 0) {
+            result.push(', ');
         }
+        result.push(
+            <span key={i} style={{color}}>
+                {key}: {prepareValue(value)}
+            </span>,
+        );
     }
 
     return result;

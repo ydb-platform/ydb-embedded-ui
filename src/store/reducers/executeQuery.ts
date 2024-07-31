@@ -167,7 +167,7 @@ export const executeQueryApi = api.injectEndpoints({
                         database,
                         action,
                         syntax,
-                        stats: querySettings?.statisticsMode,
+                        stats: querySettings?.statisticsMode ?? 'full',
                         tracingLevel: querySettings?.tracingLevel
                             ? TracingLevelNumber[querySettings?.tracingLevel]
                             : undefined,
