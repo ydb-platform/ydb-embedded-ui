@@ -8,6 +8,7 @@ import i18n from '../../containers/Tenant/Query/i18n';
 import {QUERY_SETTINGS, useSetting} from '../../lib';
 import {cn} from '../../utils/cn';
 import {useChangedQuerySettings} from '../../utils/hooks/useChangedQuerySettings';
+import QuerySettingsDescription from '../QuerySettingsDescription/QuerySettingsDescription';
 
 import './QueryExecutionStatus.scss';
 
@@ -30,15 +31,10 @@ const QuerySettingsIndicator = () => {
         <Tooltip
             openDelay={0}
             content={
-                <div className={b('message')}>
-                    {i18n('banner.query-settings.message')}
-                    {changedLastExecutionSettingsDescriptions.map((description, index, arr) => (
-                        <span key={index} className={b('description-item')}>
-                            {description}
-                            {index < arr.length - 1 ? ', ' : null}
-                        </span>
-                    ))}
-                </div>
+                <QuerySettingsDescription
+                    prefix={i18n('banner.query-settings.message')}
+                    querySettings={changedLastExecutionSettingsDescriptions}
+                />
             }
         >
             <Icon data={CircleInfo} className={b('query-settings-icon')} />

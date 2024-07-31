@@ -1,5 +1,6 @@
 import {Alert} from '@gravity-ui/uikit';
 
+import QuerySettingsDescription from '../../../../components/QuerySettingsDescription/QuerySettingsDescription';
 import {cn} from '../../../../utils/cn';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import i18n from '../i18n';
@@ -17,15 +18,10 @@ export function QuerySettingsBanner() {
             theme="info"
             align="baseline"
             message={
-                <div className={b('message')}>
-                    {i18n('banner.query-settings.message')}
-                    {changedLastExecutionSettingsDescriptions.map((description, index, arr) => (
-                        <span key={index} className={b('description-item')}>
-                            {description}
-                            {index < arr.length - 1 ? ', ' : null}
-                        </span>
-                    ))}
-                </div>
+                <QuerySettingsDescription
+                    prefix={i18n('banner.query-settings.message')}
+                    querySettings={changedLastExecutionSettingsDescriptions}
+                />
             }
             onClose={closeBanner}
         />

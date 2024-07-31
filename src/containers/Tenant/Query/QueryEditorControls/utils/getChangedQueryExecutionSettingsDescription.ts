@@ -9,20 +9,19 @@ export default function getChangedQueryExecutionSettingsDescription({
 }: {
     currentSettings: QuerySettings;
     defaultSettings: QuerySettings;
-}): string[] {
+}): Record<string, string>[] {
     const keys = getChangedQueryExecutionSettings(currentSettings, defaultSettings);
     return keys.map((key) => {
         const settings = QUERY_SETTINGS_FIELD_SETTINGS[key];
-        const currentValue = currentSettings[key];
+        const currentValue = currentSettings[key] as string;
 
         if ('options' in settings) {
-            const content = settings.options.find(
-                (option) => option.value === currentValue,
-            )?.content;
+            const content = settings.options.find((option) => option.value === currentValue)
+                ?.content as string;
 
-            return `${settings.title}: ${content}`;
+            return {[settings.title]: content};
         }
 
-        return `${settings.title}: ${currentValue}`;
+        return {[settings.title]: currentValue};
     });
 }

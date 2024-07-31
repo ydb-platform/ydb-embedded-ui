@@ -27,27 +27,21 @@ export function QuerySettingsDialog() {
     const dispatch = useTypedDispatch();
     const queryAction = useTypedSelector(selectQueryAction);
     const [querySettings, setQuerySettings] = useQueryExecutionSettings();
-    const {control, handleSubmit, reset} = useForm<QuerySettings>({
-        defaultValues: querySettings,
-    });
-
-    React.useEffect(() => {
-        reset(querySettings);
-    }, [querySettings, reset]);
 
     const onCloseDialog = React.useCallback(() => {
         dispatch(setQueryAction('idle'));
-        reset();
-    }, [dispatch, reset]);
+    }, [dispatch]);
 
     const onSaveClick = React.useCallback(
         (data: QuerySettings) => {
             setQuerySettings(data);
-            reset(data);
             onCloseDialog();
         },
-        [onCloseDialog, reset, setQuerySettings],
+        [onCloseDialog, setQuerySettings],
     );
+
+    // key to reinitialize dialog on open
+    const formKey = React.useMemo(() => JSON.stringify(querySettings), [querySettings]);
 
     return (
         <Dialog
@@ -58,137 +52,156 @@ export function QuerySettingsDialog() {
             hasCloseButton={false}
         >
             <Dialog.Header caption={i18n('action.settings')} />
-            <form onSubmit={handleSubmit(onSaveClick)}>
-                <Dialog.Body className={b('dialog-body')}>
-                    <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                        <label htmlFor="queryMode" className={b('field-title')}>
-                            {QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title}
-                        </label>
-                        <div className={b('control-wrapper')}>
-                            <Controller
-                                name="queryMode"
-                                control={control}
-                                render={({field}) => (
-                                    <QuerySettingsSelect
-                                        setting={field.value}
-                                        onUpdateSetting={field.onChange}
-                                        settingOptions={
-                                            QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options
-                                        }
-                                    />
-                                )}
-                            />
-                        </div>
-                    </Flex>
-                    <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                        <label htmlFor="timeout" className={b('field-title')}>
-                            {QUERY_SETTINGS_FIELD_SETTINGS.timeout.title}
-                        </label>
-                        <div className={b('control-wrapper')}>
-                            <Controller
-                                name="timeout"
-                                control={control}
-                                render={({field}) => (
-                                    <React.Fragment>
-                                        <TextInput
-                                            type="number"
-                                            {...field}
-                                            className={b('timeout')}
-                                            placeholder="60"
-                                        />
-                                        <span className={b('timeout-suffix')}>
-                                            {i18n('form.timeout.seconds')}
-                                        </span>
-                                    </React.Fragment>
-                                )}
-                            />
-                        </div>
-                    </Flex>
-                    <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                        <label htmlFor="tracingLevel" className={b('field-title')}>
-                            {QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title}
-                        </label>
-                        <div className={b('control-wrapper')}>
-                            <Controller
-                                name="tracingLevel"
-                                control={control}
-                                render={({field}) => (
-                                    <QuerySettingsSelect
-                                        setting={field.value}
-                                        onUpdateSetting={field.onChange}
-                                        settingOptions={
-                                            QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.options
-                                        }
-                                    />
-                                )}
-                            />
-                        </div>
-                    </Flex>
-                    <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                        <label htmlFor="isolationLevel" className={b('field-title')}>
-                            {QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.title}
-                        </label>
-                        <div className={b('control-wrapper')}>
-                            <Controller
-                                name="isolationLevel"
-                                control={control}
-                                render={({field}) => (
-                                    <QuerySettingsSelect
-                                        setting={field.value}
-                                        onUpdateSetting={field.onChange}
-                                        settingOptions={
-                                            QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.options
-                                        }
-                                    />
-                                )}
-                            />
-                        </div>
-                    </Flex>
-                    <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                        <label htmlFor="statisticsMode" className={b('field-title')}>
-                            {QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title}
-                        </label>
-                        <div className={b('control-wrapper')}>
-                            <Controller
-                                name="statisticsMode"
-                                control={control}
-                                render={({field}) => (
-                                    <QuerySettingsSelect
-                                        setting={field.value}
-                                        onUpdateSetting={field.onChange}
-                                        settingOptions={
-                                            QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options
-                                        }
-                                    />
-                                )}
-                            />
-                        </div>
-                    </Flex>
-                </Dialog.Body>
-                <Dialog.Footer
-                    textButtonApply={i18n('button-done')}
-                    textButtonCancel={i18n('button-cancel')}
-                    onClickButtonCancel={onCloseDialog}
-                    propsButtonApply={{
-                        type: 'submit',
-                    }}
-                    renderButtons={(buttonApply, buttonCancel) => (
-                        <div className={b('buttons-container')}>
-                            <ExternalLink
-                                href="https://ydb.tech/docs/ru/concepts/transactions"
-                                target="_blank"
-                                className={b('documentation-link')}
-                            >
-                                {i18n('docs')}
-                            </ExternalLink>
-                            <div className={b('main-buttons')}>
-                                {buttonCancel}
-                                {buttonApply}
-                            </div>
-                        </div>
-                    )}
-                />
-            </form>
+            <QuerySettingsForm
+                key={formKey}
+                initialValues={querySettings}
+                onSubmit={onSaveClick}
+                onCancel={onCloseDialog}
+            />
         </Dialog>
+    );
+}
+
+interface QuerySettingsFormProps {
+    initialValues: QuerySettings;
+    onSubmit: (data: QuerySettings) => void;
+    onCancel: () => void;
+}
+
+function QuerySettingsForm({initialValues, onSubmit, onCancel}: QuerySettingsFormProps) {
+    const {control, handleSubmit} = useForm<QuerySettings>({
+        defaultValues: initialValues,
+    });
+
+    return (
+        <form onSubmit={handleSubmit(onSubmit)}>
+            <Dialog.Body className={b('dialog-body')}>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="queryMode" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="queryMode"
+                            control={control}
+                            render={({field}) => (
+                                <QuerySettingsSelect
+                                    setting={field.value}
+                                    onUpdateSetting={field.onChange}
+                                    settingOptions={QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options}
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="timeout" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.timeout.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="timeout"
+                            control={control}
+                            render={({field}) => (
+                                <React.Fragment>
+                                    <TextInput
+                                        type="number"
+                                        {...field}
+                                        className={b('timeout')}
+                                        placeholder="60"
+                                    />
+                                    <span className={b('timeout-suffix')}>
+                                        {i18n('form.timeout.seconds')}
+                                    </span>
+                                </React.Fragment>
+                            )}
+                        />
+                    </div>
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="tracingLevel" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="tracingLevel"
+                            control={control}
+                            render={({field}) => (
+                                <QuerySettingsSelect
+                                    setting={field.value}
+                                    onUpdateSetting={field.onChange}
+                                    settingOptions={
+                                        QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.options
+                                    }
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="isolationLevel" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="isolationLevel"
+                            control={control}
+                            render={({field}) => (
+                                <QuerySettingsSelect
+                                    setting={field.value}
+                                    onUpdateSetting={field.onChange}
+                                    settingOptions={
+                                        QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.options
+                                    }
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="statisticsMode" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="statisticsMode"
+                            control={control}
+                            render={({field}) => (
+                                <QuerySettingsSelect
+                                    setting={field.value}
+                                    onUpdateSetting={field.onChange}
+                                    settingOptions={
+                                        QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options
+                                    }
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
+            </Dialog.Body>
+            <Dialog.Footer
+                textButtonApply={i18n('button-done')}
+                textButtonCancel={i18n('button-cancel')}
+                onClickButtonCancel={onCancel}
+                propsButtonApply={{
+                    type: 'submit',
+                }}
+                renderButtons={(buttonApply, buttonCancel) => (
+                    <div className={b('buttons-container')}>
+                        <ExternalLink
+                            href="https://ydb.tech/docs/ru/concepts/transactions"
+                            target="_blank"
+                            className={b('documentation-link')}
+                        >
+                            {i18n('docs')}
+                        </ExternalLink>
+                        <div className={b('main-buttons')}>
+                            {buttonCancel}
+                            {buttonApply}
+                        </div>
+                    </div>
+                )}
+            />
+        </form>
     );
 }

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import getChangedQueryExecutionSettings from '../../containers/Tenant/Query/QueryEditorControls/utils/getChangedQueryExecutionSettings';
 import getChangedQueryExecutionSettingsDescription from '../../containers/Tenant/Query/QueryEditorControls/utils/getChangedQueryExecutionSettingsDescription';
 import {
@@ -19,45 +17,29 @@ export const useChangedQuerySettings = () => {
     const [lastQuerySettings] = useLastQueryExecutionSettings();
     const [currentQuerySettings] = useQueryExecutionSettings();
 
-    const changedLastExucutionSettings = React.useMemo(
-        () =>
-            lastQuerySettings
-                ? getChangedQueryExecutionSettings(lastQuerySettings, DEFAULT_QUERY_SETTINGS)
-                : [],
-        [lastQuerySettings],
-    );
+    const changedLastExucutionSettings = lastQuerySettings
+        ? getChangedQueryExecutionSettings(lastQuerySettings, DEFAULT_QUERY_SETTINGS)
+        : [];
 
-    const changedCurrentSettings = React.useMemo(
-        () =>
-            currentQuerySettings
-                ? getChangedQueryExecutionSettings(currentQuerySettings, DEFAULT_QUERY_SETTINGS)
-                : [],
-        [currentQuerySettings],
-    );
+    const changedCurrentSettings = currentQuerySettings
+        ? getChangedQueryExecutionSettings(currentQuerySettings, DEFAULT_QUERY_SETTINGS)
+        : [];
 
     const hasChangedLastExucutionSettings = changedLastExucutionSettings.length > 0;
 
-    const changedLastExecutionSettingsDescriptions = React.useMemo(
-        () =>
-            lastQuerySettings
-                ? getChangedQueryExecutionSettingsDescription({
-                      currentSettings: lastQuerySettings,
-                      defaultSettings: DEFAULT_QUERY_SETTINGS,
-                  })
-                : [],
-        [lastQuerySettings],
-    );
+    const changedLastExecutionSettingsDescriptions = lastQuerySettings
+        ? getChangedQueryExecutionSettingsDescription({
+              currentSettings: lastQuerySettings,
+              defaultSettings: DEFAULT_QUERY_SETTINGS,
+          })
+        : [];
 
-    const changedCurrentSettingsDescriptions = React.useMemo(
-        () =>
-            currentQuerySettings
-                ? getChangedQueryExecutionSettingsDescription({
-                      currentSettings: currentQuerySettings,
-                      defaultSettings: DEFAULT_QUERY_SETTINGS,
-                  })
-                : [],
-        [currentQuerySettings],
-    );
+    const changedCurrentSettingsDescriptions = currentQuerySettings
+        ? getChangedQueryExecutionSettingsDescription({
+              currentSettings: currentQuerySettings,
+              defaultSettings: DEFAULT_QUERY_SETTINGS,
+          })
+        : [];
 
     const isClosedRecently =
         bannerLastClosedTimestamp &&
@@ -66,13 +48,9 @@ export const useChangedQuerySettings = () => {
     const isBannerShown = hasChangedLastExucutionSettings && !isClosedRecently;
     const isIndicatorShown = hasChangedLastExucutionSettings && isClosedRecently;
 
-    const closeBanner = React.useCallback(() => {
-        setBannerLastClosedTimestamp(Date.now());
-    }, [setBannerLastClosedTimestamp]);
+    const closeBanner = () => setBannerLastClosedTimestamp(Date.now());
 
-    const resetBanner = React.useCallback(() => {
-        setBannerLastClosedTimestamp(undefined);
-    }, [setBannerLastClosedTimestamp]);
+    const resetBanner = () => setBannerLastClosedTimestamp(undefined);
 
     return {
         isBannerShown,

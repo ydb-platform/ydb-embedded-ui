@@ -5,6 +5,7 @@ import type {ButtonView} from '@gravity-ui/uikit';
 import {Button, DropdownMenu, Icon, Tooltip} from '@gravity-ui/uikit';
 
 import {LabelWithPopover} from '../../../../components/LabelWithPopover';
+import QuerySettingsDescription from '../../../../components/QuerySettingsDescription/QuerySettingsDescription';
 import {QUERY_SETTINGS, useSetting} from '../../../../lib';
 import type {QueryAction, QueryMode, QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
@@ -60,15 +61,10 @@ const SettingsButton = ({onClick, runIsLoading}: SettingsButtonProps) => {
         <Tooltip
             disabled={changedCurrentSettings.length === 0}
             content={
-                <div className={b('message')}>
-                    {i18n('gear.tooltip')}
-                    {changedCurrentSettingsDescriptions.map((description, index, arr) => (
-                        <span key={index} className={b('description-item')}>
-                            {description}
-                            {index < arr.length - 1 ? ', ' : null}
-                        </span>
-                    ))}
-                </div>
+                <QuerySettingsDescription
+                    prefix={i18n('gear.tooltip')}
+                    querySettings={changedCurrentSettingsDescriptions}
+                />
             }
             openDelay={0}
             placement={['top-start']}
