@@ -79,7 +79,7 @@ export function VDiskPage() {
                     if (response?.result === false) {
                         const err = {
                             statusText: response.error,
-                            retryPossible: response.forceRetryPossible && !isRetry,
+                            retryPossible: response.forceRetryPossible,
                         };
                         throw err;
                     }
