@@ -15,7 +15,7 @@ export function QuerySettingsBanner() {
         <Alert
             className={b()}
             theme="info"
-            align="center"
+            align="baseline"
             message={
                 <div className={b('message')}>
                     {i18n('banner.query-settings.message')}
