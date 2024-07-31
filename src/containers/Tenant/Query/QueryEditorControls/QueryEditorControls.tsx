@@ -45,9 +45,8 @@ const QueryModeSelectorOptions = {
 interface QueryEditorControlsProps {
     onRunButtonClick: (mode?: QueryMode) => void;
     onSettingsButtonClick: () => void;
-    runIsLoading: boolean;
     onExplainButtonClick: (mode?: QueryMode) => void;
-    explainIsLoading: boolean;
+    isLoading: boolean;
     disabled: boolean;
     onUpdateQueryMode: (mode: QueryMode) => void;
     queryMode: QueryMode;
@@ -58,9 +57,8 @@ export const QueryEditorControls = ({
     onRunButtonClick,
     onSettingsButtonClick,
     onUpdateQueryMode,
-    runIsLoading,
+    isLoading,
     onExplainButtonClick,
-    explainIsLoading,
     disabled,
     queryMode,
     highlightedAction,
@@ -96,7 +94,7 @@ export const QueryEditorControls = ({
                         onRunButtonClick(queryMode);
                     }}
                     disabled={disabled}
-                    loading={runIsLoading}
+                    loading={isLoading}
                     view={runView}
                     className={b('run-button')}
                 >
@@ -108,7 +106,7 @@ export const QueryEditorControls = ({
                         onExplainButtonClick(queryMode);
                     }}
                     disabled={disabled}
-                    loading={explainIsLoading}
+                    loading={isLoading}
                     view={explainView}
                 >
                     Explain
@@ -116,7 +114,7 @@ export const QueryEditorControls = ({
                 {useQuerySettings ? (
                     <Button
                         onClick={onSettingsButtonClick}
-                        loading={runIsLoading}
+                        loading={isLoading}
                         className={b('gear-button')}
                     >
                         <Icon data={Gear} size={16} />
