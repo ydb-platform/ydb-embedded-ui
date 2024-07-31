@@ -1,13 +1,9 @@
 import type {QuerySettings} from '../../../../../types/store/query';
 import {
     ISOLATION_LEVELS,
-    ISOLATION_LEVELS_TITLES,
     QUERY_MODES,
-    QUERY_MODES_TITLES,
     STATISTICS_MODES,
-    STATISTICS_MODES_TITLES,
     TRACING_LEVELS,
-    TRACING_LEVELS_TITLES,
 } from '../../../../../utils/query';
 import {QUERY_SETTINGS_FIELD_SETTINGS} from '../../QuerySettingsDialog/constants';
 
@@ -22,7 +18,7 @@ const DEFAULT_QUERY_SETTINGS: QuerySettings = {
 };
 
 describe('getChangedQueryExecutionSettingsDescription', () => {
-    it('should return an empty array if no settings changed', () => {
+    it('should return an empty object if no settings changed', () => {
         const currentSettings: QuerySettings = {...DEFAULT_QUERY_SETTINGS};
 
         const result = getChangedQueryExecutionSettingsDescription({
@@ -30,7 +26,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
             defaultSettings: DEFAULT_QUERY_SETTINGS,
         });
 
-        expect(result).toEqual([]);
+        expect(result).toEqual({});
     });
 
     it('should return the description for changed settings', () => {
@@ -45,17 +41,13 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
             defaultSettings: DEFAULT_QUERY_SETTINGS,
         });
 
-        expect(result).toEqual([
-            {
-                [QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title]:
-                    QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options.find(
-                        (option) => option.value === QUERY_MODES.pg,
-                    )?.content,
-            },
-            {
-                [QUERY_SETTINGS_FIELD_SETTINGS.timeout.title]: '63',
-            },
-        ]);
+        expect(result).toEqual({
+            [QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title]:
+                QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options.find(
+                    (option) => option.value === QUERY_MODES.pg,
+                )?.content,
+            [QUERY_SETTINGS_FIELD_SETTINGS.timeout.title]: '63',
+        });
     });
 
     it('should return the correct description for all changed settings', () => {
@@ -72,26 +64,24 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
             defaultSettings: DEFAULT_QUERY_SETTINGS,
         });
 
-        expect(result).toEqual([
-            {
-                [QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title]:
-                    QUERY_MODES_TITLES[QUERY_MODES.data],
-            },
-            {
-                [QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.title]:
-                    ISOLATION_LEVELS_TITLES[ISOLATION_LEVELS.snapshot],
-            },
-            {
-                [QUERY_SETTINGS_FIELD_SETTINGS.timeout.title]: '120',
-            },
-            {
-                [QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title]:
-                    STATISTICS_MODES_TITLES[STATISTICS_MODES.profile],
-            },
-            {
-                [QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title]:
-                    TRACING_LEVELS_TITLES[TRACING_LEVELS.diagnostic],
-            },
-        ]);
+        expect(result).toEqual({
+            [QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title]:
+                QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options.find(
+                    (option) => option.value === QUERY_MODES.data,
+                )?.content,
+            [QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.title]:
+                QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.options.find(
+                    (option) => option.value === ISOLATION_LEVELS.snapshot,
+                )?.content,
+            [QUERY_SETTINGS_FIELD_SETTINGS.timeout.title]: '120',
+            [QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title]:
+                QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options.find(
+                    (option) => option.value === STATISTICS_MODES.profile,
+                )?.content,
+            [QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title]:
+                QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.options.find(
+                    (option) => option.value === TRACING_LEVELS.diagnostic,
+                )?.content,
+        });
     });
 });

@@ -32,14 +32,14 @@ export const useChangedQuerySettings = () => {
               currentSettings: lastQuerySettings,
               defaultSettings: DEFAULT_QUERY_SETTINGS,
           })
-        : [];
+        : {};
 
     const changedCurrentSettingsDescriptions = currentQuerySettings
         ? getChangedQueryExecutionSettingsDescription({
               currentSettings: currentQuerySettings,
               defaultSettings: DEFAULT_QUERY_SETTINGS,
           })
-        : [];
+        : {};
 
     const isClosedRecently =
         bannerLastClosedTimestamp &&

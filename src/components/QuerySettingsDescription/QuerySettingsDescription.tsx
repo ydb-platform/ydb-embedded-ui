@@ -6,7 +6,7 @@ const b = cn('ydb-query-settings-description');
 
 interface QuerySettingsDescriptionProps {
     prefix: string;
-    querySettings: Record<string, string>[];
+    querySettings: Record<string, string>;
 }
 
 const QuerySettingsDescription = ({querySettings, prefix}: QuerySettingsDescriptionProps) => {
