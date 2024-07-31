@@ -2,6 +2,7 @@ import AxiosWrapper from '@gravity-ui/axios-wrapper';
 import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import type {AxiosRequestConfig} from 'axios';
 import axiosRetry from 'axios-retry';
+import qs from 'qs';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
@@ -14,13 +15,13 @@ import type {DescribeConsumerResult} from '../types/api/consumer';
 import type {HealthCheckAPIResponse} from '../types/api/healthcheck';
 import type {JsonHotKeysResponse} from '../types/api/hotkeys';
 import type {MetaCluster, MetaClusters, MetaTenants} from '../types/api/meta';
+import type {ModifyDiskResponse} from '../types/api/modifyDisk';
 import type {TNetInfo} from '../types/api/netInfo';
 import type {TNodesInfo} from '../types/api/nodes';
 import type {TEvNodesInfo} from '../types/api/nodesList';
 import type {TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
 import type {Actions, ErrorResponse, QueryAPIResponse, Schemas} from '../types/api/query';
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/render';
-import type {RestartPDiskResponse} from '../types/api/restartPDisk';
 import type {TEvDescribeSchemeResult} from '../types/api/schema';
 import type {TStorageInfo} from '../types/api/storage';
 import type {TEvSystemStateResponse} from '../types/api/systemState';
@@ -500,36 +501,34 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         failRealmIdx,
         failDomainIdx,
         vDiskIdx,
+        force,
     }: {
         groupId: string | number;
         groupGeneration: string | number;
         failRealmIdx: string | number;
         failDomainIdx: string | number;
         vDiskIdx: string | number;
+        force?: boolean;
     }) {
-        // BSC Id is constant for all ydb clusters
-        const BSC_TABLET_ID = '72057594037932033';
+        const params = {
+            group_id: groupId,
+            group_generation_id: groupGeneration,
+            fail_realm_idx: failRealmIdx,
+            fail_domain_idx: failDomainIdx,
+            vdisk_idx: vDiskIdx,
 
-        return this.post(
-            this.getPath(`/tablets/app?TabletID=${BSC_TABLET_ID}&exec=1`),
-            {
-                Command: {
-                    ReassignGroupDisk: {
-                        GroupId: groupId,
-                        GroupGeneration: groupGeneration,
-                        FailRealmIdx: failRealmIdx,
-                        FailDomainIdx: failDomainIdx,
-                        VDiskIdx: vDiskIdx,
-                    },
-                },
-            },
+            force,
+        };
+
+        const paramsString = qs.stringify(params);
+
+        const path = this.getPath(`/vdisk/evict?${paramsString}`);
+
+        return this.post<ModifyDiskResponse>(
+            path,
+            {},
             {},
             {
-                headers: {
-                    // This handler requires exactly this string
-                    // Automatic headers may not suit
-                    Accept: 'application/json',
-                },
                 requestConfig: {'axios-retry': {retries: 0}},
             },
         );
@@ -543,7 +542,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         pDiskId: number | string;
         force?: boolean;
     }) {
-        return this.post<RestartPDiskResponse>(
+        return this.post<ModifyDiskResponse>(
             this.getPath(`/pdisk/restart?node_id=${nodeId}&pdisk_id=${pDiskId}&force=${force}`),
             {},
             {},
