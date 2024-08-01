@@ -159,4 +159,4 @@ export const AUTOCOMPLETE_ON_ENTER = 'autocompleteOnEnter';
 
 export const IS_HOTKEYS_HELP_HIDDEN_KEY = 'isHotKeysHelpHidden';
 
-export const QUERY_SETTINGS = 'query_settings';
+export const ENABLE_TRACING_LEVEL_KEY = 'enableTracingLevel';
