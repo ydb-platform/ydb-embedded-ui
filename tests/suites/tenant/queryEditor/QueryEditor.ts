@@ -6,14 +6,16 @@ import {selectContentTable} from '../../../utils/selectContentTable';
 type QueryMode = 'YQL Script' | 'Scan';
 type ExplainResultType = 'Schema' | 'JSON' | 'AST';
 
+export const VISIBILITY_TIMEOUT = 5000;
+
 export class QueryEditor extends BaseModel {
-    protected readonly editorTextArea: Locator;
-    protected runButton: Locator;
-    protected explainButton: Locator;
-    protected readonly gearButton: Locator;
-    protected readonly indicatorIcon: Locator;
-    protected readonly settingsDialog: Locator;
-    protected readonly banner: Locator;
+    editorTextArea: Locator;
+    runButton: Locator;
+    explainButton: Locator;
+    gearButton: Locator;
+    indicatorIcon: Locator;
+    settingsDialog: Locator;
+    banner: Locator;
 
     constructor(page: Page) {
         super(page, page.locator('.query-editor'));
@@ -23,7 +25,7 @@ export class QueryEditor extends BaseModel {
         this.explainButton = this.selector.getByRole('button', {name: /Explain/});
         this.gearButton = this.selector.locator('.ydb-query-editor-controls__gear-button');
         this.indicatorIcon = this.selector.locator(
-            '.ydb-query-editor-controls__query-settings-icon',
+            '.kv-query-execution-status__query-settings-icon',
         );
         this.settingsDialog = this.page.locator('.ydb-query-settings-dialog');
         this.banner = this.page.locator('.ydb-query-settings-banner');
@@ -33,51 +35,30 @@ export class QueryEditor extends BaseModel {
         await this.clickGearButton();
         await this.changeQueryMode(mode);
         await this.clickSaveInSettingsDialog();
-        await this.editorTextArea.fill(query);
-        await this.runButton.click();
+        await this.setQuery(query);
+        await this.clickRunButton();
     }
 
     async explain(query: string, mode: QueryMode) {
         await this.clickGearButton();
         await this.changeQueryMode(mode);
         await this.clickSaveInSettingsDialog();
-        await this.editorTextArea.fill(query);
-        await this.explainButton.click();
+        await this.setQuery(query);
+        await this.clickExplainButton();
     }
 
-    async gearButtonContainsText(text: string) {
-        return this.gearButton.locator(`text=${text}`).isVisible();
-    }
-
-    async isBannerVisible() {
-        return this.banner.isVisible();
-    }
-
-    async isBannerHidden() {
-        return this.banner.isHidden();
-    }
-
-    async isRunButtonEnabled() {
-        return this.runButton.isEnabled();
-    }
-
-    async isRunButtonDisabled() {
-        return this.runButton.isDisabled();
-    }
-
-    async isExplainButtonEnabled() {
-        return this.explainButton.isEnabled();
-    }
-
-    async isExplainButtonDisabled() {
-        return this.explainButton.isDisabled();
+    async gearButtonText() {
+        await this.gearButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.gearButton.innerText();
     }
 
     async clickRunButton() {
+        await this.runButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.runButton.click();
     }
 
     async clickExplainButton() {
+        await this.explainButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.explainButton.click();
     }
 
@@ -101,30 +82,28 @@ export class QueryEditor extends BaseModel {
         return selectContentTable(runResult);
     }
 
-    async settingsDialogIsVisible() {
-        return this.settingsDialog.isVisible();
-    }
-
-    async settingsDialogIsNotVisible() {
-        return this.settingsDialog.isHidden();
-    }
-
     async clickGearButton() {
+        await this.gearButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.gearButton.click();
     }
 
     async clickCancelInSettingsDialog() {
-        await this.settingsDialog.getByRole('button', {name: /Cancel/}).click();
+        const cancelButton = this.settingsDialog.getByRole('button', {name: /Cancel/});
+        await cancelButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await cancelButton.click();
     }
 
     async clickSaveInSettingsDialog() {
-        await this.settingsDialog.getByRole('button', {name: /Save/}).click();
+        const saveButton = this.settingsDialog.getByRole('button', {name: /Save/});
+        await saveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await saveButton.click();
     }
 
     async changeQueryMode(mode: QueryMode) {
         const dropdown = this.settingsDialog.locator(
             '.ydb-query-settings-dialog__control-wrapper_queryMode',
         );
+        await dropdown.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await dropdown.click();
         const popup = this.page.locator('.ydb-query-settings-select__popup');
         await popup.getByText(mode).first().click();
@@ -135,6 +114,7 @@ export class QueryEditor extends BaseModel {
         const dropdown = this.settingsDialog.locator(
             '.ydb-query-settings-dialog__control-wrapper_isolationLevel',
         );
+        await dropdown.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await dropdown.click();
         const popup = this.page.locator('.ydb-query-settings-select__popup');
         await popup.getByText(level).first().click();
@@ -142,23 +122,39 @@ export class QueryEditor extends BaseModel {
     }
 
     async closeBanner() {
-        await this.banner.locator('button').click();
-    }
-
-    async isIndicatorIconVisible() {
-        return this.indicatorIcon.isVisible();
+        const closeButton = this.banner.locator('button');
+        await closeButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await closeButton.click();
     }
 
     async hoverGearButton() {
+        await this.gearButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.gearButton.hover();
     }
 
     async setQuery(query: string) {
+        await this.editorTextArea.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.editorTextArea.fill(query);
     }
 
-    protected async selectExplainResultType(type: ExplainResultType) {
+    async selectExplainResultType(type: ExplainResultType) {
         const radio = this.selector.locator('.ydb-query-explain-result__controls .g-radio-button');
-        await radio.getByLabel(type).click();
+        const typeButton = radio.getByLabel(type);
+        await typeButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await typeButton.click();
+    }
+
+    async retry<T>(action: () => Promise<T>, maxAttempts = 3, delay = 1000): Promise<T> {
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                return await action();
+            } catch (error) {
+                if (attempt === maxAttempts) {
+                    throw error;
+                }
+                await new Promise((resolve) => setTimeout(resolve, delay));
+            }
+        }
+        throw new Error('Max attempts reached');
     }
 }
