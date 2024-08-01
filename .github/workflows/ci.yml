@@ -54,7 +54,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
@@ -66,6 +68,7 @@ jobs:
         run: npm run test:e2e:install
 
       - name: Run Playwright tests
+        id: run_tests
         run: npm run test:e2e
         env:
           CI: true
@@ -95,17 +98,33 @@ jobs:
         if: always()
         id: test-results
         run: |
+          echo "Current directory: $(pwd)"
+          echo "Listing playwright-artifacts directory:"
+          ls -R playwright-artifacts
+
           if [ -f "playwright-artifacts/test-results.json" ]; then
+            echo "Content of test-results.json:"
+            cat playwright-artifacts/test-results.json
+            
+            echo "Parsing JSON file:"
             total=$(jq '.stats.total' playwright-artifacts/test-results.json)
             passed=$(jq '.stats.passed' playwright-artifacts/test-results.json)
             failed=$(jq '.stats.failed' playwright-artifacts/test-results.json)
             skipped=$(jq '.stats.skipped' playwright-artifacts/test-results.json)
+            
+            echo "Parsed values:"
+            echo "Total: $total"
+            echo "Passed: $passed"
+            echo "Failed: $failed"
+            echo "Skipped: $skipped"
           else
+            echo "test-results.json file not found"
             total=0
             passed=0
             failed=0
             skipped=0
           fi
+
           echo "total=$total" >> $GITHUB_OUTPUT
           echo "passed=$passed" >> $GITHUB_OUTPUT
           echo "failed=$failed" >> $GITHUB_OUTPUT
