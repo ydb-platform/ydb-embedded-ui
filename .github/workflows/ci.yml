@@ -102,13 +102,13 @@ jobs:
           echo "Listing playwright-artifacts directory:"
           ls -R playwright-artifacts
 
-          if [ -f "playwright-artifacts/test-results.json" ]; then            
+          if [ -f "playwright-artifacts/test-results.json" ]; then           
             echo "Parsing JSON file:"
             total=$(jq '.stats.expected + .stats.unexpected + .stats.skipped' playwright-artifacts/test-results.json)
             passed=$(jq '.stats.expected' playwright-artifacts/test-results.json)
             failed=$(jq '.stats.unexpected' playwright-artifacts/test-results.json)
             skipped=$(jq '.stats.skipped' playwright-artifacts/test-results.json)
-            
+           
             echo "Parsed values:"
             echo "Total: $total"
             echo "Passed: $passed"
@@ -127,7 +127,7 @@ jobs:
           echo "failed=$failed" >> $GITHUB_OUTPUT
           echo "skipped=$skipped" >> $GITHUB_OUTPUT
 
-      - name: Comment PR
+      - name: Update PR description
         if: always()
         uses: actions/github-script@v6
         with:
@@ -143,7 +143,7 @@ jobs:
             const status = testResults.failed > 0 ? '❌ FAILED' : '✅ PASSED';
             const statusColor = testResults.failed > 0 ? 'red' : 'green';
 
-            const comment = `## Playwright Test Results
+            const testResultsSection = `## Playwright Test Results
 
             **Status**: <span style="color: ${statusColor}; font-weight: bold;">${status}</span>
 
@@ -171,9 +171,25 @@ jobs:
 
             </details>`;
 
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            const { data: pullRequest } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
+              pull_number: context.issue.number,
+            });
+
+            const currentBody = pullRequest.body || '';
+            const testResultsRegex = /## Playwright Test Results[\s\S]*?(?=\n\n|$)/;
+
+            let newBody;
+            if (testResultsRegex.test(currentBody)) {
+              newBody = currentBody.replace(testResultsRegex, testResultsSection);
+            } else {
+              newBody = `${currentBody}\n\n${testResultsSection}`;
+            }
+
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              body: newBody,
             });
