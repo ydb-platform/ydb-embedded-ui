@@ -7,12 +7,11 @@ import {api} from './../api';
 
 export const capabilitiesApi = api.injectEndpoints({
     endpoints: (build) => ({
-        getClusterCapabilitie: build.query({
+        getClusterCapabilities: build.query({
             queryFn: async () => {
                 try {
                     const data = await window.api.getClusterCapabilities();
-                    const {Capabilities} = data;
-                    return {data: Capabilities};
+                    return {data};
                 } catch (error) {
                     // If capabilities endpoint is not available, there will be an error
                     // That means no new features are available
@@ -24,10 +23,10 @@ export const capabilitiesApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
-const selectCapabilities = capabilitiesApi.endpoints.getClusterCapabilitie.select(undefined);
+const selectCapabilities = capabilitiesApi.endpoints.getClusterCapabilities.select(undefined);
 
 export const selectCapabilityVersion = createSelector(
     (state: RootState) => state,
     (_state: RootState, capability: Capability) => capability,
-    (state, capability) => selectCapabilities(state).data?.[capability],
+    (state, capability) => selectCapabilities(state).data?.Capabilities?.[capability],
 );

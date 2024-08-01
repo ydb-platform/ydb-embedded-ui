@@ -188,7 +188,7 @@ function GetNodesList() {
 }
 
 function GetCapabilities() {
-    capabilitiesApi.useGetClusterCapabilitieQuery(undefined);
+    capabilitiesApi.useGetClusterCapabilitiesQuery(undefined);
     return null;
 }
 
