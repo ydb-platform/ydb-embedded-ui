@@ -102,14 +102,11 @@ jobs:
           echo "Listing playwright-artifacts directory:"
           ls -R playwright-artifacts
 
-          if [ -f "playwright-artifacts/test-results.json" ]; then
-            echo "Content of test-results.json:"
-            cat playwright-artifacts/test-results.json
-            
+          if [ -f "playwright-artifacts/test-results.json" ]; then            
             echo "Parsing JSON file:"
-            total=$(jq '.stats.total' playwright-artifacts/test-results.json)
-            passed=$(jq '.stats.passed' playwright-artifacts/test-results.json)
-            failed=$(jq '.stats.failed' playwright-artifacts/test-results.json)
+            total=$(jq '.stats.expected + .stats.unexpected + .stats.skipped' playwright-artifacts/test-results.json)
+            passed=$(jq '.stats.expected' playwright-artifacts/test-results.json)
+            failed=$(jq '.stats.unexpected' playwright-artifacts/test-results.json)
             skipped=$(jq '.stats.skipped' playwright-artifacts/test-results.json)
             
             echo "Parsed values:"
