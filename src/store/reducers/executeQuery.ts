@@ -149,15 +149,15 @@ interface SendQueryParams extends QueryRequestParams {
 export const executeQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
         executeQuery: build.mutation<IQueryResult, SendQueryParams>({
-            queryFn: async ({query, database, querySettings, schema = 'modern'}) => {
+            queryFn: async ({query, database, querySettings = {}, schema = 'modern'}) => {
                 let action: ExecuteActions = 'execute';
                 let syntax: QuerySyntax = QUERY_SYNTAX.yql;
 
-                if (querySettings?.queryMode === 'pg') {
+                if (querySettings.queryMode === 'pg') {
                     action = 'execute-query';
                     syntax = QUERY_SYNTAX.pg;
-                } else if (querySettings?.queryMode) {
-                    action = `execute-${querySettings?.queryMode}`;
+                } else if (querySettings.queryMode) {
+                    action = `execute-${querySettings.queryMode}`;
                 }
 
                 try {
@@ -167,13 +167,13 @@ export const executeQueryApi = api.injectEndpoints({
                         database,
                         action,
                         syntax,
-                        stats: querySettings?.statisticsMode,
-                        tracingLevel: querySettings?.tracingLevel
-                            ? TracingLevelNumber[querySettings?.tracingLevel]
+                        stats: querySettings.statisticsMode,
+                        tracingLevel: querySettings.tracingLevel
+                            ? TracingLevelNumber[querySettings.tracingLevel]
                             : undefined,
-                        transaction_mode: querySettings?.isolationLevel,
-                        timeout: isNumeric(querySettings?.timeout)
-                            ? Number(querySettings?.timeout) * 1000
+                        transaction_mode: querySettings.isolationLevel,
+                        timeout: isNumeric(querySettings.timeout)
+                            ? Number(querySettings.timeout) * 1000
                             : undefined,
                     });
 

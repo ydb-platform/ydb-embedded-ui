@@ -18,14 +18,16 @@ import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
-import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
+import {SimplifiedPlan} from '../ExplainResult/components/SimplifiedPlan/SimplifiedPlan';
 import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {getPreparedResult} from '../utils/getPreparedResult';
 
+import i18n from './i18n';
 import {getPlan} from './utils';
 
 import './ExecuteResult.scss';
@@ -36,6 +38,7 @@ const resultOptionsIds = {
     result: 'result',
     stats: 'stats',
     schema: 'schema',
+    simplified: 'simplified',
 } as const;
 
 type SectionID = ValueOf<typeof resultOptionsIds>;
@@ -59,7 +62,6 @@ export function ExecuteResult({
 }: ExecuteResultProps) {
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
-    const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
     const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
 
@@ -70,14 +72,20 @@ export function ExecuteResult({
     const currentColumns = isMulti ? data?.resultSets?.[selectedResultSet].columns : data?.columns;
     const textResults = getPreparedResult(currentResult);
     const copyDisabled = !textResults.length;
-    const plan = React.useMemo(() => getPlan(data), [data]);
+    const {plan, simplifiedPlan} = React.useMemo(() => getPlan(data), [data]);
 
     const resultOptions: ControlGroupOption<SectionID>[] = [
-        {value: resultOptionsIds.result, content: 'Result'},
-        {value: resultOptionsIds.stats, content: 'Stats'},
+        {value: resultOptionsIds.result, content: i18n('action.result')},
+        {value: resultOptionsIds.stats, content: i18n('action.stats')},
     ];
     if (plan) {
-        resultOptions.push({value: resultOptionsIds.schema, content: 'Schema'});
+        resultOptions.push({value: resultOptionsIds.schema, content: i18n('action.schema')});
+    }
+    if (simplifiedPlan) {
+        resultOptions.push({
+            value: resultOptionsIds.simplified,
+            content: i18n('action.explain-plan'),
+        });
     }
 
     const parsedError = parseQueryError(error);
@@ -99,7 +107,7 @@ export function ExecuteResult({
         return <QueryResultTable data={result} columns={columns} settings={{sortable: false}} />;
     };
 
-    const renderContent = () => {
+    const renderResult = () => {
         return (
             <React.Fragment>
                 {isMulti && resultsSetsCount > 1 && (
@@ -135,62 +143,38 @@ export function ExecuteResult({
     };
 
     const renderStats = () => {
-        const content = (
-            <JSONTree
-                data={stats}
-                isExpanded={() => true}
-                className={b('inspector')}
-                searchOptions={{
-                    debounceTime: 300,
-                }}
-            />
-        );
         return (
-            <React.Fragment>
-                {content}
-                {isFullscreen && (
-                    <Fullscreen>
-                        <div className={b('inspector', {fullscreen: true})}>{content}</div>
-                    </Fullscreen>
-                )}
-            </React.Fragment>
+            <div className={b('inspector')}>
+                <JSONTree
+                    data={stats}
+                    isExpanded={() => true}
+                    searchOptions={{
+                        debounceTime: 300,
+                    }}
+                />
+            </div>
         );
     };
 
     const renderSchema = () => {
         const isEnoughDataForGraph = plan?.links && plan?.nodes && plan?.nodes.length;
 
-        const content = isEnoughDataForGraph ? (
+        if (!isEnoughDataForGraph) {
+            return i18n('description.graph-is-not-supported');
+        }
+
+        return (
             <div className={b('explain-canvas-container')}>
                 <YDBGraph key={theme} data={plan} />
             </div>
-        ) : null;
-
-        return (
-            <React.Fragment>
-                {!isFullscreen && content}
-                {isFullscreen && (
-                    <Fullscreen>
-                        <div className={b('result-fullscreen-wrapper')}>{content}</div>
-                    </Fullscreen>
-                )}
-            </React.Fragment>
         );
     };
 
-    const renderResult = () => {
-        const content = renderContent();
-
-        return (
-            <React.Fragment>
-                {content}
-                {isFullscreen && (
-                    <Fullscreen>
-                        <div className={b('result-fullscreen-wrapper')}>{content}</div>
-                    </Fullscreen>
-                )}
-            </React.Fragment>
-        );
+    const renderSimplified = () => {
+        if (!simplifiedPlan) {
+            return null;
+        }
+        return <SimplifiedPlan plan={simplifiedPlan} />;
     };
 
     const renderIssues = () => {
@@ -199,40 +183,30 @@ export function ExecuteResult({
         }
 
         if (typeof parsedError === 'object') {
-            const content = <ResultIssues data={parsedError} />;
-
-            return (
-                <React.Fragment>
-                    {content}
-                    {isFullscreen && (
-                        <Fullscreen>
-                            <div className={b('result-fullscreen-wrapper', b('result'))}>
-                                {content}
-                            </div>
-                        </Fullscreen>
-                    )}
-                </React.Fragment>
-            );
+            return <ResultIssues data={parsedError} />;
         }
 
         return <div className={b('error')}>{parsedError}</div>;
     };
 
     const renderResultSection = () => {
-        if (activeSection === resultOptionsIds.result && !error) {
+        if (error) {
+            return renderIssues();
+        }
+        if (activeSection === resultOptionsIds.result) {
             return renderResult();
         }
-
-        if (activeSection === resultOptionsIds.schema && !error) {
+        if (activeSection === resultOptionsIds.stats) {
+            return renderStats();
+        }
+        if (activeSection === resultOptionsIds.schema) {
             return renderSchema();
         }
+        if (activeSection === resultOptionsIds.simplified) {
+            return renderSimplified();
+        }
 
-        return (
-            <div className={b('result')}>
-                {activeSection === resultOptionsIds.stats && !error && renderStats()}
-                {renderIssues()}
-            </div>
-        );
+        return null;
     };
 
     return (
@@ -264,7 +238,7 @@ export function ExecuteResult({
                 </div>
             </div>
             {useQuerySettings && <QuerySettingsBanner />}
-            {renderResultSection()}
+            <Fullscreen>{renderResultSection()}</Fullscreen>
         </React.Fragment>
     );
 }

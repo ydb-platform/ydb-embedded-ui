@@ -12,7 +12,7 @@ import type {PreparedExplainResponse} from '../../../../store/reducers/explainQu
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ValueOf} from '../../../../types/common';
 import {cn} from '../../../../utils/cn';
-import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
@@ -81,8 +81,6 @@ export function ExplainResult({
         EXPLAIN_OPTIONS_IDS.schema,
     );
     const [isPending, startTransition] = React.useTransition();
-
-    const isFullscreen = useTypedSelector((state) => state.fullscreen);
 
     const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
 
@@ -171,11 +169,7 @@ export function ExplainResult({
             </div>
             {useQuerySettings && <QuerySettingsBanner />}
             <LoaderWrapper loading={loading || isPending}>
-                {/* this is a hack: only one Graph component may be in DOM because of it's canvas id */}
-                {activeOption === EXPLAIN_OPTIONS_IDS.schema && isFullscreen ? null : (
-                    <div className={b('result')}>{renderContent()}</div>
-                )}
-                {isFullscreen && <Fullscreen>{renderContent()}</Fullscreen>}
+                <Fullscreen className={b('result')}>{renderContent()}</Fullscreen>
             </LoaderWrapper>
         </React.Fragment>
     );

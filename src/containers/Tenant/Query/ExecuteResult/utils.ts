@@ -1,11 +1,11 @@
 import {explainVersions} from '../../../../store/reducers/explainQuery/utils';
 import type {IQueryResult} from '../../../../types/store/query';
-import {preparePlan} from '../../../../utils/prepareQueryExplain';
+import {preparePlan, prepareSimplifiedPlan} from '../../../../utils/prepareQueryExplain';
 import {parseQueryExplainPlan} from '../../../../utils/query';
 
 export function getPlan(data: IQueryResult | undefined) {
     if (!data) {
-        return undefined;
+        return {};
     }
 
     const {plan} = data;
@@ -14,28 +14,28 @@ export function getPlan(data: IQueryResult | undefined) {
         const queryPlan = parseQueryExplainPlan(plan);
         const isSupportedVersion = queryPlan.meta.version === explainVersions.v2;
         if (!isSupportedVersion) {
-            return undefined;
+            return {};
         }
 
-        const planWithStats = queryPlan.Plan;
-        if (!planWithStats) {
-            return undefined;
-        }
+        const {Plan: planWithStats, SimplifiedPlan: simplifiedPlan} = queryPlan;
+
         return {
-            ...preparePlan(planWithStats),
-            tables: queryPlan.tables,
+            plan: planWithStats
+                ? {...preparePlan(planWithStats), tables: queryPlan.tables}
+                : undefined,
+            simplifiedPlan: simplifiedPlan ? prepareSimplifiedPlan([simplifiedPlan]) : undefined,
         };
     }
 
     const {stats} = data;
     const planFromStats = stats?.Executions?.[0]?.TxPlansWithStats?.[0];
     if (!planFromStats) {
-        return undefined;
+        return {};
     }
     try {
         const planWithStats = JSON.parse(planFromStats);
-        return preparePlan(planWithStats);
+        return {plan: preparePlan(planWithStats)};
     } catch (e) {
-        return undefined;
+        return {};
     }
 }
