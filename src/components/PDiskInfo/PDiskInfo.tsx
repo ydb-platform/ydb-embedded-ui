@@ -1,4 +1,5 @@
 import {getPDiskPagePath} from '../../routes';
+import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {valueIsDefined} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
@@ -21,7 +22,7 @@ const b = cn('ydb-pdisk-info');
 interface GetPDiskInfoOptions<T extends PreparedPDisk> {
     pDisk?: T;
     nodeId?: number | string | null;
-    isPDiskPage?: boolean;
+    withPDiskPageLink?: boolean;
     isUserAllowedToMakeChanges?: boolean;
 }
 
@@ -29,7 +30,7 @@ interface GetPDiskInfoOptions<T extends PreparedPDisk> {
 function getPDiskInfo<T extends PreparedPDisk>({
     pDisk,
     nodeId,
-    isPDiskPage = false,
+    withPDiskPageLink,
     isUserAllowedToMakeChanges,
 }: GetPDiskInfoOptions<T>) {
     const {
@@ -147,7 +148,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
     const additionalInfo: InfoViewerItem[] = [];
 
     const shouldDisplayLinks =
-        (!isPDiskPage || isUserAllowedToMakeChanges) &&
+        (withPDiskPageLink || isUserAllowedToMakeChanges) &&
         valueIsDefined(PDiskId) &&
         valueIsDefined(nodeId);
 
@@ -162,7 +163,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
             label: pDiskInfoKeyset('links'),
             value: (
                 <span className={b('links')}>
-                    {!isPDiskPage && (
+                    {withPDiskPageLink && (
                         <LinkWithIcon
                             title={pDiskInfoKeyset('pdisk-page')}
                             url={pDiskPagePath}
@@ -190,15 +191,16 @@ interface PDiskInfoProps<T extends PreparedPDisk> extends GetPDiskInfoOptions<T>
 export function PDiskInfo<T extends PreparedPDisk>({
     pDisk,
     nodeId,
-    isPDiskPage = false,
+    withPDiskPageLink,
     className,
 }: PDiskInfoProps<T>) {
     const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
+    const diskPagesAvailable = useDiskPagesAvailable();
 
     const [generalInfo, statusInfo, spaceInfo, additionalInfo] = getPDiskInfo({
         pDisk,
         nodeId,
-        isPDiskPage,
+        withPDiskPageLink: withPDiskPageLink && diskPagesAvailable,
         isUserAllowedToMakeChanges,
     });
 

@@ -13,10 +13,8 @@ import {
     SHOW_DOMAIN_DATABASE_KEY,
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
-    USE_DIRECTORY_OPERATIONS,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     USE_PAGINATED_TABLES_KEY,
-    USE_SEPARATE_DISKS_PAGES_KEY,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
 import {ClusterModeGuard} from '../ClusterModeGuard';
@@ -127,17 +125,6 @@ export const queryUseMultiSchemaSetting: SettingProps = {
     description: i18n('settings.queryUseMultiSchema.description'),
 };
 
-export const useSeparateDisksPagesSetting: SettingProps = {
-    settingKey: USE_SEPARATE_DISKS_PAGES_KEY,
-    title: i18n('settings.useSeparateDisksPages.title'),
-    description: i18n('settings.useSeparateDisksPages.description'),
-};
-
-export const useDirectoryActionsSetting: SettingProps = {
-    settingKey: USE_DIRECTORY_OPERATIONS,
-    title: i18n('settings.useDirectoryOperations.title'),
-};
-
 export const useClusterBalancerAsBackendSetting: SettingProps = {
     settingKey: USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     title: i18n('settings.useClusterBalancerAsBackend.title'),
@@ -175,13 +162,7 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [
-        useNodesEndpointSetting,
-        usePaginatedTables,
-        queryUseMultiSchemaSetting,
-        useSeparateDisksPagesSetting,
-        useDirectoryActionsSetting,
-    ],
+    settings: [useNodesEndpointSetting, usePaginatedTables, queryUseMultiSchemaSetting],
 };
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',

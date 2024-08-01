@@ -2,14 +2,13 @@ import React from 'react';
 
 import {STRUCTURE} from '../../containers/Node/NodePages';
 import routes, {createHref, getVDiskPagePath} from '../../routes';
+import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import type {NodesMap} from '../../types/store/nodesList';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {USE_SEPARATE_DISKS_PAGES_KEY} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
-import {useSetting} from '../../utils/hooks';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {InternalLink} from '../InternalLink';
 import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
@@ -27,7 +26,7 @@ interface VDiskProps {
 export const VDisk = ({data = {}, nodes, compact}: VDiskProps) => {
     const isFullData = isFullVDiskData(data);
 
-    const [useSeparateDisksPages] = useSetting(USE_SEPARATE_DISKS_PAGES_KEY);
+    const diskPagesAvailable = useDiskPagesAvailable();
 
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
 
@@ -44,7 +43,7 @@ export const VDisk = ({data = {}, nodes, compact}: VDiskProps) => {
     let vDiskPath: string | undefined;
 
     if (
-        useSeparateDisksPages &&
+        diskPagesAvailable &&
         valueIsDefined(data.VDiskSlotId) &&
         valueIsDefined(data.PDiskId) &&
         valueIsDefined(data.NodeId)
