@@ -178,13 +178,15 @@ jobs:
             });
 
             const currentBody = pullRequest.body || '';
-            const testResultsRegex = /## Playwright Test Results[\s\S]*?(?=\n\n|$)/;
+            const testResultsRegex = /## Playwright Test Results[\s\S]*?(?=\n## |$)/;
 
             let newBody;
             if (testResultsRegex.test(currentBody)) {
+              // If the section exists, replace it
               newBody = currentBody.replace(testResultsRegex, testResultsSection);
             } else {
-              newBody = `${currentBody}\n\n${testResultsSection}`;
+              // If the section doesn't exist, add it to the end
+              newBody = currentBody + '\n\n' + testResultsSection;
             }
 
             await github.rest.pulls.update({
