@@ -95,10 +95,10 @@ jobs:
         if: always()
         id: test-results
         run: |
-          TOTAL=$(grep -oP 'total="\K[^"]+' playwright-artifacts/playwright-report/index.html || echo "0")
-          PASSED=$(grep -oP 'passed="\K[^"]+' playwright-artifacts/playwright-report/index.html || echo "0")
-          FAILED=$(grep -oP 'failed="\K[^"]+' playwright-artifacts/playwright-report/index.html || echo "0")
-          SKIPPED=$(grep -oP 'skipped="\K[^"]+' playwright-artifacts/playwright-report/index.html || echo "0")
+          TOTAL=$(grep -c 'class="test-file-test' playwright-artifacts/playwright-report/index.html || echo "0")
+          PASSED=$(grep -c 'class="test-file-test test-file-test-outcome-expected"' playwright-artifacts/playwright-report/index.html || echo "0")
+          FAILED=$(grep -c 'class="test-file-test test-file-test-outcome-unexpected"' playwright-artifacts/playwright-report/index.html || echo "0")
+          SKIPPED=0  # В данной структуре нет явного указания на пропущенные тесты
           echo "total=$TOTAL" >> $GITHUB_OUTPUT
           echo "passed=$PASSED" >> $GITHUB_OUTPUT
           echo "failed=$FAILED" >> $GITHUB_OUTPUT
