@@ -13,7 +13,6 @@ import './Fullscreen.scss';
 const b = cn('ydb-fullscreen');
 
 interface FullscreenProps {
-    disabled?: boolean;
     children: React.ReactNode;
     className?: string;
 }
