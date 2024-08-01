@@ -95,14 +95,21 @@ jobs:
         if: always()
         id: test-results
         run: |
-          TOTAL=$(grep -c 'class="test-file-test' playwright-artifacts/playwright-report/index.html || echo "0")
-          PASSED=$(grep -c 'class="test-file-test test-file-test-outcome-expected"' playwright-artifacts/playwright-report/index.html || echo "0")
-          FAILED=$(grep -c 'class="test-file-test test-file-test-outcome-unexpected"' playwright-artifacts/playwright-report/index.html || echo "0")
-          SKIPPED=0  # В данной структуре нет явного указания на пропущенные тесты
-          echo "total=$TOTAL" >> $GITHUB_OUTPUT
-          echo "passed=$PASSED" >> $GITHUB_OUTPUT
-          echo "failed=$FAILED" >> $GITHUB_OUTPUT
-          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+          if [ -f "playwright-artifacts/test-results.json" ]; then
+            total=$(jq '.stats.total' playwright-artifacts/test-results.json)
+            passed=$(jq '.stats.passed' playwright-artifacts/test-results.json)
+            failed=$(jq '.stats.failed' playwright-artifacts/test-results.json)
+            skipped=$(jq '.stats.skipped' playwright-artifacts/test-results.json)
+          else
+            total=0
+            passed=0
+            failed=0
+            skipped=0
+          fi
+          echo "total=$total" >> $GITHUB_OUTPUT
+          echo "passed=$passed" >> $GITHUB_OUTPUT
+          echo "failed=$failed" >> $GITHUB_OUTPUT
+          echo "skipped=$skipped" >> $GITHUB_OUTPUT
 
       - name: Comment PR
         if: always()
@@ -112,10 +119,10 @@ jobs:
           script: |
             const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/${context.issue.number}/`;
             const testResults = {
-              total: ${{ steps.test-results.outputs.total }},
-              passed: ${{ steps.test-results.outputs.passed }},
-              failed: ${{ steps.test-results.outputs.failed }},
-              skipped: ${{ steps.test-results.outputs.skipped }}
+              total: ${{ steps.test-results.outputs.total || 0 }},
+              passed: ${{ steps.test-results.outputs.passed || 0 }},
+              failed: ${{ steps.test-results.outputs.failed || 0 }},
+              skipped: ${{ steps.test-results.outputs.skipped || 0 }}
             };
             const status = testResults.failed > 0 ? '❌ FAILED' : '✅ PASSED';
             const statusColor = testResults.failed > 0 ? 'red' : 'green';
@@ -153,4 +160,4 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: comment
-            })
+            });
