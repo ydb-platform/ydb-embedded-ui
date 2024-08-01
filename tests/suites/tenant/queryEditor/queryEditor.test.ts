@@ -121,7 +121,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isIndicatorIconVisible()).resolves.toBe(true);
     });
 
-    test('Gear button shows number of changed settings', async ({page}) => {
+    test('Gear button shows number of changed settingss', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
