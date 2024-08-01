@@ -121,7 +121,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isIndicatorIconVisible()).resolves.toBe(true);
     });
 
-    test('Gear button shows number of changed settingss', async ({page}) => {
+    test('Gear button shows number of changed settings', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
@@ -131,7 +131,7 @@ test.describe('Test Query Editor', async () => {
 
         await expect(async () => {
             const text = await queryEditor.gearButtonText();
-            expect(text).toContain('(2)');
+            expect(text).toContain('(5)');
         }).toPass({timeout: VISIBILITY_TIMEOUT});
     });
 
