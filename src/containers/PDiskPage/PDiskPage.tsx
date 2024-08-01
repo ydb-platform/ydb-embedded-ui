@@ -17,6 +17,7 @@ import {PDiskInfo} from '../../components/PDiskInfo/PDiskInfo';
 import {PageMeta} from '../../components/PageMeta/PageMeta';
 import {getPDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
+import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {pDiskApi} from '../../store/reducers/pdisk/pdisk';
 import {valueIsDefined} from '../../utils';
@@ -55,7 +56,7 @@ const pDiskTabSchema = z.nativeEnum(PDISK_TABS_IDS).catch(PDISK_TABS_IDS.diskDis
 export function PDiskPage() {
     const dispatch = useTypedDispatch();
 
-    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     const [{nodeId, pDiskId, activeTab}] = useQueryParams({
         activeTab: StringParam,

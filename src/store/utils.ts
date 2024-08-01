@@ -1,7 +1,7 @@
 import createToast from '../utils/createToast';
 import {isAxiosResponse} from '../utils/response';
 
-import {SET_UNAUTHENTICATED} from './reducers/authentication/authentication';
+import {setIsAuthenticated} from './reducers/authentication/authentication';
 
 import type {AppDispatch, GetState} from '.';
 
@@ -50,9 +50,7 @@ export function createApiRequest<
             return data;
         } catch (error) {
             if (isAxiosResponse(error) && error.status === 401) {
-                dispatch({
-                    type: SET_UNAUTHENTICATED.SUCCESS,
-                });
+                dispatch(setIsAuthenticated(false));
             } else if (isAxiosResponse(error) && error.status >= 500 && error.statusText) {
                 createToast({
                     name: 'Request failure',

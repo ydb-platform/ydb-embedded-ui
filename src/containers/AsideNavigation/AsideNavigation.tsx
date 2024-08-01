@@ -5,6 +5,7 @@ import type {MenuItem} from '@gravity-ui/navigation';
 import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
 import {useHistory} from 'react-router-dom';
 
+import {selectUser} from '../../store/reducers/authentication/authentication';
 import {cn} from '../../utils/cn';
 import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
 import {useSetting, useTypedSelector} from '../../utils/hooks';
@@ -65,7 +66,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
 
     const [visiblePanel, setVisiblePanel] = React.useState<Panel>();
 
-    const {user: ydbUser} = useTypedSelector((state) => state.authentication);
+    const ydbUser = useTypedSelector(selectUser);
     const [compact, setIsCompact] = useSetting<boolean>(ASIDE_HEADER_COMPACT_KEY);
 
     return (

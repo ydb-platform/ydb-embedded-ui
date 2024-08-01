@@ -78,7 +78,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             // authUrl - external auth service link, after successful auth additional cookies will be appended
             // that will allow access to clusters where OIDC proxy is a balancer
             if (response && response.status === 401 && response.data?.authUrl) {
-                return window.location.assign(response.data.authUrl);
+                window.location.assign(response.data.authUrl);
             }
 
             return Promise.reject(error);
@@ -611,15 +611,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
-    authenticate(user: string, password: string) {
-        return this.post(
-            this.getPath('/login'),
-            {
-                user,
-                password,
-            },
-            {},
-        );
+    authenticate(params: {user: string; password: string}) {
+        return this.post(this.getPath('/login'), params, {});
     }
     logout() {
         return this.post(this.getPath('/logout'), {}, {});

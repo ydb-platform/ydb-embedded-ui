@@ -5,9 +5,10 @@ import {Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../routes';
-import {authenticate} from '../../store/reducers/authentication/authentication';
+import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {cn} from '../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+
+import {isPasswordError, isUserError} from './utils';
 
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
 
@@ -20,25 +21,24 @@ interface AuthenticationProps {
 }
 
 function Authentication({closable = false}: AuthenticationProps) {
-    const dispatch = useTypedDispatch();
     const history = useHistory();
     const location = useLocation();
 
+    const [authenticate, {error, isLoading}] = authenticationApi.useAuthenticateMutation(undefined);
+
     const {returnUrl} = parseQuery(location);
 
-    const {error} = useTypedSelector((state) => state.authentication);
-
     const [login, setLogin] = React.useState('');
-    const [pass, setPass] = React.useState('');
+    const [password, setPass] = React.useState('');
     const [loginError, setLoginError] = React.useState('');
     const [passwordError, setPasswordError] = React.useState('');
     const [showPassword, setShowPassword] = React.useState(false);
 
     React.useEffect(() => {
-        if (error?.data?.error?.includes('user')) {
+        if (isUserError(error)) {
             setLoginError(error.data.error);
         }
-        if (error?.data?.error?.includes('password')) {
+        if (isPasswordError(error)) {
             setPasswordError(error.data.error);
         }
     }, [error]);
@@ -54,7 +54,7 @@ function Authentication({closable = false}: AuthenticationProps) {
     };
 
     const onLoginClick = () => {
-        dispatch(authenticate(login, pass)).then(() => {
+        authenticate({user: login, password}).then(() => {
             if (returnUrl) {
                 const decodedUrl = decodeURIComponent(returnUrl.toString());
 
@@ -108,7 +108,7 @@ function Authentication({closable = false}: AuthenticationProps) {
                 </div>
                 <div className={b('field-wrapper')}>
                     <TextInput
-                        value={pass}
+                        value={password}
                         onUpdate={onPassUpdate}
                         type={showPassword ? 'text' : 'password'}
                         placeholder={'Password'}
@@ -130,6 +130,7 @@ function Authentication({closable = false}: AuthenticationProps) {
                     width="max"
                     size="l"
                     disabled={Boolean(!login || loginError || passwordError)}
+                    loading={isLoading}
                     className={b('button-sign-in')}
                 >
                     Sign in

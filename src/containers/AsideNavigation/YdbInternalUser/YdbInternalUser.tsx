@@ -3,9 +3,9 @@ import {Button, Icon} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
 import routes, {createHref} from '../../../routes';
-import {logout} from '../../../store/reducers/authentication/authentication';
+import {authenticationApi} from '../../../store/reducers/authentication/authentication';
 import {cn} from '../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useTypedSelector} from '../../../utils/hooks';
 import i18n from '../i18n';
 
 import './YdbInternalUser.scss';
@@ -15,6 +15,8 @@ const b = cn('kv-ydb-internal-user');
 export function YdbInternalUser() {
     const {user: ydbUser} = useTypedSelector((state) => state.authentication);
 
+    const [logout] = authenticationApi.useLogoutMutation();
+
     const history = useHistory();
     const handleLoginClick = () => {
         history.push(
@@ -22,9 +24,8 @@ export function YdbInternalUser() {
         );
     };
 
-    const dispatch = useTypedDispatch();
     const handleLogout = () => {
-        dispatch(logout);
+        logout(undefined);
     };
 
     return (
