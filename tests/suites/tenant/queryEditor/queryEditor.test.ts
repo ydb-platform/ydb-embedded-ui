@@ -14,17 +14,7 @@ import {
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
-    test.beforeEach(async ({context, page}) => {
-        // Clear all browser storage
-        await context.clearCookies();
-        await context.clearPermissions();
-
-        // Clear localStorage and sessionStorage
-        await context.addInitScript(() => {
-            window.localStorage.clear();
-            window.sessionStorage.clear();
-        });
-
+    test.beforeEach(async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
             name: tenantName,
