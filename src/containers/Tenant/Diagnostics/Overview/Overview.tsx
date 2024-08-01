@@ -94,10 +94,9 @@ function Overview({type, path, database}: OverviewProps) {
 
     return (
         <React.Fragment>
-            {schemaError || overviewError ? (
-                <ResponseError error={schemaError || overviewError} />
-            ) : null}
-            {renderContent()}
+            {schemaError ? <ResponseError error={schemaError} /> : null}
+            {overviewError ? <ResponseError error={overviewError} /> : null}
+            {overviewError && !rawData ? null : renderContent()}
         </React.Fragment>
     );
 }

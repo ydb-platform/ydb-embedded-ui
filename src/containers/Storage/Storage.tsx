@@ -3,6 +3,7 @@ import React from 'react';
 import {ArrayParam, StringParam, useQueryParams, withDefault} from 'use-query-params';
 
 import {AccessDenied} from '../../components/Errors/403';
+import {isAccessError} from '../../components/Errors/PageError/PageError';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
@@ -214,19 +215,16 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
         );
     };
 
-    if (error) {
-        if ((error as any).status === 403) {
-            return <AccessDenied position="left" />;
-        }
-
-        return <ResponseError error={error} />;
+    if (isAccessError(error)) {
+        return <AccessDenied position="left" />;
     }
 
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
-                {renderDataTable()}
+                {currentData ? renderDataTable() : null}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );

@@ -6,6 +6,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {AccessDenied} from '../../components/Errors/403';
+import {isAccessError} from '../../components/Errors/PageError/PageError';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Illustration} from '../../components/Illustration';
 import {ProblemFilter} from '../../components/ProblemFilter';
@@ -116,7 +117,7 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
                 <UptimeFilter value={uptimeFilter} onChange={handleUptimeFilterChange} />
                 <EntitiesCount
                     total={totalNodes}
-                    current={nodes?.length || 0}
+                    current={nodes.length}
                     label={'Nodes'}
                     loading={isLoading}
                 />
@@ -133,7 +134,7 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
             return {...column, sortable: isSortableNodesProperty(column.name)};
         });
 
-        if (nodes && nodes.length === 0) {
+        if (nodes.length === 0) {
             if (
                 problemFilter !== ProblemFilterValues.ALL ||
                 uptimeFilter !== NodesUptimeFilterValues.All
@@ -156,18 +157,16 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
         );
     };
 
-    if (error) {
-        if ((error as any).status === 403) {
-            return <AccessDenied />;
-        }
-        return <ResponseError error={error} />;
+    if (isAccessError(error)) {
+        return <AccessDenied />;
     }
 
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table loading={isLoading}>
-                {renderTable()}
+                {data ? renderTable() : null}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );

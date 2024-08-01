@@ -260,15 +260,12 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
         );
     };
 
-    if (error) {
-        return <ResponseError error={error} />;
-    }
-
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table loading={loading}>
-                {renderTable()}
+                {currentData ? renderTable() : null}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );

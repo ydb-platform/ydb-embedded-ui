@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import type {InfoViewerItem} from '../../../../../components/InfoViewer';
 import {InfoViewer} from '../../../../../components/InfoViewer';
@@ -89,24 +91,22 @@ export const TopicStats = ({path}: {path: string}) => {
     // If there is at least some empty data object
     // we initialize its fields with zero values
     // so no data at all is considered to be error as well
-    if (error || !data) {
-        return (
-            <div className={b()}>
-                <div className={b('title')}>Stats</div>
-                <ResponseError error={error} />
-            </div>
-        );
-    }
+    const errorContent = error || !data ? <ResponseError error={error} /> : null;
 
     return (
         <div className={b()}>
             <div className={b('title')}>Stats</div>
-            <div className={b('info')}>
-                <InfoViewer info={prepareTopicInfo(data)} multilineLabels />
-            </div>
-            <div className={b('bytes-written')}>
-                <InfoViewer info={prepareBytesWrittenInfo(data)} />
-            </div>
+            {errorContent}
+            {data ? (
+                <React.Fragment>
+                    <div className={b('info')}>
+                        <InfoViewer info={prepareTopicInfo(data)} multilineLabels />
+                    </div>
+                    <div className={b('bytes-written')}>
+                        <InfoViewer info={prepareBytesWrittenInfo(data)} />
+                    </div>
+                </React.Fragment>
+            ) : null}
         </div>
     );
 };

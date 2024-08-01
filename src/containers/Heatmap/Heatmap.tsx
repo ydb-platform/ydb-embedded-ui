@@ -119,6 +119,11 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
     const renderContent = () => {
         const {min, max} = getCurrentMetricLimits(currentMetric, tablets);
 
+        let content;
+        if (!error || currentData) {
+            content = heatmap ? renderHeatmapCanvas() : renderHistogram();
+        }
+
         return (
             <div className={b()}>
                 <div className={b('filters')}>
@@ -158,17 +163,14 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
                         </div>
                     </div>
                 </div>
-                {heatmap ? renderHeatmapCanvas() : renderHistogram()}
+                {error ? <ResponseError error={error} /> : null}
+                {content}
             </div>
         );
     };
 
     if (loading) {
         return <Loader />;
-    }
-
-    if (error) {
-        return <ResponseError error={error} />;
     }
 
     return renderContent();

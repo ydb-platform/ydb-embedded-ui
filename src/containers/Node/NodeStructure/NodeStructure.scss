@@ -10,6 +10,10 @@
     @include flex-container();
     @include body-2-typography();
 
+    &__error {
+        padding: 20px 20px 0;
+    }
+
     &__pdisk {
         display: flex;
         flex-direction: column;

@@ -100,14 +100,15 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
         if (loadingStructure) {
             return <Loader size="m" />;
         }
-        if (error) {
-            return <ResponseError error={error} />;
+        if (error && !currentData) {
+            return null;
         }
         return renderStructure();
     };
 
     return (
         <div className={b()} ref={scrollContainerRef}>
+            {error ? <ResponseError error={error} className={b('error')} /> : null}
             <div className={className}>{renderContent()}</div>
         </div>
     );
