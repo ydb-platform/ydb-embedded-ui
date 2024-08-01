@@ -3,7 +3,13 @@ import {expect, test} from '@playwright/test';
 import {tenantName} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 
-import {QueryEditor, VISIBILITY_TIMEOUT} from './QueryEditor';
+import {
+    ButtonNames,
+    ExplainResultType,
+    QueryEditor,
+    QueryMode,
+    VISIBILITY_TIMEOUT,
+} from './QueryEditor';
 
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
@@ -33,18 +39,18 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
-        await expect(queryEditor.settingsDialog).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
 
-        await queryEditor.clickCancelInSettingsDialog();
-        await expect(queryEditor.settingsDialog).toBeHidden({timeout: VISIBILITY_TIMEOUT});
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
     });
 
     test('Settings dialog saves changes and updates Gear button', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
-        await queryEditor.changeQueryMode('Scan');
-        await queryEditor.clickSaveInSettingsDialog();
+        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await expect(async () => {
             const text = await queryEditor.gearButtonText();
@@ -54,40 +60,40 @@ test.describe('Test Query Editor', async () => {
 
     test('Run button executes YQL script', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.run(testQuery, 'YQL Script');
+        await queryEditor.run(testQuery, QueryMode.YQLScript);
 
-        await expect(queryEditor.getRunResultTable()).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 
     test('Run button executes Scan', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.run(testQuery, 'Scan');
+        await queryEditor.run(testQuery, QueryMode.Scan);
 
-        await expect(queryEditor.getRunResultTable()).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 
     test('Explain button executes YQL script explanation', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.explain(testQuery, 'YQL Script');
+        await queryEditor.explain(testQuery, QueryMode.YQLScript);
 
-        const explainSchema = await queryEditor.getExplainResult('Schema');
+        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
         await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
 
-        const explainJSON = await queryEditor.getExplainResult('JSON');
+        const explainJSON = await queryEditor.getExplainResult(ExplainResultType.JSON);
         await expect(explainJSON).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
     test('Explain button executes Scan explanation', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.explain(testQuery, 'Scan');
+        await queryEditor.explain(testQuery, QueryMode.Scan);
 
-        const explainSchema = await queryEditor.getExplainResult('Schema');
+        const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
         await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
 
-        const explainJSON = await queryEditor.getExplainResult('JSON');
+        const explainJSON = await queryEditor.getExplainResult(ExplainResultType.JSON);
         await expect(explainJSON).toBeVisible({timeout: VISIBILITY_TIMEOUT});
 
-        const explainAST = await queryEditor.getExplainResult('AST');
+        const explainAST = await queryEditor.getExplainResult(ExplainResultType.AST);
         await expect(explainAST).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
@@ -96,15 +102,15 @@ test.describe('Test Query Editor', async () => {
 
         // Change a setting
         await queryEditor.clickGearButton();
-        await queryEditor.changeQueryMode('Scan');
-        await queryEditor.clickSaveInSettingsDialog();
+        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Execute a script
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickRunButton();
 
         // Check if banner appears
-        await expect(queryEditor.banner).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await expect(queryEditor.isBannerVisible()).resolves.toBe(true);
     });
 
     test('Indicator icon appears after closing banner', async ({page}) => {
@@ -112,8 +118,8 @@ test.describe('Test Query Editor', async () => {
 
         // Change a setting
         await queryEditor.clickGearButton();
-        await queryEditor.changeQueryMode('Scan');
-        await queryEditor.clickSaveInSettingsDialog();
+        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Execute a script to make the banner appear
         await queryEditor.setQuery(testQuery);
@@ -122,33 +128,33 @@ test.describe('Test Query Editor', async () => {
         // Close the banner
         await queryEditor.closeBanner();
 
-        await expect(queryEditor.indicatorIcon).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await expect(queryEditor.isIndicatorIconVisible()).resolves.toBe(true);
     });
 
     test('Gear button shows number of changed settings', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
-        await queryEditor.changeQueryMode('Scan');
-        await queryEditor.changeIsolationLevel('Snapshot');
-        await queryEditor.clickSaveInSettingsDialog();
+        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
+        await queryEditor.settingsDialog.changeIsolationLevel('Snapshot');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await expect(async () => {
             const text = await queryEditor.gearButtonText();
             expect(text).toContain('(2)');
-        }).toPass({timeout: 10000});
+        }).toPass({timeout: VISIBILITY_TIMEOUT});
     });
 
     test('Run and Explain buttons are disabled when query is empty', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
-        await expect(queryEditor.runButton).toBeDisabled({timeout: VISIBILITY_TIMEOUT});
-        await expect(queryEditor.explainButton).toBeDisabled({timeout: VISIBILITY_TIMEOUT});
+        await expect(queryEditor.isRunButtonEnabled()).resolves.toBe(false);
+        await expect(queryEditor.isExplainButtonEnabled()).resolves.toBe(false);
 
         await queryEditor.setQuery(testQuery);
 
-        await expect(queryEditor.runButton).toBeEnabled({timeout: VISIBILITY_TIMEOUT});
-        await expect(queryEditor.explainButton).toBeEnabled({timeout: VISIBILITY_TIMEOUT});
+        await expect(queryEditor.isRunButtonEnabled()).resolves.toBe(true);
+        await expect(queryEditor.isExplainButtonEnabled()).resolves.toBe(true);
     });
 
     test('Banner does not appear when executing script with default settings', async ({page}) => {
@@ -157,6 +163,6 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickRunButton();
 
-        await expect(queryEditor.banner).toBeHidden({timeout: VISIBILITY_TIMEOUT});
+        await expect(queryEditor.isBannerHidden()).resolves.toBe(true);
     });
 });
