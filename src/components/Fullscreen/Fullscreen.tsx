@@ -10,7 +10,7 @@ import disableFullscreenIcon from '../../assets/icons/disableFullscreen.svg';
 
 import './Fullscreen.scss';
 
-const b = cn('kv-fullscreen');
+const b = cn('ydb-fullscreen');
 
 interface FullscreenProps {
     disabled?: boolean;

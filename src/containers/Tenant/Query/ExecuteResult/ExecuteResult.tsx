@@ -72,7 +72,7 @@ export function ExecuteResult({
     const currentColumns = isMulti ? data?.resultSets?.[selectedResultSet].columns : data?.columns;
     const textResults = getPreparedResult(currentResult);
     const copyDisabled = !textResults.length;
-    const {plan, simplifiedPlan} = React.useMemo(() => getPlan(data), [data]) || {};
+    const {plan, simplifiedPlan} = React.useMemo(() => getPlan(data), [data]);
 
     const resultOptions: ControlGroupOption<SectionID>[] = [
         {value: resultOptionsIds.result, content: i18n('action.result')},
@@ -193,16 +193,16 @@ export function ExecuteResult({
         if (error) {
             return renderIssues();
         }
-        if (activeSection === resultOptionsIds.result && !error) {
+        if (activeSection === resultOptionsIds.result) {
             return renderResult();
         }
-        if (activeSection === resultOptionsIds.stats && !error) {
+        if (activeSection === resultOptionsIds.stats) {
             return renderStats();
         }
-        if (activeSection === resultOptionsIds.schema && !error) {
+        if (activeSection === resultOptionsIds.schema) {
             return renderSchema();
         }
-        if (activeSection === resultOptionsIds.simplified && !error) {
+        if (activeSection === resultOptionsIds.simplified) {
             return renderSimplified();
         }
 

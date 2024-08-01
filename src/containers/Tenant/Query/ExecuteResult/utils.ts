@@ -5,7 +5,7 @@ import {parseQueryExplainPlan} from '../../../../utils/query';
 
 export function getPlan(data: IQueryResult | undefined) {
     if (!data) {
-        return undefined;
+        return {};
     }
 
     const {plan} = data;
@@ -14,13 +14,10 @@ export function getPlan(data: IQueryResult | undefined) {
         const queryPlan = parseQueryExplainPlan(plan);
         const isSupportedVersion = queryPlan.meta.version === explainVersions.v2;
         if (!isSupportedVersion) {
-            return undefined;
+            return {};
         }
 
         const {Plan: planWithStats, SimplifiedPlan: simplifiedPlan} = queryPlan;
-        if (!planWithStats && !simplifiedPlan) {
-            return undefined;
-        }
 
         return {
             plan: planWithStats
@@ -33,12 +30,12 @@ export function getPlan(data: IQueryResult | undefined) {
     const {stats} = data;
     const planFromStats = stats?.Executions?.[0]?.TxPlansWithStats?.[0];
     if (!planFromStats) {
-        return undefined;
+        return {};
     }
     try {
         const planWithStats = JSON.parse(planFromStats);
         return {plan: preparePlan(planWithStats)};
     } catch (e) {
-        return undefined;
+        return {};
     }
 }
