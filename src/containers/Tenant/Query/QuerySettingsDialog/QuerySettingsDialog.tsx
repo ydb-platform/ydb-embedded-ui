@@ -3,7 +3,7 @@ import React from 'react';
 import {Dialog, Link as ExternalLink, Flex, TextInput} from '@gravity-ui/uikit';
 import {Controller, useForm} from 'react-hook-form';
 
-import {TRACING_LEVEL_VERBOSITY_KEY} from '../../../../lib';
+import {ENABLE_TRACING_LEVEL_KEY} from '../../../../lib';
 import {
     selectQueryAction,
     setQueryAction,
@@ -71,7 +71,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         defaultValues: initialValues,
     });
 
-    const [tracingLevelVerbosity] = useSetting<boolean>(TRACING_LEVEL_VERBOSITY_KEY);
+    const [enableTracingLevel] = useSetting<boolean>(ENABLE_TRACING_LEVEL_KEY);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -118,7 +118,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                         />
                     </div>
                 </Flex>
-                {tracingLevelVerbosity && (
+                {enableTracingLevel && (
                     <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                         <label htmlFor="tracingLevel" className={b('field-title')}>
                             {QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title}
@@ -191,7 +191,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                 renderButtons={(buttonApply, buttonCancel) => (
                     <div className={b('buttons-container')}>
                         <ExternalLink
-                            href="http://ydb.tech/docs"
+                            href="https://ydb.tech/docs"
                             target="_blank"
                             className={b('documentation-link')}
                         >

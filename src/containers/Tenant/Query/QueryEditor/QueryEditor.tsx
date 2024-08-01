@@ -27,9 +27,9 @@ import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
+    ENABLE_TRACING_LEVEL_KEY,
     LAST_USED_QUERY_ACTION_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
-    TRACING_LEVEL_VERBOSITY_KEY,
 } from '../../../../utils/constants';
 import {useQueryExecutionSettings, useSetting} from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
@@ -108,7 +108,7 @@ function QueryEditor(props: QueryEditorProps) {
     const [resultType, setResultType] = React.useState(RESULT_TYPES.EXECUTE);
     const [isResultLoaded, setIsResultLoaded] = React.useState(false);
     const [querySettings] = useQueryExecutionSettings();
-    const [tracingLevelVerbosity] = useSetting<boolean>(TRACING_LEVEL_VERBOSITY_KEY);
+    const [enableTracingLevel] = useSetting<boolean>(ENABLE_TRACING_LEVEL_KEY);
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
         useLastQueryExecutionSettings();
     const {resetBanner} = useChangedQuerySettings();
@@ -212,7 +212,7 @@ function QueryEditor(props: QueryEditorProps) {
                 database: tenantName,
                 querySettings,
                 schema,
-                tracingLevelVerbosity,
+                enableTracingLevel,
             });
             setIsResultLoaded(true);
             setShowPreview(false);
@@ -228,7 +228,7 @@ function QueryEditor(props: QueryEditorProps) {
         },
         [
             executeQuery,
-            tracingLevelVerbosity,
+            enableTracingLevel,
             useMultiSchema,
             setLastUsedQueryAction,
             lastQueryExecutionSettings,
@@ -262,7 +262,7 @@ function QueryEditor(props: QueryEditorProps) {
             query: input,
             database: tenantName,
             querySettings,
-            tracingLevelVerbosity,
+            enableTracingLevel,
         });
         setIsResultLoaded(true);
         setShowPreview(false);
@@ -272,7 +272,7 @@ function QueryEditor(props: QueryEditorProps) {
         lastQueryExecutionSettings,
         querySettings,
         resetBanner,
-        tracingLevelVerbosity,
+        enableTracingLevel,
         sendExplainQuery,
         setLastQueryExecutionSettings,
         setLastUsedQueryAction,

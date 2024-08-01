@@ -137,7 +137,7 @@ interface SendQueryParams extends QueryRequestParams {
     schema?: Schemas;
     // flag whether to send new tracing header or not
     // default: not send
-    tracingLevelVerbosity?: boolean;
+    enableTracingLevel?: boolean;
 }
 
 export const executeQueryApi = api.injectEndpoints({
@@ -148,7 +148,7 @@ export const executeQueryApi = api.injectEndpoints({
                 database,
                 querySettings = {},
                 schema = 'modern',
-                tracingLevelVerbosity,
+                enableTracingLevel,
             }) => {
                 let action: ExecuteActions = 'execute';
                 let syntax: QuerySyntax = QUERY_SYNTAX.yql;
@@ -169,7 +169,7 @@ export const executeQueryApi = api.injectEndpoints({
                         syntax,
                         stats: querySettings.statisticsMode,
                         tracingLevel:
-                            querySettings.tracingLevel && tracingLevelVerbosity
+                            querySettings.tracingLevel && enableTracingLevel
                                 ? TracingLevelNumber[querySettings.tracingLevel]
                                 : undefined,
                         transaction_mode: querySettings.isolationLevel,
