@@ -167,14 +167,7 @@ export function PDiskPage() {
         if (pDiskLoading) {
             return <InfoViewerSkeleton className={pdiskPageCn('info')} rows={10} />;
         }
-        return (
-            <PDiskInfo
-                pDisk={pDiskData}
-                nodeId={nodeId}
-                className={pdiskPageCn('info')}
-                isPDiskPage
-            />
-        );
+        return <PDiskInfo pDisk={pDiskData} nodeId={nodeId} className={pdiskPageCn('info')} />;
     };
 
     const renderTabs = () => {

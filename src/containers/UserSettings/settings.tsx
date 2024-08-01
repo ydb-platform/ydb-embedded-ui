@@ -6,17 +6,15 @@ import {
     AUTOCOMPLETE_ON_ENTER,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     ENABLE_AUTOCOMPLETE,
+    ENABLE_TRACING_LEVEL_KEY,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
-    QUERY_SETTINGS,
     QUERY_USE_MULTI_SCHEMA_KEY,
     SHOW_DOMAIN_DATABASE_KEY,
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
-    USE_DIRECTORY_OPERATIONS,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     USE_PAGINATED_TABLES_KEY,
-    USE_SEPARATE_DISKS_PAGES_KEY,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
 import {ClusterModeGuard} from '../ClusterModeGuard';
@@ -115,27 +113,16 @@ export const showDomainDatabase: SettingProps = {
     title: i18n('settings.showDomainDatabase.title'),
 };
 
-export const useQuerySettings: SettingProps = {
-    settingKey: QUERY_SETTINGS,
-    title: i18n('settings.useQuerySettings.title'),
-    description: i18n('settings.useQuerySettings.description'),
+export const enableTracingLevel: SettingProps = {
+    settingKey: ENABLE_TRACING_LEVEL_KEY,
+    title: i18n('settings.enableTracingLevel.title'),
+    description: i18n('settings.enableTracingLevel.description'),
 };
 
 export const queryUseMultiSchemaSetting: SettingProps = {
     settingKey: QUERY_USE_MULTI_SCHEMA_KEY,
     title: i18n('settings.queryUseMultiSchema.title'),
     description: i18n('settings.queryUseMultiSchema.description'),
-};
-
-export const useSeparateDisksPagesSetting: SettingProps = {
-    settingKey: USE_SEPARATE_DISKS_PAGES_KEY,
-    title: i18n('settings.useSeparateDisksPages.title'),
-    description: i18n('settings.useSeparateDisksPages.description'),
-};
-
-export const useDirectoryActionsSetting: SettingProps = {
-    settingKey: USE_DIRECTORY_OPERATIONS,
-    title: i18n('settings.useDirectoryOperations.title'),
 };
 
 export const useClusterBalancerAsBackendSetting: SettingProps = {
@@ -175,18 +162,12 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [
-        useNodesEndpointSetting,
-        usePaginatedTables,
-        queryUseMultiSchemaSetting,
-        useSeparateDisksPagesSetting,
-        useDirectoryActionsSetting,
-    ],
+    settings: [useNodesEndpointSetting, usePaginatedTables, queryUseMultiSchemaSetting],
 };
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',
     title: i18n('section.dev-setting'),
-    settings: [enableAutocompleteSetting, autocompleteOnEnterSetting],
+    settings: [enableAutocompleteSetting, autocompleteOnEnterSetting, enableTracingLevel],
 };
 
 export const aboutSettingsSection: SettingsSection = {

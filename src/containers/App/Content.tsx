@@ -10,6 +10,7 @@ import type {SlotComponent} from '../../components/slots/types';
 import routes from '../../routes';
 import type {RootState} from '../../store';
 import {getUser} from '../../store/reducers/authentication/authentication';
+import {capabilitiesApi} from '../../store/reducers/capabilities/capabilities';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
@@ -144,6 +145,7 @@ export function Content(props: ContentProps) {
             <Route key="single-cluster">
                 <GetUser />
                 <GetNodesList />
+                <GetCapabilities />
                 <Header mainPage={mainPage} />
                 <Switch>
                     {routesSlots.map((route) => {
@@ -182,6 +184,11 @@ function GetUser() {
 
 function GetNodesList() {
     nodesListApi.useGetNodesListQuery(undefined);
+    return null;
+}
+
+function GetCapabilities() {
+    capabilitiesApi.useGetClusterCapabilitiesQuery(undefined);
     return null;
 }
 

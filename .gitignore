@@ -7,6 +7,7 @@
 
 # testing
 /coverage
+playwright-artifacts
 
 # production
 /build

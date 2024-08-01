@@ -159,7 +159,7 @@ export function VDiskPage() {
     };
 
     const renderInfo = () => {
-        return <VDiskInfo data={vDiskData} isVDiskPage />;
+        return <VDiskInfo data={vDiskData} />;
     };
 
     const renderGroupInfo = () => {

@@ -9,6 +9,7 @@ import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/redu
 import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 import type {TMetaInfo} from '../types/api/acl';
 import type {TQueryAutocomplete} from '../types/api/autocomplete';
+import type {CapabilitiesResponse} from '../types/api/capabilities';
 import type {TClusterInfo} from '../types/api/cluster';
 import type {TComputeInfo} from '../types/api/compute';
 import type {DescribeConsumerResult} from '../types/api/consumer';
@@ -86,6 +87,9 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
 
     getPath(path: string) {
         return `${BACKEND ?? ''}${path}`;
+    }
+    getClusterCapabilities() {
+        return this.get<CapabilitiesResponse>(this.getPath('/viewer/capabilities'), {}, {});
     }
     getClusterInfo(clusterName?: string, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TClusterInfo>(
