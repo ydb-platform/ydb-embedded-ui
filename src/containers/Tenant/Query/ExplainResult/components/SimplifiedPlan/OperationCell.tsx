@@ -45,6 +45,7 @@ function getDividers(lines: string, hasLeafs: boolean) {
                 //horizontal pointer to the node (├)
                 dividers.push(
                     <Divider
+                        key={'last'}
                         modifiers={{horizontal: true}}
                         left={FIRST_PADDING + 1 + LEVEL_PADDING * (i - 1)}
                     />,
@@ -53,6 +54,7 @@ function getDividers(lines: string, hasLeafs: boolean) {
                 //pointer to the last child in the branch (└)
                 dividers.push(
                     <Divider
+                        key={'last'}
                         modifiers={{last: true}}
                         left={FIRST_PADDING + LEVEL_PADDING * (i - 1)}
                     />,
@@ -62,12 +64,16 @@ function getDividers(lines: string, hasLeafs: boolean) {
         if (i === linesArray.length - 1 && hasLeafs) {
             //starting vertical line if node has leafs
             dividers.push(
-                <Divider modifiers={{first: true}} left={FIRST_PADDING + LEVEL_PADDING * i} />,
+                <Divider
+                    key={'first'}
+                    modifiers={{first: true}}
+                    left={FIRST_PADDING + LEVEL_PADDING * i}
+                />,
             );
         }
         if (linesArray[i]) {
             //vertical line indicating level
-            dividers.push(<Divider left={FIRST_PADDING + LEVEL_PADDING * (i - 1)} />);
+            dividers.push(<Divider key={i} left={FIRST_PADDING + LEVEL_PADDING * (i - 1)} />);
         }
     }
     return dividers;

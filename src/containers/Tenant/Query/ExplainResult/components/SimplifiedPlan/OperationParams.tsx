@@ -47,17 +47,22 @@ function getOperationParams(params: Record<string, unknown> = {}) {
     if (paramsEntries.length === 1) {
         const value = paramsEntries[0][1];
         const color = getOperatorPropertyColor(paramsEntries[0][0]);
-        result.push(<span style={{color}}>{prepareValue(value)}</span>);
+        // if there is only one param, display value without key
+        result.push(
+            <span key="param" style={{color}}>
+                {prepareValue(value)}
+            </span>,
+        );
     } else {
         const reorderedParamsEntries = reorderParamsEntries(params);
         for (let i = 0; i < reorderedParamsEntries.length; i++) {
             const [key, value] = reorderedParamsEntries[i];
             const color = getOperatorPropertyColor(key);
             if (i > 0) {
-                result.push(<span>, </span>);
+                result.push(', ');
             }
             result.push(
-                <span style={{color}}>
+                <span key={i} style={{color}}>
                     {key}: {prepareValue(value)}
                 </span>,
             );
