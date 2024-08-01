@@ -65,13 +65,9 @@ interface QuerySettingsFormProps {
 }
 
 function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsFormProps) {
-    const {control, handleSubmit, reset} = useForm<QuerySettings>({
+    const {control, handleSubmit} = useForm<QuerySettings>({
         defaultValues: initialValues,
     });
-
-    React.useEffect(() => {
-        reset(initialValues);
-    }, [initialValues, reset]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
