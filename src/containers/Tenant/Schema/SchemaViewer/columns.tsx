@@ -16,6 +16,7 @@ export const SCHEMA_TABLE_COLUMS_IDS = {
     type: 'type',
     notNull: 'notNull',
     autoIncrement: 'autoIncrement',
+    defaultValue: 'defaultValue',
     familyName: 'familyName',
     prefferedPoolKind: 'prefferedPoolKind',
     columnCodec: 'columnCodec',
@@ -95,6 +96,15 @@ const autoIncrementColumn: SchemaColumn = {
         return undefined;
     },
 };
+const defaultValueColumn: SchemaColumn = {
+    name: SCHEMA_TABLE_COLUMS_IDS.defaultValue,
+    get header() {
+        return i18n('column-title.defaultValue');
+    },
+    width: 100,
+    render: ({row}) => row.defaultValue,
+};
+
 const familyColumn: SchemaColumn = {
     name: SCHEMA_TABLE_COLUMS_IDS.familyName,
     get header() {
@@ -129,12 +139,21 @@ export function getExternalTableColumns(): SchemaColumn[] {
 export function getColumnTableColumns(): SchemaColumn[] {
     return [idColumn, keyColumn, nameColumn, typeColumn, notNullColumn];
 }
-export function getRowTableColumns(extended: boolean, hasAutoIncrement: boolean): SchemaColumn[] {
+export function getRowTableColumns(
+    extended: boolean,
+    hasAutoIncrement: boolean,
+    hasDefaultValue: boolean,
+): SchemaColumn[] {
     const rowTableColumns = [idColumn, keyColumn, nameColumn, typeColumn, notNullColumn];
+
+    if (hasDefaultValue) {
+        rowTableColumns.push(defaultValueColumn);
+    }
 
     if (extended) {
         rowTableColumns.push(familyColumn, mediaColumn, compressionColumn);
     }
+
     if (hasAutoIncrement) {
         rowTableColumns.push(autoIncrementColumn);
     }
