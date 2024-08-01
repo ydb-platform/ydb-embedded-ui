@@ -37,6 +37,10 @@ jobs:
   e2e_tests:
     name: Playwright Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      pages: write
 
     services:
       backend:
@@ -58,8 +62,95 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Plawright deps
+      - name: Install Playwright deps
         run: npm run test:e2e:install
 
       - name: Run Playwright tests
         run: npm run test:e2e
+        env:
+          CI: true
+          PLAYWRIGHT_VIDEO: 'on'
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-artifacts
+          path: playwright-artifacts
+          retention-days: 30
+
+      - name: Setup Pages
+        if: always()
+        uses: actions/configure-pages@v3
+
+      - name: Deploy report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-artifacts/playwright-report
+          destination_dir: ${{ github.event.pull_request.number }}
+
+      - name: Get test results
+        if: always()
+        id: test-results
+        run: |
+          TOTAL=$(grep -oP 'total="\K[^"]+' playwright-artifacts/playwright-report/index.html || echo "0")
+          PASSED=$(grep -oP 'passed="\K[^"]+' playwright-artifacts/playwright-report/index.html || echo "0")
+          FAILED=$(grep -oP 'failed="\K[^"]+' playwright-artifacts/playwright-report/index.html || echo "0")
+          SKIPPED=$(grep -oP 'skipped="\K[^"]+' playwright-artifacts/playwright-report/index.html || echo "0")
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+
+      - name: Comment PR
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/${context.issue.number}/`;
+            const testResults = {
+              total: ${{ steps.test-results.outputs.total }},
+              passed: ${{ steps.test-results.outputs.passed }},
+              failed: ${{ steps.test-results.outputs.failed }},
+              skipped: ${{ steps.test-results.outputs.skipped }}
+            };
+            const status = testResults.failed > 0 ? '❌ FAILED' : '✅ PASSED';
+            const statusColor = testResults.failed > 0 ? 'red' : 'green';
+
+            const comment = `## Playwright Test Results
+
+            **Status**: <span style="color: ${statusColor}; font-weight: bold;">${status}</span>
+
+            | Total | Passed | Failed | Skipped |
+            |-------|--------|--------|---------|
+            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.skipped} |
+
+            ### 📊 Test Report
+
+            For detailed results, please check the [Playwright Report](${reportUrl})
+
+            ### 🎥 Test Recordings
+
+            Video recordings of failed tests (if any) are available in the report.
+
+            ---
+
+            <details>
+            <summary>ℹ️ How to use this report</summary>
+
+            1. Click on the "Playwright Report" link above to view the full test results.
+            2. In the report, you can see a breakdown of all tests, including any failures.
+            3. For failed tests, you can view screenshots and video recordings to help debug the issues.
+            4. Use the filters in the report to focus on specific test statuses or suites.
+
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })

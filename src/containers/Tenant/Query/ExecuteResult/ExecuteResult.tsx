@@ -11,14 +11,13 @@ import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {YDBGraph} from '../../../../components/Graph/Graph';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
-import {QUERY_SETTINGS} from '../../../../lib';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
-import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
+import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {SimplifiedPlan} from '../ExplainResult/components/SimplifiedPlan/SimplifiedPlan';
@@ -63,7 +62,6 @@ export function ExecuteResult({
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
     const dispatch = useTypedDispatch();
-    const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
 
     const stats = data?.stats;
     const resultsSetsCount = data?.resultSets?.length;
@@ -237,7 +235,7 @@ export function ExecuteResult({
                     />
                 </div>
             </div>
-            {useQuerySettings && <QuerySettingsBanner />}
+            <QuerySettingsBanner />
             <Fullscreen>{renderResultSection()}</Fullscreen>
         </React.Fragment>
     );

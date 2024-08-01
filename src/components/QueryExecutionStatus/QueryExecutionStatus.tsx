@@ -5,7 +5,6 @@ import {Icon, Tooltip} from '@gravity-ui/uikit';
 import {isAxiosError} from 'axios';
 
 import i18n from '../../containers/Tenant/Query/i18n';
-import {QUERY_SETTINGS, useSetting} from '../../lib';
 import {cn} from '../../utils/cn';
 import {useChangedQuerySettings} from '../../utils/hooks/useChangedQuerySettings';
 import QuerySettingsDescription from '../QuerySettingsDescription/QuerySettingsDescription';
@@ -20,10 +19,9 @@ interface QueryExecutionStatusProps {
 }
 
 const QuerySettingsIndicator = () => {
-    const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
     const {isIndicatorShown, changedLastExecutionSettingsDescriptions} = useChangedQuerySettings();
 
-    if (!isIndicatorShown || !useQuerySettings) {
+    if (!isIndicatorShown) {
         return null;
     }
 

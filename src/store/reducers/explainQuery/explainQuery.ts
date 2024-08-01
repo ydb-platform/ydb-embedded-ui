@@ -10,12 +10,15 @@ import {prepareExplainResponse} from './utils';
 
 interface ExplainQueryParams extends QueryRequestParams {
     querySettings?: Partial<QuerySettings>;
+    // flag whether to send new tracing header or not
+    // default: not send
+    tracingLevelVerbosity?: boolean;
 }
 
 export const explainQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
         explainQuery: build.mutation<PreparedExplainResponse, ExplainQueryParams>({
-            queryFn: async ({query, database, querySettings}) => {
+            queryFn: async ({query, database, querySettings, tracingLevelVerbosity}) => {
                 let action: ExplainActions = 'explain';
                 let syntax: QuerySyntax = QUERY_SYNTAX.yql;
 
@@ -33,9 +36,10 @@ export const explainQueryApi = api.injectEndpoints({
                         action,
                         syntax,
                         stats: querySettings?.statisticsMode,
-                        tracingLevel: querySettings?.tracingLevel
-                            ? TracingLevelNumber[querySettings?.tracingLevel]
-                            : undefined,
+                        tracingLevel:
+                            querySettings?.tracingLevel && tracingLevelVerbosity
+                                ? TracingLevelNumber[querySettings?.tracingLevel]
+                                : undefined,
                         transaction_mode: querySettings?.isolationLevel,
                         timeout: isNumeric(querySettings?.timeout)
                             ? Number(querySettings?.timeout) * 1000

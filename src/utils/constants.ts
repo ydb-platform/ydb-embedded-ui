@@ -159,4 +159,8 @@ export const AUTOCOMPLETE_ON_ENTER = 'autocompleteOnEnter';
 
 export const IS_HOTKEYS_HELP_HIDDEN_KEY = 'isHotKeysHelpHidden';
 
-export const QUERY_SETTINGS = 'query_settings';
+export const USE_SEPARATE_DISKS_PAGES_KEY = 'useSeparateDisksPages';
+
+export const USE_DIRECTORY_OPERATIONS = 'useDirectoryOperations';
+
+export const TRACING_LEVEL_VERBOSITY_KEY = 'tracingLevelVerbosity';

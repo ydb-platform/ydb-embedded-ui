@@ -8,10 +8,10 @@ import {
     ENABLE_AUTOCOMPLETE,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
-    QUERY_SETTINGS,
     QUERY_USE_MULTI_SCHEMA_KEY,
     SHOW_DOMAIN_DATABASE_KEY,
     THEME_KEY,
+    TRACING_LEVEL_VERBOSITY_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     USE_PAGINATED_TABLES_KEY,
@@ -113,10 +113,10 @@ export const showDomainDatabase: SettingProps = {
     title: i18n('settings.showDomainDatabase.title'),
 };
 
-export const useQuerySettings: SettingProps = {
-    settingKey: QUERY_SETTINGS,
-    title: i18n('settings.useQuerySettings.title'),
-    description: i18n('settings.useQuerySettings.description'),
+export const tracingLevelVerbosity: SettingProps = {
+    settingKey: TRACING_LEVEL_VERBOSITY_KEY,
+    title: i18n('settings.tracingLevelVerbosity.title'),
+    description: i18n('settings.tracingLevelVerbosity.description'),
 };
 
 export const queryUseMultiSchemaSetting: SettingProps = {
@@ -167,7 +167,7 @@ export const experimentsSection: SettingsSection = {
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',
     title: i18n('section.dev-setting'),
-    settings: [enableAutocompleteSetting, autocompleteOnEnterSetting],
+    settings: [enableAutocompleteSetting, autocompleteOnEnterSetting, tracingLevelVerbosity],
 };
 
 export const aboutSettingsSection: SettingsSection = {
