@@ -54,20 +54,20 @@ const SettingsButton = ({onClick, runIsLoading}: SettingsButtonProps) => {
 };
 
 interface QueryEditorControlsProps {
-    onRunButtonClick: () => void;
+    handleSendExecuteClick: () => void;
     onSettingsButtonClick: () => void;
     runIsLoading: boolean;
-    onExplainButtonClick: () => void;
+    handleGetExplainQueryClick: () => void;
     explainIsLoading: boolean;
     disabled: boolean;
     highlightedAction: QueryAction;
 }
 
 export const QueryEditorControls = ({
-    onRunButtonClick,
+    handleSendExecuteClick,
     onSettingsButtonClick,
     runIsLoading,
-    onExplainButtonClick,
+    handleGetExplainQueryClick,
     explainIsLoading,
     disabled,
     highlightedAction,
@@ -75,6 +75,14 @@ export const QueryEditorControls = ({
     const runView: ButtonView | undefined = highlightedAction === 'execute' ? 'action' : undefined;
     const explainView: ButtonView | undefined =
         highlightedAction === 'explain' ? 'action' : undefined;
+
+    const onRunButtonClick = () => {
+        handleSendExecuteClick();
+    };
+
+    const onExplainButtonClick = () => {
+        handleGetExplainQueryClick();
+    };
 
     return (
         <div className={b()}>
