@@ -24,6 +24,14 @@ export interface TColumnDescription {
     FamilyName?: string;
     /** Path to sequence for default values */
     DefaultFromSequence?: string;
+    DefaultFromLiteral?: {
+        type: {
+            type_id: string;
+        };
+        value: {
+            text_value: string;
+        };
+    };
     NotNull?: boolean;
 }
 

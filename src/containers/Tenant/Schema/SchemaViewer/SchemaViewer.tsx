@@ -56,6 +56,10 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
         return tableData.some((i) => i.autoIncrement);
     }, [tableData]);
 
+    const hasDefaultValue = React.useMemo(() => {
+        return tableData.some((i) => i.defaultValue);
+    }, [tableData]);
+
     const columns = React.useMemo(() => {
         if (isViewType(type)) {
             return getViewColumns();
@@ -67,11 +71,11 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
             return getColumnTableColumns();
         }
         if (isRowTableType(type)) {
-            return getRowTableColumns(extended, hasAutoIncrement);
+            return getRowTableColumns(extended, hasAutoIncrement, hasDefaultValue);
         }
 
         return [];
-    }, [type, extended, hasAutoIncrement]);
+    }, [type, extended, hasAutoIncrement, hasDefaultValue]);
 
     const renderContent = () => {
         if (loading || isViewSchemaLoading) {
