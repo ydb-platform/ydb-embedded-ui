@@ -4,6 +4,8 @@ import {tenantName} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {QueryEditor, QueryMode} from '../queryEditor/QueryEditor';
 
+import executeQueryWithKeybinding from './utils';
+
 export const VISIBILITY_TIMEOUT = 5000;
 
 test.describe('Query History', () => {
@@ -74,20 +76,10 @@ test.describe('Query History', () => {
         await page.keyboard.type(testQuery);
 
         // Use the keybinding to execute the query
-        if (browserName === 'chromium') {
-            // For Chromium, we need to press the keys separately
-            await page.keyboard.down('Control');
-            await page.keyboard.press('Enter');
-            await page.keyboard.up('Control');
-        } else {
-            // For other browsers, we can use the combined key press
-            await page.keyboard.press(
-                process.platform === 'darwin' ? 'Meta+Enter' : 'Control+Enter',
-            );
-        }
+        await executeQueryWithKeybinding(page, browserName);
 
         // Wait for the query to be executed
-        await page.waitForSelector('.ydb-query-execute-result__result');
+        await page.waitForSelector('.ydb-query-execute-result__result', {timeout: 10000});
 
         // Navigate to the history tab
         await page.click('text=History');
