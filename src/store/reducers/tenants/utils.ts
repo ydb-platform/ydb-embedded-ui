@@ -70,7 +70,6 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         DatabaseQuotas = {},
         StorageUsage,
         QuotaUsage,
-        MemoryStats,
     } = tenant;
 
     const cpu = Number(CoresUsed) * 1_000_000 || 0;
@@ -150,28 +149,6 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
             usage: calculateUsage(memory, memoryLimit),
         },
     ];
-
-    if (MemoryStats) {
-        if (
-            isNumeric(MemoryStats.ExternalConsumption) &&
-            Number(MemoryStats.ExternalConsumption) > 0
-        ) {
-            memoryStats.push({
-                name: 'External',
-                used: Number(MemoryStats.ExternalConsumption),
-                limit: MemoryStats.MemTotal,
-                usage: calculateUsage(memory, memoryLimit),
-            });
-        }
-        if (isNumeric(MemoryStats.ConsumersConsumption)) {
-            memoryStats.push({
-                name: 'Caches',
-                used: Number(MemoryStats.ConsumersConsumption),
-                limit: MemoryStats.ConsumersLimit,
-                usage: calculateUsage(memory, memoryLimit),
-            });
-        }
-    }
 
     return {
         memory,

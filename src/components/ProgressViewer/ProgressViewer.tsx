@@ -87,7 +87,6 @@ export function ProgressViewer({
             status = inverseColorize ? 'good' : 'danger';
         }
         if (!isNumeric(capacity)) {
-            status = 'good';
             fillWidth = 100;
         }
     }

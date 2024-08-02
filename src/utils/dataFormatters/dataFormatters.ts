@@ -6,7 +6,7 @@ import {
     getSizeWithSignificantDigits,
 } from '../bytesParsers/formatBytes';
 import type {BytesSizes} from '../bytesParsers/formatBytes';
-import {DAY_IN_SECONDS, GIGABYTE, HOUR_IN_SECONDS} from '../constants';
+import {DAY_IN_SECONDS, HOUR_IN_SECONDS} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
 
@@ -31,10 +31,6 @@ export const formatBps = (bytes?: string | number) => {
     }
 
     return formattedBytes + '/s';
-};
-
-export const formatBytesToGigabyte = (bytes: number | string) => {
-    return `${Math.floor(Number(bytes) / GIGABYTE)} GB`;
 };
 
 export const stringifyVdiskId = (id?: TVDiskID | TVSlotId) => {

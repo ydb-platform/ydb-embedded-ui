@@ -12,7 +12,7 @@ import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import type {GetNodeRefFunc} from '../../types/additionalProps';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatStorageValues} from '../../utils/dataFormatters/dataFormatters';
+import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 
 export const NODES_COLUMNS_WIDTH_LS_KEY = 'nodesTableColumnsWidth';
 
@@ -111,7 +111,7 @@ const memoryColumn: NodesColumn = {
         <ProgressViewer
             value={row.MemoryUsed}
             capacity={row.MemoryLimit}
-            formatValues={formatStorageValues}
+            formatValues={formatStorageValuesToGb}
             colorizeProgress={true}
         />
     ),
@@ -198,7 +198,7 @@ const topNodesMemoryColumn: NodesColumn = {
         <ProgressViewer
             value={row.MemoryUsed}
             capacity={row.MemoryLimit}
-            formatValues={formatStorageValues}
+            formatValues={formatStorageValuesToGb}
             colorizeProgress={true}
         />
     ),
@@ -215,7 +215,7 @@ const sharedCacheUsageColumn: NodesColumn = {
         <ProgressViewer
             value={row.SharedCacheUsed}
             capacity={row.SharedCacheLimit}
-            formatValues={formatStorageValues}
+            formatValues={formatStorageValuesToGb}
             colorizeProgress={true}
         />
     ),
