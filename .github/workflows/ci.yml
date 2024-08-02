@@ -38,9 +38,7 @@ jobs:
     name: Playwright Tests
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
-      pages: write
+      contents: read
 
     services:
       backend:
@@ -82,18 +80,6 @@ jobs:
           path: playwright-artifacts
           retention-days: 5
 
-      - name: Setup Pages
-        if: always()
-        uses: actions/configure-pages@v3
-
-      - name: Deploy report to GitHub Pages
-        if: always()
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./playwright-artifacts/playwright-report
-          destination_dir: ${{ github.event.pull_request.number }}
-
       - name: Get test results
         if: always()
         id: test-results
@@ -102,13 +88,13 @@ jobs:
           echo "Listing playwright-artifacts directory:"
           ls -R playwright-artifacts
 
-          if [ -f "playwright-artifacts/test-results.json" ]; then           
+          if [ -f "playwright-artifacts/test-results.json" ]; then          
             echo "Parsing JSON file:"
             total=$(jq '.stats.expected + .stats.unexpected + .stats.skipped' playwright-artifacts/test-results.json)
             passed=$(jq '.stats.expected' playwright-artifacts/test-results.json)
             failed=$(jq '.stats.unexpected' playwright-artifacts/test-results.json)
             skipped=$(jq '.stats.skipped' playwright-artifacts/test-results.json)
-           
+
             echo "Parsed values:"
             echo "Total: $total"
             echo "Passed: $passed"
@@ -127,19 +113,59 @@ jobs:
           echo "failed=$failed" >> $GITHUB_OUTPUT
           echo "skipped=$skipped" >> $GITHUB_OUTPUT
 
+  deploy_and_update:
+    name: Deploy and Update PR
+    needs: e2e_tests
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: write
+      pages: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: playwright-artifacts
+          path: playwright-artifacts
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Deploy report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-artifacts/playwright-report
+          destination_dir: ${{ github.event.pull_request.number }}
+
       - name: Update PR description
-        if: always()
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            const fs = require('fs');
+            const testResultsPath = 'playwright-artifacts/test-results.json';
+            let testResults;
+
+            if (fs.existsSync(testResultsPath)) {
+              const rawData = fs.readFileSync(testResultsPath);
+              const data = JSON.parse(rawData);
+              testResults = {
+                total: data.stats.expected + data.stats.unexpected + data.stats.skipped,
+                passed: data.stats.expected,
+                failed: data.stats.unexpected,
+                skipped: data.stats.skipped
+              };
+            } else {
+              console.log('Test results file not found');
+              testResults = { total: 0, passed: 0, failed: 0, skipped: 0 };
+            }
+
             const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/${context.issue.number}/`;
-            const testResults = {
-              total: ${{ steps.test-results.outputs.total || 0 }},
-              passed: ${{ steps.test-results.outputs.passed || 0 }},
-              failed: ${{ steps.test-results.outputs.failed || 0 }},
-              skipped: ${{ steps.test-results.outputs.skipped || 0 }}
-            };
             const status = testResults.failed > 0 ? '❌ FAILED' : '✅ PASSED';
             const statusColor = testResults.failed > 0 ? 'red' : 'green';
 
