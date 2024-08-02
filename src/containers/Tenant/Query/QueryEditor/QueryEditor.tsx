@@ -150,7 +150,7 @@ function QueryEditor(props: QueryEditorProps) {
 
         const schema = useMultiSchema ? 'multi' : 'modern';
 
-        const query = text && typeof text === 'string' ? text : input;
+        const query = text ?? input;
 
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
         if (!isEqual(lastQueryExecutionSettings, querySettings)) {
@@ -312,10 +312,10 @@ function QueryEditor(props: QueryEditorProps) {
     const renderControls = () => {
         return (
             <QueryEditorControls
-                onRunButtonClick={handleSendExecuteClick}
+                handleSendExecuteClick={handleSendExecuteClick}
                 onSettingsButtonClick={handleSettingsClick}
                 runIsLoading={executeQueryResult.isLoading}
-                onExplainButtonClick={handleGetExplainQueryClick}
+                handleGetExplainQueryClick={handleGetExplainQueryClick}
                 explainIsLoading={explainQueryResult.isLoading}
                 disabled={!executeQuery.input}
                 highlightedAction={lastUsedQueryAction}

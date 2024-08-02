@@ -169,6 +169,10 @@ export class QueryEditor {
         }
     }
 
+    async focusEditor() {
+        await this.editorTextArea.focus();
+    }
+
     async clickGearButton() {
         await this.gearButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.gearButton.click();
