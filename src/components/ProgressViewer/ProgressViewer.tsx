@@ -86,6 +86,9 @@ export function ProgressViewer({
         } else if (fillWidth > dangerThreshold) {
             status = inverseColorize ? 'good' : 'danger';
         }
+        if (!isNumeric(capacity)) {
+            fillWidth = 100;
+        }
     }
 
     const lineStyle = {
