@@ -236,53 +236,49 @@ jobs:
             const status = testResults.failed > 0 ? '❌ FAILED' : (testResults.flaky > 0 ? '⚠️ FLAKY' : '✅ PASSED');
             const statusColor = testResults.failed > 0 ? 'red' : (testResults.flaky > 0 ? 'orange' : 'green');
 
-            const testResultsSection = `## Playwright Test Results
-
-            **Status**: <span style="color: ${statusColor}; font-weight: bold;">${status}</span>
-
-            | Total | Passed | Failed | Flaky | Skipped |
-            |-------|--------|--------|-------|---------|
-            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.flaky} | ${testResults.skipped} |
-
-            ### 📊 Test Report
-
-            For detailed results, please check the [Playwright Report](${reportUrl})
-
-            ### 🎥 Test Recordings
-
-            Video recordings of failed tests (if any) are available in the report.
-
-            ---
-
-            <details>
-            <summary>ℹ️ How to use this report</summary>
-
-            1. Click on the "Playwright Report" link above to view the full test results.
-            2. In the report, you can see a breakdown of all tests, including any failures or flaky tests.
-            3. For failed tests, you can view screenshots and video recordings to help debug the issues.
-            4. Use the filters in the report to focus on specific test statuses or suites.
-
-            </details>`;
-
             const currentSize = parseInt('${{ needs.bundle_size.outputs.current_size }}');
             const mainSize = parseInt('${{ needs.bundle_size.outputs.main_size }}');
             const diff = parseInt('${{ needs.bundle_size.outputs.diff }}');
             const percent = '${{ needs.bundle_size.outputs.percent }}';
 
-            const bundleSizeSection = `## Bundle Size Changes
+            const formatSize = (size) => {
+              if (size >= 1024) {
+                return `${(size / 1024).toFixed(2)} MB`;
+              }
+              return `${size} KB`;
+            };
 
-            | Metric | Value |
-            |--------|-------|
-            | Current Branch | ${currentSize.toLocaleString()} bytes |
-            | Main Branch | ${mainSize.toLocaleString()} bytes |
-            | Difference | ${diff > 0 ? '+' : ''}${diff.toLocaleString()} bytes |
-            | Percentage Change | ${percent === 'N/A' ? 'N/A' : `${parseFloat(percent) > 0 ? '+' : ''}${percent}%`} |
+            const bundleStatus = percent === 'N/A' ? '⚠️' :
+                                 parseFloat(percent) > 0 ? '🔺' :
+                                 parseFloat(percent) < 0 ? '🔽' : '✅';
+
+            const ciSection = `## CI Results
+
+            ### Test Status: <span style="color: ${statusColor};">${status}</span>
+            📊 [Full Report](${reportUrl})
+
+            | Total | Passed | Failed | Flaky | Skipped |
+            |:-----:|:------:|:------:|:-----:|:-------:|
+            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.flaky} | ${testResults.skipped} |
+
+            ### Bundle Size: ${bundleStatus}
+            Current: ${formatSize(currentSize)} | Main: ${formatSize(mainSize)}
+            Diff: ${diff > 0 ? '+' : ''}${formatSize(Math.abs(diff))} (${percent === 'N/A' ? 'N/A' : `${percent}%`})
 
             ${
-              percent === 'N/A' ? '⚠️ Unable to calculate percentage change. Please check the bundle sizes manually.' :
-              parseFloat(percent) > 0 ? '⚠️ Bundle size has increased. Please review the changes and optimize if possible.' :
-              '✅ Bundle size has decreased or remained the same.'
-            }`;
+              percent === 'N/A' ? '⚠️ Unable to calculate change.' :
+              parseFloat(percent) > 0 ? '⚠️ Bundle size increased. Please review.' :
+              parseFloat(percent) < 0 ? '✅ Bundle size decreased.' : '✅ Bundle size unchanged.'
+            }
+
+            <details>
+            <summary>ℹ️ CI Information</summary>
+
+            - Test recordings for failed tests are available in the full report.
+            - Bundle size is measured for the entire 'dist' directory.
+            - 📊 indicates links to detailed reports.
+            - 🔺 indicates increase, 🔽 decrease, and ✅ no change in bundle size.
+            </details>`;
 
             const { data: pullRequest } = await github.rest.pulls.get({
               owner: context.repo.owner,
@@ -291,21 +287,13 @@ jobs:
             });
 
             const currentBody = pullRequest.body || '';
-            const testResultsRegex = /## Playwright Test Results[\s\S]*?(?=\n## |$)/;
-            const bundleSizeRegex = /## Bundle Size Changes[\s\S]*?(?=\n## |$)/;
+            const ciSectionRegex = /## CI Results[\s\S]*?(?=\n## (?!CI Results)|$)/;
 
             let newBody = currentBody;
-
-            if (testResultsRegex.test(newBody)) {
-              newBody = newBody.replace(testResultsRegex, testResultsSection);
+            if (ciSectionRegex.test(newBody)) {
+              newBody = newBody.replace(ciSectionRegex, ciSection);
             } else {
-              newBody += '\n\n' + testResultsSection;
-            }
-
-            if (bundleSizeRegex.test(newBody)) {
-              newBody = newBody.replace(bundleSizeRegex, bundleSizeSection);
-            } else {
-              newBody += '\n\n' + bundleSizeSection;
+              newBody += '\n\n' + ciSection;
             }
 
             await github.rest.pulls.update({
