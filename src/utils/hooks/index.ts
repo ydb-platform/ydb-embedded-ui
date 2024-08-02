@@ -5,3 +5,4 @@ export * from './useQueryExecutionSettings';
 export * from './useTableSort';
 export * from './useSearchQuery';
 export * from './useAutoRefreshInterval';
+export * from './useEventHandler';

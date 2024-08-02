@@ -31,7 +31,7 @@ import {
     LAST_USED_QUERY_ACTION_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../../utils/constants';
-import {useQueryExecutionSettings, useSetting} from '../../../../utils/hooks';
+import {useEventHandler, useQueryExecutionSettings, useSetting} from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
 import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
@@ -58,10 +58,6 @@ const CONTEXT_MENU_GROUP_ID = 'navigation';
 const RESULT_TYPES = {
     EXECUTE: 'execute',
     EXPLAIN: 'explain',
-};
-const MONACO_HOT_KEY_ACTIONS = {
-    sendQuery: 'sendQuery',
-    sendSelectedQuery: 'sendSelectedQuery',
 };
 
 const b = cn('query-editor');
@@ -94,9 +90,6 @@ function QueryEditor(props: QueryEditorProps) {
         tenantName,
         path,
         setTenantPath: setPath,
-        setQueryAction,
-        saveQueryToHistory,
-        setShowPreview,
         executeQuery,
         type,
         theme,
@@ -117,9 +110,6 @@ function QueryEditor(props: QueryEditorProps) {
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting<QueryAction>(
         LAST_USED_QUERY_ACTION_KEY,
     );
-    const [monacoHotKey, setMonacoHotKey] = React.useState<ValueOf<
-        typeof MONACO_HOT_KEY_ACTIONS
-    > | null>(null);
 
     const [sendExecuteQuery, executeQueryResult] = executeQueryApi.useExecuteQueryMutation();
     const [sendExplainQuery, explainQueryResult] = explainQueryApi.useExplainQueryMutation();
@@ -138,27 +128,6 @@ function QueryEditor(props: QueryEditorProps) {
         initialTenantCommonInfoState,
     );
 
-    const editorRef = React.useRef<Monaco.editor.IStandaloneCodeEditor>();
-
-    React.useEffect(() => {
-        const updateEditor = () => {
-            if (editorRef.current) {
-                editorRef.current.layout();
-            }
-        };
-
-        const onChangeWindow = throttle(() => {
-            updateEditor();
-        }, 100);
-
-        updateEditor();
-
-        window.addEventListener('resize', onChangeWindow);
-        return () => {
-            window.removeEventListener('resize', onChangeWindow);
-        };
-    }, []);
-
     React.useEffect(() => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
     }, []);
@@ -171,83 +140,51 @@ function QueryEditor(props: QueryEditorProps) {
         }
     }, [props.showPreview, isResultLoaded]);
 
-    React.useEffect(() => {
+    const getLastQueryText = useEventHandler(() => {
+        const {history} = executeQuery;
+        return history.queries[history.queries.length - 1]?.queryText || '';
+    });
+
+    const handleSendExecuteClick = useEventHandler((text?: string) => {
         const {input, history} = executeQuery;
 
-        const hasUnsavedInput = input
-            ? input !== history.queries[history.queries.length - 1]?.queryText
-            : false;
+        const schema = useMultiSchema ? 'multi' : 'modern';
 
-        if (hasUnsavedInput) {
-            window.onbeforeunload = (e) => {
-                e.preventDefault();
-                // Chrome requires returnValue to be set
-                e.returnValue = '';
-            };
-        } else {
-            window.onbeforeunload = null;
+        const query = text && typeof text === 'string' ? text : input;
+
+        setLastUsedQueryAction(QUERY_ACTIONS.execute);
+        if (!isEqual(lastQueryExecutionSettings, querySettings)) {
+            resetBanner();
+            setLastQueryExecutionSettings(querySettings);
         }
-        return () => {
-            window.onbeforeunload = null;
-        };
-    }, [executeQuery]);
 
-    const handleSendExecuteClick = React.useCallback(
-        (text?: string) => {
-            const {input, history} = executeQuery;
-
-            const schema = useMultiSchema ? 'multi' : 'modern';
-
-            const query = text && typeof text === 'string' ? text : input;
-
-            setLastUsedQueryAction(QUERY_ACTIONS.execute);
-            if (!isEqual(lastQueryExecutionSettings, querySettings)) {
-                resetBanner();
-                setLastQueryExecutionSettings(querySettings);
-            }
-
-            setResultType(RESULT_TYPES.EXECUTE);
-            sendExecuteQuery({
-                query,
-                database: tenantName,
-                querySettings,
-                schema,
-                enableTracingLevel,
-            });
-            setIsResultLoaded(true);
-            setShowPreview(false);
-
-            // Don't save partial queries in history
-            if (!text) {
-                const {queries, currentIndex} = history;
-                if (query !== queries[currentIndex]?.queryText) {
-                    saveQueryToHistory(input);
-                }
-            }
-            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
-        },
-        [
-            executeQuery,
-            enableTracingLevel,
-            useMultiSchema,
-            setLastUsedQueryAction,
-            lastQueryExecutionSettings,
+        setResultType(RESULT_TYPES.EXECUTE);
+        sendExecuteQuery({
+            query,
+            database: tenantName,
             querySettings,
-            sendExecuteQuery,
-            saveQueryToHistory,
-            setShowPreview,
-            tenantName,
-            resetBanner,
-            setLastQueryExecutionSettings,
-        ],
-    );
+            schema,
+            enableTracingLevel,
+        });
+        setIsResultLoaded(true);
+        props.setShowPreview(false);
+
+        // Don't save partial queries in history
+        if (!text) {
+            const {queries, currentIndex} = history;
+            if (query !== queries[currentIndex]?.queryText) {
+                props.saveQueryToHistory(input);
+            }
+        }
+        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+    });
 
     const handleSettingsClick = () => {
-        setQueryAction('settings');
+        props.setQueryAction('settings');
         props.setShowPreview(false);
     };
 
-    const handleGetExplainQueryClick = React.useCallback(() => {
+    const handleGetExplainQueryClick = useEventHandler(() => {
         const {input} = executeQuery;
 
         setLastUsedQueryAction(QUERY_ACTIONS.explain);
@@ -265,56 +202,22 @@ function QueryEditor(props: QueryEditorProps) {
             enableTracingLevel,
         });
         setIsResultLoaded(true);
-        setShowPreview(false);
+        props.setShowPreview(false);
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
-    }, [
-        executeQuery,
-        lastQueryExecutionSettings,
-        querySettings,
-        resetBanner,
-        enableTracingLevel,
-        sendExplainQuery,
-        setLastQueryExecutionSettings,
-        setLastUsedQueryAction,
-        setShowPreview,
-        tenantName,
-    ]);
+    });
 
-    React.useEffect(() => {
-        if (monacoHotKey === null) {
-            return;
+    const handleSendQuery = useEventHandler(() => {
+        if (lastUsedQueryAction === QUERY_ACTIONS.explain) {
+            handleGetExplainQueryClick();
+        } else {
+            handleSendExecuteClick();
         }
-        setMonacoHotKey(null);
-        switch (monacoHotKey) {
-            case MONACO_HOT_KEY_ACTIONS.sendQuery: {
-                if (lastUsedQueryAction === QUERY_ACTIONS.explain) {
-                    handleGetExplainQueryClick();
-                } else {
-                    handleSendExecuteClick();
-                }
-                break;
-            }
-            case MONACO_HOT_KEY_ACTIONS.sendSelectedQuery: {
-                const selection = editorRef.current?.getSelection();
-                const model = editorRef.current?.getModel();
-                if (selection && model) {
-                    const text = model.getValueInRange({
-                        startLineNumber: selection.getSelectionStart().lineNumber,
-                        startColumn: selection.getSelectionStart().column,
-                        endLineNumber: selection.getPosition().lineNumber,
-                        endColumn: selection.getPosition().column,
-                    });
-                    handleSendExecuteClick(text);
-                }
-                break;
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [monacoHotKey, handleSendExecuteClick, handleGetExplainQueryClick]);
+    });
 
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
         const keybindings = getKeyBindings(monaco);
-        editorRef.current = editor;
+        initResizeHandler(editor);
+        initUserPrompt(editor, getLastQueryText);
         editor.focus();
         editor.addAction({
             id: 'sendQuery',
@@ -328,7 +231,7 @@ function QueryEditor(props: QueryEditorProps) {
             contextMenuOrder: 1,
             // Method that will be executed when the action is triggered.
             // @param editor The editor instance is passed in as a convenience
-            run: () => setMonacoHotKey(MONACO_HOT_KEY_ACTIONS.sendQuery),
+            run: () => handleSendQuery(),
         });
 
         const canSendSelectedText = editor.createContextKey<boolean>('canSendSelectedText', false);
@@ -346,7 +249,19 @@ function QueryEditor(props: QueryEditorProps) {
             precondition: 'canSendSelectedText',
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 1,
-            run: () => setMonacoHotKey(MONACO_HOT_KEY_ACTIONS.sendSelectedQuery),
+            run: (e) => {
+                const selection = e.getSelection();
+                const model = e.getModel();
+                if (selection && model) {
+                    const text = model.getValueInRange({
+                        startLineNumber: selection.getSelectionStart().lineNumber,
+                        startColumn: selection.getSelectionStart().column,
+                        endLineNumber: selection.getPosition().lineNumber,
+                        endColumn: selection.getPosition().column,
+                    });
+                    handleSendExecuteClick(text);
+                }
+            },
         });
 
         editor.addAction({
@@ -374,7 +289,7 @@ function QueryEditor(props: QueryEditorProps) {
             label: i18n('action.save-query'),
             keybindings: [keybindings.saveQuery],
             run: () => {
-                setQueryAction('save');
+                props.setQueryAction('save');
             },
         });
     };
@@ -553,4 +468,41 @@ function Result({
     }
 
     return null;
+}
+
+function initResizeHandler(editor: Monaco.editor.IStandaloneCodeEditor) {
+    const layoutEditor = throttle(() => {
+        editor.layout();
+    }, 100);
+
+    editor.layout();
+
+    window.addEventListener('resize', layoutEditor);
+    editor.onDidDispose(() => {
+        window.removeEventListener('resize', layoutEditor);
+    });
+}
+
+function initUserPrompt(editor: Monaco.editor.IStandaloneCodeEditor, getInitialText: () => string) {
+    setUserPrompt(editor.getValue(), getInitialText());
+    editor.onDidChangeModelContent(() => {
+        setUserPrompt(editor.getValue(), getInitialText());
+    });
+    editor.onDidDispose(() => {
+        window.onbeforeunload = null;
+    });
+}
+
+function setUserPrompt(text: string, initialText: string) {
+    const hasUnsavedInput = text ? text !== initialText : false;
+
+    if (hasUnsavedInput) {
+        window.onbeforeunload = (e) => {
+            e.preventDefault();
+            // Chrome requires returnValue to be set
+            e.returnValue = '';
+        };
+    } else {
+        window.onbeforeunload = null;
+    }
 }
