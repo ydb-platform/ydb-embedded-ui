@@ -90,34 +90,100 @@ jobs:
 
           if [ -f "playwright-artifacts/test-results.json" ]; then          
             echo "Parsing JSON file:"
-            total=$(jq '.stats.expected + .stats.unexpected + .stats.skipped' playwright-artifacts/test-results.json)
+            total=$(jq '.stats.expected + .stats.unexpected + .stats.flaky + .stats.skipped' playwright-artifacts/test-results.json)
             passed=$(jq '.stats.expected' playwright-artifacts/test-results.json)
             failed=$(jq '.stats.unexpected' playwright-artifacts/test-results.json)
+            flaky=$(jq '.stats.flaky' playwright-artifacts/test-results.json)
             skipped=$(jq '.stats.skipped' playwright-artifacts/test-results.json)
 
             echo "Parsed values:"
             echo "Total: $total"
             echo "Passed: $passed"
             echo "Failed: $failed"
+            echo "Flaky: $flaky"
             echo "Skipped: $skipped"
           else
             echo "test-results.json file not found"
             total=0
             passed=0
             failed=0
+            flaky=0
             skipped=0
           fi
 
           echo "total=$total" >> $GITHUB_OUTPUT
           echo "passed=$passed" >> $GITHUB_OUTPUT
           echo "failed=$failed" >> $GITHUB_OUTPUT
+          echo "flaky=$flaky" >> $GITHUB_OUTPUT
           echo "skipped=$skipped" >> $GITHUB_OUTPUT
+
+  bundle_size:
+    name: Check Bundle Size
+    runs-on: ubuntu-latest
+    outputs:
+      current_size: ${{ steps.current_size.outputs.size }}
+      main_size: ${{ steps.main_size.outputs.size }}
+      diff: ${{ steps.size_diff.outputs.diff }}
+      percent: ${{ steps.size_diff.outputs.percent }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build bundle (current branch)
+        run: npm run build
+
+      - name: Get current bundle size
+        id: current_size
+        run: |
+          size=$(du -sb dist | cut -f1)
+          echo "size=$size" >> $GITHUB_OUTPUT
+
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install dependencies (main)
+        run: npm ci
+
+      - name: Build bundle (main branch)
+        run: npm run build
+
+      - name: Get main bundle size
+        id: main_size
+        run: |
+          size=$(du -sb dist | cut -f1)
+          echo "size=$size" >> $GITHUB_OUTPUT
+
+      - name: Calculate size difference
+        id: size_diff
+        run: |
+          current=${{ steps.current_size.outputs.size }}
+          main=${{ steps.main_size.outputs.size }}
+          diff=$((current - main))
+          if [ "$main" -ne "0" ]; then
+            percent=$(awk "BEGIN {printf \"%.2f\", ($diff/$main) * 100}")
+          else
+            percent="N/A"
+          fi
+          echo "diff=$diff" >> $GITHUB_OUTPUT
+          echo "percent=$percent" >> $GITHUB_OUTPUT
 
   deploy_and_update:
     name: Deploy and Update PR
-    needs: e2e_tests
-    runs-on: ubuntu-latest
+    needs: [e2e_tests, bundle_size]
     if: always() && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pages: write
@@ -155,27 +221,28 @@ jobs:
               const rawData = fs.readFileSync(testResultsPath);
               const data = JSON.parse(rawData);
               testResults = {
-                total: data.stats.expected + data.stats.unexpected + data.stats.skipped,
+                total: data.stats.expected + data.stats.unexpected + data.stats.flaky + data.stats.skipped,
                 passed: data.stats.expected,
                 failed: data.stats.unexpected,
+                flaky: data.stats.flaky,
                 skipped: data.stats.skipped
               };
             } else {
               console.log('Test results file not found');
-              testResults = { total: 0, passed: 0, failed: 0, skipped: 0 };
+              testResults = { total: 0, passed: 0, failed: 0, flaky: 0, skipped: 0 };
             }
 
             const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/${context.issue.number}/`;
-            const status = testResults.failed > 0 ? '❌ FAILED' : '✅ PASSED';
-            const statusColor = testResults.failed > 0 ? 'red' : 'green';
+            const status = testResults.failed > 0 ? '❌ FAILED' : (testResults.flaky > 0 ? '⚠️ FLAKY' : '✅ PASSED');
+            const statusColor = testResults.failed > 0 ? 'red' : (testResults.flaky > 0 ? 'orange' : 'green');
 
             const testResultsSection = `## Playwright Test Results
 
             **Status**: <span style="color: ${statusColor}; font-weight: bold;">${status}</span>
 
-            | Total | Passed | Failed | Skipped |
-            |-------|--------|--------|---------|
-            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.skipped} |
+            | Total | Passed | Failed | Flaky | Skipped |
+            |-------|--------|--------|-------|---------|
+            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.flaky} | ${testResults.skipped} |
 
             ### 📊 Test Report
 
@@ -191,11 +258,31 @@ jobs:
             <summary>ℹ️ How to use this report</summary>
 
             1. Click on the "Playwright Report" link above to view the full test results.
-            2. In the report, you can see a breakdown of all tests, including any failures.
+            2. In the report, you can see a breakdown of all tests, including any failures or flaky tests.
             3. For failed tests, you can view screenshots and video recordings to help debug the issues.
             4. Use the filters in the report to focus on specific test statuses or suites.
 
             </details>`;
+
+            const currentSize = parseInt('${{ needs.bundle_size.outputs.current_size }}');
+            const mainSize = parseInt('${{ needs.bundle_size.outputs.main_size }}');
+            const diff = parseInt('${{ needs.bundle_size.outputs.diff }}');
+            const percent = '${{ needs.bundle_size.outputs.percent }}';
+
+            const bundleSizeSection = `## Bundle Size Changes
+
+            | Metric | Value |
+            |--------|-------|
+            | Current Branch | ${currentSize.toLocaleString()} bytes |
+            | Main Branch | ${mainSize.toLocaleString()} bytes |
+            | Difference | ${diff > 0 ? '+' : ''}${diff.toLocaleString()} bytes |
+            | Percentage Change | ${percent === 'N/A' ? 'N/A' : `${parseFloat(percent) > 0 ? '+' : ''}${percent}%`} |
+
+            ${
+              percent === 'N/A' ? '⚠️ Unable to calculate percentage change. Please check the bundle sizes manually.' :
+              parseFloat(percent) > 0 ? '⚠️ Bundle size has increased. Please review the changes and optimize if possible.' :
+              '✅ Bundle size has decreased or remained the same.'
+            }`;
 
             const { data: pullRequest } = await github.rest.pulls.get({
               owner: context.repo.owner,
@@ -205,14 +292,20 @@ jobs:
 
             const currentBody = pullRequest.body || '';
             const testResultsRegex = /## Playwright Test Results[\s\S]*?(?=\n## |$)/;
+            const bundleSizeRegex = /## Bundle Size Changes[\s\S]*?(?=\n## |$)/;
 
-            let newBody;
-            if (testResultsRegex.test(currentBody)) {
-              // If the section exists, replace it
-              newBody = currentBody.replace(testResultsRegex, testResultsSection);
+            let newBody = currentBody;
+
+            if (testResultsRegex.test(newBody)) {
+              newBody = newBody.replace(testResultsRegex, testResultsSection);
             } else {
-              // If the section doesn't exist, add it to the end
-              newBody = currentBody + '\n\n' + testResultsSection;
+              newBody += '\n\n' + testResultsSection;
+            }
+
+            if (bundleSizeRegex.test(newBody)) {
+              newBody = newBody.replace(bundleSizeRegex, bundleSizeSection);
+            } else {
+              newBody += '\n\n' + bundleSizeSection;
             }
 
             await github.rest.pulls.update({
