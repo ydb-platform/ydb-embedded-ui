@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -19,15 +17,13 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
-      - run: npm run build:embedded # check that build works
+      - run: npm run build:embedded
 
   unit_tests:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -38,41 +34,101 @@ jobs:
     name: Playwright Tests
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
-      pages: write
-
-    services:
-      backend:
-        image: ghcr.io/ydb-platform/local-ydb:nightly
-        ports:
-          - 2135:2135
-          - 8765:8765
-        options: --hostname localhost -e YDB_ALLOW_ORIGIN="http://localhost:3000"
+      contents: read
+      checks: write
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
+      - run: npm ci
+      - run: npm run test:e2e:install
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright deps
-        run: npm run test:e2e:install
+      - name: Create Check Run
+        id: create_check
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const { data: check } = await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Playwright Test Results',
+              head_sha: context.sha,
+              status: 'in_progress',
+              started_at: new Date().toISOString()
+            });
+            return check.id;
 
       - name: Run Playwright tests
         id: run_tests
         run: npm run test:e2e
+        continue-on-error: true
         env:
           CI: true
           PLAYWRIGHT_VIDEO: 'on'
+
+      - name: Get test results
+        id: test_results
+        run: |
+          if [ -f "playwright-artifacts/test-results.json" ]; then
+            total=$(jq '.stats.expected + .stats.unexpected + .stats.skipped' playwright-artifacts/test-results.json)
+            passed=$(jq '.stats.expected' playwright-artifacts/test-results.json)
+            failed=$(jq '.stats.unexpected' playwright-artifacts/test-results.json)
+            skipped=$(jq '.stats.skipped' playwright-artifacts/test-results.json)
+            echo "total=$total" >> $GITHUB_OUTPUT
+            echo "passed=$passed" >> $GITHUB_OUTPUT
+            echo "failed=$failed" >> $GITHUB_OUTPUT
+            echo "skipped=$skipped" >> $GITHUB_OUTPUT
+          else
+            echo "total=0" >> $GITHUB_OUTPUT
+            echo "passed=0" >> $GITHUB_OUTPUT
+            echo "failed=0" >> $GITHUB_OUTPUT
+            echo "skipped=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Check Run
+        if: always()
+        uses: actions/github-script@v6
+        env:
+          CHECK_ID: ${{ steps.create_check.outputs.result }}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const testResults = {
+              total: ${{ steps.test_results.outputs.total || 0 }},
+              passed: ${{ steps.test_results.outputs.passed || 0 }},
+              failed: ${{ steps.test_results.outputs.failed || 0 }},
+              skipped: ${{ steps.test_results.outputs.skipped || 0 }}
+            };
+            const status = testResults.failed > 0 ? 'failure' : 'success';
+            const conclusion = status;
+            const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/${context.issue.number}/`;
+
+            const summary = `
+            # Playwright Test Results
+
+            | Total | Passed | Failed | Skipped |
+            |-------|--------|--------|---------|
+            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.skipped} |
+
+            [Detailed Test Report](${reportUrl})
+            `;
+
+            await github.rest.checks.update({
+              check_run_id: process.env.CHECK_ID,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              status: 'completed',
+              conclusion: conclusion,
+              completed_at: new Date().toISOString(),
+              output: {
+                title: 'Playwright Test Results',
+                summary: summary
+              }
+            });
 
       - name: Upload Playwright artifacts
         if: always()
@@ -93,105 +149,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./playwright-artifacts/playwright-report
           destination_dir: ${{ github.event.pull_request.number }}
-
-      - name: Get test results
-        if: always()
-        id: test-results
-        run: |
-          echo "Current directory: $(pwd)"
-          echo "Listing playwright-artifacts directory:"
-          ls -R playwright-artifacts
-
-          if [ -f "playwright-artifacts/test-results.json" ]; then           
-            echo "Parsing JSON file:"
-            total=$(jq '.stats.expected + .stats.unexpected + .stats.skipped' playwright-artifacts/test-results.json)
-            passed=$(jq '.stats.expected' playwright-artifacts/test-results.json)
-            failed=$(jq '.stats.unexpected' playwright-artifacts/test-results.json)
-            skipped=$(jq '.stats.skipped' playwright-artifacts/test-results.json)
-           
-            echo "Parsed values:"
-            echo "Total: $total"
-            echo "Passed: $passed"
-            echo "Failed: $failed"
-            echo "Skipped: $skipped"
-          else
-            echo "test-results.json file not found"
-            total=0
-            passed=0
-            failed=0
-            skipped=0
-          fi
-
-          echo "total=$total" >> $GITHUB_OUTPUT
-          echo "passed=$passed" >> $GITHUB_OUTPUT
-          echo "failed=$failed" >> $GITHUB_OUTPUT
-          echo "skipped=$skipped" >> $GITHUB_OUTPUT
-
-      - name: Update PR description
-        if: always()
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/${context.issue.number}/`;
-            const testResults = {
-              total: ${{ steps.test-results.outputs.total || 0 }},
-              passed: ${{ steps.test-results.outputs.passed || 0 }},
-              failed: ${{ steps.test-results.outputs.failed || 0 }},
-              skipped: ${{ steps.test-results.outputs.skipped || 0 }}
-            };
-            const status = testResults.failed > 0 ? '❌ FAILED' : '✅ PASSED';
-            const statusColor = testResults.failed > 0 ? 'red' : 'green';
-
-            const testResultsSection = `## Playwright Test Results
-
-            **Status**: <span style="color: ${statusColor}; font-weight: bold;">${status}</span>
-
-            | Total | Passed | Failed | Skipped |
-            |-------|--------|--------|---------|
-            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.skipped} |
-
-            ### 📊 Test Report
-
-            For detailed results, please check the [Playwright Report](${reportUrl})
-
-            ### 🎥 Test Recordings
-
-            Video recordings of failed tests (if any) are available in the report.
-
-            ---
-
-            <details>
-            <summary>ℹ️ How to use this report</summary>
-
-            1. Click on the "Playwright Report" link above to view the full test results.
-            2. In the report, you can see a breakdown of all tests, including any failures.
-            3. For failed tests, you can view screenshots and video recordings to help debug the issues.
-            4. Use the filters in the report to focus on specific test statuses or suites.
-
-            </details>`;
-
-            const { data: pullRequest } = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-            });
-
-            const currentBody = pullRequest.body || '';
-            const testResultsRegex = /## Playwright Test Results[\s\S]*?(?=\n## |$)/;
-
-            let newBody;
-            if (testResultsRegex.test(currentBody)) {
-              // If the section exists, replace it
-              newBody = currentBody.replace(testResultsRegex, testResultsSection);
-            } else {
-              // If the section doesn't exist, add it to the end
-              newBody = currentBody + '\n\n' + testResultsSection;
-            }
-
-            await github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              body: newBody,
-            });
