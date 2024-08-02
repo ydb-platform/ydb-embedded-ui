@@ -12,10 +12,7 @@ import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import type {GetNodeRefFunc} from '../../types/additionalProps';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {
-    formatBytesToGigabyte,
-    formatStorageValuesToGb,
-} from '../../utils/dataFormatters/dataFormatters';
+import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 
 export const NODES_COLUMNS_WIDTH_LS_KEY = 'nodesTableColumnsWidth';
 
@@ -110,13 +107,14 @@ const memoryColumn: NodesColumn = {
     header: 'Memory',
     sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
     defaultOrder: DataTable.DESCENDING,
-    render: ({row}) => {
-        if (row.MemoryUsed) {
-            return formatBytesToGigabyte(row.MemoryUsed);
-        } else {
-            return '—';
-        }
-    },
+    render: ({row}) => (
+        <ProgressViewer
+            value={row.MemoryUsed}
+            capacity={row.MemoryLimit}
+            formatValues={formatStorageValuesToGb}
+            colorizeProgress={true}
+        />
+    ),
     align: DataTable.RIGHT,
     width: 120,
 };
@@ -138,17 +136,18 @@ const loadAverageColumn: NodesColumn = {
     header: 'Load average',
     sortAccessor: ({LoadAveragePercents = []}) => LoadAveragePercents[0],
     defaultOrder: DataTable.DESCENDING,
-    render: ({row}) =>
-        row.LoadAveragePercents && row.LoadAveragePercents.length > 0 ? (
-            <ProgressViewer
-                value={row.LoadAveragePercents[0]}
-                percents={true}
-                colorizeProgress={true}
-                capacity={100}
-            />
-        ) : (
-            '—'
-        ),
+    render: ({row}) => (
+        <ProgressViewer
+            value={
+                row.LoadAveragePercents && row.LoadAveragePercents.length > 0
+                    ? row.LoadAveragePercents[0]
+                    : undefined
+            }
+            percents={true}
+            colorizeProgress={true}
+            capacity={100}
+        />
+    ),
     align: DataTable.LEFT,
     width: 140,
     resizeMinWidth: 140,
@@ -211,28 +210,11 @@ const topNodesMemoryColumn: NodesColumn = {
 
 const sharedCacheUsageColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.SharedCacheUsage,
-    header: 'Tablet Cache',
+    header: 'Caches',
     render: ({row}) => (
         <ProgressViewer
             value={row.SharedCacheUsed}
             capacity={row.SharedCacheLimit}
-            formatValues={formatStorageValuesToGb}
-            colorizeProgress={true}
-        />
-    ),
-    align: DataTable.LEFT,
-    width: 140,
-    resizeMinWidth: 140,
-    sortable: false,
-};
-
-const memoryUsedInAllocColumn: NodesColumn = {
-    name: NODES_COLUMNS_IDS.MemoryUsedInAlloc,
-    header: 'Query Runtime',
-    render: ({row}) => (
-        <ProgressViewer
-            value={row.MemoryUsedInAlloc}
-            capacity={row.MemoryLimit}
             formatValues={formatStorageValuesToGb}
             colorizeProgress={true}
         />
@@ -295,7 +277,6 @@ export function getTopNodesByMemoryColumns({
         topNodesLoadAverageColumn,
         topNodesMemoryColumn,
         sharedCacheUsageColumn,
-        memoryUsedInAllocColumn,
         sessionsColumn,
         getTabletsColumn(tabletsPath),
     ];
