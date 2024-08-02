@@ -145,7 +145,7 @@ jobs:
       - name: Get current bundle size
         id: current_size
         run: |
-          size=$(du -sb dist | cut -f1)
+          size=$(du -sb build | cut -f1)
           echo "size=$size" >> $GITHUB_OUTPUT
 
       - name: Checkout main branch
@@ -162,7 +162,7 @@ jobs:
       - name: Get main bundle size
         id: main_size
         run: |
-          size=$(du -sb dist | cut -f1)
+          size=$(du -sb build | cut -f1)
           echo "size=$size" >> $GITHUB_OUTPUT
 
       - name: Calculate size difference
