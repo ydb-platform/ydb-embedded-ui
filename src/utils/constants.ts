@@ -122,13 +122,13 @@ export const TENANT_OVERVIEW_TABLES_SETTINGS = {
     dynamicRender: false,
 } as const;
 
-export const DEFAULT_QUERY_SETTINGS: QuerySettings = {
+export const DEFAULT_QUERY_SETTINGS = {
     queryMode: QUERY_MODES.script,
     isolationLevel: ISOLATION_LEVELS.serializable,
     timeout: '60',
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.detailed,
-};
+} satisfies QuerySettings;
 
 export const QUERY_EXECUTION_SETTINGS_KEY = 'queryExecutionSettings';
 export const LAST_QUERY_EXECUTION_SETTINGS_KEY = 'last_query_execution_settings';
