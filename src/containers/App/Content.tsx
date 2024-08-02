@@ -5,7 +5,7 @@ import type {RedirectProps} from 'react-router-dom';
 import {Redirect, Route, Switch} from 'react-router-dom';
 
 import {PageError} from '../../components/Errors/PageError/PageError';
-import {Loader} from '../../components/Loader';
+import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
@@ -170,15 +170,11 @@ export function Content(props: ContentProps) {
 function GetUser({children}: {children: React.ReactNode}) {
     const {isLoading, error} = authenticationApi.useWhoamiQuery(undefined);
 
-    if (isLoading) {
-        return <Loader size="l" />;
-    }
-
-    if (error) {
-        return <PageError error={error} />;
-    }
-
-    return children;
+    return (
+        <LoaderWrapper loading={isLoading} size="l">
+            <PageError error={error}>{children}</PageError>
+        </LoaderWrapper>
+    );
 }
 
 function GetNodesList() {

@@ -18,13 +18,10 @@ import type {
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
 import {QUERY_SYNTAX, isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
-import {createRequestActionTypes} from '../utils';
 
 import {api} from './api';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
-
-export const SEND_QUERY = createRequestActionTypes('query', 'SEND_QUERY');
 
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
