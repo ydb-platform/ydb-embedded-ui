@@ -10,6 +10,7 @@ import {z} from 'zod';
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
+import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink/InternalLink';
 import {PDiskInfo} from '../../components/PDiskInfo/PDiskInfo';
@@ -166,14 +167,7 @@ export function PDiskPage() {
         if (pDiskLoading) {
             return <InfoViewerSkeleton className={pdiskPageCn('info')} rows={10} />;
         }
-        return (
-            <PDiskInfo
-                pDisk={pDiskData}
-                nodeId={nodeId}
-                className={pdiskPageCn('info')}
-                isPDiskPage
-            />
-        );
+        return <PDiskInfo pDisk={pDiskData} nodeId={nodeId} className={pdiskPageCn('info')} />;
     };
 
     const renderTabs = () => {
@@ -213,12 +207,20 @@ export function PDiskPage() {
         }
     };
 
+    const renderError = () => {
+        if (!pdiskDataQuery.error) {
+            return null;
+        }
+        return <ResponseError error={pdiskDataQuery.error} />;
+    };
+
     return (
         <div className={pdiskPageCn(null)}>
             {renderHelmet()}
             {renderPageMeta()}
             {renderPageTitle()}
             {renderControls()}
+            {renderError()}
             {renderInfo()}
             {renderTabs()}
             {renderTabsContent()}

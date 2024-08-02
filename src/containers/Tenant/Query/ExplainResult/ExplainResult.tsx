@@ -7,12 +7,11 @@ import EnableFullscreenButton from '../../../../components/EnableFullscreenButto
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
-import {QUERY_SETTINGS} from '../../../../lib';
 import type {PreparedExplainResponse} from '../../../../store/reducers/explainQuery/types';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ValueOf} from '../../../../types/common';
 import {cn} from '../../../../utils/cn';
-import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
+import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
@@ -81,8 +80,6 @@ export function ExplainResult({
         EXPLAIN_OPTIONS_IDS.schema,
     );
     const [isPending, startTransition] = React.useTransition();
-
-    const [useQuerySettings] = useSetting<boolean>(QUERY_SETTINGS);
 
     React.useEffect(() => {
         return () => {
@@ -167,7 +164,7 @@ export function ExplainResult({
                     </React.Fragment>
                 )}
             </div>
-            {useQuerySettings && <QuerySettingsBanner />}
+            <QuerySettingsBanner />
             <LoaderWrapper loading={loading || isPending}>
                 <Fullscreen className={b('result')}>{renderContent()}</Fullscreen>
             </LoaderWrapper>

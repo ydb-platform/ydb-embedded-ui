@@ -31,9 +31,9 @@ import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
-    formatBytesToGigabyte,
     formatCPU,
     formatNumber,
+    formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {getTenantPath} from '../Tenant/TenantPages';
@@ -183,7 +183,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                 name: 'memory',
                 header: 'Memory',
                 width: 120,
-                render: ({row}) => (row.memory ? formatBytesToGigabyte(row.memory) : '—'),
+                render: ({row}) => (row.memory ? formatStorageValuesToGb(row.memory) : '—'),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -191,7 +191,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                 name: 'storage',
                 header: 'Storage',
                 width: 120,
-                render: ({row}) => (row.storage ? formatBytesToGigabyte(row.storage) : '—'),
+                render: ({row}) => (row.storage ? formatStorageValuesToGb(row.storage) : '—'),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -260,15 +260,12 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
         );
     };
 
-    if (error) {
-        return <ResponseError error={error} />;
-    }
-
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table loading={loading}>
-                {renderTable()}
+                {currentData ? renderTable() : null}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );

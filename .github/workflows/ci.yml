@@ -37,6 +37,8 @@ jobs:
   e2e_tests:
     name: Playwright Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     services:
       backend:
@@ -50,7 +52,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
@@ -58,8 +62,162 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Plawright deps
+      - name: Install Playwright deps
         run: npm run test:e2e:install
 
       - name: Run Playwright tests
+        id: run_tests
         run: npm run test:e2e
+        env:
+          CI: true
+          PLAYWRIGHT_VIDEO: 'on'
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-artifacts
+          path: playwright-artifacts
+          retention-days: 5
+
+      - name: Get test results
+        if: always()
+        id: test-results
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Listing playwright-artifacts directory:"
+          ls -R playwright-artifacts
+
+          if [ -f "playwright-artifacts/test-results.json" ]; then          
+            echo "Parsing JSON file:"
+            total=$(jq '.stats.expected + .stats.unexpected + .stats.skipped' playwright-artifacts/test-results.json)
+            passed=$(jq '.stats.expected' playwright-artifacts/test-results.json)
+            failed=$(jq '.stats.unexpected' playwright-artifacts/test-results.json)
+            skipped=$(jq '.stats.skipped' playwright-artifacts/test-results.json)
+
+            echo "Parsed values:"
+            echo "Total: $total"
+            echo "Passed: $passed"
+            echo "Failed: $failed"
+            echo "Skipped: $skipped"
+          else
+            echo "test-results.json file not found"
+            total=0
+            passed=0
+            failed=0
+            skipped=0
+          fi
+
+          echo "total=$total" >> $GITHUB_OUTPUT
+          echo "passed=$passed" >> $GITHUB_OUTPUT
+          echo "failed=$failed" >> $GITHUB_OUTPUT
+          echo "skipped=$skipped" >> $GITHUB_OUTPUT
+
+  deploy_and_update:
+    name: Deploy and Update PR
+    needs: e2e_tests
+    runs-on: ubuntu-latest
+    if: always() && github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: write
+      pages: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: playwright-artifacts
+          path: playwright-artifacts
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Deploy report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-artifacts/playwright-report
+          destination_dir: ${{ github.event.pull_request.number }}
+
+      - name: Update PR description
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs');
+            const testResultsPath = 'playwright-artifacts/test-results.json';
+            let testResults;
+
+            if (fs.existsSync(testResultsPath)) {
+              const rawData = fs.readFileSync(testResultsPath);
+              const data = JSON.parse(rawData);
+              testResults = {
+                total: data.stats.expected + data.stats.unexpected + data.stats.skipped,
+                passed: data.stats.expected,
+                failed: data.stats.unexpected,
+                skipped: data.stats.skipped
+              };
+            } else {
+              console.log('Test results file not found');
+              testResults = { total: 0, passed: 0, failed: 0, skipped: 0 };
+            }
+
+            const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/${context.issue.number}/`;
+            const status = testResults.failed > 0 ? '❌ FAILED' : '✅ PASSED';
+            const statusColor = testResults.failed > 0 ? 'red' : 'green';
+
+            const testResultsSection = `## Playwright Test Results
+
+            **Status**: <span style="color: ${statusColor}; font-weight: bold;">${status}</span>
+
+            | Total | Passed | Failed | Skipped |
+            |-------|--------|--------|---------|
+            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.skipped} |
+
+            ### 📊 Test Report
+
+            For detailed results, please check the [Playwright Report](${reportUrl})
+
+            ### 🎥 Test Recordings
+
+            Video recordings of failed tests (if any) are available in the report.
+
+            ---
+
+            <details>
+            <summary>ℹ️ How to use this report</summary>
+
+            1. Click on the "Playwright Report" link above to view the full test results.
+            2. In the report, you can see a breakdown of all tests, including any failures.
+            3. For failed tests, you can view screenshots and video recordings to help debug the issues.
+            4. Use the filters in the report to focus on specific test statuses or suites.
+
+            </details>`;
+
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const currentBody = pullRequest.body || '';
+            const testResultsRegex = /## Playwright Test Results[\s\S]*?(?=\n## |$)/;
+
+            let newBody;
+            if (testResultsRegex.test(currentBody)) {
+              // If the section exists, replace it
+              newBody = currentBody.replace(testResultsRegex, testResultsSection);
+            } else {
+              // If the section doesn't exist, add it to the end
+              newBody = currentBody + '\n\n' + testResultsSection;
+            }
+
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              body: newBody,
+            });

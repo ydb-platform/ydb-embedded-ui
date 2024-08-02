@@ -3,6 +3,7 @@ import React from 'react';
 import {Dialog, Link as ExternalLink, Flex, TextInput} from '@gravity-ui/uikit';
 import {Controller, useForm} from 'react-hook-form';
 
+import {ENABLE_TRACING_LEVEL_KEY} from '../../../../lib';
 import {
     selectQueryAction,
     setQueryAction,
@@ -11,6 +12,7 @@ import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     useQueryExecutionSettings,
+    useSetting,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
@@ -69,6 +71,8 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         defaultValues: initialValues,
     });
 
+    const [enableTracingLevel] = useSetting<boolean>(ENABLE_TRACING_LEVEL_KEY);
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Dialog.Body className={b('dialog-body')}>
@@ -76,7 +80,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                     <label htmlFor="queryMode" className={b('field-title')}>
                         {QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title}
                     </label>
-                    <div className={b('control-wrapper')}>
+                    <div className={b('control-wrapper', {queryMode: true})}>
                         <Controller
                             name="queryMode"
                             control={control}
@@ -114,31 +118,33 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                         />
                     </div>
                 </Flex>
-                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                    <label htmlFor="tracingLevel" className={b('field-title')}>
-                        {QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title}
-                    </label>
-                    <div className={b('control-wrapper')}>
-                        <Controller
-                            name="tracingLevel"
-                            control={control}
-                            render={({field}) => (
-                                <QuerySettingsSelect
-                                    setting={field.value}
-                                    onUpdateSetting={field.onChange}
-                                    settingOptions={
-                                        QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.options
-                                    }
-                                />
-                            )}
-                        />
-                    </div>
-                </Flex>
+                {enableTracingLevel && (
+                    <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                        <label htmlFor="tracingLevel" className={b('field-title')}>
+                            {QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title}
+                        </label>
+                        <div className={b('control-wrapper')}>
+                            <Controller
+                                name="tracingLevel"
+                                control={control}
+                                render={({field}) => (
+                                    <QuerySettingsSelect
+                                        setting={field.value}
+                                        onUpdateSetting={field.onChange}
+                                        settingOptions={
+                                            QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.options
+                                        }
+                                    />
+                                )}
+                            />
+                        </div>
+                    </Flex>
+                )}
                 <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                     <label htmlFor="isolationLevel" className={b('field-title')}>
                         {QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.title}
                     </label>
-                    <div className={b('control-wrapper')}>
+                    <div className={b('control-wrapper', {isolationLevel: true})}>
                         <Controller
                             name="isolationLevel"
                             control={control}
@@ -185,7 +191,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                 renderButtons={(buttonApply, buttonCancel) => (
                     <div className={b('buttons-container')}>
                         <ExternalLink
-                            href="https://ydb.tech/docs/ru/concepts/transactions"
+                            href="https://ydb.tech/docs"
                             target="_blank"
                             className={b('documentation-link')}
                         >

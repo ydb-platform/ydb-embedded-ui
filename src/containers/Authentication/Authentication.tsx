@@ -90,7 +90,7 @@ function Authentication({closable = false}: AuthenticationProps) {
                         <Icon data={ydbLogoIcon} size={24} />
                         YDB
                     </div>
-                    <ExternalLink href="http://ydb.tech/docs" target="_blank">
+                    <ExternalLink href="https://ydb.tech/docs" target="_blank">
                         Documentation
                     </ExternalLink>
                 </div>

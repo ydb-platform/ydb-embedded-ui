@@ -121,9 +121,6 @@ export const Partitions = ({path}: PartitionsProps) => {
         if (loading) {
             return <TableSkeleton className={b('loader')} />;
         }
-        if (error) {
-            return <ResponseError error={error} />;
-        }
 
         return (
             <ResizeableDataTable
@@ -140,8 +137,9 @@ export const Partitions = ({path}: PartitionsProps) => {
     return (
         <div className={b()}>
             <div className={b('controls')}>{renderControls()}</div>
+            {error ? <ResponseError error={error} /> : null}
             <div className={b('table-wrapper')}>
-                <div className={b('table-content')}>{renderContent()}</div>
+                <div className={b('table-content')}>{partitionsData ? renderContent() : null}</div>
             </div>
         </div>
     );

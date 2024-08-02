@@ -1,4 +1,5 @@
 import {getVDiskPagePath} from '../../routes';
+import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {formatStorageValuesToGb, stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
@@ -20,17 +21,19 @@ const b = cn('ydb-vdisk-info');
 
 interface VDiskInfoProps<T extends PreparedVDisk> extends Omit<InfoViewerProps, 'info'> {
     data?: T;
-    isVDiskPage?: boolean;
+    withVDiskPageLink?: boolean;
     withTitle?: boolean;
 }
 
 // eslint-disable-next-line complexity
 export function VDiskInfo<T extends PreparedVDisk>({
     data,
-    isVDiskPage,
+    withVDiskPageLink,
     withTitle,
     ...infoViewerProps
 }: VDiskInfoProps<T>) {
+    const diskPagesAvailable = useDiskPagesAvailable();
+
     const {
         AllocatedSize,
         DiskSpace,
@@ -151,7 +154,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
             label: vDiskInfoKeyset('links'),
             value: (
                 <span className={b('links')}>
-                    {!isVDiskPage && (
+                    {withVDiskPageLink && diskPagesAvailable && (
                         <LinkWithIcon
                             title={vDiskInfoKeyset('vdisk-page')}
                             url={vDiskPagePath}
