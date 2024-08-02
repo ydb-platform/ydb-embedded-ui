@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {ButtonWithConfirmDialog} from '../../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+import {selectIsUserAllowedToMakeChanges} from '../../../store/reducers/authentication/authentication';
 import {ETabletState} from '../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
 import {useTypedSelector} from '../../../utils/hooks';
@@ -15,7 +16,7 @@ interface TabletControlsProps {
 export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
     const {TabletId, HiveId} = tablet;
 
-    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     const _onKillClick = () => {
         return window.api.killTablet(TabletId);

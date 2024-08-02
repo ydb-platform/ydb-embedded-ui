@@ -11,6 +11,7 @@ import {InternalLink} from '../../components/InternalLink';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import routes, {createHref} from '../../routes';
+import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
@@ -136,7 +137,7 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
 function TabletActions(tablet: TTabletStateInfo) {
     const isDisabledRestart = tablet.State === ETabletState.Stopped;
     const dispatch = useTypedDispatch();
-    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     return (
         <ButtonWithConfirmDialog

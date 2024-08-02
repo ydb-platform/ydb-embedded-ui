@@ -1,4 +1,5 @@
 import {getPDiskPagePath} from '../../routes';
+import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {valueIsDefined} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
@@ -194,7 +195,7 @@ export function PDiskInfo<T extends PreparedPDisk>({
     withPDiskPageLink,
     className,
 }: PDiskInfoProps<T>) {
-    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
     const diskPagesAvailable = useDiskPagesAvailable();
 
     const [generalInfo, statusInfo, spaceInfo, additionalInfo] = getPDiskInfo({

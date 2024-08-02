@@ -1,19 +1,20 @@
 import React from 'react';
 
-import {connect, shallowEqual} from 'react-redux';
+import {connect} from 'react-redux';
 import type {RedirectProps} from 'react-router-dom';
 import {Redirect, Route, Switch} from 'react-router-dom';
 
+import {PageError} from '../../components/Errors/PageError/PageError';
+import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
 import routes from '../../routes';
 import type {RootState} from '../../store';
-import {getUser} from '../../store/reducers/authentication/authentication';
+import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {capabilitiesApi} from '../../store/reducers/capabilities/capabilities';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {lazyComponent} from '../../utils/lazyComponent';
 import Authentication from '../Authentication/Authentication';
 import {getClusterPath} from '../Cluster/utils';
@@ -143,43 +144,37 @@ export function Content(props: ContentProps) {
             {additionalRoutes?.rendered}
             {/* Single cluster routes */}
             <Route key="single-cluster">
-                <GetUser />
-                <GetNodesList />
-                <GetCapabilities />
-                <Header mainPage={mainPage} />
-                <Switch>
-                    {routesSlots.map((route) => {
-                        return renderRouteSlot(slots, route);
-                    })}
-                    <Route
-                        path={redirectProps.from || redirectProps.path}
-                        exact={redirectProps.exact}
-                        strict={redirectProps.strict}
-                        render={() => <Redirect to={redirectProps.to} push={redirectProps.push} />}
-                    />
-                </Switch>
+                <GetUser>
+                    <GetNodesList />
+                    <GetCapabilities />
+                    <Header mainPage={mainPage} />
+                    <Switch>
+                        {routesSlots.map((route) => {
+                            return renderRouteSlot(slots, route);
+                        })}
+                        <Route
+                            path={redirectProps.from || redirectProps.path}
+                            exact={redirectProps.exact}
+                            strict={redirectProps.strict}
+                            render={() => (
+                                <Redirect to={redirectProps.to} push={redirectProps.push} />
+                            )}
+                        />
+                    </Switch>
+                </GetUser>
             </Route>
         </Switch>
     );
 }
 
-function GetUser() {
-    const dispatch = useTypedDispatch();
-    const {isAuthenticated, isInternalUser} = useTypedSelector(
-        (state) => ({
-            isAuthenticated: state.authentication.isAuthenticated,
-            isInternalUser: Boolean(state.authentication.user),
-        }),
-        shallowEqual,
+function GetUser({children}: {children: React.ReactNode}) {
+    const {isLoading, error} = authenticationApi.useWhoamiQuery(undefined);
+
+    return (
+        <LoaderWrapper loading={isLoading} size="l">
+            <PageError error={error}>{children}</PageError>
+        </LoaderWrapper>
     );
-
-    React.useEffect(() => {
-        if (isAuthenticated && !isInternalUser) {
-            dispatch(getUser());
-        }
-    }, [dispatch, isAuthenticated, isInternalUser]);
-
-    return null;
 }
 
 function GetNodesList() {

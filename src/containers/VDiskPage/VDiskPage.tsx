@@ -15,6 +15,7 @@ import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewer
 import {PageMeta} from '../../components/PageMeta/PageMeta';
 import {VDiskWithDonorsStack} from '../../components/VDisk/VDiskWithDonorsStack';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
+import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
@@ -34,7 +35,7 @@ export function VDiskPage() {
     const dispatch = useTypedDispatch();
 
     const nodesMap = useTypedSelector(selectNodesMap);
-    const {isUserAllowedToMakeChanges} = useTypedSelector((state) => state.authentication);
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     const [{nodeId, pDiskId, vDiskSlotId}] = useQueryParams({
         nodeId: StringParam,

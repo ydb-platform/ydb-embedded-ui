@@ -1,81 +1,92 @@
-import type {Reducer} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {createApiRequest, createRequestActionTypes} from '../../utils';
+import type {TUserToken} from '../../../types/api/whoami';
+import {isAxiosResponse} from '../../../utils/response';
+import {api} from '../api';
 
-import type {AuthenticationAction, AuthenticationState} from './types';
+import type {AuthenticationState} from './types';
 
-export const SET_UNAUTHENTICATED = createRequestActionTypes(
-    'authentication',
-    'SET_UNAUTHENTICATED',
-);
-export const SET_AUTHENTICATED = createRequestActionTypes('authentication', 'SET_AUTHENTICATED');
-export const FETCH_USER = createRequestActionTypes('authentication', 'FETCH_USER');
-
-const initialState = {
+const initialState: AuthenticationState = {
     isAuthenticated: true,
     user: '',
-    error: undefined,
 };
 
-const authentication: Reducer<AuthenticationState, AuthenticationAction> = (
-    state = initialState,
-    action,
-) => {
-    switch (action.type) {
-        case SET_UNAUTHENTICATED.SUCCESS: {
-            return {...state, isAuthenticated: false, user: '', error: undefined};
-        }
-        case SET_AUTHENTICATED.SUCCESS: {
-            return {...state, isAuthenticated: true, error: undefined};
-        }
-        case SET_AUTHENTICATED.FAILURE: {
-            return {...state, error: action.error};
-        }
-        case FETCH_USER.SUCCESS: {
-            const {user, isUserAllowedToMakeChanges} = action.data;
+export const slice = createSlice({
+    name: 'authentication',
+    initialState,
+    reducers: {
+        setIsAuthenticated: (state, action: PayloadAction<boolean>) => {
+            const isAuthenticated = action.payload;
 
-            return {
-                ...state,
-                user,
-                isUserAllowedToMakeChanges,
-            };
-        }
+            state.isAuthenticated = isAuthenticated;
 
-        default:
-            return {...state};
-    }
-};
-
-export const authenticate = (user: string, password: string) => {
-    return createApiRequest({
-        request: window.api.authenticate(user, password),
-        actions: SET_AUTHENTICATED,
-    });
-};
-
-export const logout = () => {
-    return createApiRequest({
-        request: window.api.logout(),
-        actions: SET_UNAUTHENTICATED,
-    });
-};
-
-export const getUser = () => {
-    return createApiRequest({
-        request: window.api.whoami(),
-        actions: FETCH_USER,
-        dataHandler: (data) => {
-            const {UserSID, AuthType, IsMonitoringAllowed} = data;
-            return {
-                user: AuthType === 'Login' ? UserSID : undefined,
-                // If ydb version supports this feature,
-                // There should be explicit flag in whoami response
-                // Otherwise every user is allowed to make changes
-                // Anyway there will be guards on backend
-                isUserAllowedToMakeChanges: IsMonitoringAllowed !== false,
-            };
+            if (!isAuthenticated) {
+                state.user = '';
+            }
         },
-    });
-};
+        setUser: (state, action: PayloadAction<TUserToken>) => {
+            const {UserSID, AuthType, IsMonitoringAllowed} = action.payload;
 
-export default authentication;
+            state.user = AuthType === 'Login' ? UserSID : undefined;
+
+            // If ydb version supports this feature,
+            // There should be explicit flag in whoami response
+            // Otherwise every user is allowed to make changes
+            // Anyway there will be guards on backend
+            state.isUserAllowedToMakeChanges = IsMonitoringAllowed !== false;
+        },
+    },
+    selectors: {
+        selectIsUserAllowedToMakeChanges: (state) => state.isUserAllowedToMakeChanges,
+        selectUser: (state) => state.user,
+    },
+});
+
+export default slice.reducer;
+export const {setIsAuthenticated, setUser} = slice.actions;
+export const {selectIsUserAllowedToMakeChanges, selectUser} = slice.selectors;
+
+export const authenticationApi = api.injectEndpoints({
+    endpoints: (build) => ({
+        whoami: build.query({
+            queryFn: async (_, {dispatch}) => {
+                try {
+                    const data = await window.api.whoami();
+                    dispatch(setUser(data));
+                    return {data};
+                } catch (error) {
+                    if (isAxiosResponse(error) && error.status === 401) {
+                        dispatch(setIsAuthenticated(false));
+                    }
+                    return {error};
+                }
+            },
+            providesTags: ['UserData'],
+        }),
+        authenticate: build.mutation({
+            queryFn: async (params: {user: string; password: string}, {dispatch}) => {
+                try {
+                    const data = await window.api.authenticate(params);
+                    dispatch(setIsAuthenticated(true));
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            invalidatesTags: (_, error) => (error ? [] : ['UserData']),
+        }),
+        logout: build.mutation({
+            queryFn: async (_, {dispatch}) => {
+                try {
+                    const data = await window.api.logout();
+                    dispatch(setIsAuthenticated(false));
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+        }),
+    }),
+    overrideExisting: 'throw',
+});
