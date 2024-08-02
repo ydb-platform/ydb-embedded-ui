@@ -1,5 +1,34 @@
 # Changelog
 
+## [6.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.12.0...v6.13.0) (2024-08-02)
+
+
+### Features
+
+* add flaky tests and bundle size ([#1109](https://github.com/ydb-platform/ydb-embedded-ui/issues/1109)) ([e343a13](https://github.com/ydb-platform/ydb-embedded-ui/commit/e343a13c4cffd7bb6682183208736b3179451056))
+* check whoami before other requests ([#1103](https://github.com/ydb-platform/ydb-embedded-ui/issues/1103)) ([70b6dc3](https://github.com/ydb-platform/ydb-embedded-ui/commit/70b6dc3f116aac1a2d86144f5c2a6091c7294190))
+* **Diagnostics:** display column's default value in diagnostics schema ([#1102](https://github.com/ydb-platform/ydb-embedded-ui/issues/1102)) ([97013c3](https://github.com/ydb-platform/ydb-embedded-ui/commit/97013c3cc7580feb58e03be4b61cb344319d61a2))
+* **ExecuteResult:** show query schema with stats ([#1083](https://github.com/ydb-platform/ydb-embedded-ui/issues/1083)) ([eb6c746](https://github.com/ydb-platform/ydb-embedded-ui/commit/eb6c7462248c5c308bc9c33a183b3a88531495ab))
+* **ExecuteResult:** show simplified plan ([#1098](https://github.com/ydb-platform/ydb-embedded-ui/issues/1098)) ([0a18fab](https://github.com/ydb-platform/ydb-embedded-ui/commit/0a18fabdbb9302cdb09b3aac3e14451308f70c38))
+* **ExplainResult:** add visualization for simplified query plan ([#1061](https://github.com/ydb-platform/ydb-embedded-ui/issues/1061)) ([73c53dd](https://github.com/ydb-platform/ydb-embedded-ui/commit/73c53dd77a54627df95b2f9148f993b156719fcb))
+* move test reports ([#1106](https://github.com/ydb-platform/ydb-embedded-ui/issues/1106)) ([5f8a852](https://github.com/ydb-platform/ydb-embedded-ui/commit/5f8a8522e8cd011e750abf11bb58e966ed37a753))
+* option to hide domain ([#1094](https://github.com/ydb-platform/ydb-embedded-ui/issues/1094)) ([8b2fb41](https://github.com/ydb-platform/ydb-embedded-ui/commit/8b2fb412d2744cd470f321d3d944702984cfce60))
+* **PDiskPage:** add force restart ([#1073](https://github.com/ydb-platform/ydb-embedded-ui/issues/1073)) ([27f7350](https://github.com/ydb-platform/ydb-embedded-ui/commit/27f7350d60507890ef07d1a640fdea2d795d696f))
+* release query settings dialog (and ci test reports) ([#1101](https://github.com/ydb-platform/ydb-embedded-ui/issues/1101)) ([d0ef39c](https://github.com/ydb-platform/ydb-embedded-ui/commit/d0ef39c2456dd2b51897f79efbdddb2fa0e0b8f6))
+* settings usage in requests and modification ([#1068](https://github.com/ydb-platform/ydb-embedded-ui/issues/1068)) ([c767175](https://github.com/ydb-platform/ydb-embedded-ui/commit/c767175d483214a4b05c60f26e0be2e2b994eb04))
+* show cached data on errors ([#1095](https://github.com/ydb-platform/ydb-embedded-ui/issues/1095)) ([d38f0f0](https://github.com/ydb-platform/ydb-embedded-ui/commit/d38f0f08a677afd8f30c86ced5d032569081eab4))
+* use features versions from backend ([#1097](https://github.com/ydb-platform/ydb-embedded-ui/issues/1097)) ([3f041de](https://github.com/ydb-platform/ydb-embedded-ui/commit/3f041de928f48c8f9e31264647ef68066c0f73bd))
+* **VDiskPage:** add force evict ([#1093](https://github.com/ydb-platform/ydb-embedded-ui/issues/1093)) ([97dfcfb](https://github.com/ydb-platform/ydb-embedded-ui/commit/97dfcfb318952b33a146d77f2960b7a2d3524752))
+
+
+### Bug Fixes
+
+* infinite describe requests ([#1086](https://github.com/ydb-platform/ydb-embedded-ui/issues/1086)) ([a8ee1a7](https://github.com/ydb-platform/ydb-embedded-ui/commit/a8ee1a7e62c7bf4b5f5dd828afd39cfcefd84535))
+* **Nodes:** better memory bars ([#1091](https://github.com/ydb-platform/ydb-embedded-ui/issues/1091)) ([87f2b92](https://github.com/ydb-platform/ydb-embedded-ui/commit/87f2b92aef40d40ff7af21b19d57b2c2f66528e5))
+* **QueryHistory:** query history not saving ([#1111](https://github.com/ydb-platform/ydb-embedded-ui/issues/1111)) ([b5df0d6](https://github.com/ydb-platform/ydb-embedded-ui/commit/b5df0d64c9617d28a912a3e7a8a23e368e3786ba))
+* **QuerySettingsForm:** remove excessive updates ([#1099](https://github.com/ydb-platform/ydb-embedded-ui/issues/1099)) ([a41bbff](https://github.com/ydb-platform/ydb-embedded-ui/commit/a41bbffebd0fb6d35ae1b50d5354aa5861800ba3))
+* tests not running ([#1108](https://github.com/ydb-platform/ydb-embedded-ui/issues/1108)) ([eb5a627](https://github.com/ydb-platform/ydb-embedded-ui/commit/eb5a627974c6b93c7fa89bc8d3ba7512a262ee4c))
+
 ## [6.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.11.0...v6.12.0) (2024-07-29)
 
 
