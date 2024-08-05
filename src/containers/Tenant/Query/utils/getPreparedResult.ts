@@ -28,3 +28,13 @@ function escapeValue(value: string) {
         .replaceAll('\r', '\\r')
         .replaceAll('\t', '\\t');
 }
+
+export function getStringifiedQueryStats(data: unknown) {
+    if (!data) {
+        return undefined;
+    }
+    if (typeof data === 'string') {
+        return data;
+    }
+    return JSON.stringify(data, null, 2);
+}

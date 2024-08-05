@@ -55,7 +55,7 @@ export const prepareExplainResponse = (
             version: meta.version,
             pristine: rawPlan,
         },
-        simplifiedPlan: preparedSimplifiedPlan,
+        simplifiedPlan: {plan: preparedSimplifiedPlan, pristine: SimplifiedPlan},
         ast,
     };
 };

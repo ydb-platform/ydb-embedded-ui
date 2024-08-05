@@ -4,5 +4,6 @@
   "action.schema": "Schema",
   "action.explain-plan": "Explain Plan",
   "action.json": "JSON",
-  "action.ast": "AST"
+  "action.ast": "AST",
+  "action.copy": "Copy {{activeOption}}"
 }

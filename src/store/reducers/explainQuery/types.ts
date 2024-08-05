@@ -5,6 +5,7 @@ import type {
     QueryPlan,
     ScriptPlan,
     SimlifiedPlanOperatorOtherParams,
+    SimplifiedNode,
 } from '../../../types/api/query';
 
 export interface PreparedExplainResponse {
@@ -15,7 +16,10 @@ export interface PreparedExplainResponse {
         version?: string;
         pristine?: QueryPlan | ScriptPlan;
     };
-    simplifiedPlan?: SimplifiedPlanItem[];
+    simplifiedPlan?: {
+        plan?: SimplifiedPlanItem[];
+        pristine?: SimplifiedNode;
+    };
     ast?: string;
 }
 

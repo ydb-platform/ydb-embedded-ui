@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {RadioButton} from '@gravity-ui/uikit';
+import {ClipboardButton, RadioButton} from '@gravity-ui/uikit';
 
 import Divider from '../../../../components/Divider/Divider';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
@@ -15,6 +15,7 @@ import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
+import {getStringifiedQueryStats} from '../utils/getPreparedResult';
 
 import {Ast} from './components/Ast/Ast';
 import {Graph} from './components/Graph/Graph';
@@ -122,15 +123,33 @@ export function ExplainResult({
                 return <Graph theme={theme} explain={explain} />;
             }
             case EXPLAIN_OPTIONS_IDS.simplified: {
-                if (!simplifiedPlan?.length) {
+                const {plan} = simplifiedPlan ?? {};
+                if (!plan?.length) {
                     return renderStub();
                 }
-                return <SimplifiedPlan plan={simplifiedPlan} />;
+                return <SimplifiedPlan plan={plan} />;
             }
             default:
                 return null;
         }
     };
+
+    const getStatsToCopy = () => {
+        switch (activeOption) {
+            case EXPLAIN_OPTIONS_IDS.json:
+                return explain?.pristine;
+            case EXPLAIN_OPTIONS_IDS.ast:
+                return ast;
+            case EXPLAIN_OPTIONS_IDS.simplified:
+                return simplifiedPlan?.pristine;
+            default:
+                return undefined;
+        }
+    };
+
+    const statsToCopy = getStatsToCopy();
+
+    const copyText = getStringifiedQueryStats(statsToCopy);
 
     return (
         <React.Fragment>
@@ -153,6 +172,13 @@ export function ExplainResult({
                             )}
                         </div>
                         <div className={b('controls-left')}>
+                            {copyText && (
+                                <ClipboardButton
+                                    text={copyText}
+                                    view="flat-secondary"
+                                    title={i18n('action.copy', {activeOption})}
+                                />
+                            )}
                             <EnableFullscreenButton disabled={Boolean(error)} />
                             <PaneVisibilityToggleButtons
                                 onCollapse={onCollapseResults}
