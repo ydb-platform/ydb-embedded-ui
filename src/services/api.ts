@@ -121,7 +121,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         return this.get<TTenantInfo>(
             this.getPath('/viewer/json/tenantinfo'),
             {
-                tablets: 1,
+                tablets: 0,
                 storage: 1,
                 cluster_name: clusterName,
             },
