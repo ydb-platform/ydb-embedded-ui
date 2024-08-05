@@ -1,6 +1,5 @@
 import transformPath from '../transformPath';
 
-// Jest tests
 describe('transformPath', () => {
     test.each([
         // Tests with various combinations of path and dbName
