@@ -1,4 +1,4 @@
-import transformPath from '../transformPath';
+import {transformPath} from '../transformPath';
 
 describe('transformPath', () => {
     test.each([

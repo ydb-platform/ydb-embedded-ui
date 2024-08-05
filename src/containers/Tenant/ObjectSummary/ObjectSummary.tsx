@@ -48,7 +48,7 @@ import {
 } from '../utils/paneVisibilityToggleHelpers';
 import {isIndexTableType, isTableType} from '../utils/schema';
 
-import transformPath from './transformPath';
+import {transformPath} from './transformPath';
 
 import './ObjectSummary.scss';
 
