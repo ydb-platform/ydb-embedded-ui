@@ -461,11 +461,13 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
             true,
         );
+        // FIXME: after backend fix
+        const {schema, ...rest} = params;
 
         return this.post<QueryAPIResponse<Action, Schema> | ErrorResponse>(
             this.getPath('/viewer/json/query'),
-            {...params, base64},
-            {},
+            {...rest, base64},
+            {schema},
             {
                 concurrentId,
                 timeout: params.timeout,

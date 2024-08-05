@@ -106,7 +106,7 @@ export function ExecuteResult({
 
     const renderResult = () => {
         return (
-            <React.Fragment>
+            <div className={b('result-wrapper')}>
                 {isMulti && resultsSetsCount > 1 && (
                     <div>
                         <Tabs
@@ -124,7 +124,7 @@ export function ExecuteResult({
                 <div className={b('result')}>
                     {renderResultTable(currentResult, currentColumns)}
                 </div>
-            </React.Fragment>
+            </div>
         );
     };
 
