@@ -23,7 +23,10 @@ export function getPlan(data: IQueryResult | undefined) {
             plan: planWithStats
                 ? {...preparePlan(planWithStats), tables: queryPlan.tables}
                 : undefined,
-            simplifiedPlan: simplifiedPlan ? prepareSimplifiedPlan([simplifiedPlan]) : undefined,
+            simplifiedPlan: {
+                plan: simplifiedPlan ? prepareSimplifiedPlan([simplifiedPlan]) : undefined,
+                pristine: simplifiedPlan,
+            },
         };
     }
 

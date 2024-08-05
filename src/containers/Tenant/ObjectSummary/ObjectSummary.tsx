@@ -48,6 +48,8 @@ import {
 } from '../utils/paneVisibilityToggleHelpers';
 import {isIndexTableType, isTableType} from '../utils/schema';
 
+import {transformPath} from './transformPath';
+
 import './ObjectSummary.scss';
 
 const b = cn('object-summary');
@@ -394,7 +396,9 @@ export function ObjectSummary({
                                 <div className={b('info-header')}>
                                     <div className={b('info-title')}>
                                         {renderEntityTypeBadge()}
-                                        <div className={b('path-name')}>{path}</div>
+                                        <div className={b('path-name')}>
+                                            {transformPath(path, tenantName)}
+                                        </div>
                                     </div>
                                     <div className={b('info-controls')}>
                                         {renderCommonInfoControls()}
