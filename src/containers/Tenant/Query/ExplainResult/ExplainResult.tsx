@@ -11,11 +11,11 @@ import type {PreparedExplainResponse} from '../../../../store/reducers/explainQu
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ValueOf} from '../../../../types/common';
 import {cn} from '../../../../utils/cn';
+import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
-import {getStringifiedQueryStats} from '../utils/getPreparedResult';
 
 import {Ast} from './components/Ast/Ast';
 import {Graph} from './components/Graph/Graph';
@@ -149,7 +149,7 @@ export function ExplainResult({
 
     const statsToCopy = getStatsToCopy();
 
-    const copyText = getStringifiedQueryStats(statsToCopy);
+    const copyText = getStringifiedData(statsToCopy);
 
     return (
         <React.Fragment>

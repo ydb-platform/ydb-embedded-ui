@@ -146,3 +146,14 @@ export const calcUptimeInSeconds = (milliseconds: number | string) => {
 export const calcUptime = (milliseconds?: number | string) => {
     return formatUptime(calcUptimeInSeconds(Number(milliseconds)));
 };
+
+export function getStringifiedData(value: unknown) {
+    if (value === undefined) {
+        return '';
+    }
+    if (typeof value === 'object') {
+        return JSON.stringify(value);
+    } else {
+        return value.toString();
+    }
+}

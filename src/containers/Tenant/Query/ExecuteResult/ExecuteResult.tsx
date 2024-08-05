@@ -17,6 +17,7 @@ import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
+import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
@@ -24,7 +25,7 @@ import {SimplifiedPlan} from '../ExplainResult/components/SimplifiedPlan/Simplif
 import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
-import {getPreparedResult, getStringifiedQueryStats} from '../utils/getPreparedResult';
+import {getPreparedResult} from '../utils/getPreparedResult';
 
 import i18n from './i18n';
 import {getPlan} from './utils';
@@ -144,7 +145,7 @@ export function ExecuteResult({
 
     const renderClipboardButton = () => {
         const statsToCopy = getStatsToCopy();
-        const copyText = getStringifiedQueryStats(statsToCopy);
+        const copyText = getStringifiedData(statsToCopy);
         if (!copyText) {
             return null;
         }

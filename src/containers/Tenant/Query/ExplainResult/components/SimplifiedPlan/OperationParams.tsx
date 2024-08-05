@@ -1,4 +1,5 @@
 import type {SimlifiedPlanOperatorOtherParams} from '../../../../../../types/api/query';
+import {getStringifiedData} from '../../../../../../utils/dataFormatters/dataFormatters';
 
 import {block} from './utils';
 
@@ -13,17 +14,6 @@ function getOperatorPropertyColor(property: string) {
         return operatorPropertyToColor[property];
     }
     return 'var(--g-color-text-secondary)';
-}
-
-function prepareValue(value: unknown) {
-    if (value === undefined) {
-        return '';
-    }
-    if (typeof value === 'object') {
-        return JSON.stringify(value);
-    } else {
-        return value.toString();
-    }
 }
 
 function reorderParamsEntries(params: Record<string, unknown>) {
@@ -50,7 +40,7 @@ function getOperationParams(params: Record<string, unknown> = {}) {
         // if there is only one param, display value without key
         result.push(
             <span key="param" style={{color}}>
-                {prepareValue(value)}
+                {getStringifiedData(value)}
             </span>,
         );
     } else {
@@ -63,7 +53,7 @@ function getOperationParams(params: Record<string, unknown> = {}) {
             }
             result.push(
                 <span key={i} style={{color}}>
-                    {key}: {prepareValue(value)}
+                    {key}: {getStringifiedData(value)}
                 </span>,
             );
         }
