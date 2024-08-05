@@ -17,6 +17,7 @@ import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
+import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
@@ -68,8 +69,6 @@ export function ExecuteResult({
     const isMulti = resultsSetsCount && resultsSetsCount > 0;
     const currentResult = isMulti ? data?.resultSets?.[selectedResultSet].result : data?.result;
     const currentColumns = isMulti ? data?.resultSets?.[selectedResultSet].columns : data?.columns;
-    const textResults = getPreparedResult(currentResult);
-    const copyDisabled = !textResults.length;
     const {plan, simplifiedPlan} = React.useMemo(() => getPlan(data), [data]);
 
     const resultOptions: ControlGroupOption<SectionID>[] = [
@@ -79,7 +78,7 @@ export function ExecuteResult({
     if (plan) {
         resultOptions.push({value: resultOptionsIds.schema, content: i18n('action.schema')});
     }
-    if (simplifiedPlan) {
+    if (simplifiedPlan?.plan) {
         resultOptions.push({
             value: resultOptionsIds.simplified,
             content: i18n('action.explain-plan'),
@@ -129,13 +128,32 @@ export function ExecuteResult({
         );
     };
 
+    const getStatsToCopy = () => {
+        switch (activeSection) {
+            case resultOptionsIds.result: {
+                const textResults = getPreparedResult(currentResult);
+                return textResults;
+            }
+            case resultOptionsIds.stats:
+                return stats;
+            case resultOptionsIds.simplified:
+                return simplifiedPlan?.pristine;
+            default:
+                return undefined;
+        }
+    };
+
     const renderClipboardButton = () => {
+        const statsToCopy = getStatsToCopy();
+        const copyText = getStringifiedData(statsToCopy);
+        if (!copyText) {
+            return null;
+        }
         return (
             <ClipboardButton
-                text={textResults}
+                text={copyText}
                 view="flat-secondary"
-                title="Copy results"
-                disabled={copyDisabled}
+                title={i18n('action.copy', {activeSection})}
             />
         );
     };
@@ -169,10 +187,11 @@ export function ExecuteResult({
     };
 
     const renderSimplified = () => {
-        if (!simplifiedPlan) {
+        const {plan} = simplifiedPlan ?? {};
+        if (!plan) {
             return null;
         }
-        return <SimplifiedPlan plan={simplifiedPlan} />;
+        return <SimplifiedPlan plan={plan} />;
     };
 
     const renderIssues = () => {
