@@ -450,6 +450,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             tracingLevel?: TracingLevel;
             transaction_mode?: TransactionMode;
             timeout?: Timeout;
+            query_id?: string;
         },
         {concurrentId, signal, withRetries}: AxiosOptions = {},
     ) {

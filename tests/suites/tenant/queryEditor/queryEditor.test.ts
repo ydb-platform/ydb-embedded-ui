@@ -10,6 +10,7 @@ import {
     QueryMode,
     VISIBILITY_TIMEOUT,
 } from './QueryEditor';
+import {longRunningQuery} from './constants';
 
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
@@ -87,6 +88,20 @@ test.describe('Test Query Editor', async () => {
         await expect(explainAST).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
+    test('Error is displayed for invalid query', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        const invalidQuery = 'Select d';
+        await queryEditor.setQuery(invalidQuery);
+        await queryEditor.clickRunButton();
+
+        const statusElement = await queryEditor.getExecutionStatus();
+        await expect(statusElement).toBe('Failed');
+
+        const errorMessage = await queryEditor.getErrorMessage();
+        await expect(errorMessage).toContain('Column references are not allowed without FROM');
+    });
+
     test('Banner appears after executing script with changed settings', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
@@ -154,5 +169,75 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isBannerHidden()).resolves.toBe(true);
+    });
+
+    test('Stop button and elapsed time label appears when query is running', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
+    });
+
+    test('Stop button and elapsed time label disappears after query is stopped', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+
+        await queryEditor.clickStopButton();
+
+        await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
+        await expect(queryEditor.isElapsedTimeHidden()).resolves.toBe(true);
+    });
+
+    test('Query execution is terminated when stop button is clicked', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+
+        await queryEditor.clickStopButton();
+        await page.waitForTimeout(1000); // Wait for the editor to initialize
+
+        // Check for a message or indicator that the query was stopped
+        const statusElement = await queryEditor.getExecutionStatus();
+        await expect(statusElement).toBe('Stopped');
+    });
+
+    test('Stop button is not visible for quick queries', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        const quickQuery = 'SELECT 1;';
+        await queryEditor.setQuery(quickQuery);
+        await queryEditor.clickRunButton();
+        await page.waitForTimeout(1000); // Wait for the editor to initialize
+
+        await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
+    });
+
+    test('Stop button works for both Execute and Explain modes', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        // Test for Execute mode
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        await queryEditor.clickStopButton();
+        await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
+
+        // Test for Explain mode
+        await queryEditor.clickExplainButton();
+
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        await queryEditor.clickStopButton();
+        await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 });

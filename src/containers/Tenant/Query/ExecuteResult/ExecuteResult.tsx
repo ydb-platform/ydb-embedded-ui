@@ -1,18 +1,21 @@
 import React from 'react';
 
+import {StopFill} from '@gravity-ui/icons';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {RadioButton, Tabs} from '@gravity-ui/uikit';
+import {Button, Icon, RadioButton, Tabs} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
 
 import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
+import ElapsedTime from '../../../../components/ElapsedTime/ElapsedTime';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {YDBGraph} from '../../../../components/Graph/Graph';
+import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
-import type {ColumnType, KeyValueRow} from '../../../../types/api/query';
+import type {ColumnType, KeyValueRow, TKqpStatsQuery} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import type {IQueryResult} from '../../../../types/store/query';
 import {getArray} from '../../../../utils';
@@ -26,6 +29,7 @@ import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {getPreparedResult} from '../utils/getPreparedResult';
+import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
 import i18n from './i18n';
 import {getPlan} from './utils';
@@ -46,25 +50,33 @@ type SectionID = ValueOf<typeof resultOptionsIds>;
 interface ExecuteResultProps {
     data: IQueryResult | undefined;
     error: unknown;
+    cancelError: unknown;
     isResultsCollapsed?: boolean;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
+    onStopButtonClick: VoidFunction;
     theme?: string;
+    loading?: boolean;
+    cancelQueryLoading?: boolean;
 }
 
 export function ExecuteResult({
     data,
     error,
+    cancelError,
     isResultsCollapsed,
     onCollapseResults,
     onExpandResults,
+    onStopButtonClick,
     theme,
+    loading,
+    cancelQueryLoading,
 }: ExecuteResultProps) {
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
     const dispatch = useTypedDispatch();
 
-    const stats = data?.stats;
+    const stats: TKqpStatsQuery | undefined = data?.stats;
     const resultsSetsCount = data?.resultSets?.length;
     const isMulti = resultsSetsCount && resultsSetsCount > 0;
     const currentResult = isMulti ? data?.resultSets?.[selectedResultSet].result : data?.result;
@@ -93,8 +105,8 @@ export function ExecuteResult({
         };
     }, [dispatch]);
 
-    const onSelectSection = (value: string) => {
-        setActiveSection(value as SectionID);
+    const onSelectSection = (value: SectionID) => {
+        setActiveSection(value);
     };
 
     const renderResultTable = (
@@ -207,7 +219,7 @@ export function ExecuteResult({
     };
 
     const renderResultSection = () => {
-        if (error) {
+        if (error && !isQueryCancelledError(error)) {
             return renderIssues();
         }
         if (activeSection === resultOptionsIds.result) {
@@ -230,18 +242,38 @@ export function ExecuteResult({
         <React.Fragment>
             <div className={b('controls')}>
                 <div className={b('controls-right')}>
-                    <QueryExecutionStatus error={error} />
-                    {stats && !error && (
+                    <QueryExecutionStatus error={error} loading={loading} />
+
+                    {!error && !loading && (
                         <React.Fragment>
-                            <QueryDuration duration={stats?.DurationUs} />
-                            <Divider />
-                            <RadioButton
-                                options={resultOptions}
-                                value={activeSection}
-                                onUpdate={onSelectSection}
-                            />
+                            {stats?.DurationUs !== undefined && (
+                                <QueryDuration duration={Number(stats.DurationUs)} />
+                            )}
+                            {resultOptions && activeSection && (
+                                <React.Fragment>
+                                    <Divider />
+                                    <RadioButton
+                                        options={resultOptions}
+                                        value={activeSection}
+                                        onUpdate={onSelectSection}
+                                    />
+                                </React.Fragment>
+                            )}
                         </React.Fragment>
                     )}
+                    {loading ? (
+                        <React.Fragment>
+                            <ElapsedTime className={b('elapsed-time')} />
+                            <Button
+                                loading={cancelQueryLoading}
+                                onClick={onStopButtonClick}
+                                className={b('stop-button', {error: Boolean(cancelError)})}
+                            >
+                                <Icon data={StopFill} size={16} />
+                                {i18n('action.stop')}
+                            </Button>
+                        </React.Fragment>
+                    ) : null}
                 </div>
                 <div className={b('controls-left')}>
                     {renderClipboardButton()}
@@ -254,8 +286,10 @@ export function ExecuteResult({
                     />
                 </div>
             </div>
-            <QuerySettingsBanner />
-            <Fullscreen>{renderResultSection()}</Fullscreen>
+            {loading || isQueryCancelledError(error) ? null : <QuerySettingsBanner />}
+            <LoaderWrapper loading={loading}>
+                <Fullscreen>{renderResultSection()}</Fullscreen>
+            </LoaderWrapper>
         </React.Fragment>
     );
 }

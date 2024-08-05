@@ -298,3 +298,28 @@
 
     box-shadow: inset 0 -1px 0 0 var(--g-color-line-generic);
 }
+
+@mixin query-buttons-animations() {
+    animation: errorAnimation 500ms linear;
+
+    @keyframes errorAnimation {
+        8%,
+        41% {
+            transform: translateX(-2px);
+        }
+        25%,
+        58% {
+            transform: translateX(2px);
+        }
+        75% {
+            transform: translateX(-1px);
+        }
+        92% {
+            transform: translateX(1px);
+        }
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+    }
+}

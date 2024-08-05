@@ -48,14 +48,17 @@
 
     &__controls-right {
         display: flex;
+        align-items: center;
         gap: 12px;
 
         height: 100%;
     }
+
     &__controls-left {
         display: flex;
         gap: 4px;
     }
+
     &__inspector {
         overflow: auto;
 
@@ -70,5 +73,15 @@
 
         width: 100%;
         height: 100%;
+    }
+
+    &__elapsed-label {
+        margin-left: var(--g-spacing-3);
+    }
+
+    &__stop-button {
+        &_error {
+            @include query-buttons-animations();
+        }
     }
 }

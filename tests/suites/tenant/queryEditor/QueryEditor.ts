@@ -18,6 +18,7 @@ export enum ButtonNames {
     Explain = 'Explain',
     Cancel = 'Cancel',
     Save = 'Save',
+    Stop = 'Stop',
 }
 
 export class SettingsDialog {
@@ -105,20 +106,28 @@ export class QueryEditor {
     private editorTextArea: Locator;
     private runButton: Locator;
     private explainButton: Locator;
+    private stopButton: Locator;
     private gearButton: Locator;
     private indicatorIcon: Locator;
     private banner: Locator;
+    private executionStatus: Locator;
+    private radioButton: Locator;
+    private elapsedTimeLabel: Locator;
 
     constructor(page: Page) {
         this.page = page;
         this.selector = page.locator('.query-editor');
         this.editorTextArea = this.selector.locator('.query-editor__monaco textarea');
         this.runButton = this.selector.getByRole('button', {name: ButtonNames.Run});
+        this.stopButton = this.selector.getByRole('button', {name: ButtonNames.Stop});
         this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
         this.gearButton = this.selector.locator('.ydb-query-editor-controls__gear-button');
+        this.executionStatus = this.selector.locator('.kv-query-execution-status');
         this.indicatorIcon = this.selector.locator(
             '.kv-query-execution-status__query-settings-icon',
         );
+        this.elapsedTimeLabel = this.selector.locator('.ydb-query-elapsed-time');
+        this.radioButton = this.selector.locator('.query-editor__pane-wrapper .g-radio-button');
         this.banner = this.page.locator('.ydb-query-settings-banner');
 
         this.settingsDialog = new SettingsDialog(page);
@@ -146,6 +155,11 @@ export class QueryEditor {
         return this.gearButton.innerText();
     }
 
+    async clickStopButton() {
+        await this.stopButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.stopButton.click();
+    }
+
     async clickRunButton() {
         await this.runButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.runButton.click();
@@ -157,7 +171,7 @@ export class QueryEditor {
     }
 
     async getExplainResult(type: ExplainResultType) {
-        await this.selectExplainResultType(type);
+        await this.selectResultTypeRadio(type);
         const resultArea = this.selector.locator('.ydb-query-explain-result__result');
         switch (type) {
             case ExplainResultType.Schema:
@@ -167,6 +181,17 @@ export class QueryEditor {
             case ExplainResultType.AST:
                 return resultArea.locator('.ydb-query-explain-ast');
         }
+    }
+
+    async getErrorMessage() {
+        const errorMessage = this.selector.locator('.kv-result-issues__error-message-text');
+        await errorMessage.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return errorMessage.innerText();
+    }
+
+    async getExecutionStatus() {
+        await this.executionStatus.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.executionStatus.innerText();
     }
 
     async focusEditor() {
@@ -194,11 +219,30 @@ export class QueryEditor {
         await this.editorTextArea.fill(query);
     }
 
-    async selectExplainResultType(type: ExplainResultType) {
-        const radio = this.selector.locator('.ydb-query-explain-result__controls .g-radio-button');
-        const typeButton = radio.getByLabel(type);
+    async selectResultTypeRadio(type: ExplainResultType) {
+        const typeButton = this.radioButton.getByLabel(type);
         await typeButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await typeButton.click();
+    }
+
+    async isElapsedTimeVisible() {
+        await this.elapsedTimeLabel.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async isElapsedTimeHidden() {
+        await this.elapsedTimeLabel.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async isStopButtonVisible() {
+        await this.stopButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async isStopButtonHidden() {
+        await this.stopButton.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        return true;
     }
 
     async isRunButtonEnabled() {
