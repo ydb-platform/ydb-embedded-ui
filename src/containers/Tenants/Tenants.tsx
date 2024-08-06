@@ -13,7 +13,6 @@ import {ProblemFilter} from '../../components/ProblemFilter';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {TabletsStatistic} from '../../components/TabletsStatistic';
 import {clusterName} from '../../store';
 import {
     ProblemFilterValues,
@@ -221,27 +220,6 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                 defaultOrder: DataTable.DESCENDING,
                 align: DataTable.LEFT,
                 render: ({row}) => <PoolsGraph pools={row.PoolStats} />,
-            },
-            {
-                name: 'Tablets',
-                header: 'Tablets States',
-                sortable: false,
-                width: 500,
-                resizeMinWidth: 500,
-                render: ({row}) => {
-                    const backend = getTenantBackend(row);
-
-                    return row.Tablets ? (
-                        <TabletsStatistic
-                            path={row.Name}
-                            tablets={row.Tablets}
-                            nodeIds={row.NodeIds || []}
-                            backend={backend}
-                        />
-                    ) : (
-                        '—'
-                    );
-                },
             },
         ];
 
