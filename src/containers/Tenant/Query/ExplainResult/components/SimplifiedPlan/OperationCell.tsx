@@ -33,7 +33,7 @@ function Divider({modifiers, left}: DividerProps) {
     );
 }
 
-function getDividers(lines: string, hasLeafs: boolean) {
+function getDividers(lines: string, hasVisibleSubNodes: boolean) {
     const linesArray = lines.split('.').map(Number);
     const dividers = [];
     for (let i = 0; i < linesArray.length; i++) {
@@ -61,7 +61,7 @@ function getDividers(lines: string, hasLeafs: boolean) {
                 );
             }
         }
-        if (i === linesArray.length - 1 && hasLeafs) {
+        if (i === linesArray.length - 1 && hasVisibleSubNodes) {
             //starting vertical line if node has leafs
             dividers.push(
                 <Divider
@@ -82,9 +82,12 @@ function getDividers(lines: string, hasLeafs: boolean) {
 export function OperationCell<TData>({row, depth = 0, params}: OperationCellProps<TData>) {
     const {name, operationParams, lines = ''} = params;
 
-    const hasLeafs = row.getLeafRows().length > 0;
+    const hasVisibleSubNodes = row.getLeafRows().length > 0 && row.getIsExpanded();
 
-    const dividers = React.useMemo(() => getDividers(lines, hasLeafs), [lines, hasLeafs]);
+    const dividers = React.useMemo(
+        () => getDividers(lines, hasVisibleSubNodes),
+        [lines, hasVisibleSubNodes],
+    );
 
     return (
         <div
