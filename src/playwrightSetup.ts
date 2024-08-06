@@ -1,5 +1,6 @@
 import {chromium} from '@playwright/test';
 
+import config from '../playwright.config';
 import {PageModel} from '../tests/models/PageModel';
 
 async function warmupApplication(appPage: PageModel) {
@@ -22,7 +23,7 @@ async function warmupApplication(appPage: PageModel) {
 export default async function globalSetup() {
     const browser = await chromium.launch();
     const page = await browser.newPage();
-    const appPage = new PageModel(page, 'http://localhost:3000');
+    const appPage = new PageModel(page, config.use?.baseURL);
     await warmupApplication(appPage);
     await browser.close();
 }
