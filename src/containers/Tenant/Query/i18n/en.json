@@ -6,6 +6,7 @@
   "tabs.saved": "Saved",
 
   "history.empty": "History is empty",
+  "history.empty-search": "Search is empty",
   "saved.empty": "There are no saved queries",
 
   "delete-dialog.header": "Delete query",
@@ -47,6 +48,8 @@
   "action.previous-query": "Previous query in history",
   "action.next-query": "Next query in history",
   "action.save-query": "Save query",
+
+  "filter.text.placeholder": "Search by query text...",
 
   "gear.tooltip": "Query execution settings have been changed for ",
   "banner.query-settings.message": "Query results are displayed for "

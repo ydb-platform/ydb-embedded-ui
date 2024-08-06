@@ -223,9 +223,13 @@ export const setTenantPath = (value: string) => {
     } as const;
 };
 
-export const selectQueriesHistory = (state: ExecuteQueryStateSlice): QueryInHistory[] => {
-    return state.executeQuery.history.queries;
-};
+export const selectQueriesHistory =
+    (filter: string) =>
+    (state: ExecuteQueryStateSlice): QueryInHistory[] => {
+        const items = state.executeQuery.history.queries;
+
+        return filter ? items.filter((item) => item.queryText.includes(filter)) : items;
+    };
 
 function getQueryInHistory(rawQuery: string | QueryInHistory) {
     if (typeof rawQuery === 'string') {

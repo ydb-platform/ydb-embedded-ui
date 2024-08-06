@@ -1,6 +1,10 @@
+import React from 'react';
+
 import type {Column} from '@gravity-ui/react-data-table';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {Search} from '../../../../components/Search';
+import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {selectQueriesHistory} from '../../../../store/reducers/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
@@ -23,8 +27,9 @@ interface QueriesHistoryProps {
 
 function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
+    const [filter, setFilter] = React.useState('');
 
-    const queriesHistory = useTypedSelector(selectQueriesHistory);
+    const queriesHistory = useTypedSelector(selectQueriesHistory(filter));
     const reversedHistory = [...queriesHistory].reverse();
 
     const onQueryClick = (query: QueryInHistory) => {
@@ -49,17 +54,26 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     ];
 
     return (
-        <div className={b()}>
-            <ResizeableDataTable
-                columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
-                columns={columns}
-                data={reversedHistory}
-                settings={QUERY_TABLE_SETTINGS}
-                emptyDataMessage={i18n('history.empty')}
-                onRowClick={(row) => onQueryClick(row)}
-                rowClassName={() => b('table-row')}
-            />
-        </div>
+        <TableWithControlsLayout className={b()}>
+            <TableWithControlsLayout.Controls>
+                <Search
+                    onChange={setFilter}
+                    placeholder={i18n('filter.text.placeholder')}
+                    className={b('search')}
+                />
+            </TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Table>
+                <ResizeableDataTable
+                    columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
+                    columns={columns}
+                    data={reversedHistory}
+                    settings={QUERY_TABLE_SETTINGS}
+                    emptyDataMessage={i18n(filter ? 'history.empty-search' : 'history.empty')}
+                    onRowClick={(row) => onQueryClick(row)}
+                    rowClassName={() => b('table-row')}
+                />
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 }
 
