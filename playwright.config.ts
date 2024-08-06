@@ -4,6 +4,7 @@ import {devices} from '@playwright/test';
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL;
 
 const config: PlaywrightTestConfig = {
+    globalSetup: './src/playwrightSetup.ts',
     testDir: 'tests/suites',
     timeout: 2 * 60 * 1000,
     outputDir: './playwright-artifacts/test-results',
