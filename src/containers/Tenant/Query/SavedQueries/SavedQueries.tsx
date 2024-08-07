@@ -6,6 +6,8 @@ import DataTable from '@gravity-ui/react-data-table';
 import {Button, Dialog, Icon} from '@gravity-ui/uikit';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {Search} from '../../../../components/Search';
+import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {
     deleteSavedQuery,
@@ -62,7 +64,8 @@ interface SavedQueriesProps {
 }
 
 export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
-    const savedQueries = useSavedQueries();
+    const [filter, setFilter] = React.useState('');
+    const savedQueries = useSavedQueries(filter);
     const dispatch = useTypedDispatch();
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
@@ -129,21 +132,30 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
 
     return (
         <React.Fragment>
-            <div className={b()}>
-                <ResizeableDataTable
-                    columnsWidthLSKey={SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY}
-                    columns={columns}
-                    data={savedQueries}
-                    settings={QUERY_TABLE_SETTINGS}
-                    emptyDataMessage={i18n('saved.empty')}
-                    rowClassName={() => b('row')}
-                    onRowClick={(row) => onQueryClick(row.body, row.name)}
-                    initialSortOrder={{
-                        columnId: 'name',
-                        order: DataTable.ASCENDING,
-                    }}
-                />
-            </div>
+            <TableWithControlsLayout className={b()}>
+                <TableWithControlsLayout.Controls>
+                    <Search
+                        onChange={setFilter}
+                        placeholder={i18n('filter.text.placeholder')}
+                        className={b('search')}
+                    />
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table>
+                    <ResizeableDataTable
+                        columnsWidthLSKey={SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY}
+                        columns={columns}
+                        data={savedQueries}
+                        settings={QUERY_TABLE_SETTINGS}
+                        emptyDataMessage={i18n(filter ? 'history.empty-search' : 'saved.empty')}
+                        rowClassName={() => b('row')}
+                        onRowClick={(row) => onQueryClick(row.body, row.name)}
+                        initialSortOrder={{
+                            columnId: 'name',
+                            order: DataTable.ASCENDING,
+                        }}
+                    />
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
             <DeleteDialog
                 visible={isDeleteDialogVisible}
                 queryName={queryNameToDelete}

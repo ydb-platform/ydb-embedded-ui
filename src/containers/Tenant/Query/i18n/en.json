@@ -6,7 +6,7 @@
   "tabs.saved": "Saved",
 
   "history.empty": "History is empty",
-  "history.empty-search": "Search is empty",
+  "history.empty-search": "Search result is empty",
   "saved.empty": "There are no saved queries",
 
   "delete-dialog.header": "Delete query",
