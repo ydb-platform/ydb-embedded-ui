@@ -260,7 +260,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Stop button works for both Execute and Explain modes', async ({page}) => {
+    test('Stop button works for Execute mode', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         // Test for Execute mode
@@ -270,6 +270,16 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
         await queryEditor.clickStopButton();
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
+    });
+
+    test('Stop button works for Explain mode', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        // Test for Execute mode
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeStatsLevel('Profile');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Test for Explain mode
         await queryEditor.clickExplainButton();

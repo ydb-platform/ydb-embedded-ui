@@ -52,6 +52,17 @@ export class SettingsDialog {
         await this.page.waitForTimeout(1000);
     }
 
+    async changeStatsLevel(mode: string) {
+        const dropdown = this.dialog.locator(
+            '.ydb-query-settings-dialog__control-wrapper_statisticsMode',
+        );
+        await dropdown.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await dropdown.click();
+        const popup = this.page.locator('.ydb-query-settings-select__popup');
+        await popup.getByText(mode).first().click();
+        await this.page.waitForTimeout(1000);
+    }
+
     async clickButton(buttonName: ButtonNames) {
         const button = this.dialog.getByRole('button', {name: buttonName});
         await button.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
