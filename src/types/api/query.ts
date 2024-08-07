@@ -244,7 +244,9 @@ export type ExplainActions =
     | 'explain-query'
     | 'explain-ast';
 
-export type Actions = ExecuteActions | ExplainActions;
+export type CancelActions = 'cancel-query';
+
+export type Actions = ExecuteActions | ExplainActions | CancelActions;
 
 // ==== Error response ====
 
@@ -329,6 +331,10 @@ export type ExecuteResponse<Action extends ExecuteActions, Schema extends Schema
     ? ExecuteQueryResponse<Schema>
     : ExecuteScriptResponse<Schema>;
 
+export type CancelResponse = {
+    stats?: TKqpStatsQuery;
+};
+
 // ==== Combined API response ====
 export type QueryAPIResponse<
     Action extends Actions,
@@ -337,7 +343,9 @@ export type QueryAPIResponse<
     ? ExplainResponse<Action>
     : Action extends ExecuteActions
       ? ExecuteResponse<Action, Schema>
-      : unknown;
+      : Action extends CancelActions
+        ? CancelResponse
+        : never;
 
 // ==== types to use in query result preparation ====
 export type AnyExplainResponse = ExplainQueryResponse | ExplainScriptResponse;

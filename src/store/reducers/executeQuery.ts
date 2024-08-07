@@ -130,6 +130,7 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
 };
 
 interface SendQueryParams extends QueryRequestParams {
+    queryId: string;
     querySettings?: Partial<QuerySettings>;
     schema?: Schemas;
     // flag whether to send new tracing header or not
@@ -140,13 +141,17 @@ interface SendQueryParams extends QueryRequestParams {
 export const executeQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
         executeQuery: build.mutation<IQueryResult, SendQueryParams>({
-            queryFn: async ({
-                query,
-                database,
-                querySettings = {},
-                schema = 'modern',
-                enableTracingLevel,
-            }) => {
+            queryFn: async (
+                {
+                    query,
+                    database,
+                    querySettings = {},
+                    schema = 'modern',
+                    enableTracingLevel,
+                    queryId,
+                },
+                {signal},
+            ) => {
                 let action: ExecuteActions = 'execute';
                 let syntax: QuerySyntax = QUERY_SYNTAX.yql;
 
@@ -158,22 +163,26 @@ export const executeQueryApi = api.injectEndpoints({
                 }
 
                 try {
-                    const response = await window.api.sendQuery({
-                        schema,
-                        query,
-                        database,
-                        action,
-                        syntax,
-                        stats: querySettings.statisticsMode,
-                        tracingLevel:
-                            querySettings.tracingLevel && enableTracingLevel
-                                ? TracingLevelNumber[querySettings.tracingLevel]
+                    const response = await window.api.sendQuery(
+                        {
+                            schema,
+                            query,
+                            database,
+                            action,
+                            syntax,
+                            stats: querySettings.statisticsMode,
+                            tracingLevel:
+                                querySettings.tracingLevel && enableTracingLevel
+                                    ? TracingLevelNumber[querySettings.tracingLevel]
+                                    : undefined,
+                            transaction_mode: querySettings.isolationLevel,
+                            timeout: isNumeric(querySettings.timeout)
+                                ? Number(querySettings.timeout) * 1000
                                 : undefined,
-                        transaction_mode: querySettings.isolationLevel,
-                        timeout: isNumeric(querySettings.timeout)
-                            ? Number(querySettings.timeout) * 1000
-                            : undefined,
-                    });
+                            query_id: queryId,
+                        },
+                        {signal},
+                    );
 
                     if (isQueryErrorResponse(response)) {
                         return {error: response};

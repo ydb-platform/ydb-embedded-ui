@@ -164,7 +164,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                     <label htmlFor="statisticsMode" className={b('field-title')}>
                         {QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title}
                     </label>
-                    <div className={b('control-wrapper')}>
+                    <div className={b('control-wrapper', {statisticsMode: true})}>
                         <Controller
                             name="statisticsMode"
                             control={control}

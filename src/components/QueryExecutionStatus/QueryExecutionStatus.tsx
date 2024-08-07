@@ -1,10 +1,17 @@
 import React from 'react';
 
-import {CircleCheck, CircleInfo, CircleQuestionFill, CircleXmark} from '@gravity-ui/icons';
-import {Icon, Tooltip} from '@gravity-ui/uikit';
+import {
+    CircleCheck,
+    CircleInfo,
+    CircleQuestionFill,
+    CircleStop,
+    CircleXmark,
+} from '@gravity-ui/icons';
+import {Icon, Spin, Tooltip} from '@gravity-ui/uikit';
 import {isAxiosError} from 'axios';
 
 import i18n from '../../containers/Tenant/Query/i18n';
+import {isQueryCancelledError} from '../../containers/Tenant/Query/utils/isQueryCancelledError';
 import {cn} from '../../utils/cn';
 import {useChangedQuerySettings} from '../../utils/hooks/useChangedQuerySettings';
 import QuerySettingsDescription from '../QuerySettingsDescription/QuerySettingsDescription';
@@ -16,6 +23,7 @@ const b = cn('kv-query-execution-status');
 interface QueryExecutionStatusProps {
     className?: string;
     error?: unknown;
+    loading?: boolean;
 }
 
 const QuerySettingsIndicator = () => {
@@ -40,13 +48,19 @@ const QuerySettingsIndicator = () => {
     );
 };
 
-export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusProps) => {
+export const QueryExecutionStatus = ({className, error, loading}: QueryExecutionStatusProps) => {
     let icon: React.ReactNode;
     let label: string;
 
-    if (isAxiosError(error) && error.code === 'ECONNABORTED') {
+    if (loading) {
+        icon = <Spin size="xs" />;
+        label = 'Running';
+    } else if (isAxiosError(error) && error.code === 'ECONNABORTED') {
         icon = <Icon data={CircleQuestionFill} />;
         label = 'Connection aborted';
+    } else if (isQueryCancelledError(error)) {
+        icon = <Icon data={CircleStop} />;
+        label = 'Stopped';
     } else {
         const hasError = Boolean(error);
         icon = (
@@ -62,7 +76,7 @@ export const QueryExecutionStatus = ({className, error}: QueryExecutionStatusPro
         <div className={b(null, className)}>
             {icon}
             {label}
-            <QuerySettingsIndicator />
+            {isQueryCancelledError(error) || loading ? null : <QuerySettingsIndicator />}
         </div>
     );
 };

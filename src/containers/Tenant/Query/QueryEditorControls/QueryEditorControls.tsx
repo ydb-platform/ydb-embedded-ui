@@ -54,23 +54,23 @@ const SettingsButton = ({onClick, runIsLoading}: SettingsButtonProps) => {
 };
 
 interface QueryEditorControlsProps {
-    handleSendExecuteClick: () => void;
-    onSettingsButtonClick: () => void;
-    runIsLoading: boolean;
-    handleGetExplainQueryClick: () => void;
-    explainIsLoading: boolean;
+    isLoading: boolean;
     disabled: boolean;
     highlightedAction: QueryAction;
+
+    handleGetExplainQueryClick: () => void;
+    handleSendExecuteClick: () => void;
+    onSettingsButtonClick: () => void;
 }
 
 export const QueryEditorControls = ({
+    disabled,
+    isLoading,
+    highlightedAction,
+
     handleSendExecuteClick,
     onSettingsButtonClick,
-    runIsLoading,
     handleGetExplainQueryClick,
-    explainIsLoading,
-    disabled,
-    highlightedAction,
 }: QueryEditorControlsProps) => {
     const runView: ButtonView | undefined = highlightedAction === 'execute' ? 'action' : undefined;
     const explainView: ButtonView | undefined =
@@ -90,7 +90,7 @@ export const QueryEditorControls = ({
                 <Button
                     onClick={onRunButtonClick}
                     disabled={disabled}
-                    loading={runIsLoading}
+                    loading={isLoading}
                     view={runView}
                     className={b('run-button')}
                 >
@@ -100,12 +100,12 @@ export const QueryEditorControls = ({
                 <Button
                     onClick={onExplainButtonClick}
                     disabled={disabled}
-                    loading={explainIsLoading}
+                    loading={isLoading}
                     view={explainView}
                 >
                     Explain
                 </Button>
-                <SettingsButton onClick={onSettingsButtonClick} runIsLoading={runIsLoading} />
+                <SettingsButton onClick={onSettingsButtonClick} runIsLoading={isLoading} />
             </div>
             <SaveQuery isSaveButtonDisabled={disabled} />
         </div>
