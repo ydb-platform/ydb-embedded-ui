@@ -27,22 +27,25 @@ const b = cn('ydb-diagnostics-consumers');
 
 interface ConsumersProps {
     path: string;
+    database: string;
     type?: EPathType;
 }
 
-export const Consumers = ({path, type}: ConsumersProps) => {
+export const Consumers = ({path, database, type}: ConsumersProps) => {
     const isCdcStream = isCdcStreamEntityType(type);
 
     const [searchValue, setSearchValue] = React.useState('');
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
-        {path},
+        {path, database},
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
-    const consumers = useTypedSelector((state) => selectPreparedConsumersData(state, path));
-    const topic = useTypedSelector((state) => selectPreparedTopicStats(state, path));
+    const consumers = useTypedSelector((state) =>
+        selectPreparedConsumersData(state, path, database),
+    );
+    const topic = useTypedSelector((state) => selectPreparedTopicStats(state, path, database));
 
     const dataToRender = React.useMemo(() => {
         if (!consumers) {

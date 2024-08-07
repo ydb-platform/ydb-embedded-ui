@@ -6,11 +6,12 @@ import {prepareTopicSchemaInfo} from '../utils';
 
 interface TopicInfoProps {
     path: string;
+    database: string;
     data?: TEvDescribeSchemeResult;
 }
 
 /** Displays overview for PersQueueGroup EPathType */
-export const TopicInfo = ({data, path}: TopicInfoProps) => {
+export const TopicInfo = ({data, path, database}: TopicInfoProps) => {
     const entityName = getEntityName(data?.PathDescription);
 
     if (!data) {
@@ -20,7 +21,7 @@ export const TopicInfo = ({data, path}: TopicInfoProps) => {
     return (
         <div>
             <InfoViewer title={entityName} info={prepareTopicSchemaInfo(data)} />
-            <TopicStats path={path} />
+            <TopicStats path={path} database={database} />
         </div>
     );
 };
