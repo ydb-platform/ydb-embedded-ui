@@ -268,6 +268,11 @@ export class QueryEditor {
         return true;
     }
 
+    async isIndicatorIconHidden() {
+        await this.indicatorIcon.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
     async retry<T>(action: () => Promise<T>, maxAttempts = 3, delay = 1000): Promise<T> {
         for (let attempt = 1; attempt <= maxAttempts; attempt++) {
             try {

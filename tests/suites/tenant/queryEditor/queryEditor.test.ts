@@ -118,6 +118,23 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isBannerVisible()).resolves.toBe(true);
     });
 
+    test('Banner not appears for running query', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        // Change a setting
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        // Execute a script
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.clickRunButton();
+        await page.waitForTimeout(500);
+
+        // Check if banner appears
+        await expect(queryEditor.isBannerHidden()).resolves.toBe(true);
+    });
+
     test('Indicator icon appears after closing banner', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
@@ -134,6 +151,27 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.closeBanner();
 
         await expect(queryEditor.isIndicatorIconVisible()).resolves.toBe(true);
+    });
+
+    test('Indicator not appears for running query', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        // Change a setting
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeIsolationLevel('Snapshot');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        // Execute a script to make the banner appear
+        await queryEditor.setQuery(testQuery);
+        await queryEditor.clickRunButton();
+
+        // Close the banner
+        await queryEditor.closeBanner();
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.clickRunButton();
+        await page.waitForTimeout(500);
+
+        await expect(queryEditor.isIndicatorIconHidden()).resolves.toBe(true);
     });
 
     test('Gear button shows number of changed settings', async ({page}) => {

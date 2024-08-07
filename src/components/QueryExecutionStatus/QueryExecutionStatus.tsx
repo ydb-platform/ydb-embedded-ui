@@ -76,7 +76,7 @@ export const QueryExecutionStatus = ({className, error, loading}: QueryExecution
         <div className={b(null, className)}>
             {icon}
             {label}
-            {isQueryCancelledError(error) ? null : <QuerySettingsIndicator />}
+            {isQueryCancelledError(error) || loading ? null : <QuerySettingsIndicator />}
         </div>
     );
 };
