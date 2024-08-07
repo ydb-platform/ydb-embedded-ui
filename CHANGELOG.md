@@ -1,5 +1,24 @@
 # Changelog
 
+## [6.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.13.0...v6.14.0) (2024-08-07)
+
+
+### Features
+
+* copy json query stats ([#1113](https://github.com/ydb-platform/ydb-embedded-ui/issues/1113)) ([e9cfa8a](https://github.com/ydb-platform/ydb-embedded-ui/commit/e9cfa8a7cc8dad7a1dc3fca354419a3af9a852bf))
+* display relative schema object path on left overview tab ([#1118](https://github.com/ydb-platform/ydb-embedded-ui/issues/1118)) ([c55164c](https://github.com/ydb-platform/ydb-embedded-ui/commit/c55164c4f6688ee61e520a9eebaa4b2382600a06))
+* **e2e:** add warmup for e2e ([#1122](https://github.com/ydb-platform/ydb-embedded-ui/issues/1122)) ([c15dc1a](https://github.com/ydb-platform/ydb-embedded-ui/commit/c15dc1a1a3954cab96abbf76edfb232321485d99))
+* remove tablets column from databases table ([#1121](https://github.com/ydb-platform/ydb-embedded-ui/issues/1121)) ([68c3972](https://github.com/ydb-platform/ydb-embedded-ui/commit/68c39726fccb24725bb47aaaad1beadc7d2b26bf))
+* stop running query ([#1117](https://github.com/ydb-platform/ydb-embedded-ui/issues/1117)) ([a30258f](https://github.com/ydb-platform/ydb-embedded-ui/commit/a30258f1f362d6a1aa2e098e197fb03d90abee2b))
+
+
+### Bug Fixes
+
+* **e2e:** use baseurl from config ([#1123](https://github.com/ydb-platform/ydb-embedded-ui/issues/1123)) ([d0efbb1](https://github.com/ydb-platform/ydb-embedded-ui/commit/d0efbb13cbf61accce10e453f408681560d59f3d))
+* pass database to topic api handlers ([#1128](https://github.com/ydb-platform/ydb-embedded-ui/issues/1128)) ([b23fc79](https://github.com/ydb-platform/ydb-embedded-ui/commit/b23fc79548b8bdea31d86505bd56ee2baf6d8c1a))
+* schema in sendQuery is only query parameter ([#1119](https://github.com/ydb-platform/ydb-embedded-ui/issues/1119)) ([5bb0461](https://github.com/ydb-platform/ydb-embedded-ui/commit/5bb0461b98eb7d5d5deba99199b447abda013fe4))
+* **SimplifiedPlan:** should hide dividers if item is collapsed ([#1124](https://github.com/ydb-platform/ydb-embedded-ui/issues/1124)) ([5759e1b](https://github.com/ydb-platform/ydb-embedded-ui/commit/5759e1b5aaa6865eb45f6dda4cbdd0cee91ed533))
+
 ## [6.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.12.0...v6.13.0) (2024-08-02)
 
 
