@@ -29,24 +29,25 @@ import './Partitions.scss';
 export const b = cn('ydb-diagnostics-partitions');
 
 interface PartitionsProps {
-    path?: string;
+    path: string;
+    database: string;
 }
 
-export const Partitions = ({path}: PartitionsProps) => {
+export const Partitions = ({path, database}: PartitionsProps) => {
     const dispatch = useTypedDispatch();
 
     const [partitionsToRender, setPartitionsToRender] = React.useState<
         PreparedPartitionDataWithHosts[]
     >([]);
 
-    const consumers = useTypedSelector((state) => selectConsumersNames(state, path));
+    const consumers = useTypedSelector((state) => selectConsumersNames(state, path, database));
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {selectedConsumer} = useTypedSelector((state) => state.partitions);
     const {
         currentData: topicData,
         isFetching: topicIsFetching,
         error: topicError,
-    } = topicApi.useGetTopicQuery({path});
+    } = topicApi.useGetTopicQuery({path, database});
     const topicLoading = topicIsFetching && topicData === undefined;
     const {
         currentData: nodesData,
@@ -60,7 +61,7 @@ export const Partitions = ({path}: PartitionsProps) => {
 
     const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer);
 
-    const params = !topicLoading && path ? {path, consumerName: selectedConsumer} : skipToken;
+    const params = topicLoading ? skipToken : {path, database, consumerName: selectedConsumer};
     const {
         currentData: partitionsData,
         isFetching: partitionsIsFetching,

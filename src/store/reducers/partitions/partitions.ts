@@ -27,20 +27,24 @@ export const partitionsApi = api.injectEndpoints({
     endpoints: (build) => ({
         getPartitions: build.query({
             queryFn: async (
-                {path, consumerName}: {path: string; consumerName?: string},
+                {
+                    path,
+                    database,
+                    consumerName,
+                }: {path: string; database: string; consumerName?: string},
                 {signal},
             ) => {
                 try {
                     if (consumerName) {
                         const response = await window.api.getConsumer(
-                            {path, consumer: consumerName},
+                            {path, database, consumer: consumerName},
                             {signal},
                         );
                         const rawPartitions = response.partitions;
                         const data = prepareConsumerPartitions(rawPartitions);
                         return {data};
                     } else {
-                        const response = await window.api.getTopic({path}, {signal});
+                        const response = await window.api.getTopic({path, database}, {signal});
                         const rawPartitions = response.partitions;
                         const data = prepareTopicPartitions(rawPartitions);
                         return {data};

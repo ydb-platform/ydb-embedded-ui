@@ -125,10 +125,10 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Heatmap path={path} database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.consumers: {
-                return <Consumers path={path} type={type} />;
+                return <Consumers path={path} database={tenantName} type={type} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.partitions: {
-                return <Partitions path={path} />;
+                return <Partitions path={path} database={tenantName} />;
             }
             default: {
                 return <div>No data...</div>;

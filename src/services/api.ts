@@ -359,7 +359,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getTopic(
-        {path, database}: {path?: string; database?: string},
+        {path, database}: {path: string; database: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<DescribeTopicResult>(
@@ -374,7 +374,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getConsumer(
-        {path, consumer, database}: {path: string; consumer: string; database?: string},
+        {path, consumer, database}: {path: string; consumer: string; database: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<DescribeConsumerResult>(
