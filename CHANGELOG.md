@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.14.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.14.0...v6.14.1) (2024-08-07)
+
+
+### Bug Fixes
+
+* package build ([#1129](https://github.com/ydb-platform/ydb-embedded-ui/issues/1129)) ([ea8aa29](https://github.com/ydb-platform/ydb-embedded-ui/commit/ea8aa29e8446679bf34f5c5bbc6033cb2482b6b4))
+
 ## [6.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.13.0...v6.14.0) (2024-08-07)
 
 
