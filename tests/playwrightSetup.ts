@@ -1,7 +1,8 @@
 import {chromium} from '@playwright/test';
 
 import config from '../playwright.config';
-import {PageModel} from '../tests/models/PageModel';
+
+import {PageModel} from './models/PageModel';
 
 async function warmupApplication(appPage: PageModel) {
     const maxRetries = 5;

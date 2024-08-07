@@ -4,6 +4,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "declaration": true,
+    "sourceMap": true,
     "noEmit": false,
     "importHelpers": true
   },
