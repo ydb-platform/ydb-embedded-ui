@@ -311,7 +311,7 @@ test.describe('Test Query Editor', async () => {
         await expect(statusElement).toBe('Running');
     });
 
-    test('Completed query status for running query', async ({page}) => {
+    test('Completed query status for completed query', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(testQuery);
@@ -322,7 +322,7 @@ test.describe('Test Query Editor', async () => {
         await expect(statusElement).toBe('Completed');
     });
 
-    test('Failed query status for running query', async ({page}) => {
+    test('Failed query status for failed query', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         const invalidQuery = 'Select d';
