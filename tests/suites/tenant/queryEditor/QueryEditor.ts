@@ -124,6 +124,7 @@ export class QueryEditor {
     private executionStatus: Locator;
     private radioButton: Locator;
     private elapsedTimeLabel: Locator;
+    private resultsControls: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -134,6 +135,7 @@ export class QueryEditor {
         this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
         this.gearButton = this.selector.locator('.ydb-query-editor-controls__gear-button');
         this.executionStatus = this.selector.locator('.kv-query-execution-status');
+        this.resultsControls = this.selector.locator('.ydb-query-execute-result__controls');
         this.indicatorIcon = this.selector.locator(
             '.kv-query-execution-status__query-settings-icon',
         );
@@ -253,6 +255,16 @@ export class QueryEditor {
 
     async isStopButtonHidden() {
         await this.stopButton.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async isResultsControlsVisible() {
+        await this.resultsControls.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async isResultsControlsHidden() {
+        await this.resultsControls.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 
