@@ -1,12 +1,14 @@
-import React from 'react';
-
 import type {Column} from '@gravity-ui/react-data-table';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {selectQueriesHistory} from '../../../../store/reducers/executeQuery';
+import {
+    selectQueriesHistory,
+    selectQueriesHistoryFilter,
+    setQueryHistoryFilter,
+} from '../../../../store/reducers/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {QueryInHistory} from '../../../../types/store/executeQuery';
@@ -27,14 +29,18 @@ interface QueriesHistoryProps {
 
 function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
-    const [filter, setFilter] = React.useState('');
 
-    const queriesHistory = useTypedSelector(selectQueriesHistory(filter));
+    const queriesHistory = useTypedSelector(selectQueriesHistory);
+    const filter = useTypedSelector(selectQueriesHistoryFilter);
     const reversedHistory = [...queriesHistory].reverse();
 
     const onQueryClick = (query: QueryInHistory) => {
         changeUserInput({input: query.queryText});
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+    };
+
+    const onChangeFilter = (value: string) => {
+        dispatch(setQueryHistoryFilter(value));
     };
 
     const columns: Column<QueryInHistory>[] = [
@@ -57,7 +63,8 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
         <TableWithControlsLayout className={b()}>
             <TableWithControlsLayout.Controls>
                 <Search
-                    onChange={setFilter}
+                    value={filter}
+                    onChange={onChangeFilter}
                     placeholder={i18n('filter.text.placeholder')}
                     className={b('search')}
                 />

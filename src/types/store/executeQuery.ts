@@ -3,6 +3,7 @@ import type {
     goToNextQuery,
     goToPreviousQuery,
     saveQueryToHistory,
+    setQueryHistoryFilter,
     setTenantPath,
 } from '../../store/reducers/executeQuery';
 
@@ -18,6 +19,7 @@ export interface ExecuteQueryState {
         // String type for backward compatibility
         queries: QueryInHistory[];
         currentIndex: number;
+        filter?: string;
     };
     tenantPath?: string;
 }
@@ -27,7 +29,8 @@ export type ExecuteQueryAction =
     | ReturnType<typeof goToPreviousQuery>
     | ReturnType<typeof changeUserInput>
     | ReturnType<typeof saveQueryToHistory>
-    | ReturnType<typeof setTenantPath>;
+    | ReturnType<typeof setTenantPath>
+    | ReturnType<typeof setQueryHistoryFilter>;
 
 export interface ExecuteQueryStateSlice {
     executeQuery: ExecuteQueryState;

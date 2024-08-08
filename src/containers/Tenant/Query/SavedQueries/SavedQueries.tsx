@@ -11,13 +11,15 @@ import {TableWithControlsLayout} from '../../../../components/TableWithControlsL
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {
     deleteSavedQuery,
+    selectSavedQueriesFilter,
     setQueryNameToEdit,
+    setSavedQueriesFilter,
 } from '../../../../store/reducers/queryActions/queryActions';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
-import {useTypedDispatch} from '../../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
 import {useSavedQueries} from '../utils/useSavedQueries';
@@ -64,9 +66,9 @@ interface SavedQueriesProps {
 }
 
 export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
-    const [filter, setFilter] = React.useState('');
-    const savedQueries = useSavedQueries(filter);
+    const savedQueries = useSavedQueries();
     const dispatch = useTypedDispatch();
+    const filter = useTypedSelector(selectSavedQueriesFilter);
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
     const [queryNameToDelete, setQueryNameToDelete] = React.useState<string>('');
@@ -98,6 +100,10 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
             setIsDeleteDialogVisible(true);
             setQueryNameToDelete(queryName);
         };
+    };
+
+    const onChangeFilter = (value: string) => {
+        dispatch(setSavedQueriesFilter(value));
     };
 
     const columns: Column<SavedQuery>[] = [
@@ -135,7 +141,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
             <TableWithControlsLayout className={b()}>
                 <TableWithControlsLayout.Controls>
                     <Search
-                        onChange={setFilter}
+                        onChange={onChangeFilter}
                         placeholder={i18n('filter.text.placeholder')}
                         className={b('search')}
                     />

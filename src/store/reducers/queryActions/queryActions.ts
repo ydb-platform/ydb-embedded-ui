@@ -11,6 +11,7 @@ import type {QueryActions, QueryActionsState} from './types';
 const initialState: QueryActionsState = {
     queryName: null,
     queryAction: 'idle',
+    savedQueriesFilter: '',
 };
 
 export const slice = createSlice({
@@ -26,16 +27,21 @@ export const slice = createSlice({
         setQueryAction: (state, action: PayloadAction<QueryActions>) => {
             state.queryAction = action.payload;
         },
+        setSavedQueriesFilter: (state, action: PayloadAction<string>) => {
+            state.savedQueriesFilter = action.payload;
+        },
     },
     selectors: {
         selectQueryName: (state) => state.queryName,
         selectQueryAction: (state) => state.queryAction,
+        selectSavedQueriesFilter: (state) => state.savedQueriesFilter,
     },
 });
 
 export default slice.reducer;
-export const {setQueryNameToEdit, clearQueryNameToEdit, setQueryAction} = slice.actions;
-export const {selectQueryName, selectQueryAction} = slice.selectors;
+export const {setQueryNameToEdit, clearQueryNameToEdit, setQueryAction, setSavedQueriesFilter} =
+    slice.actions;
+export const {selectQueryName, selectQueryAction, selectSavedQueriesFilter} = slice.selectors;
 
 export function deleteSavedQuery(queryName: string) {
     return function deleteSavedQueryThunk(dispatch: AppDispatch, getState: GetState) {
