@@ -60,7 +60,7 @@ const CONTEXT_MENU_GROUP_ID = 'navigation';
 const RESULT_TYPES = {
     EXECUTE: 'execute',
     EXPLAIN: 'explain',
-};
+} as const;
 
 const b = cn('query-editor');
 
@@ -100,7 +100,7 @@ function QueryEditor(props: QueryEditorProps) {
     } = props;
     const {tenantPath: savedPath} = executeQuery;
 
-    const [resultType, setResultType] = React.useState(RESULT_TYPES.EXECUTE);
+    const [resultType, setResultType] = React.useState<ValueOf<typeof RESULT_TYPES>>();
     const [isResultLoaded, setIsResultLoaded] = React.useState(false);
     const [querySettings] = useQueryExecutionSettings();
     const [enableTracingLevel] = useSetting<boolean>(ENABLE_TRACING_LEVEL_KEY);
