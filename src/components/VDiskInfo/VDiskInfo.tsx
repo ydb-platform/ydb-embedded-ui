@@ -1,4 +1,7 @@
+import React from 'react';
+
 import {getVDiskPagePath} from '../../routes';
+import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
@@ -6,6 +9,7 @@ import {formatStorageValuesToGb, stringifyVdiskId} from '../../utils/dataFormatt
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import {useTypedSelector} from '../../utils/hooks';
 import {bytesToSpeed} from '../../utils/utils';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {InfoViewer} from '../InfoViewer';
@@ -33,6 +37,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     ...infoViewerProps
 }: VDiskInfoProps<T>) {
     const diskPagesAvailable = useDiskPagesAvailable();
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     const {
         AllocatedSize,
@@ -142,32 +147,45 @@ export function VDiskInfo<T extends PreparedVDisk>({
             value: bytesToSpeed(WriteThroughput),
         });
     }
-    if (valueIsDefined(PDiskId) && valueIsDefined(NodeId) && valueIsDefined(VDiskSlotId)) {
-        const vDiskPagePath = getVDiskPagePath(VDiskSlotId, PDiskId, NodeId);
-        const vDiskInternalViewerPath = createVDiskDeveloperUILink({
-            nodeId: NodeId,
-            pDiskId: PDiskId,
-            vDiskSlotId: VDiskSlotId,
-        });
 
-        vdiskInfo.push({
-            label: vDiskInfoKeyset('links'),
-            value: (
-                <span className={b('links')}>
-                    {withVDiskPageLink && diskPagesAvailable && (
-                        <LinkWithIcon
-                            title={vDiskInfoKeyset('vdisk-page')}
-                            url={vDiskPagePath}
-                            external={false}
-                        />
-                    )}
-                    <LinkWithIcon
-                        title={vDiskInfoKeyset('developer-ui')}
-                        url={vDiskInternalViewerPath}
-                    />
-                </span>
-            ),
-        });
+    const diskParamsDefined =
+        valueIsDefined(PDiskId) && valueIsDefined(NodeId) && valueIsDefined(VDiskSlotId);
+
+    if (diskParamsDefined) {
+        const links: React.ReactNode[] = [];
+
+        if (withVDiskPageLink && diskPagesAvailable) {
+            const vDiskPagePath = getVDiskPagePath(VDiskSlotId, PDiskId, NodeId);
+            links.push(
+                <LinkWithIcon
+                    title={vDiskInfoKeyset('vdisk-page')}
+                    url={vDiskPagePath}
+                    external={false}
+                />,
+            );
+        }
+
+        if (isUserAllowedToMakeChanges) {
+            const vDiskInternalViewerPath = createVDiskDeveloperUILink({
+                nodeId: NodeId,
+                pDiskId: PDiskId,
+                vDiskSlotId: VDiskSlotId,
+            });
+
+            links.push(
+                <LinkWithIcon
+                    title={vDiskInfoKeyset('developer-ui')}
+                    url={vDiskInternalViewerPath}
+                />,
+            );
+        }
+
+        if (links.length) {
+            vdiskInfo.push({
+                label: vDiskInfoKeyset('links'),
+                value: <span className={b('links')}>{links}</span>,
+            });
+        }
     }
 
     const title = data && withTitle ? <VDiskTitle data={data} /> : null;
