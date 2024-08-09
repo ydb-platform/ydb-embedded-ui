@@ -7,7 +7,11 @@ import type {
 } from '../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {
+    PreparedStorageNode,
+    PreparedStorageNodeFilters,
+    VisibleEntities,
+} from '../../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../../types/additionalProps';
 import {NodesUptimeFilterValues, getUptimeParamValue} from '../../../utils/nodes';
 import type {NodesSortValue} from '../../../utils/nodes';
@@ -46,25 +50,25 @@ export const PaginatedStorageNodes = ({
     renderControls,
     renderErrorMessage,
 }: PaginatedStorageNodesProps) => {
-    const filters = React.useMemo(() => {
-        return [searchValue, visibleEntities, nodesUptimeFilter, tenant];
+    const tableFilters = React.useMemo(() => {
+        return {searchValue, visibleEntities, nodesUptimeFilter, tenant};
     }, [searchValue, visibleEntities, nodesUptimeFilter, tenant]);
 
-    const fetchData = React.useCallback<FetchData<PreparedStorageNode>>(
-        async (limit, offset, {sortOrder, columnId} = {}) => {
+    const fetchData = React.useCallback<FetchData<PreparedStorageNode, PreparedStorageNodeFilters>>(
+        async (limit, offset, filters, {sortOrder, columnId} = {}) => {
             return await getStorageNodes({
                 limit,
                 offset,
-                filter: searchValue,
-                uptime: getUptimeParamValue(nodesUptimeFilter),
-                visibleEntities,
-                tenant,
+                filter: filters?.searchValue,
+                uptime: getUptimeParamValue(filters?.nodesUptimeFilter),
+                visibleEntities: filters?.visibleEntities,
+                tenant: filters?.tenant,
 
                 sortOrder,
                 sortValue: columnId as NodesSortValue,
             });
         },
-        [nodesUptimeFilter, searchValue, tenant, visibleEntities],
+        [],
     );
 
     const columns = React.useMemo(() => {
@@ -100,7 +104,7 @@ export const PaginatedStorageNodes = ({
             renderErrorMessage={renderErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
             getRowClassName={getRowUnavailableClassName}
-            dependencyArray={filters}
+            filters={tableFilters}
         />
     );
 };

@@ -16,7 +16,7 @@ import type {
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {Search} from '../../components/Search';
 import {UptimeFilter} from '../../components/UptimeFIlter';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {
     ProblemFilterValues,
     changeFilter,
@@ -62,24 +62,24 @@ export const PaginatedNodes = ({path, parentContainer, additionalNodesProps}: No
 
     const problemFilter = useTypedSelector(selectProblemFilter);
 
-    const filters = React.useMemo(() => {
-        return [path, searchValue, problemFilter, uptimeFilter];
+    const tableFilters = React.useMemo(() => {
+        return {path, searchValue, problemFilter, uptimeFilter};
     }, [path, searchValue, problemFilter, uptimeFilter]);
 
-    const fetchData = React.useCallback<FetchData<NodesPreparedEntity>>(
-        async (limit, offset, {sortOrder, columnId} = {}) => {
+    const fetchData = React.useCallback<FetchData<NodesPreparedEntity, NodesFilters>>(
+        async (limit, offset, filters, {sortOrder, columnId} = {}) => {
             return await getNodes({
                 limit,
                 offset,
-                path,
-                filter: searchValue,
-                problems_only: getProblemParamValue(problemFilter),
-                uptime: getUptimeParamValue(uptimeFilter),
+                path: filters?.path,
+                filter: filters?.searchValue,
+                problems_only: getProblemParamValue(filters?.problemFilter),
+                uptime: getUptimeParamValue(filters?.uptimeFilter),
                 sortOrder,
                 sortValue: columnId as NodesSortValue,
             });
         },
-        [path, problemFilter, searchValue, uptimeFilter],
+        [],
     );
 
     const getRowClassName: GetRowClassName<NodesPreparedEntity> = (row) => {
@@ -156,8 +156,8 @@ export const PaginatedNodes = ({path, parentContainer, additionalNodesProps}: No
             renderControls={renderControls}
             renderErrorMessage={renderErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
-            dependencyArray={filters}
             getRowClassName={getRowClassName}
+            filters={tableFilters}
         />
     );
 };

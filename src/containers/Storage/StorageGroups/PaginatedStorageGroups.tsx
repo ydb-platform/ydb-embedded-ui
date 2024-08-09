@@ -7,7 +7,11 @@ import type {
 } from '../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {
+    PreparedStorageGroup,
+    PreparedStorageGroupFilters,
+    VisibleEntities,
+} from '../../../store/reducers/storage/types';
 import type {NodesMap} from '../../../types/store/nodesList';
 import type {StorageSortValue} from '../../../utils/storage';
 
@@ -44,26 +48,25 @@ export const PaginatedStorageGroups = ({
     renderControls,
     renderErrorMessage,
 }: PaginatedStorageGroupsProps) => {
-    const filters = React.useMemo(() => {
-        return [searchValue, visibleEntities, tenant, nodeId];
+    const tableFilters = React.useMemo(() => {
+        return {searchValue, visibleEntities, tenant, nodeId};
     }, [searchValue, visibleEntities, tenant, nodeId]);
 
-    const fetchData = React.useCallback<FetchData<PreparedStorageGroup>>(
-        async (limit, offset, {sortOrder, columnId} = {}) => {
-            return await getStorageGroups({
-                limit,
-                offset,
-                filter: searchValue,
-                visibleEntities,
-                tenant,
-                nodeId,
+    const fetchData = React.useCallback<
+        FetchData<PreparedStorageGroup, PreparedStorageGroupFilters>
+    >(async (limit, offset, filters, {sortOrder, columnId} = {}) => {
+        return await getStorageGroups({
+            limit,
+            offset,
+            filter: filters?.searchValue,
+            visibleEntities: filters?.visibleEntities,
+            tenant: filters?.tenant,
+            nodeId: filters?.nodeId,
 
-                sortOrder,
-                sortValue: columnId as StorageSortValue,
-            });
-        },
-        [nodeId, searchValue, tenant, visibleEntities],
-    );
+            sortOrder,
+            sortValue: columnId as StorageSortValue,
+        });
+    }, []);
 
     const columns = React.useMemo(() => {
         return getPreparedStorageGroupsColumns(nodesMap, visibleEntities);
@@ -92,7 +95,7 @@ export const PaginatedStorageGroups = ({
             renderControls={renderControls}
             renderErrorMessage={renderErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
-            dependencyArray={filters}
+            filters={tableFilters}
         />
     );
 };

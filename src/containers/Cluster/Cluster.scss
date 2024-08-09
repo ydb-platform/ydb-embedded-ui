@@ -36,4 +36,20 @@
         align-items: center;
         @include tabs-wrapper-styles();
     }
+
+    &__sticky-wrapper {
+        position: sticky;
+        z-index: 4;
+        top: 56px;
+    }
+
+    &__auto-refresh-control {
+        float: right;
+
+        margin-top: -40px;
+    }
+
+    &__auto-refresh-select {
+        background-color: var(--g-color-base-background);
+    }
 }
