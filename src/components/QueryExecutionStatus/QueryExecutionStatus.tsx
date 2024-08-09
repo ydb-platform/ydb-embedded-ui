@@ -8,12 +8,12 @@ import {
     CircleXmark,
 } from '@gravity-ui/icons';
 import {Icon, Spin, Tooltip} from '@gravity-ui/uikit';
-import {isAxiosError} from 'axios';
 
 import i18n from '../../containers/Tenant/Query/i18n';
 import {isQueryCancelledError} from '../../containers/Tenant/Query/utils/isQueryCancelledError';
 import {cn} from '../../utils/cn';
 import {useChangedQuerySettings} from '../../utils/hooks/useChangedQuerySettings';
+import {isAxiosError} from '../../utils/response';
 import QuerySettingsDescription from '../QuerySettingsDescription/QuerySettingsDescription';
 
 import './QueryExecutionStatus.scss';
