@@ -56,7 +56,7 @@ export const authenticationApi = api.injectEndpoints({
                     dispatch(setUser(data));
                     return {data};
                 } catch (error) {
-                    if (isAxiosResponse(error) && error.status === 401) {
+                    if (isAxiosResponse(error) && error.status === 401 && !error.data?.authUrl) {
                         dispatch(setIsAuthenticated(false));
                     }
                     return {error};
