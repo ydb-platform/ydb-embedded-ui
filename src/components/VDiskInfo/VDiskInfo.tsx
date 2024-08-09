@@ -158,6 +158,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
             const vDiskPagePath = getVDiskPagePath(VDiskSlotId, PDiskId, NodeId);
             links.push(
                 <LinkWithIcon
+                    key={vDiskPagePath}
                     title={vDiskInfoKeyset('vdisk-page')}
                     url={vDiskPagePath}
                     external={false}
@@ -174,6 +175,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
 
             links.push(
                 <LinkWithIcon
+                    key={vDiskInternalViewerPath}
                     title={vDiskInfoKeyset('developer-ui')}
                     url={vDiskInternalViewerPath}
                 />,
@@ -183,7 +185,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
         if (links.length) {
             vdiskInfo.push({
                 label: vDiskInfoKeyset('links'),
-                value: <span className={b('links')}>{links}</span>,
+                value: <div className={b('links')}>{links}</div>,
             });
         }
     }
