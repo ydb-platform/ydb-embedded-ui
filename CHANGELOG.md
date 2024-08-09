@@ -1,5 +1,20 @@
 # Changelog
 
+## [6.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.14.1...v6.15.0) (2024-08-09)
+
+
+### Features
+
+* search in queries history & saved ([#1127](https://github.com/ydb-platform/ydb-embedded-ui/issues/1127)) ([efd5813](https://github.com/ydb-platform/ydb-embedded-ui/commit/efd5813bcea7777eb3f4bde10de3b1f28f724502))
+
+
+### Bug Fixes
+
+* completed query status on page load ([#1132](https://github.com/ydb-platform/ydb-embedded-ui/issues/1132)) ([2fa6922](https://github.com/ydb-platform/ydb-embedded-ui/commit/2fa69229e40103750b7ded1ef828665e7a6aa082))
+* detect object that looks like axios error ([#1145](https://github.com/ydb-platform/ydb-embedded-ui/issues/1145)) ([085e116](https://github.com/ydb-platform/ydb-embedded-ui/commit/085e116ff62f0ce022c3df047e2273e190fe5999))
+* do not show Authentication page before redirect ([#1139](https://github.com/ydb-platform/ydb-embedded-ui/issues/1139)) ([e266c8f](https://github.com/ydb-platform/ydb-embedded-ui/commit/e266c8fc95fef4f9e34d56f82cd57c0b20b89ff6))
+* **VDiskInfo:** hide developer ui link for users with viewer rights ([#1137](https://github.com/ydb-platform/ydb-embedded-ui/issues/1137)) ([86104e3](https://github.com/ydb-platform/ydb-embedded-ui/commit/86104e31a6ba335c33a481b322d429205732641b))
+
 ## [6.14.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.14.0...v6.14.1) (2024-08-07)
 
 
