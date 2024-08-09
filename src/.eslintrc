@@ -15,6 +15,10 @@
                 "selector": "TSTypeReference>TSQualifiedName[left.name='React'][right.name='FC']",
                 "message": "Don't use React.FC",
             },
-        ],
+            {
+                "selector": "ImportDeclaration[source.value='axios'] :matches(ImportSpecifier[imported.name='isAxiosError'])",
+                "message": "Please use isAxiosError from utils/response instead of axios",
+            },
+          ],
     },
 }
