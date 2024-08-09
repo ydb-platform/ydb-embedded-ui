@@ -20,6 +20,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build:embedded # check that build works
+      - run: npm run package # check that package build works
 
   unit_tests:
     name: Unit Tests

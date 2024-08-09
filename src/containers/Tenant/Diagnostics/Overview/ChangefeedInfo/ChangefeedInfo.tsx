@@ -36,12 +36,13 @@ const prepareChangefeedInfo = (
 
 interface ChangefeedProps {
     path: string;
+    database: string;
     data?: TEvDescribeSchemeResult;
     topic?: TEvDescribeSchemeResult;
 }
 
 /** Displays overview for CDCStream EPathType */
-export const ChangefeedInfo = ({path, data, topic}: ChangefeedProps) => {
+export const ChangefeedInfo = ({path, database, data, topic}: ChangefeedProps) => {
     const entityName = getEntityName(data?.PathDescription);
 
     if (!data || !topic) {
@@ -51,7 +52,7 @@ export const ChangefeedInfo = ({path, data, topic}: ChangefeedProps) => {
     return (
         <div>
             <InfoViewer title={entityName} info={prepareChangefeedInfo(data, topic)} />
-            <TopicStats path={path} />
+            <TopicStats path={path} database={database} />
         </div>
     );
 };

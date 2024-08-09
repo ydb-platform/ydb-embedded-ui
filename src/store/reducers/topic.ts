@@ -10,7 +10,7 @@ import {api} from './api';
 export const topicApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTopic: build.query({
-            queryFn: async (params: {path?: string}) => {
+            queryFn: async (params: {path: string; database: string}) => {
                 try {
                     const data = await window.api.getTopic(params);
                     // On older version it can return HTML page of Developer UI with an error
@@ -29,18 +29,18 @@ export const topicApi = api.injectEndpoints({
 });
 
 const createGetTopicSelector = createSelector(
-    (path?: string) => path,
-    (path) => topicApi.endpoints.getTopic.select({path}),
+    (path: string, database: string) => ({path, database}),
+    (params) => topicApi.endpoints.getTopic.select(params),
 );
 
 const selectTopicStats = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path?: string) => createGetTopicSelector(path),
+    (_state: RootState, path: string, database: string) => createGetTopicSelector(path, database),
     (state, selectGetTopic) => selectGetTopic(state).data?.topic_stats,
 );
 const selectConsumers = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path?: string) => createGetTopicSelector(path),
+    (_state: RootState, path: string, database: string) => createGetTopicSelector(path, database),
     (state, selectGetTopic) => selectGetTopic(state).data?.consumers,
 );
 

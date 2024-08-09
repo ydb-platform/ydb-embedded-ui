@@ -1,8 +1,11 @@
 import React from 'react';
 
-import {ClipboardButton, RadioButton} from '@gravity-ui/uikit';
+import {StopFill} from '@gravity-ui/icons';
+import {Button, Icon, RadioButton} from '@gravity-ui/uikit';
 
+import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
+import ElapsedTime from '../../../../components/ElapsedTime/ElapsedTime';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
@@ -15,7 +18,9 @@ import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatter
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
+import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
+import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
 import {Ast} from './components/Ast/Ast';
 import {Graph} from './components/Graph/Graph';
@@ -55,14 +60,17 @@ const explainOptions = [
 
 interface ExplainResultProps {
     theme: string;
-    explain?: PreparedExplainResponse['plan'];
+    explain?: PreparedExplainResponse['plan'] & {DurationUs?: number};
     simplifiedPlan?: PreparedExplainResponse['simplifiedPlan'];
     ast?: string;
     loading?: boolean;
+    cancelQueryLoading?: boolean;
     isResultsCollapsed?: boolean;
     error: unknown;
+    cancelError: unknown;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
+    onStopButtonClick: VoidFunction;
 }
 
 export function ExplainResult({
@@ -70,9 +78,12 @@ export function ExplainResult({
     ast,
     theme,
     error,
+    cancelError,
     loading,
+    cancelQueryLoading,
     onCollapseResults,
     onExpandResults,
+    onStopButtonClick,
     isResultsCollapsed,
     simplifiedPlan,
 }: ExplainResultProps) {
@@ -99,6 +110,10 @@ export function ExplainResult({
     };
 
     const renderContent = () => {
+        if (isQueryCancelledError(error)) {
+            return null;
+        }
+
         if (error) {
             return <div className={b('text-message')}>{parseQueryErrorToString(error)}</div>;
         }
@@ -148,49 +163,63 @@ export function ExplainResult({
     };
 
     const statsToCopy = getStatsToCopy();
-
     const copyText = getStringifiedData(statsToCopy);
 
     return (
         <React.Fragment>
             <div className={b('controls')}>
-                {!loading && (
-                    <React.Fragment>
-                        <div className={b('controls-right')}>
-                            <QueryExecutionStatus error={error} />
-                            {!error && (
-                                <React.Fragment>
-                                    <Divider />
-                                    <RadioButton
-                                        options={explainOptions}
-                                        value={activeOption}
-                                        onUpdate={(tabId) => {
-                                            startTransition(() => setActiveOption(tabId));
-                                        }}
-                                    />
-                                </React.Fragment>
+                <div className={b('controls-right')}>
+                    <QueryExecutionStatus error={error} loading={loading} />
+
+                    {!error && !loading && (
+                        <React.Fragment>
+                            {explain?.DurationUs !== undefined && (
+                                <QueryDuration duration={explain.DurationUs} />
                             )}
-                        </div>
-                        <div className={b('controls-left')}>
-                            {copyText && (
-                                <ClipboardButton
-                                    text={copyText}
-                                    view="flat-secondary"
-                                    title={i18n('action.copy', {activeOption})}
+                            <React.Fragment>
+                                <Divider />
+                                <RadioButton
+                                    options={explainOptions}
+                                    value={activeOption}
+                                    onUpdate={(tabId) => {
+                                        startTransition(() => setActiveOption(tabId));
+                                    }}
                                 />
-                            )}
-                            <EnableFullscreenButton disabled={Boolean(error)} />
-                            <PaneVisibilityToggleButtons
-                                onCollapse={onCollapseResults}
-                                onExpand={onExpandResults}
-                                isCollapsed={isResultsCollapsed}
-                                initialDirection="bottom"
-                            />
-                        </div>
-                    </React.Fragment>
-                )}
+                            </React.Fragment>
+                        </React.Fragment>
+                    )}
+                    {loading ? (
+                        <React.Fragment>
+                            <ElapsedTime className={b('elapsed-time')} />
+                            <Button
+                                loading={cancelQueryLoading}
+                                onClick={onStopButtonClick}
+                                className={b('stop-button', {error: Boolean(cancelError)})}
+                            >
+                                <Icon data={StopFill} size={16} />
+                                {i18n('action.stop')}
+                            </Button>
+                        </React.Fragment>
+                    ) : null}
+                </div>
+                <div className={b('controls-left')}>
+                    {copyText && (
+                        <ClipboardButton
+                            text={copyText}
+                            view="flat-secondary"
+                            title={i18n('action.copy', {activeOption})}
+                        />
+                    )}
+                    <EnableFullscreenButton disabled={Boolean(error)} />
+                    <PaneVisibilityToggleButtons
+                        onCollapse={onCollapseResults}
+                        onExpand={onExpandResults}
+                        isCollapsed={isResultsCollapsed}
+                        initialDirection="bottom"
+                    />
+                </div>
             </div>
-            <QuerySettingsBanner />
+            {loading || isQueryCancelledError(error) ? null : <QuerySettingsBanner />}
             <LoaderWrapper loading={loading || isPending}>
                 <Fullscreen className={b('result')}>{renderContent()}</Fullscreen>
             </LoaderWrapper>

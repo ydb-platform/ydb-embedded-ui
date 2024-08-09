@@ -76,9 +76,16 @@ function Overview({type, path, database}: OverviewProps) {
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
             [EPathType.EPathTypeCdcStream]: () => (
-                <ChangefeedInfo path={path} data={data} topic={additionalData?.[0] ?? undefined} />
+                <ChangefeedInfo
+                    path={path}
+                    database={database}
+                    data={data}
+                    topic={additionalData?.[0] ?? undefined}
+                />
             ),
-            [EPathType.EPathTypePersQueueGroup]: () => <TopicInfo data={data} path={path} />,
+            [EPathType.EPathTypePersQueueGroup]: () => (
+                <TopicInfo data={data} path={path} database={database} />
+            ),
             [EPathType.EPathTypeExternalTable]: () => <ExternalTableInfo data={data} />,
             [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
             [EPathType.EPathTypeView]: () => <ViewInfo data={data} />,

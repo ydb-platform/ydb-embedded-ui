@@ -3,6 +3,7 @@
   "action.result": "Result",
   "action.stats": "Stats",
   "action.schema": "Schema",
+  "action.stop": "Stop",
   "action.explain-plan": "Explain Plan",
   "action.copy": "Copy {{activeSection}}"
 }

@@ -121,7 +121,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         return this.get<TTenantInfo>(
             this.getPath('/viewer/json/tenantinfo'),
             {
-                tablets: 1,
+                tablets: 0,
                 storage: 1,
                 cluster_name: clusterName,
             },
@@ -359,7 +359,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getTopic(
-        {path, database}: {path?: string; database?: string},
+        {path, database}: {path: string; database: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<DescribeTopicResult>(
@@ -374,7 +374,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getConsumer(
-        {path, consumer, database}: {path: string; consumer: string; database?: string},
+        {path, consumer, database}: {path: string; consumer: string; database: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<DescribeConsumerResult>(
@@ -450,6 +450,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             tracingLevel?: TracingLevel;
             transaction_mode?: TransactionMode;
             timeout?: Timeout;
+            query_id?: string;
         },
         {concurrentId, signal, withRetries}: AxiosOptions = {},
     ) {
