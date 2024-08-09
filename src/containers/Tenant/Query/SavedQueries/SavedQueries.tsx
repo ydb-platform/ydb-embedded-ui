@@ -6,16 +6,20 @@ import DataTable from '@gravity-ui/react-data-table';
 import {Button, Dialog, Icon} from '@gravity-ui/uikit';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {Search} from '../../../../components/Search';
+import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {
     deleteSavedQuery,
+    selectSavedQueriesFilter,
     setQueryNameToEdit,
+    setSavedQueriesFilter,
 } from '../../../../store/reducers/queryActions/queryActions';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
-import {useTypedDispatch} from '../../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
 import {useSavedQueries} from '../utils/useSavedQueries';
@@ -64,6 +68,7 @@ interface SavedQueriesProps {
 export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
     const savedQueries = useSavedQueries();
     const dispatch = useTypedDispatch();
+    const filter = useTypedSelector(selectSavedQueriesFilter);
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
     const [queryNameToDelete, setQueryNameToDelete] = React.useState<string>('');
@@ -95,6 +100,10 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
             setIsDeleteDialogVisible(true);
             setQueryNameToDelete(queryName);
         };
+    };
+
+    const onChangeFilter = (value: string) => {
+        dispatch(setSavedQueriesFilter(value));
     };
 
     const columns: Column<SavedQuery>[] = [
@@ -129,21 +138,30 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
 
     return (
         <React.Fragment>
-            <div className={b()}>
-                <ResizeableDataTable
-                    columnsWidthLSKey={SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY}
-                    columns={columns}
-                    data={savedQueries}
-                    settings={QUERY_TABLE_SETTINGS}
-                    emptyDataMessage={i18n('saved.empty')}
-                    rowClassName={() => b('row')}
-                    onRowClick={(row) => onQueryClick(row.body, row.name)}
-                    initialSortOrder={{
-                        columnId: 'name',
-                        order: DataTable.ASCENDING,
-                    }}
-                />
-            </div>
+            <TableWithControlsLayout className={b()}>
+                <TableWithControlsLayout.Controls>
+                    <Search
+                        onChange={onChangeFilter}
+                        placeholder={i18n('filter.text.placeholder')}
+                        className={b('search')}
+                    />
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table>
+                    <ResizeableDataTable
+                        columnsWidthLSKey={SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY}
+                        columns={columns}
+                        data={savedQueries}
+                        settings={QUERY_TABLE_SETTINGS}
+                        emptyDataMessage={i18n(filter ? 'history.empty-search' : 'saved.empty')}
+                        rowClassName={() => b('row')}
+                        onRowClick={(row) => onQueryClick(row.body, row.name)}
+                        initialSortOrder={{
+                            columnId: 'name',
+                            order: DataTable.ASCENDING,
+                        }}
+                    />
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
             <DeleteDialog
                 visible={isDeleteDialogVisible}
                 queryName={queryNameToDelete}

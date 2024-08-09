@@ -25,6 +25,7 @@ const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
+const SET_QUERY_HISTORY_FILTER = 'query/SET_QUERY_HISTORY_FILTER';
 const GO_TO_PREVIOUS_QUERY = 'query/GO_TO_PREVIOUS_QUERY';
 const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
 const SET_TENANT_PATH = 'query/SET_TENANT_PATH';
@@ -47,6 +48,7 @@ const initialState = {
             queriesHistoryInitial.length > MAXIMUM_QUERIES_IN_HISTORY
                 ? MAXIMUM_QUERIES_IN_HISTORY - 1
                 : queriesHistoryInitial.length - 1,
+        filter: '',
     },
 };
 
@@ -121,6 +123,16 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
             return {
                 ...state,
                 tenantPath: action.data,
+            };
+        }
+
+        case SET_QUERY_HISTORY_FILTER: {
+            return {
+                ...state,
+                history: {
+                    ...state.history,
+                    filter: action.data.filter,
+                },
             };
         }
 
@@ -232,8 +244,15 @@ export const setTenantPath = (value: string) => {
     } as const;
 };
 
+export const selectQueriesHistoryFilter = (state: ExecuteQueryStateSlice): string => {
+    return state.executeQuery.history.filter || '';
+};
+
 export const selectQueriesHistory = (state: ExecuteQueryStateSlice): QueryInHistory[] => {
-    return state.executeQuery.history.queries;
+    const items = state.executeQuery.history.queries;
+    const filter = state.executeQuery.history.filter?.toLowerCase();
+
+    return filter ? items.filter((item) => item.queryText.toLowerCase().includes(filter)) : items;
 };
 
 function getQueryInHistory(rawQuery: string | QueryInHistory) {
@@ -244,5 +263,12 @@ function getQueryInHistory(rawQuery: string | QueryInHistory) {
     }
     return rawQuery;
 }
+
+export const setQueryHistoryFilter = (filter: string) => {
+    return {
+        type: SET_QUERY_HISTORY_FILTER,
+        data: {filter},
+    } as const;
+};
 
 export default executeQuery;
