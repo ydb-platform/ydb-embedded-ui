@@ -43,6 +43,7 @@ type RouteSlot = {
     path: string;
     slot: SlotComponent<any>;
     component: React.ComponentType<any>;
+    wrapper?: React.ComponentType<any>;
     exact?: boolean;
 };
 const routesSlots: RouteSlot[] = [
@@ -50,31 +51,37 @@ const routesSlots: RouteSlot[] = [
         path: routes.cluster,
         slot: ClusterSlot,
         component: lazyComponent(() => import('../Cluster/Cluster'), 'Cluster'),
+        wrapper: DataWrapper,
     },
     {
         path: routes.tenant,
         slot: TenantSlot,
         component: lazyComponent(() => import('../Tenant/Tenant'), 'Tenant'),
+        wrapper: DataWrapper,
     },
     {
         path: routes.node,
         slot: NodeSlot,
         component: lazyComponent(() => import('../Node/Node'), 'Node'),
+        wrapper: DataWrapper,
     },
     {
         path: routes.pDisk,
         slot: PDiskPageSlot,
         component: lazyComponent(() => import('../PDiskPage/PDiskPage'), 'PDiskPage'),
+        wrapper: DataWrapper,
     },
     {
         path: routes.vDisk,
         slot: VDiskPageSlot,
         component: lazyComponent(() => import('../VDiskPage/VDiskPage'), 'VDiskPage'),
+        wrapper: DataWrapper,
     },
     {
         path: routes.tablet,
         slot: TabletSlot,
         component: lazyComponent(() => import('../Tablet'), 'Tablet'),
+        wrapper: DataWrapper,
     },
     {
         path: routes.tabletsFilters,
@@ -83,6 +90,7 @@ const routesSlots: RouteSlot[] = [
             () => import('../TabletsFilters/TabletsFilters'),
             'TabletsFilters',
         ),
+        wrapper: DataWrapper,
     },
 ];
 
@@ -105,7 +113,12 @@ function renderRouteSlot(slots: SlotMap, route: RouteSlot) {
                 } else {
                     content = slot.rendered;
                 }
-                return <main className={b('main')}>{content}</main>;
+                const Wrapper = route.wrapper ?? React.Fragment;
+                return (
+                    <main className={b('main')}>
+                        <Wrapper>{content}</Wrapper>
+                    </main>
+                );
             }}
         />
     );
@@ -144,26 +157,30 @@ export function Content(props: ContentProps) {
             {additionalRoutes?.rendered}
             {/* Single cluster routes */}
             <Route key="single-cluster">
-                <GetUser>
-                    <GetNodesList />
-                    <GetCapabilities />
-                    <Header mainPage={mainPage} />
-                    <Switch>
-                        {routesSlots.map((route) => {
-                            return renderRouteSlot(slots, route);
-                        })}
-                        <Route
-                            path={redirectProps.from || redirectProps.path}
-                            exact={redirectProps.exact}
-                            strict={redirectProps.strict}
-                            render={() => (
-                                <Redirect to={redirectProps.to} push={redirectProps.push} />
-                            )}
-                        />
-                    </Switch>
-                </GetUser>
+                <Header mainPage={mainPage} />
+                <Switch>
+                    {routesSlots.map((route) => {
+                        return renderRouteSlot(slots, route);
+                    })}
+                    <Route
+                        path={redirectProps.from || redirectProps.path}
+                        exact={redirectProps.exact}
+                        strict={redirectProps.strict}
+                        render={() => <Redirect to={redirectProps.to} push={redirectProps.push} />}
+                    />
+                </Switch>
             </Route>
         </Switch>
+    );
+}
+
+function DataWrapper({children}: {children: React.ReactNode}) {
+    return (
+        <GetUser>
+            <GetNodesList />
+            <GetCapabilities />
+            {children}
+        </GetUser>
     );
 }
 
