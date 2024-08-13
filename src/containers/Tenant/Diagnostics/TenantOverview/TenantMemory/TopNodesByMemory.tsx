@@ -25,7 +25,7 @@ export function TopNodesByMemory({tenantName, additionalNodesProps}: TopNodesByM
     });
 
     const {currentData, isFetching, error} = topNodesApi.useGetTopNodesQuery(
-        {tenant: tenantName, sortValue: 'Memory'},
+        {tenant: tenantName, sortValue: 'Memory', tablets: true},
         {pollingInterval: autoRefreshInterval},
     );
 

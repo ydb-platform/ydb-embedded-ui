@@ -8,12 +8,13 @@ const getConcurrentId = (limit?: number, offset?: number) => {
 export const getNodes = async ({
     type = 'any',
     storage = false,
+    tablets = true,
     limit,
     offset,
     ...params
 }: NodesApiRequestParams) => {
     const response = await window.api.getNodes(
-        {type, storage, limit, offset, ...params},
+        {type, storage, tablets, limit, offset, ...params},
         {concurrentId: getConcurrentId(limit, offset)},
     );
     const preparedResponse = prepareNodesData(response);

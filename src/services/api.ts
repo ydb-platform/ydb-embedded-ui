@@ -121,8 +121,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         return this.get<TTenantInfo>(
             this.getPath('/viewer/json/tenantinfo'),
             {
-                tablets: 0,
-                storage: 1,
+                tablets: false,
+                storage: true,
                 cluster_name: clusterName,
             },
             {concurrentId, requestConfig: {signal}},
@@ -137,7 +137,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {
                 database,
                 path,
-                tablets: true,
+                tablets: false,
                 storage: true,
             },
             {concurrentId, requestConfig: {signal}},
@@ -147,7 +147,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         {
             visibleEntities,
             type = 'any',
-            tablets = true,
+            tablets = false,
             sortOrder,
             sortValue,
             ...params
