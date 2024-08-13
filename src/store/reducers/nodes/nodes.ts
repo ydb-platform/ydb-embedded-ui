@@ -13,6 +13,7 @@ export const nodesApi = api.injectEndpoints({
                         {
                             type: 'any',
                             storage: false,
+                            tablets: true,
                             ...params,
                         },
                         {signal},
