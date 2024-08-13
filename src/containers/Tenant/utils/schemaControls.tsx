@@ -2,6 +2,7 @@ import {LayoutHeaderCellsLargeFill} from '@gravity-ui/icons';
 import {Button, Icon} from '@gravity-ui/uikit';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
+import {api} from '../../../store/reducers/api';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
@@ -20,6 +21,7 @@ const bindActions = (
 
     return {
         openPreview: () => {
+            dispatch(api.util.invalidateTags(['PreviewData']));
             dispatch(setShowPreview(true));
             dispatch(setTenantPage(TENANT_PAGES_IDS.query));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));

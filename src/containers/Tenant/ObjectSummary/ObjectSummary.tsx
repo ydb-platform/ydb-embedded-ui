@@ -16,6 +16,7 @@ import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {Loader} from '../../../components/Loader';
 import SplitPane from '../../../components/SplitPane';
 import routes, {createExternalUILink, createHref} from '../../../routes';
+import {api} from '../../../store/reducers/api';
 import {setShowPreview, useGetSchemaQuery} from '../../../store/reducers/schema/schema';
 import {
     TENANT_PAGES_IDS,
@@ -327,6 +328,7 @@ export function ObjectSummary({
     };
 
     const onOpenPreview = () => {
+        dispatch(api.util.invalidateTags(['PreviewData']));
         dispatch(setShowPreview(true));
         dispatch(setTenantPage(TENANT_PAGES_IDS.query));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
