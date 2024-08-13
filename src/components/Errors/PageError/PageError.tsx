@@ -34,5 +34,10 @@ export function PageError({title, description, error, children, ...restProps}: P
 }
 
 export function isAccessError(error: unknown) {
-    return Boolean(error && typeof error === 'object' && 'status' in error && error.status === 403);
+    return Boolean(
+        error &&
+            typeof error === 'object' &&
+            'status' in error &&
+            (error.status === 403 || error.status === 401),
+    );
 }
