@@ -9,9 +9,9 @@ import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/cap
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {useQueryExecutionSettings, useTypedDispatch} from '../../../../utils/hooks';
+import {getControls} from '../../utils/controls';
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
-import {getControls} from '../../utils/schemaControls';
 import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
 
 interface SchemaTreeProps {

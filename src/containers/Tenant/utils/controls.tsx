@@ -1,4 +1,5 @@
 import {LayoutHeaderCellsLargeFill} from '@gravity-ui/icons';
+import type {ButtonSize} from '@gravity-ui/uikit';
 import {Button, Icon} from '@gravity-ui/uikit';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
@@ -33,7 +34,11 @@ const bindActions = (
 type Controls = ReturnType<Required<NavigationTreeProps>['renderAdditionalNodeElements']>;
 
 export const getControls =
-    (dispatch: React.Dispatch<any>, additionalEffects: ControlsAdditionalEffects) =>
+    (
+        dispatch: React.Dispatch<any>,
+        additionalEffects: ControlsAdditionalEffects,
+        size?: ButtonSize,
+    ) =>
     (path: string, type: NavigationTreeNodeType) => {
         const options = bindActions(path, dispatch, additionalEffects);
         const openPreview = (
@@ -41,7 +46,7 @@ export const getControls =
                 view="flat-secondary"
                 onClick={options.openPreview}
                 title={i18n('actions.openPreview')}
-                size="s"
+                size={size || 's'}
             >
                 <Icon data={LayoutHeaderCellsLargeFill} />
             </Button>
