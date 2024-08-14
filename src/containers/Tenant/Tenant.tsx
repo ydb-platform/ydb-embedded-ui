@@ -4,6 +4,7 @@ import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {PageError, isAccessError} from '../../components/Errors/PageError/PageError';
+import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {useGetSchemaQuery} from '../../store/reducers/schema/schema';
@@ -73,7 +74,7 @@ export function Tenant(props: TenantProps) {
 
     const path = schema ?? tenantName;
 
-    const {data: currentItem, error} = useGetSchemaQuery({path, database: tenantName});
+    const {data: currentItem, error, isLoading} = useGetSchemaQuery({path, database: tenantName});
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
         currentItem?.PathDescription?.Self || {};
 
@@ -97,35 +98,37 @@ export function Tenant(props: TenantProps) {
                 defaultTitle={`${title} — YDB Monitoring`}
                 titleTemplate={`%s — ${title} — YDB Monitoring`}
             />
-            <PageError error={showBlockingError ? error : undefined}>
-                <SplitPane
-                    defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                    defaultSizes={[25, 75]}
-                    triggerCollapse={summaryVisibilityState.triggerCollapse}
-                    triggerExpand={summaryVisibilityState.triggerExpand}
-                    minSize={[36, 200]}
-                    onSplitStartDragAdditional={onSplitStartDragAdditional}
-                >
-                    <ObjectSummary
-                        type={currentPathType}
-                        subType={currentPathSubType}
-                        tenantName={tenantName}
-                        path={path}
-                        onCollapseSummary={onCollapseSummaryHandler}
-                        onExpandSummary={onExpandSummaryHandler}
-                        isCollapsed={summaryVisibilityState.collapsed}
-                    />
-                    <div className={b('main')}>
-                        <ObjectGeneral
+            <LoaderWrapper loading={isLoading}>
+                <PageError error={showBlockingError ? error : undefined}>
+                    <SplitPane
+                        defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                        defaultSizes={[25, 75]}
+                        triggerCollapse={summaryVisibilityState.triggerCollapse}
+                        triggerExpand={summaryVisibilityState.triggerExpand}
+                        minSize={[36, 200]}
+                        onSplitStartDragAdditional={onSplitStartDragAdditional}
+                    >
+                        <ObjectSummary
                             type={currentPathType}
-                            additionalTenantProps={props.additionalTenantProps}
-                            additionalNodesProps={props.additionalNodesProps}
+                            subType={currentPathSubType}
                             tenantName={tenantName}
                             path={path}
+                            onCollapseSummary={onCollapseSummaryHandler}
+                            onExpandSummary={onExpandSummaryHandler}
+                            isCollapsed={summaryVisibilityState.collapsed}
                         />
-                    </div>
-                </SplitPane>
-            </PageError>
+                        <div className={b('main')}>
+                            <ObjectGeneral
+                                type={currentPathType}
+                                additionalTenantProps={props.additionalTenantProps}
+                                additionalNodesProps={props.additionalNodesProps}
+                                tenantName={tenantName}
+                                path={path}
+                            />
+                        </div>
+                    </SplitPane>
+                </PageError>
+            </LoaderWrapper>
         </div>
     );
 }
