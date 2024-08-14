@@ -11,6 +11,7 @@ export const schemaAclApi = api.injectEndpoints({
                             acl: data.Common.ACL,
                             effectiveAcl: data.Common.EffectiveACL,
                             owner: data.Common.Owner,
+                            interruptInheritance: data.Common.InterruptInheritance,
                         },
                     };
                 } catch (error) {

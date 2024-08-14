@@ -1,8 +1,7 @@
 import React from 'react';
 
 import {HelpPopover} from '@gravity-ui/components';
-import {LayoutHeaderCellsLargeFill} from '@gravity-ui/icons';
-import {Button, Icon, Tabs} from '@gravity-ui/uikit';
+import {Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
 import {Link, useLocation} from 'react-router-dom';
 import {StringParam, useQueryParam} from 'use-query-params';
@@ -16,13 +15,9 @@ import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {Loader} from '../../../components/Loader';
 import SplitPane from '../../../components/SplitPane';
 import routes, {createExternalUILink, createHref} from '../../../routes';
-import {setShowPreview, useGetSchemaQuery} from '../../../store/reducers/schema/schema';
-import {
-    TENANT_PAGES_IDS,
-    TENANT_QUERY_TABS_ID,
-    TENANT_SUMMARY_TABS_IDS,
-} from '../../../store/reducers/tenant/constants';
-import {setQueryTab, setSummaryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import {useGetSchemaQuery} from '../../../store/reducers/schema/schema';
+import {TENANT_SUMMARY_TABS_IDS} from '../../../store/reducers/tenant/constants';
+import {setSummaryTab} from '../../../store/reducers/tenant/tenant';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 import {
@@ -41,6 +36,7 @@ import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
 import i18n from '../i18n';
+import {getSummaryControls} from '../utils/controls';
 import {
     PaneVisibilityActionTypes,
     PaneVisibilityToggleButtons,
@@ -84,6 +80,7 @@ export function ObjectSummary({
     isCollapsed,
 }: ObjectSummaryProps) {
     const dispatch = useTypedDispatch();
+    const [, setCurrentPath] = useQueryParam('schema', StringParam);
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED),
         undefined,
@@ -326,25 +323,16 @@ export function ObjectSummary({
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.clear);
     };
 
-    const onOpenPreview = () => {
-        dispatch(setShowPreview(true));
-        dispatch(setTenantPage(TENANT_PAGES_IDS.query));
-        dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-    };
-
     const renderCommonInfoControls = () => {
         const showPreview = isTableType(type) && !isIndexTableType(subType);
         return (
             <React.Fragment>
-                {showPreview && (
-                    <Button
-                        view="flat-secondary"
-                        onClick={onOpenPreview}
-                        title={i18n('summary.showPreview')}
-                    >
-                        <Icon data={LayoutHeaderCellsLargeFill} />
-                    </Button>
-                )}
+                {showPreview &&
+                    getSummaryControls(
+                        dispatch,
+                        {setActivePath: setCurrentPath},
+                        'm',
+                    )(path, 'preview')}
                 <ClipboardButton
                     text={path}
                     view="flat-secondary"
