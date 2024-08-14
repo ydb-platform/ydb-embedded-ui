@@ -2,6 +2,8 @@ import React from 'react';
 
 import {DefinitionList} from '@gravity-ui/components';
 import type {DefinitionListItem} from '@gravity-ui/components';
+import {SquareCheck} from '@gravity-ui/icons';
+import {Icon} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
@@ -94,6 +96,7 @@ function getAclListItems(acl?: TACE[]): DefinitionListItem[] {
             return {
                 name: Subject,
                 content: <DefinitionValue value={definedDataEntries[0][1]} />,
+                multilineName: true,
             };
         }
         return {
@@ -105,6 +108,7 @@ function getAclListItems(acl?: TACE[]): DefinitionListItem[] {
                         return {
                             name: aclParamToName[key],
                             content: <DefinitionValue value={value} />,
+                            multilineName: true,
                         };
                     }
                     return undefined;
@@ -121,8 +125,22 @@ function getOwnerItem(owner?: string): DefinitionListItem[] {
     }
     return [
         {
-            name: <span className={b('owner')}>{preparedOwner}</span>,
-            content: <span className={b('owner')}>{i18n('title_owner')}</span>,
+            name: preparedOwner,
+            content: i18n('title_owner'),
+            multilineName: true,
+        },
+    ];
+}
+
+function getInterruptInheritanceItem(flag?: boolean): DefinitionListItem[] {
+    if (!flag) {
+        return [];
+    }
+    return [
+        {
+            name: i18n('title_interupt-inheritance'),
+            content: <Icon data={SquareCheck} size={20} />,
+            multilineName: true,
         },
     ];
 }
@@ -132,12 +150,14 @@ export const Acl = ({path, database}: {path: string; database: string}) => {
 
     const loading = isFetching && !currentData;
 
-    const {acl, effectiveAcl, owner} = currentData || {};
+    const {acl, effectiveAcl, owner, interruptInheritance} = currentData || {};
 
     const aclListItems = getAclListItems(acl);
     const effectiveAclListItems = getAclListItems(effectiveAcl);
 
     const ownerItem = getOwnerItem(owner);
+
+    const interruptInheritanceItem = getInterruptInheritanceItem(interruptInheritance);
 
     if (loading) {
         return <Loader />;
@@ -155,26 +175,34 @@ export const Acl = ({path, database}: {path: string; database: string}) => {
 
     return (
         <div className={b()}>
-            {accessRightsItems.length ? (
-                <React.Fragment>
-                    <div className={b('list-title')}>{i18n('title_rights')}</div>
-                    <DefinitionList
-                        items={accessRightsItems}
-                        nameMaxWidth={200}
-                        className={b('result')}
-                    />
-                </React.Fragment>
-            ) : null}
-            {effectiveAclListItems.length ? (
-                <React.Fragment>
-                    <div className={b('list-title')}>{i18n('title_effective-rights')}</div>
-                    <DefinitionList
-                        items={effectiveAclListItems}
-                        nameMaxWidth={200}
-                        className={b('result')}
-                    />
-                </React.Fragment>
-            ) : null}
+            <AclDefinitionList items={interruptInheritanceItem} />
+            <AclDefinitionList items={accessRightsItems} title={i18n('title_rights')} />
+            <AclDefinitionList
+                items={effectiveAclListItems}
+                title={i18n('title_effective-rights')}
+            />
         </div>
     );
 };
+
+interface AclDefinitionListProps {
+    items: DefinitionListItem[];
+    title?: string;
+}
+
+function AclDefinitionList({items, title}: AclDefinitionListProps) {
+    if (!items.length) {
+        return null;
+    }
+    return (
+        <React.Fragment>
+            {title && <div className={b('list-title')}>{title}</div>}
+            <DefinitionList
+                items={items}
+                nameMaxWidth={200}
+                className={b('result', {'no-title': !title})}
+                responsive
+            />
+        </React.Fragment>
+    );
+}
