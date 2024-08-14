@@ -5,29 +5,29 @@ import type {FetchData, PaginatedTableData, SortParams} from '../../components/P
 import {api} from './api';
 
 interface PaginatedTableParams<T, F> {
-    id: number;
+    offset: number;
     fetchData: FetchData<T, F>;
     filters: F;
-    chunkSize: number;
+    limit: number;
     sortParams?: SortParams;
+    tableName: string;
 }
 
 function endpoints<T, F>(build: EndpointBuilder<BaseQueryFn, string, string>) {
     return {
         fetchTableChunk: build.query<PaginatedTableData<T>, PaginatedTableParams<T, F>>({
-            queryFn: async ({id, chunkSize, sortParams, filters, fetchData}, {signal}) => {
+            queryFn: async ({offset, limit, sortParams, filters, fetchData}, {signal}) => {
                 try {
-                    const offset = id * chunkSize;
-                    const response = await fetchData(
-                        chunkSize,
+                    const response = await fetchData({
+                        limit,
                         offset,
                         filters,
                         sortParams,
                         signal,
-                    );
+                    });
                     return {data: response};
-                } catch (error: unknown) {
-                    return {error};
+                } catch (error) {
+                    return {error: error};
                 }
             },
             providesTags: ['All'],

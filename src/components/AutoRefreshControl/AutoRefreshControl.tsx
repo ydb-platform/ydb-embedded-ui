@@ -13,10 +13,9 @@ const b = cn('auto-refresh-control');
 
 interface AutoRefreshControlProps {
     className?: string;
-    selectClassName?: string;
 }
 
-export function AutoRefreshControl({className, selectClassName}: AutoRefreshControlProps) {
+export function AutoRefreshControl({className}: AutoRefreshControlProps) {
     const dispatch = useTypedDispatch();
     const [autoRefreshInterval, setAutoRefreshInterval] = useAutoRefreshInterval();
     return (
@@ -38,7 +37,6 @@ export function AutoRefreshControl({className, selectClassName}: AutoRefreshCont
                     setAutoRefreshInterval(Number(v));
                 }}
                 width={85}
-                className={selectClassName}
             >
                 <Select.Option value="0">{i18n('None')}</Select.Option>
                 <Select.Option value="15000">{i18n('15 sec')}</Select.Option>

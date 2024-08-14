@@ -1,19 +1,10 @@
 import React from 'react';
 
-import type {
-    FetchData,
-    RenderControls,
-    RenderErrorMessage,
-} from '../../../components/PaginatedTable';
+import type {RenderControls, RenderErrorMessage} from '../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import type {
-    PreparedStorageGroup,
-    PreparedStorageGroupFilters,
-    VisibleEntities,
-} from '../../../store/reducers/storage/types';
+import type {VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesMap} from '../../../types/store/nodesList';
-import type {StorageSortValue} from '../../../utils/storage';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {getStorageGroups} from './getGroups';
@@ -52,22 +43,6 @@ export const PaginatedStorageGroups = ({
         return {searchValue, visibleEntities, tenant, nodeId};
     }, [searchValue, visibleEntities, tenant, nodeId]);
 
-    const fetchData = React.useCallback<
-        FetchData<PreparedStorageGroup, PreparedStorageGroupFilters>
-    >(async (limit, offset, filters, {sortOrder, columnId} = {}) => {
-        return await getStorageGroups({
-            limit,
-            offset,
-            filter: filters?.searchValue,
-            visibleEntities: filters?.visibleEntities,
-            tenant: filters?.tenant,
-            nodeId: filters?.nodeId,
-
-            sortOrder,
-            sortValue: columnId as StorageSortValue,
-        });
-    }, []);
-
     const columns = React.useMemo(() => {
         return getPreparedStorageGroupsColumns(nodesMap, visibleEntities);
     }, [nodesMap, visibleEntities]);
@@ -90,12 +65,13 @@ export const PaginatedStorageGroups = ({
             columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
             parentContainer={parentContainer}
             columns={columns}
-            fetchData={fetchData}
+            fetchData={getStorageGroups}
             limit={50}
             renderControls={renderControls}
             renderErrorMessage={renderErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
             filters={tableFilters}
+            tableName="storage-groups"
         />
     );
 };

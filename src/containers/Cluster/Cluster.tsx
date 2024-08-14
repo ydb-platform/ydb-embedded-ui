@@ -148,10 +148,7 @@ export function Cluster({
 
             <div>
                 <div className={b('sticky-wrapper')}>
-                    <AutoRefreshControl
-                        className={b('auto-refresh-control')}
-                        selectClassName={b('auto-refresh-select')}
-                    />
+                    <AutoRefreshControl className={b('auto-refresh-control')} />
                 </div>
                 <Switch>
                     <Route

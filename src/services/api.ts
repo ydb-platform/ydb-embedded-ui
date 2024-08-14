@@ -53,7 +53,7 @@ import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
 
-export type AxiosOptions = {
+type AxiosOptions = {
     concurrentId?: string;
     signal?: AbortSignal;
     withRetries?: boolean;

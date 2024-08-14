@@ -1,6 +1,6 @@
 import {Label} from '@gravity-ui/uikit';
 
-import {cn} from '../../lib';
+import {cn} from '../../utils/cn';
 
 import i18n from './i18n';
 

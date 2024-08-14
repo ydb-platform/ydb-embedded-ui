@@ -27,6 +27,7 @@ export interface PaginatedTableProps<T, F> {
     limit: number;
     fetchData: FetchData<T, F>;
     filters?: F;
+    tableName: string;
     columns: Column<T>[];
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
@@ -42,6 +43,7 @@ export const PaginatedTable = <T, F>({
     limit,
     fetchData,
     filters,
+    tableName,
     columns,
     getRowClassName,
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
@@ -60,7 +62,7 @@ export const PaginatedTable = <T, F>({
 
     const tableContainer = React.useRef<HTMLDivElement>(null);
 
-    const handleDataFetched = React.useCallback((_id: number, total: number, found: number) => {
+    const handleDataFetched = React.useCallback((total: number, found: number) => {
         setTotalEntities(total);
         setFoundEntities(found);
         setIsInitialLoad(false);
@@ -97,23 +99,27 @@ export const PaginatedTable = <T, F>({
 
         if (!isInitialLoad && foundEntities === 0) {
             return (
-                <EmptyTableRow columns={columns}>
-                    {renderEmptyDataMessage ? renderEmptyDataMessage() : i18n('empty')}
-                </EmptyTableRow>
+                <tbody>
+                    <EmptyTableRow columns={columns}>
+                        {renderEmptyDataMessage ? renderEmptyDataMessage() : i18n('empty')}
+                    </EmptyTableRow>
+                </tbody>
             );
         }
 
-        const chunksCount = Math.ceil(totalEntities / limit);
+        const totalLength = foundEntities || limit;
+        const chunksCount = Math.ceil(totalLength / limit);
 
         return getArray(chunksCount).map((value) => (
             <TableChunk<T, F>
                 key={value}
                 id={value}
-                chunkSize={limit}
+                limit={limit}
                 rowHeight={rowHeight}
                 columns={columns}
                 fetchData={fetchData}
                 filters={filters}
+                tableName={tableName}
                 sortParams={sortParams}
                 getRowClassName={getRowClassName}
                 renderErrorMessage={renderErrorMessage}
