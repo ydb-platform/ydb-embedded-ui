@@ -332,7 +332,7 @@ export function ObjectSummary({
                         dispatch,
                         {setActivePath: setCurrentPath},
                         'm',
-                    )(path, 'summary_preview')}
+                    )(path, 'preview')}
                 <ClipboardButton
                     text={path}
                     view="flat-secondary"

@@ -33,7 +33,7 @@ const bindActions = (
 
 type Controls = ReturnType<Required<NavigationTreeProps>['renderAdditionalNodeElements']>;
 
-type SummaryType = 'summary_preview';
+type SummaryType = 'preview';
 
 const getPreviewControl = (options: ReturnType<typeof bindActions>, size?: ButtonSize) => {
     return (
@@ -92,7 +92,7 @@ export const getSummaryControls =
         const options = bindActions(path, dispatch, additionalEffects);
         const openPreview = getPreviewControl(options, size);
 
-        const summaryControls: Record<SummaryType, Controls> = {summary_preview: openPreview};
+        const summaryControls: Record<SummaryType, Controls> = {preview: openPreview};
 
         return summaryControls[type];
     };
