@@ -33,7 +33,22 @@ const bindActions = (
 
 type Controls = ReturnType<Required<NavigationTreeProps>['renderAdditionalNodeElements']>;
 
-export const getControls =
+type SummaryType = 'summary_preview';
+
+const getPreviewControl = (options: ReturnType<typeof bindActions>, size?: ButtonSize) => {
+    return (
+        <Button
+            view="flat-secondary"
+            onClick={options.openPreview}
+            title={i18n('actions.openPreview')}
+            size={size || 's'}
+        >
+            <Icon data={LayoutHeaderCellsLargeFill} />
+        </Button>
+    );
+};
+
+export const getSchemaControls =
     (
         dispatch: React.Dispatch<any>,
         additionalEffects: ControlsAdditionalEffects,
@@ -41,16 +56,7 @@ export const getControls =
     ) =>
     (path: string, type: NavigationTreeNodeType) => {
         const options = bindActions(path, dispatch, additionalEffects);
-        const openPreview = (
-            <Button
-                view="flat-secondary"
-                onClick={options.openPreview}
-                title={i18n('actions.openPreview')}
-                size={size || 's'}
-            >
-                <Icon data={LayoutHeaderCellsLargeFill} />
-            </Button>
-        );
+        const openPreview = getPreviewControl(options, size);
 
         const nodeTypeToControls: Record<NavigationTreeNodeType, Controls> = {
             async_replication: undefined,
@@ -74,4 +80,19 @@ export const getControls =
         };
 
         return nodeTypeToControls[type];
+    };
+
+export const getSummaryControls =
+    (
+        dispatch: React.Dispatch<any>,
+        additionalEffects: ControlsAdditionalEffects,
+        size?: ButtonSize,
+    ) =>
+    (path: string, type: SummaryType) => {
+        const options = bindActions(path, dispatch, additionalEffects);
+        const openPreview = getPreviewControl(options, size);
+
+        const summaryControls: Record<SummaryType, Controls> = {summary_preview: openPreview};
+
+        return summaryControls[type];
     };

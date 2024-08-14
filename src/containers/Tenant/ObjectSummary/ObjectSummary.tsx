@@ -36,7 +36,7 @@ import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
 import i18n from '../i18n';
-import {getControls} from '../utils/controls';
+import {getSummaryControls} from '../utils/controls';
 import {
     PaneVisibilityActionTypes,
     PaneVisibilityToggleButtons,
@@ -328,7 +328,11 @@ export function ObjectSummary({
         return (
             <React.Fragment>
                 {showPreview &&
-                    getControls(dispatch, {setActivePath: setCurrentPath}, 'm')(path, 'view')}
+                    getSummaryControls(
+                        dispatch,
+                        {setActivePath: setCurrentPath},
+                        'm',
+                    )(path, 'summary_preview')}
                 <ClipboardButton
                     text={path}
                     view="flat-secondary"
