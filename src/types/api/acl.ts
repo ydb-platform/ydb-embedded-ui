@@ -15,6 +15,7 @@ export interface TMetaCommonInfo {
     Owner?: string;
     ACL?: TACE[];
     EffectiveACL?: TACE[];
+    InterruptInheritance?: boolean;
 }
 
 export interface TACE {
