@@ -79,7 +79,7 @@ export const PaginatedTable = <T, F>({
     const observer = useIntersectionObserver({onEntry, onLeave, parentContainer});
 
     // reset table on filters change
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
         setTotalEntities(limit);
         setFoundEntities(0);
         setIsInitialLoad(true);

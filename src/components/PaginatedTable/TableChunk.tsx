@@ -45,37 +45,37 @@ export const TableChunk = <T, F>({
 }: TableChunkProps<T, F>) => {
     const ref = React.useRef<HTMLTableSectionElement>(null);
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
-    const timeoutRef = React.useRef(0);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const {currentData, error} = tableDataApi.useFetchTableChunkQuery(
-        {
-            offset: id * limit,
-            limit,
-            fetchData: fetchData as FetchData<T, unknown>,
-            filters,
-            sortParams,
-            tableName,
-        },
-        {
-            skip: isTimeoutActive || !isActive,
-            pollingInterval: autoRefreshInterval,
-        },
-    );
+    const queryParams = {
+        offset: id * limit,
+        limit,
+        fetchData: fetchData as FetchData<T, unknown>,
+        filters,
+        sortParams,
+        tableName,
+    };
+
+    tableDataApi.useFetchTableChunkQuery(queryParams, {
+        skip: isTimeoutActive || !isActive,
+        pollingInterval: autoRefreshInterval,
+    });
+
+    const {currentData, error} = tableDataApi.endpoints.fetchTableChunk.useQueryState(queryParams);
 
     React.useEffect(() => {
-        window.clearTimeout(timeoutRef.current);
+        let timeout = 0;
 
-        if (isActive) {
-            timeoutRef.current = window.setTimeout(() => {
+        if (isActive && isTimeoutActive) {
+            timeout = window.setTimeout(() => {
                 setIsTimeoutActive(false);
             }, DEBOUNCE_TIMEOUT);
         }
 
         return () => {
-            window.clearTimeout(timeoutRef.current);
+            window.clearTimeout(timeout);
         };
-    }, [isActive]);
+    }, [isActive, isTimeoutActive]);
 
     React.useEffect(() => {
         const el = ref.current;
@@ -127,7 +127,7 @@ export const TableChunk = <T, F>({
             }
         }
 
-        return currentData?.data.map((rowData, index) => (
+        return currentData.data.map((rowData, index) => (
             <TableRow
                 key={index}
                 index={index}
