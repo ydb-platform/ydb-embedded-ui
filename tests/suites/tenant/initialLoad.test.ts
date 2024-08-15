@@ -10,7 +10,7 @@ const pageQueryParams = {
     tenantPage: 'diagnostics',
 };
 
-test.describe.only('Tenant initial load', () => {
+test.describe('Tenant initial load', () => {
     test('Tenant diagnostics page is visible', async ({page}) => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
