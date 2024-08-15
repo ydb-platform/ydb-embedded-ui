@@ -1,5 +1,25 @@
 # Changelog
 
+## [6.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.14.1...v6.15.0) (2024-08-14)
+
+
+### Features
+
+* **Acl:** support InterruptInheritance, fix styles ([#1154](https://github.com/ydb-platform/ydb-embedded-ui/issues/1154)) ([89804af](https://github.com/ydb-platform/ydb-embedded-ui/commit/89804aff8397e2f9ae4fee02396bdaf6acae6de3))
+* search in queries history & saved ([#1127](https://github.com/ydb-platform/ydb-embedded-ui/issues/1127)) ([efd5813](https://github.com/ydb-platform/ydb-embedded-ui/commit/efd5813bcea7777eb3f4bde10de3b1f28f724502))
+* table preview doesnt update on click ([#1152](https://github.com/ydb-platform/ydb-embedded-ui/issues/1152)) ([512786c](https://github.com/ydb-platform/ydb-embedded-ui/commit/512786ccabcd866a21d69c2e12564c9b198c8132))
+
+
+### Bug Fixes
+
+* completed query status on page load ([#1132](https://github.com/ydb-platform/ydb-embedded-ui/issues/1132)) ([2fa6922](https://github.com/ydb-platform/ydb-embedded-ui/commit/2fa69229e40103750b7ded1ef828665e7a6aa082))
+* **CriticalActionDialog:** increase padding-top ([#1149](https://github.com/ydb-platform/ydb-embedded-ui/issues/1149)) ([aa1f0a2](https://github.com/ydb-platform/ydb-embedded-ui/commit/aa1f0a228a3c95c65e3deada0ea0b11be958022f))
+* detect object that looks like axios error ([#1145](https://github.com/ydb-platform/ydb-embedded-ui/issues/1145)) ([085e116](https://github.com/ydb-platform/ydb-embedded-ui/commit/085e116ff62f0ce022c3df047e2273e190fe5999))
+* do not show Authentication page before redirect ([#1139](https://github.com/ydb-platform/ydb-embedded-ui/issues/1139)) ([e266c8f](https://github.com/ydb-platform/ydb-embedded-ui/commit/e266c8fc95fef4f9e34d56f82cd57c0b20b89ff6))
+* don't show data for un auth user ([#1150](https://github.com/ydb-platform/ydb-embedded-ui/issues/1150)) ([bc17fa4](https://github.com/ydb-platform/ydb-embedded-ui/commit/bc17fa459375611c8a8863a028bc57459410e8df))
+* remove tablets from some api handlers ([#1148](https://github.com/ydb-platform/ydb-embedded-ui/issues/1148)) ([b05bff3](https://github.com/ydb-platform/ydb-embedded-ui/commit/b05bff3b20c364b218c3d6f71061570cc6779f39))
+* **VDiskInfo:** hide developer ui link for users with viewer rights ([#1137](https://github.com/ydb-platform/ydb-embedded-ui/issues/1137)) ([86104e3](https://github.com/ydb-platform/ydb-embedded-ui/commit/86104e31a6ba335c33a481b322d429205732641b))
+
 ## [6.14.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.14.0...v6.14.1) (2024-08-07)
 
 
