@@ -13,7 +13,9 @@ import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants'
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {QueryInHistory} from '../../../../types/store/executeQuery';
 import {cn} from '../../../../utils/cn';
+import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
 
@@ -46,7 +48,7 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const columns: Column<QueryInHistory>[] = [
         {
             name: 'queryText',
-            header: 'Query Text',
+            header: i18n('history.queryText'),
             render: ({row}) => {
                 return (
                     <div className={b('query')}>
@@ -56,6 +58,23 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
             },
             sortable: false,
             width: 600,
+        },
+        {
+            name: 'EndTime',
+            header: i18n('history.endTime'),
+            render: ({row}) =>
+                row.endTime ? formatDateTime(new Date(row.endTime as string).getTime()) : '-',
+            align: 'right',
+            width: 200,
+            sortable: false,
+        },
+        {
+            name: 'Duration',
+            header: i18n('history.duration'),
+            render: ({row}) => (row.duration ? formatToMs(parseUsToMs(row.duration)) : '-'),
+            align: 'right',
+            width: 150,
+            sortable: false,
         },
     ];
 

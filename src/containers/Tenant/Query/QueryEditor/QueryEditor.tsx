@@ -16,6 +16,7 @@ import {
     goToPreviousQuery,
     saveQueryToHistory,
     setTenantPath,
+    updateQueryInHistory,
 } from '../../../../store/reducers/executeQuery';
 import {explainQueryApi} from '../../../../store/reducers/explainQuery/explainQuery';
 import type {PreparedExplainResponse} from '../../../../store/reducers/explainQuery/types';
@@ -84,6 +85,7 @@ interface QueryEditorProps {
     showPreview: boolean;
     setShowPreview: (...args: Parameters<typeof setShowPreview>) => void;
     saveQueryToHistory: (...args: Parameters<typeof saveQueryToHistory>) => void;
+    updateQueryInHistory: (...args: Parameters<typeof updateQueryInHistory>) => void;
 }
 
 function QueryEditor(props: QueryEditorProps) {
@@ -170,6 +172,10 @@ function QueryEditor(props: QueryEditorProps) {
             schema,
             enableTracingLevel,
             queryId,
+        }).then((res) => {
+            if ('data' in res) {
+                props.updateQueryInHistory(res.data.stats, queryId);
+            }
         });
         setIsResultLoaded(true);
         props.setShowPreview(false);
@@ -179,7 +185,7 @@ function QueryEditor(props: QueryEditorProps) {
         if (!text) {
             const {queries, currentIndex} = history;
             if (query !== queries[currentIndex]?.queryText) {
-                props.saveQueryToHistory(input);
+                props.saveQueryToHistory(input, queryId);
             }
         }
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
@@ -413,6 +419,7 @@ const mapStateToProps = (state: RootState) => {
 
 const mapDispatchToProps = {
     saveQueryToHistory,
+    updateQueryInHistory,
     goToPreviousQuery,
     goToNextQuery,
     setShowPreview,
