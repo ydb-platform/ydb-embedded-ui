@@ -3,13 +3,13 @@ import React from 'react';
 import {Dialog, Link as ExternalLink, Flex, TextInput} from '@gravity-ui/uikit';
 import {Controller, useForm} from 'react-hook-form';
 
-import {ENABLE_TRACING_LEVEL_KEY} from '../../../../lib';
 import {
     selectQueryAction,
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
 import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {ENABLE_TRACING_LEVEL_KEY} from '../../../../utils/constants';
 import {
     useQueryExecutionSettings,
     useSetting,
