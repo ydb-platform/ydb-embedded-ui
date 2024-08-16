@@ -12,15 +12,16 @@ function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWi
     });
 }
 
-interface ResizeablePaginatedTableProps<T> extends Omit<PaginatedTableProps<T>, 'onColumnsResize'> {
+interface ResizeablePaginatedTableProps<T, F>
+    extends Omit<PaginatedTableProps<T, F>, 'onColumnsResize'> {
     columnsWidthLSKey: string;
 }
 
-export function ResizeablePaginatedTable<T>({
+export function ResizeablePaginatedTable<T, F>({
     columnsWidthLSKey,
     columns,
     ...props
-}: ResizeablePaginatedTableProps<T>) {
+}: ResizeablePaginatedTableProps<T, F>) {
     const [tableColumnsWidth, setTableColumnsWidth] = useTableResize(columnsWidthLSKey);
 
     const updatedColumns = updateColumnsWidth(columns, tableColumnsWidth);

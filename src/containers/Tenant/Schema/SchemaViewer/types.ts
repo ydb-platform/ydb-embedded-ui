@@ -12,7 +12,7 @@ export interface SchemaData {
     familyName?: string;
     prefferedPoolKind?: string;
     columnCodec?: string;
-    defaultValue?: string;
+    defaultValue?: string | number | boolean;
 }
 
 export interface SchemaColumn extends Column<SchemaData> {

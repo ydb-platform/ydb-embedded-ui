@@ -1,6 +1,10 @@
 import {Label} from '@gravity-ui/uikit';
 
+import {cn} from '../../utils/cn';
+
 import i18n from './i18n';
+
+const b = cn('ydb-entities-count');
 
 interface EntitiesCountProps {
     current: number | string;
@@ -28,7 +32,7 @@ export const EntitiesCount = ({total, current, label, loading, className}: Entit
     }
 
     return (
-        <Label theme="info" size="m" className={className}>
+        <Label theme="info" size="m" className={b(null, className)}>
             {content}
         </Label>
     );
