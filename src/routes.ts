@@ -105,3 +105,7 @@ export function getVDiskPagePath(
 ) {
     return createHref(routes.vDisk, undefined, {...query, nodeId, pDiskId, vDiskSlotId});
 }
+
+export function getTabletPagePath(tabletId: string | number, query: Query = {}) {
+    return createHref(routes.tablet, {id: tabletId}, {...query});
+}

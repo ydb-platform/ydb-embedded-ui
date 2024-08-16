@@ -1,16 +1,19 @@
 @import '../../styles//mixins.scss';
 
 .ydb-page-meta {
-    display: flex;
-    flex-flow: row nowrap;
+    &__info {
+        display: flex;
+        flex-grow: 1;
+        flex-flow: row nowrap;
 
-    height: var(--g-text-body-2-line-height);
+        height: var(--g-text-body-2-line-height);
 
-    text-wrap: nowrap;
+        text-wrap: nowrap;
 
-    color: var(--g-color-text-primary);
+        color: var(--g-color-text-primary);
 
-    @include body-2-typography();
+        @include body-2-typography();
+    }
 
     &__skeleton {
         width: 80%;
