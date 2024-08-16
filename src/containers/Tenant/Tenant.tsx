@@ -91,6 +91,11 @@ export function Tenant(props: TenantProps) {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.clear);
     };
 
+    const [initialLoading, setInitialLoading] = React.useState(true);
+    if (initialLoading && !isLoading) {
+        setInitialLoading(false);
+    }
+
     const title = path || i18n('page.title');
     return (
         <div className={b()}>
@@ -98,7 +103,7 @@ export function Tenant(props: TenantProps) {
                 defaultTitle={`${title} — YDB Monitoring`}
                 titleTemplate={`%s — ${title} — YDB Monitoring`}
             />
-            <LoaderWrapper loading={isLoading}>
+            <LoaderWrapper loading={initialLoading}>
                 <PageError error={showBlockingError ? error : undefined}>
                     <SplitPane
                         defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}

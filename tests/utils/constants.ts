@@ -8,3 +8,6 @@ export const tenantPage = 'tenant';
 
 // Entities
 export const tenantName = '/local';
+
+// URLs
+export const backend = process.env.PLAYWRIGHT_APP_BACKEND || 'http://localhost:8765';
