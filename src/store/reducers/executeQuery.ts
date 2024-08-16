@@ -195,7 +195,7 @@ export const executeQueryApi = api.injectEndpoints({
                     enableTracingLevel,
                     queryId,
                 },
-                {signal},
+                {signal, dispatch},
             ) => {
                 let action: ExecuteActions = 'execute';
                 let syntax: QuerySyntax = QUERY_SYNTAX.yql;
@@ -234,6 +234,8 @@ export const executeQueryApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
+
+                    dispatch(updateQueryInHistory(data.stats, queryId));
                     return {data};
                 } catch (error) {
                     return {error};
@@ -251,12 +253,12 @@ export const saveQueryToHistory = (queryText: string, queryId: string) => {
     } as const;
 };
 
-export const updateQueryInHistory = (stats: IQueryResult['stats'], queryId: string) => {
+export function updateQueryInHistory(stats: IQueryResult['stats'], queryId: string) {
     return {
         type: UPDATE_QUERY_IN_HISTORY,
         data: {queryId, stats},
     } as const;
-};
+}
 
 export const goToPreviousQuery = () => {
     return {
