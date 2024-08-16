@@ -1,5 +1,16 @@
 # Changelog
 
+## [6.15.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.15.0...v6.15.1) (2024-08-16)
+
+
+### Bug Fixes
+
+* **api:** do not duplicate request params on retry ([#1105](https://github.com/ydb-platform/ydb-embedded-ui/issues/1105)) ([0580adc](https://github.com/ydb-platform/ydb-embedded-ui/commit/0580adc64a37c6ef6b776a9499a6b10fffa926d9))
+* autorefresh control doesnt update info tab in diagnostics ([#1163](https://github.com/ydb-platform/ydb-embedded-ui/issues/1163)) ([ac380ba](https://github.com/ydb-platform/ydb-embedded-ui/commit/ac380ba2394351610d1ca3873825d08b0749f5ab))
+* base64 flag both in sendQuery params and body ([#1172](https://github.com/ydb-platform/ydb-embedded-ui/issues/1172)) ([57f393b](https://github.com/ydb-platform/ydb-embedded-ui/commit/57f393b140a9bd4bfad13a48f6184591ba43a997))
+* **Preview:** remove wrong and stale styles ([#1162](https://github.com/ydb-platform/ydb-embedded-ui/issues/1162)) ([8134a64](https://github.com/ydb-platform/ydb-embedded-ui/commit/8134a64857bff8d6d76a8a23889dad42ed3c3a66))
+* **Tenant:** fix infinite load if describe returns empty data ([#1167](https://github.com/ydb-platform/ydb-embedded-ui/issues/1167)) ([8535629](https://github.com/ydb-platform/ydb-embedded-ui/commit/853562925727e5334750f6e5a2e1e398c2a17623))
+
 ## [6.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.14.1...v6.15.0) (2024-08-14)
 
 
