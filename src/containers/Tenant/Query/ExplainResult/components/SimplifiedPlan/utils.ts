@@ -5,33 +5,6 @@ import type {ExtendedSimplifiesPlanItem} from './types';
 
 export const block = cn('ydb-query-explain-simplified-plan');
 
-export function getTreeNodesCoordinates(items?: SimplifiedPlanItem[], prefix = '') {
-    const result: string[] = [];
-    const stack: {items?: SimplifiedPlanItem[]; prefix: string}[] = [];
-
-    if (items) {
-        stack.push({items, prefix});
-    }
-
-    while (stack.length > 0) {
-        const {items, prefix} = stack.pop()!;
-
-        items?.forEach((item, index) => {
-            let newPrefix = `${prefix}.${index}`;
-            if (!prefix) {
-                newPrefix = String(index);
-            }
-            result.push(newPrefix);
-
-            if (item.children) {
-                stack.push({items: item.children, prefix: newPrefix});
-            }
-        });
-    }
-
-    return result;
-}
-
 export function getExtendedTreeNodes(
     items?: SimplifiedPlanItem[],
     prefix = '',
