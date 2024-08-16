@@ -6,13 +6,12 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
-import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
-import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
+import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {GroupInfo} from '../../components/GroupInfo/GroupInfo';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
-import {PageMeta} from '../../components/PageMeta/PageMeta';
+import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {VDiskWithDonorsStack} from '../../components/VDisk/VDiskWithDonorsStack';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
@@ -120,7 +119,7 @@ export function VDiskPage() {
         const pDiskIdItem = NodeId ? `${vDiskPageKeyset('pdisk')}: ${PDiskId}` : undefined;
 
         return (
-            <PageMeta
+            <PageMetaWithAutorefresh
                 loading={loading}
                 items={[hostItem, nodeIdItem, NodeType, NodeDC, pDiskIdItem, PDiskType]}
             />
@@ -129,7 +128,7 @@ export function VDiskPage() {
 
     const renderPageTitle = () => {
         return (
-            <DiskPageTitle
+            <EntityPageTitle
                 entityName={vDiskPageKeyset('vdisk')}
                 status={getSeverityColor(Severity)}
                 id={stringifyVdiskId(vDiskData?.VDiskId)}
@@ -154,7 +153,6 @@ export function VDiskPage() {
                     <Icon data={ArrowsOppositeToDots} />
                     {vDiskPageKeyset('evict-vdisk-button')}
                 </ButtonWithConfirmDialog>
-                <AutoRefreshControl className={vDiskPageCn('auto-refresh-control')} />
             </div>
         );
     };
