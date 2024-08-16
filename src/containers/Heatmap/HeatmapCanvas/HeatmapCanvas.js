@@ -3,7 +3,7 @@ import React from 'react';
 import throttle from 'lodash/throttle';
 import PropTypes from 'prop-types';
 
-import routes, {createHref} from '../../../routes';
+import {getTabletPagePath} from '../../../routes';
 import {basename as appBasename} from '../../../store/index';
 import {cn} from '../../../utils/cn';
 
@@ -90,7 +90,7 @@ export const HeatmapCanvas = (props) => {
     const generateTabletExternalLink = (tablet) => {
         const {TabletId: id} = tablet;
         const hostname = window.location.hostname;
-        const path = createHref(routes.tablet, {id});
+        const path = getTabletPagePath(id);
         const protocol = 'https://';
         const href = [hostname, appBasename, path]
             .map((item) => (item.startsWith('/') ? item.slice(1) : item))

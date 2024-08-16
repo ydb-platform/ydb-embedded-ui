@@ -10,7 +10,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {InternalLink} from '../../components/InternalLink';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
-import routes, {createHref} from '../../routes';
+import {getTabletPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
 import {ETabletState} from '../../types/api/tablet';
@@ -54,11 +54,10 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
                 return EMPTY_DATA_PLACEHOLDER;
             }
 
-            const tabletPath = createHref(
-                routes.tablet,
-                {id: row.TabletId},
-                {nodeId: row.NodeId, type: row.Type},
-            );
+            const tabletPath = getTabletPagePath(row.TabletId, {
+                nodeId: row.NodeId,
+                type: row.Type,
+            });
 
             return (
                 <EntityStatus
