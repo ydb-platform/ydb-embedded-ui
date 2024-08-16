@@ -7,7 +7,7 @@ import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../../../components/InternalLink';
 import {LinkToSchemaObject} from '../../../../components/LinkToSchemaObject/LinkToSchemaObject';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
-import routes, {createHref} from '../../../../routes';
+import {getTabletPagePath} from '../../../../routes';
 import {getLoadSeverityForShard} from '../../../../store/reducers/tenantOverview/topShards/utils';
 import type {KeyValueRow} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
@@ -88,7 +88,7 @@ const tabletIdColumn: Column<KeyValueRow> = {
         return (
             <EntityStatus
                 name={row.TabletId?.toString()}
-                path={createHref(routes.tablet, {id: row.TabletId})}
+                path={getTabletPagePath(row.TabletId)}
                 hasClipboardButton
                 showStatus={false}
                 additionalControls={

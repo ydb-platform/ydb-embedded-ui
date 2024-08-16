@@ -7,7 +7,8 @@ import type {
 import type {EFlag} from '../../../types/api/enums';
 import type {TEndpoint, TPoolStats} from '../../../types/api/nodes';
 import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
-import type {NodesSortValue} from '../../../utils/nodes';
+import type {NodesSortValue, NodesUptimeFilterValues} from '../../../utils/nodes';
+import type {ProblemFilterValue} from '../settings/types';
 import type {VisibleEntities} from '../storage/types';
 
 // Since nodes from different endpoints can have different types,
@@ -46,6 +47,13 @@ export type NodeType = 'static' | 'dynamic' | 'any';
 export interface NodesSortParams {
     sortOrder: OrderType | undefined;
     sortValue: NodesSortValue | undefined;
+}
+
+export interface NodesFilters {
+    searchValue: string;
+    problemFilter: ProblemFilterValue;
+    uptimeFilter: NodesUptimeFilterValues;
+    path?: string;
 }
 
 export interface NodesGeneralRequestParams extends Partial<NodesSortParams> {
