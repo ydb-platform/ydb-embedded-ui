@@ -38,7 +38,7 @@ interface LoadingTableRowProps<T> {
 
 export const LoadingTableRow = <T,>({index, columns, height}: LoadingTableRowProps<T>) => {
     return (
-        <tr className={b('row')}>
+        <tr className={b('row', {loading: true})}>
             {columns.map((column) => {
                 return (
                     <TableRowCell
