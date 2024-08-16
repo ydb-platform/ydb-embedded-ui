@@ -465,10 +465,11 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         // FIXME: after backend fix
         const {schema, ...rest} = params;
 
+        // FIXME: base64 is passed both to params and body to work on versions before and after 24-3
         return this.post<QueryAPIResponse<Action, Schema> | ErrorResponse>(
             this.getPath('/viewer/json/query'),
             {...rest, base64},
-            {schema},
+            {schema, base64},
             {
                 concurrentId,
                 timeout: params.timeout,
