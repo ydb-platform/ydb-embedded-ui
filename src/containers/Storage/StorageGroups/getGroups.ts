@@ -1,14 +1,36 @@
-import type {StorageApiRequestParams} from '../../../store/reducers/storage/types';
+import type {FetchData} from '../../../components/PaginatedTable';
+import type {
+    PreparedStorageGroup,
+    PreparedStorageGroupFilters,
+} from '../../../store/reducers/storage/types';
 import {prepareStorageGroupsResponse} from '../../../store/reducers/storage/utils';
 import {EVersion} from '../../../types/api/storage';
+import type {StorageSortValue} from '../../../utils/storage';
 
 const getConcurrentId = (limit?: number, offset?: number) => {
     return `getStorageGroups|offset${offset}|limit${limit}`;
 };
 
-export const getStorageGroups = async ({limit, offset, ...params}: StorageApiRequestParams) => {
+export const getStorageGroups: FetchData<
+    PreparedStorageGroup,
+    PreparedStorageGroupFilters
+> = async (params) => {
+    const {limit, offset, sortParams, filters} = params;
+    const {sortOrder, columnId} = sortParams ?? {};
+    const {searchValue, visibleEntities, tenant, nodeId} = filters ?? {};
+
     const response = await window.api.getStorageInfo(
-        {version: EVersion.v2, limit, offset, ...params},
+        {
+            version: EVersion.v2,
+            limit,
+            offset,
+            sortOrder,
+            sortValue: columnId as StorageSortValue,
+            filter: searchValue,
+            visibleEntities,
+            tenant,
+            nodeId,
+        },
         {concurrentId: getConcurrentId(limit, offset)},
     );
     const preparedResponse = prepareStorageGroupsResponse(response);

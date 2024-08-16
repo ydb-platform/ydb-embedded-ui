@@ -81,7 +81,7 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
             type: Type,
             notNull: NotNull,
             autoIncrement: Boolean(DefaultFromSequence),
-            defaultValue: DefaultFromLiteral?.value?.text_value,
+            defaultValue: Object.values(DefaultFromLiteral?.value || {})[0] || '-',
             familyName,
             prefferedPoolKind,
             columnCodec,

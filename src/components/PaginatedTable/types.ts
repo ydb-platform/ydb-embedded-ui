@@ -42,10 +42,16 @@ export interface PaginatedTableData<T> {
     found: number;
 }
 
-export type FetchData<T> = (
-    limit: number,
-    offset: number,
-    sortParams?: SortParams,
+type FetchDataParams<F, E = {}> = {
+    limit: number;
+    offset: number;
+    filters?: F;
+    sortParams?: SortParams;
+    signal?: AbortSignal;
+} & E;
+
+export type FetchData<T, F = undefined, E = {}> = (
+    params: FetchDataParams<F, E>,
 ) => Promise<PaginatedTableData<T>>;
 
 export type OnError = (error?: IResponseError) => void;

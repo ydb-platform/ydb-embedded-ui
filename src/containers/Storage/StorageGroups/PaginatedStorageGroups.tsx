@@ -1,15 +1,10 @@
 import React from 'react';
 
-import type {
-    FetchData,
-    RenderControls,
-    RenderErrorMessage,
-} from '../../../components/PaginatedTable';
+import type {RenderControls, RenderErrorMessage} from '../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
+import type {VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesMap} from '../../../types/store/nodesList';
-import type {StorageSortValue} from '../../../utils/storage';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {getStorageGroups} from './getGroups';
@@ -44,26 +39,9 @@ export const PaginatedStorageGroups = ({
     renderControls,
     renderErrorMessage,
 }: PaginatedStorageGroupsProps) => {
-    const filters = React.useMemo(() => {
-        return [searchValue, visibleEntities, tenant, nodeId];
+    const tableFilters = React.useMemo(() => {
+        return {searchValue, visibleEntities, tenant, nodeId};
     }, [searchValue, visibleEntities, tenant, nodeId]);
-
-    const fetchData = React.useCallback<FetchData<PreparedStorageGroup>>(
-        async (limit, offset, {sortOrder, columnId} = {}) => {
-            return await getStorageGroups({
-                limit,
-                offset,
-                filter: searchValue,
-                visibleEntities,
-                tenant,
-                nodeId,
-
-                sortOrder,
-                sortValue: columnId as StorageSortValue,
-            });
-        },
-        [nodeId, searchValue, tenant, visibleEntities],
-    );
 
     const columns = React.useMemo(() => {
         return getPreparedStorageGroupsColumns(nodesMap, visibleEntities);
@@ -87,12 +65,13 @@ export const PaginatedStorageGroups = ({
             columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
             parentContainer={parentContainer}
             columns={columns}
-            fetchData={fetchData}
+            fetchData={getStorageGroups}
             limit={50}
             renderControls={renderControls}
             renderErrorMessage={renderErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
-            dependencyArray={filters}
+            filters={tableFilters}
+            tableName="storage-groups"
         />
     );
 };

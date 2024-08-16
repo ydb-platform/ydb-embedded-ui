@@ -1,5 +1,7 @@
 import {expect, test} from '@playwright/test';
 
+import {PaginatedTable} from '../paginatedTable/paginatedTable';
+
 import {StoragePage} from './StoragePage';
 
 test.describe('Test Storage page', async () => {
@@ -27,5 +29,130 @@ test.describe('Test Storage page', async () => {
         await storagePage.selectEntityType('Nodes');
 
         await expect(storagePage.table).toBeVisible();
+    });
+});
+
+test.describe('Test Storage Paginated Table', async () => {
+    test.beforeEach(async ({page}) => {
+        const nodesPage = new StoragePage(page);
+        let response = await nodesPage.goto();
+        expect(response?.ok()).toBe(true);
+
+        // Wil be removed since it's an experiment
+        await page.evaluate(() => {
+            localStorage.setItem('useBackendParamsForTables', 'true');
+            location.reload();
+        });
+        response = await nodesPage.goto();
+        expect(response?.ok()).toBe(true);
+    });
+
+    test('Table loads and displays data', async ({page}) => {
+        const paginatedTable = new PaginatedTable(page);
+
+        await paginatedTable.waitForTableToLoad();
+        await paginatedTable.waitForTableData();
+
+        const rowCount = await paginatedTable.getRowCount();
+        expect(rowCount).toBeGreaterThan(0);
+    });
+
+    test('Search by pool name filters the table', async ({page}) => {
+        const paginatedTable = new PaginatedTable(page);
+
+        await paginatedTable.waitForTableToLoad();
+        await paginatedTable.waitForTableData();
+
+        const initialRowCount = await paginatedTable.getRowCount();
+        await paginatedTable.search('static');
+
+        await page.waitForTimeout(1000); // Wait for the table to update
+
+        const filteredRowCount = await paginatedTable.getRowCount();
+        expect(filteredRowCount).toBeLessThanOrEqual(initialRowCount);
+    });
+
+    test('Radio button selection changes displayed data', async ({page}) => {
+        const paginatedTable = new PaginatedTable(page);
+
+        await paginatedTable.waitForTableToLoad();
+        await paginatedTable.waitForTableData();
+
+        const initialRowCount = await paginatedTable.getRowCount();
+        await paginatedTable.selectRadioOption(0, 'Nodes');
+
+        await page.waitForTimeout(1000); // Wait for the table to update
+
+        const nodesRowCount = await paginatedTable.getRowCount();
+        expect(nodesRowCount).not.toEqual(initialRowCount);
+    });
+
+    test('Groups count is displayed correctly', async ({page}) => {
+        const paginatedTable = new PaginatedTable(page);
+
+        await paginatedTable.waitForTableToLoad();
+        await paginatedTable.waitForTableData();
+
+        const nodeCount = await paginatedTable.getCount();
+        const rowCount = await paginatedTable.getRowCount();
+
+        expect(nodeCount).toBe(rowCount);
+    });
+
+    test('Row data can be retrieved correctly', async ({page}) => {
+        const storageTable = new PaginatedTable(page);
+
+        await storageTable.waitForTableToLoad();
+        await storageTable.waitForTableData();
+
+        const rowData = await storageTable.getRowData(0);
+
+        expect(rowData).toHaveProperty('Pool Name');
+        expect(rowData).toHaveProperty('Type');
+        expect(rowData).toHaveProperty('Erasure');
+        expect(rowData).toHaveProperty('Usage');
+    });
+
+    test('Column values can be retrieved correctly', async ({page}) => {
+        const paginatedTable = new PaginatedTable(page);
+
+        await paginatedTable.waitForTableToLoad();
+        await paginatedTable.waitForTableData();
+
+        const typeValues = await paginatedTable.getColumnValues('Type');
+        const erasureValues = await paginatedTable.getColumnValues('Erasure');
+
+        expect(typeValues.length).toBeGreaterThan(0);
+        expect(erasureValues.length).toBeGreaterThan(0);
+        expect(typeValues.length).toBe(erasureValues.length);
+    });
+
+    test('Clicking on Group ID header sorts the table', async ({page}) => {
+        const storageTable = new PaginatedTable(page);
+
+        await storageTable.waitForTableToLoad();
+        await storageTable.waitForTableData();
+
+        const initialGroupIds = await storageTable.getColumnValues('Group ID');
+
+        await storageTable.sortByColumn('Group ID');
+
+        const sortedGroupIds = await storageTable.getColumnValues('Group ID');
+
+        expect(sortedGroupIds).not.toEqual(initialGroupIds);
+
+        const sortedDescending = [...sortedGroupIds].sort((a, b) => {
+            return parseInt(b, 10) - parseInt(a, 10);
+        });
+        expect(sortedGroupIds).toEqual(sortedDescending);
+
+        await storageTable.sortByColumn('Group ID');
+
+        const sortedAscGroupIds = await storageTable.getColumnValues('Group ID');
+
+        const sortedAscending = [...sortedAscGroupIds].sort((a, b) => {
+            return parseInt(a, 10) - parseInt(b, 10);
+        });
+        expect(sortedAscGroupIds).toEqual(sortedAscending);
     });
 });
