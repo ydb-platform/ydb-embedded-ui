@@ -8,7 +8,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
-import {EntityPageTitle} from '../../components/DiskPageTitle/EntityPageTitle';
+import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink/InternalLink';
