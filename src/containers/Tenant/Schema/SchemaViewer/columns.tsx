@@ -102,7 +102,7 @@ const defaultValueColumn: SchemaColumn = {
         return i18n('column-title.defaultValue');
     },
     width: 100,
-    render: ({row}) => row.defaultValue,
+    render: ({row}) => String(row.defaultValue),
 };
 
 const familyColumn: SchemaColumn = {

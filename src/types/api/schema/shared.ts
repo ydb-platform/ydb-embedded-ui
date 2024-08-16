@@ -28,9 +28,7 @@ export interface TColumnDescription {
         type: {
             type_id: string;
         };
-        value: {
-            text_value: string;
-        };
+        value: Record<string, string | number | boolean>;
     };
     NotNull?: boolean;
 }
