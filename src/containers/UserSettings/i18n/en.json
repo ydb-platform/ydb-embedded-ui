@@ -27,7 +27,6 @@
   "settings.language.option-english": "English",
 
   "settings.binaryDataInPlainTextDisplay.title": "Display binary data in plain text",
-  "settings.binaryDataInPlainTextDisplay.description": "Available starting from version 24.1",
 
   "settings.invertedDisks.title": "Inverted disks space indicators",
 
