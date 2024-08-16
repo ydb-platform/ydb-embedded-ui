@@ -3,16 +3,15 @@ import React from 'react';
 import {Dialog, Link as ExternalLink, Flex, TextInput} from '@gravity-ui/uikit';
 import {Controller, useForm} from 'react-hook-form';
 
+import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {
     selectQueryAction,
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
 import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
-import {ENABLE_TRACING_LEVEL_KEY} from '../../../../utils/constants';
 import {
     useQueryExecutionSettings,
-    useSetting,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
@@ -71,7 +70,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         defaultValues: initialValues,
     });
 
-    const [enableTracingLevel] = useSetting<boolean>(ENABLE_TRACING_LEVEL_KEY);
+    const enableTracingLevel = useTracingLevelOptionAvailable();
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
