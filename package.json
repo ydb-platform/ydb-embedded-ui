@@ -1,6 +1,6 @@
 {
   "name": "ydb-embedded-ui",
-  "version": "6.15.0",
+  "version": "6.15.1",
   "files": [
     "dist"
   ],
@@ -26,8 +26,8 @@
     "@gravity-ui/websql-autocomplete": "^9.1.0",
     "@reduxjs/toolkit": "^2.2.3",
     "@tanstack/react-table": "^8.19.3",
-    "axios": "^1.7.2",
-    "axios-retry": "^4.4.0",
+    "axios": "^1.7.3",
+    "axios-retry": "^4.4.2",
     "colord": "^2.9.3",
     "copy-to-clipboard": "^3.3.3",
     "crc-32": "^1.2.2",

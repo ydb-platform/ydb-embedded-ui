@@ -8,7 +8,6 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {Illustration} from '../../components/Illustration';
 import {ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import type {
-    FetchData,
     GetRowClassName,
     RenderControls,
     RenderErrorMessage,
@@ -28,13 +27,10 @@ import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {
     NodesUptimeFilterValues,
-    getProblemParamValue,
-    getUptimeParamValue,
     isSortableNodesProperty,
     isUnavailableNode,
     nodesUptimeFilterValuesSchema,
 } from '../../utils/nodes';
-import type {NodesSortValue} from '../../utils/nodes';
 
 import {getNodes} from './getNodes';
 import {NODES_COLUMNS_WIDTH_LS_KEY, getNodesColumns} from './getNodesColumns';
@@ -62,25 +58,9 @@ export const PaginatedNodes = ({path, parentContainer, additionalNodesProps}: No
 
     const problemFilter = useTypedSelector(selectProblemFilter);
 
-    const filters = React.useMemo(() => {
-        return [path, searchValue, problemFilter, uptimeFilter];
+    const tableFilters = React.useMemo(() => {
+        return {path, searchValue, problemFilter, uptimeFilter};
     }, [path, searchValue, problemFilter, uptimeFilter]);
-
-    const fetchData = React.useCallback<FetchData<NodesPreparedEntity>>(
-        async (limit, offset, {sortOrder, columnId} = {}) => {
-            return await getNodes({
-                limit,
-                offset,
-                path,
-                filter: searchValue,
-                problems_only: getProblemParamValue(problemFilter),
-                uptime: getUptimeParamValue(uptimeFilter),
-                sortOrder,
-                sortValue: columnId as NodesSortValue,
-            });
-        },
-        [path, problemFilter, searchValue, uptimeFilter],
-    );
 
     const getRowClassName: GetRowClassName<NodesPreparedEntity> = (row) => {
         return b('node', {unavailable: isUnavailableNode(row)});
@@ -151,13 +131,14 @@ export const PaginatedNodes = ({path, parentContainer, additionalNodesProps}: No
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
             parentContainer={parentContainer}
             columns={columns}
-            fetchData={fetchData}
+            fetchData={getNodes}
             limit={50}
             renderControls={renderControls}
             renderErrorMessage={renderErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
-            dependencyArray={filters}
             getRowClassName={getRowClassName}
+            filters={tableFilters}
+            tableName="nodes"
         />
     );
 };
