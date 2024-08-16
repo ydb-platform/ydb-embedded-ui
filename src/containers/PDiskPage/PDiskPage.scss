@@ -20,13 +20,6 @@
         left: 0;
     }
 
-    &__meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: var(--g-spacing-4);
-    }
-
     &__controls {
         display: flex;
         align-items: center;

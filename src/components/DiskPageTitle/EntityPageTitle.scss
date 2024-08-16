@@ -1,0 +1,21 @@
+@import '../../styles/mixins.scss';
+
+.ydb-entity-page-title {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: baseline;
+
+    text-wrap: nowrap;
+
+    @include header-2-typography();
+
+    &__prefix {
+        margin-right: 6px;
+
+        color: var(--g-color-text-secondary);
+    }
+
+    &__icon {
+        margin-right: 8px;
+    }
+}
