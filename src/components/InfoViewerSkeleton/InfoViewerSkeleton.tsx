@@ -1,6 +1,7 @@
 import {Skeleton} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
+import {useDelayed} from '../../utils/hooks/useDelayed';
 
 import './InfoViewerSkeleton.scss';
 
@@ -16,15 +17,22 @@ const SkeletonLabel = () => (
 interface InfoViewerSkeletonProps {
     className?: string;
     rows?: number;
+    delay?: number;
 }
 
-export const InfoViewerSkeleton = ({rows = 8, className}: InfoViewerSkeletonProps) => (
-    <div className={b(null, className)}>
-        {[...new Array(rows)].map((_, index) => (
-            <div className={b('row')} key={`skeleton-row-${index}`}>
-                <SkeletonLabel />
-                <Skeleton className={b('value')} />
-            </div>
-        ))}
-    </div>
-);
+export const InfoViewerSkeleton = ({rows = 8, className, delay = 600}: InfoViewerSkeletonProps) => {
+    const show = useDelayed(delay);
+    if (!show) {
+        return null;
+    }
+    return (
+        <div className={b(null, className)}>
+            {[...new Array(rows)].map((_, index) => (
+                <div className={b('row')} key={`skeleton-row-${index}`}>
+                    <SkeletonLabel />
+                    <Skeleton className={b('value')} />
+                </div>
+            ))}
+        </div>
+    );
+};

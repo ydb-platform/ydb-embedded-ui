@@ -119,3 +119,26 @@ export enum ETabletState {
     'Deleted' = 'Deleted',
     'Stopped' = 'Stopped',
 }
+
+interface TBoundChannel {
+    IOPS: number;
+    StoragePoolName: string;
+    Throughput: number;
+    Size: number;
+}
+
+export interface TTabletStorageInfoChannelHistory {
+    GroupID: number;
+    FromGeneration: number;
+    Timestamp: string;
+}
+
+interface TTabletStorageInfoChannel {
+    Channel: number;
+    History: TTabletStorageInfoChannelHistory[];
+}
+
+export interface TTabletHiveResponse {
+    BoundChannels: TBoundChannel[];
+    TabletStorageInfo: {Channels: TTabletStorageInfoChannel[]; Version: number};
+}

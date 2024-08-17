@@ -1,4 +1,4 @@
-import routes, {createHref} from '../../routes';
+import {getTabletPagePath} from '../../routes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {cn} from '../../utils/cn';
 import {getTabletLabel} from '../../utils/constants';
@@ -20,8 +20,7 @@ export const Tablet = ({tablet = {}, tenantName}: TabletProps) => {
     const {TabletId: id, NodeId, Type} = tablet;
     const status = tablet.Overall?.toLowerCase();
 
-    const tabletPath =
-        id && createHref(routes.tablet, {id}, {nodeId: NodeId, tenantName, type: Type});
+    const tabletPath = id && getTabletPagePath(id, {nodeId: NodeId, tenantName, type: Type});
 
     return (
         <ContentWithPopup

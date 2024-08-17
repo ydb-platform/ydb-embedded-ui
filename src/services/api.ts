@@ -38,6 +38,7 @@ import type {TEvSystemStateResponse} from '../types/api/systemState';
 import type {
     TDomainKey,
     TEvTabletStateResponse,
+    TTabletHiveResponse,
     UnmergedTEvTabletStateResponse,
 } from '../types/api/tablet';
 import type {TTenantInfo, TTenants} from '../types/api/tenant';
@@ -389,11 +390,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId: concurrentId || 'getConsumer', requestConfig: {signal}},
         );
     }
-    getTablet({id}: {id?: string}, {concurrentId, signal}: AxiosOptions = {}) {
+    getTablet(
+        {id, database}: {id?: string; database?: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<TEvTabletStateResponse>(
             this.getPath(`/viewer/json/tabletinfo?filter=(TabletId=${id})`),
             {
                 enums: true,
+                database,
             },
             {
                 concurrentId,
@@ -401,12 +406,16 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
-    getTabletHistory({id}: {id?: string}, {concurrentId, signal}: AxiosOptions = {}) {
+    getTabletHistory(
+        {id, database}: {id?: string; database?: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<UnmergedTEvTabletStateResponse>(
             this.getPath(`/viewer/json/tabletinfo?filter=(TabletId=${id})`),
             {
                 enums: true,
                 merge: false,
+                database,
             },
             {
                 concurrentId,
@@ -414,11 +423,12 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
-    getNodesList({concurrentId, signal}: AxiosOptions = {}) {
+    getNodesList({concurrentId, signal, database}: AxiosOptions & {database?: string} = {}) {
         return this.get<TEvNodesInfo>(
             this.getPath('/viewer/json/nodelist'),
             {
                 enums: true,
+                database,
             },
             {
                 concurrentId,
@@ -584,6 +594,19 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             this.getPath(`/tablets/app?TabletID=${hiveId}&page=ResumeTablet&tablet=${id}`),
             {},
             {requestConfig: {'axios-retry': {retries: 0}}},
+        );
+    }
+    getTabletFromHive(
+        {id, hiveId}: {id?: string; hiveId?: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<Nullable<TTabletHiveResponse>>(
+            this.getPath(`/tablets/app?TabletID=${hiveId}&page=TabletInfo&tablet=${id}`),
+            {},
+            {
+                concurrentId,
+                requestConfig: {signal},
+            },
         );
     }
     getTabletDescribe(tenantId: TDomainKey, {concurrentId, signal}: AxiosOptions = {}) {

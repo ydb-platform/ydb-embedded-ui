@@ -1,27 +1,10 @@
 @import '../../styles/mixins.scss';
 
-.tablet-page {
+.ydb-tablet-page {
     $_: &;
-    display: flex;
-    flex-direction: column;
-
+    height: 100%;
     padding: 20px;
-
-    &__tenant {
-        margin-bottom: 20px;
-    }
-
-    &__pane-wrapper {
-        display: flex;
-    }
-
-    &__left-pane {
-        margin-right: 70px;
-    }
-    &__history-title {
-        margin-bottom: 15px;
-        @include body-2-typography();
-    }
+    @include body-2-typography();
 
     &__placeholder {
         display: flex;
@@ -30,67 +13,16 @@
         align-items: center;
     }
 
-    &__row {
-        display: flex;
-        align-items: center;
-
-        &_header {
-            margin-bottom: 20px;
-
-            & #{$_}__link {
-                margin: 0 10px 0 5px;
-            }
-        }
-    }
-
-    &__title {
-        margin-right: 16px;
-
-        font-weight: 500;
-        text-transform: uppercase;
-
-        @include body-2-typography();
-    }
-
     &__loader {
-        width: 25px;
-    }
-
-    .info-viewer__items {
-        grid-template-columns: auto;
+        margin-left: var(--g-spacing-2);
     }
 
     &__link {
         @extend .link;
     }
 
-    &__controls {
-        margin: 20px 0 15px;
-    }
-
-    &__control {
-        margin-right: 15px;
-    }
-
-    &__links {
-        display: flex;
-
-        margin: 5px 0 10px;
-        padding: 0;
-
-        list-style-type: none;
-
-        & > * {
-            margin: 0 10px 0 0;
-        }
-    }
-
-    &__top-label {
-        margin-right: 16px;
-
-        font-weight: 500;
-        text-transform: uppercase;
-
-        @include body-2-typography();
+    &__section-title {
+        margin: var(--g-spacing-1) 0 var(--g-spacing-3);
+        @include text-subheader-2();
     }
 }

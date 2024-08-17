@@ -7,12 +7,12 @@ import {api} from './api';
 export const tabletApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTablet: build.query({
-            queryFn: async ({id}: {id: string}, {signal}) => {
+            queryFn: async ({id, database}: {id: string; database?: string}, {signal}) => {
                 try {
                     const [tabletResponseData, historyResponseData, nodesList] = await Promise.all([
-                        window.api.getTablet({id}, {signal}),
-                        window.api.getTabletHistory({id}, {signal}),
-                        window.api.getNodesList({signal}),
+                        window.api.getTablet({id, database}, {signal}),
+                        window.api.getTabletHistory({id, database}, {signal}),
+                        window.api.getNodesList({signal, database}),
                     ]);
                     const nodesMap = prepareNodesMap(nodesList);
 
@@ -29,15 +29,17 @@ export const tabletApi = api.injectEndpoints({
                             const fqdn =
                                 nodesMap && nodeId ? nodesMap.get(Number(nodeId)) : undefined;
 
-                            list.push({
-                                nodeId,
-                                generation: Generation,
-                                changeTime: ChangeTime,
-                                state: State,
-                                leader: Leader,
-                                followerId: FollowerId,
-                                fqdn,
-                            });
+                            if (State !== 'Dead') {
+                                list.push({
+                                    nodeId,
+                                    generation: Generation,
+                                    changeTime: ChangeTime,
+                                    state: State,
+                                    leader: Leader,
+                                    followerId: FollowerId,
+                                    fqdn,
+                                });
+                            }
                         }
                         return list;
                     }, []);
@@ -61,6 +63,21 @@ export const tabletApi = api.injectEndpoints({
                     const tenantPath = tabletDescribe?.Path || `${SchemeShard}:${PathId}`;
 
                     return {data: tenantPath};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+        getAdvancedTableInfo: build.query({
+            queryFn: async ({id, hiveId}: {id: string; hiveId?: string}, {signal}) => {
+                try {
+                    const tabletResponseData = await window.api.getTabletFromHive(
+                        {id, hiveId},
+                        {signal},
+                    );
+
+                    return {data: tabletResponseData};
                 } catch (error) {
                     return {error};
                 }

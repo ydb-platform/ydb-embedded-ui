@@ -1,12 +1,14 @@
 import React from 'react';
 
-import {ButtonWithConfirmDialog} from '../../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
-import {selectIsUserAllowedToMakeChanges} from '../../../store/reducers/authentication/authentication';
-import {ETabletState} from '../../../types/api/tablet';
-import type {TTabletStateInfo} from '../../../types/api/tablet';
-import {useTypedSelector} from '../../../utils/hooks';
-import {b} from '../Tablet';
-import i18n from '../i18n';
+import {ArrowRotateLeft, StopFill, TriangleRightFill} from '@gravity-ui/icons';
+import {Flex, Icon} from '@gravity-ui/uikit';
+
+import {ButtonWithConfirmDialog} from '../../../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+import {selectIsUserAllowedToMakeChanges} from '../../../../store/reducers/authentication/authentication';
+import {ETabletState} from '../../../../types/api/tablet';
+import type {TTabletStateInfo} from '../../../../types/api/tablet';
+import {useTypedSelector} from '../../../../utils/hooks';
+import i18n from '../../i18n';
 
 interface TabletControlsProps {
     tablet: TTabletStateInfo;
@@ -28,9 +30,7 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
         return window.api.resumeTablet(TabletId, HiveId);
     };
 
-    const hasHiveId = () => {
-        return HiveId && HiveId !== '0';
-    };
+    const hasHiveId = HiveId && HiveId !== '0';
 
     const isDisabledRestart = tablet.State === ETabletState.Stopped;
 
@@ -41,50 +41,53 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
         tablet.State === ETabletState.Stopped || tablet.State === ETabletState.Deleted;
 
     return (
-        <div className={b('controls')}>
+        <Flex gap={2} wrap="nowrap">
             <ButtonWithConfirmDialog
                 dialogContent={i18n('dialog.kill')}
                 onConfirmAction={_onKillClick}
                 onConfirmActionSuccess={fetchData}
-                buttonClassName={b('control')}
                 buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
                 withPopover
+                buttonView="normal"
                 popoverContent={i18n('controls.kill-not-allowed')}
                 popoverPlacement={'bottom'}
                 popoverDisabled={isUserAllowedToMakeChanges}
             >
+                <Icon data={ArrowRotateLeft} />
                 {i18n('controls.kill')}
             </ButtonWithConfirmDialog>
-            {hasHiveId() ? (
+            {hasHiveId && (
                 <React.Fragment>
                     <ButtonWithConfirmDialog
                         dialogContent={i18n('dialog.stop')}
                         onConfirmAction={_onStopClick}
                         onConfirmActionSuccess={fetchData}
-                        buttonClassName={b('control')}
                         buttonDisabled={isDisabledStop || !isUserAllowedToMakeChanges}
                         withPopover
+                        buttonView="normal"
                         popoverContent={i18n('controls.stop-not-allowed')}
                         popoverPlacement={'bottom'}
                         popoverDisabled={isUserAllowedToMakeChanges}
                     >
+                        <Icon data={StopFill} />
                         {i18n('controls.stop')}
                     </ButtonWithConfirmDialog>
                     <ButtonWithConfirmDialog
                         dialogContent={i18n('dialog.resume')}
                         onConfirmAction={_onResumeClick}
                         onConfirmActionSuccess={fetchData}
-                        buttonClassName={b('control')}
                         buttonDisabled={isDisabledResume || !isUserAllowedToMakeChanges}
                         withPopover
+                        buttonView="normal"
                         popoverContent={i18n('controls.resume-not-allowed')}
                         popoverPlacement={'bottom'}
                         popoverDisabled={isUserAllowedToMakeChanges}
                     >
+                        <Icon data={TriangleRightFill} />
                         {i18n('controls.resume')}
                     </ButtonWithConfirmDialog>
                 </React.Fragment>
-            ) : null}
-        </div>
+            )}
+        </Flex>
     );
 };
