@@ -11,7 +11,7 @@ import {toExponential} from '../../../../../../utils/utils';
 import {MetricsCell} from './MetricsCell';
 import {OperationCell} from './OperationCell';
 import type {ExtendedSimplifiesPlanItem} from './types';
-import {block, getExtendedTreeNodes, getTreeNodesCoordinates} from './utils';
+import {block, getExtendedTreeNodes} from './utils';
 
 import './SimplifiedPlan.scss';
 
@@ -100,10 +100,7 @@ interface SimplifiedPlanProps {
 
 export function SimplifiedPlan({plan}: SimplifiedPlanProps) {
     const planWithLinesInfo = React.useMemo(() => getExtendedTreeNodes(plan), [plan]);
-    const [expanded, setExpanded] = React.useState<ExpandedState>(() => {
-        const coordinates = getTreeNodesCoordinates(plan);
-        return Object.fromEntries(coordinates.map((id) => [id, true]));
-    });
+    const [expanded, setExpanded] = React.useState<ExpandedState>(true);
 
     const table = useTable({
         columns,
