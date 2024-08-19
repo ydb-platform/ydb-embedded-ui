@@ -3,7 +3,8 @@ import React from 'react';
 import {duration} from '@gravity-ui/date-utils';
 import {Label} from '@gravity-ui/uikit';
 
-import {HOUR_IN_SECONDS, SECOND_IN_MS, cn} from '../../lib';
+import {cn} from '../../utils/cn';
+import {HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
 
 const b = cn('ydb-query-elapsed-time');
 
