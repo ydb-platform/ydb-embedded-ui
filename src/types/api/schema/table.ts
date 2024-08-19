@@ -164,6 +164,8 @@ export interface TTableStats {
     /** uint64 */
     IndexSize?: string;
     /** uint64 */
+    ByKeyFilterSize?: string;
+    /** uint64 */
     InMemSize?: string;
 
     /**

@@ -6,7 +6,6 @@ import {
     AUTOCOMPLETE_ON_ENTER,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     ENABLE_AUTOCOMPLETE,
-    ENABLE_TRACING_LEVEL_KEY,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
@@ -113,12 +112,6 @@ export const showDomainDatabase: SettingProps = {
     title: i18n('settings.showDomainDatabase.title'),
 };
 
-export const enableTracingLevel: SettingProps = {
-    settingKey: ENABLE_TRACING_LEVEL_KEY,
-    title: i18n('settings.enableTracingLevel.title'),
-    description: i18n('settings.enableTracingLevel.description'),
-};
-
 export const queryUseMultiSchemaSetting: SettingProps = {
     settingKey: QUERY_USE_MULTI_SCHEMA_KEY,
     title: i18n('settings.queryUseMultiSchema.title'),
@@ -167,7 +160,7 @@ export const experimentsSection: SettingsSection = {
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',
     title: i18n('section.dev-setting'),
-    settings: [enableAutocompleteSetting, autocompleteOnEnterSetting, enableTracingLevel],
+    settings: [enableAutocompleteSetting, autocompleteOnEnterSetting],
 };
 
 export const aboutSettingsSection: SettingsSection = {
