@@ -5,13 +5,14 @@ import type {InfoViewerItem} from '../../../../components/InfoViewer';
 import {InfoViewer} from '../../../../components/InfoViewer';
 import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
 import {TabletState} from '../../../../components/TabletState/TabletState';
-import {cn, useTypedSelector} from '../../../../lib';
 import {getTabletPagePath} from '../../../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../../../store/reducers/authentication/authentication';
 import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
+import {cn} from '../../../../utils/cn';
 import {calcUptime} from '../../../../utils/dataFormatters/dataFormatters';
 import {createTabletDeveloperUIHref} from '../../../../utils/developerUI/developerUI';
+import {useTypedSelector} from '../../../../utils/hooks';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 import {hasHive} from '../../utils';
 

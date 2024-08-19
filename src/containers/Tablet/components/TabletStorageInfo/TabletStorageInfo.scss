@@ -22,13 +22,11 @@
 
             background-color: var(--g-color-base-background);
             @include text-subheader-2();
-            // &_align_right {
-            //     #{$block}__table-header-content {
-            //         justify-content: flex-end;
-
-            //         text-align: right;
-            //     }
-            // }
+        }
+        :is(#{$block}__table-cell) {
+            height: 40px;
+            padding: 0;
+            @include text-body-2();
         }
     }
 
@@ -41,15 +39,7 @@
             }
         }
     }
-    :is(#{$block}__table-header-cell) {
-        height: 40px;
-        padding: 0;
 
-        text-align: left;
-
-        background-color: var(--g-color-base-background);
-        @include text-subheader-2();
-    }
     &__table-header-content {
         display: flex;
         align-items: center;

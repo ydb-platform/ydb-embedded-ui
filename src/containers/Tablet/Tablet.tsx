@@ -19,6 +19,7 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {tabletApi} from '../../store/reducers/tablet';
 import {EFlag} from '../../types/api/enums';
 import type {EType} from '../../types/api/tablet';
+import {cn} from '../../utils/cn';
 import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
@@ -27,10 +28,11 @@ import {TabletInfo} from './components/TabletInfo';
 import {TabletStorageInfo} from './components/TabletStorageInfo/TabletStorageInfo';
 import {TabletTable} from './components/TabletTable';
 import i18n from './i18n';
-import {b} from './shared';
 import {hasHive} from './utils';
 
 import './Tablet.scss';
+
+export const b = cn('ydb-tablet-page');
 
 const TABLET_TABS_IDS = {
     history: 'history',
