@@ -53,14 +53,14 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.run(testQuery, QueryMode.YQLScript);
 
-        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+        await expect(queryEditor.isResultTableVisible()).resolves.toBe(true);
     });
 
     test('Run button executes Scan', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.run(testQuery, QueryMode.Scan);
 
-        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+        await expect(queryEditor.isResultTableVisible()).resolves.toBe(true);
     });
 
     test('Explain button executes YQL script explanation', async ({page}) => {
