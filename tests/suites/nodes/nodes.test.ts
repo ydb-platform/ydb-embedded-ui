@@ -24,7 +24,7 @@ test.describe('Test Nodes page', async () => {
 test.describe('Test Nodes Paginated Table', async () => {
     test.beforeEach(async ({page}) => {
         const nodesPage = new NodesPage(page);
-        let response = await nodesPage.goto();
+        const response = await nodesPage.goto();
         expect(response?.ok()).toBe(true);
 
         // Wil be removed since it's an experiment
@@ -32,8 +32,8 @@ test.describe('Test Nodes Paginated Table', async () => {
             localStorage.setItem('useBackendParamsForTables', 'true');
             location.reload();
         });
-        response = await nodesPage.goto();
-        expect(response?.ok()).toBe(true);
+
+        await page.waitForLoadState('networkidle');
     });
 
     test('Table loads and displays data', async ({page}) => {
