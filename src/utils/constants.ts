@@ -124,7 +124,7 @@ export const TENANT_OVERVIEW_TABLES_SETTINGS = {
 } as const;
 
 export const DEFAULT_QUERY_SETTINGS = {
-    queryMode: QUERY_MODES.script,
+    queryMode: QUERY_MODES.query,
     isolationLevel: ISOLATION_LEVELS.serializable,
     timeout: '60',
     statisticsMode: STATISTICS_MODES.none,

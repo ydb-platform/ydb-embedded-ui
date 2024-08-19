@@ -7,7 +7,7 @@ import {
 } from '../../../../../utils/query';
 
 const DEFAULT_QUERY_SETTINGS: QuerySettings = {
-    queryMode: QUERY_MODES.script,
+    queryMode: QUERY_MODES.query,
     isolationLevel: ISOLATION_LEVELS.serializable,
     timeout: '60',
     statisticsMode: STATISTICS_MODES.none,

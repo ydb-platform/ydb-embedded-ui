@@ -14,7 +14,7 @@ import {QUERY_SETTINGS_FIELD_SETTINGS} from '../../QuerySettingsDialog/constants
 import getChangedQueryExecutionSettingsDescription from './getChangedQueryExecutionSettingsDescription';
 
 const DEFAULT_QUERY_SETTINGS: QuerySettings = {
-    queryMode: QUERY_MODES.script,
+    queryMode: QUERY_MODES.query,
     isolationLevel: ISOLATION_LEVELS.serializable,
     timeout: '60',
     statisticsMode: STATISTICS_MODES.none,
