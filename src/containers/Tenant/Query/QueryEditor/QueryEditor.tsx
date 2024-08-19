@@ -10,6 +10,7 @@ import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import SplitPane from '../../../../components/SplitPane';
 import type {RootState} from '../../../../store';
 import {cancelQueryApi} from '../../../../store/reducers/cancelQuery';
+import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {
     executeQueryApi,
     goToNextQuery,
@@ -29,7 +30,6 @@ import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
-    ENABLE_TRACING_LEVEL_KEY,
     LAST_USED_QUERY_ACTION_KEY,
     QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../../utils/constants';
@@ -103,7 +103,7 @@ function QueryEditor(props: QueryEditorProps) {
     const [resultType, setResultType] = React.useState<ValueOf<typeof RESULT_TYPES>>();
     const [isResultLoaded, setIsResultLoaded] = React.useState(false);
     const [querySettings] = useQueryExecutionSettings();
-    const [enableTracingLevel] = useSetting<boolean>(ENABLE_TRACING_LEVEL_KEY);
+    const enableTracingLevel = useTracingLevelOptionAvailable();
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
         useLastQueryExecutionSettings();
     const {resetBanner} = useChangedQuerySettings();
