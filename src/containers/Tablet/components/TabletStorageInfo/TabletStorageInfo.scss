@@ -61,10 +61,12 @@
 
         border-bottom: 1px solid var(--g-color-line-generic);
     }
-    &__table-cell {
+    :is(#{$block}__table-cell) {
         height: 40px;
         padding: 0;
         @include text-body-2();
+    }
+    &__table-cell {
         &_align_right {
             text-align: right;
         }
