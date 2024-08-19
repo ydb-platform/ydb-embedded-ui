@@ -12,7 +12,7 @@ export const tabletApi = api.injectEndpoints({
                     const [tabletResponseData, historyResponseData, nodesList] = await Promise.all([
                         window.api.getTablet({id, database}, {signal}),
                         window.api.getTabletHistory({id, database}, {signal}),
-                        window.api.getNodesList({signal, database}),
+                        window.api.getNodesList({signal}),
                     ]);
                     const nodesMap = prepareNodesMap(nodesList);
 
