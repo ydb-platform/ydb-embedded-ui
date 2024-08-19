@@ -1,6 +1,6 @@
 import {ArrowsRotateRight} from '@gravity-ui/icons';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
-import {Icon, Label, Text} from '@gravity-ui/uikit';
+import {Icon, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
@@ -10,6 +10,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {InternalLink} from '../../components/InternalLink';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
+import {TabletState} from '../../components/TabletState/TabletState';
 import {getTabletPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
@@ -21,7 +22,6 @@ import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/consta
 import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
 import {createTabletDeveloperUIHref} from '../../utils/developerUI/developerUI';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {mapTabletStateToLabelTheme} from '../../utils/tablet';
 import {getDefaultNodePath} from '../Node/NodePages';
 
 import i18n from './i18n';
@@ -78,7 +78,7 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
             return i18n('State');
         },
         render: ({row}) => {
-            return <Label theme={mapTabletStateToLabelTheme(row.State)}>{row.State}</Label>;
+            return <TabletState state={row.State} />;
         },
     },
     {

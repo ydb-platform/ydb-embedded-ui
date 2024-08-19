@@ -49,3 +49,20 @@ export const EmptyState = ({
         </div>
     );
 };
+
+interface EmptyStateWrapperProps extends EmptyStateProps {
+    isEmpty?: boolean;
+    children: React.ReactNode;
+    className?: string;
+}
+
+export function EmptyStateWrapper({isEmpty, children, className, ...rest}: EmptyStateWrapperProps) {
+    if (isEmpty) {
+        return (
+            <div className={className}>
+                <EmptyState {...rest} />
+            </div>
+        );
+    }
+    return children;
+}

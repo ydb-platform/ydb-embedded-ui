@@ -1,0 +1,16 @@
+{
+  "field_scheme-shard": "SchemeShard",
+  "field_follower": "Follower",
+  "field_generation": "Generation",
+  "field_hive": "HiveId",
+  "field_state": "State",
+  "field_uptime": "Uptime",
+  "field_node": "Node",
+  "field_links": "Links",
+  "field_developer-ui-app": "App",
+  "field_developer-ui-counters": "Counters",
+  "field_developer-ui-executor": "Executor DB internals",
+  "field_developer-ui-state": "State Storage",
+  "title_info": "Info",
+  "title_links": "Links"
+}

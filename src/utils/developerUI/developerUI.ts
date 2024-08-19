@@ -41,6 +41,12 @@ export const createVDiskDeveloperUILink = ({
     return createDeveloperUILinkWithNodeId(nodeId, host) + vdiskPath;
 };
 
-export function createTabletDeveloperUIHref(tabletId: number | string, host = backend) {
-    return `${host}/tablets?TabletID=${tabletId}`;
+export function createTabletDeveloperUIHref(
+    tabletId: number | string,
+    tabletPage?: string,
+    searchParam = 'TabletID',
+    host = backend,
+) {
+    const subPage = tabletPage ? `/${tabletPage}` : '';
+    return `${host}/tablets${subPage}?${searchParam}=${tabletId}`;
 }
