@@ -4,6 +4,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../../../components/InternalLink/InternalLink';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {TabletState} from '../../../../components/TabletState/TabletState';
 import type {ITabletPreparedHistoryItem} from '../../../../types/store/tablet';
 import {calcUptime} from '../../../../utils/dataFormatters/dataFormatters';
 import {getDefaultNodePath} from '../../../Node/NodePages';
@@ -25,7 +26,7 @@ const columns: Column<ITabletPreparedHistoryItem>[] = [
     {
         name: 'State',
         sortable: false,
-        render: ({row}) => row.state,
+        render: ({row}) => <TabletState state={row.state} />,
     },
     {
         name: 'Follower ID',

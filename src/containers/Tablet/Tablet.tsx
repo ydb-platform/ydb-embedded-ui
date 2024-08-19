@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Flex, Spin, Tabs} from '@gravity-ui/uikit';
+import {Flex, Tabs} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useLocation, useParams} from 'react-router-dom';
@@ -93,10 +93,13 @@ export const Tablet = () => {
     const noAdvancedInfo = !isUserAllowedToMakeChanges || !hasHiveId;
 
     React.useEffect(() => {
+        if (loading) {
+            return;
+        }
         if (noAdvancedInfo && TABLET_PAGE_TABS.find(({id}) => id === tabletTab)?.isAdvanced) {
             setParams({activeTab: TABLET_TABS_IDS.history});
         }
-    }, [noAdvancedInfo, tabletTab, setParams]);
+    }, [noAdvancedInfo, tabletTab, setParams, loading]);
 
     const {
         currentData: advancedData,
@@ -208,9 +211,7 @@ export const Tablet = () => {
                         entityName={i18n('tablet.header')}
                         status={Overall ?? EFlag.Grey}
                         id={TabletId}
-                    >
-                        {loading && <Spin size="xs" className={b('loader')} />}
-                    </EntityPageTitle>
+                    />
                     <TabletControls tablet={tablet} fetchData={refetchTabletInfo} />
                     <TabletInfo tablet={tablet} />
                 </Flex>
@@ -221,7 +222,7 @@ export const Tablet = () => {
         <Flex gap={5} direction="column" className={b()}>
             {renderHelmet()}
             {renderPageMeta()}
-            <LoaderWrapper loading={loading && id !== tabletId} size="l">
+            <LoaderWrapper loading={loading} size="l">
                 <EmptyStateWrapper
                     title={i18n('emptyState')}
                     className={b('placeholder')}

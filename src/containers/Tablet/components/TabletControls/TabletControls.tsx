@@ -9,6 +9,7 @@ import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {useTypedSelector} from '../../../../utils/hooks';
 import i18n from '../../i18n';
+import {hasHive} from '../../utils';
 
 interface TabletControlsProps {
     tablet: TTabletStateInfo;
@@ -30,7 +31,7 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
         return window.api.resumeTablet(TabletId, HiveId);
     };
 
-    const hasHiveId = HiveId && HiveId !== '0';
+    const hasHiveId = hasHive(HiveId);
 
     const isDisabledRestart = tablet.State === ETabletState.Stopped;
 

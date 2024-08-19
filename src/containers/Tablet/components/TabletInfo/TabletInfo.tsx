@@ -1,10 +1,11 @@
-import {Flex, Link as UIKitLink} from '@gravity-ui/uikit';
+import {Flex} from '@gravity-ui/uikit';
 import {Link} from 'react-router-dom';
 
 import type {InfoViewerItem} from '../../../../components/InfoViewer';
 import {InfoViewer} from '../../../../components/InfoViewer';
 import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
-import {useTypedSelector} from '../../../../lib';
+import {TabletState} from '../../../../components/TabletState/TabletState';
+import {cn, useTypedSelector} from '../../../../lib';
 import {getTabletPagePath} from '../../../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../../../store/reducers/authentication/authentication';
 import {ETabletState} from '../../../../types/api/tablet';
@@ -12,10 +13,13 @@ import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {calcUptime} from '../../../../utils/dataFormatters/dataFormatters';
 import {createTabletDeveloperUIHref} from '../../../../utils/developerUI/developerUI';
 import {getDefaultNodePath} from '../../../Node/NodePages';
-import {b} from '../../shared';
 import {hasHive} from '../../utils';
 
 import {tabletInfoKeyset} from './i18n';
+
+const b = cn('ydb-tablet-info');
+
+import './TabletInfo.scss';
 
 interface TabletInfoProps {
     tablet: TTabletStateInfo;
@@ -44,9 +48,9 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         tabletInfo.push({
             label: tabletInfoKeyset('field_hive'),
             value: (
-                <UIKitLink href={getTabletPagePath(HiveId)} target="_blank">
+                <Link to={getTabletPagePath(HiveId)} className={b('link')}>
                     {HiveId}
-                </UIKitLink>
+                </Link>
             ),
         });
     }
@@ -55,21 +59,21 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         tabletInfo.push({
             label: tabletInfoKeyset('field_scheme-shard'),
             value: (
-                <UIKitLink href={getTabletPagePath(SchemeShard)} target="_blank">
+                <Link to={getTabletPagePath(SchemeShard)} className={b('link')}>
                     {SchemeShard}
-                </UIKitLink>
+                </Link>
             ),
         });
     }
 
-    tabletInfo.push({label: tabletInfoKeyset('field_state'), value: State});
+    tabletInfo.push({label: tabletInfoKeyset('field_state'), value: <TabletState state={State} />});
 
     if (hasUptime) {
         tabletInfo.push({label: tabletInfoKeyset('field_uptime'), value: calcUptime(ChangeTime)});
     }
 
     tabletInfo.push(
-        {label: 'Generation', value: Generation},
+        {label: tabletInfoKeyset('field_generation'), value: Generation},
         {
             label: tabletInfoKeyset('field_node'),
             value: (
@@ -81,11 +85,16 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
     );
 
     if (FollowerId) {
-        tabletInfo.push({label: 'Follower', value: FollowerId});
+        tabletInfo.push({label: tabletInfoKeyset('field_follower'), value: FollowerId});
     }
 
     const renderTabletInfo = () => {
-        return <InfoViewer info={tabletInfo} />;
+        return (
+            <div>
+                <div className={b('section-title')}>{tabletInfoKeyset('title_info')}</div>
+                <InfoViewer info={tabletInfo} />
+            </div>
+        );
     };
 
     const renderLinks = () => {
@@ -94,7 +103,7 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         }
         return (
             <div>
-                <div className={b('section-title')}>Links</div>
+                <div className={b('section-title')}>{tabletInfoKeyset('title_links')}</div>
                 <Flex direction="column" gap={3}>
                     <LinkWithIcon
                         title={tabletInfoKeyset('field_developer-ui-app')}
@@ -119,10 +128,7 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
 
     return (
         <Flex gap={10} wrap="nowrap">
-            <div>
-                <div className={b('section-title')}>Info</div>
-                {renderTabletInfo()}
-            </div>
+            {renderTabletInfo()}
             {renderLinks()}
         </Flex>
     );

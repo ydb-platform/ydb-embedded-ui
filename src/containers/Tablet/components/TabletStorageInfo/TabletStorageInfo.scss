@@ -14,16 +14,25 @@
         tr:nth-of-type(2n + 1) {
             background-color: var(--g-color-base-generic-ultralight);
         }
+        :is(#{$block}__table-header-cell) {
+            height: 40px;
+            padding: 0;
+
+            text-align: left;
+
+            background-color: var(--g-color-base-background);
+            @include text-subheader-2();
+            // &_align_right {
+            //     #{$block}__table-header-content {
+            //         justify-content: flex-end;
+
+            //         text-align: right;
+            //     }
+            // }
+        }
     }
 
     &__table-header-cell {
-        height: 40px;
-        padding: 0;
-
-        text-align: left;
-
-        background-color: var(--g-color-base-background);
-        @include text-subheader-2();
         &_align_right {
             #{$block}__table-header-content {
                 justify-content: flex-end;
@@ -31,6 +40,15 @@
                 text-align: right;
             }
         }
+    }
+    :is(#{$block}__table-header-cell) {
+        height: 40px;
+        padding: 0;
+
+        text-align: left;
+
+        background-color: var(--g-color-base-background);
+        @include text-subheader-2();
     }
     &__table-header-content {
         display: flex;
@@ -44,14 +62,11 @@
         border-bottom: 1px solid var(--g-color-line-generic);
     }
     &__table-cell {
-        height: 30px;
+        height: 40px;
         padding: 0;
         @include text-body-2();
         &_align_right {
             text-align: right;
-        }
-        &_vertical-align_top {
-            vertical-align: top;
         }
     }
     &__metrics-cell {

@@ -16,13 +16,4 @@
     &__loader {
         margin-left: var(--g-spacing-2);
     }
-
-    &__link {
-        @extend .link;
-    }
-
-    &__section-title {
-        margin: var(--g-spacing-1) 0 var(--g-spacing-3);
-        @include text-subheader-2();
-    }
 }

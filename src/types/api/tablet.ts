@@ -121,24 +121,25 @@ export enum ETabletState {
 }
 
 interface TBoundChannel {
-    IOPS: number;
-    StoragePoolName: string;
-    Throughput: number;
-    Size: number;
+    IOPS?: number;
+    StoragePoolName?: string;
+    Throughput?: number;
+    Size?: number;
 }
 
 export interface TTabletStorageInfoChannelHistory {
-    GroupID: number;
-    FromGeneration: number;
-    Timestamp: string;
+    GroupID?: number;
+    FromGeneration?: number;
+    Timestamp?: string;
 }
 
 interface TTabletStorageInfoChannel {
-    Channel: number;
-    History: TTabletStorageInfoChannelHistory[];
+    Channel?: number;
+    History?: TTabletStorageInfoChannelHistory[];
 }
 
+//tablet data from hive
 export interface TTabletHiveResponse {
-    BoundChannels: TBoundChannel[];
-    TabletStorageInfo: {Channels: TTabletStorageInfoChannel[]; Version: number};
+    BoundChannels?: TBoundChannel[];
+    TabletStorageInfo?: {Channels?: TTabletStorageInfoChannel[]; Version?: number};
 }

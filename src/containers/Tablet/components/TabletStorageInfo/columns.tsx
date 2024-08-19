@@ -26,13 +26,13 @@ function metricsCell(
     return <div className={b('metrics-cell')}>{formattedValue}</div>;
 }
 
-interface OperationCellProps<TData> {
+interface GroupIdCellProps<TData> {
     row: Row<TData>;
     name?: string;
     hasExpand?: boolean;
 }
 
-export function StoragePoolCell<TData>({row, name, hasExpand}: OperationCellProps<TData>) {
+function GroupIdCell<TData>({row, name, hasExpand}: GroupIdCellProps<TData>) {
     const isExpandable = row.getCanExpand();
     return (
         <Flex gap={1} alignItems="flex-start" className={b('name-wrapper')}>
@@ -60,7 +60,7 @@ export function getColumns(hasExpand?: boolean) {
             header: () => <ColumnHeader name={tabletInfoKeyset('label_channel-index')} />,
             size: 50,
             cell: metricsCell,
-            meta: {align: 'right', verticalAlign: 'top'},
+            meta: {align: 'right'},
         },
         {
             accessorKey: 'storagePoolName',
@@ -78,27 +78,22 @@ export function getColumns(hasExpand?: boolean) {
             ),
             size: 100,
             cell: (info) => (
-                <StoragePoolCell
-                    row={info.row}
-                    name={info.getValue<string>()}
-                    hasExpand={hasExpand}
-                />
+                <GroupIdCell row={info.row} name={info.getValue<string>()} hasExpand={hasExpand} />
             ),
-            meta: {verticalAlign: 'top'},
         },
         {
             accessorKey: 'FromGeneration',
             header: () => <ColumnHeader name={tabletInfoKeyset('label_generation')} />,
             size: 100,
             cell: metricsCell,
-            meta: {align: 'right', verticalAlign: 'top'},
+            meta: {align: 'right'},
         },
         {
             accessorKey: 'Timestamp',
             header: () => <ColumnHeader name={tabletInfoKeyset('label_timestamp')} />,
             size: 200,
             cell: (info) => metricsCell(info, formatTimestamp),
-            meta: {align: 'right', verticalAlign: 'top'},
+            meta: {align: 'right'},
         },
     ];
     return columns;

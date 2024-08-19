@@ -164,7 +164,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
             label: pDiskInfoKeyset('links'),
             value: (
                 <span className={b('links')}>
-                    {isUserAllowedToMakeChanges && (
+                    {withPDiskPageLink && (
                         <LinkWithIcon
                             title={pDiskInfoKeyset('pdisk-page')}
                             url={pDiskPagePath}

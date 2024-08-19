@@ -423,12 +423,11 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
-    getNodesList({concurrentId, signal, database}: AxiosOptions & {database?: string} = {}) {
+    getNodesList({concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TEvNodesInfo>(
             this.getPath('/viewer/json/nodelist'),
             {
                 enums: true,
-                database,
             },
             {
                 concurrentId,
@@ -601,8 +600,12 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<Nullable<TTabletHiveResponse>>(
-            this.getPath(`/tablets/app?TabletID=${hiveId}&page=TabletInfo&tablet=${id}`),
-            {},
+            this.getPath('/tablets/app'),
+            {
+                TabletID: hiveId,
+                page: 'TabletInfo',
+                tablet: id,
+            },
             {
                 concurrentId,
                 requestConfig: {signal},

@@ -6,23 +6,23 @@ export function prepareData(data?: TTabletHiveResponse | null): TabletStorageIte
     if (!data) {
         return [];
     }
-    const {
-        BoundChannels,
-        TabletStorageInfo: {Channels},
-    } = data;
+    const {BoundChannels, TabletStorageInfo = {}} = data;
+
+    const Channels = TabletStorageInfo.Channels ?? [];
 
     const result = [];
 
     for (const channel of Channels) {
         const channelIndex = channel.Channel;
-        const history = [...channel.History];
-        if (!history.length) {
+        const channelHistory = channel.History;
+        if (!channelIndex || !channelHistory || !channelHistory.length) {
             continue;
         }
+        const copiedChannelHistory = [...channelHistory];
 
-        history.reverse();
-        const [latest, ...rest] = history;
-        const storagePoolName = BoundChannels[channelIndex].StoragePoolName;
+        copiedChannelHistory.reverse();
+        const [latest, ...rest] = copiedChannelHistory;
+        const storagePoolName = BoundChannels?.[channelIndex]?.StoragePoolName;
 
         const params = {
             ...latest,
