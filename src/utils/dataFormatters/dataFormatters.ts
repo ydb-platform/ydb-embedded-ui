@@ -136,6 +136,11 @@ export const formatDateTime = (value?: number | string, defaultValue = '') => {
 
     return formattedData ?? defaultValue;
 };
+export const formatTimestamp = (value?: string | number, defaultValue = '') => {
+    const formattedData = dateTimeParse(value)?.format('YYYY-MM-DD HH:mm:ss.SSS');
+
+    return formattedData ?? defaultValue;
+};
 
 export const calcUptimeInSeconds = (milliseconds: number | string) => {
     const currentDate = new Date();
