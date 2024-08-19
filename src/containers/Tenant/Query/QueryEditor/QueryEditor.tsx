@@ -187,7 +187,6 @@ function QueryEditor(props: QueryEditorProps) {
 
     const handleSettingsClick = () => {
         props.setQueryAction('settings');
-        props.setShowPreview(false);
     };
 
     const handleGetExplainQueryClick = useEventHandler(() => {
