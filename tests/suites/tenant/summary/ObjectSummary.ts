@@ -5,10 +5,8 @@ export const VISIBILITY_TIMEOUT = 5000;
 export class ObjectSummary {
     private tree: Locator;
     private treeRows: Locator;
-    private page: Page;
 
     constructor(page: Page) {
-        this.page = page;
         this.tree = page.locator('.object-summary__tree');
         this.treeRows = page.locator('.ydb-tree-view');
     }
