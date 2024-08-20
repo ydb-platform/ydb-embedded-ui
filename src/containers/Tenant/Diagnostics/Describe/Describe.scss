@@ -1,19 +1,30 @@
 @import '../../../../styles/mixins.scss';
 
-.kv-describe {
+.ydb-describe {
     &__message-container {
         padding: 15px 0;
     }
 
     &__result {
+        position: relative;
+
         display: flex;
         overflow: auto;
         flex: 0 0 auto;
 
-        padding: 10px 20px 20px 0;
+        padding: 0 20px 20px 0;
     }
 
     &__tree {
         @include json-tree-styles();
+    }
+
+    &__copy {
+        position: absolute;
+        left: 308px;
+    }
+
+    .json-inspector__search {
+        height: 26px;
     }
 }
