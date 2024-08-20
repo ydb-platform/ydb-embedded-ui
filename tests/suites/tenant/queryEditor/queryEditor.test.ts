@@ -278,7 +278,7 @@ test.describe('Test Query Editor', async () => {
         // Test for Execute mode
         await queryEditor.setQuery(longRunningQuery);
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeStatsLevel('Profile');
+        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Data);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Test for Explain mode

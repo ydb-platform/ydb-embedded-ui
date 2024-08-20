@@ -4,6 +4,7 @@ export const VISIBILITY_TIMEOUT = 5000;
 
 export enum QueryMode {
     YQLScript = 'YQL Script',
+    Data = 'DML',
     Scan = 'Scan',
 }
 

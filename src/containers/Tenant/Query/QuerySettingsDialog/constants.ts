@@ -38,10 +38,15 @@ export const ISOLATION_LEVEL_SELECT_OPTIONS = [
 
 export const QUERY_MODE_SELECT_OPTIONS = [
     {
+        value: QUERY_MODES.query,
+        content: QUERY_MODES_TITLES[QUERY_MODES.query],
+        text: i18n('method-description.query'),
+        isDefault: true,
+    },
+    {
         value: QUERY_MODES.script,
         content: QUERY_MODES_TITLES[QUERY_MODES.script],
         text: i18n('method-description.script'),
-        isDefault: true,
     },
     {
         value: QUERY_MODES.scan,
@@ -52,11 +57,6 @@ export const QUERY_MODE_SELECT_OPTIONS = [
         value: QUERY_MODES.data,
         content: QUERY_MODES_TITLES[QUERY_MODES.data],
         text: i18n('method-description.data'),
-    },
-    {
-        value: QUERY_MODES.query,
-        content: QUERY_MODES_TITLES[QUERY_MODES.query],
-        text: i18n('method-description.query'),
     },
     {
         value: QUERY_MODES.pg,
