@@ -15,7 +15,6 @@ import schema from './schema/schema';
 import settings from './settings/settings';
 import shardsWorkload from './shardsWorkload/shardsWorkload';
 import singleClusterMode from './singleClusterMode';
-import tablets from './tablets';
 import tenant from './tenant/tenant';
 import tenants from './tenants/tenants';
 import tooltip from './tooltip';
@@ -26,7 +25,6 @@ export const rootReducer = {
     cluster,
     tenant,
     tooltip,
-    tablets,
     schema,
     tenants,
     partitions,
