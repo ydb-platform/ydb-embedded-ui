@@ -97,11 +97,11 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
             }
 
             const newQueries = [...state.history.queries];
-            const {DurationUs, Executions: [{FinishTimeMs}] = [{}]} = stats;
+            const {duration, endTime} = stats;
             newQueries.splice(index, 1, {
                 ...state.history.queries[index],
-                duration: DurationUs,
-                endTime: FinishTimeMs,
+                duration,
+                endTime,
             });
 
             settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
@@ -183,6 +183,11 @@ interface SendQueryParams extends QueryRequestParams {
     enableTracingLevel?: boolean;
 }
 
+interface QueryStats {
+    duration?: string | number;
+    endTime?: string | number;
+}
+
 export const executeQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
         executeQuery: build.mutation<IQueryResult, SendQueryParams>({
@@ -208,6 +213,7 @@ export const executeQueryApi = api.injectEndpoints({
                 }
 
                 try {
+                    const timeStart = Date.now();
                     const response = await window.api.sendQuery(
                         {
                             schema,
@@ -235,7 +241,18 @@ export const executeQueryApi = api.injectEndpoints({
 
                     const data = parseQueryAPIExecuteResponse(response);
 
-                    dispatch(updateQueryInHistory(data.stats, queryId));
+                    const queryStats: QueryStats = {};
+                    if (data.stats) {
+                        const {DurationUs, Executions: [{FinishTimeMs}] = [{}]} = data.stats;
+                        queryStats.duration = DurationUs;
+                        queryStats.endTime = FinishTimeMs;
+                    } else {
+                        const now = Date.now();
+                        queryStats.duration = (now - timeStart) * 1000;
+                        queryStats.endTime = now;
+                    }
+
+                    dispatch(updateQueryInHistory(queryStats, queryId));
                     return {data};
                 } catch (error) {
                     return {error};
@@ -253,7 +270,7 @@ export const saveQueryToHistory = (queryText: string, queryId: string) => {
     } as const;
 };
 
-export function updateQueryInHistory(stats: IQueryResult['stats'], queryId: string) {
+export function updateQueryInHistory(stats: QueryStats, queryId: string) {
     return {
         type: UPDATE_QUERY_IN_HISTORY,
         data: {queryId, stats},
