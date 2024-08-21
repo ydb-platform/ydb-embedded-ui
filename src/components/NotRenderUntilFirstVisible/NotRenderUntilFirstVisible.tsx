@@ -1,8 +1,8 @@
 import React from 'react';
 
-import {cn} from '../../utils/cn';
+import {Freeze} from 'react-freeze';
 
-import {Freeze} from './Freeze';
+import {cn} from '../../utils/cn';
 
 import './NotRenderUntilFirstVisible.scss';
 
