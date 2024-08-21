@@ -6,7 +6,7 @@ import {PaginatedStorage} from './PaginatedStorage';
 import {Storage} from './Storage';
 
 interface StorageWrapperProps {
-    tenant?: string;
+    database?: string;
     nodeId?: string;
     parentContainer?: Element | null;
     additionalNodesProps?: AdditionalNodesProps;

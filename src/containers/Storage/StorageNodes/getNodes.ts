@@ -18,7 +18,7 @@ export const getStorageNodes: FetchData<
     Pick<NodesApiRequestParams, 'type' | 'storage'>
 > = async (params) => {
     const {type = 'static', storage = true, limit, offset, sortParams, filters} = params;
-    const {searchValue, nodesUptimeFilter, visibleEntities, tenant} = filters ?? {};
+    const {searchValue, nodesUptimeFilter, visibleEntities, database} = filters ?? {};
     const {sortOrder, columnId} = sortParams ?? {};
 
     const response = await window.api.getNodes(
@@ -32,7 +32,7 @@ export const getStorageNodes: FetchData<
             filter: searchValue,
             uptime: getUptimeParamValue(nodesUptimeFilter),
             visibleEntities,
-            tenant,
+            database,
         },
         {concurrentId: getConcurrentId(limit, offset)},
     );

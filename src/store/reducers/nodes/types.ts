@@ -54,6 +54,7 @@ export interface NodesFilters {
     problemFilter: ProblemFilterValue;
     uptimeFilter: NodesUptimeFilterValues;
     path?: string;
+    database?: string;
 }
 
 export interface NodesGeneralRequestParams extends Partial<NodesSortParams> {
@@ -68,6 +69,8 @@ export interface NodesGeneralRequestParams extends Partial<NodesSortParams> {
 export interface NodesApiRequestParams extends NodesGeneralRequestParams {
     node_id?: number | string; // get only specific node
     path?: string;
+    database?: string;
+    /** @deprecated use database instead */
     tenant?: string;
     type?: NodeType;
     visibleEntities?: VisibleEntities; // "with" param

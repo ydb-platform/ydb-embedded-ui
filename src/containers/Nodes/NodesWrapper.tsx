@@ -7,6 +7,7 @@ import {PaginatedNodes} from './PaginatedNodes';
 
 interface NodesWrapperProps {
     path?: string;
+    database?: string;
     parentContainer?: Element | null;
     additionalNodesProps?: AdditionalNodesProps;
 }
