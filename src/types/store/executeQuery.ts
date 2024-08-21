@@ -13,7 +13,7 @@ export interface QueryInHistory {
     queryText: string;
     syntax?: string;
     endTime?: string | number;
-    duration?: string | number;
+    durationUs?: string | number;
 }
 
 export interface ExecuteQueryState {

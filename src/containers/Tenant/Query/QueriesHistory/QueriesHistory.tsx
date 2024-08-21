@@ -62,8 +62,7 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
         {
             name: 'EndTime',
             header: i18n('history.endTime'),
-            render: ({row}) =>
-                row.endTime ? formatDateTime(new Date(row.endTime as string).getTime()) : '-',
+            render: ({row}) => (row.endTime ? formatDateTime(row.endTime.toString()) : '-'),
             align: 'right',
             width: 200,
             sortable: false,
@@ -71,7 +70,7 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
         {
             name: 'Duration',
             header: i18n('history.duration'),
-            render: ({row}) => (row.duration ? formatToMs(parseUsToMs(row.duration)) : '-'),
+            render: ({row}) => (row.durationUs ? formatToMs(parseUsToMs(row.durationUs)) : '-'),
             align: 'right',
             width: 150,
             sortable: false,

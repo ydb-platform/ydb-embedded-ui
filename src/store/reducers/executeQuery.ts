@@ -97,10 +97,10 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
             }
 
             const newQueries = [...state.history.queries];
-            const {duration, endTime} = stats;
+            const {durationUs, endTime} = stats;
             newQueries.splice(index, 1, {
                 ...state.history.queries[index],
-                duration,
+                durationUs,
                 endTime,
             });
 
@@ -184,7 +184,7 @@ interface SendQueryParams extends QueryRequestParams {
 }
 
 interface QueryStats {
-    duration?: string | number;
+    durationUs?: string | number;
     endTime?: string | number;
 }
 
@@ -244,11 +244,11 @@ export const executeQueryApi = api.injectEndpoints({
                     const queryStats: QueryStats = {};
                     if (data.stats) {
                         const {DurationUs, Executions: [{FinishTimeMs}] = [{}]} = data.stats;
-                        queryStats.duration = DurationUs;
+                        queryStats.durationUs = DurationUs;
                         queryStats.endTime = FinishTimeMs;
                     } else {
                         const now = Date.now();
-                        queryStats.duration = (now - timeStart) * 1000;
+                        queryStats.durationUs = (now - timeStart) * 1000;
                         queryStats.endTime = now;
                     }
 
