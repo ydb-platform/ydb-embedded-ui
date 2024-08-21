@@ -1,34 +1,12 @@
-import {createSelector, createSlice, lruMemoize} from '@reduxjs/toolkit';
-import type {PayloadAction} from '@reduxjs/toolkit';
+import {createSelector, lruMemoize} from '@reduxjs/toolkit';
 import isEqual from 'lodash/isEqual';
 
-import type {ETabletState, EType, TTabletStateInfo} from '../../types/api/tablet';
-import type {TabletsApiRequestParams, TabletsState} from '../../types/store/tablets';
+import type {TTabletStateInfo} from '../../types/api/tablet';
+import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import type {RootState} from '../defaultStore';
 
 import {api} from './api';
 import {selectNodesMap} from './nodesList';
-
-const initialState: TabletsState = {
-    stateFilter: [],
-    typeFilter: [],
-};
-
-const slice = createSlice({
-    name: 'tablets',
-    initialState,
-    reducers: {
-        setStateFilter: (state, action: PayloadAction<ETabletState[]>) => {
-            state.stateFilter = action.payload;
-        },
-        setTypeFilter: (state, action: PayloadAction<EType[]>) => {
-            state.typeFilter = action.payload;
-        },
-    },
-});
-
-export const {setStateFilter, setTypeFilter} = slice.actions;
-export default slice.reducer;
 
 export const tabletsApi = api.injectEndpoints({
     endpoints: (build) => ({
@@ -41,7 +19,7 @@ export const tabletsApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['All', {type: 'Tablet', id: 'LIST'}],
         }),
     }),
     overrideExisting: 'throw',

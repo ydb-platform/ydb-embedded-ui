@@ -584,21 +584,21 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
-    killTablet(id?: string) {
+    killTablet(id: string) {
         return this.get<string>(
             this.getPath(`/tablets?KillTabletID=${id}`),
             {},
             {requestConfig: {'axios-retry': {retries: 0}}},
         );
     }
-    stopTablet(id?: string, hiveId?: string) {
+    stopTablet(id: string, hiveId: string) {
         return this.get<string>(
             this.getPath(`/tablets/app?TabletID=${hiveId}&page=StopTablet&tablet=${id}`),
             {},
             {requestConfig: {'axios-retry': {retries: 0}}},
         );
     }
-    resumeTablet(id?: string, hiveId?: string) {
+    resumeTablet(id: string, hiveId: string) {
         return this.get<string>(
             this.getPath(`/tablets/app?TabletID=${hiveId}&page=ResumeTablet&tablet=${id}`),
             {},
@@ -606,7 +606,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getTabletFromHive(
-        {id, hiveId}: {id?: string; hiveId?: string},
+        {id, hiveId}: {id: string; hiveId: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<Nullable<TTabletHiveResponse>>(
