@@ -101,6 +101,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return (
                     <NodesWrapper
                         path={path}
+                        database={tenantName}
                         additionalNodesProps={props.additionalNodesProps}
                         parentContainer={container.current}
                     />
@@ -110,7 +111,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Tablets path={path} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.storage: {
-                return <StorageWrapper tenant={tenantName} parentContainer={container.current} />;
+                return <StorageWrapper database={tenantName} parentContainer={container.current} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.network: {
                 return <Network tenantName={tenantName} />;

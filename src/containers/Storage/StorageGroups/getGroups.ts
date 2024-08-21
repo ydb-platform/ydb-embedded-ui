@@ -17,7 +17,7 @@ export const getStorageGroups: FetchData<
 > = async (params) => {
     const {limit, offset, sortParams, filters} = params;
     const {sortOrder, columnId} = sortParams ?? {};
-    const {searchValue, visibleEntities, tenant, nodeId} = filters ?? {};
+    const {searchValue, visibleEntities, database, nodeId} = filters ?? {};
 
     const response = await window.api.getStorageInfo(
         {
@@ -28,7 +28,7 @@ export const getStorageGroups: FetchData<
             sortValue: columnId as StorageSortValue,
             filter: searchValue,
             visibleEntities,
-            tenant,
+            database,
             nodeId,
         },
         {concurrentId: getConcurrentId(limit, offset)},
