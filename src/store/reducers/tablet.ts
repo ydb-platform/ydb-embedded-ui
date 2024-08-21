@@ -53,7 +53,9 @@ export const tabletApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: (_result, _error, arg) => {
+                return ['All', {type: 'Tablet', id: arg.id}];
+            },
         }),
         getTabletDescribe: build.query({
             queryFn: async ({tenantId}: {tenantId: TDomainKey}, {signal}) => {
@@ -70,7 +72,7 @@ export const tabletApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
         getAdvancedTableInfo: build.query({
-            queryFn: async ({id, hiveId}: {id: string; hiveId?: string}, {signal}) => {
+            queryFn: async ({id, hiveId}: {id: string; hiveId: string}, {signal}) => {
                 try {
                     const tabletResponseData = await window.api.getTabletFromHive(
                         {id, hiveId},
@@ -82,7 +84,57 @@ export const tabletApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: (_result, _error, arg) => {
+                return ['All', {type: 'Tablet', id: arg.id}];
+            },
+        }),
+        killTablet: build.mutation({
+            queryFn: async ({id}: {id: string}) => {
+                try {
+                    const data = await window.api.killTablet(id);
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            invalidatesTags: (_result, _error, arg) => {
+                return [
+                    {type: 'Tablet', id: arg.id},
+                    {type: 'Tablet', id: 'LIST'},
+                ];
+            },
+        }),
+        stopTablet: build.mutation({
+            queryFn: async ({id, hiveId}: {id: string; hiveId: string}) => {
+                try {
+                    const data = await window.api.stopTablet(id, hiveId);
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            invalidatesTags: (_result, _error, arg) => {
+                return [
+                    {type: 'Tablet', id: arg.id},
+                    {type: 'Tablet', id: 'LIST'},
+                ];
+            },
+        }),
+        resumeTablet: build.mutation({
+            queryFn: async ({id, hiveId}: {id: string; hiveId: string}) => {
+                try {
+                    const data = await window.api.resumeTablet(id, hiveId);
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            invalidatesTags: (_result, _error, arg) => {
+                return [
+                    {type: 'Tablet', id: arg.id},
+                    {type: 'Tablet', id: 'LIST'},
+                ];
+            },
         }),
     }),
     overrideExisting: 'throw',

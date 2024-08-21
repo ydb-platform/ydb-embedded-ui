@@ -5,6 +5,7 @@ import {Flex, Icon} from '@gravity-ui/uikit';
 
 import {ButtonWithConfirmDialog} from '../../../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {selectIsUserAllowedToMakeChanges} from '../../../../store/reducers/authentication/authentication';
+import {tabletApi} from '../../../../store/reducers/tablet';
 import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {useTypedSelector} from '../../../../utils/hooks';
@@ -13,23 +14,20 @@ import {hasHive} from '../../utils';
 
 interface TabletControlsProps {
     tablet: TTabletStateInfo;
-    fetchData: () => Promise<unknown>;
 }
 
-export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
+export const TabletControls = ({tablet}: TabletControlsProps) => {
     const {TabletId, HiveId} = tablet;
 
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
-    const _onKillClick = () => {
-        return window.api.killTablet(TabletId);
-    };
-    const _onStopClick = () => {
-        return window.api.stopTablet(TabletId, HiveId);
-    };
-    const _onResumeClick = () => {
-        return window.api.resumeTablet(TabletId, HiveId);
-    };
+    const [killTablet] = tabletApi.useKillTabletMutation();
+    const [stopTablet] = tabletApi.useStopTabletMutation();
+    const [resumeTablet] = tabletApi.useResumeTabletMutation();
+
+    if (!TabletId) {
+        return null;
+    }
 
     const hasHiveId = hasHive(HiveId);
 
@@ -45,8 +43,7 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
         <Flex gap={2} wrap="nowrap">
             <ButtonWithConfirmDialog
                 dialogContent={i18n('dialog.kill')}
-                onConfirmAction={_onKillClick}
-                onConfirmActionSuccess={fetchData}
+                onConfirmAction={() => killTablet({id: TabletId}).unwrap()}
                 buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
                 withPopover
                 buttonView="normal"
@@ -61,8 +58,7 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                 <React.Fragment>
                     <ButtonWithConfirmDialog
                         dialogContent={i18n('dialog.stop')}
-                        onConfirmAction={_onStopClick}
-                        onConfirmActionSuccess={fetchData}
+                        onConfirmAction={() => stopTablet({id: TabletId, hiveId: HiveId}).unwrap()}
                         buttonDisabled={isDisabledStop || !isUserAllowedToMakeChanges}
                         withPopover
                         buttonView="normal"
@@ -75,8 +71,9 @@ export const TabletControls = ({tablet, fetchData}: TabletControlsProps) => {
                     </ButtonWithConfirmDialog>
                     <ButtonWithConfirmDialog
                         dialogContent={i18n('dialog.resume')}
-                        onConfirmAction={_onResumeClick}
-                        onConfirmActionSuccess={fetchData}
+                        onConfirmAction={() =>
+                            resumeTablet({id: TabletId, hiveId: HiveId}).unwrap()
+                        }
                         buttonDisabled={isDisabledResume || !isUserAllowedToMakeChanges}
                         withPopover
                         buttonView="normal"

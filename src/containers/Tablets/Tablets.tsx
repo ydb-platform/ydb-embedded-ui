@@ -13,6 +13,7 @@ import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TabletState} from '../../components/TabletState/TabletState';
 import {getTabletPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
+import {tabletApi} from '../../store/reducers/tablet';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
@@ -21,7 +22,7 @@ import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
 import {createTabletDeveloperUIHref} from '../../utils/developerUI/developerUI';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedSelector} from '../../utils/hooks';
 import {getDefaultNodePath} from '../Node/NodePages';
 
 import i18n from './i18n';
@@ -135,18 +136,20 @@ const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
 
 function TabletActions(tablet: TTabletStateInfo) {
     const isDisabledRestart = tablet.State === ETabletState.Stopped;
-    const dispatch = useTypedDispatch();
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const [killTablet] = tabletApi.useKillTabletMutation();
+
+    const id = tablet.TabletId;
+    if (!id) {
+        return null;
+    }
 
     return (
         <ButtonWithConfirmDialog
             buttonView="outlined"
             dialogContent={i18n('dialog.kill')}
             onConfirmAction={() => {
-                return window.api.killTablet(tablet.TabletId);
-            }}
-            onConfirmActionSuccess={() => {
-                dispatch(tabletsApi.util.invalidateTags(['All']));
+                return killTablet({id}).unwrap();
             }}
             buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
             withPopover

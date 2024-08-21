@@ -35,7 +35,7 @@ export interface VDiskBreadcrumbsOptions extends PDiskBreadcrumbsOptions {
 }
 
 export interface TabletsBreadcrumbsOptions extends TenantBreadcrumbsOptions {
-    nodeIds?: string[] | number[];
+    nodeIds?: (string | number)[];
 }
 
 export interface TabletBreadcrumbsOptions extends TabletsBreadcrumbsOptions {
