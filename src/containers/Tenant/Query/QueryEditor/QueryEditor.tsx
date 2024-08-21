@@ -179,7 +179,7 @@ function QueryEditor(props: QueryEditorProps) {
         if (!text) {
             const {queries, currentIndex} = history;
             if (query !== queries[currentIndex]?.queryText) {
-                props.saveQueryToHistory(input);
+                props.saveQueryToHistory(input, queryId);
             }
         }
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);

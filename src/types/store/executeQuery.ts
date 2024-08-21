@@ -5,11 +5,15 @@ import type {
     saveQueryToHistory,
     setQueryHistoryFilter,
     setTenantPath,
+    updateQueryInHistory,
 } from '../../store/reducers/executeQuery';
 
 export interface QueryInHistory {
+    queryId?: string;
     queryText: string;
     syntax?: string;
+    endTime?: string | number;
+    durationUs?: string | number;
 }
 
 export interface ExecuteQueryState {
@@ -29,6 +33,7 @@ export type ExecuteQueryAction =
     | ReturnType<typeof goToPreviousQuery>
     | ReturnType<typeof changeUserInput>
     | ReturnType<typeof saveQueryToHistory>
+    | ReturnType<typeof updateQueryInHistory>
     | ReturnType<typeof setTenantPath>
     | ReturnType<typeof setQueryHistoryFilter>;
 
