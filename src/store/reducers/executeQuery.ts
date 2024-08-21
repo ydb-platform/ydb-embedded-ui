@@ -25,6 +25,7 @@ const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
+const UPDATE_QUERY_IN_HISTORY = 'query/UPDATE_QUERY_IN_HISTORY';
 const SET_QUERY_HISTORY_FILTER = 'query/SET_QUERY_HISTORY_FILTER';
 const GO_TO_PREVIOUS_QUERY = 'query/GO_TO_PREVIOUS_QUERY';
 const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
@@ -65,9 +66,9 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
         }
 
         case SAVE_QUERY_TO_HISTORY: {
-            const queryText = action.data;
+            const {queryText, queryId} = action.data;
 
-            const newQueries = [...state.history.queries, {queryText}].slice(
+            const newQueries = [...state.history.queries, {queryText, queryId}].slice(
                 state.history.queries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
             );
             settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
@@ -78,6 +79,38 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
                 history: {
                     queries: newQueries,
                     currentIndex,
+                },
+            };
+        }
+
+        case UPDATE_QUERY_IN_HISTORY: {
+            const {queryId, stats} = action.data;
+
+            if (!stats) {
+                return state;
+            }
+
+            const index = state.history.queries.findIndex((item) => item.queryId === queryId);
+
+            if (index === -1) {
+                return state;
+            }
+
+            const newQueries = [...state.history.queries];
+            const {durationUs, endTime} = stats;
+            newQueries.splice(index, 1, {
+                ...state.history.queries[index],
+                durationUs,
+                endTime,
+            });
+
+            settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
+
+            return {
+                ...state,
+                history: {
+                    ...state.history,
+                    queries: newQueries,
                 },
             };
         }
@@ -150,6 +183,11 @@ interface SendQueryParams extends QueryRequestParams {
     enableTracingLevel?: boolean;
 }
 
+interface QueryStats {
+    durationUs?: string | number;
+    endTime?: string | number;
+}
+
 export const executeQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
         executeQuery: build.mutation<IQueryResult, SendQueryParams>({
@@ -162,7 +200,7 @@ export const executeQueryApi = api.injectEndpoints({
                     enableTracingLevel,
                     queryId,
                 },
-                {signal},
+                {signal, dispatch},
             ) => {
                 let action: ExecuteActions = 'execute';
                 let syntax: QuerySyntax = QUERY_SYNTAX.yql;
@@ -175,6 +213,7 @@ export const executeQueryApi = api.injectEndpoints({
                 }
 
                 try {
+                    const timeStart = Date.now();
                     const response = await window.api.sendQuery(
                         {
                             schema,
@@ -201,6 +240,19 @@ export const executeQueryApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
+
+                    const queryStats: QueryStats = {};
+                    if (data.stats) {
+                        const {DurationUs, Executions: [{FinishTimeMs}] = [{}]} = data.stats;
+                        queryStats.durationUs = DurationUs;
+                        queryStats.endTime = FinishTimeMs;
+                    } else {
+                        const now = Date.now();
+                        queryStats.durationUs = (now - timeStart) * 1000;
+                        queryStats.endTime = now;
+                    }
+
+                    dispatch(updateQueryInHistory(queryStats, queryId));
                     return {data};
                 } catch (error) {
                     return {error};
@@ -211,12 +263,19 @@ export const executeQueryApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
-export const saveQueryToHistory = (queryText: string) => {
+export const saveQueryToHistory = (queryText: string, queryId: string) => {
     return {
         type: SAVE_QUERY_TO_HISTORY,
-        data: queryText,
+        data: {queryText, queryId},
     } as const;
 };
+
+export function updateQueryInHistory(stats: QueryStats, queryId: string) {
+    return {
+        type: UPDATE_QUERY_IN_HISTORY,
+        data: {queryId, stats},
+    } as const;
+}
 
 export const goToPreviousQuery = () => {
     return {
