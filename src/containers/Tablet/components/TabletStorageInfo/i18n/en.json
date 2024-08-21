@@ -1,0 +1,7 @@
+{
+  "label_channel-index": "Channel",
+  "label_storage-pool": "Storage Pool Name",
+  "label_group-id": "Group ID",
+  "label_generation": "From generation",
+  "label_timestamp": "Timestamp"
+}

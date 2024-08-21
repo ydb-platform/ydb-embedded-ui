@@ -8,6 +8,7 @@ export interface TabletsState {
 export interface TabletsApiRequestParams {
     nodes?: string[];
     path?: string;
+    database?: string;
 }
 
 export interface TabletsRootStateSlice {

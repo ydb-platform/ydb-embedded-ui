@@ -19,6 +19,17 @@
                 "selector": "ImportDeclaration[source.value='axios'] :matches(ImportSpecifier[imported.name='isAxiosError'])",
                 "message": "Please use isAxiosError from utils/response instead of axios",
             },
-          ],
+        ],
+        "no-restricted-imports": [
+            "error",
+            {
+                "patterns": [
+                    {
+                        "group": [".*/**/lib"],
+                        "message": "Please use direct imports instead",
+                    },
+                ],
+            },
+        ],
     },
 }

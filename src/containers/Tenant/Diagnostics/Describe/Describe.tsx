@@ -1,3 +1,4 @@
+import {ClipboardButton} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import JSONTree from 'react-json-inspector';
 import {shallowEqual} from 'react-redux';
@@ -14,7 +15,7 @@ import {isEntityWithMergedImplementation} from '../../utils/schema';
 import './Describe.scss';
 import 'react-json-inspector/json-inspector.css';
 
-const b = cn('kv-describe');
+const b = cn('ydb-describe');
 
 const expandMap = new Map();
 
@@ -85,6 +86,11 @@ const Describe = ({path, database, type}: IDescribeProps) => {
                         isExpanded={(keypath) => {
                             return expandMap.get(keypath) || false;
                         }}
+                    />
+                    <ClipboardButton
+                        view="flat-secondary"
+                        text={JSON.stringify(preparedDescribeData)}
+                        className={b('copy')}
                     />
                 </div>
             ) : null}

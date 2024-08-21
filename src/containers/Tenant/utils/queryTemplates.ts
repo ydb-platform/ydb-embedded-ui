@@ -17,16 +17,17 @@ WITH (
     AUTO_PARTITIONING_PARTITION_SIZE_MB = 2048,
     AUTO_PARTITIONING_BY_LOAD = ENABLED,
     AUTO_PARTITIONING_MIN_PARTITIONS_COUNT = 4,
-    AUTO_PARTITIONING_MAX_PARTITIONS_COUNT = 1024,
+    AUTO_PARTITIONING_MAX_PARTITIONS_COUNT = 1024
     -- uncomment to create a table with predefined partitions
-    -- UNIFORM_PARTITIONS = 4, -- The number of partitions for uniform initial table partitioning.
+    -- , UNIFORM_PARTITIONS = 4 -- The number of partitions for uniform initial table partitioning.
                             -- The primary key's first column must have type Uint64 or Uint32.
                             -- A created table is immediately divided into the specified number of partitions
     -- uncomment to launch read only replicas in every AZ
-    -- READ_REPLICAS_SETTINGS = 'PER_AZ:1', -- Enable read replicas for stale read, launch one replica in every availability zone
+    -- , READ_REPLICAS_SETTINGS = 'PER_AZ:1' -- Enable read replicas for stale read, launch one replica in every availability zone
     -- uncomment to enable ttl
-    -- TTL = Interval("PT1H") ON expire_at, -- Enable background deletion of expired rows https://ydb.tech/en/docs/concepts/ttl
-    KEY_BLOOM_FILTER = ENABLED -- With a Bloom filter, you can more efficiently determine
+    -- , TTL = Interval("PT1H") ON expire_at -- Enable background deletion of expired rows https://ydb.tech/en/docs/concepts/ttl
+    -- uncomment to create a table with a bloom filter
+    -- , KEY_BLOOM_FILTER = ENABLED -- With a Bloom filter, you can more efficiently determine
                                -- if some keys are missing in a table when making multiple single queries by the primary key.
 )`;
 };

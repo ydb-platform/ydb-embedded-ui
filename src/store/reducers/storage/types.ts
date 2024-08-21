@@ -4,6 +4,7 @@ import {z} from 'zod';
 import type {TSystemStateInfo} from '../../../types/api/nodes';
 import type {EVersion, TStorageGroupInfo} from '../../../types/api/storage';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
+import type {NodesUptimeFilterValues} from '../../../utils/nodes';
 import type {StorageSortValue} from '../../../utils/storage';
 
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
@@ -12,6 +13,13 @@ export const visibleEntitiesSchema = z.nativeEnum(VISIBLE_ENTITIES).catch(VISIBL
 export type VisibleEntities = z.infer<typeof visibleEntitiesSchema>;
 export const storageTypeSchema = z.nativeEnum(STORAGE_TYPES).catch(STORAGE_TYPES.groups);
 export type StorageType = z.infer<typeof storageTypeSchema>;
+
+export interface PreparedStorageNodeFilters {
+    searchValue: string;
+    nodesUptimeFilter: NodesUptimeFilterValues;
+    visibleEntities: VisibleEntities;
+    tenant?: string;
+}
 
 export interface PreparedStorageNode extends TSystemStateInfo {
     NodeId: number;
@@ -23,6 +31,13 @@ export interface PreparedStorageNode extends TSystemStateInfo {
 
     Missing: number;
     Uptime: string;
+}
+
+export interface PreparedStorageGroupFilters {
+    searchValue: string;
+    visibleEntities: VisibleEntities;
+    tenant?: string;
+    nodeId?: string;
 }
 
 export interface PreparedStorageGroup extends TStorageGroupInfo {

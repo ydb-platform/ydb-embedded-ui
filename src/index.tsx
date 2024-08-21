@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 /* eslint-disable import/order */
 import ReactDOM from 'react-dom/client';
 

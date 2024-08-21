@@ -2,8 +2,8 @@ import {createSelector} from '@reduxjs/toolkit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
 import type {RootState} from '../..';
-import {SHOW_DOMAIN_DATABASE_KEY} from '../../../lib';
 import {EFlag} from '../../../types/api/enums';
+import {SHOW_DOMAIN_DATABASE_KEY} from '../../../utils/constants';
 import {ProblemFilterValues, getSettingValue, selectProblemFilter} from '../settings/settings';
 import type {ProblemFilterValue} from '../settings/types';
 

@@ -16,3 +16,7 @@ export const useDiskPagesAvailable = () => {
     // It's enough to check only pdisk handler
     return useGetFeatureVersion('/pdisk/info') > 0;
 };
+
+export const useTracingLevelOptionAvailable = () => {
+    return useGetFeatureVersion('/viewer/query') > 2;
+};

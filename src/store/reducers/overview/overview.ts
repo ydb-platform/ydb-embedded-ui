@@ -13,6 +13,7 @@ export const overviewApi = api.injectEndpoints({
                     return {error};
                 }
             },
+            providesTags: ['All'],
         }),
     }),
 });

@@ -1,6 +1,9 @@
 {
   "tablet.header": "Tablet",
 
+  "tablet.meta-database": "Database",
+  "tablet.meta-follower": "Follower",
+
   "controls.kill": "Restart",
   "controls.stop": "Stop",
   "controls.resume": "Resume",
@@ -13,5 +16,8 @@
   "dialog.stop": "The tablet will be stopped. Do you want to proceed?",
   "dialog.resume": "The tablet will be resumed. Do you want to proceed?",
 
-  "emptyState": "The tablet was not found"
+  "emptyState": "The tablet was not found",
+
+  "label_tablet-history": "Tablets",
+  "label_tablet-channels": "Storage"
 }

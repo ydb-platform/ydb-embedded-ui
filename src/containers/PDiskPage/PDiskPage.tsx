@@ -7,14 +7,13 @@ import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
-import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
-import {DiskPageTitle} from '../../components/DiskPageTitle/DiskPageTitle';
+import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink/InternalLink';
 import {PDiskInfo} from '../../components/PDiskInfo/PDiskInfo';
-import {PageMeta} from '../../components/PageMeta/PageMeta';
+import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {getPDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
@@ -125,16 +124,17 @@ export function PDiskPage() {
         const nodeIdItem = NodeId ? `${pDiskPageKeyset('node')}: ${NodeId}` : undefined;
 
         return (
-            <div className={pdiskPageCn('meta')}>
-                <PageMeta loading={pDiskLoading} items={[hostItem, nodeIdItem, NodeType, NodeDC]} />
-                <AutoRefreshControl />
-            </div>
+            <PageMetaWithAutorefresh
+                loading={pDiskLoading}
+                items={[hostItem, nodeIdItem, NodeType, NodeDC]}
+                className={pdiskPageCn('meta')}
+            />
         );
     };
 
     const renderPageTitle = () => {
         return (
-            <DiskPageTitle
+            <EntityPageTitle
                 entityName={pDiskPageKeyset('pdisk')}
                 status={getSeverityColor(Severity)}
                 id={pDiskParamsDefined ? getPDiskId(nodeId, pDiskId) : null}

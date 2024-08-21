@@ -4,6 +4,7 @@ export const VISIBILITY_TIMEOUT = 5000;
 
 export enum QueryMode {
     YQLScript = 'YQL Script',
+    Data = 'DML',
     Scan = 'Scan',
 }
 
@@ -82,9 +83,11 @@ export class SettingsDialog {
 
 export class ResultTable {
     private table: Locator;
+    private preview: Locator;
 
     constructor(selector: Locator) {
         this.table = selector.locator('.ydb-query-execute-result__result');
+        this.preview = selector.locator('.kv-preview__result');
     }
 
     async isVisible() {
@@ -94,6 +97,16 @@ export class ResultTable {
 
     async isHidden() {
         await this.table.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async isPreviewVisible() {
+        await this.preview.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async isPreviewHidden() {
+        await this.preview.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 
@@ -110,8 +123,8 @@ export class ResultTable {
 
 export class QueryEditor {
     settingsDialog: SettingsDialog;
-    resultTable: ResultTable;
 
+    private resultTable: ResultTable;
     private page: Page;
     private selector: Locator;
     private editorTextArea: Locator;
@@ -211,6 +224,10 @@ export class QueryEditor {
         await this.editorTextArea.focus();
     }
 
+    async closeSettingsDialog() {
+        await this.settingsDialog.clickButton(ButtonNames.Cancel);
+    }
+
     async clickGearButton() {
         await this.gearButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.gearButton.click();
@@ -246,6 +263,22 @@ export class QueryEditor {
     async isElapsedTimeHidden() {
         await this.elapsedTimeLabel.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
+    }
+
+    async isResultTableVisible() {
+        return await this.resultTable.isVisible();
+    }
+
+    async isResultTableHidden() {
+        return await this.resultTable.isHidden();
+    }
+
+    async isPreviewVisible() {
+        return await this.resultTable.isPreviewVisible();
+    }
+
+    async isPreviewHidden() {
+        return await this.resultTable.isPreviewHidden();
     }
 
     async isStopButtonVisible() {

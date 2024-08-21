@@ -94,7 +94,7 @@ Install all Playwright dependencies and chromium to run tests.
 npm run test:e2e:install
 ```
 
-Run tests. If `PLAYWRIGHT_BASE_URL` is provided, tests run on this url, otherwise Playwright `webServer` is started with `npm run dev` on `http://localhost:3000` and all tests run there.
+Run tests. If `PLAYWRIGHT_BASE_URL` is provided, tests run on this url, otherwise Playwright `webServer` is started with `npm run dev` on `http://localhost:3000` and all tests run there. If `PLAYWRIGHT_APP_BACKEND` is provided, tests will be use this url as backend, otherwise `http://localhost:8765` will be used.
 
 ```
 npm run test:e2e

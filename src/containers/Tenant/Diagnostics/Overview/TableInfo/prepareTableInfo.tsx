@@ -1,6 +1,7 @@
 import {Text} from '@gravity-ui/uikit';
 import omit from 'lodash/omit';
 
+import {toFormattedSize} from '../../../../../components/FormattedBytes/utils';
 import type {InfoViewerItem} from '../../../../../components/InfoViewer';
 import {formatObject} from '../../../../../components/InfoViewer';
 import {
@@ -17,8 +18,10 @@ import type {
     TTTLSettings,
 } from '../../../../../types/api/schema';
 import {EPathType} from '../../../../../types/api/schema';
+import {valueIsDefined} from '../../../../../utils';
 import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
+import {isNumeric} from '../../../../../utils/utils';
 
 import i18n from './i18n';
 
@@ -126,10 +129,12 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
         }
     }
 
-    generalTableInfo.push({
-        label: i18n('label.bloom-filter'),
-        value: EnableFilterByKey ? i18n('enabled') : i18n('disabled'),
-    });
+    if (valueIsDefined(EnableFilterByKey)) {
+        generalTableInfo.push({
+            label: i18n('label.bloom-filter'),
+            value: EnableFilterByKey ? i18n('enabled') : i18n('disabled'),
+        });
+    }
 
     return generalTableInfo;
 };
@@ -154,6 +159,7 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         RowCount,
         DataSize,
         IndexSize,
+        ByKeyFilterSize,
 
         LastAccessTime,
         LastUpdateTime,
@@ -187,13 +193,22 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         }
     }
 
+    const generalStats = formatObject(formatTableStatsItem, {
+        PartCount,
+        RowCount,
+        DataSize,
+        IndexSize,
+    });
+
+    if (
+        isNumeric(ByKeyFilterSize) &&
+        (PartitionConfig.EnableFilterByKey || Number(ByKeyFilterSize) > 0)
+    ) {
+        generalStats.push({label: 'BloomFilterSize', value: toFormattedSize(ByKeyFilterSize)});
+    }
+
     const tableStatsInfo = [
-        formatObject(formatTableStatsItem, {
-            PartCount,
-            RowCount,
-            DataSize,
-            IndexSize,
-        }),
+        generalStats,
         formatObject(formatTableStatsItem, {
             LastAccessTime,
             LastUpdateTime,
