@@ -1,6 +1,6 @@
 import type {Locator, Page} from '@playwright/test';
 
-export const VISIBILITY_TIMEOUT = 5000;
+import {VISIBILITY_TIMEOUT} from '../TenantPage';
 
 export enum QueryMode {
     YQLScript = 'YQL Script',
@@ -20,6 +20,46 @@ export enum ButtonNames {
     Cancel = 'Cancel',
     Save = 'Save',
     Stop = 'Stop',
+}
+
+export enum ResultTabNames {
+    Result = 'Result',
+    Stats = 'Stats',
+    Schema = 'Schema',
+    ExplainPlan = 'Explain Plan',
+}
+
+export enum QueryTabs {
+    Editor = 'Editor',
+    History = 'History',
+    Saved = 'Saved',
+}
+
+export class QueryTabsNavigation {
+    private tabsContainer: Locator;
+
+    constructor(page: Page) {
+        this.tabsContainer = page.locator('.ydb-query__tabs');
+    }
+
+    async selectTab(tabName: QueryTabs) {
+        const tab = this.tabsContainer.locator(`role=tab[name="${tabName}"]`);
+        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await tab.click();
+    }
+
+    async isTabSelected(tabName: QueryTabs): Promise<boolean> {
+        const tab = this.tabsContainer.locator(`role=tab[name="${tabName}"]`);
+        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const isSelected = await tab.getAttribute('aria-selected');
+        return isSelected === 'true';
+    }
+
+    async getTabHref(tabName: QueryTabs): Promise<string | null> {
+        const link = this.tabsContainer.locator(`a:has(div[role="tab"][title="${tabName}"])`);
+        await link.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return link.getAttribute('href');
+    }
 }
 
 export class SettingsDialog {
@@ -81,6 +121,22 @@ export class SettingsDialog {
     }
 }
 
+class PaneWrapper {
+    paneWrapper: Locator;
+    private radioButton: Locator;
+
+    constructor(page: Page) {
+        this.paneWrapper = page.locator('.query-editor__pane-wrapper');
+        this.radioButton = this.paneWrapper.locator('.g-radio-button');
+    }
+
+    async selectTab(tabName: ResultTabNames) {
+        const tab = this.radioButton.getByLabel(tabName);
+        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await tab.click();
+    }
+}
+
 export class ResultTable {
     private table: Locator;
     private preview: Locator;
@@ -123,8 +179,10 @@ export class ResultTable {
 
 export class QueryEditor {
     settingsDialog: SettingsDialog;
+    paneWrapper: PaneWrapper;
+    queryTabs: QueryTabsNavigation;
+    resultTable: ResultTable;
 
-    private resultTable: ResultTable;
     private page: Page;
     private selector: Locator;
     private editorTextArea: Locator;
@@ -158,6 +216,8 @@ export class QueryEditor {
 
         this.settingsDialog = new SettingsDialog(page);
         this.resultTable = new ResultTable(this.selector);
+        this.paneWrapper = new PaneWrapper(page);
+        this.queryTabs = new QueryTabsNavigation(page);
     }
 
     async run(query: string, mode: QueryMode) {
@@ -263,22 +323,6 @@ export class QueryEditor {
     async isElapsedTimeHidden() {
         await this.elapsedTimeLabel.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
-    }
-
-    async isResultTableVisible() {
-        return await this.resultTable.isVisible();
-    }
-
-    async isResultTableHidden() {
-        return await this.resultTable.isHidden();
-    }
-
-    async isPreviewVisible() {
-        return await this.resultTable.isPreviewVisible();
-    }
-
-    async isPreviewHidden() {
-        return await this.resultTable.isPreviewHidden();
     }
 
     async isStopButtonVisible() {

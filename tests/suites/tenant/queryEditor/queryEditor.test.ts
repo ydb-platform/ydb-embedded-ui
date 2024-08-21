@@ -1,14 +1,15 @@
 import {expect, test} from '@playwright/test';
 
 import {tenantName} from '../../../utils/constants';
-import {TenantPage} from '../TenantPage';
+import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 
 import {
     ButtonNames,
     ExplainResultType,
     QueryEditor,
     QueryMode,
-    VISIBILITY_TIMEOUT,
+    QueryTabs,
+    ResultTabNames,
 } from './QueryEditor';
 import {longRunningQuery} from './constants';
 
@@ -53,14 +54,14 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.run(testQuery, QueryMode.YQLScript);
 
-        await expect(queryEditor.isResultTableVisible()).resolves.toBe(true);
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 
     test('Run button executes Scan', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.run(testQuery, QueryMode.Scan);
 
-        await expect(queryEditor.isResultTableVisible()).resolves.toBe(true);
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 
     test('Explain button executes YQL script explanation', async ({page}) => {
@@ -332,5 +333,48 @@ test.describe('Test Query Editor', async () => {
 
         const statusElement = await queryEditor.getExecutionStatus();
         await expect(statusElement).toBe('Failed');
+    });
+
+    test('Changing tab inside results pane doesnt change results view', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery(testQuery);
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeStatsLevel('Profile');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+        await queryEditor.paneWrapper.selectTab(ResultTabNames.Schema);
+        await expect(queryEditor.resultTable.isHidden()).resolves.toBe(true);
+        await queryEditor.paneWrapper.selectTab(ResultTabNames.Result);
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+    });
+
+    test('Changing tab inside editor doesnt change results view', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery(testQuery);
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeStatsLevel('Profile');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await expect(queryEditor.resultTable.isHidden()).resolves.toBe(true);
+        await queryEditor.queryTabs.selectTab(QueryTabs.Editor);
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+    });
+
+    test('Changing tab to diagnostics doesnt change results view', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        const tenantPage = new TenantPage(page);
+        await queryEditor.setQuery(testQuery);
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeStatsLevel('Profile');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+        await tenantPage.selectNavigationTab(NavigationTabs.Diagnostics);
+        await expect(queryEditor.resultTable.isHidden()).resolves.toBe(true);
+        await tenantPage.selectNavigationTab(NavigationTabs.Query);
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 });

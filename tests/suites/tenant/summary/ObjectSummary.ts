@@ -1,6 +1,6 @@
 import type {Locator, Page} from '@playwright/test';
 
-export const VISIBILITY_TIMEOUT = 5000;
+import {VISIBILITY_TIMEOUT} from '../TenantPage';
 
 export class ObjectSummary {
     private tree: Locator;

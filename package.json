@@ -38,6 +38,7 @@
     "path-to-regexp": "^3.0.0",
     "qs": "^6.12.0",
     "react-error-boundary": "^4.0.13",
+    "react-freeze": "^1.0.4",
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.52.1",
     "react-json-inspector": "^7.1.1",
