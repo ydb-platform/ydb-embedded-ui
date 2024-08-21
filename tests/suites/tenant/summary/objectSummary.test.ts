@@ -31,10 +31,10 @@ test.describe('Object Summary', async () => {
         const queryEditor = new QueryEditor(page);
 
         await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
-        await expect(queryEditor.isResultTableHidden()).resolves.toBe(true);
+        await expect(queryEditor.resultTable.isHidden()).resolves.toBe(true);
 
         await objectSummary.clickPreviewButton(dsVslotsTableName);
-        await expect(queryEditor.isPreviewVisible()).resolves.toBe(true);
+        await expect(queryEditor.resultTable.isPreviewVisible()).resolves.toBe(true);
     });
 
     test('Preview table is still present after settings dialog was opened', async ({page}) => {
@@ -45,6 +45,6 @@ test.describe('Object Summary', async () => {
         await queryEditor.clickGearButton();
         await queryEditor.closeSettingsDialog();
 
-        await expect(queryEditor.isPreviewVisible()).resolves.toBe(true);
+        await expect(queryEditor.resultTable.isPreviewVisible()).resolves.toBe(true);
     });
 });
