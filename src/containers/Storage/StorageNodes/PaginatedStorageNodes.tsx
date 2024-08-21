@@ -20,7 +20,7 @@ interface PaginatedStorageNodesProps {
     searchValue: string;
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: NodesUptimeFilterValues;
-    tenant?: string;
+    database?: string;
 
     additionalNodesProps?: AdditionalNodesProps;
     onShowAll: VoidFunction;
@@ -34,7 +34,7 @@ export const PaginatedStorageNodes = ({
     searchValue,
     visibleEntities,
     nodesUptimeFilter,
-    tenant,
+    database,
     additionalNodesProps,
     onShowAll,
     parentContainer,
@@ -42,8 +42,8 @@ export const PaginatedStorageNodes = ({
     renderErrorMessage,
 }: PaginatedStorageNodesProps) => {
     const tableFilters = React.useMemo(() => {
-        return {searchValue, visibleEntities, nodesUptimeFilter, tenant};
-    }, [searchValue, visibleEntities, nodesUptimeFilter, tenant]);
+        return {searchValue, visibleEntities, nodesUptimeFilter, database};
+    }, [searchValue, visibleEntities, nodesUptimeFilter, database]);
 
     const columns = React.useMemo(() => {
         return getPreparedStorageNodesColumns(additionalNodesProps, visibleEntities);

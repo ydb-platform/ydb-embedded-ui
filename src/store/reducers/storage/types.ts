@@ -18,7 +18,7 @@ export interface PreparedStorageNodeFilters {
     searchValue: string;
     nodesUptimeFilter: NodesUptimeFilterValues;
     visibleEntities: VisibleEntities;
-    tenant?: string;
+    database?: string;
 }
 
 export interface PreparedStorageNode extends TSystemStateInfo {
@@ -36,7 +36,7 @@ export interface PreparedStorageNode extends TSystemStateInfo {
 export interface PreparedStorageGroupFilters {
     searchValue: string;
     visibleEntities: VisibleEntities;
-    tenant?: string;
+    database?: string;
     nodeId?: string;
 }
 
@@ -74,7 +74,9 @@ export interface StorageSortAndFilterParams extends Partial<StorageSortParams> {
 }
 
 export interface StorageApiRequestParams extends StorageSortAndFilterParams {
+    /** @deprecated use database instead */
     tenant?: string;
+    database?: string;
     nodeId?: string | number;
     poolName?: string;
     groupId?: string | number;

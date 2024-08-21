@@ -49,10 +49,11 @@ const b = cn('ydb-nodes');
 
 interface NodesProps {
     path?: string;
+    database?: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
+export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) => {
     const [queryParams, setQueryParams] = useQueryParams({
         uptimeFilter: StringParam,
         search: StringParam,
@@ -69,9 +70,12 @@ export const Nodes = ({path, additionalNodesProps = {}}: NodesProps) => {
 
     // If there is no path, it's cluster Nodes tab
     const useGetComputeNodes = path && !useNodesEndpoint;
-    const nodesQuery = nodesApi.useGetNodesQuery(useGetComputeNodes ? skipToken : {path}, {
-        pollingInterval: autoRefreshInterval,
-    });
+    const nodesQuery = nodesApi.useGetNodesQuery(
+        useGetComputeNodes ? skipToken : {path, database},
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
     const computeQuery = nodesApi.useGetComputeNodesQuery(useGetComputeNodes ? {path} : skipToken, {
         pollingInterval: autoRefreshInterval,
     });

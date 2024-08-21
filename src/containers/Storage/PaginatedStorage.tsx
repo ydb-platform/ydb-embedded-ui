@@ -16,14 +16,14 @@ import {PaginatedStorageGroups} from './StorageGroups/PaginatedStorageGroups';
 import {PaginatedStorageNodes} from './StorageNodes/PaginatedStorageNodes';
 
 interface PaginatedStorageProps {
-    tenant?: string;
+    database?: string;
     nodeId?: string;
     parentContainer?: Element | null;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
 export const PaginatedStorage = ({
-    tenant,
+    database,
     nodeId,
     parentContainer,
     additionalNodesProps,
@@ -105,7 +105,7 @@ export const PaginatedStorage = ({
                 searchValue={searchValue}
                 visibleEntities={visibleEntities}
                 nodesUptimeFilter={nodesUptimeFilter}
-                tenant={tenant}
+                database={database}
                 additionalNodesProps={additionalNodesProps}
                 onShowAll={handleShowAllNodes}
                 parentContainer={parentContainer}
@@ -119,7 +119,7 @@ export const PaginatedStorage = ({
         <PaginatedStorageGroups
             searchValue={searchValue}
             visibleEntities={visibleEntities}
-            tenant={tenant}
+            database={database}
             nodeId={nodeId}
             nodesMap={nodesMap}
             onShowAll={handleShowAllGroups}

@@ -42,11 +42,17 @@ const b = cn('ydb-nodes');
 
 interface NodesProps {
     path?: string;
+    database?: string;
     parentContainer?: Element | null;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const PaginatedNodes = ({path, parentContainer, additionalNodesProps}: NodesProps) => {
+export const PaginatedNodes = ({
+    path,
+    database,
+    parentContainer,
+    additionalNodesProps,
+}: NodesProps) => {
     const [queryParams, setQueryParams] = useQueryParams({
         uptimeFilter: StringParam,
         search: StringParam,
@@ -59,8 +65,8 @@ export const PaginatedNodes = ({path, parentContainer, additionalNodesProps}: No
     const problemFilter = useTypedSelector(selectProblemFilter);
 
     const tableFilters = React.useMemo(() => {
-        return {path, searchValue, problemFilter, uptimeFilter};
-    }, [path, searchValue, problemFilter, uptimeFilter]);
+        return {path, database, searchValue, problemFilter, uptimeFilter};
+    }, [path, database, searchValue, problemFilter, uptimeFilter]);
 
     const getRowClassName: GetRowClassName<NodesPreparedEntity> = (row) => {
         return b('node', {unavailable: isUnavailableNode(row)});
