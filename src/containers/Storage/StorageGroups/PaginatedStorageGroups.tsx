@@ -17,7 +17,7 @@ import i18n from './i18n';
 interface PaginatedStorageGroupsProps {
     searchValue: string;
     visibleEntities: VisibleEntities;
-    tenant?: string;
+    database?: string;
     nodeId?: string;
     nodesMap?: NodesMap;
 
@@ -31,7 +31,7 @@ interface PaginatedStorageGroupsProps {
 export const PaginatedStorageGroups = ({
     searchValue,
     visibleEntities,
-    tenant,
+    database,
     nodeId,
     nodesMap,
     onShowAll,
@@ -40,8 +40,8 @@ export const PaginatedStorageGroups = ({
     renderErrorMessage,
 }: PaginatedStorageGroupsProps) => {
     const tableFilters = React.useMemo(() => {
-        return {searchValue, visibleEntities, tenant, nodeId};
-    }, [searchValue, visibleEntities, tenant, nodeId]);
+        return {searchValue, visibleEntities, database, nodeId};
+    }, [searchValue, visibleEntities, database, nodeId]);
 
     const columns = React.useMemo(() => {
         return getPreparedStorageGroupsColumns(nodesMap, visibleEntities);

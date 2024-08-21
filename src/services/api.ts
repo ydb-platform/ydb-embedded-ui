@@ -159,7 +159,16 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
 
         return this.get<TNodesInfo>(
             this.getPath('/viewer/json/nodes?enums=true'),
-            {with: visibleEntities, type, tablets, sort, database: params.tenant, ...params},
+            {
+                with: visibleEntities,
+                type,
+                tablets,
+                sort,
+                ...params,
+                // TODO: remove after remove tenant param
+                database: params.database || params.tenant,
+                tenant: params.tenant || params.database,
+            },
             {concurrentId, requestConfig: {signal}},
         );
     }
@@ -179,6 +188,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     getStorageInfo(
         {
             tenant,
+            database,
             visibleEntities,
             nodeId,
             poolName,
@@ -194,8 +204,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         return this.get<TStorageInfo>(
             this.getPath(`/viewer/json/storage?enums=true`),
             {
-                database: tenant,
-                tenant,
+                database: database || tenant,
+                tenant: tenant || database,
                 node_id: nodeId,
                 pool: poolName,
                 group_id: groupId,

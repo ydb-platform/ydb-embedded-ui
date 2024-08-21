@@ -53,11 +53,11 @@ const UsageFilterParam = withDefault(
 
 interface StorageProps {
     additionalNodesProps?: AdditionalNodesProps;
-    tenant?: string;
+    database?: string;
     nodeId?: string;
 }
 
-export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) => {
+export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
@@ -91,14 +91,14 @@ export const Storage = ({additionalNodesProps, tenant, nodeId}: StorageProps) =>
     const storageType = isNodePage ? STORAGE_TYPES.groups : type;
 
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
-        {tenant, visibleEntities},
+        {database, visibleEntities},
         {
             skip: storageType !== STORAGE_TYPES.nodes,
             pollingInterval: autoRefreshInterval,
         },
     );
     const groupsQuery = storageApi.useGetStorageGroupsInfoQuery(
-        {tenant, visibleEntities, nodeId},
+        {database, visibleEntities, nodeId},
         {
             skip: storageType !== STORAGE_TYPES.groups,
             pollingInterval: autoRefreshInterval,

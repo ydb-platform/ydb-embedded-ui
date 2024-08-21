@@ -28,7 +28,7 @@ export const getNodes: FetchData<
     } = params;
 
     const {sortOrder, columnId} = sortParams ?? {};
-    const {path, searchValue, problemFilter, uptimeFilter} = filters ?? {};
+    const {path, database, searchValue, problemFilter, uptimeFilter} = filters ?? {};
 
     const response = await window.api.getNodes(
         {
@@ -40,6 +40,7 @@ export const getNodes: FetchData<
             sortOrder,
             sortValue: columnId as NodesSortValue,
             path,
+            database,
             filter: searchValue,
             problems_only: getProblemParamValue(problemFilter),
             uptime: getUptimeParamValue(uptimeFilter),
