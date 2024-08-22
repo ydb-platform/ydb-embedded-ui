@@ -16,6 +16,7 @@ import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {getTabletPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
+import {nodeApi} from '../../store/reducers/node/node';
 import {tabletApi} from '../../store/reducers/tablet';
 import {EFlag} from '../../types/api/enums';
 import type {TTabletStateInfo} from '../../types/api/tablet';
@@ -95,18 +96,21 @@ export function Tablet() {
     const nodeId = tablet.NodeId ?? queryNodeId ?? undefined;
     const database = (tenantPath || queryDatabase) ?? undefined;
 
+    const nodeRole = useNodeRole(nodeId?.toString());
+
     const tabletType = tablet.Type || eTypeSchema.parse(queryTabletType);
 
     React.useEffect(() => {
         dispatch(
             setHeaderBreadcrumbs('tablet', {
                 nodeId,
-                tenantName: database,
+                nodeRole,
+                tenantName: queryDatabase ?? undefined,
                 tabletId: id,
                 tabletType,
             }),
         );
-    }, [dispatch, database, id, nodeId, tabletType]);
+    }, [dispatch, queryDatabase, id, nodeId, nodeRole, tabletType]);
 
     const {Leader, Type} = tablet;
     const metaItems: string[] = [];
@@ -235,4 +239,18 @@ function Channels({id, hiveId}: {id: string; hiveId: string}) {
             {currentData ? <TabletStorageInfo data={currentData} /> : null}
         </LoaderWrapper>
     );
+}
+
+function useNodeRole(nodeId: string | undefined) {
+    const {currentData: node} = nodeApi.useGetNodeInfoQuery(nodeId ? {nodeId} : skipToken);
+
+    let nodeRole: 'Storage' | 'Compute' | undefined;
+
+    if (node) {
+        // Compute nodes have tenantName, storage nodes doesn't
+        const isStorage = !node?.Tenants?.[0];
+        nodeRole = isStorage ? 'Storage' : 'Compute';
+    }
+
+    return nodeRole;
 }

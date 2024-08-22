@@ -74,14 +74,22 @@ export function Node(props: NodeProps) {
 
     const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
 
+    let nodeRole: 'Storage' | 'Compute' | undefined;
+    if (node) {
+        // Compute nodes have tenantName, storage nodes doesn't
+        const isStorage = !node?.Tenants?.[0];
+        nodeRole = isStorage ? 'Storage' : 'Compute';
+    }
+
     React.useEffect(() => {
         dispatch(
             setHeaderBreadcrumbs('node', {
                 tenantName,
+                nodeRole,
                 nodeId,
             }),
         );
-    }, [dispatch, tenantName, nodeId]);
+    }, [dispatch, tenantName, nodeId, nodeRole]);
 
     const renderTabs = () => {
         return (

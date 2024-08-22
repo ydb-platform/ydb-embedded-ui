@@ -6,6 +6,8 @@ export const TABLETS = 'tablets';
 export const OVERVIEW = 'overview';
 export const STRUCTURE = 'structure';
 
+export type NodeTab = typeof OVERVIEW | typeof STORAGE | typeof STRUCTURE | typeof TABLETS;
+
 export const NODE_PAGES = [
     {
         id: OVERVIEW,
@@ -25,12 +27,16 @@ export const NODE_PAGES = [
     },
 ];
 
-export function getDefaultNodePath(nodeId: string | number, query: Query = {}) {
+export function getDefaultNodePath(
+    nodeId: string | number,
+    query: Query = {},
+    activeTab: NodeTab = OVERVIEW,
+) {
     return createHref(
         routes.node,
         {
             id: nodeId,
-            activeTab: OVERVIEW,
+            activeTab,
         },
         query,
     );

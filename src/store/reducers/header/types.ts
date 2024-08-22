@@ -1,17 +1,10 @@
 import type {ClusterTab} from '../../../containers/Cluster/utils';
+import type {NodeTab} from '../../../containers/Node/NodePages';
 import type {EType} from '../../../types/api/tablet';
 
 import type {setHeaderBreadcrumbs} from './header';
 
-export type Page =
-    | 'cluster'
-    | 'tenant'
-    | 'node'
-    | 'pDisk'
-    | 'vDisk'
-    | 'tablets'
-    | 'tablet'
-    | undefined;
+export type Page = 'cluster' | 'tenant' | 'node' | 'pDisk' | 'vDisk' | 'tablet' | undefined;
 
 export interface ClusterBreadcrumbsOptions {
     clusterName?: string;
@@ -24,6 +17,8 @@ export interface TenantBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
 
 export interface NodeBreadcrumbsOptions extends TenantBreadcrumbsOptions {
     nodeId?: string | number;
+    nodeActiveTab?: NodeTab;
+    nodeRole?: 'Storage' | 'Compute';
 }
 
 export interface PDiskBreadcrumbsOptions extends Omit<NodeBreadcrumbsOptions, 'tenantName'> {
@@ -34,11 +29,7 @@ export interface VDiskBreadcrumbsOptions extends PDiskBreadcrumbsOptions {
     vDiskSlotId?: string | number;
 }
 
-export interface TabletsBreadcrumbsOptions extends TenantBreadcrumbsOptions {
-    nodeId?: string | number;
-}
-
-export interface TabletBreadcrumbsOptions extends TabletsBreadcrumbsOptions {
+export interface TabletBreadcrumbsOptions extends NodeBreadcrumbsOptions {
     tabletId?: string;
     tabletType?: EType;
 }
@@ -47,7 +38,6 @@ export type BreadcrumbsOptions =
     | ClusterBreadcrumbsOptions
     | TenantBreadcrumbsOptions
     | NodeBreadcrumbsOptions
-    | TabletsBreadcrumbsOptions
     | TabletBreadcrumbsOptions;
 
 export type PageBreadcrumbsOptions<T extends Page = undefined> = T extends 'cluster'
@@ -56,11 +46,9 @@ export type PageBreadcrumbsOptions<T extends Page = undefined> = T extends 'clus
       ? TenantBreadcrumbsOptions
       : T extends 'node'
         ? NodeBreadcrumbsOptions
-        : T extends 'tablets'
-          ? TabletsBreadcrumbsOptions
-          : T extends 'tablet'
-            ? TabletBreadcrumbsOptions
-            : {};
+        : T extends 'tablet'
+          ? TabletBreadcrumbsOptions
+          : {};
 
 export interface HeaderState {
     page?: Page;

@@ -180,9 +180,10 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
                         data={storageNodes}
                         tableSettings={DEFAULT_TABLE_SETTINGS}
                         onShowAll={handleShowAllNodes}
-                        additionalNodesProps={{database, ...additionalNodesProps}}
+                        additionalNodesProps={additionalNodesProps}
                         sort={nodesSort}
                         handleSort={handleNodesSort}
+                        database={database}
                     />
                 )}
             </React.Fragment>

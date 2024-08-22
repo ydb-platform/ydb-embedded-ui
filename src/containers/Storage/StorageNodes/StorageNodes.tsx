@@ -26,6 +26,7 @@ interface StorageNodesProps {
     additionalNodesProps?: AdditionalNodesProps;
     sort?: SortOrder;
     handleSort?: HandleSort;
+    database?: string;
 }
 
 export function StorageNodes({
@@ -37,8 +38,9 @@ export function StorageNodes({
     additionalNodesProps,
     sort,
     handleSort,
+    database,
 }: StorageNodesProps) {
-    const columns = getPreparedStorageNodesColumns(additionalNodesProps, visibleEntities);
+    const columns = getPreparedStorageNodesColumns(additionalNodesProps, visibleEntities, database);
 
     if (
         !data.length &&

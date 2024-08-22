@@ -6,7 +6,7 @@ import {
 } from '@gravity-ui/icons';
 
 import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
-import routes, {createHref, getPDiskPagePath} from '../../routes';
+import {getPDiskPagePath} from '../../routes';
 import type {
     BreadcrumbsOptions,
     ClusterBreadcrumbsOptions,
@@ -14,7 +14,6 @@ import type {
     PDiskBreadcrumbsOptions,
     Page,
     TabletBreadcrumbsOptions,
-    TabletsBreadcrumbsOptions,
     TenantBreadcrumbsOptions,
     VDiskBreadcrumbsOptions,
 } from '../../store/reducers/header/types';
@@ -76,15 +75,13 @@ const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options,
 };
 
 const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, query = {}) => {
-    const {tenantName, nodeId} = options;
-    // Compute nodes have tenantName, storage nodes doesn't
-    const isStorage = !tenantName;
+    const {nodeId, nodeRole, nodeActiveTab, tenantName} = options;
 
-    const tenantQuery = getQueryForTenant('nodes');
+    const tenantQuery = getQueryForTenant(nodeActiveTab === TABLETS ? 'tablets' : 'nodes');
 
-    const breadcrumbs = isStorage
-        ? getClusterBreadcrumbs(options, query)
-        : getTenantBreadcrumbs(options, {...query, ...tenantQuery});
+    const breadcrumbs = tenantName
+        ? getTenantBreadcrumbs(options, {...query, ...tenantQuery})
+        : getClusterBreadcrumbs(options, query);
 
     let text = headerKeyset('breadcrumbs.node');
     if (nodeId) {
@@ -93,8 +90,10 @@ const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, que
 
     const lastItem = {
         text,
-        link: nodeId ? getDefaultNodePath(nodeId, query) : undefined,
-        icon: isStorage ? <StorageNodeIcon /> : <ComputeNodeIcon />,
+        link: nodeId
+            ? getDefaultNodePath(nodeId, {tenantName, ...query}, nodeActiveTab)
+            : undefined,
+        icon: getNodeIcon(nodeRole),
     };
 
     breadcrumbs.push(lastItem);
@@ -102,11 +101,24 @@ const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, que
     return breadcrumbs;
 };
 
+function getNodeIcon(nodeRole: 'Storage' | 'Compute' | undefined) {
+    switch (nodeRole) {
+        case 'Storage':
+            return <StorageNodeIcon />;
+        case 'Compute':
+            return <ComputeNodeIcon />;
+        default:
+            return undefined;
+    }
+}
+
 const getPDiskBreadcrumbs: GetBreadcrumbs<PDiskBreadcrumbsOptions> = (options, query = {}) => {
-    const {nodeId, pDiskId} = options;
+    const {nodeId, pDiskId, nodeRole, nodeActiveTab} = options;
 
     const breadcrumbs = getNodeBreadcrumbs({
         nodeId,
+        nodeRole: nodeRole ?? 'Storage',
+        nodeActiveTab,
     });
 
     let text = headerKeyset('breadcrumbs.pDisk');
@@ -144,35 +156,10 @@ const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, q
     return breadcrumbs;
 };
 
-const getTabletsBreadcrumbs: GetBreadcrumbs<TabletsBreadcrumbsOptions> = (options, query = {}) => {
-    const {tenantName, nodeId} = options;
-
-    const tenantQuery = getQueryForTenant('tablets');
-
-    const breadcrumbs = tenantName
-        ? getTenantBreadcrumbs(options, {...query, ...tenantQuery})
-        : getClusterBreadcrumbs(options, query);
-
-    if (nodeId) {
-        const link = createHref(
-            routes.node,
-            {id: nodeId, activeTab: TABLETS},
-            {
-                ...query,
-                tenantName,
-            },
-        );
-
-        const lastItem = {text: headerKeyset('breadcrumbs.tablets'), link};
-        breadcrumbs.push(lastItem);
-    }
-    return breadcrumbs;
-};
-
 const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options, query = {}) => {
-    const {tabletId, tabletType} = options;
+    const {tabletId, tabletType, nodeId, nodeRole, nodeActiveTab = TABLETS, tenantName} = options;
 
-    const breadcrumbs = getTabletsBreadcrumbs(options, query);
+    const breadcrumbs = getNodeBreadcrumbs({nodeId, nodeRole, nodeActiveTab, tenantName}, query);
 
     const lastItem = {
         text: tabletId || headerKeyset('breadcrumbs.tablet'),
@@ -189,7 +176,6 @@ const mapPageToGetter = {
     node: getNodeBreadcrumbs,
     pDisk: getPDiskBreadcrumbs,
     tablet: getTabletBreadcrumbs,
-    tablets: getTabletsBreadcrumbs,
     tenant: getTenantBreadcrumbs,
     vDisk: getVDiskBreadcrumbs,
 } as const;

@@ -46,7 +46,7 @@ export const PaginatedStorageNodes = ({
     }, [searchValue, visibleEntities, nodesUptimeFilter, database]);
 
     const columns = React.useMemo(() => {
-        return getPreparedStorageNodesColumns({database, ...additionalNodesProps}, visibleEntities);
+        return getPreparedStorageNodesColumns(additionalNodesProps, visibleEntities, database);
     }, [additionalNodesProps, visibleEntities, database]);
 
     const renderEmptyDataMessage = () => {
