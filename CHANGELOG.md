@@ -1,5 +1,26 @@
 # Changelog
 
+## [6.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.15.1...v6.16.0) (2024-08-21)
+
+
+### Features
+
+* [query settings] display trace level selector ([#1170](https://github.com/ydb-platform/ydb-embedded-ui/issues/1170)) ([f1ab08c](https://github.com/ydb-platform/ydb-embedded-ui/commit/f1ab08c3146135b6fef039ce541311bf2ca73fba))
+* **Describe:** add button to copy content to clipboard ([#1192](https://github.com/ydb-platform/ydb-embedded-ui/issues/1192)) ([dc64506](https://github.com/ydb-platform/ydb-embedded-ui/commit/dc64506f3f4fc6a8bf9a1b9a7cad5fc40a12cd38))
+* **diagnostics:** render bloom filter better ([#1165](https://github.com/ydb-platform/ydb-embedded-ui/issues/1165)) ([0562b0c](https://github.com/ydb-platform/ydb-embedded-ui/commit/0562b0cf8c2b949ad80a765a2b7bce407b100c4a))
+* duration & endtime in queries history ([#1169](https://github.com/ydb-platform/ydb-embedded-ui/issues/1169)) ([f28402c](https://github.com/ydb-platform/ydb-embedded-ui/commit/f28402caed4002f86f265d1b003c2b0b8845eda2))
+* enable autorefresh for paginated tables ([#1146](https://github.com/ydb-platform/ydb-embedded-ui/issues/1146)) ([2519c80](https://github.com/ydb-platform/ydb-embedded-ui/commit/2519c80a2807572fe64efbe4360fdcb0f02b533a))
+* **Tablet:** redesign tablet page, add data from hive ([#1183](https://github.com/ydb-platform/ydb-embedded-ui/issues/1183)) ([ab3528b](https://github.com/ydb-platform/ydb-embedded-ui/commit/ab3528bd4b1d3a806bd677ac37accb29dc8e5a04))
+
+
+### Bug Fixes
+
+* default value fixes ([#1166](https://github.com/ydb-platform/ydb-embedded-ui/issues/1166)) ([a210ba1](https://github.com/ydb-platform/ydb-embedded-ui/commit/a210ba17f9f022062e30fc86ca047a245de41313))
+* do not reset query results when switch query tabs ([#1198](https://github.com/ydb-platform/ydb-embedded-ui/issues/1198)) ([8be55f1](https://github.com/ydb-platform/ydb-embedded-ui/commit/8be55f1ea710a72b40a30f48a6b20095c89420f0))
+* **Nodes:** pass database param to nodes api handler ([#1197](https://github.com/ydb-platform/ydb-embedded-ui/issues/1197)) ([345600f](https://github.com/ydb-platform/ydb-embedded-ui/commit/345600ff227e2f3383dbd9f838ee2221fe31a744))
+* preview hides when opening query settings ([#1187](https://github.com/ydb-platform/ydb-embedded-ui/issues/1187)) ([5b80904](https://github.com/ydb-platform/ydb-embedded-ui/commit/5b80904e22ca80383d2e7e0e52d6775da384e2b1))
+* use-QueryService-by-default-for-running-queries-1171 ([#1188](https://github.com/ydb-platform/ydb-embedded-ui/issues/1188)) ([62de3e6](https://github.com/ydb-platform/ydb-embedded-ui/commit/62de3e64e1ec139586ce06ae2111137ca2416caf))
+
 ## [6.15.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.15.0...v6.15.1) (2024-08-16)
 
 
