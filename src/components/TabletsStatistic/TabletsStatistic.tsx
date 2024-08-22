@@ -1,5 +1,6 @@
 import {Link} from 'react-router-dom';
 
+import {TABLETS} from '../../containers/Node/NodePages';
 import routes, {createHref} from '../../routes';
 import type {TTabletStateInfo as TComputeTabletStateInfo} from '../../types/api/compute';
 import type {TTabletStateInfo as TFullTabletStateInfo} from '../../types/api/tablet';
@@ -29,19 +30,20 @@ const prepareTablets = (tablets: Tablets) => {
 interface TabletsStatisticProps {
     tablets: Tablets;
     path: string | undefined;
-    nodeIds: string[] | number[];
+    nodeId: string | number;
     backend?: string;
 }
 
-export const TabletsStatistic = ({tablets = [], path, nodeIds, backend}: TabletsStatisticProps) => {
+export const TabletsStatistic = ({tablets = [], path, nodeId, backend}: TabletsStatisticProps) => {
     const renderTabletInfo = (item: ReturnType<typeof prepareTablets>[number], index: number) => {
-        const tabletsPath = createHref(routes.tabletsFilters, undefined, {
-            nodeIds,
-            state: item.state,
-            type: item.type,
-            path,
-            backend,
-        });
+        const tabletsPath = createHref(
+            routes.node,
+            {id: nodeId, activeTab: TABLETS},
+            {
+                tenantName: path,
+                backend,
+            },
+        );
 
         const label = `${item.label}: ${item.count}`;
         const className = b('tablet', {state: item.state?.toLowerCase()});

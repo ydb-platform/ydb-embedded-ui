@@ -68,7 +68,7 @@ export function Tablet() {
     const [
         {
             nodeId: queryNodeId,
-            tenantName: queryTenantName,
+            tenantName: queryDatabase,
             type: queryTabletType,
             clusterName: queryClusterName,
         },
@@ -81,7 +81,7 @@ export function Tablet() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tabletApi.useGetTabletQuery(
-        {id, database: queryTenantName?.toString()},
+        {id, database: queryDatabase ?? undefined, nodeId: queryNodeId ?? undefined},
         {pollingInterval: autoRefreshInterval},
     );
 
@@ -92,35 +92,42 @@ export function Tablet() {
         tablet.TenantId ? {tenantId: tablet.TenantId} : skipToken,
     );
 
-    const nodeId = tablet.NodeId ?? queryNodeId;
-    const tenantName = (tenantPath || queryTenantName) ?? undefined;
+    const nodeId = tablet.NodeId ?? queryNodeId ?? undefined;
+    const database = (tenantPath || queryDatabase) ?? undefined;
 
     const tabletType = tablet.Type || eTypeSchema.parse(queryTabletType);
 
     React.useEffect(() => {
         dispatch(
             setHeaderBreadcrumbs('tablet', {
-                nodeIds: nodeId ? [nodeId] : [],
-                tenantName,
+                nodeId,
+                tenantName: database,
                 tabletId: id,
                 tabletType,
             }),
         );
-    }, [dispatch, tenantName, id, nodeId, tabletType]);
+    }, [dispatch, database, id, nodeId, tabletType]);
 
     const {Leader, Type} = tablet;
-    const database = tenantName ? `${i18n('tablet.meta-database')}: ${tenantName}` : undefined;
-    const type = Type ? Type : undefined;
-    const follower = Leader === false ? i18n('tablet.meta-follower').toUpperCase() : undefined;
+    const metaItems: string[] = [];
+    if (database) {
+        metaItems.push(`${i18n('tablet.meta-database')}: ${database}`);
+    }
+    if (Type) {
+        metaItems.push(Type);
+    }
+    if (Leader === false) {
+        metaItems.push(i18n('tablet.meta-follower').toUpperCase());
+    }
 
     return (
         <Flex gap={5} direction="column" className={b()}>
             <Helmet>
                 <title>{`${id} — ${i18n('tablet.header')} — ${
-                    tenantName || queryClusterName || CLUSTER_DEFAULT_TITLE
+                    database || queryClusterName || CLUSTER_DEFAULT_TITLE
                 }`}</title>
             </Helmet>
-            <PageMetaWithAutorefresh items={[database, type, follower]} />
+            <PageMetaWithAutorefresh items={metaItems} />
             <LoaderWrapper loading={loading} size="l">
                 {error ? <ResponseError error={error} /> : null}
                 {currentData ? <TabletContent id={id} tablet={tablet} history={history} /> : null}

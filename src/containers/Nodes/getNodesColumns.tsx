@@ -35,7 +35,7 @@ const NODES_COLUMNS_IDS = {
 };
 
 interface GetNodesColumnsProps {
-    tabletsPath?: string;
+    database?: string;
     getNodeRef?: GetNodeRefFunc;
 }
 
@@ -50,10 +50,10 @@ const nodeIdColumn: NodesColumn = {
     sortable: false,
 };
 
-const getHostColumn = (getNodeRef?: GetNodeRefFunc): NodesColumn => ({
+const getHostColumn = (getNodeRef?: GetNodeRefFunc, database?: string): NodesColumn => ({
     name: NODES_COLUMNS_IDS.Host,
     render: ({row}) => {
-        return <NodeHostWrapper node={row} getNodeRef={getNodeRef} />;
+        return <NodeHostWrapper node={row} getNodeRef={getNodeRef} database={database} />;
     },
     width: 350,
     align: DataTable.LEFT,
@@ -162,7 +162,7 @@ const getTabletsColumn = (tabletsPath?: string): NodesColumn => ({
         return row.Tablets ? (
             <TabletsStatistic
                 path={tabletsPath ?? row.TenantName}
-                nodeIds={[row.NodeId]}
+                nodeId={row.NodeId}
                 tablets={row.Tablets}
             />
         ) : (
@@ -234,10 +234,10 @@ const sessionsColumn: NodesColumn = {
     sortable: false,
 };
 
-export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps): NodesColumn[] {
+export function getNodesColumns({database, getNodeRef}: GetNodesColumnsProps): NodesColumn[] {
     return [
         nodeIdColumn,
-        getHostColumn(getNodeRef),
+        getHostColumn(getNodeRef, database),
         dataCenterColumn,
         rackColumn,
         versionColumn,
@@ -245,7 +245,7 @@ export function getNodesColumns({tabletsPath, getNodeRef}: GetNodesColumnsProps)
         memoryColumn,
         cpuColumn,
         loadAverageColumn,
-        getTabletsColumn(tabletsPath),
+        getTabletsColumn(database),
     ];
 }
 
@@ -267,17 +267,17 @@ export function getTopNodesByCpuColumns(
 }
 
 export function getTopNodesByMemoryColumns({
-    tabletsPath,
+    database,
     getNodeRef,
 }: GetNodesColumnsProps): NodesColumn[] {
     return [
         nodeIdColumn,
-        getHostColumn(getNodeRef),
+        getHostColumn(getNodeRef, database),
         uptimeColumn,
         topNodesLoadAverageColumn,
         topNodesMemoryColumn,
         sharedCacheUsageColumn,
         sessionsColumn,
-        getTabletsColumn(tabletsPath),
+        getTabletsColumn(database),
     ];
 }

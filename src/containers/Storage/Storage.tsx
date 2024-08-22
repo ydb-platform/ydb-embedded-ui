@@ -180,7 +180,7 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
                         data={storageNodes}
                         tableSettings={DEFAULT_TABLE_SETTINGS}
                         onShowAll={handleShowAllNodes}
-                        additionalNodesProps={additionalNodesProps}
+                        additionalNodesProps={{database, ...additionalNodesProps}}
                         sort={nodesSort}
                         handleSort={handleNodesSort}
                     />

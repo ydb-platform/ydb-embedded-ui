@@ -29,110 +29,117 @@ import i18n from './i18n';
 
 const b = cn('tablets');
 
-const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
-    {
-        name: 'Type',
-        get header() {
-            return i18n('Type');
+function getColumns({database}: {database?: string}) {
+    const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
+        {
+            name: 'Type',
+            get header() {
+                return i18n('Type');
+            },
+            render: ({row}) => {
+                const isFollower = row.Leader === false;
+                return (
+                    <span>
+                        {row.Type} {isFollower ? <Text color="secondary">follower</Text> : ''}
+                    </span>
+                );
+            },
         },
-        render: ({row}) => {
-            const isFollower = row.Leader === false;
-            return (
-                <span>
-                    {row.Type} {isFollower ? <Text color="secondary">follower</Text> : ''}
-                </span>
-            );
-        },
-    },
-    {
-        name: 'TabletId',
-        width: 220,
-        get header() {
-            return i18n('Tablet');
-        },
-        render: ({row}) => {
-            if (!row.TabletId) {
-                return EMPTY_DATA_PLACEHOLDER;
-            }
+        {
+            name: 'TabletId',
+            width: 220,
+            get header() {
+                return i18n('Tablet');
+            },
+            render: ({row}) => {
+                if (!row.TabletId) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
 
-            const tabletPath = getTabletPagePath(row.TabletId, {
-                nodeId: row.NodeId,
-                type: row.Type,
-            });
+                const tabletPath = getTabletPagePath(row.TabletId, {
+                    nodeId: row.NodeId,
+                    type: row.Type,
+                    tenantName: database,
+                });
 
-            return (
-                <EntityStatus
-                    name={row.TabletId?.toString()}
-                    path={tabletPath}
-                    hasClipboardButton
-                    showStatus={false}
-                    additionalControls={
-                        <DeveloperUILinkButton href={createTabletDeveloperUIHref(row.TabletId)} />
-                    }
-                />
-            );
+                return (
+                    <EntityStatus
+                        name={row.TabletId?.toString()}
+                        path={tabletPath}
+                        hasClipboardButton
+                        showStatus={false}
+                        additionalControls={
+                            <DeveloperUILinkButton
+                                href={createTabletDeveloperUIHref(row.TabletId)}
+                            />
+                        }
+                    />
+                );
+            },
         },
-    },
-    {
-        name: 'State',
-        get header() {
-            return i18n('State');
+        {
+            name: 'State',
+            get header() {
+                return i18n('State');
+            },
+            render: ({row}) => {
+                return <TabletState state={row.State} />;
+            },
         },
-        render: ({row}) => {
-            return <TabletState state={row.State} />;
+        {
+            name: 'NodeId',
+            get header() {
+                return i18n('Node ID');
+            },
+            render: ({row}) => {
+                const nodePath =
+                    row.NodeId === undefined ? undefined : getDefaultNodePath(row.NodeId);
+                return <InternalLink to={nodePath}>{row.NodeId}</InternalLink>;
+            },
+            align: 'right',
         },
-    },
-    {
-        name: 'NodeId',
-        get header() {
-            return i18n('Node ID');
+        {
+            name: 'fqdn',
+            get header() {
+                return i18n('Node FQDN');
+            },
+            render: ({row}) => {
+                if (!row.fqdn) {
+                    return <span>—</span>;
+                }
+                return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
+            },
         },
-        render: ({row}) => {
-            const nodePath = row.NodeId === undefined ? undefined : getDefaultNodePath(row.NodeId);
-            return <InternalLink to={nodePath}>{row.NodeId}</InternalLink>;
+        {
+            name: 'Generation',
+            get header() {
+                return i18n('Generation');
+            },
+            align: 'right',
         },
-        align: 'right',
-    },
-    {
-        name: 'fqdn',
-        get header() {
-            return i18n('Node FQDN');
+        {
+            name: 'Uptime',
+            get header() {
+                return i18n('Uptime');
+            },
+            render: ({row}) => {
+                return calcUptime(row.ChangeTime);
+            },
+            sortAccessor: (row) => -Number(row.ChangeTime),
+            align: 'right',
         },
-        render: ({row}) => {
-            if (!row.fqdn) {
-                return <span>—</span>;
-            }
-            return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
+        {
+            name: 'Actions',
+            sortable: false,
+            resizeable: false,
+            header: '',
+            render: ({row}) => {
+                return <TabletActions {...row} />;
+            },
         },
-    },
-    {
-        name: 'Generation',
-        get header() {
-            return i18n('Generation');
-        },
-        align: 'right',
-    },
-    {
-        name: 'Uptime',
-        get header() {
-            return i18n('Uptime');
-        },
-        render: ({row}) => {
-            return calcUptime(row.ChangeTime);
-        },
-        sortAccessor: (row) => -Number(row.ChangeTime),
-        align: 'right',
-    },
-    {
-        name: 'Actions',
-        sortable: false,
-        resizeable: false,
-        header: '',
-        render: ({row}) => {
-            return <TabletActions {...row} />;
-        },
-    },
-];
+    ];
+    return columns;
+}
 
 function TabletActions(tablet: TTabletStateInfo) {
     const isDisabledRestart = tablet.State === ETabletState.Stopped;
@@ -163,19 +170,20 @@ function TabletActions(tablet: TTabletStateInfo) {
 
 interface TabletsProps {
     path?: string;
+    database?: string;
     nodeId?: string | number;
     className?: string;
 }
 
-export function Tablets({nodeId, path, className}: TabletsProps) {
+export function Tablets({nodeId, path, database, className}: TabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     let params: TabletsApiRequestParams = {};
     const node = nodeId === undefined ? undefined : String(nodeId);
     if (node !== undefined) {
-        params = {nodes: [String(node)]};
+        params = {nodeId: node, database};
     } else if (path) {
-        params = {path};
+        params = {path, database};
     }
     const {currentData, isFetching, error} = tabletsApi.useGetTabletsInfoQuery(
         Object.keys(params).length === 0 ? skipToken : params,
@@ -196,7 +204,7 @@ export function Tablets({nodeId, path, className}: TabletsProps) {
             {error ? <ResponseError error={error} /> : null}
             {currentData ? (
                 <ResizeableDataTable
-                    columns={columns}
+                    columns={getColumns({database})}
                     data={tablets}
                     settings={DEFAULT_TABLE_SETTINGS}
                     emptyDataMessage={i18n('noTabletsData')}

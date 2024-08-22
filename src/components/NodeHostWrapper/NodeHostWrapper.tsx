@@ -13,9 +13,10 @@ import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 interface NodeHostWrapperProps {
     node: NodesPreparedEntity;
     getNodeRef?: (node?: NodeAddress) => string | null;
+    database?: string;
 }
 
-export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
+export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperProps) => {
     if (!node.Host) {
         return <span>—</span>;
     }
@@ -31,7 +32,7 @@ export const NodeHostWrapper = ({node, getNodeRef}: NodeHostWrapperProps) => {
 
     const nodePath = isNodeAvailable
         ? getDefaultNodePath(node.NodeId, {
-              tenantName: node.TenantName,
+              tenantName: database ?? node.TenantName,
           })
         : undefined;
 

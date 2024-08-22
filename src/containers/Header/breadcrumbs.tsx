@@ -25,7 +25,7 @@ import {
 } from '../../store/reducers/tenant/constants';
 import {CLUSTER_DEFAULT_TITLE, getTabletLabel} from '../../utils/constants';
 import {getClusterPath} from '../Cluster/utils';
-import {getDefaultNodePath} from '../Node/NodePages';
+import {TABLETS, getDefaultNodePath} from '../Node/NodePages';
 import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
 
 import {headerKeyset} from './i18n';
@@ -145,7 +145,7 @@ const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, q
 };
 
 const getTabletsBreadcrumbs: GetBreadcrumbs<TabletsBreadcrumbsOptions> = (options, query = {}) => {
-    const {tenantName, nodeIds} = options;
+    const {tenantName, nodeId} = options;
 
     const tenantQuery = getQueryForTenant('tablets');
 
@@ -153,15 +153,19 @@ const getTabletsBreadcrumbs: GetBreadcrumbs<TabletsBreadcrumbsOptions> = (option
         ? getTenantBreadcrumbs(options, {...query, ...tenantQuery})
         : getClusterBreadcrumbs(options, query);
 
-    const link = createHref(routes.tabletsFilters, undefined, {
-        ...query,
-        nodeIds,
-        path: tenantName,
-    });
+    if (nodeId) {
+        const link = createHref(
+            routes.node,
+            {id: nodeId, activeTab: TABLETS},
+            {
+                ...query,
+                tenantName,
+            },
+        );
 
-    const lastItem = {text: headerKeyset('breadcrumbs.tablets'), link};
-    breadcrumbs.push(lastItem);
-
+        const lastItem = {text: headerKeyset('breadcrumbs.tablets'), link};
+        breadcrumbs.push(lastItem);
+    }
     return breadcrumbs;
 };
 

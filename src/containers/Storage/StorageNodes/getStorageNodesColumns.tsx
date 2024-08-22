@@ -29,6 +29,7 @@ type StorageGroupsColumn = PaginatedTableColumn<PreparedStorageNode> &
 
 const getStorageNodesColumns = (additionalNodesProps: AdditionalNodesProps | undefined) => {
     const getNodeRef = additionalNodesProps?.getNodeRef;
+    const database = additionalNodesProps?.database;
 
     const columns: StorageGroupsColumn[] = [
         {
@@ -43,7 +44,7 @@ const getStorageNodesColumns = (additionalNodesProps: AdditionalNodesProps | und
             header: 'Host',
             width: 350,
             render: ({row}) => {
-                return <NodeHostWrapper node={row} getNodeRef={getNodeRef} />;
+                return <NodeHostWrapper node={row} getNodeRef={getNodeRef} database={database} />;
             },
             align: DataTable.LEFT,
         },

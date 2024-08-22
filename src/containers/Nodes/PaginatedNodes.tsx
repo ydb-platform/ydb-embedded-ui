@@ -126,6 +126,7 @@ export const PaginatedNodes = ({
 
     const rawColumns = getNodesColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
+        database,
     });
 
     const columns = rawColumns.map((column) => {

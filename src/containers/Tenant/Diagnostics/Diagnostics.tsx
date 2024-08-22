@@ -108,7 +108,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.tablets: {
-                return <Tablets path={path} />;
+                return <Tablets path={path} database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.storage: {
                 return <StorageWrapper database={tenantName} parentContainer={container.current} />;

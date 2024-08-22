@@ -132,6 +132,7 @@ export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) =
     const renderTable = () => {
         const rawColumns = getNodesColumns({
             getNodeRef: additionalNodesProps.getNodeRef,
+            database,
         });
 
         const columns = rawColumns.map((column) => {

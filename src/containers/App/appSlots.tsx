@@ -6,7 +6,6 @@ import type {Clusters} from '../Clusters/Clusters';
 import type {Node} from '../Node/Node';
 import type {PDiskPage} from '../PDiskPage/PDiskPage';
 import type {Tablet} from '../Tablet';
-import type {TabletsFilters} from '../TabletsFilters/TabletsFilters';
 import type {Tenant} from '../Tenant/Tenant';
 import type {VDiskPage} from '../VDiskPage/VDiskPage';
 
@@ -45,11 +44,6 @@ export const TabletSlot = createSlot<{
         | React.ReactNode
         | ((props: {component: typeof Tablet} & RouteComponentProps) => React.ReactNode);
 }>('tablet');
-export const TabletsFiltersSlot = createSlot<{
-    children:
-        | React.ReactNode
-        | ((props: {component: typeof TabletsFilters} & RouteComponentProps) => React.ReactNode);
-}>('tabletsFilters');
 
 export const RoutesSlot = createSlot<{children: React.ReactNode}>('routes');
 export const RedirectSlot = createSlot<RedirectProps>('redirect');

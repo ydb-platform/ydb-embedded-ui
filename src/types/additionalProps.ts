@@ -29,4 +29,5 @@ export type GetNodeRefFunc = (node?: NodeAddress) => string | null;
 
 export interface AdditionalNodesProps extends Record<string, unknown> {
     getNodeRef?: GetNodeRefFunc;
+    database?: string;
 }
