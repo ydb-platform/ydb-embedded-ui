@@ -3,13 +3,15 @@ import React from 'react';
 import {Button, Popover} from '@gravity-ui/uikit';
 import type {ButtonProps, PopoverProps} from '@gravity-ui/uikit';
 
-import {CriticalActionDialog} from '../CriticalActionDialog';
+import {CriticalActionDialog} from '../CriticalActionDialog/CriticalActionDialog';
+import {isErrorWithRetry} from '../CriticalActionDialog/utils';
 
 interface ButtonWithConfirmDialogProps<T, K> {
     children: React.ReactNode;
     onConfirmAction: (isRetry?: boolean) => Promise<T>;
     onConfirmActionSuccess?: (() => Promise<K>) | VoidFunction;
-    dialogContent: string;
+    dialogHeader: string;
+    dialogText: string;
     retryButtonText?: string;
     buttonDisabled?: ButtonProps['disabled'];
     buttonView?: ButtonProps['view'];
@@ -24,7 +26,8 @@ export function ButtonWithConfirmDialog<T, K>({
     children,
     onConfirmAction,
     onConfirmActionSuccess,
-    dialogContent,
+    dialogHeader,
+    dialogText,
     retryButtonText,
     buttonDisabled = false,
     buttonView = 'action',
@@ -60,10 +63,7 @@ export function ButtonWithConfirmDialog<T, K>({
     };
 
     const handleConfirmActionError = (error: unknown) => {
-        const isWithRetry = Boolean(
-            error && typeof error === 'object' && 'retryPossible' in error && error.retryPossible,
-        );
-        setWithRetry(isWithRetry);
+        setWithRetry(isErrorWithRetry(error));
         setButtonLoading(false);
     };
 
@@ -101,7 +101,8 @@ export function ButtonWithConfirmDialog<T, K>({
         <React.Fragment>
             <CriticalActionDialog
                 visible={isConfirmDialogVisible}
-                text={dialogContent}
+                header={dialogHeader}
+                text={dialogText}
                 withRetry={withRetry}
                 retryButtonText={retryButtonText}
                 onConfirm={handleConfirmAction}

@@ -19,16 +19,21 @@ import {api} from '../../store/reducers/api';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {pDiskApi} from '../../store/reducers/pdisk/pdisk';
+import type {EDecommitStatus} from '../../types/api/pdisk';
 import {valueIsDefined} from '../../utils';
+import {cn} from '../../utils/cn';
 import {getPDiskId, getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
+import {DecommisionLabel} from './DecommisionLabel/DecommisionLabel';
+import {DecommissionButton} from './DecommissionButton/DecommissionButton';
 import {PDiskGroups} from './PDiskGroups/PDiskGroups';
 import {PDiskSpaceDistribution} from './PDiskSpaceDistribution/PDiskSpaceDistribution';
 import {pDiskPageKeyset} from './i18n';
-import {pdiskPageCn} from './shared';
 
 import './PDiskPage.scss';
+
+const pdiskPageCn = cn('ydb-pdisk-page');
 
 const PDISK_TABS_IDS = {
     diskDistribution: 'diskDistribution',
@@ -78,7 +83,7 @@ export function PDiskPage() {
     });
     const pDiskLoading = pdiskDataQuery.isFetching && pdiskDataQuery.currentData === undefined;
     const pDiskData = pdiskDataQuery.currentData;
-    const {NodeHost, NodeId, NodeType, NodeDC, Severity} = pDiskData || {};
+    const {NodeHost, NodeId, NodeType, NodeDC, Severity, DecommitStatus} = pDiskData || {};
 
     const handleRestart = async (isRetry?: boolean) => {
         if (pDiskParamsDefined) {
@@ -96,7 +101,33 @@ export function PDiskPage() {
         return undefined;
     };
 
-    const handleAfterRestart = () => {
+    const handleDecommissionChange = async (
+        newDecomissionStatus?: EDecommitStatus,
+        isRetry?: boolean,
+    ) => {
+        if (pDiskParamsDefined) {
+            return window.api
+                .changePDiskStatus({
+                    nodeId,
+                    pDiskId,
+                    force: isRetry,
+                    decommissionStatus: newDecomissionStatus,
+                })
+                .then((response) => {
+                    if (response?.result === false) {
+                        const err = {
+                            statusText: response.error,
+                            retryPossible: response.forceRetryPossible,
+                        };
+                        throw err;
+                    }
+                });
+        }
+
+        return undefined;
+    };
+
+    const handleAfterAction = () => {
         if (pDiskParamsDefined) {
             dispatch(
                 api.util.invalidateTags([{type: 'PDiskData', id: getPDiskId(nodeId, pDiskId)}]),
@@ -134,12 +165,14 @@ export function PDiskPage() {
 
     const renderPageTitle = () => {
         return (
-            <EntityPageTitle
-                entityName={pDiskPageKeyset('pdisk')}
-                status={getSeverityColor(Severity)}
-                id={getPDiskId(nodeId, pDiskId)}
-                className={pdiskPageCn('title')}
-            />
+            <div className={pdiskPageCn('title')}>
+                <EntityPageTitle
+                    entityName={pDiskPageKeyset('pdisk')}
+                    status={getSeverityColor(Severity)}
+                    id={getPDiskId(nodeId, pDiskId)}
+                />
+                <DecommisionLabel decommission={DecommitStatus} />
+            </div>
         );
     };
 
@@ -148,10 +181,11 @@ export function PDiskPage() {
             <div className={pdiskPageCn('controls')}>
                 <ButtonWithConfirmDialog
                     onConfirmAction={handleRestart}
-                    onConfirmActionSuccess={handleAfterRestart}
-                    buttonDisabled={!nodeId || !pDiskId || !isUserAllowedToMakeChanges}
+                    onConfirmActionSuccess={handleAfterAction}
+                    buttonDisabled={!pDiskParamsDefined || !isUserAllowedToMakeChanges}
                     buttonView="normal"
-                    dialogContent={pDiskPageKeyset('restart-pdisk-dialog')}
+                    dialogHeader={pDiskPageKeyset('restart-pdisk-dialog-header')}
+                    dialogText={pDiskPageKeyset('restart-pdisk-dialog-text')}
                     retryButtonText={pDiskPageKeyset('force-restart-pdisk-button')}
                     withPopover
                     popoverContent={pDiskPageKeyset('restart-pdisk-not-allowed')}
@@ -160,6 +194,13 @@ export function PDiskPage() {
                     <Icon data={ArrowRotateLeft} />
                     {pDiskPageKeyset('restart-pdisk-button')}
                 </ButtonWithConfirmDialog>
+                <DecommissionButton
+                    decommission={DecommitStatus}
+                    onConfirmAction={handleDecommissionChange}
+                    onConfirmActionSuccess={handleAfterAction}
+                    buttonDisabled={!pDiskParamsDefined || !isUserAllowedToMakeChanges}
+                    popoverDisabled={isUserAllowedToMakeChanges}
+                />
             </div>
         );
     };

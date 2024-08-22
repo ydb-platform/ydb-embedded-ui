@@ -147,7 +147,8 @@ export function VDiskPage() {
                     onConfirmActionSuccess={handleAfterEvictVDisk}
                     buttonDisabled={!vDiskIdParamsDefined || !isUserAllowedToMakeChanges}
                     buttonView="normal"
-                    dialogContent={vDiskPageKeyset('evict-vdisk-dialog')}
+                    dialogHeader={vDiskPageKeyset('evict-vdisk-dialog-header')}
+                    dialogText={vDiskPageKeyset('evict-vdisk-dialog-text')}
                     retryButtonText={vDiskPageKeyset('force-evict-vdisk-button')}
                     withPopover
                     popoverContent={vDiskPageKeyset('evict-vdisk-not-allowed')}

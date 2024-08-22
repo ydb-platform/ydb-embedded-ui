@@ -131,7 +131,7 @@ type EDriveStatus =
     | 'FAULTY' // drive is expected to become BROKEN soon, new groups are not created, old groups are asynchronously moved out from this drive
     | 'TO_BE_REMOVED'; // same as INACTIVE, but drive is counted in fault model as not working
 
-type EDecommitStatus =
+export type EDecommitStatus =
     | 'DECOMMIT_UNSET'
     | 'DECOMMIT_NONE' // no decomission
     | 'DECOMMIT_PENDING' // drive is going to be removed soon, but SelfHeal logic would not remove it automatically
