@@ -39,24 +39,24 @@ export const selectTenants = createSelector(
     (state: RootState) => state,
     (_state: RootState, clusterName: string | undefined) =>
         createGetTenantsInfoSelector(clusterName),
-    (state: RootState, selectTenantsInfo) => selectTenantsInfo(state).data ?? [],
+    (state: RootState) => getSettingValue(state, SHOW_DOMAIN_DATABASE_KEY),
+    (state: RootState, selectTenantsInfo, showDomainDatabase) => {
+        const result = selectTenantsInfo(state).data ?? [];
+
+        return !showDomainDatabase && result.length > 1
+            ? result.filter((item) => item.Type !== 'Domain')
+            : result;
+    },
 );
 export const selectTenantsSearchValue = (state: TenantsStateSlice) => state.tenants.searchValue;
-
-export const selectShowDomainDatabase = (state: RootState) =>
-    getSettingValue(state, SHOW_DOMAIN_DATABASE_KEY);
 
 // ==== Complex selectors ====
 
 export const selectFilteredTenants = createSelector(
-    [selectTenants, selectProblemFilter, selectTenantsSearchValue, selectShowDomainDatabase],
-    (tenants, problemFilter, searchQuery, showDomainDatabase) => {
+    [selectTenants, selectProblemFilter, selectTenantsSearchValue],
+    (tenants, problemFilter, searchQuery) => {
         let result = filterTenantsByProblems(tenants, problemFilter);
         result = filteredTenantsBySearch(result, searchQuery);
-        result =
-            !showDomainDatabase && result.length > 1
-                ? result.filter((item) => item.Type !== 'Domain')
-                : result;
 
         return result;
     },
