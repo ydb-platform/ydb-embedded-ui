@@ -22,6 +22,7 @@ import {
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import {
     selectFilteredTenants,
+    selectTenants,
     selectTenantsSearchValue,
 } from '../../store/reducers/tenants/selectors';
 import {setSearchValue, tenantsApi} from '../../store/reducers/tenants/tenants';
@@ -56,8 +57,8 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
-    const tenants = currentData ?? [];
 
+    const tenants = useTypedSelector((state) => selectTenants(state, clusterName));
     const searchValue = useTypedSelector(selectTenantsSearchValue);
     const filteredTenants = useTypedSelector((state) => selectFilteredTenants(state, clusterName));
     const problemFilter = useTypedSelector(selectProblemFilter);
