@@ -27,7 +27,10 @@ export const STORAGE_NODES_COLUMNS_IDS = {
 type StorageGroupsColumn = PaginatedTableColumn<PreparedStorageNode> &
     DataTableColumn<PreparedStorageNode>;
 
-const getStorageNodesColumns = (additionalNodesProps: AdditionalNodesProps | undefined) => {
+const getStorageNodesColumns = (
+    additionalNodesProps: AdditionalNodesProps | undefined,
+    database?: string,
+) => {
     const getNodeRef = additionalNodesProps?.getNodeRef;
 
     const columns: StorageGroupsColumn[] = [
@@ -43,7 +46,7 @@ const getStorageNodesColumns = (additionalNodesProps: AdditionalNodesProps | und
             header: 'Host',
             width: 350,
             render: ({row}) => {
-                return <NodeHostWrapper node={row} getNodeRef={getNodeRef} />;
+                return <NodeHostWrapper node={row} getNodeRef={getNodeRef} database={database} />;
             },
             align: DataTable.LEFT,
         },
@@ -111,8 +114,9 @@ const getStorageNodesColumns = (additionalNodesProps: AdditionalNodesProps | und
 export const getPreparedStorageNodesColumns = (
     additionalNodesProps: AdditionalNodesProps | undefined,
     visibleEntities: VisibleEntities,
+    database?: string,
 ) => {
-    const rawColumns = getStorageNodesColumns(additionalNodesProps);
+    const rawColumns = getStorageNodesColumns(additionalNodesProps, database);
 
     const sortableColumns = rawColumns.map((column) => ({
         ...column,

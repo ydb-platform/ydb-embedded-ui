@@ -272,15 +272,14 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getTabletsInfo(
-        {nodes = [], path, database}: {nodes?: string[]; path?: string; database?: string},
+        {nodeId, path, database}: {nodeId?: string | number; path?: string; database?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
-        const filter = nodes.length > 0 && `(NodeId=[${nodes.join(',')}])`;
         return this.get<TEvTabletStateResponse>(
             this.getPath('/viewer/json/tabletinfo'),
             {
                 database,
-                filter,
+                node_id: nodeId,
                 path,
                 enums: true,
             },
@@ -401,14 +400,16 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getTablet(
-        {id, database}: {id?: string; database?: string},
+        {id, database, nodeId}: {id: string; database?: string; nodeId?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TEvTabletStateResponse>(
-            this.getPath(`/viewer/json/tabletinfo?filter=(TabletId=${id})`),
+            this.getPath('/viewer/json/tabletinfo'),
             {
                 enums: true,
                 database,
+                node_id: nodeId,
+                filter: `(TabletId=${id})`,
             },
             {
                 concurrentId,
@@ -417,15 +418,17 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getTabletHistory(
-        {id, database}: {id?: string; database?: string},
+        {id, database, nodeId}: {id: string; database?: string; nodeId?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<UnmergedTEvTabletStateResponse>(
-            this.getPath(`/viewer/json/tabletinfo?filter=(TabletId=${id})`),
+            this.getPath('/viewer/json/tabletinfo'),
             {
                 enums: true,
                 merge: false,
                 database,
+                node_id: nodeId,
+                filter: `(TabletId=${id})`,
             },
             {
                 concurrentId,

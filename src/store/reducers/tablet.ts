@@ -7,11 +7,14 @@ import {api} from './api';
 export const tabletApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTablet: build.query({
-            queryFn: async ({id, database}: {id: string; database?: string}, {signal}) => {
+            queryFn: async (
+                {id, database, nodeId}: {id: string; database?: string; nodeId?: string},
+                {signal},
+            ) => {
                 try {
                     const [tabletResponseData, historyResponseData, nodesList] = await Promise.all([
-                        window.api.getTablet({id, database}, {signal}),
-                        window.api.getTabletHistory({id, database}, {signal}),
+                        window.api.getTablet({id, database, nodeId}, {signal}),
+                        window.api.getTabletHistory({id, database, nodeId}, {signal}),
                         window.api.getNodesList({signal}),
                     ]);
                     const nodesMap = prepareNodesMap(nodesList);

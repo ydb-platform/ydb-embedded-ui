@@ -29,7 +29,6 @@ import {
     RedirectSlot,
     RoutesSlot,
     TabletSlot,
-    TabletsFiltersSlot,
     TenantSlot,
     VDiskPageSlot,
 } from './appSlots';
@@ -81,15 +80,6 @@ const routesSlots: RouteSlot[] = [
         path: routes.tablet,
         slot: TabletSlot,
         component: lazyComponent(() => import('../Tablet'), 'Tablet'),
-        wrapper: DataWrapper,
-    },
-    {
-        path: routes.tabletsFilters,
-        slot: TabletsFiltersSlot,
-        component: lazyComponent(
-            () => import('../TabletsFilters/TabletsFilters'),
-            'TabletsFilters',
-        ),
         wrapper: DataWrapper,
     },
 ];

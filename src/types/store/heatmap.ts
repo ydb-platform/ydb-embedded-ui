@@ -15,7 +15,6 @@ export interface IHeatmapState {
 }
 
 export interface IHeatmapApiRequestParams {
-    nodes?: string[];
     path: string;
     database: string;
 }

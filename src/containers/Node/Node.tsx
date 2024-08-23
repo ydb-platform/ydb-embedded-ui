@@ -72,16 +72,24 @@ export function Node(props: NodeProps) {
         return {activeTabVerified: actualActiveTab, nodeTabs: actualNodeTabs};
     }, [activeTab, node]);
 
-    React.useEffect(() => {
-        const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
+    const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
 
+    let nodeRole: 'Storage' | 'Compute' | undefined;
+    if (node) {
+        // Compute nodes have tenantName, storage nodes doesn't
+        const isStorage = !node?.Tenants?.[0];
+        nodeRole = isStorage ? 'Storage' : 'Compute';
+    }
+
+    React.useEffect(() => {
         dispatch(
             setHeaderBreadcrumbs('node', {
                 tenantName,
+                nodeRole,
                 nodeId,
             }),
         );
-    }, [dispatch, node, nodeId, tenantNameFromQuery]);
+    }, [dispatch, tenantName, nodeId, nodeRole]);
 
     const renderTabs = () => {
         return (
@@ -92,7 +100,7 @@ export function Node(props: NodeProps) {
                     activeTab={activeTabVerified.id}
                     wrapTo={({id}, tabNode) => (
                         <Link
-                            to={createHref(routes.node, {id: nodeId, activeTab: id})}
+                            to={createHref(routes.node, {id: nodeId, activeTab: id}, {tenantName})}
                             key={id}
                             className={b('tab')}
                         >
@@ -115,7 +123,13 @@ export function Node(props: NodeProps) {
                 );
             }
             case TABLETS: {
-                return <Tablets nodeId={nodeId} className={b('node-page-wrapper')} />;
+                return (
+                    <Tablets
+                        nodeId={nodeId}
+                        database={tenantName}
+                        className={b('node-page-wrapper')}
+                    />
+                );
             }
 
             case OVERVIEW: {

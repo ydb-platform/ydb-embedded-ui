@@ -6,7 +6,7 @@ export interface TabletsState {
 }
 
 export interface TabletsApiRequestParams {
-    nodes?: string[];
+    nodeId?: string | number;
     path?: string;
     database?: string;
 }

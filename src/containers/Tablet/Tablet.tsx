@@ -16,6 +16,7 @@ import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {getTabletPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
+import {nodeApi} from '../../store/reducers/node/node';
 import {tabletApi} from '../../store/reducers/tablet';
 import {EFlag} from '../../types/api/enums';
 import type {TTabletStateInfo} from '../../types/api/tablet';
@@ -68,7 +69,7 @@ export function Tablet() {
     const [
         {
             nodeId: queryNodeId,
-            tenantName: queryTenantName,
+            tenantName: queryDatabase,
             type: queryTabletType,
             clusterName: queryClusterName,
         },
@@ -81,7 +82,7 @@ export function Tablet() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tabletApi.useGetTabletQuery(
-        {id, database: queryTenantName?.toString()},
+        {id, database: queryDatabase ?? undefined, nodeId: queryNodeId ?? undefined},
         {pollingInterval: autoRefreshInterval},
     );
 
@@ -92,35 +93,45 @@ export function Tablet() {
         tablet.TenantId ? {tenantId: tablet.TenantId} : skipToken,
     );
 
-    const nodeId = tablet.NodeId ?? queryNodeId;
-    const tenantName = (tenantPath || queryTenantName) ?? undefined;
+    const nodeId = tablet.NodeId ?? queryNodeId ?? undefined;
+    const database = (tenantPath || queryDatabase) ?? undefined;
+
+    const nodeRole = useNodeRole(nodeId?.toString());
 
     const tabletType = tablet.Type || eTypeSchema.parse(queryTabletType);
 
     React.useEffect(() => {
         dispatch(
             setHeaderBreadcrumbs('tablet', {
-                nodeIds: nodeId ? [nodeId] : [],
-                tenantName,
+                nodeId,
+                nodeRole,
+                tenantName: queryDatabase ?? undefined,
                 tabletId: id,
                 tabletType,
             }),
         );
-    }, [dispatch, tenantName, id, nodeId, tabletType]);
+    }, [dispatch, queryDatabase, id, nodeId, nodeRole, tabletType]);
 
     const {Leader, Type} = tablet;
-    const database = tenantName ? `${i18n('tablet.meta-database')}: ${tenantName}` : undefined;
-    const type = Type ? Type : undefined;
-    const follower = Leader === false ? i18n('tablet.meta-follower').toUpperCase() : undefined;
+    const metaItems: string[] = [];
+    if (database) {
+        metaItems.push(`${i18n('tablet.meta-database')}: ${database}`);
+    }
+    if (Type) {
+        metaItems.push(Type);
+    }
+    if (Leader === false) {
+        metaItems.push(i18n('tablet.meta-follower').toUpperCase());
+    }
 
     return (
         <Flex gap={5} direction="column" className={b()}>
             <Helmet>
                 <title>{`${id} — ${i18n('tablet.header')} — ${
-                    tenantName || queryClusterName || CLUSTER_DEFAULT_TITLE
+                    database || queryClusterName || CLUSTER_DEFAULT_TITLE
                 }`}</title>
             </Helmet>
-            <PageMetaWithAutorefresh items={[database, type, follower]} />
+            <PageMetaWithAutorefresh items={metaItems} />
             <LoaderWrapper loading={loading} size="l">
                 {error ? <ResponseError error={error} /> : null}
                 {currentData ? <TabletContent id={id} tablet={tablet} history={history} /> : null}
@@ -228,4 +239,18 @@ function Channels({id, hiveId}: {id: string; hiveId: string}) {
             {currentData ? <TabletStorageInfo data={currentData} /> : null}
         </LoaderWrapper>
     );
+}
+
+function useNodeRole(nodeId: string | undefined) {
+    const {currentData: node} = nodeApi.useGetNodeInfoQuery(nodeId ? {nodeId} : skipToken);
+
+    let nodeRole: 'Storage' | 'Compute' | undefined;
+
+    if (node) {
+        // Compute nodes have tenantName, storage nodes doesn't
+        const isStorage = !node?.Tenants?.[0];
+        nodeRole = isStorage ? 'Storage' : 'Compute';
+    }
+
+    return nodeRole;
 }

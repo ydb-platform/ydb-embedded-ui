@@ -2,11 +2,10 @@ import React from 'react';
 
 import {Breadcrumbs} from '@gravity-ui/uikit';
 import {get} from 'lodash';
-import {useLocation} from 'react-router-dom';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {InternalLink} from '../../components/InternalLink';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
-import {parseQuery} from '../../routes';
 import {backend, customBackend} from '../../store';
 import {clusterApi} from '../../store/reducers/cluster/cluster';
 import {cn} from '../../utils/cn';
@@ -33,8 +32,7 @@ interface HeaderProps {
 }
 
 function Header({mainPage}: HeaderProps) {
-    const location = useLocation();
-    const queryParams = parseQuery(location);
+    const [queryParams] = useQueryParams({clusterName: StringParam});
 
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
@@ -64,12 +62,12 @@ function Header({mainPage}: HeaderProps) {
             };
         }
 
-        const breadcrumbs = getBreadcrumbs(page, options, rawBreadcrumbs, queryParams);
+        const breadcrumbs = getBreadcrumbs(page, options, rawBreadcrumbs);
 
         return breadcrumbs.map((item) => {
             return {...item, action: () => {}};
         });
-    }, [clusterName, mainPage, queryParams, page, pageBreadcrumbsOptions]);
+    }, [clusterName, mainPage, page, pageBreadcrumbsOptions]);
 
     const renderHeader = () => {
         return (

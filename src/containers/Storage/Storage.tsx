@@ -183,6 +183,7 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
                         additionalNodesProps={additionalNodesProps}
                         sort={nodesSort}
                         handleSort={handleNodesSort}
+                        database={database}
                     />
                 )}
             </React.Fragment>
