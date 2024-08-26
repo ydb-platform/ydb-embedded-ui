@@ -251,7 +251,7 @@ export const getStorageTopGroupsColumns = (): StorageGroupsColumn[] => {
     });
 };
 
-export const getPDiskStorageColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {
+export const getDiskPageStorageColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {
     return [
         poolNameColumn,
         typeColumn,
