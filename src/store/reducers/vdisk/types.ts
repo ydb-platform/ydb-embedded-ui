@@ -1,7 +1,7 @@
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import type {PreparedStorageGroup} from '../storage/types';
 
-export type VDiskGroup = Partial<PreparedStorageGroup>;
+export type VDiskGroup = PreparedStorageGroup;
 
 export interface VDiskData extends PreparedVDisk {
     NodeId?: number;
