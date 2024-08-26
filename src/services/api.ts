@@ -119,13 +119,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId: concurrentId || `getClusterInfo`, requestConfig: {signal}},
         );
     }
-    getClusterNodes({concurrentId, signal}: AxiosOptions = {}) {
-        return this.get<TEvSystemStateResponse>(
-            this.getPath('/viewer/json/sysinfo'),
-            {},
-            {concurrentId: concurrentId || `getClusterNodes`, requestConfig: {signal}},
-        );
-    }
     getNodeInfo(id?: string | number, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TEvSystemStateResponse>(
             this.getPath('/viewer/json/sysinfo?enums=true'),

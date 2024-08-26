@@ -10,7 +10,6 @@ import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import routes, {getLocationObjectFromHref} from '../../routes';
 import {clusterApi, updateDefaultClusterTab} from '../../store/reducers/cluster/cluster';
-import {clusterNodesApi} from '../../store/reducers/clusterNodes/clusterNodes';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import type {
     AdditionalClusterProps,
@@ -20,8 +19,8 @@ import type {
 } from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {parseNodesToVersionsValues, parseVersionsToVersionToColorMap} from '../../utils/versions';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {parseVersionsToVersionToColorMap} from '../../utils/versions';
 import {NodesWrapper} from '../Nodes/NodesWrapper';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {Tenants} from '../Tenants/Tenants';
@@ -59,22 +58,13 @@ export function Cluster({
         backend: StringParam,
     });
 
-    const [autoRefreshInterval] = useAutoRefreshInterval();
-
     const {
         data: {clusterData: cluster = {}, groupsStats} = {},
-        isLoading: isClusterLoading,
+        isLoading: infoLoading,
         error,
-    } = clusterApi.useGetClusterInfoQuery(clusterName ?? undefined, {
-        pollingInterval: autoRefreshInterval,
-    });
+    } = clusterApi.useGetClusterInfoQuery(clusterName ?? undefined);
 
     const clusterError = error && typeof error === 'object' ? error : undefined;
-
-    const {data: nodes = [], isLoading: isNodesLoading} =
-        clusterNodesApi.useGetClusterNodesQuery(undefined);
-
-    const infoLoading = isClusterLoading || isNodesLoading;
 
     const {Name} = cluster;
 
@@ -88,10 +78,6 @@ export function Cluster({
         }
         return parseVersionsToVersionToColorMap(cluster?.Versions);
     }, [additionalVersionsProps, cluster]);
-
-    const versionsValues = React.useMemo(() => {
-        return parseNodesToVersionsValues(nodes, versionToColor);
-    }, [nodes, versionToColor]);
 
     const getClusterTitle = () => {
         if (infoLoading) {
@@ -160,7 +146,7 @@ export function Cluster({
                         <ClusterInfo
                             cluster={cluster}
                             groupsStats={groupsStats}
-                            versionsValues={versionsValues}
+                            versionToColor={versionToColor}
                             loading={infoLoading}
                             error={clusterError}
                             additionalClusterProps={additionalClusterProps}
