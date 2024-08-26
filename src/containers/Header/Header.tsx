@@ -37,9 +37,7 @@ function Header({mainPage}: HeaderProps) {
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
 
-    const clusterInfo = clusterApi.useGetClusterInfoQuery(
-        queryParams.clusterName ? String(queryParams.clusterName) : undefined,
-    );
+    const clusterInfo = clusterApi.useGetClusterInfoQuery(queryParams.clusterName ?? undefined);
 
     const clusterName = get(
         clusterInfo,
