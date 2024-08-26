@@ -60,5 +60,3 @@ export const InfoViewer = ({
         </div>
     );
 };
-
-export default InfoViewer;
