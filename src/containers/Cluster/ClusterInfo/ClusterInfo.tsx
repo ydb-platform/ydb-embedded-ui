@@ -3,7 +3,7 @@ import React from 'react';
 import {ContentWithPopup} from '../../../components/ContentWithPopup/ContentWithPopup';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
-import InfoViewer from '../../../components/InfoViewer/InfoViewer';
+import {InfoViewer} from '../../../components/InfoViewer/InfoViewer';
 import {InfoViewerSkeleton} from '../../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';

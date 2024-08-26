@@ -46,7 +46,10 @@ import type {DescribeTopicResult} from '../types/api/topic';
 import type {TEvVDiskStateResponse} from '../types/api/vdisk';
 import type {TUserToken} from '../types/api/whoami';
 import type {QuerySyntax} from '../types/store/query';
-import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../utils/constants';
+import {
+    BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+    DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
+} from '../utils/constants';
 import {prepareSortValue} from '../utils/filters';
 import type {Nullable} from '../utils/typecheckers';
 
@@ -69,6 +72,20 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         axiosRetry(this._axios, {
             retries: this.DEFAULT_RETRIES_COUNT,
             retryDelay: axiosRetry.exponentialDelay,
+        });
+
+        // Make possible manually enable tracing for all requests
+        // For development purposes
+        this._axios.interceptors.request.use(function (config) {
+            const enableTracing = settingsManager.readUserSettingsValue(
+                DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
+            );
+
+            if (enableTracing) {
+                config.headers['X-Want-Trace'] = 1;
+            }
+
+            return config;
         });
 
         // Interceptor to process OIDC auth

@@ -11,6 +11,15 @@
     height: 100%;
     padding: 20px;
 
+    &__meta,
+    &__title,
+    &__controls,
+    &__info,
+    &__group-title {
+        position: sticky;
+        left: 0;
+    }
+
     &__controls {
         display: flex;
         align-items: center;

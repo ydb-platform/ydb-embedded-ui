@@ -1,7 +1,7 @@
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
 import {LOAD_AVERAGE_TIME_INTERVALS} from '../../utils/constants';
-import InfoViewer from '../InfoViewer/InfoViewer';
+import {InfoViewer} from '../InfoViewer/InfoViewer';
 import type {InfoViewerItem} from '../InfoViewer/InfoViewer';
 import {PoolUsage} from '../PoolUsage/PoolUsage';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';

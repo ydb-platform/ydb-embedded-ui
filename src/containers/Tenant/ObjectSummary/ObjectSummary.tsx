@@ -9,7 +9,7 @@ import {StringParam, useQueryParam} from 'use-query-params';
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {ClipboardButton} from '../../../components/ClipboardButton';
 import {toFormattedSize} from '../../../components/FormattedBytes/utils';
-import InfoViewer from '../../../components/InfoViewer/InfoViewer';
+import {InfoViewer} from '../../../components/InfoViewer/InfoViewer';
 import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {Loader} from '../../../components/Loader';

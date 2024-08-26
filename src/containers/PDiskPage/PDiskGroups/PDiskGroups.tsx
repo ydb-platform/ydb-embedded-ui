@@ -8,7 +8,7 @@ import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../utils/hooks';
 import {
     STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
-    getPDiskStorageColumns,
+    getDiskPageStorageColumns,
 } from '../../Storage/StorageGroups/getStorageGroupsColumns';
 
 interface PDiskGroupsProps {
@@ -28,7 +28,7 @@ export function PDiskGroups({pDiskId, nodeId}: PDiskGroupsProps) {
     const data = pDiskStorageQuery.currentData ?? [];
 
     const pDiskStorageColumns = React.useMemo(() => {
-        return getPDiskStorageColumns(nodesMap);
+        return getDiskPageStorageColumns(nodesMap);
     }, [nodesMap]);
 
     if (loading) {

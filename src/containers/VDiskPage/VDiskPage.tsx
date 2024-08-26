@@ -9,20 +9,25 @@ import {StringParam, useQueryParams} from 'use-query-params';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {GroupInfo} from '../../components/GroupInfo/GroupInfo';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
-import {VDiskWithDonorsStack} from '../../components/VDisk/VDiskWithDonorsStack';
+import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {selectNodesMap} from '../../store/reducers/nodesList';
+import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {
+    STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
+    getDiskPageStorageColumns,
+} from '../Storage/StorageGroups/getStorageGroupsColumns';
 
 import {vDiskPageKeyset} from './i18n';
 
@@ -33,7 +38,6 @@ const vDiskPageCn = cn('ydb-vdisk-page');
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
 
-    const nodesMap = useTypedSelector(selectNodesMap);
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     const [{nodeId, pDiskId, vDiskSlotId}] = useQueryParams({
@@ -120,6 +124,7 @@ export function VDiskPage() {
 
         return (
             <PageMetaWithAutorefresh
+                className={vDiskPageCn('meta')}
                 loading={loading}
                 items={[hostItem, nodeIdItem, NodeType, NodeDC, pDiskIdItem, PDiskType]}
             />
@@ -129,6 +134,7 @@ export function VDiskPage() {
     const renderPageTitle = () => {
         return (
             <EntityPageTitle
+                className={vDiskPageCn('title')}
                 entityName={vDiskPageKeyset('vdisk')}
                 status={getSeverityColor(Severity)}
                 id={stringifyVdiskId(vDiskData?.VDiskId)}
@@ -158,7 +164,7 @@ export function VDiskPage() {
     };
 
     const renderInfo = () => {
-        return <VDiskInfo data={vDiskData} />;
+        return <VDiskInfo data={vDiskData} className={vDiskPageCn('info')} />;
     };
 
     const renderGroupInfo = () => {
@@ -166,19 +172,7 @@ export function VDiskPage() {
             return (
                 <React.Fragment>
                     <div className={vDiskPageCn('group-title')}>{vDiskPageKeyset('group')}</div>
-                    <GroupInfo data={groupData} />
-                    <div className={vDiskPageCn('group-disks')}>
-                        {groupData.VDisks?.map((vDisk) => {
-                            return (
-                                <VDiskWithDonorsStack
-                                    key={stringifyVdiskId(vDisk.VDiskId)}
-                                    data={vDisk}
-                                    nodes={nodesMap}
-                                    className={vDiskPageCn('group-disk')}
-                                />
-                            );
-                        })}
-                    </div>
+                    <VDiskGroup data={groupData} />
                 </React.Fragment>
             );
         }
@@ -208,5 +202,22 @@ export function VDiskPage() {
             {renderControls()}
             {renderContent()}
         </div>
+    );
+}
+
+export function VDiskGroup({data}: {data: PreparedStorageGroup}) {
+    const nodesMap = useTypedSelector(selectNodesMap);
+
+    const pDiskStorageColumns = React.useMemo(() => {
+        return getDiskPageStorageColumns(nodesMap);
+    }, [nodesMap]);
+
+    return (
+        <ResizeableDataTable
+            columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
+            data={[data]}
+            columns={pDiskStorageColumns}
+            settings={DEFAULT_TABLE_SETTINGS}
+        />
     );
 }
