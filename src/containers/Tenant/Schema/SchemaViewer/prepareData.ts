@@ -87,8 +87,10 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
             columnCodec,
         };
     });
+    const keyColumns = preparedColumns?.filter((column) => column.isKeyColumn) || [];
+    const otherColumns = preparedColumns?.filter((column) => !column.isKeyColumn) || [];
 
-    return preparedColumns || [];
+    return [...keyColumns, ...otherColumns];
 }
 
 function prepareExternalTableSchema(data: TExternalTableDescription = {}): SchemaData[] {
@@ -107,8 +109,10 @@ function prepareExternalTableSchema(data: TExternalTableDescription = {}): Schem
 }
 
 function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaData[] {
-    const {Schema = {}} = data;
+    const {Schema = {}, Sharding = {}} = data;
     const {Columns, KeyColumnNames} = Schema;
+    const {HashSharding = {}} = Sharding;
+    const {Columns: HashColumns = []} = HashSharding;
 
     const keyAccessorsMap = getKeyColumnsSortAccessorMap(KeyColumnNames);
 
@@ -118,6 +122,9 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
         const isKeyColumn = Boolean(
             KeyColumnNames?.find((keyColumnName) => keyColumnName === Name),
         );
+        const isPartitioningKeyColumn = Boolean(
+            HashColumns?.find((hashColumnName) => hashColumnName === Name),
+        );
 
         // Values in keyAccessorsMap are always negative, so it will be 1 for not key columns
         const keyAccessor = Name && keyAccessorsMap[Name] ? keyAccessorsMap[Name] : 1;
@@ -126,13 +133,17 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
             id: Id,
             name: Name,
             isKeyColumn,
+            isPartitioningKeyColumn,
             keyAccessor,
             type: Type,
             notNull: NotNull,
         };
     });
 
-    return preparedColumns || [];
+    const keyColumns = preparedColumns?.filter((column) => column.isKeyColumn) || [];
+    const otherColumns = preparedColumns?.filter((column) => !column.isKeyColumn) || [];
+
+    return [...keyColumns, ...otherColumns];
 }
 
 export function prepareSchemaData(

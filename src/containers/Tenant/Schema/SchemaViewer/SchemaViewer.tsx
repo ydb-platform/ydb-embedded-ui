@@ -1,6 +1,5 @@
 import React from 'react';
 
-import DataTable from '@gravity-ui/react-data-table';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
@@ -16,9 +15,9 @@ import {
     isViewType,
 } from '../../utils/schema';
 
+import {KeysView} from './KeysView';
 import {
     SCHEMA_COLUMNS_WIDTH_LS_KEY,
-    SCHEMA_TABLE_COLUMS_IDS,
     getColumnTableColumns,
     getExternalTableColumns,
     getRowTableColumns,
@@ -77,24 +76,24 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
         return [];
     }, [type, extended, hasAutoIncrement, hasDefaultValue]);
 
-    const renderContent = () => {
-        if (loading || isViewSchemaLoading) {
-            return <TableSkeleton />;
-        }
+    if (loading || isViewSchemaLoading) {
+        return <TableSkeleton />;
+    }
 
-        return (
-            <ResizeableDataTable
-                columnsWidthLSKey={SCHEMA_COLUMNS_WIDTH_LS_KEY}
-                data={tableData}
-                columns={columns}
-                settings={DEFAULT_TABLE_SETTINGS}
-                initialSortOrder={{
-                    columnId: SCHEMA_TABLE_COLUMS_IDS.isKeyColumn,
-                    order: DataTable.ASCENDING,
-                }}
-            />
-        );
-    };
-
-    return <div className={b(null)}>{renderContent()}</div>;
+    return (
+        <React.Fragment>
+            <div className={b('keys-wrapper')}>
+                <KeysView tableData={tableData} extended={extended} type="primary" />
+                <KeysView tableData={tableData} extended={extended} type="partitioning" />
+            </div>
+            <div className={b('table')}>
+                <ResizeableDataTable
+                    columnsWidthLSKey={SCHEMA_COLUMNS_WIDTH_LS_KEY}
+                    data={tableData}
+                    columns={columns}
+                    settings={DEFAULT_TABLE_SETTINGS}
+                />
+            </div>
+        </React.Fragment>
+    );
 };

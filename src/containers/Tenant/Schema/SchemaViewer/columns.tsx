@@ -1,11 +1,7 @@
 import DataTable from '@gravity-ui/react-data-table';
-import {Icon} from '@gravity-ui/uikit';
 
 import i18n from './i18n';
-import {b} from './shared';
 import type {SchemaColumn, SchemaData} from './types';
-
-import keyIcon from '../../../../assets/icons/key.svg';
 
 export const SCHEMA_COLUMNS_WIDTH_LS_KEY = 'schemaTableColumnsWidth';
 
@@ -37,24 +33,6 @@ const nameColumn: SchemaColumn = {
     },
     width: 100,
     render: ({row}) => row.name,
-};
-const keyColumn: SchemaColumn = {
-    name: SCHEMA_TABLE_COLUMS_IDS.isKeyColumn,
-    get header() {
-        return i18n('column-title.key');
-    },
-    width: 70,
-    resizeMinWidth: 70,
-    // Table should start with key columns on sort click
-    defaultOrder: DataTable.ASCENDING,
-    sortAccessor: (row) => row.keyAccessor,
-    render: ({row}) => {
-        return row.isKeyColumn ? (
-            <div className={b('key-icon')}>
-                <Icon data={keyIcon} width={12} height={7} />
-            </div>
-        ) : null;
-    },
 };
 const typeColumn: SchemaColumn = {
     name: SCHEMA_TABLE_COLUMS_IDS.type,
@@ -137,14 +115,14 @@ export function getExternalTableColumns(): SchemaColumn[] {
     return [idColumn, nameColumn, typeColumn, notNullColumn];
 }
 export function getColumnTableColumns(): SchemaColumn[] {
-    return [idColumn, keyColumn, nameColumn, typeColumn, notNullColumn];
+    return [idColumn, nameColumn, typeColumn, notNullColumn];
 }
 export function getRowTableColumns(
     extended: boolean,
     hasAutoIncrement: boolean,
     hasDefaultValue: boolean,
 ): SchemaColumn[] {
-    const rowTableColumns = [idColumn, keyColumn, nameColumn, typeColumn, notNullColumn];
+    const rowTableColumns = [idColumn, nameColumn, typeColumn, notNullColumn];
 
     if (hasDefaultValue) {
         rowTableColumns.push(defaultValueColumn);

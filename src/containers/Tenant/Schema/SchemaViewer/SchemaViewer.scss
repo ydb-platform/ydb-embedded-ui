@@ -1,6 +1,61 @@
+@import '../../../../styles/mixins.scss';
+
 .schema-viewer {
-    &__key-icon {
-        display: flex;
-        align-items: center;
+    &__keys {
+        display: inline-block;
+        padding-left: 10px;
+
+        padding-bottom: var(--g-spacing-4);
+
+        &-values {
+            display: inline;
+            color: var(--g-color-text-complementary);
+            @include body-1-typography();
+        }
+
+        &-header {
+            display: inline;
+            font-weight: bold;
+            color: var(--g-color-text-primary);
+            @include subheader-1-typography();
+            white-space: nowrap;
+        }
+
+        &-label {
+            cursor: pointer;
+        }
+
+        &-wrapper {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            width: 100%;
+        }
+
+        & + & {
+            margin-left: var(--g-spacing-8);
+        }
+
+        &_summary {
+            & + & {
+                margin-left: 0;
+            }
+        }
+    }
+
+    &__popup-content {
+        padding: var(--g-spacing-2) var(--g-spacing-4);
+    }
+
+    &__popup-item {
+        padding-bottom: var(--g-spacing-2);
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+
+    &__more-badge {
+        margin-left: var(--g-spacing-1);
     }
 }
