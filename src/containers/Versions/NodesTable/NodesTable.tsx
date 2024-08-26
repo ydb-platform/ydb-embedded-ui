@@ -5,15 +5,15 @@ import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {PoolsGraph} from '../../../components/PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
-import type {PreparedClusterNode} from '../../../store/reducers/clusterNodes/clusterNodes';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {formatBytes} from '../../../utils/dataFormatters/dataFormatters';
+import type {PreparedNodeSystemState} from '../../../utils/nodes';
 import {isUnavailableNode} from '../../../utils/nodes';
 import {getDefaultNodePath} from '../../Node/NodePages';
 
 const VERSIONS_COLUMNS_WIDTH_LS_KEY = 'versionsTableColumnsWidth';
 
-const columns: Column<PreparedClusterNode>[] = [
+const columns: Column<PreparedNodeSystemState>[] = [
     {
         name: 'NodeId',
         header: '#',
@@ -110,7 +110,7 @@ const columns: Column<PreparedClusterNode>[] = [
 ];
 
 interface NodesTableProps {
-    nodes: PreparedClusterNode[];
+    nodes: PreparedNodeSystemState[];
 }
 
 export const NodesTable = ({nodes}: NodesTableProps) => {

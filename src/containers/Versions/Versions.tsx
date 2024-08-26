@@ -3,7 +3,7 @@ import React from 'react';
 import {Checkbox, RadioButton} from '@gravity-ui/uikit';
 
 import {Loader} from '../../components/Loader';
-import {clusterNodesApi} from '../../store/reducers/clusterNodes/clusterNodes';
+import {nodesApi} from '../../store/reducers/nodes/nodes';
 import type {VersionToColorMap} from '../../types/versions';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
@@ -22,11 +22,12 @@ interface VersionsProps {
 
 export const Versions = ({versionToColor}: VersionsProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const {data: nodes = [], isLoading: isNodesLoading} = clusterNodesApi.useGetClusterNodesQuery(
-        undefined,
+    const {currentData, isLoading: isNodesLoading} = nodesApi.useGetNodesQuery(
+        {tablets: false},
         {pollingInterval: autoRefreshInterval},
     );
 
+    const nodes = currentData?.Nodes;
     const [groupByValue, setGroupByValue] = React.useState<GroupByValue>(GroupByValue.VERSION);
     const [expanded, setExpanded] = React.useState(false);
 
