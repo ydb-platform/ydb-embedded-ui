@@ -15,7 +15,7 @@ export enum DiagnosticsTab {
 
 export class Diagnostics {
     private tabs: Locator;
-    private schemaViewerTable: Locator;
+    private schemaViewer: Locator;
     private dataTable: Locator;
     private primaryKeys: Locator;
     private refreshButton: Locator;
@@ -23,7 +23,7 @@ export class Diagnostics {
 
     constructor(page: Page) {
         this.tabs = page.locator('.kv-tenant-diagnostics__tabs');
-        this.schemaViewerTable = page.locator('.schema-viewer__table');
+        this.schemaViewer = page.locator('.schema-viewer');
         this.dataTable = page.locator('.data-table__table');
         this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
         this.refreshButton = page.locator('button[aria-label="Refresh"]');
@@ -31,12 +31,12 @@ export class Diagnostics {
     }
 
     async isSchemaViewerVisible() {
-        await this.schemaViewerTable.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.schemaViewer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 
     async isSchemaViewerHidden() {
-        await this.schemaViewerTable.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        await this.schemaViewer.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 

@@ -86,7 +86,7 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
                 <KeysView tableData={tableData} extended={extended} type="primary" />
                 <KeysView tableData={tableData} extended={extended} type="partitioning" />
             </div>
-            <div className={b('table')}>
+            <div className={b()}>
                 <ResizeableDataTable
                     columnsWidthLSKey={SCHEMA_COLUMNS_WIDTH_LS_KEY}
                     data={tableData}
