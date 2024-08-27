@@ -4,8 +4,7 @@ export interface SchemaData {
     id?: number;
     name?: string;
     isKeyColumn?: boolean;
-    /** value to sort keys, needed to ensure that key columns will be the first */
-    keyAccessor?: number;
+    isPartitioningKeyColumn?: boolean;
     type?: string;
     notNull?: boolean;
     autoIncrement?: boolean;

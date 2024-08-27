@@ -4,7 +4,7 @@ import {dsVslotsSchema, dsVslotsTableName, tenantName} from '../../../utils/cons
 import {TenantPage} from '../TenantPage';
 import {QueryEditor} from '../queryEditor/QueryEditor';
 
-import {ObjectSummary} from './ObjectSummary';
+import {ObjectSummary, ObjectSummaryTab} from './ObjectSummary';
 
 test.describe('Object Summary', async () => {
     test.beforeEach(async ({page}) => {
@@ -46,5 +46,18 @@ test.describe('Object Summary', async () => {
         await queryEditor.closeSettingsDialog();
 
         await expect(queryEditor.resultTable.isPreviewVisible()).resolves.toBe(true);
+    });
+
+    test('Primary keys header is visible in Schema tab', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+
+        await objectSummary.clickTab(ObjectSummaryTab.Schema);
+        await expect(objectSummary.isSchemaViewerVisible()).resolves.toBe(true);
+
+        await expect(objectSummary.getPrimaryKeys()).resolves.toEqual([
+            'NodeId',
+            'PDiskId',
+            'VSlotId',
+        ]);
     });
 });

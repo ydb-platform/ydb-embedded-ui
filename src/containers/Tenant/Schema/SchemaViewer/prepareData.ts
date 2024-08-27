@@ -12,20 +12,6 @@ import {isColumnEntityType, isExternalTableType, isRowTableType} from '../../uti
 
 import type {SchemaData} from './types';
 
-function getKeyColumnsSortAccessorMap<T extends number | string>(ids: T[] = []): Record<T, number> {
-    return ids.reduce(
-        (result, keyColumnId, index) => {
-            // Put columns with negative values, so they will be the first with ascending sort
-            // Minus keyColumnIds.length for the first key, -1 for the last
-            return {
-                ...result,
-                [keyColumnId]: index - ids.length,
-            };
-        },
-        {} as Record<T, number>,
-    );
-}
-
 function formatColumnCodec(codec?: EColumnCodec) {
     if (!codec) {
         return undefined;
@@ -58,14 +44,10 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
 
     const {Columns, KeyColumnIds} = data;
 
-    const keyAccessorsMap = getKeyColumnsSortAccessorMap(KeyColumnIds);
-
     const preparedColumns = Columns?.map((column) => {
         const {Id, Name, NotNull, Type, Family, DefaultFromSequence, DefaultFromLiteral} = column;
 
         const isKeyColumn = Boolean(KeyColumnIds?.find((keyColumnId) => keyColumnId === Id));
-        // Values in keyAccessorsMap are always negative, so it will be 1 for not key columns
-        const keyAccessor = Id && keyAccessorsMap[Id] ? keyAccessorsMap[Id] : 1;
 
         const familyName = Family ? families[Family].Name : undefined;
         const prefferedPoolKind = Family
@@ -77,7 +59,6 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
             id: Id,
             name: Name,
             isKeyColumn,
-            keyAccessor,
             type: Type,
             notNull: NotNull,
             autoIncrement: Boolean(DefaultFromSequence),
@@ -87,8 +68,10 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
             columnCodec,
         };
     });
+    const keyColumns = preparedColumns?.filter((column) => column.isKeyColumn) || [];
+    const otherColumns = preparedColumns?.filter((column) => !column.isKeyColumn) || [];
 
-    return preparedColumns || [];
+    return [...keyColumns, ...otherColumns];
 }
 
 function prepareExternalTableSchema(data: TExternalTableDescription = {}): SchemaData[] {
@@ -107,10 +90,10 @@ function prepareExternalTableSchema(data: TExternalTableDescription = {}): Schem
 }
 
 function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaData[] {
-    const {Schema = {}} = data;
+    const {Schema = {}, Sharding = {}} = data;
     const {Columns, KeyColumnNames} = Schema;
-
-    const keyAccessorsMap = getKeyColumnsSortAccessorMap(KeyColumnNames);
+    const {HashSharding = {}} = Sharding;
+    const {Columns: HashColumns = []} = HashSharding;
 
     const preparedColumns = Columns?.map((column) => {
         const {Id, Name, Type, NotNull} = column;
@@ -118,21 +101,24 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
         const isKeyColumn = Boolean(
             KeyColumnNames?.find((keyColumnName) => keyColumnName === Name),
         );
-
-        // Values in keyAccessorsMap are always negative, so it will be 1 for not key columns
-        const keyAccessor = Name && keyAccessorsMap[Name] ? keyAccessorsMap[Name] : 1;
+        const isPartitioningKeyColumn = Boolean(
+            HashColumns?.find((hashColumnName) => hashColumnName === Name),
+        );
 
         return {
             id: Id,
             name: Name,
             isKeyColumn,
-            keyAccessor,
+            isPartitioningKeyColumn,
             type: Type,
             notNull: NotNull,
         };
     });
 
-    return preparedColumns || [];
+    const keyColumns = preparedColumns?.filter((column) => column.isKeyColumn) || [];
+    const otherColumns = preparedColumns?.filter((column) => !column.isKeyColumn) || [];
+
+    return [...keyColumns, ...otherColumns];
 }
 
 export function prepareSchemaData(
