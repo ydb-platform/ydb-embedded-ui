@@ -1,0 +1,13 @@
+@import '../../styles/mixins.scss';
+
+.ydb-definition-list {
+    @include flex-container();
+
+    &__title {
+        @include info-viewer-title();
+    }
+
+    &__properties-list {
+        max-width: calc(100% - 40px);
+    }
+}

@@ -1,7 +1,9 @@
+import React from 'react';
+
 import {ContentWithPopup} from '../../../components/ContentWithPopup/ContentWithPopup';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
-import InfoViewer from '../../../components/InfoViewer/InfoViewer';
+import {InfoViewer} from '../../../components/InfoViewer/InfoViewer';
 import {InfoViewerSkeleton} from '../../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
@@ -13,15 +15,17 @@ import type {
     DiskErasureGroupsStats,
     DiskGroupsStats,
 } from '../../../store/reducers/cluster/types';
+import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {AdditionalClusterProps, ClusterLink} from '../../../types/additionalProps';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
-import type {VersionValue} from '../../../types/versions';
+import type {VersionToColorMap, VersionValue} from '../../../types/versions';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../utils/bytesParsers';
 import {cn} from '../../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../../utils/constants';
 import {formatStorageValues} from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedSelector} from '../../../utils/hooks';
+import {parseNodesToVersionsValues} from '../../../utils/versions';
 import {VersionsBar} from '../VersionsBar/VersionsBar';
 import i18n from '../i18n';
 
@@ -191,7 +195,7 @@ const getInfo = (
 
 interface ClusterInfoProps {
     cluster?: TClusterInfo;
-    versionsValues?: VersionValue[];
+    versionToColor?: VersionToColorMap;
     groupsStats?: ClusterGroupsStats;
     loading?: boolean;
     error?: IResponseError;
@@ -200,13 +204,22 @@ interface ClusterInfoProps {
 
 export const ClusterInfo = ({
     cluster,
-    versionsValues = [],
+    versionToColor,
     groupsStats = {},
     loading,
     error,
     additionalClusterProps = {},
 }: ClusterInfoProps) => {
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
+
+    const {currentData} = nodesApi.useGetNodesQuery({
+        tablets: false,
+    });
+
+    const nodes = currentData?.Nodes;
+    const versionsValues = React.useMemo(() => {
+        return parseNodesToVersionsValues(nodes, versionToColor);
+    }, [nodes, versionToColor]);
 
     let internalLink = backend + '/internal';
 

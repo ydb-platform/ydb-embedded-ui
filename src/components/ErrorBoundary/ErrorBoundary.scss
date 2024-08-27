@@ -27,6 +27,8 @@
     &__error-details {
         padding: 13px 18px;
 
+        white-space: pre-wrap;
+
         border: 1px solid var(--g-color-line-generic);
         background-color: var(--g-color-base-generic-ultralight);
     }

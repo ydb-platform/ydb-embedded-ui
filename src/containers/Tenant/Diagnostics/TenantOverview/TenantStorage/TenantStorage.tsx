@@ -1,6 +1,6 @@
 import React from 'react';
 
-import InfoViewer from '../../../../../components/InfoViewer/InfoViewer';
+import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
