@@ -10,7 +10,7 @@ export enum ObjectSummaryTab {
 
 export class ObjectSummary {
     private tabs: Locator;
-    private schemaViewer: Locator;
+    private schemaViewerTable: Locator;
     private tree: Locator;
     private treeRows: Locator;
     private primaryKeys: Locator;
@@ -19,7 +19,7 @@ export class ObjectSummary {
         this.tree = page.locator('.object-summary__tree');
         this.treeRows = page.locator('.ydb-tree-view');
         this.tabs = page.locator('.object-summary__tabs');
-        this.schemaViewer = page.locator('.schema-viewer__table');
+        this.schemaViewerTable = page.locator('.schema-viewer__table');
         this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
     }
 
@@ -34,12 +34,12 @@ export class ObjectSummary {
     }
 
     async isSchemaViewerVisible() {
-        await this.schemaViewer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.schemaViewerTable.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 
     async isSchemaViewerHidden() {
-        await this.schemaViewer.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        await this.schemaViewerTable.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 

@@ -16,7 +16,7 @@ test.describe('Diagnostics tab', async () => {
         await tenantPage.goto(pageQueryParams);
     });
 
-    test('Primary keys header is visible in Scheme tab', async ({page}) => {
+    test('Primary keys header is visible in Schema tab', async ({page}) => {
         const objectSummary = new Diagnostics(page);
 
         await objectSummary.clickTab(DiagnosticsTab.Schema);

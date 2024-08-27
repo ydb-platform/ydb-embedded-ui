@@ -48,7 +48,7 @@ test.describe('Object Summary', async () => {
         await expect(queryEditor.resultTable.isPreviewVisible()).resolves.toBe(true);
     });
 
-    test('Primary keys header is visible in Scheme tab', async ({page}) => {
+    test('Primary keys header is visible in Schema tab', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
 
         await objectSummary.clickTab(ObjectSummaryTab.Schema);

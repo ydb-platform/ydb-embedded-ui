@@ -5,8 +5,6 @@ export interface SchemaData {
     name?: string;
     isKeyColumn?: boolean;
     isPartitioningKeyColumn?: boolean;
-    /** value to sort keys, needed to ensure that key columns will be the first */
-    keyAccessor?: number;
     type?: string;
     notNull?: boolean;
     autoIncrement?: boolean;
