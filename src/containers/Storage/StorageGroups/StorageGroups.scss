@@ -1,5 +1,6 @@
 .global-storage-groups {
-    &__vdisks-column {
+    &__vdisks-column,
+    &__disks-column {
         overflow: visible; // to enable stacked disks overflow the row
     }
 

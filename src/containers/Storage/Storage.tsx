@@ -7,7 +7,6 @@ import {isAccessError} from '../../components/Errors/PageError/PageError';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
-import {selectNodesMap} from '../../store/reducers/nodesList';
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
 import {
     filterGroups,
@@ -23,7 +22,7 @@ import type {
 } from '../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {useAutoRefreshInterval, useTableSort, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTableSort} from '../../utils/hooks';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
 import {StorageControls} from './StorageControls/StorageControls';
@@ -71,8 +70,6 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
     const filter = queryParams.search ?? '';
     const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
     const usageFilter = queryParams.usageFilter;
-
-    const nodesMap = useTypedSelector(selectNodesMap);
 
     const [nodeSort, setNodeSort] = React.useState<NodesSortParams>({
         sortOrder: undefined,
@@ -166,7 +163,6 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
                         visibleEntities={visibleEntities}
                         data={storageGroups}
                         tableSettings={DEFAULT_TABLE_SETTINGS}
-                        nodes={nodesMap}
                         onShowAll={() => handleGroupVisibilityChange(VISIBLE_ENTITIES.all)}
                         sort={groupsSort}
                         handleSort={handleGroupsSort}

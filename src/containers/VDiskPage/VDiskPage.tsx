@@ -15,7 +15,6 @@ import {ResizeableDataTable} from '../../components/ResizeableDataTable/Resizeab
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {selectNodesMap} from '../../store/reducers/nodesList';
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {valueIsDefined} from '../../utils';
@@ -24,10 +23,8 @@ import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {
-    STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
-    getDiskPageStorageColumns,
-} from '../Storage/StorageGroups/getStorageGroupsColumns';
+import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../Storage/StorageGroups/getStorageGroupsColumns';
+import {useGetDiskStorageColumns} from '../Storage/StorageGroups/hooks';
 
 import {vDiskPageKeyset} from './i18n';
 
@@ -206,17 +203,13 @@ export function VDiskPage() {
 }
 
 export function VDiskGroup({data}: {data: PreparedStorageGroup}) {
-    const nodesMap = useTypedSelector(selectNodesMap);
-
-    const pDiskStorageColumns = React.useMemo(() => {
-        return getDiskPageStorageColumns(nodesMap);
-    }, [nodesMap]);
+    const vDiskStorageColumns = useGetDiskStorageColumns();
 
     return (
         <ResizeableDataTable
             columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
             data={[data]}
-            columns={pDiskStorageColumns}
+            columns={vDiskStorageColumns}
             settings={DEFAULT_TABLE_SETTINGS}
         />
     );

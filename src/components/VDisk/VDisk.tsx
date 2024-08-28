@@ -17,13 +17,25 @@ import './VDisk.scss';
 
 const b = cn('ydb-vdisk-component');
 
-interface VDiskProps {
+export interface VDiskProps {
     data?: PreparedVDisk;
     nodes?: NodesMap;
     compact?: boolean;
+    showPopup?: boolean;
+    onShowPopup?: VoidFunction;
+    onHidePopup?: VoidFunction;
+    progressBarClassName?: string;
 }
 
-export const VDisk = ({data = {}, nodes, compact}: VDiskProps) => {
+export const VDisk = ({
+    data = {},
+    nodes,
+    compact,
+    showPopup,
+    onShowPopup,
+    onHidePopup,
+    progressBarClassName,
+}: VDiskProps) => {
     const isFullData = isFullVDiskData(data);
 
     const diskPagesAvailable = useDiskPagesAvailable();
@@ -32,12 +44,14 @@ export const VDisk = ({data = {}, nodes, compact}: VDiskProps) => {
 
     const anchor = React.useRef(null);
 
-    const showPopup = () => {
+    const handleShowPopup = () => {
         setIsPopupVisible(true);
+        onShowPopup?.();
     };
 
-    const hidePopup = () => {
+    const handleHidePopup = () => {
         setIsPopupVisible(false);
+        onHidePopup?.();
     };
 
     let vDiskPath: string | undefined;
@@ -62,23 +76,26 @@ export const VDisk = ({data = {}, nodes, compact}: VDiskProps) => {
 
     return (
         <React.Fragment>
-            <VDiskPopup data={data} nodes={nodes} anchorRef={anchor} open={isPopupVisible} />
-            <div className={b()} ref={anchor} onMouseEnter={showPopup} onMouseLeave={hidePopup}>
-                {vDiskPath ? (
-                    <InternalLink to={vDiskPath} className={b('content')}>
-                        <DiskStateProgressBar
-                            diskAllocatedPercent={data.AllocatedPercent}
-                            severity={data.Severity}
-                            compact={compact}
-                        />
-                    </InternalLink>
-                ) : (
+            <VDiskPopup
+                data={data}
+                nodes={nodes}
+                anchorRef={anchor}
+                open={isPopupVisible || showPopup}
+            />
+            <div
+                className={b()}
+                ref={anchor}
+                onMouseEnter={handleShowPopup}
+                onMouseLeave={handleHidePopup}
+            >
+                <InternalLink to={vDiskPath} className={b('content')}>
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}
                         severity={data.Severity}
                         compact={compact}
+                        className={progressBarClassName}
                     />
-                )}
+                </InternalLink>
             </div>
         </React.Fragment>
     );

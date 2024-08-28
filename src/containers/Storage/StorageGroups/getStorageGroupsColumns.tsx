@@ -18,6 +18,7 @@ import {cn} from '../../../utils/cn';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {isSortableStorageProperty} from '../../../utils/storage';
 import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
+import {Disks} from '../Disks/Disks';
 import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../utils';
 
 import i18n from './i18n';
@@ -43,6 +44,7 @@ export const GROUPS_COLUMNS_IDS = {
     Read: 'Read',
     Write: 'Write',
     VDisks: 'VDisks',
+    Disks: 'Disks',
     Degraded: 'Degraded',
 } as const;
 
@@ -233,6 +235,28 @@ const getVDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
     sortable: false,
 });
 
+const getDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
+    name: GROUPS_COLUMNS_IDS.Disks,
+    className: b('disks-column'),
+    header: 'Disks',
+    render: ({row}) => {
+        return <Disks vDisks={row.VDisks} nodes={nodes} />;
+    },
+    align: DataTable.CENTER,
+    width: 1050,
+    resizeable: false,
+    sortable: false,
+});
+
+interface GetColumnsData {
+    nodes?: NodesMap;
+}
+
+interface GetColumnsOptions {
+    useAdvancedStorage?: boolean;
+    visibleEntities?: VisibleEntities;
+}
+
 export const getStorageTopGroupsColumns = (): StorageGroupsColumn[] => {
     const columns = [
         groupIdColumn,
@@ -251,7 +275,14 @@ export const getStorageTopGroupsColumns = (): StorageGroupsColumn[] => {
     });
 };
 
-export const getDiskPageStorageColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {
+export const getDiskPageStorageColumns = (
+    data?: GetColumnsData,
+    options?: GetColumnsOptions,
+): StorageGroupsColumn[] => {
+    const disksColumn = options?.useAdvancedStorage
+        ? getDisksColumn()
+        : getVDisksColumn(data?.nodes);
+
     return [
         poolNameColumn,
         typeColumn,
@@ -260,11 +291,18 @@ export const getDiskPageStorageColumns = (nodes?: NodesMap): StorageGroupsColumn
         groupIdColumn,
         usageColumn,
         usedColumn,
-        getVDisksColumn(nodes),
+        disksColumn,
     ];
 };
 
-const getStorageGroupsColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {
+const getStorageGroupsColumns = (
+    data?: GetColumnsData,
+    options?: GetColumnsOptions,
+): StorageGroupsColumn[] => {
+    const disksColumn = options?.useAdvancedStorage
+        ? getDisksColumn()
+        : getVDisksColumn(data?.nodes);
+
     return [
         poolNameColumn,
         typeColumn,
@@ -277,13 +315,13 @@ const getStorageGroupsColumns = (nodes?: NodesMap): StorageGroupsColumn[] => {
         usedSpaceFlagColumn,
         readColumn,
         writeColumn,
-        getVDisksColumn(nodes),
+        disksColumn,
     ];
 };
 
 const filterStorageGroupsColumns = (
     columns: StorageGroupsColumn[],
-    visibleEntities: VisibleEntities,
+    visibleEntities?: VisibleEntities,
 ) => {
     if (visibleEntities === VISIBLE_ENTITIES.space) {
         return columns.filter((col) => col.name !== GROUPS_COLUMNS_IDS.Degraded);
@@ -302,12 +340,12 @@ const filterStorageGroupsColumns = (
 };
 
 export const getPreparedStorageGroupsColumns = (
-    nodesMap: NodesMap | undefined,
-    visibleEntities: VisibleEntities,
+    data?: GetColumnsData,
+    options?: GetColumnsOptions,
 ) => {
-    const rawColumns = getStorageGroupsColumns(nodesMap);
+    const rawColumns = getStorageGroupsColumns(data, options);
 
-    const filteredColumns = filterStorageGroupsColumns(rawColumns, visibleEntities);
+    const filteredColumns = filterStorageGroupsColumns(rawColumns, options?.visibleEntities);
 
     return filteredColumns.map((column) => ({
         ...column,

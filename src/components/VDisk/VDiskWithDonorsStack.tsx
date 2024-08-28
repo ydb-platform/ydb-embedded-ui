@@ -1,32 +1,29 @@
-import type {NodesMap} from '../../types/store/nodesList';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {Stack} from '../Stack/Stack';
 
+import type {VDiskProps} from './VDisk';
 import {VDisk} from './VDisk';
 
-interface VDiskWithDonorsStackProps {
+interface VDiskWithDonorsStackProps extends VDiskProps {
     data?: PreparedVDisk;
-    nodes?: NodesMap;
-    compact?: boolean;
     className?: string;
     stackClassName?: string;
 }
 
 export function VDiskWithDonorsStack({
     data,
-    nodes,
-    compact,
     className,
     stackClassName,
+    ...restProps
 }: VDiskWithDonorsStackProps) {
     const donors = data?.Donors;
 
     const content =
         donors && donors.length > 0 ? (
             <Stack className={stackClassName}>
-                <VDisk data={data} nodes={nodes} compact={compact} />
+                <VDisk data={data} {...restProps} />
                 {donors.map((donor) => {
                     const isFullData = isFullVDiskData(donor);
 
@@ -35,14 +32,13 @@ export function VDiskWithDonorsStack({
                         <VDisk
                             key={stringifyVdiskId(isFullData ? donor.VDiskId : donor)}
                             data={donor}
-                            nodes={nodes}
-                            compact={compact}
+                            {...restProps}
                         />
                     );
                 })}
             </Stack>
         ) : (
-            <VDisk data={data} nodes={nodes} compact={compact} />
+            <VDisk data={data} {...restProps} />
         );
 
     return <div className={className}>{content}</div>;

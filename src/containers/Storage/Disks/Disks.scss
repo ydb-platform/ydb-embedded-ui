@@ -1,0 +1,46 @@
+.ydb-storage-disks {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+
+    width: max-content;
+
+    &__vdisks-wrapper {
+        display: flex;
+        flex-grow: 1;
+        flex-direction: row;
+        gap: 4px;
+
+        width: 300px;
+    }
+
+    &__pdisks-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: left;
+        gap: 6px;
+
+        width: max-content;
+    }
+
+    &__vdisk-item {
+        flex-basis: 8px;
+        flex-shrink: 0;
+    }
+    &__vdisk-progress-bar {
+        --progress-bar-height: 18px;
+
+        border-radius: 4px;
+    }
+
+    &__pdisk-item {
+        width: 80px;
+    }
+    &__pdisk-progress-bar {
+        --progress-bar-height: 20px;
+        padding-left: var(--g-spacing-2);
+
+        text-align: left;
+    }
+}
