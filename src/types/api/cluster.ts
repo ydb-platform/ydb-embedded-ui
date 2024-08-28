@@ -38,3 +38,18 @@ export interface TClusterInfo {
     Balancer?: string; // additional
     Solomon?: string; // additional
 }
+
+export interface TClusterConfigFeatureFlag {
+    Name: string;
+    Enabled?: boolean;
+    IsDefault?: boolean;
+}
+
+export interface TClusterConfigDb {
+    Name: string;
+    FeatureFlags: TClusterConfigFeatureFlag[];
+}
+
+export interface TClusterConfigs {
+    Databases: TClusterConfigDb[];
+}

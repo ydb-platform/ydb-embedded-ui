@@ -10,7 +10,7 @@ import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 import type {TMetaInfo} from '../types/api/acl';
 import type {TQueryAutocomplete} from '../types/api/autocomplete';
 import type {CapabilitiesResponse} from '../types/api/capabilities';
-import type {TClusterInfo} from '../types/api/cluster';
+import type {TClusterConfigs, TClusterInfo} from '../types/api/cluster';
 import type {TComputeInfo} from '../types/api/compute';
 import type {DescribeConsumerResult} from '../types/api/consumer';
 import type {HealthCheckAPIResponse} from '../types/api/healthcheck';
@@ -117,6 +117,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 tablets: true,
             },
             {concurrentId: concurrentId || `getClusterInfo`, requestConfig: {signal}},
+        );
+    }
+    getClusterConfig(database?: string) {
+        return this.get<TClusterConfigs>(
+            this.getPath('/viewer/feature_flags?features=EnableTempTables,EnableStatistics'),
+            {
+                database,
+            },
+            {},
         );
     }
     getNodeInfo(id?: string | number, {concurrentId, signal}: AxiosOptions = {}) {
