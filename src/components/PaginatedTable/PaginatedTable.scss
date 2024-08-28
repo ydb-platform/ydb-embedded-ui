@@ -40,6 +40,10 @@
     &__head {
         z-index: 1;
         @include sticky-top();
+
+        &-row {
+            display: table;
+        }
     }
 
     &__sort-icon-container {
@@ -164,5 +168,9 @@
     }
     &__head-cell-wrapper:hover > &__resize-handler {
         visibility: visible;
+    }
+
+    &__table-chunk {
+        display: block;
     }
 }
