@@ -36,14 +36,6 @@ export const paramSetup = {
             stateKey: 'heatmap.currentMetric',
             initialState: initialHeatmapState.currentMetric,
         },
-        stateFilter: {
-            stateKey: 'tablets.stateFilter',
-            type: 'array',
-        },
-        typeFilter: {
-            stateKey: 'tablets.typeFilter',
-            type: 'array',
-        },
         tenantPage: {
             stateKey: 'tenant.tenantPage',
         },
