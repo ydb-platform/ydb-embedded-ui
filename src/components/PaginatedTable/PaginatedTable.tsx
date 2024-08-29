@@ -37,6 +37,7 @@ export interface PaginatedTableProps<T, F> {
     renderControls?: RenderControls;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     renderErrorMessage?: RenderErrorMessage;
+    containerClassName?: string;
 }
 
 export const PaginatedTable = <T, F>({
@@ -53,6 +54,7 @@ export const PaginatedTable = <T, F>({
     renderControls,
     renderErrorMessage,
     renderEmptyDataMessage,
+    containerClassName,
 }: PaginatedTableProps<T, F>) => {
     const [sortParams, setSortParams] = React.useState<SortParams | undefined>(initialSortParams);
     const [totalEntities, setTotalEntities] = React.useState(limit);
@@ -153,7 +155,7 @@ export const PaginatedTable = <T, F>({
     };
 
     return (
-        <div ref={tableContainer} className={b(null)}>
+        <div ref={tableContainer} className={b(null, containerClassName)}>
             {renderContent()}
         </div>
     );

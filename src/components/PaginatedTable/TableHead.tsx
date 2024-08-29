@@ -66,7 +66,7 @@ export const TableHeadCell = <T,>({
     onCellUnMount,
     onColumnsResize,
 }: TableHeadCellProps<T>) => {
-    const cellWrapperRef = React.useRef<HTMLDivElement>(null);
+    const cellWrapperRef = React.useRef<HTMLTableCellElement>(null);
 
     React.useEffect(() => {
         const cellWrapper = cellWrapperRef.current;
@@ -93,44 +93,43 @@ export const TableHeadCell = <T,>({
 
     const content = column.header ?? column.name;
 
+    const style = {
+        height: `${rowHeight}px`,
+        width: `${column.width}px`,
+        // Additional minWidth and maxWidth for resizeable columns to ensure proper resize
+        minWidth: resizeable ? `${column.width}px` : undefined,
+        maxWidth: resizeable ? `${column.width}px` : undefined,
+    };
+
     return (
-        <th>
+        <th ref={cellWrapperRef} className={b('head-cell-wrapper')} style={style}>
             <div
-                ref={cellWrapperRef}
-                className={b('head-cell-wrapper')}
-                style={{
-                    height: `${rowHeight}px`,
-                    width: `${column.width}px`,
+                className={b(
+                    'head-cell',
+                    {align: column.align, sortable: column.sortable},
+                    column.className,
+                )}
+                onClick={() => {
+                    if (column.sortable) {
+                        onSort?.(column.name);
+                    }
                 }}
             >
-                <div
-                    className={b(
-                        'head-cell',
-                        {align: column.align, sortable: column.sortable},
-                        column.className,
-                    )}
-                    onClick={() => {
-                        if (column.sortable) {
-                            onSort?.(column.name);
-                        }
-                    }}
-                >
-                    <div className={b('head-cell-content')}>{content}</div>
-                    <ColumnSortIcon
-                        sortOrder={sortOrder}
-                        sortable={column.sortable}
-                        defaultSortOrder={defaultSortOrder}
-                    />
-                </div>
-                {resizeable ? (
-                    <ResizeHandler
-                        maxWidth={column.resizeMaxWidth}
-                        minWidth={column.resizeMinWidth}
-                        getCurrentColumnWidth={getCurrentColumnWidth}
-                        onResize={handleResize}
-                    />
-                ) : null}
+                <div className={b('head-cell-content')}>{content}</div>
+                <ColumnSortIcon
+                    sortOrder={sortOrder}
+                    sortable={column.sortable}
+                    defaultSortOrder={defaultSortOrder}
+                />
             </div>
+            {resizeable ? (
+                <ResizeHandler
+                    maxWidth={column.resizeMaxWidth}
+                    minWidth={column.resizeMinWidth}
+                    getCurrentColumnWidth={getCurrentColumnWidth}
+                    onResize={handleResize}
+                />
+            ) : null}
         </th>
     );
 };
@@ -183,7 +182,7 @@ export const TableHead = <T,>({
 
     const renderTableColGroups = () => {
         return (
-            <colgroup className={b('colgroup')}>
+            <colgroup>
                 {columns.map((column) => {
                     return <col key={column.name} style={{width: `${column.width}px`}} />;
                 })}
@@ -194,7 +193,7 @@ export const TableHead = <T,>({
     const renderTableHead = () => {
         return (
             <thead className={b('head')}>
-                <tr className={b('head-row')}>
+                <tr>
                     {columns.map((column) => {
                         const sortOrder =
                             sortParams.columnId === column.name ? sortParams.sortOrder : undefined;

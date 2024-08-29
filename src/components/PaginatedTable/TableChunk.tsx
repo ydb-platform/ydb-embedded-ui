@@ -7,7 +7,6 @@ import {useAutoRefreshInterval} from '../../utils/hooks';
 import {ResponseError} from '../Errors/ResponseError';
 
 import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
-import {b} from './shared';
 import type {Column, FetchData, GetRowClassName, SortParams} from './types';
 
 const DEBOUNCE_TIMEOUT = 200;
@@ -144,10 +143,15 @@ export const TableChunk = <T, F>({
 
     return (
         <tbody
-            className={b('table-chunk')}
             ref={ref}
             id={id.toString()}
-            style={{height: `${chunkHeight}px`}}
+            style={{
+                height: `${chunkHeight}px`,
+                // Default display: table-row-group doesn't work in Safari and breaks the table
+                // display: block works in Safari, but disconnects thead and tbody cell grids
+                // Hack to make it work in all cases
+                display: isActive ? 'table-row-group' : 'block',
+            }}
         >
             {renderContent()}
         </tbody>
