@@ -76,6 +76,7 @@ export interface NodesApiRequestParams extends NodesGeneralRequestParams {
     visibleEntities?: VisibleEntities; // "with" param
     storage?: boolean;
     tablets?: boolean;
+    group?: string;
 }
 
 export interface ComputeApiRequestParams extends NodesGeneralRequestParams {
@@ -83,8 +84,14 @@ export interface ComputeApiRequestParams extends NodesGeneralRequestParams {
     version?: EVersion; // only v2 works with filters
 }
 
+export interface NodesGroup {
+    name: string;
+    count: number;
+}
+
 export interface NodesHandledResponse {
     Nodes?: NodesPreparedEntity[];
+    NodeGroups?: NodesGroup[];
     TotalNodes: number;
     FoundNodes?: number;
 }

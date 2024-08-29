@@ -11,6 +11,7 @@ import type {TVDiskStateInfo} from './vdisk';
 export interface TNodesInfo {
     Overall?: EFlag;
     Nodes?: TNodeInfo[];
+    NodeGroups?: TNodesGroup[];
 
     /** uint64 */
     TotalNodes: string;
@@ -24,6 +25,11 @@ export interface TNodeInfo {
     PDisks?: TPDiskStateInfo[];
     VDisks?: TVDiskStateInfo[];
     Tablets?: TTabletStateInfo[];
+}
+
+export interface TNodesGroup {
+    GroupName: string;
+    NodeCount: number;
 }
 
 /**

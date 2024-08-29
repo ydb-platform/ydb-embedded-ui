@@ -67,8 +67,14 @@ export const prepareNodesData = (data: TNodesInfo): NodesHandledResponse => {
         };
     });
 
+    const preparedGroups = data.NodeGroups?.map((group) => ({
+        name: group.GroupName,
+        count: group.NodeCount,
+    }));
+
     return {
         Nodes: preparedNodes,
+        NodeGroups: preparedGroups,
         TotalNodes: Number(data.TotalNodes) || preparedNodes.length,
         FoundNodes: Number(data.FoundNodes),
     };

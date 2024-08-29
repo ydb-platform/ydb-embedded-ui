@@ -25,7 +25,7 @@ import {cn} from '../../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../../utils/constants';
 import {formatStorageValues} from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedSelector} from '../../../utils/hooks';
-import {parseNodesToVersionsValues} from '../../../utils/versions';
+import {parseNodeGroupsToVersionsValues, parseNodesToVersionsValues} from '../../../utils/versions';
 import {VersionsBar} from '../VersionsBar/VersionsBar';
 import i18n from '../i18n';
 
@@ -214,12 +214,18 @@ export const ClusterInfo = ({
 
     const {currentData} = nodesApi.useGetNodesQuery({
         tablets: false,
+        group: 'Version',
     });
 
-    const nodes = currentData?.Nodes;
     const versionsValues = React.useMemo(() => {
-        return parseNodesToVersionsValues(nodes, versionToColor);
-    }, [nodes, versionToColor]);
+        if (!currentData) {
+            return [];
+        }
+        if (Array.isArray(currentData.NodeGroups)) {
+            return parseNodeGroupsToVersionsValues(currentData.NodeGroups, versionToColor);
+        }
+        return parseNodesToVersionsValues(currentData.Nodes, versionToColor);
+    }, [currentData, versionToColor]);
 
     let internalLink = backend + '/internal';
 
