@@ -1,5 +1,6 @@
 import type {EFlag} from './enums';
 import type {TTabletStateInfo} from './tablet';
+import type {TTraceCheck, TTraceView} from './trace';
 
 /**
  * endpoint: viewer/json/cluster
@@ -37,4 +38,7 @@ export interface TClusterInfo {
 
     Balancer?: string; // additional
     Solomon?: string; // additional
+
+    TraceView?: TTraceView;
+    TraceCheck?: TTraceCheck;
 }

@@ -48,6 +48,7 @@ import type {QuerySyntax, TransactionMode} from '../types/store/query';
 import {
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
+    SECOND_IN_MS,
 } from '../utils/constants';
 import {prepareSortValue} from '../utils/filters';
 import type {Nullable} from '../utils/typecheckers';
@@ -85,6 +86,20 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             }
 
             return config;
+        });
+
+        // Add traceId to response if it exitsts
+        this._axios.interceptors.response.use(function (response) {
+            if (response.data && response.headers['traceresponse']) {
+                const traceId = response.headers['traceresponse'].split('-')[1];
+
+                response.data = {
+                    ...response.data,
+                    meta: {...response.data.meta, traceId},
+                };
+            }
+
+            return response;
         });
 
         // Interceptor to process OIDC auth
@@ -528,6 +543,28 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 enable_sampling: enableSampling,
             },
             {concurrentId: concurrentId || 'getHotKeys', requestConfig: {signal}},
+        );
+    }
+
+    checkTrace({url}: {url: string}, {concurrentId, signal, withRetries}: AxiosOptions = {}) {
+        return this.get<JsonHotKeysResponse>(
+            url,
+            {},
+            {
+                concurrentId: concurrentId || 'checkTrace',
+                requestConfig: {
+                    signal,
+                    timeout: 2 * SECOND_IN_MS,
+                    'axios-retry': {
+                        shouldResetTimeout: true,
+                        retries: withRetries ? 15 : 0,
+                        retryDelay: () => 2 * SECOND_IN_MS,
+                        retryCondition: () => {
+                            return true;
+                        },
+                    },
+                },
+            },
         );
     }
     getHealthcheckInfo(

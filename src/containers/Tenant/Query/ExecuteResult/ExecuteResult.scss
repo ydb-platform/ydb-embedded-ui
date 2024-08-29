@@ -84,4 +84,10 @@
             @include query-buttons-animations();
         }
     }
+
+    &__trace-link {
+        &_loading {
+            color: var(--g-color-text-secondary);
+        }
+    }
 }
