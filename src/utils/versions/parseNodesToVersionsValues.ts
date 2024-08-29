@@ -1,3 +1,4 @@
+import type {NodesGroup} from '../../store/reducers/nodes/types';
 import type {TSystemStateInfo} from '../../types/api/nodes';
 import type {VersionToColorMap, VersionValue} from '../../types/versions';
 
@@ -27,3 +28,17 @@ export const parseNodesToVersionsValues = (
         };
     });
 };
+
+export function parseNodeGroupsToVersionsValues(
+    groups: NodesGroup[],
+    versionsToColor?: VersionToColorMap,
+) {
+    return groups.map((group) => {
+        return {
+            title: group.name,
+            version: group.name,
+            color: versionsToColor?.get(group.name),
+            value: group.count,
+        };
+    });
+}
