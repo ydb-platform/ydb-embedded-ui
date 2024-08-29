@@ -194,7 +194,7 @@ export const TableHead = <T,>({
     const renderTableHead = () => {
         return (
             <thead className={b('head')}>
-                <tr>
+                <tr className={b('head-row')}>
                     {columns.map((column) => {
                         const sortOrder =
                             sortParams.columnId === column.name ? sortParams.sortOrder : undefined;

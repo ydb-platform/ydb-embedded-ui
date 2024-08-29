@@ -7,6 +7,7 @@ import {useAutoRefreshInterval} from '../../utils/hooks';
 import {ResponseError} from '../Errors/ResponseError';
 
 import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
+import {b} from './shared';
 import type {Column, FetchData, GetRowClassName, SortParams} from './types';
 
 const DEBOUNCE_TIMEOUT = 200;
@@ -142,7 +143,12 @@ export const TableChunk = <T, F>({
     const chunkHeight = dataLength ? dataLength * rowHeight : limit * rowHeight;
 
     return (
-        <tbody ref={ref} id={id.toString()} style={{height: `${chunkHeight}px`}}>
+        <tbody
+            className={b('table-chunk')}
+            ref={ref}
+            id={id.toString()}
+            style={{height: `${chunkHeight}px`}}
+        >
             {renderContent()}
         </tbody>
     );
