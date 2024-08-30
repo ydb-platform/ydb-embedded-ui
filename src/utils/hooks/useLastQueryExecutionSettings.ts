@@ -4,5 +4,19 @@ import {LAST_QUERY_EXECUTION_SETTINGS_KEY} from '../constants';
 import {useSetting} from './useSetting';
 
 export const useLastQueryExecutionSettings = () => {
-    return useSetting<QuerySettings | undefined>(LAST_QUERY_EXECUTION_SETTINGS_KEY);
+    const [lastStorageSettings, setLastSettings] = useSetting<QuerySettings | undefined>(
+        LAST_QUERY_EXECUTION_SETTINGS_KEY,
+    );
+
+    const lastSettings: QuerySettings | undefined = lastStorageSettings
+        ? {
+              transactionMode: lastStorageSettings.transactionMode,
+              queryMode: lastStorageSettings.queryMode,
+              statisticsMode: lastStorageSettings.statisticsMode,
+              tracingLevel: lastStorageSettings.tracingLevel,
+              timeout: lastStorageSettings.timeout,
+          }
+        : undefined;
+
+    return [lastSettings, setLastSettings] as const;
 };
