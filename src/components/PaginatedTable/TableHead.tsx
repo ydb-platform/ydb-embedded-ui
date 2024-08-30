@@ -183,7 +183,7 @@ export const TableHead = <T,>({
 
     const renderTableColGroups = () => {
         return (
-            <colgroup>
+            <colgroup className={b('colgroup')}>
                 {columns.map((column) => {
                     return <col key={column.name} style={{width: `${column.width}px`}} />;
                 })}
