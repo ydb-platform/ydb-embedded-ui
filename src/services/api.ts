@@ -29,7 +29,6 @@ import type {
     Stats,
     Timeout,
     TracingLevel,
-    TransactionMode,
 } from '../types/api/query';
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/render';
 import type {TEvDescribeSchemeResult} from '../types/api/schema';
@@ -45,7 +44,7 @@ import type {TTenantInfo, TTenants} from '../types/api/tenant';
 import type {DescribeTopicResult} from '../types/api/topic';
 import type {TEvVDiskStateResponse} from '../types/api/vdisk';
 import type {TUserToken} from '../types/api/whoami';
-import type {QuerySyntax} from '../types/store/query';
+import type {QuerySyntax, TransactionMode} from '../types/store/query';
 import {
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,

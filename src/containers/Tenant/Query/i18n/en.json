@@ -24,10 +24,11 @@
   "method-description.query": "Any query. An experimental API call supposed to replace all existing methods.\nAPI Call: query.ExecuteScript",
   "method-description.pg": "Queries in postgresql syntax.\nAPI call: query.ExecuteScript",
 
-  "isolation-level-description.serializable": "Provides the strictest isolation level for custom transactions",
-  "isolation-level-description.onlinero": "Each read operation in the transaction is reading the data that is most recent at execution time",
-  "isolation-level-description.stalero": "Read operations within a transaction may return results that are slightly out-of-date (lagging by fractions of a second)",
-  "isolation-level-description.snapshot": "All the read operations within a transaction access the database snapshot. All the data reads are consistent",
+  "transaction-mode-description.serializable": "Provides the strictest isolation level for custom transactions",
+  "transaction-mode-description.onlinero": "Each read operation in the transaction is reading the data that is most recent at execution time",
+  "transaction-mode-description.stalero": "Read operations within a transaction may return results that are slightly out-of-date (lagging by fractions of a second)",
+  "transaction-mode-description.snapshot": "All the read operations within a transaction access the database snapshot. All the data reads are consistent",
+  "transaction-mode-description.implicit": "No transaction",
 
   "tracing-level-description.basic": "Spans of main component operations",
   "tracing-level-description.detailed": "Highest detail applicable for diagnosing problems in production",

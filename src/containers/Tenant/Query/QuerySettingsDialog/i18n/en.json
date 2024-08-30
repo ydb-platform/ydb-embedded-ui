@@ -2,7 +2,7 @@
   "action.settings": "Query settings",
   "form.query-mode": "Query type",
   "form.timeout": "Timeout",
-  "form.isolation-level": "Isolation level",
+  "form.transaction-mode": "Transaction Mode",
   "form.statistics-mode": "Statistics collection mode",
   "form.tracing-level": "Tracing level",
   "button-done": "Save",

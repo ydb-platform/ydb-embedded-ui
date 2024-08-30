@@ -13,26 +13,28 @@ import type {
 } from '../types/api/query';
 import type {
     IQueryResult,
-    IsolationLevel,
     QueryMode,
     StatisticsMode,
     TracingLevel,
+    TransactionMode,
 } from '../types/store/query';
 
 import {isAxiosResponse, isNetworkError} from './response';
 
-export const ISOLATION_LEVELS = {
+export const TRANSACTION_MODES = {
     serializable: 'serializable-read-write',
     stalero: 'stale-read-only',
     onlinero: 'online-read-only',
     snapshot: 'snapshot-read-only',
+    implicit: 'implicit',
 } as const;
 
-export const ISOLATION_LEVELS_TITLES: Record<IsolationLevel, string> = {
-    [ISOLATION_LEVELS.serializable]: 'Serializable',
-    [ISOLATION_LEVELS.stalero]: 'Stale Read-Only',
-    [ISOLATION_LEVELS.onlinero]: 'Online Read-Only',
-    [ISOLATION_LEVELS.snapshot]: 'Snapshot Read-Only',
+export const TRANSACTION_MODES_TITLES: Record<TransactionMode, string> = {
+    [TRANSACTION_MODES.serializable]: 'Serializable',
+    [TRANSACTION_MODES.stalero]: 'Stale Read-Only',
+    [TRANSACTION_MODES.onlinero]: 'Online Read-Only',
+    [TRANSACTION_MODES.snapshot]: 'Snapshot Read-Only',
+    [TRANSACTION_MODES.implicit]: 'Implicit',
 } as const;
 
 export const STATISTICS_MODES = {

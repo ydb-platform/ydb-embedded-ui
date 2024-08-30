@@ -1,5 +1,5 @@
 import {TRACING_LEVELS} from '../../utils/query';
-import type {IsolationLevel, StatisticsMode} from '../store/query';
+import type {StatisticsMode} from '../store/query';
 
 // ==== types from backend protos ====
 interface Position {
@@ -217,9 +217,6 @@ export type Stats = StatisticsMode;
 
 /** undefined = '60000' */
 export type Timeout = number;
-
-/** undefined = 'serializable-read-write' */
-export type TransactionMode = IsolationLevel;
 
 /** undefined = '15' */
 export type TracingLevel = number;

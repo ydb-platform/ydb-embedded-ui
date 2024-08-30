@@ -82,9 +82,9 @@ export class SettingsDialog {
         await this.page.waitForTimeout(1000);
     }
 
-    async changeIsolationLevel(level: string) {
+    async changeTransactionMode(level: string) {
         const dropdown = this.dialog.locator(
-            '.ydb-query-settings-dialog__control-wrapper_isolationLevel',
+            '.ydb-query-settings-dialog__control-wrapper_transactionMode',
         );
         await dropdown.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await dropdown.click();
