@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.17.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.17.0...v6.17.1) (2024-08-30)
+
+
+### Bug Fixes
+
+* **PaginatedTable:** fix layout ([#1237](https://github.com/ydb-platform/ydb-embedded-ui/issues/1237)) ([fc22275](https://github.com/ydb-platform/ydb-embedded-ui/commit/fc2227553b92ce2b0850a949f1636397b3307784))
+
 ## [6.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.16.0...v6.17.0) (2024-08-29)
 
 
