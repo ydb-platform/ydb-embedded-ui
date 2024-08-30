@@ -148,9 +148,4 @@ export const QUERY_SETTINGS_FIELD_SETTINGS = {
     timeout: {
         title: formI18n('form.timeout'),
     },
-
-    // deprecated https://github.com/ydb-platform/ydb-embedded-ui/issues/1239
-    isolationLevel: {
-        title: '',
-    },
 } as const;

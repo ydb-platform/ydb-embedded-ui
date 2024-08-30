@@ -8,9 +8,6 @@ export const useQueryExecutionSettings = () => {
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [setting, setSetting] = useSetting<QuerySettings>(QUERY_EXECUTION_SETTINGS_KEY);
 
-    // deprecated https://github.com/ydb-platform/ydb-embedded-ui/issues/1239
-    delete setting['isolationLevel'];
-
     return [
         {
             ...setting,

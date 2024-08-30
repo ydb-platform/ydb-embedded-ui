@@ -42,9 +42,6 @@ export interface QuerySettings {
     timeout?: string;
     statisticsMode?: StatisticsMode;
     tracingLevel?: TracingLevel;
-
-    // deprecated https://github.com/ydb-platform/ydb-embedded-ui/issues/1239
-    isolationLevel?: string;
 }
 
 export type QueryErrorResponse = IResponseError<QueryErrorResponseData>;
