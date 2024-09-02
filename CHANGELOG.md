@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.17.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.17.1...v6.17.2) (2024-09-02)
+
+
+### Bug Fixes
+
+* add implicit transaction_mode to query settings ([#1240](https://github.com/ydb-platform/ydb-embedded-ui/issues/1240)) ([75a0d89](https://github.com/ydb-platform/ydb-embedded-ui/commit/75a0d892bd30b31da49e1b0e56de87eb13ec00b8))
+
 ## [6.17.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.17.0...v6.17.1) (2024-08-30)
 
 
