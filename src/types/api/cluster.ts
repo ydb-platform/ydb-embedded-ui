@@ -41,8 +41,8 @@ export interface TClusterInfo {
 
 export interface TClusterConfigFeatureFlag {
     Name: string;
-    Enabled?: boolean;
-    IsDefault?: boolean;
+    Current?: boolean;
+    Default?: boolean;
 }
 
 export interface TClusterConfigDb {

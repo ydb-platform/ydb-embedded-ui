@@ -18,14 +18,15 @@ const FEATURE_FLAGS_COLUMNS_WIDTH_LS_KEY = 'featureFlagsColumnsWidth';
 const columns: Column<TClusterConfigFeatureFlag>[] = [
     {
         name: 'Feature flag',
-        render: ({row}) => row.Name,
+        render: ({row}) =>
+            row.Current ? <b title="Default value was changed">{row.Name}</b> : row.Name,
         width: 400,
         sortable: false,
     },
     {
         name: 'Default',
         render: ({row}) => {
-            switch (row.IsDefault) {
+            switch (row.Default) {
                 case true:
                     return 'Enabled';
                 case false:
@@ -39,8 +40,8 @@ const columns: Column<TClusterConfigFeatureFlag>[] = [
         resizeable: false,
     },
     {
-        name: 'Actual',
-        render: ({row}) => <Switch disabled checked={row.Enabled} />,
+        name: 'Current',
+        render: ({row}) => <Switch disabled checked={(row.Current ?? row.Default) || false} />,
         width: 100,
         sortable: false,
         resizeable: false,
