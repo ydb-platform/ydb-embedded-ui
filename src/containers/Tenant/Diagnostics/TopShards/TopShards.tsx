@@ -107,7 +107,7 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
 
     const [sortOrder, setSortOrder] = React.useState(TOP_SHARD_COLUMNS_IDS.CPUCores);
     const {
-        data: result,
+        currentData: result,
         isFetching,
         error,
     } = shardApi.useSendShardQueryQuery(
