@@ -159,7 +159,7 @@ test.describe('Test Query Editor', async () => {
 
         // Change a setting
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeIsolationLevel('Snapshot');
+        await queryEditor.settingsDialog.changeTransactionMode('Snapshot');
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Execute a script to make the banner appear
@@ -180,7 +180,7 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
-        await queryEditor.settingsDialog.changeIsolationLevel('Snapshot');
+        await queryEditor.settingsDialog.changeTransactionMode('Snapshot');
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await expect(async () => {

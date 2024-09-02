@@ -2,7 +2,7 @@
   "action.settings": "Настройки запроса",
   "form.query-mode": "Тип запроса",
   "form.timeout": "Таймаут",
-  "form.isolation-level": "Уровень изоляции",
+  "form.transaction-mode": "Уровень изоляции",
   "form.statistics-mode": "Режим сбора статистики",
   "form.tracing-level": "Tracing level",
   "button-done": "Готово",

@@ -45,7 +45,10 @@ export const explainQueryApi = api.injectEndpoints({
                                 querySettings?.tracingLevel && enableTracingLevel
                                     ? TracingLevelNumber[querySettings?.tracingLevel]
                                     : undefined,
-                            transaction_mode: querySettings?.isolationLevel,
+                            transaction_mode:
+                                querySettings?.transactionMode === 'implicit'
+                                    ? undefined
+                                    : querySettings?.transactionMode,
                             timeout: isNumeric(querySettings?.timeout)
                                 ? Number(querySettings?.timeout) * 1000
                                 : undefined,
