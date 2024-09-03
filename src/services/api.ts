@@ -119,13 +119,13 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId: concurrentId || `getClusterInfo`, requestConfig: {signal}},
         );
     }
-    getClusterConfig(database?: string) {
+    getClusterConfig(database?: string, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TClusterConfigs>(
-            this.getPath('/viewer/feature_flags?features=EnableTempTables,EnableStatistics'),
+            this.getPath('/viewer/feature_flags'),
             {
                 database,
             },
-            {},
+            {concurrentId, requestConfig: {signal}},
         );
     }
     getNodeInfo(id?: string | number, {concurrentId, signal}: AxiosOptions = {}) {

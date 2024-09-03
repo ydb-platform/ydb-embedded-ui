@@ -42,12 +42,21 @@ const slice = createSlice({
         setMetricsTab: (state, action: PayloadAction<TenantMetricsTab>) => {
             state.metricsTab = action.payload;
         },
+        setFeatureFlagsFilter: (state, action: PayloadAction<string>) => {
+            state.featureFlagsFilter = action.payload;
+        },
     },
 });
 
 export default slice.reducer;
-export const {setTenantPage, setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} =
-    slice.actions;
+export const {
+    setTenantPage,
+    setQueryTab,
+    setDiagnosticsTab,
+    setSummaryTab,
+    setMetricsTab,
+    setFeatureFlagsFilter,
+} = slice.actions;
 
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -61,6 +70,19 @@ export const tenantApi = api.injectEndpoints({
                 }
             },
             providesTags: ['All'],
+        }),
+        getClusterConfig: builder.query({
+            queryFn: async ({database}: {database?: string}, {signal}) => {
+                try {
+                    // FIXME!
+                    const res = await window.api.getClusterConfig(undefined, {signal});
+                    const db = res.Databases.filter((item) => item.Name === database)[0];
+
+                    return {data: db.FeatureFlags};
+                } catch (error) {
+                    return {error};
+                }
+            },
         }),
     }),
     overrideExisting: 'throw',

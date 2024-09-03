@@ -4,14 +4,11 @@ import type {Column} from '@gravity-ui/react-data-table';
 import {Switch} from '@gravity-ui/uikit';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {setFeatureFlagsFilter, tenantApi} from '../../../../store/reducers/tenant/tenant';
 import type {TClusterConfigFeatureFlag} from '../../../../types/api/cluster';
-
-enum Statuses {
-    'Idle',
-    'Error',
-    'Success',
-}
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 const FEATURE_FLAGS_COLUMNS_WIDTH_LS_KEY = 'featureFlagsColumnsWidth';
 
@@ -54,29 +51,27 @@ interface Props {
 }
 
 export const Configs = ({database}: Props) => {
-    const [status, setStatus] = React.useState<Statuses>(Statuses.Idle);
-    const [featureFlags, setFeatureFlags] = React.useState<TClusterConfigFeatureFlag[]>([]);
+    const dispatch = useTypedDispatch();
+    const {currentData = [], isFetching, isError} = tenantApi.useGetClusterConfigQuery({database});
+    const featureFlagsFilter = useTypedSelector(
+        (state) => state.tenant.featureFlagsFilter,
+    )?.toLocaleLowerCase();
 
-    React.useEffect(() => {
-        window.api
-            // .getClusterConfig(database)
-            .getClusterConfig()
-            .then((res) => {
-                const db = res.Databases.filter((item) => item.Name === database)[0];
+    const onChange = (value: string) => {
+        dispatch(setFeatureFlagsFilter(value));
+    };
 
-                setFeatureFlags(db.FeatureFlags);
-                setStatus(Statuses.Success);
-            })
-            .catch(() => setStatus(Statuses.Error));
-    }, [database]);
+    const featureFlags = featureFlagsFilter
+        ? currentData.filter((item) => item.Name.toLocaleLowerCase().includes(featureFlagsFilter))
+        : currentData;
 
     const renderContent = () => {
-        if (status === Statuses.Error) {
+        if (isError) {
             return 'Error while loading configs';
         }
 
         if (!featureFlags.length) {
-            return 'No data';
+            return featureFlagsFilter ? 'Empty search result' : 'No data';
         }
 
         return (
@@ -91,9 +86,22 @@ export const Configs = ({database}: Props) => {
         );
     };
 
+    const renderControls = () => {
+        return (
+            <React.Fragment>
+                <Search
+                    value={featureFlagsFilter}
+                    onChange={onChange}
+                    placeholder="Search by flag name"
+                />
+            </React.Fragment>
+        );
+    };
+
     return (
         <TableWithControlsLayout>
-            <TableWithControlsLayout.Table loading={status === Statuses.Idle}>
+            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Table loading={isFetching}>
                 {renderContent()}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>

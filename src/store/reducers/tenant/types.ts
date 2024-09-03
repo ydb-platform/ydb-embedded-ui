@@ -24,4 +24,5 @@ export interface TenantState {
     diagnosticsTab?: TenantDiagnosticsTab;
     summaryTab?: TenantSummaryTab;
     metricsTab?: TenantMetricsTab;
+    featureFlagsFilter?: string;
 }
