@@ -2,6 +2,7 @@ import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
 import {Switch} from '@gravity-ui/uikit';
+import {StringParam, useQueryParam} from 'use-query-params';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
@@ -52,13 +53,24 @@ interface Props {
 
 export const Configs = ({database}: Props) => {
     const dispatch = useTypedDispatch();
+    const [search, setSearch] = useQueryParam('search', StringParam);
     const {currentData = [], isFetching, isError} = tenantApi.useGetClusterConfigQuery({database});
     const featureFlagsFilter = useTypedSelector(
         (state) => state.tenant.featureFlagsFilter,
     )?.toLocaleLowerCase();
 
+    // sync store and query filter
+    React.useEffect(() => {
+        if (search) {
+            dispatch(setFeatureFlagsFilter(search));
+        } else if (featureFlagsFilter) {
+            setSearch(featureFlagsFilter);
+        }
+    }, []);
+
     const onChange = (value: string) => {
         dispatch(setFeatureFlagsFilter(value));
+        setSearch(value || undefined);
     };
 
     const featureFlags = featureFlagsFilter
@@ -92,7 +104,7 @@ export const Configs = ({database}: Props) => {
                 <Search
                     value={featureFlagsFilter}
                     onChange={onChange}
-                    placeholder="Search by flag name"
+                    placeholder="Search by feature flag"
                 />
             </React.Fragment>
         );
