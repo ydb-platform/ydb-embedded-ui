@@ -88,7 +88,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             return config;
         });
 
-        // Add traceId to response if it exitsts
+        // Add traceId to response if it exists
         this._axios.interceptors.response.use(function (response) {
             if (response.data && response.headers['traceresponse']) {
                 const traceId = response.headers['traceresponse'].split('-')[1];
