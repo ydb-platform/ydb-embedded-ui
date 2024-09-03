@@ -54,14 +54,17 @@ interface Props {
 }
 
 export const Configs = ({database}: Props) => {
-    const [status, setStatus] = React.useState<Statuses>(Statuses.Success);
+    const [status, setStatus] = React.useState<Statuses>(Statuses.Idle);
     const [featureFlags, setFeatureFlags] = React.useState<TClusterConfigFeatureFlag[]>([]);
 
     React.useEffect(() => {
         window.api
-            .getClusterConfig(database)
+            // .getClusterConfig(database)
+            .getClusterConfig()
             .then((res) => {
-                setFeatureFlags(res.Databases[0].FeatureFlags);
+                const db = res.Databases.filter((item) => item.Name === database)[0];
+
+                setFeatureFlags(db.FeatureFlags);
                 setStatus(Statuses.Success);
             })
             .catch(() => setStatus(Statuses.Error));
