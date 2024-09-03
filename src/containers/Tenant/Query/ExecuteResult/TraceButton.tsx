@@ -41,7 +41,7 @@ export function TraceButton({traceId}: TraceUrlButtonProps) {
     return (
         <Button view="flat-secondary" loading={!traceData && !traceError}>
             <LinkWithIcon
-                className={b('trace-link', {loading: !traceError && !traceError})}
+                className={b('trace-link', {loading: !traceData && !traceError})}
                 title={i18n('trace')}
                 url={traceUrl}
                 external

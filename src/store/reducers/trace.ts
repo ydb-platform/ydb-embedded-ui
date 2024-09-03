@@ -14,10 +14,7 @@ function endpoints(build: EndpointBuilder<BaseQueryFn, string, string>) {
                     if (!url) {
                         throw new Error('no tracecheck url provided');
                     }
-                    const response = await window.api.checkTrace(
-                        {url},
-                        {signal, withRetries: true},
-                    );
+                    const response = await window.api.checkTrace({url}, {signal});
                     return {data: response};
                 } catch (error) {
                     return {error: error};

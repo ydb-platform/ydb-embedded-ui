@@ -57,6 +57,10 @@ import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
 
+const TRACE_CHECK_TIMEOUT = 2 * SECOND_IN_MS;
+const TRACE_CHECK_MAX_RETRIES = 15;
+const TRACE_CHECK_RETRY_DELAY = 2 * SECOND_IN_MS;
+
 type AxiosOptions = {
     concurrentId?: string;
     signal?: AbortSignal;
@@ -546,7 +550,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
 
-    checkTrace({url}: {url: string}, {concurrentId, signal, withRetries}: AxiosOptions = {}) {
+    checkTrace({url}: {url: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<JsonHotKeysResponse>(
             url,
             {},
@@ -554,14 +558,12 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 concurrentId: concurrentId || 'checkTrace',
                 requestConfig: {
                     signal,
-                    timeout: 2 * SECOND_IN_MS,
+                    timeout: TRACE_CHECK_TIMEOUT,
                     'axios-retry': {
                         shouldResetTimeout: true,
-                        retries: withRetries ? 15 : 0,
-                        retryDelay: () => 2 * SECOND_IN_MS,
-                        retryCondition: () => {
-                            return true;
-                        },
+                        retries: TRACE_CHECK_MAX_RETRIES,
+                        retryDelay: () => TRACE_CHECK_RETRY_DELAY,
+                        retryCondition: () => true,
                     },
                 },
             },
