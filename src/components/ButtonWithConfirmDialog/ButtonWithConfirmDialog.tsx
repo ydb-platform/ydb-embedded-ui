@@ -44,21 +44,15 @@ export function ButtonWithConfirmDialog<T, K>({
     const handleConfirmAction = async (isRetry?: boolean) => {
         setButtonLoading(true);
         await onConfirmAction(isRetry);
-        setButtonLoading(false);
     };
 
     const handleConfirmActionSuccess = async () => {
         setWithRetry(false);
 
-        if (onConfirmActionSuccess) {
-            setButtonLoading(true);
-
-            try {
-                await onConfirmActionSuccess();
-            } catch {
-            } finally {
-                setButtonLoading(false);
-            }
+        try {
+            await onConfirmActionSuccess?.();
+        } finally {
+            setButtonLoading(false);
         }
     };
 

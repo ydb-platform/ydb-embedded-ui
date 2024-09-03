@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ChevronDown} from '@gravity-ui/icons';
-import type {DropdownMenuItem, DropdownMenuProps} from '@gravity-ui/uikit';
+import type {ButtonProps, DropdownMenuItem, DropdownMenuProps} from '@gravity-ui/uikit';
 import {Button, DropdownMenu, Icon, Popover} from '@gravity-ui/uikit';
 
 import {CriticalActionDialog} from '../../../components/CriticalActionDialog/CriticalActionDialog';
@@ -34,56 +34,11 @@ function getDecommissionWarningText(decommission?: EDecommitStatus) {
     return undefined;
 }
 
-interface DecommissionButtonProps {
-    decommission?: EDecommitStatus;
-    onConfirmAction: (newDecomissionStatus?: EDecommitStatus, isRetry?: boolean) => Promise<void>;
-    onConfirmActionSuccess: (() => Promise<void>) | VoidFunction;
-    buttonDisabled?: boolean;
-    popoverDisabled?: boolean;
-}
-
-export function DecommissionButton({
-    decommission,
-    onConfirmAction,
-    onConfirmActionSuccess,
-    buttonDisabled,
-    popoverDisabled,
-}: DecommissionButtonProps) {
-    const [newDecommission, setNewDecommission] = React.useState<EDecommitStatus | undefined>();
-    const [buttonLoading, setButtonLoading] = React.useState(false);
-    const [withRetry, setWithRetry] = React.useState(false);
-
-    const handleConfirmAction = async (isRetry?: boolean) => {
-        setButtonLoading(true);
-        await onConfirmAction(newDecommission, isRetry);
-        setButtonLoading(false);
-    };
-
-    const handleConfirmActionSuccess = async () => {
-        setWithRetry(false);
-
-        if (onConfirmActionSuccess) {
-            setButtonLoading(true);
-
-            // Decommission needs some time to change
-            // Wait for some time to send request for updated data
-            await wait(5000);
-
-            try {
-                await onConfirmActionSuccess();
-            } catch {
-            } finally {
-                setButtonLoading(false);
-            }
-        }
-    };
-
-    const handleConfirmActionError = (error: unknown) => {
-        setWithRetry(isErrorWithRetry(error));
-        setButtonLoading(false);
-    };
-
-    const items: DropdownMenuItem[] = [
+function getDecommissionButtonItems(
+    decommission: EDecommitStatus | undefined,
+    setNewDecommission: (newDecommission: EDecommitStatus | undefined) => void,
+): DropdownMenuItem[] {
+    return [
         {
             text: pDiskPageKeyset('decommission-none'),
             action: () => setNewDecommission('DECOMMIT_NONE'),
@@ -109,26 +64,65 @@ export function DecommissionButton({
             hidden: decommission === 'DECOMMIT_IMMINENT',
         },
     ];
+}
+
+interface DecommissionButtonProps {
+    decommission?: EDecommitStatus;
+    onConfirmAction: (newDecommissionStatus?: EDecommitStatus, isRetry?: boolean) => Promise<void>;
+    onConfirmActionSuccess: (() => Promise<void>) | VoidFunction;
+    buttonDisabled?: boolean;
+    popoverDisabled?: boolean;
+}
+
+export function DecommissionButton({
+    decommission,
+    onConfirmAction,
+    onConfirmActionSuccess,
+    buttonDisabled,
+    popoverDisabled,
+}: DecommissionButtonProps) {
+    const [newDecommission, setNewDecommission] = React.useState<EDecommitStatus | undefined>();
+    const [buttonLoading, setButtonLoading] = React.useState(false);
+    const [withRetry, setWithRetry] = React.useState(false);
+
+    const handleConfirmAction = async (isRetry?: boolean) => {
+        setButtonLoading(true);
+        await onConfirmAction(newDecommission, isRetry);
+    };
+
+    const handleConfirmActionSuccess = async () => {
+        setWithRetry(false);
+
+        // Decommission needs some time to change
+        // Wait for some time to send request for updated data
+        await wait(5000);
+
+        try {
+            await onConfirmActionSuccess();
+        } finally {
+            setButtonLoading(false);
+        }
+    };
+
+    const handleConfirmActionError = (error: unknown) => {
+        setWithRetry(isErrorWithRetry(error));
+        setButtonLoading(false);
+    };
+
+    const handleClose = () => {
+        setNewDecommission(undefined);
+    };
+
+    const items = getDecommissionButtonItems(decommission, setNewDecommission);
 
     const renderSwitcher: DropdownMenuProps<unknown>['renderSwitcher'] = (props) => {
         return (
-            <Popover
-                content={pDiskPageKeyset('decommission-change-not-allowed')}
-                placement={'right'}
-                disabled={popoverDisabled}
-            >
-                <Button
-                    view={'normal'}
-                    className={b('button')}
-                    loading={buttonLoading}
-                    disabled={buttonDisabled}
-                    {...props}
-                >
-                    <Icon data={decommissionIcon} />
-                    {pDiskPageKeyset('decommission-button')}
-                    <Icon data={ChevronDown} />
-                </Button>
-            </Popover>
+            <DecommissionButtonSwitcher
+                popoverDisabled={popoverDisabled}
+                loading={buttonLoading}
+                disabled={buttonDisabled}
+                {...props}
+            />
         );
     };
 
@@ -148,10 +142,27 @@ export function DecommissionButton({
                 onConfirm={handleConfirmAction}
                 onConfirmActionSuccess={handleConfirmActionSuccess}
                 onConfirmActionError={handleConfirmActionError}
-                onClose={() => {
-                    setNewDecommission(undefined);
-                }}
+                onClose={handleClose}
             />
         </React.Fragment>
+    );
+}
+
+function DecommissionButtonSwitcher({
+    popoverDisabled,
+    ...restProps
+}: ButtonProps & {popoverDisabled?: boolean}) {
+    return (
+        <Popover
+            content={pDiskPageKeyset('decommission-change-not-allowed')}
+            placement={'right'}
+            disabled={popoverDisabled}
+        >
+            <Button view={'normal'} className={b('button')} {...restProps}>
+                <Icon data={decommissionIcon} />
+                {pDiskPageKeyset('decommission-button')}
+                <Icon data={ChevronDown} />
+            </Button>
+        </Popover>
     );
 }

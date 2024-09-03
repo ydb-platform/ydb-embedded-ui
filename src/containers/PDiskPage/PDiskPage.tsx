@@ -25,8 +25,8 @@ import {cn} from '../../utils/cn';
 import {getPDiskId, getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
-import {DecommisionLabel} from './DecommisionLabel/DecommisionLabel';
 import {DecommissionButton} from './DecommissionButton/DecommissionButton';
+import {DecommissionLabel} from './DecommissionLabel/DecommissionLabel';
 import {PDiskGroups} from './PDiskGroups/PDiskGroups';
 import {PDiskSpaceDistribution} from './PDiskSpaceDistribution/PDiskSpaceDistribution';
 import {pDiskPageKeyset} from './i18n';
@@ -102,16 +102,16 @@ export function PDiskPage() {
     };
 
     const handleDecommissionChange = async (
-        newDecomissionStatus?: EDecommitStatus,
+        newDecommissionStatus?: EDecommitStatus,
         isRetry?: boolean,
     ) => {
         if (pDiskParamsDefined) {
-            return window.api
+            return await window.api
                 .changePDiskStatus({
                     nodeId,
                     pDiskId,
                     force: isRetry,
-                    decommissionStatus: newDecomissionStatus,
+                    decommissionStatus: newDecommissionStatus,
                 })
                 .then((response) => {
                     if (response?.result === false) {
@@ -171,7 +171,7 @@ export function PDiskPage() {
                     status={getSeverityColor(Severity)}
                     id={getPDiskId(nodeId, pDiskId)}
                 />
-                <DecommisionLabel decommission={DecommitStatus} />
+                <DecommissionLabel decommission={DecommitStatus} />
             </div>
         );
     };

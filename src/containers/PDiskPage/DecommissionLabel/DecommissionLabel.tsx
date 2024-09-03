@@ -3,7 +3,7 @@ import {Label} from '@gravity-ui/uikit';
 import type {EDecommitStatus} from '../../../types/api/pdisk';
 import {pDiskPageKeyset} from '../i18n';
 
-interface DecommisionLabelProps {
+interface DecommissionLabelProps {
     decommission?: EDecommitStatus;
 }
 
@@ -11,7 +11,7 @@ function getDecommissionLabelText(decommission: string) {
     return pDiskPageKeyset('decommission-label', {decommission});
 }
 
-export function DecommisionLabel({decommission}: DecommisionLabelProps) {
+export function DecommissionLabel({decommission}: DecommissionLabelProps) {
     if (decommission === 'DECOMMIT_IMMINENT') {
         return (
             <Label theme="danger" size="m">

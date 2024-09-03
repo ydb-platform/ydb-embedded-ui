@@ -133,7 +133,7 @@ type EDriveStatus =
 
 export type EDecommitStatus =
     | 'DECOMMIT_UNSET'
-    | 'DECOMMIT_NONE' // no decomission
+    | 'DECOMMIT_NONE' // no decommission
     | 'DECOMMIT_PENDING' // drive is going to be removed soon, but SelfHeal logic would not remove it automatically
     | 'DECOMMIT_IMMINENT' // drive is going to be settled automatically
     | 'DECOMMIT_REJECTED'; // drive is working as usual, but decommitted slots are not placed here
