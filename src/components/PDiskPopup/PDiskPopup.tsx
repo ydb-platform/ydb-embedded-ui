@@ -5,7 +5,6 @@ import {Popup} from '@gravity-ui/uikit';
 
 import {EFlag} from '../../types/api/enums';
 import type {NodesMap} from '../../types/store/nodesList';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {getPDiskId} from '../../utils/disks/helpers';
@@ -26,10 +25,7 @@ export const preparePDiskData = (data: PreparedPDisk, nodes?: NodesMap) => {
     const pdiskData: InfoViewerItem[] = [
         {
             label: 'PDisk',
-            value:
-                valueIsDefined(NodeId) && valueIsDefined(PDiskId)
-                    ? getPDiskId(NodeId, PDiskId)
-                    : EMPTY_DATA_PLACEHOLDER,
+            value: getPDiskId(NodeId, PDiskId) ?? EMPTY_DATA_PLACEHOLDER,
         },
         {label: 'State', value: State || 'not available'},
         {label: 'Type', value: Type || 'unknown'},

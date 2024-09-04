@@ -7,7 +7,7 @@ import type {HandleSort} from '../../../utils/hooks/useTableSort';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './getStorageGroupsColumns';
-import {useGetStorageColumns} from './hooks';
+import {useGetStorageGroupsColumns} from './hooks';
 import i18n from './i18n';
 
 import './StorageGroups.scss';
@@ -29,7 +29,7 @@ export function StorageGroups({
     sort,
     handleSort,
 }: StorageGroupsProps) {
-    const columns = useGetStorageColumns(visibleEntities);
+    const columns = useGetStorageGroupsColumns(visibleEntities);
 
     if (!data.length && visibleEntities !== VISIBLE_ENTITIES.all) {
         return (

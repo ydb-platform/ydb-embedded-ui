@@ -5,25 +5,28 @@ import type {VisibleEntities} from '../../../store/reducers/storage/types';
 import {USE_ADVANCED_STORAGE_KEY} from '../../../utils/constants';
 import {useSetting, useTypedSelector} from '../../../utils/hooks';
 
+import type {StorageColumnsGetter} from './getStorageGroupsColumns';
 import {
     getDiskPageStorageColumns,
     getPreparedStorageGroupsColumns,
 } from './getStorageGroupsColumns';
 
-export const useGetStorageColumns = (visibleEntities: VisibleEntities) => {
+const useGetStorageColumns = (
+    columnsGetter: StorageColumnsGetter,
+    visibleEntities?: VisibleEntities,
+) => {
     const [useAdvancedStorage] = useSetting(USE_ADVANCED_STORAGE_KEY, false);
     const nodes = useTypedSelector(selectNodesMap);
 
     return React.useMemo(() => {
-        return getPreparedStorageGroupsColumns({nodes}, {visibleEntities, useAdvancedStorage});
-    }, [visibleEntities, useAdvancedStorage, nodes]);
+        return columnsGetter({nodes}, {useAdvancedStorage, visibleEntities});
+    }, [columnsGetter, nodes, useAdvancedStorage, visibleEntities]);
+};
+
+export const useGetStorageGroupsColumns = (visibleEntities: VisibleEntities) => {
+    return useGetStorageColumns(getPreparedStorageGroupsColumns, visibleEntities);
 };
 
 export const useGetDiskStorageColumns = () => {
-    const [useAdvancedStorage] = useSetting(USE_ADVANCED_STORAGE_KEY, false);
-    const nodes = useTypedSelector(selectNodesMap);
-
-    return React.useMemo(() => {
-        return getDiskPageStorageColumns({nodes}, {useAdvancedStorage});
-    }, [useAdvancedStorage, nodes]);
+    return useGetStorageColumns(getDiskPageStorageColumns);
 };

@@ -1,3 +1,4 @@
+import {valueIsDefined} from '..';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 
 import {DISK_NUMERIC_SEVERITY_TO_STATE_COLOR, NOT_AVAILABLE_SEVERITY_COLOR} from './constants';
@@ -14,6 +15,9 @@ export function getSeverityColor(severity: number | undefined) {
     return DISK_NUMERIC_SEVERITY_TO_STATE_COLOR[severity] || NOT_AVAILABLE_SEVERITY_COLOR;
 }
 
-export function getPDiskId(nodeId: string | number, pDiskId: string | number) {
-    return `${nodeId}-${pDiskId}`;
+export function getPDiskId(nodeId?: string | number | null, pDiskId?: string | number | null) {
+    if (valueIsDefined(nodeId) && valueIsDefined(pDiskId)) {
+        return `${nodeId}-${pDiskId}`;
+    }
+    return undefined;
 }

@@ -29,7 +29,7 @@
         flex-shrink: 0;
     }
     &__vdisk-progress-bar {
-        --progress-bar-height: 18px;
+        --progress-bar-compact-height: 18px;
 
         border-radius: 4px;
     }
@@ -38,7 +38,7 @@
         width: 80px;
     }
     &__pdisk-progress-bar {
-        --progress-bar-height: 20px;
+        --progress-bar-full-height: 20px;
         padding-left: var(--g-spacing-2);
 
         text-align: left;

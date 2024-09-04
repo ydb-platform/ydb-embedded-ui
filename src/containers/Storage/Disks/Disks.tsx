@@ -4,6 +4,7 @@ import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsSta
 import type {NodesMap} from '../../../types/store/nodesList';
 import {cn} from '../../../utils/cn';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
+import {getPDiskId} from '../../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {PDisk} from '../PDisk';
 
@@ -19,58 +20,91 @@ interface DisksProps {
 export function Disks({vDisks = [], nodes}: DisksProps) {
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
 
+    if (!vDisks.length) {
+        return null;
+    }
+
     return (
         <div className={b(null)}>
             <div className={b('vdisks-wrapper')}>
                 {vDisks?.map((vDisk) => {
-                    // Do not show PDisk popup for VDisk
-                    const vDiskToShow = {...vDisk, PDisk: undefined};
-
-                    const vDiskId = stringifyVdiskId(vDisk.VDiskId);
-
                     return (
-                        <div
+                        <VDiskItem
                             key={stringifyVdiskId(vDisk.VDiskId)}
-                            style={{
-                                flexGrow: Number(vDisk.AllocatedSize) || 1,
-                            }}
-                            className={b('vdisk-item')}
-                        >
-                            <VDiskWithDonorsStack
-                                data={vDiskToShow}
-                                nodes={nodes}
-                                compact={true}
-                                showPopup={highlightedVDisk === vDiskId}
-                                onShowPopup={() => setHighlightedVDisk(vDiskId)}
-                                onHidePopup={() => setHighlightedVDisk(undefined)}
-                                progressBarClassName={b('vdisk-progress-bar')}
-                            />
-                        </div>
+                            vDisk={vDisk}
+                            nodes={nodes}
+                            highlightedVDisk={highlightedVDisk}
+                            setHighlightedVDisk={setHighlightedVDisk}
+                        />
                     );
                 })}
             </div>
 
             <div className={b('pdisks-wrapper')}>
                 {vDisks?.map((vDisk) => {
-                    const vDiskId = stringifyVdiskId(vDisk.VDiskId);
-
-                    if (!vDisk.PDisk) {
-                        return null;
-                    }
-
                     return (
-                        <PDisk
-                            key={vDisk.PDisk.PDiskId}
-                            className={b('pdisk-item')}
-                            progressBarClassName={b('pdisk-progress-bar')}
-                            data={vDisk.PDisk}
-                            showPopup={highlightedVDisk === vDiskId}
-                            onShowPopup={() => setHighlightedVDisk(vDiskId)}
-                            onHidePopup={() => setHighlightedVDisk(undefined)}
+                        <PDiskItem
+                            key={getPDiskId(vDisk.NodeId, vDisk?.PDisk?.PDiskId)}
+                            vDisk={vDisk}
+                            nodes={nodes}
+                            highlightedVDisk={highlightedVDisk}
+                            setHighlightedVDisk={setHighlightedVDisk}
                         />
                     );
                 })}
             </div>
         </div>
+    );
+}
+
+interface DisksItemProps {
+    nodes?: NodesMap;
+    vDisk: PreparedVDisk;
+    highlightedVDisk: string | undefined;
+    setHighlightedVDisk: (id: string | undefined) => void;
+}
+
+function VDiskItem({nodes, vDisk, highlightedVDisk, setHighlightedVDisk}: DisksItemProps) {
+    // Do not show PDisk popup for VDisk
+    const vDiskToShow = {...vDisk, PDisk: undefined};
+
+    const vDiskId = stringifyVdiskId(vDisk.VDiskId);
+
+    return (
+        <div
+            style={{
+                flexGrow: Number(vDisk.AllocatedSize) || 1,
+            }}
+            className={b('vdisk-item')}
+        >
+            <VDiskWithDonorsStack
+                data={vDiskToShow}
+                nodes={nodes}
+                compact
+                showPopup={highlightedVDisk === vDiskId}
+                onShowPopup={() => setHighlightedVDisk(vDiskId)}
+                onHidePopup={() => setHighlightedVDisk(undefined)}
+                progressBarClassName={b('vdisk-progress-bar')}
+            />
+        </div>
+    );
+}
+
+function PDiskItem({vDisk, highlightedVDisk, setHighlightedVDisk}: DisksItemProps) {
+    const vDiskId = stringifyVdiskId(vDisk.VDiskId);
+
+    if (!vDisk.PDisk) {
+        return null;
+    }
+
+    return (
+        <PDisk
+            className={b('pdisk-item')}
+            progressBarClassName={b('pdisk-progress-bar')}
+            data={vDisk.PDisk}
+            showPopup={highlightedVDisk === vDiskId}
+            onShowPopup={() => setHighlightedVDisk(vDiskId)}
+            onHidePopup={() => setHighlightedVDisk(undefined)}
+        />
     );
 }

@@ -76,12 +76,6 @@ export const VDisk = ({
 
     return (
         <React.Fragment>
-            <VDiskPopup
-                data={data}
-                nodes={nodes}
-                anchorRef={anchor}
-                open={isPopupVisible || showPopup}
-            />
             <div
                 className={b()}
                 ref={anchor}
@@ -97,6 +91,12 @@ export const VDisk = ({
                     />
                 </InternalLink>
             </div>
+            <VDiskPopup
+                data={data}
+                nodes={nodes}
+                anchorRef={anchor}
+                open={isPopupVisible || showPopup}
+            />
         </React.Fragment>
     );
 };

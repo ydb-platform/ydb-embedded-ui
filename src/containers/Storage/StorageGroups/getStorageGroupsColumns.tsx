@@ -243,21 +243,26 @@ const getDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
         return <Disks vDisks={row.VDisks} nodes={nodes} />;
     },
     align: DataTable.CENTER,
-    width: 1050,
+    width: 900,
     resizeable: false,
     sortable: false,
 });
 
-interface GetColumnsData {
+interface GetStorageColumnsData {
     nodes?: NodesMap;
 }
 
-interface GetColumnsOptions {
+interface GetStorageColumnsOptions {
     useAdvancedStorage?: boolean;
     visibleEntities?: VisibleEntities;
 }
 
-export const getStorageTopGroupsColumns = (): StorageGroupsColumn[] => {
+export type StorageColumnsGetter = (
+    data?: GetStorageColumnsData,
+    options?: GetStorageColumnsOptions,
+) => StorageGroupsColumn[];
+
+export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
     const columns = [
         groupIdColumn,
         typeColumn,
@@ -275,10 +280,7 @@ export const getStorageTopGroupsColumns = (): StorageGroupsColumn[] => {
     });
 };
 
-export const getDiskPageStorageColumns = (
-    data?: GetColumnsData,
-    options?: GetColumnsOptions,
-): StorageGroupsColumn[] => {
+export const getDiskPageStorageColumns: StorageColumnsGetter = (data, options) => {
     const disksColumn = options?.useAdvancedStorage
         ? getDisksColumn()
         : getVDisksColumn(data?.nodes);
@@ -295,10 +297,7 @@ export const getDiskPageStorageColumns = (
     ];
 };
 
-const getStorageGroupsColumns = (
-    data?: GetColumnsData,
-    options?: GetColumnsOptions,
-): StorageGroupsColumn[] => {
+const getStorageGroupsColumns: StorageColumnsGetter = (data, options) => {
     const disksColumn = options?.useAdvancedStorage
         ? getDisksColumn()
         : getVDisksColumn(data?.nodes);
@@ -339,10 +338,7 @@ const filterStorageGroupsColumns = (
     });
 };
 
-export const getPreparedStorageGroupsColumns = (
-    data?: GetColumnsData,
-    options?: GetColumnsOptions,
-) => {
+export const getPreparedStorageGroupsColumns: StorageColumnsGetter = (data, options) => {
     const rawColumns = getStorageGroupsColumns(data, options);
 
     const filteredColumns = filterStorageGroupsColumns(rawColumns, options?.visibleEntities);

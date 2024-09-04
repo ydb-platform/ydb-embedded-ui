@@ -8,7 +8,7 @@ import type {VisibleEntities} from '../../../store/reducers/storage/types';
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {getStorageGroups} from './getGroups';
 import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './getStorageGroupsColumns';
-import {useGetStorageColumns} from './hooks';
+import {useGetStorageGroupsColumns} from './hooks';
 import i18n from './i18n';
 
 interface PaginatedStorageGroupsProps {
@@ -34,7 +34,7 @@ export const PaginatedStorageGroups = ({
     renderControls,
     renderErrorMessage,
 }: PaginatedStorageGroupsProps) => {
-    const columns = useGetStorageColumns(visibleEntities);
+    const columns = useGetStorageGroupsColumns(visibleEntities);
 
     const tableFilters = React.useMemo(() => {
         return {searchValue, visibleEntities, database, nodeId};

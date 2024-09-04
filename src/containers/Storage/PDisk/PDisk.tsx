@@ -97,7 +97,6 @@ export const PDisk = ({
 
     return (
         <React.Fragment>
-            <PDiskPopup data={data} anchorRef={anchor} open={isPopupVisible || showPopup} />
             <div className={b(null, className)} ref={anchor}>
                 {renderVDisks()}
                 <InternalLink
@@ -114,6 +113,7 @@ export const PDisk = ({
                     <div className={b('media-type')}>{data.Type}</div>
                 </InternalLink>
             </div>
+            <PDiskPopup data={data} anchorRef={anchor} open={isPopupVisible || showPopup} />
         </React.Fragment>
     );
 };
