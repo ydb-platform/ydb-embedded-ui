@@ -25,6 +25,11 @@
         @include sticky-top();
     }
 
+    &__table {
+        position: relative;
+        z-index: 2;
+    }
+
     .ydb-paginated-table__head {
         top: 62px;
     }

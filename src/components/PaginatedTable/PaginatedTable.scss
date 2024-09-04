@@ -25,15 +25,10 @@
         }
     }
 
-    &__colgroup {
-        display: table;
-    }
-
-    &__table-chunk {
-        display: block;
-    }
-
     &__row {
+        position: relative;
+        z-index: 1;
+
         &:hover {
             background: var(--paginated-table-hover-color);
         }
@@ -46,12 +41,8 @@
     }
 
     &__head {
-        z-index: 1;
+        z-index: 2;
         @include sticky-top();
-
-        &-row {
-            display: table;
-        }
     }
 
     &__sort-icon-container {
@@ -74,7 +65,7 @@
     &__head-cell-wrapper {
         position: relative;
 
-        display: flex;
+        display: table-cell;
         overflow-x: hidden;
 
         border-bottom: $cell-border;
@@ -176,5 +167,12 @@
     }
     &__head-cell-wrapper:hover > &__resize-handler {
         visibility: visible;
+    }
+
+    &__resizeable-table-container {
+        width: max-content;
+
+        // padding for easier resize of the last column
+        padding-right: 20px;
     }
 }
