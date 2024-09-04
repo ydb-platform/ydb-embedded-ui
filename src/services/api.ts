@@ -10,9 +10,10 @@ import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 import type {TMetaInfo} from '../types/api/acl';
 import type {TQueryAutocomplete} from '../types/api/autocomplete';
 import type {CapabilitiesResponse} from '../types/api/capabilities';
-import type {TClusterConfigs, TClusterInfo} from '../types/api/cluster';
+import type {TClusterInfo} from '../types/api/cluster';
 import type {TComputeInfo} from '../types/api/compute';
 import type {DescribeConsumerResult} from '../types/api/consumer';
+import type {TConfigs} from '../types/api/featureFlags';
 import type {HealthCheckAPIResponse} from '../types/api/healthcheck';
 import type {JsonHotKeysResponse} from '../types/api/hotkeys';
 import type {MetaCluster, MetaClusters, MetaTenants} from '../types/api/meta';
@@ -120,7 +121,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getClusterConfig(database?: string, {concurrentId, signal}: AxiosOptions = {}) {
-        return this.get<TClusterConfigs>(
+        return this.get<TConfigs>(
             this.getPath('/viewer/feature_flags'),
             {
                 database,

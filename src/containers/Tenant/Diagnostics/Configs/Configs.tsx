@@ -1,34 +1,60 @@
 import React from 'react';
 
+import {TriangleExclamation} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
-import {Switch} from '@gravity-ui/uikit';
+import {Icon, Switch} from '@gravity-ui/uikit';
 import {StringParam, useQueryParam} from 'use-query-params';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {setFeatureFlagsFilter, tenantApi} from '../../../../store/reducers/tenant/tenant';
-import type {TClusterConfigFeatureFlag} from '../../../../types/api/cluster';
+import type {TConfigFeatureFlag} from '../../../../types/api/featureFlags';
+import {cn} from '../../../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+
+import i18n from './i18n';
+
+import './Configs.scss';
 
 const FEATURE_FLAGS_COLUMNS_WIDTH_LS_KEY = 'featureFlagsColumnsWidth';
 
-const columns: Column<TClusterConfigFeatureFlag>[] = [
+const b = cn('ydb-diagnostics-configs');
+
+const columns: Column<TConfigFeatureFlag>[] = [
     {
-        name: 'Feature flag',
-        render: ({row}) =>
-            row.Current ? <b title="Default value was changed">{row.Name}</b> : row.Name,
-        width: 400,
+        name: ' ',
+        render: ({row}) => (
+            <React.Fragment>
+                {row.Current && (
+                    <span title={i18n('flag-touched')}>
+                        <Icon data={TriangleExclamation} className={b('icon-touched')} />
+                    </span>
+                )}
+            </React.Fragment>
+        ),
+        width: 36,
         sortable: false,
+        resizeable: false,
     },
     {
-        name: 'Default',
+        name: i18n('td-feature-flag'),
+        render: ({row}) => (row.Current ? <b>{row.Name}</b> : row.Name),
+        width: 400,
+        sortable: true,
+        sortAccessor: ({Current, Name}) => {
+            return Number(Current ?? 0) + Name.toLowerCase();
+        },
+    },
+    {
+        name: i18n('td-default'),
         render: ({row}) => {
             switch (row.Default) {
                 case true:
-                    return 'Enabled';
+                    return i18n('enabled');
                 case false:
-                    return 'Disabled';
+                    return i18n('disabled');
                 default:
                     return '-';
             }
@@ -38,7 +64,7 @@ const columns: Column<TClusterConfigFeatureFlag>[] = [
         resizeable: false,
     },
     {
-        name: 'Current',
+        name: i18n('td-current'),
         render: ({row}) => <Switch disabled checked={(row.Current ?? row.Default) || false} />,
         width: 100,
         sortable: false,
@@ -64,13 +90,13 @@ export const Configs = ({database}: Props) => {
         if (search) {
             dispatch(setFeatureFlagsFilter(search));
         } else if (featureFlagsFilter) {
-            setSearch(featureFlagsFilter);
+            setSearch(featureFlagsFilter, 'replaceIn');
         }
     }, []);
 
     const onChange = (value: string) => {
         dispatch(setFeatureFlagsFilter(value));
-        setSearch(value || undefined);
+        setSearch(value || undefined, 'replaceIn');
     };
 
     const featureFlags = featureFlagsFilter
@@ -79,21 +105,19 @@ export const Configs = ({database}: Props) => {
 
     const renderContent = () => {
         if (isError) {
-            return 'Error while loading configs';
+            return i18n('error-msg');
         }
 
         if (!featureFlags.length) {
-            return featureFlagsFilter ? 'Empty search result' : 'No data';
+            return i18n(featureFlagsFilter ? 'search-empty' : 'no-data');
         }
 
         return (
-            <ResizeableDataTable<TClusterConfigFeatureFlag>
+            <ResizeableDataTable
                 columnsWidthLSKey={FEATURE_FLAGS_COLUMNS_WIDTH_LS_KEY}
                 columns={columns}
                 data={featureFlags}
-                settings={{
-                    displayIndices: false,
-                }}
+                settings={DEFAULT_TABLE_SETTINGS}
             />
         );
     };
@@ -104,7 +128,7 @@ export const Configs = ({database}: Props) => {
                 <Search
                     value={featureFlagsFilter}
                     onChange={onChange}
-                    placeholder="Search by feature flag"
+                    placeholder={i18n('search-placeholder')}
                 />
             </React.Fragment>
         );

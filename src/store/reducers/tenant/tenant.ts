@@ -74,7 +74,7 @@ export const tenantApi = api.injectEndpoints({
         getClusterConfig: builder.query({
             queryFn: async ({database}: {database?: string}, {signal}) => {
                 try {
-                    // FIXME!
+                    // FIXME: pass database param when supported, remove filter
                     const res = await window.api.getClusterConfig(undefined, {signal});
                     const db = res.Databases.filter((item) => item.Name === database)[0];
 
