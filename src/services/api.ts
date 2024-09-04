@@ -58,6 +58,7 @@ import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
 
 const TRACE_CHECK_TIMEOUT = 60 * SECOND_IN_MS;
+const MAX_TRACE_CHECK_RETRIES = 9;
 
 type AxiosOptions = {
     concurrentId?: string;
@@ -563,7 +564,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                     signal,
                     timeout: TRACE_CHECK_TIMEOUT,
                     'axios-retry': {
-                        shouldResetTimeout: true,
+                        retries: MAX_TRACE_CHECK_RETRIES,
+                        retryDelay: axiosRetry.exponentialDelay,
                         retryCondition: () => true,
                     },
                 },
