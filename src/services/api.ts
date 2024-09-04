@@ -2,7 +2,6 @@ import AxiosWrapper from '@gravity-ui/axios-wrapper';
 import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import type {AxiosRequestConfig} from 'axios';
 import axiosRetry from 'axios-retry';
-import qs from 'qs';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
@@ -20,7 +19,7 @@ import type {ModifyDiskResponse} from '../types/api/modifyDisk';
 import type {TNetInfo} from '../types/api/netInfo';
 import type {TNodesInfo} from '../types/api/nodes';
 import type {TEvNodesInfo} from '../types/api/nodesList';
-import type {TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
+import type {EDecommitStatus, TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
 import type {
     Actions,
     ErrorResponse,
@@ -599,24 +598,18 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         vDiskIdx: string | number;
         force?: boolean;
     }) {
-        const params = {
-            group_id: groupId,
-            group_generation_id: groupGeneration,
-            fail_realm_idx: failRealmIdx,
-            fail_domain_idx: failDomainIdx,
-            vdisk_idx: vDiskIdx,
-
-            force,
-        };
-
-        const paramsString = qs.stringify(params);
-
-        const path = this.getPath(`/vdisk/evict?${paramsString}`);
-
         return this.post<ModifyDiskResponse>(
-            path,
+            this.getPath('/vdisk/evict'),
             {},
-            {},
+            {
+                group_id: groupId,
+                group_generation_id: groupGeneration,
+                fail_realm_idx: failRealmIdx,
+                fail_domain_idx: failDomainIdx,
+                vdisk_idx: vDiskIdx,
+
+                force,
+            },
             {
                 requestConfig: {'axios-retry': {retries: 0}},
             },
@@ -632,9 +625,39 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         force?: boolean;
     }) {
         return this.post<ModifyDiskResponse>(
-            this.getPath(`/pdisk/restart?node_id=${nodeId}&pdisk_id=${pDiskId}&force=${force}`),
+            this.getPath('/pdisk/restart'),
             {},
-            {},
+            {
+                node_id: nodeId,
+                pdisk_id: pDiskId,
+                force,
+            },
+            {
+                requestConfig: {'axios-retry': {retries: 0}},
+            },
+        );
+    }
+    changePDiskStatus({
+        nodeId,
+        pDiskId,
+        force,
+        decommissionStatus,
+    }: {
+        nodeId: number | string;
+        pDiskId: number | string;
+        force?: boolean;
+        decommissionStatus?: EDecommitStatus;
+    }) {
+        return this.post<ModifyDiskResponse>(
+            this.getPath('/pdisk/status'),
+            {
+                decommit_status: decommissionStatus,
+            },
+            {
+                node_id: nodeId,
+                pdisk_id: pDiskId,
+                force,
+            },
             {
                 requestConfig: {'axios-retry': {retries: 0}},
             },

@@ -42,7 +42,8 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
     return (
         <Flex gap={2} wrap="nowrap">
             <ButtonWithConfirmDialog
-                dialogContent={i18n('dialog.kill')}
+                dialogHeader={i18n('dialog.kill-header')}
+                dialogText={i18n('dialog.kill-text')}
                 onConfirmAction={() => killTablet({id: TabletId}).unwrap()}
                 buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
                 withPopover
@@ -57,7 +58,8 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
             {hasHiveId && (
                 <React.Fragment>
                     <ButtonWithConfirmDialog
-                        dialogContent={i18n('dialog.stop')}
+                        dialogHeader={i18n('dialog.stop-header')}
+                        dialogText={i18n('dialog.stop-text')}
                         onConfirmAction={() => stopTablet({id: TabletId, hiveId: HiveId}).unwrap()}
                         buttonDisabled={isDisabledStop || !isUserAllowedToMakeChanges}
                         withPopover
@@ -70,7 +72,8 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
                         {i18n('controls.stop')}
                     </ButtonWithConfirmDialog>
                     <ButtonWithConfirmDialog
-                        dialogContent={i18n('dialog.resume')}
+                        dialogHeader={i18n('dialog.resume-header')}
+                        dialogText={i18n('dialog.resume-text')}
                         onConfirmAction={() =>
                             resumeTablet({id: TabletId, hiveId: HiveId}).unwrap()
                         }
