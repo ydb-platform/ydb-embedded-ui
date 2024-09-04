@@ -275,8 +275,7 @@ export function ExecuteResult({
                             </Button>
                         </React.Fragment>
                     ) : null}
-                    {/* For testing made single. After review will be multi */}
-                    <ClusterModeGuard mode="single">
+                    <ClusterModeGuard mode="multi">
                         <TraceButton traceId={data?.traceId} />
                     </ClusterModeGuard>
                 </div>

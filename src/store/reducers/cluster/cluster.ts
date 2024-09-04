@@ -55,18 +55,8 @@ export const clusterApi = api.injectEndpoints({
         >({
             queryFn: async (clusterName, {signal}) => {
                 try {
-                    let clusterData = await window.api.getClusterInfo(clusterName, {signal});
-                    clusterData = {
-                        ...clusterData,
+                    const clusterData = await window.api.getClusterInfo(clusterName, {signal});
 
-                        // Test
-                        TraceCheck: {
-                            url: 'https://t.yandex-team.ru/api/traces/${traceId}',
-                        },
-                        TraceView: {
-                            url: 'https://monitoring.yandex-team.ru/projects/ydb/traces/${traceId}',
-                        },
-                    };
                     const clusterRoot = clusterData.Domain;
 
                     // Without domain we cannot get stats from system tables
