@@ -23,6 +23,7 @@ import {cn} from '../../../../utils/cn';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
+import {ClusterModeGuard} from '../../../ClusterModeGuard';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {SimplifiedPlan} from '../ExplainResult/components/SimplifiedPlan/SimplifiedPlan';
 import {ResultIssues} from '../Issues/Issues';
@@ -31,6 +32,7 @@ import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {getPreparedResult} from '../utils/getPreparedResult';
 import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
+import {TraceButton} from './TraceButton';
 import i18n from './i18n';
 import {getPlan} from './utils';
 
@@ -243,7 +245,6 @@ export function ExecuteResult({
             <div className={b('controls')}>
                 <div className={b('controls-right')}>
                     <QueryExecutionStatus error={error} loading={loading} />
-
                     {!error && !loading && (
                         <React.Fragment>
                             {stats?.DurationUs !== undefined && (
@@ -274,6 +275,9 @@ export function ExecuteResult({
                             </Button>
                         </React.Fragment>
                     ) : null}
+                    <ClusterModeGuard mode="multi">
+                        <TraceButton traceId={data?.traceId} />
+                    </ClusterModeGuard>
                 </div>
                 <div className={b('controls-left')}>
                     {renderClipboardButton()}

@@ -56,6 +56,7 @@ export const clusterApi = api.injectEndpoints({
             queryFn: async (clusterName, {signal}) => {
                 try {
                     const clusterData = await window.api.getClusterInfo(clusterName, {signal});
+
                     const clusterRoot = clusterData.Domain;
 
                     // Without domain we cannot get stats from system tables
