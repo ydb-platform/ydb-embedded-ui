@@ -87,18 +87,16 @@ export function PDiskPage() {
 
     const handleRestart = async (isRetry?: boolean) => {
         if (pDiskParamsDefined) {
-            return window.api.restartPDisk({nodeId, pDiskId, force: isRetry}).then((response) => {
-                if (response?.result === false) {
-                    const err = {
-                        statusText: response.error,
-                        retryPossible: response.forceRetryPossible,
-                    };
-                    throw err;
-                }
-            });
-        }
+            const response = await window.api.restartPDisk({nodeId, pDiskId, force: isRetry});
 
-        return undefined;
+            if (response?.result === false) {
+                const err = {
+                    statusText: response.error,
+                    retryPossible: response.forceRetryPossible,
+                };
+                throw err;
+            }
+        }
     };
 
     const handleDecommissionChange = async (
@@ -106,25 +104,20 @@ export function PDiskPage() {
         isRetry?: boolean,
     ) => {
         if (pDiskParamsDefined) {
-            return await window.api
-                .changePDiskStatus({
-                    nodeId,
-                    pDiskId,
-                    force: isRetry,
-                    decommissionStatus: newDecommissionStatus,
-                })
-                .then((response) => {
-                    if (response?.result === false) {
-                        const err = {
-                            statusText: response.error,
-                            retryPossible: response.forceRetryPossible,
-                        };
-                        throw err;
-                    }
-                });
+            const response = await window.api.changePDiskStatus({
+                nodeId,
+                pDiskId,
+                force: isRetry,
+                decommissionStatus: newDecommissionStatus,
+            });
+            if (response?.result === false) {
+                const err = {
+                    statusText: response.error,
+                    retryPossible: response.forceRetryPossible,
+                };
+                throw err;
+            }
         }
-
-        return undefined;
     };
 
     const handleAfterAction = () => {
