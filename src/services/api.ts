@@ -57,7 +57,8 @@ import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
 
-const TRACE_CHECK_TIMEOUT = 60 * SECOND_IN_MS;
+// Overall timeout 53~71 s depending on server response time
+const TRACE_CHECK_TIMEOUT = 2 * SECOND_IN_MS;
 const MAX_TRACE_CHECK_RETRIES = 9;
 
 type AxiosOptions = {
@@ -566,6 +567,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                     'axios-retry': {
                         retries: MAX_TRACE_CHECK_RETRIES,
                         retryDelay: axiosRetry.exponentialDelay,
+                        shouldResetTimeout: true,
                         retryCondition: () => true,
                     },
                 },
