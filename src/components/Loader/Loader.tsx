@@ -15,7 +15,7 @@ interface LoaderProps {
 }
 
 export const Loader = ({size = 'm', delay = 600, className}: LoaderProps) => {
-    const show = useDelayed(delay);
+    const [show] = useDelayed(delay);
     if (!show) {
         return null;
     }

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {Button} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 
@@ -40,7 +42,11 @@ export function TraceButton({traceId}: TraceUrlButtonProps) {
             : '';
 
     // We won't get any trace data at first 15 seconds for sure
-    const readyToFetch = useDelayed(TIME_BEFORE_CHECK);
+    const [readyToFetch, resetDelay] = useDelayed(TIME_BEFORE_CHECK);
+
+    React.useEffect(() => {
+        resetDelay();
+    }, [traceId, resetDelay]);
 
     const {currentData: traceData, error: traceError} = traceApi.useCheckTraceQuery(
         {url: checkTraceUrl},
