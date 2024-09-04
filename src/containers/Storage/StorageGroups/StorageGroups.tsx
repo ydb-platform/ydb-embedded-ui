@@ -6,11 +6,9 @@ import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducer
 import type {HandleSort} from '../../../utils/hooks/useTableSort';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
-import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './getStorageGroupsColumns';
-import {useGetStorageGroupsColumns} from './hooks';
+import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/getStorageGroupsColumns';
+import {useGetStorageGroupsColumns} from './columns/hooks';
 import i18n from './i18n';
-
-import './StorageGroups.scss';
 
 interface StorageGroupsProps {
     data: PreparedStorageGroup[];

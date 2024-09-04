@@ -6,9 +6,9 @@ import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
+import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/getStorageGroupsColumns';
+import {useGetStorageGroupsColumns} from './columns/hooks';
 import {getStorageGroups} from './getGroups';
-import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './getStorageGroupsColumns';
-import {useGetStorageGroupsColumns} from './hooks';
 import i18n from './i18n';
 
 interface PaginatedStorageGroupsProps {

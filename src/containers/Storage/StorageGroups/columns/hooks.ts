@@ -1,15 +1,15 @@
 import React from 'react';
 
-import {selectNodesMap} from '../../../store/reducers/nodesList';
-import type {VisibleEntities} from '../../../store/reducers/storage/types';
-import {USE_ADVANCED_STORAGE_KEY} from '../../../utils/constants';
-import {useSetting, useTypedSelector} from '../../../utils/hooks';
+import {selectNodesMap} from '../../../../store/reducers/nodesList';
+import type {VisibleEntities} from '../../../../store/reducers/storage/types';
+import {USE_ADVANCED_STORAGE_KEY} from '../../../../utils/constants';
+import {useSetting, useTypedSelector} from '../../../../utils/hooks';
 
-import type {StorageColumnsGetter} from './getStorageGroupsColumns';
 import {
     getDiskPageStorageColumns,
     getPreparedStorageGroupsColumns,
 } from './getStorageGroupsColumns';
+import type {StorageColumnsGetter} from './types';
 
 const useGetStorageColumns = (
     columnsGetter: StorageColumnsGetter,

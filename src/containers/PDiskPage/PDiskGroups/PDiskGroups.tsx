@@ -3,8 +3,8 @@ import {TableSkeleton} from '../../../components/TableSkeleton/TableSkeleton';
 import {pDiskApi} from '../../../store/reducers/pdisk/pdisk';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
-import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../../Storage/StorageGroups/getStorageGroupsColumns';
-import {useGetDiskStorageColumns} from '../../Storage/StorageGroups/hooks';
+import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../../Storage/StorageGroups/columns/getStorageGroupsColumns';
+import {useGetDiskStorageColumns} from '../../Storage/StorageGroups/columns/hooks';
 
 interface PDiskGroupsProps {
     nodeId: string | number;

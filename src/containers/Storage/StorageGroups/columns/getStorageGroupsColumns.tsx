@@ -2,35 +2,31 @@ import React from 'react';
 
 import {ShieldKeyhole} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
-import {CellWithPopover} from '../../../components/CellWithPopover/CellWithPopover';
-import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
-import type {Column as PaginatedTableColumn} from '../../../components/PaginatedTable';
-import {UsageLabel} from '../../../components/UsageLabel/UsageLabel';
-import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
-import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import type {PreparedStorageGroup, VisibleEntities} from '../../../store/reducers/storage/types';
-import {EFlag} from '../../../types/api/enums';
-import type {NodesMap} from '../../../types/store/nodesList';
-import {cn} from '../../../utils/cn';
-import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import {isSortableStorageProperty} from '../../../utils/storage';
-import {bytesToGB, bytesToSpeed} from '../../../utils/utils';
-import {Disks} from '../Disks/Disks';
-import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../utils';
+import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
+import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
+import {VDiskWithDonorsStack} from '../../../../components/VDisk/VDiskWithDonorsStack';
+import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
+import type {VisibleEntities} from '../../../../store/reducers/storage/types';
+import {EFlag} from '../../../../types/api/enums';
+import type {NodesMap} from '../../../../types/store/nodesList';
+import {cn} from '../../../../utils/cn';
+import {stringifyVdiskId} from '../../../../utils/dataFormatters/dataFormatters';
+import {isSortableStorageProperty} from '../../../../utils/storage';
+import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
+import {Disks} from '../../Disks/Disks';
+import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../../utils';
+import i18n from '../i18n';
 
-import i18n from './i18n';
+import type {StorageColumnsGetter, StorageGroupsColumn} from './types';
 
-import './StorageGroups.scss';
+import './StorageGroupsColumns.scss';
 
-const b = cn('global-storage-groups');
+const b = cn('ydb-storage-groups-columns');
 
 export const STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY = 'storageGroupsColumnsWidth';
-
-type StorageGroupsColumn = PaginatedTableColumn<PreparedStorageGroup> &
-    DataTableColumn<PreparedStorageGroup>;
 
 export const GROUPS_COLUMNS_IDS = {
     PoolName: 'PoolName',
@@ -247,20 +243,6 @@ const getDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
     resizeable: false,
     sortable: false,
 });
-
-interface GetStorageColumnsData {
-    nodes?: NodesMap;
-}
-
-interface GetStorageColumnsOptions {
-    useAdvancedStorage?: boolean;
-    visibleEntities?: VisibleEntities;
-}
-
-export type StorageColumnsGetter = (
-    data?: GetStorageColumnsData,
-    options?: GetStorageColumnsOptions,
-) => StorageGroupsColumn[];
 
 export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
     const columns = [
