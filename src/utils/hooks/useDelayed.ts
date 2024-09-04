@@ -16,10 +16,13 @@ export function useDelayed(initialDelay = 600) {
         };
     }, [delay, key]);
 
-    const resetDelay = (newDelay = initialDelay) => {
-        setDelay(newDelay);
-        setKey((prevKey) => prevKey + 1);
-    };
+    const resetDelay = React.useCallback(
+        (newDelay = initialDelay) => {
+            setDelay(newDelay);
+            setKey((prevKey) => prevKey + 1);
+        },
+        [initialDelay],
+    );
 
     return [show, resetDelay] as const;
 }

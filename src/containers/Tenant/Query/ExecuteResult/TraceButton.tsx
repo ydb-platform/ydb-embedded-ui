@@ -22,8 +22,12 @@ interface TraceUrlButtonProps {
     traceId?: string;
 }
 
-function hasValidTraceUrl(cluster?: TClusterInfo): cluster is {TraceCheck: {url: string}} {
+function hasValidTraceCheckUrl(cluster?: TClusterInfo): cluster is {TraceCheck: {url: string}} {
     return Boolean(cluster && cluster.TraceCheck && typeof cluster.TraceCheck.url === 'string');
+}
+
+function hasValidTraceViewUrl(cluster?: TClusterInfo): cluster is {TraceView: {url: string}} {
+    return Boolean(cluster && cluster.TraceView && typeof cluster.TraceView.url === 'string');
 }
 
 export function TraceButton({traceId}: TraceUrlButtonProps) {
@@ -34,10 +38,10 @@ export function TraceButton({traceId}: TraceUrlButtonProps) {
         {skip: !traceId},
     );
 
-    const hasTraceCheck = Boolean(hasValidTraceUrl(cluster) && traceId);
+    const hasTraceCheck = Boolean(hasValidTraceCheckUrl(cluster) && traceId);
 
     const checkTraceUrl =
-        traceId && hasValidTraceUrl(cluster)
+        traceId && hasValidTraceCheckUrl(cluster)
             ? replaceParams(cluster.TraceCheck.url, {traceId})
             : '';
 
@@ -54,7 +58,9 @@ export function TraceButton({traceId}: TraceUrlButtonProps) {
     );
 
     const traceUrl =
-        cluster?.TraceView?.url && traceId ? replaceParams(cluster.TraceView.url, {traceId}) : '';
+        hasValidTraceViewUrl(cluster) && traceId
+            ? replaceParams(cluster.TraceView.url, {traceId})
+            : '';
 
     if (!traceUrl) {
         return null;
