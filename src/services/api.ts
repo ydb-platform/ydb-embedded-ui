@@ -48,6 +48,7 @@ import type {QuerySyntax, TransactionMode} from '../types/store/query';
 import {
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
+    SECOND_IN_MS,
 } from '../utils/constants';
 import {prepareSortValue} from '../utils/filters';
 import type {Nullable} from '../utils/typecheckers';
@@ -55,6 +56,10 @@ import type {Nullable} from '../utils/typecheckers';
 import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
+
+// Overall timeout 53~71 s depending on server response time
+const TRACE_CHECK_TIMEOUT = 2 * SECOND_IN_MS;
+const MAX_TRACE_CHECK_RETRIES = 9;
 
 type AxiosOptions = {
     concurrentId?: string;
@@ -85,6 +90,25 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             }
 
             return config;
+        });
+
+        // Add traceId to response if it exists
+        this._axios.interceptors.response.use(function (response) {
+            if (
+                response.data &&
+                response.data instanceof Object &&
+                !Array.isArray(response.data) &&
+                response.headers['traceresponse']
+            ) {
+                const traceId = response.headers['traceresponse'].split('-')[1];
+
+                response.data = {
+                    ...response.data,
+                    _meta: {...response.data._meta, traceId},
+                };
+            }
+
+            return response;
         });
 
         // Interceptor to process OIDC auth
@@ -528,6 +552,26 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 enable_sampling: enableSampling,
             },
             {concurrentId: concurrentId || 'getHotKeys', requestConfig: {signal}},
+        );
+    }
+
+    checkTrace({url}: {url: string}, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get(
+            url,
+            {},
+            {
+                concurrentId: concurrentId || 'checkTrace',
+                requestConfig: {
+                    signal,
+                    timeout: TRACE_CHECK_TIMEOUT,
+                    'axios-retry': {
+                        retries: MAX_TRACE_CHECK_RETRIES,
+                        retryDelay: axiosRetry.exponentialDelay,
+                        shouldResetTimeout: true,
+                        retryCondition: () => true,
+                    },
+                },
+            },
         );
     }
     getHealthcheckInfo(
