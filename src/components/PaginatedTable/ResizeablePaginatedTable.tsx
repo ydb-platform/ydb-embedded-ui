@@ -4,6 +4,7 @@ import {useTableResize} from '../../utils/hooks/useTableResize';
 
 import type {PaginatedTableProps} from './PaginatedTable';
 import {PaginatedTable} from './PaginatedTable';
+import {b} from './shared';
 import type {Column} from './types';
 
 function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWidthByName) {
@@ -30,6 +31,7 @@ export function ResizeablePaginatedTable<T, F>({
         <PaginatedTable
             columns={updatedColumns}
             onColumnsResize={setTableColumnsWidth}
+            containerClassName={b('resizeable-table-container')}
             {...props}
         />
     );
