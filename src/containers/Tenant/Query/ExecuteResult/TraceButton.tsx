@@ -6,11 +6,15 @@ import {clusterApi} from '../../../../store/reducers/cluster/cluster';
 import {traceApi} from '../../../../store/reducers/trace';
 import type {TClusterInfo} from '../../../../types/api/cluster';
 import {cn} from '../../../../utils/cn';
+import {SECOND_IN_MS} from '../../../../utils/constants';
+import {useDelayed} from '../../../../utils/hooks/useDelayed';
 import {replaceParams} from '../utils/replaceParams';
 
 import i18n from './i18n';
 
 const b = cn('ydb-query-execute-result');
+
+const TIME_BEFORE_CHECK = 15 * SECOND_IN_MS;
 
 interface TraceUrlButtonProps {
     traceId?: string;
@@ -35,9 +39,12 @@ export function TraceButton({traceId}: TraceUrlButtonProps) {
             ? replaceParams(cluster.TraceCheck.url, {traceId})
             : '';
 
+    // We won't get any trace data at first 15 seconds for sure
+    const readyToFetch = useDelayed(TIME_BEFORE_CHECK);
+
     const {currentData: traceData, error: traceError} = traceApi.useCheckTraceQuery(
         {url: checkTraceUrl},
-        {skip: !hasTraceCheck},
+        {skip: !hasTraceCheck || !readyToFetch},
     );
 
     const traceUrl =
