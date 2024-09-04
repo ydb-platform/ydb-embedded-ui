@@ -57,9 +57,7 @@ import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
 
-const TRACE_CHECK_TIMEOUT = 2 * SECOND_IN_MS;
-const TRACE_CHECK_MAX_RETRIES = 15;
-const TRACE_CHECK_RETRY_DELAY = 2 * SECOND_IN_MS;
+const TRACE_CHECK_TIMEOUT = 60 * SECOND_IN_MS;
 
 type AxiosOptions = {
     concurrentId?: string;
@@ -94,12 +92,17 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
 
         // Add traceId to response if it exists
         this._axios.interceptors.response.use(function (response) {
-            if (response.data && response.headers['traceresponse']) {
+            if (
+                response.data &&
+                response.data instanceof Object &&
+                !Array.isArray(response.data) &&
+                response.headers['traceresponse']
+            ) {
                 const traceId = response.headers['traceresponse'].split('-')[1];
 
                 response.data = {
                     ...response.data,
-                    meta: {...response.data.meta, traceId},
+                    _meta: {...response.data._meta, traceId},
                 };
             }
 
@@ -551,7 +554,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     }
 
     checkTrace({url}: {url: string}, {concurrentId, signal}: AxiosOptions = {}) {
-        return this.get<JsonHotKeysResponse>(
+        return this.get(
             url,
             {},
             {
@@ -561,8 +564,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                     timeout: TRACE_CHECK_TIMEOUT,
                     'axios-retry': {
                         shouldResetTimeout: true,
-                        retries: TRACE_CHECK_MAX_RETRIES,
-                        retryDelay: () => TRACE_CHECK_RETRY_DELAY,
                         retryCondition: () => true,
                     },
                 },

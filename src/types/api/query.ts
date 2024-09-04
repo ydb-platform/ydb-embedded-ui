@@ -345,7 +345,7 @@ export type QueryAPIResponseByAction<
         : never;
 
 type QueryAPIResponseMeta = {
-    meta?: {
+    _meta?: {
         traceId?: string;
     };
 };

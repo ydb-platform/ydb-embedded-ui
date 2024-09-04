@@ -23,6 +23,7 @@ import {cn} from '../../../../utils/cn';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
+import {ClusterModeGuard} from '../../../ClusterModeGuard';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {SimplifiedPlan} from '../ExplainResult/components/SimplifiedPlan/SimplifiedPlan';
 import {ResultIssues} from '../Issues/Issues';
@@ -274,7 +275,10 @@ export function ExecuteResult({
                             </Button>
                         </React.Fragment>
                     ) : null}
-                    <TraceButton traceId={data?.traceId} />
+                    {/* For testing made single. After review will be multi */}
+                    <ClusterModeGuard mode="single">
+                        <TraceButton traceId={data?.traceId} />
+                    </ClusterModeGuard>
                 </div>
                 <div className={b('controls-left')}>
                     {renderClipboardButton()}

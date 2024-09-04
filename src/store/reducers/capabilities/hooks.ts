@@ -18,5 +18,6 @@ export const useDiskPagesAvailable = () => {
 };
 
 export const useTracingLevelOptionAvailable = () => {
+    // remove after review
     return useGetFeatureVersion('/viewer/query') > 1;
 };

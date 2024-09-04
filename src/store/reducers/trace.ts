@@ -8,8 +8,8 @@ interface CheckTraceParams {
 
 function endpoints(build: EndpointBuilder<BaseQueryFn, string, string>) {
     return {
-        checkTrace: build.query<{}, CheckTraceParams>({
-            queryFn: async ({url}, {signal}) => {
+        checkTrace: build.query({
+            queryFn: async ({url}: CheckTraceParams, {signal}) => {
                 try {
                     if (!url) {
                         throw new Error('no tracecheck url provided');
@@ -20,7 +20,6 @@ function endpoints(build: EndpointBuilder<BaseQueryFn, string, string>) {
                     return {error: error};
                 }
             },
-            providesTags: ['All'],
         }),
     };
 }
