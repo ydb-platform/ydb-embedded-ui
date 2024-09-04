@@ -1,8 +1,7 @@
 import React from 'react';
 
-export function useDelayed(initialDelay = 600) {
+export function useDelayed(delay = 600) {
     const [show, setShow] = React.useState(false);
-    const [delay, setDelay] = React.useState(initialDelay);
     const [key, setKey] = React.useState(0);
 
     React.useEffect(() => {
@@ -16,13 +15,9 @@ export function useDelayed(initialDelay = 600) {
         };
     }, [delay, key]);
 
-    const resetDelay = React.useCallback(
-        (newDelay = initialDelay) => {
-            setDelay(newDelay);
-            setKey((prevKey) => prevKey + 1);
-        },
-        [initialDelay],
-    );
+    const resetDelay = React.useCallback(() => {
+        setKey((prevKey) => prevKey + 1);
+    }, []);
 
     return [show, resetDelay] as const;
 }
