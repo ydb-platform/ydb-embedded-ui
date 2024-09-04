@@ -4,7 +4,7 @@ import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks
 import {
     STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
     getStorageTopGroupsColumns,
-} from '../../../../Storage/StorageGroups/getStorageGroupsColumns';
+} from '../../../../Storage/StorageGroups/columns/getStorageGroupsColumns';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
