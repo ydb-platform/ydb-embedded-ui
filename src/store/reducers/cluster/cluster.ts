@@ -1,5 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {Dispatch, PayloadAction} from '@reduxjs/toolkit';
+import {skipToken} from '@reduxjs/toolkit/query';
+import {StringParam, useQueryParam} from 'use-query-params';
 
 import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
@@ -96,6 +98,31 @@ export const clusterApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
+        getClusterBaseInfo: builder.query({
+            queryFn: async (clusterName: string, {signal}) => {
+                try {
+                    const data = await window.api.getClusterBaseInfo(clusterName, {signal});
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
     }),
     overrideExisting: 'throw',
 });
+
+export function useClusterBaseInfo() {
+    const [clusterName] = useQueryParam('clusterName', StringParam);
+
+    const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterName ?? skipToken);
+
+    const {solomon: monitoring, name, ...data} = currentData || {};
+
+    return {
+        ...data,
+        name: name ?? clusterName ?? undefined,
+        monitoring,
+    };
+}

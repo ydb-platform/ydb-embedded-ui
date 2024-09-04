@@ -1,13 +1,11 @@
 import React from 'react';
 
 import {Breadcrumbs} from '@gravity-ui/uikit';
-import {get} from 'lodash';
-import {StringParam, useQueryParams} from 'use-query-params';
 
 import {InternalLink} from '../../components/InternalLink';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
 import {backend, customBackend} from '../../store';
-import {clusterApi} from '../../store/reducers/cluster/cluster';
+import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
 import {useTypedSelector} from '../../utils/hooks';
@@ -32,18 +30,12 @@ interface HeaderProps {
 }
 
 function Header({mainPage}: HeaderProps) {
-    const [queryParams] = useQueryParams({clusterName: StringParam});
-
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
 
-    const clusterInfo = clusterApi.useGetClusterInfoQuery(queryParams.clusterName ?? undefined);
+    const clusterInfo = useClusterBaseInfo();
 
-    const clusterName = get(
-        clusterInfo,
-        ['currentData', 'clusterData', 'Name'],
-        queryParams.clusterName,
-    );
+    const clusterName = clusterInfo.title || clusterInfo.name;
 
     const breadcrumbItems = React.useMemo(() => {
         const rawBreadcrumbs: RawBreadcrumbItem[] = [];
