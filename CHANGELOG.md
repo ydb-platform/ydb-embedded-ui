@@ -1,5 +1,21 @@
 # Changelog
 
+## [6.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.17.2...v6.18.0) (2024-09-04)
+
+
+### Features
+
+* **PDiskPage:** add decommission button ([#1168](https://github.com/ydb-platform/ydb-embedded-ui/issues/1168)) ([d3e5f70](https://github.com/ydb-platform/ydb-embedded-ui/commit/d3e5f70a4b71e95f6f42478b979a1157c80e6a36))
+* show query trace results ([#1248](https://github.com/ydb-platform/ydb-embedded-ui/issues/1248)) ([2be0f0b](https://github.com/ydb-platform/ydb-embedded-ui/commit/2be0f0b6aa931bf68597370923e7815935db4ba8))
+* **Storage:** add advanced disks view ([#1235](https://github.com/ydb-platform/ydb-embedded-ui/issues/1235)) ([3d780aa](https://github.com/ydb-platform/ydb-embedded-ui/commit/3d780aa4c6724f75a811c5d75061c2febd81a4a3))
+
+
+### Bug Fixes
+
+* **PaginatedTable:** fix table overflow, make column width optional ([#1234](https://github.com/ydb-platform/ydb-embedded-ui/issues/1234)) ([2d06930](https://github.com/ydb-platform/ydb-embedded-ui/commit/2d069305167ffb0b47c2d0e59ed2057dc73e649c))
+* **Tablet:** preserve query params when switch tabs ([#1254](https://github.com/ydb-platform/ydb-embedded-ui/issues/1254)) ([c79ccbc](https://github.com/ydb-platform/ydb-embedded-ui/commit/c79ccbc5c9a07b664620c3e3155d24f2754844b5))
+* **TopShards:** fix data update on schema object change ([#1245](https://github.com/ydb-platform/ydb-embedded-ui/issues/1245)) ([024fec4](https://github.com/ydb-platform/ydb-embedded-ui/commit/024fec40a4395a31e4780f7ab2206b25d0762e82))
+
 ## [6.17.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.17.1...v6.17.2) (2024-09-02)
 
 
