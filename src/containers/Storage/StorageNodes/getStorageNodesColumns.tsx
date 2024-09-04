@@ -94,7 +94,7 @@ const getStorageNodesColumns = (
 
                             return (
                                 <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                    <PDisk data={pDisk} nodeId={row.NodeId} vDisks={vDisks} />
+                                    <PDisk data={pDisk} vDisks={vDisks} />
                                 </div>
                             );
                         })}

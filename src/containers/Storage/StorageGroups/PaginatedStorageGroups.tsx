@@ -4,14 +4,11 @@ import type {RenderControls, RenderErrorMessage} from '../../../components/Pagin
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
-import type {NodesMap} from '../../../types/store/nodesList';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
+import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/getStorageGroupsColumns';
+import {useGetStorageGroupsColumns} from './columns/hooks';
 import {getStorageGroups} from './getGroups';
-import {
-    STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
-    getPreparedStorageGroupsColumns,
-} from './getStorageGroupsColumns';
 import i18n from './i18n';
 
 interface PaginatedStorageGroupsProps {
@@ -19,7 +16,6 @@ interface PaginatedStorageGroupsProps {
     visibleEntities: VisibleEntities;
     database?: string;
     nodeId?: string;
-    nodesMap?: NodesMap;
 
     onShowAll: VoidFunction;
 
@@ -33,19 +29,16 @@ export const PaginatedStorageGroups = ({
     visibleEntities,
     database,
     nodeId,
-    nodesMap,
     onShowAll,
     parentContainer,
     renderControls,
     renderErrorMessage,
 }: PaginatedStorageGroupsProps) => {
+    const columns = useGetStorageGroupsColumns(visibleEntities);
+
     const tableFilters = React.useMemo(() => {
         return {searchValue, visibleEntities, database, nodeId};
     }, [searchValue, visibleEntities, database, nodeId]);
-
-    const columns = React.useMemo(() => {
-        return getPreparedStorageGroupsColumns(nodesMap, visibleEntities);
-    }, [nodesMap, visibleEntities]);
 
     const renderEmptyDataMessage = () => {
         if (visibleEntities !== VISIBLE_ENTITIES.all) {

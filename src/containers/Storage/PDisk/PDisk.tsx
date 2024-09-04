@@ -18,24 +18,41 @@ import './PDisk.scss';
 const b = cn('pdisk-storage');
 
 interface PDiskProps {
-    nodeId: number;
     data?: PreparedPDisk;
     vDisks?: TVDiskStateInfo[];
+    showPopup?: boolean;
+    onShowPopup?: VoidFunction;
+    onHidePopup?: VoidFunction;
+    className?: string;
+    progressBarClassName?: string;
 }
 
-export const PDisk = ({nodeId, data = {}, vDisks}: PDiskProps) => {
+export const PDisk = ({
+    data = {},
+    vDisks,
+    showPopup,
+    onShowPopup,
+    onHidePopup,
+    className,
+    progressBarClassName,
+}: PDiskProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
 
     const diskPagesAvailable = useDiskPagesAvailable();
 
     const anchor = React.useRef(null);
 
-    const showPopup = () => {
+    const {NodeId, PDiskId} = data;
+    const pDiskIdsDefined = valueIsDefined(NodeId) && valueIsDefined(PDiskId);
+
+    const handleShowPopup = () => {
         setIsPopupVisible(true);
+        onShowPopup?.();
     };
 
-    const hidePopup = () => {
+    const handleHidePopup = () => {
         setIsPopupVisible(false);
+        onHidePopup?.();
     };
 
     const renderVDisks = () => {
@@ -68,34 +85,35 @@ export const PDisk = ({nodeId, data = {}, vDisks}: PDiskProps) => {
         );
     };
 
-    let pDiskPath = createHref(
-        routes.node,
-        {id: nodeId, activeTab: STRUCTURE},
-        {pdiskId: data.PDiskId || ''},
-    );
+    let pDiskPath: string | undefined;
 
-    if (diskPagesAvailable && valueIsDefined(data.PDiskId)) {
-        pDiskPath = getPDiskPagePath(data.PDiskId, nodeId);
+    if (pDiskIdsDefined) {
+        pDiskPath = createHref(routes.node, {id: NodeId, activeTab: STRUCTURE}, {pdiskId: PDiskId});
+    }
+
+    if (pDiskIdsDefined && diskPagesAvailable) {
+        pDiskPath = getPDiskPagePath(PDiskId, NodeId);
     }
 
     return (
         <React.Fragment>
-            <PDiskPopup data={data} anchorRef={anchor} open={isPopupVisible} />
-            <div className={b()} ref={anchor}>
+            <div className={b(null, className)} ref={anchor}>
                 {renderVDisks()}
                 <InternalLink
                     to={pDiskPath}
                     className={b('content')}
-                    onMouseEnter={showPopup}
-                    onMouseLeave={hidePopup}
+                    onMouseEnter={handleShowPopup}
+                    onMouseLeave={handleHidePopup}
                 >
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}
                         severity={data.Severity}
+                        className={progressBarClassName}
                     />
                     <div className={b('media-type')}>{data.Type}</div>
                 </InternalLink>
             </div>
+            <PDiskPopup data={data} anchorRef={anchor} open={isPopupVisible || showPopup} />
         </React.Fragment>
     );
 };

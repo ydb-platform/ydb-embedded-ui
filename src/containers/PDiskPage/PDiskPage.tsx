@@ -137,7 +137,7 @@ export function PDiskPage() {
             <EntityPageTitle
                 entityName={pDiskPageKeyset('pdisk')}
                 status={getSeverityColor(Severity)}
-                id={pDiskParamsDefined ? getPDiskId(nodeId, pDiskId) : null}
+                id={getPDiskId(nodeId, pDiskId)}
                 className={pdiskPageCn('title')}
             />
         );
