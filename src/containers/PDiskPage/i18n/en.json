@@ -17,6 +17,25 @@
 
   "restart-pdisk-button": "Restart PDisk",
   "force-restart-pdisk-button": "Restart anyway",
-  "restart-pdisk-dialog": "PDisk will be restarted. Do you want to proceed?",
-  "restart-pdisk-not-allowed": "You don't have enough rights to restart PDisk"
+  "restart-pdisk-not-allowed": "You don't have enough rights to restart PDisk",
+
+  "restart-pdisk-dialog-header": "Restart PDisk",
+  "restart-pdisk-dialog-text": "PDisk will be restarted. Do you want to proceed?",
+
+  "decommission-none": "None",
+  "decommission-imminent": "Imminent",
+  "decommission-pending": "Pending",
+  "decommission-rejected": "Rejected",
+
+  "decommission-label": "{{decommission}} decommission",
+
+  "decommission-button": "Decommission",
+  "decommission-change-not-allowed": "You don't have enough rights to change PDisk decommission",
+  "decommission-dialog-title": "Change decommission status",
+  "decommission-dialog-force-change": "Change anyway",
+
+  "decommission-dialog-imminent-warning": "This will start imminent decommission. Existing slots will be moved from the disk",
+  "decommission-dialog-pending-warning": "This will start pending decommission. Decommission will be planned for this disk, but will not start immediatelly. Existing slots will not be moved from the disk, but no new slots will be allocated on it",
+  "decommission-dialog-rejected-warning": "This will start rejected decommission. No slots from other disks are placed on this disk in the process of decommission",
+  "decommission-dialog-none-warning": "This will reset decommission mode, allowing the disk to  be used by the storage"
 }

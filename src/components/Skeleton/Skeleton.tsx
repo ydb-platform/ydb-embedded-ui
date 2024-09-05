@@ -8,7 +8,7 @@ interface SkeletonProps {
 }
 
 export const Skeleton = ({delay = 600, className}: SkeletonProps) => {
-    const show = useDelayed(delay);
+    const [show] = useDelayed(delay);
     if (!show) {
         return null;
     }

@@ -230,6 +230,7 @@ export const parseQueryAPIExecuteResponse = (
     if (isUnsupportedType(data)) {
         return {};
     }
+
     if (isMulti(data)) {
         return parseExecuteMultiResponse(data);
     }

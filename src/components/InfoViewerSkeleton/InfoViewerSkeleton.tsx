@@ -23,7 +23,7 @@ interface InfoViewerSkeletonProps {
 }
 
 export const InfoViewerSkeleton = ({rows = 8, className, delay = 600}: InfoViewerSkeletonProps) => {
-    const show = useDelayed(delay);
+    const [show] = useDelayed(delay);
     let skeletons: React.ReactNode = (
         <React.Fragment>
             <SkeletonLabel />

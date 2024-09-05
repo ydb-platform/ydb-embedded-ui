@@ -29,6 +29,7 @@ export interface IQueryResult {
     stats?: TKqpStatsQuery;
     plan?: ScriptPlan | QueryPlan;
     ast?: string;
+    traceId?: string;
 }
 
 export interface QueryRequestParams {
