@@ -1,8 +1,8 @@
 import React from 'react';
 
-import {TriangleExclamation} from '@gravity-ui/icons';
+import {PersonPencil} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
-import {Icon, Switch} from '@gravity-ui/uikit';
+import {Icon, Popover, Switch} from '@gravity-ui/uikit';
 import {StringParam, useQueryParam} from 'use-query-params';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
@@ -28,9 +28,13 @@ const columns: Column<TConfigFeatureFlag>[] = [
         render: ({row}) => (
             <React.Fragment>
                 {row.Current && (
-                    <span title={i18n('flag-touched')}>
-                        <Icon data={TriangleExclamation} className={b('icon-touched')} />
-                    </span>
+                    <Popover
+                        content={i18n('flag-touched')}
+                        className={b('icon-touched')}
+                        placement="left"
+                    >
+                        <Icon data={PersonPencil} />
+                    </Popover>
                 )}
             </React.Fragment>
         ),
@@ -44,7 +48,7 @@ const columns: Column<TConfigFeatureFlag>[] = [
         width: 400,
         sortable: true,
         sortAccessor: ({Current, Name}) => {
-            return Number(Current ?? 0) + Name.toLowerCase();
+            return Number(!Current) + Name.toLowerCase();
         },
     },
     {
