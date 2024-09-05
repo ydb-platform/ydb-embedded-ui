@@ -5,6 +5,7 @@ import {StringParam, useQueryParam} from 'use-query-params';
 
 import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
+import {parseTraceFields} from '../../../services/parsers/parseMetaCluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import {DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
 import {isQueryErrorResponse} from '../../../utils/query';
@@ -118,10 +119,17 @@ export function useClusterBaseInfo() {
 
     const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterName ?? skipToken);
 
-    const {solomon: monitoring, name, ...data} = currentData || {};
+    const {
+        solomon: monitoring,
+        name,
+        trace_check: traceCheck,
+        trace_view: traceView,
+        ...data
+    } = currentData || {};
 
     return {
         ...data,
+        ...parseTraceFields({traceCheck, traceView}),
         name: name ?? clusterName ?? undefined,
         monitoring,
     };

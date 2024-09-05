@@ -1,19 +1,14 @@
-import type {BaseQueryFn, EndpointBuilder} from '@reduxjs/toolkit/query';
-
 import {api} from './api';
 
 interface CheckTraceParams {
-    url?: string;
+    url: string;
 }
 
-function endpoints(build: EndpointBuilder<BaseQueryFn, string, string>) {
-    return {
+export const traceApi = api.injectEndpoints({
+    endpoints: (build) => ({
         checkTrace: build.query({
             queryFn: async ({url}: CheckTraceParams, {signal}) => {
                 try {
-                    if (!url) {
-                        throw new Error('no tracecheck url provided');
-                    }
                     const response = await window.api.checkTrace({url}, {signal});
                     return {data: response};
                 } catch (error) {
@@ -21,7 +16,6 @@ function endpoints(build: EndpointBuilder<BaseQueryFn, string, string>) {
                 }
             },
         }),
-    };
-}
-
-export const traceApi = api.injectEndpoints({endpoints});
+    }),
+    overrideExisting: 'throw',
+});

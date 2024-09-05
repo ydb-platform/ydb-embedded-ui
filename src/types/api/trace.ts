@@ -1,9 +1,13 @@
-import type {AxiosRequestConfig} from 'axios';
+import {z} from 'zod';
 
-export interface TTraceCheck {
-    url: AxiosRequestConfig['url'];
-}
+export const traceCheckSchema = z.object({
+    url: z.string().url(),
+});
 
-export interface TTraceView {
-    url: string;
-}
+export type TTraceCheck = z.infer<typeof traceCheckSchema>;
+
+export const traceViewSchema = z.object({
+    url: z.string().url(),
+});
+
+export type TTraceView = z.infer<typeof traceViewSchema>;
