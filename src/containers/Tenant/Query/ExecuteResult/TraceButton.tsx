@@ -1,9 +1,9 @@
 import React from 'react';
 
-import {Button} from '@gravity-ui/uikit';
+import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
+import {Button, Icon} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 
-import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
 import {clusterApi} from '../../../../store/reducers/cluster/cluster';
 import {traceApi} from '../../../../store/reducers/trace';
 import type {TClusterInfo} from '../../../../types/api/cluster';
@@ -66,14 +66,17 @@ export function TraceButton({traceId}: TraceUrlButtonProps) {
         return null;
     }
 
+    const isLoading = !traceData && !traceError;
     return (
-        <Button view="flat-secondary" loading={!traceData && !traceError}>
-            <LinkWithIcon
-                className={b('trace-link', {loading: !traceData && !traceError})}
-                title={i18n('trace')}
-                url={traceUrl}
-                external
-            />
+        <Button
+            className={b('trace-link', {loading: isLoading})}
+            loading={isLoading}
+            href={traceUrl}
+            view="flat-secondary"
+            target="_blank"
+        >
+            {i18n('trace')}
+            <Icon data={ArrowUpRightFromSquare} />
         </Button>
     );
 }

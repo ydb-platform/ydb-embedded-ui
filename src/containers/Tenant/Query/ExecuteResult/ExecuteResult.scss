@@ -86,6 +86,8 @@
     }
 
     &__trace-link {
+        color: var(--g-color-text-link);
+
         &_loading {
             color: var(--g-color-text-secondary);
         }
