@@ -14,7 +14,12 @@ import type {TComputeInfo} from '../types/api/compute';
 import type {DescribeConsumerResult} from '../types/api/consumer';
 import type {HealthCheckAPIResponse} from '../types/api/healthcheck';
 import type {JsonHotKeysResponse} from '../types/api/hotkeys';
-import type {MetaCluster, MetaClusters, MetaTenants} from '../types/api/meta';
+import type {
+    MetaCluster,
+    MetaClusters,
+    MetaGeneralClusterInfo,
+    MetaTenants,
+} from '../types/api/meta';
 import type {ModifyDiskResponse} from '../types/api/modifyDisk';
 import type {TNetInfo} from '../types/api/netInfo';
 import type {TNodesInfo} from '../types/api/nodes';
@@ -749,13 +754,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
 
-    // used if not single cluster mode
-    getClustersList(_?: never, {signal}: {signal?: AbortSignal} = {}) {
-        return this.get<MetaClusters>(`${META_BACKEND || ''}/meta/clusters`, null, {
-            requestConfig: {signal},
-        });
-    }
-
     createSchemaDirectory(
         {database, path}: {database: string; path: string},
         {signal}: {signal?: AbortSignal} = {},
@@ -772,9 +770,26 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
+
+    getClustersList(_?: never, __: {signal?: AbortSignal} = {}): Promise<MetaClusters> {
+        throw new Error('Method is not implemented.');
+    }
+
+    getClusterBaseInfo(
+        _clusterName: string,
+        _opts: AxiosOptions = {},
+    ): Promise<MetaGeneralClusterInfo> {
+        throw new Error('Method is not implemented.');
+    }
 }
 
 export class YdbWebVersionAPI extends YdbEmbeddedAPI {
+    getClustersList(_?: never, {signal}: {signal?: AbortSignal} = {}) {
+        return this.get<MetaClusters>(`${META_BACKEND || ''}/meta/clusters`, null, {
+            requestConfig: {signal},
+        });
+    }
+
     getClusterInfo(clusterName: string, {signal}: AxiosOptions = {}) {
         return this.get<MetaCluster>(
             `${META_BACKEND || ''}/meta/cluster`,
@@ -785,14 +800,27 @@ export class YdbWebVersionAPI extends YdbEmbeddedAPI {
         ).then(parseMetaCluster);
     }
 
-    getTenants(clusterName: string, {concurrentId, signal}: AxiosOptions = {}) {
+    getTenants(clusterName: string, {signal}: AxiosOptions = {}) {
         return this.get<MetaTenants>(
             `${META_BACKEND || ''}/meta/cp_databases`,
             {
                 cluster_name: clusterName,
             },
-            {concurrentId, requestConfig: {signal}},
+            {requestConfig: {signal}},
         ).then(parseMetaTenants);
+    }
+
+    getClusterBaseInfo(
+        clusterName: string,
+        {concurrentId, signal}: AxiosOptions = {},
+    ): Promise<MetaGeneralClusterInfo> {
+        return this.get<MetaGeneralClusterInfo[]>(
+            `${META_BACKEND || ''}/meta/db_clusters`,
+            {
+                name: clusterName,
+            },
+            {concurrentId, requestConfig: {signal}},
+        ).then((data) => data[0]);
     }
 }
 

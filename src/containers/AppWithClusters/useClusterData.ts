@@ -1,16 +1,14 @@
 import React from 'react';
 
-import {useLocation} from 'react-router-dom';
+import {StringParam, useQueryParam} from 'use-query-params';
 
-import {parseQuery} from '../../routes';
 import {clustersApi} from '../../store/reducers/clusters/clusters';
 import {getAdditionalNodesProps} from '../../utils/additionalProps';
 import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
 
 export function useClusterData() {
-    const location = useLocation();
-    const {clusterName} = parseQuery(location);
+    const [clusterName] = useQueryParam('clusterName', StringParam);
 
     const {data} = clustersApi.useGetClustersListQuery(undefined);
 
@@ -21,16 +19,19 @@ export function useClusterData() {
 
     const {solomon: monitoring, balancer, versions, cluster} = info || {};
 
-    const [useClusterBalancerAsBackend] = useSetting<boolean>(USE_CLUSTER_BALANCER_AS_BACKEND_KEY);
-
-    const additionalNodesProps = getAdditionalNodesProps(balancer, useClusterBalancerAsBackend);
-
     return {
         monitoring,
         balancer,
         versions,
         cluster,
-        useClusterBalancerAsBackend,
-        additionalNodesProps,
+        ...useAdditionalNodeProps({balancer}),
     };
+}
+
+export function useAdditionalNodeProps({balancer}: {balancer?: string}) {
+    const [useClusterBalancerAsBackend] = useSetting<boolean>(USE_CLUSTER_BALANCER_AS_BACKEND_KEY);
+
+    const additionalNodesProps = getAdditionalNodesProps(balancer, useClusterBalancerAsBackend);
+
+    return {additionalNodesProps, useClusterBalancerAsBackend};
 }
