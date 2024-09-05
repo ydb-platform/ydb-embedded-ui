@@ -17,15 +17,15 @@ import {
     goToPreviousQuery,
     saveQueryToHistory,
     setTenantPath,
+    updateQueryResult,
 } from '../../../../store/reducers/executeQuery';
 import {explainQueryApi} from '../../../../store/reducers/explainQuery/explainQuery';
-import type {PreparedExplainResponse} from '../../../../store/reducers/explainQuery/types';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
-import type {ValueOf} from '../../../../types/common';
-import type {ExecuteQueryState} from '../../../../types/store/executeQuery';
-import type {IQueryResult, QueryAction} from '../../../../types/store/query';
+import {ResultType} from '../../../../types/store/executeQuery';
+import type {ExecuteQueryResult, ExecuteQueryState} from '../../../../types/store/executeQuery';
+import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
@@ -57,10 +57,6 @@ import {getKeyBindings} from './keybindings';
 import './QueryEditor.scss';
 
 const CONTEXT_MENU_GROUP_ID = 'navigation';
-const RESULT_TYPES = {
-    EXECUTE: 'execute',
-    EXPLAIN: 'explain',
-} as const;
 
 const b = cn('query-editor');
 
@@ -78,6 +74,7 @@ interface QueryEditorProps {
     goToPreviousQuery: (...args: Parameters<typeof goToPreviousQuery>) => void;
     setTenantPath: (...args: Parameters<typeof setTenantPath>) => void;
     setQueryAction: (...args: Parameters<typeof setQueryAction>) => void;
+    updateQueryResult: (...args: Parameters<typeof updateQueryResult>) => void;
     executeQuery: ExecuteQueryState;
     theme: string;
     type?: EPathType;
@@ -96,11 +93,11 @@ function QueryEditor(props: QueryEditorProps) {
         type,
         theme,
         changeUserInput,
+        updateQueryResult,
         showPreview,
     } = props;
     const {tenantPath: savedPath} = executeQuery;
 
-    const [resultType, setResultType] = React.useState<ValueOf<typeof RESULT_TYPES>>();
     const [isResultLoaded, setIsResultLoaded] = React.useState(false);
     const [querySettings] = useQueryExecutionSettings();
     const enableTracingLevel = useTracingLevelOptionAvailable();
@@ -113,18 +110,35 @@ function QueryEditor(props: QueryEditorProps) {
         LAST_USED_QUERY_ACTION_KEY,
     );
 
-    const [sendExecuteQuery, executeQueryResult] = executeQueryApi.useExecuteQueryMutation();
-    const [sendExplainQuery, explainQueryResult] = explainQueryApi.useExplainQueryMutation();
+    const [
+        sendExecuteQuery,
+        {isLoading: isExecuteQueryLoading, originalArgs: originalExecuteQueryArgs},
+    ] = executeQueryApi.useExecuteQueryMutation();
+    const [
+        sendExplainQuery,
+        {isLoading: isExplainQueryLoading, originalArgs: originalExplainQueryArgs},
+    ] = explainQueryApi.useExplainQueryMutation();
     const [sendCancelQuery, cancelQueryResult] = cancelQueryApi.useCancelQueryMutation();
 
     React.useEffect(() => {
         if (savedPath !== tenantName) {
             if (savedPath) {
                 changeUserInput({input: ''});
+                updateQueryResult();
             }
             setPath(tenantName);
+        } else if (executeQuery.result?.data || executeQuery.result?.error) {
+            setIsResultLoaded(true);
         }
-    }, [changeUserInput, setPath, tenantName, savedPath]);
+    }, [
+        changeUserInput,
+        setPath,
+        updateQueryResult,
+        tenantName,
+        savedPath,
+        executeQuery.result?.data,
+        executeQuery.result?.error,
+    ]);
 
     const [resultVisibilityState, dispatchResultVisibilityState] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
@@ -161,7 +175,8 @@ function QueryEditor(props: QueryEditorProps) {
             setLastQueryExecutionSettings(querySettings);
         }
         const queryId = uuidv4();
-        setResultType(RESULT_TYPES.EXECUTE);
+
+        updateQueryResult({type: ResultType.EXECUTE});
 
         sendExecuteQuery({
             query,
@@ -170,7 +185,14 @@ function QueryEditor(props: QueryEditorProps) {
             schema,
             enableTracingLevel,
             queryId,
-        });
+        })
+            .then((result) => {
+                updateQueryResult({type: ResultType.EXECUTE, ...result});
+            })
+            .catch((error) => {
+                updateQueryResult({type: ResultType.EXECUTE, error});
+            });
+
         setIsResultLoaded(true);
         props.setShowPreview(false);
         cancelQueryResult.reset();
@@ -200,7 +222,8 @@ function QueryEditor(props: QueryEditorProps) {
         }
 
         const queryId = uuidv4();
-        setResultType(RESULT_TYPES.EXPLAIN);
+
+        updateQueryResult({type: ResultType.EXPLAIN});
 
         sendExplainQuery({
             query: input,
@@ -208,7 +231,13 @@ function QueryEditor(props: QueryEditorProps) {
             querySettings,
             enableTracingLevel,
             queryId,
-        });
+        })
+            .then((result) => {
+                updateQueryResult({type: ResultType.EXPLAIN, ...result});
+            })
+            .catch((error) => {
+                updateQueryResult({type: ResultType.EXPLAIN, error});
+            });
 
         setIsResultLoaded(true);
         props.setShowPreview(false);
@@ -217,9 +246,9 @@ function QueryEditor(props: QueryEditorProps) {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     });
 
-    const currentQueryId = executeQueryResult.isLoading
-        ? executeQueryResult.originalArgs?.queryId
-        : explainQueryResult.originalArgs?.queryId;
+    const currentQueryId = isExecuteQueryLoading
+        ? originalExecuteQueryArgs?.queryId
+        : originalExplainQueryArgs?.queryId;
 
     const handleStopButtonClick = React.useCallback(() => {
         if (currentQueryId) {
@@ -335,7 +364,7 @@ function QueryEditor(props: QueryEditorProps) {
             <QueryEditorControls
                 handleSendExecuteClick={handleSendExecuteClick}
                 onSettingsButtonClick={handleSettingsClick}
-                isLoading={explainQueryResult.isLoading || executeQueryResult.isLoading}
+                isLoading={isExecuteQueryLoading || isExplainQueryLoading}
                 handleGetExplainQueryClick={handleGetExplainQueryClick}
                 disabled={!executeQuery.input}
                 highlightedAction={lastUsedQueryAction}
@@ -375,14 +404,10 @@ function QueryEditor(props: QueryEditorProps) {
                 </div>
                 <div className={b('pane-wrapper')}>
                     <Result
-                        executeQueryData={executeQueryResult.data}
-                        executeQueryError={executeQueryResult.error}
                         cancelQueryError={cancelQueryResult.error}
                         cancelQueryData={cancelQueryResult.data}
-                        explainQueryData={explainQueryResult.data}
-                        explainQueryError={explainQueryResult.error}
-                        explainQueryLoading={explainQueryResult.isLoading}
-                        executeResultLoading={executeQueryResult.isLoading}
+                        explainQueryLoading={isExplainQueryLoading}
+                        executeResultLoading={isExecuteQueryLoading}
                         cancelQueryLoading={cancelQueryResult.isLoading}
                         resultVisibilityState={resultVisibilityState}
                         onExpandResultHandler={onExpandResultHandler}
@@ -390,7 +415,7 @@ function QueryEditor(props: QueryEditorProps) {
                         onStopButtonClick={handleStopButtonClick}
                         type={type}
                         theme={theme}
-                        resultType={resultType}
+                        result={executeQuery.result}
                         tenantName={tenantName}
                         path={path}
                         showPreview={showPreview}
@@ -417,17 +442,14 @@ const mapDispatchToProps = {
     setShowPreview,
     setTenantPath,
     setQueryAction,
+    updateQueryResult,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryEditor);
 
 interface ResultProps {
-    executeQueryData?: IQueryResult;
-    executeQueryError?: unknown;
     cancelQueryError?: unknown;
     cancelQueryData?: unknown;
-    explainQueryData?: PreparedExplainResponse;
-    explainQueryError?: unknown;
     explainQueryLoading?: boolean;
     executeResultLoading?: boolean;
     cancelQueryLoading?: boolean;
@@ -437,17 +459,13 @@ interface ResultProps {
     onStopButtonClick: VoidFunction;
     type?: EPathType;
     theme: string;
-    resultType: ValueOf<typeof RESULT_TYPES> | undefined;
+    result?: ExecuteQueryResult;
     tenantName: string;
     path: string;
     showPreview?: boolean;
 }
 function Result({
-    executeQueryData,
-    executeQueryError,
     cancelQueryError,
-    explainQueryData,
-    explainQueryError,
     explainQueryLoading,
     executeResultLoading,
     cancelQueryLoading,
@@ -457,7 +475,7 @@ function Result({
     onStopButtonClick,
     type,
     theme,
-    resultType,
+    result,
     tenantName,
     path,
     showPreview,
@@ -466,11 +484,11 @@ function Result({
         return <Preview database={tenantName} path={path} type={type} />;
     }
 
-    if (resultType === RESULT_TYPES.EXECUTE) {
+    if (result?.type === ResultType.EXECUTE) {
         return (
             <ExecuteResult
-                data={executeQueryData}
-                error={executeQueryError}
+                data={result.data}
+                error={result.error}
                 cancelError={cancelQueryError}
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 onExpandResults={onExpandResultHandler}
@@ -483,12 +501,12 @@ function Result({
         );
     }
 
-    if (resultType === RESULT_TYPES.EXPLAIN) {
-        const {plan, ast, simplifiedPlan} = explainQueryData || {};
+    if (result?.type === ResultType.EXPLAIN) {
+        const {plan, ast, simplifiedPlan} = result.data || {};
 
         return (
             <ExplainResult
-                error={explainQueryError}
+                error={result.error}
                 cancelError={cancelQueryError}
                 explain={plan}
                 simplifiedPlan={simplifiedPlan}

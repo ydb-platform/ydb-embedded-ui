@@ -5,6 +5,7 @@ import {TracingLevelNumber} from '../../types/api/query';
 import type {ExecuteActions, Schemas} from '../../types/api/query';
 import type {
     ExecuteQueryAction,
+    ExecuteQueryResult,
     ExecuteQueryState,
     ExecuteQueryStateSlice,
     QueryInHistory,
@@ -24,6 +25,7 @@ import {api} from './api';
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
+const UPDATE_QUERY_RESULT = 'query/UPDATE_QUERY_RESULT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
 const UPDATE_QUERY_IN_HISTORY = 'query/UPDATE_QUERY_IN_HISTORY';
 const SET_QUERY_HISTORY_FILTER = 'query/SET_QUERY_HISTORY_FILTER';
@@ -57,11 +59,19 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
     state = initialState,
     action,
 ) => {
+    console.log(action);
     switch (action.type) {
         case CHANGE_USER_INPUT: {
             return {
                 ...state,
                 input: action.data.input,
+            };
+        }
+
+        case UPDATE_QUERY_RESULT: {
+            return {
+                ...state,
+                result: action.data,
             };
         }
 
@@ -296,6 +306,13 @@ export const changeUserInput = ({input}: {input: string}) => {
     return {
         type: CHANGE_USER_INPUT,
         data: {input},
+    } as const;
+};
+
+export const updateQueryResult = (data?: ExecuteQueryResult) => {
+    return {
+        type: UPDATE_QUERY_RESULT,
+        data,
     } as const;
 };
 
