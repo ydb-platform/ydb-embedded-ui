@@ -11,6 +11,9 @@ import type {Column, FetchData, GetRowClassName, SortParams} from './types';
 
 const DEBOUNCE_TIMEOUT = 200;
 
+// With original memo generic types are lost
+const typedMemo: <T>(Component: T) => T = React.memo;
+
 interface TableChunkProps<T, F> {
     id: number;
     limit: number;
@@ -28,7 +31,8 @@ interface TableChunkProps<T, F> {
     onDataFetched: (total: number, found: number) => void;
 }
 
-export const TableChunk = <T, F>({
+// Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
+export const TableChunk = typedMemo(function TableChunk<T, F>({
     id,
     limit,
     rowHeight,
@@ -42,7 +46,7 @@ export const TableChunk = <T, F>({
     renderErrorMessage,
     onDataFetched,
     isActive,
-}: TableChunkProps<T, F>) => {
+}: TableChunkProps<T, F>) {
     const ref = React.useRef<HTMLTableSectionElement>(null);
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -156,4 +160,4 @@ export const TableChunk = <T, F>({
             {renderContent()}
         </tbody>
     );
-};
+});
