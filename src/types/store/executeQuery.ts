@@ -4,6 +4,7 @@ import type {
     goToPreviousQuery,
     saveQueryToHistory,
     setQueryHistoryFilter,
+    setQueryResult,
     setTenantPath,
     updateQueryInHistory,
     updateQueryResult,
@@ -25,7 +26,13 @@ export enum ResultType {
     EXPLAIN = 'explain',
 }
 
-export type ExecuteQueryResult =
+interface CommonResultParams {
+    queryId: string;
+    isLoading: boolean;
+    cancelledStatus?: 'error' | 'success' | 'loading';
+}
+
+export type ExecuteQueryResult = (
     | {
           type: ResultType.EXECUTE;
           data?: IQueryResult;
@@ -35,10 +42,11 @@ export type ExecuteQueryResult =
           type: ResultType.EXPLAIN;
           data?: PreparedExplainResponse;
           error?: unknown;
-      };
+      }
+) &
+    CommonResultParams;
 
 export interface ExecuteQueryState {
-    loading: boolean;
     input: string;
     result?: ExecuteQueryResult;
     history: {
@@ -55,6 +63,7 @@ export type ExecuteQueryAction =
     | ReturnType<typeof goToPreviousQuery>
     | ReturnType<typeof changeUserInput>
     | ReturnType<typeof updateQueryResult>
+    | ReturnType<typeof setQueryResult>
     | ReturnType<typeof saveQueryToHistory>
     | ReturnType<typeof updateQueryInHistory>
     | ReturnType<typeof setTenantPath>

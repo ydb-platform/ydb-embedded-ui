@@ -51,7 +51,7 @@ type SectionID = ValueOf<typeof resultOptionsIds>;
 interface ExecuteResultProps {
     data: IQueryResult | undefined;
     error: unknown;
-    cancelError: unknown;
+    cancelError: boolean;
     isResultsCollapsed?: boolean;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
@@ -267,7 +267,7 @@ export function ExecuteResult({
                             <Button
                                 loading={cancelQueryLoading}
                                 onClick={onStopButtonClick}
-                                className={b('stop-button', {error: Boolean(cancelError)})}
+                                className={b('stop-button', {error: cancelError})}
                             >
                                 <Icon data={StopFill} size={16} />
                                 {i18n('action.stop')}

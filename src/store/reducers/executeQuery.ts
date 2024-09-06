@@ -3,6 +3,7 @@ import type {Reducer} from '@reduxjs/toolkit';
 import {settingsManager} from '../../services/settings';
 import {TracingLevelNumber} from '../../types/api/query';
 import type {ExecuteActions, Schemas} from '../../types/api/query';
+import {ResultType} from '../../types/store/executeQuery';
 import type {
     ExecuteQueryAction,
     ExecuteQueryResult,
@@ -26,6 +27,7 @@ const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
 const UPDATE_QUERY_RESULT = 'query/UPDATE_QUERY_RESULT';
+const SET_QUERY_RESULT = 'query/SET_QUERY_RESULT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
 const UPDATE_QUERY_IN_HISTORY = 'query/UPDATE_QUERY_IN_HISTORY';
 const SET_QUERY_HISTORY_FILTER = 'query/SET_QUERY_HISTORY_FILTER';
@@ -59,7 +61,6 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
     state = initialState,
     action,
 ) => {
-    console.log(action);
     switch (action.type) {
         case CHANGE_USER_INPUT: {
             return {
@@ -68,10 +69,23 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
             };
         }
 
-        case UPDATE_QUERY_RESULT: {
+        case SET_QUERY_RESULT: {
             return {
                 ...state,
                 result: action.data,
+            };
+        }
+
+        case UPDATE_QUERY_RESULT: {
+            return {
+                ...state,
+                result:
+                    state.result || action.data
+                        ? ({
+                              ...state.result,
+                              ...action.data,
+                          } as ExecuteQueryResult)
+                        : undefined,
             };
         }
 
@@ -215,6 +229,8 @@ export const executeQueryApi = api.injectEndpoints({
                 let action: ExecuteActions = 'execute';
                 let syntax: QuerySyntax = QUERY_SYNTAX.yql;
 
+                dispatch(setQueryResult({type: ResultType.EXECUTE, queryId, isLoading: true}));
+
                 if (querySettings.queryMode === 'pg') {
                     action = 'execute-query';
                     syntax = QUERY_SYNTAX.pg;
@@ -249,6 +265,14 @@ export const executeQueryApi = api.injectEndpoints({
                     );
 
                     if (isQueryErrorResponse(response)) {
+                        dispatch(
+                            setQueryResult({
+                                type: ResultType.EXECUTE,
+                                error: response,
+                                isLoading: false,
+                                queryId,
+                            }),
+                        );
                         return {error: response};
                     }
 
@@ -267,8 +291,24 @@ export const executeQueryApi = api.injectEndpoints({
                     }
 
                     dispatch(updateQueryInHistory(queryStats, queryId));
+                    dispatch(
+                        setQueryResult({
+                            type: ResultType.EXECUTE,
+                            data,
+                            isLoading: false,
+                            queryId,
+                        }),
+                    );
                     return {data};
                 } catch (error) {
+                    dispatch(
+                        setQueryResult({
+                            type: ResultType.EXECUTE,
+                            error,
+                            isLoading: false,
+                            queryId,
+                        }),
+                    );
                     return {error};
                 }
             },
@@ -291,6 +331,20 @@ export function updateQueryInHistory(stats: QueryStats, queryId: string) {
     } as const;
 }
 
+export function updateQueryResult(data?: Partial<ExecuteQueryResult>) {
+    return {
+        type: UPDATE_QUERY_RESULT,
+        data,
+    } as const;
+}
+
+export function setQueryResult(data?: ExecuteQueryResult) {
+    return {
+        type: SET_QUERY_RESULT,
+        data,
+    } as const;
+}
+
 export const goToPreviousQuery = () => {
     return {
         type: GO_TO_PREVIOUS_QUERY,
@@ -307,13 +361,6 @@ export const changeUserInput = ({input}: {input: string}) => {
     return {
         type: CHANGE_USER_INPUT,
         data: {input},
-    } as const;
-};
-
-export const updateQueryResult = (data?: ExecuteQueryResult) => {
-    return {
-        type: UPDATE_QUERY_RESULT,
-        data,
     } as const;
 };
 

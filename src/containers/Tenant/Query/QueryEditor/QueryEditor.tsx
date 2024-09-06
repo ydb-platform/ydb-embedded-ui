@@ -16,8 +16,8 @@ import {
     goToNextQuery,
     goToPreviousQuery,
     saveQueryToHistory,
+    setQueryResult,
     setTenantPath,
-    updateQueryResult,
 } from '../../../../store/reducers/executeQuery';
 import {explainQueryApi} from '../../../../store/reducers/explainQuery/explainQuery';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
@@ -74,7 +74,7 @@ interface QueryEditorProps {
     goToPreviousQuery: (...args: Parameters<typeof goToPreviousQuery>) => void;
     setTenantPath: (...args: Parameters<typeof setTenantPath>) => void;
     setQueryAction: (...args: Parameters<typeof setQueryAction>) => void;
-    updateQueryResult: (...args: Parameters<typeof updateQueryResult>) => void;
+    setQueryResult: (...args: Parameters<typeof setQueryResult>) => void;
     executeQuery: ExecuteQueryState;
     theme: string;
     type?: EPathType;
@@ -93,7 +93,7 @@ function QueryEditor(props: QueryEditorProps) {
         type,
         theme,
         changeUserInput,
-        updateQueryResult,
+        setQueryResult,
         showPreview,
     } = props;
     const {tenantPath: savedPath} = executeQuery;
@@ -110,21 +110,15 @@ function QueryEditor(props: QueryEditorProps) {
         LAST_USED_QUERY_ACTION_KEY,
     );
 
-    const [
-        sendExecuteQuery,
-        {isLoading: isExecuteQueryLoading, originalArgs: originalExecuteQueryArgs},
-    ] = executeQueryApi.useExecuteQueryMutation();
-    const [
-        sendExplainQuery,
-        {isLoading: isExplainQueryLoading, originalArgs: originalExplainQueryArgs},
-    ] = explainQueryApi.useExplainQueryMutation();
-    const [sendCancelQuery, cancelQueryResult] = cancelQueryApi.useCancelQueryMutation();
+    const [sendExecuteQuery] = executeQueryApi.useExecuteQueryMutation();
+    const [sendExplainQuery] = explainQueryApi.useExplainQueryMutation();
+    const [sendCancelQuery] = cancelQueryApi.useCancelQueryMutation();
 
     React.useEffect(() => {
         if (savedPath !== tenantName) {
             if (savedPath) {
                 changeUserInput({input: ''});
-                updateQueryResult();
+                setQueryResult();
             }
             setPath(tenantName);
         } else if (executeQuery.result?.data || executeQuery.result?.error) {
@@ -133,7 +127,7 @@ function QueryEditor(props: QueryEditorProps) {
     }, [
         changeUserInput,
         setPath,
-        updateQueryResult,
+        setQueryResult,
         tenantName,
         savedPath,
         executeQuery.result?.data,
@@ -176,8 +170,6 @@ function QueryEditor(props: QueryEditorProps) {
         }
         const queryId = uuidv4();
 
-        updateQueryResult({type: ResultType.EXECUTE});
-
         sendExecuteQuery({
             query,
             database: tenantName,
@@ -185,17 +177,10 @@ function QueryEditor(props: QueryEditorProps) {
             schema,
             enableTracingLevel,
             queryId,
-        })
-            .then((result) => {
-                updateQueryResult({type: ResultType.EXECUTE, ...result});
-            })
-            .catch((error) => {
-                updateQueryResult({type: ResultType.EXECUTE, error});
-            });
+        });
 
         setIsResultLoaded(true);
         props.setShowPreview(false);
-        cancelQueryResult.reset();
 
         // Don't save partial queries in history
         if (!text) {
@@ -223,38 +208,25 @@ function QueryEditor(props: QueryEditorProps) {
 
         const queryId = uuidv4();
 
-        updateQueryResult({type: ResultType.EXPLAIN});
-
         sendExplainQuery({
             query: input,
             database: tenantName,
             querySettings,
             enableTracingLevel,
             queryId,
-        })
-            .then((result) => {
-                updateQueryResult({type: ResultType.EXPLAIN, ...result});
-            })
-            .catch((error) => {
-                updateQueryResult({type: ResultType.EXPLAIN, error});
-            });
+        });
 
         setIsResultLoaded(true);
         props.setShowPreview(false);
-        cancelQueryResult.reset();
 
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     });
 
-    const currentQueryId = isExecuteQueryLoading
-        ? originalExecuteQueryArgs?.queryId
-        : originalExplainQueryArgs?.queryId;
-
     const handleStopButtonClick = React.useCallback(() => {
-        if (currentQueryId) {
-            sendCancelQuery({queryId: currentQueryId, database: tenantName});
+        if (executeQuery.result?.queryId) {
+            sendCancelQuery({queryId: executeQuery.result?.queryId, database: tenantName});
         }
-    }, [currentQueryId, sendCancelQuery, tenantName]);
+    }, [executeQuery.result?.queryId, sendCancelQuery, tenantName]);
 
     const handleSendQuery = useEventHandler(() => {
         if (lastUsedQueryAction === QUERY_ACTIONS.explain) {
@@ -364,7 +336,7 @@ function QueryEditor(props: QueryEditorProps) {
             <QueryEditorControls
                 handleSendExecuteClick={handleSendExecuteClick}
                 onSettingsButtonClick={handleSettingsClick}
-                isLoading={isExecuteQueryLoading || isExplainQueryLoading}
+                isLoading={Boolean(executeQuery.result?.isLoading)}
                 handleGetExplainQueryClick={handleGetExplainQueryClick}
                 disabled={!executeQuery.input}
                 highlightedAction={lastUsedQueryAction}
@@ -404,11 +376,6 @@ function QueryEditor(props: QueryEditorProps) {
                 </div>
                 <div className={b('pane-wrapper')}>
                     <Result
-                        cancelQueryError={cancelQueryResult.error}
-                        cancelQueryData={cancelQueryResult.data}
-                        explainQueryLoading={isExplainQueryLoading}
-                        executeResultLoading={isExecuteQueryLoading}
-                        cancelQueryLoading={cancelQueryResult.isLoading}
                         resultVisibilityState={resultVisibilityState}
                         onExpandResultHandler={onExpandResultHandler}
                         onCollapseResultHandler={onCollapseResultHandler}
@@ -442,17 +409,12 @@ const mapDispatchToProps = {
     setShowPreview,
     setTenantPath,
     setQueryAction,
-    updateQueryResult,
+    setQueryResult,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryEditor);
 
 interface ResultProps {
-    cancelQueryError?: unknown;
-    cancelQueryData?: unknown;
-    explainQueryLoading?: boolean;
-    executeResultLoading?: boolean;
-    cancelQueryLoading?: boolean;
     resultVisibilityState: InitialPaneState;
     onExpandResultHandler: VoidFunction;
     onCollapseResultHandler: VoidFunction;
@@ -465,10 +427,6 @@ interface ResultProps {
     showPreview?: boolean;
 }
 function Result({
-    cancelQueryError,
-    explainQueryLoading,
-    executeResultLoading,
-    cancelQueryLoading,
     resultVisibilityState,
     onExpandResultHandler,
     onCollapseResultHandler,
@@ -484,18 +442,20 @@ function Result({
         return <Preview database={tenantName} path={path} type={type} />;
     }
 
+    console.log(result);
+
     if (result?.type === ResultType.EXECUTE) {
         return (
             <ExecuteResult
                 data={result.data}
                 error={result.error}
-                cancelError={cancelQueryError}
+                cancelError={result.cancelledStatus === 'error'}
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}
                 theme={theme}
-                loading={executeResultLoading}
-                cancelQueryLoading={cancelQueryLoading}
+                loading={result.isLoading}
+                cancelQueryLoading={result.cancelledStatus === 'loading'}
                 onStopButtonClick={onStopButtonClick}
             />
         );
@@ -507,12 +467,12 @@ function Result({
         return (
             <ExplainResult
                 error={result.error}
-                cancelError={cancelQueryError}
+                cancelError={result.cancelledStatus === 'error'}
                 explain={plan}
                 simplifiedPlan={simplifiedPlan}
                 ast={ast}
-                loading={explainQueryLoading}
-                cancelQueryLoading={cancelQueryLoading}
+                loading={result.isLoading}
+                cancelQueryLoading={result.cancelledStatus === 'loading'}
                 theme={theme}
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 onExpandResults={onExpandResultHandler}

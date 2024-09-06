@@ -67,7 +67,7 @@ interface ExplainResultProps {
     cancelQueryLoading?: boolean;
     isResultsCollapsed?: boolean;
     error: unknown;
-    cancelError: unknown;
+    cancelError: boolean;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
     onStopButtonClick: VoidFunction;
@@ -194,7 +194,7 @@ export function ExplainResult({
                             <Button
                                 loading={cancelQueryLoading}
                                 onClick={onStopButtonClick}
-                                className={b('stop-button', {error: Boolean(cancelError)})}
+                                className={b('stop-button', {error: cancelError})}
                             >
                                 <Icon data={StopFill} size={16} />
                                 {i18n('action.stop')}
