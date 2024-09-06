@@ -98,7 +98,10 @@ function QueryEditor(props: QueryEditorProps) {
     } = props;
     const {tenantPath: savedPath} = executeQuery;
 
-    const [isResultLoaded, setIsResultLoaded] = React.useState(false);
+    const [isResultLoaded, setIsResultLoaded] = React.useState(
+        (executeQuery.result?.data || executeQuery.result?.error) && savedPath === tenantName,
+    );
+
     const [querySettings] = useQueryExecutionSettings();
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
@@ -121,8 +124,6 @@ function QueryEditor(props: QueryEditorProps) {
                 setQueryResult();
             }
             setPath(tenantName);
-        } else if (executeQuery.result?.data || executeQuery.result?.error) {
-            setIsResultLoaded(true);
         }
     }, [
         changeUserInput,
