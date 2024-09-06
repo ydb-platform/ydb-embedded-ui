@@ -4,6 +4,7 @@ export {
     ErrorBoundaryInner as ErrorBoundary,
     ErrorBoundaryFallback,
 } from './components/ErrorBoundary/ErrorBoundary';
+export {AsideNavigation} from './containers/AsideNavigation/AsideNavigation';
 
 export {configureStore, rootReducer} from './store';
 export {default as appRoutes} from './routes';

@@ -5,16 +5,13 @@ import {useHistory} from 'react-router-dom';
 import routes, {createHref} from '../../../routes';
 import {authenticationApi} from '../../../store/reducers/authentication/authentication';
 import {cn} from '../../../utils/cn';
-import {useTypedSelector} from '../../../utils/hooks';
 import i18n from '../i18n';
 
 import './YdbInternalUser.scss';
 
 const b = cn('kv-ydb-internal-user');
 
-export function YdbInternalUser() {
-    const {user: ydbUser} = useTypedSelector((state) => state.authentication);
-
+export function YdbInternalUser({login}: {login?: string}) {
     const [logout] = authenticationApi.useLogoutMutation();
 
     const history = useHistory();
@@ -32,9 +29,9 @@ export function YdbInternalUser() {
         <div className={b()}>
             <div className={b('user-info-wrapper')}>
                 <div className={b('ydb-internal-user-title')}>{i18n('account.user')}</div>
-                {ydbUser && <div className={b('username')}>{ydbUser}</div>}
+                {login && <div className={b('username')}>{login}</div>}
             </div>
-            {ydbUser ? (
+            {login ? (
                 <Button view="flat-secondary" title={i18n('account.logout')} onClick={handleLogout}>
                     <Icon data={ArrowRightFromSquare} />
                 </Button>
