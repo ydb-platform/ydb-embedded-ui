@@ -1,4 +1,6 @@
 import {useComponent} from '../../components/ComponentsProvider/ComponentsProvider';
+import {selectUser} from '../../store/reducers/authentication/authentication';
+import {useTypedSelector} from '../../utils/hooks';
 import {UserSettings} from '../UserSettings/UserSettings';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
 
@@ -11,10 +13,13 @@ interface NavigationProps {
 export function Navigation({children, userSettings}: NavigationProps) {
     const AsideNavigation = useComponent('AsideNavigation');
 
+    const ydbUser = useTypedSelector(selectUser);
+
     return (
         <AsideNavigation
             settings={<UserSettings settings={userSettings} />}
-            ydbInternalUser={<YdbInternalUser />}
+            ydbInternalUser={<YdbInternalUser login={ydbUser} />}
+            user={ydbUser ? {login: ydbUser} : undefined}
             content={children}
         />
     );
