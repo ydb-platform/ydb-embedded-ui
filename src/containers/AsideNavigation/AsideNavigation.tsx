@@ -5,10 +5,9 @@ import type {MenuItem} from '@gravity-ui/navigation';
 import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
 import {useHistory} from 'react-router-dom';
 
-import {selectUser} from '../../store/reducers/authentication/authentication';
 import {cn} from '../../utils/cn';
 import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
-import {useSetting, useTypedSelector} from '../../utils/hooks';
+import {useSetting} from '../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -21,25 +20,25 @@ const b = cn('kv-navigation');
 
 interface YdbUserDropdownProps {
     isCompact: boolean;
-    ydbUser: {
-        login?: string;
+    user?: {
+        login: string;
     };
     popupAnchor: React.RefObject<HTMLDivElement>;
     children: React.ReactNode;
 }
 
-function YdbUserDropdown({isCompact, popupAnchor, ydbUser, children}: YdbUserDropdownProps) {
+function UserDropdown({isCompact, popupAnchor, user, children}: YdbUserDropdownProps) {
     const [isUserDropdownVisible, setIsUserDropdownVisible] = React.useState(false);
-    const iconData = ydbUser.login ? Person : userSecret;
+    const iconData = user ? Person : userSecret;
     return (
         <FooterItem
             compact={isCompact}
             item={{
                 id: 'user-popup',
-                title: ydbUser.login ? ydbUser.login : i18n('navigation-item.account'),
+                title: user?.login ? user.login : i18n('navigation-item.account'),
                 current: isUserDropdownVisible,
                 icon: iconData,
-                onItemClick: () => setIsUserDropdownVisible(true),
+                onItemClick: () => setIsUserDropdownVisible((v) => !v),
             }}
             enableTooltip={!isUserDropdownVisible}
             popupAnchor={popupAnchor}
@@ -55,6 +54,7 @@ export interface AsideNavigationProps {
     ydbInternalUser: JSX.Element;
     menuItems?: MenuItem[];
     content: React.ReactNode;
+    user?: {login: string};
 }
 
 enum Panel {
@@ -66,7 +66,6 @@ export function AsideNavigation(props: AsideNavigationProps) {
 
     const [visiblePanel, setVisiblePanel] = React.useState<Panel>();
 
-    const ydbUser = useTypedSelector(selectUser);
     const [compact, setIsCompact] = useSetting<boolean>(ASIDE_HEADER_COMPACT_KEY);
 
     return (
@@ -113,15 +112,9 @@ export function AsideNavigation(props: AsideNavigationProps) {
                             compact={compact}
                         />
 
-                        <YdbUserDropdown
-                            isCompact={compact}
-                            popupAnchor={asideRef}
-                            ydbUser={{
-                                login: ydbUser,
-                            }}
-                        >
+                        <UserDropdown isCompact={compact} popupAnchor={asideRef} user={props.user}>
                             {props.ydbInternalUser}
-                        </YdbUserDropdown>
+                        </UserDropdown>
                     </React.Fragment>
                 )}
                 panelItems={[
