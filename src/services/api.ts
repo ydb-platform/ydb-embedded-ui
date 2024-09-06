@@ -55,15 +55,16 @@ import {
     SECOND_IN_MS,
 } from '../utils/constants';
 import {prepareSortValue} from '../utils/filters';
+import {isAxiosError} from '../utils/response';
 import type {Nullable} from '../utils/typecheckers';
 
 import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
 
-// Overall timeout 53~71 s depending on server response time
 const TRACE_CHECK_TIMEOUT = 2 * SECOND_IN_MS;
-const MAX_TRACE_CHECK_RETRIES = 9;
+const TRACE_API_ERROR_TIMEOUT = 10 * SECOND_IN_MS;
+const MAX_TRACE_CHECK_RETRIES = 30;
 
 type AxiosOptions = {
     concurrentId?: string;
@@ -570,7 +571,17 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                     timeout: TRACE_CHECK_TIMEOUT,
                     'axios-retry': {
                         retries: MAX_TRACE_CHECK_RETRIES,
-                        retryDelay: axiosRetry.exponentialDelay,
+                        retryDelay: (_: number, error: unknown) => {
+                            const isTracingError =
+                                isAxiosError(error) &&
+                                (error?.response?.status === 404 || error.code === 'ERR_NETWORK');
+
+                            if (isTracingError) {
+                                return TRACE_CHECK_TIMEOUT;
+                            }
+
+                            return TRACE_API_ERROR_TIMEOUT;
+                        },
                         shouldResetTimeout: true,
                         retryCondition: () => true,
                     },
