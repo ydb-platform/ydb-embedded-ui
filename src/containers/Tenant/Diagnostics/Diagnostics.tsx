@@ -133,7 +133,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Partitions path={path} database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.configs: {
-                return <Configs path={path} database={tenantName} />;
+                return <Configs database={tenantName} />;
             }
             default: {
                 return <div>No data...</div>;

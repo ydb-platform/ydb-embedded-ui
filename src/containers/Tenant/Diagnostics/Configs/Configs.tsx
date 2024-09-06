@@ -9,7 +9,7 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {setFeatureFlagsFilter, tenantApi} from '../../../../store/reducers/tenant/tenant';
-import type {TConfigFeatureFlag} from '../../../../types/api/featureFlags';
+import type {FeatureFlagConfig} from '../../../../types/api/featureFlags';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
@@ -22,11 +22,11 @@ const FEATURE_FLAGS_COLUMNS_WIDTH_LS_KEY = 'featureFlagsColumnsWidth';
 
 const b = cn('ydb-diagnostics-configs');
 
-const columns: Column<TConfigFeatureFlag>[] = [
+const columns: Column<FeatureFlagConfig>[] = [
     {
-        name: ' Touched',
+        name: 'Touched',
         header: '',
-        render: ({row}) => (
+        render: ({row}) =>
             row.Current ? (
                 <Popover
                     content={i18n('flag-touched')}
@@ -35,8 +35,7 @@ const columns: Column<TConfigFeatureFlag>[] = [
                 >
                     <Icon data={PersonPencil} />
                 </Popover>
-            ) : null
-        ),
+            ) : null,
         width: 36,
         sortable: false,
         resizeable: false,
@@ -54,7 +53,10 @@ const columns: Column<TConfigFeatureFlag>[] = [
         },
     },
     {
-        name: i18n('td-default'),
+        name: 'Default',
+        get header() {
+            return i18n('td-default');
+        },
         render: ({row}) => {
             switch (row.Default) {
                 case true:
@@ -70,7 +72,10 @@ const columns: Column<TConfigFeatureFlag>[] = [
         resizeable: false,
     },
     {
-        name: i18n('td-current'),
+        name: 'Current',
+        get header() {
+            return i18n('td-current');
+        },
         render: ({row}) => <Switch disabled checked={(row.Current ?? row.Default) || false} />,
         width: 100,
         sortable: false,
@@ -78,12 +83,36 @@ const columns: Column<TConfigFeatureFlag>[] = [
     },
 ];
 
-interface Props {
-    path: string;
+interface FeatureFlagsListsProps {
+    isError?: boolean;
+    featureFlags: FeatureFlagConfig[];
+    featureFlagsFilter?: string;
+}
+
+const FeatureFlagsList = ({isError, featureFlags, featureFlagsFilter}: FeatureFlagsListsProps) => {
+    if (isError) {
+        return i18n('error-msg');
+    }
+
+    if (!featureFlags.length) {
+        return i18n(featureFlagsFilter ? 'search-empty' : 'no-data');
+    }
+
+    return (
+        <ResizeableDataTable
+            columnsWidthLSKey={FEATURE_FLAGS_COLUMNS_WIDTH_LS_KEY}
+            columns={columns}
+            data={featureFlags}
+            settings={DEFAULT_TABLE_SETTINGS}
+        />
+    );
+};
+
+interface ConfigsProps {
     database: string;
 }
 
-export const Configs = ({database}: Props) => {
+export const Configs = ({database}: ConfigsProps) => {
     const dispatch = useTypedDispatch();
     const [search, setSearch] = useQueryParam('search', StringParam);
     const {currentData = [], isFetching, isError} = tenantApi.useGetClusterConfigQuery({database});
@@ -109,42 +138,21 @@ export const Configs = ({database}: Props) => {
         ? currentData.filter((item) => item.Name.toLocaleLowerCase().includes(featureFlagsFilter))
         : currentData;
 
-    const renderContent = () => {
-        if (isError) {
-            return i18n('error-msg');
-        }
-
-        if (!featureFlags.length) {
-            return i18n(featureFlagsFilter ? 'search-empty' : 'no-data');
-        }
-
-        return (
-            <ResizeableDataTable
-                columnsWidthLSKey={FEATURE_FLAGS_COLUMNS_WIDTH_LS_KEY}
-                columns={columns}
-                data={featureFlags}
-                settings={DEFAULT_TABLE_SETTINGS}
-            />
-        );
-    };
-
-    const renderControls = () => {
-        return (
-            <React.Fragment>
+    return (
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>
                 <Search
                     value={featureFlagsFilter}
                     onChange={onChange}
                     placeholder={i18n('search-placeholder')}
                 />
-            </React.Fragment>
-        );
-    };
-
-    return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            </TableWithControlsLayout.Controls>
             <TableWithControlsLayout.Table loading={isFetching}>
-                {renderContent()}
+                <FeatureFlagsList
+                    isError={isError}
+                    featureFlags={featureFlags}
+                    featureFlagsFilter={featureFlagsFilter}
+                />
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );

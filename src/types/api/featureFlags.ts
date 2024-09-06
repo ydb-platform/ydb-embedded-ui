@@ -1,14 +1,14 @@
-export interface TConfigFeatureFlag {
+export interface FeatureFlagConfig {
     Name: string;
     Current?: boolean;
     Default?: boolean;
 }
 
-export interface TConfigDb {
+interface ConfigDb {
     Name: string;
-    FeatureFlags: TConfigFeatureFlag[];
+    FeatureFlags: FeatureFlagConfig[];
 }
 
-export interface TConfigs {
-    Databases: TConfigDb[];
+export interface FeatureFlagConfigs {
+    Databases: ConfigDb[];
 }
