@@ -24,26 +24,28 @@ const b = cn('ydb-diagnostics-configs');
 
 const columns: Column<TConfigFeatureFlag>[] = [
     {
-        name: ' ',
+        name: ' Touched',
+        header: '',
         render: ({row}) => (
-            <React.Fragment>
-                {row.Current && (
-                    <Popover
-                        content={i18n('flag-touched')}
-                        className={b('icon-touched')}
-                        placement="left"
-                    >
-                        <Icon data={PersonPencil} />
-                    </Popover>
-                )}
-            </React.Fragment>
+            row.Current ? (
+                <Popover
+                    content={i18n('flag-touched')}
+                    className={b('icon-touched')}
+                    placement="left"
+                >
+                    <Icon data={PersonPencil} />
+                </Popover>
+            ) : null
         ),
         width: 36,
         sortable: false,
         resizeable: false,
     },
     {
-        name: i18n('td-feature-flag'),
+        name: 'Name',
+        get header() {
+            return i18n('td-feature-flag');
+        },
         render: ({row}) => (row.Current ? <b>{row.Name}</b> : row.Name),
         width: 400,
         sortable: true,
