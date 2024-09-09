@@ -42,21 +42,12 @@ const slice = createSlice({
         setMetricsTab: (state, action: PayloadAction<TenantMetricsTab>) => {
             state.metricsTab = action.payload;
         },
-        setFeatureFlagsFilter: (state, action: PayloadAction<string>) => {
-            state.featureFlagsFilter = action.payload;
-        },
     },
 });
 
 export default slice.reducer;
-export const {
-    setTenantPage,
-    setQueryTab,
-    setDiagnosticsTab,
-    setSummaryTab,
-    setMetricsTab,
-    setFeatureFlagsFilter,
-} = slice.actions;
+export const {setTenantPage, setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} =
+    slice.actions;
 
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {PersonPencil} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import {Icon, Popover, Switch} from '@gravity-ui/uikit';
@@ -9,11 +7,10 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {setFeatureFlagsFilter, tenantApi} from '../../../../store/reducers/tenant/tenant';
+import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import type {FeatureFlagConfig} from '../../../../types/api/featureFlags';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -89,25 +86,14 @@ interface ConfigsProps {
 }
 
 export const Configs = ({database}: ConfigsProps) => {
-    const dispatch = useTypedDispatch();
     const [search, setSearch] = useQueryParam('search', StringParam);
     const {currentData = [], isFetching, error} = tenantApi.useGetClusterConfigQuery({database});
-    const featureFlagsFilter = useTypedSelector(
-        (state) => state.tenant.featureFlagsFilter,
-    )?.toLocaleLowerCase();
-
-    // apply permalink state
-    React.useEffect(() => {
-        if (search) {
-            dispatch(setFeatureFlagsFilter(search));
-        }
-    }, []);
 
     const onChange = (value: string) => {
-        dispatch(setFeatureFlagsFilter(value));
         setSearch(value || undefined, 'replaceIn');
     };
 
+    const featureFlagsFilter = search?.toLocaleLowerCase();
     const featureFlags = featureFlagsFilter
         ? currentData.filter((item) => item.Name.toLocaleLowerCase().includes(featureFlagsFilter))
         : currentData;
