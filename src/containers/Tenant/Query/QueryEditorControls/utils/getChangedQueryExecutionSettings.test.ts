@@ -1,14 +1,14 @@
 import type {QuerySettings} from '../../../../../types/store/query';
 import {
-    ISOLATION_LEVELS,
     QUERY_MODES,
     STATISTICS_MODES,
     TRACING_LEVELS,
+    TRANSACTION_MODES,
 } from '../../../../../utils/query';
 
 const DEFAULT_QUERY_SETTINGS: QuerySettings = {
     queryMode: QUERY_MODES.query,
-    isolationLevel: ISOLATION_LEVELS.serializable,
+    transactionMode: TRANSACTION_MODES.implicit,
     timeout: '60',
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.detailed,
@@ -36,7 +36,7 @@ describe('getChangedQueryExecutionSettings', () => {
     it('should return all keys if all settings have changed', () => {
         const currentSettings: QuerySettings = {
             queryMode: QUERY_MODES.data,
-            isolationLevel: ISOLATION_LEVELS.onlinero,
+            transactionMode: TRANSACTION_MODES.onlinero,
             timeout: '90',
             statisticsMode: STATISTICS_MODES.basic,
             tracingLevel: TRACING_LEVELS.basic,
@@ -44,7 +44,7 @@ describe('getChangedQueryExecutionSettings', () => {
         const result = getChangedQueryExecutionSettings(currentSettings, DEFAULT_QUERY_SETTINGS);
         expect(result).toEqual([
             'queryMode',
-            'isolationLevel',
+            'transactionMode',
             'timeout',
             'statisticsMode',
             'tracingLevel',

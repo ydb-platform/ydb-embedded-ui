@@ -140,19 +140,19 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                     </Flex>
                 )}
                 <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                    <label htmlFor="isolationLevel" className={b('field-title')}>
-                        {QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.title}
+                    <label htmlFor="transactionMode" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.title}
                     </label>
-                    <div className={b('control-wrapper', {isolationLevel: true})}>
+                    <div className={b('control-wrapper', {transactionMode: true})}>
                         <Controller
-                            name="isolationLevel"
+                            name="transactionMode"
                             control={control}
                             render={({field}) => (
                                 <QuerySettingsSelect
                                     setting={field.value}
                                     onUpdateSetting={field.onChange}
                                     settingOptions={
-                                        QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.options
+                                        QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.options
                                     }
                                 />
                             )}

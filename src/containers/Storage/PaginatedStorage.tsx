@@ -3,12 +3,10 @@ import {StringParam, useQueryParams} from 'use-query-params';
 import {AccessDenied} from '../../components/Errors/403/AccessDenied';
 import {ResponseError} from '../../components/Errors/ResponseError/ResponseError';
 import type {RenderControls, RenderErrorMessage} from '../../components/PaginatedTable';
-import {selectNodesMap} from '../../store/reducers/nodesList';
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
 import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import {useTypedSelector} from '../../utils/hooks';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
 import {StorageControls} from './StorageControls/StorageControls';
@@ -54,8 +52,6 @@ export const PaginatedStorage = ({
     const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
         setQueryParams({uptimeFilter: value}, 'replaceIn');
     };
-
-    const nodesMap = useTypedSelector(selectNodesMap);
 
     const handleShowAllGroups = () => {
         handleGroupVisibilityChange(VISIBLE_ENTITIES.all);
@@ -121,7 +117,6 @@ export const PaginatedStorage = ({
             visibleEntities={visibleEntities}
             database={database}
             nodeId={nodeId}
-            nodesMap={nodesMap}
             onShowAll={handleShowAllGroups}
             parentContainer={parentContainer}
             renderControls={renderControls}

@@ -4,7 +4,7 @@ import type {Settings} from '@gravity-ui/react-data-table';
 import {EType} from '../types/api/tablet';
 import type {QuerySettings} from '../types/store/query';
 
-import {ISOLATION_LEVELS, QUERY_MODES, STATISTICS_MODES, TRACING_LEVELS} from './query';
+import {QUERY_MODES, STATISTICS_MODES, TRACING_LEVELS, TRANSACTION_MODES} from './query';
 
 const SECOND = 1000;
 
@@ -125,7 +125,7 @@ export const TENANT_OVERVIEW_TABLES_SETTINGS = {
 
 export const DEFAULT_QUERY_SETTINGS = {
     queryMode: QUERY_MODES.query,
-    isolationLevel: ISOLATION_LEVELS.serializable,
+    transactionMode: TRANSACTION_MODES.implicit,
     timeout: '60',
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.detailed,
@@ -161,3 +161,5 @@ export const AUTOCOMPLETE_ON_ENTER = 'autocompleteOnEnter';
 export const IS_HOTKEYS_HELP_HIDDEN_KEY = 'isHotKeysHelpHidden';
 
 export const DEV_ENABLE_TRACING_FOR_ALL_REQUESTS = 'enable_tracing_for_all_requests';
+
+export const USE_ADVANCED_STORAGE_KEY = 'use_advanced_storage';

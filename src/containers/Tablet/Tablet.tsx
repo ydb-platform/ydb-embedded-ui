@@ -61,6 +61,14 @@ const TABLET_PAGE_TABS = [
 const tabletTabSchema = z.nativeEnum(TABLET_TABS_IDS).catch(TABLET_TABS_IDS.history);
 const eTypeSchema = z.nativeEnum(EType).or(z.undefined()).catch(undefined);
 
+const tabletQueryParams = {
+    nodeId: StringParam,
+    tenantName: StringParam,
+    type: StringParam,
+    clusterName: StringParam,
+    activeTab: StringParam,
+};
+
 export function Tablet() {
     const dispatch = useTypedDispatch();
 
@@ -73,12 +81,7 @@ export function Tablet() {
             type: queryTabletType,
             clusterName: queryClusterName,
         },
-    ] = useQueryParams({
-        nodeId: StringParam,
-        tenantName: StringParam,
-        type: StringParam,
-        clusterName: StringParam,
-    });
+    ] = useQueryParams(tabletQueryParams);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tabletApi.useGetTabletQuery(
@@ -181,7 +184,7 @@ function TabletTabs({
     hiveId?: string;
     history: ITabletPreparedHistoryItem[];
 }) {
-    const [{activeTab}, setParams] = useQueryParams({activeTab: StringParam});
+    const [{activeTab, ...restParams}, setParams] = useQueryParams(tabletQueryParams);
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     const noAdvancedInfo = !isUserAllowedToMakeChanges || !hasHive(hiveId);
@@ -199,21 +202,24 @@ function TabletTabs({
 
     return (
         <Flex gap={5} direction="column">
-            <Tabs
-                size="l"
-                items={TABLET_PAGE_TABS.filter(({isAdvanced}) =>
-                    isAdvanced ? !noAdvancedInfo : true,
-                )}
-                activeTab={tabletTab}
-                wrapTo={(tab, tabNode) => {
-                    const path = getTabletPagePath(id, {activeTab: tab.id});
-                    return (
-                        <InternalLink to={path} key={tab.id}>
-                            {tabNode}
-                        </InternalLink>
-                    );
-                }}
-            />
+            {/* block wrapper fror tabs to preserve height */}
+            <div>
+                <Tabs
+                    size="l"
+                    items={TABLET_PAGE_TABS.filter(({isAdvanced}) =>
+                        isAdvanced ? !noAdvancedInfo : true,
+                    )}
+                    activeTab={tabletTab}
+                    wrapTo={(tab, tabNode) => {
+                        const path = getTabletPagePath(id, {...restParams, activeTab: tab.id});
+                        return (
+                            <InternalLink to={path} key={tab.id}>
+                                {tabNode}
+                            </InternalLink>
+                        );
+                    }}
+                />
+            </div>
             {tabletTab === 'history' ? <TabletTable history={history} /> : null}
             {tabletTab === 'channels' && !noAdvancedInfo ? (
                 <Channels id={id} hiveId={hiveId} />

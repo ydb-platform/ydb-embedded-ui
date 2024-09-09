@@ -6,15 +6,17 @@ import {useSetting} from './useSetting';
 
 export const useQueryExecutionSettings = () => {
     const enableTracingLevel = useTracingLevelOptionAvailable();
-    const [setting, setSetting] = useSetting<QuerySettings>(QUERY_EXECUTION_SETTINGS_KEY);
+    const [storageSettings, setSettings] = useSetting<QuerySettings>(QUERY_EXECUTION_SETTINGS_KEY);
 
-    return [
-        {
-            ...setting,
-            tracingLevel: enableTracingLevel
-                ? setting.tracingLevel
-                : DEFAULT_QUERY_SETTINGS.tracingLevel,
-        },
-        setSetting,
-    ] as const;
+    const settings: QuerySettings = {
+        queryMode: storageSettings.queryMode ?? DEFAULT_QUERY_SETTINGS.queryMode,
+        timeout: storageSettings.timeout ?? DEFAULT_QUERY_SETTINGS.timeout,
+        statisticsMode: storageSettings.statisticsMode ?? DEFAULT_QUERY_SETTINGS.statisticsMode,
+        transactionMode: storageSettings.transactionMode ?? DEFAULT_QUERY_SETTINGS.transactionMode,
+        tracingLevel: enableTracingLevel
+            ? storageSettings.tracingLevel
+            : DEFAULT_QUERY_SETTINGS.tracingLevel,
+    };
+
+    return [settings, setSettings] as const;
 };

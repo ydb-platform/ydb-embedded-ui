@@ -1,15 +1,16 @@
 import {Skeleton} from '@gravity-ui/uikit';
 
-import {DEFAULT_ALIGN} from './constants';
+import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from './constants';
 import {b} from './shared';
 import type {AlignType, Column, GetRowClassName} from './types';
 
 interface TableCellProps {
     height: number;
-    width: number;
+    width?: number;
     align?: AlignType;
     children: React.ReactNode;
     className?: string;
+    resizeable?: boolean;
 }
 
 const TableRowCell = ({
@@ -18,12 +19,17 @@ const TableRowCell = ({
     height,
     width,
     align = DEFAULT_ALIGN,
+    resizeable,
 }: TableCellProps) => {
-    // Additional maxWidth to ensure overflow hidden for <td>
     return (
         <td
             className={b('row-cell', {align: align}, className)}
-            style={{height: `${height}px`, width: `${width}px`, maxWidth: `${width}px`}}
+            style={{
+                height: `${height}px`,
+                width: `${width}px`,
+                // Additional maxWidth for resizeable columns to ensure overflow hidden for <td>
+                maxWidth: resizeable ? `${width}px` : undefined,
+            }}
         >
             {children}
         </td>
@@ -40,6 +46,8 @@ export const LoadingTableRow = <T,>({index, columns, height}: LoadingTableRowPro
     return (
         <tr className={b('row', {loading: true})}>
             {columns.map((column) => {
+                const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
+
                 return (
                     <TableRowCell
                         key={`${column.name}${index}`}
@@ -47,6 +55,7 @@ export const LoadingTableRow = <T,>({index, columns, height}: LoadingTableRowPro
                         width={column.width}
                         align={column.align}
                         className={column.className}
+                        resizeable={resizeable}
                     >
                         <Skeleton style={{width: '80%', height: '50%'}} />
                     </TableRowCell>
@@ -70,6 +79,8 @@ export const TableRow = <T,>({row, index, columns, getRowClassName, height}: Tab
     return (
         <tr className={b('row', additionalClassName)}>
             {columns.map((column) => {
+                const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
+
                 return (
                     <TableRowCell
                         key={`${column.name}${index}`}
@@ -77,6 +88,7 @@ export const TableRow = <T,>({row, index, columns, getRowClassName, height}: Tab
                         width={column.width}
                         align={column.align}
                         className={column.className}
+                        resizeable={resizeable}
                     >
                         {column.render({row, index})}
                     </TableRowCell>

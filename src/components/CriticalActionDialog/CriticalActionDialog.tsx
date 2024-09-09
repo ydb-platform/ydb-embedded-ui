@@ -25,7 +25,8 @@ const parseError = (error: IResponseError) => {
 
 interface CriticalActionDialogProps<T> {
     visible: boolean;
-    text: string;
+    header?: React.ReactNode;
+    text?: string;
     withRetry?: boolean;
     retryButtonText?: string;
     onClose: VoidFunction;
@@ -36,6 +37,7 @@ interface CriticalActionDialogProps<T> {
 
 export function CriticalActionDialog<T>({
     visible,
+    header,
     text,
     withRetry,
     retryButtonText,
@@ -64,15 +66,22 @@ export function CriticalActionDialog<T>({
             });
     };
 
+    const handleTransitionExited = () => {
+        setError(undefined);
+    };
+
     const renderDialogContent = () => {
         if (error) {
             return (
                 <React.Fragment>
+                    <Dialog.Header caption={header} />
                     <Dialog.Body className={b('body')}>
-                        <span className={b('error-icon')}>
-                            <CircleXmarkFill width="24" height="22" />
-                        </span>
-                        {parseError(error)}
+                        <div className={b('body-message', {error: true})}>
+                            <span className={b('error-icon')}>
+                                <CircleXmarkFill width="24" height="22" />
+                            </span>
+                            {parseError(error)}
+                        </div>
                     </Dialog.Body>
 
                     <Dialog.Footer
@@ -93,11 +102,15 @@ export function CriticalActionDialog<T>({
 
         return (
             <React.Fragment>
+                <Dialog.Header caption={header} />
+
                 <Dialog.Body className={b('body')}>
-                    <span className={b('warning-icon')}>
-                        <Icon data={TriangleExclamationFill} size={24} />
-                    </span>
-                    {text}
+                    <div className={b('body-message', {warning: true})}>
+                        <span className={b('warning-icon')}>
+                            <Icon data={TriangleExclamationFill} size={24} />
+                        </span>
+                        {text}
+                    </div>
                 </Dialog.Body>
 
                 <Dialog.Footer
@@ -120,7 +133,7 @@ export function CriticalActionDialog<T>({
             className={b()}
             size="s"
             onClose={onClose}
-            onTransitionExited={() => setError(undefined)}
+            onTransitionExited={handleTransitionExited}
         >
             {renderDialogContent()}
         </Dialog>

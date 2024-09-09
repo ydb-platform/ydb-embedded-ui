@@ -2,10 +2,10 @@ import type {SelectOption} from '@gravity-ui/uikit';
 import {Select} from '@gravity-ui/uikit';
 
 import type {
-    IsolationLevel,
     QueryMode,
     StatisticsMode,
     TracingLevel,
+    TransactionMode,
 } from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 
@@ -19,7 +19,7 @@ export const getOptionHeight = () => -1;
 
 const b = cn('ydb-query-settings-select');
 
-type SelectType = QueryMode | IsolationLevel | StatisticsMode | TracingLevel;
+type SelectType = QueryMode | TransactionMode | StatisticsMode | TracingLevel;
 type QuerySettingSelectOption<T> = SelectOption<T> & {isDefault?: boolean};
 
 interface QuerySettingsSelectProps<T extends SelectType> {

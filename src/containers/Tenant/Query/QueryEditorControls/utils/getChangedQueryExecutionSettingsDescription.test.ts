@@ -1,13 +1,13 @@
 import type {QuerySettings} from '../../../../../types/store/query';
 import {
-    ISOLATION_LEVELS,
-    ISOLATION_LEVELS_TITLES,
     QUERY_MODES,
     QUERY_MODES_TITLES,
     STATISTICS_MODES,
     STATISTICS_MODES_TITLES,
     TRACING_LEVELS,
     TRACING_LEVELS_TITLES,
+    TRANSACTION_MODES,
+    TRANSACTION_MODES_TITLES,
 } from '../../../../../utils/query';
 import {QUERY_SETTINGS_FIELD_SETTINGS} from '../../QuerySettingsDialog/constants';
 
@@ -15,7 +15,7 @@ import getChangedQueryExecutionSettingsDescription from './getChangedQueryExecut
 
 const DEFAULT_QUERY_SETTINGS: QuerySettings = {
     queryMode: QUERY_MODES.query,
-    isolationLevel: ISOLATION_LEVELS.serializable,
+    transactionMode: TRANSACTION_MODES.implicit,
     timeout: '60',
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.detailed,
@@ -57,7 +57,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
     it('should return the correct description for all changed settings', () => {
         const currentSettings: QuerySettings = {
             queryMode: QUERY_MODES.data,
-            isolationLevel: ISOLATION_LEVELS.snapshot,
+            transactionMode: TRANSACTION_MODES.snapshot,
             timeout: '120',
             statisticsMode: STATISTICS_MODES.profile,
             tracingLevel: TRACING_LEVELS.diagnostic,
@@ -70,8 +70,8 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
 
         expect(result).toEqual({
             [QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title]: QUERY_MODES_TITLES.data,
-            [QUERY_SETTINGS_FIELD_SETTINGS.isolationLevel.title]:
-                ISOLATION_LEVELS_TITLES['snapshot-read-only'],
+            [QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.title]:
+                TRANSACTION_MODES_TITLES['snapshot-read-only'],
             [QUERY_SETTINGS_FIELD_SETTINGS.timeout.title]: '120',
             [QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title]: STATISTICS_MODES_TITLES.profile,
             [QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title]: TRACING_LEVELS_TITLES.diagnostic,

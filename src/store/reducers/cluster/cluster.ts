@@ -1,8 +1,11 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {Dispatch, PayloadAction} from '@reduxjs/toolkit';
+import {skipToken} from '@reduxjs/toolkit/query';
+import {StringParam, useQueryParam} from 'use-query-params';
 
 import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
+import {parseTraceFields} from '../../../services/parsers/parseMetaCluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import {DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
 import {isQueryErrorResponse} from '../../../utils/query';
@@ -56,6 +59,7 @@ export const clusterApi = api.injectEndpoints({
             queryFn: async (clusterName, {signal}) => {
                 try {
                     const clusterData = await window.api.getClusterInfo(clusterName, {signal});
+
                     const clusterRoot = clusterData.Domain;
 
                     // Without domain we cannot get stats from system tables
@@ -95,6 +99,38 @@ export const clusterApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
+        getClusterBaseInfo: builder.query({
+            queryFn: async (clusterName: string, {signal}) => {
+                try {
+                    const data = await window.api.getClusterBaseInfo(clusterName, {signal});
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
     }),
     overrideExisting: 'throw',
 });
+
+export function useClusterBaseInfo() {
+    const [clusterName] = useQueryParam('clusterName', StringParam);
+
+    const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterName ?? skipToken);
+
+    const {
+        solomon: monitoring,
+        name,
+        trace_check: traceCheck,
+        trace_view: traceView,
+        ...data
+    } = currentData || {};
+
+    return {
+        ...data,
+        ...parseTraceFields({traceCheck, traceView}),
+        name: name ?? clusterName ?? undefined,
+        monitoring,
+    };
+}

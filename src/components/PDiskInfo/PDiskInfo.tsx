@@ -46,7 +46,6 @@ function getPDiskInfo<T extends PreparedPDisk>({
         SerialNumber,
         TotalSize,
         AllocatedSize,
-        DecommitStatus,
         StatusV2,
         NumActiveSlots,
         ExpectedSlotCount,
@@ -58,12 +57,6 @@ function getPDiskInfo<T extends PreparedPDisk>({
 
     const generalInfo: InfoViewerItem[] = [];
 
-    if (valueIsDefined(DecommitStatus)) {
-        generalInfo.push({
-            label: pDiskInfoKeyset('decomission-status'),
-            value: DecommitStatus.replace('DECOMMIT_', ''),
-        });
-    }
     if (valueIsDefined(Category)) {
         generalInfo.push({label: pDiskInfoKeyset('type'), value: Type});
     }

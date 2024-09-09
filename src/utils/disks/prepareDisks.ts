@@ -8,7 +8,12 @@ import type {PreparedPDisk, PreparedVDisk} from './types';
 
 export function prepareVDiskData(vdiskState: TVDiskStateInfo = {}): PreparedVDisk {
     // Prepare PDisk only if it is present
-    const PDisk = vdiskState.PDisk ? preparePDiskData(vdiskState.PDisk) : undefined;
+    const PDisk = vdiskState.PDisk
+        ? preparePDiskData({
+              ...vdiskState.PDisk,
+              NodeId: vdiskState.PDisk.NodeId ?? vdiskState.NodeId,
+          })
+        : undefined;
 
     const PDiskId = vdiskState.PDiskId ?? PDisk?.PDiskId;
 

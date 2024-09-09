@@ -1,15 +1,10 @@
-import React from 'react';
-
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../components/TableSkeleton/TableSkeleton';
-import {selectNodesMap} from '../../../store/reducers/nodesList';
 import {pDiskApi} from '../../../store/reducers/pdisk/pdisk';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
-import {useAutoRefreshInterval, useTypedSelector} from '../../../utils/hooks';
-import {
-    STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
-    getDiskPageStorageColumns,
-} from '../../Storage/StorageGroups/getStorageGroupsColumns';
+import {useAutoRefreshInterval} from '../../../utils/hooks';
+import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../../Storage/StorageGroups/columns/getStorageGroupsColumns';
+import {useGetDiskStorageColumns} from '../../Storage/StorageGroups/columns/hooks';
 
 interface PDiskGroupsProps {
     nodeId: string | number;
@@ -17,7 +12,6 @@ interface PDiskGroupsProps {
 }
 
 export function PDiskGroups({pDiskId, nodeId}: PDiskGroupsProps) {
-    const nodesMap = useTypedSelector(selectNodesMap);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const pDiskStorageQuery = pDiskApi.useGetStorageInfoQuery(
@@ -27,9 +21,7 @@ export function PDiskGroups({pDiskId, nodeId}: PDiskGroupsProps) {
     const loading = pDiskStorageQuery.isFetching && pDiskStorageQuery.currentData === undefined;
     const data = pDiskStorageQuery.currentData ?? [];
 
-    const pDiskStorageColumns = React.useMemo(() => {
-        return getDiskPageStorageColumns(nodesMap);
-    }, [nodesMap]);
+    const pDiskStorageColumns = useGetDiskStorageColumns();
 
     if (loading) {
         return <TableSkeleton />;

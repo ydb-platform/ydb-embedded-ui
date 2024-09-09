@@ -1,5 +1,57 @@
 # Changelog
 
+## [6.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.17.2...v6.18.0) (2024-09-04)
+
+
+### Features
+
+* **PDiskPage:** add decommission button ([#1168](https://github.com/ydb-platform/ydb-embedded-ui/issues/1168)) ([d3e5f70](https://github.com/ydb-platform/ydb-embedded-ui/commit/d3e5f70a4b71e95f6f42478b979a1157c80e6a36))
+* show query trace results ([#1248](https://github.com/ydb-platform/ydb-embedded-ui/issues/1248)) ([2be0f0b](https://github.com/ydb-platform/ydb-embedded-ui/commit/2be0f0b6aa931bf68597370923e7815935db4ba8))
+* **Storage:** add advanced disks view ([#1235](https://github.com/ydb-platform/ydb-embedded-ui/issues/1235)) ([3d780aa](https://github.com/ydb-platform/ydb-embedded-ui/commit/3d780aa4c6724f75a811c5d75061c2febd81a4a3))
+
+
+### Bug Fixes
+
+* **PaginatedTable:** fix table overflow, make column width optional ([#1234](https://github.com/ydb-platform/ydb-embedded-ui/issues/1234)) ([2d06930](https://github.com/ydb-platform/ydb-embedded-ui/commit/2d069305167ffb0b47c2d0e59ed2057dc73e649c))
+* **Tablet:** preserve query params when switch tabs ([#1254](https://github.com/ydb-platform/ydb-embedded-ui/issues/1254)) ([c79ccbc](https://github.com/ydb-platform/ydb-embedded-ui/commit/c79ccbc5c9a07b664620c3e3155d24f2754844b5))
+* **TopShards:** fix data update on schema object change ([#1245](https://github.com/ydb-platform/ydb-embedded-ui/issues/1245)) ([024fec4](https://github.com/ydb-platform/ydb-embedded-ui/commit/024fec40a4395a31e4780f7ab2206b25d0762e82))
+
+## [6.17.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.17.1...v6.17.2) (2024-09-02)
+
+
+### Bug Fixes
+
+* add implicit transaction_mode to query settings ([#1240](https://github.com/ydb-platform/ydb-embedded-ui/issues/1240)) ([75a0d89](https://github.com/ydb-platform/ydb-embedded-ui/commit/75a0d892bd30b31da49e1b0e56de87eb13ec00b8))
+
+## [6.17.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.17.0...v6.17.1) (2024-08-30)
+
+
+### Bug Fixes
+
+* **PaginatedTable:** fix layout ([#1237](https://github.com/ydb-platform/ydb-embedded-ui/issues/1237)) ([fc22275](https://github.com/ydb-platform/ydb-embedded-ui/commit/fc2227553b92ce2b0850a949f1636397b3307784))
+
+## [6.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.16.0...v6.17.0) (2024-08-29)
+
+
+### Features
+
+* add setting to add tracing to all requests ([#1218](https://github.com/ydb-platform/ydb-embedded-ui/issues/1218)) ([d7df777](https://github.com/ydb-platform/ydb-embedded-ui/commit/d7df77750d123be881264993c2333c1767a8b66c))
+* display all types of keys as plain text ([#1219](https://github.com/ydb-platform/ydb-embedded-ui/issues/1219)) ([13d21cb](https://github.com/ydb-platform/ydb-embedded-ui/commit/13d21cb3bfcca00138e08f83b00cc4068d12dc51))
+* **Tablets:** pass database and nodeId params to api handler ([#1199](https://github.com/ydb-platform/ydb-embedded-ui/issues/1199)) ([c049f75](https://github.com/ydb-platform/ydb-embedded-ui/commit/c049f75f0bbd140e40c3caa196a95e0c702ce091))
+* **VDiskPage:** use storage table instead of storage info ([#1209](https://github.com/ydb-platform/ydb-embedded-ui/issues/1209)) ([027c668](https://github.com/ydb-platform/ydb-embedded-ui/commit/027c668d917b216646ec15f659707dc146b23d87))
+
+
+### Bug Fixes
+
+* **AsyncReplicationInfo:** do not show empty fields ([#1189](https://github.com/ydb-platform/ydb-embedded-ui/issues/1189)) ([7b1eff6](https://github.com/ydb-platform/ydb-embedded-ui/commit/7b1eff693c4e4440b96f7a9d2628b916d9d58131))
+* incorrect database count with hidden root ([#1206](https://github.com/ydb-platform/ydb-embedded-ui/issues/1206)) ([c0f716f](https://github.com/ydb-platform/ydb-embedded-ui/commit/c0f716f3e30df1ae00aaad231748a8807e395359))
+* **Overview:** use nodes?group=Version to get node versions ([#1230](https://github.com/ydb-platform/ydb-embedded-ui/issues/1230)) ([d95ea95](https://github.com/ydb-platform/ydb-embedded-ui/commit/d95ea95c3cd392b9e7052268703b469212c0f508))
+* paginated tables not working in safari ([#1231](https://github.com/ydb-platform/ydb-embedded-ui/issues/1231)) ([7162aeb](https://github.com/ydb-platform/ydb-embedded-ui/commit/7162aeb81e1bd453eb8f401a359f922716dd6148))
+* remove binary data setting description ([#1180](https://github.com/ydb-platform/ydb-embedded-ui/issues/1180)) ([ec46259](https://github.com/ydb-platform/ydb-embedded-ui/commit/ec46259195e213c0d5c65aca6857ce3b65b32f75))
+* set ErrorBoundary max width ([#1221](https://github.com/ydb-platform/ydb-embedded-ui/issues/1221)) ([3191b31](https://github.com/ydb-platform/ydb-embedded-ui/commit/3191b31e0a42970ed4cdd25b21f313381cb57eb5))
+* **store:** remove unused params from url mapping ([#1227](https://github.com/ydb-platform/ydb-embedded-ui/issues/1227)) ([be442a0](https://github.com/ydb-platform/ydb-embedded-ui/commit/be442a055a50003ad189a12e372cdf7a2a4d0de8))
+* **Versions:** use /nodes instead of /sysinfo to collect versions ([#1220](https://github.com/ydb-platform/ydb-embedded-ui/issues/1220)) ([217d77b](https://github.com/ydb-platform/ydb-embedded-ui/commit/217d77bab69a8e2277de3e4077c3f407b36cd70c))
+
 ## [6.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.15.1...v6.16.0) (2024-08-21)
 
 

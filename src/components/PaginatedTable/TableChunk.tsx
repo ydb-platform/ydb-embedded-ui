@@ -142,7 +142,17 @@ export const TableChunk = <T, F>({
     const chunkHeight = dataLength ? dataLength * rowHeight : limit * rowHeight;
 
     return (
-        <tbody ref={ref} id={id.toString()} style={{height: `${chunkHeight}px`}}>
+        <tbody
+            ref={ref}
+            id={id.toString()}
+            style={{
+                height: `${chunkHeight}px`,
+                // Default display: table-row-group doesn't work in Safari and breaks the table
+                // display: block works in Safari, but disconnects thead and tbody cell grids
+                // Hack to make it work in all cases
+                display: isActive ? 'table-row-group' : 'block',
+            }}
+        >
             {renderContent()}
         </tbody>
     );

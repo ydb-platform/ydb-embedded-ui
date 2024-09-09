@@ -11,6 +11,7 @@ import {
     QUERY_USE_MULTI_SCHEMA_KEY,
     SHOW_DOMAIN_DATABASE_KEY,
     THEME_KEY,
+    USE_ADVANCED_STORAGE_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     USE_PAGINATED_TABLES_KEY,
@@ -95,6 +96,11 @@ export const useNodesEndpointSetting: SettingProps = {
     title: i18n('settings.useNodesEndpoint.title'),
     description: i18n('settings.useNodesEndpoint.description'),
 };
+export const useAdvancedStorageSetting: SettingProps = {
+    settingKey: USE_ADVANCED_STORAGE_KEY,
+    title: i18n('settings.useAdvancedStorage.title'),
+    description: i18n('settings.useAdvancedStorage.description'),
+};
 export const usePaginatedTables: SettingProps = {
     settingKey: USE_PAGINATED_TABLES_KEY,
     title: i18n('settings.usePaginatedTables.title'),
@@ -149,7 +155,12 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [useNodesEndpointSetting, usePaginatedTables, queryUseMultiSchemaSetting],
+    settings: [
+        useNodesEndpointSetting,
+        useAdvancedStorageSetting,
+        usePaginatedTables,
+        queryUseMultiSchemaSetting,
+    ],
 };
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',

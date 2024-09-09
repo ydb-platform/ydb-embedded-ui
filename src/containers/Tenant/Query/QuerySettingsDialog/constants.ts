@@ -1,38 +1,43 @@
 import {
-    ISOLATION_LEVELS,
-    ISOLATION_LEVELS_TITLES,
     QUERY_MODES,
     QUERY_MODES_TITLES,
     STATISTICS_MODES,
     STATISTICS_MODES_TITLES,
     TRACING_LEVELS,
     TRACING_LEVELS_TITLES,
+    TRANSACTION_MODES,
+    TRANSACTION_MODES_TITLES,
 } from '../../../../utils/query';
 import i18n from '../i18n';
 
 import formI18n from './i18n';
 
-export const ISOLATION_LEVEL_SELECT_OPTIONS = [
+export const TRANSACTION_MODE_SELECT_OPTIONS = [
     {
-        value: ISOLATION_LEVELS.serializable,
-        content: ISOLATION_LEVELS_TITLES[ISOLATION_LEVELS.serializable],
-        text: i18n('isolation-level-description.serializable'),
+        value: TRANSACTION_MODES.implicit,
+        content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.implicit],
+        text: i18n('transaction-mode-description.implicit'),
         isDefault: true,
     },
     {
-        value: ISOLATION_LEVELS.onlinero,
-        content: ISOLATION_LEVELS_TITLES[ISOLATION_LEVELS.onlinero],
-        text: i18n('isolation-level-description.onlinero'),
+        value: TRANSACTION_MODES.serializable,
+        content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.serializable],
+        text: i18n('transaction-mode-description.serializable'),
     },
     {
-        value: ISOLATION_LEVELS.stalero,
-        content: ISOLATION_LEVELS_TITLES[ISOLATION_LEVELS.stalero],
-        text: i18n('isolation-level-description.stalero'),
+        value: TRANSACTION_MODES.onlinero,
+        content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.onlinero],
+        text: i18n('transaction-mode-description.onlinero'),
     },
     {
-        value: ISOLATION_LEVELS.snapshot,
-        content: ISOLATION_LEVELS_TITLES[ISOLATION_LEVELS.snapshot],
-        text: i18n('isolation-level-description.snapshot'),
+        value: TRANSACTION_MODES.stalero,
+        content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.stalero],
+        text: i18n('transaction-mode-description.stalero'),
+    },
+    {
+        value: TRANSACTION_MODES.snapshot,
+        content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.snapshot],
+        text: i18n('transaction-mode-description.snapshot'),
     },
 ];
 
@@ -124,9 +129,9 @@ export const TRACING_LEVEL_SELECT_OPTIONS = [
 ];
 
 export const QUERY_SETTINGS_FIELD_SETTINGS = {
-    isolationLevel: {
-        title: formI18n('form.isolation-level'),
-        options: ISOLATION_LEVEL_SELECT_OPTIONS,
+    transactionMode: {
+        title: formI18n('form.transaction-mode'),
+        options: TRANSACTION_MODE_SELECT_OPTIONS,
     },
     queryMode: {
         title: formI18n('form.query-mode'),

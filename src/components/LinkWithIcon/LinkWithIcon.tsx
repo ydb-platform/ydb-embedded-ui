@@ -14,9 +14,15 @@ interface ExternalLinkWithIconProps {
     title: string;
     url: string;
     external?: boolean;
+    className?: string;
 }
 
-export const LinkWithIcon = ({title, url, external = true}: ExternalLinkWithIconProps) => {
+export const LinkWithIcon = ({
+    title,
+    url,
+    external = true,
+    className,
+}: ExternalLinkWithIconProps) => {
     const linkContent = (
         <React.Fragment>
             {title}
@@ -27,14 +33,14 @@ export const LinkWithIcon = ({title, url, external = true}: ExternalLinkWithIcon
 
     if (external) {
         return (
-            <Link href={url} target="_blank" className={b()}>
+            <Link href={url} target="_blank" className={b(null, className)}>
                 {linkContent}
             </Link>
         );
     }
 
     return (
-        <InternalLink to={url} className={b()}>
+        <InternalLink to={url} className={b(null, className)}>
             {linkContent}
         </InternalLink>
     );

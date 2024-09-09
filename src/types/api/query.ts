@@ -1,5 +1,5 @@
 import {TRACING_LEVELS} from '../../utils/query';
-import type {IsolationLevel, StatisticsMode} from '../store/query';
+import type {StatisticsMode} from '../store/query';
 
 // ==== types from backend protos ====
 interface Position {
@@ -218,9 +218,6 @@ export type Stats = StatisticsMode;
 /** undefined = '60000' */
 export type Timeout = number;
 
-/** undefined = 'serializable-read-write' */
-export type TransactionMode = IsolationLevel;
-
 /** undefined = '15' */
 export type TracingLevel = number;
 
@@ -336,7 +333,7 @@ export type CancelResponse = {
 };
 
 // ==== Combined API response ====
-export type QueryAPIResponse<
+export type QueryAPIResponseByAction<
     Action extends Actions,
     Schema extends Schemas,
 > = Action extends ExplainActions
@@ -346,6 +343,17 @@ export type QueryAPIResponse<
       : Action extends CancelActions
         ? CancelResponse
         : never;
+
+type QueryAPIResponseMeta = {
+    _meta?: {
+        traceId?: string;
+    };
+};
+
+export type QueryAPIResponse<
+    Action extends Actions,
+    Schema extends Schemas,
+> = QueryAPIResponseByAction<Action, Schema> & QueryAPIResponseMeta;
 
 // ==== types to use in query result preparation ====
 export type AnyExplainResponse = ExplainQueryResponse | ExplainScriptResponse;

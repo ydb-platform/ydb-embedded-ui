@@ -39,6 +39,8 @@ export interface MetaGeneralClusterInfo {
     balancer?: string;
     service?: string;
     cluster?: MetaViewerClusterInfo;
+    trace_view?: string;
+    trace_check?: string;
 }
 
 // In case of error in viewer /cluster request mvp return error field instead of cluster data

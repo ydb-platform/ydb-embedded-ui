@@ -2,7 +2,6 @@ import AxiosWrapper from '@gravity-ui/axios-wrapper';
 import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import type {AxiosRequestConfig} from 'axios';
 import axiosRetry from 'axios-retry';
-import qs from 'qs';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
@@ -16,12 +15,17 @@ import type {DescribeConsumerResult} from '../types/api/consumer';
 import type {FeatureFlagConfigs} from '../types/api/featureFlags';
 import type {HealthCheckAPIResponse} from '../types/api/healthcheck';
 import type {JsonHotKeysResponse} from '../types/api/hotkeys';
-import type {MetaCluster, MetaClusters, MetaTenants} from '../types/api/meta';
+import type {
+    MetaCluster,
+    MetaClusters,
+    MetaGeneralClusterInfo,
+    MetaTenants,
+} from '../types/api/meta';
 import type {ModifyDiskResponse} from '../types/api/modifyDisk';
 import type {TNetInfo} from '../types/api/netInfo';
 import type {TNodesInfo} from '../types/api/nodes';
 import type {TEvNodesInfo} from '../types/api/nodesList';
-import type {TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
+import type {EDecommitStatus, TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
 import type {
     Actions,
     ErrorResponse,
@@ -30,7 +34,6 @@ import type {
     Stats,
     Timeout,
     TracingLevel,
-    TransactionMode,
 } from '../types/api/query';
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/render';
 import type {TEvDescribeSchemeResult} from '../types/api/schema';
@@ -46,17 +49,23 @@ import type {TTenantInfo, TTenants} from '../types/api/tenant';
 import type {DescribeTopicResult} from '../types/api/topic';
 import type {TEvVDiskStateResponse} from '../types/api/vdisk';
 import type {TUserToken} from '../types/api/whoami';
-import type {QuerySyntax} from '../types/store/query';
+import type {QuerySyntax, TransactionMode} from '../types/store/query';
 import {
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
+    SECOND_IN_MS,
 } from '../utils/constants';
 import {prepareSortValue} from '../utils/filters';
+import {isAxiosError} from '../utils/response';
 import type {Nullable} from '../utils/typecheckers';
 
 import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
+
+const TRACE_CHECK_TIMEOUT = 2 * SECOND_IN_MS;
+const TRACE_API_ERROR_TIMEOUT = 10 * SECOND_IN_MS;
+const MAX_TRACE_CHECK_RETRIES = 30;
 
 type AxiosOptions = {
     concurrentId?: string;
@@ -87,6 +96,25 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             }
 
             return config;
+        });
+
+        // Add traceId to response if it exists
+        this._axios.interceptors.response.use(function (response) {
+            if (
+                response.data &&
+                response.data instanceof Object &&
+                !Array.isArray(response.data) &&
+                response.headers['traceresponse']
+            ) {
+                const traceId = response.headers['traceresponse'].split('-')[1];
+
+                response.data = {
+                    ...response.data,
+                    _meta: {...response.data._meta, traceId},
+                };
+            }
+
+            return response;
         });
 
         // Interceptor to process OIDC auth
@@ -541,6 +569,36 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId: concurrentId || 'getHotKeys', requestConfig: {signal}},
         );
     }
+
+    checkTrace({url}: {url: string}, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get(
+            url,
+            {},
+            {
+                concurrentId: concurrentId || 'checkTrace',
+                requestConfig: {
+                    signal,
+                    timeout: TRACE_CHECK_TIMEOUT,
+                    'axios-retry': {
+                        retries: MAX_TRACE_CHECK_RETRIES,
+                        retryDelay: (_: number, error: unknown) => {
+                            const isTracingError =
+                                isAxiosError(error) &&
+                                (error?.response?.status === 404 || error.code === 'ERR_NETWORK');
+
+                            if (isTracingError) {
+                                return TRACE_CHECK_TIMEOUT;
+                            }
+
+                            return TRACE_API_ERROR_TIMEOUT;
+                        },
+                        shouldResetTimeout: true,
+                        retryCondition: () => true,
+                    },
+                },
+            },
+        );
+    }
     getHealthcheckInfo(
         {database, maxLevel}: {database: string; maxLevel?: number},
         {concurrentId, signal}: AxiosOptions = {},
@@ -566,24 +624,18 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         vDiskIdx: string | number;
         force?: boolean;
     }) {
-        const params = {
-            group_id: groupId,
-            group_generation_id: groupGeneration,
-            fail_realm_idx: failRealmIdx,
-            fail_domain_idx: failDomainIdx,
-            vdisk_idx: vDiskIdx,
-
-            force,
-        };
-
-        const paramsString = qs.stringify(params);
-
-        const path = this.getPath(`/vdisk/evict?${paramsString}`);
-
         return this.post<ModifyDiskResponse>(
-            path,
+            this.getPath('/vdisk/evict'),
             {},
-            {},
+            {
+                group_id: groupId,
+                group_generation_id: groupGeneration,
+                fail_realm_idx: failRealmIdx,
+                fail_domain_idx: failDomainIdx,
+                vdisk_idx: vDiskIdx,
+
+                force,
+            },
             {
                 requestConfig: {'axios-retry': {retries: 0}},
             },
@@ -599,9 +651,39 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         force?: boolean;
     }) {
         return this.post<ModifyDiskResponse>(
-            this.getPath(`/pdisk/restart?node_id=${nodeId}&pdisk_id=${pDiskId}&force=${force}`),
+            this.getPath('/pdisk/restart'),
             {},
-            {},
+            {
+                node_id: nodeId,
+                pdisk_id: pDiskId,
+                force,
+            },
+            {
+                requestConfig: {'axios-retry': {retries: 0}},
+            },
+        );
+    }
+    changePDiskStatus({
+        nodeId,
+        pDiskId,
+        force,
+        decommissionStatus,
+    }: {
+        nodeId: number | string;
+        pDiskId: number | string;
+        force?: boolean;
+        decommissionStatus?: EDecommitStatus;
+    }) {
+        return this.post<ModifyDiskResponse>(
+            this.getPath('/pdisk/status'),
+            {
+                decommit_status: decommissionStatus,
+            },
+            {
+                node_id: nodeId,
+                pdisk_id: pDiskId,
+                force,
+            },
             {
                 requestConfig: {'axios-retry': {retries: 0}},
             },
@@ -693,13 +775,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
 
-    // used if not single cluster mode
-    getClustersList(_?: never, {signal}: {signal?: AbortSignal} = {}) {
-        return this.get<MetaClusters>(`${META_BACKEND || ''}/meta/clusters`, null, {
-            requestConfig: {signal},
-        });
-    }
-
     createSchemaDirectory(
         {database, path}: {database: string; path: string},
         {signal}: {signal?: AbortSignal} = {},
@@ -716,9 +791,26 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
+
+    getClustersList(_?: never, __: {signal?: AbortSignal} = {}): Promise<MetaClusters> {
+        throw new Error('Method is not implemented.');
+    }
+
+    getClusterBaseInfo(
+        _clusterName: string,
+        _opts: AxiosOptions = {},
+    ): Promise<MetaGeneralClusterInfo> {
+        throw new Error('Method is not implemented.');
+    }
 }
 
 export class YdbWebVersionAPI extends YdbEmbeddedAPI {
+    getClustersList(_?: never, {signal}: {signal?: AbortSignal} = {}) {
+        return this.get<MetaClusters>(`${META_BACKEND || ''}/meta/clusters`, null, {
+            requestConfig: {signal},
+        });
+    }
+
     getClusterInfo(clusterName: string, {signal}: AxiosOptions = {}) {
         return this.get<MetaCluster>(
             `${META_BACKEND || ''}/meta/cluster`,
@@ -729,14 +821,27 @@ export class YdbWebVersionAPI extends YdbEmbeddedAPI {
         ).then(parseMetaCluster);
     }
 
-    getTenants(clusterName: string, {concurrentId, signal}: AxiosOptions = {}) {
+    getTenants(clusterName: string, {signal}: AxiosOptions = {}) {
         return this.get<MetaTenants>(
             `${META_BACKEND || ''}/meta/cp_databases`,
             {
                 cluster_name: clusterName,
             },
-            {concurrentId, requestConfig: {signal}},
+            {requestConfig: {signal}},
         ).then(parseMetaTenants);
+    }
+
+    getClusterBaseInfo(
+        clusterName: string,
+        {concurrentId, signal}: AxiosOptions = {},
+    ): Promise<MetaGeneralClusterInfo> {
+        return this.get<MetaGeneralClusterInfo[]>(
+            `${META_BACKEND || ''}/meta/db_clusters`,
+            {
+                name: clusterName,
+            },
+            {concurrentId, requestConfig: {signal}},
+        ).then((data) => data[0]);
     }
 }
 

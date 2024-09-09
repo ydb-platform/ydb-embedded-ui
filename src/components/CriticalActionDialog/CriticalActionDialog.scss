@@ -1,5 +1,5 @@
 .ydb-critical-dialog {
-    padding-top: var(--g-spacing-7);
+    padding-top: var(--g-spacing-3);
 
     &__warning-icon {
         margin-right: 16px;
@@ -16,6 +16,28 @@
 
     &__body {
         display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-6);
+    }
+
+    &__body-message {
+        display: flex;
         align-items: center;
+
+        &_warning,
+        &_error {
+            padding: var(--g-spacing-4) var(--g-spacing-5);
+
+            border: 1px solid;
+            border-radius: var(--g-modal-border-radius, 5px);
+        }
+
+        &_warning {
+            border-color: var(--ydb-color-status-yellow);
+        }
+
+        &_error {
+            border-color: var(--ydb-color-status-red);
+        }
     }
 }

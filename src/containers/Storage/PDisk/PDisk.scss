@@ -40,12 +40,14 @@
 
     &__media-type {
         position: absolute;
-        top: 0;
+        top: 50%;
         right: 4px;
 
         font-size: var(--g-text-body-1-font-size);
-        line-height: var(--g-text-body-3-line-height);
+        line-height: var(--g-text-body-1-line-height);
 
         color: var(--g-color-text-secondary);
+
+        transform: translateY(-50%);
     }
 }
