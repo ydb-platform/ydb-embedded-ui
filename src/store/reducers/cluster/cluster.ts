@@ -114,6 +114,14 @@ export const clusterApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
+function normalizeDomain(domain?: string) {
+    if (!domain) {
+        return undefined;
+    }
+    const normalizedDomain = domain.startsWith('/') ? domain.slice(1) : domain;
+    return normalizedDomain.toUpperCase();
+}
+
 export function useClusterBaseInfo() {
     const [clusterName] = useQueryParam('clusterName', StringParam);
 
@@ -127,10 +135,16 @@ export function useClusterBaseInfo() {
         ...data
     } = currentData || {};
 
+    const normalizedClusterName = name ?? clusterName;
+
+    const {currentData: baseClusterInfo} = clusterApi.useGetClusterInfoQuery(
+        normalizedClusterName ? skipToken : undefined,
+    );
+
     return {
         ...data,
         ...parseTraceFields({traceCheck, traceView}),
-        name: name ?? clusterName ?? undefined,
+        name: normalizedClusterName ?? normalizeDomain(baseClusterInfo?.clusterData.Domain),
         monitoring,
     };
 }
