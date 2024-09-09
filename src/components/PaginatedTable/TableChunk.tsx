@@ -21,6 +21,7 @@ interface TableChunkProps<T, F> {
     columns: Column<T>[];
     filters?: F;
     sortParams?: SortParams;
+    observer: IntersectionObserver;
     isActive: boolean;
     tableName: string;
 
@@ -40,6 +41,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     tableName,
     filters,
     sortParams,
+    observer,
     getRowClassName,
     renderErrorMessage,
     onDataFetched,
@@ -78,6 +80,19 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
             window.clearTimeout(timeout);
         };
     }, [isActive, isTimeoutActive]);
+
+    React.useEffect(() => {
+        const el = ref.current;
+        if (el) {
+            observer.observe(el);
+        }
+
+        return () => {
+            if (el) {
+                observer.unobserve(el);
+            }
+        };
+    }, [observer]);
 
     React.useEffect(() => {
         if (currentData && isActive) {
