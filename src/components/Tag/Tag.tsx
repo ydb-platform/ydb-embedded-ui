@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {cn} from '../../utils/cn';
 
 import './Tag.scss';
@@ -7,7 +9,7 @@ const b = cn('tag');
 export type TagType = 'blue';
 
 interface TagProps {
-    text: string;
+    text: React.ReactNode;
     type?: TagType;
 }
 
