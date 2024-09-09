@@ -5,6 +5,7 @@ import type {Column} from '@gravity-ui/react-data-table';
 import {Icon, Popover, Switch} from '@gravity-ui/uikit';
 import {StringParam, useQueryParam} from 'use-query-params';
 
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
@@ -83,31 +84,6 @@ const columns: Column<FeatureFlagConfig>[] = [
     },
 ];
 
-interface FeatureFlagsListsProps {
-    isError?: boolean;
-    featureFlags: FeatureFlagConfig[];
-    featureFlagsFilter?: string;
-}
-
-const FeatureFlagsList = ({isError, featureFlags, featureFlagsFilter}: FeatureFlagsListsProps) => {
-    if (isError) {
-        return i18n('error-msg');
-    }
-
-    if (!featureFlags.length) {
-        return i18n(featureFlagsFilter ? 'search-empty' : 'no-data');
-    }
-
-    return (
-        <ResizeableDataTable
-            columnsWidthLSKey={FEATURE_FLAGS_COLUMNS_WIDTH_LS_KEY}
-            columns={columns}
-            data={featureFlags}
-            settings={DEFAULT_TABLE_SETTINGS}
-        />
-    );
-};
-
 interface ConfigsProps {
     database: string;
 }
@@ -115,17 +91,15 @@ interface ConfigsProps {
 export const Configs = ({database}: ConfigsProps) => {
     const dispatch = useTypedDispatch();
     const [search, setSearch] = useQueryParam('search', StringParam);
-    const {currentData = [], isFetching, isError} = tenantApi.useGetClusterConfigQuery({database});
+    const {currentData = [], isFetching, error} = tenantApi.useGetClusterConfigQuery({database});
     const featureFlagsFilter = useTypedSelector(
         (state) => state.tenant.featureFlagsFilter,
     )?.toLocaleLowerCase();
 
-    // sync store and query filter
+    // apply permalink state
     React.useEffect(() => {
         if (search) {
             dispatch(setFeatureFlagsFilter(search));
-        } else if (featureFlagsFilter) {
-            setSearch(featureFlagsFilter, 'replaceIn');
         }
     }, []);
 
@@ -148,11 +122,17 @@ export const Configs = ({database}: ConfigsProps) => {
                 />
             </TableWithControlsLayout.Controls>
             <TableWithControlsLayout.Table loading={isFetching}>
-                <FeatureFlagsList
-                    isError={isError}
-                    featureFlags={featureFlags}
-                    featureFlagsFilter={featureFlagsFilter}
-                />
+                {error ? (
+                    <ResponseError error={error} />
+                ) : (
+                    <ResizeableDataTable
+                        emptyDataMessage={i18n(featureFlagsFilter ? 'search-empty' : 'no-data')}
+                        columnsWidthLSKey={FEATURE_FLAGS_COLUMNS_WIDTH_LS_KEY}
+                        columns={columns}
+                        data={featureFlags}
+                        settings={DEFAULT_TABLE_SETTINGS}
+                    />
+                )}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );
