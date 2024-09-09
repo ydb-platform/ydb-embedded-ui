@@ -52,7 +52,7 @@ export const getNodes: FetchData<
     // FOR TESTING
     let mockedData = preparedResponse.Nodes?.slice();
 
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 1000; i++) {
         mockedData = mockedData?.concat(
             preparedResponse.Nodes?.map((data, j) => ({
                 ...data,
