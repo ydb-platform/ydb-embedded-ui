@@ -63,7 +63,7 @@ export const tenantApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
         getClusterConfig: builder.query({
-            queryFn: async ({database}: {database?: string}, {signal}) => {
+            queryFn: async ({database}: {database: string}, {signal}) => {
                 try {
                     const res = await window.api.getClusterConfig(database, {signal});
                     const db = res.Databases[0];
