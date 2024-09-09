@@ -12,6 +12,7 @@ import type {CapabilitiesResponse} from '../types/api/capabilities';
 import type {TClusterInfo} from '../types/api/cluster';
 import type {TComputeInfo} from '../types/api/compute';
 import type {DescribeConsumerResult} from '../types/api/consumer';
+import type {FeatureFlagConfigs} from '../types/api/featureFlags';
 import type {HealthCheckAPIResponse} from '../types/api/healthcheck';
 import type {JsonHotKeysResponse} from '../types/api/hotkeys';
 import type {
@@ -145,6 +146,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 tablets: true,
             },
             {concurrentId: concurrentId || `getClusterInfo`, requestConfig: {signal}},
+        );
+    }
+    getClusterConfig(database?: string, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<FeatureFlagConfigs>(
+            this.getPath('/viewer/feature_flags'),
+            {
+                database,
+            },
+            {concurrentId, requestConfig: {signal}},
         );
     }
     getNodeInfo(id?: string | number, {concurrentId, signal}: AxiosOptions = {}) {
