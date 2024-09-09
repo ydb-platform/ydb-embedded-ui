@@ -7,7 +7,6 @@ import type {
     setQueryResult,
     setTenantPath,
     updateQueryInHistory,
-    updateQueryResult,
 } from '../../store/reducers/executeQuery';
 import type {PreparedExplainResponse} from '../../store/reducers/explainQuery/types';
 
@@ -29,26 +28,25 @@ export enum ResultType {
 interface CommonResultParams {
     queryId: string;
     isLoading: boolean;
-    cancelledStatus?: 'error' | 'success' | 'loading';
 }
 
-export type ExecuteQueryResult = (
-    | {
-          type: ResultType.EXECUTE;
-          data?: IQueryResult;
-          error?: unknown;
-      }
-    | {
-          type: ResultType.EXPLAIN;
-          data?: PreparedExplainResponse;
-          error?: unknown;
-      }
-) &
-    CommonResultParams;
+export type ExecuteQueryResult = {
+    type: ResultType.EXECUTE;
+    data?: IQueryResult;
+    error?: unknown;
+} & CommonResultParams;
+
+export type EplainQueryResult = {
+    type: ResultType.EXPLAIN;
+    data?: PreparedExplainResponse;
+    error?: unknown;
+} & CommonResultParams;
+
+export type QueryResult = ExecuteQueryResult | EplainQueryResult;
 
 export interface ExecuteQueryState {
     input: string;
-    result?: ExecuteQueryResult;
+    result?: QueryResult;
     history: {
         // String type for backward compatibility
         queries: QueryInHistory[];
@@ -62,7 +60,6 @@ export type ExecuteQueryAction =
     | ReturnType<typeof goToNextQuery>
     | ReturnType<typeof goToPreviousQuery>
     | ReturnType<typeof changeUserInput>
-    | ReturnType<typeof updateQueryResult>
     | ReturnType<typeof setQueryResult>
     | ReturnType<typeof saveQueryToHistory>
     | ReturnType<typeof updateQueryInHistory>

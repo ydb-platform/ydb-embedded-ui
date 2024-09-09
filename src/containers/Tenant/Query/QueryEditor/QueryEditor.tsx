@@ -9,7 +9,6 @@ import {v4 as uuidv4} from 'uuid';
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import SplitPane from '../../../../components/SplitPane';
 import type {RootState} from '../../../../store';
-import {cancelQueryApi} from '../../../../store/reducers/cancelQuery';
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {
     executeQueryApi,
@@ -24,7 +23,7 @@ import {setQueryAction} from '../../../../store/reducers/queryActions/queryActio
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import {ResultType} from '../../../../types/store/executeQuery';
-import type {ExecuteQueryResult, ExecuteQueryState} from '../../../../types/store/executeQuery';
+import type {ExecuteQueryState, QueryResult} from '../../../../types/store/executeQuery';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
@@ -98,9 +97,7 @@ function QueryEditor(props: QueryEditorProps) {
     } = props;
     const {tenantPath: savedPath} = executeQuery;
 
-    const [isResultLoaded, setIsResultLoaded] = React.useState(
-        (executeQuery.result?.data || executeQuery.result?.error) && savedPath === tenantName,
-    );
+    const isResultLoaded = Boolean(executeQuery.result);
 
     const [querySettings] = useQueryExecutionSettings();
     const enableTracingLevel = useTracingLevelOptionAvailable();
@@ -115,7 +112,6 @@ function QueryEditor(props: QueryEditorProps) {
 
     const [sendExecuteQuery] = executeQueryApi.useExecuteQueryMutation();
     const [sendExplainQuery] = explainQueryApi.useExplainQueryMutation();
-    const [sendCancelQuery] = cancelQueryApi.useCancelQueryMutation();
 
     React.useEffect(() => {
         if (savedPath !== tenantName) {
@@ -180,7 +176,6 @@ function QueryEditor(props: QueryEditorProps) {
             queryId,
         });
 
-        setIsResultLoaded(true);
         props.setShowPreview(false);
 
         // Don't save partial queries in history
@@ -217,17 +212,10 @@ function QueryEditor(props: QueryEditorProps) {
             queryId,
         });
 
-        setIsResultLoaded(true);
         props.setShowPreview(false);
 
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     });
-
-    const handleStopButtonClick = React.useCallback(() => {
-        if (executeQuery.result?.queryId) {
-            sendCancelQuery({queryId: executeQuery.result?.queryId, database: tenantName});
-        }
-    }, [executeQuery.result?.queryId, sendCancelQuery, tenantName]);
 
     const handleSendQuery = useEventHandler(() => {
         if (lastUsedQueryAction === QUERY_ACTIONS.explain) {
@@ -380,7 +368,6 @@ function QueryEditor(props: QueryEditorProps) {
                         resultVisibilityState={resultVisibilityState}
                         onExpandResultHandler={onExpandResultHandler}
                         onCollapseResultHandler={onCollapseResultHandler}
-                        onStopButtonClick={handleStopButtonClick}
                         type={type}
                         theme={theme}
                         result={executeQuery.result}
@@ -419,10 +406,9 @@ interface ResultProps {
     resultVisibilityState: InitialPaneState;
     onExpandResultHandler: VoidFunction;
     onCollapseResultHandler: VoidFunction;
-    onStopButtonClick: VoidFunction;
     type?: EPathType;
     theme: string;
-    result?: ExecuteQueryResult;
+    result?: QueryResult;
     tenantName: string;
     path: string;
     showPreview?: boolean;
@@ -431,7 +417,6 @@ function Result({
     resultVisibilityState,
     onExpandResultHandler,
     onCollapseResultHandler,
-    onStopButtonClick,
     type,
     theme,
     result,
@@ -443,21 +428,15 @@ function Result({
         return <Preview database={tenantName} path={path} type={type} />;
     }
 
-    console.log(result);
-
     if (result?.type === ResultType.EXECUTE) {
         return (
             <ExecuteResult
-                data={result.data}
-                error={result.error}
-                cancelError={result.cancelledStatus === 'error'}
+                result={result}
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}
                 theme={theme}
-                loading={result.isLoading}
-                cancelQueryLoading={result.cancelledStatus === 'loading'}
-                onStopButtonClick={onStopButtonClick}
+                tenantName={tenantName}
             />
         );
     }
@@ -467,18 +446,15 @@ function Result({
 
         return (
             <ExplainResult
-                error={result.error}
-                cancelError={result.cancelledStatus === 'error'}
+                result={result}
                 explain={plan}
                 simplifiedPlan={simplifiedPlan}
                 ast={ast}
-                loading={result.isLoading}
-                cancelQueryLoading={result.cancelledStatus === 'loading'}
                 theme={theme}
+                tenantName={tenantName}
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}
-                onStopButtonClick={onStopButtonClick}
             />
         );
     }

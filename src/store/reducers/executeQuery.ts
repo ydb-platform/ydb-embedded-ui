@@ -6,10 +6,10 @@ import type {ExecuteActions, Schemas} from '../../types/api/query';
 import {ResultType} from '../../types/store/executeQuery';
 import type {
     ExecuteQueryAction,
-    ExecuteQueryResult,
     ExecuteQueryState,
     ExecuteQueryStateSlice,
     QueryInHistory,
+    QueryResult,
 } from '../../types/store/executeQuery';
 import type {
     IQueryResult,
@@ -26,7 +26,6 @@ import {api} from './api';
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
-const UPDATE_QUERY_RESULT = 'query/UPDATE_QUERY_RESULT';
 const SET_QUERY_RESULT = 'query/SET_QUERY_RESULT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
 const UPDATE_QUERY_IN_HISTORY = 'query/UPDATE_QUERY_IN_HISTORY';
@@ -73,19 +72,6 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
             return {
                 ...state,
                 result: action.data,
-            };
-        }
-
-        case UPDATE_QUERY_RESULT: {
-            return {
-                ...state,
-                result:
-                    state.result || action.data
-                        ? ({
-                              ...state.result,
-                              ...action.data,
-                          } as ExecuteQueryResult)
-                        : undefined,
             };
         }
 
@@ -331,14 +317,7 @@ export function updateQueryInHistory(stats: QueryStats, queryId: string) {
     } as const;
 }
 
-export function updateQueryResult(data?: Partial<ExecuteQueryResult>) {
-    return {
-        type: UPDATE_QUERY_RESULT,
-        data,
-    } as const;
-}
-
-export function setQueryResult(data?: ExecuteQueryResult) {
+export function setQueryResult(data?: QueryResult) {
     return {
         type: SET_QUERY_RESULT,
         data,

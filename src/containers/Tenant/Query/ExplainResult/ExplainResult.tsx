@@ -1,11 +1,9 @@
 import React from 'react';
 
-import {StopFill} from '@gravity-ui/icons';
-import {Button, Icon, RadioButton} from '@gravity-ui/uikit';
+import {RadioButton} from '@gravity-ui/uikit';
 
 import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
-import ElapsedTime from '../../../../components/ElapsedTime/ElapsedTime';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
@@ -13,11 +11,13 @@ import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus'
 import type {PreparedExplainResponse} from '../../../../store/reducers/explainQuery/types';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ValueOf} from '../../../../types/common';
+import type {EplainQueryResult} from '../../../../types/store/executeQuery';
 import {cn} from '../../../../utils/cn';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
+import {CancelQueryButton} from '../CancelQueryButton/CancelQueryButton';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {isQueryCancelledError} from '../utils/isQueryCancelledError';
@@ -60,30 +60,24 @@ const explainOptions = [
 
 interface ExplainResultProps {
     theme: string;
+    result: EplainQueryResult;
+    tenantName: string;
     explain?: PreparedExplainResponse['plan'] & {DurationUs?: number};
     simplifiedPlan?: PreparedExplainResponse['simplifiedPlan'];
     ast?: string;
-    loading?: boolean;
-    cancelQueryLoading?: boolean;
     isResultsCollapsed?: boolean;
-    error: unknown;
-    cancelError: boolean;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
-    onStopButtonClick: VoidFunction;
 }
 
 export function ExplainResult({
     explain,
     ast,
     theme,
-    error,
-    cancelError,
-    loading,
-    cancelQueryLoading,
+    result,
+    tenantName,
     onCollapseResults,
     onExpandResults,
-    onStopButtonClick,
     isResultsCollapsed,
     simplifiedPlan,
 }: ExplainResultProps) {
@@ -92,6 +86,7 @@ export function ExplainResult({
         EXPLAIN_OPTIONS_IDS.schema,
     );
     const [isPending, startTransition] = React.useTransition();
+    const {error, isLoading, queryId} = result;
 
     React.useEffect(() => {
         return () => {
@@ -169,9 +164,9 @@ export function ExplainResult({
         <React.Fragment>
             <div className={b('controls')}>
                 <div className={b('controls-right')}>
-                    <QueryExecutionStatus error={error} loading={loading} />
+                    <QueryExecutionStatus error={error} loading={isLoading} />
 
-                    {!error && !loading && (
+                    {!error && !isLoading && (
                         <React.Fragment>
                             {explain?.DurationUs !== undefined && (
                                 <QueryDuration duration={explain.DurationUs} />
@@ -188,18 +183,8 @@ export function ExplainResult({
                             </React.Fragment>
                         </React.Fragment>
                     )}
-                    {loading ? (
-                        <React.Fragment>
-                            <ElapsedTime className={b('elapsed-time')} />
-                            <Button
-                                loading={cancelQueryLoading}
-                                onClick={onStopButtonClick}
-                                className={b('stop-button', {error: cancelError})}
-                            >
-                                <Icon data={StopFill} size={16} />
-                                {i18n('action.stop')}
-                            </Button>
-                        </React.Fragment>
+                    {isLoading ? (
+                        <CancelQueryButton queryId={queryId} tenantName={tenantName} />
                     ) : null}
                 </div>
                 <div className={b('controls-left')}>
@@ -219,8 +204,8 @@ export function ExplainResult({
                     />
                 </div>
             </div>
-            {loading || isQueryCancelledError(error) ? null : <QuerySettingsBanner />}
-            <LoaderWrapper loading={loading || isPending}>
+            {isLoading || isQueryCancelledError(error) ? null : <QuerySettingsBanner />}
+            <LoaderWrapper loading={isLoading || isPending}>
                 <Fullscreen className={b('result')}>{renderContent()}</Fullscreen>
             </LoaderWrapper>
         </React.Fragment>

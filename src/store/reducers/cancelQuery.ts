@@ -3,7 +3,6 @@ import type {IQueryResult, QueryRequestParams} from '../../types/store/query';
 import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
 
 import {api} from './api';
-import {updateQueryResult} from './executeQuery';
 
 interface SendQueryParams extends Omit<QueryRequestParams, 'query'> {
     queryId: string;
@@ -12,13 +11,8 @@ interface SendQueryParams extends Omit<QueryRequestParams, 'query'> {
 export const cancelQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
         cancelQuery: build.mutation<IQueryResult, SendQueryParams>({
-            queryFn: async ({queryId, database}, {signal, dispatch}) => {
+            queryFn: async ({queryId, database}, {signal}) => {
                 const action: CancelActions = 'cancel-query';
-                dispatch(
-                    updateQueryResult({
-                        cancelledStatus: 'loading',
-                    }),
-                );
 
                 try {
                     const response = await window.api.sendQuery(
@@ -31,27 +25,13 @@ export const cancelQueryApi = api.injectEndpoints({
                     );
 
                     if (isQueryErrorResponse(response)) {
-                        dispatch(
-                            updateQueryResult({
-                                cancelledStatus: 'error',
-                            }),
-                        );
                         return {error: response};
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
-                    dispatch(
-                        updateQueryResult({
-                            cancelledStatus: 'success',
-                        }),
-                    );
+
                     return {data};
                 } catch (error) {
-                    dispatch(
-                        updateQueryResult({
-                            cancelledStatus: 'error',
-                        }),
-                    );
                     return {error};
                 }
             },
