@@ -19,7 +19,6 @@ import type {
     RenderErrorMessage,
     SortParams,
 } from './types';
-import {useIntersectionObserver} from './useIntersectionObserver';
 
 import './PaginatedTable.scss';
 
@@ -63,6 +62,7 @@ export const PaginatedTable = <T, F>({
     const [isInitialLoad, setIsInitialLoad] = React.useState(true);
 
     const tableContainer = React.useRef<HTMLDivElement>(null);
+    const observerRef = React.useRef<IntersectionObserver | null>(null);
 
     const handleDataFetched = React.useCallback((total: number, found: number) => {
         setTotalEntities(total);
@@ -70,18 +70,37 @@ export const PaginatedTable = <T, F>({
         setIsInitialLoad(false);
     }, []);
 
-    const onEntry = React.useCallback((id: string) => {
-        setActiveChunks((prev) => [...new Set([...prev, Number(id)])]);
+    const updateActiveChunks = React.useCallback((entries: IntersectionObserverEntry[]) => {
+        setActiveChunks((prev) => {
+            const newActiveChunks = new Set(prev);
+
+            entries.forEach((entry) => {
+                const chunkId = Number(entry.target.id);
+                if (entry.isIntersecting) {
+                    newActiveChunks.add(chunkId);
+                } else {
+                    newActiveChunks.delete(chunkId);
+                }
+            });
+
+            return Array.from(newActiveChunks);
+        });
     }, []);
 
-    const onLeave = React.useCallback((id: string) => {
-        setActiveChunks((prev) => prev.filter((chunk) => chunk !== Number(id)));
-    }, []);
-
-    const observer = useIntersectionObserver({onEntry, onLeave, parentContainer});
-
-    // reset table on filters change
     React.useLayoutEffect(() => {
+        if (tableContainer.current) {
+            observerRef.current = new IntersectionObserver(updateActiveChunks);
+
+            const chunkElements = tableContainer.current.querySelectorAll('tbody[id]');
+            chunkElements.forEach((el) => observerRef.current?.observe(el));
+        }
+
+        return () => {
+            observerRef.current?.disconnect();
+        };
+    }, [parentContainer, updateActiveChunks, foundEntities, limit]);
+
+    React.useEffect(() => {
         setTotalEntities(limit);
         setFoundEntities(0);
         setIsInitialLoad(true);
@@ -95,10 +114,6 @@ export const PaginatedTable = <T, F>({
     }, [filters, limit, parentContainer]);
 
     const renderChunks = () => {
-        if (!observer) {
-            return null;
-        }
-
         if (!isInitialLoad && foundEntities === 0) {
             return (
                 <tbody>
@@ -127,7 +142,6 @@ export const PaginatedTable = <T, F>({
                 renderErrorMessage={renderErrorMessage}
                 onDataFetched={handleDataFetched}
                 isActive={activeChunks.includes(value)}
-                observer={observer}
             />
         ));
     };

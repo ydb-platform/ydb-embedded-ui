@@ -57,7 +57,10 @@ export const LoadingTableRow = <T,>({index, columns, height}: LoadingTableRowPro
                         className={column.className}
                         resizeable={resizeable}
                     >
-                        <Skeleton style={{width: '80%', height: '50%'}} />
+                        <Skeleton
+                            className={b('row-skeleton')}
+                            style={{width: '80%', height: '50%'}}
+                        />
                     </TableRowCell>
                 );
             })}
