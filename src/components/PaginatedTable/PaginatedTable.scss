@@ -175,4 +175,8 @@
         // padding for easier resize of the last column
         padding-right: 20px;
     }
+
+    &__row-skeleton::after {
+        animation-delay: 200ms;
+    }
 }
