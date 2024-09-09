@@ -21,6 +21,7 @@ import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {TenantTabsGroups} from '../TenantPages';
 import {isDatabaseEntityType} from '../utils/schema';
 
+import {Configs} from './Configs/Configs';
 import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
@@ -130,6 +131,9 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.partitions: {
                 return <Partitions path={path} database={tenantName} />;
+            }
+            case TENANT_DIAGNOSTICS_TABS_IDS.configs: {
+                return <Configs database={tenantName} />;
             }
             default: {
                 return <div>No data...</div>;

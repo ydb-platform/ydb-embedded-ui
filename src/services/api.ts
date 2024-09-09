@@ -12,6 +12,7 @@ import type {CapabilitiesResponse} from '../types/api/capabilities';
 import type {TClusterInfo} from '../types/api/cluster';
 import type {TComputeInfo} from '../types/api/compute';
 import type {DescribeConsumerResult} from '../types/api/consumer';
+import type {FeatureFlagConfigs} from '../types/api/featureFlags';
 import type {HealthCheckAPIResponse} from '../types/api/healthcheck';
 import type {JsonHotKeysResponse} from '../types/api/hotkeys';
 import type {
@@ -55,15 +56,16 @@ import {
     SECOND_IN_MS,
 } from '../utils/constants';
 import {prepareSortValue} from '../utils/filters';
+import {isAxiosError} from '../utils/response';
 import type {Nullable} from '../utils/typecheckers';
 
 import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
 
-// Overall timeout 53~71 s depending on server response time
 const TRACE_CHECK_TIMEOUT = 2 * SECOND_IN_MS;
-const MAX_TRACE_CHECK_RETRIES = 9;
+const TRACE_API_ERROR_TIMEOUT = 10 * SECOND_IN_MS;
+const MAX_TRACE_CHECK_RETRIES = 30;
 
 type AxiosOptions = {
     concurrentId?: string;
@@ -144,6 +146,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 tablets: true,
             },
             {concurrentId: concurrentId || `getClusterInfo`, requestConfig: {signal}},
+        );
+    }
+    getClusterConfig(database?: string, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<FeatureFlagConfigs>(
+            this.getPath('/viewer/feature_flags'),
+            {
+                database,
+            },
+            {concurrentId, requestConfig: {signal}},
         );
     }
     getNodeInfo(id?: string | number, {concurrentId, signal}: AxiosOptions = {}) {
@@ -570,7 +581,17 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                     timeout: TRACE_CHECK_TIMEOUT,
                     'axios-retry': {
                         retries: MAX_TRACE_CHECK_RETRIES,
-                        retryDelay: axiosRetry.exponentialDelay,
+                        retryDelay: (_: number, error: unknown) => {
+                            const isTracingError =
+                                isAxiosError(error) &&
+                                (error?.response?.status === 404 || error.code === 'ERR_NETWORK');
+
+                            if (isTracingError) {
+                                return TRACE_CHECK_TIMEOUT;
+                            }
+
+                            return TRACE_API_ERROR_TIMEOUT;
+                        },
                         shouldResetTimeout: true,
                         retryCondition: () => true,
                     },

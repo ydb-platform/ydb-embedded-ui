@@ -70,6 +70,11 @@ const partitions = {
     title: 'Partitions',
 };
 
+const configs = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.configs,
+    title: 'Configs',
+};
+
 export const ASYNC_REPLICATION_PAGES = [overview, tablets, describe];
 
 export const DATABASE_PAGES = [
@@ -81,6 +86,7 @@ export const DATABASE_PAGES = [
     storage,
     network,
     describe,
+    configs,
 ];
 
 export const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe];

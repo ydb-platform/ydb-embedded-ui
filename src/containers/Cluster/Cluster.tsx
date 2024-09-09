@@ -131,71 +131,62 @@ export function Cluster({
                     }}
                 />
             </div>
-
-            <div>
-                <div className={b('sticky-wrapper')}>
-                    <AutoRefreshControl className={b('auto-refresh-control')} />
-                </div>
-                <Switch>
-                    <Route
-                        path={
-                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.overview))
-                                .pathname
-                        }
-                    >
-                        <ClusterInfo
-                            cluster={cluster}
-                            groupsStats={groupsStats}
-                            versionToColor={versionToColor}
-                            loading={infoLoading}
-                            error={clusterError}
-                            additionalClusterProps={additionalClusterProps}
-                        />
-                    </Route>
-                    <Route
-                        path={
-                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants))
-                                .pathname
-                        }
-                    >
-                        <Tenants additionalTenantsProps={additionalTenantsProps} />
-                    </Route>
-                    <Route
-                        path={
-                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname
-                        }
-                    >
-                        <NodesWrapper
-                            parentContainer={container.current}
-                            additionalNodesProps={additionalNodesProps}
-                        />
-                    </Route>
-                    <Route
-                        path={
-                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage))
-                                .pathname
-                        }
-                    >
-                        <StorageWrapper
-                            parentContainer={container.current}
-                            additionalNodesProps={additionalNodesProps}
-                        />
-                    </Route>
-                    <Route
-                        path={
-                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions))
-                                .pathname
-                        }
-                    >
-                        <Versions versionToColor={versionToColor} />
-                    </Route>
-                    <Route
-                        render={() => (
-                            <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
-                        )}
-                    />
-                </Switch>
+            <div className={b('sticky-wrapper')}>
+                <AutoRefreshControl className={b('auto-refresh-control')} />
             </div>
+            <Switch>
+                <Route
+                    path={
+                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.overview)).pathname
+                    }
+                >
+                    <ClusterInfo
+                        cluster={cluster}
+                        groupsStats={groupsStats}
+                        versionToColor={versionToColor}
+                        loading={infoLoading}
+                        error={clusterError}
+                        additionalClusterProps={additionalClusterProps}
+                    />
+                </Route>
+                <Route
+                    path={
+                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants)).pathname
+                    }
+                >
+                    <Tenants additionalTenantsProps={additionalTenantsProps} />
+                </Route>
+                <Route
+                    path={getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname}
+                >
+                    <NodesWrapper
+                        parentContainer={container.current}
+                        additionalNodesProps={additionalNodesProps}
+                    />
+                </Route>
+                <Route
+                    path={
+                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage)).pathname
+                    }
+                >
+                    <StorageWrapper
+                        parentContainer={container.current}
+                        additionalNodesProps={additionalNodesProps}
+                    />
+                </Route>
+                <Route
+                    path={
+                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions)).pathname
+                    }
+                >
+                    <Versions versionToColor={versionToColor} />
+                </Route>
+                <Route
+                    render={() => (
+                        <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
+                    )}
+                />
+            </Switch>
         </div>
     );
 }
