@@ -7,7 +7,6 @@
   "disabled": "Disabled",
   "flag-touched": "Flag is changed",
 
-  "error-msg": "Error while loading configs",
   "search-placeholder": "Search by feature flag",
   "search-empty": "Empty search result",
   "no-data": "No data"
