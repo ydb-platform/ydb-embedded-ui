@@ -84,7 +84,7 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
     const groupsSortParams = groupSort.sortOrder ? groupSort : getDefaultSortGroup(visibleEntities);
 
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
-        {database, visibleEntities},
+        {database, visibleEntities, node_id: nodeId},
         {
             skip: storageType !== STORAGE_TYPES.nodes,
             pollingInterval: autoRefreshInterval,
