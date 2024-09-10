@@ -1,4 +1,3 @@
-import {EVersion} from '../../../types/api/storage';
 import {valueIsDefined} from '../../../utils';
 import {api} from '../api';
 
@@ -53,9 +52,9 @@ async function requestVDiskData(
         const groupResponse = await window.api.getStorageInfo(
             {
                 nodeId,
-                poolName: StoragePoolName,
+                pool: StoragePoolName,
                 groupId: GroupID,
-                version: EVersion.v1,
+                version: 'v1',
             },
             {signal},
         );

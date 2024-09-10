@@ -164,7 +164,7 @@ export interface TVSlotInfo {
     IsBeingDeleted?: boolean;
 }
 
-type EVDiskStatus =
+export type EVDiskStatus =
     | 'ERROR' // the disk is not operational at all
     | 'INIT_PENDING' // initialization in process
     | 'REPLICATING' // the disk accepts queries, but not all the data was replicated

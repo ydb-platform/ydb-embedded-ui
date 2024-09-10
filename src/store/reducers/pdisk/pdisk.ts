@@ -1,4 +1,3 @@
-import {EVersion} from '../../../types/api/storage';
 import {getPDiskId} from '../../../utils/disks/helpers';
 import {api} from '../api';
 
@@ -36,7 +35,7 @@ export const pDiskApi = api.injectEndpoints({
             queryFn: async ({nodeId, pDiskId}: PDiskParams, {signal}) => {
                 try {
                     const response = await window.api.getStorageInfo(
-                        {nodeId, version: EVersion.v1},
+                        {nodeId, version: 'v1'},
                         {signal},
                     );
                     const data = preparePDiskStorageResponse(response, pDiskId, nodeId);
