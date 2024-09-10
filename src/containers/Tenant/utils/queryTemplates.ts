@@ -59,7 +59,7 @@ WITH (
 };
 export const alterTableTemplate = (path: string) => {
     return `ALTER TABLE \`${path}\`
-    ADD COLUMN is_deleted Bool;`;
+    ADD COLUMN numeric_column Int32;`;
 };
 export const selectQueryTemplate = (path: string) => {
     return `SELECT *
