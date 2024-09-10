@@ -124,6 +124,7 @@ export function PDiskPage() {
         if (pDiskParamsDefined) {
             dispatch(
                 api.util.invalidateTags([{type: 'PDiskData', id: getPDiskId(nodeId, pDiskId)}]),
+                'StorageData',
             );
         }
     };

@@ -1,7 +1,7 @@
 import {getPDiskId} from '../../../utils/disks/helpers';
 import {api} from '../api';
 
-import {preparePDiskDataResponse, preparePDiskStorageResponse} from './utils';
+import {preparePDiskDataResponse} from './utils';
 
 interface PDiskParams {
     nodeId: number | string;
@@ -18,27 +18,6 @@ export const pDiskApi = api.injectEndpoints({
                         window.api.getNodeInfo(nodeId, {signal}),
                     ]);
                     const data = preparePDiskDataResponse(response);
-                    return {data};
-                } catch (error) {
-                    return {error};
-                }
-            },
-            providesTags: (_result, _error, arg) => [
-                'All',
-                {
-                    type: 'PDiskData',
-                    id: getPDiskId(arg.nodeId, arg.pDiskId),
-                },
-            ],
-        }),
-        getStorageInfo: build.query({
-            queryFn: async ({nodeId, pDiskId}: PDiskParams, {signal}) => {
-                try {
-                    const response = await window.api.getStorageInfo(
-                        {nodeId, version: 'v1'},
-                        {signal},
-                    );
-                    const data = preparePDiskStorageResponse(response, pDiskId, nodeId);
                     return {data};
                 } catch (error) {
                     return {error};

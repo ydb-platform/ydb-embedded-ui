@@ -13,20 +13,22 @@ import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewer
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
+import {api} from '../../store/reducers/api';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
+import {storageApi} from '../../store/reducers/storage/storage';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
-import {getSeverityColor} from '../../utils/disks/helpers';
+import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../Storage/StorageGroups/columns/getStorageGroupsColumns';
 import {useGetDiskStorageColumns} from '../Storage/StorageGroups/columns/hooks';
 
 import {vDiskPageKeyset} from './i18n';
+import {prepareVDiskGroupResponse} from './utils';
 
 import './VDiskPage.scss';
 
@@ -52,11 +54,14 @@ export function VDiskPage() {
         valueIsDefined(nodeId) && valueIsDefined(pDiskId) && valueIsDefined(vDiskSlotId)
             ? {nodeId, pDiskId, vDiskSlotId}
             : skipToken;
-    const {currentData, isFetching, refetch, error} = vDiskApi.useGetVDiskDataQuery(params, {
+    const {
+        currentData: vDiskData = {},
+        isFetching,
+        error,
+    } = vDiskApi.useGetVDiskDataQuery(params, {
         pollingInterval: autoRefreshInterval,
     });
-    const loading = isFetching && currentData === undefined;
-    const {vDiskData = {}, groupData} = currentData || {};
+    const loading = isFetching && vDiskData === undefined;
     const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} = vDiskData;
     const {GroupID, GroupGeneration, Ring, Domain, VDisk} = VDiskId || {};
     const vDiskIdParamsDefined =
@@ -91,8 +96,16 @@ export function VDiskPage() {
         return undefined;
     };
 
-    const handleAfterEvictVDisk = async () => {
-        return refetch();
+    const handleAfterEvictVDisk = () => {
+        dispatch(
+            api.util.invalidateTags([
+                {
+                    type: 'VDiskData',
+                    id: getVDiskSlotBasedId(nodeId || 0, pDiskId || 0, vDiskSlotId || 0),
+                },
+                'StorageData',
+            ]),
+        );
     };
 
     const renderHelmet = () => {
@@ -166,11 +179,11 @@ export function VDiskPage() {
     };
 
     const renderGroupInfo = () => {
-        if (groupData) {
+        if (valueIsDefined(GroupID)) {
             return (
                 <React.Fragment>
                     <div className={vDiskPageCn('group-title')}>{vDiskPageKeyset('group')}</div>
-                    <VDiskGroup data={groupData} />
+                    <VDiskGroup groupId={GroupID} />
                 </React.Fragment>
             );
         }
@@ -203,13 +216,30 @@ export function VDiskPage() {
     );
 }
 
-export function VDiskGroup({data}: {data: PreparedStorageGroup}) {
+export function VDiskGroup({groupId}: {groupId: string | number}) {
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+
+    const {currentData} = storageApi.useGetStorageGroupsInfoQuery(
+        {groupId},
+        {pollingInterval: autoRefreshInterval},
+    );
+
+    const preparedGroups = React.useMemo(() => {
+        const group = prepareVDiskGroupResponse(currentData, groupId);
+
+        return group ? [group] : undefined;
+    }, [currentData, groupId]);
+
     const vDiskStorageColumns = useGetDiskStorageColumns();
+
+    if (!preparedGroups) {
+        return null;
+    }
 
     return (
         <ResizeableDataTable
             columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-            data={[data]}
+            data={preparedGroups}
             columns={vDiskStorageColumns}
             settings={DEFAULT_TABLE_SETTINGS}
         />

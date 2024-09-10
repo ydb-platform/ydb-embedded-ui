@@ -1,5 +1,8 @@
+import React from 'react';
+
+import {storageApi} from '../../../../../store/reducers/storage/storage';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {topStorageGroupsApi} from '../../../../../store/reducers/tenantOverview/topStorageGroups/topStorageGroups';
+import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
 import {
     STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
@@ -9,6 +12,8 @@ import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
+
+import {prepareTopStorageGroups} from './utils';
 
 interface TopGroupsProps {
     tenant?: string;
@@ -21,12 +26,21 @@ export function TopGroups({tenant}: TopGroupsProps) {
 
     const columns = getStorageTopGroupsColumns();
 
-    const {currentData, isFetching, error} = topStorageGroupsApi.useGetTopStorageGroupsQuery(
-        {tenant},
+    const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
+        {
+            tenant,
+            sort: '-Usage',
+            with: 'all',
+            limit: TENANT_OVERVIEW_TABLES_LIMIT,
+        },
         {pollingInterval: autoRefreshInterval},
     );
+
     const loading = isFetching && currentData === undefined;
-    const topGroups = currentData;
+
+    const preparedGroups = React.useMemo(() => {
+        return prepareTopStorageGroups(currentData);
+    }, [currentData]);
 
     const title = getSectionTitle({
         entity: i18n('groups'),
@@ -40,7 +54,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
     return (
         <TenantOverviewTableLayout
             columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-            data={topGroups || []}
+            data={preparedGroups}
             columns={columns}
             title={title}
             loading={loading}
