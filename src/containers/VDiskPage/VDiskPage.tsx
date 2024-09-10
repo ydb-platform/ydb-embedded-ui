@@ -15,6 +15,10 @@ import {ResizeableDataTable} from '../../components/ResizeableDataTable/Resizeab
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {api} from '../../store/reducers/api';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
+import {
+    useCapabilitiesLoaded,
+    useStorageGroupsHandlerAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
@@ -180,12 +184,7 @@ export function VDiskPage() {
 
     const renderGroupInfo = () => {
         if (valueIsDefined(GroupID)) {
-            return (
-                <React.Fragment>
-                    <div className={vDiskPageCn('group-title')}>{vDiskPageKeyset('group')}</div>
-                    <VDiskGroup groupId={GroupID} />
-                </React.Fragment>
-            );
+            return <VDiskGroup groupId={GroupID} />;
         }
 
         return null;
@@ -217,11 +216,16 @@ export function VDiskPage() {
 }
 
 export function VDiskGroup({groupId}: {groupId: string | number}) {
+    const capabilitiesLoaded = useCapabilitiesLoaded();
+    const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData} = storageApi.useGetStorageGroupsInfoQuery(
-        {groupId},
-        {pollingInterval: autoRefreshInterval},
+        {groupId, useGroupsHandler: groupsHandlerAvailable},
+        {
+            pollingInterval: autoRefreshInterval,
+            skip: !capabilitiesLoaded,
+        },
     );
 
     const preparedGroups = React.useMemo(() => {
@@ -237,11 +241,14 @@ export function VDiskGroup({groupId}: {groupId: string | number}) {
     }
 
     return (
-        <ResizeableDataTable
-            columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-            data={preparedGroups}
-            columns={vDiskStorageColumns}
-            settings={DEFAULT_TABLE_SETTINGS}
-        />
+        <React.Fragment>
+            <div className={vDiskPageCn('group-title')}>{vDiskPageKeyset('group')}</div>
+            <ResizeableDataTable
+                columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
+                data={preparedGroups}
+                columns={vDiskStorageColumns}
+                settings={DEFAULT_TABLE_SETTINGS}
+            />
+        </React.Fragment>
     );
 }

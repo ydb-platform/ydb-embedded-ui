@@ -1,7 +1,13 @@
 import type {Capability} from '../../../types/api/capabilities';
 import {useTypedSelector} from '../../../utils/hooks';
 
-import {selectCapabilityVersion} from './capabilities';
+import {capabilitiesApi, selectCapabilityVersion} from './capabilities';
+
+export function useCapabilitiesLoaded() {
+    const {data, error} = capabilitiesApi.useGetClusterCapabilitiesQuery(undefined);
+
+    return Boolean(data || error);
+}
 
 const useGetFeatureVersion = (feature: Capability) => {
     return useTypedSelector((state) => selectCapabilityVersion(state, feature) || 0);
@@ -19,4 +25,8 @@ export const useDiskPagesAvailable = () => {
 
 export const useTracingLevelOptionAvailable = () => {
     return useGetFeatureVersion('/viewer/query') > 2;
+};
+
+export const useStorageGroupsHandlerAvailable = () => {
+    return useGetFeatureVersion('/storage/groups') > 2;
 };
