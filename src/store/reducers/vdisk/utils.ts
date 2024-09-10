@@ -1,10 +1,8 @@
 import type {TEvPDiskStateResponse} from '../../../types/api/pdisk';
-import type {TStorageInfo} from '../../../types/api/storage';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
 import type {TEvVDiskStateResponse} from '../../../types/api/vdisk';
 import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
 import {prepareNodeSystemState} from '../../../utils/nodes';
-import {prepareStorageGroupData} from '../storage/utils';
 
 import type {VDiskData} from './types';
 
@@ -41,15 +39,4 @@ export function prepareVDiskDataResponse([vDiskResponse, pDiskResponse, nodeResp
         PDiskId,
         PDiskType,
     };
-}
-
-export function prepareVDiskGroupResponse(data: TStorageInfo, poolName: string, groupId: number) {
-    const rawPoolData = data.StoragePools?.find((pool) => pool.Name === poolName);
-    const rawGroupData = rawPoolData?.Groups?.find((group) => group.GroupID === groupId);
-
-    if (rawGroupData && rawPoolData) {
-        return prepareStorageGroupData(rawGroupData, rawPoolData);
-    }
-
-    return undefined;
 }

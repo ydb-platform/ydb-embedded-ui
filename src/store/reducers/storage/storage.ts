@@ -18,13 +18,13 @@ export const storageApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['All', 'StorageData'],
         }),
         getStorageGroupsInfo: builder.query({
             queryFn: async (params: StorageRequestParams, {signal}) => {
                 try {
                     const result = await window.api.getStorageInfo(
-                        {version: 'v1', ...params},
+                        {version: 'v2', ...params},
                         {signal},
                     );
                     return {data: prepareStorageResponse(result)};
@@ -32,7 +32,7 @@ export const storageApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['All', 'StorageData'],
         }),
     }),
     overrideExisting: 'throw',
