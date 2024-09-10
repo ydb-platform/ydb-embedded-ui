@@ -1,4 +1,3 @@
-import {EVersion} from '../../../types/api/compute';
 import {api} from '../api';
 
 import type {ComputeApiRequestParams, NodesApiRequestParams} from './types';
@@ -30,7 +29,7 @@ export const nodesApi = api.injectEndpoints({
                 try {
                     const data = await window.api.getCompute(
                         {
-                            version: EVersion.v2,
+                            version: 'v2',
                             ...params,
                         },
                         {signal},

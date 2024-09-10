@@ -61,7 +61,4 @@ export interface TTabletStateInfo {
     Count: number;
 }
 
-export enum EVersion {
-    v1 = 'v1',
-    v2 = 'v2', // only this versions works with sorting
-}
+export type EVersion = 'v1' | 'v2'; // only v2 versions works with sorting

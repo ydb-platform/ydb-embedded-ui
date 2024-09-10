@@ -16,12 +16,12 @@ export function GroupInfo<T extends Partial<PreparedStorageGroup>>({
     data,
     ...infoViewerProps
 }: GroupInfoProps<T>) {
-    const {GroupID, PoolName, Used, Limit, ErasureSpecies} = data;
+    const {GroupId, PoolName, Used, Limit, ErasureSpecies} = data;
 
     const groupInfo = [];
 
-    if (valueIsDefined(GroupID)) {
-        groupInfo.push({label: groupInfoKeyset('group-id'), value: GroupID});
+    if (valueIsDefined(GroupId)) {
+        groupInfo.push({label: groupInfoKeyset('group-id'), value: GroupId});
     }
     if (valueIsDefined(PoolName)) {
         groupInfo.push({label: groupInfoKeyset('pool-name'), value: PoolName});

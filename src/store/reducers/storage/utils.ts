@@ -1,7 +1,9 @@
-import {EFlag} from '../../../types/api/enums';
+import type {EFlag} from '../../../types/api/enums';
 import type {TNodeInfo, TNodesInfo} from '../../../types/api/nodes';
 import {TPDiskState} from '../../../types/api/pdisk';
 import type {
+    StorageGroupsResponse,
+    TGroupsStorageGroupInfo,
     TStorageGroupInfo,
     TStorageGroupInfoV2,
     TStorageInfo,
@@ -9,26 +11,23 @@ import type {
 } from '../../../types/api/storage';
 import {EVDiskState} from '../../../types/api/vdisk';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
+import {getColorSeverity, getSeverityColor} from '../../../utils/disks/helpers';
 import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 import {getUsage} from '../../../utils/storage';
 
 import type {PreparedStorageGroup, PreparedStorageNode, PreparedStorageResponse} from './types';
 
-// ==== Constants  ====
-
-// Do not count Grey and Blue statuses in used space severity calculations
-const FLAGS_POINTS: Record<EFlag, number> = {
-    [EFlag.Grey]: 0,
-    [EFlag.Blue]: 0,
-
-    [EFlag.Green]: 1,
-    [EFlag.Yellow]: 100,
-    [EFlag.Orange]: 10_000,
-    [EFlag.Red]: 1_000_000,
-};
-
 // ==== Prepare groups ====
+
+function getGroupDiskSpaceStatus(group: TStorageGroupInfo | TGroupsStorageGroupInfo): EFlag {
+    const {DiskSpace, VDisks = []} = group;
+
+    return (
+        DiskSpace ||
+        getSeverityColor(Math.max(...VDisks.map((disk) => getColorSeverity(disk.DiskSpace))))
+    );
+}
 
 const prepareVDisk = (vDisk: TVDiskStateInfo, poolName: string | undefined) => {
     const preparedVDisk = prepareVDiskData(vDisk);
@@ -49,7 +48,6 @@ export const prepareStorageGroupData = (
     pool: TStoragePoolInfo,
 ): PreparedStorageGroup => {
     let missing = 0;
-    let usedSpaceFlag = 0;
     let usedSpaceBytes = 0;
     let limitSizeBytes = 0;
     let readSpeedBytesPerSec = 0;
@@ -66,7 +64,6 @@ export const prepareStorageGroupData = (
                 AvailableSize,
                 AllocatedSize,
                 PDisk,
-                DiskSpace,
                 ReadThroughput,
                 WriteThroughput,
             } = vDisk;
@@ -79,10 +76,6 @@ export const prepareStorageGroupData = (
 
             if (!Replicated || PDiskState !== TPDiskState.Normal || VDiskState !== EVDiskState.OK) {
                 missing += 1;
-            }
-
-            if (DiskSpace) {
-                usedSpaceFlag += FLAGS_POINTS[DiskSpace];
             }
 
             const available = Number(AvailableSize ?? PDiskAvailableSize) || 0;
@@ -101,8 +94,11 @@ export const prepareStorageGroupData = (
     const vDisks = group.VDisks?.map((vdisk) => prepareVDisk(vdisk, poolName));
     const usage = getUsage({Used: usedSpaceBytes, Limit: limitSizeBytes}, 5);
 
+    const diskSpaceStatus = getGroupDiskSpaceStatus(group);
+
     return {
         ...group,
+        GroupId: group.GroupID,
         VDisks: vDisks,
         Usage: usage,
         Read: readSpeedBytesPerSec,
@@ -111,8 +107,8 @@ export const prepareStorageGroupData = (
         Used: usedSpaceBytes,
         Limit: limitSizeBytes,
         Degraded: missing,
-        UsedSpaceFlag: usedSpaceFlag,
         MediaType: poolMediaType || mediaType || undefined,
+        DiskSpace: diskSpaceStatus,
     };
 };
 
@@ -128,22 +124,18 @@ export const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedS
         Degraded = 0,
         Kind,
         MediaType,
+        GroupID,
     } = group;
-
-    const UsedSpaceFlag = VDisks.reduce((acc, {DiskSpace}) => {
-        if (DiskSpace && DiskSpace !== EFlag.Grey) {
-            return acc + FLAGS_POINTS[DiskSpace];
-        }
-        return acc;
-    }, 0);
 
     const vDisks = VDisks.map((vdisk) => prepareVDisk(vdisk, PoolName));
     const usage = Math.floor(Number(Usage) * 100);
 
+    const diskSpaceStatus = getGroupDiskSpaceStatus(group);
+
     return {
         ...group,
-        UsedSpaceFlag,
         PoolName,
+        GroupId: GroupID,
         MediaType: MediaType || Kind,
         VDisks: vDisks,
         Usage: usage,
@@ -152,6 +144,7 @@ export const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedS
         Used: Number(Used),
         Limit: Number(Limit),
         Degraded: Number(Degraded),
+        DiskSpace: diskSpaceStatus,
     };
 };
 
@@ -217,7 +210,7 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
     };
 };
 
-export const prepareStorageGroupsResponse = (data: TStorageInfo): PreparedStorageResponse => {
+export const prepareStorageResponse = (data: TStorageInfo): PreparedStorageResponse => {
     const {StoragePools, StorageGroups, TotalGroups, FoundGroups} = data;
 
     const preparedGroups = prepareStorageGroups(StorageGroups, StoragePools);
@@ -228,3 +221,50 @@ export const prepareStorageGroupsResponse = (data: TStorageInfo): PreparedStorag
         found: Number(FoundGroups),
     };
 };
+
+export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStorageResponse {
+    const {FoundGroups, TotalGroups, StorageGroups = []} = data;
+    const preparedGroups: PreparedStorageGroup[] = StorageGroups.map((group) => {
+        const {Usage, Read, Write, Used, Limit, MissingDisks, VDisks = []} = group;
+
+        const vDisks = VDisks.map((disk) => {
+            const whiteboardVDisk = disk.Whiteboard;
+            const whiteboardPDisk = disk.PDisk?.Whiteboard;
+
+            const NodeId = disk.NodeId;
+            const PDiskId = whiteboardPDisk?.PDiskId;
+
+            const whiteboardVDiskData = {
+                ...whiteboardVDisk,
+                PDiskId,
+                NodeId,
+                PDisk: {...whiteboardPDisk, NodeId},
+            };
+
+            return prepareVDiskData(whiteboardVDiskData);
+        });
+
+        const diskSpaceStatus = getGroupDiskSpaceStatus(group);
+
+        return {
+            ...group,
+
+            Usage: Math.floor(Number(Usage)) || 0,
+            Read: Number(Read),
+            Write: Number(Write),
+            Used: Number(Used),
+            Limit: Number(Limit),
+            Degraded: Number(MissingDisks),
+
+            VDisks: vDisks,
+
+            DiskSpace: diskSpaceStatus,
+        };
+    });
+
+    return {
+        groups: preparedGroups,
+        total: Number(TotalGroups) || preparedGroups.length,
+        found: Number(FoundGroups),
+    };
+}

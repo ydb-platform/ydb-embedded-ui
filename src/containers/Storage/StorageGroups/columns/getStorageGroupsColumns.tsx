@@ -10,7 +10,6 @@ import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {VDiskWithDonorsStack} from '../../../../components/VDisk/VDiskWithDonorsStack';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../../store/reducers/storage/types';
-import {EFlag} from '../../../../types/api/enums';
 import type {NodesMap} from '../../../../types/store/nodesList';
 import {cn} from '../../../../utils/cn';
 import {stringifyVdiskId} from '../../../../utils/dataFormatters/dataFormatters';
@@ -36,7 +35,7 @@ export const GROUPS_COLUMNS_IDS = {
     Used: 'Used',
     Limit: 'Limit',
     Usage: 'Usage',
-    UsedSpaceFlag: 'UsedSpaceFlag',
+    DiskSpace: 'DiskSpace',
     Read: 'Read',
     Write: 'Write',
     VDisks: 'VDisks',
@@ -140,9 +139,9 @@ const groupIdColumn: StorageGroupsColumn = {
     header: 'Group ID',
     width: 130,
     render: ({row}) => {
-        return <span className={b('group-id')}>{row.GroupID}</span>;
+        return <span className={b('group-id')}>{row.GroupId}</span>;
     },
-    sortAccessor: (row) => Number(row.GroupID),
+    sortAccessor: (row) => Number(row.GroupId),
     align: DataTable.RIGHT,
 };
 
@@ -167,22 +166,11 @@ const limitColumn: StorageGroupsColumn = {
 };
 
 const usedSpaceFlagColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.UsedSpaceFlag,
+    name: GROUPS_COLUMNS_IDS.DiskSpace,
     header: 'Space',
     width: 110,
     render: ({row}) => {
-        const value = row.UsedSpaceFlag;
-
-        let color = EFlag.Red;
-
-        if (value < 100) {
-            color = EFlag.Green;
-        } else if (value < 10000) {
-            color = EFlag.Yellow;
-        } else if (value < 1000000) {
-            color = EFlag.Orange;
-        }
-        return <EntityStatus status={color} />;
+        return <EntityStatus status={row.DiskSpace} />;
     },
     align: DataTable.CENTER,
 };
@@ -309,13 +297,12 @@ const filterStorageGroupsColumns = (
     }
 
     if (visibleEntities === VISIBLE_ENTITIES.missing) {
-        return columns.filter((col) => col.name !== GROUPS_COLUMNS_IDS.UsedSpaceFlag);
+        return columns.filter((col) => col.name !== GROUPS_COLUMNS_IDS.DiskSpace);
     }
 
     return columns.filter((col) => {
         return (
-            col.name !== GROUPS_COLUMNS_IDS.Degraded &&
-            col.name !== GROUPS_COLUMNS_IDS.UsedSpaceFlag
+            col.name !== GROUPS_COLUMNS_IDS.Degraded && col.name !== GROUPS_COLUMNS_IDS.DiskSpace
         );
     });
 };

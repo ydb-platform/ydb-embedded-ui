@@ -3,9 +3,9 @@ import type {
     PreparedStorageGroup,
     PreparedStorageGroupFilters,
 } from '../../../store/reducers/storage/types';
-import {prepareStorageGroupsResponse} from '../../../store/reducers/storage/utils';
-import {EVersion} from '../../../types/api/storage';
-import type {StorageSortValue} from '../../../utils/storage';
+import {prepareStorageResponse} from '../../../store/reducers/storage/utils';
+import type {StorageV2Sort} from '../../../types/api/storage';
+import {prepareSortValue} from '../../../utils/filters';
 
 const getConcurrentId = (limit?: number, offset?: number) => {
     return `getStorageGroups|offset${offset}|limit${limit}`;
@@ -19,21 +19,22 @@ export const getStorageGroups: FetchData<
     const {sortOrder, columnId} = sortParams ?? {};
     const {searchValue, visibleEntities, database, nodeId} = filters ?? {};
 
+    const sort = prepareSortValue(columnId, sortOrder) as StorageV2Sort;
+
     const response = await window.api.getStorageInfo(
         {
-            version: EVersion.v2,
+            version: 'v2',
             limit,
             offset,
-            sortOrder,
-            sortValue: columnId as StorageSortValue,
+            sort,
             filter: searchValue,
-            visibleEntities,
+            with: visibleEntities,
             database,
             nodeId,
         },
         {concurrentId: getConcurrentId(limit, offset)},
     );
-    const preparedResponse = prepareStorageGroupsResponse(response);
+    const preparedResponse = prepareStorageResponse(response);
 
     return {
         data: preparedResponse.groups || [],

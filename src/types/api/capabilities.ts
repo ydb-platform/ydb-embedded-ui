@@ -6,4 +6,4 @@ export interface CapabilitiesResponse {
 }
 
 // Add feature name before using it
-export type Capability = '/pdisk/info' | '/scheme/directory' | '/viewer/query';
+export type Capability = '/pdisk/info' | '/scheme/directory' | '/storage/groups' | '/viewer/query';
