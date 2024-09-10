@@ -18,8 +18,7 @@ import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {Tablets} from '../Tablets';
 
-import {NODE_PAGES, OVERVIEW, STORAGE, STRUCTURE, TABLETS} from './NodePages';
-import NodeStructure from './NodeStructure/NodeStructure';
+import {NODE_PAGES, OVERVIEW, STORAGE, TABLETS} from './NodePages';
 
 import './Node.scss';
 
@@ -53,11 +52,7 @@ export function Node(props: NodeProps) {
     const node = currentData;
 
     const {activeTabVerified, nodeTabs} = React.useMemo(() => {
-        const hasStorage = node?.Roles?.find((el) => el === STORAGE_ROLE);
-
-        const nodePages = hasStorage ? NODE_PAGES : NODE_PAGES.filter((el) => el.id !== STORAGE);
-
-        const actualNodeTabs = nodePages.map((page) => {
+        const actualNodeTabs = NODE_PAGES.map((page) => {
             return {
                 ...page,
                 title: page.name,
@@ -136,9 +131,6 @@ export function Node(props: NodeProps) {
                 return <FullNodeViewer node={node} className={b('overview-wrapper')} />;
             }
 
-            case STRUCTURE: {
-                return <NodeStructure className={b('node-page-wrapper')} nodeId={nodeId} />;
-            }
             default:
                 return false;
         }
