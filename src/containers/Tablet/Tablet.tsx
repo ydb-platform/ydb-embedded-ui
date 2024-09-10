@@ -58,8 +58,8 @@ const TABLET_PAGE_TABS = [
     },
 ];
 
-const tabletTabSchema = z.nativeEnum(TABLET_TABS_IDS).catch(TABLET_TABS_IDS.history);
 const eTypeSchema = z.nativeEnum(EType).or(z.undefined()).catch(undefined);
+const tabletTabSchema = z.nativeEnum(TABLET_TABS_IDS).catch(TABLET_TABS_IDS.history);
 
 const tabletQueryParams = {
     nodeId: StringParam,
