@@ -32,7 +32,7 @@ const filterGroupsByText = (entities: PreparedStorageGroup[], text: string) => {
     return entities.filter((entity) => {
         return (
             entity.PoolName?.toLowerCase().includes(preparedSearch) ||
-            entity.GroupID?.toString().includes(preparedSearch)
+            entity.GroupId?.toString().includes(preparedSearch)
         );
     });
 };

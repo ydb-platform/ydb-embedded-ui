@@ -1,11 +1,11 @@
 import type {OrderType} from '@gravity-ui/react-data-table';
 import {z} from 'zod';
 
+import type {EFlag} from '../../../types/api/enums';
 import type {TSystemStateInfo} from '../../../types/api/nodes';
-import type {EVersion, TStorageGroupInfo} from '../../../types/api/storage';
+import type {StorageV2SortValue} from '../../../types/api/storage';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesUptimeFilterValues} from '../../../utils/nodes';
-import type {StorageSortValue} from '../../../utils/storage';
 
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
 
@@ -40,18 +40,22 @@ export interface PreparedStorageGroupFilters {
     nodeId?: string;
 }
 
-export interface PreparedStorageGroup extends TStorageGroupInfo {
-    PoolName: string | undefined;
+export interface PreparedStorageGroup {
+    PoolName?: string;
+    MediaType?: string;
+    Encryption?: boolean;
+    ErasureSpecies?: string;
+    Degraded: number;
+
+    GroupId?: string | number;
 
     Usage: number;
     Read: number;
     Write: number;
     Used: number;
     Limit: number;
-    Degraded: number;
-    MediaType?: string;
 
-    UsedSpaceFlag: number;
+    DiskSpace: EFlag;
 
     VDisks?: PreparedVDisk[];
 }
@@ -63,26 +67,7 @@ export interface UsageFilter {
 
 export interface StorageSortParams {
     sortOrder: OrderType | undefined;
-    sortValue: StorageSortValue | undefined;
-}
-
-export interface StorageSortAndFilterParams extends Partial<StorageSortParams> {
-    filter?: string; // PoolName or GroupId
-
-    offset?: number;
-    limit?: number;
-}
-
-export interface StorageApiRequestParams extends StorageSortAndFilterParams {
-    /** @deprecated use database instead */
-    tenant?: string;
-    database?: string;
-    nodeId?: string | number;
-    poolName?: string;
-    groupId?: string | number;
-    visibleEntities?: VisibleEntities;
-
-    version?: EVersion;
+    sortValue: StorageV2SortValue | undefined;
 }
 
 export interface PreparedStorageResponse {

@@ -123,7 +123,7 @@ export interface TPDiskInfo {
     DecommitStatus?: EDecommitStatus;
 }
 
-type EDriveStatus =
+export type EDriveStatus =
     | 'UNKNOWN' // value of status is unknown (default)
     | 'ACTIVE' // working as expected
     | 'INACTIVE' // new groups are not created over this drive, but existing ones continue to work as expected
