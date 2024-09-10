@@ -208,6 +208,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./playwright-artifacts/playwright-report
           destination_dir: ${{ github.event.pull_request.number }}
+          force_orphan: true
 
       - name: Update PR description
         uses: actions/github-script@v6
