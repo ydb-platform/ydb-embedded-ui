@@ -52,7 +52,11 @@ export function Node(props: NodeProps) {
     const node = currentData;
 
     const {activeTabVerified, nodeTabs} = React.useMemo(() => {
-        const actualNodeTabs = NODE_PAGES.map((page) => {
+        const hasStorage = node?.Roles?.find((el) => el === STORAGE_ROLE);
+
+        const nodePages = hasStorage ? NODE_PAGES : NODE_PAGES.filter((el) => el.id !== STORAGE);
+
+        const actualNodeTabs = nodePages.map((page) => {
             return {
                 ...page,
                 title: page.name,
