@@ -71,7 +71,7 @@ const TRACE_CHECK_TIMEOUT = 2 * SECOND_IN_MS;
 const TRACE_API_ERROR_TIMEOUT = 10 * SECOND_IN_MS;
 const MAX_TRACE_CHECK_RETRIES = 30;
 
-type AxiosOptions = {
+export type AxiosOptions = {
     concurrentId?: string;
     signal?: AbortSignal;
     withRetries?: boolean;

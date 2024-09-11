@@ -2,7 +2,8 @@ import type {StorageRequestParams} from '../../../types/api/storage';
 import {api} from '../api';
 import type {NodesApiRequestParams} from '../nodes/types';
 
-import {prepareStorageNodesResponse, prepareStorageResponse} from './utils';
+import {requestStorageData} from './requestStorageData';
+import {prepareStorageNodesResponse} from './utils';
 
 export const storageApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -21,13 +22,13 @@ export const storageApi = api.injectEndpoints({
             providesTags: ['All', 'StorageData'],
         }),
         getStorageGroupsInfo: builder.query({
-            queryFn: async (params: StorageRequestParams, {signal}) => {
+            queryFn: async (
+                params: StorageRequestParams & {shouldUseGroupsHandler?: boolean},
+                {signal},
+            ) => {
                 try {
-                    const result = await window.api.getStorageInfo(
-                        {version: 'v2', ...params},
-                        {signal},
-                    );
-                    return {data: prepareStorageResponse(result)};
+                    const result = await requestStorageData(params, {signal});
+                    return {data: result};
                 } catch (error) {
                     return {error};
                 }
