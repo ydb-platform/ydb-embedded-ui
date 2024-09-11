@@ -84,11 +84,6 @@ const getStorageStats = (cluster: TClusterInfo) => {
                 {} as Record<string, {used?: string; total?: string}>,
             );
         }
-        return Object.entries(cluster.MapDataCenters).map(([dc, count]) => (
-            <React.Fragment key={dc}>
-                {dc}: <span className={b('dc-count')}>{i18n('quantity', {count})}</span>
-            </React.Fragment>
-        ));
     }
     return {_default: {used: cluster?.StorageUsed, total: cluster?.StorageTotal}};
 };
@@ -138,8 +133,6 @@ export const getInfo = (
     });
 
     if (isClusterInfoV2(cluster) && cluster.MapNodeStates) {
-        // const fake = {Grey: 1, Green: 10, Red: 1, Orange: 2, Yellow: 2, Blue: 3};
-        // const arrayNodesStates = Object.entries(fake) as [EFlag, number][];
         const arrayNodesStates = Object.entries(cluster.MapNodeStates) as [EFlag, number][];
         // sort stack to achieve order "green, orange, yellow, red, blue, grey"
         arrayNodesStates.sort((a, b) => COLORS_PRIORITY[b[0]] - COLORS_PRIORITY[a[0]]);
