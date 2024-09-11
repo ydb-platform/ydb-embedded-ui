@@ -6,12 +6,12 @@ import {prepareGroupsResponse, prepareStorageResponse} from './utils';
 export async function requestStorageData(
     {
         version = 'v2',
-        useGroupsHandler,
+        shouldUseGroupsHandler,
         ...params
-    }: StorageRequestParams & {useGroupsHandler?: boolean},
+    }: StorageRequestParams & {shouldUseGroupsHandler?: boolean},
     options: AxiosOptions,
 ) {
-    if (useGroupsHandler && version !== 'v1') {
+    if (shouldUseGroupsHandler && version !== 'v1') {
         const result = await window.api.getStorageGroups({...params}, options);
         return prepareGroupsResponse(result);
     } else {

@@ -25,7 +25,7 @@ export function PDiskGroups({pDiskId, nodeId}: PDiskGroupsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching} = storageApi.useGetStorageGroupsInfoQuery(
-        {pDiskId, nodeId, useGroupsHandler: groupsHandlerAvailable},
+        {pDiskId, nodeId, shouldUseGroupsHandler: groupsHandlerAvailable},
         {
             pollingInterval: autoRefreshInterval,
             skip: !capabilitiesLoaded,

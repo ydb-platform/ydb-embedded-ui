@@ -15,7 +15,7 @@ const getConcurrentId = (limit?: number, offset?: number) => {
 
 type GetStorageGroups = FetchData<PreparedStorageGroup, PreparedStorageGroupFilters>;
 
-export function useGroupsGetter(useGroupsHandler: boolean) {
+export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
     const fetchData: GetStorageGroups = React.useCallback(
         async (params) => {
             const {limit, offset, sortParams, filters} = params;
@@ -33,7 +33,7 @@ export function useGroupsGetter(useGroupsHandler: boolean) {
                     with: visibleEntities,
                     database,
                     nodeId,
-                    useGroupsHandler,
+                    shouldUseGroupsHandler,
                 },
                 {concurrentId: getConcurrentId(limit, offset)},
             );
@@ -44,7 +44,7 @@ export function useGroupsGetter(useGroupsHandler: boolean) {
                 total: total || 0,
             };
         },
-        [useGroupsHandler],
+        [shouldUseGroupsHandler],
     );
 
     return fetchData;

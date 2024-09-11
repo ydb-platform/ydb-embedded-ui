@@ -102,7 +102,7 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
         },
     );
     const groupsQuery = storageApi.useGetStorageGroupsInfoQuery(
-        {database, with: visibleEntities, nodeId, useGroupsHandler: groupsHandlerAvailable},
+        {database, with: visibleEntities, nodeId, shouldUseGroupsHandler: groupsHandlerAvailable},
         {
             skip: storageType !== STORAGE_TYPES.groups || !capabilitiesLoaded,
             pollingInterval: autoRefreshInterval,

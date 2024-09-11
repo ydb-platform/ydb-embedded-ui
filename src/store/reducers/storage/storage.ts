@@ -23,7 +23,7 @@ export const storageApi = api.injectEndpoints({
         }),
         getStorageGroupsInfo: builder.query({
             queryFn: async (
-                params: StorageRequestParams & {useGroupsHandler?: boolean},
+                params: StorageRequestParams & {shouldUseGroupsHandler?: boolean},
                 {signal},
             ) => {
                 try {

@@ -38,7 +38,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
             sort: '-Usage',
             with: 'all',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
-            useGroupsHandler: groupsHandlerAvailable,
+            shouldUseGroupsHandler: groupsHandlerAvailable,
         },
         {
             pollingInterval: autoRefreshInterval,

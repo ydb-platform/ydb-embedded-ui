@@ -221,7 +221,7 @@ export function VDiskGroup({groupId}: {groupId: string | number}) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData} = storageApi.useGetStorageGroupsInfoQuery(
-        {groupId, useGroupsHandler: groupsHandlerAvailable},
+        {groupId, shouldUseGroupsHandler: groupsHandlerAvailable},
         {
             pollingInterval: autoRefreshInterval,
             skip: !capabilitiesLoaded,
