@@ -10,7 +10,6 @@ import type {
 import {EFlag} from '../../../types/api/enums';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {NODES_SORT_VALUES} from '../../../utils/nodes';
-import {STORAGE_SORT_VALUES} from '../../../utils/storage';
 
 const defaultDegradationEvaluator = generateEvaluator(1, 2, ['success', 'warning', 'danger']);
 
@@ -47,17 +46,17 @@ export const defaultSortNode: NodesSortParams = {
 };
 
 const defaultSortGroup: StorageSortParams = {
-    sortValue: STORAGE_SORT_VALUES.PoolName,
+    sortValue: 'PoolName',
     sortOrder: ASCENDING,
 };
 
 const defaultSortGroupMissing: StorageSortParams = {
-    sortValue: STORAGE_SORT_VALUES.Degraded,
+    sortValue: 'Degraded',
     sortOrder: DESCENDING,
 };
 
 const defaultSortGroupSpace: StorageSortParams = {
-    sortValue: STORAGE_SORT_VALUES.Usage,
+    sortValue: 'Usage',
     sortOrder: DESCENDING,
 };
 

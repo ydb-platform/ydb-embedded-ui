@@ -1,9 +1,9 @@
-import {EVersion} from '../../../types/api/storage';
+import type {StorageRequestParams} from '../../../types/api/storage';
 import {api} from '../api';
 import type {NodesApiRequestParams} from '../nodes/types';
 
-import type {StorageApiRequestParams} from './types';
-import {prepareStorageGroupsResponse, prepareStorageNodesResponse} from './utils';
+import {requestStorageData} from './requestStorageData';
+import {prepareStorageNodesResponse} from './utils';
 
 export const storageApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -19,21 +19,21 @@ export const storageApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['All', 'StorageData'],
         }),
         getStorageGroupsInfo: builder.query({
-            queryFn: async (params: StorageApiRequestParams, {signal}) => {
+            queryFn: async (
+                params: StorageRequestParams & {shouldUseGroupsHandler?: boolean},
+                {signal},
+            ) => {
                 try {
-                    const result = await window.api.getStorageInfo(
-                        {version: EVersion.v1, ...params},
-                        {signal},
-                    );
-                    return {data: prepareStorageGroupsResponse(result)};
+                    const result = await requestStorageData(params, {signal});
+                    return {data: result};
                 } catch (error) {
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['All', 'StorageData'],
         }),
     }),
     overrideExisting: 'throw',

@@ -1,9 +1,7 @@
-import {EVersion} from '../../../types/api/storage';
-import {valueIsDefined} from '../../../utils';
+import {getVDiskSlotBasedId} from '../../../utils/disks/helpers';
 import {api} from '../api';
 
-import type {VDiskGroup} from './types';
-import {prepareVDiskDataResponse, prepareVDiskGroupResponse} from './utils';
+import {prepareVDiskDataResponse} from './utils';
 
 interface VDiskDataRequestParams {
     nodeId: number | string;
@@ -14,53 +12,27 @@ interface VDiskDataRequestParams {
 export const vDiskApi = api.injectEndpoints({
     endpoints: (build) => ({
         getVDiskData: build.query({
-            queryFn: async ({nodeId, pDiskId, vDiskSlotId}) => {
+            queryFn: async ({nodeId, pDiskId, vDiskSlotId}: VDiskDataRequestParams, {signal}) => {
                 try {
-                    const {vDiskData, groupData} = await requestVDiskData({
-                        nodeId,
-                        pDiskId,
-                        vDiskSlotId,
-                    });
-                    return {data: {vDiskData, groupData}};
+                    const response = await Promise.all([
+                        window.api.getVDiskInfo({nodeId, pDiskId, vDiskSlotId}, {signal}),
+                        window.api.getNodeWhiteboardPDiskInfo({nodeId, pDiskId}, {signal}),
+                        window.api.getNodeInfo(nodeId, {signal}),
+                    ]);
+                    const data = prepareVDiskDataResponse(response);
+                    return {data};
                 } catch (error) {
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: (_result, _error, arg) => [
+                'All',
+                {
+                    type: 'VDiskData',
+                    id: getVDiskSlotBasedId(arg.nodeId, arg.pDiskId, arg.vDiskSlotId),
+                },
+            ],
         }),
     }),
     overrideExisting: 'throw',
 });
-
-async function requestVDiskData(
-    {nodeId, pDiskId, vDiskSlotId}: VDiskDataRequestParams,
-    {signal}: {signal?: AbortSignal} = {},
-) {
-    const vDiskDataResponse = await Promise.all([
-        window.api.getVDiskInfo({nodeId, pDiskId, vDiskSlotId}, {signal}),
-        window.api.getNodeWhiteboardPDiskInfo({nodeId, pDiskId}, {signal}),
-        window.api.getNodeInfo(nodeId, {signal}),
-    ]);
-
-    const vDiskData = prepareVDiskDataResponse(vDiskDataResponse);
-
-    const {StoragePoolName, VDiskId = {}} = vDiskData;
-    const {GroupID} = VDiskId;
-
-    let groupData: VDiskGroup | undefined;
-
-    if (valueIsDefined(StoragePoolName) && valueIsDefined(GroupID)) {
-        const groupResponse = await window.api.getStorageInfo(
-            {
-                nodeId,
-                poolName: StoragePoolName,
-                groupId: GroupID,
-                version: EVersion.v1,
-            },
-            {signal},
-        );
-        groupData = prepareVDiskGroupResponse(groupResponse, StoragePoolName, GroupID);
-    }
-
-    return {vDiskData, groupData};
-}

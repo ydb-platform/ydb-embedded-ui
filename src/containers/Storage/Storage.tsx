@@ -6,6 +6,10 @@ import {AccessDenied} from '../../components/Errors/403';
 import {isAccessError} from '../../components/Errors/PageError/PageError';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {
+    useCapabilitiesLoaded,
+    useStorageGroupsHandlerAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
 import {
@@ -57,7 +61,10 @@ interface StorageProps {
 }
 
 export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) => {
+    const capabilitiesLoaded = useCapabilitiesLoaded();
+    const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
+
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
         visible: StringParam,
@@ -91,9 +98,9 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
         },
     );
     const groupsQuery = storageApi.useGetStorageGroupsInfoQuery(
-        {database, visibleEntities, nodeId},
+        {database, with: visibleEntities, nodeId, shouldUseGroupsHandler: groupsHandlerAvailable},
         {
-            skip: storageType !== STORAGE_TYPES.groups,
+            skip: storageType !== STORAGE_TYPES.groups || !capabilitiesLoaded,
             pollingInterval: autoRefreshInterval,
         },
     );
@@ -216,7 +223,10 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
             {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
+            <TableWithControlsLayout.Table
+                loading={isLoading || !capabilitiesLoaded}
+                className={b('table')}
+            >
                 {currentData ? renderDataTable() : null}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>

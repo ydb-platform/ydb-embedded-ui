@@ -1,8 +1,7 @@
-import url from 'url';
-
 import React from 'react';
 
 import isEmpty from 'lodash/isEmpty';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {Loader} from '../.././../components/Loader';
 import {ResponseError} from '../../../components/Errors/ResponseError';
@@ -37,25 +36,30 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
 
     const loadingStructure = isFetching && currentData === undefined;
 
-    const {pdiskId: pdiskIdFromUrl, vdiskId: vdiskIdFromUrl} = url.parse(
-        window.location.href,
-        true,
-    ).query;
+    const [{pdiskId: pdiskIdFromUrl, vdiskId: vdiskIdFromUrl}] = useQueryParams({
+        pdiskId: StringParam,
+        vdiskId: StringParam,
+    });
 
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
     const scrolled = React.useRef(false);
 
     React.useEffect(() => {
-        if (!isEmpty(nodeStructure) && !scrolled.current && scrollContainerRef.current) {
+        if (
+            !isEmpty(nodeStructure) &&
+            !scrolled.current &&
+            scrollContainerRef.current &&
+            pdiskIdFromUrl
+        ) {
             const element = document.getElementById(
-                generateId({type: 'pdisk', id: pdiskIdFromUrl as string}),
+                generateId({type: 'pdisk', id: pdiskIdFromUrl}),
             );
 
             let scrollToVdisk = 0;
 
             if (vdiskIdFromUrl) {
-                const vDisks = nodeStructure[pdiskIdFromUrl as string]?.vDisks;
+                const vDisks = nodeStructure[pdiskIdFromUrl]?.vDisks;
                 const vDisk = vDisks?.find((el) => el.id === vdiskIdFromUrl);
                 const dataTable = vDisk ? document.querySelector('.data-table') : undefined;
                 const order = vDisk?.order || 0;
