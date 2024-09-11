@@ -72,7 +72,7 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
         uptimeFilter: StringParam,
         usageFilter: UsageFilterParam,
     });
-    const type = storageTypeSchema.parse(queryParams.type);
+    const storageType = storageTypeSchema.parse(queryParams.type);
     const visibleEntities = visibleEntitiesSchema.parse(queryParams.visible);
     const filter = queryParams.search ?? '';
     const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
@@ -90,12 +90,8 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
     });
     const groupsSortParams = groupSort.sortOrder ? groupSort : getDefaultSortGroup(visibleEntities);
 
-    // Do not display Nodes table for Node page (NodeId present)
-    const isNodePage = nodeId !== undefined;
-    const storageType = isNodePage ? STORAGE_TYPES.groups : type;
-
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
-        {database, visibleEntities},
+        {database, visibleEntities, node_id: nodeId},
         {
             skip: storageType !== STORAGE_TYPES.nodes,
             pollingInterval: autoRefreshInterval,
@@ -198,7 +194,7 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
             <StorageControls
                 searchValue={filter}
                 handleSearchValueChange={handleTextFilterChange}
-                withTypeSelector={!isNodePage}
+                withTypeSelector
                 storageType={storageType}
                 handleStorageTypeChange={handleStorageTypeChange}
                 visibleEntities={visibleEntities}

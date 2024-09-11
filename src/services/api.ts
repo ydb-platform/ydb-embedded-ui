@@ -224,6 +224,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 // TODO: remove after remove tenant param
                 database: params.database || params.tenant,
                 tenant: params.tenant || params.database,
+                node_id: params.node_id,
             },
             {concurrentId, requestConfig: {signal}},
         );

@@ -18,8 +18,7 @@ import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {Tablets} from '../Tablets';
 
-import {NODE_PAGES, OVERVIEW, STORAGE, STRUCTURE, TABLETS} from './NodePages';
-import NodeStructure from './NodeStructure/NodeStructure';
+import {NODE_PAGES, OVERVIEW, STORAGE, TABLETS} from './NodePages';
 
 import './Node.scss';
 
@@ -136,9 +135,6 @@ export function Node(props: NodeProps) {
                 return <FullNodeViewer node={node} className={b('overview-wrapper')} />;
             }
 
-            case STRUCTURE: {
-                return <NodeStructure className={b('node-page-wrapper')} nodeId={nodeId} />;
-            }
             default:
                 return false;
         }
