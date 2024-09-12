@@ -7,7 +7,6 @@ import {isNumeric} from '../../../utils/utils';
 import {api} from '../api';
 import {setQueryResult} from '../executeQuery';
 
-import type {PreparedExplainResponse} from './types';
 import {prepareExplainResponse} from './utils';
 
 interface ExplainQueryParams extends QueryRequestParams {
@@ -20,7 +19,7 @@ interface ExplainQueryParams extends QueryRequestParams {
 
 export const explainQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
-        explainQuery: build.mutation<PreparedExplainResponse, ExplainQueryParams>({
+        explainQuery: build.mutation<null, ExplainQueryParams>({
             queryFn: async (
                 {query, database, querySettings, enableTracingLevel, queryId},
                 {signal, dispatch},
@@ -82,7 +81,7 @@ export const explainQueryApi = api.injectEndpoints({
                             isLoading: false,
                         }),
                     );
-                    return {data};
+                    return {data: null};
                 } catch (error) {
                     dispatch(
                         setQueryResult({

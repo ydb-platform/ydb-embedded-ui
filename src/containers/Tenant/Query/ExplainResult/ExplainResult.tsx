@@ -4,14 +4,14 @@ import {RadioButton} from '@gravity-ui/uikit';
 
 import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
+import ElapsedTime from '../../../../components/ElapsedTime/ElapsedTime';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
-import type {PreparedExplainResponse} from '../../../../store/reducers/explainQuery/types';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ValueOf} from '../../../../types/common';
-import type {EplainQueryResult} from '../../../../types/store/executeQuery';
+import type {ExplainQueryResult} from '../../../../types/store/executeQuery';
 import {cn} from '../../../../utils/cn';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch} from '../../../../utils/hooks';
@@ -60,26 +60,20 @@ const explainOptions = [
 
 interface ExplainResultProps {
     theme: string;
-    result: EplainQueryResult;
+    result: ExplainQueryResult;
     tenantName: string;
-    explain?: PreparedExplainResponse['plan'] & {DurationUs?: number};
-    simplifiedPlan?: PreparedExplainResponse['simplifiedPlan'];
-    ast?: string;
     isResultsCollapsed?: boolean;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
 }
 
 export function ExplainResult({
-    explain,
-    ast,
     theme,
     result,
     tenantName,
     onCollapseResults,
     onExpandResults,
     isResultsCollapsed,
-    simplifiedPlan,
 }: ExplainResultProps) {
     const dispatch = useTypedDispatch();
     const [activeOption, setActiveOption] = React.useState<QueryExplainTab>(
@@ -87,6 +81,8 @@ export function ExplainResult({
     );
     const [isPending, startTransition] = React.useTransition();
     const {error, isLoading, queryId} = result;
+
+    const {plan: explain, ast, simplifiedPlan} = result.data || {};
 
     React.useEffect(() => {
         return () => {
@@ -184,7 +180,10 @@ export function ExplainResult({
                         </React.Fragment>
                     )}
                     {isLoading ? (
-                        <CancelQueryButton queryId={queryId} tenantName={tenantName} />
+                        <React.Fragment>
+                            <ElapsedTime className={b('elapsed-time')} />
+                            <CancelQueryButton queryId={queryId} tenantName={tenantName} />
+                        </React.Fragment>
                     ) : null}
                 </div>
                 <div className={b('controls-left')}>

@@ -121,15 +121,7 @@ function QueryEditor(props: QueryEditorProps) {
             }
             setPath(tenantName);
         }
-    }, [
-        changeUserInput,
-        setPath,
-        setQueryResult,
-        tenantName,
-        savedPath,
-        executeQuery.result?.data,
-        executeQuery.result?.error,
-    ]);
+    }, [changeUserInput, setPath, setQueryResult, tenantName, savedPath]);
 
     const [resultVisibilityState, dispatchResultVisibilityState] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
@@ -370,6 +362,7 @@ function QueryEditor(props: QueryEditorProps) {
                         onCollapseResultHandler={onCollapseResultHandler}
                         type={type}
                         theme={theme}
+                        key={executeQuery.result?.queryId}
                         result={executeQuery.result}
                         tenantName={tenantName}
                         path={path}
@@ -442,14 +435,9 @@ function Result({
     }
 
     if (result?.type === ResultType.EXPLAIN) {
-        const {plan, ast, simplifiedPlan} = result.data || {};
-
         return (
             <ExplainResult
                 result={result}
-                explain={plan}
-                simplifiedPlan={simplifiedPlan}
-                ast={ast}
                 theme={theme}
                 tenantName={tenantName}
                 isResultsCollapsed={resultVisibilityState.collapsed}

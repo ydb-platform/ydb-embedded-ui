@@ -11,12 +11,7 @@ import type {
     QueryInHistory,
     QueryResult,
 } from '../../types/store/executeQuery';
-import type {
-    IQueryResult,
-    QueryRequestParams,
-    QuerySettings,
-    QuerySyntax,
-} from '../../types/store/query';
+import type {QueryRequestParams, QuerySettings, QuerySyntax} from '../../types/store/query';
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
 import {QUERY_SYNTAX, isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
@@ -200,7 +195,7 @@ interface QueryStats {
 
 export const executeQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
-        executeQuery: build.mutation<IQueryResult, SendQueryParams>({
+        executeQuery: build.mutation<null, SendQueryParams>({
             queryFn: async (
                 {
                     query,
@@ -285,7 +280,7 @@ export const executeQueryApi = api.injectEndpoints({
                             queryId,
                         }),
                     );
-                    return {data};
+                    return {data: null};
                 } catch (error) {
                     dispatch(
                         setQueryResult({

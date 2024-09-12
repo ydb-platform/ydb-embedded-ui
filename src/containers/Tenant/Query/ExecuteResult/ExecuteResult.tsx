@@ -6,6 +6,7 @@ import JSONTree from 'react-json-inspector';
 
 import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
+import ElapsedTime from '../../../../components/ElapsedTime/ElapsedTime';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {YDBGraph} from '../../../../components/Graph/Graph';
@@ -255,7 +256,10 @@ export function ExecuteResult({
                         </React.Fragment>
                     )}
                     {isLoading ? (
-                        <CancelQueryButton queryId={queryId} tenantName={tenantName} />
+                        <React.Fragment>
+                            <ElapsedTime className={b('elapsed-time')} />
+                            <CancelQueryButton queryId={queryId} tenantName={tenantName} />
+                        </React.Fragment>
                     ) : null}
                     {data?.traceId ? <TraceButton traceId={data.traceId} /> : null}
                 </div>

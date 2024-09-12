@@ -36,13 +36,13 @@ export type ExecuteQueryResult = {
     error?: unknown;
 } & CommonResultParams;
 
-export type EplainQueryResult = {
+export type ExplainQueryResult = {
     type: ResultType.EXPLAIN;
     data?: PreparedExplainResponse;
     error?: unknown;
 } & CommonResultParams;
 
-export type QueryResult = ExecuteQueryResult | EplainQueryResult;
+export type QueryResult = ExecuteQueryResult | ExplainQueryResult;
 
 export interface ExecuteQueryState {
     input: string;
