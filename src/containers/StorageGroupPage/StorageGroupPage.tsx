@@ -73,7 +73,7 @@ export function StorageGroupPage() {
     );
 
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
-        storageGroupTab === STORAGE_TYPES.nodes ? {} : skipToken,
+        groupId && storageGroupTab === STORAGE_TYPES.nodes ? {group_id: groupId} : skipToken,
         {
             pollingInterval: autoRefreshInterval,
         },

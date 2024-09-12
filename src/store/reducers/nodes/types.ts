@@ -68,6 +68,7 @@ export interface NodesGeneralRequestParams extends Partial<NodesSortParams> {
 
 export interface NodesApiRequestParams extends NodesGeneralRequestParams {
     node_id?: number | string; // get only specific node
+    group_id?: number | string;
     path?: string;
     database?: string;
     /** @deprecated use database instead */
