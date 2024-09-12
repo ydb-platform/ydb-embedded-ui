@@ -72,6 +72,7 @@ export const clusterApi = api.injectEndpoints({
             string | undefined
         >({
             queryFn: async (clusterName, {signal, dispatch}) => {
+                let clusterTitle = clusterName;
                 try {
                     const clusterData = await window.api.getClusterInfo(clusterName, {signal});
 
@@ -79,11 +80,7 @@ export const clusterApi = api.injectEndpoints({
 
                     const clusterRoot = Domain;
 
-                    const clusterTitle = Name || clusterName || normalizeDomain(clusterRoot);
-                    if (clusterTitle) {
-                        dispatch(setClusterTitle(clusterTitle));
-                    }
-
+                    clusterTitle = Name || clusterName || normalizeDomain(clusterRoot);
                     // Without domain we cannot get stats from system tables
                     if (!clusterRoot) {
                         return {data: {clusterData}};
@@ -117,21 +114,27 @@ export const clusterApi = api.injectEndpoints({
                     }
                 } catch (error) {
                     return {error};
+                } finally {
+                    if (clusterTitle) {
+                        dispatch(setClusterTitle(clusterTitle));
+                    }
                 }
             },
             providesTags: ['All'],
         }),
         getClusterBaseInfo: builder.query({
             queryFn: async (clusterName: string, {signal, dispatch}) => {
+                let clusterTitle = clusterName;
                 try {
                     const data = await window.api.getClusterBaseInfo(clusterName, {signal});
-                    const clusterTitle = data.title || data.name || clusterName;
-                    if (clusterTitle) {
-                        dispatch(setClusterTitle(clusterTitle));
-                    }
+                    clusterTitle = data.title || data.name || clusterName;
                     return {data};
                 } catch (error) {
                     return {error};
+                } finally {
+                    if (clusterTitle) {
+                        dispatch(setClusterTitle(clusterTitle));
+                    }
                 }
             },
             providesTags: ['All'],
