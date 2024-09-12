@@ -5,7 +5,7 @@ import {Breadcrumbs} from '@gravity-ui/uikit';
 import {InternalLink} from '../../components/InternalLink';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
 import {backend, customBackend} from '../../store';
-import {selectClusterTitle} from '../../store/reducers/cluster/cluster';
+import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
 import {useTypedSelector} from '../../utils/hooks';
@@ -32,7 +32,10 @@ interface HeaderProps {
 function Header({mainPage}: HeaderProps) {
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
-    const clusterName = useTypedSelector(selectClusterTitle);
+
+    const clusterInfo = useClusterBaseInfo();
+
+    const clusterName = clusterInfo.title || clusterInfo.name;
 
     const breadcrumbItems = React.useMemo(() => {
         const rawBreadcrumbs: RawBreadcrumbItem[] = [];

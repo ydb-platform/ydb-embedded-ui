@@ -123,18 +123,12 @@ export const clusterApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
         getClusterBaseInfo: builder.query({
-            queryFn: async (clusterName: string, {signal, dispatch}) => {
-                let clusterTitle = clusterName;
+            queryFn: async (clusterName: string, {signal}) => {
                 try {
                     const data = await window.api.getClusterBaseInfo(clusterName, {signal});
-                    clusterTitle = data.title || data.name || clusterName;
                     return {data};
                 } catch (error) {
                     return {error};
-                } finally {
-                    if (clusterTitle) {
-                        dispatch(setClusterTitle(clusterTitle));
-                    }
                 }
             },
             providesTags: ['All'],
