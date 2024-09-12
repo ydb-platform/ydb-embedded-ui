@@ -28,7 +28,7 @@ import {Versions} from '../Versions/Versions';
 
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';
 import type {ClusterTab} from './utils';
-import {clusterTabs, clusterTabsIds, getClusterPath, isClusterTab} from './utils';
+import {clusterTabs, clusterTabsIds, getClusterPath, isClusterTab, normalizeDomain} from './utils';
 
 import './Cluster.scss';
 
@@ -66,11 +66,11 @@ export function Cluster({
 
     const clusterError = error && typeof error === 'object' ? error : undefined;
 
-    const {Name} = cluster;
+    const {Name, Domain} = cluster;
 
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('cluster', {}));
-    }, [dispatch, Name]);
+    }, [dispatch]);
 
     const versionToColor = React.useMemo(() => {
         if (additionalVersionsProps?.getVersionToColorMap) {
@@ -78,6 +78,8 @@ export function Cluster({
         }
         return parseVersionsToVersionToColorMap(cluster?.Versions);
     }, [additionalVersionsProps, cluster]);
+
+    const clusterTitle = Name ?? clusterName ?? normalizeDomain(Domain) ?? CLUSTER_DEFAULT_TITLE;
 
     const getClusterTitle = () => {
         if (infoLoading) {
@@ -88,13 +90,12 @@ export function Cluster({
             <EntityStatus
                 size="m"
                 status={cluster?.Overall}
-                name={cluster?.Name ?? CLUSTER_DEFAULT_TITLE}
+                name={clusterTitle}
                 className={b('title')}
             />
         );
     };
 
-    const clusterTitle = cluster?.Name ?? clusterName ?? CLUSTER_DEFAULT_TITLE;
     const activeTab = React.useMemo(
         () => clusterTabs.find(({id}) => id === activeTabId),
         [activeTabId],

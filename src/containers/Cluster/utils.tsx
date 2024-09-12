@@ -42,3 +42,11 @@ export function isClusterTab(tab: any): tab is ClusterTab {
 export const getClusterPath = (activeTab?: ClusterTab, query = {}) => {
     return createHref(routes.cluster, activeTab ? {activeTab} : undefined, query);
 };
+
+export function normalizeDomain(domain?: string) {
+    if (!domain) {
+        return undefined;
+    }
+    const normalizedDomain = domain.startsWith('/') ? domain.slice(1) : domain;
+    return normalizedDomain.toUpperCase();
+}
