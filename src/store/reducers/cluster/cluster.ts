@@ -12,7 +12,11 @@ import {isQueryErrorResponse} from '../../../utils/query';
 import {api} from '../api';
 
 import type {ClusterGroupsStats, ClusterState} from './types';
-import {createSelectClusterGroupsQuery, parseGroupsStatsQueryResponse} from './utils';
+import {
+    createSelectClusterGroupsQuery,
+    normalizeDomain,
+    parseGroupsStatsQueryResponse,
+} from './utils';
 
 const defaultClusterTabLS = localStorage.getItem(DEFAULT_CLUSTER_TAB_KEY);
 
@@ -33,19 +37,30 @@ const clusterSlice = createSlice({
         setDefaultClusterTab(state, action: PayloadAction<ClusterTab>) {
             state.defaultClusterTab = action.payload;
         },
+        setClusterTitle: (state, action: PayloadAction<string>) => {
+            const clusterTitle = action.payload;
+
+            state.clusterTitle = clusterTitle;
+        },
+    },
+    selectors: {
+        selectClusterTitle: (state) => state.clusterTitle,
     },
 });
+
+export default clusterSlice.reducer;
+export const {selectClusterTitle} = clusterSlice.selectors;
+
+const {setClusterTitle, setDefaultClusterTab} = clusterSlice.actions;
 
 export function updateDefaultClusterTab(tab: string) {
     return (dispatch: Dispatch) => {
         if (isClusterTab(tab)) {
             localStorage.setItem(DEFAULT_CLUSTER_TAB_KEY, tab);
-            dispatch(clusterSlice.actions.setDefaultClusterTab(tab));
+            dispatch(setDefaultClusterTab(tab));
         }
     };
 }
-
-export default clusterSlice.reducer;
 
 export const clusterApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -56,11 +71,18 @@ export const clusterApi = api.injectEndpoints({
             },
             string | undefined
         >({
-            queryFn: async (clusterName, {signal}) => {
+            queryFn: async (clusterName, {signal, dispatch}) => {
                 try {
                     const clusterData = await window.api.getClusterInfo(clusterName, {signal});
 
-                    const clusterRoot = clusterData.Domain;
+                    const {Name, Domain} = clusterData;
+
+                    const clusterRoot = Domain;
+
+                    const clusterTitle = Name || clusterName || normalizeDomain(clusterRoot);
+                    if (clusterTitle) {
+                        dispatch(setClusterTitle(clusterTitle));
+                    }
 
                     // Without domain we cannot get stats from system tables
                     if (!clusterRoot) {
@@ -100,9 +122,13 @@ export const clusterApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
         getClusterBaseInfo: builder.query({
-            queryFn: async (clusterName: string, {signal}) => {
+            queryFn: async (clusterName: string, {signal, dispatch}) => {
                 try {
                     const data = await window.api.getClusterBaseInfo(clusterName, {signal});
+                    const clusterTitle = data.title || data.name || clusterName;
+                    if (clusterTitle) {
+                        dispatch(setClusterTitle(clusterTitle));
+                    }
                     return {data};
                 } catch (error) {
                     return {error};

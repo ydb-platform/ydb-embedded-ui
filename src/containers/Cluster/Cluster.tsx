@@ -9,7 +9,11 @@ import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefres
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import routes, {getLocationObjectFromHref} from '../../routes';
-import {clusterApi, updateDefaultClusterTab} from '../../store/reducers/cluster/cluster';
+import {
+    clusterApi,
+    selectClusterTitle,
+    updateDefaultClusterTab,
+} from '../../store/reducers/cluster/cluster';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import type {
     AdditionalClusterProps,
@@ -28,7 +32,7 @@ import {Versions} from '../Versions/Versions';
 
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';
 import type {ClusterTab} from './utils';
-import {clusterTabs, clusterTabsIds, getClusterPath, isClusterTab, normalizeDomain} from './utils';
+import {clusterTabs, clusterTabsIds, getClusterPath, isClusterTab} from './utils';
 
 import './Cluster.scss';
 
@@ -49,6 +53,10 @@ export function Cluster({
 }: ClusterProps) {
     const container = React.useRef<HTMLDivElement>(null);
 
+    const rawClusterTitle = useTypedSelector(selectClusterTitle);
+
+    const clusterTitle = rawClusterTitle ?? CLUSTER_DEFAULT_TITLE;
+
     const dispatch = useTypedDispatch();
 
     const activeTabId = useClusterTab();
@@ -66,8 +74,6 @@ export function Cluster({
 
     const clusterError = error && typeof error === 'object' ? error : undefined;
 
-    const {Name, Domain} = cluster;
-
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('cluster', {}));
     }, [dispatch]);
@@ -78,8 +84,6 @@ export function Cluster({
         }
         return parseVersionsToVersionToColorMap(cluster?.Versions);
     }, [additionalVersionsProps, cluster]);
-
-    const clusterTitle = Name ?? clusterName ?? normalizeDomain(Domain) ?? CLUSTER_DEFAULT_TITLE;
 
     const getClusterTitle = () => {
         if (infoLoading) {
