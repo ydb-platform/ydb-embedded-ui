@@ -1,4 +1,4 @@
-import type {ValueOf} from '../types/common';
+import type {StorageV2SortValue} from '../types/api/storage';
 
 interface EntityWithUsage {
     Used: number;
@@ -12,26 +12,19 @@ export const getUsage = <T extends EntityWithUsage>(data: T, step = 1) => {
     return Math.floor(usage / step) * step;
 };
 
-/**
- * Values to sort /storage v2 response
- *
- * Source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/json_storage.h
- */
-export const STORAGE_SORT_VALUES = {
-    PoolName: 'PoolName',
-    Kind: 'Kind',
-    MediaType: 'MediaType',
-    Erasure: 'Erasure',
-    Degraded: 'Degraded',
-    Usage: 'Usage',
-    GroupId: 'GroupId',
-    Used: 'Used',
-    Limit: 'Limit',
-    Read: 'Read',
-    Write: 'Write',
-} as const;
+const STORAGE_SORT_VALUES: StorageV2SortValue[] = [
+    'PoolName',
+    'Kind',
+    'MediaType',
+    'Erasure',
+    'Degraded',
+    'Usage',
+    'GroupId',
+    'Used',
+    'Limit',
+    'Read',
+    'Write',
+];
 
-export type StorageSortValue = ValueOf<typeof STORAGE_SORT_VALUES>;
-
-export const isSortableStorageProperty = (value: string): value is StorageSortValue =>
-    Object.values(STORAGE_SORT_VALUES).includes(value as StorageSortValue);
+export const isSortableStorageProperty = (value: string): value is StorageV2SortValue =>
+    STORAGE_SORT_VALUES.includes(value as StorageV2SortValue);

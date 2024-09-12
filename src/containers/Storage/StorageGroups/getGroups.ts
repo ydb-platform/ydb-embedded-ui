@@ -1,43 +1,51 @@
+import React from 'react';
+
 import type {FetchData} from '../../../components/PaginatedTable';
+import {requestStorageData} from '../../../store/reducers/storage/requestStorageData';
 import type {
     PreparedStorageGroup,
     PreparedStorageGroupFilters,
 } from '../../../store/reducers/storage/types';
-import {prepareStorageGroupsResponse} from '../../../store/reducers/storage/utils';
-import {EVersion} from '../../../types/api/storage';
-import type {StorageSortValue} from '../../../utils/storage';
+import type {StorageV2Sort} from '../../../types/api/storage';
+import {prepareSortValue} from '../../../utils/filters';
 
 const getConcurrentId = (limit?: number, offset?: number) => {
     return `getStorageGroups|offset${offset}|limit${limit}`;
 };
 
-export const getStorageGroups: FetchData<
-    PreparedStorageGroup,
-    PreparedStorageGroupFilters
-> = async (params) => {
-    const {limit, offset, sortParams, filters} = params;
-    const {sortOrder, columnId} = sortParams ?? {};
-    const {searchValue, visibleEntities, database, nodeId} = filters ?? {};
+type GetStorageGroups = FetchData<PreparedStorageGroup, PreparedStorageGroupFilters>;
 
-    const response = await window.api.getStorageInfo(
-        {
-            version: EVersion.v2,
-            limit,
-            offset,
-            sortOrder,
-            sortValue: columnId as StorageSortValue,
-            filter: searchValue,
-            visibleEntities,
-            database,
-            nodeId,
+export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
+    const fetchData: GetStorageGroups = React.useCallback(
+        async (params) => {
+            const {limit, offset, sortParams, filters} = params;
+            const {sortOrder, columnId} = sortParams ?? {};
+            const {searchValue, visibleEntities, database, nodeId} = filters ?? {};
+
+            const sort = prepareSortValue(columnId, sortOrder) as StorageV2Sort;
+
+            const {groups, found, total} = await requestStorageData(
+                {
+                    limit,
+                    offset,
+                    sort,
+                    filter: searchValue,
+                    with: visibleEntities,
+                    database,
+                    nodeId,
+                    shouldUseGroupsHandler,
+                },
+                {concurrentId: getConcurrentId(limit, offset)},
+            );
+
+            return {
+                data: groups || [],
+                found: found || 0,
+                total: total || 0,
+            };
         },
-        {concurrentId: getConcurrentId(limit, offset)},
+        [shouldUseGroupsHandler],
     );
-    const preparedResponse = prepareStorageGroupsResponse(response);
 
-    return {
-        data: preparedResponse.groups || [],
-        found: preparedResponse.found || 0,
-        total: preparedResponse.total || 0,
-    };
-};
+    return fetchData;
+}

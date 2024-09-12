@@ -1,5 +1,3 @@
-import url from 'url';
-
 export const getUrlData = ({
     href,
     singleClusterMode,
@@ -10,17 +8,20 @@ export const getUrlData = ({
     customBackend?: string;
 }) => {
     if (!singleClusterMode) {
-        const {backend, clusterName} = url.parse(href, true).query;
+        const urlSearchParams = new URL(href).searchParams;
+        const backend = urlSearchParams.get('backend') ?? undefined;
+        const clusterName = urlSearchParams.get('clusterName') ?? undefined;
         return {
             basename: '/',
-            backend: backend ? String(backend) : backend,
-            clusterName: clusterName ? String(clusterName) : clusterName,
+            backend,
+            clusterName,
         };
     } else if (customBackend) {
-        const {backend} = url.parse(href, true).query;
+        const urlSearchParams = new URL(href).searchParams;
+        const backend = urlSearchParams.get('backend') ?? undefined;
         return {
             basename: '/',
-            backend: backend ? String(backend) : customBackend,
+            backend: backend ? backend : customBackend,
         };
     } else {
         const parsedPrefix = window.location.pathname.match(/.*(?=\/monitoring)/) || [];

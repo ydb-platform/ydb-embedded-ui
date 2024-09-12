@@ -5,7 +5,6 @@ import axiosRetry from 'axios-retry';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
 import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
-import type {StorageApiRequestParams} from '../store/reducers/storage/types';
 import type {TMetaInfo} from '../types/api/acl';
 import type {TQueryAutocomplete} from '../types/api/autocomplete';
 import type {CapabilitiesResponse} from '../types/api/capabilities';
@@ -37,7 +36,12 @@ import type {
 } from '../types/api/query';
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../types/api/render';
 import type {TEvDescribeSchemeResult} from '../types/api/schema';
-import type {TStorageInfo} from '../types/api/storage';
+import type {
+    GroupsRequestParams,
+    StorageGroupsResponse,
+    StorageRequestParams,
+    TStorageInfo,
+} from '../types/api/storage';
 import type {TEvSystemStateResponse} from '../types/api/systemState';
 import type {
     TDomainKey,
@@ -67,7 +71,7 @@ const TRACE_CHECK_TIMEOUT = 2 * SECOND_IN_MS;
 const TRACE_API_ERROR_TIMEOUT = 10 * SECOND_IN_MS;
 const MAX_TRACE_CHECK_RETRIES = 30;
 
-type AxiosOptions = {
+export type AxiosOptions = {
     concurrentId?: string;
     signal?: AbortSignal;
     withRetries?: boolean;
@@ -135,6 +139,10 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     getPath(path: string) {
         return `${BACKEND ?? ''}${path}`;
     }
+    prepareArrayRequestParam(arr: (string | number)[]) {
+        return arr.join(',');
+    }
+
     getClusterCapabilities() {
         return this.get<CapabilitiesResponse>(this.getPath('/viewer/capabilities'), {}, {});
     }
@@ -216,6 +224,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 // TODO: remove after remove tenant param
                 database: params.database || params.tenant,
                 tenant: params.tenant || params.database,
+                node_id: params.node_id,
             },
             {concurrentId, requestConfig: {signal}},
         );
@@ -234,31 +243,49 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getStorageInfo(
-        {
-            tenant,
-            database,
-            visibleEntities,
-            nodeId,
-            poolName,
-            groupId,
-            sortOrder,
-            sortValue,
-            ...params
-        }: StorageApiRequestParams,
+        {tenant, database, nodeId, groupId, pDiskId, ...params}: StorageRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
-        const sort = prepareSortValue(sortValue, sortOrder);
-
         return this.get<TStorageInfo>(
             this.getPath(`/viewer/json/storage?enums=true`),
             {
                 database: database || tenant,
                 tenant: tenant || database,
                 node_id: nodeId,
-                pool: poolName,
                 group_id: groupId,
-                with: visibleEntities,
-                sort,
+                pdisk_id: pDiskId,
+                ...params,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+    getStorageGroups(
+        {nodeId, pDiskId, groupId, fieldsRequired = 'all', ...params}: GroupsRequestParams,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        const preparedNodeId = Array.isArray(nodeId)
+            ? this.prepareArrayRequestParam(nodeId)
+            : nodeId;
+
+        const preparedPDiskId = Array.isArray(pDiskId)
+            ? this.prepareArrayRequestParam(pDiskId)
+            : pDiskId;
+
+        const preparedGroupId = Array.isArray(groupId)
+            ? this.prepareArrayRequestParam(groupId)
+            : groupId;
+
+        const preparedFieldsRequired = Array.isArray(fieldsRequired)
+            ? this.prepareArrayRequestParam(fieldsRequired)
+            : fieldsRequired;
+
+        return this.get<StorageGroupsResponse>(
+            this.getPath('/storage/groups'),
+            {
+                node_id: preparedNodeId,
+                pdisk_id: preparedPDiskId,
+                group_id: preparedGroupId,
+                fields_required: preparedFieldsRequired,
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},
