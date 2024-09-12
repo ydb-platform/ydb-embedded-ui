@@ -1,0 +1,44 @@
+@import '../../styles//mixins.scss';
+
+.ydb-storage-group-page {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    height: 100%;
+    padding: 20px;
+
+    &__meta,
+    &__title,
+    &__controls,
+    &__info,
+    &__tabs {
+        position: sticky;
+        left: 0;
+    }
+
+    &__controls {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-2);
+    }
+
+    &__group-disks {
+        display: flex;
+        flex-grow: 1;
+        flex-flow: row wrap;
+        gap: 10px;
+
+        margin-top: 20px;
+    }
+
+    &__tabs {
+        @include tabs-wrapper-styles();
+    }
+
+    &__group-disk {
+        width: 150px;
+    }
+}
