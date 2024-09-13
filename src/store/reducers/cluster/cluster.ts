@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
 import type {Dispatch, PayloadAction} from '@reduxjs/toolkit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {StringParam, useQueryParam} from 'use-query-params';
@@ -8,14 +8,16 @@ import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
 import {parseTraceFields} from '../../../services/parsers/parseMetaCluster';
 import {isClusterInfoV2} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
-import {DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
+import {CLUSTER_DEFAULT_TITLE, DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
 import {isQueryErrorResponse} from '../../../utils/query';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
 import type {ClusterGroupsStats, ClusterState} from './types';
 import {
     createSelectClusterGroupsQuery,
     getGroupStatsFromClusterInfo,
+    normalizeDomain,
     parseGroupsStatsQueryResponse,
 } from './utils';
 
@@ -66,7 +68,6 @@ export const clusterApi = api.injectEndpoints({
                     const clusterData = await window.api.getClusterInfo(clusterName, {signal});
 
                     const clusterRoot = clusterData.Domain;
-
                     // Without domain we cannot get stats from system tables
                     if (!clusterRoot) {
                         return {data: {clusterData}};
@@ -148,3 +149,24 @@ export function useClusterBaseInfo() {
         monitoring,
     };
 }
+
+const createClusterInfoSelector = createSelector(
+    (clusterName?: string) => clusterName,
+    (clusterName) => clusterApi.endpoints.getClusterInfo.select(clusterName),
+);
+
+export const selectClusterInfo = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, clusterName?: string) => createClusterInfoSelector(clusterName),
+    (state, selectGetClusterInfo) => selectGetClusterInfo(state).data,
+);
+
+export const selectClusterTitle = createSelector(
+    (_state: RootState, clusterName?: string) => clusterName,
+    (state: RootState, clusterName?: string) => selectClusterInfo(state, clusterName),
+    (clusterName, clusterInfo) => {
+        const {Name, Domain} = clusterInfo?.clusterData || {};
+
+        return Name || clusterName || normalizeDomain(Domain) || CLUSTER_DEFAULT_TITLE;
+    },
+);

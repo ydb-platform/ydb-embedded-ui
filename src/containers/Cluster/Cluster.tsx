@@ -9,7 +9,11 @@ import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefres
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import routes, {getLocationObjectFromHref} from '../../routes';
-import {clusterApi, updateDefaultClusterTab} from '../../store/reducers/cluster/cluster';
+import {
+    clusterApi,
+    selectClusterTitle,
+    updateDefaultClusterTab,
+} from '../../store/reducers/cluster/cluster';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import type {
     AdditionalClusterProps,
@@ -18,7 +22,6 @@ import type {
     AdditionalVersionsProps,
 } from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {parseVersionsToVersionToColorMap} from '../../utils/versions';
 import {NodesWrapper} from '../Nodes/NodesWrapper';
@@ -58,6 +61,10 @@ export function Cluster({
         backend: StringParam,
     });
 
+    const clusterTitle = useTypedSelector((state) =>
+        selectClusterTitle(state, clusterName ?? undefined),
+    );
+
     const {
         data: {clusterData: cluster = {}, groupsStats} = {},
         isLoading: infoLoading,
@@ -66,11 +73,9 @@ export function Cluster({
 
     const clusterError = error && typeof error === 'object' ? error : undefined;
 
-    const {Name} = cluster;
-
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('cluster', {}));
-    }, [dispatch, Name]);
+    }, [dispatch]);
 
     const versionToColor = React.useMemo(() => {
         if (additionalVersionsProps?.getVersionToColorMap) {
@@ -88,13 +93,12 @@ export function Cluster({
             <EntityStatus
                 size="m"
                 status={cluster?.Overall}
-                name={cluster?.Name ?? CLUSTER_DEFAULT_TITLE}
+                name={clusterTitle}
                 className={b('title')}
             />
         );
     };
 
-    const clusterTitle = cluster?.Name ?? clusterName ?? CLUSTER_DEFAULT_TITLE;
     const activeTab = React.useMemo(
         () => clusterTabs.find(({id}) => id === activeTabId),
         [activeTabId],

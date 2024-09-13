@@ -1,5 +1,29 @@
 # Changelog
 
+## [6.19.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.18.0...v6.19.0) (2024-09-13)
+
+
+### Features
+
+* add storage/groups endpoint ([#1273](https://github.com/ydb-platform/ydb-embedded-ui/issues/1273)) ([42ee9a4](https://github.com/ydb-platform/ydb-embedded-ui/commit/42ee9a470632807650cfc0dd934f5b0a3d30c909))
+* **Diagnostics:** display db feature flags ([#1229](https://github.com/ydb-platform/ydb-embedded-ui/issues/1229)) ([182d803](https://github.com/ydb-platform/ydb-embedded-ui/commit/182d803205667794f16811de1be5ea685b1478e8))
+* **Header:** use cluster domain if cluster name is undefined ([#1271](https://github.com/ydb-platform/ydb-embedded-ui/issues/1271)) ([125d556](https://github.com/ydb-platform/ydb-embedded-ui/commit/125d556810a4013aee9a97bfde3db27f3e4e0b5b))
+* **Node:** enable nodes switch in storage tab on node page ([#1277](https://github.com/ydb-platform/ydb-embedded-ui/issues/1277)) ([07560ed](https://github.com/ydb-platform/ydb-embedded-ui/commit/07560ed8fca8cedbd473f629267522596d1ecb35))
+* **package:** export AsideNavigation ([#1262](https://github.com/ydb-platform/ydb-embedded-ui/issues/1262)) ([bb647f5](https://github.com/ydb-platform/ydb-embedded-ui/commit/bb647f5588a7ddcf11b3efa45067b79462159e97))
+* paginated table fixes ([#1265](https://github.com/ydb-platform/ydb-embedded-ui/issues/1265)) ([d0ef412](https://github.com/ydb-platform/ydb-embedded-ui/commit/d0ef412197f84542faff019e524855bf81989315))
+* use /db_clusters to get base cluster info ([#1251](https://github.com/ydb-platform/ydb-embedded-ui/issues/1251)) ([cd8c7dc](https://github.com/ydb-platform/ydb-embedded-ui/commit/cd8c7dc69364eedfcb490060ca1cdd2d0b4e1e77))
+* use groups handler for storage ([#1225](https://github.com/ydb-platform/ydb-embedded-ui/issues/1225)) ([45c0a1e](https://github.com/ydb-platform/ydb-embedded-ui/commit/45c0a1e8dc15eb4a404177a6f02e3e947d9a27e2))
+
+
+### Bug Fixes
+
+* **autocomplete:** do not lose folder if its name is equals to database ([#1290](https://github.com/ydb-platform/ydb-embedded-ui/issues/1290)) ([f22bdba](https://github.com/ydb-platform/ydb-embedded-ui/commit/f22bdbab6493a07c6150d7a6a52b4064f62f58ac))
+* better retry timeout for traces ([#1263](https://github.com/ydb-platform/ydb-embedded-ui/issues/1263)) ([400a526](https://github.com/ydb-platform/ydb-embedded-ui/commit/400a526d9b587563eb977c33e70d0134f41d861d))
+* gh-pages commit history ([#1275](https://github.com/ydb-platform/ydb-embedded-ui/issues/1275)) ([f09ccd3](https://github.com/ydb-platform/ydb-embedded-ui/commit/f09ccd3d8fe7fa87b1b162ef386c6dd01f69eb4f))
+* **PaginatedStorageNodes:** increase row height ([#1282](https://github.com/ydb-platform/ydb-embedded-ui/issues/1282)) ([08e4308](https://github.com/ydb-platform/ydb-embedded-ui/commit/08e43089fd99ad762d1d6c0300c9c07e5c07dc00))
+* unnecessary background refresh on query page ([#1256](https://github.com/ydb-platform/ydb-embedded-ui/issues/1256)) ([04b4313](https://github.com/ydb-platform/ydb-embedded-ui/commit/04b431377e143c002426c39ceca713dbe14cd23e))
+* update alter table query template ([#1284](https://github.com/ydb-platform/ydb-embedded-ui/issues/1284)) ([4bf43af](https://github.com/ydb-platform/ydb-embedded-ui/commit/4bf43aff05acd1ab20f670e77b3bdd42c9213d42))
+
 ## [6.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.17.2...v6.18.0) (2024-09-04)
 
 
