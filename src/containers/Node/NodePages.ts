@@ -17,10 +17,11 @@ export const NODE_PAGES = [
         id: STORAGE,
         name: 'Storage',
     },
-    {
-        id: STRUCTURE,
-        name: 'Structure',
-    },
+    // TODO: remove Node Structure component
+    // {
+    //     id: STRUCTURE,
+    //     name: 'Structure',
+    // },
     {
         id: TABLETS,
         name: 'Tablets',

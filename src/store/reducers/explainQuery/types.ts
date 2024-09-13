@@ -15,6 +15,7 @@ export interface PreparedExplainResponse {
         tables?: PlanTable[];
         version?: string;
         pristine?: QueryPlan | ScriptPlan;
+        DurationUs?: string | number;
     };
     simplifiedPlan?: {
         plan?: SimplifiedPlanItem[];

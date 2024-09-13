@@ -6,6 +6,10 @@ import {AccessDenied} from '../../components/Errors/403';
 import {isAccessError} from '../../components/Errors/PageError/PageError';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {
+    useCapabilitiesLoaded,
+    useStorageGroupsHandlerAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
 import {
@@ -57,7 +61,10 @@ interface StorageProps {
 }
 
 export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) => {
+    const capabilitiesLoaded = useCapabilitiesLoaded();
+    const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
+
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
         visible: StringParam,
@@ -65,7 +72,7 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
         uptimeFilter: StringParam,
         usageFilter: UsageFilterParam,
     });
-    const type = storageTypeSchema.parse(queryParams.type);
+    const storageType = storageTypeSchema.parse(queryParams.type);
     const visibleEntities = visibleEntitiesSchema.parse(queryParams.visible);
     const filter = queryParams.search ?? '';
     const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
@@ -83,21 +90,17 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
     });
     const groupsSortParams = groupSort.sortOrder ? groupSort : getDefaultSortGroup(visibleEntities);
 
-    // Do not display Nodes table for Node page (NodeId present)
-    const isNodePage = nodeId !== undefined;
-    const storageType = isNodePage ? STORAGE_TYPES.groups : type;
-
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
-        {database, visibleEntities},
+        {database, visibleEntities, node_id: nodeId},
         {
             skip: storageType !== STORAGE_TYPES.nodes,
             pollingInterval: autoRefreshInterval,
         },
     );
     const groupsQuery = storageApi.useGetStorageGroupsInfoQuery(
-        {database, with: visibleEntities, nodeId},
+        {database, with: visibleEntities, nodeId, shouldUseGroupsHandler: groupsHandlerAvailable},
         {
-            skip: storageType !== STORAGE_TYPES.groups,
+            skip: storageType !== STORAGE_TYPES.groups || !capabilitiesLoaded,
             pollingInterval: autoRefreshInterval,
         },
     );
@@ -191,7 +194,7 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
             <StorageControls
                 searchValue={filter}
                 handleSearchValueChange={handleTextFilterChange}
-                withTypeSelector={!isNodePage}
+                withTypeSelector
                 storageType={storageType}
                 handleStorageTypeChange={handleStorageTypeChange}
                 visibleEntities={visibleEntities}
@@ -220,7 +223,10 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
             {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
+            <TableWithControlsLayout.Table
+                loading={isLoading || !capabilitiesLoaded}
+                className={b('table')}
+            >
                 {currentData ? renderDataTable() : null}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>

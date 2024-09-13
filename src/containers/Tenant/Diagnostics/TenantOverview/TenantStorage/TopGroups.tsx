@@ -1,5 +1,9 @@
 import React from 'react';
 
+import {
+    useCapabilitiesLoaded,
+    useStorageGroupsHandlerAvailable,
+} from '../../../../../store/reducers/capabilities/hooks';
 import {storageApi} from '../../../../../store/reducers/storage/storage';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../../utils/constants';
@@ -22,6 +26,8 @@ interface TopGroupsProps {
 export function TopGroups({tenant}: TopGroupsProps) {
     const query = useSearchQuery();
 
+    const capabilitiesLoaded = useCapabilitiesLoaded();
+    const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const columns = getStorageTopGroupsColumns();
@@ -32,8 +38,12 @@ export function TopGroups({tenant}: TopGroupsProps) {
             sort: '-Usage',
             with: 'all',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
+            shouldUseGroupsHandler: groupsHandlerAvailable,
         },
-        {pollingInterval: autoRefreshInterval},
+        {
+            pollingInterval: autoRefreshInterval,
+            skip: !capabilitiesLoaded,
+        },
     );
 
     const loading = isFetching && currentData === undefined;
@@ -57,7 +67,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
             data={preparedGroups}
             columns={columns}
             title={title}
-            loading={loading}
+            loading={loading || !capabilitiesLoaded}
             error={error}
         />
     );

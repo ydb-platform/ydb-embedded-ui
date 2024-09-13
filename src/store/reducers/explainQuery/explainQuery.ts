@@ -1,11 +1,12 @@
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {ExplainActions} from '../../../types/api/query';
+import {ResultType} from '../../../types/store/executeQuery';
 import type {QueryRequestParams, QuerySettings, QuerySyntax} from '../../../types/store/query';
 import {QUERY_SYNTAX, isQueryErrorResponse} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import {api} from '../api';
+import {setQueryResult} from '../executeQuery';
 
-import type {PreparedExplainResponse} from './types';
 import {prepareExplainResponse} from './utils';
 
 interface ExplainQueryParams extends QueryRequestParams {
@@ -18,13 +19,15 @@ interface ExplainQueryParams extends QueryRequestParams {
 
 export const explainQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
-        explainQuery: build.mutation<PreparedExplainResponse, ExplainQueryParams>({
+        explainQuery: build.mutation<null, ExplainQueryParams>({
             queryFn: async (
                 {query, database, querySettings, enableTracingLevel, queryId},
-                {signal},
+                {signal, dispatch},
             ) => {
                 let action: ExplainActions = 'explain';
                 let syntax: QuerySyntax = QUERY_SYNTAX.yql;
+
+                dispatch(setQueryResult({type: ResultType.EXPLAIN, queryId, isLoading: true}));
 
                 if (querySettings?.queryMode === 'pg') {
                     action = 'explain-query';
@@ -58,12 +61,36 @@ export const explainQueryApi = api.injectEndpoints({
                     );
 
                     if (isQueryErrorResponse(response)) {
+                        dispatch(
+                            setQueryResult({
+                                type: ResultType.EXPLAIN,
+                                error: response,
+                                queryId,
+                                isLoading: false,
+                            }),
+                        );
                         return {error: response};
                     }
 
                     const data = prepareExplainResponse(response);
-                    return {data};
+                    dispatch(
+                        setQueryResult({
+                            type: ResultType.EXPLAIN,
+                            data,
+                            queryId,
+                            isLoading: false,
+                        }),
+                    );
+                    return {data: null};
                 } catch (error) {
+                    dispatch(
+                        setQueryResult({
+                            type: ResultType.EXPLAIN,
+                            error,
+                            queryId,
+                            isLoading: false,
+                        }),
+                    );
                     return {error};
                 }
             },

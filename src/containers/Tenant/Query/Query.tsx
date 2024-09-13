@@ -2,7 +2,6 @@ import React from 'react';
 
 import {Helmet} from 'react-helmet-async';
 
-import NotRenderUntilFirstVisible from '../../../components/NotRenderUntilFirstVisible/NotRenderUntilFirstVisible';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import type {EPathType} from '../../../types/api/schema';
@@ -40,19 +39,20 @@ export const Query = (props: QueryProps) => {
     );
 
     const renderContent = () => {
-        return (
-            <React.Fragment>
-                <NotRenderUntilFirstVisible show={queryTab === TENANT_QUERY_TABS_ID.newQuery}>
-                    <QueryEditor changeUserInput={handleUserInputChange} {...props} />
-                </NotRenderUntilFirstVisible>
-                <NotRenderUntilFirstVisible show={queryTab === TENANT_QUERY_TABS_ID.history}>
-                    <QueriesHistory changeUserInput={handleUserInputChange} />
-                </NotRenderUntilFirstVisible>
-                <NotRenderUntilFirstVisible show={queryTab === TENANT_QUERY_TABS_ID.saved}>
-                    <SavedQueries changeUserInput={handleUserInputChange} />
-                </NotRenderUntilFirstVisible>
-            </React.Fragment>
-        );
+        switch (queryTab) {
+            case TENANT_QUERY_TABS_ID.newQuery: {
+                return <QueryEditor changeUserInput={handleUserInputChange} {...props} />;
+            }
+            case TENANT_QUERY_TABS_ID.history: {
+                return <QueriesHistory changeUserInput={handleUserInputChange} />;
+            }
+            case TENANT_QUERY_TABS_ID.saved: {
+                return <SavedQueries changeUserInput={handleUserInputChange} />;
+            }
+            default: {
+                return null;
+            }
+        }
     };
 
     return (

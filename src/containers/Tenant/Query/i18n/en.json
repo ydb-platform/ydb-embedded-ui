@@ -49,6 +49,7 @@
   "action.previous-query": "Previous query in history",
   "action.next-query": "Next query in history",
   "action.save-query": "Save query",
+  "action.stop": "Stop",
 
   "filter.text.placeholder": "Search by query text...",
 
