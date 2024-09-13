@@ -52,6 +52,7 @@ export interface TStorageStats {
     CurrentGroupsCreated?: number;
     AvailableGroupsToCreate?: number;
 }
+
 export interface TClusterInfoV2 extends TClusterInfoV1 {
     MapDataCenters?: {
         [key: string]: number;
