@@ -22,7 +22,7 @@ export interface MetaExtendedClusterInfo extends MetaGeneralClusterInfo {
     versions?: MetaClusterVersion[];
 }
 
-export interface MetaGeneralClusterInfo {
+export interface MetaBaseClusterInfo {
     owner?: string;
     location?: string;
     image?: string;
@@ -38,9 +38,12 @@ export interface MetaGeneralClusterInfo {
     description?: string;
     balancer?: string;
     service?: string;
-    cluster?: MetaViewerClusterInfo;
     trace_view?: string;
     trace_check?: string;
+}
+
+export interface MetaGeneralClusterInfo extends MetaBaseClusterInfo {
+    cluster?: MetaViewerClusterInfo;
 }
 
 // In case of error in viewer /cluster request mvp return error field instead of cluster data

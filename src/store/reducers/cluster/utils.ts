@@ -86,3 +86,11 @@ export const parseGroupsStatsQueryResponse = (
 
     return result;
 };
+
+export function normalizeDomain(domain?: string) {
+    if (!domain) {
+        return undefined;
+    }
+    const normalizedDomain = domain.startsWith('/') ? domain.slice(1) : domain;
+    return normalizedDomain.toUpperCase();
+}
