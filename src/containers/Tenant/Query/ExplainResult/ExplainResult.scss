@@ -43,10 +43,4 @@
     &__elapsed-label {
         margin-left: var(--g-spacing-3);
     }
-
-    &__stop-button {
-        &_error {
-            @include query-buttons-animations();
-        }
-    }
 }

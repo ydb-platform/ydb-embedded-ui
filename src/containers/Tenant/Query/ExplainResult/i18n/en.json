@@ -5,6 +5,5 @@
   "action.explain-plan": "Explain Plan",
   "action.json": "JSON",
   "action.ast": "AST",
-  "action.copy": "Copy {{activeOption}}",
-  "action.stop": "Stop"
+  "action.copy": "Copy {{activeOption}}"
 }

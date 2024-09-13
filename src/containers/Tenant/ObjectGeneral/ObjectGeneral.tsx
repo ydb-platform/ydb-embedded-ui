@@ -1,8 +1,5 @@
-import React from 'react';
-
 import {useThemeValue} from '@gravity-ui/uikit';
 
-import NotRenderUntilFirstVisible from '../../../components/NotRenderUntilFirstVisible/NotRenderUntilFirstVisible';
 import {TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {EPathType} from '../../../types/api/schema';
@@ -31,13 +28,12 @@ function ObjectGeneral(props: ObjectGeneralProps) {
 
     const renderPageContent = () => {
         const {type, additionalTenantProps, additionalNodesProps, tenantName, path} = props;
-
-        return (
-            <React.Fragment>
-                <NotRenderUntilFirstVisible show={tenantPage === TENANT_PAGES_IDS.query}>
-                    <Query tenantName={tenantName} path={path} theme={theme} type={type} />
-                </NotRenderUntilFirstVisible>
-                <NotRenderUntilFirstVisible show={tenantPage === TENANT_PAGES_IDS.diagnostics}>
+        switch (tenantPage) {
+            case TENANT_PAGES_IDS.query: {
+                return <Query tenantName={tenantName} path={path} theme={theme} type={type} />;
+            }
+            default: {
+                return (
                     <Diagnostics
                         type={type}
                         tenantName={tenantName}
@@ -45,9 +41,9 @@ function ObjectGeneral(props: ObjectGeneralProps) {
                         additionalTenantProps={additionalTenantProps}
                         additionalNodesProps={additionalNodesProps}
                     />
-                </NotRenderUntilFirstVisible>
-            </React.Fragment>
-        );
+                );
+            }
+        }
     };
 
     return (
