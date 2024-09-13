@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {cn} from '../../utils/cn';
 import type {TagType} from '../Tag';
 import {Tag} from '../Tag';
@@ -7,7 +9,7 @@ import './Tags.scss';
 const b = cn('tags');
 
 interface TagsProps {
-    tags: string[];
+    tags: React.ReactNode[];
     tagsType?: TagType;
     className?: string;
 }

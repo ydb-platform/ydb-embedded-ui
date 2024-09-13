@@ -1,4 +1,5 @@
-import type {ExecuteQueryResponse} from '../../../types/api/query';
+import type {TClusterInfoV2, TStorageStats} from '../../../types/api/cluster';
+import type {ExecuteQueryResponse, KeyValueRow} from '../../../types/api/query';
 import {parseQueryAPIExecuteResponse} from '../../../utils/query';
 
 import type {ClusterGroupsStats} from './types';
@@ -31,13 +32,10 @@ const getDiskType = (rawTypeString: string) => {
     return diskType;
 };
 
-export const parseGroupsStatsQueryResponse = (
-    data: ExecuteQueryResponse<'modern'>,
-): ClusterGroupsStats => {
-    const parsedData = parseQueryAPIExecuteResponse(data).result;
+function getGroupStats(data?: KeyValueRow[] | TStorageStats[]) {
     const result: ClusterGroupsStats = {};
 
-    parsedData?.forEach((stats) => {
+    data?.forEach((stats) => {
         const {
             PDiskFilter,
             ErasureSpecies: erasure,
@@ -85,7 +83,18 @@ export const parseGroupsStatsQueryResponse = (
     });
 
     return result;
+}
+
+export const parseGroupsStatsQueryResponse = (
+    data: ExecuteQueryResponse<'modern'>,
+): ClusterGroupsStats => {
+    const parsedData = parseQueryAPIExecuteResponse(data).result;
+    return getGroupStats(parsedData);
 };
+
+export function getGroupStatsFromClusterInfo(info: TClusterInfoV2) {
+    return getGroupStats(info.StorageStats);
+}
 
 export function normalizeDomain(domain?: string) {
     if (!domain) {

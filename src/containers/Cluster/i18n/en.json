@@ -8,9 +8,15 @@
   "tablets": "Tablets",
   "databases": "Databases",
   "nodes": "Nodes",
+  "nodes-state": "Nodes state",
   "load": "Load",
   "storage-size": "Storage size",
   "storage-groups": "Storage groups, {{diskType}}",
   "links": "Links",
-  "versions": "Versions"
+  "versions": "Versions",
+  "quantity": {
+    "one": "{{count}} node",
+    "other": "{{count}} nodes",
+    "zero": "no nodes"
+  }
 }

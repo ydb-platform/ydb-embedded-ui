@@ -323,3 +323,48 @@
         }
     }
 }
+
+@mixin entity-state-colors {
+    --entity-state-border-color: var(--g-color-base-misc-heavy);
+    --entity-state-background-color: var(--g-color-base-misc-light);
+    --entity-state-fill-color: var(--g-color-base-misc-medium);
+    --entity-state-font-color: var(--g-color-text-primary);
+
+    &_green {
+        --entity-state-font-color: var(--g-color-text-positive);
+        --entity-state-border-color: var(--g-color-base-positive-heavy);
+        --entity-state-background-color: var(--g-color-base-positive-light);
+        --entity-state-fill-color: var(--g-color-base-positive-medium);
+    }
+
+    &_blue {
+        --entity-state-font-color: var(--g-color-text-info);
+        --entity-state-border-color: var(--g-color-base-info-heavy);
+        --entity-state-background-color: var(--g-color-base-info-light);
+        --entity-state-fill-color: var(--g-color-base-info-medium);
+    }
+
+    &_yellow {
+        --entity-state-font-color: var(--g-color-text-warning);
+        --entity-state-border-color: var(--g-color-base-warning-heavy);
+        --entity-state-background-color: var(--g-color-base-yellow-light);
+        --entity-state-fill-color: var(--g-color-base-yellow-medium);
+    }
+
+    &_orange {
+        --entity-state-font-color: var(--g-color-text-warning-heavy);
+        --entity-state-border-color: var(--ydb-color-status-orange);
+        --entity-state-background-color: var(--g-color-base-warning-light);
+        --entity-state-fill-color: var(--g-color-base-warning-medium);
+    }
+    &_red {
+        --entity-state-font-color: var(--g-color-text-danger);
+        --entity-state-border-color: var(--g-color-base-danger-heavy);
+        --entity-state-background-color: var(--g-color-base-danger-light);
+        --entity-state-fill-color: var(--g-color-base-danger-medium);
+    }
+    &__grey {
+        --entity-state-font-color: var(--g-color-text-secondary);
+        --entity-state-border-color: var(--g-color-line-generic-hover);
+    }
+}
