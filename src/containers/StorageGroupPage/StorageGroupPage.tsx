@@ -102,7 +102,7 @@ export function StorageGroupPage() {
             return null;
         }
 
-        const items = [`${storageGroupPageKeyset('storage-group')}: ${groupId}`];
+        const items = [`${storageGroupPageKeyset('pool-name')}: ${storageGroupData?.PoolName}`];
 
         return (
             <PageMetaWithAutorefresh

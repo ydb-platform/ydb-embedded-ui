@@ -20,6 +20,10 @@
         left: 0;
     }
 
+    &__info {
+        margin-top: var(--g-spacing-10);
+    }
+
     &__controls {
         display: flex;
         align-items: center;

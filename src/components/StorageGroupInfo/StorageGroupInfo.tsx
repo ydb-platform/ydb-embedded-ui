@@ -22,8 +22,6 @@ interface StorageGroupInfoProps extends Omit<InfoViewerProps, 'info'> {
 // eslint-disable-next-line complexity
 export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageGroupInfoProps) {
     const {
-        GroupId,
-        PoolName,
         Encryption,
         Overall,
         DiskSpace,
@@ -47,22 +45,10 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
 
     const storageGroupInfoFirstColumn = [];
 
-    if (valueIsDefined(GroupId)) {
-        storageGroupInfoFirstColumn.push({
-            label: storageGroupInfoKeyset('group-id'),
-            value: GroupId,
-        });
-    }
     if (valueIsDefined(GroupGeneration)) {
         storageGroupInfoFirstColumn.push({
             label: storageGroupInfoKeyset('group-generation'),
             value: GroupGeneration,
-        });
-    }
-    if (valueIsDefined(PoolName)) {
-        storageGroupInfoFirstColumn.push({
-            label: storageGroupInfoKeyset('pool-name'),
-            value: PoolName,
         });
     }
     if (valueIsDefined(ErasureSpecies)) {
