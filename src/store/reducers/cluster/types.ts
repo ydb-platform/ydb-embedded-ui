@@ -18,7 +18,6 @@ export type ClusterGroupsStats = Record<string, DiskGroupsStats>;
 
 export interface ClusterState {
     defaultClusterTab: ClusterTab;
-    clusterTitle?: string;
 }
 
 export interface HandledClusterResponse {

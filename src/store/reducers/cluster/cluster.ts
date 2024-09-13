@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
 import type {Dispatch, PayloadAction} from '@reduxjs/toolkit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {StringParam, useQueryParam} from 'use-query-params';
@@ -7,8 +7,9 @@ import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
 import {parseTraceFields} from '../../../services/parsers/parseMetaCluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
-import {DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
+import {CLUSTER_DEFAULT_TITLE, DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
 import {isQueryErrorResponse} from '../../../utils/query';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
 import type {ClusterGroupsStats, ClusterState} from './types';
@@ -37,30 +38,19 @@ const clusterSlice = createSlice({
         setDefaultClusterTab(state, action: PayloadAction<ClusterTab>) {
             state.defaultClusterTab = action.payload;
         },
-        setClusterTitle: (state, action: PayloadAction<string>) => {
-            const clusterTitle = action.payload;
-
-            state.clusterTitle = clusterTitle;
-        },
-    },
-    selectors: {
-        selectClusterTitle: (state) => state.clusterTitle,
     },
 });
-
-export default clusterSlice.reducer;
-export const {selectClusterTitle} = clusterSlice.selectors;
-
-const {setClusterTitle, setDefaultClusterTab} = clusterSlice.actions;
 
 export function updateDefaultClusterTab(tab: string) {
     return (dispatch: Dispatch) => {
         if (isClusterTab(tab)) {
             localStorage.setItem(DEFAULT_CLUSTER_TAB_KEY, tab);
-            dispatch(setDefaultClusterTab(tab));
+            dispatch(clusterSlice.actions.setDefaultClusterTab(tab));
         }
     };
 }
+
+export default clusterSlice.reducer;
 
 export const clusterApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -71,16 +61,11 @@ export const clusterApi = api.injectEndpoints({
             },
             string | undefined
         >({
-            queryFn: async (clusterName, {signal, dispatch}) => {
-                let clusterTitle = clusterName;
+            queryFn: async (clusterName, {signal}) => {
                 try {
                     const clusterData = await window.api.getClusterInfo(clusterName, {signal});
 
-                    const {Name, Domain} = clusterData;
-
-                    const clusterRoot = Domain;
-
-                    clusterTitle = Name || clusterName || normalizeDomain(clusterRoot);
+                    const clusterRoot = clusterData.Domain;
                     // Without domain we cannot get stats from system tables
                     if (!clusterRoot) {
                         return {data: {clusterData}};
@@ -114,10 +99,6 @@ export const clusterApi = api.injectEndpoints({
                     }
                 } catch (error) {
                     return {error};
-                } finally {
-                    if (clusterTitle) {
-                        dispatch(setClusterTitle(clusterTitle));
-                    }
                 }
             },
             providesTags: ['All'],
@@ -157,3 +138,24 @@ export function useClusterBaseInfo() {
         monitoring,
     };
 }
+
+const createClusterInfoSelector = createSelector(
+    (clusterName?: string) => clusterName,
+    (clusterName) => clusterApi.endpoints.getClusterInfo.select(clusterName),
+);
+
+export const selectClusterInfo = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, clusterName?: string) => createClusterInfoSelector(clusterName),
+    (state, selectGetTopic) => selectGetTopic(state).data,
+);
+
+export const selectClusterTitle = createSelector(
+    (_state: RootState, clusterName?: string) => clusterName,
+    (state: RootState, clusterName?: string) => selectClusterInfo(state, clusterName),
+    (clusterName, clusterInfo) => {
+        const {Name, Domain} = clusterInfo?.clusterData || {};
+
+        return Name || clusterName || normalizeDomain(Domain) || CLUSTER_DEFAULT_TITLE;
+    },
+);

@@ -22,7 +22,6 @@ import type {
     AdditionalVersionsProps,
 } from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {parseVersionsToVersionToColorMap} from '../../utils/versions';
 import {NodesWrapper} from '../Nodes/NodesWrapper';
@@ -53,9 +52,7 @@ export function Cluster({
 }: ClusterProps) {
     const container = React.useRef<HTMLDivElement>(null);
 
-    const rawClusterTitle = useTypedSelector(selectClusterTitle);
-
-    const clusterTitle = rawClusterTitle ?? CLUSTER_DEFAULT_TITLE;
+    const clusterTitle = useTypedSelector(selectClusterTitle);
 
     const dispatch = useTypedDispatch();
 
