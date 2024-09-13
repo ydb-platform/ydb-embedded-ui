@@ -29,6 +29,7 @@ export const cancelQueryApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
+
                     return {data};
                 } catch (error) {
                     return {error};

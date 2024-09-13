@@ -1,8 +1,7 @@
 import React from 'react';
 
-import {StopFill} from '@gravity-ui/icons';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {Button, Icon, RadioButton, Tabs} from '@gravity-ui/uikit';
+import {RadioButton, Tabs} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
 
 import {ClipboardButton} from '../../../../components/ClipboardButton';
@@ -17,13 +16,14 @@ import {QueryResultTable} from '../../../../components/QueryResultTable/QueryRes
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {ColumnType, KeyValueRow, TKqpStatsQuery} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
-import type {IQueryResult} from '../../../../types/store/query';
+import type {ExecuteQueryResult} from '../../../../types/store/executeQuery';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
+import {CancelQueryButton} from '../CancelQueryButton/CancelQueryButton';
 import {SimplifiedPlan} from '../ExplainResult/components/SimplifiedPlan/SimplifiedPlan';
 import {ResultIssues} from '../Issues/Issues';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
@@ -49,33 +49,27 @@ const resultOptionsIds = {
 type SectionID = ValueOf<typeof resultOptionsIds>;
 
 interface ExecuteResultProps {
-    data: IQueryResult | undefined;
-    error: unknown;
-    cancelError: unknown;
+    result: ExecuteQueryResult;
     isResultsCollapsed?: boolean;
+    theme?: string;
+    tenantName: string;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
-    onStopButtonClick: VoidFunction;
-    theme?: string;
-    loading?: boolean;
-    cancelQueryLoading?: boolean;
 }
 
 export function ExecuteResult({
-    data,
-    error,
-    cancelError,
+    result,
     isResultsCollapsed,
+    theme,
+    tenantName,
     onCollapseResults,
     onExpandResults,
-    onStopButtonClick,
-    theme,
-    loading,
-    cancelQueryLoading,
 }: ExecuteResultProps) {
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
     const dispatch = useTypedDispatch();
+
+    const {error, isLoading, queryId, data} = result;
 
     const stats: TKqpStatsQuery | undefined = data?.stats;
     const resultsSetsCount = data?.resultSets?.length;
@@ -111,10 +105,10 @@ export function ExecuteResult({
     };
 
     const renderResultTable = (
-        result: KeyValueRow[] | undefined,
+        resultSet: KeyValueRow[] | undefined,
         columns: ColumnType[] | undefined,
     ) => {
-        return <QueryResultTable data={result} columns={columns} settings={{sortable: false}} />;
+        return <QueryResultTable data={resultSet} columns={columns} settings={{sortable: false}} />;
     };
 
     const renderResult = () => {
@@ -243,8 +237,8 @@ export function ExecuteResult({
         <React.Fragment>
             <div className={b('controls')}>
                 <div className={b('controls-right')}>
-                    <QueryExecutionStatus error={error} loading={loading} />
-                    {!error && !loading && (
+                    <QueryExecutionStatus error={error} loading={isLoading} />
+                    {!error && !isLoading && (
                         <React.Fragment>
                             {stats?.DurationUs !== undefined && (
                                 <QueryDuration duration={Number(stats.DurationUs)} />
@@ -261,17 +255,10 @@ export function ExecuteResult({
                             )}
                         </React.Fragment>
                     )}
-                    {loading ? (
+                    {isLoading ? (
                         <React.Fragment>
                             <ElapsedTime className={b('elapsed-time')} />
-                            <Button
-                                loading={cancelQueryLoading}
-                                onClick={onStopButtonClick}
-                                className={b('stop-button', {error: Boolean(cancelError)})}
-                            >
-                                <Icon data={StopFill} size={16} />
-                                {i18n('action.stop')}
-                            </Button>
+                            <CancelQueryButton queryId={queryId} tenantName={tenantName} />
                         </React.Fragment>
                     ) : null}
                     {data?.traceId ? <TraceButton traceId={data.traceId} /> : null}
@@ -287,8 +274,8 @@ export function ExecuteResult({
                     />
                 </div>
             </div>
-            {loading || isQueryCancelledError(error) ? null : <QuerySettingsBanner />}
-            <LoaderWrapper loading={loading}>
+            {isLoading || isQueryCancelledError(error) ? null : <QuerySettingsBanner />}
+            <LoaderWrapper loading={isLoading}>
                 <Fullscreen>{renderResultSection()}</Fullscreen>
             </LoaderWrapper>
         </React.Fragment>

@@ -3,18 +3,15 @@ import type {Reducer} from '@reduxjs/toolkit';
 import {settingsManager} from '../../services/settings';
 import {TracingLevelNumber} from '../../types/api/query';
 import type {ExecuteActions, Schemas} from '../../types/api/query';
+import {ResultType} from '../../types/store/executeQuery';
 import type {
     ExecuteQueryAction,
     ExecuteQueryState,
     ExecuteQueryStateSlice,
     QueryInHistory,
+    QueryResult,
 } from '../../types/store/executeQuery';
-import type {
-    IQueryResult,
-    QueryRequestParams,
-    QuerySettings,
-    QuerySyntax,
-} from '../../types/store/query';
+import type {QueryRequestParams, QuerySettings, QuerySyntax} from '../../types/store/query';
 import {QUERIES_HISTORY_KEY} from '../../utils/constants';
 import {QUERY_SYNTAX, isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
@@ -24,6 +21,7 @@ import {api} from './api';
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
+const SET_QUERY_RESULT = 'query/SET_QUERY_RESULT';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
 const UPDATE_QUERY_IN_HISTORY = 'query/UPDATE_QUERY_IN_HISTORY';
 const SET_QUERY_HISTORY_FILTER = 'query/SET_QUERY_HISTORY_FILTER';
@@ -62,6 +60,13 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
             return {
                 ...state,
                 input: action.data.input,
+            };
+        }
+
+        case SET_QUERY_RESULT: {
+            return {
+                ...state,
+                result: action.data,
             };
         }
 
@@ -190,7 +195,7 @@ interface QueryStats {
 
 export const executeQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
-        executeQuery: build.mutation<IQueryResult, SendQueryParams>({
+        executeQuery: build.mutation<null, SendQueryParams>({
             queryFn: async (
                 {
                     query,
@@ -204,6 +209,8 @@ export const executeQueryApi = api.injectEndpoints({
             ) => {
                 let action: ExecuteActions = 'execute';
                 let syntax: QuerySyntax = QUERY_SYNTAX.yql;
+
+                dispatch(setQueryResult({type: ResultType.EXECUTE, queryId, isLoading: true}));
 
                 if (querySettings.queryMode === 'pg') {
                     action = 'execute-query';
@@ -239,6 +246,14 @@ export const executeQueryApi = api.injectEndpoints({
                     );
 
                     if (isQueryErrorResponse(response)) {
+                        dispatch(
+                            setQueryResult({
+                                type: ResultType.EXECUTE,
+                                error: response,
+                                isLoading: false,
+                                queryId,
+                            }),
+                        );
                         return {error: response};
                     }
 
@@ -257,8 +272,24 @@ export const executeQueryApi = api.injectEndpoints({
                     }
 
                     dispatch(updateQueryInHistory(queryStats, queryId));
-                    return {data};
+                    dispatch(
+                        setQueryResult({
+                            type: ResultType.EXECUTE,
+                            data,
+                            isLoading: false,
+                            queryId,
+                        }),
+                    );
+                    return {data: null};
                 } catch (error) {
+                    dispatch(
+                        setQueryResult({
+                            type: ResultType.EXECUTE,
+                            error,
+                            isLoading: false,
+                            queryId,
+                        }),
+                    );
                     return {error};
                 }
             },
@@ -278,6 +309,13 @@ export function updateQueryInHistory(stats: QueryStats, queryId: string) {
     return {
         type: UPDATE_QUERY_IN_HISTORY,
         data: {queryId, stats},
+    } as const;
+}
+
+export function setQueryResult(data?: QueryResult) {
+    return {
+        type: SET_QUERY_RESULT,
+        data,
     } as const;
 }
 
