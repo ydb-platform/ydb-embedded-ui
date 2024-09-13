@@ -147,7 +147,7 @@ const createClusterInfoSelector = createSelector(
 export const selectClusterInfo = createSelector(
     (state: RootState) => state,
     (_state: RootState, clusterName?: string) => createClusterInfoSelector(clusterName),
-    (state, selectGetTopic) => selectGetTopic(state).data,
+    (state, selectGetClusterInfo) => selectGetClusterInfo(state).data,
 );
 
 export const selectClusterTitle = createSelector(
