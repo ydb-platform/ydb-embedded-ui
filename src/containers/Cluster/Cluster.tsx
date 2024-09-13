@@ -52,8 +52,6 @@ export function Cluster({
 }: ClusterProps) {
     const container = React.useRef<HTMLDivElement>(null);
 
-    const clusterTitle = useTypedSelector(selectClusterTitle);
-
     const dispatch = useTypedDispatch();
 
     const activeTabId = useClusterTab();
@@ -62,6 +60,10 @@ export function Cluster({
         clusterName: StringParam,
         backend: StringParam,
     });
+
+    const clusterTitle = useTypedSelector((state) =>
+        selectClusterTitle(state, clusterName ?? undefined),
+    );
 
     const {
         data: {clusterData: cluster = {}, groupsStats} = {},
