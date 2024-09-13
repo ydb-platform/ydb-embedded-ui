@@ -57,11 +57,11 @@ export interface TClusterInfoV2 extends TClusterInfoV1 {
         [key: string]: number;
     };
     MapNodeStates?: Partial<Record<EFlag, number>>;
-    /** key is uint64 */
+    /** value is uint64 */
     MapStorageTotal?: {
         [key: string]: string;
     };
-    /** key is uint64 */
+    /** value is uint64 */
     MapStorageUsed?: {
         [key: string]: string;
     };
