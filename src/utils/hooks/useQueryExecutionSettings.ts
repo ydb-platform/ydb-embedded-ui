@@ -13,6 +13,7 @@ export const useQueryExecutionSettings = () => {
         timeout: storageSettings.timeout ?? DEFAULT_QUERY_SETTINGS.timeout,
         statisticsMode: storageSettings.statisticsMode ?? DEFAULT_QUERY_SETTINGS.statisticsMode,
         transactionMode: storageSettings.transactionMode ?? DEFAULT_QUERY_SETTINGS.transactionMode,
+        limitRows: storageSettings.limitRows ?? DEFAULT_QUERY_SETTINGS.limitRows,
         tracingLevel: enableTracingLevel
             ? storageSettings.tracingLevel
             : DEFAULT_QUERY_SETTINGS.tracingLevel,

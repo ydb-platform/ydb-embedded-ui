@@ -17,6 +17,7 @@ const DEFAULT_QUERY_SETTINGS: QuerySettings = {
     queryMode: QUERY_MODES.query,
     transactionMode: TRANSACTION_MODES.implicit,
     timeout: '60',
+    limitRows: '10000',
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.detailed,
 };
@@ -38,6 +39,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
             ...DEFAULT_QUERY_SETTINGS,
             queryMode: QUERY_MODES.pg,
             timeout: '63',
+            limitRows: '100',
         };
 
         const result = getChangedQueryExecutionSettingsDescription({
@@ -51,6 +53,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
                     (option) => option.value === QUERY_MODES.pg,
                 )?.content,
             [QUERY_SETTINGS_FIELD_SETTINGS.timeout.title]: '63',
+            [QUERY_SETTINGS_FIELD_SETTINGS.limitRows.title]: '100',
         });
     });
 

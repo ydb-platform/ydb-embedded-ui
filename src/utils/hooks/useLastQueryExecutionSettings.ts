@@ -14,6 +14,7 @@ export const useLastQueryExecutionSettings = () => {
               queryMode: lastStorageSettings.queryMode,
               statisticsMode: lastStorageSettings.statisticsMode,
               tracingLevel: lastStorageSettings.tracingLevel,
+              limitRows: lastStorageSettings.limitRows,
               timeout: lastStorageSettings.timeout,
           }
         : undefined;

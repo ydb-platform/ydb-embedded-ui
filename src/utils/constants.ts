@@ -127,6 +127,7 @@ export const DEFAULT_QUERY_SETTINGS = {
     queryMode: QUERY_MODES.query,
     transactionMode: TRANSACTION_MODES.implicit,
     timeout: '60',
+    limitRows: '10000',
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.detailed,
 } satisfies QuerySettings;

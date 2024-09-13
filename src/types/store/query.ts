@@ -41,6 +41,7 @@ export interface QuerySettings {
     queryMode: QueryMode;
     transactionMode: TransactionMode;
     timeout?: string;
+    limitRows?: string;
     statisticsMode?: StatisticsMode;
     tracingLevel?: TracingLevel;
 }

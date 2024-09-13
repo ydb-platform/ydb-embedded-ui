@@ -233,6 +233,7 @@ export const executeQueryApi = api.injectEndpoints({
                                 querySettings.tracingLevel && enableTracingLevel
                                     ? TracingLevelNumber[querySettings.tracingLevel]
                                     : undefined,
+                            limit_rows: querySettings.limitRows || undefined,
                             transaction_mode:
                                 querySettings.transactionMode === 'implicit'
                                     ? undefined

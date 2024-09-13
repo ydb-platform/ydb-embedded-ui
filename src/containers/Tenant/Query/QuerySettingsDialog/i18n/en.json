@@ -5,6 +5,7 @@
   "form.transaction-mode": "Transaction mode",
   "form.statistics-mode": "Statistics collection mode",
   "form.tracing-level": "Tracing level",
+  "form.limit-rows": "Limit rows",
   "button-done": "Save",
   "button-cancel": "Cancel",
   "form.timeout.seconds": "sec",

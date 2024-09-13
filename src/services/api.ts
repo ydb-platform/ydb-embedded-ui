@@ -548,6 +548,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             transaction_mode?: TransactionMode;
             timeout?: Timeout;
             query_id?: string;
+            limit_rows?: string;
         },
         {concurrentId, signal, withRetries}: AxiosOptions = {},
     ) {

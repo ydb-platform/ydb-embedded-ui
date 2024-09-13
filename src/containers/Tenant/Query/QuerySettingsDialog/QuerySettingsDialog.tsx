@@ -179,6 +179,27 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                         />
                     </div>
                 </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="limitRows" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.limitRows.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="limitRows"
+                            control={control}
+                            render={({field}) => (
+                                <React.Fragment>
+                                    <TextInput
+                                        type="number"
+                                        {...field}
+                                        className={b('limit-rows')}
+                                        placeholder="10000"
+                                    />
+                                </React.Fragment>
+                            )}
+                        />
+                    </div>
+                </Flex>
             </Dialog.Body>
             <Dialog.Footer
                 textButtonApply={i18n('button-done')}

@@ -10,6 +10,7 @@ const DEFAULT_QUERY_SETTINGS: QuerySettings = {
     queryMode: QUERY_MODES.query,
     transactionMode: TRANSACTION_MODES.implicit,
     timeout: '60',
+    limitRows: '10000',
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.detailed,
 };
@@ -28,9 +29,10 @@ describe('getChangedQueryExecutionSettings', () => {
             ...DEFAULT_QUERY_SETTINGS,
             queryMode: QUERY_MODES.data,
             timeout: '30',
+            limitRows: '100',
         };
         const result = getChangedQueryExecutionSettings(currentSettings, DEFAULT_QUERY_SETTINGS);
-        expect(result).toEqual(['queryMode', 'timeout']);
+        expect(result).toEqual(['queryMode', 'timeout', 'limitRows']);
     });
 
     it('should return all keys if all settings have changed', () => {
