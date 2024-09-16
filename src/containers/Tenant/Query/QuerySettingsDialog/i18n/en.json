@@ -9,8 +9,6 @@
   "button-done": "Save",
   "button-cancel": "Cancel",
   "form.timeout.seconds": "sec",
-  "form.validation.timeout": "Must be positive",
-  "form.validation.limitRows": "Must be between 1 and 100000",
   "description.default": " (default)",
   "docs": "Documentation"
 }

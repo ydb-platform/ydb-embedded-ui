@@ -15,11 +15,12 @@ export default function getChangedQueryExecutionSettingsDescription({
 
     keys.forEach((key) => {
         const settings = QUERY_SETTINGS_FIELD_SETTINGS[key];
-        const currentValue = currentSettings[key] as string;
+        const currentValue = currentSettings[key];
 
         if ('options' in settings) {
-            const content = settings.options.find((option) => option.value === currentValue)
-                ?.content as string;
+            const content = settings.options.find(
+                (option) => option.value === currentValue,
+            )?.content;
 
             if (content) {
                 result[settings.title] = content;
