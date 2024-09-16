@@ -13,7 +13,6 @@ import {
     THEME_KEY,
     USE_ADVANCED_STORAGE_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
-    USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
     USE_PAGINATED_TABLES_KEY,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
@@ -91,11 +90,6 @@ export const invertedDisksSetting: SettingProps = {
     settingKey: INVERTED_DISKS_KEY,
     title: i18n('settings.invertedDisks.title'),
 };
-export const useNodesEndpointSetting: SettingProps = {
-    settingKey: USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY,
-    title: i18n('settings.useNodesEndpoint.title'),
-    description: i18n('settings.useNodesEndpoint.description'),
-};
 export const useAdvancedStorageSetting: SettingProps = {
     settingKey: USE_ADVANCED_STORAGE_KEY,
     title: i18n('settings.useAdvancedStorage.title'),
@@ -155,12 +149,7 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [
-        useNodesEndpointSetting,
-        useAdvancedStorageSetting,
-        usePaginatedTables,
-        queryUseMultiSchemaSetting,
-    ],
+    settings: [useAdvancedStorageSetting, usePaginatedTables, queryUseMultiSchemaSetting],
 };
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',
