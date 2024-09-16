@@ -24,7 +24,7 @@ export const viewSchemaApi = api.injectEndpoints({
                         return {error: response};
                     }
 
-                    return {data: response.columns || []};
+                    return {data: response?.columns || []};
                 } catch (error) {
                     return {error: error};
                 }
