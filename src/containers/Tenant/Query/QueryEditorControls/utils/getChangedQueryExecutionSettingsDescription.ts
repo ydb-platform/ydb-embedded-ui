@@ -21,8 +21,10 @@ export default function getChangedQueryExecutionSettingsDescription({
             const content = settings.options.find((option) => option.value === currentValue)
                 ?.content as string;
 
-            result[settings.title] = content;
-        } else {
+            if (content) {
+                result[settings.title] = content;
+            }
+        } else if (currentValue) {
             result[settings.title] = currentValue;
         }
     });

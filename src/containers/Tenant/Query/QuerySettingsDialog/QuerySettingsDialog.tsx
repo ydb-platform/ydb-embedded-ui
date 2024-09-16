@@ -1,14 +1,22 @@
 import React from 'react';
 
 import {Dialog, Link as ExternalLink, Flex, TextInput} from '@gravity-ui/uikit';
+import {yupResolver} from '@hookform/resolvers/yup';
 import {Controller, useForm} from 'react-hook-form';
+import * as yup from 'yup';
 
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {
     selectQueryAction,
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
-import type {QuerySettings} from '../../../../types/store/query';
+import type {
+    QueryMode,
+    QuerySettings,
+    StatisticsMode,
+    TracingLevel,
+    TransactionMode,
+} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     useQueryExecutionSettings,
@@ -23,6 +31,27 @@ import i18n from './i18n';
 import './QuerySettingsDialog.scss';
 
 const b = cn('ydb-query-settings-dialog');
+
+const validationSchema = yup.object().shape({
+    timeout: yup.string().test('is-within-range', i18n('form.validation.timeout'), (value) => {
+        if (!value) {
+            return true;
+        }
+        const num = Number(value);
+        return !isNaN(num) && num > 0;
+    }),
+    limitRows: yup.string().test('is-within-range', i18n('form.validation.limitRows'), (value) => {
+        if (!value) {
+            return true;
+        }
+        const num = Number(value);
+        return !isNaN(num) && num > 0 && num <= 100000;
+    }),
+    queryMode: yup.mixed<QueryMode>().required(),
+    transactionMode: yup.mixed<TransactionMode>().required(),
+    statisticsMode: yup.mixed<StatisticsMode>(),
+    tracingLevel: yup.mixed<TracingLevel>(),
+});
 
 export function QuerySettingsDialog() {
     const dispatch = useTypedDispatch();
@@ -66,8 +95,13 @@ interface QuerySettingsFormProps {
 }
 
 function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsFormProps) {
-    const {control, handleSubmit} = useForm<QuerySettings>({
+    const {
+        control,
+        handleSubmit,
+        formState: {errors},
+    } = useForm<QuerySettings>({
         defaultValues: initialValues,
+        resolver: yupResolver<QuerySettings>(validationSchema),
     });
 
     const enableTracingLevel = useTracingLevelOptionAvailable();
@@ -85,6 +119,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             control={control}
                             render={({field}) => (
                                 <QuerySettingsSelect
+                                    id="queryMode"
                                     setting={field.value}
                                     onUpdateSetting={field.onChange}
                                     settingOptions={QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options}
@@ -104,10 +139,14 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             render={({field}) => (
                                 <React.Fragment>
                                     <TextInput
+                                        id="timeout"
                                         type="number"
                                         {...field}
                                         className={b('timeout')}
                                         placeholder="60"
+                                        validationState={errors.timeout ? 'invalid' : undefined}
+                                        errorMessage={errors.timeout?.message}
+                                        errorPlacement="inside"
                                     />
                                     <span className={b('timeout-suffix')}>
                                         {i18n('form.timeout.seconds')}
@@ -128,6 +167,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                 control={control}
                                 render={({field}) => (
                                     <QuerySettingsSelect
+                                        id="tracingLevel"
                                         setting={field.value}
                                         onUpdateSetting={field.onChange}
                                         settingOptions={
@@ -149,6 +189,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             control={control}
                             render={({field}) => (
                                 <QuerySettingsSelect
+                                    id="transactionMode"
                                     setting={field.value}
                                     onUpdateSetting={field.onChange}
                                     settingOptions={
@@ -169,6 +210,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             control={control}
                             render={({field}) => (
                                 <QuerySettingsSelect
+                                    id="statisticsMode"
                                     setting={field.value}
                                     onUpdateSetting={field.onChange}
                                     settingOptions={
@@ -188,14 +230,16 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             name="limitRows"
                             control={control}
                             render={({field}) => (
-                                <React.Fragment>
-                                    <TextInput
-                                        type="number"
-                                        {...field}
-                                        className={b('limit-rows')}
-                                        placeholder="10000"
-                                    />
-                                </React.Fragment>
+                                <TextInput
+                                    id="limitRows"
+                                    type="number"
+                                    {...field}
+                                    className={b('limit-rows')}
+                                    placeholder="10000"
+                                    validationState={errors.limitRows ? 'invalid' : undefined}
+                                    errorMessage={errors.limitRows?.message}
+                                    errorPlacement="inside"
+                                />
                             )}
                         />
                     </div>
