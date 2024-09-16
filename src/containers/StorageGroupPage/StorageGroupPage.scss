@@ -2,10 +2,12 @@
 
 .ydb-storage-group-page {
     position: relative;
+
     display: flex;
     overflow: auto;
     flex-direction: column;
     gap: 20px;
+
     height: 100%;
     padding: 20px;
 
