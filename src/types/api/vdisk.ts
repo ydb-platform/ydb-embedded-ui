@@ -35,6 +35,8 @@ export interface TVDiskStateInfo {
 
     /** Current state of VDisk */
     VDiskState?: EVDiskState;
+    /** PDisk error string */
+    PDiskErrorReason?: string;
     /** Disk space flags */
     DiskSpace?: EFlag;
     /** Compaction satisfaction rank */

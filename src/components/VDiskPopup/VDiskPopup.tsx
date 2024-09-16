@@ -42,6 +42,7 @@ const prepareVDiskData = (data: TVDiskStateInfo) => {
     const {
         VDiskId,
         VDiskState,
+        PDiskErrorReason,
         SatisfactionRank,
         DiskSpace,
         FrontQueues,
@@ -57,6 +58,10 @@ const prepareVDiskData = (data: TVDiskStateInfo) => {
         {label: 'VDisk', value: stringifyVdiskId(VDiskId)},
         {label: 'State', value: VDiskState ?? 'not available'},
     ];
+
+    if (PDiskErrorReason) {
+        vdiskData.push({label: 'PDisk Error', value: PDiskErrorReason});
+    }
 
     if (StoragePoolName) {
         vdiskData.push({label: 'StoragePool', value: StoragePoolName});
