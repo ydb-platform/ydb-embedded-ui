@@ -7,7 +7,7 @@ import type {TTraceCheck, TTraceView} from './trace';
  *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
  */
-export interface TClusterInfo {
+export interface TClusterInfoV1 {
     Name?: string;
     Overall?: EFlag;
     NodesTotal?: number;
@@ -41,4 +41,40 @@ export interface TClusterInfo {
 
     TraceView?: TTraceView;
     TraceCheck?: TTraceCheck;
+}
+
+export interface TStorageStats {
+    PDiskFilter?: string;
+    ErasureSpecies?: string;
+    CurrentAvailableSize?: string;
+    /** uint64 */
+    CurrentAllocatedSize?: string;
+    CurrentGroupsCreated?: number;
+    AvailableGroupsToCreate?: number;
+}
+
+export interface TClusterInfoV2 extends TClusterInfoV1 {
+    MapDataCenters?: {
+        [key: string]: number;
+    };
+    MapNodeStates?: Partial<Record<EFlag, number>>;
+    /** value is uint64 */
+    MapStorageTotal?: {
+        [key: string]: string;
+    };
+    /** value is uint64 */
+    MapStorageUsed?: {
+        [key: string]: string;
+    };
+    MapVersions?: {
+        [key: string]: number;
+    };
+    StorageStats?: TStorageStats[];
+    Version?: number;
+}
+
+export type TClusterInfo = TClusterInfoV1 | TClusterInfoV2;
+
+export function isClusterInfoV2(info?: TClusterInfo): info is TClusterInfoV2 {
+    return info ? 'Version' in info && info.Version === 2 : false;
 }

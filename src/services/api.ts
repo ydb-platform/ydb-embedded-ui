@@ -14,12 +14,7 @@ import type {DescribeConsumerResult} from '../types/api/consumer';
 import type {FeatureFlagConfigs} from '../types/api/featureFlags';
 import type {HealthCheckAPIResponse} from '../types/api/healthcheck';
 import type {JsonHotKeysResponse} from '../types/api/hotkeys';
-import type {
-    MetaCluster,
-    MetaClusters,
-    MetaGeneralClusterInfo,
-    MetaTenants,
-} from '../types/api/meta';
+import type {MetaBaseClusterInfo, MetaCluster, MetaClusters, MetaTenants} from '../types/api/meta';
 import type {ModifyDiskResponse} from '../types/api/modifyDisk';
 import type {TNetInfo} from '../types/api/netInfo';
 import type {TNodesInfo} from '../types/api/nodes';
@@ -564,7 +559,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         const {schema, ...rest} = params;
 
         // FIXME: base64 is passed both to params and body to work on versions before and after 24-3
-        return this.post<QueryAPIResponse<Action, Schema> | ErrorResponse>(
+        return this.post<QueryAPIResponse<Action, Schema> | ErrorResponse | null>(
             this.getPath('/viewer/json/query'),
             {...rest, base64},
             {schema, base64},
@@ -827,7 +822,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     getClusterBaseInfo(
         _clusterName: string,
         _opts: AxiosOptions = {},
-    ): Promise<MetaGeneralClusterInfo> {
+    ): Promise<MetaBaseClusterInfo> {
         throw new Error('Method is not implemented.');
     }
 }
@@ -862,8 +857,8 @@ export class YdbWebVersionAPI extends YdbEmbeddedAPI {
     getClusterBaseInfo(
         clusterName: string,
         {concurrentId, signal}: AxiosOptions = {},
-    ): Promise<MetaGeneralClusterInfo> {
-        return this.get<MetaGeneralClusterInfo[]>(
+    ): Promise<MetaBaseClusterInfo> {
+        return this.get<MetaBaseClusterInfo[]>(
             `${META_BACKEND || ''}/meta/db_clusters`,
             {
                 name: clusterName,

@@ -65,7 +65,9 @@ const suggestionEntityToAutocomplete: Partial<Record<YQLEntity, AutocompleteEnti
     tableIndex: ['table_index', 'index'],
 };
 
-const commonSuggestionEntities: AutocompleteEntityType[] = ['dir', 'unknown'];
+const commonSuggestionEntities: AutocompleteEntityType[] = ['dir', 'unknown', 'ext_sub_domain'];
+
+const directoryTypes: AutocompleteEntityType[] = ['dir', 'ext_sub_domain'];
 
 function filterAutocompleteEntities(
     autocompleteEntities: TAutocompleteEntity[],
@@ -109,7 +111,11 @@ function removeStartSlash(value: string) {
 }
 
 function normalizeEntityPrefix(value = '', database: string) {
-    let cleanedValue = removeStartSlash(removeBackticks(value));
+    const valueWithoutBackticks = removeBackticks(value);
+    if (!valueWithoutBackticks.startsWith('/')) {
+        return valueWithoutBackticks;
+    }
+    let cleanedValue = removeStartSlash(valueWithoutBackticks);
     const cleanedDatabase = removeStartSlash(database);
     if (cleanedValue.startsWith(cleanedDatabase)) {
         cleanedValue = cleanedValue.slice(cleanedDatabase.length);
@@ -297,7 +303,7 @@ export async function generateEntitiesSuggestion(
     if (data.Success) {
         const filteredEntities = filterAutocompleteEntities(data.Result.Entities, suggestEntities);
         return filteredEntities.reduce((acc, {Name, Type}) => {
-            const isDir = Type === 'dir';
+            const isDir = directoryTypes.includes(Type);
             const label = isDir ? `${Name}/` : Name;
             let labelAsSnippet;
             if (isDir && !withBackticks) {

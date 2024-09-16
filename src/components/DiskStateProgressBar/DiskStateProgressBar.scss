@@ -1,3 +1,5 @@
+@import '../../styles/mixins';
+
 .storage-disk-progress-bar {
     $block: &;
 
@@ -5,9 +7,6 @@
     $outer-border-radius: 4px;
     $inner-border-radius: $outer-border-radius - $border-width;
 
-    --progress-bar-border-color: var(--g-color-base-misc-heavy);
-    --progress-bar-background-color: var(--g-color-base-misc-light);
-    --progress-bar-fill-color: var(--g-color-base-misc-medium);
     --progress-bar-full-height: var(--g-text-body-3-line-height);
     --progress-bar-compact-height: 12px;
 
@@ -20,44 +19,16 @@
     text-align: center;
 
     color: var(--g-color-text-primary);
-    border: $border-width solid var(--progress-bar-border-color);
+    border: $border-width solid var(--entity-state-border-color);
     border-radius: $outer-border-radius;
-    background-color: var(--progress-bar-background-color);
+    background-color: var(--entity-state-background-color);
+    @include entity-state-colors();
 
     &_compact {
         min-width: 0;
         height: var(--progress-bar-compact-height);
 
         border-radius: 2px;
-    }
-
-    &_green {
-        --progress-bar-border-color: var(--g-color-base-positive-heavy);
-        --progress-bar-background-color: var(--g-color-base-positive-light);
-        --progress-bar-fill-color: var(--g-color-base-positive-medium);
-    }
-
-    &_blue {
-        --progress-bar-border-color: var(--g-color-base-info-heavy);
-        --progress-bar-background-color: var(--g-color-base-info-light);
-        --progress-bar-fill-color: var(--g-color-base-info-medium);
-    }
-
-    &_yellow {
-        --progress-bar-border-color: var(--g-color-base-warning-heavy);
-        --progress-bar-background-color: var(--g-color-base-yellow-light);
-        --progress-bar-fill-color: var(--g-color-base-yellow-medium);
-    }
-
-    &_orange {
-        --progress-bar-border-color: var(--ydb-color-status-orange);
-        --progress-bar-background-color: var(--g-color-base-warning-light);
-        --progress-bar-fill-color: var(--g-color-base-warning-medium);
-    }
-    &_red {
-        --progress-bar-border-color: var(--g-color-base-danger-heavy);
-        --progress-bar-background-color: var(--g-color-base-danger-light);
-        --progress-bar-fill-color: var(--g-color-base-danger-medium);
     }
 
     &_faded {
@@ -78,11 +49,11 @@
         height: 100%;
 
         border-radius: $inner-border-radius 0 0 $inner-border-radius;
-        background-color: var(--progress-bar-fill-color);
+        background-color: var(--entity-state-fill-color);
 
         &_faded {
             // Bg color is light variant, use it to make bar less bright
-            background-color: var(--progress-bar-background-color);
+            background-color: var(--entity-state-background-color);
         }
 
         &_compact {
