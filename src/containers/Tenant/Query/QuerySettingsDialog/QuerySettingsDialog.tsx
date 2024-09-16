@@ -1,9 +1,9 @@
 import React from 'react';
 
 import {Dialog, Link as ExternalLink, Flex, TextInput} from '@gravity-ui/uikit';
-import {yupResolver} from '@hookform/resolvers/yup';
+import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
-import * as yup from 'yup';
+import {z} from 'zod';
 
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {
@@ -32,25 +32,31 @@ import './QuerySettingsDialog.scss';
 
 const b = cn('ydb-query-settings-dialog');
 
-const validationSchema = yup.object().shape({
-    timeout: yup.string().test('is-within-range', i18n('form.validation.timeout'), (value) => {
-        if (!value) {
-            return true;
-        }
-        const num = Number(value);
-        return !isNaN(num) && num > 0;
-    }),
-    limitRows: yup.string().test('is-within-range', i18n('form.validation.limitRows'), (value) => {
-        if (!value) {
-            return true;
-        }
-        const num = Number(value);
-        return !isNaN(num) && num > 0 && num <= 100000;
-    }),
-    queryMode: yup.mixed<QueryMode>().required(),
-    transactionMode: yup.mixed<TransactionMode>().required(),
-    statisticsMode: yup.mixed<StatisticsMode>(),
-    tracingLevel: yup.mixed<TracingLevel>(),
+const validationSchema = z.object({
+    timeout: z.string().refine(
+        (value) => {
+            if (!value) {
+                return true;
+            }
+            const num = Number(value);
+            return !isNaN(num) && num > 0;
+        },
+        {message: i18n('form.validation.timeout')},
+    ),
+    limitRows: z.string().refine(
+        (value) => {
+            if (!value) {
+                return true;
+            }
+            const num = Number(value);
+            return !isNaN(num) && num > 0 && num <= 100000;
+        },
+        {message: i18n('form.validation.limitRows')},
+    ),
+    queryMode: z.custom<QueryMode>(),
+    transactionMode: z.custom<TransactionMode>(),
+    statisticsMode: z.custom<StatisticsMode>().optional(),
+    tracingLevel: z.custom<TracingLevel>().optional(),
 });
 
 export function QuerySettingsDialog() {
@@ -101,7 +107,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         formState: {errors},
     } = useForm<QuerySettings>({
         defaultValues: initialValues,
-        resolver: yupResolver<QuerySettings>(validationSchema),
+        resolver: zodResolver(validationSchema),
     });
 
     const enableTracingLevel = useTracingLevelOptionAvailable();
