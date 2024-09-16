@@ -6,6 +6,7 @@ import {StringParam, useQueryParam} from 'use-query-params';
 import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
 import {parseTraceFields} from '../../../services/parsers/parseMetaCluster';
+import {isClusterInfoV2} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import {CLUSTER_DEFAULT_TITLE, DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
 import {isQueryErrorResponse} from '../../../utils/query';
@@ -15,6 +16,7 @@ import {api} from '../api';
 import type {ClusterGroupsStats, ClusterState} from './types';
 import {
     createSelectClusterGroupsQuery,
+    getGroupStatsFromClusterInfo,
     normalizeDomain,
     parseGroupsStatsQueryResponse,
 } from './utils';
@@ -69,6 +71,15 @@ export const clusterApi = api.injectEndpoints({
                     // Without domain we cannot get stats from system tables
                     if (!clusterRoot) {
                         return {data: {clusterData}};
+                    }
+
+                    if (isClusterInfoV2(clusterData)) {
+                        return {
+                            data: {
+                                clusterData,
+                                groupsStats: getGroupStatsFromClusterInfo(clusterData),
+                            },
+                        };
                     }
 
                     try {

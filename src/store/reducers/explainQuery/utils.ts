@@ -13,7 +13,7 @@ export const explainVersions = {
 const supportedExplainQueryVersions = Object.values(explainVersions);
 
 export const prepareExplainResponse = (
-    response: ExplainScriptResponse | ExplainQueryResponse,
+    response: ExplainScriptResponse | ExplainQueryResponse | null,
 ): PreparedExplainResponse => {
     const {plan: rawPlan, ast} = parseQueryAPIExplainResponse(response);
 

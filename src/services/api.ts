@@ -558,7 +558,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         const {schema, ...rest} = params;
 
         // FIXME: base64 is passed both to params and body to work on versions before and after 24-3
-        return this.post<QueryAPIResponse<Action, Schema> | ErrorResponse>(
+        return this.post<QueryAPIResponse<Action, Schema> | ErrorResponse | null>(
             this.getPath('/viewer/json/query'),
             {...rest, base64},
             {schema, base64},

@@ -32,13 +32,15 @@ export const parseNodesToVersionsValues = (
 export function parseNodeGroupsToVersionsValues(
     groups: NodesGroup[],
     versionsToColor?: VersionToColorMap,
+    total?: number,
 ) {
+    const normalizedTotal = total ?? groups.reduce((acc, group) => acc + group.count, 0);
     return groups.map((group) => {
         return {
             title: group.name,
             version: group.name,
             color: versionsToColor?.get(group.name),
-            value: group.count,
+            value: (group.count / normalizedTotal) * 100,
         };
     });
 }

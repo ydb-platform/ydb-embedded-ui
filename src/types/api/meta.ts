@@ -47,9 +47,9 @@ export interface MetaGeneralClusterInfo extends MetaBaseClusterInfo {
 }
 
 // In case of error in viewer /cluster request mvp return error field instead of cluster data
-export interface MetaViewerClusterInfo extends TClusterInfo {
+export type MetaViewerClusterInfo = TClusterInfo & {
     error?: string;
-}
+};
 
 export interface MetaClusterVersion {
     version: string;

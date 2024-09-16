@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {CircleXmarkFill, TriangleExclamationFill} from '@gravity-ui/icons';
-import {Dialog, Icon} from '@gravity-ui/uikit';
+import {Checkbox, Dialog, Icon} from '@gravity-ui/uikit';
 
 import type {IResponseError} from '../../types/api/error';
 import {cn} from '../../utils/cn';
@@ -29,6 +29,7 @@ interface CriticalActionDialogProps<T> {
     text?: string;
     withRetry?: boolean;
     retryButtonText?: string;
+    withCheckBox?: boolean;
     onClose: VoidFunction;
     onConfirm: (isRetry?: boolean) => Promise<T>;
     onConfirmActionSuccess: VoidFunction;
@@ -41,6 +42,7 @@ export function CriticalActionDialog<T>({
     text,
     withRetry,
     retryButtonText,
+    withCheckBox,
     onClose,
     onConfirm,
     onConfirmActionSuccess,
@@ -48,6 +50,7 @@ export function CriticalActionDialog<T>({
 }: CriticalActionDialogProps<T>) {
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<IResponseError>();
+    const [checkBoxChecked, setCheckBoxChecked] = React.useState<boolean>(false);
 
     const onApply = async (isRetry?: boolean) => {
         setIsLoading(true);
@@ -68,6 +71,19 @@ export function CriticalActionDialog<T>({
 
     const handleTransitionExited = () => {
         setError(undefined);
+        setCheckBoxChecked(false);
+    };
+
+    const renderCheckBox = () => {
+        if (withCheckBox) {
+            return (
+                <Checkbox checked={checkBoxChecked} onUpdate={setCheckBoxChecked}>
+                    {criticalActionDialogKeyset('checkbox-text')}
+                </Checkbox>
+            );
+        }
+
+        return null;
     };
 
     const renderDialogContent = () => {
@@ -111,6 +127,8 @@ export function CriticalActionDialog<T>({
                         </span>
                         {text}
                     </div>
+
+                    {renderCheckBox()}
                 </Dialog.Body>
 
                 <Dialog.Footer
@@ -118,7 +136,7 @@ export function CriticalActionDialog<T>({
                     preset="default"
                     textButtonApply={criticalActionDialogKeyset('button-confirm')}
                     textButtonCancel={criticalActionDialogKeyset('button-cancel')}
-                    propsButtonApply={{type: 'submit'}}
+                    propsButtonApply={{type: 'submit', disabled: withCheckBox && !checkBoxChecked}}
                     onClickButtonCancel={onClose}
                     onClickButtonApply={() => onApply()}
                 />

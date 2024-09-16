@@ -258,7 +258,7 @@ export const executeQueryApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
-                    data.traceId = response._meta?.traceId;
+                    data.traceId = response?._meta?.traceId;
 
                     const queryStats: QueryStats = {};
                     if (data.stats) {

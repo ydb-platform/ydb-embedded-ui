@@ -1,7 +1,7 @@
 const path = require('path');
 
+const MiniCSSExtractPlugin = require('mini-css-extract-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-
 const srcRoot = path.resolve(__dirname, 'src');
 const uiKitRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/uikit');
 const uiKitIconsRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/icons');
@@ -33,6 +33,11 @@ module.exports = {
                 ],
             }),
         );
+
+        const cssExtractPlugin = config.plugins.find((p) => p instanceof MiniCSSExtractPlugin);
+        if (cssExtractPlugin) {
+            cssExtractPlugin.options.ignoreOrder = true;
+        }
 
         return config;
     },

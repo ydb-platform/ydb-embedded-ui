@@ -47,24 +47,17 @@
         gap: var(--g-spacing-2);
     }
 
-    &__storage-groups-stats {
-        display: flex;
-        flex-direction: column;
-        gap: 11px;
-    }
-
-    &__groups-stats-bar {
-        cursor: pointer;
-    }
-
-    &__groups-stats-popup-content {
-        padding: 12px;
-    }
-
     &__clipboard-button {
         display: flex;
         align-items: center;
 
         margin-left: 5px;
+    }
+    &__dc-count {
+        text-transform: lowercase;
+    }
+    &__nodes-states {
+        display: flex;
+        gap: var(--g-spacing-half);
     }
 }
