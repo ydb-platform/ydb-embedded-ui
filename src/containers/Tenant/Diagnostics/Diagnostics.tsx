@@ -26,7 +26,7 @@ import {Configs} from './Configs/Configs';
 import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
-import {getDataBasePage, getPagesByType} from './DiagnosticsPages';
+import {getDataBasePages, getPagesByType} from './DiagnosticsPages';
 import {HotKeys} from './HotKeys/HotKeys';
 import {Network} from './Network/Network';
 import {Partitions} from './Partitions/Partitions';
@@ -64,7 +64,7 @@ function Diagnostics(props: DiagnosticsProps) {
     const isDatabase = isDatabaseEntityType(props.type) || props.path === props.tenantName;
 
     const hasFeatureFlags = useFeatureFlags();
-    const pages = isDatabase ? getDataBasePage({hasFeatureFlags}) : getPagesByType(props.type);
+    const pages = isDatabase ? getDataBasePages({hasFeatureFlags}) : getPagesByType(props.type);
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {
         activeTab = pages[0];
