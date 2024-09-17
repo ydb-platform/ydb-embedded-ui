@@ -20,6 +20,7 @@ import type {ValueOf} from '../common';
 export interface ParsedResultSet {
     columns?: ColumnType[];
     result?: KeyValueRow[];
+    truncated?: boolean;
 }
 
 export interface IQueryResult {
@@ -30,6 +31,7 @@ export interface IQueryResult {
     plan?: ScriptPlan | QueryPlan;
     ast?: string;
     traceId?: string;
+    truncated?: boolean;
 }
 
 export interface QueryRequestParams {

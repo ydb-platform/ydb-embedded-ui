@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {RadioButton, Tabs} from '@gravity-ui/uikit';
+import {RadioButton, Tabs, Text} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
 
 import {ClipboardButton} from '../../../../components/ClipboardButton';
@@ -14,7 +14,7 @@ import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper'
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
-import type {ColumnType, KeyValueRow, TKqpStatsQuery} from '../../../../types/api/query';
+import type {TKqpStatsQuery} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import type {ExecuteQueryResult} from '../../../../types/store/executeQuery';
 import {getArray} from '../../../../utils';
@@ -74,8 +74,7 @@ export function ExecuteResult({
     const stats: TKqpStatsQuery | undefined = data?.stats;
     const resultsSetsCount = data?.resultSets?.length;
     const isMulti = resultsSetsCount && resultsSetsCount > 0;
-    const currentResult = isMulti ? data?.resultSets?.[selectedResultSet].result : data?.result;
-    const currentColumns = isMulti ? data?.resultSets?.[selectedResultSet].columns : data?.columns;
+    const currentResult = isMulti ? data?.resultSets?.[selectedResultSet] : data;
     const {plan, simplifiedPlan} = React.useMemo(() => getPlan(data), [data]);
 
     const resultOptions: ControlGroupOption<SectionID>[] = [
@@ -104,13 +103,6 @@ export function ExecuteResult({
         setActiveSection(value);
     };
 
-    const renderResultTable = (
-        resultSet: KeyValueRow[] | undefined,
-        columns: ColumnType[] | undefined,
-    ) => {
-        return <QueryResultTable data={resultSet} columns={columns} settings={{sortable: false}} />;
-    };
-
     const renderResult = () => {
         return (
             <div className={b('result-wrapper')}>
@@ -121,7 +113,7 @@ export function ExecuteResult({
                             size="l"
                             items={getArray(resultsSetsCount).map((item) => ({
                                 id: String(item),
-                                title: `Result #${item + 1}`,
+                                title: `Result #${item + 1}${data?.resultSets?.[item]?.truncated ? ' (T)' : ''}`,
                             }))}
                             activeTab={String(selectedResultSet)}
                             onSelectTab={(tabId) => setSelectedResultSet(Number(tabId))}
@@ -129,7 +121,21 @@ export function ExecuteResult({
                     </div>
                 )}
                 <div className={b('result')}>
-                    {renderResultTable(currentResult, currentColumns)}
+                    {currentResult?.truncated ? (
+                        <div className={b('result-head')}>
+                            <Text variant="subheader-3">{i18n('truncated')}</Text>
+                            <Text
+                                color="secondary"
+                                variant="body-2"
+                                className={b('row-count')}
+                            >{`(${currentResult?.result?.length})`}</Text>
+                        </div>
+                    ) : null}
+                    <QueryResultTable
+                        data={currentResult?.result}
+                        columns={currentResult?.columns}
+                        settings={{sortable: false}}
+                    />
                 </div>
             </div>
         );
@@ -138,7 +144,7 @@ export function ExecuteResult({
     const getStatsToCopy = () => {
         switch (activeSection) {
             case resultOptionsIds.result: {
-                const textResults = getPreparedResult(currentResult);
+                const textResults = getPreparedResult(currentResult?.result);
                 return textResults;
             }
             case resultOptionsIds.stats:

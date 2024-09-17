@@ -15,6 +15,14 @@
         }
     }
 
+    &__row-count {
+        margin-left: var(--g-spacing-1);
+    }
+
+    &__result-head {
+        margin-top: var(--g-spacing-4);
+    }
+
     &__result-wrapper {
         display: flex;
         flex-direction: column;
