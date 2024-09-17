@@ -33,8 +33,27 @@ import './QuerySettingsDialog.scss';
 const b = cn('ydb-query-settings-dialog');
 
 const validationSchema = z.object({
-    timeout: z.coerce.number().positive().optional().or(z.string().length(0)),
-    limitRows: z.coerce.number().gt(0).lte(10_000).optional().or(z.string().length(0)),
+    timeout: z.string().refine(
+        (value) => {
+            if (!value) {
+                return true;
+            }
+            const num = Number(value);
+            return !isNaN(num) && num > 0;
+        },
+        {message: i18n('form.validation.timeout')},
+    ),
+    limitRows: z.string().refine(
+        (value) => {
+            if (!value) {
+                return true;
+            }
+            const num = Number(value);
+            return !isNaN(num) && num > 0 && num <= 100000;
+        },
+        {message: i18n('form.validation.limitRows')},
+    ),
+
     queryMode: z.custom<QueryMode>(),
     transactionMode: z.custom<TransactionMode>(),
     statisticsMode: z.custom<StatisticsMode>().optional(),
