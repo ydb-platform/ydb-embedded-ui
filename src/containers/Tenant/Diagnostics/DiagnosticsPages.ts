@@ -130,3 +130,9 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
 };
 
 export const getPagesByType = (type?: EPathType) => (type && pathTypeToPages[type]) || DIR_PAGES;
+
+export const getDataBasePage = ({hasFeatureFlags}: {hasFeatureFlags?: boolean}) => {
+    return hasFeatureFlags
+        ? DATABASE_PAGES
+        : DATABASE_PAGES.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
+};

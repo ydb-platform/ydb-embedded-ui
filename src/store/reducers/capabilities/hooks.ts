@@ -30,3 +30,7 @@ export const useTracingLevelOptionAvailable = () => {
 export const useStorageGroupsHandlerAvailable = () => {
     return useGetFeatureVersion('/storage/groups') > 2;
 };
+
+export const useFeatureFlags = () => {
+    return useGetFeatureVersion('/viewer/feature_flags') > 1;
+};

@@ -7,6 +7,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
 import routes, {createHref} from '../../../routes';
+import {useFeatureFlags} from '../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
@@ -25,7 +26,7 @@ import {Configs} from './Configs/Configs';
 import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
-import {DATABASE_PAGES, getPagesByType} from './DiagnosticsPages';
+import {getDataBasePage, getPagesByType} from './DiagnosticsPages';
 import {HotKeys} from './HotKeys/HotKeys';
 import {Network} from './Network/Network';
 import {Partitions} from './Partitions/Partitions';
@@ -62,7 +63,8 @@ function Diagnostics(props: DiagnosticsProps) {
     const tenantName = isDatabaseEntityType(props.type) ? props.path : props.tenantName;
     const isDatabase = isDatabaseEntityType(props.type) || props.path === props.tenantName;
 
-    const pages = isDatabase ? DATABASE_PAGES : getPagesByType(props.type);
+    const hasFeatureFlags = useFeatureFlags();
+    const pages = isDatabase ? getDataBasePage({hasFeatureFlags}) : getPagesByType(props.type);
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {
         activeTab = pages[0];
