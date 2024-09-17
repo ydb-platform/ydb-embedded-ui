@@ -2,14 +2,21 @@
 
 .ydb-storage-group-page {
     position: relative;
-
-    display: flex;
     overflow: auto;
-    flex-direction: column;
-    gap: 20px;
-
     height: 100%;
-    padding: 20px;
+
+    &__info-content {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        gap: 20px;
+        position: sticky;
+        left: 0;
+    }
+
+    &__tabs-content {
+        padding-left: 20px;
+    }
 
     &__meta,
     &__title,

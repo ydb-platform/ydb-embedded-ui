@@ -188,14 +188,16 @@ export function StorageGroupPage() {
     };
 
     return (
-        <div className={storageGroupPageCn()}>
-            {renderHelmet()}
-            {renderPageMeta()}
-            {renderPageTitle()}
-            {renderError()}
-            {renderInfo()}
-            {renderTabs()}
-            {renderTabsContent()}
+        <div className={storageGroupPageCn(null)}>
+            <div className={storageGroupPageCn('info-content')}>
+                {renderHelmet()}
+                {renderPageMeta()}
+                {renderPageTitle()}
+                {renderError()}
+                {renderInfo()}
+                {renderTabs()}
+            </div>
+            <div className={storageGroupPageCn('tabs-content')}>{renderTabsContent()}</div>
         </div>
     );
 }
