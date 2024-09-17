@@ -4,9 +4,8 @@ import type {NodesPreparedEntity} from '../store/reducers/nodes/types';
 import {ProblemFilterValues} from '../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../store/reducers/settings/types';
 import {EFlag} from '../types/api/enums';
-import type {TSystemStateInfo} from '../types/api/nodes';
+import type {NodesSortValue, TSystemStateInfo} from '../types/api/nodes';
 import type {TNodeInfo} from '../types/api/nodesList';
-import type {ValueOf} from '../types/common';
 import type {NodesMap} from '../types/store/nodesList';
 
 import {HOUR_IN_SECONDS} from './constants';
@@ -87,26 +86,15 @@ export const getUptimeParamValue = (nodesUptimeFilter: NodesUptimeFilterValues |
     return nodesUptimeFilter === NodesUptimeFilterValues.SmallUptime ? HOUR_IN_SECONDS : undefined;
 };
 
-/**
- * Values to sort /compute v2 and /nodes responses
- *
- * For actual values go to:\
- * /nodes: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/json_nodes.h\
- * /compute: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/json_compute.h
- */
-export const NODES_SORT_VALUES = {
-    NodeId: 'NodeId',
-    Host: 'Host',
-    DC: 'DC',
-    Rack: 'Rack',
-    Version: 'Version',
-    Uptime: 'Uptime',
-    Memory: 'Memory',
-    CPU: 'CPU',
-    LoadAverage: 'LoadAverage',
-} as const;
-
-export type NodesSortValue = ValueOf<typeof NODES_SORT_VALUES>;
+export const NODES_SORT_VALUES: NodesSortValue[] = [
+    'NodeId',
+    'Host',
+    'NodeName',
+    'DC',
+    'Rack',
+    'Version',
+    'Uptime',
+];
 
 export const isSortableNodesProperty = (value: string): value is NodesSortValue =>
-    Object.values(NODES_SORT_VALUES).includes(value as NodesSortValue);
+    NODES_SORT_VALUES.includes(value as NodesSortValue);

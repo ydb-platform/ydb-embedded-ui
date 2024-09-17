@@ -1,0 +1,16 @@
+{
+  "node-id": "Node Id",
+  "host": "Host",
+  "dc": "DC",
+  "rack": "Rack",
+  "version": "Version",
+  "uptime": "Uptime",
+  "memory": "Memory",
+  "cpu": "CPU",
+  "tablets": "Tablets",
+  "load-average": "Load Average",
+  "load": "Load",
+  "process": "Process",
+  "caches": "Caches",
+  "sessions": "Sessions"
+}

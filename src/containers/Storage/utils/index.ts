@@ -9,7 +9,6 @@ import type {
 } from '../../../store/reducers/storage/types';
 import {EFlag} from '../../../types/api/enums';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
-import {NODES_SORT_VALUES} from '../../../utils/nodes';
 
 const defaultDegradationEvaluator = generateEvaluator(1, 2, ['success', 'warning', 'danger']);
 
@@ -41,7 +40,7 @@ export const getUsageSeverityForEntityStatus = generateEvaluator(80, 85, [
 ]);
 
 export const defaultSortNode: NodesSortParams = {
-    sortValue: NODES_SORT_VALUES.NodeId,
+    sortValue: 'NodeId',
     sortOrder: ASCENDING,
 };
 

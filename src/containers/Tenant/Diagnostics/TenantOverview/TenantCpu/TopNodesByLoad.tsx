@@ -1,15 +1,15 @@
+import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {topNodesApi} from '../../../../../store/reducers/tenantOverview/topNodes/topNodes';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
-import {
-    NODES_COLUMNS_WIDTH_LS_KEY,
-    getTopNodesByLoadColumns,
-} from '../../../../Nodes/getNodesColumns';
+import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../Nodes/columns/constants';
+import {getTopNodesByLoadColumns} from '../../../../Nodes/columns/getNodesColumns';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
+
+import {prepareTopNodesByLoad} from './utils';
 
 interface TopNodesByLoadProps {
     tenantName: string;
@@ -22,13 +22,14 @@ export function TopNodesByLoad({tenantName, additionalNodesProps}: TopNodesByLoa
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const columns = getTopNodesByLoadColumns(additionalNodesProps?.getNodeRef);
 
-    const {currentData, isFetching, error} = topNodesApi.useGetTopNodesQuery(
-        {tenant: tenantName, sortValue: 'LoadAverage'},
+    const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
+        {tenant: tenantName, type: 'any'},
         {pollingInterval: autoRefreshInterval},
     );
 
     const loading = isFetching && currentData === undefined;
-    const topNodes = currentData;
+
+    const topNodes = prepareTopNodesByLoad(currentData);
 
     const title = getSectionTitle({
         entity: i18n('nodes'),
