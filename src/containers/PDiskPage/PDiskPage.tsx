@@ -252,14 +252,16 @@ export function PDiskPage() {
 
     return (
         <div className={pdiskPageCn(null)}>
-            {renderHelmet()}
-            {renderPageMeta()}
-            {renderPageTitle()}
-            {renderControls()}
-            {renderError()}
-            {renderInfo()}
-            {renderTabs()}
-            {renderTabsContent()}
+            <div className={pdiskPageCn('info-content')}>
+                {renderHelmet()}
+                {renderPageMeta()}
+                {renderPageTitle()}
+                {renderControls()}
+                {renderError()}
+                {renderInfo()}
+                {renderTabs()}
+            </div>
+            <div className={pdiskPageCn('tabs-content')}>{renderTabsContent()}</div>
         </div>
     );
 }

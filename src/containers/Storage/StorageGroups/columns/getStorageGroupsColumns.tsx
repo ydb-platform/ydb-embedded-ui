@@ -6,8 +6,10 @@ import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {InternalLink} from '../../../../components/InternalLink';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {VDiskWithDonorsStack} from '../../../../components/VDisk/VDiskWithDonorsStack';
+import {getStorageGroupPath} from '../../../../routes';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../../store/reducers/storage/types';
 import type {NodesMap} from '../../../../types/store/nodesList';
@@ -139,7 +141,13 @@ const groupIdColumn: StorageGroupsColumn = {
     header: 'Group ID',
     width: 130,
     render: ({row}) => {
-        return <span className={b('group-id')}>{row.GroupId}</span>;
+        return row.GroupId ? (
+            <InternalLink className={b('group-id')} to={getStorageGroupPath(row.GroupId)}>
+                {row.GroupId}
+            </InternalLink>
+        ) : (
+            '-'
+        );
     },
     sortAccessor: (row) => Number(row.GroupId),
     align: DataTable.RIGHT,

@@ -11,6 +11,7 @@ export const TENANT = 'tenant';
 export const NODE = 'node';
 export const PDISK = 'pDisk';
 export const VDISK = 'vDisk';
+export const STORAGE_GROUP = 'storageGroup';
 export const TABLET = 'tablet';
 
 const routes = {
@@ -20,6 +21,7 @@ const routes = {
     node: `/${NODE}/:id/:activeTab?`,
     pDisk: `/${PDISK}`,
     vDisk: `/${VDISK}`,
+    storageGroup: `/${STORAGE_GROUP}`,
     tablet: `/${TABLET}/:id`,
     tabletsFilters: `/tabletsFilters`,
     auth: `/auth`,
@@ -104,6 +106,10 @@ export function getVDiskPagePath(
     query: Query = {},
 ) {
     return createHref(routes.vDisk, undefined, {...query, nodeId, pDiskId, vDiskSlotId});
+}
+
+export function getStorageGroupPath(groupId: string | number, query: Query = {}) {
+    return createHref(routes.storageGroup, undefined, {...query, groupId});
 }
 
 export function getTabletPagePath(tabletId: string | number, query: Query = {}) {

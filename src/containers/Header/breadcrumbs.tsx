@@ -13,6 +13,7 @@ import type {
     NodeBreadcrumbsOptions,
     PDiskBreadcrumbsOptions,
     Page,
+    StorageGroupBreadcrumbsOptions,
     TabletBreadcrumbsOptions,
     TenantBreadcrumbsOptions,
     VDiskBreadcrumbsOptions,
@@ -156,6 +157,27 @@ const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, q
     return breadcrumbs;
 };
 
+const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions> = (
+    options,
+    query = {},
+) => {
+    const {groupId} = options;
+
+    const breadcrumbs = getClusterBreadcrumbs(options, query);
+
+    let text = headerKeyset('breadcrumbs.storageGroup');
+    if (groupId) {
+        text += ` ${groupId}`;
+    }
+
+    const lastItem = {
+        text,
+    };
+    breadcrumbs.push(lastItem);
+
+    return breadcrumbs;
+};
+
 const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options, query = {}) => {
     const {tabletId, tabletType, nodeId, nodeRole, nodeActiveTab = TABLETS, tenantName} = options;
 
@@ -178,6 +200,7 @@ const mapPageToGetter = {
     tablet: getTabletBreadcrumbs,
     tenant: getTenantBreadcrumbs,
     vDisk: getVDiskBreadcrumbs,
+    storageGroup: getStorageGroupBreadcrumbs,
 } as const;
 
 export const getBreadcrumbs = (
