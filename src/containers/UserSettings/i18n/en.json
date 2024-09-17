@@ -30,9 +30,6 @@
 
   "settings.invertedDisks.title": "Inverted disks space indicators",
 
-  "settings.useNodesEndpoint.title": "Break the Nodes tab in Diagnostics",
-  "settings.useNodesEndpoint.description": "Use /viewer/json/nodes endpoint for Nodes tab in diagnostics. It could return incorrect data on versions before 24-1",
-
   "settings.useAdvancedStorage.title": "Use advanced storage",
   "settings.useAdvancedStorage.description": "Display additional data in Storage table",
 
