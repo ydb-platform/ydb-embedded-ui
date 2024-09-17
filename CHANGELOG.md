@@ -1,5 +1,19 @@
 # Changelog
 
+## [6.20.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.19.0...v6.20.0) (2024-09-17)
+
+
+### Features
+
+* use new /viewer/cluster handler format ([#1272](https://github.com/ydb-platform/ydb-embedded-ui/issues/1272)) ([f0742ab](https://github.com/ydb-platform/ydb-embedded-ui/commit/f0742ab480bf595f7b5a250dcbd23d33f15ea523))
+
+
+### Bug Fixes
+
+* **DecommissionButton:** add checkbox to dialog ([#1294](https://github.com/ydb-platform/ydb-embedded-ui/issues/1294)) ([6d65839](https://github.com/ydb-platform/ydb-embedded-ui/commit/6d6583951e31d2ad407077dbd9c9b29472a4983a))
+* **queries:** do not fail on response with 200 code and null body ([#1304](https://github.com/ydb-platform/ydb-embedded-ui/issues/1304)) ([d115989](https://github.com/ydb-platform/ydb-embedded-ui/commit/d115989a8ad0479a8269507df14c4b533f7d2084))
+* remove break nodes setting, remove compute ([#1306](https://github.com/ydb-platform/ydb-embedded-ui/issues/1306)) ([de315ae](https://github.com/ydb-platform/ydb-embedded-ui/commit/de315ae980b3e7d4bbea48f1497934d11180002a))
+
 ## [6.19.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.18.0...v6.19.0) (2024-09-13)
 
 
