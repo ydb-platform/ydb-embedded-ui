@@ -1,7 +1,9 @@
+import {Flex} from '@gravity-ui/uikit';
+
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
 import {valueIsDefined} from '../../utils';
-import {cn} from '../../utils/cn';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {formatToMs} from '../../utils/timeParsers';
 import {bytesToSpeed} from '../../utils/utils';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {InfoViewer} from '../InfoViewer';
@@ -9,10 +11,6 @@ import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 
 import {storageGroupInfoKeyset} from './i18n';
-
-import './StorageGroupInfo.scss';
-
-const b = cn('ydb-storage-group-info');
 
 interface StorageGroupInfoProps extends Omit<InfoViewerProps, 'info'> {
     data?: PreparedStorageGroup;
@@ -127,19 +125,19 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
     if (valueIsDefined(LatencyPutTabletLog)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency-put-tablet-log'),
-            value: `${LatencyPutTabletLog} ms`,
+            value: formatToMs(LatencyPutTabletLog),
         });
     }
     if (valueIsDefined(LatencyPutUserData)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency-put-user-data'),
-            value: `${LatencyPutUserData} ms`,
+            value: formatToMs(LatencyPutUserData),
         });
     }
     if (valueIsDefined(LatencyGetFast)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency-get-fast'),
-            value: `${LatencyGetFast} ms`,
+            value: formatToMs(LatencyGetFast),
         });
     }
     if (valueIsDefined(AllocationUnits)) {
@@ -162,13 +160,9 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
     }
 
     return (
-        <div className={b('wrapper', className)}>
-            <div className={b('col')}>
-                <InfoViewer info={storageGroupInfoFirstColumn} {...infoViewerProps} />
-            </div>
-            <div className={b('col')}>
-                <InfoViewer info={storageGroupInfoSecondColumn} {...infoViewerProps} />
-            </div>
-        </div>
+        <Flex className={className} gap={2} direction="row" wrap>
+            <InfoViewer info={storageGroupInfoFirstColumn} {...infoViewerProps} />
+            <InfoViewer info={storageGroupInfoSecondColumn} {...infoViewerProps} />
+        </Flex>
     );
 }

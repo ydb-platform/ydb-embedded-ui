@@ -1,18 +1,4 @@
 .ydb-pdisk-info {
-    &__wrapper {
-        display: flex;
-        flex-flow: row wrap;
-        gap: 7px;
-    }
-
-    &__col {
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-
-        width: 500px;
-    }
-
     &__links {
         display: flex;
         flex-flow: row wrap;
