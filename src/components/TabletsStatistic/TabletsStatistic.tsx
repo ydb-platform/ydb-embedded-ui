@@ -2,8 +2,7 @@ import {Link} from 'react-router-dom';
 
 import {TABLETS} from '../../containers/Node/NodePages';
 import routes, {createHref} from '../../routes';
-import type {TTabletStateInfo as TComputeTabletStateInfo} from '../../types/api/compute';
-import type {TTabletStateInfo as TFullTabletStateInfo} from '../../types/api/tablet';
+import type {TTabletStateInfo} from '../../types/api/tablet';
 import {cn} from '../../utils/cn';
 import {getTabletLabel} from '../../utils/constants';
 import {mapTabletStateToColorState} from '../../utils/tablet';
@@ -12,9 +11,7 @@ import './TabletsStatistic.scss';
 
 const b = cn('tablets-statistic');
 
-type Tablets = TFullTabletStateInfo[] | TComputeTabletStateInfo[];
-
-const prepareTablets = (tablets: Tablets) => {
+const prepareTablets = (tablets: TTabletStateInfo[]) => {
     const res = tablets.map((tablet) => {
         return {
             label: getTabletLabel(tablet.Type),
@@ -28,7 +25,7 @@ const prepareTablets = (tablets: Tablets) => {
 };
 
 interface TabletsStatisticProps {
-    tablets: Tablets;
+    tablets: TTabletStateInfo[];
     path: string | undefined;
     nodeId: string | number;
     backend?: string;

@@ -3,7 +3,6 @@ import {z} from 'zod';
 import type {NodesPreparedEntity} from '../store/reducers/nodes/types';
 import {ProblemFilterValues} from '../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../store/reducers/settings/types';
-import type {TComputeNodeInfo} from '../types/api/compute';
 import {EFlag} from '../types/api/enums';
 import type {TSystemStateInfo} from '../types/api/nodes';
 import type {TNodeInfo} from '../types/api/nodesList';
@@ -41,7 +40,7 @@ export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
     }, new Map());
 };
 
-export function calculateLoadAveragePercents(node: TSystemStateInfo | TComputeNodeInfo = {}) {
+export function calculateLoadAveragePercents(node: TSystemStateInfo = {}) {
     const {LoadAverage, NumberOfCpus} = node;
 
     if (!valueIsDefined(LoadAverage) || !valueIsDefined(NumberOfCpus)) {
