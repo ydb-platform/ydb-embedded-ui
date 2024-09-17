@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
-import {skipToken} from '@reduxjs/toolkit/query';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
@@ -25,10 +24,9 @@ import {
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS, USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
     useAutoRefreshInterval,
-    useSetting,
     useTableSort,
     useTypedDispatch,
     useTypedSelector,
@@ -66,21 +64,11 @@ export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) =
     const problemFilter = useTypedSelector(selectProblemFilter);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const [useNodesEndpoint] = useSetting(USE_NODES_ENDPOINT_IN_DIAGNOSTICS_KEY);
-
-    // If there is no path, it's cluster Nodes tab
-    const useGetComputeNodes = path && !useNodesEndpoint;
-    const nodesQuery = nodesApi.useGetNodesQuery(
-        useGetComputeNodes ? skipToken : {path, database},
-        {
-            pollingInterval: autoRefreshInterval,
-        },
-    );
-    const computeQuery = nodesApi.useGetComputeNodesQuery(useGetComputeNodes ? {path} : skipToken, {
-        pollingInterval: autoRefreshInterval,
-    });
-
-    const {currentData: data, isLoading, error} = useGetComputeNodes ? computeQuery : nodesQuery;
+    const {
+        currentData: data,
+        isLoading,
+        error,
+    } = nodesApi.useGetNodesQuery({path, database}, {pollingInterval: autoRefreshInterval});
 
     const [sortValue, setSortValue] = React.useState<NodesSortParams>({
         sortValue: 'NodeId',

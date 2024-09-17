@@ -1,9 +1,5 @@
 import type {OrderType} from '@gravity-ui/react-data-table';
 
-import type {
-    EVersion,
-    TTabletStateInfo as TComputeTabletStateInfo,
-} from '../../../types/api/compute';
 import type {EFlag} from '../../../types/api/enums';
 import type {TEndpoint, TPoolStats} from '../../../types/api/nodes';
 import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
@@ -36,7 +32,7 @@ export interface NodesPreparedEntity {
     PoolStats?: TPoolStats[];
     LoadAverage?: number[];
     LoadAveragePercents?: number[];
-    Tablets?: TFullTabletStateInfo[] | TComputeTabletStateInfo[];
+    Tablets?: TFullTabletStateInfo[];
     Endpoints?: TEndpoint[];
 
     TotalSessions?: number;
@@ -77,11 +73,6 @@ export interface NodesApiRequestParams extends NodesGeneralRequestParams {
     storage?: boolean;
     tablets?: boolean;
     group?: string;
-}
-
-export interface ComputeApiRequestParams extends NodesGeneralRequestParams {
-    path: string;
-    version?: EVersion; // only v2 works with filters
 }
 
 export interface NodesGroup {

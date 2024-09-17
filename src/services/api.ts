@@ -4,12 +4,11 @@ import type {AxiosRequestConfig} from 'axios';
 import axiosRetry from 'axios-retry';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
-import type {ComputeApiRequestParams, NodesApiRequestParams} from '../store/reducers/nodes/types';
+import type {NodesApiRequestParams} from '../store/reducers/nodes/types';
 import type {TMetaInfo} from '../types/api/acl';
 import type {TQueryAutocomplete} from '../types/api/autocomplete';
 import type {CapabilitiesResponse} from '../types/api/capabilities';
 import type {TClusterInfo} from '../types/api/cluster';
-import type {TComputeInfo} from '../types/api/compute';
 import type {DescribeConsumerResult} from '../types/api/consumer';
 import type {FeatureFlagConfigs} from '../types/api/featureFlags';
 import type {HealthCheckAPIResponse} from '../types/api/healthcheck';
@@ -221,19 +220,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 tenant: params.tenant || params.database,
                 node_id: params.node_id,
             },
-            {concurrentId, requestConfig: {signal}},
-        );
-    }
-    /** @deprecated use getNodes instead */
-    getCompute(
-        {sortOrder, sortValue, ...params}: ComputeApiRequestParams,
-        {concurrentId, signal}: AxiosOptions = {},
-    ) {
-        const sort = prepareSortValue(sortValue, sortOrder);
-
-        return this.get<TComputeInfo>(
-            this.getPath('/viewer/json/compute?enums=true'),
-            {sort, ...params},
             {concurrentId, requestConfig: {signal}},
         );
     }
