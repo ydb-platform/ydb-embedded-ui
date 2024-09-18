@@ -94,6 +94,9 @@ export const NODES_SORT_VALUES: NodesSortValue[] = [
     'Rack',
     'Version',
     'Uptime',
+    'CPU',
+    'LoadAverage',
+    'Memory',
 ];
 
 export const isSortableNodesProperty = (value: string): value is NodesSortValue =>

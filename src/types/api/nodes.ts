@@ -173,7 +173,18 @@ type NodesRequiredField =
     | 'DisconnectTime'
     | 'Database';
 
-export type NodesSortValue = 'NodeId' | 'Host' | 'NodeName' | 'DC' | 'Rack' | 'Version' | 'Uptime';
+export type NodesSortValue =
+    | 'NodeId'
+    | 'Host'
+    | 'NodeName'
+    | 'DC'
+    | 'Rack'
+    | 'Version'
+    | 'Uptime'
+    // TODO: Ensure that values work after https://github.com/ydb-platform/ydb/issues/9449
+    | 'CPU'
+    | 'LoadAverage'
+    | 'Memory';
 
 export type NodesSort = `-${NodesSortValue}` | `+${NodesSortValue}`;
 
