@@ -1,5 +1,18 @@
 # Changelog
 
+## [6.21.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.20.0...v6.21.0) (2024-09-18)
+
+
+### Features
+
+* add storage group page ([#1289](https://github.com/ydb-platform/ydb-embedded-ui/issues/1289)) ([8e05166](https://github.com/ydb-platform/ydb-embedded-ui/commit/8e05166388964c9fbe01984723c8d3e4cedd48a8))
+
+
+### Bug Fixes
+
+* **api:** correctly get cluster info from data (/meta/db_clusters) ([#1314](https://github.com/ydb-platform/ydb-embedded-ui/issues/1314)) ([762f8ed](https://github.com/ydb-platform/ydb-embedded-ui/commit/762f8ede6cda7b3f3e20eb7d69286d5ff76ea627))
+* check feature flag api is available ([#1308](https://github.com/ydb-platform/ydb-embedded-ui/issues/1308)) ([8531b95](https://github.com/ydb-platform/ydb-embedded-ui/commit/8531b954cd8870c5ecf7495064a5bac65aea55d6))
+
 ## [6.20.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.19.0...v6.20.0) (2024-09-17)
 
 
