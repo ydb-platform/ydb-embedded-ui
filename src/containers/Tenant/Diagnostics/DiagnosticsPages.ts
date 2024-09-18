@@ -19,7 +19,7 @@ const schema = {
 
 const topQueries = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.topQueries,
-    title: 'Top queries',
+    title: 'Queries',
 };
 
 const topShards = {
