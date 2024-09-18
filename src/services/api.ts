@@ -13,7 +13,13 @@ import type {DescribeConsumerResult} from '../types/api/consumer';
 import type {FeatureFlagConfigs} from '../types/api/featureFlags';
 import type {HealthCheckAPIResponse} from '../types/api/healthcheck';
 import type {JsonHotKeysResponse} from '../types/api/hotkeys';
-import type {MetaBaseClusterInfo, MetaCluster, MetaClusters, MetaTenants} from '../types/api/meta';
+import type {
+    MetaBaseClusterInfo,
+    MetaBaseClusters,
+    MetaCluster,
+    MetaClusters,
+    MetaTenants,
+} from '../types/api/meta';
 import type {ModifyDiskResponse} from '../types/api/modifyDisk';
 import type {TNetInfo} from '../types/api/netInfo';
 import type {TNodesInfo} from '../types/api/nodes';
@@ -843,13 +849,13 @@ export class YdbWebVersionAPI extends YdbEmbeddedAPI {
         clusterName: string,
         {concurrentId, signal}: AxiosOptions = {},
     ): Promise<MetaBaseClusterInfo> {
-        return this.get<MetaBaseClusterInfo[]>(
+        return this.get<MetaBaseClusters>(
             `${META_BACKEND || ''}/meta/db_clusters`,
             {
                 name: clusterName,
             },
             {concurrentId, requestConfig: {signal}},
-        ).then((data) => data[0]);
+        ).then((data) => data.clusters[0]);
     }
 }
 
