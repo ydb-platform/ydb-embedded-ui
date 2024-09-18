@@ -122,8 +122,8 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         },
     },
     {
-        name: COLUMNS_NAMES.CLUSTER,
-        header: COLUMNS_TITLES[COLUMNS_NAMES.CLUSTER],
+        name: COLUMNS_NAMES.DC,
+        header: COLUMNS_TITLES[COLUMNS_NAMES.DC],
         width: 120,
         sortable: false,
         render: ({row}) => {

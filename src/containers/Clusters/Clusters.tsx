@@ -20,14 +20,19 @@ import {
 } from '../../store/reducers/clusters/selectors';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
 import {ClustersStatistics} from './ClustersStatistics';
 import {CLUSTERS_COLUMNS, CLUSTERS_COLUMNS_WIDTH_LS_KEY} from './columns';
-import {COLUMNS_NAMES, COLUMNS_TITLES, DEFAULT_COLUMNS, SELECTED_COLUMNS_KEY} from './constants';
+import {
+    CLUSTERS_SELECTED_COLUMNS_KEY,
+    COLUMNS_NAMES,
+    COLUMNS_TITLES,
+    DEFAULT_COLUMNS,
+} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
-import {useSelectedColumns} from './useSelectedColumns';
 
 import './Clusters.scss';
 
@@ -59,7 +64,7 @@ export function Clusters() {
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         CLUSTERS_COLUMNS,
-        SELECTED_COLUMNS_KEY,
+        CLUSTERS_SELECTED_COLUMNS_KEY,
         COLUMNS_TITLES,
         DEFAULT_COLUMNS,
         [COLUMNS_NAMES.TITLE],
