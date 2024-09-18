@@ -1,3 +1,4 @@
+import type {BackendSortParam} from './common';
 import type {EFlag} from './enums';
 import type {EDecommitStatus, EDriveStatus, TPDiskStateInfo} from './pdisk';
 import type {EVDiskStatus, TVDiskStateInfo} from './vdisk';
@@ -233,8 +234,8 @@ export type GroupsSortField =
     | 'AllocationUnits'
     | 'Latency';
 
-export type StorageV2Sort = `-${StorageV2SortValue}` | `+${StorageV2SortValue}`;
-export type GroupsSort = `-${GroupsSortField}` | `+${GroupsSortField}`;
+export type StorageV2Sort = BackendSortParam<StorageV2SortValue>;
+export type GroupsSort = BackendSortParam<GroupsSortField>;
 
 export type StorageWithFilter = 'space' | 'missing' | 'all';
 

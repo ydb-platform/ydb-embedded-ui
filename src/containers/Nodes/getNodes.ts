@@ -1,9 +1,13 @@
 import type {FetchData} from '../../components/PaginatedTable';
 import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {prepareNodesData} from '../../store/reducers/nodes/utils';
-import type {NodesRequestParams, NodesSort} from '../../types/api/nodes';
+import type {NodesRequestParams} from '../../types/api/nodes';
 import {prepareSortValue} from '../../utils/filters';
-import {getProblemParamValue, getUptimeParamValue} from '../../utils/nodes';
+import {
+    getProblemParamValue,
+    getUptimeParamValue,
+    isSortableNodesProperty,
+} from '../../utils/nodes';
 
 const getConcurrentId = (limit?: number, offset?: number) => {
     return `getNodes|offset${offset}|limit${limit}`;
@@ -27,7 +31,9 @@ export const getNodes: FetchData<
     const {sortOrder, columnId} = sortParams ?? {};
     const {path, database, searchValue, problemFilter, uptimeFilter} = filters ?? {};
 
-    const sort = prepareSortValue(columnId, sortOrder) as NodesSort;
+    const sort = isSortableNodesProperty(columnId)
+        ? prepareSortValue(columnId, sortOrder)
+        : undefined;
 
     const response = await window.api.getNodes(
         {

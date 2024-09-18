@@ -9,6 +9,8 @@ import type {
 } from '../../../store/reducers/storage/types';
 import {EFlag} from '../../../types/api/enums';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
+import {NODES_COLUMNS_IDS} from '../../Nodes/columns/constants';
+import {GROUPS_COLUMNS_IDS} from '../StorageGroups/columns/getStorageGroupsColumns';
 
 const defaultDegradationEvaluator = generateEvaluator(1, 2, ['success', 'warning', 'danger']);
 
@@ -40,22 +42,22 @@ export const getUsageSeverityForEntityStatus = generateEvaluator(80, 85, [
 ]);
 
 export const defaultSortNode: NodesSortParams = {
-    sortValue: 'NodeId',
+    sortValue: NODES_COLUMNS_IDS.NodeId,
     sortOrder: ASCENDING,
 };
 
 const defaultSortGroup: StorageSortParams = {
-    sortValue: 'PoolName',
+    sortValue: GROUPS_COLUMNS_IDS.PoolName,
     sortOrder: ASCENDING,
 };
 
 const defaultSortGroupMissing: StorageSortParams = {
-    sortValue: 'Degraded',
+    sortValue: GROUPS_COLUMNS_IDS.Degraded,
     sortOrder: DESCENDING,
 };
 
 const defaultSortGroupSpace: StorageSortParams = {
-    sortValue: 'Usage',
+    sortValue: GROUPS_COLUMNS_IDS.Usage,
     sortOrder: DESCENDING,
 };
 

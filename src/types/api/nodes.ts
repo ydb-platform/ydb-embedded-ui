@@ -1,3 +1,4 @@
+import type {BackendSortParam} from './common';
 import type {EFlag} from './enums';
 import type {TPDiskStateInfo} from './pdisk';
 import type {TTabletStateInfo} from './tablet';
@@ -186,7 +187,7 @@ export type NodesSortValue =
     | 'LoadAverage'
     | 'Memory';
 
-export type NodesSort = `-${NodesSortValue}` | `+${NodesSortValue}`;
+export type NodesSort = BackendSortParam<NodesSortValue>;
 
 export interface NodesRequestParams {
     /** @deprecated use database instead */

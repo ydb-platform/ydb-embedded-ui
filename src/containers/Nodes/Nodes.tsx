@@ -38,8 +38,8 @@ import {
     nodesUptimeFilterValuesSchema,
 } from '../../utils/nodes';
 
+import {getNodesColumns} from './columns/columns';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
-import {getNodesColumns} from './columns/getNodesColumns';
 import i18n from './i18n';
 
 import './Nodes.scss';

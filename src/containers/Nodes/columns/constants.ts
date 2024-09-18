@@ -21,7 +21,7 @@ export const NODES_COLUMNS_IDS = {
     TotalSessions: 'TotalSessions',
 } as const;
 
-type NodeColumnId = ValueOf<typeof NODES_COLUMNS_IDS>;
+type NodesColumnId = ValueOf<typeof NODES_COLUMNS_IDS>;
 
 export const NODES_COLUMNS_TITLES = {
     get NodeId() {
@@ -66,4 +66,4 @@ export const NODES_COLUMNS_TITLES = {
     get TotalSessions() {
         return i18n('sessions');
     },
-} as const satisfies Record<NodeColumnId, string>;
+} as const satisfies Record<NodesColumnId, string>;

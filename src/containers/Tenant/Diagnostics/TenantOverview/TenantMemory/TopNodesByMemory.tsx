@@ -3,8 +3,8 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
+import {getTopNodesByMemoryColumns} from '../../../../Nodes/columns/columns';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../Nodes/columns/constants';
-import {getTopNodesByMemoryColumns} from '../../../../Nodes/columns/getNodesColumns';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';

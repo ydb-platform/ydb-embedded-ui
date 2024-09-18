@@ -99,5 +99,5 @@ export const NODES_SORT_VALUES: NodesSortValue[] = [
     'Memory',
 ];
 
-export const isSortableNodesProperty = (value: string): value is NodesSortValue =>
+export const isSortableNodesProperty = (value: unknown): value is NodesSortValue =>
     NODES_SORT_VALUES.includes(value as NodesSortValue);

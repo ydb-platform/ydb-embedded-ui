@@ -4,9 +4,9 @@ import type {
     PreparedStorageNodeFilters,
 } from '../../../store/reducers/storage/types';
 import {prepareStorageNodesResponse} from '../../../store/reducers/storage/utils';
-import type {NodesRequestParams, NodesSort} from '../../../types/api/nodes';
+import type {NodesRequestParams} from '../../../types/api/nodes';
 import {prepareSortValue} from '../../../utils/filters';
-import {getUptimeParamValue} from '../../../utils/nodes';
+import {getUptimeParamValue, isSortableNodesProperty} from '../../../utils/nodes';
 
 const getConcurrentId = (limit?: number, offset?: number) => {
     return `getStorageNodes|offset${offset}|limit${limit}`;
@@ -21,7 +21,9 @@ export const getStorageNodes: FetchData<
     const {searchValue, nodesUptimeFilter, visibleEntities, database} = filters ?? {};
     const {sortOrder, columnId} = sortParams ?? {};
 
-    const sort = prepareSortValue(columnId, sortOrder) as NodesSort;
+    const sort = isSortableNodesProperty(columnId)
+        ? prepareSortValue(columnId, sortOrder)
+        : undefined;
 
     const response = await window.api.getNodes(
         {
