@@ -31,6 +31,6 @@ export const useStorageGroupsHandlerAvailable = () => {
     return useGetFeatureVersion('/storage/groups') > 2;
 };
 
-export const useFeatureFlags = () => {
+export const useFeatureFlagsAvailable = () => {
     return useGetFeatureVersion('/viewer/feature_flags') > 1;
 };

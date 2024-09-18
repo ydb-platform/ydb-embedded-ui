@@ -7,7 +7,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
 import routes, {createHref} from '../../../routes';
-import {useFeatureFlags} from '../../../store/reducers/capabilities/hooks';
+import {useFeatureFlagsAvailable} from '../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
@@ -63,7 +63,7 @@ function Diagnostics(props: DiagnosticsProps) {
     const tenantName = isDatabaseEntityType(props.type) ? props.path : props.tenantName;
     const isDatabase = isDatabaseEntityType(props.type) || props.path === props.tenantName;
 
-    const hasFeatureFlags = useFeatureFlags();
+    const hasFeatureFlags = useFeatureFlagsAvailable();
     const pages = isDatabase ? getDataBasePages({hasFeatureFlags}) : getPagesByType(props.type);
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {
