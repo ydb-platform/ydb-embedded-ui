@@ -8,10 +8,8 @@ import type {HandleSort} from '../../../utils/hooks/useTableSort';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
-import {
-    STORAGE_NODES_COLUMNS_WIDTH_LS_KEY,
-    getPreparedStorageNodesColumns,
-} from './getStorageNodesColumns';
+import {STORAGE_NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
+import {useGetStorageNodesColumns} from './columns/hooks';
 import i18n from './i18n';
 import {getRowUnavailableClassName} from './shared';
 
@@ -40,7 +38,7 @@ export function StorageNodes({
     handleSort,
     database,
 }: StorageNodesProps) {
-    const columns = getPreparedStorageNodesColumns(additionalNodesProps, visibleEntities, database);
+    const columns = useGetStorageNodesColumns({additionalNodesProps, visibleEntities, database});
 
     if (
         !data.length &&
