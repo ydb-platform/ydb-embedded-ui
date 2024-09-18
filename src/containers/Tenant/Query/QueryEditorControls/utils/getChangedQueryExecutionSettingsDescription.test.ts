@@ -1,5 +1,6 @@
 import type {QuerySettings} from '../../../../../types/store/query';
 import {
+    DEFAULT_QUERY_SETTINGS,
     QUERY_MODES,
     QUERY_MODES_TITLES,
     STATISTICS_MODES,
@@ -12,15 +13,6 @@ import {
 import {QUERY_SETTINGS_FIELD_SETTINGS} from '../../QuerySettingsDialog/constants';
 
 import getChangedQueryExecutionSettingsDescription from './getChangedQueryExecutionSettingsDescription';
-
-const DEFAULT_QUERY_SETTINGS: QuerySettings = {
-    queryMode: QUERY_MODES.query,
-    transactionMode: TRANSACTION_MODES.implicit,
-    timeout: '60',
-    limitRows: '10000',
-    statisticsMode: STATISTICS_MODES.none,
-    tracingLevel: TRACING_LEVELS.detailed,
-};
 
 describe('getChangedQueryExecutionSettingsDescription', () => {
     it('should return an empty object if no settings changed', () => {
@@ -38,8 +30,8 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
         const currentSettings: QuerySettings = {
             ...DEFAULT_QUERY_SETTINGS,
             queryMode: QUERY_MODES.pg,
-            timeout: '63',
-            limitRows: '100',
+            timeout: 63,
+            limitRows: 100,
         };
 
         const result = getChangedQueryExecutionSettingsDescription({
@@ -61,7 +53,8 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
         const currentSettings: QuerySettings = {
             queryMode: QUERY_MODES.data,
             transactionMode: TRANSACTION_MODES.snapshot,
-            timeout: '120',
+            timeout: 120,
+            limitRows: DEFAULT_QUERY_SETTINGS.limitRows,
             statisticsMode: STATISTICS_MODES.profile,
             tracingLevel: TRACING_LEVELS.diagnostic,
         };

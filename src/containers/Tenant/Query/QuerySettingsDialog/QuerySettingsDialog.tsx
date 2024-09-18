@@ -3,26 +3,20 @@ import React from 'react';
 import {Dialog, Link as ExternalLink, Flex, TextInput} from '@gravity-ui/uikit';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
-import {z} from 'zod';
 
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {
     selectQueryAction,
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
-import type {
-    QueryMode,
-    QuerySettings,
-    StatisticsMode,
-    TracingLevel,
-    TransactionMode,
-} from '../../../../types/store/query';
+import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     useQueryExecutionSettings,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
+import {querySettingsValidationSchema} from '../../../../utils/query';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
 import {QUERY_SETTINGS_FIELD_SETTINGS} from './constants';
@@ -31,34 +25,6 @@ import i18n from './i18n';
 import './QuerySettingsDialog.scss';
 
 const b = cn('ydb-query-settings-dialog');
-
-const validationSchema = z.object({
-    timeout: z.string().refine(
-        (value) => {
-            if (!value) {
-                return true;
-            }
-            const num = Number(value);
-            return !isNaN(num) && num > 0;
-        },
-        {message: i18n('form.validation.timeout')},
-    ),
-    limitRows: z.string().refine(
-        (value) => {
-            if (!value) {
-                return true;
-            }
-            const num = Number(value);
-            return !isNaN(num) && num > 0 && num <= 100000;
-        },
-        {message: i18n('form.validation.limitRows')},
-    ),
-
-    queryMode: z.custom<QueryMode>(),
-    transactionMode: z.custom<TransactionMode>(),
-    statisticsMode: z.custom<StatisticsMode>().optional(),
-    tracingLevel: z.custom<TracingLevel>().optional(),
-});
 
 export function QuerySettingsDialog() {
     const dispatch = useTypedDispatch();
@@ -108,7 +74,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         formState: {errors},
     } = useForm<QuerySettings>({
         defaultValues: initialValues,
-        resolver: zodResolver(validationSchema),
+        resolver: zodResolver(querySettingsValidationSchema),
     });
 
     const enableTracingLevel = useTracingLevelOptionAvailable();
@@ -149,6 +115,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                         id="timeout"
                                         type="number"
                                         {...field}
+                                        value={field.value?.toString()}
                                         className={b('timeout')}
                                         placeholder="60"
                                         validationState={errors.timeout ? 'invalid' : undefined}
@@ -241,6 +208,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                     id="limitRows"
                                     type="number"
                                     {...field}
+                                    value={field.value?.toString()}
                                     className={b('limit-rows')}
                                     placeholder="10000"
                                     validationState={errors.limitRows ? 'invalid' : undefined}

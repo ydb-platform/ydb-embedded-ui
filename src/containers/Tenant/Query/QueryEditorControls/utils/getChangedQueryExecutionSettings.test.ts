@@ -1,19 +1,11 @@
 import type {QuerySettings} from '../../../../../types/store/query';
 import {
+    DEFAULT_QUERY_SETTINGS,
     QUERY_MODES,
     STATISTICS_MODES,
     TRACING_LEVELS,
     TRANSACTION_MODES,
 } from '../../../../../utils/query';
-
-const DEFAULT_QUERY_SETTINGS: QuerySettings = {
-    queryMode: QUERY_MODES.query,
-    transactionMode: TRANSACTION_MODES.implicit,
-    timeout: '60',
-    limitRows: '10000',
-    statisticsMode: STATISTICS_MODES.none,
-    tracingLevel: TRACING_LEVELS.detailed,
-};
 
 import getChangedQueryExecutionSettings from './getChangedQueryExecutionSettings';
 
@@ -28,8 +20,8 @@ describe('getChangedQueryExecutionSettings', () => {
         const currentSettings: QuerySettings = {
             ...DEFAULT_QUERY_SETTINGS,
             queryMode: QUERY_MODES.data,
-            timeout: '30',
-            limitRows: '100',
+            timeout: 30,
+            limitRows: 100,
         };
         const result = getChangedQueryExecutionSettings(currentSettings, DEFAULT_QUERY_SETTINGS);
         expect(result).toEqual(['queryMode', 'timeout', 'limitRows']);
@@ -39,7 +31,8 @@ describe('getChangedQueryExecutionSettings', () => {
         const currentSettings: QuerySettings = {
             queryMode: QUERY_MODES.data,
             transactionMode: TRANSACTION_MODES.onlinero,
-            timeout: '90',
+            timeout: 90,
+            limitRows: DEFAULT_QUERY_SETTINGS.limitRows,
             statisticsMode: STATISTICS_MODES.basic,
             tracingLevel: TRACING_LEVELS.basic,
         };

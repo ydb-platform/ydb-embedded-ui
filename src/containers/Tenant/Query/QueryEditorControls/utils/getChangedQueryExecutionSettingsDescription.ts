@@ -26,7 +26,7 @@ export default function getChangedQueryExecutionSettingsDescription({
                 result[settings.title] = content;
             }
         } else if (currentValue) {
-            result[settings.title] = currentValue;
+            result[settings.title] = String(currentValue);
         }
     });
 
