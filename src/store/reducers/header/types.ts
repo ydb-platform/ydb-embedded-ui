@@ -4,7 +4,15 @@ import type {EType} from '../../../types/api/tablet';
 
 import type {setHeaderBreadcrumbs} from './header';
 
-export type Page = 'cluster' | 'tenant' | 'node' | 'pDisk' | 'vDisk' | 'tablet' | undefined;
+export type Page =
+    | 'cluster'
+    | 'tenant'
+    | 'node'
+    | 'pDisk'
+    | 'vDisk'
+    | 'tablet'
+    | 'storageGroup'
+    | undefined;
 
 export interface ClusterBreadcrumbsOptions {
     clusterName?: string;
@@ -13,6 +21,10 @@ export interface ClusterBreadcrumbsOptions {
 
 export interface TenantBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
     tenantName?: string;
+}
+
+export interface StorageGroupBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
+    groupId?: string;
 }
 
 export interface NodeBreadcrumbsOptions extends TenantBreadcrumbsOptions {
@@ -38,7 +50,8 @@ export type BreadcrumbsOptions =
     | ClusterBreadcrumbsOptions
     | TenantBreadcrumbsOptions
     | NodeBreadcrumbsOptions
-    | TabletBreadcrumbsOptions;
+    | TabletBreadcrumbsOptions
+    | StorageGroupBreadcrumbsOptions;
 
 export type PageBreadcrumbsOptions<T extends Page = undefined> = T extends 'cluster'
     ? ClusterBreadcrumbsOptions

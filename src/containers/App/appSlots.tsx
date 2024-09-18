@@ -5,6 +5,7 @@ import type {Cluster} from '../Cluster/Cluster';
 import type {Clusters} from '../Clusters/Clusters';
 import type {Node} from '../Node/Node';
 import type {PDiskPage} from '../PDiskPage/PDiskPage';
+import type {StorageGroupPage} from '../StorageGroupPage/StorageGroupPage';
 import type {Tablet} from '../Tablet';
 import type {Tenant} from '../Tenant/Tenant';
 import type {VDiskPage} from '../VDiskPage/VDiskPage';
@@ -39,6 +40,11 @@ export const VDiskPageSlot = createSlot<{
         | React.ReactNode
         | ((props: {component: typeof VDiskPage} & RouteComponentProps) => React.ReactNode);
 }>('vDisk');
+export const StorageGroupSlot = createSlot<{
+    children:
+        | React.ReactNode
+        | ((props: {component: typeof StorageGroupPage} & RouteComponentProps) => React.ReactNode);
+}>('storageGroup');
 export const TabletSlot = createSlot<{
     children:
         | React.ReactNode

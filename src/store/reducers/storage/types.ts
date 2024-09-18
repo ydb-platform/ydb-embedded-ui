@@ -46,6 +46,7 @@ export interface PreparedStorageGroup {
     Encryption?: boolean;
     ErasureSpecies?: string;
     Degraded: number;
+    Overall?: EFlag;
 
     GroupId?: string | number;
 
@@ -58,6 +59,26 @@ export interface PreparedStorageGroup {
     DiskSpace: EFlag;
 
     VDisks?: PreparedVDisk[];
+
+    Kind?: string;
+    ChangeTime?: number | string;
+    GroupGeneration?: string;
+    Latency?: EFlag;
+    AcquiredUnits?: string;
+    AcquiredIOPS?: number;
+    AcquiredThroughput?: string;
+    AcquiredSize?: string;
+    MaximumIOPS?: number;
+    MaximumThroughput?: string;
+    MaximumSize?: string;
+
+    AllocationUnits?: string | number;
+    State?: string;
+    MissingDisks?: string | number;
+    Available?: string;
+    LatencyPutTabletLog?: number;
+    LatencyPutUserData?: number;
+    LatencyGetFast?: number;
 }
 
 export interface UsageFilter {
