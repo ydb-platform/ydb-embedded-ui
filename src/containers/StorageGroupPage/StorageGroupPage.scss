@@ -1,6 +1,6 @@
-@import '../../styles//mixins.scss';
+@import '../../styles/mixins.scss';
 
-.ydb-pdisk-page {
+.ydb-storage-group-page {
     position: relative;
 
     overflow: auto;
@@ -25,23 +25,13 @@
     &__meta,
     &__title,
     &__info,
-    &__controls,
     &__tabs {
         position: sticky;
         left: 0;
     }
 
-    &__title {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: var(--g-spacing-2);
-    }
-
-    &__controls {
-        display: flex;
-        align-items: center;
-        gap: var(--g-spacing-2);
+    &__info {
+        margin-top: var(--g-spacing-10);
     }
 
     &__tabs {

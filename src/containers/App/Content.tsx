@@ -28,6 +28,7 @@ import {
     PDiskPageSlot,
     RedirectSlot,
     RoutesSlot,
+    StorageGroupSlot,
     TabletSlot,
     TenantSlot,
     VDiskPageSlot,
@@ -74,6 +75,15 @@ const routesSlots: RouteSlot[] = [
         path: routes.vDisk,
         slot: VDiskPageSlot,
         component: lazyComponent(() => import('../VDiskPage/VDiskPage'), 'VDiskPage'),
+        wrapper: DataWrapper,
+    },
+    {
+        path: routes.storageGroup,
+        slot: StorageGroupSlot,
+        component: lazyComponent(
+            () => import('../StorageGroupPage/StorageGroupPage'),
+            'StorageGroupPage',
+        ),
         wrapper: DataWrapper,
     },
     {

@@ -98,7 +98,9 @@ export const prepareStorageGroupData = (
 
     return {
         ...group,
+        GroupGeneration: group.GroupGeneration ? String(group.GroupGeneration) : undefined,
         GroupId: group.GroupID,
+        Overall: group.Overall,
         VDisks: vDisks,
         Usage: usage,
         Read: readSpeedBytesPerSec,
@@ -125,6 +127,8 @@ export const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedS
         Kind,
         MediaType,
         GroupID,
+        Overall,
+        GroupGeneration,
     } = group;
 
     const vDisks = VDisks.map((vdisk) => prepareVDisk(vdisk, PoolName));
@@ -139,6 +143,8 @@ export const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedS
         MediaType: MediaType || Kind,
         VDisks: vDisks,
         Usage: usage,
+        Overall,
+        GroupGeneration: GroupGeneration ? String(GroupGeneration) : undefined,
         Read: Number(Read),
         Write: Number(Write),
         Used: Number(Used),
@@ -225,7 +231,7 @@ export const prepareStorageResponse = (data: TStorageInfo): PreparedStorageRespo
 export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStorageResponse {
     const {FoundGroups, TotalGroups, StorageGroups = []} = data;
     const preparedGroups: PreparedStorageGroup[] = StorageGroups.map((group) => {
-        const {Usage, Read, Write, Used, Limit, MissingDisks, VDisks = []} = group;
+        const {Usage, Read, Write, Used, Limit, MissingDisks, VDisks = [], Overall} = group;
 
         const vDisks = VDisks.map((disk) => {
             const whiteboardVDisk = disk.Whiteboard;
@@ -248,13 +254,13 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
 
         return {
             ...group,
-
             Usage: Math.floor(Number(Usage)) || 0,
             Read: Number(Read),
             Write: Number(Write),
             Used: Number(Used),
             Limit: Number(Limit),
             Degraded: Number(MissingDisks),
+            Overall,
 
             VDisks: vDisks,
 

@@ -1,3 +1,5 @@
+import {Flex} from '@gravity-ui/uikit';
+
 import {getPDiskPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
@@ -199,15 +201,15 @@ export function PDiskInfo<T extends PreparedPDisk>({
     });
 
     return (
-        <div className={b('wrapper', className)}>
-            <div className={b('col')}>
+        <Flex className={className} gap={2} direction="row" wrap>
+            <Flex direction="column" gap={2} width={500}>
                 <InfoViewer info={generalInfo} renderEmptyState={() => null} />
                 <InfoViewer info={spaceInfo} renderEmptyState={() => null} />
-            </div>
-            <div className={b('col')}>
+            </Flex>
+            <Flex direction="column" gap={2} width={500}>
                 <InfoViewer info={statusInfo} renderEmptyState={() => null} />
                 <InfoViewer info={additionalInfo} renderEmptyState={() => null} />
-            </div>
-        </div>
+            </Flex>
+        </Flex>
     );
 }
