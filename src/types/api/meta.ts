@@ -22,6 +22,10 @@ export interface MetaExtendedClusterInfo extends MetaGeneralClusterInfo {
     versions?: MetaClusterVersion[];
 }
 
+export interface MetaBaseClusters {
+    clusters: MetaBaseClusterInfo[];
+}
+
 export interface MetaBaseClusterInfo {
     owner?: string;
     location?: string;
