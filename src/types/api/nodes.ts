@@ -182,10 +182,12 @@ export type NodesSortValue =
     | 'Rack'
     | 'Version'
     | 'Uptime'
-    // TODO: Ensure that values work after https://github.com/ydb-platform/ydb/issues/9449
     | 'CPU'
     | 'LoadAverage'
-    | 'Memory';
+    | 'Memory'
+    | `Missing`
+    | `DiskSpaceUsage`
+    | `Database`;
 
 export type NodesSort = BackendSortParam<NodesSortValue>;
 
@@ -216,7 +218,7 @@ export interface NodesRequestParams {
     group?: NodesGroupByField;
     filter_group_by?: NodesGroupByField;
     filter_group?: string;
-    fields_required?: NodesRequiredField[] | 'all';
+    fieldsRequired?: NodesRequiredField[] | 'all';
 
     offset?: number;
     limit?: number;

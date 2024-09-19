@@ -199,9 +199,20 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getNodes(
-        {type = 'any', tablets = false, database, tenant, ...params}: NodesRequestParams,
+        {
+            type = 'any',
+            tablets = false,
+            database,
+            tenant,
+            fieldsRequired,
+            ...params
+        }: NodesRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
+        const preparedFieldsRequired = Array.isArray(fieldsRequired)
+            ? this.prepareArrayRequestParam(fieldsRequired)
+            : fieldsRequired;
+
         return this.get<TNodesInfo>(
             this.getPath('/viewer/json/nodes?enums=true'),
             {
@@ -210,6 +221,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 // TODO: remove after remove tenant param
                 database: database || tenant,
                 tenant: tenant || database,
+                fields_required: preparedFieldsRequired,
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},

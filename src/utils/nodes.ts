@@ -97,6 +97,9 @@ export const NODES_SORT_VALUES: NodesSortValue[] = [
     'CPU',
     'LoadAverage',
     'Memory',
+    `Missing`,
+    `DiskSpaceUsage`,
+    `Database`,
 ];
 
 export const isSortableNodesProperty = (value: unknown): value is NodesSortValue =>
