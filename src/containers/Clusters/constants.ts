@@ -1,9 +1,9 @@
-export const SELECTED_COLUMNS_KEY = 'selectedColumns';
+export const CLUSTERS_SELECTED_COLUMNS_KEY = 'selectedColumns';
 
 export const COLUMNS_NAMES = {
     TITLE: 'title',
     VERSIONS: 'versions',
-    CLUSTER: 'cluster',
+    DC: 'dc',
     SERVICE: 'service',
     STATUS: 'status',
     NODES: 'nodes',
@@ -33,7 +33,7 @@ export const DEFAULT_COLUMNS = [
 export const COLUMNS_TITLES = {
     [COLUMNS_NAMES.TITLE]: 'Cluster',
     [COLUMNS_NAMES.VERSIONS]: 'Versions',
-    [COLUMNS_NAMES.CLUSTER]: 'DC',
+    [COLUMNS_NAMES.DC]: 'DC',
     [COLUMNS_NAMES.SERVICE]: 'Service',
     [COLUMNS_NAMES.STATUS]: 'Status',
     [COLUMNS_NAMES.NODES]: 'Nodes',
