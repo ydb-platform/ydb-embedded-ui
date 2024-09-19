@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {TableColumnSetup} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
@@ -27,13 +28,12 @@ import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {
     NodesUptimeFilterValues,
-    isSortableNodesProperty,
     isUnavailableNode,
     nodesUptimeFilterValuesSchema,
 } from '../../utils/nodes';
 
-import {getNodesColumns} from './columns/columns';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
+import {useNodesSelectedColumns} from './columns/hooks';
 import {getNodes} from './getNodes';
 import i18n from './i18n';
 
@@ -69,6 +69,11 @@ export const PaginatedNodes = ({
         return {path, database, searchValue, problemFilter, uptimeFilter};
     }, [path, database, searchValue, problemFilter, uptimeFilter]);
 
+    const {columnsToShow, columnsToSelect, setColumns} = useNodesSelectedColumns({
+        getNodeRef: additionalNodesProps?.getNodeRef,
+        database,
+    });
+
     const getRowClassName: GetRowClassName<NodesPreparedEntity> = (row) => {
         return b('node', {unavailable: isUnavailableNode(row)});
     };
@@ -102,6 +107,13 @@ export const PaginatedNodes = ({
                     label={'Nodes'}
                     loading={!inited}
                 />
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
+                    sortable={false}
+                />
             </React.Fragment>
         );
     };
@@ -125,20 +137,11 @@ export const PaginatedNodes = ({
         return <ResponseError error={error} />;
     };
 
-    const rawColumns = getNodesColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database,
-    });
-
-    const columns = rawColumns.map((column) => {
-        return {...column, sortable: isSortableNodesProperty(column.name)};
-    });
-
     return (
         <ResizeablePaginatedTable
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
             parentContainer={parentContainer}
-            columns={columns}
+            columns={columnsToShow}
             fetchData={getNodes}
             limit={50}
             renderControls={renderControls}
