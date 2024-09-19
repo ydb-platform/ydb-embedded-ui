@@ -10,7 +10,7 @@ import type {
 import {EFlag} from '../../../types/api/enums';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {NODES_COLUMNS_IDS} from '../../Nodes/columns/constants';
-import {GROUPS_COLUMNS_IDS} from '../StorageGroups/columns/getStorageGroupsColumns';
+import {STORAGE_GROUPS_COLUMNS_IDS} from '../StorageGroups/columns/constants';
 
 const defaultDegradationEvaluator = generateEvaluator(1, 2, ['success', 'warning', 'danger']);
 
@@ -47,17 +47,17 @@ export const defaultSortNode: NodesSortParams = {
 };
 
 const defaultSortGroup: StorageSortParams = {
-    sortValue: GROUPS_COLUMNS_IDS.PoolName,
+    sortValue: STORAGE_GROUPS_COLUMNS_IDS.PoolName,
     sortOrder: ASCENDING,
 };
 
 const defaultSortGroupMissing: StorageSortParams = {
-    sortValue: GROUPS_COLUMNS_IDS.Degraded,
+    sortValue: STORAGE_GROUPS_COLUMNS_IDS.Degraded,
     sortOrder: DESCENDING,
 };
 
 const defaultSortGroupSpace: StorageSortParams = {
-    sortValue: GROUPS_COLUMNS_IDS.Usage,
+    sortValue: STORAGE_GROUPS_COLUMNS_IDS.Usage,
     sortOrder: DESCENDING,
 };
 
