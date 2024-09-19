@@ -230,7 +230,8 @@ export type GroupsSortField =
     | 'Available'
     | 'DiskSpaceUsage'
     | 'Encryption'
-    | 'AllocationUnits';
+    | 'AllocationUnits'
+    | 'Latency';
 
 export type StorageV2Sort = `-${StorageV2SortValue}` | `+${StorageV2SortValue}`;
 export type GroupsSort = `-${GroupsSortField}` | `+${GroupsSortField}`;
@@ -247,7 +248,8 @@ export type GroupsGroupByField =
     | 'Encryption'
     | 'MediaType'
     | 'MissingDisks'
-    | 'State';
+    | 'State'
+    | 'Latency';
 
 export type GroupsRequiredField =
     | 'GroupId' // always required
@@ -269,7 +271,8 @@ export type GroupsRequiredField =
     | 'Read'
     | 'Write'
     | 'PDisk'
-    | 'VDisk';
+    | 'VDisk'
+    | 'Latency';
 
 interface BaseStorageRequestParams {
     /** @deprecated use database instead */
@@ -299,5 +302,7 @@ export interface GroupsRequestParams extends BaseStorageRequestParams {
 
     sort?: GroupsSort;
     group?: GroupsGroupByField;
+    filter_group_by?: GroupsGroupByField;
+    filter_group?: string;
     fieldsRequired?: GroupsRequiredField[] | 'all';
 }

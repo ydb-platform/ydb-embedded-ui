@@ -28,7 +28,7 @@ import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../Storage/StorageGroups/columns/getStorageGroupsColumns';
+import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../Storage/StorageGroups/columns/constants';
 import {useGetDiskStorageColumns} from '../Storage/StorageGroups/columns/hooks';
 
 import {vDiskPageKeyset} from './i18n';

@@ -8,10 +8,8 @@ import {storageApi} from '../../../../../store/reducers/storage/storage';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
-import {
-    STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
-    getStorageTopGroupsColumns,
-} from '../../../../Storage/StorageGroups/columns/getStorageGroupsColumns';
+import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/columns/columns';
+import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../../../../Storage/StorageGroups/columns/constants';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';

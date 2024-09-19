@@ -8,13 +8,13 @@ import type {AdditionalNodesProps} from '../../../types/additionalProps';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
+import {STORAGE_NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
+import {useGetStorageNodesColumns} from './columns/hooks';
 import {getStorageNodes} from './getNodes';
-import {
-    STORAGE_NODES_COLUMNS_WIDTH_LS_KEY,
-    getPreparedStorageNodesColumns,
-} from './getStorageNodesColumns';
 import i18n from './i18n';
 import {getRowUnavailableClassName} from './shared';
+
+import './StorageNodes.scss';
 
 interface PaginatedStorageNodesProps {
     searchValue: string;
@@ -45,9 +45,7 @@ export const PaginatedStorageNodes = ({
         return {searchValue, visibleEntities, nodesUptimeFilter, database};
     }, [searchValue, visibleEntities, nodesUptimeFilter, database]);
 
-    const columns = React.useMemo(() => {
-        return getPreparedStorageNodesColumns(additionalNodesProps, visibleEntities, database);
-    }, [additionalNodesProps, visibleEntities, database]);
+    const columns = useGetStorageNodesColumns({additionalNodesProps, visibleEntities, database});
 
     const renderEmptyDataMessage = () => {
         if (

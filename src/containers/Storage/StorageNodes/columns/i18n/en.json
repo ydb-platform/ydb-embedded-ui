@@ -1,0 +1,9 @@
+{
+  "nodes-id": "Node ID",
+  "host": "Host",
+  "dc": "DC",
+  "rack": "Rack",
+  "uptime": "Uptime",
+  "missing": "Missing",
+  "pdisks": "PDisks"
+}

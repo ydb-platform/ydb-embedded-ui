@@ -1,0 +1,23 @@
+.ydb-storage-nodes-columns {
+    &__pdisks-column {
+        overflow: visible; // to enable stacked disks overflow the row
+    }
+
+    &__pdisks-wrapper {
+        display: flex;
+        justify-content: left;
+        align-items: flex-end;
+
+        width: max-content;
+    }
+    &__pdisks-item {
+        flex-grow: 1;
+
+        max-width: 200px;
+        margin-right: 10px;
+
+        &:last-child {
+            margin-right: 0px;
+        }
+    }
+}

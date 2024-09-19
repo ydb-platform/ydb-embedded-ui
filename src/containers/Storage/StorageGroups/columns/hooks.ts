@@ -5,10 +5,7 @@ import type {VisibleEntities} from '../../../../store/reducers/storage/types';
 import {USE_ADVANCED_STORAGE_KEY} from '../../../../utils/constants';
 import {useSetting, useTypedSelector} from '../../../../utils/hooks';
 
-import {
-    getDiskPageStorageColumns,
-    getPreparedStorageGroupsColumns,
-} from './getStorageGroupsColumns';
+import {getDiskPageStorageColumns, getPreparedStorageGroupsColumns} from './columns';
 import type {StorageColumnsGetter} from './types';
 
 const useGetStorageColumns = (
@@ -23,7 +20,7 @@ const useGetStorageColumns = (
     }, [columnsGetter, nodes, useAdvancedStorage, visibleEntities]);
 };
 
-export const useGetStorageGroupsColumns = (visibleEntities: VisibleEntities) => {
+export const useGetStorageGroupsColumns = (visibleEntities?: VisibleEntities) => {
     return useGetStorageColumns(getPreparedStorageGroupsColumns, visibleEntities);
 };
 

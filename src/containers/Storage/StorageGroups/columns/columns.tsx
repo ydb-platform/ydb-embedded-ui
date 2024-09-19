@@ -21,33 +21,16 @@ import {Disks} from '../../Disks/Disks';
 import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../../utils';
 import i18n from '../i18n';
 
+import {STORAGE_GROUPS_COLUMNS_IDS, STORAGE_GROUPS_COLUMNS_TITLES} from './constants';
 import type {StorageColumnsGetter, StorageGroupsColumn} from './types';
 
 import './StorageGroupsColumns.scss';
 
 const b = cn('ydb-storage-groups-columns');
 
-export const STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY = 'storageGroupsColumnsWidth';
-
-export const GROUPS_COLUMNS_IDS = {
-    PoolName: 'PoolName',
-    MediaType: 'MediaType',
-    Erasure: 'Erasure',
-    GroupId: 'GroupId',
-    Used: 'Used',
-    Limit: 'Limit',
-    Usage: 'Usage',
-    DiskSpace: 'DiskSpace',
-    Read: 'Read',
-    Write: 'Write',
-    VDisks: 'VDisks',
-    Disks: 'Disks',
-    Degraded: 'Degraded',
-} as const;
-
 const poolNameColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.PoolName,
-    header: 'Pool Name',
+    name: STORAGE_GROUPS_COLUMNS_IDS.PoolName,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.PoolName,
     width: 250,
     render: ({row}) => {
         const splitted = row.PoolName?.split('/');
@@ -68,8 +51,8 @@ const poolNameColumn: StorageGroupsColumn = {
 };
 
 const typeColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.MediaType,
-    header: 'Type',
+    name: STORAGE_GROUPS_COLUMNS_IDS.MediaType,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.MediaType,
     width: 100,
     resizeMinWidth: 100,
     align: DataTable.LEFT,
@@ -94,8 +77,8 @@ const typeColumn: StorageGroupsColumn = {
 };
 
 const erasureColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.Erasure,
-    header: 'Erasure',
+    name: STORAGE_GROUPS_COLUMNS_IDS.Erasure,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.Erasure,
     width: 100,
     sortAccessor: (row) => row.ErasureSpecies,
     render: ({row}) => (row.ErasureSpecies ? row.ErasureSpecies : '-'),
@@ -103,8 +86,8 @@ const erasureColumn: StorageGroupsColumn = {
 };
 
 const degradedColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.Degraded,
-    header: 'Degraded',
+    name: STORAGE_GROUPS_COLUMNS_IDS.Degraded,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.Degraded,
     width: 110,
     resizeMinWidth: 110,
     render: ({row}) =>
@@ -118,8 +101,8 @@ const degradedColumn: StorageGroupsColumn = {
 };
 
 const usageColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.Usage,
-    header: 'Usage',
+    name: STORAGE_GROUPS_COLUMNS_IDS.Usage,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.Usage,
     width: 75,
     resizeMinWidth: 75,
     render: ({row}) => {
@@ -137,8 +120,8 @@ const usageColumn: StorageGroupsColumn = {
 };
 
 const groupIdColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.GroupId,
-    header: 'Group ID',
+    name: STORAGE_GROUPS_COLUMNS_IDS.GroupId,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.GroupId,
     width: 130,
     render: ({row}) => {
         return row.GroupId ? (
@@ -154,8 +137,8 @@ const groupIdColumn: StorageGroupsColumn = {
 };
 
 const usedColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.Used,
-    header: 'Used',
+    name: STORAGE_GROUPS_COLUMNS_IDS.Used,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.Used,
     width: 100,
     render: ({row}) => {
         return bytesToGB(row.Used, true);
@@ -164,8 +147,8 @@ const usedColumn: StorageGroupsColumn = {
 };
 
 const limitColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.Limit,
-    header: 'Limit',
+    name: STORAGE_GROUPS_COLUMNS_IDS.Limit,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.Limit,
     width: 100,
     render: ({row}) => {
         return bytesToGB(row.Limit);
@@ -174,8 +157,8 @@ const limitColumn: StorageGroupsColumn = {
 };
 
 const usedSpaceFlagColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.DiskSpace,
-    header: 'Space',
+    name: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.DiskSpace,
     width: 110,
     render: ({row}) => {
         return <EntityStatus status={row.DiskSpace} />;
@@ -184,8 +167,8 @@ const usedSpaceFlagColumn: StorageGroupsColumn = {
 };
 
 const readColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.Read,
-    header: 'Read',
+    name: STORAGE_GROUPS_COLUMNS_IDS.Read,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.Read,
     width: 100,
     render: ({row}) => {
         return row.Read ? bytesToSpeed(row.Read) : '-';
@@ -194,8 +177,8 @@ const readColumn: StorageGroupsColumn = {
 };
 
 const writeColumn: StorageGroupsColumn = {
-    name: GROUPS_COLUMNS_IDS.Write,
-    header: 'Write',
+    name: STORAGE_GROUPS_COLUMNS_IDS.Write,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.Write,
     width: 100,
     render: ({row}) => {
         return row.Write ? bytesToSpeed(row.Write) : '-';
@@ -204,9 +187,9 @@ const writeColumn: StorageGroupsColumn = {
 };
 
 const getVDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
-    name: GROUPS_COLUMNS_IDS.VDisks,
+    name: STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.VDisks,
     className: b('vdisks-column'),
-    header: 'VDisks',
     render: ({row}) => (
         <div className={b('vdisks-wrapper')}>
             {row.VDisks?.map((vDisk) => {
@@ -228,9 +211,9 @@ const getVDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
 });
 
 const getDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
-    name: GROUPS_COLUMNS_IDS.Disks,
+    name: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.VDisksPDisks,
     className: b('disks-column'),
-    header: 'Disks',
     render: ({row}) => {
         return <Disks vDisks={row.VDisks} nodes={nodes} />;
     },
@@ -301,16 +284,17 @@ const filterStorageGroupsColumns = (
     visibleEntities?: VisibleEntities,
 ) => {
     if (visibleEntities === VISIBLE_ENTITIES.space) {
-        return columns.filter((col) => col.name !== GROUPS_COLUMNS_IDS.Degraded);
+        return columns.filter((col) => col.name !== STORAGE_GROUPS_COLUMNS_IDS.Degraded);
     }
 
     if (visibleEntities === VISIBLE_ENTITIES.missing) {
-        return columns.filter((col) => col.name !== GROUPS_COLUMNS_IDS.DiskSpace);
+        return columns.filter((col) => col.name !== STORAGE_GROUPS_COLUMNS_IDS.DiskSpace);
     }
 
     return columns.filter((col) => {
         return (
-            col.name !== GROUPS_COLUMNS_IDS.Degraded && col.name !== GROUPS_COLUMNS_IDS.DiskSpace
+            col.name !== STORAGE_GROUPS_COLUMNS_IDS.Degraded &&
+            col.name !== STORAGE_GROUPS_COLUMNS_IDS.DiskSpace
         );
     });
 };
