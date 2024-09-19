@@ -231,7 +231,11 @@ export function PDiskPage() {
     const renderTabsContent = () => {
         switch (pDiskTab) {
             case 'diskDistribution': {
-                return pDiskData ? <PDiskSpaceDistribution data={pDiskData} /> : null;
+                return pDiskData ? (
+                    <div className={pdiskPageCn('disk-distribution')}>
+                        <PDiskSpaceDistribution data={pDiskData} />
+                    </div>
+                ) : null;
             }
             case 'groups': {
                 return pDiskParamsDefined ? (
@@ -252,16 +256,14 @@ export function PDiskPage() {
 
     return (
         <div className={pdiskPageCn(null)}>
-            <div className={pdiskPageCn('info-content')}>
-                {renderHelmet()}
-                {renderPageMeta()}
-                {renderPageTitle()}
-                {renderControls()}
-                {renderError()}
-                {renderInfo()}
-                {renderTabs()}
-            </div>
-            <div className={pdiskPageCn('tabs-content')}>{renderTabsContent()}</div>
+            {renderHelmet()}
+            {renderPageMeta()}
+            {renderPageTitle()}
+            {renderControls()}
+            {renderError()}
+            {renderInfo()}
+            {renderTabs()}
+            {renderTabsContent()}
         </div>
     );
 }

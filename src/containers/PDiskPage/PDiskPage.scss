@@ -6,21 +6,7 @@
     overflow: auto;
 
     height: 100%;
-
-    &__info-content {
-        position: sticky;
-        left: 0;
-
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-
-        padding: 20px;
-    }
-
-    &__tabs-content {
-        padding-left: 20px;
-    }
+    padding: 0 20px;
 
     &__meta,
     &__title,
@@ -29,6 +15,20 @@
     &__tabs {
         position: sticky;
         left: 0;
+
+        margin-bottom: 20px;
+    }
+
+    &__meta {
+        margin-top: 20px;
+    }
+
+    &__tabs {
+        margin-bottom: 0;
+    }
+
+    &__disk-distribution {
+        padding: 20px 0;
     }
 
     &__title {

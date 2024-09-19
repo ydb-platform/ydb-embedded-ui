@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ArrowsOppositeToDots} from '@gravity-ui/icons';
-import {Icon} from '@gravity-ui/uikit';
+import {Icon, TableColumnSetup} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
@@ -12,6 +12,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {api} from '../../store/reducers/api';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
@@ -29,7 +30,7 @@ import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../Storage/StorageGroups/columns/constants';
-import {useGetDiskStorageColumns} from '../Storage/StorageGroups/columns/hooks';
+import {useStorageGroupsSelectedColumns} from '../Storage/StorageGroups/columns/hooks';
 
 import {vDiskPageKeyset} from './i18n';
 import {prepareVDiskGroupResponse} from './utils';
@@ -216,6 +217,8 @@ export function VDiskPage() {
 }
 
 export function VDiskGroup({groupId}: {groupId: string | number}) {
+    const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns();
+
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -234,8 +237,6 @@ export function VDiskGroup({groupId}: {groupId: string | number}) {
         return group ? [group] : undefined;
     }, [currentData, groupId]);
 
-    const vDiskStorageColumns = useGetDiskStorageColumns();
-
     if (!preparedGroups) {
         return null;
     }
@@ -243,12 +244,25 @@ export function VDiskGroup({groupId}: {groupId: string | number}) {
     return (
         <React.Fragment>
             <div className={vDiskPageCn('group-title')}>{vDiskPageKeyset('group')}</div>
-            <ResizeableDataTable
-                columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-                data={preparedGroups}
-                columns={vDiskStorageColumns}
-                settings={DEFAULT_TABLE_SETTINGS}
-            />
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <TableColumnSetup
+                        popupWidth={200}
+                        items={columnsToSelect}
+                        showStatus
+                        onUpdate={setColumns}
+                        sortable={false}
+                    />
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table>
+                    <ResizeableDataTable
+                        columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
+                        data={preparedGroups}
+                        columns={columnsToShow}
+                        settings={DEFAULT_TABLE_SETTINGS}
+                    />
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
         </React.Fragment>
     );
 }

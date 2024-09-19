@@ -1,29 +1,48 @@
 import React from 'react';
 
 import {selectNodesMap} from '../../../../store/reducers/nodesList';
+import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../../store/reducers/storage/types';
-import {USE_ADVANCED_STORAGE_KEY} from '../../../../utils/constants';
-import {useSetting, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedSelector} from '../../../../utils/hooks';
+import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
-import {getDiskPageStorageColumns, getPreparedStorageGroupsColumns} from './columns';
-import type {StorageColumnsGetter} from './types';
+import {getStorageGroupsColumns} from './columns';
+import {
+    DEFAULT_STORAGE_GROUPS_COLUMNS,
+    REQUIRED_STORAGE_GROUPS_COLUMNS,
+    STORAGE_GROUPS_COLUMNS_IDS,
+    STORAGE_GROUPS_COLUMNS_TITLES,
+    STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
+} from './constants';
 
-const useGetStorageColumns = (
-    columnsGetter: StorageColumnsGetter,
-    visibleEntities?: VisibleEntities,
-) => {
-    const [useAdvancedStorage] = useSetting(USE_ADVANCED_STORAGE_KEY, false);
+export function useGetStorageGroupsColumns() {
     const nodes = useTypedSelector(selectNodesMap);
 
     return React.useMemo(() => {
-        return columnsGetter({nodes}, {useAdvancedStorage, visibleEntities});
-    }, [columnsGetter, nodes, useAdvancedStorage, visibleEntities]);
-};
+        return getStorageGroupsColumns({nodes});
+    }, [nodes]);
+}
 
-export const useGetStorageGroupsColumns = (visibleEntities?: VisibleEntities) => {
-    return useGetStorageColumns(getPreparedStorageGroupsColumns, visibleEntities);
-};
+export function useStorageGroupsSelectedColumns(visibleEntities?: VisibleEntities) {
+    const columns = useGetStorageGroupsColumns();
 
-export const useGetDiskStorageColumns = () => {
-    return useGetStorageColumns(getDiskPageStorageColumns);
-};
+    const requiredColumns = React.useMemo(() => {
+        if (visibleEntities === VISIBLE_ENTITIES.missing) {
+            return [...REQUIRED_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.Degraded];
+        }
+
+        if (visibleEntities === VISIBLE_ENTITIES.space) {
+            return [...REQUIRED_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.DiskSpace];
+        }
+
+        return REQUIRED_STORAGE_GROUPS_COLUMNS;
+    }, [visibleEntities]);
+
+    return useSelectedColumns(
+        columns,
+        STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
+        STORAGE_GROUPS_COLUMNS_TITLES,
+        DEFAULT_STORAGE_GROUPS_COLUMNS,
+        requiredColumns,
+    );
+}

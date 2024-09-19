@@ -3,13 +3,10 @@
 .ydb-vdisk-page {
     position: relative;
 
-    display: flex;
     overflow: auto;
-    flex-direction: column;
-    gap: 20px;
 
     height: 100%;
-    padding: 20px;
+    padding: 0 20px;
 
     &__meta,
     &__title,
@@ -18,6 +15,12 @@
     &__group-title {
         position: sticky;
         left: 0;
+
+        margin-bottom: 20px;
+    }
+
+    &__meta {
+        margin-top: 20px;
     }
 
     &__controls {
@@ -27,19 +30,7 @@
     }
 
     &__group-title {
+        margin-bottom: 0;
         @include header-1-typography();
-    }
-
-    &__group-disks {
-        display: flex;
-        flex-grow: 1;
-        flex-flow: row wrap;
-        gap: 10px;
-
-        margin-top: 20px;
-    }
-
-    &__group-disk {
-        width: 150px;
     }
 }

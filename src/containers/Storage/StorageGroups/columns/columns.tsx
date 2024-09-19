@@ -10,8 +10,6 @@ import {InternalLink} from '../../../../components/InternalLink';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {VDiskWithDonorsStack} from '../../../../components/VDisk/VDiskWithDonorsStack';
 import {getStorageGroupPath} from '../../../../routes';
-import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
-import type {VisibleEntities} from '../../../../store/reducers/storage/types';
 import type {NodesMap} from '../../../../types/store/nodesList';
 import {cn} from '../../../../utils/cn';
 import {stringifyVdiskId} from '../../../../utils/dataFormatters/dataFormatters';
@@ -241,29 +239,8 @@ export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
     });
 };
 
-export const getDiskPageStorageColumns: StorageColumnsGetter = (data, options) => {
-    const disksColumn = options?.useAdvancedStorage
-        ? getDisksColumn()
-        : getVDisksColumn(data?.nodes);
-
-    return [
-        poolNameColumn,
-        typeColumn,
-        erasureColumn,
-        degradedColumn,
-        groupIdColumn,
-        usageColumn,
-        usedColumn,
-        disksColumn,
-    ];
-};
-
-const getStorageGroupsColumns: StorageColumnsGetter = (data, options) => {
-    const disksColumn = options?.useAdvancedStorage
-        ? getDisksColumn()
-        : getVDisksColumn(data?.nodes);
-
-    return [
+export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
+    const columns = [
         poolNameColumn,
         typeColumn,
         erasureColumn,
@@ -275,36 +252,11 @@ const getStorageGroupsColumns: StorageColumnsGetter = (data, options) => {
         usedSpaceFlagColumn,
         readColumn,
         writeColumn,
-        disksColumn,
+        getVDisksColumn(data?.nodes),
+        getDisksColumn(data?.nodes),
     ];
-};
 
-const filterStorageGroupsColumns = (
-    columns: StorageGroupsColumn[],
-    visibleEntities?: VisibleEntities,
-) => {
-    if (visibleEntities === VISIBLE_ENTITIES.space) {
-        return columns.filter((col) => col.name !== STORAGE_GROUPS_COLUMNS_IDS.Degraded);
-    }
-
-    if (visibleEntities === VISIBLE_ENTITIES.missing) {
-        return columns.filter((col) => col.name !== STORAGE_GROUPS_COLUMNS_IDS.DiskSpace);
-    }
-
-    return columns.filter((col) => {
-        return (
-            col.name !== STORAGE_GROUPS_COLUMNS_IDS.Degraded &&
-            col.name !== STORAGE_GROUPS_COLUMNS_IDS.DiskSpace
-        );
-    });
-};
-
-export const getPreparedStorageGroupsColumns: StorageColumnsGetter = (data, options) => {
-    const rawColumns = getStorageGroupsColumns(data, options);
-
-    const filteredColumns = filterStorageGroupsColumns(rawColumns, options?.visibleEntities);
-
-    return filteredColumns.map((column) => ({
+    return columns.map((column) => ({
         ...column,
         sortable: isSortableStorageProperty(column.name),
     }));

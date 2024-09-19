@@ -1,7 +1,9 @@
 import React from 'react';
 
+import {TableColumnSetup} from '@gravity-ui/uikit';
+
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
-import {TableSkeleton} from '../../../components/TableSkeleton/TableSkeleton';
+import {TableWithControlsLayout} from '../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
     useCapabilitiesLoaded,
     useStorageGroupsHandlerAvailable,
@@ -10,7 +12,7 @@ import {storageApi} from '../../../store/reducers/storage/storage';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../../Storage/StorageGroups/columns/constants';
-import {useGetDiskStorageColumns} from '../../Storage/StorageGroups/columns/hooks';
+import {useStorageGroupsSelectedColumns} from '../../Storage/StorageGroups/columns/hooks';
 
 import {preparePDiskStorageResponse} from './utils';
 
@@ -20,6 +22,8 @@ interface PDiskGroupsProps {
 }
 
 export function PDiskGroups({pDiskId, nodeId}: PDiskGroupsProps) {
+    const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns();
+
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -37,18 +41,25 @@ export function PDiskGroups({pDiskId, nodeId}: PDiskGroupsProps) {
         return preparePDiskStorageResponse(currentData, pDiskId, nodeId) || [];
     }, [currentData, pDiskId, nodeId]);
 
-    const pDiskStorageColumns = useGetDiskStorageColumns();
-
-    if (loading || !capabilitiesLoaded) {
-        return <TableSkeleton />;
-    }
-
     return (
-        <ResizeableDataTable
-            columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-            data={preparedGroups}
-            columns={pDiskStorageColumns}
-            settings={DEFAULT_TABLE_SETTINGS}
-        />
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
+                    sortable={false}
+                />
+            </TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Table loading={loading || !capabilitiesLoaded}>
+                <ResizeableDataTable
+                    columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
+                    data={preparedGroups}
+                    columns={columnsToShow}
+                    settings={DEFAULT_TABLE_SETTINGS}
+                />
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 }

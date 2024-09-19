@@ -11,7 +11,7 @@ import {
     useStorageGroupsHandlerAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
-import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
+import {VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
 import {
     filterGroups,
     filterNodes,
@@ -31,7 +31,9 @@ import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../util
 
 import {StorageControls} from './StorageControls/StorageControls';
 import {StorageGroups} from './StorageGroups/StorageGroups';
+import {useStorageGroupsSelectedColumns} from './StorageGroups/columns/hooks';
 import {StorageNodes} from './StorageNodes/StorageNodes';
+import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
 import {b} from './shared';
 import {defaultSortNode, getDefaultSortGroup} from './utils';
 
@@ -73,6 +75,9 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
         usageFilter: UsageFilterParam,
     });
     const storageType = storageTypeSchema.parse(queryParams.type);
+    const isGroups = storageType === 'groups';
+    const isNodes = storageType === 'nodes';
+
     const visibleEntities = visibleEntitiesSchema.parse(queryParams.visible);
     const filter = queryParams.search ?? '';
     const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
@@ -90,23 +95,38 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
     });
     const groupsSortParams = groupSort.sortOrder ? groupSort : getDefaultSortGroup(visibleEntities);
 
+    const {
+        columnsToShow: storageNodesColumnsToShow,
+        columnsToSelect: storageNodesColumnsToSelect,
+        setColumns: setStorageNodesSelectedColumns,
+    } = useStorageNodesSelectedColumns({
+        additionalNodesProps,
+        visibleEntities,
+        database,
+    });
+
+    const {
+        columnsToShow: storageGroupsColumnsToShow,
+        columnsToSelect: storageGroupsColumnsToSelect,
+        setColumns: setStorageGroupsSelectedColumns,
+    } = useStorageGroupsSelectedColumns(visibleEntities);
+
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
         {database, with: visibleEntities, node_id: nodeId},
         {
-            skip: storageType !== STORAGE_TYPES.nodes,
+            skip: !isNodes,
             pollingInterval: autoRefreshInterval,
         },
     );
     const groupsQuery = storageApi.useGetStorageGroupsInfoQuery(
         {database, with: visibleEntities, nodeId, shouldUseGroupsHandler: groupsHandlerAvailable},
         {
-            skip: storageType !== STORAGE_TYPES.groups || !capabilitiesLoaded,
+            skip: !isGroups || !capabilitiesLoaded,
             pollingInterval: autoRefreshInterval,
         },
     );
 
-    const {currentData, isFetching, error} =
-        storageType === STORAGE_TYPES.nodes ? nodesQuery : groupsQuery;
+    const {currentData, isFetching, error} = isNodes ? nodesQuery : groupsQuery;
 
     const {currentData: {nodes = []} = {}} = nodesQuery;
     const {currentData: {groups = []} = {}} = groupsQuery;
@@ -160,7 +180,7 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
     const renderDataTable = () => {
         return (
             <React.Fragment>
-                {storageType === STORAGE_TYPES.groups && (
+                {isGroups ? (
                     <StorageGroups
                         key="groups"
                         visibleEntities={visibleEntities}
@@ -169,9 +189,10 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
                         onShowAll={() => handleGroupVisibilityChange(VISIBLE_ENTITIES.all)}
                         sort={groupsSort}
                         handleSort={handleGroupsSort}
+                        columns={storageGroupsColumnsToShow}
                     />
-                )}
-                {storageType === STORAGE_TYPES.nodes && (
+                ) : null}
+                {isNodes ? (
                     <StorageNodes
                         key="nodes"
                         visibleEntities={visibleEntities}
@@ -179,17 +200,26 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
                         data={storageNodes}
                         tableSettings={DEFAULT_TABLE_SETTINGS}
                         onShowAll={handleShowAllNodes}
-                        additionalNodesProps={additionalNodesProps}
                         sort={nodesSort}
                         handleSort={handleNodesSort}
-                        database={database}
+                        columns={storageNodesColumnsToShow}
                     />
-                )}
+                ) : null}
             </React.Fragment>
         );
     };
 
     const renderControls = () => {
+        const entitiesCountCurrent = isGroups ? storageGroups.length : storageNodes.length;
+
+        const columnsToSelect = isGroups
+            ? storageGroupsColumnsToSelect
+            : storageNodesColumnsToSelect;
+
+        const handleSelectedColumnsUpdate = isGroups
+            ? setStorageGroupsSelectedColumns
+            : setStorageNodesSelectedColumns;
+
         return (
             <StorageControls
                 searchValue={filter}
@@ -204,13 +234,11 @@ export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) 
                 groupsUsageFilter={usageFilter}
                 groupsUsageFilterOptions={usageFilterOptions}
                 handleGroupsUsageFilterChange={handleUsageFilterChange}
-                entitiesCountCurrent={
-                    storageType === STORAGE_TYPES.groups
-                        ? storageGroups.length
-                        : storageNodes.length
-                }
+                entitiesCountCurrent={entitiesCountCurrent}
                 entitiesCountTotal={entitiesCount.total}
                 entitiesLoading={isLoading}
+                columnsToSelect={columnsToSelect}
+                handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
             />
         );
     };

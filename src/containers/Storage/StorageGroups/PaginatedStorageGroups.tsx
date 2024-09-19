@@ -12,11 +12,13 @@ import type {VisibleEntities} from '../../../store/reducers/storage/types';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
-import {useGetStorageGroupsColumns} from './columns/hooks';
+import type {StorageGroupsColumn} from './columns/types';
 import {useGroupsGetter} from './getGroups';
 import i18n from './i18n';
 
 interface PaginatedStorageGroupsProps {
+    columns: StorageGroupsColumn[];
+
     searchValue: string;
     visibleEntities: VisibleEntities;
     database?: string;
@@ -30,6 +32,7 @@ interface PaginatedStorageGroupsProps {
 }
 
 export const PaginatedStorageGroups = ({
+    columns,
     searchValue,
     visibleEntities,
     database,
@@ -39,8 +42,6 @@ export const PaginatedStorageGroups = ({
     renderControls,
     renderErrorMessage,
 }: PaginatedStorageGroupsProps) => {
-    const columns = useGetStorageGroupsColumns(visibleEntities);
-
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
 

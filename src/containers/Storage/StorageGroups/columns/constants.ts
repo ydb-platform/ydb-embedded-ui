@@ -3,6 +3,7 @@ import type {ValueOf} from '../../../../types/common';
 import i18n from './i18n';
 
 export const STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY = 'storageGroupsColumnsWidth';
+export const STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY = 'storageGroupsSelectedColumns';
 
 export const STORAGE_GROUPS_COLUMNS_IDS = {
     PoolName: 'PoolName',
@@ -21,6 +22,21 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
 } as const;
 
 type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
+
+export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
+    'PoolName',
+    'MediaType',
+    'Erasure',
+    'GroupId',
+    'Used',
+    'Limit',
+    'Usage',
+    'Read',
+    'Write',
+    'VDisks',
+];
+
+export const REQUIRED_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = ['GroupId'];
 
 // This code is running when module is initialized and correct language may not be set yet
 // get functions guarantee that i18n fields will be inited on render with current render language

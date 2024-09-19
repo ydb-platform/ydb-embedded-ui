@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Tabs} from '@gravity-ui/uikit';
+import {TableColumnSetup, Tabs} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
@@ -12,8 +12,10 @@ import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewer
 import {InternalLink} from '../../components/InternalLink';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupInfo';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {getStorageGroupPath} from '../../routes';
 import {useStorageGroupsHandlerAvailable} from '../../store/reducers/capabilities/hooks';
+import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import {storageApi} from '../../store/reducers/storage/storage';
@@ -23,8 +25,11 @@ import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {useAdditionalNodeProps} from '../AppWithClusters/useClusterData';
 import {StorageGroups} from '../Storage/StorageGroups/StorageGroups';
+import {useStorageGroupsSelectedColumns} from '../Storage/StorageGroups/columns/hooks';
 import {StorageNodes} from '../Storage/StorageNodes/StorageNodes';
+import {useStorageNodesSelectedColumns} from '../Storage/StorageNodes/columns/hooks';
 
 import {storageGroupPageKeyset} from './i18n';
 
@@ -62,6 +67,22 @@ export function StorageGroupPage() {
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('storageGroup', {groupId}));
     }, [dispatch, groupId]);
+
+    const {balancer} = useClusterBaseInfo();
+    const additionalNodesProps = useAdditionalNodeProps({balancer});
+
+    const {
+        columnsToShow: storageNodesColumnsToShow,
+        columnsToSelect: storageNodesColumnsToSelect,
+        setColumns: setStorageNodesSelectedColumns,
+    } = useStorageNodesSelectedColumns({
+        additionalNodesProps,
+    });
+    const {
+        columnsToShow: storageGroupsColumnsToShow,
+        columnsToSelect: storageGroupsColumnsToSelect,
+        setColumns: setStorageGroupsSelectedColumns,
+    } = useStorageGroupsSelectedColumns();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const shouldUseGroupsHandler = useStorageGroupsHandlerAvailable();
@@ -154,26 +175,69 @@ export function StorageGroupPage() {
         );
     };
 
-    const renderTabsContent = () => {
-        switch (storageGroupTab) {
-            case 'groups': {
-                return storageGroupData ? (
+    const renderGroupsTable = () => {
+        if (!storageGroupData) {
+            return null;
+        }
+
+        return (
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <TableColumnSetup
+                        popupWidth={200}
+                        items={storageGroupsColumnsToSelect}
+                        showStatus
+                        onUpdate={setStorageGroupsSelectedColumns}
+                        sortable={false}
+                    />
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table>
                     <StorageGroups
                         data={[storageGroupData]}
+                        columns={storageGroupsColumnsToShow}
                         tableSettings={DEFAULT_TABLE_SETTINGS}
                         visibleEntities="all"
                     />
-                ) : null;
-            }
-            case 'nodes': {
-                return nodesData ? (
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        );
+    };
+    const renderNodesTable = () => {
+        if (!nodesData) {
+            return null;
+        }
+
+        return (
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <TableColumnSetup
+                        popupWidth={200}
+                        items={storageNodesColumnsToSelect}
+                        showStatus
+                        onUpdate={setStorageNodesSelectedColumns}
+                        sortable={false}
+                    />
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table>
                     <StorageNodes
-                        data={nodesData}
+                        data={[...nodesData]}
+                        columns={storageNodesColumnsToShow}
                         tableSettings={DEFAULT_TABLE_SETTINGS}
                         visibleEntities="all"
                         nodesUptimeFilter={NodesUptimeFilterValues.All}
                     />
-                ) : null;
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        );
+    };
+
+    const renderTabsContent = () => {
+        switch (storageGroupTab) {
+            case 'groups': {
+                return renderGroupsTable();
+            }
+            case 'nodes': {
+                return renderNodesTable();
             }
             default:
                 return null;
@@ -189,15 +253,13 @@ export function StorageGroupPage() {
 
     return (
         <div className={storageGroupPageCn(null)}>
-            <div className={storageGroupPageCn('info-content')}>
-                {renderHelmet()}
-                {renderPageMeta()}
-                {renderPageTitle()}
-                {renderError()}
-                {renderInfo()}
-                {renderTabs()}
-            </div>
-            <div className={storageGroupPageCn('tabs-content')}>{renderTabsContent()}</div>
+            {renderHelmet()}
+            {renderPageMeta()}
+            {renderPageTitle()}
+            {renderError()}
+            {renderInfo()}
+            {renderTabs()}
+            {renderTabsContent()}
         </div>
     );
 }

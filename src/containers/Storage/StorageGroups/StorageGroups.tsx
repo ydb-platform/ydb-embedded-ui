@@ -7,11 +7,12 @@ import type {HandleSort} from '../../../utils/hooks/useTableSort';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
-import {useGetStorageGroupsColumns} from './columns/hooks';
+import type {StorageGroupsColumn} from './columns/types';
 import i18n from './i18n';
 
 interface StorageGroupsProps {
     data: PreparedStorageGroup[];
+    columns: StorageGroupsColumn[];
     tableSettings: Settings;
     visibleEntities: VisibleEntities;
     onShowAll?: VoidFunction;
@@ -21,14 +22,13 @@ interface StorageGroupsProps {
 
 export function StorageGroups({
     data,
+    columns,
     tableSettings,
     visibleEntities,
     onShowAll,
     sort,
     handleSort,
 }: StorageGroupsProps) {
-    const columns = useGetStorageGroupsColumns(visibleEntities);
-
     if (!data.length && visibleEntities !== VISIBLE_ENTITIES.all) {
         return (
             <StorageGroupsEmptyDataMessage

@@ -18,7 +18,6 @@ import {
     SHOW_DOMAIN_DATABASE_KEY,
     TENANT_INITIAL_PAGE_KEY,
     THEME_KEY,
-    USE_ADVANCED_STORAGE_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_PAGINATED_TABLES_KEY,
 } from '../utils/constants';
@@ -32,7 +31,6 @@ export const DEFAULT_USER_SETTINGS = {
     [THEME_KEY]: 'system',
     [LANGUAGE_KEY]: undefined,
     [INVERTED_DISKS_KEY]: false,
-    [USE_ADVANCED_STORAGE_KEY]: false,
     [QUERY_USE_MULTI_SCHEMA_KEY]: true,
     [BINARY_DATA_IN_PLAIN_TEXT_DISPLAY]: true,
     [SAVED_QUERIES_KEY]: [],

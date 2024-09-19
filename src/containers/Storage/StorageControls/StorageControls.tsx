@@ -1,5 +1,8 @@
 import React from 'react';
 
+import type {TableColumnSetupItem} from '@gravity-ui/uikit';
+import {TableColumnSetup} from '@gravity-ui/uikit';
+
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {Search} from '../../../components/Search/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
@@ -35,6 +38,9 @@ interface StorageControlsProps {
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
+
+    columnsToSelect: TableColumnSetupItem[];
+    handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
 }
 
 export const StorageControls = ({
@@ -59,8 +65,12 @@ export const StorageControls = ({
     entitiesCountCurrent,
     entitiesCountTotal,
     entitiesLoading,
+
+    columnsToSelect,
+    handleSelectedColumnsUpdate,
 }: StorageControlsProps) => {
     const isNodes = storageType === STORAGE_TYPES.nodes;
+    const isGroups = storageType === STORAGE_TYPES.groups;
     const entityName = isNodes ? i18n('nodes') : i18n('groups');
 
     return (
@@ -86,7 +96,7 @@ export const StorageControls = ({
             {isNodes && (
                 <UptimeFilter value={nodesUptimeFilter} onChange={handleNodesUptimeFilterChange} />
             )}
-            {!isNodes && withGroupsUsageFilter && (
+            {isGroups && withGroupsUsageFilter && (
                 <UsageFilter
                     value={groupsUsageFilter}
                     onChange={handleGroupsUsageFilterChange}
@@ -99,6 +109,13 @@ export const StorageControls = ({
                 loading={entitiesLoading}
                 total={entitiesCountTotal}
                 current={entitiesCountCurrent}
+            />
+            <TableColumnSetup
+                popupWidth={200}
+                items={columnsToSelect}
+                showStatus
+                onUpdate={handleSelectedColumnsUpdate}
+                sortable={false}
             />
         </React.Fragment>
     );
