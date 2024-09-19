@@ -285,6 +285,7 @@ interface MultiSchemaResult {
     result?: {
         rows?: ArrayRow[] | null;
         columns?: ColumnType[];
+        truncated?: boolean;
     }[];
 }
 interface DefaultSchemaResult {
