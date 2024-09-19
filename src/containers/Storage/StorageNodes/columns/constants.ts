@@ -16,7 +16,7 @@ export const STORAGE_NODES_COLUMNS_IDS = {
 
 type StorageNodesColumnId = ValueOf<typeof STORAGE_NODES_COLUMNS_IDS>;
 
-// This code is running when module is initialized and correct language may not be set yes
+// This code is running when module is initialized and correct language may not be set yet
 // get functions guarantee that i18n fields will be inited on render with current render language
 export const STORAGE_NODES_COLUMNS_TITLES = {
     get NodeId() {
