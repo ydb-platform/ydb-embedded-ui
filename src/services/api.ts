@@ -4,7 +4,6 @@ import type {AxiosRequestConfig} from 'axios';
 import axiosRetry from 'axios-retry';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
-import type {NodesApiRequestParams} from '../store/reducers/nodes/types';
 import type {TMetaInfo} from '../types/api/acl';
 import type {TQueryAutocomplete} from '../types/api/autocomplete';
 import type {CapabilitiesResponse} from '../types/api/capabilities';
@@ -22,7 +21,7 @@ import type {
 } from '../types/api/meta';
 import type {ModifyDiskResponse} from '../types/api/modifyDisk';
 import type {TNetInfo} from '../types/api/netInfo';
-import type {TNodesInfo} from '../types/api/nodes';
+import type {NodesRequestParams, TNodesInfo} from '../types/api/nodes';
 import type {TEvNodesInfo} from '../types/api/nodesList';
 import type {EDecommitStatus, TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
 import type {
@@ -59,7 +58,6 @@ import {
     DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
     SECOND_IN_MS,
 } from '../utils/constants';
-import {prepareSortValue} from '../utils/filters';
 import {isAxiosError} from '../utils/response';
 import type {Nullable} from '../utils/typecheckers';
 
@@ -202,29 +200,29 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     }
     getNodes(
         {
-            visibleEntities,
             type = 'any',
             tablets = false,
-            sortOrder,
-            sortValue,
+            database,
+            tenant,
+            fieldsRequired,
             ...params
-        }: NodesApiRequestParams,
+        }: NodesRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
-        const sort = prepareSortValue(sortValue, sortOrder);
+        const preparedFieldsRequired = Array.isArray(fieldsRequired)
+            ? this.prepareArrayRequestParam(fieldsRequired)
+            : fieldsRequired;
 
         return this.get<TNodesInfo>(
             this.getPath('/viewer/json/nodes?enums=true'),
             {
-                with: visibleEntities,
                 type,
                 tablets,
-                sort,
-                ...params,
                 // TODO: remove after remove tenant param
-                database: params.database || params.tenant,
-                tenant: params.tenant || params.database,
-                node_id: params.node_id,
+                database: database || tenant,
+                tenant: tenant || database,
+                fields_required: preparedFieldsRequired,
+                ...params,
             },
             {concurrentId, requestConfig: {signal}},
         );

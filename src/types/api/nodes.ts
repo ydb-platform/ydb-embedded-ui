@@ -1,3 +1,4 @@
+import type {BackendSortParam} from './common';
 import type {EFlag} from './enums';
 import type {TPDiskStateInfo} from './pdisk';
 import type {TTabletStateInfo} from './tablet';
@@ -132,4 +133,93 @@ interface TNodeSharedCache {
 enum EConfigState {
     'Consistent' = 'Consistent',
     'Outdated' = 'Outdated',
+}
+
+// ==== Request types ====
+
+type NodesType = 'static' | 'dynamic' | 'any';
+
+type NodesWithFilter = 'space' | 'missing' | 'all';
+
+type NodesGroupByField =
+    | 'NodeId'
+    | 'Host'
+    | 'NodeName'
+    | 'Database'
+    | 'DiskSpaceUsage'
+    | 'DC'
+    | 'Rack'
+    | 'Missing'
+    | 'Uptime'
+    | 'Version';
+
+type NodesRequiredField =
+    | 'NodeId'
+    | 'SystemState'
+    | 'PDisks'
+    | 'VDisks'
+    | 'Tablets'
+    | 'Host'
+    | 'NodeName'
+    | 'DC'
+    | 'Rack'
+    | 'Version'
+    | 'Uptime'
+    | 'Memory'
+    | 'CPU'
+    | 'LoadAverage'
+    | 'Missing'
+    | 'DiskSpaceUsage'
+    | 'SubDomainKey'
+    | 'DisconnectTime'
+    | 'Database';
+
+export type NodesSortValue =
+    | 'NodeId'
+    | 'Host'
+    | 'NodeName'
+    | 'DC'
+    | 'Rack'
+    | 'Version'
+    | 'Uptime'
+    | 'CPU'
+    | 'LoadAverage'
+    | 'Memory'
+    | `Missing`
+    | `DiskSpaceUsage`
+    | `Database`;
+
+export type NodesSort = BackendSortParam<NodesSortValue>;
+
+export interface NodesRequestParams {
+    /** @deprecated use database instead */
+    tenant?: string;
+    database?: string;
+    path?: string;
+    node_id?: string | number;
+    group_id?: string | number;
+    pool?: string;
+
+    type?: NodesType;
+    with?: NodesWithFilter;
+
+    storage?: boolean;
+    tablets?: boolean;
+
+    /** return nodes with less uptime in seconds */
+    uptime?: number;
+    /** return nodes with SystemState !== EFlag.Green */
+    problems_only?: boolean;
+    /** filter nodes by id or host */
+    filter?: string;
+
+    sort?: NodesSort;
+
+    group?: NodesGroupByField;
+    filter_group_by?: NodesGroupByField;
+    filter_group?: string;
+    fieldsRequired?: NodesRequiredField[] | 'all';
+
+    offset?: number;
+    limit?: number;
 }

@@ -1,12 +1,12 @@
+import type {NodesRequestParams} from '../../../types/api/nodes';
 import {api} from '../api';
 
-import type {NodesApiRequestParams} from './types';
 import {prepareNodesData} from './utils';
 
 export const nodesApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getNodes: builder.query({
-            queryFn: async (params: NodesApiRequestParams, {signal}) => {
+            queryFn: async (params: NodesRequestParams, {signal}) => {
                 try {
                     const data = await window.api.getNodes(
                         {

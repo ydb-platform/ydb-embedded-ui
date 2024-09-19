@@ -1,45 +1,20 @@
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 
-import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
-import {NodeHostWrapper} from '../../components/NodeHostWrapper/NodeHostWrapper';
-import type {Column as PaginatedTableColumn} from '../../components/PaginatedTable';
-import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
-import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
-import {TabletsStatistic} from '../../components/TabletsStatistic';
-import {UsageLabel} from '../../components/UsageLabel/UsageLabel';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
-import type {GetNodeRefFunc} from '../../types/additionalProps';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {CellWithPopover} from '../../../components/CellWithPopover/CellWithPopover';
+import {NodeHostWrapper} from '../../../components/NodeHostWrapper/NodeHostWrapper';
+import {PoolsGraph} from '../../../components/PoolsGraph/PoolsGraph';
+import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
+import {TabletsStatistic} from '../../../components/TabletsStatistic';
+import {UsageLabel} from '../../../components/UsageLabel/UsageLabel';
+import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
+import {getLoadSeverityForNode} from '../../../store/reducers/nodes/utils';
+import type {GetNodeRefFunc} from '../../../types/additionalProps';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
+import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 
-export const NODES_COLUMNS_WIDTH_LS_KEY = 'nodesTableColumnsWidth';
-
-const NODES_COLUMNS_IDS = {
-    NodeId: 'NodeId',
-    Host: 'Host',
-    DC: 'DC',
-    Rack: 'Rack',
-    Version: 'Version',
-    Uptime: 'Uptime',
-    Memory: 'Memory',
-    CPU: 'CPU',
-    LoadAverage: 'LoadAverage',
-    Tablets: 'Tablets',
-    TopNodesLoadAverage: 'TopNodesLoadAverage',
-    TopNodesMemory: 'TopNodesMemory',
-    SharedCacheUsage: 'SharedCacheUsage',
-    MemoryUsedInAlloc: 'MemoryUsedInAlloc',
-    TotalSessions: 'TotalSessions',
-};
-
-interface GetNodesColumnsProps {
-    database?: string;
-    getNodeRef?: GetNodeRefFunc;
-}
-
-type NodesColumn = PaginatedTableColumn<NodesPreparedEntity> & DataTableColumn<NodesPreparedEntity>;
+import {NODES_COLUMNS_IDS, NODES_COLUMNS_TITLES} from './constants';
+import type {GetNodesColumnsProps, NodesColumn} from './types';
 
 const nodeIdColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.NodeId,
@@ -52,6 +27,7 @@ const nodeIdColumn: NodesColumn = {
 
 const getHostColumn = (getNodeRef?: GetNodeRefFunc, database?: string): NodesColumn => ({
     name: NODES_COLUMNS_IDS.Host,
+    header: NODES_COLUMNS_TITLES.Host,
     render: ({row}) => {
         return <NodeHostWrapper node={row} getNodeRef={getNodeRef} database={database} />;
     },
@@ -68,7 +44,7 @@ const getHostColumnWithUndefinedWidth = (
 
 const dataCenterColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.DC,
-    header: 'DC',
+    header: NODES_COLUMNS_TITLES.DC,
     align: DataTable.LEFT,
     render: ({row}) => row.DC || EMPTY_DATA_PLACEHOLDER,
     width: 60,
@@ -76,7 +52,7 @@ const dataCenterColumn: NodesColumn = {
 
 const rackColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.Rack,
-    header: 'Rack',
+    header: NODES_COLUMNS_TITLES.Rack,
     align: DataTable.LEFT,
     render: ({row}) => (row.Rack ? row.Rack : '—'),
     width: 80,
@@ -84,6 +60,7 @@ const rackColumn: NodesColumn = {
 
 const versionColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.Version,
+    header: NODES_COLUMNS_TITLES.Version,
     width: 200,
     align: DataTable.LEFT,
     render: ({row}) => {
@@ -94,7 +71,7 @@ const versionColumn: NodesColumn = {
 
 const uptimeColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.Uptime,
-    header: 'Uptime',
+    header: NODES_COLUMNS_TITLES.Uptime,
     sortAccessor: ({StartTime}) => StartTime && -StartTime,
     render: ({row}) => row.Uptime,
     align: DataTable.RIGHT,
@@ -104,7 +81,7 @@ const uptimeColumn: NodesColumn = {
 
 const memoryColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.Memory,
-    header: 'Memory',
+    header: NODES_COLUMNS_TITLES.Memory,
     sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
     defaultOrder: DataTable.DESCENDING,
     render: ({row}) => (
@@ -121,7 +98,7 @@ const memoryColumn: NodesColumn = {
 
 const cpuColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.CPU,
-    header: 'CPU',
+    header: NODES_COLUMNS_TITLES.CPU,
     sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
     defaultOrder: DataTable.DESCENDING,
     render: ({row}) => (row.PoolStats ? <PoolsGraph pools={row.PoolStats} /> : '—'),
@@ -133,7 +110,7 @@ const cpuColumn: NodesColumn = {
 
 const loadAverageColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.LoadAverage,
-    header: 'Load average',
+    header: NODES_COLUMNS_TITLES.LoadAverage,
     sortAccessor: ({LoadAveragePercents = []}) => LoadAveragePercents[0],
     defaultOrder: DataTable.DESCENDING,
     render: ({row}) => (
@@ -156,6 +133,7 @@ const loadAverageColumn: NodesColumn = {
 
 const getTabletsColumn = (tabletsPath?: string): NodesColumn => ({
     name: NODES_COLUMNS_IDS.Tablets,
+    header: NODES_COLUMNS_TITLES.Tablets,
     width: 500,
     resizeMinWidth: 500,
     render: ({row}) => {
@@ -175,7 +153,7 @@ const getTabletsColumn = (tabletsPath?: string): NodesColumn => ({
 
 const topNodesLoadAverageColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.TopNodesLoadAverage,
-    header: 'Load',
+    header: NODES_COLUMNS_TITLES.TopNodesLoadAverage,
     render: ({row}) =>
         row.LoadAveragePercents && row.LoadAveragePercents.length > 0 ? (
             <UsageLabel
@@ -193,7 +171,7 @@ const topNodesLoadAverageColumn: NodesColumn = {
 
 const topNodesMemoryColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.TopNodesMemory,
-    header: 'Process',
+    header: NODES_COLUMNS_TITLES.TopNodesMemory,
     render: ({row}) => (
         <ProgressViewer
             value={row.MemoryUsed}
@@ -210,7 +188,7 @@ const topNodesMemoryColumn: NodesColumn = {
 
 const sharedCacheUsageColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.SharedCacheUsage,
-    header: 'Caches',
+    header: NODES_COLUMNS_TITLES.SharedCacheUsage,
     render: ({row}) => (
         <ProgressViewer
             value={row.SharedCacheUsed}
@@ -227,7 +205,7 @@ const sharedCacheUsageColumn: NodesColumn = {
 
 const sessionsColumn: NodesColumn = {
     name: NODES_COLUMNS_IDS.TotalSessions,
-    header: 'Sessions',
+    header: NODES_COLUMNS_TITLES.TotalSessions,
     render: ({row}) => row.TotalSessions ?? '—',
     align: DataTable.RIGHT,
     width: 100,

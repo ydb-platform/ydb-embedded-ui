@@ -1,12 +1,13 @@
 import type {FetchData} from '../../components/PaginatedTable';
-import type {
-    NodesApiRequestParams,
-    NodesFilters,
-    NodesPreparedEntity,
-} from '../../store/reducers/nodes/types';
+import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {prepareNodesData} from '../../store/reducers/nodes/utils';
-import {getProblemParamValue, getUptimeParamValue} from '../../utils/nodes';
-import type {NodesSortValue} from '../../utils/nodes';
+import type {NodesRequestParams} from '../../types/api/nodes';
+import {prepareSortValue} from '../../utils/filters';
+import {
+    getProblemParamValue,
+    getUptimeParamValue,
+    isSortableNodesProperty,
+} from '../../utils/nodes';
 
 const getConcurrentId = (limit?: number, offset?: number) => {
     return `getNodes|offset${offset}|limit${limit}`;
@@ -15,7 +16,7 @@ const getConcurrentId = (limit?: number, offset?: number) => {
 export const getNodes: FetchData<
     NodesPreparedEntity,
     NodesFilters,
-    Pick<NodesApiRequestParams, 'type' | 'storage' | 'tablets'>
+    Pick<NodesRequestParams, 'type' | 'storage' | 'tablets'>
 > = async (params) => {
     const {
         type = 'any',
@@ -30,6 +31,10 @@ export const getNodes: FetchData<
     const {sortOrder, columnId} = sortParams ?? {};
     const {path, database, searchValue, problemFilter, uptimeFilter} = filters ?? {};
 
+    const sort = isSortableNodesProperty(columnId)
+        ? prepareSortValue(columnId, sortOrder)
+        : undefined;
+
     const response = await window.api.getNodes(
         {
             type,
@@ -37,8 +42,7 @@ export const getNodes: FetchData<
             tablets,
             limit,
             offset,
-            sortOrder,
-            sortValue: columnId as NodesSortValue,
+            sort,
             path,
             database,
             filter: searchValue,

@@ -26,5 +26,5 @@ const STORAGE_SORT_VALUES: StorageV2SortValue[] = [
     'Write',
 ];
 
-export const isSortableStorageProperty = (value: string): value is StorageV2SortValue =>
+export const isSortableStorageProperty = (value: unknown): value is StorageV2SortValue =>
     STORAGE_SORT_VALUES.includes(value as StorageV2SortValue);

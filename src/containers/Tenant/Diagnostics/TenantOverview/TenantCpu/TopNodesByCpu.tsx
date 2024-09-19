@@ -1,11 +1,10 @@
+import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {topNodesApi} from '../../../../../store/reducers/tenantOverview/topNodes/topNodes';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
+import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
-import {
-    NODES_COLUMNS_WIDTH_LS_KEY,
-    getTopNodesByCpuColumns,
-} from '../../../../Nodes/getNodesColumns';
+import {getTopNodesByCpuColumns} from '../../../../Nodes/columns/columns';
+import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../Nodes/columns/constants';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
@@ -22,13 +21,19 @@ export function TopNodesByCpu({tenantName, additionalNodesProps}: TopNodesByCpuP
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const columns = getTopNodesByCpuColumns(additionalNodesProps?.getNodeRef);
 
-    const {currentData, isFetching, error} = topNodesApi.useGetTopNodesQuery(
-        {tenant: tenantName, sortValue: 'CPU'},
+    const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
+        {
+            tenant: tenantName,
+            type: 'any',
+            sort: '-CPU',
+            limit: TENANT_OVERVIEW_TABLES_LIMIT,
+        },
         {pollingInterval: autoRefreshInterval},
     );
 
     const loading = isFetching && currentData === undefined;
-    const topNodes = currentData;
+
+    const topNodes = currentData?.Nodes || [];
 
     const title = getSectionTitle({
         entity: i18n('nodes'),
@@ -42,7 +47,7 @@ export function TopNodesByCpu({tenantName, additionalNodesProps}: TopNodesByCpuP
     return (
         <TenantOverviewTableLayout
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
-            data={topNodes || []}
+            data={topNodes}
             columns={columns}
             title={title}
             loading={loading}
