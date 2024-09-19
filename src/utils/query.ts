@@ -159,7 +159,7 @@ const parseExecuteMultiResponse = (data: ExecuteMultiResponse): IQueryResult => 
     const {result, ...restData} = data;
 
     const parsedResult = result?.map((resultSet) => {
-        const {rows, columns} = resultSet;
+        const {rows, columns, truncated} = resultSet;
 
         let parsedRows: KeyValueRow[] | undefined;
 
@@ -175,6 +175,7 @@ const parseExecuteMultiResponse = (data: ExecuteMultiResponse): IQueryResult => 
         return {
             columns: columns,
             result: parsedRows,
+            truncated,
         };
     });
 

@@ -5,5 +5,6 @@
   "action.schema": "Schema",
   "action.explain-plan": "Explain Plan",
   "action.copy": "Copy {{activeSection}}",
-  "trace": "Trace"
+  "trace": "Trace",
+  "truncated": "Truncated"
 }
