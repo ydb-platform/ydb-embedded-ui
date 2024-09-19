@@ -3,3 +3,5 @@ export interface IProtobufTimeObject {
     seconds?: string;
     nanos?: number;
 }
+
+export type BackendSortParam<T extends string> = `-${T}` | `+${T}` | T;

@@ -13,6 +13,8 @@ import {StorageControls} from './StorageControls/StorageControls';
 import {PaginatedStorageGroups} from './StorageGroups/PaginatedStorageGroups';
 import {PaginatedStorageNodes} from './StorageNodes/PaginatedStorageNodes';
 
+import './Storage.scss';
+
 interface PaginatedStorageProps {
     database?: string;
     nodeId?: string;

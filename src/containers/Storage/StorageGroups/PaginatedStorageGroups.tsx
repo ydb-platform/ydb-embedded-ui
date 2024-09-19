@@ -11,7 +11,7 @@ import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
-import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/getStorageGroupsColumns';
+import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
 import {useGetStorageGroupsColumns} from './columns/hooks';
 import {useGroupsGetter} from './getGroups';
 import i18n from './i18n';

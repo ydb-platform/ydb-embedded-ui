@@ -1,0 +1,15 @@
+{
+  "pool-name": "Pool Name",
+  "type": "Type",
+  "erasure": "Erasure",
+  "degraded": "Degraded",
+  "usage": "Usage",
+  "group-id": "Group ID",
+  "used": "Used",
+  "limit": "Limit",
+  "space": "Space",
+  "read": "Read",
+  "write": "Write",
+  "vdisks": "VDisks",
+  "vdisks-pdisks": "VDisks with PDisks"
+}

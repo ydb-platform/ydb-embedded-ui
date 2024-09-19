@@ -6,8 +6,8 @@ import type {
     PreparedStorageGroup,
     PreparedStorageGroupFilters,
 } from '../../../store/reducers/storage/types';
-import type {StorageV2Sort} from '../../../types/api/storage';
 import {prepareSortValue} from '../../../utils/filters';
+import {isSortableStorageProperty} from '../../../utils/storage';
 
 const getConcurrentId = (limit?: number, offset?: number) => {
     return `getStorageGroups|offset${offset}|limit${limit}`;
@@ -22,7 +22,9 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
             const {sortOrder, columnId} = sortParams ?? {};
             const {searchValue, visibleEntities, database, nodeId} = filters ?? {};
 
-            const sort = prepareSortValue(columnId, sortOrder) as StorageV2Sort;
+            const sort = isSortableStorageProperty(columnId)
+                ? prepareSortValue(columnId, sortOrder)
+                : undefined;
 
             const {groups, found, total} = await requestStorageData(
                 {
