@@ -23,6 +23,8 @@ export const NODES_COLUMNS_IDS = {
 
 type NodesColumnId = ValueOf<typeof NODES_COLUMNS_IDS>;
 
+// This code is running when module is initialized and correct language may not be set yet
+// get functions guarantee that i18n fields will be inited on render with current render language
 export const NODES_COLUMNS_TITLES = {
     get NodeId() {
         return i18n('node-id');
