@@ -8,10 +8,13 @@ export const useLastQueryExecutionSettings = () => {
     const [lastStorageSettings, setLastSettings] = useSetting<QuerySettings | undefined>(
         LAST_QUERY_EXECUTION_SETTINGS_KEY,
     );
+    let lastSettings: QuerySettings | undefined;
 
-    const lastSettings: QuerySettings | undefined = lastStorageSettings
-        ? querySettingsValidationSchema.parse(lastStorageSettings)
-        : undefined;
+    try {
+        lastSettings = querySettingsValidationSchema.parse(lastStorageSettings);
+    } catch (error) {
+        lastSettings = undefined;
+    }
 
     return [lastSettings, setLastSettings] as const;
 };

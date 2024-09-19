@@ -21,10 +21,10 @@ describe('getChangedQueryExecutionSettings', () => {
             ...DEFAULT_QUERY_SETTINGS,
             queryMode: QUERY_MODES.data,
             timeout: 30,
-            limitRows: 100,
+            limitRows: undefined,
         };
         const result = getChangedQueryExecutionSettings(currentSettings, DEFAULT_QUERY_SETTINGS);
-        expect(result).toEqual(['queryMode', 'timeout', 'limitRows']);
+        expect(result).toEqual(['queryMode', 'timeout']);
     });
 
     it('should return all keys if all settings have changed', () => {
