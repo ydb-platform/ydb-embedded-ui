@@ -22,6 +22,8 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
 
 type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
 
+// This code is running when module is initialized and correct language may not be set yes
+// get functions guarantee that i18n fields will be inited on render with current render language
 export const STORAGE_GROUPS_COLUMNS_TITLES = {
     get PoolName() {
         return i18n('pool-name');
