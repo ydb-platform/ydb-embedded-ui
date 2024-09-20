@@ -30,6 +30,11 @@ import './TopQueries.scss';
 
 const b = cn('kv-top-queries');
 
+const QUERY_MODE_OPTIONS: RadioButtonOption[] = [
+    {value: 'top', content: i18n('mode_top')},
+    {value: 'running', content: i18n('mode_running')},
+];
+
 interface TopQueriesProps {
     tenantName: string;
     type?: EPathType;
@@ -45,10 +50,8 @@ export const TopQueries = ({tenantName, type}: TopQueriesProps) => {
 
     const filters = useTypedSelector((state) => state.executeTopQueries);
 
-    const handleRowClick = React.useCallback(
-        (row: any) => {
-            const {QueryText: input} = row;
-
+    const onRowClick = React.useCallback(
+        (input: string) => {
             dispatch(changeUserInput({input}));
 
             const queryParams = parseQuery(location);
@@ -72,22 +75,21 @@ export const TopQueries = ({tenantName, type}: TopQueriesProps) => {
         dispatch(setTopQueriesFilters(value));
     };
 
-    const options: RadioButtonOption[] = [
-        {value: 'top', content: 'Top'},
-        {value: 'running', content: 'Running'},
-    ];
-
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>
-                <RadioButton options={options} value={queryMode} onUpdate={setQueryMode} />
+                <RadioButton
+                    options={QUERY_MODE_OPTIONS}
+                    value={queryMode}
+                    onUpdate={setQueryMode}
+                />
                 <Search
                     value={filters.text}
                     onChange={handleTextSearchUpdate}
                     placeholder={i18n('filter.text.placeholder')}
                     className={b('search')}
                 />
-                {queryMode === 'top' ? (
+                {isTopQueries ? (
                     <DateRange
                         from={filters.from}
                         to={filters.to}
@@ -96,7 +98,7 @@ export const TopQueries = ({tenantName, type}: TopQueriesProps) => {
                 ) : null}
             </TableWithControlsLayout.Controls>
             {isTopQueries ? (
-                <TopQueriesData database={tenantName} type={type} onRowClick={handleRowClick} />
+                <TopQueriesData database={tenantName} type={type} onRowClick={onRowClick} />
             ) : (
                 <RunningQueriesData database={tenantName} />
             )}

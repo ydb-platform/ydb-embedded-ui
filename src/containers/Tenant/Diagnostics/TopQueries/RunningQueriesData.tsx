@@ -23,20 +23,20 @@ const RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY = 'runningQueriesColumnsWidth';
 
 const columns: Column<KeyValueRow>[] = [
     {
-        name: 'UserSID',
-        header: 'User',
+        name: 'user',
+        header: i18n('col_user'),
         render: ({row}) => row.UserSID || '-',
         sortable: false,
     },
     {
-        name: 'QueryStartAt',
-        header: 'Start time',
+        name: 'startTime',
+        header: i18n('col_start-time'),
         render: ({row}) => formatDateTime(new Date(row.QueryStartAt as string).getTime()),
         sortable: false,
     },
     {
-        name: 'Query',
-        headerTitle: 'Query text',
+        name: 'queryText',
+        header: i18n('col_query-text'),
         render: ({row}) => (
             <div className={b('query')}>
                 <TruncatedQuery value={row.Query?.toString()} maxQueryHeight={MAX_QUERY_HEIGHT} />
@@ -46,8 +46,8 @@ const columns: Column<KeyValueRow>[] = [
         sortable: false,
     },
     {
-        name: 'ApplicationName',
-        header: 'Application',
+        name: 'app',
+        header: i18n('col_app'),
         render: ({row}) => row.ApplicationName || '-',
         sortable: false,
     },
@@ -68,19 +68,16 @@ export const RunningQueriesData = ({database}: Props) => {
         {pollingInterval: autoRefreshInterval},
     );
 
-    console.log(data);
-    console.log(error);
-
     return (
         <TableWithControlsLayout.Table loading={isFetching}>
             {error ? (
-                <ResponseError error={error?.error} />
+                <ResponseError error={error} />
             ) : (
                 <ResizeableDataTable
                     emptyDataMessage={i18n('no-data')}
                     columnsWidthLSKey={RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY}
                     columns={columns}
-                    data={data}
+                    data={data || []}
                     settings={QUERY_TABLE_SETTINGS}
                 />
             )}

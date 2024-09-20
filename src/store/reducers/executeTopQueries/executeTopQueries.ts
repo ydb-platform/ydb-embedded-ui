@@ -70,7 +70,6 @@ export const topQueriesApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
-                    console.log(data);
                     return {data};
                 } catch (error) {
                     return {error};
@@ -95,14 +94,14 @@ export const topQueriesApi = api.injectEndpoints({
                 {signal},
             ) => {
                 try {
-                    const filterConditions = filters?.text
-                        ? `QueryText ILIKE '%${filters.text}%'`
-                        : '';
+                    const filterConditions = filters?.text ? `Query ILIKE '%${filters.text}%'` : '';
+                    const queryText = `SELECT * from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'} limit 10`;
 
                     const response = await window.api.sendQuery(
                         {
-                            query: `SELECT * from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'} limit 10`,
+                            query: queryText,
                             database,
+                            action: 'execute-query',
                         },
                         {signal, withRetries: true},
                     );
@@ -111,8 +110,7 @@ export const topQueriesApi = api.injectEndpoints({
                         throw response;
                     }
 
-                    console.log(response);
-                    return {data: response};
+                    return {data: response?.result?.filter((item) => item.Query !== queryText)};
                 } catch (error) {
                     return {error};
                 }

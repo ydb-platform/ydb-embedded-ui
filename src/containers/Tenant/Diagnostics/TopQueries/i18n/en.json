@@ -1,4 +1,10 @@
 {
   "no-data": "No data",
-  "filter.text.placeholder": "Search by query text..."
+  "filter.text.placeholder": "Search by query text...",
+  "mode_top": "Top",
+  "mode_running": "Running",
+  "col_user": "User",
+  "col_start-time": "Start time",
+  "col_query-text": "Query text",
+  "col_app": "Application"
 }

@@ -2,7 +2,9 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {topQueriesApi} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
+import type {KeyValueRow} from '../../../../types/api/query';
 import type {EPathType} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
 import {isSortableTopQueriesProperty} from '../../../../utils/diagnostics';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
@@ -10,6 +12,8 @@ import {isColumnEntityType} from '../../utils/schema';
 
 import {TOP_QUERIES_COLUMNS, TOP_QUERIES_COLUMNS_WIDTH_LS_KEY} from './getTopQueriesColumns';
 import i18n from './i18n';
+
+const b = cn('kv-top-queries');
 
 interface Props {
     database: string;
@@ -36,6 +40,10 @@ export const TopQueriesData = ({database, onRowClick, type}: Props) => {
         sortable: isSortableTopQueriesProperty(column.name),
     }));
 
+    const handleRowClick = (row: KeyValueRow) => {
+        return onRowClick(row.QueryText as string);
+    };
+
     if (error && !data) {
         return (
             <TableWithControlsLayout.Table>
@@ -55,7 +63,8 @@ export const TopQueriesData = ({database, onRowClick, type}: Props) => {
                 columns={columns}
                 data={data}
                 settings={QUERY_TABLE_SETTINGS}
-                onRowClick={onRowClick}
+                onRowClick={handleRowClick}
+                rowClassName={() => b('row')}
             />
         </TableWithControlsLayout.Table>
     );

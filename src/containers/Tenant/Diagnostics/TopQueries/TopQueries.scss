@@ -12,7 +12,7 @@
         @include search();
     }
 
-    tr {
+    &__row {
         cursor: pointer;
     }
 
