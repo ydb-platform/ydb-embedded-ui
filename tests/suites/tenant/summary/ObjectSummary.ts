@@ -16,9 +16,9 @@ export class ObjectSummary {
     private primaryKeys: Locator;
 
     constructor(page: Page) {
-        this.tree = page.locator('.object-summary__tree');
+        this.tree = page.locator('.ydb-object-summary__tree');
         this.treeRows = page.locator('.ydb-tree-view');
-        this.tabs = page.locator('.object-summary__tabs');
+        this.tabs = page.locator('.ydb-object-summary__tabs');
         this.schemaViewer = page.locator('.schema-viewer');
         this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
     }
@@ -66,7 +66,7 @@ export class ObjectSummary {
     }
 
     async clickTab(tabName: ObjectSummaryTab): Promise<void> {
-        const tab = this.tabs.locator(`.object-summary__tab:has-text("${tabName}")`);
+        const tab = this.tabs.locator(`.ydb-object-summary__tab:has-text("${tabName}")`);
         await tab.click();
     }
 
