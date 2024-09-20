@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
+import {TableColumnSetup} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
@@ -33,13 +34,12 @@ import {
 } from '../../utils/hooks';
 import {
     NodesUptimeFilterValues,
-    isSortableNodesProperty,
     isUnavailableNode,
     nodesUptimeFilterValuesSchema,
 } from '../../utils/nodes';
 
-import {getNodesColumns} from './columns/columns';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
+import {useNodesSelectedColumns} from './columns/hooks';
 import i18n from './i18n';
 
 import './Nodes.scss';
@@ -64,6 +64,11 @@ export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) =
 
     const problemFilter = useTypedSelector(selectProblemFilter);
     const [autoRefreshInterval] = useAutoRefreshInterval();
+
+    const {columnsToShow, columnsToSelect, setColumns} = useNodesSelectedColumns({
+        getNodeRef: additionalNodesProps.getNodeRef,
+        database,
+    });
 
     const {
         currentData: data,
@@ -114,20 +119,18 @@ export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) =
                     label={'Nodes'}
                     loading={isLoading}
                 />
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
+                    sortable={false}
+                />
             </React.Fragment>
         );
     };
 
     const renderTable = () => {
-        const rawColumns = getNodesColumns({
-            getNodeRef: additionalNodesProps.getNodeRef,
-            database,
-        });
-
-        const columns = rawColumns.map((column) => {
-            return {...column, sortable: isSortableNodesProperty(column.name)};
-        });
-
         if (nodes.length === 0) {
             if (
                 problemFilter !== ProblemFilterValues.ALL ||
@@ -141,7 +144,7 @@ export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) =
             <ResizeableDataTable
                 columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
                 data={nodes || []}
-                columns={columns}
+                columns={columnsToShow}
                 settings={DEFAULT_TABLE_SETTINGS}
                 sortOrder={sort}
                 onSort={handleSort}
