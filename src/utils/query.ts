@@ -366,11 +366,11 @@ export const querySettingsRestoreSchema = z
     .object({
         timeout: z.preprocess(
             (val) => (val === '' ? undefined : val),
-            z.coerce.number().positive().catch(DEFAULT_QUERY_SETTINGS.timeout),
+            z.coerce.number().positive().optional().catch(DEFAULT_QUERY_SETTINGS.timeout),
         ),
         limitRows: z.preprocess(
             (val) => (val === '' ? undefined : val),
-            z.coerce.number().gt(0).lte(10_000).catch(DEFAULT_QUERY_SETTINGS.limitRows),
+            z.coerce.number().gt(0).lte(10_000).optional().catch(DEFAULT_QUERY_SETTINGS.limitRows),
         ),
         queryMode: queryModeSchema.catch(DEFAULT_QUERY_SETTINGS.queryMode),
         transactionMode: transactionModeSchema.catch(DEFAULT_QUERY_SETTINGS.transactionMode),
