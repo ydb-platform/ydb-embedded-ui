@@ -11,14 +11,10 @@ import {
 } from './constants';
 import type {GetNodesColumnsProps} from './types';
 
-export function useNodesColumns(params: GetNodesColumnsProps) {
-    return React.useMemo(() => {
+export function useNodesSelectedColumns(params: GetNodesColumnsProps) {
+    const columns = React.useMemo(() => {
         return getNodesColumns(params);
     }, [params]);
-}
-
-export function useNodesSelectedColumns(params: GetNodesColumnsProps) {
-    const columns = useNodesColumns(params);
 
     return useSelectedColumns(
         columns,
