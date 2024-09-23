@@ -95,7 +95,7 @@ export const topQueriesApi = api.injectEndpoints({
             ) => {
                 try {
                     const filterConditions = filters?.text ? `Query ILIKE '%${filters.text}%'` : '';
-                    const queryText = `SELECT * from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'} limit 10`;
+                    const queryText = `SELECT * from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'} ORDER BY SessionStartAt limit 100`;
 
                     const response = await window.api.sendQuery(
                         {
