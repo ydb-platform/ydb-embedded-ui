@@ -42,7 +42,7 @@ body,
     --ydb-color-status-grey: var(--g-color-base-neutral-heavy);
     --ydb-color-status-green: var(--g-color-base-positive-heavy);
     --ydb-color-status-yellow: var(--g-color-base-warning-heavy);
-    --ydb-color-status-orange: #ff922e;
+    --ydb-color-status-orange: var(--g-color-private-orange-500-solid);
     --ydb-color-status-red: var(--g-color-base-danger-heavy);
     --ydb-color-status-blue: var(--g-color-base-info-heavy);
     --ydb-color-status-black: var(--g-color-base-misc-heavy);
