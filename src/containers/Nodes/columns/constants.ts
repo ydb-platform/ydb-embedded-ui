@@ -3,6 +3,7 @@ import type {ValueOf} from '../../../types/common';
 import i18n from './i18n';
 
 export const NODES_COLUMNS_WIDTH_LS_KEY = 'nodesTableColumnsWidth';
+export const NODES_TABLE_SELECTED_COLUMNS_LS_KEY = 'nodesTableSelectedColumns';
 
 export const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
@@ -22,6 +23,21 @@ export const NODES_COLUMNS_IDS = {
 } as const;
 
 type NodesColumnId = ValueOf<typeof NODES_COLUMNS_IDS>;
+
+export const DEFAULT_NODES_COLUMNS: NodesColumnId[] = [
+    'NodeId',
+    'Host',
+    'DC',
+    'Rack',
+    'Version',
+    'Uptime',
+    'Memory',
+    'CPU',
+    'LoadAverage',
+    'Tablets',
+];
+
+export const REQUIRED_NODES_COLUMNS: NodesColumnId[] = ['NodeId'];
 
 // This code is running when module is initialized and correct language may not be set yet
 // get functions guarantee that i18n fields will be inited on render with current render language

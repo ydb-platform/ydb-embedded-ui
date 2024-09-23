@@ -12,6 +12,7 @@ import {getLoadSeverityForNode} from '../../../store/reducers/nodes/utils';
 import type {GetNodeRefFunc} from '../../../types/additionalProps';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
+import {isSortableNodesProperty} from '../../../utils/nodes';
 
 import {NODES_COLUMNS_IDS, NODES_COLUMNS_TITLES} from './constants';
 import type {GetNodesColumnsProps, NodesColumn} from './types';
@@ -213,7 +214,7 @@ const sessionsColumn: NodesColumn = {
 };
 
 export function getNodesColumns({database, getNodeRef}: GetNodesColumnsProps): NodesColumn[] {
-    return [
+    const columns = [
         nodeIdColumn,
         getHostColumn(getNodeRef, database),
         dataCenterColumn,
@@ -225,6 +226,10 @@ export function getNodesColumns({database, getNodeRef}: GetNodesColumnsProps): N
         loadAverageColumn,
         getTabletsColumn(database),
     ];
+
+    return columns.map((column) => {
+        return {...column, sortable: isSortableNodesProperty(column.name)};
+    });
 }
 
 export function getTopNodesByLoadColumns(
