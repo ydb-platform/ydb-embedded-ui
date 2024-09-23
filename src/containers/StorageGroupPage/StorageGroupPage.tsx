@@ -36,7 +36,7 @@ export function StorageGroupPage() {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const shouldUseGroupsHandler = useStorageGroupsHandlerAvailable();
     const groupQuery = storageApi.useGetStorageGroupsInfoQuery(
-        valueIsDefined(groupId) ? {groupId, shouldUseGroupsHandler} : skipToken,
+        valueIsDefined(groupId) ? {groupId, shouldUseGroupsHandler, with: 'all'} : skipToken,
         {
             pollingInterval: autoRefreshInterval,
         },
