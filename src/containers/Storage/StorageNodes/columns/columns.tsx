@@ -19,6 +19,7 @@ const getStorageNodesColumns = (
     database?: string,
 ) => {
     const getNodeRef = additionalNodesProps?.getNodeRef;
+    const groupId = additionalNodesProps?.groupId;
 
     const columns: StorageNodesColumn[] = [
         {
@@ -81,7 +82,7 @@ const getStorageNodesColumns = (
 
                             return (
                                 <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                    <PDisk data={pDisk} vDisks={vDisks} />
+                                    <PDisk data={pDisk} vDisks={vDisks} groupId={groupId} />
                                 </div>
                             );
                         })}

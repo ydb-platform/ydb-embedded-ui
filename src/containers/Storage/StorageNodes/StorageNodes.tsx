@@ -18,8 +18,8 @@ interface StorageNodesProps {
     tableSettings: Settings;
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: NodesUptimeFilterValues;
-    onShowAll?: VoidFunction;
     sort?: SortOrder;
+    onShowAll?: VoidFunction;
     handleSort?: HandleSort;
 }
 
@@ -28,9 +28,9 @@ export function StorageNodes({
     columns,
     tableSettings,
     visibleEntities,
-    onShowAll,
     nodesUptimeFilter,
     sort,
+    onShowAll,
     handleSort,
 }: StorageNodesProps) {
     if (

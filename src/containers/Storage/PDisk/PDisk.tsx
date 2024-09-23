@@ -6,11 +6,10 @@ import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import routes, {createHref, getPDiskPagePath} from '../../../routes';
 import {useDiskPagesAvailable} from '../../../store/reducers/capabilities/hooks';
-import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import type {PreparedPDisk} from '../../../utils/disks/types';
+import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {STRUCTURE} from '../../Node/NodePages';
 
 import './PDisk.scss';
@@ -19,12 +18,13 @@ const b = cn('pdisk-storage');
 
 interface PDiskProps {
     data?: PreparedPDisk;
-    vDisks?: TVDiskStateInfo[];
+    vDisks?: PreparedVDisk[];
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
     className?: string;
     progressBarClassName?: string;
+    groupId?: string;
 }
 
 export const PDisk = ({
@@ -35,6 +35,7 @@ export const PDisk = ({
     onHidePopup,
     className,
     progressBarClassName,
+    groupId,
 }: PDiskProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
 
@@ -75,8 +76,11 @@ export const PDisk = ({
                         >
                             <VDiskWithDonorsStack
                                 data={vdisk}
-                                compact={true}
+                                faded={
+                                    groupId ? groupId !== vdisk.VDiskId?.GroupID?.toString() : false
+                                }
                                 stackClassName={b('donors-stack')}
+                                compact
                             />
                         </div>
                     );

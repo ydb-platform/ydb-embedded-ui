@@ -67,7 +67,10 @@ interface StorageProps {
 
 export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
     const {balancer} = useClusterBaseInfo();
-    const additionalNodesProps = useAdditionalNodeProps({balancer});
+    const additionalNodesProps = useAdditionalNodeProps({
+        balancer,
+        groupId: valueIsDefined(groupId) ? groupId.toString() : undefined,
+    });
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();

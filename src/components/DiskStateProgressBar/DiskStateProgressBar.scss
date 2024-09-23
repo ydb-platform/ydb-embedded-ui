@@ -35,6 +35,10 @@
         background-color: unset;
     }
 
+    &#{&}_compact#{&}_faded {
+        opacity: 0.5;
+    }
+
     &_empty {
         color: var(--g-color-text-hint);
         border-style: dashed;

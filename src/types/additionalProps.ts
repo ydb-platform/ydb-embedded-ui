@@ -28,5 +28,6 @@ export type NodeAddress = Pick<TSystemStateInfo, 'Host' | 'Endpoints' | 'NodeId'
 export type GetNodeRefFunc = (node?: NodeAddress) => string | null;
 
 export interface AdditionalNodesProps extends Record<string, unknown> {
+    groupId?: string;
     getNodeRef?: GetNodeRefFunc;
 }

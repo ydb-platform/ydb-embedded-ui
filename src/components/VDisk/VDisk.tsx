@@ -21,6 +21,7 @@ export interface VDiskProps {
     data?: PreparedVDisk;
     nodes?: NodesMap;
     compact?: boolean;
+    faded?: boolean;
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
@@ -31,6 +32,7 @@ export const VDisk = ({
     data = {},
     nodes,
     compact,
+    faded,
     showPopup,
     onShowPopup,
     onHidePopup,
@@ -87,6 +89,7 @@ export const VDisk = ({
                         diskAllocatedPercent={data.AllocatedPercent}
                         severity={data.Severity}
                         compact={compact}
+                        faded={faded}
                         className={progressBarClassName}
                     />
                 </InternalLink>
