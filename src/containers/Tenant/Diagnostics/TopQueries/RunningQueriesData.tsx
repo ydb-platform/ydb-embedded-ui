@@ -6,7 +6,7 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {topQueriesApi} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
-import type {CellValue, KeyValueRow} from '../../../../types/api/query';
+import type {KeyValueRow} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
@@ -22,26 +22,20 @@ interface Props {
 
 const RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY = 'runningQueriesColumnsWidth';
 
-const parseDate = (date: CellValue) => (date ? new Date(date.toString()).getTime() : '');
-
 const columns: Column<KeyValueRow>[] = [
     {
         name: 'UserSID',
         header: i18n('col_user'),
         render: ({row}) => <div className={b('user-sid')}>{row.UserSID || '–'}</div>,
-        sortAccessor: (row) => String(row.UserSID),
         sortable: true,
     },
     {
         name: 'QueryStartAt',
         header: i18n('col_start-time'),
-        render: ({row}) => formatDateTime(parseDate(row.QueryStartAt)),
+        render: ({row}) => formatDateTime(new Date(row.QueryStartAt as string).getTime()),
         sortable: true,
         resizeable: false,
         defaultOrder: DataTable.DESCENDING,
-        sortAccessor: (row) => {
-            return parseDate(row.QueryStartAt);
-        },
     },
     {
         name: 'Query',
@@ -57,7 +51,7 @@ const columns: Column<KeyValueRow>[] = [
     {
         name: 'ApplicationName',
         header: i18n('col_app'),
-        render: ({row}) => row.ApplicationName || '-',
+        render: ({row}) => <div className={b('user-sid')}>{row.ApplicationName || '–'}</div>,
         sortable: true,
     },
 ];
@@ -78,7 +72,7 @@ export const RunningQueriesData = ({database}: Props) => {
     );
 
     return (
-        <TableWithControlsLayout.Table loading={isFetching}>
+        <TableWithControlsLayout.Table loading={isFetching && data === undefined}>
             {error ? (
                 <ResponseError error={error} />
             ) : (

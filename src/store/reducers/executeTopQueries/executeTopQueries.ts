@@ -87,6 +87,7 @@ export const topQueriesApi = api.injectEndpoints({
 
                 return false;
             },
+            providesTags: ['All'],
         }),
         getRunningQueries: build.query({
             queryFn: async (
@@ -118,6 +119,7 @@ export const topQueriesApi = api.injectEndpoints({
             forceRefetch() {
                 return true;
             },
+            providesTags: ['All'],
         }),
     }),
     overrideExisting: 'throw',
