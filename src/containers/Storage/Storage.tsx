@@ -122,7 +122,7 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
             database,
             with: visibleEntities,
             node_id: nodeId,
-            // node_id and group_id params doesn't work together
+            // node_id and group_id params don't work together
             group_id: valueIsDefined(nodeId) ? undefined : groupId,
         },
         {

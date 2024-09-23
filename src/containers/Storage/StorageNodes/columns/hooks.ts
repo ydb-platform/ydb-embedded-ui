@@ -13,17 +13,14 @@ import {
 } from './constants';
 import type {GetStorageNodesColumnsParams} from './types';
 
-export const useGetStorageNodesColumns = (params: GetStorageNodesColumnsParams) => {
-    return React.useMemo(() => {
-        return getPreparedStorageNodesColumns(params);
-    }, [params]);
-};
-
 export function useStorageNodesSelectedColumns({
     visibleEntities,
-    ...restParams
+    database,
+    additionalNodesProps,
 }: GetStorageNodesColumnsParams) {
-    const columns = useGetStorageNodesColumns(restParams);
+    const columns = React.useMemo(() => {
+        return getPreparedStorageNodesColumns({database, additionalNodesProps});
+    }, [database, additionalNodesProps]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {
