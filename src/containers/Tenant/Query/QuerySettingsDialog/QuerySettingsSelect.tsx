@@ -23,6 +23,7 @@ type SelectType = QueryMode | TransactionMode | StatisticsMode | TracingLevel;
 type QuerySettingSelectOption<T> = SelectOption<T> & {isDefault?: boolean};
 
 interface QuerySettingsSelectProps<T extends SelectType> {
+    id?: string;
     setting: T;
     settingOptions: QuerySettingSelectOption<T>[];
     onUpdateSetting: (mode: T) => void;
@@ -32,6 +33,7 @@ export function QuerySettingsSelect<T extends SelectType>(props: QuerySettingsSe
     return (
         <div className={b('selector')}>
             <Select<T>
+                id={props.id}
                 options={props.settingOptions}
                 value={[props.setting]}
                 onUpdate={(value) => {

@@ -8,6 +8,9 @@ export default function getChangedQueryExecutionSettings(
     const defaultMap = new Map(Object.entries(defaultSettings));
 
     return Array.from(currentMap.keys()).filter(
-        (key) => currentMap.get(key) !== defaultMap.get(key),
+        (key) =>
+            currentMap.has(key) &&
+            currentMap.get(key) !== undefined &&
+            currentMap.get(key) !== defaultMap.get(key),
     ) as (keyof QuerySettings)[];
 }

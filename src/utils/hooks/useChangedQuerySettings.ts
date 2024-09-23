@@ -1,10 +1,7 @@
 import getChangedQueryExecutionSettings from '../../containers/Tenant/Query/QueryEditorControls/utils/getChangedQueryExecutionSettings';
 import getChangedQueryExecutionSettingsDescription from '../../containers/Tenant/Query/QueryEditorControls/utils/getChangedQueryExecutionSettingsDescription';
-import {
-    DEFAULT_QUERY_SETTINGS,
-    QUERY_SETTINGS_BANNER_LAST_CLOSED_KEY,
-    WEEK_IN_SECONDS,
-} from '../constants';
+import {QUERY_SETTINGS_BANNER_LAST_CLOSED_KEY, WEEK_IN_SECONDS} from '../constants';
+import {DEFAULT_QUERY_SETTINGS} from '../query';
 
 import {useLastQueryExecutionSettings} from './useLastQueryExecutionSettings';
 import {useQueryExecutionSettings} from './useQueryExecutionSettings';

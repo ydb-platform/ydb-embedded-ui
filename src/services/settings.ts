@@ -4,7 +4,6 @@ import {
     AUTOCOMPLETE_ON_ENTER,
     AUTO_REFRESH_INTERVAL,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
-    DEFAULT_QUERY_SETTINGS,
     ENABLE_AUTOCOMPLETE,
     INVERTED_DISKS_KEY,
     IS_HOTKEYS_HELP_HIDDEN_KEY,
@@ -23,7 +22,7 @@ import {
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_PAGINATED_TABLES_KEY,
 } from '../utils/constants';
-import {QUERY_ACTIONS} from '../utils/query';
+import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS} from '../utils/query';
 import {parseJson} from '../utils/utils';
 
 export type SettingsObject = Record<string, unknown>;
