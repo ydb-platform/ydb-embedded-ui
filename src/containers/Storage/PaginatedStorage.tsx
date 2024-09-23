@@ -101,7 +101,7 @@ export const PaginatedStorage = ({
             <StorageControls
                 searchValue={searchValue}
                 handleSearchValueChange={handleTextFilterChange}
-                withTypeSelector={!nodeId}
+                withTypeSelector
                 storageType={storageType}
                 handleStorageTypeChange={handleStorageTypeChange}
                 visibleEntities={visibleEntities}
