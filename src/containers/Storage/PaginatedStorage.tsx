@@ -3,11 +3,12 @@ import {StringParam, useQueryParams} from 'use-query-params';
 import {AccessDenied} from '../../components/Errors/403/AccessDenied';
 import {ResponseError} from '../../components/Errors/ResponseError/ResponseError';
 import type {RenderControls, RenderErrorMessage} from '../../components/PaginatedTable';
+import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
 import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
-import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
+import {useAdditionalNodeProps} from '../AppWithClusters/useClusterData';
 
 import {StorageControls} from './StorageControls/StorageControls';
 import {PaginatedStorageGroups} from './StorageGroups/PaginatedStorageGroups';
@@ -19,15 +20,12 @@ interface PaginatedStorageProps {
     database?: string;
     nodeId?: string;
     parentContainer?: Element | null;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const PaginatedStorage = ({
-    database,
-    nodeId,
-    parentContainer,
-    additionalNodesProps,
-}: PaginatedStorageProps) => {
+export const PaginatedStorage = ({database, nodeId, parentContainer}: PaginatedStorageProps) => {
+    const {balancer} = useClusterBaseInfo();
+    const additionalNodesProps = useAdditionalNodeProps({balancer});
+
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
         visible: StringParam,

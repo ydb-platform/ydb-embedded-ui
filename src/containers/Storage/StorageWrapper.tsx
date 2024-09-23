@@ -1,4 +1,3 @@
-import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {USE_PAGINATED_TABLES_KEY} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
 
@@ -9,7 +8,6 @@ interface StorageWrapperProps {
     database?: string;
     nodeId?: string;
     parentContainer?: Element | null;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
 export const StorageWrapper = ({parentContainer, ...props}: StorageWrapperProps) => {

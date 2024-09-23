@@ -10,6 +10,7 @@ import {
     useCapabilitiesLoaded,
     useStorageGroupsHandlerAvailable,
 } from '../../store/reducers/capabilities/hooks';
+import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import {VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
 import {
@@ -24,10 +25,10 @@ import type {
     StorageType,
     VisibleEntities,
 } from '../../store/reducers/storage/types';
-import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTableSort} from '../../utils/hooks';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
+import {useAdditionalNodeProps} from '../AppWithClusters/useClusterData';
 
 import {StorageControls} from './StorageControls/StorageControls';
 import {StorageGroups} from './StorageGroups/StorageGroups';
@@ -57,12 +58,14 @@ const UsageFilterParam = withDefault(
 );
 
 interface StorageProps {
-    additionalNodesProps?: AdditionalNodesProps;
     database?: string;
-    nodeId?: string;
+    nodeId?: string | number;
 }
 
-export const Storage = ({additionalNodesProps, database, nodeId}: StorageProps) => {
+export const Storage = ({database, nodeId}: StorageProps) => {
+    const {balancer} = useClusterBaseInfo();
+    const additionalNodesProps = useAdditionalNodeProps({balancer});
+
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
