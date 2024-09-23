@@ -180,16 +180,31 @@ export function ObjectSummary({
 
         const title = <EntityTitle data={PathDescription} />;
 
-        const getDatabaseOverview = () => [
-            {
-                label: i18n('summary.paths'),
-                value: PathDescription?.DomainDescription?.PathsInside,
-            },
-            {
-                label: i18n('summary.shards'),
-                value: PathDescription?.DomainDescription?.ShardsInside,
-            },
-        ];
+        const getDatabaseOverview = () => {
+            const {PathsInside, ShardsInside, PathsLimit, ShardsLimit} =
+                PathDescription?.DomainDescription ?? {};
+            let paths = formatNumber(PathsInside);
+            let shards = formatNumber(ShardsInside);
+
+            if (paths && PathsLimit) {
+                paths = `${paths} / ${formatNumber(PathsLimit)}`;
+            }
+
+            if (shards && ShardsLimit) {
+                shards = `${shards} / ${formatNumber(ShardsLimit)}`;
+            }
+
+            return [
+                {
+                    label: i18n('summary.paths'),
+                    value: paths,
+                },
+                {
+                    label: i18n('summary.shards'),
+                    value: shards,
+                },
+            ];
+        };
 
         const getPathTypeOverview: Record<EPathType, (() => InfoViewerItem[]) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,

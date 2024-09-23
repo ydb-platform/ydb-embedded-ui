@@ -1,3 +1,5 @@
+import {z} from 'zod';
+
 import {YQLType} from '../types';
 import type {
     AnyExecuteResponse,
@@ -331,3 +333,48 @@ export const parseQueryErrorToString = (error: unknown) => {
 
     return parsedError?.error?.message;
 };
+
+export const DEFAULT_QUERY_SETTINGS = {
+    queryMode: QUERY_MODES.query,
+    transactionMode: TRANSACTION_MODES.implicit,
+    timeout: 60,
+    limitRows: 10000,
+    statisticsMode: STATISTICS_MODES.none,
+    tracingLevel: TRACING_LEVELS.detailed,
+};
+
+export const queryModeSchema = z.nativeEnum(QUERY_MODES);
+export const transactionModeSchema = z.nativeEnum(TRANSACTION_MODES);
+export const statisticsModeSchema = z.nativeEnum(STATISTICS_MODES);
+export const tracingLevelSchema = z.nativeEnum(TRACING_LEVELS);
+export const querySettingsValidationSchema = z.object({
+    timeout: z.preprocess(
+        (val) => (val === '' ? undefined : val),
+        z.coerce.number().positive().or(z.undefined()),
+    ),
+    limitRows: z.preprocess(
+        (val) => (val === '' ? undefined : val),
+        z.coerce.number().gt(0).lte(10_000).or(z.undefined()),
+    ),
+    queryMode: queryModeSchema,
+    transactionMode: transactionModeSchema,
+    statisticsMode: statisticsModeSchema,
+    tracingLevel: tracingLevelSchema,
+});
+
+export const querySettingsRestoreSchema = z
+    .object({
+        timeout: z.preprocess(
+            (val) => (val === '' ? undefined : val),
+            z.coerce.number().positive().optional().catch(DEFAULT_QUERY_SETTINGS.timeout),
+        ),
+        limitRows: z.preprocess(
+            (val) => (val === '' ? undefined : val),
+            z.coerce.number().gt(0).lte(10_000).optional().catch(DEFAULT_QUERY_SETTINGS.limitRows),
+        ),
+        queryMode: queryModeSchema.catch(DEFAULT_QUERY_SETTINGS.queryMode),
+        transactionMode: transactionModeSchema.catch(DEFAULT_QUERY_SETTINGS.transactionMode),
+        statisticsMode: statisticsModeSchema.catch(DEFAULT_QUERY_SETTINGS.statisticsMode),
+        tracingLevel: tracingLevelSchema.catch(DEFAULT_QUERY_SETTINGS.tracingLevel),
+    })
+    .catch(DEFAULT_QUERY_SETTINGS);

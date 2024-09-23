@@ -24,6 +24,7 @@
     "@gravity-ui/table": "^0.5.0",
     "@gravity-ui/uikit": "^6.20.1",
     "@gravity-ui/websql-autocomplete": "^9.1.0",
+    "@hookform/resolvers": "^3.9.0",
     "@reduxjs/toolkit": "^2.2.3",
     "@tanstack/react-table": "^8.19.3",
     "axios": "^1.7.3",

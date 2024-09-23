@@ -148,4 +148,7 @@ export const QUERY_SETTINGS_FIELD_SETTINGS = {
     timeout: {
         title: formI18n('form.timeout'),
     },
+    limitRows: {
+        title: formI18n('form.limit-rows'),
+    },
 } as const;

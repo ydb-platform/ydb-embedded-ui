@@ -5,9 +5,12 @@
   "form.transaction-mode": "Уровень изоляции",
   "form.statistics-mode": "Режим сбора статистики",
   "form.tracing-level": "Tracing level",
+  "form.limit-rows": "Лимит строк",
   "button-done": "Готово",
   "button-cancel": "Отменить",
   "form.timeout.seconds": "сек",
+  "form.validation.timeout": "Таймаут должен быть положительным",
+  "form.validation.limitRows": "Лимит строк должен быть между 1 и 100000",
   "description.default": " (default)",
   "docs": "Документация"
 }

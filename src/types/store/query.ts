@@ -1,3 +1,5 @@
+import type {z} from 'zod';
+
 import type {
     QUERY_ACTIONS,
     QUERY_MODES,
@@ -5,6 +7,7 @@ import type {
     STATISTICS_MODES,
     TRACING_LEVELS,
     TRANSACTION_MODES,
+    querySettingsValidationSchema,
 } from '../../utils/query';
 import type {IResponseError, NetworkError} from '../api/error';
 import type {
@@ -39,13 +42,7 @@ export interface QueryRequestParams {
     query: string;
 }
 
-export interface QuerySettings {
-    queryMode: QueryMode;
-    transactionMode: TransactionMode;
-    timeout?: string;
-    statisticsMode?: StatisticsMode;
-    tracingLevel?: TracingLevel;
-}
+export type QuerySettings = z.infer<typeof querySettingsValidationSchema>;
 
 export type QueryErrorResponse = IResponseError<QueryErrorResponseData>;
 export type QueryError = NetworkError | QueryErrorResponse;
