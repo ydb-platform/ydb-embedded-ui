@@ -204,7 +204,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             tablets = false,
             database,
             tenant,
-            fieldsRequired,
+            fieldsRequired = 'all',
+            filter,
             ...params
         }: NodesRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
@@ -218,6 +219,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {
                 type,
                 tablets,
+                // Do not send empty string
+                filter: filter || undefined,
                 // TODO: remove after remove tenant param
                 database: database || tenant,
                 tenant: tenant || database,
@@ -228,7 +231,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getStorageInfo(
-        {tenant, database, nodeId, groupId, pDiskId, ...params}: StorageRequestParams,
+        {tenant, database, nodeId, groupId, pDiskId, filter, ...params}: StorageRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TStorageInfo>(
@@ -239,13 +242,15 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 node_id: nodeId,
                 group_id: groupId,
                 pdisk_id: pDiskId,
+                // Do not send empty string
+                filter: filter || undefined,
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
     getStorageGroups(
-        {nodeId, pDiskId, groupId, fieldsRequired = 'all', ...params}: GroupsRequestParams,
+        {nodeId, pDiskId, groupId, fieldsRequired = 'all', filter, ...params}: GroupsRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         const preparedNodeId = Array.isArray(nodeId)
@@ -271,6 +276,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 pdisk_id: preparedPDiskId,
                 group_id: preparedGroupId,
                 fields_required: preparedFieldsRequired,
+                // Do not send empty string
+                filter: filter || undefined,
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},
