@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ArrowsOppositeToDots} from '@gravity-ui/icons';
-import {Icon, TableColumnSetup} from '@gravity-ui/uikit';
+import {Icon} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
@@ -11,29 +11,19 @@ import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle'
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
-import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
-import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {api} from '../../store/reducers/api';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
-import {
-    useCapabilitiesLoaded,
-    useStorageGroupsHandlerAvailable,
-} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {storageApi} from '../../store/reducers/storage/storage';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../Storage/StorageGroups/columns/constants';
-import {useStorageGroupsSelectedColumns} from '../Storage/StorageGroups/columns/hooks';
+import {Storage} from '../Storage/Storage';
 
 import {vDiskPageKeyset} from './i18n';
-import {prepareVDiskGroupResponse} from './utils';
 
 import './VDiskPage.scss';
 
@@ -183,9 +173,14 @@ export function VDiskPage() {
         return <VDiskInfo data={vDiskData} className={vDiskPageCn('info')} />;
     };
 
-    const renderGroupInfo = () => {
-        if (valueIsDefined(GroupID)) {
-            return <VDiskGroup groupId={GroupID} />;
+    const renderStorageInfo = () => {
+        if (valueIsDefined(GroupID) && valueIsDefined(nodeId)) {
+            return (
+                <React.Fragment>
+                    <div className={vDiskPageCn('storage-title')}>{vDiskPageKeyset('storage')}</div>
+                    <Storage groupId={GroupID} nodeId={nodeId} />
+                </React.Fragment>
+            );
         }
 
         return null;
@@ -200,7 +195,7 @@ export function VDiskPage() {
             <React.Fragment>
                 {error ? <ResponseError error={error} /> : null}
                 {renderInfo()}
-                {renderGroupInfo()}
+                {renderStorageInfo()}
             </React.Fragment>
         );
     };
@@ -213,56 +208,5 @@ export function VDiskPage() {
             {renderControls()}
             {renderContent()}
         </div>
-    );
-}
-
-export function VDiskGroup({groupId}: {groupId: string | number}) {
-    const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns();
-
-    const capabilitiesLoaded = useCapabilitiesLoaded();
-    const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
-    const [autoRefreshInterval] = useAutoRefreshInterval();
-
-    const {currentData} = storageApi.useGetStorageGroupsInfoQuery(
-        {groupId, shouldUseGroupsHandler: groupsHandlerAvailable},
-        {
-            pollingInterval: autoRefreshInterval,
-            skip: !capabilitiesLoaded,
-        },
-    );
-
-    const preparedGroups = React.useMemo(() => {
-        const group = prepareVDiskGroupResponse(currentData, groupId);
-
-        return group ? [group] : undefined;
-    }, [currentData, groupId]);
-
-    if (!preparedGroups) {
-        return null;
-    }
-
-    return (
-        <React.Fragment>
-            <div className={vDiskPageCn('group-title')}>{vDiskPageKeyset('group')}</div>
-            <TableWithControlsLayout>
-                <TableWithControlsLayout.Controls>
-                    <TableColumnSetup
-                        popupWidth={200}
-                        items={columnsToSelect}
-                        showStatus
-                        onUpdate={setColumns}
-                        sortable={false}
-                    />
-                </TableWithControlsLayout.Controls>
-                <TableWithControlsLayout.Table>
-                    <ResizeableDataTable
-                        columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-                        data={preparedGroups}
-                        columns={columnsToShow}
-                        settings={DEFAULT_TABLE_SETTINGS}
-                    />
-                </TableWithControlsLayout.Table>
-            </TableWithControlsLayout>
-        </React.Fragment>
     );
 }

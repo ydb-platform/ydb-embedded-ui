@@ -60,9 +60,11 @@ const UsageFilterParam = withDefault(
 interface StorageProps {
     database?: string;
     nodeId?: string | number;
+    groupId?: string | number;
+    pDiskId?: string | number;
 }
 
-export const Storage = ({database, nodeId}: StorageProps) => {
+export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
     const {balancer} = useClusterBaseInfo();
     const additionalNodesProps = useAdditionalNodeProps({balancer});
 
@@ -115,14 +117,21 @@ export const Storage = ({database, nodeId}: StorageProps) => {
     } = useStorageGroupsSelectedColumns(visibleEntities);
 
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
-        {database, with: visibleEntities, node_id: nodeId},
+        {database, with: visibleEntities, node_id: nodeId, group_id: groupId},
         {
             skip: !isNodes,
             pollingInterval: autoRefreshInterval,
         },
     );
     const groupsQuery = storageApi.useGetStorageGroupsInfoQuery(
-        {database, with: visibleEntities, nodeId, shouldUseGroupsHandler: groupsHandlerAvailable},
+        {
+            database,
+            with: visibleEntities,
+            nodeId,
+            groupId,
+            pDiskId,
+            shouldUseGroupsHandler: groupsHandlerAvailable,
+        },
         {
             skip: !isGroups || !capabilitiesLoaded,
             pollingInterval: autoRefreshInterval,

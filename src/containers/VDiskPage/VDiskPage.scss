@@ -12,7 +12,7 @@
     &__title,
     &__controls,
     &__info,
-    &__group-title {
+    &__storage-title {
         position: sticky;
         left: 0;
 
@@ -29,7 +29,7 @@
         gap: var(--g-spacing-2);
     }
 
-    &__group-title {
+    &__storage-title {
         margin-bottom: 0;
         @include header-1-typography();
     }

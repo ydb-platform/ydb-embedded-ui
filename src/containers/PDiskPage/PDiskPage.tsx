@@ -24,10 +24,10 @@ import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {getPDiskId, getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {Storage} from '../Storage/Storage';
 
 import {DecommissionButton} from './DecommissionButton/DecommissionButton';
 import {DecommissionLabel} from './DecommissionLabel/DecommissionLabel';
-import {PDiskGroups} from './PDiskGroups/PDiskGroups';
 import {PDiskSpaceDistribution} from './PDiskSpaceDistribution/PDiskSpaceDistribution';
 import {pDiskPageKeyset} from './i18n';
 
@@ -37,7 +37,7 @@ const pdiskPageCn = cn('ydb-pdisk-page');
 
 const PDISK_TABS_IDS = {
     diskDistribution: 'diskDistribution',
-    groups: 'groups',
+    storage: 'storage',
 } as const;
 
 const PDISK_PAGE_TABS = [
@@ -48,9 +48,9 @@ const PDISK_PAGE_TABS = [
         },
     },
     {
-        id: PDISK_TABS_IDS.groups,
+        id: PDISK_TABS_IDS.storage,
         get title() {
-            return pDiskPageKeyset('groups');
+            return pDiskPageKeyset('storage');
         },
     },
 ];
@@ -237,10 +237,8 @@ export function PDiskPage() {
                     </div>
                 ) : null;
             }
-            case 'groups': {
-                return pDiskParamsDefined ? (
-                    <PDiskGroups nodeId={nodeId} pDiskId={pDiskId} />
-                ) : null;
+            case 'storage': {
+                return pDiskParamsDefined ? <Storage nodeId={nodeId} pDiskId={pDiskId} /> : null;
             }
             default:
                 return null;

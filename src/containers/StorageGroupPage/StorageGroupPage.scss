@@ -11,7 +11,7 @@
     &__meta,
     &__title,
     &__info,
-    &__tabs {
+    &__storage-title {
         position: sticky;
         left: 0;
 
@@ -26,15 +26,12 @@
         margin-bottom: 60px;
     }
 
-    &__tabs {
+    &__storage-title {
         margin-bottom: 0;
+        @include header-1-typography();
     }
 
     &__info {
         margin-top: var(--g-spacing-10);
-    }
-
-    &__tabs {
-        @include tabs-wrapper-styles();
     }
 }
