@@ -3,7 +3,7 @@
   "pdisk": "PDisk",
   "node": "Node",
 
-  "groups": "Groups",
+  "storage": "Storage",
   "disk-distribution": "Disk distribution",
 
   "empty-slot": "Empty slot",

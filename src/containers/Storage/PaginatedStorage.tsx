@@ -3,31 +3,29 @@ import {StringParam, useQueryParams} from 'use-query-params';
 import {AccessDenied} from '../../components/Errors/403/AccessDenied';
 import {ResponseError} from '../../components/Errors/ResponseError/ResponseError';
 import type {RenderControls, RenderErrorMessage} from '../../components/PaginatedTable';
-import {STORAGE_TYPES, VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
+import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
+import {VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
 import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
-import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
+import {useAdditionalNodeProps} from '../AppWithClusters/useClusterData';
 
 import {StorageControls} from './StorageControls/StorageControls';
 import {PaginatedStorageGroups} from './StorageGroups/PaginatedStorageGroups';
+import {useStorageGroupsSelectedColumns} from './StorageGroups/columns/hooks';
 import {PaginatedStorageNodes} from './StorageNodes/PaginatedStorageNodes';
-
-import './Storage.scss';
+import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
 
 interface PaginatedStorageProps {
     database?: string;
     nodeId?: string;
     parentContainer?: Element | null;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const PaginatedStorage = ({
-    database,
-    nodeId,
-    parentContainer,
-    additionalNodesProps,
-}: PaginatedStorageProps) => {
+export const PaginatedStorage = ({database, nodeId, parentContainer}: PaginatedStorageProps) => {
+    const {balancer} = useClusterBaseInfo();
+    const additionalNodesProps = useAdditionalNodeProps({balancer});
+
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
         visible: StringParam,
@@ -35,9 +33,28 @@ export const PaginatedStorage = ({
         uptimeFilter: StringParam,
     });
     const storageType = storageTypeSchema.parse(queryParams.type);
+    const isGroups = storageType === 'groups';
+    const isNodes = storageType === 'nodes';
+
     const visibleEntities = visibleEntitiesSchema.parse(queryParams.visible);
     const searchValue = queryParams.search ?? '';
     const nodesUptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
+
+    const {
+        columnsToShow: storageNodesColumnsToShow,
+        columnsToSelect: storageNodesColumnsToSelect,
+        setColumns: setStorageNodesSelectedColumns,
+    } = useStorageNodesSelectedColumns({
+        additionalNodesProps,
+        visibleEntities,
+        database,
+    });
+
+    const {
+        columnsToShow: storageGroupsColumnsToShow,
+        columnsToSelect: storageGroupsColumnsToSelect,
+        setColumns: setStorageGroupsSelectedColumns,
+    } = useStorageGroupsSelectedColumns(visibleEntities);
 
     const handleTextFilterChange = (value: string) => {
         setQueryParams({search: value || undefined}, 'replaceIn');
@@ -70,11 +87,19 @@ export const PaginatedStorage = ({
     };
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
+        const columnsToSelect = isGroups
+            ? storageGroupsColumnsToSelect
+            : storageNodesColumnsToSelect;
+
+        const handleSelectedColumnsUpdate = isGroups
+            ? setStorageGroupsSelectedColumns
+            : setStorageNodesSelectedColumns;
+
         return (
             <StorageControls
                 searchValue={searchValue}
                 handleSearchValueChange={handleTextFilterChange}
-                withTypeSelector={!nodeId}
+                withTypeSelector
                 storageType={storageType}
                 handleStorageTypeChange={handleStorageTypeChange}
                 visibleEntities={visibleEntities}
@@ -85,6 +110,8 @@ export const PaginatedStorage = ({
                 entitiesCountCurrent={foundEntities}
                 entitiesCountTotal={totalEntities}
                 entitiesLoading={!inited}
+                columnsToSelect={columnsToSelect}
+                handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
             />
         );
     };
@@ -97,18 +124,18 @@ export const PaginatedStorage = ({
         return <ResponseError error={error} />;
     };
 
-    if (storageType === STORAGE_TYPES.nodes) {
+    if (isNodes) {
         return (
             <PaginatedStorageNodes
                 searchValue={searchValue}
                 visibleEntities={visibleEntities}
                 nodesUptimeFilter={nodesUptimeFilter}
                 database={database}
-                additionalNodesProps={additionalNodesProps}
                 onShowAll={handleShowAllNodes}
                 parentContainer={parentContainer}
                 renderControls={renderControls}
                 renderErrorMessage={renderErrorMessage}
+                columns={storageNodesColumnsToShow}
             />
         );
     }
@@ -123,6 +150,7 @@ export const PaginatedStorage = ({
             parentContainer={parentContainer}
             renderControls={renderControls}
             renderErrorMessage={renderErrorMessage}
+            columns={storageGroupsColumnsToShow}
         />
     );
 };

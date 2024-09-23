@@ -4,25 +4,23 @@ import type {RenderControls, RenderErrorMessage} from '../../../components/Pagin
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
-import type {AdditionalNodesProps} from '../../../types/additionalProps';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
 import {STORAGE_NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
-import {useGetStorageNodesColumns} from './columns/hooks';
+import type {StorageNodesColumn} from './columns/types';
 import {getStorageNodes} from './getNodes';
 import i18n from './i18n';
 import {getRowUnavailableClassName} from './shared';
 
-import './StorageNodes.scss';
-
 interface PaginatedStorageNodesProps {
+    columns: StorageNodesColumn[];
+
     searchValue: string;
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: NodesUptimeFilterValues;
     database?: string;
 
-    additionalNodesProps?: AdditionalNodesProps;
     onShowAll: VoidFunction;
 
     parentContainer?: Element | null;
@@ -31,11 +29,11 @@ interface PaginatedStorageNodesProps {
 }
 
 export const PaginatedStorageNodes = ({
+    columns,
     searchValue,
     visibleEntities,
     nodesUptimeFilter,
     database,
-    additionalNodesProps,
     onShowAll,
     parentContainer,
     renderControls,
@@ -44,8 +42,6 @@ export const PaginatedStorageNodes = ({
     const tableFilters = React.useMemo(() => {
         return {searchValue, visibleEntities, nodesUptimeFilter, database};
     }, [searchValue, visibleEntities, nodesUptimeFilter, database]);
-
-    const columns = useGetStorageNodesColumns({additionalNodesProps, visibleEntities, database});
 
     const renderEmptyDataMessage = () => {
         if (

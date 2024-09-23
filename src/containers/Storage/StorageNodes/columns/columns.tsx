@@ -1,7 +1,6 @@
 import DataTable from '@gravity-ui/react-data-table';
 
 import {NodeHostWrapper} from '../../../../components/NodeHostWrapper/NodeHostWrapper';
-import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import type {AdditionalNodesProps} from '../../../../types/additionalProps';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
@@ -101,7 +100,6 @@ const getStorageNodesColumns = (
 
 export const getPreparedStorageNodesColumns = ({
     additionalNodesProps,
-    visibleEntities,
     database,
 }: GetStorageNodesColumnsParams) => {
     const rawColumns = getStorageNodesColumns(additionalNodesProps, database);
@@ -110,10 +108,6 @@ export const getPreparedStorageNodesColumns = ({
         ...column,
         sortable: isSortableNodesProperty(column.name),
     }));
-
-    if (visibleEntities !== VISIBLE_ENTITIES.missing) {
-        return sortableColumns.filter((col) => col.name !== STORAGE_NODES_COLUMNS_IDS.Missing);
-    }
 
     return sortableColumns;
 };

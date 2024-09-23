@@ -30,9 +30,6 @@
 
   "settings.invertedDisks.title": "Inverted disks space indicators",
 
-  "settings.useAdvancedStorage.title": "Use advanced storage",
-  "settings.useAdvancedStorage.description": "Display additional data in Storage table",
-
   "settings.usePaginatedTables.title": "Use paginated tables",
   "settings.usePaginatedTables.description": " Use table with data load on scroll for Nodes and Storage tabs. It will increase performance, but could work unstable",
 

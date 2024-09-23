@@ -1,63 +1,36 @@
 import React from 'react';
 
-import {Tabs} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
-import {z} from 'zod';
 
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
-import {InternalLink} from '../../components/InternalLink';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupInfo';
-import {getStorageGroupPath} from '../../routes';
-import {useStorageGroupsHandlerAvailable} from '../../store/reducers/capabilities/hooks';
+import {
+    useCapabilitiesLoaded,
+    useStorageGroupsHandlerAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
-import {NodesUptimeFilterValues} from '../../utils/nodes';
-import {StorageGroups} from '../Storage/StorageGroups/StorageGroups';
-import {StorageNodes} from '../Storage/StorageNodes/StorageNodes';
+import {Storage} from '../Storage/Storage';
 
 import {storageGroupPageKeyset} from './i18n';
 
 import './StorageGroupPage.scss';
 
-const STORAGE_GROUP_PAGE_TABS = [
-    {
-        id: STORAGE_TYPES.groups,
-        get title() {
-            return storageGroupPageKeyset('group');
-        },
-    },
-    {
-        id: STORAGE_TYPES.nodes,
-        get title() {
-            return storageGroupPageKeyset('nodes');
-        },
-    },
-];
-
 const storageGroupPageCn = cn('ydb-storage-group-page');
-
-const storageGroupTabSchema = z.nativeEnum(STORAGE_TYPES).catch(STORAGE_TYPES.groups);
 
 export function StorageGroupPage() {
     const dispatch = useTypedDispatch();
 
-    const [{groupId, activeTab}] = useQueryParams({
-        groupId: StringParam,
-        activeTab: StringParam,
-    });
-
-    const storageGroupTab = storageGroupTabSchema.parse(activeTab);
+    const [{groupId}] = useQueryParams({groupId: StringParam});
 
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('storageGroup', {groupId}));
@@ -65,22 +38,16 @@ export function StorageGroupPage() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const shouldUseGroupsHandler = useStorageGroupsHandlerAvailable();
+    const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupQuery = storageApi.useGetStorageGroupsInfoQuery(
-        valueIsDefined(groupId) ? {groupId, shouldUseGroupsHandler} : skipToken,
+        valueIsDefined(groupId) ? {groupId, shouldUseGroupsHandler, with: 'all'} : skipToken,
         {
             pollingInterval: autoRefreshInterval,
-        },
-    );
-
-    const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
-        groupId && storageGroupTab === STORAGE_TYPES.nodes ? {group_id: groupId} : skipToken,
-        {
-            pollingInterval: autoRefreshInterval,
+            skip: !capabilitiesLoaded,
         },
     );
 
     const storageGroupData = groupQuery.data?.groups?.[0];
-    const nodesData = nodesQuery.data?.nodes;
 
     const loading = groupQuery.isFetching && storageGroupData === undefined;
 
@@ -131,73 +98,35 @@ export function StorageGroupPage() {
         return <StorageGroupInfo data={storageGroupData} className={storageGroupPageCn('info')} />;
     };
 
-    const renderTabs = () => {
+    const renderStorage = () => {
+        if (!groupId) {
+            return null;
+        }
         return (
-            <div className={storageGroupPageCn('tabs')}>
-                <Tabs
-                    size="l"
-                    items={STORAGE_GROUP_PAGE_TABS}
-                    activeTab={storageGroupTab}
-                    wrapTo={({id}, tabNode) => {
-                        const path = groupId
-                            ? getStorageGroupPath(groupId, {activeTab: id})
-                            : undefined;
-
-                        return (
-                            <InternalLink to={path} key={id}>
-                                {tabNode}
-                            </InternalLink>
-                        );
-                    }}
-                />
-            </div>
+            <React.Fragment>
+                <div className={storageGroupPageCn('storage-title')}>
+                    {storageGroupPageKeyset('storage')}
+                </div>
+                <Storage groupId={groupId} />
+            </React.Fragment>
         );
     };
 
-    const renderTabsContent = () => {
-        switch (storageGroupTab) {
-            case 'groups': {
-                return storageGroupData ? (
-                    <StorageGroups
-                        data={[storageGroupData]}
-                        tableSettings={DEFAULT_TABLE_SETTINGS}
-                        visibleEntities="all"
-                    />
-                ) : null;
-            }
-            case 'nodes': {
-                return nodesData ? (
-                    <StorageNodes
-                        data={nodesData}
-                        tableSettings={DEFAULT_TABLE_SETTINGS}
-                        visibleEntities="all"
-                        nodesUptimeFilter={NodesUptimeFilterValues.All}
-                    />
-                ) : null;
-            }
-            default:
-                return null;
-        }
-    };
-
     const renderError = () => {
-        if (!groupQuery.error && !nodesQuery.error) {
+        if (!groupQuery.error) {
             return null;
         }
-        return <ResponseError error={groupQuery.error || nodesQuery.error} />;
+        return <ResponseError error={groupQuery.error} />;
     };
 
     return (
         <div className={storageGroupPageCn(null)}>
-            <div className={storageGroupPageCn('info-content')}>
-                {renderHelmet()}
-                {renderPageMeta()}
-                {renderPageTitle()}
-                {renderError()}
-                {renderInfo()}
-                {renderTabs()}
-            </div>
-            <div className={storageGroupPageCn('tabs-content')}>{renderTabsContent()}</div>
+            {renderHelmet()}
+            {renderPageMeta()}
+            {renderPageTitle()}
+            {renderError()}
+            {renderInfo()}
+            {renderStorage()}
         </div>
     );
 }
