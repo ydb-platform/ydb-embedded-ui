@@ -9,7 +9,10 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupInfo';
-import {useStorageGroupsHandlerAvailable} from '../../store/reducers/capabilities/hooks';
+import {
+    useCapabilitiesLoaded,
+    useStorageGroupsHandlerAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {EFlag} from '../../types/api/enums';
@@ -35,10 +38,12 @@ export function StorageGroupPage() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const shouldUseGroupsHandler = useStorageGroupsHandlerAvailable();
+    const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupQuery = storageApi.useGetStorageGroupsInfoQuery(
         valueIsDefined(groupId) ? {groupId, shouldUseGroupsHandler, with: 'all'} : skipToken,
         {
             pollingInterval: autoRefreshInterval,
+            skip: !capabilitiesLoaded,
         },
     );
 
