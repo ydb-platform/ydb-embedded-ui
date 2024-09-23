@@ -25,6 +25,7 @@ import type {
     StorageType,
     VisibleEntities,
 } from '../../store/reducers/storage/types';
+import {valueIsDefined} from '../../utils';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTableSort} from '../../utils/hooks';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
@@ -117,7 +118,13 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
     } = useStorageGroupsSelectedColumns(visibleEntities);
 
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
-        {database, with: visibleEntities, node_id: nodeId, group_id: groupId},
+        {
+            database,
+            with: visibleEntities,
+            node_id: nodeId,
+            // node_id and group_id params doesn't work together
+            group_id: valueIsDefined(nodeId) ? undefined : groupId,
+        },
         {
             skip: !isNodes,
             pollingInterval: autoRefreshInterval,
