@@ -10,6 +10,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {Loader} from '../../components/Loader';
 import routes, {createHref, parseQuery} from '../../routes';
+import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {nodeApi} from '../../store/reducers/node/node';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
@@ -18,7 +19,8 @@ import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {Tablets} from '../Tablets';
 
-import {NODE_PAGES, OVERVIEW, STORAGE, TABLETS} from './NodePages';
+import {NODE_PAGES, OVERVIEW, STORAGE, STRUCTURE, TABLETS} from './NodePages';
+import NodeStructure from './NodeStructure/NodeStructure';
 
 import './Node.scss';
 
@@ -50,11 +52,15 @@ export function Node(props: NodeProps) {
     );
     const loading = isFetching && currentData === undefined;
     const node = currentData;
+    const isDiskPagesAvailable = useDiskPagesAvailable();
 
     const {activeTabVerified, nodeTabs} = React.useMemo(() => {
         const hasStorage = node?.Roles?.find((el) => el === STORAGE_ROLE);
 
-        const nodePages = hasStorage ? NODE_PAGES : NODE_PAGES.filter((el) => el.id !== STORAGE);
+        let nodePages = hasStorage ? NODE_PAGES : NODE_PAGES.filter((el) => el.id !== STORAGE);
+        if (isDiskPagesAvailable) {
+            nodePages = nodePages.filter((el) => el.id !== STRUCTURE);
+        }
 
         const actualNodeTabs = nodePages.map((page) => {
             return {
@@ -69,7 +75,7 @@ export function Node(props: NodeProps) {
         }
 
         return {activeTabVerified: actualActiveTab, nodeTabs: actualNodeTabs};
-    }, [activeTab, node]);
+    }, [activeTab, node, isDiskPagesAvailable]);
 
     const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
 
@@ -131,6 +137,9 @@ export function Node(props: NodeProps) {
                 );
             }
 
+            case STRUCTURE: {
+                return <NodeStructure className={b('node-page-wrapper')} nodeId={nodeId} />;
+            }
             case OVERVIEW: {
                 return <FullNodeViewer node={node} className={b('overview-wrapper')} />;
             }
