@@ -10,7 +10,10 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {Loader} from '../../components/Loader';
 import routes, {createHref, parseQuery} from '../../routes';
-import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
+import {
+    useCapabilitiesLoaded,
+    useDiskPagesAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {nodeApi} from '../../store/reducers/node/node';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
@@ -52,6 +55,7 @@ export function Node(props: NodeProps) {
     );
     const loading = isFetching && currentData === undefined;
     const node = currentData;
+    const capabilitiesLoaded = useCapabilitiesLoaded();
     const isDiskPagesAvailable = useDiskPagesAvailable();
 
     const {activeTabVerified, nodeTabs} = React.useMemo(() => {
@@ -149,7 +153,7 @@ export function Node(props: NodeProps) {
         }
     };
 
-    if (loading) {
+    if (loading || !capabilitiesLoaded) {
         return <Loader size="l" />;
     }
 
