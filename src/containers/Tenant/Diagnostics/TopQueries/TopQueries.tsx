@@ -60,11 +60,11 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
     const dispatch = useTypedDispatch();
     const location = useLocation();
     const history = useHistory();
-    const [_queryMode = 'top', setQueryMode] = useQueryParam('queryMode', StringParam);
+    const [_queryMode = QueryModeIds.top, setQueryMode] = useQueryParam('queryMode', StringParam);
 
     const queryMode = queryModeSchema.parse(_queryMode);
 
-    const isTopQueries = queryMode === 'top';
+    const isTopQueries = queryMode === QueryModeIds.top;
 
     const filters = useTypedSelector((state) => state.executeTopQueries);
 
