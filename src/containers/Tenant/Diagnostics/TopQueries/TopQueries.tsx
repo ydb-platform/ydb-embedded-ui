@@ -4,6 +4,7 @@ import type {RadioButtonOption} from '@gravity-ui/uikit';
 import {RadioButton} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router-dom';
 import {StringParam, useQueryParam} from 'use-query-params';
+import {z} from 'zod';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
 import {DateRange} from '../../../../components/DateRange';
@@ -29,27 +30,27 @@ import './TopQueries.scss';
 
 const b = cn('kv-top-queries');
 
-enum QueryModeIds {
-    'top',
-    'running',
-}
+const QueryModeIds = {
+    top: 'top',
+    running: 'running',
+};
 
-type QueryModeIdsType = keyof typeof QueryModeIds;
-
-const QUERY_MODE_OPTIONS: RadioButtonOption<QueryModeIdsType>[] = [
+const QUERY_MODE_OPTIONS: RadioButtonOption[] = [
     {
-        value: 'top',
+        value: QueryModeIds.top,
         get content() {
             return i18n('mode_top');
         },
     },
     {
-        value: 'running',
+        value: QueryModeIds.running,
         get content() {
             return i18n('mode_running');
         },
     },
 ];
+
+const queryModeSchema = z.nativeEnum(QueryModeIds).catch(QueryModeIds.top);
 
 interface TopQueriesProps {
     tenantName: string;
@@ -61,8 +62,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
     const history = useHistory();
     const [_queryMode = 'top', setQueryMode] = useQueryParam('queryMode', StringParam);
 
-    const queryMode =
-        _queryMode && Object.keys(QueryModeIds).includes(_queryMode) ? _queryMode : 'top';
+    const queryMode = queryModeSchema.parse(_queryMode);
 
     const isTopQueries = queryMode === 'top';
 
