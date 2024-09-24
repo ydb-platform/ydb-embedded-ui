@@ -129,6 +129,7 @@ export const selectSchemaMergedChildrenPaths = createSelector(
 );
 
 export function useGetSchemaQuery({path, database}: {path: string; database: string}) {
+    console.log('IS HERE', path);
     const {currentData, isFetching, error, refetch, originalArgs} = schemaApi.useGetSchemaQuery({
         path,
         database,

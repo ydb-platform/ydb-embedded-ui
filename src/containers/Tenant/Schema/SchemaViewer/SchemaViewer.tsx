@@ -4,10 +4,11 @@ import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import {useGetSchemaQuery} from '../../../../store/reducers/schema/schema';
+import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {viewSchemaApi} from '../../../../store/reducers/viewSchema/viewSchema';
 import type {EPathType} from '../../../../types/api/schema';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {
     isColumnEntityType,
     isExternalTableType,
@@ -36,7 +37,18 @@ interface SchemaViewerProps {
 }
 
 export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaViewerProps) => {
-    const {data: schemaData, isLoading: loading} = useGetSchemaQuery({path, database: tenantName});
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {currentData, isLoading: loading} = overviewApi.useGetOverviewQuery(
+        {
+            paths: [path],
+            database: tenantName,
+        },
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
+
+    const {data: schemaData} = currentData ?? {};
 
     const viewSchemaRequestParams = isViewType(type) ? {path, database: tenantName} : skipToken;
 

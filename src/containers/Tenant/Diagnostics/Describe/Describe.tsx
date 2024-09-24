@@ -5,7 +5,10 @@ import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
-import {describeApi} from '../../../../store/reducers/describe';
+import {
+    overviewApi,
+    selectPreparedPathOverview,
+} from '../../../../store/reducers/overview/overview';
 import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
@@ -41,14 +44,17 @@ const Describe = ({path, database, type}: IDescribeProps) => {
     } else if (mergedChildrenPaths) {
         paths = [path, ...mergedChildrenPaths];
     }
-    const {currentData, isFetching, error} = describeApi.useGetDescribeQuery(
+    const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
         paths.length ? {paths, database} : skipToken,
         {
             pollingInterval: autoRefreshInterval,
         },
     );
     const loading = isFetching && currentData === undefined;
-    const currentDescribe = currentData;
+
+    const data = useTypedSelector((state) => selectPreparedPathOverview(state, paths, database));
+
+    const currentDescribe = data;
 
     let preparedDescribeData: Object | undefined;
     if (currentDescribe) {

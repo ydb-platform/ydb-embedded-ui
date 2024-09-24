@@ -14,7 +14,7 @@ import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import SplitPane from '../../../components/SplitPane';
 import routes, {createExternalUILink, createHref} from '../../../routes';
-import {useGetSchemaQuery} from '../../../store/reducers/schema/schema';
+import {overviewApi} from '../../../store/reducers/overview/overview';
 import {TENANT_SUMMARY_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setSummaryTab} from '../../../store/reducers/tenant/tenant';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
@@ -27,7 +27,7 @@ import {
     formatNumber,
     formatSecondsToHours,
 } from '../../../utils/dataFormatters/dataFormatters';
-import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Acl} from '../Acl/Acl';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
@@ -77,6 +77,7 @@ export function ObjectSummary({
     onExpandSummary,
     isCollapsed,
 }: ObjectSummaryProps) {
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const dispatch = useTypedDispatch();
     const [, setCurrentPath] = useQueryParam('schema', StringParam);
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
@@ -94,7 +95,16 @@ export function ObjectSummary({
         ignoreQueryPrefix: true,
     });
 
-    const {data: currentObjectData} = useGetSchemaQuery({path, database: tenantName});
+    const {currentData} = overviewApi.useGetOverviewQuery(
+        {
+            paths: [path],
+            database: tenantName,
+        },
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
+    const {data: currentObjectData} = currentData ?? {};
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
     React.useEffect(() => {

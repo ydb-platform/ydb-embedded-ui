@@ -7,10 +7,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
-import {
-    selectSchemaMergedChildrenPaths,
-    useGetSchemaQuery,
-} from '../../../../store/reducers/schema/schema';
+import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import {EPathType} from '../../../../types/api/schema';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
@@ -57,8 +54,6 @@ function Overview({type, path, database}: OverviewProps) {
     const overviewLoading = isFetching && currentData === undefined;
     const {data: rawData, additionalData} = currentData || {};
 
-    const {error: schemaError} = useGetSchemaQuery({path, database});
-
     const entityLoading = overviewLoading;
     const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
 
@@ -101,7 +96,6 @@ function Overview({type, path, database}: OverviewProps) {
 
     return (
         <React.Fragment>
-            {schemaError ? <ResponseError error={schemaError} /> : null}
             {overviewError ? <ResponseError error={overviewError} /> : null}
             {overviewError && !rawData ? null : renderContent()}
         </React.Fragment>

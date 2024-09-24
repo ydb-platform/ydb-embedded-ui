@@ -7,11 +7,11 @@ import {PageError, isAccessError} from '../../components/Errors/PageError/PageEr
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {useGetSchemaQuery} from '../../store/reducers/schema/schema';
+import {overviewApi} from '../../store/reducers/overview/overview';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
-import {useTypedDispatch} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
@@ -41,6 +41,7 @@ interface TenantProps {
 }
 
 export function Tenant(props: TenantProps) {
+    const [autoRefreshInterval] = useAutoRefreshInterval();
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED),
         undefined,
@@ -74,7 +75,13 @@ export function Tenant(props: TenantProps) {
 
     const path = schema ?? tenantName;
 
-    const {data: currentItem, error, isLoading} = useGetSchemaQuery({path, database: tenantName});
+    const {currentData, error, isLoading} = overviewApi.useGetOverviewQuery(
+        {paths: [path], database: tenantName},
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
+    const {data: currentItem} = currentData ?? {};
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
         currentItem?.PathDescription?.Self || {};
 

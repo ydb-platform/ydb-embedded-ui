@@ -8,6 +8,7 @@ import type {
     TTableDescription,
 } from '../../../../types/api/schema';
 import {EColumnCodec} from '../../../../types/api/schema';
+import type {Nullable} from '../../../../utils/typecheckers';
 import {isColumnEntityType, isExternalTableType, isRowTableType} from '../../utils/schema';
 
 import type {SchemaData} from './types';
@@ -123,7 +124,7 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
 
 export function prepareSchemaData(
     type?: EPathType,
-    schema?: TEvDescribeSchemeResult,
+    schema?: Nullable<TEvDescribeSchemeResult>,
 ): SchemaData[] {
     const {Table, ColumnTableDescription, ExternalTableDescription} = schema?.PathDescription || {};
 

@@ -8,11 +8,11 @@ import {Button, Card, Icon} from '@gravity-ui/uikit';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {hotKeysApi} from '../../../../store/reducers/hotKeys/hotKeys';
-import {useGetSchemaQuery} from '../../../../store/reducers/schema/schema';
+import {overviewApi} from '../../../../store/reducers/overview/overview';
 import type {HotKey} from '../../../../types/api/hotkeys';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, IS_HOTKEYS_HELP_HIDDEN_KEY} from '../../../../utils/constants';
-import {useSetting} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useSetting} from '../../../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -61,9 +61,17 @@ interface HotKeysProps {
 export function HotKeys({path, database}: HotKeysProps) {
     const {currentData: data, isFetching, error} = hotKeysApi.useGetHotKeysQuery({path, database});
     const loading = isFetching && data === undefined;
-
-    const {data: schemaData, isLoading: schemaLoading} = useGetSchemaQuery({path, database});
-
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {currentData, isLoading: schemaLoading} = overviewApi.useGetOverviewQuery(
+        {
+            paths: [path],
+            database,
+        },
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
+    const {data: schemaData} = currentData ?? {};
     const keyColumnsIds = schemaData?.PathDescription?.Table?.KeyColumnNames;
 
     const tableColumns = React.useMemo(() => {
