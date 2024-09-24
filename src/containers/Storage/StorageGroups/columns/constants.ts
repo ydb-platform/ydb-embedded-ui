@@ -6,10 +6,10 @@ export const STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY = 'storageGroupsColumnsWidth';
 export const STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY = 'storageGroupsSelectedColumns';
 
 export const STORAGE_GROUPS_COLUMNS_IDS = {
+    GroupId: 'GroupId',
     PoolName: 'PoolName',
     MediaType: 'MediaType',
     Erasure: 'Erasure',
-    GroupId: 'GroupId',
     Used: 'Used',
     Limit: 'Limit',
     Usage: 'Usage',
@@ -24,10 +24,10 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
 type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
 
 export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
+    'GroupId',
     'PoolName',
     'MediaType',
     'Erasure',
-    'GroupId',
     'Used',
     'Limit',
     'Usage',
