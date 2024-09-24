@@ -1,5 +1,28 @@
 # Changelog
 
+## [6.22.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.21.0...v6.22.0) (2024-09-24)
+
+
+### Features
+
+* add rows limit to query settings ([#1291](https://github.com/ydb-platform/ydb-embedded-ui/issues/1291)) ([1728e61](https://github.com/ydb-platform/ydb-embedded-ui/commit/1728e6162e5be9c5fdc0954595b562873ad6fb9b))
+* big query results freeze interface ([#1354](https://github.com/ydb-platform/ydb-embedded-ui/issues/1354)) ([660f89c](https://github.com/ydb-platform/ydb-embedded-ui/commit/660f89cd696f85b2ea61ce31a64e7ef2d70f9283))
+* in query results show when it was truncated ([#1309](https://github.com/ydb-platform/ydb-embedded-ui/issues/1309)) ([0434410](https://github.com/ydb-platform/ydb-embedded-ui/commit/043441045d5e9cc463271da505bec6bf04489f5d))
+* **Nodes:** add columns setup ([#1320](https://github.com/ydb-platform/ydb-embedded-ui/issues/1320)) ([c9ec3b7](https://github.com/ydb-platform/ydb-embedded-ui/commit/c9ec3b790d461ea150d315bb0f364e979218f788))
+* **ObjectSummary:** add link to Schema in Diagnostics ([#1323](https://github.com/ydb-platform/ydb-embedded-ui/issues/1323)) ([deaf519](https://github.com/ydb-platform/ydb-embedded-ui/commit/deaf519c35b7df50919bf12de6fd87fe2a764aa9))
+* **ObjectSummary:** add paths and shards limits ([#1326](https://github.com/ydb-platform/ydb-embedded-ui/issues/1326)) ([61c3562](https://github.com/ydb-platform/ydb-embedded-ui/commit/61c3562ea569b217d2fffb5622b38d2054240aeb))
+* show vdisks of selected group in a special color ([#1336](https://github.com/ydb-platform/ydb-embedded-ui/issues/1336)) ([5402c86](https://github.com/ydb-platform/ydb-embedded-ui/commit/5402c86a9a07f8999bb084ac2d50ebda54c9adc6))
+* **Storage:** add columns setup ([#1321](https://github.com/ydb-platform/ydb-embedded-ui/issues/1321)) ([b53487e](https://github.com/ydb-platform/ydb-embedded-ui/commit/b53487e7a6ad5779dbc02b08eaf4b1a9929021b6))
+
+
+### Bug Fixes
+
+* **Clusters:** fix columns setup do not save values ([#1316](https://github.com/ydb-platform/ydb-embedded-ui/issues/1316)) ([964122f](https://github.com/ydb-platform/ydb-embedded-ui/commit/964122f5560cff67fcb3562cfa7ee05f33646b5b))
+* do not send empty strings in filters ([#1330](https://github.com/ydb-platform/ydb-embedded-ui/issues/1330)) ([5af61ac](https://github.com/ydb-platform/ydb-embedded-ui/commit/5af61acd52202c58815883bcfa179bfcbaabc8c3))
+* show structure tab and PDisk/VDisk if disk's new API is absent ([#1338](https://github.com/ydb-platform/ydb-embedded-ui/issues/1338)) ([6213ed7](https://github.com/ydb-platform/ydb-embedded-ui/commit/6213ed7856a80cb2158bc0ff1af79ed160b3b3f1))
+* **Storage:** fix additional props not passed ([#1350](https://github.com/ydb-platform/ydb-embedded-ui/issues/1350)) ([e8beb49](https://github.com/ydb-platform/ydb-embedded-ui/commit/e8beb4900685be5c7d7c339364d3941bd25fadda))
+* **StorageGroups:** make group id first column ([#1351](https://github.com/ydb-platform/ydb-embedded-ui/issues/1351)) ([73642db](https://github.com/ydb-platform/ydb-embedded-ui/commit/73642db54728fb15be91de64e9ca0eb60ac2a857))
+
 ## [6.21.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.20.0...v6.21.0) (2024-09-18)
 
 
