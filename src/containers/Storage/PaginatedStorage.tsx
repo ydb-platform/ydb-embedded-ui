@@ -30,7 +30,7 @@ export const PaginatedStorage = ({
     parentContainer,
 }: PaginatedStorageProps) => {
     const {balancer} = useClusterBaseInfo();
-    const additionalNodesProps = useAdditionalNodeProps({balancer, groupId});
+    const additionalNodesProps = useAdditionalNodeProps({balancer});
 
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
