@@ -17,6 +17,7 @@ import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {getPDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
+import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {pDiskApi} from '../../store/reducers/pdisk/pdisk';
 import type {EDecommitStatus} from '../../types/api/pdisk';
@@ -61,6 +62,7 @@ export function PDiskPage() {
     const dispatch = useTypedDispatch();
 
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const newDiskApiAvailable = useDiskPagesAvailable();
 
     const [{nodeId, pDiskId, activeTab}] = useQueryParams({
         activeTab: StringParam,
@@ -87,7 +89,9 @@ export function PDiskPage() {
 
     const handleRestart = async (isRetry?: boolean) => {
         if (pDiskParamsDefined) {
-            const response = await window.api.restartPDisk({nodeId, pDiskId, force: isRetry});
+            const response = await window.api[
+                newDiskApiAvailable ? 'restartPDisk' : 'restartPDiskOld'
+            ]({nodeId, pDiskId, force: isRetry});
 
             if (response?.result === false) {
                 const err = {
@@ -188,13 +192,15 @@ export function PDiskPage() {
                     <Icon data={ArrowRotateLeft} />
                     {pDiskPageKeyset('restart-pdisk-button')}
                 </ButtonWithConfirmDialog>
-                <DecommissionButton
-                    decommission={DecommitStatus}
-                    onConfirmAction={handleDecommissionChange}
-                    onConfirmActionSuccess={handleAfterAction}
-                    buttonDisabled={!pDiskParamsDefined || !isUserAllowedToMakeChanges}
-                    popoverDisabled={isUserAllowedToMakeChanges}
-                />
+                {newDiskApiAvailable ? (
+                    <DecommissionButton
+                        decommission={DecommitStatus}
+                        onConfirmAction={handleDecommissionChange}
+                        onConfirmActionSuccess={handleAfterAction}
+                        buttonDisabled={!pDiskParamsDefined || !isUserAllowedToMakeChanges}
+                        popoverDisabled={isUserAllowedToMakeChanges}
+                    />
+                ) : null}
             </div>
         );
     };

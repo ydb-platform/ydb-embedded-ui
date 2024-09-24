@@ -14,6 +14,7 @@ import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {api} from '../../store/reducers/api';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
+import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {valueIsDefined} from '../../utils';
@@ -33,6 +34,7 @@ export function VDiskPage() {
     const dispatch = useTypedDispatch();
 
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const newDiskApiAvailable = useDiskPagesAvailable();
 
     const [{nodeId, pDiskId, vDiskSlotId}] = useQueryParams({
         nodeId: StringParam,
@@ -68,24 +70,22 @@ export function VDiskPage() {
 
     const handleEvictVDisk = async (isRetry?: boolean) => {
         if (vDiskIdParamsDefined) {
-            return window.api
-                .evictVDisk({
-                    groupId: GroupID,
-                    groupGeneration: GroupGeneration,
-                    failRealmIdx: Ring,
-                    failDomainIdx: Domain,
-                    vDiskIdx: VDisk,
-                    force: isRetry,
-                })
-                .then((response) => {
-                    if (response?.result === false) {
-                        const err = {
-                            statusText: response.error,
-                            retryPossible: response.forceRetryPossible,
-                        };
-                        throw err;
-                    }
-                });
+            return window.api[newDiskApiAvailable ? 'evictVDisk' : 'evictVDiskOld']({
+                groupId: GroupID,
+                groupGeneration: GroupGeneration,
+                failRealmIdx: Ring,
+                failDomainIdx: Domain,
+                vDiskIdx: VDisk,
+                force: isRetry,
+            }).then((response) => {
+                if (response?.result === false) {
+                    const err = {
+                        statusText: response.error,
+                        retryPossible: response.forceRetryPossible,
+                    };
+                    throw err;
+                }
+            });
         }
 
         return undefined;

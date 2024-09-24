@@ -2,7 +2,6 @@ import {Flex} from '@gravity-ui/uikit';
 
 import {getPDiskPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
-import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {valueIsDefined} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
@@ -191,12 +190,11 @@ export function PDiskInfo<T extends PreparedPDisk>({
     className,
 }: PDiskInfoProps<T>) {
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
-    const diskPagesAvailable = useDiskPagesAvailable();
 
     const [generalInfo, statusInfo, spaceInfo, additionalInfo] = getPDiskInfo({
         pDisk,
         nodeId,
-        withPDiskPageLink: withPDiskPageLink && diskPagesAvailable,
+        withPDiskPageLink,
         isUserAllowedToMakeChanges,
     });
 
