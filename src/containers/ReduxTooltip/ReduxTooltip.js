@@ -23,19 +23,19 @@ function ReduxTooltip(props) {
         rect: {top: props.positions?.top, left: props.positions?.left},
     });
 
+    const handleScroll = React.useCallback(() => {
+        const {hideTooltip, toolTipVisible} = props;
+        if (toolTipVisible) {
+            setTimeout(() => hideTooltip(), 500);
+        }
+    }, [props]);
+
     React.useEffect(() => {
         window.addEventListener('scroll', handleScroll, true);
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, []);
-
-    const handleScroll = () => {
-        const {hideTooltip, toolTipVisible} = props;
-        if (toolTipVisible) {
-            setTimeout(() => hideTooltip(), 500);
-        }
-    };
+    }, [handleScroll]);
 
     const renderPositionPopup = (visible, positions, data, additionalData) => {
         const {template, popupClassName, hideTooltip} = props;
