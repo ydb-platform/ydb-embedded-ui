@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {hideTooltip, showTooltip} from '../../../store/reducers/tooltip';
+import {showTooltip} from '../../../store/reducers/tooltip';
 import {useTypedDispatch} from '../../../utils/hooks';
 import {b} from '../QueryResultTable';
 
@@ -13,13 +13,6 @@ export const Cell = React.memo(function Cell(props: CellProps) {
     const {className, value} = props;
 
     const dispatch = useTypedDispatch();
-
-    React.useEffect(
-        () => () => {
-            dispatch(hideTooltip());
-        },
-        [dispatch],
-    );
 
     return (
         <span
