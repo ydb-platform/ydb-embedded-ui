@@ -17,7 +17,6 @@ import {
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../../store/reducers/tenant/constants';
-import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
@@ -30,21 +29,40 @@ import './TopQueries.scss';
 
 const b = cn('kv-top-queries');
 
-const QUERY_MODE_OPTIONS: RadioButtonOption[] = [
-    {value: 'top', content: i18n('mode_top')},
-    {value: 'running', content: i18n('mode_running')},
+enum QueryModeIds {
+    'top',
+    'running',
+}
+
+type QueryModeIdsType = keyof typeof QueryModeIds;
+
+const QUERY_MODE_OPTIONS: RadioButtonOption<QueryModeIdsType>[] = [
+    {
+        value: 'top',
+        get content() {
+            return i18n('mode_top');
+        },
+    },
+    {
+        value: 'running',
+        get content() {
+            return i18n('mode_running');
+        },
+    },
 ];
 
 interface TopQueriesProps {
     tenantName: string;
-    type?: EPathType;
 }
 
-export const TopQueries = ({tenantName, type}: TopQueriesProps) => {
+export const TopQueries = ({tenantName}: TopQueriesProps) => {
     const dispatch = useTypedDispatch();
     const location = useLocation();
     const history = useHistory();
-    const [queryMode = 'top', setQueryMode] = useQueryParam('queryMode', StringParam);
+    const [_queryMode = 'top', setQueryMode] = useQueryParam('queryMode', StringParam);
+
+    const queryMode =
+        _queryMode && Object.keys(QueryModeIds).includes(_queryMode) ? _queryMode : 'top';
 
     const isTopQueries = queryMode === 'top';
 
@@ -98,7 +116,7 @@ export const TopQueries = ({tenantName, type}: TopQueriesProps) => {
                 ) : null}
             </TableWithControlsLayout.Controls>
             {isTopQueries ? (
-                <TopQueriesData database={tenantName} type={type} onRowClick={onRowClick} />
+                <TopQueriesData database={tenantName} onRowClick={onRowClick} />
             ) : (
                 <RunningQueriesData database={tenantName} />
             )}

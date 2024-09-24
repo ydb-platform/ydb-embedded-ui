@@ -13,11 +13,14 @@ import {generateHash} from '../../../../utils/generateHash';
 import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
 import {MAX_QUERY_HEIGHT} from '../../utils/constants';
 
+import i18n from './i18n';
+
 import './TopQueries.scss';
 
 const b = cn('kv-top-queries');
 
 export const TOP_QUERIES_COLUMNS_WIDTH_LS_KEY = 'topQueriesColumnsWidth';
+export const RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY = 'runningQueriesColumnsWidth';
 
 const cpuTimeUsColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.CPUTimeUs,
@@ -94,6 +97,26 @@ const durationColumn: Column<KeyValueRow> = {
     width: 150,
 };
 
+const queryStartColumn: Column<KeyValueRow> = {
+    name: 'QueryStartAt',
+    get header() {
+        return i18n('col_start-time');
+    },
+    render: ({row}) => formatDateTime(new Date(row.QueryStartAt as string).getTime()),
+    sortable: true,
+    resizeable: false,
+    defaultOrder: DataTable.DESCENDING,
+};
+
+const applicationColumn: Column<KeyValueRow> = {
+    name: 'ApplicationName',
+    get header() {
+        return i18n('col_app');
+    },
+    render: ({row}) => <div className={b('user-sid')}>{row.ApplicationName || '–'}</div>,
+    sortable: true,
+};
+
 export const TOP_QUERIES_COLUMNS = [
     cpuTimeUsColumn,
     queryTextColumn,
@@ -108,4 +131,11 @@ export const TENANT_OVERVIEW_TOP_QUERUES_COLUMNS = [
     queryHashColumn,
     oneLineQueryTextColumn,
     cpuTimeUsColumn,
+];
+
+export const RUNNING_QUERIES_COLUMNS = [
+    userSIDColumn,
+    queryStartColumn,
+    queryTextColumn,
+    applicationColumn,
 ];

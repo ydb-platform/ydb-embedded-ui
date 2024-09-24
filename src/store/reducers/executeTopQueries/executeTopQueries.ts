@@ -96,13 +96,13 @@ export const topQueriesApi = api.injectEndpoints({
             ) => {
                 try {
                     const filterConditions = filters?.text ? `Query ILIKE '%${filters.text}%'` : '';
-                    const queryText = `SELECT * from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'} ORDER BY SessionStartAt limit 100`;
+                    const queryText = `SELECT UserSID, QueryStartAt, Query as QueryText, ApplicationName from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'} ORDER BY SessionStartAt limit 100`;
 
                     const response = await window.api.sendQuery(
                         {
                             query: queryText,
                             database,
-                            action: 'execute-query',
+                            action: 'execute-scan',
                         },
                         {signal, withRetries: true},
                     );
@@ -111,7 +111,7 @@ export const topQueriesApi = api.injectEndpoints({
                         throw response;
                     }
 
-                    return {data: response?.result?.filter((item) => item.Query !== queryText)};
+                    return {data: response?.result?.filter((item) => item.QueryText !== queryText)};
                 } catch (error) {
                     return {error};
                 }

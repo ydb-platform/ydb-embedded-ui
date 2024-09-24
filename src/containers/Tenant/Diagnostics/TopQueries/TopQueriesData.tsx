@@ -1,14 +1,15 @@
+import React from 'react';
+
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {topQueriesApi} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import type {KeyValueRow} from '../../../../types/api/query';
-import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {isSortableTopQueriesProperty} from '../../../../utils/diagnostics';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
+import {parseQueryErrorToString} from '../../../../utils/query';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
-import {isColumnEntityType} from '../../utils/schema';
 
 import {TOP_QUERIES_COLUMNS, TOP_QUERIES_COLUMNS_WIDTH_LS_KEY} from './getTopQueriesColumns';
 import i18n from './i18n';
@@ -17,11 +18,10 @@ const b = cn('kv-top-queries');
 
 interface Props {
     database: string;
-    onRowClick: (row: any) => void;
-    type?: EPathType;
+    onRowClick: (query: string) => void;
 }
 
-export const TopQueriesData = ({database, onRowClick, type}: Props) => {
+export const TopQueriesData = ({database, onRowClick}: Props) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
@@ -31,7 +31,6 @@ export const TopQueriesData = ({database, onRowClick, type}: Props) => {
         },
         {pollingInterval: autoRefreshInterval},
     );
-    const loading = isFetching && currentData === undefined;
     const {result: data} = currentData || {};
 
     const rawColumns = TOP_QUERIES_COLUMNS;
@@ -44,28 +43,20 @@ export const TopQueriesData = ({database, onRowClick, type}: Props) => {
         return onRowClick(row.QueryText as string);
     };
 
-    if (error && !data) {
-        return (
-            <TableWithControlsLayout.Table>
-                <ResponseError error={error} />
-            </TableWithControlsLayout.Table>
-        );
-    }
-
-    if (!data || isColumnEntityType(type)) {
-        return <TableWithControlsLayout.Table>{i18n('no-data')}</TableWithControlsLayout.Table>;
-    }
-
     return (
-        <TableWithControlsLayout.Table loading={loading}>
-            <ResizeableDataTable
-                columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
-                columns={columns}
-                data={data}
-                settings={QUERY_TABLE_SETTINGS}
-                onRowClick={handleRowClick}
-                rowClassName={() => b('row')}
-            />
-        </TableWithControlsLayout.Table>
+        <React.Fragment>
+            {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
+            <TableWithControlsLayout.Table loading={isFetching && currentData === undefined}>
+                <ResizeableDataTable
+                    emptyDataMessage={i18n('no-data')}
+                    columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
+                    columns={columns}
+                    data={data || []}
+                    settings={QUERY_TABLE_SETTINGS}
+                    onRowClick={handleRowClick}
+                    rowClassName={() => b('row')}
+                />
+            </TableWithControlsLayout.Table>
+        </React.Fragment>
     );
 };
