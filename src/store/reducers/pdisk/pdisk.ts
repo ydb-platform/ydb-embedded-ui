@@ -1,5 +1,6 @@
 import type {TPDiskInfoResponse} from '../../../types/api/pdisk';
 import {getPDiskId} from '../../../utils/disks/helpers';
+import type {GetState} from '../../defaultStore';
 import {api} from '../api';
 import {queryCapability} from '../capabilities/capabilities';
 
@@ -14,9 +15,11 @@ export const pDiskApi = api.injectEndpoints({
     endpoints: (build) => ({
         getPdiskInfo: build.query({
             queryFn: async ({nodeId, pDiskId}: PDiskParams, {signal, getState, dispatch}) => {
-                const newApiAvailable =
-                    (await queryCapability('/pdisk/info', {getState: getState as any, dispatch})) >
-                    0;
+                const pDiskInfoHandlerVersion = await queryCapability('/pdisk/info', {
+                    getState: getState as GetState,
+                    dispatch,
+                });
+                const newApiAvailable = pDiskInfoHandlerVersion > 0;
 
                 let diskInfoPromise: Promise<TPDiskInfoResponse>;
                 if (newApiAvailable) {
@@ -27,7 +30,12 @@ export const pDiskApi = api.injectEndpoints({
                         .then((result) => {
                             if (result.PDiskStateInfo) {
                                 return {
-                                    Whiteboard: {PDisk: result.PDiskStateInfo[0]},
+                                    Whiteboard: {
+                                        PDisk: {
+                                            ...result.PDiskStateInfo[0],
+                                            ExpectedSlotCount: undefined,
+                                        },
+                                    },
                                 };
                             }
                             return {};

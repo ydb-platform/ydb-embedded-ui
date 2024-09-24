@@ -38,8 +38,6 @@ export async function queryCapability(
 ) {
     const thunk = capabilitiesApi.util.getRunningQueryThunk('getClusterCapabilities', undefined);
     await dispatch(thunk);
-    const capabilityVersion =
-        capabilitiesApi.endpoints.getClusterCapabilities.select(undefined)(getState() as any).data
-            ?.Capabilities?.[capability] || 0;
-    return capabilityVersion;
+
+    return selectCapabilityVersion(getState(), capability) || 0;
 }
