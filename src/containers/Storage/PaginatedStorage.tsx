@@ -24,7 +24,7 @@ interface PaginatedStorageProps {
 
 export const PaginatedStorage = ({database, nodeId, parentContainer}: PaginatedStorageProps) => {
     const {balancer} = useClusterBaseInfo();
-    const additionalNodesProps = useAdditionalNodeProps({balancer});
+    const {additionalNodesProps} = useAdditionalNodeProps({balancer});
 
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
