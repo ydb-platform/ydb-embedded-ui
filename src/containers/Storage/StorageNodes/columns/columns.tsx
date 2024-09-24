@@ -17,6 +17,7 @@ const b = cn('ydb-storage-nodes-columns');
 const getStorageNodesColumns = (
     additionalNodesProps: AdditionalNodesProps | undefined,
     database?: string,
+    groupId?: string,
 ) => {
     const getNodeRef = additionalNodesProps?.getNodeRef;
 
@@ -79,9 +80,17 @@ const getStorageNodesColumns = (
                                 (vdisk) => vdisk.PDiskId === pDisk.PDiskId,
                             );
 
+                            const inactiveVdisks = vDisks?.filter(
+                                (vdisk) => groupId && vdisk.VDiskId?.GroupID !== Number(groupId),
+                            );
+
                             return (
                                 <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                    <PDisk data={pDisk} vDisks={vDisks} />
+                                    <PDisk
+                                        data={pDisk}
+                                        vDisks={vDisks}
+                                        inactiveVdisks={inactiveVdisks}
+                                    />
                                 </div>
                             );
                         })}
@@ -101,8 +110,9 @@ const getStorageNodesColumns = (
 export const getPreparedStorageNodesColumns = ({
     additionalNodesProps,
     database,
+    groupId,
 }: GetStorageNodesColumnsParams) => {
-    const rawColumns = getStorageNodesColumns(additionalNodesProps, database);
+    const rawColumns = getStorageNodesColumns(additionalNodesProps, database, groupId);
 
     const sortableColumns = rawColumns.map((column) => ({
         ...column,

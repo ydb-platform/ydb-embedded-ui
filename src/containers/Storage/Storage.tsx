@@ -109,6 +109,7 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
         additionalNodesProps,
         visibleEntities,
         database,
+        groupId: groupId?.toString(),
     });
 
     const {
