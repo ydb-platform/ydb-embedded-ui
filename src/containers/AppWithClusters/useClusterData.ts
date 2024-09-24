@@ -31,7 +31,7 @@ export function useClusterData() {
 export function useAdditionalNodeProps({balancer}: {balancer?: string}) {
     const [useClusterBalancerAsBackend] = useSetting<boolean>(USE_CLUSTER_BALANCER_AS_BACKEND_KEY);
 
-    const additionalNodesProps = getAdditionalNodesProps({balancer, useClusterBalancerAsBackend});
+    const additionalNodesProps = getAdditionalNodesProps(balancer, useClusterBalancerAsBackend);
 
     return {additionalNodesProps, useClusterBalancerAsBackend};
 }
