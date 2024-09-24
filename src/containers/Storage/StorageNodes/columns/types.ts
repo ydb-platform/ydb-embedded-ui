@@ -11,4 +11,5 @@ export interface GetStorageNodesColumnsParams {
     additionalNodesProps: AdditionalNodesProps | undefined;
     visibleEntities?: VisibleEntities;
     database?: string;
+    groupId?: string;
 }

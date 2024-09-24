@@ -19,23 +19,23 @@ const b = cn('pdisk-storage');
 interface PDiskProps {
     data?: PreparedPDisk;
     vDisks?: PreparedVDisk[];
+    inactiveVdisks?: PreparedVDisk[];
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
     className?: string;
     progressBarClassName?: string;
-    groupId?: string;
 }
 
 export const PDisk = ({
     data = {},
     vDisks,
+    inactiveVdisks,
     showPopup,
     onShowPopup,
     onHidePopup,
     className,
     progressBarClassName,
-    groupId,
 }: PDiskProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
 
@@ -76,9 +76,7 @@ export const PDisk = ({
                         >
                             <VDiskWithDonorsStack
                                 data={vdisk}
-                                faded={
-                                    groupId ? groupId !== vdisk.VDiskId?.GroupID?.toString() : false
-                                }
+                                inactive={inactiveVdisks?.includes(vdisk)}
                                 stackClassName={b('donors-stack')}
                                 compact
                             />

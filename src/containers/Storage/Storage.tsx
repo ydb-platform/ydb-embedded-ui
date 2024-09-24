@@ -112,6 +112,7 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
         additionalNodesProps,
         visibleEntities,
         database,
+        groupId: valueIsDefined(groupId) ? groupId.toString() : undefined,
     });
 
     const {

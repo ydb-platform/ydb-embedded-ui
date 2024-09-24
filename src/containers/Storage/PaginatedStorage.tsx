@@ -19,7 +19,7 @@ import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
 interface PaginatedStorageProps {
     database?: string;
     nodeId?: string;
-    groupId: string;
+    groupId?: string;
     parentContainer?: Element | null;
 }
 
@@ -54,6 +54,7 @@ export const PaginatedStorage = ({
         additionalNodesProps,
         visibleEntities,
         database,
+        groupId,
     });
 
     const {

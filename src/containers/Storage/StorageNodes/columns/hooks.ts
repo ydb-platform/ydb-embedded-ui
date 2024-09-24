@@ -17,10 +17,11 @@ export function useStorageNodesSelectedColumns({
     visibleEntities,
     database,
     additionalNodesProps,
+    groupId,
 }: GetStorageNodesColumnsParams) {
     const columns = React.useMemo(() => {
-        return getPreparedStorageNodesColumns({database, additionalNodesProps});
-    }, [database, additionalNodesProps]);
+        return getPreparedStorageNodesColumns({database, additionalNodesProps, groupId});
+    }, [database, additionalNodesProps, groupId]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {
