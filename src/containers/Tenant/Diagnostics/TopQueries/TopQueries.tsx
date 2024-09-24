@@ -33,7 +33,7 @@ const b = cn('kv-top-queries');
 const QueryModeIds = {
     top: 'top',
     running: 'running',
-};
+} as const;
 
 const QUERY_MODE_OPTIONS: RadioButtonOption[] = [
     {
