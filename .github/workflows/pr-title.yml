@@ -7,11 +7,14 @@ on:
       - synchronize
       - reopened
       - edited
+  merge_group:
+    types: [checks_requested]
 
 jobs:
   verify_title:
     name: Verify Title
     runs-on: ubuntu-latest
+    if: ${{github.event.action != 'checks_requested'}}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
