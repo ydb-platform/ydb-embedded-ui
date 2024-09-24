@@ -241,12 +241,12 @@ export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
 
 export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
     const columns = [
+        groupIdColumn,
         poolNameColumn,
         typeColumn,
         erasureColumn,
         degradedColumn,
         usageColumn,
-        groupIdColumn,
         usedColumn,
         limitColumn,
         usedSpaceFlagColumn,
