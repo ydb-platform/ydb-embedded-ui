@@ -11,28 +11,19 @@ import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle'
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
-import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {api} from '../../store/reducers/api';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
-import {
-    useCapabilitiesLoaded,
-    useStorageGroupsHandlerAvailable,
-} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {storageApi} from '../../store/reducers/storage/storage';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../Storage/StorageGroups/columns/constants';
-import {useGetDiskStorageColumns} from '../Storage/StorageGroups/columns/hooks';
+import {Storage} from '../Storage/Storage';
 
 import {vDiskPageKeyset} from './i18n';
-import {prepareVDiskGroupResponse} from './utils';
 
 import './VDiskPage.scss';
 
@@ -182,9 +173,14 @@ export function VDiskPage() {
         return <VDiskInfo data={vDiskData} className={vDiskPageCn('info')} />;
     };
 
-    const renderGroupInfo = () => {
-        if (valueIsDefined(GroupID)) {
-            return <VDiskGroup groupId={GroupID} />;
+    const renderStorageInfo = () => {
+        if (valueIsDefined(GroupID) && valueIsDefined(nodeId)) {
+            return (
+                <React.Fragment>
+                    <div className={vDiskPageCn('storage-title')}>{vDiskPageKeyset('storage')}</div>
+                    <Storage groupId={GroupID} nodeId={nodeId} />
+                </React.Fragment>
+            );
         }
 
         return null;
@@ -199,7 +195,7 @@ export function VDiskPage() {
             <React.Fragment>
                 {error ? <ResponseError error={error} /> : null}
                 {renderInfo()}
-                {renderGroupInfo()}
+                {renderStorageInfo()}
             </React.Fragment>
         );
     };
@@ -212,43 +208,5 @@ export function VDiskPage() {
             {renderControls()}
             {renderContent()}
         </div>
-    );
-}
-
-export function VDiskGroup({groupId}: {groupId: string | number}) {
-    const capabilitiesLoaded = useCapabilitiesLoaded();
-    const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
-    const [autoRefreshInterval] = useAutoRefreshInterval();
-
-    const {currentData} = storageApi.useGetStorageGroupsInfoQuery(
-        {groupId, shouldUseGroupsHandler: groupsHandlerAvailable},
-        {
-            pollingInterval: autoRefreshInterval,
-            skip: !capabilitiesLoaded,
-        },
-    );
-
-    const preparedGroups = React.useMemo(() => {
-        const group = prepareVDiskGroupResponse(currentData, groupId);
-
-        return group ? [group] : undefined;
-    }, [currentData, groupId]);
-
-    const vDiskStorageColumns = useGetDiskStorageColumns();
-
-    if (!preparedGroups) {
-        return null;
-    }
-
-    return (
-        <React.Fragment>
-            <div className={vDiskPageCn('group-title')}>{vDiskPageKeyset('group')}</div>
-            <ResizeableDataTable
-                columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-                data={preparedGroups}
-                columns={vDiskStorageColumns}
-                settings={DEFAULT_TABLE_SETTINGS}
-            />
-        </React.Fragment>
     );
 }

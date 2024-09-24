@@ -6,35 +6,32 @@
     overflow: auto;
 
     height: 100%;
-
-    &__info-content {
-        position: sticky;
-        left: 0;
-
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-
-        padding: 20px;
-    }
-
-    &__tabs-content {
-        padding-left: 20px;
-    }
+    padding: 0 20px;
 
     &__meta,
     &__title,
     &__info,
-    &__tabs {
+    &__storage-title {
         position: sticky;
         left: 0;
+
+        margin-bottom: 20px;
+    }
+
+    &__meta {
+        margin-top: 20px;
+    }
+
+    &__title {
+        margin-bottom: 60px;
+    }
+
+    &__storage-title {
+        margin-bottom: 0;
+        @include header-1-typography();
     }
 
     &__info {
         margin-top: var(--g-spacing-10);
-    }
-
-    &__tabs {
-        @include tabs-wrapper-styles();
     }
 }

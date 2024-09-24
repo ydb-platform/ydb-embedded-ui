@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {HelpPopover} from '@gravity-ui/components';
-import {Tabs} from '@gravity-ui/uikit';
+import {Flex, Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
 import {Link, useLocation} from 'react-router-dom';
 import {StringParam, useQueryParam} from 'use-query-params';
@@ -12,14 +12,12 @@ import {toFormattedSize} from '../../../components/FormattedBytes/utils';
 import {InfoViewer} from '../../../components/InfoViewer/InfoViewer';
 import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
-import {Loader} from '../../../components/Loader';
 import SplitPane from '../../../components/SplitPane';
 import routes, {createExternalUILink, createHref} from '../../../routes';
 import {useGetSchemaQuery} from '../../../store/reducers/schema/schema';
 import {TENANT_SUMMARY_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setSummaryTab} from '../../../store/reducers/tenant/tenant';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
-import {cn} from '../../../utils/cn';
 import {
     DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
@@ -32,10 +30,8 @@ import {
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Acl} from '../Acl/Acl';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
-import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
-import i18n from '../i18n';
 import {getSummaryControls} from '../utils/controls';
 import {
     PaneVisibilityActionTypes,
@@ -44,11 +40,13 @@ import {
 } from '../utils/paneVisibilityToggleHelpers';
 import {isIndexTableType, isTableType} from '../utils/schema';
 
+import {ObjectTree} from './ObjectTree';
+import {SchemaActions} from './SchemaActions';
+import i18n from './i18n';
+import {b} from './shared';
 import {transformPath} from './transformPath';
 
 import './ObjectSummary.scss';
-
-const b = cn('object-summary');
 
 const getTenantCommonInfoState = () => {
     const collapsed = Boolean(localStorage.getItem(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED));
@@ -113,24 +111,31 @@ export function ObjectSummary({
 
         return (
             <div className={b('tabs')}>
-                <Tabs
-                    size="l"
-                    items={tabsItems}
-                    activeTab={summaryTab}
-                    wrapTo={({id}, node) => {
-                        const path = createHref(routes.tenant, undefined, {
-                            ...queryParams,
-                            name: tenantName,
-                            [TenantTabsGroups.summaryTab]: id,
-                        });
-                        return (
-                            <Link to={path} key={id} className={b('tab')}>
-                                {node}
-                            </Link>
-                        );
-                    }}
-                    allowNotSelected
-                />
+                <Flex
+                    className={b('tabs-inner')}
+                    justifyContent="space-between"
+                    alignItems="center"
+                >
+                    <Tabs
+                        size="l"
+                        items={tabsItems}
+                        activeTab={summaryTab}
+                        wrapTo={({id}, node) => {
+                            const path = createHref(routes.tenant, undefined, {
+                                ...queryParams,
+                                name: tenantName,
+                                [TenantTabsGroups.summaryTab]: id,
+                            });
+                            return (
+                                <Link to={path} key={id} className={b('tab')}>
+                                    {node}
+                                </Link>
+                            );
+                        }}
+                        allowNotSelected
+                    />
+                    {summaryTab === TENANT_SUMMARY_TABS_IDS.schema && <SchemaActions />}
+                </Flex>
             </div>
         );
     };
@@ -143,21 +148,21 @@ export function ObjectSummary({
 
         const overview: InfoViewerItem[] = [];
 
-        overview.push({label: i18n('summary.type'), value: PathType?.replace(/^EPathType/, '')});
+        overview.push({label: i18n('field_type'), value: PathType?.replace(/^EPathType/, '')});
 
         if (PathSubType !== EPathSubType.EPathSubTypeEmpty) {
             overview.push({
-                label: i18n('summary.subtype'),
+                label: i18n('field_subtype'),
                 value: PathSubType?.replace(/^EPathSubType/, ''),
             });
         }
 
-        overview.push({label: i18n('summary.id'), value: PathId});
+        overview.push({label: i18n('field_id'), value: PathId});
 
-        overview.push({label: i18n('summary.version'), value: PathVersion});
+        overview.push({label: i18n('field_version'), value: PathVersion});
 
         overview.push({
-            label: i18n('summary.created'),
+            label: i18n('field_created'),
             value: formatDateTime(CreateStep),
         });
 
@@ -168,11 +173,11 @@ export function ObjectSummary({
 
             overview.push(
                 {
-                    label: i18n('summary.data-size'),
+                    label: i18n('field_data-size'),
                     value: toFormattedSize(DataSize),
                 },
                 {
-                    label: i18n('summary.row-count'),
+                    label: i18n('field_row-count'),
                     value: formatNumber(RowCount),
                 },
             );
@@ -196,11 +201,11 @@ export function ObjectSummary({
 
             return [
                 {
-                    label: i18n('summary.paths'),
+                    label: i18n('field_paths'),
                     value: paths,
                 },
                 {
-                    label: i18n('summary.shards'),
+                    label: i18n('field_shards'),
                     value: shards,
                 },
             ];
@@ -211,7 +216,7 @@ export function ObjectSummary({
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeTable]: () => [
                 {
-                    label: i18n('summary.partitions'),
+                    label: i18n('field_partitions'),
                     value: PathDescription?.TablePartitions?.length,
                 },
             ],
@@ -220,13 +225,13 @@ export function ObjectSummary({
             [EPathType.EPathTypeExtSubDomain]: getDatabaseOverview,
             [EPathType.EPathTypeColumnStore]: () => [
                 {
-                    label: i18n('summary.partitions'),
+                    label: i18n('field_partitions'),
                     value: PathDescription?.ColumnStoreDescription?.ColumnShards?.length,
                 },
             ],
             [EPathType.EPathTypeColumnTable]: () => [
                 {
-                    label: i18n('summary.partitions'),
+                    label: i18n('field_partitions'),
                     value: PathDescription?.ColumnTableDescription?.Sharding?.ColumnShards?.length,
                 },
             ],
@@ -235,11 +240,11 @@ export function ObjectSummary({
 
                 return [
                     {
-                        label: i18n('summary.mode'),
+                        label: i18n('field_mode'),
                         value: Mode?.replace(/^ECdcStreamMode/, ''),
                     },
                     {
-                        label: i18n('summary.format'),
+                        label: i18n('field_format'),
                         value: Format?.replace(/^ECdcStreamFormat/, ''),
                     },
                 ];
@@ -250,11 +255,11 @@ export function ObjectSummary({
 
                 return [
                     {
-                        label: i18n('summary.partitions'),
+                        label: i18n('field_partitions'),
                         value: pqGroup?.Partitions?.length,
                     },
                     {
-                        label: i18n('summary.retention'),
+                        label: i18n('field_retention'),
                         value: value && formatSecondsToHours(value),
                     },
                 ];
@@ -271,9 +276,9 @@ export function ObjectSummary({
                 const dataSourceName = DataSourcePath?.match(/([^/]*)\/*$/)?.[1] || '';
 
                 return [
-                    {label: i18n('summary.source-type'), value: SourceType},
+                    {label: i18n('field_source-type'), value: SourceType},
                     {
-                        label: i18n('summary.data-source'),
+                        label: i18n('field_data-source'),
                         value: DataSourcePath && (
                             <span title={DataSourcePath}>
                                 <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
@@ -284,7 +289,7 @@ export function ObjectSummary({
             },
             [EPathType.EPathTypeExternalDataSource]: () => [
                 {
-                    label: i18n('summary.source-type'),
+                    label: i18n('field_source-type'),
                     value: PathDescription?.ExternalDataSourceDescription?.SourceType,
                 },
             ],
@@ -298,7 +303,7 @@ export function ObjectSummary({
 
                 return [
                     {
-                        label: i18n('summary.state'),
+                        label: i18n('field_state'),
                         value: <AsyncReplicationState state={state} />,
                     },
                 ];
@@ -351,7 +356,7 @@ export function ObjectSummary({
                 <ClipboardButton
                     text={path}
                     view="flat-secondary"
-                    title={i18n('summary.copySchemaPath')}
+                    title={i18n('action_copySchemaPath')}
                 />
                 <PaneVisibilityToggleButtons
                     onCollapse={onCollapseInfoHandler}
@@ -425,42 +430,4 @@ export function ObjectSummary({
     };
 
     return renderContent();
-}
-
-function ObjectTree({tenantName, path}: {tenantName: string; path?: string}) {
-    const {data: tenantData = {}, isLoading} = useGetSchemaQuery({
-        path: tenantName,
-        database: tenantName,
-    });
-    const pathData = tenantData?.PathDescription?.Self;
-
-    const [, setCurrentPath] = useQueryParam('schema', StringParam);
-
-    if (!pathData && isLoading) {
-        // If Loader isn't wrapped with div, SplitPane doesn't calculate panes height correctly
-        return (
-            <div>
-                <Loader />
-            </div>
-        );
-    }
-
-    return (
-        <div className={b('tree-wrapper')}>
-            <div className={b('tree-header')}>{i18n('summary.navigation')}</div>
-            <div className={b('tree')}>
-                {pathData ? (
-                    <SchemaTree
-                        rootPath={tenantName}
-                        // for the root pathData.Name contains the same string as tenantName,
-                        // but without the leading slash
-                        rootName={pathData.Name || tenantName}
-                        rootType={pathData.PathType}
-                        currentPath={path}
-                        onActivePathUpdate={setCurrentPath}
-                    />
-                ) : null}
-            </div>
-        </div>
-    );
 }

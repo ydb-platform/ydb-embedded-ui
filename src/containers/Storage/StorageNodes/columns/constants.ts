@@ -3,6 +3,7 @@ import type {ValueOf} from '../../../../types/common';
 import i18n from './i18n';
 
 export const STORAGE_NODES_COLUMNS_WIDTH_LS_KEY = 'storageNodesColumnsWidth';
+export const STORAGE_NODES_SELECTED_COLUMNS_LS_KEY = 'storageNodesSelectedColumns';
 
 export const STORAGE_NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
@@ -15,6 +16,16 @@ export const STORAGE_NODES_COLUMNS_IDS = {
 } as const;
 
 type StorageNodesColumnId = ValueOf<typeof STORAGE_NODES_COLUMNS_IDS>;
+
+export const DEFAULT_STORAGE_NODES_COLUMNS: StorageNodesColumnId[] = [
+    'NodeId',
+    'Host',
+    'DC',
+    'Rack',
+    'Uptime',
+    'PDisks',
+];
+export const REQUIRED_STORAGE_NODES_COLUMNS: StorageNodesColumnId[] = ['NodeId'];
 
 // This code is running when module is initialized and correct language may not be set yet
 // get functions guarantee that i18n fields will be inited on render with current render language

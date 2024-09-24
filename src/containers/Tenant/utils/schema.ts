@@ -120,6 +120,7 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypeReplication]: false,
 };
 
+//if add entity with tableType, make sure that Schema is available in Diagnostics section
 export const isTableType = (pathType?: EPathType) =>
     (pathType && pathTypeToIsTable[pathType]) ?? false;
 

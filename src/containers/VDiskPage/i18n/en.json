@@ -3,7 +3,7 @@
   "node": "Node",
   "pdisk": "PDisk",
   "vdisk": "VDisk",
-  "group": "Group",
+  "storage": "Storage",
 
   "evict-vdisk-button": "Evict VDisk",
   "force-evict-vdisk-button": "Evict anyway",

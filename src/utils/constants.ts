@@ -149,5 +149,3 @@ export const AUTOCOMPLETE_ON_ENTER = 'autocompleteOnEnter';
 export const IS_HOTKEYS_HELP_HIDDEN_KEY = 'isHotKeysHelpHidden';
 
 export const DEV_ENABLE_TRACING_FOR_ALL_REQUESTS = 'enable_tracing_for_all_requests';
-
-export const USE_ADVANCED_STORAGE_KEY = 'use_advanced_storage';

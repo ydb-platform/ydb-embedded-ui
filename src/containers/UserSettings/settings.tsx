@@ -11,7 +11,6 @@ import {
     QUERY_USE_MULTI_SCHEMA_KEY,
     SHOW_DOMAIN_DATABASE_KEY,
     THEME_KEY,
-    USE_ADVANCED_STORAGE_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_PAGINATED_TABLES_KEY,
 } from '../../utils/constants';
@@ -90,11 +89,6 @@ export const invertedDisksSetting: SettingProps = {
     settingKey: INVERTED_DISKS_KEY,
     title: i18n('settings.invertedDisks.title'),
 };
-export const useAdvancedStorageSetting: SettingProps = {
-    settingKey: USE_ADVANCED_STORAGE_KEY,
-    title: i18n('settings.useAdvancedStorage.title'),
-    description: i18n('settings.useAdvancedStorage.description'),
-};
 export const usePaginatedTables: SettingProps = {
     settingKey: USE_PAGINATED_TABLES_KEY,
     title: i18n('settings.usePaginatedTables.title'),
@@ -149,7 +143,7 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [useAdvancedStorageSetting, usePaginatedTables, queryUseMultiSchemaSetting],
+    settings: [usePaginatedTables, queryUseMultiSchemaSetting],
 };
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',

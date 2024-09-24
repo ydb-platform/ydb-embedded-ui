@@ -98,9 +98,9 @@ export const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, tablets
 export const TOPIC_PAGES = [overview, consumers, partitions, nodes, tablets, describe];
 
 export const EXTERNAL_DATA_SOURCE_PAGES = [overview, describe];
-export const EXTERNAL_TABLE_PAGES = [overview, describe];
+export const EXTERNAL_TABLE_PAGES = [overview, schema, describe];
 
-export const VIEW_PAGES = [overview, describe];
+export const VIEW_PAGES = [overview, schema, describe];
 
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here

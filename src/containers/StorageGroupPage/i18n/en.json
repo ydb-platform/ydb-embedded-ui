@@ -1,6 +1,5 @@
 {
   "storage-group": "Storage Group",
-  "group": "Group",
-  "nodes": "Nodes",
+  "storage": "Storage",
   "pool-name": "Pool Name"
 }
