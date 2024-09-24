@@ -3,6 +3,8 @@ name: Node.js CI
 on:
   pull_request:
     branches: ['**']
+  merge_group:
+    types: [checks_requested]
 
 jobs:
   verify_files:
