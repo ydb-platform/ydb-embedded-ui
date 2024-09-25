@@ -90,7 +90,7 @@ export const DATABASE_PAGES = [
 ];
 
 export const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe];
-export const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, describe];
+export const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe];
 
 export const DIR_PAGES = [overview, topShards, nodes, describe];
 
