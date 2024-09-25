@@ -66,7 +66,7 @@ export const topQueriesApi = api.injectEndpoints({
                     );
 
                     if (isQueryErrorResponse(response)) {
-                        return {error: response};
+                        throw response;
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
@@ -87,6 +87,39 @@ export const topQueriesApi = api.injectEndpoints({
 
                 return false;
             },
+            providesTags: ['All'],
+        }),
+        getRunningQueries: build.query({
+            queryFn: async (
+                {database, filters}: {database: string; filters?: TopQueriesFilters},
+                {signal},
+            ) => {
+                try {
+                    const filterConditions = filters?.text ? `Query ILIKE '%${filters.text}%'` : '';
+                    const queryText = `SELECT UserSID, QueryStartAt, Query as QueryText, ApplicationName from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'} ORDER BY SessionStartAt limit 100`;
+
+                    const response = await window.api.sendQuery(
+                        {
+                            query: queryText,
+                            database,
+                            action: 'execute-scan',
+                        },
+                        {signal, withRetries: true},
+                    );
+
+                    if (isQueryErrorResponse(response)) {
+                        throw response;
+                    }
+
+                    return {data: response?.result?.filter((item) => item.QueryText !== queryText)};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            forceRefetch() {
+                return true;
+            },
+            providesTags: ['All'],
         }),
     }),
     overrideExisting: 'throw',
