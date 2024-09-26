@@ -1,3 +1,7 @@
+import type {SelectOption} from '@gravity-ui/uikit';
+import {z} from 'zod';
+
+import type {NodesGroupByField} from '../../../../types/api/nodes';
 import type {ValueOf} from '../../../../types/common';
 
 import i18n from './i18n';
@@ -52,3 +56,24 @@ export const STORAGE_NODES_COLUMNS_TITLES = {
         return i18n('missing');
     },
 } as const satisfies Record<StorageNodesColumnId, string>;
+
+const STORAGE_NODES_GROUP_BY_PARAMS = [
+    'Host',
+    'DC',
+    'Rack',
+    'Uptime',
+    'Missing',
+] as const satisfies NodesGroupByField[];
+
+export const STORAGE_NODES_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_NODES_GROUP_BY_PARAMS.map(
+    (param) => {
+        return {
+            value: param,
+            content: STORAGE_NODES_COLUMNS_TITLES[param],
+        };
+    },
+);
+
+export const storageNodesGroupByParamSchema = z
+    .custom<NodesGroupByField | undefined>((value) => STORAGE_NODES_GROUP_BY_PARAMS.includes(value))
+    .catch(undefined);

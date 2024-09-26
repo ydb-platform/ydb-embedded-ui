@@ -17,6 +17,7 @@ const typedMemo: <T>(Component: T) => T = React.memo;
 interface TableChunkProps<T, F> {
     id: number;
     limit: number;
+    totalLength: number;
     rowHeight: number;
     columns: Column<T>[];
     filters?: F;
@@ -35,6 +36,7 @@ interface TableChunkProps<T, F> {
 export const TableChunk = typedMemo(function TableChunk<T, F>({
     id,
     limit,
+    totalLength,
     rowHeight,
     columns,
     fetchData,
@@ -101,7 +103,11 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         }
     }, [currentData, isActive, onDataFetched]);
 
-    const dataLength = currentData?.data?.length || limit;
+    const chunkOffset = id * limit;
+    const remainingLenght = totalLength - chunkOffset;
+    const calculatedChunkLength = remainingLenght < limit ? remainingLenght : limit;
+
+    const dataLength = currentData?.data?.length || calculatedChunkLength;
 
     const renderContent = () => {
         if (!isActive) {

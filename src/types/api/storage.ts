@@ -119,10 +119,10 @@ export interface StorageGroupsResponse {
     FieldsAvailable?: number;
     FieldsRequired?: number;
     StorageGroups?: TGroupsStorageGroupInfo[];
-    StorageGroupGroups?: StorageGroupGroups;
+    StorageGroupGroups?: StorageGroupGroups[];
 }
 
-interface StorageGroupGroups {
+export interface StorageGroupGroups {
     GroupName?: string;
     GroupCount?: string;
 }

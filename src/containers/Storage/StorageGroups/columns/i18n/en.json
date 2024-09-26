@@ -1,8 +1,10 @@
 {
   "pool-name": "Pool Name",
   "type": "Type",
+  "encryption": "Encryption",
   "erasure": "Erasure",
   "degraded": "Degraded",
+  "missing-disks": "Missing Disks",
   "usage": "Usage",
   "group-id": "Group ID",
   "used": "Used",

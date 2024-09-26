@@ -141,7 +141,7 @@ type NodesType = 'static' | 'dynamic' | 'any';
 
 type NodesWithFilter = 'space' | 'missing' | 'all';
 
-type NodesGroupByField =
+export type NodesGroupByField =
     | 'NodeId'
     | 'Host'
     | 'NodeName'
@@ -153,7 +153,7 @@ type NodesGroupByField =
     | 'Uptime'
     | 'Version';
 
-type NodesRequiredField =
+export type NodesRequiredField =
     | 'NodeId'
     | 'SystemState'
     | 'PDisks'

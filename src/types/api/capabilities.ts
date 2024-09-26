@@ -11,4 +11,5 @@ export type Capability =
     | '/scheme/directory'
     | '/storage/groups'
     | '/viewer/query'
-    | '/viewer/feature_flags';
+    | '/viewer/feature_flags'
+    | '/viewer/nodes';

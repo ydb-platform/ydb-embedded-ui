@@ -16,7 +16,12 @@ import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDi
 import {prepareNodeSystemState} from '../../../utils/nodes';
 import {getUsage} from '../../../utils/storage';
 
-import type {PreparedStorageGroup, PreparedStorageNode, PreparedStorageResponse} from './types';
+import type {
+    PreparedStorageGroup,
+    PreparedStorageNode,
+    PreparedStorageResponse,
+    TableGroup,
+} from './types';
 
 // ==== Prepare groups ====
 
@@ -205,7 +210,17 @@ const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
 // ==== Prepare responses ====
 
 export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageResponse => {
-    const {Nodes, TotalNodes, FoundNodes} = data;
+    const {Nodes, TotalNodes, FoundNodes, NodeGroups} = data;
+
+    const tableGroups = NodeGroups?.map(({GroupName, NodeCount}) => {
+        if (GroupName && NodeCount) {
+            return {
+                name: GroupName,
+                count: Number(NodeCount),
+            };
+        }
+        return undefined;
+    }).filter((group): group is TableGroup => Boolean(group));
 
     const preparedNodes = Nodes?.map(prepareStorageNodeData);
 
@@ -213,6 +228,7 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
         nodes: preparedNodes,
         total: Number(TotalNodes) || preparedNodes?.length,
         found: Number(FoundNodes),
+        tableGroups,
     };
 };
 
@@ -229,7 +245,7 @@ export const prepareStorageResponse = (data: TStorageInfo): PreparedStorageRespo
 };
 
 export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStorageResponse {
-    const {FoundGroups, TotalGroups, StorageGroups = []} = data;
+    const {FoundGroups, TotalGroups, StorageGroups = [], StorageGroupGroups} = data;
     const preparedGroups: PreparedStorageGroup[] = StorageGroups.map((group) => {
         const {Usage, Read, Write, Used, Limit, MissingDisks, VDisks = [], Overall} = group;
 
@@ -268,9 +284,20 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
         };
     });
 
+    const tableGroups = StorageGroupGroups?.map(({GroupName, GroupCount}) => {
+        if (GroupName && GroupCount) {
+            return {
+                name: GroupName,
+                count: Number(GroupCount),
+            };
+        }
+        return undefined;
+    }).filter((group): group is TableGroup => Boolean(group));
+
     return {
         groups: preparedGroups,
         total: Number(TotalGroups) || preparedGroups.length,
         found: Number(FoundGroups),
+        tableGroups,
     };
 }

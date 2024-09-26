@@ -9,6 +9,7 @@ import {
 } from '../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
+import type {GroupsGroupByField} from '../../../types/api/storage';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
@@ -16,40 +17,47 @@ import type {StorageGroupsColumn} from './columns/types';
 import {useGroupsGetter} from './getGroups';
 import i18n from './i18n';
 
-interface PaginatedStorageGroupsProps {
+interface PaginatedStorageGroupsTableProps {
     columns: StorageGroupsColumn[];
 
-    searchValue: string;
-    visibleEntities: VisibleEntities;
     database?: string;
     nodeId?: string;
 
+    filterGroup?: string;
+    filterGroupBy?: GroupsGroupByField;
+
+    searchValue: string;
+    visibleEntities: VisibleEntities;
     onShowAll: VoidFunction;
 
     parentContainer?: Element | null;
-    renderControls: RenderControls;
+    renderControls?: RenderControls;
     renderErrorMessage: RenderErrorMessage;
+    initialEntitiesCount?: number;
 }
 
-export const PaginatedStorageGroups = ({
+export const PaginatedStorageGroupsTable = ({
     columns,
-    searchValue,
-    visibleEntities,
     database,
     nodeId,
+    filterGroup,
+    filterGroupBy,
+    searchValue,
+    visibleEntities,
     onShowAll,
     parentContainer,
     renderControls,
     renderErrorMessage,
-}: PaginatedStorageGroupsProps) => {
+    initialEntitiesCount,
+}: PaginatedStorageGroupsTableProps) => {
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
 
     const fetchData = useGroupsGetter(groupsHandlerAvailable);
 
     const tableFilters = React.useMemo(() => {
-        return {searchValue, visibleEntities, database, nodeId};
-    }, [searchValue, visibleEntities, database, nodeId]);
+        return {searchValue, visibleEntities, database, nodeId, filterGroup, filterGroupBy};
+    }, [searchValue, visibleEntities, database, nodeId, filterGroup, filterGroupBy]);
 
     const renderEmptyDataMessage = () => {
         if (visibleEntities !== VISIBLE_ENTITIES.all) {
@@ -72,6 +80,7 @@ export const PaginatedStorageGroups = ({
                 columns={columns}
                 fetchData={fetchData}
                 limit={50}
+                initialEntitiesCount={initialEntitiesCount}
                 renderControls={renderControls}
                 renderErrorMessage={renderErrorMessage}
                 renderEmptyDataMessage={renderEmptyDataMessage}

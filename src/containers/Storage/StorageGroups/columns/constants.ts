@@ -1,3 +1,7 @@
+import type {SelectOption} from '@gravity-ui/uikit';
+import {z} from 'zod';
+
+import type {GroupsGroupByField} from '../../../../types/api/storage';
 import type {ValueOf} from '../../../../types/common';
 
 import i18n from './i18n';
@@ -9,6 +13,7 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
     GroupId: 'GroupId',
     PoolName: 'PoolName',
     MediaType: 'MediaType',
+    Encryption: 'Encryption',
     Erasure: 'Erasure',
     Used: 'Used',
     Limit: 'Limit',
@@ -18,6 +23,7 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
     Write: 'Write',
     VDisks: 'VDisks',
     VDisksPDisks: 'VDisksPDisks',
+    MissingDisks: 'MissingDisks',
     Degraded: 'Degraded',
 } as const;
 
@@ -46,6 +52,9 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     },
     get MediaType() {
         return i18n('type');
+    },
+    get Encryption() {
+        return i18n('encryption');
     },
     get Erasure() {
         return i18n('erasure');
@@ -78,6 +87,33 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
         return i18n('vdisks-pdisks');
     },
     get Degraded() {
-        return i18n('degraded');
+        return i18n('missing-disks');
+    },
+    get MissingDisks() {
+        return i18n('missing-disks');
     },
 } as const satisfies Record<StorageGroupsColumnId, string>;
+
+const STORAGE_GROUPS_GROUP_BY_PARAMS = [
+    'PoolName',
+    'MediaType',
+    'Encryption',
+    'Erasure',
+    'Usage',
+    'MissingDisks',
+] as const satisfies GroupsGroupByField[];
+
+export const STORAGE_GROUPS_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_GROUPS_GROUP_BY_PARAMS.map(
+    (param) => {
+        return {
+            value: param,
+            content: STORAGE_GROUPS_COLUMNS_TITLES[param],
+        };
+    },
+);
+
+export const storageGroupsGroupByParamSchema = z
+    .custom<
+        GroupsGroupByField | undefined
+    >((value) => STORAGE_GROUPS_GROUP_BY_PARAMS.includes(value))
+    .catch(undefined);

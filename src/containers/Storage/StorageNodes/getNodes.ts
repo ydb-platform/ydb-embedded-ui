@@ -8,37 +8,33 @@ import type {NodesRequestParams} from '../../../types/api/nodes';
 import {prepareSortValue} from '../../../utils/filters';
 import {getUptimeParamValue, isSortableNodesProperty} from '../../../utils/nodes';
 
-const getConcurrentId = (limit?: number, offset?: number) => {
-    return `getStorageNodes|offset${offset}|limit${limit}`;
-};
-
 export const getStorageNodes: FetchData<
     PreparedStorageNode,
     PreparedStorageNodeFilters,
     Pick<NodesRequestParams, 'type' | 'storage'>
 > = async (params) => {
     const {type = 'static', storage = true, limit, offset, sortParams, filters} = params;
-    const {searchValue, nodesUptimeFilter, visibleEntities, database} = filters ?? {};
+    const {searchValue, nodesUptimeFilter, visibleEntities, database, filterGroup, filterGroupBy} =
+        filters ?? {};
     const {sortOrder, columnId} = sortParams ?? {};
 
     const sort = isSortableNodesProperty(columnId)
         ? prepareSortValue(columnId, sortOrder)
         : undefined;
 
-    const response = await window.api.getNodes(
-        {
-            type,
-            storage,
-            limit,
-            offset,
-            sort,
-            filter: searchValue,
-            uptime: getUptimeParamValue(nodesUptimeFilter),
-            with: visibleEntities,
-            database,
-        },
-        {concurrentId: getConcurrentId(limit, offset)},
-    );
+    const response = await window.api.getNodes({
+        type,
+        storage,
+        limit,
+        offset,
+        sort,
+        filter: searchValue,
+        uptime: getUptimeParamValue(nodesUptimeFilter),
+        with: visibleEntities,
+        database,
+        filter_group: filterGroup,
+        filter_group_by: filterGroupBy,
+    });
     const preparedResponse = prepareStorageNodesResponse(response);
     return {
         data: preparedResponse.nodes || [],
