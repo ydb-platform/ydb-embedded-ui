@@ -12,7 +12,7 @@ export const overviewApi = api.injectEndpoints({
                                     path: p,
                                     database,
                                 },
-                                {signal, concurrentId: 'overview'},
+                                {signal},
                             ),
                         ),
                     );
