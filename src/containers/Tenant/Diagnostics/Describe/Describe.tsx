@@ -5,12 +5,10 @@ import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
-import {
-    overviewApi,
-    selectPreparedPathOverview,
-} from '../../../../store/reducers/overview/overview';
+import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
+import type {IDescribeData} from '../../../../types/store/describe';
 import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {isEntityWithMergedImplementation} from '../../utils/schema';
@@ -28,6 +26,8 @@ interface IDescribeProps {
     type?: EPathType;
 }
 
+const emptyObject: IDescribeData = {};
+
 const Describe = ({path, database, type}: IDescribeProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -44,17 +44,29 @@ const Describe = ({path, database, type}: IDescribeProps) => {
     } else if (mergedChildrenPaths) {
         paths = [path, ...mergedChildrenPaths];
     }
-    const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
+    const {currentDescribe, currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
         paths.length ? {paths, database} : skipToken,
         {
             pollingInterval: autoRefreshInterval,
+            selectFromResult: (props) => {
+                const {currentData} = props;
+                if (!currentData) {
+                    return {currentDescribe: emptyObject, ...props};
+                }
+
+                const mergedData = Object.values(currentData).flat();
+
+                const data = mergedData.reduce<IDescribeData>((acc, item) => {
+                    if (item?.Path) {
+                        acc[item.Path] = item;
+                    }
+                    return acc;
+                }, {});
+                return {currentDescribe: data, ...props};
+            },
         },
     );
     const loading = isFetching && currentData === undefined;
-
-    const data = useTypedSelector((state) => selectPreparedPathOverview(state, paths, database));
-
-    const currentDescribe = data;
 
     let preparedDescribeData: Object | undefined;
     if (currentDescribe) {
