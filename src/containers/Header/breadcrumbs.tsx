@@ -114,12 +114,11 @@ function getNodeIcon(nodeRole: 'Storage' | 'Compute' | undefined) {
 }
 
 const getPDiskBreadcrumbs: GetBreadcrumbs<PDiskBreadcrumbsOptions> = (options, query = {}) => {
-    const {nodeId, pDiskId, nodeRole, nodeActiveTab} = options;
+    const {nodeId, pDiskId, nodeRole} = options;
 
     const breadcrumbs = getNodeBreadcrumbs({
-        nodeId,
+        ...options,
         nodeRole: nodeRole ?? 'Storage',
-        nodeActiveTab,
     });
 
     let text = headerKeyset('breadcrumbs.pDisk');

@@ -2,7 +2,6 @@ import React from 'react';
 
 import {getVDiskPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
-import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {formatStorageValuesToGb, stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
@@ -36,7 +35,6 @@ export function VDiskInfo<T extends PreparedVDisk>({
     withTitle,
     ...infoViewerProps
 }: VDiskInfoProps<T>) {
-    const diskPagesAvailable = useDiskPagesAvailable();
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     const {
@@ -154,7 +152,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     if (diskParamsDefined) {
         const links: React.ReactNode[] = [];
 
-        if (withVDiskPageLink && diskPagesAvailable) {
+        if (withVDiskPageLink) {
             const vDiskPagePath = getVDiskPagePath(VDiskSlotId, PDiskId, NodeId);
             links.push(
                 <LinkWithIcon

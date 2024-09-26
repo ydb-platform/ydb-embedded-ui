@@ -19,12 +19,18 @@ import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
 interface PaginatedStorageProps {
     database?: string;
     nodeId?: string;
+    groupId?: string;
     parentContainer?: Element | null;
 }
 
-export const PaginatedStorage = ({database, nodeId, parentContainer}: PaginatedStorageProps) => {
+export const PaginatedStorage = ({
+    database,
+    nodeId,
+    groupId,
+    parentContainer,
+}: PaginatedStorageProps) => {
     const {balancer} = useClusterBaseInfo();
-    const additionalNodesProps = useAdditionalNodeProps({balancer});
+    const {additionalNodesProps} = useAdditionalNodeProps({balancer});
 
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
@@ -48,6 +54,7 @@ export const PaginatedStorage = ({database, nodeId, parentContainer}: PaginatedS
         additionalNodesProps,
         visibleEntities,
         database,
+        groupId,
     });
 
     const {

@@ -3,6 +3,8 @@ name: Node.js CI
 on:
   pull_request:
     branches: ['**']
+  merge_group:
+    types: [checks_requested]
 
 jobs:
   verify_files:
@@ -38,6 +40,7 @@ jobs:
   e2e_tests:
     name: Playwright Tests
     runs-on: ubuntu-latest
+    if: ${{github.event.action != 'checks_requested'}}
     permissions:
       contents: read
 
@@ -121,6 +124,7 @@ jobs:
   bundle_size:
     name: Check Bundle Size
     runs-on: ubuntu-latest
+    if: ${{github.event.action != 'checks_requested'}}
     outputs:
       current_size: ${{ steps.current_size.outputs.size }}
       main_size: ${{ steps.main_size.outputs.size }}
@@ -183,7 +187,7 @@ jobs:
   deploy_and_update:
     name: Deploy and Update PR
     needs: [e2e_tests, bundle_size]
-    if: always() && github.event.pull_request.head.repo.full_name == github.repository
+    if: ${{always() && github.event.pull_request.head.repo.full_name == github.repository && github.event.action != 'checks_requested'}}
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -90,7 +90,7 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
 
     const diskSlots: PDiskData['SlotItems'] = [...vdisksSlots, ...emptySlots];
 
-    if (logSlot) {
+    if (logSlot && diskSlots.length > 0) {
         diskSlots.unshift(logSlot);
     }
 

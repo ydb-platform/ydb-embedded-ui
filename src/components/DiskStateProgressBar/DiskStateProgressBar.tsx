@@ -14,6 +14,7 @@ interface DiskStateProgressBarProps {
     severity?: number;
     compact?: boolean;
     faded?: boolean;
+    inactive?: boolean;
     empty?: boolean;
     content?: React.ReactNode;
     className?: string;
@@ -24,13 +25,14 @@ export function DiskStateProgressBar({
     severity,
     compact,
     faded,
+    inactive,
     empty,
     content,
     className,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(INVERTED_DISKS_KEY);
 
-    const mods: Record<string, boolean | undefined> = {inverted, compact, faded, empty};
+    const mods: Record<string, boolean | undefined> = {inverted, compact, faded, empty, inactive};
 
     const color = severity !== undefined && getSeverityColor(severity);
     if (color) {

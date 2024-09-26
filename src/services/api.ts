@@ -58,6 +58,7 @@ import {
     DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
     SECOND_IN_MS,
 } from '../utils/constants';
+import {createPDiskDeveloperUILink} from '../utils/developerUI/developerUI';
 import {isAxiosError} from '../utils/response';
 import type {Nullable} from '../utils/typecheckers';
 
@@ -629,6 +630,45 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {concurrentId, requestConfig: {signal}},
         );
     }
+    evictVDiskOld({
+        groupId,
+        groupGeneration,
+        failRealmIdx,
+        failDomainIdx,
+        vDiskIdx,
+    }: {
+        groupId: string | number;
+        groupGeneration: string | number;
+        failRealmIdx: string | number;
+        failDomainIdx: string | number;
+        vDiskIdx: string | number;
+    }) {
+        // BSC Id is constant for all ydb clusters
+        const BSC_TABLET_ID = '72057594037932033';
+
+        return this.post(
+            this.getPath(`/tablets/app?TabletID=${BSC_TABLET_ID}&exec=1`),
+            {
+                Command: {
+                    ReassignGroupDisk: {
+                        GroupId: groupId,
+                        GroupGeneration: groupGeneration,
+                        FailRealmIdx: failRealmIdx,
+                        FailDomainIdx: failDomainIdx,
+                        VDiskIdx: vDiskIdx,
+                    },
+                },
+            },
+            {},
+            {
+                headers: {
+                    // This handler requires exactly this string
+                    // Automatic headers may not suit
+                    Accept: 'application/json',
+                },
+            },
+        );
+    }
     evictVDisk({
         groupId,
         groupGeneration,
@@ -661,6 +701,26 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
+
+    restartPDiskOld({nodeId, pDiskId}: {nodeId: number | string; pDiskId: number | string}) {
+        const pDiskPath = createPDiskDeveloperUILink({
+            nodeId,
+            pDiskId,
+            host: this.getPath(''),
+        });
+
+        return this.post<ModifyDiskResponse>(
+            pDiskPath,
+            'restartPDisk=',
+            {},
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                },
+            },
+        );
+    }
+
     restartPDisk({
         nodeId,
         pDiskId,

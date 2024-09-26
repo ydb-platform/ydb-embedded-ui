@@ -67,7 +67,7 @@ interface StorageProps {
 
 export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
     const {balancer} = useClusterBaseInfo();
-    const additionalNodesProps = useAdditionalNodeProps({balancer});
+    const {additionalNodesProps} = useAdditionalNodeProps({balancer});
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
@@ -109,6 +109,7 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
         additionalNodesProps,
         visibleEntities,
         database,
+        groupId: groupId?.toString(),
     });
 
     const {
