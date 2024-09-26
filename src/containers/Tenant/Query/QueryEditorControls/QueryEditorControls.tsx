@@ -6,6 +6,7 @@ import QuerySettingsDescription from '../../../../components/QuerySettingsDescri
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
+import {NewSQL} from '../NewSQL/NewSQL';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
 
@@ -107,7 +108,10 @@ export const QueryEditorControls = ({
                 </Button>
                 <SettingsButton onClick={onSettingsButtonClick} runIsLoading={isLoading} />
             </div>
-            <SaveQuery isSaveButtonDisabled={disabled} />
+            <div className={b('right')}>
+                <NewSQL />
+                <SaveQuery isSaveButtonDisabled={disabled} />
+            </div>
         </div>
     );
 };

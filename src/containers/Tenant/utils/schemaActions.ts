@@ -24,7 +24,7 @@ import {
     dropViewTemplate,
     selectQueryTemplate,
     upsertQueryTemplate,
-} from './queryTemplates';
+} from './schemaQueryTemplates';
 
 interface ActionsAdditionalEffects {
     updateQueryExecutionSettings: (settings?: Partial<QuerySettings>) => void;
