@@ -1,7 +1,6 @@
 import DataTable from '@gravity-ui/react-data-table';
 
 import {NodeHostWrapper} from '../../../../components/NodeHostWrapper/NodeHostWrapper';
-import type {AdditionalNodesProps} from '../../../../types/additionalProps';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {isSortableNodesProperty} from '../../../../utils/nodes';
@@ -14,11 +13,11 @@ import './StorageNodesColumns.scss';
 
 const b = cn('ydb-storage-nodes-columns');
 
-const getStorageNodesColumns = (
-    additionalNodesProps: AdditionalNodesProps | undefined,
-    database?: string,
-    groupId?: string,
-) => {
+const getStorageNodesColumns = ({
+    additionalNodesProps,
+    database,
+    groupId,
+}: GetStorageNodesColumnsParams) => {
     const getNodeRef = additionalNodesProps?.getNodeRef;
 
     const columns: StorageNodesColumn[] = [
@@ -107,12 +106,8 @@ const getStorageNodesColumns = (
     return columns;
 };
 
-export const getPreparedStorageNodesColumns = ({
-    additionalNodesProps,
-    database,
-    groupId,
-}: GetStorageNodesColumnsParams) => {
-    const rawColumns = getStorageNodesColumns(additionalNodesProps, database, groupId);
+export const getPreparedStorageNodesColumns = (params: GetStorageNodesColumnsParams) => {
+    const rawColumns = getStorageNodesColumns(params);
 
     const sortableColumns = rawColumns.map((column) => ({
         ...column,
