@@ -3,7 +3,6 @@ import React from 'react';
 import {STRUCTURE} from '../../containers/Node/NodePages';
 import routes, {createHref, getVDiskPagePath} from '../../routes';
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
-import type {NodesMap} from '../../types/store/nodesList';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
@@ -19,7 +18,6 @@ const b = cn('ydb-vdisk-component');
 
 export interface VDiskProps {
     data?: PreparedVDisk;
-    nodes?: NodesMap;
     compact?: boolean;
     inactive?: boolean;
     showPopup?: boolean;
@@ -30,7 +28,6 @@ export interface VDiskProps {
 
 export const VDisk = ({
     data = {},
-    nodes,
     compact,
     inactive,
     showPopup,
@@ -94,12 +91,7 @@ export const VDisk = ({
                     />
                 </InternalLink>
             </div>
-            <VDiskPopup
-                data={data}
-                nodes={nodes}
-                anchorRef={anchor}
-                open={isPopupVisible || showPopup}
-            />
+            <VDiskPopup data={data} anchorRef={anchor} open={isPopupVisible || showPopup} />
         </React.Fragment>
     );
 };

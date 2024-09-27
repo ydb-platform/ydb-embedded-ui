@@ -6,13 +6,13 @@ import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import routes, {createHref, getPDiskPagePath} from '../../../routes';
 import {useDiskPagesAvailable} from '../../../store/reducers/capabilities/hooks';
-import {selectNodesMap} from '../../../store/reducers/nodesList';
 import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
-import {useTypedSelector} from '../../../utils/hooks';
 import {STRUCTURE} from '../../Node/NodePages';
+import {isVdiskActive} from '../utils';
+import type {VDiskViewContext} from '../utils';
 
 import './PDisk.scss';
 
@@ -21,27 +21,26 @@ const b = cn('pdisk-storage');
 interface PDiskProps {
     data?: PreparedPDisk;
     vDisks?: PreparedVDisk[];
-    inactiveVdisks?: PreparedVDisk[];
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
     className?: string;
     progressBarClassName?: string;
+    viewContext?: VDiskViewContext;
 }
 
 export const PDisk = ({
     data = {},
     vDisks,
-    inactiveVdisks,
     showPopup,
     onShowPopup,
     onHidePopup,
     className,
     progressBarClassName,
+    viewContext,
 }: PDiskProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
 
-    const nodes = useTypedSelector(selectNodesMap);
     const diskPagesAvailable = useDiskPagesAvailable();
 
     const anchor = React.useRef(null);
@@ -79,7 +78,7 @@ export const PDisk = ({
                         >
                             <VDiskWithDonorsStack
                                 data={vdisk}
-                                inactive={inactiveVdisks?.includes(vdisk)}
+                                inactive={!isVdiskActive(vdisk, viewContext)}
                                 stackClassName={b('donors-stack')}
                                 compact
                             />
@@ -118,12 +117,7 @@ export const PDisk = ({
                     <div className={b('media-type')}>{data.Type}</div>
                 </InternalLink>
             </div>
-            <PDiskPopup
-                data={data}
-                nodes={nodes}
-                anchorRef={anchor}
-                open={isPopupVisible || showPopup}
-            />
+            <PDiskPopup data={data} anchorRef={anchor} open={isPopupVisible || showPopup} />
         </React.Fragment>
     );
 };

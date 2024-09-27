@@ -3,12 +3,14 @@ import React from 'react';
 import type {PopupProps} from '@gravity-ui/uikit';
 import {Popup} from '@gravity-ui/uikit';
 
+import {selectNodeNamesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
-import type {NodesMap} from '../../types/store/nodesList';
+import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {getPDiskId} from '../../utils/disks/helpers';
 import type {PreparedPDisk} from '../../utils/disks/types';
+import {useTypedSelector} from '../../utils/hooks';
 import {bytesToGB} from '../../utils/utils';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
@@ -19,7 +21,7 @@ const b = cn('pdisk-storage-popup');
 
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
-export const preparePDiskData = (data: PreparedPDisk, nodes?: NodesMap) => {
+export const preparePDiskData = (data: PreparedPDisk, nodeName?: string) => {
     const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Type, Device} = data;
 
     const pdiskData: InfoViewerItem[] = [
@@ -35,8 +37,8 @@ export const preparePDiskData = (data: PreparedPDisk, nodes?: NodesMap) => {
         pdiskData.push({label: 'Node Id', value: NodeId});
     }
 
-    if (nodes && NodeId && nodes.get(NodeId)) {
-        pdiskData.push({label: 'Host', value: nodes.get(NodeId)});
+    if (nodeName) {
+        pdiskData.push({label: 'Host', value: nodeName});
     }
 
     if (Path) {
@@ -61,11 +63,12 @@ export const preparePDiskData = (data: PreparedPDisk, nodes?: NodesMap) => {
 
 interface PDiskPopupProps extends PopupProps {
     data: PreparedPDisk;
-    nodes?: NodesMap;
 }
 
-export const PDiskPopup = ({data, nodes, ...props}: PDiskPopupProps) => {
-    const info = React.useMemo(() => preparePDiskData(data, nodes), [data, nodes]);
+export const PDiskPopup = ({data, ...props}: PDiskPopupProps) => {
+    const nodeNamesMap = useTypedSelector(selectNodeNamesMap);
+    const nodeName = valueIsDefined(data.NodeId) ? nodeNamesMap?.get(data.NodeId) : undefined;
+    const info = React.useMemo(() => preparePDiskData(data, nodeName), [data, nodeName]);
 
     return (
         <Popup

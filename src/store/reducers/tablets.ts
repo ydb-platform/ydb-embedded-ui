@@ -6,7 +6,7 @@ import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import type {RootState} from '../defaultStore';
 
 import {api} from './api';
-import {selectNodesMap} from './nodesList';
+import {selectNodeNamesMap} from './nodesList';
 
 export const tabletsApi = api.injectEndpoints({
     endpoints: (build) => ({
@@ -42,7 +42,7 @@ export const selectGetTabletsInfo = createSelector(
 
 export const selectTabletsWithFqdn = createSelector(
     (state: RootState, params: TabletsApiRequestParams) => selectGetTabletsInfo(state, params),
-    (state: RootState) => selectNodesMap(state),
+    (state: RootState) => selectNodeNamesMap(state),
     (data, nodesMap): (TTabletStateInfo & {fqdn?: string})[] => {
         if (!data?.TabletStateInfo) {
             return [];

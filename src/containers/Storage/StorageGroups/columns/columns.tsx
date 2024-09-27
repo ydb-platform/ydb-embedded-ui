@@ -10,17 +10,16 @@ import {InternalLink} from '../../../../components/InternalLink';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {VDiskWithDonorsStack} from '../../../../components/VDisk/VDiskWithDonorsStack';
 import {getStorageGroupPath} from '../../../../routes';
-import type {NodesMap} from '../../../../types/store/nodesList';
 import {cn} from '../../../../utils/cn';
 import {stringifyVdiskId} from '../../../../utils/dataFormatters/dataFormatters';
 import {isSortableStorageProperty} from '../../../../utils/storage';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
-import {getDegradedSeverity, getUsageSeverityForStorageGroup} from '../../utils';
+import {getDegradedSeverity, getUsageSeverityForStorageGroup, isVdiskActive} from '../../utils';
 import i18n from '../i18n';
 
 import {STORAGE_GROUPS_COLUMNS_IDS, STORAGE_GROUPS_COLUMNS_TITLES} from './constants';
-import type {StorageColumnsGetter, StorageGroupsColumn} from './types';
+import type {GetStorageColumnsData, StorageColumnsGetter, StorageGroupsColumn} from './types';
 
 import './StorageGroupsColumns.scss';
 
@@ -184,22 +183,20 @@ const writeColumn: StorageGroupsColumn = {
     align: DataTable.RIGHT,
 };
 
-const getVDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
+const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
     name: STORAGE_GROUPS_COLUMNS_IDS.VDisks,
     header: STORAGE_GROUPS_COLUMNS_TITLES.VDisks,
     className: b('vdisks-column'),
     render: ({row}) => (
         <div className={b('vdisks-wrapper')}>
-            {row.VDisks?.map((vDisk) => {
-                return (
-                    <VDiskWithDonorsStack
-                        key={stringifyVdiskId(vDisk.VDiskId)}
-                        data={vDisk}
-                        nodes={nodes}
-                        className={b('vdisks-item')}
-                    />
-                );
-            })}
+            {row.VDisks?.map((vDisk) => (
+                <VDiskWithDonorsStack
+                    key={stringifyVdiskId(vDisk.VDiskId)}
+                    data={vDisk}
+                    inactive={!isVdiskActive(vDisk, data)}
+                    className={b('vdisks-item')}
+                />
+            ))}
         </div>
     ),
     align: DataTable.CENTER,
@@ -208,12 +205,12 @@ const getVDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
     sortable: false,
 });
 
-const getDisksColumn = (nodes?: NodesMap): StorageGroupsColumn => ({
+const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
     name: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
     header: STORAGE_GROUPS_COLUMNS_TITLES.VDisksPDisks,
     className: b('disks-column'),
     render: ({row}) => {
-        return <Disks vDisks={row.VDisks} nodes={nodes} />;
+        return <Disks vDisks={row.VDisks} viewContext={data} />;
     },
     align: DataTable.CENTER,
     width: 900,
@@ -239,7 +236,7 @@ export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
     });
 };
 
-export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
+export const getStorageGroupsColumns: StorageColumnsGetter = (data?: GetStorageColumnsData) => {
     const columns = [
         groupIdColumn,
         poolNameColumn,
@@ -252,8 +249,8 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
         usedSpaceFlagColumn,
         readColumn,
         writeColumn,
-        getVDisksColumn(data?.nodes),
-        getDisksColumn(data?.nodes),
+        getVDisksColumn(data),
+        getDisksColumn(data),
     ];
 
     return columns.map((column) => ({

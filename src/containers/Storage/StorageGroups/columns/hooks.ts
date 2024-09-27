@@ -1,9 +1,6 @@
 import React from 'react';
 
-import {selectNodesMap} from '../../../../store/reducers/nodesList';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
-import type {VisibleEntities} from '../../../../store/reducers/storage/types';
-import {useTypedSelector} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
 import {getStorageGroupsColumns} from './columns';
@@ -14,17 +11,19 @@ import {
     STORAGE_GROUPS_COLUMNS_TITLES,
     STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
 } from './constants';
+import type {GetStorageGroupsColumnsParams} from './types';
 
-export function useGetStorageGroupsColumns() {
-    const nodes = useTypedSelector(selectNodesMap);
-
+export function useGetStorageGroupsColumns(nodeId?: string) {
     return React.useMemo(() => {
-        return getStorageGroupsColumns({nodes});
-    }, [nodes]);
+        return getStorageGroupsColumns({nodeId});
+    }, [nodeId]);
 }
 
-export function useStorageGroupsSelectedColumns(visibleEntities?: VisibleEntities) {
-    const columns = useGetStorageGroupsColumns();
+export function useStorageGroupsSelectedColumns({
+    visibleEntities,
+    nodeId,
+}: GetStorageGroupsColumnsParams) {
+    const columns = useGetStorageGroupsColumns(nodeId);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

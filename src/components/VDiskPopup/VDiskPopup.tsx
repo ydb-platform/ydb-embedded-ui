@@ -3,14 +3,16 @@ import React from 'react';
 import type {PopupProps} from '@gravity-ui/uikit';
 import {Label, Popup} from '@gravity-ui/uikit';
 
+import {selectNodeNamesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import type {TVDiskStateInfo} from '../../types/api/vdisk';
-import type {NodesMap} from '../../types/store/nodesList';
+import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {UnavailableDonor} from '../../utils/disks/types';
+import {useTypedSelector} from '../../utils/hooks';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
@@ -129,19 +131,21 @@ const prepareVDiskData = (data: TVDiskStateInfo) => {
 
 interface VDiskPopupProps extends PopupProps {
     data: TVDiskStateInfo | UnavailableDonor;
-    nodes?: NodesMap;
 }
 
-export const VDiskPopup = ({data, nodes, ...props}: VDiskPopupProps) => {
+export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
 
     const vdiskInfo = React.useMemo(
         () => (isFullData ? prepareVDiskData(data) : prepareUnavailableVDiskData(data)),
         [data, isFullData],
     );
+
+    const nodeNamesMap = useTypedSelector(selectNodeNamesMap);
+    const nodeName = valueIsDefined(data.NodeId) ? nodeNamesMap?.get(data.NodeId) : undefined;
     const pdiskInfo = React.useMemo(
-        () => isFullData && data.PDisk && preparePDiskData(data.PDisk, nodes),
-        [data, nodes, isFullData],
+        () => isFullData && data.PDisk && preparePDiskData(data.PDisk, nodeName),
+        [data, nodeName, isFullData],
     );
 
     return (

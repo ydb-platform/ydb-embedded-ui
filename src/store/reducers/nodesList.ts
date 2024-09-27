@@ -24,7 +24,7 @@ export const nodesListApi = api.injectEndpoints({
 
 const selectNodesList = nodesListApi.endpoints.getNodesList.select(undefined);
 
-export const selectNodesMap = createSelector(
+export const selectNodeNamesMap = createSelector(
     (state: RootState) => selectNodesList(state).data,
     (data) => prepareNodesMap(data),
 );
