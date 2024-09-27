@@ -24,14 +24,5 @@ export function isDomain(path: string, type?: EPathType) {
     if (type !== EPathType.EPathTypeDir) {
         return false;
     }
-    let count = 0;
-    for (let i = 0; i <= path.length; i++) {
-        if (path[i] === '/') {
-            count++;
-        }
-        if (count > 1) {
-            return false;
-        }
-    }
-    return count === 1;
+    return path.split('/').length === 2 && path.startsWith('/');
 }
