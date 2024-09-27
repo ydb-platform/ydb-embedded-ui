@@ -6,13 +6,22 @@ export const overviewApi = api.injectEndpoints({
             queryFn: async ({paths, database}: {paths: string[]; database: string}, {signal}) => {
                 try {
                     const [data, ...additionalData] = await Promise.all(
-                        paths.map((p) => window.api.getDescribe({path: p, database}, {signal})),
+                        paths.map((p) =>
+                            window.api.getDescribe(
+                                {
+                                    path: p,
+                                    database,
+                                },
+                                {signal},
+                            ),
+                        ),
                     );
                     return {data: {data, additionalData}};
                 } catch (error) {
                     return {error};
                 }
             },
+            keepUnusedDataFor: 0,
             providesTags: ['All'],
         }),
     }),

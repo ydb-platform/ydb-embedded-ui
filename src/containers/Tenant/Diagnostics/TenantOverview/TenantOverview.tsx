@@ -1,7 +1,7 @@
 import {Loader} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
-import {useGetSchemaQuery} from '../../../../store/reducers/schema/schema';
+import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
@@ -44,9 +44,17 @@ export function TenantOverview({
     const {Name, Type, Overall} = tenant || {};
 
     const tenantType = mapDatabaseTypeToDBName(Type);
-
     // FIXME: remove after correct data is added to tenantInfo
-    const {data: tenantSchemaData} = useGetSchemaQuery({path: tenantName, database: tenantName});
+    const {currentData} = overviewApi.useGetOverviewQuery(
+        {
+            paths: [tenantName],
+            database: tenantName,
+        },
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
+    const {data: tenantSchemaData} = currentData ?? {};
     const {Tables, Topics} =
         tenantSchemaData?.PathDescription?.DomainDescription?.DiskSpaceUsage || {};
 
