@@ -6,6 +6,7 @@ import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/te
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import type {QueryMode, QuerySettings} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
+import {transformPath} from '../ObjectSummary/transformPath';
 import i18n from '../i18n';
 
 import {
@@ -33,7 +34,7 @@ interface ActionsAdditionalEffects {
 }
 
 const bindActions = (
-    path: string,
+    {path, relativePath}: {path: string; relativePath: string},
     dispatch: React.Dispatch<any>,
     additionalEffects: ActionsAdditionalEffects,
 ) => {
@@ -45,7 +46,7 @@ const bindActions = (
             updateQueryExecutionSettings({queryMode: mode});
         }
 
-        dispatch(changeUserInput({input: tmpl(path)}));
+        dispatch(changeUserInput({input: tmpl(relativePath)}));
         dispatch(setTenantPage(TENANT_PAGES_IDS.query));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
         setActivePath(path);
@@ -75,7 +76,7 @@ const bindActions = (
         dropView: inputQuery(dropViewTemplate, 'script'),
         copyPath: () => {
             try {
-                copy(path);
+                copy(relativePath);
                 createToast({
                     name: 'Copied',
                     title: i18n('actions.copied'),
@@ -95,9 +96,10 @@ const bindActions = (
 type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
 
 export const getActions =
-    (dispatch: React.Dispatch<any>, additionalEffects: ActionsAdditionalEffects) =>
+    (dispatch: React.Dispatch<any>, additionalEffects: ActionsAdditionalEffects, rootPath = '') =>
     (path: string, type: NavigationTreeNodeType) => {
-        const actions = bindActions(path, dispatch, additionalEffects);
+        const relativePath = transformPath(path, rootPath);
+        const actions = bindActions({path, relativePath}, dispatch, additionalEffects);
         const copyItem = {text: i18n('actions.copyPath'), action: actions.copyPath};
 
         const DIR_SET: ActionsSet = [
