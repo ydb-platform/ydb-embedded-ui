@@ -16,8 +16,13 @@ export const useSelectedColumns = <T extends {name: string}>(
     });
 
     const columnsToShow = React.useMemo(() => {
-        return columns.filter((column) => selectedColumnsIds.find((name) => name === column.name));
-    }, [columns, selectedColumnsIds]);
+        return columns.filter((column) => {
+            const columnId = column.name;
+            const isSelected = selectedColumnsIds.includes(columnId);
+            const isRequired = requiredColumnsIds?.includes(columnId);
+            return isSelected || isRequired;
+        });
+    }, [columns, requiredColumnsIds, selectedColumnsIds]);
 
     const columnsToSelect: TableColumnSetupItem[] = React.useMemo(() => {
         const columnsIds = columns.map((column) => column.name);
