@@ -106,6 +106,7 @@ function GroupedStorageNodesComponent({database, groupId, nodeId}: PaginatedStor
         {
             database,
             with: 'all',
+            filter: searchValue,
             node_id: nodeId,
             // node_id and group_id params don't work together
             group_id: valueIsDefined(nodeId) ? undefined : groupId,
@@ -134,24 +135,28 @@ function GroupedStorageNodesComponent({database, groupId, nodeId}: PaginatedStor
     };
 
     const renderGroups = () => {
-        return tableGroups?.map(({name, count}) => {
-            return (
-                <TableGroup key={name} title={name} count={count} entityName={i18n('nodes')}>
-                    <PaginatedStorageNodesTable
-                        database={database}
-                        searchValue={searchValue}
-                        visibleEntities={'all'}
-                        nodesUptimeFilter={NodesUptimeFilterValues.All}
-                        onShowAll={handleShowAllNodes}
-                        filterGroup={name}
-                        filterGroupBy={storageNodesGroupByParam}
-                        renderErrorMessage={renderPaginatedTableErrorMessage}
-                        columns={columnsToShow}
-                        initialEntitiesCount={count}
-                    />
-                </TableGroup>
-            );
-        });
+        if (tableGroups?.length) {
+            return tableGroups.map(({name, count}) => {
+                return (
+                    <TableGroup key={name} title={name} count={count} entityName={i18n('nodes')}>
+                        <PaginatedStorageNodesTable
+                            database={database}
+                            searchValue={searchValue}
+                            visibleEntities={'all'}
+                            nodesUptimeFilter={NodesUptimeFilterValues.All}
+                            onShowAll={handleShowAllNodes}
+                            filterGroup={name}
+                            filterGroupBy={storageNodesGroupByParam}
+                            renderErrorMessage={renderPaginatedTableErrorMessage}
+                            columns={columnsToShow}
+                            initialEntitiesCount={count}
+                        />
+                    </TableGroup>
+                );
+            });
+        }
+
+        return i18n('no-nodes');
     };
 
     return (

@@ -95,6 +95,7 @@ function GroupedStorageGroupsComponent({database, groupId, nodeId}: PaginatedSto
             with: 'all',
             nodeId,
             groupId,
+            filter: searchValue,
             shouldUseGroupsHandler: true,
             group: storageGroupsGroupByParam,
         },
@@ -121,24 +122,28 @@ function GroupedStorageGroupsComponent({database, groupId, nodeId}: PaginatedSto
     };
 
     const renderGroups = () => {
-        return tableGroups?.map(({name, count}) => {
-            return (
-                <TableGroup key={name} title={name} count={count} entityName={i18n('groups')}>
-                    <PaginatedStorageGroupsTable
-                        database={database}
-                        nodeId={nodeId}
-                        filterGroup={name}
-                        filterGroupBy={storageGroupsGroupByParam}
-                        searchValue={searchValue}
-                        visibleEntities={'all'}
-                        onShowAll={handleShowAllGroups}
-                        renderErrorMessage={renderPaginatedTableErrorMessage}
-                        columns={columnsToShow}
-                        initialEntitiesCount={count}
-                    />
-                </TableGroup>
-            );
-        });
+        if (tableGroups?.length) {
+            return tableGroups.map(({name, count}) => {
+                return (
+                    <TableGroup key={name} title={name} count={count} entityName={i18n('groups')}>
+                        <PaginatedStorageGroupsTable
+                            database={database}
+                            nodeId={nodeId}
+                            filterGroup={name}
+                            filterGroupBy={storageGroupsGroupByParam}
+                            searchValue={searchValue}
+                            visibleEntities={'all'}
+                            onShowAll={handleShowAllGroups}
+                            renderErrorMessage={renderPaginatedTableErrorMessage}
+                            columns={columnsToShow}
+                            initialEntitiesCount={count}
+                        />
+                    </TableGroup>
+                );
+            });
+        }
+
+        return i18n('no-groups');
     };
 
     return (
