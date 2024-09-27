@@ -54,7 +54,7 @@ const Describe = ({path, database, type}: IDescribeProps) => {
                     return {currentDescribe: emptyObject, ...props};
                 }
 
-                const mergedData = Object.values(currentData).flat();
+                const mergedData = [currentData.data, ...currentData.additionalData];
 
                 const data = mergedData.reduce<IDescribeData>((acc, item) => {
                     if (item?.Path) {
