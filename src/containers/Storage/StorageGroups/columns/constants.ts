@@ -18,13 +18,16 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
     Used: 'Used',
     Limit: 'Limit',
     Usage: 'Usage',
+    DiskSpaceUsage: 'DiskSpaceUsage',
     DiskSpace: 'DiskSpace',
     Read: 'Read',
     Write: 'Write',
+    Latency: 'Latency',
     VDisks: 'VDisks',
     VDisksPDisks: 'VDisksPDisks',
     MissingDisks: 'MissingDisks',
     Degraded: 'Degraded',
+    State: 'State',
 } as const;
 
 type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
@@ -71,6 +74,9 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     get Usage() {
         return i18n('usage');
     },
+    get DiskSpaceUsage() {
+        return i18n('disk-space-usage');
+    },
     get DiskSpace() {
         return i18n('space');
     },
@@ -79,6 +85,9 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     },
     get Write() {
         return i18n('write');
+    },
+    get Latency() {
+        return i18n('latency');
     },
     get VDisks() {
         return i18n('vdisks');
@@ -92,6 +101,9 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     get MissingDisks() {
         return i18n('missing-disks');
     },
+    get State() {
+        return i18n('state');
+    },
 } as const satisfies Record<StorageGroupsColumnId, string>;
 
 const STORAGE_GROUPS_GROUP_BY_PARAMS = [
@@ -100,7 +112,10 @@ const STORAGE_GROUPS_GROUP_BY_PARAMS = [
     'Encryption',
     'Erasure',
     'Usage',
+    'DiskSpaceUsage',
+    'State',
     'MissingDisks',
+    'Latency',
 ] as const satisfies GroupsGroupByField[];
 
 export const STORAGE_GROUPS_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_GROUPS_GROUP_BY_PARAMS.map(

@@ -87,7 +87,7 @@ export function StorageGroupsControls({
                     hasClear
                     placeholder={'-'}
                     label={i18n('controls_group-by-placeholder')}
-                    width={200}
+                    width={240}
                     defaultValue={
                         storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
                     }
@@ -165,7 +165,7 @@ export function StorageNodesControls({
                     hasClear
                     placeholder={'-'}
                     label={i18n('controls_group-by-placeholder')}
-                    width={200}
+                    width={240}
                     defaultValue={storageNodesGroupByParam ? [storageNodesGroupByParam] : undefined}
                     onUpdate={handleGroupBySelectUpdate}
                     options={STORAGE_NODES_GROUP_BY_OPTIONS}

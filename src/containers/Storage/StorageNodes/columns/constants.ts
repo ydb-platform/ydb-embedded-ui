@@ -14,9 +14,11 @@ export const STORAGE_NODES_COLUMNS_IDS = {
     Host: 'Host',
     DC: 'DC',
     Rack: 'Rack',
+    Version: 'Version',
     Uptime: 'Uptime',
     PDisks: 'PDisks',
     Missing: 'Missing',
+    DiskSpaceUsage: 'DiskSpaceUsage',
 } as const;
 
 type StorageNodesColumnId = ValueOf<typeof STORAGE_NODES_COLUMNS_IDS>;
@@ -46,6 +48,9 @@ export const STORAGE_NODES_COLUMNS_TITLES = {
     get Rack() {
         return i18n('rack');
     },
+    get Version() {
+        return i18n('version');
+    },
     get Uptime() {
         return i18n('uptime');
     },
@@ -55,14 +60,19 @@ export const STORAGE_NODES_COLUMNS_TITLES = {
     get Missing() {
         return i18n('missing');
     },
+    get DiskSpaceUsage() {
+        return i18n('disk-space-usage');
+    },
 } as const satisfies Record<StorageNodesColumnId, string>;
 
 const STORAGE_NODES_GROUP_BY_PARAMS = [
     'Host',
     'DC',
     'Rack',
+    'Version',
     'Uptime',
     'Missing',
+    'DiskSpaceUsage',
 ] as const satisfies NodesGroupByField[];
 
 export const STORAGE_NODES_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_NODES_GROUP_BY_PARAMS.map(
