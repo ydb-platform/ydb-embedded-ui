@@ -1,8 +1,9 @@
-import type {Settings, SortOrder} from '@gravity-ui/react-data-table';
+import type {SortOrder} from '@gravity-ui/react-data-table';
 
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
+import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import type {HandleSort} from '../../../utils/hooks/useTableSort';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 
@@ -12,10 +13,14 @@ import type {StorageNodesColumn} from './columns/types';
 import i18n from './i18n';
 import {getRowUnavailableClassName} from './shared';
 
-interface StorageNodesProps {
+const tableSettings = {
+    ...DEFAULT_TABLE_SETTINGS,
+    dynamicRenderMinSize: 51,
+} as const;
+
+interface StorageNodesTableProps {
     data: PreparedStorageNode[];
     columns: StorageNodesColumn[];
-    tableSettings: Settings;
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: NodesUptimeFilterValues;
     sort?: SortOrder;
@@ -23,16 +28,15 @@ interface StorageNodesProps {
     handleSort?: HandleSort;
 }
 
-export function StorageNodes({
+export function StorageNodesTable({
     data,
     columns,
-    tableSettings,
     visibleEntities,
     nodesUptimeFilter,
     sort,
     onShowAll,
     handleSort,
-}: StorageNodesProps) {
+}: StorageNodesTableProps) {
     if (
         !data.length &&
         (visibleEntities !== VISIBLE_ENTITIES.all ||
@@ -53,10 +57,7 @@ export function StorageNodes({
             key={visibleEntities as string}
             data={data}
             columns={columns}
-            settings={{
-                ...tableSettings,
-                dynamicRenderType: 'variable',
-            }}
+            settings={tableSettings}
             emptyDataMessage={i18n('empty.default')}
             rowClassName={getRowUnavailableClassName}
             sortOrder={sort}

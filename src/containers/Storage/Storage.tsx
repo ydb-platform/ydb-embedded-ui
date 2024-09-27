@@ -26,15 +26,14 @@ import type {
     VisibleEntities,
 } from '../../store/reducers/storage/types';
 import {valueIsDefined} from '../../utils';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTableSort} from '../../utils/hooks';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 import {useAdditionalNodeProps} from '../AppWithClusters/useClusterData';
 
 import {StorageControls} from './StorageControls/StorageControls';
-import {StorageGroups} from './StorageGroups/StorageGroups';
+import {StorageGroupsTable} from './StorageGroups/StorageGroupsTable';
 import {useStorageGroupsSelectedColumns} from './StorageGroups/columns/hooks';
-import {StorageNodes} from './StorageNodes/StorageNodes';
+import {StorageNodesTable} from './StorageNodes/StorageNodesTable';
 import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
 import {b} from './shared';
 import {defaultSortNode, getDefaultSortGroup} from './utils';
@@ -201,11 +200,10 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
         return (
             <React.Fragment>
                 {isGroups ? (
-                    <StorageGroups
+                    <StorageGroupsTable
                         key="groups"
                         visibleEntities={visibleEntities}
                         data={storageGroups}
-                        tableSettings={DEFAULT_TABLE_SETTINGS}
                         onShowAll={() => handleGroupVisibilityChange(VISIBLE_ENTITIES.all)}
                         sort={groupsSort}
                         handleSort={handleGroupsSort}
@@ -213,12 +211,11 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
                     />
                 ) : null}
                 {isNodes ? (
-                    <StorageNodes
+                    <StorageNodesTable
                         key="nodes"
                         visibleEntities={visibleEntities}
                         nodesUptimeFilter={uptimeFilter}
                         data={storageNodes}
-                        tableSettings={DEFAULT_TABLE_SETTINGS}
                         onShowAll={handleShowAllNodes}
                         sort={nodesSort}
                         handleSort={handleNodesSort}
