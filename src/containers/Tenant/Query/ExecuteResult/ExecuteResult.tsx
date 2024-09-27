@@ -121,16 +121,18 @@ export function ExecuteResult({
                     </div>
                 )}
                 <div className={b('result')}>
-                    {currentResult?.truncated ? (
-                        <div className={b('result-head')}>
-                            <Text variant="subheader-3">{i18n('truncated')}</Text>
-                            <Text
-                                color="secondary"
-                                variant="body-2"
-                                className={b('row-count')}
-                            >{`(${currentResult?.result?.length})`}</Text>
-                        </div>
-                    ) : null}
+                    <div className={b('result-head')}>
+                        <Text variant="subheader-3">
+                            {currentResult?.truncated
+                                ? i18n('title.truncated')
+                                : i18n('title.result')}
+                        </Text>
+                        <Text
+                            color="secondary"
+                            variant="body-2"
+                            className={b('row-count')}
+                        >{`(${currentResult?.result?.length})`}</Text>
+                    </div>
                     <QueryResultTable
                         data={currentResult?.result}
                         columns={currentResult?.columns}
