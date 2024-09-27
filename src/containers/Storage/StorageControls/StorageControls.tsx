@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type {TableColumnSetupItem} from '@gravity-ui/uikit';
-import {Select, TableColumnSetup} from '@gravity-ui/uikit';
+import {Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {Search} from '../../../components/Search/Search';
@@ -83,17 +83,19 @@ export function StorageGroupsControls({
                 sortable={false}
             />
             {withGroupBySelect ? (
-                <Select
-                    hasClear
-                    placeholder={'-'}
-                    label={i18n('controls_group-by-placeholder')}
-                    width={240}
-                    defaultValue={
-                        storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
-                    }
-                    onUpdate={handleGroupBySelectUpdate}
-                    options={STORAGE_GROUPS_GROUP_BY_OPTIONS}
-                />
+                <React.Fragment>
+                    <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
+                    <Select
+                        hasClear
+                        placeholder={'-'}
+                        width={170}
+                        defaultValue={
+                            storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
+                        }
+                        onUpdate={handleGroupBySelectUpdate}
+                        options={STORAGE_GROUPS_GROUP_BY_OPTIONS}
+                    />
+                </React.Fragment>
             ) : null}
         </React.Fragment>
     );
@@ -161,15 +163,19 @@ export function StorageNodesControls({
                 sortable={false}
             />
             {withGroupBySelect ? (
-                <Select
-                    hasClear
-                    placeholder={'-'}
-                    label={i18n('controls_group-by-placeholder')}
-                    width={240}
-                    defaultValue={storageNodesGroupByParam ? [storageNodesGroupByParam] : undefined}
-                    onUpdate={handleGroupBySelectUpdate}
-                    options={STORAGE_NODES_GROUP_BY_OPTIONS}
-                />
+                <React.Fragment>
+                    <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
+                    <Select
+                        hasClear
+                        placeholder={'-'}
+                        width={170}
+                        defaultValue={
+                            storageNodesGroupByParam ? [storageNodesGroupByParam] : undefined
+                        }
+                        onUpdate={handleGroupBySelectUpdate}
+                        options={STORAGE_NODES_GROUP_BY_OPTIONS}
+                    />
+                </React.Fragment>
             ) : null}
         </React.Fragment>
     );
