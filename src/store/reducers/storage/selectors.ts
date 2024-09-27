@@ -1,8 +1,7 @@
 import type {NodesUptimeFilterValues} from '../../../utils/nodes';
-import {getUsage} from '../../../utils/storage';
 import {filterNodesByUptime} from '../nodes/selectors';
 
-import type {PreparedStorageGroup, PreparedStorageNode, UsageFilter} from './types';
+import type {PreparedStorageGroup, PreparedStorageNode} from './types';
 
 // ==== Filters ====
 
@@ -37,17 +36,6 @@ const filterGroupsByText = (entities: PreparedStorageGroup[], text: string) => {
     });
 };
 
-const filterGroupsByUsage = (entities: PreparedStorageGroup[], usage?: string[]) => {
-    if (!Array.isArray(usage) || usage.length === 0) {
-        return entities;
-    }
-
-    return entities.filter((entity) => {
-        const entityUsage = entity.Usage;
-        return usage.some((val) => Number(val) <= entityUsage && entityUsage < Number(val) + 5);
-    });
-};
-
 export function filterNodes(
     storageNodes: PreparedStorageNode[],
     textFilter: string,
@@ -60,35 +48,9 @@ export function filterNodes(
     return result;
 }
 
-export function filterGroups(
-    storageGroups: PreparedStorageGroup[],
-    textFilter: string,
-    usageFilter: string[],
-) {
+export function filterGroups(storageGroups: PreparedStorageGroup[], textFilter: string) {
     let result = storageGroups || [];
     result = filterGroupsByText(result, textFilter);
-    result = filterGroupsByUsage(result, usageFilter);
 
     return result;
-}
-
-// ==== Complex selectors ====
-
-export function getUsageFilterOptions(groups: PreparedStorageGroup[]): UsageFilter[] {
-    const items: Record<number, number> = {};
-
-    groups?.forEach((group) => {
-        // Get groups usage with step 5
-        const usage = getUsage(group, 5);
-
-        if (!Object.prototype.hasOwnProperty.call(items, usage)) {
-            items[usage] = 0;
-        }
-
-        items[usage] += 1;
-    });
-
-    return Object.entries(items)
-        .map(([threshold, count]) => ({threshold: Number(threshold), count}))
-        .sort((a, b) => b.threshold - a.threshold);
 }

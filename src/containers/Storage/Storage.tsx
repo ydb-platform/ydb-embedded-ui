@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {ArrayParam, StringParam, useQueryParams, withDefault} from 'use-query-params';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {isAccessError} from '../../components/Errors/PageError/PageError';
@@ -13,11 +13,7 @@ import {
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import {VISIBLE_ENTITIES} from '../../store/reducers/storage/constants';
-import {
-    filterGroups,
-    filterNodes,
-    getUsageFilterOptions,
-} from '../../store/reducers/storage/selectors';
+import {filterGroups, filterNodes} from '../../store/reducers/storage/selectors';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
 import type {
@@ -41,23 +37,6 @@ import {defaultSortNode, getDefaultSortGroup} from './utils';
 
 import './Storage.scss';
 
-const UsageFilterParam = withDefault(
-    {
-        encode: ArrayParam.encode,
-        decode: (input) => {
-            if (input === null || input === undefined) {
-                return input;
-            }
-
-            if (!Array.isArray(input)) {
-                return input ? [input] : [];
-            }
-            return input.filter(Boolean) as string[];
-        },
-    },
-    [],
-);
-
 interface StorageProps {
     database?: string;
     nodeId?: string | number;
@@ -78,7 +57,6 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
         visible: StringParam,
         search: StringParam,
         uptimeFilter: StringParam,
-        usageFilter: UsageFilterParam,
     });
     const storageType = storageTypeSchema.parse(queryParams.type);
     const isGroups = storageType === 'groups';
@@ -87,7 +65,6 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
     const visibleEntities = visibleEntitiesSchema.parse(queryParams.visible);
     const filter = queryParams.search ?? '';
     const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
-    const usageFilter = queryParams.usageFilter;
 
     const [nodeSort, setNodeSort] = React.useState<NodesSortParams>({
         sortOrder: undefined,
@@ -158,12 +135,7 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
         () => filterNodes(nodes, filter, uptimeFilter),
         [filter, nodes, uptimeFilter],
     );
-    const storageGroups = React.useMemo(
-        () => filterGroups(groups, filter, usageFilter),
-        [filter, groups, usageFilter],
-    );
-
-    const usageFilterOptions = React.useMemo(() => getUsageFilterOptions(groups), [groups]);
+    const storageGroups = React.useMemo(() => filterGroups(groups, filter), [filter, groups]);
 
     const [nodesSort, handleNodesSort] = useTableSort(nodesSortParams, (params) =>
         setNodeSort(params as NodesSortParams),
@@ -171,10 +143,6 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
     const [groupsSort, handleGroupsSort] = useTableSort(groupsSortParams, (params) =>
         setGroupSort(params as StorageSortParams),
     );
-
-    const handleUsageFilterChange = (value: string[]) => {
-        setQueryParams({usageFilter: value.length ? value : undefined}, 'replaceIn');
-    };
 
     const handleTextFilterChange = (value: string) => {
         setQueryParams({search: value || undefined}, 'replaceIn');
@@ -251,9 +219,6 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
                 handleVisibleEntitiesChange={handleGroupVisibilityChange}
                 nodesUptimeFilter={uptimeFilter}
                 handleNodesUptimeFilterChange={handleUptimeFilterChange}
-                groupsUsageFilter={usageFilter}
-                groupsUsageFilterOptions={usageFilterOptions}
-                handleGroupsUsageFilterChange={handleUsageFilterChange}
                 entitiesCountCurrent={entitiesCountCurrent}
                 entitiesCountTotal={entitiesCount.total}
                 entitiesLoading={isLoading}

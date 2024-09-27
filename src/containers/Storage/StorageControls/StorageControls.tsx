@@ -11,8 +11,6 @@ import type {StorageType, VisibleEntities} from '../../../store/reducers/storage
 import type {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
 import {StorageVisibleEntitiesFilter} from '../StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
-import {UsageFilter} from '../UsageFilter/UsageFilter';
-import type {UsageFilterItem} from '../UsageFilter/UsageFilter';
 import i18n from '../i18n';
 import {b} from '../shared';
 
@@ -29,11 +27,6 @@ interface StorageControlsProps {
 
     nodesUptimeFilter: NodesUptimeFilterValues;
     handleNodesUptimeFilterChange: (value: NodesUptimeFilterValues) => void;
-
-    withGroupsUsageFilter?: boolean;
-    groupsUsageFilter?: string[];
-    groupsUsageFilterOptions?: UsageFilterItem[];
-    handleGroupsUsageFilterChange?: (value: string[]) => void;
 
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
@@ -57,11 +50,6 @@ export const StorageControls = ({
     nodesUptimeFilter,
     handleNodesUptimeFilterChange,
 
-    withGroupsUsageFilter,
-    groupsUsageFilter,
-    groupsUsageFilterOptions,
-    handleGroupsUsageFilterChange,
-
     entitiesCountCurrent,
     entitiesCountTotal,
     entitiesLoading,
@@ -70,7 +58,6 @@ export const StorageControls = ({
     handleSelectedColumnsUpdate,
 }: StorageControlsProps) => {
     const isNodes = storageType === STORAGE_TYPES.nodes;
-    const isGroups = storageType === STORAGE_TYPES.groups;
     const entityName = isNodes ? i18n('nodes') : i18n('groups');
 
     return (
@@ -96,14 +83,6 @@ export const StorageControls = ({
             {isNodes && (
                 <UptimeFilter value={nodesUptimeFilter} onChange={handleNodesUptimeFilterChange} />
             )}
-            {isGroups && withGroupsUsageFilter && (
-                <UsageFilter
-                    value={groupsUsageFilter}
-                    onChange={handleGroupsUsageFilterChange}
-                    groups={groupsUsageFilterOptions}
-                />
-            )}
-
             <EntitiesCount
                 label={entityName}
                 loading={entitiesLoading}

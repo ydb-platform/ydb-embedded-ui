@@ -7,7 +7,6 @@ import type {
     StorageSortParams,
     VisibleEntities,
 } from '../../../store/reducers/storage/types';
-import {EFlag} from '../../../types/api/enums';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {NODES_COLUMNS_IDS} from '../../Nodes/columns/constants';
 import {STORAGE_GROUPS_COLUMNS_IDS} from '../StorageGroups/columns/constants';
@@ -34,11 +33,6 @@ export const getUsageSeverityForStorageGroup = generateEvaluator(80, 85, [
     'success',
     'warning',
     'danger',
-]);
-export const getUsageSeverityForEntityStatus = generateEvaluator(80, 85, [
-    EFlag.Green,
-    EFlag.Yellow,
-    EFlag.Red,
 ]);
 
 export const defaultSortNode: NodesSortParams = {

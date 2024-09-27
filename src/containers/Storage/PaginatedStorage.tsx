@@ -113,7 +113,6 @@ export const PaginatedStorage = ({
                 handleVisibleEntitiesChange={handleGroupVisibilityChange}
                 nodesUptimeFilter={nodesUptimeFilter}
                 handleNodesUptimeFilterChange={handleUptimeFilterChange}
-                withGroupsUsageFilter={false}
                 entitiesCountCurrent={foundEntities}
                 entitiesCountTotal={totalEntities}
                 entitiesLoading={!inited}
