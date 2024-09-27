@@ -6,5 +6,6 @@
   "action.explain-plan": "Explain Plan",
   "action.copy": "Copy {{activeSection}}",
   "trace": "Trace",
-  "truncated": "Truncated"
+  "title.truncated": "Truncated",
+  "title.result": "Result"
 }
