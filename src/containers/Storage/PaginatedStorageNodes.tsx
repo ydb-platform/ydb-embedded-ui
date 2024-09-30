@@ -21,8 +21,10 @@ import {PaginatedStorageNodesTable} from './StorageNodes/PaginatedStorageNodesTa
 import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
 import {TableGroup} from './TableGroup/TableGroup';
 import i18n from './i18n';
-import {renderPaginatedTableErrorMessage} from './shared';
+import {b, renderPaginatedTableErrorMessage} from './shared';
 import {useStorageQueryParams} from './useStorageQueryParams';
+
+import './Storage.scss';
 
 export const PaginatedStorageNodes = (props: PaginatedStorageProps) => {
     const {storageNodesGroupByParam, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
@@ -163,7 +165,7 @@ function GroupedStorageNodesComponent({database, groupId, nodeId}: PaginatedStor
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
             {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading}>
+            <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
                 {renderGroups()}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
