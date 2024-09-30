@@ -32,15 +32,17 @@ export function TableGroup({
 
     const renderTitle = () => {
         return (
-            <div onClick={toggleCollapsed} className={b('title-wrapper')} tabIndex={0}>
-                <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
-                <div className={b('title')}>
-                    <Text variant="subheader-2">{title}</Text>
-                    <Text variant="body-2" color="secondary" className={b('count')}>
-                        {entityName}: <Label theme="normal">{count}</Label>
-                    </Text>
+            <button onClick={toggleCollapsed} className={b('button')}>
+                <div className={b('title-wrapper')}>
+                    <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
+                    <div className={b('title')}>
+                        <Text variant="subheader-2">{title}</Text>
+                        <Text variant="body-2" color="secondary" className={b('count')}>
+                            {entityName}: <Label theme="normal">{count}</Label>
+                        </Text>
+                    </div>
                 </div>
-            </div>
+            </button>
         );
     };
 

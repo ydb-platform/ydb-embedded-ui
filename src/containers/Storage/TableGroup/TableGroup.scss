@@ -4,10 +4,18 @@
 
     width: 100%;
     margin-bottom: 20px;
-    padding: 8px 0;
 
     border: 1px solid var(--g-color-line-generic);
     border-radius: var(--g-spacing-2);
+
+    &__button {
+        padding: 8px 0;
+
+        cursor: pointer;
+
+        border: unset;
+        background: unset;
+    }
 
     &__title-wrapper {
         position: sticky;
@@ -21,8 +29,6 @@
 
         width: max-content;
         padding-left: 20px;
-
-        cursor: pointer;
     }
 
     &__title {
@@ -38,6 +44,6 @@
     }
 
     &__content {
-        padding: 20px 0 20px 20px;
+        padding: 12px 0 20px 20px;
     }
 }
