@@ -1,3 +1,5 @@
+import {EPathType} from '../../../types/api/schema';
+
 export function transformPath(path: string, dbName: string): string {
     // Normalize the path and dbName by removing leading/trailing slashes
     const normalizedPath = path.replace(/^\/+|\/+$/g, '');
@@ -6,6 +8,9 @@ export function transformPath(path: string, dbName: string): string {
     if (!normalizedPath.startsWith(normalizedDbName)) {
         return normalizedPath || '/';
     }
+    if (normalizedPath === normalizedDbName) {
+        return `/${normalizedPath}`;
+    }
 
     let result = normalizedPath.slice(normalizedDbName.length);
 
@@ -13,4 +18,11 @@ export function transformPath(path: string, dbName: string): string {
     result = result.replace(/^\/+/, '') || '/';
 
     return result;
+}
+
+export function isDomain(path: string, type?: EPathType) {
+    if (type !== EPathType.EPathTypeDir) {
+        return false;
+    }
+    return path.split('/').length === 2 && path.startsWith('/');
 }

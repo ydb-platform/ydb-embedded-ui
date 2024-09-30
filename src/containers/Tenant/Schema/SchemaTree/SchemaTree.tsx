@@ -110,14 +110,18 @@ export function SchemaTree(props: SchemaTreeProps) {
                     collapsed: false,
                 }}
                 fetchPath={fetchPath}
-                getActions={getActions(dispatch, {
-                    setActivePath: onActivePathUpdate,
-                    updateQueryExecutionSettings: (settings) =>
-                        setQueryExecutionSettings({...querySettings, ...settings}),
-                    showCreateDirectoryDialog: createDirectoryFeatureAvailable
-                        ? handleOpenCreateDirectoryDialog
-                        : undefined,
-                })}
+                getActions={getActions(
+                    dispatch,
+                    {
+                        setActivePath: onActivePathUpdate,
+                        updateQueryExecutionSettings: (settings) =>
+                            setQueryExecutionSettings({...querySettings, ...settings}),
+                        showCreateDirectoryDialog: createDirectoryFeatureAvailable
+                            ? handleOpenCreateDirectoryDialog
+                            : undefined,
+                    },
+                    rootPath,
+                )}
                 renderAdditionalNodeElements={getSchemaControls(dispatch, {
                     setActivePath: onActivePathUpdate,
                 })}

@@ -44,7 +44,7 @@ import {ObjectTree} from './ObjectTree';
 import {SchemaActions} from './SchemaActions';
 import i18n from './i18n';
 import {b} from './shared';
-import {transformPath} from './transformPath';
+import {isDomain, transformPath} from './transformPath';
 
 import './ObjectSummary.scss';
 
@@ -158,7 +158,11 @@ export function ObjectSummary({
 
         const overview: InfoViewerItem[] = [];
 
-        overview.push({label: i18n('field_type'), value: PathType?.replace(/^EPathType/, '')});
+        const normalizedType = isDomain(path, PathType)
+            ? 'Domain'
+            : PathType?.replace(/^EPathType/, '');
+
+        overview.push({label: i18n('field_type'), value: normalizedType});
 
         if (PathSubType !== EPathSubType.EPathSubTypeEmpty) {
             overview.push({
@@ -353,6 +357,8 @@ export function ObjectSummary({
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.clear);
     };
 
+    const relativePath = transformPath(path, tenantName);
+
     const renderCommonInfoControls = () => {
         const showPreview = isTableType(type) && !isIndexTableType(subType);
         return (
@@ -364,7 +370,7 @@ export function ObjectSummary({
                         'm',
                     )(path, 'preview')}
                 <ClipboardButton
-                    text={path}
+                    text={relativePath}
                     view="flat-secondary"
                     title={i18n('action_copySchemaPath')}
                 />
@@ -380,15 +386,19 @@ export function ObjectSummary({
 
     const renderEntityTypeBadge = () => {
         const {Status, Reason} = currentObjectData ?? {};
-
-        let message;
-        if (!type && Status && Reason) {
-            message = `${Status}: ${Reason}`;
+        if (type) {
+            let label = type.replace('EPathType', '');
+            if (isDomain(path, type)) {
+                label = 'domain';
+            }
+            return <div className={b('entity-type')}>{label}</div>;
         }
 
-        return type ? (
-            <div className={b('entity-type')}>{type.replace('EPathType', '')}</div>
-        ) : (
+        let message;
+        if (Status && Reason) {
+            message = `${Status}: ${Reason}`;
+        }
+        return (
             <div className={b('entity-type', {error: true})}>
                 <HelpPopover content={message} offset={{left: 0}} />
             </div>
@@ -414,9 +424,7 @@ export function ObjectSummary({
                                 <div className={b('info-header')}>
                                     <div className={b('info-title')}>
                                         {renderEntityTypeBadge()}
-                                        <div className={b('path-name')}>
-                                            {transformPath(path, tenantName)}
-                                        </div>
+                                        <div className={b('path-name')}>{relativePath}</div>
                                     </div>
                                     <div className={b('info-controls')}>
                                         {renderCommonInfoControls()}
