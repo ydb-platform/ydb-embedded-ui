@@ -14,7 +14,8 @@ interface TableGroupProps {
     title: string;
     entityName: string;
     count: string | number;
-    expanded?: boolean;
+    expanded: boolean;
+    onIsExpandedChange: (name: string, isExpanded: boolean) => void;
 }
 
 export function TableGroup({
@@ -23,15 +24,10 @@ export function TableGroup({
     entityName,
     count,
     expanded = false,
+    onIsExpandedChange,
 }: TableGroupProps) {
-    const [isExpanded, setIsExpanded] = React.useState(false);
-
-    React.useEffect(() => {
-        setIsExpanded(expanded);
-    }, [expanded]);
-
     const toggleCollapsed = () => {
-        setIsExpanded((value) => !value);
+        onIsExpandedChange(title, !expanded);
     };
 
     const renderTitle = () => {
@@ -49,7 +45,7 @@ export function TableGroup({
     };
 
     const renderContent = () => {
-        if (isExpanded) {
+        if (expanded) {
             return <div className={b('content')}>{children}</div>;
         }
 

@@ -16,6 +16,7 @@ import {StorageGroupsControls} from './StorageControls/StorageControls';
 import {PaginatedStorageGroupsTable} from './StorageGroups/PaginatedStorageGroupsTable';
 import {useStorageGroupsSelectedColumns} from './StorageGroups/columns/hooks';
 import {TableGroup} from './TableGroup/TableGroup';
+import {useExpandedGroups} from './TableGroup/useExpandedTableGroups';
 import i18n from './i18n';
 import {b, renderPaginatedTableErrorMessage} from './shared';
 import {useStorageQueryParams} from './useStorageQueryParams';
@@ -109,6 +110,8 @@ function GroupedStorageGroupsComponent({database, groupId, nodeId}: PaginatedSto
     const isLoading = currentData === undefined && isFetching;
     const {tableGroups, found = 0, total = 0} = currentData || {};
 
+    const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
+
     const renderControls = () => {
         return (
             <StorageGroupsControls
@@ -126,8 +129,17 @@ function GroupedStorageGroupsComponent({database, groupId, nodeId}: PaginatedSto
     const renderGroups = () => {
         if (tableGroups?.length) {
             return tableGroups.map(({name, count}) => {
+                const isExpanded = expandedGroups[name];
+
                 return (
-                    <TableGroup key={name} title={name} count={count} entityName={i18n('groups')}>
+                    <TableGroup
+                        key={name}
+                        title={name}
+                        count={count}
+                        entityName={i18n('groups')}
+                        expanded={isExpanded}
+                        onIsExpandedChange={setIsGroupExpanded}
+                    >
                         <PaginatedStorageGroupsTable
                             database={database}
                             nodeId={nodeId}
