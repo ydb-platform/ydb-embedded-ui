@@ -25,6 +25,7 @@ import './PaginatedTable.scss';
 
 export interface PaginatedTableProps<T, F> {
     limit: number;
+    initialEntitiesCount?: number;
     fetchData: FetchData<T, F>;
     filters?: F;
     tableName: string;
@@ -42,6 +43,7 @@ export interface PaginatedTableProps<T, F> {
 
 export const PaginatedTable = <T, F>({
     limit,
+    initialEntitiesCount,
     fetchData,
     filters,
     tableName,
@@ -56,9 +58,12 @@ export const PaginatedTable = <T, F>({
     renderEmptyDataMessage,
     containerClassName,
 }: PaginatedTableProps<T, F>) => {
+    const initialTotal = initialEntitiesCount || limit;
+    const initialFound = initialEntitiesCount || 0;
+
     const [sortParams, setSortParams] = React.useState<SortParams | undefined>(initialSortParams);
-    const [totalEntities, setTotalEntities] = React.useState(limit);
-    const [foundEntities, setFoundEntities] = React.useState(0);
+    const [totalEntities, setTotalEntities] = React.useState(initialTotal);
+    const [foundEntities, setFoundEntities] = React.useState(initialFound);
     const [activeChunks, setActiveChunks] = React.useState<number[]>([]);
     const [isInitialLoad, setIsInitialLoad] = React.useState(true);
 
@@ -82,8 +87,8 @@ export const PaginatedTable = <T, F>({
 
     // reset table on filters change
     React.useLayoutEffect(() => {
-        setTotalEntities(limit);
-        setFoundEntities(0);
+        setTotalEntities(initialTotal);
+        setFoundEntities(initialFound);
         setIsInitialLoad(true);
         if (parentContainer) {
             parentContainer.scrollTo(0, 0);
@@ -92,7 +97,7 @@ export const PaginatedTable = <T, F>({
         }
 
         setActiveChunks([0]);
-    }, [filters, limit, parentContainer]);
+    }, [filters, initialFound, initialTotal, limit, parentContainer]);
 
     const renderChunks = () => {
         if (!observer) {
@@ -117,6 +122,7 @@ export const PaginatedTable = <T, F>({
                 key={value}
                 id={value}
                 limit={limit}
+                totalLength={totalLength}
                 rowHeight={rowHeight}
                 columns={columns}
                 fetchData={fetchData}

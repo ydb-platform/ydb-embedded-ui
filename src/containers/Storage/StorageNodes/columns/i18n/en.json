@@ -3,7 +3,9 @@
   "host": "Host",
   "dc": "DC",
   "rack": "Rack",
+  "version": "Version",
   "uptime": "Uptime",
   "missing": "Missing",
+  "disk-space-usage": "Disk space usage",
   "pdisks": "PDisks"
 }

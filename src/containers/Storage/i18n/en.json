@@ -3,5 +3,9 @@
   "nodes": "Nodes",
 
   "controls_groups-search-placeholder": "Group ID, Pool name",
-  "controls_nodes-search-placeholder": "Node ID, FQDN"
+  "controls_nodes-search-placeholder": "Node ID, FQDN",
+  "controls_group-by-placeholder": "Group by:",
+
+  "no-nodes": "No such nodes",
+  "no-groups": "No such groups"
 }

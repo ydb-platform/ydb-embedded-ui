@@ -1,7 +1,0 @@
-{
-  "groups": "Группы",
-  "nodes": "Ноды",
-
-  "controls_groups-search-placeholder": "ID группы, имя пула",
-  "controls_nodes-search-placeholder": "ID узла, FQDN"
-}

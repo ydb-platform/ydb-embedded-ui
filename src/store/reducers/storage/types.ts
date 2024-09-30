@@ -2,8 +2,8 @@ import type {OrderType} from '@gravity-ui/react-data-table';
 import {z} from 'zod';
 
 import type {EFlag} from '../../../types/api/enums';
-import type {TSystemStateInfo} from '../../../types/api/nodes';
-import type {StorageV2SortValue} from '../../../types/api/storage';
+import type {NodesGroupByField, TSystemStateInfo} from '../../../types/api/nodes';
+import type {GroupsGroupByField, StorageV2SortValue} from '../../../types/api/storage';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesUptimeFilterValues} from '../../../utils/nodes';
 
@@ -19,6 +19,8 @@ export interface PreparedStorageNodeFilters {
     nodesUptimeFilter: NodesUptimeFilterValues;
     visibleEntities: VisibleEntities;
     database?: string;
+    filterGroup?: string;
+    filterGroupBy?: NodesGroupByField;
 }
 
 export interface PreparedStorageNode extends TSystemStateInfo {
@@ -38,6 +40,8 @@ export interface PreparedStorageGroupFilters {
     visibleEntities: VisibleEntities;
     database?: string;
     nodeId?: string;
+    filterGroup?: string;
+    filterGroupBy?: GroupsGroupByField;
 }
 
 export interface PreparedStorageGroup {
@@ -86,9 +90,15 @@ export interface StorageSortParams {
     sortValue: StorageV2SortValue | undefined;
 }
 
+export type TableGroup = {
+    name: string;
+    count: number;
+};
+
 export interface PreparedStorageResponse {
     nodes?: PreparedStorageNode[];
     groups?: PreparedStorageGroup[];
     found: number | undefined;
     total: number | undefined;
+    tableGroups?: TableGroup[];
 }

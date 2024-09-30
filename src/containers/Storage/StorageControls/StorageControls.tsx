@@ -1,32 +1,22 @@
 import React from 'react';
 
 import type {TableColumnSetupItem} from '@gravity-ui/uikit';
-import {TableColumnSetup} from '@gravity-ui/uikit';
+import {Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {Search} from '../../../components/Search/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
-import {STORAGE_TYPES} from '../../../store/reducers/storage/constants';
-import type {StorageType, VisibleEntities} from '../../../store/reducers/storage/types';
-import type {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {STORAGE_GROUPS_GROUP_BY_OPTIONS} from '../StorageGroups/columns/constants';
+import {STORAGE_NODES_GROUP_BY_OPTIONS} from '../StorageNodes/columns/constants';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
 import {StorageVisibleEntitiesFilter} from '../StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
 import i18n from '../i18n';
 import {b} from '../shared';
+import {useStorageQueryParams} from '../useStorageQueryParams';
 
 interface StorageControlsProps {
-    searchValue?: string;
-    handleSearchValueChange: (value: string) => void;
-
     withTypeSelector?: boolean;
-    storageType: StorageType;
-    handleStorageTypeChange: (value: StorageType) => void;
-
-    visibleEntities: VisibleEntities;
-    handleVisibleEntitiesChange: (value: VisibleEntities) => void;
-
-    nodesUptimeFilter: NodesUptimeFilterValues;
-    handleNodesUptimeFilterChange: (value: NodesUptimeFilterValues) => void;
+    withGroupBySelect?: boolean;
 
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
@@ -36,19 +26,9 @@ interface StorageControlsProps {
     handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
 }
 
-export const StorageControls = ({
-    searchValue,
-    handleSearchValueChange,
-
+export function StorageGroupsControls({
     withTypeSelector,
-    storageType,
-    handleStorageTypeChange,
-
-    visibleEntities,
-    handleVisibleEntitiesChange,
-
-    nodesUptimeFilter,
-    handleNodesUptimeFilterChange,
+    withGroupBySelect,
 
     entitiesCountCurrent,
     entitiesCountTotal,
@@ -56,35 +36,41 @@ export const StorageControls = ({
 
     columnsToSelect,
     handleSelectedColumnsUpdate,
-}: StorageControlsProps) => {
-    const isNodes = storageType === STORAGE_TYPES.nodes;
-    const entityName = isNodes ? i18n('nodes') : i18n('groups');
+}: StorageControlsProps) {
+    const {
+        searchValue,
+        storageType,
+        visibleEntities,
+        storageGroupsGroupByParam,
+        handleTextFilterChange,
+        handleStorageTypeChange,
+        handleVisibleEntitiesChange,
+        handleStorageGroupsGroupByParamChange,
+    } = useStorageQueryParams();
+
+    const handleGroupBySelectUpdate = (value: string[]) => {
+        handleStorageGroupsGroupByParamChange(value[0]);
+    };
 
     return (
         <React.Fragment>
             <Search
                 value={searchValue}
-                onChange={handleSearchValueChange}
-                placeholder={
-                    isNodes
-                        ? i18n('controls_nodes-search-placeholder')
-                        : i18n('controls_groups-search-placeholder')
-                }
+                onChange={handleTextFilterChange}
+                placeholder={i18n('controls_groups-search-placeholder')}
                 className={b('search')}
             />
             {withTypeSelector && (
                 <StorageTypeFilter value={storageType} onChange={handleStorageTypeChange} />
             )}
-            <StorageVisibleEntitiesFilter
-                value={visibleEntities}
-                onChange={handleVisibleEntitiesChange}
-            />
-
-            {isNodes && (
-                <UptimeFilter value={nodesUptimeFilter} onChange={handleNodesUptimeFilterChange} />
+            {withGroupBySelect ? null : (
+                <StorageVisibleEntitiesFilter
+                    value={visibleEntities}
+                    onChange={handleVisibleEntitiesChange}
+                />
             )}
             <EntitiesCount
-                label={entityName}
+                label={i18n('groups')}
                 loading={entitiesLoading}
                 total={entitiesCountTotal}
                 current={entitiesCountCurrent}
@@ -96,6 +82,101 @@ export const StorageControls = ({
                 onUpdate={handleSelectedColumnsUpdate}
                 sortable={false}
             />
+            {withGroupBySelect ? (
+                <React.Fragment>
+                    <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
+                    <Select
+                        hasClear
+                        placeholder={'-'}
+                        width={170}
+                        defaultValue={
+                            storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
+                        }
+                        onUpdate={handleGroupBySelectUpdate}
+                        options={STORAGE_GROUPS_GROUP_BY_OPTIONS}
+                    />
+                </React.Fragment>
+            ) : null}
         </React.Fragment>
     );
-};
+}
+
+export function StorageNodesControls({
+    withTypeSelector,
+    withGroupBySelect,
+
+    entitiesCountCurrent,
+    entitiesCountTotal,
+    entitiesLoading,
+
+    columnsToSelect,
+    handleSelectedColumnsUpdate,
+}: StorageControlsProps) {
+    const {
+        searchValue,
+        storageType,
+        visibleEntities,
+        nodesUptimeFilter,
+        storageNodesGroupByParam,
+        handleTextFilterChange,
+        handleStorageTypeChange,
+        handleVisibleEntitiesChange,
+        handleUptimeFilterChange,
+        handleStorageNodesGroupByParamChange,
+    } = useStorageQueryParams();
+
+    const handleGroupBySelectUpdate = (value: string[]) => {
+        handleStorageNodesGroupByParamChange(value[0]);
+    };
+
+    return (
+        <React.Fragment>
+            <Search
+                value={searchValue}
+                onChange={handleTextFilterChange}
+                placeholder={i18n('controls_nodes-search-placeholder')}
+                className={b('search')}
+            />
+            {withTypeSelector && (
+                <StorageTypeFilter value={storageType} onChange={handleStorageTypeChange} />
+            )}
+            {withGroupBySelect ? null : (
+                <StorageVisibleEntitiesFilter
+                    value={visibleEntities}
+                    onChange={handleVisibleEntitiesChange}
+                />
+            )}
+            {withGroupBySelect ? null : (
+                <UptimeFilter value={nodesUptimeFilter} onChange={handleUptimeFilterChange} />
+            )}
+            <EntitiesCount
+                label={i18n('nodes')}
+                loading={entitiesLoading}
+                total={entitiesCountTotal}
+                current={entitiesCountCurrent}
+            />
+            <TableColumnSetup
+                popupWidth={200}
+                items={columnsToSelect}
+                showStatus
+                onUpdate={handleSelectedColumnsUpdate}
+                sortable={false}
+            />
+            {withGroupBySelect ? (
+                <React.Fragment>
+                    <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
+                    <Select
+                        hasClear
+                        placeholder={'-'}
+                        width={170}
+                        defaultValue={
+                            storageNodesGroupByParam ? [storageNodesGroupByParam] : undefined
+                        }
+                        onUpdate={handleGroupBySelectUpdate}
+                        options={STORAGE_NODES_GROUP_BY_OPTIONS}
+                    />
+                </React.Fragment>
+            ) : null}
+        </React.Fragment>
+    );
+}

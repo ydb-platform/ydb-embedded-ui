@@ -31,6 +31,14 @@ export const useStorageGroupsHandlerAvailable = () => {
     return useGetFeatureVersion('/storage/groups') > 2;
 };
 
+export const useStorageGroupsHandlerHasGrouping = () => {
+    return useGetFeatureVersion('/storage/groups') > 4;
+};
+
+export const useViewerNodesHandlerHasGrouping = () => {
+    return useGetFeatureVersion('/viewer/nodes') > 6;
+};
+
 export const useFeatureFlagsAvailable = () => {
     return useGetFeatureVersion('/viewer/feature_flags') > 1;
 };
