@@ -45,11 +45,11 @@ export function StorageGroupsControls({
         handleTextFilterChange,
         handleStorageTypeChange,
         handleVisibleEntitiesChange,
-        handleGroupByParamChange,
+        handleStorageGroupsGroupByParamChange,
     } = useStorageQueryParams();
 
     const handleGroupBySelectUpdate = (value: string[]) => {
-        handleGroupByParamChange(value[0]);
+        handleStorageGroupsGroupByParamChange(value[0]);
     };
 
     return (
@@ -122,11 +122,11 @@ export function StorageNodesControls({
         handleStorageTypeChange,
         handleVisibleEntitiesChange,
         handleUptimeFilterChange,
-        handleGroupByParamChange,
+        handleStorageNodesGroupByParamChange,
     } = useStorageQueryParams();
 
     const handleGroupBySelectUpdate = (value: string[]) => {
-        handleGroupByParamChange(value[0]);
+        handleStorageNodesGroupByParamChange(value[0]);
     };
 
     return (

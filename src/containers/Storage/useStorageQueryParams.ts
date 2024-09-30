@@ -13,7 +13,8 @@ export function useStorageQueryParams() {
         visible: StringParam,
         search: StringParam,
         uptimeFilter: StringParam,
-        groupBy: StringParam,
+        storageNodesGroupBy: StringParam,
+        storageGroupsGroupBy: StringParam,
     });
 
     const storageType = storageTypeSchema.parse(queryParams.type);
@@ -22,8 +23,12 @@ export function useStorageQueryParams() {
     const searchValue = queryParams.search ?? '';
     const nodesUptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
 
-    const storageGroupsGroupByParam = storageGroupsGroupByParamSchema.parse(queryParams.groupBy);
-    const storageNodesGroupByParam = storageNodesGroupByParamSchema.parse(queryParams.groupBy);
+    const storageGroupsGroupByParam = storageGroupsGroupByParamSchema.parse(
+        queryParams.storageGroupsGroupBy,
+    );
+    const storageNodesGroupByParam = storageNodesGroupByParamSchema.parse(
+        queryParams.storageNodesGroupBy,
+    );
 
     const handleTextFilterChange = (value: string) => {
         setQueryParams({search: value || undefined}, 'replaceIn');
@@ -41,8 +46,11 @@ export function useStorageQueryParams() {
         setQueryParams({uptimeFilter: value}, 'replaceIn');
     };
 
-    const handleGroupByParamChange = (value: string) => {
-        setQueryParams({groupBy: value}, 'replaceIn');
+    const handleStorageGroupsGroupByParamChange = (value: string) => {
+        setQueryParams({storageGroupsGroupBy: value}, 'replaceIn');
+    };
+    const handleStorageNodesGroupByParamChange = (value: string) => {
+        setQueryParams({storageNodesGroupBy: value}, 'replaceIn');
     };
 
     const handleShowAllGroups = () => {
@@ -66,7 +74,10 @@ export function useStorageQueryParams() {
         handleVisibleEntitiesChange,
         handleStorageTypeChange,
         handleUptimeFilterChange,
-        handleGroupByParamChange,
+
+        handleStorageGroupsGroupByParamChange,
+        handleStorageNodesGroupByParamChange,
+
         handleShowAllGroups,
         handleShowAllNodes,
     };
