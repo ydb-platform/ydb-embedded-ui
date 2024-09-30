@@ -81,11 +81,6 @@ export interface PreparedStorageGroup {
     LatencyGetFast?: number;
 }
 
-export interface UsageFilter {
-    threshold: number;
-    count: number;
-}
-
 export interface StorageSortParams {
     sortOrder: OrderType | undefined;
     sortValue: StorageV2SortValue | undefined;
