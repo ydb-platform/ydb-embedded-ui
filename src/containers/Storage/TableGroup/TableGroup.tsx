@@ -32,7 +32,7 @@ export function TableGroup({
 
     const renderTitle = () => {
         return (
-            <div onClick={toggleCollapsed} className={b('title-wrapper')}>
+            <div onClick={toggleCollapsed} className={b('title-wrapper')} tabIndex={0}>
                 <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
                 <div className={b('title')}>
                     <Text variant="subheader-2">{title}</Text>
