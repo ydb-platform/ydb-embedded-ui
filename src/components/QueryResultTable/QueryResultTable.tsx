@@ -6,7 +6,7 @@ import type {Column, Settings} from '@gravity-ui/react-data-table';
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {getColumnType, prepareQueryResponse} from '../../utils/query';
+import {getColumnType, getColumnWidthByType, prepareQueryResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
 import type {ResizeableDataTableProps} from '../ResizeableDataTable/ResizeableDataTable';
 import {ResizeableDataTable} from '../ResizeableDataTable/ResizeableDataTable';
@@ -35,6 +35,7 @@ const prepareTypedColumns = (columns: ColumnType[]) => {
 
         const column: Column<KeyValueRow> = {
             name,
+            width: getColumnWidthByType(type, name),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
             sortAccessor: (row) => {
                 const value = row[name];
