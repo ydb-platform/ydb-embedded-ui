@@ -56,7 +56,8 @@ function bytesToMB(bytes?: number | string) {
 }
 
 export function bytesToSpeed(bytes?: number | string) {
-    return `${bytesToMB(bytes)}${bytes ? 'ps' : ''}`;
+    const speed = bytesToMB(bytes);
+    return `${speed}${speed ? 'ps' : ''}`;
 }
 
 export function bytesToGB(bytes?: number | string, shouldRound?: boolean) {
