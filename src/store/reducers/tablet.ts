@@ -1,6 +1,6 @@
 import type {TDomainKey} from '../../types/api/tablet';
 import type {ITabletPreparedHistoryItem} from '../../types/store/tablet';
-import {prepareNodesMap} from '../../utils/nodes';
+import {prepareNodeHostsMap} from '../../utils/nodes';
 
 import {api} from './api';
 
@@ -17,7 +17,7 @@ export const tabletApi = api.injectEndpoints({
                         window.api.getTabletHistory({id, database, nodeId}, {signal}),
                         window.api.getNodesList({signal}),
                     ]);
-                    const nodesMap = prepareNodesMap(nodesList);
+                    const nodeHostsMap = prepareNodeHostsMap(nodesList);
 
                     const historyData = Object.keys(historyResponseData).reduce<
                         ITabletPreparedHistoryItem[]
@@ -30,7 +30,9 @@ export const tabletApi = api.injectEndpoints({
                                 leaderTablet;
 
                             const fqdn =
-                                nodesMap && nodeId ? nodesMap.get(Number(nodeId)) : undefined;
+                                nodeHostsMap && nodeId
+                                    ? nodeHostsMap.get(Number(nodeId))
+                                    : undefined;
 
                             if (State !== 'Dead') {
                                 list.push({

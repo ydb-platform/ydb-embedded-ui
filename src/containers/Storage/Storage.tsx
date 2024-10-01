@@ -83,7 +83,7 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
         columnsToShow: storageGroupsColumnsToShow,
         columnsToSelect: storageGroupsColumnsToSelect,
         setColumns: setStorageGroupsSelectedColumns,
-    } = useStorageGroupsSelectedColumns(visibleEntities);
+    } = useStorageGroupsSelectedColumns({visibleEntities, nodeId: nodeId?.toString()});
 
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
         {

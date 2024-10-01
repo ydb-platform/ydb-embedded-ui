@@ -1,6 +1,6 @@
 import {createSelector} from '@reduxjs/toolkit';
 
-import {prepareNodesMap} from '../../utils/nodes';
+import {prepareNodeHostsMap} from '../../utils/nodes';
 import type {RootState} from '../defaultStore';
 
 import {api} from './api';
@@ -24,7 +24,7 @@ export const nodesListApi = api.injectEndpoints({
 
 const selectNodesList = nodesListApi.endpoints.getNodesList.select(undefined);
 
-export const selectNodesMap = createSelector(
+export const selectNodeHostsMap = createSelector(
     (state: RootState) => selectNodesList(state).data,
-    (data) => prepareNodesMap(data),
+    (data) => prepareNodeHostsMap(data),
 );

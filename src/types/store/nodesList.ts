@@ -1,1 +1,1 @@
-export type NodesMap = Map<number, string>;
+export type NodeHostsMap = Map<number, string>;

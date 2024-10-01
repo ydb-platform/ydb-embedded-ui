@@ -5,7 +5,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
+import {nodesListApi, selectNodeHostsMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
 import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
 import {cn} from '../../../../utils/cn';
@@ -55,7 +55,7 @@ export const Partitions = ({path, database}: PartitionsProps) => {
         error: nodesError,
     } = nodesListApi.useGetNodesListQuery(undefined);
     const nodesLoading = nodesIsFetching && nodesData === undefined;
-    const nodesMap = useTypedSelector(selectNodesMap);
+    const nodeHostsMap = useTypedSelector(selectNodeHostsMap);
 
     const [hiddenColumns, setHiddenColumns] = useSetting<string[]>(PARTITIONS_HIDDEN_COLUMNS_KEY);
 
@@ -71,8 +71,8 @@ export const Partitions = ({path, database}: PartitionsProps) => {
     const rawPartitions = partitionsData;
 
     const partitionsWithHosts = React.useMemo(() => {
-        return addHostToPartitions(rawPartitions, nodesMap);
-    }, [rawPartitions, nodesMap]);
+        return addHostToPartitions(rawPartitions, nodeHostsMap);
+    }, [rawPartitions, nodeHostsMap]);
 
     // Wrong consumer could be passed in search query
     // Reset consumer if it doesn't exist for current topic

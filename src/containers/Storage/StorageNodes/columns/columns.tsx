@@ -79,17 +79,9 @@ const getStorageNodesColumns = ({
                                 (vdisk) => vdisk.PDiskId === pDisk.PDiskId,
                             );
 
-                            const inactiveVdisks = vDisks?.filter(
-                                (vdisk) => groupId && vdisk.VDiskId?.GroupID !== Number(groupId),
-                            );
-
                             return (
                                 <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                    <PDisk
-                                        data={pDisk}
-                                        vDisks={vDisks}
-                                        inactiveVdisks={inactiveVdisks}
-                                    />
+                                    <PDisk data={pDisk} vDisks={vDisks} viewContext={{groupId}} />
                                 </div>
                             );
                         })}

@@ -7,6 +7,8 @@ import type {
     StorageSortParams,
     VisibleEntities,
 } from '../../../store/reducers/storage/types';
+import {valueIsDefined} from '../../../utils';
+import type {PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {NODES_COLUMNS_IDS} from '../../Nodes/columns/constants';
 import {STORAGE_GROUPS_COLUMNS_IDS} from '../StorageGroups/columns/constants';
@@ -63,4 +65,21 @@ export function getDefaultSortGroup(visibleEntities: VisibleEntities) {
         return defaultSortGroupSpace;
     }
     return defaultSortGroup;
+}
+
+export type VDiskViewContext = {
+    groupId?: string;
+    nodeId?: string;
+};
+
+export function isVdiskActive(vDisk: PreparedVDisk, viewContext?: VDiskViewContext) {
+    if (valueIsDefined(vDisk.VDiskId?.GroupID) && viewContext?.groupId) {
+        return String(vDisk.VDiskId.GroupID) === viewContext.groupId;
+    }
+
+    if (valueIsDefined(vDisk.NodeId) && viewContext?.nodeId) {
+        return String(vDisk.NodeId) === viewContext.nodeId;
+    }
+
+    return true;
 }

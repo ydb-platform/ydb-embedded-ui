@@ -1,21 +1,21 @@
 import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
-import type {NodesMap} from '../../../../../types/store/nodesList';
+import type {NodeHostsMap} from '../../../../../types/store/nodesList';
 
 import type {PreparedPartitionDataWithHosts} from './types';
 
 export const addHostToPartitions = (
     partitions: PreparedPartitionData[] = [],
-    nodesMap?: NodesMap,
+    nodeHosts?: NodeHostsMap,
 ): PreparedPartitionDataWithHosts[] => {
     return partitions?.map((partition) => {
         const partitionHost =
-            partition.partitionNodeId && nodesMap
-                ? nodesMap.get(partition.partitionNodeId)
+            partition.partitionNodeId && nodeHosts
+                ? nodeHosts.get(partition.partitionNodeId)
                 : undefined;
 
         const connectionHost =
-            partition.connectionNodeId && nodesMap
-                ? nodesMap.get(partition.connectionNodeId)
+            partition.connectionNodeId && nodeHosts
+                ? nodeHosts.get(partition.connectionNodeId)
                 : undefined;
 
         return {

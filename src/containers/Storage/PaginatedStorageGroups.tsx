@@ -52,8 +52,10 @@ export function PaginatedStorageGroups(props: PaginatedStorageProps) {
 function StorageGroupsComponent({database, nodeId, parentContainer}: PaginatedStorageProps) {
     const {searchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
 
-    const {columnsToShow, columnsToSelect, setColumns} =
-        useStorageGroupsSelectedColumns(visibleEntities);
+    const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
+        visibleEntities,
+        nodeId,
+    });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
@@ -89,8 +91,10 @@ function GroupedStorageGroupsComponent({database, groupId, nodeId}: PaginatedSto
     const {searchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
         useStorageQueryParams();
 
-    const {columnsToShow, columnsToSelect, setColumns} =
-        useStorageGroupsSelectedColumns(visibleEntities);
+    const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
+        visibleEntities,
+        nodeId,
+    });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
         {
