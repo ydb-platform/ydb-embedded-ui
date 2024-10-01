@@ -16,8 +16,16 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
         async (params) => {
             const {limit, offset, sortParams, filters} = params;
             const {sortOrder, columnId} = sortParams ?? {};
-            const {searchValue, visibleEntities, database, nodeId, filterGroup, filterGroupBy} =
-                filters ?? {};
+            const {
+                searchValue,
+                visibleEntities,
+                database,
+                nodeId,
+                groupId,
+                pDiskId,
+                filterGroup,
+                filterGroupBy,
+            } = filters ?? {};
 
             const sort = isSortableStorageProperty(columnId)
                 ? prepareSortValue(columnId, sortOrder)
@@ -31,6 +39,8 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
                 with: visibleEntities,
                 database,
                 nodeId,
+                groupId,
+                pDiskId,
                 filter_group: filterGroup,
                 filter_group_by: filterGroupBy,
                 shouldUseGroupsHandler,

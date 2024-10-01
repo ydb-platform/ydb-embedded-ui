@@ -13,7 +13,6 @@ import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import {filterGroups, filterNodes} from '../../store/reducers/storage/selectors';
 import {storageApi} from '../../store/reducers/storage/storage';
 import type {StorageSortParams} from '../../store/reducers/storage/types';
-import {valueIsDefined} from '../../utils';
 import {useAutoRefreshInterval, useTableSort} from '../../utils/hooks';
 import {useAdditionalNodeProps} from '../AppWithClusters/useClusterData';
 
@@ -90,8 +89,7 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
             database,
             with: visibleEntities,
             node_id: nodeId,
-            // node_id and group_id params don't work together
-            group_id: valueIsDefined(nodeId) ? undefined : groupId,
+            group_id: groupId,
         },
         {
             skip: !isNodes,

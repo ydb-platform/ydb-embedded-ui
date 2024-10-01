@@ -10,7 +10,6 @@ import {
 } from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {storageApi} from '../../store/reducers/storage/storage';
-import {valueIsDefined} from '../../utils';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {useAdditionalNodeProps} from '../AppWithClusters/useClusterData';
@@ -57,13 +56,18 @@ export const PaginatedStorageNodes = (props: PaginatedStorageProps) => {
     return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
 };
 
-function StorageNodesComponent({database, groupId, parentContainer}: PaginatedStorageProps) {
+function StorageNodesComponent({
+    database,
+    nodeId,
+    groupId,
+    parentContainer,
+}: PaginatedStorageProps) {
     const {searchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
         useStorageQueryParams();
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
-        groupId,
+        groupId: groupId?.toString(),
     });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
@@ -83,6 +87,8 @@ function StorageNodesComponent({database, groupId, parentContainer}: PaginatedSt
     return (
         <PaginatedStorageNodesTable
             database={database}
+            nodeId={nodeId}
+            groupId={groupId}
             searchValue={searchValue}
             visibleEntities={visibleEntities}
             nodesUptimeFilter={nodesUptimeFilter}
@@ -102,7 +108,7 @@ function GroupedStorageNodesComponent({database, groupId, nodeId}: PaginatedStor
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
-        groupId,
+        groupId: groupId?.toString(),
     });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageNodesInfoQuery(
@@ -111,8 +117,7 @@ function GroupedStorageNodesComponent({database, groupId, nodeId}: PaginatedStor
             with: 'all',
             filter: searchValue,
             node_id: nodeId,
-            // node_id and group_id params don't work together
-            group_id: valueIsDefined(nodeId) ? undefined : groupId,
+            group_id: groupId,
             group: storageNodesGroupByParam,
         },
         {
@@ -155,6 +160,8 @@ function GroupedStorageNodesComponent({database, groupId, nodeId}: PaginatedStor
                     >
                         <PaginatedStorageNodesTable
                             database={database}
+                            nodeId={nodeId}
+                            groupId={groupId}
                             searchValue={searchValue}
                             visibleEntities={'all'}
                             nodesUptimeFilter={NodesUptimeFilterValues.All}

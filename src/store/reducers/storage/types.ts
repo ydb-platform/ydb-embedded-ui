@@ -18,7 +18,11 @@ export interface PreparedStorageNodeFilters {
     searchValue: string;
     nodesUptimeFilter: NodesUptimeFilterValues;
     visibleEntities: VisibleEntities;
+
     database?: string;
+    nodeId?: string | number;
+    groupId?: string | number;
+
     filterGroup?: string;
     filterGroupBy?: NodesGroupByField;
 }
@@ -38,8 +42,12 @@ export interface PreparedStorageNode extends TSystemStateInfo {
 export interface PreparedStorageGroupFilters {
     searchValue: string;
     visibleEntities: VisibleEntities;
+
     database?: string;
-    nodeId?: string;
+    nodeId?: string | number;
+    groupId?: string | number;
+    pDiskId?: string | number;
+
     filterGroup?: string;
     filterGroupBy?: GroupsGroupByField;
 }

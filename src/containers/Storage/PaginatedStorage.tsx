@@ -4,8 +4,10 @@ import {useStorageQueryParams} from './useStorageQueryParams';
 
 export interface PaginatedStorageProps {
     database?: string;
-    nodeId?: string;
-    groupId?: string;
+    nodeId?: string | number;
+    groupId?: string | number;
+    pDiskId?: string | number;
+
     parentContainer?: Element | null;
 }
 

@@ -21,7 +21,9 @@ interface PaginatedStorageGroupsTableProps {
     columns: StorageGroupsColumn[];
 
     database?: string;
-    nodeId?: string;
+    nodeId?: string | number;
+    groupId?: string | number;
+    pDiskId?: string | number;
 
     filterGroup?: string;
     filterGroupBy?: GroupsGroupByField;
@@ -40,6 +42,8 @@ export const PaginatedStorageGroupsTable = ({
     columns,
     database,
     nodeId,
+    groupId,
+    pDiskId,
     filterGroup,
     filterGroupBy,
     searchValue,
@@ -56,8 +60,26 @@ export const PaginatedStorageGroupsTable = ({
     const fetchData = useGroupsGetter(groupsHandlerAvailable);
 
     const tableFilters = React.useMemo(() => {
-        return {searchValue, visibleEntities, database, nodeId, filterGroup, filterGroupBy};
-    }, [searchValue, visibleEntities, database, nodeId, filterGroup, filterGroupBy]);
+        return {
+            searchValue,
+            visibleEntities,
+            database,
+            nodeId,
+            groupId,
+            pDiskId,
+            filterGroup,
+            filterGroupBy,
+        };
+    }, [
+        searchValue,
+        visibleEntities,
+        database,
+        nodeId,
+        groupId,
+        pDiskId,
+        filterGroup,
+        filterGroupBy,
+    ]);
 
     const renderEmptyDataMessage = () => {
         if (visibleEntities !== VISIBLE_ENTITIES.all) {
