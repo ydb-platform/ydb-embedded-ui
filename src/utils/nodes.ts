@@ -6,7 +6,7 @@ import type {ProblemFilterValue} from '../store/reducers/settings/types';
 import {EFlag} from '../types/api/enums';
 import type {NodesSortValue, TSystemStateInfo} from '../types/api/nodes';
 import type {TNodeInfo} from '../types/api/nodesList';
-import type {NodesMap} from '../types/store/nodesList';
+import type {NodeHostsMap} from '../types/store/nodesList';
 
 import {HOUR_IN_SECONDS} from './constants';
 import {calcUptime} from './dataFormatters/dataFormatters';
@@ -30,12 +30,12 @@ export const NodesUptimeFilterTitles = {
 export const isUnavailableNode = (node: NodesPreparedEntity | TSystemStateInfo) =>
     !node.SystemState || node.SystemState === EFlag.Grey;
 
-export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
-    return nodesList?.reduce<NodesMap>((nodesMap, node) => {
+export const prepareNodeHostsMap = (nodesList?: TNodeInfo[]) => {
+    return nodesList?.reduce<NodeHostsMap>((nodeHosts, node) => {
         if (node.Id && node.Host) {
-            nodesMap.set(Number(node.Id), node.Host);
+            nodeHosts.set(Number(node.Id), node.Host);
         }
-        return nodesMap;
+        return nodeHosts;
     }, new Map());
 };
 

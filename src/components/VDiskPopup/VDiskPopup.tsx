@@ -3,7 +3,7 @@ import React from 'react';
 import type {PopupProps} from '@gravity-ui/uikit';
 import {Label, Popup} from '@gravity-ui/uikit';
 
-import {selectNodeNamesMap} from '../../store/reducers/nodesList';
+import {selectNodeHostsMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import type {TVDiskStateInfo} from '../../types/api/vdisk';
 import {valueIsDefined} from '../../utils';
@@ -141,11 +141,11 @@ export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
         [data, isFullData],
     );
 
-    const nodeNamesMap = useTypedSelector(selectNodeNamesMap);
-    const nodeName = valueIsDefined(data.NodeId) ? nodeNamesMap?.get(data.NodeId) : undefined;
+    const nodeHostsMap = useTypedSelector(selectNodeHostsMap);
+    const nodeHost = valueIsDefined(data.NodeId) ? nodeHostsMap?.get(data.NodeId) : undefined;
     const pdiskInfo = React.useMemo(
-        () => isFullData && data.PDisk && preparePDiskData(data.PDisk, nodeName),
-        [data, nodeName, isFullData],
+        () => isFullData && data.PDisk && preparePDiskData(data.PDisk, nodeHost),
+        [data, nodeHost, isFullData],
     );
 
     return (

@@ -3,7 +3,7 @@ import React from 'react';
 import type {PopupProps} from '@gravity-ui/uikit';
 import {Popup} from '@gravity-ui/uikit';
 
-import {selectNodeNamesMap} from '../../store/reducers/nodesList';
+import {selectNodeHostsMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
@@ -21,7 +21,7 @@ const b = cn('pdisk-storage-popup');
 
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
-export const preparePDiskData = (data: PreparedPDisk, nodeName?: string) => {
+export const preparePDiskData = (data: PreparedPDisk, nodeHost?: string) => {
     const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Type, Device} = data;
 
     const pdiskData: InfoViewerItem[] = [
@@ -37,8 +37,8 @@ export const preparePDiskData = (data: PreparedPDisk, nodeName?: string) => {
         pdiskData.push({label: 'Node Id', value: NodeId});
     }
 
-    if (nodeName) {
-        pdiskData.push({label: 'Host', value: nodeName});
+    if (nodeHost) {
+        pdiskData.push({label: 'Host', value: nodeHost});
     }
 
     if (Path) {
@@ -66,9 +66,9 @@ interface PDiskPopupProps extends PopupProps {
 }
 
 export const PDiskPopup = ({data, ...props}: PDiskPopupProps) => {
-    const nodeNamesMap = useTypedSelector(selectNodeNamesMap);
-    const nodeName = valueIsDefined(data.NodeId) ? nodeNamesMap?.get(data.NodeId) : undefined;
-    const info = React.useMemo(() => preparePDiskData(data, nodeName), [data, nodeName]);
+    const nodeHostsMap = useTypedSelector(selectNodeHostsMap);
+    const nodeHost = valueIsDefined(data.NodeId) ? nodeHostsMap?.get(data.NodeId) : undefined;
+    const info = React.useMemo(() => preparePDiskData(data, nodeHost), [data, nodeHost]);
 
     return (
         <Popup
