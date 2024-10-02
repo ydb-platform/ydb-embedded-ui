@@ -13,6 +13,7 @@ import {ResizeableDataTable} from '../ResizeableDataTable/ResizeableDataTable';
 
 import {Cell} from './Cell';
 import i18n from './i18n';
+import {getColumnWidth} from './utils/getColumnWidth';
 
 import './QueryResultTable.scss';
 
@@ -26,7 +27,6 @@ const TABLE_SETTINGS: Settings = {
 export const b = cn('ydb-query-result-table');
 
 const WIDTH_PREDICTION_ROWS_COUNT = 100;
-const MAX_COLUMN_WIDTH = 600;
 
 const prepareTypedColumns = (columns: ColumnType[], data?: KeyValueRow[]) => {
     if (!columns.length) {
@@ -38,17 +38,9 @@ const prepareTypedColumns = (columns: ColumnType[], data?: KeyValueRow[]) => {
     return columns.map(({name, type}) => {
         const columnType = getColumnType(type);
 
-        const maxColumnContentLength =
-            dataSlice?.reduce(
-                (max, row) => Math.max(max, row[name] ? String(row[name]).length : max),
-                name.length,
-            ) || name.length;
-
-        const headerPadding = columnType === 'number' ? 40 : 20;
-
         const column: Column<KeyValueRow> = {
             name,
-            width: Math.min(maxColumnContentLength * 10 + headerPadding, MAX_COLUMN_WIDTH),
+            width: getColumnWidth({data: dataSlice, name, columnType}),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
             sortAccessor: (row) => {
                 const value = row[name];
