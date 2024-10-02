@@ -13,6 +13,7 @@ import {ResizeableDataTable} from '../ResizeableDataTable/ResizeableDataTable';
 
 import {Cell} from './Cell';
 import i18n from './i18n';
+import {getColumnWidth} from './utils/getColumnWidth';
 
 import './QueryResultTable.scss';
 
@@ -21,30 +22,27 @@ const TABLE_SETTINGS: Settings = {
     stripedRows: true,
     dynamicRenderType: 'variable',
     dynamicItemSizeGetter: () => 40,
+    sortable: false,
 };
 
 export const b = cn('ydb-query-result-table');
 
-const prepareTypedColumns = (columns: ColumnType[]) => {
+const WIDTH_PREDICTION_ROWS_COUNT = 100;
+
+const prepareTypedColumns = (columns: ColumnType[], data?: KeyValueRow[]) => {
     if (!columns.length) {
         return [];
     }
+
+    const dataSlice = data?.slice(0, WIDTH_PREDICTION_ROWS_COUNT);
 
     return columns.map(({name, type}) => {
         const columnType = getColumnType(type);
 
         const column: Column<KeyValueRow> = {
             name,
+            width: getColumnWidth({data: dataSlice, name}),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
-            sortAccessor: (row) => {
-                const value = row[name];
-
-                if (value === undefined || value === null) {
-                    return null;
-                }
-
-                return columnType === 'number' ? BigInt(value) : value;
-            },
             render: ({row}) => <Cell value={String(row[name])} />,
         };
 
@@ -57,11 +55,13 @@ const prepareGenericColumns = (data: KeyValueRow[]) => {
         return [];
     }
 
+    const dataSlice = data?.slice(0, WIDTH_PREDICTION_ROWS_COUNT);
+
     return Object.keys(data[0]).map((name) => {
         const column: Column<KeyValueRow> = {
             name,
+            width: getColumnWidth({data: dataSlice, name}),
             align: isNumeric(data[0][name]) ? DataTable.RIGHT : DataTable.LEFT,
-            sortAccessor: (row) => (isNumeric(row[name]) ? Number(row[name]) : row[name]),
             render: ({row}) => <Cell value={String(row[name])} />,
         };
 
@@ -78,19 +78,12 @@ interface QueryResultTableProps
 }
 
 export const QueryResultTable = (props: QueryResultTableProps) => {
-    const {columns: rawColumns, data: rawData, settings: settingsMix, ...restProps} = props;
+    const {columns: rawColumns, data: rawData, ...restProps} = props;
 
     const data = React.useMemo(() => prepareQueryResponse(rawData), [rawData]);
     const columns = React.useMemo(() => {
-        return rawColumns ? prepareTypedColumns(rawColumns) : prepareGenericColumns(data);
+        return rawColumns ? prepareTypedColumns(rawColumns, data) : prepareGenericColumns(data);
     }, [data, rawColumns]);
-    const settings = React.useMemo(
-        () => ({
-            ...TABLE_SETTINGS,
-            ...settingsMix,
-        }),
-        [settingsMix],
-    );
 
     // empty data is expected to be be an empty array
     // undefined data is not rendered at all
@@ -106,7 +99,7 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
         <ResizeableDataTable
             data={data}
             columns={columns}
-            settings={settings}
+            settings={TABLE_SETTINGS}
             // prevent accessing row.id in case it is present but is not the PK (i.e. may repeat)
             rowKey={getRowIndex}
             {...restProps}

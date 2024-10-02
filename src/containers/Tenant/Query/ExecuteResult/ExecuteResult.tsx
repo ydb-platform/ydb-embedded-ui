@@ -136,7 +136,6 @@ export function ExecuteResult({
                     <QueryResultTable
                         data={currentResult?.result}
                         columns={currentResult?.columns}
-                        settings={{sortable: false}}
                     />
                 </div>
             </div>
