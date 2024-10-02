@@ -40,17 +40,8 @@ const prepareTypedColumns = (columns: ColumnType[], data?: KeyValueRow[]) => {
 
         const column: Column<KeyValueRow> = {
             name,
-            width: getColumnWidth({data: dataSlice, name, columnType}),
+            width: getColumnWidth({data: dataSlice, name}),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
-            sortAccessor: (row) => {
-                const value = row[name];
-
-                if (value === undefined || value === null) {
-                    return null;
-                }
-
-                return columnType === 'number' ? BigInt(value) : value;
-            },
             render: ({row}) => <Cell value={String(row[name])} />,
         };
 
@@ -63,11 +54,13 @@ const prepareGenericColumns = (data: KeyValueRow[]) => {
         return [];
     }
 
+    const dataSlice = data?.slice(0, WIDTH_PREDICTION_ROWS_COUNT);
+
     return Object.keys(data[0]).map((name) => {
         const column: Column<KeyValueRow> = {
             name,
+            width: getColumnWidth({data: dataSlice, name}),
             align: isNumeric(data[0][name]) ? DataTable.RIGHT : DataTable.LEFT,
-            sortAccessor: (row) => (isNumeric(row[name]) ? Number(row[name]) : row[name]),
             render: ({row}) => <Cell value={String(row[name])} />,
         };
 
@@ -94,6 +87,7 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
         () => ({
             ...TABLE_SETTINGS,
             ...settingsMix,
+            sortable: false,
         }),
         [settingsMix],
     );
