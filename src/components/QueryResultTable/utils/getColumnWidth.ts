@@ -1,7 +1,6 @@
 import type {KeyValueRow} from '../../../types/api/query';
 
 export const MAX_COLUMN_WIDTH = 600;
-export const PADDING_WITH_SORT_ICON = 55;
 export const HEADER_PADDING = 20;
 
 export const getColumnWidth = ({data, name}: {data?: KeyValueRow[]; name: string}) => {
