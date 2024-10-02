@@ -36,6 +36,13 @@ const getHostColumn = (getNodeRef?: GetNodeRefFunc, database?: string): NodesCol
     align: DataTable.LEFT,
     sortable: false,
 });
+const nodeNameColumn: NodesColumn = {
+    name: NODES_COLUMNS_IDS.NodeName,
+    header: NODES_COLUMNS_TITLES.NodeName,
+    align: DataTable.LEFT,
+    render: ({row}) => row.NodeName || EMPTY_DATA_PLACEHOLDER,
+    width: 200,
+};
 
 const getHostColumnWithUndefinedWidth = (
     getNodeRef?: GetNodeRefFunc,
@@ -217,6 +224,7 @@ export function getNodesColumns({database, getNodeRef}: GetNodesColumnsProps): N
     const columns = [
         nodeIdColumn,
         getHostColumn(getNodeRef, database),
+        nodeNameColumn,
         dataCenterColumn,
         rackColumn,
         versionColumn,

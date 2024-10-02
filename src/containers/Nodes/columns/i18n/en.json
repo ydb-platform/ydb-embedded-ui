@@ -1,6 +1,7 @@
 {
   "node-id": "Node Id",
   "host": "Host",
+  "node-name": "Node Name",
   "dc": "DC",
   "rack": "Rack",
   "version": "Version",

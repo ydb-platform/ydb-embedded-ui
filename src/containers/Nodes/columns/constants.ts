@@ -8,6 +8,7 @@ export const NODES_TABLE_SELECTED_COLUMNS_LS_KEY = 'nodesTableSelectedColumns';
 export const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
     Host: 'Host',
+    NodeName: 'NodeName',
     DC: 'DC',
     Rack: 'Rack',
     Version: 'Version',
@@ -47,6 +48,9 @@ export const NODES_COLUMNS_TITLES = {
     },
     get Host() {
         return i18n('host');
+    },
+    get NodeName() {
+        return i18n('node-name');
     },
     get DC() {
         return i18n('dc');
