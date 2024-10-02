@@ -11,6 +11,7 @@ import type {ProblemFilterValue} from '../settings/types';
 export interface NodesPreparedEntity {
     NodeId: number;
     Host?: string;
+    NodeName?: string;
     SystemState?: EFlag;
     DC?: string;
     Rack?: string;

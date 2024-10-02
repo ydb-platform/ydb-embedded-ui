@@ -49,12 +49,18 @@ export function PaginatedStorageGroups(props: PaginatedStorageProps) {
     return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
 }
 
-function StorageGroupsComponent({database, nodeId, parentContainer}: PaginatedStorageProps) {
+function StorageGroupsComponent({
+    database,
+    nodeId,
+    groupId,
+    pDiskId,
+    parentContainer,
+}: PaginatedStorageProps) {
     const {searchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
-        nodeId,
+        nodeId: nodeId?.toString(),
     });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
@@ -75,6 +81,8 @@ function StorageGroupsComponent({database, nodeId, parentContainer}: PaginatedSt
         <PaginatedStorageGroupsTable
             database={database}
             nodeId={nodeId}
+            groupId={groupId}
+            pDiskId={pDiskId}
             searchValue={searchValue}
             visibleEntities={visibleEntities}
             onShowAll={handleShowAllGroups}
@@ -86,14 +94,19 @@ function StorageGroupsComponent({database, nodeId, parentContainer}: PaginatedSt
     );
 }
 
-function GroupedStorageGroupsComponent({database, groupId, nodeId}: PaginatedStorageProps) {
+function GroupedStorageGroupsComponent({
+    database,
+    nodeId,
+    groupId,
+    pDiskId,
+}: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {searchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
         useStorageQueryParams();
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
-        nodeId,
+        nodeId: nodeId?.toString(),
     });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
@@ -102,6 +115,7 @@ function GroupedStorageGroupsComponent({database, groupId, nodeId}: PaginatedSto
             with: 'all',
             nodeId,
             groupId,
+            pDiskId,
             filter: searchValue,
             shouldUseGroupsHandler: true,
             group: storageGroupsGroupByParam,
@@ -147,6 +161,8 @@ function GroupedStorageGroupsComponent({database, groupId, nodeId}: PaginatedSto
                         <PaginatedStorageGroupsTable
                             database={database}
                             nodeId={nodeId}
+                            groupId={groupId}
+                            pDiskId={pDiskId}
                             filterGroup={name}
                             filterGroupBy={storageGroupsGroupByParam}
                             searchValue={searchValue}

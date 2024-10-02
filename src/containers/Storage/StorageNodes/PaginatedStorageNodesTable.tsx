@@ -18,6 +18,8 @@ interface PaginatedStorageNodesTableProps {
     columns: StorageNodesColumn[];
 
     database?: string;
+    nodeId?: string | number;
+    groupId?: string | number;
 
     filterGroup?: string;
     filterGroupBy?: NodesGroupByField;
@@ -36,6 +38,8 @@ interface PaginatedStorageNodesTableProps {
 export const PaginatedStorageNodesTable = ({
     columns,
     database,
+    nodeId,
+    groupId,
     filterGroup,
     filterGroupBy,
     searchValue,
@@ -53,10 +57,21 @@ export const PaginatedStorageNodesTable = ({
             visibleEntities,
             nodesUptimeFilter,
             database,
+            nodeId,
+            groupId,
             filterGroup,
             filterGroupBy,
         };
-    }, [searchValue, visibleEntities, nodesUptimeFilter, database, filterGroup, filterGroupBy]);
+    }, [
+        searchValue,
+        visibleEntities,
+        nodesUptimeFilter,
+        database,
+        nodeId,
+        groupId,
+        filterGroup,
+        filterGroupBy,
+    ]);
 
     const renderEmptyDataMessage = () => {
         if (

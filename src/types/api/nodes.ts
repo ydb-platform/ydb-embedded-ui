@@ -86,6 +86,7 @@ export interface TSystemStateInfo {
 
     SharedCacheStats?: TNodeSharedCache;
     TotalSessions?: number;
+    NodeName?: string;
 }
 
 export type PoolName = 'System' | 'User' | 'Batch' | 'IO' | 'IC';
