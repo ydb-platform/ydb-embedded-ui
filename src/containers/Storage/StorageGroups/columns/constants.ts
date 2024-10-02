@@ -23,6 +23,7 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
     Read: 'Read',
     Write: 'Write',
     Latency: 'Latency',
+    AllocationUnits: 'AllocationUnits',
     VDisks: 'VDisks',
     VDisksPDisks: 'VDisksPDisks',
     MissingDisks: 'MissingDisks',
@@ -88,6 +89,9 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     },
     get Latency() {
         return i18n('latency');
+    },
+    get AllocationUnits() {
+        return i18n('allocation-units');
     },
     get VDisks() {
         return i18n('vdisks');

@@ -88,9 +88,10 @@ export interface PreparedStorageGroup {
     State?: string;
     MissingDisks?: string | number;
     Available?: string;
-    LatencyPutTabletLog?: number;
-    LatencyPutUserData?: number;
-    LatencyGetFast?: number;
+
+    LatencyPutTabletLogMs?: number;
+    LatencyPutUserDataMs?: number;
+    LatencyGetFastMs?: number;
 }
 
 export interface StorageSortParams {
