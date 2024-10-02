@@ -97,13 +97,9 @@ export const QUERY_SYNTAX = {
     pg: 'pg',
 } as const;
 
-export const getYQLColumnType = (type: string): YQLType => {
-    return type.replace(/\?$/, '') as YQLType;
-};
-
 // eslint-disable-next-line complexity
 export const getColumnType = (type: string) => {
-    switch (getYQLColumnType(type)) {
+    switch (type.replace(/\?$/, '')) {
         case YQLType.Bool:
             return 'boolean';
         case YQLType.Int8:
@@ -136,50 +132,6 @@ export const getColumnType = (type: string) => {
         default:
             return undefined;
     }
-};
-
-const columnTypeToDefaultWidth: Record<YQLType, number> = {
-    // Numeric
-    [YQLType.Bool]: 80,
-    [YQLType.Int8]: 80,
-    [YQLType.Int16]: 90,
-    [YQLType.Int32]: 140,
-    [YQLType.Int64]: 220,
-    [YQLType.Uint8]: 80,
-    [YQLType.Uint16]: 90,
-    [YQLType.Uint32]: 140,
-    [YQLType.Uint64]: 220,
-    [YQLType.Float]: 120,
-    [YQLType.Double]: 220,
-    [YQLType.Decimal]: 220,
-
-    // String
-    [YQLType.String]: 240,
-    [YQLType.Utf8]: 240,
-    [YQLType.Json]: 340,
-    [YQLType.JsonDocument]: 340,
-    [YQLType.Yson]: 340,
-    [YQLType.Uuid]: 190,
-
-    // Date and time
-    [YQLType.Date]: 300,
-    [YQLType.Datetime]: 300,
-    [YQLType.Timestamp]: 300,
-    [YQLType.Interval]: 300,
-    [YQLType.TzDate]: 300,
-    [YQLType.TzDateTime]: 300,
-    [YQLType.TzTimestamp]: 300,
-};
-
-const COLUMN_DEFAULT_WIDTH = 200;
-
-export const getColumnWidthByType = (type: string, columnName: string) => {
-    const yqlType = getYQLColumnType(type);
-
-    return Math.max(
-        columnTypeToDefaultWidth[yqlType] || COLUMN_DEFAULT_WIDTH,
-        columnName.length * 15,
-    );
 };
 
 /** parse response result from ArrayRow to KeyValueRow */

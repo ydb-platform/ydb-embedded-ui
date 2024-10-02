@@ -6,7 +6,7 @@ import type {Column, Settings} from '@gravity-ui/react-data-table';
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {getColumnType, getColumnWidthByType, prepareQueryResponse} from '../../utils/query';
+import {getColumnType, prepareQueryResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
 import type {ResizeableDataTableProps} from '../ResizeableDataTable/ResizeableDataTable';
 import {ResizeableDataTable} from '../ResizeableDataTable/ResizeableDataTable';
@@ -25,17 +25,30 @@ const TABLE_SETTINGS: Settings = {
 
 export const b = cn('ydb-query-result-table');
 
-const prepareTypedColumns = (columns: ColumnType[]) => {
+const WIDTH_PREDICTION_ROWS_COUNT = 100;
+const MAX_COLUMN_WIDTH = 600;
+
+const prepareTypedColumns = (columns: ColumnType[], data?: KeyValueRow[]) => {
     if (!columns.length) {
         return [];
     }
 
+    const dataSlice = data?.slice(0, WIDTH_PREDICTION_ROWS_COUNT);
+
     return columns.map(({name, type}) => {
         const columnType = getColumnType(type);
 
+        const maxColumnContentLength =
+            dataSlice?.reduce(
+                (max, row) => Math.max(max, row[name] ? String(row[name]).length : max),
+                name.length,
+            ) || name.length;
+
+        const headerPadding = columnType === 'number' ? 40 : 20;
+
         const column: Column<KeyValueRow> = {
             name,
-            width: getColumnWidthByType(type, name),
+            width: Math.min(maxColumnContentLength * 10 + headerPadding, MAX_COLUMN_WIDTH),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
             sortAccessor: (row) => {
                 const value = row[name];
@@ -83,7 +96,7 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
 
     const data = React.useMemo(() => prepareQueryResponse(rawData), [rawData]);
     const columns = React.useMemo(() => {
-        return rawColumns ? prepareTypedColumns(rawColumns) : prepareGenericColumns(data);
+        return rawColumns ? prepareTypedColumns(rawColumns, data) : prepareGenericColumns(data);
     }, [data, rawColumns]);
     const settings = React.useMemo(
         () => ({
