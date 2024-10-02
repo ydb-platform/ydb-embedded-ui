@@ -22,6 +22,7 @@ const TABLE_SETTINGS: Settings = {
     stripedRows: true,
     dynamicRenderType: 'variable',
     dynamicItemSizeGetter: () => 40,
+    sortable: false,
 };
 
 export const b = cn('ydb-query-result-table');
@@ -77,20 +78,12 @@ interface QueryResultTableProps
 }
 
 export const QueryResultTable = (props: QueryResultTableProps) => {
-    const {columns: rawColumns, data: rawData, settings: settingsMix, ...restProps} = props;
+    const {columns: rawColumns, data: rawData, ...restProps} = props;
 
     const data = React.useMemo(() => prepareQueryResponse(rawData), [rawData]);
     const columns = React.useMemo(() => {
         return rawColumns ? prepareTypedColumns(rawColumns, data) : prepareGenericColumns(data);
     }, [data, rawColumns]);
-    const settings = React.useMemo(
-        () => ({
-            ...TABLE_SETTINGS,
-            ...settingsMix,
-            sortable: false,
-        }),
-        [settingsMix],
-    );
 
     // empty data is expected to be be an empty array
     // undefined data is not rendered at all
@@ -106,7 +99,7 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
         <ResizeableDataTable
             data={data}
             columns={columns}
-            settings={settings}
+            settings={TABLE_SETTINGS}
             // prevent accessing row.id in case it is present but is not the PK (i.e. may repeat)
             rowKey={getRowIndex}
             {...restProps}
