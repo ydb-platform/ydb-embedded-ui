@@ -159,6 +159,25 @@ export interface TGroupsStorageGroupInfo {
     /** float */
     DiskSpaceUsage?: number;
 
+    /**
+     * uint64
+     *
+     * time in us
+     */
+    LatencyPutTabletLog?: string;
+    /**
+     * uint64
+     *
+     * time in us
+     */
+    LatencyPutUserData?: string;
+    /**
+     * uint64
+     *
+     * time in us
+     */
+    LatencyGetFast?: string;
+
     VDisks?: TStorageVDisk[];
 }
 
@@ -219,7 +238,13 @@ export type StorageV2SortValue =
     | 'Used'
     | 'Limit'
     | 'Read'
-    | 'Write';
+    | 'Write'
+
+    // These fields are not present in storage v2
+    // So this sort does nothing
+    // Added them here for types compatibility
+    | 'AllocationUnits'
+    | 'Latency';
 
 /**
  * Values to sort /storage/groups response
@@ -230,9 +255,7 @@ export type GroupsSortField =
     | 'State'
     | 'Available'
     | 'DiskSpaceUsage'
-    | 'Encryption'
-    | 'AllocationUnits'
-    | 'Latency';
+    | 'Encryption';
 
 export type StorageV2Sort = BackendSortParam<StorageV2SortValue>;
 export type GroupsSort = BackendSortParam<GroupsSortField>;

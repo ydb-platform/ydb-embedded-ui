@@ -15,6 +15,7 @@ import {getColorSeverity, getSeverityColor} from '../../../utils/disks/helpers';
 import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 import {getUsage} from '../../../utils/storage';
+import {parseUsToMs} from '../../../utils/timeParsers';
 
 import type {
     PreparedStorageGroup,
@@ -247,7 +248,19 @@ export const prepareStorageResponse = (data: TStorageInfo): PreparedStorageRespo
 export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStorageResponse {
     const {FoundGroups, TotalGroups, StorageGroups = [], StorageGroupGroups} = data;
     const preparedGroups: PreparedStorageGroup[] = StorageGroups.map((group) => {
-        const {Usage, Read, Write, Used, Limit, MissingDisks, VDisks = [], Overall} = group;
+        const {
+            Usage,
+            Read,
+            Write,
+            Used,
+            Limit,
+            MissingDisks,
+            VDisks = [],
+            Overall,
+            LatencyPutTabletLog,
+            LatencyPutUserData,
+            LatencyGetFast,
+        } = group;
 
         const vDisks = VDisks.map((disk) => {
             const whiteboardVDisk = disk.Whiteboard;
@@ -275,6 +288,11 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
             Write: Number(Write),
             Used: Number(Used),
             Limit: Number(Limit),
+
+            LatencyPutTabletLogMs: parseUsToMs(LatencyPutTabletLog),
+            LatencyPutUserDataMs: parseUsToMs(LatencyPutUserData),
+            LatencyGetFastMs: parseUsToMs(LatencyGetFast),
+
             Degraded: Number(MissingDisks),
             Overall,
 
