@@ -17,5 +17,5 @@ export const getColumnWidth = ({data, name}: {data?: KeyValueRow[]; name: string
         }
     }
 
-    return Math.min(maxColumnContentLength * 10 + HEADER_PADDING, MAX_COLUMN_WIDTH);
+    return maxColumnContentLength * 10 + HEADER_PADDING;
 };
