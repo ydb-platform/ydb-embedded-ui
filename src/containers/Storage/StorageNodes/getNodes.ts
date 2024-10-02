@@ -14,8 +14,16 @@ export const getStorageNodes: FetchData<
     Pick<NodesRequestParams, 'type' | 'storage'>
 > = async (params) => {
     const {type = 'static', storage = true, limit, offset, sortParams, filters} = params;
-    const {searchValue, nodesUptimeFilter, visibleEntities, database, filterGroup, filterGroupBy} =
-        filters ?? {};
+    const {
+        searchValue,
+        nodesUptimeFilter,
+        visibleEntities,
+        database,
+        nodeId,
+        groupId,
+        filterGroup,
+        filterGroupBy,
+    } = filters ?? {};
     const {sortOrder, columnId} = sortParams ?? {};
 
     const sort = isSortableNodesProperty(columnId)
@@ -32,6 +40,8 @@ export const getStorageNodes: FetchData<
         uptime: getUptimeParamValue(nodesUptimeFilter),
         with: visibleEntities,
         database,
+        node_id: nodeId,
+        group_id: groupId,
         filter_group: filterGroup,
         filter_group_by: filterGroupBy,
     });
