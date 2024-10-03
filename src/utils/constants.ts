@@ -137,9 +137,6 @@ export const USE_PAGINATED_TABLES_KEY = 'useBackendParamsForTables';
 // Setting to hide domain in database list
 export const SHOW_DOMAIN_DATABASE_KEY = 'showDomainDatabase';
 
-// Enable schema that supports multiple resultsets
-export const QUERY_USE_MULTI_SCHEMA_KEY = 'queryUseMultiSchema';
-
 export const USE_CLUSTER_BALANCER_AS_BACKEND_KEY = 'useClusterBalancerAsBacked';
 
 export const ENABLE_AUTOCOMPLETE = 'enableAutocomplete';

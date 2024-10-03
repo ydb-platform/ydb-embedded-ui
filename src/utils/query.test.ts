@@ -39,76 +39,11 @@ describe('API utils', () => {
                 });
             });
             describe('should correctly parse data', () => {
-                it('should parse modern schema result to KeyValueRow', () => {
-                    const response = {
-                        result: [['42', 'hello world']],
-                        columns: [
-                            {
-                                name: 'id',
-                                type: 'Uint64?',
-                            },
-                            {
-                                name: 'value',
-                                type: 'Utf8?',
-                            },
-                        ],
-                    };
-                    const parsedResponse = parseQueryAPIExecuteResponse(response);
-
-                    expect(parsedResponse.result).toEqual([
-                        {
-                            id: '42',
-                            value: 'hello world',
-                        },
-                    ]);
-                    expect(parsedResponse.columns).toEqual(response.columns);
-                });
-                it('should return KeyValueRow result for ydb and classic schemas unchanged', () => {
-                    const response = {result: [{foo: 'bar'}]};
-                    expect(parseQueryAPIExecuteResponse(response).result).toEqual(response.result);
-                });
-                it('shoudl return stats for modern schema', () => {
-                    const result = [['42', 'hello world']];
-                    const columns = [
-                        {
-                            name: 'id',
-                            type: 'Uint64?',
-                        },
-                        {
-                            name: 'value',
-                            type: 'Utf8?',
-                        },
-                    ];
-
-                    const stats = {metric: 'good'} as TKqpStatsQuery;
-
-                    const response = {result, columns, stats};
-                    const parsedResponse = parseQueryAPIExecuteResponse(response);
-
-                    expect(parsedResponse.result).toEqual([
-                        {
-                            id: '42',
-                            value: 'hello world',
-                        },
-                    ]);
-                    expect(parsedResponse.columns).toEqual(response.columns);
-                    expect(parsedResponse.stats).toEqual(response.stats);
-                });
-                it('shoudl return stats for ydb and classic schemas', () => {
-                    const result = [{foo: 'bar'}];
-                    const stats = {metric: 'good'} as TKqpStatsQuery;
-
-                    const response = {result, stats};
-                    const parsedResponse = parseQueryAPIExecuteResponse(response);
-
-                    expect(parsedResponse.result).toEqual(response.result);
-                    expect(parsedResponse.stats).toEqual(response.stats);
-                });
                 it('should accept stats without a result', () => {
                     const stats = {metric: 'good'} as TKqpStatsQuery;
                     const response = {stats};
                     const actual = parseQueryAPIExecuteResponse(response);
-                    expect(actual.result).toBeUndefined();
+                    expect(actual.resultSets?.[0]?.result).toBeUndefined();
                     expect(actual.columns).toBeUndefined();
                     expect(actual.stats).toEqual(response.stats);
                 });

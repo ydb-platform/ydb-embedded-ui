@@ -12,7 +12,6 @@ export const viewSchemaApi = api.injectEndpoints({
                 try {
                     const response = await window.api.sendQuery(
                         {
-                            schema: 'modern',
                             query: createViewSchemaQuery(path),
                             database,
                             action: 'execute-scan',
@@ -24,7 +23,7 @@ export const viewSchemaApi = api.injectEndpoints({
                         return {error: response};
                     }
 
-                    return {data: response?.columns || []};
+                    return {data: response?.result?.[0]?.columns || []};
                 } catch (error) {
                     return {error: error};
                 }

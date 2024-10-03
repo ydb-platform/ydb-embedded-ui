@@ -31,7 +31,7 @@ export const TopQueriesData = ({database, onRowClick}: Props) => {
         },
         {pollingInterval: autoRefreshInterval},
     );
-    const {result: data} = currentData || {};
+    const data = currentData?.resultSets?.[0]?.result || [];
 
     const rawColumns = TOP_QUERIES_COLUMNS;
     const columns = rawColumns.map((column) => ({

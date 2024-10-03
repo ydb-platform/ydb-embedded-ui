@@ -30,7 +30,7 @@ export const Preview = ({database, path, type}: PreviewProps) => {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const query = `--!syntax_v1\nselect * from \`${path}\` limit 32`;
+    const query = `select * from \`${path}\` limit 32`;
     const {currentData, isFetching, error} = previewApi.useSendQueryQuery(
         {database, query, action: isExternalTableType(type) ? 'execute-query' : 'execute-scan'},
         {
@@ -40,7 +40,7 @@ export const Preview = ({database, path, type}: PreviewProps) => {
         },
     );
     const loading = isFetching && currentData === undefined;
-    const data = currentData ?? {};
+    const data = currentData?.resultSets?.[0] ?? {};
 
     const handleClosePreview = () => {
         dispatch(setShowPreview(false));

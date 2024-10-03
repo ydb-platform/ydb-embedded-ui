@@ -133,7 +133,6 @@ export const shardApi = api.injectEndpoints({
                 try {
                     const response = await window.api.sendQuery(
                         {
-                            schema: 'modern',
                             query:
                                 filters?.mode === EShardsWorkloadMode.Immediate
                                     ? createShardQueryImmediate(path, sortOrder, database)

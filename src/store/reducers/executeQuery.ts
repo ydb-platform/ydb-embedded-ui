@@ -2,7 +2,7 @@ import type {Reducer} from '@reduxjs/toolkit';
 
 import {settingsManager} from '../../services/settings';
 import {TracingLevelNumber} from '../../types/api/query';
-import type {ExecuteActions, Schemas} from '../../types/api/query';
+import type {ExecuteActions} from '../../types/api/query';
 import {ResultType} from '../../types/store/executeQuery';
 import type {
     ExecuteQueryAction,
@@ -182,7 +182,6 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
 interface SendQueryParams extends QueryRequestParams {
     queryId: string;
     querySettings?: Partial<QuerySettings>;
-    schema?: Schemas;
     // flag whether to send new tracing header or not
     // default: not send
     enableTracingLevel?: boolean;
@@ -197,14 +196,7 @@ export const executeQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
         executeQuery: build.mutation<null, SendQueryParams>({
             queryFn: async (
-                {
-                    query,
-                    database,
-                    querySettings = {},
-                    schema = 'modern',
-                    enableTracingLevel,
-                    queryId,
-                },
+                {query, database, querySettings = {}, enableTracingLevel, queryId},
                 {signal, dispatch},
             ) => {
                 let action: ExecuteActions = 'execute';
@@ -223,7 +215,6 @@ export const executeQueryApi = api.injectEndpoints({
                     const timeStart = Date.now();
                     const response = await window.api.sendQuery(
                         {
-                            schema,
                             query,
                             database,
                             action,

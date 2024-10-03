@@ -28,7 +28,6 @@ import type {
     Actions,
     ErrorResponse,
     QueryAPIResponse,
-    Schemas,
     Stats,
     Timeout,
     TracingLevel,
@@ -529,12 +528,11 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             },
         );
     }
-    sendQuery<Action extends Actions, Schema extends Schemas = undefined>(
+    sendQuery<Action extends Actions>(
         params: {
             query?: string;
             database?: string;
             action?: Action;
-            schema?: Schema;
             syntax?: QuerySyntax;
             stats?: Stats;
             tracingLevel?: TracingLevel;
@@ -553,14 +551,12 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
             true,
         );
-        // FIXME: after backend fix
-        const {schema, ...rest} = params;
 
         // FIXME: base64 is passed both to params and body to work on versions before and after 24-3
-        return this.post<QueryAPIResponse<Action, Schema> | ErrorResponse | null>(
+        return this.post<QueryAPIResponse<Action> | ErrorResponse | null>(
             this.getPath('/viewer/json/query'),
-            {...rest, base64},
-            {schema, base64},
+            {...params, base64},
+            {schema: 'multi', base64},
             {
                 concurrentId,
                 timeout: params.timeout,

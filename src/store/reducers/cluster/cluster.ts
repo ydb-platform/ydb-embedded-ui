@@ -89,7 +89,6 @@ export const clusterApi = api.injectEndpoints({
                         // Table with stats is supposed to be very small (less than 10 rows)
                         // So we batch this request with cluster request to prevent possible layout shifts, if data is missing
                         const groupsStatsResponse = await window.api.sendQuery({
-                            schema: 'modern',
                             query: query,
                             database: clusterRoot,
                             action: 'execute-scan',

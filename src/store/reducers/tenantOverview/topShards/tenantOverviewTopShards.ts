@@ -28,7 +28,6 @@ export const topShardsApi = api.injectEndpoints({
                 try {
                     const response = await window.api.sendQuery(
                         {
-                            schema: 'modern',
                             query: createShardQuery(path, database),
                             database,
                             action: queryAction,

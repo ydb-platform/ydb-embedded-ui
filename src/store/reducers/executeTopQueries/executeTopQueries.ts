@@ -57,7 +57,6 @@ export const topQueriesApi = api.injectEndpoints({
                 try {
                     const response = await window.api.sendQuery(
                         {
-                            schema: 'modern',
                             query: getQueryText(database, preparedFilters),
                             database,
                             action: 'execute-scan',
@@ -111,7 +110,9 @@ export const topQueriesApi = api.injectEndpoints({
                         throw response;
                     }
 
-                    return {data: response?.result?.filter((item) => item.QueryText !== queryText)};
+                    const data = parseQueryAPIExecuteResponse(response);
+
+                    return {data};
                 } catch (error) {
                     return {error};
                 }

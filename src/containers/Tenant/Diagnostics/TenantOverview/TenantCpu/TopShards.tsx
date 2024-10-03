@@ -32,7 +32,7 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
     );
 
     const loading = isFetching && currentData === undefined;
-    const {result: data} = currentData || {};
+    const data = currentData?.resultSets?.[0]?.result || [];
 
     const columns = getTopShardsColumns(tenantName, location);
 

@@ -15,7 +15,7 @@ export const previewApi = api.injectEndpoints({
             queryFn: async ({query, database, action}: SendQueryParams, {signal}) => {
                 try {
                     const response = await window.api.sendQuery(
-                        {schema: 'modern', query, database, action},
+                        {query, database, action},
                         {signal, withRetries: true},
                     );
 
