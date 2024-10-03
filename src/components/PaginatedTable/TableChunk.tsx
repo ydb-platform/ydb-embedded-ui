@@ -104,8 +104,8 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     }, [currentData, isActive, onDataFetched]);
 
     const chunkOffset = id * limit;
-    const remainingLenght = totalLength - chunkOffset;
-    const calculatedChunkLength = remainingLenght < limit ? remainingLenght : limit;
+    const remainingLength = totalLength - chunkOffset;
+    const calculatedChunkLength = remainingLength < limit ? remainingLength : limit;
 
     const dataLength = currentData?.data?.length || calculatedChunkLength;
 

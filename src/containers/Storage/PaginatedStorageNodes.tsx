@@ -63,6 +63,7 @@ function StorageNodesComponent({
     groupId,
     viewContext,
     parentContainer,
+    initialEntitiesCount,
 }: PaginatedStorageProps) {
     const {searchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
         useStorageQueryParams();
@@ -99,6 +100,7 @@ function StorageNodesComponent({
             renderControls={renderControls}
             renderErrorMessage={renderPaginatedTableErrorMessage}
             columns={columnsToShow}
+            initialEntitiesCount={initialEntitiesCount}
         />
     );
 }
