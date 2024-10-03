@@ -36,9 +36,9 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
         State,
         MissingDisks,
         Available,
-        LatencyPutTabletLog,
-        LatencyPutUserData,
-        LatencyGetFast,
+        LatencyPutTabletLogMs,
+        LatencyPutUserDataMs,
+        LatencyGetFastMs,
     } = data || {};
 
     const storageGroupInfoFirstColumn = [];
@@ -122,22 +122,22 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
             value: <EntityStatus status={Latency} />,
         });
     }
-    if (valueIsDefined(LatencyPutTabletLog)) {
+    if (valueIsDefined(LatencyPutTabletLogMs)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency-put-tablet-log'),
-            value: formatToMs(LatencyPutTabletLog),
+            value: formatToMs(LatencyPutTabletLogMs),
         });
     }
-    if (valueIsDefined(LatencyPutUserData)) {
+    if (valueIsDefined(LatencyPutUserDataMs)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency-put-user-data'),
-            value: formatToMs(LatencyPutUserData),
+            value: formatToMs(LatencyPutUserDataMs),
         });
     }
-    if (valueIsDefined(LatencyGetFast)) {
+    if (valueIsDefined(LatencyGetFastMs)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency-get-fast'),
-            value: formatToMs(LatencyGetFast),
+            value: formatToMs(LatencyGetFastMs),
         });
     }
     if (valueIsDefined(AllocationUnits)) {

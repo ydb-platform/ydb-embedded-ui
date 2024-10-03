@@ -10,9 +10,12 @@ import {InternalLink} from '../../../../components/InternalLink';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {VDiskWithDonorsStack} from '../../../../components/VDisk/VDiskWithDonorsStack';
 import {getStorageGroupPath} from '../../../../routes';
+import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
-import {stringifyVdiskId} from '../../../../utils/dataFormatters/dataFormatters';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
+import {formatNumber, stringifyVdiskId} from '../../../../utils/dataFormatters/dataFormatters';
 import {isSortableStorageProperty} from '../../../../utils/storage';
+import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
 import {getDegradedSeverity, getUsageSeverityForStorageGroup, isVdiskActive} from '../../utils';
@@ -183,6 +186,30 @@ const writeColumn: StorageGroupsColumn = {
     align: DataTable.RIGHT,
 };
 
+const latencyColumn: StorageGroupsColumn = {
+    name: STORAGE_GROUPS_COLUMNS_IDS.Latency,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.Latency,
+    width: 100,
+    render: ({row}) => {
+        return valueIsDefined(row.LatencyPutTabletLogMs)
+            ? formatToMs(parseUsToMs(row.LatencyPutTabletLogMs))
+            : EMPTY_DATA_PLACEHOLDER;
+    },
+    align: DataTable.RIGHT,
+};
+
+const allocationUnitsColumn: StorageGroupsColumn = {
+    name: STORAGE_GROUPS_COLUMNS_IDS.AllocationUnits,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.AllocationUnits,
+    width: 150,
+    render: ({row}) => {
+        return valueIsDefined(row.AllocationUnits)
+            ? formatNumber(row.AllocationUnits)
+            : EMPTY_DATA_PLACEHOLDER;
+    },
+    align: DataTable.RIGHT,
+};
+
 const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
     name: STORAGE_GROUPS_COLUMNS_IDS.VDisks,
     header: STORAGE_GROUPS_COLUMNS_TITLES.VDisks,
@@ -236,7 +263,7 @@ export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
     });
 };
 
-export const getStorageGroupsColumns: StorageColumnsGetter = (data?: GetStorageColumnsData) => {
+export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
     const columns = [
         groupIdColumn,
         poolNameColumn,
@@ -249,6 +276,8 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data?: GetStorageC
         usedSpaceFlagColumn,
         readColumn,
         writeColumn,
+        latencyColumn,
+        allocationUnitsColumn,
         getVDisksColumn(data),
         getDisksColumn(data),
     ];

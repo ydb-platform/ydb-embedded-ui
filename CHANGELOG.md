@@ -1,5 +1,39 @@
 # Changelog
 
+## [6.23.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.23.0...v6.23.1) (2024-10-03)
+
+
+### Bug Fixes
+
+* **Cluster:** contatiner should take its parent width ([#1393](https://github.com/ydb-platform/ydb-embedded-ui/issues/1393)) ([a34bb3e](https://github.com/ydb-platform/ydb-embedded-ui/commit/a34bb3e1248a4656887b25118e4d4b153aa485b7))
+
+## [6.23.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.22.0...v6.23.0) (2024-10-02)
+
+
+### Features
+
+* dim vdisks on the node page that are not on the selected node ([#1369](https://github.com/ydb-platform/ydb-embedded-ui/issues/1369)) ([446019f](https://github.com/ydb-platform/ydb-embedded-ui/commit/446019f06ecd26c775dbf59fc9d5bed0b786f0ca))
+* **ExecuteResult:** add row count for all results ([#1368](https://github.com/ydb-platform/ydb-embedded-ui/issues/1368)) ([570507e](https://github.com/ydb-platform/ydb-embedded-ui/commit/570507e911d339fc994df4d0d9ebf7c4e9f0ed94))
+* move query templates to a hierarchical menu at query editor ([#1327](https://github.com/ydb-platform/ydb-embedded-ui/issues/1327)) ([960e97f](https://github.com/ydb-platform/ydb-embedded-ui/commit/960e97fcdf1e2d358006abd7811e92c1243f2109))
+* **Nodes:** add node name column ([#1385](https://github.com/ydb-platform/ydb-embedded-ui/issues/1385)) ([a4c24e1](https://github.com/ydb-platform/ydb-embedded-ui/commit/a4c24e147b9e09c1675ee6a597b3c8e56f1602d7))
+* **PaginatedStorage:** add grouping ([#1364](https://github.com/ydb-platform/ydb-embedded-ui/issues/1364)) ([93dd920](https://github.com/ydb-platform/ydb-embedded-ui/commit/93dd9200a0a299195f7887fa2b04c3b0e5c4d476))
+* show running queries ([#1313](https://github.com/ydb-platform/ydb-embedded-ui/issues/1313)) ([acd4a1e](https://github.com/ydb-platform/ydb-embedded-ui/commit/acd4a1ec7e83806aef106168e843f196879d71e7))
+* **StorageGroups:** add latency and allocation units columns ([#1390](https://github.com/ydb-platform/ydb-embedded-ui/issues/1390)) ([4cb6fed](https://github.com/ydb-platform/ydb-embedded-ui/commit/4cb6fedc30b969c0e5a38e18415145389e9dc86a))
+* use relative entity  path in schema actions ([#1366](https://github.com/ydb-platform/ydb-embedded-ui/issues/1366)) ([418d3d8](https://github.com/ydb-platform/ydb-embedded-ui/commit/418d3d8a74256b4eee2e74084a11acc61e819f11))
+
+
+### Bug Fixes
+
+* always show required columns ([#1374](https://github.com/ydb-platform/ydb-embedded-ui/issues/1374)) ([6cab2df](https://github.com/ydb-platform/ydb-embedded-ui/commit/6cab2df320535cb0c4fdcd163608f677e2c603a6))
+* **Diagnostics:** hide graph for column tables ([#1356](https://github.com/ydb-platform/ydb-embedded-ui/issues/1356)) ([4fe1a24](https://github.com/ydb-platform/ydb-embedded-ui/commit/4fe1a24a90e2bf2d86ef9c665ce6cb71d24519ea))
+* different measurements look confusing ([#1381](https://github.com/ydb-platform/ydb-embedded-ui/issues/1381)) ([5f26767](https://github.com/ydb-platform/ydb-embedded-ui/commit/5f2676737a6f2733c30562f69b3f80fb06229a7e))
+* fix columns width on long rowset ([#1384](https://github.com/ydb-platform/ydb-embedded-ui/issues/1384)) ([f30a38f](https://github.com/ydb-platform/ydb-embedded-ui/commit/f30a38f5801b3a3eef2ca8c44fa980718682e76e))
+* **Header:** show cluster name in breadcrumb for PDisk/VDisk pages ([#1357](https://github.com/ydb-platform/ydb-embedded-ui/issues/1357)) ([56839bc](https://github.com/ydb-platform/ydb-embedded-ui/commit/56839bc12bccd3874f7270e2951711f8d3811068))
+* **PaginatedStorage:** properly pass ids, display 1 node on Node page ([#1382](https://github.com/ydb-platform/ydb-embedded-ui/issues/1382)) ([e63d22b](https://github.com/ydb-platform/ydb-embedded-ui/commit/e63d22b41d85059f66d311b299b28a330097669a))
+* **PDisk:** show node host name in popup ([#1352](https://github.com/ydb-platform/ydb-embedded-ui/issues/1352)) ([12010dd](https://github.com/ydb-platform/ydb-embedded-ui/commit/12010ddd75d90b1e3f30e55916e39481298858b4))
+* **Storage:** completely remove usage filter ([#1375](https://github.com/ydb-platform/ydb-embedded-ui/issues/1375)) ([d200b4c](https://github.com/ydb-platform/ydb-embedded-ui/commit/d200b4c0d07060b946fb03d9332895f8b2583d41))
+* **StorageNodes:** uniform render type ([#1376](https://github.com/ydb-platform/ydb-embedded-ui/issues/1376)) ([9e25733](https://github.com/ydb-platform/ydb-embedded-ui/commit/9e2573363f3e1c9aa54a5ed47d37821fffcdbc41))
+
 ## [6.22.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.21.0...v6.22.0) (2024-09-24)
 
 

@@ -24,6 +24,9 @@ const STORAGE_SORT_VALUES: StorageV2SortValue[] = [
     'Limit',
     'Read',
     'Write',
+
+    'AllocationUnits',
+    'Latency',
 ];
 
 export const isSortableStorageProperty = (value: unknown): value is StorageV2SortValue =>
