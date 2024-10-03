@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.23.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.23.0...v6.23.1) (2024-10-03)
+
+
+### Bug Fixes
+
+* **Cluster:** contatiner should take its parent width ([#1393](https://github.com/ydb-platform/ydb-embedded-ui/issues/1393)) ([a34bb3e](https://github.com/ydb-platform/ydb-embedded-ui/commit/a34bb3e1248a4656887b25118e4d4b153aa485b7))
+
 ## [6.23.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.22.0...v6.23.0) (2024-10-02)
 
 
