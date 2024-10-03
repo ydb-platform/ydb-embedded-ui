@@ -1,5 +1,6 @@
 import {PaginatedStorageGroups} from './PaginatedStorageGroups';
 import {PaginatedStorageNodes} from './PaginatedStorageNodes';
+import type {StorageViewContext} from './types';
 import {useStorageQueryParams} from './useStorageQueryParams';
 
 export interface PaginatedStorageProps {
@@ -7,6 +8,8 @@ export interface PaginatedStorageProps {
     nodeId?: string | number;
     groupId?: string | number;
     pDiskId?: string | number;
+
+    viewContext: StorageViewContext;
 
     parentContainer?: Element | null;
 }

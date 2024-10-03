@@ -22,7 +22,7 @@ import {cn} from '../../utils/cn';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {Storage} from '../Storage/Storage';
+import {StorageWrapper} from '../Storage/StorageWrapper';
 
 import {vDiskPageKeyset} from './i18n';
 
@@ -178,7 +178,12 @@ export function VDiskPage() {
             return (
                 <React.Fragment>
                     <div className={vDiskPageCn('storage-title')}>{vDiskPageKeyset('storage')}</div>
-                    <Storage groupId={GroupID} nodeId={nodeId} />
+                    <StorageWrapper
+                        groupId={GroupID}
+                        nodeId={nodeId}
+                        pDiskId={pDiskId ?? undefined}
+                        vDiskSlotId={vDiskSlotId ?? undefined}
+                    />
                 </React.Fragment>
             );
         }

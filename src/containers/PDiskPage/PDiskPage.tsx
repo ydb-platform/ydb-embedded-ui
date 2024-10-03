@@ -25,7 +25,7 @@ import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {getPDiskId, getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {Storage} from '../Storage/Storage';
+import {StorageWrapper} from '../Storage/StorageWrapper';
 
 import {DecommissionButton} from './DecommissionButton/DecommissionButton';
 import {DecommissionLabel} from './DecommissionLabel/DecommissionLabel';
@@ -244,7 +244,9 @@ export function PDiskPage() {
                 ) : null;
             }
             case 'storage': {
-                return pDiskParamsDefined ? <Storage nodeId={nodeId} pDiskId={pDiskId} /> : null;
+                return pDiskParamsDefined ? (
+                    <StorageWrapper nodeId={nodeId} pDiskId={pDiskId} />
+                ) : null;
             }
             default:
                 return null;

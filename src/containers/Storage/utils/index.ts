@@ -12,6 +12,7 @@ import type {PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {NODES_COLUMNS_IDS} from '../../Nodes/columns/constants';
 import {STORAGE_GROUPS_COLUMNS_IDS} from '../StorageGroups/columns/constants';
+import type {StorageViewContext} from '../types';
 
 const defaultDegradationEvaluator = generateEvaluator(1, 2, ['success', 'warning', 'danger']);
 
@@ -67,19 +68,23 @@ export function getDefaultSortGroup(visibleEntities: VisibleEntities) {
     return defaultSortGroup;
 }
 
-export type VDiskViewContext = {
-    groupId?: string;
-    nodeId?: string;
-};
-
-export function isVdiskActive(vDisk: PreparedVDisk, viewContext?: VDiskViewContext) {
+export function isVdiskActive(vDisk: PreparedVDisk, viewContext?: StorageViewContext) {
+    let isActive = true;
     if (valueIsDefined(vDisk.VDiskId?.GroupID) && viewContext?.groupId) {
-        return String(vDisk.VDiskId.GroupID) === viewContext.groupId;
+        isActive &&= String(vDisk.VDiskId.GroupID) === viewContext.groupId;
     }
 
     if (valueIsDefined(vDisk.NodeId) && viewContext?.nodeId) {
-        return String(vDisk.NodeId) === viewContext.nodeId;
+        isActive &&= String(vDisk.NodeId) === viewContext.nodeId;
     }
 
-    return true;
+    if (valueIsDefined(vDisk.PDiskId) && viewContext?.pDiskId) {
+        isActive &&= String(vDisk.PDiskId) === viewContext.pDiskId;
+    }
+
+    if (valueIsDefined(vDisk.VDiskSlotId) && viewContext?.vDiskSlotId) {
+        isActive &&= String(vDisk.VDiskSlotId) === viewContext.vDiskSlotId;
+    }
+
+    return isActive;
 }

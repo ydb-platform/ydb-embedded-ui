@@ -22,6 +22,7 @@ import {TableGroup} from './TableGroup/TableGroup';
 import {useExpandedGroups} from './TableGroup/useExpandedTableGroups';
 import i18n from './i18n';
 import {b, renderPaginatedTableErrorMessage} from './shared';
+import type {StorageViewContext} from './types';
 import {useStorageQueryParams} from './useStorageQueryParams';
 
 import './Storage.scss';
@@ -60,6 +61,7 @@ function StorageNodesComponent({
     database,
     nodeId,
     groupId,
+    viewContext,
     parentContainer,
 }: PaginatedStorageProps) {
     const {searchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
@@ -67,7 +69,7 @@ function StorageNodesComponent({
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
-        groupId: groupId?.toString(),
+        viewContext,
     });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
@@ -101,14 +103,19 @@ function StorageNodesComponent({
     );
 }
 
-function GroupedStorageNodesComponent({database, groupId, nodeId}: PaginatedStorageProps) {
+function GroupedStorageNodesComponent({
+    database,
+    groupId,
+    nodeId,
+    viewContext,
+}: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {searchValue, storageNodesGroupByParam, handleShowAllNodes} = useStorageQueryParams();
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
-        groupId: groupId?.toString(),
+        viewContext,
     });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageNodesInfoQuery(
@@ -193,10 +200,10 @@ function GroupedStorageNodesComponent({database, groupId, nodeId}: PaginatedStor
 
 function useStorageNodesColumnsToSelect({
     database,
-    groupId,
+    viewContext,
 }: {
     database?: string;
-    groupId?: string;
+    viewContext: StorageViewContext;
 }) {
     const {balancer} = useClusterBaseInfo();
     const {additionalNodesProps} = useAdditionalNodeProps({balancer});
@@ -206,6 +213,6 @@ function useStorageNodesColumnsToSelect({
         additionalNodesProps,
         visibleEntities,
         database,
-        groupId,
+        viewContext,
     });
 }

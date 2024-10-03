@@ -193,7 +193,7 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => (
                 <VDiskWithDonorsStack
                     key={stringifyVdiskId(vDisk.VDiskId)}
                     data={vDisk}
-                    inactive={!isVdiskActive(vDisk, data)}
+                    inactive={!isVdiskActive(vDisk, data?.viewContext)}
                     className={b('vdisks-item')}
                 />
             ))}
@@ -210,7 +210,7 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
     header: STORAGE_GROUPS_COLUMNS_TITLES.VDisksPDisks,
     className: b('disks-column'),
     render: ({row}) => {
-        return <Disks vDisks={row.VDisks} viewContext={data} />;
+        return <Disks vDisks={row.VDisks} viewContext={data?.viewContext} />;
     },
     align: DataTable.CENTER,
     width: 900,

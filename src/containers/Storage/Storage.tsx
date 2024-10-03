@@ -22,6 +22,7 @@ import {useStorageGroupsSelectedColumns} from './StorageGroups/columns/hooks';
 import {StorageNodesTable} from './StorageNodes/StorageNodesTable';
 import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
 import {b} from './shared';
+import type {StorageViewContext} from './types';
 import {useStorageQueryParams} from './useStorageQueryParams';
 import {defaultSortNode, getDefaultSortGroup} from './utils';
 
@@ -32,9 +33,11 @@ interface StorageProps {
     nodeId?: string | number;
     groupId?: string | number;
     pDiskId?: string | number;
+
+    viewContext: StorageViewContext;
 }
 
-export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
+export const Storage = ({database, viewContext, nodeId, groupId, pDiskId}: StorageProps) => {
     const {balancer} = useClusterBaseInfo();
     const {additionalNodesProps} = useAdditionalNodeProps({balancer});
 
@@ -75,14 +78,14 @@ export const Storage = ({database, nodeId, groupId, pDiskId}: StorageProps) => {
         additionalNodesProps,
         visibleEntities,
         database,
-        groupId: groupId?.toString(),
+        viewContext,
     });
 
     const {
         columnsToShow: storageGroupsColumnsToShow,
         columnsToSelect: storageGroupsColumnsToSelect,
         setColumns: setStorageGroupsSelectedColumns,
-    } = useStorageGroupsSelectedColumns({visibleEntities, nodeId: nodeId?.toString()});
+    } = useStorageGroupsSelectedColumns({visibleEntities, viewContext});
 
     const nodesQuery = storageApi.useGetStorageNodesInfoQuery(
         {

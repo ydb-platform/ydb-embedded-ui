@@ -19,7 +19,7 @@ import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
-import {Storage} from '../Storage/Storage';
+import {StorageWrapper} from '../Storage/StorageWrapper';
 
 import {storageGroupPageKeyset} from './i18n';
 
@@ -107,7 +107,7 @@ export function StorageGroupPage() {
                 <div className={storageGroupPageCn('storage-title')}>
                     {storageGroupPageKeyset('storage')}
                 </div>
-                <Storage groupId={groupId} />
+                <StorageWrapper groupId={groupId} />
             </React.Fragment>
         );
     };

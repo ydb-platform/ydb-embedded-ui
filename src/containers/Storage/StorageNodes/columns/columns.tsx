@@ -16,7 +16,7 @@ const b = cn('ydb-storage-nodes-columns');
 const getStorageNodesColumns = ({
     additionalNodesProps,
     database,
-    groupId,
+    viewContext,
 }: GetStorageNodesColumnsParams) => {
     const getNodeRef = additionalNodesProps?.getNodeRef;
 
@@ -81,7 +81,7 @@ const getStorageNodesColumns = ({
 
                             return (
                                 <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                    <PDisk data={pDisk} vDisks={vDisks} viewContext={{groupId}} />
+                                    <PDisk data={pDisk} vDisks={vDisks} viewContext={viewContext} />
                                 </div>
                             );
                         })}
