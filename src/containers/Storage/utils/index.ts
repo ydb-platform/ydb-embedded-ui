@@ -88,3 +88,39 @@ export function isVdiskActive(vDisk: PreparedVDisk, viewContext?: StorageViewCon
 
     return isActive;
 }
+
+const DEFAULT_ENTITIES_COUNT = 10;
+
+// NodePage -  1 node
+// GroupPage - DEFAULT_ENTITIES_COUNT nodes
+// PDiskPage - 1 node
+// VDiskPage - 1 node
+export function getStorageNodesInitialEntitiesCount({
+    nodeId,
+    pDiskId,
+    vDiskSlotId,
+}: StorageViewContext): number | undefined {
+    if (valueIsDefined(nodeId) || valueIsDefined(pDiskId) || valueIsDefined(vDiskSlotId)) {
+        return 1;
+    }
+
+    return DEFAULT_ENTITIES_COUNT;
+}
+
+// NodePage - DEFAULT_ENTITIES_COUNT groups
+// GroupPage - 1 group
+// PDiskPage - DEFAULT_ENTITIES_COUNT groups
+// VDiskPage - 1 group
+export function getStorageGroupsInitialEntitiesCount({
+    vDiskSlotId,
+    groupId,
+}: StorageViewContext): number | undefined {
+    if (valueIsDefined(groupId)) {
+        return 1;
+    }
+    if (valueIsDefined(vDiskSlotId)) {
+        return 1;
+    }
+
+    return DEFAULT_ENTITIES_COUNT;
+}
