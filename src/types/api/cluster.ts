@@ -71,10 +71,14 @@ export interface TClusterInfoV2 extends TClusterInfoV1 {
     };
     StorageStats?: TStorageStats[];
     Version?: number;
+    /** value is uint64 */
+    CoresUsed?: string;
 }
 
 export type TClusterInfo = TClusterInfoV1 | TClusterInfoV2;
 
 export function isClusterInfoV2(info?: TClusterInfo): info is TClusterInfoV2 {
-    return info ? 'Version' in info && info.Version === 2 : false;
+    return info
+        ? 'Version' in info && typeof info.Version === 'number' && info.Version >= 2
+        : false;
 }

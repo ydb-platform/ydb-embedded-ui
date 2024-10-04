@@ -15,7 +15,7 @@ import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber, stringifyVdiskId} from '../../../../utils/dataFormatters/dataFormatters';
 import {isSortableStorageProperty} from '../../../../utils/storage';
-import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
+import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
 import {getDegradedSeverity, getUsageSeverityForStorageGroup, isVdiskActive} from '../../utils';
@@ -192,7 +192,7 @@ const latencyColumn: StorageGroupsColumn = {
     width: 100,
     render: ({row}) => {
         return valueIsDefined(row.LatencyPutTabletLogMs)
-            ? formatToMs(parseUsToMs(row.LatencyPutTabletLogMs))
+            ? formatToMs(row.LatencyPutTabletLogMs)
             : EMPTY_DATA_PLACEHOLDER;
     },
     align: DataTable.RIGHT,
