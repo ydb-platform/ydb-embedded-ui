@@ -28,6 +28,7 @@ module.exports = {
             test: [/\.[jt]sx?$/, /\.[cm]js$/],
             include: [antlr4C3Root, websqlRoot, antlr4ngRoot],
             loader: 'babel-loader',
+            options: {babelrc: false, configFile: false, compact: true},
         });
 
         if (env === 'production') {
