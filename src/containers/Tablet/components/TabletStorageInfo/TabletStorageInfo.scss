@@ -51,15 +51,8 @@
 
         border-bottom: 1px solid var(--g-color-line-generic);
     }
-    :is(#{$block}__table-cell) {
-        height: 40px;
-        padding: 0;
-        @include text-body-2();
-    }
-    &__table-cell {
-        &_align_right {
-            text-align: right;
-        }
+    :is(&__table-cell_align_right) {
+        text-align: right;
     }
     &__metrics-cell {
         padding: var(--g-spacing-1) var(--g-spacing-2);
