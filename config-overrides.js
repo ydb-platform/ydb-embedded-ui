@@ -4,11 +4,15 @@ const MiniCSSExtractPlugin = require('mini-css-extract-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const srcRoot = path.resolve(__dirname, 'src');
 const uiKitRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/uikit');
+const antlr4C3Root = path.resolve(__dirname, 'node_modules/antlr4-c3');
+const websqlRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/websql-autocomplete');
+const antlr4ngRoot = path.resolve(__dirname, 'node_modules/antlr4ng');
 const uiKitIconsRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/icons');
 
 module.exports = {
     webpack: (config, env) => {
         const oneOfRule = config.module.rules.find((r) => r.oneOf);
+
         oneOfRule.oneOf.splice(0, 0, {
             test: /\.svg$/,
             include: [
@@ -18,6 +22,12 @@ module.exports = {
             ],
             loader: '@svgr/webpack',
             options: {dimensions: false},
+        });
+
+        oneOfRule.oneOf.splice(1, 0, {
+            test: [/\.[jt]sx?$/, /\.[cm]js$/],
+            include: [antlr4C3Root, websqlRoot, antlr4ngRoot],
+            loader: 'babel-loader',
         });
 
         if (env === 'production') {
