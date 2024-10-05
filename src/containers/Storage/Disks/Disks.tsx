@@ -6,8 +6,8 @@ import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {getPDiskId} from '../../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {PDisk} from '../PDisk';
+import type {StorageViewContext} from '../types';
 import {isVdiskActive} from '../utils';
-import type {VDiskViewContext} from '../utils';
 
 import './Disks.scss';
 
@@ -15,7 +15,7 @@ const b = cn('ydb-storage-disks');
 
 interface DisksProps {
     vDisks?: PreparedVDisk[];
-    viewContext?: VDiskViewContext;
+    viewContext?: StorageViewContext;
 }
 
 export function Disks({vDisks = [], viewContext}: DisksProps) {

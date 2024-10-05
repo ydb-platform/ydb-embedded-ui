@@ -11,8 +11,8 @@ import {cn} from '../../../utils/cn';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {STRUCTURE} from '../../Node/NodePages';
+import type {StorageViewContext} from '../types';
 import {isVdiskActive} from '../utils';
-import type {VDiskViewContext} from '../utils';
 
 import './PDisk.scss';
 
@@ -26,7 +26,7 @@ interface PDiskProps {
     onHidePopup?: VoidFunction;
     className?: string;
     progressBarClassName?: string;
-    viewContext?: VDiskViewContext;
+    viewContext?: StorageViewContext;
 }
 
 export const PDisk = ({
