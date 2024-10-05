@@ -12,6 +12,7 @@ const uiKitIconsRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/icons')
 module.exports = {
     webpack: (config, env) => {
         const oneOfRule = config.module.rules.find((r) => r.oneOf);
+
         oneOfRule.oneOf.splice(0, 0, {
             test: /\.svg$/,
             include: [
