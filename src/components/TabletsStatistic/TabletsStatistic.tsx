@@ -26,18 +26,23 @@ const prepareTablets = (tablets: TTabletStateInfo[]) => {
 
 interface TabletsStatisticProps {
     tablets: TTabletStateInfo[];
-    path: string | undefined;
+    tenantName: string | undefined;
     nodeId: string | number;
     backend?: string;
 }
 
-export const TabletsStatistic = ({tablets = [], path, nodeId, backend}: TabletsStatisticProps) => {
+export const TabletsStatistic = ({
+    tablets = [],
+    tenantName,
+    nodeId,
+    backend,
+}: TabletsStatisticProps) => {
     const renderTabletInfo = (item: ReturnType<typeof prepareTablets>[number], index: number) => {
         const tabletsPath = createHref(
             routes.node,
             {id: nodeId, activeTab: TABLETS},
             {
-                tenantName: path,
+                tenantName,
                 backend,
             },
         );
