@@ -33,18 +33,17 @@ const poolNameColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.PoolName,
     width: 250,
     render: ({row}) => {
-        const splitted = row.PoolName?.split('/');
-        return (
-            splitted && (
-                <CellWithPopover
-                    wrapperClassName={b('pool-name-wrapper')}
-                    content={row.PoolName}
-                    placement={['right']}
-                    behavior={PopoverBehavior.Immediate}
-                >
-                    {splitted[splitted.length - 1]}
-                </CellWithPopover>
-            )
+        return row.PoolName ? (
+            <CellWithPopover
+                content={row.PoolName}
+                placement={['right']}
+                behavior={PopoverBehavior.Immediate}
+                className={b('pool-name-wrapper')}
+            >
+                <span className={b('pool-name')}>{row.PoolName}</span>
+            </CellWithPopover>
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
         );
     },
     align: DataTable.LEFT,

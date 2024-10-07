@@ -22,8 +22,17 @@
             }
         }
     }
+
     &__pool-name-wrapper {
-        width: 230px;
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        direction: rtl;
+    }
+
+    &__pool-name {
+        unicode-bidi: plaintext;
     }
 
     &__group-id {
