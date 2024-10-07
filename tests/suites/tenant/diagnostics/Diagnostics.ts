@@ -64,6 +64,47 @@ export class Table {
 
         return true;
     }
+
+    async getHeaders() {
+        const headers = this.table.locator('th.data-table__th');
+        const headerCount = await headers.count();
+        const headerNames = [];
+        for (let i = 0; i < headerCount; i++) {
+            headerNames.push(await headers.nth(i).innerText());
+        }
+        return headerNames;
+    }
+
+    async getCellValueByHeader(row: number, header: string) {
+        const headers = await this.getHeaders();
+        const colIndex = headers.indexOf(header);
+        if (colIndex === -1) {
+            throw new Error(`Header "${header}" not found`);
+        }
+        const cell = this.table.locator(
+            `tr.data-table__row:nth-child(${row}) td:nth-child(${colIndex + 1})`,
+        );
+        return cell.innerText();
+    }
+
+    async waitForCellValueByHeader(row: number, header: string, value: string) {
+        const headers = await this.getHeaders();
+        const colIndex = headers.indexOf(header);
+        if (colIndex === -1) {
+            throw new Error(`Header "${header}" not found`);
+        }
+        const cell = this.table.locator(
+            `tr.data-table__row:nth-child(${row}) td:nth-child(${colIndex + 1})`,
+        );
+        await retryAction(async () => {
+            const cellValue = (await cell.innerText()).trim();
+            if (cellValue === value) {
+                return true;
+            }
+            throw new Error(`Cell value ${cellValue} did not match expected ${value}`);
+        });
+        return true;
+    }
 }
 
 export enum QueriesSwitch {
