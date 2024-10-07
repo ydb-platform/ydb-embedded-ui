@@ -2,6 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {tenantName} from '../../../utils/constants';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
+import {longRunningQuery} from '../constants';
 
 import {
     ButtonNames,
@@ -11,7 +12,6 @@ import {
     QueryTabs,
     ResultTabNames,
 } from './QueryEditor';
-import {longRunningQuery} from './constants';
 
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';

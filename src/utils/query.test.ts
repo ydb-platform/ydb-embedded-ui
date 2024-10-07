@@ -47,6 +47,252 @@ describe('API utils', () => {
                     expect(actual.columns).toBeUndefined();
                     expect(actual.stats).toEqual(response.stats);
                 });
+
+                const mockColumns = [
+                    {name: 'PDiskFilter', type: 'Utf8?'},
+                    {name: 'ErasureSpecies', type: 'Utf8?'},
+                    {name: 'CurrentAvailableSize', type: 'Uint64?'},
+                    {name: 'CurrentAllocatedSize', type: 'Uint64?'},
+                    {name: 'CurrentGroupsCreated', type: 'Uint32?'},
+                    {name: 'AvailableGroupsToCreate', type: 'Uint32?'},
+                ];
+
+                const mockRows = [
+                    ['Type:SSD', 'block-4-2', '1000', '2000', 100, 50],
+                    ['Type:ROT', 'block-4-2', '2000', '1000', 50, 0],
+                ];
+
+                it('should parse a valid ExecuteResponse correctly', () => {
+                    const input = {
+                        result: [
+                            {
+                                columns: mockColumns,
+                                rows: mockRows,
+                                truncated: false,
+                            },
+                        ],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    const expected = {
+                        resultSets: [
+                            {
+                                columns: mockColumns,
+                                result: [
+                                    {
+                                        PDiskFilter: 'Type:SSD',
+                                        ErasureSpecies: 'block-4-2',
+                                        CurrentAvailableSize: '1000',
+                                        CurrentAllocatedSize: '2000',
+                                        CurrentGroupsCreated: 100,
+                                        AvailableGroupsToCreate: 50,
+                                    },
+                                    {
+                                        PDiskFilter: 'Type:ROT',
+                                        ErasureSpecies: 'block-4-2',
+                                        CurrentAvailableSize: '2000',
+                                        CurrentAllocatedSize: '1000',
+                                        CurrentGroupsCreated: 50,
+                                        AvailableGroupsToCreate: 0,
+                                    },
+                                ],
+                                truncated: false,
+                            },
+                        ],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                });
+
+                it('should handle empty result array', () => {
+                    const input = {
+                        result: [],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    const expected = {
+                        result: [],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                });
+
+                it('should handle result with columns but no rows', () => {
+                    const input = {
+                        result: [
+                            {
+                                columns: mockColumns,
+                                rows: [],
+                                truncated: false,
+                            },
+                        ],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    const expected = {
+                        resultSets: [
+                            {
+                                columns: mockColumns,
+                                result: [],
+                                truncated: false,
+                            },
+                        ],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                });
+
+                it('should return empty object for unsupported format', () => {
+                    const input = {
+                        result: 'unsupported',
+                    };
+
+                    expect(parseQueryAPIExecuteResponse(input)).toEqual({});
+                });
+
+                it('should handle multiple result sets', () => {
+                    const input = {
+                        result: [
+                            {
+                                columns: mockColumns,
+                                rows: mockRows,
+                                truncated: false,
+                            },
+                            {
+                                columns: [{name: 'Count', type: 'Uint32?'}],
+                                rows: [[2]],
+                                truncated: false,
+                            },
+                        ],
+                        stats: {DurationUs: '1500'},
+                    };
+
+                    const expected = {
+                        resultSets: [
+                            {
+                                columns: mockColumns,
+                                result: [
+                                    {
+                                        PDiskFilter: 'Type:SSD',
+                                        ErasureSpecies: 'block-4-2',
+                                        CurrentAvailableSize: '1000',
+                                        CurrentAllocatedSize: '2000',
+                                        CurrentGroupsCreated: 100,
+                                        AvailableGroupsToCreate: 50,
+                                    },
+                                    {
+                                        PDiskFilter: 'Type:ROT',
+                                        ErasureSpecies: 'block-4-2',
+                                        CurrentAvailableSize: '2000',
+                                        CurrentAllocatedSize: '1000',
+                                        CurrentGroupsCreated: 50,
+                                        AvailableGroupsToCreate: 0,
+                                    },
+                                ],
+                                truncated: false,
+                            },
+                            {
+                                columns: [{name: 'Count', type: 'Uint32?'}],
+                                result: [{Count: 2}],
+                                truncated: false,
+                            },
+                        ],
+                        stats: {DurationUs: '1500'},
+                    };
+
+                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                });
+
+                it('should handle null values in rows', () => {
+                    const input = {
+                        result: [
+                            {
+                                columns: mockColumns,
+                                rows: [
+                                    ['Type:SSD', null, '1000', null, 100, 50],
+                                    [null, 'block-4-2', null, '1000', null, 0],
+                                ],
+                                truncated: false,
+                            },
+                        ],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    const expected = {
+                        resultSets: [
+                            {
+                                columns: mockColumns,
+                                result: [
+                                    {
+                                        PDiskFilter: 'Type:SSD',
+                                        ErasureSpecies: null,
+                                        CurrentAvailableSize: '1000',
+                                        CurrentAllocatedSize: null,
+                                        CurrentGroupsCreated: 100,
+                                        AvailableGroupsToCreate: 50,
+                                    },
+                                    {
+                                        PDiskFilter: null,
+                                        ErasureSpecies: 'block-4-2',
+                                        CurrentAvailableSize: null,
+                                        CurrentAllocatedSize: '1000',
+                                        CurrentGroupsCreated: null,
+                                        AvailableGroupsToCreate: 0,
+                                    },
+                                ],
+                                truncated: false,
+                            },
+                        ],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                });
+
+                it('should handle truncated results', () => {
+                    const input = {
+                        result: [
+                            {
+                                columns: mockColumns,
+                                rows: mockRows,
+                                truncated: true,
+                            },
+                        ],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    const result = parseQueryAPIExecuteResponse(input);
+                    expect(result.resultSets?.[0].truncated).toBe(true);
+                });
+
+                it('should handle empty columns and rows', () => {
+                    const input = {
+                        result: [
+                            {
+                                columns: [],
+                                rows: [],
+                                truncated: false,
+                            },
+                        ],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    const expected = {
+                        resultSets: [
+                            {
+                                columns: [],
+                                result: [],
+                                truncated: false,
+                            },
+                        ],
+                        stats: {DurationUs: '1000'},
+                    };
+
+                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                });
             });
         });
 

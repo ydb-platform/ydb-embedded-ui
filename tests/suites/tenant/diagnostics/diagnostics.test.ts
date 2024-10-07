@@ -1,12 +1,14 @@
 import {expect, test} from '@playwright/test';
 
 import {dsVslotsSchema, tenantName} from '../../../utils/constants';
-import {TenantPage} from '../TenantPage';
+import {NavigationTabs, TenantPage} from '../TenantPage';
+import {longRunningQuery} from '../constants';
+import {QueryEditor} from '../queryEditor/QueryEditor';
 
-import {Diagnostics, DiagnosticsTab} from './Diagnostics';
+import {Diagnostics, DiagnosticsTab, QueriesSwitch} from './Diagnostics';
 
 test.describe('Diagnostics tab', async () => {
-    test.beforeEach(async ({page}) => {
+    test('Primary keys header is visible in Schema tab', async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
             name: tenantName,
@@ -14,9 +16,7 @@ test.describe('Diagnostics tab', async () => {
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
-    });
 
-    test('Primary keys header is visible in Schema tab', async ({page}) => {
         const objectSummary = new Diagnostics(page);
 
         await objectSummary.clickTab(DiagnosticsTab.Schema);
@@ -27,5 +27,45 @@ test.describe('Diagnostics tab', async () => {
             'PDiskId',
             'VSlotId',
         ]);
+    });
+
+    test('No runnning queries in Queries if no queries are running', async ({page}) => {
+        const pageQueryParams = {
+            schema: tenantName,
+            name: tenantName,
+            tenantPage: 'diagnostics',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.clickTab(DiagnosticsTab.Queries);
+        await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
+        await diagnostics.table.hasNoData();
+    });
+
+    test('Running query is shown if query is running', async ({page}) => {
+        const pageQueryParams = {
+            schema: tenantName,
+            name: tenantName,
+            tenantPage: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.clickRunButton();
+        await page.waitForTimeout(500);
+        const statusElement = await queryEditor.getExecutionStatus();
+        await expect(statusElement).toBe('Running');
+        await tenantPage.selectNavigationTab(NavigationTabs.Diagnostics);
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.clickTab(DiagnosticsTab.Queries);
+        await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
+        expect(await diagnostics.table.getRowCount()).toBe(1);
+        expect(await diagnostics.table.waitForCellValue(1, 4, '–')).toBe(true);
     });
 });
