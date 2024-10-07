@@ -5,6 +5,7 @@ import type {
     AdditionalClusterProps,
     AdditionalTenantsProps,
     AdditionalVersionsProps,
+    NodeAddress,
 } from '../../../types/additionalProps';
 import type {MetaClusterVersion} from '../../../types/api/meta';
 import type {ETenantType} from '../../../types/api/tenant';
@@ -12,7 +13,7 @@ import {getVersionColors, getVersionMap} from '../../../utils/clusterVersionColo
 import {cn} from '../../../utils/cn';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../../utils/monitoring';
 import {getCleanBalancerValue, removeViewerPathname} from '../../../utils/parseBalancer';
-import {getBackendFromNodeHost} from '../../../utils/prepareBackend';
+import {getBackendFromNodeHost, getBackendFromRawNodeData} from '../../../utils/prepareBackend';
 import type {Cluster} from '../../Cluster/Cluster';
 import {useClusterData} from '../useClusterData';
 
@@ -76,7 +77,9 @@ const getAdditionalTenantsProps = (
 ) => {
     const additionalTenantsProps: AdditionalTenantsProps = {};
 
-    additionalTenantsProps.prepareTenantBackend = (nodeHost: string | undefined) => {
+    additionalTenantsProps.prepareTenantBackend = (
+        nodeHostOrAddress: string | NodeAddress | undefined,
+    ) => {
         // Proxy received from balancer value, so it's necessary
         if (!balancer) {
             return undefined;
@@ -86,11 +89,15 @@ const getAdditionalTenantsProps = (
             return removeViewerPathname(balancer);
         }
 
-        if (!nodeHost) {
+        if (!nodeHostOrAddress) {
             return undefined;
         }
 
-        return getBackendFromNodeHost(nodeHost, balancer);
+        if (typeof nodeHostOrAddress === 'string') {
+            return getBackendFromNodeHost(nodeHostOrAddress, balancer);
+        }
+
+        return getBackendFromRawNodeData(nodeHostOrAddress, balancer, true) ?? undefined;
     };
 
     if (monitoring && getMonitoringLink) {
