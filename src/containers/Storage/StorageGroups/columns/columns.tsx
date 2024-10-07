@@ -13,7 +13,7 @@ import {getStorageGroupPath} from '../../../../routes';
 import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
-import {formatNumber, stringifyVdiskId} from '../../../../utils/dataFormatters/dataFormatters';
+import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {isSortableStorageProperty} from '../../../../utils/storage';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
@@ -217,7 +217,7 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => (
         <div className={b('vdisks-wrapper')}>
             {row.VDisks?.map((vDisk) => (
                 <VDiskWithDonorsStack
-                    key={stringifyVdiskId(vDisk.VDiskId)}
+                    key={vDisk.StringifiedId}
                     data={vDisk}
                     inactive={!isVdiskActive(vDisk, data?.viewContext)}
                     className={b('vdisks-item')}

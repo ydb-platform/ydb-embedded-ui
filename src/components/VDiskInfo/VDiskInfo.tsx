@@ -4,7 +4,7 @@ import {getVDiskPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {formatStorageValuesToGb, stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
@@ -201,10 +201,7 @@ function VDiskTitle<T extends PreparedVDisk>({data}: VDiskTitleProps<T>) {
     return (
         <div className={b('title')}>
             {vDiskInfoKeyset('vdiks-title')}
-            <EntityStatus
-                status={getSeverityColor(data.Severity)}
-                name={stringifyVdiskId(data.VDiskId)}
-            />
+            <EntityStatus status={getSeverityColor(data.Severity)} name={data.StringifiedId} />
         </div>
     );
 }

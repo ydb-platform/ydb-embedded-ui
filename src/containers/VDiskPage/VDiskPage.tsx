@@ -19,7 +19,6 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {StorageWrapper} from '../Storage/StorageWrapper';
@@ -142,7 +141,7 @@ export function VDiskPage() {
                 className={vDiskPageCn('title')}
                 entityName={vDiskPageKeyset('vdisk')}
                 status={getSeverityColor(Severity)}
-                id={stringifyVdiskId(vDiskData?.VDiskId)}
+                id={vDiskData?.StringifiedId}
             />
         );
     };

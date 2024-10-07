@@ -263,20 +263,37 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
         } = group;
 
         const vDisks = VDisks.map((disk) => {
-            const whiteboardVDisk = disk.Whiteboard;
-            const whiteboardPDisk = disk.PDisk?.Whiteboard;
+            const {
+                Whiteboard: whiteboardVDisk,
+                PDisk,
+                VDiskId,
+                NodeId,
+                AllocatedSize,
+                AvailableSize,
+                DiskSpace,
+                Status,
+            } = disk;
+            const whiteboardPDisk = PDisk?.Whiteboard;
 
-            const NodeId = disk.NodeId;
             const PDiskId = whiteboardPDisk?.PDiskId;
 
             const whiteboardVDiskData = {
                 ...whiteboardVDisk,
                 PDiskId,
                 NodeId,
+                AllocatedSize,
+                AvailableSize,
+                DiskSpace,
+                Status,
                 PDisk: {...whiteboardPDisk, NodeId},
             };
 
-            return prepareVDiskData(whiteboardVDiskData);
+            const preparedVDiskData = prepareVDiskData(whiteboardVDiskData);
+
+            return {
+                ...preparedVDiskData,
+                StringifiedId: preparedVDiskData.StringifiedId || VDiskId,
+            };
         });
 
         const diskSpaceStatus = getGroupDiskSpaceStatus(group);
