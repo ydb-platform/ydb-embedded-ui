@@ -27,7 +27,7 @@ import {
 } from '../../store/reducers/tenants/selectors';
 import {setSearchValue, tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
-import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import type {AdditionalTenantsProps, NodeAddress} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
@@ -93,8 +93,18 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
 
     const renderTable = () => {
         const getTenantBackend = (tenant: PreparedTenant) => {
-            const backend = tenant.MonitoringEndpoint ?? tenant.backend;
-            return additionalTenantsProps?.prepareTenantBackend?.(backend);
+            if (typeof additionalTenantsProps?.prepareTenantBackend !== 'function') {
+                return undefined;
+            }
+
+            let backend: string | NodeAddress | undefined =
+                tenant.MonitoringEndpoint ?? tenant.backend;
+            const nodeIds = tenant.NodeIds ?? tenant.sharedNodeIds;
+            if (!backend && nodeIds && nodeIds.length > 0) {
+                const index = Math.floor(Math.random() * nodeIds.length);
+                backend = {NodeId: nodeIds[index]};
+            }
+            return additionalTenantsProps.prepareTenantBackend(backend);
         };
 
         const columns: Column<PreparedTenant>[] = [
