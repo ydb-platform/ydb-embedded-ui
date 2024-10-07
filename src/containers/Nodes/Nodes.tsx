@@ -14,6 +14,7 @@ import {ResizeableDataTable} from '../../components/ResizeableDataTable/Resizeab
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {UptimeFilter} from '../../components/UptimeFIlter';
+import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
 import {filterNodes} from '../../store/reducers/nodes/selectors';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
@@ -38,7 +39,6 @@ import {
     nodesUptimeFilterValuesSchema,
 } from '../../utils/nodes';
 
-import {NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
 import {useNodesSelectedColumns} from './columns/hooks';
 import i18n from './i18n';
 

@@ -1,5 +1,6 @@
 import {ASCENDING, DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
 
+import {NODES_COLUMNS_IDS} from '../../../components/nodesColumns/constants';
 import type {NodesSortParams} from '../../../store/reducers/nodes/types';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {
@@ -10,7 +11,6 @@ import type {
 import {valueIsDefined} from '../../../utils';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
-import {NODES_COLUMNS_IDS} from '../../Nodes/columns/constants';
 import {STORAGE_GROUPS_COLUMNS_IDS} from '../StorageGroups/columns/constants';
 import type {StorageViewContext} from '../types';
 
