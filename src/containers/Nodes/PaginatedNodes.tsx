@@ -16,6 +16,7 @@ import type {
 import {ProblemFilter} from '../../components/ProblemFilter';
 import {Search} from '../../components/Search';
 import {UptimeFilter} from '../../components/UptimeFIlter';
+import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {
     ProblemFilterValues,
@@ -32,7 +33,6 @@ import {
     nodesUptimeFilterValuesSchema,
 } from '../../utils/nodes';
 
-import {NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
 import {useNodesSelectedColumns} from './columns/hooks';
 import {getNodes} from './getNodes';
 import i18n from './i18n';

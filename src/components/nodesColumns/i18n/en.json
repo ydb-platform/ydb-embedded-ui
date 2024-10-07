@@ -1,5 +1,5 @@
 {
-  "node-id": "Node Id",
+  "node-id": "Node ID",
   "host": "Host",
   "node-name": "Node Name",
   "dc": "DC",
@@ -11,7 +11,7 @@
   "tablets": "Tablets",
   "load-average": "Load Average",
   "load": "Load",
-  "process": "Process",
   "caches": "Caches",
-  "sessions": "Sessions"
+  "sessions": "Sessions",
+  "missing": "Missing"
 }

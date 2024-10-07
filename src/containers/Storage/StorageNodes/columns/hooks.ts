@@ -3,7 +3,7 @@ import React from 'react';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
-import {getPreparedStorageNodesColumns} from './columns';
+import {getStorageNodesColumns} from './columns';
 import {
     DEFAULT_STORAGE_NODES_COLUMNS,
     REQUIRED_STORAGE_NODES_COLUMNS,
@@ -17,11 +17,11 @@ export function useStorageNodesSelectedColumns({
     visibleEntities,
     database,
     additionalNodesProps,
-    groupId,
+    viewContext,
 }: GetStorageNodesColumnsParams) {
     const columns = React.useMemo(() => {
-        return getPreparedStorageNodesColumns({database, additionalNodesProps, groupId});
-    }, [database, additionalNodesProps, groupId]);
+        return getStorageNodesColumns({database, additionalNodesProps, viewContext});
+    }, [database, additionalNodesProps, viewContext]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

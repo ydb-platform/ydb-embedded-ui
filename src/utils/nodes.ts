@@ -1,6 +1,5 @@
 import {z} from 'zod';
 
-import type {NodesPreparedEntity} from '../store/reducers/nodes/types';
 import {ProblemFilterValues} from '../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../store/reducers/settings/types';
 import {EFlag} from '../types/api/enums';
@@ -27,8 +26,11 @@ export const NodesUptimeFilterTitles = {
     [NodesUptimeFilterValues.SmallUptime]: 'Uptime < 1h',
 };
 
-export const isUnavailableNode = (node: NodesPreparedEntity | TSystemStateInfo) =>
-    !node.SystemState || node.SystemState === EFlag.Grey;
+export const isUnavailableNode = <
+    T extends Pick<TSystemStateInfo, 'SystemState'> = Pick<TSystemStateInfo, 'SystemState'>,
+>(
+    node: T,
+) => !node.SystemState || node.SystemState === EFlag.Grey;
 
 export const prepareNodeHostsMap = (nodesList?: TNodeInfo[]) => {
     return nodesList?.reduce<NodeHostsMap>((nodeHosts, node) => {
@@ -56,6 +58,9 @@ export interface PreparedNodeSystemState extends TSystemStateInfo {
     DC?: string;
     LoadAveragePercents?: number[];
     Uptime: string;
+    TenantName?: string;
+    SharedCacheLimit?: number;
+    SharedCacheUsed?: number;
 }
 
 export const prepareNodeSystemState = (
@@ -64,10 +69,17 @@ export const prepareNodeSystemState = (
     // There is no Rack in Location field for din nodes
     const Rack = systemState.Location?.Rack || systemState.Rack;
     const DC = systemState.Location?.DataCenter || systemState.DataCenter;
+    const TenantName = systemState?.Tenants?.[0];
 
     const Uptime = calcUptime(systemState.StartTime);
 
     const LoadAveragePercents = calculateLoadAveragePercents(systemState);
+
+    // 0 limit means that limit is not set, so it should be undefined
+    const SharedCacheLimit = Number(systemState.SharedCacheStats?.LimitBytes) || undefined;
+    const SharedCacheUsed = valueIsDefined(systemState.SharedCacheStats?.UsedBytes)
+        ? Number(systemState.SharedCacheStats?.UsedBytes)
+        : undefined;
 
     return {
         ...systemState,
@@ -75,6 +87,9 @@ export const prepareNodeSystemState = (
         DC,
         Uptime,
         LoadAveragePercents,
+        TenantName,
+        SharedCacheLimit,
+        SharedCacheUsed,
     };
 };
 

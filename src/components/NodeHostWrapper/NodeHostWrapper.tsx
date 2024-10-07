@@ -1,8 +1,8 @@
 import {PopoverBehavior} from '@gravity-ui/uikit';
 
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {NodeAddress} from '../../types/additionalProps';
+import type {TSystemStateInfo} from '../../types/api/nodes';
 import {createDeveloperUILinkWithNodeId} from '../../utils/developerUI/developerUI';
 import {isUnavailableNode} from '../../utils/nodes';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
@@ -10,8 +10,14 @@ import {DeveloperUILinkButton} from '../DeveloperUILinkButton/DeveloperUILinkBut
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 
+export type NodeHostData = NodeAddress &
+    Pick<TSystemStateInfo, 'SystemState'> & {
+        NodeId: string | number;
+        TenantName?: string;
+    };
+
 interface NodeHostWrapperProps {
-    node: NodesPreparedEntity;
+    node: NodeHostData;
     getNodeRef?: (node?: NodeAddress) => string | null;
     database?: string;
 }

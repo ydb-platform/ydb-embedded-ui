@@ -54,13 +54,15 @@ function StorageGroupsComponent({
     nodeId,
     groupId,
     pDiskId,
+    viewContext,
     parentContainer,
+    initialEntitiesCount,
 }: PaginatedStorageProps) {
     const {searchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
-        nodeId: nodeId?.toString(),
+        viewContext,
     });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
@@ -90,6 +92,7 @@ function StorageGroupsComponent({
             renderControls={renderControls}
             renderErrorMessage={renderPaginatedTableErrorMessage}
             columns={columnsToShow}
+            initialEntitiesCount={initialEntitiesCount}
         />
     );
 }
@@ -99,6 +102,8 @@ function GroupedStorageGroupsComponent({
     nodeId,
     groupId,
     pDiskId,
+
+    viewContext,
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {searchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
@@ -106,7 +111,7 @@ function GroupedStorageGroupsComponent({
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
-        nodeId: nodeId?.toString(),
+        viewContext,
     });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(

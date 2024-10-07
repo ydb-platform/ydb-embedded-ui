@@ -1,6 +1,8 @@
 import {PaginatedStorageGroups} from './PaginatedStorageGroups';
 import {PaginatedStorageNodes} from './PaginatedStorageNodes';
+import type {StorageViewContext} from './types';
 import {useStorageQueryParams} from './useStorageQueryParams';
+import {getStorageGroupsInitialEntitiesCount, getStorageNodesInitialEntitiesCount} from './utils';
 
 export interface PaginatedStorageProps {
     database?: string;
@@ -8,7 +10,11 @@ export interface PaginatedStorageProps {
     groupId?: string | number;
     pDiskId?: string | number;
 
+    viewContext: StorageViewContext;
+
     parentContainer?: Element | null;
+
+    initialEntitiesCount?: number;
 }
 
 export const PaginatedStorage = (props: PaginatedStorageProps) => {
@@ -17,8 +23,18 @@ export const PaginatedStorage = (props: PaginatedStorageProps) => {
     const isNodes = storageType === 'nodes';
 
     if (isNodes) {
-        return <PaginatedStorageNodes {...props} />;
+        return (
+            <PaginatedStorageNodes
+                initialEntitiesCount={getStorageNodesInitialEntitiesCount(props.viewContext)}
+                {...props}
+            />
+        );
     }
 
-    return <PaginatedStorageGroups {...props} />;
+    return (
+        <PaginatedStorageGroups
+            initialEntitiesCount={getStorageGroupsInitialEntitiesCount(props.viewContext)}
+            {...props}
+        />
+    );
 };
