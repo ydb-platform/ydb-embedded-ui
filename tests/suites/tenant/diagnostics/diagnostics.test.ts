@@ -66,6 +66,6 @@ test.describe('Diagnostics tab', async () => {
         await diagnostics.clickTab(DiagnosticsTab.Queries);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
         expect(await diagnostics.table.getRowCount()).toBe(1);
-        expect(await diagnostics.table.waitForCellValue(1, 4, '–')).toBe(true);
+        expect(await diagnostics.table.waitForCellValue(1, 1, '–')).toBe(true);
     });
 });
