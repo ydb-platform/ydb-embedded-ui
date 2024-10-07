@@ -1,12 +1,16 @@
 import DataTable from '@gravity-ui/react-data-table';
 
 import {
+    getCpuColumn,
     getDataCenterColumn,
     getHostColumn,
+    getMemoryColumn,
     getMissingDisksColumn,
     getNodeIdColumn,
+    getNodeNameColumn,
     getRackColumn,
     getUptimeColumn,
+    getVersionColumn,
 } from '../../../../components/nodesColumns/columns';
 import type {PreparedStorageNode} from '../../../../store/reducers/storage/types';
 import {cn} from '../../../../utils/cn';
@@ -58,9 +62,13 @@ export const getStorageNodesColumns = ({
 
     const columns = [
         getNodeIdColumn<PreparedStorageNode>(),
+        getNodeNameColumn<PreparedStorageNode>(),
         getHostColumn<PreparedStorageNode>({getNodeRef, database}),
         getDataCenterColumn<PreparedStorageNode>(),
         getRackColumn<PreparedStorageNode>(),
+        getVersionColumn<PreparedStorageNode>(),
+        getMemoryColumn<PreparedStorageNode>(),
+        getCpuColumn<PreparedStorageNode>(),
         getUptimeColumn<PreparedStorageNode>(),
         getMissingDisksColumn<PreparedStorageNode>(),
         getPDisksColumn({viewContext}),
