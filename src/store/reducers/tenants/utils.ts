@@ -178,7 +178,9 @@ const calculateTenantEntities = (tenant: TTenant) => {
 export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean): PreparedTenant[] => {
     return tenants.map((tenant) => {
         const backend = useNodeAsBackend ? getTenantBackend(tenant) : undefined;
-        const sharedTenantName = tenants.find((item) => item.Id === tenant.ResourceId)?.Name;
+        const sharedDatabase = tenants.find((item) => item.Id === tenant.ResourceId);
+        const sharedTenantName = sharedDatabase?.Name;
+        const sharedNodeIds = sharedDatabase?.NodeIds;
         const controlPlaneName = getControlPlaneValue(tenant);
         const {cpu, memory, blobStorage} = calculateTenantMetrics(tenant);
         const {nodesCount, groupsCount} = calculateTenantEntities(tenant);
@@ -188,6 +190,7 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean): P
 
             backend,
             sharedTenantName,
+            sharedNodeIds,
             controlPlaneName,
             cpu,
             memory,
