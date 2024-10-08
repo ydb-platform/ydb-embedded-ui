@@ -16,6 +16,7 @@ export type PreparedPDisk = TPDiskStateInfo &
 export interface PreparedVDisk extends TVDiskStateInfo {
     PDisk?: PreparedPDisk;
     Severity?: number;
+    StringifiedId?: string;
 
     TotalSize?: number;
     AllocatedPercent?: number;

@@ -2,7 +2,6 @@ import React from 'react';
 
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import {cn} from '../../../utils/cn';
-import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {getPDiskId} from '../../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {PDisk} from '../PDisk';
@@ -30,7 +29,7 @@ export function Disks({vDisks = [], viewContext}: DisksProps) {
             <div className={b('vdisks-wrapper')}>
                 {vDisks?.map((vDisk) => (
                     <VDiskItem
-                        key={stringifyVdiskId(vDisk.VDiskId)}
+                        key={vDisk.StringifiedId}
                         vDisk={vDisk}
                         inactive={!isVdiskActive(vDisk, viewContext)}
                         highlightedVDisk={highlightedVDisk}
@@ -64,7 +63,7 @@ function VDiskItem({vDisk, highlightedVDisk, inactive, setHighlightedVDisk}: Dis
     // Do not show PDisk popup for VDisk
     const vDiskToShow = {...vDisk, PDisk: undefined};
 
-    const vDiskId = stringifyVdiskId(vDisk.VDiskId);
+    const vDiskId = vDisk.StringifiedId;
 
     return (
         <div
@@ -87,7 +86,7 @@ function VDiskItem({vDisk, highlightedVDisk, inactive, setHighlightedVDisk}: Dis
 }
 
 function PDiskItem({vDisk, highlightedVDisk, setHighlightedVDisk}: DisksItemProps) {
-    const vDiskId = stringifyVdiskId(vDisk.VDiskId);
+    const vDiskId = vDisk.StringifiedId;
 
     if (!vDisk.PDisk) {
         return null;
