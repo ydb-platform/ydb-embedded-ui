@@ -292,6 +292,9 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
 
             return {
                 ...preparedVDiskData,
+                // There might be no Whiteboard data if cluster is not healthy
+                // StringifiedId is formed from Whiteboard.VDiskId object
+                // Use VDiskId string from backend in such case
                 StringifiedId: preparedVDiskData.StringifiedId || VDiskId,
             };
         });
