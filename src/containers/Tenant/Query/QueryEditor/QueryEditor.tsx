@@ -30,7 +30,6 @@ import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
     LAST_USED_QUERY_ACTION_KEY,
-    QUERY_USE_MULTI_SCHEMA_KEY,
 } from '../../../../utils/constants';
 import {useEventHandler, useQueryExecutionSettings, useSetting} from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
@@ -105,7 +104,6 @@ function QueryEditor(props: QueryEditorProps) {
         useLastQueryExecutionSettings();
     const {resetBanner} = useChangedQuerySettings();
 
-    const [useMultiSchema] = useSetting(QUERY_USE_MULTI_SCHEMA_KEY);
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting<QueryAction>(
         LAST_USED_QUERY_ACTION_KEY,
     );
@@ -148,8 +146,6 @@ function QueryEditor(props: QueryEditorProps) {
     const handleSendExecuteClick = useEventHandler((text?: string) => {
         const {input, history} = executeQuery;
 
-        const schema = useMultiSchema ? 'multi' : 'modern';
-
         const query = text ?? input;
 
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
@@ -163,7 +159,6 @@ function QueryEditor(props: QueryEditorProps) {
             query,
             database: tenantName,
             querySettings,
-            schema,
             enableTracingLevel,
             queryId,
         });

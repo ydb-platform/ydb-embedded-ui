@@ -28,7 +28,6 @@ export interface ParsedResultSet {
 
 export interface IQueryResult {
     resultSets?: ParsedResultSet[];
-    result?: KeyValueRow[];
     columns?: ColumnType[];
     stats?: TKqpStatsQuery;
     plan?: ScriptPlan | QueryPlan;

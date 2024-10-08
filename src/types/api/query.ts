@@ -221,9 +221,6 @@ export type Timeout = number;
 /** undefined = '15' */
 export type TracingLevel = number;
 
-/** undefined = 'classic' */
-export type Schemas = 'classic' | 'modern' | 'ydb' | 'multi' | undefined;
-
 /** undefined = 'execute' */
 export type ExecuteActions =
     | 'execute'
@@ -271,76 +268,58 @@ export interface ExplainQueryResponse {
     plan?: QueryPlan;
 }
 
-export type ExplainResponse<Action extends ExplainActions> = Action extends 'explain-script'
+export type GenericExplainResponse<Action extends ExplainActions> = Action extends 'explain-script'
     ? ExplainScriptResponse
     : ExplainQueryResponse;
 
-// ==== Execute Results ====
+// ==== Execute Result ====
 
-interface ModernSchemaResult {
-    result?: ArrayRow[];
+type SchemaResult = {
+    rows?: ArrayRow[] | null;
     columns?: ColumnType[];
-}
-interface MultiSchemaResult {
-    result?: {
-        rows?: ArrayRow[] | null;
-        columns?: ColumnType[];
-        truncated?: boolean;
-    }[];
-}
-interface DefaultSchemaResult {
-    result?: KeyValueRow[];
-}
-
-// ==== Execute Responses ====
-
-type ResultFields<Schema extends Schemas> = Schema extends 'modern'
-    ? ModernSchemaResult
-    : Schema extends 'multi'
-      ? MultiSchemaResult
-      : DefaultSchemaResult;
+    truncated?: boolean;
+}[];
 
 /**
  * meta.type = 'query'
  *
  * execute-scan, execute-data, execute-query
  */
-export type ExecuteQueryResponse<Schema extends Schemas> = {
+export type ExecuteQueryResponse = {
     plan?: QueryPlan;
     ast?: string;
     stats?: TKqpStatsQuery;
-} & ResultFields<Schema>;
+    result?: SchemaResult;
+};
 
 /**
  * meta.type = 'script'
  *
  * execute, execute-script
  */
-export type ExecuteScriptResponse<Schema extends Schemas> = {
+export type ExecuteScriptResponse = {
     plan?: ScriptPlan;
     ast?: string;
     stats?: TKqpStatsQuery;
-} & ResultFields<Schema>;
+    result?: SchemaResult;
+};
 
-export type ExecuteResponse<Action extends ExecuteActions, Schema extends Schemas> = Action extends
+export type GenericExecuteResponse<Action extends ExecuteActions> = Action extends
     | 'execute-scan'
     | 'execute-data'
     | 'execute-query'
-    ? ExecuteQueryResponse<Schema>
-    : ExecuteScriptResponse<Schema>;
+    ? ExecuteQueryResponse
+    : ExecuteScriptResponse;
 
 export type CancelResponse = {
     stats?: TKqpStatsQuery;
 };
 
 // ==== Combined API response ====
-export type QueryAPIResponseByAction<
-    Action extends Actions,
-    Schema extends Schemas,
-> = Action extends ExplainActions
-    ? ExplainResponse<Action>
+export type QueryAPIResponseByAction<Action extends Actions> = Action extends ExplainActions
+    ? GenericExplainResponse<Action>
     : Action extends ExecuteActions
-      ? ExecuteResponse<Action, Schema>
+      ? GenericExecuteResponse<Action>
       : Action extends CancelActions
         ? CancelResponse
         : never;
@@ -351,25 +330,10 @@ type QueryAPIResponseMeta = {
     };
 };
 
-export type QueryAPIResponse<
-    Action extends Actions,
-    Schema extends Schemas,
-> = QueryAPIResponseByAction<Action, Schema> & QueryAPIResponseMeta;
+export type QueryAPIResponse<Action extends Actions> = QueryAPIResponseByAction<Action> &
+    QueryAPIResponseMeta;
 
 // ==== types to use in query result preparation ====
-export type AnyExplainResponse = ExplainQueryResponse | ExplainScriptResponse;
+export type ExplainResponse = ExplainQueryResponse | ExplainScriptResponse;
 
-export type ExecuteModernResponse =
-    | ExecuteQueryResponse<'modern'>
-    | ExecuteScriptResponse<'modern'>;
-export type ExecuteMultiResponse = ExecuteQueryResponse<'multi'> | ExecuteScriptResponse<'multi'>;
-export type ExecuteClassicResponse =
-    | ExecuteQueryResponse<'classic'>
-    | ExecuteScriptResponse<'classic'>;
-export type ExecuteYdbResponse = ExecuteQueryResponse<'ydb'> | ExecuteScriptResponse<'ydb'>;
-
-export type AnyExecuteResponse =
-    | ExecuteModernResponse
-    | ExecuteMultiResponse
-    | ExecuteClassicResponse
-    | ExecuteYdbResponse;
+export type ExecuteResponse = ExecuteQueryResponse | ExecuteScriptResponse;

@@ -120,7 +120,7 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && result === undefined;
-    const {result: data} = result ?? {};
+    const data = result?.resultSets?.[0]?.result || [];
 
     const onSort = (newSortOrder?: SortOrder | SortOrder[]) => {
         // omit information about sort order to disable ASC order, only DESC makes sense for top shards

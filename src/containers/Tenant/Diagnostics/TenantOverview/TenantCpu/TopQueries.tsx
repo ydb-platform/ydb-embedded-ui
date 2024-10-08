@@ -46,7 +46,7 @@ export function TopQueries({tenantName}: TopQueriesProps) {
     );
 
     const loading = isFetching && currentData === undefined;
-    const {result: data} = currentData || {};
+    const data = currentData?.resultSets?.[0]?.result || [];
 
     const handleRowClick = React.useCallback(
         (row: any) => {

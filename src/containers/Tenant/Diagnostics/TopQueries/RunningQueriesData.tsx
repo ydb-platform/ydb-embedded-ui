@@ -21,17 +21,15 @@ interface Props {
 export const RunningQueriesData = ({database}: Props) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
-    const {
-        currentData: data,
-        isFetching,
-        error,
-    } = topQueriesApi.useGetRunningQueriesQuery(
+    const {currentData, isFetching, error} = topQueriesApi.useGetRunningQueriesQuery(
         {
             database,
             filters,
         },
         {pollingInterval: autoRefreshInterval},
     );
+
+    const data = currentData?.resultSets?.[0].result || [];
 
     return (
         <React.Fragment>
@@ -41,7 +39,7 @@ export const RunningQueriesData = ({database}: Props) => {
                     emptyDataMessage={i18n('no-data')}
                     columnsWidthLSKey={RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY}
                     columns={RUNNING_QUERIES_COLUMNS}
-                    data={data || []}
+                    data={data}
                     settings={QUERY_TABLE_SETTINGS}
                 />
             </TableWithControlsLayout.Table>

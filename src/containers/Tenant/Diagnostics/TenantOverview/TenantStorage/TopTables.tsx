@@ -32,7 +32,7 @@ export function TopTables({path}: TopTablesProps) {
     );
     const loading = isFetching && currentData === undefined;
 
-    const {result: data} = currentData || {};
+    const data = currentData?.resultSets?.[0]?.result || [];
 
     const formatSize = (value?: number) => {
         const size = getSizeWithSignificantDigits(data?.length ? Number(data[0].Size) : 0, 0);

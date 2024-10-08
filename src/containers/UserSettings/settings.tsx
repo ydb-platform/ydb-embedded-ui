@@ -8,7 +8,6 @@ import {
     ENABLE_AUTOCOMPLETE,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
-    QUERY_USE_MULTI_SCHEMA_KEY,
     SHOW_DOMAIN_DATABASE_KEY,
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
@@ -100,12 +99,6 @@ export const showDomainDatabase: SettingProps = {
     title: i18n('settings.showDomainDatabase.title'),
 };
 
-export const queryUseMultiSchemaSetting: SettingProps = {
-    settingKey: QUERY_USE_MULTI_SCHEMA_KEY,
-    title: i18n('settings.queryUseMultiSchema.title'),
-    description: i18n('settings.queryUseMultiSchema.description'),
-};
-
 export const useClusterBalancerAsBackendSetting: SettingProps = {
     settingKey: USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     title: i18n('settings.useClusterBalancerAsBackend.title'),
@@ -143,7 +136,7 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [usePaginatedTables, queryUseMultiSchemaSetting],
+    settings: [usePaginatedTables],
 };
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',

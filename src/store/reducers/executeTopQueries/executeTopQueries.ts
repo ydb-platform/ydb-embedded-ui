@@ -57,7 +57,6 @@ export const topQueriesApi = api.injectEndpoints({
                 try {
                     const response = await window.api.sendQuery(
                         {
-                            schema: 'modern',
                             query: getQueryText(database, preparedFilters),
                             database,
                             action: 'execute-scan',
@@ -96,7 +95,9 @@ export const topQueriesApi = api.injectEndpoints({
             ) => {
                 try {
                     const filterConditions = filters?.text ? `Query ILIKE '%${filters.text}%'` : '';
-                    const queryText = `SELECT UserSID, QueryStartAt, Query as QueryText, ApplicationName from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'} ORDER BY SessionStartAt limit 100`;
+                    const commonQueryPart = `SELECT UserSID, QueryStartAt, Query as QueryText, ApplicationName from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'}`;
+
+                    const queryText = `${commonQueryPart} AND Query NOT LIKE '${commonQueryPart}%' ORDER BY SessionStartAt limit 100`;
 
                     const response = await window.api.sendQuery(
                         {
@@ -111,7 +112,9 @@ export const topQueriesApi = api.injectEndpoints({
                         throw response;
                     }
 
-                    return {data: response?.result?.filter((item) => item.QueryText !== queryText)};
+                    const data = parseQueryAPIExecuteResponse(response);
+
+                    return {data};
                 } catch (error) {
                     return {error};
                 }

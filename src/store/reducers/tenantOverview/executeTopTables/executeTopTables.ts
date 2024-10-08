@@ -20,7 +20,6 @@ export const topTablesApi = api.injectEndpoints({
                 try {
                     const response = await window.api.sendQuery(
                         {
-                            schema: 'modern',
                             query: getQueryText(path),
                             database: path,
                             action: 'execute-scan',

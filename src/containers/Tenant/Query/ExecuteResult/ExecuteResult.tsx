@@ -72,9 +72,8 @@ export function ExecuteResult({
     const {error, isLoading, queryId, data} = result;
 
     const stats: TKqpStatsQuery | undefined = data?.stats;
-    const resultsSetsCount = data?.resultSets?.length;
-    const isMulti = resultsSetsCount && resultsSetsCount > 0;
-    const currentResult = isMulti ? data?.resultSets?.[selectedResultSet] : data;
+    const resultsSetsCount = data?.resultSets?.length || 0;
+    const currentResult = data?.resultSets?.[selectedResultSet];
     const {plan, simplifiedPlan} = React.useMemo(() => getPlan(data), [data]);
 
     const resultOptions: ControlGroupOption<SectionID>[] = [
@@ -106,7 +105,7 @@ export function ExecuteResult({
     const renderResult = () => {
         return (
             <div className={b('result-wrapper')}>
-                {isMulti && resultsSetsCount > 1 && (
+                {resultsSetsCount > 1 && (
                     <div>
                         <Tabs
                             className={b('result-tabs')}

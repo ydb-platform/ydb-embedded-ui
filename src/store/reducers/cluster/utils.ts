@@ -86,9 +86,9 @@ function getGroupStats(data?: KeyValueRow[] | TStorageStats[]) {
 }
 
 export const parseGroupsStatsQueryResponse = (
-    data: ExecuteQueryResponse<'modern'> | null,
+    data: ExecuteQueryResponse | null,
 ): ClusterGroupsStats => {
-    const parsedData = parseQueryAPIExecuteResponse(data).result;
+    const parsedData = parseQueryAPIExecuteResponse(data).resultSets?.[0]?.result;
     return getGroupStats(parsedData);
 };
 
