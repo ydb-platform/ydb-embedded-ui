@@ -1,3 +1,5 @@
+// TEST FOR MANY ENTITIES
+
 import type {FetchData} from '../../components/PaginatedTable';
 import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {prepareNodesData} from '../../store/reducers/nodes/utils';
@@ -41,9 +43,9 @@ export const getNodes: FetchData<
             storage,
             tablets,
             limit,
-            offset,
-            sort,
+            offset: 0,
             path,
+            sort,
             database,
             filter: searchValue,
             problems_only: getProblemParamValue(problemFilter),
@@ -53,9 +55,22 @@ export const getNodes: FetchData<
     );
     const preparedResponse = prepareNodesData(response);
 
+    let mockedData = preparedResponse.Nodes?.slice();
+
+    for (let i = 0; i < 1000; i++) {
+        mockedData = mockedData?.concat(
+            preparedResponse.Nodes?.map((data, j) => ({
+                ...data,
+                NodeId: data.NodeId + i + j,
+                Host: data.Host || String(i) + j,
+            })) || [],
+        );
+    }
+    const paginatedData = mockedData?.slice(offset, offset + limit);
+
     return {
-        data: preparedResponse.Nodes || [],
-        found: preparedResponse.FoundNodes || 0,
-        total: preparedResponse.TotalNodes || 0,
+        data: paginatedData || [],
+        found: mockedData?.length || 0,
+        total: mockedData?.length || 0,
     };
 };
