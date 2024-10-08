@@ -32,7 +32,7 @@ export interface PaginatedTableProps<T, F> {
     columns: Column<T>[];
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
-    parentRef?: React.RefObject<HTMLElement> | null;
+    parentRef?: React.RefObject<HTMLElement>;
     initialSortParams?: SortParams;
     onColumnsResize?: HandleTableColumnsResize;
     renderControls?: RenderControls;

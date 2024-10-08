@@ -2,60 +2,65 @@ import React from 'react';
 
 import {throttle} from 'lodash';
 
+import {getArray} from '../../utils';
+
 interface UseScrollBasedChunksProps {
-    containerRef: React.RefObject<HTMLElement> | null;
+    containerRef: React.RefObject<HTMLElement>;
     totalItems: number;
     itemHeight: number;
     chunkSize: number;
 }
 
-const THROTTLING_TIMEOUT = 100;
+const THROTTLE_DELAY = 100;
 
 export const useScrollBasedChunks = ({
     containerRef,
     totalItems,
     itemHeight,
     chunkSize,
-}: UseScrollBasedChunksProps) => {
+}: UseScrollBasedChunksProps): number[] => {
     const [activeChunks, setActiveChunks] = React.useState<number[]>([0]);
 
-    const handleScroll = React.useCallback(() => {
-        if (!containerRef?.current) {
+    const calculateActiveChunks = React.useCallback(() => {
+        const container = containerRef.current;
+        if (!container) {
             return;
         }
 
-        const {scrollTop, clientHeight} = containerRef.current;
-
+        const {scrollTop, clientHeight} = container;
         const visibleStartIndex = Math.floor(scrollTop / itemHeight);
         const visibleEndIndex = Math.min(
             Math.ceil((scrollTop + clientHeight) / itemHeight),
-            Math.max(totalItems - 1, 0),
+            totalItems - 1,
         );
 
         const startChunk = Math.floor(visibleStartIndex / chunkSize);
         const endChunk = Math.floor(visibleEndIndex / chunkSize);
 
-        const newActiveChunks = Array.from(
-            {length: endChunk - startChunk + 1},
-            (_, index) => startChunk + index,
+        const newActiveChunks = getArray(endChunk - startChunk + 1).map(
+            (index) => startChunk + index,
         );
 
         setActiveChunks(newActiveChunks);
     }, [chunkSize, containerRef, itemHeight, totalItems]);
 
+    const throttledCalculateActiveChunks = React.useMemo(
+        () => throttle(calculateActiveChunks, THROTTLE_DELAY),
+        [calculateActiveChunks],
+    );
+
     React.useEffect(() => {
-        const containerElement = containerRef?.current;
-        if (!containerElement) {
+        const container = containerRef.current;
+        if (!container) {
             return undefined;
         }
 
-        const throttledHandleScroll = throttle(handleScroll, THROTTLING_TIMEOUT);
-        containerElement.addEventListener('scroll', throttledHandleScroll);
-
+        container.addEventListener('scroll', throttledCalculateActiveChunks);
         return () => {
-            containerElement.removeEventListener('scroll', throttledHandleScroll);
+            container.removeEventListener('scroll', throttledCalculateActiveChunks);
+            throttledCalculateActiveChunks.cancel();
         };
-    }, [containerRef, handleScroll]);
+    }, [containerRef, throttledCalculateActiveChunks]);
 
     return activeChunks;
 };
