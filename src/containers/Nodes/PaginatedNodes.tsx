@@ -44,16 +44,11 @@ const b = cn('ydb-nodes');
 interface NodesProps {
     path?: string;
     database?: string;
-    parentContainer?: Element | null;
+    parentRef?: React.RefObject<HTMLElement> | null;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const PaginatedNodes = ({
-    path,
-    database,
-    parentContainer,
-    additionalNodesProps,
-}: NodesProps) => {
+export const PaginatedNodes = ({path, database, parentRef, additionalNodesProps}: NodesProps) => {
     const [queryParams, setQueryParams] = useQueryParams({
         uptimeFilter: StringParam,
         search: StringParam,
@@ -140,7 +135,7 @@ export const PaginatedNodes = ({
     return (
         <ResizeablePaginatedTable
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
-            parentContainer={parentContainer}
+            parentRef={parentRef}
             columns={columnsToShow}
             fetchData={getNodes}
             limit={50}

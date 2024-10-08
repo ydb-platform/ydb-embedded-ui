@@ -32,7 +32,7 @@ interface PaginatedStorageGroupsTableProps {
     visibleEntities: VisibleEntities;
     onShowAll: VoidFunction;
 
-    parentContainer?: Element | null;
+    parentRef?: React.RefObject<HTMLElement> | null;
     renderControls?: RenderControls;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
@@ -49,7 +49,7 @@ export const PaginatedStorageGroupsTable = ({
     searchValue,
     visibleEntities,
     onShowAll,
-    parentContainer,
+    parentRef,
     renderControls,
     renderErrorMessage,
     initialEntitiesCount,
@@ -98,7 +98,7 @@ export const PaginatedStorageGroupsTable = ({
         <LoaderWrapper loading={!capabilitiesLoaded}>
             <ResizeablePaginatedTable
                 columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-                parentContainer={parentContainer}
+                parentRef={parentRef}
                 columns={columns}
                 fetchData={fetchData}
                 limit={50}

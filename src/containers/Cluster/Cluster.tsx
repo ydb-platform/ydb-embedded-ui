@@ -164,7 +164,7 @@ export function Cluster({
                     path={getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname}
                 >
                     <NodesWrapper
-                        parentContainer={container.current}
+                        parentRef={container}
                         additionalNodesProps={additionalNodesProps}
                     />
                 </Route>
@@ -173,7 +173,7 @@ export function Cluster({
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage)).pathname
                     }
                 >
-                    <StorageWrapper parentContainer={container.current} />
+                    <StorageWrapper parentRef={container} />
                 </Route>
                 <Route
                     path={
