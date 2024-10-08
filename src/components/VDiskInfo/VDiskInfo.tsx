@@ -44,6 +44,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
         Guid,
         Replicated,
         VDiskState,
+        PDiskErrorReason,
         VDiskSlotId,
         Kind,
         SatisfactionRank,
@@ -70,6 +71,12 @@ export function VDiskInfo<T extends PreparedVDisk>({
         vdiskInfo.push({
             label: vDiskInfoKeyset('state-status'),
             value: VDiskState,
+        });
+    }
+    if (valueIsDefined(PDiskErrorReason) && PDiskErrorReason != '') {
+        vdiskInfo.push({
+            label: vDiskInfoKeyset('disk-error-reason'),
+            value: PDiskErrorReason,
         });
     }
     if (Number(AllocatedSize) >= 0 && Number(AvailableSize) >= 0) {

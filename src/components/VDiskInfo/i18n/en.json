@@ -9,6 +9,7 @@
 
   "replication-status": "Replicated",
   "state-status": "VDisk State",
+  "disk-error-reason": "PDisk Error Reason",
   "space-status": "Disk Space",
 
   "fresh-rank-satisfaction": "Fresh Rank Satisfaction",
