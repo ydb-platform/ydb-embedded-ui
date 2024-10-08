@@ -8,13 +8,16 @@ import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
+import {InternalLink} from '../InternalLink';
 import {preparePDiskData} from '../PDiskPopup/PDiskPopup';
+import {getVDiskLink} from '../VDisk/utils';
 
 import './VDiskPopup.scss';
 
@@ -146,6 +149,30 @@ export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
         [data, nodeHost, isFullData],
     );
 
+    const donorsInfo: InfoViewerItem[] = [];
+    if ('Donors' in data && data.Donors) {
+        const donors = data.Donors;
+        for (const donor of donors) {
+            const isFullDonorData = isFullVDiskData(donor);
+            donorsInfo.push({
+                label: 'VDisk',
+                value: (
+                    <InternalLink to={getVDiskLink(donor)}>
+                        {stringifyVdiskId(
+                            isFullDonorData
+                                ? donor.VDiskId
+                                : {
+                                      NodeId: donor.NodeId,
+                                      PDiskId: donor.PDiskId,
+                                      VSlotId: donor.VSlotId,
+                                  },
+                        )}
+                    </InternalLink>
+                ),
+            });
+        }
+    }
+
     return (
         <Popup
             contentClassName={b()}
@@ -159,6 +186,7 @@ export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
             {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
             <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
             {pdiskInfo && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
+            {donorsInfo.length > 0 && <InfoViewer title="Donors" info={donorsInfo} size="s" />}
         </Popup>
     );
 };
