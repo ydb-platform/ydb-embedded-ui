@@ -88,7 +88,7 @@ export function StorageGroupsControls({
                     <Select
                         hasClear
                         placeholder={'-'}
-                        width={170}
+                        width={150}
                         defaultValue={
                             storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
                         }
@@ -168,7 +168,7 @@ export function StorageNodesControls({
                     <Select
                         hasClear
                         placeholder={'-'}
-                        width={170}
+                        width={150}
                         defaultValue={
                             storageNodesGroupByParam ? [storageNodesGroupByParam] : undefined
                         }

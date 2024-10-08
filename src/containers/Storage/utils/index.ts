@@ -32,12 +32,6 @@ export const getDegradedSeverity = (group: PreparedStorageGroup) => {
     return evaluate(group.Degraded);
 };
 
-export const getUsageSeverityForStorageGroup = generateEvaluator(80, 85, [
-    'success',
-    'warning',
-    'danger',
-]);
-
 export const defaultSortNode: NodesSortParams = {
     sortValue: NODES_COLUMNS_IDS.NodeId,
     sortOrder: ASCENDING,

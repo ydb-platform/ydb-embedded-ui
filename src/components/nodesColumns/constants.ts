@@ -16,6 +16,7 @@ export const NODES_COLUMNS_IDS = {
     CPU: 'CPU',
     LoadAverage: 'LoadAverage',
     Load: 'Load',
+    DiskSpaceUsage: 'DiskSpaceUsage',
     SharedCacheUsage: 'SharedCacheUsage',
     TotalSessions: 'TotalSessions',
     Missing: 'Missing',
@@ -59,6 +60,9 @@ export const NODES_COLUMNS_TITLES = {
     },
     get Load() {
         return i18n('load');
+    },
+    get DiskSpaceUsage() {
+        return i18n('disk-usage');
     },
     get SharedCacheUsage() {
         return i18n('caches');

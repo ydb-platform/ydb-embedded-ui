@@ -2,10 +2,10 @@ import type {OrderType} from '@gravity-ui/react-data-table';
 import {z} from 'zod';
 
 import type {EFlag} from '../../../types/api/enums';
-import type {NodesGroupByField, TSystemStateInfo} from '../../../types/api/nodes';
+import type {NodesGroupByField} from '../../../types/api/nodes';
 import type {GroupsGroupByField, StorageV2SortValue} from '../../../types/api/storage';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
-import type {NodesUptimeFilterValues} from '../../../utils/nodes';
+import type {NodesUptimeFilterValues, PreparedNodeSystemState} from '../../../utils/nodes';
 
 import {STORAGE_TYPES, VISIBLE_ENTITIES} from './constants';
 
@@ -27,16 +27,15 @@ export interface PreparedStorageNodeFilters {
     filterGroupBy?: NodesGroupByField;
 }
 
-export interface PreparedStorageNode extends TSystemStateInfo {
+export interface PreparedStorageNode extends PreparedNodeSystemState {
     NodeId: number;
+
+    DiskSpaceUsage?: number;
+
     PDisks?: PreparedPDisk[];
     VDisks?: PreparedVDisk[];
 
-    DC?: string;
-    Rack?: string;
-
     Missing: number;
-    Uptime: string;
 }
 
 export interface PreparedStorageGroupFilters {
@@ -62,11 +61,13 @@ export interface PreparedStorageGroup {
 
     GroupId?: string | number;
 
-    Usage: number;
+    Usage?: number;
     Read: number;
     Write: number;
     Used: number;
     Limit: number;
+
+    DiskSpaceUsage?: number;
 
     DiskSpace: EFlag;
 

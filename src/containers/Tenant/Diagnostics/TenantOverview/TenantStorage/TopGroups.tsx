@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {
     useCapabilitiesLoaded,
     useStorageGroupsHandlerAvailable,
@@ -14,8 +12,6 @@ import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
-
-import {prepareTopStorageGroups} from './utils';
 
 interface TopGroupsProps {
     tenant?: string;
@@ -46,9 +42,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
 
     const loading = isFetching && currentData === undefined;
 
-    const preparedGroups = React.useMemo(() => {
-        return prepareTopStorageGroups(currentData);
-    }, [currentData]);
+    const groups = currentData?.groups || [];
 
     const title = getSectionTitle({
         entity: i18n('groups'),
@@ -62,7 +56,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
     return (
         <TenantOverviewTableLayout
             columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-            data={preparedGroups}
+            data={groups}
             columns={columns}
             title={title}
             loading={loading || !capabilitiesLoaded}

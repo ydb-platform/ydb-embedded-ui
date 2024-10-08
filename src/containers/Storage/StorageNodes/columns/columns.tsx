@@ -3,6 +3,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {
     getCpuColumn,
     getDataCenterColumn,
+    getDiskSpaceUsageColumn,
     getHostColumn,
     getMemoryColumn,
     getMissingDisksColumn,
@@ -69,6 +70,7 @@ export const getStorageNodesColumns = ({
         getVersionColumn<PreparedStorageNode>(),
         getMemoryColumn<PreparedStorageNode>(),
         getCpuColumn<PreparedStorageNode>(),
+        getDiskSpaceUsageColumn<PreparedStorageNode>(),
         getUptimeColumn<PreparedStorageNode>(),
         getMissingDisksColumn<PreparedStorageNode>(),
         getPDisksColumn({viewContext}),
