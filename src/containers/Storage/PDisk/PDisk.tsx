@@ -3,9 +3,8 @@ import React from 'react';
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
-import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
+import {VDisk} from '../../../components/VDisk/VDisk';
 import routes, {createHref, getPDiskPagePath} from '../../../routes';
-import {useDiskPagesAvailable} from '../../../store/reducers/capabilities/hooks';
 import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
@@ -41,8 +40,6 @@ export const PDisk = ({
 }: PDiskProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
 
-    const diskPagesAvailable = useDiskPagesAvailable();
-
     const anchor = React.useRef(null);
 
     const {NodeId, PDiskId} = data;
@@ -76,10 +73,9 @@ export const PDisk = ({
                                 flexGrow: Number(vdisk.AllocatedSize) || 1,
                             }}
                         >
-                            <VDiskWithDonorsStack
+                            <VDisk
                                 data={vdisk}
                                 inactive={!isVdiskActive(vdisk, viewContext)}
-                                stackClassName={b('donors-stack')}
                                 compact
                             />
                         </div>
@@ -95,7 +91,7 @@ export const PDisk = ({
         pDiskPath = createHref(routes.node, {id: NodeId, activeTab: STRUCTURE}, {pdiskId: PDiskId});
     }
 
-    if (pDiskIdsDefined && diskPagesAvailable) {
+    if (pDiskIdsDefined) {
         pDiskPath = getPDiskPagePath(PDiskId, NodeId);
     }
 

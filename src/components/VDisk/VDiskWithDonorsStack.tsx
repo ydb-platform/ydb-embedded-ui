@@ -18,12 +18,12 @@ export function VDiskWithDonorsStack({
     stackClassName,
     ...restProps
 }: VDiskWithDonorsStackProps) {
-    const donors = data?.Donors;
+    const {Donors: donors, ...restData} = data || {};
 
     const content =
         donors && donors.length > 0 ? (
             <Stack className={stackClassName}>
-                <VDisk data={data} {...restProps} />
+                <VDisk data={restData} {...restProps} />
                 {donors.map((donor) => {
                     const isFullData = isFullVDiskData(donor);
 
