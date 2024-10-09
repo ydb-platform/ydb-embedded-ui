@@ -4,6 +4,8 @@ import type {VersionToColorMap, VersionValue} from '../../types/versions';
 
 import {getMinorVersion} from './parseVersion';
 
+const MIN_VALUE = 0.5;
+
 export const parseNodesToVersionsValues = (
     nodes: TSystemStateInfo[] = [],
     versionsToColor?: VersionToColorMap,
@@ -18,15 +20,16 @@ export const parseNodesToVersionsValues = (
         }
         return acc;
     }, {});
-
-    return Object.keys(versionsCount).map((version) => {
+    const result = Object.keys(versionsCount).map((version) => {
+        const value = (versionsCount[version] / nodes.length) * 100;
         return {
             title: version,
             version: version,
             color: versionsToColor?.get(getMinorVersion(version)),
-            value: (versionsCount[version] / nodes.length) * 100,
+            value: value < MIN_VALUE ? MIN_VALUE : value,
         };
     });
+    return normalizeResult(result);
 };
 
 export function parseNodeGroupsToVersionsValues(
@@ -35,12 +38,31 @@ export function parseNodeGroupsToVersionsValues(
     total?: number,
 ) {
     const normalizedTotal = total ?? groups.reduce((acc, group) => acc + group.count, 0);
-    return groups.map((group) => {
+    const result = groups.map((group) => {
+        const value = (group.count / normalizedTotal) * 100;
         return {
             title: group.name,
             version: group.name,
             color: versionsToColor?.get(group.name),
-            value: (group.count / normalizedTotal) * 100,
+            value: value < MIN_VALUE ? MIN_VALUE : value,
         };
     });
+    const normalized = normalizeResult(result);
+    return normalized;
+}
+
+function normalizeResult(data: VersionValue[]) {
+    let maximum = data[0].value;
+    let maximumIndex = 0;
+    let total = 0;
+    data.forEach((item, index) => {
+        total += item.value;
+        if (item.value > maximum) {
+            maximum = item.value;
+            maximumIndex = index;
+        }
+    });
+    const result = [...data];
+    result[maximumIndex] = {...data[maximumIndex], value: maximum + 100 - total};
+    return result;
 }
