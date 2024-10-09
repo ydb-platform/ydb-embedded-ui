@@ -98,7 +98,11 @@ export const prepareStorageGroupData = (
     }
 
     const vDisks = group.VDisks?.map((vdisk) => prepareVDisk(vdisk, poolName));
-    const usage = getUsage({Used: usedSpaceBytes, Limit: limitSizeBytes}, 5);
+
+    // Do not calculate usage if there is no limit
+    const usage = limitSizeBytes
+        ? getUsage({Used: usedSpaceBytes, Limit: limitSizeBytes}, 5)
+        : undefined;
 
     const diskSpaceStatus = getGroupDiskSpaceStatus(group);
 
@@ -138,7 +142,7 @@ export const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedS
     } = group;
 
     const vDisks = VDisks.map((vdisk) => prepareVDisk(vdisk, PoolName));
-    const usage = Math.floor(Number(Usage) * 100);
+    const usage = Number(Usage) * 100;
 
     const diskSpaceStatus = getGroupDiskSpaceStatus(group);
 
@@ -202,6 +206,7 @@ const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
     return {
         ...prepareNodeSystemState(node.SystemState),
         NodeId: node.NodeId,
+        DiskSpaceUsage: node.DiskSpaceUsage,
         PDisks: pDisks,
         VDisks: vDisks,
         Missing: missing,
@@ -250,6 +255,7 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
     const preparedGroups: PreparedStorageGroup[] = StorageGroups.map((group) => {
         const {
             Usage,
+            DiskSpaceUsage,
             Read,
             Write,
             Used,
@@ -303,7 +309,8 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
 
         return {
             ...group,
-            Usage: Math.floor(Number(Usage)) || 0,
+            Usage,
+            DiskSpaceUsage,
             Read: Number(Read),
             Write: Number(Write),
             Used: Number(Used),

@@ -244,7 +244,8 @@ export type StorageV2SortValue =
     // So this sort does nothing
     // Added them here for types compatibility
     | 'AllocationUnits'
-    | 'Latency';
+    | 'Latency'
+    | 'DiskSpaceUsage';
 
 /**
  * Values to sort /storage/groups response
@@ -254,7 +255,6 @@ export type GroupsSortField =
     | 'MissingDisks'
     | 'State'
     | 'Available'
-    | 'DiskSpaceUsage'
     | 'Encryption';
 
 export type StorageV2Sort = BackendSortParam<StorageV2SortValue>;

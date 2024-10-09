@@ -16,7 +16,6 @@ export const STORAGE_NODES_SELECTED_COLUMNS_LS_KEY = 'storageNodesSelectedColumn
 export const STORAGE_NODES_COLUMNS_IDS = {
     ...BASE_NODES_COLUMNS_IDS,
     PDisks: 'PDisks',
-    DiskSpaceUsage: 'DiskSpaceUsage',
 } as const;
 
 type StorageNodesColumnId = ValueOf<typeof STORAGE_NODES_COLUMNS_IDS>;
@@ -38,9 +37,6 @@ export const STORAGE_NODES_COLUMNS_TITLES = {
     ...BASE_NODES_COLUMNS_TITLES,
     get PDisks() {
         return i18n('pdisks');
-    },
-    get DiskSpaceUsage() {
-        return i18n('disk-space-usage');
     },
 } as const satisfies Record<StorageNodesColumnId, string>;
 

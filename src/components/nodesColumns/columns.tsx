@@ -3,8 +3,10 @@ import DataTable from '@gravity-ui/react-data-table';
 import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import type {TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
+import {valueIsDefined} from '../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {getSpaceUsageSeverity} from '../../utils/storage';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
 import type {NodeHostData} from '../NodeHostWrapper/NodeHostWrapper';
@@ -182,6 +184,25 @@ export function getLoadColumn<T extends {LoadAveragePercents?: number[]}>(): Col
         align: DataTable.LEFT,
         width: 80,
         resizeMinWidth: 70,
+    };
+}
+export function getDiskSpaceUsageColumn<T extends {DiskSpaceUsage?: number}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.DiskSpaceUsage,
+        header: NODES_COLUMNS_TITLES.DiskSpaceUsage,
+        render: ({row}) => {
+            return valueIsDefined(row.DiskSpaceUsage) ? (
+                <UsageLabel
+                    value={Math.floor(row.DiskSpaceUsage)}
+                    theme={getSpaceUsageSeverity(row.DiskSpaceUsage)}
+                />
+            ) : (
+                EMPTY_DATA_PLACEHOLDER
+            );
+        },
+        align: DataTable.LEFT,
+        width: 115,
+        resizeMinWidth: 75,
     };
 }
 export function getSessionsColumn<T extends {TotalSessions?: number}>(): Column<T> {
