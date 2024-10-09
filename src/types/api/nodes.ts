@@ -22,6 +22,11 @@ export interface TNodesInfo {
 
 export interface TNodeInfo {
     NodeId: number;
+
+    CpuUsage?: number;
+    DiskSpaceUsage?: number;
+    UptimeSeconds?: number;
+
     SystemState: TSystemStateInfo;
     PDisks?: TPDiskStateInfo[];
     VDisks?: TVDiskStateInfo[];

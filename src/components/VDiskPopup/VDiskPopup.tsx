@@ -5,13 +5,11 @@ import {Label, Popup} from '@gravity-ui/uikit';
 
 import {selectNodeHostsMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
-import type {TVDiskStateInfo} from '../../types/api/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
-import type {UnavailableDonor} from '../../utils/disks/types';
+import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import type {InfoViewerItem} from '../InfoViewer';
@@ -40,9 +38,9 @@ const prepareUnavailableVDiskData = (data: UnavailableDonor) => {
     return vdiskData;
 };
 
-const prepareVDiskData = (data: TVDiskStateInfo) => {
+const prepareVDiskData = (data: PreparedVDisk) => {
     const {
-        VDiskId,
+        StringifiedId,
         VDiskState,
         SatisfactionRank,
         DiskSpace,
@@ -56,7 +54,7 @@ const prepareVDiskData = (data: TVDiskStateInfo) => {
     } = data;
 
     const vdiskData: InfoViewerItem[] = [
-        {label: 'VDisk', value: stringifyVdiskId(VDiskId)},
+        {label: 'VDisk', value: StringifiedId},
         {label: 'State', value: VDiskState ?? 'not available'},
     ];
 
@@ -130,7 +128,7 @@ const prepareVDiskData = (data: TVDiskStateInfo) => {
 };
 
 interface VDiskPopupProps extends PopupProps {
-    data: TVDiskStateInfo | UnavailableDonor;
+    data: PreparedVDisk | UnavailableDonor;
 }
 
 export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {

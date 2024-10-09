@@ -24,7 +24,7 @@ function Authentication({closable = false}: AuthenticationProps) {
     const history = useHistory();
     const location = useLocation();
 
-    const [authenticate, {error, isLoading}] = authenticationApi.useAuthenticateMutation(undefined);
+    const [authenticate, {isLoading}] = authenticationApi.useAuthenticateMutation(undefined);
 
     const {returnUrl} = parseQuery(location);
 
@@ -33,15 +33,6 @@ function Authentication({closable = false}: AuthenticationProps) {
     const [loginError, setLoginError] = React.useState('');
     const [passwordError, setPasswordError] = React.useState('');
     const [showPassword, setShowPassword] = React.useState(false);
-
-    React.useEffect(() => {
-        if (isUserError(error)) {
-            setLoginError(error.data.error);
-        }
-        if (isPasswordError(error)) {
-            setPasswordError(error.data.error);
-        }
-    }, [error]);
 
     const onLoginUpdate = (value: string) => {
         setLogin(value);
@@ -54,18 +45,28 @@ function Authentication({closable = false}: AuthenticationProps) {
     };
 
     const onLoginClick = () => {
-        authenticate({user: login, password}).then(() => {
-            if (returnUrl) {
-                const decodedUrl = decodeURIComponent(returnUrl.toString());
+        authenticate({user: login, password})
+            .unwrap()
+            .then(() => {
+                if (returnUrl) {
+                    const decodedUrl = decodeURIComponent(returnUrl.toString());
 
-                // to prevent page reload we use router history
-                // history navigates relative to origin
-                // so we remove origin to make it work properly
-                const url = new URL(decodedUrl);
-                const path = url.pathname + url.search;
-                history.replace(path);
-            }
-        });
+                    // to prevent page reload we use router history
+                    // history navigates relative to origin
+                    // so we remove origin to make it work properly
+                    const url = new URL(decodedUrl);
+                    const path = url.pathname + url.search;
+                    history.replace(path);
+                }
+            })
+            .catch((error) => {
+                if (isUserError(error)) {
+                    setLoginError(error.data.error);
+                }
+                if (isPasswordError(error)) {
+                    setPasswordError(error.data.error);
+                }
+            });
     };
 
     const onEnterClick = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {

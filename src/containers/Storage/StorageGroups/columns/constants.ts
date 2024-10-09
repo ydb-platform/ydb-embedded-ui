@@ -76,7 +76,7 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
         return i18n('usage');
     },
     get DiskSpaceUsage() {
-        return i18n('disk-space-usage');
+        return i18n('disk-usage');
     },
     get DiskSpace() {
         return i18n('space');

@@ -1,5 +1,6 @@
 import type {TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo} from '../../types/api/vdisk';
+import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
 
 import {calculatePDiskSeverity} from './calculatePDiskSeverity';
 import {calculateVDiskSeverity} from './calculateVDiskSeverity';
@@ -28,12 +29,15 @@ export function prepareVDiskData(vdiskState: TVDiskStateInfo = {}): PreparedVDis
 
     const Severity = calculateVDiskSeverity(vdiskState);
 
+    const StringifiedId = stringifyVdiskId(vdiskState.VDiskId);
+
     return {
         ...vdiskState,
         PDisk,
         PDiskId,
         Donors,
         Severity,
+        StringifiedId,
 
         TotalSize: total,
         AllocatedPercent: allocatedPercent,

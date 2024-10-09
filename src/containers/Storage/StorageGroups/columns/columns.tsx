@@ -13,12 +13,12 @@ import {getStorageGroupPath} from '../../../../routes';
 import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
-import {formatNumber, stringifyVdiskId} from '../../../../utils/dataFormatters/dataFormatters';
-import {isSortableStorageProperty} from '../../../../utils/storage';
+import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
+import {getSpaceUsageSeverity, isSortableStorageProperty} from '../../../../utils/storage';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
-import {getDegradedSeverity, getUsageSeverityForStorageGroup, isVdiskActive} from '../../utils';
+import {getDegradedSeverity, isVdiskActive} from '../../utils';
 import i18n from '../i18n';
 
 import {STORAGE_GROUPS_COLUMNS_IDS, STORAGE_GROUPS_COLUMNS_TITLES} from './constants';
@@ -33,18 +33,17 @@ const poolNameColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.PoolName,
     width: 250,
     render: ({row}) => {
-        const splitted = row.PoolName?.split('/');
-        return (
-            splitted && (
-                <CellWithPopover
-                    wrapperClassName={b('pool-name-wrapper')}
-                    content={row.PoolName}
-                    placement={['right']}
-                    behavior={PopoverBehavior.Immediate}
-                >
-                    {splitted[splitted.length - 1]}
-                </CellWithPopover>
-            )
+        return row.PoolName ? (
+            <CellWithPopover
+                content={row.PoolName}
+                placement={['right']}
+                behavior={PopoverBehavior.Immediate}
+                className={b('pool-name-wrapper')}
+            >
+                <span className={b('pool-name')}>{row.PoolName}</span>
+            </CellWithPopover>
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
         );
     },
     align: DataTable.LEFT,
@@ -103,19 +102,32 @@ const degradedColumn: StorageGroupsColumn = {
 const usageColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.Usage,
     header: STORAGE_GROUPS_COLUMNS_TITLES.Usage,
-    width: 75,
+    width: 85,
     resizeMinWidth: 75,
     render: ({row}) => {
-        // without a limit the usage can be evaluated as 0,
-        // but the absence of a value is more clear
-        return row.Limit ? (
-            <UsageLabel value={row.Usage} theme={getUsageSeverityForStorageGroup(row.Usage)} />
+        return valueIsDefined(row.Usage) ? (
+            <UsageLabel value={Math.floor(row.Usage)} theme={getSpaceUsageSeverity(row.Usage)} />
         ) : (
-            '-'
+            EMPTY_DATA_PLACEHOLDER
         );
     },
-    // without a limit exclude usage from sort to display at the bottom
-    sortAccessor: (row) => (row.Limit ? row.Usage : null),
+    align: DataTable.LEFT,
+};
+const diskSpaceUsageColumn: StorageGroupsColumn = {
+    name: STORAGE_GROUPS_COLUMNS_IDS.DiskSpaceUsage,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.DiskSpaceUsage,
+    width: 115,
+    resizeMinWidth: 75,
+    render: ({row}) => {
+        return valueIsDefined(row.DiskSpaceUsage) ? (
+            <UsageLabel
+                value={Math.floor(row.DiskSpaceUsage)}
+                theme={getSpaceUsageSeverity(row.DiskSpaceUsage)}
+            />
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
+        );
+    },
     align: DataTable.LEFT,
 };
 
@@ -218,7 +230,7 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => (
         <div className={b('vdisks-wrapper')}>
             {row.VDisks?.map((vDisk) => (
                 <VDiskWithDonorsStack
-                    key={stringifyVdiskId(vDisk.VDiskId)}
+                    key={vDisk.StringifiedId}
                     data={vDisk}
                     inactive={!isVdiskActive(vDisk, data?.viewContext)}
                     className={b('vdisks-item')}
@@ -271,6 +283,7 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
         erasureColumn,
         degradedColumn,
         usageColumn,
+        diskSpaceUsageColumn,
         usedColumn,
         limitColumn,
         usedSpaceFlagColumn,

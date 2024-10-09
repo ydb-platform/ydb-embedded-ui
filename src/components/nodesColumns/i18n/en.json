@@ -8,6 +8,7 @@
   "uptime": "Uptime",
   "memory": "Memory",
   "cpu": "CPU",
+  "disk-usage": "Disk usage",
   "tablets": "Tablets",
   "load-average": "Load Average",
   "load": "Load",

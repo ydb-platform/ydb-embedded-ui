@@ -8,7 +8,6 @@ import routes, {createHref, getPDiskPagePath} from '../../../routes';
 import {useDiskPagesAvailable} from '../../../store/reducers/capabilities/hooks';
 import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
-import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {STRUCTURE} from '../../Node/NodePages';
 import type {StorageViewContext} from '../types';
@@ -68,7 +67,7 @@ export const PDisk = ({
                 {vDisks.map((vdisk) => {
                     return (
                         <div
-                            key={stringifyVdiskId(vdisk.VDiskId)}
+                            key={vdisk.StringifiedId}
                             className={b('vdisks-item')}
                             style={{
                                 // 1 is small enough for empty disks to be of the minimum width

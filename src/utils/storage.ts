@@ -1,5 +1,7 @@
 import type {StorageV2SortValue} from '../types/api/storage';
 
+import {generateEvaluator} from './generateEvaluator';
+
 interface EntityWithUsage {
     Used: number;
     Limit: number;
@@ -11,6 +13,8 @@ export const getUsage = <T extends EntityWithUsage>(data: T, step = 1) => {
 
     return Math.floor(usage / step) * step;
 };
+
+export const getSpaceUsageSeverity = generateEvaluator(80, 85, ['success', 'warning', 'danger']);
 
 const STORAGE_SORT_VALUES: StorageV2SortValue[] = [
     'PoolName',
@@ -27,6 +31,7 @@ const STORAGE_SORT_VALUES: StorageV2SortValue[] = [
 
     'AllocationUnits',
     'Latency',
+    'DiskSpaceUsage',
 ];
 
 export const isSortableStorageProperty = (value: unknown): value is StorageV2SortValue =>

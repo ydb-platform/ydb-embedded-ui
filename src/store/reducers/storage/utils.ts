@@ -98,7 +98,11 @@ export const prepareStorageGroupData = (
     }
 
     const vDisks = group.VDisks?.map((vdisk) => prepareVDisk(vdisk, poolName));
-    const usage = getUsage({Used: usedSpaceBytes, Limit: limitSizeBytes}, 5);
+
+    // Do not calculate usage if there is no limit
+    const usage = limitSizeBytes
+        ? getUsage({Used: usedSpaceBytes, Limit: limitSizeBytes}, 5)
+        : undefined;
 
     const diskSpaceStatus = getGroupDiskSpaceStatus(group);
 
@@ -138,7 +142,7 @@ export const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedS
     } = group;
 
     const vDisks = VDisks.map((vdisk) => prepareVDisk(vdisk, PoolName));
-    const usage = Math.floor(Number(Usage) * 100);
+    const usage = Number(Usage) * 100;
 
     const diskSpaceStatus = getGroupDiskSpaceStatus(group);
 
@@ -202,6 +206,7 @@ const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
     return {
         ...prepareNodeSystemState(node.SystemState),
         NodeId: node.NodeId,
+        DiskSpaceUsage: node.DiskSpaceUsage,
         PDisks: pDisks,
         VDisks: vDisks,
         Missing: missing,
@@ -250,6 +255,7 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
     const preparedGroups: PreparedStorageGroup[] = StorageGroups.map((group) => {
         const {
             Usage,
+            DiskSpaceUsage,
             Read,
             Write,
             Used,
@@ -263,27 +269,48 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
         } = group;
 
         const vDisks = VDisks.map((disk) => {
-            const whiteboardVDisk = disk.Whiteboard;
-            const whiteboardPDisk = disk.PDisk?.Whiteboard;
+            const {
+                Whiteboard: whiteboardVDisk,
+                PDisk,
+                VDiskId,
+                NodeId,
+                AllocatedSize,
+                AvailableSize,
+                DiskSpace,
+                Status,
+            } = disk;
+            const whiteboardPDisk = PDisk?.Whiteboard;
 
-            const NodeId = disk.NodeId;
             const PDiskId = whiteboardPDisk?.PDiskId;
 
             const whiteboardVDiskData = {
                 ...whiteboardVDisk,
                 PDiskId,
                 NodeId,
+                AllocatedSize,
+                AvailableSize,
+                DiskSpace,
+                Status,
                 PDisk: {...whiteboardPDisk, NodeId},
             };
 
-            return prepareVDiskData(whiteboardVDiskData);
+            const preparedVDiskData = prepareVDiskData(whiteboardVDiskData);
+
+            return {
+                ...preparedVDiskData,
+                // There might be no Whiteboard data if cluster is not healthy
+                // StringifiedId is formed from Whiteboard.VDiskId object
+                // Use VDiskId string from backend in such case
+                StringifiedId: preparedVDiskData.StringifiedId || VDiskId,
+            };
         });
 
         const diskSpaceStatus = getGroupDiskSpaceStatus(group);
 
         return {
             ...group,
-            Usage: Math.floor(Number(Usage)) || 0,
+            Usage,
+            DiskSpaceUsage,
             Read: Number(Read),
             Write: Number(Write),
             Used: Number(Used),

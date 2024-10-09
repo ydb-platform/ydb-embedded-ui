@@ -5,7 +5,6 @@ import routes, {createHref, getVDiskPagePath} from '../../routes';
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
@@ -68,7 +67,7 @@ export const VDisk = ({
             {id: data.NodeId, activeTab: STRUCTURE},
             {
                 pdiskId: data.PDiskId,
-                vdiskId: stringifyVdiskId(data.VDiskId),
+                vdiskId: data.StringifiedId,
             },
         );
     }

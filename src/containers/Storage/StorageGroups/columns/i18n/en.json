@@ -7,7 +7,7 @@
   "missing-disks": "Missing Disks",
   "state": "State",
   "usage": "Usage",
-  "disk-space-usage": "Disk space usage",
+  "disk-usage": "Disk usage",
   "group-id": "Group ID",
   "used": "Used",
   "limit": "Limit",
