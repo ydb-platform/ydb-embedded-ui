@@ -12,7 +12,7 @@ export interface PaginatedStorageProps {
 
     viewContext: StorageViewContext;
 
-    parentContainer?: Element | null;
+    parentRef?: React.RefObject<HTMLElement>;
 
     initialEntitiesCount?: number;
 }

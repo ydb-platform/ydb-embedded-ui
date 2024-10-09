@@ -46,7 +46,7 @@ interface DiagnosticsProps {
 const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
-    const container = React.useRef<HTMLDivElement>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
     const dispatch = useTypedDispatch();
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
@@ -106,7 +106,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         path={path}
                         database={tenantName}
                         additionalNodesProps={props.additionalNodesProps}
-                        parentContainer={container.current}
+                        parentRef={containerRef}
                     />
                 );
             }
@@ -114,7 +114,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Tablets path={path} database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.storage: {
-                return <StorageWrapper database={tenantName} parentContainer={container.current} />;
+                return <StorageWrapper database={tenantName} parentRef={containerRef} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.network: {
                 return <Network tenantName={tenantName} />;
@@ -171,14 +171,16 @@ function Diagnostics(props: DiagnosticsProps) {
     };
 
     return (
-        <div className={b()} ref={container}>
+        <div className={b()}>
             {activeTab ? (
                 <Helmet>
                     <title>{activeTab.title}</title>
                 </Helmet>
             ) : null}
             {renderTabs()}
-            <div className={b('page-wrapper')}>{renderTabContent()}</div>
+            <div className={b('page-wrapper')} ref={containerRef}>
+                {renderTabContent()}
+            </div>
         </div>
     );
 }
