@@ -12,6 +12,7 @@ interface UseScrollBasedChunksProps {
 }
 
 const THROTTLE_DELAY = 100;
+const CHUNKS_AHEAD_COUNT = 1;
 
 export const useScrollBasedChunks = ({
     containerRef,
@@ -19,7 +20,9 @@ export const useScrollBasedChunks = ({
     itemHeight,
     chunkSize,
 }: UseScrollBasedChunksProps): number[] => {
-    const [activeChunks, setActiveChunks] = React.useState<number[]>([0]);
+    const [activeChunks, setActiveChunks] = React.useState<number[]>(
+        getArray(1 + CHUNKS_AHEAD_COUNT).map((index) => index),
+    );
 
     const calculateActiveChunks = React.useCallback(() => {
         const container = containerRef.current;
@@ -37,7 +40,7 @@ export const useScrollBasedChunks = ({
         const startChunk = Math.floor(visibleStartIndex / chunkSize);
         const endChunk = Math.floor(visibleEndIndex / chunkSize);
 
-        const newActiveChunks = getArray(endChunk - startChunk + 1).map(
+        const newActiveChunks = getArray(endChunk - startChunk + 1 + CHUNKS_AHEAD_COUNT).map(
             (index) => startChunk + index,
         );
 
