@@ -99,6 +99,7 @@ export const TRACING_LEVEL_SELECT_OPTIONS = [
         value: TRACING_LEVELS.off,
         content: TRACING_LEVELS_TITLES[TRACING_LEVELS.off],
         text: i18n('tracing-level-description.off'),
+        isDefault: true,
     },
     {
         value: TRACING_LEVELS.toplevel,
@@ -114,7 +115,6 @@ export const TRACING_LEVEL_SELECT_OPTIONS = [
         value: TRACING_LEVELS.detailed,
         content: TRACING_LEVELS_TITLES[TRACING_LEVELS.detailed],
         text: i18n('tracing-level-description.detailed'),
-        isDefault: true,
     },
     {
         value: TRACING_LEVELS.diagnostic,
