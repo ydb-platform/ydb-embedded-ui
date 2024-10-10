@@ -11,6 +11,8 @@ interface CellWithPopoverProps extends PopoverProps {
     wrapperClassName?: string;
 }
 
+const DELAY_TIMEOUT = 100;
+
 export function CellWithPopover({
     children,
     className,
@@ -19,7 +21,12 @@ export function CellWithPopover({
 }: CellWithPopoverProps) {
     return (
         <div className={b(null, wrapperClassName)}>
-            <Popover className={b('popover', className)} {...props}>
+            <Popover
+                delayClosing={DELAY_TIMEOUT}
+                delayOpening={DELAY_TIMEOUT}
+                className={b('popover', className)}
+                {...props}
+            >
                 {children}
             </Popover>
         </div>
