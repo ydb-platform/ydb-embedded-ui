@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {tenantName} from '../../../utils/constants';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
-import {longRunningQuery} from '../constants';
+import {createTableQuery, longRunningQuery, longTableSelect} from '../constants';
 
 import {
     ButtonNames,
@@ -376,5 +376,30 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.isHidden()).resolves.toBe(true);
         await tenantPage.selectNavigationTab(NavigationTabs.Query);
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+    });
+
+    test('Result head value is 1 for 1 row result', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery(testQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Result(1)');
+    });
+
+    test('No result head value for no result', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery(createTableQuery);
+        await queryEditor.clickRunButton();
+        await page.waitForTimeout(1000);
+        await expect(queryEditor.resultTable.isResultHeaderHidden()).resolves.toBe(true);
+    });
+
+    test('Truncated head value is 1 for 1 row truncated result', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery(longTableSelect);
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeLimitRows(1);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Truncated(1)');
     });
 });
