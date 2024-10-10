@@ -1,8 +1,7 @@
-import {Link as UIKitLink} from '@gravity-ui/uikit';
+import {ClipboardButton, Link as UIKitLink} from '@gravity-ui/uikit';
 
 import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
-import {ClipboardButton} from '../ClipboardButton';
 import {InternalLink} from '../InternalLink/InternalLink';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {StatusIconMode, StatusIconSize} from '../StatusIcon/StatusIcon';
@@ -95,18 +94,21 @@ export function EntityStatus({
                 </span>
             )}
             <span className={b('link', {'with-left-trim': withLeftTrim})}>{renderLink()}</span>
-            {hasClipboardButton && (
-                <ClipboardButton
-                    text={name}
-                    size="s"
-                    className={b('clipboard-button', {
-                        visible: clipboardButtonAlwaysVisible,
-                    })}
-                />
-            )}
-            {additionalControls && (
-                <span className={b('additional-controls ')}>{additionalControls}</span>
-            )}
+            <div className={b('controls-wrapper')}>
+                {hasClipboardButton && (
+                    <ClipboardButton
+                        text={name}
+                        size="xs"
+                        view="normal"
+                        className={b('clipboard-button', {
+                            visible: clipboardButtonAlwaysVisible,
+                        })}
+                    />
+                )}
+                {additionalControls && (
+                    <span className={b('additional-controls')}>{additionalControls}</span>
+                )}
+            </div>
         </div>
     );
 }

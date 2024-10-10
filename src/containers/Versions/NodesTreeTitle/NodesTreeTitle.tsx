@@ -1,6 +1,5 @@
-import {Progress} from '@gravity-ui/uikit';
+import {ClipboardButton, Progress} from '@gravity-ui/uikit';
 
-import {ClipboardButton} from '../../../components/ClipboardButton';
 import type {VersionValue} from '../../../types/versions';
 import {cn} from '../../../utils/cn';
 import type {PreparedNodeSystemState} from '../../../utils/nodes';
@@ -46,7 +45,12 @@ export const NodesTreeTitle = ({
                 {title ? (
                     <span className={b('overview-title')}>
                         {title}
-                        <ClipboardButton text={title} size="s" className={b('clipboard-button')} />
+                        <ClipboardButton
+                            text={title}
+                            size="s"
+                            className={b('clipboard-button')}
+                            view="normal"
+                        />
                     </span>
                 ) : null}
             </div>

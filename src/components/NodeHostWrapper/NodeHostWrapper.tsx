@@ -42,7 +42,9 @@ export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperPro
           })
         : undefined;
 
-    const additionalControls = nodeHref ? <DeveloperUILinkButton href={nodeHref} /> : null;
+    const additionalControls = nodeHref ? (
+        <DeveloperUILinkButton href={nodeHref} size="xs" />
+    ) : null;
 
     return (
         <CellWithPopover
