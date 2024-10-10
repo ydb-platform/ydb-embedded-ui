@@ -1,15 +1,12 @@
 import React from 'react';
 
-import {STRUCTURE} from '../../containers/Node/NodePages';
-import routes, {createHref, getVDiskPagePath} from '../../routes';
-import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {InternalLink} from '../InternalLink';
 import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
+
+import {getVDiskLink} from './utils';
 
 import './VDisk.scss';
 
@@ -34,10 +31,6 @@ export const VDisk = ({
     onHidePopup,
     progressBarClassName,
 }: VDiskProps) => {
-    const isFullData = isFullVDiskData(data);
-
-    const diskPagesAvailable = useDiskPagesAvailable();
-
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
 
     const anchor = React.useRef(null);
@@ -52,25 +45,7 @@ export const VDisk = ({
         onHidePopup?.();
     };
 
-    let vDiskPath: string | undefined;
-
-    if (
-        diskPagesAvailable &&
-        valueIsDefined(data.VDiskSlotId) &&
-        valueIsDefined(data.PDiskId) &&
-        valueIsDefined(data.NodeId)
-    ) {
-        vDiskPath = getVDiskPagePath(data.VDiskSlotId, data.PDiskId, data.NodeId);
-    } else if (valueIsDefined(data.NodeId) && isFullData) {
-        vDiskPath = createHref(
-            routes.node,
-            {id: data.NodeId, activeTab: STRUCTURE},
-            {
-                pdiskId: data.PDiskId,
-                vdiskId: data.StringifiedId,
-            },
-        );
-    }
+    const vDiskPath = getVDiskLink(data);
 
     return (
         <React.Fragment>

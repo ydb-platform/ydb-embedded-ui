@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
+import {VDisk} from '../../../components/VDisk/VDisk';
 import {cn} from '../../../utils/cn';
 import {getPDiskId} from '../../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../../utils/disks/types';
@@ -72,7 +72,7 @@ function VDiskItem({vDisk, highlightedVDisk, inactive, setHighlightedVDisk}: Dis
             }}
             className={b('vdisk-item')}
         >
-            <VDiskWithDonorsStack
+            <VDisk
                 data={vDiskToShow}
                 compact
                 inactive={inactive}

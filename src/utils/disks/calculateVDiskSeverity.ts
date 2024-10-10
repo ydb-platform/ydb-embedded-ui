@@ -13,7 +13,7 @@ export function calculateVDiskSeverity(vDisk: TVDiskStateInfo) {
         return NOT_AVAILABLE_SEVERITY;
     }
 
-    const {DiskSpace, VDiskState, FrontQueues, Replicated, DonorMode} = vDisk;
+    const {DiskSpace, VDiskState, FrontQueues, Replicated} = vDisk;
 
     // if the disk is not available, this determines its status severity regardless of other features
     if (!VDiskState) {
@@ -30,8 +30,7 @@ export function calculateVDiskSeverity(vDisk: TVDiskStateInfo) {
     let severity = Math.max(DiskSpaceSeverity, VDiskSpaceSeverity, FrontQueuesSeverity);
 
     // donors are always in the not replicated state since they are leftovers
-    // painting them blue is useless
-    if (!Replicated && !DonorMode && severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green) {
+    if (!Replicated && severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green) {
         severity = DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
     }
 
