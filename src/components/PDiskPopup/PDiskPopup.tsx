@@ -70,6 +70,14 @@ export const PDiskPopup = ({data, ...props}: PDiskPopupProps) => {
     const nodeHost = valueIsDefined(data.NodeId) ? nodeHostsMap?.get(data.NodeId) : undefined;
     const info = React.useMemo(() => preparePDiskData(data, nodeHost), [data, nodeHost]);
 
+    const [isPopupOpen, setIsPopupOpen] = React.useState(props.open);
+    const onMouseLeave = React.useCallback(() => {
+        setIsPopupOpen(false);
+    }, []);
+    const onMouseEnter = React.useCallback(() => {
+        setIsPopupOpen(true);
+    }, []);
+
     return (
         <Popup
             contentClassName={b()}
@@ -78,7 +86,10 @@ export const PDiskPopup = ({data, ...props}: PDiskPopupProps) => {
             // bigger offset for easier switching to neighbour nodes
             // matches the default offset for popup with arrow out of a sense of beauty
             offset={[0, 12]}
+            onMouseLeave={onMouseLeave}
+            onMouseEnter={onMouseEnter}
             {...props}
+            open={isPopupOpen || props.open}
         >
             <InfoViewer title="PDisk" info={info} size="s" />
         </Popup>

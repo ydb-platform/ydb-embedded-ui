@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {debounce} from 'lodash';
+
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
@@ -15,6 +17,8 @@ import {isVdiskActive} from '../utils';
 import './PDisk.scss';
 
 const b = cn('pdisk-storage');
+
+const DEBOUNCE_TIMEOUT = 100;
 
 interface PDiskProps {
     data?: PreparedPDisk;
@@ -44,15 +48,15 @@ export const PDisk = ({
     const {NodeId, PDiskId} = data;
     const pDiskIdsDefined = valueIsDefined(NodeId) && valueIsDefined(PDiskId);
 
-    const handleShowPopup = () => {
+    const debouncedHandleShowPopup = debounce(() => {
         setIsPopupVisible(true);
         onShowPopup?.();
-    };
+    }, DEBOUNCE_TIMEOUT);
 
-    const handleHidePopup = () => {
+    const debouncedHandleHidePopup = debounce(() => {
         setIsPopupVisible(false);
         onHidePopup?.();
-    };
+    }, DEBOUNCE_TIMEOUT);
 
     const renderVDisks = () => {
         if (!vDisks?.length) {
@@ -101,8 +105,11 @@ export const PDisk = ({
                 <InternalLink
                     to={pDiskPath}
                     className={b('content')}
-                    onMouseEnter={handleShowPopup}
-                    onMouseLeave={handleHidePopup}
+                    onMouseEnter={debouncedHandleShowPopup}
+                    onMouseLeave={() => {
+                        debouncedHandleShowPopup.cancel();
+                        debouncedHandleHidePopup();
+                    }}
                 >
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}

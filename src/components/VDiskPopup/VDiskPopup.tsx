@@ -136,6 +136,13 @@ interface VDiskPopupProps extends PopupProps {
 
 export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
+    const [isPopupOpen, setIsPopupOpen] = React.useState(props.open);
+    const onMouseLeave = React.useCallback(() => {
+        setIsPopupOpen(false);
+    }, []);
+    const onMouseEnter = React.useCallback(() => {
+        setIsPopupOpen(true);
+    }, []);
 
     const vdiskInfo = React.useMemo(
         () => (isFullData ? prepareVDiskData(data) : prepareUnavailableVDiskData(data)),
@@ -181,7 +188,10 @@ export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
             // bigger offset for easier switching to neighbour nodes
             // matches the default offset for popup with arrow out of a sense of beauty
             offset={[0, 12]}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
             {...props}
+            open={isPopupOpen || props.open}
         >
             {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
             <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
