@@ -104,6 +104,12 @@ export class SettingsDialog {
         await this.page.waitForTimeout(1000);
     }
 
+    async changeLimitRows(limitRows: number) {
+        const limitRowsInput = this.dialog.locator('.ydb-query-settings-dialog__limit-rows input');
+        await limitRowsInput.fill(limitRows.toString());
+        await this.page.waitForTimeout(1000);
+    }
+
     async clickButton(buttonName: ButtonNames) {
         const button = this.dialog.getByRole('button', {name: buttonName});
         await button.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
