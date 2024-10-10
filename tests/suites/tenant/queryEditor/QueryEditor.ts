@@ -140,10 +140,12 @@ class PaneWrapper {
 export class ResultTable {
     private table: Locator;
     private preview: Locator;
+    private resultHead: Locator;
 
     constructor(selector: Locator) {
         this.table = selector.locator('.ydb-query-execute-result__result');
         this.preview = selector.locator('.kv-preview__result');
+        this.resultHead = selector.locator('.ydb-query-execute-result__result-head');
     }
 
     async isVisible() {
@@ -174,6 +176,16 @@ export class ResultTable {
     async getCellValue(row: number, col: number) {
         const cell = this.table.locator(`tr:nth-child(${row}) td:nth-child(${col})`);
         return cell.innerText();
+    }
+
+    async isResultHeaderHidden() {
+        await this.resultHead.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async getResultHeadText() {
+        await this.resultHead.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.resultHead.innerText();
     }
 }
 
