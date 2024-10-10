@@ -1,3 +1,4 @@
+import type {ProgressProps} from '@gravity-ui/uikit';
 import {Progress} from '@gravity-ui/uikit';
 
 import type {VersionValue} from '../../../types/versions';
@@ -9,12 +10,18 @@ const b = cn('ydb-cluster-versions-bar');
 
 interface VersionsBarProps {
     versionsValues?: VersionValue[];
+    size?: ProgressProps['size'];
+    progressClassName?: string;
 }
 
-export const VersionsBar = ({versionsValues = []}: VersionsBarProps) => {
+export const VersionsBar = ({
+    versionsValues = [],
+    size = 's',
+    progressClassName: className,
+}: VersionsBarProps) => {
     return (
         <div className={b()}>
-            <Progress value={100} stack={versionsValues} size="s" />
+            <Progress value={100} stack={versionsValues} size={size} className={className} />
             <div className={b('versions')}>
                 {versionsValues.map((item, index) => (
                     <div
