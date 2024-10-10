@@ -71,6 +71,7 @@ function getColumns({database}: {database?: string}) {
                         additionalControls={
                             <DeveloperUILinkButton
                                 href={createTabletDeveloperUIHref(row.TabletId)}
+                                size="xs"
                             />
                         }
                     />
