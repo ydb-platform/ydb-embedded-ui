@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {debounce} from 'lodash';
+
 import {cn} from '../../utils/cn';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
@@ -11,6 +13,8 @@ import {getVDiskLink} from './utils';
 import './VDisk.scss';
 
 const b = cn('ydb-vdisk-component');
+
+const DEBOUNCE_TIMEOUT = 100;
 
 export interface VDiskProps {
     data?: PreparedVDisk;
@@ -35,15 +39,15 @@ export const VDisk = ({
 
     const anchor = React.useRef(null);
 
-    const handleShowPopup = () => {
+    const debouncedHandleShowPopup = debounce(() => {
         setIsPopupVisible(true);
         onShowPopup?.();
-    };
+    }, DEBOUNCE_TIMEOUT);
 
-    const handleHidePopup = () => {
+    const debouncedHandleHidePopup = debounce(() => {
         setIsPopupVisible(false);
         onHidePopup?.();
-    };
+    }, DEBOUNCE_TIMEOUT);
 
     const vDiskPath = getVDiskLink(data);
 
@@ -52,8 +56,11 @@ export const VDisk = ({
             <div
                 className={b()}
                 ref={anchor}
-                onMouseEnter={handleShowPopup}
-                onMouseLeave={handleHidePopup}
+                onMouseEnter={debouncedHandleShowPopup}
+                onMouseLeave={() => {
+                    debouncedHandleShowPopup.cancel();
+                    debouncedHandleHidePopup();
+                }}
             >
                 <InternalLink to={vDiskPath} className={b('content')}>
                     <DiskStateProgressBar
