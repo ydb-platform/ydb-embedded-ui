@@ -119,24 +119,28 @@ export function ExecuteResult({
                         />
                     </div>
                 )}
-                <div className={b('result')}>
-                    <div className={b('result-head')}>
-                        <Text variant="subheader-3">
-                            {currentResult?.truncated
-                                ? i18n('title.truncated')
-                                : i18n('title.result')}
-                        </Text>
-                        <Text
-                            color="secondary"
-                            variant="body-2"
-                            className={b('row-count')}
-                        >{`(${currentResult?.result?.length})`}</Text>
+                {currentResult && (
+                    <div className={b('result')}>
+                        <div className={b('result-head')}>
+                            <Text variant="subheader-3">
+                                {currentResult?.truncated
+                                    ? i18n('title.truncated')
+                                    : i18n('title.result')}
+                            </Text>
+                            {currentResult.result && (
+                                <Text
+                                    color="secondary"
+                                    variant="body-2"
+                                    className={b('row-count')}
+                                >{`(${currentResult.result.length})`}</Text>
+                            )}
+                        </div>
+                        <QueryResultTable
+                            data={currentResult.result}
+                            columns={currentResult.columns}
+                        />
                     </div>
-                    <QueryResultTable
-                        data={currentResult?.result}
-                        columns={currentResult?.columns}
-                    />
-                </div>
+                )}
             </div>
         );
     };
