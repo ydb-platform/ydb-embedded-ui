@@ -136,12 +136,13 @@ interface VDiskPopupProps extends PopupProps {
 
 export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
-    const [isPopupOpen, setIsPopupOpen] = React.useState(props.open);
+
+    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
     const onMouseLeave = React.useCallback(() => {
-        setIsPopupOpen(false);
+        setIsPopupContentHovered(false);
     }, []);
     const onMouseEnter = React.useCallback(() => {
-        setIsPopupOpen(true);
+        setIsPopupContentHovered(true);
     }, []);
 
     const vdiskInfo = React.useMemo(
@@ -191,7 +192,7 @@ export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             {...props}
-            open={isPopupOpen || props.open}
+            open={isPopupContentHovered || props.open}
         >
             {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
             <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
