@@ -75,6 +75,11 @@ const configs = {
     title: 'Configs',
 };
 
+const operations = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.operations,
+    title: 'Operations',
+};
+
 export const ASYNC_REPLICATION_PAGES = [overview, tablets, describe];
 
 export const DATABASE_PAGES = [
@@ -87,6 +92,7 @@ export const DATABASE_PAGES = [
     network,
     describe,
     configs,
+    operations,
 ];
 
 export const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe];
