@@ -36,7 +36,7 @@ body,
 }
 
 .g-root {
-    --ydb-data-table-color-hover: var(--g-color-base-float-hover);
+    --ydb-data-table-color-hover: var(--g-color-base-float);
 
     // Colors for tablets, status icons and progress bars
     --ydb-color-status-grey: var(--g-color-base-neutral-heavy);
@@ -93,8 +93,13 @@ body,
 .ydb-paginated-table__row,
 .ydb-tree-view__item {
     &:hover {
-        & .clipboard-button {
+        & .entity-status__clipboard-button,
+        .ydb-versions-nodes-tree-title__clipboard-button {
             opacity: 1;
+        }
+        & .entity-status__controls-wrapper {
+            width: min-content;
+            padding: var(--g-spacing-1);
         }
     }
 }

@@ -1,8 +1,7 @@
 import React from 'react';
 
-import {RadioButton} from '@gravity-ui/uikit';
+import {ClipboardButton, RadioButton} from '@gravity-ui/uikit';
 
-import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
 import ElapsedTime from '../../../../components/ElapsedTime/ElapsedTime';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';

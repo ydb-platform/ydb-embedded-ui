@@ -92,7 +92,10 @@ const tabletIdColumn: Column<KeyValueRow> = {
                 hasClipboardButton
                 showStatus={false}
                 additionalControls={
-                    <DeveloperUILinkButton href={createTabletDeveloperUIHref(row.TabletId)} />
+                    <DeveloperUILinkButton
+                        href={createTabletDeveloperUIHref(row.TabletId)}
+                        size="xs"
+                    />
                 }
             />
         );
