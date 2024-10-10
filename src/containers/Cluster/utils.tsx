@@ -7,6 +7,7 @@ export const clusterTabsIds = {
     nodes: 'nodes',
     storage: 'storage',
     versions: 'versions',
+    tablets: 'tablets',
 } as const;
 
 export type ClusterTab = ValueOf<typeof clusterTabsIds>;
@@ -32,8 +33,12 @@ const versions = {
     id: clusterTabsIds.versions,
     title: 'Versions',
 };
+const tablets = {
+    id: clusterTabsIds.tablets,
+    title: 'Tablets',
+};
 
-export const clusterTabs = [overview, tenants, nodes, storage, versions];
+export const clusterTabs = [overview, tenants, nodes, storage, tablets, versions];
 
 export function isClusterTab(tab: any): tab is ClusterTab {
     return Object.values(clusterTabsIds).includes(tab);
