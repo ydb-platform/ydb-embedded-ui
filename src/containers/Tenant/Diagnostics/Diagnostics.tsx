@@ -16,6 +16,7 @@ import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Heatmap} from '../../Heatmap';
 import {NodesWrapper} from '../../Nodes/NodesWrapper';
+import {Operations} from '../../Operations';
 import {StorageWrapper} from '../../Storage/StorageWrapper';
 import {Tablets} from '../../Tablets';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
@@ -136,6 +137,9 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.configs: {
                 return <Configs database={tenantName} />;
+            }
+            case TENANT_DIAGNOSTICS_TABS_IDS.operations: {
+                return <Operations database={tenantName} />;
             }
             default: {
                 return <div>No data...</div>;
