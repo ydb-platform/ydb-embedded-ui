@@ -317,7 +317,7 @@ export const DEFAULT_QUERY_SETTINGS = {
     timeout: 60,
     limitRows: 10000,
     statisticsMode: STATISTICS_MODES.none,
-    tracingLevel: TRACING_LEVELS.detailed,
+    tracingLevel: TRACING_LEVELS.off,
 };
 
 export const queryModeSchema = z.nativeEnum(QUERY_MODES);

@@ -11,10 +11,10 @@ interface StorageWrapperProps {
     pDiskId?: string | number;
     groupId?: string | number;
     vDiskSlotId?: string | number;
-    parentContainer?: Element | null;
+    parentRef?: React.RefObject<HTMLElement>;
 }
 
-export const StorageWrapper = ({parentContainer, ...props}: StorageWrapperProps) => {
+export const StorageWrapper = ({parentRef, ...props}: StorageWrapperProps) => {
     const [usePaginatedTables] = useSetting<boolean>(USE_PAGINATED_TABLES_KEY);
 
     const viewContext: StorageViewContext = {
@@ -25,13 +25,7 @@ export const StorageWrapper = ({parentContainer, ...props}: StorageWrapperProps)
     };
 
     if (usePaginatedTables) {
-        return (
-            <PaginatedStorage
-                parentContainer={parentContainer}
-                viewContext={viewContext}
-                {...props}
-            />
-        );
+        return <PaginatedStorage parentRef={parentRef} viewContext={viewContext} {...props} />;
     }
 
     return <Storage viewContext={viewContext} {...props} />;

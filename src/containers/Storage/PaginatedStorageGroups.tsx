@@ -55,7 +55,7 @@ function StorageGroupsComponent({
     groupId,
     pDiskId,
     viewContext,
-    parentContainer,
+    parentRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
     const {searchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
@@ -88,7 +88,7 @@ function StorageGroupsComponent({
             searchValue={searchValue}
             visibleEntities={visibleEntities}
             onShowAll={handleShowAllGroups}
-            parentContainer={parentContainer}
+            parentRef={parentRef}
             renderControls={renderControls}
             renderErrorMessage={renderPaginatedTableErrorMessage}
             columns={columnsToShow}

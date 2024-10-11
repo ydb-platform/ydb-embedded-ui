@@ -127,7 +127,7 @@ export function Node(props: NodeProps) {
             case STORAGE: {
                 return (
                     <div className={b('storage')}>
-                        <StorageWrapper nodeId={nodeId} parentContainer={container.current} />
+                        <StorageWrapper nodeId={nodeId} parentRef={container} />
                     </div>
                 );
             }

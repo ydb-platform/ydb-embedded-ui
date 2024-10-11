@@ -8,15 +8,15 @@ import {PaginatedNodes} from './PaginatedNodes';
 interface NodesWrapperProps {
     path?: string;
     database?: string;
-    parentContainer?: Element | null;
+    parentRef?: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const NodesWrapper = ({parentContainer, ...props}: NodesWrapperProps) => {
+export const NodesWrapper = ({parentRef, ...props}: NodesWrapperProps) => {
     const [usePaginatedTables] = useSetting<boolean>(USE_PAGINATED_TABLES_KEY);
 
     if (usePaginatedTables) {
-        return <PaginatedNodes parentContainer={parentContainer} {...props} />;
+        return <PaginatedNodes parentRef={parentRef} {...props} />;
     }
 
     return <Nodes {...props} />;

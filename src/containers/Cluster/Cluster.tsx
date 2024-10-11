@@ -26,6 +26,7 @@ import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {parseVersionsToVersionToColorMap} from '../../utils/versions';
 import {NodesWrapper} from '../Nodes/NodesWrapper';
 import {StorageWrapper} from '../Storage/StorageWrapper';
+import {TabletsTable} from '../Tablets/TabletsTable';
 import {Tenants} from '../Tenants/Tenants';
 import {Versions} from '../Versions/Versions';
 
@@ -155,6 +156,19 @@ export function Cluster({
                 </Route>
                 <Route
                     path={
+                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.tablets)).pathname
+                    }
+                >
+                    <div className={b('tablets')}>
+                        <div className={b('fake-block')} />
+                        <TabletsTable
+                            tablets={cluster.SystemTablets ?? []}
+                            className={b('tablets-table')}
+                        />
+                    </div>
+                </Route>
+                <Route
+                    path={
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants)).pathname
                     }
                 >
@@ -164,7 +178,7 @@ export function Cluster({
                     path={getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname}
                 >
                     <NodesWrapper
-                        parentContainer={container.current}
+                        parentRef={container}
                         additionalNodesProps={additionalNodesProps}
                     />
                 </Route>
@@ -173,7 +187,7 @@ export function Cluster({
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage)).pathname
                     }
                 >
-                    <StorageWrapper parentContainer={container.current} />
+                    <StorageWrapper parentRef={container} />
                 </Route>
                 <Route
                     path={

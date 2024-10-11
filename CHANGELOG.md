@@ -1,5 +1,29 @@
 # Changelog
 
+## [6.24.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.23.1...v6.24.0) (2024-10-10)
+
+
+### Features
+
+* add dimming to vdisk page (nodes) and pdisk page (vdisks) ([#1397](https://github.com/ydb-platform/ydb-embedded-ui/issues/1397)) ([deb2a88](https://github.com/ydb-platform/ydb-embedded-ui/commit/deb2a88d86ac0ad84f13acf1b7a3bf89289f5722))
+* **Databases:** use balancer + /node/:id as backend endpoint ([#1418](https://github.com/ydb-platform/ydb-embedded-ui/issues/1418)) ([f8a0db1](https://github.com/ydb-platform/ydb-embedded-ui/commit/f8a0db18fa01b9e9198e7c1ad4a656ba17de5922))
+* **Storage:** add disk space usage column ([#1425](https://github.com/ydb-platform/ydb-embedded-ui/issues/1425)) ([d254ee2](https://github.com/ydb-platform/ydb-embedded-ui/commit/d254ee2bd71b5028eb48b4d34c30bc5ea48fa484))
+* **StorageNodes:** add columns, use the same nodes columns ([#1396](https://github.com/ydb-platform/ydb-embedded-ui/issues/1396)) ([90a3403](https://github.com/ydb-platform/ydb-embedded-ui/commit/90a34037c8ea8e7fe8e680a47d6e1323b9fd9ff2))
+* **VDisk:** show VDisk donors inside popup ([#1422](https://github.com/ydb-platform/ydb-embedded-ui/issues/1422)) ([fc12a38](https://github.com/ydb-platform/ydb-embedded-ui/commit/fc12a38156e117e43e89b301b58df59408a98928))
+
+
+### Bug Fixes
+
+* **Authentication:** handle login error properly ([#1426](https://github.com/ydb-platform/ydb-embedded-ui/issues/1426)) ([10f817e](https://github.com/ydb-platform/ydb-embedded-ui/commit/10f817ef9879ce8fc3beddda1377a03ca285bc5f))
+* autocomplete not working in standalone version ([#1405](https://github.com/ydb-platform/ydb-embedded-ui/issues/1405)) ([8f516be](https://github.com/ydb-platform/ydb-embedded-ui/commit/8f516becf0fc0cfdd25d10abf00a41dc6953a326))
+* **cluster:** infoV2 check ([#1401](https://github.com/ydb-platform/ydb-embedded-ui/issues/1401)) ([6dbe56d](https://github.com/ydb-platform/ydb-embedded-ui/commit/6dbe56db0e3a85c44852b85477e2027f8e1754b4))
+* nodes list stops working on sort by uptime scroll down ([#1424](https://github.com/ydb-platform/ydb-embedded-ui/issues/1424)) ([5ecaecb](https://github.com/ydb-platform/ydb-embedded-ui/commit/5ecaecbfdedd47d39539e871cca8a7cf5a45e1f0))
+* **StorageGroups:** display full pool name with left cut ([#1421](https://github.com/ydb-platform/ydb-embedded-ui/issues/1421)) ([09599c1](https://github.com/ydb-platform/ydb-embedded-ui/commit/09599c1d920fc691e2e8f97ced5ccf057651ca53))
+* **StorageGroups:** fix latency column ([#1403](https://github.com/ydb-platform/ydb-embedded-ui/issues/1403)) ([5e1961c](https://github.com/ydb-platform/ydb-embedded-ui/commit/5e1961c72d2904be7a7700259c1b517c5fa997db))
+* **Storage:** prevent duplicating vdisks when no whiteboard ([#1420](https://github.com/ydb-platform/ydb-embedded-ui/issues/1420)) ([73e9e6b](https://github.com/ydb-platform/ydb-embedded-ui/commit/73e9e6bf939873c497b900286f8557ba12621917))
+* tracelevel none by default ([#1432](https://github.com/ydb-platform/ydb-embedded-ui/issues/1432)) ([1c786cb](https://github.com/ydb-platform/ydb-embedded-ui/commit/1c786cb2b62e2470b79193b6b2d10b46ed384ff6))
+* use babel loader from create-react-app ([#1409](https://github.com/ydb-platform/ydb-embedded-ui/issues/1409)) ([0a4734e](https://github.com/ydb-platform/ydb-embedded-ui/commit/0a4734ebc54c036c422fd269e8e6b691af5a6b5d))
+
 ## [6.23.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.23.0...v6.23.1) (2024-10-03)
 
 

@@ -148,8 +148,7 @@ describe('VDisk state', () => {
             DonorMode: true,
         });
 
-        expect(severity1).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue);
-        expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green);
+        expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue);
         expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
         expect(severity3).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
     });

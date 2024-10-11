@@ -62,7 +62,7 @@ function StorageNodesComponent({
     nodeId,
     groupId,
     viewContext,
-    parentContainer,
+    parentRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
     const {searchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
@@ -96,7 +96,7 @@ function StorageNodesComponent({
             visibleEntities={visibleEntities}
             nodesUptimeFilter={nodesUptimeFilter}
             onShowAll={handleShowAllNodes}
-            parentContainer={parentContainer}
+            parentRef={parentRef}
             renderControls={renderControls}
             renderErrorMessage={renderPaginatedTableErrorMessage}
             columns={columnsToShow}

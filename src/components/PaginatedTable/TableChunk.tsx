@@ -11,9 +11,6 @@ import type {Column, FetchData, GetRowClassName, SortParams} from './types';
 
 const DEBOUNCE_TIMEOUT = 200;
 
-// With original memo generic types are lost
-const typedMemo: <T>(Component: T) => T = React.memo;
-
 interface TableChunkProps<T, F> {
     id: number;
     limit: number;
@@ -22,7 +19,6 @@ interface TableChunkProps<T, F> {
     columns: Column<T>[];
     filters?: F;
     sortParams?: SortParams;
-    observer: IntersectionObserver;
     isActive: boolean;
     tableName: string;
 
@@ -33,7 +29,7 @@ interface TableChunkProps<T, F> {
 }
 
 // Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
-export const TableChunk = typedMemo(function TableChunk<T, F>({
+export const TableChunk = <T, F>({
     id,
     limit,
     totalLength,
@@ -43,13 +39,11 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     tableName,
     filters,
     sortParams,
-    observer,
     getRowClassName,
     renderErrorMessage,
     onDataFetched,
     isActive,
-}: TableChunkProps<T, F>) {
-    const ref = React.useRef<HTMLTableSectionElement>(null);
+}: TableChunkProps<T, F>) => {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -82,19 +76,6 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
             window.clearTimeout(timeout);
         };
     }, [isActive, isTimeoutActive]);
-
-    React.useEffect(() => {
-        const el = ref.current;
-        if (el) {
-            observer.observe(el);
-        }
-
-        return () => {
-            if (el) {
-                observer.unobserve(el);
-            }
-        };
-    }, [observer]);
 
     React.useEffect(() => {
         if (currentData && isActive) {
@@ -154,7 +135,6 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
 
     return (
         <tbody
-            ref={ref}
             id={id.toString()}
             style={{
                 height: `${chunkHeight}px`,
@@ -167,4 +147,4 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
             {renderContent()}
         </tbody>
     );
-});
+};
