@@ -138,11 +138,22 @@ export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
 
     const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
+    const [isFocused, setIsFocused] = React.useState(false);
+
     const onMouseLeave = React.useCallback(() => {
         setIsPopupContentHovered(false);
     }, []);
+
     const onMouseEnter = React.useCallback(() => {
         setIsPopupContentHovered(true);
+    }, []);
+
+    const onContextMenu = React.useCallback(() => {
+        setIsFocused(true);
+    }, []);
+
+    const onBlur = React.useCallback(() => {
+        setIsFocused(false);
     }, []);
 
     const vdiskInfo = React.useMemo(
@@ -191,13 +202,16 @@ export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
             offset={[0, 12]}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onBlur={onBlur}
             {...props}
-            open={isPopupContentHovered || props.open}
+            open={isPopupContentHovered || props.open || isFocused}
         >
-            {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
-            <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
-            {pdiskInfo && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
-            {donorsInfo.length > 0 && <InfoViewer title="Donors" info={donorsInfo} size="s" />}
+            <div onContextMenu={onContextMenu}>
+                {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
+                <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
+                {pdiskInfo && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
+                {donorsInfo.length > 0 && <InfoViewer title="Donors" info={donorsInfo} size="s" />}
+            </div>
         </Popup>
     );
 };

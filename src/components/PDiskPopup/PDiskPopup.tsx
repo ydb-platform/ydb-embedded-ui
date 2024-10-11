@@ -71,11 +71,22 @@ export const PDiskPopup = ({data, ...props}: PDiskPopupProps) => {
     const info = React.useMemo(() => preparePDiskData(data, nodeHost), [data, nodeHost]);
 
     const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
+    const [isFocused, setIsFocused] = React.useState(false);
+
     const onMouseLeave = React.useCallback(() => {
         setIsPopupContentHovered(false);
     }, []);
+
     const onMouseEnter = React.useCallback(() => {
         setIsPopupContentHovered(true);
+    }, []);
+
+    const onContextMenu = React.useCallback(() => {
+        setIsFocused(true);
+    }, []);
+
+    const onBlur = React.useCallback(() => {
+        setIsFocused(false);
     }, []);
 
     return (
@@ -88,10 +99,13 @@ export const PDiskPopup = ({data, ...props}: PDiskPopupProps) => {
             offset={[0, 12]}
             onMouseLeave={onMouseLeave}
             onMouseEnter={onMouseEnter}
+            onBlur={onBlur}
             {...props}
-            open={isPopupContentHovered || props.open}
+            open={isPopupContentHovered || props.open || isFocused}
         >
-            <InfoViewer title="PDisk" info={info} size="s" />
+            <div onContextMenu={onContextMenu}>
+                <InfoViewer title="PDisk" info={info} size="s" />
+            </div>
         </Popup>
     );
 };
