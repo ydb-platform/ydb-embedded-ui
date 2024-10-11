@@ -68,6 +68,8 @@ function StorageNodesComponent({
     const {searchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
         useStorageQueryParams();
 
+    const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
         viewContext,
@@ -77,7 +79,7 @@ function StorageNodesComponent({
         return (
             <StorageNodesControls
                 withTypeSelector
-                withGroupBySelect
+                withGroupBySelect={viewerNodesHandlerHasGrouping}
                 entitiesCountCurrent={foundEntities}
                 entitiesCountTotal={totalEntities}
                 entitiesLoading={!inited}
