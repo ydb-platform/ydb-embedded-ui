@@ -10,7 +10,6 @@ import {useAutoRefreshInterval} from '../../utils/hooks';
 
 import {OperationsControls} from './OperationsControls';
 import {getColumns} from './columns';
-import {BASE_COLUMNS, BUILD_INDEX_COLUMNS} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
 import {useOperationsQueryParams} from './useOperationsQueryParams';
@@ -47,14 +46,6 @@ export function Operations({database}: OperationsProps) {
         return <AccessDenied position="left" />;
     }
 
-    const columnsList: string[] = BASE_COLUMNS;
-
-    if (kind === 'buildindex') {
-        columnsList.push(...BUILD_INDEX_COLUMNS);
-    }
-
-    const columns = getColumns().filter(({name}) => columnsList.includes(name));
-
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>
@@ -72,7 +63,7 @@ export function Operations({database}: OperationsProps) {
             <TableWithControlsLayout.Table loading={isFetching} className={b('table')}>
                 {data ? (
                     <ResizeableDataTable
-                        columns={columns}
+                        columns={getColumns()}
                         data={filteredOperations}
                         emptyDataMessage={i18n('operations.noData')}
                     />

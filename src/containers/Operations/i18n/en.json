@@ -36,16 +36,5 @@
   "column.createdBy": "Created By",
   "column.createTime": "Create Time",
   "column.endTime": "End Time",
-  "column.duration": "Duration",
-  "column.indexBuildState": "Index Build State",
-  "column.indexBuildProgress": "Index Build Progress",
-  "column.indexName": "Index Name",
-  "column.indexType": "Index Type",
-  "column.indexPath": "Index Path",
-  "column.indexColumns": "Index Columns",
-
-  "indexType.globalIndex": "Global Index",
-  "indexType.globalAsyncIndex": "Global Async Index",
-  "indexType.globalUniqueIndex": "Global Unique Index",
-  "indexType.globalVectorKMeansTreeIndex": "Global Vector KMeans Tree Index"
+  "column.duration": "Duration"
 }
