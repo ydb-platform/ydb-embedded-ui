@@ -104,6 +104,12 @@ export class SettingsDialog {
         await this.page.waitForTimeout(1000);
     }
 
+    async changeLimitRows(limitRows: number) {
+        const limitRowsInput = this.dialog.locator('.ydb-query-settings-dialog__limit-rows input');
+        await limitRowsInput.fill(limitRows.toString());
+        await this.page.waitForTimeout(1000);
+    }
+
     async clickButton(buttonName: ButtonNames) {
         const button = this.dialog.getByRole('button', {name: buttonName});
         await button.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
@@ -140,10 +146,12 @@ class PaneWrapper {
 export class ResultTable {
     private table: Locator;
     private preview: Locator;
+    private resultHead: Locator;
 
     constructor(selector: Locator) {
         this.table = selector.locator('.ydb-query-execute-result__result');
         this.preview = selector.locator('.kv-preview__result');
+        this.resultHead = selector.locator('.ydb-query-execute-result__result-head');
     }
 
     async isVisible() {
@@ -174,6 +182,16 @@ export class ResultTable {
     async getCellValue(row: number, col: number) {
         const cell = this.table.locator(`tr:nth-child(${row}) td:nth-child(${col})`);
         return cell.innerText();
+    }
+
+    async isResultHeaderHidden() {
+        await this.resultHead.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async getResultHeadText() {
+        await this.resultHead.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.resultHead.innerText();
     }
 }
 
