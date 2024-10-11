@@ -144,4 +144,13 @@
             background-color: transparent;
         }
     }
+    &__overview-title {
+        margin: 15px 0 10px;
+
+        font-weight: 600;
+    }
+    &__overview-item-content {
+        text-align: end;
+        white-space: nowrap;
+    }
 }
