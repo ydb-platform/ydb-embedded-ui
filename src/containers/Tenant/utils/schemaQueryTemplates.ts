@@ -153,3 +153,7 @@ export const dropAsyncReplicationTemplate = (path: string) => {
 export const alterAsyncReplicationTemplate = (path: string) => {
     return `ALTER ASYNC REPLICATION \`${path}\` SET (STATE = "DONE", FAILOVER_MODE = "FORCE");`;
 };
+
+export const addTableIndex = (path: string) => {
+    return `ALTER TABLE \`${path}\` ADD INDEX \`$indexName\` GLOBAL ON (\`$columnName\`);`;
+};

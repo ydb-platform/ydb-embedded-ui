@@ -36,6 +36,7 @@
   "actions.dropTopic": "Drop topic...",
   "actions.dropView": "Drop view...",
   "actions.alterTable": "Alter table...",
+  "actions.addTableIndex": "Add index...",
   "actions.alterTopic": "Alter topic...",
   "actions.selectQuery": "Select query...",
   "actions.upsertQuery": "Upsert query...",

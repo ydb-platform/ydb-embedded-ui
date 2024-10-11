@@ -10,6 +10,7 @@ import {transformPath} from '../ObjectSummary/transformPath';
 import i18n from '../i18n';
 
 import {
+    addTableIndex,
     alterAsyncReplicationTemplate,
     alterTableTemplate,
     alterTopicTemplate,
@@ -74,6 +75,7 @@ const bindActions = (
         dropTopic: inputQuery(dropTopicTemplate, 'script'),
         createView: inputQuery(createViewTemplate, 'script'),
         dropView: inputQuery(dropViewTemplate, 'script'),
+        addTableIndex: inputQuery(addTableIndex, 'script'),
         copyPath: () => {
             try {
                 copy(relativePath);
@@ -126,6 +128,7 @@ export const getActions =
                 {text: i18n('actions.alterTable'), action: actions.alterTable},
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
+                {text: i18n('actions.addTableIndex'), action: actions.addTableIndex},
             ],
         ];
 
