@@ -1,5 +1,19 @@
 # Changelog
 
+## [6.25.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.24.0...v6.25.0) (2024-10-11)
+
+
+### Features
+
+* **Cluster:** add Tablets tab ([#1438](https://github.com/ydb-platform/ydb-embedded-ui/issues/1438)) ([f349bcd](https://github.com/ydb-platform/ydb-embedded-ui/commit/f349bcdf758483e42aa571ba293cf3558a9d2e34))
+
+
+### Bug Fixes
+
+* do not hide pdisk and vdisk popups if mouse on popup content ([#1435](https://github.com/ydb-platform/ydb-embedded-ui/issues/1435)) ([ac70e8d](https://github.com/ydb-platform/ydb-embedded-ui/commit/ac70e8d62ec81913e0d4256900cdc4422fa44cf5))
+* **ExecuteResult:** do not show title if no result ([#1444](https://github.com/ydb-platform/ydb-embedded-ui/issues/1444)) ([78cd713](https://github.com/ydb-platform/ydb-embedded-ui/commit/78cd7137f5f77990daaca28a460766baaa5f96b1))
+* **Storage:** do not display group control if not available ([#1449](https://github.com/ydb-platform/ydb-embedded-ui/issues/1449)) ([a647026](https://github.com/ydb-platform/ydb-embedded-ui/commit/a6470263d3f9a2948be0baefcf13fbfb80b282ca))
+
 ## [6.24.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.23.1...v6.24.0) (2024-10-10)
 
 

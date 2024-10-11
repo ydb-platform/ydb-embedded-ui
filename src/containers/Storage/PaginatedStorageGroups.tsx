@@ -60,6 +60,8 @@ function StorageGroupsComponent({
 }: PaginatedStorageProps) {
     const {searchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
 
+    const storageGroupsHandlerHasGroupping = useStorageGroupsHandlerHasGrouping();
+
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
         viewContext,
@@ -69,7 +71,7 @@ function StorageGroupsComponent({
         return (
             <StorageGroupsControls
                 withTypeSelector
-                withGroupBySelect
+                withGroupBySelect={storageGroupsHandlerHasGroupping}
                 entitiesCountCurrent={foundEntities}
                 entitiesCountTotal={totalEntities}
                 entitiesLoading={!inited}
