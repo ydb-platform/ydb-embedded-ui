@@ -15,7 +15,6 @@ test.describe('Test Storage page', async () => {
         const storagePage = new StoragePage(page);
         await storagePage.goto();
 
-        await storagePage.selectVisibleEntityType('All');
         await storagePage.selectEntityType('Groups');
 
         await expect(storagePage.table).toBeVisible();
@@ -25,7 +24,6 @@ test.describe('Test Storage page', async () => {
         const storagePage = new StoragePage(page);
         await storagePage.goto();
 
-        await storagePage.selectVisibleEntityType('All');
         await storagePage.selectEntityType('Nodes');
 
         await expect(storagePage.table).toBeVisible();
