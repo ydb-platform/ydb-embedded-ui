@@ -94,7 +94,10 @@ export const topQueriesApi = api.injectEndpoints({
                 {signal},
             ) => {
                 try {
-                    const filterConditions = filters?.text ? `Query ILIKE '%${filters.text}%'` : '';
+                    const filterConditions = filters?.text
+                        ? `Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%'`
+                        : '';
+
                     const commonQueryPart = `SELECT UserSID, QueryStartAt, Query as QueryText, ApplicationName from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'}`;
 
                     const queryText = `${commonQueryPart} AND Query NOT LIKE '${commonQueryPart}%' ORDER BY SessionStartAt limit 100`;

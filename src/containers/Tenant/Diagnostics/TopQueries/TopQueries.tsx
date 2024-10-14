@@ -93,6 +93,8 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
         dispatch(setTopQueriesFilters(value));
     };
 
+    const DataComponent = isTopQueries ? TopQueriesData : RunningQueriesData;
+
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>
@@ -115,11 +117,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
                     />
                 ) : null}
             </TableWithControlsLayout.Controls>
-            {isTopQueries ? (
-                <TopQueriesData database={tenantName} onRowClick={onRowClick} />
-            ) : (
-                <RunningQueriesData database={tenantName} />
-            )}
+            <DataComponent database={tenantName} onRowClick={onRowClick} rowClassName={b('row')} />
         </TableWithControlsLayout>
     );
 };
