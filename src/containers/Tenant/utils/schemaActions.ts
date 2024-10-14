@@ -9,6 +9,7 @@ import createToast from '../../../utils/createToast';
 import {transformPath} from '../ObjectSummary/transformPath';
 import i18n from '../i18n';
 
+import type {SchemaQueryParams} from './schemaQueryTemplates';
 import {
     addTableIndex,
     alterAsyncReplicationTemplate,
@@ -22,6 +23,7 @@ import {
     createViewTemplate,
     dropAsyncReplicationTemplate,
     dropExternalTableTemplate,
+    dropTableIndex,
     dropTopicTemplate,
     dropViewTemplate,
     selectQueryTemplate,
@@ -35,28 +37,28 @@ interface ActionsAdditionalEffects {
 }
 
 const bindActions = (
-    {path, relativePath}: {path: string; relativePath: string},
+    schemaQueryParams: SchemaQueryParams,
     dispatch: React.Dispatch<any>,
     additionalEffects: ActionsAdditionalEffects,
 ) => {
     const {setActivePath, updateQueryExecutionSettings, showCreateDirectoryDialog} =
         additionalEffects;
 
-    const inputQuery = (tmpl: (path: string) => string, mode?: QueryMode) => () => {
+    const inputQuery = (tmpl: (params?: SchemaQueryParams) => string, mode?: QueryMode) => () => {
         if (mode) {
             updateQueryExecutionSettings({queryMode: mode});
         }
 
-        dispatch(changeUserInput({input: tmpl(relativePath)}));
+        dispatch(changeUserInput({input: tmpl(schemaQueryParams)}));
         dispatch(setTenantPage(TENANT_PAGES_IDS.query));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-        setActivePath(path);
+        setActivePath(schemaQueryParams.path);
     };
 
     return {
         createDirectory: showCreateDirectoryDialog
             ? () => {
-                  showCreateDirectoryDialog(path);
+                  showCreateDirectoryDialog(schemaQueryParams.path);
               }
             : undefined,
         createTable: inputQuery(createTableTemplate, 'script'),
@@ -75,10 +77,11 @@ const bindActions = (
         dropTopic: inputQuery(dropTopicTemplate, 'script'),
         createView: inputQuery(createViewTemplate, 'script'),
         dropView: inputQuery(dropViewTemplate, 'script'),
+        dropIndex: inputQuery(dropTableIndex, 'script'),
         addTableIndex: inputQuery(addTableIndex, 'script'),
         copyPath: () => {
             try {
-                copy(relativePath);
+                copy(schemaQueryParams.relativePath);
                 createToast({
                     name: 'Copied',
                     title: i18n('actions.copied'),
@@ -170,6 +173,10 @@ export const getActions =
             ],
         ];
 
+        const INDEX_SET: ActionsSet = [
+            [copyItem, {text: i18n('actions.dropIndex'), action: actions.dropIndex}],
+        ];
+
         const JUST_COPY: ActionsSet = [copyItem];
 
         // verbose mapping to guarantee a correct actions set for new node types
@@ -187,7 +194,7 @@ export const getActions =
             topic: TOPIC_SET,
             stream: JUST_COPY,
 
-            index: JUST_COPY,
+            index: INDEX_SET,
 
             external_table: EXTERNAL_TABLE_SET,
             external_data_source: EXTERNAL_DATA_SOURCE_SET,

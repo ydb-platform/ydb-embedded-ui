@@ -27,7 +27,7 @@ import {
     selectQueryTemplate,
     updateTableTemplate,
     upsertQueryTemplate,
-} from './newSQLQueryTemplates';
+} from './schemaQueryTemplates';
 
 export const bindActions = (dispatch: React.Dispatch<any>) => {
     const inputQuery = (query: () => string) => () => {

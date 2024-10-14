@@ -25,6 +25,7 @@
   "actions.copied": "The path is copied to the clipboard",
   "actions.notCopied": "Couldn’t copy the path",
   "actions.copyPath": "Copy path",
+  "actions.dropIndex": "Drop index",
   "actions.openPreview": "Open preview",
   "actions.createTable": "Create table...",
   "actions.createExternalTable": "Create external table...",
