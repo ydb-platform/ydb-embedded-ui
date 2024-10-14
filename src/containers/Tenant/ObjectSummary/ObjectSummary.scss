@@ -145,9 +145,7 @@
         }
     }
     &__overview-title {
-        margin: 15px 0 10px;
-
-        font-weight: 600;
+        @include info-viewer-title();
     }
     &__overview-item-content {
         text-align: end;
