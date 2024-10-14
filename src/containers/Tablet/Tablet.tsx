@@ -19,7 +19,6 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {tabletApi} from '../../store/reducers/tablet';
 import {EFlag} from '../../types/api/enums';
 import type {TTabletStateInfo} from '../../types/api/tablet';
-import {EType} from '../../types/api/tablet';
 import type {ITabletPreparedHistoryItem} from '../../types/store/tablet';
 import {cn} from '../../utils/cn';
 import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
@@ -58,11 +57,9 @@ const TABLET_PAGE_TABS = [
 ];
 
 const tabletTabSchema = z.nativeEnum(TABLET_TABS_IDS).catch(TABLET_TABS_IDS.history);
-const eTypeSchema = z.nativeEnum(EType).or(z.undefined()).catch(undefined);
 
 const tabletQueryParams = {
     tenantName: StringParam,
-    type: StringParam,
     clusterName: StringParam,
     activeTab: StringParam,
 };
@@ -72,7 +69,7 @@ export function Tablet() {
 
     const {id} = useParams<{id: string}>();
 
-    const [{tenantName: queryDatabase, type: queryTabletType, clusterName: queryClusterName}] =
+    const [{tenantName: queryDatabase, clusterName: queryClusterName}] =
         useQueryParams(tabletQueryParams);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -90,7 +87,7 @@ export function Tablet() {
 
     const database = (tenantPath || queryDatabase) ?? undefined;
 
-    const tabletType = tablet.Type || eTypeSchema.parse(queryTabletType);
+    const tabletType = tablet.Type;
 
     React.useEffect(() => {
         dispatch(
