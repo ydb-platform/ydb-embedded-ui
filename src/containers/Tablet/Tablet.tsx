@@ -16,7 +16,6 @@ import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {getTabletPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {nodeApi} from '../../store/reducers/node/node';
 import {tabletApi} from '../../store/reducers/tablet';
 import {EFlag} from '../../types/api/enums';
 import type {TTabletStateInfo} from '../../types/api/tablet';
@@ -62,7 +61,6 @@ const tabletTabSchema = z.nativeEnum(TABLET_TABS_IDS).catch(TABLET_TABS_IDS.hist
 const eTypeSchema = z.nativeEnum(EType).or(z.undefined()).catch(undefined);
 
 const tabletQueryParams = {
-    nodeId: StringParam,
     tenantName: StringParam,
     type: StringParam,
     clusterName: StringParam,
@@ -74,18 +72,12 @@ export function Tablet() {
 
     const {id} = useParams<{id: string}>();
 
-    const [
-        {
-            nodeId: queryNodeId,
-            tenantName: queryDatabase,
-            type: queryTabletType,
-            clusterName: queryClusterName,
-        },
-    ] = useQueryParams(tabletQueryParams);
+    const [{tenantName: queryDatabase, type: queryTabletType, clusterName: queryClusterName}] =
+        useQueryParams(tabletQueryParams);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tabletApi.useGetTabletQuery(
-        {id, database: queryDatabase ?? undefined, nodeId: queryNodeId ?? undefined},
+        {id, database: queryDatabase ?? undefined},
         {pollingInterval: autoRefreshInterval},
     );
 
@@ -96,24 +88,19 @@ export function Tablet() {
         tablet.TenantId ? {tenantId: tablet.TenantId} : skipToken,
     );
 
-    const nodeId = tablet.NodeId ?? queryNodeId ?? undefined;
     const database = (tenantPath || queryDatabase) ?? undefined;
-
-    const nodeRole = useNodeRole(nodeId?.toString());
 
     const tabletType = tablet.Type || eTypeSchema.parse(queryTabletType);
 
     React.useEffect(() => {
         dispatch(
             setHeaderBreadcrumbs('tablet', {
-                nodeId,
-                nodeRole,
                 tenantName: queryDatabase ?? undefined,
                 tabletId: id,
                 tabletType,
             }),
         );
-    }, [dispatch, queryDatabase, id, nodeId, nodeRole, tabletType]);
+    }, [dispatch, queryDatabase, id, tabletType]);
 
     const {Leader, Type} = tablet;
     const metaItems: string[] = [];
@@ -245,18 +232,4 @@ function Channels({id, hiveId}: {id: string; hiveId: string}) {
             {currentData ? <TabletStorageInfo data={currentData} /> : null}
         </LoaderWrapper>
     );
-}
-
-function useNodeRole(nodeId: string | undefined) {
-    const {currentData: node} = nodeApi.useGetNodeInfoQuery(nodeId ? {nodeId} : skipToken);
-
-    let nodeRole: 'Storage' | 'Compute' | undefined;
-
-    if (node) {
-        // Compute nodes have tenantName, storage nodes doesn't
-        const isStorage = !node?.Tenants?.[0];
-        nodeRole = isStorage ? 'Storage' : 'Compute';
-    }
-
-    return nodeRole;
 }
