@@ -1,6 +1,7 @@
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 
 import {
+    addTableIndex,
     alterAsyncReplicationTemplate,
     alterTableTemplate,
     alterTopicTemplate,
@@ -17,6 +18,7 @@ import {
     dropAsyncReplicationTemplate,
     dropExternalTableTemplate,
     dropGroupTemplate,
+    dropTableIndex,
     dropTableTemplate,
     dropTopicTemplate,
     dropUserTemplate,
@@ -25,7 +27,7 @@ import {
     selectQueryTemplate,
     updateTableTemplate,
     upsertQueryTemplate,
-} from './newSQLQueryTemplates';
+} from './schemaQueryTemplates';
 
 export const bindActions = (dispatch: React.Dispatch<any>) => {
     const inputQuery = (query: () => string) => () => {
@@ -58,5 +60,7 @@ export const bindActions = (dispatch: React.Dispatch<any>) => {
         revokePrivilege: inputQuery(revokePrivilegeTemplate),
         dropUser: inputQuery(dropUserTemplate),
         dropGroup: inputQuery(dropGroupTemplate),
+        addTableIndex: inputQuery(addTableIndex),
+        dropTableIndex: inputQuery(dropTableIndex),
     };
 };

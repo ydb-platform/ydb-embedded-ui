@@ -58,6 +58,14 @@ export function NewSQL() {
                     text: i18n('action.drop-external-table'),
                     action: actions.dropExternalTable,
                 },
+                {
+                    text: i18n('action.add-index'),
+                    action: actions.addTableIndex,
+                },
+                {
+                    text: i18n('action.drop-index'),
+                    action: actions.dropTableIndex,
+                },
             ],
         },
         {
