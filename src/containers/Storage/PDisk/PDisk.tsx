@@ -76,6 +76,7 @@ export const PDisk = ({
                 onShowPopup={onShowPopup}
                 onHidePopup={onHidePopup}
                 popupContent={<PDiskPopup data={data} />}
+                offset={vDisks?.length ? [0, 28] : undefined}
             >
                 <InternalLink to={pDiskPath} className={b('content')}>
                     <DiskStateProgressBar

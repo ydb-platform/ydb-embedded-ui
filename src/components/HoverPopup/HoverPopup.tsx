@@ -13,6 +13,7 @@ interface HoverPopupProps {
     children: React.ReactNode;
     popupContent: React.ReactNode;
     showPopup?: boolean;
+    offset?: [number, number];
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
 }
@@ -21,6 +22,7 @@ export const HoverPopup = ({
     children,
     popupContent,
     showPopup,
+    offset,
     onShowPopup,
     onHidePopup,
 }: HoverPopupProps) => {
@@ -99,7 +101,7 @@ export const HoverPopup = ({
                 hasArrow
                 // bigger offset for easier switching to neighbour nodes
                 // matches the default offset for popup with arrow out of a sense of beauty
-                offset={[0, 12]}
+                offset={offset || [0, 12]}
             >
                 <div onContextMenu={onPopupContextMenu}>{popupContent}</div>
             </Popup>
