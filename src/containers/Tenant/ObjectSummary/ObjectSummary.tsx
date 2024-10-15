@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {HelpPopover} from '@gravity-ui/components';
+import {DefinitionList, HelpPopover} from '@gravity-ui/components';
+import type {DefinitionListSingleItem} from '@gravity-ui/components/build/esm/components/DefinitionList/types';
 import {Flex, Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
 import {Link, useLocation} from 'react-router-dom';
@@ -9,8 +10,6 @@ import {StringParam, useQueryParam} from 'use-query-params';
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {ClipboardButton} from '../../../components/ClipboardButton';
 import {toFormattedSize} from '../../../components/FormattedBytes/utils';
-import {InfoViewer} from '../../../components/InfoViewer/InfoViewer';
-import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import SplitPane from '../../../components/SplitPane';
 import routes, {createExternalUILink, createHref} from '../../../routes';
@@ -156,28 +155,28 @@ export function ObjectSummary({
         }
         const {CreateStep, PathType, PathSubType, PathId, PathVersion} = currentSchemaData;
 
-        const overview: InfoViewerItem[] = [];
+        const overview: DefinitionListSingleItem[] = [];
 
         const normalizedType = isDomain(path, PathType)
             ? 'Domain'
             : PathType?.replace(/^EPathType/, '');
 
-        overview.push({label: i18n('field_type'), value: normalizedType});
+        overview.push({name: i18n('field_type'), content: normalizedType});
 
         if (PathSubType !== EPathSubType.EPathSubTypeEmpty) {
             overview.push({
-                label: i18n('field_subtype'),
-                value: PathSubType?.replace(/^EPathSubType/, ''),
+                name: i18n('field_subtype'),
+                content: PathSubType?.replace(/^EPathSubType/, ''),
             });
         }
 
-        overview.push({label: i18n('field_id'), value: PathId});
+        overview.push({name: i18n('field_id'), content: PathId});
 
-        overview.push({label: i18n('field_version'), value: PathVersion});
+        overview.push({name: i18n('field_version'), content: PathVersion});
 
         overview.push({
-            label: i18n('field_created'),
-            value: formatDateTime(CreateStep),
+            name: i18n('field_created'),
+            content: formatDateTime(CreateStep),
         });
 
         const {PathDescription} = currentObjectData;
@@ -187,17 +186,15 @@ export function ObjectSummary({
 
             overview.push(
                 {
-                    label: i18n('field_data-size'),
-                    value: toFormattedSize(DataSize),
+                    name: i18n('field_data-size'),
+                    content: toFormattedSize(DataSize),
                 },
                 {
-                    label: i18n('field_row-count'),
-                    value: formatNumber(RowCount),
+                    name: i18n('field_row-count'),
+                    content: formatNumber(RowCount),
                 },
             );
         }
-
-        const title = <EntityTitle data={PathDescription} />;
 
         const getDatabaseOverview = () => {
             const {PathsInside, ShardsInside, PathsLimit, ShardsLimit} =
@@ -215,23 +212,26 @@ export function ObjectSummary({
 
             return [
                 {
-                    label: i18n('field_paths'),
-                    value: paths,
+                    name: i18n('field_paths'),
+                    content: paths,
                 },
                 {
-                    label: i18n('field_shards'),
-                    value: shards,
+                    name: i18n('field_shards'),
+                    content: shards,
                 },
             ];
         };
 
-        const getPathTypeOverview: Record<EPathType, (() => InfoViewerItem[]) | undefined> = {
+        const getPathTypeOverview: Record<
+            EPathType,
+            (() => DefinitionListSingleItem[]) | undefined
+        > = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeTable]: () => [
                 {
-                    label: i18n('field_partitions'),
-                    value: PathDescription?.TablePartitions?.length,
+                    name: i18n('field_partitions'),
+                    content: PathDescription?.TablePartitions?.length,
                 },
             ],
             [EPathType.EPathTypeSubDomain]: getDatabaseOverview,
@@ -239,14 +239,15 @@ export function ObjectSummary({
             [EPathType.EPathTypeExtSubDomain]: getDatabaseOverview,
             [EPathType.EPathTypeColumnStore]: () => [
                 {
-                    label: i18n('field_partitions'),
-                    value: PathDescription?.ColumnStoreDescription?.ColumnShards?.length,
+                    name: i18n('field_partitions'),
+                    content: PathDescription?.ColumnStoreDescription?.ColumnShards?.length,
                 },
             ],
             [EPathType.EPathTypeColumnTable]: () => [
                 {
-                    label: i18n('field_partitions'),
-                    value: PathDescription?.ColumnTableDescription?.Sharding?.ColumnShards?.length,
+                    name: i18n('field_partitions'),
+                    content:
+                        PathDescription?.ColumnTableDescription?.Sharding?.ColumnShards?.length,
                 },
             ],
             [EPathType.EPathTypeCdcStream]: () => {
@@ -254,12 +255,12 @@ export function ObjectSummary({
 
                 return [
                     {
-                        label: i18n('field_mode'),
-                        value: Mode?.replace(/^ECdcStreamMode/, ''),
+                        name: i18n('field_mode'),
+                        content: Mode?.replace(/^ECdcStreamMode/, ''),
                     },
                     {
-                        label: i18n('field_format'),
-                        value: Format?.replace(/^ECdcStreamFormat/, ''),
+                        name: i18n('field_format'),
+                        content: Format?.replace(/^ECdcStreamFormat/, ''),
                     },
                 ];
             },
@@ -269,12 +270,12 @@ export function ObjectSummary({
 
                 return [
                     {
-                        label: i18n('field_partitions'),
-                        value: pqGroup?.Partitions?.length,
+                        name: i18n('field_partitions'),
+                        content: pqGroup?.Partitions?.length,
                     },
                     {
-                        label: i18n('field_retention'),
-                        value: value && formatSecondsToHours(value),
+                        name: i18n('field_retention'),
+                        content: value && formatSecondsToHours(value),
                     },
                 ];
             },
@@ -290,10 +291,10 @@ export function ObjectSummary({
                 const dataSourceName = DataSourcePath?.match(/([^/]*)\/*$/)?.[1] || '';
 
                 return [
-                    {label: i18n('field_source-type'), value: SourceType},
+                    {name: i18n('field_source-type'), content: SourceType},
                     {
-                        label: i18n('field_data-source'),
-                        value: DataSourcePath && (
+                        name: i18n('field_data-source'),
+                        content: DataSourcePath && (
                             <span title={DataSourcePath}>
                                 <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
                             </span>
@@ -303,8 +304,8 @@ export function ObjectSummary({
             },
             [EPathType.EPathTypeExternalDataSource]: () => [
                 {
-                    label: i18n('field_source-type'),
-                    value: PathDescription?.ExternalDataSourceDescription?.SourceType,
+                    name: i18n('field_source-type'),
+                    content: PathDescription?.ExternalDataSourceDescription?.SourceType,
                 },
             ],
             [EPathType.EPathTypeView]: undefined,
@@ -317,8 +318,8 @@ export function ObjectSummary({
 
                 return [
                     {
-                        label: i18n('field_state'),
-                        value: <AsyncReplicationState state={state} />,
+                        name: i18n('field_state'),
+                        content: <AsyncReplicationState state={state} />,
                     },
                 ];
             },
@@ -329,7 +330,21 @@ export function ObjectSummary({
 
         // filter all empty values in according this requirement
         // https://github.com/ydb-platform/ydb-embedded-ui/issues/906
-        return <InfoViewer title={title} info={overview.filter((i) => i.value)} />;
+        const listItems = overview
+            .filter((i) => i.content)
+            .map((el) => ({
+                ...el,
+                content: <div className={b('overview-item-content')}>{el.content}</div>,
+                multilineName: true,
+            }));
+        return (
+            <React.Fragment>
+                <div className={b('overview-title')}>
+                    <EntityTitle data={PathDescription} />
+                </div>
+                <DefinitionList items={listItems} responsive nameMaxWidth={150} />
+            </React.Fragment>
+        );
     };
 
     const renderTabContent = () => {
