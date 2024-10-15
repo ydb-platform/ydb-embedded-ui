@@ -12,6 +12,7 @@ import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
+import {usePopupOpenState} from '../../utils/hooks/usePopupOpenState';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
@@ -132,29 +133,14 @@ const prepareVDiskData = (data: PreparedVDisk) => {
 
 interface VDiskPopupProps extends PopupProps {
     data: PreparedVDisk | UnavailableDonor;
+    hidePopup?: VoidFunction;
 }
 
-export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
+export const VDiskPopup = ({data, hidePopup, ...props}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
 
-    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
-    const [isFocused, setIsFocused] = React.useState(false);
-
-    const onMouseLeave = React.useCallback(() => {
-        setIsPopupContentHovered(false);
-    }, []);
-
-    const onMouseEnter = React.useCallback(() => {
-        setIsPopupContentHovered(true);
-    }, []);
-
-    const onContextMenu = React.useCallback(() => {
-        setIsFocused(true);
-    }, []);
-
-    const onBlur = React.useCallback(() => {
-        setIsFocused(false);
-    }, []);
+    const {open, onMouseEnter, onMouseLeave, onContextMenu, onBlur, onEscapeKeyDown} =
+        usePopupOpenState(hidePopup);
 
     const vdiskInfo = React.useMemo(
         () => (isFullData ? prepareVDiskData(data) : prepareUnavailableVDiskData(data)),
@@ -202,10 +188,10 @@ export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
             offset={[0, 12]}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            onEscapeKeyDown={onBlur}
+            onEscapeKeyDown={onEscapeKeyDown}
             onBlur={onBlur}
             {...props}
-            open={isPopupContentHovered || props.open || isFocused}
+            open={open || props.open}
         >
             <div onContextMenu={onContextMenu}>
                 {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}

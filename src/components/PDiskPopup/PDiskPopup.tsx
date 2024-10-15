@@ -11,6 +11,7 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {getPDiskId} from '../../utils/disks/helpers';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
+import {usePopupOpenState} from '../../utils/hooks/usePopupOpenState';
 import {bytesToGB} from '../../utils/utils';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
@@ -63,46 +64,29 @@ export const preparePDiskData = (data: PreparedPDisk, nodeHost?: string) => {
 
 interface PDiskPopupProps extends PopupProps {
     data: PreparedPDisk;
+    hidePopup?: VoidFunction;
 }
 
-export const PDiskPopup = ({data, ...props}: PDiskPopupProps) => {
+export const PDiskPopup = ({data, hidePopup, ...props}: PDiskPopupProps) => {
     const nodeHostsMap = useTypedSelector(selectNodeHostsMap);
     const nodeHost = valueIsDefined(data.NodeId) ? nodeHostsMap?.get(data.NodeId) : undefined;
     const info = React.useMemo(() => preparePDiskData(data, nodeHost), [data, nodeHost]);
 
-    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
-    const [isFocused, setIsFocused] = React.useState(false);
-
-    const onMouseLeave = React.useCallback(() => {
-        setIsPopupContentHovered(false);
-    }, []);
-
-    const onMouseEnter = React.useCallback(() => {
-        setIsPopupContentHovered(true);
-    }, []);
-
-    const onContextMenu = React.useCallback(() => {
-        setIsFocused(true);
-    }, []);
-
-    const onBlur = React.useCallback(() => {
-        setIsFocused(false);
-    }, []);
+    const {open, onMouseEnter, onMouseLeave, onContextMenu, onBlur, onEscapeKeyDown} =
+        usePopupOpenState(hidePopup);
 
     return (
         <Popup
             contentClassName={b()}
             placement={['top', 'bottom']}
             hasArrow
-            // bigger offset for easier switching to neighbour nodes
-            // matches the default offset for popup with arrow out of a sense of beauty
             offset={[0, 12]}
             onMouseLeave={onMouseLeave}
             onMouseEnter={onMouseEnter}
-            onEscapeKeyDown={onBlur}
+            onEscapeKeyDown={onEscapeKeyDown}
             onBlur={onBlur}
             {...props}
-            open={isPopupContentHovered || props.open || isFocused}
+            open={open || props.open}
         >
             <div onContextMenu={onContextMenu}>
                 <InfoViewer title="PDisk" info={info} size="s" />

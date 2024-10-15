@@ -1,9 +1,8 @@
 import React from 'react';
 
-import {debounce} from 'lodash';
-
 import {cn} from '../../utils/cn';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import {usePopupAnchor} from '../../utils/hooks/usePopupAnchor';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {InternalLink} from '../InternalLink';
 import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
@@ -13,8 +12,6 @@ import {getVDiskLink} from './utils';
 import './VDisk.scss';
 
 const b = cn('ydb-vdisk-component');
-
-const DEBOUNCE_TIMEOUT = 100;
 
 export interface VDiskProps {
     data?: PreparedVDisk;
@@ -35,19 +32,10 @@ export const VDisk = ({
     onHidePopup,
     progressBarClassName,
 }: VDiskProps) => {
-    const [isPopupVisible, setIsPopupVisible] = React.useState(false);
-
-    const anchor = React.useRef(null);
-
-    const debouncedHandleShowPopup = debounce(() => {
-        setIsPopupVisible(true);
-        onShowPopup?.();
-    }, DEBOUNCE_TIMEOUT);
-
-    const debouncedHandleHidePopup = debounce(() => {
-        setIsPopupVisible(false);
-        onHidePopup?.();
-    }, DEBOUNCE_TIMEOUT);
+    const {isPopupVisible, anchor, onMouseEnter, onMouseLeave, hidePopup} = usePopupAnchor(
+        onShowPopup,
+        onHidePopup,
+    );
 
     const vDiskPath = getVDiskLink(data);
 
@@ -56,11 +44,8 @@ export const VDisk = ({
             <div
                 className={b()}
                 ref={anchor}
-                onMouseEnter={debouncedHandleShowPopup}
-                onMouseLeave={() => {
-                    debouncedHandleShowPopup.cancel();
-                    debouncedHandleHidePopup();
-                }}
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}
             >
                 <InternalLink to={vDiskPath} className={b('content')}>
                     <DiskStateProgressBar
@@ -72,7 +57,12 @@ export const VDisk = ({
                     />
                 </InternalLink>
             </div>
-            <VDiskPopup data={data} anchorRef={anchor} open={isPopupVisible || showPopup} />
+            <VDiskPopup
+                data={data}
+                anchorRef={anchor}
+                open={isPopupVisible || showPopup}
+                hidePopup={hidePopup}
+            />
         </React.Fragment>
     );
 };
