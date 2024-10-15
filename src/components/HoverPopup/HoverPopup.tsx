@@ -9,11 +9,14 @@ import './HoverPopup.scss';
 
 const b = cn('hover-popup');
 
+const DEBOUNCE_TIMEOUT = 100;
+
 interface HoverPopupProps {
     children: React.ReactNode;
     popupContent: React.ReactNode;
     showPopup?: boolean;
     offset?: [number, number];
+    anchorRef?: React.RefObject<HTMLElement>;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
 }
@@ -23,13 +26,12 @@ export const HoverPopup = ({
     popupContent,
     showPopup,
     offset,
+    anchorRef,
     onShowPopup,
     onHidePopup,
 }: HoverPopupProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
     const anchor = React.useRef<HTMLDivElement>(null);
-
-    const DEBOUNCE_TIMEOUT = 100;
 
     const debouncedHandleShowPopup = React.useMemo(
         () =>
@@ -91,7 +93,7 @@ export const HoverPopup = ({
             </div>
             <Popup
                 contentClassName={b()}
-                anchorRef={anchor}
+                anchorRef={anchorRef || anchor}
                 open={open}
                 onMouseEnter={onPopupMouseEnter}
                 onMouseLeave={onPopupMouseLeave}

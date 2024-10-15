@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
@@ -38,6 +40,8 @@ export const PDisk = ({
     const {NodeId, PDiskId} = data;
     const pDiskIdsDefined = valueIsDefined(NodeId) && valueIsDefined(PDiskId);
 
+    const anchorRef = React.useRef<HTMLDivElement>(null);
+
     const renderVDisks = () => {
         if (!vDisks?.length) {
             return null;
@@ -69,14 +73,14 @@ export const PDisk = ({
     }
 
     return (
-        <div className={b(null, className)}>
+        <div className={b(null, className)} ref={anchorRef}>
             {renderVDisks()}
             <HoverPopup
                 showPopup={showPopup}
+                anchorRef={anchorRef}
                 onShowPopup={onShowPopup}
                 onHidePopup={onHidePopup}
                 popupContent={<PDiskPopup data={data} />}
-                offset={vDisks?.length ? [0, 28] : undefined}
             >
                 <InternalLink to={pDiskPath} className={b('content')}>
                     <DiskStateProgressBar
