@@ -51,8 +51,6 @@ function getColumns({database}: {database?: string}) {
                 }
 
                 const tabletPath = getTabletPagePath(row.TabletId, {
-                    nodeId: row.NodeId,
-                    type: row.Type,
                     tenantName: database,
                 });
 

@@ -41,7 +41,7 @@ export interface VDiskBreadcrumbsOptions extends PDiskBreadcrumbsOptions {
     vDiskSlotId?: string | number;
 }
 
-export interface TabletBreadcrumbsOptions extends NodeBreadcrumbsOptions {
+export interface TabletBreadcrumbsOptions extends TenantBreadcrumbsOptions {
     tabletId?: string;
     tabletType?: EType;
 }
