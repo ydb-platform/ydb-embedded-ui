@@ -1,24 +1,15 @@
 import React from 'react';
 
-import type {PopupProps} from '@gravity-ui/uikit';
-import {Popup} from '@gravity-ui/uikit';
-
 import {selectNodeHostsMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
-import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {getPDiskId} from '../../utils/disks/helpers';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
-import {usePopupOpenState} from '../../utils/hooks/usePopupOpenState';
 import {bytesToGB} from '../../utils/utils';
-import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
-
-import './PDiskPopup.scss';
-
-const b = cn('pdisk-storage-popup');
+import type {InfoViewerItem} from '../InfoViewer';
 
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
@@ -62,35 +53,14 @@ export const preparePDiskData = (data: PreparedPDisk, nodeHost?: string) => {
     return pdiskData;
 };
 
-interface PDiskPopupProps extends PopupProps {
+interface PDiskPopupProps {
     data: PreparedPDisk;
-    hidePopup?: VoidFunction;
 }
 
-export const PDiskPopup = ({data, hidePopup, ...props}: PDiskPopupProps) => {
+export const PDiskPopup = ({data}: PDiskPopupProps) => {
     const nodeHostsMap = useTypedSelector(selectNodeHostsMap);
     const nodeHost = valueIsDefined(data.NodeId) ? nodeHostsMap?.get(data.NodeId) : undefined;
     const info = React.useMemo(() => preparePDiskData(data, nodeHost), [data, nodeHost]);
 
-    const {open, onMouseEnter, onMouseLeave, onContextMenu, onBlur, onEscapeKeyDown} =
-        usePopupOpenState(hidePopup);
-
-    return (
-        <Popup
-            contentClassName={b()}
-            placement={['top', 'bottom']}
-            hasArrow
-            offset={[0, 12]}
-            onMouseLeave={onMouseLeave}
-            onMouseEnter={onMouseEnter}
-            onEscapeKeyDown={onEscapeKeyDown}
-            onBlur={onBlur}
-            {...props}
-            open={open || props.open}
-        >
-            <div onContextMenu={onContextMenu}>
-                <InfoViewer title="PDisk" info={info} size="s" />
-            </div>
-        </Popup>
-    );
+    return <InfoViewer title="PDisk" info={info} size="s" />;
 };

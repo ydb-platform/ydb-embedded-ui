@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type {PopupProps} from '@gravity-ui/uikit';
-import {Label, Popup} from '@gravity-ui/uikit';
+import {Label} from '@gravity-ui/uikit';
 
 import {selectNodeHostsMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
@@ -12,7 +11,6 @@ import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
-import {usePopupOpenState} from '../../utils/hooks/usePopupOpenState';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
@@ -131,16 +129,12 @@ const prepareVDiskData = (data: PreparedVDisk) => {
     return vdiskData;
 };
 
-interface VDiskPopupProps extends PopupProps {
+interface VDiskPopupProps {
     data: PreparedVDisk | UnavailableDonor;
-    hidePopup?: VoidFunction;
 }
 
-export const VDiskPopup = ({data, hidePopup, ...props}: VDiskPopupProps) => {
+export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
-
-    const {open, onMouseEnter, onMouseLeave, onContextMenu, onBlur, onEscapeKeyDown} =
-        usePopupOpenState(hidePopup);
 
     const vdiskInfo = React.useMemo(
         () => (isFullData ? prepareVDiskData(data) : prepareUnavailableVDiskData(data)),
@@ -179,26 +173,11 @@ export const VDiskPopup = ({data, hidePopup, ...props}: VDiskPopupProps) => {
     }
 
     return (
-        <Popup
-            contentClassName={b()}
-            placement={['top', 'bottom']}
-            hasArrow
-            // bigger offset for easier switching to neighbour nodes
-            // matches the default offset for popup with arrow out of a sense of beauty
-            offset={[0, 12]}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-            onEscapeKeyDown={onEscapeKeyDown}
-            onBlur={onBlur}
-            {...props}
-            open={open || props.open}
-        >
-            <div onContextMenu={onContextMenu}>
-                {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
-                <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
-                {pdiskInfo && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
-                {donorsInfo.length > 0 && <InfoViewer title="Donors" info={donorsInfo} size="s" />}
-            </div>
-        </Popup>
+        <div className={b()}>
+            {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
+            <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
+            {pdiskInfo && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
+            {donorsInfo.length > 0 && <InfoViewer title="Donors" info={donorsInfo} size="s" />}
+        </div>
     );
 };

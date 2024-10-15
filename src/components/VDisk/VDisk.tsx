@@ -1,9 +1,7 @@
-import React from 'react';
-
 import {cn} from '../../utils/cn';
 import type {PreparedVDisk} from '../../utils/disks/types';
-import {usePopupAnchor} from '../../utils/hooks/usePopupAnchor';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
+import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
 import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
 
@@ -32,21 +30,16 @@ export const VDisk = ({
     onHidePopup,
     progressBarClassName,
 }: VDiskProps) => {
-    const {isPopupVisible, anchor, onMouseEnter, onMouseLeave, hidePopup} = usePopupAnchor(
-        onShowPopup,
-        onHidePopup,
-    );
-
     const vDiskPath = getVDiskLink(data);
 
     return (
-        <React.Fragment>
-            <div
-                className={b()}
-                ref={anchor}
-                onMouseEnter={onMouseEnter}
-                onMouseLeave={onMouseLeave}
-            >
+        <HoverPopup
+            showPopup={showPopup}
+            onShowPopup={onShowPopup}
+            onHidePopup={onHidePopup}
+            popupContent={<VDiskPopup data={data} />}
+        >
+            <div className={b()}>
                 <InternalLink to={vDiskPath} className={b('content')}>
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}
@@ -57,12 +50,6 @@ export const VDisk = ({
                     />
                 </InternalLink>
             </div>
-            <VDiskPopup
-                data={data}
-                anchorRef={anchor}
-                open={isPopupVisible || showPopup}
-                hidePopup={hidePopup}
-            />
-        </React.Fragment>
+        </HoverPopup>
     );
 };
