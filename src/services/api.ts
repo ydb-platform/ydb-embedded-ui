@@ -467,7 +467,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getTablet(
-        {id, database, nodeId}: {id: string; database?: string; nodeId?: string},
+        {id, database}: {id: string; database?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TEvTabletStateResponse>(
@@ -475,7 +475,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             {
                 enums: true,
                 database,
-                node_id: nodeId,
                 filter: `(TabletId=${id})`,
             },
             {
@@ -485,7 +484,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getTabletHistory(
-        {id, database, nodeId}: {id: string; database?: string; nodeId?: string},
+        {id, database}: {id: string; database?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<UnmergedTEvTabletStateResponse>(
@@ -494,7 +493,6 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 enums: true,
                 merge: false,
                 database,
-                node_id: nodeId,
                 filter: `(TabletId=${id})`,
             },
             {

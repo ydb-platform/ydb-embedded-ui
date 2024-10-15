@@ -178,9 +178,11 @@ const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions>
 };
 
 const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options, query = {}) => {
-    const {tabletId, tabletType, nodeId, nodeRole, nodeActiveTab = TABLETS, tenantName} = options;
+    const {tabletId, tabletType, tenantName} = options;
 
-    const breadcrumbs = getNodeBreadcrumbs({nodeId, nodeRole, nodeActiveTab, tenantName}, query);
+    const breadcrumbs = tenantName
+        ? getTenantBreadcrumbs(options, query)
+        : getClusterBreadcrumbs(options, query);
 
     const lastItem = {
         text: tabletId || headerKeyset('breadcrumbs.tablet'),
