@@ -7,6 +7,7 @@ import {DeveloperUILinkButton} from '../../components/DeveloperUILinkButton/Deve
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
+import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TabletState} from '../../components/TabletState/TabletState';
 import {getTabletPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
@@ -168,9 +169,13 @@ interface TabletsTableProps {
         fqdn?: string;
     })[];
     className?: string;
+    loading?: boolean;
 }
 
-export function TabletsTable({database, tablets, className}: TabletsTableProps) {
+export function TabletsTable({database, tablets, className, loading}: TabletsTableProps) {
+    if (loading) {
+        return <TableSkeleton />;
+    }
     return (
         <ResizeableDataTable
             wrapperClassName={className}
