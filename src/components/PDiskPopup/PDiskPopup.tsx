@@ -99,6 +99,7 @@ export const PDiskPopup = ({data, ...props}: PDiskPopupProps) => {
             offset={[0, 12]}
             onMouseLeave={onMouseLeave}
             onMouseEnter={onMouseEnter}
+            onEscapeKeyDown={onBlur}
             onBlur={onBlur}
             {...props}
             open={isPopupContentHovered || props.open || isFocused}

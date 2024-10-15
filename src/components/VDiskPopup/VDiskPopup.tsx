@@ -202,6 +202,7 @@ export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
             offset={[0, 12]}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onEscapeKeyDown={onBlur}
             onBlur={onBlur}
             {...props}
             open={isPopupContentHovered || props.open || isFocused}
