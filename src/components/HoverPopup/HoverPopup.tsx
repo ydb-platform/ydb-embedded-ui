@@ -97,6 +97,8 @@ export const HoverPopup = ({
                 onBlur={onPopupBlur}
                 placement={['top', 'bottom']}
                 hasArrow
+                // bigger offset for easier switching to neighbour nodes
+                // matches the default offset for popup with arrow out of a sense of beauty
                 offset={[0, 12]}
             >
                 <div onContextMenu={onPopupContextMenu}>{popupContent}</div>
