@@ -50,6 +50,8 @@ export const PDisk = ({
                         key={vdisk.StringifiedId}
                         className={b('vdisks-item')}
                         style={{
+                            // 1 is small enough for empty disks to be of the minimum width
+                            // but if all of them are empty, `flex-grow: 1` would size them evenly
                             flexGrow: Number(vdisk.AllocatedSize) || 1,
                         }}
                     >
