@@ -3,7 +3,7 @@ import type {Column} from '@gravity-ui/react-data-table';
 export interface SchemaData {
     id?: number;
     name?: string;
-    isKeyColumn?: boolean;
+    keyColumnIndex?: number;
     isPartitioningKeyColumn?: boolean;
     type?: string;
     notNull?: boolean;
