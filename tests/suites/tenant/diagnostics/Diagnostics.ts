@@ -88,15 +88,15 @@ export class Table {
     }
 
     async waitForCellValueByHeader(row: number, header: string, value: string) {
-        const headers = await this.getHeaders();
-        const colIndex = headers.indexOf(header);
-        if (colIndex === -1) {
-            throw new Error(`Header "${header}" not found`);
-        }
-        const cell = this.table.locator(
-            `tr.data-table__row:nth-child(${row}) td:nth-child(${colIndex + 1})`,
-        );
         await retryAction(async () => {
+            const headers = await this.getHeaders();
+            const colIndex = headers.indexOf(header);
+            if (colIndex === -1) {
+                throw new Error(`Header "${header}" not found`);
+            }
+            const cell = this.table.locator(
+                `tr.data-table__row:nth-child(${row}) td:nth-child(${colIndex + 1})`,
+            );
             const cellValue = (await cell.innerText()).trim();
             if (cellValue === value) {
                 return true;

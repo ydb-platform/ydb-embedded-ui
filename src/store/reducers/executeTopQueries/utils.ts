@@ -37,7 +37,9 @@ export function getFiltersConditions(path: string, filters?: TopQueriesFilters) 
     }
 
     if (filters?.text) {
-        conditions.push(`QueryText ILIKE '%${filters.text}%'`);
+        conditions.push(
+            `(QueryText ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%')`,
+        );
     }
 
     return conditions.join(' AND ');
