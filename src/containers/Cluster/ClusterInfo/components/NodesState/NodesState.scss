@@ -5,11 +5,12 @@
     justify-content: center;
     align-items: center;
 
-    min-width: 30px;
+    width: max-content;
+    min-width: 26px;
+    height: 20px;
     padding: 0 var(--g-spacing-1);
 
     color: var(--entity-state-font-color);
-    border: 1px solid var(--entity-state-border-color);
     border-radius: var(--g-spacing-1);
     background-color: var(--entity-state-background-color);
     @include entity-state-colors();
