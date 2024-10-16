@@ -8,6 +8,8 @@ export interface TIndexDescription {
 
     KeyColumnNames?: string[];
 
+    KeyColumnIds?: number[];
+
     /** uint64 */
     SchemaVersion?: string;
 

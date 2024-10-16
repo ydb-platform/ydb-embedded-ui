@@ -75,6 +75,7 @@ interface TTtl {
 interface TColumnTableSchema {
     Columns?: TOlapColumnDescription[];
     KeyColumnNames?: string[];
+    KeyColumnIds?: number[];
     Engine?: EColumnTableEngine;
     NextColumnId?: number;
 
