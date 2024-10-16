@@ -11,6 +11,7 @@ import {InternalLink} from '../../components/InternalLink';
 import routes, {getLocationObjectFromHref} from '../../routes';
 import {
     clusterApi,
+    selectClusterTabletsWithFqdn,
     selectClusterTitle,
     updateDefaultClusterTab,
 } from '../../store/reducers/cluster/cluster';
@@ -73,6 +74,10 @@ export function Cluster({
     } = clusterApi.useGetClusterInfoQuery(clusterName ?? undefined);
 
     const clusterError = error && typeof error === 'object' ? error : undefined;
+
+    const clusterTablets = useTypedSelector((state) =>
+        selectClusterTabletsWithFqdn(state, clusterName ?? undefined),
+    );
 
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('cluster', {}));
@@ -162,7 +167,8 @@ export function Cluster({
                     <div className={b('tablets')}>
                         <div className={b('fake-block')} />
                         <TabletsTable
-                            tablets={cluster.SystemTablets ?? []}
+                            loading={infoLoading}
+                            tablets={clusterTablets}
                             className={b('tablets-table')}
                         />
                     </div>
