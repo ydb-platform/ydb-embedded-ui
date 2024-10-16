@@ -31,6 +31,7 @@ import {TabletsTable} from '../Tablets/TabletsTable';
 import {Tenants} from '../Tenants/Tenants';
 import {Versions} from '../Versions/Versions';
 
+import {ClusterDashboard} from './ClusterDashboard/ClusterDashboard';
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';
 import type {ClusterTab} from './utils';
 import {clusterTabs, clusterTabsIds, getClusterPath, isClusterTab} from './utils';
@@ -119,7 +120,11 @@ export function Cluster({
                 {activeTab ? <title>{activeTab.title}</title> : null}
             </Helmet>
             <div className={b('header')}>{getClusterTitle()}</div>
-            <div className={b('tabs')}>
+            <div className={b('sticky-wrapper')}>
+                <AutoRefreshControl className={b('auto-refresh-control')} />
+            </div>
+            <ClusterDashboard cluster={cluster} groupStats={groupsStats} loading={infoLoading} />
+            <div className={b('tabs-sticky-wrapper')}>
                 <Tabs
                     size="l"
                     allowNotSelected={true}
@@ -141,9 +146,6 @@ export function Cluster({
                     }}
                 />
             </div>
-            <div className={b('sticky-wrapper')}>
-                <AutoRefreshControl className={b('auto-refresh-control')} />
-            </div>
             <Switch>
                 <Route
                     path={
@@ -152,7 +154,6 @@ export function Cluster({
                 >
                     <ClusterInfo
                         cluster={cluster}
-                        groupsStats={groupsStats}
                         versionToColor={versionToColor}
                         loading={infoLoading}
                         error={clusterError}

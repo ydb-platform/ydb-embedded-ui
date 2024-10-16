@@ -4,19 +4,18 @@
   "allocated": "Allocated",
   "available": "Available",
   "usage": "Usage",
-  "dc": "DC",
-  "tablets": "Tablets",
-  "databases": "Databases",
-  "nodes": "Nodes",
-  "nodes-state": "Nodes state",
-  "load": "Load",
+  "label_nodes-state": "Nodes state",
+  "label_dc": "Nodes data centers",
   "storage-size": "Storage size",
   "storage-groups": "Storage groups, {{diskType}}",
   "links": "Links",
-  "versions": "Versions",
-  "quantity": {
-    "one": "{{count}} node",
-    "other": "{{count}} nodes",
-    "zero": "no nodes"
-  }
+  "context_cores": "cores",
+  "title_cpu": "CPU",
+  "title_storage": "Storage",
+  "title_memory": "Memory",
+  "label_nodes": "Nodes",
+  "label_hosts": "Hosts",
+  "label_storage-groups": "Storage groups",
+  "label_databases": "Databases",
+  "label_load": "Load"
 }

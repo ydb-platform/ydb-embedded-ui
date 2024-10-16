@@ -84,8 +84,8 @@ const formatToSize = ({value, size = 'mb', precision = 0}: FormatToSizeArgs) => 
     return formatNumber(result);
 };
 
-const addSizeLabel = (result: string, size: BytesSizes) => {
-    return result + ` ${sizes[size].label}`;
+const addSizeLabel = (result: string, size: BytesSizes, delimiter = '\xa0') => {
+    return result + delimiter + sizes[size].label;
 };
 
 const addSpeedLabel = (result: string, size: BytesSizes) => {
@@ -97,6 +97,7 @@ export type FormatBytesArgs = Omit<FormatToSizeArgs, 'value'> & {
     withSpeedLabel?: boolean;
     withSizeLabel?: boolean;
     significantDigits?: number;
+    delimiter?: string;
 };
 
 /**
@@ -108,6 +109,7 @@ export const formatBytes = ({
     withSpeedLabel = false,
     withSizeLabel = true,
     significantDigits = 0,
+    delimiter,
     ...params
 }: FormatBytesArgs) => {
     if (!isNumeric(value)) {
@@ -125,7 +127,7 @@ export const formatBytes = ({
     }
 
     if (withSizeLabel) {
-        return addSizeLabel(result, sizeToConvert);
+        return addSizeLabel(result, sizeToConvert, delimiter);
     }
 
     return result;

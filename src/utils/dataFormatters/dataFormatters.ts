@@ -52,7 +52,12 @@ export const formatMsToUptime = (ms?: number) => {
     return ms && formatUptime(ms / 1000);
 };
 
-export const formatStorageValues = (value?: number, total?: number, size?: BytesSizes) => {
+export const formatStorageValues = (
+    value?: number,
+    total?: number,
+    size?: BytesSizes,
+    delimiter?: string,
+) => {
     let calculatedSize = getSizeWithSignificantDigits(Number(value), 0);
     let valueWithSizeLabel = true;
     let valuePrecision = 0;
@@ -63,13 +68,28 @@ export const formatStorageValues = (value?: number, total?: number, size?: Bytes
         valuePrecision = 1;
     }
 
-    const formattedValue = formatBytesCustom({
+    let formattedValue = formatBytesCustom({
         value,
         withSizeLabel: valueWithSizeLabel,
         size: size || calculatedSize,
         precision: valuePrecision,
     });
-    const formattedTotal = formatBytesCustom({value: total, size: size || calculatedSize});
+    if (value && value > 0) {
+        while (formattedValue === '0') {
+            valuePrecision += 1;
+            formattedValue = formatBytesCustom({
+                value,
+                withSizeLabel: valueWithSizeLabel,
+                size: size || calculatedSize,
+                precision: valuePrecision,
+            });
+        }
+    }
+    const formattedTotal = formatBytesCustom({
+        value: total,
+        size: size || calculatedSize,
+        delimiter,
+    });
 
     return [formattedValue, formattedTotal];
 };
@@ -89,6 +109,21 @@ export const formatNumber = (number?: unknown) => {
 
     // "," in format is delimiter sign, not delimiter itself
     return configuredNumeral(number).format('0,0.[00000]');
+};
+export const formatNumberCustom = (number?: number) => {
+    return configuredNumeral(number).format('0.[0]a');
+};
+export const formatPercent = (number?: unknown) => {
+    if (!isNumeric(number)) {
+        return '';
+    }
+    const configuredNumber = configuredNumeral(number);
+    const numberValue = configuredNumber.value();
+    let format = '0.[0]%';
+    if (numberValue && numberValue < 0.001) {
+        format = '0.[00]%';
+    }
+    return configuredNumber.format(format);
 };
 
 export const formatSecondsToHours = (seconds: number) => {
