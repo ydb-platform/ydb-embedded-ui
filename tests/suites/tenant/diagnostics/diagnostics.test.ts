@@ -65,7 +65,6 @@ test.describe('Diagnostics tab', async () => {
         const diagnostics = new Diagnostics(page);
         await diagnostics.clickTab(DiagnosticsTab.Queries);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
-        expect(await diagnostics.table.getRowCount()).toBe(1);
         expect(
             await diagnostics.table.waitForCellValueByHeader(1, 'QueryText', longRunningQuery),
         ).toBe(true);

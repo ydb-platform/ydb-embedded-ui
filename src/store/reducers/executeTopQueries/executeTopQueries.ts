@@ -94,10 +94,11 @@ export const topQueriesApi = api.injectEndpoints({
                 {signal},
             ) => {
                 try {
-                    const filterConditions = filters?.text ? `Query ILIKE '%${filters.text}%'` : '';
-                    const commonQueryPart = `SELECT UserSID, QueryStartAt, Query as QueryText, ApplicationName from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'}`;
+                    const filterConditions = filters?.text
+                        ? `Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%'`
+                        : '';
 
-                    const queryText = `${commonQueryPart} AND Query NOT LIKE '${commonQueryPart}%' ORDER BY SessionStartAt limit 100`;
+                    const queryText = `SELECT UserSID, QueryStartAt, Query as QueryText, ApplicationName from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'}  ORDER BY SessionStartAt limit 100`;
 
                     const response = await window.api.sendQuery(
                         {
@@ -113,6 +114,13 @@ export const topQueriesApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
+
+                    /* filter running queries query itself */
+                    if (data?.resultSets?.[0]?.result) {
+                        data.resultSets[0].result = data.resultSets[0].result.filter(
+                            (item) => item.QueryText !== queryText,
+                        );
+                    }
 
                     return {data};
                 } catch (error) {
