@@ -14,8 +14,6 @@ import i18n from './i18n';
 import {b} from './shared';
 import {useOperationsQueryParams} from './useOperationsQueryParams';
 
-import './Operations.scss';
-
 interface OperationsProps {
     database: string;
 }

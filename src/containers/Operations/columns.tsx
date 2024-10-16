@@ -2,7 +2,7 @@ import {duration} from '@gravity-ui/date-utils';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {Text} from '@gravity-ui/uikit';
 
-import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
+import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
 import type {TOperation} from '../../types/api/operationList';
 import {EStatusCode} from '../../types/api/operationList';
 import {EMPTY_DATA_PLACEHOLDER, HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
@@ -17,12 +17,16 @@ export function getColumns(): DataTableColumn<TOperation>[] {
         {
             name: COLUMNS_NAMES.ID,
             header: COLUMNS_TITLES[COLUMNS_NAMES.ID],
-            width: 220,
+            width: 340,
             render: ({row}) => {
                 if (!row.id) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                return <EntityStatus name={row.id} showStatus={false} />;
+                return (
+                    <CellWithPopover placement={['top', 'bottom']} content={row.id}>
+                        {row.id}
+                    </CellWithPopover>
+                );
             },
         },
         {

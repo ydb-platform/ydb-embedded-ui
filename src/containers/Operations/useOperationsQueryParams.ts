@@ -3,9 +3,7 @@ import {z} from 'zod';
 
 import type {OperationKind} from '../../types/api/operationList';
 
-const operationKindSchema = z
-    .enum(['ss/backgrounds', 'import', 'export', 'buildindex', 'scriptexec'])
-    .catch('ss/backgrounds');
+const operationKindSchema = z.enum(['ss/backgrounds', 'export', 'buildindex']).catch('buildindex');
 
 export function useOperationsQueryParams() {
     const [queryParams, setQueryParams] = useQueryParams({
