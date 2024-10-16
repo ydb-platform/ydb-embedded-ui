@@ -4,6 +4,8 @@ import {Button, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 
+import i18n from './i18n';
+
 import './DeveloperUILinkButton.scss';
 
 const b = cn('developer-ui-link-button');
@@ -30,7 +32,13 @@ export function DeveloperUILinkButton({
     size = 's',
 }: DeveloperUiLinkProps) {
     return (
-        <Button size={size} href={href} className={b({visible}, className)} target="_blank">
+        <Button
+            size={size}
+            href={href}
+            className={b({visible}, className)}
+            target="_blank"
+            title={i18n('action_go-to', {href})}
+        >
             <Icon data={ArrowUpRightFromSquare} size={buttonSizeToIconSize[size]} />
         </Button>
     );

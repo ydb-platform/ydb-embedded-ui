@@ -16,16 +16,9 @@
     }
 
     &__clipboard-button {
-        display: flex;
-        flex-shrink: 0;
-
-        opacity: 0;
         color: var(--g-color-text-secondary);
 
-        &_visible,
-        &:focus-visible {
-            opacity: 1;
-        }
+        @include table-hover-appearing-button();
     }
 
     &__controls-wrapper {
@@ -41,6 +34,13 @@
         height: 100%;
 
         background-color: var(--g-color-base-float);
+
+        .data-table__row:hover &,
+        .ydb-paginated-table__row:hover &,
+        .ydb-tree-view__item & {
+            width: min-content;
+            padding: var(--g-spacing-1);
+        }
     }
 
     &__label {

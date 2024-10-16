@@ -89,21 +89,6 @@ body,
     color: var(--g-color-text-danger);
 }
 
-.data-table__row,
-.ydb-paginated-table__row,
-.ydb-tree-view__item {
-    &:hover {
-        & .entity-status__clipboard-button,
-        .ydb-versions-nodes-tree-title__clipboard-button {
-            opacity: 1;
-        }
-        & .entity-status__controls-wrapper {
-            width: min-content;
-            padding: var(--g-spacing-1);
-        }
-    }
-}
-
 .g-root .data-table_highlight-rows .data-table__row:hover {
     background: var(--ydb-data-table-color-hover);
 }
