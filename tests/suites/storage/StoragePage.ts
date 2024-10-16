@@ -2,6 +2,7 @@ import type {Locator, Page} from '@playwright/test';
 
 import {PageModel} from '../../models/PageModel';
 import {storagePage} from '../../utils/constants';
+import {selectContentTable} from '../../utils/selectContentTable';
 
 type EntityType = 'Groups' | 'Nodes';
 
@@ -14,7 +15,7 @@ export class StoragePage extends PageModel {
     constructor(page: Page) {
         super(page, storagePage);
 
-        this.table = this.selector.locator('.ydb-paginated-table__table');
+        this.table = selectContentTable(this.selector);
 
         this.entityTypeSelector = this.selector.getByTestId(storageTypeFilterQa);
     }
