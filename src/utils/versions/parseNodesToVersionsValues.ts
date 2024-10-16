@@ -63,6 +63,7 @@ function normalizeResult(data: VersionValue[]) {
         }
     });
     const result = [...data];
+    //Progress breakes if sum of values more than 100, so we need to subtrackt difference appeared because of MIN_VALUE from the biggest value in set
     result[maximumIndex] = {...data[maximumIndex], value: maximum + 100 - total};
     return result;
 }
