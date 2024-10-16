@@ -24,7 +24,7 @@ interface Props {
 export const RunningQueriesData = ({database, onRowClick, rowClassName}: Props) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
-    const {currentData, isFetching, error} = topQueriesApi.useGetRunningQueriesQuery(
+    const {currentData, isLoading, error} = topQueriesApi.useGetRunningQueriesQuery(
         {
             database,
             filters,
@@ -41,7 +41,7 @@ export const RunningQueriesData = ({database, onRowClick, rowClassName}: Props) 
     return (
         <React.Fragment>
             {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
-            <TableWithControlsLayout.Table loading={isFetching && !data.length}>
+            <TableWithControlsLayout.Table loading={isLoading}>
                 <ResizeableDataTable
                     emptyDataMessage={i18n('no-data')}
                     columnsWidthLSKey={RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY}

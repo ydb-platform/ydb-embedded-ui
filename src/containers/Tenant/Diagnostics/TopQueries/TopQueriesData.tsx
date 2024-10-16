@@ -22,7 +22,7 @@ interface Props {
 export const TopQueriesData = ({database, onRowClick, rowClassName}: Props) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
-    const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
+    const {currentData, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
         {
             database,
             filters,
@@ -44,7 +44,7 @@ export const TopQueriesData = ({database, onRowClick, rowClassName}: Props) => {
     return (
         <React.Fragment>
             {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
-            <TableWithControlsLayout.Table loading={isFetching && currentData === undefined}>
+            <TableWithControlsLayout.Table loading={isLoading}>
                 <ResizeableDataTable
                     emptyDataMessage={i18n('no-data')}
                     columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
