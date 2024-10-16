@@ -1,3 +1,5 @@
+import type {Column} from '@gravity-ui/react-data-table';
+
 import {
     getHostColumn,
     getLoadColumn,
@@ -5,7 +7,7 @@ import {
     getVersionColumn,
 } from '../../../../../components/nodesColumns/columns';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../../components/nodesColumns/constants';
-import type {Column, GetNodesColumnsParams} from '../../../../../components/nodesColumns/types';
+import type {GetNodesColumnsParams} from '../../../../../components/nodesColumns/types';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
 import type {NodesPreparedEntity} from '../../../../../store/reducers/nodes/types';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';

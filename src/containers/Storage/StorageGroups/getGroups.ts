@@ -6,15 +6,20 @@ import type {
     PreparedStorageGroup,
     PreparedStorageGroupFilters,
 } from '../../../store/reducers/storage/types';
+import type {GroupsRequiredField} from '../../../types/api/storage';
 import {prepareSortValue} from '../../../utils/filters';
 import {isSortableStorageProperty} from '../../../utils/storage';
 
-type GetStorageGroups = FetchData<PreparedStorageGroup, PreparedStorageGroupFilters>;
+type GetStorageGroups = FetchData<
+    PreparedStorageGroup,
+    PreparedStorageGroupFilters,
+    GroupsRequiredField
+>;
 
 export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
     const fetchData: GetStorageGroups = React.useCallback(
         async (params) => {
-            const {limit, offset, sortParams, filters} = params;
+            const {limit, offset, sortParams, filters, dataFieldsRequired} = params;
             const {sortOrder, columnId} = sortParams ?? {};
             const {
                 searchValue,
@@ -43,6 +48,7 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
                 pDiskId,
                 filter_group: filterGroup,
                 filter_group_by: filterGroupBy,
+                fieldsRequired: dataFieldsRequired,
                 shouldUseGroupsHandler,
             });
 

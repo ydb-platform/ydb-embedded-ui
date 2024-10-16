@@ -7,6 +7,7 @@ import {valueIsDefined} from '../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {getSpaceUsageSeverity} from '../../utils/storage';
+import type {Column} from '../../utils/tableUtils/types';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
 import type {NodeHostData} from '../NodeHostWrapper/NodeHostWrapper';
@@ -16,7 +17,7 @@ import {TabletsStatistic} from '../TabletsStatistic';
 import {UsageLabel} from '../UsageLabel/UsageLabel';
 
 import {NODES_COLUMNS_IDS, NODES_COLUMNS_TITLES} from './constants';
-import type {Column, GetNodesColumnsParams} from './types';
+import type {GetNodesColumnsParams} from './types';
 
 export function getNodeIdColumn<T extends {NodeId?: string | number}>(): Column<T> {
     return {

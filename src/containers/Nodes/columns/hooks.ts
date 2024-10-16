@@ -1,8 +1,12 @@
 import React from 'react';
 
-import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
+import {
+    NODES_COLUMNS_TITLES,
+    NODES_COLUMNS_TO_DATA_FIELDS,
+} from '../../../components/nodesColumns/constants';
 import type {GetNodesColumnsParams} from '../../../components/nodesColumns/types';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
+import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
 
 import {getNodesColumns} from './columns';
 import {
@@ -16,11 +20,22 @@ export function useNodesSelectedColumns(params: GetNodesColumnsParams) {
         return getNodesColumns(params);
     }, [params]);
 
-    return useSelectedColumns(
+    const {columnsToSelect, columnsToShow, setColumns} = useSelectedColumns(
         columns,
         NODES_TABLE_SELECTED_COLUMNS_LS_KEY,
         NODES_COLUMNS_TITLES,
         DEFAULT_NODES_COLUMNS,
         REQUIRED_NODES_COLUMNS,
     );
+
+    const dataFieldsRequired = React.useMemo(() => {
+        return getRequiredDataFields(columnsToShow, NODES_COLUMNS_TO_DATA_FIELDS);
+    }, [columnsToShow]);
+
+    return {
+        columnsToSelect,
+        columnsToShow,
+        setColumns,
+        dataFieldsRequired,
+    };
 }

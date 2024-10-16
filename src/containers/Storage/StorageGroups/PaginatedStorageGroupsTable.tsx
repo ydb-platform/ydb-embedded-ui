@@ -9,7 +9,7 @@ import {
 } from '../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
-import type {GroupsGroupByField} from '../../../types/api/storage';
+import type {GroupsGroupByField, GroupsRequiredField} from '../../../types/api/storage';
 
 import {StorageGroupsEmptyDataMessage} from './StorageGroupsEmptyDataMessage';
 import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
@@ -28,6 +28,8 @@ interface PaginatedStorageGroupsTableProps {
     filterGroup?: string;
     filterGroupBy?: GroupsGroupByField;
 
+    dataFieldsRequired?: GroupsRequiredField[];
+
     searchValue: string;
     visibleEntities: VisibleEntities;
     onShowAll: VoidFunction;
@@ -44,6 +46,7 @@ export const PaginatedStorageGroupsTable = ({
     nodeId,
     groupId,
     pDiskId,
+    dataFieldsRequired,
     filterGroup,
     filterGroupBy,
     searchValue,
@@ -107,6 +110,7 @@ export const PaginatedStorageGroupsTable = ({
                 renderErrorMessage={renderErrorMessage}
                 renderEmptyDataMessage={renderEmptyDataMessage}
                 filters={tableFilters}
+                dataFieldsRequired={dataFieldsRequired}
                 tableName="storage-groups"
             />
         </LoaderWrapper>

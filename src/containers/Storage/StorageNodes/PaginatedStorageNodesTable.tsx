@@ -4,7 +4,7 @@ import type {RenderControls, RenderErrorMessage} from '../../../components/Pagin
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
-import type {NodesGroupByField} from '../../../types/api/nodes';
+import type {NodesGroupByField, NodesRequiredField} from '../../../types/api/nodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
@@ -23,6 +23,8 @@ interface PaginatedStorageNodesTableProps {
 
     filterGroup?: string;
     filterGroupBy?: NodesGroupByField;
+
+    dataFieldsRequired?: NodesRequiredField[];
 
     searchValue: string;
     visibleEntities: VisibleEntities;
@@ -45,6 +47,7 @@ export const PaginatedStorageNodesTable = ({
     searchValue,
     visibleEntities,
     nodesUptimeFilter,
+    dataFieldsRequired,
     onShowAll,
     parentRef,
     renderControls,
@@ -104,6 +107,7 @@ export const PaginatedStorageNodesTable = ({
             renderEmptyDataMessage={renderEmptyDataMessage}
             getRowClassName={getRowUnavailableClassName}
             filters={tableFilters}
+            dataFieldsRequired={dataFieldsRequired}
             tableName="storage-nodes"
         />
     );
