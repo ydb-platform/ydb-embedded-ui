@@ -1,15 +1,18 @@
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
+import type {AppDispatch} from '../../../store';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import type {QueryMode, QuerySettings} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
+import {getTableDataPromise} from '../../../utils/hooks';
 import {transformPath} from '../ObjectSummary/transformPath';
 import i18n from '../i18n';
 
-import type {SchemaQueryParams} from './schemaQueryTemplates';
+import {nodeTableTypeToPathType} from './schema';
+import type {TemplateFn} from './schemaQueryTemplates';
 import {
     addTableIndex,
     alterAsyncReplicationTemplate,
@@ -36,52 +39,74 @@ interface ActionsAdditionalEffects {
     showCreateDirectoryDialog?: (path: string) => void;
 }
 
+interface AdditionalInputQueryOptions {
+    mode?: QueryMode;
+    withTableData?: boolean;
+}
+
+interface BindActionParams {
+    tenantName: string;
+    type: NavigationTreeNodeType;
+    path: string;
+    relativePath: string;
+}
+
 const bindActions = (
-    schemaQueryParams: SchemaQueryParams,
-    dispatch: React.Dispatch<any>,
+    params: BindActionParams,
+    dispatch: AppDispatch,
     additionalEffects: ActionsAdditionalEffects,
 ) => {
     const {setActivePath, updateQueryExecutionSettings, showCreateDirectoryDialog} =
         additionalEffects;
 
-    const inputQuery = (tmpl: (params?: SchemaQueryParams) => string, mode?: QueryMode) => () => {
-        if (mode) {
-            updateQueryExecutionSettings({queryMode: mode});
+    const inputQuery = (tmpl: TemplateFn, options?: AdditionalInputQueryOptions) => () => {
+        if (options?.mode) {
+            updateQueryExecutionSettings({queryMode: options.mode});
         }
 
-        dispatch(changeUserInput({input: tmpl(schemaQueryParams)}));
+        const pathType = nodeTableTypeToPathType[params.type];
+
+        const userInputDataPromise =
+            options?.withTableData && pathType
+                ? getTableDataPromise(params.path, params.tenantName, pathType, dispatch)
+                : Promise.resolve(undefined);
+
+        userInputDataPromise.then((tableData) => {
+            dispatch(changeUserInput({input: tmpl({...params, tableData})}));
+        });
+
         dispatch(setTenantPage(TENANT_PAGES_IDS.query));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-        setActivePath(schemaQueryParams.path);
+        setActivePath(params.path);
     };
 
     return {
         createDirectory: showCreateDirectoryDialog
             ? () => {
-                  showCreateDirectoryDialog(schemaQueryParams.path);
+                  showCreateDirectoryDialog(params.path);
               }
             : undefined,
-        createTable: inputQuery(createTableTemplate, 'script'),
-        createColumnTable: inputQuery(createColumnTableTemplate, 'script'),
-        createAsyncReplication: inputQuery(createAsyncReplicationTemplate, 'script'),
-        alterAsyncReplication: inputQuery(alterAsyncReplicationTemplate, 'script'),
-        dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate, 'script'),
-        alterTable: inputQuery(alterTableTemplate, 'script'),
-        selectQuery: inputQuery(selectQueryTemplate),
-        upsertQuery: inputQuery(upsertQueryTemplate),
-        createExternalTable: inputQuery(createExternalTableTemplate, 'script'),
-        dropExternalTable: inputQuery(dropExternalTableTemplate, 'script'),
-        selectQueryFromExternalTable: inputQuery(selectQueryTemplate, 'query'),
-        createTopic: inputQuery(createTopicTemplate, 'script'),
-        alterTopic: inputQuery(alterTopicTemplate, 'script'),
-        dropTopic: inputQuery(dropTopicTemplate, 'script'),
-        createView: inputQuery(createViewTemplate, 'script'),
-        dropView: inputQuery(dropViewTemplate, 'script'),
-        dropIndex: inputQuery(dropTableIndex, 'script'),
-        addTableIndex: inputQuery(addTableIndex, 'script'),
+        createTable: inputQuery(createTableTemplate, {mode: 'script'}),
+        createColumnTable: inputQuery(createColumnTableTemplate, {mode: 'script'}),
+        createAsyncReplication: inputQuery(createAsyncReplicationTemplate, {mode: 'script'}),
+        alterAsyncReplication: inputQuery(alterAsyncReplicationTemplate, {mode: 'script'}),
+        dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate, {mode: 'script'}),
+        alterTable: inputQuery(alterTableTemplate, {mode: 'script'}),
+        selectQuery: inputQuery(selectQueryTemplate, {withTableData: true}),
+        upsertQuery: inputQuery(upsertQueryTemplate, {withTableData: true}),
+        createExternalTable: inputQuery(createExternalTableTemplate, {mode: 'script'}),
+        dropExternalTable: inputQuery(dropExternalTableTemplate, {mode: 'script'}),
+        selectQueryFromExternalTable: inputQuery(selectQueryTemplate, {mode: 'query'}),
+        createTopic: inputQuery(createTopicTemplate, {mode: 'script'}),
+        alterTopic: inputQuery(alterTopicTemplate, {mode: 'script'}),
+        dropTopic: inputQuery(dropTopicTemplate, {mode: 'script'}),
+        createView: inputQuery(createViewTemplate, {mode: 'script'}),
+        dropView: inputQuery(dropViewTemplate, {mode: 'script'}),
+        dropIndex: inputQuery(dropTableIndex, {mode: 'script'}),
+        addTableIndex: inputQuery(addTableIndex, {mode: 'script'}),
         copyPath: () => {
             try {
-                copy(schemaQueryParams.relativePath);
+                copy(params.relativePath);
                 createToast({
                     name: 'Copied',
                     title: i18n('actions.copied'),
@@ -101,10 +126,14 @@ const bindActions = (
 type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
 
 export const getActions =
-    (dispatch: React.Dispatch<any>, additionalEffects: ActionsAdditionalEffects, rootPath = '') =>
+    (dispatch: AppDispatch, additionalEffects: ActionsAdditionalEffects, rootPath = '') =>
     (path: string, type: NavigationTreeNodeType) => {
         const relativePath = transformPath(path, rootPath);
-        const actions = bindActions({path, relativePath}, dispatch, additionalEffects);
+        const actions = bindActions(
+            {path, relativePath, tenantName: rootPath, type},
+            dispatch,
+            additionalEffects,
+        );
         const copyItem = {text: i18n('actions.copyPath'), action: actions.copyPath};
 
         const DIR_SET: ActionsSet = [

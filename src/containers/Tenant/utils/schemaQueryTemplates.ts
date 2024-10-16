@@ -1,7 +1,12 @@
+import type {SchemaData} from '../Schema/SchemaViewer/types';
+
 export interface SchemaQueryParams {
     path: string;
     relativePath: string;
+    tableData?: SchemaData[];
 }
+
+export type TemplateFn = (params?: SchemaQueryParams) => string;
 
 export const createTableTemplate = (params?: SchemaQueryParams) => {
     return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_table
@@ -67,13 +72,18 @@ export const alterTableTemplate = (params?: SchemaQueryParams) => {
     ADD COLUMN numeric_column Int32;`;
 };
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
-    return `SELECT *
+    const columns = params?.tableData?.map((column) => '`' + column.name + '`').join(', ') || '*';
+
+    return `SELECT ${columns}
     FROM \`${params?.relativePath || '$path'}\`
     LIMIT 10;`;
 };
 export const upsertQueryTemplate = (params?: SchemaQueryParams) => {
+    const columns =
+        params?.tableData?.map((column) => `\`${column.name}\``).join(', ') || `\`id\`, \`name\``;
+
     return `UPSERT INTO \`${params?.relativePath || '$path'}\`
-    ( \`id\`, \`name\` )
+    ( ${columns} )
 VALUES ( );`;
 };
 

@@ -1,4 +1,10 @@
-import type {ColumnType} from '../../../../types/api/query';
+import type {SchemaData} from '../containers/Tenant/Schema/SchemaViewer/types';
+import {
+    isColumnEntityType,
+    isExternalTableType,
+    isRowTableType,
+} from '../containers/Tenant/utils/schema';
+import type {ColumnType} from '../types/api/query';
 import type {
     EPathType,
     TColumnTableDescription,
@@ -6,12 +12,10 @@ import type {
     TExternalTableDescription,
     TFamilyDescription,
     TTableDescription,
-} from '../../../../types/api/schema';
-import {EColumnCodec} from '../../../../types/api/schema';
-import type {Nullable} from '../../../../utils/typecheckers';
-import {isColumnEntityType, isExternalTableType, isRowTableType} from '../../utils/schema';
+} from '../types/api/schema';
+import {EColumnCodec} from '../types/api/schema';
 
-import type {SchemaData} from './types';
+import type {Nullable} from './typecheckers';
 
 function formatColumnCodec(codec?: EColumnCodec) {
     if (!codec) {
