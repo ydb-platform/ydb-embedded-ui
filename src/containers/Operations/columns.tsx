@@ -1,12 +1,16 @@
+import {duration} from '@gravity-ui/date-utils';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {Text} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import type {TOperation} from '../../types/api/operationList';
 import {EStatusCode} from '../../types/api/operationList';
-import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {EMPTY_DATA_PLACEHOLDER, HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
+import {formatDateTime} from '../../utils/dataFormatters/dataFormatters';
+import {parseProtobufTimestampToMs} from '../../utils/timeParsers';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
+import i18n from './i18n';
 
 export function getColumns(): DataTableColumn<TOperation>[] {
     return [
@@ -52,9 +56,10 @@ export function getColumns(): DataTableColumn<TOperation>[] {
                 if (!row.create_time) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                return new Date(row.create_time || '').toLocaleString();
+                return formatDateTime(parseProtobufTimestampToMs(row.create_time));
             },
-            sortAccessor: (row) => new Date(row.create_time || '').getTime(),
+            sortAccessor: (row) =>
+                row.create_time ? parseProtobufTimestampToMs(row.create_time) : 0,
         },
         {
             name: COLUMNS_NAMES.END_TIME,
@@ -63,31 +68,46 @@ export function getColumns(): DataTableColumn<TOperation>[] {
                 if (!row.end_time) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                return row.end_time ? new Date(row.end_time).toLocaleString() : '-';
+                return formatDateTime(parseProtobufTimestampToMs(row.end_time));
             },
             sortAccessor: (row) =>
-                row.end_time ? new Date(row.end_time).getTime() : Number.MAX_SAFE_INTEGER,
+                row.end_time ? parseProtobufTimestampToMs(row.end_time) : Number.MAX_SAFE_INTEGER,
         },
         {
             name: COLUMNS_NAMES.DURATION,
             header: COLUMNS_TITLES[COLUMNS_NAMES.DURATION],
             render: ({row}) => {
+                let durationValue = 0;
                 if (!row.create_time) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                if (row.create_time && row.end_time) {
-                    const duration =
-                        new Date(row.end_time).getTime() - new Date(row.create_time).getTime();
-                    return `${(duration / 1000).toFixed(2)}s`;
+                const createTime = parseProtobufTimestampToMs(row.create_time);
+                if (row.end_time) {
+                    const endTime = parseProtobufTimestampToMs(row.end_time);
+                    durationValue = endTime - createTime;
+                } else {
+                    durationValue = Date.now() - createTime;
                 }
-                const duration = Date.now() - new Date(row.create_time || '').getTime();
-                return `${(duration / 1000).toFixed(2)}s (ongoing)`;
+
+                const durationFormatted =
+                    durationValue > HOUR_IN_SECONDS * SECOND_IN_MS
+                        ? duration(durationValue).format('hh:mm:ss')
+                        : duration(durationValue).format('mm:ss');
+
+                return row.end_time
+                    ? durationFormatted
+                    : i18n('duration.ongoing', {value: durationFormatted});
             },
             sortAccessor: (row) => {
-                if (row.create_time && row.end_time) {
-                    return new Date(row.end_time).getTime() - new Date(row.create_time).getTime();
+                if (!row.create_time) {
+                    return 0;
                 }
-                return Date.now() - new Date(row.create_time || '').getTime();
+                const createTime = parseProtobufTimestampToMs(row.create_time);
+                if (row.end_time) {
+                    const endTime = parseProtobufTimestampToMs(row.end_time);
+                    return endTime - createTime;
+                }
+                return Date.now() - createTime;
             },
         },
     ];

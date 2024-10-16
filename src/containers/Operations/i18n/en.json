@@ -36,5 +36,6 @@
   "column.createdBy": "Created By",
   "column.createTime": "Create Time",
   "column.endTime": "End Time",
-  "column.duration": "Duration"
+  "column.duration": "Duration",
+  "duration.ongoing": "{{value}} (ongoing)"
 }

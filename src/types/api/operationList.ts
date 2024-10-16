@@ -1,3 +1,5 @@
+import type {IProtobufTimeObject} from './common';
+
 /**
  * endpoint: /operation/list
  *
@@ -99,8 +101,8 @@ export interface TOperation {
     issues?: TIssueMessage[];
     metadata?: TOperationMetadata;
     cost_info?: TCostInfo;
-    create_time?: string;
-    end_time?: string;
+    create_time?: IProtobufTimeObject;
+    end_time?: IProtobufTimeObject;
     created_by?: string;
 }
 

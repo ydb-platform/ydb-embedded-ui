@@ -32,7 +32,7 @@ export const BASE_COLUMNS = [
 ];
 
 export const OPERATION_KINDS: {value: OperationKind; content: string}[] = [
-    {value: 'ss/backgrounds', content: i18n('kind.ssBackgrounds')},
     {value: 'export', content: i18n('kind.export')},
+    {value: 'ss/backgrounds', content: i18n('kind.ssBackgrounds')},
     {value: 'buildindex', content: i18n('kind.buildIndex')},
 ];
