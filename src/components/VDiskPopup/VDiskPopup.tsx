@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type {PopupProps} from '@gravity-ui/uikit';
-import {Label, Popup} from '@gravity-ui/uikit';
+import {Label} from '@gravity-ui/uikit';
 
 import {selectNodeHostsMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
@@ -130,20 +129,12 @@ const prepareVDiskData = (data: PreparedVDisk) => {
     return vdiskData;
 };
 
-interface VDiskPopupProps extends PopupProps {
+interface VDiskPopupProps {
     data: PreparedVDisk | UnavailableDonor;
 }
 
-export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
+export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
-
-    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
-    const onMouseLeave = React.useCallback(() => {
-        setIsPopupContentHovered(false);
-    }, []);
-    const onMouseEnter = React.useCallback(() => {
-        setIsPopupContentHovered(true);
-    }, []);
 
     const vdiskInfo = React.useMemo(
         () => (isFullData ? prepareVDiskData(data) : prepareUnavailableVDiskData(data)),
@@ -182,22 +173,11 @@ export const VDiskPopup = ({data, ...props}: VDiskPopupProps) => {
     }
 
     return (
-        <Popup
-            contentClassName={b()}
-            placement={['top', 'bottom']}
-            hasArrow
-            // bigger offset for easier switching to neighbour nodes
-            // matches the default offset for popup with arrow out of a sense of beauty
-            offset={[0, 12]}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-            {...props}
-            open={isPopupContentHovered || props.open}
-        >
+        <div className={b()}>
             {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
             <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
             {pdiskInfo && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
             {donorsInfo.length > 0 && <InfoViewer title="Donors" info={donorsInfo} size="s" />}
-        </Popup>
+        </div>
     );
 };

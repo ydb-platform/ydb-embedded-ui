@@ -7,5 +7,8 @@ export function getPartitioningKeys(tableData: SchemaData[]): string[] {
 }
 
 export function getPrimaryKeys(tableData: SchemaData[]): string[] {
-    return tableData.filter((row) => row.isKeyColumn && row.name).map((row) => row.name!);
+    return tableData
+        .filter((row) => row.keyColumnIndex !== undefined && row.keyColumnIndex !== -1 && row.name)
+        .sort((column1, column2) => column1.keyColumnIndex! - column2.keyColumnIndex!)
+        .map((row) => row.name!);
 }

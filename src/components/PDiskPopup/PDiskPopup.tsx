@@ -1,23 +1,15 @@
 import React from 'react';
 
-import type {PopupProps} from '@gravity-ui/uikit';
-import {Popup} from '@gravity-ui/uikit';
-
 import {selectNodeHostsMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
-import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {getPDiskId} from '../../utils/disks/helpers';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {bytesToGB} from '../../utils/utils';
-import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
-
-import './PDiskPopup.scss';
-
-const b = cn('pdisk-storage-popup');
+import type {InfoViewerItem} from '../InfoViewer';
 
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
@@ -61,37 +53,14 @@ export const preparePDiskData = (data: PreparedPDisk, nodeHost?: string) => {
     return pdiskData;
 };
 
-interface PDiskPopupProps extends PopupProps {
+interface PDiskPopupProps {
     data: PreparedPDisk;
 }
 
-export const PDiskPopup = ({data, ...props}: PDiskPopupProps) => {
+export const PDiskPopup = ({data}: PDiskPopupProps) => {
     const nodeHostsMap = useTypedSelector(selectNodeHostsMap);
     const nodeHost = valueIsDefined(data.NodeId) ? nodeHostsMap?.get(data.NodeId) : undefined;
     const info = React.useMemo(() => preparePDiskData(data, nodeHost), [data, nodeHost]);
 
-    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
-    const onMouseLeave = React.useCallback(() => {
-        setIsPopupContentHovered(false);
-    }, []);
-    const onMouseEnter = React.useCallback(() => {
-        setIsPopupContentHovered(true);
-    }, []);
-
-    return (
-        <Popup
-            contentClassName={b()}
-            placement={['top', 'bottom']}
-            hasArrow
-            // bigger offset for easier switching to neighbour nodes
-            // matches the default offset for popup with arrow out of a sense of beauty
-            offset={[0, 12]}
-            onMouseLeave={onMouseLeave}
-            onMouseEnter={onMouseEnter}
-            {...props}
-            open={isPopupContentHovered || props.open}
-        >
-            <InfoViewer title="PDisk" info={info} size="s" />
-        </Popup>
-    );
+    return <InfoViewer title="PDisk" info={info} size="s" />;
 };

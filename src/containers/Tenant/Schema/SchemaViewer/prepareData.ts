@@ -48,7 +48,7 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
     const preparedColumns = Columns?.map((column) => {
         const {Id, Name, NotNull, Type, Family, DefaultFromSequence, DefaultFromLiteral} = column;
 
-        const isKeyColumn = Boolean(KeyColumnIds?.find((keyColumnId) => keyColumnId === Id));
+        const keyColumnIndex = KeyColumnIds?.findIndex((keyColumnId) => keyColumnId === Id) ?? -1;
 
         const familyName = Family ? families[Family].Name : undefined;
         const prefferedPoolKind = Family
@@ -59,7 +59,7 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
         return {
             id: Id,
             name: Name,
-            isKeyColumn,
+            keyColumnIndex,
             type: Type,
             notNull: NotNull,
             autoIncrement: Boolean(DefaultFromSequence),
@@ -69,8 +69,8 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
             columnCodec,
         };
     });
-    const keyColumns = preparedColumns?.filter((column) => column.isKeyColumn) || [];
-    const otherColumns = preparedColumns?.filter((column) => !column.isKeyColumn) || [];
+    const keyColumns = preparedColumns?.filter((column) => column.keyColumnIndex !== -1) || [];
+    const otherColumns = preparedColumns?.filter((column) => column.keyColumnIndex === -1) || [];
 
     return [...keyColumns, ...otherColumns];
 }
@@ -92,16 +92,15 @@ function prepareExternalTableSchema(data: TExternalTableDescription = {}): Schem
 
 function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaData[] {
     const {Schema = {}, Sharding = {}} = data;
-    const {Columns, KeyColumnNames} = Schema;
+    const {Columns, KeyColumnIds} = Schema;
     const {HashSharding = {}} = Sharding;
     const {Columns: HashColumns = []} = HashSharding;
 
     const preparedColumns = Columns?.map((column) => {
         const {Id, Name, Type, NotNull} = column;
 
-        const isKeyColumn = Boolean(
-            KeyColumnNames?.find((keyColumnName) => keyColumnName === Name),
-        );
+        const keyColumnIndex = KeyColumnIds?.findIndex((keyColumnId) => keyColumnId === Id) ?? -1;
+
         const isPartitioningKeyColumn = Boolean(
             HashColumns?.find((hashColumnName) => hashColumnName === Name),
         );
@@ -109,15 +108,15 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
         return {
             id: Id,
             name: Name,
-            isKeyColumn,
+            keyColumnIndex,
             isPartitioningKeyColumn,
             type: Type,
             notNull: NotNull,
         };
     });
 
-    const keyColumns = preparedColumns?.filter((column) => column.isKeyColumn) || [];
-    const otherColumns = preparedColumns?.filter((column) => !column.isKeyColumn) || [];
+    const keyColumns = preparedColumns?.filter((column) => column.keyColumnIndex !== -1) || [];
+    const otherColumns = preparedColumns?.filter((column) => column.keyColumnIndex === -1) || [];
 
     return [...keyColumns, ...otherColumns];
 }
