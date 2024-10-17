@@ -1,7 +1,7 @@
 import {isQueryErrorResponse} from '../../../utils/query';
 import {api} from '../api';
 
-export function createViewSchemaQuery(path: string) {
+function createViewSchemaQuery(path: string) {
     return `SELECT * FROM \`${path}\` LIMIT 0`;
 }
 
