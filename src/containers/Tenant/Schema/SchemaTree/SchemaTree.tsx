@@ -7,8 +7,8 @@ import {NavigationTree} from 'ydb-ui-components';
 
 import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
+import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import type {GetTableSchemaDataParams} from '../../../../store/reducers/tableSchemaData';
-import {useGetTableSchemaDataMutation} from '../../../../store/reducers/tableSchemaData';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {wait} from '../../../../utils';
 import {SECOND_IN_MS} from '../../../../utils/constants';
@@ -32,7 +32,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const createDirectoryFeatureAvailable = useCreateDirectoryFeatureAvailable();
     const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
     const dispatch = useTypedDispatch();
-    const [getTableSchemaDataMutation] = useGetTableSchemaDataMutation();
+    const [getTableSchemaDataMutation] = tableSchemaDataApi.useGetTableSchemaDataMutation();
 
     const getTableSchemaDataPromise = React.useCallback(
         async (args: GetTableSchemaDataParams) => {

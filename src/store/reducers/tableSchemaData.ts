@@ -17,7 +17,7 @@ export interface GetTableSchemaDataParams {
     type: EPathType;
 }
 
-export const tableSchemeDataApi = api.injectEndpoints({
+export const tableSchemaDataApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTableSchemaData: build.mutation<SchemaData[], GetTableSchemaDataParams>({
             queryFn: async ({path, tenantName, type}, {dispatch}) => {
@@ -54,5 +54,3 @@ export const tableSchemeDataApi = api.injectEndpoints({
         }),
     }),
 });
-
-export const {useGetTableSchemaDataMutation} = tableSchemeDataApi;
