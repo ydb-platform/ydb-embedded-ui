@@ -65,5 +65,9 @@
 
         opacity: 0;
         color: var(--g-color-text-secondary);
+        .ydb-tree-view__item:hover &,
+        &:focus-visible {
+            opacity: 1;
+        }
     }
 }
