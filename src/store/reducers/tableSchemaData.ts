@@ -8,7 +8,8 @@ import type {EPathType} from '../../types/api/schema';
 import {isQueryErrorResponse} from '../../utils/query';
 
 import {api} from './api';
-import {createViewSchemaQuery} from './viewSchema/viewSchema';
+import {overviewApi} from './overview/overview';
+import {viewSchemaApi} from './viewSchema/viewSchema';
 
 export interface GetTableSchemaDataParams {
     path: string;
@@ -16,48 +17,43 @@ export interface GetTableSchemaDataParams {
     type: EPathType;
 }
 
-const tableSchemaDataConcurrentId = 'getTableSchemaData';
-
 const TABLE_SCHEMA_TIMEOUT = 1000;
+
+const getTableSchemaDataConcurrentId = 'getTableSchemaData';
 
 export const tableSchemeDataApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTableSchemaData: build.mutation<SchemaData[], GetTableSchemaDataParams>({
-            queryFn: async ({path, tenantName, type}, {signal}) => {
+            queryFn: async ({path, tenantName, type}, {dispatch}) => {
                 try {
-                    const schemaData = await window.api.getDescribe(
-                        {
-                            path,
+                    const schemaData = await dispatch(
+                        overviewApi.endpoints.getOverview.initiate({
+                            paths: [path],
                             database: tenantName,
                             timeout: TABLE_SCHEMA_TIMEOUT,
-                        },
-                        {signal, concurrentId: tableSchemaDataConcurrentId + 'describe'},
+                            concurrentId: getTableSchemaDataConcurrentId + 'getOverview',
+                        }),
                     );
 
                     if (isViewType(type)) {
-                        const response = await window.api.sendQuery(
-                            {
-                                query: createViewSchemaQuery(path),
+                        const response = await dispatch(
+                            viewSchemaApi.endpoints.getViewSchema.initiate({
                                 database: tenantName,
-                                action: 'execute-scan',
+                                path,
                                 timeout: TABLE_SCHEMA_TIMEOUT,
-                            },
-                            {
-                                withRetries: true,
-                                concurrentId: tableSchemaDataConcurrentId + 'query',
-                            },
+                                concurrentId: getTableSchemaDataConcurrentId + 'getViewSchema',
+                            }),
                         );
 
                         if (isQueryErrorResponse(response)) {
                             return {error: response};
                         }
 
-                        const viewColumnsData = {data: response?.result?.[0]?.columns || []};
-                        const result = prepareViewSchema(viewColumnsData.data);
+                        const result = prepareViewSchema(response.data);
                         return {data: result};
                     }
 
-                    const result = prepareSchemaData(type, schemaData);
+                    const result = prepareSchemaData(type, schemaData.data?.data);
 
                     return {data: result};
                 } catch (error) {
