@@ -1,11 +1,8 @@
 import React from 'react';
 
 import type {Reducer} from '@reduxjs/toolkit';
-import {createSelector} from '@reduxjs/toolkit';
 
-import {isEntityWithMergedImplementation} from '../../../containers/Tenant/utils/schema';
-import type {EPathType, TEvDescribeSchemeResult} from '../../../types/api/schema';
-import type {RootState} from '../../defaultStore';
+import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
 import {api} from '../api';
 
 import type {SchemaAction, SchemaState} from './types';
@@ -98,35 +95,6 @@ function getSchemaChildren(data: TEvDescribeSchemeResult) {
     }
     return children;
 }
-
-const getSchemaSelector = createSelector(
-    (path: string) => path,
-    (_path: string, database: string) => database,
-    (path, database) => schemaApi.endpoints.getSchema.select({path, database}),
-);
-
-const selectGetSchema = createSelector(
-    (state: RootState) => state,
-    (_state: RootState, path: string) => path,
-    (_state: RootState, path: string, database: string) => getSchemaSelector(path, database),
-    (state, path, selectTabletsInfo) => selectTabletsInfo(state).data?.[path],
-);
-
-const selectSchemaChildren = (state: RootState, path: string, database: string) =>
-    selectGetSchema(state, path, database)?.PathDescription?.Children;
-
-export const selectSchemaMergedChildrenPaths = createSelector(
-    [
-        (_, path: string) => path,
-        (_, _path, type: EPathType | undefined) => type,
-        (state, path, _type, database: string) => selectSchemaChildren(state, path, database),
-    ],
-    (path, type, children) => {
-        return isEntityWithMergedImplementation(type)
-            ? children?.map(({Name}) => path + '/' + Name)
-            : undefined;
-    },
-);
 
 export function useGetSchemaQuery({path, database}: {path: string; database: string}) {
     const {currentData, isFetching, error, refetch, originalArgs} = schemaApi.useGetSchemaQuery({

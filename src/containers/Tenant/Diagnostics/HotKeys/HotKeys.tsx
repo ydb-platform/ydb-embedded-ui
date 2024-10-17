@@ -62,16 +62,15 @@ export function HotKeys({path, database}: HotKeysProps) {
     const {currentData: data, isFetching, error} = hotKeysApi.useGetHotKeysQuery({path, database});
     const loading = isFetching && data === undefined;
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const {currentData, isLoading: schemaLoading} = overviewApi.useGetOverviewQuery(
+    const {currentData: schemaData, isLoading: schemaLoading} = overviewApi.useGetOverviewQuery(
         {
-            paths: [path],
+            path,
             database,
         },
         {
             pollingInterval: autoRefreshInterval,
         },
     );
-    const {data: schemaData} = currentData ?? {};
     const keyColumnsIds = schemaData?.PathDescription?.Table?.KeyColumnNames;
 
     const tableColumns = React.useMemo(() => {

@@ -45,16 +45,15 @@ export function TenantOverview({
 
     const tenantType = mapDatabaseTypeToDBName(Type);
     // FIXME: remove after correct data is added to tenantInfo
-    const {currentData} = overviewApi.useGetOverviewQuery(
+    const {currentData: tenantSchemaData} = overviewApi.useGetOverviewQuery(
         {
-            paths: [tenantName],
+            path: tenantName,
             database: tenantName,
         },
         {
             pollingInterval: autoRefreshInterval,
         },
     );
-    const {data: tenantSchemaData} = currentData ?? {};
     const {Tables, Topics} =
         tenantSchemaData?.PathDescription?.DomainDescription?.DiskSpaceUsage || {};
 
