@@ -75,13 +75,16 @@ export function Tenant(props: TenantProps) {
 
     const path = schema ?? tenantName;
 
-    const {currentData, error, isLoading} = overviewApi.useGetOverviewQuery(
-        {paths: [path], database: tenantName},
+    const {
+        currentData: currentItem,
+        error,
+        isLoading,
+    } = overviewApi.useGetOverviewQuery(
+        {path, database: tenantName},
         {
             pollingInterval: autoRefreshInterval,
         },
     );
-    const {data: currentItem} = currentData ?? {};
     const {PathType: currentPathType, PathSubType: currentPathSubType} =
         currentItem?.PathDescription?.Self || {};
 

@@ -1,13 +1,14 @@
 import React from 'react';
 
-import {skipToken} from '@reduxjs/toolkit/query';
 import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
-import {overviewApi} from '../../../../store/reducers/overview/overview';
-import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
+import {
+    selectSchemaMergedChildrenPaths,
+    useGetMultiOverviewQuery,
+} from '../../../../store/reducers/overview/overview';
 import {EPathType} from '../../../../types/api/schema';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
@@ -45,16 +46,17 @@ function Overview({type, path, database}: OverviewProps) {
     }
 
     const {
-        currentData,
-        isFetching,
-        error: overviewError,
-    } = overviewApi.useGetOverviewQuery(paths.length ? {paths, database} : skipToken, {
-        pollingInterval: autoRefreshInterval,
+        mergedDescribe,
+        loading: entityLoading,
+        error,
+    } = useGetMultiOverviewQuery({
+        paths,
+        database,
+        autoRefreshInterval,
     });
-    const overviewLoading = isFetching && currentData === undefined;
-    const {data: rawData, additionalData} = currentData || {};
 
-    const entityLoading = overviewLoading;
+    const rawData = mergedDescribe[path];
+
     const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
 
     const renderContent = () => {
@@ -70,14 +72,20 @@ function Overview({type, path, database}: OverviewProps) {
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
-            [EPathType.EPathTypeCdcStream]: () => (
-                <ChangefeedInfo
-                    path={path}
-                    database={database}
-                    data={data}
-                    topic={additionalData?.[0] ?? undefined}
-                />
-            ),
+            [EPathType.EPathTypeCdcStream]: () => {
+                const topicPath = mergedChildrenPaths?.[0];
+                if (topicPath) {
+                    return (
+                        <ChangefeedInfo
+                            path={path}
+                            database={database}
+                            data={data}
+                            topic={mergedDescribe?.[topicPath] ?? undefined}
+                        />
+                    );
+                }
+                return undefined;
+            },
             [EPathType.EPathTypePersQueueGroup]: () => (
                 <TopicInfo data={data} path={path} database={database} />
             ),
@@ -96,8 +104,8 @@ function Overview({type, path, database}: OverviewProps) {
 
     return (
         <React.Fragment>
-            {overviewError ? <ResponseError error={overviewError} /> : null}
-            {overviewError && !rawData ? null : renderContent()}
+            {error ? <ResponseError error={error} /> : null}
+            {error && !rawData ? null : renderContent()}
         </React.Fragment>
     );
 }

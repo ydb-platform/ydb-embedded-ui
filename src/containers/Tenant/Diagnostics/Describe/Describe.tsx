@@ -1,14 +1,14 @@
 import {ClipboardButton} from '@gravity-ui/uikit';
-import {skipToken} from '@reduxjs/toolkit/query';
 import JSONTree from 'react-json-inspector';
 import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
-import {overviewApi} from '../../../../store/reducers/overview/overview';
-import {selectSchemaMergedChildrenPaths} from '../../../../store/reducers/schema/schema';
+import {
+    selectSchemaMergedChildrenPaths,
+    useGetMultiOverviewQuery,
+} from '../../../../store/reducers/overview/overview';
 import type {EPathType} from '../../../../types/api/schema';
-import type {IDescribeData} from '../../../../types/store/describe';
 import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {isEntityWithMergedImplementation} from '../../utils/schema';
@@ -26,8 +26,6 @@ interface IDescribeProps {
     type?: EPathType;
 }
 
-const emptyObject: IDescribeData = {};
-
 const Describe = ({path, database, type}: IDescribeProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -44,37 +42,20 @@ const Describe = ({path, database, type}: IDescribeProps) => {
     } else if (mergedChildrenPaths) {
         paths = [path, ...mergedChildrenPaths];
     }
-    const {currentDescribe, currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
-        paths.length ? {paths, database} : skipToken,
-        {
-            pollingInterval: autoRefreshInterval,
-            selectFromResult: (props) => {
-                const {currentData} = props;
-                if (!currentData) {
-                    return {currentDescribe: emptyObject, ...props};
-                }
 
-                const mergedData = [currentData.data, ...currentData.additionalData];
-
-                const data = mergedData.reduce<IDescribeData>((acc, item) => {
-                    if (item?.Path) {
-                        acc[item.Path] = item;
-                    }
-                    return acc;
-                }, {});
-                return {currentDescribe: data, ...props};
-            },
-        },
-    );
-    const loading = isFetching && currentData === undefined;
+    const {mergedDescribe, loading, error} = useGetMultiOverviewQuery({
+        paths,
+        autoRefreshInterval,
+        database,
+    });
 
     let preparedDescribeData: Object | undefined;
-    if (currentDescribe) {
-        const paths = Object.keys(currentDescribe);
+    if (mergedDescribe) {
+        const paths = Object.keys(mergedDescribe);
         if (paths.length === 1) {
-            preparedDescribeData = currentDescribe[paths[0]];
+            preparedDescribeData = mergedDescribe[paths[0]];
         } else {
-            preparedDescribeData = currentDescribe;
+            preparedDescribeData = mergedDescribe;
         }
     }
 
