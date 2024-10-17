@@ -1,12 +1,5 @@
+@import '../../styles/mixins.scss';
+
 .developer-ui-link-button {
-    display: none;
-
-    &_visible {
-        display: inline-block;
-    }
-
-    .data-table__row:hover &,
-    .ydb-paginated-table__row:hover & {
-        display: inline-block;
-    }
+    @include table-hover-appearing-button();
 }

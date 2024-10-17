@@ -2,13 +2,12 @@ import React from 'react';
 
 import {DefinitionList, HelpPopover} from '@gravity-ui/components';
 import type {DefinitionListSingleItem} from '@gravity-ui/components/build/esm/components/DefinitionList/types';
-import {Flex, Tabs} from '@gravity-ui/uikit';
+import {ClipboardButton, Flex, Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
 import {Link, useLocation} from 'react-router-dom';
 import {StringParam, useQueryParam} from 'use-query-params';
 
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
-import {ClipboardButton} from '../../../components/ClipboardButton';
 import {toFormattedSize} from '../../../components/FormattedBytes/utils';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import SplitPane from '../../../components/SplitPane';

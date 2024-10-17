@@ -1,10 +1,9 @@
 import React from 'react';
 
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {RadioButton, Tabs, Text} from '@gravity-ui/uikit';
+import {ClipboardButton, RadioButton, Tabs, Text} from '@gravity-ui/uikit';
 import JSONTree from 'react-json-inspector';
 
-import {ClipboardButton} from '../../../../components/ClipboardButton';
 import Divider from '../../../../components/Divider/Divider';
 import ElapsedTime from '../../../../components/ElapsedTime/ElapsedTime';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
