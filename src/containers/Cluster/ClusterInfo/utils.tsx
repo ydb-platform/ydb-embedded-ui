@@ -208,6 +208,7 @@ export const useGetVersionValues = (cluster?: TClusterInfo, versionToColor?: Ver
             ? skipToken
             : {
                   tablets: false,
+                  fieldsRequired: ['SystemState'],
                   group: 'Version',
               },
     );

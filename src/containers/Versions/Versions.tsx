@@ -29,7 +29,7 @@ export const Versions = ({versionToColor, cluster}: VersionsProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const versionsValues = useGetVersionValues(cluster, versionToColor);
     const {currentData, isLoading: isNodesLoading} = nodesApi.useGetNodesQuery(
-        {tablets: false},
+        {tablets: false, fieldsRequired: ['SystemState']},
         {pollingInterval: autoRefreshInterval},
     );
 
