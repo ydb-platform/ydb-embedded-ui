@@ -1,4 +1,3 @@
-import type {Timeout} from '../../../types/api/query';
 import {isQueryErrorResponse} from '../../../utils/query';
 import {api} from '../api';
 
@@ -9,26 +8,15 @@ export function createViewSchemaQuery(path: string) {
 export const viewSchemaApi = api.injectEndpoints({
     endpoints: (build) => ({
         getViewSchema: build.query({
-            queryFn: async ({
-                database,
-                path,
-                timeout,
-                concurrentId,
-            }: {
-                database: string;
-                path: string;
-                timeout?: Timeout;
-                concurrentId?: string;
-            }) => {
+            queryFn: async ({database, path}: {database: string; path: string}) => {
                 try {
                     const response = await window.api.sendQuery(
                         {
                             query: createViewSchemaQuery(path),
                             database,
                             action: 'execute-scan',
-                            timeout,
                         },
-                        {withRetries: true, concurrentId},
+                        {withRetries: true},
                     );
 
                     if (isQueryErrorResponse(response)) {

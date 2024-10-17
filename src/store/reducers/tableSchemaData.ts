@@ -17,31 +17,16 @@ export interface GetTableSchemaDataParams {
     type: EPathType;
 }
 
-const TABLE_SCHEMA_TIMEOUT = 1000;
-
-const getTableSchemaDataConcurrentId = 'getTableSchemaData';
-
 export const tableSchemeDataApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTableSchemaData: build.mutation<SchemaData[], GetTableSchemaDataParams>({
             queryFn: async ({path, tenantName, type}, {dispatch}) => {
                 try {
-                    const schemaData = await dispatch(
-                        overviewApi.endpoints.getOverview.initiate({
-                            paths: [path],
-                            database: tenantName,
-                            timeout: TABLE_SCHEMA_TIMEOUT,
-                            concurrentId: getTableSchemaDataConcurrentId + 'getOverview',
-                        }),
-                    );
-
                     if (isViewType(type)) {
                         const response = await dispatch(
                             viewSchemaApi.endpoints.getViewSchema.initiate({
                                 database: tenantName,
                                 path,
-                                timeout: TABLE_SCHEMA_TIMEOUT,
-                                concurrentId: getTableSchemaDataConcurrentId + 'getViewSchema',
                             }),
                         );
 
@@ -53,6 +38,12 @@ export const tableSchemeDataApi = api.injectEndpoints({
                         return {data: result};
                     }
 
+                    const schemaData = await dispatch(
+                        overviewApi.endpoints.getOverview.initiate({
+                            paths: [path],
+                            database: tenantName,
+                        }),
+                    );
                     const result = prepareSchemaData(type, schemaData.data?.data);
 
                     return {data: result};

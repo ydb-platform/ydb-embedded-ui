@@ -10,6 +10,8 @@ import {schemaApi} from '../../../../store/reducers/schema/schema';
 import type {GetTableSchemaDataParams} from '../../../../store/reducers/tableSchemaData';
 import {useGetTableSchemaDataMutation} from '../../../../store/reducers/tableSchemaData';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {wait} from '../../../../utils';
+import {SECOND_IN_MS} from '../../../../utils/constants';
 import {useQueryExecutionSettings, useTypedDispatch} from '../../../../utils/hooks';
 import {getSchemaControls} from '../../utils/controls';
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
@@ -24,6 +26,8 @@ interface SchemaTreeProps {
     onActivePathUpdate: (path: string) => void;
 }
 
+const TABLE_SCHEMA_TIMEOUT = SECOND_IN_MS * 2;
+
 export function SchemaTree(props: SchemaTreeProps) {
     const createDirectoryFeatureAvailable = useCreateDirectoryFeatureAvailable();
     const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
@@ -33,7 +37,10 @@ export function SchemaTree(props: SchemaTreeProps) {
     const getTableSchemaDataPromise = React.useCallback(
         async (args: GetTableSchemaDataParams) => {
             try {
-                const result = await getTableSchemaDataMutation(args).unwrap();
+                const result = await Promise.race([
+                    getTableSchemaDataMutation(args).unwrap(),
+                    wait<undefined>(TABLE_SCHEMA_TIMEOUT),
+                ]);
                 return result;
             } catch (e) {
                 return undefined;
