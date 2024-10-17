@@ -38,17 +38,15 @@ interface SchemaViewerProps {
 
 export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaViewerProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const {currentData, isLoading: loading} = overviewApi.useGetOverviewQuery(
+    const {currentData: schemaData, isLoading: loading} = overviewApi.useGetOverviewQuery(
         {
-            paths: [path],
+            path,
             database: tenantName,
         },
         {
             pollingInterval: autoRefreshInterval,
         },
     );
-
-    const {data: schemaData} = currentData ?? {};
 
     const viewSchemaRequestParams = isViewType(type) ? {path, database: tenantName} : skipToken;
 
