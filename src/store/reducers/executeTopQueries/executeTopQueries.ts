@@ -10,6 +10,8 @@ import {getFiltersConditions} from './utils';
 
 const initialState: TopQueriesFilters = {};
 
+const QUERY_TECHNICAL_MARK = '/*UI-QUERY-EXCLUDE*/';
+
 const slice = createSlice({
     name: 'executeTopQueries',
     initialState,
@@ -26,7 +28,7 @@ export default slice.reducer;
 const getQueryText = (path: string, filters?: TopQueriesFilters) => {
     const filterConditions = getFiltersConditions(path, filters);
     return `
-SELECT
+SELECT ${QUERY_TECHNICAL_MARK}
     CPUTime as CPUTimeUs,
     QueryText,
     IntervalEnd,
@@ -36,7 +38,7 @@ SELECT
     UserSID,
     Duration
 FROM \`${path}/.sys/top_queries_by_cpu_time_one_hour\`
-WHERE ${filterConditions || 'true'}
+WHERE ${filterConditions || 'true'} AND QueryText NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 ORDER BY CPUTimeUs DESC
 `;
 };
@@ -98,7 +100,15 @@ export const topQueriesApi = api.injectEndpoints({
                         ? `Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%'`
                         : '';
 
-                    const queryText = `SELECT UserSID, QueryStartAt, Query as QueryText, ApplicationName from \`.sys/query_sessions\` WHERE ${filterConditions || 'true'}  ORDER BY SessionStartAt limit 100`;
+                    const queryText = `SELECT ${QUERY_TECHNICAL_MARK}
+                        UserSID, QueryStartAt, Query as QueryText, ApplicationName
+                    FROM
+                        \`.sys/query_sessions\`
+                    WHERE
+                        ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
+                    ORDER BY
+                        SessionStartAt
+                    LIMIT 100`;
 
                     const response = await window.api.sendQuery(
                         {
@@ -114,13 +124,6 @@ export const topQueriesApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIExecuteResponse(response);
-
-                    /* filter running queries query itself */
-                    if (data?.resultSets?.[0]?.result) {
-                        data.resultSets[0].result = data.resultSets[0].result.filter(
-                            (item) => item.QueryText !== queryText,
-                        );
-                    }
 
                     return {data};
                 } catch (error) {

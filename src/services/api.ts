@@ -205,7 +205,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             tablets = false,
             database,
             tenant,
-            fieldsRequired = 'all',
+            fieldsRequired,
             filter,
             ...params
         }: NodesRequestParams,

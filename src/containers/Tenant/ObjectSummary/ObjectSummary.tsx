@@ -93,16 +93,15 @@ export function ObjectSummary({
         ignoreQueryPrefix: true,
     });
 
-    const {currentData} = overviewApi.useGetOverviewQuery(
+    const {currentData: currentObjectData} = overviewApi.useGetOverviewQuery(
         {
-            paths: [path],
+            path,
             database: tenantName,
         },
         {
             pollingInterval: autoRefreshInterval,
         },
     );
-    const {data: currentObjectData} = currentData ?? {};
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
     React.useEffect(() => {
