@@ -200,7 +200,7 @@ export function Cluster({
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions)).pathname
                     }
                 >
-                    <Versions versionToColor={versionToColor} />
+                    <Versions versionToColor={versionToColor} cluster={cluster} />
                 </Route>
                 <Route
                     render={() => (
