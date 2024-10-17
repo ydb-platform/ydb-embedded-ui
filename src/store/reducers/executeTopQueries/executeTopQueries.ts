@@ -10,7 +10,7 @@ import {getFiltersConditions} from './utils';
 
 const initialState: TopQueriesFilters = {};
 
-const QUERY_TECHNICAL_MARK = '/*UX-QUERY-EXCLUDE*/';
+const QUERY_TECHNICAL_MARK = '/*UI-QUERY-EXCLUDE*/';
 
 const slice = createSlice({
     name: 'executeTopQueries',
