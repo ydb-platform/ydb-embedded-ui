@@ -23,6 +23,7 @@ import type {ModifyDiskResponse} from '../types/api/modifyDisk';
 import type {TNetInfo} from '../types/api/netInfo';
 import type {NodesRequestParams, TNodesInfo} from '../types/api/nodes';
 import type {TEvNodesInfo} from '../types/api/nodesList';
+import type {OperationListRequestParams, TOperationList} from '../types/api/operationList';
 import type {EDecommitStatus, TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
 import type {
     Actions,
@@ -868,6 +869,20 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
 
     getClustersList(_?: never, __: {signal?: AbortSignal} = {}): Promise<MetaClusters> {
         throw new Error('Method is not implemented.');
+    }
+
+    getOperationList(
+        params: OperationListRequestParams,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<TOperationList>(
+            this.getPath('/operation/list'),
+            {...params},
+            {
+                concurrentId,
+                requestConfig: {signal},
+            },
+        );
     }
 
     getClusterBaseInfo(
