@@ -104,3 +104,5 @@ export function isNumeric(value?: unknown): value is number | string {
 export function toExponential(value: number, precision?: number) {
     return Number(value).toExponential(precision);
 }
+
+export const unbreakableGap = '\xa0';

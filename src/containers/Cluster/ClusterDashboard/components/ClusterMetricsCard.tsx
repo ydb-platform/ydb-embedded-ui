@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {Text} from '@gravity-ui/uikit';
 
 import type {DiagnosticCardProps} from '../../../../components/DiagnosticCard/DiagnosticCard';
@@ -45,17 +47,27 @@ export function ClusterMetricsCardDoughnut({
 }: ClusterMetricsDougnutCardProps) {
     return (
         <ClusterMetricsCard title={title} size={size}>
-            <DoughnutMetrics {...rest} className={b('doughtnut')}>
+            <DoughnutMetrics {...rest} className={b('doughnut')}>
                 {children}
             </DoughnutMetrics>
         </ClusterMetricsCard>
     );
 }
 
-export function ClusterMetricsCardSkeleton() {
+function ClusterMetricsCardSkeleton() {
     return (
         <ClusterMetricsCard className={b('skeleton-wrapper')}>
             <Skeleton className={b('skeleton')} />
         </ClusterMetricsCard>
+    );
+}
+
+export function ClusterDashboardSkeleton() {
+    return (
+        <React.Fragment>
+            <ClusterMetricsCardSkeleton />
+            <ClusterMetricsCardSkeleton />
+            <ClusterMetricsCardSkeleton />
+        </React.Fragment>
     );
 }
