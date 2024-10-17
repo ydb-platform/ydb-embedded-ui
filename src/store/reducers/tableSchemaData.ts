@@ -40,11 +40,11 @@ export const tableSchemaDataApi = api.injectEndpoints({
 
                     const schemaData = await dispatch(
                         overviewApi.endpoints.getOverview.initiate({
-                            paths: [path],
+                            path,
                             database: tenantName,
                         }),
                     );
-                    const result = prepareSchemaData(type, schemaData.data?.data);
+                    const result = prepareSchemaData(type, schemaData.data);
 
                     return {data: result};
                 } catch (error) {
