@@ -7,6 +7,8 @@ import {NavigationTree} from 'ydb-ui-components';
 
 import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
+import type {GetTableSchemaDataParams} from '../../../../store/reducers/tableSchemaData';
+import {useGetTableSchemaDataMutation} from '../../../../store/reducers/tableSchemaData';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {useQueryExecutionSettings, useTypedDispatch} from '../../../../utils/hooks';
 import {getSchemaControls} from '../../utils/controls';
@@ -26,6 +28,19 @@ export function SchemaTree(props: SchemaTreeProps) {
     const createDirectoryFeatureAvailable = useCreateDirectoryFeatureAvailable();
     const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
     const dispatch = useTypedDispatch();
+    const [getTableSchemaDataMutation] = useGetTableSchemaDataMutation();
+
+    const getTableSchemaDataPromise = React.useCallback(
+        async (args: GetTableSchemaDataParams) => {
+            try {
+                const result = await getTableSchemaDataMutation(args).unwrap();
+                return result;
+            } catch (e) {
+                return undefined;
+            }
+        },
+        [getTableSchemaDataMutation],
+    );
 
     const [querySettings, setQueryExecutionSettings] = useQueryExecutionSettings();
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
@@ -119,6 +134,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                         showCreateDirectoryDialog: createDirectoryFeatureAvailable
                             ? handleOpenCreateDirectoryDialog
                             : undefined,
+                        getTableSchemaDataPromise,
                     },
                     rootPath,
                 )}

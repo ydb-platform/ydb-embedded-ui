@@ -3,12 +3,13 @@ import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-component
 
 import type {AppDispatch} from '../../../store';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
+import type {GetTableSchemaDataParams} from '../../../store/reducers/tableSchemaData';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import type {QueryMode, QuerySettings} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
-import {getTableDataPromise} from '../../../utils/hooks';
 import {transformPath} from '../ObjectSummary/transformPath';
+import type {SchemaData} from '../Schema/SchemaViewer/types';
 import i18n from '../i18n';
 
 import {nodeTableTypeToPathType} from './schema';
@@ -37,11 +38,9 @@ interface ActionsAdditionalEffects {
     updateQueryExecutionSettings: (settings?: Partial<QuerySettings>) => void;
     setActivePath: (path: string) => void;
     showCreateDirectoryDialog?: (path: string) => void;
-}
-
-interface AdditionalInputQueryOptions {
-    mode?: QueryMode;
-    withTableData?: boolean;
+    getTableSchemaDataPromise?: (
+        params: GetTableSchemaDataParams,
+    ) => Promise<SchemaData[] | undefined>;
 }
 
 interface BindActionParams {
@@ -56,19 +55,28 @@ const bindActions = (
     dispatch: AppDispatch,
     additionalEffects: ActionsAdditionalEffects,
 ) => {
-    const {setActivePath, updateQueryExecutionSettings, showCreateDirectoryDialog} =
-        additionalEffects;
+    const {
+        setActivePath,
+        updateQueryExecutionSettings,
+        showCreateDirectoryDialog,
+        getTableSchemaDataPromise,
+    } = additionalEffects;
 
-    const inputQuery = (tmpl: TemplateFn, options?: AdditionalInputQueryOptions) => () => {
-        if (options?.mode) {
-            updateQueryExecutionSettings({queryMode: options.mode});
+    const inputQuery = (tmpl: TemplateFn, mode?: QueryMode) => () => {
+        if (mode) {
+            updateQueryExecutionSettings({queryMode: mode});
         }
 
         const pathType = nodeTableTypeToPathType[params.type];
+        const withTableData = [selectQueryTemplate, upsertQueryTemplate].includes(tmpl);
 
         const userInputDataPromise =
-            options?.withTableData && pathType
-                ? getTableDataPromise(params.path, params.tenantName, pathType, dispatch)
+            withTableData && pathType && getTableSchemaDataPromise
+                ? getTableSchemaDataPromise({
+                      path: params.path,
+                      tenantName: params.tenantName,
+                      type: pathType,
+                  })
                 : Promise.resolve(undefined);
 
         userInputDataPromise.then((tableData) => {
@@ -86,24 +94,24 @@ const bindActions = (
                   showCreateDirectoryDialog(params.path);
               }
             : undefined,
-        createTable: inputQuery(createTableTemplate, {mode: 'script'}),
-        createColumnTable: inputQuery(createColumnTableTemplate, {mode: 'script'}),
-        createAsyncReplication: inputQuery(createAsyncReplicationTemplate, {mode: 'script'}),
-        alterAsyncReplication: inputQuery(alterAsyncReplicationTemplate, {mode: 'script'}),
-        dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate, {mode: 'script'}),
-        alterTable: inputQuery(alterTableTemplate, {mode: 'script'}),
-        selectQuery: inputQuery(selectQueryTemplate, {withTableData: true}),
-        upsertQuery: inputQuery(upsertQueryTemplate, {withTableData: true}),
-        createExternalTable: inputQuery(createExternalTableTemplate, {mode: 'script'}),
-        dropExternalTable: inputQuery(dropExternalTableTemplate, {mode: 'script'}),
-        selectQueryFromExternalTable: inputQuery(selectQueryTemplate, {mode: 'query'}),
-        createTopic: inputQuery(createTopicTemplate, {mode: 'script'}),
-        alterTopic: inputQuery(alterTopicTemplate, {mode: 'script'}),
-        dropTopic: inputQuery(dropTopicTemplate, {mode: 'script'}),
-        createView: inputQuery(createViewTemplate, {mode: 'script'}),
-        dropView: inputQuery(dropViewTemplate, {mode: 'script'}),
-        dropIndex: inputQuery(dropTableIndex, {mode: 'script'}),
-        addTableIndex: inputQuery(addTableIndex, {mode: 'script'}),
+        createTable: inputQuery(createTableTemplate, 'script'),
+        createColumnTable: inputQuery(createColumnTableTemplate, 'script'),
+        createAsyncReplication: inputQuery(createAsyncReplicationTemplate, 'script'),
+        alterAsyncReplication: inputQuery(alterAsyncReplicationTemplate, 'script'),
+        dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate, 'script'),
+        alterTable: inputQuery(alterTableTemplate, 'script'),
+        selectQuery: inputQuery(selectQueryTemplate),
+        upsertQuery: inputQuery(upsertQueryTemplate),
+        createExternalTable: inputQuery(createExternalTableTemplate, 'script'),
+        dropExternalTable: inputQuery(dropExternalTableTemplate, 'script'),
+        selectQueryFromExternalTable: inputQuery(selectQueryTemplate, 'query'),
+        createTopic: inputQuery(createTopicTemplate, 'script'),
+        alterTopic: inputQuery(alterTopicTemplate, 'script'),
+        dropTopic: inputQuery(dropTopicTemplate, 'script'),
+        createView: inputQuery(createViewTemplate, 'script'),
+        dropView: inputQuery(dropViewTemplate, 'script'),
+        dropIndex: inputQuery(dropTableIndex, 'script'),
+        addTableIndex: inputQuery(addTableIndex, 'script'),
         copyPath: () => {
             try {
                 copy(params.relativePath);

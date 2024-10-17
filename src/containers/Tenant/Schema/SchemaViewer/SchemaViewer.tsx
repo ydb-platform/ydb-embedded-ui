@@ -1,10 +1,14 @@
 import React from 'react';
 
+import {skipToken} from '@reduxjs/toolkit/query';
+
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
+import {overviewApi} from '../../../../store/reducers/overview/overview';
+import {viewSchemaApi} from '../../../../store/reducers/viewSchema/viewSchema';
 import type {EPathType} from '../../../../types/api/schema';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {useTableData} from '../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {
     isColumnEntityType,
     isExternalTableType,
@@ -20,6 +24,7 @@ import {
     getRowTableColumns,
     getViewColumns,
 } from './columns';
+import {prepareSchemaData, prepareViewSchema} from './prepareData';
 import {b} from './shared';
 
 import './SchemaViewer.scss';
@@ -32,11 +37,31 @@ interface SchemaViewerProps {
 }
 
 export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaViewerProps) => {
-    const {tableData, isOverviewLoading, isViewSchemaLoading} = useTableData({
-        type,
-        path,
-        tenantName,
-    });
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {currentData, isLoading: loading} = overviewApi.useGetOverviewQuery(
+        {
+            paths: [path],
+            database: tenantName,
+        },
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
+
+    const {data: schemaData} = currentData ?? {};
+
+    const viewSchemaRequestParams = isViewType(type) ? {path, database: tenantName} : skipToken;
+
+    const {data: viewColumnsData, isLoading: isViewSchemaLoading} =
+        viewSchemaApi.useGetViewSchemaQuery(viewSchemaRequestParams);
+
+    const tableData = React.useMemo(() => {
+        if (isViewType(type)) {
+            return prepareViewSchema(viewColumnsData);
+        }
+
+        return prepareSchemaData(type, schemaData);
+    }, [schemaData, type, viewColumnsData]);
 
     const hasAutoIncrement = React.useMemo(() => {
         return tableData.some((i) => i.autoIncrement);
@@ -63,7 +88,7 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
         return [];
     }, [type, extended, hasAutoIncrement, hasDefaultValue]);
 
-    if (isOverviewLoading || isViewSchemaLoading) {
+    if (loading || isViewSchemaLoading) {
         return <TableSkeleton />;
     }
 
