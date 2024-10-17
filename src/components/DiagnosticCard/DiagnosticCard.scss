@@ -1,7 +1,6 @@
 .ydb-diagnostic-card {
     flex-shrink: 0;
 
-    width: 206px;
     padding: 16px;
     padding-bottom: 28px;
 
@@ -13,10 +12,24 @@
         border-color: var(--g-color-base-info-medium);
         background-color: var(--g-color-base-selection);
     }
+    &_interactive {
+        &:hover {
+            cursor: pointer;
 
-    &:hover {
-        cursor: pointer;
+            box-shadow: 0px 1px 5px var(--g-color-sfx-shadow);
+        }
+    }
 
-        box-shadow: 0px 1px 5px var(--g-color-sfx-shadow);
+    &_size_m {
+        width: 206px;
+        min-width: 206px;
+    }
+    &_size_l {
+        width: 289px;
+        min-width: 289px;
+    }
+    &_size_s {
+        width: 134px;
+        min-width: 134px;
     }
 }

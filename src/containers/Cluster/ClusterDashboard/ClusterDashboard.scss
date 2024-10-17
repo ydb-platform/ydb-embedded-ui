@@ -1,0 +1,46 @@
+.ydb-cluster-dashboard {
+    position: sticky;
+    left: 0;
+
+    padding-top: 16px;
+    &__card {
+        display: flex;
+        flex-direction: column;
+
+        height: 252px;
+    }
+    &__card_size_s {
+        height: unset;
+    }
+    &__card_size_l {
+        width: 100%;
+        height: unset;
+    }
+    &__skeleton-wrapper {
+        padding: unset;
+
+        border: unset;
+    }
+    &__doughtnut {
+        margin-top: auto;
+    }
+    &__cards {
+        display: flex;
+    }
+    &__card-title {
+        margin-bottom: var(--g-spacing-2);
+    }
+    &__skeleton {
+        height: 100%;
+    }
+    &__cards-container {
+        display: grid;
+        grid-template-columns: repeat(2, max-content);
+        grid-template-rows: repeat(2, 118px);
+        grid-auto-flow: column dense;
+        gap: var(--g-spacing-4);
+    }
+    &__double-height {
+        grid-row: span 2;
+    }
+}

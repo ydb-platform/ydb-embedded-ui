@@ -1,0 +1,58 @@
+.ydb-doughnut-metrics {
+    --doughnut-border: 11px;
+    --doughnut-color: var(--ydb-color-status-green);
+    &__doughnut {
+        position: relative;
+
+        width: 172px;
+        aspect-ratio: 1;
+
+        border-radius: 50%;
+        background-color: var(--doughnut-color);
+        &::before {
+            display: block;
+
+            height: calc(100% - calc(var(--doughnut-border) * 2));
+
+            content: '';
+
+            border-radius: 50%;
+            background-color: var(--g-color-base-background);
+
+            transform: translate(var(--doughnut-border), var(--doughnut-border));
+            aspect-ratio: 1;
+        }
+    }
+    &__doughnut_status_warning {
+        --doughnut-color: var(--ydb-color-status-yellow);
+    }
+    &__doughnut_status_danger {
+        --doughnut-color: var(--ydb-color-status-red);
+    }
+    &__text-wrapper {
+        --wrapper-indent: calc(var(--doughnut-border) + 5px);
+
+        position: absolute;
+        top: var(--wrapper-indent);
+        right: var(--wrapper-indent);
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        width: calc(100% - calc(var(--wrapper-indent) * 2));
+
+        text-align: center;
+        aspect-ratio: 1;
+    }
+    &__value {
+        position: absolute;
+        bottom: 20px;
+    }
+    &__legend {
+        height: 50%;
+
+        white-space: pre-wrap;
+    }
+}
