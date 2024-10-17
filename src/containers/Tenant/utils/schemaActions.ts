@@ -1,15 +1,19 @@
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
+import type {AppDispatch} from '../../../store';
 import {changeUserInput} from '../../../store/reducers/executeQuery';
+import type {GetTableSchemaDataParams} from '../../../store/reducers/tableSchemaData';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import type {QueryMode, QuerySettings} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
 import {transformPath} from '../ObjectSummary/transformPath';
+import type {SchemaData} from '../Schema/SchemaViewer/types';
 import i18n from '../i18n';
 
-import type {SchemaQueryParams} from './schemaQueryTemplates';
+import {nodeTableTypeToPathType} from './schema';
+import type {TemplateFn} from './schemaQueryTemplates';
 import {
     addTableIndex,
     alterAsyncReplicationTemplate,
@@ -34,31 +38,60 @@ interface ActionsAdditionalEffects {
     updateQueryExecutionSettings: (settings?: Partial<QuerySettings>) => void;
     setActivePath: (path: string) => void;
     showCreateDirectoryDialog?: (path: string) => void;
+    getTableSchemaDataPromise?: (
+        params: GetTableSchemaDataParams,
+    ) => Promise<SchemaData[] | undefined>;
+}
+
+interface BindActionParams {
+    tenantName: string;
+    type: NavigationTreeNodeType;
+    path: string;
+    relativePath: string;
 }
 
 const bindActions = (
-    schemaQueryParams: SchemaQueryParams,
-    dispatch: React.Dispatch<any>,
+    params: BindActionParams,
+    dispatch: AppDispatch,
     additionalEffects: ActionsAdditionalEffects,
 ) => {
-    const {setActivePath, updateQueryExecutionSettings, showCreateDirectoryDialog} =
-        additionalEffects;
+    const {
+        setActivePath,
+        updateQueryExecutionSettings,
+        showCreateDirectoryDialog,
+        getTableSchemaDataPromise,
+    } = additionalEffects;
 
-    const inputQuery = (tmpl: (params?: SchemaQueryParams) => string, mode?: QueryMode) => () => {
+    const inputQuery = (tmpl: TemplateFn, mode?: QueryMode) => () => {
         if (mode) {
             updateQueryExecutionSettings({queryMode: mode});
         }
 
-        dispatch(changeUserInput({input: tmpl(schemaQueryParams)}));
+        const pathType = nodeTableTypeToPathType[params.type];
+        const withTableData = [selectQueryTemplate, upsertQueryTemplate].includes(tmpl);
+
+        const userInputDataPromise =
+            withTableData && pathType && getTableSchemaDataPromise
+                ? getTableSchemaDataPromise({
+                      path: params.path,
+                      tenantName: params.tenantName,
+                      type: pathType,
+                  })
+                : Promise.resolve(undefined);
+
+        userInputDataPromise.then((tableData) => {
+            dispatch(changeUserInput({input: tmpl({...params, tableData})}));
+        });
+
         dispatch(setTenantPage(TENANT_PAGES_IDS.query));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-        setActivePath(schemaQueryParams.path);
+        setActivePath(params.path);
     };
 
     return {
         createDirectory: showCreateDirectoryDialog
             ? () => {
-                  showCreateDirectoryDialog(schemaQueryParams.path);
+                  showCreateDirectoryDialog(params.path);
               }
             : undefined,
         createTable: inputQuery(createTableTemplate, 'script'),
@@ -81,7 +114,7 @@ const bindActions = (
         addTableIndex: inputQuery(addTableIndex, 'script'),
         copyPath: () => {
             try {
-                copy(schemaQueryParams.relativePath);
+                copy(params.relativePath);
                 createToast({
                     name: 'Copied',
                     title: i18n('actions.copied'),
@@ -101,10 +134,14 @@ const bindActions = (
 type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
 
 export const getActions =
-    (dispatch: React.Dispatch<any>, additionalEffects: ActionsAdditionalEffects, rootPath = '') =>
+    (dispatch: AppDispatch, additionalEffects: ActionsAdditionalEffects, rootPath = '') =>
     (path: string, type: NavigationTreeNodeType) => {
         const relativePath = transformPath(path, rootPath);
-        const actions = bindActions({path, relativePath}, dispatch, additionalEffects);
+        const actions = bindActions(
+            {path, relativePath, tenantName: rootPath, type},
+            dispatch,
+            additionalEffects,
+        );
         const copyItem = {text: i18n('actions.copyPath'), action: actions.copyPath};
 
         const DIR_SET: ActionsSet = [

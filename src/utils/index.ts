@@ -6,8 +6,8 @@ export function valueIsDefined<T>(value: T | null | undefined): value is T {
     return value !== null && value !== undefined;
 }
 
-export async function wait(time: number) {
+export async function wait<T = unknown>(time: number, value?: T): Promise<T | undefined> {
     return new Promise((resolve) => {
-        setTimeout(resolve, time);
+        setTimeout(() => resolve(value), time);
     });
 }

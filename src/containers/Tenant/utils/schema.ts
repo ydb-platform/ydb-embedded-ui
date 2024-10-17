@@ -41,6 +41,14 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeReplication]: 'async_replication',
 };
 
+export const nodeTableTypeToPathType: Partial<Record<NavigationTreeNodeType, EPathType>> = {
+    table: EPathType.EPathTypeTable,
+    index: EPathType.EPathTypeTableIndex,
+    column_table: EPathType.EPathTypeColumnTable,
+    external_table: EPathType.EPathTypeExternalTable,
+    view: EPathType.EPathTypeView,
+};
+
 export const mapPathTypeToNavigationTreeType = (
     type: EPathType = EPathType.EPathTypeDir,
     subType?: EPathSubType,
