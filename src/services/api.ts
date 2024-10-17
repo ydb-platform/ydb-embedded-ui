@@ -204,7 +204,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
             tablets = false,
             database,
             tenant,
-            fieldsRequired = 'all',
+            fieldsRequired,
             filter,
             ...params
         }: NodesRequestParams,
@@ -250,7 +250,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getStorageGroups(
-        {nodeId, pDiskId, groupId, fieldsRequired = 'all', filter, ...params}: GroupsRequestParams,
+        {nodeId, pDiskId, groupId, fieldsRequired, filter, ...params}: GroupsRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         const preparedNodeId = Array.isArray(nodeId)
