@@ -107,7 +107,7 @@ export function useGetMultiOverviewQuery({
     );
 
     const {
-        currentData: currentChindrenDescribe = [],
+        currentData: currentChindrenDescribe,
         isFetching: childrenDescribeIsFetching,
         error: childrenDescribeError,
     } = overviewApi.useGetMultiOverviewQuery(
@@ -123,7 +123,7 @@ export function useGetMultiOverviewQuery({
 
     const loading = mainDescribeLoading || childrenDescribeLoading;
 
-    const describe = [mainDescribe, ...currentChindrenDescribe];
+    const describe = [mainDescribe, ...(currentChindrenDescribe ?? [])];
 
     const mergedDescribe = describe.reduce<IDescribeData>((acc, item) => {
         if (item?.Path) {
