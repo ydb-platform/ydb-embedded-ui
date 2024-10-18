@@ -1,0 +1,17 @@
+{
+  "label_operations": "Operations",
+  "title_empty": "No operations data",
+  "pleaceholder_search": "Search operations",
+  "placeholder_kind": "Select operation kind",
+  "kind_ssBackgrounds": "SS/Backgrounds",
+  "kind_export": "Export",
+  "kind_buildIndex": "Build Index",
+
+  "column_operationId": "Operation ID",
+  "column_status": "Status",
+  "column_createdBy": "Created By",
+  "column_createTime": "Create Time",
+  "column_endTime": "End Time",
+  "column_duration": "Duration",
+  "label_duration-ongoing": "{{value}} (ongoing)"
+}
