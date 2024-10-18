@@ -2,11 +2,11 @@ import type {IResponseError} from '../../types/api/error';
 
 import type {ASCENDING, CENTER, DESCENDING, LEFT, RIGHT} from './constants';
 
-export interface Chunk<T> {
+export interface Chunk<EntityType> {
     active: boolean;
     loading: boolean;
     wasLoaded: boolean;
-    data?: T[];
+    data?: EntityType[];
     error?: IResponseError;
 }
 
@@ -23,36 +23,42 @@ export type OnSort = (params: SortParams) => void;
 
 export type HandleTableColumnsResize = (columnId: string, width: number) => void;
 
-export interface Column<T> {
+export interface Column<EntityType> {
     name: string;
     header?: React.ReactNode;
     className?: string;
     sortable?: boolean;
     resizeable?: boolean;
-    render: (props: {row: T; index: number}) => React.ReactNode;
+    render: (props: {row: EntityType; index: number}) => React.ReactNode;
     width?: number;
     resizeMaxWidth?: number;
     resizeMinWidth?: number;
     align: AlignType;
 }
 
-export interface PaginatedTableData<T> {
-    data: T[];
+export interface PaginatedTableData<EntityType> {
+    data: EntityType[];
     total: number;
     found: number;
 }
 
-type FetchDataParams<F, E = {}> = {
+type FetchDataParams<Filters, DataFieldType = undefined, AdditionalParams = {}> = {
     limit: number;
     offset: number;
-    filters?: F;
+    filters?: Filters;
+    dataFieldsRequired?: DataFieldType[];
     sortParams?: SortParams;
     signal?: AbortSignal;
-} & E;
+} & AdditionalParams;
 
-export type FetchData<T, F = undefined, E = {}> = (
-    params: FetchDataParams<F, E>,
-) => Promise<PaginatedTableData<T>>;
+export type FetchData<
+    EntityType,
+    Filters = undefined,
+    DataFieldType = undefined,
+    AdditionalParams = {},
+> = (
+    params: FetchDataParams<Filters, DataFieldType, AdditionalParams>,
+) => Promise<PaginatedTableData<EntityType>>;
 
 export type OnError = (error?: IResponseError) => void;
 
@@ -66,4 +72,4 @@ export type RenderControls = (params: ControlsParams) => React.ReactNode;
 export type RenderEmptyDataMessage = () => React.ReactNode;
 export type RenderErrorMessage = (error: IResponseError) => React.ReactNode;
 
-export type GetRowClassName<T> = (row: T) => string | undefined;
+export type GetRowClassName<EntityType> = (row: EntityType) => string | undefined;

@@ -4,24 +4,34 @@ import type {FetchData, PaginatedTableData, SortParams} from '../../components/P
 
 import {api} from './api';
 
-interface PaginatedTableParams<T, F> {
+interface PaginatedTableParams<EntityType, Filters, DataFieldType> {
     offset: number;
-    fetchData: FetchData<T, F>;
-    filters: F;
+    fetchData: FetchData<EntityType, Filters, DataFieldType>;
+    filters: Filters;
+    dataFieldsRequired?: DataFieldType[];
     limit: number;
     sortParams?: SortParams;
     tableName: string;
 }
 
-function endpoints<T, F>(build: EndpointBuilder<BaseQueryFn, string, string>) {
+function endpoints<EntityType, Filters, DataFieldType>(
+    build: EndpointBuilder<BaseQueryFn, string, string>,
+) {
     return {
-        fetchTableChunk: build.query<PaginatedTableData<T>, PaginatedTableParams<T, F>>({
-            queryFn: async ({offset, limit, sortParams, filters, fetchData}, {signal}) => {
+        fetchTableChunk: build.query<
+            PaginatedTableData<EntityType>,
+            PaginatedTableParams<EntityType, Filters, DataFieldType>
+        >({
+            queryFn: async (
+                {offset, limit, sortParams, filters, dataFieldsRequired, fetchData},
+                {signal},
+            ) => {
                 try {
                     const response = await fetchData({
                         limit,
                         offset,
                         filters,
+                        dataFieldsRequired,
                         sortParams,
                         signal,
                     });

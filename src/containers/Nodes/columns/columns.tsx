@@ -11,9 +11,10 @@ import {
     getUptimeColumn,
     getVersionColumn,
 } from '../../../components/nodesColumns/columns';
-import type {Column, GetNodesColumnsParams} from '../../../components/nodesColumns/types';
+import type {GetNodesColumnsParams} from '../../../components/nodesColumns/types';
 import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
 import {isSortableNodesProperty} from '../../../utils/nodes';
+import type {Column} from '../../../utils/tableUtils/types';
 
 export function getNodesColumns(params: GetNodesColumnsParams): Column<NodesPreparedEntity>[] {
     const columns = [

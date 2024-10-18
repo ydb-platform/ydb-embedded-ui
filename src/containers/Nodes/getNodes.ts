@@ -1,7 +1,7 @@
 import type {FetchData} from '../../components/PaginatedTable';
 import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {prepareNodesData} from '../../store/reducers/nodes/utils';
-import type {NodesRequestParams} from '../../types/api/nodes';
+import type {NodesRequestParams, NodesRequiredField} from '../../types/api/nodes';
 import {prepareSortValue} from '../../utils/filters';
 import {
     getProblemParamValue,
@@ -16,6 +16,7 @@ const getConcurrentId = (limit?: number, offset?: number) => {
 export const getNodes: FetchData<
     NodesPreparedEntity,
     NodesFilters,
+    NodesRequiredField,
     Pick<NodesRequestParams, 'type' | 'storage' | 'tablets'>
 > = async (params) => {
     const {
@@ -26,6 +27,7 @@ export const getNodes: FetchData<
         offset,
         sortParams,
         filters,
+        dataFieldsRequired,
     } = params;
 
     const {sortOrder, columnId} = sortParams ?? {};
@@ -48,6 +50,7 @@ export const getNodes: FetchData<
             filter: searchValue,
             problems_only: getProblemParamValue(problemFilter),
             uptime: getUptimeParamValue(uptimeFilter),
+            fieldsRequired: dataFieldsRequired,
         },
         {concurrentId: getConcurrentId(limit, offset), signal: params.signal},
     );

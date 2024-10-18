@@ -64,10 +64,11 @@ export const PaginatedNodes = ({path, database, parentRef, additionalNodesProps}
         return {path, database, searchValue, problemFilter, uptimeFilter};
     }, [path, database, searchValue, problemFilter, uptimeFilter]);
 
-    const {columnsToShow, columnsToSelect, setColumns} = useNodesSelectedColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database,
-    });
+    const {columnsToShow, columnsToSelect, setColumns, dataFieldsRequired} =
+        useNodesSelectedColumns({
+            getNodeRef: additionalNodesProps?.getNodeRef,
+            database,
+        });
 
     const getRowClassName: GetRowClassName<NodesPreparedEntity> = (row) => {
         return b('node', {unavailable: isUnavailableNode(row)});
@@ -144,6 +145,7 @@ export const PaginatedNodes = ({path, database, parentRef, additionalNodesProps}
             renderEmptyDataMessage={renderEmptyDataMessage}
             getRowClassName={getRowClassName}
             filters={tableFilters}
+            dataFieldsRequired={dataFieldsRequired}
             tableName="nodes"
         />
     );

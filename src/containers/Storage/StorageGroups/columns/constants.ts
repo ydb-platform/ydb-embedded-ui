@@ -1,7 +1,7 @@
 import type {SelectOption} from '@gravity-ui/uikit';
 import {z} from 'zod';
 
-import type {GroupsGroupByField} from '../../../../types/api/storage';
+import type {GroupsGroupByField, GroupsRequiredField} from '../../../../types/api/storage';
 import type {ValueOf} from '../../../../types/common';
 
 import i18n from './i18n';
@@ -31,7 +31,7 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
     State: 'State',
 } as const;
 
-type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
+export type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
 
 export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
     'GroupId',
@@ -136,3 +136,29 @@ export const storageGroupsGroupByParamSchema = z
         GroupsGroupByField | undefined
     >((value) => STORAGE_GROUPS_GROUP_BY_PARAMS.includes(value))
     .catch(undefined);
+
+// Although columns ids mostly similar to backend fields, there might be some difference
+// Also for some columns we may use more than one field
+export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, GroupsRequiredField[]> = {
+    GroupId: ['GroupId'],
+    PoolName: ['PoolName'],
+    // We display MediaType and Encryption in one Type column
+    MediaType: ['MediaType', 'Encryption'],
+    Encryption: ['Encryption'],
+    Erasure: ['Erasure'],
+    Used: ['Used'],
+    Limit: ['Limit'],
+    Usage: ['Usage'],
+    DiskSpaceUsage: ['DiskSpaceUsage'],
+    DiskSpace: ['State'],
+    Read: ['Read'],
+    Write: ['Write'],
+    Latency: ['Latency'],
+    AllocationUnits: ['AllocationUnits'],
+    // Read and Write fields make backend to return Whiteboard data
+    VDisks: ['VDisk', 'PDisk', 'Read', 'Write'],
+    VDisksPDisks: ['VDisk', 'PDisk', 'Read', 'Write'],
+    MissingDisks: ['MissingDisks'],
+    Degraded: ['MissingDisks'],
+    State: ['State'],
+};

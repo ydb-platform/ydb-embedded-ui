@@ -70,10 +70,11 @@ function StorageNodesComponent({
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
-    const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
-        database,
-        viewContext,
-    });
+    const {columnsToShow, columnsToSelect, setColumns, dataFieldsRequired} =
+        useStorageNodesColumnsToSelect({
+            database,
+            viewContext,
+        });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
@@ -97,6 +98,7 @@ function StorageNodesComponent({
             searchValue={searchValue}
             visibleEntities={visibleEntities}
             nodesUptimeFilter={nodesUptimeFilter}
+            dataFieldsRequired={dataFieldsRequired}
             onShowAll={handleShowAllNodes}
             parentRef={parentRef}
             renderControls={renderControls}
@@ -117,10 +119,11 @@ function GroupedStorageNodesComponent({
 
     const {searchValue, storageNodesGroupByParam, handleShowAllNodes} = useStorageQueryParams();
 
-    const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
-        database,
-        viewContext,
-    });
+    const {columnsToShow, columnsToSelect, setColumns, dataFieldsRequired} =
+        useStorageNodesColumnsToSelect({
+            database,
+            viewContext,
+        });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageNodesInfoQuery(
         {
@@ -176,6 +179,7 @@ function GroupedStorageNodesComponent({
                             searchValue={searchValue}
                             visibleEntities={'all'}
                             nodesUptimeFilter={NodesUptimeFilterValues.All}
+                            dataFieldsRequired={dataFieldsRequired}
                             onShowAll={handleShowAllNodes}
                             filterGroup={name}
                             filterGroupBy={storageNodesGroupByParam}

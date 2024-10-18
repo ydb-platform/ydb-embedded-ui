@@ -13,12 +13,15 @@ import {
     getUptimeColumn,
     getVersionColumn,
 } from '../../../../components/nodesColumns/columns';
+import {
+    NODES_COLUMNS_IDS,
+    NODES_COLUMNS_TITLES,
+} from '../../../../components/nodesColumns/constants';
 import type {PreparedStorageNode} from '../../../../store/reducers/storage/types';
 import {cn} from '../../../../utils/cn';
 import {isSortableNodesProperty} from '../../../../utils/nodes';
 import {PDisk} from '../../PDisk/PDisk';
 
-import {STORAGE_NODES_COLUMNS_IDS, STORAGE_NODES_COLUMNS_TITLES} from './constants';
 import type {GetStorageNodesColumnsParams, StorageNodesColumn} from './types';
 
 import './StorageNodesColumns.scss';
@@ -27,8 +30,8 @@ const b = cn('ydb-storage-nodes-columns');
 
 const getPDisksColumn = ({viewContext}: GetStorageNodesColumnsParams): StorageNodesColumn => {
     return {
-        name: STORAGE_NODES_COLUMNS_IDS.PDisks,
-        header: STORAGE_NODES_COLUMNS_TITLES.PDisks,
+        name: NODES_COLUMNS_IDS.PDisks,
+        header: NODES_COLUMNS_TITLES.PDisks,
         className: b('pdisks-column'),
         render: ({row}) => {
             return (

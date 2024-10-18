@@ -62,10 +62,11 @@ function StorageGroupsComponent({
 
     const storageGroupsHandlerHasGroupping = useStorageGroupsHandlerHasGrouping();
 
-    const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
-        visibleEntities,
-        viewContext,
-    });
+    const {columnsToShow, columnsToSelect, setColumns, dataFieldsRequired} =
+        useStorageGroupsSelectedColumns({
+            visibleEntities,
+            viewContext,
+        });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
@@ -87,6 +88,7 @@ function StorageGroupsComponent({
             nodeId={nodeId}
             groupId={groupId}
             pDiskId={pDiskId}
+            dataFieldsRequired={dataFieldsRequired}
             searchValue={searchValue}
             visibleEntities={visibleEntities}
             onShowAll={handleShowAllGroups}
@@ -111,10 +113,11 @@ function GroupedStorageGroupsComponent({
     const {searchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
         useStorageQueryParams();
 
-    const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
-        visibleEntities,
-        viewContext,
-    });
+    const {columnsToShow, columnsToSelect, setColumns, dataFieldsRequired} =
+        useStorageGroupsSelectedColumns({
+            visibleEntities,
+            viewContext,
+        });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
         {
@@ -170,6 +173,7 @@ function GroupedStorageGroupsComponent({
                             nodeId={nodeId}
                             groupId={groupId}
                             pDiskId={pDiskId}
+                            dataFieldsRequired={dataFieldsRequired}
                             filterGroup={name}
                             filterGroupBy={storageGroupsGroupByParam}
                             searchValue={searchValue}

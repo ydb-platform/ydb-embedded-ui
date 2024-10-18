@@ -1,3 +1,4 @@
+import type {NodesRequiredField} from '../../types/api/nodes';
 import type {ValueOf} from '../../types/common';
 
 import i18n from './i18n';
@@ -21,6 +22,7 @@ export const NODES_COLUMNS_IDS = {
     TotalSessions: 'TotalSessions',
     Missing: 'Missing',
     Tablets: 'Tablets',
+    PDisks: 'PDisks',
 } as const;
 
 export type NodesColumnId = ValueOf<typeof NODES_COLUMNS_IDS>;
@@ -76,4 +78,29 @@ export const NODES_COLUMNS_TITLES = {
     get Tablets() {
         return i18n('tablets');
     },
+    get PDisks() {
+        return i18n('pdisks');
+    },
 } as const satisfies Record<NodesColumnId, string>;
+
+// Although columns ids mostly similar to backend fields, there might be some difference
+// Also for some columns we may use more than one field
+export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredField[]> = {
+    NodeId: ['NodeId'],
+    Host: ['Host', 'Rack', 'Database', 'SystemState'],
+    NodeName: ['NodeName'],
+    DC: ['DC'],
+    Rack: ['Rack'],
+    Version: ['Version'],
+    Uptime: ['Uptime'],
+    Memory: ['Memory'],
+    CPU: ['CPU'],
+    LoadAverage: ['LoadAverage'],
+    Load: ['LoadAverage'],
+    DiskSpaceUsage: ['DiskSpaceUsage'],
+    SharedCacheUsage: ['SystemState'],
+    TotalSessions: ['SystemState'],
+    Missing: ['Missing'],
+    Tablets: ['Tablets', 'Database'],
+    PDisks: ['PDisks'],
+};

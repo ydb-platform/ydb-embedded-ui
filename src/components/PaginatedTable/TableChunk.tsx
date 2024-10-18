@@ -11,25 +11,26 @@ import type {Column, FetchData, GetRowClassName, SortParams} from './types';
 
 const DEBOUNCE_TIMEOUT = 200;
 
-interface TableChunkProps<T, F> {
+interface TableChunkProps<EntityType, Filters, DataFieldType> {
     id: number;
     limit: number;
     totalLength: number;
     rowHeight: number;
-    columns: Column<T>[];
-    filters?: F;
+    columns: Column<EntityType>[];
+    filters?: Filters;
+    dataFieldsRequired?: DataFieldType[];
     sortParams?: SortParams;
     isActive: boolean;
     tableName: string;
 
-    fetchData: FetchData<T, F>;
-    getRowClassName?: GetRowClassName<T>;
+    fetchData: FetchData<EntityType, Filters, DataFieldType>;
+    getRowClassName?: GetRowClassName<EntityType>;
     renderErrorMessage?: (error: IResponseError) => React.ReactNode;
     onDataFetched: (total: number, found: number) => void;
 }
 
 // Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
-export const TableChunk = <T, F>({
+export const TableChunk = <EntityType, Filters, DataFieldType>({
     id,
     limit,
     totalLength,
@@ -38,20 +39,22 @@ export const TableChunk = <T, F>({
     fetchData,
     tableName,
     filters,
+    dataFieldsRequired,
     sortParams,
     getRowClassName,
     renderErrorMessage,
     onDataFetched,
     isActive,
-}: TableChunkProps<T, F>) => {
+}: TableChunkProps<EntityType, Filters, DataFieldType>) => {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const queryParams = {
         offset: id * limit,
         limit,
-        fetchData: fetchData as FetchData<T, unknown>,
+        fetchData: fetchData as FetchData<EntityType, unknown, unknown>,
         filters,
+        dataFieldsRequired,
         sortParams,
         tableName,
     };
@@ -123,7 +126,7 @@ export const TableChunk = <T, F>({
             <TableRow
                 key={index}
                 index={index}
-                row={rowData as T}
+                row={rowData as EntityType}
                 columns={columns}
                 height={rowHeight}
                 getRowClassName={getRowClassName}

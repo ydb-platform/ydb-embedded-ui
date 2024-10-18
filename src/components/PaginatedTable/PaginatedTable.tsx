@@ -23,14 +23,15 @@ import {useScrollBasedChunks} from './useScrollBasedChunks';
 
 import './PaginatedTable.scss';
 
-export interface PaginatedTableProps<T, F> {
+export interface PaginatedTableProps<EntityType, Filters, DataFieldType> {
     limit: number;
     initialEntitiesCount?: number;
-    fetchData: FetchData<T, F>;
-    filters?: F;
+    fetchData: FetchData<EntityType, Filters, DataFieldType>;
+    filters?: Filters;
+    dataFieldsRequired?: DataFieldType[];
     tableName: string;
-    columns: Column<T>[];
-    getRowClassName?: GetRowClassName<T>;
+    columns: Column<EntityType>[];
+    getRowClassName?: GetRowClassName<EntityType>;
     rowHeight?: number;
     parentRef?: React.RefObject<HTMLElement>;
     initialSortParams?: SortParams;
@@ -41,11 +42,12 @@ export interface PaginatedTableProps<T, F> {
     containerClassName?: string;
 }
 
-export const PaginatedTable = <T, F>({
+export const PaginatedTable = <EntityType, Filters, DataFieldType>({
     limit,
     initialEntitiesCount,
     fetchData,
     filters,
+    dataFieldsRequired,
     tableName,
     columns,
     getRowClassName,
@@ -57,7 +59,7 @@ export const PaginatedTable = <T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     containerClassName,
-}: PaginatedTableProps<T, F>) => {
+}: PaginatedTableProps<EntityType, Filters, DataFieldType>) => {
     const initialTotal = initialEntitiesCount || limit;
     const initialFound = initialEntitiesCount || 0;
 
@@ -108,7 +110,7 @@ export const PaginatedTable = <T, F>({
         const chunksCount = Math.ceil(totalLength / limit);
 
         return getArray(chunksCount).map((value) => (
-            <TableChunk<T, F>
+            <TableChunk<EntityType, Filters, DataFieldType>
                 key={value}
                 id={value}
                 limit={limit}
@@ -117,6 +119,7 @@ export const PaginatedTable = <T, F>({
                 columns={columns}
                 fetchData={fetchData}
                 filters={filters}
+                dataFieldsRequired={dataFieldsRequired}
                 tableName={tableName}
                 sortParams={sortParams}
                 getRowClassName={getRowClassName}

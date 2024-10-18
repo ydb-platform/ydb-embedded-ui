@@ -14,5 +14,6 @@
   "load": "Load",
   "caches": "Caches",
   "sessions": "Sessions",
-  "missing": "Missing"
+  "missing": "Missing",
+  "pdisks": "PDisks"
 }

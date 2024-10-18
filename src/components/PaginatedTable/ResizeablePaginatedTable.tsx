@@ -7,22 +7,25 @@ import {PaginatedTable} from './PaginatedTable';
 import {b} from './shared';
 import type {Column} from './types';
 
-function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWidthByName) {
+function updateColumnsWidth<EntityType>(
+    columns: Column<EntityType>[],
+    columnsWidthSetup: ColumnWidthByName,
+) {
     return columns.map((column) => {
         return {...column, width: columnsWidthSetup[column.name] ?? column.width};
     });
 }
 
-interface ResizeablePaginatedTableProps<T, F>
-    extends Omit<PaginatedTableProps<T, F>, 'onColumnsResize'> {
+interface ResizeablePaginatedTableProps<EntityType, Filters, DataFieldType>
+    extends Omit<PaginatedTableProps<EntityType, Filters, DataFieldType>, 'onColumnsResize'> {
     columnsWidthLSKey: string;
 }
 
-export function ResizeablePaginatedTable<T, F>({
+export function ResizeablePaginatedTable<EntityType, Filters, DataFieldType>({
     columnsWidthLSKey,
     columns,
     ...props
-}: ResizeablePaginatedTableProps<T, F>) {
+}: ResizeablePaginatedTableProps<EntityType, Filters, DataFieldType>) {
     const [tableColumnsWidth, setTableColumnsWidth] = useTableResize(columnsWidthLSKey);
 
     const updatedColumns = updateColumnsWidth(columns, tableColumnsWidth);
