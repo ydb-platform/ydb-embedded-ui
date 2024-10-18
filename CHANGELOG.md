@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.26.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.26.0...v6.26.1) (2024-10-18)
+
+
+### Bug Fixes
+
+* **EntityStatus:** set minimum container width ([#1494](https://github.com/ydb-platform/ydb-embedded-ui/issues/1494)) ([d6c6a4c](https://github.com/ydb-platform/ydb-embedded-ui/commit/d6c6a4c709e5b8ce6bdff85fe756b1299805b776))
+
 ## [6.26.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.25.0...v6.26.0) (2024-10-18)
 
 
