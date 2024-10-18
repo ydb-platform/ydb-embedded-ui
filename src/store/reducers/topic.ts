@@ -29,8 +29,9 @@ export const topicApi = api.injectEndpoints({
 });
 
 const createGetTopicSelector = createSelector(
-    (path: string, database: string) => ({path, database}),
-    (params) => topicApi.endpoints.getTopic.select(params),
+    (path: string) => path,
+    (_path: string, database: string) => database,
+    (path, database) => topicApi.endpoints.getTopic.select({path, database}),
 );
 
 const selectTopicStats = createSelector(
