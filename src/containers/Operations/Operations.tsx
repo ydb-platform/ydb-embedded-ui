@@ -63,7 +63,7 @@ export function Operations({database}: OperationsProps) {
                     <ResizeableDataTable
                         columns={getColumns()}
                         data={filteredOperations}
-                        emptyDataMessage={i18n('operations.noData')}
+                        emptyDataMessage={i18n('title_empty')}
                     />
                 ) : null}
             </TableWithControlsLayout.Table>

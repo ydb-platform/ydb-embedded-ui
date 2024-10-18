@@ -14,12 +14,12 @@ export const COLUMNS_NAMES = {
 } as const;
 
 export const COLUMNS_TITLES = {
-    [COLUMNS_NAMES.ID]: i18n('column.operationId'),
-    [COLUMNS_NAMES.STATUS]: i18n('column.status'),
-    [COLUMNS_NAMES.CREATED_BY]: i18n('column.createdBy'),
-    [COLUMNS_NAMES.CREATE_TIME]: i18n('column.createTime'),
-    [COLUMNS_NAMES.END_TIME]: i18n('column.endTime'),
-    [COLUMNS_NAMES.DURATION]: i18n('column.duration'),
+    [COLUMNS_NAMES.ID]: i18n('column_operationId'),
+    [COLUMNS_NAMES.STATUS]: i18n('column_status'),
+    [COLUMNS_NAMES.CREATED_BY]: i18n('column_createdBy'),
+    [COLUMNS_NAMES.CREATE_TIME]: i18n('column_createTime'),
+    [COLUMNS_NAMES.END_TIME]: i18n('column_endTime'),
+    [COLUMNS_NAMES.DURATION]: i18n('column_duration'),
 } as const;
 
 export const BASE_COLUMNS = [
@@ -32,7 +32,7 @@ export const BASE_COLUMNS = [
 ];
 
 export const OPERATION_KINDS: {value: OperationKind; content: string}[] = [
-    {value: 'export', content: i18n('kind.export')},
-    {value: 'ss/backgrounds', content: i18n('kind.ssBackgrounds')},
-    {value: 'buildindex', content: i18n('kind.buildIndex')},
+    {value: 'export', content: i18n('kind_export')},
+    {value: 'ss/backgrounds', content: i18n('kind_ssBackgrounds')},
+    {value: 'buildindex', content: i18n('kind_buildIndex')},
 ];

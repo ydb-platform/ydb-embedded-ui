@@ -100,7 +100,7 @@ export function getColumns(): DataTableColumn<TOperation>[] {
 
                 return row.end_time
                     ? durationFormatted
-                    : i18n('duration.ongoing', {value: durationFormatted});
+                    : i18n('label_duration-ongoing', {value: durationFormatted});
             },
             sortAccessor: (row) => {
                 if (!row.create_time) {

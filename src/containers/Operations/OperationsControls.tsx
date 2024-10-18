@@ -34,7 +34,7 @@ export function OperationsControls({
             <Search
                 value={searchValue}
                 onChange={handleSearchChange}
-                placeholder={i18n('controls.searchPlaceholder')}
+                placeholder={i18n('pleaceholder_search')}
                 className={b('search')}
             />
             <Select
@@ -43,7 +43,7 @@ export function OperationsControls({
                 onUpdate={(value) => handleKindChange(value[0] as OperationKind)}
             />
             <EntitiesCount
-                label={i18n('label.operations')}
+                label={i18n('label_operations')}
                 loading={entitiesLoading}
                 total={entitiesCountTotal}
                 current={entitiesCountCurrent}
