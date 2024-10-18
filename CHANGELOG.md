@@ -1,5 +1,37 @@
 # Changelog
 
+## [6.26.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.26.0...v6.26.1) (2024-10-18)
+
+
+### Bug Fixes
+
+* **EntityStatus:** set minimum container width ([#1494](https://github.com/ydb-platform/ydb-embedded-ui/issues/1494)) ([d6c6a4c](https://github.com/ydb-platform/ydb-embedded-ui/commit/d6c6a4c709e5b8ce6bdff85fe756b1299805b776))
+
+## [6.26.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.25.0...v6.26.0) (2024-10-18)
+
+
+### Features
+
+* add/drop table index template ([#1456](https://github.com/ydb-platform/ydb-embedded-ui/issues/1456)) ([d7a8e0b](https://github.com/ydb-platform/ydb-embedded-ui/commit/d7a8e0ba5d59ac0d9f483b8f70083393531b8a5c))
+* improve appearing controls styles ([#1436](https://github.com/ydb-platform/ydb-embedded-ui/issues/1436)) ([830c0a5](https://github.com/ydb-platform/ydb-embedded-ui/commit/830c0a503db6a49b2daf316585e0f31d998149d1))
+* **ObjectSummary:** improve object overview ([#1447](https://github.com/ydb-platform/ydb-embedded-ui/issues/1447)) ([4afa2b6](https://github.com/ydb-platform/ydb-embedded-ui/commit/4afa2b65370772a78980114f856579e8c73b5952))
+* paginated tables - enable setting by default ([#1464](https://github.com/ydb-platform/ydb-embedded-ui/issues/1464)) ([9006a52](https://github.com/ydb-platform/ydb-embedded-ui/commit/9006a527be9c75227cd970eda848bf0316977616))
+* **RunningQueries:** add userSID search ([#1462](https://github.com/ydb-platform/ydb-embedded-ui/issues/1462)) ([1194b34](https://github.com/ydb-platform/ydb-embedded-ui/commit/1194b34cacacc25c7547da60e6f6ec305bfae173))
+* snippets for table (under tree dots in navigation tree) ([#1476](https://github.com/ydb-platform/ydb-embedded-ui/issues/1476)) ([39d86c9](https://github.com/ydb-platform/ydb-embedded-ui/commit/39d86c9a9492acf6d7f8b82e8713c2b412a952b8))
+* **Versions:** show overall version info in Versions tab ([#1442](https://github.com/ydb-platform/ydb-embedded-ui/issues/1442)) ([6cc07d5](https://github.com/ydb-platform/ydb-embedded-ui/commit/6cc07d5e55d1ac9d601ea9e463085fc241465988))
+
+
+### Bug Fixes
+
+* **Cluster, TabletsTable:** add node fqdn and loading state ([#1468](https://github.com/ydb-platform/ydb-embedded-ui/issues/1468)) ([4090696](https://github.com/ydb-platform/ydb-embedded-ui/commit/40906964c978189c84dfff86c9c581756d5ebfa5))
+* correct key columns order ([#1478](https://github.com/ydb-platform/ydb-embedded-ui/issues/1478)) ([da4cf1f](https://github.com/ydb-platform/ydb-embedded-ui/commit/da4cf1ffd25b7fbba374d933099be01785c6b49f))
+* exclude top and running queries itself ([#1487](https://github.com/ydb-platform/ydb-embedded-ui/issues/1487)) ([4c91b29](https://github.com/ydb-platform/ydb-embedded-ui/commit/4c91b2928c5a3504a47bbd82f65120aaafcf18c1))
+* get info about topic children from overview ([#1489](https://github.com/ydb-platform/ydb-embedded-ui/issues/1489)) ([82531a5](https://github.com/ydb-platform/ydb-embedded-ui/commit/82531a584e59ff8a6c17343e3ec18772b9e39c05))
+* popup closes on context menu copy ([#1453](https://github.com/ydb-platform/ydb-embedded-ui/issues/1453)) ([9daa5a3](https://github.com/ydb-platform/ydb-embedded-ui/commit/9daa5a384a433dac57bc5822a72df108067ef973))
+* **Tablet:** remove nodeId from header and api requests for tablet ([#1461](https://github.com/ydb-platform/ydb-embedded-ui/issues/1461)) ([e452f15](https://github.com/ydb-platform/ydb-embedded-ui/commit/e452f15b797dc85ff5af3fffe43f7fa42ad7f5bf))
+* turn off default paginated tables ([#1475](https://github.com/ydb-platform/ydb-embedded-ui/issues/1475)) ([d4f528c](https://github.com/ydb-platform/ydb-embedded-ui/commit/d4f528cafb660ddc603b1ba9f740f7d119526985))
+* **Versions:** request only SystemState ([#1481](https://github.com/ydb-platform/ydb-embedded-ui/issues/1481)) ([df74377](https://github.com/ydb-platform/ydb-embedded-ui/commit/df743773c2f259264fef82a7fd13d354c640b478))
+
 ## [6.25.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.24.0...v6.25.0) (2024-10-11)
 
 
