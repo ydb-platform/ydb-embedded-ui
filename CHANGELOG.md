@@ -1,5 +1,19 @@
 # Changelog
 
+## [6.27.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.26.1...v6.27.0) (2024-10-18)
+
+
+### Features
+
+* display a list of operations ([#1445](https://github.com/ydb-platform/ydb-embedded-ui/issues/1445)) ([3dda3fe](https://github.com/ydb-platform/ydb-embedded-ui/commit/3dda3feab9ba43c0ff6b73ce6a6d7c87ed32de0e))
+
+
+### Bug Fixes
+
+* fix cdc stream query template ([#1498](https://github.com/ydb-platform/ydb-embedded-ui/issues/1498)) ([8405466](https://github.com/ydb-platform/ydb-embedded-ui/commit/84054666dae4df611a9657027b7be2bde84f153d))
+* **overview:** broken loading state calculation ([#1499](https://github.com/ydb-platform/ydb-embedded-ui/issues/1499)) ([05d89be](https://github.com/ydb-platform/ydb-embedded-ui/commit/05d89be1bcc8718781ec003b4444a922c32b0e43))
+* **topic:** broken memoization ([#1500](https://github.com/ydb-platform/ydb-embedded-ui/issues/1500)) ([e85f70e](https://github.com/ydb-platform/ydb-embedded-ui/commit/e85f70ea2f6053d3b9dae7e0f6630b3fe672a488))
+
 ## [6.26.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.26.0...v6.26.1) (2024-10-18)
 
 
