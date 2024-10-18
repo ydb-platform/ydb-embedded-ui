@@ -1,3 +1,4 @@
+import type {ButtonSize} from '@gravity-ui/uikit';
 import {Button, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
@@ -12,15 +13,21 @@ interface MonitoringButtonProps {
     className?: string;
     visible?: boolean;
     href: string;
+    size?: ButtonSize;
 }
 
-export function MonitoringButton({href, visible = false, className}: MonitoringButtonProps) {
+export function MonitoringButton({
+    href,
+    visible = false,
+    className,
+    size = 's',
+}: MonitoringButtonProps) {
     return (
         <Button
             href={href}
             target="_blank"
             className={b({visible}, className)}
-            size="s"
+            size={size}
             title="Monitoring dashboard"
         >
             <Icon data={monitoringIcon} />
