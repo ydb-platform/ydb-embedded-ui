@@ -179,9 +179,9 @@ export const dropTableIndex = (params?: SchemaQueryParams) => {
     return `ALTER TABLE \`${path || '$path'}\` DROP INDEX \`${indexName || '$indexName'}\`;`;
 };
 
-export const createCdcStreamTemplate = () => {
+export const createCdcStreamTemplate = (params?: SchemaQueryParams) => {
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create_changefeed
-ADD CHANGEFEED $name WITH (
+ALTER TABLE \`${params?.relativePath || '$path'}\` ADD CHANGEFEED $name WITH (
     MODE = $mode, -- KEYS_ONLY, UPDATES, NEW_IMAGE, OLD_IMAGE, or NEW_AND_OLD_IMAGES
     FORMAT = $format, -- JSON or DEBEZIUM_JSON
     VIRTUAL_TIMESTAMPS = $virtualTimestamps, -- true or false
