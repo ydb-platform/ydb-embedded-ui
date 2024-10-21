@@ -31,6 +31,8 @@ export interface SettingsPage {
     title: string;
     icon: IconProps;
     sections: SettingsSection[];
+    // default true
+    showTitle?: false;
 }
 
 export type YDBEmbeddedUISettings = SettingsPage[];
@@ -155,12 +157,14 @@ export const generalPage: SettingsPage = {
     title: i18n('page.general'),
     icon: {data: StarFill, height: 14, width: 14},
     sections: [appearanceSection],
+    showTitle: false,
 };
 export const experimentsPage: SettingsPage = {
     id: 'experimentsPage',
     title: i18n('page.experiments'),
     icon: {data: Flask},
     sections: [experimentsSection],
+    showTitle: false,
 };
 export const editorPage: SettingsPage = {
     id: 'editorPage',
@@ -174,6 +178,7 @@ export const aboutPage: SettingsPage = {
     title: i18n('page.about'),
     icon: {data: CircleInfo},
     sections: [aboutSettingsSection],
+    showTitle: false,
 };
 
 export function getUserSettings({singleClusterMode}: {singleClusterMode: boolean}) {
