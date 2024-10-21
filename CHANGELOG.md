@@ -1,5 +1,23 @@
 # Changelog
 
+## [6.27.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.26.1...v6.27.0) (2024-10-21)
+
+
+### Features
+
+* **Cluster:** rework cluster page ([#1473](https://github.com/ydb-platform/ydb-embedded-ui/issues/1473)) ([ee06b4e](https://github.com/ydb-platform/ydb-embedded-ui/commit/ee06b4e47e0450d7c1e8e2ba79d00d6786155425))
+* display a list of operations ([#1445](https://github.com/ydb-platform/ydb-embedded-ui/issues/1445)) ([3dda3fe](https://github.com/ydb-platform/ydb-embedded-ui/commit/3dda3feab9ba43c0ff6b73ce6a6d7c87ed32de0e))
+* **Storage,Nodes:** request only needed fields from backend ([#1491](https://github.com/ydb-platform/ydb-embedded-ui/issues/1491)) ([0af72a4](https://github.com/ydb-platform/ydb-embedded-ui/commit/0af72a42c7035aef519340334a7c954e86ab272d))
+
+
+### Bug Fixes
+
+* cluster layout ([#1507](https://github.com/ydb-platform/ydb-embedded-ui/issues/1507)) ([d38d01b](https://github.com/ydb-platform/ydb-embedded-ui/commit/d38d01b9a1dfd1c8b5ccb6cf814a5d02689e3f42))
+* fix cdc stream query template ([#1498](https://github.com/ydb-platform/ydb-embedded-ui/issues/1498)) ([8405466](https://github.com/ydb-platform/ydb-embedded-ui/commit/84054666dae4df611a9657027b7be2bde84f153d))
+* **overview:** broken loading state calculation ([#1499](https://github.com/ydb-platform/ydb-embedded-ui/issues/1499)) ([05d89be](https://github.com/ydb-platform/ydb-embedded-ui/commit/05d89be1bcc8718781ec003b4444a922c32b0e43))
+* **Preview:** do not auto refresh table preview ([#1503](https://github.com/ydb-platform/ydb-embedded-ui/issues/1503)) ([dbe83b2](https://github.com/ydb-platform/ydb-embedded-ui/commit/dbe83b2ee05cf5b2b01c876b59f8d7a127ac0f67))
+* **topic:** broken memoization ([#1500](https://github.com/ydb-platform/ydb-embedded-ui/issues/1500)) ([e85f70e](https://github.com/ydb-platform/ydb-embedded-ui/commit/e85f70ea2f6053d3b9dae7e0f6630b3fe672a488))
+
 ## [6.26.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.26.0...v6.26.1) (2024-10-18)
 
 
