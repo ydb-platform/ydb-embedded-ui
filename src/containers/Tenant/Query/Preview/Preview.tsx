@@ -8,7 +8,7 @@ import {previewApi} from '../../../../store/reducers/preview';
 import {setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
-import {useAutoRefreshInterval, useTypedDispatch} from '../../../../utils/hooks';
+import {useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {isExternalTableType, isTableType} from '../../utils/schema';
 import i18n from '../i18n';
@@ -28,13 +28,10 @@ export const Preview = ({database, path, type}: PreviewProps) => {
 
     const isPreviewAvailable = isTableType(type);
 
-    const [autoRefreshInterval] = useAutoRefreshInterval();
-
     const query = `select * from \`${path}\` limit 32`;
     const {currentData, isFetching, error} = previewApi.useSendQueryQuery(
         {database, query, action: isExternalTableType(type) ? 'execute-query' : 'execute-scan'},
         {
-            pollingInterval: autoRefreshInterval,
             skip: !isPreviewAvailable,
             refetchOnMountOrArgChange: true,
         },
