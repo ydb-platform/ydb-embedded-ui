@@ -47,6 +47,7 @@ type FetchDataParams<F, E = {}> = {
     offset: number;
     filters?: F;
     sortParams?: SortParams;
+    columnsIds: string[];
     signal?: AbortSignal;
 } & E;
 

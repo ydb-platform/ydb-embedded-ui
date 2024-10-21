@@ -8,13 +8,16 @@ import type {
 } from '../../../store/reducers/storage/types';
 import {prepareSortValue} from '../../../utils/filters';
 import {isSortableStorageProperty} from '../../../utils/storage';
+import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
+
+import {GROUPS_COLUMNS_TO_DATA_FIELDS} from './columns/constants';
 
 type GetStorageGroups = FetchData<PreparedStorageGroup, PreparedStorageGroupFilters>;
 
 export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
     const fetchData: GetStorageGroups = React.useCallback(
         async (params) => {
-            const {limit, offset, sortParams, filters} = params;
+            const {limit, offset, sortParams, filters, columnsIds} = params;
             const {sortOrder, columnId} = sortParams ?? {};
             const {
                 searchValue,
@@ -31,6 +34,11 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
                 ? prepareSortValue(columnId, sortOrder)
                 : undefined;
 
+            const dataFieldsRequired = getRequiredDataFields(
+                columnsIds,
+                GROUPS_COLUMNS_TO_DATA_FIELDS,
+            );
+
             const {groups, found, total} = await requestStorageData({
                 limit,
                 offset,
@@ -43,6 +51,7 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
                 pDiskId,
                 filter_group: filterGroup,
                 filter_group_by: filterGroupBy,
+                fieldsRequired: dataFieldsRequired,
                 shouldUseGroupsHandler,
             });
 
