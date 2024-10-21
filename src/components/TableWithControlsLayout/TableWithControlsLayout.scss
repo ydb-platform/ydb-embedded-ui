@@ -1,6 +1,8 @@
 @import '../../styles/mixins.scss';
 
 .ydb-table-with-controls-layout {
+    --data-table-sticky-top-offset: 62px;
+
     display: inline-block;
 
     box-sizing: border-box;
@@ -31,11 +33,11 @@
     }
 
     .ydb-paginated-table__head {
-        top: 62px;
+        top: var(--data-table-sticky-top-offset, 62px);
     }
 
     .data-table__sticky_moving {
         // Place table head right after controls
-        top: 62px !important;
+        top: var(--data-table-sticky-top-offset, 62px) !important;
     }
 }

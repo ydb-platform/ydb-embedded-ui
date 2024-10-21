@@ -1,6 +1,6 @@
 @import '../../styles/mixins.scss';
 
-.cluster {
+.ydb-cluster {
     position: relative;
 
     overflow: auto;
@@ -73,5 +73,9 @@
         height: 20px;
 
         background-color: var(--g-color-base-background);
+    }
+
+    .ydb-table-with-controls-layout {
+        --data-table-sticky-top-offset: 102px;
     }
 }
