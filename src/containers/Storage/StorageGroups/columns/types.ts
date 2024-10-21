@@ -1,11 +1,8 @@
-import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
-
-import type {Column as PaginatedTableColumn} from '../../../../components/PaginatedTable';
 import type {PreparedStorageGroup, VisibleEntities} from '../../../../store/reducers/storage/types';
+import type {Column} from '../../../../utils/tableUtils/types';
 import type {StorageViewContext} from '../../types';
 
-export type StorageGroupsColumn = PaginatedTableColumn<PreparedStorageGroup> &
-    DataTableColumn<PreparedStorageGroup>;
+export type StorageGroupsColumn = Column<PreparedStorageGroup>;
 
 export interface GetStorageColumnsData {
     viewContext: StorageViewContext;

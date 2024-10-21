@@ -1,26 +1,14 @@
 import type {SelectOption} from '@gravity-ui/uikit';
 import {z} from 'zod';
 
-import {
-    NODES_COLUMNS_IDS as BASE_NODES_COLUMNS_IDS,
-    NODES_COLUMNS_TITLES as BASE_NODES_COLUMNS_TITLES,
-} from '../../../../components/nodesColumns/constants';
+import type {NodesColumnId} from '../../../../components/nodesColumns/constants';
+import {NODES_COLUMNS_TITLES} from '../../../../components/nodesColumns/constants';
 import type {NodesGroupByField} from '../../../../types/api/nodes';
-import type {ValueOf} from '../../../../types/common';
-
-import i18n from './i18n';
 
 export const STORAGE_NODES_COLUMNS_WIDTH_LS_KEY = 'storageNodesColumnsWidth';
 export const STORAGE_NODES_SELECTED_COLUMNS_LS_KEY = 'storageNodesSelectedColumns';
 
-export const STORAGE_NODES_COLUMNS_IDS = {
-    ...BASE_NODES_COLUMNS_IDS,
-    PDisks: 'PDisks',
-} as const;
-
-type StorageNodesColumnId = ValueOf<typeof STORAGE_NODES_COLUMNS_IDS>;
-
-export const DEFAULT_STORAGE_NODES_COLUMNS: StorageNodesColumnId[] = [
+export const DEFAULT_STORAGE_NODES_COLUMNS: NodesColumnId[] = [
     'NodeId',
     'Host',
     'DC',
@@ -29,16 +17,7 @@ export const DEFAULT_STORAGE_NODES_COLUMNS: StorageNodesColumnId[] = [
     'Uptime',
     'PDisks',
 ];
-export const REQUIRED_STORAGE_NODES_COLUMNS: StorageNodesColumnId[] = ['NodeId'];
-
-// This code is running when module is initialized and correct language may not be set yet
-// get functions guarantee that i18n fields will be inited on render with current render language
-export const STORAGE_NODES_COLUMNS_TITLES = {
-    ...BASE_NODES_COLUMNS_TITLES,
-    get PDisks() {
-        return i18n('pdisks');
-    },
-} as const satisfies Record<StorageNodesColumnId, string>;
+export const REQUIRED_STORAGE_NODES_COLUMNS: NodesColumnId[] = ['NodeId'];
 
 const STORAGE_NODES_GROUP_BY_PARAMS = [
     'Host',
@@ -54,7 +33,7 @@ export const STORAGE_NODES_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_NODES_GROU
     (param) => {
         return {
             value: param,
-            content: STORAGE_NODES_COLUMNS_TITLES[param],
+            content: NODES_COLUMNS_TITLES[param],
         };
     },
 );

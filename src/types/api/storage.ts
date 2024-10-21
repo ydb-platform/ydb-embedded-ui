@@ -284,7 +284,6 @@ export type GroupsRequiredField =
     | 'MissingDisks'
     | 'Degraded'
     | 'State'
-    | 'Usage'
     | 'Used'
     | 'Limit'
     | 'Usage'

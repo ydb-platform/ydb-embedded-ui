@@ -10,19 +10,24 @@ interface PaginatedTableParams<T, F> {
     filters: F;
     limit: number;
     sortParams?: SortParams;
+    columnsIds: string[];
     tableName: string;
 }
 
 function endpoints<T, F>(build: EndpointBuilder<BaseQueryFn, string, string>) {
     return {
         fetchTableChunk: build.query<PaginatedTableData<T>, PaginatedTableParams<T, F>>({
-            queryFn: async ({offset, limit, sortParams, filters, fetchData}, {signal}) => {
+            queryFn: async (
+                {offset, limit, sortParams, filters, columnsIds, fetchData},
+                {signal},
+            ) => {
                 try {
                     const response = await fetchData({
                         limit,
                         offset,
                         filters,
                         sortParams,
+                        columnsIds,
                         signal,
                     });
                     return {data: response};

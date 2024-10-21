@@ -1,4 +1,5 @@
 import type {FetchData} from '../../components/PaginatedTable';
+import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../components/nodesColumns/constants';
 import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {prepareNodesData} from '../../store/reducers/nodes/utils';
 import type {NodesRequestParams} from '../../types/api/nodes';
@@ -8,6 +9,7 @@ import {
     getUptimeParamValue,
     isSortableNodesProperty,
 } from '../../utils/nodes';
+import {getRequiredDataFields} from '../../utils/tableUtils/getRequiredDataFields';
 
 const getConcurrentId = (limit?: number, offset?: number) => {
     return `getNodes|offset${offset}|limit${limit}`;
@@ -26,6 +28,7 @@ export const getNodes: FetchData<
         offset,
         sortParams,
         filters,
+        columnsIds,
     } = params;
 
     const {sortOrder, columnId} = sortParams ?? {};
@@ -34,6 +37,8 @@ export const getNodes: FetchData<
     const sort = isSortableNodesProperty(columnId)
         ? prepareSortValue(columnId, sortOrder)
         : undefined;
+
+    const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
     const response = await window.api.getNodes(
         {
@@ -48,6 +53,7 @@ export const getNodes: FetchData<
             filter: searchValue,
             problems_only: getProblemParamValue(problemFilter),
             uptime: getUptimeParamValue(uptimeFilter),
+            fieldsRequired: dataFieldsRequired,
         },
         {concurrentId: getConcurrentId(limit, offset), signal: params.signal},
     );
