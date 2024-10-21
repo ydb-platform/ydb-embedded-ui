@@ -105,4 +105,4 @@ export function toExponential(value: number, precision?: number) {
     return Number(value).toExponential(precision);
 }
 
-export const unbreakableGap = '\xa0';
+export const UNBREAKABLE_GAP = '\xa0';

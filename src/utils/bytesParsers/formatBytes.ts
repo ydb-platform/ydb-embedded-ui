@@ -1,6 +1,6 @@
 import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE} from '../constants';
 import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
-import {isNumeric, unbreakableGap} from '../utils';
+import {UNBREAKABLE_GAP, isNumeric} from '../utils';
 
 import i18n from './i18n';
 
@@ -84,7 +84,7 @@ const formatToSize = ({value, size = 'mb', precision = 0}: FormatToSizeArgs) => 
     return formatNumber(result);
 };
 
-const addSizeLabel = (result: string, size: BytesSizes, delimiter = unbreakableGap) => {
+const addSizeLabel = (result: string, size: BytesSizes, delimiter = UNBREAKABLE_GAP) => {
     return result + delimiter + sizes[size].label;
 };
 
