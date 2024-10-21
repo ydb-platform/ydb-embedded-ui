@@ -38,7 +38,7 @@ import {clusterTabs, clusterTabsIds, getClusterPath, isClusterTab} from './utils
 
 import './Cluster.scss';
 
-const b = cn('cluster');
+const b = cn('ydb-cluster');
 
 interface ClusterProps {
     additionalTenantsProps?: AdditionalTenantsProps;
