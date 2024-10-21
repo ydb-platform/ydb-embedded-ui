@@ -47,7 +47,7 @@ export const TableChunk = <T, F>({
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const columnsIds = columns.map((column) => column.name).sort();
+    const columnsIds = columns.map((column) => column.name);
 
     const queryParams = {
         offset: id * limit,
