@@ -33,7 +33,7 @@
     }
 
     .ydb-paginated-table__head {
-        top: 62px;
+        top: var(--data-table-sticky-top-offset, 62px);
     }
 
     .data-table__sticky_moving {
