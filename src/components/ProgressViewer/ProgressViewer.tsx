@@ -2,6 +2,7 @@ import {useTheme} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
+import {calculateProgressStatus} from '../../utils/progress';
 import {isNumeric} from '../../utils/utils';
 
 import './ProgressViewer.scss';
@@ -9,8 +10,6 @@ import './ProgressViewer.scss';
 const b = cn('progress-viewer');
 
 type ProgressViewerSize = 'xs' | 's' | 'ns' | 'm' | 'n' | 'l' | 'head';
-
-type ProgressViewerStatus = 'good' | 'warning' | 'danger';
 
 type FormatProgressViewerValues = (
     value?: number,
@@ -79,16 +78,15 @@ export function ProgressViewer({
         [valueText, capacityText] = formatValues(Number(value), Number(capacity));
     }
 
-    let status: ProgressViewerStatus = inverseColorize ? 'danger' : 'good';
-    if (colorizeProgress) {
-        if (fillWidth > warningThreshold && fillWidth <= dangerThreshold) {
-            status = 'warning';
-        } else if (fillWidth > dangerThreshold) {
-            status = inverseColorize ? 'good' : 'danger';
-        }
-        if (!isNumeric(capacity)) {
-            fillWidth = 100;
-        }
+    const status = calculateProgressStatus({
+        fillWidth,
+        warningThreshold,
+        dangerThreshold,
+        colorizeProgress,
+        inverseColorize,
+    });
+    if (colorizeProgress && !isNumeric(capacity)) {
+        fillWidth = 100;
     }
 
     const lineStyle = {

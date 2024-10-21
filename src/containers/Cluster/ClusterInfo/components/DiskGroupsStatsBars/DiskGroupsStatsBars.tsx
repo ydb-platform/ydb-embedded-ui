@@ -1,10 +1,7 @@
+import {DefinitionList} from '@gravity-ui/components';
+
 import {ContentWithPopup} from '../../../../../components/ContentWithPopup/ContentWithPopup';
-import {InfoViewer} from '../../../../../components/InfoViewer';
-import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
-import type {
-    DiskErasureGroupsStats,
-    DiskGroupsStats,
-} from '../../../../../store/reducers/cluster/types';
+import type {DiskErasureGroupsStats} from '../../../../../store/reducers/cluster/types';
 import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
 import {cn} from '../../../../../utils/cn';
 import i18n from '../../../i18n';
@@ -14,25 +11,20 @@ import './DiskGroupsStatsBars.scss';
 const b = cn('ydb-disk-groups-stats');
 
 interface DiskGroupsStatsProps {
-    stats: DiskGroupsStats;
+    stats: DiskErasureGroupsStats;
+    children: React.ReactNode;
 }
 
-export const DiskGroupsStatsBars = ({stats}: DiskGroupsStatsProps) => {
+export const DiskGroupsErasureStats = ({stats, children}: DiskGroupsStatsProps) => {
     return (
         <div className={b()}>
-            {Object.values(stats).map((erasureStats) => (
-                <ContentWithPopup
-                    placement={['right']}
-                    key={erasureStats.erasure}
-                    content={<GroupsStatsPopupContent stats={erasureStats} />}
-                >
-                    <ProgressViewer
-                        className={b('bar')}
-                        value={erasureStats.createdGroups}
-                        capacity={erasureStats.totalGroups}
-                    />
-                </ContentWithPopup>
-            ))}
+            <ContentWithPopup
+                placement={['right']}
+                pinOnClick
+                content={<GroupsStatsPopupContent stats={stats} />}
+            >
+                {children}
+            </ContentWithPopup>
         </div>
     );
 };
@@ -53,26 +45,26 @@ function GroupsStatsPopupContent({stats}: GroupsStatsPopupContentProps) {
 
     const info = [
         {
-            label: i18n('disk-type'),
-            value: diskType,
+            name: i18n('disk-type'),
+            content: diskType,
         },
         {
-            label: i18n('erasure'),
-            value: erasure,
+            name: i18n('erasure'),
+            content: erasure,
         },
         {
-            label: i18n('allocated'),
-            value: convertedAllocatedSize,
+            name: i18n('allocated'),
+            content: convertedAllocatedSize,
         },
         {
-            label: i18n('available'),
-            value: convertedAvailableSize,
+            name: i18n('available'),
+            content: convertedAvailableSize,
         },
         {
-            label: i18n('usage'),
-            value: usage + '%',
+            name: i18n('usage'),
+            content: usage + '%',
         },
     ];
 
-    return <InfoViewer dots={true} info={info} className={b('popup-content')} size="s" />;
+    return <DefinitionList items={info} className={b('popup-content')} responsive />;
 }
