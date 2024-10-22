@@ -76,11 +76,20 @@ export const PaginatedTable = <T, F>({
         chunkSize: limit,
     });
 
-    const handleDataFetched = React.useCallback((total: number, found: number) => {
-        setTotalEntities(total);
-        setFoundEntities(found);
-        setIsInitialLoad(false);
-    }, []);
+    const handleDataFetched = React.useCallback(
+        (total: number, found: number) => {
+            if (total !== totalEntities) {
+                setTotalEntities(total);
+            }
+
+            if (found !== foundEntities) {
+                setFoundEntities(found);
+            }
+
+            setIsInitialLoad(false);
+        },
+        [foundEntities, totalEntities],
+    );
 
     // reset table on filters change
     React.useLayoutEffect(() => {
@@ -123,7 +132,7 @@ export const PaginatedTable = <T, F>({
                 getRowClassName={getRowClassName}
                 renderErrorMessage={renderErrorMessage}
                 onDataFetched={handleDataFetched}
-                isActive={activeChunks.includes(value)}
+                isActive={activeChunks[value]}
             />
         ));
     };

@@ -2,8 +2,6 @@ import React from 'react';
 
 import {isEqual, throttle} from 'lodash';
 
-import {getArray} from '../../utils';
-
 interface UseScrollBasedChunksProps {
     parentRef?: React.RefObject<HTMLElement>;
     tableRef: React.RefObject<HTMLElement>;
@@ -21,10 +19,8 @@ export const useScrollBasedChunks = ({
     totalItems,
     rowHeight,
     chunkSize,
-}: UseScrollBasedChunksProps): number[] => {
-    const [activeChunks, setActiveChunks] = React.useState<number[]>(
-        getArray(1 + CHUNKS_AHEAD_COUNT).map((index) => index),
-    );
+}: UseScrollBasedChunksProps): boolean[] => {
+    const [activeChunks, setActiveChunks] = React.useState<boolean[]>([true, true]);
 
     const calculateActiveChunks = React.useCallback(() => {
         const container = parentRef?.current;
@@ -40,12 +36,16 @@ export const useScrollBasedChunks = ({
             totalItems - 1,
         );
 
-        const startChunk = Math.floor(visibleStartIndex / chunkSize);
-        const endChunk = Math.floor(visibleEndIndex / chunkSize);
-
-        const newActiveChunks = getArray(endChunk - startChunk + 1 + CHUNKS_AHEAD_COUNT).map(
-            (index) => startChunk + index,
+        const startChunk = Math.max(
+            Math.floor(visibleStartIndex / chunkSize) - CHUNKS_AHEAD_COUNT,
+            0,
         );
+        const endChunk = Math.floor(visibleEndIndex / chunkSize) + CHUNKS_AHEAD_COUNT;
+
+        const newActiveChunks = [];
+        for (let i = startChunk; i <= endChunk; i++) {
+            newActiveChunks[i] = true;
+        }
 
         if (!isEqual(activeChunks, newActiveChunks)) {
             setActiveChunks(newActiveChunks);
