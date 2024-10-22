@@ -40,7 +40,9 @@ export function StorageGroupPage() {
     const shouldUseGroupsHandler = useStorageGroupsHandlerAvailable();
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupQuery = storageApi.useGetStorageGroupsInfoQuery(
-        valueIsDefined(groupId) ? {groupId, shouldUseGroupsHandler, with: 'all'} : skipToken,
+        valueIsDefined(groupId)
+            ? {groupId, shouldUseGroupsHandler, with: 'all', fieldsRequired: 'all'}
+            : skipToken,
         {
             pollingInterval: autoRefreshInterval,
             skip: !capabilitiesLoaded,

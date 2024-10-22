@@ -107,6 +107,7 @@ export const Storage = ({database, viewContext, nodeId, groupId, pDiskId}: Stora
             groupId,
             pDiskId,
             shouldUseGroupsHandler: groupsHandlerAvailable,
+            fieldsRequired: 'all',
         },
         {
             skip: !isGroups || !capabilitiesLoaded,

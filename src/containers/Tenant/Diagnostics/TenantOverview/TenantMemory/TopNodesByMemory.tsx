@@ -10,20 +10,27 @@ import {
     getTabletsColumn,
     getUptimeColumn,
 } from '../../../../../components/nodesColumns/columns';
-import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../../components/nodesColumns/constants';
+import {
+    NODES_COLUMNS_TO_DATA_FIELDS,
+    NODES_COLUMNS_WIDTH_LS_KEY,
+} from '../../../../../components/nodesColumns/constants';
 import type {GetNodesColumnsParams} from '../../../../../components/nodesColumns/types';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
 import type {NodesPreparedEntity} from '../../../../../store/reducers/nodes/types';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
+import type {NodesRequiredField} from '../../../../../types/api/nodes';
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
+import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
-function getTopNodesByMemoryColumns(params: GetNodesColumnsParams): Column<NodesPreparedEntity>[] {
+function getTopNodesByMemoryColumns(
+    params: GetNodesColumnsParams,
+): [Column<NodesPreparedEntity>[], NodesRequiredField[]] {
     const memoryColumn = {
         ...getMemoryColumn<NodesPreparedEntity>(),
         header: i18n('column-header.process'),
@@ -40,10 +47,15 @@ function getTopNodesByMemoryColumns(params: GetNodesColumnsParams): Column<Nodes
         getTabletsColumn<NodesPreparedEntity>(params),
     ];
 
-    return columns.map((column) => ({
+    const preparedColumns = columns.map((column) => ({
         ...column,
         sortable: false,
     }));
+
+    const columnsIds = preparedColumns.map((column) => column.name);
+    const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
+
+    return [preparedColumns, dataFieldsRequired];
 }
 
 interface TopNodesByMemoryProps {
@@ -55,7 +67,7 @@ export function TopNodesByMemory({tenantName, additionalNodesProps}: TopNodesByM
     const query = useSearchQuery();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const columns = getTopNodesByMemoryColumns({
+    const [columns, fieldsRequired] = getTopNodesByMemoryColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
         database: tenantName,
     });
@@ -67,6 +79,7 @@ export function TopNodesByMemory({tenantName, additionalNodesProps}: TopNodesByM
             tablets: true,
             sort: '-Memory',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
+            fieldsRequired,
         },
         {pollingInterval: autoRefreshInterval},
     );
