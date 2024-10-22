@@ -328,4 +328,10 @@ export interface GroupsRequestParams extends BaseStorageRequestParams {
     filter_group_by?: GroupsGroupByField;
     filter_group?: string;
     fieldsRequired?: GroupsRequiredField[] | 'all';
+
+    /**
+     * Backend timeout, default 10_000
+     * 50% - BSC timeout
+     */
+    timeout?: number;
 }
