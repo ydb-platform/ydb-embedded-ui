@@ -1,5 +1,5 @@
-import {ContentWithPopup} from '../../../components/ContentWithPopup/ContentWithPopup';
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
+import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import type {InfoViewerItem} from '../../../components/InfoViewer';
 import {InfoViewer} from '../../../components/InfoViewer';
 import {InternalLink} from '../../../components/InternalLink';
@@ -85,8 +85,8 @@ function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
                     : undefined;
 
             return (
-                <ContentWithPopup
-                    content={<VDiskInfo data={item.SlotData} withTitle />}
+                <HoverPopup
+                    popupContent={<VDiskInfo data={item.SlotData} withTitle />}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >
@@ -105,13 +105,13 @@ function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
                             }
                         />
                     </InternalLink>
-                </ContentWithPopup>
+                </HoverPopup>
             );
         }
         if (isLogSlot(item)) {
             return (
-                <ContentWithPopup
-                    content={<LogInfo data={item.SlotData} />}
+                <HoverPopup
+                    popupContent={<LogInfo data={item.SlotData} />}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >
@@ -127,14 +127,14 @@ function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
                             />
                         }
                     />
-                </ContentWithPopup>
+                </HoverPopup>
             );
         }
 
         if (isEmptySlot(item)) {
             return (
-                <ContentWithPopup
-                    content={<EmptySlotInfo data={item.SlotData} />}
+                <HoverPopup
+                    popupContent={<EmptySlotInfo data={item.SlotData} />}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >
@@ -150,7 +150,7 @@ function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
                             />
                         }
                     />
-                </ContentWithPopup>
+                </HoverPopup>
             );
         }
 

@@ -1,19 +1,26 @@
 import React from 'react';
 
+import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {selectNodeHostsMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getPDiskId} from '../../utils/disks/helpers';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {bytesToGB} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerItem} from '../InfoViewer';
+import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
-export const preparePDiskData = (data: PreparedPDisk, nodeHost?: string) => {
+export const preparePDiskData = (
+    data: PreparedPDisk,
+    nodeHost?: string,
+    withDeveloperUILink?: boolean,
+) => {
     const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Type, Device} = data;
 
     const pdiskData: InfoViewerItem[] = [
@@ -50,6 +57,18 @@ export const preparePDiskData = (data: PreparedPDisk, nodeHost?: string) => {
         pdiskData.push({label: 'Device', value: Device});
     }
 
+    if (withDeveloperUILink && valueIsDefined(NodeId) && valueIsDefined(PDiskId)) {
+        const pDiskInternalViewerPath = createPDiskDeveloperUILink({
+            nodeId: NodeId,
+            pDiskId: PDiskId,
+        });
+
+        pdiskData.push({
+            label: 'Links',
+            value: <LinkWithIcon title={'Developer UI'} url={pDiskInternalViewerPath} />,
+        });
+    }
+
     return pdiskData;
 };
 
@@ -58,9 +77,13 @@ interface PDiskPopupProps {
 }
 
 export const PDiskPopup = ({data}: PDiskPopupProps) => {
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
     const nodeHostsMap = useTypedSelector(selectNodeHostsMap);
     const nodeHost = valueIsDefined(data.NodeId) ? nodeHostsMap?.get(data.NodeId) : undefined;
-    const info = React.useMemo(() => preparePDiskData(data, nodeHost), [data, nodeHost]);
+    const info = React.useMemo(
+        () => preparePDiskData(data, nodeHost, isUserAllowedToMakeChanges),
+        [data, nodeHost, isUserAllowedToMakeChanges],
+    );
 
     return <InfoViewer title="PDisk" info={info} size="s" />;
 };

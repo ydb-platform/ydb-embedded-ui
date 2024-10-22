@@ -2,12 +2,14 @@ import React from 'react';
 
 import {Label} from '@gravity-ui/uikit';
 
+import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {selectNodeHostsMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
+import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
@@ -15,6 +17,7 @@ import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
 import {InternalLink} from '../InternalLink';
+import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {preparePDiskData} from '../PDiskPopup/PDiskPopup';
 import {getVDiskLink} from '../VDisk/utils';
 
@@ -22,7 +25,7 @@ import './VDiskPopup.scss';
 
 const b = cn('vdisk-storage-popup');
 
-const prepareUnavailableVDiskData = (data: UnavailableDonor) => {
+const prepareUnavailableVDiskData = (data: UnavailableDonor, withDeveloperUILink?: boolean) => {
     const {NodeId, PDiskId, VSlotId, StoragePoolName} = data;
 
     const vdiskData: InfoViewerItem[] = [{label: 'State', value: 'not available'}];
@@ -37,11 +40,33 @@ const prepareUnavailableVDiskData = (data: UnavailableDonor) => {
         {label: 'VSlotId', value: VSlotId ?? EMPTY_DATA_PLACEHOLDER},
     );
 
+    if (
+        withDeveloperUILink &&
+        valueIsDefined(NodeId) &&
+        valueIsDefined(PDiskId) &&
+        valueIsDefined(VSlotId)
+    ) {
+        const vDiskInternalViewerPath = createVDiskDeveloperUILink({
+            nodeId: NodeId,
+            pDiskId: PDiskId,
+            vDiskSlotId: VSlotId,
+        });
+
+        vdiskData.push({
+            label: 'Links',
+            value: <LinkWithIcon title={'Developer UI'} url={vDiskInternalViewerPath} />,
+        });
+    }
+
     return vdiskData;
 };
 
-const prepareVDiskData = (data: PreparedVDisk) => {
+// eslint-disable-next-line complexity
+const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) => {
     const {
+        NodeId,
+        PDiskId,
+        VDiskSlotId,
         StringifiedId,
         VDiskState,
         SatisfactionRank,
@@ -126,6 +151,24 @@ const prepareVDiskData = (data: PreparedVDisk) => {
         });
     }
 
+    if (
+        withDeveloperUILink &&
+        valueIsDefined(NodeId) &&
+        valueIsDefined(PDiskId) &&
+        valueIsDefined(VDiskSlotId)
+    ) {
+        const vDiskInternalViewerPath = createVDiskDeveloperUILink({
+            nodeId: NodeId,
+            pDiskId: PDiskId,
+            vDiskSlotId: VDiskSlotId,
+        });
+
+        vdiskData.push({
+            label: 'Links',
+            value: <LinkWithIcon title={'Developer UI'} url={vDiskInternalViewerPath} />,
+        });
+    }
+
     return vdiskData;
 };
 
@@ -136,16 +179,24 @@ interface VDiskPopupProps {
 export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
 
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+
     const vdiskInfo = React.useMemo(
-        () => (isFullData ? prepareVDiskData(data) : prepareUnavailableVDiskData(data)),
-        [data, isFullData],
+        () =>
+            isFullData
+                ? prepareVDiskData(data, isUserAllowedToMakeChanges)
+                : prepareUnavailableVDiskData(data, isUserAllowedToMakeChanges),
+        [data, isFullData, isUserAllowedToMakeChanges],
     );
 
     const nodeHostsMap = useTypedSelector(selectNodeHostsMap);
     const nodeHost = valueIsDefined(data.NodeId) ? nodeHostsMap?.get(data.NodeId) : undefined;
     const pdiskInfo = React.useMemo(
-        () => isFullData && data.PDisk && preparePDiskData(data.PDisk, nodeHost),
-        [data, nodeHost, isFullData],
+        () =>
+            isFullData &&
+            data.PDisk &&
+            preparePDiskData(data.PDisk, nodeHost, isUserAllowedToMakeChanges),
+        [data, nodeHost, isFullData, isUserAllowedToMakeChanges],
     );
 
     const donorsInfo: InfoViewerItem[] = [];
