@@ -1,3 +1,5 @@
+import React from 'react';
+
 // invoke passed function at most once per animation frame
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function rafThrottle<Fn extends (...args: any[]) => any>(fn: Fn) {
@@ -23,3 +25,5 @@ export function rafThrottle<Fn extends (...args: any[]) => any>(fn: Fn) {
 export function calculateColumnWidth(newWidth: number, minWidth = 40, maxWidth = Infinity) {
     return Math.max(minWidth, Math.min(newWidth, maxWidth));
 }
+
+export const typedMemo: <T>(Component: T) => T = React.memo;
