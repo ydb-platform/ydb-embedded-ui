@@ -69,9 +69,10 @@ export const PaginatedTable = <T, F>({
     const tableRef = React.useRef<HTMLDivElement>(null);
 
     const activeChunks = useScrollBasedChunks({
-        containerRef: parentRef ?? tableRef,
+        parentRef,
+        tableRef,
         totalItems: foundEntities,
-        itemHeight: rowHeight,
+        rowHeight,
         chunkSize: limit,
     });
 

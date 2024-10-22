@@ -8,6 +8,7 @@ import {ResponseError} from '../Errors/ResponseError';
 
 import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
 import type {Column, FetchData, GetRowClassName, SortParams} from './types';
+import {typedMemo} from './utils';
 
 const DEBOUNCE_TIMEOUT = 200;
 
@@ -29,7 +30,7 @@ interface TableChunkProps<T, F> {
 }
 
 // Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
-export const TableChunk = <T, F>({
+export const TableChunk = typedMemo(function TableChunk<T, F>({
     id,
     limit,
     totalLength,
@@ -43,7 +44,7 @@ export const TableChunk = <T, F>({
     renderErrorMessage,
     onDataFetched,
     isActive,
-}: TableChunkProps<T, F>) => {
+}: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -150,4 +151,4 @@ export const TableChunk = <T, F>({
             {renderContent()}
         </tbody>
     );
-};
+});
