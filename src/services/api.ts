@@ -279,6 +279,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 fields_required: preparedFieldsRequired,
                 // Do not send empty string
                 filter: filter || undefined,
+                timeout: 20_000,
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},

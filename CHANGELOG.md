@@ -1,5 +1,13 @@
 # Changelog
 
+## [6.27.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.27.0...v6.27.1) (2024-10-22)
+
+
+### Bug Fixes
+
+* increase storage/groups timeout ([#1510](https://github.com/ydb-platform/ydb-embedded-ui/issues/1510)) ([b3dad05](https://github.com/ydb-platform/ydb-embedded-ui/commit/b3dad0545744ba091349c468ec5b62408dcfaff5))
+* remove unneeded titles ([#1508](https://github.com/ydb-platform/ydb-embedded-ui/issues/1508)) ([b4c44e9](https://github.com/ydb-platform/ydb-embedded-ui/commit/b4c44e9f668bbf3528bc156117e821d126225865))
+
 ## [6.27.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.26.1...v6.27.0) (2024-10-21)
 
 
