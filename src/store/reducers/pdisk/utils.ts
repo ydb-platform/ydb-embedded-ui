@@ -10,12 +10,17 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
     TPDiskInfoResponse,
     TEvSystemStateResponse,
 ]): PDiskData {
+    const rawNode = nodeResponse.SystemStateInfo?.[0];
+    const preparedNode = prepareNodeSystemState(rawNode);
+
     const {BSC = {}, Whiteboard = {}} = pdiskResponse || {};
 
     const {PDisk: WhiteboardPDiskData = {}, VDisks: WhiteboardVDisksData = []} = Whiteboard;
     const {PDisk: BSCPDiskData = {}} = BSC;
 
     const preparedPDisk = preparePDiskData(WhiteboardPDiskData, BSCPDiskData);
+
+    const NodeId = preparedPDisk.NodeId ?? preparedNode.NodeId;
 
     const {
         LogUsedSize,
@@ -43,9 +48,8 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         };
     }
 
-    const preparedVDisks = WhiteboardVDisksData.map(prepareVDiskData).sort(
-        (disk1, disk2) => Number(disk2.VDiskSlotId) - Number(disk1.VDiskSlotId),
-    );
+    const preparedVDisks = WhiteboardVDisksData.map((disk) => prepareVDiskData({...disk, NodeId}));
+    preparedVDisks.sort((disk1, disk2) => Number(disk2.VDiskSlotId) - Number(disk1.VDiskSlotId));
 
     const vdisksSlots: SlotItem<'vDisk'>[] = preparedVDisks.map((preparedVDisk) => {
         return {
@@ -94,12 +98,9 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         diskSlots.unshift(logSlot);
     }
 
-    const rawNode = nodeResponse.SystemStateInfo?.[0];
-    const preparedNode = prepareNodeSystemState(rawNode);
-
     return {
         ...preparedPDisk,
-        NodeId: preparedPDisk.NodeId ?? preparedNode.NodeId,
+        NodeId,
         NodeHost: preparedNode.Host,
         NodeType: preparedNode.Roles?.[0],
         NodeDC: preparedNode.DC,

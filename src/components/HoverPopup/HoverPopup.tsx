@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {PopupProps} from '@gravity-ui/uikit';
 import {Popup} from '@gravity-ui/uikit';
 import debounce from 'lodash/debounce';
 
@@ -11,7 +12,7 @@ const b = cn('hover-popup');
 
 const DEBOUNCE_TIMEOUT = 100;
 
-interface HoverPopupProps {
+type HoverPopupProps = {
     children: React.ReactNode;
     popupContent: React.ReactNode;
     showPopup?: boolean;
@@ -19,7 +20,7 @@ interface HoverPopupProps {
     anchorRef?: React.RefObject<HTMLElement>;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
-}
+} & Pick<PopupProps, 'placement' | 'contentClassName'>;
 
 export const HoverPopup = ({
     children,
@@ -29,6 +30,8 @@ export const HoverPopup = ({
     anchorRef,
     onShowPopup,
     onHidePopup,
+    placement = ['top', 'bottom'],
+    contentClassName,
 }: HoverPopupProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
     const anchor = React.useRef<HTMLDivElement>(null);
@@ -88,18 +91,18 @@ export const HoverPopup = ({
 
     return (
         <React.Fragment>
-            <div ref={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+            <span ref={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                 {children}
-            </div>
+            </span>
             <Popup
-                contentClassName={b()}
+                contentClassName={b(null, contentClassName)}
                 anchorRef={anchorRef || anchor}
                 open={open}
                 onMouseEnter={onPopupMouseEnter}
                 onMouseLeave={onPopupMouseLeave}
                 onEscapeKeyDown={onPopupEscapeKeyDown}
                 onBlur={onPopupBlur}
-                placement={['top', 'bottom']}
+                placement={placement}
                 hasArrow
                 // bigger offset for easier switching to neighbour nodes
                 // matches the default offset for popup with arrow out of a sense of beauty
