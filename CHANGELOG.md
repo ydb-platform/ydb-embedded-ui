@@ -1,5 +1,24 @@
 # Changelog
 
+## [6.28.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.27.1...v6.28.0) (2024-10-23)
+
+
+### Features
+
+* add developer ui links to disks popups ([#1512](https://github.com/ydb-platform/ydb-embedded-ui/issues/1512)) ([57d2092](https://github.com/ydb-platform/ydb-embedded-ui/commit/57d20927839b4a11b7f24b57f7d3cf9b7549fb0f))
+
+
+### Bug Fixes
+
+* **Cluster:** handle cluster error in meta requests ([#1525](https://github.com/ydb-platform/ydb-embedded-ui/issues/1525)) ([71b254e](https://github.com/ydb-platform/ydb-embedded-ui/commit/71b254ec73ae492d722f8a720cda4e1de714e286))
+* correct width for columns with ProgressViewer ([#1522](https://github.com/ydb-platform/ydb-embedded-ui/issues/1522)) ([e27749a](https://github.com/ydb-platform/ydb-embedded-ui/commit/e27749af04d9230edd8cd24f5e3a59d968d87dcf))
+* **EntityStatus:** remove additionalControls, fix ClipboardButton layout ([#1524](https://github.com/ydb-platform/ydb-embedded-ui/issues/1524)) ([ea4d3a9](https://github.com/ydb-platform/ydb-embedded-ui/commit/ea4d3a95ffe99c8380f0a8971ff41f9b9b534aa7))
+* fields required in all groups and nodes requests ([#1515](https://github.com/ydb-platform/ydb-embedded-ui/issues/1515)) ([a9f79a3](https://github.com/ydb-platform/ydb-embedded-ui/commit/a9f79a31ced8a642dabd6231df4e810e1f14eaa3))
+* operations kind button width ([#1521](https://github.com/ydb-platform/ydb-embedded-ui/issues/1521)) ([980d4fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/980d4facf842eb2f64275afaf925e6dde309c0fe))
+* replace EntityStatus with StatusIcon where possible ([#1518](https://github.com/ydb-platform/ydb-embedded-ui/issues/1518)) ([017c82a](https://github.com/ydb-platform/ydb-embedded-ui/commit/017c82a54fac97c2e62422ac971f615f39434d84))
+* **Storage:** display unavailable vdisks with average size ([#1511](https://github.com/ydb-platform/ydb-embedded-ui/issues/1511)) ([1868e18](https://github.com/ydb-platform/ydb-embedded-ui/commit/1868e182bd88fec178b400f32219f80f1cee1c02))
+* update license ([#1516](https://github.com/ydb-platform/ydb-embedded-ui/issues/1516)) ([cabcb5c](https://github.com/ydb-platform/ydb-embedded-ui/commit/cabcb5c89b0fa50ea4fdb2018eff39091d1b440f))
+
 ## [6.27.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.27.0...v6.27.1) (2024-10-22)
 
 
