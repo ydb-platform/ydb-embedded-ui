@@ -166,7 +166,6 @@ export function Cluster({
                     }
                 >
                     <div className={b('tablets')}>
-                        <div className={b('fake-block')} />
                         <TabletsTable
                             loading={infoLoading}
                             tablets={clusterTablets}

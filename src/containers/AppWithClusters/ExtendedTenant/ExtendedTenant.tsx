@@ -25,7 +25,7 @@ export function ExtendedTenant({
                     dbName,
                     dbType,
                 });
-                return href ? <MonitoringButton href={href} visible={true} size="xs" /> : null;
+                return href ? <MonitoringButton href={href} size="xs" /> : null;
             }
 
             return null;
