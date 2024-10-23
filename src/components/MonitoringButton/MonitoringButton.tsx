@@ -9,7 +9,7 @@ interface MonitoringButtonProps {
     size?: ButtonSize;
 }
 
-export function MonitoringButton({href, className, size = 's'}: MonitoringButtonProps) {
+export function MonitoringButton({href, className, size = 'xs'}: MonitoringButtonProps) {
     return (
         <Button
             href={href}
