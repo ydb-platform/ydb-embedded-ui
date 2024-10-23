@@ -37,6 +37,7 @@
 
     &__status-color,
     &__status-icon {
+        display: inline-flex;
         flex-shrink: 0;
 
         border-radius: 3px;

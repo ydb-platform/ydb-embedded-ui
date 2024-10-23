@@ -9,11 +9,11 @@ import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
-import {EntityStatus} from '../EntityStatus/EntityStatus';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
+import {StatusIcon} from '../StatusIcon/StatusIcon';
 
 import {pDiskInfoKeyset} from './i18n';
 
@@ -92,13 +92,13 @@ function getPDiskInfo<T extends PreparedPDisk>({
     if (valueIsDefined(Device)) {
         statusInfo.push({
             label: pDiskInfoKeyset('device'),
-            value: <EntityStatus status={Device} />,
+            value: <StatusIcon status={Device} />,
         });
     }
     if (valueIsDefined(Realtime)) {
         statusInfo.push({
             label: pDiskInfoKeyset('realtime'),
-            value: <EntityStatus status={Realtime} />,
+            value: <StatusIcon status={Realtime} />,
         });
     }
 
