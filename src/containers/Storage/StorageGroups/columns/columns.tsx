@@ -5,8 +5,8 @@ import DataTable from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
-import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../../../components/InternalLink';
+import {StatusIcon} from '../../../../components/StatusIcon/StatusIcon';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {VDiskWithDonorsStack} from '../../../../components/VDisk/VDiskWithDonorsStack';
 import {getStorageGroupPath} from '../../../../routes';
@@ -171,9 +171,9 @@ const limitColumn: StorageGroupsColumn = {
 const usedSpaceFlagColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.DiskSpace,
     header: STORAGE_GROUPS_COLUMNS_TITLES.DiskSpace,
-    width: 110,
+    width: 70,
     render: ({row}) => {
-        return <EntityStatus status={row.DiskSpace} />;
+        return <StatusIcon status={row.DiskSpace} />;
     },
     align: DataTable.CENTER,
 };

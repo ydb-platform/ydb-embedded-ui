@@ -6,9 +6,9 @@ import type {Column} from '@gravity-ui/react-data-table';
 import {ArrowToggle, Button, Icon, Popover} from '@gravity-ui/uikit';
 import isEmpty from 'lodash/isEmpty';
 
-import {EntityStatus} from '../../../components/EntityStatus/EntityStatus';
 import {PDiskInfo} from '../../../components/PDiskInfo/PDiskInfo';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
+import {StatusIcon} from '../../../components/StatusIcon/StatusIcon';
 import {VDiskInfo} from '../../../components/VDiskInfo/VDiskInfo';
 import type {
     PreparedStructurePDisk,
@@ -107,7 +107,7 @@ function getColumns({
             width: 70,
             render: ({row}) => {
                 return (
-                    <EntityStatus
+                    <StatusIcon
                         status={row.VDiskState === EVDiskState.OK ? EFlag.Green : EFlag.Red}
                     />
                 );
@@ -220,7 +220,7 @@ export function PDisk({
         <div className={b('pdisk')} id={id}>
             <div className={b('pdisk-header')}>
                 <div className={b('pdisk-title-wrapper')}>
-                    <EntityStatus status={Device} />
+                    <StatusIcon status={Device} />
                     <PDiskTitleBadge
                         label="PDiskID"
                         value={PDiskId}
