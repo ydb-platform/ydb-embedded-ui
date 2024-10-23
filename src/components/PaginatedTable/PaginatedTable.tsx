@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {getArray} from '../../utils';
 import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
 
 import {TableChunk} from './TableChunk';
@@ -32,7 +31,7 @@ export interface PaginatedTableProps<T, F> {
     columns: Column<T>[];
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
-    parentRef?: React.RefObject<HTMLElement>;
+    parentRef: React.RefObject<HTMLElement> | null;
     initialSortParams?: SortParams;
     onColumnsResize?: HandleTableColumnsResize;
     renderControls?: RenderControls;
@@ -42,7 +41,7 @@ export interface PaginatedTableProps<T, F> {
 }
 
 export const PaginatedTable = <T, F>({
-    limit,
+    limit: chunkSize,
     initialEntitiesCount,
     fetchData,
     filters,
@@ -58,8 +57,8 @@ export const PaginatedTable = <T, F>({
     renderEmptyDataMessage,
     containerClassName,
 }: PaginatedTableProps<T, F>) => {
-    const initialTotal = initialEntitiesCount || limit;
-    const initialFound = initialEntitiesCount || 0;
+    const initialTotal = initialEntitiesCount || 1;
+    const initialFound = initialEntitiesCount || 1;
 
     const [sortParams, setSortParams] = React.useState<SortParams | undefined>(initialSortParams);
     const [totalEntities, setTotalEntities] = React.useState(initialTotal);
@@ -73,7 +72,7 @@ export const PaginatedTable = <T, F>({
         tableRef,
         totalItems: foundEntities,
         rowHeight,
-        chunkSize: limit,
+        chunkSize,
     });
 
     const handleDataFetched = React.useCallback(
@@ -93,15 +92,13 @@ export const PaginatedTable = <T, F>({
 
     // reset table on filters change
     React.useLayoutEffect(() => {
+        if (parentRef?.current && tableRef.current && !initialTotal) {
+            parentRef.current.scrollTo(0, tableRef.current.offsetTop);
+        }
         setTotalEntities(initialTotal);
         setFoundEntities(initialFound);
         setIsInitialLoad(true);
-        if (parentRef?.current) {
-            parentRef.current.scrollTo(0, 0);
-        } else {
-            tableRef.current?.scrollTo(0, 0);
-        }
-    }, [filters, initialFound, initialTotal, limit, parentRef]);
+    }, [filters, initialFound, initialTotal, parentRef]);
 
     const renderChunks = () => {
         if (!isInitialLoad && foundEntities === 0) {
@@ -114,15 +111,13 @@ export const PaginatedTable = <T, F>({
             );
         }
 
-        const totalLength = foundEntities || limit;
-        const chunksCount = Math.ceil(totalLength / limit);
-
-        return getArray(chunksCount).map((value) => (
+        const totalItemsCount = foundEntities || chunkSize;
+        return activeChunks.map((isActive, index) => (
             <TableChunk<T, F>
-                key={value}
-                id={value}
-                limit={limit}
-                totalLength={totalLength}
+                key={index}
+                id={index}
+                totalItemsCount={totalItemsCount}
+                chunkSize={chunkSize}
                 rowHeight={rowHeight}
                 columns={columns}
                 fetchData={fetchData}
@@ -132,7 +127,7 @@ export const PaginatedTable = <T, F>({
                 getRowClassName={getRowClassName}
                 renderErrorMessage={renderErrorMessage}
                 onDataFetched={handleDataFetched}
-                isActive={activeChunks[value]}
+                isActive={isActive}
             />
         ));
     };

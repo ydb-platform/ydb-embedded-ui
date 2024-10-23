@@ -1,17 +1,23 @@
 import React from 'react';
 
-import {isEqual, throttle} from 'lodash';
+import {throttle} from 'lodash';
 
 interface UseScrollBasedChunksProps {
-    parentRef?: React.RefObject<HTMLElement>;
+    parentRef: React.RefObject<HTMLElement> | null;
     tableRef: React.RefObject<HTMLElement>;
     totalItems: number;
     rowHeight: number;
     chunkSize: number;
+    overscanCount?: number;
 }
 
+interface ChunksRange {
+    start: number;
+    end: number;
+}
+
+const DEFAULT_OVERSCAN_COUNT = 1;
 const THROTTLE_DELAY = 100;
-const CHUNKS_AHEAD_COUNT = 1;
 
 export const useScrollBasedChunks = ({
     parentRef,
@@ -19,42 +25,55 @@ export const useScrollBasedChunks = ({
     totalItems,
     rowHeight,
     chunkSize,
+    overscanCount = DEFAULT_OVERSCAN_COUNT,
 }: UseScrollBasedChunksProps): boolean[] => {
-    const [activeChunks, setActiveChunks] = React.useState<boolean[]>([true, true]);
+    const chunksCount = React.useMemo(
+        () => Math.ceil(totalItems / chunkSize),
+        [chunkSize, totalItems],
+    );
 
-    const calculateActiveChunks = React.useCallback(() => {
+    const [chunksRange, setChunksRange] = React.useState<ChunksRange>({
+        start: 0,
+        end: Math.min(overscanCount, chunksCount - 1),
+    });
+
+    const calculateVisibleRange = React.useCallback(() => {
         const container = parentRef?.current;
         const table = tableRef.current;
         if (!container || !table) {
-            return;
+            return null;
         }
 
-        const tableScrollTop = Math.max(container.scrollTop - table.offsetTop, 0);
-        const visibleStartIndex = Math.floor(Math.max(tableScrollTop, 0) / rowHeight);
-        const visibleEndIndex = Math.min(
-            Math.ceil((tableScrollTop + container.clientHeight) / rowHeight),
-            totalItems - 1,
-        );
+        const tableOffset = table.offsetTop;
+        const containerScroll = container.scrollTop;
+        const visibleStart = Math.max(containerScroll - tableOffset, 0);
+        const visibleEnd = visibleStart + container.clientHeight;
 
         const startChunk = Math.max(
-            Math.floor(visibleStartIndex / chunkSize) - CHUNKS_AHEAD_COUNT,
+            Math.floor(visibleStart / rowHeight / chunkSize) - overscanCount,
             0,
         );
-        const endChunk = Math.floor(visibleEndIndex / chunkSize) + CHUNKS_AHEAD_COUNT;
+        const endChunk = Math.min(
+            Math.floor(visibleEnd / rowHeight / chunkSize) + overscanCount,
+            chunksCount - 1,
+        );
 
-        const newActiveChunks = [];
-        for (let i = startChunk; i <= endChunk; i++) {
-            newActiveChunks[i] = true;
+        return {start: startChunk, end: endChunk};
+    }, [parentRef, tableRef, rowHeight, chunkSize, chunksCount, overscanCount]);
+
+    const handleScroll = React.useCallback(() => {
+        const newRange = calculateVisibleRange();
+        if (
+            newRange &&
+            (newRange.start !== chunksRange.start || newRange.end !== chunksRange.end)
+        ) {
+            setChunksRange(newRange);
         }
+    }, [calculateVisibleRange, chunksRange.end, chunksRange.start]);
 
-        if (!isEqual(activeChunks, newActiveChunks)) {
-            setActiveChunks(newActiveChunks);
-        }
-    }, [parentRef, tableRef, rowHeight, totalItems, chunkSize, activeChunks]);
-
-    const throttledCalculateActiveChunks = React.useMemo(
-        () => throttle(calculateActiveChunks, THROTTLE_DELAY),
-        [calculateActiveChunks],
+    const throttledHandleScroll = React.useMemo(
+        () => throttle(handleScroll, THROTTLE_DELAY, {leading: true, trailing: true}),
+        [handleScroll],
     );
 
     React.useEffect(() => {
@@ -63,12 +82,25 @@ export const useScrollBasedChunks = ({
             return undefined;
         }
 
-        container.addEventListener('scroll', throttledCalculateActiveChunks);
+        container.addEventListener('scroll', throttledHandleScroll);
         return () => {
-            container.removeEventListener('scroll', throttledCalculateActiveChunks);
-            throttledCalculateActiveChunks.cancel();
+            container.removeEventListener('scroll', throttledHandleScroll);
+            throttledHandleScroll.cancel();
         };
-    }, [parentRef, throttledCalculateActiveChunks]);
+    }, [parentRef, throttledHandleScroll]);
 
-    return activeChunks;
+    return React.useMemo(() => {
+        const activeChunkIds = Array.from(
+            {length: chunksRange.end - chunksRange.start + 1},
+            (_, i) => chunksRange.start + i,
+        );
+
+        // Create boolean array where true represents active chunks
+        const activeChunks = Array(chunksCount).fill(false);
+        activeChunkIds.forEach((id) => {
+            activeChunks[id] = true;
+        });
+
+        return activeChunks;
+    }, [chunksRange.start, chunksRange.end, chunksCount]);
 };

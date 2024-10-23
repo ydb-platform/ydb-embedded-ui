@@ -14,9 +14,9 @@ const DEBOUNCE_TIMEOUT = 200;
 
 interface TableChunkProps<T, F> {
     id: number;
-    limit: number;
-    totalLength: number;
+    chunkSize: number;
     rowHeight: number;
+    totalItemsCount: number;
     columns: Column<T>[];
     filters?: F;
     sortParams?: SortParams;
@@ -32,8 +32,8 @@ interface TableChunkProps<T, F> {
 // Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
 export const TableChunk = typedMemo(function TableChunk<T, F>({
     id,
-    limit,
-    totalLength,
+    chunkSize,
+    totalItemsCount,
     rowHeight,
     columns,
     fetchData,
@@ -51,8 +51,8 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     const columnsIds = columns.map((column) => column.name);
 
     const queryParams = {
-        offset: id * limit,
-        limit,
+        offset: id * chunkSize,
+        limit: chunkSize,
         fetchData: fetchData as FetchData<T, unknown>,
         filters,
         sortParams,
@@ -88,9 +88,10 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         }
     }, [currentData, isActive, onDataFetched]);
 
-    const chunkOffset = id * limit;
-    const remainingLength = totalLength - chunkOffset;
-    const calculatedChunkLength = remainingLength < limit ? remainingLength : limit;
+    const chunkOffset = id * chunkSize;
+    const remainingLength = totalItemsCount - chunkOffset;
+    const calculatedChunkLength =
+        remainingLength < chunkSize && remainingLength > 0 ? remainingLength : chunkSize;
 
     const dataLength = currentData?.data?.length || calculatedChunkLength;
 
@@ -135,7 +136,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         ));
     };
 
-    const chunkHeight = dataLength ? dataLength * rowHeight : limit * rowHeight;
+    const chunkHeight = dataLength ? dataLength * rowHeight : chunkSize * rowHeight;
 
     return (
         <tbody
