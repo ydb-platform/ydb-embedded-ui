@@ -46,6 +46,8 @@ body,
     --ydb-color-status-red: var(--g-color-base-danger-heavy);
     --ydb-color-status-blue: var(--g-color-base-info-heavy);
     --ydb-color-status-black: var(--g-color-base-misc-heavy);
+
+    --g-popover-max-width: 500px;
 }
 
 :is(#tab, .g-tabs-item_active .g-tabs-item__title) {
@@ -102,8 +104,4 @@ body,
 
 .app_embedded {
     font-family: 'Rubik', sans-serif;
-}
-
-.g-popup {
-    max-width: 500px;
 }
