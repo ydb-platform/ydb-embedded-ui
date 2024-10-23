@@ -1,6 +1,9 @@
 import React from 'react';
 
+import {Flex, useLayoutContext} from '@gravity-ui/uikit';
+
 import {VDisk} from '../../../components/VDisk/VDisk';
+import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import {getPDiskId} from '../../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../../utils/disks/types';
@@ -12,6 +15,8 @@ import './Disks.scss';
 
 const b = cn('ydb-storage-disks');
 
+const VDISKS_CONTAINER_WIDTH = 300;
+
 interface DisksProps {
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
@@ -20,13 +25,20 @@ interface DisksProps {
 export function Disks({vDisks = [], viewContext}: DisksProps) {
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
 
+    const {
+        theme: {spaceBaseSize},
+    } = useLayoutContext();
+
     if (!vDisks.length) {
         return null;
     }
 
+    const unavailableVDiskWidth =
+        (VDISKS_CONTAINER_WIDTH - spaceBaseSize * (vDisks.length - 1)) / vDisks.length;
+
     return (
         <div className={b(null)}>
-            <div className={b('vdisks-wrapper')}>
+            <Flex direction={'row'} gap={1} grow style={{width: VDISKS_CONTAINER_WIDTH}}>
                 {vDisks?.map((vDisk) => (
                     <VDiskItem
                         key={vDisk.StringifiedId}
@@ -34,9 +46,10 @@ export function Disks({vDisks = [], viewContext}: DisksProps) {
                         inactive={!isVdiskActive(vDisk, viewContext)}
                         highlightedVDisk={highlightedVDisk}
                         setHighlightedVDisk={setHighlightedVDisk}
+                        unavailableVDiskWidth={unavailableVDiskWidth}
                     />
                 ))}
-            </div>
+            </Flex>
 
             <div className={b('pdisks-wrapper')}>
                 {vDisks?.map((vDisk) => (
@@ -57,21 +70,27 @@ interface DisksItemProps {
     inactive?: boolean;
     highlightedVDisk: string | undefined;
     setHighlightedVDisk: (id: string | undefined) => void;
+    unavailableVDiskWidth?: number;
 }
 
-function VDiskItem({vDisk, highlightedVDisk, inactive, setHighlightedVDisk}: DisksItemProps) {
+function VDiskItem({
+    vDisk,
+    highlightedVDisk,
+    inactive,
+    setHighlightedVDisk,
+    unavailableVDiskWidth,
+}: DisksItemProps) {
     // Do not show PDisk popup for VDisk
     const vDiskToShow = {...vDisk, PDisk: undefined};
 
     const vDiskId = vDisk.StringifiedId;
 
+    // show vdisks without AllocatedSize as having average width (#1433)
+    const minWidth = valueIsDefined(vDiskToShow.AllocatedSize) ? undefined : unavailableVDiskWidth;
+    const flexGrow = Number(vDiskToShow.AllocatedSize) || 1;
+
     return (
-        <div
-            style={{
-                flexGrow: Number(vDisk.AllocatedSize) || 1,
-            }}
-            className={b('vdisk-item')}
-        >
+        <div style={{flexGrow, minWidth}} className={b('vdisk-item')}>
             <VDisk
                 data={vDiskToShow}
                 compact

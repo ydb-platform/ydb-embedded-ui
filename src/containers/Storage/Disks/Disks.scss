@@ -6,15 +6,6 @@
 
     width: max-content;
 
-    &__vdisks-wrapper {
-        display: flex;
-        flex-grow: 1;
-        flex-direction: row;
-        gap: 4px;
-
-        width: 300px;
-    }
-
     &__pdisks-wrapper {
         display: flex;
         flex-direction: row;
