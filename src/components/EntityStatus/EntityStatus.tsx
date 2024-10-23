@@ -28,8 +28,6 @@ interface EntityStatusProps {
     clipboardButtonAlwaysVisible?: boolean;
 
     className?: string;
-
-    additionalControls?: React.ReactNode;
 }
 
 export function EntityStatus({
@@ -50,8 +48,6 @@ export function EntityStatus({
     clipboardButtonAlwaysVisible = false,
 
     className,
-
-    additionalControls,
 }: EntityStatusProps) {
     const renderIcon = () => {
         if (!showStatus) {
@@ -93,22 +89,29 @@ export function EntityStatus({
                     {label}
                 </span>
             )}
-            <span className={b('link', {'with-left-trim': withLeftTrim})}>{renderLink()}</span>
-            <div className={b('controls-wrapper')}>
-                {hasClipboardButton && (
-                    <ClipboardButton
-                        text={name}
-                        size="xs"
-                        view="normal"
-                        className={b('clipboard-button', {
-                            visible: clipboardButtonAlwaysVisible,
-                        })}
-                    />
-                )}
-                {additionalControls && (
-                    <span className={b('additional-controls')}>{additionalControls}</span>
-                )}
-            </div>
+            {(path || name) && (
+                <div className={b('wrapper')}>
+                    <span className={b('link', {'with-left-trim': withLeftTrim})}>
+                        {renderLink()}
+                    </span>
+                    {hasClipboardButton && (
+                        <div
+                            className={b('controls-wrapper', {
+                                visible: clipboardButtonAlwaysVisible,
+                            })}
+                        >
+                            <ClipboardButton
+                                text={name}
+                                size="xs"
+                                view="normal"
+                                className={b('clipboard-button', {
+                                    visible: clipboardButtonAlwaysVisible,
+                                })}
+                            />
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

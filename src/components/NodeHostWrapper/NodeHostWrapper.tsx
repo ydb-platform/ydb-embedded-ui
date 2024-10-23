@@ -6,7 +6,6 @@ import type {TSystemStateInfo} from '../../types/api/nodes';
 import {createDeveloperUILinkWithNodeId} from '../../utils/developerUI/developerUI';
 import {isUnavailableNode} from '../../utils/nodes';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
-import {DeveloperUILinkButton} from '../DeveloperUILinkButton/DeveloperUILinkButton';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 
@@ -42,14 +41,10 @@ export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperPro
           })
         : undefined;
 
-    const additionalControls = nodeHref ? (
-        <DeveloperUILinkButton href={nodeHref} size="xs" />
-    ) : null;
-
     return (
         <CellWithPopover
             disabled={!isNodeAvailable}
-            content={<NodeEndpointsTooltipContent data={node} />}
+            content={<NodeEndpointsTooltipContent data={node} nodeHref={nodeHref} />}
             placement={['top', 'bottom']}
             behavior={PopoverBehavior.Immediate}
         >
@@ -58,7 +53,6 @@ export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperPro
                 status={node.SystemState}
                 path={nodePath}
                 hasClipboardButton
-                additionalControls={additionalControls}
             />
         </CellWithPopover>
     );

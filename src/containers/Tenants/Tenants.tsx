@@ -5,7 +5,6 @@ import DataTable from '@gravity-ui/react-data-table';
 import {Button} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
-import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Illustration} from '../../components/Illustration';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
@@ -13,6 +12,7 @@ import {ProblemFilter} from '../../components/ProblemFilter';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {clusterName} from '../../store';
 import {
     ProblemFilterValues,
@@ -27,7 +27,7 @@ import {
 } from '../../store/reducers/tenants/selectors';
 import {setSearchValue, tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
-import type {AdditionalTenantsProps, NodeAddress} from '../../types/additionalProps';
+import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
@@ -36,7 +36,6 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {getTenantPath} from '../Tenant/TenantPages';
 
 import './Tenants.scss';
 
@@ -92,47 +91,16 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     };
 
     const renderTable = () => {
-        const getTenantBackend = (tenant: PreparedTenant) => {
-            if (typeof additionalTenantsProps?.prepareTenantBackend !== 'function') {
-                return undefined;
-            }
-
-            let backend: string | NodeAddress | undefined =
-                tenant.MonitoringEndpoint ?? tenant.backend;
-            const nodeIds = tenant.NodeIds ?? tenant.sharedNodeIds;
-            if (!backend && nodeIds && nodeIds.length > 0) {
-                const index = Math.floor(Math.random() * nodeIds.length);
-                backend = {NodeId: nodeIds[index]};
-            }
-            return additionalTenantsProps.prepareTenantBackend(backend);
-        };
-
         const columns: Column<PreparedTenant>[] = [
             {
                 name: 'Name',
                 header: 'Database',
-                render: ({row}) => {
-                    const backend = getTenantBackend(row);
-                    const isExternalLink = Boolean(backend);
-                    return (
-                        <EntityStatus
-                            externalLink={isExternalLink}
-                            className={b('name')}
-                            name={row.Name || 'unknown database'}
-                            withLeftTrim={true}
-                            status={row.Overall}
-                            hasClipboardButton
-                            path={getTenantPath({
-                                name: row.Name,
-                                backend,
-                            })}
-                            additionalControls={additionalTenantsProps?.getMonitoringLink?.(
-                                row.Name,
-                                row.Type,
-                            )}
-                        />
-                    );
-                },
+                render: ({row}) => (
+                    <TenantNameWrapper
+                        tenant={row}
+                        additionalTenantsProps={additionalTenantsProps}
+                    />
+                ),
                 width: 440,
                 sortable: true,
                 defaultOrder: DataTable.DESCENDING,

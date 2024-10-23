@@ -1,4 +1,3 @@
-import {MonitoringButton} from '../../../components/MonitoringButton/MonitoringButton';
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {ETenantType} from '../../../types/api/tenant';
 import type {GetMonitoringLink} from '../../../utils/monitoring';
@@ -20,12 +19,11 @@ export function ExtendedTenant({
     const additionalTenantProps = {
         getMonitoringLink: (dbName?: string, dbType?: ETenantType) => {
             if (monitoring && dbName && dbType && getMonitoringLink) {
-                const href = getMonitoringLink({
+                return getMonitoringLink({
                     monitoring,
                     dbName,
                     dbType,
                 });
-                return href ? <MonitoringButton href={href} visible={true} size="xs" /> : null;
             }
 
             return null;

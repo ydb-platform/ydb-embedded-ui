@@ -3,20 +3,18 @@ import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {Icon, Text} from '@gravity-ui/uikit';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
-import {DeveloperUILinkButton} from '../../components/DeveloperUILinkButton/DeveloperUILinkButton';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
+import {TabletNameWrapper} from '../../components/TabletNameWrapper/TabletNameWrapper';
 import {TabletState} from '../../components/TabletState/TabletState';
-import {getTabletPagePath} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {tabletApi} from '../../store/reducers/tablet';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
-import {createTabletDeveloperUIHref} from '../../utils/developerUI/developerUI';
 import {useTypedSelector} from '../../utils/hooks';
 import {getDefaultNodePath} from '../Node/NodePages';
 
@@ -50,23 +48,7 @@ function getColumns({database}: {database?: string}) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
 
-                const tabletPath = getTabletPagePath(row.TabletId, {
-                    tenantName: database,
-                });
-
-                return (
-                    <EntityStatus
-                        name={row.TabletId?.toString()}
-                        path={tabletPath}
-                        hasClipboardButton
-                        showStatus={false}
-                        additionalControls={
-                            <DeveloperUILinkButton
-                                href={createTabletDeveloperUIHref(row.TabletId)}
-                            />
-                        }
-                    />
-                );
+                return <TabletNameWrapper tabletId={row.TabletId} database={database} />;
             },
         },
         {
