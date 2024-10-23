@@ -1,8 +1,14 @@
+@import '../../../styles/mixins.scss';
+
 .ydb-cluster-dashboard {
     position: sticky;
     left: 0;
 
     padding-top: 16px;
+
+    &__error {
+        @include body-2-typography();
+    }
     &__card {
         display: flex;
         flex-direction: column;
