@@ -123,7 +123,12 @@ export function Cluster({
             <div className={b('sticky-wrapper')}>
                 <AutoRefreshControl className={b('auto-refresh-control')} />
             </div>
-            <ClusterDashboard cluster={cluster} groupStats={groupsStats} loading={infoLoading} />
+            <ClusterDashboard
+                cluster={cluster}
+                groupStats={groupsStats}
+                loading={infoLoading}
+                error={clusterError || cluster?.error}
+            />
             <div className={b('tabs-sticky-wrapper')}>
                 <Tabs
                     size="l"

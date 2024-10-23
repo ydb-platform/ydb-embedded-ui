@@ -1,9 +1,11 @@
 import {Flex, Text} from '@gravity-ui/uikit';
 
+import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Tags} from '../../../components/Tags';
 import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
 import {isClusterInfoV2} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
+import type {IResponseError} from '../../../types/api/error';
 import {valueIsDefined} from '../../../utils';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
 import i18n from '../i18n';
@@ -41,9 +43,13 @@ interface ClusterDashboardProps {
     cluster: TClusterInfo;
     groupStats?: ClusterGroupsStats;
     loading?: boolean;
+    error?: IResponseError | string;
 }
 
 export function ClusterDashboard(props: ClusterDashboardProps) {
+    if (props.error) {
+        return <ResponseError error={props.error} className={b('error')} />;
+    }
     return (
         <div className={b()}>
             <Flex gap={4} wrap>

@@ -8,6 +8,7 @@ import type {TTraceCheck, TTraceView} from './trace';
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/viewer/protos/viewer.proto
  */
 export interface TClusterInfoV1 {
+    error?: string;
     Name?: string;
     Overall?: EFlag;
     NodesTotal?: number;
