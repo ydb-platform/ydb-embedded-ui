@@ -4,14 +4,29 @@ import {
 } from '../../../../../store/reducers/capabilities/hooks';
 import {storageApi} from '../../../../../store/reducers/storage/storage';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
+import type {GroupsRequiredField} from '../../../../../types/api/storage';
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
+import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
 import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/columns/columns';
-import {STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY} from '../../../../Storage/StorageGroups/columns/constants';
+import {
+    GROUPS_COLUMNS_TO_DATA_FIELDS,
+    STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
+} from '../../../../Storage/StorageGroups/columns/constants';
+import type {StorageGroupsColumn} from '../../../../Storage/StorageGroups/columns/types';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
+
+function getColumns(): [StorageGroupsColumn[], GroupsRequiredField[]] {
+    const preparedColumns = getStorageTopGroupsColumns();
+
+    const columnsIds = preparedColumns.map((column) => column.name);
+    const dataFieldsRequired = getRequiredDataFields(columnsIds, GROUPS_COLUMNS_TO_DATA_FIELDS);
+
+    return [preparedColumns, dataFieldsRequired];
+}
 
 interface TopGroupsProps {
     tenant?: string;
@@ -24,7 +39,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const columns = getStorageTopGroupsColumns();
+    const [columns, fieldsRequired] = getColumns();
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
         {
@@ -33,6 +48,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
             with: 'all',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
             shouldUseGroupsHandler: groupsHandlerAvailable,
+            fieldsRequired,
         },
         {
             pollingInterval: autoRefreshInterval,

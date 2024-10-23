@@ -11,5 +11,5 @@ export function getRequiredDataFields<ColumnId extends string, RequiredField ext
         return fields;
     }, new Set<RequiredField>());
 
-    return Array.from(requiredFieldsSet);
+    return Array.from(requiredFieldsSet).sort();
 }
