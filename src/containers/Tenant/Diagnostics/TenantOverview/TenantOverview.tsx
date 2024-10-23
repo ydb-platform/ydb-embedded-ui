@@ -1,6 +1,7 @@
 import {Loader} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {MonitoringButton} from '../../../../components/MonitoringButton/MonitoringButton';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
@@ -147,13 +148,15 @@ export function TenantOverview({
         );
     }
 
+    const monitoringLink = additionalTenantProps?.getMonitoringLink?.(Name, Type);
+
     return (
         <div className={b()}>
             <div className={b('info')}>
                 <div className={b('top-label')}>{tenantType}</div>
                 <div className={b('top')}>
                     {renderName()}
-                    {additionalTenantProps?.getMonitoringLink?.(Name, Type)}
+                    {monitoringLink && <MonitoringButton href={monitoringLink} />}
                 </div>
                 <MetricsCards
                     poolsCpuStats={poolsStats}

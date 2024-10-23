@@ -95,7 +95,11 @@ export function EntityStatus({
                         {renderLink()}
                     </span>
                     {hasClipboardButton && (
-                        <div className={b('controls-wrapper')}>
+                        <div
+                            className={b('controls-wrapper', {
+                                visible: clipboardButtonAlwaysVisible,
+                            })}
+                        >
                             <ClipboardButton
                                 text={name}
                                 size="xs"

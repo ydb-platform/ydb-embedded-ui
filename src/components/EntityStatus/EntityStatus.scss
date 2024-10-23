@@ -20,6 +20,10 @@
         color: var(--g-color-text-secondary);
 
         @include table-hover-appearing-button();
+
+        &_visible {
+            opacity: 1;
+        }
     }
 
     &__wrapper {
@@ -42,13 +46,18 @@
         width: 0;
         height: 100%;
 
-        background-color: var(--g-color-base-float);
+        &_visible {
+            width: min-content;
+            padding: var(--g-spacing-1);
+        }
 
         .data-table__row:hover &,
         .ydb-paginated-table__row:hover &,
         .ydb-tree-view__item & {
             width: min-content;
             padding: var(--g-spacing-1);
+
+            background-color: var(--g-color-base-float);
         }
     }
 

@@ -7,6 +7,7 @@ import type {AdditionalTenantsProps, NodeAddress} from '../../types/additionalPr
 import {useTypedSelector} from '../../utils/hooks';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
+import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 
 import i18n from './i18n';
 
@@ -44,11 +45,16 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
         <CellWithPopover
             disabled={!isUserAllowedToMakeChanges || !monitoringLink}
             content={
-                <DefinitionList responsive>
-                    <DefinitionList.Item name={i18n('field_monitoring-link')}>
-                        {monitoringLink}
-                    </DefinitionList.Item>
-                </DefinitionList>
+                monitoringLink ? (
+                    <DefinitionList responsive>
+                        <DefinitionList.Item name={i18n('field_links')}>
+                            <LinkWithIcon
+                                title={i18n('field_monitoring-link')}
+                                url={monitoringLink}
+                            />
+                        </DefinitionList.Item>
+                    </DefinitionList>
+                ) : null
             }
             placement={['top', 'bottom']}
             behavior={PopoverBehavior.Immediate}

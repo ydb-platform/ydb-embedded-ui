@@ -23,7 +23,7 @@ export const NodeEndpointsTooltipContent = ({data, nodeHref}: NodeEdpointsToolti
     const info: (DefinitionListItemProps & {key: string})[] = [];
 
     if (data?.Rack) {
-        info.push({name: 'Rack', children: data.Rack, key: i18n('field_rack')});
+        info.push({name: i18n('field_rack'), children: data.Rack, key: 'Rack'});
     }
 
     if (data?.Endpoints && data.Endpoints.length) {

@@ -1,6 +1,5 @@
 import {ClipboardButton} from '@gravity-ui/uikit';
 
-import {MonitoringButton} from '../../../components/MonitoringButton/MonitoringButton';
 import type {
     AdditionalClusterProps,
     AdditionalTenantsProps,
@@ -103,8 +102,7 @@ const getAdditionalTenantsProps = (
     if (monitoring && getMonitoringLink) {
         additionalTenantsProps.getMonitoringLink = (dbName?: string, dbType?: ETenantType) => {
             if (dbName && dbType) {
-                const href = getMonitoringLink({monitoring, dbName, dbType, clusterName});
-                return <MonitoringButton href={href} />;
+                return getMonitoringLink({monitoring, dbName, dbType, clusterName});
             }
 
             return null;
