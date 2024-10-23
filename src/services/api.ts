@@ -251,7 +251,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getStorageGroups(
-        {nodeId, pDiskId, groupId, fieldsRequired = 'all', filter, ...params}: GroupsRequestParams,
+        {nodeId, pDiskId, groupId, fieldsRequired, filter, ...params}: GroupsRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         const preparedNodeId = Array.isArray(nodeId)

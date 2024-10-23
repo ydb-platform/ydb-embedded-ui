@@ -146,7 +146,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
     {
         name: COLUMNS_NAMES.NODES,
         header: COLUMNS_TITLES[COLUMNS_NAMES.NODES],
-        resizeMinWidth: 140,
+        resizeMinWidth: 170,
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({cluster = {}}) => {
             const {NodesTotal = 0} = cluster;
@@ -166,7 +166,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
     {
         name: COLUMNS_NAMES.LOAD,
         header: COLUMNS_TITLES[COLUMNS_NAMES.LOAD],
-        resizeMinWidth: 140,
+        resizeMinWidth: 170,
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({cluster}) => {
             return cluster?.NumberOfCpus;
@@ -184,7 +184,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
     {
         name: COLUMNS_NAMES.STORAGE,
         header: COLUMNS_TITLES[COLUMNS_NAMES.STORAGE],
-        resizeMinWidth: 140,
+        resizeMinWidth: 170,
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({cluster}) => {
             return Number(cluster?.StorageTotal);

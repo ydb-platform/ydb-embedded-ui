@@ -15,6 +15,7 @@ import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
+import {StatusIcon} from '../StatusIcon/StatusIcon';
 
 import {vDiskInfoKeyset} from './i18n';
 
@@ -106,25 +107,25 @@ export function VDiskInfo<T extends PreparedVDisk>({
     if (valueIsDefined(DiskSpace)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('space-status'),
-            value: <EntityStatus status={DiskSpace} />,
+            value: <StatusIcon status={DiskSpace} />,
         });
     }
     if (valueIsDefined(SatisfactionRank?.FreshRank?.Flag)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('fresh-rank-satisfaction'),
-            value: <EntityStatus status={SatisfactionRank?.FreshRank?.Flag} />,
+            value: <StatusIcon status={SatisfactionRank?.FreshRank?.Flag} />,
         });
     }
     if (valueIsDefined(SatisfactionRank?.LevelRank?.Flag)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('level-rank-satisfaction'),
-            value: <EntityStatus status={SatisfactionRank?.LevelRank?.Flag} />,
+            value: <StatusIcon status={SatisfactionRank?.LevelRank?.Flag} />,
         });
     }
     if (valueIsDefined(FrontQueues)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('front-queues'),
-            value: <EntityStatus status={FrontQueues} />,
+            value: <StatusIcon status={FrontQueues} />,
         });
     }
     if (valueIsDefined(HasUnreadableBlobs)) {
