@@ -5,10 +5,10 @@ import {valueIsDefined} from '../../utils';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {formatToMs} from '../../utils/timeParsers';
 import {bytesToSpeed} from '../../utils/utils';
-import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
+import {StatusIcon} from '../StatusIcon/StatusIcon';
 
 import {storageGroupInfoKeyset} from './i18n';
 
@@ -70,7 +70,7 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
     if (valueIsDefined(Overall)) {
         storageGroupInfoFirstColumn.push({
             label: storageGroupInfoKeyset('overall'),
-            value: <EntityStatus status={Overall} />,
+            value: <StatusIcon status={Overall} />,
         });
     }
     if (valueIsDefined(State)) {
@@ -113,13 +113,13 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
     if (valueIsDefined(DiskSpace)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('disk-space'),
-            value: <EntityStatus status={DiskSpace} />,
+            value: <StatusIcon status={DiskSpace} />,
         });
     }
     if (valueIsDefined(Latency)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency'),
-            value: <EntityStatus status={Latency} />,
+            value: <StatusIcon status={Latency} />,
         });
     }
     if (valueIsDefined(LatencyPutTabletLogMs)) {
