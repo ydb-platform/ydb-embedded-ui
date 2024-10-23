@@ -10,6 +10,8 @@ import {OPERATION_KINDS} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
 
+import './Operations.scss';
+
 interface OperationsControlsProps {
     kind: OperationKind;
     searchValue: string;
@@ -39,6 +41,7 @@ export function OperationsControls({
             />
             <Select
                 value={[kind]}
+                width={150}
                 options={OPERATION_KINDS}
                 onUpdate={(value) => handleKindChange(value[0] as OperationKind)}
             />
