@@ -10,6 +10,8 @@ import {OPERATION_KINDS} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
 
+import './Operations.scss';
+
 interface OperationsControlsProps {
     kind: OperationKind;
     searchValue: string;
@@ -37,14 +39,12 @@ export function OperationsControls({
                 placeholder={i18n('pleaceholder_search')}
                 className={b('search')}
             />
-            <div>
-                <Select
-                    value={[kind]}
-                    width={150}
-                    options={OPERATION_KINDS}
-                    onUpdate={(value) => handleKindChange(value[0] as OperationKind)}
-                />
-            </div>
+            <Select
+                value={[kind]}
+                width={150}
+                options={OPERATION_KINDS}
+                onUpdate={(value) => handleKindChange(value[0] as OperationKind)}
+            />
             <EntitiesCount
                 label={i18n('label_operations')}
                 loading={entitiesLoading}
