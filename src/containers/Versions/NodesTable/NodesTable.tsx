@@ -92,8 +92,8 @@ const columns: Column<PreparedNodeSystemState>[] = [
         header: 'Load average',
         sortAccessor: ({LoadAveragePercents = []}) => LoadAveragePercents[0],
         defaultOrder: DataTable.DESCENDING,
-        width: 140,
-        resizeMinWidth: 140,
+        width: 170,
+        resizeMinWidth: 170,
         render: ({row}) =>
             row.LoadAveragePercents && row.LoadAveragePercents.length > 0 ? (
                 <ProgressViewer

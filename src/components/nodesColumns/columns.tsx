@@ -107,8 +107,8 @@ export function getMemoryColumn<
             />
         ),
         align: DataTable.LEFT,
-        width: 140,
-        resizeMinWidth: 140,
+        width: 170,
+        resizeMinWidth: 170,
     };
 }
 export function getSharedCacheUsageColumn<
@@ -126,8 +126,8 @@ export function getSharedCacheUsageColumn<
             />
         ),
         align: DataTable.LEFT,
-        width: 140,
-        resizeMinWidth: 140,
+        width: 170,
+        resizeMinWidth: 170,
     };
 }
 export function getCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Column<T> {
@@ -162,8 +162,8 @@ export function getLoadAverageColumn<T extends {LoadAveragePercents?: number[]}>
             />
         ),
         align: DataTable.LEFT,
-        width: 140,
-        resizeMinWidth: 140,
+        width: 170,
+        resizeMinWidth: 170,
     };
 }
 // The same as loadAverage, but more compact

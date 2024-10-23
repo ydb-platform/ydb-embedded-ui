@@ -118,7 +118,7 @@ function getColumns({
         {
             name: VDiskTableColumnsIds.Size,
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.Size],
-            width: 100,
+            width: 170,
             render: ({row}) => {
                 return (
                     <ProgressViewer
