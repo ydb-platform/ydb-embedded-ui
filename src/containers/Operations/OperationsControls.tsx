@@ -37,11 +37,14 @@ export function OperationsControls({
                 placeholder={i18n('pleaceholder_search')}
                 className={b('search')}
             />
-            <Select
-                value={[kind]}
-                options={OPERATION_KINDS}
-                onUpdate={(value) => handleKindChange(value[0] as OperationKind)}
-            />
+            <div>
+                <Select
+                    value={[kind]}
+                    width={150}
+                    options={OPERATION_KINDS}
+                    onUpdate={(value) => handleKindChange(value[0] as OperationKind)}
+                />
+            </div>
             <EntitiesCount
                 label={i18n('label_operations')}
                 loading={entitiesLoading}
