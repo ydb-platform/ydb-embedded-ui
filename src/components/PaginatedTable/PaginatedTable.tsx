@@ -71,7 +71,7 @@ export const PaginatedTable = <T, F>({
 
     const tableRef = React.useRef<HTMLDivElement>(null);
 
-    const activeChunks = useScrollBasedChunks({
+    const chunks = useScrollBasedChunks({
         parentRef,
         tableRef,
         totalItems: foundEntities,
@@ -109,12 +109,11 @@ export const PaginatedTable = <T, F>({
             );
         }
 
-        const totalItemsCount = foundEntities || chunkSize;
-        return activeChunks.map((isActive, index) => (
+        return chunks.map((itemsCount, index) => (
             <TableChunk<T, F>
                 key={index}
                 id={index}
-                totalItemsCount={totalItemsCount}
+                itemsCount={itemsCount}
                 chunkSize={chunkSize}
                 rowHeight={rowHeight}
                 columns={columns}
@@ -125,7 +124,7 @@ export const PaginatedTable = <T, F>({
                 getRowClassName={getRowClassName}
                 renderErrorMessage={renderErrorMessage}
                 onDataFetched={handleDataFetched}
-                isActive={isActive}
+                isActive={Boolean(itemsCount)}
             />
         ));
     };

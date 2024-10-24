@@ -16,7 +16,7 @@ interface TableChunkProps<T, F> {
     id: number;
     chunkSize: number;
     rowHeight: number;
-    totalItemsCount: number;
+    itemsCount: number;
     columns: Column<T>[];
     filters?: F;
     sortParams?: SortParams;
@@ -33,7 +33,7 @@ interface TableChunkProps<T, F> {
 export const TableChunk = typedMemo(function TableChunk<T, F>({
     id,
     chunkSize,
-    totalItemsCount,
+    itemsCount,
     rowHeight,
     columns,
     fetchData,
@@ -88,12 +88,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         }
     }, [currentData, isActive, onDataFetched]);
 
-    const chunkOffset = id * chunkSize;
-    const remainingLength = totalItemsCount - chunkOffset;
-    const calculatedChunkLength =
-        remainingLength < chunkSize && remainingLength > 0 ? remainingLength : chunkSize;
-
-    const dataLength = currentData?.data?.length || calculatedChunkLength;
+    const dataLength = currentData?.data?.length || itemsCount || chunkSize;
 
     const renderContent = () => {
         if (!isActive) {
@@ -136,13 +131,11 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         ));
     };
 
-    const chunkHeight = dataLength ? dataLength * rowHeight : chunkSize * rowHeight;
-
     return (
         <tbody
             id={id.toString()}
             style={{
-                height: `${chunkHeight}px`,
+                height: `${dataLength * rowHeight}px`,
                 // Default display: table-row-group doesn't work in Safari and breaks the table
                 // display: block works in Safari, but disconnects thead and tbody cell grids
                 // Hack to make it work in all cases
