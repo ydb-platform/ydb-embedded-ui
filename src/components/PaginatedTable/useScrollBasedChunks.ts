@@ -13,11 +13,6 @@ interface UseScrollBasedChunksProps {
     overscanCount?: number;
 }
 
-interface ChunksRange {
-    start: number;
-    end: number;
-}
-
 const DEFAULT_OVERSCAN_COUNT = 1;
 const THROTTLE_DELAY = 100;
 
@@ -34,10 +29,10 @@ export const useScrollBasedChunks = ({
         [chunkSize, totalItems],
     );
 
-    const [chunksRange, setChunksRange] = React.useState<ChunksRange>({
-        start: 0,
-        end: Math.min(overscanCount, chunksCount - 1),
-    });
+    const [startChunk, setStartChunk] = React.useState(0);
+    const [endChunk, setEndChunk] = React.useState(
+        Math.min(overscanCount, Math.max(chunksCount - 1, 0)),
+    );
 
     const calculateVisibleRange = React.useCallback(() => {
         const container = parentRef?.current;
@@ -51,32 +46,22 @@ export const useScrollBasedChunks = ({
         const visibleStart = Math.max(containerScroll - tableOffset, 0);
         const visibleEnd = visibleStart + container.clientHeight;
 
-        const startChunk = Math.max(
-            Math.floor(visibleStart / rowHeight / chunkSize) - overscanCount,
-            0,
-        );
-        const endChunk = Math.min(
+        const start = Math.max(Math.floor(visibleStart / rowHeight / chunkSize) - overscanCount, 0);
+        const end = Math.min(
             Math.floor(visibleEnd / rowHeight / chunkSize) + overscanCount,
-            chunksCount - 1,
+            Math.max(chunksCount - 1, 0),
         );
 
-        return {start: startChunk, end: endChunk};
-    }, [parentRef, tableRef, rowHeight, chunkSize, chunksCount, overscanCount]);
+        return {start, end};
+    }, [parentRef, tableRef, rowHeight, chunkSize, overscanCount, chunksCount]);
 
     const handleScroll = React.useCallback(() => {
         const newRange = calculateVisibleRange();
-        if (
-            newRange &&
-            (newRange.start !== chunksRange.start || newRange.end !== chunksRange.end)
-        ) {
-            setChunksRange(newRange);
+        if (newRange) {
+            setStartChunk(newRange.start);
+            setEndChunk(newRange.end);
         }
-    }, [calculateVisibleRange, chunksRange.end, chunksRange.start]);
-
-    const throttledHandleScroll = React.useMemo(
-        () => throttle(handleScroll, THROTTLE_DELAY, {leading: true, trailing: true}),
-        [handleScroll],
-    );
+    }, [calculateVisibleRange]);
 
     React.useEffect(() => {
         const container = parentRef?.current;
@@ -84,17 +69,22 @@ export const useScrollBasedChunks = ({
             return undefined;
         }
 
+        const throttledHandleScroll = throttle(handleScroll, THROTTLE_DELAY, {
+            leading: true,
+            trailing: true,
+        });
+
         container.addEventListener('scroll', throttledHandleScroll);
         return () => {
             container.removeEventListener('scroll', throttledHandleScroll);
             throttledHandleScroll.cancel();
         };
-    }, [parentRef, throttledHandleScroll]);
+    }, [handleScroll, parentRef]);
 
     return React.useMemo(() => {
         const activeChunkIds = Array.from(
-            {length: chunksRange.end - chunksRange.start + 1},
-            (_, i) => chunksRange.start + i,
+            {length: endChunk - startChunk + 1},
+            (_, i) => startChunk + i,
         );
 
         // Create boolean array where true represents active chunks
@@ -104,5 +94,5 @@ export const useScrollBasedChunks = ({
         });
 
         return activeChunks;
-    }, [chunksRange.start, chunksRange.end, chunksCount]);
+    }, [endChunk, startChunk, chunksCount]);
 };
