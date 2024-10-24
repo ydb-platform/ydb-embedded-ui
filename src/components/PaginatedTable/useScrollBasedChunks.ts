@@ -5,7 +5,7 @@ import {throttle} from 'lodash';
 import {calculateElementOffsetTop} from './utils';
 
 interface UseScrollBasedChunksProps {
-    parentRef: React.RefObject<HTMLElement> | null;
+    parentRef: React.RefObject<HTMLElement>;
     tableRef: React.RefObject<HTMLElement>;
     totalItems: number;
     rowHeight: number;
@@ -82,16 +82,11 @@ export const useScrollBasedChunks = ({
     }, [handleScroll, parentRef]);
 
     return React.useMemo(() => {
-        const activeChunkIds = Array.from(
-            {length: endChunk - startChunk + 1},
-            (_, i) => startChunk + i,
-        );
-
         // Create boolean array where true represents active chunks
         const activeChunks = Array(chunksCount).fill(false);
-        activeChunkIds.forEach((id) => {
-            activeChunks[id] = true;
-        });
+        for (let i = startChunk; i <= endChunk; i++) {
+            activeChunks[i] = true;
+        }
 
         return activeChunks;
     }, [endChunk, startChunk, chunksCount]);

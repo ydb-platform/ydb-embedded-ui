@@ -32,7 +32,7 @@ interface PaginatedStorageGroupsTableProps {
     visibleEntities: VisibleEntities;
     onShowAll: VoidFunction;
 
-    parentRef: React.RefObject<HTMLElement> | null;
+    parentRef: React.RefObject<HTMLElement>;
     renderControls?: RenderControls;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;

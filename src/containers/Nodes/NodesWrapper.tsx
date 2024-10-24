@@ -8,7 +8,7 @@ import {PaginatedNodes} from './PaginatedNodes';
 interface NodesWrapperProps {
     path?: string;
     database?: string;
-    parentRef: React.RefObject<HTMLElement> | null;
+    parentRef: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
 }
 

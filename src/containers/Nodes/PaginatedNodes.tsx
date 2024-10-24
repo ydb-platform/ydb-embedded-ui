@@ -44,7 +44,7 @@ const b = cn('ydb-nodes');
 interface NodesProps {
     path?: string;
     database?: string;
-    parentRef: React.RefObject<HTMLElement> | null;
+    parentRef: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
