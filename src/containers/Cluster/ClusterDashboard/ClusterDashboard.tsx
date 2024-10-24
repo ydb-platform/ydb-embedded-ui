@@ -70,10 +70,11 @@ function ClusterDoughnuts({cluster, loading}: ClusterDashboardProps) {
     }
     const metricsCards = [];
     if (isClusterInfoV2(cluster)) {
-        const {CoresUsed, NumberOfCpus} = cluster;
-        if (valueIsDefined(CoresUsed) && valueIsDefined(NumberOfCpus)) {
+        const {CoresUsed, NumberOfCpus, CoresTotal} = cluster;
+        const total = CoresTotal ?? NumberOfCpus;
+        if (valueIsDefined(CoresUsed) && valueIsDefined(total)) {
             metricsCards.push(
-                <ClusterMetricsCores value={CoresUsed} capacity={NumberOfCpus} key="cores" />,
+                <ClusterMetricsCores value={CoresUsed} capacity={total} key="cores" />,
             );
         }
     }
