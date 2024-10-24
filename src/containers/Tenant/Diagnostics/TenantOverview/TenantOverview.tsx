@@ -58,13 +58,7 @@ export function TenantOverview({
     const {Tables, Topics} =
         tenantSchemaData?.PathDescription?.DomainDescription?.DiskSpaceUsage || {};
 
-    const usedTabletStorage = [
-        Tables?.TotalSize,
-        Topics?.AccountSize,
-        Topics?.DataSize,
-        Topics?.ReserveSize,
-        Topics?.UsedReserveSize,
-    ].reduce((sum, current) => {
+    const usedTabletStorage = [Tables?.TotalSize, Topics?.DataSize].reduce((sum, current) => {
         if (current) {
             return sum + Number(current);
         }
