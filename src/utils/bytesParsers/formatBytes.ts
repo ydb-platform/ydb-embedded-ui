@@ -2,6 +2,7 @@ import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE} from '../constants';
 import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
 import {UNBREAKABLE_GAP, isNumeric} from '../utils';
 
+import type {FormatToSizeArgs, FormatValuesArgs} from './common';
 import i18n from './i18n';
 
 const sizes = {
@@ -72,13 +73,7 @@ export const getSizeWithSignificantDigits = (value: number, significantDigits: n
     return size;
 };
 
-interface FormatToSizeArgs {
-    value: number;
-    size?: BytesSizes;
-    precision?: number;
-}
-
-const formatToSize = ({value, size = 'mb', precision = 0}: FormatToSizeArgs) => {
+const formatToSize = ({value, size = 'mb', precision = 0}: FormatToSizeArgs<BytesSizes>) => {
     const result = roundToPrecision(Number(value) / sizes[size].value, precision);
 
     return formatNumber(result);
@@ -92,14 +87,6 @@ const addSpeedLabel = (result: string, size: BytesSizes) => {
     return addSizeLabel(result, size) + i18n('perSecond');
 };
 
-export type FormatBytesArgs = Omit<FormatToSizeArgs, 'value'> & {
-    value: number | string | undefined | null;
-    withSpeedLabel?: boolean;
-    withSizeLabel?: boolean;
-    significantDigits?: number;
-    delimiter?: string;
-};
-
 /**
  * @param significantDigits - number of digits above 3
  */
@@ -111,7 +98,7 @@ export const formatBytes = ({
     significantDigits = 0,
     delimiter,
     ...params
-}: FormatBytesArgs) => {
+}: FormatValuesArgs<BytesSizes>) => {
     if (!isNumeric(value)) {
         return '';
     }
