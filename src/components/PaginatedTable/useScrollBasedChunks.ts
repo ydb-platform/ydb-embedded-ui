@@ -84,9 +84,11 @@ export const useScrollBasedChunks = ({
     return React.useMemo(() => {
         // 0 items represent inactive chunk
         const chunks = Array(chunksCount).fill(0);
-        for (let i = startChunk; i <= endChunk; i++) {
-            chunks[i] = i === chunksCount - 1 ? totalItems % chunkSize : chunkSize;
+        for (let i = startChunk; i < endChunk; i++) {
+            chunks[i] = chunkSize;
         }
+
+        chunks[endChunk] = endChunk === chunksCount - 1 ? totalItems % chunkSize : chunkSize;
 
         return chunks;
     }, [chunksCount, startChunk, endChunk, totalItems, chunkSize]);
