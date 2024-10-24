@@ -1,6 +1,8 @@
 import type {YQLEntity} from '@gravity-ui/websql-autocomplete';
 
 export const SimpleTypes = [
+    'Text',
+    'Bytes',
     'String',
     'Bool',
     'Int32',
