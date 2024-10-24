@@ -27,3 +27,15 @@ export function calculateColumnWidth(newWidth: number, minWidth = 40, maxWidth =
 }
 
 export const typedMemo: <T>(Component: T) => T = React.memo;
+
+export function calculateElementOffsetTop(element: HTMLElement, container?: HTMLElement): number {
+    let currentElement = element;
+    let offsetTop = 0;
+
+    while (currentElement && currentElement !== container) {
+        offsetTop += currentElement.offsetTop;
+        currentElement = currentElement.offsetParent as HTMLElement;
+    }
+
+    return offsetTop;
+}

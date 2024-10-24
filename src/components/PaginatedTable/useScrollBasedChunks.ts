@@ -2,6 +2,8 @@ import React from 'react';
 
 import {throttle} from 'lodash';
 
+import {calculateElementOffsetTop} from './utils';
+
 interface UseScrollBasedChunksProps {
     parentRef: React.RefObject<HTMLElement> | null;
     tableRef: React.RefObject<HTMLElement>;
@@ -44,7 +46,7 @@ export const useScrollBasedChunks = ({
             return null;
         }
 
-        const tableOffset = table.offsetTop;
+        const tableOffset = calculateElementOffsetTop(table, container);
         const containerScroll = container.scrollTop;
         const visibleStart = Math.max(containerScroll - tableOffset, 0);
         const visibleEnd = visibleStart + container.clientHeight;

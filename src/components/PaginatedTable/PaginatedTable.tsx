@@ -19,8 +19,12 @@ import type {
     SortParams,
 } from './types';
 import {useScrollBasedChunks} from './useScrollBasedChunks';
+import {calculateElementOffsetTop} from './utils';
 
 import './PaginatedTable.scss';
+
+const HEADER_HEIGHT = 40;
+const CONTROLS_HEIGHT = 50;
 
 export interface PaginatedTableProps<T, F> {
     limit: number;
@@ -57,7 +61,7 @@ export const PaginatedTable = <T, F>({
     renderEmptyDataMessage,
     containerClassName,
 }: PaginatedTableProps<T, F>) => {
-    const initialTotal = initialEntitiesCount || 1;
+    const initialTotal = initialEntitiesCount || 0;
     const initialFound = initialEntitiesCount || 1;
 
     const [sortParams, setSortParams] = React.useState<SortParams | undefined>(initialSortParams);
@@ -75,25 +79,19 @@ export const PaginatedTable = <T, F>({
         chunkSize,
     });
 
-    const handleDataFetched = React.useCallback(
-        (total: number, found: number) => {
-            if (total !== totalEntities) {
-                setTotalEntities(total);
-            }
-
-            if (found !== foundEntities) {
-                setFoundEntities(found);
-            }
-
-            setIsInitialLoad(false);
-        },
-        [foundEntities, totalEntities],
-    );
+    const handleDataFetched = React.useCallback((total: number, found: number) => {
+        setTotalEntities(total);
+        setFoundEntities(found);
+        setIsInitialLoad(false);
+    }, []);
 
     // reset table on filters change
     React.useLayoutEffect(() => {
         if (parentRef?.current && tableRef.current && !initialTotal) {
-            parentRef.current.scrollTo(0, tableRef.current.offsetTop);
+            parentRef.current.scrollTo({
+                left: 0,
+                top: calculateElementOffsetTop(tableRef.current) - HEADER_HEIGHT - CONTROLS_HEIGHT,
+            });
         }
         setTotalEntities(initialTotal);
         setFoundEntities(initialFound);
