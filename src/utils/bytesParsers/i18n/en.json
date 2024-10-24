@@ -4,5 +4,9 @@
   "mb": "MB",
   "gb": "GB",
   "tb": "TB",
+  "label_thousand": "k",
+  "label_million": "m",
+  "label_billion": "b",
+  "label_trillion": "t",
   "perSecond": "/s"
 }

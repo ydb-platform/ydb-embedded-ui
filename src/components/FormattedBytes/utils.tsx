@@ -1,10 +1,11 @@
-import type {FormatBytesArgs} from '../../utils/bytesParsers';
+import type {BytesSizes} from '../../utils/bytesParsers';
+import type {FormatValuesArgs} from '../../utils/bytesParsers/common';
 
 import {FormattedBytes} from './FormattedBytes';
 
 export const toFormattedSize = (
     value: number | string | undefined,
-    params?: Omit<FormatBytesArgs, 'value'>,
+    params?: Omit<FormatValuesArgs<BytesSizes>, 'value'>,
 ) => {
     if (!value) {
         return null;
