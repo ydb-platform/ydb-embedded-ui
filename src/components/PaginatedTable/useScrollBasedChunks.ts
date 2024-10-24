@@ -85,7 +85,7 @@ export const useScrollBasedChunks = ({
         // 0 items represent inactive chunk
         const chunks = Array(chunksCount).fill(0);
         for (let i = startChunk; i <= endChunk; i++) {
-            chunks[i] = endChunk === chunksCount - 1 ? totalItems % chunkSize : chunkSize;
+            chunks[i] = i === chunksCount - 1 ? totalItems % chunkSize : chunkSize;
         }
 
         return chunks;
