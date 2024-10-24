@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.29.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.28.0...v6.29.0) (2024-10-24)
+
+
+### Features
+
+* add Bytes and Text types suggestion in autocomplete ([#1531](https://github.com/ydb-platform/ydb-embedded-ui/issues/1531)) ([6a99452](https://github.com/ydb-platform/ydb-embedded-ui/commit/6a994523986f68d775c1efb13f49c624f0125107))
+
+
+### Bug Fixes
+
+* **TenantOverview:** fix used tablet storage calculation ([#1528](https://github.com/ydb-platform/ydb-embedded-ui/issues/1528)) ([96411ee](https://github.com/ydb-platform/ydb-embedded-ui/commit/96411ee7b3f7f1830c2bd445c584438964cc7347))
+
 ## [6.28.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.27.1...v6.28.0) (2024-10-23)
 
 
