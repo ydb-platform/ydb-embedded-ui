@@ -88,7 +88,8 @@ export const useScrollBasedChunks = ({
             chunks[i] = chunkSize;
         }
 
-        chunks[endChunk] = endChunk === chunksCount - 1 ? totalItems % chunkSize : chunkSize;
+        const lastChunkSize = totalItems % chunkSize || chunkSize;
+        chunks[endChunk] = endChunk === chunksCount - 1 ? lastChunkSize : chunkSize;
 
         return chunks;
     }, [chunksCount, startChunk, endChunk, totalItems, chunkSize]);
