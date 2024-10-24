@@ -2,8 +2,6 @@ import React from 'react';
 
 import {throttle} from 'lodash';
 
-import {getArray} from '../../utils';
-
 import {calculateElementOffsetTop} from './utils';
 
 interface UseScrollBasedChunksProps {
@@ -29,14 +27,6 @@ export const useScrollBasedChunks = ({
     const chunksCount = React.useMemo(
         () => Math.ceil(totalItems / chunkSize),
         [chunkSize, totalItems],
-    );
-
-    const chunkLengths = React.useMemo(
-        () =>
-            getArray(chunksCount).map((value) =>
-                Math.min(chunkSize, totalItems - value * chunkSize),
-            ),
-        [chunkSize, chunksCount, totalItems],
     );
 
     const [startChunk, setStartChunk] = React.useState(0);
@@ -95,9 +85,9 @@ export const useScrollBasedChunks = ({
         // 0 items represent inactive chunk
         const chunks = Array(chunksCount).fill(0);
         for (let i = startChunk; i <= endChunk; i++) {
-            chunks[i] = chunkLengths[i];
+            chunks[i] = endChunk === chunksCount - 1 ? totalItems % chunkSize : chunkSize;
         }
 
         return chunks;
-    }, [chunksCount, startChunk, endChunk, chunkLengths]);
+    }, [chunksCount, startChunk, endChunk, totalItems, chunkSize]);
 };
