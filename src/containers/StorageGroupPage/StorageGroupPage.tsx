@@ -29,6 +29,7 @@ const storageGroupPageCn = cn('ydb-storage-group-page');
 
 export function StorageGroupPage() {
     const dispatch = useTypedDispatch();
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
     const [{groupId}] = useQueryParams({groupId: StringParam});
 
@@ -109,7 +110,7 @@ export function StorageGroupPage() {
                 <div className={storageGroupPageCn('storage-title')}>
                     {storageGroupPageKeyset('storage')}
                 </div>
-                <StorageWrapper groupId={groupId} />
+                <StorageWrapper groupId={groupId} parentRef={containerRef} />
             </React.Fragment>
         );
     };
@@ -122,7 +123,7 @@ export function StorageGroupPage() {
     };
 
     return (
-        <div className={storageGroupPageCn(null)}>
+        <div className={storageGroupPageCn(null)} ref={containerRef}>
             {renderHelmet()}
             {renderPageMeta()}
             {renderPageTitle()}

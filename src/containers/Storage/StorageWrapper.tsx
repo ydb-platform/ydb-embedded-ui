@@ -11,7 +11,7 @@ interface StorageWrapperProps {
     pDiskId?: string | number;
     groupId?: string | number;
     vDiskSlotId?: string | number;
-    parentRef?: React.RefObject<HTMLElement>;
+    parentRef: React.RefObject<HTMLElement>;
 }
 
 export const StorageWrapper = ({parentRef, ...props}: StorageWrapperProps) => {

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {getArray} from '../../utils';
 import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
 
 import {TableChunk} from './TableChunk';
@@ -20,8 +19,12 @@ import type {
     SortParams,
 } from './types';
 import {useScrollBasedChunks} from './useScrollBasedChunks';
+import {calculateElementOffsetTop} from './utils';
 
 import './PaginatedTable.scss';
+
+const HEADER_HEIGHT = 40;
+const CONTROLS_HEIGHT = 50;
 
 export interface PaginatedTableProps<T, F> {
     limit: number;
@@ -32,7 +35,7 @@ export interface PaginatedTableProps<T, F> {
     columns: Column<T>[];
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
-    parentRef?: React.RefObject<HTMLElement>;
+    parentRef: React.RefObject<HTMLElement>;
     initialSortParams?: SortParams;
     onColumnsResize?: HandleTableColumnsResize;
     renderControls?: RenderControls;
@@ -42,7 +45,7 @@ export interface PaginatedTableProps<T, F> {
 }
 
 export const PaginatedTable = <T, F>({
-    limit,
+    limit: chunkSize,
     initialEntitiesCount,
     fetchData,
     filters,
@@ -58,8 +61,8 @@ export const PaginatedTable = <T, F>({
     renderEmptyDataMessage,
     containerClassName,
 }: PaginatedTableProps<T, F>) => {
-    const initialTotal = initialEntitiesCount || limit;
-    const initialFound = initialEntitiesCount || 0;
+    const initialTotal = initialEntitiesCount || 0;
+    const initialFound = initialEntitiesCount || 1;
 
     const [sortParams, setSortParams] = React.useState<SortParams | undefined>(initialSortParams);
     const [totalEntities, setTotalEntities] = React.useState(initialTotal);
@@ -68,11 +71,12 @@ export const PaginatedTable = <T, F>({
 
     const tableRef = React.useRef<HTMLDivElement>(null);
 
-    const activeChunks = useScrollBasedChunks({
-        containerRef: parentRef ?? tableRef,
+    const chunks = useScrollBasedChunks({
+        parentRef,
+        tableRef,
         totalItems: foundEntities,
-        itemHeight: rowHeight,
-        chunkSize: limit,
+        rowHeight,
+        chunkSize,
     });
 
     const handleDataFetched = React.useCallback((total: number, found: number) => {
@@ -83,15 +87,16 @@ export const PaginatedTable = <T, F>({
 
     // reset table on filters change
     React.useLayoutEffect(() => {
+        if (parentRef?.current && tableRef.current && !initialTotal) {
+            parentRef.current.scrollTo({
+                left: 0,
+                top: calculateElementOffsetTop(tableRef.current) - HEADER_HEIGHT - CONTROLS_HEIGHT,
+            });
+        }
         setTotalEntities(initialTotal);
         setFoundEntities(initialFound);
         setIsInitialLoad(true);
-        if (parentRef?.current) {
-            parentRef.current.scrollTo(0, 0);
-        } else {
-            tableRef.current?.scrollTo(0, 0);
-        }
-    }, [filters, initialFound, initialTotal, limit, parentRef]);
+    }, [filters, initialFound, initialTotal, parentRef]);
 
     const renderChunks = () => {
         if (!isInitialLoad && foundEntities === 0) {
@@ -104,15 +109,12 @@ export const PaginatedTable = <T, F>({
             );
         }
 
-        const totalLength = foundEntities || limit;
-        const chunksCount = Math.ceil(totalLength / limit);
-
-        return getArray(chunksCount).map((value) => (
+        return chunks.map((itemsCount, index) => (
             <TableChunk<T, F>
-                key={value}
-                id={value}
-                limit={limit}
-                totalLength={totalLength}
+                key={index}
+                id={index}
+                itemsCount={itemsCount}
+                chunkSize={chunkSize}
                 rowHeight={rowHeight}
                 columns={columns}
                 fetchData={fetchData}
@@ -122,7 +124,7 @@ export const PaginatedTable = <T, F>({
                 getRowClassName={getRowClassName}
                 renderErrorMessage={renderErrorMessage}
                 onDataFetched={handleDataFetched}
-                isActive={activeChunks.includes(value)}
+                isActive={Boolean(itemsCount)}
             />
         ));
     };

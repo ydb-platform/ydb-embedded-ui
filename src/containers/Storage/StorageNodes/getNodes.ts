@@ -46,7 +46,7 @@ export const getStorageNodes: FetchData<
         type,
         storage,
         limit,
-        offset,
+        offset: 0,
         sort,
         filter: searchValue,
         uptime: getUptimeParamValue(nodesUptimeFilter),
@@ -59,9 +59,23 @@ export const getStorageNodes: FetchData<
         fieldsRequired: dataFieldsRequired,
     });
     const preparedResponse = prepareStorageNodesResponse(response);
+
+    let mockedData = preparedResponse.nodes?.slice();
+
+    for (let i = 0; i < 1000; i++) {
+        mockedData = mockedData?.concat(
+            preparedResponse.nodes?.map((data, j) => ({
+                ...data,
+                NodeId: data.NodeId + i * 2000 + j,
+                Host: data.Host || String(i) + ',' + j,
+            })) || [],
+        );
+    }
+    const paginatedData = mockedData?.slice(offset, offset + limit);
+
     return {
-        data: preparedResponse.nodes || [],
-        found: preparedResponse.found || 0,
-        total: preparedResponse.total || 0,
+        data: paginatedData || [],
+        found: mockedData?.length || 0,
+        total: mockedData?.length || 0,
     };
 };

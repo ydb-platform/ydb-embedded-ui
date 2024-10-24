@@ -46,7 +46,7 @@ export const getNodes: FetchData<
             storage,
             tablets,
             limit,
-            offset,
+            offset: 0,
             sort,
             path,
             database,
@@ -59,9 +59,22 @@ export const getNodes: FetchData<
     );
     const preparedResponse = prepareNodesData(response);
 
+    let mockedData = preparedResponse.Nodes?.slice();
+
+    for (let i = 0; i < 1000; i++) {
+        mockedData = mockedData?.concat(
+            preparedResponse.Nodes?.map((data, j) => ({
+                ...data,
+                NodeId: data.NodeId + i * 2000 + j,
+                Host: data.Host || String(i) + ',' + j,
+            })) || [],
+        );
+    }
+    const paginatedData = mockedData?.slice(offset, offset + limit);
+
     return {
-        data: preparedResponse.Nodes || [],
-        found: preparedResponse.FoundNodes || 0,
-        total: preparedResponse.TotalNodes || 0,
+        data: paginatedData || [],
+        found: mockedData?.length || 0,
+        total: mockedData?.length || 0,
     };
 };

@@ -112,6 +112,7 @@ function GroupedStorageNodesComponent({
     groupId,
     nodeId,
     viewContext,
+    parentRef,
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -171,6 +172,7 @@ function GroupedStorageNodesComponent({
                     >
                         <PaginatedStorageNodesTable
                             database={database}
+                            parentRef={parentRef}
                             nodeId={nodeId}
                             groupId={groupId}
                             searchValue={searchValue}

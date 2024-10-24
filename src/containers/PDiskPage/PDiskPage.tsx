@@ -63,6 +63,7 @@ export function PDiskPage() {
 
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
     const newDiskApiAvailable = useDiskPagesAvailable();
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
     const [{nodeId, pDiskId, activeTab}] = useQueryParams({
         activeTab: StringParam,
@@ -245,7 +246,7 @@ export function PDiskPage() {
             }
             case 'storage': {
                 return pDiskParamsDefined ? (
-                    <StorageWrapper nodeId={nodeId} pDiskId={pDiskId} />
+                    <StorageWrapper nodeId={nodeId} pDiskId={pDiskId} parentRef={containerRef} />
                 ) : null;
             }
             default:
@@ -261,7 +262,7 @@ export function PDiskPage() {
     };
 
     return (
-        <div className={pdiskPageCn(null)}>
+        <div className={pdiskPageCn(null)} ref={containerRef}>
             {renderHelmet()}
             {renderPageMeta()}
             {renderPageTitle()}
