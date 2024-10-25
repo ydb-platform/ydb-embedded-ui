@@ -77,6 +77,7 @@ export interface TClusterInfoV2 extends TClusterInfoV1 {
     Version?: number;
     /** value is uint64 */
     CoresUsed?: string;
+    CoresTotal?: number;
 }
 
 export type TClusterInfo = TClusterInfoV1 | TClusterInfoV2;

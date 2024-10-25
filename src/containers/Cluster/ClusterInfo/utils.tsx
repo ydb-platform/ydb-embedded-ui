@@ -63,7 +63,7 @@ export const getInfo = (
         const nodesStates = arrayNodesStates.map(([state, count]) => {
             return (
                 <NodesState state={state as EFlag} key={state}>
-                    {count}
+                    {formatNumber(count)}
                 </NodesState>
             );
         });
