@@ -29,6 +29,10 @@
         position: relative;
         z-index: 1;
 
+        // Performance optimization for row hovering.
+        // it actually works.
+        transform: translateZ(0);
+
         &:hover {
             background: var(--paginated-table-hover-color);
         }
@@ -177,6 +181,7 @@
     }
 
     &__row-skeleton::after {
+        animation: none;
         animation-delay: 200ms;
     }
 }
