@@ -1,5 +1,19 @@
 # Changelog
 
+## [6.29.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.28.0...v6.29.0) (2024-10-25)
+
+
+### Features
+
+* add Bytes and Text types suggestion in autocomplete ([#1531](https://github.com/ydb-platform/ydb-embedded-ui/issues/1531)) ([6a99452](https://github.com/ydb-platform/ydb-embedded-ui/commit/6a994523986f68d775c1efb13f49c624f0125107))
+
+
+### Bug Fixes
+
+* **ClusterDashboard:** hide dashboard if /cluster handler version less 5 ([#1535](https://github.com/ydb-platform/ydb-embedded-ui/issues/1535)) ([f24e5e4](https://github.com/ydb-platform/ydb-embedded-ui/commit/f24e5e4cb2498fd1fa828d8dc40a7f36253016a1))
+* remove excessive slash for requests via tenant node ([#1537](https://github.com/ydb-platform/ydb-embedded-ui/issues/1537)) ([6fb97a9](https://github.com/ydb-platform/ydb-embedded-ui/commit/6fb97a96710bccc39918bb5b127df421df1cbfc4))
+* **TenantOverview:** fix used tablet storage calculation ([#1528](https://github.com/ydb-platform/ydb-embedded-ui/issues/1528)) ([96411ee](https://github.com/ydb-platform/ydb-embedded-ui/commit/96411ee7b3f7f1830c2bd445c584438964cc7347))
+
 ## [6.28.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.27.1...v6.28.0) (2024-10-23)
 
 
