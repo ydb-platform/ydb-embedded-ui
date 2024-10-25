@@ -19,12 +19,8 @@ import type {
     SortParams,
 } from './types';
 import {useScrollBasedChunks} from './useScrollBasedChunks';
-import {calculateElementOffsetTop} from './utils';
 
 import './PaginatedTable.scss';
-
-const HEADER_HEIGHT = 40;
-const CONTROLS_HEIGHT = 50;
 
 export interface PaginatedTableProps<T, F> {
     limit: number;
@@ -87,15 +83,12 @@ export const PaginatedTable = <T, F>({
 
     // reset table on filters change
     React.useLayoutEffect(() => {
-        if (parentRef?.current && tableRef.current && !initialTotal) {
-            parentRef.current.scrollTo({
-                left: 0,
-                top: calculateElementOffsetTop(tableRef.current) - HEADER_HEIGHT - CONTROLS_HEIGHT,
-            });
-        }
         setTotalEntities(initialTotal);
         setFoundEntities(initialFound);
         setIsInitialLoad(true);
+        if (parentRef?.current) {
+            parentRef.current.scrollTo(0, 0);
+        }
     }, [filters, initialFound, initialTotal, parentRef]);
 
     const renderChunks = () => {
