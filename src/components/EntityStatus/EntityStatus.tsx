@@ -90,7 +90,7 @@ export function EntityStatus({
                 </span>
             )}
             {(path || name) && (
-                <div className={b('wrapper')}>
+                <div className={b('wrapper', {'with-button': hasClipboardButton})}>
                     <span className={b('link', {'with-left-trim': withLeftTrim})}>
                         {renderLink()}
                     </span>

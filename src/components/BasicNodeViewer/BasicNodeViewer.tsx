@@ -24,9 +24,9 @@ export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNo
     let nodeHref: string | undefined;
 
     if (additionalNodesProps?.getNodeRef) {
-        nodeHref = additionalNodesProps.getNodeRef(node) + 'internal';
+        nodeHref = additionalNodesProps.getNodeRef(node) + '/internal';
     } else if (node.NodeId) {
-        nodeHref = createDeveloperUILinkWithNodeId(node.NodeId) + 'internal';
+        nodeHref = createDeveloperUILinkWithNodeId(node.NodeId) + '/internal';
     }
 
     return (

@@ -31,7 +31,9 @@
 
         overflow: hidden;
 
-        padding-right: var(--button-width);
+        &_with-button {
+            padding-right: var(--button-width);
+        }
     }
 
     &__controls-wrapper {

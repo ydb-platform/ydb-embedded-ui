@@ -42,7 +42,7 @@ describe('getBackendFromRawNodeData', () => {
                 },
             ],
         };
-        const result = 'https://viewer.ydb.ru:443/ydb-dev02-000.search.net:8765/';
+        const result = 'https://viewer.ydb.ru:443/ydb-dev02-000.search.net:8765';
 
         expect(getBackendFromRawNodeData(node, balancer)).toBe(result);
     });
