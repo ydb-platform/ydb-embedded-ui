@@ -8,10 +8,10 @@ export const createDeveloperUILinkWithNodeId = (nodeId: number | string, host = 
     // In case current backend is already relative node path ({host}/node/{nodeId})
     // We replace existing nodeId path with new nodeId path
     if (nodePathRegexp.test(String(host))) {
-        return String(host).replace(nodePathRegexp, `/node/${nodeId}/`);
+        return String(host).replace(nodePathRegexp, `/node/${nodeId}`);
     }
 
-    return `${host ?? ''}/node/${nodeId}/`;
+    return `${host ?? ''}/node/${nodeId}`;
 };
 
 interface PDiskDeveloperUILinkParams {
@@ -21,7 +21,7 @@ interface PDiskDeveloperUILinkParams {
 }
 
 export const createPDiskDeveloperUILink = ({nodeId, pDiskId, host}: PDiskDeveloperUILinkParams) => {
-    const pdiskPath = 'actors/pdisks/pdisk' + pad9(pDiskId);
+    const pdiskPath = '/actors/pdisks/pdisk' + pad9(pDiskId);
 
     return createDeveloperUILinkWithNodeId(nodeId, host) + pdiskPath;
 };
@@ -36,7 +36,7 @@ export const createVDiskDeveloperUILink = ({
     vDiskSlotId,
     host,
 }: VDiskDeveloperUILinkParams) => {
-    const vdiskPath = 'actors/vdisks/vdisk' + pad9(pDiskId) + '_' + pad9(vDiskSlotId);
+    const vdiskPath = '/actors/vdisks/vdisk' + pad9(pDiskId) + '_' + pad9(vDiskSlotId);
 
     return createDeveloperUILinkWithNodeId(nodeId, host) + vdiskPath;
 };

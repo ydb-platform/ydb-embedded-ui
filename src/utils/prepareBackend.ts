@@ -29,7 +29,7 @@ export const getBackendFromRawNodeData = (
 
     if (useBalancerAsBackend && NodeId) {
         const preparedBalancer = removeViewerPathname(balancer);
-        return `${preparedBalancer}/node/${NodeId}/`;
+        return `${preparedBalancer}/node/${NodeId}`;
     }
 
     if (Host && Endpoints) {
@@ -43,7 +43,7 @@ export const getBackendFromRawNodeData = (
 
         // Currently this func is used to get link to developerUI for specific node
         // It's expected with / at the end (code in embedded version)
-        return getBackendFromNodeHost(hostWithPort, balancer) + '/';
+        return getBackendFromNodeHost(hostWithPort, balancer);
     }
 
     return null;

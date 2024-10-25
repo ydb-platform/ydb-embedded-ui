@@ -30,9 +30,9 @@ export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperPro
 
     let nodeHref: string | undefined;
     if (getNodeRef) {
-        nodeHref = getNodeRef(node) + 'internal';
+        nodeHref = getNodeRef(node) + '/internal';
     } else if (node.NodeId) {
-        nodeHref = createDeveloperUILinkWithNodeId(node.NodeId) + 'internal';
+        nodeHref = createDeveloperUILinkWithNodeId(node.NodeId) + '/internal';
     }
 
     const nodePath = isNodeAvailable
