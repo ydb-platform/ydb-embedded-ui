@@ -43,12 +43,13 @@ export function prepareFamilies(data?: TTableDescription): Record<number, TFamil
 function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
     const families = prepareFamilies(data);
 
-    const {Columns, KeyColumnIds} = data;
+    const {Columns, KeyColumnNames} = data;
 
     const preparedColumns = Columns?.map((column) => {
         const {Id, Name, NotNull, Type, Family, DefaultFromSequence, DefaultFromLiteral} = column;
 
-        const keyColumnIndex = KeyColumnIds?.findIndex((keyColumnId) => keyColumnId === Id) ?? -1;
+        const keyColumnIndex =
+            KeyColumnNames?.findIndex((keyColumnName) => keyColumnName === Name) ?? -1;
 
         const familyName = Family ? families[Family].Name : undefined;
         const prefferedPoolKind = Family
@@ -92,14 +93,15 @@ function prepareExternalTableSchema(data: TExternalTableDescription = {}): Schem
 
 function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaData[] {
     const {Schema = {}, Sharding = {}} = data;
-    const {Columns, KeyColumnIds} = Schema;
+    const {Columns, KeyColumnNames} = Schema;
     const {HashSharding = {}} = Sharding;
     const {Columns: HashColumns = []} = HashSharding;
 
     const preparedColumns = Columns?.map((column) => {
         const {Id, Name, Type, NotNull} = column;
 
-        const keyColumnIndex = KeyColumnIds?.findIndex((keyColumnId) => keyColumnId === Id) ?? -1;
+        const keyColumnIndex =
+            KeyColumnNames?.findIndex((keyColumnName) => keyColumnName === Name) ?? -1;
 
         const isPartitioningKeyColumn = Boolean(
             HashColumns?.find((hashColumnName) => hashColumnName === Name),
