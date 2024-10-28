@@ -1,8 +1,8 @@
-import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
+import i18n from '../bytesParsers/i18n';
 import {UNBREAKABLE_GAP, isNumeric} from '../utils';
 
 import type {FormatToSizeArgs, FormatValuesArgs} from './common';
-import i18n from './i18n';
+import {formatNumber, roundToPrecision} from './dataFormatters';
 
 const sizes = {
     thousand: {
@@ -32,7 +32,7 @@ export type Digits = keyof typeof sizes;
  * @returns size to format value to get required number of digits
  *
  * By default value converted to the next size when it's above 1000,
- * so we have 900mb and 1gb. To extend it additional significantDigits could be set
+ * so we have 900k and 1m. To extend it additional significantDigits could be set
  *
  * significantDigits value added above default 3
  *
@@ -45,7 +45,7 @@ export type Digits = keyof typeof sizes;
 export const getNumberWithSignificantDigits = (value: number, significantDigits: number) => {
     const multiplier = 10 ** significantDigits;
 
-    const thousandLevel = sizes.million.value * multiplier;
+    const thousandLevel = sizes.thousand.value * multiplier;
     const millionLevel = sizes.million.value * multiplier;
     const billionLevel = sizes.billion.value * multiplier;
     const trillionLevel = sizes.trillion.value * multiplier;

@@ -1,5 +1,5 @@
 import type {BytesSizes} from '../../utils/bytesParsers';
-import type {FormatValuesArgs} from '../../utils/bytesParsers/common';
+import type {FormatValuesArgs} from '../../utils/dataFormatters/common';
 
 import {FormattedBytes} from './FormattedBytes';
 

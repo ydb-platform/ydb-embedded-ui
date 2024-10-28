@@ -1,8 +1,8 @@
 import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE} from '../constants';
+import type {FormatToSizeArgs, FormatValuesArgs} from '../dataFormatters/common';
 import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
 import {UNBREAKABLE_GAP, isNumeric} from '../utils';
 
-import type {FormatToSizeArgs, FormatValuesArgs} from './common';
 import i18n from './i18n';
 
 const sizes = {
