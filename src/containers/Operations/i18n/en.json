@@ -13,5 +13,10 @@
   "column_createTime": "Create Time",
   "column_endTime": "End Time",
   "column_duration": "Duration",
-  "label_duration-ongoing": "{{value}} (ongoing)"
+  "label_duration-ongoing": "{{value}} (ongoing)",
+
+  "header_cancel": "Cancel operation",
+  "header_forget": "Forget operation",
+  "text_cancel": "The operation will be cancelled. Do you want to proceed?",
+  "text_forget": "The operation will be forgotten. Do you want to proceed?"
 }
