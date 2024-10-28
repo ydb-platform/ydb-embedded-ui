@@ -1,5 +1,13 @@
 # Changelog
 
+## [6.29.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.29.1...v6.29.2) (2024-10-28)
+
+
+### Bug Fixes
+
+* **ClusterMetricsCores:** format value and capacity same way ([#1532](https://github.com/ydb-platform/ydb-embedded-ui/issues/1532)) ([4eb5c04](https://github.com/ydb-platform/ydb-embedded-ui/commit/4eb5c041f8b5615a2806bf5d5bd015afa963ac09))
+* **TabletsTable:** action icons coincide in tablet's page and in table ([#1549](https://github.com/ydb-platform/ydb-embedded-ui/issues/1549)) ([26f77a8](https://github.com/ydb-platform/ydb-embedded-ui/commit/26f77a8563e3c3a100001b198e3e7ee5f97ad7f9))
+
 ## [6.29.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.29.0...v6.29.1) (2024-10-25)
 
 
