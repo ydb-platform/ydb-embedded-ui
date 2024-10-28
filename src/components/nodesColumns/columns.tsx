@@ -230,7 +230,7 @@ export function getTabletsColumn<
         render: ({row}) => {
             return row.Tablets ? (
                 <TabletsStatistic
-                    tenantName={database ?? row.TenantName}
+                    database={database ?? row.TenantName}
                     nodeId={row.NodeId}
                     tablets={row.Tablets}
                 />

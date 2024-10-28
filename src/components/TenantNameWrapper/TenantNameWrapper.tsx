@@ -66,7 +66,7 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
                 status={tenant.Overall}
                 hasClipboardButton
                 path={getTenantPath({
-                    name: tenant.Name,
+                    database: tenant.Name,
                     backend,
                 })}
             />

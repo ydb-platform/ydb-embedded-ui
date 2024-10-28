@@ -37,7 +37,7 @@ export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperPro
 
     const nodePath = isNodeAvailable
         ? getDefaultNodePath(node.NodeId, {
-              tenantName: database ?? node.TenantName,
+              database: database ?? node.TenantName,
           })
         : undefined;
 

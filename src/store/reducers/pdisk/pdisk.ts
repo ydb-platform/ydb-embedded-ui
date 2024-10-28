@@ -15,7 +15,7 @@ export const pDiskApi = api.injectEndpoints({
     endpoints: (build) => ({
         getPdiskInfo: build.query({
             queryFn: async ({nodeId, pDiskId}: PDiskParams, {signal, getState, dispatch}) => {
-                const pDiskInfoHandlerVersion = await queryCapability('/pdisk/info', {
+                const pDiskInfoHandlerVersion = await queryCapability('/pdisk/info', undefined, {
                     getState: getState as GetState,
                     dispatch,
                 });

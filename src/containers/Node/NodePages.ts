@@ -1,4 +1,6 @@
-import type {Query} from '../../routes';
+import {StringParam} from 'use-query-params';
+
+import type {QueryParamsTypeFromQueryObject} from '../../routes';
 import routes, {createHref} from '../../routes';
 
 export const STORAGE = 'storage';
@@ -27,9 +29,15 @@ export const NODE_PAGES = [
     },
 ];
 
+export const nodePageQueryParams = {
+    database: StringParam,
+};
+
+type NodePageQuery = QueryParamsTypeFromQueryObject<typeof nodePageQueryParams>;
+
 export function getDefaultNodePath(
     nodeId: string | number,
-    query: Query = {},
+    query: NodePageQuery = {},
     activeTab: NodeTab = OVERVIEW,
 ) {
     return createHref(

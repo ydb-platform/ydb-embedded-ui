@@ -4,7 +4,7 @@ import {Flex, Tabs} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useParams} from 'react-router-dom';
-import {StringParam, useQueryParams} from 'use-query-params';
+import {useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
 import {EmptyStateWrapper} from '../../components/EmptyState';
@@ -13,7 +13,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {InternalLink} from '../../components/InternalLink';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
-import {getTabletPagePath} from '../../routes';
+import {getTabletPagePath, tabletPageQueryParams} from '../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {tabletApi} from '../../store/reducers/tablet';
@@ -58,19 +58,13 @@ const TABLET_PAGE_TABS = [
 
 const tabletTabSchema = z.nativeEnum(TABLET_TABS_IDS).catch(TABLET_TABS_IDS.history);
 
-const tabletQueryParams = {
-    tenantName: StringParam,
-    clusterName: StringParam,
-    activeTab: StringParam,
-};
-
 export function Tablet() {
     const dispatch = useTypedDispatch();
 
     const {id} = useParams<{id: string}>();
 
-    const [{tenantName: queryDatabase, clusterName: queryClusterName}] =
-        useQueryParams(tabletQueryParams);
+    const [{database: queryDatabase, clusterName: queryClusterName}] =
+        useQueryParams(tabletPageQueryParams);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tabletApi.useGetTabletQuery(
@@ -168,7 +162,7 @@ function TabletTabs({
     hiveId?: string;
     history: ITabletPreparedHistoryItem[];
 }) {
-    const [{activeTab, ...restParams}, setParams] = useQueryParams(tabletQueryParams);
+    const [{activeTab, ...restParams}, setParams] = useQueryParams(tabletPageQueryParams);
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     const noAdvancedInfo = !isUserAllowedToMakeChanges || !hasHive(hiveId);

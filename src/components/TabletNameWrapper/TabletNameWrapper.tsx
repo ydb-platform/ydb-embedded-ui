@@ -18,9 +18,7 @@ interface TabletNameWrapperProps {
 export function TabletNameWrapper({tabletId, database}: TabletNameWrapperProps) {
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
-    const tabletPath = getTabletPagePath(tabletId, {
-        tenantName: database,
-    });
+    const tabletPath = getTabletPagePath(tabletId, {database});
 
     return (
         <CellWithPopover
