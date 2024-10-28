@@ -1,4 +1,4 @@
-import {ArrowsRotateRight} from '@gravity-ui/icons';
+import {ArrowRotateLeft} from '@gravity-ui/icons';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {Icon, Text} from '@gravity-ui/uikit';
 
@@ -128,6 +128,7 @@ function TabletActions(tablet: TTabletStateInfo) {
     return (
         <ButtonWithConfirmDialog
             buttonView="outlined"
+            buttonTitle={i18n('dialog.kill-header')}
             dialogHeader={i18n('dialog.kill-header')}
             dialogText={i18n('dialog.kill-text')}
             onConfirmAction={() => {
@@ -138,7 +139,7 @@ function TabletActions(tablet: TTabletStateInfo) {
             popoverContent={i18n('controls.kill-not-allowed')}
             popoverDisabled={isUserAllowedToMakeChanges}
         >
-            <Icon data={ArrowsRotateRight} />
+            <Icon data={ArrowRotateLeft} />
         </ButtonWithConfirmDialog>
     );
 }
