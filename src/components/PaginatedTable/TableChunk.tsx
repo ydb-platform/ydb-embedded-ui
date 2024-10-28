@@ -8,14 +8,15 @@ import {ResponseError} from '../Errors/ResponseError';
 
 import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
 import type {Column, FetchData, GetRowClassName, SortParams} from './types';
+import {typedMemo} from './utils';
 
 const DEBOUNCE_TIMEOUT = 200;
 
 interface TableChunkProps<T, F> {
     id: number;
-    limit: number;
-    totalLength: number;
+    chunkSize: number;
     rowHeight: number;
+    calculatedCount: number;
     columns: Column<T>[];
     filters?: F;
     sortParams?: SortParams;
@@ -29,10 +30,10 @@ interface TableChunkProps<T, F> {
 }
 
 // Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
-export const TableChunk = <T, F>({
+export const TableChunk = typedMemo(function TableChunk<T, F>({
     id,
-    limit,
-    totalLength,
+    chunkSize,
+    calculatedCount,
     rowHeight,
     columns,
     fetchData,
@@ -43,15 +44,15 @@ export const TableChunk = <T, F>({
     renderErrorMessage,
     onDataFetched,
     isActive,
-}: TableChunkProps<T, F>) => {
+}: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const columnsIds = columns.map((column) => column.name);
 
     const queryParams = {
-        offset: id * limit,
-        limit,
+        offset: id * chunkSize,
+        limit: chunkSize,
         fetchData: fetchData as FetchData<T, unknown>,
         filters,
         sortParams,
@@ -87,11 +88,7 @@ export const TableChunk = <T, F>({
         }
     }, [currentData, isActive, onDataFetched]);
 
-    const chunkOffset = id * limit;
-    const remainingLength = totalLength - chunkOffset;
-    const calculatedChunkLength = remainingLength < limit ? remainingLength : limit;
-
-    const dataLength = currentData?.data?.length || calculatedChunkLength;
+    const dataLength = currentData?.data?.length || calculatedCount;
 
     const renderContent = () => {
         if (!isActive) {
@@ -134,13 +131,11 @@ export const TableChunk = <T, F>({
         ));
     };
 
-    const chunkHeight = dataLength ? dataLength * rowHeight : limit * rowHeight;
-
     return (
         <tbody
             id={id.toString()}
             style={{
-                height: `${chunkHeight}px`,
+                height: `${dataLength * rowHeight}px`,
                 // Default display: table-row-group doesn't work in Safari and breaks the table
                 // display: block works in Safari, but disconnects thead and tbody cell grids
                 // Hack to make it work in all cases
@@ -150,4 +145,4 @@ export const TableChunk = <T, F>({
             {renderContent()}
         </tbody>
     );
-};
+});

@@ -32,6 +32,7 @@ const vDiskPageCn = cn('ydb-vdisk-page');
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
 
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
     const newDiskApiAvailable = useDiskPagesAvailable();
 
@@ -182,6 +183,7 @@ export function VDiskPage() {
                         nodeId={nodeId}
                         pDiskId={pDiskId ?? undefined}
                         vDiskSlotId={vDiskSlotId ?? undefined}
+                        parentRef={containerRef}
                     />
                 </React.Fragment>
             );
@@ -205,7 +207,7 @@ export function VDiskPage() {
     };
 
     return (
-        <div className={vDiskPageCn(null)}>
+        <div className={vDiskPageCn(null)} ref={containerRef}>
             {renderHelmet()}
             {renderPageMeta()}
             {renderPageTitle()}

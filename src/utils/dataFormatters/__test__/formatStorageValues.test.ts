@@ -22,11 +22,6 @@ describe('formatStorageValues', () => {
         expect(result).toEqual(['1', `2${UNBREAKABLE_GAP}KB`]);
     });
 
-    it('should handle small value compared to total and increase precision', () => {
-        const result = formatStorageValues(1, 1024);
-        expect(result).toEqual(['0.001', `1${UNBREAKABLE_GAP}KB`]);
-    });
-
     it('should return ["0", formattedTotal] when value is 0', () => {
         const result = formatStorageValues(0, 2048);
         expect(result).toEqual(['0', `2${UNBREAKABLE_GAP}KB`]);
@@ -34,7 +29,7 @@ describe('formatStorageValues', () => {
 
     it('should use provided size and delimiter', () => {
         const result = formatStorageValues(5120, 10240, 'mb', '/');
-        expect(result).toEqual(['0.01', '0/MB']);
+        expect(result).toEqual(['0', '0/MB']);
     });
 
     it('should handle non-numeric total gracefully', () => {

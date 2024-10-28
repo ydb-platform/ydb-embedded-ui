@@ -126,7 +126,7 @@ export function Node(props: NodeProps) {
         switch (activeTabVerified.id) {
             case STORAGE: {
                 return (
-                    <div className={b('storage')}>
+                    <div className={b('storage')} ref={container}>
                         <StorageWrapper nodeId={nodeId} parentRef={container} />
                     </div>
                 );
@@ -159,7 +159,7 @@ export function Node(props: NodeProps) {
 
     if (node) {
         return (
-            <div className={b(null, props.className)} ref={container}>
+            <div className={b(null, props.className)}>
                 <Helmet
                     titleTemplate={`%s — ${node.Host} — YDB Monitoring`}
                     defaultTitle={`${node.Host} — YDB Monitoring`}
