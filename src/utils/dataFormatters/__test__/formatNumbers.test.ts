@@ -26,11 +26,6 @@ describe('formatNumericValues', () => {
         expect(result).toEqual([`1${UNBREAKABLE_GAP}k`, `2${UNBREAKABLE_GAP}k`]);
     });
 
-    it('should handle small value compared to total and increase precision', () => {
-        const result = formatNumericValues(1, 1024);
-        expect(result).toEqual(['0.001', `1${UNBREAKABLE_GAP}k`]);
-    });
-
     it('should return ["0", formattedTotal] when value is 0', () => {
         const result = formatNumericValues(0, 2048);
         expect(result).toEqual(['0', `2${UNBREAKABLE_GAP}k`]);
@@ -38,7 +33,7 @@ describe('formatNumericValues', () => {
 
     it('should use provided size and delimiter', () => {
         const result = formatNumericValues(5120, 10240, 'billion', '/');
-        expect(result).toEqual(['0.00001', '0/b']);
+        expect(result).toEqual(['0', '0/b']);
     });
 
     it('should handle non-numeric total gracefully', () => {

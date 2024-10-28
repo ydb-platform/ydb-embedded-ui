@@ -113,11 +113,7 @@ export const formatPercent = (number?: unknown) => {
         return '';
     }
     const configuredNumber = configuredNumeral(number);
-    const numberValue = configuredNumber.value();
-    let format = '0.[0]%';
-    if (numberValue && numberValue < 0.001) {
-        format = '0.[00]%';
-    }
+    const format = '0%';
     return configuredNumber.format(format);
 };
 

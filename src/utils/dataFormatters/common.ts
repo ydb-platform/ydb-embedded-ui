@@ -33,25 +33,13 @@ export function formatValues<T>(
         valuePrecision = 1;
     }
 
-    let formattedValue = formatter({
+    const formattedValue = formatter({
         value,
         withSizeLabel: valueWithSizeLabel,
         size: size || calculatedSize,
         precision: valuePrecision,
         delimiter,
     });
-    if (value && value > 0) {
-        while (parseFloat(formattedValue) === 0) {
-            valuePrecision += 1;
-            formattedValue = formatter({
-                value,
-                withSizeLabel: valueWithSizeLabel,
-                size: size || calculatedSize,
-                precision: valuePrecision,
-                delimiter,
-            });
-        }
-    }
     const formattedTotal = formatter({
         value: total,
         size: size || calculatedSize,
