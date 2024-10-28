@@ -16,7 +16,7 @@ interface TableChunkProps<T, F> {
     id: number;
     chunkSize: number;
     rowHeight: number;
-    itemsCount: number;
+    calculatedCount: number;
     columns: Column<T>[];
     filters?: F;
     sortParams?: SortParams;
@@ -33,7 +33,7 @@ interface TableChunkProps<T, F> {
 export const TableChunk = typedMemo(function TableChunk<T, F>({
     id,
     chunkSize,
-    itemsCount,
+    calculatedCount,
     rowHeight,
     columns,
     fetchData,
@@ -88,7 +88,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         }
     }, [currentData, isActive, onDataFetched]);
 
-    const dataLength = currentData?.data?.length || itemsCount || chunkSize;
+    const dataLength = currentData?.data?.length || calculatedCount;
 
     const renderContent = () => {
         if (!isActive) {
