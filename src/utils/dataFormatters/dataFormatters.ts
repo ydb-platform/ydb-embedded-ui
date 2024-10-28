@@ -10,6 +10,9 @@ import {DAY_IN_SECONDS, HOUR_IN_SECONDS} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {isNumeric} from '../utils';
 
+import {formatValues} from './common';
+import {formatNumberWithDigits, getNumberWithSignificantDigits} from './formatNumber';
+import type {Digits} from './formatNumber';
 import i18n from './i18n';
 
 // Here you can't control displayed size and precision
@@ -52,47 +55,41 @@ export const formatMsToUptime = (ms?: number) => {
     return ms && formatUptime(ms / 1000);
 };
 
-export const formatStorageValues = (
+export function formatStorageValues(
     value?: number,
     total?: number,
     size?: BytesSizes,
     delimiter?: string,
-) => {
-    let calculatedSize = getSizeWithSignificantDigits(Number(value), 0);
-    let valueWithSizeLabel = true;
-    let valuePrecision = 0;
-
-    if (isNumeric(total)) {
-        calculatedSize = getSizeWithSignificantDigits(Number(total), 0);
-        valueWithSizeLabel = false;
-        valuePrecision = 1;
-    }
-
-    let formattedValue = formatBytesCustom({
+    withValueLabel?: boolean,
+) {
+    return formatValues<BytesSizes>(
+        formatBytesCustom,
+        getSizeWithSignificantDigits,
         value,
-        withSizeLabel: valueWithSizeLabel,
-        size: size || calculatedSize,
-        precision: valuePrecision,
-    });
-    if (value && value > 0) {
-        while (formattedValue === '0') {
-            valuePrecision += 1;
-            formattedValue = formatBytesCustom({
-                value,
-                withSizeLabel: valueWithSizeLabel,
-                size: size || calculatedSize,
-                precision: valuePrecision,
-            });
-        }
-    }
-    const formattedTotal = formatBytesCustom({
-        value: total,
-        size: size || calculatedSize,
+        total,
+        size,
         delimiter,
-    });
+        withValueLabel,
+    );
+}
 
-    return [formattedValue, formattedTotal];
-};
+export function formatNumericValues(
+    value?: number,
+    total?: number,
+    size?: Digits,
+    delimiter?: string,
+    withValueLabel?: boolean,
+) {
+    return formatValues<Digits>(
+        formatNumberWithDigits,
+        getNumberWithSignificantDigits,
+        value,
+        total,
+        size,
+        delimiter,
+        withValueLabel,
+    );
+}
 
 export const formatStorageValuesToGb = (value?: number, total?: number) => {
     return formatStorageValues(value, total, 'gb');
@@ -110,19 +107,13 @@ export const formatNumber = (number?: unknown) => {
     // "," in format is delimiter sign, not delimiter itself
     return configuredNumeral(number).format('0,0.[00000]');
 };
-export const formatNumberCustom = (number?: number) => {
-    return configuredNumeral(number).format('0.[0]a');
-};
+
 export const formatPercent = (number?: unknown) => {
     if (!isNumeric(number)) {
         return '';
     }
     const configuredNumber = configuredNumeral(number);
-    const numberValue = configuredNumber.value();
-    let format = '0.[0]%';
-    if (numberValue && numberValue < 0.001) {
-        format = '0.[00]%';
-    }
+    const format = '0%';
     return configuredNumber.format(format);
 };
 

@@ -1,7 +1,8 @@
-import type {FormatBytesArgs} from '../../utils/bytesParsers';
+import type {BytesSizes} from '../../utils/bytesParsers';
 import {formatBytes} from '../../utils/bytesParsers';
+import type {FormatValuesArgs} from '../../utils/dataFormatters/common';
 
-type FormattedBytesProps = FormatBytesArgs;
+type FormattedBytesProps = FormatValuesArgs<BytesSizes>;
 
 export const FormattedBytes = ({value, withSpeedLabel, ...params}: FormattedBytesProps) => {
     const formatted = formatBytes({value, withSpeedLabel, ...params});
