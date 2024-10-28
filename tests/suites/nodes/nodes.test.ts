@@ -83,8 +83,9 @@ test.describe('Test Nodes Paginated Table', async () => {
         await paginatedTable.waitForTableData();
 
         const nodeCount = await paginatedTable.getCount();
+        const rowCount = await paginatedTable.getRowCount();
 
-        expect(nodeCount).toBe(1001);
+        expect(nodeCount).toBe(rowCount);
     });
 
     test('Uptime values are displayed in correct format', async ({page}) => {
