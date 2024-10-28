@@ -29,7 +29,7 @@ interface PaginatedStorageNodesTableProps {
     nodesUptimeFilter: NodesUptimeFilterValues;
     onShowAll: VoidFunction;
 
-    parentRef?: React.RefObject<HTMLElement>;
+    parentRef: React.RefObject<HTMLElement>;
     renderControls?: RenderControls;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
