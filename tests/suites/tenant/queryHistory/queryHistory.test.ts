@@ -15,7 +15,7 @@ test.describe('Query History', () => {
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
-            name: tenantName,
+            database: tenantName,
             general: 'query',
         };
 

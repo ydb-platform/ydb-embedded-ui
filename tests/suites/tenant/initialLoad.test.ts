@@ -6,7 +6,7 @@ import {TenantPage} from './TenantPage';
 
 const pageQueryParams = {
     schema: tenantName,
-    name: tenantName,
+    database: tenantName,
     tenantPage: 'diagnostics',
 };
 

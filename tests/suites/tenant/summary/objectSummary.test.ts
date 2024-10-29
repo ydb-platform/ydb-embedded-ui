@@ -10,7 +10,7 @@ test.describe('Object Summary', async () => {
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
-            name: tenantName,
+            database: tenantName,
             general: 'query',
         };
         const tenantPage = new TenantPage(page);
