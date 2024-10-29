@@ -6,7 +6,7 @@ interface CheckTraceParams {
 
 export const traceApi = api.injectEndpoints({
     endpoints: (build) => ({
-        checkTrace: build.query({
+        checkTrace: build.mutation({
             queryFn: async ({url}: CheckTraceParams, {signal}) => {
                 try {
                     const response = await window.api.checkTrace({url}, {signal});
