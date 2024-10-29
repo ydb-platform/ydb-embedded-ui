@@ -5,6 +5,7 @@ import type {
     saveQueryToHistory,
     setQueryHistoryFilter,
     setQueryResult,
+    setQueryTraceReady,
     setTenantPath,
     updateQueryInHistory,
 } from '../../store/reducers/executeQuery';
@@ -34,6 +35,7 @@ export type ExecuteQueryResult = {
     type: ResultType.EXECUTE;
     data?: IQueryResult;
     error?: unknown;
+    isTraceReady?: true;
 } & CommonResultParams;
 
 export type ExplainQueryResult = {
@@ -64,7 +66,8 @@ export type ExecuteQueryAction =
     | ReturnType<typeof saveQueryToHistory>
     | ReturnType<typeof updateQueryInHistory>
     | ReturnType<typeof setTenantPath>
-    | ReturnType<typeof setQueryHistoryFilter>;
+    | ReturnType<typeof setQueryHistoryFilter>
+    | ReturnType<typeof setQueryTraceReady>;
 
 export interface ExecuteQueryStateSlice {
     executeQuery: ExecuteQueryState;

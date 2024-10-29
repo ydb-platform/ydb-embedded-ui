@@ -11,9 +11,10 @@ import i18n from './i18n';
 
 interface TraceUrlButtonProps {
     traceId: string;
+    isTraceReady?: true;
 }
 
-export function TraceButton({traceId}: TraceUrlButtonProps) {
+export function TraceButton({traceId, isTraceReady}: TraceUrlButtonProps) {
     const {traceCheck, traceView} = useClusterBaseInfo();
 
     const checkTraceUrl = traceCheck?.url ? replaceParams(traceCheck.url, {traceId}) : '';
@@ -23,14 +24,14 @@ export function TraceButton({traceId}: TraceUrlButtonProps) {
 
     React.useEffect(() => {
         let checkTraceMutation: {abort: () => void} | null;
-        if (checkTraceUrl) {
+        if (checkTraceUrl && !isTraceReady) {
             checkTraceMutation = checkTrace({url: checkTraceUrl});
         }
 
         return () => checkTraceMutation?.abort();
-    }, [checkTrace, checkTraceUrl]);
+    }, [checkTrace, checkTraceUrl, isTraceReady]);
 
-    if (!traceUrl || isUninitialized) {
+    if (!traceUrl || (isUninitialized && !isTraceReady)) {
         return null;
     }
 
