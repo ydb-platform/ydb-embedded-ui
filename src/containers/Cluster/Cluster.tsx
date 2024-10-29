@@ -9,6 +9,7 @@ import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefres
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
 import routes, {getLocationObjectFromHref} from '../../routes';
+import {useClusterDashboardAvailable} from '../../store/reducers/capabilities/hooks';
 import {
     clusterApi,
     selectClusterTabletsWithFqdn,
@@ -54,6 +55,7 @@ export function Cluster({
     additionalVersionsProps,
 }: ClusterProps) {
     const container = React.useRef<HTMLDivElement>(null);
+    const isClusterDashboardAvailable = useClusterDashboardAvailable();
 
     const dispatch = useTypedDispatch();
 
@@ -123,12 +125,14 @@ export function Cluster({
             <div className={b('sticky-wrapper')}>
                 <AutoRefreshControl className={b('auto-refresh-control')} />
             </div>
-            <ClusterDashboard
-                cluster={cluster}
-                groupStats={groupsStats}
-                loading={infoLoading}
-                error={clusterError || cluster?.error}
-            />
+            {isClusterDashboardAvailable && (
+                <ClusterDashboard
+                    cluster={cluster}
+                    groupStats={groupsStats}
+                    loading={infoLoading}
+                    error={clusterError || cluster?.error}
+                />
+            )}
             <div className={b('tabs-sticky-wrapper')}>
                 <Tabs
                     size="l"
