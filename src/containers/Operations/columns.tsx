@@ -163,11 +163,7 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
 
     return (
         <div className={b('buttons-container')}>
-            <Tooltip
-                openDelay={0}
-                content={i18n('header_forget')}
-                placement={['right', 'right-end', 'right-start', 'top', 'bottom']}
-            >
+            <Tooltip openDelay={0} content={i18n('header_forget')} placement={['left', 'auto']}>
                 <div>
                     <ButtonWithConfirmDialog
                         buttonView="outlined"
@@ -184,11 +180,7 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                     </ButtonWithConfirmDialog>
                 </div>
             </Tooltip>
-            <Tooltip
-                openDelay={0}
-                content={i18n('header_cancel')}
-                placement={['left', 'left-end', 'left-start', 'top', 'bottom']}
-            >
+            <Tooltip openDelay={0} content={i18n('header_cancel')} placement={['right', 'auto']}>
                 <div>
                     <ButtonWithConfirmDialog
                         buttonView="outlined"
