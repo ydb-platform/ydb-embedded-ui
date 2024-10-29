@@ -1,6 +1,6 @@
 import {ArrowRotateLeft} from '@gravity-ui/icons';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
-import {Icon, Text, Tooltip} from '@gravity-ui/uikit';
+import {Icon, Text} from '@gravity-ui/uikit';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
@@ -126,25 +126,26 @@ function TabletActions(tablet: TTabletStateInfo) {
     }
 
     return (
-        <Tooltip openDelay={0} content={i18n('dialog.kill-header')} placement={['right', 'auto']}>
-            <div>
-                <ButtonWithConfirmDialog
-                    buttonView="outlined"
-                    buttonTitle={i18n('dialog.kill-header')}
-                    dialogHeader={i18n('dialog.kill-header')}
-                    dialogText={i18n('dialog.kill-text')}
-                    onConfirmAction={() => {
-                        return killTablet({id}).unwrap();
-                    }}
-                    buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
-                    withPopover
-                    popoverContent={i18n('controls.kill-not-allowed')}
-                    popoverDisabled={isUserAllowedToMakeChanges}
-                >
-                    <Icon data={ArrowRotateLeft} />
-                </ButtonWithConfirmDialog>
-            </div>
-        </Tooltip>
+        <ButtonWithConfirmDialog
+            buttonView="outlined"
+            buttonTitle={i18n('dialog.kill-header')}
+            dialogHeader={i18n('dialog.kill-header')}
+            dialogText={i18n('dialog.kill-text')}
+            onConfirmAction={() => {
+                return killTablet({id}).unwrap();
+            }}
+            buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
+            withPopover
+            popoverContent={
+                isUserAllowedToMakeChanges
+                    ? i18n('dialog.kill-header')
+                    : i18n('controls.kill-not-allowed')
+            }
+            popoverPlacement={['right', 'auto']}
+            popoverDisabled={false}
+        >
+            <Icon data={ArrowRotateLeft} />
+        </ButtonWithConfirmDialog>
     );
 }
 
