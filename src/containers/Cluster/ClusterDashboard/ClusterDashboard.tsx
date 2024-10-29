@@ -3,7 +3,8 @@ import {Flex, Text} from '@gravity-ui/uikit';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Tags} from '../../../components/Tags';
 import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
-import type {TClusterInfo, TClusterInfoV2} from '../../../types/api/cluster';
+import {isClusterInfoV2} from '../../../types/api/cluster';
+import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
 import {valueIsDefined} from '../../../utils';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
@@ -23,13 +24,6 @@ import {
 
 import './ClusterDashboard.scss';
 
-// fixed CPU calculation
-export function isClusterInfoV5(info?: TClusterInfo): info is TClusterInfoV2 {
-    return info
-        ? 'Version' in info && typeof info.Version === 'number' && info.Version >= 5
-        : false;
-}
-
 interface AmountProps {
     value?: number | string;
 }
@@ -45,18 +39,14 @@ function Amount({value}: AmountProps) {
     );
 }
 
-interface ClusterDashboardProps<T = TClusterInfo> {
-    cluster: T;
+interface ClusterDashboardProps {
+    cluster: TClusterInfo;
     groupStats?: ClusterGroupsStats;
     loading?: boolean;
     error?: IResponseError | string;
 }
 
 export function ClusterDashboard({cluster, ...props}: ClusterDashboardProps) {
-    const isSupportedClusterResponse = isClusterInfoV5(cluster);
-    if (!isSupportedClusterResponse) {
-        return null;
-    }
     if (props.error) {
         return <ResponseError error={props.error} className={b('error')} />;
     }
@@ -74,15 +64,19 @@ export function ClusterDashboard({cluster, ...props}: ClusterDashboardProps) {
     );
 }
 
-function ClusterDoughnuts({cluster, loading}: ClusterDashboardProps<TClusterInfoV2>) {
+function ClusterDoughnuts({cluster, loading}: ClusterDashboardProps) {
     if (loading) {
         return <ClusterDashboardSkeleton />;
     }
     const metricsCards = [];
-    const {CoresUsed, NumberOfCpus, CoresTotal} = cluster;
-    const total = CoresTotal ?? NumberOfCpus;
-    if (valueIsDefined(CoresUsed) && valueIsDefined(total)) {
-        metricsCards.push(<ClusterMetricsCores value={CoresUsed} capacity={total} key="cores" />);
+    if (isClusterInfoV2(cluster)) {
+        const {CoresUsed, NumberOfCpus, CoresTotal} = cluster;
+        const total = CoresTotal ?? NumberOfCpus;
+        if (valueIsDefined(CoresUsed) && valueIsDefined(total)) {
+            metricsCards.push(
+                <ClusterMetricsCores value={CoresUsed} capacity={total} key="cores" />,
+            );
+        }
     }
     const {StorageTotal, StorageUsed} = cluster;
     if (valueIsDefined(StorageTotal) && valueIsDefined(StorageUsed)) {

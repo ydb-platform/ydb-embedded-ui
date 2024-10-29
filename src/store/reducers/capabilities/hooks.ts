@@ -42,3 +42,6 @@ export const useViewerNodesHandlerHasGrouping = () => {
 export const useFeatureFlagsAvailable = () => {
     return useGetFeatureVersion('/viewer/feature_flags') > 1;
 };
+export const useClusterDashboardAvailable = () => {
+    return useGetFeatureVersion('/viewer/cluster') > 4;
+};
