@@ -3,6 +3,7 @@ import React from 'react';
 import {CircleXmarkFill, TriangleExclamationFill} from '@gravity-ui/icons';
 import {Checkbox, Dialog, Icon} from '@gravity-ui/uikit';
 
+import {ResultIssues} from '../../containers/Tenant/Query/Issues/Issues';
 import type {IResponseError} from '../../types/api/error';
 import {cn} from '../../utils/cn';
 
@@ -13,6 +14,9 @@ import './CriticalActionDialog.scss';
 const b = cn('ydb-critical-dialog');
 
 const parseError = (error: IResponseError) => {
+    if (error.data && 'issues' in error.data && error.data.issues) {
+        return <ResultIssues data={error.data} />;
+    }
     if (error.status === 403) {
         return criticalActionDialogKeyset('no-rights-error');
     }
