@@ -2,14 +2,15 @@ import React from 'react';
 
 import {Tabs} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
-import {Link, useLocation, useRouteMatch} from 'react-router-dom';
+import {Link, useRouteMatch} from 'react-router-dom';
+import {useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {BasicNodeViewer} from '../../components/BasicNodeViewer';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {Loader} from '../../components/Loader';
-import routes, {createHref, parseQuery} from '../../routes';
+import routes from '../../routes';
 import {
     useCapabilitiesLoaded,
     useDiskPagesAvailable,
@@ -22,7 +23,16 @@ import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {Tablets} from '../Tablets';
 
-import {NODE_PAGES, OVERVIEW, STORAGE, STRUCTURE, TABLETS} from './NodePages';
+import type {NodeTab} from './NodePages';
+import {
+    NODE_PAGES,
+    OVERVIEW,
+    STORAGE,
+    STRUCTURE,
+    TABLETS,
+    getDefaultNodePath,
+    nodePageQueryParams,
+} from './NodePages';
 import NodeStructure from './NodeStructure/NodeStructure';
 
 import './Node.scss';
@@ -40,13 +50,12 @@ export function Node(props: NodeProps) {
     const container = React.useRef<HTMLDivElement>(null);
 
     const dispatch = useTypedDispatch();
-    const location = useLocation();
 
     const match =
         useRouteMatch<{id: string; activeTab: string}>(routes.node) ?? Object.create(null);
 
     const {id: nodeId, activeTab} = match.params;
-    const {tenantName: tenantNameFromQuery} = parseQuery(location);
+    const [{database: tenantNameFromQuery}] = useQueryParams(nodePageQueryParams);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = nodeApi.useGetNodeInfoQuery(
@@ -109,7 +118,13 @@ export function Node(props: NodeProps) {
                     activeTab={activeTabVerified.id}
                     wrapTo={({id}, tabNode) => (
                         <Link
-                            to={createHref(routes.node, {id: nodeId, activeTab: id}, {tenantName})}
+                            to={getDefaultNodePath(
+                                nodeId,
+                                {
+                                    database: tenantName,
+                                },
+                                id as NodeTab,
+                            )}
                             key={id}
                             className={b('tab')}
                         >

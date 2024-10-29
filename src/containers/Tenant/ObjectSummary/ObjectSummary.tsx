@@ -11,7 +11,7 @@ import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {toFormattedSize} from '../../../components/FormattedBytes/utils';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import SplitPane from '../../../components/SplitPane';
-import routes, {createExternalUILink, createHref} from '../../../routes';
+import {createExternalUILink} from '../../../routes';
 import {overviewApi} from '../../../store/reducers/overview/overview';
 import {TENANT_SUMMARY_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setSummaryTab} from '../../../store/reducers/tenant/tenant';
@@ -29,7 +29,7 @@ import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../
 import {Acl} from '../Acl/Acl';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
-import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
+import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups, getTenantPath} from '../TenantPages';
 import {getSummaryControls} from '../utils/controls';
 import {
     PaneVisibilityActionTypes,
@@ -128,13 +128,12 @@ export function ObjectSummary({
                         items={tabsItems}
                         activeTab={summaryTab}
                         wrapTo={({id}, node) => {
-                            const path = createHref(routes.tenant, undefined, {
+                            const tabPath = getTenantPath({
                                 ...queryParams,
-                                name: tenantName,
                                 [TenantTabsGroups.summaryTab]: id,
                             });
                             return (
-                                <Link to={path} key={id} className={b('tab')}>
+                                <Link to={tabPath} key={id} className={b('tab')}>
                                     {node}
                                 </Link>
                             );

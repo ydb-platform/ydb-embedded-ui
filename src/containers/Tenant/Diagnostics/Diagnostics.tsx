@@ -6,7 +6,6 @@ import {Link} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
-import routes, {createHref} from '../../../routes';
 import {useFeatureFlagsAvailable} from '../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
@@ -20,7 +19,7 @@ import {Operations} from '../../Operations';
 import {StorageWrapper} from '../../Storage/StorageWrapper';
 import {Tablets} from '../../Tablets';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
-import {TenantTabsGroups} from '../TenantPages';
+import {TenantTabsGroups, getTenantPath} from '../TenantPages';
 import {isDatabaseEntityType} from '../utils/schema';
 
 import {Configs} from './Configs/Configs';
@@ -55,7 +54,7 @@ function Diagnostics(props: DiagnosticsProps) {
     );
 
     const [queryParams] = useQueryParams({
-        name: StringParam,
+        database: StringParam,
         schema: StringParam,
         backend: StringParam,
         clusterName: StringParam,
@@ -155,7 +154,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         items={pages}
                         activeTab={activeTab?.id}
                         wrapTo={({id}, node) => {
-                            const path = createHref(routes.tenant, undefined, {
+                            const path = getTenantPath({
                                 ...queryParams,
                                 [TenantTabsGroups.diagnosticsTab]: id,
                             });

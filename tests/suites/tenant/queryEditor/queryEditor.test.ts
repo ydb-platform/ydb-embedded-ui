@@ -19,7 +19,7 @@ test.describe('Test Query Editor', async () => {
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
-            name: tenantName,
+            database: tenantName,
             general: 'query',
         };
 

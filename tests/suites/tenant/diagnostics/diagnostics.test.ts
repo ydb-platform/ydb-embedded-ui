@@ -11,7 +11,7 @@ test.describe('Diagnostics tab', async () => {
     test('Primary keys header is visible in Schema tab', async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
-            name: tenantName,
+            database: tenantName,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);
@@ -32,7 +32,7 @@ test.describe('Diagnostics tab', async () => {
     test('No runnning queries in Queries if no queries are running', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
-            name: tenantName,
+            database: tenantName,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);
@@ -47,7 +47,7 @@ test.describe('Diagnostics tab', async () => {
     test('Running query is shown if query is running', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
-            name: tenantName,
+            database: tenantName,
             tenantPage: 'query',
         };
         const tenantPage = new TenantPage(page);

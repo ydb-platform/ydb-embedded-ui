@@ -67,7 +67,7 @@ const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options,
     const breadcrumbs = getClusterBreadcrumbs(options, query);
 
     const text = tenantName ? prepareTenantName(tenantName) : headerKeyset('breadcrumbs.tenant');
-    const link = tenantName ? getTenantPath({...query, name: tenantName}) : undefined;
+    const link = tenantName ? getTenantPath({...query, database: tenantName}) : undefined;
 
     const lastItem = {text, link, icon: <DatabaseIcon />};
     breadcrumbs.push(lastItem);
@@ -92,7 +92,7 @@ const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, que
     const lastItem = {
         text,
         link: nodeId
-            ? getDefaultNodePath(nodeId, {tenantName, ...query}, nodeActiveTab)
+            ? getDefaultNodePath(nodeId, {database: tenantName, ...query}, nodeActiveTab)
             : undefined,
         icon: getNodeIcon(nodeRole),
     };

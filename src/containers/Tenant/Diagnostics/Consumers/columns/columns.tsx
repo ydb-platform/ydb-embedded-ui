@@ -4,12 +4,11 @@ import qs from 'qs';
 
 import {InternalLink} from '../../../../../components/InternalLink';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
-import routes, {createHref} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {IPreparedConsumerData} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
 import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
-import {TenantTabsGroups} from '../../../TenantPages';
+import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {ReadLagsHeader} from '../Headers';
 import {
     CONSUMERS_COLUMNS_IDS,
@@ -40,7 +39,7 @@ export const columns: Column<IPreparedConsumerData>[] = [
 
             return (
                 <InternalLink
-                    to={createHref(routes.tenant, undefined, {
+                    to={getTenantPath({
                         ...queryParams,
                         [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
                         selectedConsumer: row.name,

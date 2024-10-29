@@ -13,14 +13,14 @@ const b = cn('tablet');
 
 interface TabletProps {
     tablet?: TTabletStateInfo;
-    tenantName?: string;
+    database?: string;
 }
 
-export const Tablet = ({tablet = {}, tenantName}: TabletProps) => {
-    const {TabletId: id, NodeId, Type} = tablet;
+export const Tablet = ({tablet = {}, database}: TabletProps) => {
+    const {TabletId: id} = tablet;
     const status = tablet.Overall?.toLowerCase();
 
-    const tabletPath = id && getTabletPagePath(id, {nodeId: NodeId, tenantName, type: Type});
+    const tabletPath = id && getTabletPagePath(id, {database});
 
     return (
         <ContentWithPopup
