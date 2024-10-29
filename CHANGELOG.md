@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.29.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.29.2...v6.29.3) (2024-10-28)
+
+
+### Bug Fixes
+
+* very bad performance when scrolling paginated tables ([#1513](https://github.com/ydb-platform/ydb-embedded-ui/issues/1513)) ([e2f7a25](https://github.com/ydb-platform/ydb-embedded-ui/commit/e2f7a2557e4699f2737b7f660579fec47580f48a))
+
 ## [6.29.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.29.1...v6.29.2) (2024-10-28)
 
 
