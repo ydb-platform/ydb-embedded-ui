@@ -10,7 +10,6 @@ import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {bytesToSpeed} from '../../utils/utils';
-import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -202,7 +201,8 @@ function VDiskTitle<T extends PreparedVDisk>({data}: VDiskTitleProps<T>) {
     return (
         <div className={b('title')}>
             {vDiskInfoKeyset('vdiks-title')}
-            <EntityStatus status={getSeverityColor(data.Severity)} name={data.StringifiedId} />
+            <StatusIcon status={getSeverityColor(data.Severity)} />
+            {data.StringifiedId}
         </div>
     );
 }
