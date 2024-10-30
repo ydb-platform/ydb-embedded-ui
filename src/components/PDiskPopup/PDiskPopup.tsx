@@ -6,7 +6,6 @@ import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
-import {getPDiskId} from '../../utils/disks/helpers';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {bytesToGB} from '../../utils/utils';
@@ -21,12 +20,23 @@ export const preparePDiskData = (
     nodeHost?: string,
     withDeveloperUILink?: boolean,
 ) => {
-    const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Type, Device} = data;
+    const {
+        AvailableSize,
+        TotalSize,
+        State,
+        PDiskId,
+        NodeId,
+        StringifiedId,
+        Path,
+        Realtime,
+        Type,
+        Device,
+    } = data;
 
     const pdiskData: InfoViewerItem[] = [
         {
             label: 'PDisk',
-            value: getPDiskId(NodeId, PDiskId) ?? EMPTY_DATA_PLACEHOLDER,
+            value: StringifiedId ?? EMPTY_DATA_PLACEHOLDER,
         },
         {label: 'State', value: State || 'not available'},
         {label: 'Type', value: Type || 'unknown'},
@@ -44,10 +54,12 @@ export const preparePDiskData = (
         pdiskData.push({label: 'Path', value: Path});
     }
 
-    pdiskData.push({
-        label: 'Available',
-        value: `${bytesToGB(AvailableSize)} of ${bytesToGB(TotalSize)}`,
-    });
+    if (!isNaN(Number(TotalSize))) {
+        pdiskData.push({
+            label: 'Available',
+            value: `${bytesToGB(AvailableSize)} of ${bytesToGB(TotalSize)}`,
+        });
+    }
 
     if (Realtime && errorColors.includes(Realtime)) {
         pdiskData.push({label: 'Realtime', value: Realtime});

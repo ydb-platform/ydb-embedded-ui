@@ -1,7 +1,10 @@
 import type {TPDiskInfoResponse} from '../../../types/api/pdisk';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
 import {getArray, valueIsDefined} from '../../../utils';
-import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
+import {
+    prepareWhiteboardPDiskData,
+    prepareWhiteboardVDiskData,
+} from '../../../utils/disks/prepareDisks';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 
 import type {PDiskData, SlotItem} from './types';
@@ -18,7 +21,10 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
     const {PDisk: WhiteboardPDiskData = {}, VDisks: WhiteboardVDisksData = []} = Whiteboard;
     const {PDisk: BSCPDiskData = {}} = BSC;
 
-    const preparedPDisk = preparePDiskData(WhiteboardPDiskData, BSCPDiskData);
+    const preparedPDisk = prepareWhiteboardPDiskData({
+        ...BSCPDiskData,
+        ...WhiteboardPDiskData,
+    });
 
     const NodeId = preparedPDisk.NodeId ?? preparedNode.NodeId;
 
@@ -48,7 +54,9 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         };
     }
 
-    const preparedVDisks = WhiteboardVDisksData.map((disk) => prepareVDiskData({...disk, NodeId}));
+    const preparedVDisks = WhiteboardVDisksData.map((disk) =>
+        prepareWhiteboardVDiskData({...disk, NodeId}),
+    );
     preparedVDisks.sort((disk1, disk2) => Number(disk2.VDiskSlotId) - Number(disk1.VDiskSlotId));
 
     const vdisksSlots: SlotItem<'vDisk'>[] = preparedVDisks.map((preparedVDisk) => {

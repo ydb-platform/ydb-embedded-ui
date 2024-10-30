@@ -193,7 +193,7 @@ export interface TStorageVDisk {
     AvailableSize?: string;
     Status?: EVDiskStatus;
     DiskSpace?: EFlag;
-    Donors?: Omit<TStorageVDisk, 'PDisk' | 'Whiteboard'>;
+    Donors?: TStorageVDisk[];
     PDisk?: TStoragePDisk;
     Whiteboard?: TVDiskStateInfo;
 }
@@ -201,7 +201,7 @@ export interface TStorageVDisk {
 /**
  * PDisk data from storage/groups handler
  */
-interface TStoragePDisk {
+export interface TStoragePDisk {
     PDiskId?: string;
     Path?: string;
     Type?: 'hdd' | 'ssd' | 'nvme';

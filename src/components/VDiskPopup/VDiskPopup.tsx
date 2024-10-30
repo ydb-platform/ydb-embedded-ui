@@ -8,7 +8,6 @@ import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
@@ -203,22 +202,9 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     if ('Donors' in data && data.Donors) {
         const donors = data.Donors;
         for (const donor of donors) {
-            const isFullDonorData = isFullVDiskData(donor);
             donorsInfo.push({
                 label: 'VDisk',
-                value: (
-                    <InternalLink to={getVDiskLink(donor)}>
-                        {stringifyVdiskId(
-                            isFullDonorData
-                                ? donor.VDiskId
-                                : {
-                                      NodeId: donor.NodeId,
-                                      PDiskId: donor.PDiskId,
-                                      VSlotId: donor.VSlotId,
-                                  },
-                        )}
-                    </InternalLink>
-                ),
+                value: <InternalLink to={getVDiskLink(donor)}>{donor.StringifiedId}</InternalLink>,
             });
         }
     }

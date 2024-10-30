@@ -1,7 +1,10 @@
 import type {TEvPDiskStateResponse} from '../../../types/api/pdisk';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
 import type {TEvVDiskStateResponse} from '../../../types/api/vdisk';
-import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
+import {
+    prepareWhiteboardPDiskData,
+    prepareWhiteboardVDiskData,
+} from '../../../utils/disks/prepareDisks';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 
 import type {VDiskData} from './types';
@@ -12,10 +15,10 @@ export function prepareVDiskDataResponse([vDiskResponse, pDiskResponse, nodeResp
     TEvSystemStateResponse,
 ]): VDiskData {
     const rawVDisk = vDiskResponse.VDiskStateInfo?.[0];
-    const preparedVDisk = prepareVDiskData(rawVDisk);
+    const preparedVDisk = prepareWhiteboardVDiskData(rawVDisk);
 
     const rawPDisk = pDiskResponse.PDiskStateInfo?.[0];
-    const preparedPDisk = preparePDiskData(rawPDisk);
+    const preparedPDisk = prepareWhiteboardPDiskData(rawPDisk);
 
     const rawNode = nodeResponse.SystemStateInfo?.[0];
     const preparedNode = prepareNodeSystemState(rawNode);
