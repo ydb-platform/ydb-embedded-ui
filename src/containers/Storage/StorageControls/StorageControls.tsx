@@ -69,12 +69,6 @@ export function StorageGroupsControls({
                     onChange={handleVisibleEntitiesChange}
                 />
             )}
-            <EntitiesCount
-                label={i18n('groups')}
-                loading={entitiesLoading}
-                total={entitiesCountTotal}
-                current={entitiesCountCurrent}
-            />
             <TableColumnSetup
                 popupWidth={200}
                 items={columnsToSelect}
@@ -97,6 +91,12 @@ export function StorageGroupsControls({
                     />
                 </React.Fragment>
             ) : null}
+            <EntitiesCount
+                label={i18n('groups')}
+                loading={entitiesLoading}
+                total={entitiesCountTotal}
+                current={entitiesCountCurrent}
+            />
         </React.Fragment>
     );
 }
@@ -149,12 +149,6 @@ export function StorageNodesControls({
             {withGroupBySelect ? null : (
                 <UptimeFilter value={nodesUptimeFilter} onChange={handleUptimeFilterChange} />
             )}
-            <EntitiesCount
-                label={i18n('nodes')}
-                loading={entitiesLoading}
-                total={entitiesCountTotal}
-                current={entitiesCountCurrent}
-            />
             <TableColumnSetup
                 popupWidth={200}
                 items={columnsToSelect}
@@ -177,6 +171,12 @@ export function StorageNodesControls({
                     />
                 </React.Fragment>
             ) : null}
+            <EntitiesCount
+                label={i18n('nodes')}
+                loading={entitiesLoading}
+                total={entitiesCountTotal}
+                current={entitiesCountCurrent}
+            />
         </React.Fragment>
     );
 }

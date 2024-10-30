@@ -96,18 +96,18 @@ export const PaginatedNodes = ({path, database, parentRef, additionalNodesProps}
                 />
                 <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
                 <UptimeFilter value={uptimeFilter} onChange={handleUptimeFilterChange} />
-                <EntitiesCount
-                    total={totalEntities}
-                    current={foundEntities}
-                    label={'Nodes'}
-                    loading={!inited}
-                />
                 <TableColumnSetup
                     popupWidth={200}
                     items={columnsToSelect}
                     showStatus
                     onUpdate={setColumns}
                     sortable={false}
+                />
+                <EntitiesCount
+                    total={totalEntities}
+                    current={foundEntities}
+                    label={'Nodes'}
+                    loading={!inited}
                 />
             </React.Fragment>
         );
