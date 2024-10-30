@@ -9,6 +9,7 @@ const b = cn('ydb-cell-with-popover');
 
 interface CellWithPopoverProps extends PopoverProps {
     wrapperClassName?: string;
+    fullWidth?: boolean;
 }
 
 const DELAY_TIMEOUT = 100;
@@ -17,14 +18,15 @@ export function CellWithPopover({
     children,
     className,
     wrapperClassName,
+    fullWidth,
     ...props
 }: CellWithPopoverProps) {
     return (
-        <div className={b(null, wrapperClassName)}>
+        <div className={b({fullWidth}, wrapperClassName)}>
             <Popover
                 delayClosing={DELAY_TIMEOUT}
                 delayOpening={DELAY_TIMEOUT}
-                className={b('popover', className)}
+                className={b('popover', {'full-width': fullWidth}, className)}
                 {...props}
             >
                 {children}

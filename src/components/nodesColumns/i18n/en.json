@@ -17,5 +17,7 @@
   "caches": "Caches",
   "sessions": "Sessions",
   "missing": "Missing",
-  "pdisks": "PDisks"
+  "pdisks": "PDisks",
+  "field_memory-used": "Memory used",
+  "field_memory-limit": "Memory limit"
 }

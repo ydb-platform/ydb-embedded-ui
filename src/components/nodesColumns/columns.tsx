@@ -1,4 +1,5 @@
 import DataTable from '@gravity-ui/react-data-table';
+import {DefinitionList} from '@gravity-ui/uikit';
 
 import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import type {TPoolStats} from '../../types/api/nodes';
@@ -11,15 +12,18 @@ import {
 } from '../../utils/dataFormatters/dataFormatters';
 import {getSpaceUsageSeverity} from '../../utils/storage';
 import type {Column} from '../../utils/tableUtils/types';
+import {isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
 import type {NodeHostData} from '../NodeHostWrapper/NodeHostWrapper';
 import {PoolsGraph} from '../PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../TabletsStatistic';
+import {formatPool} from '../TooltipsContent';
 import {UsageLabel} from '../UsageLabel/UsageLabel';
 
 import {NODES_COLUMNS_IDS, NODES_COLUMNS_TITLES} from './constants';
+import i18n from './i18n';
 import type {GetNodesColumnsParams} from './types';
 
 export function getNodeIdColumn<T extends {NodeId?: string | number}>(): Column<T> {
@@ -114,24 +118,52 @@ export function getMemoryColumn<
         resizeMinWidth: 170,
     };
 }
+
 export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: string}>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.RAM,
         header: NODES_COLUMNS_TITLES.RAM,
         sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
         defaultOrder: DataTable.DESCENDING,
-        render: ({row}) => (
-            <ProgressViewer
-                value={row.MemoryUsed}
-                capacity={row.MemoryLimit}
-                formatValues={(value, total) =>
-                    formatStorageValues(value, total, 'gb', undefined, true)
-                }
-                colorizeProgress
-                vertical
-                hideCapacity
-            />
-        ),
+        render: ({row}) => {
+            const [memoryUsed, memoryLimit] =
+                isNumeric(row.MemoryUsed) && isNumeric(row.MemoryLimit)
+                    ? formatStorageValues(
+                          Number(row.MemoryUsed),
+                          Number(row.MemoryLimit),
+                          'gb',
+                          undefined,
+                          true,
+                      )
+                    : [0, 0];
+            return (
+                <CellWithPopover
+                    placement={['top', 'auto']}
+                    fullWidth
+                    content={
+                        <DefinitionList responsive>
+                            <DefinitionList.Item name={i18n('field_memory-used')}>
+                                {memoryUsed}
+                            </DefinitionList.Item>
+                            <DefinitionList.Item name={i18n('field_memory-limit')}>
+                                {memoryLimit}
+                            </DefinitionList.Item>
+                        </DefinitionList>
+                    }
+                >
+                    <ProgressViewer
+                        value={row.MemoryUsed}
+                        capacity={row.MemoryLimit}
+                        formatValues={(value, total) =>
+                            formatStorageValues(value, total, 'gb', undefined, true)
+                        }
+                        colorizeProgress
+                        vertical
+                        hideCapacity
+                    />
+                </CellWithPopover>
+            );
+        },
         align: DataTable.LEFT,
         width: 85,
         resizeMinWidth: 40,
@@ -183,13 +215,29 @@ export function getTotalCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Colum
             const totalPoolUsage = row.PoolStats.reduce((acc, pool) => acc + (pool.Usage || 0), 0);
 
             return (
-                <ProgressViewer
-                    value={totalPoolUsage}
-                    capacity={1}
-                    colorizeProgress
-                    percents
-                    vertical
-                />
+                <CellWithPopover
+                    placement={['top', 'auto']}
+                    fullWidth
+                    content={
+                        <DefinitionList responsive>
+                            {row.PoolStats.map((pool) =>
+                                isNumeric(pool.Usage) ? (
+                                    <DefinitionList.Item key={pool.Name} name={pool.Name}>
+                                        {formatPool('Usage', pool.Usage).value}
+                                    </DefinitionList.Item>
+                                ) : null,
+                            )}
+                        </DefinitionList>
+                    }
+                >
+                    <ProgressViewer
+                        value={totalPoolUsage}
+                        capacity={1}
+                        colorizeProgress
+                        percents
+                        vertical
+                    />
+                </CellWithPopover>
             );
         },
         align: DataTable.LEFT,
