@@ -2,8 +2,8 @@ import {StringParam, useQueryParam} from 'use-query-params';
 
 import {Loader} from '../../../components/Loader';
 import {useGetSchemaQuery} from '../../../store/reducers/schema/schema';
-import {SchemaTree} from '../Schema/SchemaTree/SchemaTree';
 
+import {SchemaTree} from './SchemaTree/SchemaTree';
 import i18n from './i18n';
 import {b} from './shared';
 

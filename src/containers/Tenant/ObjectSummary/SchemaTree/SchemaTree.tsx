@@ -17,6 +17,7 @@ import {getSchemaControls} from '../../utils/controls';
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
+import {useDispatchTreeKey, useTreeKey} from '../UpdateTreeContext';
 
 interface SchemaTreeProps {
     rootPath: string;
@@ -52,7 +53,8 @@ export function SchemaTree(props: SchemaTreeProps) {
     const [querySettings, setQueryExecutionSettings] = useQueryExecutionSettings();
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parentPath, setParentPath] = React.useState('');
-    const [schemaTreeKey, setSchemaTreeKey] = React.useState('');
+    const setSchemaTreeKey = useDispatchTreeKey();
+    const schemaTreeKey = useTreeKey();
 
     const fetchPath = async (path: string) => {
         let schemaData: TEvDescribeSchemeResult | undefined;
