@@ -25,9 +25,10 @@ const blockIssue = cn('kv-issue');
 
 interface ResultIssuesProps {
     data: ErrorResponse | string;
+    hideSeverity?: boolean;
 }
 
-export function ResultIssues({data}: ResultIssuesProps) {
+export function ResultIssues({data, hideSeverity}: ResultIssuesProps) {
     const [showIssues, setShowIssues] = React.useState(false);
 
     const issues = typeof data === 'string' ? undefined : data?.issues;
@@ -41,7 +42,11 @@ export function ResultIssues({data}: ResultIssuesProps) {
             const severity = getSeverity(data?.error?.severity);
             content = (
                 <React.Fragment>
-                    <IssueSeverity severity={severity} />{' '}
+                    {hideSeverity ? null : (
+                        <React.Fragment>
+                            <IssueSeverity severity={severity} />{' '}
+                        </React.Fragment>
+                    )}
                     <span className={blockWrapper('error-message-text')}>
                         {data?.error?.message}
                     </span>
@@ -62,15 +67,16 @@ export function ResultIssues({data}: ResultIssuesProps) {
                     </Button>
                 )}
             </div>
-            {hasIssues && showIssues && <Issues issues={issues} />}
+            {hasIssues && showIssues && <Issues hideSeverity={hideSeverity} issues={issues} />}
         </div>
     );
 }
 
 interface IssuesProps {
     issues: IssueMessage[] | null | undefined;
+    hideSeverity?: boolean;
 }
-export function Issues({issues}: IssuesProps) {
+export function Issues({issues, hideSeverity}: IssuesProps) {
     const mostSevereIssue = issues?.reduce((result, issue) => {
         const severity = issue.severity ?? 10;
         return Math.min(result, severity);
@@ -78,13 +84,27 @@ export function Issues({issues}: IssuesProps) {
     return (
         <div className={blockIssues(null)}>
             {issues?.map((issue, index) => (
-                <Issue key={index} issue={issue} expanded={issue === mostSevereIssue} />
+                <Issue
+                    key={index}
+                    hideSeverity={hideSeverity}
+                    issue={issue}
+                    expanded={issue === mostSevereIssue}
+                />
             ))}
         </div>
     );
 }
 
-function Issue({issue, level = 0}: {issue: IssueMessage; expanded?: boolean; level?: number}) {
+function Issue({
+    issue,
+    hideSeverity,
+    level = 0,
+}: {
+    issue: IssueMessage;
+    expanded?: boolean;
+    hideSeverity?: boolean;
+    level?: number;
+}) {
     const [isExpand, setIsExpand] = React.useState(true);
     const severity = getSeverity(issue.severity);
     const position = getIssuePosition(issue);
@@ -111,7 +131,7 @@ function Issue({issue, level = 0}: {issue: IssueMessage; expanded?: boolean; lev
                         <ArrowToggle direction={arrowDirection} size={16} />
                     </Button>
                 )}
-                <IssueSeverity severity={severity} />
+                {hideSeverity ? null : <IssueSeverity severity={severity} />}
 
                 <span className={blockIssue('message')}>
                     {position && (

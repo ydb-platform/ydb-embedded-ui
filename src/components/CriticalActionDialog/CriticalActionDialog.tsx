@@ -15,7 +15,7 @@ const b = cn('ydb-critical-dialog');
 
 const parseError = (error: IResponseError) => {
     if (error.data && 'issues' in error.data && error.data.issues) {
-        return <ResultIssues data={error.data} />;
+        return <ResultIssues hideSeverity data={error.data} />;
     }
     if (error.status === 403) {
         return criticalActionDialogKeyset('no-rights-error');

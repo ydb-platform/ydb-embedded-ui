@@ -1,7 +1,7 @@
 import {duration} from '@gravity-ui/date-utils';
 import {Ban, CircleStop} from '@gravity-ui/icons';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
-import {Icon, Text} from '@gravity-ui/uikit';
+import {Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
@@ -9,12 +9,12 @@ import {operationsApi} from '../../store/reducers/operations';
 import type {TOperation} from '../../types/api/operations';
 import {EStatusCode} from '../../types/api/operations';
 import {EMPTY_DATA_PLACEHOLDER, HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
+import createToast from '../../utils/createToast';
 import {formatDateTime} from '../../utils/dataFormatters/dataFormatters';
 import {parseProtobufTimestampToMs} from '../../utils/timeParsers';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
 import i18n from './i18n';
-import {b} from './shared';
 
 import './Operations.scss';
 
@@ -162,7 +162,7 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
     }
 
     return (
-        <div className={b('buttons-container')}>
+        <Flex gap="2">
             <ButtonWithConfirmDialog
                 buttonView="outlined"
                 dialogHeader={i18n('header_forget')}
@@ -170,7 +170,14 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                 onConfirmAction={() =>
                     forgetOperation({id, database})
                         .unwrap()
-                        .then(() => refreshTable())
+                        .then(() => {
+                            createToast({
+                                name: 'Forgotten',
+                                title: i18n('text_forgotten', {id}),
+                                type: 'success',
+                            });
+                            refreshTable();
+                        })
                 }
                 buttonDisabled={isLoadingCancel}
                 withPopover
@@ -187,7 +194,14 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                 onConfirmAction={() =>
                     cancelOperation({id, database})
                         .unwrap()
-                        .then(() => refreshTable())
+                        .then(() => {
+                            createToast({
+                                name: 'Cancelled',
+                                title: i18n('text_cancelled', {id}),
+                                type: 'success',
+                            });
+                            refreshTable();
+                        })
                 }
                 buttonDisabled={isForgetLoading}
                 withPopover
@@ -197,6 +211,6 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
             >
                 <Icon data={CircleStop} />
             </ButtonWithConfirmDialog>
-        </div>
+        </Flex>
     );
 }

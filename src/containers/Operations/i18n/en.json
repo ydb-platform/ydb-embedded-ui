@@ -18,5 +18,7 @@
   "header_cancel": "Cancel operation",
   "header_forget": "Forget operation",
   "text_cancel": "The operation will be cancelled. Do you want to proceed?",
-  "text_forget": "The operation will be forgotten. Do you want to proceed?"
+  "text_forget": "The operation will be forgotten. Do you want to proceed?",
+  "text_forgotten": "The operation {{id}} has been forgotten",
+  "text_cancelled": "The operation {{id}} has been cancelled"
 }
