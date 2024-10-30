@@ -5,7 +5,10 @@ import type {TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {valueIsDefined} from '../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {
+    formatStorageValues,
+    formatStorageValuesToGb,
+} from '../../utils/dataFormatters/dataFormatters';
 import {getSpaceUsageSeverity} from '../../utils/storage';
 import type {Column} from '../../utils/tableUtils/types';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
@@ -111,6 +114,29 @@ export function getMemoryColumn<
         resizeMinWidth: 170,
     };
 }
+export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: string}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.RAM,
+        header: NODES_COLUMNS_TITLES.RAM,
+        sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
+        defaultOrder: DataTable.DESCENDING,
+        render: ({row}) => (
+            <ProgressViewer
+                value={row.MemoryUsed}
+                capacity={row.MemoryLimit}
+                formatValues={(value, total) =>
+                    formatStorageValues(value, total, 'gb', undefined, true)
+                }
+                colorizeProgress
+                vertical
+                hideCapacity
+            />
+        ),
+        align: DataTable.LEFT,
+        width: 85,
+        resizeMinWidth: 40,
+    };
+}
 export function getSharedCacheUsageColumn<
     T extends {SharedCacheUsed?: string | number; SharedCacheLimit?: string | number},
 >(): Column<T> {
@@ -141,6 +167,34 @@ export function getCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Column<T> 
         align: DataTable.LEFT,
         width: 80,
         resizeMinWidth: 60,
+    };
+}
+export function getTotalCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.TotalCPU,
+        header: NODES_COLUMNS_TITLES.TotalCPU,
+        sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
+        defaultOrder: DataTable.DESCENDING,
+        render: ({row}) => {
+            if (!row.PoolStats) {
+                return EMPTY_DATA_PLACEHOLDER;
+            }
+
+            const totalPoolUsage = row.PoolStats.reduce((acc, pool) => acc + (pool.Usage || 0), 0);
+
+            return (
+                <ProgressViewer
+                    value={totalPoolUsage}
+                    capacity={1}
+                    colorizeProgress
+                    percents
+                    vertical
+                />
+            );
+        },
+        align: DataTable.LEFT,
+        width: 85,
+        resizeMinWidth: 40,
     };
 }
 export function getLoadAverageColumn<T extends {LoadAveragePercents?: number[]}>(): Column<T> {

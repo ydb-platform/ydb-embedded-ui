@@ -14,7 +14,9 @@ export const NODES_COLUMNS_IDS = {
     Version: 'Version',
     Uptime: 'Uptime',
     Memory: 'Memory',
+    RAM: 'RAM',
     CPU: 'CPU',
+    TotalCPU: 'TotalCPU',
     LoadAverage: 'LoadAverage',
     Load: 'Load',
     DiskSpaceUsage: 'DiskSpaceUsage',
@@ -54,8 +56,14 @@ export const NODES_COLUMNS_TITLES = {
     get Memory() {
         return i18n('memory');
     },
+    get RAM() {
+        return i18n('ram');
+    },
     get CPU() {
         return i18n('cpu');
+    },
+    get TotalCPU() {
+        return i18n('totalcpu');
     },
     get LoadAverage() {
         return i18n('load-average');
@@ -94,7 +102,9 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     Version: ['Version'],
     Uptime: ['Uptime'],
     Memory: ['Memory'],
+    RAM: ['Memory'],
     CPU: ['CPU'],
+    TotalCPU: ['CPU'],
     LoadAverage: ['LoadAverage'],
     Load: ['LoadAverage'],
     DiskSpaceUsage: ['DiskSpaceUsage'],

@@ -6,8 +6,10 @@ import {
     getMemoryColumn,
     getNodeIdColumn,
     getNodeNameColumn,
+    getRAMColumn,
     getRackColumn,
     getTabletsColumn,
+    getTotalCpuColumn,
     getUptimeColumn,
     getVersionColumn,
 } from '../../../components/nodesColumns/columns';
@@ -26,7 +28,9 @@ export function getNodesColumns(params: GetNodesColumnsParams): Column<NodesPrep
         getVersionColumn<NodesPreparedEntity>(),
         getUptimeColumn<NodesPreparedEntity>(),
         getMemoryColumn<NodesPreparedEntity>(),
+        getRAMColumn<NodesPreparedEntity>(),
         getCpuColumn<NodesPreparedEntity>(),
+        getTotalCpuColumn<NodesPreparedEntity>(),
         getLoadAverageColumn<NodesPreparedEntity>(),
         getTabletsColumn<NodesPreparedEntity>(params),
     ];
