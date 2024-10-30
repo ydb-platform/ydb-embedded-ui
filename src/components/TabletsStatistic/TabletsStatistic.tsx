@@ -1,7 +1,6 @@
 import {Link} from 'react-router-dom';
 
-import {TABLETS} from '../../containers/Node/NodePages';
-import routes, {createHref} from '../../routes';
+import {TABLETS, getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {cn} from '../../utils/cn';
 import {getTabletLabel} from '../../utils/constants';
@@ -26,35 +25,18 @@ const prepareTablets = (tablets: TTabletStateInfo[]) => {
 
 interface TabletsStatisticProps {
     tablets: TTabletStateInfo[];
-    tenantName: string | undefined;
+    database: string | undefined;
     nodeId: string | number;
-    backend?: string;
 }
 
-export const TabletsStatistic = ({
-    tablets = [],
-    tenantName,
-    nodeId,
-    backend,
-}: TabletsStatisticProps) => {
+export const TabletsStatistic = ({tablets = [], database, nodeId}: TabletsStatisticProps) => {
     const renderTabletInfo = (item: ReturnType<typeof prepareTablets>[number], index: number) => {
-        const tabletsPath = createHref(
-            routes.node,
-            {id: nodeId, activeTab: TABLETS},
-            {
-                tenantName,
-                backend,
-            },
-        );
+        const tabletsPath = getDefaultNodePath(nodeId, {database}, TABLETS);
 
         const label = `${item.label}: ${item.count}`;
         const className = b('tablet', {state: item.state?.toLowerCase()});
 
-        return backend ? (
-            <a href={tabletsPath} key={index} className={className}>
-                {label}
-            </a>
-        ) : (
+        return (
             <Link to={tabletsPath} key={index} className={className}>
                 {label}
             </Link>

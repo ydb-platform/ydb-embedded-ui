@@ -2,6 +2,8 @@ import type {Location} from 'history';
 import isEmpty from 'lodash/isEmpty';
 import {compile} from 'path-to-regexp';
 import qs from 'qs';
+import type {QueryParamConfig} from 'use-query-params';
+import {StringParam} from 'use-query-params';
 
 import {backend, clusterName, webVersion} from './store';
 
@@ -91,6 +93,13 @@ export function getLocationObjectFromHref(href: string) {
     return {pathname, search, hash};
 }
 
+// ==== Get page path functions ====
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type QueryParamsTypeFromQueryObject<T extends Record<string, QueryParamConfig<any, any>>> = {
+    [QueryParamName in keyof T]?: Parameters<T[QueryParamName]['encode']>[0];
+};
+
 export function getPDiskPagePath(
     pDiskId: string | number,
     nodeId: string | number,
@@ -112,6 +121,14 @@ export function getStorageGroupPath(groupId: string | number, query: Query = {})
     return createHref(routes.storageGroup, undefined, {...query, groupId});
 }
 
-export function getTabletPagePath(tabletId: string | number, query: Query = {}) {
+export const tabletPageQueryParams = {
+    database: StringParam,
+    clusterName: StringParam,
+    activeTab: StringParam,
+} as const;
+
+export type TabletPageQuery = QueryParamsTypeFromQueryObject<typeof tabletPageQueryParams>;
+
+export function getTabletPagePath(tabletId: string | number, query: TabletPageQuery = {}) {
     return createHref(routes.tablet, {id: tabletId}, {...query});
 }

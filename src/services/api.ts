@@ -147,8 +147,8 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         return arr.join(',');
     }
 
-    getClusterCapabilities() {
-        return this.get<CapabilitiesResponse>(this.getPath('/viewer/capabilities'), {}, {});
+    getClusterCapabilities({database}: {database?: string}) {
+        return this.get<CapabilitiesResponse>(this.getPath('/viewer/capabilities'), {database}, {});
     }
     getClusterInfo(clusterName?: string, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TClusterInfo>(

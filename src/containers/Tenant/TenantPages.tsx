@@ -8,6 +8,7 @@ type TenantQueryParams = {
 };
 
 type AdditionalQueryParams = {
+    database?: string;
     name?: string;
     backend?: string;
 };

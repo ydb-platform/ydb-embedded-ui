@@ -8,9 +8,9 @@ import {api} from './../api';
 export const capabilitiesApi = api.injectEndpoints({
     endpoints: (build) => ({
         getClusterCapabilities: build.query({
-            queryFn: async () => {
+            queryFn: async (params: {database?: string}) => {
                 try {
-                    const data = await window.api.getClusterCapabilities();
+                    const data = await window.api.getClusterCapabilities(params);
                     return {data};
                 } catch (error) {
                     // If capabilities endpoint is not available, there will be an error
@@ -23,20 +23,31 @@ export const capabilitiesApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
-export const selectCapabilities =
-    capabilitiesApi.endpoints.getClusterCapabilities.select(undefined);
+const createCapabilitiesSelector = createSelector(
+    (database?: string) => database,
+    (database) => capabilitiesApi.endpoints.getClusterCapabilities.select({database}),
+);
+
+export const selectDatabaseCapabilities = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, database?: string) => createCapabilitiesSelector(database),
+    (state, selectCapabilities) => selectCapabilities(state),
+);
 
 export const selectCapabilityVersion = createSelector(
     (state: RootState) => state,
     (_state: RootState, capability: Capability) => capability,
-    (state, capability) => selectCapabilities(state).data?.Capabilities?.[capability],
+    (_state: RootState, _capability: Capability, database?: string) => database,
+    (state, capability, database) =>
+        selectDatabaseCapabilities(state, database).data?.Capabilities?.[capability],
 );
 
 export async function queryCapability(
     capability: Capability,
+    database: string | undefined,
     {dispatch, getState}: {dispatch: AppDispatch; getState: () => RootState},
 ) {
-    const thunk = capabilitiesApi.util.getRunningQueryThunk('getClusterCapabilities', undefined);
+    const thunk = capabilitiesApi.util.getRunningQueryThunk('getClusterCapabilities', {database});
     await dispatch(thunk);
 
     return selectCapabilityVersion(getState(), capability) || 0;
