@@ -22,6 +22,7 @@ const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
 const SET_QUERY_RESULT = 'query/SET_QUERY_RESULT';
+const SET_QUERY_TRACE_READY = 'query/SET_QUERY_TRACE_READY';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
 const UPDATE_QUERY_IN_HISTORY = 'query/UPDATE_QUERY_IN_HISTORY';
 const SET_QUERY_HISTORY_FILTER = 'query/SET_QUERY_HISTORY_FILTER';
@@ -61,6 +62,20 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
                 ...state,
                 input: action.data.input,
             };
+        }
+
+        case SET_QUERY_TRACE_READY: {
+            if (state.result) {
+                return {
+                    ...state,
+                    result: {
+                        ...state.result,
+                        isTraceReady: true,
+                    },
+                };
+            }
+
+            return state;
         }
 
         case SET_QUERY_RESULT: {
@@ -310,6 +325,12 @@ export function setQueryResult(data?: QueryResult) {
     return {
         type: SET_QUERY_RESULT,
         data,
+    } as const;
+}
+
+export function setQueryTraceReady() {
+    return {
+        type: SET_QUERY_TRACE_READY,
     } as const;
 }
 

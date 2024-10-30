@@ -270,7 +270,9 @@ export function ExecuteResult({
                             <CancelQueryButton queryId={queryId} tenantName={tenantName} />
                         </React.Fragment>
                     ) : null}
-                    {data?.traceId ? <TraceButton traceId={data.traceId} /> : null}
+                    {data?.traceId ? (
+                        <TraceButton traceId={data.traceId} isTraceReady={result.isTraceReady} />
+                    ) : null}
                 </div>
                 <div className={b('controls-left')}>
                     {renderClipboardButton()}

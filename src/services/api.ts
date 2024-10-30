@@ -66,8 +66,9 @@ import {parseMetaCluster} from './parsers/parseMetaCluster';
 import {parseMetaTenants} from './parsers/parseMetaTenants';
 import {settingsManager} from './settings';
 
-const TRACE_CHECK_TIMEOUT = 2 * SECOND_IN_MS;
-const TRACE_API_ERROR_TIMEOUT = 10 * SECOND_IN_MS;
+const TRACE_RETRY_DELAY = 4 * SECOND_IN_MS;
+const TRACE_CHECK_TIMEOUT = 10 * SECOND_IN_MS;
+const TRACE_API_ERROR_RETRY_DELAY = 10 * SECOND_IN_MS;
 const MAX_TRACE_CHECK_RETRIES = 30;
 
 export type AxiosOptions = {
@@ -604,10 +605,10 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                                 (error?.response?.status === 404 || error.code === 'ERR_NETWORK');
 
                             if (isTracingError) {
-                                return TRACE_CHECK_TIMEOUT;
+                                return TRACE_RETRY_DELAY;
                             }
 
-                            return TRACE_API_ERROR_TIMEOUT;
+                            return TRACE_API_ERROR_RETRY_DELAY;
                         },
                         shouldResetTimeout: true,
                         retryCondition: () => true,

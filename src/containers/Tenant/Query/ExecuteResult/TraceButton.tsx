@@ -5,45 +5,40 @@ import {Button} from '@gravity-ui/uikit';
 
 import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {traceApi} from '../../../../store/reducers/trace';
-import {SECOND_IN_MS} from '../../../../utils/constants';
-import {useDelayed} from '../../../../utils/hooks/useDelayed';
 import {replaceParams} from '../utils/replaceParams';
 
 import i18n from './i18n';
 
-const TIME_BEFORE_CHECK = 15 * SECOND_IN_MS;
-
 interface TraceUrlButtonProps {
     traceId: string;
+    isTraceReady?: true;
 }
 
-export function TraceButton({traceId}: TraceUrlButtonProps) {
+export function TraceButton({traceId, isTraceReady}: TraceUrlButtonProps) {
     const {traceCheck, traceView} = useClusterBaseInfo();
 
     const checkTraceUrl = traceCheck?.url ? replaceParams(traceCheck.url, {traceId}) : '';
     const traceUrl = traceView?.url ? replaceParams(traceView.url, {traceId}) : '';
 
-    // We won't get any trace data at first 15 seconds for sure
-    const [readyToFetch, resetDelay] = useDelayed(TIME_BEFORE_CHECK);
+    const [checkTrace, {isLoading, isUninitialized}] = traceApi.useCheckTraceMutation();
 
     React.useEffect(() => {
-        resetDelay();
-    }, [traceId, resetDelay]);
+        let checkTraceMutation: {abort: () => void} | null;
+        if (checkTraceUrl && !isTraceReady) {
+            checkTraceMutation = checkTrace({url: checkTraceUrl});
+        }
 
-    const {isFetching} = traceApi.useCheckTraceQuery(
-        {url: checkTraceUrl},
-        {skip: !checkTraceUrl || !readyToFetch},
-    );
+        return () => checkTraceMutation?.abort();
+    }, [checkTrace, checkTraceUrl, isTraceReady]);
 
-    if (!traceUrl) {
+    if (!traceUrl || (isUninitialized && !isTraceReady)) {
         return null;
     }
 
-    const loading = !readyToFetch || isFetching;
     return (
         <Button
-            view={loading ? 'flat-secondary' : 'flat-info'}
-            loading={loading}
+            view={isLoading ? 'flat-secondary' : 'flat-info'}
+            loading={isLoading}
             href={traceUrl}
             target="_blank"
         >
