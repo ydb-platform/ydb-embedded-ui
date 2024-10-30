@@ -12,10 +12,6 @@
     align-items: center;
 
     min-width: 150px;
-
-    &_vertical {
-        min-width: unset;
-    }
     height: 23px;
     padding: 0 4px;
 
@@ -25,6 +21,10 @@
     color: var(--g-color-text-complementary);
     border-radius: 2px;
     background: var(--g-color-base-generic);
+
+    &_vertical {
+        min-width: unset;
+    }
 
     &_theme_dark {
         color: var(--g-color-text-light-primary);
@@ -64,9 +64,10 @@
         height: 100%;
 
         &_vertical {
-            width: 100%;
-            bottom: 0;
             top: auto;
+            bottom: 0;
+
+            width: 100%;
         }
     }
 
