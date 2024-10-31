@@ -1,7 +1,7 @@
 import {duration} from '@gravity-ui/date-utils';
 import {Ban, CircleStop} from '@gravity-ui/icons';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
-import {Flex, Icon, Text} from '@gravity-ui/uikit';
+import {ActionTooltip, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
@@ -163,54 +163,54 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
 
     return (
         <Flex gap="2">
-            <ButtonWithConfirmDialog
-                buttonView="outlined"
-                dialogHeader={i18n('header_forget')}
-                dialogText={i18n('text_forget')}
-                onConfirmAction={() =>
-                    forgetOperation({id, database})
-                        .unwrap()
-                        .then(() => {
-                            createToast({
-                                name: 'Forgotten',
-                                title: i18n('text_forgotten', {id}),
-                                type: 'success',
-                            });
-                            refreshTable();
-                        })
-                }
-                buttonDisabled={isLoadingCancel}
-                withPopover
-                popoverContent={i18n('header_forget')}
-                popoverPlacement={['left', 'auto']}
-                popoverDisabled={false}
-            >
-                <Icon data={Ban} />
-            </ButtonWithConfirmDialog>
-            <ButtonWithConfirmDialog
-                buttonView="outlined"
-                dialogHeader={i18n('header_cancel')}
-                dialogText={i18n('text_cancel')}
-                onConfirmAction={() =>
-                    cancelOperation({id, database})
-                        .unwrap()
-                        .then(() => {
-                            createToast({
-                                name: 'Cancelled',
-                                title: i18n('text_cancelled', {id}),
-                                type: 'success',
-                            });
-                            refreshTable();
-                        })
-                }
-                buttonDisabled={isForgetLoading}
-                withPopover
-                popoverContent={i18n('header_cancel')}
-                popoverPlacement={['right', 'auto']}
-                popoverDisabled={false}
-            >
-                <Icon data={CircleStop} />
-            </ButtonWithConfirmDialog>
+            <ActionTooltip title={i18n('header_forget')} placement={['left', 'auto']}>
+                <div>
+                    <ButtonWithConfirmDialog
+                        buttonView="outlined"
+                        dialogHeader={i18n('header_forget')}
+                        dialogText={i18n('text_forget')}
+                        onConfirmAction={() =>
+                            forgetOperation({id, database})
+                                .unwrap()
+                                .then(() => {
+                                    createToast({
+                                        name: 'Forgotten',
+                                        title: i18n('text_forgotten', {id}),
+                                        type: 'success',
+                                    });
+                                    refreshTable();
+                                })
+                        }
+                        buttonDisabled={isLoadingCancel}
+                    >
+                        <Icon data={Ban} />
+                    </ButtonWithConfirmDialog>
+                </div>
+            </ActionTooltip>
+            <ActionTooltip title={i18n('header_cancel')} placement={['right', 'auto']}>
+                <div>
+                    <ButtonWithConfirmDialog
+                        buttonView="outlined"
+                        dialogHeader={i18n('header_cancel')}
+                        dialogText={i18n('text_cancel')}
+                        onConfirmAction={() =>
+                            cancelOperation({id, database})
+                                .unwrap()
+                                .then(() => {
+                                    createToast({
+                                        name: 'Cancelled',
+                                        title: i18n('text_cancelled', {id}),
+                                        type: 'success',
+                                    });
+                                    refreshTable();
+                                })
+                        }
+                        buttonDisabled={isForgetLoading}
+                    >
+                        <Icon data={CircleStop} />
+                    </ButtonWithConfirmDialog>
+                </div>
+            </ActionTooltip>
         </Flex>
     );
 }
