@@ -1,5 +1,19 @@
 # Changelog
 
+## [6.30.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.29.3...v6.30.0) (2024-10-31)
+
+
+### Features
+
+* **ObjectSummary:** add button to refresh tree ([#1559](https://github.com/ydb-platform/ydb-embedded-ui/issues/1559)) ([e7dbf9d](https://github.com/ydb-platform/ydb-embedded-ui/commit/e7dbf9dcabfa6b0f8fed0e16886e59e1c9b46d09))
+
+
+### Bug Fixes
+
+* **Cluster:** use /capabilities to show dashboard ([#1556](https://github.com/ydb-platform/ydb-embedded-ui/issues/1556)) ([7811347](https://github.com/ydb-platform/ydb-embedded-ui/commit/78113477d3a9b0bee26de20b4a4a9e38e8eefd5f))
+* pass database to capabilities query ([#1551](https://github.com/ydb-platform/ydb-embedded-ui/issues/1551)) ([7e7b3e3](https://github.com/ydb-platform/ydb-embedded-ui/commit/7e7b3e38c82aa7df8a454f6ce2bc4f37c2fd1a99))
+* tracing issues ([#1555](https://github.com/ydb-platform/ydb-embedded-ui/issues/1555)) ([4cb2d7f](https://github.com/ydb-platform/ydb-embedded-ui/commit/4cb2d7fdd59126a44ef3b003a73e3375ba1f853b))
+
 ## [6.29.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.29.2...v6.29.3) (2024-10-28)
 
 
