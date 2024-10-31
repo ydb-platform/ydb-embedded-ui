@@ -113,18 +113,18 @@ export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) =
                 />
                 <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
                 <UptimeFilter value={uptimeFilter} onChange={handleUptimeFilterChange} />
-                <EntitiesCount
-                    total={totalNodes}
-                    current={nodes.length}
-                    label={'Nodes'}
-                    loading={isLoading}
-                />
                 <TableColumnSetup
                     popupWidth={200}
                     items={columnsToSelect}
                     showStatus
                     onUpdate={setColumns}
                     sortable={false}
+                />
+                <EntitiesCount
+                    total={totalNodes}
+                    current={nodes.length}
+                    label={'Nodes'}
+                    loading={isLoading}
                 />
             </React.Fragment>
         );
