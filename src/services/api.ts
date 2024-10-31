@@ -23,7 +23,12 @@ import type {ModifyDiskResponse} from '../types/api/modifyDisk';
 import type {TNetInfo} from '../types/api/netInfo';
 import type {NodesRequestParams, TNodesInfo} from '../types/api/nodes';
 import type {TEvNodesInfo} from '../types/api/nodesList';
-import type {OperationListRequestParams, TOperationList} from '../types/api/operationList';
+import type {
+    OperationCancelRequestParams,
+    OperationForgetRequestParams,
+    OperationListRequestParams,
+    TOperationList,
+} from '../types/api/operations';
 import type {EDecommitStatus, TEvPDiskStateResponse, TPDiskInfoResponse} from '../types/api/pdisk';
 import type {
     Actions,
@@ -879,6 +884,36 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
     ) {
         return this.get<TOperationList>(
             this.getPath('/operation/list'),
+            {...params},
+            {
+                concurrentId,
+                requestConfig: {signal},
+            },
+        );
+    }
+
+    cancelOperation(
+        params: OperationCancelRequestParams,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.post<TOperationList>(
+            this.getPath('/operation/cancel'),
+            {},
+            {...params},
+            {
+                concurrentId,
+                requestConfig: {signal},
+            },
+        );
+    }
+
+    forgetOperation(
+        params: OperationForgetRequestParams,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.post<TOperationList>(
+            this.getPath('/operation/forget'),
+            {},
             {...params},
             {
                 concurrentId,

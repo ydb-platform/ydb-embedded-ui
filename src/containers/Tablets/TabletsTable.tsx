@@ -136,8 +136,13 @@ function TabletActions(tablet: TTabletStateInfo) {
             }}
             buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
             withPopover
-            popoverContent={i18n('controls.kill-not-allowed')}
-            popoverDisabled={isUserAllowedToMakeChanges}
+            popoverContent={
+                isUserAllowedToMakeChanges
+                    ? i18n('dialog.kill-header')
+                    : i18n('controls.kill-not-allowed')
+            }
+            popoverPlacement={['right', 'auto']}
+            popoverDisabled={false}
         >
             <Icon data={ArrowRotateLeft} />
         </ButtonWithConfirmDialog>

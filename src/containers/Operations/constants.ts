@@ -1,4 +1,4 @@
-import type {OperationKind} from '../../types/api/operationList';
+import type {OperationKind} from '../../types/api/operations';
 
 import i18n from './i18n';
 
