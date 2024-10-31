@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ChevronsUp} from '@gravity-ui/icons';
-import {Button, Icon} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../../utils/cn';
 
@@ -84,32 +84,35 @@ export function PaneVisibilityToggleButtons({
 }: ToggleButtonProps) {
     return (
         <React.Fragment>
-            <Button
-                view="flat-secondary"
-                onClick={onCollapse}
-                className={b(
-                    {
-                        hidden: isCollapsed,
-                    },
-                    className,
-                )}
-                title="Collapse"
-            >
-                <Icon data={ChevronsUp} className={b({[initialDirection]: true})} />
-            </Button>
-            <Button
-                view="flat-secondary"
-                onClick={onExpand}
-                className={b(
-                    {
-                        hidden: !isCollapsed,
-                    },
-                    className,
-                )}
-                title="Expand"
-            >
-                <Icon data={ChevronsUp} className={b({[initialDirection]: true}, 'rotate')} />
-            </Button>
+            <ActionTooltip title="Collapse">
+                <Button
+                    view="flat-secondary"
+                    onClick={onCollapse}
+                    className={b(
+                        {
+                            hidden: isCollapsed,
+                        },
+                        className,
+                    )}
+                >
+                    <Icon data={ChevronsUp} className={b({[initialDirection]: true})} />
+                </Button>
+            </ActionTooltip>
+
+            <ActionTooltip title="Expand">
+                <Button
+                    view="flat-secondary"
+                    onClick={onExpand}
+                    className={b(
+                        {
+                            hidden: !isCollapsed,
+                        },
+                        className,
+                    )}
+                >
+                    <Icon data={ChevronsUp} className={b({[initialDirection]: true}, 'rotate')} />
+                </Button>
+            </ActionTooltip>
         </React.Fragment>
     );
 }

@@ -27,14 +27,16 @@
         visibility: hidden;
     }
 
-    &__action-button {
+    &__actions {
         position: absolute;
         top: 19px; // centered relative to the heading
         right: 5px; // centered relative to the collapsed panel
 
         background-color: var(--g-color-base-background);
+    }
+    &__button {
         &_hidden {
-            visibility: hidden;
+            display: none;
         }
     }
 
