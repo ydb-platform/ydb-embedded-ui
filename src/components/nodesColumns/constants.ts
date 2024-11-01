@@ -16,7 +16,7 @@ export const NODES_COLUMNS_IDS = {
     Memory: 'Memory',
     RAM: 'RAM',
     CPU: 'CPU',
-    TotalCPU: 'TotalCPU',
+    Pools: 'Pools',
     LoadAverage: 'LoadAverage',
     Load: 'Load',
     DiskSpaceUsage: 'DiskSpaceUsage',
@@ -59,11 +59,11 @@ export const NODES_COLUMNS_TITLES = {
     get RAM() {
         return i18n('ram');
     },
+    get Pools() {
+        return i18n('pools');
+    },
     get CPU() {
         return i18n('cpu');
-    },
-    get TotalCPU() {
-        return i18n('totalcpu');
     },
     get LoadAverage() {
         return i18n('load-average');
@@ -103,8 +103,8 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     Uptime: ['Uptime'],
     Memory: ['Memory'],
     RAM: ['Memory'],
+    Pools: ['CPU'],
     CPU: ['CPU'],
-    TotalCPU: ['CPU'],
     LoadAverage: ['LoadAverage'],
     Load: ['LoadAverage'],
     DiskSpaceUsage: ['DiskSpaceUsage'],

@@ -9,7 +9,7 @@
   "memory": "Memory",
   "ram": "RAM",
   "cpu": "CPU",
-  "totalcpu": "TotalCPU",
+  "pools": "Pools",
   "disk-usage": "Disk usage",
   "tablets": "Tablets",
   "load-average": "Load Average",

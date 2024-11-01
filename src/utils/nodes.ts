@@ -115,7 +115,28 @@ export const NODES_SORT_VALUES: NodesSortValue[] = [
     `Missing`,
     `DiskSpaceUsage`,
     `Database`,
+    'Pools',
+    'RAM',
 ];
+
+// Maps column names to actual fields on backend for sorting.
+export const NODES_SORT_VALUE_TO_FIELD: Record<NodesSortValue, NodesSortValue> = {
+    NodeId: 'NodeId',
+    Host: 'Host',
+    NodeName: 'NodeName',
+    DC: 'DC',
+    Rack: 'Rack',
+    Version: 'Version',
+    Uptime: 'Uptime',
+    CPU: 'CPU',
+    LoadAverage: 'LoadAverage',
+    Memory: 'Memory',
+    Missing: 'Missing',
+    DiskSpaceUsage: 'DiskSpaceUsage',
+    Database: 'Database',
+    Pools: 'CPU',
+    RAM: 'Memory',
+};
 
 export const isSortableNodesProperty = (value: unknown): value is NodesSortValue =>
     NODES_SORT_VALUES.includes(value as NodesSortValue);

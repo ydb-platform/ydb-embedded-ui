@@ -48,7 +48,6 @@ export interface ProgressViewerProps {
     inverseColorize?: boolean;
     warningThreshold?: number;
     dangerThreshold?: number;
-    vertical?: boolean;
     hideCapacity?: boolean;
 }
 
@@ -58,7 +57,6 @@ export function ProgressViewer({
     formatValues = defaultFormatValues,
     percents,
     className,
-    vertical,
     size = 'xs',
     colorizeProgress,
     inverseColorize,
@@ -93,13 +91,9 @@ export function ProgressViewer({
         fillWidth = 100;
     }
 
-    const lineStyle = vertical
-        ? {
-              height: fillWidth + '%',
-          }
-        : {
-              width: fillWidth + '%',
-          };
+    const lineStyle = {
+        width: fillWidth + '%',
+    };
 
     const renderContent = () => {
         if (isNumeric(capacity) && !hideCapacity) {
@@ -111,8 +105,8 @@ export function ProgressViewer({
 
     if (isNumeric(value)) {
         return (
-            <div className={b({size, theme, status, vertical}, className)}>
-                <div className={b('line', {vertical})} style={lineStyle}></div>
+            <div className={b({size, theme, status}, className)}>
+                <div className={b('line')} style={lineStyle}></div>
                 <span className={b('text')}>{renderContent()}</span>
             </div>
         );

@@ -1,9 +1,9 @@
 import type {Column} from '@gravity-ui/react-data-table';
 
 import {
-    getCpuColumn,
     getHostColumn,
     getNodeIdColumn,
+    getPoolsColumn,
 } from '../../../../../components/nodesColumns/columns';
 import {
     NODES_COLUMNS_TO_DATA_FIELDS,
@@ -29,7 +29,7 @@ export function getTopNodesByCpuColumns(
     const hostColumn = {...getHostColumn<NodesPreparedEntity>(params), width: undefined};
 
     const columns = [
-        getCpuColumn<NodesPreparedEntity>(),
+        getPoolsColumn<NodesPreparedEntity>(),
         getNodeIdColumn<NodesPreparedEntity>(),
         hostColumn,
     ];

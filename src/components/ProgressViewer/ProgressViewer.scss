@@ -22,10 +22,6 @@
     border-radius: 2px;
     background: var(--g-color-base-generic);
 
-    &_vertical {
-        min-width: unset;
-    }
-
     &_theme_dark {
         color: var(--g-color-text-light-primary);
 
@@ -62,13 +58,6 @@
         left: 0;
 
         height: 100%;
-
-        &_vertical {
-            top: auto;
-            bottom: 0;
-
-            width: 100%;
-        }
     }
 
     &__text {

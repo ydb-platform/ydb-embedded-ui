@@ -5,6 +5,7 @@ import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import type {TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {valueIsDefined} from '../../utils';
+import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {
     formatStorageValues,
@@ -25,6 +26,10 @@ import {UsageLabel} from '../UsageLabel/UsageLabel';
 import {NODES_COLUMNS_IDS, NODES_COLUMNS_TITLES} from './constants';
 import i18n from './i18n';
 import type {GetNodesColumnsParams} from './types';
+
+import './NodesColumns.scss';
+
+const b = cn('ydb-nodes-columns');
 
 export function getNodeIdColumn<T extends {NodeId?: string | number}>(): Column<T> {
     return {
@@ -157,15 +162,15 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
                         formatValues={(value, total) =>
                             formatStorageValues(value, total, 'gb', undefined, true)
                         }
+                        className={b('column-ram')}
                         colorizeProgress
-                        vertical
                         hideCapacity
                     />
                 </CellWithPopover>
             );
         },
         align: DataTable.LEFT,
-        width: 85,
+        width: 80,
         resizeMinWidth: 40,
     };
 }
@@ -188,10 +193,10 @@ export function getSharedCacheUsageColumn<
         resizeMinWidth: 170,
     };
 }
-export function getCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Column<T> {
+export function getPoolsColumn<T extends {PoolStats?: TPoolStats[]}>(): Column<T> {
     return {
-        name: NODES_COLUMNS_IDS.CPU,
-        header: NODES_COLUMNS_TITLES.CPU,
+        name: NODES_COLUMNS_IDS.Pools,
+        header: NODES_COLUMNS_TITLES.Pools,
         sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) =>
@@ -201,10 +206,12 @@ export function getCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Column<T> 
         resizeMinWidth: 60,
     };
 }
-export function getTotalCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Column<T> {
+export function getCpuColumn<
+    T extends {PoolStats?: TPoolStats[]; CoresUsed?: number; CoresTotal?: number},
+>(): Column<T> {
     return {
-        name: NODES_COLUMNS_IDS.TotalCPU,
-        header: NODES_COLUMNS_TITLES.TotalCPU,
+        name: NODES_COLUMNS_IDS.CPU,
+        header: NODES_COLUMNS_TITLES.CPU,
         sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
@@ -212,7 +219,20 @@ export function getTotalCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Colum
                 return EMPTY_DATA_PLACEHOLDER;
             }
 
-            const totalPoolUsage = row.PoolStats.reduce((acc, pool) => acc + (pool.Usage || 0), 0);
+            let totalPoolUsage =
+                isNumeric(row.CoresUsed) && isNumeric(row.CoresTotal)
+                    ? row.CoresUsed / row.CoresTotal
+                    : undefined;
+
+            if (totalPoolUsage === undefined) {
+                let totalThreadsCount = 0;
+                totalPoolUsage = row.PoolStats.reduce((acc, pool) => {
+                    totalThreadsCount += Number(pool.Threads);
+                    return acc + Number(pool.Usage) * Number(pool.Threads);
+                }, 0);
+
+                totalPoolUsage = totalPoolUsage / totalThreadsCount;
+            }
 
             return (
                 <CellWithPopover
@@ -231,17 +251,17 @@ export function getTotalCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Colum
                     }
                 >
                     <ProgressViewer
+                        className={b('column-cpu')}
                         value={totalPoolUsage}
                         capacity={1}
                         colorizeProgress
                         percents
-                        vertical
                     />
                 </CellWithPopover>
             );
         },
         align: DataTable.LEFT,
-        width: 85,
+        width: 80,
         resizeMinWidth: 40,
     };
 }
