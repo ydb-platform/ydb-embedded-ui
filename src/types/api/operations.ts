@@ -121,3 +121,13 @@ export interface OperationListRequestParams {
     page_size?: number;
     page_token?: string;
 }
+
+export interface OperationCancelRequestParams {
+    database: string;
+    id: string;
+}
+
+export interface OperationForgetRequestParams {
+    database: string;
+    id: string;
+}

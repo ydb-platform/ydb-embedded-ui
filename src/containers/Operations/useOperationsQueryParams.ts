@@ -1,7 +1,7 @@
 import {NumberParam, StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
-import type {OperationKind} from '../../types/api/operationList';
+import type {OperationKind} from '../../types/api/operations';
 
 const operationKindSchema = z.enum(['ss/backgrounds', 'export', 'buildindex']).catch('buildindex');
 

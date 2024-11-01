@@ -21,6 +21,28 @@ interface NodeEdpointsTooltipProps {
 export const NodeEndpointsTooltipContent = ({data, nodeHref}: NodeEdpointsTooltipProps) => {
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
     const info: (DefinitionListItemProps & {key: string})[] = [];
+    if (data?.Host) {
+        info.push({
+            name: i18n('field_host'),
+            children: data.Host,
+            copyText: data.Host,
+            key: 'Host',
+        });
+    }
+    if (data?.Tenants?.[0]) {
+        info.push({
+            name: i18n('field_database'),
+            children: data.Tenants[0],
+            key: 'Database',
+        });
+    }
+    if (data?.Roles?.length) {
+        info.push({
+            name: i18n('field_roles'),
+            children: data.Roles.join(', '),
+            key: 'Roles',
+        });
+    }
 
     if (data?.Rack) {
         info.push({name: i18n('field_rack'), children: data.Rack, key: 'Rack'});
@@ -31,14 +53,6 @@ export const NodeEndpointsTooltipContent = ({data, nodeHref}: NodeEdpointsToolti
             if (Name && Address) {
                 info.push({name: Name, children: Address, key: Name});
             }
-        });
-    }
-    if (data?.Host) {
-        info.push({
-            name: i18n('field_host'),
-            children: data.Host,
-            copyText: data.Host,
-            key: 'Host',
         });
     }
 
@@ -56,7 +70,7 @@ export const NodeEndpointsTooltipContent = ({data, nodeHref}: NodeEdpointsToolti
                 {info.map(({children, key, ...rest}) => {
                     return (
                         <DefinitionList.Item key={key} {...rest}>
-                            <span className={b('definition')}>{children}</span>
+                            <div className={b('definition')}>{children}</div>
                         </DefinitionList.Item>
                     );
                 })}

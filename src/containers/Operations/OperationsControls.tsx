@@ -4,7 +4,7 @@ import {Select} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {Search} from '../../components/Search';
-import type {OperationKind} from '../../types/api/operationList';
+import type {OperationKind} from '../../types/api/operations';
 
 import {OPERATION_KINDS} from './constants';
 import i18n from './i18n';
