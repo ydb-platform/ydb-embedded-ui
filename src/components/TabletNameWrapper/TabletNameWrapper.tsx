@@ -23,6 +23,7 @@ export function TabletNameWrapper({tabletId, database}: TabletNameWrapperProps) 
     return (
         <CellWithPopover
             disabled={!isUserAllowedToMakeChanges}
+            delayClosing={200}
             content={
                 <DefinitionList responsive>
                     <DefinitionList.Item name={i18n('field_links')}>

@@ -44,6 +44,7 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
     return (
         <CellWithPopover
             disabled={!isUserAllowedToMakeChanges || !monitoringLink}
+            delayClosing={200}
             content={
                 monitoringLink ? (
                     <DefinitionList responsive>
