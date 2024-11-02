@@ -16,5 +16,9 @@
         .g-popover__handler {
             display: inline;
         }
+
+        &_full-width {
+            width: 100%;
+        }
     }
 }

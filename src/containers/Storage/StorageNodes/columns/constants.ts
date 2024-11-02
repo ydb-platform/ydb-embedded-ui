@@ -13,7 +13,7 @@ export const DEFAULT_STORAGE_NODES_COLUMNS: NodesColumnId[] = [
     'Host',
     'DC',
     'Rack',
-    'CPU',
+    'Pools',
     'Uptime',
     'PDisks',
 ];

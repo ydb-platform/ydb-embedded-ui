@@ -1,23 +1,35 @@
 import DataTable from '@gravity-ui/react-data-table';
+import {DefinitionList} from '@gravity-ui/uikit';
 
 import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import type {TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {valueIsDefined} from '../../utils';
+import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {
+    formatStorageValues,
+    formatStorageValuesToGb,
+} from '../../utils/dataFormatters/dataFormatters';
 import {getSpaceUsageSeverity} from '../../utils/storage';
 import type {Column} from '../../utils/tableUtils/types';
+import {isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
 import type {NodeHostData} from '../NodeHostWrapper/NodeHostWrapper';
 import {PoolsGraph} from '../PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../TabletsStatistic';
+import {formatPool} from '../TooltipsContent';
 import {UsageLabel} from '../UsageLabel/UsageLabel';
 
 import {NODES_COLUMNS_IDS, NODES_COLUMNS_TITLES} from './constants';
+import i18n from './i18n';
 import type {GetNodesColumnsParams} from './types';
+
+import './NodesColumns.scss';
+
+const b = cn('ydb-nodes-columns');
 
 export function getNodeIdColumn<T extends {NodeId?: string | number}>(): Column<T> {
     return {
@@ -111,6 +123,57 @@ export function getMemoryColumn<
         resizeMinWidth: 170,
     };
 }
+
+export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: string}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.RAM,
+        header: NODES_COLUMNS_TITLES.RAM,
+        sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
+        defaultOrder: DataTable.DESCENDING,
+        render: ({row}) => {
+            const [memoryUsed, memoryLimit] =
+                isNumeric(row.MemoryUsed) && isNumeric(row.MemoryLimit)
+                    ? formatStorageValues(
+                          Number(row.MemoryUsed),
+                          Number(row.MemoryLimit),
+                          'gb',
+                          undefined,
+                          true,
+                      )
+                    : [0, 0];
+            return (
+                <CellWithPopover
+                    placement={['top', 'auto']}
+                    fullWidth
+                    content={
+                        <DefinitionList responsive>
+                            <DefinitionList.Item name={i18n('field_memory-used')}>
+                                {memoryUsed}
+                            </DefinitionList.Item>
+                            <DefinitionList.Item name={i18n('field_memory-limit')}>
+                                {memoryLimit}
+                            </DefinitionList.Item>
+                        </DefinitionList>
+                    }
+                >
+                    <ProgressViewer
+                        value={row.MemoryUsed}
+                        capacity={row.MemoryLimit}
+                        formatValues={(value, total) =>
+                            formatStorageValues(value, total, 'gb', undefined, true)
+                        }
+                        className={b('column-ram')}
+                        colorizeProgress
+                        hideCapacity
+                    />
+                </CellWithPopover>
+            );
+        },
+        align: DataTable.LEFT,
+        width: 80,
+        resizeMinWidth: 40,
+    };
+}
 export function getSharedCacheUsageColumn<
     T extends {SharedCacheUsed?: string | number; SharedCacheLimit?: string | number},
 >(): Column<T> {
@@ -130,10 +193,10 @@ export function getSharedCacheUsageColumn<
         resizeMinWidth: 170,
     };
 }
-export function getCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Column<T> {
+export function getPoolsColumn<T extends {PoolStats?: TPoolStats[]}>(): Column<T> {
     return {
-        name: NODES_COLUMNS_IDS.CPU,
-        header: NODES_COLUMNS_TITLES.CPU,
+        name: NODES_COLUMNS_IDS.Pools,
+        header: NODES_COLUMNS_TITLES.Pools,
         sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) =>
@@ -141,6 +204,65 @@ export function getCpuColumn<T extends {PoolStats?: TPoolStats[]}>(): Column<T> 
         align: DataTable.LEFT,
         width: 80,
         resizeMinWidth: 60,
+    };
+}
+export function getCpuColumn<
+    T extends {PoolStats?: TPoolStats[]; CoresUsed?: number; CoresTotal?: number},
+>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.CPU,
+        header: NODES_COLUMNS_TITLES.CPU,
+        sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
+        defaultOrder: DataTable.DESCENDING,
+        render: ({row}) => {
+            if (!row.PoolStats) {
+                return EMPTY_DATA_PLACEHOLDER;
+            }
+
+            let totalPoolUsage =
+                isNumeric(row.CoresUsed) && isNumeric(row.CoresTotal)
+                    ? row.CoresUsed / row.CoresTotal
+                    : undefined;
+
+            if (totalPoolUsage === undefined) {
+                let totalThreadsCount = 0;
+                totalPoolUsage = row.PoolStats.reduce((acc, pool) => {
+                    totalThreadsCount += Number(pool.Threads);
+                    return acc + Number(pool.Usage) * Number(pool.Threads);
+                }, 0);
+
+                totalPoolUsage = totalPoolUsage / totalThreadsCount;
+            }
+
+            return (
+                <CellWithPopover
+                    placement={['top', 'auto']}
+                    fullWidth
+                    content={
+                        <DefinitionList responsive>
+                            {row.PoolStats.map((pool) =>
+                                isNumeric(pool.Usage) ? (
+                                    <DefinitionList.Item key={pool.Name} name={pool.Name}>
+                                        {formatPool('Usage', pool.Usage).value}
+                                    </DefinitionList.Item>
+                                ) : null,
+                            )}
+                        </DefinitionList>
+                    }
+                >
+                    <ProgressViewer
+                        className={b('column-cpu')}
+                        value={totalPoolUsage}
+                        capacity={1}
+                        colorizeProgress
+                        percents
+                    />
+                </CellWithPopover>
+            );
+        },
+        align: DataTable.LEFT,
+        width: 80,
+        resizeMinWidth: 40,
     };
 }
 export function getLoadAverageColumn<T extends {LoadAveragePercents?: number[]}>(): Column<T> {

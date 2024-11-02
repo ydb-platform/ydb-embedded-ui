@@ -7,7 +7,11 @@ import type {
 import {prepareStorageNodesResponse} from '../../../store/reducers/storage/utils';
 import type {NodesRequestParams} from '../../../types/api/nodes';
 import {prepareSortValue} from '../../../utils/filters';
-import {getUptimeParamValue, isSortableNodesProperty} from '../../../utils/nodes';
+import {
+    NODES_SORT_VALUE_TO_FIELD,
+    getUptimeParamValue,
+    isSortableNodesProperty,
+} from '../../../utils/nodes';
 import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
 
 export const getStorageNodes: FetchData<
@@ -37,7 +41,7 @@ export const getStorageNodes: FetchData<
     const {sortOrder, columnId} = sortParams ?? {};
 
     const sort = isSortableNodesProperty(columnId)
-        ? prepareSortValue(columnId, sortOrder)
+        ? prepareSortValue(NODES_SORT_VALUE_TO_FIELD[columnId], sortOrder)
         : undefined;
 
     const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);

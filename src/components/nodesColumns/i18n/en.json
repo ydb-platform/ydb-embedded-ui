@@ -7,7 +7,9 @@
   "version": "Version",
   "uptime": "Uptime",
   "memory": "Memory",
+  "ram": "RAM",
   "cpu": "CPU",
+  "pools": "Pools",
   "disk-usage": "Disk usage",
   "tablets": "Tablets",
   "load-average": "Load Average",
@@ -15,5 +17,7 @@
   "caches": "Caches",
   "sessions": "Sessions",
   "missing": "Missing",
-  "pdisks": "PDisks"
+  "pdisks": "PDisks",
+  "field_memory-used": "Memory used",
+  "field_memory-limit": "Memory limit"
 }

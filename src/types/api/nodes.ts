@@ -77,6 +77,8 @@ export interface TSystemStateInfo {
     /** double */
     MaxDiskUsage?: number;
     Location?: TNodeLocation;
+    CoresUsed?: number;
+    CoresTotal?: number;
 
     /**
      * int64
@@ -193,7 +195,9 @@ export type NodesSortValue =
     | 'Memory'
     | `Missing`
     | `DiskSpaceUsage`
-    | `Database`;
+    | `Database`
+    | 'Pools'
+    | 'RAM';
 
 export type NodesSort = BackendSortParam<NodesSortValue>;
 

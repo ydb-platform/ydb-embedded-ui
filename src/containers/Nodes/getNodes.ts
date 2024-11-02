@@ -5,6 +5,7 @@ import {prepareNodesData} from '../../store/reducers/nodes/utils';
 import type {NodesRequestParams} from '../../types/api/nodes';
 import {prepareSortValue} from '../../utils/filters';
 import {
+    NODES_SORT_VALUE_TO_FIELD,
     getProblemParamValue,
     getUptimeParamValue,
     isSortableNodesProperty,
@@ -35,7 +36,7 @@ export const getNodes: FetchData<
     const {path, database, searchValue, problemFilter, uptimeFilter} = filters ?? {};
 
     const sort = isSortableNodesProperty(columnId)
-        ? prepareSortValue(columnId, sortOrder)
+        ? prepareSortValue(NODES_SORT_VALUE_TO_FIELD[columnId], sortOrder)
         : undefined;
 
     const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
