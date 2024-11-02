@@ -38,6 +38,23 @@ export interface TNodesGroup {
     NodeCount: number;
 }
 
+export interface TMemoryStats {
+    ExternalConsumption?: string;
+    AllocatorCachesMemory?: string;
+
+    SharedCacheConsumption?: string;
+    SharedCacheLimit?: string;
+
+    MemTableConsumption?: string;
+    MemTableLimit?: string;
+
+    QueryExecutionConsumption?: string;
+    QueryExecutionLimit?: string;
+
+    HardLimit?: string;
+    SoftLimit?: string;
+}
+
 /**
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/node_whiteboard.proto
  */
@@ -79,6 +96,8 @@ export interface TSystemStateInfo {
     Location?: TNodeLocation;
     CoresUsed?: number;
     CoresTotal?: number;
+
+    MemoryStats?: TMemoryStats;
 
     /**
      * int64
@@ -175,6 +194,7 @@ export type NodesRequiredField =
     | 'Version'
     | 'Uptime'
     | 'Memory'
+    | 'MemoryDetailed'
     | 'CPU'
     | 'LoadAverage'
     | 'Missing'

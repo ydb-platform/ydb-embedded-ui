@@ -3,10 +3,9 @@ import type {Column} from '@gravity-ui/react-data-table';
 import {
     getHostColumn,
     getLoadColumn,
-    getMemoryColumn,
+    getMemoryDetailedColumn,
     getNodeIdColumn,
     getSessionsColumn,
-    getSharedCacheUsageColumn,
     getTabletsColumn,
     getUptimeColumn,
 } from '../../../../../components/nodesColumns/columns';
@@ -31,18 +30,12 @@ import i18n from '../i18n';
 function getTopNodesByMemoryColumns(
     params: GetNodesColumnsParams,
 ): [Column<NodesPreparedEntity>[], NodesRequiredField[]] {
-    const memoryColumn = {
-        ...getMemoryColumn<NodesPreparedEntity>(),
-        header: i18n('column-header.process'),
-    };
-
     const columns = [
         getNodeIdColumn<NodesPreparedEntity>(),
         getHostColumn<NodesPreparedEntity>(params),
         getUptimeColumn<NodesPreparedEntity>(),
         getLoadColumn<NodesPreparedEntity>(),
-        memoryColumn,
-        getSharedCacheUsageColumn<NodesPreparedEntity>(),
+        getMemoryDetailedColumn<NodesPreparedEntity>(),
         getSessionsColumn<NodesPreparedEntity>(),
         getTabletsColumn<NodesPreparedEntity>(params),
     ];

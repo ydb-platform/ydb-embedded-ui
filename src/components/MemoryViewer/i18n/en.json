@@ -1,0 +1,9 @@
+{
+  "text_memory-detailed": "Memory Detailed",
+  "text_external-consumption": "External Consumption",
+  "text_allocator-caches": "Allocator Caches",
+  "text_shared-cache": "Shared Cache",
+  "text_memtable": "MemTable",
+  "text_query-execution": "Query Execution",
+  "memory-detailed": "Memory Detailed"
+}

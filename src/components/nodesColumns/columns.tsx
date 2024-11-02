@@ -2,7 +2,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {DefinitionList} from '@gravity-ui/uikit';
 
 import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
-import type {TPoolStats} from '../../types/api/nodes';
+import type {TMemoryStats, TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
@@ -15,6 +15,7 @@ import {getSpaceUsageSeverity} from '../../utils/storage';
 import type {Column} from '../../utils/tableUtils/types';
 import {isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
+import {MemoryViewer} from '../MemoryViewer/MemoryViewer';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
 import type {NodeHostData} from '../NodeHostWrapper/NodeHostWrapper';
 import {PoolsGraph} from '../PoolsGraph/PoolsGraph';
@@ -190,6 +191,40 @@ export function getSharedCacheUsageColumn<
         ),
         align: DataTable.LEFT,
         width: 170,
+        resizeMinWidth: 170,
+    };
+}
+export function getMemoryDetailedColumn<
+    T extends {MemoryStats?: TMemoryStats; MemoryUsed?: string; MemoryLimit?: string},
+>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.Memory,
+        header: NODES_COLUMNS_TITLES.Memory,
+        defaultOrder: DataTable.DESCENDING,
+        render: ({row}) => {
+            const totalCapacity = parseFloat(String(row.MemoryStats?.HardLimit));
+            return (
+                <MemoryViewer
+                    capacity={row.MemoryLimit}
+                    value={7200451001 + 500073896 + 900073896 + 9802002400}
+                    formatValues={formatStorageValuesToGb}
+                    totalCapacity={totalCapacity}
+                    stats={{
+                        AllocatorCachesMemory: '376178864',
+                        HardLimit: '47687091200',
+                        SoftLimit: '40265318400',
+                        SharedCacheConsumption: '7200451001',
+                        SharedCacheLimit: '24888908800',
+                        MemTableConsumption: '900073896',
+                        MemTableLimit: '1480303616',
+                        QueryExecutionConsumption: '9802002400',
+                        QueryExecutionLimit: '10737418240',
+                    }}
+                />
+            );
+        },
+        align: DataTable.LEFT,
+        width: 500,
         resizeMinWidth: 170,
     };
 }
