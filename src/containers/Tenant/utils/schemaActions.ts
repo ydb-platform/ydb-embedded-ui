@@ -28,6 +28,7 @@ import {
     dropAsyncReplicationTemplate,
     dropExternalTableTemplate,
     dropTableIndex,
+    dropTableTemplate,
     dropTopicTemplate,
     dropViewTemplate,
     selectQueryTemplate,
@@ -100,6 +101,7 @@ const bindActions = (
         alterAsyncReplication: inputQuery(alterAsyncReplicationTemplate, 'script'),
         dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate, 'script'),
         alterTable: inputQuery(alterTableTemplate, 'script'),
+        dropTable: inputQuery(dropTableTemplate, 'script'),
         selectQuery: inputQuery(selectQueryTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
         createExternalTable: inputQuery(createExternalTableTemplate, 'script'),
@@ -166,6 +168,7 @@ export const getActions =
             [copyItem],
             [
                 {text: i18n('actions.alterTable'), action: actions.alterTable},
+                {text: i18n('actions.dropTable'), action: actions.dropTable},
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
                 {text: i18n('actions.addTableIndex'), action: actions.addTableIndex},
