@@ -10,7 +10,7 @@ export const DEFAULT_NODES_COLUMNS: NodesColumnId[] = [
     'Version',
     'Uptime',
     'Memory',
-    'CPU',
+    'Pools',
     'LoadAverage',
     'Tablets',
 ];
