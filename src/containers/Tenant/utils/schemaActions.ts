@@ -20,6 +20,7 @@ import {
     alterTableTemplate,
     alterTopicTemplate,
     createAsyncReplicationTemplate,
+    createCdcStreamTemplate,
     createColumnTableTemplate,
     createExternalTableTemplate,
     createTableTemplate,
@@ -114,6 +115,7 @@ const bindActions = (
         dropView: inputQuery(dropViewTemplate, 'script'),
         dropIndex: inputQuery(dropTableIndex, 'script'),
         addTableIndex: inputQuery(addTableIndex, 'script'),
+        createCdcStream: inputQuery(createCdcStreamTemplate, 'script'),
         copyPath: () => {
             try {
                 copy(params.relativePath);
@@ -172,6 +174,7 @@ export const getActions =
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
                 {text: i18n('actions.addTableIndex'), action: actions.addTableIndex},
+                {text: i18n('actions.createCdcStream'), action: actions.createCdcStream},
             ],
         ];
 

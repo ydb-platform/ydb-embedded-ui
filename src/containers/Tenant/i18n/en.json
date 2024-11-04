@@ -38,6 +38,7 @@
   "actions.dropView": "Drop view...",
   "actions.alterTable": "Alter table...",
   "actions.addTableIndex": "Add index...",
+  "actions.createCdcStream": "Create changefeed...",
   "actions.alterTopic": "Alter topic...",
   "actions.selectQuery": "Select query...",
   "actions.upsertQuery": "Upsert query...",
