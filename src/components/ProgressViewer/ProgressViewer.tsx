@@ -48,6 +48,7 @@ export interface ProgressViewerProps {
     inverseColorize?: boolean;
     warningThreshold?: number;
     dangerThreshold?: number;
+    hideCapacity?: boolean;
 }
 
 export function ProgressViewer({
@@ -61,6 +62,7 @@ export function ProgressViewer({
     inverseColorize,
     warningThreshold = 60,
     dangerThreshold = 80,
+    hideCapacity,
 }: ProgressViewerProps) {
     const theme = useTheme();
 
@@ -94,7 +96,7 @@ export function ProgressViewer({
     };
 
     const renderContent = () => {
-        if (isNumeric(capacity)) {
+        if (isNumeric(capacity) && !hideCapacity) {
             return `${valueText} ${divider} ${capacityText}`;
         }
 
