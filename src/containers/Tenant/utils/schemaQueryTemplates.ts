@@ -73,7 +73,6 @@ export const alterTableTemplate = (params?: SchemaQueryParams) => {
 ALTER TABLE \`${params?.relativePath || '$path'}\`
     -- RENAME TO new_table_name
     -- DROP COLUMN some_existing_column
-    -- ADD COLUMN text_column Utf8 NOT NULL DEFAULT 'default_value'
     ADD COLUMN numeric_column Int32;`;
 };
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
