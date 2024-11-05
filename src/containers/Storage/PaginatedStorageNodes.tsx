@@ -39,8 +39,7 @@ export const PaginatedStorageNodes = (props: PaginatedStorageProps) => {
     React.useEffect(() => {
         if (
             viewerNodesHandlerHasGrouping &&
-            visibleEntities !== 'all' &&
-            nodesUptimeFilter !== NodesUptimeFilterValues.All
+            (visibleEntities !== 'all' || nodesUptimeFilter !== NodesUptimeFilterValues.All)
         ) {
             handleShowAllNodes();
         }

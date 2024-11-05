@@ -2,7 +2,7 @@ import type {TNodesInfo} from '../../../types/api/nodes';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 
-import type {NodesHandledResponse} from './types';
+import type {NodesGroup, NodesHandledResponse} from './types';
 
 export const prepareNodesData = (data: TNodesInfo): NodesHandledResponse => {
     const rawNodes = data.Nodes || [];
@@ -15,10 +15,15 @@ export const prepareNodesData = (data: TNodesInfo): NodesHandledResponse => {
         };
     });
 
-    const preparedGroups = data.NodeGroups?.map((group) => ({
-        name: group.GroupName,
-        count: group.NodeCount,
-    }));
+    const preparedGroups = data.NodeGroups?.map(({GroupName, NodeCount}) => {
+        if (GroupName && NodeCount) {
+            return {
+                name: GroupName,
+                count: Number(NodeCount),
+            };
+        }
+        return undefined;
+    }).filter((group): group is NodesGroup => Boolean(group));
 
     return {
         Nodes: preparedNodes,

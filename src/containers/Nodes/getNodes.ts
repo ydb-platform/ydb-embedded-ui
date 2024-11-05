@@ -12,10 +12,6 @@ import {
 } from '../../utils/nodes';
 import {getRequiredDataFields} from '../../utils/tableUtils/getRequiredDataFields';
 
-const getConcurrentId = (limit?: number, offset?: number) => {
-    return `getNodes|offset${offset}|limit${limit}`;
-};
-
 export const getNodes: FetchData<
     NodesPreparedEntity,
     NodesFilters,
@@ -33,7 +29,8 @@ export const getNodes: FetchData<
     } = params;
 
     const {sortOrder, columnId} = sortParams ?? {};
-    const {path, database, searchValue, problemFilter, uptimeFilter} = filters ?? {};
+    const {path, database, searchValue, problemFilter, uptimeFilter, filterGroup, filterGroupBy} =
+        filters ?? {};
 
     const sort = isSortableNodesProperty(columnId)
         ? prepareSortValue(NODES_SORT_VALUE_TO_FIELD[columnId], sortOrder)
@@ -41,23 +38,22 @@ export const getNodes: FetchData<
 
     const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
-    const response = await window.api.getNodes(
-        {
-            type,
-            storage,
-            tablets,
-            limit,
-            offset,
-            sort,
-            path,
-            database,
-            filter: searchValue,
-            problems_only: getProblemParamValue(problemFilter),
-            uptime: getUptimeParamValue(uptimeFilter),
-            fieldsRequired: dataFieldsRequired,
-        },
-        {concurrentId: getConcurrentId(limit, offset), signal: params.signal},
-    );
+    const response = await window.api.getNodes({
+        type,
+        storage,
+        tablets,
+        limit,
+        offset,
+        sort,
+        path,
+        database,
+        filter: searchValue,
+        problems_only: getProblemParamValue(problemFilter),
+        uptime: getUptimeParamValue(uptimeFilter),
+        filter_group: filterGroup,
+        filter_group_by: filterGroupBy,
+        fieldsRequired: dataFieldsRequired,
+    });
     const preparedResponse = prepareNodesData(response);
 
     return {

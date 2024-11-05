@@ -1,3 +1,10 @@
 {
-  "empty.default": "No such nodes"
+  "nodes": "Nodes",
+
+  "empty.default": "No such nodes",
+
+  "no-nodes-groups": "No nodes groups",
+
+  "controls_search-placeholder": "Host name",
+  "controls_group-by-placeholder": "Group by:"
 }

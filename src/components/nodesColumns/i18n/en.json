@@ -1,6 +1,8 @@
 {
   "node-id": "Node ID",
+  "system-state": "System State",
   "host": "Host",
+  "database": "Database",
   "node-name": "Node Name",
   "dc": "DC",
   "rack": "Rack",

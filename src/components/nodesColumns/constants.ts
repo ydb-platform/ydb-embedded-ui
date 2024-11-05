@@ -7,7 +7,9 @@ export const NODES_COLUMNS_WIDTH_LS_KEY = 'nodesTableColumnsWidth';
 
 export const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
+    SystemState: 'SystemState',
     Host: 'Host',
+    Database: 'Database',
     NodeName: 'NodeName',
     DC: 'DC',
     Rack: 'Rack',
@@ -35,8 +37,14 @@ export const NODES_COLUMNS_TITLES = {
     get NodeId() {
         return i18n('node-id');
     },
+    get SystemState() {
+        return i18n('system-state');
+    },
     get Host() {
         return i18n('host');
+    },
+    get Database() {
+        return i18n('database');
     },
     get NodeName() {
         return i18n('node-name');
@@ -95,7 +103,9 @@ export const NODES_COLUMNS_TITLES = {
 // Also for some columns we may use more than one field
 export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredField[]> = {
     NodeId: ['NodeId'],
+    SystemState: ['SystemState'],
     Host: ['Host', 'Rack', 'Database', 'SystemState'],
+    Database: ['Database'],
     NodeName: ['NodeName'],
     DC: ['DC'],
     Rack: ['Rack'],

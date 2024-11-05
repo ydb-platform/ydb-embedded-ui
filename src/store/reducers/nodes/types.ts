@@ -1,7 +1,12 @@
 import type {OrderType} from '@gravity-ui/react-data-table';
 
 import type {EFlag} from '../../../types/api/enums';
-import type {NodesSortValue, TEndpoint, TPoolStats} from '../../../types/api/nodes';
+import type {
+    NodesGroupByField,
+    NodesSortValue,
+    TEndpoint,
+    TPoolStats,
+} from '../../../types/api/nodes';
 import type {TTabletStateInfo as TFullTabletStateInfo} from '../../../types/api/tablet';
 import type {NodesUptimeFilterValues, PreparedNodeSystemState} from '../../../utils/nodes';
 import type {ProblemFilterValue} from '../settings/types';
@@ -39,8 +44,12 @@ export interface NodesFilters {
     searchValue: string;
     problemFilter: ProblemFilterValue;
     uptimeFilter: NodesUptimeFilterValues;
+
     path?: string;
     database?: string;
+
+    filterGroup?: string;
+    filterGroupBy?: NodesGroupByField;
 }
 
 export interface NodesGroup {
