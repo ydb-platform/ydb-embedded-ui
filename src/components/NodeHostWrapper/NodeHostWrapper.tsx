@@ -3,7 +3,10 @@ import {PopoverBehavior} from '@gravity-ui/uikit';
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {NodeAddress} from '../../types/additionalProps';
 import type {TSystemStateInfo} from '../../types/api/nodes';
-import {createDeveloperUILinkWithNodeId} from '../../utils/developerUI/developerUI';
+import {
+    createDeveloperUIInternalPageHref,
+    createDeveloperUILinkWithNodeId,
+} from '../../utils/developerUI/developerUI';
 import {isUnavailableNode} from '../../utils/nodes';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
@@ -28,11 +31,15 @@ export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperPro
 
     const isNodeAvailable = !isUnavailableNode(node);
 
-    let nodeHref: string | undefined;
+    let developerUIInternalHref: string | undefined;
     if (getNodeRef) {
-        nodeHref = getNodeRef(node) + '/internal';
+        const developerUIHref = getNodeRef(node);
+        developerUIInternalHref = developerUIHref
+            ? createDeveloperUIInternalPageHref(developerUIHref)
+            : undefined;
     } else if (node.NodeId) {
-        nodeHref = createDeveloperUILinkWithNodeId(node.NodeId) + '/internal';
+        const developerUIHref = createDeveloperUILinkWithNodeId(node.NodeId);
+        developerUIInternalHref = createDeveloperUIInternalPageHref(developerUIHref);
     }
 
     const nodePath = isNodeAvailable
@@ -44,7 +51,7 @@ export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperPro
     return (
         <CellWithPopover
             disabled={!isNodeAvailable}
-            content={<NodeEndpointsTooltipContent data={node} nodeHref={nodeHref} />}
+            content={<NodeEndpointsTooltipContent data={node} nodeHref={developerUIInternalHref} />}
             placement={['top', 'bottom']}
             behavior={PopoverBehavior.Immediate}
             delayClosing={200}

@@ -4,10 +4,10 @@ import {Breadcrumbs} from '@gravity-ui/uikit';
 
 import {InternalLink} from '../../components/InternalLink';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
-import {backend, customBackend} from '../../store';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
+import {createDeveloperUIInternalPageHref} from '../../utils/developerUI/developerUI';
 import {useTypedSelector} from '../../utils/hooks';
 
 import type {RawBreadcrumbItem} from './breadcrumbs';
@@ -17,20 +17,11 @@ import './Header.scss';
 
 const b = cn('header');
 
-const getInternalLink = (singleClusterMode: boolean) => {
-    if (singleClusterMode && !customBackend) {
-        return `/internal`;
-    }
-
-    return backend + '/internal';
-};
-
 interface HeaderProps {
     mainPage?: RawBreadcrumbItem;
 }
 
 function Header({mainPage}: HeaderProps) {
-    const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
 
     const clusterInfo = useClusterBaseInfo();
@@ -87,7 +78,10 @@ function Header({mainPage}: HeaderProps) {
                     }}
                 />
 
-                <LinkWithIcon title={DEVELOPER_UI_TITLE} url={getInternalLink(singleClusterMode)} />
+                <LinkWithIcon
+                    title={DEVELOPER_UI_TITLE}
+                    url={createDeveloperUIInternalPageHref()}
+                />
             </header>
         );
     };

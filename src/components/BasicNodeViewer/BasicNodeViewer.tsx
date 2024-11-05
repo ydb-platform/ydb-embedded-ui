@@ -6,7 +6,10 @@ import {Icon} from '@gravity-ui/uikit';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
-import {createDeveloperUILinkWithNodeId} from '../../utils/developerUI/developerUI';
+import {
+    createDeveloperUIInternalPageHref,
+    createDeveloperUILinkWithNodeId,
+} from '../../utils/developerUI/developerUI';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {Tags} from '../Tags';
 
@@ -21,12 +24,16 @@ interface BasicNodeViewerProps {
 }
 
 export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNodeViewerProps) => {
-    let nodeHref: string | undefined;
+    let developerUIInternalHref: string | undefined;
 
     if (additionalNodesProps?.getNodeRef) {
-        nodeHref = additionalNodesProps.getNodeRef(node) + '/internal';
+        const developerUIHref = additionalNodesProps.getNodeRef(node);
+        developerUIInternalHref = developerUIHref
+            ? createDeveloperUIInternalPageHref(developerUIHref)
+            : undefined;
     } else if (node.NodeId) {
-        nodeHref = createDeveloperUILinkWithNodeId(node.NodeId) + '/internal';
+        const developerUIHref = createDeveloperUILinkWithNodeId(node.NodeId);
+        developerUIInternalHref = createDeveloperUIInternalPageHref(developerUIHref);
     }
 
     return (
@@ -35,11 +42,11 @@ export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNo
                 <React.Fragment>
                     <div className={b('title')}>Node</div>
                     <EntityStatus status={node.SystemState} name={node.Host} />
-                    {nodeHref && (
+                    {developerUIInternalHref && (
                         <a
                             rel="noopener noreferrer"
                             className={b('link', {external: true})}
-                            href={nodeHref}
+                            href={developerUIInternalHref}
                             target="_blank"
                         >
                             <Icon data={ArrowUpRightFromSquare} />
