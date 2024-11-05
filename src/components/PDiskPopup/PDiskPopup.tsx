@@ -8,7 +8,7 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
-import {bytesToGB} from '../../utils/utils';
+import {bytesToGB, isNumeric} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerItem} from '../InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -54,7 +54,7 @@ export const preparePDiskData = (
         pdiskData.push({label: 'Path', value: Path});
     }
 
-    if (!isNaN(Number(TotalSize))) {
+    if (isNumeric(TotalSize)) {
         pdiskData.push({
             label: 'Available',
             value: `${bytesToGB(AvailableSize)} of ${bytesToGB(TotalSize)}`,

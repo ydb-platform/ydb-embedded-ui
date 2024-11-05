@@ -45,7 +45,7 @@ export function prepareWhiteboardVDiskData(
         ? prepareWhiteboardPDiskData({...PDisk, NodeId: PDisk?.NodeId ?? NodeId})
         : undefined;
 
-    const actualPDiskId = PDiskId ?? PDisk?.PDiskId;
+    const actualPDiskId = PDiskId ?? preparedPDisk?.PDiskId;
 
     const vDiskSizeFields = prepareVDiskSizeFields({
         AvailableSize: AvailableSize ?? PDisk?.AvailableSize,
