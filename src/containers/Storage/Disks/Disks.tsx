@@ -5,7 +5,6 @@ import {Flex, useLayoutContext} from '@gravity-ui/uikit';
 import {VDisk} from '../../../components/VDisk/VDisk';
 import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
-import {getPDiskId} from '../../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {PDisk} from '../PDisk';
 import type {StorageViewContext} from '../types';
@@ -54,7 +53,7 @@ export function Disks({vDisks = [], viewContext}: DisksProps) {
             <div className={b('pdisks-wrapper')}>
                 {vDisks?.map((vDisk) => (
                     <PDiskItem
-                        key={getPDiskId(vDisk.NodeId, vDisk?.PDisk?.PDiskId)}
+                        key={vDisk?.PDisk?.StringifiedId}
                         vDisk={vDisk}
                         highlightedVDisk={highlightedVDisk}
                         setHighlightedVDisk={setHighlightedVDisk}

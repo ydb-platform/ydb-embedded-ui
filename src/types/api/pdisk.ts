@@ -88,7 +88,7 @@ interface TPDiskInfoWhiteboard {
 
 interface TPDiskInfoBSC {
     PDisk?: TPDiskInfo;
-    VDisks?: TVSlotEntry;
+    VDisks?: TVSlotEntry[];
 }
 
 /**

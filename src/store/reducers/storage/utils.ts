@@ -12,11 +12,15 @@ import type {
 import {EVDiskState} from '../../../types/api/vdisk';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {getColorSeverity, getSeverityColor} from '../../../utils/disks/helpers';
-import {preparePDiskData, prepareVDiskData} from '../../../utils/disks/prepareDisks';
+import {
+    prepareWhiteboardPDiskData,
+    prepareWhiteboardVDiskData,
+} from '../../../utils/disks/prepareDisks';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 import {getUsage} from '../../../utils/storage';
 import {parseUsToMs} from '../../../utils/timeParsers';
 
+import {prepareGroupsVDisk} from './prepareGroupsDisks';
 import type {
     PreparedStorageGroup,
     PreparedStorageNode,
@@ -36,7 +40,7 @@ function getGroupDiskSpaceStatus(group: TStorageGroupInfo | TGroupsStorageGroupI
 }
 
 const prepareVDisk = (vDisk: TVDiskStateInfo, poolName: string | undefined) => {
-    const preparedVDisk = prepareVDiskData(vDisk);
+    const preparedVDisk = prepareWhiteboardVDiskData(vDisk);
 
     // VDisk doesn't have its own StoragePoolName when located inside StoragePool data
     return {
@@ -78,7 +82,7 @@ export const prepareStorageGroupData = (
                 Type: PDiskType,
                 State: PDiskState,
                 AvailableSize: PDiskAvailableSize,
-            } = preparePDiskData(PDisk);
+            } = prepareWhiteboardPDiskData(PDisk);
 
             if (!Replicated || PDiskState !== TPDiskState.Normal || VDiskState !== EVDiskState.OK) {
                 missing += 1;
@@ -192,13 +196,13 @@ const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
 
     const pDisks = node.PDisks?.map((pDisk) => {
         return {
-            ...preparePDiskData(pDisk),
+            ...prepareWhiteboardPDiskData(pDisk),
             NodeId: node.NodeId,
         };
     });
     const vDisks = node.VDisks?.map((vDisk) => {
         return {
-            ...prepareVDiskData(vDisk),
+            ...prepareWhiteboardVDiskData(vDisk),
             NodeId: node.NodeId,
         };
     });
@@ -268,42 +272,7 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
             LatencyGetFast,
         } = group;
 
-        const vDisks = VDisks.map((disk) => {
-            const {
-                Whiteboard: whiteboardVDisk,
-                PDisk,
-                VDiskId,
-                NodeId,
-                AllocatedSize,
-                AvailableSize,
-                DiskSpace,
-                Status,
-            } = disk;
-            const whiteboardPDisk = PDisk?.Whiteboard;
-
-            const PDiskId = whiteboardPDisk?.PDiskId;
-
-            const whiteboardVDiskData = {
-                ...whiteboardVDisk,
-                PDiskId,
-                NodeId,
-                AllocatedSize,
-                AvailableSize,
-                DiskSpace,
-                Status,
-                PDisk: {...whiteboardPDisk, NodeId},
-            };
-
-            const preparedVDiskData = prepareVDiskData(whiteboardVDiskData);
-
-            return {
-                ...preparedVDiskData,
-                // There might be no Whiteboard data if cluster is not healthy
-                // StringifiedId is formed from Whiteboard.VDiskId object
-                // Use VDiskId string from backend in such case
-                StringifiedId: preparedVDiskData.StringifiedId || VDiskId,
-            };
-        });
+        const vDisks = VDisks.map(prepareGroupsVDisk);
 
         const diskSpaceStatus = getGroupDiskSpaceStatus(group);
 

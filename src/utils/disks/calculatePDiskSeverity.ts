@@ -1,5 +1,5 @@
 import {EFlag} from '../../types/api/enums';
-import type {TPDiskState, TPDiskStateInfo} from '../../types/api/pdisk';
+import type {TPDiskState} from '../../types/api/pdisk';
 import {generateEvaluator} from '../generateEvaluator';
 
 import {
@@ -10,9 +10,14 @@ import {
 
 const getUsageSeverityForPDisk = generateEvaluator(85, 95, [EFlag.Green, EFlag.Yellow, EFlag.Red]);
 
-export function calculatePDiskSeverity(pDisk: TPDiskStateInfo, allocatedPercent = 0) {
+export function calculatePDiskSeverity<
+    T extends {
+        State?: TPDiskState;
+        AllocatedPercent?: number;
+    },
+>(pDisk: T) {
     const stateSeverity = getStateSeverity(pDisk.State);
-    const spaceSeverityFlag = getUsageSeverityForPDisk(allocatedPercent);
+    const spaceSeverityFlag = getUsageSeverityForPDisk(pDisk.AllocatedPercent || 0);
 
     if (stateSeverity === NOT_AVAILABLE_SEVERITY || !spaceSeverityFlag) {
         return stateSeverity;

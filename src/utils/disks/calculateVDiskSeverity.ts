@@ -1,18 +1,20 @@
 import type {EFlag} from '../../types/api/enums';
-import type {EVDiskState, TVDiskStateInfo} from '../../types/api/vdisk';
+import type {EVDiskState} from '../../types/api/vdisk';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     NOT_AVAILABLE_SEVERITY,
     VDISK_STATE_SEVERITY,
 } from './constants';
-import {isFullVDiskData} from './helpers';
 
-export function calculateVDiskSeverity(vDisk: TVDiskStateInfo) {
-    if (!isFullVDiskData(vDisk)) {
-        return NOT_AVAILABLE_SEVERITY;
-    }
-
+export function calculateVDiskSeverity<
+    T extends {
+        DiskSpace?: EFlag;
+        VDiskState?: EVDiskState;
+        FrontQueues?: EFlag;
+        Replicated?: boolean;
+    },
+>(vDisk: T) {
     const {DiskSpace, VDiskState, FrontQueues, Replicated} = vDisk;
 
     // if the disk is not available, this determines its status severity regardless of other features

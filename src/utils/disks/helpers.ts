@@ -7,8 +7,11 @@ import {
     DISK_NUMERIC_SEVERITY_TO_STATE_COLOR,
     NOT_AVAILABLE_SEVERITY_COLOR,
 } from './constants';
+import type {PreparedVDisk} from './types';
 
-export function isFullVDiskData(disk: TVDiskStateInfo | TVSlotId): disk is TVDiskStateInfo {
+export function isFullVDiskData(
+    disk: PreparedVDisk | TVDiskStateInfo | TVSlotId,
+): disk is PreparedVDisk | TVDiskStateInfo {
     return 'VDiskId' in disk;
 }
 

@@ -4,22 +4,35 @@ import type {ValueOf} from '../../types/common';
 
 import type {PDISK_TYPES} from './getPDiskType';
 
-export type PreparedPDisk = TPDiskStateInfo &
-    Omit<Partial<TPDiskInfo>, 'Type'> & {
+export type PreparedPDisk = Omit<
+    TPDiskStateInfo,
+    'AvailableSize' | 'TotalSize' | 'EnforcedDynamicSlotSize'
+> &
+    Omit<Partial<TPDiskInfo>, 'Type' | 'AvailableSize' | 'TotalSize'> & {
         Type?: PDiskType;
         Severity?: number;
+        StringifiedId?: string;
 
+        AvailableSize?: number;
+        TotalSize?: number;
         AllocatedSize?: number;
         AllocatedPercent?: number;
+
+        SlotSize?: string;
     };
 
-export interface PreparedVDisk extends TVDiskStateInfo {
+export interface PreparedVDisk
+    extends Omit<TVDiskStateInfo, 'PDisk' | 'AvailableSize' | 'AllocatedSize' | 'Donors'> {
     PDisk?: PreparedPDisk;
     Severity?: number;
     StringifiedId?: string;
 
+    AvailableSize?: number;
     TotalSize?: number;
+    AllocatedSize?: number;
     AllocatedPercent?: number;
+
+    Donors?: PreparedVDisk[];
 }
 
 export type PDiskType = ValueOf<typeof PDISK_TYPES>;

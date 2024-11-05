@@ -1,14 +1,13 @@
-import type {TVDiskStateInfo} from '../../../types/api/vdisk';
-import type {PreparedPDisk} from '../../../utils/disks/types';
+import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {PreparedNodeSystemState} from '../../../utils/nodes';
 
 interface RawStructurePDisk extends PreparedPDisk {
-    vDisks: Record<string, TVDiskStateInfo>;
+    vDisks: Record<string, PreparedVDisk>;
 }
 
 export type RawNodeStructure = Record<string, RawStructurePDisk>;
 
-export interface PreparedStructureVDisk extends TVDiskStateInfo {
+export interface PreparedStructureVDisk extends PreparedVDisk {
     id: string;
     order: number;
 }
