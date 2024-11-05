@@ -1,6 +1,10 @@
 import {backend} from '../../store';
 import {pad9} from '../utils';
 
+export function createDeveloperUIInternalPageHref(host = backend) {
+    return host + '/internal';
+}
+
 // Current node connects with target node by itself using nodeId
 export const createDeveloperUILinkWithNodeId = (nodeId: number | string, host = backend) => {
     const nodePathRegexp = /\/node\/\d+\/?$/g;

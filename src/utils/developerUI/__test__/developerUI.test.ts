@@ -1,10 +1,39 @@
 import {
+    createDeveloperUIInternalPageHref,
     createDeveloperUILinkWithNodeId,
     createPDiskDeveloperUILink,
     createVDiskDeveloperUILink,
 } from '../developerUI';
 
 describe('Developer UI links generators', () => {
+    describe('createDeveloperUIInternalPageHref', () => {
+        it('should create correct link for embedded UI', () => {
+            expect(createDeveloperUIInternalPageHref('')).toBe('/internal');
+        });
+        it('should create correct link for embedded UI with node', () => {
+            expect(createDeveloperUIInternalPageHref('/node/5')).toBe('/node/5/internal');
+        });
+        it('should create correct link for embedded UI with proxy', () => {
+            expect(createDeveloperUIInternalPageHref('/my-ydb-host.net:8765')).toBe(
+                '/my-ydb-host.net:8765/internal',
+            );
+        });
+        it('should create correct link for UI with custom host', () => {
+            expect(createDeveloperUIInternalPageHref('http://my-ydb-host.net:8765')).toBe(
+                'http://my-ydb-host.net:8765/internal',
+            );
+        });
+        it('should create correct link for UI with custom host and node', () => {
+            expect(createDeveloperUIInternalPageHref('http://my-ydb-host.net:8765/node/5')).toBe(
+                'http://my-ydb-host.net:8765/node/5/internal',
+            );
+        });
+        it('should create correct link for UI with custom host and proxy', () => {
+            expect(
+                createDeveloperUIInternalPageHref('https://my-ydb-proxy/my-ydb-host.net:8765'),
+            ).toBe('https://my-ydb-proxy/my-ydb-host.net:8765/internal');
+        });
+    });
     describe('createDeveloperUILinkWithNodeId', () => {
         it('should create relative link with no host', () => {
             expect(createDeveloperUILinkWithNodeId(1)).toBe('/node/1');
