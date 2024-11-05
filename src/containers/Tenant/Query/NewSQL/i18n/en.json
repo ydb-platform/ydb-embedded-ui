@@ -21,7 +21,7 @@
   "action.create-topic": "Create Topic",
   "action.drop-topic": "Drop Topic",
   "action.alter-topic": "Alter Topic",
-  "action.create-cdc-stream": "Create CDC Stream",
+  "action.create-cdc-stream": "Create changefeed",
   "action.create-async-replication": "Create async replication",
   "action.create-user": "Create user",
   "action.create-group": "Create group",

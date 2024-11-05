@@ -68,7 +68,11 @@ WITH (
 );`;
 };
 export const alterTableTemplate = (params?: SchemaQueryParams) => {
-    return `ALTER TABLE \`${params?.relativePath || '$path'}\`
+    return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/alter_table/
+
+ALTER TABLE \`${params?.relativePath || '$path'}\`
+    -- RENAME TO new_table_name
+    -- DROP COLUMN some_existing_column
     ADD COLUMN numeric_column Int32;`;
 };
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
