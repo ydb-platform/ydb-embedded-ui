@@ -1,5 +1,20 @@
 # Changelog
 
+## [6.31.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.30.0...v6.31.0) (2024-11-02)
+
+
+### Features
+
+* add control to execute forget command for an export ([#1552](https://github.com/ydb-platform/ydb-embedded-ui/issues/1552)) ([b31d2cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/b31d2cfd44f34e0fc5a94d019389c4ca8ae77486))
+* implement simple and narrow vertical progress bar ([#1560](https://github.com/ydb-platform/ydb-embedded-ui/issues/1560)) ([e5d0823](https://github.com/ydb-platform/ydb-embedded-ui/commit/e5d0823d7869d547f9c92d3681e8abc5c70000b9))
+* **NodeEndpointsTooltipContent:** add fields ([#1566](https://github.com/ydb-platform/ydb-embedded-ui/issues/1566)) ([3287f99](https://github.com/ydb-platform/ydb-embedded-ui/commit/3287f9921ef1a92942c6fee4205e6a26465877d6))
+
+
+### Bug Fixes
+
+* **Nodes,Storage:** reorder controls - prevent moving on count change ([#1562](https://github.com/ydb-platform/ydb-embedded-ui/issues/1562)) ([74b27f7](https://github.com/ydb-platform/ydb-embedded-ui/commit/74b27f7758287dfc6861b9de032b24a4288aea63))
+* **VDiskInfo:** fix title layout ([#1561](https://github.com/ydb-platform/ydb-embedded-ui/issues/1561)) ([7bd2262](https://github.com/ydb-platform/ydb-embedded-ui/commit/7bd2262ba583f7d007929d2d2d5c3ed9a1829a85))
+
 ## [6.30.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.29.3...v6.30.0) (2024-10-31)
 
 
