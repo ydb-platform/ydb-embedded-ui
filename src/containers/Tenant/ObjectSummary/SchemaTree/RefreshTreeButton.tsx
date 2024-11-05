@@ -1,4 +1,4 @@
-import {ArrowRotateRight} from '@gravity-ui/icons';
+import {ArrowsRotateLeft} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 import {nanoid} from '@reduxjs/toolkit';
 
@@ -14,7 +14,7 @@ export function RefreshTreeButton() {
                     updateTreeKey(nanoid());
                 }}
             >
-                <Icon data={ArrowRotateRight} />
+                <Icon data={ArrowsRotateLeft} />
             </Button>
         </ActionTooltip>
     );

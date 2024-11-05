@@ -21,7 +21,7 @@ export function AutoRefreshControl({className}: AutoRefreshControlProps) {
     return (
         <div className={b(null, className)}>
             <Button
-                view="flat"
+                view="flat-secondary"
                 onClick={() => {
                     dispatch(api.util.invalidateTags(['All']));
                 }}
