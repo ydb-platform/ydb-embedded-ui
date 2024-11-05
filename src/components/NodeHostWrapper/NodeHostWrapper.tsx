@@ -47,6 +47,7 @@ export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperPro
             content={<NodeEndpointsTooltipContent data={node} nodeHref={nodeHref} />}
             placement={['top', 'bottom']}
             behavior={PopoverBehavior.Immediate}
+            delayClosing={200}
         >
             <EntityStatus
                 name={node.Host}
