@@ -21,14 +21,15 @@ interface NodeEdpointsTooltipProps {
 export const NodeEndpointsTooltipContent = ({data, nodeHref}: NodeEdpointsTooltipProps) => {
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
     const info: (DefinitionListItemProps & {key: string})[] = [];
-    if (data?.Host) {
+
+    if (data?.Roles?.length) {
         info.push({
-            name: i18n('field_host'),
-            children: data.Host,
-            copyText: data.Host,
-            key: 'Host',
+            name: i18n('field_roles'),
+            children: data.Roles.join(', '),
+            key: 'Roles',
         });
     }
+
     if (data?.Tenants?.[0]) {
         info.push({
             name: i18n('field_database'),
@@ -36,11 +37,13 @@ export const NodeEndpointsTooltipContent = ({data, nodeHref}: NodeEdpointsToolti
             key: 'Database',
         });
     }
-    if (data?.Roles?.length) {
+
+    if (data?.Host) {
         info.push({
-            name: i18n('field_roles'),
-            children: data.Roles.join(', '),
-            key: 'Roles',
+            name: i18n('field_host'),
+            children: data.Host,
+            copyText: data.Host,
+            key: 'Host',
         });
     }
 
