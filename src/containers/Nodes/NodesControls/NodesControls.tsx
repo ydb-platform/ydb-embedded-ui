@@ -11,6 +11,7 @@ import {useViewerNodesHandlerHasGroupingBySystemState} from '../../../store/redu
 import {useProblemFilter} from '../../../store/reducers/settings/hooks';
 import {getNodesGroupByOptions} from '../columns/constants';
 import i18n from '../i18n';
+import {b} from '../shared';
 import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
 
 interface NodesControlsProps {
@@ -83,6 +84,8 @@ export function NodesControls({
                         defaultValue={groupByParam ? [groupByParam] : undefined}
                         onUpdate={handleGroupBySelectUpdate}
                         options={groupByoptions}
+                        className={b('group-by-select')}
+                        popupClassName={b('group-by-popup')}
                     />
                 </React.Fragment>
             ) : null}
