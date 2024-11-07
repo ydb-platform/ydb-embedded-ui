@@ -51,11 +51,10 @@ export function getNodesGroupByOptions(withSystemStateGroupBy?: boolean): Select
 }
 
 export function parseNodesGroupByParam(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    param?: any,
+    paramToParse: unknown,
     withSystemStateGroupBy?: boolean,
 ): NodesGroupByField | undefined {
     const availableParams = getAvailableNodesGroupByParams(withSystemStateGroupBy);
 
-    return availableParams.includes(param) ? param : undefined;
+    return availableParams.find((groupByField) => groupByField === paramToParse);
 }
