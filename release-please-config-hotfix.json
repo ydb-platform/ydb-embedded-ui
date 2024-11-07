@@ -7,7 +7,6 @@
       "versioning": "prerelease",
       "prerelease": true,
       "prerelease-type": "hotfix",
-      "skip-github-release": true,
       "pull-request-title-pattern": "chore(${branch}): release ${version}"
     }
   }
