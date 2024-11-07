@@ -151,6 +151,7 @@ type NodesWithFilter = 'space' | 'missing' | 'all';
 
 export type NodesGroupByField =
     | 'NodeId'
+    | 'SystemState'
     | 'Host'
     | 'NodeName'
     | 'Database'

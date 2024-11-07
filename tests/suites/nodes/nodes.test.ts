@@ -61,19 +61,23 @@ test.describe('Test Nodes Paginated Table', async () => {
         expect(filteredRowCount).toBeLessThanOrEqual(initialRowCount);
     });
 
-    test('Radio button selection changes displayed data', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+    test('Table groups displayed correctly if group by option is selected', async ({page}) => {
+        const nodesPage = new NodesPage(page);
+        const nodesTable = new PaginatedTable(page);
 
-        await paginatedTable.waitForTableToLoad();
-        await paginatedTable.waitForTableData();
+        await nodesTable.waitForTableToLoad();
+        await nodesTable.waitForTableData();
 
-        const initialRowCount = await paginatedTable.getRowCount();
-        await paginatedTable.selectRadioOption(0, 'With problems');
+        const rowData = await nodesTable.getRowData(0);
+        const host = rowData['Host'];
 
-        await page.waitForTimeout(1000); // Wait for the table to update
+        await nodesPage.selectGroupByOption('Host');
+        await nodesPage.waitForTableGroupsLoaded();
 
-        const filteredRowCount = await paginatedTable.getRowCount();
-        expect(filteredRowCount).toBeLessThanOrEqual(initialRowCount);
+        await nodesPage.selectTableGroup(host).isVisible();
+
+        await nodesPage.expandTableGroup(host);
+        await nodesPage.selectTableGroupContent(host).isVisible();
     });
 
     test('Node count is displayed correctly', async ({page}) => {

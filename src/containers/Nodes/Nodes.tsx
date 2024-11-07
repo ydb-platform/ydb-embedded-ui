@@ -1,50 +1,30 @@
 import React from 'react';
 
 import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
-import {TableColumnSetup} from '@gravity-ui/uikit';
-import {StringParam, useQueryParams} from 'use-query-params';
 
-import {EntitiesCount} from '../../components/EntitiesCount';
 import {AccessDenied} from '../../components/Errors/403';
 import {isAccessError} from '../../components/Errors/PageError/PageError';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Illustration} from '../../components/Illustration';
-import {ProblemFilter} from '../../components/ProblemFilter';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
-import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {UptimeFilter} from '../../components/UptimeFIlter';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
 import {filterNodes} from '../../store/reducers/nodes/selectors';
 import type {NodesSortParams} from '../../store/reducers/nodes/types';
-import {
-    ProblemFilterValues,
-    changeFilter,
-    selectProblemFilter,
-} from '../../store/reducers/settings/settings';
-import type {ProblemFilterValue} from '../../store/reducers/settings/types';
+import {useProblemFilter} from '../../store/reducers/settings/hooks';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {
-    useAutoRefreshInterval,
-    useTableSort,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../utils/hooks';
-import {
-    NodesUptimeFilterValues,
-    isUnavailableNode,
-    nodesUptimeFilterValuesSchema,
-} from '../../utils/nodes';
+import {useAutoRefreshInterval, useTableSort} from '../../utils/hooks';
+import {NodesUptimeFilterValues} from '../../utils/nodes';
 
+import {NodesControls} from './NodesControls/NodesControls';
 import {useNodesSelectedColumns} from './columns/hooks';
 import i18n from './i18n';
+import {getRowClassName} from './shared';
+import {useNodesPageQueryParams} from './useNodesPageQueryParams';
 
 import './Nodes.scss';
-
-const b = cn('ydb-nodes');
 
 interface NodesProps {
     path?: string;
@@ -53,16 +33,9 @@ interface NodesProps {
 }
 
 export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) => {
-    const [queryParams, setQueryParams] = useQueryParams({
-        uptimeFilter: StringParam,
-        search: StringParam,
-    });
-    const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
-    const searchValue = queryParams.search ?? '';
+    const {searchValue, uptimeFilter} = useNodesPageQueryParams();
+    const {problemFilter} = useProblemFilter();
 
-    const dispatch = useTypedDispatch();
-
-    const problemFilter = useTypedSelector(selectProblemFilter);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {columnsToShow, columnsToSelect, setColumns} = useNodesSelectedColumns({
@@ -84,18 +57,6 @@ export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) =
         setSortValue(sortParams as NodesSortParams);
     });
 
-    const handleSearchQueryChange = (value: string) => {
-        setQueryParams({search: value || undefined}, 'replaceIn');
-    };
-
-    const handleProblemFilterChange = (value: ProblemFilterValue) => {
-        dispatch(changeFilter(value));
-    };
-
-    const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
-        setQueryParams({uptimeFilter: value}, 'replaceIn');
-    };
-
     const nodes = React.useMemo(() => {
         return filterNodes(data?.Nodes, {searchValue, uptimeFilter, problemFilter});
     }, [data, searchValue, uptimeFilter, problemFilter]);
@@ -104,38 +65,19 @@ export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) =
 
     const renderControls = () => {
         return (
-            <React.Fragment>
-                <Search
-                    onChange={handleSearchQueryChange}
-                    placeholder="Host name"
-                    className={b('search')}
-                    value={searchValue}
-                />
-                <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
-                <UptimeFilter value={uptimeFilter} onChange={handleUptimeFilterChange} />
-                <TableColumnSetup
-                    popupWidth={200}
-                    items={columnsToSelect}
-                    showStatus
-                    onUpdate={setColumns}
-                    sortable={false}
-                />
-                <EntitiesCount
-                    total={totalNodes}
-                    current={nodes.length}
-                    label={'Nodes'}
-                    loading={isLoading}
-                />
-            </React.Fragment>
+            <NodesControls
+                columnsToSelect={columnsToSelect}
+                handleSelectedColumnsUpdate={setColumns}
+                entitiesCountCurrent={nodes.length}
+                entitiesCountTotal={totalNodes}
+                entitiesLoading={isLoading}
+            />
         );
     };
 
     const renderTable = () => {
         if (nodes.length === 0) {
-            if (
-                problemFilter !== ProblemFilterValues.ALL ||
-                uptimeFilter !== NodesUptimeFilterValues.All
-            ) {
+            if (problemFilter !== 'All' || uptimeFilter !== NodesUptimeFilterValues.All) {
                 return <Illustration name="thumbsUp" width="200" />;
             }
         }
@@ -149,7 +91,7 @@ export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) =
                 sortOrder={sort}
                 onSort={handleSort}
                 emptyDataMessage={i18n('empty.default')}
-                rowClassName={(row) => b('node', {unavailable: isUnavailableNode(row)})}
+                rowClassName={getRowClassName}
             />
         );
     };

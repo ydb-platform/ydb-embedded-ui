@@ -11,6 +11,7 @@ const b = cn('ydb-search');
 interface SearchProps {
     onChange: (value: string) => void;
     value?: string;
+    width?: React.CSSProperties['width'];
     className?: string;
     debounce?: number;
     placeholder?: string;
@@ -19,6 +20,7 @@ interface SearchProps {
 export const Search = ({
     onChange,
     value = '',
+    width,
     className,
     debounce = 200,
     placeholder,
@@ -50,6 +52,7 @@ export const Search = ({
         <TextInput
             hasClear
             autoFocus
+            style={{width}}
             className={b(null, className)}
             placeholder={placeholder}
             value={searchValue}

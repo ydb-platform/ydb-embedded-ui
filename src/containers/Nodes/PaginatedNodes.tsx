@@ -1,150 +1,200 @@
 import React from 'react';
 
-import {TableColumnSetup} from '@gravity-ui/uikit';
-import {StringParam, useQueryParams} from 'use-query-params';
-
-import {EntitiesCount} from '../../components/EntitiesCount';
-import {AccessDenied} from '../../components/Errors/403';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {Illustration} from '../../components/Illustration';
-import {ResizeablePaginatedTable} from '../../components/PaginatedTable';
-import type {
-    GetRowClassName,
-    RenderControls,
-    RenderErrorMessage,
-} from '../../components/PaginatedTable';
-import {ProblemFilter} from '../../components/ProblemFilter';
-import {Search} from '../../components/Search';
-import {UptimeFilter} from '../../components/UptimeFIlter';
-import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
+import type {RenderControls} from '../../components/PaginatedTable';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
-    ProblemFilterValues,
-    changeFilter,
-    selectProblemFilter,
-} from '../../store/reducers/settings/settings';
-import type {ProblemFilterValue} from '../../store/reducers/settings/types';
+    useCapabilitiesLoaded,
+    useViewerNodesHandlerHasGrouping,
+} from '../../store/reducers/capabilities/hooks';
+import {nodesApi} from '../../store/reducers/nodes/nodes';
+import {useProblemFilter} from '../../store/reducers/settings/hooks';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import {cn} from '../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {
-    NodesUptimeFilterValues,
-    isUnavailableNode,
-    nodesUptimeFilterValuesSchema,
-} from '../../utils/nodes';
+import {useAutoRefreshInterval} from '../../utils/hooks';
+import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {TableGroup} from '../Storage/TableGroup/TableGroup';
+import {useExpandedGroups} from '../Storage/TableGroup/useExpandedTableGroups';
 
+import {NodesControls} from './NodesControls/NodesControls';
+import {PaginatedNodesTable} from './PaginatedNodesTable';
 import {useNodesSelectedColumns} from './columns/hooks';
-import {getNodes} from './getNodes';
 import i18n from './i18n';
+import {b} from './shared';
+import {useNodesPageQueryParams} from './useNodesPageQueryParams';
 
 import './Nodes.scss';
 
-const b = cn('ydb-nodes');
-
-interface NodesProps {
+interface PaginatedNodesProps {
     path?: string;
     database?: string;
     parentRef: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export const PaginatedNodes = ({path, database, parentRef, additionalNodesProps}: NodesProps) => {
-    const [queryParams, setQueryParams] = useQueryParams({
-        uptimeFilter: StringParam,
-        search: StringParam,
-    });
-    const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
-    const searchValue = queryParams.search ?? '';
+export function PaginatedNodes(props: PaginatedNodesProps) {
+    const {uptimeFilter, groupByParam, handleUptimeFilterChange} = useNodesPageQueryParams();
+    const {problemFilter, handleProblemFilterChange} = useProblemFilter();
 
-    const dispatch = useTypedDispatch();
+    const capabilitiesLoaded = useCapabilitiesLoaded();
+    const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
-    const problemFilter = useTypedSelector(selectProblemFilter);
+    // Other filters do not fit with grouping
+    // Reset them if grouping available
+    React.useEffect(() => {
+        if (
+            viewerNodesHandlerHasGrouping &&
+            (problemFilter !== 'All' || uptimeFilter !== NodesUptimeFilterValues.All)
+        ) {
+            handleProblemFilterChange('All');
+            handleUptimeFilterChange(NodesUptimeFilterValues.All);
+        }
+    }, [
+        handleProblemFilterChange,
+        handleUptimeFilterChange,
+        problemFilter,
+        uptimeFilter,
+        viewerNodesHandlerHasGrouping,
+    ]);
 
-    const tableFilters = React.useMemo(() => {
-        return {path, database, searchValue, problemFilter, uptimeFilter};
-    }, [path, database, searchValue, problemFilter, uptimeFilter]);
+    const renderContent = () => {
+        if (viewerNodesHandlerHasGrouping && groupByParam) {
+            return <GroupedNodesComponent {...props} />;
+        }
+
+        return <NodesComponent {...props} />;
+    };
+
+    return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
+}
+
+function NodesComponent({path, database, parentRef, additionalNodesProps}: PaginatedNodesProps) {
+    const {searchValue, uptimeFilter} = useNodesPageQueryParams();
+    const {problemFilter} = useProblemFilter();
+    const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
     const {columnsToShow, columnsToSelect, setColumns} = useNodesSelectedColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
         database,
     });
 
-    const getRowClassName: GetRowClassName<NodesPreparedEntity> = (row) => {
-        return b('node', {unavailable: isUnavailableNode(row)});
-    };
-
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
-        const handleSearchQueryChange = (value: string) => {
-            setQueryParams({search: value || undefined}, 'replaceIn');
-        };
-
-        const handleProblemFilterChange = (value: ProblemFilterValue) => {
-            dispatch(changeFilter(value));
-        };
-
-        const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
-            setQueryParams({uptimeFilter: value}, 'replaceIn');
-        };
-
         return (
-            <React.Fragment>
-                <Search
-                    onChange={handleSearchQueryChange}
-                    placeholder="Host name"
-                    className={b('search')}
-                    value={searchValue}
-                />
-                <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
-                <UptimeFilter value={uptimeFilter} onChange={handleUptimeFilterChange} />
-                <TableColumnSetup
-                    popupWidth={200}
-                    items={columnsToSelect}
-                    showStatus
-                    onUpdate={setColumns}
-                    sortable={false}
-                />
-                <EntitiesCount
-                    total={totalEntities}
-                    current={foundEntities}
-                    label={'Nodes'}
-                    loading={!inited}
-                />
-            </React.Fragment>
+            <NodesControls
+                withGroupBySelect={viewerNodesHandlerHasGrouping}
+                columnsToSelect={columnsToSelect}
+                handleSelectedColumnsUpdate={setColumns}
+                entitiesCountCurrent={foundEntities}
+                entitiesCountTotal={totalEntities}
+                entitiesLoading={!inited}
+            />
         );
     };
 
-    const renderEmptyDataMessage = () => {
-        if (
-            problemFilter !== ProblemFilterValues.ALL ||
-            uptimeFilter !== NodesUptimeFilterValues.All
-        ) {
-            return <Illustration name="thumbsUp" width="200" />;
-        }
+    return (
+        <PaginatedNodesTable
+            path={path}
+            database={database}
+            searchValue={searchValue}
+            problemFilter={problemFilter}
+            uptimeFilter={uptimeFilter}
+            columns={columnsToShow}
+            parentRef={parentRef}
+            renderControls={renderControls}
+        />
+    );
+}
 
-        return i18n('empty.default');
+function GroupedNodesComponent({
+    path,
+    database,
+    parentRef,
+    additionalNodesProps,
+}: PaginatedNodesProps) {
+    const {searchValue, groupByParam} = useNodesPageQueryParams();
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+
+    const {columnsToShow, columnsToSelect, setColumns} = useNodesSelectedColumns({
+        getNodeRef: additionalNodesProps?.getNodeRef,
+        database,
+    });
+
+    const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
+        {
+            path,
+            database,
+            filter: searchValue,
+            group: groupByParam,
+            limit: 0,
+        },
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
+
+    const isLoading = currentData === undefined && isFetching;
+    const {
+        NodeGroups: tableGroups,
+        FoundNodes: found = 0,
+        TotalNodes: total = 0,
+    } = currentData || {};
+
+    const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
+
+    const renderControls = () => {
+        return (
+            <NodesControls
+                withGroupBySelect
+                columnsToSelect={columnsToSelect}
+                handleSelectedColumnsUpdate={setColumns}
+                entitiesCountCurrent={found}
+                entitiesCountTotal={total}
+                entitiesLoading={isLoading}
+            />
+        );
     };
 
-    const renderErrorMessage: RenderErrorMessage = (error) => {
-        if (error && error.status === 403) {
-            return <AccessDenied position="left" />;
+    const renderGroups = () => {
+        if (tableGroups?.length) {
+            return tableGroups.map(({name, count}) => {
+                const isExpanded = expandedGroups[name];
+
+                return (
+                    <TableGroup
+                        key={name}
+                        title={name}
+                        count={count}
+                        entityName={i18n('nodes')}
+                        expanded={isExpanded}
+                        onIsExpandedChange={setIsGroupExpanded}
+                    >
+                        <PaginatedNodesTable
+                            path={path}
+                            database={database}
+                            searchValue={searchValue}
+                            problemFilter={'All'}
+                            uptimeFilter={NodesUptimeFilterValues.All}
+                            filterGroup={name}
+                            filterGroupBy={groupByParam}
+                            initialEntitiesCount={count}
+                            columns={columnsToShow}
+                            parentRef={parentRef}
+                        />
+                    </TableGroup>
+                );
+            });
         }
 
-        return <ResponseError error={error} />;
+        return i18n('no-nodes-groups');
     };
 
     return (
-        <ResizeablePaginatedTable
-            columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
-            parentRef={parentRef}
-            columns={columnsToShow}
-            fetchData={getNodes}
-            limit={50}
-            renderControls={renderControls}
-            renderErrorMessage={renderErrorMessage}
-            renderEmptyDataMessage={renderEmptyDataMessage}
-            getRowClassName={getRowClassName}
-            filters={tableFilters}
-            tableName="nodes"
-        />
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            {error ? <ResponseError error={error} /> : null}
+            <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
+                {renderGroups()}
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
-};
+}

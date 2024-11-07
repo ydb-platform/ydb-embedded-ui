@@ -67,4 +67,4 @@ export type RenderControls = (params: ControlsParams) => React.ReactNode;
 export type RenderEmptyDataMessage = () => React.ReactNode;
 export type RenderErrorMessage = (error: IResponseError) => React.ReactNode;
 
-export type GetRowClassName<T> = (row: T) => string | undefined;
+export type GetRowClassName<T> = (row: T) => string;

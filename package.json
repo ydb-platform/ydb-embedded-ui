@@ -76,7 +76,8 @@
     "typecheck": "tsc --noEmit",
     "prepare": "husky",
     "test:e2e:install": "npx playwright install --with-deps",
-    "test:e2e": "npx playwright test --config=playwright.config.ts"
+    "test:e2e": "npx playwright test --config=playwright.config.ts",
+    "test:e2e:local": "PLAYWRIGHT_BASE_URL=http://localhost:3000/ npm run test:e2e"
   },
   "lint-staged": {
     "*.{scss, css}": [
