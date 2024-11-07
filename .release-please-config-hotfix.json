@@ -1,0 +1,8 @@
+{
+  "prerelease-type": "hotfix",
+  "versioning": "prerelease",
+  "prerelease": true,
+  "packages": {
+    ".": {}
+  }
+}

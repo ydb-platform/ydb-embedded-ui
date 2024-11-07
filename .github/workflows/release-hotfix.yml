@@ -1,7 +1,8 @@
 on:
   push:
     branches:
-      - main
+      - v[1-9]+.[0-9]+.[0-9]+-hotfix-[1-9]+ # match branches in format v6-20-10-hotfix-1
+      - hotfix-test-[1-9]+
 
 name: Release
 
@@ -14,9 +15,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - run: npm ci
-      - run: npm test
       - uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
           release-type: node
+          target-branch: ${{ github.ref_name }}
+          config-file: .release-please-config-hotfix.json
+          manifest-file: .release-please-manifest-hotfix.json
