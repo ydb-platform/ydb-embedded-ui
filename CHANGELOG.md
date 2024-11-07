@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.32.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.32.0-hotfix...v6.32.0-hotfix.1) (2024-11-07)
+
+
+### Bug Fixes
+
+* little fix ([d2e69e2](https://github.com/ydb-platform/ydb-embedded-ui/commit/d2e69e2f30575f62e5a339079ccf47a482ce83a2))
+
 ## [6.32.0-hotfix](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.31.1-hotfix...v6.32.0-hotfix) (2024-11-07)
 
 
