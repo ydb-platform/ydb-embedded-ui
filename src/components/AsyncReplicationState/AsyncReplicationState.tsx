@@ -24,5 +24,5 @@ export function AsyncReplicationState({state}: AsyncReplicationStateProps) {
         return <Label theme="danger">Error</Label>;
     }
 
-    return <Label size="s">Unknown</Label>;
+    return <Label size="s">{'Unknown'}</Label>;
 }
