@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.31.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.31.0...v6.31.1) (2024-11-07)
+
+
+### Bug Fixes
+
+* **Header:** fix developer ui link for embedded UI with proxy ([#1580](https://github.com/ydb-platform/ydb-embedded-ui/issues/1580)) ([b229301](https://github.com/ydb-platform/ydb-embedded-ui/commit/b229301e167c8651550606ee5450f6d7f2409048))
+* if popover has actions increase delayClosing ([#1573](https://github.com/ydb-platform/ydb-embedded-ui/issues/1573)) ([7680e96](https://github.com/ydb-platform/ydb-embedded-ui/commit/7680e96681a9edf6b29589b73189ac72ef48f3d4))
+* **NodeEndpointsTooltipContent:** change fields order ([#1585](https://github.com/ydb-platform/ydb-embedded-ui/issues/1585)) ([949a518](https://github.com/ydb-platform/ydb-embedded-ui/commit/949a518a272e920e36f4c2a94c3b502d37d6e3a4))
+* query templates modification ([#1579](https://github.com/ydb-platform/ydb-embedded-ui/issues/1579)) ([697921a](https://github.com/ydb-platform/ydb-embedded-ui/commit/697921abe30e0b3415c0cd08519b8fecdfaaa03b))
+* refresh schema and autoresresh icons should be similar ([#1572](https://github.com/ydb-platform/ydb-embedded-ui/issues/1572)) ([03bc63d](https://github.com/ydb-platform/ydb-embedded-ui/commit/03bc63dc5d386591a4ef2e73c7051349b37c83ed))
+* use both BSC and Whiteboard for disks ([#1564](https://github.com/ydb-platform/ydb-embedded-ui/issues/1564)) ([da6dfcd](https://github.com/ydb-platform/ydb-embedded-ui/commit/da6dfcd856468ff89b031a2d6bbf710c7033ef5a))
+
 ## [6.31.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.30.0...v6.31.0) (2024-11-02)
 
 
