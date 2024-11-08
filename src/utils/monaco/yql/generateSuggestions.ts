@@ -1,9 +1,8 @@
 import type {
     ColumnAliasSuggestion,
     KeywordSuggestion,
-    YQLEntity,
-    YqlAutocompleteResult,
-} from '@gravity-ui/websql-autocomplete';
+} from '@gravity-ui/websql-autocomplete/shared';
+import type {YQLEntity, YqlAutocompleteResult} from '@gravity-ui/websql-autocomplete/yql';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 import type {AutocompleteEntityType, TAutocompleteEntity} from '../../../types/api/autocomplete';
@@ -123,24 +122,27 @@ function normalizeEntityPrefix(value = '', database: string) {
     return removeStartSlash(cleanedValue);
 }
 
-type SuggestionType = keyof Omit<YqlAutocompleteResult, 'errors' | 'suggestDatabases'>;
+type SuggestionType =
+    | keyof Omit<YqlAutocompleteResult, 'errors' | 'suggestDatabases'>
+    | 'suggestAllColumns';
 
 const SuggestionsWeight: Record<SuggestionType, number> = {
     suggestTemplates: 0,
     suggestPragmas: 1,
     suggestEntity: 2,
-    suggestColumns: 3,
-    suggestColumnAliases: 4,
-    suggestTableIndexes: 5,
-    suggestTableHints: 6,
-    suggestEntitySettings: 7,
-    suggestKeywords: 8,
-    suggestAggregateFunctions: 9,
-    suggestTableFunctions: 10,
-    suggestWindowFunctions: 11,
-    suggestFunctions: 12,
-    suggestSimpleTypes: 13,
-    suggestUdfs: 14,
+    suggestAllColumns: 3,
+    suggestColumns: 4,
+    suggestColumnAliases: 5,
+    suggestTableIndexes: 6,
+    suggestTableHints: 7,
+    suggestEntitySettings: 8,
+    suggestKeywords: 9,
+    suggestAggregateFunctions: 10,
+    suggestTableFunctions: 11,
+    suggestWindowFunctions: 12,
+    suggestFunctions: 13,
+    suggestSimpleTypes: 14,
+    suggestUdfs: 15,
 };
 
 function getSuggestionIndex(suggestionType: SuggestionType) {
@@ -181,6 +183,7 @@ export async function generateColumnsSuggestion(
         return [];
     }
     const suggestions: monaco.languages.CompletionItem[] = [];
+    const normalizedColumns = suggestColumns.all ? ([] as string[]) : undefined;
     const multi = suggestColumns.tables.length > 1;
 
     const normalizedTableNames =
@@ -228,6 +231,7 @@ export async function generateColumnsSuggestion(
 
         const normalizedParentName = normalizeEntityPrefix(col.Parent, database);
         const aliases = tableNameToAliasMap[normalizedParentName];
+        const currentSuggestionIndex = suggestions.length;
         if (aliases?.length) {
             aliases.forEach((a) => {
                 const columnNameSuggestion = `${a}.${normalizedName}`;
@@ -237,8 +241,11 @@ export async function generateColumnsSuggestion(
                     kind: CompletionItemKind.Field,
                     detail: 'Column',
                     range: rangeToInsertSuggestion,
-                    sortText: suggestionIndexToWeight(getSuggestionIndex('suggestColumns')),
+                    sortText:
+                        suggestionIndexToWeight(getSuggestionIndex('suggestColumns')) +
+                        suggestionIndexToWeight(currentSuggestionIndex),
                 });
+                normalizedColumns?.push(columnNameSuggestion);
             });
         } else {
             let columnNameSuggestion = normalizedName;
@@ -251,10 +258,24 @@ export async function generateColumnsSuggestion(
                 kind: CompletionItemKind.Field,
                 detail: 'Column',
                 range: rangeToInsertSuggestion,
-                sortText: suggestionIndexToWeight(getSuggestionIndex('suggestColumns')),
+                sortText:
+                    suggestionIndexToWeight(getSuggestionIndex('suggestColumns')) +
+                    suggestionIndexToWeight(currentSuggestionIndex),
             });
+            normalizedColumns?.push(columnNameSuggestion);
         }
     });
+    if (normalizedColumns && normalizedColumns.length > 0) {
+        const allColumsn = normalizedColumns.join(', ');
+        suggestions.push({
+            label: allColumsn,
+            insertText: allColumsn,
+            kind: CompletionItemKind.Field,
+            detail: 'All columns',
+            range: rangeToInsertSuggestion,
+            sortText: suggestionIndexToWeight(getSuggestionIndex('suggestAllColumns')),
+        });
+    }
     return suggestions;
 }
 
@@ -309,6 +330,7 @@ export async function generateEntitiesSuggestion(
             if (isDir && !withBackticks) {
                 labelAsSnippet = `\`${label}$0\``;
             }
+            const suggestionIndex = acc.length;
             acc.push({
                 label,
                 insertText: labelAsSnippet ?? label,
@@ -321,7 +343,10 @@ export async function generateEntitiesSuggestion(
                 command: label.endsWith('/')
                     ? {id: 'editor.action.triggerSuggest', title: ''}
                     : undefined,
-                sortText: suggestionIndexToWeight(getSuggestionIndex('suggestEntity')),
+                // first argument is responsible for sorting groups of suggestions, the second - to preserve suggestions order returned from backend
+                sortText:
+                    suggestionIndexToWeight(getSuggestionIndex('suggestEntity')) +
+                    suggestionIndexToWeight(suggestionIndex),
             });
             return acc;
         }, [] as monaco.languages.CompletionItem[]);
