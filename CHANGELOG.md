@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.32.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.32.0...v6.32.0-hotfix.1) (2024-11-08)
+
+
+### Bug Fixes
+
+* **Nodes:** remove redundant group by params ([#1598](https://github.com/ydb-platform/ydb-embedded-ui/issues/1598)) ([fb9a5a9](https://github.com/ydb-platform/ydb-embedded-ui/commit/fb9a5a9c647f097a89c045f607f148c308d67bdf))
+
 ## [6.32.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.31.0...v6.32.0) (2024-11-08)
 
 
