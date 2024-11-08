@@ -5,27 +5,31 @@
 
     position: relative;
     z-index: 0;
+
     min-width: 150px;
     padding: 0 4px;
 
     &__progress-container {
         position: relative;
+
+        overflow: hidden;
+
         height: 23px;
+
         border-radius: 2px;
         background: var(--g-color-base-generic);
-        overflow: hidden;
     }
 
     &__container {
         display: flex;
         align-items: end;
+
         text-align: end;
     }
 
     &__legend {
         width: 20px;
         height: 20px;
-
         margin-right: 4px;
 
         &_type_ExternalConsumption {
@@ -51,6 +55,7 @@
 
     &__segment {
         position: absolute;
+
         height: 100%;
 
         &_type_ExternalConsumption {
@@ -78,7 +83,9 @@
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
+
         margin-top: 8px;
+
         color: var(--g-color-text-complementary);
     }
 
@@ -86,14 +93,17 @@
         display: flex;
         align-items: center;
         gap: 4px;
+
         white-space: nowrap;
     }
 
     &__legend-color {
+        flex-shrink: 0;
+
         width: 12px;
         height: 12px;
+
         border-radius: 2px;
-        flex-shrink: 0;
     }
 
     &_theme_dark {
@@ -123,45 +133,8 @@
     }
 
     &_size {
-        &_xs {
-            height: 20px;
-            @include body-2-typography();
-        }
-
-        &_s {
-            height: 28px;
-            font-size: var(--g-text-body-1-font-size);
-            line-height: 28px;
-        }
-
-        &_m {
-            height: 32px;
-            font-size: var(--g-text-body-2-font-size);
-            line-height: 32px;
-        }
-
-        &_ns {
-            height: 24px;
-            font-size: 13px;
-            line-height: var(--g-text-subheader-3-line-height);
-        }
-
-        &_n {
-            height: 36px;
-            font-size: var(--g-text-body-1-font-size);
-            line-height: 36px;
-        }
-
-        &_l {
-            height: 38px;
-            font-size: var(--g-text-subheader-3-font-size);
-            line-height: 38px;
-        }
-
-        &_head {
-            font-size: var(--g-text-body-1-font-size);
-            line-height: 36px;
-        }
+        height: 20px;
+        @include body-2-typography();
 
         #{$block}__progress-container {
             height: inherit;
@@ -170,26 +143,7 @@
 
     &__text {
         display: flex;
-        align-items: center;
         justify-content: center;
-    }
-
-    &__memory-segment {
-        display: flex;
         align-items: center;
-
-        width: 280px;
-    }
-
-    &__hard-limit {
-        position: absolute;
-        height: 100%;
-        background-color: var(--g-color-base-danger-medium);
-    }
-
-    &__soft-limit {
-        position: absolute;
-        height: 100%;
-        background-color: var(--g-color-base-warning-medium);
     }
 }

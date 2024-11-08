@@ -3,7 +3,7 @@ import type {Column} from '@gravity-ui/react-data-table';
 import {
     getHostColumn,
     getLoadColumn,
-    getMemoryDetailedColumn,
+    getMemoryColumn,
     getNodeIdColumn,
     getSessionsColumn,
     getTabletsColumn,
@@ -35,7 +35,7 @@ function getTopNodesByMemoryColumns(
         getHostColumn<NodesPreparedEntity>(params),
         getUptimeColumn<NodesPreparedEntity>(),
         getLoadColumn<NodesPreparedEntity>(),
-        getMemoryDetailedColumn<NodesPreparedEntity>(),
+        getMemoryColumn<NodesPreparedEntity>(),
         getSessionsColumn<NodesPreparedEntity>(),
         getTabletsColumn<NodesPreparedEntity>(params),
     ];

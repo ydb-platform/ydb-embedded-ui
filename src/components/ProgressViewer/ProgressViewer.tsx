@@ -95,8 +95,6 @@ export function ProgressViewer({
         width: fillWidth + '%',
     };
 
-    console.log(lineStyle);
-
     const renderContent = () => {
         if (isNumeric(capacity) && !hideCapacity) {
             return `${valueText} ${divider} ${capacityText}`;

@@ -1,16 +1,13 @@
-import React from 'react';
-
 import {DefinitionList, useTheme} from '@gravity-ui/uikit';
 
 import type {TMemoryStats} from '../../types/api/nodes';
 import {cn} from '../../utils/cn';
-import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
 import {calculateProgressStatus} from '../../utils/progress';
-import {UNBREAKABLE_GAP, isNumeric} from '../../utils/utils';
+import {isNumeric} from '../../utils/utils';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 
-import i18n from './i18n';
+import {getMemorySegments} from './utils';
 
 import './MemoryViewer.scss';
 
@@ -21,25 +18,13 @@ type FormatProgressViewerValues = (
     capacity?: number,
 ) => (string | number | undefined)[];
 
-const formatValue2 = (value?: number) => {
-    return formatNumber(roundToPrecision(Number(value), 2));
-};
-
-const defaultFormatValues: FormatProgressViewerValues = (value, total) => {
-    return [formatValue2(value), formatValue2(total)];
-};
-
-type ProgressViewerSize = 'xs' | 's' | 'ns' | 'm' | 'n' | 'l' | 'head';
-
 export interface MemoryProgressViewerProps {
-    stats?: TMemoryStats;
-    totalCapacity: number;
+    stats: TMemoryStats;
     className?: string;
-    size?: ProgressViewerSize;
     warningThreshold?: number;
     value?: number | string;
     capacity?: number | string;
-    formatValues?: FormatProgressViewerValues;
+    formatValues: FormatProgressViewerValues;
     percents?: boolean;
     dangerThreshold?: number;
 }
@@ -49,10 +34,8 @@ export function MemoryViewer({
     value,
     capacity,
     percents,
-    formatValues = defaultFormatValues,
-    totalCapacity,
+    formatValues,
     className,
-    size = 'xs',
     warningThreshold = 60,
     dangerThreshold = 80,
 }: MemoryProgressViewerProps) {
@@ -80,49 +63,20 @@ export function MemoryViewer({
         return valueText;
     };
 
-    const calculateMemoryPercentage = (value: number) => {
+    const calculateMemoryShare = (segmentSize: number) => {
         if (!value) {
             return 0;
         }
-        return parseFloat(((value / parseFloat(String(capacity))) * 100).toFixed(2));
+        return (segmentSize / parseFloat(String(capacity))) * 100;
     };
 
-    const memorySegments = [
-        {
-            label: i18n('text_external-consumption'),
-            key: 'ExternalConsumption',
-            value: parseFloat(stats?.ExternalConsumption || '0'),
-        },
-        {
-            label: i18n('text_allocator-caches'),
-            key: 'AllocatorCachesMemory',
-            value: parseFloat(stats?.AllocatorCachesMemory || '0'),
-        },
-        {
-            label: i18n('text_shared-cache'),
-            key: 'SharedCacheConsumption',
-            value: parseFloat(stats?.SharedCacheConsumption || '0'),
-            capacity: stats?.SharedCacheLimit,
-        },
-        {
-            label: i18n('text_memtable'),
-            key: 'MemTableConsumption',
-            value: parseFloat(stats?.MemTableConsumption || '0'),
-            capacity: stats?.MemTableLimit,
-        },
-        {
-            label: i18n('text_query-execution'),
-            key: 'QueryExecutionConsumption',
-            value: parseFloat(stats?.QueryExecutionConsumption || '0'),
-            capacity: stats?.QueryExecutionLimit,
-        },
-    ];
-
-    console.log(memorySegments);
+    const memorySegments = getMemorySegments(stats);
 
     const totalUsedMemory =
-        memorySegments.reduce((acc, segment) => acc + calculateMemoryPercentage(segment.value), 0) /
-        totalCapacity;
+        memorySegments
+            .filter(({isInfo}) => !isInfo)
+            .reduce((acc, segment) => acc + calculateMemoryShare(segment.value), 0) /
+        parseFloat(String(capacity));
 
     const status = calculateProgressStatus({
         fillWidth: totalUsedMemory,
@@ -137,9 +91,8 @@ export function MemoryViewer({
         <HoverPopup
             popupContent={
                 <DefinitionList responsive>
-                    {memorySegments
-                        .filter(({value}) => value)
-                        .map(({label, value, capacity, key}) => (
+                    {memorySegments.map(
+                        ({label, value: segmentSize, capacity: segmentCapacity, key}) => (
                             <DefinitionList.Item
                                 key={label}
                                 name={
@@ -149,67 +102,41 @@ export function MemoryViewer({
                                     </div>
                                 }
                             >
-                                <div className={b('memory-segment')}>
-                                    {capacity ? (
-                                        <React.Fragment>
-                                            <ProgressViewer
-                                                value={value}
-                                                capacity={capacity}
-                                                formatValues={formatValues}
-                                                colorizeProgress
-                                                percents
-                                            />
-                                            {UNBREAKABLE_GAP}
-                                        </React.Fragment>
-                                    ) : null}
-                                    <div className={b('memory-segment-percentage')}>
-                                        {formatValues(value, value)[1]}
-                                    </div>
-                                    {UNBREAKABLE_GAP + '/' + UNBREAKABLE_GAP}
-                                    <div className={b('memory-segment-percentage')}>
-                                        {calculateMemoryPercentage(value)}% total
-                                    </div>
-                                </div>
+                                {segmentCapacity ? (
+                                    <ProgressViewer
+                                        value={segmentSize}
+                                        capacity={segmentCapacity}
+                                        formatValues={formatValues}
+                                        colorizeProgress
+                                    />
+                                ) : (
+                                    formatValues(segmentSize)[0]
+                                )}
                             </DefinitionList.Item>
-                        ))}
+                        ),
+                    )}
                 </DefinitionList>
             }
         >
-            <div className={b({size, theme, status}, className)}>
+            <div className={b({theme, status}, className)}>
                 <div className={b('progress-container')}>
-                    {memorySegments.map((segment) => {
-                        const position = currentPosition;
-                        currentPosition += calculateMemoryPercentage(segment.value);
+                    {memorySegments
+                        .filter(({isInfo}) => !isInfo)
+                        .map((segment) => {
+                            const position = currentPosition;
+                            currentPosition += calculateMemoryShare(segment.value);
 
-                        return (
-                            <div
-                                key={segment.key}
-                                className={b('segment', {type: segment.key})}
-                                style={{
-                                    width: `${calculateMemoryPercentage(segment.value)}%`,
-                                    left: `${position}%`,
-                                }}
-                            />
-                        );
-                    })}
-                    {stats?.SoftLimit ? (
-                        <div
-                            className={b('soft-limit')}
-                            style={{
-                                width: '2px',
-                                left: `${calculateMemoryPercentage(parseFloat(stats?.SoftLimit))}%`,
-                            }}
-                        />
-                    ) : null}
-                    {stats?.HardLimit ? (
-                        <div
-                            className={b('hard-limit')}
-                            style={{
-                                width: '2px',
-                                left: `${calculateMemoryPercentage(parseFloat(stats?.HardLimit))}%`,
-                            }}
-                        />
-                    ) : null}
+                            return (
+                                <div
+                                    key={segment.key}
+                                    className={b('segment', {type: segment.key})}
+                                    style={{
+                                        width: `${calculateMemoryShare(segment.value).toFixed(2)}%`,
+                                        left: `${position}%`,
+                                    }}
+                                />
+                            );
+                        })}
                     <div className={b('text')}>{renderContent()}</div>
                 </div>
             </div>

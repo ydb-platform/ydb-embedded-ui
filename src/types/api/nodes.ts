@@ -39,6 +39,7 @@ export interface TNodesGroup {
 }
 
 export interface TMemoryStats {
+    AnonRss: string;
     ExternalConsumption?: string;
     AllocatorCachesMemory?: string;
 

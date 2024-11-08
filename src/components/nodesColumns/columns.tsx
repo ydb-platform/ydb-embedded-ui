@@ -103,27 +103,6 @@ export function getUptimeColumn<T extends {StartTime?: string; Uptime?: string}>
         width: 110,
     };
 }
-export function getMemoryColumn<
-    T extends {MemoryUsed?: string; MemoryLimit?: string},
->(): Column<T> {
-    return {
-        name: NODES_COLUMNS_IDS.Memory,
-        header: NODES_COLUMNS_TITLES.Memory,
-        sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
-        defaultOrder: DataTable.DESCENDING,
-        render: ({row}) => (
-            <ProgressViewer
-                value={row.MemoryUsed}
-                capacity={row.MemoryLimit}
-                formatValues={formatStorageValuesToGb}
-                colorizeProgress={true}
-            />
-        ),
-        align: DataTable.LEFT,
-        width: 170,
-        resizeMinWidth: 170,
-    };
-}
 
 export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: string}>(): Column<T> {
     return {
@@ -194,7 +173,7 @@ export function getSharedCacheUsageColumn<
         resizeMinWidth: 170,
     };
 }
-export function getMemoryDetailedColumn<
+export function getMemoryColumn<
     T extends {MemoryStats?: TMemoryStats; MemoryUsed?: string; MemoryLimit?: string},
 >(): Column<T> {
     return {
@@ -202,24 +181,19 @@ export function getMemoryDetailedColumn<
         header: NODES_COLUMNS_TITLES.Memory,
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
-            const totalCapacity = parseFloat(String(row.MemoryStats?.HardLimit));
-            return (
+            return row.MemoryStats ? (
                 <MemoryViewer
                     capacity={row.MemoryLimit}
-                    value={7200451001 + 500073896 + 900073896 + 9802002400}
+                    value={row.MemoryStats.AnonRss}
                     formatValues={formatStorageValuesToGb}
-                    totalCapacity={totalCapacity}
-                    stats={{
-                        AllocatorCachesMemory: '376178864',
-                        HardLimit: '47687091200',
-                        SoftLimit: '40265318400',
-                        SharedCacheConsumption: '7200451001',
-                        SharedCacheLimit: '24888908800',
-                        MemTableConsumption: '900073896',
-                        MemTableLimit: '1480303616',
-                        QueryExecutionConsumption: '9802002400',
-                        QueryExecutionLimit: '10737418240',
-                    }}
+                    stats={row.MemoryStats}
+                />
+            ) : (
+                <ProgressViewer
+                    value={row.MemoryUsed}
+                    capacity={row.MemoryLimit}
+                    formatValues={formatStorageValuesToGb}
+                    colorizeProgress={true}
                 />
             );
         },

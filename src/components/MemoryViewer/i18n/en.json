@@ -5,5 +5,7 @@
   "text_shared-cache": "Shared Cache",
   "text_memtable": "MemTable",
   "text_query-execution": "Query Execution",
+  "text_soft-limit": "Soft Limit",
+  "text_hard-limit": "Hard Limit",
   "memory-detailed": "Memory Detailed"
 }
