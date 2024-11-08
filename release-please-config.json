@@ -5,6 +5,9 @@
   "include-component-in-tag": false,
   "pull-request-title-pattern": "chore(${branch}): release ${version}",
   "packages": {
-    ".": {}
+    ".": {
+      "release-as": "6.31.0-hotfix.1",
+      "prerelease": true
+    }
   }
 }
