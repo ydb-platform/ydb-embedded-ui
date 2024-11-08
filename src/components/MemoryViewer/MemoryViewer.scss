@@ -32,24 +32,20 @@
         height: 20px;
         margin-right: 4px;
 
-        &_type_ExternalConsumption {
-            background-color: var(--g-color-base-info-medium);
-        }
-
         &_type_AllocatorCachesMemory {
-            background-color: var(--g-color-base-warning-medium);
+            background-color: var(--g-color-base-utility-medium-hover);
         }
 
         &_type_SharedCacheConsumption {
-            background-color: var(--g-color-base-utility-medium);
+            background-color: var(--g-color-base-info-medium-hover);
         }
 
         &_type_MemTableConsumption {
-            background-color: var(--g-color-base-danger-medium);
+            background-color: var(--g-color-base-warning-medium-hover);
         }
 
         &_type_QueryExecutionConsumption {
-            background-color: var(--g-color-base-misc-medium);
+            background-color: var(--g-color-base-positive-medium-hover);
         }
     }
 
@@ -57,25 +53,20 @@
         position: absolute;
 
         height: 100%;
-
-        &_type_ExternalConsumption {
-            background-color: var(--g-color-base-info-medium);
-        }
-
         &_type_AllocatorCachesMemory {
-            background-color: var(--g-color-base-warning-medium);
+            background-color: var(--g-color-base-utility-medium-hover);
         }
 
         &_type_SharedCacheConsumption {
-            background-color: var(--g-color-base-utility-medium);
+            background-color: var(--g-color-base-info-medium-hover);
         }
 
         &_type_MemTableConsumption {
-            background-color: var(--g-color-base-danger-medium);
+            background-color: var(--g-color-base-warning-medium-hover);
         }
 
         &_type_QueryExecutionConsumption {
-            background-color: var(--g-color-base-misc-medium);
+            background-color: var(--g-color-base-positive-medium-hover);
         }
     }
 

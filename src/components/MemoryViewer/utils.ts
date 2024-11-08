@@ -18,27 +18,10 @@ interface MemorySegment {
 export function getMemorySegments(stats: TMemoryStats): MemorySegment[] {
     const segments = [
         {
-            label: i18n('text_external-consumption'),
-            key: 'ExternalConsumption',
-            value: getMaybeNumber(stats.ExternalConsumption),
-            isInfo: true,
-        },
-        {
-            label: i18n('text_allocator-caches'),
-            key: 'AllocatorCachesMemory',
-            value: getMaybeNumber(stats.AllocatorCachesMemory),
-        },
-        {
             label: i18n('text_shared-cache'),
             key: 'SharedCacheConsumption',
             value: getMaybeNumber(stats.SharedCacheConsumption),
             capacity: getMaybeNumber(stats.SharedCacheLimit),
-        },
-        {
-            label: i18n('text_memtable'),
-            key: 'MemTableConsumption',
-            value: getMaybeNumber(stats.MemTableConsumption),
-            capacity: getMaybeNumber(stats.MemTableLimit),
         },
         {
             label: i18n('text_query-execution'),
@@ -47,14 +30,33 @@ export function getMemorySegments(stats: TMemoryStats): MemorySegment[] {
             capacity: getMaybeNumber(stats.QueryExecutionLimit),
         },
         {
+            label: i18n('text_memtable'),
+            key: 'MemTableConsumption',
+            value: getMaybeNumber(stats.MemTableConsumption),
+            capacity: getMaybeNumber(stats.MemTableLimit),
+        },
+        {
+            label: i18n('text_allocator-caches'),
+            key: 'AllocatorCachesMemory',
+            value: getMaybeNumber(stats.AllocatorCachesMemory),
+        },
+        {
+            label: i18n('text_external-consumption'),
+            key: 'ExternalConsumption',
+            value: getMaybeNumber(stats.ExternalConsumption),
+            isInfo: true,
+        },
+        {
             label: i18n('text_soft-limit'),
             key: 'SoftLimit',
             value: getMaybeNumber(stats.SoftLimit),
+            isInfo: true,
         },
         {
             label: i18n('text_hard-limit'),
             key: 'HardLimit',
             value: getMaybeNumber(stats.HardLimit),
+            isInfo: true,
         },
     ];
 
