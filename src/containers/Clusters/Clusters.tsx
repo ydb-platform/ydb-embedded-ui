@@ -178,7 +178,7 @@ export function Clusters() {
                         sortable={false}
                     />
                 </div>
-                <AutoRefreshControl />
+                <AutoRefreshControl className={b('autorefresh')} />
             </div>
             {query.isError ? <ResponseError error={query.error} className={b('error')} /> : null}
             {query.isLoading ? <Loader size="l" /> : null}

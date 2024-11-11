@@ -1,6 +1,6 @@
 {
   "name": "ydb-embedded-ui",
-  "version": "6.31.0",
+  "version": "6.33.0",
   "files": [
     "dist"
   ],
@@ -23,7 +23,7 @@
     "@gravity-ui/react-data-table": "^2.1.1",
     "@gravity-ui/table": "^0.5.0",
     "@gravity-ui/uikit": "^6.33.0",
-    "@gravity-ui/websql-autocomplete": "^9.1.0",
+    "@gravity-ui/websql-autocomplete": "^12.1.2",
     "@hookform/resolvers": "^3.9.0",
     "@reduxjs/toolkit": "^2.2.3",
     "@tanstack/react-table": "^8.19.3",

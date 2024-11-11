@@ -29,8 +29,6 @@ const ALL_NODES_GROUP_BY_PARAMS = [
     'Database',
     'Version',
     'Uptime',
-    'Missing',
-    'DiskSpaceUsage',
 ] as const satisfies NodesGroupByField[];
 
 function getAvailableNodesGroupByParams(withSystemStateGroupBy?: boolean) {
