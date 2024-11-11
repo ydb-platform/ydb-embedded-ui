@@ -1,5 +1,18 @@
 # Changelog
 
+## [6.33.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.32.0...v6.33.0) (2024-11-11)
+
+
+### Features
+
+* **autocomplete:** suggest all columns in a row ([#1599](https://github.com/ydb-platform/ydb-embedded-ui/issues/1599)) ([b4d2b7f](https://github.com/ydb-platform/ydb-embedded-ui/commit/b4d2b7f45c35b7eaadf93faf602cca16776093eb))
+
+
+### Bug Fixes
+
+* **Clusters:** controls and aggregations layout ([#1588](https://github.com/ydb-platform/ydb-embedded-ui/issues/1588)) ([ee61273](https://github.com/ydb-platform/ydb-embedded-ui/commit/ee61273c3b67a383a9c0ad8f7b783716cf53f750))
+* **Nodes:** remove redundant group by params ([#1598](https://github.com/ydb-platform/ydb-embedded-ui/issues/1598)) ([d3c5714](https://github.com/ydb-platform/ydb-embedded-ui/commit/d3c571446d5b37dc83e359254d7872c01eca3c31))
+
 ## [6.32.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.31.0...v6.32.0) (2024-11-08)
 
 
