@@ -7,7 +7,9 @@
 
     @include mixins.body-2-typography();
     @include mixins.flex-container();
-
+    &__autorefresh {
+        margin-left: auto;
+    }
     &__cluster {
         display: flex;
         align-items: center;
@@ -87,6 +89,7 @@
 
     &__aggregation,
     &__controls {
+        margin-right: 15px;
         margin-left: 15px;
     }
 
@@ -108,7 +111,7 @@
         display: flex;
         align-items: center;
 
-        max-width: 200px;
+        max-width: 230px;
 
         font-size: var(--g-text-subheader-3-font-size);
         line-height: var(--g-text-subheader-3-line-height);
