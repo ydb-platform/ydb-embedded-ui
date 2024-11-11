@@ -1,5 +1,16 @@
 @import '../../styles/mixins.scss';
 
+$memory-type-colors: (
+    'AllocatorCachesMemory': var(--g-color-base-utility-medium-hover),
+    'SharedCacheConsumption': var(--g-color-base-info-medium-hover),
+    'MemTableConsumption': var(--g-color-base-warning-medium-hover),
+    'QueryExecutionConsumption': var(--g-color-base-positive-medium-hover),
+);
+
+@mixin memory-type-color($type) {
+    background-color: map-get($memory-type-colors, $type);
+}
+
 .memory-viewer {
     $block: &;
 
@@ -7,94 +18,48 @@
     z-index: 0;
 
     min-width: 150px;
-    padding: 0 4px;
+    padding: 0 var(--g-spacing-1);
 
     &__progress-container {
         position: relative;
-
         overflow: hidden;
-
         height: 23px;
-
         border-radius: 2px;
         background: var(--g-color-base-generic);
     }
 
     &__container {
         display: flex;
-        align-items: end;
-
-        text-align: end;
+        padding: 2px 0;
     }
 
     &__legend {
+        position: absolute;
         width: 20px;
         height: 20px;
-        margin-right: 4px;
+        border-radius: 2px;
+        bottom: 2px;
 
-        &_type_AllocatorCachesMemory {
-            background-color: var(--g-color-base-utility-medium-hover);
-        }
-
-        &_type_SharedCacheConsumption {
-            background-color: var(--g-color-base-info-medium-hover);
-        }
-
-        &_type_MemTableConsumption {
-            background-color: var(--g-color-base-warning-medium-hover);
-        }
-
-        &_type_QueryExecutionConsumption {
-            background-color: var(--g-color-base-positive-medium-hover);
+        @each $type, $color in $memory-type-colors {
+            &_type_#{$type} {
+                @include memory-type-color($type);
+            }
         }
     }
 
     &__segment {
         position: absolute;
-
         height: 100%;
-        &_type_AllocatorCachesMemory {
-            background-color: var(--g-color-base-utility-medium-hover);
-        }
 
-        &_type_SharedCacheConsumption {
-            background-color: var(--g-color-base-info-medium-hover);
-        }
-
-        &_type_MemTableConsumption {
-            background-color: var(--g-color-base-warning-medium-hover);
-        }
-
-        &_type_QueryExecutionConsumption {
-            background-color: var(--g-color-base-positive-medium-hover);
+        @each $type, $color in $memory-type-colors {
+            &_type_#{$type} {
+                @include memory-type-color($type);
+            }
         }
     }
 
-    &__legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-
-        margin-top: 8px;
-
-        color: var(--g-color-text-complementary);
-    }
-
-    &__legend-item {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-
-        white-space: nowrap;
-    }
-
-    &__legend-color {
-        flex-shrink: 0;
-
-        width: 12px;
-        height: 12px;
-
-        border-radius: 2px;
+    &__name {
+        padding-left: 28px;
     }
 
     &_theme_dark {

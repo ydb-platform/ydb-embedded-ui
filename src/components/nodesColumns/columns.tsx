@@ -198,7 +198,7 @@ export function getMemoryColumn<
             );
         },
         align: DataTable.LEFT,
-        width: 500,
+        width: 300,
         resizeMinWidth: 170,
     };
 }

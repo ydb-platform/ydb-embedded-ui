@@ -22,6 +22,7 @@ export function formatValues<T>(
     size?: T,
     delimiter?: string,
     withValueLabel = false,
+    precision?: number,
 ) {
     let calculatedSize = sizeGetter(Number(value), 0);
     let valueWithSizeLabel = true;
@@ -37,7 +38,7 @@ export function formatValues<T>(
         value,
         withSizeLabel: valueWithSizeLabel,
         size: size || calculatedSize,
-        precision: valuePrecision,
+        precision: precision ?? valuePrecision,
         delimiter,
     });
     const formattedTotal = formatter({
