@@ -82,7 +82,7 @@ export function EntityStatus({
         return name && <span className={b('name')}>{name}</span>;
     };
     return (
-        <div className={b(null, className)} title={name}>
+        <div className={b(null, className)}>
             {iconPath ? renderStatusLink(iconPath) : renderIcon()}
             {label && (
                 <span title={label} className={b('label', {size, state: status.toLowerCase()})}>
@@ -91,7 +91,7 @@ export function EntityStatus({
             )}
             {(path || name) && (
                 <div className={b('wrapper', {'with-button': hasClipboardButton})}>
-                    <span className={b('link', {'with-left-trim': withLeftTrim})}>
+                    <span className={b('link', {'with-left-trim': withLeftTrim})} title={name}>
                         {renderLink()}
                     </span>
                     {hasClipboardButton && (
