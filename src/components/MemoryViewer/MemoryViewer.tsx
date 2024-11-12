@@ -30,7 +30,7 @@ export interface MemoryProgressViewerProps {
     dangerThreshold?: number;
 }
 
-const MEMORY_PRECISION = 2;
+const MEMORY_PRECISION = 1;
 
 export function MemoryViewer({
     stats,
