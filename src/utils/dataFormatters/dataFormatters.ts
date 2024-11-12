@@ -61,7 +61,6 @@ export function formatStorageValues(
     size?: BytesSizes,
     delimiter?: string,
     withValueLabel?: boolean,
-    precision?: number,
 ) {
     return formatValues<BytesSizes>(
         formatBytesCustom,
@@ -71,7 +70,6 @@ export function formatStorageValues(
         size,
         delimiter,
         withValueLabel,
-        precision,
     );
 }
 
@@ -93,12 +91,12 @@ export function formatNumericValues(
     );
 }
 
-export const formatStorageValuesToGb = (value?: number, total?: number, precision?: number) => {
-    return formatStorageValues(value, total, 'gb', undefined, undefined, precision);
+export const formatStorageValuesToGb = (value?: number, total?: number) => {
+    return formatStorageValues(value, total, 'gb');
 };
 
-export const formatStorageValuesToTb = (value?: number, total?: number, precision?: number) => {
-    return formatStorageValues(value, total, 'tb', undefined, undefined, precision);
+export const formatStorageValuesToTb = (value?: number, total?: number) => {
+    return formatStorageValues(value, total, 'tb');
 };
 
 export const formatNumber = (number?: unknown) => {
