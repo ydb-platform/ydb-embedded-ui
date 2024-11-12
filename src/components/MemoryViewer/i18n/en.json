@@ -7,5 +7,6 @@
   "text_query-execution": "Query Execution",
   "text_soft-limit": "Soft Limit",
   "text_hard-limit": "Hard Limit",
+  "text_other": "Other",
   "memory-detailed": "Memory Detailed"
 }

@@ -22,24 +22,49 @@ export function getMemorySegments(stats: TMemoryStats): MemorySegment[] {
             key: 'SharedCacheConsumption',
             value: getMaybeNumber(stats.SharedCacheConsumption),
             capacity: getMaybeNumber(stats.SharedCacheLimit),
+            isInfo: false,
         },
         {
             label: i18n('text_query-execution'),
             key: 'QueryExecutionConsumption',
             value: getMaybeNumber(stats.QueryExecutionConsumption),
             capacity: getMaybeNumber(stats.QueryExecutionLimit),
+            isInfo: false,
         },
         {
             label: i18n('text_memtable'),
             key: 'MemTableConsumption',
             value: getMaybeNumber(stats.MemTableConsumption),
             capacity: getMaybeNumber(stats.MemTableLimit),
+            isInfo: false,
         },
         {
             label: i18n('text_allocator-caches'),
             key: 'AllocatorCachesMemory',
             value: getMaybeNumber(stats.AllocatorCachesMemory),
+            isInfo: false,
         },
+    ];
+
+    const nonInfoSegments = segments.filter(
+        (segment) => segment.value !== undefined,
+    ) as MemorySegment[];
+    const sumNonInfoSegments = nonInfoSegments.reduce((acc, segment) => acc + segment.value, 0);
+
+    const totalMemory = getMaybeNumber(stats.AnonRss);
+
+    if (totalMemory) {
+        const otherMemory = Math.max(0, totalMemory - sumNonInfoSegments);
+
+        segments.push({
+            label: i18n('text_other'),
+            key: 'Other',
+            value: otherMemory,
+            isInfo: false,
+        });
+    }
+
+    segments.push(
         {
             label: i18n('text_external-consumption'),
             key: 'ExternalConsumption',
@@ -58,7 +83,7 @@ export function getMemorySegments(stats: TMemoryStats): MemorySegment[] {
             value: getMaybeNumber(stats.HardLimit),
             isInfo: true,
         },
-    ];
+    );
 
     return segments.filter((segment) => segment.value !== undefined) as MemorySegment[];
 }
