@@ -16,6 +16,7 @@ const b = cn('memory-viewer');
 type FormatProgressViewerValues = (
     value?: number,
     capacity?: number,
+    precision?: number,
 ) => (string | number | undefined)[];
 
 export interface MemoryProgressViewerProps {
@@ -28,6 +29,8 @@ export interface MemoryProgressViewerProps {
     percents?: boolean;
     dangerThreshold?: number;
 }
+
+const MEMORY_PRECISION = 1;
 
 export function MemoryViewer({
     stats,
@@ -51,7 +54,7 @@ export function MemoryViewer({
         capacityText = '';
         divider = '';
     } else if (formatValues) {
-        [valueText, capacityText] = formatValues(Number(value), Number(capacity));
+        [valueText, capacityText] = formatValues(Number(value), Number(capacity), MEMORY_PRECISION);
     }
 
     const renderContent = () => {
@@ -105,11 +108,13 @@ export function MemoryViewer({
                                     <ProgressViewer
                                         value={segmentSize}
                                         capacity={segmentCapacity}
-                                        formatValues={formatValues}
+                                        formatValues={(val, size) =>
+                                            formatValues(val, size, MEMORY_PRECISION)
+                                        }
                                         colorizeProgress
                                     />
                                 ) : (
-                                    formatValues(segmentSize, undefined)[0]
+                                    formatValues(segmentSize, undefined, MEMORY_PRECISION)[0]
                                 )}
                             </DefinitionList.Item>
                         ),
