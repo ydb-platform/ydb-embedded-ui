@@ -580,12 +580,18 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     planToSvg({database, plan}: PlanToSvgQueryParams, {signal}: {signal?: AbortSignal} = {}) {
-        return this.post<{test: string}>(
+        return this.post<string>(
             this.getPath('/viewer/plan2svg'),
             plan,
             {database},
             {
-                requestConfig: {signal},
+                requestConfig: {
+                    signal,
+                    responseType: 'text',
+                    headers: {
+                        Accept: 'image/svg+xml',
+                    },
+                },
             },
         );
     }

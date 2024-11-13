@@ -1,5 +1,4 @@
 import type {QueryPlan, ScriptPlan} from '../../types/api/query';
-import type {IQueryResult} from '../../types/store/query';
 
 import {api} from './api';
 
@@ -10,7 +9,8 @@ export interface PlanToSvgQueryParams {
 
 export const planToSvgQueryApi = api.injectEndpoints({
     endpoints: (build) => ({
-        planToSvgQuery: build.mutation<IQueryResult, PlanToSvgQueryParams>({
+        planToSvgQuery: build.mutation<string, PlanToSvgQueryParams>({
+            // Changed return type to string
             queryFn: async ({plan, database}, {signal}) => {
                 try {
                     const response = await window.api.planToSvg(
@@ -20,8 +20,6 @@ export const planToSvgQueryApi = api.injectEndpoints({
                         },
                         {signal},
                     );
-
-                    console.log(response);
 
                     return {data: response};
                 } catch (error) {
