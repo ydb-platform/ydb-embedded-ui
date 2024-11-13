@@ -3,9 +3,9 @@ import React from 'react';
 import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
 import {Button, Tooltip} from '@gravity-ui/uikit';
 
-import {planToSvgQueryApi} from '../../../../store/reducers/planToSvgQuery';
 import type {QueryPlan, ScriptPlan} from '../../../../types/api/query';
 
+import {usePlanToSvg} from './hooks';
 import i18n from './i18n';
 
 function getButtonView(error: string | null, isLoading: boolean) {
@@ -21,34 +21,7 @@ interface PlanToSvgButtonProps {
 }
 
 export function PlanToSvgButton({plan, database}: PlanToSvgButtonProps) {
-    const [error, setError] = React.useState<string | null>(null);
-    const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
-    const [checkPlanToSvg, {isLoading, isUninitialized}] =
-        planToSvgQueryApi.usePlanToSvgQueryMutation();
-
-    React.useEffect(() => {
-        if (!plan) {
-            return undefined;
-        }
-
-        checkPlanToSvg({plan, database})
-            .unwrap()
-            .then((result) => {
-                const blob = new Blob([result], {type: 'image/svg+xml'});
-                const url = URL.createObjectURL(blob);
-                setBlobUrl(url);
-                setError(null);
-            })
-            .catch((err) => {
-                setError(JSON.stringify(err));
-            });
-
-        return () => {
-            if (blobUrl) {
-                URL.revokeObjectURL(blobUrl);
-            }
-        };
-    }, [checkPlanToSvg, database, plan, blobUrl]);
+    const {error, blobUrl, isLoading, isUninitialized} = usePlanToSvg(database, plan);
 
     const handleClick = React.useCallback(() => {
         if (blobUrl) {
