@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Dialog, Link as ExternalLink, Flex, TextInput} from '@gravity-ui/uikit';
+import {Checkbox, Dialog, Link as ExternalLink, Flex, TextInput} from '@gravity-ui/uikit';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
 
@@ -214,6 +214,25 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                     validationState={errors.limitRows ? 'invalid' : undefined}
                                     errorMessage={errors.limitRows?.message}
                                     errorPlacement="inside"
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="showPlanToSvg" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.showPlanToSvg.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="showPlanToSvg"
+                            control={control}
+                            render={({field: {value, onChange, ...field}}) => (
+                                <Checkbox
+                                    id="showPlanToSvg"
+                                    checked={Boolean(value)}
+                                    onUpdate={onChange}
+                                    {...field}
                                 />
                             )}
                         />

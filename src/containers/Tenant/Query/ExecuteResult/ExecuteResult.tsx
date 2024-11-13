@@ -19,7 +19,7 @@ import type {ExecuteQueryResult} from '../../../../types/store/executeQuery';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
-import {useTypedDispatch} from '../../../../utils/hooks';
+import {useQueryExecutionSettings, useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {CancelQueryButton} from '../CancelQueryButton/CancelQueryButton';
@@ -68,6 +68,7 @@ export function ExecuteResult({
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
     const dispatch = useTypedDispatch();
+    const [{showPlanToSvg}] = useQueryExecutionSettings();
 
     const {error, isLoading, queryId, data} = result;
 
@@ -274,7 +275,7 @@ export function ExecuteResult({
                     {data?.traceId ? (
                         <TraceButton traceId={data.traceId} isTraceReady={result.isTraceReady} />
                     ) : null}
-                    {data?.plan ? (
+                    {data?.plan && showPlanToSvg ? (
                         <PlanToSvgButton plan={data?.plan} database={tenantName} />
                     ) : null}
                 </div>
