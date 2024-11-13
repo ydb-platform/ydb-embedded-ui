@@ -1,6 +1,7 @@
 import {DefinitionList, useTheme} from '@gravity-ui/uikit';
 
 import type {TMemoryStats} from '../../types/api/nodes';
+import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {calculateProgressStatus} from '../../utils/progress';
 import {isNumeric} from '../../utils/utils';
@@ -71,14 +72,8 @@ export function MemoryViewer({
 
     const memorySegments = getMemorySegments(stats);
 
-    const totalUsedMemory =
-        memorySegments
-            .filter(({isInfo}) => !isInfo)
-            .reduce((acc, segment) => acc + calculateMemoryShare(segment.value), 0) /
-        parseFloat(String(capacity));
-
     const status = calculateProgressStatus({
-        fillWidth: totalUsedMemory,
+        fillWidth,
         warningThreshold,
         dangerThreshold,
         colorizeProgress: true,
@@ -109,7 +104,12 @@ export function MemoryViewer({
                                         colorizeProgress
                                     />
                                 ) : (
-                                    formatValues(segmentSize, undefined)[0]
+                                    formatBytes({
+                                        value: segmentSize,
+                                        size: 'gb',
+                                        withSizeLabel: true,
+                                        precision: 2,
+                                    })
                                 )}
                             </DefinitionList.Item>
                         ),

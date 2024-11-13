@@ -26,7 +26,7 @@ $memory-type-colors: (
 
         overflow: hidden;
 
-        height: 23px;
+        height: 20px;
 
         border-radius: 2px;
         background: var(--g-color-base-generic);
@@ -93,15 +93,6 @@ $memory-type-colors: (
             #{$block}__progress-container {
                 background-color: var(--g-color-base-danger-light);
             }
-        }
-    }
-
-    &_size {
-        height: 20px;
-        @include body-2-typography();
-
-        #{$block}__progress-container {
-            height: inherit;
         }
     }
 

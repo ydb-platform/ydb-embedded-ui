@@ -72,6 +72,12 @@ export function getMemorySegments(stats: TMemoryStats): MemorySegment[] {
             isInfo: true,
         },
         {
+            label: i18n('text_usage'),
+            key: 'Usage',
+            value: getMaybeNumber(stats.AnonRss),
+            isInfo: true,
+        },
+        {
             label: i18n('text_soft-limit'),
             key: 'SoftLimit',
             value: getMaybeNumber(stats.SoftLimit),
