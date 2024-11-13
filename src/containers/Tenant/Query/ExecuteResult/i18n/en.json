@@ -7,5 +7,6 @@
   "action.copy": "Copy {{activeSection}}",
   "trace": "Trace",
   "title.truncated": "Truncated",
-  "title.result": "Result"
+  "title.result": "Result",
+  "text_plan-svg": "Plan SVG"
 }

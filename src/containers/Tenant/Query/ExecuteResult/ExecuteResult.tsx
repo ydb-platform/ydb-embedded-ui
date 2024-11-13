@@ -30,6 +30,7 @@ import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {getPreparedResult} from '../utils/getPreparedResult';
 import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
+import {PlanToSvgButton} from './PlanToSvgButton';
 import {TraceButton} from './TraceButton';
 import i18n from './i18n';
 import {getPlan} from './utils';
@@ -272,6 +273,9 @@ export function ExecuteResult({
                     ) : null}
                     {data?.traceId ? (
                         <TraceButton traceId={data.traceId} isTraceReady={result.isTraceReady} />
+                    ) : null}
+                    {data?.plan ? (
+                        <PlanToSvgButton plan={data?.plan} database={tenantName} />
                     ) : null}
                 </div>
                 <div className={b('controls-left')}>
