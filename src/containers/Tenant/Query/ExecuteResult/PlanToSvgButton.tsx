@@ -21,46 +21,54 @@ interface PlanToSvgButtonProps {
 }
 
 export function PlanToSvgButton({plan, database}: PlanToSvgButtonProps) {
-    const [svgData, setSvgData] = React.useState<string | null>(null);
     const [error, setError] = React.useState<string | null>(null);
+    const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
     const [checkPlanToSvg, {isLoading, isUninitialized}] =
         planToSvgQueryApi.usePlanToSvgQueryMutation();
 
     React.useEffect(() => {
         if (!plan) {
-            return;
+            return undefined;
         }
 
         checkPlanToSvg({plan, database})
             .unwrap()
             .then((result) => {
-                setSvgData(result);
+                const blob = new Blob([result], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                setBlobUrl(url);
                 setError(null);
             })
             .catch((err) => {
                 setError(JSON.stringify(err));
             });
-    }, [checkPlanToSvg, database, plan]);
+
+        return () => {
+            if (blobUrl) {
+                URL.revokeObjectURL(blobUrl);
+            }
+        };
+    }, [checkPlanToSvg, database, plan, blobUrl]);
 
     const handleClick = React.useCallback(() => {
-        if (svgData) {
-            const blob = new Blob([svgData], {type: 'image/svg+xml'});
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
+        if (blobUrl) {
+            window.open(blobUrl, '_blank');
         }
-    }, [svgData]);
+    }, [blobUrl]);
 
     if (isUninitialized) {
         return null;
     }
 
     return (
-        <Tooltip content={i18n('text_error-plan-svg', {error}) || i18n('text_plan-svg')}>
+        <Tooltip
+            content={error ? i18n('text_error-plan-svg', {error}) : i18n('text_open-plan-svg')}
+        >
             <Button
                 view={getButtonView(error, isLoading)}
                 loading={isLoading}
                 onClick={handleClick}
-                disabled={isLoading || !svgData}
+                disabled={isLoading || !blobUrl}
             >
                 {i18n('text_plan-svg')}
                 <Button.Icon>

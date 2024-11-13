@@ -9,6 +9,6 @@
   "title.truncated": "Truncated",
   "title.result": "Result",
   "text_plan-svg": "Plan SVG",
-  "text_open-plan-svg": "Open query plan in new window",
+  "text_open-plan-svg": "Open execution plan in new window",
   "text_error-plan-svg": "Error: {{error}}"
 }
