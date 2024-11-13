@@ -14,14 +14,18 @@ import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
-import {getSpaceUsageSeverity, isSortableStorageProperty} from '../../../../utils/storage';
+import {getSpaceUsageSeverity} from '../../../../utils/storage';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
 import {getDegradedSeverity, isVdiskActive} from '../../utils';
 import i18n from '../i18n';
 
-import {STORAGE_GROUPS_COLUMNS_IDS, STORAGE_GROUPS_COLUMNS_TITLES} from './constants';
+import {
+    STORAGE_GROUPS_COLUMNS_IDS,
+    STORAGE_GROUPS_COLUMNS_TITLES,
+    isSortableStorageGroupsColumn,
+} from './constants';
 import type {GetStorageColumnsData, StorageColumnsGetter, StorageGroupsColumn} from './types';
 
 import './StorageGroupsColumns.scss';
@@ -297,6 +301,6 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
 
     return columns.map((column) => ({
         ...column,
-        sortable: isSortableStorageProperty(column.name),
+        sortable: isSortableStorageGroupsColumn(column.name),
     }));
 };

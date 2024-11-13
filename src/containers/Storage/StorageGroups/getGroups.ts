@@ -7,10 +7,9 @@ import type {
     PreparedStorageGroupFilters,
 } from '../../../store/reducers/storage/types';
 import {prepareSortValue} from '../../../utils/filters';
-import {isSortableStorageProperty} from '../../../utils/storage';
 import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
 
-import {GROUPS_COLUMNS_TO_DATA_FIELDS} from './columns/constants';
+import {GROUPS_COLUMNS_TO_DATA_FIELDS, getStorageGroupsColumnSortField} from './columns/constants';
 
 type GetStorageGroups = FetchData<PreparedStorageGroup, PreparedStorageGroupFilters>;
 
@@ -30,9 +29,8 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
                 filterGroupBy,
             } = filters ?? {};
 
-            const sort = isSortableStorageProperty(columnId)
-                ? prepareSortValue(columnId, sortOrder)
-                : undefined;
+            const sortField = getStorageGroupsColumnSortField(columnId);
+            const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
 
             const dataFieldsRequired = getRequiredDataFields(
                 columnsIds,

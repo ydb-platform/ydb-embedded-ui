@@ -3,7 +3,7 @@ import {z} from 'zod';
 import {ProblemFilterValues} from '../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../store/reducers/settings/types';
 import {EFlag} from '../types/api/enums';
-import type {NodesSortValue, TSystemStateInfo} from '../types/api/nodes';
+import type {TSystemStateInfo} from '../types/api/nodes';
 import type {TNodeInfo} from '../types/api/nodesList';
 import type {NodeHostsMap} from '../types/store/nodesList';
 
@@ -100,43 +100,3 @@ export const getProblemParamValue = (problemFilter: ProblemFilterValue | undefin
 export const getUptimeParamValue = (nodesUptimeFilter: NodesUptimeFilterValues | undefined) => {
     return nodesUptimeFilter === NodesUptimeFilterValues.SmallUptime ? HOUR_IN_SECONDS : undefined;
 };
-
-export const NODES_SORT_VALUES: NodesSortValue[] = [
-    'NodeId',
-    'Host',
-    'NodeName',
-    'DC',
-    'Rack',
-    'Version',
-    'Uptime',
-    'CPU',
-    'LoadAverage',
-    'Memory',
-    `Missing`,
-    `DiskSpaceUsage`,
-    `Database`,
-    'Pools',
-    'RAM',
-];
-
-// Maps column names to actual fields on backend for sorting.
-export const NODES_SORT_VALUE_TO_FIELD: Record<NodesSortValue, NodesSortValue> = {
-    NodeId: 'NodeId',
-    Host: 'Host',
-    NodeName: 'NodeName',
-    DC: 'DC',
-    Rack: 'Rack',
-    Version: 'Version',
-    Uptime: 'Uptime',
-    CPU: 'CPU',
-    LoadAverage: 'LoadAverage',
-    Memory: 'Memory',
-    Missing: 'Missing',
-    DiskSpaceUsage: 'DiskSpaceUsage',
-    Database: 'Database',
-    Pools: 'CPU',
-    RAM: 'Memory',
-};
-
-export const isSortableNodesProperty = (value: unknown): value is NodesSortValue =>
-    NODES_SORT_VALUES.includes(value as NodesSortValue);

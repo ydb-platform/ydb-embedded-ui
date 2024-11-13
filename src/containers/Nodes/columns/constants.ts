@@ -1,6 +1,6 @@
 import type {SelectOption} from '@gravity-ui/uikit';
 
-import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
+import {getNodesGroupByFieldTitle} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 
@@ -43,7 +43,7 @@ export function getNodesGroupByOptions(withSystemStateGroupBy?: boolean): Select
     return getAvailableNodesGroupByParams(withSystemStateGroupBy).map((param) => {
         return {
             value: param,
-            content: NODES_COLUMNS_TITLES[param],
+            content: getNodesGroupByFieldTitle(param),
         };
     });
 }

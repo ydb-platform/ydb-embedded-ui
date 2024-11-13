@@ -165,13 +165,17 @@ enum EConfigState {
 
 // ==== Request types ====
 
-type NodesType = 'static' | 'dynamic' | 'any';
+type NodesType =
+    | 'static'
+    | 'dynamic'
+    | 'storage' // v6
+    | 'any';
 
 type NodesWithFilter = 'space' | 'missing' | 'all';
 
+// v6
 export type NodesGroupByField =
     | 'NodeId'
-    | 'SystemState'
     | 'Host'
     | 'NodeName'
     | 'Database'
@@ -180,7 +184,12 @@ export type NodesGroupByField =
     | 'Rack'
     | 'Missing'
     | 'Uptime'
-    | 'Version';
+    | 'Version'
+    | 'SystemState' // v12
+    | 'ConnectStatus' // v13
+    | 'NetworkUtilization' // v13
+    | 'ClockSkew' // v13
+    | 'PingTime'; // v13
 
 export type NodesRequiredField =
     | 'NodeId'
@@ -188,6 +197,7 @@ export type NodesRequiredField =
     | 'PDisks'
     | 'VDisks'
     | 'Tablets'
+    | 'Peers' // v13
     | 'Host'
     | 'NodeName'
     | 'DC'
@@ -195,14 +205,21 @@ export type NodesRequiredField =
     | 'Version'
     | 'Uptime'
     | 'Memory'
-    | 'MemoryDetailed'
+    | 'MemoryDetailed' // v10
     | 'CPU'
     | 'LoadAverage'
     | 'Missing'
     | 'DiskSpaceUsage'
     | 'SubDomainKey'
     | 'DisconnectTime'
-    | 'Database';
+    | 'Database'
+    | `Connections` // v13
+    | `ConnectStatus` // v13
+    | `NetworkUtilization` // v13
+    | `ClockSkew` // v13
+    | `PingTime` // v13
+    | `SendThroughput` // v13
+    | `ReceiveThroughput`; // v13
 
 export type NodesSortValue =
     | 'NodeId'
@@ -215,11 +232,18 @@ export type NodesSortValue =
     | 'CPU'
     | 'LoadAverage'
     | 'Memory'
+    | 'MemoryDetailed' // v10
     | `Missing`
     | `DiskSpaceUsage`
     | `Database`
-    | 'Pools'
-    | 'RAM';
+    | 'SystemState' // v12
+    | `Connections` // v13
+    | `ConnectStatus` // v13
+    | `NetworkUtilization` // v13
+    | `ClockSkew` // v13
+    | `PingTime` // v13
+    | `SendThroughput` // v13
+    | `ReceiveThroughput`; // v13
 
 export type NodesSort = BackendSortParam<NodesSortValue>;
 
