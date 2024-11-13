@@ -10,17 +10,13 @@ interface UsePlanToSvgResult {
     isUninitialized: boolean;
 }
 
-export function usePlanToSvg(database: string, plan?: QueryPlan | ScriptPlan): UsePlanToSvgResult {
+export function usePlanToSvg(database: string, plan: QueryPlan | ScriptPlan): UsePlanToSvgResult {
     const [error, setError] = React.useState<string | null>(null);
     const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
     const [getPlanToSvg, {isLoading, isUninitialized}] =
         planToSvgQueryApi.usePlanToSvgQueryMutation();
 
     React.useEffect(() => {
-        if (!plan) {
-            return undefined;
-        }
-
         let currentUrl: string | null = null;
 
         getPlanToSvg({plan, database})

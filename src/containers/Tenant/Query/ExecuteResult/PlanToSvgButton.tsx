@@ -16,7 +16,7 @@ function getButtonView(error: string | null, isLoading: boolean) {
 }
 
 interface PlanToSvgButtonProps {
-    plan?: QueryPlan | ScriptPlan;
+    plan: QueryPlan | ScriptPlan;
     database: string;
 }
 
