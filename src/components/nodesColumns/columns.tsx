@@ -2,7 +2,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {DefinitionList} from '@gravity-ui/uikit';
 
 import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
-import type {TPoolStats} from '../../types/api/nodes';
+import type {TMemoryStats, TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
@@ -15,6 +15,7 @@ import {getSpaceUsageSeverity} from '../../utils/storage';
 import type {Column} from '../../utils/tableUtils/types';
 import {isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
+import {MemoryViewer} from '../MemoryViewer/MemoryViewer';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
 import type {NodeHostData} from '../NodeHostWrapper/NodeHostWrapper';
 import {PoolsGraph} from '../PoolsGraph/PoolsGraph';
@@ -102,27 +103,6 @@ export function getUptimeColumn<T extends {StartTime?: string; Uptime?: string}>
         width: 110,
     };
 }
-export function getMemoryColumn<
-    T extends {MemoryUsed?: string; MemoryLimit?: string},
->(): Column<T> {
-    return {
-        name: NODES_COLUMNS_IDS.Memory,
-        header: NODES_COLUMNS_TITLES.Memory,
-        sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
-        defaultOrder: DataTable.DESCENDING,
-        render: ({row}) => (
-            <ProgressViewer
-                value={row.MemoryUsed}
-                capacity={row.MemoryLimit}
-                formatValues={formatStorageValuesToGb}
-                colorizeProgress={true}
-            />
-        ),
-        align: DataTable.LEFT,
-        width: 170,
-        resizeMinWidth: 170,
-    };
-}
 
 export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: string}>(): Column<T> {
     return {
@@ -190,6 +170,35 @@ export function getSharedCacheUsageColumn<
         ),
         align: DataTable.LEFT,
         width: 170,
+        resizeMinWidth: 170,
+    };
+}
+export function getMemoryColumn<
+    T extends {MemoryStats?: TMemoryStats; MemoryUsed?: string; MemoryLimit?: string},
+>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.Memory,
+        header: NODES_COLUMNS_TITLES.Memory,
+        defaultOrder: DataTable.DESCENDING,
+        render: ({row}) => {
+            return row.MemoryStats ? (
+                <MemoryViewer
+                    capacity={row.MemoryLimit}
+                    value={row.MemoryStats.AnonRss}
+                    formatValues={formatStorageValuesToGb}
+                    stats={row.MemoryStats}
+                />
+            ) : (
+                <ProgressViewer
+                    value={row.MemoryUsed}
+                    capacity={row.MemoryLimit}
+                    formatValues={formatStorageValuesToGb}
+                    colorizeProgress={true}
+                />
+            );
+        },
+        align: DataTable.LEFT,
+        width: 300,
         resizeMinWidth: 170,
     };
 }

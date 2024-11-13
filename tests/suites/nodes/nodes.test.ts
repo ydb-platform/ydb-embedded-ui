@@ -130,7 +130,7 @@ test.describe('Test Nodes Paginated Table', async () => {
 
         expect(rowData).toHaveProperty('Host');
         expect(rowData).toHaveProperty('Uptime');
-        expect(rowData).toHaveProperty('Memory');
+        expect(rowData).toHaveProperty('Detailed Memory');
         expect(rowData).toHaveProperty('Pools');
     });
 

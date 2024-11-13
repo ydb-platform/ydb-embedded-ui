@@ -1,0 +1,11 @@
+{
+  "text_external-consumption": "External Consumption",
+  "text_allocator-caches": "Allocator Caches",
+  "text_shared-cache": "Shared Cache",
+  "text_memtable": "MemTable",
+  "text_query-execution": "Query Execution",
+  "text_usage": "Usage",
+  "text_soft-limit": "Soft Limit",
+  "text_hard-limit": "Hard Limit",
+  "text_other": "Other"
+}
