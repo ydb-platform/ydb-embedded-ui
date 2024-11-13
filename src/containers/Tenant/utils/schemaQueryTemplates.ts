@@ -112,7 +112,7 @@ export const createExternalTableTemplate = (params?: SchemaQueryParams) => {
 };
 
 export const createTopicTemplate = (params?: SchemaQueryParams) => {
-    return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_topic
+    return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-topic
 CREATE TOPIC \`${params?.relativePath || '$path'}/my_topic\` (
     CONSUMER consumer1,
     CONSUMER consumer2 WITH (read_from = Datetime('1970-01-01T00:00:00Z')) -- Sets up the message write time starting from which the consumer will receive data.
