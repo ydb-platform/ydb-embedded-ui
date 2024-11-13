@@ -6,7 +6,7 @@ import {changeUserInput} from '../../../store/reducers/executeQuery';
 import type {GetTableSchemaDataParams} from '../../../store/reducers/tableSchemaData';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import type {QueryMode, QuerySettings} from '../../../types/store/query';
+import type {QuerySettings} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
 import {transformPath} from '../ObjectSummary/transformPath';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
@@ -57,18 +57,9 @@ const bindActions = (
     dispatch: AppDispatch,
     additionalEffects: ActionsAdditionalEffects,
 ) => {
-    const {
-        setActivePath,
-        updateQueryExecutionSettings,
-        showCreateDirectoryDialog,
-        getTableSchemaDataPromise,
-    } = additionalEffects;
+    const {setActivePath, showCreateDirectoryDialog, getTableSchemaDataPromise} = additionalEffects;
 
-    const inputQuery = (tmpl: TemplateFn, mode?: QueryMode) => () => {
-        if (mode) {
-            updateQueryExecutionSettings({queryMode: mode});
-        }
-
+    const inputQuery = (tmpl: TemplateFn) => () => {
         const pathType = nodeTableTypeToPathType[params.type];
         const withTableData = [selectQueryTemplate, upsertQueryTemplate].includes(tmpl);
 
@@ -96,26 +87,26 @@ const bindActions = (
                   showCreateDirectoryDialog(params.path);
               }
             : undefined,
-        createTable: inputQuery(createTableTemplate, 'script'),
-        createColumnTable: inputQuery(createColumnTableTemplate, 'script'),
-        createAsyncReplication: inputQuery(createAsyncReplicationTemplate, 'script'),
-        alterAsyncReplication: inputQuery(alterAsyncReplicationTemplate, 'script'),
-        dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate, 'script'),
-        alterTable: inputQuery(alterTableTemplate, 'script'),
-        dropTable: inputQuery(dropTableTemplate, 'script'),
+        createTable: inputQuery(createTableTemplate),
+        createColumnTable: inputQuery(createColumnTableTemplate),
+        createAsyncReplication: inputQuery(createAsyncReplicationTemplate),
+        alterAsyncReplication: inputQuery(alterAsyncReplicationTemplate),
+        dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate),
+        alterTable: inputQuery(alterTableTemplate),
+        dropTable: inputQuery(dropTableTemplate),
         selectQuery: inputQuery(selectQueryTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
-        createExternalTable: inputQuery(createExternalTableTemplate, 'script'),
-        dropExternalTable: inputQuery(dropExternalTableTemplate, 'script'),
-        selectQueryFromExternalTable: inputQuery(selectQueryTemplate, 'query'),
-        createTopic: inputQuery(createTopicTemplate, 'script'),
-        alterTopic: inputQuery(alterTopicTemplate, 'script'),
-        dropTopic: inputQuery(dropTopicTemplate, 'script'),
-        createView: inputQuery(createViewTemplate, 'script'),
-        dropView: inputQuery(dropViewTemplate, 'script'),
-        dropIndex: inputQuery(dropTableIndex, 'script'),
-        addTableIndex: inputQuery(addTableIndex, 'script'),
-        createCdcStream: inputQuery(createCdcStreamTemplate, 'script'),
+        createExternalTable: inputQuery(createExternalTableTemplate),
+        dropExternalTable: inputQuery(dropExternalTableTemplate),
+        selectQueryFromExternalTable: inputQuery(selectQueryTemplate),
+        createTopic: inputQuery(createTopicTemplate),
+        alterTopic: inputQuery(alterTopicTemplate),
+        dropTopic: inputQuery(dropTopicTemplate),
+        createView: inputQuery(createViewTemplate),
+        dropView: inputQuery(dropViewTemplate),
+        dropIndex: inputQuery(dropTableIndex),
+        addTableIndex: inputQuery(addTableIndex),
+        createCdcStream: inputQuery(createCdcStreamTemplate),
         copyPath: () => {
             try {
                 copy(params.relativePath);
