@@ -3,21 +3,38 @@ import {DefinitionList, useTheme} from '@gravity-ui/uikit';
 import type {TMemoryStats} from '../../types/api/nodes';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
+import {GIGABYTE} from '../../utils/constants';
 import {calculateProgressStatus} from '../../utils/progress';
 import {isNumeric} from '../../utils/utils';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
+import type {FormatProgressViewerValues} from '../ProgressViewer/ProgressViewer';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 
 import {getMemorySegments} from './utils';
 
 import './MemoryViewer.scss';
 
+const MIN_VISIBLE_MEMORY_SHARE = 1;
+const MIN_VISIBLE_MEMORY_VALUE = 0.01 * GIGABYTE;
+
 const b = cn('memory-viewer');
 
-type FormatProgressViewerValues = (
-    value?: number,
-    capacity?: number,
-) => (string | number | undefined)[];
+const formatDetailedValues: FormatProgressViewerValues = (value, total) => {
+    return [
+        formatBytes({
+            value,
+            size: 'gb',
+            withSizeLabel: false,
+            precision: 2,
+        }),
+        formatBytes({
+            value: total,
+            size: 'gb',
+            withSizeLabel: true,
+            precision: 1,
+        }),
+    ];
+};
 
 export interface MemoryProgressViewerProps {
     stats: TMemoryStats;
@@ -100,7 +117,7 @@ export function MemoryViewer({
                                     <ProgressViewer
                                         value={segmentSize}
                                         capacity={segmentCapacity}
-                                        formatValues={formatValues}
+                                        formatValues={formatDetailedValues}
                                         colorizeProgress
                                     />
                                 ) : (
@@ -122,15 +139,23 @@ export function MemoryViewer({
                     {memorySegments
                         .filter(({isInfo}) => !isInfo)
                         .map((segment) => {
+                            if (segment.value < MIN_VISIBLE_MEMORY_VALUE) {
+                                return null;
+                            }
+
+                            const currentMemoryShare = Math.max(
+                                calculateMemoryShare(segment.value),
+                                MIN_VISIBLE_MEMORY_SHARE,
+                            );
                             const position = currentPosition;
-                            currentPosition += calculateMemoryShare(segment.value);
+                            currentPosition += currentMemoryShare;
 
                             return (
                                 <div
                                     key={segment.key}
                                     className={b('segment', {type: segment.key})}
                                     style={{
-                                        width: `${calculateMemoryShare(segment.value).toFixed(2)}%`,
+                                        width: `${currentMemoryShare}%`,
                                         left: `${position}%`,
                                     }}
                                 />

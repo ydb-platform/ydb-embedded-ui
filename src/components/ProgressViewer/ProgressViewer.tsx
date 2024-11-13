@@ -11,7 +11,7 @@ const b = cn('progress-viewer');
 
 type ProgressViewerSize = 'xs' | 's' | 'ns' | 'm' | 'n' | 'l' | 'head';
 
-type FormatProgressViewerValues = (
+export type FormatProgressViewerValues = (
     value?: number,
     capacity?: number,
 ) => (string | number | undefined)[];
