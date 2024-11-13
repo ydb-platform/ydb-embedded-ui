@@ -19,6 +19,7 @@ import {
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_PAGINATED_TABLES_KEY,
+    USE_SHOW_PLAN_SVG_KEY,
 } from '../utils/constants';
 import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS} from '../utils/query';
 import {parseJson} from '../utils/utils';
@@ -37,6 +38,7 @@ export const DEFAULT_USER_SETTINGS = {
     [ASIDE_HEADER_COMPACT_KEY]: true,
     [PARTITIONS_HIDDEN_COLUMNS_KEY]: [],
     [USE_PAGINATED_TABLES_KEY]: true,
+    [USE_SHOW_PLAN_SVG_KEY]: false,
     [USE_CLUSTER_BALANCER_AS_BACKEND_KEY]: true,
     [ENABLE_AUTOCOMPLETE]: true,
     [AUTOCOMPLETE_ON_ENTER]: true,

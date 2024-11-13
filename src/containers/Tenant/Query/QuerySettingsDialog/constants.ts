@@ -151,7 +151,4 @@ export const QUERY_SETTINGS_FIELD_SETTINGS = {
     limitRows: {
         title: formI18n('form.limit-rows'),
     },
-    showPlanToSvg: {
-        title: formI18n('form.show-plan-to-svg'),
-    },
 } as const;

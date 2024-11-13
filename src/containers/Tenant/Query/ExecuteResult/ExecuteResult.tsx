@@ -18,8 +18,9 @@ import type {ValueOf} from '../../../../types/common';
 import type {ExecuteQueryResult} from '../../../../types/store/executeQuery';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
+import {USE_SHOW_PLAN_SVG_KEY} from '../../../../utils/constants';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
-import {useQueryExecutionSettings, useTypedDispatch} from '../../../../utils/hooks';
+import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {parseQueryError} from '../../../../utils/query';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {CancelQueryButton} from '../CancelQueryButton/CancelQueryButton';
@@ -68,7 +69,7 @@ export function ExecuteResult({
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [activeSection, setActiveSection] = React.useState<SectionID>(resultOptionsIds.result);
     const dispatch = useTypedDispatch();
-    const [{showPlanToSvg}] = useQueryExecutionSettings();
+    const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
 
     const {error, isLoading, queryId, data} = result;
 
@@ -275,7 +276,7 @@ export function ExecuteResult({
                     {data?.traceId ? (
                         <TraceButton traceId={data.traceId} isTraceReady={result.isTraceReady} />
                     ) : null}
-                    {data?.plan && showPlanToSvg ? (
+                    {data?.plan && useShowPlanToSvg ? (
                         <PlanToSvgButton plan={data?.plan} database={tenantName} />
                     ) : null}
                 </div>

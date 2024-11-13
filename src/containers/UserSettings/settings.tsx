@@ -12,6 +12,7 @@ import {
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_PAGINATED_TABLES_KEY,
+    USE_SHOW_PLAN_SVG_KEY,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
 
@@ -96,6 +97,12 @@ export const usePaginatedTables: SettingProps = {
     description: i18n('settings.usePaginatedTables.description'),
 };
 
+export const useShowPlanToSvgTables: SettingProps = {
+    settingKey: USE_SHOW_PLAN_SVG_KEY,
+    title: i18n('settings.useShowPlanToSvg.title'),
+    description: i18n('settings.useShowPlanToSvg.description'),
+};
+
 export const showDomainDatabase: SettingProps = {
     settingKey: SHOW_DOMAIN_DATABASE_KEY,
     title: i18n('settings.showDomainDatabase.title'),
@@ -138,7 +145,7 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [usePaginatedTables],
+    settings: [usePaginatedTables, useShowPlanToSvgTables],
 };
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',

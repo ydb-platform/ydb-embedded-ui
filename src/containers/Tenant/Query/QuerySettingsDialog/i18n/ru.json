@@ -6,7 +6,6 @@
   "form.statistics-mode": "Режим сбора статистики",
   "form.tracing-level": "Tracing level",
   "form.limit-rows": "Лимит строк",
-  "form.show-plan-to-svg": "План в svg",
   "button-done": "Готово",
   "button-cancel": "Отменить",
   "form.timeout.seconds": "сек",

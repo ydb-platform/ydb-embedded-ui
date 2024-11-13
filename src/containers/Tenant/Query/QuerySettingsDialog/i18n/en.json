@@ -6,7 +6,6 @@
   "form.statistics-mode": "Statistics collection mode",
   "form.tracing-level": "Tracing level",
   "form.limit-rows": "Limit rows",
-  "form.show-plan-to-svg": "Plan to svg",
   "button-done": "Save",
   "button-cancel": "Cancel",
   "form.timeout.seconds": "sec",
