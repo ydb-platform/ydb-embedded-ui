@@ -38,7 +38,6 @@ export type QueryResult = ExecuteQueryResult | ExplainQueryResult;
 export interface ExecuteQueryState {
     input: string;
     result?: QueryResult & {isTraceReady?: boolean};
-    changed?: boolean;
     history: {
         // String type for backward compatibility
         queries: QueryInHistory[];

@@ -1,4 +1,4 @@
-import {createSelector, createSlice} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {settingsManager} from '../../services/settings';
@@ -6,19 +6,12 @@ import {TracingLevelNumber} from '../../types/api/query';
 import type {ExecuteActions} from '../../types/api/query';
 import {ResultType} from '../../types/store/executeQuery';
 import type {ExecuteQueryState, QueryInHistory, QueryResult} from '../../types/store/executeQuery';
-import type {
-    QueryRequestParams,
-    QuerySettings,
-    QuerySyntax,
-    SavedQuery,
-} from '../../types/store/query';
-import {QUERIES_HISTORY_KEY, SAVED_QUERIES_KEY} from '../../utils/constants';
+import type {QueryRequestParams, QuerySettings, QuerySyntax} from '../../types/store/query';
+import {QUERIES_HISTORY_KEY} from '../../utils/constants';
 import {QUERY_SYNTAX, isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
-import type {RootState} from '../defaultStore';
 
 import {api} from './api';
-import {getSettingValue} from './settings/settings';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
@@ -31,7 +24,6 @@ const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
 const initialState: ExecuteQueryState = {
     input: '',
-    changed: false,
     history: {
         queries: queriesHistoryInitial
             .slice(sliceLimit < 0 ? 0 : sliceLimit)
@@ -50,11 +42,6 @@ const slice = createSlice({
     reducers: {
         changeUserInput: (state, action: PayloadAction<{input: string}>) => {
             state.input = action.payload.input;
-            state.changed = state.input !== action.payload.input;
-        },
-
-        setQueryChanged: (state, action: PayloadAction<boolean>) => {
-            state.changed = action.payload;
         },
         setQueryTraceReady: (state) => {
             if (state.result) {
@@ -156,7 +143,6 @@ const slice = createSlice({
 export default slice.reducer;
 export const {
     changeUserInput,
-    setQueryChanged,
     setQueryTraceReady,
     setQueryResult,
     saveQueryToHistory,
@@ -174,18 +160,6 @@ export const {
     selectResult,
     selectUserInput,
 } = slice.selectors;
-
-export const selectIsQuerySaved = createSelector(
-    (state: RootState) => state,
-    (state: RootState) => {
-        const savedQueries = (getSettingValue(state, SAVED_QUERIES_KEY) as SavedQuery[]) ?? [];
-        return (
-            savedQueries.some((query) => query.body === state.executeQuery.input) ||
-            state.executeQuery.history.queries[state.executeQuery.history.queries.length - 1]
-                ?.queryText === state.executeQuery.input
-        );
-    },
-);
 
 interface SendQueryParams extends QueryRequestParams {
     queryId: string;

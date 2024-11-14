@@ -6,7 +6,7 @@ import React from 'react';
 import {NavigationTree} from 'ydb-ui-components';
 
 import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/capabilities/hooks';
-import {selectIsQuerySaved} from '../../../../store/reducers/executeQuery';
+import {selectUserInput} from '../../../../store/reducers/executeQuery';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import type {GetTableSchemaDataParams} from '../../../../store/reducers/tableSchemaData';
@@ -39,7 +39,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const createDirectoryFeatureAvailable = useCreateDirectoryFeatureAvailable();
     const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
     const dispatch = useTypedDispatch();
-    const isQuerySaved = useTypedSelector(selectIsQuerySaved);
+    const input = useTypedSelector(selectUserInput);
     const [getTableSchemaDataMutation] = tableSchemaDataApi.useGetTableSchemaDataMutation();
 
     const getTableSchemaDataPromise = React.useCallback(
@@ -151,7 +151,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                             ? handleOpenCreateDirectoryDialog
                             : undefined,
                         getTableSchemaDataPromise,
-                        getConfirmation: isQuerySaved ? undefined : getConfirmation,
+                        getConfirmation: input ? getConfirmation : undefined,
                     },
                     rootPath,
                 )}
