@@ -14,7 +14,7 @@ const initialState: QueryActionsState = {
     savedQueriesFilter: '',
 };
 
-export const slice = createSlice({
+const slice = createSlice({
     name: 'queryActions',
     initialState,
     reducers: {

@@ -1,13 +1,10 @@
 import React from 'react';
 
-import type {Reducer} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
 
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
 import {api} from '../api';
-
-import type {SchemaAction, SchemaState} from './types';
-
-const SET_SHOW_PREVIEW = 'schema/SET_SHOW_PREVIEW';
 
 export const initialState = {
     loading: true,
@@ -16,27 +13,22 @@ export const initialState = {
     showPreview: false,
 };
 
-const schema: Reducer<SchemaState, SchemaAction> = (state = initialState, action) => {
-    switch (action.type) {
-        case SET_SHOW_PREVIEW: {
-            return {
-                ...state,
-                showPreview: action.data,
-            };
-        }
-        default:
-            return state;
-    }
-};
+const slice = createSlice({
+    name: 'schema',
+    initialState,
+    reducers: {
+        setShowPreview: (state, action: PayloadAction<boolean>) => {
+            state.showPreview = action.payload;
+        },
+    },
+    selectors: {
+        selectShowPreview: (state) => state.showPreview,
+    },
+});
 
-export function setShowPreview(value: boolean) {
-    return {
-        type: SET_SHOW_PREVIEW,
-        data: value,
-    } as const;
-}
-
-export default schema;
+export default slice.reducer;
+export const {setShowPreview} = slice.actions;
+export const {selectShowPreview} = slice.selectors;
 
 export const schemaApi = api.injectEndpoints({
     endpoints: (builder) => ({

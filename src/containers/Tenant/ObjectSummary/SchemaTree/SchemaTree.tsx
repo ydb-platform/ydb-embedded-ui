@@ -6,13 +6,19 @@ import React from 'react';
 import {NavigationTree} from 'ydb-ui-components';
 
 import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {selectUserInput} from '../../../../store/reducers/executeQuery';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import type {GetTableSchemaDataParams} from '../../../../store/reducers/tableSchemaData';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {wait} from '../../../../utils';
 import {SECOND_IN_MS} from '../../../../utils/constants';
-import {useQueryExecutionSettings, useTypedDispatch} from '../../../../utils/hooks';
+import {
+    useQueryExecutionSettings,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../../../utils/hooks';
+import {getConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {getSchemaControls} from '../../utils/controls';
 import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
@@ -33,6 +39,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const createDirectoryFeatureAvailable = useCreateDirectoryFeatureAvailable();
     const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
     const dispatch = useTypedDispatch();
+    const input = useTypedSelector(selectUserInput);
     const [getTableSchemaDataMutation] = tableSchemaDataApi.useGetTableSchemaDataMutation();
 
     const getTableSchemaDataPromise = React.useCallback(
@@ -144,6 +151,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                             ? handleOpenCreateDirectoryDialog
                             : undefined,
                         getTableSchemaDataPromise,
+                        getConfirmation: input ? getConfirmation : undefined,
                     },
                     rootPath,
                 )}

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import * as NiceModal from '@ebay/nice-modal-react';
 import {ThemeProvider} from '@gravity-ui/uikit';
 import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
@@ -34,9 +35,11 @@ export function Providers({
                 <Router history={history}>
                     <QueryParamProvider adapter={ReactRouter5Adapter}>
                         <Theme>
-                            <ComponentsProvider registry={componentsRegistry}>
-                                {children}
-                            </ComponentsProvider>
+                            <NiceModal.Provider>
+                                <ComponentsProvider registry={componentsRegistry}>
+                                    {children}
+                                </ComponentsProvider>
+                            </NiceModal.Provider>
                         </Theme>
                     </QueryParamProvider>
                 </Router>

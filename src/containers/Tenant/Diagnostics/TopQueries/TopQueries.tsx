@@ -20,6 +20,7 @@ import {
 } from '../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 
 import {RunningQueriesData} from './RunningQueriesData';
@@ -68,7 +69,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
 
     const filters = useTypedSelector((state) => state.executeTopQueries);
 
-    const onRowClick = React.useCallback(
+    const applyRowClick = React.useCallback(
         (input: string) => {
             dispatch(changeUserInput({input}));
 
@@ -84,6 +85,8 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
         },
         [dispatch, history, location],
     );
+
+    const onRowClick = useChangeInputWithConfirmation(applyRowClick);
 
     const handleTextSearchUpdate = (text: string) => {
         dispatch(setTopQueriesFilters({text}));
