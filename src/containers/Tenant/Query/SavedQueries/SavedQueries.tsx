@@ -20,6 +20,7 @@ import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
 import {useSavedQueries} from '../utils/useSavedQueries';
@@ -88,11 +89,16 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
         setQueryNameToDelete('');
     };
 
-    const onQueryClick = (queryText: string, queryName: string) => {
-        changeUserInput({input: queryText});
-        dispatch(setQueryNameToEdit(queryName));
-        dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-    };
+    const applyQueryClick = React.useCallback(
+        ({queryText, queryName}: {queryText: string; queryName: string}) => {
+            changeUserInput({input: queryText});
+            dispatch(setQueryNameToEdit(queryName));
+            dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+        },
+        [changeUserInput, dispatch],
+    );
+
+    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);
 
     const onDeleteQueryClick = (queryName: string) => {
         return (event: React.MouseEvent) => {
@@ -154,7 +160,12 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
                         settings={QUERY_TABLE_SETTINGS}
                         emptyDataMessage={i18n(filter ? 'history.empty-search' : 'saved.empty')}
                         rowClassName={() => b('row')}
-                        onRowClick={(row) => onQueryClick(row.body, row.name)}
+                        onRowClick={async (row) =>
+                            onQueryClick({
+                                queryText: row.body,
+                                queryName: row.name,
+                            })
+                        }
                         initialSortOrder={{
                             columnId: 'name',
                             order: DataTable.ASCENDING,

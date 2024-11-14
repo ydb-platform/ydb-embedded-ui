@@ -1,14 +1,3 @@
-import type {
-    changeUserInput,
-    goToNextQuery,
-    goToPreviousQuery,
-    saveQueryToHistory,
-    setQueryHistoryFilter,
-    setQueryResult,
-    setQueryTraceReady,
-    setTenantPath,
-    updateQueryInHistory,
-} from '../../store/reducers/executeQuery';
 import type {PreparedExplainResponse} from '../../store/reducers/explainQuery/types';
 
 import type {IQueryResult} from './query';
@@ -48,7 +37,8 @@ export type QueryResult = ExecuteQueryResult | ExplainQueryResult;
 
 export interface ExecuteQueryState {
     input: string;
-    result?: QueryResult;
+    result?: QueryResult & {isTraceReady?: boolean};
+    changed?: boolean;
     history: {
         // String type for backward compatibility
         queries: QueryInHistory[];
@@ -56,19 +46,4 @@ export interface ExecuteQueryState {
         filter?: string;
     };
     tenantPath?: string;
-}
-
-export type ExecuteQueryAction =
-    | ReturnType<typeof goToNextQuery>
-    | ReturnType<typeof goToPreviousQuery>
-    | ReturnType<typeof changeUserInput>
-    | ReturnType<typeof setQueryResult>
-    | ReturnType<typeof saveQueryToHistory>
-    | ReturnType<typeof updateQueryInHistory>
-    | ReturnType<typeof setTenantPath>
-    | ReturnType<typeof setQueryHistoryFilter>
-    | ReturnType<typeof setQueryTraceReady>;
-
-export interface ExecuteQueryStateSlice {
-    executeQuery: ExecuteQueryState;
 }

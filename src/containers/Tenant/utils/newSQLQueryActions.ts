@@ -1,5 +1,3 @@
-import {changeUserInput} from '../../../store/reducers/executeQuery';
-
 import {
     addTableIndex,
     alterAsyncReplicationTemplate,
@@ -29,9 +27,9 @@ import {
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
 
-export const bindActions = (dispatch: React.Dispatch<any>) => {
+export const bindActions = (changeUserInput: (input: string) => void) => {
     const inputQuery = (query: () => string) => () => {
-        dispatch(changeUserInput({input: query()}));
+        changeUserInput(query());
     };
 
     return {

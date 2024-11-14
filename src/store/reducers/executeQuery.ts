@@ -1,34 +1,26 @@
-import type {Reducer} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {settingsManager} from '../../services/settings';
 import {TracingLevelNumber} from '../../types/api/query';
 import type {ExecuteActions} from '../../types/api/query';
 import {ResultType} from '../../types/store/executeQuery';
+import type {ExecuteQueryState, QueryInHistory, QueryResult} from '../../types/store/executeQuery';
 import type {
-    ExecuteQueryAction,
-    ExecuteQueryState,
-    ExecuteQueryStateSlice,
-    QueryInHistory,
-    QueryResult,
-} from '../../types/store/executeQuery';
-import type {QueryRequestParams, QuerySettings, QuerySyntax} from '../../types/store/query';
-import {QUERIES_HISTORY_KEY} from '../../utils/constants';
+    QueryRequestParams,
+    QuerySettings,
+    QuerySyntax,
+    SavedQuery,
+} from '../../types/store/query';
+import {QUERIES_HISTORY_KEY, SAVED_QUERIES_KEY} from '../../utils/constants';
 import {QUERY_SYNTAX, isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
+import type {RootState} from '../defaultStore';
 
 import {api} from './api';
+import {getSettingValue} from './settings/settings';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
-
-const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
-const SET_QUERY_RESULT = 'query/SET_QUERY_RESULT';
-const SET_QUERY_TRACE_READY = 'query/SET_QUERY_TRACE_READY';
-const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
-const UPDATE_QUERY_IN_HISTORY = 'query/UPDATE_QUERY_IN_HISTORY';
-const SET_QUERY_HISTORY_FILTER = 'query/SET_QUERY_HISTORY_FILTER';
-const GO_TO_PREVIOUS_QUERY = 'query/GO_TO_PREVIOUS_QUERY';
-const GO_TO_NEXT_QUERY = 'query/GO_TO_NEXT_QUERY';
-const SET_TENANT_PATH = 'query/SET_TENANT_PATH';
 
 const queriesHistoryInitial = settingsManager.readUserSettingsValue(
     QUERIES_HISTORY_KEY,
@@ -37,9 +29,9 @@ const queriesHistoryInitial = settingsManager.readUserSettingsValue(
 
 const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
-const initialState = {
-    loading: false,
+const initialState: ExecuteQueryState = {
     input: '',
+    changed: false,
     history: {
         queries: queriesHistoryInitial
             .slice(sliceLimit < 0 ? 0 : sliceLimit)
@@ -52,41 +44,31 @@ const initialState = {
     },
 };
 
-const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
-    state = initialState,
-    action,
-) => {
-    switch (action.type) {
-        case CHANGE_USER_INPUT: {
-            return {
-                ...state,
-                input: action.data.input,
-            };
-        }
+const slice = createSlice({
+    name: 'executeQuery',
+    initialState,
+    reducers: {
+        changeUserInput: (state, action: PayloadAction<{input: string}>) => {
+            state.input = action.payload.input;
+            state.changed = state.input !== action.payload.input;
+        },
 
-        case SET_QUERY_TRACE_READY: {
+        setQueryChanged: (state, action: PayloadAction<boolean>) => {
+            state.changed = action.payload;
+        },
+        setQueryTraceReady: (state) => {
             if (state.result) {
-                return {
-                    ...state,
-                    result: {
-                        ...state.result,
-                        isTraceReady: true,
-                    },
-                };
+                state.result.isTraceReady = true;
             }
-
-            return state;
-        }
-
-        case SET_QUERY_RESULT: {
-            return {
-                ...state,
-                result: action.data,
-            };
-        }
-
-        case SAVE_QUERY_TO_HISTORY: {
-            const {queryText, queryId} = action.data;
+        },
+        setQueryResult: (state, action: PayloadAction<QueryResult | undefined>) => {
+            state.result = action.payload;
+        },
+        saveQueryToHistory: (
+            state,
+            action: PayloadAction<{queryText: string; queryId: string}>,
+        ) => {
+            const {queryText, queryId} = action.payload;
 
             const newQueries = [...state.history.queries, {queryText, queryId}].slice(
                 state.history.queries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
@@ -94,26 +76,25 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
             settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
             const currentIndex = newQueries.length - 1;
 
-            return {
-                ...state,
-                history: {
-                    queries: newQueries,
-                    currentIndex,
-                },
+            state.history = {
+                queries: newQueries,
+                currentIndex,
             };
-        }
-
-        case UPDATE_QUERY_IN_HISTORY: {
-            const {queryId, stats} = action.data;
+        },
+        updateQueryInHistory: (
+            state,
+            action: PayloadAction<{queryId: string; stats: QueryStats}>,
+        ) => {
+            const {queryId, stats} = action.payload;
 
             if (!stats) {
-                return state;
+                return;
             }
 
             const index = state.history.queries.findIndex((item) => item.queryId === queryId);
 
             if (index === -1) {
-                return state;
+                return;
             }
 
             const newQueries = [...state.history.queries];
@@ -126,73 +107,85 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
 
             settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
 
-            return {
-                ...state,
-                history: {
-                    ...state.history,
-                    queries: newQueries,
-                },
-            };
-        }
-
-        case GO_TO_PREVIOUS_QUERY: {
+            state.history.queries = newQueries;
+        },
+        goToPreviousQuery: (state) => {
             const currentIndex = state.history.currentIndex;
             if (currentIndex <= 0) {
-                return state;
+                return;
             }
             const newCurrentIndex = currentIndex - 1;
             const query = state.history.queries[newCurrentIndex];
-
-            return {
-                ...state,
-                history: {
-                    ...state.history,
-                    currentIndex: newCurrentIndex,
-                },
-                input: query.queryText,
-            };
-        }
-
-        case GO_TO_NEXT_QUERY: {
-            const lastIndexInHistory = state.history.queries.length - 1;
+            state.input = query.queryText;
+            state.history.currentIndex = newCurrentIndex;
+        },
+        goToNextQuery: (state) => {
             const currentIndex = state.history.currentIndex;
-            if (currentIndex >= lastIndexInHistory) {
-                return state;
+            if (currentIndex >= state.history.queries.length - 1) {
+                return;
             }
             const newCurrentIndex = currentIndex + 1;
             const query = state.history.queries[newCurrentIndex];
+            state.input = query.queryText;
+            state.history.currentIndex = newCurrentIndex;
+        },
+        setTenantPath: (state, action: PayloadAction<string>) => {
+            state.tenantPath = action.payload;
+        },
+        setQueryHistoryFilter: (state, action: PayloadAction<string>) => {
+            state.history.filter = action.payload;
+        },
+    },
+    selectors: {
+        selectQueriesHistoryFilter: (state) => state.history.filter || '',
+        selectTenantPath: (state) => state.tenantPath,
+        selectResult: (state) => state.result,
+        selectQueriesHistory: (state) => {
+            const items = state.history.queries;
+            const filter = state.history.filter?.toLowerCase();
 
-            return {
-                ...state,
-                history: {
-                    ...state.history,
-                    currentIndex: newCurrentIndex,
-                },
-                input: query.queryText,
-            };
-        }
+            return filter
+                ? items.filter((item) => item.queryText.toLowerCase().includes(filter))
+                : items;
+        },
+        selectUserInput: (state) => state.input,
+        selectQueriesHistoryCurrentIndex: (state) => state.history?.currentIndex,
+    },
+});
 
-        case SET_TENANT_PATH: {
-            return {
-                ...state,
-                tenantPath: action.data,
-            };
-        }
+export default slice.reducer;
+export const {
+    changeUserInput,
+    setQueryChanged,
+    setQueryTraceReady,
+    setQueryResult,
+    saveQueryToHistory,
+    updateQueryInHistory,
+    goToPreviousQuery,
+    goToNextQuery,
+    setTenantPath,
+    setQueryHistoryFilter,
+} = slice.actions;
+export const {
+    selectQueriesHistoryFilter,
+    selectQueriesHistoryCurrentIndex,
+    selectQueriesHistory,
+    selectTenantPath,
+    selectResult,
+    selectUserInput,
+} = slice.selectors;
 
-        case SET_QUERY_HISTORY_FILTER: {
-            return {
-                ...state,
-                history: {
-                    ...state.history,
-                    filter: action.data.filter,
-                },
-            };
-        }
-
-        default:
-            return state;
-    }
-};
+export const selectIsQuerySaved = createSelector(
+    (state: RootState) => state,
+    (state: RootState) => {
+        const savedQueries = (getSettingValue(state, SAVED_QUERIES_KEY) as SavedQuery[]) ?? [];
+        return (
+            savedQueries.some((query) => query.body === state.executeQuery.input) ||
+            state.executeQuery.history.queries[state.executeQuery.history.queries.length - 1]
+                ?.queryText === state.executeQuery.input
+        );
+    },
+);
 
 interface SendQueryParams extends QueryRequestParams {
     queryId: string;
@@ -280,7 +273,7 @@ export const executeQueryApi = api.injectEndpoints({
                         queryStats.endTime = now;
                     }
 
-                    dispatch(updateQueryInHistory(queryStats, queryId));
+                    dispatch(updateQueryInHistory({stats: queryStats, queryId}));
                     dispatch(
                         setQueryResult({
                             type: ResultType.EXECUTE,
@@ -307,70 +300,6 @@ export const executeQueryApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
-export const saveQueryToHistory = (queryText: string, queryId: string) => {
-    return {
-        type: SAVE_QUERY_TO_HISTORY,
-        data: {queryText, queryId},
-    } as const;
-};
-
-export function updateQueryInHistory(stats: QueryStats, queryId: string) {
-    return {
-        type: UPDATE_QUERY_IN_HISTORY,
-        data: {queryId, stats},
-    } as const;
-}
-
-export function setQueryResult(data?: QueryResult) {
-    return {
-        type: SET_QUERY_RESULT,
-        data,
-    } as const;
-}
-
-export function setQueryTraceReady() {
-    return {
-        type: SET_QUERY_TRACE_READY,
-    } as const;
-}
-
-export const goToPreviousQuery = () => {
-    return {
-        type: GO_TO_PREVIOUS_QUERY,
-    } as const;
-};
-
-export const goToNextQuery = () => {
-    return {
-        type: GO_TO_NEXT_QUERY,
-    } as const;
-};
-
-export const changeUserInput = ({input}: {input: string}) => {
-    return {
-        type: CHANGE_USER_INPUT,
-        data: {input},
-    } as const;
-};
-
-export const setTenantPath = (value: string) => {
-    return {
-        type: SET_TENANT_PATH,
-        data: value,
-    } as const;
-};
-
-export const selectQueriesHistoryFilter = (state: ExecuteQueryStateSlice): string => {
-    return state.executeQuery.history.filter || '';
-};
-
-export const selectQueriesHistory = (state: ExecuteQueryStateSlice): QueryInHistory[] => {
-    const items = state.executeQuery.history.queries;
-    const filter = state.executeQuery.history.filter?.toLowerCase();
-
-    return filter ? items.filter((item) => item.queryText.toLowerCase().includes(filter)) : items;
-};
-
 function getQueryInHistory(rawQuery: string | QueryInHistory) {
     if (typeof rawQuery === 'string') {
         return {
@@ -379,12 +308,3 @@ function getQueryInHistory(rawQuery: string | QueryInHistory) {
     }
     return rawQuery;
 }
-
-export const setQueryHistoryFilter = (filter: string) => {
-    return {
-        type: SET_QUERY_HISTORY_FILTER,
-        data: {filter},
-    } as const;
-};
-
-export default executeQuery;

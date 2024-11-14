@@ -15,6 +15,7 @@ import type {QueryInHistory} from '../../../../types/store/executeQuery';
 import {cn} from '../../../../utils/cn';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
@@ -36,10 +37,12 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const filter = useTypedSelector(selectQueriesHistoryFilter);
     const reversedHistory = [...queriesHistory].reverse();
 
-    const onQueryClick = (query: QueryInHistory) => {
+    const applyQueryClick = (query: QueryInHistory) => {
         changeUserInput({input: query.queryText});
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
     };
+
+    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);
 
     const onChangeFilter = (value: string) => {
         dispatch(setQueryHistoryFilter(value));

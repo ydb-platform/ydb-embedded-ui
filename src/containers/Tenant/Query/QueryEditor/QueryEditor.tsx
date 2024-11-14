@@ -3,27 +3,29 @@ import React from 'react';
 import {isEqual} from 'lodash';
 import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
-import {connect} from 'react-redux';
 import {v4 as uuidv4} from 'uuid';
 
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import SplitPane from '../../../../components/SplitPane';
-import type {RootState} from '../../../../store';
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {
     executeQueryApi,
     goToNextQuery,
     goToPreviousQuery,
     saveQueryToHistory,
-    setQueryResult,
+    selectQueriesHistory,
+    selectQueriesHistoryCurrentIndex,
+    selectResult,
+    selectTenantPath,
+    selectUserInput,
     setTenantPath,
 } from '../../../../store/reducers/executeQuery';
 import {explainQueryApi} from '../../../../store/reducers/explainQuery/explainQuery';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
-import {setShowPreview} from '../../../../store/reducers/schema/schema';
+import {selectShowPreview, setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
 import {ResultType} from '../../../../types/store/executeQuery';
-import type {ExecuteQueryState, QueryResult} from '../../../../types/store/executeQuery';
+import type {QueryResult} from '../../../../types/store/executeQuery';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
@@ -31,7 +33,13 @@ import {
     DEFAULT_SIZE_RESULT_PANE_KEY,
     LAST_USED_QUERY_ACTION_KEY,
 } from '../../../../utils/constants';
-import {useEventHandler, useQueryExecutionSettings, useSetting} from '../../../../utils/hooks';
+import {
+    useEventHandler,
+    useQueryExecutionSettings,
+    useSetting,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
 import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
@@ -68,35 +76,22 @@ interface QueryEditorProps {
     tenantName: string;
     path: string;
     changeUserInput: (arg: {input: string}) => void;
-    goToNextQuery: (...args: Parameters<typeof goToNextQuery>) => void;
-    goToPreviousQuery: (...args: Parameters<typeof goToPreviousQuery>) => void;
-    setTenantPath: (...args: Parameters<typeof setTenantPath>) => void;
-    setQueryAction: (...args: Parameters<typeof setQueryAction>) => void;
-    setQueryResult: (...args: Parameters<typeof setQueryResult>) => void;
-    executeQuery: ExecuteQueryState;
     theme: string;
     type?: EPathType;
-    showPreview: boolean;
-    setShowPreview: (...args: Parameters<typeof setShowPreview>) => void;
-    saveQueryToHistory: (...args: Parameters<typeof saveQueryToHistory>) => void;
 }
 
-function QueryEditor(props: QueryEditorProps) {
+export default function QueryEditor(props: QueryEditorProps) {
     const editorOptions = useEditorOptions();
-    const {
-        tenantName,
-        path,
-        setTenantPath: setPath,
-        executeQuery,
-        type,
-        theme,
-        changeUserInput,
-        setQueryResult,
-        showPreview,
-    } = props;
-    const {tenantPath: savedPath} = executeQuery;
+    const dispatch = useTypedDispatch();
+    const {tenantName, path, type, theme, changeUserInput} = props;
+    const savedPath = useTypedSelector(selectTenantPath);
+    const result = useTypedSelector(selectResult);
+    const historyQueries = useTypedSelector(selectQueriesHistory);
+    const historyCurrentIndex = useTypedSelector(selectQueriesHistoryCurrentIndex);
+    const input = useTypedSelector(selectUserInput);
+    const showPreview = useTypedSelector(selectShowPreview);
 
-    const isResultLoaded = Boolean(executeQuery.result);
+    const isResultLoaded = Boolean(result);
 
     const [querySettings] = useQueryExecutionSettings();
     const enableTracingLevel = useTracingLevelOptionAvailable();
@@ -113,13 +108,9 @@ function QueryEditor(props: QueryEditorProps) {
 
     React.useEffect(() => {
         if (savedPath !== tenantName) {
-            if (savedPath) {
-                changeUserInput({input: ''});
-                setQueryResult();
-            }
-            setPath(tenantName);
+            dispatch(setTenantPath(tenantName));
         }
-    }, [changeUserInput, setPath, setQueryResult, tenantName, savedPath]);
+    }, [dispatch, tenantName, savedPath]);
 
     const [resultVisibilityState, dispatchResultVisibilityState] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
@@ -131,21 +122,21 @@ function QueryEditor(props: QueryEditorProps) {
     }, []);
 
     React.useEffect(() => {
-        if (props.showPreview || isResultLoaded) {
+        if (showPreview || isResultLoaded) {
             dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
         } else {
             dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
         }
-    }, [props.showPreview, isResultLoaded]);
+    }, [showPreview, isResultLoaded]);
 
     const getLastQueryText = useEventHandler(() => {
-        const {history} = executeQuery;
-        return history.queries[history.queries.length - 1]?.queryText || '';
+        if (!historyQueries || historyQueries.length === 0) {
+            return '';
+        }
+        return historyQueries[historyQueries.length - 1].queryText;
     });
 
     const handleSendExecuteClick = useEventHandler((text?: string) => {
-        const {input, history} = executeQuery;
-
         const query = text ?? input;
 
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
@@ -163,25 +154,22 @@ function QueryEditor(props: QueryEditorProps) {
             queryId,
         });
 
-        props.setShowPreview(false);
+        dispatch(setShowPreview(false));
 
         // Don't save partial queries in history
         if (!text) {
-            const {queries, currentIndex} = history;
-            if (query !== queries[currentIndex]?.queryText) {
-                props.saveQueryToHistory(input, queryId);
+            if (query !== historyQueries[historyCurrentIndex]?.queryText) {
+                dispatch(saveQueryToHistory({queryText: input, queryId}));
             }
         }
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     });
 
     const handleSettingsClick = () => {
-        props.setQueryAction('settings');
+        dispatch(setQueryAction('settings'));
     };
 
     const handleGetExplainQueryClick = useEventHandler(() => {
-        const {input} = executeQuery;
-
         setLastUsedQueryAction(QUERY_ACTIONS.explain);
 
         if (!isEqual(lastQueryExecutionSettings, querySettings)) {
@@ -199,7 +187,7 @@ function QueryEditor(props: QueryEditorProps) {
             queryId,
         });
 
-        props.setShowPreview(false);
+        dispatch(setShowPreview(false));
 
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     });
@@ -269,7 +257,7 @@ function QueryEditor(props: QueryEditorProps) {
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 2,
             run: () => {
-                props.goToPreviousQuery();
+                dispatch(goToPreviousQuery());
             },
         });
         editor.addAction({
@@ -279,7 +267,7 @@ function QueryEditor(props: QueryEditorProps) {
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 3,
             run: () => {
-                props.goToNextQuery();
+                dispatch(goToNextQuery());
             },
         });
         editor.addAction({
@@ -287,13 +275,13 @@ function QueryEditor(props: QueryEditorProps) {
             label: i18n('action.save-query'),
             keybindings: [keybindings.saveQuery],
             run: () => {
-                props.setQueryAction('save');
+                dispatch(setQueryAction('save'));
             },
         });
     };
 
     const onChange = (newValue: string) => {
-        props.changeUserInput({input: newValue});
+        changeUserInput({input: newValue});
     };
 
     const onCollapseResultHandler = () => {
@@ -312,9 +300,9 @@ function QueryEditor(props: QueryEditorProps) {
             <QueryEditorControls
                 handleSendExecuteClick={handleSendExecuteClick}
                 onSettingsButtonClick={handleSettingsClick}
-                isLoading={Boolean(executeQuery.result?.isLoading)}
+                isLoading={Boolean(result?.isLoading)}
                 handleGetExplainQueryClick={handleGetExplainQueryClick}
-                disabled={!executeQuery.input}
+                disabled={!input}
                 highlightedAction={lastUsedQueryAction}
             />
         );
@@ -340,7 +328,7 @@ function QueryEditor(props: QueryEditorProps) {
                         <div className={b('monaco')}>
                             <MonacoEditor
                                 language={YQL_LANGUAGE_ID}
-                                value={executeQuery.input}
+                                value={input}
                                 options={editorOptions}
                                 onChange={onChange}
                                 editorDidMount={editorDidMount}
@@ -357,8 +345,8 @@ function QueryEditor(props: QueryEditorProps) {
                         onCollapseResultHandler={onCollapseResultHandler}
                         type={type}
                         theme={theme}
-                        key={executeQuery.result?.queryId}
-                        result={executeQuery.result}
+                        key={result?.queryId}
+                        result={result}
                         tenantName={tenantName}
                         path={path}
                         showPreview={showPreview}
@@ -370,25 +358,6 @@ function QueryEditor(props: QueryEditorProps) {
         </div>
     );
 }
-
-const mapStateToProps = (state: RootState) => {
-    return {
-        executeQuery: state.executeQuery,
-        showPreview: state.schema.showPreview,
-    };
-};
-
-const mapDispatchToProps = {
-    saveQueryToHistory,
-    goToPreviousQuery,
-    goToNextQuery,
-    setShowPreview,
-    setTenantPath,
-    setQueryAction,
-    setQueryResult,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(QueryEditor);
 
 interface ResultProps {
     resultVisibilityState: InitialPaneState;

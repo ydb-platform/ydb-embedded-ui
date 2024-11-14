@@ -43,6 +43,7 @@ interface ActionsAdditionalEffects {
     getTableSchemaDataPromise?: (
         params: GetTableSchemaDataParams,
     ) => Promise<SchemaData[] | undefined>;
+    getConfirmation?: () => Promise<boolean>;
 }
 
 interface BindActionParams {
@@ -57,28 +58,41 @@ const bindActions = (
     dispatch: AppDispatch,
     additionalEffects: ActionsAdditionalEffects,
 ) => {
-    const {setActivePath, showCreateDirectoryDialog, getTableSchemaDataPromise} = additionalEffects;
+    const {setActivePath, showCreateDirectoryDialog, getTableSchemaDataPromise, getConfirmation} =
+        additionalEffects;
 
     const inputQuery = (tmpl: TemplateFn) => () => {
-        const pathType = nodeTableTypeToPathType[params.type];
-        const withTableData = [selectQueryTemplate, upsertQueryTemplate].includes(tmpl);
+        const applyInsert = () => {
+            const pathType = nodeTableTypeToPathType[params.type];
+            const withTableData = [selectQueryTemplate, upsertQueryTemplate].includes(tmpl);
 
-        const userInputDataPromise =
-            withTableData && pathType && getTableSchemaDataPromise
-                ? getTableSchemaDataPromise({
-                      path: params.path,
-                      tenantName: params.tenantName,
-                      type: pathType,
-                  })
-                : Promise.resolve(undefined);
+            const userInputDataPromise =
+                withTableData && pathType && getTableSchemaDataPromise
+                    ? getTableSchemaDataPromise({
+                          path: params.path,
+                          tenantName: params.tenantName,
+                          type: pathType,
+                      })
+                    : Promise.resolve(undefined);
 
-        userInputDataPromise.then((tableData) => {
-            dispatch(changeUserInput({input: tmpl({...params, tableData})}));
-        });
+            userInputDataPromise.then((tableData) => {
+                dispatch(changeUserInput({input: tmpl({...params, tableData})}));
+            });
 
-        dispatch(setTenantPage(TENANT_PAGES_IDS.query));
-        dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-        setActivePath(params.path);
+            dispatch(setTenantPage(TENANT_PAGES_IDS.query));
+            dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+            setActivePath(params.path);
+        };
+        if (getConfirmation) {
+            const confirmedPromise = getConfirmation();
+            confirmedPromise.then((confirmed) => {
+                if (confirmed) {
+                    applyInsert();
+                }
+            });
+        } else {
+            applyInsert();
+        }
     };
 
     return {

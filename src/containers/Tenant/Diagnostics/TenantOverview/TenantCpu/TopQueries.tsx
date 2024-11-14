@@ -15,6 +15,7 @@ import {
     TENANT_QUERY_TABS_ID,
 } from '../../../../../store/reducers/tenant/constants';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../../../../utils/hooks';
+import {useChangeInputWithConfirmation} from '../../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {
@@ -48,7 +49,7 @@ export function TopQueries({tenantName}: TopQueriesProps) {
     const loading = isFetching && currentData === undefined;
     const data = currentData?.resultSets?.[0]?.result || [];
 
-    const handleRowClick = React.useCallback(
+    const applyRowClick = React.useCallback(
         (row: any) => {
             const {QueryText: input} = row;
 
@@ -66,6 +67,8 @@ export function TopQueries({tenantName}: TopQueriesProps) {
         },
         [dispatch, history, location],
     );
+
+    const handleRowClick = useChangeInputWithConfirmation(applyRowClick);
 
     const title = getSectionTitle({
         entity: i18n('queries'),
