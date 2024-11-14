@@ -18,10 +18,10 @@ import {
 import {
     NODES_COLUMNS_IDS,
     NODES_COLUMNS_TITLES,
+    isSortableNodesColumn,
 } from '../../../../components/nodesColumns/constants';
 import type {PreparedStorageNode} from '../../../../store/reducers/storage/types';
 import {cn} from '../../../../utils/cn';
-import {isSortableNodesProperty} from '../../../../utils/nodes';
 import {PDisk} from '../../PDisk/PDisk';
 
 import type {GetStorageNodesColumnsParams, StorageNodesColumn} from './types';
@@ -85,7 +85,7 @@ export const getStorageNodesColumns = ({
 
     const sortableColumns = columns.map((column) => ({
         ...column,
-        sortable: isSortableNodesProperty(column.name),
+        sortable: isSortableNodesColumn(column.name),
     }));
 
     return sortableColumns;

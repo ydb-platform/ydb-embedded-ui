@@ -154,25 +154,6 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
         resizeMinWidth: 40,
     };
 }
-export function getSharedCacheUsageColumn<
-    T extends {SharedCacheUsed?: string | number; SharedCacheLimit?: string | number},
->(): Column<T> {
-    return {
-        name: NODES_COLUMNS_IDS.SharedCacheUsage,
-        header: NODES_COLUMNS_TITLES.SharedCacheUsage,
-        render: ({row}) => (
-            <ProgressViewer
-                value={row.SharedCacheUsed}
-                capacity={row.SharedCacheLimit}
-                formatValues={formatStorageValuesToGb}
-                colorizeProgress={true}
-            />
-        ),
-        align: DataTable.LEFT,
-        width: 170,
-        resizeMinWidth: 170,
-    };
-}
 export function getMemoryColumn<
     T extends {MemoryStats?: TMemoryStats; MemoryUsed?: string; MemoryLimit?: string},
 >(): Column<T> {

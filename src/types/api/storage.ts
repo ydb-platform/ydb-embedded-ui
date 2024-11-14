@@ -262,6 +262,7 @@ export type GroupsSort = BackendSortParam<GroupsSortField>;
 
 export type StorageWithFilter = 'space' | 'missing' | 'all';
 
+// v4
 export type GroupsGroupByField =
     | 'GroupId'
     | 'Erasure'

@@ -1,6 +1,5 @@
 {
   "node-id": "Node ID",
-  "system-state": "System State",
   "host": "Host",
   "database": "Database",
   "node-name": "Node Name",
@@ -12,14 +11,20 @@
   "ram": "RAM",
   "cpu": "CPU",
   "pools": "Pools",
-  "disk-usage": "Disk usage",
+  "disk-usage": "Disk Usage",
   "tablets": "Tablets",
   "load-average": "Load Average",
   "load": "Load",
-  "caches": "Caches",
   "sessions": "Sessions",
   "missing": "Missing",
   "pdisks": "PDisks",
+
   "field_memory-used": "Memory used",
-  "field_memory-limit": "Memory limit"
+  "field_memory-limit": "Memory limit",
+
+  "system-state": "System State",
+  "connect-status": "Connect Status",
+  "network-utilization": "Network Utilization",
+  "clock-skew": "Clock Skew",
+  "ping-time": "Ping Time"
 }

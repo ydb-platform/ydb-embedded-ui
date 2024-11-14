@@ -2,7 +2,7 @@ import type {SelectOption} from '@gravity-ui/uikit';
 import {z} from 'zod';
 
 import type {NodesColumnId} from '../../../../components/nodesColumns/constants';
-import {NODES_COLUMNS_TITLES} from '../../../../components/nodesColumns/constants';
+import {getNodesGroupByFieldTitle} from '../../../../components/nodesColumns/constants';
 import type {NodesGroupByField} from '../../../../types/api/nodes';
 
 export const STORAGE_NODES_COLUMNS_WIDTH_LS_KEY = 'storageNodesColumnsWidth';
@@ -33,7 +33,7 @@ export const STORAGE_NODES_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_NODES_GROU
     (param) => {
         return {
             value: param,
-            content: NODES_COLUMNS_TITLES[param],
+            content: getNodesGroupByFieldTitle(param),
         };
     },
 );
