@@ -21,6 +21,7 @@ import {api} from './api';
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
 const CHANGE_USER_INPUT = 'query/CHANGE_USER_INPUT';
+const REPLACE_USER_INPUT = 'query/REPLACE_USER_INPUT';
 const SET_QUERY_RESULT = 'query/SET_QUERY_RESULT';
 const SET_QUERY_TRACE_READY = 'query/SET_QUERY_TRACE_READY';
 const SAVE_QUERY_TO_HISTORY = 'query/SAVE_QUERY_TO_HISTORY';
@@ -57,6 +58,21 @@ const executeQuery: Reducer<ExecuteQueryState, ExecuteQueryAction> = (
     action,
 ) => {
     switch (action.type) {
+        case REPLACE_USER_INPUT: {
+            if (action.data.input === state.input) {
+                return state;
+            }
+
+            if (window.confirm('Are you sure you want to replace the input?')) {
+                return {
+                    ...state,
+                    input: action.data.input,
+                };
+            }
+
+            return state;
+        }
+
         case CHANGE_USER_INPUT: {
             return {
                 ...state,
@@ -355,8 +371,8 @@ export const changeUserInput = ({input}: {input: string}) => {
 
 export const replaceUserInput = ({input}: {input: string}) => {
     return {
-        type: CHANGE_USER_INPUT,
-        data: window.confirm('Input value will be lost. Continue?') ? {input} : undefined,
+        type: REPLACE_USER_INPUT,
+        data: {input},
     } as const;
 };
 

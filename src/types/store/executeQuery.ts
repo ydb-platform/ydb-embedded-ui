@@ -2,6 +2,7 @@ import type {
     changeUserInput,
     goToNextQuery,
     goToPreviousQuery,
+    replaceUserInput,
     saveQueryToHistory,
     setQueryHistoryFilter,
     setQueryResult,
@@ -62,6 +63,7 @@ export type ExecuteQueryAction =
     | ReturnType<typeof goToNextQuery>
     | ReturnType<typeof goToPreviousQuery>
     | ReturnType<typeof changeUserInput>
+    | ReturnType<typeof replaceUserInput>
     | ReturnType<typeof setQueryResult>
     | ReturnType<typeof saveQueryToHistory>
     | ReturnType<typeof updateQueryInHistory>
