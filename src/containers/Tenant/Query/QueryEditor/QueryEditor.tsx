@@ -98,28 +98,6 @@ function QueryEditor(props: QueryEditorProps) {
 
     const isResultLoaded = Boolean(executeQuery.result);
 
-    const [inputValue, setInputValue] = React.useState<string>(executeQuery.input);
-
-    const propsChangeUserInput = props.changeUserInput;
-    const changeInputValue = React.useCallback(
-        (input: string) => {
-            setInputValue(input);
-            propsChangeUserInput({input});
-        },
-        [propsChangeUserInput],
-    );
-
-    React.useEffect(() => {
-        if (executeQuery.input !== inputValue) {
-            const response = window.confirm('Input value will be lost. Continue?');
-            if (response) {
-                setInputValue(executeQuery.input);
-            } else {
-                changeInputValue(inputValue);
-            }
-        }
-    }, [changeInputValue, executeQuery.input, inputValue]);
-
     const [querySettings] = useQueryExecutionSettings();
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
@@ -314,6 +292,10 @@ function QueryEditor(props: QueryEditorProps) {
         });
     };
 
+    const onChange = (newValue: string) => {
+        props.changeUserInput({input: newValue});
+    };
+
     const onCollapseResultHandler = () => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
     };
@@ -358,9 +340,9 @@ function QueryEditor(props: QueryEditorProps) {
                         <div className={b('monaco')}>
                             <MonacoEditor
                                 language={YQL_LANGUAGE_ID}
-                                value={inputValue}
+                                value={executeQuery.input}
                                 options={editorOptions}
-                                onChange={changeInputValue}
+                                onChange={onChange}
                                 editorDidMount={editorDidMount}
                                 theme={`vs-${theme}`}
                             />
