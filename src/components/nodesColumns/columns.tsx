@@ -163,12 +163,7 @@ export function getMemoryColumn<
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
             return row.MemoryStats ? (
-                <MemoryViewer
-                    capacity={row.MemoryLimit}
-                    value={row.MemoryStats.AnonRss}
-                    formatValues={formatStorageValuesToGb}
-                    stats={row.MemoryStats}
-                />
+                <MemoryViewer formatValues={formatStorageValuesToGb} stats={row.MemoryStats} />
             ) : (
                 <ProgressViewer
                     value={row.MemoryUsed}

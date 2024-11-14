@@ -1,5 +1,5 @@
 import type {EFlag} from './enums';
-import type {TPoolStats, TSystemStateInfo} from './nodes';
+import type {TMemoryStats, TPoolStats, TSystemStateInfo} from './nodes';
 import type {TTabletStateInfo} from './tablet';
 
 /**
@@ -50,6 +50,7 @@ export interface TTenant {
     MemoryUsed?: string; // Actual memory consumption
     /** uint64 */
     MemoryLimit?: string;
+    MemoryStats?: TMemoryStats;
     /** double */
     CoresUsed?: number; // Actual cpu consumption
     /** uint64 */
