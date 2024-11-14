@@ -160,7 +160,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
                         settings={QUERY_TABLE_SETTINGS}
                         emptyDataMessage={i18n(filter ? 'history.empty-search' : 'saved.empty')}
                         rowClassName={() => b('row')}
-                        onRowClick={async (row) =>
+                        onRowClick={(row) =>
                             onQueryClick({
                                 queryText: row.body,
                                 queryName: row.name,
