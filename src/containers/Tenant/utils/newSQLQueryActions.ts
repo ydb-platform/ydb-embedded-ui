@@ -1,4 +1,4 @@
-import {changeUserInput} from '../../../store/reducers/executeQuery';
+import {replaceUserInput} from '../../../store/reducers/executeQuery';
 
 import {
     addTableIndex,
@@ -31,7 +31,7 @@ import {
 
 export const bindActions = (dispatch: React.Dispatch<any>) => {
     const inputQuery = (query: () => string) => () => {
-        dispatch(changeUserInput({input: query()}));
+        dispatch(replaceUserInput({input: query()}));
     };
 
     return {

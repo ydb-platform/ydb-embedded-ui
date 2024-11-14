@@ -26,10 +26,10 @@ const b = cn('ydb-queries-history');
 const QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY = 'queriesHistoryTableColumnsWidth';
 
 interface QueriesHistoryProps {
-    changeUserInput: (value: {input: string}) => void;
+    replaceUserInput: (value: {input: string}) => void;
 }
 
-function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
+function QueriesHistory({replaceUserInput}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
 
     const queriesHistory = useTypedSelector(selectQueriesHistory);
@@ -37,7 +37,7 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const reversedHistory = [...queriesHistory].reverse();
 
     const onQueryClick = (query: QueryInHistory) => {
-        changeUserInput({input: query.queryText});
+        replaceUserInput({input: query.queryText});
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
     };
 

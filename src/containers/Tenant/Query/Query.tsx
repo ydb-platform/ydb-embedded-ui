@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Helmet} from 'react-helmet-async';
 
-import {changeUserInput} from '../../../store/reducers/executeQuery';
+import {changeUserInput, replaceUserInput} from '../../../store/reducers/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import type {EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
@@ -33,6 +33,10 @@ export const Query = (props: QueryProps) => {
         dispatch(changeUserInput(value));
     };
 
+    const handleUserInputReplace = (value: {input: string}) => {
+        dispatch(replaceUserInput(value));
+    };
+
     const activeTab = React.useMemo(
         () => queryEditorTabs.find(({id}) => id === queryTab),
         [queryTab],
@@ -44,10 +48,10 @@ export const Query = (props: QueryProps) => {
                 return <QueryEditor changeUserInput={handleUserInputChange} {...props} />;
             }
             case TENANT_QUERY_TABS_ID.history: {
-                return <QueriesHistory changeUserInput={handleUserInputChange} />;
+                return <QueriesHistory replaceUserInput={handleUserInputReplace} />;
             }
             case TENANT_QUERY_TABS_ID.saved: {
-                return <SavedQueries changeUserInput={handleUserInputChange} />;
+                return <SavedQueries replaceUserInput={handleUserInputReplace} />;
             }
             default: {
                 return null;

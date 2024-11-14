@@ -353,6 +353,13 @@ export const changeUserInput = ({input}: {input: string}) => {
     } as const;
 };
 
+export const replaceUserInput = ({input}: {input: string}) => {
+    return {
+        type: CHANGE_USER_INPUT,
+        data: window.confirm('Input value will be lost. Continue?') ? {input} : undefined,
+    } as const;
+};
+
 export const setTenantPath = (value: string) => {
     return {
         type: SET_TENANT_PATH,

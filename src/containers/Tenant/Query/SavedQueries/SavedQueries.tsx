@@ -62,10 +62,10 @@ const DeleteDialog = ({visible, queryName, onCancelClick, onConfirmClick}: Delet
 const SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY = 'savedQueriesTableColumnsWidth';
 
 interface SavedQueriesProps {
-    changeUserInput: (value: {input: string}) => void;
+    replaceUserInput: (value: {input: string}) => void;
 }
 
-export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
+export const SavedQueries = ({replaceUserInput}: SavedQueriesProps) => {
     const savedQueries = useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
@@ -89,7 +89,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
     };
 
     const onQueryClick = (queryText: string, queryName: string) => {
-        changeUserInput({input: queryText});
+        replaceUserInput({input: queryText});
         dispatch(setQueryNameToEdit(queryName));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
     };

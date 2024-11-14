@@ -11,7 +11,7 @@ import {DateRange} from '../../../../components/DateRange';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {parseQuery} from '../../../../routes';
-import {changeUserInput} from '../../../../store/reducers/executeQuery';
+import {replaceUserInput} from '../../../../store/reducers/executeQuery';
 import {setTopQueriesFilters} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import {
     TENANT_PAGE,
@@ -70,7 +70,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
 
     const onRowClick = React.useCallback(
         (input: string) => {
-            dispatch(changeUserInput({input}));
+            dispatch(replaceUserInput({input}));
 
             const queryParams = parseQuery(location);
 

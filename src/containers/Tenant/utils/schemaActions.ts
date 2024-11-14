@@ -2,7 +2,7 @@ import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
 import type {AppDispatch} from '../../../store';
-import {changeUserInput} from '../../../store/reducers/executeQuery';
+import {replaceUserInput} from '../../../store/reducers/executeQuery';
 import type {GetTableSchemaDataParams} from '../../../store/reducers/tableSchemaData';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
@@ -73,7 +73,7 @@ const bindActions = (
                 : Promise.resolve(undefined);
 
         userInputDataPromise.then((tableData) => {
-            dispatch(changeUserInput({input: tmpl({...params, tableData})}));
+            dispatch(replaceUserInput({input: tmpl({...params, tableData})}));
         });
 
         dispatch(setTenantPage(TENANT_PAGES_IDS.query));

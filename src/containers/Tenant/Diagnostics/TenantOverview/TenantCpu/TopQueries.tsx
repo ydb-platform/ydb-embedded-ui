@@ -3,7 +3,7 @@ import React from 'react';
 import {useHistory, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../../../../routes';
-import {changeUserInput} from '../../../../../store/reducers/executeQuery';
+import {replaceUserInput} from '../../../../../store/reducers/executeQuery';
 import {
     setTopQueriesFilters,
     topQueriesApi,
@@ -52,7 +52,7 @@ export function TopQueries({tenantName}: TopQueriesProps) {
         (row: any) => {
             const {QueryText: input} = row;
 
-            dispatch(changeUserInput({input}));
+            dispatch(replaceUserInput({input}));
 
             const queryParams = parseQuery(location);
 
