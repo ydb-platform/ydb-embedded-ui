@@ -27,7 +27,7 @@ test.describe('Test Query Editor', async () => {
         await tenantPage.goto(pageQueryParams);
     });
 
-    test.only('Settings dialog opens on Gear click and closes on Cancel', async ({page}) => {
+    test('Settings dialog opens on Gear click and closes on Cancel', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
