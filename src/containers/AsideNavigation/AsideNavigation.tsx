@@ -3,6 +3,7 @@ import React from 'react';
 import {CircleQuestion, Gear, Person} from '@gravity-ui/icons';
 import type {MenuItem} from '@gravity-ui/navigation';
 import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
+import type {IconData} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
 import {cn} from '../../utils/cn';
@@ -22,6 +23,7 @@ interface YdbUserDropdownProps {
     isCompact: boolean;
     user?: {
         login: string;
+        icon?: IconData;
     };
     popupAnchor: React.RefObject<HTMLDivElement>;
     children: React.ReactNode;
@@ -29,7 +31,7 @@ interface YdbUserDropdownProps {
 
 function UserDropdown({isCompact, popupAnchor, user, children}: YdbUserDropdownProps) {
     const [isUserDropdownVisible, setIsUserDropdownVisible] = React.useState(false);
-    const iconData = user ? Person : userSecret;
+    const iconData = user ? user.icon ?? Person : userSecret;
     return (
         <FooterItem
             compact={isCompact}
@@ -54,7 +56,7 @@ export interface AsideNavigationProps {
     ydbInternalUser: JSX.Element;
     menuItems?: MenuItem[];
     content: React.ReactNode;
-    user?: {login: string};
+    user?: {login: string; icon?: IconData};
 }
 
 enum Panel {
