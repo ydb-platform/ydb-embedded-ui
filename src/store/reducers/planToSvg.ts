@@ -7,7 +7,7 @@ export interface PlanToSvgQueryParams {
     database: string;
 }
 
-export const planToSvgQueryApi = api.injectEndpoints({
+export const planToSvgApi = api.injectEndpoints({
     endpoints: (build) => ({
         planToSvgQuery: build.mutation<string, PlanToSvgQueryParams>({
             queryFn: async ({plan, database}, {signal}) => {

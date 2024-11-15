@@ -3,9 +3,9 @@ import React from 'react';
 import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
 import {Button, Tooltip} from '@gravity-ui/uikit';
 
+import {planToSvgApi} from '../../../../store/reducers/planToSvg';
 import type {QueryPlan, ScriptPlan} from '../../../../types/api/query';
 
-import {usePlanToSvg} from './hooks';
 import i18n from './i18n';
 
 function getButtonView(error: string | null, isLoading: boolean) {
@@ -21,17 +21,36 @@ interface PlanToSvgButtonProps {
 }
 
 export function PlanToSvgButton({plan, database}: PlanToSvgButtonProps) {
-    const {error, blobUrl, isLoading, isUninitialized} = usePlanToSvg(database, plan);
+    const [error, setError] = React.useState<string | null>(null);
+    const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
+    const [getPlanToSvg, {isLoading}] = planToSvgApi.usePlanToSvgQueryMutation();
 
     const handleClick = React.useCallback(() => {
-        if (blobUrl) {
-            window.open(blobUrl, '_blank');
-        }
-    }, [blobUrl]);
+        getPlanToSvg({plan, database})
+            .unwrap()
+            .then((result) => {
+                if (blobUrl) {
+                    URL.revokeObjectURL(blobUrl);
+                }
 
-    if (isUninitialized) {
-        return null;
-    }
+                const blob = new Blob([result], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                setBlobUrl(url);
+                setError(null);
+                window.open(url, '_blank');
+            })
+            .catch((err) => {
+                setError(JSON.stringify(err));
+            });
+    }, [blobUrl, database, getPlanToSvg, plan]);
+
+    React.useEffect(() => {
+        return () => {
+            if (blobUrl) {
+                URL.revokeObjectURL(blobUrl);
+            }
+        };
+    }, [blobUrl]);
 
     return (
         <Tooltip
@@ -41,7 +60,7 @@ export function PlanToSvgButton({plan, database}: PlanToSvgButtonProps) {
                 view={getButtonView(error, isLoading)}
                 loading={isLoading}
                 onClick={handleClick}
-                disabled={isLoading || !blobUrl}
+                disabled={isLoading}
             >
                 {i18n('text_plan-svg')}
                 <Button.Icon>
