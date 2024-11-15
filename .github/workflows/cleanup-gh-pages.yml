@@ -1,0 +1,35 @@
+name: Cleanup GitHub Pages on PR Close
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch gh-pages branch
+        run: |
+          git fetch origin gh-pages:gh-pages
+          mkdir gh-pages
+          git --work-tree=gh-pages checkout gh-pages -- .
+
+      - name: Remove PR directory
+        run: |
+          rm -rf gh-pages/${{ github.event.pull_request.number }}
+
+      - name: Deploy report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: gh-pages
+          destination_dir: .
+          force_orphan: true
