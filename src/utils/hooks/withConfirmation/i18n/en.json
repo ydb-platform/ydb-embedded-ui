@@ -1,4 +1,4 @@
 {
-  "action_apply": "Proceed",
-  "context_unsaved-changes-warning": "You have unsaved changes in query editor. Do you want to proceed?"
+  "action_apply": "Don't save",
+  "context_unsaved-changes-warning": "You have unsaved changes in query editor.\nDo you want to proceed?"
 }

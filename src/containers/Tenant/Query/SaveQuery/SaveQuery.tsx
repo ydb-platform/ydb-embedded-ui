@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {ButtonProps} from '@gravity-ui/uikit';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
 import {
@@ -20,29 +21,36 @@ import './SaveQuery.scss';
 const b = cn('ydb-save-query');
 
 interface SaveQueryProps {
-    isSaveButtonDisabled?: boolean;
+    buttonProps?: ButtonProps;
 }
 
-export function SaveQuery({isSaveButtonDisabled}: SaveQueryProps) {
+function useSaveQueryHandler() {
     const dispatch = useTypedDispatch();
-    const queryNameToEdit = useTypedSelector(selectQueryName);
-
-    const onSaveQueryClick = () => {
+    const onSaveQueryClick = React.useCallback(() => {
         dispatch(setQueryAction('save'));
         dispatch(clearQueryNameToEdit());
-    };
+    }, [dispatch]);
+
+    return onSaveQueryClick;
+}
+
+export function SaveQueryButton(props: ButtonProps) {
+    const onSaveQueryClick = useSaveQueryHandler();
+    return (
+        <Button onClick={onSaveQueryClick} {...props}>
+            {i18n('action.save')}
+        </Button>
+    );
+}
+
+export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
+    const dispatch = useTypedDispatch();
+    const queryNameToEdit = useTypedSelector(selectQueryName);
+    const onSaveQueryClick = useSaveQueryHandler();
 
     const onEditQueryClick = () => {
         dispatch(saveQuery(queryNameToEdit));
         dispatch(clearQueryNameToEdit());
-    };
-
-    const renderSaveButton = () => {
-        return (
-            <Button onClick={onSaveQueryClick} disabled={isSaveButtonDisabled}>
-                {i18n('action.save')}
-            </Button>
-        );
     };
 
     const renderSaveDropdownMenu = () => {
@@ -60,7 +68,7 @@ export function SaveQuery({isSaveButtonDisabled}: SaveQueryProps) {
             <DropdownMenu
                 items={items}
                 renderSwitcher={(props) => (
-                    <Button {...props} disabled={isSaveButtonDisabled}>
+                    <Button {...props} {...buttonProps}>
                         {i18n('action.edit')}
                     </Button>
                 )}
@@ -69,10 +77,15 @@ export function SaveQuery({isSaveButtonDisabled}: SaveQueryProps) {
         );
     };
 
-    return queryNameToEdit ? renderSaveDropdownMenu() : renderSaveButton();
+    return queryNameToEdit ? renderSaveDropdownMenu() : <SaveQueryButton />;
 }
 
-export function SaveQueryDialog() {
+interface SaveQueryDialogProps {
+    onSuccess?: () => void;
+    onCancel?: () => void;
+}
+
+export function SaveQueryDialog({onSuccess, onCancel}: SaveQueryDialogProps) {
     const savedQueries = useSavedQueries();
     const dispatch = useTypedDispatch();
     const queryAction = useTypedSelector(selectQueryAction);
@@ -95,6 +108,11 @@ export function SaveQueryDialog() {
         setValidationError(undefined);
     };
 
+    const onCloseWithoutSave = () => {
+        onCancel?.();
+        onCloseDialog();
+    };
+
     const handleQueryNameChange = (value: string) => {
         setQueryName(value);
         setValidationError(undefined);
@@ -103,6 +121,7 @@ export function SaveQueryDialog() {
     const onSaveClick = () => {
         dispatch(saveQuery(queryName));
         onCloseDialog();
+        onSuccess?.();
     };
 
     return (
@@ -110,7 +129,7 @@ export function SaveQueryDialog() {
             open={queryAction === 'save'}
             hasCloseButton={false}
             size="s"
-            onClose={onCloseDialog}
+            onClose={onCloseWithoutSave}
         >
             <Dialog.Header caption={i18n('action.save')} />
             <form
@@ -147,7 +166,7 @@ export function SaveQueryDialog() {
                 <Dialog.Footer
                     textButtonApply={i18n('button-apply')}
                     textButtonCancel={i18n('button-cancel')}
-                    onClickButtonCancel={onCloseDialog}
+                    onClickButtonCancel={onCloseWithoutSave}
                     propsButtonApply={{
                         type: 'submit',
                     }}

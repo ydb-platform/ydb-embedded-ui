@@ -1,5 +1,7 @@
+import React from 'react';
+
 import * as NiceModal from '@ebay/nice-modal-react';
-import type {ButtonView} from '@gravity-ui/uikit';
+import type {ButtonView, DialogFooterProps} from '@gravity-ui/uikit';
 import {Dialog} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
@@ -23,11 +25,11 @@ interface CommonDialogProps {
     onConfirm?: () => void;
 }
 
-interface ConfirmationDialogNiceModalProps extends CommonDialogProps {
+interface ConfirmationDialogNiceModalProps extends CommonDialogProps, DialogFooterProps {
     onClose?: () => void;
 }
 
-interface ConfirmationDialogProps extends CommonDialogProps {
+interface ConfirmationDialogProps extends CommonDialogProps, DialogFooterProps {
     onClose: () => void;
     open: boolean;
     children?: React.ReactNode;
@@ -44,6 +46,7 @@ function ConfirmationDialog({
     textButtonCancel,
     buttonApplyView = 'normal',
     className,
+    renderButtons,
     open,
 }: ConfirmationDialogProps) {
     return (
@@ -54,7 +57,7 @@ function ConfirmationDialog({
             disableOutsideClick
             open={open}
         >
-            <Dialog.Header caption={caption} />
+            <Dialog.Header caption={<span className={block('caption')}>{caption}</span>} />
             <Dialog.Body>{children}</Dialog.Body>
             <Dialog.Footer
                 onClickButtonApply={onConfirm}
@@ -63,6 +66,7 @@ function ConfirmationDialog({
                 textButtonCancel={textButtonCancel ?? confirmationDialogKeyset('action_cancel')}
                 onClickButtonCancel={onClose}
                 loading={progress}
+                renderButtons={renderButtons}
             />
         </Dialog>
     );

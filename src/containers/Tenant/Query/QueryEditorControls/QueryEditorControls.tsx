@@ -110,7 +110,7 @@ export const QueryEditorControls = ({
             </div>
             <div className={b('right')}>
                 <NewSQL />
-                <SaveQuery isSaveButtonDisabled={disabled} />
+                <SaveQuery buttonProps={{disabled}} />
             </div>
         </div>
     );
