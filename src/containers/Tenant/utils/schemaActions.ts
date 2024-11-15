@@ -171,7 +171,7 @@ export const getActions =
                 {text: i18n('actions.createDirectory'), action: actions.createDirectory},
             ]);
         }
-        const TABLE_SET: ActionsSet = [
+        const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
             [
                 {text: i18n('actions.alterTable'), action: actions.alterTable},
@@ -180,6 +180,15 @@ export const getActions =
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
                 {text: i18n('actions.addTableIndex'), action: actions.addTableIndex},
                 {text: i18n('actions.createCdcStream'), action: actions.createCdcStream},
+            ],
+        ];
+        const COLUMN_TABLE_SET: ActionsSet = [
+            [copyItem],
+            [
+                {text: i18n('actions.alterTable'), action: actions.alterTable},
+                {text: i18n('actions.dropTable'), action: actions.dropTable},
+                {text: i18n('actions.selectQuery'), action: actions.selectQuery},
+                {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
             ],
         ];
 
@@ -235,8 +244,8 @@ export const getActions =
             database: DIR_SET,
             directory: DIR_SET,
 
-            table: TABLE_SET,
-            column_table: TABLE_SET,
+            table: ROW_TABLE_SET,
+            column_table: COLUMN_TABLE_SET,
 
             index_table: JUST_COPY,
             topic: TOPIC_SET,
