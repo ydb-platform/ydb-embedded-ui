@@ -200,8 +200,22 @@ export default function QueryEditor(props: QueryEditorProps) {
         }
     });
 
+    const editorWillUnmount = () => {
+        window.ydbEditor = undefined;
+    };
+
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
+        window.ydbEditor = editor;
         const keybindings = getKeyBindings(monaco);
+        monaco.editor.registerCommand('insertSnippetToEditor', (_asessor, input: string) => {
+            //suggestController is not properly typed yet in monaco-editor package
+            const contribution = editor.getContribution<any>('snippetController2');
+            if (contribution) {
+                editor.focus();
+                editor.setValue('');
+                contribution.insert(input);
+            }
+        });
         initResizeHandler(editor);
         initUserPrompt(editor, getLastQueryText);
         editor.focus();
@@ -333,6 +347,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                                 onChange={onChange}
                                 editorDidMount={editorDidMount}
                                 theme={`vs-${theme}`}
+                                editorWillUnmount={editorWillUnmount}
                             />
                         </div>
                     </div>

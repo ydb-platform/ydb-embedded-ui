@@ -3,22 +3,16 @@ import React from 'react';
 import {ChevronDown} from '@gravity-ui/icons';
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
 
-import {changeUserInput} from '../../../../store/reducers/executeQuery';
-import {useTypedDispatch} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
+import {insertSnipperToEditor} from '../../../../utils/monaco/insertSnippet';
 import {bindActions} from '../../utils/newSQLQueryActions';
 
 import i18n from './i18n';
 
 export function NewSQL() {
-    const dispatch = useTypedDispatch();
-
-    const insertTemplate = React.useCallback(
-        (input: string) => {
-            dispatch(changeUserInput({input}));
-        },
-        [dispatch],
-    );
+    const insertTemplate = React.useCallback((input: string) => {
+        insertSnipperToEditor(input);
+    }, []);
 
     const onTemplateClick = useChangeInputWithConfirmation(insertTemplate);
 

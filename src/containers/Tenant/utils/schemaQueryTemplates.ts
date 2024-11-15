@@ -9,8 +9,11 @@ export interface SchemaQueryParams {
 export type TemplateFn = (params?: SchemaQueryParams) => string;
 
 export const createTableTemplate = (params?: SchemaQueryParams) => {
+    const tableName = params?.relativePath
+        ? `\`${params?.relativePath}/my_row_table\``
+        : '${1:my_row_table}';
     return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_table
-CREATE TABLE \`${params?.relativePath || '$path'}/ydb_row_table\` (
+CREATE TABLE ${tableName} (
     category_id Uint64 NOT NULL,
     id Uint64,
     expire_at Datetime,
@@ -42,8 +45,11 @@ WITH (
 )`;
 };
 export const createColumnTableTemplate = (params?: SchemaQueryParams) => {
+    const tableName = params?.relativePath
+        ? `\`${params?.relativePath}/my_column_table\``
+        : '${1:my_column_table}';
     return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_table#olap-tables
-CREATE TABLE \`${params?.relativePath || '$path'}/ydb_column_table\` (
+CREATE TABLE ${tableName} (
     id Int64 NOT NULL,
     author Text,
     title Text,
@@ -57,42 +63,47 @@ export const createAsyncReplicationTemplate = () => {
     return `CREATE OBJECT secret_name (TYPE SECRET) WITH value="secret_value";
 
 CREATE ASYNC REPLICATION my_replication
-FOR \`/remote_database/table_name\` AS \`local_table_name\` --[, \`/remote_database/another_table_name\` AS \`another_local_table_name\` ...]
+FOR \`/\${1:<remote_database>}/\${2:table_name}\` AS \${3:local_table_name} --[, \`/remote_database/another_table_name\` AS \`another_local_table_name\` ...]
 WITH (
-    CONNECTION_STRING="grpcs://mydb.ydb.tech:2135/?database=/remote_database",
+    CONNECTION_STRING="grpcs://mydb.ydb.tech:2135/?database=/\${1:remote_database}",
     TOKEN_SECRET_NAME = "secret_name"
     -- ENDPOINT="mydb.ydb.tech:2135",
-    -- DATABASE=\`/remote_database\`,
+    -- DATABASE=\`\${1:/remote_database}\`,
     -- USER="user",
     -- PASSWORD_SECRET_NAME="your_password"
 );`;
 };
 export const alterTableTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/alter_table/
 
-ALTER TABLE \`${params?.relativePath || '$path'}\`
+ALTER TABLE ${path}
     -- RENAME TO new_table_name
     -- DROP COLUMN some_existing_column
     ADD COLUMN numeric_column Int32;`;
 };
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
     const columns = params?.tableData?.map((column) => '`' + column.name + '`').join(', ') || '*';
 
     return `SELECT ${columns}
-    FROM \`${params?.relativePath || '$path'}\`
+    FROM ${path}
     LIMIT 10;`;
 };
 export const upsertQueryTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
     const columns =
-        params?.tableData?.map((column) => `\`${column.name}\``).join(', ') || `\`id\`, \`name\``;
+        params?.tableData?.map((column) => `\`${column.name}\``).join(', ') || `id, name`;
 
-    return `UPSERT INTO \`${params?.relativePath || '$path'}\`
+    return `UPSERT INTO ${path}
     ( ${columns} )
 VALUES ( );`;
 };
 
 export const dropExternalTableTemplate = (params?: SchemaQueryParams) => {
-    return `DROP EXTERNAL TABLE \`${params?.relativePath || '$path'}\`;`;
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:my_table}';
+    return `DROP EXTERNAL TABLE ${path};`;
 };
 
 export const createExternalTableTemplate = (params?: SchemaQueryParams) => {
@@ -100,11 +111,18 @@ export const createExternalTableTemplate = (params?: SchemaQueryParams) => {
     // to create table in the same folder with data source
     const targetPath = params?.relativePath.split('/').slice(0, -1).join('/');
 
-    return `CREATE EXTERNAL TABLE \`${targetPath || '$path'}/my_external_table\` (
+    const target = targetPath
+        ? `\`${targetPath}/my_external_table\``
+        : '${1:<path_to_table>}/${2:my_external_table_name}';
+
+    const source = params?.relativePath
+        ? `${params.relativePath}`
+        : '${1:path_to_table}/${3:data_source_name}';
+    return `CREATE EXTERNAL TABLE ${target} (
     column1 Int,
     column2 Int
 ) WITH (
-    DATA_SOURCE="${params?.relativePath || '$path'}",
+    DATA_SOURCE="${source}",
     LOCATION="",
     FORMAT="json_as_string",
     \`file_pattern\`=""
@@ -112,8 +130,9 @@ export const createExternalTableTemplate = (params?: SchemaQueryParams) => {
 };
 
 export const createTopicTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath ? `\`${params?.relativePath}\`/my_topic` : '${1:my_topic}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-topic
-CREATE TOPIC \`${params?.relativePath || '$path'}/my_topic\` (
+CREATE TOPIC ${path} (
     CONSUMER consumer1,
     CONSUMER consumer2 WITH (read_from = Datetime('1970-01-01T00:00:00Z')) -- Sets up the message write time starting from which the consumer will receive data.
                                                                            -- Value type: Datetime OR Timestamp OR integer (unix-timestamp in the numeric format). 
@@ -133,8 +152,9 @@ CREATE TOPIC \`${params?.relativePath || '$path'}/my_topic\` (
 };
 
 export const alterTopicTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_topic>}';
     return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/alter_topic
-ALTER TOPIC \`${params?.relativePath || '$path'}\`
+ALTER TOPIC ${path}
     ADD CONSUMER new_consumer WITH (read_from = Datetime('1970-01-01T00:00:00Z')), -- Sets up the message write time starting from which the consumer will receive data.
                                                                                    -- Value type: Datetime OR Timestamp OR integer (unix-timestamp in the numeric format).
                                                                                    -- Default value: now
@@ -155,43 +175,50 @@ ALTER TOPIC \`${params?.relativePath || '$path'}\`
 };
 
 export const dropTopicTemplate = (params?: SchemaQueryParams) => {
-    return `DROP TOPIC \`${params?.relativePath || '$path'}\`;`;
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_topic>}';
+    return `DROP TOPIC ${path};`;
 };
 
 export const createViewTemplate = (params?: SchemaQueryParams) => {
-    return `CREATE VIEW \`${params?.relativePath || '$path'}/my_view\` WITH (security_invoker = TRUE) AS SELECT 1;`;
+    const path = params?.relativePath ? `\`${params?.relativePath}\`/my_view` : '${1:my_view}';
+    return `CREATE VIEW ${path} WITH (security_invoker = TRUE) AS SELECT 1;`;
 };
 
 export const dropViewTemplate = (params?: SchemaQueryParams) => {
-    return `DROP VIEW \`${params?.relativePath || '$path'}\`;`;
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_view>}';
+    return `DROP VIEW ${path};`;
 };
 export const dropAsyncReplicationTemplate = (params?: SchemaQueryParams) => {
-    return `DROP ASYNC REPLICATION \`${params?.relativePath || '$path'}\`;`;
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_replication>}';
+    return `DROP ASYNC REPLICATION ${path};`;
 };
 
 export const alterAsyncReplicationTemplate = (params?: SchemaQueryParams) => {
-    return `ALTER ASYNC REPLICATION \`${params?.relativePath || '$path'}\` SET (STATE = "DONE", FAILOVER_MODE = "FORCE");`;
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_replication>}';
+    return `ALTER ASYNC REPLICATION ${path} SET (STATE = "DONE", FAILOVER_MODE = "FORCE");`;
 };
 
 export const addTableIndex = (params?: SchemaQueryParams) => {
-    return `ALTER TABLE \`${params?.relativePath || '$path'}\` ADD INDEX \`$indexName\` GLOBAL ON (\`$columnName\`);`;
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+    return `ALTER TABLE ${path} ADD INDEX \${2:index_name} GLOBAL ON (\${3:<column_name>});`;
 };
 
 export const dropTableIndex = (params?: SchemaQueryParams) => {
     const indexName = params?.relativePath.split('/').pop();
     const path = params?.relativePath.split('/').slice(0, -1).join('/');
-    return `ALTER TABLE \`${path || '$path'}\` DROP INDEX \`${indexName || '$indexName'}\`;`;
+    return `ALTER TABLE \`${path || '${1:<my_table>}'}\` DROP INDEX ${indexName || '${2:<index_name>}'};`;
 };
 
 export const createCdcStreamTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create_changefeed
-ALTER TABLE \`${params?.relativePath || '$path'}\` ADD CHANGEFEED $name WITH (
-    MODE = $mode, -- KEYS_ONLY, UPDATES, NEW_IMAGE, OLD_IMAGE, or NEW_AND_OLD_IMAGES
-    FORMAT = $format, -- JSON or DEBEZIUM_JSON
-    VIRTUAL_TIMESTAMPS = $virtualTimestamps, -- true or false
-    RETENTION_PERIOD = $retentionPeriod, -- Interval value, e.g., Interval('PT24H')
-    TOPIC_MIN_ACTIVE_PARTITIONS = $topicMinActivePartitions,
-    INITIAL_SCAN = $initialScan -- true or false
+ALTER TABLE ${path} ADD CHANGEFEED \${2:changefeed_name} WITH (
+    MODE = \${3:mode}, -- KEYS_ONLY, UPDATES, NEW_IMAGE, OLD_IMAGE, or NEW_AND_OLD_IMAGES
+    FORMAT = \${4:format}, -- JSON or DEBEZIUM_JSON
+    VIRTUAL_TIMESTAMPS = \${5:virtualTimestamps}, -- true or false
+    RETENTION_PERIOD = \${6:retentionPeriod}, -- Interval value, e.g., Interval('PT24H')
+    TOPIC_MIN_ACTIVE_PARTITIONS = \${7:topicMinActivePartitions},
+    INITIAL_SCAN = \${8:initialScan} -- true or false
 )
 
 -- MODE options:
@@ -204,13 +231,13 @@ ALTER TABLE \`${params?.relativePath || '$path'}\` ADD CHANGEFEED $name WITH (
 
 export const createGroupTemplate = () => {
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-group
-CREATE GROUP $group_name
+CREATE GROUP \${1:group_name}
 -- group_name: The name of the group. It may contain lowercase Latin letters and digits.`;
 };
 
 export const createUserTemplate = () => {
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-user
-CREATE USER $user_name [option]
+CREATE USER \${1:user_name} [option]
 -- user_name: The name of the user. It may contain lowercase Latin letters and digits.
 -- option: The password of the user:
     -- PASSWORD 'password' creates a user with the password password. The ENCRYPTED option is always enabled.
@@ -218,14 +245,15 @@ CREATE USER $user_name [option]
 };
 
 export const deleteRowsTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/delete
-DELETE FROM \`${params?.relativePath || '$path'}\`
-WHERE Key1 == $key1 AND Key2 >= $key2;`;
+DELETE FROM ${path}
+WHERE Key1 == \${2:key1} AND Key2 >= \${3:key2};`;
 };
 
 export const dropGroupTemplate = () => {
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/drop-group
-DROP GROUP [ IF EXISTS ] $group_name [, ...]
+DROP GROUP [ IF EXISTS ] \${1:<group_name>} [, ...]
 
 -- IF EXISTS: Suppress an error if the group doesn't exist.
 -- group_name: The name of the group to be deleted.`;
@@ -233,17 +261,20 @@ DROP GROUP [ IF EXISTS ] $group_name [, ...]
 
 export const dropUserTemplate = () => {
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/drop-user
-DROP USER [ IF EXISTS ] $user_name [, ...]
+DROP USER [ IF EXISTS ] \${1:<user_name>} [, ...]
 
 -- IF EXISTS: Suppress an error if the user doesn't exist.
 -- user_name: The name of the user to be deleted.`;
 };
 
 export const grantPrivilegeTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${params?.relativePath}\``
+        : '${2:<path_to_scheme_object>}';
     return `
-GRANT $permission_name [, ...] | ALL [PRIVILEGES]
-ON \`${params?.relativePath || '$path_to_scheme_object'}\` [, ...]
-TO $role_name [, ...]
+GRANT \${1:<permission_name>} [, ...] | ALL [PRIVILEGES]
+ON ${path} [, ...]
+TO \${3:<role_name>} [, ...]
 [WITH GRANT OPTION]
 
 -- permission_name: The name of the access right to schema objects that needs to be assigned.
@@ -256,10 +287,13 @@ TO $role_name [, ...]
 };
 
 export const revokePrivilegeTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${params?.relativePath}\``
+        : '${2:<path_to_scheme_object>}';
     return `
-REVOKE [GRANT OPTION FOR] $permission_name [, ...] | ALL [PRIVILEGES]
-ON \`${params?.relativePath || '$path_to_scheme_object'}\` [, ...]
-FROM $role_name [, ...]
+REVOKE [GRANT OPTION FOR] \${1:<permission_name>} [, ...] | ALL [PRIVILEGES]
+ON ${path} [, ...]
+FROM \${3:<role_name>} [, ...]
 
 -- permission_name: The name of the access right to schema objects that needs to be revoked.
 -- path_to_scheme_object: The path to the schema object from which rights are being revoked.
@@ -270,12 +304,14 @@ FROM $role_name [, ...]
 };
 
 export const updateTableTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/update
-UPDATE \`${params?.relativePath || '$path'}\`
-SET Value1 = YQL::ToString($value2 + 1), Value2 = $value2 - 1
-WHERE Key1 > $key1;`;
+UPDATE ${path}
+SET Value1 = YQL::ToString(\${2:value2} + 1), Value2 = \${3:value2} - 1
+WHERE Key1 > \${4:key1};`;
 };
 
 export const dropTableTemplate = (params?: SchemaQueryParams) => {
-    return `DROP TABLE \`${params?.relativePath || '$path'}\`;`;
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+    return `DROP TABLE ${path};`;
 };
