@@ -63,12 +63,12 @@ export const createAsyncReplicationTemplate = () => {
     return `CREATE OBJECT secret_name (TYPE SECRET) WITH value="secret_value";
 
 CREATE ASYNC REPLICATION my_replication
-FOR \`/\${1:<remote_database>}/\${2:table_name}\` AS \${3:local_table_name} --[, \`/remote_database/another_table_name\` AS \`another_local_table_name\` ...]
+FOR \${1:<table_name>} AS \${2:local_table_name} --[, \`/remote_database/another_table_name\` AS \`another_local_table_name\` ...]
 WITH (
-    CONNECTION_STRING="grpcs://mydb.ydb.tech:2135/?database=/\${1:remote_database}",
+    CONNECTION_STRING="grpcs://mydb.ydb.tech:2135/?database=/\${3:<remote_database>}",
     TOKEN_SECRET_NAME = "secret_name"
     -- ENDPOINT="mydb.ydb.tech:2135",
-    -- DATABASE=\`\${1:/remote_database}\`,
+    -- DATABASE=\`\${3:/remote_database}\`,
     -- USER="user",
     -- PASSWORD_SECRET_NAME="your_password"
 );`;
@@ -111,13 +111,9 @@ export const createExternalTableTemplate = (params?: SchemaQueryParams) => {
     // to create table in the same folder with data source
     const targetPath = params?.relativePath.split('/').slice(0, -1).join('/');
 
-    const target = targetPath
-        ? `\`${targetPath}/my_external_table\``
-        : '${1:<path_to_table>}/${2:my_external_table_name}';
+    const target = targetPath ? `\`${targetPath}/my_external_table\`` : '${1:<my_external_table>}';
 
-    const source = params?.relativePath
-        ? `${params.relativePath}`
-        : '${1:path_to_table}/${3:data_source_name}';
+    const source = params?.relativePath ? `${params.relativePath}` : '${2:<path_to_data_source>}';
     return `CREATE EXTERNAL TABLE ${target} (
     column1 Int,
     column2 Int
