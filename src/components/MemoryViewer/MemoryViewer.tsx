@@ -99,7 +99,39 @@ export function MemoryViewer({
 
     return (
         <HoverPopup
-            popupContent={<MemoryViewerComponents stats={stats} formatValues={formatValues} />}
+            popupContent={
+                <DefinitionList responsive>
+                    {memorySegments.map(
+                        ({label, value: segmentSize, capacity: segmentCapacity, key}) => (
+                            <DefinitionList.Item
+                                key={label}
+                                name={
+                                    <div className={b('container')}>
+                                        <div className={b('legend', {type: key})}></div>
+                                        <div className={b('name')}>{label}</div>
+                                    </div>
+                                }
+                            >
+                                {segmentCapacity ? (
+                                    <ProgressViewer
+                                        value={segmentSize}
+                                        capacity={segmentCapacity}
+                                        formatValues={formatDetailedValues}
+                                        colorizeProgress
+                                    />
+                                ) : (
+                                    formatBytes({
+                                        value: segmentSize,
+                                        size: 'gb',
+                                        withSizeLabel: true,
+                                        precision: 2,
+                                    })
+                                )}
+                            </DefinitionList.Item>
+                        ),
+                    )}
+                </DefinitionList>
+            }
         >
             <div className={b({theme, status}, className)}>
                 <div className={b('progress-container')}>
@@ -132,41 +164,5 @@ export function MemoryViewer({
                 </div>
             </div>
         </HoverPopup>
-    );
-}
-
-export function MemoryViewerComponents({stats}: MemoryProgressViewerProps) {
-    const memorySegments = getMemorySegments(stats);
-
-    return (
-        <DefinitionList responsive>
-            {memorySegments.map(({label, value: segmentSize, capacity: segmentCapacity, key}) => (
-                <DefinitionList.Item
-                    key={label}
-                    name={
-                        <div className={b('container')}>
-                            <div className={b('legend', {type: key})}></div>
-                            <div className={b('name')}>{label}</div>
-                        </div>
-                    }
-                >
-                    {segmentCapacity ? (
-                        <ProgressViewer
-                            value={segmentSize}
-                            capacity={segmentCapacity}
-                            formatValues={formatDetailedValues}
-                            colorizeProgress
-                        />
-                    ) : (
-                        formatBytes({
-                            value: segmentSize,
-                            size: 'gb',
-                            withSizeLabel: true,
-                            precision: 2,
-                        })
-                    )}
-                </DefinitionList.Item>
-            ))}
-        </DefinitionList>
     );
 }

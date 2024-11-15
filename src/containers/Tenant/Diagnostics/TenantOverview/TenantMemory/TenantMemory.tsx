@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {MemoryViewerComponents} from '../../../../../components/MemoryViewer/MemoryViewer';
+import {MemoryViewer} from '../../../../../components/MemoryViewer/MemoryViewer';
 import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
 import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -29,10 +29,7 @@ export function TenantMemory({
             <div className={b('title')}>{'Memory details'}</div>
             <div className={b('memory-info')}>
                 {memoryStats ? (
-                    <MemoryViewerComponents
-                        formatValues={formatStorageValuesToGb}
-                        stats={memoryStats}
-                    />
+                    <MemoryViewer formatValues={formatStorageValuesToGb} stats={memoryStats} />
                 ) : (
                     <ProgressViewer
                         value={memoryUsed}
