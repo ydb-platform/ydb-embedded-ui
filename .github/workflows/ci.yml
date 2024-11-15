@@ -203,6 +203,11 @@ jobs:
           mkdir gh-pages
           git --work-tree=gh-pages checkout gh-pages -- .
 
+      - name: Download Playwright artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: playwright-artifacts
+
       - name: Copy new report
         run: |
           mkdir -p gh-pages/${{ github.event.pull_request.number }}
