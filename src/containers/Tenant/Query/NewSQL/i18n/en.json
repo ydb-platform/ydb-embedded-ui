@@ -1,5 +1,5 @@
 {
-  "button.new-sql": "New SQL",
+  "button.new-sql": "New query",
   "action.create-row-table": "Create row table",
   "action.create-column-table": "Create column table",
   "action.create-external-table": "Create external table",
