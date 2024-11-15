@@ -7,5 +7,8 @@
   "action.copy": "Copy {{activeSection}}",
   "trace": "Trace",
   "title.truncated": "Truncated",
-  "title.result": "Result"
+  "title.result": "Result",
+  "text_plan-svg": "Execution plan",
+  "text_open-plan-svg": "Open execution plan in new window",
+  "text_error-plan-svg": "Error: {{error}}"
 }

@@ -4,6 +4,7 @@ import type {AxiosRequestConfig} from 'axios';
 import axiosRetry from 'axios-retry';
 
 import {backend as BACKEND, metaBackend as META_BACKEND} from '../store';
+import type {PlanToSvgQueryParams} from '../store/reducers/planToSvg';
 import type {TMetaInfo} from '../types/api/acl';
 import type {TQueryAutocomplete} from '../types/api/autocomplete';
 import type {CapabilitiesResponse} from '../types/api/capabilities';
@@ -575,6 +576,22 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                           'X-Trace-Verbosity': params.tracingLevel,
                       }
                     : undefined,
+            },
+        );
+    }
+    planToSvg({database, plan}: PlanToSvgQueryParams, {signal}: {signal?: AbortSignal} = {}) {
+        return this.post<string>(
+            this.getPath('/viewer/plan2svg'),
+            plan,
+            {database},
+            {
+                requestConfig: {
+                    signal,
+                    responseType: 'text',
+                    headers: {
+                        Accept: 'image/svg+xml',
+                    },
+                },
             },
         );
     }
