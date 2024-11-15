@@ -29,10 +29,6 @@ export function PlanToSvgButton({plan, database}: PlanToSvgButtonProps) {
         getPlanToSvg({plan, database})
             .unwrap()
             .then((result) => {
-                if (blobUrl) {
-                    URL.revokeObjectURL(blobUrl);
-                }
-
                 const blob = new Blob([result], {type: 'image/svg+xml'});
                 const url = URL.createObjectURL(blob);
                 setBlobUrl(url);
@@ -42,7 +38,7 @@ export function PlanToSvgButton({plan, database}: PlanToSvgButtonProps) {
             .catch((err) => {
                 setError(JSON.stringify(err));
             });
-    }, [blobUrl, database, getPlanToSvg, plan]);
+    }, [database, getPlanToSvg, plan]);
 
     React.useEffect(() => {
         return () => {
