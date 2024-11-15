@@ -197,22 +197,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: playwright-artifacts
-          path: playwright-artifacts
+      - name: Fetch gh-pages branch
+        run: |
+          git fetch origin gh-pages:gh-pages
+          mkdir gh-pages
+          git --work-tree=gh-pages checkout gh-pages -- .
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
+      - name: Copy new report
+        run: |
+          mkdir -p gh-pages/${{ github.event.pull_request.number }}
+          cp -r playwright-artifacts/playwright-report/* gh-pages/${{ github.event.pull_request.number }}/
 
       - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./playwright-artifacts/playwright-report
-          destination_dir: ${{ github.event.pull_request.number }}
-          force_orphan: true
+          publish_dir: gh-pages
+          destination_dir: .
+          keep_history: false
 
       - name: Update PR description
         uses: actions/github-script@v6
