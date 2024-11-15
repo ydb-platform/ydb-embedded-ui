@@ -1,12 +1,13 @@
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {useViewerNodesHandlerHasGroupingBySystemState} from '../../store/reducers/capabilities/hooks';
+import type {NodesGroupByField} from '../../types/api/nodes';
 import type {NodesUptimeFilterValues} from '../../utils/nodes';
 import {nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
 import {parseNodesGroupByParam} from './columns/constants';
 
-export function useNodesPageQueryParams() {
+export function useNodesPageQueryParams(groupByParams: NodesGroupByField[] | undefined) {
     const [queryParams, setQueryParams] = useQueryParams({
         uptimeFilter: StringParam,
         search: StringParam,
@@ -19,6 +20,7 @@ export function useNodesPageQueryParams() {
     const systemStateGroupingAvailable = useViewerNodesHandlerHasGroupingBySystemState();
     const groupByParam = parseNodesGroupByParam(
         queryParams.nodesGroupBy,
+        groupByParams ?? [],
         systemStateGroupingAvailable,
     );
 

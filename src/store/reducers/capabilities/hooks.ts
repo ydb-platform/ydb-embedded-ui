@@ -62,6 +62,10 @@ export const useViewerNodesHandlerHasGroupingBySystemState = () => {
     return useGetFeatureVersion('/viewer/nodes') > 11;
 };
 
+export const useViewerNodesHandlerHasNetworkStats = () => {
+    return useGetFeatureVersion('/viewer/nodes') > 12;
+};
+
 export const useFeatureFlagsAvailable = () => {
     return useGetFeatureVersion('/viewer/feature_flags') > 1;
 };

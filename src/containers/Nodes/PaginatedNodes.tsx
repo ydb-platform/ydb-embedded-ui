@@ -2,38 +2,66 @@ import React from 'react';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
-import type {RenderControls} from '../../components/PaginatedTable';
+import type {Column, RenderControls} from '../../components/PaginatedTable';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {NODES_COLUMNS_TITLES} from '../../components/nodesColumns/constants';
+import type {NodesColumnId} from '../../components/nodesColumns/constants';
 import {
     useCapabilitiesLoaded,
     useViewerNodesHandlerHasGrouping,
 } from '../../store/reducers/capabilities/hooks';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
+import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {useProblemFilter} from '../../store/reducers/settings/hooks';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
+import type {NodesGroupByField} from '../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../utils/hooks';
+import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {TableGroup} from '../Storage/TableGroup/TableGroup';
 import {useExpandedGroups} from '../Storage/TableGroup/useExpandedTableGroups';
 
 import {NodesControls} from './NodesControls/NodesControls';
 import {PaginatedNodesTable} from './PaginatedNodesTable';
-import {useNodesSelectedColumns} from './columns/hooks';
+import {getNodesColumns} from './columns/columns';
+import {
+    ALL_NODES_GROUP_BY_PARAMS,
+    DEFAULT_NODES_COLUMNS,
+    NODES_TABLE_SELECTED_COLUMNS_LS_KEY,
+    REQUIRED_NODES_COLUMNS,
+} from './columns/constants';
 import i18n from './i18n';
 import {b} from './shared';
 import {useNodesPageQueryParams} from './useNodesPageQueryParams';
 
 import './Nodes.scss';
 
-interface PaginatedNodesProps {
+export interface PaginatedNodesProps {
     path?: string;
     database?: string;
     parentRef: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
+
+    columns?: Column<NodesPreparedEntity>[];
+    defaultColumnsIds?: NodesColumnId[];
+    requiredColumnsIds?: NodesColumnId[];
+    selectedColumnsKey?: string;
+    groupByParams?: NodesGroupByField[];
 }
 
-export function PaginatedNodes(props: PaginatedNodesProps) {
-    const {uptimeFilter, groupByParam, handleUptimeFilterChange} = useNodesPageQueryParams();
+export function PaginatedNodes({
+    path,
+    database,
+    parentRef,
+    additionalNodesProps,
+    columns = getNodesColumns({database, getNodeRef: additionalNodesProps?.getNodeRef}),
+    defaultColumnsIds = DEFAULT_NODES_COLUMNS,
+    requiredColumnsIds = REQUIRED_NODES_COLUMNS,
+    selectedColumnsKey = NODES_TABLE_SELECTED_COLUMNS_LS_KEY,
+    groupByParams = ALL_NODES_GROUP_BY_PARAMS,
+}: PaginatedNodesProps) {
+    const {uptimeFilter, groupByParam, handleUptimeFilterChange} =
+        useNodesPageQueryParams(groupByParams);
     const {problemFilter, handleProblemFilterChange} = useProblemFilter();
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
@@ -59,29 +87,76 @@ export function PaginatedNodes(props: PaginatedNodesProps) {
 
     const renderContent = () => {
         if (viewerNodesHandlerHasGrouping && groupByParam) {
-            return <GroupedNodesComponent {...props} />;
+            return (
+                <GroupedNodesComponent
+                    path={path}
+                    database={database}
+                    parentRef={parentRef}
+                    columns={columns}
+                    defaultColumnsIds={defaultColumnsIds}
+                    requiredColumnsIds={requiredColumnsIds}
+                    selectedColumnsKey={selectedColumnsKey}
+                    groupByParams={groupByParams}
+                />
+            );
         }
 
-        return <NodesComponent {...props} />;
+        return (
+            <NodesComponent
+                path={path}
+                database={database}
+                parentRef={parentRef}
+                columns={columns}
+                defaultColumnsIds={defaultColumnsIds}
+                requiredColumnsIds={requiredColumnsIds}
+                selectedColumnsKey={selectedColumnsKey}
+                groupByParams={groupByParams}
+            />
+        );
     };
 
     return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
 }
 
-function NodesComponent({path, database, parentRef, additionalNodesProps}: PaginatedNodesProps) {
-    const {searchValue, uptimeFilter} = useNodesPageQueryParams();
+interface PaginatedNodesComponentProps {
+    path?: string;
+    database?: string;
+    parentRef: React.RefObject<HTMLElement>;
+
+    columns: Column<NodesPreparedEntity>[];
+    defaultColumnsIds: NodesColumnId[];
+    requiredColumnsIds: NodesColumnId[];
+    selectedColumnsKey: string;
+    groupByParams: NodesGroupByField[];
+}
+
+function NodesComponent({
+    path,
+    database,
+    parentRef,
+    columns,
+    defaultColumnsIds,
+    requiredColumnsIds,
+    selectedColumnsKey,
+    groupByParams,
+}: PaginatedNodesComponentProps) {
+    const {searchValue, uptimeFilter} = useNodesPageQueryParams(groupByParams);
     const {problemFilter} = useProblemFilter();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
-    const {columnsToShow, columnsToSelect, setColumns} = useNodesSelectedColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database,
-    });
+    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
+        columns,
+        selectedColumnsKey,
+        NODES_COLUMNS_TITLES,
+        defaultColumnsIds,
+        requiredColumnsIds,
+    );
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
             <NodesControls
                 withGroupBySelect={viewerNodesHandlerHasGrouping}
+                groupByParams={groupByParams}
                 columnsToSelect={columnsToSelect}
                 handleSelectedColumnsUpdate={setColumns}
                 entitiesCountCurrent={foundEntities}
@@ -109,15 +184,22 @@ function GroupedNodesComponent({
     path,
     database,
     parentRef,
-    additionalNodesProps,
-}: PaginatedNodesProps) {
-    const {searchValue, groupByParam} = useNodesPageQueryParams();
+    columns,
+    defaultColumnsIds,
+    requiredColumnsIds,
+    selectedColumnsKey,
+    groupByParams,
+}: PaginatedNodesComponentProps) {
+    const {searchValue, groupByParam} = useNodesPageQueryParams(groupByParams);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const {columnsToShow, columnsToSelect, setColumns} = useNodesSelectedColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database,
-    });
+    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
+        columns,
+        selectedColumnsKey,
+        NODES_COLUMNS_TITLES,
+        defaultColumnsIds,
+        requiredColumnsIds,
+    );
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
@@ -145,6 +227,7 @@ function GroupedNodesComponent({
         return (
             <NodesControls
                 withGroupBySelect
+                groupByParams={groupByParams}
                 columnsToSelect={columnsToSelect}
                 handleSelectedColumnsUpdate={setColumns}
                 entitiesCountCurrent={found}

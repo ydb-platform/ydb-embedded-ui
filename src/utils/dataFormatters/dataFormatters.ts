@@ -108,12 +108,17 @@ export const formatNumber = (number?: unknown) => {
     return configuredNumeral(number).format('0,0.[00000]');
 };
 
-export const formatPercent = (number?: unknown) => {
+export const formatPercent = (number?: unknown, precision = 2) => {
     if (!isNumeric(number)) {
         return '';
     }
-    const configuredNumber = configuredNumeral(number);
-    const format = '0%';
+
+    // Numeral doesn't work well with very low numbers (for example 2e-27)
+    // We can receive such numbers from backend in float fields
+    // So we need apply toFixed before configuration
+    const preparedNumber = Number(number).toFixed(precision);
+    const configuredNumber = configuredNumeral(preparedNumber);
+    const format = '0.[00]%';
     return configuredNumber.format(format);
 };
 
@@ -123,12 +128,14 @@ export const formatSecondsToHours = (seconds: number) => {
 };
 
 export const roundToPrecision = (value: number | string, precision = 0) => {
-    let [digits] = String(value).split('.');
-    if (Number(value) < 1) {
+    // Prevent "-" counting as digit in negative values
+    const valueAbs = Math.abs(Number(value));
+    let [digits] = String(valueAbs).split('.');
+    if (Number(valueAbs) < 1) {
         digits = '';
     }
     if (digits.length >= precision) {
-        return Math.round(Number(value));
+        return Number(Number(value).toFixed(0));
     }
     return Number(Number(value).toFixed(precision - digits.length));
 };

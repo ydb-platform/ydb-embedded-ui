@@ -8,16 +8,17 @@ import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {
+    formatPercent,
     formatStorageValues,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {getSpaceUsageSeverity} from '../../utils/storage';
 import type {Column} from '../../utils/tableUtils/types';
-import {isNumeric} from '../../utils/utils';
+import {bytesToSpeed, isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {MemoryViewer} from '../MemoryViewer/MemoryViewer';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
-import type {NodeHostData} from '../NodeHostWrapper/NodeHostWrapper';
+import type {NodeHostData, StatusForIcon} from '../NodeHostWrapper/NodeHostWrapper';
 import {PoolsGraph} from '../PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../TabletsStatistic';
@@ -27,6 +28,7 @@ import {UsageLabel} from '../UsageLabel/UsageLabel';
 import {NODES_COLUMNS_IDS, NODES_COLUMNS_TITLES} from './constants';
 import i18n from './i18n';
 import type {GetNodesColumnsParams} from './types';
+import {prepareClockSkewValue, preparePingTimeValue} from './utils';
 
 import './NodesColumns.scss';
 
@@ -41,15 +43,22 @@ export function getNodeIdColumn<T extends {NodeId?: string | number}>(): Column<
         align: DataTable.RIGHT,
     };
 }
-export function getHostColumn<T extends NodeHostData>({
-    getNodeRef,
-    database,
-}: GetNodesColumnsParams): Column<T> {
+export function getHostColumn<T extends NodeHostData>(
+    {getNodeRef, database}: GetNodesColumnsParams,
+    {statusForIcon = 'SystemState'}: {statusForIcon?: StatusForIcon} = {},
+): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Host,
         header: NODES_COLUMNS_TITLES.Host,
         render: ({row}) => {
-            return <NodeHostWrapper node={row} getNodeRef={getNodeRef} database={database} />;
+            return (
+                <NodeHostWrapper
+                    node={row}
+                    getNodeRef={getNodeRef}
+                    database={database}
+                    statusForIcon={statusForIcon}
+                />
+            );
         },
         width: 350,
         align: DataTable.LEFT,
@@ -361,5 +370,165 @@ export function getMissingDisksColumn<T extends {Missing?: number}>(): Column<T>
         render: ({row}) => row.Missing,
         align: DataTable.CENTER,
         defaultOrder: DataTable.DESCENDING,
+    };
+}
+
+// Network diagnostics columns
+export function getConnectionsColumn<T extends {Connections?: number}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.Connections,
+        header: NODES_COLUMNS_TITLES.Connections,
+        render: ({row}) => (isNumeric(row.Connections) ? row.Connections : EMPTY_DATA_PLACEHOLDER),
+        align: DataTable.RIGHT,
+        width: 130,
+    };
+}
+export function getNetworkUtilizationColumn<
+    T extends {
+        NetworkUtilization?: number;
+        NetworkUtilizationMin?: number;
+        NetworkUtilizationMax?: number;
+    },
+>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.NetworkUtilization,
+        header: NODES_COLUMNS_TITLES.NetworkUtilization,
+        render: ({row}) => {
+            const {NetworkUtilization, NetworkUtilizationMin = 0, NetworkUtilizationMax = 0} = row;
+
+            if (!isNumeric(NetworkUtilization)) {
+                return EMPTY_DATA_PLACEHOLDER;
+            }
+
+            return (
+                <CellWithPopover
+                    placement={['top', 'auto']}
+                    fullWidth
+                    content={
+                        <DefinitionList responsive>
+                            <DefinitionList.Item key={'NetworkUtilization'} name={i18n('sum')}>
+                                {formatPercent(NetworkUtilization)}
+                            </DefinitionList.Item>
+                            <DefinitionList.Item key={'NetworkUtilizationMin'} name={i18n('min')}>
+                                {formatPercent(NetworkUtilizationMin)}
+                            </DefinitionList.Item>
+                            <DefinitionList.Item key={'NetworkUtilizationMax'} name={i18n('max')}>
+                                {formatPercent(NetworkUtilizationMax)}
+                            </DefinitionList.Item>
+                        </DefinitionList>
+                    }
+                >
+                    {formatPercent(NetworkUtilization)}
+                </CellWithPopover>
+            );
+        },
+        align: DataTable.RIGHT,
+        width: 110,
+    };
+}
+export function getSendThroughputColumn<T extends {SendThroughput?: string}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.SendThroughput,
+        header: NODES_COLUMNS_TITLES.SendThroughput,
+        render: ({row}) =>
+            isNumeric(row.SendThroughput)
+                ? bytesToSpeed(row.SendThroughput)
+                : EMPTY_DATA_PLACEHOLDER,
+        align: DataTable.RIGHT,
+        width: 110,
+    };
+}
+export function getReceiveThroughputColumn<T extends {ReceiveThroughput?: string}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.ReceiveThroughput,
+        header: NODES_COLUMNS_TITLES.ReceiveThroughput,
+        render: ({row}) =>
+            isNumeric(row.ReceiveThroughput)
+                ? bytesToSpeed(row.ReceiveThroughput)
+                : EMPTY_DATA_PLACEHOLDER,
+        align: DataTable.RIGHT,
+        width: 110,
+    };
+}
+export function getPingTimeColumn<
+    T extends {
+        PingTimeUs?: string;
+        PingTimeMinUs?: string;
+        PingTimeMaxUs?: string;
+    },
+>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.PingTime,
+        header: NODES_COLUMNS_TITLES.PingTime,
+        render: ({row}) => {
+            const {PingTimeUs, PingTimeMinUs = 0, PingTimeMaxUs = 0} = row;
+
+            if (!isNumeric(PingTimeUs)) {
+                return EMPTY_DATA_PLACEHOLDER;
+            }
+
+            return (
+                <CellWithPopover
+                    placement={['top', 'auto']}
+                    fullWidth
+                    content={
+                        <DefinitionList responsive>
+                            <DefinitionList.Item key={'PingTimeUs'} name={i18n('avg')}>
+                                {preparePingTimeValue(PingTimeUs)}
+                            </DefinitionList.Item>
+                            <DefinitionList.Item key={'PingTimeMinUs'} name={i18n('min')}>
+                                {preparePingTimeValue(PingTimeMinUs)}
+                            </DefinitionList.Item>
+                            <DefinitionList.Item key={'PingTimeMaxUs'} name={i18n('max')}>
+                                {preparePingTimeValue(PingTimeMaxUs)}
+                            </DefinitionList.Item>
+                        </DefinitionList>
+                    }
+                >
+                    {preparePingTimeValue(PingTimeUs)}
+                </CellWithPopover>
+            );
+        },
+        align: DataTable.RIGHT,
+        width: 110,
+    };
+}
+export function getClockSkewColumn<
+    T extends {ClockSkewUs?: string; ClockSkewMinUs?: string; ClockSkewMaxUs?: string},
+>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.ClockSkew,
+        header: NODES_COLUMNS_TITLES.ClockSkew,
+        render: ({row}) => {
+            const {ClockSkewUs, ClockSkewMinUs = 0, ClockSkewMaxUs = 0} = row;
+
+            if (!isNumeric(ClockSkewUs)) {
+                return EMPTY_DATA_PLACEHOLDER;
+            }
+
+            return (
+                <CellWithPopover
+                    placement={['top', 'auto']}
+                    fullWidth
+                    content={
+                        <DefinitionList responsive>
+                            <DefinitionList.Item key={'ClockSkewUs'} name={i18n('avg')}>
+                                {prepareClockSkewValue(ClockSkewUs)}
+                            </DefinitionList.Item>
+                            <DefinitionList.Item key={'ClockSkewMinUs'} name={i18n('min')}>
+                                {prepareClockSkewValue(ClockSkewMinUs)}
+                            </DefinitionList.Item>
+                            <DefinitionList.Item key={'ClockSkewMaxUs'} name={i18n('max')}>
+                                {prepareClockSkewValue(ClockSkewMaxUs)}
+                            </DefinitionList.Item>
+                        </DefinitionList>
+                    }
+                >
+                    {prepareClockSkewValue(ClockSkewUs)}
+                </CellWithPopover>
+            );
+        },
+        align: DataTable.RIGHT,
+        width: 110,
     };
 }

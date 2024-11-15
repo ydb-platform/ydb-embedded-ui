@@ -8,10 +8,11 @@ export const prepareNodesData = (data: TNodesInfo): NodesHandledResponse => {
     const rawNodes = data.Nodes || [];
 
     const preparedNodes = rawNodes.map((node) => {
+        const {SystemState, ...restNodeParams} = node;
+
         return {
-            ...prepareNodeSystemState(node.SystemState),
-            Tablets: node.Tablets,
-            NodeId: node.NodeId,
+            ...restNodeParams,
+            ...prepareNodeSystemState(SystemState),
         };
     });
 

@@ -33,7 +33,7 @@ interface NodesProps {
 }
 
 export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) => {
-    const {searchValue, uptimeFilter} = useNodesPageQueryParams();
+    const {searchValue, uptimeFilter} = useNodesPageQueryParams(undefined);
     const {problemFilter} = useProblemFilter();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -71,6 +71,7 @@ export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) =
                 entitiesCountCurrent={nodes.length}
                 entitiesCountTotal={totalNodes}
                 entitiesLoading={isLoading}
+                groupByParams={undefined}
             />
         );
     };

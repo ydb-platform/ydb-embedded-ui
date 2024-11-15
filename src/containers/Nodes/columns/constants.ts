@@ -21,7 +21,7 @@ export const DEFAULT_NODES_COLUMNS: NodesColumnId[] = [
 
 export const REQUIRED_NODES_COLUMNS: NodesColumnId[] = ['NodeId'];
 
-const ALL_NODES_GROUP_BY_PARAMS = [
+export const ALL_NODES_GROUP_BY_PARAMS = [
     'SystemState',
     'Host',
     'DC',
@@ -31,16 +31,22 @@ const ALL_NODES_GROUP_BY_PARAMS = [
     'Uptime',
 ] as const satisfies NodesGroupByField[];
 
-function getAvailableNodesGroupByParams(withSystemStateGroupBy?: boolean) {
+function prepareGroupByParams(
+    groupByParams: NodesGroupByField[],
+    withSystemStateGroupBy?: boolean,
+) {
     if (!withSystemStateGroupBy) {
-        return ALL_NODES_GROUP_BY_PARAMS.filter((param) => param !== 'SystemState');
+        return groupByParams.filter((param) => param !== 'SystemState');
     }
 
-    return ALL_NODES_GROUP_BY_PARAMS;
+    return groupByParams;
 }
 
-export function getNodesGroupByOptions(withSystemStateGroupBy?: boolean): SelectOption[] {
-    return getAvailableNodesGroupByParams(withSystemStateGroupBy).map((param) => {
+export function getNodesGroupByOptions(
+    groupByParams: NodesGroupByField[],
+    withSystemStateGroupBy?: boolean,
+): SelectOption[] {
+    return prepareGroupByParams(groupByParams, withSystemStateGroupBy).map((param) => {
         return {
             value: param,
             content: getNodesGroupByFieldTitle(param),
@@ -50,9 +56,10 @@ export function getNodesGroupByOptions(withSystemStateGroupBy?: boolean): Select
 
 export function parseNodesGroupByParam(
     paramToParse: unknown,
+    groupByParams: NodesGroupByField[],
     withSystemStateGroupBy?: boolean,
 ): NodesGroupByField | undefined {
-    const availableParams = getAvailableNodesGroupByParams(withSystemStateGroupBy);
+    const availableParams = prepareGroupByParams(groupByParams, withSystemStateGroupBy);
 
     return availableParams.find((groupByField) => groupByField === paramToParse);
 }
