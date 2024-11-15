@@ -220,7 +220,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: gh-pages
           destination_dir: .
-          keep_history: false
+          force_orphan: true
 
       - name: Update PR description
         uses: actions/github-script@v6
