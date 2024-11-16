@@ -1,12 +1,10 @@
 import {expect, test} from '@playwright/test';
 
 import {tenantName} from '../../../utils/constants';
-import {TenantPage} from '../TenantPage';
+import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {QueryEditor, QueryMode} from '../queryEditor/QueryEditor';
 
 import executeQueryWithKeybinding from './utils';
-
-export const VISIBILITY_TIMEOUT = 5000;
 
 test.describe('Query History', () => {
     let tenantPage: TenantPage;
