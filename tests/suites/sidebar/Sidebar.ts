@@ -8,11 +8,19 @@ export class Sidebar {
     private documentationButton: Locator;
     private accountButton: Locator;
     private collapseButton: Locator;
+    private drawer: Locator;
+    private drawerMenu: Locator;
+    private experimentsSection: Locator;
 
     constructor(page: Page) {
         this.sidebarContainer = page.locator('.gn-aside-header__aside-content');
         this.logoButton = this.sidebarContainer.locator('.gn-logo__btn-logo');
         this.footer = this.sidebarContainer.locator('.gn-aside-header__footer');
+        this.drawer = page.locator('.gn-drawer');
+        this.drawerMenu = page.locator('.gn-settings-menu');
+        this.experimentsSection = this.drawerMenu
+            .locator('.gn-settings-menu__item')
+            .filter({hasText: 'Experiments'});
 
         // Footer buttons with specific icons
         const footerItems = this.sidebarContainer.locator('.gn-footer-item');
@@ -93,5 +101,42 @@ export class Sidebar {
         const items = this.footer.locator('.gn-composite-bar-item');
         const item = items.nth(index);
         return item.locator('.gn-composite-bar-item__title-text').innerText();
+    }
+
+    async isDrawerVisible() {
+        return this.drawer.isVisible();
+    }
+
+    async getDrawerMenuItems(): Promise<string[]> {
+        const items = this.drawerMenu.locator('.gn-settings-menu__item >> span');
+        const count = await items.count();
+        const texts: string[] = [];
+        for (let i = 0; i < count; i++) {
+            texts.push(await items.nth(i).innerText());
+        }
+        return texts;
+    }
+
+    async clickExperimentsSection() {
+        await this.experimentsSection.click();
+    }
+
+    async toggleExperimentByTitle(title: string) {
+        const experimentItem = this.drawer
+            .locator('.gn-settings__item-title')
+            .filter({hasText: title});
+        // Click the label element which wraps the switch, avoiding the slider that intercepts events
+        const switchLabel = experimentItem.locator(
+            'xpath=../../..//label[contains(@class, "g-control-label")]',
+        );
+        await switchLabel.click();
+    }
+
+    async isExperimentEnabled(title: string): Promise<boolean> {
+        const experimentItem = this.drawer
+            .locator('.gn-settings__item-title')
+            .filter({hasText: title});
+        const switchControl = experimentItem.locator('xpath=../../..//input[@type="checkbox"]');
+        return switchControl.isChecked();
     }
 }
