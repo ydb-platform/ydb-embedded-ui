@@ -6,7 +6,7 @@ import {longRunningQuery} from '../constants';
 
 import {QueryEditor} from './QueryEditor';
 
-test.describe('Test Plan to SVG functionality', async () => {
+test.describe('Test Query Execution Status', async () => {
     const testQuery = 'SELECT 1;'; // Simple query that will generate a plan
 
     test.beforeEach(async ({page}) => {
