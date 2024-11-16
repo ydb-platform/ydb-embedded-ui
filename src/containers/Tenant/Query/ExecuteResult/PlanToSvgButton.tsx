@@ -23,7 +23,7 @@ interface PlanToSvgButtonProps {
 export function PlanToSvgButton({plan, database}: PlanToSvgButtonProps) {
     const [error, setError] = React.useState<string | null>(null);
     const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
-    const [getPlanToSvg, {isLoading}] = planToSvgApi.usePlanToSvgQueryMutation();
+    const [getPlanToSvg, {isLoading}] = planToSvgApi.useLazyPlanToSvgQueryQuery();
 
     const handleClick = React.useCallback(() => {
         getPlanToSvg({plan, database})

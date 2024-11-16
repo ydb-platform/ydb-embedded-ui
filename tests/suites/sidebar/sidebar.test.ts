@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {PageModel} from '../../models/PageModel';
+import {toggleExperiment} from '../../utils/toggleExperiment';
 
 import {Sidebar} from './Sidebar';
 
@@ -92,32 +93,13 @@ test.describe('Test Sidebar', async () => {
 
     test('Can toggle experiments in settings', async ({page}) => {
         const sidebar = new Sidebar(page);
-        await sidebar.waitForSidebarToLoad();
-
-        // Open settings
-        await sidebar.clickSettings();
-        await page.waitForTimeout(500); // Wait for animation
-
-        // Click experiments section
-        await sidebar.clickExperimentsSection();
-        await page.waitForTimeout(500); // Wait for animation
-
-        // Toggle "Use paginated tables" experiment
-        const experimentTitle = 'Use paginated tables';
-        const initialState = await sidebar.isExperimentEnabled(experimentTitle);
-        await sidebar.toggleExperimentByTitle(experimentTitle);
-        await page.waitForTimeout(500); // Wait for animation
-
-        // Verify the state has changed
+        const experimentTitle = 'Plan to SVG';
+        await toggleExperiment(page, 'on', experimentTitle);
         const newState = await sidebar.isExperimentEnabled(experimentTitle);
-        expect(newState).not.toBe(initialState);
+        expect(newState).toBe(true);
 
-        // Toggle back
-        await sidebar.toggleExperimentByTitle(experimentTitle);
-        await page.waitForTimeout(500); // Wait for animation
-
-        // Verify it's back to initial state
+        await toggleExperiment(page, 'off', experimentTitle);
         const finalState = await sidebar.isExperimentEnabled(experimentTitle);
-        expect(finalState).toBe(initialState);
+        expect(finalState).toBe(false);
     });
 });
