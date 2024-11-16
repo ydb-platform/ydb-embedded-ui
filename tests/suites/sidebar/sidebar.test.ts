@@ -91,7 +91,7 @@ test.describe('Test Sidebar', async () => {
         expect(itemsCount).toBeGreaterThan(0);
     });
 
-    test.only('Can toggle experiments in settings', async ({page}) => {
+    test('Can toggle experiments in settings', async ({page}) => {
         const sidebar = new Sidebar(page);
         await sidebar.clickSettings();
         await page.waitForTimeout(500); // Wait for animation
