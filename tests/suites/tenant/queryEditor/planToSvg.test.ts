@@ -3,7 +3,8 @@ import {expect, test} from '@playwright/test';
 import {tenantName} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage} from '../TenantPage';
-import {ButtonNames, QueryEditor} from '../queryEditor/QueryEditor';
+
+import {ButtonNames, QueryEditor} from './QueryEditor';
 
 test.describe('Test Plan to SVG functionality', async () => {
     const testQuery = 'SELECT 1;'; // Simple query that will generate a plan

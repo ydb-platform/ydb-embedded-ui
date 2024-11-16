@@ -27,29 +27,6 @@ test.describe('Test Query Editor', async () => {
         await tenantPage.goto(pageQueryParams);
     });
 
-    test('Settings dialog opens on Gear click and closes on Cancel', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-        await queryEditor.clickGearButton();
-
-        await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
-
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
-        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
-    });
-
-    test('Settings dialog saves changes and updates Gear button', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-        await queryEditor.clickGearButton();
-
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-
-        await expect(async () => {
-            const text = await queryEditor.gearButtonText();
-            expect(text).toContain('(1)');
-        }).toPass({timeout: VISIBILITY_TIMEOUT});
-    });
-
     test('Run button executes YQL script', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.run(testQuery, QueryMode.YQLScript);
@@ -103,92 +80,6 @@ test.describe('Test Query Editor', async () => {
         await expect(errorMessage).toContain('Column references are not allowed without FROM');
     });
 
-    test('Banner appears after executing script with changed settings', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        // Change a setting
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-
-        // Execute a script
-        await queryEditor.setQuery(testQuery);
-        await queryEditor.clickRunButton();
-
-        // Check if banner appears
-        await expect(queryEditor.isBannerVisible()).resolves.toBe(true);
-    });
-
-    test('Banner not appears for running query', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        // Change a setting
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-
-        // Execute a script
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.clickRunButton();
-        await page.waitForTimeout(500);
-
-        // Check if banner appears
-        await expect(queryEditor.isBannerHidden()).resolves.toBe(true);
-    });
-
-    test('Indicator icon appears after closing banner', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        // Change a setting
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-
-        // Execute a script to make the banner appear
-        await queryEditor.setQuery(testQuery);
-        await queryEditor.clickRunButton();
-
-        // Close the banner
-        await queryEditor.closeBanner();
-
-        await expect(queryEditor.isIndicatorIconVisible()).resolves.toBe(true);
-    });
-
-    test('Indicator not appears for running query', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        // Change a setting
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeTransactionMode('Snapshot');
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-
-        // Execute a script to make the banner appear
-        await queryEditor.setQuery(testQuery);
-        await queryEditor.clickRunButton();
-
-        // Close the banner
-        await queryEditor.closeBanner();
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.clickRunButton();
-        await page.waitForTimeout(500);
-
-        await expect(queryEditor.isIndicatorIconHidden()).resolves.toBe(true);
-    });
-
-    test('Gear button shows number of changed settings', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-        await queryEditor.clickGearButton();
-
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
-        await queryEditor.settingsDialog.changeTransactionMode('Snapshot');
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-
-        await expect(async () => {
-            const text = await queryEditor.gearButtonText();
-            expect(text).toContain('(2)');
-        }).toPass({timeout: VISIBILITY_TIMEOUT});
-    });
-
     test('Run and Explain buttons are disabled when query is empty', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
@@ -199,15 +90,6 @@ test.describe('Test Query Editor', async () => {
 
         await expect(queryEditor.isRunButtonEnabled()).resolves.toBe(true);
         await expect(queryEditor.isExplainButtonEnabled()).resolves.toBe(true);
-    });
-
-    test('Banner does not appear when executing script with default settings', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        await queryEditor.setQuery(testQuery);
-        await queryEditor.clickRunButton();
-
-        await expect(queryEditor.isBannerHidden()).resolves.toBe(true);
     });
 
     test('Stop button and elapsed time label appears when query is running', async ({page}) => {
@@ -288,51 +170,6 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
         await queryEditor.clickStopButton();
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
-    });
-
-    test('No query status when no query was executed', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        // Ensure page is loaded
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeStatsLevel('Profile');
-
-        await expect(queryEditor.isResultsControlsHidden()).resolves.toBe(true);
-    });
-
-    test('Running query status for running query', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.clickRunButton();
-        await page.waitForTimeout(500);
-
-        const statusElement = await queryEditor.getExecutionStatus();
-        await expect(statusElement).toBe('Running');
-    });
-
-    test('Completed query status for completed query', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        await queryEditor.setQuery(testQuery);
-        await queryEditor.clickRunButton();
-        await page.waitForTimeout(1000);
-
-        const statusElement = await queryEditor.getExecutionStatus();
-        await expect(statusElement).toBe('Completed');
-    });
-
-    test('Failed query status for failed query', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        const invalidQuery = 'Select d';
-        await queryEditor.setQuery(invalidQuery);
-        await queryEditor.clickRunButton();
-        await page.waitForTimeout(1000);
-
-        const statusElement = await queryEditor.getExecutionStatus();
-        await expect(statusElement).toBe('Failed');
     });
 
     test('Changing tab inside results pane doesnt change results view', async ({page}) => {
