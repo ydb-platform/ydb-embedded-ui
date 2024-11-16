@@ -132,6 +132,11 @@ export class Sidebar {
         await switchLabel.click();
     }
 
+    async getFirstExperimentTitle(): Promise<string> {
+        const experimentItem = this.drawer.locator('.gn-settings__item-title').first();
+        return experimentItem.innerText();
+    }
+
     async isExperimentEnabled(title: string): Promise<boolean> {
         const experimentItem = this.drawer
             .locator('.gn-settings__item-title')

@@ -91,15 +91,17 @@ test.describe('Test Sidebar', async () => {
         expect(itemsCount).toBeGreaterThan(0);
     });
 
-    test('Can toggle experiments in settings', async ({page}) => {
+    test.only('Can toggle experiments in settings', async ({page}) => {
         const sidebar = new Sidebar(page);
-        const experimentTitle = 'Plan to SVG';
+        await sidebar.clickSettings();
+        await page.waitForTimeout(500); // Wait for animation
+        await sidebar.clickExperimentsSection();
+        const experimentTitle = await sidebar.getFirstExperimentTitle();
 
         await toggleExperiment(page, 'on', experimentTitle);
         await sidebar.clickSettings();
         await page.waitForTimeout(500); // Wait for animation
         await sidebar.clickExperimentsSection();
-        await page.waitForTimeout(500); // Wait for animation
         const newState = await sidebar.isExperimentEnabled(experimentTitle);
         expect(newState).toBe(true);
 
@@ -107,7 +109,6 @@ test.describe('Test Sidebar', async () => {
         await sidebar.clickSettings();
         await page.waitForTimeout(500); // Wait for animation
         await sidebar.clickExperimentsSection();
-        await page.waitForTimeout(500); // Wait for animation
         const finalState = await sidebar.isExperimentEnabled(experimentTitle);
         expect(finalState).toBe(false);
     });
