@@ -7,6 +7,7 @@ export class PaginatedTable {
     private radioButtons: Locator;
     private countLabel: Locator;
     private tableRows: Locator;
+    private emptyTableRows: Locator;
     private refreshButton: Locator;
     private refreshIntervalSelect: Locator;
     private headCells: Locator;
@@ -19,8 +20,9 @@ export class PaginatedTable {
         this.countLabel = this.tableSelector.locator('.ydb-entities-count .g-label__content');
         this.headCells = this.tableSelector.locator('.ydb-paginated-table__head-cell');
         this.tableRows = this.tableSelector.locator('.ydb-paginated-table__row');
+        this.emptyTableRows = this.tableSelector.locator('.ydb-paginated-table__row_empty');
         this.refreshButton = page.locator('.auto-refresh-control button[aria-label="Refresh"]');
-        this.refreshIntervalSelect = page.locator('.cluster__auto-refresh-select');
+        this.refreshIntervalSelect = page.getByTestId('ydb-autorefresh-select');
     }
 
     async search(searchTerm: string) {
@@ -70,6 +72,10 @@ export class PaginatedTable {
         return this.tableRows.count();
     }
 
+    async getEmptyDataMessageLocator() {
+        return this.emptyTableRows.nth(0);
+    }
+
     async waitForTableToLoad() {
         await this.tableSelector.waitFor({state: 'visible'});
     }
@@ -97,7 +103,7 @@ export class PaginatedTable {
 
     async setRefreshInterval(interval: string) {
         await this.refreshIntervalSelect.click();
-        await this.page.locator('.g-select-popup__option', {hasText: interval}).click();
+        await this.page.locator('.g-select-list__option', {hasText: interval}).click();
     }
 
     async getRefreshInterval(): Promise<string> {

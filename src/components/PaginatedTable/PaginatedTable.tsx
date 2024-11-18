@@ -4,9 +4,7 @@ import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithContr
 
 import {TableChunk} from './TableChunk';
 import {TableHead} from './TableHead';
-import {EmptyTableRow} from './TableRow';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
-import i18n from './i18n';
 import {b} from './shared';
 import type {
     Column,
@@ -75,10 +73,14 @@ export const PaginatedTable = <T, F>({
         chunkSize,
     });
 
-    const lastChunkSize = React.useMemo(
-        () => foundEntities % chunkSize || chunkSize,
-        [foundEntities, chunkSize],
-    );
+    const lastChunkSize = React.useMemo(() => {
+        // If foundEntities = 0, there will only first chunk
+        // Display it with 1 row, to display empty data message
+        if (!foundEntities) {
+            return 1;
+        }
+        return foundEntities % chunkSize || chunkSize;
+    }, [foundEntities, chunkSize]);
 
     const handleDataFetched = React.useCallback((total: number, found: number) => {
         setTotalEntities(total);
@@ -97,16 +99,6 @@ export const PaginatedTable = <T, F>({
     }, [filters, initialFound, initialTotal, parentRef]);
 
     const renderChunks = () => {
-        if (!isInitialLoad && foundEntities === 0) {
-            return (
-                <tbody>
-                    <EmptyTableRow columns={columns}>
-                        {renderEmptyDataMessage ? renderEmptyDataMessage() : i18n('empty')}
-                    </EmptyTableRow>
-                </tbody>
-            );
-        }
-
         return activeChunks.map((isActive, index) => (
             <TableChunk<T, F>
                 key={index}
@@ -121,6 +113,7 @@ export const PaginatedTable = <T, F>({
                 sortParams={sortParams}
                 getRowClassName={getRowClassName}
                 renderErrorMessage={renderErrorMessage}
+                renderEmptyDataMessage={renderEmptyDataMessage}
                 onDataFetched={handleDataFetched}
                 isActive={isActive}
             />

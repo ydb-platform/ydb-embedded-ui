@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test';
 
+import {backend} from '../../utils/constants';
 import {toggleExperiment} from '../../utils/toggleExperiment';
 import {NodesPage} from '../nodes/NodesPage';
 import {PaginatedTable} from '../paginatedTable/paginatedTable';
@@ -142,5 +143,49 @@ test.describe('Test Nodes Paginated Table', async () => {
         expect(hostValues.length).toBeGreaterThan(0);
         expect(uptimeValues.length).toBeGreaterThan(0);
         expect(hostValues.length).toBe(uptimeValues.length);
+    });
+
+    test('Table displays empty data message when no entities', async ({page}) => {
+        const paginatedTable = new PaginatedTable(page);
+
+        await paginatedTable.waitForTableToLoad();
+        await paginatedTable.waitForTableData();
+
+        await paginatedTable.search('Some Invalid search string !%#@[]');
+
+        await paginatedTable.waitForTableData();
+
+        const emptyDataMessage = await paginatedTable.getEmptyDataMessageLocator();
+        await expect(emptyDataMessage).toContainText('No such nodes');
+    });
+
+    test('Autorefresh updates data when initially empty data', async ({page}) => {
+        const paginatedTable = new PaginatedTable(page);
+
+        const emptyRequest = page.route(`${backend}/viewer/json/nodes?*`, async (route) => {
+            await route.fulfill({json: {FoundNodes: 0, TotalNodes: 0, Nodes: []}});
+        });
+        await paginatedTable.clickRefreshButton();
+
+        await emptyRequest;
+
+        const emptyDataMessage = await paginatedTable.getEmptyDataMessageLocator();
+        await expect(emptyDataMessage).toContainText('No such nodes');
+
+        await paginatedTable.setRefreshInterval('15 sec');
+
+        const requestWithData = page.route(`${backend}/viewer/json/nodes?*`, async (route) => {
+            await route.continue();
+        });
+
+        await page.waitForTimeout(15_000); // Wait for autorefresh
+
+        await requestWithData;
+        await paginatedTable.waitForTableData();
+
+        await expect(emptyDataMessage).toBeHidden();
+
+        const hostValues = await paginatedTable.getColumnValues('Host');
+        expect(hostValues.length).toBeGreaterThan(0);
     });
 });
