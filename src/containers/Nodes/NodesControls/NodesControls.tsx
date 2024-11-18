@@ -9,6 +9,7 @@ import {Search} from '../../../components/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
 import {useViewerNodesHandlerHasGroupingBySystemState} from '../../../store/reducers/capabilities/hooks';
 import {useProblemFilter} from '../../../store/reducers/settings/hooks';
+import type {NodesGroupByField} from '../../../types/api/nodes';
 import {getNodesGroupByOptions} from '../columns/constants';
 import i18n from '../i18n';
 import {b} from '../shared';
@@ -16,6 +17,7 @@ import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
 
 interface NodesControlsProps {
     withGroupBySelect?: boolean;
+    groupByParams: NodesGroupByField[] | undefined;
 
     columnsToSelect: TableColumnSetupItem[];
     handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
@@ -27,6 +29,7 @@ interface NodesControlsProps {
 
 export function NodesControls({
     withGroupBySelect,
+    groupByParams = [],
 
     columnsToSelect,
     handleSelectedColumnsUpdate,
@@ -43,11 +46,11 @@ export function NodesControls({
         handleSearchQueryChange,
         handleUptimeFilterChange,
         handleGroupByParamChange,
-    } = useNodesPageQueryParams();
+    } = useNodesPageQueryParams(groupByParams);
     const {problemFilter, handleProblemFilterChange} = useProblemFilter();
 
     const systemStateGroupingAvailable = useViewerNodesHandlerHasGroupingBySystemState();
-    const groupByoptions = getNodesGroupByOptions(systemStateGroupingAvailable);
+    const groupByoptions = getNodesGroupByOptions(groupByParams, systemStateGroupingAvailable);
 
     const handleGroupBySelectUpdate = (value: string[]) => {
         handleGroupByParamChange(value[0]);

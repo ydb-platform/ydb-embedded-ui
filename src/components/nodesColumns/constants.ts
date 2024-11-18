@@ -22,6 +22,12 @@ export const NODES_COLUMNS_IDS = {
     Load: 'Load',
     DiskSpaceUsage: 'DiskSpaceUsage',
     TotalSessions: 'TotalSessions',
+    Connections: 'Connections',
+    NetworkUtilization: 'NetworkUtilization',
+    SendThroughput: 'SendThroughput',
+    ReceiveThroughput: 'ReceiveThroughput',
+    PingTime: 'PingTime',
+    ClockSkew: 'ClockSkew',
     Missing: 'Missing',
     Tablets: 'Tablets',
     PDisks: 'PDisks',
@@ -79,6 +85,24 @@ export const NODES_COLUMNS_TITLES = {
     },
     get TotalSessions() {
         return i18n('sessions');
+    },
+    get Connections() {
+        return i18n('connections');
+    },
+    get NetworkUtilization() {
+        return i18n('utilization');
+    },
+    get SendThroughput() {
+        return i18n('send');
+    },
+    get ReceiveThroughput() {
+        return i18n('receive');
+    },
+    get PingTime() {
+        return i18n('ping');
+    },
+    get ClockSkew() {
+        return i18n('skew');
     },
     get Missing() {
         return i18n('missing');
@@ -162,6 +186,12 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     Load: ['LoadAverage'],
     DiskSpaceUsage: ['DiskSpaceUsage'],
     TotalSessions: ['SystemState'],
+    Connections: ['Connections'],
+    NetworkUtilization: ['NetworkUtilization'],
+    SendThroughput: ['SendThroughput'],
+    ReceiveThroughput: ['ReceiveThroughput'],
+    PingTime: ['PingTime'],
+    ClockSkew: ['ClockSkew'],
     Missing: ['Missing'],
     Tablets: ['Tablets', 'Database'],
     PDisks: ['PDisks'],
@@ -184,6 +214,12 @@ const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undef
     Load: 'LoadAverage',
     DiskSpaceUsage: 'DiskSpaceUsage',
     TotalSessions: undefined,
+    Connections: 'Connections',
+    NetworkUtilization: 'NetworkUtilization',
+    SendThroughput: 'SendThroughput',
+    ReceiveThroughput: 'ReceiveThroughput',
+    PingTime: 'PingTime',
+    ClockSkew: 'ClockSkew',
     Missing: 'Missing',
     Tablets: undefined,
     PDisks: undefined,
