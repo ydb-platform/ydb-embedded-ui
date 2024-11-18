@@ -51,10 +51,6 @@ export function NewSQL() {
                     action: actions.selectQuery,
                 },
                 {
-                    text: i18n('action.select-from-external-table'),
-                    action: actions.selectQueryFromExternalTable,
-                },
-                {
                     text: i18n('action.delete-rows'),
                     action: actions.deleteRows,
                 },

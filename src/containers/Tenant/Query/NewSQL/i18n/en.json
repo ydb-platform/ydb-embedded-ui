@@ -7,7 +7,6 @@
   "action.update-table": "Update table",
   "action.alter-table": "Alter table",
   "action.select-rows": "Select from a table",
-  "action.select-from-external-table": "Select from external table",
   "action.delete-rows": "Delete rows",
   "action.drop-table": "Drop table",
   "action.add-index": "Add index",
