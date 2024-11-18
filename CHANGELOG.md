@@ -1,5 +1,27 @@
 # Changelog
 
+## [6.34.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.33.0...v6.34.0) (2024-11-18)
+
+
+### Features
+
+* add to embedded ui link to plan2svg converter ([#1619](https://github.com/ydb-platform/ydb-embedded-ui/issues/1619)) ([fb007a7](https://github.com/ydb-platform/ydb-embedded-ui/commit/fb007a764c8cf40d97242d598e4fa90310c97460))
+* **ConfirmationDialog:** add saving query before replace ([#1629](https://github.com/ydb-platform/ydb-embedded-ui/issues/1629)) ([c71925d](https://github.com/ydb-platform/ydb-embedded-ui/commit/c71925dee41c588d5ca18f6170a62a15e32d9e8d))
+* **Navigation:** allow to change user icon ([#1628](https://github.com/ydb-platform/ydb-embedded-ui/issues/1628)) ([71956ec](https://github.com/ydb-platform/ydb-embedded-ui/commit/71956ec3a1be3318f70b82c75656940a81478b3a))
+* render per component memory consumption ([#1574](https://github.com/ydb-platform/ydb-embedded-ui/issues/1574)) ([3e4a04b](https://github.com/ydb-platform/ydb-embedded-ui/commit/3e4a04b2eaf68c98403b87f98ab1d31da930206a))
+* warn about unsaved changes in editor ([#1620](https://github.com/ydb-platform/ydb-embedded-ui/issues/1620)) ([2632b90](https://github.com/ydb-platform/ydb-embedded-ui/commit/2632b90ed38cd89a1691b77b8cf4bccb2cf19507))
+
+
+### Bug Fixes
+
+* change trace and svg mutations to lazy query ([#1640](https://github.com/ydb-platform/ydb-embedded-ui/issues/1640)) ([19d7f56](https://github.com/ydb-platform/ydb-embedded-ui/commit/19d7f5629786531781dec738310b3cee8d3fd83e))
+* delete directory from gh-pages on pr close ([#1638](https://github.com/ydb-platform/ydb-embedded-ui/issues/1638)) ([d99e295](https://github.com/ydb-platform/ydb-embedded-ui/commit/d99e295ba5574f04eb42def2770cc59113669b46))
+* dont remove previous tests reports ([#1630](https://github.com/ydb-platform/ydb-embedded-ui/issues/1630)) ([5302a94](https://github.com/ydb-platform/ydb-embedded-ui/commit/5302a94e871eb55050bc2d462d9629b61cb9f685))
+* **EntityStatus:** show title for text part only ([#1608](https://github.com/ydb-platform/ydb-embedded-ui/issues/1608)) ([7e234a5](https://github.com/ydb-platform/ydb-embedded-ui/commit/7e234a5e7d62e1bb845632f5bef9ab30103fc49e))
+* **schemaActions:** preserve query settings when insert snippet ([#1615](https://github.com/ydb-platform/ydb-embedded-ui/issues/1615)) ([2ec5ccd](https://github.com/ydb-platform/ydb-embedded-ui/commit/2ec5ccde77a26228b148e46b7857b8767e134e1f))
+* **schemaActions:** use different sets for row and column tables ([#1627](https://github.com/ydb-platform/ydb-embedded-ui/issues/1627)) ([9972ac2](https://github.com/ydb-platform/ydb-embedded-ui/commit/9972ac2fafc027564b7bc1df163ccd97de346801))
+* **schemaQueryTemplates:** doc link for topic creation ([#1616](https://github.com/ydb-platform/ydb-embedded-ui/issues/1616)) ([3e07ca5](https://github.com/ydb-platform/ydb-embedded-ui/commit/3e07ca5488577aa7f2bad2731ae7ef09f8c66e6b))
+
 ## [6.33.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.32.0...v6.33.0) (2024-11-11)
 
 
