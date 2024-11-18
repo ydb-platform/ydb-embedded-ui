@@ -28,7 +28,3 @@ export interface PreparedPartitionData {
     partitionNodeId: number;
     connectionNodeId?: number;
 }
-
-export interface PartitionsState {
-    selectedConsumer: string;
-}

@@ -3,18 +3,17 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {api} from '../api';
 
-import type {PartitionsState} from './types';
 import {prepareConsumerPartitions, prepareTopicPartitions} from './utils';
 
-const initialState: PartitionsState = {
-    selectedConsumer: '',
-};
+const initialState: {
+    selectedConsumer?: string;
+} = {};
 
 const slice = createSlice({
     name: 'partitions',
     initialState,
     reducers: {
-        setSelectedConsumer: (state, action: PayloadAction<string>) => {
+        setSelectedConsumer: (state, action: PayloadAction<string | undefined>) => {
             state.selectedConsumer = action.payload;
         },
     },

@@ -13,8 +13,8 @@ import type {PreparedPartitionDataWithHosts} from '../utils/types';
 
 interface PartitionsControlsProps {
     consumers: string[] | undefined;
-    selectedConsumer: string;
-    onSelectedConsumerChange: (consumer: string) => void;
+    selectedConsumer?: string;
+    onSelectedConsumerChange: (consumer?: string) => void;
     selectDisabled: boolean;
     partitions: PreparedPartitionDataWithHosts[] | undefined;
     onSearchChange: (filteredPartitions: PreparedPartitionDataWithHosts[]) => void;
@@ -111,7 +111,8 @@ export const PartitionsControls = ({
     }, [initialColumnsIds, hiddenColumns]);
 
     const handleConsumerSelectChange = (value: string[]) => {
-        onSelectedConsumerChange(value[0]);
+        // Do not set empty string to state
+        onSelectedConsumerChange(value[0] || undefined);
     };
 
     const handlePartitionIdSearchChange = (value: string) => {
@@ -151,7 +152,7 @@ export const PartitionsControls = ({
                 className={b('consumer-select')}
                 label={i18n('controls.consumerSelector')}
                 options={consumersToSelect}
-                value={[selectedConsumer]}
+                value={[selectedConsumer || '']}
                 onUpdate={handleConsumerSelectChange}
                 filterable={consumers && consumers.length > 5}
                 disabled={selectDisabled || !consumers || !consumers.length}
