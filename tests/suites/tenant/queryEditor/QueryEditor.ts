@@ -237,4 +237,20 @@ export class QueryEditor {
         await this.indicatorIcon.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
+
+    async waitForStatus(expectedStatus: string, timeout = VISIBILITY_TIMEOUT) {
+        await this.executionStatus.waitFor({state: 'visible', timeout});
+
+        // Keep checking status until it matches or times out
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const status = await this.executionStatus.innerText();
+            if (status === expectedStatus) {
+                return true;
+            }
+            await this.page.waitForTimeout(100); // Small delay between checks
+        }
+
+        throw new Error(`Status did not change to ${expectedStatus} within ${timeout}ms`);
+    }
 }

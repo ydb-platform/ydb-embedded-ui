@@ -73,9 +73,7 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setQuery(invalidQuery);
         await queryEditor.clickRunButton();
 
-        const statusElement = await queryEditor.getExecutionStatus();
-        await expect(statusElement).toBe('Failed');
-
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
         const errorMessage = await queryEditor.getErrorMessage();
         await expect(errorMessage).toContain('Column references are not allowed without FROM');
     });
@@ -123,13 +121,9 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
-
         await queryEditor.clickStopButton();
-        await page.waitForTimeout(1000); // Wait for the editor to initialize
 
-        // Check for a message or indicator that the query was stopped
-        const statusElement = await queryEditor.getExecutionStatus();
-        await expect(statusElement).toBe('Stopped');
+        await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
     test('Stop button is not visible for quick queries', async ({page}) => {
@@ -238,5 +232,13 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
         await queryEditor.clickRunButton();
         await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Truncated(1)');
+    });
+
+    test('Query execution status changes correctly', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery(testQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 });
