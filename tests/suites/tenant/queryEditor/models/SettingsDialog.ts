@@ -1,7 +1,8 @@
 import type {Locator, Page} from '@playwright/test';
 
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
-import type {ButtonNames, QueryMode} from '../QueryEditor';
+
+import type {ButtonNames, QueryMode} from './QueryEditor';
 
 export class SettingsDialog {
     private dialog: Locator;

@@ -1,7 +1,8 @@
 import type {Locator, Page} from '@playwright/test';
 
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
-import type {ResultTabNames} from '../QueryEditor';
+
+import type {ResultTabNames} from './QueryEditor';
 
 export class PaneWrapper {
     paneWrapper: Locator;

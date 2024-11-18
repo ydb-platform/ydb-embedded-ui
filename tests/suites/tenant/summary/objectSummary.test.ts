@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {dsVslotsSchema, dsVslotsTableName, tenantName} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
-import {QueryEditor} from '../queryEditor/QueryEditor';
+import {QueryEditor} from '../queryEditor/models/QueryEditor';
 
 import {ObjectSummary, ObjectSummaryTab} from './ObjectSummary';
 import {RowTableAction} from './types';

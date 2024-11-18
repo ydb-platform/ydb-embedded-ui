@@ -11,7 +11,7 @@ import {
     QueryMode,
     QueryTabs,
     ResultTabNames,
-} from './QueryEditor';
+} from './models/QueryEditor';
 
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';

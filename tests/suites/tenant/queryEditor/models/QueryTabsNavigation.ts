@@ -1,7 +1,8 @@
 import type {Locator, Page} from '@playwright/test';
 
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
-import type {QueryTabs} from '../QueryEditor';
+
+import type {QueryTabs} from './QueryEditor';
 
 export class QueryTabsNavigation {
     private tabsContainer: Locator;

@@ -4,7 +4,7 @@ import {tenantName} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {longRunningQuery} from '../constants';
 
-import {QueryEditor} from './QueryEditor';
+import {QueryEditor} from './models/QueryEditor';
 
 test.describe('Test Query Execution Status', async () => {
     const testQuery = 'SELECT 1;'; // Simple query that will generate a plan

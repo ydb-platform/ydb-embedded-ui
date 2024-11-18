@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {tenantName} from '../../../utils/constants';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
-import {QueryEditor, QueryMode} from '../queryEditor/QueryEditor';
+import {QueryEditor, QueryMode} from '../queryEditor/models/QueryEditor';
 
 import executeQueryWithKeybinding from './utils';
 

@@ -1,11 +1,11 @@
 import type {Locator, Page} from '@playwright/test';
 
-import {VISIBILITY_TIMEOUT} from '../TenantPage';
+import {VISIBILITY_TIMEOUT} from '../../TenantPage';
 
-import {QueryTabsNavigation} from './models/QueryTabsNavigation';
-import {PaneWrapper, ResultTable} from './models/ResultTable';
-import {SavedQueriesTable} from './models/SavedQueriesTable';
-import {SettingsDialog} from './models/SettingsDialog';
+import {QueryTabsNavigation} from './QueryTabsNavigation';
+import {PaneWrapper, ResultTable} from './ResultTable';
+import {SavedQueriesTable} from './SavedQueriesTable';
+import {SettingsDialog} from './SettingsDialog';
 
 export enum QueryMode {
     YQLScript = 'YQL Script',

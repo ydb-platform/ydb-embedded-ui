@@ -5,7 +5,12 @@ import {TenantPage} from '../TenantPage';
 import {ObjectSummary} from '../summary/ObjectSummary';
 import {RowTableAction} from '../summary/types';
 
-import {QueryEditor, QueryTabs} from './QueryEditor';
+import {
+    AsyncReplicationTemplates,
+    NewSqlDropdownMenu,
+    TemplateCategory,
+} from './models/NewSqlDropdownMenu';
+import {QueryEditor, QueryTabs} from './models/QueryEditor';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
 import {SavedQueriesTable} from './models/SavedQueriesTable';
 import {UnsavedChangesModal} from './models/UnsavedChangesModal';
@@ -115,5 +120,42 @@ test.describe('Query Templates', () => {
         await savedQueriesTable.isVisible();
         const row = await savedQueriesTable.waitForRow(queryName);
         expect(row).not.toBe(null);
+    });
+
+    test('New SQL dropdown menu works correctly', async ({page}) => {
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+        const queryEditor = new QueryEditor(page);
+
+        // Open dropdown menu
+        await newSqlDropdown.clickNewSqlButton();
+        await expect(newSqlDropdown.isMenuVisible()).resolves.toBe(true);
+
+        // Hover over Async replication category
+        await newSqlDropdown.hoverCategory(TemplateCategory.AsyncReplication);
+        await expect(newSqlDropdown.isSubMenuVisible()).resolves.toBe(true);
+
+        // Select Create template
+        await newSqlDropdown.selectTemplate(AsyncReplicationTemplates.Create);
+
+        expect(queryEditor.editorTextArea).not.toBeEmpty();
+    });
+
+    test('Template selection shows unsaved changes warning when editor has content', async ({
+        page,
+    }) => {
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+        const queryEditor = new QueryEditor(page);
+        const unsavedChangesModal = new UnsavedChangesModal(page);
+
+        // First set some content
+        await queryEditor.setQuery('SELECT 1;');
+
+        // Try to select a template
+        await newSqlDropdown.clickNewSqlButton();
+        await newSqlDropdown.hoverCategory(TemplateCategory.AsyncReplication);
+        await newSqlDropdown.selectTemplate(AsyncReplicationTemplates.Create);
+
+        // Verify unsaved changes modal appears
+        await expect(unsavedChangesModal.isVisible()).resolves.toBe(true);
     });
 });

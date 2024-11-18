@@ -4,7 +4,7 @@ import {tenantName} from '../../../utils/constants';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {longRunningQuery} from '../constants';
 
-import {ButtonNames, QueryEditor, QueryMode} from './QueryEditor';
+import {ButtonNames, QueryEditor, QueryMode} from './models/QueryEditor';
 
 test.describe('Test Query Settings', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
