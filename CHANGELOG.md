@@ -1,5 +1,21 @@
 # Changelog
 
+## [6.35.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.34.0...v6.35.0) (2024-11-18)
+
+
+### Features
+
+* **Network:** add table view ([#1622](https://github.com/ydb-platform/ydb-embedded-ui/issues/1622)) ([507aa71](https://github.com/ydb-platform/ydb-embedded-ui/commit/507aa712afd529a6ea7e180e91c827d611844cfd))
+* use monaco snippets for query templates ([#1626](https://github.com/ydb-platform/ydb-embedded-ui/issues/1626)) ([bcdefd5](https://github.com/ydb-platform/ydb-embedded-ui/commit/bcdefd5994161318c9da4b7a75beeac03c1bd14c))
+
+
+### Bug Fixes
+
+* move @ebay/nice-modal-react to dependencies ([#1647](https://github.com/ydb-platform/ydb-embedded-ui/issues/1647)) ([8887b75](https://github.com/ydb-platform/ydb-embedded-ui/commit/8887b7554dd65a5caf064ad84ebbc13af9a13f9a))
+* remove empty selectedConsumer from url ([#1644](https://github.com/ydb-platform/ydb-embedded-ui/issues/1644)) ([14f3fa4](https://github.com/ydb-platform/ydb-embedded-ui/commit/14f3fa46747e9222bf93b82af19ec8b2dae853e4))
+* **SaveQueryDialog:** should not duplicate component in DOM ([#1649](https://github.com/ydb-platform/ydb-embedded-ui/issues/1649)) ([3b37565](https://github.com/ydb-platform/ydb-embedded-ui/commit/3b37565241126763269aa8cc1e328e6ea2a14bc7))
+* tests for templates ([#1648](https://github.com/ydb-platform/ydb-embedded-ui/issues/1648)) ([da2a02d](https://github.com/ydb-platform/ydb-embedded-ui/commit/da2a02d017b5af972fa68d5f5b02a4956e0763ab))
+
 ## [6.34.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.33.0...v6.34.0) (2024-11-18)
 
 
