@@ -66,10 +66,10 @@ CREATE OBJECT secret_name (TYPE SECRET) WITH value="secret_value";
 CREATE ASYNC REPLICATION my_replication
 FOR \${1:<original_table>} AS \${2:replica_table} --[, \`/remote_database/another_table_name\` AS \`another_local_table_name\` ...]
 WITH (
-    CONNECTION_STRING="grpcs://mydb.ydb.tech:2135/?database=/\${3:<remote_database>}",
+    CONNECTION_STRING="\${3:grpcs://mydb.ydb.tech:2135/?database=/remote_database}",
     TOKEN_SECRET_NAME = "secret_name"
     -- ENDPOINT="mydb.ydb.tech:2135",
-    -- DATABASE=\`\${3:/remote_database}\`,
+    -- DATABASE=\`/remote_database\`,
     -- USER="user",
     -- PASSWORD_SECRET_NAME="your_password"
 );`;
