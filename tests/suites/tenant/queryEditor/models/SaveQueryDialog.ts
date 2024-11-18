@@ -7,8 +7,8 @@ export class SaveQueryDialog {
     private dialogFooter: Locator;
 
     constructor(page: Page) {
-        this.dialogBody = page.locator('.ydb-save-query__dialog-body').last();
-        this.dialogFooter = page.locator('.ydb-save-query__dialog-body + .g-dialog-footer').last();
+        this.dialogBody = page.locator('.ydb-save-query__dialog-body');
+        this.dialogFooter = page.locator('.ydb-save-query__dialog-body + .g-dialog-footer');
     }
 
     async setQueryName(name: string) {
