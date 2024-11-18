@@ -27,6 +27,7 @@
     "@hookform/resolvers": "^3.9.0",
     "@reduxjs/toolkit": "^2.2.3",
     "@tanstack/react-table": "^8.19.3",
+    "@ebay/nice-modal-react": "^1.2.13",
     "axios": "^1.7.3",
     "axios-retry": "^4.4.2",
     "colord": "^2.9.3",
@@ -119,7 +120,6 @@
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
-    "@ebay/nice-modal-react": "^1.2.13",
     "@gravity-ui/browserslist-config": "^4.3.0",
     "@gravity-ui/eslint-config": "^3.2.0",
     "@gravity-ui/prettier-config": "^1.1.0",
