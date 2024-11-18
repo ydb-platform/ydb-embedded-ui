@@ -1,4 +1,4 @@
-export function insertSnipperToEditor(input: string) {
+export function insertSnippetToEditor(input: string) {
     if (!window.ydbEditor) {
         console.error('Monaco editor not found');
     }

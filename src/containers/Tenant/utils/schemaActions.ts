@@ -7,7 +7,7 @@ import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/te
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import type {QuerySettings} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
-import {insertSnipperToEditor} from '../../../utils/monaco/insertSnippet';
+import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
 import {transformPath} from '../ObjectSummary/transformPath';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 import i18n from '../i18n';
@@ -80,7 +80,7 @@ const bindActions = (
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(params.path);
             userInputDataPromise.then((tableData) => {
-                insertSnipperToEditor(tmpl({...params, tableData}));
+                insertSnippetToEditor(tmpl({...params, tableData}));
             });
         };
         if (getConfirmation) {
