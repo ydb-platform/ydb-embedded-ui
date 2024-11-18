@@ -2,12 +2,12 @@ import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
 import type {AppDispatch} from '../../../store';
-import {changeUserInput} from '../../../store/reducers/executeQuery';
 import type {GetTableSchemaDataParams} from '../../../store/reducers/tableSchemaData';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import type {QuerySettings} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
+import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
 import {transformPath} from '../ObjectSummary/transformPath';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 import i18n from '../i18n';
@@ -75,13 +75,13 @@ const bindActions = (
                       })
                     : Promise.resolve(undefined);
 
-            userInputDataPromise.then((tableData) => {
-                dispatch(changeUserInput({input: tmpl({...params, tableData})}));
-            });
-
+            //order is important here: firstly we should open query tab and initialize editor (it will be set to window.ydbEditor), after that it is possible to insert snippet
             dispatch(setTenantPage(TENANT_PAGES_IDS.query));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(params.path);
+            userInputDataPromise.then((tableData) => {
+                insertSnippetToEditor(tmpl({...params, tableData}));
+            });
         };
         if (getConfirmation) {
             const confirmedPromise = getConfirmation();

@@ -32,6 +32,8 @@ interface Window {
         Rum?: RumCounter;
     };
 
+    ydbEditor?: Monaco.editor.IStandaloneCodeEditor;
+
     web_version?: boolean;
     custom_backend?: string;
     meta_backend?: string;

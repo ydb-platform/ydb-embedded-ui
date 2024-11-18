@@ -3,22 +3,16 @@ import React from 'react';
 import {ChevronDown} from '@gravity-ui/icons';
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
 
-import {changeUserInput} from '../../../../store/reducers/executeQuery';
-import {useTypedDispatch} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
+import {insertSnippetToEditor} from '../../../../utils/monaco/insertSnippet';
 import {bindActions} from '../../utils/newSQLQueryActions';
 
 import i18n from './i18n';
 
 export function NewSQL() {
-    const dispatch = useTypedDispatch();
-
-    const insertTemplate = React.useCallback(
-        (input: string) => {
-            dispatch(changeUserInput({input}));
-        },
-        [dispatch],
-    );
+    const insertTemplate = React.useCallback((input: string) => {
+        insertSnippetToEditor(input);
+    }, []);
 
     const onTemplateClick = useChangeInputWithConfirmation(insertTemplate);
 
@@ -55,10 +49,6 @@ export function NewSQL() {
                 {
                     text: i18n('action.select-rows'),
                     action: actions.selectQuery,
-                },
-                {
-                    text: i18n('action.select-from-external-table'),
-                    action: actions.selectQueryFromExternalTable,
                 },
                 {
                     text: i18n('action.delete-rows'),
