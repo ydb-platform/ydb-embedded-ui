@@ -4,10 +4,7 @@ import NiceModal from '@ebay/nice-modal-react';
 
 import {useTypedSelector} from '..';
 import {CONFIRMATION_DIALOG} from '../../../components/ConfirmationDialog/ConfirmationDialog';
-import {
-    SaveQueryButton,
-    SaveQueryDialog,
-} from '../../../containers/Tenant/Query/SaveQuery/SaveQuery';
+import {SaveQueryButton} from '../../../containers/Tenant/Query/SaveQuery/SaveQuery';
 import {selectUserInput} from '../../../store/reducers/executeQuery';
 
 import i18n from './i18n';
@@ -15,24 +12,28 @@ import i18n from './i18n';
 function ExtendedSaveQueryButton() {
     const modal = NiceModal.useModal(CONFIRMATION_DIALOG);
 
-    const closeModal = () => {
+    const closeModal = React.useCallback(() => {
         modal.hide();
         modal.remove();
-    };
-    const handleSaveQuerySuccess = () => {
+    }, [modal]);
+    const handleSaveQuerySuccess = React.useCallback(() => {
         modal.resolve(true);
         closeModal();
-    };
-    const handleCancelQuerySave = () => {
+    }, [modal, closeModal]);
+    const handleCancelQuerySave = React.useCallback(() => {
         modal.resolve(false);
         closeModal();
-    };
-    return (
-        <React.Fragment>
-            <SaveQueryDialog onSuccess={handleSaveQuerySuccess} onCancel={handleCancelQuerySave} />
-            <SaveQueryButton view="action" size="l" />
-        </React.Fragment>
+    }, [closeModal, modal]);
+
+    const dialogProps = React.useMemo(
+        () => ({
+            onSuccess: handleSaveQuerySuccess,
+            onCancel: handleCancelQuerySave,
+        }),
+        [handleSaveQuerySuccess, handleCancelQuerySave],
     );
+
+    return <SaveQueryButton view="action" size="l" dialogProps={dialogProps} />;
 }
 
 export async function getConfirmation(): Promise<boolean> {

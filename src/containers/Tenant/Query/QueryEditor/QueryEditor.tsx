@@ -1,5 +1,6 @@
 import React from 'react';
 
+import NiceModal from '@ebay/nice-modal-react';
 import {isEqual} from 'lodash';
 import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
@@ -54,7 +55,7 @@ import {ExplainResult} from '../ExplainResult/ExplainResult';
 import {Preview} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
-import {SaveQueryDialog} from '../SaveQuery/SaveQuery';
+import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
 
 import {useEditorOptions} from './helpers';
@@ -289,7 +290,7 @@ export default function QueryEditor(props: QueryEditorProps) {
             label: i18n('action.save-query'),
             keybindings: [keybindings.saveQuery],
             run: () => {
-                dispatch(setQueryAction('save'));
+                NiceModal.show(SAVE_QUERY_DIALOG);
             },
         });
     };
@@ -368,7 +369,6 @@ export default function QueryEditor(props: QueryEditorProps) {
                     />
                 </div>
             </SplitPane>
-            <SaveQueryDialog />
             <QuerySettingsDialog />
         </div>
     );
