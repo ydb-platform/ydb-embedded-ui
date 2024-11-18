@@ -3,7 +3,7 @@ import {expect, test} from '@playwright/test';
 import {dsVslotsSchema, tenantName} from '../../../utils/constants';
 import {NavigationTabs, TenantPage} from '../TenantPage';
 import {longRunningQuery} from '../constants';
-import {QueryEditor} from '../queryEditor/QueryEditor';
+import {QueryEditor} from '../queryEditor/models/QueryEditor';
 
 import {Diagnostics, DiagnosticsTab, QueriesSwitch} from './Diagnostics';
 

@@ -2,9 +2,10 @@ import {expect, test} from '@playwright/test';
 
 import {dsVslotsSchema, dsVslotsTableName, tenantName} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
-import {QueryEditor} from '../queryEditor/QueryEditor';
+import {QueryEditor} from '../queryEditor/models/QueryEditor';
 
 import {ObjectSummary, ObjectSummaryTab} from './ObjectSummary';
+import {RowTableAction} from './types';
 
 test.describe('Object Summary', async () => {
     test.beforeEach(async ({page}) => {
@@ -17,7 +18,7 @@ test.describe('Object Summary', async () => {
         await tenantPage.goto(pageQueryParams);
     });
 
-    test('Open Preview icon appears on hover for "test" tree item', async ({page}) => {
+    test('Open Preview icon appears on hover for "dv_slots" tree item', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
 
@@ -59,5 +60,25 @@ test.describe('Object Summary', async () => {
             'PDiskId',
             'VSlotId',
         ]);
+    });
+
+    test('Actions dropdown menu opens and contains expected items', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+
+        await objectSummary.clickActionsButton(dsVslotsTableName);
+        await expect(objectSummary.isActionsMenuVisible()).resolves.toBe(true);
+    });
+
+    test('Can click menu items in actions dropdown', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
+        await page.waitForTimeout(500);
+
+        await expect(queryEditor.editorTextArea).toBeVisible();
+        await expect(queryEditor.editorTextArea).not.toBeEmpty();
     });
 });
