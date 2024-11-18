@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test';
 
+import {toggleExperiment} from '../../utils/toggleExperiment';
 import {NodesPage} from '../nodes/NodesPage';
 import {PaginatedTable} from '../paginatedTable/paginatedTable';
 
@@ -28,12 +29,7 @@ test.describe('Test Nodes Paginated Table', async () => {
         expect(response?.ok()).toBe(true);
 
         // Wil be removed since it's an experiment
-        await page.evaluate(() => {
-            localStorage.setItem('useBackendParamsForTables', 'true');
-            location.reload();
-        });
-
-        await page.waitForLoadState('networkidle');
+        await toggleExperiment(page, 'on', 'Use paginated tables');
     });
 
     test('Table loads and displays data', async ({page}) => {

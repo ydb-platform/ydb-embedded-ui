@@ -20,7 +20,7 @@ export function TraceButton({traceId, isTraceReady}: TraceUrlButtonProps) {
     const checkTraceUrl = traceCheck?.url ? replaceParams(traceCheck.url, {traceId}) : '';
     const traceUrl = traceView?.url ? replaceParams(traceView.url, {traceId}) : '';
 
-    const [checkTrace, {isLoading, isUninitialized}] = traceApi.useCheckTraceMutation();
+    const [checkTrace, {isLoading, isUninitialized}] = traceApi.useLazyCheckTraceQuery();
 
     React.useEffect(() => {
         let checkTraceMutation: {abort: () => void} | null;
