@@ -2,7 +2,7 @@ import {PopoverBehavior} from '@gravity-ui/uikit';
 
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {NodeAddress} from '../../types/additionalProps';
-import type {TSystemStateInfo} from '../../types/api/nodes';
+import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
 import {
     createDeveloperUIInternalPageHref,
     createDeveloperUILinkWithNodeId,
@@ -13,21 +13,32 @@ import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 
 export type NodeHostData = NodeAddress &
+    Pick<TNodeInfo, 'ConnectStatus'> &
     Pick<TSystemStateInfo, 'SystemState'> & {
         NodeId: string | number;
         TenantName?: string;
     };
 
+export type StatusForIcon = 'SystemState' | 'ConnectStatus';
+
 interface NodeHostWrapperProps {
     node: NodeHostData;
     getNodeRef?: (node?: NodeAddress) => string | null;
     database?: string;
+    statusForIcon?: StatusForIcon;
 }
 
-export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperProps) => {
+export const NodeHostWrapper = ({
+    node,
+    getNodeRef,
+    database,
+    statusForIcon,
+}: NodeHostWrapperProps) => {
     if (!node.Host) {
         return <span>—</span>;
     }
+
+    const status = statusForIcon === 'ConnectStatus' ? node.ConnectStatus : node.SystemState;
 
     const isNodeAvailable = !isUnavailableNode(node);
 
@@ -56,12 +67,7 @@ export const NodeHostWrapper = ({node, getNodeRef, database}: NodeHostWrapperPro
             behavior={PopoverBehavior.Immediate}
             delayClosing={200}
         >
-            <EntityStatus
-                name={node.Host}
-                status={node.SystemState}
-                path={nodePath}
-                hasClipboardButton
-            />
+            <EntityStatus name={node.Host} status={status} path={nodePath} hasClipboardButton />
         </CellWithPopover>
     );
 };

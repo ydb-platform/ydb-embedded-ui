@@ -28,7 +28,7 @@ import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
 import {getDataBasePages, getPagesByType} from './DiagnosticsPages';
 import {HotKeys} from './HotKeys/HotKeys';
-import {Network} from './Network/Network';
+import {NetworkWrapper} from './Network/NetworkWrapper';
 import {Partitions} from './Partitions/Partitions';
 import {TopQueries} from './TopQueries';
 import {TopShards} from './TopShards';
@@ -117,7 +117,14 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <StorageWrapper database={tenantName} parentRef={containerRef} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.network: {
-                return <Network tenantName={tenantName} />;
+                return (
+                    <NetworkWrapper
+                        path={path}
+                        database={tenantName}
+                        additionalNodesProps={props.additionalNodesProps}
+                        parentRef={containerRef}
+                    />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.describe: {
                 return <Describe path={path} database={tenantName} type={type} />;

@@ -33,6 +33,20 @@ export interface NodesPreparedEntity extends PreparedNodeSystemState {
     Endpoints?: TEndpoint[];
 
     TotalSessions?: number;
+
+    Connections?: number;
+    ConnectStatus?: EFlag;
+    ReceiveThroughput?: string;
+    SendThroughput?: string;
+    NetworkUtilization?: number;
+    NetworkUtilizationMin?: number;
+    NetworkUtilizationMax?: number;
+    ClockSkewUs?: string;
+    ClockSkewMinUs?: string;
+    ClockSkewMaxUs?: string;
+    PingTimeUs?: string;
+    PingTimeMinUs?: string;
+    PingTimeMaxUs?: string;
 }
 
 export interface NodesSortParams {

@@ -43,7 +43,6 @@ export const bindActions = (changeUserInput: (input: string) => void) => {
         upsertQuery: inputQuery(upsertQueryTemplate),
         createExternalTable: inputQuery(createExternalTableTemplate),
         dropExternalTable: inputQuery(dropExternalTableTemplate),
-        selectQueryFromExternalTable: inputQuery(selectQueryTemplate),
         createTopic: inputQuery(createTopicTemplate),
         alterTopic: inputQuery(alterTopicTemplate),
         dropTopic: inputQuery(dropTopicTemplate),

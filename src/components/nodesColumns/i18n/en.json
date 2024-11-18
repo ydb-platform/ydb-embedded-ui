@@ -24,7 +24,18 @@
 
   "system-state": "System State",
   "connect-status": "Connect Status",
+  "utilization": "Utilization",
   "network-utilization": "Network Utilization",
+  "connections": "Connections",
   "clock-skew": "Clock Skew",
-  "ping-time": "Ping Time"
+  "skew": "Skew",
+  "ping-time": "Ping Time",
+  "ping": "Ping",
+  "send": "Send",
+  "receive": "Receive",
+
+  "max": "Max",
+  "min": "Min",
+  "avg": "Avg",
+  "sum": "Sum"
 }

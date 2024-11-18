@@ -6,6 +6,7 @@ import {
     AUTOCOMPLETE_ON_ENTER,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     ENABLE_AUTOCOMPLETE,
+    ENABLE_NETWORK_TABLE_KEY,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     SHOW_DOMAIN_DATABASE_KEY,
@@ -97,6 +98,11 @@ export const usePaginatedTables: SettingProps = {
     description: i18n('settings.usePaginatedTables.description'),
 };
 
+export const enableNetworkTable: SettingProps = {
+    settingKey: ENABLE_NETWORK_TABLE_KEY,
+    title: i18n('settings.enableNetworkTable.title'),
+};
+
 export const useShowPlanToSvgTables: SettingProps = {
     settingKey: USE_SHOW_PLAN_SVG_KEY,
     title: i18n('settings.useShowPlanToSvg.title'),
@@ -145,7 +151,7 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [usePaginatedTables, useShowPlanToSvgTables],
+    settings: [usePaginatedTables, enableNetworkTable, useShowPlanToSvgTables],
 };
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',

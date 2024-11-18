@@ -134,6 +134,8 @@ export const TENANT_INITIAL_PAGE_KEY = 'saved_tenant_initial_tab';
 // Old key value for backward compatibility
 export const USE_PAGINATED_TABLES_KEY = 'useBackendParamsForTables';
 
+export const ENABLE_NETWORK_TABLE_KEY = 'enableNetworkTable';
+
 export const USE_SHOW_PLAN_SVG_KEY = 'useShowPlanToSvg';
 
 // Setting to hide domain in database list

@@ -1,4 +1,5 @@
 import type {IProtobufTimeObject} from '../../types/api/common';
+import {roundToPrecision} from '../dataFormatters/dataFormatters';
 import {isNumeric} from '../utils';
 
 import {parseProtobufDurationToMs, parseProtobufTimestampToMs} from './protobufParsers';
@@ -18,10 +19,10 @@ export const parseTimestampToIdleTime = (value: string | IProtobufTimeObject | u
     return duration < 0 ? 0 : duration;
 };
 
-export const parseUsToMs = (value: string | number | undefined) => {
+export const parseUsToMs = (value: string | number | undefined, precision = 0) => {
     if (!value || !isNumeric(value)) {
         return 0;
     }
 
-    return Math.round(Number(value) / 1000);
+    return roundToPrecision(Number(value) / 1000, precision);
 };

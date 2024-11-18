@@ -23,14 +23,46 @@ export interface TNodesInfo {
 export interface TNodeInfo {
     NodeId: number;
 
+    Database?: string;
+
     CpuUsage?: number;
     DiskSpaceUsage?: number;
     UptimeSeconds?: number;
+    Disconnected?: boolean;
 
     SystemState: TSystemStateInfo;
     PDisks?: TPDiskStateInfo[];
     VDisks?: TVDiskStateInfo[];
     Tablets?: TTabletStateInfo[];
+
+    // Network stats
+    Connections?: number; // total number of live connections
+    ConnectStatus?: EFlag; // Max
+    /** uint64 */
+    ReceiveThroughput?: string;
+    /** uint64 */
+    SendThroughput?: string;
+    NetworkUtilization?: number; // Sum
+    NetworkUtilizationMin?: number;
+    NetworkUtilizationMax?: number;
+    /** int64 */
+    ClockSkewUs?: string; // Avg
+    /** int64 */
+    ClockSkewMinUs?: string;
+    /** int64 */
+    ClockSkewMaxUs?: string;
+    /** int64 */
+    ReverseClockSkewUs?: string; // Avg
+    /** uint64 */
+    PingTimeUs?: string; // Avg
+    /** uint64 */
+    PingTimeMinUs?: string;
+    /** uint64 */
+    PingTimeMaxUs?: string;
+    /** uint64 */
+    ReversePingTimeUs?: string; // Avg
+    Peers?: TNodeStateInfo[];
+    ReversePeers?: TNodeStateInfo[];
 }
 
 export interface TNodesGroup {
@@ -115,6 +147,35 @@ export interface TSystemStateInfo {
     TotalSessions?: number;
     NodeName?: string;
 }
+
+interface TNodeStateInfo {
+    PeerName?: string;
+    Connected?: boolean;
+    NodeId?: number;
+    /** uint64 */
+    ChangeTime?: string;
+    /** uint32 */
+    OutputQueueSize?: string;
+    ConnectStatus?: EFlag;
+    /** uint64 */
+    ConnectTime?: string;
+    PeerNodeId?: number;
+    /** int64 */
+    ClockSkewUs?: string; // a positive value means the peer is ahead in time; a negative value means it's behind
+    /** uint32 */
+    PingTimeUs?: string; // RTT for the peer
+    Utilization?: number; // network utilization 0-1
+    ScopeId?: unknown;
+    /** uint32 */
+    Count?: string;
+    /** uint64 */
+    BytesWritten?: string; // bytes written to the socket
+    /** uint64 */
+    WriteThroughput?: string; // bytes written per second
+    SessionState?: ESessionState;
+}
+
+type ESessionState = 'CLOSED' | 'PENDING_CONNECTION' | 'CONNECTED';
 
 export type PoolName = 'System' | 'User' | 'Batch' | 'IO' | 'IC';
 

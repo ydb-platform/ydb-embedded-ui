@@ -33,6 +33,8 @@
   "settings.usePaginatedTables.title": "Use paginated tables",
   "settings.usePaginatedTables.description": " Use table with data load on scroll for Nodes and Storage tabs. It will increase performance, but could work unstable",
 
+  "settings.enableNetworkTable.title": "Enable network table",
+
   "settings.useShowPlanToSvg.title": "Plan to svg",
   "settings.useShowPlanToSvg.description": " Show \"Plan to svg\" button in query result widow (if query was executed with full stats option).",
 
