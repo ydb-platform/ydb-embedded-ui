@@ -2,6 +2,11 @@ import type {Locator, Page} from '@playwright/test';
 
 import {VISIBILITY_TIMEOUT} from '../TenantPage';
 
+import {QueryTabsNavigation} from './models/QueryTabsNavigation';
+import {PaneWrapper, ResultTable} from './models/ResultTable';
+import {SavedQueriesTable} from './models/SavedQueriesTable';
+import {SettingsDialog} from './models/SettingsDialog';
+
 export enum QueryMode {
     YQLScript = 'YQL Script',
     Data = 'DML',
@@ -35,175 +40,16 @@ export enum QueryTabs {
     Saved = 'Saved',
 }
 
-export class QueryTabsNavigation {
-    private tabsContainer: Locator;
-
-    constructor(page: Page) {
-        this.tabsContainer = page.locator('.ydb-query__tabs');
-    }
-
-    async selectTab(tabName: QueryTabs) {
-        const tab = this.tabsContainer.locator(`role=tab[name="${tabName}"]`);
-        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await tab.click();
-    }
-
-    async isTabSelected(tabName: QueryTabs): Promise<boolean> {
-        const tab = this.tabsContainer.locator(`role=tab[name="${tabName}"]`);
-        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        const isSelected = await tab.getAttribute('aria-selected');
-        return isSelected === 'true';
-    }
-
-    async getTabHref(tabName: QueryTabs): Promise<string | null> {
-        const link = this.tabsContainer.locator(`a:has(div[role="tab"][title="${tabName}"])`);
-        await link.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return link.getAttribute('href');
-    }
-}
-
-export class SettingsDialog {
-    private dialog: Locator;
-    private page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-        this.dialog = page.locator('.ydb-query-settings-dialog');
-    }
-
-    async changeQueryMode(mode: QueryMode) {
-        const dropdown = this.dialog.locator(
-            '.ydb-query-settings-dialog__control-wrapper_queryMode',
-        );
-        await dropdown.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await dropdown.click();
-        const popup = this.page.locator('.ydb-query-settings-select__popup');
-        await popup.getByText(mode).first().click();
-        await this.page.waitForTimeout(1000);
-    }
-
-    async changeTransactionMode(level: string) {
-        const dropdown = this.dialog.locator(
-            '.ydb-query-settings-dialog__control-wrapper_transactionMode',
-        );
-        await dropdown.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await dropdown.click();
-        const popup = this.page.locator('.ydb-query-settings-select__popup');
-        await popup.getByText(level).first().click();
-        await this.page.waitForTimeout(1000);
-    }
-
-    async changeStatsLevel(mode: string) {
-        const dropdown = this.dialog.locator(
-            '.ydb-query-settings-dialog__control-wrapper_statisticsMode',
-        );
-        await dropdown.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await dropdown.click();
-        const popup = this.page.locator('.ydb-query-settings-select__popup');
-        await popup.getByText(mode).first().click();
-        await this.page.waitForTimeout(1000);
-    }
-
-    async changeLimitRows(limitRows: number) {
-        const limitRowsInput = this.dialog.locator('.ydb-query-settings-dialog__limit-rows input');
-        await limitRowsInput.fill(limitRows.toString());
-        await this.page.waitForTimeout(1000);
-    }
-
-    async clickButton(buttonName: ButtonNames) {
-        const button = this.dialog.getByRole('button', {name: buttonName});
-        await button.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await button.click();
-    }
-
-    async isVisible() {
-        await this.dialog.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
-    async isHidden() {
-        await this.dialog.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-}
-
-class PaneWrapper {
-    paneWrapper: Locator;
-    private radioButton: Locator;
-
-    constructor(page: Page) {
-        this.paneWrapper = page.locator('.query-editor__pane-wrapper');
-        this.radioButton = this.paneWrapper.locator('.g-radio-button');
-    }
-
-    async selectTab(tabName: ResultTabNames) {
-        const tab = this.radioButton.getByLabel(tabName);
-        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await tab.click();
-    }
-}
-
-export class ResultTable {
-    private table: Locator;
-    private preview: Locator;
-    private resultHead: Locator;
-
-    constructor(selector: Locator) {
-        this.table = selector.locator('.ydb-query-execute-result__result');
-        this.preview = selector.locator('.kv-preview__result');
-        this.resultHead = selector.locator('.ydb-query-execute-result__result-head');
-    }
-
-    async isVisible() {
-        await this.table.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
-    async isHidden() {
-        await this.table.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
-    async isPreviewVisible() {
-        await this.preview.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
-    async isPreviewHidden() {
-        await this.preview.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
-    async getRowCount() {
-        const rows = this.table.locator('tr');
-        return rows.count();
-    }
-
-    async getCellValue(row: number, col: number) {
-        const cell = this.table.locator(`tr:nth-child(${row}) td:nth-child(${col})`);
-        return cell.innerText();
-    }
-
-    async isResultHeaderHidden() {
-        await this.resultHead.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
-    async getResultHeadText() {
-        await this.resultHead.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return this.resultHead.innerText();
-    }
-}
-
 export class QueryEditor {
     settingsDialog: SettingsDialog;
     paneWrapper: PaneWrapper;
     queryTabs: QueryTabsNavigation;
     resultTable: ResultTable;
+    savedQueries: SavedQueriesTable;
+    editorTextArea: Locator;
 
     private page: Page;
     private selector: Locator;
-    private editorTextArea: Locator;
     private runButton: Locator;
     private explainButton: Locator;
     private stopButton: Locator;
@@ -236,6 +82,7 @@ export class QueryEditor {
         this.resultTable = new ResultTable(this.selector);
         this.paneWrapper = new PaneWrapper(page);
         this.queryTabs = new QueryTabsNavigation(page);
+        this.savedQueries = new SavedQueriesTable(page);
     }
 
     async run(query: string, mode: QueryMode) {
