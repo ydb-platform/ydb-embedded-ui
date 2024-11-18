@@ -85,7 +85,7 @@ test.describe('Query Templates', () => {
         expect(newContent).not.toBe('');
     });
 
-    test.only('Save query flow saves query and shows it in Saved tab', async ({page}) => {
+    test('Save query flow saves query and shows it in Saved tab', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         const unsavedChangesModal = new UnsavedChangesModal(page);
         const queryEditor = new QueryEditor(page);
