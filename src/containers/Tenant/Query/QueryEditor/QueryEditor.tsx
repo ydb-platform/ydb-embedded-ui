@@ -10,9 +10,9 @@ import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import SplitPane from '../../../../components/SplitPane';
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {
-    executeQueryApi,
     goToNextQuery,
     goToPreviousQuery,
+    queryApi,
     saveQueryToHistory,
     selectQueriesHistory,
     selectQueriesHistoryCurrentIndex,
@@ -20,13 +20,11 @@ import {
     selectTenantPath,
     selectUserInput,
     setTenantPath,
-} from '../../../../store/reducers/executeQuery';
-import {explainQueryApi} from '../../../../store/reducers/explainQuery/explainQuery';
+} from '../../../../store/reducers/query/query';
+import type {QueryResult} from '../../../../store/reducers/query/types';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {selectShowPreview, setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
-import {ResultType} from '../../../../types/store/executeQuery';
-import type {QueryResult} from '../../../../types/store/executeQuery';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
@@ -104,8 +102,7 @@ export default function QueryEditor(props: QueryEditorProps) {
         LAST_USED_QUERY_ACTION_KEY,
     );
 
-    const [sendExecuteQuery] = executeQueryApi.useExecuteQueryMutation();
-    const [sendExplainQuery] = explainQueryApi.useExplainQueryMutation();
+    const [sendQuery] = queryApi.useUseSendQueryMutation();
 
     React.useEffect(() => {
         if (savedPath !== tenantName) {
@@ -147,7 +144,8 @@ export default function QueryEditor(props: QueryEditorProps) {
         }
         const queryId = uuidv4();
 
-        sendExecuteQuery({
+        sendQuery({
+            actionType: 'execute',
             query,
             database: tenantName,
             querySettings,
@@ -180,7 +178,8 @@ export default function QueryEditor(props: QueryEditorProps) {
 
         const queryId = uuidv4();
 
-        sendExplainQuery({
+        sendQuery({
+            actionType: 'explain',
             query: input,
             database: tenantName,
             querySettings,
@@ -400,7 +399,7 @@ function Result({
         return <Preview database={tenantName} path={path} type={type} />;
     }
 
-    if (result?.type === ResultType.EXECUTE) {
+    if (result?.type === 'execute') {
         return (
             <ExecuteResult
                 result={result}
@@ -413,7 +412,7 @@ function Result({
         );
     }
 
-    if (result?.type === ResultType.EXPLAIN) {
+    if (result?.type === 'explain') {
         return (
             <ExplainResult
                 result={result}

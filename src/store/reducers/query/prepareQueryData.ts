@@ -1,10 +1,10 @@
 import type {ExplainPlanNodeData, GraphNode, Link} from '@gravity-ui/paranoid';
 
-import type {ExplainQueryResponse, ExplainScriptResponse} from '../../../types/api/query';
+import type {ExecuteResponse, ExplainResponse} from '../../../types/api/query';
 import {preparePlan, prepareSimplifiedPlan} from '../../../utils/prepareQueryExplain';
-import {parseQueryAPIExplainResponse, parseQueryExplainPlan} from '../../../utils/query';
+import {parseQueryAPIResponse, parseQueryExplainPlan} from '../../../utils/query';
 
-import type {PreparedExplainResponse} from './types';
+import type {PreparedQueryData} from './types';
 
 export const explainVersions = {
     v2: '0.2',
@@ -12,13 +12,14 @@ export const explainVersions = {
 
 const supportedExplainQueryVersions = Object.values(explainVersions);
 
-export const prepareExplainResponse = (
-    response: ExplainScriptResponse | ExplainQueryResponse | null,
-): PreparedExplainResponse => {
-    const {plan: rawPlan, ast} = parseQueryAPIExplainResponse(response);
+export function prepareQueryData(
+    response: ExplainResponse | ExecuteResponse | null,
+): PreparedQueryData {
+    const result = parseQueryAPIResponse(response);
+    const {plan: rawPlan} = result;
 
     if (!rawPlan) {
-        return {ast};
+        return result;
     }
 
     const {tables, meta, Plan, SimplifiedPlan} = parseQueryExplainPlan(rawPlan);
@@ -26,11 +27,11 @@ export const prepareExplainResponse = (
     if (supportedExplainQueryVersions.indexOf(meta.version) === -1) {
         // Do not prepare plan for not supported versions
         return {
-            plan: {
+            ...result,
+            preparedPlan: {
                 pristine: rawPlan,
                 version: meta.version,
             },
-            ast,
         };
     }
 
@@ -48,7 +49,8 @@ export const prepareExplainResponse = (
     }
 
     return {
-        plan: {
+        ...result,
+        preparedPlan: {
             links,
             nodes,
             tables,
@@ -56,6 +58,5 @@ export const prepareExplainResponse = (
             pristine: rawPlan,
         },
         simplifiedPlan: {plan: preparedSimplifiedPlan, pristine: SimplifiedPlan},
-        ast,
     };
-};
+}

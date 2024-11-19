@@ -5,7 +5,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import {useTypedSelector} from '..';
 import {CONFIRMATION_DIALOG} from '../../../components/ConfirmationDialog/ConfirmationDialog';
 import {SaveQueryButton} from '../../../containers/Tenant/Query/SaveQuery/SaveQuery';
-import {selectUserInput} from '../../../store/reducers/executeQuery';
+import {selectUserInput} from '../../../store/reducers/query/query';
 
 import i18n from './i18n';
 

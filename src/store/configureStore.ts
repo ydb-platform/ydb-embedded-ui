@@ -33,7 +33,7 @@ function _configureStore<
                 },
                 serializableCheck: {
                     ignoredPaths: ['tooltip.currentHoveredRef', 'api'],
-                    ignoredActions: [UPDATE_REF, 'api/executeQuery/rejected'],
+                    ignoredActions: [UPDATE_REF, 'api/sendQuery/rejected'],
                 },
             }).concat(locationMiddleware, ...middleware),
     });

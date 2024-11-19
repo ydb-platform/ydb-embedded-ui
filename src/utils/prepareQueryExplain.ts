@@ -7,7 +7,7 @@ import type {
     TopologyNodeDataStatsSection,
 } from '@gravity-ui/paranoid';
 
-import type {SimplifiedPlanItem} from '../store/reducers/explainQuery/types';
+import type {SimplifiedPlanItem} from '../store/reducers/query/types';
 import type {PlanNode, SimplifiedNode} from '../types/api/query';
 
 const CONNECTION_NODE_META_FIELDS = new Set(['PlanNodeId', 'PlanNodeType', 'Node Type', 'Plans']);

@@ -4,12 +4,12 @@ import {api} from './api';
 import authentication from './authentication/authentication';
 import cluster from './cluster/cluster';
 import clusters from './clusters/clusters';
-import executeQuery from './executeQuery';
 import executeTopQueries from './executeTopQueries/executeTopQueries';
 import fullscreen from './fullscreen';
 import header from './header/header';
 import heatmap from './heatmap';
 import partitions from './partitions/partitions';
+import query from './query/query';
 import queryActions from './queryActions/queryActions';
 import schema from './schema/schema';
 import settings from './settings/settings';
@@ -28,7 +28,7 @@ export const rootReducer = {
     schema,
     tenants,
     partitions,
-    executeQuery,
+    query,
     heatmap,
     settings,
     executeTopQueries,

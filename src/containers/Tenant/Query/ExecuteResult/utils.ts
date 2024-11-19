@@ -1,4 +1,4 @@
-import {explainVersions} from '../../../../store/reducers/explainQuery/utils';
+import {explainVersions} from '../../../../store/reducers/query/prepareQueryData';
 import type {IQueryResult} from '../../../../types/store/query';
 import {preparePlan, prepareSimplifiedPlan} from '../../../../utils/prepareQueryExplain';
 import {parseQueryExplainPlan} from '../../../../utils/query';

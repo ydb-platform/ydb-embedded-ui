@@ -1,5 +1,5 @@
 import {api} from './api';
-import {setQueryTraceReady} from './executeQuery';
+import {setQueryTraceReady} from './query/query';
 
 interface CheckTraceParams {
     url: string;

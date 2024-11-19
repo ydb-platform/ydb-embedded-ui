@@ -1,6 +1,6 @@
 import type {CancelActions} from '../../types/api/query';
 import type {IQueryResult, QueryRequestParams} from '../../types/store/query';
-import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
+import {isQueryErrorResponse, parseQueryAPIResponse} from '../../utils/query';
 
 import {api} from './api';
 
@@ -28,7 +28,7 @@ export const cancelQueryApi = api.injectEndpoints({
                         return {error: response};
                     }
 
-                    const data = parseQueryAPIExecuteResponse(response);
+                    const data = parseQueryAPIResponse(response);
 
                     return {data};
                 } catch (error) {

@@ -1,17 +1,17 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {settingsManager} from '../../services/settings';
-import {TracingLevelNumber} from '../../types/api/query';
-import type {ExecuteActions} from '../../types/api/query';
-import {ResultType} from '../../types/store/executeQuery';
-import type {ExecuteQueryState, QueryInHistory, QueryResult} from '../../types/store/executeQuery';
-import type {QueryRequestParams, QuerySettings, QuerySyntax} from '../../types/store/query';
-import {QUERIES_HISTORY_KEY} from '../../utils/constants';
-import {QUERY_SYNTAX, isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
-import {isNumeric} from '../../utils/utils';
+import {settingsManager} from '../../../services/settings';
+import {TracingLevelNumber} from '../../../types/api/query';
+import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
+import {QUERIES_HISTORY_KEY} from '../../../utils/constants';
+import {isQueryErrorResponse} from '../../../utils/query';
+import {isNumeric} from '../../../utils/utils';
+import {api} from '../api';
 
-import {api} from './api';
+import {prepareQueryData} from './prepareQueryData';
+import type {QueryResult, QueryState} from './types';
+import {getActionAndSyntaxFromQueryMode, getQueryInHistory} from './utils';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
@@ -22,7 +22,7 @@ const queriesHistoryInitial = settingsManager.readUserSettingsValue(
 
 const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
-const initialState: ExecuteQueryState = {
+const initialState: QueryState = {
     input: '',
     history: {
         queries: queriesHistoryInitial
@@ -37,7 +37,7 @@ const initialState: ExecuteQueryState = {
 };
 
 const slice = createSlice({
-    name: 'executeQuery',
+    name: 'query',
     initialState,
     reducers: {
         changeUserInput: (state, action: PayloadAction<{input: string}>) => {
@@ -162,6 +162,7 @@ export const {
 } = slice.selectors;
 
 interface SendQueryParams extends QueryRequestParams {
+    actionType?: QueryAction;
     queryId: string;
     querySettings?: Partial<QuerySettings>;
     // flag whether to send new tracing header or not
@@ -174,24 +175,26 @@ interface QueryStats {
     endTime?: string | number;
 }
 
-export const executeQueryApi = api.injectEndpoints({
+export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
-        executeQuery: build.mutation<null, SendQueryParams>({
+        useSendQuery: build.mutation<null, SendQueryParams>({
             queryFn: async (
-                {query, database, querySettings = {}, enableTracingLevel, queryId},
+                {
+                    actionType = 'execute',
+                    query,
+                    database,
+                    querySettings = {},
+                    enableTracingLevel,
+                    queryId,
+                },
                 {signal, dispatch},
             ) => {
-                let action: ExecuteActions = 'execute';
-                let syntax: QuerySyntax = QUERY_SYNTAX.yql;
+                dispatch(setQueryResult({type: actionType, queryId, isLoading: true}));
 
-                dispatch(setQueryResult({type: ResultType.EXECUTE, queryId, isLoading: true}));
-
-                if (querySettings.queryMode === 'pg') {
-                    action = 'execute-query';
-                    syntax = QUERY_SYNTAX.pg;
-                } else if (querySettings.queryMode) {
-                    action = `execute-${querySettings.queryMode}`;
-                }
+                const {action, syntax} = getActionAndSyntaxFromQueryMode(
+                    actionType,
+                    querySettings?.queryMode,
+                );
 
                 try {
                     const timeStart = Date.now();
@@ -224,7 +227,7 @@ export const executeQueryApi = api.injectEndpoints({
                     if (isQueryErrorResponse(response)) {
                         dispatch(
                             setQueryResult({
-                                type: ResultType.EXECUTE,
+                                type: actionType,
                                 error: response,
                                 isLoading: false,
                                 queryId,
@@ -233,24 +236,27 @@ export const executeQueryApi = api.injectEndpoints({
                         return {error: response};
                     }
 
-                    const data = parseQueryAPIExecuteResponse(response);
+                    const data = prepareQueryData(response);
                     data.traceId = response?._meta?.traceId;
 
-                    const queryStats: QueryStats = {};
-                    if (data.stats) {
-                        const {DurationUs, Executions: [{FinishTimeMs}] = [{}]} = data.stats;
-                        queryStats.durationUs = DurationUs;
-                        queryStats.endTime = FinishTimeMs;
-                    } else {
-                        const now = Date.now();
-                        queryStats.durationUs = (now - timeStart) * 1000;
-                        queryStats.endTime = now;
+                    if (actionType === 'execute') {
+                        const queryStats: QueryStats = {};
+                        if (data.stats) {
+                            const {DurationUs, Executions: [{FinishTimeMs}] = [{}]} = data.stats;
+                            queryStats.durationUs = DurationUs;
+                            queryStats.endTime = FinishTimeMs;
+                        } else {
+                            const now = Date.now();
+                            queryStats.durationUs = (now - timeStart) * 1000;
+                            queryStats.endTime = now;
+                        }
+
+                        dispatch(updateQueryInHistory({stats: queryStats, queryId}));
                     }
 
-                    dispatch(updateQueryInHistory({stats: queryStats, queryId}));
                     dispatch(
                         setQueryResult({
-                            type: ResultType.EXECUTE,
+                            type: actionType,
                             data,
                             isLoading: false,
                             queryId,
@@ -260,7 +266,7 @@ export const executeQueryApi = api.injectEndpoints({
                 } catch (error) {
                     dispatch(
                         setQueryResult({
-                            type: ResultType.EXECUTE,
+                            type: actionType,
                             error,
                             isLoading: false,
                             queryId,
@@ -273,12 +279,3 @@ export const executeQueryApi = api.injectEndpoints({
     }),
     overrideExisting: 'throw',
 });
-
-function getQueryInHistory(rawQuery: string | QueryInHistory) {
-    if (typeof rawQuery === 'string') {
-        return {
-            queryText: rawQuery,
-        };
-    }
-    return rawQuery;
-}
