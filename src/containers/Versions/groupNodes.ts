@@ -112,7 +112,7 @@ export const getOtherNodes = (
         return undefined;
     }
 
-    const otherNodes = nodes.filter(({Roles}) => !Roles);
+    const otherNodes = nodes.filter(({Roles, Version}) => !Roles && Version);
     const otherNodesDividedByVersion = groupBy(otherNodes, 'Version');
 
     return Object.keys(otherNodesDividedByVersion).map((version) => {
