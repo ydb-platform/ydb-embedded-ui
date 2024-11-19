@@ -37,6 +37,7 @@ export function AutoRefreshControl({className}: AutoRefreshControlProps) {
                     setAutoRefreshInterval(Number(v));
                 }}
                 width={85}
+                qa="ydb-autorefresh-select"
             >
                 <Select.Option value="0">{i18n('None')}</Select.Option>
                 <Select.Option value="15000">{i18n('15 sec')}</Select.Option>

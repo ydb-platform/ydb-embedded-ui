@@ -7,7 +7,15 @@ import {useAutoRefreshInterval} from '../../utils/hooks';
 import {ResponseError} from '../Errors/ResponseError';
 
 import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
-import type {Column, FetchData, GetRowClassName, SortParams} from './types';
+import i18n from './i18n';
+import type {
+    Column,
+    FetchData,
+    GetRowClassName,
+    RenderEmptyDataMessage,
+    RenderErrorMessage,
+    SortParams,
+} from './types';
 import {typedMemo} from './utils';
 
 const DEBOUNCE_TIMEOUT = 200;
@@ -25,7 +33,8 @@ interface TableChunkProps<T, F> {
 
     fetchData: FetchData<T, F>;
     getRowClassName?: GetRowClassName<T>;
-    renderErrorMessage?: (error: IResponseError) => React.ReactNode;
+    renderErrorMessage?: RenderErrorMessage;
+    renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (total: number, found: number) => void;
 }
 
@@ -42,6 +51,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     sortParams,
     getRowClassName,
     renderErrorMessage,
+    renderEmptyDataMessage,
     onDataFetched,
     isActive,
 }: TableChunkProps<T, F>) {
@@ -117,6 +127,15 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
                     />
                 ));
             }
+        }
+
+        // Data is loaded, but there are no entities in the chunk
+        if (!currentData.data?.length) {
+            return (
+                <EmptyTableRow columns={columns}>
+                    {renderEmptyDataMessage ? renderEmptyDataMessage() : i18n('empty')}
+                </EmptyTableRow>
+            );
         }
 
         return currentData.data.map((rowData, index) => (
