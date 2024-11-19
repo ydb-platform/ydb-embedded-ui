@@ -8,8 +8,8 @@ import {
     selectQueriesHistory,
     selectQueriesHistoryFilter,
     setQueryHistoryFilter,
-} from '../../../../store/reducers/query/executeQuery';
-import type {QueryInHistory} from '../../../../store/reducers/query/executeQueryTypes';
+} from '../../../../store/reducers/query/query';
+import type {QueryInHistory} from '../../../../store/reducers/query/types';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {cn} from '../../../../utils/cn';

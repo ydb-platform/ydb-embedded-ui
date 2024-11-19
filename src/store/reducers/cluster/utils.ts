@@ -1,6 +1,6 @@
 import type {TClusterInfoV2, TStorageStats} from '../../../types/api/cluster';
 import type {ExecuteQueryResponse, KeyValueRow} from '../../../types/api/query';
-import {parseQueryAPIExecuteResponse} from '../../../utils/query';
+import {parseQueryAPIResponse} from '../../../utils/query';
 
 import type {ClusterGroupsStats} from './types';
 
@@ -88,7 +88,7 @@ function getGroupStats(data?: KeyValueRow[] | TStorageStats[]) {
 export const parseGroupsStatsQueryResponse = (
     data: ExecuteQueryResponse | null,
 ): ClusterGroupsStats => {
-    const parsedData = parseQueryAPIExecuteResponse(data).resultSets?.[0]?.result;
+    const parsedData = parseQueryAPIResponse(data).resultSets?.[0]?.result;
     return getGroupStats(parsedData);
 };
 

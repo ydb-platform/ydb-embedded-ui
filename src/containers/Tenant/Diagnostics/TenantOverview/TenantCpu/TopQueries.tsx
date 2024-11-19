@@ -7,7 +7,7 @@ import {
     setTopQueriesFilters,
     topQueriesApi,
 } from '../../../../../store/reducers/executeTopQueries/executeTopQueries';
-import {changeUserInput} from '../../../../../store/reducers/query/executeQuery';
+import {changeUserInput} from '../../../../../store/reducers/query/query';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGE,

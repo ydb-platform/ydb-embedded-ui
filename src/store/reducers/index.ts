@@ -9,7 +9,7 @@ import fullscreen from './fullscreen';
 import header from './header/header';
 import heatmap from './heatmap';
 import partitions from './partitions/partitions';
-import executeQuery from './query/executeQuery';
+import query from './query/query';
 import queryActions from './queryActions/queryActions';
 import schema from './schema/schema';
 import settings from './settings/settings';
@@ -28,7 +28,7 @@ export const rootReducer = {
     schema,
     tenants,
     partitions,
-    executeQuery,
+    query,
     heatmap,
     settings,
     executeTopQueries,

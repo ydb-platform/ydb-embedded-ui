@@ -3,7 +3,7 @@ import React from 'react';
 import {Table, useTable} from '@gravity-ui/table';
 import type {CellContext, ColumnDef, ExpandedState} from '@tanstack/react-table';
 
-import type {SimplifiedPlanItem} from '../../../../../../store/reducers/query/explainQueryTypes';
+import type {SimplifiedPlanItem} from '../../../../../../store/reducers/query/types';
 import {configuredNumeral} from '../../../../../../utils/numeral';
 import {formatToMs} from '../../../../../../utils/timeParsers';
 import {toExponential} from '../../../../../../utils/utils';

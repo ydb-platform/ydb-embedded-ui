@@ -6,43 +6,39 @@ import type {
     TKqpStatsQuery,
 } from '../types/api/query';
 
-import {
-    parseQueryAPIExecuteResponse,
-    parseQueryAPIExplainResponse,
-    parseQueryExplainPlan,
-} from './query';
+import {parseQueryAPIResponse, parseQueryExplainPlan} from './query';
 
 describe('API utils', () => {
     describe('json/viewer/query', () => {
-        describe('parseQueryAPIExecuteResponse', () => {
+        describe('parseQueryAPIResponse', () => {
             describe('should handle responses with incorrect format', () => {
                 it('should handle null response', () => {
-                    expect(parseQueryAPIExecuteResponse(null)).toEqual({});
+                    expect(parseQueryAPIResponse(null)).toEqual({});
                 });
                 it('should handle undefined response', () => {
-                    expect(parseQueryAPIExecuteResponse(undefined)).toEqual({});
+                    expect(parseQueryAPIResponse(undefined)).toEqual({});
                 });
                 it('should handle string response', () => {
-                    expect(parseQueryAPIExecuteResponse('foo')).toEqual({});
+                    expect(parseQueryAPIResponse('foo')).toEqual({});
                 });
                 it('should handle array response', () => {
-                    expect(parseQueryAPIExecuteResponse([{foo: 'bar'}])).toEqual({});
+                    expect(parseQueryAPIResponse([{foo: 'bar'}])).toEqual({});
                 });
                 it('should handle json string in the result field', () => {
                     const json = {foo: 'bar'};
                     const response = {result: JSON.stringify(json)};
-                    expect(parseQueryAPIExecuteResponse(response)).toEqual({});
+                    expect(parseQueryAPIResponse(response)).toEqual({});
                 });
                 it('should handle object with request plan in the result field', () => {
                     const response = {result: {queries: 'some queries'}};
-                    expect(parseQueryAPIExecuteResponse(response)).toEqual({});
+                    expect(parseQueryAPIResponse(response)).toEqual({});
                 });
             });
             describe('should correctly parse data', () => {
                 it('should accept stats without a result', () => {
                     const stats = {metric: 'good'} as TKqpStatsQuery;
                     const response = {stats};
-                    const actual = parseQueryAPIExecuteResponse(response);
+                    const actual = parseQueryAPIResponse(response);
                     expect(actual.resultSets?.[0]?.result).toBeUndefined();
                     expect(actual.columns).toBeUndefined();
                     expect(actual.stats).toEqual(response.stats);
@@ -102,7 +98,7 @@ describe('API utils', () => {
                         stats: {DurationUs: '1000'},
                     };
 
-                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                    expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
 
                 it('should handle empty result array', () => {
@@ -116,7 +112,7 @@ describe('API utils', () => {
                         stats: {DurationUs: '1000'},
                     };
 
-                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                    expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
 
                 it('should handle result with columns but no rows', () => {
@@ -142,7 +138,7 @@ describe('API utils', () => {
                         stats: {DurationUs: '1000'},
                     };
 
-                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                    expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
 
                 it('should return empty object for unsupported format', () => {
@@ -150,7 +146,7 @@ describe('API utils', () => {
                         result: 'unsupported',
                     };
 
-                    expect(parseQueryAPIExecuteResponse(input)).toEqual({});
+                    expect(parseQueryAPIResponse(input)).toEqual({});
                 });
 
                 it('should handle multiple result sets', () => {
@@ -203,7 +199,7 @@ describe('API utils', () => {
                         stats: {DurationUs: '1500'},
                     };
 
-                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                    expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
 
                 it('should handle null values in rows', () => {
@@ -249,7 +245,7 @@ describe('API utils', () => {
                         stats: {DurationUs: '1000'},
                     };
 
-                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                    expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
 
                 it('should handle truncated results', () => {
@@ -264,7 +260,7 @@ describe('API utils', () => {
                         stats: {DurationUs: '1000'},
                     };
 
-                    const result = parseQueryAPIExecuteResponse(input);
+                    const result = parseQueryAPIResponse(input);
                     expect(result.resultSets?.[0].truncated).toBe(true);
                 });
 
@@ -291,33 +287,17 @@ describe('API utils', () => {
                         stats: {DurationUs: '1000'},
                     };
 
-                    expect(parseQueryAPIExecuteResponse(input)).toEqual(expected);
+                    expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
             });
-        });
-
-        describe('parseQueryAPIExplainResponse', () => {
-            describe('should handle responses with incorrect format', () => {
-                it('should handle null response', () => {
-                    expect(parseQueryAPIExecuteResponse(null)).toEqual({});
-                });
-                it('should handle undefined response', () => {
-                    expect(parseQueryAPIExecuteResponse(undefined)).toEqual({});
-                });
-                it('should handle object with plan in the result field', () => {
-                    const response = {result: {foo: 'bar'}};
-                    expect(parseQueryAPIExecuteResponse(response)).toEqual({});
-                });
-            });
-
-            describe('should correctly parse data', () => {
+            describe('should correctly parse plans', () => {
                 it('should parse explain-scan', () => {
                     const plan: PlanNode = {};
                     const tables: PlanTable[] = [];
                     const meta: PlanMeta = {version: '0.2', type: 'script'};
                     const ast = 'ast';
                     const response = {plan: {Plan: plan, tables, meta}, ast};
-                    expect(parseQueryAPIExplainResponse(response)).toBe(response);
+                    expect(parseQueryAPIResponse(response)).toBe(response);
                 });
                 it('should parse explain-script', () => {
                     const plan: PlanNode = {};
@@ -327,7 +307,7 @@ describe('API utils', () => {
                     const response = {
                         plan: {queries: [{Plan: plan, tables}], meta},
                     };
-                    expect(parseQueryAPIExplainResponse(response)).toBe(response);
+                    expect(parseQueryAPIResponse(response)).toBe(response);
                 });
             });
         });

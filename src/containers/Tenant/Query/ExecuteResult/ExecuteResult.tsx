@@ -13,7 +13,7 @@ import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper'
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
-import type {ExecuteQueryResult} from '../../../../store/reducers/query/executeQueryTypes';
+import type {QueryResult} from '../../../../store/reducers/query/types';
 import type {TKqpStatsQuery} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
 import {getArray} from '../../../../utils';
@@ -50,7 +50,7 @@ const resultOptionsIds = {
 type SectionID = ValueOf<typeof resultOptionsIds>;
 
 interface ExecuteResultProps {
-    result: ExecuteQueryResult;
+    result: QueryResult;
     isResultsCollapsed?: boolean;
     theme?: string;
     tenantName: string;

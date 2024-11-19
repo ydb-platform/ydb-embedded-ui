@@ -12,7 +12,7 @@ import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {parseQuery} from '../../../../routes';
 import {setTopQueriesFilters} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
-import {changeUserInput} from '../../../../store/reducers/query/executeQuery';
+import {changeUserInput} from '../../../../store/reducers/query/query';
 import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
