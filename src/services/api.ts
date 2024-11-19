@@ -202,6 +202,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 path,
                 tablets: false,
                 storage: true,
+                memory: true,
             },
             {concurrentId, requestConfig: {signal}},
         );

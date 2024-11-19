@@ -40,8 +40,6 @@ export interface MemoryProgressViewerProps {
     stats: TMemoryStats;
     className?: string;
     warningThreshold?: number;
-    value?: number | string;
-    capacity?: number | string;
     formatValues: FormatProgressViewerValues;
     percents?: boolean;
     dangerThreshold?: number;
@@ -49,14 +47,15 @@ export interface MemoryProgressViewerProps {
 
 export function MemoryViewer({
     stats,
-    value,
-    capacity,
     percents,
     formatValues,
     className,
     warningThreshold = 60,
     dangerThreshold = 80,
 }: MemoryProgressViewerProps) {
+    const value = stats.AnonRss;
+    const capacity = stats.HardLimit;
+
     const theme = useTheme();
     let fillWidth =
         Math.round((parseFloat(String(value)) / parseFloat(String(capacity))) * 100) || 0;

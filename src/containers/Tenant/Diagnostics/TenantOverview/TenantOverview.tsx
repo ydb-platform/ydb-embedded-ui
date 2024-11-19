@@ -123,7 +123,14 @@ export function TenantOverview({
                 return <TenantStorage tenantName={tenantName} metrics={storageMetrics} />;
             }
             case TENANT_METRICS_TABS_IDS.memory: {
-                return <TenantMemory tenantName={tenantName} />;
+                return (
+                    <TenantMemory
+                        tenantName={tenantName}
+                        memoryUsed={tenantData.MemoryUsed}
+                        memoryLimit={tenantData.MemoryLimit}
+                        memoryStats={tenantData.MemoryStats}
+                    />
+                );
             }
             case TENANT_METRICS_TABS_IDS.healthcheck: {
                 return <HealthcheckDetails tenantName={tenantName} />;
