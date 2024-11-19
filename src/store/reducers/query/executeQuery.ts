@@ -1,17 +1,21 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {settingsManager} from '../../services/settings';
-import {TracingLevelNumber} from '../../types/api/query';
-import type {ExecuteActions} from '../../types/api/query';
-import {ResultType} from '../../types/store/executeQuery';
-import type {ExecuteQueryState, QueryInHistory, QueryResult} from '../../types/store/executeQuery';
-import type {QueryRequestParams, QuerySettings, QuerySyntax} from '../../types/store/query';
-import {QUERIES_HISTORY_KEY} from '../../utils/constants';
-import {QUERY_SYNTAX, isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../utils/query';
-import {isNumeric} from '../../utils/utils';
+import {settingsManager} from '../../../services/settings';
+import {TracingLevelNumber} from '../../../types/api/query';
+import type {ExecuteActions} from '../../../types/api/query';
+import type {QueryRequestParams, QuerySettings, QuerySyntax} from '../../../types/store/query';
+import {QUERIES_HISTORY_KEY} from '../../../utils/constants';
+import {
+    QUERY_SYNTAX,
+    isQueryErrorResponse,
+    parseQueryAPIExecuteResponse,
+} from '../../../utils/query';
+import {isNumeric} from '../../../utils/utils';
+import {api} from '../api';
 
-import {api} from './api';
+import type {ExecuteQueryState, QueryInHistory, QueryResult} from './executeQueryTypes';
+import {ResultType} from './executeQueryTypes';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 

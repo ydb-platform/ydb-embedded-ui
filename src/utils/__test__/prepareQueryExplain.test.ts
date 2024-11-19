@@ -1,4 +1,4 @@
-import type {SimplifiedPlanItem} from '../../store/reducers/explainQuery/types';
+import type {SimplifiedPlanItem} from '../../store/reducers/query/explainQueryTypes';
 import type {SimplifiedNode} from '../../types/api/query';
 import {prepareSimplifiedPlan} from '../prepareQueryExplain';
 

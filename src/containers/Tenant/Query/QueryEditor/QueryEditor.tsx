@@ -20,13 +20,13 @@ import {
     selectTenantPath,
     selectUserInput,
     setTenantPath,
-} from '../../../../store/reducers/executeQuery';
-import {explainQueryApi} from '../../../../store/reducers/explainQuery/explainQuery';
+} from '../../../../store/reducers/query/executeQuery';
+import type {QueryResult} from '../../../../store/reducers/query/executeQueryTypes';
+import {ResultType} from '../../../../store/reducers/query/executeQueryTypes';
+import {explainQueryApi} from '../../../../store/reducers/query/explainQuery';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {selectShowPreview, setShowPreview} from '../../../../store/reducers/schema/schema';
 import type {EPathType} from '../../../../types/api/schema';
-import {ResultType} from '../../../../types/store/executeQuery';
-import type {QueryResult} from '../../../../types/store/executeQuery';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {

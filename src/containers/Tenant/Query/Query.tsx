@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Helmet} from 'react-helmet-async';
 
-import {changeUserInput} from '../../../store/reducers/executeQuery';
+import {changeUserInput} from '../../../store/reducers/query/executeQuery';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import type {EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';

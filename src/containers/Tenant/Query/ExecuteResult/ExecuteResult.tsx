@@ -13,9 +13,9 @@ import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper'
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {QueryResultTable} from '../../../../components/QueryResultTable/QueryResultTable';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
+import type {ExecuteQueryResult} from '../../../../store/reducers/query/executeQueryTypes';
 import type {TKqpStatsQuery} from '../../../../types/api/query';
 import type {ValueOf} from '../../../../types/common';
-import type {ExecuteQueryResult} from '../../../../types/store/executeQuery';
 import {getArray} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {USE_SHOW_PLAN_SVG_KEY} from '../../../../utils/constants';

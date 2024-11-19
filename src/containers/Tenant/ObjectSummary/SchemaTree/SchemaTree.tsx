@@ -6,7 +6,7 @@ import React from 'react';
 import {NavigationTree} from 'ydb-ui-components';
 
 import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/capabilities/hooks';
-import {selectUserInput} from '../../../../store/reducers/executeQuery';
+import {selectUserInput} from '../../../../store/reducers/query/executeQuery';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import type {GetTableSchemaDataParams} from '../../../../store/reducers/tableSchemaData';

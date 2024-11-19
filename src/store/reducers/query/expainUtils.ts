@@ -4,7 +4,7 @@ import type {ExplainQueryResponse, ExplainScriptResponse} from '../../../types/a
 import {preparePlan, prepareSimplifiedPlan} from '../../../utils/prepareQueryExplain';
 import {parseQueryAPIExplainResponse, parseQueryExplainPlan} from '../../../utils/query';
 
-import type {PreparedExplainResponse} from './types';
+import type {PreparedExplainResponse} from './explainQueryTypes';
 
 export const explainVersions = {
     v2: '0.2',

@@ -1,6 +1,6 @@
-import type {PreparedExplainResponse} from '../../store/reducers/explainQuery/types';
+import type {IQueryResult} from '../../../types/store/query';
 
-import type {IQueryResult} from './query';
+import type {PreparedExplainResponse} from './explainQueryTypes';
 
 export interface QueryInHistory {
     queryId?: string;

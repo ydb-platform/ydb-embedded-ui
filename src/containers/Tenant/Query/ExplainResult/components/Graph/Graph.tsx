@@ -1,6 +1,6 @@
 import {YDBGraph} from '../../../../../../components/Graph/Graph';
-import type {PreparedExplainResponse} from '../../../../../../store/reducers/explainQuery/types';
-import {explainVersions} from '../../../../../../store/reducers/explainQuery/utils';
+import {explainVersions} from '../../../../../../store/reducers/query/expainUtils';
+import type {PreparedExplainResponse} from '../../../../../../store/reducers/query/explainQueryTypes';
 import {cn} from '../../../../../../utils/cn';
 import i18n from '../../i18n';
 

@@ -1,13 +1,13 @@
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {ExplainActions} from '../../../types/api/query';
-import {ResultType} from '../../../types/store/executeQuery';
 import type {QueryRequestParams, QuerySettings, QuerySyntax} from '../../../types/store/query';
 import {QUERY_SYNTAX, isQueryErrorResponse} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import {api} from '../api';
-import {setQueryResult} from '../executeQuery';
 
-import {prepareExplainResponse} from './utils';
+import {setQueryResult} from './executeQuery';
+import {ResultType} from './executeQueryTypes';
+import {prepareExplainResponse} from './expainUtils';
 
 interface ExplainQueryParams extends QueryRequestParams {
     queryId: string;
