@@ -3,11 +3,11 @@ import React from 'react';
 import {useHistory, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../../../../routes';
-import {changeUserInput} from '../../../../../store/reducers/executeQuery';
 import {
     setTopQueriesFilters,
     topQueriesApi,
 } from '../../../../../store/reducers/executeTopQueries/executeTopQueries';
+import {changeUserInput} from '../../../../../store/reducers/query/query';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGE,

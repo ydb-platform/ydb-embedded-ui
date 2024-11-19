@@ -9,8 +9,8 @@ import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
+import type {QueryResult} from '../../../../store/reducers/query/types';
 import type {ValueOf} from '../../../../types/common';
-import type {ExplainQueryResult} from '../../../../types/store/executeQuery';
 import {cn} from '../../../../utils/cn';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch} from '../../../../utils/hooks';
@@ -59,7 +59,7 @@ const explainOptions = [
 
 interface ExplainResultProps {
     theme: string;
-    result: ExplainQueryResult;
+    result: QueryResult;
     tenantName: string;
     isResultsCollapsed?: boolean;
     onCollapseResults: VoidFunction;
@@ -81,7 +81,7 @@ export function ExplainResult({
     const [isPending, startTransition] = React.useTransition();
     const {error, isLoading, queryId} = result;
 
-    const {plan: explain, ast, simplifiedPlan} = result.data || {};
+    const {preparedPlan: explain, ast, simplifiedPlan} = result.data || {};
 
     React.useEffect(() => {
         return () => {

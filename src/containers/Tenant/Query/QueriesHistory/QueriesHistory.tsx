@@ -8,10 +8,10 @@ import {
     selectQueriesHistory,
     selectQueriesHistoryFilter,
     setQueryHistoryFilter,
-} from '../../../../store/reducers/executeQuery';
+} from '../../../../store/reducers/query/query';
+import type {QueryInHistory} from '../../../../store/reducers/query/types';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
-import type {QueryInHistory} from '../../../../types/store/executeQuery';
 import {cn} from '../../../../utils/cn';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';

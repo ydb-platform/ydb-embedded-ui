@@ -2,7 +2,7 @@ import {isLikeRelative} from '@gravity-ui/date-utils';
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../../utils/query';
+import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {api} from '../api';
 
 import type {TopQueriesFilters} from './types';
@@ -70,7 +70,7 @@ export const topQueriesApi = api.injectEndpoints({
                         throw response;
                     }
 
-                    const data = parseQueryAPIExecuteResponse(response);
+                    const data = parseQueryAPIResponse(response);
                     return {data};
                 } catch (error) {
                     return {error};
@@ -123,7 +123,7 @@ export const topQueriesApi = api.injectEndpoints({
                         throw response;
                     }
 
-                    const data = parseQueryAPIExecuteResponse(response);
+                    const data = parseQueryAPIResponse(response);
 
                     return {data};
                 } catch (error) {

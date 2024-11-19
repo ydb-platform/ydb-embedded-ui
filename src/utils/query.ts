@@ -173,10 +173,13 @@ const parseExecuteResponse = (data: ExecuteResponse): IQueryResult => {
     };
 };
 
-const isSupportedType = (response: ExecuteResponse): response is ExecuteResponse =>
+const isSupportedExecuteResponse = (
+    response: ExecuteResponse | ExplainResponse,
+): response is ExecuteResponse =>
     Boolean(
         response &&
             !Array.isArray(response) &&
+            'result' in response &&
             Array.isArray(response.result) &&
             typeof response.result[0] === 'object' &&
             'rows' in response.result[0] &&
@@ -207,29 +210,19 @@ export function isQueryErrorResponse(data: unknown): data is ErrorResponse {
 
 // Although schema is set in request, if schema is not supported default schema for the version will be used
 // So we should additionally parse response
-export const parseQueryAPIExecuteResponse = (
-    data: ExecuteResponse | UnsupportedQueryResponseFormat,
-): IQueryResult => {
+export function parseQueryAPIResponse(
+    data: ExecuteResponse | ExplainResponse | UnsupportedQueryResponseFormat,
+): IQueryResult {
     if (isUnsupportedType(data)) {
         return {};
     }
 
-    if (isSupportedType(data)) {
+    if (isSupportedExecuteResponse(data)) {
         return parseExecuteResponse(data);
     }
 
     return data;
-};
-
-export const parseQueryAPIExplainResponse = (
-    data: ExplainResponse | UnsupportedQueryResponseFormat,
-): IQueryResult => {
-    if (isUnsupportedType(data)) {
-        return {};
-    }
-
-    return data;
-};
+}
 
 const isExplainScriptPlan = (plan: ScriptPlan | QueryPlan): plan is ScriptPlan =>
     Boolean(plan && 'queries' in plan);

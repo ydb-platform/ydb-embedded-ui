@@ -58,7 +58,7 @@ export function saveQuery(queryName: string | null) {
     return function saveQueryThunk(dispatch: AppDispatch, getState: GetState) {
         const state = getState();
         const savedQueries = (getSettingValue(state, SAVED_QUERIES_KEY) as SavedQuery[]) ?? [];
-        const queryBody = state.executeQuery.input;
+        const queryBody = state.query.input;
         if (queryName === null) {
             return;
         }

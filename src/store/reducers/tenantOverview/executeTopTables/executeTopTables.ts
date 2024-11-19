@@ -1,5 +1,5 @@
 import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
-import {isQueryErrorResponse, parseQueryAPIExecuteResponse} from '../../../../utils/query';
+import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../../utils/query';
 import {api} from '../../api';
 
 const getQueryText = (path: string) => {
@@ -31,7 +31,7 @@ export const topTablesApi = api.injectEndpoints({
                         return {error: response};
                     }
 
-                    return {data: parseQueryAPIExecuteResponse(response)};
+                    return {data: parseQueryAPIResponse(response)};
                 } catch (error) {
                     return {error: error || 'Unauthorized'};
                 }
