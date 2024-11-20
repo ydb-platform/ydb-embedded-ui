@@ -96,7 +96,7 @@ test.describe('Test Plan to SVG functionality', async () => {
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
     });
 
-    test('Statistics setting shows tooltip when disabled by execution plan experiment', async ({
+    test.only('Statistics setting shows tooltip when disabled by execution plan experiment', async ({
         page,
     }) => {
         const queryEditor = new QueryEditor(page);

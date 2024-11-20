@@ -236,12 +236,12 @@ jobs:
           new_tests=0
           for file in $changed_files; do
             if git show HEAD:$file > /dev/null 2>&1; then
-              new_cases=$(git show HEAD:$file | grep -c "it\('" || true)
-              base_cases=$(git show main:$file 2>/dev/null | grep -c "it\('" || true)
+              new_cases=$(git show HEAD:$file | grep -E "it[\( ][\"\']" | wc -l || true)
+              base_cases=$(git show main:$file 2>/dev/null | grep -E "it[\( ][\"\']" | wc -l || true)
               ((new_tests += new_cases - base_cases))
             else
               # If file is completely new, count all test cases
-              new_tests+=$(git show HEAD:$file | grep -c "it\('" || true)
+              new_tests+=$(git show HEAD:$file | grep -E "it[\( ][\"\']" | wc -l || true)
             fi
           done
           echo "new_tests=$new_tests" >> $GITHUB_OUTPUT
