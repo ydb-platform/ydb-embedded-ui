@@ -65,7 +65,7 @@ export class QueryEditor {
         this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
         this.gearButton = this.selector.locator('.ydb-query-editor-controls__gear-button');
         this.executionStatus = this.selector.locator('.kv-query-execution-status');
-        this.resultsControls = this.selector.locator('.ydb-query-execute-result__controls');
+        this.resultsControls = this.selector.locator('.ydb-query-result__controls');
         this.indicatorIcon = this.selector.locator(
             '.kv-query-execution-status__query-settings-icon',
         );
@@ -118,14 +118,14 @@ export class QueryEditor {
 
     async getExplainResult(type: ExplainResultType) {
         await this.selectResultTypeRadio(type);
-        const resultArea = this.selector.locator('.ydb-query-explain-result__result');
+        const resultArea = this.selector.locator('.ydb-query-result__result');
         switch (type) {
             case ExplainResultType.Schema:
-                return resultArea.locator('.canvas-container');
+                return resultArea.locator('.ydb-query-explain-graph__canvas-container');
             case ExplainResultType.JSON:
-                return resultArea.locator('.json-inspector');
+                return resultArea.locator('.ydb-query-json-viewer__inspector');
             case ExplainResultType.AST:
-                return resultArea.locator('.ydb-query-explain-ast');
+                return resultArea.locator('.ydb-query-ast');
         }
     }
 

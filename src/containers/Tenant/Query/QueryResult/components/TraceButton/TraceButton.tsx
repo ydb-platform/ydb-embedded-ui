@@ -3,11 +3,10 @@ import React from 'react';
 import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
 import {Button} from '@gravity-ui/uikit';
 
-import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
-import {traceApi} from '../../../../store/reducers/trace';
-import {replaceParams} from '../utils/replaceParams';
-
-import i18n from './i18n';
+import {useClusterBaseInfo} from '../../../../../../store/reducers/cluster/cluster';
+import {traceApi} from '../../../../../../store/reducers/trace';
+import {replaceParams} from '../../../utils/replaceParams';
+import i18n from '../../i18n';
 
 interface TraceUrlButtonProps {
     traceId: string;

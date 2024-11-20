@@ -5,7 +5,7 @@ import {S_EXPRESSION_LANGUAGE_ID} from '../../../../../../utils/monaco/constats'
 
 import './Ast.scss';
 
-const b = cn('ydb-query-explain-ast');
+const b = cn('ydb-query-ast');
 
 const EDITOR_OPTIONS = {
     automaticLayout: true,
@@ -19,7 +19,7 @@ const EDITOR_OPTIONS = {
 
 interface AstProps {
     ast: string;
-    theme: string;
+    theme?: string;
 }
 
 export function Ast({ast, theme}: AstProps) {

@@ -48,10 +48,9 @@ import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
 } from '../../utils/paneVisibilityToggleHelpers';
-import {ExecuteResult} from '../ExecuteResult/ExecuteResult';
-import {ExplainResult} from '../ExplainResult/ExplainResult';
 import {Preview} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
+import {QueryResultViewer} from '../QueryResult/QueryResultViewer';
 import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
 import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
@@ -399,23 +398,11 @@ function Result({
         return <Preview database={tenantName} path={path} type={type} />;
     }
 
-    if (result?.type === 'execute') {
+    if (result) {
         return (
-            <ExecuteResult
+            <QueryResultViewer
                 result={result}
-                isResultsCollapsed={resultVisibilityState.collapsed}
-                onExpandResults={onExpandResultHandler}
-                onCollapseResults={onCollapseResultHandler}
-                theme={theme}
-                tenantName={tenantName}
-            />
-        );
-    }
-
-    if (result?.type === 'explain') {
-        return (
-            <ExplainResult
-                result={result}
+                resultType={result?.type}
                 theme={theme}
                 tenantName={tenantName}
                 isResultsCollapsed={resultVisibilityState.collapsed}

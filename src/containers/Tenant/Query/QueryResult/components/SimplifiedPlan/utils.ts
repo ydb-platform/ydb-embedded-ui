@@ -3,7 +3,7 @@ import {cn} from '../../../../../../utils/cn';
 
 import type {ExtendedSimplifiesPlanItem} from './types';
 
-export const block = cn('ydb-query-explain-simplified-plan');
+export const block = cn('ydb-query-simplified-plan');
 
 export function getExtendedTreeNodes(
     items?: SimplifiedPlanItem[],
