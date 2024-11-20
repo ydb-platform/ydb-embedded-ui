@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test';
 
+import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {tenantName} from '../../../utils/constants';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {createTableQuery, longRunningQuery, longTableSelect} from '../constants';
@@ -8,7 +9,6 @@ import {
     ButtonNames,
     ExplainResultType,
     QueryEditor,
-    QueryMode,
     QueryTabs,
     ResultTabNames,
 } from './models/QueryEditor';
@@ -29,21 +29,21 @@ test.describe('Test Query Editor', async () => {
 
     test('Run button executes YQL script', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.run(testQuery, QueryMode.YQLScript);
+        await queryEditor.run(testQuery, QUERY_MODES.script);
 
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 
     test('Run button executes Scan', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.run(testQuery, QueryMode.Scan);
+        await queryEditor.run(testQuery, QUERY_MODES.scan);
 
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 
     test('Explain button executes YQL script explanation', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.explain(testQuery, QueryMode.YQLScript);
+        await queryEditor.explain(testQuery, QUERY_MODES.script);
 
         const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
         await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
@@ -54,7 +54,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Explain button executes Scan explanation', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.explain(testQuery, QueryMode.Scan);
+        await queryEditor.explain(testQuery, QUERY_MODES.scan);
 
         const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Schema);
         await expect(explainSchema).toBeVisible({timeout: VISIBILITY_TIMEOUT});
@@ -155,7 +155,7 @@ test.describe('Test Query Editor', async () => {
         // Test for Execute mode
         await queryEditor.setQuery(longRunningQuery);
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Data);
+        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.data);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Test for Explain mode
@@ -170,7 +170,7 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeStatsLevel('Profile');
+        await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.profile);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
         await queryEditor.clickRunButton();
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
@@ -184,7 +184,7 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeStatsLevel('Profile');
+        await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.profile);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
         await queryEditor.clickRunButton();
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
@@ -199,7 +199,7 @@ test.describe('Test Query Editor', async () => {
         const tenantPage = new TenantPage(page);
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeStatsLevel('Profile');
+        await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.profile);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
         await queryEditor.clickRunButton();
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);

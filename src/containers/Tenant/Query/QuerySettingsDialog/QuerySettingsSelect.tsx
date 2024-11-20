@@ -44,7 +44,7 @@ export function QuerySettingsSelect<T extends SelectType>(props: QuerySettingsSe
                 getOptionHeight={getOptionHeight}
                 popupClassName={b('popup')}
                 renderOption={(option: QuerySettingSelectOption<T>) => (
-                    <div className={b('item')}>
+                    <div className={b('item', {type: option.value})}>
                         <div className={b('item-title')}>
                             {option.content}
                             {option.isDefault ? i18n('description.default') : ''}

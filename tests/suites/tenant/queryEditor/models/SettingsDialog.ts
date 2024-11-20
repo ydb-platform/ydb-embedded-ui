@@ -1,54 +1,81 @@
 import type {Locator, Page} from '@playwright/test';
 
+import type {
+    QUERY_MODES,
+    STATISTICS_MODES,
+    TRANSACTION_MODES,
+} from '../../../../../src/utils/query';
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
 
-import type {ButtonNames, QueryMode} from './QueryEditor';
+import type {ButtonNames} from './QueryEditor';
 
 export class SettingsDialog {
     private dialog: Locator;
     private page: Page;
+    private selectPopup: Locator;
+    private limitRowsInput: Locator;
+
+    private queryModeSelect: Locator;
+    private transactionModeSelect: Locator;
+    private statisticsModeSelect: Locator;
+    private statisticsModeTooltip: Locator;
 
     constructor(page: Page) {
         this.page = page;
         this.dialog = page.locator('.ydb-query-settings-dialog');
-    }
 
-    async changeQueryMode(mode: QueryMode) {
-        const dropdown = this.dialog.locator(
+        this.limitRowsInput = this.dialog.locator('.ydb-query-settings-dialog__limit-rows input');
+        this.selectPopup = page.locator('.ydb-query-settings-select__popup');
+
+        // Define distinct locators for selects
+        this.queryModeSelect = this.dialog.locator(
             '.ydb-query-settings-dialog__control-wrapper_queryMode',
         );
-        await dropdown.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await dropdown.click();
-        const popup = this.page.locator('.ydb-query-settings-select__popup');
-        await popup.getByText(mode).first().click();
-        await this.page.waitForTimeout(1000);
-    }
-
-    async changeTransactionMode(level: string) {
-        const dropdown = this.dialog.locator(
+        this.transactionModeSelect = this.dialog.locator(
             '.ydb-query-settings-dialog__control-wrapper_transactionMode',
         );
-        await dropdown.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await dropdown.click();
-        const popup = this.page.locator('.ydb-query-settings-select__popup');
-        await popup.getByText(level).first().click();
+        this.statisticsModeSelect = this.dialog.locator(
+            '.ydb-query-settings-dialog__control-wrapper_statisticsMode',
+        );
+        this.statisticsModeTooltip = this.page.locator(
+            '.ydb-query-settings-dialog__statistics-mode-tooltip',
+        );
+    }
+
+    async changeQueryMode(mode: (typeof QUERY_MODES)[keyof typeof QUERY_MODES]) {
+        await this.queryModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.queryModeSelect.click();
+        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.page.locator(`.ydb-query-settings-select__item_type_${mode}`).click();
         await this.page.waitForTimeout(1000);
     }
 
-    async changeStatsLevel(mode: string) {
-        const dropdown = this.dialog.locator(
-            '.ydb-query-settings-dialog__control-wrapper_statisticsMode',
-        );
-        await dropdown.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await dropdown.click();
-        const popup = this.page.locator('.ydb-query-settings-select__popup');
-        await popup.getByText(mode).first().click();
+    async changeTransactionMode(level: (typeof TRANSACTION_MODES)[keyof typeof TRANSACTION_MODES]) {
+        await this.transactionModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.transactionModeSelect.click();
+        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.page.locator(`.ydb-query-settings-select__item_type_${level}`).click();
         await this.page.waitForTimeout(1000);
+    }
+
+    async changeStatsLevel(mode: (typeof STATISTICS_MODES)[keyof typeof STATISTICS_MODES]) {
+        await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.statisticsModeSelect.click();
+        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.page.locator(`.ydb-query-settings-select__item_type_${mode}`).click();
+        await this.page.waitForTimeout(1000);
+    }
+
+    async getStatsLevel() {
+        await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const selectedText = await this.statisticsModeSelect
+            .locator('.g-select-control__option-text')
+            .textContent();
+        return selectedText;
     }
 
     async changeLimitRows(limitRows: number) {
-        const limitRowsInput = this.dialog.locator('.ydb-query-settings-dialog__limit-rows input');
-        await limitRowsInput.fill(limitRows.toString());
+        await this.limitRowsInput.fill(limitRows.toString());
         await this.page.waitForTimeout(1000);
     }
 
@@ -63,8 +90,23 @@ export class SettingsDialog {
         return true;
     }
 
+    async isStatsTooltipVisible() {
+        await this.statisticsModeTooltip.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
     async isHidden() {
         await this.dialog.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
+    }
+
+    async isStatisticsSelectDisabled() {
+        await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.statisticsModeSelect.locator('.g-select-control_disabled').isVisible();
+    }
+
+    async hoverStatisticsSelect() {
+        await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.statisticsModeSelect.hover();
     }
 }

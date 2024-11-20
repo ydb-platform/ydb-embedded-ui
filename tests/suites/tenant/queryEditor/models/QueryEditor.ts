@@ -1,17 +1,12 @@
 import type {Locator, Page} from '@playwright/test';
 
+import type {QUERY_MODES} from '../../../../../src/utils/query';
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
 
 import {QueryTabsNavigation} from './QueryTabsNavigation';
 import {PaneWrapper, ResultTable} from './ResultTable';
 import {SavedQueriesTable} from './SavedQueriesTable';
 import {SettingsDialog} from './SettingsDialog';
-
-export enum QueryMode {
-    YQLScript = 'YQL Script',
-    Data = 'DML',
-    Scan = 'Scan',
-}
 
 export enum ExplainResultType {
     Schema = 'Schema',
@@ -85,7 +80,7 @@ export class QueryEditor {
         this.savedQueries = new SavedQueriesTable(page);
     }
 
-    async run(query: string, mode: QueryMode) {
+    async run(query: string, mode: keyof typeof QUERY_MODES) {
         await this.clickGearButton();
         await this.settingsDialog.changeQueryMode(mode);
         await this.settingsDialog.clickButton(ButtonNames.Save);
@@ -93,7 +88,7 @@ export class QueryEditor {
         await this.clickRunButton();
     }
 
-    async explain(query: string, mode: QueryMode) {
+    async explain(query: string, mode: keyof typeof QUERY_MODES) {
         await this.clickGearButton();
         await this.settingsDialog.changeQueryMode(mode);
         await this.settingsDialog.clickButton(ButtonNames.Save);
