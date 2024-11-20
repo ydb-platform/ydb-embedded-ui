@@ -196,6 +196,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Fetch gh-pages branch
         run: |
@@ -221,6 +223,34 @@ jobs:
           publish_dir: gh-pages
           destination_dir: .
           force_orphan: true
+
+      - name: Count new tests
+        id: count_tests
+        run: |
+          git fetch origin main:main
+          new_tests=0
+
+          # Get list of changed test files
+          for file in $(git diff --name-only main...HEAD | grep -E '^tests/suites/.*\.(spec|test)\.(ts|tsx|js|jsx)$'); do
+            # Count tests in current version
+            if git show HEAD:"$file" > /dev/null 2>&1; then
+              current_tests=$(git show HEAD:"$file" | grep -E "test\([\'\"]" | wc -l)
+            else
+              current_tests=0
+            fi
+
+            # Count tests in main version
+            if git show main:"$file" > /dev/null 2>&1; then
+              base_tests=$(git show main:"$file" | grep -E "test\([\'\"]" | wc -l)
+            else
+              base_tests=0
+            fi
+
+            # Add difference to total
+            ((new_tests += current_tests - base_tests))
+          done
+
+          echo "new_tests=$new_tests" >> $GITHUB_OUTPUT
 
       - name: Update PR description
         uses: actions/github-script@v6
@@ -266,14 +296,17 @@ jobs:
                                  parseFloat(percent) > 0 ? '🔺' :
                                  parseFloat(percent) < 0 ? '🔽' : '✅';
 
+            const newTests = parseInt('${{ steps.count_tests.outputs.new_tests }}');
+            const testsStatus = newTests > 0 ? '✨' : '➖';
+
             const ciSection = `## CI Results
 
             ### Test Status: <span style="color: ${statusColor};">${status}</span>
             📊 [Full Report](${reportUrl})
 
-            | Total | Passed | Failed | Flaky | Skipped |
-            |:-----:|:------:|:------:|:-----:|:-------:|
-            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.flaky} | ${testResults.skipped} |
+            | Total | Passed | Failed | Flaky | Skipped | New Tests |
+            |:-----:|:------:|:------:|:-----:|:-------:|:---------:|
+            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.flaky} | ${testResults.skipped} | ${testsStatus} ${newTests} |
 
             ### Bundle Size: ${bundleStatus}
             Current: ${formatSize(currentSize)} | Main: ${formatSize(mainSize)}
@@ -292,6 +325,7 @@ jobs:
             - Bundle size is measured for the entire 'dist' directory.
             - 📊 indicates links to detailed reports.
             - 🔺 indicates increase, 🔽 decrease, and ✅ no change in bundle size.
+            - ${testsStatus} indicates ${newTests} new test cases added in this PR.
             </details>`;
 
             const { data: pullRequest } = await github.rest.pulls.get({

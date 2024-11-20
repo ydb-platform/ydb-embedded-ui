@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test';
 
+import {STATISTICS_MODES} from '../../../../src/utils/query';
 import {tenantName} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {longRunningQuery} from '../constants';
@@ -26,7 +27,7 @@ test.describe('Test Query Execution Status', async () => {
         // Ensure page is loaded
         await queryEditor.setQuery(longRunningQuery);
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeStatsLevel('Profile');
+        await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.profile);
 
         await expect(queryEditor.isResultsControlsHidden()).resolves.toBe(true);
     });

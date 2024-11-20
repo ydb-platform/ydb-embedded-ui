@@ -182,6 +182,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                         {QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title}
                     </label>
                     <Tooltip
+                        className={b('statistics-mode-tooltip')}
                         disabled={!useShowPlanToSvg}
                         openDelay={0}
                         content={i18n('tooltip_plan-to-svg-statistics')}

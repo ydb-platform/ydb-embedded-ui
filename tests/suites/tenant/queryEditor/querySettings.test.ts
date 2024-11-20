@@ -1,10 +1,11 @@
 import {expect, test} from '@playwright/test';
 
+import {QUERY_MODES, TRANSACTION_MODES} from '../../../../src/utils/query';
 import {tenantName} from '../../../utils/constants';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {longRunningQuery} from '../constants';
 
-import {ButtonNames, QueryEditor, QueryMode} from './models/QueryEditor';
+import {ButtonNames, QueryEditor} from './models/QueryEditor';
 
 test.describe('Test Query Settings', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
@@ -34,7 +35,7 @@ test.describe('Test Query Settings', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
+        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await expect(async () => {
@@ -48,7 +49,7 @@ test.describe('Test Query Settings', async () => {
 
         // Change a setting
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
+        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Execute a script
@@ -64,7 +65,7 @@ test.describe('Test Query Settings', async () => {
 
         // Change a setting
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
+        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Execute a script
@@ -81,7 +82,7 @@ test.describe('Test Query Settings', async () => {
 
         // Change a setting
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
+        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Execute a script to make the banner appear
@@ -99,7 +100,7 @@ test.describe('Test Query Settings', async () => {
 
         // Change a setting
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeTransactionMode('Snapshot');
+        await queryEditor.settingsDialog.changeTransactionMode(TRANSACTION_MODES.snapshot);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Execute a script to make the banner appear
@@ -119,8 +120,8 @@ test.describe('Test Query Settings', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
-        await queryEditor.settingsDialog.changeQueryMode(QueryMode.Scan);
-        await queryEditor.settingsDialog.changeTransactionMode('Snapshot');
+        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
+        await queryEditor.settingsDialog.changeTransactionMode(TRANSACTION_MODES.snapshot);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await expect(async () => {

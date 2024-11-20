@@ -1,8 +1,9 @@
 import {expect, test} from '@playwright/test';
 
+import {QUERY_MODES} from '../../../../src/utils/query';
 import {tenantName} from '../../../utils/constants';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
-import {QueryEditor, QueryMode} from '../queryEditor/models/QueryEditor';
+import {QueryEditor} from '../queryEditor/models/QueryEditor';
 
 import executeQueryWithKeybinding from './utils';
 
@@ -26,7 +27,7 @@ test.describe('Query History', () => {
         const testQuery = 'SELECT 1 AS test_column;';
 
         // Execute the query
-        await queryEditor.run(testQuery, QueryMode.YQLScript);
+        await queryEditor.run(testQuery, QUERY_MODES.script);
 
         // Navigate to the history tab
         await page.click('text=History');
@@ -47,7 +48,7 @@ test.describe('Query History', () => {
 
         // Execute multiple queries
         for (const query of queries) {
-            await queryEditor.run(query, QueryMode.YQLScript);
+            await queryEditor.run(query, QUERY_MODES.script);
         }
 
         // Navigate to the history tab
