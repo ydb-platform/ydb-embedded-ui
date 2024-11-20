@@ -26,6 +26,7 @@ interface QuerySettingsSelectProps<T extends SelectType> {
     id?: string;
     setting: T;
     settingOptions: QuerySettingSelectOption<T>[];
+    disabled?: boolean;
     onUpdateSetting: (mode: T) => void;
 }
 
@@ -34,6 +35,7 @@ export function QuerySettingsSelect<T extends SelectType>(props: QuerySettingsSe
         <div className={b('selector')}>
             <Select<T>
                 id={props.id}
+                disabled={props.disabled}
                 options={props.settingOptions}
                 value={[props.setting]}
                 onUpdate={(value) => {
