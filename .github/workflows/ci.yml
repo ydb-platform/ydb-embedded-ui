@@ -228,22 +228,28 @@ jobs:
         id: count_tests
         run: |
           git fetch origin main:main
+          new_tests=0
 
           # Get list of changed test files
-          changed_files=$(git diff --name-only main...HEAD | grep -E '.*\.(spec|test)\.(ts|tsx|js|jsx)$' || true)
-
-          # Count new test cases
-          new_tests=0
-          for file in $changed_files; do
-            if git show HEAD:$file > /dev/null 2>&1; then
-              new_cases=$(git show HEAD:$file | grep -E "it[\( ][\"\']" | wc -l || true)
-              base_cases=$(git show main:$file 2>/dev/null | grep -E "it[\( ][\"\']" | wc -l || true)
-              ((new_tests += new_cases - base_cases))
+          for file in $(git diff --name-only main...HEAD | grep -E '^tests/suites/.*\.(spec|test)\.(ts|tsx|js|jsx)$'); do
+            # Count tests in current version
+            if git show HEAD:"$file" > /dev/null 2>&1; then
+              current_tests=$(git show HEAD:"$file" | grep -E "test\([\'\"]" | wc -l)
             else
-              # If file is completely new, count all test cases
-              new_tests+=$(git show HEAD:$file | grep -E "it[\( ][\"\']" | wc -l || true)
+              current_tests=0
             fi
+
+            # Count tests in main version
+            if git show main:"$file" > /dev/null 2>&1; then
+              base_tests=$(git show main:"$file" | grep -E "test\([\'\"]" | wc -l)
+            else
+              base_tests=0
+            fi
+
+            # Add difference to total
+            ((new_tests += current_tests - base_tests))
           done
+
           echo "new_tests=$new_tests" >> $GITHUB_OUTPUT
 
       - name: Update PR description
