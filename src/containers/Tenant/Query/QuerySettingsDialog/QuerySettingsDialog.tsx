@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Dialog, Link as ExternalLink, Flex, TextInput} from '@gravity-ui/uikit';
+import {Dialog, Link as ExternalLink, Flex, TextInput, Tooltip} from '@gravity-ui/uikit';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
 
@@ -11,8 +11,10 @@ import {
 } from '../../../../store/reducers/queryActions/queryActions';
 import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {USE_SHOW_PLAN_SVG_KEY} from '../../../../utils/constants';
 import {
     useQueryExecutionSettings,
+    useSetting,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
@@ -77,6 +79,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         resolver: zodResolver(querySettingsValidationSchema),
     });
 
+    const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
     const enableTracingLevel = useTracingLevelOptionAvailable();
 
     return (
@@ -178,22 +181,29 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                     <label htmlFor="statisticsMode" className={b('field-title')}>
                         {QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title}
                     </label>
-                    <div className={b('control-wrapper', {statisticsMode: true})}>
-                        <Controller
-                            name="statisticsMode"
-                            control={control}
-                            render={({field}) => (
-                                <QuerySettingsSelect
-                                    id="statisticsMode"
-                                    setting={field.value}
-                                    onUpdateSetting={field.onChange}
-                                    settingOptions={
-                                        QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options
-                                    }
-                                />
-                            )}
-                        />
-                    </div>
+                    <Tooltip
+                        disabled={!useShowPlanToSvg}
+                        openDelay={0}
+                        content={i18n('tooltip_plan-to-svg-statistics')}
+                    >
+                        <div className={b('control-wrapper', {statisticsMode: true})}>
+                            <Controller
+                                name="statisticsMode"
+                                control={control}
+                                render={({field}) => (
+                                    <QuerySettingsSelect
+                                        id="statisticsMode"
+                                        disabled={useShowPlanToSvg}
+                                        setting={field.value}
+                                        onUpdateSetting={field.onChange}
+                                        settingOptions={
+                                            QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options
+                                        }
+                                    />
+                                )}
+                            />
+                        </div>
+                    </Tooltip>
                 </Flex>
                 <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                     <label htmlFor="limitRows" className={b('field-title')}>
