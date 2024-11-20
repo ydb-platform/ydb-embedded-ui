@@ -1,5 +1,19 @@
 # Changelog
 
+## [6.36.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.35.0...v6.36.0) (2024-11-20)
+
+
+### Features
+
+* render tenant memory details ([#1623](https://github.com/ydb-platform/ydb-embedded-ui/issues/1623)) ([09b1238](https://github.com/ydb-platform/ydb-embedded-ui/commit/09b1238dfd6024778d187dcca2a5132d5c601fec))
+
+
+### Bug Fixes
+
+* make plan to svg more comprehensive ([#1658](https://github.com/ydb-platform/ydb-embedded-ui/issues/1658)) ([e973bae](https://github.com/ydb-platform/ydb-embedded-ui/commit/e973bae006fb67452a219f4f20f1772d8d73674f))
+* **PaginatedTable:** fix autorefresh when no data ([#1650](https://github.com/ydb-platform/ydb-embedded-ui/issues/1650)) ([ed9a03b](https://github.com/ydb-platform/ydb-embedded-ui/commit/ed9a03b599d4fd8aaafab0c5e2005b2f111af009))
+* **Versions:** should not show nodes withot version ([#1653](https://github.com/ydb-platform/ydb-embedded-ui/issues/1653)) ([fd60b9d](https://github.com/ydb-platform/ydb-embedded-ui/commit/fd60b9d0d71ecd98dfff2d254425d254525d6853))
+
 ## [6.35.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.34.0...v6.35.0) (2024-11-18)
 
 
