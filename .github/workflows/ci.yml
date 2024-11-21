@@ -322,7 +322,7 @@ jobs:
             const newTests = parseInt('${{ steps.count_tests.outputs.new_tests }}');
             const testsStatus = newTests > 0 ? '✨' : '➖';
 
-            const ciSection = `## CI Results
+            const ciSection = `##  CI Results
 
             ### Test Status: <span style="color: ${statusColor};">${status}</span>
             📊 [Full Report](${reportUrl})
