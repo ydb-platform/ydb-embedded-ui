@@ -3,6 +3,8 @@ name: Node.js CI
 on:
   pull_request:
     branches: ['**']
+  push:
+    branches: ['main']
   merge_group:
     types: [checks_requested]
 
@@ -40,7 +42,6 @@ jobs:
   e2e_tests:
     name: Playwright Tests
     runs-on: ubuntu-latest
-    if: ${{github.event.action != 'checks_requested'}}
     permissions:
       contents: read
 
@@ -187,7 +188,7 @@ jobs:
   deploy_and_update:
     name: Deploy and Update PR
     needs: [e2e_tests, bundle_size]
-    if: ${{always() && github.event.pull_request.head.repo.full_name == github.repository && github.event.action != 'checks_requested'}}
+    if: ${{always() && (github.ref == 'refs/heads/main' || github.event.pull_request.head.repo.full_name == github.repository)}}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -213,8 +214,13 @@ jobs:
 
       - name: Copy new report
         run: |
-          mkdir -p gh-pages/${{ github.event.pull_request.number }}
-          cp -r playwright-artifacts/playwright-report/* gh-pages/${{ github.event.pull_request.number }}/
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            REPORT_DIR="${{ github.event.pull_request.number }}"
+          else
+            REPORT_DIR="main"
+          fi
+          mkdir -p gh-pages/$REPORT_DIR
+          cp -r playwright-artifacts/playwright-report/* gh-pages/$REPORT_DIR/
 
       - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -226,6 +232,7 @@ jobs:
 
       - name: Count new tests
         id: count_tests
+        if: github.event_name == 'pull_request'
         run: |
           git fetch origin main:main
           new_tests=0
@@ -253,6 +260,7 @@ jobs:
           echo "new_tests=$new_tests" >> $GITHUB_OUTPUT
 
       - name: Update PR description
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
