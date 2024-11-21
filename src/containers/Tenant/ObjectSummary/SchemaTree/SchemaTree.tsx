@@ -9,10 +9,7 @@ import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/cap
 import {selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
-import type {GetTableSchemaDataParams} from '../../../../store/reducers/tableSchemaData';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {wait} from '../../../../utils';
-import {SECOND_IN_MS} from '../../../../utils/constants';
 import {
     useQueryExecutionSettings,
     useTypedDispatch,
@@ -20,7 +17,11 @@ import {
 } from '../../../../utils/hooks';
 import {getConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {getSchemaControls} from '../../utils/controls';
-import {isChildlessPathType, mapPathTypeToNavigationTreeType} from '../../utils/schema';
+import {
+    isChildlessPathType,
+    mapPathTypeToNavigationTreeType,
+    nodeTableTypeToPathType,
+} from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
 import {useDispatchTreeKey, useTreeKey} from '../UpdateTreeContext';
@@ -33,29 +34,15 @@ interface SchemaTreeProps {
     onActivePathUpdate: (path: string) => void;
 }
 
-const TABLE_SCHEMA_TIMEOUT = SECOND_IN_MS * 2;
-
 export function SchemaTree(props: SchemaTreeProps) {
     const createDirectoryFeatureAvailable = useCreateDirectoryFeatureAvailable();
     const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
     const dispatch = useTypedDispatch();
     const input = useTypedSelector(selectUserInput);
-    const [getTableSchemaDataMutation] = tableSchemaDataApi.useGetTableSchemaDataMutation();
-
-    const getTableSchemaDataPromise = React.useCallback(
-        async (args: GetTableSchemaDataParams) => {
-            try {
-                const result = await Promise.race([
-                    getTableSchemaDataMutation(args).unwrap(),
-                    wait<undefined>(TABLE_SCHEMA_TIMEOUT),
-                ]);
-                return result;
-            } catch (e) {
-                return undefined;
-            }
-        },
-        [getTableSchemaDataMutation],
-    );
+    const [
+        getTableSchemaDataQuery,
+        {currentData: actionsSchemaData, isFetching: isActionsDataFetching},
+    ] = tableSchemaDataApi.useLazyGetTableSchemaDataQuery();
 
     const [querySettings, setQueryExecutionSettings] = useQueryExecutionSettings();
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
@@ -123,6 +110,36 @@ export function SchemaTree(props: SchemaTreeProps) {
         setParentPath(value);
         setCreateDirectoryOpen(true);
     };
+
+    const getTreeNodeActions = React.useMemo(() => {
+        return getActions(
+            dispatch,
+            {
+                setActivePath: onActivePathUpdate,
+                updateQueryExecutionSettings: (settings) =>
+                    setQueryExecutionSettings({...querySettings, ...settings}),
+                showCreateDirectoryDialog: createDirectoryFeatureAvailable
+                    ? handleOpenCreateDirectoryDialog
+                    : undefined,
+                getConfirmation: input ? getConfirmation : undefined,
+
+                schemaData: actionsSchemaData,
+                isSchemaDataLoading: isActionsDataFetching,
+            },
+            rootPath,
+        );
+    }, [
+        actionsSchemaData,
+        createDirectoryFeatureAvailable,
+        dispatch,
+        input,
+        isActionsDataFetching,
+        onActivePathUpdate,
+        querySettings,
+        rootPath,
+        setQueryExecutionSettings,
+    ]);
+
     return (
         <React.Fragment>
             <CreateDirectoryDialog
@@ -141,20 +158,15 @@ export function SchemaTree(props: SchemaTreeProps) {
                     collapsed: false,
                 }}
                 fetchPath={fetchPath}
-                getActions={getActions(
-                    dispatch,
-                    {
-                        setActivePath: onActivePathUpdate,
-                        updateQueryExecutionSettings: (settings) =>
-                            setQueryExecutionSettings({...querySettings, ...settings}),
-                        showCreateDirectoryDialog: createDirectoryFeatureAvailable
-                            ? handleOpenCreateDirectoryDialog
-                            : undefined,
-                        getTableSchemaDataPromise,
-                        getConfirmation: input ? getConfirmation : undefined,
-                    },
-                    rootPath,
-                )}
+                getActions={getTreeNodeActions}
+                onActionsOpenToggle={({path, type, isOpen}) => {
+                    const pathType = nodeTableTypeToPathType[type];
+                    if (isOpen && pathType) {
+                        getTableSchemaDataQuery({path, tenantName: rootPath, type: pathType});
+                    }
+
+                    return [];
+                }}
                 renderAdditionalNodeElements={getSchemaControls(dispatch, {
                     setActivePath: onActivePathUpdate,
                 })}

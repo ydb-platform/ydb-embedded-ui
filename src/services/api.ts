@@ -384,7 +384,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
         );
     }
     getDescribe(
-        {path, database}: {path: string; database: string},
+        {path, database, timeout}: {path: string; database: string; timeout?: number},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
@@ -396,7 +396,7 @@ export class YdbEmbeddedAPI extends AxiosWrapper {
                 partition_stats: true,
                 subs: 0,
             },
-            {concurrentId: concurrentId || `getDescribe|${path}`, requestConfig: {signal}},
+            {concurrentId: concurrentId || `getDescribe|${path}`, requestConfig: {signal}, timeout},
         );
     }
     getSchemaAcl(

@@ -1,8 +1,16 @@
 import {expect, test} from '@playwright/test';
 
-import {dsVslotsSchema, dsVslotsTableName, tenantName} from '../../../utils/constants';
+import {wait} from '../../../../src/utils';
+import {
+    backend,
+    dsStoragePoolsTableName,
+    dsVslotsSchema,
+    dsVslotsTableName,
+    tenantName,
+} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {QueryEditor} from '../queryEditor/models/QueryEditor';
+import {UnsavedChangesModal} from '../queryEditor/models/UnsavedChangesModal';
 
 import {ObjectSummary, ObjectSummaryTab} from './ObjectSummary';
 import {RowTableAction} from './types';
@@ -80,5 +88,76 @@ test.describe('Object Summary', async () => {
 
         await expect(queryEditor.editorTextArea).toBeVisible();
         await expect(queryEditor.editorTextArea).not.toBeEmpty();
+    });
+
+    test('Select and Upsert actions show loading state', async ({page}) => {
+        await page.route(`${backend}/viewer/json/describe?*`, async (route) => {
+            await wait(1000);
+            await route.continue();
+        });
+
+        const objectSummary = new ObjectSummary(page);
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+
+        // Open actions menu
+        await objectSummary.clickActionsButton(dsStoragePoolsTableName);
+        await expect(objectSummary.isActionsMenuVisible()).resolves.toBe(true);
+
+        // Verify loading states
+        await expect(objectSummary.isActionItemLoading(RowTableAction.SelectQuery)).resolves.toBe(
+            true,
+        );
+        await expect(objectSummary.isActionItemLoading(RowTableAction.UpsertQuery)).resolves.toBe(
+            true,
+        );
+    });
+
+    test('Monaco editor shows column list after select query loading completes', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+
+        const selectContent = await queryEditor.editorTextArea.inputValue();
+        expect(selectContent).toContain('SELECT');
+        expect(selectContent).toContain('FROM');
+        expect(selectContent).toMatch(/`\w+`,\s*`\w+`/); // At least two backticked columns
+    });
+
+    test('Monaco editor shows column list after upsert query loading completes', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.UpsertQuery);
+
+        const upsertContent = await queryEditor.editorTextArea.inputValue();
+        expect(upsertContent).toContain('UPSERT INTO');
+        expect(upsertContent).toContain('VALUES');
+        expect(upsertContent).toMatch(/\(\s*`\w+`\s*(,\s*`\w+`\s*)*\)/); // Backticked columns in parentheses
+    });
+
+    test('Different tables show different column lists in Monaco editor', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+        const unsavedChangesModal = new UnsavedChangesModal(page);
+
+        // Get columns for first table
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+        const vslotsColumns = await queryEditor.editorTextArea.inputValue();
+
+        // Get columns for second table
+        await objectSummary.clickActionMenuItem(
+            dsStoragePoolsTableName,
+            RowTableAction.SelectQuery,
+        );
+
+        await page.waitForTimeout(500);
+        // Click Don't save in the modal
+        await unsavedChangesModal.clickDontSave();
+
+        const storagePoolsColumns = await queryEditor.editorTextArea.inputValue();
+
+        // Verify the column lists are different
+        expect(vslotsColumns).not.toEqual(storagePoolsColumns);
     });
 });

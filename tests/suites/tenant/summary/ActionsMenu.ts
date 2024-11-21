@@ -25,7 +25,7 @@ export class ActionsMenu {
     }
 
     async clickItem(itemText: string): Promise<void> {
-        const menuItem = this.menu.locator(`.g-menu__item-content:text("${itemText}")`);
+        const menuItem = this.menu.locator(`.g-menu__item-content:has-text("${itemText}")`);
         await menuItem.click();
     }
 
@@ -33,6 +33,13 @@ export class ActionsMenu {
         const menuItem = this.menu.locator(`.g-menu__item:has-text("${itemText}")`);
         const className = (await menuItem.getAttribute('class')) || '';
         return className.includes('g-menu__item_selected');
+    }
+
+    async isItemLoading(itemText: string): Promise<boolean> {
+        const menuItem = this.menu.locator(`.g-menu__item:has-text("${itemText}")`);
+        const className = (await menuItem.getAttribute('class')) || '';
+        const hasSpinner = await menuItem.locator('.g-spin').isVisible();
+        return className.includes('g-menu__item_disabled') && hasSpinner;
     }
 
     async getTableTemplates(): Promise<RowTableAction[]> {

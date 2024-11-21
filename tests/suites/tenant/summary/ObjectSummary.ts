@@ -82,11 +82,18 @@ export class ObjectSummary {
         return this.actionsMenu.isVisible();
     }
 
+    async isActionItemLoading(itemText: string): Promise<boolean> {
+        return this.actionsMenu.isItemLoading(itemText);
+    }
+
     async getActionsMenuItems(): Promise<string[]> {
         return this.actionsMenu.getItems();
     }
 
     async clickActionsMenuItem(itemText: string): Promise<void> {
+        if (await this.isActionItemLoading(itemText)) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
         await this.actionsMenu.clickItem(itemText);
     }
 
@@ -107,6 +114,6 @@ export class ObjectSummary {
 
     async clickActionMenuItem(treeItemText: string, menuItemText: string): Promise<void> {
         await this.clickActionsButton(treeItemText);
-        await this.actionsMenu.clickItem(menuItemText);
+        await this.clickActionsMenuItem(menuItemText);
     }
 }

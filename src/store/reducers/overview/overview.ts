@@ -32,12 +32,16 @@ export const overviewApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
         getOverview: build.query({
-            queryFn: async ({path, database}: {path: string; database: string}, {signal}) => {
+            queryFn: async (
+                {path, database, timeout}: {path: string; database: string; timeout?: number},
+                {signal},
+            ) => {
                 try {
                     const data = await window.api.getDescribe(
                         {
                             path,
                             database,
+                            timeout,
                         },
                         {signal},
                     );

@@ -1,8 +1,8 @@
+import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
 import type {AppDispatch} from '../../../store';
-import type {GetTableSchemaDataParams} from '../../../store/reducers/tableSchemaData';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import type {QuerySettings} from '../../../types/store/query';
@@ -12,7 +12,6 @@ import {transformPath} from '../ObjectSummary/transformPath';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 import i18n from '../i18n';
 
-import {nodeTableTypeToPathType} from './schema';
 import type {TemplateFn} from './schemaQueryTemplates';
 import {
     addTableIndex,
@@ -36,14 +35,13 @@ import {
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
 
-interface ActionsAdditionalEffects {
+interface ActionsAdditionalParams {
     updateQueryExecutionSettings: (settings?: Partial<QuerySettings>) => void;
     setActivePath: (path: string) => void;
     showCreateDirectoryDialog?: (path: string) => void;
-    getTableSchemaDataPromise?: (
-        params: GetTableSchemaDataParams,
-    ) => Promise<SchemaData[] | undefined>;
     getConfirmation?: () => Promise<boolean>;
+    schemaData?: SchemaData[];
+    isSchemaDataLoading?: boolean;
 }
 
 interface BindActionParams {
@@ -56,32 +54,18 @@ interface BindActionParams {
 const bindActions = (
     params: BindActionParams,
     dispatch: AppDispatch,
-    additionalEffects: ActionsAdditionalEffects,
+    additionalEffects: ActionsAdditionalParams,
 ) => {
-    const {setActivePath, showCreateDirectoryDialog, getTableSchemaDataPromise, getConfirmation} =
+    const {setActivePath, showCreateDirectoryDialog, getConfirmation, schemaData} =
         additionalEffects;
 
     const inputQuery = (tmpl: TemplateFn) => () => {
         const applyInsert = () => {
-            const pathType = nodeTableTypeToPathType[params.type];
-            const withTableData = [selectQueryTemplate, upsertQueryTemplate].includes(tmpl);
-
-            const userInputDataPromise =
-                withTableData && pathType && getTableSchemaDataPromise
-                    ? getTableSchemaDataPromise({
-                          path: params.path,
-                          tenantName: params.tenantName,
-                          type: pathType,
-                      })
-                    : Promise.resolve(undefined);
-
             //order is important here: firstly we should open query tab and initialize editor (it will be set to window.ydbEditor), after that it is possible to insert snippet
             dispatch(setTenantPage(TENANT_PAGES_IDS.query));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(params.path);
-            userInputDataPromise.then((tableData) => {
-                insertSnippetToEditor(tmpl({...params, tableData}));
-            });
+            insertSnippetToEditor(tmpl({...params, schemaData}));
         };
         if (getConfirmation) {
             const confirmedPromise = getConfirmation();
@@ -142,8 +126,25 @@ const bindActions = (
 
 type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
 
+interface ActionConfig {
+    text: string;
+    action: () => void;
+    isLoading?: boolean;
+}
+
+const getActionWithLoader = ({text, action, isLoading}: ActionConfig) => ({
+    text: (
+        <Flex justifyContent="space-between" alignItems="center">
+            {text}
+            {isLoading && <Spin size="xs" />}
+        </Flex>
+    ),
+    action,
+    disabled: isLoading,
+});
+
 export const getActions =
-    (dispatch: AppDispatch, additionalEffects: ActionsAdditionalEffects, rootPath = '') =>
+    (dispatch: AppDispatch, additionalEffects: ActionsAdditionalParams, rootPath = '') =>
     (path: string, type: NavigationTreeNodeType) => {
         const relativePath = transformPath(path, rootPath);
         const actions = bindActions(
@@ -176,8 +177,16 @@ export const getActions =
             [
                 {text: i18n('actions.alterTable'), action: actions.alterTable},
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
-                {text: i18n('actions.selectQuery'), action: actions.selectQuery},
-                {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
+                getActionWithLoader({
+                    text: i18n('actions.selectQuery'),
+                    action: actions.selectQuery,
+                    isLoading: additionalEffects.isSchemaDataLoading,
+                }),
+                getActionWithLoader({
+                    text: i18n('actions.upsertQuery'),
+                    action: actions.upsertQuery,
+                    isLoading: additionalEffects.isSchemaDataLoading,
+                }),
                 {text: i18n('actions.addTableIndex'), action: actions.addTableIndex},
                 {text: i18n('actions.createCdcStream'), action: actions.createCdcStream},
             ],
