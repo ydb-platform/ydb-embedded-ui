@@ -20,6 +20,17 @@ export interface TAutocompleteEntity {
     Parent: string;
 }
 
+export interface AutocompleteColumn extends TAutocompleteEntity {
+    Type: 'column';
+    PKIndex?: number;
+    NotNull?: boolean;
+    Default?: number;
+}
+
+export function isAutocompleteColumn(entity: TAutocompleteEntity): entity is AutocompleteColumn {
+    return entity.Type === 'column';
+}
+
 export type AutocompleteEntityType =
     | 'unknown'
     | 'dir'

@@ -5,7 +5,12 @@ import type {
 import type {YQLEntity, YqlAutocompleteResult} from '@gravity-ui/websql-autocomplete/yql';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
-import type {AutocompleteEntityType, TAutocompleteEntity} from '../../../types/api/autocomplete';
+import {isAutocompleteColumn} from '../../../types/api/autocomplete';
+import type {
+    AutocompleteColumn,
+    AutocompleteEntityType,
+    TAutocompleteEntity,
+} from '../../../types/api/autocomplete';
 
 import {
     AggregateFunctions,
@@ -174,6 +179,23 @@ async function getSimpleTypes() {
     return SimpleTypes;
 }
 
+function getColumnDetails(col: AutocompleteColumn) {
+    const {PKIndex, NotNull, Default} = col;
+    const details = [];
+    if (PKIndex !== undefined) {
+        details.push(`PK${PKIndex}`);
+    }
+    if (NotNull) {
+        details.push('NN');
+    }
+    if (Default) {
+        details.push('Default');
+    }
+    const detailsString = details.length ? details.join(', ') : '';
+    // return `Column${detailsString}`;
+    return detailsString;
+}
+
 export async function generateColumnsSuggestion(
     rangeToInsertSuggestion: monaco.IRange,
     suggestColumns: YqlAutocompleteResult['suggestColumns'] | undefined,
@@ -224,9 +246,11 @@ export async function generateColumnsSuggestion(
     );
 
     autocompleteResponse.Result.Entities.forEach((col) => {
-        if (col.Type !== 'column') {
+        if (!isAutocompleteColumn(col)) {
             return;
         }
+
+        const columnDetails = getColumnDetails(col);
         const normalizedName = wrapStringToBackticks(col.Name);
 
         const normalizedParentName = normalizeEntityPrefix(col.Parent, database);
@@ -236,9 +260,9 @@ export async function generateColumnsSuggestion(
             aliases.forEach((a) => {
                 const columnNameSuggestion = `${a}.${normalizedName}`;
                 suggestions.push({
-                    label: columnNameSuggestion,
+                    label: {label: columnNameSuggestion, description: columnDetails},
                     insertText: columnNameSuggestion,
-                    kind: CompletionItemKind.Field,
+                    kind: CompletionItemKind.Variable,
                     detail: 'Column',
                     range: rangeToInsertSuggestion,
                     sortText:
@@ -253,9 +277,12 @@ export async function generateColumnsSuggestion(
                 columnNameSuggestion = `${wrapStringToBackticks(normalizedParentName)}.${normalizedName}`;
             }
             suggestions.push({
-                label: columnNameSuggestion,
+                label: {
+                    label: columnNameSuggestion,
+                    description: columnDetails,
+                },
                 insertText: columnNameSuggestion,
-                kind: CompletionItemKind.Field,
+                kind: CompletionItemKind.Variable,
                 detail: 'Column',
                 range: rangeToInsertSuggestion,
                 sortText:
@@ -266,12 +293,11 @@ export async function generateColumnsSuggestion(
         }
     });
     if (normalizedColumns && normalizedColumns.length > 0) {
-        const allColumsn = normalizedColumns.join(', ');
+        const allColumns = normalizedColumns.join(', ');
         suggestions.push({
-            label: allColumsn,
-            insertText: allColumsn,
-            kind: CompletionItemKind.Field,
-            detail: 'All columns',
+            label: allColumns,
+            insertText: allColumns,
+            kind: CompletionItemKind.Variable,
             range: rangeToInsertSuggestion,
             sortText: suggestionIndexToWeight(getSuggestionIndex('suggestAllColumns')),
         });
@@ -289,7 +315,7 @@ export function generateColumnAliasesSuggestion(
     return suggestColumnAliases?.map((columnAliasSuggestion) => ({
         label: columnAliasSuggestion.name,
         insertText: columnAliasSuggestion.name,
-        kind: CompletionItemKind.Field,
+        kind: CompletionItemKind.Variable,
         detail: 'Column alias',
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestColumnAliases')),
