@@ -88,12 +88,10 @@ export const selectQueryTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${2:<my_table>}';
     const columns =
         params?.tableData?.map((column) => '`' + column.name + '`').join(', ') || '${1:*}';
-
+    const filters = params?.relativePath ? '' : 'WHERE ${3:Key1 = 1}\nORDER BY ${4:Key1}\n';
     return `SELECT ${columns}
 FROM ${path}
-WHERE \${3:Key1 = 1}
-ORDER BY \${4:Key1}
-LIMIT \${5:10};`;
+${filters}LIMIT \${5:10};`;
 };
 export const upsertQueryTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
