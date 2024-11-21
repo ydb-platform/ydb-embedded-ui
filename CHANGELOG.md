@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.36.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.36.0...v6.36.1) (2024-11-21)
+
+
+### Bug Fixes
+
+* should not set filters for SELECT with known context ([#1666](https://github.com/ydb-platform/ydb-embedded-ui/issues/1666)) ([3e4ceef](https://github.com/ydb-platform/ydb-embedded-ui/commit/3e4ceef952a0821c94ec100f116fb97d033cc1f2))
+
 ## [6.36.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.35.0...v6.36.0) (2024-11-20)
 
 
