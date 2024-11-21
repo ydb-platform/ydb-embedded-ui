@@ -183,15 +183,14 @@ jobs:
           echo "diff=$diff" >> $GITHUB_OUTPUT
           echo "percent=$percent" >> $GITHUB_OUTPUT
 
-  deploy_and_update:
-    name: Deploy and Update PR
-    needs: [e2e_tests, bundle_size]
+  deploy_report:
+    name: Deploy Test Report
+    needs: [e2e_tests]
     if: ${{always() && (github.ref == 'refs/heads/main' || github.event.pull_request.head.repo.full_name == github.repository)}}
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pages: write
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -229,9 +228,27 @@ jobs:
           destination_dir: .
           force_orphan: true
 
+  update_pr:
+    name: Update PR Description
+    needs: [e2e_tests, bundle_size]
+    if: ${{always() && github.event_name == 'pull_request'}}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Playwright artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: playwright-artifacts
+          path: playwright-artifacts
+
       - name: Count new tests
         id: count_tests
-        if: github.event_name == 'pull_request'
         run: |
           git fetch origin main:main
           new_tests=0
@@ -259,7 +276,6 @@ jobs:
           echo "new_tests=$new_tests" >> $GITHUB_OUTPUT
 
       - name: Update PR description
-        if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
