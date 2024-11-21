@@ -24,8 +24,8 @@ const config: PlaywrightTestConfig = {
         baseURL: baseUrl || 'http://localhost:3000/',
         testIdAttribute: 'data-qa',
         trace: 'on-first-retry',
-        video: 'retain-on-failure',
         screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
     },
     projects: [
         {
