@@ -120,51 +120,6 @@ jobs:
           echo "flaky=$flaky" >> $GITHUB_OUTPUT
           echo "skipped=$skipped" >> $GITHUB_OUTPUT
 
-  deploy_report:
-    name: Deploy Test Report
-    needs: [e2e_tests]
-    if: ${{always() && (github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))}}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pages: write
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Fetch gh-pages branch
-        run: |
-          git fetch origin gh-pages:gh-pages
-          mkdir gh-pages
-          git --work-tree=gh-pages checkout gh-pages -- .
-
-      - name: Download Playwright artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: playwright-artifacts
-          path: playwright-artifacts
-
-      - name: Copy new report
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            REPORT_DIR="${{ github.event.pull_request.number }}"
-          else
-            REPORT_DIR="main"
-          fi
-          rm -rf gh-pages/$REPORT_DIR
-          mkdir -p gh-pages/$REPORT_DIR
-          cp -r playwright-artifacts/playwright-report/* gh-pages/$REPORT_DIR/
-
-      - name: Deploy report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: gh-pages
-          destination_dir: .
-          force_orphan: true
-
   bundle_size:
     name: Check Bundle Size
     runs-on: ubuntu-latest
@@ -227,6 +182,51 @@ jobs:
           fi
           echo "diff=$diff" >> $GITHUB_OUTPUT
           echo "percent=$percent" >> $GITHUB_OUTPUT
+
+  deploy_report:
+    name: Deploy Test Report
+    needs: [e2e_tests]
+    if: ${{always() && (github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))}}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch gh-pages branch
+        run: |
+          git fetch origin gh-pages:gh-pages
+          mkdir gh-pages
+          git --work-tree=gh-pages checkout gh-pages -- .
+
+      - name: Download Playwright artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: playwright-artifacts
+          path: playwright-artifacts
+
+      - name: Copy new report
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            REPORT_DIR="${{ github.event.pull_request.number }}"
+          else
+            REPORT_DIR="main"
+          fi
+          rm -rf gh-pages/$REPORT_DIR
+          mkdir -p gh-pages/$REPORT_DIR
+          cp -r playwright-artifacts/playwright-report/* gh-pages/$REPORT_DIR/
+
+      - name: Deploy report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: gh-pages
+          destination_dir: .
+          force_orphan: true
 
   update_pr:
     name: Update PR Description
