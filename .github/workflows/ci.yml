@@ -3,8 +3,6 @@ name: Node.js CI
 on:
   pull_request:
     branches: ['**']
-  push:
-    branches: ['main']
   merge_group:
     types: [checks_requested]
 
