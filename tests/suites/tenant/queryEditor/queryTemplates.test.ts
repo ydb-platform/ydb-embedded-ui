@@ -8,6 +8,7 @@ import {RowTableAction} from '../summary/types';
 import {
     AsyncReplicationTemplates,
     NewSqlDropdownMenu,
+    TablesTemplates,
     TemplateCategory,
 } from './models/NewSqlDropdownMenu';
 import {QueryEditor, QueryTabs} from './models/QueryEditor';
@@ -24,6 +25,61 @@ test.describe('Query Templates', () => {
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
+    });
+
+    test('Update table template should not run successfully', async ({page}) => {
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+        const queryEditor = new QueryEditor(page);
+
+        // Open dropdown and select Update table template
+        await newSqlDropdown.clickNewSqlButton();
+        await newSqlDropdown.hoverCategory(TemplateCategory.Tables);
+        await newSqlDropdown.selectTemplate(TablesTemplates.UpdateTable);
+
+        // Try to run the query
+        await queryEditor.clickRunButton();
+
+        // Verify that execution fails
+        try {
+            await queryEditor.waitForStatus('Failed');
+            // If we reach here, the test passed because execution failed as expected
+        } catch (error) {
+            throw new Error('Update table template should not have executed successfully');
+        }
+    });
+
+    test('Create row table template should handle both success and failure cases', async ({
+        page,
+    }) => {
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+        const queryEditor = new QueryEditor(page);
+
+        // Open dropdown and select Create row table template
+        await newSqlDropdown.clickNewSqlButton();
+        await newSqlDropdown.hoverCategory(TemplateCategory.Tables);
+        await newSqlDropdown.selectTemplate(TablesTemplates.CreateRowTable);
+
+        // Try to run the query
+        await queryEditor.clickRunButton();
+        await page.waitForTimeout(500);
+
+        try {
+            // Wait for either Completed or Failed status
+            const status = await queryEditor.getExecutionStatus();
+
+            if (status === 'Failed') {
+                // If failed, verify it's the expected "path exists" error
+                const errorMessage = await queryEditor.getErrorMessage();
+                expect(errorMessage).toContain('path exist, request accepts it');
+            } else {
+                // If not failed, verify it completed successfully
+                expect(status).toBe('Completed');
+            }
+        } catch (error) {
+            throw new Error(
+                'Query execution neither completed successfully nor failed with expected error',
+            );
+        }
     });
 
     test('Unsaved changes modal appears when switching between templates', async ({page}) => {
