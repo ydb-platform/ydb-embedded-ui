@@ -1,4 +1,4 @@
-name: E2E Tests
+name: Quality Checks
 
 on:
   pull_request:
