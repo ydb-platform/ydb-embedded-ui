@@ -234,7 +234,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Truncated(1)');
     });
 
-    test.only('Query execution status changes correctly', async ({page}) => {
+    test('Query execution status changes correctly', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickRunButton();
