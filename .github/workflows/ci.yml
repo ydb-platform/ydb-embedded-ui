@@ -186,7 +186,7 @@ jobs:
   deploy_report:
     name: Deploy Test Report
     needs: [e2e_tests]
-    if: ${{always() && (github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))}}
+    if: ${{always() && (github.ref == 'refs/heads/test-report' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))}}
     runs-on: ubuntu-latest
     permissions:
       contents: write
