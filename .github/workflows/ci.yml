@@ -219,6 +219,7 @@ jobs:
           else
             REPORT_DIR="main"
           fi
+          rm -rf gh-pages/$REPORT_DIR
           mkdir -p gh-pages/$REPORT_DIR
           cp -r playwright-artifacts/playwright-report/* gh-pages/$REPORT_DIR/
 
