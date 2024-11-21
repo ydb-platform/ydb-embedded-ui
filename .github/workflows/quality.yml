@@ -221,46 +221,33 @@ jobs:
           name: playwright-artifacts
           path: playwright-artifacts
 
-      - name: Extract test names and count
-        id: test_info
+      - name: Count new tests
+        id: count_tests
         run: |
           git fetch origin main:main
           new_tests=0
-          test_names=""
 
           # Get list of changed test files
           for file in $(git diff --name-only main...HEAD | grep -E '^tests/suites/.*\.(spec|test)\.(ts|tsx|js|jsx)$'); do
-            # Get test names from current version that don't exist in main
+            # Count tests in current version
             if git show HEAD:"$file" > /dev/null 2>&1; then
-              current_tests=$(git show HEAD:"$file" | grep -E "test\([\'\"]" | sed -E "s/.*test\(['\"]([^'\"]+)['\"].*/\1/")
-              
-              # For each test in current version
-              while IFS= read -r test_name; do
-                if [ ! -z "$test_name" ]; then
-                  # Check if test exists in main version
-                  if git show main:"$file" > /dev/null 2>&1; then
-                    if ! git show main:"$file" | grep -q "test(['\"]$test_name['\"]"; then
-                      # Test doesn't exist in main - it's new
-                      test_names="$test_names- $test_name\n"
-                      ((new_tests++))
-                    fi
-                  else
-                    # File doesn't exist in main - all tests are new
-                    test_names="$test_names- $test_name\n"
-                    ((new_tests++))
-                  fi
-                fi
-              done <<< "$current_tests"
+              current_tests=$(git show HEAD:"$file" | grep -E "test\([\'\"]" | wc -l)
+            else
+              current_tests=0
             fi
+
+            # Count tests in main version
+            if git show main:"$file" > /dev/null 2>&1; then
+              base_tests=$(git show main:"$file" | grep -E "test\([\'\"]" | wc -l)
+            else
+              base_tests=0
+            fi
+
+            # Add difference to total
+            ((new_tests += current_tests - base_tests))
           done
 
-          # Escape newlines for GitHub Actions
-          test_names="${test_names//'%'/'%25'}"
-          test_names="${test_names//$'\n'/'%0A'}"
-          test_names="${test_names//$'\r'/'%0D'}"
-
           echo "new_tests=$new_tests" >> $GITHUB_OUTPUT
-          echo "test_names=$test_names" >> $GITHUB_OUTPUT
 
       - name: Update PR description
         uses: actions/github-script@v6
@@ -306,8 +293,7 @@ jobs:
                                  parseFloat(percent) > 0 ? '🔺' :
                                  parseFloat(percent) < 0 ? '🔽' : '✅';
 
-            const newTests = parseInt('${{ steps.test_info.outputs.new_tests }}');
-            const testNames = '${{ steps.test_info.outputs.test_names }}'.replace(/%0A/g, '\n');
+            const newTests = parseInt('${{ steps.count_tests.outputs.new_tests }}');
             const testsStatus = newTests > 0 ? '✨' : '➖';
 
             const ciSection = `## CI Results
@@ -318,9 +304,6 @@ jobs:
             | Total | Passed | Failed | Flaky | Skipped | New Tests |
             |:-----:|:------:|:------:|:-----:|:-------:|:---------:|
             | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.flaky} | ${testResults.skipped} | ${testsStatus} ${newTests} |
-
-            ${newTests > 0 ? `<details>
-            <summary>✨ New Tests Added (${newTests})</summary>\n\n${testNames}\n</details>\n` : ''}
 
             ### Bundle Size: ${bundleStatus}
             Current: ${formatSize(currentSize)} | Main: ${formatSize(mainSize)}
