@@ -189,6 +189,10 @@ jobs:
           rm -rf gh-pages/$REPORT_DIR
           mkdir -p gh-pages/$REPORT_DIR
           cp -r playwright-artifacts/playwright-report/* gh-pages/$REPORT_DIR/
+          # Also copy test-results.json if it exists
+          if [ -f "playwright-artifacts/test-results.json" ]; then
+            cp playwright-artifacts/test-results.json gh-pages/$REPORT_DIR/
+          fi
 
       - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
