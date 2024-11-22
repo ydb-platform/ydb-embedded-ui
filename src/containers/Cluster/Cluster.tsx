@@ -26,7 +26,7 @@ import type {
 import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {parseVersionsToVersionToColorMap} from '../../utils/versions';
-import {NodesWrapper} from '../Nodes/NodesWrapper';
+import {Nodes} from '../Nodes/Nodes';
 import {StorageWrapper} from '../Storage/StorageWrapper';
 import {TabletsTable} from '../Tablets/TabletsTable';
 import {Tenants} from '../Tenants/Tenants';
@@ -192,10 +192,7 @@ export function Cluster({
                 <Route
                     path={getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname}
                 >
-                    <NodesWrapper
-                        parentRef={container}
-                        additionalNodesProps={additionalNodesProps}
-                    />
+                    <Nodes parentRef={container} additionalNodesProps={additionalNodesProps} />
                 </Route>
                 <Route
                     path={

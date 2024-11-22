@@ -5,8 +5,8 @@ import {
 } from '../../../../store/reducers/capabilities/hooks';
 import {ENABLE_NETWORK_TABLE_KEY} from '../../../../utils/constants';
 import {useSetting} from '../../../../utils/hooks';
-import type {PaginatedNodesProps} from '../../../Nodes/PaginatedNodes';
-import {PaginatedNodes} from '../../../Nodes/PaginatedNodes';
+import type {NodesProps} from '../../../Nodes/Nodes';
+import {Nodes} from '../../../Nodes/Nodes';
 
 import {Network} from './Network';
 import {getNetworkTableNodesColumns} from './NetworkTable/columns';
@@ -18,7 +18,7 @@ import {
 } from './NetworkTable/constants';
 
 interface NetworkWrapperProps
-    extends Pick<PaginatedNodesProps, 'path' | 'parentRef' | 'additionalNodesProps'> {
+    extends Pick<NodesProps, 'path' | 'parentRef' | 'additionalNodesProps'> {
     database: string;
 }
 
@@ -37,7 +37,7 @@ export function NetworkWrapper({
     const renderContent = () => {
         if (shouldUseNetworkNodesTable) {
             return (
-                <PaginatedNodes
+                <Nodes
                     path={path}
                     database={database}
                     parentRef={parentRef}
