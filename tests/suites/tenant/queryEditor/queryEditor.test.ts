@@ -90,7 +90,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isExplainButtonEnabled()).resolves.toBe(true);
     });
 
-    test('Stop button and elapsed time label appears when query is running', async ({page}) => {
+    test('Stop button and elapsed time label appear when query is running', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
@@ -100,7 +100,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
     });
 
-    test('Stop button and elapsed time label disappears after query is stopped', async ({page}) => {
+    test('Stop button and elapsed time label disappear after query is stopped', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
