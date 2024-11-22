@@ -1,21 +1,20 @@
 import JSONTree from 'react-json-inspector';
 
-import type {QueryPlan, ScriptPlan} from '../../../../../../types/api/query';
 import {cn} from '../../../../../../utils/cn';
 
-import './TextExplain.scss';
+import './QueryJSONViewer.scss';
 import 'react-json-inspector/json-inspector.css';
 
-const b = cn('ydb-query-explain-text');
+const b = cn('ydb-query-json-viewer');
 
-interface TextExplainProps {
-    explain: QueryPlan | ScriptPlan;
+interface QueryJSONViewerProps {
+    data?: object;
 }
 
-export function TextExplain({explain}: TextExplainProps) {
+export function QueryJSONViewer({data}: QueryJSONViewerProps) {
     return (
         <JSONTree
-            data={explain}
+            data={data}
             isExpanded={() => true}
             className={b('inspector')}
             searchOptions={{

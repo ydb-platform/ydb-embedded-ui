@@ -78,7 +78,7 @@ test.describe('Query History', () => {
         await executeQueryWithKeybinding(page, browserName);
 
         // Wait for the query to be executed
-        await page.waitForSelector('.ydb-query-execute-result__result', {timeout: 10000});
+        await page.waitForSelector('.ydb-query-result-sets-viewer__result', {timeout: 10000});
 
         // Navigate to the history tab
         await page.click('text=History');

@@ -1,14 +1,12 @@
 @import '../../../../../../styles/mixins.scss';
 
-.ydb-query-explain-text {
+.ydb-query-json-viewer {
     &__inspector {
         overflow-y: auto;
 
-        padding: 15px 20px;
+        width: 100%;
+        height: 100%;
+        padding: 15px 10px;
         @include json-tree-styles();
-
-        &_fullscreen {
-            padding: 10px;
-        }
     }
 }

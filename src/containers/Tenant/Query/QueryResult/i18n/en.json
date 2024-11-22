@@ -1,9 +1,12 @@
 {
   "description.graph-is-not-supported": "Graph can not be rendered",
+  "description.empty-result": "There is no {{activeSection}} for the request",
   "action.result": "Result",
   "action.stats": "Stats",
   "action.schema": "Schema",
   "action.explain-plan": "Explain Plan",
+  "action.json": "JSON",
+  "action.ast": "AST",
   "action.copy": "Copy {{activeSection}}",
   "trace": "Trace",
   "title.truncated": "Truncated",

@@ -1,0 +1,36 @@
+@import '../../../../../../styles/mixins.scss';
+
+.ydb-query-result-sets-viewer {
+    &__tabs {
+        padding-left: 10px;
+    }
+
+    &__head {
+        margin-top: var(--g-spacing-4);
+    }
+
+    &__row-count {
+        margin-left: var(--g-spacing-1);
+    }
+
+    &__result-wrapper {
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+    }
+
+    &__result {
+        display: flex;
+        overflow: auto;
+        flex-grow: 1;
+        flex-direction: column;
+
+        padding-left: 10px;
+
+        @include query-data-table();
+        & .data-table__table-wrapper {
+            padding-bottom: 0;
+        }
+    }
+}

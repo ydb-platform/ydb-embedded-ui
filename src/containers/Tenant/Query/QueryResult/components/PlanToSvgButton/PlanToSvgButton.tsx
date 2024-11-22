@@ -3,10 +3,9 @@ import React from 'react';
 import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
 import {Button, Tooltip} from '@gravity-ui/uikit';
 
-import {planToSvgApi} from '../../../../store/reducers/planToSvg';
-import type {QueryPlan, ScriptPlan} from '../../../../types/api/query';
-
-import i18n from './i18n';
+import {planToSvgApi} from '../../../../../../store/reducers/planToSvg';
+import type {QueryPlan, ScriptPlan} from '../../../../../../types/api/query';
+import i18n from '../../i18n';
 
 function getButtonView(error: string | null, isLoading: boolean) {
     if (error) {

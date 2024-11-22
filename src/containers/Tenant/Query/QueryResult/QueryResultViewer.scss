@@ -1,16 +1,4 @@
-@import '../../../../styles/mixins.scss';
-
-.ydb-query-explain-result {
-    &__result {
-        display: flex;
-        overflow: auto;
-        flex-grow: 1;
-        flex-direction: column;
-    }
-    &__text-message {
-        padding: 15px 20px;
-    }
-
+.ydb-query-result {
     &__controls {
         position: sticky;
         z-index: 2;
@@ -27,7 +15,7 @@
         background-color: var(--g-color-base-background);
     }
 
-    &__controls-right {
+    &__controls-left {
         display: flex;
         align-items: center;
         gap: 12px;
@@ -35,7 +23,7 @@
         height: 100%;
     }
 
-    &__controls-left {
+    &__controls-right {
         display: flex;
         gap: 4px;
     }

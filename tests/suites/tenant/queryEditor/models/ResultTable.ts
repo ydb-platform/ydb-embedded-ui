@@ -26,9 +26,9 @@ export class ResultTable {
     private resultHead: Locator;
 
     constructor(selector: Locator) {
-        this.table = selector.locator('.ydb-query-execute-result__result');
+        this.table = selector.locator('.ydb-query-result-sets-viewer__result');
         this.preview = selector.locator('.kv-preview__result');
-        this.resultHead = selector.locator('.ydb-query-execute-result__result-head');
+        this.resultHead = selector.locator('.ydb-query-result-sets-viewer__head');
     }
 
     async isVisible() {
