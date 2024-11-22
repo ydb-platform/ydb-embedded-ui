@@ -5,8 +5,8 @@ import {prepareGroupsResponse, prepareStorageResponse} from './utils';
 
 export async function requestStorageData(
     {
-        shouldUseGroupsHandler,
         version = 'v2',
+        shouldUseGroupsHandler,
         ...params
     }: StorageRequestParams & GroupsRequestParams & {shouldUseGroupsHandler?: boolean},
     options?: AxiosOptions,
