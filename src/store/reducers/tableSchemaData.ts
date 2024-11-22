@@ -5,6 +5,7 @@ import {
 import type {SchemaData} from '../../containers/Tenant/Schema/SchemaViewer/types';
 import {isViewType} from '../../containers/Tenant/utils/schema';
 import type {EPathType} from '../../types/api/schema';
+import {SECOND_IN_MS} from '../../utils/constants';
 import {isQueryErrorResponse} from '../../utils/query';
 
 import {api} from './api';
@@ -17,9 +18,11 @@ export interface GetTableSchemaDataParams {
     type: EPathType;
 }
 
+const TABLE_SCHEMA_TIMEOUT = SECOND_IN_MS * 5;
+
 export const tableSchemaDataApi = api.injectEndpoints({
     endpoints: (build) => ({
-        getTableSchemaData: build.mutation<SchemaData[], GetTableSchemaDataParams>({
+        getTableSchemaData: build.query<SchemaData[], GetTableSchemaDataParams>({
             queryFn: async ({path, tenantName, type}, {dispatch}) => {
                 try {
                     if (isViewType(type)) {
@@ -27,6 +30,7 @@ export const tableSchemaDataApi = api.injectEndpoints({
                             viewSchemaApi.endpoints.getViewSchema.initiate({
                                 database: tenantName,
                                 path,
+                                timeout: TABLE_SCHEMA_TIMEOUT,
                             }),
                         );
 
@@ -42,6 +46,7 @@ export const tableSchemaDataApi = api.injectEndpoints({
                         overviewApi.endpoints.getOverview.initiate({
                             path,
                             database: tenantName,
+                            timeout: TABLE_SCHEMA_TIMEOUT,
                         }),
                     );
                     const result = prepareSchemaData(type, schemaData.data);

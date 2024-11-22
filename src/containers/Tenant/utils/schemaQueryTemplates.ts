@@ -3,7 +3,7 @@ import type {SchemaData} from '../Schema/SchemaViewer/types';
 export interface SchemaQueryParams {
     path: string;
     relativePath: string;
-    tableData?: SchemaData[];
+    schemaData?: SchemaData[];
 }
 
 export type TemplateFn = (params?: SchemaQueryParams) => string;
@@ -87,7 +87,7 @@ ALTER TABLE ${path}
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${2:<my_table>}';
     const columns =
-        params?.tableData?.map((column) => '`' + column.name + '`').join(', ') || '${1:*}';
+        params?.schemaData?.map((column) => '`' + column.name + '`').join(', ') || '${1:*}';
     const filters = params?.relativePath ? '' : 'WHERE ${3:Key1 = 1}\nORDER BY ${4:Key1}\n';
     return `SELECT ${columns}
 FROM ${path}
@@ -96,8 +96,8 @@ ${filters}LIMIT \${5:10};`;
 export const upsertQueryTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
     const columns =
-        params?.tableData?.map((column) => `\`${column.name}\``).join(', ') || '${2:id, name}';
-    const values = params?.tableData ? '${3: }' : '${3:1, "foo"}';
+        params?.schemaData?.map((column) => `\`${column.name}\``).join(', ') || '${2:id, name}';
+    const values = params?.schemaData ? '${3: }' : '${3:1, "foo"}';
     return `UPSERT INTO ${path}
 ( ${columns} )
 VALUES ( ${values} );`;
