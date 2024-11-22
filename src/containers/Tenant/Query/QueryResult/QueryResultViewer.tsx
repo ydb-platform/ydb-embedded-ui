@@ -72,6 +72,9 @@ const RESULT_OPTIONS_TITLES: Record<SectionID, string> = {
     },
 };
 
+const EXECUTE_SECTIONS: SectionID[] = ['result', 'schema', 'simplified', 'stats'];
+const EXPLAIN_SECTIONS: SectionID[] = ['schema', 'json', 'simplified', 'ast'];
+
 interface ExecuteResultProps {
     result: QueryResult;
     resultType?: QueryAction;
@@ -105,23 +108,22 @@ export function QueryResultViewer({
     const {error, isLoading, queryId, data = {}} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
 
+    React.useEffect(() => {
+        if (resultType === 'execute' && !EXECUTE_SECTIONS.includes(activeSection)) {
+            setActiveSection('result');
+        }
+        if (resultType === 'explain' && !EXPLAIN_SECTIONS.includes(activeSection)) {
+            setActiveSection('schema');
+        }
+    }, [activeSection, resultType]);
+
     const radioButtonOptions: ControlGroupOption<SectionID>[] = React.useMemo(() => {
-        const sections: SectionID[] = [];
+        let sections: SectionID[] = [];
 
         if (isExecute) {
-            sections.push('result');
-
-            if (preparedPlan) {
-                sections.push('schema');
-            }
-            if (simplifiedPlan?.plan) {
-                sections.push('simplified');
-            }
-            if (stats) {
-                sections.push('stats');
-            }
+            sections = EXECUTE_SECTIONS;
         } else if (isExplain) {
-            sections.push('schema', 'json', 'simplified', 'ast');
+            sections = EXPLAIN_SECTIONS;
         }
 
         return sections.map((section) => {
@@ -130,7 +132,7 @@ export function QueryResultViewer({
                 content: RESULT_OPTIONS_TITLES[section],
             };
         });
-    }, [isExecute, isExplain, preparedPlan, simplifiedPlan?.plan, stats]);
+    }, [isExecute, isExplain]);
 
     React.useEffect(() => {
         return () => {
@@ -214,8 +216,8 @@ export function QueryResultViewer({
             }
             return <QueryJSONViewer data={preparedPlan?.pristine} />;
         }
-        if (activeSection === RESULT_OPTIONS_IDS.simplified && simplifiedPlan?.plan) {
-            if (!simplifiedPlan?.plan) {
+        if (activeSection === RESULT_OPTIONS_IDS.simplified) {
+            if (!simplifiedPlan?.plan?.length) {
                 return renderStubMessage();
             }
             return <SimplifiedPlan plan={simplifiedPlan.plan} />;
