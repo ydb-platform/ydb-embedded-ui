@@ -91,10 +91,10 @@ describe('bundle utils', () => {
         });
 
         it('should handle missing environment variables', () => {
-            delete process.env.CURRENT_SIZE;
-            delete process.env.MAIN_SIZE;
-            delete process.env.SIZE_DIFF;
-            delete process.env.SIZE_PERCENT;
+            process.env.CURRENT_SIZE = undefined;
+            process.env.MAIN_SIZE = undefined;
+            process.env.SIZE_DIFF = undefined;
+            process.env.SIZE_PERCENT = undefined;
 
             const result = getBundleInfo();
             expect(result).toEqual({
