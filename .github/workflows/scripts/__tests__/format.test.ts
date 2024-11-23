@@ -9,7 +9,7 @@ describe('format utils', () => {
 
         it('should format size in MB when greater than or equal to 1024 bytes', () => {
             const size = 2.5 * 1024; // 2.5 KB -> will be shown in MB
-            expect(formatSize(size)).toBe('0.00 MB');
+            expect(formatSize(size)).toBe('2.50 KB');
         });
 
         it('should handle small sizes', () => {

@@ -4,7 +4,7 @@
  * @returns {string} Formatted size string with units
  */
 function formatSize(sizeInBytes) {
-  const MB_THRESHOLD = 1024;
+  const MB_THRESHOLD = 10 * 1024;
   if (sizeInBytes >= MB_THRESHOLD) {
     return `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`;
   }
