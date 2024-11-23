@@ -1,7 +1,4 @@
-import {
-    generateBundleSizeSection,
-    getBundleInfo,
-} from '../../../.github/workflows/scripts/utils/bundle';
+import {generateBundleSizeSection, getBundleInfo} from '../utils/bundle';
 
 describe('bundle utils', () => {
     describe('generateBundleSizeSection', () => {

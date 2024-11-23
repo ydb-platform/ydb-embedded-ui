@@ -60,6 +60,16 @@ module.exports = {
         // see https://github.com/timarney/react-app-rewired/issues/241
         config.transformIgnorePatterns = ['node_modules/(?!(@gravity-ui)/)'];
 
+        // Add .github directory to roots
+        config.roots = ['<rootDir>/src', '<rootDir>/.github'];
+
+        // Update testMatch to include .github directory
+        config.testMatch = [
+            '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
+            '<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}',
+            '<rootDir>/.github/**/*.{spec,test}.{js,jsx,ts,tsx}',
+        ];
+
         return config;
     },
 };

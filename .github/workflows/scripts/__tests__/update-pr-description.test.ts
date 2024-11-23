@@ -1,21 +1,18 @@
-import updatePRDescription from '../../../.github/workflows/scripts/update-pr-description';
-import {
-    generateBundleSizeSection,
-    getBundleInfo,
-} from '../../../.github/workflows/scripts/utils/bundle';
-import {generateTestChangesSummary} from '../../../.github/workflows/scripts/utils/format';
-import {getTestStatus, readTestResults} from '../../../.github/workflows/scripts/utils/results';
-import {compareTests} from '../../../.github/workflows/scripts/utils/test';
-import type {TestResultsInfo} from '../types';
+import updatePRDescription from '../update-pr-description';
+import {generateBundleSizeSection, getBundleInfo} from '../utils/bundle';
+import {generateTestChangesSummary} from '../utils/format';
+import {getTestStatus, readTestResults} from '../utils/results';
+import {compareTests} from '../utils/test';
+import type {TestResultsInfo} from './types';
 
 // Mock dependencies
-jest.mock('../../../.github/workflows/scripts/utils/results', () => ({
+jest.mock('../utils/results', () => ({
     readTestResults: jest.fn(),
     getTestStatus: jest.fn(),
 }));
-jest.mock('../../../.github/workflows/scripts/utils/test');
-jest.mock('../../../.github/workflows/scripts/utils/format');
-jest.mock('../../../.github/workflows/scripts/utils/bundle');
+jest.mock('../utils/test');
+jest.mock('../utils/format');
+jest.mock('../utils/bundle');
 jest.mock('fs');
 
 describe('updatePRDescription', () => {

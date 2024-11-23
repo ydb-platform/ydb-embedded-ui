@@ -1,9 +1,5 @@
-import {
-    compareTests,
-    extractTestsFromSuite,
-    isTestSkipped,
-} from '../../../.github/workflows/scripts/utils/test';
-import type {Spec, Suite, TestInfo} from '../types';
+import {compareTests, extractTestsFromSuite, isTestSkipped} from '../utils/test';
+import type {Spec, Suite, TestInfo} from './types';
 
 describe('test utils', () => {
     describe('isTestSkipped', () => {

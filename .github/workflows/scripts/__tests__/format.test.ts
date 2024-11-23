@@ -1,7 +1,4 @@
-import {
-    formatSize,
-    generateTestChangesSummary,
-} from '../../../.github/workflows/scripts/utils/format';
+import {formatSize, generateTestChangesSummary} from '../utils/format';
 
 describe('format utils', () => {
     describe('formatSize', () => {

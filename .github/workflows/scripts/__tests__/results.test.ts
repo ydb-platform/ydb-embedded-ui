@@ -1,7 +1,7 @@
 import fs from 'fs';
 
-import {getTestStatus, readTestResults} from '../../../.github/workflows/scripts/utils/results';
-import type {TestResults, TestResultsInfo, TestStatusInfo} from '../types';
+import {getTestStatus, readTestResults} from '../utils/results';
+import type {TestResults, TestResultsInfo, TestStatusInfo} from './types';
 
 jest.mock('fs');
 
