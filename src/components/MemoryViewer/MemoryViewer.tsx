@@ -53,15 +53,15 @@ export function MemoryViewer({
     warningThreshold = 60,
     dangerThreshold = 80,
 }: MemoryProgressViewerProps) {
-    const value = stats.AnonRss ?? calculateAllocatedMemory(stats);
+    const memoryUsage = stats.AnonRss ?? calculateAllocatedMemory(stats);
 
     const capacity = stats.HardLimit;
 
     const theme = useTheme();
     let fillWidth =
-        Math.round((parseFloat(String(value)) / parseFloat(String(capacity))) * 100) || 0;
+        Math.round((parseFloat(String(memoryUsage)) / parseFloat(String(capacity))) * 100) || 0;
     fillWidth = fillWidth > 100 ? 100 : fillWidth;
-    let valueText: number | string | undefined = value,
+    let valueText: number | string | undefined = memoryUsage,
         capacityText: number | string | undefined = capacity,
         divider = '/';
     if (percents) {
@@ -69,7 +69,7 @@ export function MemoryViewer({
         capacityText = '';
         divider = '';
     } else if (formatValues) {
-        [valueText, capacityText] = formatValues(Number(value), Number(capacity));
+        [valueText, capacityText] = formatValues(Number(memoryUsage), Number(capacity));
     }
 
     const renderContent = () => {
@@ -81,13 +81,13 @@ export function MemoryViewer({
     };
 
     const calculateMemoryShare = (segmentSize: number) => {
-        if (!value) {
+        if (!memoryUsage) {
             return 0;
         }
         return (segmentSize / parseFloat(String(capacity))) * 100;
     };
 
-    const memorySegments = getMemorySegments(stats);
+    const memorySegments = getMemorySegments(stats, Number(memoryUsage));
 
     const status = calculateProgressStatus({
         fillWidth,

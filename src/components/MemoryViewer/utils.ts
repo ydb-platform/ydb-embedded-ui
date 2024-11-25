@@ -21,7 +21,7 @@ interface MemorySegment {
     isInfo?: boolean;
 }
 
-export function getMemorySegments(stats: TMemoryStats): MemorySegment[] {
+export function getMemorySegments(stats: TMemoryStats, memoryUsage: number): MemorySegment[] {
     const segments = [
         {
             label: i18n('text_shared-cache'),
@@ -57,18 +57,14 @@ export function getMemorySegments(stats: TMemoryStats): MemorySegment[] {
     ) as MemorySegment[];
     const sumNonInfoSegments = nonInfoSegments.reduce((acc, segment) => acc + segment.value, 0);
 
-    const memoryUsage = getMaybeNumber(stats.AnonRss ?? calculateAllocatedMemory(stats));
+    const otherMemory = Math.max(0, memoryUsage - sumNonInfoSegments);
 
-    if (memoryUsage) {
-        const otherMemory = Math.max(0, memoryUsage - sumNonInfoSegments);
-
-        segments.push({
-            label: i18n('text_other'),
-            key: 'Other',
-            value: otherMemory,
-            isInfo: false,
-        });
-    }
+    segments.push({
+        label: i18n('text_other'),
+        key: 'Other',
+        value: otherMemory,
+        isInfo: false,
+    });
 
     segments.push(
         {
