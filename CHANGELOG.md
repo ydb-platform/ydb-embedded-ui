@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.37.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.37.0...v6.37.1) (2024-11-25)
+
+
+### Bug Fixes
+
+* investigate 1 minute query timeout ([#1690](https://github.com/ydb-platform/ydb-embedded-ui/issues/1690)) ([70ac486](https://github.com/ydb-platform/ydb-embedded-ui/commit/70ac4869db5cf2930a201f0e639689381182e780))
+
 ## [6.37.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.36.1...v6.37.0) (2024-11-25)
 
 
