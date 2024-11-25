@@ -14,7 +14,7 @@ import {getNodes} from './getNodes';
 import i18n from './i18n';
 import {getRowClassName, renderPaginatedTableErrorMessage} from './shared';
 
-interface PaginatedNodesTableProps {
+interface NodesTableProps {
     path?: string;
     database?: string;
 
@@ -32,7 +32,7 @@ interface PaginatedNodesTableProps {
     initialEntitiesCount?: number;
 }
 
-export function PaginatedNodesTable({
+export function NodesTable({
     path,
     database,
     searchValue,
@@ -44,7 +44,7 @@ export function PaginatedNodesTable({
     parentRef,
     renderControls,
     initialEntitiesCount,
-}: PaginatedNodesTableProps) {
+}: NodesTableProps) {
     const tableFilters = React.useMemo(() => {
         return {
             path,

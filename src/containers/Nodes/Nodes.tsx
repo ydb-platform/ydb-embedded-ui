@@ -1,113 +1,283 @@
 import React from 'react';
 
-import {ASCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
-
-import {AccessDenied} from '../../components/Errors/403';
-import {isAccessError} from '../../components/Errors/PageError/PageError';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {Illustration} from '../../components/Illustration';
-import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
+import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
+import type {Column, RenderControls} from '../../components/PaginatedTable';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
+import {NODES_COLUMNS_TITLES} from '../../components/nodesColumns/constants';
+import type {NodesColumnId} from '../../components/nodesColumns/constants';
+import {
+    useCapabilitiesLoaded,
+    useViewerNodesHandlerHasGrouping,
+} from '../../store/reducers/capabilities/hooks';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
-import {filterNodes} from '../../store/reducers/nodes/selectors';
-import type {NodesSortParams} from '../../store/reducers/nodes/types';
+import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {useProblemFilter} from '../../store/reducers/settings/hooks';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {useAutoRefreshInterval, useTableSort} from '../../utils/hooks';
+import type {NodesGroupByField} from '../../types/api/nodes';
+import {useAutoRefreshInterval} from '../../utils/hooks';
+import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {TableGroup} from '../Storage/TableGroup/TableGroup';
+import {useExpandedGroups} from '../Storage/TableGroup/useExpandedTableGroups';
 
 import {NodesControls} from './NodesControls/NodesControls';
-import {useNodesSelectedColumns} from './columns/hooks';
+import {NodesTable} from './NodesTable';
+import {getNodesColumns} from './columns/columns';
+import {
+    ALL_NODES_GROUP_BY_PARAMS,
+    DEFAULT_NODES_COLUMNS,
+    NODES_TABLE_SELECTED_COLUMNS_LS_KEY,
+    REQUIRED_NODES_COLUMNS,
+} from './columns/constants';
 import i18n from './i18n';
-import {getRowClassName} from './shared';
+import {b} from './shared';
 import {useNodesPageQueryParams} from './useNodesPageQueryParams';
 
 import './Nodes.scss';
 
-interface NodesProps {
+export interface NodesProps {
     path?: string;
     database?: string;
+    parentRef: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
+
+    columns?: Column<NodesPreparedEntity>[];
+    defaultColumnsIds?: NodesColumnId[];
+    requiredColumnsIds?: NodesColumnId[];
+    selectedColumnsKey?: string;
+    groupByParams?: NodesGroupByField[];
 }
 
-export const Nodes = ({path, database, additionalNodesProps = {}}: NodesProps) => {
-    const {searchValue, uptimeFilter} = useNodesPageQueryParams(undefined);
-    const {problemFilter} = useProblemFilter();
+export function Nodes({
+    path,
+    database,
+    parentRef,
+    additionalNodesProps,
+    columns = getNodesColumns({database, getNodeRef: additionalNodesProps?.getNodeRef}),
+    defaultColumnsIds = DEFAULT_NODES_COLUMNS,
+    requiredColumnsIds = REQUIRED_NODES_COLUMNS,
+    selectedColumnsKey = NODES_TABLE_SELECTED_COLUMNS_LS_KEY,
+    groupByParams = ALL_NODES_GROUP_BY_PARAMS,
+}: NodesProps) {
+    const {uptimeFilter, groupByParam, handleUptimeFilterChange} =
+        useNodesPageQueryParams(groupByParams);
+    const {problemFilter, handleProblemFilterChange} = useProblemFilter();
 
+    const capabilitiesLoaded = useCapabilitiesLoaded();
+    const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+
+    // Other filters do not fit with grouping
+    // Reset them if grouping available
+    React.useEffect(() => {
+        if (
+            viewerNodesHandlerHasGrouping &&
+            (problemFilter !== 'All' || uptimeFilter !== NodesUptimeFilterValues.All)
+        ) {
+            handleProblemFilterChange('All');
+            handleUptimeFilterChange(NodesUptimeFilterValues.All);
+        }
+    }, [
+        handleProblemFilterChange,
+        handleUptimeFilterChange,
+        problemFilter,
+        uptimeFilter,
+        viewerNodesHandlerHasGrouping,
+    ]);
+
+    const renderContent = () => {
+        if (viewerNodesHandlerHasGrouping && groupByParam) {
+            return (
+                <GroupedNodesComponent
+                    path={path}
+                    database={database}
+                    parentRef={parentRef}
+                    columns={columns}
+                    defaultColumnsIds={defaultColumnsIds}
+                    requiredColumnsIds={requiredColumnsIds}
+                    selectedColumnsKey={selectedColumnsKey}
+                    groupByParams={groupByParams}
+                />
+            );
+        }
+
+        return (
+            <NodesComponent
+                path={path}
+                database={database}
+                parentRef={parentRef}
+                columns={columns}
+                defaultColumnsIds={defaultColumnsIds}
+                requiredColumnsIds={requiredColumnsIds}
+                selectedColumnsKey={selectedColumnsKey}
+                groupByParams={groupByParams}
+            />
+        );
+    };
+
+    return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
+}
+
+interface NodesComponentProps {
+    path?: string;
+    database?: string;
+    parentRef: React.RefObject<HTMLElement>;
+
+    columns: Column<NodesPreparedEntity>[];
+    defaultColumnsIds: NodesColumnId[];
+    requiredColumnsIds: NodesColumnId[];
+    selectedColumnsKey: string;
+    groupByParams: NodesGroupByField[];
+}
+
+function NodesComponent({
+    path,
+    database,
+    parentRef,
+    columns,
+    defaultColumnsIds,
+    requiredColumnsIds,
+    selectedColumnsKey,
+    groupByParams,
+}: NodesComponentProps) {
+    const {searchValue, uptimeFilter} = useNodesPageQueryParams(groupByParams);
+    const {problemFilter} = useProblemFilter();
+    const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+
+    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
+        columns,
+        selectedColumnsKey,
+        NODES_COLUMNS_TITLES,
+        defaultColumnsIds,
+        requiredColumnsIds,
+    );
+
+    const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
+        return (
+            <NodesControls
+                withGroupBySelect={viewerNodesHandlerHasGrouping}
+                groupByParams={groupByParams}
+                columnsToSelect={columnsToSelect}
+                handleSelectedColumnsUpdate={setColumns}
+                entitiesCountCurrent={foundEntities}
+                entitiesCountTotal={totalEntities}
+                entitiesLoading={!inited}
+            />
+        );
+    };
+
+    return (
+        <NodesTable
+            path={path}
+            database={database}
+            searchValue={searchValue}
+            problemFilter={problemFilter}
+            uptimeFilter={uptimeFilter}
+            columns={columnsToShow}
+            parentRef={parentRef}
+            renderControls={renderControls}
+        />
+    );
+}
+
+function GroupedNodesComponent({
+    path,
+    database,
+    parentRef,
+    columns,
+    defaultColumnsIds,
+    requiredColumnsIds,
+    selectedColumnsKey,
+    groupByParams,
+}: NodesComponentProps) {
+    const {searchValue, groupByParam} = useNodesPageQueryParams(groupByParams);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const {columnsToShow, columnsToSelect, setColumns} = useNodesSelectedColumns({
-        getNodeRef: additionalNodesProps.getNodeRef,
-        database,
-    });
+    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
+        columns,
+        selectedColumnsKey,
+        NODES_COLUMNS_TITLES,
+        defaultColumnsIds,
+        requiredColumnsIds,
+    );
 
+    const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
+        {
+            path,
+            database,
+            filter: searchValue,
+            group: groupByParam,
+            limit: 0,
+        },
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
+
+    const isLoading = currentData === undefined && isFetching;
     const {
-        currentData: data,
-        isLoading,
-        error,
-    } = nodesApi.useGetNodesQuery({path, database}, {pollingInterval: autoRefreshInterval});
+        NodeGroups: tableGroups,
+        FoundNodes: found = 0,
+        TotalNodes: total = 0,
+    } = currentData || {};
 
-    const [sortValue, setSortValue] = React.useState<NodesSortParams>({
-        sortValue: 'NodeId',
-        sortOrder: ASCENDING,
-    });
-    const [sort, handleSort] = useTableSort(sortValue, (sortParams) => {
-        setSortValue(sortParams as NodesSortParams);
-    });
-
-    const nodes = React.useMemo(() => {
-        return filterNodes(data?.Nodes, {searchValue, uptimeFilter, problemFilter});
-    }, [data, searchValue, uptimeFilter, problemFilter]);
-
-    const totalNodes = data?.TotalNodes || 0;
+    const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
     const renderControls = () => {
         return (
             <NodesControls
+                withGroupBySelect
+                groupByParams={groupByParams}
                 columnsToSelect={columnsToSelect}
                 handleSelectedColumnsUpdate={setColumns}
-                entitiesCountCurrent={nodes.length}
-                entitiesCountTotal={totalNodes}
+                entitiesCountCurrent={found}
+                entitiesCountTotal={total}
                 entitiesLoading={isLoading}
-                groupByParams={undefined}
             />
         );
     };
 
-    const renderTable = () => {
-        if (nodes.length === 0) {
-            if (problemFilter !== 'All' || uptimeFilter !== NodesUptimeFilterValues.All) {
-                return <Illustration name="thumbsUp" width="200" />;
-            }
+    const renderGroups = () => {
+        if (tableGroups?.length) {
+            return tableGroups.map(({name, count}) => {
+                const isExpanded = expandedGroups[name];
+
+                return (
+                    <TableGroup
+                        key={name}
+                        title={name}
+                        count={count}
+                        entityName={i18n('nodes')}
+                        expanded={isExpanded}
+                        onIsExpandedChange={setIsGroupExpanded}
+                    >
+                        <NodesTable
+                            path={path}
+                            database={database}
+                            searchValue={searchValue}
+                            problemFilter={'All'}
+                            uptimeFilter={NodesUptimeFilterValues.All}
+                            filterGroup={name}
+                            filterGroupBy={groupByParam}
+                            initialEntitiesCount={count}
+                            columns={columnsToShow}
+                            parentRef={parentRef}
+                        />
+                    </TableGroup>
+                );
+            });
         }
 
-        return (
-            <ResizeableDataTable
-                columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
-                data={nodes || []}
-                columns={columnsToShow}
-                settings={DEFAULT_TABLE_SETTINGS}
-                sortOrder={sort}
-                onSort={handleSort}
-                emptyDataMessage={i18n('empty.default')}
-                rowClassName={getRowClassName}
-            />
-        );
+        return i18n('no-nodes-groups');
     };
-
-    if (isAccessError(error)) {
-        return <AccessDenied />;
-    }
 
     return (
         <TableWithControlsLayout>
             <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
             {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading}>
-                {data ? renderTable() : null}
+            <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
+                {renderGroups()}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );
-};
+}
