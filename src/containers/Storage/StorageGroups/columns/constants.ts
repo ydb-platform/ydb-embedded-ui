@@ -37,13 +37,8 @@ export type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
 export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
     'GroupId',
     'PoolName',
-    'MediaType',
     'Erasure',
     'Used',
-    'Limit',
-    'Usage',
-    'Read',
-    'Write',
     'VDisks',
 ];
 

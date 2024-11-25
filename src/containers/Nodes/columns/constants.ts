@@ -9,13 +9,10 @@ export const NODES_TABLE_SELECTED_COLUMNS_LS_KEY = 'nodesTableSelectedColumns';
 export const DEFAULT_NODES_COLUMNS: NodesColumnId[] = [
     'NodeId',
     'Host',
-    'DC',
-    'Rack',
-    'Version',
     'Uptime',
-    'Memory',
-    'Pools',
-    'LoadAverage',
+    'CPU',
+    'RAM',
+    'Version',
     'Tablets',
 ];
 

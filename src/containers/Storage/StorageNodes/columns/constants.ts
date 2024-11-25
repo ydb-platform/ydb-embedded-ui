@@ -11,10 +11,9 @@ export const STORAGE_NODES_SELECTED_COLUMNS_LS_KEY = 'storageNodesSelectedColumn
 export const DEFAULT_STORAGE_NODES_COLUMNS: NodesColumnId[] = [
     'NodeId',
     'Host',
-    'DC',
-    'Rack',
-    'Pools',
     'Uptime',
+    'CPU',
+    'RAM',
     'PDisks',
 ];
 export const REQUIRED_STORAGE_NODES_COLUMNS: NodesColumnId[] = ['NodeId'];
