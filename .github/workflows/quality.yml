@@ -221,97 +221,21 @@ jobs:
           name: playwright-artifacts
           path: playwright-artifacts
 
+      - name: Fetch gh-pages branch
+        run: |
+          git fetch origin gh-pages:gh-pages
+          mkdir gh-pages
+          git --work-tree=gh-pages checkout gh-pages -- .
+
       - name: Update PR description
         uses: actions/github-script@v6
+        env:
+          CURRENT_SIZE: ${{ needs.bundle_size.outputs.current_size }}
+          MAIN_SIZE: ${{ needs.bundle_size.outputs.main_size }}
+          SIZE_DIFF: ${{ needs.bundle_size.outputs.diff }}
+          SIZE_PERCENT: ${{ needs.bundle_size.outputs.percent }}
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const fs = require('fs');
-            const testResultsPath = 'playwright-artifacts/test-results.json';
-            let testResults;
-
-            if (fs.existsSync(testResultsPath)) {
-              const rawData = fs.readFileSync(testResultsPath);
-              const data = JSON.parse(rawData);
-              testResults = {
-                total: data.stats.expected + data.stats.unexpected + data.stats.flaky + data.stats.skipped,
-                passed: data.stats.expected,
-                failed: data.stats.unexpected,
-                flaky: data.stats.flaky,
-                skipped: data.stats.skipped
-              };
-            } else {
-              console.log('Test results file not found');
-              testResults = { total: 0, passed: 0, failed: 0, flaky: 0, skipped: 0 };
-            }
-
-            const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/${context.issue.number}/`;
-            const status = testResults.failed > 0 ? '❌ FAILED' : (testResults.flaky > 0 ? '⚠️ FLAKY' : '✅ PASSED');
-            const statusColor = testResults.failed > 0 ? 'red' : (testResults.flaky > 0 ? 'orange' : 'green');
-
-            const currentSize = parseInt('${{ needs.bundle_size.outputs.current_size }}');
-            const mainSize = parseInt('${{ needs.bundle_size.outputs.main_size }}');
-            const diff = parseInt('${{ needs.bundle_size.outputs.diff }}');
-            const percent = '${{ needs.bundle_size.outputs.percent }}';
-
-            const formatSize = (size) => {
-              if (size >= 1024) {
-                return `${(size / (1024 * 1024)).toFixed(2)} MB`;
-              }
-              return `${(size / 1024).toFixed(2)} KB`;
-            };
-
-            const bundleStatus = percent === 'N/A' ? '⚠️' :
-                                 parseFloat(percent) > 0 ? '🔺' :
-                                 parseFloat(percent) < 0 ? '🔽' : '✅';
-
-            const ciSection = `## CI Results
-
-            ### Test Status: <span style="color: ${statusColor};">${status}</span>
-            📊 [Full Report](${reportUrl})
-
-            | Total | Passed | Failed | Flaky | Skipped |
-            |:-----:|:------:|:------:|:-----:|:-------:|
-            | ${testResults.total} | ${testResults.passed} | ${testResults.failed} | ${testResults.flaky} | ${testResults.skipped} |
-
-            ### Bundle Size: ${bundleStatus}
-            Current: ${formatSize(currentSize)} | Main: ${formatSize(mainSize)}
-            Diff: ${diff > 0 ? '+' : ''}${formatSize(Math.abs(diff))} (${percent === 'N/A' ? 'N/A' : `${percent}%`})
-
-            ${
-              percent === 'N/A' ? '⚠️ Unable to calculate change.' :
-              parseFloat(percent) > 0 ? '⚠️ Bundle size increased. Please review.' :
-              parseFloat(percent) < 0 ? '✅ Bundle size decreased.' : '✅ Bundle size unchanged.'
-            }
-
-            <details>
-            <summary>ℹ️ CI Information</summary>
-
-            - Test recordings for failed tests are available in the full report.
-            - Bundle size is measured for the entire 'dist' directory.
-            - 📊 indicates links to detailed reports.
-            - 🔺 indicates increase, 🔽 decrease, and ✅ no change in bundle size.
-            </details>`;
-
-            const { data: pullRequest } = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-            });
-
-            const currentBody = pullRequest.body || '';
-            const ciSectionRegex = /## CI Results[\s\S]*?(?=\n## (?!CI Results)|$)/;
-
-            let newBody = currentBody;
-            if (ciSectionRegex.test(newBody)) {
-              newBody = newBody.replace(ciSectionRegex, ciSection);
-            } else {
-              newBody += '\n\n' + ciSection;
-            }
-
-            await github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              body: newBody,
-            });
+            const updatePRDescription = require('./.github/workflows/scripts/update-pr-description.js');
+            await updatePRDescription(github, context);

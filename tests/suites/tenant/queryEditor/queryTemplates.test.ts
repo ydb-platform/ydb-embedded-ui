@@ -121,7 +121,7 @@ test.describe('Query Templates', () => {
         await expect(queryEditor.editorTextArea).toHaveValue(initialContent);
     });
 
-    test('Dont save button in unsaved changes modal allows text to change', async ({page}) => {
+    test('Dont save button in unsaved changes modal allows to change text', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         const unsavedChangesModal = new UnsavedChangesModal(page);
         const queryEditor = new QueryEditor(page);
