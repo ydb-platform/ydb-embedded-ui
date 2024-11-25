@@ -8,14 +8,10 @@ on:
 
 jobs:
   e2e_tests:
-    name: Playwright Tests (${{ matrix.shard }})
+    name: Playwright Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3, 4]
 
     services:
       backend:
@@ -44,7 +40,7 @@ jobs:
 
       - name: Run Playwright tests
         id: run_tests
-        run: npx playwright test --shard ${{ matrix.shard }}/4
+        run: npm run test:e2e
         env:
           CI: true
           PLAYWRIGHT_VIDEO: 'on'
@@ -53,7 +49,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: playwright-artifacts-${{ matrix.shard }}
+          name: playwright-artifacts
           path: playwright-artifacts
           retention-days: 5
 
@@ -93,35 +89,6 @@ jobs:
           echo "failed=$failed" >> $GITHUB_OUTPUT
           echo "flaky=$flaky" >> $GITHUB_OUTPUT
           echo "skipped=$skipped" >> $GITHUB_OUTPUT
-
-  merge_reports:
-    name: Merge Test Reports
-    if: always()
-    needs: [e2e_tests]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: all-artifacts
-
-      - name: Merge reports
-        run: |
-          mkdir -p merged-artifacts/playwright-report
-          # Merge HTML reports (just copy the last one as they can't be properly merged)
-          cp -r all-artifacts/playwright-artifacts-*/playwright-report/* merged-artifacts/playwright-report/
-
-          # Create directory for merged results
-          mkdir -p merged-artifacts
-
-      - name: Upload merged artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: playwright-artifacts
-          path: merged-artifacts
-          retention-days: 5
 
   bundle_size:
     name: Check Bundle Size
@@ -188,7 +155,7 @@ jobs:
 
   deploy_report:
     name: Deploy Test Report
-    needs: [merge_reports]
+    needs: [e2e_tests]
     if: always() && (github.event_name == 'push' && github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))
     runs-on: ubuntu-latest
     permissions:
@@ -206,7 +173,7 @@ jobs:
           mkdir gh-pages
           git --work-tree=gh-pages checkout gh-pages -- .
 
-      - name: Download merged artifacts
+      - name: Download Playwright artifacts
         uses: actions/download-artifact@v3
         with:
           name: playwright-artifacts
@@ -248,7 +215,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download merged artifacts
+      - name: Download Playwright artifacts
         uses: actions/download-artifact@v3
         with:
           name: playwright-artifacts
