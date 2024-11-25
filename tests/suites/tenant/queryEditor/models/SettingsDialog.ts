@@ -14,6 +14,8 @@ export class SettingsDialog {
     private page: Page;
     private selectPopup: Locator;
     private limitRowsInput: Locator;
+    private limitRowsErrorIcon: Locator;
+    private limitRowsErrorPopover: Locator;
 
     private queryModeSelect: Locator;
     private transactionModeSelect: Locator;
@@ -25,6 +27,10 @@ export class SettingsDialog {
         this.dialog = page.locator('.ydb-query-settings-dialog');
 
         this.limitRowsInput = this.dialog.locator('.ydb-query-settings-dialog__limit-rows input');
+        this.limitRowsErrorIcon = this.dialog.locator(
+            '.ydb-query-settings-dialog__limit-rows [data-qa="control-error-icon-qa"]',
+        );
+        this.limitRowsErrorPopover = this.page.locator('.g-popover__tooltip-content');
         this.selectPopup = page.locator('.ydb-query-settings-select__popup');
 
         // Define distinct locators for selects
@@ -77,6 +83,25 @@ export class SettingsDialog {
     async changeLimitRows(limitRows: number) {
         await this.limitRowsInput.fill(limitRows.toString());
         await this.page.waitForTimeout(1000);
+    }
+
+    async clearLimitRows() {
+        await this.limitRowsInput.clear();
+        await this.page.waitForTimeout(1000);
+    }
+
+    async getLimitRowsValue() {
+        return await this.limitRowsInput.inputValue();
+    }
+
+    async isLimitRowsError() {
+        return await this.limitRowsErrorIcon.isVisible();
+    }
+
+    async getLimitRowsErrorMessage() {
+        await this.limitRowsErrorIcon.hover();
+        await this.limitRowsErrorPopover.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return await this.limitRowsErrorPopover.textContent();
     }
 
     async clickButton(buttonName: ButtonNames) {
