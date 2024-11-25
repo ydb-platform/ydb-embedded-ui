@@ -14,7 +14,7 @@ import type {EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Heatmap} from '../../Heatmap';
-import {NodesWrapper} from '../../Nodes/NodesWrapper';
+import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations';
 import {StorageWrapper} from '../../Storage/StorageWrapper';
 import {Tablets} from '../../Tablets';
@@ -102,7 +102,7 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.nodes: {
                 return (
-                    <NodesWrapper
+                    <Nodes
                         path={path}
                         database={tenantName}
                         additionalNodesProps={props.additionalNodesProps}

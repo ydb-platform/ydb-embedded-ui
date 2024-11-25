@@ -1,7 +1,6 @@
 import {expect, test} from '@playwright/test';
 
 import {backend} from '../../utils/constants';
-import {toggleExperiment} from '../../utils/toggleExperiment';
 import {NodesPage} from '../nodes/NodesPage';
 import {PaginatedTable} from '../paginatedTable/paginatedTable';
 
@@ -28,9 +27,6 @@ test.describe('Test Nodes Paginated Table', async () => {
         const nodesPage = new NodesPage(page);
         const response = await nodesPage.goto();
         expect(response?.ok()).toBe(true);
-
-        // Wil be removed since it's an experiment
-        await toggleExperiment(page, 'on', 'Use paginated tables');
     });
 
     test('Table loads and displays data', async ({page}) => {
