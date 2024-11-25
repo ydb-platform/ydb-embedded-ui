@@ -6,8 +6,9 @@ import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
 import type {IconData} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
+import {settingsManager} from '../../services/settings';
 import {cn} from '../../utils/cn';
-import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
+import {ASIDE_HEADER_COMPACT_KEY, LANGUAGE_KEY} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
 
 import i18n from './i18n';
@@ -63,6 +64,17 @@ enum Panel {
     UserSettings = 'UserSettings',
 }
 
+function getDocumentationLink() {
+    // Use saved language from settings if it's present, otherwise use browser language
+    const lang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, navigator.language);
+
+    if (lang === 'ru') {
+        return 'https://ydb.tech/docs/ru/';
+    }
+
+    return 'https://ydb.tech/docs/en/';
+}
+
 export function AsideNavigation(props: AsideNavigationProps) {
     const history = useHistory();
 
@@ -92,7 +104,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
                                 title: i18n('navigation-item.documentation'),
                                 icon: CircleQuestion,
                                 onItemClick: () => {
-                                    window.open('https://ydb.tech/docs', '_blank', 'noreferrer');
+                                    window.open(getDocumentationLink(), '_blank', 'noreferrer');
                                 },
                             }}
                         />
