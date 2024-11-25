@@ -1,5 +1,22 @@
 # Changelog
 
+## [6.37.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.36.1...v6.37.0) (2024-11-25)
+
+
+### Features
+
+* **autocomplete:** show column attributes ([#1665](https://github.com/ydb-platform/ydb-embedded-ui/issues/1665)) ([de0b9b6](https://github.com/ydb-platform/ydb-embedded-ui/commit/de0b9b6f1305e71b4f4a37e2b289f41971d131ea))
+* indicate schema description loading ([#1672](https://github.com/ydb-platform/ydb-embedded-ui/issues/1672)) ([c0781f1](https://github.com/ydb-platform/ydb-embedded-ui/commit/c0781f102250e1aa6c7f4886919b08d97ce54e09))
+
+
+### Bug Fixes
+
+* add couple of template tests ([#1662](https://github.com/ydb-platform/ydb-embedded-ui/issues/1662)) ([80b3b88](https://github.com/ydb-platform/ydb-embedded-ui/commit/80b3b8889bdff30938bc62b5911433c40e5e785a))
+* deploy report condition ([#1671](https://github.com/ydb-platform/ydb-embedded-ui/issues/1671)) ([09b6784](https://github.com/ydb-platform/ydb-embedded-ui/commit/09b678420c89d1bd76ef1c5b9bdeebf8579375aa))
+* remove push trigger ([#1669](https://github.com/ydb-platform/ydb-embedded-ui/issues/1669)) ([108db81](https://github.com/ydb-platform/ydb-embedded-ui/commit/108db81c2e8115495ef946b181610ee5b5a2f637))
+* show zero default for column ([#1681](https://github.com/ydb-platform/ydb-embedded-ui/issues/1681)) ([e33b702](https://github.com/ydb-platform/ydb-embedded-ui/commit/e33b7025ab967ef1c43bd21befeea170e18dacc2))
+* split deploy and update pr ([#1670](https://github.com/ydb-platform/ydb-embedded-ui/issues/1670)) ([aa216b1](https://github.com/ydb-platform/ydb-embedded-ui/commit/aa216b11616a283786300a17805c33c9d0b3a2a2))
+
 ## [6.36.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.36.0...v6.36.1) (2024-11-21)
 
 
