@@ -10,7 +10,7 @@ import {HoverPopup} from '../HoverPopup/HoverPopup';
 import type {FormatProgressViewerValues} from '../ProgressViewer/ProgressViewer';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 
-import {getMemorySegments} from './utils';
+import {calculateAllocatedMemory, getMemorySegments} from './utils';
 
 import './MemoryViewer.scss';
 
@@ -53,7 +53,8 @@ export function MemoryViewer({
     warningThreshold = 60,
     dangerThreshold = 80,
 }: MemoryProgressViewerProps) {
-    const value = stats.AnonRss;
+    const value = stats.AnonRss ?? calculateAllocatedMemory(stats);
+
     const capacity = stats.HardLimit;
 
     const theme = useTheme();

@@ -3,7 +3,13 @@ import {isNumeric} from '../../utils/utils';
 
 import i18n from './i18n';
 
-function getMaybeNumber(value: string | number | undefined): number | undefined {
+export function calculateAllocatedMemory(stats: TMemoryStats) {
+    const allocatedMemory = getMaybeNumber(stats.AllocatedMemory) || 0;
+    const allocatorCaches = getMaybeNumber(stats.AllocatorCachesMemory) || 0;
+    return String(allocatedMemory + allocatorCaches);
+}
+
+export function getMaybeNumber(value: string | number | undefined): number | undefined {
     return isNumeric(value) ? parseFloat(String(value)) : undefined;
 }
 
@@ -51,10 +57,10 @@ export function getMemorySegments(stats: TMemoryStats): MemorySegment[] {
     ) as MemorySegment[];
     const sumNonInfoSegments = nonInfoSegments.reduce((acc, segment) => acc + segment.value, 0);
 
-    const totalMemory = getMaybeNumber(stats.AnonRss);
+    const memoryUsage = getMaybeNumber(stats.AnonRss ?? calculateAllocatedMemory(stats));
 
-    if (totalMemory) {
-        const otherMemory = Math.max(0, totalMemory - sumNonInfoSegments);
+    if (memoryUsage) {
+        const otherMemory = Math.max(0, memoryUsage - sumNonInfoSegments);
 
         segments.push({
             label: i18n('text_other'),
@@ -74,7 +80,7 @@ export function getMemorySegments(stats: TMemoryStats): MemorySegment[] {
         {
             label: i18n('text_usage'),
             key: 'Usage',
-            value: getMaybeNumber(stats.AnonRss),
+            value: memoryUsage,
             isInfo: true,
         },
         {

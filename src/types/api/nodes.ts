@@ -71,9 +71,10 @@ export interface TNodesGroup {
 }
 
 export interface TMemoryStats {
-    AnonRss: string;
+    AnonRss?: string;
     ExternalConsumption?: string;
     AllocatorCachesMemory?: string;
+    AllocatedMemory?: string;
 
     SharedCacheConsumption?: string;
     SharedCacheLimit?: string;
