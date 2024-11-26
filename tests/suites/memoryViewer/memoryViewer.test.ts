@@ -1,17 +1,25 @@
 import {expect, test} from '@playwright/test';
 
 import {NodesPage} from '../nodes/NodesPage';
+import {PaginatedTable} from '../paginatedTable/paginatedTable';
 
 import {MemoryViewer} from './MemoryViewer';
 
 test.describe('Memory Viewer Widget', () => {
     test.beforeEach(async ({page}) => {
         const nodesPage = new NodesPage(page);
+        const memoryViewer = new MemoryViewer(page);
         await nodesPage.goto();
 
-        // Get the first row's memory viewer
-        const paginatedTable = await page.locator('.ydb-paginated-table__table');
-        await paginatedTable.waitFor();
+        const paginatedTable = new PaginatedTable(page);
+        await paginatedTable.waitForTableVisible();
+        await paginatedTable.waitForTableData();
+        if (!(await memoryViewer.isVisible())) {
+            await paginatedTable.openColumnSetup();
+            await paginatedTable.setColumnChecked('Memory');
+            await paginatedTable.applyColumnVisibility();
+        }
+        await memoryViewer.waitForVisible();
     });
 
     test('Memory viewer is visible and has correct status', async ({page}) => {

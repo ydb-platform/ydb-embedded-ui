@@ -1,5 +1,7 @@
 import type {Locator, Page} from '@playwright/test';
 
+import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
+
 export class MemoryViewer {
     readonly container: Locator;
     readonly progressContainer: Locator;
@@ -22,6 +24,14 @@ export class MemoryViewer {
         // Popup elements
         this.popup = page.locator('.g-popup.g-popup_open');
         this.definitionList = this.popup.locator('.g-definition-list');
+    }
+
+    async isVisible() {
+        return this.container.isVisible();
+    }
+
+    async waitForVisible() {
+        await this.container.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
     }
 
     async getStatus() {
