@@ -20,8 +20,6 @@ import './QueryResultTable.scss';
 const TABLE_SETTINGS: Settings = {
     ...DEFAULT_TABLE_SETTINGS,
     stripedRows: true,
-    dynamicRenderType: 'variable',
-    dynamicItemSizeGetter: () => 40,
     sortable: false,
 };
 
