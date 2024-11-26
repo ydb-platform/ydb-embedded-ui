@@ -13,6 +13,7 @@ test.describe('Memory Viewer Widget', () => {
 
         const paginatedTable = new PaginatedTable(page);
         await paginatedTable.waitForTableVisible();
+        await paginatedTable.waitForTableData();
         if (!(await memoryViewer.isVisible())) {
             await paginatedTable.openColumnSetup();
             await paginatedTable.setColumnChecked('Memory');
