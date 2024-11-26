@@ -118,6 +118,7 @@ const applicationColumn: Column<KeyValueRow> = {
 };
 
 export const TOP_QUERIES_COLUMNS = [
+    queryHashColumn,
     cpuTimeUsColumn,
     queryTextColumn,
     endTimeColumn,
