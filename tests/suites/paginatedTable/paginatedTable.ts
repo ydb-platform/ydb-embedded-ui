@@ -1,5 +1,7 @@
 import type {Locator, Page} from '@playwright/test';
 
+import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
+
 export class PaginatedTable {
     private page: Page;
     private tableSelector: Locator;
@@ -11,6 +13,8 @@ export class PaginatedTable {
     private refreshButton: Locator;
     private refreshIntervalSelect: Locator;
     private headCells: Locator;
+    private columnSetupButton: Locator;
+    private columnSetupPopup: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -23,6 +27,14 @@ export class PaginatedTable {
         this.emptyTableRows = this.tableSelector.locator('.ydb-paginated-table__row_empty');
         this.refreshButton = page.locator('.auto-refresh-control button[aria-label="Refresh"]');
         this.refreshIntervalSelect = page.getByTestId('ydb-autorefresh-select');
+        this.columnSetupButton = this.tableSelector.locator(
+            '.g-tree-select.g-table-column-setup button',
+        );
+        this.columnSetupPopup = page.locator('.g-popup .g-select-popup.g-tree-select__popup');
+    }
+
+    async waitForTableVisible() {
+        await this.tableSelector.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
     }
 
     async search(searchTerm: string) {
@@ -117,6 +129,48 @@ export class PaginatedTable {
         await columnHeader.click();
         await this.page.waitForTimeout(1000);
         await this.waitForTableData();
+    }
+
+    async openColumnSetup() {
+        await this.columnSetupButton.click();
+        await this.columnSetupPopup.waitFor({state: 'visible'});
+    }
+
+    async setColumnChecked(columnName: string) {
+        const columnOption = this.columnSetupPopup.locator(`[data-list-item="${columnName}"]`);
+        const checkIcon = columnOption.locator('.g-icon.g-color-text_color_info');
+        const isVisible = await checkIcon.isVisible();
+        if (!isVisible) {
+            await columnOption.click();
+        }
+    }
+
+    async setColumnUnchecked(columnName: string) {
+        const columnOption = this.columnSetupPopup.locator(`[data-list-item="${columnName}"]`);
+        const checkIcon = columnOption.locator('.g-icon.g-color-text_color_info');
+        const isVisible = await checkIcon.isVisible();
+        if (isVisible) {
+            await columnOption.click();
+        }
+    }
+
+    async applyColumnVisibility() {
+        const applyButton = this.columnSetupPopup.locator('button:has-text("Apply")');
+        await applyButton.click();
+        await this.columnSetupPopup.waitFor({state: 'hidden'});
+    }
+
+    async getVisibleColumnsCount(): Promise<string> {
+        const statusText = await this.columnSetupButton
+            .locator('.g-table-column-setup__status')
+            .innerText();
+        return statusText;
+    }
+
+    async isColumnVisible(columnName: string): Promise<boolean> {
+        const columnOption = this.columnSetupPopup.locator(`[data-list-item="${columnName}"]`);
+        const checkIcon = columnOption.locator('.g-icon.g-color-text_color_info');
+        return await checkIcon.isVisible();
     }
 
     private async getColumnIndex(columnName: string): Promise<number> {
