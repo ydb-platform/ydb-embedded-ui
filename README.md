@@ -61,7 +61,7 @@ YDB docker represents a single node cluster with only one version, small amount 
 ```
 REACT_APP_BACKEND=http://your-cluster-host:8765
 REACT_APP_META_BACKEND=undefined
-META_YDB_BACKEND=undefined
+META_YDB_BACKEND= undefined
 ```
 
 #### Meta backend in dev mode (multi cluster)
