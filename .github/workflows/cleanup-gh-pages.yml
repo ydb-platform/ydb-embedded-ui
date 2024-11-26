@@ -12,6 +12,9 @@ jobs:
       contents: write
       pages: write
       pull-requests: write
+    concurrency:
+      group: deploy_report
+      cancel-in-progress: false
 
     steps:
       - uses: actions/checkout@v4
