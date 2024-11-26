@@ -1,5 +1,16 @@
 # Changelog
 
+## [6.37.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.37.1...v6.37.2) (2024-11-26)
+
+
+### Bug Fixes
+
+* **AsideNavigation:** fix documentation link ([#1687](https://github.com/ydb-platform/ydb-embedded-ui/issues/1687)) ([017b983](https://github.com/ydb-platform/ydb-embedded-ui/commit/017b983ceed8c0899e6837f91f6c1178abd6fa6f))
+* change default tables columns, reorder columns ([#1694](https://github.com/ydb-platform/ydb-embedded-ui/issues/1694)) ([f164489](https://github.com/ydb-platform/ydb-embedded-ui/commit/f1644891c4c59f47f15fc28c2071ec020885aca0))
+* fallback for detailed memory ([#1696](https://github.com/ydb-platform/ydb-embedded-ui/issues/1696)) ([05094d7](https://github.com/ydb-platform/ydb-embedded-ui/commit/05094d7d7b657b9e9ee30ca5a8532aaa1cd82389))
+* make limit rows less or equal to 100_000 ([#1695](https://github.com/ydb-platform/ydb-embedded-ui/issues/1695)) ([db8ec37](https://github.com/ydb-platform/ydb-embedded-ui/commit/db8ec37b43313617a00c762f44afedfd1a76f4e8))
+* memory tests ([#1699](https://github.com/ydb-platform/ydb-embedded-ui/issues/1699)) ([4b1889f](https://github.com/ydb-platform/ydb-embedded-ui/commit/4b1889fa63aea2583850a6f6494eed360e7e56a0))
+
 ## [6.37.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.37.0...v6.37.1) (2024-11-25)
 
 
