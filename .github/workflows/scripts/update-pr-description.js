@@ -43,6 +43,7 @@ async function updatePRDescription(github, context) {
   - Test recordings for failed tests are available in the full report.
   - Bundle size is measured for the entire 'dist' directory.
   - 📊 indicates links to detailed reports.
+  kekekek
   - 🔺 indicates increase, 🔽 decrease, and ✅ no change in bundle size.
   </details>`;
 
