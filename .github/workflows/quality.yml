@@ -161,6 +161,9 @@ jobs:
     permissions:
       contents: write
       pages: write
+    concurrency:
+      group: deploy_report
+      cancel-in-progress: false
 
     steps:
       - uses: actions/checkout@v4
