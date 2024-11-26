@@ -25,13 +25,13 @@ export function getNodesColumns(params: GetNodesColumnsParams): Column<NodesPrep
         getNodeNameColumn<NodesPreparedEntity>(),
         getDataCenterColumn<NodesPreparedEntity>(),
         getRackColumn<NodesPreparedEntity>(),
-        getVersionColumn<NodesPreparedEntity>(),
         getUptimeColumn<NodesPreparedEntity>(),
-        getMemoryColumn<NodesPreparedEntity>(),
-        getRAMColumn<NodesPreparedEntity>(),
-        getPoolsColumn<NodesPreparedEntity>(),
         getCpuColumn<NodesPreparedEntity>(),
+        getPoolsColumn<NodesPreparedEntity>(),
+        getRAMColumn<NodesPreparedEntity>(),
+        getMemoryColumn<NodesPreparedEntity>(),
         getLoadAverageColumn<NodesPreparedEntity>(),
+        getVersionColumn<NodesPreparedEntity>(),
         getTabletsColumn<NodesPreparedEntity>(params),
     ];
 

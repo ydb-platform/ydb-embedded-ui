@@ -105,10 +105,11 @@ test.describe('Test Storage Paginated Table', async () => {
 
         const rowData = await storageTable.getRowData(0);
 
+        expect(rowData).toHaveProperty('Group ID');
         expect(rowData).toHaveProperty('Pool Name');
-        expect(rowData).toHaveProperty('Type');
         expect(rowData).toHaveProperty('Erasure');
-        expect(rowData).toHaveProperty('Usage');
+        expect(rowData).toHaveProperty('Used');
+        expect(rowData).toHaveProperty('VDisks');
     });
 
     test('Column values can be retrieved correctly', async ({page}) => {
@@ -117,12 +118,12 @@ test.describe('Test Storage Paginated Table', async () => {
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
 
-        const typeValues = await paginatedTable.getColumnValues('Type');
+        const poolValues = await paginatedTable.getColumnValues('Pool Name');
         const erasureValues = await paginatedTable.getColumnValues('Erasure');
 
-        expect(typeValues.length).toBeGreaterThan(0);
+        expect(poolValues.length).toBeGreaterThan(0);
         expect(erasureValues.length).toBeGreaterThan(0);
-        expect(typeValues.length).toBe(erasureValues.length);
+        expect(poolValues.length).toBe(erasureValues.length);
     });
 
     test('Clicking on Group ID header sorts the table', async ({page}) => {
