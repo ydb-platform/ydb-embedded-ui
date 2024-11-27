@@ -1,5 +1,5 @@
 import {Xmark} from '@gravity-ui/icons';
-import {Button, Icon, Loader} from '@gravity-ui/uikit';
+import {Button, Icon, Loader, Text} from '@gravity-ui/uikit';
 
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
@@ -28,9 +28,14 @@ export const Preview = ({database, path, type}: PreviewProps) => {
 
     const isPreviewAvailable = isTableType(type);
 
-    const query = `select * from \`${path}\` limit 32`;
+    const query = `select * from \`${path}\` limit 101`;
     const {currentData, isFetching, error} = previewApi.useSendQueryQuery(
-        {database, query, action: isExternalTableType(type) ? 'execute-query' : 'execute-scan'},
+        {
+            database,
+            query,
+            action: isExternalTableType(type) ? 'execute-query' : 'execute-scan',
+            limitRows: 100,
+        },
         {
             skip: !isPreviewAvailable,
             refetchOnMountOrArgChange: true,
@@ -47,7 +52,12 @@ export const Preview = ({database, path, type}: PreviewProps) => {
         return (
             <div className={b('header')}>
                 <div className={b('title')}>
-                    {i18n('preview.title')} <div className={b('table-name')}>{path}</div>
+                    {i18n('preview.title')}
+                    <Text color="secondary" variant="body-2">
+                        {data.truncated ? `${i18n('preview.truncated')} ` : ''}(
+                        {data.result?.length ?? 0})
+                    </Text>
+                    <div className={b('table-name')}>{path}</div>
                 </div>
                 <div className={b('controls-left')}>
                     <EnableFullscreenButton disabled={Boolean(error)} />

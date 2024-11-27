@@ -17,6 +17,7 @@
   "preview.title": "Preview",
   "preview.not-available": "Preview is not available",
   "preview.close": "Close preview",
+  "preview.truncated": "truncated",
 
   "method-description.script": "For YQL-scripts combining DDL and DML.\nAPI call: schema.scripting",
   "method-description.scan": "Read-only queries, potentially reading a lot of data.\nAPI call: table.ExecuteScan",
