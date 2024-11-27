@@ -7,7 +7,7 @@ export const hotKeysApi = api.injectEndpoints({
             queryFn: async ({path, database}, {signal}) => {
                 try {
                     // Send request that will trigger hot keys sampling (enable_sampling = true)
-                    const initialResponse = await window.api.getHotKeys(
+                    const initialResponse = await window.api.viewer.getHotKeys(
                         {path, database, enableSampling: true},
                         {signal},
                     );
@@ -29,7 +29,7 @@ export const hotKeysApi = api.injectEndpoints({
                     ]);
 
                     // And request these samples (enable_sampling = false)
-                    const response = await window.api.getHotKeys(
+                    const response = await window.api.viewer.getHotKeys(
                         {path, database, enableSampling: false},
                         {signal},
                     );

@@ -10,7 +10,7 @@ export const nodesListApi = api.injectEndpoints({
         getNodesList: build.query({
             queryFn: async (_, {signal}) => {
                 try {
-                    const data = await window.api.getNodesList({signal});
+                    const data = await window.api.viewer.getNodesList({signal});
                     return {data};
                 } catch (error) {
                     return {error};

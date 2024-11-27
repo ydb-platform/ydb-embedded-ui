@@ -10,7 +10,7 @@ export const capabilitiesApi = api.injectEndpoints({
         getClusterCapabilities: build.query({
             queryFn: async (params: {database?: string}) => {
                 try {
-                    const data = await window.api.getClusterCapabilities(params);
+                    const data = await window.api.viewer.getClusterCapabilities(params);
                     return {data};
                 } catch (error) {
                     // If capabilities endpoint is not available, there will be an error

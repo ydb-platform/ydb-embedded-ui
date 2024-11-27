@@ -12,7 +12,7 @@ export const planToSvgApi = api.injectEndpoints({
         planToSvgQuery: build.query<string, PlanToSvgQueryParams>({
             queryFn: async ({plan, database}, {signal}) => {
                 try {
-                    const response = await window.api.planToSvg(
+                    const response = await window.api.viewer.planToSvg(
                         {
                             database,
                             plan,

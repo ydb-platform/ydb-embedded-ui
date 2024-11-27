@@ -44,7 +44,7 @@ export const getStorageNodes: FetchData<
 
     const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
-    const response = await window.api.getNodes({
+    const response = await window.api.viewer.getNodes({
         type,
         storage,
         limit,

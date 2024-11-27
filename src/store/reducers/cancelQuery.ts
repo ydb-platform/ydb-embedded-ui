@@ -15,7 +15,7 @@ export const cancelQueryApi = api.injectEndpoints({
                 const action: CancelActions = 'cancel-query';
 
                 try {
-                    const response = await window.api.sendQuery(
+                    const response = await window.api.viewer.sendQuery(
                         {
                             database,
                             action,

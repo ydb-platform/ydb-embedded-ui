@@ -18,7 +18,7 @@ export const viewSchemaApi = api.injectEndpoints({
                 timeout?: number;
             }) => {
                 try {
-                    const response = await window.api.sendQuery(
+                    const response = await window.api.viewer.sendQuery(
                         {
                             query: createViewSchemaQuery(path),
                             database,

@@ -10,7 +10,7 @@ export const traceApi = api.injectEndpoints({
         checkTrace: build.query({
             queryFn: async ({url}: CheckTraceParams, {signal, dispatch}) => {
                 try {
-                    const response = await window.api.checkTrace({url}, {signal});
+                    const response = await window.api.trace.checkTrace({url}, {signal});
 
                     dispatch(setQueryTraceReady());
                     return {data: response};

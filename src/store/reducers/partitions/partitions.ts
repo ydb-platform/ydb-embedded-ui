@@ -35,7 +35,7 @@ export const partitionsApi = api.injectEndpoints({
             ) => {
                 try {
                     if (consumerName) {
-                        const response = await window.api.getConsumer(
+                        const response = await window.api.viewer.getConsumer(
                             {path, database, consumer: consumerName},
                             {signal},
                         );
@@ -43,7 +43,10 @@ export const partitionsApi = api.injectEndpoints({
                         const data = prepareConsumerPartitions(rawPartitions);
                         return {data};
                     } else {
-                        const response = await window.api.getTopic({path, database}, {signal});
+                        const response = await window.api.viewer.getTopic(
+                            {path, database},
+                            {signal},
+                        );
                         const rawPartitions = response.partitions;
                         const data = prepareTopicPartitions(rawPartitions);
                         return {data};

@@ -23,9 +23,9 @@ export const pDiskApi = api.injectEndpoints({
 
                 let diskInfoPromise: Promise<TPDiskInfoResponse>;
                 if (newApiAvailable) {
-                    diskInfoPromise = window.api.getPDiskInfo({nodeId, pDiskId}, {signal});
+                    diskInfoPromise = window.api.pdisk.getPDiskInfo({nodeId, pDiskId}, {signal});
                 } else {
-                    diskInfoPromise = window.api
+                    diskInfoPromise = window.api.viewer
                         .getNodeWhiteboardPDiskInfo({nodeId, pDiskId}, {signal})
                         .then((result) => {
                             if (result.PDiskStateInfo) {
@@ -45,7 +45,7 @@ export const pDiskApi = api.injectEndpoints({
                 try {
                     const response = await Promise.all([
                         diskInfoPromise,
-                        window.api.getNodeInfo(nodeId, {signal}),
+                        window.api.viewer.getNodeInfo(nodeId, {signal}),
                     ]);
                     const data = preparePDiskDataResponse(response);
                     return {data};

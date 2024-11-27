@@ -11,7 +11,7 @@ export const operationsApi = api.injectEndpoints({
         getOperationList: build.query({
             queryFn: async (params: OperationListRequestParams, {signal}) => {
                 try {
-                    const data = await window.api.getOperationList(params, {signal});
+                    const data = await window.api.operation.getOperationList(params, {signal});
                     return {data};
                 } catch (error) {
                     return {error};
@@ -22,7 +22,7 @@ export const operationsApi = api.injectEndpoints({
         cancelOperation: build.mutation({
             queryFn: async (params: OperationCancelRequestParams, {signal}) => {
                 try {
-                    const data = await window.api.cancelOperation(params, {signal});
+                    const data = await window.api.operation.cancelOperation(params, {signal});
                     return {data};
                 } catch (error) {
                     return {error};
@@ -32,7 +32,7 @@ export const operationsApi = api.injectEndpoints({
         forgetOperation: build.mutation({
             queryFn: async (params: OperationForgetRequestParams, {signal}) => {
                 try {
-                    const data = await window.api.forgetOperation(params, {signal});
+                    const data = await window.api.operation.forgetOperation(params, {signal});
                     return {data};
                 } catch (error) {
                     return {error};

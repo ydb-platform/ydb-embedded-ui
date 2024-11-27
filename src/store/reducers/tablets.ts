@@ -13,7 +13,7 @@ export const tabletsApi = api.injectEndpoints({
         getTabletsInfo: build.query({
             queryFn: async (params: TabletsApiRequestParams, {signal}) => {
                 try {
-                    const data = await window.api.getTabletsInfo(params, {signal});
+                    const data = await window.api.viewer.getTabletsInfo(params, {signal});
                     return {data};
                 } catch (error) {
                     return {error};

@@ -15,9 +15,9 @@ export const vDiskApi = api.injectEndpoints({
             queryFn: async ({nodeId, pDiskId, vDiskSlotId}: VDiskDataRequestParams, {signal}) => {
                 try {
                     const response = await Promise.all([
-                        window.api.getVDiskInfo({nodeId, pDiskId, vDiskSlotId}, {signal}),
-                        window.api.getNodeWhiteboardPDiskInfo({nodeId, pDiskId}, {signal}),
-                        window.api.getNodeInfo(nodeId, {signal}),
+                        window.api.viewer.getVDiskInfo({nodeId, pDiskId, vDiskSlotId}, {signal}),
+                        window.api.viewer.getNodeWhiteboardPDiskInfo({nodeId, pDiskId}, {signal}),
+                        window.api.viewer.getNodeInfo(nodeId, {signal}),
                     ]);
                     const data = prepareVDiskDataResponse(response);
                     return {data};

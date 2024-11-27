@@ -5,7 +5,7 @@ export const schemaAclApi = api.injectEndpoints({
         getSchemaAcl: build.query({
             queryFn: async ({path, database}: {path: string; database: string}, {signal}) => {
                 try {
-                    const data = await window.api.getSchemaAcl({path, database}, {signal});
+                    const data = await window.api.viewer.getSchemaAcl({path, database}, {signal});
                     return {
                         data: {
                             acl: data.Common.ACL,

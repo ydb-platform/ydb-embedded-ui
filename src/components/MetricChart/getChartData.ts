@@ -19,7 +19,7 @@ export const getChartData = async (
     const until = Math.round(Date.now() / 1000);
     const from = until - TIMEFRAMES[timeFrame];
 
-    return window.api.getChartData(
+    return window.api.viewer.getChartData(
         {target: targetString, from, until, maxDataPoints, database},
         {signal},
     );

@@ -14,7 +14,7 @@ export const healthcheckApi = api.injectEndpoints({
                 {signal},
             ) => {
                 try {
-                    const data = await window.api.getHealthcheckInfo(
+                    const data = await window.api.viewer.getHealthcheckInfo(
                         {database, maxLevel},
                         {signal},
                     );

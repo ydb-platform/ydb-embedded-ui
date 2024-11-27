@@ -46,8 +46,8 @@ export const heatmapApi = api.injectEndpoints({
             ) => {
                 try {
                     const response = await Promise.all([
-                        window.api.getTabletsInfo({path, database}, {signal}),
-                        window.api.getHeatmapData({path, database}, {signal}),
+                        window.api.viewer.getTabletsInfo({path, database}, {signal}),
+                        window.api.viewer.getHeatmapData({path, database}, {signal}),
                     ]);
                     const data = transformResponse(response);
 

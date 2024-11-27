@@ -70,7 +70,9 @@ export function VDiskPage() {
 
     const handleEvictVDisk = async (isRetry?: boolean) => {
         if (vDiskIdParamsDefined) {
-            return window.api[newDiskApiAvailable ? 'evictVDisk' : 'evictVDiskOld']({
+            return (
+                newDiskApiAvailable ? window.api.vdisk.evictVDisk : window.api.tablets.evictVDiskOld
+            )({
                 groupId: GroupID,
                 groupGeneration: GroupGeneration,
                 failRealmIdx: Ring,

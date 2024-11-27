@@ -7,7 +7,7 @@ export const nodeApi = api.injectEndpoints({
         getNodeInfo: build.query({
             queryFn: async ({nodeId}: {nodeId: string}, {signal}) => {
                 try {
-                    const data = await window.api.getNodeInfo(nodeId, {signal});
+                    const data = await window.api.viewer.getNodeInfo(nodeId, {signal});
                     return {data: prepareNodeData(data)};
                 } catch (error) {
                     return {error};
@@ -18,7 +18,7 @@ export const nodeApi = api.injectEndpoints({
         getNodeStructure: build.query({
             queryFn: async ({nodeId}: {nodeId: string}, {signal}) => {
                 try {
-                    const data = await window.api.getStorageInfo({nodeId}, {signal});
+                    const data = await window.api.viewer.getStorageInfo({nodeId}, {signal});
                     return {data};
                 } catch (error) {
                     return {error};

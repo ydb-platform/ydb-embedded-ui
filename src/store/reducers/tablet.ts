@@ -13,9 +13,9 @@ export const tabletApi = api.injectEndpoints({
             ) => {
                 try {
                     const [tabletResponseData, historyResponseData, nodesList] = await Promise.all([
-                        window.api.getTablet({id, database}, {signal}),
-                        window.api.getTabletHistory({id, database}, {signal}),
-                        window.api.getNodesList({signal}),
+                        window.api.viewer.getTablet({id, database}, {signal}),
+                        window.api.viewer.getTabletHistory({id, database}, {signal}),
+                        window.api.viewer.getNodesList({signal}),
                     ]);
                     const nodeHostsMap = prepareNodeHostsMap(nodesList);
 
@@ -65,7 +65,9 @@ export const tabletApi = api.injectEndpoints({
         getTabletDescribe: build.query({
             queryFn: async ({tenantId}: {tenantId: TDomainKey}, {signal}) => {
                 try {
-                    const tabletDescribe = await window.api.getTabletDescribe(tenantId, {signal});
+                    const tabletDescribe = await window.api.viewer.getTabletDescribe(tenantId, {
+                        signal,
+                    });
                     const {SchemeShard, PathId} = tenantId;
                     const tenantPath = tabletDescribe?.Path || `${SchemeShard}:${PathId}`;
 
@@ -79,7 +81,7 @@ export const tabletApi = api.injectEndpoints({
         getAdvancedTableInfo: build.query({
             queryFn: async ({id, hiveId}: {id: string; hiveId: string}, {signal}) => {
                 try {
-                    const tabletResponseData = await window.api.getTabletFromHive(
+                    const tabletResponseData = await window.api.tablets.getTabletFromHive(
                         {id, hiveId},
                         {signal},
                     );
@@ -96,7 +98,7 @@ export const tabletApi = api.injectEndpoints({
         killTablet: build.mutation({
             queryFn: async ({id}: {id: string}) => {
                 try {
-                    const data = await window.api.killTablet(id);
+                    const data = await window.api.tablets.killTablet(id);
                     return {data};
                 } catch (error) {
                     return {error};
@@ -112,7 +114,7 @@ export const tabletApi = api.injectEndpoints({
         stopTablet: build.mutation({
             queryFn: async ({id, hiveId}: {id: string; hiveId: string}) => {
                 try {
-                    const data = await window.api.stopTablet(id, hiveId);
+                    const data = await window.api.tablets.stopTablet(id, hiveId);
                     return {data};
                 } catch (error) {
                     return {error};
@@ -128,7 +130,7 @@ export const tabletApi = api.injectEndpoints({
         resumeTablet: build.mutation({
             queryFn: async ({id, hiveId}: {id: string; hiveId: string}) => {
                 try {
-                    const data = await window.api.resumeTablet(id, hiveId);
+                    const data = await window.api.tablets.resumeTablet(id, hiveId);
                     return {data};
                 } catch (error) {
                     return {error};

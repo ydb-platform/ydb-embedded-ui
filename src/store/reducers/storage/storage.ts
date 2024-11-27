@@ -10,7 +10,7 @@ export const storageApi = api.injectEndpoints({
         getStorageNodesInfo: builder.query({
             queryFn: async (params: Omit<NodesRequestParams, 'type'>, {signal}) => {
                 try {
-                    const result = await window.api.getNodes(
+                    const result = await window.api.viewer.getNodes(
                         {storage: true, type: 'static', ...params},
                         {signal},
                     );

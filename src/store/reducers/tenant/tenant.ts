@@ -54,7 +54,7 @@ export const tenantApi = api.injectEndpoints({
         getTenantInfo: builder.query({
             queryFn: async ({path}: {path: string}, {signal}) => {
                 try {
-                    const tenantData = await window.api.getTenantInfo({path}, {signal});
+                    const tenantData = await window.api.viewer.getTenantInfo({path}, {signal});
                     return {data: tenantData.TenantInfo?.[0] ?? null};
                 } catch (error) {
                     return {error};
@@ -65,7 +65,7 @@ export const tenantApi = api.injectEndpoints({
         getClusterConfig: builder.query({
             queryFn: async ({database}: {database: string}, {signal}) => {
                 try {
-                    const res = await window.api.getClusterConfig(database, {signal});
+                    const res = await window.api.viewer.getClusterConfig(database, {signal});
                     const db = res.Databases[0];
 
                     return {data: db.FeatureFlags};

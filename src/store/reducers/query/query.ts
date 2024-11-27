@@ -198,7 +198,7 @@ export const queryApi = api.injectEndpoints({
 
                 try {
                     const timeStart = Date.now();
-                    const response = await window.api.sendQuery(
+                    const response = await window.api.viewer.sendQuery(
                         {
                             query,
                             database,
