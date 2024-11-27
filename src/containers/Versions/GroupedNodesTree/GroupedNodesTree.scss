@@ -20,9 +20,6 @@
 
         margin-right: $margin-size;
         margin-left: $margin-size;
-
-        @include freeze-nth-column(1);
-        @include freeze-nth-column(2, 80px);
     }
 
     .ydb-tree-view {

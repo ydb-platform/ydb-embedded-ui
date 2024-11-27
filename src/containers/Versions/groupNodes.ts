@@ -1,7 +1,7 @@
 import groupBy from 'lodash/groupBy';
 
+import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {VersionToColorMap} from '../../types/versions';
-import type {PreparedNodeSystemState} from '../../utils/nodes';
 import {getMinorVersion, parseNodesToVersionsValues} from '../../utils/versions';
 
 import type {GroupedNodesItem} from './types';
@@ -11,7 +11,7 @@ const sortByTitle = (a: GroupedNodesItem, b: GroupedNodesItem) =>
     a.title?.localeCompare(b.title || '') || -1;
 
 export const getGroupedTenantNodes = (
-    nodes: PreparedNodeSystemState[] | undefined,
+    nodes: NodesPreparedEntity[] | undefined,
     versionToColor: VersionToColorMap | undefined,
     groupByValue: GroupByValue,
 ): GroupedNodesItem[] | undefined => {
@@ -85,7 +85,7 @@ export const getGroupedTenantNodes = (
 };
 
 export const getGroupedStorageNodes = (
-    nodes: PreparedNodeSystemState[] | undefined,
+    nodes: NodesPreparedEntity[] | undefined,
     versionToColor: VersionToColorMap | undefined,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
@@ -105,7 +105,7 @@ export const getGroupedStorageNodes = (
 };
 
 export const getOtherNodes = (
-    nodes: PreparedNodeSystemState[] | undefined,
+    nodes: NodesPreparedEntity[] | undefined,
     versionToColor: VersionToColorMap | undefined,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {

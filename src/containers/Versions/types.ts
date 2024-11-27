@@ -1,9 +1,9 @@
+import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {VersionValue} from '../../types/versions';
-import type {PreparedNodeSystemState} from '../../utils/nodes';
 
 export interface GroupedNodesItem {
     title?: string;
-    nodes?: PreparedNodeSystemState[];
+    nodes?: NodesPreparedEntity[];
     items?: GroupedNodesItem[];
     versionColor?: string;
     versionsValues?: VersionValue[];

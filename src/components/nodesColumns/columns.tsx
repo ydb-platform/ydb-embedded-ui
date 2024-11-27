@@ -39,6 +39,7 @@ export function getNodeIdColumn<T extends {NodeId?: string | number}>(): Column<
         name: NODES_COLUMNS_IDS.NodeId,
         header: '#',
         width: 80,
+        resizeMinWidth: 80,
         render: ({row}) => row.NodeId,
         align: DataTable.RIGHT,
     };
