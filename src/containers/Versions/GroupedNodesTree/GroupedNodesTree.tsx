@@ -2,9 +2,9 @@ import React from 'react';
 
 import {TreeView} from 'ydb-ui-components';
 
+import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
 import type {VersionValue} from '../../../types/versions';
 import {cn} from '../../../utils/cn';
-import type {PreparedNodeSystemState} from '../../../utils/nodes';
 import {NodesTable} from '../NodesTable/NodesTable';
 import {NodesTreeTitle} from '../NodesTreeTitle/NodesTreeTitle';
 import type {GroupedNodesItem} from '../types';
@@ -15,7 +15,7 @@ export const b = cn('ydb-versions-grouped-node-tree');
 
 interface GroupedNodesTreeProps {
     title?: string;
-    nodes?: PreparedNodeSystemState[];
+    nodes?: NodesPreparedEntity[];
     items?: GroupedNodesItem[];
     expanded?: boolean;
     versionColor?: string;
