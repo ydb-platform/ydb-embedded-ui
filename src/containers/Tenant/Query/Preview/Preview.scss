@@ -1,10 +1,9 @@
-@use '../../../../styles/mixins.scss';
+@import '../../../../styles/mixins.scss';
 
 .kv-preview {
     height: 100%;
-    @include mixins.flex-container();
-    @include mixins.query-data-table();
-
+    @include flex-container();
+    @include query-data-table();
     &__header {
         position: sticky;
         top: 0;
@@ -22,17 +21,18 @@
 
     &__title {
         display: flex;
+        gap: var(--g-spacing-1);
     }
 
     &__table-name {
-        margin-left: 4px;
+        margin-left: var(--g-spacing-1);
 
         color: var(--g-color-text-complementary);
     }
 
     &__controls-left {
         display: flex;
-        gap: 5px;
+        gap: var(--g-spacing-1);
     }
     &__message-container {
         padding: 15px 20px;

@@ -7,15 +7,16 @@ interface SendQueryParams {
     query?: string;
     database?: string;
     action?: ExecuteActions;
+    limitRows?: number;
 }
 
 export const previewApi = api.injectEndpoints({
     endpoints: (build) => ({
         sendQuery: build.query({
-            queryFn: async ({query, database, action}: SendQueryParams, {signal}) => {
+            queryFn: async ({query, database, action, limitRows}: SendQueryParams, {signal}) => {
                 try {
                     const response = await window.api.sendQuery(
-                        {query, database, action},
+                        {query, database, action, limit_rows: limitRows},
                         {signal, withRetries: true},
                     );
 
