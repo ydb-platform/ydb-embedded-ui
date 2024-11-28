@@ -1,4 +1,4 @@
-@import '@gravity-ui/uikit/styles/mixins.scss';
+@forward '@gravity-ui/uikit/styles/mixins.scss';
 
 @mixin container() {
     max-width: 1170px;

@@ -1,4 +1,4 @@
-@import '../../../styles/mixins.scss';
+@use '../../../styles/mixins.scss';
 
 .kv-node-structure {
     position: relative;
@@ -7,8 +7,8 @@
     overflow: auto;
     flex-direction: column;
     flex-shrink: 0;
-    @include flex-container();
-    @include body-2-typography();
+    @include mixins.flex-container();
+    @include mixins.body-2-typography();
 
     &__error {
         padding: 20px 20px 0;

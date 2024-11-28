@@ -1,10 +1,10 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .ydb-tablet-page {
     $_: &;
     height: 100%;
     padding: 20px;
-    @include body-2-typography();
+    @include mixins.body-2-typography();
 
     &__placeholder {
         display: flex;

@@ -1,4 +1,4 @@
-@import '../../../../styles/mixins.scss';
+@use '../../../../styles/mixins.scss';
 
 .ydb-describe {
     &__message-container {
@@ -16,7 +16,7 @@
     }
 
     &__tree {
-        @include json-tree-styles();
+        @include mixins.json-tree-styles();
     }
 
     &__copy {

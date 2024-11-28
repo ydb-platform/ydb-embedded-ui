@@ -1,10 +1,10 @@
-@import '../../styles/mixins';
+@use '../../styles/mixins';
 
 .heatmap {
     overflow: auto;
 
     height: 100%;
-    @include flex-container();
+    @include mixins.flex-container();
 
     &__limits {
         display: flex;
@@ -43,7 +43,7 @@
         font-weight: 500;
         text-transform: uppercase;
 
-        @include body-2-typography();
+        @include mixins.body-2-typography();
 
         &_overall {
             margin-right: 15px;

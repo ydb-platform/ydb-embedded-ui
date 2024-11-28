@@ -1,5 +1,6 @@
+@use '../../styles/mixins.scss';
+
 @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
-@import '../../styles/mixins.scss';
 
 * {
     // FIXME: this is an overkill, potentially could break external components, needs refactoring
@@ -73,17 +74,17 @@ body,
 }
 
 .loader {
-    @include loader();
+    @include mixins.loader();
 }
 
 .app {
     height: 100%;
-    @include flex-container();
-    @include data-table-styles();
+    @include mixins.flex-container();
+    @include mixins.data-table-styles();
 
     &__main {
         overflow: auto;
-        @include flex-container();
+        @include mixins.flex-container();
     }
 }
 

@@ -1,4 +1,4 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .empty-state {
     padding: 20px;
@@ -50,18 +50,18 @@
         font-weight: 500;
 
         &_size_s {
-            @include lead-typography();
+            @include mixins.lead-typography();
         }
 
         &_size_m {
-            @include header-2-typography();
+            @include mixins.header-2-typography();
         }
     }
 
     &__description {
         grid-area: description;
 
-        @include body-2-typography();
+        @include mixins.body-2-typography();
     }
 
     &__actions {

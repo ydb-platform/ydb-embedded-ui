@@ -1,4 +1,4 @@
-@import '../../styles/mixins';
+@use '../../styles/mixins';
 
 .storage-disk-progress-bar {
     $block: &;
@@ -22,7 +22,7 @@
     border: $border-width solid var(--entity-state-border-color);
     border-radius: $outer-border-radius;
     background-color: var(--entity-state-background-color);
-    @include entity-state-colors();
+    @include mixins.entity-state-colors();
 
     &_compact {
         min-width: 0;

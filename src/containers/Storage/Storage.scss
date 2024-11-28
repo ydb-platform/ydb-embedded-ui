@@ -1,8 +1,8 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .global-storage {
     &__search {
-        @include search();
+        @include mixins.search();
     }
 
     &__table {

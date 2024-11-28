@@ -1,4 +1,4 @@
-@import '../../../../styles/mixins.scss';
+@use '../../../../styles/mixins.scss';
 
 .network {
     display: flex;
@@ -10,7 +10,7 @@
     max-width: 1305px;
     height: 100%;
 
-    @include body-2-typography();
+    @include mixins.body-2-typography();
 
     &__nodes-row {
         display: flex;
@@ -24,7 +24,7 @@
 
     &__inner {
         overflow: auto;
-        @include flex-container();
+        @include mixins.flex-container();
     }
 
     &__right {
@@ -77,7 +77,7 @@
         color: var(--g-color-text-secondary);
         border-bottom: 1px solid var(--g-color-base-generic-accent);
 
-        @include body-2-typography();
+        @include mixins.body-2-typography();
     }
 
     &__link {
@@ -91,7 +91,7 @@
 
         font-weight: 500;
 
-        @include body-1-typography();
+        @include mixins.body-1-typography();
     }
 
     &__checkbox-wrapper {
@@ -116,7 +116,7 @@
     &__controls-wrapper {
         display: flex;
         flex-direction: row;
-        @include flex-container();
+        @include mixins.flex-container();
     }
 
     &__select {

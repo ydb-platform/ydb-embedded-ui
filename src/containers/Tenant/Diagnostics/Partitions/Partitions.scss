@@ -1,4 +1,4 @@
-@import '../../../../styles/mixins.scss';
+@use '../../../../styles/mixins.scss';
 
 .ydb-diagnostics-partitions {
     overflow: auto;
@@ -6,10 +6,10 @@
 
     height: 100%;
 
-    @include flex-container();
+    @include mixins.flex-container();
 
     &__controls {
-        @include controls();
+        @include mixins.controls();
     }
 
     &__consumer-select {
@@ -21,7 +21,7 @@
     }
 
     &__search {
-        @include search();
+        @include mixins.search();
         &_partition {
             width: 100px;
         }
@@ -32,7 +32,7 @@
 
     &__table-wrapper {
         overflow: auto;
-        @include flex-container();
+        @include mixins.flex-container();
     }
 
     &__table-content {
@@ -42,6 +42,6 @@
     }
 
     &__table {
-        @include freeze-nth-column(1);
+        @include mixins.freeze-nth-column(1);
     }
 }

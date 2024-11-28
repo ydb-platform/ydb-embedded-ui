@@ -1,4 +1,4 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .popup2 {
     max-width: 300px;
@@ -22,7 +22,7 @@
     padding: 20px 20px 20px 0;
 
     &__inspector {
-        @include json-tree-styles();
+        @include mixins.json-tree-styles();
 
         :not(.json-inspector__leaf_expanded).json-inspector__leaf_composite:before {
             content: '';

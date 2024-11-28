@@ -1,4 +1,4 @@
-@import '../../styles//mixins.scss';
+@use '../../styles//mixins.scss';
 
 .ydb-pdisk-page {
     position: relative;
@@ -45,6 +45,6 @@
     }
 
     &__tabs {
-        @include tabs-wrapper-styles();
+        @include mixins.tabs-wrapper-styles();
     }
 }

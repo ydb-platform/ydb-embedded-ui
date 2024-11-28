@@ -1,4 +1,4 @@
-@import '../../../../styles/mixins.scss';
+@use '../../../../styles/mixins.scss';
 
 .schema-viewer {
     &__keys {
@@ -11,7 +11,7 @@
             display: inline;
 
             color: var(--g-color-text-complementary);
-            @include body-1-typography();
+            @include mixins.body-1-typography();
         }
 
         &-header {
@@ -21,7 +21,7 @@
             white-space: nowrap;
 
             color: var(--g-color-text-primary);
-            @include subheader-1-typography();
+            @include mixins.subheader-1-typography();
         }
 
         &-label {

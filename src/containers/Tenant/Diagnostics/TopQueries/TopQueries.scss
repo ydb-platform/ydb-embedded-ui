@@ -1,4 +1,4 @@
-@import '../../../../styles/mixins.scss';
+@use '../../../../styles/mixins.scss';
 
 .kv-top-queries {
     display: flex;
@@ -6,10 +6,10 @@
 
     height: 100%;
 
-    @include query-data-table;
+    @include mixins.query-data-table;
 
     &__search {
-        @include search();
+        @include mixins.search();
     }
 
     &__row {

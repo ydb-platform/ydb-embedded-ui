@@ -1,7 +1,7 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .ydb-pool-usage {
-    @include body-2-typography();
+    @include mixins.body-2-typography();
 
     &__info {
         display: flex;

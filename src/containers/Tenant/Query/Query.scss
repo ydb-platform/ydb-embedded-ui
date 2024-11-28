@@ -1,8 +1,8 @@
-@import '../../../styles/mixins.scss';
+@use '../../../styles/mixins.scss';
 
 .ydb-query {
     max-height: calc(100% - 56px); // 56px - height of TenantNavigation
-    @include flex-container();
+    @include mixins.flex-container();
 
     &__tabs {
         padding: 0 20px 16px;

@@ -1,4 +1,4 @@
-@import '../../styles//mixins.scss';
+@use '../../styles//mixins.scss';
 
 .ydb-page-meta {
     &__info {
@@ -12,7 +12,7 @@
 
         color: var(--g-color-text-primary);
 
-        @include body-2-typography();
+        @include mixins.body-2-typography();
     }
 
     &__skeleton {

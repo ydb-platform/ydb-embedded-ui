@@ -1,10 +1,10 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .kv-user {
     display: inline-block;
 
     color: var(--g-color-text-primary);
-    @include body-2-typography();
+    @include mixins.body-2-typography();
 
     &__name {
         display: inline-block;

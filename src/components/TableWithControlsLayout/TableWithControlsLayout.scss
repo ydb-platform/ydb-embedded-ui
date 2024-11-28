@@ -1,4 +1,4 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .ydb-table-with-controls-layout {
     --data-table-sticky-top-offset: 62px;
@@ -14,7 +14,7 @@
         box-sizing: border-box;
         width: 100%;
 
-        @include sticky-top();
+        @include mixins.sticky-top();
     }
 
     &__controls {
@@ -23,8 +23,8 @@
         width: max-content;
         height: 62px;
 
-        @include controls();
-        @include sticky-top();
+        @include mixins.controls();
+        @include mixins.sticky-top();
     }
 
     &__table {

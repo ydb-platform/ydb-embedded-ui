@@ -1,4 +1,4 @@
-@import '../../../../../../styles/mixins.scss';
+@use '../../../../../../styles/mixins.scss';
 
 .ydb-metrics-card {
     $b: &;
@@ -18,7 +18,7 @@
         font-weight: 600;
 
         color: var(--g-color-text-link);
-        @include lead-typography();
+        @include mixins.lead-typography();
     }
 
     &__content {

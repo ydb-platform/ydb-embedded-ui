@@ -1,4 +1,4 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .ydb-error-boundary {
     display: flex;
@@ -7,7 +7,7 @@
 
     padding: 20px;
 
-    @include body-2-typography();
+    @include mixins.body-2-typography();
 
     &__illustration {
         width: 230px;
@@ -16,7 +16,7 @@
     }
     &__error-title {
         margin-top: 44px;
-        @include lead-typography();
+        @include mixins.lead-typography();
     }
     &__error-description {
         margin-top: 12px;

@@ -1,10 +1,10 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .tenant-page {
     overflow: hidden;
 
-    @include body-2-typography();
-    @include flex-container();
+    @include mixins.body-2-typography();
+    @include mixins.flex-container();
 
     &__main {
         flex-grow: 1;

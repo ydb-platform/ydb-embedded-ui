@@ -1,4 +1,4 @@
-@import '../../../styles/mixins.scss';
+@use '../../../styles/mixins.scss';
 
 .ydb-versions-grouped-node-tree {
     $item-width: 100%;
@@ -23,7 +23,7 @@
     }
 
     .ydb-tree-view {
-        @include body-2-typography();
+        @include mixins.body-2-typography();
 
         // Apply margin ignoring first element of the tree
         .ydb-tree-view {

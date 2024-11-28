@@ -1,4 +1,4 @@
-@import '../../../../../../styles/mixins.scss';
+@use '../../../../../../styles/mixins.scss';
 
 .ydb-query-result-sets-viewer {
     &__tabs {
@@ -28,7 +28,7 @@
 
         padding-left: 10px;
 
-        @include query-data-table();
+        @include mixins.query-data-table();
         & .data-table__table-wrapper {
             padding-bottom: 0;
         }

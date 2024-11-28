@@ -1,10 +1,10 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .ydb-definition-list {
-    @include flex-container();
+    @include mixins.flex-container();
 
     &__title {
-        @include info-viewer-title();
+        @include mixins.info-viewer-title();
     }
 
     &__properties-list {
