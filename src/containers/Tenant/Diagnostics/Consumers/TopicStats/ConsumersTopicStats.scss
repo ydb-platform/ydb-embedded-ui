@@ -1,7 +1,7 @@
-@import '../../../../../styles/mixins.scss';
+@use '../../../../../styles/mixins.scss';
 
 .ydb-diagnostics-consumers-topic-stats {
-    @include body-2-typography();
+    @include mixins.body-2-typography();
 
     &__wrapper {
         display: flex;

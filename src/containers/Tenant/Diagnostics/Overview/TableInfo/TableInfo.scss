@@ -1,8 +1,8 @@
-@import '../../../../../styles/mixins.scss';
+@use '../../../../../styles/mixins.scss';
 
 .ydb-diagnostics-table-info {
     &__title {
-        @include info-viewer-title();
+        @include mixins.info-viewer-title();
     }
 
     &__row {

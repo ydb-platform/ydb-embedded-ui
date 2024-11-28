@@ -1,8 +1,8 @@
-@import '../../styles/mixins';
+@use '../../styles/mixins';
 
 .node {
     overflow: auto;
-    @include flex-container();
+    @include mixins.flex-container();
 
     &__header {
         margin: 16px 20px;
@@ -12,7 +12,7 @@
         position: relative;
 
         overflow: auto;
-        @include flex-container();
+        @include mixins.flex-container();
     }
 
     &__storage {
@@ -28,7 +28,7 @@
         align-items: center;
 
         padding: 0 20px;
-        @include tabs-wrapper-styles();
+        @include mixins.tabs-wrapper-styles();
     }
 
     &__tab {

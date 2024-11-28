@@ -1,7 +1,7 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .full-node-viewer {
-    @include body-2-typography();
+    @include mixins.body-2-typography();
 
     &__common-info {
         display: flex;

@@ -1,4 +1,4 @@
-@import '../../../../../../styles/mixins.scss';
+@use '../../../../../../styles/mixins.scss';
 
 .issue-tree {
     display: flex;
@@ -23,7 +23,7 @@
     }
 
     &__inspector {
-        @include json-tree-styles();
+        @include mixins.json-tree-styles();
 
         :not(.json-inspector__leaf_expanded).json-inspector__leaf_composite:before {
             content: '';

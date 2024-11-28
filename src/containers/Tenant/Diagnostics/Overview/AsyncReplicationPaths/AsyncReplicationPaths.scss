@@ -1,7 +1,7 @@
-@import '../../../../../styles/mixins.scss';
+@use '../../../../../styles/mixins.scss';
 
 .ydb-async-replication-paths {
     &__title {
-        @include info-viewer-title();
+        @include mixins.info-viewer-title();
     }
 }

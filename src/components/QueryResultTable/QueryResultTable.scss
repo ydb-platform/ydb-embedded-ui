@@ -1,9 +1,9 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .ydb-query-result-table {
     &__cell {
         width: 100%;
-        @include cell-container;
+        @include mixins.cell-container;
     }
 
     &__message {

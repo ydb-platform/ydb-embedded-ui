@@ -1,4 +1,4 @@
-@import '../../../../../styles/mixins.scss';
+@use '../../../../../styles/mixins.scss';
 
 .healthcheck {
     $block: &;
@@ -23,7 +23,7 @@
 
         color: var(--g-color-text-link);
 
-        @include lead-typography();
+        @include mixins.lead-typography();
     }
 
     &__preview-content {

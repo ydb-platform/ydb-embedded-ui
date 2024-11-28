@@ -1,4 +1,4 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .progress-viewer {
     $block: &;
@@ -68,7 +68,7 @@
     &_size_xs {
         height: 20px;
 
-        @include body-2-typography();
+        @include mixins.body-2-typography();
     }
 
     &_size_s {

@@ -1,4 +1,4 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .tenants {
     &__format-label {
@@ -14,7 +14,7 @@
     }
 
     &__search {
-        @include search();
+        @include mixins.search();
     }
 
     &__tablets {

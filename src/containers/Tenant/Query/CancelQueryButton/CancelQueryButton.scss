@@ -1,9 +1,9 @@
-@import '../../../../styles/mixins.scss';
+@use '../../../../styles/mixins.scss';
 
 .cancel-query-button {
     &__stop-button {
         &_error {
-            @include query-buttons-animations();
+            @include mixins.query-buttons-animations();
         }
     }
 }

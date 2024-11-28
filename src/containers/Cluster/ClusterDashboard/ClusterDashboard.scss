@@ -1,4 +1,4 @@
-@import '../../../styles/mixins.scss';
+@use '../../../styles/mixins.scss';
 
 .ydb-cluster-dashboard {
     position: sticky;
@@ -7,7 +7,7 @@
     padding-top: 16px;
 
     &__error {
-        @include body-2-typography();
+        @include mixins.body-2-typography();
     }
     &__card {
         display: flex;

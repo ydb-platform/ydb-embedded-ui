@@ -1,4 +1,4 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .ydb-cluster {
     position: relative;
@@ -18,7 +18,7 @@
 
     &__title {
         font-weight: var(--g-text-header-font-weight);
-        @include header-1-typography();
+        @include mixins.header-1-typography();
     }
 
     &__title-skeleton {
@@ -36,11 +36,11 @@
         padding-left: 20px;
 
         transform: translateX(-20px);
-        @include sticky-top();
+        @include mixins.sticky-top();
     }
     &__tabs {
         display: flex;
-        @include tabs-wrapper-styles();
+        @include mixins.tabs-wrapper-styles();
     }
 
     &__sticky-wrapper {

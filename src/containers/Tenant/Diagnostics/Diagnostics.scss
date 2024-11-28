@@ -1,4 +1,4 @@
-@import '../../../styles/mixins.scss';
+@use '../../../styles/mixins.scss';
 
 .kv-tenant-diagnostics {
     display: flex;
@@ -18,7 +18,7 @@
         justify-content: space-between;
         align-items: center;
 
-        @include tabs-wrapper-styles();
+        @include mixins.tabs-wrapper-styles();
         & .g-tabs_direction_horizontal {
             box-shadow: unset;
         }

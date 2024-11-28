@@ -1,4 +1,4 @@
-@import '../../../../styles/mixins.scss';
+@use '../../../../styles/mixins.scss';
 
 .ydb-queries-history {
     overflow: auto;
@@ -6,7 +6,7 @@
     height: 100%;
     padding: 0 20px;
 
-    @include flex-container();
+    @include mixins.flex-container();
 
     .ydb-table-with-controls-layout__controls {
         height: 46px;
@@ -18,7 +18,7 @@
     }
 
     &__search {
-        @include search();
+        @include mixins.search();
     }
 
     &__table-row {

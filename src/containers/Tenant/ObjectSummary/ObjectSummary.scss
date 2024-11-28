@@ -1,4 +1,4 @@
-@import '../../../styles/mixins.scss';
+@use '../../../styles/mixins.scss';
 
 .ydb-object-summary {
     position: relative;
@@ -59,7 +59,7 @@
 
     &__sticky-top {
         z-index: 5;
-        @include sticky-top();
+        @include mixins.sticky-top();
     }
 
     &__tabs {
@@ -147,7 +147,7 @@
         }
     }
     &__overview-title {
-        @include info-viewer-title();
+        @include mixins.info-viewer-title();
     }
     &__overview-item-content {
         text-align: end;

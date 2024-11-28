@@ -1,4 +1,4 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .ydb-storage-group-page {
     position: relative;
@@ -28,7 +28,7 @@
 
     &__storage-title {
         margin-bottom: 0;
-        @include header-1-typography();
+        @include mixins.header-1-typography();
     }
 
     &__info {

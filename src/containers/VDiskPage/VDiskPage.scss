@@ -1,4 +1,4 @@
-@import '../../styles//mixins.scss';
+@use '../../styles//mixins.scss';
 
 .ydb-vdisk-page {
     position: relative;
@@ -31,6 +31,6 @@
 
     &__storage-title {
         margin-bottom: 0;
-        @include header-1-typography();
+        @include mixins.header-1-typography();
     }
 }

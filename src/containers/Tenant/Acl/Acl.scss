@@ -1,4 +1,4 @@
-@import '../../../styles/mixins.scss';
+@use '../../../styles/mixins.scss';
 
 .ydb-acl {
     width: 100%;
@@ -19,9 +19,9 @@
         margin: var(--g-spacing-3) 0 var(--g-spacing-5);
 
         font-weight: 600;
-        @include text-subheader-2();
+        @include mixins.text-subheader-2();
     }
     &__group-label {
-        @include text-subheader-2();
+        @include mixins.text-subheader-2();
     }
 }

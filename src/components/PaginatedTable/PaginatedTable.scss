@@ -1,4 +1,4 @@
-@import '../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .ydb-paginated-table {
     $block: &;
@@ -10,7 +10,7 @@
     --paginated-table-hover-color: var(--g-color-base-float);
 
     width: 100%;
-    @include body-2-typography();
+    @include mixins.body-2-typography();
 
     &__table {
         width: max-content;
@@ -46,7 +46,7 @@
 
     &__head {
         z-index: 2;
-        @include sticky-top();
+        @include mixins.sticky-top();
     }
 
     &__sort-icon-container {

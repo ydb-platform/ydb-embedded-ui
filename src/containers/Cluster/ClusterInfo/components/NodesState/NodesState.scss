@@ -1,4 +1,4 @@
-@import '../../../../../styles/mixins.scss';
+@use '../../../../../styles/mixins.scss';
 
 .ydb-nodes-state {
     display: flex;
@@ -13,5 +13,5 @@
     color: var(--entity-state-font-color);
     border-radius: var(--g-spacing-1);
     background-color: var(--entity-state-background-color);
-    @include entity-state-colors();
+    @include mixins.entity-state-colors();
 }
