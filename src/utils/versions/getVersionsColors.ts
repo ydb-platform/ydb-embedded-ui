@@ -15,12 +15,12 @@ export const COLORS = [
     '#008000', // green
     '#4169e1', // royalblue
     '#ffd700', // gold
-    '#ff8c00', // darkorange
     '#808000', // olive
     '#e9967a', // darksalmon
     '#ff1493', // deeppink
     '#00bfff', // deepskyblue
     '#da70d6', // orchid
+    '#8b4513', //saddlebrown
     '#b22222', // firebrick
 ];
 
