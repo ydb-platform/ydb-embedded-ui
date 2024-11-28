@@ -4,9 +4,9 @@ import {Illustration} from '../../components/Illustration';
 import type {RenderControls} from '../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
-import type {NodesGroupByField} from '../../types/api/nodes';
+import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import type {Column} from '../../utils/tableUtils/types';
 
@@ -21,6 +21,7 @@ interface NodesTableProps {
     searchValue: string;
     problemFilter: ProblemFilterValue;
     uptimeFilter: NodesUptimeFilterValues;
+    peerRoleFilter?: NodesPeerRole;
 
     filterGroup?: string;
     filterGroupBy?: NodesGroupByField;
@@ -38,6 +39,7 @@ export function NodesTable({
     searchValue,
     problemFilter,
     uptimeFilter,
+    peerRoleFilter,
     filterGroup,
     filterGroupBy,
     columns,
@@ -45,17 +47,27 @@ export function NodesTable({
     renderControls,
     initialEntitiesCount,
 }: NodesTableProps) {
-    const tableFilters = React.useMemo(() => {
+    const tableFilters: NodesFilters = React.useMemo(() => {
         return {
             path,
             database,
             searchValue,
             problemFilter,
             uptimeFilter,
+            peerRoleFilter,
             filterGroup,
             filterGroupBy,
         };
-    }, [path, database, searchValue, problemFilter, uptimeFilter, filterGroup, filterGroupBy]);
+    }, [
+        path,
+        database,
+        searchValue,
+        problemFilter,
+        uptimeFilter,
+        peerRoleFilter,
+        filterGroup,
+        filterGroupBy,
+    ]);
 
     const renderEmptyDataMessage = () => {
         if (problemFilter !== 'All' || uptimeFilter !== NodesUptimeFilterValues.All) {

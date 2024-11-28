@@ -1,21 +1,24 @@
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {useViewerNodesHandlerHasGroupingBySystemState} from '../../store/reducers/capabilities/hooks';
-import type {NodesGroupByField} from '../../types/api/nodes';
+import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
 import type {NodesUptimeFilterValues} from '../../utils/nodes';
 import {nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
+import {parseNodesPeerRoleFilter} from './PeerRoleFilter/utils';
 import {parseNodesGroupByParam} from './columns/constants';
 
 export function useNodesPageQueryParams(groupByParams: NodesGroupByField[] | undefined) {
     const [queryParams, setQueryParams] = useQueryParams({
         uptimeFilter: StringParam,
+        peerRole: StringParam,
         search: StringParam,
         nodesGroupBy: StringParam,
     });
 
     const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
     const searchValue = queryParams.search ?? '';
+    const peerRoleFilter = parseNodesPeerRoleFilter(queryParams.peerRole);
 
     const systemStateGroupingAvailable = useViewerNodesHandlerHasGroupingBySystemState();
     const groupByParam = parseNodesGroupByParam(
@@ -30,6 +33,9 @@ export function useNodesPageQueryParams(groupByParams: NodesGroupByField[] | und
     const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
         setQueryParams({uptimeFilter: value}, 'replaceIn');
     };
+    const handlePeerRoleFilterChange = (value: NodesPeerRole) => {
+        setQueryParams({peerRole: value}, 'replaceIn');
+    };
     const handleGroupByParamChange = (value: string) => {
         setQueryParams({nodesGroupBy: value}, 'replaceIn');
     };
@@ -37,10 +43,12 @@ export function useNodesPageQueryParams(groupByParams: NodesGroupByField[] | und
     return {
         uptimeFilter,
         searchValue,
+        peerRoleFilter,
         groupByParam,
 
         handleSearchQueryChange,
         handleUptimeFilterChange,
+        handlePeerRoleFilterChange,
         handleGroupByParamChange,
     };
 }

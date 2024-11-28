@@ -42,6 +42,8 @@ export interface NodesProps {
     parentRef: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
 
+    withPeerRoleFilter?: boolean;
+
     columns?: Column<NodesPreparedEntity>[];
     defaultColumnsIds?: NodesColumnId[];
     requiredColumnsIds?: NodesColumnId[];
@@ -54,6 +56,7 @@ export function Nodes({
     database,
     parentRef,
     additionalNodesProps,
+    withPeerRoleFilter,
     columns = getNodesColumns({database, getNodeRef: additionalNodesProps?.getNodeRef}),
     defaultColumnsIds = DEFAULT_NODES_COLUMNS,
     requiredColumnsIds = REQUIRED_NODES_COLUMNS,
@@ -92,6 +95,7 @@ export function Nodes({
                     path={path}
                     database={database}
                     parentRef={parentRef}
+                    withPeerRoleFilter={withPeerRoleFilter}
                     columns={columns}
                     defaultColumnsIds={defaultColumnsIds}
                     requiredColumnsIds={requiredColumnsIds}
@@ -106,6 +110,7 @@ export function Nodes({
                 path={path}
                 database={database}
                 parentRef={parentRef}
+                withPeerRoleFilter={withPeerRoleFilter}
                 columns={columns}
                 defaultColumnsIds={defaultColumnsIds}
                 requiredColumnsIds={requiredColumnsIds}
@@ -123,6 +128,8 @@ interface NodesComponentProps {
     database?: string;
     parentRef: React.RefObject<HTMLElement>;
 
+    withPeerRoleFilter?: boolean;
+
     columns: Column<NodesPreparedEntity>[];
     defaultColumnsIds: NodesColumnId[];
     requiredColumnsIds: NodesColumnId[];
@@ -134,13 +141,14 @@ function NodesComponent({
     path,
     database,
     parentRef,
+    withPeerRoleFilter,
     columns,
     defaultColumnsIds,
     requiredColumnsIds,
     selectedColumnsKey,
     groupByParams,
 }: NodesComponentProps) {
-    const {searchValue, uptimeFilter} = useNodesPageQueryParams(groupByParams);
+    const {searchValue, uptimeFilter, peerRoleFilter} = useNodesPageQueryParams(groupByParams);
     const {problemFilter} = useProblemFilter();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
@@ -157,6 +165,7 @@ function NodesComponent({
             <NodesControls
                 withGroupBySelect={viewerNodesHandlerHasGrouping}
                 groupByParams={groupByParams}
+                withPeerRoleFilter={withPeerRoleFilter}
                 columnsToSelect={columnsToSelect}
                 handleSelectedColumnsUpdate={setColumns}
                 entitiesCountCurrent={foundEntities}
@@ -173,6 +182,7 @@ function NodesComponent({
             searchValue={searchValue}
             problemFilter={problemFilter}
             uptimeFilter={uptimeFilter}
+            peerRoleFilter={peerRoleFilter}
             columns={columnsToShow}
             parentRef={parentRef}
             renderControls={renderControls}
@@ -184,13 +194,14 @@ function GroupedNodesComponent({
     path,
     database,
     parentRef,
+    withPeerRoleFilter,
     columns,
     defaultColumnsIds,
     requiredColumnsIds,
     selectedColumnsKey,
     groupByParams,
 }: NodesComponentProps) {
-    const {searchValue, groupByParam} = useNodesPageQueryParams(groupByParams);
+    const {searchValue, peerRoleFilter, groupByParam} = useNodesPageQueryParams(groupByParams);
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
@@ -206,6 +217,7 @@ function GroupedNodesComponent({
             path,
             database,
             filter: searchValue,
+            filter_peer_role: peerRoleFilter,
             group: groupByParam,
             limit: 0,
         },
@@ -228,6 +240,7 @@ function GroupedNodesComponent({
             <NodesControls
                 withGroupBySelect
                 groupByParams={groupByParams}
+                withPeerRoleFilter={withPeerRoleFilter}
                 columnsToSelect={columnsToSelect}
                 handleSelectedColumnsUpdate={setColumns}
                 entitiesCountCurrent={found}
@@ -257,6 +270,7 @@ function GroupedNodesComponent({
                             searchValue={searchValue}
                             problemFilter={'All'}
                             uptimeFilter={NodesUptimeFilterValues.All}
+                            peerRoleFilter={peerRoleFilter}
                             filterGroup={name}
                             filterGroupBy={groupByParam}
                             initialEntitiesCount={count}

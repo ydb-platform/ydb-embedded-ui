@@ -7,9 +7,13 @@ import {EntitiesCount} from '../../../components/EntitiesCount';
 import {ProblemFilter} from '../../../components/ProblemFilter';
 import {Search} from '../../../components/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
-import {useViewerNodesHandlerHasGroupingBySystemState} from '../../../store/reducers/capabilities/hooks';
+import {
+    useViewerNodesHandlerHasGroupingBySystemState,
+    useViewerNodesHandlerHasNetworkStats,
+} from '../../../store/reducers/capabilities/hooks';
 import {useProblemFilter} from '../../../store/reducers/settings/hooks';
 import type {NodesGroupByField} from '../../../types/api/nodes';
+import {PeerRoleFilter} from '../PeerRoleFilter/PeerRoleFilter';
 import {getNodesGroupByOptions} from '../columns/constants';
 import i18n from '../i18n';
 import {b} from '../shared';
@@ -18,6 +22,8 @@ import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
 interface NodesControlsProps {
     withGroupBySelect?: boolean;
     groupByParams: NodesGroupByField[] | undefined;
+
+    withPeerRoleFilter?: boolean;
 
     columnsToSelect: TableColumnSetupItem[];
     handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
@@ -31,6 +37,8 @@ export function NodesControls({
     withGroupBySelect,
     groupByParams = [],
 
+    withPeerRoleFilter,
+
     columnsToSelect,
     handleSelectedColumnsUpdate,
 
@@ -41,16 +49,21 @@ export function NodesControls({
     const {
         searchValue,
         uptimeFilter,
+        peerRoleFilter,
         groupByParam,
 
         handleSearchQueryChange,
         handleUptimeFilterChange,
+        handlePeerRoleFilterChange,
         handleGroupByParamChange,
     } = useNodesPageQueryParams(groupByParams);
     const {problemFilter, handleProblemFilterChange} = useProblemFilter();
 
     const systemStateGroupingAvailable = useViewerNodesHandlerHasGroupingBySystemState();
     const groupByoptions = getNodesGroupByOptions(groupByParams, systemStateGroupingAvailable);
+
+    const networStatsAvailable = useViewerNodesHandlerHasNetworkStats();
+    const shouldDisplayPeerRoleFilter = withPeerRoleFilter && networStatsAvailable;
 
     const handleGroupBySelectUpdate = (value: string[]) => {
         handleGroupByParamChange(value[0]);
@@ -70,6 +83,12 @@ export function NodesControls({
             {withGroupBySelect ? null : (
                 <UptimeFilter value={uptimeFilter} onChange={handleUptimeFilterChange} />
             )}
+            {shouldDisplayPeerRoleFilter ? (
+                <React.Fragment>
+                    <Text variant="body-2">{i18n('controls_peer-role-label')}</Text>
+                    <PeerRoleFilter value={peerRoleFilter} onChange={handlePeerRoleFilterChange} />
+                </React.Fragment>
+            ) : null}
             <TableColumnSetup
                 popupWidth={200}
                 items={columnsToSelect}

@@ -41,6 +41,7 @@ export function NetworkWrapper({
                     path={path}
                     database={database}
                     parentRef={parentRef}
+                    withPeerRoleFilter
                     additionalNodesProps={additionalNodesProps}
                     columns={getNetworkTableNodesColumns({
                         database: database,
