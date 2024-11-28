@@ -42,6 +42,7 @@ import {
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
 import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
+import {inlineCompletionProviderInstance} from '../../../../utils/monaco/yql/ydb.inlineCompletionProvider';
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
@@ -215,6 +216,23 @@ export default function QueryEditor(props: QueryEditorProps) {
                 contribution.insert(input);
             }
         });
+
+        if (window.api.codeAssistant) {
+            monaco.editor.registerCommand('acceptCodeAssistCompletion', (_accessor, ...args) => {
+                const data = args[0] ?? {};
+                if (!data || typeof data !== 'object') {
+                    return;
+                }
+                const {requestId, suggestionText} = data;
+                if (requestId && suggestionText) {
+                    inlineCompletionProviderInstance.handleAccept({requestId, suggestionText});
+                }
+            });
+
+            monaco.editor.registerCommand('declineCodeAssistCompletion', () => {
+                inlineCompletionProviderInstance.commandDiscard();
+            });
+        }
         initResizeHandler(editor);
         initUserPrompt(editor, getLastQueryText);
         editor.focus();

@@ -46,6 +46,7 @@ function _configureStore<
 export const webVersion = window.web_version;
 export const customBackend = window.custom_backend;
 export const metaBackend = window.meta_backend;
+export const codeAssistantBackend = window.code_assistant_backend;
 
 const isSingleClusterMode = `${metaBackend}` === 'undefined';
 
