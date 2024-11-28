@@ -12,6 +12,7 @@ export const hashCode = (s: string) => {
 // TODO: colors used in charts as well, need to move to constants
 // 11 distinct colors from https://mokole.com/palette.html
 export const COLORS = [
+    '#008000', // green
     '#4169e1', // royalblue
     '#ffd700', // gold
     '#ff8c00', // darkorange
@@ -20,11 +21,10 @@ export const COLORS = [
     '#ff1493', // deeppink
     '#00bfff', // deepskyblue
     '#da70d6', // orchid
-    '#3cb371', // mediumseagreen
     '#b22222', // firebrick
 ];
 
-export const DEFAULT_COLOR = '#008000'; // green
+export const DEFAULT_COLOR = '#3cb371'; // mediumseagreen
 
 export const getVersionsMap = (versions: string[], initialMap: VersionsMap = new Map()) => {
     versions.forEach((version) => {
