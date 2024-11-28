@@ -14,7 +14,7 @@ export const overviewApi = api.injectEndpoints({
                 try {
                     const data = await Promise.all(
                         paths.map((p) =>
-                            window.api.getDescribe(
+                            window.api.viewer.getDescribe(
                                 {
                                     path: p,
                                     database,
@@ -37,7 +37,7 @@ export const overviewApi = api.injectEndpoints({
                 {signal},
             ) => {
                 try {
-                    const data = await window.api.getDescribe(
+                    const data = await window.api.viewer.getDescribe(
                         {
                             path,
                             database,

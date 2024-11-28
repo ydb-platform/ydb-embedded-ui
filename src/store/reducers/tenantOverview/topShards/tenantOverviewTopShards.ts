@@ -26,7 +26,7 @@ export const topShardsApi = api.injectEndpoints({
         getTopShards: builder.query({
             queryFn: async ({database, path = ''}: {database: string; path?: string}, {signal}) => {
                 try {
-                    const response = await window.api.sendQuery(
+                    const response = await window.api.viewer.sendQuery(
                         {
                             query: createShardQuery(path, database),
                             database,

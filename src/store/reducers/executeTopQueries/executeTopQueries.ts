@@ -57,7 +57,7 @@ export const topQueriesApi = api.injectEndpoints({
                 };
 
                 try {
-                    const response = await window.api.sendQuery(
+                    const response = await window.api.viewer.sendQuery(
                         {
                             query: getQueryText(database, preparedFilters),
                             database,
@@ -110,7 +110,7 @@ export const topQueriesApi = api.injectEndpoints({
                         SessionStartAt
                     LIMIT 100`;
 
-                    const response = await window.api.sendQuery(
+                    const response = await window.api.viewer.sendQuery(
                         {
                             query: queryText,
                             database,

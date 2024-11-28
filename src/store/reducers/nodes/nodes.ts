@@ -8,7 +8,7 @@ export const nodesApi = api.injectEndpoints({
         getNodes: builder.query({
             queryFn: async (params: NodesRequestParams, {signal}) => {
                 try {
-                    const data = await window.api.getNodes(
+                    const data = await window.api.viewer.getNodes(
                         {
                             type: 'any',
                             storage: false,

@@ -18,7 +18,7 @@ export const topTablesApi = api.injectEndpoints({
         getTopTables: builder.query({
             queryFn: async ({path}: {path: string}, {signal}) => {
                 try {
-                    const response = await window.api.sendQuery(
+                    const response = await window.api.viewer.sendQuery(
                         {
                             query: getQueryText(path),
                             database: path,

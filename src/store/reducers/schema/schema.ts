@@ -35,7 +35,10 @@ export const schemaApi = api.injectEndpoints({
         createDirectory: builder.mutation<unknown, {database: string; path: string}>({
             queryFn: async ({database, path}, {signal}) => {
                 try {
-                    const data = await window.api.createSchemaDirectory({database, path}, {signal});
+                    const data = await window.api.scheme.createSchemaDirectory(
+                        {database, path},
+                        {signal},
+                    );
                     return {data};
                 } catch (error) {
                     return {error};
@@ -48,7 +51,7 @@ export const schemaApi = api.injectEndpoints({
         >({
             queryFn: async ({path, database}, {signal}) => {
                 try {
-                    const data = await window.api.getSchema({path, database}, {signal});
+                    const data = await window.api.viewer.getSchema({path, database}, {signal});
                     if (!data) {
                         return {error: new Error('Schema is not available')};
                     }

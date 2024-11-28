@@ -41,5 +41,5 @@ interface Window {
     userSettings?: import('../services/settings').SettingsObject;
     systemSettings?: import('../services/settings').SettingsObject;
 
-    api: import('../services/api').YdbEmbeddedAPI;
+    api: import('../services/api/index').YdbEmbeddedAPI;
 }

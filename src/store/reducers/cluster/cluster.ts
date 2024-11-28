@@ -67,7 +67,9 @@ export const clusterApi = api.injectEndpoints({
         >({
             queryFn: async (clusterName, {signal}) => {
                 try {
-                    const clusterData = await window.api.getClusterInfo(clusterName, {signal});
+                    const clusterData = window.api.meta
+                        ? await window.api.meta.getClusterInfo(clusterName, {signal})
+                        : await window.api.viewer.getClusterInfo(clusterName, {signal});
 
                     const clusterRoot = clusterData.Domain;
                     // Without domain we cannot get stats from system tables
@@ -90,7 +92,7 @@ export const clusterApi = api.injectEndpoints({
                         // Normally query request should be fulfilled within 300-400ms even on very big clusters
                         // Table with stats is supposed to be very small (less than 10 rows)
                         // So we batch this request with cluster request to prevent possible layout shifts, if data is missing
-                        const groupsStatsResponse = await window.api.sendQuery({
+                        const groupsStatsResponse = await window.api.viewer.sendQuery({
                             query: query,
                             database: clusterRoot,
                             action: 'execute-scan',
@@ -118,7 +120,10 @@ export const clusterApi = api.injectEndpoints({
         getClusterBaseInfo: builder.query({
             queryFn: async (clusterName: string, {signal}) => {
                 try {
-                    const data = await window.api.getClusterBaseInfo(clusterName, {signal});
+                    if (!window.api.meta) {
+                        throw new Error('Method is not implemented.');
+                    }
+                    const data = await window.api.meta.getClusterBaseInfo(clusterName, {signal});
                     return {data};
                 } catch (error) {
                     return {error};

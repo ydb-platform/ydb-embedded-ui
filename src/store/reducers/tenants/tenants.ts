@@ -27,7 +27,9 @@ export const tenantsApi = api.injectEndpoints({
         getTenantsInfo: build.query({
             queryFn: async ({clusterName}: {clusterName?: string}, {signal, getState}) => {
                 try {
-                    const response = await window.api.getTenants(clusterName, {signal});
+                    const response = window.api.meta
+                        ? await window.api.meta.getTenants(clusterName, {signal})
+                        : await window.api.viewer.getTenants(clusterName, {signal});
                     let data: PreparedTenant[];
                     if (Array.isArray(response.TenantInfo)) {
                         const {singleClusterMode} = getState() as RootState;

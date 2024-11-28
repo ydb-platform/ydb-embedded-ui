@@ -220,7 +220,7 @@ export async function generateColumnsSuggestion(
     // remove duplicates if any
     const filteredTableNames = Array.from(new Set(normalizedTableNames));
 
-    const autocompleteResponse = await window.api.autocomplete({
+    const autocompleteResponse = await window.api.viewer.autocomplete({
         database,
         table: filteredTableNames,
         limit: 1000,
@@ -345,7 +345,11 @@ export async function generateEntitiesSuggestion(
     prefix?: string,
 ): Promise<monaco.languages.CompletionItem[]> {
     const normalizedPrefix = normalizeEntityPrefix(prefix, database);
-    const data = await window.api.autocomplete({database, prefix: normalizedPrefix, limit: 1000});
+    const data = await window.api.viewer.autocomplete({
+        database,
+        prefix: normalizedPrefix,
+        limit: 1000,
+    });
     const withBackticks = prefix?.startsWith('`');
     if (data.Success) {
         const filteredEntities = filterAutocompleteEntities(data.Result.Entities, suggestEntities);

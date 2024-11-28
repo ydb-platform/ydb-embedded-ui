@@ -12,7 +12,7 @@ export const topicApi = api.injectEndpoints({
         getTopic: build.query({
             queryFn: async (params: {path: string; database: string}) => {
                 try {
-                    const data = await window.api.getTopic(params);
+                    const data = await window.api.viewer.getTopic(params);
                     // On older version it can return HTML page of Developer UI with an error
                     if (typeof data !== 'object') {
                         return {error: {}};

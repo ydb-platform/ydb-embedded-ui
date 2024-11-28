@@ -32,8 +32,12 @@ export const clustersApi = api.injectEndpoints({
         getClustersList: builder.query({
             queryFn: async (_, {signal}) => {
                 try {
-                    const data = await window.api.getClustersList(undefined, {signal});
-                    return {data: prepareClustersData(data)};
+                    if (window.api.meta) {
+                        const data = await window.api.meta.getClustersList(undefined, {signal});
+                        return {data: prepareClustersData(data)};
+                    } else {
+                        throw new Error('Method is not implemented.');
+                    }
                 } catch (error) {
                     return {error};
                 }

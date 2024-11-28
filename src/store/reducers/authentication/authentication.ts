@@ -52,7 +52,7 @@ export const authenticationApi = api.injectEndpoints({
         whoami: build.query({
             queryFn: async (_, {dispatch}) => {
                 try {
-                    const data = await window.api.whoami();
+                    const data = await window.api.viewer.whoami();
                     dispatch(setUser(data));
                     return {data};
                 } catch (error) {
@@ -67,7 +67,7 @@ export const authenticationApi = api.injectEndpoints({
         authenticate: build.mutation({
             queryFn: async (params: {user: string; password: string}, {dispatch}) => {
                 try {
-                    const data = await window.api.authenticate(params);
+                    const data = await window.api.auth.authenticate(params);
                     dispatch(setIsAuthenticated(true));
                     return {data};
                 } catch (error) {
@@ -79,7 +79,7 @@ export const authenticationApi = api.injectEndpoints({
         logout: build.mutation({
             queryFn: async (_, {dispatch}) => {
                 try {
-                    const data = await window.api.logout();
+                    const data = await window.api.auth.logout();
                     dispatch(setIsAuthenticated(false));
                     return {data};
                 } catch (error) {

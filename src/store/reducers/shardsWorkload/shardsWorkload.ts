@@ -131,7 +131,7 @@ export const shardApi = api.injectEndpoints({
                 {signal},
             ) => {
                 try {
-                    const response = await window.api.sendQuery(
+                    const response = await window.api.viewer.sendQuery(
                         {
                             query:
                                 filters?.mode === EShardsWorkloadMode.Immediate

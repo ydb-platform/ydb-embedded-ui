@@ -90,7 +90,7 @@ export function PDiskPage() {
 
     const handleRestart = async (isRetry?: boolean) => {
         if (pDiskParamsDefined) {
-            const response = await window.api[
+            const response = await window.api.pdisk[
                 newDiskApiAvailable ? 'restartPDisk' : 'restartPDiskOld'
             ]({nodeId, pDiskId, force: isRetry});
 
@@ -109,7 +109,7 @@ export function PDiskPage() {
         isRetry?: boolean,
     ) => {
         if (pDiskParamsDefined) {
-            const response = await window.api.changePDiskStatus({
+            const response = await window.api.pdisk.changePDiskStatus({
                 nodeId,
                 pDiskId,
                 force: isRetry,
