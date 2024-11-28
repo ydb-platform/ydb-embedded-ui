@@ -78,7 +78,7 @@ function Fullscreen({children, className}: FullscreenProps) {
                     >
                         <Icon data={disableFullscreenIcon} />
                     </Button>
-                    {children}
+                    <div className={b('content')}>{children}</div>
                 </div>
             </Portal>
         </div>
