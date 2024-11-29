@@ -36,7 +36,7 @@ body,
 }
 
 .g-root {
-    --ydb-data-table-color-hover: var(--g-color-base-float);
+    --ydb-data-table-color-hover: var(--g-color-base-simple-hover-solid);
 
     // Colors for tablets, status icons and progress bars
     --ydb-color-status-grey: var(--g-color-base-neutral-heavy);
