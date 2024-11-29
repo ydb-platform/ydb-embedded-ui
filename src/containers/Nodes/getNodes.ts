@@ -27,8 +27,16 @@ export const getNodes: FetchData<
     } = params;
 
     const {sortOrder, columnId} = sortParams ?? {};
-    const {path, database, searchValue, problemFilter, uptimeFilter, filterGroup, filterGroupBy} =
-        filters ?? {};
+    const {
+        path,
+        database,
+        searchValue,
+        problemFilter,
+        uptimeFilter,
+        peerRoleFilter,
+        filterGroup,
+        filterGroupBy,
+    } = filters ?? {};
 
     const sortField = getNodesColumnSortField(columnId);
     const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
@@ -47,6 +55,7 @@ export const getNodes: FetchData<
         filter: searchValue,
         problems_only: getProblemParamValue(problemFilter),
         uptime: getUptimeParamValue(uptimeFilter),
+        filter_peer_role: peerRoleFilter,
         filter_group: filterGroup,
         filter_group_by: filterGroupBy,
         fieldsRequired: dataFieldsRequired,

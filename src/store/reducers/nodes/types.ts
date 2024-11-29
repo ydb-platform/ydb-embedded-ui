@@ -3,6 +3,7 @@ import type {OrderType} from '@gravity-ui/react-data-table';
 import type {EFlag} from '../../../types/api/enums';
 import type {
     NodesGroupByField,
+    NodesPeerRole,
     NodesSortValue,
     TEndpoint,
     TPoolStats,
@@ -58,6 +59,7 @@ export interface NodesFilters {
     searchValue: string;
     problemFilter: ProblemFilterValue;
     uptimeFilter: NodesUptimeFilterValues;
+    peerRoleFilter?: NodesPeerRole;
 
     path?: string;
     database?: string;

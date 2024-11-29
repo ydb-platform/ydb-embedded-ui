@@ -6,5 +6,12 @@
   "no-nodes-groups": "No nodes groups",
 
   "controls_search-placeholder": "Host name",
-  "controls_group-by-placeholder": "Group by:"
+  "controls_group-by-placeholder": "Group by:",
+
+  "controls_peer-role-label": "Peer role:",
+
+  "database": "database",
+  "static": "static",
+  "other": "other",
+  "any": "any"
 }

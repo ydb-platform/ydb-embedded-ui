@@ -233,6 +233,9 @@ type NodesType =
     | 'storage' // v6
     | 'any';
 
+// v14
+export type NodesPeerRole = 'database' | 'static' | 'other' | 'any';
+
 type NodesWithFilter = 'space' | 'missing' | 'all';
 
 // v6
@@ -330,6 +333,7 @@ export interface NodesRequestParams {
     problems_only?: boolean;
     /** filter nodes by id or host */
     filter?: string;
+    filter_peer_role?: NodesPeerRole; // v14
 
     sort?: NodesSort;
 
