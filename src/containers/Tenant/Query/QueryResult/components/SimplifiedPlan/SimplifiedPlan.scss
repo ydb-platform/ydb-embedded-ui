@@ -15,7 +15,7 @@
         border-collapse: collapse;
         tr {
             &:hover {
-                background-color: var(--g-color-base-generic-hover) !important;
+                background-color: var(--g-color-base-simple-hover) !important;
             }
         }
         tr:nth-of-type(2n + 1) {
