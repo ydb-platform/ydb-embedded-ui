@@ -1,4 +1,4 @@
-import type {TelemetryOpenTabs} from '../../types/api/codeAssistant';
+import type {TelemetryOpenTabs} from '../../services/codeCompletion/types';
 
 import {api} from './api';
 

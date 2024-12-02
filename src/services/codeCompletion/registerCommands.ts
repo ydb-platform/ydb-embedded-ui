@@ -3,7 +3,6 @@ import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import type {ICodeCompletionService} from './types';
 
 export function registerCompletionCommands(
-    editor: monaco.editor.IStandaloneCodeEditor,
     monacoInstance: typeof monaco,
     completionService: ICodeCompletionService,
 ) {

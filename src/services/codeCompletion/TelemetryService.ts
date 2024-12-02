@@ -1,6 +1,4 @@
-import type {DiscardReason, TelemetryEvent} from '../../types/api/codeAssistant';
-
-import type {ITelemetryService} from './types';
+import type {DiscardReason, ITelemetryService, TelemetryEvent} from './types';
 
 export class TelemetryService implements ITelemetryService {
     private readonly sendTelemetry: (data: TelemetryEvent) => Promise<unknown>;

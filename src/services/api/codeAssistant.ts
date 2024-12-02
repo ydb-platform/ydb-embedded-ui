@@ -4,7 +4,7 @@ import type {
     Suggestions,
     TelemetryEvent,
     TelemetryOpenTabs,
-} from '../../types/api/codeAssistant';
+} from '../codeCompletion/types';
 
 import {BaseYdbAPI} from './base';
 

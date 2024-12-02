@@ -1,9 +1,8 @@
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
-import type {DiscardReason} from '../../types/api/codeAssistant';
-
 import {getPromptFileContent} from './promptContent';
 import type {
+    DiscardReason,
     EnrichedCompletion,
     ICodeCompletionAPI,
     ICodeCompletionService,

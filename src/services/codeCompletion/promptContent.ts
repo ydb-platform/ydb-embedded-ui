@@ -1,7 +1,7 @@
 import type Monaco from 'monaco-editor';
 import {v4} from 'uuid';
 
-import type {PromptFile} from '../../types/api/codeAssistant';
+import type {PromptFile} from './types';
 
 const limitBeforeCursor = 8_000;
 const limitAfterCursor = 1_000;
