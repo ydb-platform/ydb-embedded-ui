@@ -12,7 +12,7 @@
 * **Network:** add peer role filter ([#1724](https://github.com/ydb-platform/ydb-embedded-ui/issues/1724)) ([1285049](https://github.com/ydb-platform/ydb-embedded-ui/commit/1285049d7101dcac432b9f9c934d58e7b074faa7))
 * **Preview:** add rows count and truncated flag ([#1715](https://github.com/ydb-platform/ydb-embedded-ui/issues/1715)) ([6e1e701](https://github.com/ydb-platform/ydb-embedded-ui/commit/6e1e701b975b6fd3582bf7a6e30b2c97fb7d8235))
 * **QueryResultTable:** display row number ([#1714](https://github.com/ydb-platform/ydb-embedded-ui/issues/1714)) ([eba72a0](https://github.com/ydb-platform/ydb-embedded-ui/commit/eba72a0a18605377f06e485f54d8072255900915))
-* refactor API structure ([e050bd7](https://github.com/ydb-platform/ydb-embedded-ui/commit/e050bd7e93355de1adf50b78c1c50dfcf78794e1))
+* refactor API structure ([#1718](https://github.com/ydb-platform/ydb-embedded-ui/issues/1718)) ([e050bd7](https://github.com/ydb-platform/ydb-embedded-ui/commit/e050bd7e93355de1adf50b78c1c50dfcf78794e1))
 * **Versions:** use columns from Nodes table ([#1713](https://github.com/ydb-platform/ydb-embedded-ui/issues/1713)) ([9b3f779](https://github.com/ydb-platform/ydb-embedded-ui/commit/9b3f779ce41579af1dc1420c32ab8d10d6ab7b7f))
 
 
