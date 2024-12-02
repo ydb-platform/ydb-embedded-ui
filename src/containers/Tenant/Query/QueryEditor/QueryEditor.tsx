@@ -6,6 +6,7 @@ import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 import {v4 as uuidv4} from 'uuid';
 
+import {CodeAssistantTelemetry} from '../../../../components/CodeAssistantTelemetry/CodeAssistantTelemetry';
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import SplitPane from '../../../../components/SplitPane';
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
@@ -341,6 +342,7 @@ export default function QueryEditor(props: QueryEditorProps) {
 
     return (
         <div className={b()}>
+            {window.api.codeAssistant && <CodeAssistantTelemetry />}
             <SplitPane
                 direction="vertical"
                 defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
