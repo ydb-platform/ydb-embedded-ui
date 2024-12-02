@@ -1,5 +1,31 @@
 # Changelog
 
+## [7.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.37.2...v7.0.0) (2024-12-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* `window.api` was previously a flat `YdbEmbeddedAPI` object. It has been refactored into multiple distributed `AxiosWrapper` instances. Each endpoint is now handled by a dedicated wrapper instance, improving modularity and maintainability. Developers should update their integrations to use the new structure. For example: Replace `window.api.getTenants` with `window.api.viewer.getTenants`.
+
+### Features
+
+* **Network:** add peer role filter ([#1724](https://github.com/ydb-platform/ydb-embedded-ui/issues/1724)) ([1285049](https://github.com/ydb-platform/ydb-embedded-ui/commit/1285049d7101dcac432b9f9c934d58e7b074faa7))
+* **Preview:** add rows count and truncated flag ([#1715](https://github.com/ydb-platform/ydb-embedded-ui/issues/1715)) ([6e1e701](https://github.com/ydb-platform/ydb-embedded-ui/commit/6e1e701b975b6fd3582bf7a6e30b2c97fb7d8235))
+* **QueryResultTable:** display row number ([#1714](https://github.com/ydb-platform/ydb-embedded-ui/issues/1714)) ([eba72a0](https://github.com/ydb-platform/ydb-embedded-ui/commit/eba72a0a18605377f06e485f54d8072255900915))
+* refactor API structure ([e050bd7](https://github.com/ydb-platform/ydb-embedded-ui/commit/e050bd7e93355de1adf50b78c1c50dfcf78794e1))
+* **Versions:** use columns from Nodes table ([#1713](https://github.com/ydb-platform/ydb-embedded-ui/issues/1713)) ([9b3f779](https://github.com/ydb-platform/ydb-embedded-ui/commit/9b3f779ce41579af1dc1420c32ab8d10d6ab7b7f))
+
+
+### Bug Fixes
+
+* dependabot found vulnerabilities ([#1720](https://github.com/ydb-platform/ydb-embedded-ui/issues/1720)) ([0faaf87](https://github.com/ydb-platform/ydb-embedded-ui/commit/0faaf87126728cc01a2961f901020ec07f2402ad))
+* deploy test report error ([#1703](https://github.com/ydb-platform/ydb-embedded-ui/issues/1703)) ([efb0b9c](https://github.com/ydb-platform/ydb-embedded-ui/commit/efb0b9c65bb2b188f4aef8104c9c5ebf7e25143f))
+* **FullScreen:** ensure the content is scrollable ([#1723](https://github.com/ydb-platform/ydb-embedded-ui/issues/1723)) ([f6e79f2](https://github.com/ydb-platform/ydb-embedded-ui/commit/f6e79f29fadf1b689dfc1e089cd122bde74e653a))
+* **QueryResultTable:** optimise rendering ([#1697](https://github.com/ydb-platform/ydb-embedded-ui/issues/1697)) ([d93e866](https://github.com/ydb-platform/ydb-embedded-ui/commit/d93e866d8333cdf2fa0f3b3e2a16065f1cc4358a))
+* **styles:** tune hover for tables ([#1710](https://github.com/ydb-platform/ydb-embedded-ui/issues/1710)) ([e86c845](https://github.com/ydb-platform/ydb-embedded-ui/commit/e86c8454ffc035786bdf7247ead77d80e4f3241f))
+* **TopQueries:** add queryHashColumns ([#1701](https://github.com/ydb-platform/ydb-embedded-ui/issues/1701)) ([278f622](https://github.com/ydb-platform/ydb-embedded-ui/commit/278f622ad2886632bc6c0f42c366979ec7f4252f))
+* **Versions:** tune default color ([#1719](https://github.com/ydb-platform/ydb-embedded-ui/issues/1719)) ([97c66b8](https://github.com/ydb-platform/ydb-embedded-ui/commit/97c66b87799695add99514f7173aedd1ef873077))
+
 ## [6.37.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.37.1...v6.37.2) (2024-11-26)
 
 
