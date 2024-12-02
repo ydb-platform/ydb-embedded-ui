@@ -21,17 +21,24 @@ The code completion system consists of several key components working together:
    - Records acceptance, decline, and ignore events
    - Captures timing and interaction data
 
-3. **Factory** (`factory.ts`)
+3. **PromptContent** (`promptContent.ts`)
+
+   - Handles extraction of code context for suggestions
+   - Manages text fragments before and after cursor
+   - Implements text length limits and cursor positioning
+   - Creates structured prompt data for API requests
+
+4. **Factory** (`factory.ts`)
 
    - Creates and configures the completion provider
    - Wires together the completion and telemetry services
 
-4. **Command Registration** (`registerCommands.ts`)
+5. **Command Registration** (`registerCommands.ts`)
 
    - Registers Monaco editor commands for completion actions
    - Handles accept/decline completion commands
 
-5. **CodeAssistantTelemetry** (`CodeAssistantTelemetry.tsx`)
+6. **CodeAssistantTelemetry** (`CodeAssistantTelemetry.tsx`)
    - Optional context caching mechanism
    - Tracks query history as virtual "open tabs"
    - Sends historical queries to the backend for context-aware suggestions
@@ -60,21 +67,28 @@ The code completion system consists of several key components working together:
    -> sendOpenTabs -> Backend Context Cache
    ```
 
-2. **Suggestion Generation**
+2. **Prompt Generation**
 
    ```
-   Editor Change -> CodeCompletionService.provideInlineCompletions
+   Editor Change -> PromptContent.getPromptFileContent
+   -> Text Fragments with Cursor Position -> API Request
+   ```
+
+3. **Suggestion Generation**
+
+   ```
+   Prompt Data -> CodeCompletionService.provideInlineCompletions
    -> API Request (with cached context) -> Suggestions Returned -> Monaco Display
    ```
 
-3. **Suggestion Acceptance**
+4. **Suggestion Acceptance**
 
    ```
    User Accept -> handleAccept -> TelemetryService.sendAcceptTelemetry
    -> API Telemetry Event
    ```
 
-4. **Suggestion Rejection**
+5. **Suggestion Rejection**
    ```
    User Decline -> commandDiscard -> TelemetryService.sendDeclineTelemetry
    -> API Telemetry Event
@@ -82,26 +96,33 @@ The code completion system consists of several key components working together:
 
 ## Key Features
 
-1. **Context Caching**
+1. **Prompt Generation**
+
+   - Extracts relevant code context around cursor
+   - Implements smart text truncation (8000 chars before, 1000 after cursor)
+   - Maintains cursor position information
+   - Creates structured prompt format for API
+
+2. **Context Caching**
 
    - Maintains history of queries as virtual open tabs
    - Each query is assigned a unique ID and treated as a `.yql` file
    - Provides historical context to improve suggestion relevance
    - Optional feature that can be enabled/disabled
 
-2. **Suggestion Caching**
+3. **Suggestion Caching**
 
    - Caches suggestions to reduce API calls
    - Tracks suggestion display count
    - Manages suggestion lifecycle
 
-3. **Telemetry**
+4. **Telemetry**
 
    - Tracks suggestion acceptance rate
    - Records user interaction patterns
    - Monitors suggestion quality
 
-4. **Command Integration**
+5. **Command Integration**
    - Keyboard shortcuts for completion actions
    - Context menu integration
    - Custom commands for completion workflow
@@ -114,6 +135,22 @@ The completion service expects an API implementation with these methods:
 interface ICodeCompletionAPI {
   getCodeAssistSuggestions(data: PromptFile[]): Promise<Suggestions>;
   sendCodeAssistTelemetry(data: TelemetryEvent): Promise<unknown>;
+}
+```
+
+## Prompt Format
+
+The prompt generation creates structured data in this format:
+
+```typescript
+interface PromptFile {
+  Fragments: {
+    Text: string;
+    Start: {Ln: number; Col: number};
+    End: {Ln: number; Col: number};
+  }[];
+  Cursor: {Ln: number; Col: number};
+  Path: string;
 }
 ```
 
@@ -164,25 +201,31 @@ registerCompletionCommands(editor, monaco, completionService);
 
 ## Best Practices
 
-1. **Context Management**
+1. **Prompt Generation**
+
+   - Consider text limits for optimal performance
+   - Maintain cursor position accuracy
+   - Handle edge cases in text extraction
+
+2. **Context Management**
 
    - Consider enabling context caching for better suggestions
    - Monitor the size of historical context
    - Clean up old context when no longer relevant
 
-2. **Error Handling**
+3. **Error Handling**
 
    - All API calls should be wrapped in try-catch blocks
    - Failed suggestions should not break the editor
    - Telemetry failures should be logged but not impact user experience
 
-3. **Performance**
+4. **Performance**
 
    - Suggestions are throttled to prevent excessive API calls
    - Caching reduces server load
    - Completion provider is disposed when not needed
 
-4. **User Experience**
+5. **User Experience**
    - Suggestions appear inline with minimal delay
    - Clear feedback for acceptance/rejection
    - Non-intrusive telemetry collection
@@ -197,6 +240,7 @@ When modifying the code completion system:
 4. Consider performance implications of changes
 5. Document new features or changes
 6. Consider impact on context caching when modifying query handling
+7. Follow text limit guidelines in prompt generation
 
 ## Related Components
 
