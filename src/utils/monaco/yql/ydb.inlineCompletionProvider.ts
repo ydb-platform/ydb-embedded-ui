@@ -1,11 +1,8 @@
 import * as monaco from 'monaco-editor';
 import {LANGUAGE_ID} from 'monaco-yql-languages/build/yql/yql.contribution';
 
-import {createCompletionProvider} from '../../../services/codeCompletion/factory';
-import type {
-    ICodeCompletionAPI,
-    ICodeCompletionService,
-} from '../../../services/codeCompletion/types';
+import {createCompletionProvider} from '../../../services/codeCompletion';
+import type {ICodeCompletionAPI, ICodeCompletionService} from '../../../services/codeCompletion';
 
 let inlineProvider: monaco.IDisposable | undefined;
 

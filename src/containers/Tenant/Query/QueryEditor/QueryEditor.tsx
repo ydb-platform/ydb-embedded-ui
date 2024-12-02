@@ -9,7 +9,7 @@ import {v4 as uuidv4} from 'uuid';
 import {CodeAssistantTelemetry} from '../../../../components/CodeAssistantTelemetry/CodeAssistantTelemetry';
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import SplitPane from '../../../../components/SplitPane';
-import {registerCompletionCommands} from '../../../../services/codeCompletion/registerCommands';
+import {registerCompletionCommands} from '../../../../services/codeCompletion';
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {
     goToNextQuery,
@@ -222,7 +222,7 @@ export default function QueryEditor(props: QueryEditorProps) {
         if (window.api.codeAssistant) {
             const provider = getCompletionProvider();
             if (provider) {
-                registerCompletionCommands(editor, monaco, provider);
+                registerCompletionCommands(monaco, provider);
             }
         }
 

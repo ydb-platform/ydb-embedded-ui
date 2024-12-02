@@ -1,10 +1,5 @@
 import {codeAssistantBackend as CODE_ASSISTANT_BACKEND} from '../../store';
-import type {
-    PromptFile,
-    Suggestions,
-    TelemetryEvent,
-    TelemetryOpenTabs,
-} from '../codeCompletion/types';
+import type {PromptFile, Suggestions, TelemetryEvent, TelemetryOpenTabs} from '../codeCompletion';
 
 import {BaseYdbAPI} from './base';
 
