@@ -71,13 +71,24 @@ export function Tenant(props: TenantProps) {
     const previousTenant = React.useRef<string>();
     React.useEffect(() => {
         if (previousTenant.current !== tenantName) {
-            const register = async () => {
+            const registerSuggestCompletion = async () => {
                 const {registerYQLCompletionItemProvider} = await import(
                     '../../utils/monaco/yql/yql.completionItemProvider'
                 );
                 registerYQLCompletionItemProvider(tenantName);
             };
-            register().catch(console.error);
+
+            const registerInlineCompletion = async () => {
+                const {registerInlineCompletionProvider} = await import(
+                    '../../utils/monaco/yql/ydb.inlineCompletionProvider'
+                );
+                if (window.api.codeAssistant) {
+                    registerInlineCompletionProvider(window.api.codeAssistant);
+                }
+            };
+
+            registerSuggestCompletion().catch(console.error);
+            registerInlineCompletion().catch(console.error);
             previousTenant.current = tenantName;
         }
     }, [tenantName]);

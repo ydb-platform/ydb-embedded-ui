@@ -1,7 +1,6 @@
 import * as monaco from 'monaco-editor';
 import {LANGUAGE_ID} from 'monaco-yql-languages/build/yql/yql.contribution';
 
-import {inlineCompletionProviderInstance} from './ydb.inlineCompletionProvider';
 import {createProvideSuggestionsFunction} from './yqlSuggestions';
 
 let completionProvider: monaco.IDisposable | undefined;
@@ -18,8 +17,4 @@ export function registerYQLCompletionItemProvider(database: string) {
         triggerCharacters: [' ', '.', '`', '(', '/'],
         provideCompletionItems: createProvideSuggestionsFunction(database),
     });
-    monaco.languages.registerInlineCompletionsProvider(
-        LANGUAGE_ID,
-        inlineCompletionProviderInstance,
-    );
 }
