@@ -222,7 +222,7 @@ export default function QueryEditor(props: QueryEditorProps) {
         if (window.api.codeAssistant) {
             const provider = getCompletionProvider();
             if (provider) {
-                registerCompletionCommands(monaco, provider);
+                registerCompletionCommands(monaco, provider, editor);
             }
         }
 

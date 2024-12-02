@@ -2,7 +2,11 @@ import * as monaco from 'monaco-editor';
 import {LANGUAGE_ID} from 'monaco-yql-languages/build/yql/yql.contribution';
 
 import {createCompletionProvider} from '../../../services/codeCompletion';
-import type {ICodeCompletionAPI, ICodeCompletionService} from '../../../services/codeCompletion';
+import type {
+    CodeCompletionConfig,
+    ICodeCompletionAPI,
+    ICodeCompletionService,
+} from '../../../services/codeCompletion';
 
 let inlineProvider: monaco.IDisposable | undefined;
 
@@ -18,10 +22,13 @@ export function getCompletionProvider(): ICodeCompletionService | null {
     return completionProviderInstance;
 }
 
-export function registerInlineCompletionProvider(api: ICodeCompletionAPI) {
+export function registerInlineCompletionProvider(
+    api: ICodeCompletionAPI,
+    config?: CodeCompletionConfig,
+) {
     disableCodeSuggestions();
 
-    completionProviderInstance = createCompletionProvider(api);
+    completionProviderInstance = createCompletionProvider(api, config);
 
     inlineProvider = monaco.languages.registerInlineCompletionsProvider(
         LANGUAGE_ID,

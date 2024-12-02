@@ -1,10 +1,17 @@
-import type {DiscardReason, ITelemetryService, TelemetryEvent} from './types';
+import type {CodeCompletionConfig, DiscardReason, ITelemetryService, TelemetryEvent} from './types';
 
 export class TelemetryService implements ITelemetryService {
     private readonly sendTelemetry: (data: TelemetryEvent) => Promise<unknown>;
+    private readonly config: Required<NonNullable<CodeCompletionConfig['telemetry']>>;
 
-    constructor(sendTelemetry: (data: TelemetryEvent) => Promise<unknown>) {
+    constructor(
+        sendTelemetry: (data: TelemetryEvent) => Promise<unknown>,
+        config: CodeCompletionConfig = {},
+    ) {
         this.sendTelemetry = sendTelemetry;
+        this.config = {
+            enabled: config.telemetry?.enabled ?? true,
+        };
     }
 
     sendAcceptTelemetry(requestId: string, acceptedText: string): void {
@@ -49,6 +56,10 @@ export class TelemetryService implements ITelemetryService {
     }
 
     private send(data: TelemetryEvent): void {
+        if (!this.config.enabled) {
+            return;
+        }
+
         try {
             this.sendTelemetry(data);
         } catch (e) {

@@ -2,6 +2,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 import {getPromptFileContent} from './promptContent';
 import type {
+    CodeCompletionConfig,
     DiscardReason,
     EnrichedCompletion,
     ICodeCompletionAPI,
@@ -10,27 +11,61 @@ import type {
     InternalSuggestion,
 } from './types';
 
+const DEFAULT_CONFIG: Required<CodeCompletionConfig> = {
+    debounceTime: 200,
+    textLimits: {
+        beforeCursor: 8000,
+        afterCursor: 1000,
+    },
+    telemetry: {
+        enabled: true,
+    },
+    suggestionCache: {
+        enabled: true,
+    },
+};
+
 export class CodeCompletionService implements ICodeCompletionService {
     private prevSuggestions: InternalSuggestion[] = [];
     private timer: number | null = null;
     private readonly api: ICodeCompletionAPI;
     private readonly telemetry: ITelemetryService;
-    private readonly editor?: monaco.editor.IStandaloneCodeEditor;
+    private readonly config: Required<CodeCompletionConfig>;
 
     constructor(
         api: ICodeCompletionAPI,
         telemetry: ITelemetryService,
-        editor?: monaco.editor.IStandaloneCodeEditor,
+        userConfig?: CodeCompletionConfig,
     ) {
         this.api = api;
         this.telemetry = telemetry;
-        this.editor = editor;
+        // Merge user config with defaults, ensuring all properties exist
+        this.config = {
+            ...DEFAULT_CONFIG,
+            ...userConfig,
+            textLimits: {
+                ...DEFAULT_CONFIG.textLimits,
+                ...(userConfig?.textLimits || {}),
+            },
+            telemetry: {
+                ...DEFAULT_CONFIG.telemetry,
+                ...(userConfig?.telemetry || {}),
+            },
+            suggestionCache: {
+                ...DEFAULT_CONFIG.suggestionCache,
+                ...(userConfig?.suggestionCache || {}),
+            },
+        };
     }
 
     handleItemDidShow(
         _completions: monaco.languages.InlineCompletions<EnrichedCompletion>,
         item: EnrichedCompletion,
     ) {
+        if (!this.config.suggestionCache.enabled) {
+            return;
+        }
+
         for (const suggests of this.prevSuggestions) {
             for (const completion of suggests.items) {
                 if (completion.pristine === item.pristine) {
@@ -47,10 +82,13 @@ export class CodeCompletionService implements ICodeCompletionService {
         _context: monaco.languages.InlineCompletionContext,
         _token: monaco.CancellationToken,
     ) {
-        const cachedCompletions = this.getCachedCompletion(model, position);
-        if (cachedCompletions.length) {
-            return {items: cachedCompletions};
+        if (this.config.suggestionCache.enabled) {
+            const cachedCompletions = this.getCachedCompletion(model, position);
+            if (cachedCompletions.length) {
+                return {items: cachedCompletions};
+            }
         }
+
         while (this.prevSuggestions.length > 0) {
             this.dismissCompletion(this.prevSuggestions.pop());
         }
@@ -89,13 +127,14 @@ export class CodeCompletionService implements ICodeCompletionService {
         this.telemetry.sendAcceptTelemetry(requestId, suggestionText);
     }
 
-    commandDiscard(reason: DiscardReason = 'OnCancel'): void {
+    commandDiscard(
+        reason: DiscardReason = 'OnCancel',
+        editor: monaco.editor.IStandaloneCodeEditor,
+    ): void {
         while (this.prevSuggestions.length > 0) {
             this.discardCompletion(reason, this.prevSuggestions.pop());
         }
-        if (this.editor) {
-            this.editor.trigger(undefined, 'editor.action.inlineSuggest.hide', undefined);
-        }
+        editor.trigger(undefined, 'editor.action.inlineSuggest.hide', undefined);
     }
 
     emptyCache() {
@@ -165,12 +204,15 @@ export class CodeCompletionService implements ICodeCompletionService {
             window.clearTimeout(this.timer);
         }
         await new Promise((r) => {
-            this.timer = window.setTimeout(r, 200);
+            this.timer = window.setTimeout(r, this.config.debounceTime);
         });
         let suggestions: EnrichedCompletion[] = [];
         let requestId = '';
         try {
-            const data = getPromptFileContent(model, position);
+            const data = getPromptFileContent(model, position, {
+                beforeCursor: this.config.textLimits.beforeCursor,
+                afterCursor: this.config.textLimits.afterCursor,
+            });
             if (!data) {
                 return {suggestions: []};
             }

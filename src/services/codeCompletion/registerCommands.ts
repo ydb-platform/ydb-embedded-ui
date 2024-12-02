@@ -1,10 +1,11 @@
-import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import type * as monaco from 'monaco-editor';
 
 import type {ICodeCompletionService} from './types';
 
 export function registerCompletionCommands(
     monacoInstance: typeof monaco,
     completionService: ICodeCompletionService,
+    editor: monaco.editor.IStandaloneCodeEditor,
 ) {
     monacoInstance.editor.registerCommand('acceptCodeAssistCompletion', (_accessor, ...args) => {
         const data = args[0] ?? {};
@@ -18,6 +19,6 @@ export function registerCompletionCommands(
     });
 
     monacoInstance.editor.registerCommand('declineCodeAssistCompletion', () => {
-        completionService.commandDiscard();
+        completionService.commandDiscard('OnCancel', editor);
     });
 }

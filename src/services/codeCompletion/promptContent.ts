@@ -3,15 +3,29 @@ import {v4} from 'uuid';
 
 import type {PromptFile} from './types';
 
-const limitBeforeCursor = 8_000;
-const limitAfterCursor = 1_000;
+export interface TextLimits {
+    beforeCursor: number;
+    afterCursor: number;
+}
+
+const DEFAULT_LIMITS: Required<TextLimits> = {
+    beforeCursor: 8_000,
+    afterCursor: 1_000,
+};
 
 const sessionId = v4();
 
 export function getPromptFileContent(
     model: Monaco.editor.ITextModel,
     position: Monaco.Position,
+    limits?: Partial<TextLimits>,
 ): PromptFile[] | undefined {
+    // Merge with defaults to ensure we always have valid numbers
+    const finalLimits: Required<TextLimits> = {
+        ...DEFAULT_LIMITS,
+        ...limits,
+    };
+
     const linesContent = model.getLinesContent();
     const prevTextInCurrentLine = linesContent[position.lineNumber - 1].slice(
         0,
@@ -31,8 +45,8 @@ export function getPromptFileContent(
     if (prevText) {
         fragments.push({
             Text:
-                prevText.length > limitBeforeCursor
-                    ? prevText.slice(prevText.length - limitBeforeCursor)
+                prevText.length > finalLimits.beforeCursor
+                    ? prevText.slice(prevText.length - finalLimits.beforeCursor)
                     : prevText,
             Start: {Ln: 1, Col: 1},
             End: cursorPostion,
@@ -40,7 +54,7 @@ export function getPromptFileContent(
     }
     if (postText) {
         fragments.push({
-            Text: postText.slice(0, limitAfterCursor),
+            Text: postText.slice(0, finalLimits.afterCursor),
             Start: cursorPostion,
             End: {
                 Ln: linesContent.length,

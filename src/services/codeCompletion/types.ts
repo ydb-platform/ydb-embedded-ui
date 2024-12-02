@@ -116,6 +116,27 @@ export interface ICodeCompletionService extends monaco.languages.InlineCompletio
         acceptedLetters: number,
     ): void;
     handleAccept(params: {requestId: string; suggestionText: string}): void;
-    commandDiscard(reason?: DiscardReason): void;
+    commandDiscard(reason: DiscardReason, editor: monaco.editor.IStandaloneCodeEditor): void;
     emptyCache(): void;
+}
+
+export interface CodeCompletionConfig {
+    // Performance settings
+    debounceTime?: number; // Time in ms to debounce API calls (default: 200)
+
+    // Text limits
+    textLimits?: {
+        beforeCursor?: number; // Characters to include before cursor (default: 8000)
+        afterCursor?: number; // Characters to include after cursor (default: 1000)
+    };
+
+    // Telemetry settings
+    telemetry?: {
+        enabled?: boolean; // Whether to enable telemetry (default: true)
+    };
+
+    // Cache settings
+    suggestionCache?: {
+        enabled?: boolean; // Whether to enable suggestion caching (default: true)
+    };
 }
