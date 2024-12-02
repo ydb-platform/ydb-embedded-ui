@@ -74,7 +74,7 @@ const commonSuggestionEntities: AutocompleteEntityType[] = ['dir', 'unknown', 'e
 const directoryTypes: AutocompleteEntityType[] = ['dir', 'ext_sub_domain'];
 
 function filterAutocompleteEntities(
-    autocompleteEntities: TAutocompleteEntity[],
+    autocompleteEntities: TAutocompleteEntity[] | undefined,
     suggestions: YQLEntity[],
 ) {
     const suggestionsSet = suggestions.reduce((acc, el) => {
@@ -84,7 +84,7 @@ function filterAutocompleteEntities(
         }
         return acc;
     }, new Set(commonSuggestionEntities));
-    return autocompleteEntities.filter(({Type}) => suggestionsSet.has(Type));
+    return autocompleteEntities?.filter(({Type}) => suggestionsSet.has(Type));
 }
 
 function wrapStringToBackticks(value: string) {
@@ -245,7 +245,7 @@ export async function generateColumnsSuggestion(
         {} as Record<string, string[]>,
     );
 
-    autocompleteResponse.Result.Entities.forEach((col) => {
+    autocompleteResponse.Result.Entities?.forEach((col) => {
         if (!isAutocompleteColumn(col)) {
             return;
         }
@@ -353,6 +353,9 @@ export async function generateEntitiesSuggestion(
     const withBackticks = prefix?.startsWith('`');
     if (data.Success) {
         const filteredEntities = filterAutocompleteEntities(data.Result.Entities, suggestEntities);
+        if (!filteredEntities) {
+            return [];
+        }
         return filteredEntities.reduce((acc, {Name, Type}) => {
             const isDir = directoryTypes.includes(Type);
             const label = isDir ? `${Name}/` : Name;

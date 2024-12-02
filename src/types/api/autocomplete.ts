@@ -10,7 +10,7 @@ export interface TQueryAutocomplete {
 }
 
 interface TAutocompleteResult {
-    Entities: TAutocompleteEntity[];
+    Entities?: TAutocompleteEntity[];
     Total?: number;
 }
 
