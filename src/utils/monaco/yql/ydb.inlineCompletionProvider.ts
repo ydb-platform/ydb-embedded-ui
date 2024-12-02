@@ -113,7 +113,7 @@ class InlineCompletionProvider implements monaco.languages.InlineCompletionsProv
             window.clearTimeout(this.timer);
         }
         await new Promise((r) => {
-            this.timer = window.setTimeout(r, 400);
+            this.timer = window.setTimeout(r, 200);
         });
         let suggestions: EnrichedCompletion[] = [];
         let requestId = '';
