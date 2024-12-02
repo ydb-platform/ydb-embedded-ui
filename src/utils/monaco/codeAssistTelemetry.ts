@@ -129,6 +129,10 @@ export function sendCodeAssistTelemetry(props: SendCodeAssistTelemetryProps) {
         };
     }
     if (data) {
-        window.api.codeAssistant?.sendCodeAssistTelemetry(data);
+        try {
+            window.api.codeAssistant?.sendCodeAssistTelemetry(data);
+        } catch (e) {
+            console.error(e);
+        }
     }
 }

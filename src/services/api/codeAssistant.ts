@@ -9,9 +9,9 @@ import type {
 import {BaseYdbAPI} from './base';
 
 const ideInfo = {
-    Ide: 'yql',
+    Ide: 'ydb',
     IdeVersion: '1',
-    PluginFamily: 'yql',
+    PluginFamily: 'ydb',
     PluginVersion: '0.2',
 };
 
