@@ -18,10 +18,8 @@ import {useAutoRefreshInterval, useTypedDispatch} from '../../../../../utils/hoo
 import {useChangeInputWithConfirmation} from '../../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-import {
-    TENANT_OVERVIEW_TOP_QUERUES_COLUMNS,
-    TOP_QUERIES_COLUMNS_WIDTH_LS_KEY,
-} from '../../TopQueries/getTopQueriesColumns';
+import {getTenantOverviewTopQueriesColumns} from '../../TopQueries/columns/columns';
+import {TOP_QUERIES_COLUMNS_WIDTH_LS_KEY} from '../../TopQueries/columns/constants';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
@@ -39,7 +37,7 @@ export function TopQueries({tenantName}: TopQueriesProps) {
     const query = parseQuery(location);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const columns = TENANT_OVERVIEW_TOP_QUERUES_COLUMNS;
+    const columns = getTenantOverviewTopQueriesColumns();
 
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
         {database: tenantName},

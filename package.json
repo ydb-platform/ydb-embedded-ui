@@ -127,7 +127,7 @@
     "@gravity-ui/tsconfig": "^1.0.0",
     "@playwright/test": "^1.42.1",
     "@testing-library/jest-dom": "^6.4.6",
-    "@testing-library/react": "^14.2.2",
+    "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/jest": "^29.5.12",
     "@types/lodash": "^4.17.0",

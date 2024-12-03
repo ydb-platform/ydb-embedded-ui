@@ -6,10 +6,8 @@ import {topShardsApi} from '../../../../../store/reducers/tenantOverview/topShar
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-import {
-    TOP_SHARDS_COLUMNS_WIDTH_LS_KEY,
-    getTopShardsColumns,
-} from '../../TopShards/getTopShardsColumns';
+import {getTopShardsColumns} from '../../TopShards/columns/columns';
+import {TOP_SHARDS_COLUMNS_WIDTH_LS_KEY} from '../../TopShards/columns/constants';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';

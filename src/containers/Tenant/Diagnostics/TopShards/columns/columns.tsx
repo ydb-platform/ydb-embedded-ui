@@ -2,41 +2,16 @@ import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 import type {Location} from 'history';
 
-import {InternalLink} from '../../../../components/InternalLink';
-import {LinkToSchemaObject} from '../../../../components/LinkToSchemaObject/LinkToSchemaObject';
-import {TabletNameWrapper} from '../../../../components/TabletNameWrapper/TabletNameWrapper';
-import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
-import {getLoadSeverityForShard} from '../../../../store/reducers/tenantOverview/topShards/utils';
-import type {KeyValueRow} from '../../../../types/api/query';
-import type {ValueOf} from '../../../../types/common';
-import {formatNumber, roundToPrecision} from '../../../../utils/dataFormatters/dataFormatters';
-import {getDefaultNodePath} from '../../../Node/NodePages';
+import {InternalLink} from '../../../../../components/InternalLink';
+import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
+import {TabletNameWrapper} from '../../../../../components/TabletNameWrapper/TabletNameWrapper';
+import {UsageLabel} from '../../../../../components/UsageLabel/UsageLabel';
+import {getLoadSeverityForShard} from '../../../../../store/reducers/tenantOverview/topShards/utils';
+import type {KeyValueRow} from '../../../../../types/api/query';
+import {formatNumber, roundToPrecision} from '../../../../../utils/dataFormatters/dataFormatters';
+import {getDefaultNodePath} from '../../../../Node/NodePages';
 
-export const TOP_SHARDS_COLUMNS_WIDTH_LS_KEY = 'topShardsColumnsWidth';
-
-const TOP_SHARDS_COLUMNS_IDS = {
-    TabletId: 'TabletId',
-    CPUCores: 'CPUCores',
-    DataSize: 'DataSize',
-    Path: 'Path',
-    NodeId: 'NodeId',
-    PeakTime: 'PeakTime',
-    InFlightTxCount: 'InFlightTxCount',
-    IntervalEnd: 'IntervalEnd',
-} as const;
-
-type TopShardsColumns = ValueOf<typeof TOP_SHARDS_COLUMNS_IDS>;
-
-const tableColumnsNames: Record<TopShardsColumns, string> = {
-    TabletId: 'TabletId',
-    CPUCores: 'CPUCores',
-    DataSize: 'DataSize (B)',
-    Path: 'Path',
-    NodeId: 'NodeId',
-    PeakTime: 'PeakTime',
-    InFlightTxCount: 'InFlightTxCount',
-    IntervalEnd: 'IntervalEnd',
-};
+import {TOP_SHARDS_COLUMNS_IDS, TOP_SHARDS_COLUMNS_TITLES} from './constants';
 
 function prepareCPUWorkloadValue(value: string | number) {
     return `${roundToPrecision(Number(value) * 100, 2)}%`;
@@ -44,7 +19,7 @@ function prepareCPUWorkloadValue(value: string | number) {
 
 const getPathColumn = (schemaPath: string, location: Location): Column<KeyValueRow> => ({
     name: TOP_SHARDS_COLUMNS_IDS.Path,
-    header: tableColumnsNames[TOP_SHARDS_COLUMNS_IDS.Path],
+    header: TOP_SHARDS_COLUMNS_TITLES.Path,
     render: ({row}) => {
         // row.Path - relative schema path
         return (
@@ -59,7 +34,7 @@ const getPathColumn = (schemaPath: string, location: Location): Column<KeyValueR
 
 const cpuCoresColumn: Column<KeyValueRow> = {
     name: TOP_SHARDS_COLUMNS_IDS.CPUCores,
-    header: tableColumnsNames[TOP_SHARDS_COLUMNS_IDS.CPUCores],
+    header: TOP_SHARDS_COLUMNS_TITLES.CPUCores,
     render: ({row}) => {
         return prepareCPUWorkloadValue(row.CPUCores || 0);
     },
@@ -68,7 +43,7 @@ const cpuCoresColumn: Column<KeyValueRow> = {
 
 const dataSizeColumn: Column<KeyValueRow> = {
     name: TOP_SHARDS_COLUMNS_IDS.DataSize,
-    header: tableColumnsNames[TOP_SHARDS_COLUMNS_IDS.DataSize],
+    header: TOP_SHARDS_COLUMNS_TITLES.DataSize,
     render: ({row}) => {
         return formatNumber(row.DataSize);
     },
@@ -77,7 +52,7 @@ const dataSizeColumn: Column<KeyValueRow> = {
 
 const tabletIdColumn: Column<KeyValueRow> = {
     name: TOP_SHARDS_COLUMNS_IDS.TabletId,
-    header: tableColumnsNames[TOP_SHARDS_COLUMNS_IDS.TabletId],
+    header: TOP_SHARDS_COLUMNS_TITLES.TabletId,
     render: ({row}) => {
         if (!row.TabletId) {
             return '–';
@@ -90,7 +65,7 @@ const tabletIdColumn: Column<KeyValueRow> = {
 
 const nodeIdColumn: Column<KeyValueRow> = {
     name: TOP_SHARDS_COLUMNS_IDS.NodeId,
-    header: tableColumnsNames[TOP_SHARDS_COLUMNS_IDS.NodeId],
+    header: TOP_SHARDS_COLUMNS_TITLES.NodeId,
     render: ({row}) => {
         if (!row.NodeId) {
             return '–';
@@ -102,7 +77,7 @@ const nodeIdColumn: Column<KeyValueRow> = {
 
 const topShardsCpuCoresColumn: Column<KeyValueRow> = {
     name: TOP_SHARDS_COLUMNS_IDS.CPUCores,
-    header: tableColumnsNames[TOP_SHARDS_COLUMNS_IDS.CPUCores],
+    header: TOP_SHARDS_COLUMNS_TITLES.CPUCores,
     render: ({row}) => {
         return (
             <UsageLabel
@@ -119,7 +94,7 @@ const topShardsCpuCoresColumn: Column<KeyValueRow> = {
 
 const inFlightTxCountColumn: Column<KeyValueRow> = {
     name: TOP_SHARDS_COLUMNS_IDS.InFlightTxCount,
-    header: tableColumnsNames[TOP_SHARDS_COLUMNS_IDS.InFlightTxCount],
+    header: TOP_SHARDS_COLUMNS_TITLES.InFlightTxCount,
     render: ({row}) => formatNumber(row.InFlightTxCount),
     align: DataTable.RIGHT,
 };
