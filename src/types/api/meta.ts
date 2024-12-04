@@ -35,6 +35,8 @@ export interface MetaBaseClusterInfo {
     mvp_token?: string;
     name?: string;
     solomon?: string;
+    cores?: string;
+    logging?: string;
     status?: string;
     scale?: number;
     environment?: string;

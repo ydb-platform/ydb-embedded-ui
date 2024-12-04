@@ -7,7 +7,7 @@ import type {IResponseError} from '../../../types/api/error';
 import type {VersionToColorMap} from '../../../types/versions';
 
 import {b} from './shared';
-import {getInfo} from './utils';
+import {getInfo, useClusterLinks} from './utils';
 
 import './ClusterInfo.scss';
 
@@ -27,7 +27,9 @@ export const ClusterInfo = ({
 }: ClusterInfoProps) => {
     const {info = [], links = []} = additionalClusterProps;
 
-    const clusterInfo = getInfo(cluster ?? {}, info, links);
+    const clusterLinks = useClusterLinks();
+
+    const clusterInfo = getInfo(cluster ?? {}, info, [...links, ...clusterLinks]);
 
     const getContent = () => {
         if (loading) {

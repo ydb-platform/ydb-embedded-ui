@@ -6,6 +6,7 @@ import type {InfoViewerItem} from '../../../components/InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {Tags} from '../../../components/Tags';
+import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {ClusterLink} from '../../../types/additionalProps';
 import {isClusterInfoV2} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
@@ -13,10 +14,12 @@ import type {EFlag} from '../../../types/api/enums';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
 import {EType} from '../../../types/api/tablet';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import {parseJson} from '../../../utils/utils';
 import i18n from '../i18n';
 
 import {NodesState} from './components/NodesState/NodesState';
 import {b} from './shared';
+
 const COLORS_PRIORITY: Record<EFlag, number> = {
     Green: 5,
     Blue: 4,
@@ -103,3 +106,50 @@ export const getInfo = (
 
     return info;
 };
+
+/**
+ * parses stringified json in format {url: "href"}
+ */
+function prepareClusterLink(rawLink?: string) {
+    try {
+        const linkObject = parseJson(rawLink) as unknown;
+
+        if (
+            linkObject &&
+            typeof linkObject === 'object' &&
+            'url' in linkObject &&
+            typeof linkObject.url === 'string'
+        ) {
+            return linkObject.url;
+        }
+    } catch {}
+
+    return undefined;
+}
+
+export function useClusterLinks() {
+    const {cores, logging} = useClusterBaseInfo();
+
+    return React.useMemo(() => {
+        const result: ClusterLink[] = [];
+
+        const coresLink = prepareClusterLink(cores);
+        const loggingLink = prepareClusterLink(logging);
+
+        if (coresLink) {
+            result.push({
+                title: i18n('link_cores'),
+                url: coresLink,
+            });
+        }
+
+        if (loggingLink) {
+            result.push({
+                title: i18n('link_logging'),
+                url: loggingLink,
+            });
+        }
+
+        return result;
+    }, [cores, logging]);
+}
