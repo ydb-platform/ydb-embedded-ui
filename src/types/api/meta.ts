@@ -46,6 +46,7 @@ export interface MetaBaseClusterInfo {
     service?: string;
     trace_view?: string;
     trace_check?: string;
+    use_embedded_ui?: boolean;
 }
 
 export interface MetaGeneralClusterInfo extends MetaBaseClusterInfo {

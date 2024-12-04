@@ -9,6 +9,7 @@ import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
 import {UserCard} from '../../components/User/User';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
 import {formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
+import {createDeveloperUIMonitoringPageHref} from '../../utils/developerUI/developerUI';
 import {getCleanBalancerValue, removeViewerPathname} from '../../utils/parseBalancer';
 import {clusterTabsIds, getClusterPath} from '../Cluster/utils';
 
@@ -26,11 +27,14 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         header: COLUMNS_TITLES[COLUMNS_NAMES.TITLE],
         width: 230,
         render: ({row}) => {
-            const {balancer, name: clusterName} = row;
+            const {balancer, name: clusterName, use_embedded_ui: useEmbeddedUi} = row;
 
             const backend = balancer && removeViewerPathname(balancer);
 
-            const clusterPath = getClusterPath(undefined, {backend, clusterName});
+            const clusterPath =
+                useEmbeddedUi && backend
+                    ? createDeveloperUIMonitoringPageHref(backend)
+                    : getClusterPath(undefined, {backend, clusterName});
 
             const clusterStatus = row.cluster?.Overall;
 
