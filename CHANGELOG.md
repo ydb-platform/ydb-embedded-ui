@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v7.0.0...v7.1.0) (2024-12-04)
+
+
+### Features
+
+* **ClusterInfo:** add cores and logging links ([#1731](https://github.com/ydb-platform/ydb-embedded-ui/issues/1731)) ([f8acb2b](https://github.com/ydb-platform/ydb-embedded-ui/commit/f8acb2baad8d92c06f620e5a7f03aba499c852f1))
+
+
+### Bug Fixes
+
+* **autocomplete:** should work properly if handler returns no entites ([#1726](https://github.com/ydb-platform/ydb-embedded-ui/issues/1726)) ([9cdab88](https://github.com/ydb-platform/ydb-embedded-ui/commit/9cdab88c00619e1c9d37faff27376d9156257fe1))
+
 ## [7.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v6.37.2...v7.0.0) (2024-12-02)
 
 
