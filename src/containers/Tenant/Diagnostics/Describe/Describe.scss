@@ -15,16 +15,8 @@
         padding: 0 20px 20px 0;
     }
 
-    &__tree {
-        @include mixins.json-tree-styles();
-    }
-
     &__copy {
         position: absolute;
-        left: 308px;
-    }
-
-    .json-inspector__search {
-        height: 26px;
+        left: 340px;
     }
 }
