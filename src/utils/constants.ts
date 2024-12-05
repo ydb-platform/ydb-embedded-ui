@@ -93,6 +93,8 @@ export const DATA_QA_TUNE_COLUMNS_POPUP = 'tune-columns-popup';
 export const BINARY_DATA_IN_PLAIN_TEXT_DISPLAY = 'binaryDataInPlainTextDisplay';
 export const AUTO_REFRESH_INTERVAL = 'auto-refresh-interval';
 
+export const CASE_SENSITIVE_JSON_SEARCH = 'caseSensitiveJsonSearch';
+
 export const DEFAULT_SIZE_RESULT_PANE_KEY = 'default-size-result-pane';
 export const DEFAULT_SIZE_TENANT_SUMMARY_KEY = 'default-size-tenant-summary-pane';
 export const DEFAULT_SIZE_TENANT_KEY = 'default-size-tenant-pane';

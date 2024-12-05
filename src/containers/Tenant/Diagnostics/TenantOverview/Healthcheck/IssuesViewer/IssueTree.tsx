@@ -1,9 +1,9 @@
 import React from 'react';
 
 import _omit from 'lodash/omit';
-import JSONTree from 'react-json-inspector';
 import {TreeView} from 'ydb-ui-components';
 
+import {JSONTree} from '../../../../../../components/JSONTree/JSONTree';
 import type {IssuesTree} from '../../../../../../store/reducers/healthcheckInfo/types';
 import {hcStatusToColorFlag} from '../../../../../../store/reducers/healthcheckInfo/utils';
 import {cn} from '../../../../../../utils/cn';
@@ -32,7 +32,7 @@ const IssueTree = ({issueTree}: IssuesViewerProps) => {
                     data={info}
                     search={false}
                     isExpanded={() => true}
-                    className={b('inspector')}
+                    treeClassName={b('inspector')}
                 />
             </div>
         );

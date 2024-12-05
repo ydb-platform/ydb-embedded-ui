@@ -1,8 +1,8 @@
 import {ClipboardButton} from '@gravity-ui/uikit';
-import JSONTree from 'react-json-inspector';
 import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {JSONTree} from '../../../../components/JSONTree/JSONTree';
 import {Loader} from '../../../../components/Loader';
 import {
     selectSchemaMergedChildrenPaths,
@@ -14,7 +14,6 @@ import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks'
 import {isEntityWithMergedImplementation} from '../../utils/schema';
 
 import './Describe.scss';
-import 'react-json-inspector/json-inspector.css';
 
 const b = cn('ydb-describe');
 
@@ -74,13 +73,9 @@ const Describe = ({path, database, type}: IDescribeProps) => {
                 <div className={b('result')}>
                     <JSONTree
                         data={preparedDescribeData}
-                        className={b('tree')}
                         onClick={({path}) => {
                             const newValue = !(expandMap.get(path) || false);
                             expandMap.set(path, newValue);
-                        }}
-                        searchOptions={{
-                            debounceTime: 300,
                         }}
                         isExpanded={(keypath) => {
                             return expandMap.get(keypath) || false;

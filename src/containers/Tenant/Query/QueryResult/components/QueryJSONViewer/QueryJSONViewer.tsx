@@ -1,9 +1,7 @@
-import JSONTree from 'react-json-inspector';
-
+import {JSONTree} from '../../../../../../components/JSONTree/JSONTree';
 import {cn} from '../../../../../../utils/cn';
 
 import './QueryJSONViewer.scss';
-import 'react-json-inspector/json-inspector.css';
 
 const b = cn('ydb-query-json-viewer');
 
@@ -13,13 +11,8 @@ interface QueryJSONViewerProps {
 
 export function QueryJSONViewer({data}: QueryJSONViewerProps) {
     return (
-        <JSONTree
-            data={data}
-            isExpanded={() => true}
-            className={b('inspector')}
-            searchOptions={{
-                debounceTime: 300,
-            }}
-        />
+        <div className={b('inspector')}>
+            <JSONTree data={data} isExpanded={() => true} />
+        </div>
     );
 }
