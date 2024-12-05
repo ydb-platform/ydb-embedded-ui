@@ -3,7 +3,7 @@ $memory-type-colors: (
     'SharedCacheConsumption': var(--g-color-base-info-medium-hover),
     'MemTableConsumption': var(--g-color-base-warning-medium-hover),
     'QueryExecutionConsumption': var(--g-color-base-positive-medium-hover),
-    'Other': var(--g-color-base-neutral-light-hover),
+    'Other': var(---g-color-base-generic-medium-hover),
 );
 
 @mixin memory-type-color($type) {
