@@ -108,9 +108,5 @@ export function SimplifiedPlan({plan}: SimplifiedPlanProps) {
         columnResizeMode: 'onChange',
     });
 
-    return (
-        <div className={block()}>
-            <Table table={table} stickyHeader width="max" />
-        </div>
-    );
+    return <Table wrapperClassName={block()} table={table} stickyHeader width="max" />;
 }

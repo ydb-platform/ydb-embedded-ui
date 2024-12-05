@@ -30,9 +30,5 @@ export function TabletStorageInfo({data}: TabletStorageInfoProps) {
             expanded,
         },
     });
-    return (
-        <div>
-            <Table table={table} />
-        </div>
-    );
+    return <Table table={table} />;
 }

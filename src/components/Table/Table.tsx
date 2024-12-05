@@ -9,6 +9,7 @@ const block = cn('ydb-table');
 
 interface TableProps<TData> extends BaseTableProps<TData> {
     width?: 'max' | 'auto';
+    wrapperClassName?: string;
 }
 
 interface ColumnHeaderProps {
@@ -20,9 +21,9 @@ export function ColumnHeader({children, className}: ColumnHeaderProps) {
     return <div className={block('table-header-content', className)}>{children}</div>;
 }
 
-export function Table<TData>({className, width, ...props}: TableProps<TData>) {
+export function Table<TData>({className, width, wrapperClassName, ...props}: TableProps<TData>) {
     return (
-        <div className={block()}>
+        <div className={block(null, wrapperClassName)}>
             <BaseTable
                 headerCellClassName={({column}) => {
                     const align = column.columnDef.meta?.align;
