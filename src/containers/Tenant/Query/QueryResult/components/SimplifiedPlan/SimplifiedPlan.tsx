@@ -1,8 +1,9 @@
 import React from 'react';
 
-import {Table, useTable} from '@gravity-ui/table';
+import {useTable} from '@gravity-ui/table';
 import type {CellContext, ColumnDef, ExpandedState} from '@tanstack/react-table';
 
+import {ColumnHeader, Table} from '../../../../../../components/Table/Table';
 import type {SimplifiedPlanItem} from '../../../../../../store/reducers/query/types';
 import {configuredNumeral} from '../../../../../../utils/numeral';
 import {formatToMs} from '../../../../../../utils/timeParsers';
@@ -30,19 +31,11 @@ function cpuCell(info: CellContext<ExtendedSimplifiesPlanItem, unknown>) {
     return <MetricsCell value={info.getValue()} formatter={formatter} />;
 }
 
-interface ColumnHeaderProps {
-    name: string;
-}
-
-function ColumnHeader({name}: ColumnHeaderProps) {
-    return <div className={block('table-header-content')}>{name}</div>;
-}
-
 const columns: ColumnDef<ExtendedSimplifiesPlanItem>[] = [
     {
         accessorKey: 'name',
         accessorFn: nameAccessorFn,
-        header: () => <ColumnHeader name="Operation" />,
+        header: () => <ColumnHeader>Operation</ColumnHeader>,
         size: 600,
         cell: (info) => (
             <OperationCell
@@ -54,41 +47,41 @@ const columns: ColumnDef<ExtendedSimplifiesPlanItem>[] = [
     },
     {
         accessorKey: 'aCpu',
-        header: () => <ColumnHeader name="A-Cpu" />,
+        header: () => <ColumnHeader>A-Cpu</ColumnHeader>,
         size: 90,
-        minSize: 100,
+        minSize: 90,
         cell: cpuCell,
         meta: {align: 'right', verticalAlign: 'top'},
     },
     {
         accessorKey: 'aRows',
-        header: () => <ColumnHeader name="A-Rows" />,
+        header: () => <ColumnHeader>A-Rows</ColumnHeader>,
         size: 90,
-        minSize: 100,
+        minSize: 90,
         cell: metricsCell,
         meta: {align: 'right', verticalAlign: 'top'},
     },
     {
         accessorKey: 'eCost',
-        header: () => <ColumnHeader name="E-Cost" />,
+        header: () => <ColumnHeader>E-Cost</ColumnHeader>,
         size: 90,
-        minSize: 100,
+        minSize: 90,
         cell: metricsCell,
         meta: {align: 'right', verticalAlign: 'top'},
     },
     {
         accessorKey: 'eRows',
-        header: () => <ColumnHeader name="E-Rows" />,
+        header: () => <ColumnHeader>E-Rows</ColumnHeader>,
         size: 90,
-        minSize: 100,
+        minSize: 90,
         cell: metricsCell,
         meta: {align: 'right', verticalAlign: 'top'},
     },
     {
         accessorKey: 'eSize',
-        header: () => <ColumnHeader name="E-Size" />,
+        header: () => <ColumnHeader>E-Size</ColumnHeader>,
         size: 90,
-        minSize: 100,
+        minSize: 90,
         cell: metricsCell,
         meta: {align: 'right', verticalAlign: 'top'},
     },
@@ -111,24 +104,13 @@ export function SimplifiedPlan({plan}: SimplifiedPlanProps) {
         state: {
             expanded,
         },
+        enableColumnResizing: true,
+        columnResizeMode: 'onChange',
     });
 
     return (
         <div className={block()}>
-            <Table
-                table={table}
-                headerCellClassName={({column}) => {
-                    const align = column.columnDef.meta?.align;
-                    return block('table-header-cell', {align});
-                }}
-                cellClassName={(cell) => {
-                    const align = cell?.column.columnDef.meta?.align;
-                    const verticalAlign = cell?.column.columnDef.meta?.verticalAlign;
-                    return block('table-cell', {align, 'vertical-align': verticalAlign});
-                }}
-                className={block('table')}
-                stickyHeader
-            />
+            <Table table={table} stickyHeader width="max" />
         </div>
     );
 }

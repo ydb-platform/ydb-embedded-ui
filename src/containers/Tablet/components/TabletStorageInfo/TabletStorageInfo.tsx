@@ -1,12 +1,12 @@
 import React from 'react';
 
-import {Table, useTable} from '@gravity-ui/table';
+import {useTable} from '@gravity-ui/table';
 import type {ExpandedState} from '@tanstack/react-table';
 
+import {Table} from '../../../../components/Table/Table';
 import type {TTabletHiveResponse} from '../../../../types/api/tablet';
 
 import {getColumns} from './columns';
-import {b} from './shared';
 import {prepareData} from './utils';
 
 import './TabletStorageInfo.scss';
@@ -31,21 +31,8 @@ export function TabletStorageInfo({data}: TabletStorageInfoProps) {
         },
     });
     return (
-        //block wrapper for table
         <div>
-            <Table
-                table={table}
-                headerCellClassName={({column}) => {
-                    const align = column.columnDef.meta?.align;
-                    return b('table-header-cell', {align});
-                }}
-                cellClassName={(cell) => {
-                    const align = cell?.column.columnDef.meta?.align;
-                    const verticalAlign = cell?.column.columnDef.meta?.verticalAlign;
-                    return b('table-cell', {align, 'vertical-align': verticalAlign});
-                }}
-                className={b('table')}
-            />
+            <Table table={table} />
         </div>
     );
 }

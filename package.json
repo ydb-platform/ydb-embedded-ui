@@ -22,7 +22,7 @@
     "@gravity-ui/navigation": "^2.16.0",
     "@gravity-ui/paranoid": "^2.0.1",
     "@gravity-ui/react-data-table": "^2.1.1",
-    "@gravity-ui/table": "^0.5.0",
+    "@gravity-ui/table": "^1.7.0",
     "@gravity-ui/uikit": "^6.33.0",
     "@gravity-ui/websql-autocomplete": "^12.1.2",
     "@hookform/resolvers": "^3.9.0",
