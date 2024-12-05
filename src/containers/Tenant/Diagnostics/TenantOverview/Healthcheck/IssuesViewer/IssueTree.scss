@@ -23,8 +23,6 @@
     }
 
     &__inspector {
-        @include mixins.json-tree-styles();
-
         :not(.json-inspector__leaf_expanded).json-inspector__leaf_composite:before {
             content: '';
         }

@@ -2,7 +2,7 @@ import {ClipboardButton} from '@gravity-ui/uikit';
 import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-import {JSONTreeWithSearch} from '../../../../components/JSONTreeWithSearch/JSONTreeWithSearch';
+import {JSONTree} from '../../../../components/JSONTree/JSONTree';
 import {Loader} from '../../../../components/Loader';
 import {
     selectSchemaMergedChildrenPaths,
@@ -71,7 +71,7 @@ const Describe = ({path, database, type}: IDescribeProps) => {
             {error ? <ResponseError error={error} /> : null}
             {preparedDescribeData ? (
                 <div className={b('result')}>
-                    <JSONTreeWithSearch
+                    <JSONTree
                         data={preparedDescribeData}
                         onClick={({path}) => {
                             const newValue = !(expandMap.get(path) || false);

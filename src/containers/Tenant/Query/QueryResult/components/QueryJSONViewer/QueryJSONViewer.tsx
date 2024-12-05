@@ -1,4 +1,4 @@
-import {JSONTreeWithSearch} from '../../../../../../components/JSONTreeWithSearch/JSONTreeWithSearch';
+import {JSONTree} from '../../../../../../components/JSONTree/JSONTree';
 import {cn} from '../../../../../../utils/cn';
 
 import './QueryJSONViewer.scss';
@@ -12,7 +12,7 @@ interface QueryJSONViewerProps {
 export function QueryJSONViewer({data}: QueryJSONViewerProps) {
     return (
         <div className={b('inspector')}>
-            <JSONTreeWithSearch data={data} isExpanded={() => true} />
+            <JSONTree data={data} isExpanded={() => true} />
         </div>
     );
 }
