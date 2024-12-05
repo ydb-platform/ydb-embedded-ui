@@ -17,10 +17,11 @@ const b = cn('ydb-json-tree');
 const DEBAUNCE_TIME = 300;
 
 interface JSONTreeProps extends React.ComponentProps<typeof JSONTreeBase> {
+    search?: false;
     treeClassName?: string;
 }
 
-export function JSONTree({treeClassName, search = true, ...rest}: JSONTreeProps) {
+export function JSONTree({treeClassName, search, ...rest}: JSONTreeProps) {
     const [caseSensitiveSearch, setCaseSensitiveSearch] = useSetting(
         CASE_SENSITIVE_JSON_SEARCH,
         false,
@@ -35,10 +36,9 @@ export function JSONTree({treeClassName, search = true, ...rest}: JSONTreeProps)
                 searchOptions={{
                     debounceTime: DEBAUNCE_TIME,
                 }}
-                search={search}
                 {...rest}
             />
-            {search && (
+            {search !== false && (
                 <ActionTooltip
                     title={
                         caseSensitiveSearch
