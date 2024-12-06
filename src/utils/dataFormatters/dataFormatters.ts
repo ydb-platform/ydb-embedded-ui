@@ -40,7 +40,7 @@ export const stringifyVdiskId = (id?: TVDiskID | TVSlotId) => {
     return id ? Object.values(id).join('-') : '';
 };
 
-export const formatUptime = (seconds: number) => {
+export const formatUptimeInSeconds = (seconds: number) => {
     const days = Math.floor(seconds / DAY_IN_SECONDS);
     const remain = seconds % DAY_IN_SECONDS;
 
@@ -52,8 +52,31 @@ export const formatUptime = (seconds: number) => {
 };
 
 export const formatMsToUptime = (ms?: number) => {
-    return ms && formatUptime(ms / 1000);
+    return ms && formatUptimeInSeconds(ms / 1000);
 };
+
+export function getUptimeFromDateFormatted(dateFrom?: number | string, dateTo?: number | string) {
+    let diff = calcTimeDiffInSec(dateFrom, dateTo);
+
+    // Our time and server time could differ a little
+    // Prevent wrong negative uptime values
+    diff = diff < 0 ? 0 : diff;
+
+    return formatUptimeInSeconds(diff);
+}
+
+export function getDowntimeFromDateFormatted(dateFrom?: number | string, dateTo?: number | string) {
+    return '-' + getUptimeFromDateFormatted(dateFrom, dateTo);
+}
+
+export function calcTimeDiffInSec(
+    dateFrom?: number | string,
+    dateTo: number | string = new Date().getTime(),
+) {
+    const diffMs = Number(dateTo) - Number(dateFrom);
+
+    return diffMs / 1000;
+}
 
 export function formatStorageValues(
     value?: number,
@@ -173,16 +196,6 @@ export const formatTimestamp = (value?: string | number, defaultValue = '') => {
     const formattedData = dateTimeParse(value)?.format('YYYY-MM-DD HH:mm:ss.SSS');
 
     return formattedData ?? defaultValue;
-};
-
-export const calcUptimeInSeconds = (milliseconds: number | string) => {
-    const currentDate = new Date();
-    const diff = currentDate.getTime() - Number(milliseconds);
-    return diff <= 0 ? 0 : diff / 1000;
-};
-
-export const calcUptime = (milliseconds?: number | string) => {
-    return formatUptime(calcUptimeInSeconds(Number(milliseconds)));
 };
 
 export function getStringifiedData(value: unknown) {
