@@ -1,5 +1,19 @@
 # Changelog
 
+## [7.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v7.1.0...v7.2.0) (2024-12-06)
+
+
+### Features
+
+* add wrapper for gravity-ui/table ([#1736](https://github.com/ydb-platform/ydb-embedded-ui/issues/1736)) ([26d00e9](https://github.com/ydb-platform/ydb-embedded-ui/commit/26d00e910a078ad7042a3a41599978c0fb1995ad))
+* **JSONTree:** allow case insensitive search ([#1735](https://github.com/ydb-platform/ydb-embedded-ui/issues/1735)) ([d4845d3](https://github.com/ydb-platform/ydb-embedded-ui/commit/d4845d3cd598ebbaece4934e7b0a4a886f657170))
+* redirect to embedded ([#1732](https://github.com/ydb-platform/ydb-embedded-ui/issues/1732)) ([dacc546](https://github.com/ydb-platform/ydb-embedded-ui/commit/dacc546dc86f1e442c81dcd3120b40707d5a0504))
+
+
+### Bug Fixes
+
+* make grey more grey ([#1738](https://github.com/ydb-platform/ydb-embedded-ui/issues/1738)) ([6d39f9d](https://github.com/ydb-platform/ydb-embedded-ui/commit/6d39f9d498d86e2ec9f6763758a2c379aec71518))
+
 ## [7.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v7.0.0...v7.1.0) (2024-12-04)
 
 
