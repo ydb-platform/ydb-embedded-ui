@@ -4,26 +4,27 @@ import type {Column} from '@gravity-ui/react-data-table';
 import {
     OneLineQueryWithPopover,
     TruncatedQuery,
-} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import type {KeyValueRow} from '../../../../types/api/query';
-import {cn} from '../../../../utils/cn';
-import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
-import {TOP_QUERIES_COLUMNS_IDS} from '../../../../utils/diagnostics';
-import {generateHash} from '../../../../utils/generateHash';
-import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
-import {MAX_QUERY_HEIGHT} from '../../utils/constants';
+} from '../../../../../components/TruncatedQuery/TruncatedQuery';
+import type {KeyValueRow} from '../../../../../types/api/query';
+import {cn} from '../../../../../utils/cn';
+import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
+import {generateHash} from '../../../../../utils/generateHash';
+import {formatToMs, parseUsToMs} from '../../../../../utils/timeParsers';
+import {MAX_QUERY_HEIGHT} from '../../../utils/constants';
 
-import i18n from './i18n';
+import {
+    TOP_QUERIES_COLUMNS_IDS,
+    TOP_QUERIES_COLUMNS_TITLES,
+    isSortableTopQueriesColumn,
+} from './constants';
 
-import './TopQueries.scss';
+import '../TopQueries.scss';
 
 const b = cn('kv-top-queries');
 
-export const TOP_QUERIES_COLUMNS_WIDTH_LS_KEY = 'topQueriesColumnsWidth';
-export const RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY = 'runningQueriesColumnsWidth';
-
 const cpuTimeUsColumn: Column<KeyValueRow> = {
-    name: TOP_QUERIES_COLUMNS_IDS.CPUTimeUs,
+    name: TOP_QUERIES_COLUMNS_IDS.CPUTime,
+    header: TOP_QUERIES_COLUMNS_TITLES.CPUTime,
     sortAccessor: (row) => Number(row.CPUTimeUs),
     render: ({row}) => formatToMs(parseUsToMs(row.CPUTimeUs ?? undefined)),
     width: 120,
@@ -33,6 +34,7 @@ const cpuTimeUsColumn: Column<KeyValueRow> = {
 
 const queryTextColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.QueryText,
+    header: TOP_QUERIES_COLUMNS_TITLES.QueryText,
     sortAccessor: (row) => Number(row.CPUTimeUs),
     render: ({row}) => (
         <div className={b('query')}>
@@ -45,6 +47,7 @@ const queryTextColumn: Column<KeyValueRow> = {
 
 const endTimeColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.EndTime,
+    header: TOP_QUERIES_COLUMNS_TITLES.EndTime,
     render: ({row}) => formatDateTime(new Date(row.EndTime as string).getTime()),
     align: DataTable.RIGHT,
     width: 200,
@@ -52,6 +55,7 @@ const endTimeColumn: Column<KeyValueRow> = {
 
 const readRowsColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.ReadRows,
+    header: TOP_QUERIES_COLUMNS_TITLES.ReadRows,
     render: ({row}) => formatNumber(row.ReadRows),
     sortAccessor: (row) => Number(row.ReadRows),
     align: DataTable.RIGHT,
@@ -60,6 +64,7 @@ const readRowsColumn: Column<KeyValueRow> = {
 
 const readBytesColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.ReadBytes,
+    header: TOP_QUERIES_COLUMNS_TITLES.ReadBytes,
     render: ({row}) => formatNumber(row.ReadBytes),
     sortAccessor: (row) => Number(row.ReadBytes),
     align: DataTable.RIGHT,
@@ -68,6 +73,7 @@ const readBytesColumn: Column<KeyValueRow> = {
 
 const userSIDColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.UserSID,
+    header: TOP_QUERIES_COLUMNS_TITLES.UserSID,
     render: ({row}) => <div className={b('user-sid')}>{row.UserSID || '–'}</div>,
     sortAccessor: (row) => String(row.UserSID),
     align: DataTable.LEFT,
@@ -75,7 +81,7 @@ const userSIDColumn: Column<KeyValueRow> = {
 
 const oneLineQueryTextColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.OneLineQueryText,
-    header: 'QueryText',
+    header: TOP_QUERIES_COLUMNS_TITLES.OneLineQueryText,
     render: ({row}) => <OneLineQueryWithPopover value={row.QueryText?.toString()} />,
     sortable: false,
     width: 500,
@@ -83,6 +89,7 @@ const oneLineQueryTextColumn: Column<KeyValueRow> = {
 
 const queryHashColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.QueryHash,
+    header: TOP_QUERIES_COLUMNS_TITLES.QueryHash,
     render: ({row}) => generateHash(String(row.QueryText)),
     width: 130,
     sortable: false,
@@ -90,7 +97,7 @@ const queryHashColumn: Column<KeyValueRow> = {
 
 const durationColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.Duration,
-    header: 'Duration',
+    header: TOP_QUERIES_COLUMNS_TITLES.Duration,
     render: ({row}) => formatToMs(parseUsToMs(row.Duration ?? undefined)),
     sortAccessor: (row) => Number(row.Duration),
     align: DataTable.RIGHT,
@@ -98,10 +105,8 @@ const durationColumn: Column<KeyValueRow> = {
 };
 
 const queryStartColumn: Column<KeyValueRow> = {
-    name: 'QueryStartAt',
-    get header() {
-        return i18n('col_start-time');
-    },
+    name: TOP_QUERIES_COLUMNS_IDS.QueryStartAt,
+    header: TOP_QUERIES_COLUMNS_TITLES.QueryStartAt,
     render: ({row}) => formatDateTime(new Date(row.QueryStartAt as string).getTime()),
     sortable: true,
     resizeable: false,
@@ -109,34 +114,44 @@ const queryStartColumn: Column<KeyValueRow> = {
 };
 
 const applicationColumn: Column<KeyValueRow> = {
-    name: 'ApplicationName',
-    get header() {
-        return i18n('col_app');
-    },
+    name: TOP_QUERIES_COLUMNS_IDS.ApplicationName,
+    header: TOP_QUERIES_COLUMNS_TITLES.ApplicationName,
     render: ({row}) => <div className={b('user-sid')}>{row.ApplicationName || '–'}</div>,
     sortable: true,
 };
 
-export const TOP_QUERIES_COLUMNS = [
-    queryHashColumn,
-    cpuTimeUsColumn,
-    queryTextColumn,
-    endTimeColumn,
-    durationColumn,
-    readRowsColumn,
-    readBytesColumn,
-    userSIDColumn,
-];
+export function getTopQueriesColumns() {
+    const columns = [
+        queryHashColumn,
+        cpuTimeUsColumn,
+        queryTextColumn,
+        endTimeColumn,
+        durationColumn,
+        readRowsColumn,
+        readBytesColumn,
+        userSIDColumn,
+    ];
 
-export const TENANT_OVERVIEW_TOP_QUERUES_COLUMNS = [
-    queryHashColumn,
-    oneLineQueryTextColumn,
-    cpuTimeUsColumn,
-];
+    return columns.map((column) => ({
+        ...column,
+        sortable: isSortableTopQueriesColumn(column.name),
+    }));
+}
 
-export const RUNNING_QUERIES_COLUMNS = [
-    userSIDColumn,
-    queryStartColumn,
-    queryTextColumn,
-    applicationColumn,
-];
+export function getTenantOverviewTopQueriesColumns() {
+    const columns = [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
+
+    return columns.map((column) => ({
+        ...column,
+        sortable: false,
+    }));
+}
+
+export function getRunningQueriesColumns() {
+    const columns = [userSIDColumn, queryStartColumn, queryTextColumn, applicationColumn];
+
+    return columns.map((column) => ({
+        ...column,
+        sortable: isSortableTopQueriesColumn(column.name),
+    }));
+}

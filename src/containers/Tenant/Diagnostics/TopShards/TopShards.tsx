@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type {Column, Settings, SortOrder} from '@gravity-ui/react-data-table';
+import type {Column, Settings} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import {useLocation} from 'react-router-dom';
 
@@ -18,14 +18,19 @@ import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
-import {TOP_SHARD_COLUMNS_IDS, isSortableTopShardsProperty} from '../../../../utils/diagnostics';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {isColumnEntityType} from '../../utils/schema';
 
 import {Filters} from './Filters';
-import {TOP_SHARDS_COLUMNS_WIDTH_LS_KEY, getShardsWorkloadColumns} from './getTopShardsColumns';
+import {getShardsWorkloadColumns} from './columns/columns';
+import {
+    TOP_SHARDS_COLUMNS_IDS,
+    TOP_SHARDS_COLUMNS_WIDTH_LS_KEY,
+    isSortableTopShardsColumn,
+} from './columns/constants';
 import i18n from './i18n';
+import {useTopShardSort} from './utils';
 
 import './TopShards.scss';
 
@@ -44,29 +49,6 @@ function prepareDateTimeValue(value: CellValue) {
         return '–';
     }
     return formatDateTime(new Date(value).getTime());
-}
-
-function stringToDataTableSortOrder(value: string): SortOrder[] | undefined {
-    return value
-        ? value.split(',').map((columnId) => ({
-              columnId,
-              order: DataTable.DESCENDING,
-          }))
-        : undefined;
-}
-
-function stringToQuerySortOrder(value: string) {
-    return value
-        ? value.split(',').map((columnId) => ({
-              columnId,
-              order: 'DESC',
-          }))
-        : undefined;
-}
-
-function dataTableToStringSortOrder(value: SortOrder | SortOrder[] = []) {
-    const sortOrders = Array.isArray(value) ? value : [value];
-    return sortOrders.map(({columnId}) => columnId).join(',');
 }
 
 function fillDateRangeFor(value: ShardsWorkloadFilters) {
@@ -105,7 +87,8 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
         return defaultValue;
     });
 
-    const [sortOrder, setSortOrder] = React.useState(TOP_SHARD_COLUMNS_IDS.CPUCores);
+    const {tableSort, handleTableSort, backendSort} = useTopShardSort();
+
     const {
         currentData: result,
         isFetching,
@@ -114,20 +97,13 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
         {
             database: tenantName,
             path: path,
-            sortOrder: stringToQuerySortOrder(sortOrder),
+            sortOrder: backendSort,
             filters,
         },
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && result === undefined;
     const data = result?.resultSets?.[0]?.result || [];
-
-    const onSort = (newSortOrder?: SortOrder | SortOrder[]) => {
-        // omit information about sort order to disable ASC order, only DESC makes sense for top shards
-        // use a string (and not the DataTable default format) to prevent reference change,
-        // which would cause an excess state change, to avoid repeating requests
-        setSortOrder(dataTableToStringSortOrder(newSortOrder));
-    };
 
     const handleFiltersChange = (value: Partial<ShardsWorkloadFilters>) => {
         const newStateValue = {...value};
@@ -155,20 +131,20 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
 
         const columns: Column<KeyValueRow>[] = rawColumns.map((column) => ({
             ...column,
-            sortable: isSortableTopShardsProperty(column.name),
+            sortable: isSortableTopShardsColumn(column.name),
         }));
 
         if (filters.mode === EShardsWorkloadMode.History) {
             // after NodeId
             columns.splice(5, 0, {
-                name: TOP_SHARD_COLUMNS_IDS.PeakTime,
+                name: TOP_SHARDS_COLUMNS_IDS.PeakTime,
                 render: ({row}) => {
                     return prepareDateTimeValue(row.PeakTime);
                 },
                 sortable: false,
             });
             columns.push({
-                name: TOP_SHARD_COLUMNS_IDS.IntervalEnd,
+                name: TOP_SHARDS_COLUMNS_IDS.IntervalEnd,
                 render: ({row}) => {
                     return prepareDateTimeValue(row.IntervalEnd);
                 },
@@ -197,8 +173,8 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
                 columns={tableColumns}
                 data={data}
                 settings={TABLE_SETTINGS}
-                onSort={onSort}
-                sortOrder={stringToDataTableSortOrder(sortOrder)}
+                onSort={handleTableSort}
+                sortOrder={tableSort}
             />
         );
     };

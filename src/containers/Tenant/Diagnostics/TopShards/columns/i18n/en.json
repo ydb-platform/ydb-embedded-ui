@@ -1,0 +1,10 @@
+{
+  "tablet-id": "TabletId",
+  "cpu-cores": "CPUCores",
+  "data-size": "DataSize (B)",
+  "path": "Path",
+  "node-id": "NodeId",
+  "peak-time": "PeakTime",
+  "in-flight-tx-count": "InFlightTxCount",
+  "interval-end": "IntervalEnd"
+}

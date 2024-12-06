@@ -7,13 +7,11 @@ import {topQueriesApi} from '../../../../store/reducers/executeTopQueries/execut
 import type {KeyValueRow} from '../../../../types/api/query';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
-import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 
-import {
-    RUNNING_QUERIES_COLUMNS,
-    RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY,
-} from './getTopQueriesColumns';
+import {getRunningQueriesColumns} from './columns/columns';
+import {RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
 import i18n from './i18n';
+import {TOP_QUERIES_TABLE_SETTINGS, useRunningQueriesSort} from './utils';
 
 interface Props {
     database: string;
@@ -24,15 +22,25 @@ interface Props {
 export const RunningQueriesData = ({database, onRowClick, rowClassName}: Props) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
-    const {currentData, isLoading, error} = topQueriesApi.useGetRunningQueriesQuery(
+
+    const {tableSort, handleTableSort, backendSort} = useRunningQueriesSort();
+
+    const {currentData, isFetching, error} = topQueriesApi.useGetRunningQueriesQuery(
         {
             database,
             filters,
+            sortOrder: backendSort,
         },
         {pollingInterval: autoRefreshInterval},
     );
 
+    const loading = isFetching && currentData === undefined;
+
     const data = currentData?.resultSets?.[0].result || [];
+
+    const columns = React.useMemo(() => {
+        return getRunningQueriesColumns();
+    }, []);
 
     const handleRowClick = (row: KeyValueRow) => {
         return onRowClick(row.QueryText as string);
@@ -41,15 +49,17 @@ export const RunningQueriesData = ({database, onRowClick, rowClassName}: Props) 
     return (
         <React.Fragment>
             {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading}>
+            <TableWithControlsLayout.Table loading={loading}>
                 <ResizeableDataTable
                     emptyDataMessage={i18n('no-data')}
                     columnsWidthLSKey={RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY}
-                    columns={RUNNING_QUERIES_COLUMNS}
+                    columns={columns}
                     data={data}
-                    settings={QUERY_TABLE_SETTINGS}
+                    settings={TOP_QUERIES_TABLE_SETTINGS}
                     onRowClick={handleRowClick}
                     rowClassName={() => rowClassName}
+                    sortOrder={tableSort}
+                    onSort={handleTableSort}
                 />
             </TableWithControlsLayout.Table>
         </React.Fragment>

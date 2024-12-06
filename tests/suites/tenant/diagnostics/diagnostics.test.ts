@@ -66,7 +66,7 @@ test.describe('Diagnostics tab', async () => {
         await diagnostics.clickTab(DiagnosticsTab.Queries);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
         expect(
-            await diagnostics.table.waitForCellValueByHeader(1, 'QueryText', longRunningQuery),
+            await diagnostics.table.waitForCellValueByHeader(1, 'Query text', longRunningQuery),
         ).toBe(true);
     });
 });

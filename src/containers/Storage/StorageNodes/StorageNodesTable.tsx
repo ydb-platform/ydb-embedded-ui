@@ -23,7 +23,7 @@ interface StorageNodesTableProps {
     columns: StorageNodesColumn[];
     visibleEntities: VisibleEntities;
     nodesUptimeFilter: NodesUptimeFilterValues;
-    sort?: SortOrder;
+    sort?: SortOrder[];
     onShowAll?: VoidFunction;
     handleSort?: HandleSort;
 }

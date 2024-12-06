@@ -16,7 +16,7 @@ interface StorageGroupsTableProps {
     columns: StorageGroupsColumn[];
     visibleEntities: VisibleEntities;
     onShowAll?: VoidFunction;
-    sort?: SortOrder;
+    sort?: SortOrder[];
     handleSort?: HandleSort;
 }
 

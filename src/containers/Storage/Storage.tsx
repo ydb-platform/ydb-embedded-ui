@@ -1,5 +1,7 @@
 import React from 'react';
 
+import type {OrderType, SortOrder} from '@gravity-ui/react-data-table';
+
 import {AccessDenied} from '../../components/Errors/403';
 import {isAccessError} from '../../components/Errors/PageError/PageError';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -13,6 +15,7 @@ import type {NodesSortParams} from '../../store/reducers/nodes/types';
 import {filterGroups, filterNodes} from '../../store/reducers/storage/selectors';
 import {storageApi} from '../../store/reducers/storage/storage';
 import type {StorageSortParams} from '../../store/reducers/storage/types';
+import type {HandleSort} from '../../utils/hooks';
 import {useAutoRefreshInterval, useTableSort} from '../../utils/hooks';
 import {useAdditionalNodeProps} from '../AppWithClusters/useClusterData';
 
@@ -27,6 +30,32 @@ import {useStorageQueryParams} from './useStorageQueryParams';
 import {defaultSortNode, getDefaultSortGroup} from './utils';
 
 import './Storage.scss';
+
+export function useStorageSort<
+    T extends {
+        sortValue: string;
+        sortOrder: OrderType;
+    },
+>(
+    {sortValue, sortOrder}: T,
+    onSort: (params: T | undefined) => void,
+): [SortOrder[] | undefined, HandleSort] {
+    return useTableSort({
+        initialSortColumn: sortValue,
+        initialSortOrder: sortOrder,
+        multiple: false,
+        onSort: (sort) => {
+            const newSort = sort?.[0]
+                ? {
+                      sortValue: sort[0].columnId,
+                      sortOrder: sort[0].order,
+                  }
+                : undefined;
+
+            onSort(newSort as T);
+        },
+    });
+}
 
 interface StorageProps {
     database?: string;
@@ -58,17 +87,11 @@ export const Storage = ({database, viewContext, nodeId, groupId, pDiskId}: Stora
     const isGroups = storageType === 'groups';
     const isNodes = storageType === 'nodes';
 
-    const [nodeSort, setNodeSort] = React.useState<NodesSortParams>({
-        sortOrder: undefined,
-        sortValue: undefined,
-    });
-    const nodesSortParams = nodeSort.sortValue ? nodeSort : defaultSortNode;
+    const [nodeSort, setNodeSort] = React.useState<NodesSortParams | undefined>(undefined);
+    const nodesSortParams = nodeSort ? nodeSort : defaultSortNode;
 
-    const [groupSort, setGroupSort] = React.useState<StorageSortParams>({
-        sortOrder: undefined,
-        sortValue: undefined,
-    });
-    const groupsSortParams = groupSort.sortOrder ? groupSort : getDefaultSortGroup(visibleEntities);
+    const [groupSort, setGroupSort] = React.useState<StorageSortParams | undefined>(undefined);
+    const groupsSortParams = groupSort ? groupSort : getDefaultSortGroup(visibleEntities);
 
     const {
         columnsToShow: storageNodesColumnsToShow,
@@ -134,12 +157,8 @@ export const Storage = ({database, viewContext, nodeId, groupId, pDiskId}: Stora
         [searchValue, groups],
     );
 
-    const [nodesSort, handleNodesSort] = useTableSort(nodesSortParams, (params) =>
-        setNodeSort(params as NodesSortParams),
-    );
-    const [groupsSort, handleGroupsSort] = useTableSort(groupsSortParams, (params) =>
-        setGroupSort(params as StorageSortParams),
-    );
+    const [nodesSort, handleNodesSort] = useStorageSort(nodesSortParams, setNodeSort);
+    const [groupsSort, handleGroupsSort] = useStorageSort(groupsSortParams, setGroupSort);
 
     const renderDataTable = () => {
         return (

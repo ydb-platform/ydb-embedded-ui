@@ -96,8 +96,8 @@ export interface PreparedStorageGroup {
 }
 
 export interface StorageSortParams {
-    sortOrder: OrderType | undefined;
-    sortValue: StorageV2SortValue | undefined;
+    sortOrder: OrderType;
+    sortValue: StorageV2SortValue;
 }
 
 export type TableGroup = {
