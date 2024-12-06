@@ -1,20 +1,12 @@
 import {ArrowToggle, Button, Flex} from '@gravity-ui/uikit';
 import type {CellContext, ColumnDef, Row} from '@tanstack/react-table';
 
+import {ColumnHeader} from '../../../../components/Table/Table';
 import {formatTimestamp} from '../../../../utils/dataFormatters/dataFormatters';
 
 import {tabletInfoKeyset} from './i18n';
 import {b} from './shared';
 import type {TabletStorageItem} from './types';
-
-interface ColumnHeaderProps {
-    name: string;
-    className?: string;
-}
-
-function ColumnHeader({name, className}: ColumnHeaderProps) {
-    return <div className={b('table-header-content', className)}>{name}</div>;
-}
 
 function metricsCell(
     info: CellContext<TabletStorageItem, unknown>,
@@ -57,24 +49,23 @@ export function getColumns(hasExpand?: boolean) {
     const columns: ColumnDef<TabletStorageItem>[] = [
         {
             accessorKey: 'channelIndex',
-            header: () => <ColumnHeader name={tabletInfoKeyset('label_channel-index')} />,
+            header: () => <ColumnHeader>{tabletInfoKeyset('label_channel-index')}</ColumnHeader>,
             size: 50,
             cell: metricsCell,
             meta: {align: 'right'},
         },
         {
             accessorKey: 'storagePoolName',
-            header: () => <ColumnHeader name={tabletInfoKeyset('label_storage-pool')} />,
+            header: () => <ColumnHeader>{tabletInfoKeyset('label_storage-pool')}</ColumnHeader>,
             size: 200,
             cell: metricsCell,
         },
         {
             accessorKey: 'GroupID',
             header: () => (
-                <ColumnHeader
-                    name={tabletInfoKeyset('label_group-id')}
-                    className={hasExpand ? b('with-padding') : undefined}
-                />
+                <ColumnHeader className={hasExpand ? b('with-padding') : undefined}>
+                    {tabletInfoKeyset('label_group-id')}
+                </ColumnHeader>
             ),
             size: 100,
             cell: (info) => (
@@ -83,14 +74,14 @@ export function getColumns(hasExpand?: boolean) {
         },
         {
             accessorKey: 'FromGeneration',
-            header: () => <ColumnHeader name={tabletInfoKeyset('label_generation')} />,
+            header: () => <ColumnHeader>{tabletInfoKeyset('label_generation')}</ColumnHeader>,
             size: 100,
             cell: metricsCell,
             meta: {align: 'right'},
         },
         {
             accessorKey: 'Timestamp',
-            header: () => <ColumnHeader name={tabletInfoKeyset('label_timestamp')} />,
+            header: () => <ColumnHeader>{tabletInfoKeyset('label_timestamp')}</ColumnHeader>,
             size: 200,
             cell: (info) => metricsCell(info, formatTimestamp),
             meta: {align: 'right'},
