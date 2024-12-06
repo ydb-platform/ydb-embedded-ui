@@ -14,7 +14,7 @@ import {tabletApi} from '../../store/reducers/tablet';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {calcUptime} from '../../utils/dataFormatters/dataFormatters';
+import {getUptimeFromDateFormatted} from '../../utils/dataFormatters/dataFormatters';
 import {useTypedSelector} from '../../utils/hooks';
 import {getDefaultNodePath} from '../Node/NodePages';
 
@@ -97,7 +97,7 @@ function getColumns({database}: {database?: string}) {
                 return i18n('Uptime');
             },
             render: ({row}) => {
-                return calcUptime(row.ChangeTime);
+                return getUptimeFromDateFormatted(row.ChangeTime);
             },
             sortAccessor: (row) => -Number(row.ChangeTime),
             align: 'right',

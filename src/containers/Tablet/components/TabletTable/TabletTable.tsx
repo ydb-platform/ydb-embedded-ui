@@ -6,7 +6,7 @@ import {InternalLink} from '../../../../components/InternalLink/InternalLink';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TabletState} from '../../../../components/TabletState/TabletState';
 import type {ITabletPreparedHistoryItem} from '../../../../types/store/tablet';
-import {calcUptime} from '../../../../utils/dataFormatters/dataFormatters';
+import {getUptimeFromDateFormatted} from '../../../../utils/dataFormatters/dataFormatters';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 
 const TABLET_COLUMNS_WIDTH_LS_KEY = 'tabletTableColumnsWidth';
@@ -21,7 +21,7 @@ const columns: Column<ITabletPreparedHistoryItem>[] = [
         name: 'Change time',
         align: DataTable.RIGHT,
         sortable: false,
-        render: ({row}) => calcUptime(row.changeTime),
+        render: ({row}) => getUptimeFromDateFormatted(row.changeTime),
     },
     {
         name: 'State',
