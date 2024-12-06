@@ -45,6 +45,7 @@ SELECT ${QUERY_TECHNICAL_MARK}
 FROM \`${path}/.sys/top_queries_by_cpu_time_one_hour\`
 WHERE ${filterConditions || 'true'} AND QueryText NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 ${orderBy}
+LIMIT 100
 `;
 };
 

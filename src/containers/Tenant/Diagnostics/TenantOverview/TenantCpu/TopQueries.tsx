@@ -37,7 +37,10 @@ export function TopQueries({tenantName}: TopQueriesProps) {
     const query = parseQuery(location);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const columns = getTenantOverviewTopQueriesColumns();
+
+    const columns = React.useMemo(() => {
+        return getTenantOverviewTopQueriesColumns();
+    }, []);
 
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
         {database: tenantName},

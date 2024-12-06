@@ -38,7 +38,9 @@ export const RunningQueriesData = ({database, onRowClick, rowClassName}: Props) 
 
     const data = currentData?.resultSets?.[0].result || [];
 
-    const columns = getRunningQueriesColumns();
+    const columns = React.useMemo(() => {
+        return getRunningQueriesColumns();
+    }, []);
 
     const handleRowClick = (row: KeyValueRow) => {
         return onRowClick(row.QueryText as string);

@@ -37,7 +37,9 @@ export const TopQueriesData = ({database, onRowClick, rowClassName}: Props) => {
 
     const data = currentData?.resultSets?.[0]?.result || [];
 
-    const columns = getTopQueriesColumns();
+    const columns = React.useMemo(() => {
+        return getTopQueriesColumns();
+    }, []);
 
     const handleRowClick = (row: KeyValueRow) => {
         return onRowClick(row.QueryText as string);
