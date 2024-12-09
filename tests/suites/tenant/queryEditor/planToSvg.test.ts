@@ -89,6 +89,59 @@ test.describe('Test Plan to SVG functionality', async () => {
         expect(download.suggestedFilename()).toBe('query-plan.svg');
     });
 
+    test('Plan to SVG handles API errors correctly', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        // 1. Turn on Plan to SVG experiment
+        await toggleExperiment(page, 'on', 'Execution plan');
+
+        // 2. Set query and run it
+        await queryEditor.setQuery(testQuery);
+        await queryEditor.clickRunButton();
+
+        // 3. Wait for query execution to complete
+        await expect(async () => {
+            const status = await queryEditor.getExecutionStatus();
+            expect(status).toBe('Completed');
+        }).toPass();
+
+        // 4. Mock the plan2svg API to return an error
+        await page.route('**/plan2svg**', (route) => {
+            route.fulfill({
+                status: 500,
+                contentType: 'application/json',
+                body: JSON.stringify({message: 'Failed to generate SVG'}),
+            });
+        });
+
+        // 5. Click execution plan button to open dropdown
+        const executionPlanButton = page.locator('button:has-text("Execution plan")');
+        await executionPlanButton.click();
+
+        // 6. Click "Open in new tab" option and wait for error state
+        const openInNewTabOption = page.locator('text="Open in new tab"');
+        await openInNewTabOption.click();
+        await page.waitForTimeout(1000); // Wait for error to be processed
+
+        // 7. Close the dropdown
+        await page.keyboard.press('Escape');
+
+        // 8. Verify error state
+        await expect(executionPlanButton).toHaveClass(/flat-danger/);
+
+        // 9. Verify error tooltip
+        await executionPlanButton.hover();
+        await page.waitForTimeout(500); // Wait for tooltip animation
+        const tooltipText = await page.textContent('.g-tooltip');
+        expect(tooltipText).toContain('Error');
+        expect(tooltipText).toContain('Failed to generate SVG');
+
+        // 10. Verify dropdown is disabled after error
+        await executionPlanButton.click();
+        await expect(openInNewTabOption).not.toBeVisible();
+        await expect(page.locator('text="Download"')).not.toBeVisible();
+    });
+
     test('Statistics setting becomes disabled when execution plan experiment is enabled', async ({
         page,
     }) => {

@@ -2,7 +2,7 @@ import React from 'react';
 
 import {ArrowDownToLine, ArrowUpRightFromSquare, ChevronDown} from '@gravity-ui/icons';
 import type {ButtonProps} from '@gravity-ui/uikit';
-import {Button, DropdownMenu} from '@gravity-ui/uikit';
+import {Button, DropdownMenu, Tooltip} from '@gravity-ui/uikit';
 
 import {planToSvgApi} from '../../../../../../store/reducers/planToSvg';
 import type {QueryPlan, ScriptPlan} from '../../../../../../types/api/query';
@@ -40,26 +40,33 @@ export function PlanToSvgButton({plan, database}: PlanToSvgButtonProps) {
                 return url;
             })
             .catch((err) => {
-                setError(JSON.stringify(err));
-                throw err;
+                const errorMessage = err.data?.message || err.message || JSON.stringify(err);
+                setError(errorMessage);
+                return null;
             });
     }, [database, getPlanToSvg, plan, blobUrl]);
 
     const handleOpenInNewTab = React.useCallback(() => {
         handleGetSvg().then((url) => {
-            window.open(url, '_blank');
+            if (url) {
+                window.open(url, '_blank');
+            }
         });
+        return;
     }, [handleGetSvg]);
 
     const handleDownload = React.useCallback(() => {
         handleGetSvg().then((url) => {
             const link = document.createElement('a');
-            link.href = url;
-            link.download = 'query-plan.svg';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            if (url) {
+                link.href = url;
+                link.download = 'query-plan.svg';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         });
+        return;
     }, [handleGetSvg]);
 
     React.useEffect(() => {
@@ -85,19 +92,21 @@ export function PlanToSvgButton({plan, database}: PlanToSvgButtonProps) {
 
     const renderSwitcher = (props: ButtonProps) => {
         return (
-            <Button
-                view={getButtonView(error, isLoading)}
-                loading={isLoading}
-                disabled={isLoading}
-                {...props}
-            >
-                {i18n('text_plan-svg')}
-                <Button.Icon>
-                    <ChevronDown />
-                </Button.Icon>
-            </Button>
+            <Tooltip content={error ? i18n('text_error-plan-svg', {error}) : i18n('text_plan-svg')}>
+                <Button
+                    view={getButtonView(error, isLoading)}
+                    loading={isLoading}
+                    disabled={isLoading}
+                    {...props}
+                >
+                    {i18n('text_plan-svg')}
+                    <Button.Icon>
+                        <ChevronDown />
+                    </Button.Icon>
+                </Button>
+            </Tooltip>
         );
     };
 
-    return <DropdownMenu renderSwitcher={renderSwitcher} items={items} />;
+    return <DropdownMenu renderSwitcher={renderSwitcher} items={items} disabled={Boolean(error)} />;
 }
