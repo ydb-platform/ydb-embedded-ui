@@ -1,7 +1,9 @@
 import {dateTimeParse, isLikeRelative} from '@gravity-ui/date-utils';
+import type {SortOrder} from '@gravity-ui/react-data-table';
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
+import {prepareOrderByFromTableSort} from '../../../utils/hooks/useTableSort';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {api} from '../api';
 
@@ -9,15 +11,6 @@ import type {ShardsWorkloadFilters} from './types';
 import {EShardsWorkloadMode} from './types';
 
 const initialState: ShardsWorkloadFilters = {};
-
-export interface SortOrder {
-    columnId: string;
-    order: string;
-}
-
-function formatSortOrder({columnId, order}: SortOrder) {
-    return `${columnId} ${order}`;
-}
 
 function getFiltersConditions(filters?: ShardsWorkloadFilters) {
     const conditions: string[] = [];
@@ -59,7 +52,7 @@ function createShardQueryHistorical(
         where = `(${where}) AND ${filterConditions}`;
     }
 
-    const orderBy = sortOrder ? `ORDER BY ${sortOrder.map(formatSortOrder).join(', ')}` : '';
+    const orderBy = prepareOrderByFromTableSort(sortOrder);
 
     return `SELECT
     ${pathSelect},
@@ -81,7 +74,7 @@ function createShardQueryImmediate(path: string, sortOrder?: SortOrder[], tenant
         ? `CAST(SUBSTRING(CAST(Path AS String), ${tenantName.length}) AS Utf8) AS Path`
         : 'Path';
 
-    const orderBy = sortOrder ? `ORDER BY ${sortOrder.map(formatSortOrder).join(', ')}` : '';
+    const orderBy = prepareOrderByFromTableSort(sortOrder);
 
     return `SELECT
     ${pathSelect},

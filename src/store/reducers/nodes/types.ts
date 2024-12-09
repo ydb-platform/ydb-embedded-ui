@@ -51,8 +51,8 @@ export interface NodesPreparedEntity extends PreparedNodeSystemState {
 }
 
 export interface NodesSortParams {
-    sortOrder: OrderType | undefined;
-    sortValue: NodesSortValue | undefined;
+    sortOrder: OrderType;
+    sortValue: NodesSortValue;
 }
 
 export interface NodesFilters {
