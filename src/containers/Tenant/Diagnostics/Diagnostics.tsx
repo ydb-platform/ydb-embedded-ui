@@ -16,7 +16,7 @@ import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations';
-import {StorageWrapper} from '../../Storage/StorageWrapper';
+import {PaginatedStorage} from '../../Storage/PaginatedStorage';
 import {Tablets} from '../../Tablets';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {TenantTabsGroups, getTenantPath} from '../TenantPages';
@@ -114,7 +114,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Tablets path={path} database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.storage: {
-                return <StorageWrapper database={tenantName} parentRef={containerRef} />;
+                return <PaginatedStorage database={tenantName} parentRef={containerRef} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.network: {
                 return (

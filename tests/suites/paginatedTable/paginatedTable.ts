@@ -14,6 +14,7 @@ export class PaginatedTable {
     private refreshIntervalSelect: Locator;
     private headCells: Locator;
     private columnSetupButton: Locator;
+    private scrollContainer: string;
     private columnSetupPopup: Locator;
 
     constructor(page: Page) {
@@ -31,6 +32,7 @@ export class PaginatedTable {
             '.g-tree-select.g-table-column-setup button',
         );
         this.columnSetupPopup = page.locator('.g-popup .g-select-popup.g-tree-select__popup');
+        this.scrollContainer = '.ydb-cluster';
     }
 
     async waitForTableVisible() {
@@ -171,6 +173,27 @@ export class PaginatedTable {
         const columnOption = this.columnSetupPopup.locator(`[data-list-item="${columnName}"]`);
         const checkIcon = columnOption.locator('.g-icon.g-color-text_color_info');
         return await checkIcon.isVisible();
+    }
+
+    async scrollToBottom() {
+        await this.page.evaluate((selector) => {
+            const container = document.querySelector(selector);
+            if (container) {
+                container.scrollTo({top: container.scrollHeight, behavior: 'instant'});
+            }
+        }, this.scrollContainer);
+    }
+
+    async scrollToMiddle() {
+        await this.page.evaluate((selector) => {
+            const container = document.querySelector(selector);
+            if (container) {
+                container.scrollTo({
+                    top: Math.floor(container.scrollHeight / 2),
+                    behavior: 'instant',
+                });
+            }
+        }, this.scrollContainer);
     }
 
     private async getColumnIndex(columnName: string): Promise<number> {

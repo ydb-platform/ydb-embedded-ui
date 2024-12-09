@@ -27,7 +27,7 @@ import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {parseVersionsToVersionToColorMap} from '../../utils/versions';
 import {Nodes} from '../Nodes/Nodes';
-import {StorageWrapper} from '../Storage/StorageWrapper';
+import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {TabletsTable} from '../Tablets/TabletsTable';
 import {Tenants} from '../Tenants/Tenants';
 import {Versions} from '../Versions/Versions';
@@ -199,7 +199,7 @@ export function Cluster({
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage)).pathname
                     }
                 >
-                    <StorageWrapper parentRef={container} />
+                    <PaginatedStorage parentRef={container} />
                 </Route>
                 <Route
                     path={

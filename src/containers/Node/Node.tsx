@@ -20,7 +20,7 @@ import {nodeApi} from '../../store/reducers/node/node';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
-import {StorageWrapper} from '../Storage/StorageWrapper';
+import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {Tablets} from '../Tablets';
 
 import type {NodeTab} from './NodePages';
@@ -142,7 +142,13 @@ export function Node(props: NodeProps) {
             case STORAGE: {
                 return (
                     <div className={b('storage')} ref={container}>
-                        <StorageWrapper nodeId={nodeId} parentRef={container} />
+                        <PaginatedStorage
+                            nodeId={nodeId}
+                            parentRef={container}
+                            viewContext={{
+                                nodeId: nodeId?.toString(),
+                            }}
+                        />
                     </div>
                 );
             }

@@ -208,7 +208,7 @@ function useStorageNodesColumnsToSelect({
     viewContext,
 }: {
     database?: string;
-    viewContext: StorageViewContext;
+    viewContext?: StorageViewContext;
 }) {
     const {balancer} = useClusterBaseInfo();
     const {additionalNodesProps} = useAdditionalNodeProps({balancer});

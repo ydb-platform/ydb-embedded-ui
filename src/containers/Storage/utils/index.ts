@@ -89,12 +89,14 @@ const DEFAULT_ENTITIES_COUNT = 10;
 // GroupPage - DEFAULT_ENTITIES_COUNT nodes
 // PDiskPage - 1 node
 // VDiskPage - 1 node
-export function getStorageNodesInitialEntitiesCount({
-    nodeId,
-    pDiskId,
-    vDiskSlotId,
-}: StorageViewContext): number | undefined {
-    if (valueIsDefined(nodeId) || valueIsDefined(pDiskId) || valueIsDefined(vDiskSlotId)) {
+export function getStorageNodesInitialEntitiesCount(
+    context?: StorageViewContext,
+): number | undefined {
+    if (
+        valueIsDefined(context?.nodeId) ||
+        valueIsDefined(context?.pDiskId) ||
+        valueIsDefined(context?.vDiskSlotId)
+    ) {
         return 1;
     }
 
@@ -105,14 +107,13 @@ export function getStorageNodesInitialEntitiesCount({
 // GroupPage - 1 group
 // PDiskPage - DEFAULT_ENTITIES_COUNT groups
 // VDiskPage - 1 group
-export function getStorageGroupsInitialEntitiesCount({
-    vDiskSlotId,
-    groupId,
-}: StorageViewContext): number | undefined {
-    if (valueIsDefined(groupId)) {
+export function getStorageGroupsInitialEntitiesCount(
+    context?: StorageViewContext,
+): number | undefined {
+    if (valueIsDefined(context?.groupId)) {
         return 1;
     }
-    if (valueIsDefined(vDiskSlotId)) {
+    if (valueIsDefined(context?.vDiskSlotId)) {
         return 1;
     }
 
