@@ -46,7 +46,7 @@ test.describe('PaginatedTable', () => {
         }
     });
 
-    test.only('loads data when scrolling to middle of table', async ({page}) => {
+    test('loads data when scrolling to middle of table', async ({page}) => {
         // Setup mocks with large dataset
         await setupLargeNodesMock(page);
         await setupSettingsMock(page);

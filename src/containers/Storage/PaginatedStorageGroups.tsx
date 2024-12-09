@@ -64,7 +64,7 @@ function StorageGroupsComponent({
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
-        viewContext: viewContext ?? {},
+        viewContext,
     });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
@@ -113,7 +113,7 @@ function GroupedStorageGroupsComponent({
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
-        viewContext: viewContext ?? {},
+        viewContext,
     });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(

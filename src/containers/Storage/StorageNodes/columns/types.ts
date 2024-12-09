@@ -9,5 +9,5 @@ export interface GetStorageNodesColumnsParams {
     additionalNodesProps?: AdditionalNodesProps | undefined;
     visibleEntities?: VisibleEntities;
     database?: string;
-    viewContext: StorageViewContext;
+    viewContext?: StorageViewContext;
 }

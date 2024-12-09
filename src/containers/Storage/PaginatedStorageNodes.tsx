@@ -71,7 +71,7 @@ function StorageNodesComponent({
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
-        viewContext: viewContext ?? {},
+        viewContext,
     });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
@@ -119,7 +119,7 @@ function GroupedStorageNodesComponent({
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
-        viewContext: viewContext ?? {},
+        viewContext,
     });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageNodesInfoQuery(
@@ -218,6 +218,6 @@ function useStorageNodesColumnsToSelect({
         additionalNodesProps,
         visibleEntities,
         database,
-        viewContext: viewContext ?? {},
+        viewContext,
     });
 }

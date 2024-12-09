@@ -5,12 +5,12 @@ import type {StorageViewContext} from '../../types';
 export type StorageGroupsColumn = Column<PreparedStorageGroup>;
 
 export interface GetStorageColumnsData {
-    viewContext: StorageViewContext;
+    viewContext?: StorageViewContext;
 }
 
 export interface GetStorageGroupsColumnsParams {
     visibleEntities?: VisibleEntities;
-    viewContext: StorageViewContext;
+    viewContext?: StorageViewContext;
 }
 
 export type StorageColumnsGetter = (data?: GetStorageColumnsData) => StorageGroupsColumn[];
