@@ -2,6 +2,8 @@ import type {Page} from '@playwright/test';
 
 import {backend} from '../../utils/constants';
 
+const MOCK_DELAY = 200; // 200ms delay to simulate network latency
+
 interface NodeMockOptions {
     offset: number;
     limit: number;
@@ -52,6 +54,8 @@ export const setupNodesMock = async (page: Page) => {
 
         const nodes = await generateNodeMock({offset, limit});
 
+        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
@@ -65,8 +69,54 @@ export const setupNodesMock = async (page: Page) => {
     });
 };
 
+export const setupEmptyNodesMock = async (page: Page) => {
+    await page.route(`${backend}/viewer/json/nodes?*`, async (route) => {
+        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                Overall: 'Green',
+                Nodes: [],
+                TotalNodes: '0',
+                FoundNodes: '0',
+            }),
+        });
+    });
+};
+
+export const setupLargeNodesMock = async (page: Page, totalNodes = 1000) => {
+    await page.route(`${backend}/viewer/json/nodes?*`, async (route) => {
+        const url = new URL(route.request().url());
+        const offset = parseInt(url.searchParams.get('offset') || '0', 10);
+        const limit = parseInt(url.searchParams.get('limit') || '100', 10);
+
+        // Generate nodes for the requested chunk
+        const nodes = await generateNodeMock({
+            offset,
+            limit: Math.min(limit, totalNodes - offset), // Ensure we don't generate more than total
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                Overall: 'Green',
+                Nodes: nodes,
+                TotalNodes: totalNodes.toString(),
+                FoundNodes: totalNodes.toString(),
+            }),
+        });
+    });
+};
+
 export const setupSettingsMock = async (page: Page) => {
     await page.route(`${backend}/api/settings`, async (route) => {
+        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
