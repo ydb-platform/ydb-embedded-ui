@@ -10,7 +10,7 @@ export interface PaginatedStorageProps {
     groupId?: string | number;
     pDiskId?: string | number;
 
-    viewContext: StorageViewContext;
+    viewContext?: StorageViewContext;
 
     parentRef: React.RefObject<HTMLElement>;
 
@@ -25,7 +25,7 @@ export const PaginatedStorage = (props: PaginatedStorageProps) => {
     if (isNodes) {
         return (
             <PaginatedStorageNodes
-                initialEntitiesCount={getStorageNodesInitialEntitiesCount(props.viewContext)}
+                initialEntitiesCount={getStorageNodesInitialEntitiesCount(props.viewContext ?? {})}
                 {...props}
             />
         );
@@ -33,7 +33,7 @@ export const PaginatedStorage = (props: PaginatedStorageProps) => {
 
     return (
         <PaginatedStorageGroups
-            initialEntitiesCount={getStorageGroupsInitialEntitiesCount(props.viewContext)}
+            initialEntitiesCount={getStorageGroupsInitialEntitiesCount(props.viewContext ?? {})}
             {...props}
         />
     );

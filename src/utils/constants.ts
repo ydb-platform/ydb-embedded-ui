@@ -132,10 +132,6 @@ export const PARTITIONS_HIDDEN_COLUMNS_KEY = 'partitionsHiddenColumns';
 // Remain "tab" in key name for backward compatibility
 export const TENANT_INITIAL_PAGE_KEY = 'saved_tenant_initial_tab';
 
-// Setting to use paginated tables
-// Old key value for backward compatibility
-export const USE_PAGINATED_TABLES_KEY = 'useBackendParamsForTables';
-
 export const ENABLE_NETWORK_TABLE_KEY = 'enableNetworkTable';
 
 export const USE_SHOW_PLAN_SVG_KEY = 'useShowPlanToSvg';

@@ -12,7 +12,7 @@
   "section.about": "About",
 
   "settings.editor.autocomplete.title": "Enable autocomplete",
-  "settings.editor.autocomplete.description": "You’re always able to get suggestions by pressing Ctrl+Space.",
+  "settings.editor.autocomplete.description": "You're always able to get suggestions by pressing Ctrl+Space.",
 
   "settings.editor.autocomplete-on-enter.title": "Accept suggestion on Enter",
   "settings.editor.autocomplete-on-enter.description": "Controls whether suggestions should be accepted on Enter, in addition to Tab. Helps to avoid ambiguity between inserting new lines or accepting suggestions.",
@@ -29,9 +29,6 @@
   "settings.binaryDataInPlainTextDisplay.title": "Display binary data in plain text",
 
   "settings.invertedDisks.title": "Inverted disks space indicators",
-
-  "settings.usePaginatedTables.title": "Use paginated tables",
-  "settings.usePaginatedTables.description": " Use table with data load on scroll for Nodes and Storage tabs. It will increase performance, but could work unstable",
 
   "settings.enableNetworkTable.title": "Enable network table",
 
