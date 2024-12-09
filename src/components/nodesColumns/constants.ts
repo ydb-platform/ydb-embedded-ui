@@ -177,7 +177,7 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     DC: ['DC'],
     Rack: ['Rack'],
     Version: ['Version'],
-    Uptime: ['Uptime'],
+    Uptime: ['Uptime', 'DisconnectTime'],
     Memory: ['Memory', 'MemoryDetailed'],
     RAM: ['Memory'],
     Pools: ['CPU'],

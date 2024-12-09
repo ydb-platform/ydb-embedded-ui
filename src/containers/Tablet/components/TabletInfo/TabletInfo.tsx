@@ -10,7 +10,7 @@ import {selectIsUserAllowedToMakeChanges} from '../../../../store/reducers/authe
 import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {cn} from '../../../../utils/cn';
-import {calcUptime} from '../../../../utils/dataFormatters/dataFormatters';
+import {getUptimeFromDateFormatted} from '../../../../utils/dataFormatters/dataFormatters';
 import {createTabletDeveloperUIHref} from '../../../../utils/developerUI/developerUI';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {getDefaultNodePath} from '../../../Node/NodePages';
@@ -70,7 +70,10 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
     tabletInfo.push({label: tabletInfoKeyset('field_state'), value: <TabletState state={State} />});
 
     if (hasUptime) {
-        tabletInfo.push({label: tabletInfoKeyset('field_uptime'), value: calcUptime(ChangeTime)});
+        tabletInfo.push({
+            label: tabletInfoKeyset('field_uptime'),
+            value: getUptimeFromDateFormatted(ChangeTime),
+        });
     }
 
     tabletInfo.push(
