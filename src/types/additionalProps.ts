@@ -1,7 +1,6 @@
-import type {InfoViewerItem} from '../components/InfoViewer';
-
 import type {TSystemStateInfo} from './api/nodes';
 import type {ETenantType} from './api/tenant';
+import type {InfoItem} from './components';
 import type {VersionToColorMap} from './versions';
 
 export interface AdditionalVersionsProps {
@@ -14,7 +13,7 @@ export interface ClusterLink {
 }
 
 export interface AdditionalClusterProps {
-    info?: InfoViewerItem[];
+    info?: InfoItem[];
     links?: ClusterLink[];
 }
 
