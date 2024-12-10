@@ -110,7 +110,7 @@ export function getUptimeColumn<T extends {StartTime?: string; Uptime?: string}>
         sortAccessor: ({StartTime}) => (StartTime ? -StartTime : 0),
         render: ({row}) => row.Uptime,
         align: DataTable.RIGHT,
-        width: 110,
+        width: 120,
     };
 }
 
