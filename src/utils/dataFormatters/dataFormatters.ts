@@ -66,7 +66,16 @@ export function getUptimeFromDateFormatted(dateFrom?: number | string, dateTo?: 
 }
 
 export function getDowntimeFromDateFormatted(dateFrom?: number | string, dateTo?: number | string) {
-    return '-' + getUptimeFromDateFormatted(dateFrom, dateTo);
+    let diff = calcTimeDiffInSec(dateFrom, dateTo);
+
+    // Our time and server time could differ a little
+    // Prevent wrong negative uptime values
+    diff = diff < 0 ? 0 : diff;
+
+    const formattedUptime = formatUptimeInSeconds(diff);
+
+    // Do not add sign to 0 values to prevent -0:00:00 uptime
+    return diff === 0 ? formattedUptime : '-' + formattedUptime;
 }
 
 export function calcTimeDiffInSec(
