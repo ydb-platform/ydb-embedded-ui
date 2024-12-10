@@ -3,38 +3,19 @@
 .cluster-info {
     padding: 20px 0;
 
+    @include mixins.body-2-typography();
+
     &__skeleton {
         margin-top: 5px;
     }
 
-    &__error {
-        @include mixins.body-2-typography();
+    &__section-title {
+        margin: var(--g-spacing-1) 0 var(--g-spacing-3);
+        @include mixins.text-subheader-2();
     }
 
-    &__metrics {
-        margin: 0 -15px;
-        padding: 0 15px !important;
-
-        .info-viewer__items {
-            grid-template-columns: repeat(2, minmax(auto, 250px));
-        }
-
-        .info-viewer__label {
-            width: 50px;
-        }
-        .info-viewer__value {
-            width: 130px;
-        }
-    }
-
-    &__tablets {
-        margin-left: 15px;
-        padding: 0 !important;
-    }
-    &__links {
-        display: flex;
-        flex-flow: row wrap;
-        gap: var(--g-spacing-2);
+    &__dc {
+        height: 20px;
     }
 
     &__clipboard-button {

@@ -1,10 +1,13 @@
+import {DefinitionList, Flex} from '@gravity-ui/uikit';
+
 import {ResponseError} from '../../../components/Errors/ResponseError';
-import {InfoViewer} from '../../../components/InfoViewer/InfoViewer';
 import {InfoViewerSkeleton} from '../../../components/InfoViewerSkeleton/InfoViewerSkeleton';
+import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
 import type {VersionToColorMap} from '../../../types/versions';
+import i18n from '../i18n';
 
 import {b} from './shared';
 import {getInfo, useClusterLinks} from './utils';
@@ -29,24 +32,66 @@ export const ClusterInfo = ({
 
     const clusterLinks = useClusterLinks();
 
-    const clusterInfo = getInfo(cluster ?? {}, info, [...links, ...clusterLinks]);
+    const clusterInfo = getInfo(cluster ?? {}, info);
 
-    const getContent = () => {
-        if (loading) {
-            return <InfoViewerSkeleton className={b('skeleton')} rows={9} />;
-        }
-
+    const renderInfo = () => {
         if (error && !cluster) {
             return null;
         }
 
-        return <InfoViewer dots={true} info={clusterInfo} />;
+        return (
+            <div>
+                <div className={b('section-title')}>{i18n('title_info')}</div>
+                <DefinitionList nameMaxWidth={200}>
+                    {clusterInfo.map(({label, value}) => {
+                        return (
+                            <DefinitionList.Item key={label} name={label}>
+                                {value}
+                            </DefinitionList.Item>
+                        );
+                    })}
+                </DefinitionList>
+            </div>
+        );
+    };
+
+    const renderLinks = () => {
+        if (links.length || clusterLinks.length) {
+            return (
+                <div>
+                    <div className={b('section-title')}>{i18n('title_links')}</div>
+                    <Flex direction="column" gap={4}>
+                        {links.map(({title, url}) => {
+                            return <LinkWithIcon key={title} title={title} url={url} />;
+                        })}
+                        {clusterLinks.map(({title, url}) => {
+                            return <LinkWithIcon key={title} title={title} url={url} />;
+                        })}
+                    </Flex>
+                </div>
+            );
+        }
+
+        return null;
+    };
+
+    const renderContent = () => {
+        if (loading) {
+            return <InfoViewerSkeleton className={b('skeleton')} rows={4} />;
+        }
+
+        return (
+            <Flex gap={10} wrap="nowrap">
+                {renderInfo()}
+                {renderLinks()}
+            </Flex>
+        );
     };
 
     return (
         <div className={b()}>
             {error ? <ResponseError error={error} className={b('error')} /> : null}
-            <div className={b('info')}>{getContent()}</div>
+            {renderContent()}
         </div>
     );
 };
