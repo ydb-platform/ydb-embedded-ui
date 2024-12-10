@@ -1,5 +1,21 @@
 # Changelog
 
+## [7.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v7.1.0...v7.2.0) (2024-12-10)
+
+
+### Features
+
+* add wrapper for gravity-ui/table ([#1736](https://github.com/ydb-platform/ydb-embedded-ui/issues/1736)) ([26d00e9](https://github.com/ydb-platform/ydb-embedded-ui/commit/26d00e910a078ad7042a3a41599978c0fb1995ad))
+* **JSONTree:** allow case insensitive search ([#1735](https://github.com/ydb-platform/ydb-embedded-ui/issues/1735)) ([d4845d3](https://github.com/ydb-platform/ydb-embedded-ui/commit/d4845d3cd598ebbaece4934e7b0a4a886f657170))
+* redirect to embedded ([#1732](https://github.com/ydb-platform/ydb-embedded-ui/issues/1732)) ([dacc546](https://github.com/ydb-platform/ydb-embedded-ui/commit/dacc546dc86f1e442c81dcd3120b40707d5a0504))
+* show negative uptime for nodes when disconnected ([#1740](https://github.com/ydb-platform/ydb-embedded-ui/issues/1740)) ([3991c56](https://github.com/ydb-platform/ydb-embedded-ui/commit/3991c5666c222688fbcc24c578d58833ba258904))
+* **TopQueries:** add limit, sort on backend ([#1737](https://github.com/ydb-platform/ydb-embedded-ui/issues/1737)) ([bc8acee](https://github.com/ydb-platform/ydb-embedded-ui/commit/bc8aceee8ac50c85110139324ddbed279b863925))
+
+
+### Bug Fixes
+
+* make grey more grey ([#1738](https://github.com/ydb-platform/ydb-embedded-ui/issues/1738)) ([6d39f9d](https://github.com/ydb-platform/ydb-embedded-ui/commit/6d39f9d498d86e2ec9f6763758a2c379aec71518))
+
 ## [7.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v7.0.0...v7.1.0) (2024-12-04)
 
 
