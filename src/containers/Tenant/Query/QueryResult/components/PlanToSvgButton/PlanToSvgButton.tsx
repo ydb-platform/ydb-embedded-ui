@@ -6,6 +6,7 @@ import {Button, DropdownMenu, Tooltip} from '@gravity-ui/uikit';
 
 import {planToSvgApi} from '../../../../../../store/reducers/planToSvg';
 import type {QueryPlan, ScriptPlan} from '../../../../../../types/api/query';
+import {prepareCommonErrorMessage} from '../../../../../../utils/errors';
 import i18n from '../../i18n';
 
 function getButtonView(error: string | null, isLoading: boolean) {
@@ -40,8 +41,7 @@ export function PlanToSvgButton({plan, database}: PlanToSvgButtonProps) {
                 return url;
             })
             .catch((err) => {
-                const errorMessage = err.data?.message || err.message || JSON.stringify(err);
-                setError(errorMessage);
+                setError(prepareCommonErrorMessage(err));
                 return null;
             });
     }, [database, getPlanToSvg, plan, blobUrl]);
