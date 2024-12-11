@@ -1,4 +1,4 @@
-import {dateTimeParse} from '@gravity-ui/date-utils';
+import {dateTimeParse, duration} from '@gravity-ui/date-utils';
 
 import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
 import {
@@ -6,9 +6,9 @@ import {
     getSizeWithSignificantDigits,
 } from '../bytesParsers/formatBytes';
 import type {BytesSizes} from '../bytesParsers/formatBytes';
-import {DAY_IN_SECONDS, HOUR_IN_SECONDS} from '../constants';
+import {EMPTY_DATA_PLACEHOLDER, HOUR_IN_SECONDS} from '../constants';
 import {configuredNumeral} from '../numeral';
-import {isNumeric} from '../utils';
+import {UNBREAKABLE_GAP, isNumeric} from '../utils';
 
 import {formatValues} from './common';
 import {formatNumberWithDigits, getNumberWithSignificantDigits} from './formatNumber';
@@ -40,19 +40,33 @@ export const stringifyVdiskId = (id?: TVDiskID | TVSlotId) => {
     return id ? Object.values(id).join('-') : '';
 };
 
-export const formatUptimeInSeconds = (seconds: number) => {
-    const days = Math.floor(seconds / DAY_IN_SECONDS);
-    const remain = seconds % DAY_IN_SECONDS;
+/**
+ * It works well only with positive values,
+ * if you want to get negative formatted uptime, use some wrapper like getDowntimeFromDateFormatted
+ */
+export function formatUptimeInSeconds(seconds: number) {
+    if (!isNumeric(seconds)) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
 
-    const uptime = [days && `${days}d`, configuredNumeral(remain).format('00:00:00')]
-        .filter(Boolean)
-        .join(' ');
+    const d = duration(seconds, 's').rescale();
 
-    return uptime;
-};
+    if (d.days() > 0) {
+        return d.format(`d[${i18n('d')}${UNBREAKABLE_GAP}]hh:mm:ss`);
+    }
+
+    if (d.hours() > 0) {
+        return d.format('h:mm:ss');
+    }
+    if (d.minutes() > 0) {
+        return d.format('m:ss');
+    }
+
+    return d.format(`s[${i18n('s')}]`);
+}
 
 export const formatMsToUptime = (ms?: number) => {
-    return ms && formatUptimeInSeconds(ms / 1000);
+    return formatUptimeInSeconds(Number(ms) / 1000);
 };
 
 export function getUptimeFromDateFormatted(dateFrom?: number | string, dateTo?: number | string) {
