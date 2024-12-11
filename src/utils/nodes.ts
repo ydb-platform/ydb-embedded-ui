@@ -8,7 +8,10 @@ import type {TNodeInfo} from '../types/api/nodesList';
 import type {NodeHostsMap} from '../types/store/nodesList';
 
 import {HOUR_IN_SECONDS} from './constants';
-import {calcUptime} from './dataFormatters/dataFormatters';
+import {
+    getDowntimeFromDateFormatted,
+    getUptimeFromDateFormatted,
+} from './dataFormatters/dataFormatters';
 
 import {valueIsDefined} from '.';
 
@@ -63,15 +66,21 @@ export interface PreparedNodeSystemState extends TSystemStateInfo {
     SharedCacheUsed?: number;
 }
 
-export const prepareNodeSystemState = (
+export function prepareNodeSystemState(
     systemState: TSystemStateInfo = {},
-): PreparedNodeSystemState => {
+): PreparedNodeSystemState {
     // There is no Rack in Location field for din nodes
     const Rack = systemState.Location?.Rack || systemState.Rack;
     const DC = systemState.Location?.DataCenter || systemState.DataCenter;
     const TenantName = systemState?.Tenants?.[0];
 
-    const Uptime = calcUptime(systemState.StartTime);
+    let Uptime: string;
+
+    if (systemState.DisconnectTime) {
+        Uptime = getDowntimeFromDateFormatted(systemState.DisconnectTime);
+    } else {
+        Uptime = getUptimeFromDateFormatted(systemState.StartTime);
+    }
 
     const LoadAveragePercents = calculateLoadAveragePercents(systemState);
 
@@ -91,7 +100,7 @@ export const prepareNodeSystemState = (
         SharedCacheLimit,
         SharedCacheUsed,
     };
-};
+}
 
 export const getProblemParamValue = (problemFilter: ProblemFilterValue | undefined) => {
     return problemFilter === ProblemFilterValues.PROBLEMS;
