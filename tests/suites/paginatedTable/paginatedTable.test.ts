@@ -3,7 +3,7 @@ import {expect, test} from '@playwright/test';
 import {NodesPage} from '../nodes/NodesPage';
 
 import {setupEmptyNodesMock, setupLargeNodesMock, setupNodesMock} from './mocks';
-import {PaginatedTable} from './paginatedTable';
+import {ClusterNodesTable} from './paginatedTable';
 
 test.describe('PaginatedTable', () => {
     test('loads data in chunks when scrolling', async ({page}) => {
@@ -14,7 +14,7 @@ test.describe('PaginatedTable', () => {
         const nodesPage = new NodesPage(page);
         await nodesPage.goto();
 
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
         await paginatedTable.waitForTableVisible();
         await paginatedTable.waitForTableData();
 
@@ -53,7 +53,7 @@ test.describe('PaginatedTable', () => {
         const nodesPage = new NodesPage(page);
         await nodesPage.goto();
 
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
         await paginatedTable.waitForTableVisible();
         await paginatedTable.waitForTableData();
 
@@ -81,7 +81,7 @@ test.describe('PaginatedTable', () => {
         const nodesPage = new NodesPage(page);
         await nodesPage.goto();
 
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
         await paginatedTable.waitForTableVisible();
 
         // Verify empty state
@@ -98,7 +98,7 @@ test.describe('PaginatedTable', () => {
         const nodesPage = new NodesPage(page);
         await nodesPage.goto();
 
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
         await paginatedTable.waitForTableVisible();
         await paginatedTable.waitForTableData();
 
@@ -123,7 +123,7 @@ test.describe('PaginatedTable', () => {
         const nodesPage = new NodesPage(page);
         await nodesPage.goto();
 
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
         await paginatedTable.waitForTableVisible();
         await paginatedTable.waitForTableData();
 

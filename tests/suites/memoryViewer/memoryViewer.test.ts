@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {NodesPage} from '../nodes/NodesPage';
-import {PaginatedTable} from '../paginatedTable/paginatedTable';
+import {ClusterNodesTable} from '../paginatedTable/paginatedTable';
 
 import {MemoryViewer} from './MemoryViewer';
 
@@ -11,13 +11,14 @@ test.describe('Memory Viewer Widget', () => {
         const memoryViewer = new MemoryViewer(page);
         await nodesPage.goto();
 
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
         await paginatedTable.waitForTableVisible();
         await paginatedTable.waitForTableData();
         if (!(await memoryViewer.isVisible())) {
-            await paginatedTable.openColumnSetup();
-            await paginatedTable.setColumnChecked('Memory');
-            await paginatedTable.applyColumnVisibility();
+            const controls = paginatedTable.getControls();
+            await controls.openColumnSetup();
+            await controls.setColumnChecked('Memory');
+            await controls.applyColumnVisibility();
         }
         await memoryViewer.waitForVisible();
     });
