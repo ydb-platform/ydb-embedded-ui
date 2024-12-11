@@ -2,14 +2,13 @@ import {expect, test} from '@playwright/test';
 
 import {NodesPage} from '../nodes/NodesPage';
 
-import {setupEmptyNodesMock, setupLargeNodesMock, setupNodesMock, setupSettingsMock} from './mocks';
+import {setupEmptyNodesMock, setupLargeNodesMock, setupNodesMock} from './mocks';
 import {PaginatedTable} from './paginatedTable';
 
 test.describe('PaginatedTable', () => {
     test('loads data in chunks when scrolling', async ({page}) => {
         // Setup mocks
         await setupNodesMock(page);
-        await setupSettingsMock(page);
 
         // Navigate to nodes page which uses PaginatedTable
         const nodesPage = new NodesPage(page);
@@ -49,7 +48,6 @@ test.describe('PaginatedTable', () => {
     test('loads data when scrolling to middle of table', async ({page}) => {
         // Setup mocks with large dataset
         await setupLargeNodesMock(page);
-        await setupSettingsMock(page);
 
         // Navigate to nodes page which uses PaginatedTable
         const nodesPage = new NodesPage(page);
@@ -79,7 +77,6 @@ test.describe('PaginatedTable', () => {
     test('displays empty state when no data is present', async ({page}) => {
         // Setup mocks with empty data
         await setupEmptyNodesMock(page);
-        await setupSettingsMock(page);
 
         const nodesPage = new NodesPage(page);
         await nodesPage.goto();
@@ -96,7 +93,6 @@ test.describe('PaginatedTable', () => {
 
     test('handles 10 pages of data correctly', async ({page}) => {
         // Setup mocks with 1000 nodes (100 per page * 10 pages)
-        await setupSettingsMock(page);
         await setupLargeNodesMock(page);
 
         const nodesPage = new NodesPage(page);
@@ -122,7 +118,6 @@ test.describe('PaginatedTable', () => {
 
     test('handles 100 pages of data correctly', async ({page}) => {
         // Setup mocks with 10000 nodes (100 per page * 10 pages)
-        await setupSettingsMock(page);
         await setupLargeNodesMock(page, 10000);
 
         const nodesPage = new NodesPage(page);

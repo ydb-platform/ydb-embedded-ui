@@ -112,19 +112,3 @@ export const setupLargeNodesMock = async (page: Page, totalNodes = 1000) => {
         });
     });
 };
-
-export const setupSettingsMock = async (page: Page) => {
-    await page.route(`${backend}/api/settings`, async (route) => {
-        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
-
-        await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
-                theme: 'light',
-                language: 'en',
-                autoRefreshInterval: 10000,
-            }),
-        });
-    });
-};
