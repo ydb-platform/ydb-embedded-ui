@@ -31,6 +31,7 @@ export const ClusterInfo = ({
     const {info = [], links = []} = additionalClusterProps;
 
     const clusterLinks = useClusterLinks();
+    const linksList = links.concat(clusterLinks);
 
     const clusterInfo = getInfo(cluster ?? {}, info);
 
@@ -56,15 +57,12 @@ export const ClusterInfo = ({
     };
 
     const renderLinks = () => {
-        if (links.length || clusterLinks.length) {
+        if (linksList.length) {
             return (
                 <div>
                     <div className={b('section-title')}>{i18n('title_links')}</div>
                     <Flex direction="column" gap={4}>
-                        {links.map(({title, url}) => {
-                            return <LinkWithIcon key={title} title={title} url={url} />;
-                        })}
-                        {clusterLinks.map(({title, url}) => {
+                        {linksList.map(({title, url}) => {
                             return <LinkWithIcon key={title} title={title} url={url} />;
                         })}
                     </Flex>
