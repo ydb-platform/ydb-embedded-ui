@@ -161,7 +161,7 @@ const createClusterInfoSelector = createSelector(
     (clusterName) => clusterApi.endpoints.getClusterInfo.select(clusterName),
 );
 
-export const selectClusterInfo = createSelector(
+const selectClusterInfo = createSelector(
     (state: RootState) => state,
     (_state: RootState, clusterName?: string) => createClusterInfoSelector(clusterName),
     (state, selectGetClusterInfo) => selectGetClusterInfo(state).data,

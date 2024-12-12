@@ -39,7 +39,7 @@ import './Node.scss';
 
 const b = cn('node');
 
-export const STORAGE_ROLE = 'Storage';
+const STORAGE_ROLE = 'Storage';
 
 interface NodeProps {
     additionalNodesProps?: AdditionalNodesProps;

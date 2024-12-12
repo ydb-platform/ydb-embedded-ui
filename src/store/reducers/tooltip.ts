@@ -15,7 +15,7 @@ const initialState: ITooltipState = {
     toolTipVisible: false,
     currentHoveredRef: undefined,
     data: undefined,
-    templateType: 'pool',
+    templateType: 'cell',
 };
 
 const tooltip: Reducer<ITooltipState, ITooltipAction> = (state = initialState, action) => {

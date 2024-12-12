@@ -12,7 +12,7 @@ import {api} from './api';
 import {overviewApi} from './overview/overview';
 import {viewSchemaApi} from './viewSchema/viewSchema';
 
-export interface GetTableSchemaDataParams {
+interface GetTableSchemaDataParams {
     path: string;
     tenantName: string;
     type: EPathType;

@@ -10,7 +10,3 @@ export interface ShardsWorkloadFilters {
     to?: string;
     mode?: EShardsWorkloadMode;
 }
-
-export interface ShardsWorkloadRootStateSlice {
-    shardsWorkload: ShardsWorkloadFilters;
-}

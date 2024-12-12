@@ -54,7 +54,7 @@ const prepareRoute = (route: string) => {
     return preparedRoute;
 };
 
-export type Query = AnyRecord;
+type Query = AnyRecord;
 
 export function createHref(
     route: string,
@@ -127,7 +127,7 @@ export const tabletPageQueryParams = {
     activeTab: StringParam,
 } as const;
 
-export type TabletPageQuery = QueryParamsTypeFromQueryObject<typeof tabletPageQueryParams>;
+type TabletPageQuery = QueryParamsTypeFromQueryObject<typeof tabletPageQueryParams>;
 
 export function getTabletPagePath(tabletId: string | number, query: TabletPageQuery = {}) {
     return createHref(routes.tablet, {id: tabletId}, {...query});

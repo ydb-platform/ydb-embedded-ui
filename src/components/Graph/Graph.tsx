@@ -38,7 +38,7 @@ export function Graph<T>(props: GraphProps<T>) {
     return <div id={containerId} ref={containerRef} style={{overflow: 'auto'}} />;
 }
 
-export const renderExplainNode = (node: GraphNode): string => {
+const renderExplainNode = (node: GraphNode): string => {
     const parts = node.name.split('|');
     return parts.length > 1 ? parts[1] : node.name;
 };

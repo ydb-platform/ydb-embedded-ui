@@ -3,7 +3,7 @@ import {RadioButton} from '@gravity-ui/uikit';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
 
-export const VisibleEntitiesTitles = {
+const VisibleEntitiesTitles = {
     [VISIBLE_ENTITIES.all]: 'All',
     [VISIBLE_ENTITIES.missing]: 'Degraded',
     [VISIBLE_ENTITIES.space]: 'Out of Space',

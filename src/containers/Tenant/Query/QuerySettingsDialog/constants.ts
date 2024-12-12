@@ -12,7 +12,7 @@ import i18n from '../i18n';
 
 import formI18n from './i18n';
 
-export const TRANSACTION_MODE_SELECT_OPTIONS = [
+const TRANSACTION_MODE_SELECT_OPTIONS = [
     {
         value: TRANSACTION_MODES.implicit,
         content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.implicit],
@@ -41,7 +41,7 @@ export const TRANSACTION_MODE_SELECT_OPTIONS = [
     },
 ];
 
-export const QUERY_MODE_SELECT_OPTIONS = [
+const QUERY_MODE_SELECT_OPTIONS = [
     {
         value: QUERY_MODES.query,
         content: QUERY_MODES_TITLES[QUERY_MODES.query],
@@ -70,7 +70,7 @@ export const QUERY_MODE_SELECT_OPTIONS = [
     },
 ];
 
-export const STATISTICS_MODE_SELECT_OPTIONS = [
+const STATISTICS_MODE_SELECT_OPTIONS = [
     {
         value: STATISTICS_MODES.none,
         content: STATISTICS_MODES_TITLES[STATISTICS_MODES.none],
@@ -94,7 +94,7 @@ export const STATISTICS_MODE_SELECT_OPTIONS = [
     },
 ];
 
-export const TRACING_LEVEL_SELECT_OPTIONS = [
+const TRACING_LEVEL_SELECT_OPTIONS = [
     {
         value: TRACING_LEVELS.off,
         content: TRACING_LEVELS_TITLES[TRACING_LEVELS.off],

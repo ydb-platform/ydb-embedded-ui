@@ -1,5 +1,4 @@
 import type {ClusterTab} from '../../../containers/Cluster/utils';
-import type {TClusterInfo} from '../../../types/api/cluster';
 
 export interface DiskErasureGroupsStats {
     diskType: string;
@@ -11,16 +10,11 @@ export interface DiskErasureGroupsStats {
 }
 
 /** Keys - erasure types */
-export type DiskGroupsStats = Record<string, DiskErasureGroupsStats>;
+type DiskGroupsStats = Record<string, DiskErasureGroupsStats>;
 
 /** Keys - PDisks types */
 export type ClusterGroupsStats = Record<string, DiskGroupsStats>;
 
 export interface ClusterState {
     defaultClusterTab: ClusterTab;
-}
-
-export interface HandledClusterResponse {
-    clusterData: TClusterInfo;
-    groupsStats: ClusterGroupsStats;
 }

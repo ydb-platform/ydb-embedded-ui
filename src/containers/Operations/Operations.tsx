@@ -10,6 +10,7 @@ import {useAutoRefreshInterval} from '../../utils/hooks';
 
 import {OperationsControls} from './OperationsControls';
 import {getColumns} from './columns';
+import {OPERATIONS_SELECTED_COLUMNS_KEY} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
 import {useOperationsQueryParams} from './useOperationsQueryParams';
@@ -62,6 +63,7 @@ export function Operations({database}: OperationsProps) {
                 {data ? (
                     <ResizeableDataTable
                         columns={getColumns({database, refreshTable: refetch})}
+                        columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
                         data={filteredOperations}
                         emptyDataMessage={i18n('title_empty')}
                     />

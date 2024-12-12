@@ -80,9 +80,9 @@ const operations = {
     title: 'Operations',
 };
 
-export const ASYNC_REPLICATION_PAGES = [overview, tablets, describe];
+const ASYNC_REPLICATION_PAGES = [overview, tablets, describe];
 
-export const DATABASE_PAGES = [
+const DATABASE_PAGES = [
     overview,
     topQueries,
     topShards,
@@ -95,18 +95,18 @@ export const DATABASE_PAGES = [
     operations,
 ];
 
-export const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe];
-export const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe];
+const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe];
+const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe];
 
-export const DIR_PAGES = [overview, topShards, nodes, describe];
+const DIR_PAGES = [overview, topShards, nodes, describe];
 
-export const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, tablets, describe];
-export const TOPIC_PAGES = [overview, consumers, partitions, nodes, tablets, describe];
+const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, tablets, describe];
+const TOPIC_PAGES = [overview, consumers, partitions, nodes, tablets, describe];
 
-export const EXTERNAL_DATA_SOURCE_PAGES = [overview, describe];
-export const EXTERNAL_TABLE_PAGES = [overview, schema, describe];
+const EXTERNAL_DATA_SOURCE_PAGES = [overview, describe];
+const EXTERNAL_TABLE_PAGES = [overview, schema, describe];
 
-export const VIEW_PAGES = [overview, schema, describe];
+const VIEW_PAGES = [overview, schema, describe];
 
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here

@@ -1,4 +1,4 @@
-export const SEVERITY_LIST = ['S_FATAL', 'S_ERROR', 'S_WARNING', 'S_INFO'] as const;
+const SEVERITY_LIST = ['S_FATAL', 'S_ERROR', 'S_WARNING', 'S_INFO'] as const;
 
 export type SEVERITY = (typeof SEVERITY_LIST)[number];
 
@@ -7,7 +7,7 @@ export type SEVERITY = (typeof SEVERITY_LIST)[number];
 // ERROR = 1;
 // WARNING = 2;
 // INFO = 3;
-export function isSeverity(value: number | undefined) {
+function isSeverity(value: number | undefined) {
     return value ? SEVERITY_LIST[value] !== undefined : false;
 }
 

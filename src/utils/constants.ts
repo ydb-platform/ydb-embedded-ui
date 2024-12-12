@@ -3,10 +3,6 @@ import type {Settings} from '@gravity-ui/react-data-table';
 
 import {EType} from '../types/api/tablet';
 
-const SECOND = 1000;
-
-export const AUTO_RELOAD_INTERVAL = 10 * SECOND;
-export const DEFAULT_POLLING_INTERVAL = 30 * SECOND;
 // by agreement, display all byte values in decimal scale
 // values in data are always in bytes, never in higher units,
 // therefore there is no issue arbitrary converting them in UI
@@ -23,20 +19,7 @@ export const WEEK_IN_SECONDS = 7 * DAY_IN_SECONDS;
 
 export const MS_IN_NANOSECONDS = 1000000;
 
-export const TABLET_COLORS = {
-    Created: 'grey',
-    ResolveStateStorage: 'lightgrey',
-    Candidate: 'lightgrey',
-    BlockBlobStorage: 'lightgrey',
-    RebuildGraph: 'yellow',
-    Restored: 'yellow',
-    Discover: 'orange',
-    Lock: 'lightblue',
-    Dead: 'black',
-    Active: 'lightgreen',
-};
-
-export const TABLET_SYMBOLS = {
+const TABLET_SYMBOLS = {
     [EType.OldTxProxy]: 'P',
     [EType.TxProxy]: 'P',
     [EType.BSController]: 'BS',
@@ -64,15 +47,6 @@ export const getTabletLabel = (type?: string) => {
 
 export const LOAD_AVERAGE_TIME_INTERVALS = ['1 min', '5 min', '15 min'];
 
-export const COLORS_PRIORITY = {
-    green: 5,
-    yellow: 4,
-    orange: 3,
-    red: 2,
-    blue: 1,
-    grey: 1,
-};
-
 export const TENANT_OVERVIEW_TABLES_LIMIT = 5;
 
 export const EMPTY_DATA_PLACEHOLDER = '—';
@@ -89,7 +63,6 @@ export const INVERTED_DISKS_KEY = 'invertedDisks';
 export const SAVED_QUERIES_KEY = 'saved_queries';
 export const ASIDE_HEADER_COMPACT_KEY = 'asideHeaderCompact';
 export const QUERIES_HISTORY_KEY = 'queries_history';
-export const DATA_QA_TUNE_COLUMNS_POPUP = 'tune-columns-popup';
 export const BINARY_DATA_IN_PLAIN_TEXT_DISPLAY = 'binaryDataInPlainTextDisplay';
 export const AUTO_REFRESH_INTERVAL = 'auto-refresh-interval';
 

@@ -16,7 +16,7 @@ export {setSettingValue, getSettingValue} from './store/reducers/settings/settin
 
 export {componentsRegistry} from './components/ComponentsProvider/componentsRegistry';
 export {useSetting, useTypedSelector} from './utils/hooks';
-export {getMonitoringLink, getMonitoringClusterLink} from './utils/monitoring';
+export {getMonitoringLink, getMonitoringClusterLink, parseMonitoringData} from './utils/monitoring';
 export {i18n, Lang, registerKeysets} from './utils/i18n';
 export {toaster} from './utils/createToast';
 export {cn} from './utils/cn';
@@ -30,6 +30,6 @@ export type {
     SettingsPage,
     SettingsSection,
 } from './containers/UserSettings/settings';
-export type {SettingProps} from './containers/UserSettings/Setting';
+export type {SettingProps, SettingsInfoFieldProps} from './containers/UserSettings/Setting';
 export type {AsideNavigationProps} from './containers/AsideNavigation/AsideNavigation';
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';

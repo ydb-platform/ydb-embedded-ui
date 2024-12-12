@@ -7,7 +7,7 @@ import {useSetting} from '../../../../utils/hooks';
 
 export type EditorOptions = Monaco.editor.IEditorOptions & Monaco.editor.IGlobalEditorOptions;
 
-export const EDITOR_OPTIONS: EditorOptions = {
+const EDITOR_OPTIONS: EditorOptions = {
     automaticLayout: true,
     selectOnLineNumbers: true,
     minimap: {

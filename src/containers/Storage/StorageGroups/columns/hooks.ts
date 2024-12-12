@@ -2,7 +2,6 @@ import React from 'react';
 
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
-import type {StorageViewContext} from '../../types';
 
 import {getStorageGroupsColumns} from './columns';
 import {
@@ -14,17 +13,13 @@ import {
 } from './constants';
 import type {GetStorageGroupsColumnsParams} from './types';
 
-export function useGetStorageGroupsColumns(viewContext?: StorageViewContext) {
-    return React.useMemo(() => {
-        return getStorageGroupsColumns({viewContext});
-    }, [viewContext]);
-}
-
 export function useStorageGroupsSelectedColumns({
     visibleEntities,
     viewContext,
 }: GetStorageGroupsColumnsParams) {
-    const columns = useGetStorageGroupsColumns(viewContext);
+    const columns = React.useMemo(() => {
+        return getStorageGroupsColumns({viewContext});
+    }, [viewContext]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {
