@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test';
 
-import {PaginatedTable} from '../paginatedTable/paginatedTable';
+import {ClusterStorageTable} from '../paginatedTable/paginatedTable';
 
 import {StoragePage} from './StoragePage';
 
@@ -46,7 +46,7 @@ test.describe('Test Storage Paginated Table', async () => {
     });
 
     test('Table loads and displays data', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterStorageTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
@@ -56,7 +56,7 @@ test.describe('Test Storage Paginated Table', async () => {
     });
 
     test('Search by pool name filters the table', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterStorageTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
@@ -71,13 +71,13 @@ test.describe('Test Storage Paginated Table', async () => {
     });
 
     test('Radio button selection changes displayed data', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterStorageTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
 
         const initialRowCount = await paginatedTable.getRowCount();
-        await paginatedTable.selectRadioOption(0, 'Nodes');
+        await paginatedTable.getControls().selectRadioOption(0, 'Nodes');
 
         await page.waitForTimeout(1000); // Wait for the table to update
 
@@ -86,7 +86,7 @@ test.describe('Test Storage Paginated Table', async () => {
     });
 
     test('Groups count is displayed correctly', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterStorageTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
@@ -98,7 +98,7 @@ test.describe('Test Storage Paginated Table', async () => {
     });
 
     test('Row data can be retrieved correctly', async ({page}) => {
-        const storageTable = new PaginatedTable(page);
+        const storageTable = new ClusterStorageTable(page);
 
         await storageTable.waitForTableToLoad();
         await storageTable.waitForTableData();
@@ -113,7 +113,7 @@ test.describe('Test Storage Paginated Table', async () => {
     });
 
     test('Column values can be retrieved correctly', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterStorageTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
@@ -127,7 +127,7 @@ test.describe('Test Storage Paginated Table', async () => {
     });
 
     test('Clicking on Group ID header sorts the table', async ({page}) => {
-        const storageTable = new PaginatedTable(page);
+        const storageTable = new ClusterStorageTable(page);
 
         await storageTable.waitForTableToLoad();
         await storageTable.waitForTableData();

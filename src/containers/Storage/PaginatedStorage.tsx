@@ -10,7 +10,7 @@ export interface PaginatedStorageProps {
     groupId?: string | number;
     pDiskId?: string | number;
 
-    viewContext: StorageViewContext;
+    viewContext?: StorageViewContext;
 
     parentRef: React.RefObject<HTMLElement>;
 

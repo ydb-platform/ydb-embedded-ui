@@ -14,7 +14,7 @@ import {
 } from './constants';
 import type {GetStorageGroupsColumnsParams} from './types';
 
-export function useGetStorageGroupsColumns(viewContext: StorageViewContext) {
+export function useGetStorageGroupsColumns(viewContext?: StorageViewContext) {
     return React.useMemo(() => {
         return getStorageGroupsColumns({viewContext});
     }, [viewContext]);

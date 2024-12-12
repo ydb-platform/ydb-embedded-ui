@@ -21,7 +21,7 @@ import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {StorageWrapper} from '../Storage/StorageWrapper';
+import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {vDiskPageKeyset} from './i18n';
 
@@ -180,12 +180,17 @@ export function VDiskPage() {
             return (
                 <React.Fragment>
                     <div className={vDiskPageCn('storage-title')}>{vDiskPageKeyset('storage')}</div>
-                    <StorageWrapper
+                    <PaginatedStorage
                         groupId={GroupID}
                         nodeId={nodeId}
                         pDiskId={pDiskId ?? undefined}
-                        vDiskSlotId={vDiskSlotId ?? undefined}
                         parentRef={containerRef}
+                        viewContext={{
+                            groupId: GroupID?.toString(),
+                            nodeId: nodeId?.toString(),
+                            pDiskId: pDiskId?.toString(),
+                            vDiskSlotId: vDiskSlotId?.toString(),
+                        }}
                     />
                 </React.Fragment>
             );

@@ -12,7 +12,6 @@ import {
     SHOW_DOMAIN_DATABASE_KEY,
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
-    USE_PAGINATED_TABLES_KEY,
     USE_SHOW_PLAN_SVG_KEY,
 } from '../../utils/constants';
 import {Lang, defaultLang} from '../../utils/i18n';
@@ -92,11 +91,6 @@ export const invertedDisksSetting: SettingProps = {
     settingKey: INVERTED_DISKS_KEY,
     title: i18n('settings.invertedDisks.title'),
 };
-export const usePaginatedTables: SettingProps = {
-    settingKey: USE_PAGINATED_TABLES_KEY,
-    title: i18n('settings.usePaginatedTables.title'),
-    description: i18n('settings.usePaginatedTables.description'),
-};
 
 export const enableNetworkTable: SettingProps = {
     settingKey: ENABLE_NETWORK_TABLE_KEY,
@@ -148,11 +142,13 @@ export const appearanceSection: SettingsSection = {
         showDomainDatabase,
     ],
 };
+
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [usePaginatedTables, enableNetworkTable, useShowPlanToSvgTables],
+    settings: [enableNetworkTable, useShowPlanToSvgTables],
 };
+
 export const devSettingsSection: SettingsSection = {
     id: 'devSettingsSection',
     title: i18n('section.dev-setting'),
@@ -172,6 +168,7 @@ export const generalPage: SettingsPage = {
     sections: [appearanceSection],
     showTitle: false,
 };
+
 export const experimentsPage: SettingsPage = {
     id: 'experimentsPage',
     title: i18n('page.experiments'),
@@ -179,6 +176,7 @@ export const experimentsPage: SettingsPage = {
     sections: [experimentsSection],
     showTitle: false,
 };
+
 export const editorPage: SettingsPage = {
     id: 'editorPage',
     title: i18n('page.editor'),

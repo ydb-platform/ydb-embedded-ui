@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {backend} from '../../utils/constants';
 import {NodesPage} from '../nodes/NodesPage';
-import {PaginatedTable} from '../paginatedTable/paginatedTable';
+import {ClusterNodesTable} from '../paginatedTable/paginatedTable';
 
 test.describe('Test Nodes page', async () => {
     test('Nodes page is OK', async ({page}) => {
@@ -30,7 +30,7 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 
     test('Table loads and displays data', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
@@ -40,13 +40,13 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 
     test('Search by hostname filters the table', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
 
         const initialRowCount = await paginatedTable.getRowCount();
-        await paginatedTable.search('localhost');
+        await paginatedTable.getControls().search('localhost');
 
         await page.waitForTimeout(1000); // Wait for the table to update
 
@@ -56,7 +56,7 @@ test.describe('Test Nodes Paginated Table', async () => {
 
     test('Table groups displayed correctly if group by option is selected', async ({page}) => {
         const nodesPage = new NodesPage(page);
-        const nodesTable = new PaginatedTable(page);
+        const nodesTable = new ClusterNodesTable(page);
 
         await nodesTable.waitForTableToLoad();
         await nodesTable.waitForTableData();
@@ -74,19 +74,19 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 
     test('Node count is displayed correctly', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
 
-        const nodeCount = await paginatedTable.getCount();
+        const nodeCount = await paginatedTable.getControls().getCount();
         const rowCount = await paginatedTable.getRowCount();
 
         expect(nodeCount).toBe(rowCount);
     });
 
     test('Uptime values are displayed in correct format', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
@@ -99,14 +99,14 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 
     test('Refresh button updates the table data', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
 
         const initialUptimeValues = await paginatedTable.getColumnValues('Uptime');
         await page.waitForTimeout(2000); // Wait for some time to pass
-        await paginatedTable.clickRefreshButton();
+        await paginatedTable.getControls().clickRefreshButton();
         await paginatedTable.waitForTableData();
 
         const updatedUptimeValues = await paginatedTable.getColumnValues('Uptime');
@@ -114,12 +114,12 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 
     test('Row data can be retrieved correctly', async ({page}) => {
-        const storageTable = new PaginatedTable(page);
+        const nodesTable = new ClusterNodesTable(page);
 
-        await storageTable.waitForTableToLoad();
-        await storageTable.waitForTableData();
+        await nodesTable.waitForTableToLoad();
+        await nodesTable.waitForTableData();
 
-        const rowData = await storageTable.getRowData(0);
+        const rowData = await nodesTable.getRowData(0);
 
         expect(rowData).toHaveProperty('Host');
         expect(rowData).toHaveProperty('Uptime');
@@ -130,7 +130,7 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 
     test('Column values can be retrieved correctly', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
@@ -144,12 +144,12 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 
     test('Table displays empty data message when no entities', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
 
         await paginatedTable.waitForTableToLoad();
         await paginatedTable.waitForTableData();
 
-        await paginatedTable.search('Some Invalid search string !%#@[]');
+        await paginatedTable.getControls().search('Some Invalid search string !%#@[]');
 
         await paginatedTable.waitForTableData();
 
@@ -158,19 +158,19 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 
     test('Autorefresh updates data when initially empty data', async ({page}) => {
-        const paginatedTable = new PaginatedTable(page);
+        const paginatedTable = new ClusterNodesTable(page);
 
         const emptyRequest = page.route(`${backend}/viewer/json/nodes?*`, async (route) => {
             await route.fulfill({json: {FoundNodes: 0, TotalNodes: 0, Nodes: []}});
         });
-        await paginatedTable.clickRefreshButton();
+        await paginatedTable.getControls().clickRefreshButton();
 
         await emptyRequest;
 
         const emptyDataMessage = await paginatedTable.getEmptyDataMessageLocator();
         await expect(emptyDataMessage).toContainText('No such nodes');
 
-        await paginatedTable.setRefreshInterval('15 sec');
+        await paginatedTable.getControls().setRefreshInterval('15 sec');
 
         const requestWithData = page.route(`${backend}/viewer/json/nodes?*`, async (route) => {
             await route.continue();
