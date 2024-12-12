@@ -1,8 +1,6 @@
 import type {PoolName, TPoolStats} from '../../../types/api/nodes';
 import type {TTenant} from '../../../types/api/tenant';
 import {EType} from '../../../types/api/tenant';
-import {formatBytes} from '../../../utils/bytesParsers';
-import {formatCPUWithLabel} from '../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../utils/utils';
 
 import {METRIC_STATUS} from './contants';
@@ -201,21 +199,13 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean): P
     });
 };
 
-export function calculateUsage(valueUsed?: number, valueLimit?: number): number | undefined {
+function calculateUsage(valueUsed?: number, valueLimit?: number): number | undefined {
     if (valueUsed && valueLimit) {
         return (valueUsed * 100) / valueLimit;
     }
 
     return undefined;
 }
-
-export const formatUsage = (usage?: number) => {
-    if (usage) {
-        return `${usage.toFixed()}%`;
-    }
-
-    return undefined;
-};
 
 export const TENANT_CPU_DANGER_TRESHOLD = 70;
 export const TENANT_CPU_WARNING_TRESHOLD = 60;
@@ -269,20 +259,6 @@ export const memoryUsageToStatus = (usage?: number) => {
 
     return METRIC_STATUS.Good;
 };
-
-export const formatTenantMetrics = ({
-    cpu,
-    storage,
-    memory,
-}: {
-    cpu?: number;
-    storage?: number;
-    memory?: number;
-}) => ({
-    cpu: formatCPUWithLabel(cpu),
-    storage: formatBytes({value: storage, significantDigits: 2}) || undefined,
-    memory: formatBytes({value: memory, significantDigits: 2}) || undefined,
-});
 
 export const normalizeProgress = (progress: number) => {
     if (progress >= 100) {

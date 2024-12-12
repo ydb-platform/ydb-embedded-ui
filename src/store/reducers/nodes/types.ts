@@ -1,10 +1,7 @@
-import type {OrderType} from '@gravity-ui/react-data-table';
-
 import type {EFlag} from '../../../types/api/enums';
 import type {
     NodesGroupByField,
     NodesPeerRole,
-    NodesSortValue,
     TEndpoint,
     TPoolStats,
 } from '../../../types/api/nodes';
@@ -48,11 +45,6 @@ export interface NodesPreparedEntity extends PreparedNodeSystemState {
     PingTimeUs?: string;
     PingTimeMinUs?: string;
     PingTimeMaxUs?: string;
-}
-
-export interface NodesSortParams {
-    sortOrder: OrderType;
-    sortValue: NodesSortValue;
 }
 
 export interface NodesFilters {

@@ -23,7 +23,7 @@ function formatColumnCodec(codec?: EColumnCodec) {
     return codec.replace('ColumnCodec', '').toLocaleLowerCase();
 }
 
-export function prepareFamilies(data?: TTableDescription): Record<number, TFamilyDescription> {
+function prepareFamilies(data?: TTableDescription): Record<number, TFamilyDescription> {
     return (
         data?.PartitionConfig?.ColumnFamilies?.reduce<Record<number, TFamilyDescription>>(
             (acc, family) => {

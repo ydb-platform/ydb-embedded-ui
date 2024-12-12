@@ -7,7 +7,6 @@
 }
 
 .node-tootltip,
-.tabletsOverall-tooltip,
 .histogram-tooltip {
     padding: 10px;
 
@@ -15,35 +14,6 @@
         padding-right: 15px;
 
         color: var(--g-color-text-secondary);
-    }
-}
-
-.json-tooltip {
-    padding: 20px 20px 20px 0;
-
-    &__inspector {
-        @include mixins.json-tree-styles();
-
-        :not(.json-inspector__leaf_expanded).json-inspector__leaf_composite:before {
-            content: '';
-        }
-        .json-inspector__leaf_expanded.json-inspector__leaf_composite:before {
-            content: '';
-        }
-
-        & .json-inspector {
-            &__line:hover:after {
-                background: transparent;
-            }
-            &__show-original:hover:after,
-            &__show-original:hover:before {
-                color: transparent;
-            }
-
-            &__value_helper {
-                display: none;
-            }
-        }
     }
 }
 

@@ -34,7 +34,7 @@ const getTabletsInfoSelector = createSelector(
     },
 );
 
-export const selectGetTabletsInfo = createSelector(
+const selectGetTabletsInfo = createSelector(
     (state: RootState) => state,
     (_state: RootState, params: TabletsApiRequestParams) => getTabletsInfoSelector(params),
     (state, selectTabletsInfo) => selectTabletsInfo(state).data,

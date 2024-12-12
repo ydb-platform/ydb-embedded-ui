@@ -1,10 +1,4 @@
-import JSONTree from 'react-json-inspector';
-
-import {
-    NodeEndpointsTooltipContent,
-    PoolTooltipContent,
-    TabletTooltipContent,
-} from '../components/TooltipsContent';
+import {TabletTooltipContent} from '../components/TooltipsContent';
 
 import {cn} from './cn';
 
@@ -33,34 +27,6 @@ const NodeTooltip = (props) => {
                                 </td>
                             </tr>
                         ) : null}
-                    </tbody>
-                </table>
-            </div>
-        )
-    );
-};
-
-const tabletsOverallB = cn('tabletsOverall-tooltip');
-
-const TabletsOverallTooltip = (props) => {
-    const {data} = props;
-    return (
-        data && (
-            <div className={tabletsOverallB()}>
-                <table>
-                    <tbody>
-                        {data.map((colorInfo, key) => {
-                            return (
-                                <tr key={key}>
-                                    <td className={tabletsOverallB('label')}>{colorInfo.color}:</td>
-                                    <td className={tabletsOverallB('value')}>
-                                        {`${colorInfo.value}/${
-                                            colorInfo.total
-                                        } (${colorInfo.percents.toFixed(2)}%)`}
-                                    </td>
-                                </tr>
-                            );
-                        })}
                     </tbody>
                 </table>
             </div>
@@ -97,33 +63,10 @@ const HistogramTooltip = (props) => {
 };
 
 const cellB = cn('cell-tooltip');
-const jsonB = cn('json-tooltip');
 
 export const tooltipTemplates = {
-    // eslint-disable-next-line react/display-name
-    pool: (data) => <PoolTooltipContent data={data} />,
-    // eslint-disable-next-line react/display-name
     tablet: (data) => <TabletTooltipContent data={data} />,
-    // eslint-disable-next-line react/display-name
     node: (data) => <NodeTooltip data={data} />,
-    nodeEndpoints: (data) => <NodeEndpointsTooltipContent data={data} />,
-    // eslint-disable-next-line react/display-name
-    tabletsOverall: (data) => <TabletsOverallTooltip data={data} />,
-    // eslint-disable-next-line react/display-name
     histogram: (data) => <HistogramTooltip data={data} />,
-    // eslint-disable-next-line react/display-name
     cell: (data) => <div className={cellB()}>{data}</div>,
-    // eslint-disable-next-line react/display-name
-    json: (data) => {
-        return (
-            <div className={jsonB()}>
-                <JSONTree
-                    data={data}
-                    search={false}
-                    isExpanded={() => true}
-                    className={jsonB('inspector')}
-                />
-            </div>
-        );
-    },
 };

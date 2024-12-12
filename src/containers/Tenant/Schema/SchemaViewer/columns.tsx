@@ -5,7 +5,7 @@ import type {SchemaColumn, SchemaData} from './types';
 
 export const SCHEMA_COLUMNS_WIDTH_LS_KEY = 'schemaTableColumnsWidth';
 
-export const SCHEMA_TABLE_COLUMS_IDS = {
+const SCHEMA_TABLE_COLUMS_IDS = {
     id: 'id',
     name: 'name',
     keyColumnIndex: 'keyColumnIndex',

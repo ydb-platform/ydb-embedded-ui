@@ -11,7 +11,7 @@ import type {GroupedNodesItem} from '../types';
 
 import './GroupedNodesTree.scss';
 
-export const b = cn('ydb-versions-grouped-node-tree');
+const b = cn('ydb-versions-grouped-node-tree');
 
 interface GroupedNodesTreeProps {
     title?: string;

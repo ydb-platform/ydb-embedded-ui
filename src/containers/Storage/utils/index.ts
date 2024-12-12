@@ -1,17 +1,7 @@
-import {ASCENDING, DESCENDING} from '@gravity-ui/react-data-table/build/esm/lib/constants';
-
-import {NODES_COLUMNS_IDS} from '../../../components/nodesColumns/constants';
-import type {NodesSortParams} from '../../../store/reducers/nodes/types';
-import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import type {
-    PreparedStorageGroup,
-    StorageSortParams,
-    VisibleEntities,
-} from '../../../store/reducers/storage/types';
+import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
 import {valueIsDefined} from '../../../utils';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
-import {STORAGE_GROUPS_COLUMNS_IDS} from '../StorageGroups/columns/constants';
 import type {StorageViewContext} from '../types';
 
 const defaultDegradationEvaluator = generateEvaluator(1, 2, ['success', 'warning', 'danger']);
@@ -31,36 +21,6 @@ export const getDegradedSeverity = (group: PreparedStorageGroup) => {
 
     return evaluate(group.Degraded);
 };
-
-export const defaultSortNode: NodesSortParams = {
-    sortValue: NODES_COLUMNS_IDS.NodeId,
-    sortOrder: ASCENDING,
-};
-
-const defaultSortGroup: StorageSortParams = {
-    sortValue: STORAGE_GROUPS_COLUMNS_IDS.PoolName,
-    sortOrder: ASCENDING,
-};
-
-const defaultSortGroupMissing: StorageSortParams = {
-    sortValue: STORAGE_GROUPS_COLUMNS_IDS.Degraded,
-    sortOrder: DESCENDING,
-};
-
-const defaultSortGroupSpace: StorageSortParams = {
-    sortValue: STORAGE_GROUPS_COLUMNS_IDS.Usage,
-    sortOrder: DESCENDING,
-};
-
-export function getDefaultSortGroup(visibleEntities: VisibleEntities) {
-    if (visibleEntities === VISIBLE_ENTITIES.missing) {
-        return defaultSortGroupMissing;
-    }
-    if (visibleEntities === VISIBLE_ENTITIES.space) {
-        return defaultSortGroupSpace;
-    }
-    return defaultSortGroup;
-}
 
 export function isVdiskActive(vDisk: PreparedVDisk, viewContext?: StorageViewContext) {
     let isActive = true;

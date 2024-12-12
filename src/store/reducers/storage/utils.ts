@@ -53,7 +53,7 @@ const prepareVDisk = (vDisk: TVDiskStateInfo, poolName: string | undefined) => {
     };
 };
 
-export const prepareStorageGroupData = (
+const prepareStorageGroupData = (
     group: TStorageGroupInfo,
     pool: TStoragePoolInfo,
 ): PreparedStorageGroup => {
@@ -128,7 +128,7 @@ export const prepareStorageGroupData = (
     };
 };
 
-export const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedStorageGroup => {
+const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedStorageGroup => {
     const {
         VDisks = [],
         PoolName,
@@ -168,7 +168,7 @@ export const prepareStorageGroupDataV2 = (group: TStorageGroupInfoV2): PreparedS
     };
 };
 
-export const prepareStorageGroups = (
+const prepareStorageGroups = (
     StorageGroups?: TStorageGroupInfoV2[],
     StoragePools?: TStoragePoolInfo[],
 ) => {

@@ -26,7 +26,7 @@ export interface PreparedPlan {
     DurationUs?: string | number;
 }
 
-export interface SimplifiedPlan {
+interface SimplifiedPlan {
     plan?: SimplifiedPlanItem[];
     pristine?: SimplifiedNode;
 }

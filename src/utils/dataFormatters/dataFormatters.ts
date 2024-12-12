@@ -94,7 +94,7 @@ export function getDowntimeFromDateFormatted(dateFrom?: number | string, dateTo?
     return formatUptimeInSeconds(-diff);
 }
 
-export function calcTimeDiffInSec(
+function calcTimeDiffInSec(
     dateFrom?: number | string,
     dateTo: number | string = new Date().getTime(),
 ) {

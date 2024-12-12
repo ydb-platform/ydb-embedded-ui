@@ -109,9 +109,7 @@ const getIssuesLog = createSelector(
     (state: RootState, selectGetPost) => selectGetPost(state).data?.issue_log || [],
 );
 
-export const selectIssuesTreesRoots = createSelector(getIssuesLog, (issues = []) =>
-    getRoots(issues),
-);
+const selectIssuesTreesRoots = createSelector(getIssuesLog, (issues = []) => getRoots(issues));
 
 export const selectIssuesTrees = createSelector(
     [getIssuesLog, selectIssuesTreesRoots],

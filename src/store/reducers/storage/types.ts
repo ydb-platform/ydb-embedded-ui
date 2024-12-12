@@ -1,9 +1,8 @@
-import type {OrderType} from '@gravity-ui/react-data-table';
 import {z} from 'zod';
 
 import type {EFlag} from '../../../types/api/enums';
 import type {NodesGroupByField} from '../../../types/api/nodes';
-import type {GroupsGroupByField, StorageV2SortValue} from '../../../types/api/storage';
+import type {GroupsGroupByField} from '../../../types/api/storage';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesUptimeFilterValues, PreparedNodeSystemState} from '../../../utils/nodes';
 
@@ -93,11 +92,6 @@ export interface PreparedStorageGroup {
     LatencyPutTabletLogMs?: number;
     LatencyPutUserDataMs?: number;
     LatencyGetFastMs?: number;
-}
-
-export interface StorageSortParams {
-    sortOrder: OrderType;
-    sortValue: StorageV2SortValue;
 }
 
 export type TableGroup = {

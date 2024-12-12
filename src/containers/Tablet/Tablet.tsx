@@ -33,7 +33,7 @@ import {hasHive} from './utils';
 
 import './Tablet.scss';
 
-export const b = cn('ydb-tablet-page');
+const b = cn('ydb-tablet-page');
 
 const TABLET_TABS_IDS = {
     history: 'history',

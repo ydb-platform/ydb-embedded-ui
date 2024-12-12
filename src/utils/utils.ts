@@ -9,15 +9,6 @@ export function parseJson(value?: string | null) {
     }
 }
 
-export function getValueFromLS(key: string, defaultValue: string) {
-    try {
-        return localStorage.getItem(key) ?? defaultValue;
-    } catch (err) {
-        console.log(err);
-    }
-    return;
-}
-
 const sizes = [' B', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB'];
 const base = 1000;
 

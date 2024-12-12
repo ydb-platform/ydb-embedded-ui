@@ -1,6 +1,6 @@
 import type {ETenantType} from '../types/api/tenant';
 
-export type ParsedMonitoringData = {
+type ParsedMonitoringData = {
     monitoring_url: string;
 
     serverless_dashboard?: string;
@@ -13,7 +13,7 @@ export type ParsedMonitoringData = {
     cluster_name?: string;
 };
 
-export interface GetMonitoringLinkProps {
+interface GetMonitoringLinkProps {
     monitoring: string;
     dbName: string;
     dbType: ETenantType;

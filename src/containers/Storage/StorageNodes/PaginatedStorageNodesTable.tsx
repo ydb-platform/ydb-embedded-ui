@@ -3,16 +3,23 @@ import React from 'react';
 import type {RenderControls, RenderErrorMessage} from '../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
-import type {VisibleEntities} from '../../../store/reducers/storage/types';
+import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
-import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {cn} from '../../../utils/cn';
+import {NodesUptimeFilterValues, isUnavailableNode} from '../../../utils/nodes';
 
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
 import {STORAGE_NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
 import type {StorageNodesColumn} from './columns/types';
 import {getStorageNodes} from './getNodes';
 import i18n from './i18n';
-import {getRowUnavailableClassName} from './shared';
+
+import './StorageNodes.scss';
+
+const b = cn('ydb-storage-nodes');
+
+const getRowUnavailableClassName = (row: PreparedStorageNode) =>
+    b('node', {unavailable: isUnavailableNode(row)});
 
 interface PaginatedStorageNodesTableProps {
     columns: StorageNodesColumn[];

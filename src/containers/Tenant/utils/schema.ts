@@ -262,32 +262,6 @@ export const isChildlessPathType = (type?: EPathType, subType?: EPathSubType) =>
 
 // ====================
 
-const mapPathTypeToIsWithTopic: Record<EPathType, boolean> = {
-    [EPathType.EPathTypeCdcStream]: true,
-    [EPathType.EPathTypePersQueueGroup]: true,
-
-    [EPathType.EPathTypeInvalid]: false,
-    [EPathType.EPathTypeColumnStore]: false,
-    [EPathType.EPathTypeColumnTable]: false,
-    [EPathType.EPathTypeDir]: false,
-    [EPathType.EPathTypeTable]: false,
-    [EPathType.EPathTypeSubDomain]: false,
-    [EPathType.EPathTypeTableIndex]: false,
-    [EPathType.EPathTypeExtSubDomain]: false,
-
-    [EPathType.EPathTypeExternalDataSource]: false,
-    [EPathType.EPathTypeExternalTable]: false,
-
-    [EPathType.EPathTypeView]: false,
-
-    [EPathType.EPathTypeReplication]: false,
-};
-
-export const isPathTypeWithTopic = (type?: EPathType) =>
-    (type && mapPathTypeToIsWithTopic[type]) ?? false;
-
-// ====================
-
 export const isExternalTableType = (type?: EPathType) => type === EPathType.EPathTypeExternalTable;
 export const isRowTableType = (type?: EPathType) => type === EPathType.EPathTypeTable;
 export const isViewType = (type?: EPathType) => type === EPathType.EPathTypeView;

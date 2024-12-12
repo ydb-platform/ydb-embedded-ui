@@ -6,7 +6,7 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
 import {api} from '../api';
 
-export const initialState = {
+const initialState = {
     loading: true,
     data: {},
     currentSchemaPath: undefined,

@@ -23,21 +23,6 @@ const tabletStateToColorState: Record<ETabletState, EFlag> = {
     [ETabletState.Active]: EFlag.Green,
 };
 
-export const tabletStates = Object.keys(ETabletState);
-
-export const tabletColorToTabletState = Object.entries(tabletStateToColorState).reduce(
-    (acc, [state, color]) => {
-        if (acc[color]) {
-            acc[color].push(state as ETabletState);
-        } else {
-            acc[color] = [state as ETabletState];
-        }
-
-        return acc;
-    },
-    {} as Record<EFlag, ETabletState[]>,
-);
-
 // Tablet State in different versions or in different endpoint
 // could be represented as ETabletState of EFlag
 export const mapTabletStateToColorState = (state?: ETabletState | EFlag): EFlag => {

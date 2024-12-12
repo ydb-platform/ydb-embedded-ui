@@ -3,7 +3,7 @@ import React from 'react';
 import type {OrderType, SortOrder} from '@gravity-ui/react-data-table';
 import isEqual from 'lodash/isEqual';
 
-export type HandleSort = (rawValue: SortOrder | SortOrder[] | undefined) => void;
+type HandleSort = (rawValue: SortOrder | SortOrder[] | undefined) => void;
 
 interface TableSortProps {
     initialSortColumn?: string;

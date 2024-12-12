@@ -23,7 +23,7 @@ import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
-export function getTopNodesByCpuColumns(
+function getTopNodesByCpuColumns(
     params: GetNodesColumnsParams,
 ): [Column<NodesPreparedEntity>[], NodesRequiredField[]] {
     const hostColumn = {...getHostColumn<NodesPreparedEntity>(params), width: undefined};

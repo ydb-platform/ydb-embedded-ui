@@ -5,7 +5,3 @@ export interface TopQueriesFilters {
     to?: string;
     text?: string;
 }
-
-export interface TopQueriesRootStateSlice {
-    executeTopQueries: TopQueriesFilters;
-}

@@ -69,7 +69,7 @@
     "lint:styles": "stylelint 'src/**/*.{css,scss}'",
     "lint:other": "npm run prettier -- --check",
     "prettier": "prettier '**/*.{json,yaml,yml,md}'",
-    "unimported": "npx unimported --no-cache",
+    "unused": "npx knip --include dependencies,files,exports,types",
     "package": "rm -rf dist && tsc -p tsconfig.package.json && copyfiles -u 1 'src/**/*.{css,scss,svg}' dist",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
