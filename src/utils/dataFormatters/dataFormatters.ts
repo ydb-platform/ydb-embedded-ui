@@ -49,20 +49,25 @@ export function formatUptimeInSeconds(seconds: number) {
         return EMPTY_DATA_PLACEHOLDER;
     }
 
-    const d = duration(seconds, 's').rescale();
+    // duration.format() doesn't work well with negative values
+    // negative value will be displayed like -2d -12:-58:-21
+    // so we process positive duration and only then add sign if any
+    const sign = seconds < 0 ? '-' : '';
+    const d = duration(Math.abs(seconds), 's').rescale();
+
+    let value: string;
 
     if (d.days() > 0) {
-        return d.format(`d[${i18n('d')}${UNBREAKABLE_GAP}]hh:mm:ss`);
+        value = d.format(`d[${i18n('d')}${UNBREAKABLE_GAP}]hh:mm:ss`);
+    } else if (d.hours() > 0) {
+        value = d.format('h:mm:ss');
+    } else if (d.minutes() > 0) {
+        value = d.format('m:ss');
+    } else {
+        value = d.format(`s[${i18n('s')}]`);
     }
 
-    if (d.hours() > 0) {
-        return d.format('h:mm:ss');
-    }
-    if (d.minutes() > 0) {
-        return d.format('m:ss');
-    }
-
-    return d.format(`s[${i18n('s')}]`);
+    return sign + value;
 }
 
 export const formatMsToUptime = (ms?: number) => {
@@ -86,10 +91,7 @@ export function getDowntimeFromDateFormatted(dateFrom?: number | string, dateTo?
     // Prevent wrong negative uptime values
     diff = diff < 0 ? 0 : diff;
 
-    const formattedUptime = formatUptimeInSeconds(diff);
-
-    // Do not add sign to 0 values to prevent -0:00:00 uptime
-    return diff === 0 ? formattedUptime : '-' + formattedUptime;
+    return formatUptimeInSeconds(-diff);
 }
 
 export function calcTimeDiffInSec(

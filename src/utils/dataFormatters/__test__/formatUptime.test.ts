@@ -52,6 +52,15 @@ describe('formatUptimeInSeconds', () => {
         expect(formatUptimeInSeconds(12)).toBe('12s');
         expect(formatUptimeInSeconds(2)).toBe('2s');
     });
+    it('should correctly process negative values', () => {
+        expect(formatUptimeInSeconds(-0)).toBe('0s');
+        expect(formatUptimeInSeconds(-12)).toBe('-12s');
+        expect(formatUptimeInSeconds(-1 * (12 * M + 2))).toBe('-12:02');
+        expect(formatUptimeInSeconds(-1 * (12 * H + 12 * M + 12))).toBe('-12:12:12');
+        expect(formatUptimeInSeconds(-1 * (12 * D + 12 * H + 12 * M + 12))).toBe(
+            '-12d' + UNBREAKABLE_GAP + '12:12:12',
+        );
+    });
     it('should return empty placeholder on NaN', () => {
         expect(formatUptimeInSeconds(Number.NaN)).toBe(EMPTY_DATA_PLACEHOLDER);
     });
