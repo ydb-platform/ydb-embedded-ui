@@ -1,4 +1,4 @@
-import {dateTimeParse} from '@gravity-ui/date-utils';
+import {dateTimeParse, duration} from '@gravity-ui/date-utils';
 
 import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
 import {
@@ -6,9 +6,9 @@ import {
     getSizeWithSignificantDigits,
 } from '../bytesParsers/formatBytes';
 import type {BytesSizes} from '../bytesParsers/formatBytes';
-import {DAY_IN_SECONDS, HOUR_IN_SECONDS} from '../constants';
+import {EMPTY_DATA_PLACEHOLDER, HOUR_IN_SECONDS} from '../constants';
 import {configuredNumeral} from '../numeral';
-import {isNumeric} from '../utils';
+import {UNBREAKABLE_GAP, isNumeric} from '../utils';
 
 import {formatValues} from './common';
 import {formatNumberWithDigits, getNumberWithSignificantDigits} from './formatNumber';
@@ -40,19 +40,38 @@ export const stringifyVdiskId = (id?: TVDiskID | TVSlotId) => {
     return id ? Object.values(id).join('-') : '';
 };
 
-export const formatUptimeInSeconds = (seconds: number) => {
-    const days = Math.floor(seconds / DAY_IN_SECONDS);
-    const remain = seconds % DAY_IN_SECONDS;
+/**
+ * It works well only with positive values,
+ * if you want to get negative formatted uptime, use some wrapper like getDowntimeFromDateFormatted
+ */
+export function formatUptimeInSeconds(seconds: number) {
+    if (!isNumeric(seconds)) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
 
-    const uptime = [days && `${days}d`, configuredNumeral(remain).format('00:00:00')]
-        .filter(Boolean)
-        .join(' ');
+    // duration.format() doesn't work well with negative values
+    // negative value will be displayed like -2d -12:-58:-21
+    // so we process positive duration and only then add sign if any
+    const sign = seconds < 0 ? '-' : '';
+    const d = duration(Math.abs(seconds), 's').rescale();
 
-    return uptime;
-};
+    let value: string;
+
+    if (d.days() > 0) {
+        value = d.format(`d[${i18n('d')}${UNBREAKABLE_GAP}]hh:mm:ss`);
+    } else if (d.hours() > 0) {
+        value = d.format('h:mm:ss');
+    } else if (d.minutes() > 0) {
+        value = d.format('m:ss');
+    } else {
+        value = d.format(`s[${i18n('s')}]`);
+    }
+
+    return sign + value;
+}
 
 export const formatMsToUptime = (ms?: number) => {
-    return ms && formatUptimeInSeconds(ms / 1000);
+    return formatUptimeInSeconds(Number(ms) / 1000);
 };
 
 export function getUptimeFromDateFormatted(dateFrom?: number | string, dateTo?: number | string) {
@@ -72,10 +91,7 @@ export function getDowntimeFromDateFormatted(dateFrom?: number | string, dateTo?
     // Prevent wrong negative uptime values
     diff = diff < 0 ? 0 : diff;
 
-    const formattedUptime = formatUptimeInSeconds(diff);
-
-    // Do not add sign to 0 values to prevent -0:00:00 uptime
-    return diff === 0 ? formattedUptime : '-' + formattedUptime;
+    return formatUptimeInSeconds(-diff);
 }
 
 export function calcTimeDiffInSec(

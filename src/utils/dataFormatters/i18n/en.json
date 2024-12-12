@@ -1,3 +1,6 @@
 {
-  "format-cpu.cores": ["core", "cores", "cores", "cores"]
+  "format-cpu.cores": ["core", "cores", "cores", "cores"],
+
+  "d": "d",
+  "s": "s"
 }

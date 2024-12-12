@@ -94,7 +94,13 @@ test.describe('Test Nodes Paginated Table', async () => {
         const uptimeValues = await paginatedTable.getColumnValues('Uptime');
 
         for (const uptime of uptimeValues) {
-            expect(uptime).toMatch(/^(\d+d\s)?(\d+):(\d{2}):(\d{2})$/); // Format: DDd? HH:MM:SS
+            // \d+d\xa0\d{2}:\d{2}:\d{2} - DDd HH:MM:SS, 1d 00:20:30
+            // \d{1,2}:\d{2}:\d{2}$ - HH:MM:SS, 1:02:02 or 12:02:02
+            // \d{1,2}:\d{2}$ - MM:SS, 1:02 or 12:02
+            // \d{1,2}s$ - SSs, 1s or 12s
+            expect(uptime).toMatch(
+                /^(\d+d\xa0\d{2}:\d{2}:\d{2}|\d{1,2}:\d{2}:\d{2}|\d{1,2}:\d{2}|\d{1,2}s)$/,
+            );
         }
     });
 

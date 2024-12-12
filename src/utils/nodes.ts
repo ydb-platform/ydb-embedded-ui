@@ -74,7 +74,7 @@ export function prepareNodeSystemState(
     const DC = systemState.Location?.DataCenter || systemState.DataCenter;
     const TenantName = systemState?.Tenants?.[0];
 
-    let Uptime: string;
+    let Uptime: PreparedNodeSystemState['Uptime'];
 
     if (systemState.DisconnectTime) {
         Uptime = getDowntimeFromDateFormatted(systemState.DisconnectTime);
