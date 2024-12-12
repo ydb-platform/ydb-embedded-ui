@@ -18,7 +18,7 @@ export interface NetworkError {
     description?: unknown;
     fileName?: unknown;
     lineNumber?: unknown;
-    message?: 'Network Error';
+    message: 'Network Error';
     name?: string;
     number?: unknown;
     stack?: string;
