@@ -1,5 +1,28 @@
 # Changelog
 
+## [8.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v7.2.0...v8.0.0) (2024-12-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* only pagination tables in storage ([#1745](https://github.com/ydb-platform/ydb-embedded-ui/issues/1745))
+
+### Features
+
+* change uptime format ([#1748](https://github.com/ydb-platform/ydb-embedded-ui/issues/1748)) ([d40aea0](https://github.com/ydb-platform/ydb-embedded-ui/commit/d40aea027dd87defdf2fbceb60eb44a5d480034d))
+* remove unused exports, functions and files ([#1750](https://github.com/ydb-platform/ydb-embedded-ui/issues/1750)) ([cdf9ebc](https://github.com/ydb-platform/ydb-embedded-ui/commit/cdf9ebc46850cf5a0d150436bd4b07183b2080a8))
+
+
+### Bug Fixes
+
+* **ClusterInfo:** update links view ([#1746](https://github.com/ydb-platform/ydb-embedded-ui/issues/1746)) ([b3d5897](https://github.com/ydb-platform/ydb-embedded-ui/commit/b3d5897a05f503226458f4a47fcee113ced428db))
+* execution plan svg not saving in chrome ([#1744](https://github.com/ydb-platform/ydb-embedded-ui/issues/1744)) ([189174a](https://github.com/ydb-platform/ydb-embedded-ui/commit/189174a20c8d8a1270e0f5fdaa86a5c43bfe0751))
+
+
+### Miscellaneous Chores
+
+* only pagination tables in storage ([#1745](https://github.com/ydb-platform/ydb-embedded-ui/issues/1745)) ([b12599e](https://github.com/ydb-platform/ydb-embedded-ui/commit/b12599e365d9ae9e0cbe3e87091568c575a0074e))
+
 ## [7.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v7.1.0...v7.2.0) (2024-12-10)
 
 
