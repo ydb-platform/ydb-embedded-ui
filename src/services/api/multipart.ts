@@ -1,5 +1,3 @@
-import type {AxiosResponse} from 'axios';
-
 import {BaseYdbAPI} from './base';
 import type {AxiosOptions} from './base';
 
@@ -11,53 +9,114 @@ interface MultipartChunk<T = any> {
 }
 
 export class MultipartAPI extends BaseYdbAPI {
-    async streamMultipartResponse<T>(
-        url: string,
-        params: Record<string, any> = {},
-        options: AxiosOptions = {},
-    ): Promise<MultipartChunk<T>[]> {
-        const response = await this._axios.get<string>(this.getPath(url), {
-            params,
-            ...options,
-            headers: {
-                Accept: 'multipart/x-mixed-replace',
-            },
-            responseType: 'text',
-            transformResponse: (data) => data, // Prevent default JSON parsing
-        });
+    private boundary = 'boundary'; // Fixed boundary as per server response
+    private lastProcessedLength = 0;
 
-        return this.parseMultipartResponse<T>(response);
+    getPath(): string {
+        return 'http://localhost:3000/stream';
     }
 
-    private parseMultipartResponse<T>(response: AxiosResponse<string>): MultipartChunk<T>[] {
-        const contentType = response.headers['content-type'];
-        const boundaryMatch = contentType.match(/boundary=([^;]+)/);
+    async streamMultipartResponse<T>(
+        url: string,
+        onChunk: (chunk: MultipartChunk<T>) => void,
+        params: Record<string, any> = {},
+        options: AxiosOptions = {},
+    ): Promise<void> {
+        // Reset state for new request
+        this.lastProcessedLength = 0;
 
-        if (!boundaryMatch) {
-            throw new Error('No boundary found in multipart response');
-        }
+        await this.get<string>(
+            this.getPath(),
+            {
+                params,
+            },
+            {
+                ...options,
+                headers: {
+                    Accept: 'multipart/x-mixed-replace',
+                },
+                onDownloadProgress: (progressEvent) => {
+                    const response = progressEvent.event.target as XMLHttpRequest;
+                    const responseText = response.responseText;
 
-        const boundary = boundaryMatch[1];
-        const parts = response.data.split(`--${boundary}`);
-        const chunks: MultipartChunk<T>[] = [];
+                    console.log('Progress event received');
+                    console.log('Last processed length:', this.lastProcessedLength);
+                    console.log('Current response length:', responseText.length);
 
-        // Process each part except first (usually empty) and last (boundary terminator)
-        for (const part of parts.slice(1, -1)) {
-            const lines = part.split('\n').filter(Boolean);
-            const jsonStartIndex = lines.findIndex((line) => line.trim().startsWith('{'));
+                    // Get only the new data
+                    const newData = responseText.slice(this.lastProcessedLength);
+                    console.log('New data length:', newData.length);
+                    console.log('New data:', newData);
 
-            if (jsonStartIndex !== -1) {
-                try {
-                    const jsonContent = lines.slice(jsonStartIndex).join('\n');
-                    const chunk = JSON.parse(jsonContent) as MultipartChunk<T>;
-                    chunks.push(chunk);
-                } catch (error) {
-                    console.error('Failed to parse chunk:', error);
-                }
+                    if (newData) {
+                        const boundaryStr = `--${this.boundary}`;
+                        const parts = newData.split(boundaryStr);
+
+                        console.log('Number of parts found:', parts.length);
+                        console.log('Parts:', parts);
+
+                        // Process all parts including the first one
+                        for (let i = 0; i < parts.length; i++) {
+                            const part = parts[i].trim();
+                            if (!part) {
+                                console.log('Empty part, skipping:', i);
+                                continue;
+                            }
+
+                            console.log('Processing part:', i, 'Content:', part);
+                            const chunk = this.parseChunk<T>(part);
+                            if (chunk) {
+                                console.log('Chunk parsed successfully:', chunk);
+                                onChunk(chunk);
+                            } else {
+                                console.log('Failed to parse chunk for part:', i);
+                            }
+                        }
+                    }
+
+                    // Update the processed length
+                    this.lastProcessedLength = responseText.length;
+                },
+            },
+        );
+    }
+
+    private parseChunk<T>(part: string): MultipartChunk<T> | null {
+        try {
+            console.log('Parsing chunk, part length:', part.length);
+
+            // Split headers and body using CRLF sequence
+            const sections = part.split('\r\n\r\n');
+            console.log('Number of sections:', sections.length);
+
+            if (sections.length < 2) {
+                console.log('Invalid chunk format: not enough sections');
+                return null;
             }
-        }
 
-        return chunks;
+            console.log('Headers:', sections[0]);
+            console.log('Body:', sections[1]);
+
+            const body = sections[1].trim();
+            if (!body) {
+                console.log('Invalid chunk format: empty body');
+                return null;
+            }
+
+            // Parse the JSON content
+            const content = JSON.parse(body);
+            console.log('Parsed content:', content);
+
+            // Wrap in MultipartChunk format
+            return {
+                part_number: Math.floor(Math.random() * 1000), // Temporary random number for testing
+                total_parts: 100, // Using a placeholder since total is unknown
+                content: content as T,
+            };
+        } catch (error) {
+            console.error('Failed to parse chunk:', error);
+            return null;
+        }
     }
 }
 

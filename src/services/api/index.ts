@@ -2,6 +2,7 @@ import type {AxiosRequestConfig} from 'axios';
 
 import {AuthAPI} from './auth';
 import {MetaAPI} from './meta';
+import {MultipartAPI} from './multipart';
 import {OperationAPI} from './operation';
 import {PDiskAPI} from './pdisk';
 import {SchemeAPI} from './scheme';
@@ -22,6 +23,7 @@ export class YdbEmbeddedAPI {
     vdisk: VDiskAPI;
     viewer: ViewerAPI;
     meta?: MetaAPI;
+    multipart?: MultipartAPI;
 
     constructor({config, webVersion}: {config: AxiosRequestConfig; webVersion?: boolean}) {
         this.auth = new AuthAPI({config});
@@ -36,6 +38,7 @@ export class YdbEmbeddedAPI {
         this.trace = new TraceAPI({config});
         this.vdisk = new VDiskAPI({config});
         this.viewer = new ViewerAPI({config});
+        this.multipart = new MultipartAPI({config});
     }
 }
 

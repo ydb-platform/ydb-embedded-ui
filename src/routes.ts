@@ -15,6 +15,7 @@ export const PDISK = 'pDisk';
 export const VDISK = 'vDisk';
 export const STORAGE_GROUP = 'storageGroup';
 export const TABLET = 'tablet';
+export const MULTIPART_TEST = 'multipart-test';
 
 const routes = {
     clusters: `/${CLUSTERS}`,
@@ -27,6 +28,7 @@ const routes = {
     tablet: `/${TABLET}/:id`,
     tabletsFilters: `/tabletsFilters`,
     auth: `/auth`,
+    multipartTest: `/${MULTIPART_TEST}`,
 } as const;
 
 export default routes;
