@@ -138,16 +138,17 @@ const SuggestionsWeight: Record<SuggestionType, number> = {
     suggestAllColumns: 3,
     suggestColumns: 4,
     suggestColumnAliases: 5,
-    suggestTableIndexes: 6,
-    suggestTableHints: 7,
-    suggestEntitySettings: 8,
-    suggestKeywords: 9,
-    suggestAggregateFunctions: 10,
-    suggestTableFunctions: 11,
-    suggestWindowFunctions: 12,
-    suggestFunctions: 13,
-    suggestSimpleTypes: 14,
-    suggestUdfs: 15,
+    suggestVariables: 6,
+    suggestTableIndexes: 7,
+    suggestTableHints: 8,
+    suggestEntitySettings: 9,
+    suggestKeywords: 10,
+    suggestAggregateFunctions: 11,
+    suggestTableFunctions: 12,
+    suggestWindowFunctions: 13,
+    suggestFunctions: 14,
+    suggestSimpleTypes: 15,
+    suggestUdfs: 16,
 };
 
 function getSuggestionIndex(suggestionType: SuggestionType) {
@@ -328,7 +329,7 @@ export function generateKeywordsSuggestion(
     if (!suggestKeywords) {
         return [];
     }
-    return suggestKeywords?.map((keywordSuggestion) => ({
+    return suggestKeywords.map((keywordSuggestion) => ({
         label: keywordSuggestion.value,
         insertText: keywordSuggestion.value,
         kind: CompletionItemKind.Keyword,
@@ -336,6 +337,26 @@ export function generateKeywordsSuggestion(
         range: rangeToInsertSuggestion,
         sortText: suggestionIndexToWeight(getSuggestionIndex('suggestKeywords')),
     }));
+}
+
+export function generateVariableSuggestion(
+    rangeToInsertSuggestion: monaco.IRange,
+    suggestVariables?: string[],
+) {
+    if (!suggestVariables) {
+        return [];
+    }
+    return suggestVariables.map((rawVariable) => {
+        const variable = '$' + rawVariable;
+        return {
+            label: variable,
+            insertText: variable,
+            kind: CompletionItemKind.Variable,
+            detail: 'Variable',
+            range: rangeToInsertSuggestion,
+            sortText: suggestionIndexToWeight(getSuggestionIndex('suggestVariables')),
+        };
+    });
 }
 
 export async function generateEntitiesSuggestion(
