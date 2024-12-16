@@ -46,9 +46,9 @@ export const getStorageNodes: FetchData<
     const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
     let response;
-    if (process.env.NODE_ENV === 'development') {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mocks')) {
         // Get mock configuration from URL parameters or use defaults
-        const urlParams = new URLSearchParams(window.location.search);
         const pdisks = parseInt(urlParams.get('pdisks') || '10', 10);
         const vdisksPerPDisk = parseInt(urlParams.get('vdisksPerPDisk') || '2', 10);
         response = generateNodes(5, {vdisksCount: pdisks * vdisksPerPDisk, pdisksCount: pdisks});
