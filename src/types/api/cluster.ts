@@ -1,6 +1,5 @@
 import type {EFlag} from './enums';
 import type {TTabletStateInfo} from './tablet';
-import type {TTraceCheck, TTraceView} from './trace';
 
 /**
  * endpoint: viewer/json/cluster
@@ -9,7 +8,6 @@ import type {TTraceCheck, TTraceView} from './trace';
  */
 export interface TClusterInfoV1 {
     error?: string;
-    Name?: string;
     Overall?: EFlag;
     NodesTotal?: number;
     NodesAlive?: number;
@@ -36,12 +34,6 @@ export interface TClusterInfoV1 {
 
     /** Cluster root database */
     Domain?: string;
-
-    Balancer?: string; // additional
-    Solomon?: string; // additional
-
-    TraceView?: TTraceView;
-    TraceCheck?: TTraceCheck;
 }
 
 export interface TStorageStats {

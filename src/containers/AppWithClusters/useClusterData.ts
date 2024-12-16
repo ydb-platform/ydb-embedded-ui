@@ -17,13 +17,12 @@ export function useClusterData() {
         return clusters.find((cluster) => cluster.name === clusterName);
     }, [data, clusterName]);
 
-    const {solomon: monitoring, balancer, versions, cluster} = info || {};
+    const {solomon: monitoring, balancer, versions} = info || {};
 
     return {
         monitoring,
         balancer,
         versions,
-        cluster,
         ...useAdditionalNodeProps({balancer}),
     };
 }

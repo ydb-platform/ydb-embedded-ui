@@ -15,6 +15,7 @@ import {
     selectClusterTabletsWithFqdn,
     selectClusterTitle,
     updateDefaultClusterTab,
+    useClusterBaseInfo,
 } from '../../store/reducers/cluster/cluster';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import type {
@@ -66,9 +67,13 @@ export function Cluster({
         backend: StringParam,
     });
 
-    const clusterTitle = useTypedSelector((state) =>
+    const viewerClusterTitle = useTypedSelector((state) =>
         selectClusterTitle(state, clusterName ?? undefined),
     );
+
+    const {title: metaClusterTitle} = useClusterBaseInfo();
+
+    const clusterTitle = metaClusterTitle ?? viewerClusterTitle;
 
     const {
         data: {clusterData: cluster = {}, groupsStats} = {},

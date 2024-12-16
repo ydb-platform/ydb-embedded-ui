@@ -2,11 +2,9 @@ import {metaBackend as META_BACKEND} from '../../store';
 import type {
     MetaBaseClusterInfo,
     MetaBaseClusters,
-    MetaCluster,
     MetaClusters,
     MetaTenants,
 } from '../../types/api/meta';
-import {parseMetaCluster} from '../parsers/parseMetaCluster';
 import {parseMetaTenants} from '../parsers/parseMetaTenants';
 
 import type {AxiosOptions} from './base';
@@ -21,16 +19,6 @@ export class MetaAPI extends BaseYdbAPI {
         return this.get<MetaClusters>(this.getPath('/meta/clusters'), null, {
             requestConfig: {signal},
         });
-    }
-
-    getClusterInfo(clusterName?: string, {signal}: AxiosOptions = {}) {
-        return this.get<MetaCluster>(
-            this.getPath('/meta/cluster'),
-            {
-                name: clusterName,
-            },
-            {concurrentId: `getCluster${clusterName}`, requestConfig: {signal}},
-        ).then(parseMetaCluster);
     }
 
     getTenants(clusterName?: string, {signal}: AxiosOptions = {}) {
