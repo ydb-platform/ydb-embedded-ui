@@ -1,28 +1,35 @@
 .pdisk-storage {
     position: relative;
 
-    width: 120px;
+    display: flex;
+    flex-direction: column;
+
+    min-width: 120px;
 
     &__content {
         position: relative;
 
         display: block;
+        flex: 1;
 
-        border-radius: 4px; // to match interactive area with disk shape
+        border-radius: 4px;
     }
 
     &__vdisks {
         display: flex;
-        // this breaks disks relative sizes, but disks rarely exceed one line
-        flex-wrap: wrap;
+        overflow: hidden; // Prevent overflow
+        flex: 0 0 auto;
         gap: 2px;
 
         margin-bottom: 4px;
+
+        white-space: nowrap;
     }
 
     &__vdisks-item {
-        flex-basis: 3px;
-        flex-shrink: 0;
+        flex: 0 0 3px;
+
+        min-width: 3px;
 
         .stack__layer {
             .data-table__row:hover & {

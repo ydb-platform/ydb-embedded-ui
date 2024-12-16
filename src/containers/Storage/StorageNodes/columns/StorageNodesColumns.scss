@@ -5,20 +5,13 @@
 
     &__pdisks-wrapper {
         display: flex;
-        justify-content: left;
-        align-items: flex-end;
+        gap: 10px;
 
-        width: max-content;
-        height: 40px;
+        width: 100%;
     }
+
     &__pdisks-item {
-        flex-grow: 1;
-
-        max-width: 200px;
-        margin-right: 10px;
-
-        &:last-child {
-            margin-right: 0px;
-        }
+        display: flex;
+        flex-shrink: 0;
     }
 }
