@@ -1,5 +1,6 @@
 import {ClipboardButton} from '@gravity-ui/uikit';
 
+import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {
     AdditionalClusterProps,
     AdditionalTenantsProps,
@@ -122,27 +123,22 @@ export function ExtendedCluster({
     getMonitoringLink,
     getMonitoringClusterLink,
 }: ExtendedClusterProps) {
-    const {
-        monitoring,
-        balancer,
-        versions,
-        cluster,
-        useClusterBalancerAsBackend,
-        additionalNodesProps,
-    } = useClusterData();
+    const {versions, useClusterBalancerAsBackend, additionalNodesProps} = useClusterData();
+
+    const {name, balancer, monitoring} = useClusterBaseInfo();
 
     return (
         <div className={b()}>
             <ClusterComponent
                 additionalClusterProps={getAdditionalClusterProps(
-                    cluster?.Name,
+                    name,
                     monitoring,
                     balancer,
                     getMonitoringClusterLink,
                 )}
                 additionalVersionsProps={getAdditionalVersionsProps(versions)}
                 additionalTenantsProps={getAdditionalTenantsProps(
-                    cluster?.Name,
+                    name,
                     monitoring,
                     balancer,
                     useClusterBalancerAsBackend,

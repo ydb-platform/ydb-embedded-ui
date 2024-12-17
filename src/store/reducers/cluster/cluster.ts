@@ -67,9 +67,9 @@ export const clusterApi = api.injectEndpoints({
         >({
             queryFn: async (clusterName, {signal}) => {
                 try {
-                    const clusterData = window.api.meta
-                        ? await window.api.meta.getClusterInfo(clusterName, {signal})
-                        : await window.api.viewer.getClusterInfo(clusterName, {signal});
+                    const clusterData = await window.api.viewer.getClusterInfo(clusterName, {
+                        signal,
+                    });
 
                     const clusterRoot = clusterData.Domain;
                     // Without domain we cannot get stats from system tables
@@ -171,9 +171,11 @@ export const selectClusterTitle = createSelector(
     (_state: RootState, clusterName?: string) => clusterName,
     (state: RootState, clusterName?: string) => selectClusterInfo(state, clusterName),
     (clusterName, clusterInfo) => {
-        const {Name, Domain} = clusterInfo?.clusterData || {};
-
-        return Name || clusterName || normalizeDomain(Domain) || CLUSTER_DEFAULT_TITLE;
+        return (
+            clusterName ||
+            normalizeDomain(clusterInfo?.clusterData?.Domain) ||
+            CLUSTER_DEFAULT_TITLE
+        );
     },
 );
 
