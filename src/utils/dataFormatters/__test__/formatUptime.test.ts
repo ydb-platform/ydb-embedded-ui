@@ -31,10 +31,13 @@ describe('formatUptimeInSeconds', () => {
     const D = 24 * H;
 
     it('should return days if value is more than 24h', () => {
-        expect(formatUptimeInSeconds(D)).toBe('1d' + UNBREAKABLE_GAP + '00:00:00');
+        expect(formatUptimeInSeconds(24 * H)).toBe('1d' + UNBREAKABLE_GAP + '00:00:00');
         expect(formatUptimeInSeconds(D + H + M + 12)).toBe('1d' + UNBREAKABLE_GAP + '01:01:12');
-        expect(formatUptimeInSeconds(12 * D + 12 * H + 12 * M + 12)).toBe(
-            '12d' + UNBREAKABLE_GAP + '12:12:12',
+        // 1 week
+        expect(formatUptimeInSeconds(7 * D + H + M + 12)).toBe('7d' + UNBREAKABLE_GAP + '01:01:12');
+        // 1 month
+        expect(formatUptimeInSeconds(30 * D + 11 * H + 30 * M + 12)).toBe(
+            '30d' + UNBREAKABLE_GAP + '11:30:12',
         );
         expect(formatUptimeInSeconds(1234 * D + 12 * H + 12 * M + 12)).toBe(
             '1234d' + UNBREAKABLE_GAP + '12:12:12',
