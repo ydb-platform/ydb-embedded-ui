@@ -57,7 +57,9 @@ export function formatUptimeInSeconds(seconds: number) {
 
     let value: string;
 
-    if (d.days() > 0) {
+    // Do not use just d.days(), since days could be rescaled up to weeks and more
+    // So for 7d we will have d.weeks() = 1 and d.days() = 0
+    if (Math.floor(d.asDays()) > 0) {
         value = d.format(`d[${i18n('d')}${UNBREAKABLE_GAP}]hh:mm:ss`);
     } else if (d.hours() > 0) {
         value = d.format('h:mm:ss');
