@@ -1,5 +1,18 @@
 # Changelog
 
+## [8.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.0.0...v8.1.0) (2024-12-17)
+
+
+### Features
+
+* **autocomplete:** suggest variables ([#1752](https://github.com/ydb-platform/ydb-embedded-ui/issues/1752)) ([44e079a](https://github.com/ydb-platform/ydb-embedded-ui/commit/44e079a2001b40a20583311dcba621ea142e027c))
+* remove /meta/cluster ([#1757](https://github.com/ydb-platform/ydb-embedded-ui/issues/1757)) ([6abc16e](https://github.com/ydb-platform/ydb-embedded-ui/commit/6abc16e5d31024884628c56d32704cb8daa354d7))
+
+
+### Bug Fixes
+
+* fix 1 week uptime formatting ([#1759](https://github.com/ydb-platform/ydb-embedded-ui/issues/1759)) ([e3de008](https://github.com/ydb-platform/ydb-embedded-ui/commit/e3de0084cbb6f1338dd892c74f0aaaaed1736104))
+
 ## [8.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v7.2.0...v8.0.0) (2024-12-12)
 
 
