@@ -118,18 +118,27 @@ const generateVDisk = (nodeId: number, vdiskId: number, pdiskId: number) => ({
 });
 
 interface NodeGeneratorOptions {
-    vdisksCount?: number;
-    pdisksCount?: number;
+    maxVdisksPerPDisk?: number;
+    maxPdisks?: number;
 }
 
 const DEFAULT_OPTIONS: NodeGeneratorOptions = {
-    vdisksCount: 12,
-    pdisksCount: 4,
+    maxVdisksPerPDisk: 3,
+    maxPdisks: 4,
 };
 
 const generateNode = (nodeId: number, options: NodeGeneratorOptions = {}): TNodeInfo => {
-    const pdisksCount = options.pdisksCount ?? DEFAULT_OPTIONS.pdisksCount;
-    const vdisksCount = options.vdisksCount ?? DEFAULT_OPTIONS.vdisksCount;
+    const maxPdisks = options.maxPdisks ?? DEFAULT_OPTIONS.maxPdisks!;
+    const maxVdisksPerPDisk = options.maxVdisksPerPDisk ?? DEFAULT_OPTIONS.maxVdisksPerPDisk!;
+
+    // Generate a random number of pdisks up to maxPdisks
+    const pdisksCount = Math.floor(Math.random() * maxPdisks) + 1;
+
+    // For each pdisk, generate a random number of vdisks up to maxVdisksPerPDisk
+    const pdiskVdisksCounts = Array.from({length: pdisksCount}, () =>
+        Math.floor(Math.random() * maxVdisksPerPDisk),
+    );
+    const totalVdisks = pdiskVdisksCounts.reduce((sum: number, count: number) => sum + count, 0);
 
     return {
         NodeId: nodeId,
@@ -137,22 +146,44 @@ const generateNode = (nodeId: number, options: NodeGeneratorOptions = {}): TNode
         CpuUsage: 0.00947996,
         DiskSpaceUsage: 0.234985,
         SystemState: generateSystemState(nodeId),
-        PDisks: Array.from({length: pdisksCount!}, (_, i) =>
+        PDisks: Array.from({length: pdisksCount}, (_, i) =>
             generatePDisk(nodeId, i + 1, getRandomDiskSize()),
         ),
-        VDisks: Array.from({length: vdisksCount!}, (_, i) => {
-            // Distribute VDisks evenly across PDisks
-            const pdiskId = (i % pdisksCount!) + 1;
-            return generateVDisk(nodeId, i, pdiskId);
+        VDisks: Array.from({length: totalVdisks}, (_, i) => {
+            // Find which pdisk this vdisk belongs to based on the distribution
+            let pdiskIndex = 0;
+            let vdiskCount = pdiskVdisksCounts[0];
+            while (i >= vdiskCount && pdiskIndex < pdisksCount - 1) {
+                pdiskIndex++;
+                vdiskCount += pdiskVdisksCounts[pdiskIndex];
+            }
+            return generateVDisk(nodeId, i, pdiskIndex + 1);
         }),
     };
 };
 
 export const generateNodes = (count = 1, options?: NodeGeneratorOptions): TNodesInfo => {
     const nodes = Array.from({length: count}, (_, i) => generateNode(i + 1, options));
+
+    // Calculate MaximumSlotsPerDisk as the maximum number of vdisks on any pdisk
+    let maxSlotsPerDisk = 0;
+    nodes.forEach((node) => {
+        if (node.VDisks) {
+            const pdiskVdiskCounts = new Map<number, number>();
+            node.VDisks.forEach((vdisk) => {
+                if (typeof vdisk.PDiskId === 'number') {
+                    const count = (pdiskVdiskCounts.get(vdisk.PDiskId) || 0) + 1;
+                    pdiskVdiskCounts.set(vdisk.PDiskId, count);
+                    maxSlotsPerDisk = Math.max(maxSlotsPerDisk, count);
+                }
+            });
+        }
+    });
+
     return {
         TotalNodes: count.toString(),
         FoundNodes: count.toString(),
         Nodes: nodes,
+        MaximumSlotsPerDisk: maxSlotsPerDisk.toString(),
     };
 };

@@ -188,7 +188,10 @@ const prepareStorageGroups = (
 
 // ==== Prepare nodes ====
 
-const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
+const prepareStorageNodeData = (
+    node: TNodeInfo,
+    maximumSlotsPerDisk: string,
+): PreparedStorageNode => {
     const missing =
         node.PDisks?.filter((pDisk) => {
             return pDisk.State !== TPDiskState.Normal;
@@ -214,13 +217,36 @@ const prepareStorageNodeData = (node: TNodeInfo): PreparedStorageNode => {
         PDisks: pDisks,
         VDisks: vDisks,
         Missing: missing,
+        MaximumSlotsPerDisk: maximumSlotsPerDisk,
     };
+};
+
+export const calculateMaximumSlotsPerDisk = (
+    nodes: TNodeInfo[] | undefined,
+    providedMaximumSlotsPerDisk?: string,
+) => {
+    if (providedMaximumSlotsPerDisk) {
+        return providedMaximumSlotsPerDisk;
+    }
+
+    return String(
+        Math.max(
+            1,
+            ...(nodes || []).flatMap((node) =>
+                (node.PDisks || []).map(
+                    (pDisk) =>
+                        (node.VDisks || []).filter((vDisk) => vDisk.PDiskId === pDisk.PDiskId)
+                            .length || 0,
+                ),
+            ),
+        ),
+    );
 };
 
 // ==== Prepare responses ====
 
 export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageResponse => {
-    const {Nodes, TotalNodes, FoundNodes, NodeGroups} = data;
+    const {Nodes, TotalNodes, FoundNodes, NodeGroups, MaximumSlotsPerDisk} = data;
 
     const tableGroups = NodeGroups?.map(({GroupName, NodeCount}) => {
         if (GroupName && NodeCount) {
@@ -232,7 +258,8 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
         return undefined;
     }).filter((group): group is TableGroup => Boolean(group));
 
-    const preparedNodes = Nodes?.map(prepareStorageNodeData);
+    const maximumSlots = calculateMaximumSlotsPerDisk(Nodes, MaximumSlotsPerDisk);
+    const preparedNodes = Nodes?.map((node) => prepareStorageNodeData(node, maximumSlots));
 
     return {
         nodes: preparedNodes,

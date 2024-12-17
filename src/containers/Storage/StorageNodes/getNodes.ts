@@ -51,7 +51,7 @@ export const getStorageNodes: FetchData<
         // Get mock configuration from URL parameters or use defaults
         const pdisks = parseInt(urlParams.get('pdisks') || '10', 10);
         const vdisksPerPDisk = parseInt(urlParams.get('vdisksPerPDisk') || '2', 10);
-        response = generateNodes(5, {vdisksCount: pdisks * vdisksPerPDisk, pdisksCount: pdisks});
+        response = generateNodes(5, {maxVdisksPerPDisk: vdisksPerPDisk, maxPdisks: pdisks});
     } else {
         response = await window.api.viewer.getNodes({
             type,

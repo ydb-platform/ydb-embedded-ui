@@ -1,10 +1,18 @@
 .pdisk-storage {
+    --pdisk-vdisk-width: 3px;
+    --pdisk-gap-width: 2px;
+
     position: relative;
 
     display: flex;
     flex-direction: column;
+    justify-content: flex-end;
 
     min-width: 120px;
+    width: calc(
+        var(--pdisk-max-slots, 1) * var(--pdisk-vdisk-width) + (var(--pdisk-max-slots, 1) - 1) *
+            var(--pdisk-gap-width)
+    );
 
     &__content {
         position: relative;
@@ -18,7 +26,7 @@
     &__vdisks {
         display: flex;
         flex: 0 0 auto;
-        gap: 2px;
+        gap: var(--pdisk-gap-width);
 
         margin-bottom: 4px;
 
@@ -26,9 +34,9 @@
     }
 
     &__vdisks-item {
-        flex: 0 0 3px;
+        flex: 0 0 var(--pdisk-vdisk-width);
 
-        min-width: 3px;
+        min-width: var(--pdisk-vdisk-width);
 
         .stack__layer {
             .data-table__row:hover & {
