@@ -1,5 +1,13 @@
 # Changelog
 
+## [8.0.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.0.0...v8.0.0-hotfix.1) (2024-12-17)
+
+
+### Bug Fixes
+
+* fix 1 week uptime formatting ([e4c3baa](https://github.com/ydb-platform/ydb-embedded-ui/commit/e4c3baabd758a3dbebc086eebf632bd3ffc54a4d))
+* fix 1 week uptime formatting ([#1759](https://github.com/ydb-platform/ydb-embedded-ui/issues/1759)) ([5ce9117](https://github.com/ydb-platform/ydb-embedded-ui/commit/5ce9117069cda706b53196e837a1346265a91bc7))
+
 ## [8.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v7.2.0...v8.0.0) (2024-12-12)
 
 
