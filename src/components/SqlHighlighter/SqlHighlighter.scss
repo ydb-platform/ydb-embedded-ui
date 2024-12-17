@@ -1,0 +1,13 @@
+.sql-highlighter {
+    code {
+        white-space: pre-wrap !important;
+
+        color: var(--g-color-text-primary) !important;
+    }
+
+    pre {
+        margin: 0 !important;
+
+        background: var(--g-color-base-background) !important;
+    }
+}
