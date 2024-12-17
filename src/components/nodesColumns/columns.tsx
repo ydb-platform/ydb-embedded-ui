@@ -23,6 +23,7 @@ import {PoolsGraph} from '../PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../TabletsStatistic';
 import {formatPool} from '../TooltipsContent';
+import {NodeUptime} from '../UptimeViewer/UptimeViewer';
 import {UsageLabel} from '../UsageLabel/UsageLabel';
 
 import {NODES_COLUMNS_IDS, NODES_COLUMNS_TITLES} from './constants';
@@ -103,12 +104,16 @@ export function getVersionColumn<T extends {Version?: string}>(): Column<T> {
         },
     };
 }
-export function getUptimeColumn<T extends {StartTime?: string; Uptime?: string}>(): Column<T> {
+export function getUptimeColumn<
+    T extends {StartTime?: string; DisconnectTime?: string},
+>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Uptime,
         header: NODES_COLUMNS_TITLES.Uptime,
         sortAccessor: ({StartTime}) => (StartTime ? -StartTime : 0),
-        render: ({row}) => row.Uptime,
+        render: ({row}) => {
+            return <NodeUptime StartTime={row.StartTime} DisconnectTime={row.DisconnectTime} />;
+        },
         align: DataTable.RIGHT,
         width: 120,
     };

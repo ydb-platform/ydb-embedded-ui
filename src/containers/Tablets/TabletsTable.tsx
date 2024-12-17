@@ -9,12 +9,12 @@ import {ResizeableDataTable} from '../../components/ResizeableDataTable/Resizeab
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TabletNameWrapper} from '../../components/TabletNameWrapper/TabletNameWrapper';
 import {TabletState} from '../../components/TabletState/TabletState';
+import {TabletUptime} from '../../components/UptimeViewer/UptimeViewer';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {tabletApi} from '../../store/reducers/tablet';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {getUptimeFromDateFormatted} from '../../utils/dataFormatters/dataFormatters';
 import {useTypedSelector} from '../../utils/hooks';
 import {getDefaultNodePath} from '../Node/NodePages';
 
@@ -97,10 +97,11 @@ function getColumns({database}: {database?: string}) {
                 return i18n('Uptime');
             },
             render: ({row}) => {
-                return getUptimeFromDateFormatted(row.ChangeTime);
+                return <TabletUptime ChangeTime={row.ChangeTime} />;
             },
             sortAccessor: (row) => -Number(row.ChangeTime),
             align: 'right',
+            width: 120,
         },
         {
             name: 'Actions',

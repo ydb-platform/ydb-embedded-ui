@@ -22,7 +22,7 @@ export function CellWithPopover({
     ...props
 }: CellWithPopoverProps) {
     return (
-        <div className={b({fullWidth}, wrapperClassName)}>
+        <div className={b({'full-width': fullWidth}, wrapperClassName)}>
             <Popover
                 delayClosing={DELAY_TIMEOUT}
                 delayOpening={DELAY_TIMEOUT}

@@ -17,7 +17,6 @@ export interface NodesPreparedEntity extends PreparedNodeSystemState {
     Version?: string;
 
     StartTime?: string;
-    Uptime: string;
     DisconnectTime?: string;
 
     MemoryUsed?: string;
