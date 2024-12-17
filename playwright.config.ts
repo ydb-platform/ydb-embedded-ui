@@ -19,6 +19,7 @@ const config: PlaywrightTestConfig = {
         : {
               command: 'npm run dev',
               port: 3000,
+              reuseExistingServer: true,
           },
     use: {
         baseURL: baseUrl || 'http://localhost:3000/',
