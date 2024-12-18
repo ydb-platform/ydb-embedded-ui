@@ -60,7 +60,6 @@ export const getStorageNodes: FetchData<
         filter_group_by: filterGroupBy,
         fieldsRequired: dataFieldsRequired,
     });
-
     const preparedResponse = prepareStorageNodesResponse(response);
     return {
         data: preparedResponse.nodes || [],
