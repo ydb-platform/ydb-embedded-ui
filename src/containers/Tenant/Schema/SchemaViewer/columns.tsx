@@ -31,7 +31,7 @@ const nameColumn: SchemaColumn = {
     get header() {
         return i18n('column-title.name');
     },
-    width: 100,
+    width: 120,
     render: ({row}) => row.name,
 };
 const typeColumn: SchemaColumn = {
@@ -104,7 +104,7 @@ const compressionColumn: SchemaColumn = {
     get header() {
         return i18n('column-title.compression');
     },
-    width: 100,
+    width: 130,
     render: ({row}) => row.columnCodec,
 };
 
