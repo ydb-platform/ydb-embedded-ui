@@ -38,7 +38,7 @@
 
         background-color: var(--g-color-base-background);
         @include mixins.text-subheader-2();
-        &_align_right {
+        :is(&_align_right) {
             #{$block}__table-header-content {
                 justify-content: flex-end;
 
