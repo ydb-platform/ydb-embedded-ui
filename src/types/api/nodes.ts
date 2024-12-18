@@ -18,6 +18,8 @@ export interface TNodesInfo {
     TotalNodes: string;
     /** uint64 */
     FoundNodes: string;
+    /** uint64 */
+    MaximumSlotsPerDisk?: string;
 }
 
 export interface TNodeInfo {

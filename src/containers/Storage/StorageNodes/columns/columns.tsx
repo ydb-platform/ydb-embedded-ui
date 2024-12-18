@@ -45,7 +45,12 @@ const getPDisksColumn = ({viewContext}: GetStorageNodesColumnsParams): StorageNo
 
                         return (
                             <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                <PDisk data={pDisk} vDisks={vDisks} viewContext={viewContext} />
+                                <PDisk
+                                    data={pDisk}
+                                    vDisks={vDisks}
+                                    viewContext={viewContext}
+                                    maximumSlotsPerDisk={row.MaximumSlotsPerDisk}
+                                />
                             </div>
                         );
                     })}
