@@ -9,7 +9,7 @@ import i18n from '../i18n';
 
 import './View.scss';
 
-const b = cn('snippet-container');
+const b = cn('snippet');
 
 const prepareViewItems = (data: TEvDescribeSchemeResult): DefinitionListItem[] => {
     const queryText = data.PathDescription?.ViewDescription?.QueryText;
