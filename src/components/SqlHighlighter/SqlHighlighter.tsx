@@ -1,16 +1,41 @@
 import {useThemeValue} from '@gravity-ui/uikit';
 import {PrismLight as SyntaxHighlighter} from 'react-syntax-highlighter';
-import sql from 'react-syntax-highlighter/dist/esm/languages/prism/sql';
+import plsql from 'react-syntax-highlighter/dist/esm/languages/prism/plsql';
 import {
-    vscDarkPlus as dark,
-    materialLight as light,
+    vscDarkPlus as darkTheme,
+    materialLight as lightTheme,
 } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+// Create custom themes with transparent backgrounds
+const light = {
+    ...lightTheme,
+    'pre[class*="language-"]': {
+        ...lightTheme['pre[class*="language-"]'],
+        background: 'transparent',
+    },
+    'code[class*="language-"]': {
+        ...lightTheme['code[class*="language-"]'],
+        background: 'transparent',
+    },
+};
+
+const dark = {
+    ...darkTheme,
+    'pre[class*="language-"]': {
+        ...darkTheme['pre[class*="language-"]'],
+        background: 'transparent',
+    },
+    'code[class*="language-"]': {
+        ...darkTheme['code[class*="language-"]'],
+        background: 'transparent',
+    },
+};
 
 import {cn} from '../../utils/cn';
 
 import './SqlHighlighter.scss';
 
-SyntaxHighlighter.registerLanguage('sql', sql);
+SyntaxHighlighter.registerLanguage('plsql', plsql);
 
 const b = cn('sql-highlighter');
 
