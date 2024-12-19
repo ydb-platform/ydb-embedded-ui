@@ -17,7 +17,7 @@ import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
-import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
+import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
 
 import './QueriesHistory.scss';
@@ -55,7 +55,7 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
             render: ({row}) => {
                 return (
                     <div className={b('query')}>
-                        <TruncatedQuery value={row.queryText} maxQueryHeight={MAX_QUERY_HEIGHT} />
+                        <TruncatedQuery value={row.queryText} />
                     </div>
                 );
             },

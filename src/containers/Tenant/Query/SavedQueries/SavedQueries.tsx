@@ -21,7 +21,7 @@ import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
-import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
+import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
@@ -125,7 +125,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
             render: ({row: query}) => (
                 <div className={b('query')}>
                     <div className={b('query-body')}>
-                        <TruncatedQuery value={query.body} maxQueryHeight={MAX_QUERY_HEIGHT} />
+                        <TruncatedQuery value={query.body} />
                     </div>
                     <span className={b('controls')}>
                         <Button view="flat-secondary">
@@ -139,6 +139,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
             ),
             sortable: false,
             resizeMinWidth: 650,
+            width: 650,
         },
     ];
 

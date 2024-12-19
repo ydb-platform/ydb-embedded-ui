@@ -1,7 +1,7 @@
 import MonacoEditor from 'react-monaco-editor';
 
 import {cn} from '../../../../../../utils/cn';
-import {S_EXPRESSION_LANGUAGE_ID} from '../../../../../../utils/monaco/constats';
+import {S_EXPRESSION_LANGUAGE_ID} from '../../../../../../utils/monaco/constants';
 
 import './Ast.scss';
 

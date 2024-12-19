@@ -41,7 +41,7 @@ import {
 } from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
-import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
+import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constants';
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
