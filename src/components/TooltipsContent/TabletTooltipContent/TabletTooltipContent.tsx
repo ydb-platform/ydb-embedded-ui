@@ -1,10 +1,12 @@
 import type {TTabletStateInfo} from '../../../types/api/tablet';
-import {getUptimeFromDateFormatted} from '../../../utils/dataFormatters/dataFormatters';
 import {InfoViewer, createInfoFormatter, formatObject} from '../../InfoViewer';
+import {TabletUptime} from '../../UptimeViewer/UptimeViewer';
 
 const formatTablet = createInfoFormatter<TTabletStateInfo>({
     values: {
-        ChangeTime: (value) => getUptimeFromDateFormatted(value),
+        ChangeTime: (value) => {
+            return <TabletUptime ChangeTime={value} />;
+        },
     },
     labels: {
         TabletId: 'Tablet',

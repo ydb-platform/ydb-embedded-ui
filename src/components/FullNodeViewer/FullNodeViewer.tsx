@@ -5,6 +5,7 @@ import {InfoViewer} from '../InfoViewer/InfoViewer';
 import type {InfoViewerItem} from '../InfoViewer/InfoViewer';
 import {PoolUsage} from '../PoolUsage/PoolUsage';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
+import {NodeUptime} from '../UptimeViewer/UptimeViewer';
 
 import './FullNodeViewer.scss';
 
@@ -30,7 +31,10 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
 
     commonInfo.push(
         {label: 'Version', value: node?.Version},
-        {label: 'Uptime', value: node?.Uptime},
+        {
+            label: 'Uptime',
+            value: <NodeUptime StartTime={node?.StartTime} DisconnectTime={node?.DisconnectTime} />,
+        },
         {label: 'DC', value: node?.DataCenterDescription || node?.DC},
         {label: 'Rack', value: node?.Rack},
     );

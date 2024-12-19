@@ -25,8 +25,9 @@ const config: PlaywrightTestConfig = {
         baseURL: baseUrl || 'http://localhost:3000/',
         testIdAttribute: 'data-qa',
         trace: 'on-first-retry',
-        video: 'retain-on-failure',
-        screenshot: 'only-on-failure',
+        // Always record video and take screenshots on main branch, otherwise only on failure
+        video: process.env.GITHUB_REF === 'refs/heads/main' ? 'on' : 'retain-on-failure',
+        screenshot: process.env.GITHUB_REF === 'refs/heads/main' ? 'on' : 'only-on-failure',
     },
     projects: [
         {
