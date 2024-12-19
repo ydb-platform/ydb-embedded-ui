@@ -1,7 +1,10 @@
 import {useThemeValue} from '@gravity-ui/uikit';
 import {PrismLight as SyntaxHighlighter} from 'react-syntax-highlighter';
 import sql from 'react-syntax-highlighter/dist/esm/languages/prism/sql';
-import {oneLight, tomorrow} from 'react-syntax-highlighter/dist/esm/styles/prism';
+import {
+    vscDarkPlus as dark,
+    materialLight as light,
+} from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import {cn} from '../../utils/cn';
 
@@ -22,7 +25,7 @@ export const SqlHighlighter = ({children, className}: SqlHighlighterProps) => {
 
     return (
         <div className={b(null, className)}>
-            <SyntaxHighlighter language="sql" style={isDark ? tomorrow : oneLight}>
+            <SyntaxHighlighter language="sql" style={isDark ? dark : light}>
                 {children}
             </SyntaxHighlighter>
         </div>
