@@ -49,6 +49,7 @@ export const Snippet = ({
             fontSize: 13,
             lineHeight: 20,
             domReadOnly: true,
+            automaticLayout: true,
         }),
         [],
     );
