@@ -20,7 +20,7 @@ export function NodeUptime({StartTime, DisconnectTime}: NodeUptimeProps) {
 
     if (DisconnectTime) {
         uptime = getDowntimeFromDateFormatted(DisconnectTime);
-    } else {
+    } else if (StartTime) {
         uptime = getUptimeFromDateFormatted(StartTime);
     }
 
@@ -55,7 +55,11 @@ interface TabletUptimeProps {
 }
 
 export function TabletUptime({ChangeTime}: TabletUptimeProps) {
-    const uptime = getUptimeFromDateFormatted(ChangeTime);
+    let uptime: string | undefined;
+
+    if (ChangeTime) {
+        uptime = getUptimeFromDateFormatted(ChangeTime);
+    }
 
     if (!uptime) {
         return EMPTY_DATA_PLACEHOLDER;
