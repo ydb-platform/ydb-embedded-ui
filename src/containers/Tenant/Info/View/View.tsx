@@ -1,10 +1,15 @@
 import type {DefinitionListItem} from '@gravity-ui/components';
-import {Text} from '@gravity-ui/uikit';
 
+import {Snippet} from '../../../../components/Snippet/Snippet';
 import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {cn} from '../../../../utils/cn';
 import {getEntityName} from '../../utils';
 import i18n from '../i18n';
+
+import './View.scss';
+
+const b = cn('view');
 
 const prepareViewItems = (data: TEvDescribeSchemeResult): DefinitionListItem[] => {
     const queryText = data.PathDescription?.ViewDescription?.QueryText;
@@ -13,11 +18,9 @@ const prepareViewItems = (data: TEvDescribeSchemeResult): DefinitionListItem[] =
         {
             name: i18n('view.query-text'),
             copyText: queryText,
-            content: (
-                <Text variant="code-2" wordBreak="break-word">
-                    {queryText}
-                </Text>
-            ),
+            content: queryText ? (
+                <Snippet className={b('snippet-container')}>{queryText}</Snippet>
+            ) : null,
         },
     ];
 };

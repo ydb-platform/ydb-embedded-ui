@@ -10,7 +10,6 @@ import {cn} from '../../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {generateHash} from '../../../../../utils/generateHash';
 import {formatToMs, parseUsToMs} from '../../../../../utils/timeParsers';
-import {MAX_QUERY_HEIGHT} from '../../../utils/constants';
 
 import {
     TOP_QUERIES_COLUMNS_IDS,
@@ -38,7 +37,7 @@ const queryTextColumn: Column<KeyValueRow> = {
     sortAccessor: (row) => Number(row.CPUTimeUs),
     render: ({row}) => (
         <div className={b('query')}>
-            <TruncatedQuery value={row.QueryText?.toString()} maxQueryHeight={MAX_QUERY_HEIGHT} />
+            <TruncatedQuery value={row.QueryText?.toString()} />
         </div>
     ),
     sortable: false,
