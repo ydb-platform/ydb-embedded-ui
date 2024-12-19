@@ -1,6 +1,6 @@
 import type {DefinitionListItem} from '@gravity-ui/components';
-import {Text} from '@gravity-ui/uikit';
 
+import {SqlHighlighter} from '../../../../components/SqlHighlighter/SqlHighlighter';
 import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {getEntityName} from '../../utils';
@@ -13,11 +13,7 @@ const prepareViewItems = (data: TEvDescribeSchemeResult): DefinitionListItem[] =
         {
             name: i18n('view.query-text'),
             copyText: queryText,
-            content: (
-                <Text variant="code-2" wordBreak="break-word">
-                    {queryText}
-                </Text>
-            ),
+            content: queryText ? <SqlHighlighter>{queryText}</SqlHighlighter> : null,
         },
     ];
 };
