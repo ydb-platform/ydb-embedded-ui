@@ -8,10 +8,6 @@ import type {TNodeInfo} from '../types/api/nodesList';
 import type {NodeHostsMap} from '../types/store/nodesList';
 
 import {HOUR_IN_SECONDS} from './constants';
-import {
-    getDowntimeFromDateFormatted,
-    getUptimeFromDateFormatted,
-} from './dataFormatters/dataFormatters';
 
 import {valueIsDefined} from '.';
 
@@ -60,7 +56,6 @@ export interface PreparedNodeSystemState extends TSystemStateInfo {
     Rack?: string;
     DC?: string;
     LoadAveragePercents?: number[];
-    Uptime: string;
     TenantName?: string;
     SharedCacheLimit?: number;
     SharedCacheUsed?: number;
@@ -74,14 +69,6 @@ export function prepareNodeSystemState(
     const DC = systemState.Location?.DataCenter || systemState.DataCenter;
     const TenantName = systemState?.Tenants?.[0];
 
-    let Uptime: PreparedNodeSystemState['Uptime'];
-
-    if (systemState.DisconnectTime) {
-        Uptime = getDowntimeFromDateFormatted(systemState.DisconnectTime);
-    } else {
-        Uptime = getUptimeFromDateFormatted(systemState.StartTime);
-    }
-
     const LoadAveragePercents = calculateLoadAveragePercents(systemState);
 
     // 0 limit means that limit is not set, so it should be undefined
@@ -94,7 +81,6 @@ export function prepareNodeSystemState(
         ...systemState,
         Rack,
         DC,
-        Uptime,
         LoadAveragePercents,
         TenantName,
         SharedCacheLimit,

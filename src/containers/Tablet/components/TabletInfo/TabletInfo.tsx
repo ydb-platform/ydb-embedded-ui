@@ -5,12 +5,12 @@ import type {InfoViewerItem} from '../../../../components/InfoViewer';
 import {InfoViewer} from '../../../../components/InfoViewer';
 import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
 import {TabletState} from '../../../../components/TabletState/TabletState';
+import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
 import {getTabletPagePath} from '../../../../routes';
 import {selectIsUserAllowedToMakeChanges} from '../../../../store/reducers/authentication/authentication';
 import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {cn} from '../../../../utils/cn';
-import {getUptimeFromDateFormatted} from '../../../../utils/dataFormatters/dataFormatters';
 import {createTabletDeveloperUIHref} from '../../../../utils/developerUI/developerUI';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {getDefaultNodePath} from '../../../Node/NodePages';
@@ -72,7 +72,7 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
     if (hasUptime) {
         tabletInfo.push({
             label: tabletInfoKeyset('field_uptime'),
-            value: getUptimeFromDateFormatted(ChangeTime),
+            value: <TabletUptime ChangeTime={ChangeTime} />,
         });
     }
 

@@ -6,7 +6,7 @@ import {
     getSizeWithSignificantDigits,
 } from '../bytesParsers/formatBytes';
 import type {BytesSizes} from '../bytesParsers/formatBytes';
-import {EMPTY_DATA_PLACEHOLDER, HOUR_IN_SECONDS} from '../constants';
+import {HOUR_IN_SECONDS} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {UNBREAKABLE_GAP, isNumeric} from '../utils';
 
@@ -46,7 +46,7 @@ export const stringifyVdiskId = (id?: TVDiskID | TVSlotId) => {
  */
 export function formatUptimeInSeconds(seconds: number) {
     if (!isNumeric(seconds)) {
-        return EMPTY_DATA_PLACEHOLDER;
+        return undefined;
     }
 
     // duration.format() doesn't work well with negative values
@@ -214,8 +214,12 @@ export const formatCPUWithLabel = (value?: number) => {
     return `${localizedCores} ${i18n('format-cpu.cores', {count: cores})}`;
 };
 
-export const formatDateTime = (value?: number | string, defaultValue = '') => {
-    const formattedData = dateTimeParse(Number(value))?.format('YYYY-MM-DD HH:mm');
+export const formatDateTime = (
+    value?: number | string,
+    {withTimeZone, defaultValue = ''}: {withTimeZone?: boolean; defaultValue?: string} = {},
+) => {
+    const tz = withTimeZone ? ' z' : '';
+    const formattedData = dateTimeParse(Number(value))?.format(`YYYY-MM-DD HH:mm${tz}`);
 
     return formattedData ?? defaultValue;
 };
