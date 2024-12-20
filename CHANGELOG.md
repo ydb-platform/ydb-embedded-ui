@@ -1,5 +1,22 @@
 # Changelog
 
+## [8.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.1.0...v8.2.0) (2024-12-20)
+
+
+### Features
+
+* add absolute timestamp to uptime ([#1768](https://github.com/ydb-platform/ydb-embedded-ui/issues/1768)) ([a77e6db](https://github.com/ydb-platform/ydb-embedded-ui/commit/a77e6db725c09e765529deb7b7b06f3f0d688e0a))
+* vdisks in 2 rows ([#1758](https://github.com/ydb-platform/ydb-embedded-ui/issues/1758)) ([1f8d6fc](https://github.com/ydb-platform/ydb-embedded-ui/commit/1f8d6fc42612f39fb14b7de24f043e1554f00593))
+
+
+### Bug Fixes
+
+* create view template text ([#1772](https://github.com/ydb-platform/ydb-embedded-ui/issues/1772)) ([4773ce8](https://github.com/ydb-platform/ydb-embedded-ui/commit/4773ce82c48ae3a4940911475f38a355d83cd25b))
+* **Schema:** increase default columns width ([#1765](https://github.com/ydb-platform/ydb-embedded-ui/issues/1765)) ([6be903d](https://github.com/ydb-platform/ydb-embedded-ui/commit/6be903d7dedbd9965994cb13ffbeed778d88dddf))
+* **SchemaTree:** snippet not insert if user is not on Query tab ([#1766](https://github.com/ydb-platform/ydb-embedded-ui/issues/1766)) ([1e29666](https://github.com/ydb-platform/ydb-embedded-ui/commit/1e296666c6d3f38819f89784bb5e489124f90afe))
+* **Stack:** reduce offset y on hover ([#1771](https://github.com/ydb-platform/ydb-embedded-ui/issues/1771)) ([640dd97](https://github.com/ydb-platform/ydb-embedded-ui/commit/640dd971f98803726eb51fad59866475c59abb37))
+* **Table:** cell aligning should be maximum specific ([#1764](https://github.com/ydb-platform/ydb-embedded-ui/issues/1764)) ([5db78c9](https://github.com/ydb-platform/ydb-embedded-ui/commit/5db78c98be3c5c26b8ce8346aacc1f6ac78b0000))
+
 ## [8.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.0.0...v8.1.0) (2024-12-17)
 
 
