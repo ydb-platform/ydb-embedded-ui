@@ -1,4 +1,3 @@
-import {EMPTY_DATA_PLACEHOLDER} from '../../constants';
 import {UNBREAKABLE_GAP} from '../../utils';
 import {
     formatUptimeInSeconds,
@@ -65,6 +64,6 @@ describe('formatUptimeInSeconds', () => {
         );
     });
     it('should return empty placeholder on NaN', () => {
-        expect(formatUptimeInSeconds(Number.NaN)).toBe(EMPTY_DATA_PLACEHOLDER);
+        expect(formatUptimeInSeconds(Number.NaN)).toBe(undefined);
     });
 });

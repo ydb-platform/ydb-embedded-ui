@@ -1,7 +1,11 @@
 .ydb-cell-with-popover {
-    display: flex;
+    display: inline-flex;
 
     max-width: 100%;
+
+    &_full-width {
+        display: flex;
+    }
 
     &__popover {
         display: inline-block;
