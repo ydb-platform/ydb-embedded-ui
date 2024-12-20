@@ -178,7 +178,7 @@ export const dropTopicTemplate = (params?: SchemaQueryParams) => {
 };
 
 export const createViewTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`/my_view` : '${1:my_view}';
+    const path = params?.relativePath ? `\`${params?.relativePath}/my_view\`` : '${1:my_view}';
     return `CREATE VIEW ${path} WITH (security_invoker = TRUE) AS SELECT 1;`;
 };
 
