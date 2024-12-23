@@ -116,7 +116,7 @@ export function MultipartTest() {
             >
                 {receivedChunks.map((chunk: MultipartChunk) => {
                     const content = chunk.content || {};
-                    const {color = '#e5e5e5', message = '', id} = content;
+                    const counter = content.Counter || 0;
 
                     return (
                         <div
@@ -124,8 +124,8 @@ export function MultipartTest() {
                             style={{
                                 padding: '16px',
                                 borderRadius: '8px',
-                                backgroundColor: color,
-                                color: isLightColor(color) ? '#000' : '#fff',
+                                backgroundColor: 'var(--g-color-base-generic)',
+                                color: 'var(--g-color-text-primary)',
                                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                                 animation: `fadeIn ${ANIMATION_DURATION}ms ease-out`,
                                 position: 'relative',
@@ -141,10 +141,8 @@ export function MultipartTest() {
                                     opacity: 0.8,
                                 }}
                             >
-                                <span>ID: {id}</span>
-                                <span>
-                                    Part {chunk.part_number} of {chunk.total_parts}
-                                </span>
+                                <span>Counter: {counter}</span>
+                                <span>Part {chunk.part_number}</span>
                             </div>
                             <div
                                 style={{
@@ -153,19 +151,8 @@ export function MultipartTest() {
                                     wordBreak: 'break-word',
                                 }}
                             >
-                                {message}
+                                {JSON.stringify(content, null, 2)}
                             </div>
-                            {chunk.result && (
-                                <div
-                                    style={{
-                                        marginTop: '8px',
-                                        fontSize: '14px',
-                                        opacity: 0.8,
-                                    }}
-                                >
-                                    Result: {chunk.result}
-                                </div>
-                            )}
                         </div>
                     );
                 })}
@@ -185,14 +172,4 @@ export function MultipartTest() {
             `}</style>
         </div>
     );
-}
-
-// Helper function to determine if a color is light or dark
-function isLightColor(color: string) {
-    const hex = color.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 128;
 }

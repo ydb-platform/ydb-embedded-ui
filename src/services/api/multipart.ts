@@ -49,27 +49,26 @@ export class MultipartAPI extends BaseYdbAPI {
                     console.log('New data:', newData);
 
                     if (newData) {
+                        // Split on boundary with double dashes
                         const boundaryStr = `--${this.boundary}`;
-                        const parts = newData.split(boundaryStr);
+                        const parts = newData.split(boundaryStr).filter(Boolean);
 
                         console.log('Number of parts found:', parts.length);
-                        console.log('Parts:', parts);
 
-                        // Process all parts including the first one
-                        for (let i = 0; i < parts.length; i++) {
-                            const part = parts[i].trim();
-                            if (!part) {
-                                console.log('Empty part, skipping:', i);
+                        for (const part of parts) {
+                            // Skip the final boundary marker
+                            if (part.trim() === '--') {
+                                console.log('Final boundary marker found, skipping');
                                 continue;
                             }
 
-                            console.log('Processing part:', i, 'Content:', part);
+                            console.log('Processing part:', part);
                             const chunk = this.parseChunk<T>(part);
                             if (chunk) {
                                 console.log('Chunk parsed successfully:', chunk);
                                 onChunk(chunk);
                             } else {
-                                console.log('Failed to parse chunk for part:', i);
+                                console.log('Failed to parse chunk');
                             }
                         }
                     }
@@ -85,19 +84,31 @@ export class MultipartAPI extends BaseYdbAPI {
         try {
             console.log('Parsing chunk, part length:', part.length);
 
-            // Split headers and body using CRLF sequence
-            const sections = part.split('\r\n\r\n');
-            console.log('Number of sections:', sections.length);
+            // Split headers and body
+            const lines = part.split('\n');
+            let contentLength = 0;
+            let bodyStartIndex = -1;
 
-            if (sections.length < 2) {
-                console.log('Invalid chunk format: not enough sections');
+            // Parse headers
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line.startsWith('Content-Length:')) {
+                    contentLength = parseInt(line.split(':')[1].trim(), 10);
+                }
+                // Empty line indicates end of headers
+                if (line === '') {
+                    bodyStartIndex = i + 1;
+                    break;
+                }
+            }
+
+            if (bodyStartIndex === -1 || !contentLength) {
+                console.log('Invalid chunk format: missing headers or content length');
                 return null;
             }
 
-            console.log('Headers:', sections[0]);
-            console.log('Body:', sections[1]);
-
-            const body = sections[1].trim();
+            // Get the body
+            const body = lines[bodyStartIndex].trim();
             if (!body) {
                 console.log('Invalid chunk format: empty body');
                 return null;
@@ -107,10 +118,10 @@ export class MultipartAPI extends BaseYdbAPI {
             const content = JSON.parse(body);
             console.log('Parsed content:', content);
 
-            // Wrap in MultipartChunk format
+            // For the new format, we'll use the Counter value as the part number
             return {
-                part_number: Math.floor(Math.random() * 1000), // Temporary random number for testing
-                total_parts: 100, // Using a placeholder since total is unknown
+                part_number: content.Counter || 0,
+                total_parts: 0, // We don't know the total in advance
                 content: content as T,
             };
         } catch (error) {
