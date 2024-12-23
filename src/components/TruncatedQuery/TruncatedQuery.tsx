@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {cn} from '../../utils/cn';
-import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
+import {YqlHighlighter} from '../YqlHighlighter/YqlHighlighter';
 
 import './TruncatedQuery.scss';
 
@@ -22,22 +22,10 @@ export const TruncatedQuery = ({value = '', maxQueryHeight = 6}: TruncatedQueryP
             '\n...\nThe request was truncated. Click on the line to show the full query on the query tab';
         return (
             <React.Fragment>
-                <span className={b()}>{content}</span>
+                <YqlHighlighter className={b()}>{content}</YqlHighlighter>
                 <span className={b('message', {color: 'secondary'})}>{message}</span>
             </React.Fragment>
         );
     }
-    return <React.Fragment>{value}</React.Fragment>;
-};
-
-interface OneLineQueryWithPopoverProps {
-    value?: string;
-}
-
-export const OneLineQueryWithPopover = ({value = ''}: OneLineQueryWithPopoverProps) => {
-    return (
-        <CellWithPopover contentClassName={b('popover-content')} content={value}>
-            {value}
-        </CellWithPopover>
-    );
+    return <YqlHighlighter>{value}</YqlHighlighter>;
 };

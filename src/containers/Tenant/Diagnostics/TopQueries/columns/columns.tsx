@@ -1,10 +1,8 @@
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 
-import {
-    OneLineQueryWithPopover,
-    TruncatedQuery,
-} from '../../../../../components/TruncatedQuery/TruncatedQuery';
+import {TruncatedQuery} from '../../../../../components/TruncatedQuery/TruncatedQuery';
+import {YqlHighlighter} from '../../../../../components/YqlHighlighter/YqlHighlighter';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {cn} from '../../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -82,7 +80,7 @@ const userSIDColumn: Column<KeyValueRow> = {
 const oneLineQueryTextColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.OneLineQueryText,
     header: TOP_QUERIES_COLUMNS_TITLES.OneLineQueryText,
-    render: ({row}) => <OneLineQueryWithPopover value={row.QueryText?.toString()} />,
+    render: ({row}) => <YqlHighlighter>{row.QueryText?.toString() || ''}</YqlHighlighter>,
     sortable: false,
     width: 500,
 };

@@ -34,7 +34,7 @@ test.describe('Query History', () => {
 
         // Check if the query appears in the history
         const historyTable = page.locator('.ydb-queries-history table');
-        await expect(historyTable.locator(`text="${testQuery}"`)).toBeVisible({
+        await expect(historyTable.locator('.yql-highlighter', {hasText: testQuery})).toBeVisible({
             timeout: VISIBILITY_TIMEOUT,
         });
     });
@@ -85,6 +85,6 @@ test.describe('Query History', () => {
 
         // Check if the query appears in the history
         const historyTable = page.locator('.ydb-queries-history table');
-        await expect(historyTable.locator(`text="${testQuery}"`)).toBeVisible();
+        await expect(historyTable.locator('.yql-highlighter', {hasText: testQuery})).toBeVisible();
     });
 });
