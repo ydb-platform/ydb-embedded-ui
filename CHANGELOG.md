@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.2.0...v8.2.1) (2024-12-23)
+
+
+### Bug Fixes
+
+* **Table:** increase styles specifity ([#1776](https://github.com/ydb-platform/ydb-embedded-ui/issues/1776)) ([96b8d2f](https://github.com/ydb-platform/ydb-embedded-ui/commit/96b8d2fc20bb9382cbb48a3aed87417ca1be5f39))
+
 ## [8.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.1.0...v8.2.0) (2024-12-20)
 
 
