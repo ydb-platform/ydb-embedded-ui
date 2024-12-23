@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.2.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.2.1...v8.2.2) (2024-12-23)
+
+
+### Bug Fixes
+
+* **Table:** selectors specifity ([#1778](https://github.com/ydb-platform/ydb-embedded-ui/issues/1778)) ([005c672](https://github.com/ydb-platform/ydb-embedded-ui/commit/005c672a1319140dfa1dadab2bf3dd25ab99fc3b))
+
 ## [8.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.2.0...v8.2.1) (2024-12-23)
 
 
