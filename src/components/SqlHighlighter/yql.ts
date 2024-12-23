@@ -1,9 +1,12 @@
 import {
+    builtinFunctions,
+    keywords,
+    typeKeywords,
+} from 'monaco-yql-languages/build/yql/yql.keywords';
+import {
     vscDarkPlus as darkTheme,
     materialLight as lightTheme,
 } from 'react-syntax-highlighter/dist/esm/styles/prism';
-
-import {builtinFunctions, keywords, typeKeywords} from './keywords';
 
 export const light = {
     ...lightTheme,
