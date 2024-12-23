@@ -50,11 +50,11 @@
         height: var(--ydb-table-cell-height) !important;
         padding: 0;
         @include mixins.text-body-2();
-        :is(&_align_right) {
-            text-align: right;
+        &_align_right {
+            text-align: right !important;
         }
-        :is(&_vertical-align_top) {
-            vertical-align: top;
+        &_vertical-align_top {
+            vertical-align: top !important;
         }
     }
 }
