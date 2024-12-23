@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {cn} from '../../utils/cn';
-import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {YqlHighlighter} from '../YqlHighlighter/YqlHighlighter';
 
 import './TruncatedQuery.scss';
@@ -29,19 +28,4 @@ export const TruncatedQuery = ({value = '', maxQueryHeight = 6}: TruncatedQueryP
         );
     }
     return <YqlHighlighter>{value}</YqlHighlighter>;
-};
-
-interface OneLineQueryWithPopoverProps {
-    value?: string;
-}
-
-export const OneLineQueryWithPopover = ({value = ''}: OneLineQueryWithPopoverProps) => {
-    return (
-        <CellWithPopover
-            contentClassName={b('popover-content')}
-            content={<YqlHighlighter>{value}</YqlHighlighter>}
-        >
-            <YqlHighlighter>{value}</YqlHighlighter>
-        </CellWithPopover>
-    );
 };
