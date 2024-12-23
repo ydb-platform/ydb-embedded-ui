@@ -24,6 +24,7 @@ import type {RawBreadcrumbItem} from '../Header/breadcrumbs';
 import {
     ClusterSlot,
     ClustersSlot,
+    MultipartTestSlot,
     NodeSlot,
     PDiskPageSlot,
     RedirectSlot,
@@ -46,7 +47,14 @@ type RouteSlot = {
     wrapper?: React.ComponentType<any>;
     exact?: boolean;
 };
+
 const routesSlots: RouteSlot[] = [
+    {
+        path: routes.multipartTest,
+        slot: MultipartTestSlot,
+        component: lazyComponent(() => import('../MultipartTest/MultipartTest'), 'MultipartTest'),
+        exact: true,
+    },
     {
         path: routes.cluster,
         slot: ClusterSlot,
