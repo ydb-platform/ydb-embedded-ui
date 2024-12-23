@@ -13,11 +13,13 @@ export const light = {
     'pre[class*="language-"]': {
         ...lightTheme['pre[class*="language-"]'],
         background: 'transparent',
+        margin: 0,
     },
     'code[class*="language-"]': {
         ...lightTheme['code[class*="language-"]'],
         background: 'transparent',
         color: 'var(--g-color-text-primary)',
+        whiteSpace: 'pre-wrap' as const,
     },
     comment: {
         color: '#969896',
@@ -53,11 +55,13 @@ export const dark = {
     'pre[class*="language-"]': {
         ...darkTheme['pre[class*="language-"]'],
         background: 'transparent',
+        margin: 0,
     },
     'code[class*="language-"]': {
         ...darkTheme['code[class*="language-"]'],
         background: 'transparent',
         color: 'var(--g-color-text-primary)',
+        whiteSpace: 'pre-wrap' as const,
     },
     comment: {
         color: '#969896',
