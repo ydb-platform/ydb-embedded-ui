@@ -32,6 +32,7 @@ export class MultipartAPI extends BaseYdbAPI {
             },
             {
                 ...options,
+                timeout: 0, // Disable timeout for multipart responses
                 headers: {
                     Accept: 'multipart/x-mixed-replace',
                 },
