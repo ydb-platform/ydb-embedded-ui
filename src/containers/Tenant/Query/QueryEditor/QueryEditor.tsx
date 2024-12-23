@@ -6,8 +6,10 @@ import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 import {v4 as uuidv4} from 'uuid';
 
+import {CodeAssistantTelemetry} from '../../../../components/CodeAssistantTelemetry/CodeAssistantTelemetry';
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import SplitPane from '../../../../components/SplitPane';
+import {registerCompletionCommands} from '../../../../services/codeCompletion';
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {
     goToNextQuery,
@@ -42,6 +44,7 @@ import {
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
 import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
+import {getCompletionProvider} from '../../../../utils/monaco/yql/ydb.inlineCompletionProvider';
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
@@ -215,6 +218,14 @@ export default function QueryEditor(props: QueryEditorProps) {
                 contribution.insert(input);
             }
         });
+
+        if (window.api.codeAssistant) {
+            const provider = getCompletionProvider();
+            if (provider) {
+                registerCompletionCommands(monaco, provider, editor);
+            }
+        }
+
         initResizeHandler(editor);
         initUserPrompt(editor, getLastQueryText);
         editor.focus();
@@ -323,6 +334,7 @@ export default function QueryEditor(props: QueryEditorProps) {
 
     return (
         <div className={b()}>
+            {window.api.codeAssistant && <CodeAssistantTelemetry />}
             <SplitPane
                 direction="vertical"
                 defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
