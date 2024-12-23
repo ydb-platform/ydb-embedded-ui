@@ -84,31 +84,15 @@ export class MultipartAPI extends BaseYdbAPI {
         try {
             console.log('Parsing chunk, part length:', part.length);
 
-            // Split headers and body
-            const lines = part.split('\n');
-            let contentLength = 0;
-            let bodyStartIndex = -1;
-
-            // Parse headers
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line.startsWith('Content-Length:')) {
-                    contentLength = parseInt(line.split(':')[1].trim(), 10);
-                }
-                // Empty line indicates end of headers
-                if (line === '') {
-                    bodyStartIndex = i + 1;
-                    break;
-                }
-            }
-
-            if (bodyStartIndex === -1 || !contentLength) {
-                console.log('Invalid chunk format: missing headers or content length');
+            // Split headers and body using double newline as separator
+            const [_headers, ...bodyParts] = part.split('\n\n');
+            if (!bodyParts.length) {
+                console.log('Invalid chunk format: no body found');
                 return null;
             }
 
-            // Get the body
-            const body = lines[bodyStartIndex].trim();
+            // Get the body (join with newlines in case the body contains newlines)
+            const body = bodyParts.join('\n\n').trim();
             if (!body) {
                 console.log('Invalid chunk format: empty body');
                 return null;
