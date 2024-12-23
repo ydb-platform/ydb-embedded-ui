@@ -5,18 +5,18 @@ import {cn} from '../../utils/cn';
 
 import {dark, light, yql} from './yql';
 
-import './SqlHighlighter.scss';
+import './YqlHighlighter.scss';
 
 SyntaxHighlighter.registerLanguage('yql', yql);
 
-const b = cn('sql-highlighter');
+const b = cn('yql-highlighter');
 
-interface SqlHighlighterProps {
+interface YqlHighlighterProps {
     children: string;
     className?: string;
 }
 
-export const SqlHighlighter = ({children, className}: SqlHighlighterProps) => {
+export const YqlHighlighter = ({children, className}: YqlHighlighterProps) => {
     const themeValue = useThemeValue();
     const isDark = themeValue === 'dark' || themeValue === 'dark-hc';
 
