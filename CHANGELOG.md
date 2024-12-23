@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.2.2...v8.3.0) (2024-12-23)
+
+
+### Features
+
+* display view query text ([#1780](https://github.com/ydb-platform/ydb-embedded-ui/issues/1780)) ([d590f05](https://github.com/ydb-platform/ydb-embedded-ui/commit/d590f0557c161dbed49a12fa419f307f6fa9f416))
+
 ## [8.2.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.2.1...v8.2.2) (2024-12-23)
 
 
