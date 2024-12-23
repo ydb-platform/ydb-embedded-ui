@@ -17,6 +17,7 @@ export const light = {
     'code[class*="language-"]': {
         ...lightTheme['code[class*="language-"]'],
         background: 'transparent',
+        color: 'var(--g-color-text-primary)',
     },
     comment: {
         color: '#969896',
@@ -56,6 +57,7 @@ export const dark = {
     'code[class*="language-"]': {
         ...darkTheme['code[class*="language-"]'],
         background: 'transparent',
+        color: 'var(--g-color-text-primary)',
     },
     comment: {
         color: '#969896',
