@@ -1,19 +1,30 @@
+/* eslint-disable complexity */
+/* eslint-disable no-param-reassign */
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {settingsManager} from '../../../services/settings';
+import type {ColumnType} from '../../../types/api/query';
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
+import type {
+    QueryResponseChunk,
+    SessionChunk,
+    StreamDataChunk,
+} from '../../../types/store/streaming';
 import {QUERIES_HISTORY_KEY} from '../../../utils/constants';
-import {isQueryErrorResponse} from '../../../utils/query';
+import {isQueryErrorResponse, parseResult} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
+import {preparePlanData} from './preparePlanData';
 import {prepareQueryData} from './prepareQueryData';
 import type {QueryResult, QueryState} from './types';
 import {getActionAndSyntaxFromQueryMode, getQueryInHistory} from './utils';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
+export const INDEX_COLUMN: ColumnType = {name: '#', type: 'Uint64'};
 
 const queriesHistoryInitial = settingsManager.readUserSettingsValue(
     QUERIES_HISTORY_KEY,
@@ -117,6 +128,164 @@ const slice = createSlice({
         setQueryHistoryFilter: (state, action: PayloadAction<string>) => {
             state.history.filter = action.payload;
         },
+        setStreamSession: (state, action: PayloadAction<SessionChunk>) => {
+            if (!state.result) {
+                return;
+            }
+
+            if (!state.result.data) {
+                state.result.data = prepareQueryData(null);
+            }
+
+            const chunk = action.payload;
+            state.result.isLoading = true;
+            state.result.queryId = chunk.meta.query_id;
+            state.result.data.traceId = chunk.meta.trace_id;
+        },
+        addStreamingChunks: (state, action: PayloadAction<StreamDataChunk[]>) => {
+            if (!state.result) {
+                return;
+            }
+
+            if (!state.result.data) {
+                state.result.data = prepareQueryData(null);
+            }
+
+            // Initialize speed metrics if not present
+            if (!state.result.speedMetrics) {
+                state.result.speedMetrics = {
+                    rowsPerSecond: 0,
+                    lastUpdateTime: Date.now(),
+                    recentChunks: [],
+                };
+            }
+
+            const currentTime = Date.now();
+            let totalNewRows = 0;
+
+            const mergedStreamDataChunks = new Map<number, StreamDataChunk>();
+            for (const chunk of action.payload) {
+                const currentMergedChunk = mergedStreamDataChunks.get(chunk.meta.result_index);
+                const chunkRowCount = (chunk.result.rows || []).length;
+                totalNewRows += chunkRowCount;
+
+                if (currentMergedChunk) {
+                    if (!currentMergedChunk.result.rows) {
+                        currentMergedChunk.result.rows = [];
+                    }
+                    for (const row of chunk.result.rows || []) {
+                        currentMergedChunk.result.rows.push(row);
+                    }
+                } else {
+                    mergedStreamDataChunks.set(chunk.meta.result_index, chunk);
+                }
+            }
+
+            // Update speed metrics
+            const metrics = state.result.speedMetrics;
+            metrics.recentChunks.push({
+                timestamp: currentTime,
+                rowCount: totalNewRows,
+            });
+
+            // Keep only chunks from the last 5 seconds
+            const WINDOW_SIZE = 5000; // 5 seconds in milliseconds
+            metrics.recentChunks = metrics.recentChunks.filter(
+                (chunk) => currentTime - chunk.timestamp <= WINDOW_SIZE,
+            );
+
+            // Calculate moving average
+            if (metrics.recentChunks.length > 0) {
+                const oldestChunkTime = metrics.recentChunks[0].timestamp;
+                const timeWindow = (currentTime - oldestChunkTime) / 1000; // Convert to seconds
+                const totalRows = metrics.recentChunks.reduce(
+                    (sum, chunk) => sum + chunk.rowCount,
+                    0,
+                );
+                metrics.rowsPerSecond = timeWindow > 0 ? totalRows / timeWindow : 0;
+            }
+
+            metrics.lastUpdateTime = currentTime;
+
+            if (!state.result.data.resultSets) {
+                state.result.data.resultSets = [];
+            }
+
+            for (const [resultIndex, chunk] of mergedStreamDataChunks.entries()) {
+                const {columns, rows} = chunk.result;
+
+                if (!state.result.data.resultSets[resultIndex]) {
+                    state.result.data.resultSets[resultIndex] = {};
+                }
+
+                if (columns && !state.result.data.resultSets[resultIndex].columns?.length) {
+                    const columnsWithIndex = [INDEX_COLUMN, ...columns];
+                    if (!state.result.data.resultSets) {
+                        state.result.data.resultSets = [];
+                    }
+
+                    if (state.result.data.resultSets[resultIndex]) {
+                        state.result.data.resultSets[resultIndex].columns = columnsWithIndex;
+                    } else {
+                        state.result.data.resultSets[resultIndex] = {
+                            columns: columnsWithIndex,
+                            result: [],
+                        };
+                    }
+                }
+
+                const indexedRows = (rows || []).map((row, index) => [
+                    (state.result?.data?.resultSets?.[resultIndex].totalCount || 1) + index,
+                    ...row,
+                ]);
+
+                const formattedRows = parseResult(
+                    indexedRows,
+                    state.result.data.resultSets[resultIndex].columns || [],
+                );
+
+                // Update result set by pushing formatted rows directly
+                if (!state.result.data.resultSets?.[resultIndex].resultChunks) {
+                    // eslint-disable-next-line new-cap
+                    state.result.data.resultSets[resultIndex].resultChunks = [];
+                }
+
+                state.result.data.resultSets[resultIndex].resultChunks.push(formattedRows);
+                state.result.data.resultSets[resultIndex].totalCount = state.result.data.resultSets[
+                    resultIndex
+                ].totalCount
+                    ? formattedRows.length + state.result.data.resultSets[resultIndex].totalCount
+                    : formattedRows.length;
+            }
+        },
+        setStreamQueryResponse: (state, action: PayloadAction<QueryResponseChunk>) => {
+            if (!state.result) {
+                return;
+            }
+
+            if (!state.result.data) {
+                state.result.data = prepareQueryData(null);
+            }
+
+            state.result.isLoading = false;
+
+            const chunk = action.payload;
+            if ('error' in chunk) {
+                state.result.error = chunk;
+            } else if ('plan' in chunk) {
+                if (!state.result.data) {
+                    state.result.data = prepareQueryData(null);
+                }
+
+                const {plan: rawPlan, stats} = chunk;
+                const {simplifiedPlan, ...planData} = preparePlanData(rawPlan, stats);
+                state.result.data.preparedPlan =
+                    Object.keys(planData).length > 0 ? planData : undefined;
+                state.result.data.simplifiedPlan = simplifiedPlan;
+                state.result.data.plan = chunk.plan;
+                state.result.data.stats = chunk.stats;
+            }
+        },
     },
     selectors: {
         selectQueriesHistoryFilter: (state) => state.history.filter || '',
@@ -145,7 +314,11 @@ export const {
     goToNextQuery,
     setTenantPath,
     setQueryHistoryFilter,
+    addStreamingChunks,
+    setStreamQueryResponse,
+    setStreamSession,
 } = slice.actions;
+
 export const {
     selectQueriesHistoryFilter,
     selectQueriesHistoryCurrentIndex,
@@ -169,8 +342,96 @@ interface QueryStats {
     endTime?: string | number;
 }
 
+const DEFAULT_STREAM_CHUNK_SIZE = 1000;
+const DEFAULT_CONCURRENT_RESULTS = false;
+
 export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
+        useStreamQuery: build.mutation<null, SendQueryParams>({
+            queryFn: async (
+                {query, database, querySettings = {}, enableTracingLevel, queryId},
+                {signal, dispatch, getState},
+            ) => {
+                dispatch(setQueryResult({type: 'execute', queryId, isLoading: true}));
+
+                const {action, syntax} = getActionAndSyntaxFromQueryMode(
+                    'execute',
+                    querySettings?.queryMode,
+                );
+
+                try {
+                    let streamDataChunkBatch: StreamDataChunk[] = [];
+                    let batchTimeout: number | null = null;
+
+                    const flushBatch = () => {
+                        if (streamDataChunkBatch.length > 0) {
+                            dispatch(addStreamingChunks(streamDataChunkBatch));
+                            streamDataChunkBatch = [];
+                        }
+                        batchTimeout = null;
+                    };
+
+                    await window.api.streaming.streamQuery(
+                        {
+                            query,
+                            database,
+                            action,
+                            syntax,
+                            stats: querySettings.statisticsMode,
+                            tracingLevel:
+                                querySettings.tracingLevel && enableTracingLevel
+                                    ? TracingLevelNumber[querySettings.tracingLevel]
+                                    : undefined,
+                            limit_rows: 100000000,
+                            transaction_mode:
+                                querySettings.transactionMode === 'implicit'
+                                    ? undefined
+                                    : querySettings.transactionMode,
+                            timeout: isNumeric(querySettings.timeout)
+                                ? Number(querySettings.timeout) * 1000
+                                : undefined,
+                            output_chunk_max_size: DEFAULT_STREAM_CHUNK_SIZE,
+                            concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
+                        },
+                        {
+                            signal,
+                            onQueryResponseChunk: (chunk) => {
+                                dispatch(setStreamQueryResponse(chunk));
+                            },
+                            onSessionChunk: (chunk) => {
+                                dispatch(setStreamSession(chunk));
+                            },
+                            onStreamDataChunk: (chunk) => {
+                                streamDataChunkBatch.push(chunk);
+                                if (!batchTimeout) {
+                                    batchTimeout = window.requestAnimationFrame(flushBatch);
+                                }
+                            },
+                        },
+                    );
+
+                    // Flush any remaining chunks
+                    if (batchTimeout) {
+                        window.cancelAnimationFrame(batchTimeout);
+                        flushBatch();
+                    }
+
+                    return {data: null};
+                } catch (error) {
+                    const state = getState() as RootState;
+                    dispatch(
+                        setQueryResult({
+                            ...state.query.result,
+                            type: 'execute',
+                            error,
+                            isLoading: false,
+                            queryId,
+                        }),
+                    );
+                    return {error};
+                }
+            },
+        }),
         useSendQuery: build.mutation<null, SendQueryParams>({
             queryFn: async (
                 {
@@ -183,6 +444,7 @@ export const queryApi = api.injectEndpoints({
                 },
                 {signal, dispatch},
             ) => {
+                const timeStart = Date.now();
                 dispatch(setQueryResult({type: actionType, queryId, isLoading: true}));
 
                 const {action, syntax} = getActionAndSyntaxFromQueryMode(
@@ -191,7 +453,6 @@ export const queryApi = api.injectEndpoints({
                 );
 
                 try {
-                    const timeStart = Date.now();
                     const response = await window.api.viewer.sendQuery(
                         {
                             query,

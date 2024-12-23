@@ -4,7 +4,10 @@ import {isEqual} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
 import SplitPane from '../../../../components/SplitPane';
-import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {
+    useStreamingAvailable,
+    useTracingLevelOptionAvailable,
+} from '../../../../store/reducers/capabilities/hooks';
 import {
     queryApi,
     saveQueryToHistory,
@@ -86,8 +89,12 @@ export default function QueryEditor(props: QueryEditorProps) {
         LAST_USED_QUERY_ACTION_KEY,
     );
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
+    const isStreamingSupported = useStreamingAvailable();
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
+    const [streamQuery] = queryApi.useUseStreamQueryMutation();
+
+    const runningQueryRef = React.useRef<{abort: VoidFunction} | null>(null);
 
     React.useEffect(() => {
         if (savedPath !== tenantName) {
@@ -121,14 +128,25 @@ export default function QueryEditor(props: QueryEditorProps) {
         }
         const queryId = uuidv4();
 
-        sendQuery({
-            actionType: 'execute',
-            query: text,
-            database: tenantName,
-            querySettings,
-            enableTracingLevel,
-            queryId,
-        });
+        if (isStreamingSupported) {
+            runningQueryRef.current = streamQuery({
+                actionType: 'execute',
+                query: text,
+                database: tenantName,
+                querySettings,
+                enableTracingLevel,
+                queryId,
+            });
+        } else {
+            runningQueryRef.current = sendQuery({
+                actionType: 'execute',
+                query: text,
+                database: tenantName,
+                querySettings,
+                enableTracingLevel,
+                queryId,
+            });
+        }
 
         dispatch(setShowPreview(false));
 
@@ -155,7 +173,7 @@ export default function QueryEditor(props: QueryEditorProps) {
 
         const queryId = uuidv4();
 
-        sendQuery({
+        runningQueryRef.current = sendQuery({
             actionType: 'explain',
             query: text,
             database: tenantName,
@@ -168,6 +186,12 @@ export default function QueryEditor(props: QueryEditorProps) {
 
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     });
+
+    const handleCancelRunningQuery = React.useCallback(() => {
+        if (runningQueryRef.current) {
+            runningQueryRef.current.abort();
+        }
+    }, []);
 
     const onCollapseResultHandler = () => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
@@ -233,6 +257,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                         path={path}
                         showPreview={showPreview}
                         queryText={lastExecutedQueryText}
+                        onCancelRunningQuery={handleCancelRunningQuery}
                     />
                 </div>
             </SplitPane>
@@ -252,6 +277,7 @@ interface ResultProps {
     path: string;
     showPreview?: boolean;
     queryText: string;
+    onCancelRunningQuery: VoidFunction;
 }
 function Result({
     resultVisibilityState,
@@ -264,6 +290,7 @@ function Result({
     path,
     showPreview,
     queryText,
+    onCancelRunningQuery,
 }: ResultProps) {
     if (showPreview) {
         return <Preview database={tenantName} path={path} type={type} />;
@@ -280,6 +307,7 @@ function Result({
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}
                 queryText={queryText}
+                onCancelRunningQuery={onCancelRunningQuery}
             />
         );
     }

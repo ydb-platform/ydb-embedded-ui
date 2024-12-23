@@ -139,14 +139,30 @@ export const getColumnType = (type: string) => {
     }
 };
 
-/** parse response result from ArrayRow to KeyValueRow */
-const parseResult = (rows: ArrayRow[], columns: ColumnType[]) => {
+/** parse response result from ArrayRow to KeyValueRow and format values */
+export const parseResult = (rows: ArrayRow[], columns: ColumnType[]): KeyValueRow[] => {
+    // Precompute the mapping from column index to column name
+    const columnNames: string[] = columns.map((column) => column.name);
+
     return rows.map((row) => {
-        return row.reduce<KeyValueRow>((newRow, cellData, columnIndex) => {
-            const {name} = columns[columnIndex];
-            newRow[name] = cellData;
-            return newRow;
-        }, {});
+        const obj: KeyValueRow = {};
+
+        row.forEach((value, index) => {
+            const columnName = columnNames[index];
+
+            // Format the value based on its type
+            if (
+                (value !== null && typeof value === 'object') ||
+                typeof value === 'boolean' ||
+                Array.isArray(value)
+            ) {
+                obj[columnName] = JSON.stringify(value);
+            } else {
+                obj[columnName] = value;
+            }
+        });
+
+        return obj;
     });
 };
 
@@ -249,36 +265,6 @@ export const parseQueryExplainPlan = (plan: ScriptPlan | QueryPlan): QueryPlan =
     }
 
     return plan;
-};
-
-export const prepareQueryResponse = (data?: KeyValueRow[]) => {
-    if (!Array.isArray(data)) {
-        return [];
-    }
-
-    return data.map((row) => {
-        const formattedData: KeyValueRow = {};
-
-        for (const field in row) {
-            if (Object.prototype.hasOwnProperty.call(row, field)) {
-                const type = typeof row[field];
-
-                // Although typeof null == 'object'
-                // null result should be preserved
-                if (
-                    (row[field] !== null && type === 'object') ||
-                    type === 'boolean' ||
-                    Array.isArray(row[field])
-                ) {
-                    formattedData[field] = JSON.stringify(row[field]);
-                } else {
-                    formattedData[field] = row[field];
-                }
-            }
-        }
-
-        return formattedData;
-    });
 };
 
 export const parseQueryError = (error: unknown): ErrorResponse | string | undefined => {

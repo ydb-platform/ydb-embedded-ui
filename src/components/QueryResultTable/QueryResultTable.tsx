@@ -3,11 +3,12 @@ import React from 'react';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column, Settings} from '@gravity-ui/react-data-table';
 
+import {INDEX_COLUMN} from '../../store/reducers/query/query';
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {getColumnWidth} from '../../utils/getColumnWidth';
-import {getColumnType, prepareQueryResponse} from '../../utils/query';
+import {getColumnType} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
 import type {ResizeableDataTableProps} from '../ResizeableDataTable/ResizeableDataTable';
 import {ResizeableDataTable} from '../ResizeableDataTable/ResizeableDataTable';
@@ -21,7 +22,6 @@ const TABLE_SETTINGS: Settings = {
     ...DEFAULT_TABLE_SETTINGS,
     stripedRows: true,
     sortable: false,
-    displayIndices: true,
 };
 
 export const b = cn('ydb-query-result-table');
@@ -49,8 +49,8 @@ const prepareTypedColumns = (columns: ColumnType[], data?: KeyValueRow[]) => {
     });
 };
 
-const prepareGenericColumns = (data: KeyValueRow[]) => {
-    if (!data.length) {
+const prepareGenericColumns = (data?: KeyValueRow[]) => {
+    if (!data?.length) {
         return [];
     }
 
@@ -80,16 +80,15 @@ interface QueryResultTableProps
 }
 
 export const QueryResultTable = (props: QueryResultTableProps) => {
-    const {columns: rawColumns, data: rawData, ...restProps} = props;
+    const {columns: rawColumns, data, ...restProps} = props;
 
-    const data = React.useMemo(() => prepareQueryResponse(rawData), [rawData]);
     const columns = React.useMemo(() => {
         return rawColumns ? prepareTypedColumns(rawColumns, data) : prepareGenericColumns(data);
     }, [data, rawColumns]);
 
     // empty data is expected to be be an empty array
     // undefined data is not rendered at all
-    if (!Array.isArray(rawData)) {
+    if (!Array.isArray(data)) {
         return null;
     }
 
@@ -97,11 +96,16 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
         return <div className={b('message')}>{i18n('empty')}</div>;
     }
 
+    const settings = {
+        ...TABLE_SETTINGS,
+        displayIndices: columns.filter(({name}) => INDEX_COLUMN.name === name).length === 0,
+    };
+
     return (
         <ResizeableDataTable
             data={data}
             columns={columns}
-            settings={TABLE_SETTINGS}
+            settings={settings}
             // prevent accessing row.id in case it is present but is not the PK (i.e. may repeat)
             rowKey={getRowIndex}
             visibleRowIndex={getVisibleRowIndex}

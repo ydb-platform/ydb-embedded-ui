@@ -14,14 +14,16 @@ const b = cn('cancel-query-button');
 interface CancelQueryButtonProps {
     queryId: string;
     tenantName: string;
+    onClick?: VoidFunction;
 }
 
-export function CancelQueryButton({queryId, tenantName}: CancelQueryButtonProps) {
+export function CancelQueryButton({queryId, tenantName, onClick}: CancelQueryButtonProps) {
     const [sendCancelQuery, cancelQueryResponse] = cancelQueryApi.useCancelQueryMutation();
 
     const onStopButtonClick = React.useCallback(() => {
         sendCancelQuery({queryId, database: tenantName});
-    }, [queryId, sendCancelQuery, tenantName]);
+        onClick?.();
+    }, [onClick, queryId, sendCancelQuery, tenantName]);
 
     return (
         <Button

@@ -48,12 +48,22 @@ export interface PreparedQueryData extends IQueryResult {
     simplifiedPlan?: SimplifiedPlan;
 }
 
+export interface SpeedMetrics {
+    rowsPerSecond: number;
+    lastUpdateTime: number;
+    recentChunks: Array<{
+        timestamp: number;
+        rowCount: number;
+    }>;
+}
+
 export interface QueryResult {
     type: QueryAction;
     data?: PreparedQueryData;
     error?: unknown;
     queryId: string;
     isLoading: boolean;
+    speedMetrics?: SpeedMetrics;
 }
 
 export interface QueryState {
