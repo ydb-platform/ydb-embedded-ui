@@ -6,9 +6,12 @@ import type {MultipartChunk} from '../../store/reducers/multipart/multipart';
 import {useLazyStreamMultipartQuery} from '../../store/reducers/multipart/multipart';
 
 const ANIMATION_DURATION = 300;
+const TOTAL_EXPECTED_CHUNKS = 9999;
+const GRID_SIZE = 50; // Number of squares per row
 
 export function MultipartTest() {
     const [receivedChunks, setReceivedChunks] = React.useState<MultipartChunk[]>([]);
+    const [receivedCounters, setReceivedCounters] = React.useState<Set<number>>(new Set());
 
     const handleChunk = React.useCallback((chunk: MultipartChunk) => {
         console.log('handleChunk called in component:', chunk);
@@ -19,7 +22,58 @@ export function MultipartTest() {
             // Sort by part_number in descending order to show newest first
             return newChunks;
         });
+        setReceivedCounters((prev) => {
+            const counter = chunk.content?.Counter || 0;
+            return new Set([...prev, counter]);
+        });
     }, []);
+
+    const getMissingCounters = React.useCallback(() => {
+        const missing: number[] = [];
+        for (let i = 1; i <= TOTAL_EXPECTED_CHUNKS; i++) {
+            if (!receivedCounters.has(i)) {
+                missing.push(i);
+            }
+        }
+        return missing;
+    }, [receivedCounters]);
+
+    const renderProgressGrid = React.useCallback(() => {
+        const cells = [];
+        for (let i = 1; i <= TOTAL_EXPECTED_CHUNKS; i++) {
+            const isReceived = receivedCounters.has(i);
+            cells.push(
+                <div
+                    key={i}
+                    style={{
+                        width: '8px',
+                        height: '8px',
+                        backgroundColor: isReceived
+                            ? 'var(--g-color-success)'
+                            : 'var(--g-color-base-generic)',
+                        margin: '1px',
+                        transition: 'background-color 0.3s ease',
+                    }}
+                    title={`Counter: ${i}`}
+                />,
+            );
+        }
+        return (
+            <div
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${GRID_SIZE}, 8px)`,
+                    gap: '1px',
+                    padding: '16px',
+                    backgroundColor: 'var(--g-color-base-generic-hover)',
+                    borderRadius: '8px',
+                    marginBottom: '24px',
+                }}
+            >
+                {cells}
+            </div>
+        );
+    }, [receivedCounters]);
 
     const [trigger, {error, isLoading}] = useLazyStreamMultipartQuery();
     const requestRef = React.useRef<ReturnType<typeof trigger> | null>(null);
@@ -84,10 +138,39 @@ export function MultipartTest() {
                             fontSize: '14px',
                         }}
                     >
-                        Received: {receivedChunks.length} chunks
+                        Received: {receivedChunks.length} chunks (
+                        {Math.round((receivedCounters.size / TOTAL_EXPECTED_CHUNKS) * 100)}%)
                     </span>
                 )}
             </div>
+
+            {renderProgressGrid()}
+
+            {receivedChunks.length > 0 && (
+                <div
+                    style={{
+                        marginBottom: '24px',
+                        padding: '12px',
+                        backgroundColor: 'var(--g-color-base-generic)',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                    }}
+                >
+                    <div style={{marginBottom: '8px', fontWeight: 500}}>Progress Analysis:</div>
+                    <div>Total Expected: {TOTAL_EXPECTED_CHUNKS}</div>
+                    <div>Received: {receivedCounters.size}</div>
+                    <div>Missing: {TOTAL_EXPECTED_CHUNKS - receivedCounters.size}</div>
+                    {receivedCounters.size < TOTAL_EXPECTED_CHUNKS && (
+                        <div style={{marginTop: '8px'}}>
+                            <div style={{marginBottom: '4px'}}>First 10 missing counters:</div>
+                            <div style={{color: 'var(--g-color-text-secondary)'}}>
+                                {getMissingCounters().slice(0, 10).join(', ')}
+                                {getMissingCounters().length > 10 ? '...' : ''}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {Boolean(error) && (
                 <div
