@@ -204,7 +204,7 @@ export function MultipartTest() {
                             style={{
                                 padding: '16px',
                                 borderRadius: '8px',
-                                backgroundColor: 'var(--g-color-base-generic)',
+                                backgroundColor: 'var(--g-color-success-light)',
                                 color: 'var(--g-color-text-primary)',
                                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                                 animation: `fadeIn ${ANIMATION_DURATION}ms ease-out`,
