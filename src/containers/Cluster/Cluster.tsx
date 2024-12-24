@@ -8,8 +8,12 @@ import {StringParam, useQueryParams} from 'use-query-params';
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../components/InternalLink';
+import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import routes, {getLocationObjectFromHref} from '../../routes';
-import {useClusterDashboardAvailable} from '../../store/reducers/capabilities/hooks';
+import {
+    useCapabilitiesLoaded,
+    useClusterDashboardAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {
     clusterApi,
     selectClusterTabletsWithFqdn,
@@ -56,6 +60,7 @@ export function Cluster({
     additionalVersionsProps,
 }: ClusterProps) {
     const container = React.useRef<HTMLDivElement>(null);
+    const capabilitiesLoaded = useCapabilitiesLoaded();
     const isClusterDashboardAvailable = useClusterDashboardAvailable();
 
     const dispatch = useTypedDispatch();
@@ -119,107 +124,116 @@ export function Cluster({
     );
 
     return (
-        <div className={b()} ref={container}>
-            <Helmet
-                defaultTitle={`${clusterTitle} — YDB Monitoring`}
-                titleTemplate={`%s — ${clusterTitle} — YDB Monitoring`}
-            >
-                {activeTab ? <title>{activeTab.title}</title> : null}
-            </Helmet>
-            <div className={b('header')}>{getClusterTitle()}</div>
-            <div className={b('sticky-wrapper')}>
-                <AutoRefreshControl className={b('auto-refresh-control')} />
-            </div>
-            {isClusterDashboardAvailable && (
-                <ClusterDashboard
-                    cluster={cluster}
-                    groupStats={groupsStats}
-                    loading={infoLoading}
-                    error={clusterError || cluster?.error}
-                />
-            )}
-            <div className={b('tabs-sticky-wrapper')}>
-                <Tabs
-                    size="l"
-                    allowNotSelected={true}
-                    activeTab={activeTabId}
-                    items={clusterTabs}
-                    wrapTo={({id}, node) => {
-                        const path = getClusterPath(id as ClusterTab, {clusterName, backend});
-                        return (
-                            <InternalLink
-                                to={path}
-                                key={id}
-                                onClick={() => {
-                                    dispatch(updateDefaultClusterTab(id));
-                                }}
-                            >
-                                {node}
-                            </InternalLink>
-                        );
-                    }}
-                />
-            </div>
-            <Switch>
-                <Route
-                    path={
-                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.overview)).pathname
-                    }
+        <LoaderWrapper loading={!capabilitiesLoaded} size="l" delay={0}>
+            <div className={b()} ref={container}>
+                <Helmet
+                    defaultTitle={`${clusterTitle} — YDB Monitoring`}
+                    titleTemplate={`%s — ${clusterTitle} — YDB Monitoring`}
                 >
-                    <ClusterInfo
+                    {activeTab ? <title>{activeTab.title}</title> : null}
+                </Helmet>
+                <div className={b('header')}>{getClusterTitle()}</div>
+                <div className={b('sticky-wrapper')}>
+                    <AutoRefreshControl className={b('auto-refresh-control')} />
+                </div>
+                {isClusterDashboardAvailable && (
+                    <ClusterDashboard
                         cluster={cluster}
-                        versionToColor={versionToColor}
+                        groupStats={groupsStats}
                         loading={infoLoading}
-                        error={clusterError}
-                        additionalClusterProps={additionalClusterProps}
+                        error={clusterError || cluster?.error}
                     />
-                </Route>
-                <Route
-                    path={
-                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.tablets)).pathname
-                    }
-                >
-                    <div className={b('tablets')}>
-                        <TabletsTable
+                )}
+                <div className={b('tabs-sticky-wrapper')}>
+                    <Tabs
+                        size="l"
+                        allowNotSelected={true}
+                        activeTab={activeTabId}
+                        items={clusterTabs}
+                        wrapTo={({id}, node) => {
+                            const path = getClusterPath(id as ClusterTab, {clusterName, backend});
+                            return (
+                                <InternalLink
+                                    to={path}
+                                    key={id}
+                                    onClick={() => {
+                                        dispatch(updateDefaultClusterTab(id));
+                                    }}
+                                >
+                                    {node}
+                                </InternalLink>
+                            );
+                        }}
+                    />
+                </div>
+                <Switch>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.overview))
+                                .pathname
+                        }
+                    >
+                        <ClusterInfo
+                            cluster={cluster}
+                            versionToColor={versionToColor}
                             loading={infoLoading}
-                            tablets={clusterTablets}
-                            className={b('tablets-table')}
+                            error={clusterError}
+                            additionalClusterProps={additionalClusterProps}
                         />
-                    </div>
-                </Route>
-                <Route
-                    path={
-                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants)).pathname
-                    }
-                >
-                    <Tenants additionalTenantsProps={additionalTenantsProps} />
-                </Route>
-                <Route
-                    path={getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname}
-                >
-                    <Nodes parentRef={container} additionalNodesProps={additionalNodesProps} />
-                </Route>
-                <Route
-                    path={
-                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage)).pathname
-                    }
-                >
-                    <PaginatedStorage parentRef={container} />
-                </Route>
-                <Route
-                    path={
-                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions)).pathname
-                    }
-                >
-                    <Versions versionToColor={versionToColor} cluster={cluster} />
-                </Route>
-                <Route
-                    render={() => (
-                        <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
-                    )}
-                />
-            </Switch>
-        </div>
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.tablets))
+                                .pathname
+                        }
+                    >
+                        <div className={b('tablets')}>
+                            <TabletsTable
+                                loading={infoLoading}
+                                tablets={clusterTablets}
+                                className={b('tablets-table')}
+                            />
+                        </div>
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants))
+                                .pathname
+                        }
+                    >
+                        <Tenants additionalTenantsProps={additionalTenantsProps} />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname
+                        }
+                    >
+                        <Nodes parentRef={container} additionalNodesProps={additionalNodesProps} />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage))
+                                .pathname
+                        }
+                    >
+                        <PaginatedStorage parentRef={container} />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions))
+                                .pathname
+                        }
+                    >
+                        <Versions versionToColor={versionToColor} cluster={cluster} />
+                    </Route>
+                    <Route
+                        render={() => (
+                            <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
+                        )}
+                    />
+                </Switch>
+            </div>
+        </LoaderWrapper>
     );
 }
 
