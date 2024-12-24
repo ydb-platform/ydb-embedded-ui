@@ -74,7 +74,7 @@ export function MultipartTest() {
             </h2>
 
             <div style={{marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'center'}}>
-                <Button view="action" size="l" onClick={handleButtonClick} loading={isLoading}>
+                <Button view="action" size="l" onClick={handleButtonClick}>
                     {isLoading ? 'Stop Streaming' : 'Start Streaming'}
                 </Button>
                 {receivedChunks.length > 0 && (

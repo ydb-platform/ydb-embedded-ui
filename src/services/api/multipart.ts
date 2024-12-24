@@ -13,7 +13,7 @@ export class MultipartAPI extends BaseYdbAPI {
     private lastProcessedLength = 0;
 
     getPath(): string {
-        return 'http://localhost:3000/stream';
+        return 'еуы';
     }
     async streamMultipartResponse<T>(
         url: string,
@@ -31,6 +31,7 @@ export class MultipartAPI extends BaseYdbAPI {
             },
             {
                 ...options,
+                requestConfig: {signal: options.signal, 'axios-retry': {retries: 0}},
                 timeout: 0, // Disable timeout for multipart responses
                 headers: {
                     Accept: 'multipart/x-mixed-replace',
