@@ -15,7 +15,6 @@ export class MultipartAPI extends BaseYdbAPI {
     getPath(): string {
         return 'http://localhost:3000/stream';
     }
-
     async streamMultipartResponse<T>(
         url: string,
         onChunk: (chunk: MultipartChunk<T>) => void,

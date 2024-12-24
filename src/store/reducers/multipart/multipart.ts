@@ -15,7 +15,7 @@ interface StreamOptions {
 export const multipartApi = api.injectEndpoints({
     endpoints: (build) => ({
         streamMultipart: build.query<void, StreamOptions>({
-            queryFn: async ({url, onChunk}, _signal, _extraOptions, _baseQuery) => {
+            queryFn: async ({url, onChunk}, {signal}, _extraOptions, _baseQuery) => {
                 try {
                     console.log('Starting multipart stream with onChunk:', Boolean(onChunk));
 
@@ -27,6 +27,10 @@ export const multipartApi = api.injectEndpoints({
                                 console.log('Calling onChunk callback');
                                 onChunk(chunk);
                             }
+                        },
+                        {},
+                        {
+                            signal,
                         },
                     );
 
@@ -46,4 +50,4 @@ export const multipartApi = api.injectEndpoints({
     }),
 });
 
-export const {useStreamMultipartQuery} = multipartApi;
+export const {useStreamMultipartQuery, useLazyStreamMultipartQuery} = multipartApi;

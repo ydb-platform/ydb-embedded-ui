@@ -3,12 +3,11 @@ import React from 'react';
 import {Button} from '@gravity-ui/uikit';
 
 import type {MultipartChunk} from '../../store/reducers/multipart/multipart';
-import {useStreamMultipartQuery} from '../../store/reducers/multipart/multipart';
+import {useLazyStreamMultipartQuery} from '../../store/reducers/multipart/multipart';
 
 const ANIMATION_DURATION = 300;
 
 export function MultipartTest() {
-    const [startStream, setStartStream] = React.useState(false);
     const [receivedChunks, setReceivedChunks] = React.useState<MultipartChunk[]>([]);
 
     const handleChunk = React.useCallback((chunk: MultipartChunk) => {
@@ -22,28 +21,31 @@ export function MultipartTest() {
         });
     }, []);
 
-    console.log('Component rendered, startStream:', startStream);
-
-    const {error, isLoading} = useStreamMultipartQuery(
-        {
-            url: '/viewer/json/query',
-            onChunk: handleChunk,
-        },
-        {
-            skip: !startStream,
-        },
-    );
+    const [trigger, {error, isLoading}] = useLazyStreamMultipartQuery();
+    const requestRef = React.useRef<ReturnType<typeof trigger> | null>(null);
 
     const handleStart = React.useCallback(() => {
         console.log('Starting stream...');
         setReceivedChunks([]);
-        setStartStream(true);
-    }, []);
+        requestRef.current = trigger({
+            url: '/viewer/json/query',
+            onChunk: handleChunk,
+        });
+    }, [trigger, handleChunk]);
 
     const handleStop = React.useCallback(() => {
         console.log('Stopping stream...');
-        setStartStream(false);
+        requestRef.current?.abort();
+        requestRef.current = null;
     }, []);
+
+    const handleButtonClick = React.useCallback(() => {
+        if (isLoading) {
+            handleStop();
+        } else {
+            handleStart();
+        }
+    }, [isLoading, handleStart, handleStop]);
 
     const getErrorMessage = (err: unknown): string => {
         if (err instanceof Error) {
@@ -72,13 +74,8 @@ export function MultipartTest() {
             </h2>
 
             <div style={{marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'center'}}>
-                <Button
-                    view="action"
-                    size="l"
-                    onClick={startStream ? handleStop : handleStart}
-                    loading={isLoading}
-                >
-                    {startStream ? 'Stop Streaming' : 'Start Streaming'}
+                <Button view="action" size="l" onClick={handleButtonClick} loading={isLoading}>
+                    {isLoading ? 'Stop Streaming' : 'Start Streaming'}
                 </Button>
                 {receivedChunks.length > 0 && (
                     <span
