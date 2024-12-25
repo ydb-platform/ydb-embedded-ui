@@ -245,3 +245,9 @@ export class ClusterStorageTable extends PaginatedTable {
         super(page, '.ydb-cluster');
     }
 }
+
+export class DiagnosticsNodesTable extends PaginatedTable {
+    constructor(page: Page) {
+        super(page, '.kv-tenant-diagnostics__page-wrapper');
+    }
+}

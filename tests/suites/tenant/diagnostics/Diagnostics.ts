@@ -1,6 +1,9 @@
 import type {Locator, Page} from '@playwright/test';
 
 import {retryAction} from '../../../utils/retryAction';
+import {MemoryViewer} from '../../memoryViewer/MemoryViewer';
+import {NodesPage} from '../../nodes/NodesPage';
+import {StoragePage} from '../../storage/StoragePage';
 import {VISIBILITY_TIMEOUT} from '../TenantPage';
 
 export enum DiagnosticsTab {
@@ -13,6 +16,7 @@ export enum DiagnosticsTab {
     Tablets = 'Tablets',
     HotKeys = 'Hot keys',
     Describe = 'Describe',
+    Storage = 'Storage',
 }
 
 export class Table {
@@ -114,6 +118,9 @@ export enum QueriesSwitch {
 
 export class Diagnostics {
     table: Table;
+    storage: StoragePage;
+    nodes: NodesPage;
+    memoryViewer: MemoryViewer;
 
     private tabs: Locator;
     private schemaViewer: Locator;
@@ -122,8 +129,15 @@ export class Diagnostics {
     private primaryKeys: Locator;
     private refreshButton: Locator;
     private autoRefreshSelect: Locator;
+    private cpuCard: Locator;
+    private storageCard: Locator;
+    private memoryCard: Locator;
+    private healthcheckCard: Locator;
 
     constructor(page: Page) {
+        this.storage = new StoragePage(page);
+        this.nodes = new NodesPage(page);
+        this.memoryViewer = new MemoryViewer(page);
         this.tabs = page.locator('.kv-tenant-diagnostics__tabs');
         this.tableControls = page.locator('.ydb-table-with-controls-layout__controls');
         this.schemaViewer = page.locator('.schema-viewer');
@@ -132,6 +146,12 @@ export class Diagnostics {
         this.refreshButton = page.locator('button[aria-label="Refresh"]');
         this.autoRefreshSelect = page.locator('.g-select');
         this.table = new Table(page.locator('.object-general'));
+
+        // Info tab cards
+        this.cpuCard = page.locator('.metrics-cards__tab:has-text("CPU")');
+        this.storageCard = page.locator('.metrics-cards__tab:has-text("Storage")');
+        this.memoryCard = page.locator('.metrics-cards__tab:has-text("Memory")');
+        this.healthcheckCard = page.locator('.metrics-cards__tab:has-text("Healthcheck")');
     }
 
     async isSchemaViewerVisible() {
@@ -183,5 +203,48 @@ export class Diagnostics {
         await this.autoRefreshSelect.click();
         const optionLocator = this.autoRefreshSelect.locator(`text=${option}`);
         await optionLocator.click();
+    }
+
+    async areInfoCardsVisible() {
+        await this.cpuCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.storageCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.memoryCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.healthcheckCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async getResourceUtilization() {
+        const cpuSystem = await this.cpuCard
+            .locator('.ydb-metrics-card__metric:has-text("System") .progress-viewer__text')
+            .textContent();
+        const cpuUser = await this.cpuCard
+            .locator('.ydb-metrics-card__metric:has-text("User") .progress-viewer__text')
+            .textContent();
+        const cpuIC = await this.cpuCard
+            .locator('.ydb-metrics-card__metric:has-text("IC") .progress-viewer__text')
+            .textContent();
+        const storage = await this.storageCard
+            .locator('.ydb-metrics-card__metric:has-text("SSD") .progress-viewer__text')
+            .textContent();
+        const memory = await this.memoryCard
+            .locator('.ydb-metrics-card__metric:has-text("Process") .progress-viewer__text')
+            .textContent();
+
+        return {
+            cpu: {
+                system: cpuSystem?.trim() || '',
+                user: cpuUser?.trim() || '',
+                ic: cpuIC?.trim() || '',
+            },
+            storage: storage?.trim() || '',
+            memory: memory?.trim() || '',
+        };
+    }
+
+    async getHealthcheckStatus() {
+        const statusElement = this.healthcheckCard.locator(
+            '.healthcheck__self-check-status-indicator',
+        );
+        return (await statusElement.textContent())?.trim() || '';
     }
 }
