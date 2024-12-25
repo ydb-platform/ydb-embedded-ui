@@ -178,8 +178,7 @@ function DataWrapper({children}: {children: React.ReactNode}) {
     return (
         <GetUser>
             <GetNodesList />
-            <GetCapabilities />
-            {children}
+            <GetCapabilities>{children}</GetCapabilities>
         </GetUser>
     );
 }
@@ -199,9 +198,14 @@ function GetNodesList() {
     return null;
 }
 
-function GetCapabilities() {
-    useCapabilitiesQuery();
-    return null;
+function GetCapabilities({children}: {children: React.ReactNode}) {
+    const {isLoading} = useCapabilitiesQuery();
+
+    return (
+        <LoaderWrapper loading={isLoading} size="l">
+            {children}
+        </LoaderWrapper>
+    );
 }
 
 interface ContentWrapperProps {
