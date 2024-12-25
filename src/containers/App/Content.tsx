@@ -12,7 +12,7 @@ import type {SlotComponent} from '../../components/slots/types';
 import routes from '../../routes';
 import type {RootState} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
-import {useCapabilitiesQuery} from '../../store/reducers/capabilities/hooks';
+import {useCapabilitiesLoaded, useCapabilitiesQuery} from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
 import {lazyComponent} from '../../utils/lazyComponent';
@@ -199,10 +199,11 @@ function GetNodesList() {
 }
 
 function GetCapabilities({children}: {children: React.ReactNode}) {
-    const {isLoading} = useCapabilitiesQuery();
+    useCapabilitiesQuery();
+    const capabilitiesLoaded = useCapabilitiesLoaded();
 
     return (
-        <LoaderWrapper loading={isLoading} size="l">
+        <LoaderWrapper loading={!capabilitiesLoaded} size="l">
             {children}
         </LoaderWrapper>
     );
