@@ -12,7 +12,7 @@
         width: var(--pdisks-container-width);
         height: 40px;
 
-        @include calculate-storage-pdisk-variables();
+        @include calculate-storage-nodes-pdisk-variables();
     }
 
     &__pdisks-item {

@@ -396,7 +396,7 @@
     }
 }
 
-@mixin calculate-storage-pdisk-variables() {
+@mixin calculate-storage-nodes-pdisk-variables() {
     --pdisk-vdisk-width: 3px;
     --pdisk-gap-width: 2px;
     --pdisk-min-width: 120px;
