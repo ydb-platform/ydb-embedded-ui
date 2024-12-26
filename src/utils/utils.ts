@@ -4,7 +4,7 @@ export function parseJson(value?: string | null) {
     }
     try {
         return JSON.parse(value);
-    } catch (err) {
+    } catch {
         return value;
     }
 }

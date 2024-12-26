@@ -57,7 +57,7 @@ export class ObjectSummary {
         try {
             await openPreviewIcon.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     }

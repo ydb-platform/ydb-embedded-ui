@@ -66,7 +66,7 @@ export function prepareQueryData(
                 ...result,
                 preparedPlan: {...preparePlan(planWithStats), pristine: planWithStats},
             };
-        } catch (e) {}
+        } catch {}
     }
 
     return result;
