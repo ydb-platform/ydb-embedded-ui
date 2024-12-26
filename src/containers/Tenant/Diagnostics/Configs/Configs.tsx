@@ -11,6 +11,7 @@ import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import type {FeatureFlagConfig} from '../../../../types/api/featureFlags';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {useAutoRefreshInterval} from '../../../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -87,7 +88,12 @@ interface ConfigsProps {
 
 export const Configs = ({database}: ConfigsProps) => {
     const [search, setSearch] = useQueryParam('search', StringParam);
-    const {currentData = [], isFetching, error} = tenantApi.useGetClusterConfigQuery({database});
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {
+        currentData = [],
+        isFetching,
+        error,
+    } = tenantApi.useGetClusterConfigQuery({database}, {pollingInterval: autoRefreshInterval});
 
     const onChange = (value: string) => {
         setSearch(value || undefined, 'replaceIn');

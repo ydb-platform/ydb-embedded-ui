@@ -73,6 +73,7 @@ export const tenantApi = api.injectEndpoints({
                     return {error};
                 }
             },
+            providesTags: ['All'],
         }),
     }),
     overrideExisting: 'throw',

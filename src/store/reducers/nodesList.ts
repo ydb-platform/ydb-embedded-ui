@@ -16,7 +16,6 @@ export const nodesListApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
         }),
     }),
     overrideExisting: 'throw',
