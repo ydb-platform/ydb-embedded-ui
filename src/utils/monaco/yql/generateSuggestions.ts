@@ -244,15 +244,19 @@ export async function generateColumnsSuggestion(
     }
 
     const variableSources = filteredTableNames.filter(isVariable);
-    let columnsFromVariable: TAutocompleteEntity[] = [];
+    const columnsFromVariable: TAutocompleteEntity[] = [];
     if (variableSources.length) {
         variableSources.forEach((source) => {
-            columnsFromVariable =
+            const newColumns =
                 suggestVariables
                     // Variable name from suggestions doesn't include $ sign
                     ?.find((variable) => source.slice(1) === variable.name)
-                    ?.value?.columns?.map((col) => ({Name: col, Type: 'column', Parent: source})) ??
-                [];
+                    ?.value?.columns?.map((col) => ({
+                        Name: col,
+                        Type: 'column' as const,
+                        Parent: source,
+                    })) ?? [];
+            columnsFromVariable.push(...newColumns);
         });
     }
 
