@@ -1,5 +1,3 @@
-@import '../../../styles/mixins.scss';
-
 .pdisk-storage {
     position: relative;
 
@@ -10,7 +8,6 @@
     width: var(--pdisk-width);
     min-width: var(--pdisk-min-width);
 
-    @include calculate-storage-pdisk-variables();
     &__content {
         position: relative;
 
