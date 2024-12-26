@@ -16,8 +16,6 @@ import './PDisk.scss';
 
 const b = cn('pdisk-storage');
 
-const PDISK_MAX_SLOTS_CSS_VAR = '--pdisk-max-slots';
-
 interface PDiskProps {
     data?: PreparedPDisk;
     vDisks?: PreparedVDisk[];
@@ -27,7 +25,6 @@ interface PDiskProps {
     className?: string;
     progressBarClassName?: string;
     viewContext?: StorageViewContext;
-    maximumSlotsPerDisk?: string;
 }
 
 export const PDisk = ({
@@ -39,7 +36,6 @@ export const PDisk = ({
     className,
     progressBarClassName,
     viewContext,
-    maximumSlotsPerDisk,
 }: PDiskProps) => {
     const {NodeId, PDiskId} = data;
     const pDiskIdsDefined = valueIsDefined(NodeId) && valueIsDefined(PDiskId);
@@ -77,17 +73,7 @@ export const PDisk = ({
     }
 
     return (
-        <div
-            className={b(null, className)}
-            ref={anchorRef}
-            style={
-                maximumSlotsPerDisk
-                    ? ({
-                          [PDISK_MAX_SLOTS_CSS_VAR]: maximumSlotsPerDisk,
-                      } as React.CSSProperties)
-                    : undefined
-            }
-        >
+        <div className={b(null, className)} ref={anchorRef}>
             {renderVDisks()}
             <HoverPopup
                 showPopup={showPopup}

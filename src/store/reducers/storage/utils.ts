@@ -191,6 +191,7 @@ const prepareStorageGroups = (
 const prepareStorageNodeData = (
     node: TNodeInfo,
     maximumSlotsPerDisk: string,
+    maximumDisksPerNode: string,
 ): PreparedStorageNode => {
     const missing =
         node.PDisks?.filter((pDisk) => {
@@ -218,6 +219,7 @@ const prepareStorageNodeData = (
         VDisks: vDisks,
         Missing: missing,
         MaximumSlotsPerDisk: maximumSlotsPerDisk,
+        MaximumDisksPerNode: maximumDisksPerNode,
     };
 };
 
@@ -243,10 +245,22 @@ export const calculateMaximumSlotsPerDisk = (
     );
 };
 
+export const calculateMaximumDisksPerNode = (
+    nodes: TNodeInfo[] | undefined,
+    providedMaximumDisksPerNode?: string,
+) => {
+    if (providedMaximumDisksPerNode) {
+        return providedMaximumDisksPerNode;
+    }
+
+    return String(Math.max(1, ...(nodes || []).map((node) => node.PDisks?.length || 0)));
+};
+
 // ==== Prepare responses ====
 
 export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageResponse => {
-    const {Nodes, TotalNodes, FoundNodes, NodeGroups, MaximumSlotsPerDisk} = data;
+    const {Nodes, TotalNodes, FoundNodes, NodeGroups, MaximumSlotsPerDisk, MaximumDisksPerNode} =
+        data;
 
     const tableGroups = NodeGroups?.map(({GroupName, NodeCount}) => {
         if (GroupName && NodeCount) {
@@ -259,7 +273,10 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
     }).filter((group): group is TableGroup => Boolean(group));
 
     const maximumSlots = calculateMaximumSlotsPerDisk(Nodes, MaximumSlotsPerDisk);
-    const preparedNodes = Nodes?.map((node) => prepareStorageNodeData(node, maximumSlots));
+    const maximumDisks = calculateMaximumDisksPerNode(Nodes, MaximumDisksPerNode);
+    const preparedNodes = Nodes?.map((node) =>
+        prepareStorageNodeData(node, maximumSlots, maximumDisks),
+    );
 
     return {
         nodes: preparedNodes,

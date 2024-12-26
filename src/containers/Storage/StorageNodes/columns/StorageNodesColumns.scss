@@ -1,3 +1,5 @@
+@import '../../../../styles/mixins.scss';
+
 .ydb-storage-nodes-columns {
     &__pdisks-column {
         overflow: visible; // to enable stacked disks overflow the row
@@ -5,10 +7,12 @@
 
     &__pdisks-wrapper {
         display: flex;
-        gap: 10px;
+        gap: var(--pdisk-margin);
 
-        width: 100%;
+        width: var(--pdisks-container-width);
         height: 40px;
+
+        @include calculate-storage-pdisk-variables();
     }
 
     &__pdisks-item {
