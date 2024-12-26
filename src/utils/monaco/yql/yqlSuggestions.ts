@@ -128,6 +128,7 @@ async function getSuggestions(
     const columnsSuggestions = await generateColumnsSuggestion(
         rangeToInsertSuggestion,
         parseResult.suggestColumns,
+        parseResult.suggestVariables,
         database,
     );
 

@@ -24,7 +24,7 @@
     "@gravity-ui/react-data-table": "^2.1.1",
     "@gravity-ui/table": "^1.7.0",
     "@gravity-ui/uikit": "^6.33.0",
-    "@gravity-ui/websql-autocomplete": "^12.7.0",
+    "@gravity-ui/websql-autocomplete": "^13.1.0",
     "@hookform/resolvers": "^3.9.0",
     "@reduxjs/toolkit": "^2.2.3",
     "@tanstack/react-table": "^8.19.3",

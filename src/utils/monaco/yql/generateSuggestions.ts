@@ -1,6 +1,7 @@
 import type {
     ColumnAliasSuggestion,
     KeywordSuggestion,
+    VariableSuggestion,
 } from '@gravity-ui/websql-autocomplete/shared';
 import type {YQLEntity, YqlAutocompleteResult} from '@gravity-ui/websql-autocomplete/yql';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
@@ -107,6 +108,10 @@ function removeBackticks(value: string) {
     return value.slice(sliceStart, sliceEnd);
 }
 
+function isVariable(value: string) {
+    return value.startsWith('$');
+}
+
 function removeStartSlash(value: string) {
     if (value.startsWith('/')) {
         return value.slice(1);
@@ -199,7 +204,8 @@ function getColumnDetails(col: AutocompleteColumn) {
 
 export async function generateColumnsSuggestion(
     rangeToInsertSuggestion: monaco.IRange,
-    suggestColumns: YqlAutocompleteResult['suggestColumns'] | undefined,
+    suggestColumns: YqlAutocompleteResult['suggestColumns'],
+    suggestVariables: YqlAutocompleteResult['suggestVariables'],
     database: string,
 ): Promise<monaco.languages.CompletionItem[]> {
     if (!suggestColumns?.tables) {
@@ -209,26 +215,66 @@ export async function generateColumnsSuggestion(
     const normalizedColumns = suggestColumns.all ? ([] as string[]) : undefined;
     const multi = suggestColumns.tables.length > 1;
 
-    const normalizedTableNames =
+    const normalizedSuggestions =
         suggestColumns.tables?.map((entity) => {
             let normalizedEntityName = removeBackticks(entity.name);
-            if (!normalizedEntityName.endsWith('/')) {
+            if (!normalizedEntityName.endsWith('/') && !isVariable(normalizedEntityName)) {
                 normalizedEntityName = `${normalizedEntityName}/`;
             }
-            return normalizeEntityPrefix(normalizedEntityName, database);
+            return {...entity, name: normalizeEntityPrefix(normalizedEntityName, database)};
         }) ?? [];
+
+    const normalizedTableNames = normalizedSuggestions.map((entity) => entity.name);
 
     // remove duplicates if any
     const filteredTableNames = Array.from(new Set(normalizedTableNames));
 
-    const autocompleteResponse = await window.api.viewer.autocomplete({
-        database,
-        table: filteredTableNames,
-        limit: 1000,
-    });
-    if (!autocompleteResponse.Success) {
-        return [];
+    const tableSources = filteredTableNames.filter((name) => !isVariable(name));
+
+    let autocompleteEntities: TAutocompleteEntity[] = [];
+    if (tableSources.length) {
+        const autocompleteResponse = await window.api.viewer.autocomplete({
+            database,
+            table: tableSources,
+            limit: 1000,
+        });
+        if (autocompleteResponse.Success) {
+            autocompleteEntities = autocompleteResponse.Result.Entities ?? [];
+        }
     }
+
+    const variableSources = filteredTableNames.filter(isVariable);
+    const columnsFromVariable: TAutocompleteEntity[] = [];
+    if (variableSources.length) {
+        variableSources.forEach((source) => {
+            const newColumns =
+                suggestVariables
+                    // Variable name from suggestions doesn't include $ sign
+                    ?.find((variable) => source.slice(1) === variable.name)
+                    ?.value?.columns?.map((col) => ({
+                        Name: col,
+                        Type: 'column' as const,
+                        Parent: source,
+                    })) ?? [];
+            columnsFromVariable.push(...newColumns);
+        });
+    }
+
+    const predefinedColumns: TAutocompleteEntity[] = normalizedSuggestions.reduce<
+        TAutocompleteEntity[]
+    >((acc, entity) => {
+        const columns = entity.columns;
+        if (columns) {
+            acc.push(
+                ...columns.map((col) => ({
+                    Name: col,
+                    Type: 'column' as const,
+                    Parent: entity.name,
+                })),
+            );
+        }
+        return acc;
+    }, []);
 
     const tableNameToAliasMap = suggestColumns.tables?.reduce(
         (acc, entity) => {
@@ -246,7 +292,7 @@ export async function generateColumnsSuggestion(
         {} as Record<string, string[]>,
     );
 
-    autocompleteResponse.Result.Entities?.forEach((col) => {
+    [...autocompleteEntities, ...columnsFromVariable, ...predefinedColumns].forEach((col) => {
         if (!isAutocompleteColumn(col)) {
             return;
         }
@@ -293,7 +339,7 @@ export async function generateColumnsSuggestion(
             normalizedColumns?.push(columnNameSuggestion);
         }
     });
-    if (normalizedColumns && normalizedColumns.length > 0) {
+    if (normalizedColumns && normalizedColumns.length > 1) {
         const allColumns = normalizedColumns.join(', ');
         suggestions.push({
             label: allColumns,
@@ -341,13 +387,13 @@ export function generateKeywordsSuggestion(
 
 export function generateVariableSuggestion(
     rangeToInsertSuggestion: monaco.IRange,
-    suggestVariables?: string[],
+    suggestVariables?: VariableSuggestion[],
 ) {
     if (!suggestVariables) {
         return [];
     }
-    return suggestVariables.map((rawVariable) => {
-        const variable = '$' + rawVariable;
+    return suggestVariables.map(({name}) => {
+        const variable = '$' + name;
         return {
             label: variable,
             insertText: variable,
