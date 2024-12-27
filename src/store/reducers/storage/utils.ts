@@ -223,37 +223,48 @@ const prepareStorageNodeData = (
     };
 };
 
+/**
+ * Calculates the maximum number of VDisk slots per PDisk across all nodes
+ * A slot represents a VDisk that can be allocated to a PDisk
+ */
 export const calculateMaximumSlotsPerDisk = (
     nodes: TNodeInfo[] | undefined,
     providedMaximumSlotsPerDisk?: string,
-) => {
+): string => {
     if (providedMaximumSlotsPerDisk) {
         return providedMaximumSlotsPerDisk;
     }
 
-    return String(
-        Math.max(
-            1,
-            ...(nodes || []).flatMap((node) =>
-                (node.PDisks || []).map(
-                    (pDisk) =>
-                        (node.VDisks || []).filter((vDisk) => vDisk.PDiskId === pDisk.PDiskId)
-                            .length || 0,
-                ),
-            ),
-        ),
-    );
+    const safeNodes = nodes || [];
+    const slotsPerDiskCounts = safeNodes.flatMap((node) => {
+        const safePDisks = node.PDisks || [];
+        const safeVDisks = node.VDisks || [];
+
+        return safePDisks.map((pDisk) => {
+            const vDisksOnPDisk = safeVDisks.filter((vDisk) => vDisk.PDiskId === pDisk.PDiskId);
+            return vDisksOnPDisk.length || 0;
+        });
+    });
+
+    const maxSlots = Math.max(1, ...slotsPerDiskCounts);
+    return String(maxSlots);
 };
 
+/**
+ * Calculates the maximum number of PDisks per node across all nodes
+ */
 export const calculateMaximumDisksPerNode = (
     nodes: TNodeInfo[] | undefined,
     providedMaximumDisksPerNode?: string,
-) => {
+): string => {
     if (providedMaximumDisksPerNode) {
         return providedMaximumDisksPerNode;
     }
 
-    return String(Math.max(1, ...(nodes || []).map((node) => node.PDisks?.length || 0)));
+    const safeNodes = nodes || [];
+    const disksPerNodeCounts = safeNodes.map((node) => node.PDisks?.length || 0);
+    const maxDisks = Math.max(1, ...disksPerNodeCounts);
+    return String(maxDisks);
 };
 
 // ==== Prepare responses ====
