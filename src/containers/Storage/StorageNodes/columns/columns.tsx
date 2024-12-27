@@ -30,14 +30,22 @@ import './StorageNodesColumns.scss';
 
 const b = cn('ydb-storage-nodes-columns');
 
+const MAX_SLOTS_CSS_VAR = '--maximum-slots';
+const MAX_DISKS_CSS_VAR = '--maximum-disks';
+
 const getPDisksColumn = ({viewContext}: GetStorageNodesColumnsParams): StorageNodesColumn => {
     return {
         name: NODES_COLUMNS_IDS.PDisks,
         header: NODES_COLUMNS_TITLES.PDisks,
         className: b('pdisks-column'),
         render: ({row}) => {
+            const pDiskStyles = {
+                [MAX_SLOTS_CSS_VAR]: row.MaximumSlotsPerDisk,
+                [MAX_DISKS_CSS_VAR]: row.MaximumDisksPerNode,
+            } as React.CSSProperties;
+
             return (
-                <div className={b('pdisks-wrapper')}>
+                <div className={b('pdisks-wrapper')} style={pDiskStyles}>
                     {row.PDisks?.map((pDisk) => {
                         const vDisks = row.VDisks?.filter(
                             (vdisk) => vdisk.PDiskId === pDisk.PDiskId,
@@ -45,12 +53,7 @@ const getPDisksColumn = ({viewContext}: GetStorageNodesColumnsParams): StorageNo
 
                         return (
                             <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                <PDisk
-                                    data={pDisk}
-                                    vDisks={vDisks}
-                                    viewContext={viewContext}
-                                    maximumSlotsPerDisk={row.MaximumSlotsPerDisk}
-                                />
+                                <PDisk data={pDisk} vDisks={vDisks} viewContext={viewContext} />
                             </div>
                         );
                     })}
@@ -59,7 +62,6 @@ const getPDisksColumn = ({viewContext}: GetStorageNodesColumnsParams): StorageNo
         },
         align: DataTable.CENTER,
         sortable: false,
-        width: 900,
         resizeable: false,
     };
 };

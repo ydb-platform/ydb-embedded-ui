@@ -1,18 +1,12 @@
 .pdisk-storage {
-    --pdisk-vdisk-width: 3px;
-    --pdisk-gap-width: 2px;
-
     position: relative;
 
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
 
-    width: calc(
-        var(--pdisk-max-slots, 1) * var(--pdisk-vdisk-width) + (var(--pdisk-max-slots, 1) - 1) *
-            var(--pdisk-gap-width)
-    );
-    min-width: 120px;
+    width: var(--pdisk-width);
+    min-width: var(--pdisk-min-width);
 
     &__content {
         position: relative;

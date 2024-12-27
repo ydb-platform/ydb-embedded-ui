@@ -395,3 +395,23 @@
         background-color: unset;
     }
 }
+
+@mixin calculate-storage-nodes-pdisk-variables() {
+    --pdisk-vdisk-width: 3px;
+    --pdisk-gap-width: 2px;
+    --pdisk-min-width: 120px;
+    --pdisk-margin: 10px;
+
+    --pdisk-width: max(
+        calc(
+            var(--maximum-slots, 1) * var(--pdisk-vdisk-width) + (var(--maximum-slots, 1) - 1) *
+                var(--pdisk-gap-width)
+        ),
+        var(--pdisk-min-width)
+    );
+
+    --pdisks-container-width: calc(
+        var(--maximum-disks, 1) * var(--pdisk-width) + (var(--maximum-disks, 1) - 1) *
+            var(--pdisk-margin)
+    );
+}
