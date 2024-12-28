@@ -160,4 +160,43 @@ test.describe('Object Summary', async () => {
         // Verify the column lists are different
         expect(vslotsColumns).not.toEqual(storagePoolsColumns);
     });
+
+    test.only('ACL tab shows correct access rights', async ({page}) => {
+        const pageQueryParams = {
+            schema: '/local/.sys_health',
+            database: '/local',
+            summaryTab: 'acl',
+            tenantPage: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const objectSummary = new ObjectSummary(page);
+        await objectSummary.waitForAclVisible();
+
+        // Check Access Rights
+        const accessRights = await objectSummary.getAccessRights();
+        expect(accessRights).toEqual([{user: 'root@builtin', rights: 'Owner'}]);
+
+        // Check Effective Access Rights
+        const effectiveRights = await objectSummary.getEffectiveAccessRights();
+        expect(effectiveRights).toEqual([
+            {group: 'USERS', permissions: ['ConnectDatabase']},
+            {group: 'METADATA-READERS', permissions: ['List']},
+            {group: 'DATA-READERS', permissions: ['SelectRow']},
+            {group: 'DATA-WRITERS', permissions: ['UpdateRow', 'EraseRow']},
+            {
+                group: 'DDL-ADMINS',
+                permissions: [
+                    'WriteAttributes',
+                    'CreateDirectory',
+                    'CreateTable',
+                    'RemoveSchema',
+                    'AlterSchema',
+                ],
+            },
+            {group: 'ACCESS-ADMINS', permissions: ['GrantAccessRights']},
+            {group: 'DATABASE-ADMINS', permissions: ['Manage']},
+        ]);
+    });
 });

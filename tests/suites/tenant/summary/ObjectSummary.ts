@@ -18,6 +18,9 @@ export class ObjectSummary {
     private treeRows: Locator;
     private primaryKeys: Locator;
     private actionsMenu: ActionsMenu;
+    private aclWrapper: Locator;
+    private aclList: Locator;
+    private effectiveAclList: Locator;
 
     constructor(page: Page) {
         this.tree = page.locator('.ydb-object-summary__tree');
@@ -26,6 +29,49 @@ export class ObjectSummary {
         this.schemaViewer = page.locator('.schema-viewer');
         this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
         this.actionsMenu = new ActionsMenu(page.locator('.g-popup.g-popup_open'));
+        this.aclWrapper = page.locator('.ydb-acl');
+        this.aclList = this.aclWrapper.locator('dl.gc-definition-list').first();
+        this.effectiveAclList = this.aclWrapper.locator('dl.gc-definition-list').last();
+    }
+
+    async waitForAclVisible() {
+        await this.aclWrapper.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async getAccessRights(): Promise<{user: string; rights: string}[]> {
+        await this.waitForAclVisible();
+        const items = await this.aclList.locator('.gc-definition-list__item').all();
+        const result = [];
+
+        for (const item of items) {
+            const user =
+                (await item.locator('.gc-definition-list__term-wrapper span').textContent()) || '';
+            const definitionContent = await item.locator('.gc-definition-list__definition').first();
+            const rights = (await definitionContent.textContent()) || '';
+            result.push({user: user.trim(), rights: rights.trim()});
+        }
+
+        return result;
+    }
+
+    async getEffectiveAccessRights(): Promise<{group: string; permissions: string[]}[]> {
+        await this.waitForAclVisible();
+        const items = await this.effectiveAclList.locator('.gc-definition-list__item').all();
+        const result = [];
+
+        for (const item of items) {
+            const group =
+                (await item.locator('.gc-definition-list__term-wrapper span').textContent()) || '';
+            const definitionContent = await item.locator('.gc-definition-list__definition').first();
+            const permissionElements = await definitionContent.locator('span').all();
+            const permissions = await Promise.all(
+                permissionElements.map(async (el) => ((await el.textContent()) || '').trim()),
+            );
+            result.push({group: group.trim(), permissions});
+        }
+
+        return result;
     }
 
     async isTreeVisible() {
