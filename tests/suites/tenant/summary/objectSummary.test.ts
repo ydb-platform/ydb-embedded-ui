@@ -201,7 +201,7 @@ test.describe('Object Summary', async () => {
         ]);
     });
 
-    test.only('Copy path copies correct path to clipboard', async ({page, browserName}) => {
+    test('Copy path copies correct path to clipboard', async ({page, browserName}) => {
         test.skip(browserName === 'webkit', 'Clipboard API is not reliable in Safari');
 
         const pageQueryParams = {
@@ -247,7 +247,7 @@ test.describe('Object Summary', async () => {
         await expect(treeItem).toBeVisible();
     });
 
-    test.only('Refresh button updates tree view after creating table', async ({page}) => {
+    test('Refresh button updates tree view after creating table', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
             database: tenantName,
