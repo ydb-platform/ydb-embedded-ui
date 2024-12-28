@@ -244,4 +244,36 @@ test.describe('Object Summary', async () => {
         const treeItem = page.locator('.ydb-tree-view').filter({hasText: directoryName});
         await expect(treeItem).toBeVisible();
     });
+
+    test.only('Refresh button updates tree view after creating table', async ({page}) => {
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            general: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+
+        const tableName = `a_test_table_${Date.now()}`;
+
+        // Create table by executing query
+        await queryEditor.setQuery(`CREATE TABLE \`${tableName}\` (id Int32, PRIMARY KEY(id));`);
+        await queryEditor.clickRunButton();
+        await queryEditor.waitForStatus('Completed');
+
+        // Verify table is not visible before refresh
+        const treeItemBeforeRefresh = page.locator('.ydb-tree-view').filter({hasText: tableName});
+        await expect(treeItemBeforeRefresh).not.toBeVisible();
+
+        // Click refresh button to update tree view
+        await objectSummary.clickRefreshButton();
+
+        // Verify table appears in tree
+        const treeItemAfterRefresh = page.locator('.ydb-tree-view').filter({hasText: tableName});
+        await expect(treeItemAfterRefresh).toBeVisible();
+    });
 });

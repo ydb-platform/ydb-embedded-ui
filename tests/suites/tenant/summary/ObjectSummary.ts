@@ -10,7 +10,6 @@ export enum ObjectSummaryTab {
     ACL = 'ACL',
     Schema = 'Schema',
 }
-
 export class ObjectSummary {
     private tabs: Locator;
     private schemaViewer: Locator;
@@ -24,6 +23,7 @@ export class ObjectSummary {
     private createDirectoryModal: Locator;
     private createDirectoryInput: Locator;
     private createDirectoryButton: Locator;
+    private refreshButton: Locator;
 
     constructor(page: Page) {
         this.tree = page.locator('.ydb-object-summary__tree');
@@ -40,6 +40,7 @@ export class ObjectSummary {
             '.g-text-input__control[placeholder="Relative path"]',
         );
         this.createDirectoryButton = page.locator('button.g-button_view_action:has-text("Create")');
+        this.refreshButton = page.locator('.ydb-object-summary__refresh-button');
     }
 
     async isCreateDirectoryModalVisible(): Promise<boolean> {
@@ -192,9 +193,12 @@ export class ObjectSummary {
     async getTableTemplates(): Promise<RowTableAction[]> {
         return this.actionsMenu.getTableTemplates();
     }
-
     async clickActionMenuItem(treeItemText: string, menuItemText: string): Promise<void> {
         await this.clickActionsButton(treeItemText);
         await this.clickActionsMenuItem(menuItemText);
+    }
+
+    async clickRefreshButton(): Promise<void> {
+        await this.refreshButton.click();
     }
 }
