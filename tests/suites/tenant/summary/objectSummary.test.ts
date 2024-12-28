@@ -213,7 +213,7 @@ test.describe('Object Summary', async () => {
         const objectSummary = new ObjectSummary(page);
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.CopyPath);
 
-        await page.waitForTimeout(100);
+        await page.waitForTimeout(1000);
 
         const clipboardContent = await getClipboardContent(page);
         expect(clipboardContent).toBe('.sys/ds_vslots');
