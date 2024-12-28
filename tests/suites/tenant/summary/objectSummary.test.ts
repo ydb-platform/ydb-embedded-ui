@@ -201,7 +201,7 @@ test.describe('Object Summary', async () => {
         ]);
     });
 
-    test.only('Copy path copies correct path to clipboard', async ({page}) => {
+    test('Copy path copies correct path to clipboard', async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
             database: tenantName,
