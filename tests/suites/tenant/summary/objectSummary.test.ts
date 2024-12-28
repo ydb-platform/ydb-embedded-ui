@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {wait} from '../../../../src/utils';
+import {getClipboardContent} from '../../../utils/clipboard';
 import {
     backend,
     dsStoragePoolsTableName,
@@ -161,7 +162,7 @@ test.describe('Object Summary', async () => {
         expect(vslotsColumns).not.toEqual(storagePoolsColumns);
     });
 
-    test.only('ACL tab shows correct access rights', async ({page}) => {
+    test('ACL tab shows correct access rights', async ({page}) => {
         const pageQueryParams = {
             schema: '/local/.sys_health',
             database: '/local',
@@ -198,5 +199,23 @@ test.describe('Object Summary', async () => {
             {group: 'ACCESS-ADMINS', permissions: ['GrantAccessRights']},
             {group: 'DATABASE-ADMINS', permissions: ['Manage']},
         ]);
+    });
+
+    test('Copy path copies correct path to clipboard', async ({page}) => {
+        const pageQueryParams = {
+            schema: dsVslotsSchema,
+            database: tenantName,
+            general: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const objectSummary = new ObjectSummary(page);
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.CopyPath);
+
+        await page.waitForTimeout(100);
+
+        const clipboardContent = await getClipboardContent(page);
+        expect(clipboardContent).toBe('.sys/ds_vslots');
     });
 });
