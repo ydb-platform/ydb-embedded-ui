@@ -1,5 +1,19 @@
 # Changelog
 
+## [8.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.3.0...v8.4.0) (2024-12-28)
+
+
+### Features
+
+* **autocomplete:** suggest columns from subqueries ([#1788](https://github.com/ydb-platform/ydb-embedded-ui/issues/1788)) ([1095d96](https://github.com/ydb-platform/ydb-embedded-ui/commit/1095d96fba7b803f013761ad250808e5f547566d))
+* set pdisks column width ([#1793](https://github.com/ydb-platform/ydb-embedded-ui/issues/1793)) ([db11791](https://github.com/ydb-platform/ydb-embedded-ui/commit/db11791071f0b8721d3329516515ca92f5185f71))
+
+
+### Bug Fixes
+
+* **Cluster:** show loader if capabilities not loaded ([#1785](https://github.com/ydb-platform/ydb-embedded-ui/issues/1785)) ([01b8424](https://github.com/ydb-platform/ydb-embedded-ui/commit/01b8424a8040c1d422f7fc1ec87e92d3a833ad4e))
+* handlers list that should be refetched in autorefresh mode ([#1791](https://github.com/ydb-platform/ydb-embedded-ui/issues/1791)) ([9d2280e](https://github.com/ydb-platform/ydb-embedded-ui/commit/9d2280e41fe5153fb5d5c62d30fc8ed25834c875))
+
 ## [8.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.2.2...v8.3.0) (2024-12-23)
 
 
