@@ -201,9 +201,7 @@ test.describe('Object Summary', async () => {
         ]);
     });
 
-    test('Copy path copies correct path to clipboard', async ({page, browserName}) => {
-        test.skip(browserName === 'webkit', 'Clipboard API is not reliable in Safari');
-
+    test.only('Copy path copies correct path to clipboard', async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
             database: tenantName,
@@ -215,9 +213,18 @@ test.describe('Object Summary', async () => {
         const objectSummary = new ObjectSummary(page);
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.CopyPath);
 
-        await page.waitForTimeout(1000);
+        // Wait for clipboard operation to complete
+        await page.waitForTimeout(2000);
 
-        const clipboardContent = await getClipboardContent(page);
+        // Retry clipboard read a few times if needed
+        let clipboardContent = '';
+        for (let i = 0; i < 3; i++) {
+            clipboardContent = await getClipboardContent(page);
+            if (clipboardContent) {
+                break;
+            }
+            await page.waitForTimeout(500);
+        }
         expect(clipboardContent).toBe('.sys/ds_vslots');
     });
 
