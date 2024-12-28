@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {wait} from '../../../../src/utils';
+import {getClipboardContent} from '../../../utils/clipboard';
 import {
     backend,
     dsStoragePoolsTableName,
@@ -159,5 +160,129 @@ test.describe('Object Summary', async () => {
 
         // Verify the column lists are different
         expect(vslotsColumns).not.toEqual(storagePoolsColumns);
+    });
+
+    test('ACL tab shows correct access rights', async ({page}) => {
+        const pageQueryParams = {
+            schema: '/local/.sys_health',
+            database: '/local',
+            summaryTab: 'acl',
+            tenantPage: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const objectSummary = new ObjectSummary(page);
+        await objectSummary.waitForAclVisible();
+
+        // Check Access Rights
+        const accessRights = await objectSummary.getAccessRights();
+        expect(accessRights).toEqual([{user: 'root@builtin', rights: 'Owner'}]);
+
+        // Check Effective Access Rights
+        const effectiveRights = await objectSummary.getEffectiveAccessRights();
+        expect(effectiveRights).toEqual([
+            {group: 'USERS', permissions: ['ConnectDatabase']},
+            {group: 'METADATA-READERS', permissions: ['List']},
+            {group: 'DATA-READERS', permissions: ['SelectRow']},
+            {group: 'DATA-WRITERS', permissions: ['UpdateRow', 'EraseRow']},
+            {
+                group: 'DDL-ADMINS',
+                permissions: [
+                    'WriteAttributes',
+                    'CreateDirectory',
+                    'CreateTable',
+                    'RemoveSchema',
+                    'AlterSchema',
+                ],
+            },
+            {group: 'ACCESS-ADMINS', permissions: ['GrantAccessRights']},
+            {group: 'DATABASE-ADMINS', permissions: ['Manage']},
+        ]);
+    });
+
+    test('Copy path copies correct path to clipboard', async ({page}) => {
+        const pageQueryParams = {
+            schema: dsVslotsSchema,
+            database: tenantName,
+            general: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const objectSummary = new ObjectSummary(page);
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.CopyPath);
+
+        // Wait for clipboard operation to complete
+        await page.waitForTimeout(2000);
+
+        // Retry clipboard read a few times if needed
+        let clipboardContent = '';
+        for (let i = 0; i < 3; i++) {
+            clipboardContent = await getClipboardContent(page);
+            if (clipboardContent) {
+                break;
+            }
+            await page.waitForTimeout(500);
+        }
+        expect(clipboardContent).toBe('.sys/ds_vslots');
+    });
+
+    test('Create directory in local node', async ({page}) => {
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            general: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const objectSummary = new ObjectSummary(page);
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+
+        const directoryName = `test_dir_${Date.now()}`;
+
+        // Open actions menu and click Create directory
+        await objectSummary.clickActionMenuItem('local', RowTableAction.CreateDirectory);
+        await expect(objectSummary.isCreateDirectoryModalVisible()).resolves.toBe(true);
+
+        // Create directory
+        await objectSummary.createDirectory(directoryName);
+
+        // Verify the new directory appears in the tree
+        const treeItem = page.locator('.ydb-tree-view').filter({hasText: directoryName});
+        await expect(treeItem).toBeVisible();
+    });
+
+    test('Refresh button updates tree view after creating table', async ({page}) => {
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            general: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+
+        const tableName = `a_test_table_${Date.now()}`;
+
+        // Create table by executing query
+        await queryEditor.setQuery(`CREATE TABLE \`${tableName}\` (id Int32, PRIMARY KEY(id));`);
+        await queryEditor.clickRunButton();
+        await queryEditor.waitForStatus('Completed');
+
+        // Verify table is not visible before refresh
+        const treeItemBeforeRefresh = page.locator('.ydb-tree-view').filter({hasText: tableName});
+        await expect(treeItemBeforeRefresh).not.toBeVisible();
+
+        // Click refresh button to update tree view
+        await objectSummary.clickRefreshButton();
+
+        // Verify table appears in tree
+        const treeItemAfterRefresh = page.locator('.ydb-tree-view').filter({hasText: tableName});
+        await expect(treeItemAfterRefresh).toBeVisible();
     });
 });

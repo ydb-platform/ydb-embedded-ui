@@ -10,7 +10,6 @@ export enum ObjectSummaryTab {
     ACL = 'ACL',
     Schema = 'Schema',
 }
-
 export class ObjectSummary {
     private tabs: Locator;
     private schemaViewer: Locator;
@@ -18,6 +17,13 @@ export class ObjectSummary {
     private treeRows: Locator;
     private primaryKeys: Locator;
     private actionsMenu: ActionsMenu;
+    private aclWrapper: Locator;
+    private aclList: Locator;
+    private effectiveAclList: Locator;
+    private createDirectoryModal: Locator;
+    private createDirectoryInput: Locator;
+    private createDirectoryButton: Locator;
+    private refreshButton: Locator;
 
     constructor(page: Page) {
         this.tree = page.locator('.ydb-object-summary__tree');
@@ -26,6 +32,82 @@ export class ObjectSummary {
         this.schemaViewer = page.locator('.schema-viewer');
         this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
         this.actionsMenu = new ActionsMenu(page.locator('.g-popup.g-popup_open'));
+        this.aclWrapper = page.locator('.ydb-acl');
+        this.aclList = this.aclWrapper.locator('dl.gc-definition-list').first();
+        this.effectiveAclList = this.aclWrapper.locator('dl.gc-definition-list').last();
+        this.createDirectoryModal = page.locator('.g-modal.g-modal_open');
+        this.createDirectoryInput = page.locator(
+            '.g-text-input__control[placeholder="Relative path"]',
+        );
+        this.createDirectoryButton = page.locator('button.g-button_view_action:has-text("Create")');
+        this.refreshButton = page.locator('.ydb-object-summary__refresh-button');
+    }
+
+    async isCreateDirectoryModalVisible(): Promise<boolean> {
+        try {
+            await this.createDirectoryModal.waitFor({
+                state: 'visible',
+                timeout: VISIBILITY_TIMEOUT,
+            });
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async enterDirectoryName(name: string): Promise<void> {
+        await this.createDirectoryInput.fill(name);
+    }
+
+    async clickCreateDirectoryButton(): Promise<void> {
+        await this.createDirectoryButton.click();
+    }
+
+    async createDirectory(name: string): Promise<void> {
+        await this.enterDirectoryName(name);
+        await this.clickCreateDirectoryButton();
+        // Wait for modal to close
+        await this.createDirectoryModal.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+    }
+
+    async waitForAclVisible() {
+        await this.aclWrapper.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async getAccessRights(): Promise<{user: string; rights: string}[]> {
+        await this.waitForAclVisible();
+        const items = await this.aclList.locator('.gc-definition-list__item').all();
+        const result = [];
+
+        for (const item of items) {
+            const user =
+                (await item.locator('.gc-definition-list__term-wrapper span').textContent()) || '';
+            const definitionContent = await item.locator('.gc-definition-list__definition').first();
+            const rights = (await definitionContent.textContent()) || '';
+            result.push({user: user.trim(), rights: rights.trim()});
+        }
+
+        return result;
+    }
+
+    async getEffectiveAccessRights(): Promise<{group: string; permissions: string[]}[]> {
+        await this.waitForAclVisible();
+        const items = await this.effectiveAclList.locator('.gc-definition-list__item').all();
+        const result = [];
+
+        for (const item of items) {
+            const group =
+                (await item.locator('.gc-definition-list__term-wrapper span').textContent()) || '';
+            const definitionContent = await item.locator('.gc-definition-list__definition').first();
+            const permissionElements = await definitionContent.locator('span').all();
+            const permissions = await Promise.all(
+                permissionElements.map(async (el) => ((await el.textContent()) || '').trim()),
+            );
+            result.push({group: group.trim(), permissions});
+        }
+
+        return result;
     }
 
     async isTreeVisible() {
@@ -111,9 +193,12 @@ export class ObjectSummary {
     async getTableTemplates(): Promise<RowTableAction[]> {
         return this.actionsMenu.getTableTemplates();
     }
-
     async clickActionMenuItem(treeItemText: string, menuItemText: string): Promise<void> {
         await this.clickActionsButton(treeItemText);
         await this.clickActionsMenuItem(menuItemText);
+    }
+
+    async clickRefreshButton(): Promise<void> {
+        await this.refreshButton.click();
     }
 }
