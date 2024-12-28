@@ -15,21 +15,22 @@ export function lazyComponent<TExports extends {[key: string]: any}, TKey extend
             .then((module) => ({default: module[exportName] as React.ComponentType}))
             .catch((error) => ({default: () => <ErrorBoundaryFallback error={error} />})),
     );
-    const LazyComponent = (
-        props: React.ComponentProps<TExports[TKey]>,
-        ref: React.ForwardedRef<TExports[TKey]>,
-    ) => {
-        const ErrorBoundary = useComponent('ErrorBoundary');
-        return (
-            <ErrorBoundary>
-                <React.Suspense fallback={loader ?? <DefaultLoader />}>
-                    <Component ref={ref} {...props} />
-                </React.Suspense>
-            </ErrorBoundary>
-        );
-    };
+
+    const LazyComponent = React.forwardRef<TExports[TKey], React.ComponentProps<TExports[TKey]>>(
+        (props, ref) => {
+            const ErrorBoundary = useComponent('ErrorBoundary');
+            return (
+                <ErrorBoundary>
+                    <React.Suspense fallback={loader ?? <DefaultLoader />}>
+                        <Component ref={ref} {...props} />
+                    </React.Suspense>
+                </ErrorBoundary>
+            );
+        },
+    );
+
     LazyComponent.displayName = exportName as string;
-    return React.forwardRef(LazyComponent);
+    return LazyComponent;
 }
 
 function DefaultLoader() {
