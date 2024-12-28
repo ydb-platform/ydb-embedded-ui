@@ -201,7 +201,9 @@ test.describe('Object Summary', async () => {
         ]);
     });
 
-    test('Copy path copies correct path to clipboard', async ({page}) => {
+    test.only('Copy path copies correct path to clipboard', async ({page, browserName}) => {
+        test.skip(browserName === 'webkit', 'Clipboard API is not reliable in Safari');
+
         const pageQueryParams = {
             schema: dsVslotsSchema,
             database: tenantName,
