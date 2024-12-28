@@ -21,6 +21,9 @@ export class ObjectSummary {
     private aclWrapper: Locator;
     private aclList: Locator;
     private effectiveAclList: Locator;
+    private createDirectoryModal: Locator;
+    private createDirectoryInput: Locator;
+    private createDirectoryButton: Locator;
 
     constructor(page: Page) {
         this.tree = page.locator('.ydb-object-summary__tree');
@@ -32,6 +35,38 @@ export class ObjectSummary {
         this.aclWrapper = page.locator('.ydb-acl');
         this.aclList = this.aclWrapper.locator('dl.gc-definition-list').first();
         this.effectiveAclList = this.aclWrapper.locator('dl.gc-definition-list').last();
+        this.createDirectoryModal = page.locator('.g-modal.g-modal_open');
+        this.createDirectoryInput = page.locator(
+            '.g-text-input__control[placeholder="Relative path"]',
+        );
+        this.createDirectoryButton = page.locator('button.g-button_view_action:has-text("Create")');
+    }
+
+    async isCreateDirectoryModalVisible(): Promise<boolean> {
+        try {
+            await this.createDirectoryModal.waitFor({
+                state: 'visible',
+                timeout: VISIBILITY_TIMEOUT,
+            });
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async enterDirectoryName(name: string): Promise<void> {
+        await this.createDirectoryInput.fill(name);
+    }
+
+    async clickCreateDirectoryButton(): Promise<void> {
+        await this.createDirectoryButton.click();
+    }
+
+    async createDirectory(name: string): Promise<void> {
+        await this.enterDirectoryName(name);
+        await this.clickCreateDirectoryButton();
+        // Wait for modal to close
+        await this.createDirectoryModal.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
     }
 
     async waitForAclVisible() {

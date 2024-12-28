@@ -218,4 +218,30 @@ test.describe('Object Summary', async () => {
         const clipboardContent = await getClipboardContent(page);
         expect(clipboardContent).toBe('.sys/ds_vslots');
     });
+
+    test('Create directory in local node', async ({page}) => {
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            general: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const objectSummary = new ObjectSummary(page);
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+
+        const directoryName = `test_dir_${Date.now()}`;
+
+        // Open actions menu and click Create directory
+        await objectSummary.clickActionMenuItem('local', RowTableAction.CreateDirectory);
+        await expect(objectSummary.isCreateDirectoryModalVisible()).resolves.toBe(true);
+
+        // Create directory
+        await objectSummary.createDirectory(directoryName);
+
+        // Verify the new directory appears in the tree
+        const treeItem = page.locator('.ydb-tree-view').filter({hasText: directoryName});
+        await expect(treeItem).toBeVisible();
+    });
 });
