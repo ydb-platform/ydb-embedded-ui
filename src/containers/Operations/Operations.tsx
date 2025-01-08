@@ -1,12 +1,12 @@
 import React from 'react';
 
 import {AccessDenied} from '../../components/Errors/403';
-import {isAccessError} from '../../components/Errors/PageError/PageError';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {operationsApi} from '../../store/reducers/operations';
 import {useAutoRefreshInterval} from '../../utils/hooks';
+import {isAccessError} from '../../utils/response';
 
 import {OperationsControls} from './OperationsControls';
 import {getColumns} from './columns';

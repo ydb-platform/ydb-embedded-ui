@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {isAccessError, isRedirectToAuth} from '../../../utils/response';
 import type {EmptyStateProps} from '../../EmptyState';
 import {EmptyState} from '../../EmptyState';
 import {Illustration} from '../../Illustration';
@@ -15,6 +16,11 @@ interface PageErrorProps extends Omit<EmptyStateProps, 'image' | 'title' | 'desc
 }
 
 export function PageError({title, description, error, children, ...restProps}: PageErrorProps) {
+    if (isRedirectToAuth(error)) {
+        // Do not show an error, because we redirect to auth anyway.
+        return null;
+    }
+
     if (isAccessError(error)) {
         return <AccessDenied title={title} description={description} {...restProps} />;
     }
@@ -31,13 +37,4 @@ export function PageError({title, description, error, children, ...restProps}: P
     }
 
     return <React.Fragment>{children}</React.Fragment>;
-}
-
-export function isAccessError(error: unknown) {
-    return Boolean(
-        error &&
-            typeof error === 'object' &&
-            'status' in error &&
-            (error.status === 403 || error.status === 401),
-    );
 }

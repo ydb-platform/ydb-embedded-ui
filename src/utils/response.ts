@@ -24,3 +24,25 @@ export function isAxiosError(error: unknown): error is AxiosErrorObject {
         error && typeof error === 'object' && 'name' in error && error.name === 'AxiosError',
     );
 }
+
+export function isAccessError(error: unknown): error is {status: number} {
+    return Boolean(
+        error &&
+            typeof error === 'object' &&
+            'status' in error &&
+            (error.status === 403 || error.status === 401),
+    );
+}
+
+export function isRedirectToAuth(error: unknown): error is {status: 401; data: {authUrl: string}} {
+    return Boolean(
+        isAccessError(error) &&
+            error.status === 401 &&
+            'data' in error &&
+            error.data &&
+            typeof error.data === 'object' &&
+            'authUrl' in error.data &&
+            error.data.authUrl &&
+            typeof error.data.authUrl === 'string',
+    );
+}
