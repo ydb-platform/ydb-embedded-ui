@@ -115,4 +115,33 @@ test.describe('Query History', () => {
         const value = await queryEditor.resultTable.getCellValue(1, 2);
         expect(value).toBe('42');
     });
+
+    test('Can search in query history', async () => {
+        const queries = [
+            'SELECT 1 AS first_test;',
+            'SELECT 2 AS second_test;',
+            'SELECT 3 AS another_query;',
+        ];
+
+        // Execute multiple queries
+        for (const query of queries) {
+            await queryEditor.run(query, QUERY_MODES.script);
+        }
+
+        // Navigate to the history tab
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+
+        // Search for "test" queries
+        await queryEditor.historyQueries.search('test');
+
+        // Verify only queries with "test" are visible
+        const firstQueryRow = await queryEditor.historyQueries.getQueryRow(queries[0]);
+        const secondQueryRow = await queryEditor.historyQueries.getQueryRow(queries[1]);
+        const otherQueryRow = await queryEditor.historyQueries.getQueryRow(queries[2]);
+
+        await expect(firstQueryRow).toBeVisible();
+        await expect(secondQueryRow).toBeVisible();
+        await expect(otherQueryRow).not.toBeVisible();
+    });
 });
