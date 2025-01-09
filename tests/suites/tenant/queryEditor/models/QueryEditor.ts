@@ -240,6 +240,28 @@ export class QueryEditor {
         return true;
     }
 
+    async collapseResultsControls() {
+        const collapseButton = this.resultsControls.locator('button[title="Collapse"]');
+        await collapseButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await collapseButton.click();
+    }
+
+    async expandResultsControls() {
+        const expandButton = this.resultsControls.locator('button[title="Expand"]');
+        await expandButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await expandButton.click();
+    }
+
+    async isResultsControlsCollapsed() {
+        const expandButton = this.resultsControls.locator('button[title="Expand"]');
+        try {
+            await expandButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     async isRunButtonEnabled() {
         return this.runButton.isEnabled({timeout: VISIBILITY_TIMEOUT});
     }

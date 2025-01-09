@@ -296,4 +296,25 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.hasMultipleResultTabs()).resolves.toBe(false);
         await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Result(1)');
     });
+
+    test('Results controls collapse and expand functionality', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        // Run a query to show results
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.clickRunButton();
+        await queryEditor.waitForStatus('Completed');
+
+        // Verify controls are initially visible
+        await expect(queryEditor.isResultsControlsVisible()).resolves.toBe(true);
+        await expect(queryEditor.isResultsControlsCollapsed()).resolves.toBe(false);
+
+        // Test collapse
+        await queryEditor.collapseResultsControls();
+        await expect(queryEditor.isResultsControlsCollapsed()).resolves.toBe(true);
+
+        // Test expand
+        await queryEditor.expandResultsControls();
+        await expect(queryEditor.isResultsControlsCollapsed()).resolves.toBe(false);
+    });
 });

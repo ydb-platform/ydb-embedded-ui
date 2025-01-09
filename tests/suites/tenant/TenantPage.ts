@@ -3,7 +3,7 @@ import type {Locator, Page} from '@playwright/test';
 import {PageModel} from '../../models/PageModel';
 import {tenantPage} from '../../utils/constants';
 
-export const VISIBILITY_TIMEOUT = 10000;
+export const VISIBILITY_TIMEOUT = 5000;
 
 export enum NavigationTabs {
     Query = 'Query',
