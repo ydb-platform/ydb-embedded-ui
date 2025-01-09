@@ -165,6 +165,16 @@ export class QueryEditor {
         await this.editorTextArea.press(key);
     }
 
+    async runSelectedQueryViaContextMenu() {
+        await this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            if (editor) {
+                // Trigger the sendSelectedQuery action directly
+                editor.trigger('contextMenu', 'sendSelectedQuery', null);
+            }
+        });
+    }
+
     async closeSettingsDialog() {
         await this.settingsDialog.clickButton(ButtonNames.Cancel);
     }

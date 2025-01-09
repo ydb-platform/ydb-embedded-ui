@@ -243,7 +243,9 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 
-    test('Running selected query executes only selected part', async ({page}) => {
+    test('Running selected query via keyboard shortcut executes only selected part', async ({
+        page,
+    }) => {
         const queryEditor = new QueryEditor(page);
         const multiQuery = 'SELECT 1;\nSELECT 2;';
 
@@ -263,6 +265,32 @@ test.describe('Test Query Editor', async () => {
 
         // Use keyboard shortcut to run selected query
         await executeSelectedQueryWithKeybinding(page);
+
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(queryEditor.resultTable.hasMultipleResultTabs()).resolves.toBe(false);
+        await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Result(1)');
+    });
+
+    test('Running selected query via context menu executes only selected part', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        const multiQuery = 'SELECT 1;\nSELECT 2;';
+
+        // First verify running the entire query produces two results with tabs
+        await queryEditor.setQuery(multiQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        // Verify there are two result tabs
+        await expect(queryEditor.resultTable.getResultTabsCount()).resolves.toBe(2);
+        await expect(queryEditor.resultTable.getResultTabTitle(0)).resolves.toBe('Result #1');
+        await expect(queryEditor.resultTable.getResultTabTitle(1)).resolves.toBe('Result #2');
+
+        // Then verify running only selected part produces one result without tabs
+        await queryEditor.focusEditor();
+        await queryEditor.selectText(1, 1, 1, 9);
+
+        // Use context menu to run selected query
+        await queryEditor.runSelectedQueryViaContextMenu();
 
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
         await expect(queryEditor.resultTable.hasMultipleResultTabs()).resolves.toBe(false);
