@@ -24,6 +24,10 @@ export class ObjectSummary {
     private createDirectoryInput: Locator;
     private createDirectoryButton: Locator;
     private refreshButton: Locator;
+    private infoCollapseButton: Locator;
+    private infoExpandButton: Locator;
+    private summaryCollapseButton: Locator;
+    private summaryExpandButton: Locator;
 
     constructor(page: Page) {
         this.tree = page.locator('.ydb-object-summary__tree');
@@ -41,6 +45,33 @@ export class ObjectSummary {
         );
         this.createDirectoryButton = page.locator('button.g-button_view_action:has-text("Create")');
         this.refreshButton = page.locator('.ydb-object-summary__refresh-button');
+
+        // Info panel collapse/expand buttons
+        this.infoCollapseButton = page.locator(
+            '.ydb-object-summary__info-controls button[title="Collapse"]',
+        );
+        this.infoExpandButton = page.locator(
+            '.ydb-object-summary__info-controls button[title="Expand"]',
+        );
+        this.summaryCollapseButton = page.locator(
+            '.ydb-object-summary__actions button[title="Collapse"]',
+        );
+        this.summaryExpandButton = page.locator(
+            '.ydb-object-summary__actions button[title="Expand"]',
+        );
+    }
+
+    async collapseInfoPanel(): Promise<void> {
+        await this.infoCollapseButton.click();
+    }
+
+    async expandInfoPanel(): Promise<void> {
+        await this.infoExpandButton.click();
+    }
+
+    async isInfoPanelCollapsed(): Promise<boolean> {
+        // When panel is collapsed, expand button should be visible
+        return this.infoExpandButton.isVisible();
     }
 
     async isCreateDirectoryModalVisible(): Promise<boolean> {
@@ -200,5 +231,18 @@ export class ObjectSummary {
 
     async clickRefreshButton(): Promise<void> {
         await this.refreshButton.click();
+    }
+
+    async collapseSummary(): Promise<void> {
+        await this.summaryCollapseButton.click();
+    }
+
+    async expandSummary(): Promise<void> {
+        await this.summaryExpandButton.click();
+    }
+
+    async isSummaryCollapsed(): Promise<boolean> {
+        // When summary is collapsed, expand button should be visible
+        return this.summaryExpandButton.isVisible();
     }
 }

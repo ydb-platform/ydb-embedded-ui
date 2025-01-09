@@ -285,4 +285,28 @@ test.describe('Object Summary', async () => {
         const treeItemAfterRefresh = page.locator('.ydb-tree-view').filter({hasText: tableName});
         await expect(treeItemAfterRefresh).toBeVisible();
     });
+
+    test('Info panel collapse and expand functionality', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+
+        // Test info panel collapse/expand
+        await objectSummary.collapseInfoPanel();
+        await expect(objectSummary.isInfoPanelCollapsed()).resolves.toBe(true);
+
+        await objectSummary.expandInfoPanel();
+        await expect(objectSummary.isInfoPanelCollapsed()).resolves.toBe(false);
+    });
+
+    test('Summary collapse and expand functionality', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+
+        // Test summary collapse/expand
+        await objectSummary.collapseSummary();
+        await expect(objectSummary.isSummaryCollapsed()).resolves.toBe(true);
+
+        await objectSummary.expandSummary();
+        await expect(objectSummary.isSummaryCollapsed()).resolves.toBe(false);
+    });
 });
