@@ -3,7 +3,8 @@ import {expect, test} from '@playwright/test';
 import {QUERY_MODES} from '../../../../src/utils/query';
 import {tenantName} from '../../../utils/constants';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
-import {QueryEditor} from '../queryEditor/models/QueryEditor';
+import {QueryEditor, QueryTabs} from '../queryEditor/models/QueryEditor';
+import {UnsavedChangesModal} from '../queryEditor/models/UnsavedChangesModal';
 
 import executeQueryWithKeybinding from './utils';
 
@@ -23,23 +24,22 @@ test.describe('Query History', () => {
         queryEditor = new QueryEditor(page);
     });
 
-    test('New query appears in history after execution', async ({page}) => {
+    test('New query appears in history after execution', async () => {
         const testQuery = 'SELECT 1 AS test_column;';
 
         // Execute the query
         await queryEditor.run(testQuery, QUERY_MODES.script);
 
-        // Navigate to the history tab
-        await page.click('text=History');
+        // Navigate to the history tab using existing navigation method
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
 
         // Check if the query appears in the history
-        const historyTable = page.locator('.ydb-queries-history table');
-        await expect(historyTable.locator('.yql-highlighter', {hasText: testQuery})).toBeVisible({
-            timeout: VISIBILITY_TIMEOUT,
-        });
+        await queryEditor.historyQueries.isVisible();
+        const queryRow = await queryEditor.historyQueries.getQueryRow(testQuery);
+        await expect(queryRow).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
-    test('Multiple queries appear in correct order in history', async ({page}) => {
+    test('Multiple queries appear in correct order in history', async () => {
         const queries = [
             'SELECT 1 AS first_query;',
             'SELECT 2 AS second_query;',
@@ -51,17 +51,19 @@ test.describe('Query History', () => {
             await queryEditor.run(query, QUERY_MODES.script);
         }
 
-        // Navigate to the history tab
-        await page.click('text=History');
+        // Navigate to the history tab using existing navigation method
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
 
         // Check if queries appear in reverse order (most recent first)
-        const historyTable = page.locator('.ydb-queries-history table');
-        const rows = historyTable.locator('tbody tr');
-
-        await expect(rows).toHaveCount(queries.length);
+        await queryEditor.historyQueries.isVisible();
 
         for (let i = 0; i < queries.length; i++) {
-            await expect(rows.nth(i)).toContainText(queries[queries.length - 1 - i]);
+            const queryRow = await queryEditor.historyQueries.getQueryRow(
+                queries[queries.length - 1 - i],
+            );
+            await expect(queryRow).toBeVisible();
+            const queryText = await queryEditor.historyQueries.getQueryText(i);
+            expect(queryText).toContain(queries[queries.length - 1 - i]);
         }
     });
 
@@ -77,14 +79,40 @@ test.describe('Query History', () => {
         // Use the keybinding to execute the query
         await executeQueryWithKeybinding(page, browserName);
 
-        // Wait for the query to be executed
-        await page.waitForSelector('.ydb-query-result-sets-viewer__result', {timeout: 10000});
+        // Wait for query results
+        await queryEditor.resultTable.isVisible();
 
-        // Navigate to the history tab
-        await page.click('text=History');
+        // Navigate to the history tab using existing navigation method
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
 
         // Check if the query appears in the history
-        const historyTable = page.locator('.ydb-queries-history table');
-        await expect(historyTable.locator('.yql-highlighter', {hasText: testQuery})).toBeVisible();
+        await queryEditor.historyQueries.isVisible();
+        const queryRow = await queryEditor.historyQueries.getQueryRow(testQuery);
+        await expect(queryRow).toBeVisible();
+    });
+
+    test('Can run query from history', async ({page}) => {
+        const testQuery = 'SELECT 42 AS history_run_test;';
+        const unsavedChangesModal = new UnsavedChangesModal(page);
+
+        // Execute the query first time
+        await queryEditor.run(testQuery, QUERY_MODES.script);
+
+        // Navigate to the history tab using existing navigation method
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+
+        // Select query from history to load it into editor
+        await queryEditor.historyQueries.selectQuery(testQuery);
+
+        // Handle unsaved changes modal by clicking "Don't save"
+        await unsavedChangesModal.clickDontSave();
+
+        // Run the query using the editor
+        await queryEditor.clickRunButton();
+
+        // Verify query was executed by checking results
+        await queryEditor.resultTable.isVisible();
+        const value = await queryEditor.resultTable.getCellValue(1, 2);
+        expect(value).toBe('42');
     });
 });

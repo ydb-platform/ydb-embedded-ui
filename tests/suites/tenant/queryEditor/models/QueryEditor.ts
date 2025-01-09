@@ -3,6 +3,7 @@ import type {Locator, Page} from '@playwright/test';
 import type {QUERY_MODES} from '../../../../../src/utils/query';
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
 
+import {QueriesHistoryTable} from './QueriesHistoryTable';
 import {QueryTabsNavigation} from './QueryTabsNavigation';
 import {PaneWrapper, ResultTable} from './ResultTable';
 import {SavedQueriesTable} from './SavedQueriesTable';
@@ -41,6 +42,7 @@ export class QueryEditor {
     queryTabs: QueryTabsNavigation;
     resultTable: ResultTable;
     savedQueries: SavedQueriesTable;
+    historyQueries: QueriesHistoryTable;
     editorTextArea: Locator;
 
     private page: Page;
@@ -78,6 +80,7 @@ export class QueryEditor {
         this.paneWrapper = new PaneWrapper(page);
         this.queryTabs = new QueryTabsNavigation(page);
         this.savedQueries = new SavedQueriesTable(page);
+        this.historyQueries = new QueriesHistoryTable(page);
     }
 
     async run(query: string, mode: keyof typeof QUERY_MODES) {
@@ -197,6 +200,7 @@ export class QueryEditor {
 
     async setQuery(query: string) {
         await this.editorTextArea.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.editorTextArea.clear();
         await this.editorTextArea.fill(query);
     }
 
