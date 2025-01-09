@@ -1,5 +1,6 @@
 import type {Locator, Page} from '@playwright/test';
 
+import {isInViewport} from '../../../utils/dom';
 import {VISIBILITY_TIMEOUT} from '../TenantPage';
 
 import {ActionsMenu} from './ActionsMenu';
@@ -28,6 +29,7 @@ export class ObjectSummary {
     private infoExpandButton: Locator;
     private summaryCollapseButton: Locator;
     private summaryExpandButton: Locator;
+    private overviewWrapper: Locator;
 
     constructor(page: Page) {
         this.tree = page.locator('.ydb-object-summary__tree');
@@ -59,6 +61,7 @@ export class ObjectSummary {
         this.summaryExpandButton = page.locator(
             '.ydb-object-summary__actions button[title="Expand"]',
         );
+        this.overviewWrapper = page.locator('.ydb-object-summary__overview-wrapper');
     }
 
     async collapseInfoPanel(): Promise<void> {
@@ -70,8 +73,19 @@ export class ObjectSummary {
     }
 
     async isInfoPanelCollapsed(): Promise<boolean> {
-        // When panel is collapsed, expand button should be visible
-        return this.infoExpandButton.isVisible();
+        const expandButtonVisible = await this.infoExpandButton.isVisible();
+        if (!expandButtonVisible) {
+            return false;
+        }
+
+        const isVisible = await this.overviewWrapper.isVisible();
+        if (!isVisible) {
+            return true;
+        }
+
+        // Check if it's actually in the viewport
+        const elementInViewport = await isInViewport(this.overviewWrapper);
+        return !elementInViewport;
     }
 
     async isCreateDirectoryModalVisible(): Promise<boolean> {
@@ -242,7 +256,18 @@ export class ObjectSummary {
     }
 
     async isSummaryCollapsed(): Promise<boolean> {
-        // When summary is collapsed, expand button should be visible
-        return this.summaryExpandButton.isVisible();
+        const expandButtonVisible = await this.summaryExpandButton.isVisible();
+        if (!expandButtonVisible) {
+            return false;
+        }
+
+        const isVisible = await this.tree.isVisible();
+        if (!isVisible) {
+            return true;
+        }
+
+        // Check if it's actually in the viewport
+        const elementInViewport = await isInViewport(this.tree);
+        return !elementInViewport;
     }
 }
