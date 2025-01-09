@@ -4,6 +4,7 @@ import axiosRetry from 'axios-retry';
 
 import {backend as BACKEND} from '../../store';
 import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
+import {isRedirectToAuth} from '../../utils/response';
 import {settingsManager} from '../settings';
 
 export type AxiosOptions = {
@@ -63,7 +64,7 @@ export class BaseYdbAPI extends AxiosWrapper {
             // OIDC proxy returns 401 response with authUrl in it
             // authUrl - external auth service link, after successful auth additional cookies will be appended
             // that will allow access to clusters where OIDC proxy is a balancer
-            if (response && response.status === 401 && response.data?.authUrl) {
+            if (isRedirectToAuth(response)) {
                 window.location.assign(response.data.authUrl);
             }
 

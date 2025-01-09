@@ -3,7 +3,7 @@ import React from 'react';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
-import {PageError, isAccessError} from '../../components/Errors/PageError/PageError';
+import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
@@ -12,6 +12,7 @@ import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/add
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {isAccessError} from '../../utils/response';
 
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
