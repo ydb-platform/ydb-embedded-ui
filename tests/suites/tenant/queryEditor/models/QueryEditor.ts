@@ -144,6 +144,27 @@ export class QueryEditor {
         await this.editorTextArea.focus();
     }
 
+    async selectText(startLine: number, startColumn: number, endLine: number, endColumn: number) {
+        await this.editorTextArea.evaluate(
+            (_, coords) => {
+                const editor = window.ydbEditor;
+                if (editor) {
+                    editor.setSelection({
+                        startLineNumber: coords.startLine,
+                        startColumn: coords.startColumn,
+                        endLineNumber: coords.endLine,
+                        endColumn: coords.endColumn,
+                    });
+                }
+            },
+            {startLine, startColumn, endLine, endColumn},
+        );
+    }
+
+    async pressKeys(key: string) {
+        await this.editorTextArea.press(key);
+    }
+
     async closeSettingsDialog() {
         await this.settingsDialog.clickButton(ButtonNames.Cancel);
     }

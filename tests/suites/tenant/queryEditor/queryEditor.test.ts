@@ -12,6 +12,7 @@ import {
     QueryTabs,
     ResultTabNames,
 } from './models/QueryEditor';
+import {executeSelectedQueryWithKeybinding} from './utils';
 
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
@@ -240,5 +241,31 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+    });
+
+    test('Running selected query executes only selected part', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        const multiQuery = 'SELECT 1;\nSELECT 2;';
+
+        // First verify running the entire query produces two results
+        await queryEditor.setQuery(multiQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        // Verify there are two result tabs
+        await expect(queryEditor.resultTable.getResultTabsCount()).resolves.toBe(2);
+        await expect(queryEditor.resultTable.getResultTabTitle(0)).resolves.toBe('Result #1');
+        await expect(queryEditor.resultTable.getResultTabTitle(1)).resolves.toBe('Result #2');
+
+        // Then verify running only selected part produces one result
+        await queryEditor.focusEditor();
+        await queryEditor.selectText(1, 1, 1, 9);
+
+        // Use keyboard shortcut to run selected query
+        await executeSelectedQueryWithKeybinding(page);
+
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(queryEditor.resultTable.hasMultipleResultTabs()).resolves.toBe(false);
+        await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Result(1)');
     });
 });
