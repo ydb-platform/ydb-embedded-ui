@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
+import {getClipboardContent} from '../../../utils/clipboard';
 import {tenantName} from '../../../utils/constants';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {createTableQuery, longRunningQuery, longTableSelect} from '../constants';
@@ -316,5 +317,34 @@ test.describe('Test Query Editor', async () => {
         // Test expand
         await queryEditor.expandResultsControls();
         await expect(queryEditor.isResultsControlsCollapsed()).resolves.toBe(false);
+    });
+
+    test('Copy result button copies to clipboard', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        const query = 'SELECT 42 as answer;';
+
+        // Run query to get results
+        await queryEditor.setQuery(query);
+        await queryEditor.clickRunButton();
+        await queryEditor.waitForStatus('Completed');
+
+        // Click copy button
+        await queryEditor.clickCopyResultButton();
+
+        // Wait for clipboard operation to complete
+        await page.waitForTimeout(2000);
+
+        // Retry clipboard read a few times if needed
+        let clipboardContent = '';
+        for (let i = 0; i < 3; i++) {
+            clipboardContent = await getClipboardContent(page);
+            if (clipboardContent) {
+                break;
+            }
+            await page.waitForTimeout(500);
+        }
+
+        // Verify clipboard contains the query result
+        expect(clipboardContent).toContain('42');
     });
 });
