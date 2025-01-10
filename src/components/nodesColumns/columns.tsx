@@ -1,7 +1,6 @@
 import DataTable from '@gravity-ui/react-data-table';
 import {DefinitionList} from '@gravity-ui/uikit';
 
-import {getLoadSeverityForNode} from '../../store/reducers/nodes/utils';
 import type {TMemoryStats, TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {valueIsDefined} from '../../utils';
@@ -12,7 +11,7 @@ import {
     formatStorageValues,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
-import {getSpaceUsageSeverity} from '../../utils/storage';
+import {getUsageSeverity} from '../../utils/generateEvaluator';
 import type {Column} from '../../utils/tableUtils/types';
 import {bytesToSpeed, isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
@@ -299,7 +298,7 @@ export function getLoadColumn<T extends {LoadAveragePercents?: number[]}>(): Col
             row.LoadAveragePercents && row.LoadAveragePercents.length > 0 ? (
                 <UsageLabel
                     value={row.LoadAveragePercents[0].toFixed()}
-                    theme={getLoadSeverityForNode(row.LoadAveragePercents[0])}
+                    theme={getUsageSeverity(row.LoadAveragePercents[0])}
                 />
             ) : (
                 EMPTY_DATA_PLACEHOLDER
@@ -317,7 +316,7 @@ export function getDiskSpaceUsageColumn<T extends {DiskSpaceUsage?: number}>(): 
             return valueIsDefined(row.DiskSpaceUsage) ? (
                 <UsageLabel
                     value={Math.floor(row.DiskSpaceUsage)}
-                    theme={getSpaceUsageSeverity(row.DiskSpaceUsage)}
+                    theme={getUsageSeverity(row.DiskSpaceUsage)}
                 />
             ) : (
                 EMPTY_DATA_PLACEHOLDER

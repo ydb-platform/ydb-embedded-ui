@@ -4,11 +4,11 @@ import type {PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import type {StorageViewContext} from '../types';
 
-const defaultDegradationEvaluator = generateEvaluator(1, 2, ['success', 'warning', 'danger']);
+const defaultDegradationEvaluator = generateEvaluator(['success', 'warning', 'danger'], 1, 2);
 
 const degradationEvaluators = {
-    'block-4-2': generateEvaluator(1, 2, ['success', 'warning', 'danger']),
-    'mirror-3-dc': generateEvaluator(1, 3, ['success', 'warning', 'danger']),
+    'block-4-2': generateEvaluator(['success', 'warning', 'danger'], 1, 2),
+    'mirror-3-dc': generateEvaluator(['success', 'warning', 'danger'], 1, 3),
 };
 
 const canEvaluateErasureSpecies = (value?: string): value is keyof typeof degradationEvaluators =>

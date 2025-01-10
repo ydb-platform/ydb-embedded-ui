@@ -6,9 +6,9 @@ import {InternalLink} from '../../../../../components/InternalLink';
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
 import {TabletNameWrapper} from '../../../../../components/TabletNameWrapper/TabletNameWrapper';
 import {UsageLabel} from '../../../../../components/UsageLabel/UsageLabel';
-import {getLoadSeverityForShard} from '../../../../../store/reducers/tenantOverview/topShards/utils';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatNumber, roundToPrecision} from '../../../../../utils/dataFormatters/dataFormatters';
+import {getUsageSeverity} from '../../../../../utils/generateEvaluator';
 import {getDefaultNodePath} from '../../../../Node/NodePages';
 
 import {TOP_SHARDS_COLUMNS_IDS, TOP_SHARDS_COLUMNS_TITLES} from './constants';
@@ -82,7 +82,7 @@ const topShardsCpuCoresColumn: Column<KeyValueRow> = {
         return (
             <UsageLabel
                 value={roundToPrecision(Number(row.CPUCores) * 100, 2)}
-                theme={getLoadSeverityForShard(Number(row.CPUCores) * 100)}
+                theme={getUsageSeverity(Number(row.CPUCores) * 100)}
             />
         );
     },

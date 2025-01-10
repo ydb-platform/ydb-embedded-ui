@@ -1,5 +1,4 @@
 import type {TNodesInfo} from '../../../types/api/nodes';
-import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 
 import type {NodesGroup, NodesHandledResponse} from './types';
@@ -33,5 +32,3 @@ export const prepareNodesData = (data: TNodesInfo): NodesHandledResponse => {
         FoundNodes: Number(data.FoundNodes),
     };
 };
-
-export const getLoadSeverityForNode = generateEvaluator(60, 80, ['success', 'warning', 'danger']);

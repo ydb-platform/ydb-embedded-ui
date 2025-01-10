@@ -43,8 +43,6 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                     capacity={tabletStorageLimit}
                     formatValues={formatStorageValues}
                     colorizeProgress={true}
-                    warningThreshold={75}
-                    dangerThreshold={85}
                 />
             ),
         },
@@ -61,8 +59,6 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                     capacity={blobStorageLimit}
                     formatValues={formatStorageValues}
                     colorizeProgress={true}
-                    warningThreshold={75}
-                    dangerThreshold={85}
                 />
             ),
         },

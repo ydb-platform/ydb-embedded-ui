@@ -13,17 +13,7 @@ import type {
     TenantPoolsStats,
     TenantStorageStats,
 } from '../../../../../store/reducers/tenants/utils';
-import {
-    TENANT_CPU_DANGER_TRESHOLD,
-    TENANT_CPU_WARNING_TRESHOLD,
-    TENANT_MEMORY_DANGER_TRESHOLD,
-    TENANT_MEMORY_WARNING_TRESHOLD,
-    TENANT_STORAGE_DANGER_TRESHOLD,
-    TENANT_STORAGE_WARNING_TRESHOLD,
-    cpuUsageToStatus,
-    memoryUsageToStatus,
-    storageUsageToStatus,
-} from '../../../../../store/reducers/tenants/utils';
+import {getMetricStatusFromUsage} from '../../../../../store/reducers/tenants/utils';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useTypedSelector} from '../../../../../utils/hooks';
@@ -141,7 +131,7 @@ function CPUCard({poolsCpuStats = [], active}: CPUCardProps) {
         .map((pool) => {
             const {name, usage, limit, used} = pool;
 
-            const poolStatus = cpuUsageToStatus(usage);
+            const poolStatus = getMetricStatusFromUsage(usage);
             if (MetricStatusToSeverity[poolStatus] > MetricStatusToSeverity[status]) {
                 status = poolStatus;
             }
@@ -150,8 +140,6 @@ function CPUCard({poolsCpuStats = [], active}: CPUCardProps) {
                 title: name,
                 value: used,
                 capacity: limit,
-                warningThreshold: TENANT_CPU_WARNING_TRESHOLD,
-                dangerThreshold: TENANT_CPU_DANGER_TRESHOLD,
             };
         });
 
@@ -180,7 +168,7 @@ function StorageCard({blobStorageStats = [], tabletStorageStats, active}: Storag
     const metrics: DiagnosticsCardMetric[] = storageStats.map((metric) => {
         const {name, used, limit, usage} = metric;
 
-        const metircStatus = storageUsageToStatus(usage);
+        const metircStatus = getMetricStatusFromUsage(usage);
         if (MetricStatusToSeverity[metircStatus] > MetricStatusToSeverity[status]) {
             status = metircStatus;
         }
@@ -189,8 +177,6 @@ function StorageCard({blobStorageStats = [], tabletStorageStats, active}: Storag
             title: name,
             value: used,
             capacity: limit,
-            warningThreshold: TENANT_STORAGE_WARNING_TRESHOLD,
-            dangerThreshold: TENANT_STORAGE_DANGER_TRESHOLD,
             formatValues: formatStorageValues,
         };
     });
@@ -215,7 +201,7 @@ function MemoryCard({active, memoryStats = []}: MemoryCardProps) {
     const metrics: DiagnosticsCardMetric[] = memoryStats.map((metric) => {
         const {name, used, limit, usage} = metric;
 
-        const metircStatus = memoryUsageToStatus(usage);
+        const metircStatus = getMetricStatusFromUsage(usage);
         if (MetricStatusToSeverity[metircStatus] > MetricStatusToSeverity[status]) {
             status = metircStatus;
         }
@@ -224,8 +210,6 @@ function MemoryCard({active, memoryStats = []}: MemoryCardProps) {
             title: name,
             value: used,
             capacity: limit,
-            warningThreshold: TENANT_MEMORY_WARNING_TRESHOLD,
-            dangerThreshold: TENANT_MEMORY_DANGER_TRESHOLD,
             formatValues: formatStorageValues,
         };
     });

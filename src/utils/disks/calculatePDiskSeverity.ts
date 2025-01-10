@@ -8,7 +8,7 @@ import {
     PDISK_STATE_SEVERITY,
 } from './constants';
 
-const getUsageSeverityForPDisk = generateEvaluator(85, 95, [EFlag.Green, EFlag.Yellow, EFlag.Red]);
+const getUsageSeverityForPDisk = generateEvaluator([EFlag.Green, EFlag.Yellow, EFlag.Red]);
 
 export function calculatePDiskSeverity<
     T extends {

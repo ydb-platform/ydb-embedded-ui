@@ -1,5 +1,3 @@
-import {generateEvaluator} from './generateEvaluator';
-
 interface EntityWithUsage {
     Used: number;
     Limit: number;
@@ -11,5 +9,3 @@ export const getUsage = <T extends EntityWithUsage>(data: T, step = 1) => {
 
     return Math.floor(usage / step) * step;
 };
-
-export const getSpaceUsageSeverity = generateEvaluator(80, 85, ['success', 'warning', 'danger']);

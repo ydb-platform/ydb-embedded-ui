@@ -19,6 +19,9 @@ export const WEEK_IN_SECONDS = 7 * DAY_IN_SECONDS;
 
 export const MS_IN_NANOSECONDS = 1000000;
 
+export const DEFAULT_WARNING_THRESHOLD = 85;
+export const DEFAULT_DANGER_THRESHOLD = 95;
+
 const TABLET_SYMBOLS = {
     [EType.OldTxProxy]: 'P',
     [EType.TxProxy]: 'P',
