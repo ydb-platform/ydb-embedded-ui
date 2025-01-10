@@ -27,14 +27,18 @@ export class SavedQueriesTable {
     }
 
     async editQuery(name: string) {
-        const row = await this.getQueryRow(name);
+        const row = await this.waitForRow(name);
+        await row.hover();
         const editButton = row.locator('button:has(svg)').first();
+        await editButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await editButton.click();
     }
 
     async deleteQuery(name: string) {
-        const row = await this.getQueryRow(name);
+        const row = await this.waitForRow(name);
+        await row.hover();
         const deleteButton = row.locator('button:has(svg)').nth(1);
+        await deleteButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await deleteButton.click();
     }
 

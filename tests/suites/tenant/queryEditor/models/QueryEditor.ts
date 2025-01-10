@@ -2,11 +2,11 @@ import type {Locator, Page} from '@playwright/test';
 
 import type {QUERY_MODES} from '../../../../../src/utils/query';
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
+import {QueriesHistoryTable} from '../../queryHistory/models/QueriesHistoryTable';
+import {SavedQueriesTable} from '../../savedQueries/models/SavedQueriesTable';
 
-import {QueriesHistoryTable} from './QueriesHistoryTable';
 import {QueryTabsNavigation} from './QueryTabsNavigation';
 import {PaneWrapper, ResultTable} from './ResultTable';
-import {SavedQueriesTable} from './SavedQueriesTable';
 import {SettingsDialog} from './SettingsDialog';
 
 export enum ExplainResultType {
@@ -50,6 +50,7 @@ export class QueryEditor {
     private runButton: Locator;
     private explainButton: Locator;
     private stopButton: Locator;
+    private saveButton: Locator;
     private gearButton: Locator;
     private indicatorIcon: Locator;
     private banner: Locator;
@@ -65,6 +66,7 @@ export class QueryEditor {
         this.runButton = this.selector.getByRole('button', {name: ButtonNames.Run});
         this.stopButton = this.selector.getByRole('button', {name: ButtonNames.Stop});
         this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
+        this.saveButton = this.selector.getByRole('button', {name: ButtonNames.Save});
         this.gearButton = this.selector.locator('.ydb-query-editor-controls__gear-button');
         this.executionStatus = this.selector.locator('.kv-query-execution-status');
         this.resultsControls = this.selector.locator('.ydb-query-result__controls');
@@ -117,6 +119,11 @@ export class QueryEditor {
     async clickExplainButton() {
         await this.explainButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.explainButton.click();
+    }
+
+    async clickSaveButton() {
+        await this.saveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.saveButton.click();
     }
 
     async getExplainResult(type: ExplainResultType) {
