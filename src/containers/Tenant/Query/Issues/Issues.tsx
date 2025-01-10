@@ -7,7 +7,7 @@ import {
     TriangleExclamationFill,
 } from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
-import {ArrowToggle, Button, Icon} from '@gravity-ui/uikit';
+import {ArrowToggle, Button, Icon, Link} from '@gravity-ui/uikit';
 
 import ShortyString from '../../../../components/ShortyString/ShortyString';
 import type {ErrorResponse, IssueMessage} from '../../../../types/api/query';
@@ -107,7 +107,6 @@ function Issue({
 }) {
     const [isExpand, setIsExpand] = React.useState(true);
     const severity = getSeverity(issue.severity);
-    const position = getIssuePosition(issue);
 
     const issues = issue.issues;
     const hasIssues = Array.isArray(issues) && issues.length > 0;
@@ -132,17 +131,7 @@ function Issue({
                     </Button>
                 )}
                 {hideSeverity ? null : <IssueSeverity severity={severity} />}
-
-                <span className={blockIssue('message')}>
-                    {position && (
-                        <span className={blockIssue('place-text')} title="Position">
-                            {position}
-                        </span>
-                    )}
-                    <div className={blockIssue('message-text')}>
-                        <ShortyString value={issue.message} expandLabel={'Show full message'} />
-                    </div>
-                </span>
+                <IssueText issue={issue} />
                 {issue.issue_code ? (
                     <span className={blockIssue('code')}>Code: {issue.issue_code}</span>
                 ) : null}
@@ -153,6 +142,51 @@ function Issue({
                 </div>
             )}
         </div>
+    );
+}
+
+interface IssueTextProps {
+    issue: IssueMessage;
+}
+
+function IssueText({issue}: IssueTextProps) {
+    const position = getIssuePosition(issue);
+
+    const ydbEditor = window.ydbEditor;
+
+    const getIssue = () => {
+        return (
+            <span className={blockIssue('message')}>
+                {position && (
+                    <span className={blockIssue('place-text')} title="Position">
+                        {position}
+                    </span>
+                )}
+                <div className={blockIssue('message-text')}>
+                    <ShortyString value={issue.message} expandLabel={'Show full message'} />
+                </div>
+            </span>
+        );
+    };
+
+    const {row, column} = issue.position ?? {};
+    const isIssueClickable = isNumeric(row) && ydbEditor;
+    if (!isIssueClickable) {
+        return getIssue();
+    }
+
+    const onIssueClickHandler = () => {
+        const monacoPosition = {lineNumber: row, column: column ?? 0};
+
+        ydbEditor.setPosition(monacoPosition);
+        ydbEditor.revealPositionInCenterIfOutsideViewport(monacoPosition);
+        ydbEditor.focus();
+    };
+
+    return (
+        <Link href="#" extraProps={{draggable: false}} onClick={onIssueClickHandler} view="primary">
+            {getIssue()}
+        </Link>
     );
 }
 
