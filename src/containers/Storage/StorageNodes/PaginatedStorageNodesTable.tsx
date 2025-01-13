@@ -1,7 +1,7 @@
 import React from 'react';
 
-import type {RenderControls} from '../../../components/PaginatedTable';
-import {ResizeablePaginatedTableV2} from '../../../components/PaginatedTable';
+import {GravityPaginatedTable} from '../../../components/GravityPaginatedTable';
+import type {RenderControls} from '../../../components/GravityPaginatedTable/GravityPaginatedTable.types';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {IResponseError} from '../../../types/api/error';
@@ -99,7 +99,7 @@ export const PaginatedStorageNodesTable = ({
     };
 
     return (
-        <ResizeablePaginatedTableV2
+        <GravityPaginatedTable
             columnsWidthLSKey={STORAGE_NODES_COLUMNS_WIDTH_LS_KEY}
             parentRef={parentRef}
             columns={columns}
