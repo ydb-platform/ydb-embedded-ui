@@ -1,0 +1,17 @@
+.ydb-resizeable-paginated-table-v2 {
+    &__table {
+        width: 100%;
+        border-collapse: collapse;
+
+        &_loading {
+            opacity: 0.5;
+        }
+    }
+
+    &__resizeable-table-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+}
