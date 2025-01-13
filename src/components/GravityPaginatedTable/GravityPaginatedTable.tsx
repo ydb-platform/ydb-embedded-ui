@@ -2,15 +2,22 @@ import React from 'react';
 
 import {Table, useRowVirtualizer, useTable} from '@gravity-ui/table';
 import type {ColumnDef} from '@gravity-ui/table/tanstack';
+import {Skeleton} from '@gravity-ui/uikit';
 import {ErrorBoundary} from 'react-error-boundary';
 
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useTableResize} from '../../utils/hooks/useTableResize';
+import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from '../PaginatedTable/constants';
+import {b as tableB} from '../PaginatedTable/shared';
+import type {AlignType} from '../PaginatedTable/types';
 
-import type {BaseEntity, GravityPaginatedTableProps} from './GravityPaginatedTable.types';
+import type {
+    BaseEntity,
+    GravityPaginatedTableProps,
+    VirtualRow,
+} from './GravityPaginatedTable.types';
 import {TableContainer} from './TableContainer';
-import {useInfiniteScroll} from './useInfiniteScroll';
 import {useTableData} from './useTableData';
 
 import './GravityPaginatedTable.scss';
@@ -19,6 +26,52 @@ const b = cn('ydb-gravity-paginated-table');
 
 const ROW_HEIGHT = 51;
 const OVERSCAN_COUNT = 5;
+const DEFAULT_MAX_VISIBLE_ROWS = 10;
+
+interface TableCellProps {
+    height: number;
+    width?: number;
+    align?: AlignType;
+    children: React.ReactNode;
+    className?: string;
+    resizeable?: boolean;
+}
+
+const TableRowCell = ({
+    children,
+    className,
+    height,
+    width,
+    align = DEFAULT_ALIGN,
+    resizeable,
+}: TableCellProps) => {
+    return (
+        <td
+            className={tableB('row-cell', {align: align}, className)}
+            style={{
+                height: `${height}px`,
+                width: `${width}px`,
+                maxWidth: resizeable ? `${width}px` : undefined,
+            }}
+        >
+            {children}
+        </td>
+    );
+};
+
+const calculateInitialHeight = (params: {
+    initialEntitiesCount?: number;
+    rowHeight: number;
+    maxVisibleRows: number;
+    minHeight?: number;
+}) => {
+    const {initialEntitiesCount, rowHeight, maxVisibleRows, minHeight} = params;
+    const calculatedHeight = Math.min(
+        (initialEntitiesCount || 1) * rowHeight,
+        maxVisibleRows * rowHeight,
+    );
+    return Math.max(calculatedHeight, minHeight || rowHeight * 3);
+};
 
 /**
  * GravityPaginatedTable is an enhanced table component that supports:
@@ -43,6 +96,8 @@ export function GravityPaginatedTable<T extends BaseEntity, F>({
     renderEmptyDataMessage,
     rowHeight = ROW_HEIGHT,
     initialEntitiesCount = 0,
+    maxVisibleRows = DEFAULT_MAX_VISIBLE_ROWS,
+    minHeight,
 }: GravityPaginatedTableProps<T, F>) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [tableColumnsWidth, handleColumnResize] = useTableResize(columnsWidthLSKey);
@@ -67,34 +122,70 @@ export function GravityPaginatedTable<T extends BaseEntity, F>({
         autoRefreshInterval,
     });
 
-    // Infinite scroll handling
-    useInfiniteScroll({
-        containerRef,
-        onLoadMore: loadMoreData,
-        hasNextPage,
-        isLoading: isLoadingMore,
-        threshold: rowHeight * OVERSCAN_COUNT,
-    });
+    // Generate virtual rows for the table
+    const virtualRows = React.useMemo(() => {
+        const items: VirtualRow<T>[] = data.map((item, index) => ({
+            id: item.id || item.NodeId || index,
+            type: 'data',
+            data: item,
+            index,
+        }));
 
-    // Table columns configuration
-    const tableColumns = React.useMemo<ColumnDef<T>[]>(
+        // Add loading/empty rows for unloaded content
+        for (let i = data.length; i < totalEntities; i++) {
+            items[i] = {
+                id: `virtual-${i}`,
+                type: isLoadingMore && i < data.length + OVERSCAN_COUNT ? 'loading' : 'empty',
+                index: i,
+            };
+        }
+        return items;
+    }, [data, totalEntities, isLoadingMore]);
+
+    // Table columns with virtual row handling
+    const virtualTableColumns = React.useMemo<ColumnDef<VirtualRow<T>>[]>(
         () =>
             columns.map((column) => ({
                 id: column.name,
                 header: () => column.header ?? column.name,
                 accessorKey: column.name,
-                cell: ({row}) => column.render({row: row.original, index: row.index}),
+                cell: ({row}) => {
+                    const virtualRow = row.original;
+                    const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
+
+                    return (
+                        <TableRowCell
+                            height={rowHeight}
+                            width={column.width}
+                            align={column.align}
+                            className={column.className}
+                            resizeable={resizeable}
+                        >
+                            {virtualRow.type === 'data' && virtualRow.data ? (
+                                column.render({
+                                    row: virtualRow.data,
+                                    index: virtualRow.index,
+                                })
+                            ) : virtualRow.type === 'loading' ? (
+                                <Skeleton
+                                    className={tableB('row-skeleton')}
+                                    style={{width: '80%', height: '50%'}}
+                                />
+                            ) : null}
+                        </TableRowCell>
+                    );
+                },
                 size: tableColumnsWidth[column.name] ?? column.width,
                 enableSorting: column.sortable,
                 enableResizing: column.resizeable,
             })),
-        [columns, tableColumnsWidth],
+        [columns, tableColumnsWidth, rowHeight],
     );
 
     // Table configuration
     const table = useTable({
-        columns: tableColumns,
-        data,
+        columns: virtualTableColumns,
+        data: virtualRows,
         enableColumnResizing: true,
         columnResizeMode: 'onChange',
         manualPagination: true,
@@ -109,21 +200,52 @@ export function GravityPaginatedTable<T extends BaseEntity, F>({
         },
     });
 
-    // Initialize virtualizer
+    // Initialize virtualizer with full count
     const rowVirtualizer = useRowVirtualizer({
-        count: data.length || initialEntitiesCount,
+        count: totalEntities,
         estimateSize: () => rowHeight,
         overscan: OVERSCAN_COUNT,
         getScrollElement: () => containerRef.current,
     });
 
+    // Load more data before virtualizer needs it
+    React.useEffect(() => {
+        const virtualItems = rowVirtualizer.getVirtualItems();
+        const lastItem = virtualItems[virtualItems.length - 1];
+
+        if (
+            lastItem &&
+            lastItem.index > data.length - OVERSCAN_COUNT &&
+            hasNextPage &&
+            !isLoadingMore
+        ) {
+            loadMoreData();
+        }
+    }, [rowVirtualizer.getVirtualItems(), data.length, hasNextPage, isLoadingMore, loadMoreData]);
+
     // Row class name handler
     const getRowClassNameWrapper = React.useCallback(
-        (row?: {original: T}) => {
-            if (!row?.original || !getRowClassName) {
+        (row?: {original: VirtualRow<T>}) => {
+            if (!row?.original) {
                 return '';
             }
-            return getRowClassName(row.original) || '';
+
+            const classNames = [];
+            if (row.original.type === 'loading') {
+                classNames.push(tableB('row', {loading: true}));
+            }
+            if (row.original.type === 'empty') {
+                classNames.push(tableB('row', {empty: true}));
+            }
+
+            if (row.original.type === 'data' && row.original.data && getRowClassName) {
+                const customClassName = getRowClassName(row.original.data);
+                if (customClassName) {
+                    classNames.push(customClassName);
+                }
+            }
+
+            return classNames.join(' ');
         },
         [getRowClassName],
     );
@@ -157,12 +279,22 @@ export function GravityPaginatedTable<T extends BaseEntity, F>({
                 </div>
             }
         >
-            <TableContainer ref={containerRef}>
+            <TableContainer
+                ref={containerRef}
+                initialHeight={calculateInitialHeight({
+                    initialEntitiesCount,
+                    rowHeight,
+                    maxVisibleRows,
+                    minHeight,
+                })}
+            >
                 <div
                     className={b('virtualized-content')}
-                    style={{height: `${rowVirtualizer.getTotalSize()}px`}}
+                    style={{
+                        height: `${rowVirtualizer.getTotalSize()}px`,
+                    }}
                     role="grid"
-                    aria-rowcount={data.length}
+                    aria-rowcount={totalEntities}
                     aria-busy={isLoading || isLoadingMore}
                 >
                     <Table

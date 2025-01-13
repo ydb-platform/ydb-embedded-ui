@@ -22,6 +22,7 @@ export function useTableData<T extends BaseEntity, F>({
     autoRefreshInterval,
 }: UseTableDataProps<T, F>): UseTableDataResult<T> {
     const [data, setData] = React.useState<T[]>([]);
+    const [currentPage, setCurrentPage] = React.useState(0);
     const [hasNextPage, setHasNextPage] = React.useState(true);
     const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
@@ -52,6 +53,14 @@ export function useTableData<T extends BaseEntity, F>({
         },
     );
 
+    // Reset state when filters or tableName change
+    React.useEffect(() => {
+        setCurrentPage(0);
+        setData([]);
+        setHasNextPage(true);
+        setIsLoadingMore(false);
+    }, [filters, tableName]);
+
     // Process initial data
     React.useEffect(() => {
         if (currentData?.data) {
@@ -59,10 +68,15 @@ export function useTableData<T extends BaseEntity, F>({
                 ...item,
                 id: item.NodeId ?? item.id ?? index,
             }));
-            setData(processedData);
-            setHasNextPage(processedData.length < (currentData.total || 0));
+
+            // Only set data if we're on the first page or loading more
+            if (currentPage === 0) {
+                setData(processedData);
+            }
+
+            setHasNextPage((currentPage + 1) * chunkSize < (currentData.total || 0));
         }
-    }, [currentData]);
+    }, [currentData, currentPage, chunkSize]);
 
     // Load more data
     const loadMoreData = React.useCallback(async () => {
@@ -72,23 +86,30 @@ export function useTableData<T extends BaseEntity, F>({
 
         setIsLoadingMore(true);
         try {
+            const nextPage = currentPage + 1;
             const result = await fetchData({
                 ...baseQueryParams,
-                offset: data.length,
+                offset: nextPage * chunkSize,
                 limit: chunkSize,
             });
 
             const newData = (result.data as T[]).map((item, index) => ({
                 ...item,
-                id: item.NodeId ?? item.id ?? data.length + index,
+                id: item.NodeId ?? item.id ?? nextPage * chunkSize + index,
             }));
 
-            setData((prev) => [...prev, ...newData]);
-            setHasNextPage(data.length + newData.length < (result.total || 0));
+            setData((prev) => {
+                // Ensure we don't have duplicates and maintain order
+                const existingIds = new Set(prev.map((item) => item.id));
+                const uniqueNewData = newData.filter((item) => !existingIds.has(item.id));
+                return [...prev, ...uniqueNewData];
+            });
+            setCurrentPage(nextPage);
+            setHasNextPage((nextPage + 1) * chunkSize < (result.total || 0));
         } finally {
             setIsLoadingMore(false);
         }
-    }, [hasNextPage, isLoadingMore, data.length, fetchData, baseQueryParams, chunkSize]);
+    }, [hasNextPage, isLoadingMore, currentPage, fetchData, baseQueryParams, chunkSize]);
 
     return {
         data,

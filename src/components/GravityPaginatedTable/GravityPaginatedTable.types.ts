@@ -6,6 +6,15 @@ export interface BaseEntity {
     NodeId?: string | number;
 }
 
+export type VirtualRowType = 'data' | 'loading' | 'empty';
+
+export interface VirtualRow<T> {
+    id: string | number;
+    type: VirtualRowType;
+    data?: T;
+    index: number;
+}
+
 export interface UseTableDataProps<T extends BaseEntity, F> {
     fetchData: FetchData<T, F>;
     filters?: F;
@@ -31,6 +40,7 @@ export interface TableContainerProps {
     height?: string | number;
     className?: string;
     children: React.ReactNode;
+    initialHeight?: number;
 }
 
 export interface ControlsParams {
@@ -58,4 +68,19 @@ export interface GravityPaginatedTableProps<T extends BaseEntity, F> {
     renderErrorMessage?: (error: IResponseError) => React.ReactNode;
     renderEmptyDataMessage?: () => React.ReactNode;
     initialEntitiesCount?: number;
+    /**
+     * Maximum number of rows to show in the initial viewport
+     * @default 10
+     */
+    maxVisibleRows?: number;
+    /**
+     * Minimum height of the table container in pixels
+     * If not provided, will be calculated as rowHeight * 3
+     */
+    minHeight?: number;
+}
+
+export interface TableContainerState {
+    isInitialRender: boolean;
+    containerHeight: number;
 }
