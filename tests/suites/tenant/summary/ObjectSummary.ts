@@ -50,16 +50,16 @@ export class ObjectSummary {
 
         // Info panel collapse/expand buttons
         this.infoCollapseButton = page.locator(
-            '.ydb-object-summary__info-controls button[title="Collapse"]',
+            '.ydb-object-summary__info-controls .kv-pane-visibility-button_type_collapse',
         );
         this.infoExpandButton = page.locator(
-            '.ydb-object-summary__info-controls button[title="Expand"]',
+            '.ydb-object-summary__info-controls .kv-pane-visibility-button_type_expand',
         );
         this.summaryCollapseButton = page.locator(
-            '.ydb-object-summary__actions button[title="Collapse"]',
+            '.ydb-object-summary__actions .kv-pane-visibility-button_type_collapse',
         );
         this.summaryExpandButton = page.locator(
-            '.ydb-object-summary__actions button[title="Expand"]',
+            '.ydb-object-summary__actions .kv-pane-visibility-button_type_expand',
         );
         this.overviewWrapper = page.locator('.ydb-object-summary__overview-wrapper');
     }

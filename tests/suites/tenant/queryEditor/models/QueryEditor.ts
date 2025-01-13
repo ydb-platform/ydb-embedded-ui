@@ -248,19 +248,21 @@ export class QueryEditor {
     }
 
     async collapseResultsControls() {
-        const collapseButton = this.resultsControls.locator('button[title="Collapse"]');
+        const collapseButton = this.resultsControls.locator(
+            '.kv-pane-visibility-button_type_collapse',
+        );
         await collapseButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await collapseButton.click();
     }
 
     async expandResultsControls() {
-        const expandButton = this.resultsControls.locator('button[title="Expand"]');
+        const expandButton = this.resultsControls.locator('.kv-pane-visibility-button_type_expand');
         await expandButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await expandButton.click();
     }
 
     async isResultsControlsCollapsed() {
-        const expandButton = this.resultsControls.locator('button[title="Expand"]');
+        const expandButton = this.resultsControls.locator('.kv-pane-visibility-button_type_expand');
         try {
             await expandButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
             return true;

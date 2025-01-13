@@ -86,12 +86,12 @@ export function PaneVisibilityToggleButtons({
         <React.Fragment>
             <ActionTooltip title="Collapse">
                 <Button
-                    title="Collapse"
                     view="flat-secondary"
                     onClick={onCollapse}
                     className={b(
                         {
                             hidden: isCollapsed,
+                            type: 'collapse',
                         },
                         className,
                     )}
@@ -102,12 +102,12 @@ export function PaneVisibilityToggleButtons({
 
             <ActionTooltip title="Expand">
                 <Button
-                    title="Expand"
                     view="flat-secondary"
                     onClick={onExpand}
                     className={b(
                         {
                             hidden: !isCollapsed,
+                            type: 'expand',
                         },
                         className,
                     )}
