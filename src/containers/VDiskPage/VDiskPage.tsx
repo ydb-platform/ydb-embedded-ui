@@ -17,6 +17,7 @@ import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authenticat
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
+import type {ModifyDiskResponse} from '../../types/api/modifyDisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
@@ -70,27 +71,31 @@ export function VDiskPage() {
 
     const handleEvictVDisk = async (isRetry?: boolean) => {
         if (vDiskIdParamsDefined) {
-            return (
-                newDiskApiAvailable ? window.api.vdisk.evictVDisk : window.api.tablets.evictVDiskOld
-            )({
+            const requestParams = {
                 groupId: GroupID,
                 groupGeneration: GroupGeneration,
                 failRealmIdx: Ring,
                 failDomainIdx: Domain,
                 vDiskIdx: VDisk,
                 force: isRetry,
-            }).then((response) => {
-                if (response?.result === false) {
-                    const err = {
-                        statusText: response.error,
-                        retryPossible: response.forceRetryPossible,
-                    };
-                    throw err;
-                }
-            });
-        }
+            };
 
-        return undefined;
+            let response: ModifyDiskResponse;
+
+            if (newDiskApiAvailable) {
+                response = await window.api.vdisk.evictVDisk(requestParams);
+            } else {
+                response = await window.api.tablets.evictVDiskOld(requestParams);
+            }
+
+            if (response?.result === false) {
+                const err = {
+                    statusText: response.error,
+                    retryPossible: response.forceRetryPossible,
+                };
+                throw err;
+            }
+        }
     };
 
     const handleAfterEvictVDisk = () => {
