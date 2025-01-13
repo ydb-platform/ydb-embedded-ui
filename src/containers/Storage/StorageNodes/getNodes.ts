@@ -76,7 +76,7 @@ export const getStorageNodes: FetchData<
     }
 
     const preparedResponse = prepareStorageNodesResponse(response);
-    console.log(preparedResponse);
+    console.log('New params', offset, limit);
     return {
         data: preparedResponse.nodes || [],
         found: preparedResponse.found || 0,
