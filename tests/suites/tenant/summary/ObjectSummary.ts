@@ -1,5 +1,6 @@
 import type {Locator, Page} from '@playwright/test';
 
+import {isInViewport} from '../../../utils/dom';
 import {VISIBILITY_TIMEOUT} from '../TenantPage';
 
 import {ActionsMenu} from './ActionsMenu';
@@ -24,6 +25,11 @@ export class ObjectSummary {
     private createDirectoryInput: Locator;
     private createDirectoryButton: Locator;
     private refreshButton: Locator;
+    private infoCollapseButton: Locator;
+    private infoExpandButton: Locator;
+    private summaryCollapseButton: Locator;
+    private summaryExpandButton: Locator;
+    private overviewWrapper: Locator;
 
     constructor(page: Page) {
         this.tree = page.locator('.ydb-object-summary__tree');
@@ -41,6 +47,45 @@ export class ObjectSummary {
         );
         this.createDirectoryButton = page.locator('button.g-button_view_action:has-text("Create")');
         this.refreshButton = page.locator('.ydb-object-summary__refresh-button');
+
+        // Info panel collapse/expand buttons
+        this.infoCollapseButton = page.locator(
+            '.ydb-object-summary__info-controls .kv-pane-visibility-button_type_collapse',
+        );
+        this.infoExpandButton = page.locator(
+            '.ydb-object-summary__info-controls .kv-pane-visibility-button_type_expand',
+        );
+        this.summaryCollapseButton = page.locator(
+            '.ydb-object-summary__actions .kv-pane-visibility-button_type_collapse',
+        );
+        this.summaryExpandButton = page.locator(
+            '.ydb-object-summary__actions .kv-pane-visibility-button_type_expand',
+        );
+        this.overviewWrapper = page.locator('.ydb-object-summary__overview-wrapper');
+    }
+
+    async collapseInfoPanel(): Promise<void> {
+        await this.infoCollapseButton.click();
+    }
+
+    async expandInfoPanel(): Promise<void> {
+        await this.infoExpandButton.click();
+    }
+
+    async isInfoPanelCollapsed(): Promise<boolean> {
+        const expandButtonVisible = await this.infoExpandButton.isVisible();
+        if (!expandButtonVisible) {
+            return false;
+        }
+
+        const isVisible = await this.overviewWrapper.isVisible();
+        if (!isVisible) {
+            return true;
+        }
+
+        // Check if it's actually in the viewport
+        const elementInViewport = await isInViewport(this.overviewWrapper);
+        return !elementInViewport;
     }
 
     async isCreateDirectoryModalVisible(): Promise<boolean> {
@@ -200,5 +245,29 @@ export class ObjectSummary {
 
     async clickRefreshButton(): Promise<void> {
         await this.refreshButton.click();
+    }
+
+    async collapseSummary(): Promise<void> {
+        await this.summaryCollapseButton.click();
+    }
+
+    async expandSummary(): Promise<void> {
+        await this.summaryExpandButton.click();
+    }
+
+    async isSummaryCollapsed(): Promise<boolean> {
+        const expandButtonVisible = await this.summaryExpandButton.isVisible();
+        if (!expandButtonVisible) {
+            return false;
+        }
+
+        const isVisible = await this.tree.isVisible();
+        if (!isVisible) {
+            return true;
+        }
+
+        // Check if it's actually in the viewport
+        const elementInViewport = await isInViewport(this.tree);
+        return !elementInViewport;
     }
 }

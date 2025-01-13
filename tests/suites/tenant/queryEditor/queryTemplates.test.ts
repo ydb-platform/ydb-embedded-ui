@@ -2,6 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {dsVslotsSchema, dsVslotsTableName, tenantName} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
+import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
 import {ObjectSummary} from '../summary/ObjectSummary';
 import {RowTableAction} from '../summary/types';
 
@@ -13,7 +14,6 @@ import {
 } from './models/NewSqlDropdownMenu';
 import {QueryEditor, QueryTabs} from './models/QueryEditor';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
-import {SavedQueriesTable} from './models/SavedQueriesTable';
 import {UnsavedChangesModal} from './models/UnsavedChangesModal';
 
 test.describe('Query Templates', () => {

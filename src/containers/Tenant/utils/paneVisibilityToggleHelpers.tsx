@@ -91,6 +91,7 @@ export function PaneVisibilityToggleButtons({
                     className={b(
                         {
                             hidden: isCollapsed,
+                            type: 'collapse',
                         },
                         className,
                     )}
@@ -106,6 +107,7 @@ export function PaneVisibilityToggleButtons({
                     className={b(
                         {
                             hidden: !isCollapsed,
+                            type: 'expand',
                         },
                         className,
                     )}

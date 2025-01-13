@@ -2,10 +2,11 @@ import type {Locator, Page} from '@playwright/test';
 
 import type {QUERY_MODES} from '../../../../../src/utils/query';
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
+import {QueriesHistoryTable} from '../../queryHistory/models/QueriesHistoryTable';
+import {SavedQueriesTable} from '../../savedQueries/models/SavedQueriesTable';
 
 import {QueryTabsNavigation} from './QueryTabsNavigation';
 import {PaneWrapper, ResultTable} from './ResultTable';
-import {SavedQueriesTable} from './SavedQueriesTable';
 import {SettingsDialog} from './SettingsDialog';
 
 export enum ExplainResultType {
@@ -41,6 +42,7 @@ export class QueryEditor {
     queryTabs: QueryTabsNavigation;
     resultTable: ResultTable;
     savedQueries: SavedQueriesTable;
+    historyQueries: QueriesHistoryTable;
     editorTextArea: Locator;
 
     private page: Page;
@@ -48,6 +50,7 @@ export class QueryEditor {
     private runButton: Locator;
     private explainButton: Locator;
     private stopButton: Locator;
+    private saveButton: Locator;
     private gearButton: Locator;
     private indicatorIcon: Locator;
     private banner: Locator;
@@ -63,6 +66,7 @@ export class QueryEditor {
         this.runButton = this.selector.getByRole('button', {name: ButtonNames.Run});
         this.stopButton = this.selector.getByRole('button', {name: ButtonNames.Stop});
         this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
+        this.saveButton = this.selector.getByRole('button', {name: ButtonNames.Save});
         this.gearButton = this.selector.locator('.ydb-query-editor-controls__gear-button');
         this.executionStatus = this.selector.locator('.kv-query-execution-status');
         this.resultsControls = this.selector.locator('.ydb-query-result__controls');
@@ -78,6 +82,7 @@ export class QueryEditor {
         this.paneWrapper = new PaneWrapper(page);
         this.queryTabs = new QueryTabsNavigation(page);
         this.savedQueries = new SavedQueriesTable(page);
+        this.historyQueries = new QueriesHistoryTable(page);
     }
 
     async run(query: string, mode: keyof typeof QUERY_MODES) {
@@ -116,6 +121,11 @@ export class QueryEditor {
         await this.explainButton.click();
     }
 
+    async clickSaveButton() {
+        await this.saveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.saveButton.click();
+    }
+
     async getExplainResult(type: ExplainResultType) {
         await this.selectResultTypeRadio(type);
         const resultArea = this.selector.locator('.ydb-query-result__result');
@@ -144,6 +154,37 @@ export class QueryEditor {
         await this.editorTextArea.focus();
     }
 
+    async selectText(startLine: number, startColumn: number, endLine: number, endColumn: number) {
+        await this.editorTextArea.evaluate(
+            (_, coords) => {
+                const editor = window.ydbEditor;
+                if (editor) {
+                    editor.setSelection({
+                        startLineNumber: coords.startLine,
+                        startColumn: coords.startColumn,
+                        endLineNumber: coords.endLine,
+                        endColumn: coords.endColumn,
+                    });
+                }
+            },
+            {startLine, startColumn, endLine, endColumn},
+        );
+    }
+
+    async pressKeys(key: string) {
+        await this.editorTextArea.press(key);
+    }
+
+    async runSelectedQueryViaContextMenu() {
+        await this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            if (editor) {
+                // Trigger the sendSelectedQuery action directly
+                editor.trigger('contextMenu', 'sendSelectedQuery', null);
+            }
+        });
+    }
+
     async closeSettingsDialog() {
         await this.settingsDialog.clickButton(ButtonNames.Cancel);
     }
@@ -166,6 +207,7 @@ export class QueryEditor {
 
     async setQuery(query: string) {
         await this.editorTextArea.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.editorTextArea.clear();
         await this.editorTextArea.fill(query);
     }
 
@@ -203,6 +245,36 @@ export class QueryEditor {
     async isResultsControlsHidden() {
         await this.resultsControls.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
+    }
+
+    async collapseResultsControls() {
+        const collapseButton = this.resultsControls.locator(
+            '.kv-pane-visibility-button_type_collapse',
+        );
+        await collapseButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await collapseButton.click();
+    }
+
+    async expandResultsControls() {
+        const expandButton = this.resultsControls.locator('.kv-pane-visibility-button_type_expand');
+        await expandButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await expandButton.click();
+    }
+
+    async isResultsControlsCollapsed() {
+        const expandButton = this.resultsControls.locator('.kv-pane-visibility-button_type_expand');
+        try {
+            await expandButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    async clickCopyResultButton() {
+        const copyButton = this.resultsControls.locator('button[title="Copy result"]');
+        await copyButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await copyButton.click();
     }
 
     async isRunButtonEnabled() {
