@@ -1,5 +1,22 @@
 # Changelog
 
+## [8.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.3.0...v8.4.0) (2025-01-13)
+
+
+### Features
+
+* **autocomplete:** suggest columns from subqueries ([#1788](https://github.com/ydb-platform/ydb-embedded-ui/issues/1788)) ([1095d96](https://github.com/ydb-platform/ydb-embedded-ui/commit/1095d96fba7b803f013761ad250808e5f547566d))
+* **Issues:** click on issue sets cursor to error in editor ([#1797](https://github.com/ydb-platform/ydb-embedded-ui/issues/1797)) ([6434633](https://github.com/ydb-platform/ydb-embedded-ui/commit/643463385501010fba0c901cc6fef6ab3b479b59))
+* set pdisks column width ([#1793](https://github.com/ydb-platform/ydb-embedded-ui/issues/1793)) ([db11791](https://github.com/ydb-platform/ydb-embedded-ui/commit/db11791071f0b8721d3329516515ca92f5185f71))
+
+
+### Bug Fixes
+
+* **Auth:** do not show access error when redirecting to auth ([#1803](https://github.com/ydb-platform/ydb-embedded-ui/issues/1803)) ([b2dbe17](https://github.com/ydb-platform/ydb-embedded-ui/commit/b2dbe176f554dfda378b4ab4fd3acec7ac60a78d))
+* **Cluster:** show loader if capabilities not loaded ([#1785](https://github.com/ydb-platform/ydb-embedded-ui/issues/1785)) ([01b8424](https://github.com/ydb-platform/ydb-embedded-ui/commit/01b8424a8040c1d422f7fc1ec87e92d3a833ad4e))
+* handlers list that should be refetched in autorefresh mode ([#1791](https://github.com/ydb-platform/ydb-embedded-ui/issues/1791)) ([9d2280e](https://github.com/ydb-platform/ydb-embedded-ui/commit/9d2280e41fe5153fb5d5c62d30fc8ed25834c875))
+* **VDiskPage:** fix evict action ([#1817](https://github.com/ydb-platform/ydb-embedded-ui/issues/1817)) ([3312ae2](https://github.com/ydb-platform/ydb-embedded-ui/commit/3312ae20bc0f912a4a2b28572e1833efdb770a73))
+
 ## [8.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.2.2...v8.3.0) (2024-12-23)
 
 
