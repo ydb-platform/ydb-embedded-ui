@@ -12,7 +12,7 @@ export const useLastQueryExecutionSettings = () => {
 
     try {
         lastSettings = querySettingsValidationSchema.parse(lastStorageSettings);
-    } catch (error) {
+    } catch {
         lastSettings = undefined;
     }
 

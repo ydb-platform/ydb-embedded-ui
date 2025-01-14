@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-duplicate-imports */
 declare module 'redux-location-state' {
     import type {Dispatch, Middleware, PayloadAction, Reducer, Store} from '@reduxjs/toolkit';
     import type {History, Location} from 'history';

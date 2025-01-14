@@ -7,10 +7,13 @@
     "root": true,
     "overrides": [
         {
-            "files": [
-                "config-overrides.js",
-                "commitlint.config.js"
-            ],
+            "files": ["*.js"],
+            "rules": {
+                "@typescript-eslint/consistent-type-imports": "off",
+            },
+        },
+        {
+            "files": ["config-overrides.js", "commitlint.config.js"],
             "env": {
                 "node": true,
             },
@@ -20,20 +23,14 @@
         "project": "./tsconfig.json",
     },
     "rules": {
-        "import/consistent-type-specifier-style": [
-            "error",
-            "prefer-top-level"
-        ],
+        "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
         "@typescript-eslint/consistent-type-imports": [
             "error",
             {
                 "prefer": "type-imports",
-                "fixStyle": "separate-type-imports"
+                "fixStyle": "separate-type-imports",
             },
         ],
-        "curly": [
-            "error",
-            "all"
-        ],
+        "curly": ["error", "all"],
     },
 }

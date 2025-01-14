@@ -44,14 +44,12 @@
         .stack__layer + .stack__layer {
             transform: translate(
                 calc(
-                    var(--ydb-stack-level) * (var(--ydb-stack-offset-x-hover) * 2) - var(
-                            --ydb-stack-offset-x-hover
-                        )
+                    var(--ydb-stack-level) *
+                        (var(--ydb-stack-offset-x-hover) * 2) - var(--ydb-stack-offset-x-hover)
                 ),
                 calc(
-                    var(--ydb-stack-level) * (var(--ydb-stack-offset-y-hover) * 2) - var(
-                            --ydb-stack-offset-y-hover
-                        )
+                    var(--ydb-stack-level) *
+                        (var(--ydb-stack-offset-y-hover) * 2) - var(--ydb-stack-offset-y-hover)
                 )
             );
         }

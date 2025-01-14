@@ -32,7 +32,7 @@ interface YdbUserDropdownProps {
 
 function UserDropdown({isCompact, popupAnchor, user, children}: YdbUserDropdownProps) {
     const [isUserDropdownVisible, setIsUserDropdownVisible] = React.useState(false);
-    const iconData = user ? user.icon ?? Person : userSecret;
+    const iconData = user ? (user.icon ?? Person) : userSecret;
     return (
         <FooterItem
             compact={isCompact}
