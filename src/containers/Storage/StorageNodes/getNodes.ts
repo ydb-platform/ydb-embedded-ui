@@ -58,6 +58,8 @@ export const getStorageNodes: FetchData<
                 limit,
             });
 
+            console.log('loading', offset, limit);
+
             setTimeout(() => res(result), 1000);
         })) as TNodesInfo;
     } else {
@@ -80,7 +82,7 @@ export const getStorageNodes: FetchData<
     }
 
     const preparedResponse = prepareStorageNodesResponse(response);
-    console.log('New params', offset, limit);
+
     return {
         data: preparedResponse.nodes || [],
         found: preparedResponse.found || 0,
