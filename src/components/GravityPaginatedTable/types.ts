@@ -1,6 +1,8 @@
 import type {IResponseError} from '../../types/api/error';
 import type {Column, FetchData} from '../PaginatedTable/types';
 
+export type AlignType = 'left' | 'center' | 'right';
+
 export interface BaseEntity {
     id?: string | number;
     NodeId?: string | number;

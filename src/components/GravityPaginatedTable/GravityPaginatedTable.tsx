@@ -4,20 +4,18 @@ import {useTable} from '@gravity-ui/table';
 import type {ColumnDef} from '@gravity-ui/table/tanstack';
 import {ErrorBoundary} from 'react-error-boundary';
 
-import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useTableResize} from '../../utils/hooks/useTableResize';
-import {TableHead} from '../PaginatedTable/TableHead';
 
-import type {BaseEntity, GravityPaginatedTableProps} from './GravityPaginatedTable.types';
 import {TableContainer} from './TableContainer';
+import {TableHead} from './components/TableHead';
 import {VirtualRows} from './components/VirtualRows';
 import {useVirtualization} from './features/virtualization';
+import {b} from './shared';
+import type {BaseEntity, GravityPaginatedTableProps} from './types';
 import {useTableData} from './useTableData';
 
 import './GravityPaginatedTable.scss';
-
-const b = cn('ydb-gravity-paginated-table');
 
 const ROW_HEIGHT = 51;
 const DEFAULT_MAX_VISIBLE_ROWS = 10;
@@ -189,11 +187,7 @@ export function GravityPaginatedTable<T extends BaseEntity, F>({
                     aria-busy={isLoading || isLoadingMore}
                 >
                     <table className={b('table', {loading: isLoading || isLoadingMore})}>
-                        <TableHead
-                            columns={columns}
-                            onColumnsResize={handleColumnResize}
-                            rowHeight={rowHeight}
-                        />
+                        <TableHead table={table} rowHeight={rowHeight} />
                         <tbody>
                             <VirtualRows
                                 virtualItems={virtualItems}

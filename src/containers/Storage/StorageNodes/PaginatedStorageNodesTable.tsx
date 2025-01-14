@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {GravityPaginatedTable} from '../../../components/GravityPaginatedTable';
-import type {RenderControls} from '../../../components/GravityPaginatedTable/GravityPaginatedTable.types';
+import type {RenderControls} from '../../../components/GravityPaginatedTable/types';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {IResponseError} from '../../../types/api/error';

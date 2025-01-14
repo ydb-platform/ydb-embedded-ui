@@ -1,12 +1,9 @@
 import React from 'react';
 
-import {cn} from '../../utils/cn';
-
-import type {TableContainerProps, TableContainerState} from './GravityPaginatedTable.types';
+import {b} from './shared';
+import type {TableContainerProps, TableContainerState} from './types';
 
 import './GravityPaginatedTable.scss';
-
-const b = cn('ydb-gravity-paginated-table');
 
 export const TableContainer = React.forwardRef<HTMLDivElement, TableContainerProps>(
     ({height, className, children, initialHeight}, ref) => {

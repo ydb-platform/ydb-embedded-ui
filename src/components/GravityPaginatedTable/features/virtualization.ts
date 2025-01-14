@@ -2,7 +2,7 @@ import React from 'react';
 
 import {useRowVirtualizer} from '@gravity-ui/table';
 
-import type {BaseEntity, VirtualRow} from '../GravityPaginatedTable.types';
+import type {BaseEntity, VirtualRow} from '../types';
 
 const OVERSCAN_COUNT = 5;
 

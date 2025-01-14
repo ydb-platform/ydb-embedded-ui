@@ -4,11 +4,7 @@ import {tableDataApi} from '../../store/reducers/tableData';
 import type {IResponseError} from '../../types/api/error';
 import type {FetchData} from '../PaginatedTable/types';
 
-import type {
-    BaseEntity,
-    UseTableDataProps,
-    UseTableDataResult,
-} from './GravityPaginatedTable.types';
+import type {BaseEntity, UseTableDataProps, UseTableDataResult} from './types';
 
 const DEFAULT_CHUNK_SIZE = 50;
 

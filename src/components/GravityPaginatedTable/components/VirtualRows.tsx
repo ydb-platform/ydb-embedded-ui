@@ -3,8 +3,8 @@ import React from 'react';
 import type {ColumnDef, Table as TableInstance} from '@gravity-ui/table/tanstack';
 import type {VirtualItem} from '@gravity-ui/table/tanstack-virtual';
 
-import {b as tableB} from '../../PaginatedTable/shared';
-import type {BaseEntity, VirtualRow} from '../GravityPaginatedTable.types';
+import {b} from '../shared';
+import type {BaseEntity, VirtualRow} from '../types';
 
 import {LoadingCell, TableCell} from './TableCell';
 
@@ -38,11 +38,11 @@ export function VirtualRows<T extends BaseEntity>({
                 const row = virtualRows[virtualItem.index];
                 const tableRow = rows[virtualItem.index];
 
-                let className = tableB('row');
+                let className = b('row');
                 if (row.type === 'loading') {
-                    className = tableB('row', {loading: true});
+                    className = b('row', {loading: true});
                 } else if (row.type === 'empty') {
-                    className = tableB('row', {empty: true});
+                    className = b('row', {empty: true});
                 } else if (row.data && getRowClassName) {
                     const customClassName = getRowClassName(row.data);
                     if (customClassName) {

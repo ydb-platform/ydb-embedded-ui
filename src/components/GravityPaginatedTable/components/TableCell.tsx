@@ -2,9 +2,9 @@ import React from 'react';
 
 import {Skeleton} from '@gravity-ui/uikit';
 
-import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from '../../PaginatedTable/constants';
-import {b as tableB} from '../../PaginatedTable/shared';
-import type {AlignType} from '../../PaginatedTable/types';
+import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from '../constants';
+import {b} from '../shared';
+import type {AlignType} from '../types';
 
 interface TableCellProps {
     height: number;
@@ -25,7 +25,7 @@ export function TableCell({
 }: TableCellProps): React.ReactElement {
     return (
         <td
-            className={tableB('row-cell', {align}, className)}
+            className={b('row-cell', {align}, className)}
             style={{
                 height: `${height}px`,
                 width: `${width}px`,
@@ -42,7 +42,7 @@ interface LoadingCellProps extends Omit<TableCellProps, 'children'> {}
 export function LoadingCell(props: LoadingCellProps): React.ReactElement {
     return (
         <TableCell {...props}>
-            <Skeleton className={tableB('row-skeleton')} style={{width: '80%', height: '50%'}} />
+            <Skeleton className={b('row-skeleton')} style={{width: '80%', height: '50%'}} />
         </TableCell>
     );
 }

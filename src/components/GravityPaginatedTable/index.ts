@@ -5,6 +5,6 @@ export type {
     TableContainerProps,
     UseTableDataProps,
     UseTableDataResult,
-} from './GravityPaginatedTable.types';
+} from './types';
 export {TableContainer} from './TableContainer';
 export {useTableData} from './useTableData';
