@@ -26,14 +26,19 @@ Built on top of:
 ┌────────────────────────────────────────┐
 │           GravityPaginatedTable        │
 │  ┌─────────────┐    ┌───────────────┐  │
-│  │  TableHead  │    │ TableContainer│  │
-│  │   Sticky    │    │  Scrollable   │  │
+│  │  Controls   │    │ VirtualContent│  │
+│  │  Optional   │    │  Scrollable   │  │
 │  └─────────────┘    └───────┬───────┘  │
-│         ▲                   │          │
-│         │           ┌───────▼───────┐  │
-│    useTable         │  VirtualRows  │  │
-│    Columns         │ Visible only  │  │
-│                     └───────────────┘  │
+│                            │          │
+│         ┌─────────────┐    │          │
+│         │  TableHead  │    │          │
+│         │   Sticky    │    │          │
+│         └─────────────┘    │          │
+│              ▲             │          │
+│              │      ┌──────▼──────┐   │
+│         useTable    │ VirtualRows │   │
+│         Columns     │ Visible only│   │
+│                     └─────────────┘   │
 └────────────────────────────────────────┘
 ```
 
@@ -86,19 +91,28 @@ For 1000 total rows:
 ### 3. Table Structure
 
 ```
-<TableContainer>                // Scrollable container
-    <table>
-        <TableHead>            // Sticky header
-            <th>...</th>       // Column headers
-        </TableHead>
-        <tbody>
-            <VirtualRows>      // Only visible rows + overscan
-                <tr>...</tr>   // Data rows
-                <tr>...</tr>   // Loading rows
-            </VirtualRows>
-        </tbody>
-    </table>
-</TableContainer>
+<TableWithControlsLayout>           // Optional controls wrapper
+    <TableWithControlsLayout.Controls>
+        {/* Custom controls */}
+    </TableWithControlsLayout.Controls>
+    <TableWithControlsLayout.Table>
+        <div className="virtualized-content">  // Scrollable container
+            <div>                              // Content wrapper
+                <table>
+                    <TableHead>                // Sticky header
+                        <th>...</th>           // Column headers
+                    </TableHead>
+                    <tbody>
+                        <VirtualRows>          // Only visible rows + overscan
+                            <tr>...</tr>       // Data rows
+                            <tr>...</tr>       // Loading rows
+                        </VirtualRows>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </TableWithControlsLayout.Table>
+</TableWithControlsLayout>
 ```
 
 ### 4. Column Management (@gravity-ui/table)
@@ -229,27 +243,39 @@ import {GravityPaginatedTable} from '@/components/GravityPaginatedTable';
 // Independent data loading hook
 import {useTableData} from '@/components/GravityPaginatedTable';
 const {
-    data,                // Current data array
-    isLoading,          // Initial loading state
-    isLoadingMore,      // Loading next chunk
-    hasNextPage,        // More data available
-    totalEntities,      // Total count
-    foundEntities,      // Filtered count
-    loadMoreData,       // Load next chunk
+  data, // Current data array
+  isLoading, // Initial loading state
+  isLoadingMore, // Loading next chunk
+  hasNextPage, // More data available
+  totalEntities, // Total count
+  foundEntities, // Filtered count
+  loadMoreData, // Load next chunk
 } = useTableData({
-    fetchData,          // Data fetching function
-    getRowId,           // Row identifier function
-    // ... other props
+  fetchData, // Data fetching function
+  getRowId, // Row identifier function
+  // ... other props
 });
+```
 
-// Standalone container component
-import {TableContainer} from '@/components/GravityPaginatedTable';
-<TableContainer
-    height={400}
-    initialHeight={200}
->
-    {/* Your content */}
-</TableContainer>
+## Controls Integration
+
+The table uses TableWithControlsLayout for consistent controls placement:
+
+```typescript
+// When renderControls prop is provided:
+<GravityPaginatedTable
+    renderControls={({inited, totalEntities, foundEntities}) => (
+        <YourControls
+            inited={inited}
+            total={totalEntities}
+            found={foundEntities}
+        />
+    )}
+    // ... other props
+/>
+
+// Controls will be automatically placed above the table
+// in a consistent layout using TableWithControlsLayout
 ```
 
 ## Key Points

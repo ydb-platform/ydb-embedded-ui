@@ -6,8 +6,8 @@ import {ErrorBoundary} from 'react-error-boundary';
 
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useTableResize} from '../../utils/hooks/useTableResize';
+import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
 
-import {TableContainer} from './TableContainer';
 import {TableHead} from './components/TableHead';
 import {VirtualRows} from './components/VirtualRows';
 import {useVirtualization} from './features/virtualization';
@@ -173,22 +173,20 @@ export function GravityPaginatedTable<T, F>({
                 </div>
             }
         >
-            <TableContainer
+            <div
                 ref={containerRef}
-                initialHeight={calculateInitialHeight({
-                    initialEntitiesCount,
-                    rowHeight,
-                    maxVisibleRows,
-                    minHeight,
-                })}
+                className={b('virtualized-content')}
+                style={{
+                    height: calculateInitialHeight({
+                        initialEntitiesCount,
+                        rowHeight,
+                        maxVisibleRows,
+                        minHeight,
+                    }),
+                    overflow: 'auto',
+                }}
             >
-                <div
-                    className={b('virtualized-content')}
-                    style={{height: `${totalSize}px`}}
-                    role="grid"
-                    aria-rowcount={totalEntities}
-                    aria-busy={isLoading || isLoadingMore}
-                >
+                <div style={{height: `${totalSize}px`}}>
                     <table className={b('table', {loading: isLoading || isLoadingMore})}>
                         <TableHead table={table} rowHeight={rowHeight} />
                         <tbody>
@@ -208,11 +206,30 @@ export function GravityPaginatedTable<T, F>({
                         </div>
                     )}
                 </div>
-            </TableContainer>
+            </div>
         </ErrorBoundary>
     );
 
     // Render with optional controls
+    const renderContent = () => {
+        if (renderControls) {
+            return (
+                <TableWithControlsLayout>
+                    <TableWithControlsLayout.Controls>
+                        {renderControls({
+                            inited: !isLoading,
+                            totalEntities,
+                            foundEntities,
+                        })}
+                    </TableWithControlsLayout.Controls>
+                    <TableWithControlsLayout.Table>{tableContent}</TableWithControlsLayout.Table>
+                </TableWithControlsLayout>
+            );
+        }
+
+        return tableContent;
+    };
+
     return (
         <div
             ref={parentRef}
@@ -220,16 +237,7 @@ export function GravityPaginatedTable<T, F>({
             role="region"
             aria-label="Paginated data table"
         >
-            {renderControls && (
-                <div className={b('controls')}>
-                    {renderControls({
-                        inited: !isLoading,
-                        totalEntities,
-                        foundEntities,
-                    })}
-                </div>
-            )}
-            {tableContent}
+            {renderContent()}
         </div>
     );
 }

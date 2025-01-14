@@ -76,13 +76,6 @@ export interface UseTableDataResult<T> {
     loadMoreData: () => Promise<void>;
 }
 
-export interface TableContainerProps {
-    height?: string | number;
-    className?: string;
-    children: React.ReactNode;
-    initialHeight?: number;
-}
-
 export interface ControlsParams {
     totalEntities: number;
     foundEntities: number;
@@ -122,9 +115,4 @@ export interface GravityPaginatedTableProps<T, F = undefined> {
      * If not provided, will be calculated as rowHeight * 3
      */
     minHeight?: number;
-}
-
-export interface TableContainerState {
-    isInitialRender: boolean;
-    containerHeight: number;
 }

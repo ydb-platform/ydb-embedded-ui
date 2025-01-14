@@ -48,23 +48,12 @@
         height: 100%;
     }
 
-    &__table-container {
-        position: relative;
-
-        overflow: auto;
-        flex: 1;
-
-        width: 100%;
-    }
-
     &__virtualized-content {
         position: relative;
 
-        width: 100%;
-    }
+        flex: 1;
 
-    &__controls {
-        margin-bottom: 16px;
+        width: 100%;
     }
 
     &__error-message {
