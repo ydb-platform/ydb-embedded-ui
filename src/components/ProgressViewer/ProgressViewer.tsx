@@ -60,8 +60,8 @@ export function ProgressViewer({
     size = 'xs',
     colorizeProgress,
     inverseColorize,
-    warningThreshold = 60,
-    dangerThreshold = 80,
+    warningThreshold,
+    dangerThreshold,
     hideCapacity,
 }: ProgressViewerProps) {
     const theme = useTheme();

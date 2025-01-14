@@ -14,7 +14,7 @@ import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
-import {getSpaceUsageSeverity} from '../../../../utils/storage';
+import {getUsageSeverity} from '../../../../utils/generateEvaluator';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
@@ -110,7 +110,7 @@ const usageColumn: StorageGroupsColumn = {
     resizeMinWidth: 75,
     render: ({row}) => {
         return valueIsDefined(row.Usage) ? (
-            <UsageLabel value={Math.floor(row.Usage)} theme={getSpaceUsageSeverity(row.Usage)} />
+            <UsageLabel value={Math.floor(row.Usage)} theme={getUsageSeverity(row.Usage)} />
         ) : (
             EMPTY_DATA_PLACEHOLDER
         );
@@ -126,7 +126,7 @@ const diskSpaceUsageColumn: StorageGroupsColumn = {
         return valueIsDefined(row.DiskSpaceUsage) ? (
             <UsageLabel
                 value={Math.floor(row.DiskSpaceUsage)}
-                theme={getSpaceUsageSeverity(row.DiskSpaceUsage)}
+                theme={getUsageSeverity(row.DiskSpaceUsage)}
             />
         ) : (
             EMPTY_DATA_PLACEHOLDER

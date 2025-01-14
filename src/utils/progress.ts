@@ -1,3 +1,5 @@
+import {DEFAULT_DANGER_THRESHOLD, DEFAULT_WARNING_THRESHOLD} from './constants';
+
 export type ProgressStatus = 'good' | 'warning' | 'danger';
 
 interface CalculateProgressStatusProps {
@@ -10,8 +12,8 @@ interface CalculateProgressStatusProps {
 
 export function calculateProgressStatus({
     inverseColorize,
-    warningThreshold = 60,
-    dangerThreshold = 80,
+    warningThreshold = DEFAULT_WARNING_THRESHOLD,
+    dangerThreshold = DEFAULT_DANGER_THRESHOLD,
     colorizeProgress,
     fillWidth,
 }: CalculateProgressStatusProps) {

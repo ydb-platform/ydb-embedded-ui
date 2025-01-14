@@ -13,8 +13,8 @@ export function useDiagramValues({
     value,
     capacity,
     colorizeProgress = true,
-    warningThreshold = 60,
-    dangerThreshold = 80,
+    warningThreshold,
+    dangerThreshold,
     inverseColorize = false,
     legendFormatter,
 }: ClusterMetricsCommonProps & {

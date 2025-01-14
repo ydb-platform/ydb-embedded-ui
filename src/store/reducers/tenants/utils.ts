@@ -1,6 +1,7 @@
 import type {PoolName, TPoolStats} from '../../../types/api/nodes';
 import type {TTenant} from '../../../types/api/tenant';
 import {EType} from '../../../types/api/tenant';
+import {DEFAULT_DANGER_THRESHOLD, DEFAULT_WARNING_THRESHOLD} from '../../../utils/constants';
 import {isNumeric} from '../../../utils/utils';
 
 import {METRIC_STATUS} from './contants';
@@ -207,58 +208,20 @@ function calculateUsage(valueUsed?: number, valueLimit?: number): number | undef
     return undefined;
 }
 
-export const TENANT_CPU_DANGER_TRESHOLD = 70;
-export const TENANT_CPU_WARNING_TRESHOLD = 60;
-
-export const TENANT_STORAGE_DANGER_TRESHOLD = 85;
-export const TENANT_STORAGE_WARNING_TRESHOLD = 75;
-
-export const TENANT_MEMORY_DANGER_TRESHOLD = 70;
-export const TENANT_MEMORY_WARNING_TRESHOLD = 60;
-
-export const cpuUsageToStatus = (usage?: number) => {
+export function getMetricStatusFromUsage(usage?: number) {
     if (!usage) {
         return METRIC_STATUS.Unspecified;
     }
 
-    if (usage > TENANT_CPU_DANGER_TRESHOLD) {
+    if (usage > DEFAULT_DANGER_THRESHOLD) {
         return METRIC_STATUS.Danger;
     }
-    if (usage > TENANT_CPU_WARNING_TRESHOLD) {
+    if (usage > DEFAULT_WARNING_THRESHOLD) {
         return METRIC_STATUS.Warning;
     }
 
     return METRIC_STATUS.Good;
-};
-export const storageUsageToStatus = (usage?: number) => {
-    if (!usage) {
-        return METRIC_STATUS.Unspecified;
-    }
-
-    if (usage > TENANT_STORAGE_DANGER_TRESHOLD) {
-        return METRIC_STATUS.Danger;
-    }
-    if (usage > TENANT_STORAGE_WARNING_TRESHOLD) {
-        return METRIC_STATUS.Warning;
-    }
-
-    return METRIC_STATUS.Good;
-};
-
-export const memoryUsageToStatus = (usage?: number) => {
-    if (!usage) {
-        return METRIC_STATUS.Unspecified;
-    }
-
-    if (usage > TENANT_MEMORY_DANGER_TRESHOLD) {
-        return METRIC_STATUS.Danger;
-    }
-    if (usage > TENANT_MEMORY_WARNING_TRESHOLD) {
-        return METRIC_STATUS.Warning;
-    }
-
-    return METRIC_STATUS.Good;
-};
+}
 
 export const normalizeProgress = (progress: number) => {
     if (progress >= 100) {

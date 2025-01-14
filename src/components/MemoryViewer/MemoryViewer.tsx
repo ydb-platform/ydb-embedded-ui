@@ -40,9 +40,9 @@ export interface MemoryProgressViewerProps {
     stats: TMemoryStats;
     className?: string;
     warningThreshold?: number;
+    dangerThreshold?: number;
     formatValues: FormatProgressViewerValues;
     percents?: boolean;
-    dangerThreshold?: number;
 }
 
 export function MemoryViewer({
@@ -50,8 +50,8 @@ export function MemoryViewer({
     percents,
     formatValues,
     className,
-    warningThreshold = 60,
-    dangerThreshold = 80,
+    warningThreshold,
+    dangerThreshold,
 }: MemoryProgressViewerProps) {
     const memoryUsage = stats.AnonRss ?? calculateAllocatedMemory(stats);
 
