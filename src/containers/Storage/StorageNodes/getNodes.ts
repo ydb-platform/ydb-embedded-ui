@@ -9,7 +9,7 @@ import type {
     PreparedStorageNodeFilters,
 } from '../../../store/reducers/storage/types';
 import {prepareStorageNodesResponse} from '../../../store/reducers/storage/utils';
-import type {NodesRequestParams} from '../../../types/api/nodes';
+import type {NodesRequestParams, TNodesInfo} from '../../../types/api/nodes';
 import {prepareSortValue} from '../../../utils/filters';
 import {getUptimeParamValue} from '../../../utils/nodes';
 import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
@@ -50,12 +50,16 @@ export const getStorageNodes: FetchData<
         const pdisks = parseInt(urlParams.get('pdisks') || '10', 10);
         const vdisksPerPDisk = parseInt(urlParams.get('vdisksPerPDisk') || '2', 10);
         const totalNodes = parseInt(urlParams.get('totalNodes') || '50', 10);
-        response = generateNodes(totalNodes, {
-            maxVdisksPerPDisk: vdisksPerPDisk,
-            maxPdisks: pdisks,
-            offset,
-            limit,
-        });
+        response = (await new Promise((res) => {
+            const result = generateNodes(totalNodes, {
+                maxVdisksPerPDisk: vdisksPerPDisk,
+                maxPdisks: pdisks,
+                offset,
+                limit,
+            });
+
+            setTimeout(() => res(result), 1000);
+        })) as TNodesInfo;
     } else {
         response = await window.api.viewer.getNodes({
             type,
