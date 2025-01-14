@@ -2,29 +2,31 @@ import React from 'react';
 
 import {useRowVirtualizer} from '@gravity-ui/table';
 
-import type {BaseEntity, VirtualRow} from '../types';
+import type {GetRowId, VirtualRow} from '../types';
 
 const OVERSCAN_COUNT = 5;
 
-interface UseVirtualizationProps<T extends BaseEntity> {
+interface UseVirtualizationProps<T> {
     data: T[];
     totalEntities: number;
     rowHeight: number;
     containerRef: React.RefObject<HTMLDivElement>;
     isLoadingMore: boolean;
+    getRowId: GetRowId<T>;
 }
 
-export function useVirtualization<T extends BaseEntity>({
+export function useVirtualization<T>({
     data,
     totalEntities,
     rowHeight,
     containerRef,
     isLoadingMore,
+    getRowId,
 }: UseVirtualizationProps<T>) {
     // Generate virtual rows
     const virtualRows = React.useMemo(() => {
         const items: VirtualRow<T>[] = data.map((item, index) => ({
-            id: item.id || item.NodeId || index,
+            id: getRowId(item),
             type: 'data',
             data: item,
             index,
@@ -39,7 +41,7 @@ export function useVirtualization<T extends BaseEntity>({
             };
         }
         return items;
-    }, [data, totalEntities, isLoadingMore]);
+    }, [data, totalEntities, isLoadingMore, getRowId]);
 
     // Initialize virtualizer
     const rowVirtualizer = useRowVirtualizer({

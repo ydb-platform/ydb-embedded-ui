@@ -4,11 +4,11 @@ import type {ColumnDef, Table as TableInstance} from '@gravity-ui/table/tanstack
 import type {VirtualItem} from '@gravity-ui/table/tanstack-virtual';
 
 import {b} from '../shared';
-import type {BaseEntity, VirtualRow} from '../types';
+import type {VirtualRow} from '../types';
 
 import {LoadingCell, TableCell} from './TableCell';
 
-interface VirtualRowsProps<T extends BaseEntity> {
+interface VirtualRowsProps<T> {
     virtualItems: VirtualItem[];
     virtualRows: VirtualRow<T>[];
     columns: ColumnDef<VirtualRow<T>>[];
@@ -17,7 +17,7 @@ interface VirtualRowsProps<T extends BaseEntity> {
     table: TableInstance<VirtualRow<T>>;
 }
 
-export function VirtualRows<T extends BaseEntity>({
+export function VirtualRows<T>({
     virtualItems,
     virtualRows,
     columns,

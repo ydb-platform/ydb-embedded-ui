@@ -1,12 +1,49 @@
 import type {IResponseError} from '../../types/api/error';
-import type {Column, FetchData} from '../PaginatedTable/types';
 
-export type AlignType = 'left' | 'center' | 'right';
+import type {ASCENDING, CENTER, DESCENDING, LEFT, RIGHT} from './constants';
 
-export interface BaseEntity {
-    id?: string | number;
-    NodeId?: string | number;
+export type AlignType = typeof LEFT | typeof RIGHT | typeof CENTER;
+export type SortOrderType = typeof ASCENDING | typeof DESCENDING;
+
+export interface Column<T> {
+    name: string;
+    header?: React.ReactNode;
+    className?: string;
+    sortable?: boolean;
+    resizeable?: boolean;
+    render: (props: {row: T; index: number}) => React.ReactNode;
+    width?: number;
+    resizeMaxWidth?: number;
+    resizeMinWidth?: number;
+    align: AlignType;
 }
+
+export interface PaginatedTableData<T> {
+    data: T[];
+    total: number;
+    found: number;
+}
+
+export type SortParams = {
+    columnId?: string;
+    sortOrder?: SortOrderType;
+};
+
+type FetchDataParams<F, E = {}> = {
+    limit: number;
+    offset: number;
+    filters?: F;
+    sortParams?: SortParams;
+    columnsIds: string[];
+    signal?: AbortSignal;
+} & E;
+
+export type FetchData<T, F = undefined, E = {}> = (
+    params: FetchDataParams<F, E>,
+) => Promise<PaginatedTableData<T>>;
+
+export type RowIdentifier = string | number;
+export type GetRowId<T> = (row: T) => RowIdentifier;
 
 export type VirtualRowType = 'data' | 'loading' | 'empty';
 
@@ -17,7 +54,8 @@ export interface VirtualRow<T> {
     index: number;
 }
 
-export interface UseTableDataProps<T extends BaseEntity, F> {
+export interface UseTableDataProps<T, F> {
+    getRowId: GetRowId<T>;
     fetchData: FetchData<T, F>;
     filters?: F;
     tableName: string;
@@ -53,7 +91,11 @@ export interface ControlsParams {
 
 export type RenderControls = (params: ControlsParams) => React.ReactNode;
 
-export interface GravityPaginatedTableProps<T extends BaseEntity, F> {
+export interface GravityPaginatedTableProps<T, F = undefined> {
+    /**
+     * Function to extract unique identifier from a row
+     */
+    getRowId: GetRowId<T>;
     columnsWidthLSKey: string;
     columns: Column<T>[];
     fetchData: FetchData<T, F>;

@@ -12,7 +12,7 @@ import {TableHead} from './components/TableHead';
 import {VirtualRows} from './components/VirtualRows';
 import {useVirtualization} from './features/virtualization';
 import {b} from './shared';
-import type {BaseEntity, GravityPaginatedTableProps} from './types';
+import type {GravityPaginatedTableProps} from './types';
 import {useTableData} from './useTableData';
 
 import './GravityPaginatedTable.scss';
@@ -34,7 +34,7 @@ const calculateInitialHeight = (params: {
     return Math.max(calculatedHeight, minHeight || rowHeight * 3);
 };
 
-export function GravityPaginatedTable<T extends BaseEntity, F>({
+export function GravityPaginatedTable<T, F>({
     columnsWidthLSKey,
     columns,
     fetchData,
@@ -49,6 +49,7 @@ export function GravityPaginatedTable<T extends BaseEntity, F>({
     initialEntitiesCount = 0,
     maxVisibleRows = DEFAULT_MAX_VISIBLE_ROWS,
     minHeight,
+    getRowId,
 }: GravityPaginatedTableProps<T, F>) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [tableColumnsWidth, handleColumnResize] = useTableResize(columnsWidthLSKey);
@@ -71,6 +72,7 @@ export function GravityPaginatedTable<T extends BaseEntity, F>({
         columns,
         initialEntitiesCount,
         autoRefreshInterval,
+        getRowId,
     });
 
     // Virtualization setup
@@ -80,6 +82,7 @@ export function GravityPaginatedTable<T extends BaseEntity, F>({
         rowHeight,
         containerRef,
         isLoadingMore,
+        getRowId,
     });
 
     // Table columns configuration

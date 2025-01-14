@@ -4,14 +4,12 @@ import type {Table as TableInstance} from '@gravity-ui/table/tanstack';
 import {flexRender} from '@tanstack/react-table';
 
 import {b} from '../shared';
-import type {BaseEntity} from '../types';
-
-interface TableHeadProps<T extends BaseEntity> {
+interface TableHeadProps<T> {
     rowHeight: number;
     table: TableInstance<T>;
 }
 
-export function TableHead<T extends BaseEntity>({rowHeight, table}: TableHeadProps<T>) {
+export function TableHead<T>({rowHeight, table}: TableHeadProps<T>) {
     const headerGroups = table.getHeaderGroups();
 
     return (

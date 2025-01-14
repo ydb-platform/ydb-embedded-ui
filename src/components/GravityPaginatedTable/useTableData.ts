@@ -4,11 +4,11 @@ import {tableDataApi} from '../../store/reducers/tableData';
 import type {IResponseError} from '../../types/api/error';
 import type {FetchData} from '../PaginatedTable/types';
 
-import type {BaseEntity, UseTableDataProps, UseTableDataResult} from './types';
+import type {UseTableDataProps, UseTableDataResult} from './types';
 
 const DEFAULT_CHUNK_SIZE = 50;
 
-export function useTableData<T extends BaseEntity, F>({
+export function useTableData<T, F>({
     fetchData,
     filters,
     tableName,
@@ -16,7 +16,13 @@ export function useTableData<T extends BaseEntity, F>({
     chunkSize = DEFAULT_CHUNK_SIZE,
     initialEntitiesCount = 0,
     autoRefreshInterval,
+    getRowId,
 }: UseTableDataProps<T, F>): UseTableDataResult<T> {
+    // Create a wrapper function to handle fallback index-based IDs
+    const getItemId = React.useCallback(
+        (item: T, index: number) => getRowId(item) ?? index,
+        [getRowId],
+    );
     const [data, setData] = React.useState<T[]>([]);
     const [currentPage, setCurrentPage] = React.useState(0);
     const [hasNextPage, setHasNextPage] = React.useState(true);
@@ -60,10 +66,10 @@ export function useTableData<T extends BaseEntity, F>({
     // Process initial data
     React.useEffect(() => {
         if (currentData?.data) {
-            const processedData = (currentData.data as T[]).map((item, index) => ({
-                ...item,
-                id: item.NodeId ?? item.id ?? index,
-            }));
+            const processedData = (currentData.data as T[]).map((item, index) => {
+                const id = getItemId(item, index);
+                return {...item, id};
+            });
 
             // Only set data if we're on the first page or loading more
             if (currentPage === 0) {
@@ -72,7 +78,7 @@ export function useTableData<T extends BaseEntity, F>({
 
             setHasNextPage((currentPage + 1) * chunkSize < (currentData.total || 0));
         }
-    }, [currentData, currentPage, chunkSize]);
+    }, [currentData, currentPage, chunkSize, getItemId]);
 
     // Load more data
     const loadMoreData = React.useCallback(async () => {
@@ -89,15 +95,17 @@ export function useTableData<T extends BaseEntity, F>({
                 limit: chunkSize,
             });
 
-            const newData = (result.data as T[]).map((item, index) => ({
-                ...item,
-                id: item.NodeId ?? item.id ?? nextPage * chunkSize + index,
-            }));
+            const newData = (result.data as T[]).map((item, index) => {
+                const id = getItemId(item, nextPage * chunkSize + index);
+                return {...item, id};
+            });
 
             setData((prev) => {
                 // Ensure we don't have duplicates and maintain order
-                const existingIds = new Set(prev.map((item) => item.id));
-                const uniqueNewData = newData.filter((item) => !existingIds.has(item.id));
+                const existingIds = new Set(prev.map((item) => getItemId(item, 0)));
+                const uniqueNewData = newData.filter(
+                    (item) => !existingIds.has(getItemId(item, 0)),
+                );
                 return [...prev, ...uniqueNewData];
             });
             setCurrentPage(nextPage);
@@ -105,7 +113,7 @@ export function useTableData<T extends BaseEntity, F>({
         } finally {
             setIsLoadingMore(false);
         }
-    }, [hasNextPage, isLoadingMore, currentPage, fetchData, baseQueryParams, chunkSize]);
+    }, [hasNextPage, isLoadingMore, currentPage, fetchData, baseQueryParams, chunkSize, getItemId]);
 
     return {
         data,

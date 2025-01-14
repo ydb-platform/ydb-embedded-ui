@@ -99,7 +99,7 @@ export const PaginatedStorageNodesTable = ({
     };
 
     return (
-        <GravityPaginatedTable
+        <GravityPaginatedTable<PreparedStorageNode, typeof tableFilters>
             columnsWidthLSKey={STORAGE_NODES_COLUMNS_WIDTH_LS_KEY}
             parentRef={parentRef}
             columns={columns}
@@ -111,6 +111,7 @@ export const PaginatedStorageNodesTable = ({
             getRowClassName={getRowUnavailableClassName}
             filters={tableFilters}
             tableName="storage-nodes"
+            getRowId={(row) => row.NodeId}
         />
     );
 };

@@ -157,6 +157,7 @@ Layout:
         total: number;
     };
     parentRef: RefObject;           // Container ref
+    getRowId: (row: T) => string | number;  // Function to extract unique row identifier
 }
 
 // Optional props
@@ -178,12 +179,23 @@ Layout:
 
 ## Data Requirements
 
-Each data item must have either:
+The table requires a way to uniquely identify each row. This is handled through the required `getRowId` prop, which is a function that extracts a unique identifier from each data item:
 
-- `id: string | number`
-- `NodeId: string | number`
+```typescript
+// Example with id field
+<GravityPaginatedTable
+    getRowId={(row) => row.id}
+    // ... other props
+/>
 
-The table will use these for row identification and virtualization.
+// Example with custom field
+<GravityPaginatedTable
+    getRowId={(row) => row.NodeId}
+    // ... other props
+/>
+```
+
+The extracted identifier must be either a string or number and should be unique within the dataset.
 
 ## Customization
 
@@ -224,7 +236,11 @@ const {
     totalEntities,      // Total count
     foundEntities,      // Filtered count
     loadMoreData,       // Load next chunk
-} = useTableData(props);
+} = useTableData({
+    fetchData,          // Data fetching function
+    getRowId,           // Row identifier function
+    // ... other props
+});
 
 // Standalone container component
 import {TableContainer} from '@/components/GravityPaginatedTable';
@@ -238,13 +254,14 @@ import {TableContainer} from '@/components/GravityPaginatedTable';
 
 ## Key Points
 
-1. **Performance**
+1. **Performance & Flexibility**
 
    - Only renders visible rows + overscan
    - Uses 5-row overscan buffer
    - Reuses DOM elements
    - Loads data as needed
    - Prevents duplicate data
+   - Flexible row identification through getRowId
 
 2. **Memory**
 
