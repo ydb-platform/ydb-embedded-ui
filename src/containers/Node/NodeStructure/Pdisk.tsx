@@ -10,6 +10,7 @@ import {PDiskInfo} from '../../../components/PDiskInfo/PDiskInfo';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {StatusIcon} from '../../../components/StatusIcon/StatusIcon';
 import {VDiskInfo} from '../../../components/VDiskInfo/VDiskInfo';
+import {selectIsUserAllowedToMakeChanges} from '../../../store/reducers/authentication/authentication';
 import type {
     PreparedStructurePDisk,
     PreparedStructureVDisk,
@@ -22,6 +23,7 @@ import {cn} from '../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../../utils/developerUI/developerUI';
+import {useTypedSelector} from '../../../utils/hooks';
 import i18n from '../i18n';
 
 import {PDiskTitleBadge} from './PDiskTitleBadge';
@@ -56,10 +58,12 @@ function getColumns({
     pDiskId,
     selectedVdiskId,
     nodeId,
+    withDeveloperUILink,
 }: {
     pDiskId: number | undefined;
     selectedVdiskId?: string;
     nodeId?: string | number;
+    withDeveloperUILink?: boolean;
 }) {
     const columns: Column<PreparedStructureVDisk>[] = [
         {
@@ -85,7 +89,7 @@ function getColumns({
                 return (
                     <div className={b('vdisk-id', {selected: row.id === selectedVdiskId})}>
                         <span>{vDiskSlotId}</span>
-                        {vdiskInternalViewerLink && (
+                        {vdiskInternalViewerLink && withDeveloperUILink ? (
                             <Button
                                 size="s"
                                 className={b('external-button', {hidden: true})}
@@ -95,7 +99,7 @@ function getColumns({
                             >
                                 <Icon data={ArrowUpRightFromSquare} />
                             </Button>
-                        )}
+                        ) : null}
                     </div>
                 );
             },
@@ -167,6 +171,8 @@ export function PDisk({
     nodeId,
     unfolded: unfoldedFromProps,
 }: PDiskProps) {
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+
     const [unfolded, setUnfolded] = React.useState(unfoldedFromProps ?? false);
 
     const {TotalSize = 0, AvailableSize = 0, Device, PDiskId, Type, vDisks} = data;
@@ -186,7 +192,12 @@ export function PDisk({
             <DataTable
                 theme="yandex-cloud"
                 data={vDisks}
-                columns={getColumns({nodeId, pDiskId: PDiskId, selectedVdiskId})}
+                columns={getColumns({
+                    nodeId,
+                    pDiskId: PDiskId,
+                    selectedVdiskId,
+                    withDeveloperUILink: isUserAllowedToMakeChanges,
+                })}
                 settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
                 rowClassName={(row) => {
                     return row.id === selectedVdiskId ? b('selected-vdisk') : '';

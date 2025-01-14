@@ -3,6 +3,7 @@ import React from 'react';
 import {ArrowUpRightFromSquare} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
 
+import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
@@ -10,6 +11,7 @@ import {
     createDeveloperUIInternalPageHref,
     createDeveloperUILinkWithNodeId,
 } from '../../utils/developerUI/developerUI';
+import {useTypedSelector} from '../../utils/hooks';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {Tags} from '../Tags';
 
@@ -24,6 +26,8 @@ interface BasicNodeViewerProps {
 }
 
 export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNodeViewerProps) => {
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+
     let developerUIInternalHref: string | undefined;
 
     if (additionalNodesProps?.getNodeRef) {
@@ -42,7 +46,7 @@ export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNo
                 <React.Fragment>
                     <div className={b('title')}>Node</div>
                     <EntityStatus status={node.SystemState} name={node.Host} />
-                    {developerUIInternalHref && (
+                    {developerUIInternalHref && isUserAllowedToMakeChanges ? (
                         <a
                             rel="noopener noreferrer"
                             className={b('link', {external: true})}
@@ -51,7 +55,7 @@ export const BasicNodeViewer = ({node, additionalNodesProps, className}: BasicNo
                         >
                             <Icon data={ArrowUpRightFromSquare} />
                         </a>
-                    )}
+                    ) : null}
 
                     <div className={b('id')}>
                         <label className={b('label')}>NodeID</label>
