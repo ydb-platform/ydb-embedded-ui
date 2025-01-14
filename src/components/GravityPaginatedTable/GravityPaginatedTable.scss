@@ -2,10 +2,35 @@
     &__table {
         width: 100%;
         border-collapse: collapse;
+        position: relative;
 
         &_loading {
             opacity: 0.5;
             transition: opacity 0.2s ease;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: var(--g-color-base-background);
+        }
+
+        tbody {
+            position: relative;
+        }
+
+        tr {
+            display: flex;
+            width: 100%;
+        }
+
+        td,
+        th {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
         }
     }
 
@@ -20,6 +45,7 @@
         width: 100%;
         position: relative;
         overflow: auto;
+        flex: 1;
     }
 
     &__virtualized-content {
