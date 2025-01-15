@@ -4,6 +4,7 @@ import {Breadcrumbs} from '@gravity-ui/uikit';
 
 import {InternalLink} from '../../components/InternalLink';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
+import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
@@ -23,6 +24,7 @@ interface HeaderProps {
 
 function Header({mainPage}: HeaderProps) {
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
+    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     const clusterInfo = useClusterBaseInfo();
 
@@ -78,10 +80,12 @@ function Header({mainPage}: HeaderProps) {
                     }}
                 />
 
-                <LinkWithIcon
-                    title={DEVELOPER_UI_TITLE}
-                    url={createDeveloperUIInternalPageHref()}
-                />
+                {isUserAllowedToMakeChanges ? (
+                    <LinkWithIcon
+                        title={DEVELOPER_UI_TITLE}
+                        url={createDeveloperUIInternalPageHref()}
+                    />
+                ) : null}
             </header>
         );
     };
