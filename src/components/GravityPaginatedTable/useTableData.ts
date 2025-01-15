@@ -1,12 +1,35 @@
 import React from 'react';
 
+import {useRowVirtualizer} from '@gravity-ui/table';
+
 import {tableDataApi} from '../../store/reducers/tableData';
 import type {IResponseError} from '../../types/api/error';
 import type {FetchData} from '../PaginatedTable/types';
 
+import {tableReducer} from './tableReducer';
 import type {UseTableDataProps, UseTableDataResult} from './types';
 
 const DEFAULT_CHUNK_SIZE = 50;
+const OVERSCAN_COUNT = 5;
+
+function getQueryParams<T, F>(params: {
+    fetchData: FetchData<T, F>;
+    filters: F | undefined;
+    columns: Array<{name: string}>;
+    tableName: string;
+    startIndex: number;
+    chunkSize: number;
+}) {
+    const {fetchData, filters, columns, tableName, startIndex, chunkSize} = params;
+    return {
+        fetchData: fetchData as FetchData<unknown, unknown>,
+        filters,
+        columnsIds: columns.map((col) => col.name),
+        tableName,
+        offset: startIndex - (startIndex % chunkSize),
+        limit: chunkSize,
+    };
+}
 
 export function useTableData<T, F>({
     fetchData,
@@ -15,113 +38,75 @@ export function useTableData<T, F>({
     columns,
     chunkSize = DEFAULT_CHUNK_SIZE,
     autoRefreshInterval,
-    getRowId,
+    initialEntitiesCount = 0,
+    rowHeight,
+    containerRef,
+    overscanCount = OVERSCAN_COUNT,
 }: UseTableDataProps<T, F>): UseTableDataResult<T> {
-    // Create a wrapper function to handle fallback index-based IDs
-    const getItemId = React.useCallback(
-        (item: T, index: number) => getRowId(item) ?? index,
-        [getRowId],
-    );
-    const [data, setData] = React.useState<T[]>([]);
-    const [currentPage, setCurrentPage] = React.useState(0);
-    const [hasNextPage, setHasNextPage] = React.useState(true);
-    const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+    const [state, dispatch] = React.useReducer(tableReducer<T>, {
+        rows: [],
+        foundEntities: initialEntitiesCount || 0,
+        totalEntities: initialEntitiesCount || 0,
+    });
 
-    // Create base query parameters
-    const baseQueryParams = React.useMemo(
-        () => ({
-            fetchData: fetchData as FetchData<unknown, unknown>,
-            filters,
-            columnsIds: columns.map((col) => col.name),
+    const rowVirtualizer = useRowVirtualizer({
+        count: state.foundEntities,
+        estimateSize: () => rowHeight,
+        overscan: overscanCount,
+        getScrollElement: () => containerRef.current,
+    });
+
+    const [fetchTableChunk, {error, isFetching}] = tableDataApi.useLazyFetchTableChunkQuery({
+        pollingInterval: autoRefreshInterval,
+    });
+
+    const fetchChunkData = React.useCallback(async () => {
+        const startIndex = rowVirtualizer.range?.startIndex ?? 0;
+        const queryParams = getQueryParams({
+            fetchData,
+            filters: filters as F, // Type assertion since we know the filter type from props
+            columns,
             tableName,
-        }),
-        [fetchData, filters, columns, tableName],
-    );
+            startIndex,
+            chunkSize,
+        });
 
-    // Initial data fetch
-    const {
-        data: currentData,
-        error,
-        isFetching,
-    } = tableDataApi.useFetchTableChunkQuery(
-        {
-            ...baseQueryParams,
-            offset: 0,
-            limit: chunkSize,
-        },
-        {
-            pollingInterval: autoRefreshInterval,
-        },
-    );
-
-    // Reset state when filters or tableName change
-    React.useEffect(() => {
-        setCurrentPage(0);
-        setData([]);
-        setHasNextPage(true);
-        setIsLoadingMore(false);
-    }, [filters, tableName]);
-
-    // Process initial data
-    React.useEffect(() => {
-        if (currentData?.data) {
-            const processedData = (currentData.data as T[]).map((item, index) => {
-                const id = getItemId(item, index);
-                return {...item, id};
-            });
-
-            // Only set data if we're on the first page or loading more
-            if (currentPage === 0) {
-                setData(processedData);
-            }
-
-            setHasNextPage((currentPage + 1) * chunkSize < (currentData.total || 0));
-        }
-    }, [currentData, currentPage, chunkSize, getItemId]);
-
-    // Load more data
-    const loadMoreData = React.useCallback(async () => {
-        if (!hasNextPage || isLoadingMore) {
-            return;
-        }
-
-        setIsLoadingMore(true);
         try {
-            const nextPage = currentPage + 1;
-            const result = await fetchData({
-                ...baseQueryParams,
-                offset: nextPage * chunkSize,
-                limit: chunkSize,
+            const {data, found, total} = await fetchTableChunk(queryParams).unwrap();
+            dispatch({
+                type: 'UPDATE_DATA',
+                payload: {
+                    data: data as T[],
+                    found,
+                    total,
+                    offset: queryParams.offset,
+                },
             });
-
-            const newData = (result.data as T[]).map((item, index) => {
-                const id = getItemId(item, nextPage * chunkSize + index);
-                return {...item, id};
-            });
-
-            setData((prev) => {
-                // Ensure we don't have duplicates and maintain order
-                const existingIds = new Set(prev.map((item) => getItemId(item, 0)));
-                const uniqueNewData = newData.filter(
-                    (item) => !existingIds.has(getItemId(item, 0)),
-                );
-                return [...prev, ...uniqueNewData];
-            });
-            setCurrentPage(nextPage);
-            setHasNextPage((nextPage + 1) * chunkSize < (result.total || 0));
-        } finally {
-            setIsLoadingMore(false);
+        } catch (e) {
+            // Error is handled by RTK Query and available via error state
+            console.error('Failed to fetch chunk data:', e);
         }
-    }, [hasNextPage, isLoadingMore, currentPage, fetchData, baseQueryParams, chunkSize, getItemId]);
+    }, [
+        fetchTableChunk,
+        fetchData,
+        filters,
+        columns,
+        tableName,
+        chunkSize,
+        rowVirtualizer.range?.startIndex,
+    ]);
+
+    React.useEffect(() => {
+        fetchChunkData();
+    }, [fetchChunkData]);
 
     return {
-        data,
+        data: state.rows.filter((row: T | undefined): row is T => row !== undefined),
         isLoading: isFetching,
-        isLoadingMore,
-        hasNextPage,
         error: error as IResponseError | undefined,
-        totalEntities: currentData?.total || 0,
-        foundEntities: currentData?.found || 0,
-        loadMoreData,
+        totalEntities: state.totalEntities,
+        foundEntities: state.foundEntities,
+        rowVirtualizer,
+        rows: state.rows,
     };
 }

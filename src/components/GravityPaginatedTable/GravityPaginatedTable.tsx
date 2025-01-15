@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Table, useRowVirtualizer, useTable} from '@gravity-ui/table';
+import {Table, useTable} from '@gravity-ui/table';
 import type {ColumnDef} from '@gravity-ui/table/tanstack';
 import {ErrorBoundary} from 'react-error-boundary';
 
@@ -15,7 +15,6 @@ import {useTableData} from './useTableData';
 import './GravityPaginatedTable.scss';
 
 const ROW_HEIGHT = 51;
-const DEFAULT_MAX_VISIBLE_ROWS = 10;
 const OVERSCAN_COUNT = 5;
 
 export function GravityPaginatedTable<T, F>({
@@ -29,74 +28,40 @@ export function GravityPaginatedTable<T, F>({
     renderControls,
     renderErrorMessage,
     renderEmptyDataMessage,
+    initialEntitiesCount,
     rowHeight = ROW_HEIGHT,
-    maxVisibleRows = DEFAULT_MAX_VISIBLE_ROWS,
-    getRowId,
 }: GravityPaginatedTableProps<T, F>) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [tableColumnsWidth, handleColumnResize] = useTableResize(columnsWidthLSKey);
+
     const containerRef = React.useRef<HTMLDivElement>(null);
 
-    // Table data management
-    const {
-        data,
-        isLoading,
-        isLoadingMore,
-        hasNextPage,
-        error,
-        totalEntities,
-        foundEntities,
-        loadMoreData,
-    } = useTableData({
-        fetchData,
-        filters,
-        tableName,
-        columns,
-        autoRefreshInterval,
-        getRowId,
-    });
-
-    // Create virtual rows array with loading placeholders
-    const virtualRows = React.useMemo(() => {
-        const rows: Array<{id: string; isLoading?: boolean; data?: T}> = [];
-
-        // Add loaded data
-        data.forEach((item, index) => {
-            rows[index] = {
-                id: String(getRowId(item)),
-                data: item,
-            };
+    // Table data management with virtualizer
+    const {data, isLoading, error, totalEntities, foundEntities, rowVirtualizer, rows} =
+        useTableData({
+            fetchData,
+            filters,
+            tableName,
+            columns,
+            autoRefreshInterval,
+            rowHeight,
+            containerRef,
+            overscanCount: OVERSCAN_COUNT,
+            initialEntitiesCount,
         });
 
-        // Add loading placeholders for unloaded data
-        if (hasNextPage) {
-            for (let i = data.length; i < totalEntities; i++) {
-                rows[i] = {
-                    id: `loading-${i}`,
-                    isLoading: true,
-                };
-            }
-        }
-
-        return rows;
-    }, [data, totalEntities, hasNextPage, getRowId]);
-
     // Table columns configuration
-    const tableColumns = React.useMemo<ColumnDef<(typeof virtualRows)[0]>[]>(
+    const tableColumns = React.useMemo<ColumnDef<T | undefined>[]>(
         () =>
             columns.map((column) => ({
                 id: column.name,
                 header: () => column.header ?? column.name,
-                accessorKey: column.name,
                 cell: ({row}) => {
-                    if (row.original.isLoading) {
+                    if (!row.original) {
                         return <div className={b('loading-cell')} />;
                     }
-                    if (!row.original.data) {
-                        return null;
-                    }
                     return column.render({
-                        row: row.original.data,
+                        row: row.original,
                         index: row.index,
                     });
                 },
@@ -104,17 +69,17 @@ export function GravityPaginatedTable<T, F>({
                 enableSorting: column.sortable,
                 enableResizing: column.resizeable,
             })),
-        [columns, tableColumnsWidth, rowHeight],
+        [columns, tableColumnsWidth],
     );
 
     // Table configuration
     const table = useTable({
         columns: tableColumns,
-        data: virtualRows,
+        data: rows,
         enableColumnResizing: true,
         columnResizeMode: 'onChange',
         manualPagination: true,
-        getRowId: (row) => row.id,
+        getRowId: (_, index) => `row-${index}`,
         onColumnSizingChange: (updater) => {
             if (typeof updater === 'function') {
                 const newSizing = updater({});
@@ -124,23 +89,6 @@ export function GravityPaginatedTable<T, F>({
             }
         },
     });
-
-    // Virtualization setup
-    const rowVirtualizer = useRowVirtualizer({
-        count: totalEntities,
-        estimateSize: () => rowHeight,
-        overscan: OVERSCAN_COUNT,
-        getScrollElement: () => containerRef.current,
-    });
-
-    // Load more data when scrolling near the end
-    React.useEffect(() => {
-        const range = rowVirtualizer.range;
-        const endIndex = range?.endIndex;
-        if (endIndex !== undefined && endIndex > data.length - 5 && hasNextPage && !isLoadingMore) {
-            loadMoreData();
-        }
-    }, [rowVirtualizer.range, data.length, hasNextPage, isLoadingMore, loadMoreData]);
 
     // Table content
     const tableContent = (
@@ -155,22 +103,22 @@ export function GravityPaginatedTable<T, F>({
                 ref={containerRef}
                 className={b('virtualized-content')}
                 style={{
-                    height: Math.min(totalEntities * rowHeight, maxVisibleRows * rowHeight),
                     overflow: 'auto',
+                    height: '90vh',
                 }}
             >
                 <Table
                     table={table}
                     rowVirtualizer={rowVirtualizer}
                     className={b('table', {
-                        loading: isLoading || isLoadingMore,
+                        loading: isLoading,
                     })}
                     rowClassName={(row) => {
-                        if (row?.original.isLoading) {
+                        if (!row?.original) {
                             return b('row', {loading: true});
                         }
-                        if (row?.original.data && getRowClassName) {
-                            return getRowClassName(row.original.data) || '';
+                        if (getRowClassName) {
+                            return getRowClassName(row.original) || '';
                         }
                         return '';
                     }}
@@ -190,11 +138,6 @@ export function GravityPaginatedTable<T, F>({
                         ) : null
                     }
                 />
-                {isLoadingMore && (
-                    <div className={b('loading-more')} role="status">
-                        Loading more data...
-                    </div>
-                )}
             </div>
         </ErrorBoundary>
     );

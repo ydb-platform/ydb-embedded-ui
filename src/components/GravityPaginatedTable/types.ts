@@ -1,3 +1,5 @@
+import type {Virtualizer} from '@gravity-ui/table/tanstack-virtual';
+
 import type {IResponseError} from '../../types/api/error';
 
 import type {ASCENDING, CENTER, DESCENDING, LEFT, RIGHT} from './constants';
@@ -46,24 +48,26 @@ export type RowIdentifier = string | number;
 export type GetRowId<T> = (row: T) => RowIdentifier;
 
 export interface UseTableDataProps<T, F> {
-    getRowId: GetRowId<T>;
     fetchData: FetchData<T, F>;
     filters?: F;
     tableName: string;
     columns: Column<T>[];
     chunkSize?: number;
     autoRefreshInterval?: number;
+    initialEntitiesCount?: number;
+    rowHeight: number;
+    containerRef: React.RefObject<HTMLDivElement>;
+    overscanCount?: number;
 }
 
 export interface UseTableDataResult<T> {
     data: T[];
     isLoading: boolean;
-    isLoadingMore: boolean;
-    hasNextPage: boolean;
     error?: IResponseError;
     totalEntities: number;
     foundEntities: number;
-    loadMoreData: () => Promise<void>;
+    rowVirtualizer: Virtualizer<HTMLDivElement, HTMLTableRowElement>;
+    rows: (T | undefined)[];
 }
 
 export interface ControlsParams {
@@ -75,10 +79,6 @@ export interface ControlsParams {
 export type RenderControls = (params: ControlsParams) => React.ReactNode;
 
 export interface GravityPaginatedTableProps<T, F = undefined> {
-    /**
-     * Function to extract unique identifier from a row
-     */
-    getRowId: GetRowId<T>;
     columnsWidthLSKey: string;
     columns: Column<T>[];
     fetchData: FetchData<T, F>;
@@ -87,6 +87,7 @@ export interface GravityPaginatedTableProps<T, F = undefined> {
     getRowClassName?: (row: T) => string | undefined;
     rowHeight?: number;
     parentRef: React.RefObject<HTMLDivElement>;
+    initialEntitiesCount?: number;
     renderControls?: (props: {
         inited: boolean;
         totalEntities: number;
@@ -94,9 +95,5 @@ export interface GravityPaginatedTableProps<T, F = undefined> {
     }) => React.ReactNode;
     renderErrorMessage?: (error: IResponseError) => React.ReactNode;
     renderEmptyDataMessage?: () => React.ReactNode;
-    /**
-     * Maximum number of rows to show in the initial viewport
-     * @default 10
-     */
-    maxVisibleRows?: number;
+    getRowId?: GetRowId<T>;
 }

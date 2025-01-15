@@ -106,8 +106,6 @@
         color: var(--g-color-text-secondary);
         border-radius: 4px;
         background-color: var(--g-color-base-generic);
-
-        animation: pulse 1.5s ease-in-out infinite;
     }
 
     &__loading-more {
@@ -144,8 +142,6 @@
 
             border-radius: 4px;
             background: var(--g-color-base-generic);
-
-            animation: pulse 1.5s ease-in-out infinite;
         }
     }
 
@@ -208,17 +204,5 @@
                 text-overflow: ellipsis;
             }
         }
-    }
-}
-
-@keyframes pulse {
-    0% {
-        opacity: 0.6;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0.6;
     }
 }

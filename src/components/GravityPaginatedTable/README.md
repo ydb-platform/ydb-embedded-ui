@@ -13,7 +13,7 @@ Built on top of:
 ```
 ┌─────────────┐     ┌──────────────┐     ┌──────────────┐
 │    API      │     │  useTableData│     │ Virtual Rows │
-│  50 rows    │────>│  Data Store  │────>│ Only visible │
+│  50 rows    │────>│  Data Store  │────>│ With loading │
 └─────────────┘     └──────────────┘     └──────────────┘
       ▲                    │                     │
       │                    │                     │
@@ -36,8 +36,8 @@ Built on top of:
 │         └─────────────┘    │          │
 │              ▲             │          │
 │              │      ┌──────▼──────┐   │
-│         useTable    │ VirtualRows │   │
-│         Columns     │ Visible only│   │
+│         useTable    │ Table with  │   │
+│         Columns     │ Virtualizer │   │
 │                     └─────────────┘   │
 └────────────────────────────────────────┘
 ```
@@ -65,27 +65,25 @@ Features:
 - Loading states and error handling
 ```
 
-### 2. Row Virtualization (useVirtualization)
+### 2. Row Virtualization (@gravity-ui/table)
 
 ```
 For 1000 total rows:
 1. Creates array of virtual rows:
    [
-     { type: 'data', data: row1 },     // Loaded data
-     { type: 'data', data: row2 },
+     { id: '1', data: row1 },        // Loaded data
+     { id: '2', data: row2 },
      ...
-     { type: 'loading' },              // Next 5 rows being loaded
-     { type: 'loading' },
-     { type: 'empty' },                // Remaining rows
-     { type: 'empty' }
+     { id: 'loading-51', isLoading: true },  // Loading placeholders
+     { id: 'loading-52', isLoading: true },
    ]
 
-2. Renders efficiently:
-   - Shows ~10 rows in viewport
+2. Uses @gravity-ui/table's virtualization:
+   - Shows full scrollable area from start (totalEntities * rowHeight)
+   - Shows ~10 rows in viewport (configurable via maxVisibleRows)
    - Keeps 5 rows above and below (overscan)
-   - Uses overscan for smooth scrolling
-   - Adds padding for invisible rows
-   - Shows loading state for next chunk
+   - Uses transform for positioning
+   - Shows loading placeholders with animation and proper cell sizing
 ```
 
 ### 3. Table Structure
@@ -97,19 +95,12 @@ For 1000 total rows:
     </TableWithControlsLayout.Controls>
     <TableWithControlsLayout.Table>
         <div className="virtualized-content">  // Scrollable container
-            <div>                              // Content wrapper
-                <table>
-                    <TableHead>                // Sticky header
-                        <th>...</th>           // Column headers
-                    </TableHead>
-                    <tbody>
-                        <VirtualRows>          // Only visible rows + overscan
-                            <tr>...</tr>       // Data rows
-                            <tr>...</tr>       // Loading rows
-                        </VirtualRows>
-                    </tbody>
-                </table>
-            </div>
+            <Table                             // @gravity-ui/table
+                table={table}                  // Table instance
+                rowVirtualizer={rowVirtualizer} // Virtualization
+                stickyHeader                   // Sticky header
+                size="m"                       // Table size
+            />
         </div>
     </TableWithControlsLayout.Table>
 </TableWithControlsLayout>
@@ -154,9 +145,12 @@ Layout:
 │   └── Vertical centering
 │
 └── Loading States
-    ├── Opacity transitions (0.2s ease)
-    ├── Pulse animation (1.5s)
-    └── Centered loading indicators
+    ├── Initial loading state with opacity transition
+    ├── Loading placeholders for unloaded rows
+    │   ├── Full cell height with proper padding
+    │   ├── Centered content with flex layout
+    │   └── Pulse animation (1.5s) for visual feedback
+    └── Loading indicator for next chunk
 ```
 
 ## Configuration
@@ -178,9 +172,8 @@ Layout:
 {
     filters?: any;                  // Data filters
     tableName?: string;             // Table identifier
-    rowHeight?: number;             // Default: 51px
-    maxVisibleRows?: number;        // Default: 10
-    minHeight?: number;             // Default: rowHeight * 3
+    rowHeight?: number;             // Default: 51px, used for virtualization and loading placeholders
+    maxVisibleRows?: number;        // Default: 10, limits initial viewport height
     autoRefreshInterval?: number;   // Auto-refresh interval in ms
 
     // Customization
@@ -282,9 +275,10 @@ The table uses TableWithControlsLayout for consistent controls placement:
 
 1. **Performance & Flexibility**
 
+   - Uses @gravity-ui/table's native virtualization
+   - Shows loading placeholders for unloaded rows
    - Only renders visible rows + overscan
    - Uses 5-row overscan buffer
-   - Reuses DOM elements
    - Loads data as needed
    - Prevents duplicate data
    - Flexible row identification through getRowId
@@ -292,11 +286,13 @@ The table uses TableWithControlsLayout for consistent controls placement:
 2. **Memory**
 
    - Keeps all loaded data in memory
-   - Virtual rows for unloaded data
+   - Loading placeholders for unloaded data
    - Efficient DOM updates
+   - No empty tr elements for padding
 
 3. **User Experience**
    - Smooth scrolling with overscan
-   - Responsive loading with animations
+   - Animated loading placeholders
    - No layout shifts
    - Auto-refresh support
+   - Full scrollable area from start
