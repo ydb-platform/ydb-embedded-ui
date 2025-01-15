@@ -45,15 +45,6 @@ export type FetchData<T, F = undefined, E = {}> = (
 export type RowIdentifier = string | number;
 export type GetRowId<T> = (row: T) => RowIdentifier;
 
-export type VirtualRowType = 'data' | 'loading' | 'empty';
-
-export interface VirtualRow<T> {
-    id: string | number;
-    type: VirtualRowType;
-    data?: T;
-    index: number;
-}
-
 export interface UseTableDataProps<T, F> {
     getRowId: GetRowId<T>;
     fetchData: FetchData<T, F>;
@@ -61,7 +52,6 @@ export interface UseTableDataProps<T, F> {
     tableName: string;
     columns: Column<T>[];
     chunkSize?: number;
-    initialEntitiesCount?: number;
     autoRefreshInterval?: number;
 }
 
@@ -104,15 +94,9 @@ export interface GravityPaginatedTableProps<T, F = undefined> {
     }) => React.ReactNode;
     renderErrorMessage?: (error: IResponseError) => React.ReactNode;
     renderEmptyDataMessage?: () => React.ReactNode;
-    initialEntitiesCount?: number;
     /**
      * Maximum number of rows to show in the initial viewport
      * @default 10
      */
     maxVisibleRows?: number;
-    /**
-     * Minimum height of the table container in pixels
-     * If not provided, will be calculated as rowHeight * 3
-     */
-    minHeight?: number;
 }

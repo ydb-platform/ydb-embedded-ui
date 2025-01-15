@@ -14,7 +14,6 @@ export function useTableData<T, F>({
     tableName,
     columns,
     chunkSize = DEFAULT_CHUNK_SIZE,
-    initialEntitiesCount = 0,
     autoRefreshInterval,
     getRowId,
 }: UseTableDataProps<T, F>): UseTableDataResult<T> {
@@ -121,7 +120,7 @@ export function useTableData<T, F>({
         isLoadingMore,
         hasNextPage,
         error: error as IResponseError | undefined,
-        totalEntities: currentData?.total || initialEntitiesCount,
+        totalEntities: currentData?.total || 0,
         foundEntities: currentData?.found || 0,
         loadMoreData,
     };

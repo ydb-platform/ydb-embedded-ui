@@ -40,7 +40,6 @@ interface PaginatedStorageNodesTableProps {
     parentRef: React.RefObject<HTMLDivElement>;
     renderControls?: RenderControls;
     renderErrorMessage: (error: IResponseError) => React.ReactNode;
-    initialEntitiesCount?: number;
 }
 
 export const PaginatedStorageNodesTable = ({
@@ -57,7 +56,6 @@ export const PaginatedStorageNodesTable = ({
     parentRef,
     renderControls,
     renderErrorMessage,
-    initialEntitiesCount,
 }: PaginatedStorageNodesTableProps) => {
     const tableFilters = React.useMemo(() => {
         return {
@@ -104,7 +102,6 @@ export const PaginatedStorageNodesTable = ({
             parentRef={parentRef}
             columns={columns}
             fetchData={getStorageNodes}
-            initialEntitiesCount={initialEntitiesCount}
             renderControls={renderControls}
             renderErrorMessage={renderErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}

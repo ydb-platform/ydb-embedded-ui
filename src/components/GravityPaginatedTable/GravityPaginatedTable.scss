@@ -12,6 +12,27 @@
             transition: opacity 0.2s ease;
         }
 
+        &_virtualized {
+            display: grid;
+
+            height: auto;
+
+            tbody {
+                position: relative;
+
+                display: grid;
+            }
+
+            tr {
+                position: absolute;
+
+                display: flex;
+
+                width: 100%;
+                height: auto;
+            }
+        }
+
         thead {
             position: sticky;
             z-index: 1;
@@ -103,6 +124,29 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
         transform: translateX(-50%);
+    }
+
+    &__loading-cell {
+        display: flex;
+        align-items: center;
+
+        width: 100%;
+        height: 100%;
+        padding: 8px 16px;
+
+        &::after {
+            display: block;
+
+            width: 100%;
+            height: 20px;
+
+            content: '';
+
+            border-radius: 4px;
+            background: var(--g-color-base-generic);
+
+            animation: pulse 1.5s ease-in-out infinite;
+        }
     }
 
     &__row {
