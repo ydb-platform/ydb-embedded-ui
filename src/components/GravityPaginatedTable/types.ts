@@ -95,5 +95,4 @@ export interface GravityPaginatedTableProps<T, F = undefined> {
     }) => React.ReactNode;
     renderErrorMessage?: (error: IResponseError) => React.ReactNode;
     renderEmptyDataMessage?: () => React.ReactNode;
-    getRowId?: GetRowId<T>;
 }

@@ -37,7 +37,7 @@ export function useTableData<T, F>({
         useScrollendEvent: true,
     });
 
-    const [fetchTableChunk, {error, isFetching}] = tableDataApi.useLazyFetchTableChunkQuery({
+    const [fetchTableChunk, {error, isLoading}] = tableDataApi.useLazyFetchTableChunkQuery({
         pollingInterval: autoRefreshInterval,
     });
 
@@ -78,7 +78,7 @@ export function useTableData<T, F>({
 
     return {
         data: state.rows.filter((row: T | undefined): row is T => row !== undefined),
-        isLoading: isFetching,
+        isLoading,
         error: error as IResponseError | undefined,
         totalEntities: state.totalEntities,
         foundEntities: state.foundEntities,

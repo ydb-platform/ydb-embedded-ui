@@ -4,18 +4,18 @@ import {Table, useTable} from '@gravity-ui/table';
 import type {ColumnDef} from '@gravity-ui/table/tanstack';
 import {ErrorBoundary} from 'react-error-boundary';
 
+import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useTableResize} from '../../utils/hooks/useTableResize';
 import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
 
-import {b} from './shared';
+import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
 import type {GravityPaginatedTableProps} from './types';
 import {useTableData} from './useTableData';
 
 import './GravityPaginatedTable.scss';
 
-const ROW_HEIGHT = 51;
-const OVERSCAN_COUNT = 5;
+const b = cn('ydb-gravity-paginated-table');
 
 export function GravityPaginatedTable<T, F>({
     columnsWidthLSKey,
@@ -29,7 +29,7 @@ export function GravityPaginatedTable<T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     initialEntitiesCount,
-    rowHeight = ROW_HEIGHT,
+    rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
 }: GravityPaginatedTableProps<T, F>) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [tableColumnsWidth, handleColumnResize] = useTableResize(columnsWidthLSKey);
@@ -46,7 +46,6 @@ export function GravityPaginatedTable<T, F>({
             autoRefreshInterval,
             rowHeight,
             containerRef,
-            overscanCount: OVERSCAN_COUNT,
             initialEntitiesCount,
         });
 
@@ -79,7 +78,6 @@ export function GravityPaginatedTable<T, F>({
         enableColumnResizing: true,
         columnResizeMode: 'onChange',
         manualPagination: true,
-        getRowId: (_, index) => `row-${index}`,
         onColumnSizingChange: (updater) => {
             if (typeof updater === 'function') {
                 const newSizing = updater({});
@@ -99,14 +97,7 @@ export function GravityPaginatedTable<T, F>({
                 </div>
             }
         >
-            <div
-                ref={containerRef}
-                className={b('virtualized-content')}
-                style={{
-                    overflow: 'auto',
-                    height: '90vh',
-                }}
-            >
+            <div ref={containerRef} className={b('virtualized-content')}>
                 <Table
                     table={table}
                     rowVirtualizer={rowVirtualizer}
@@ -122,19 +113,21 @@ export function GravityPaginatedTable<T, F>({
                     }}
                     stickyHeader
                     size="m"
-                    emptyContent={
-                        isLoading ? (
-                            <div className={b('loading')} role="status" aria-busy="true">
-                                Loading data...
-                            </div>
-                        ) : error && renderErrorMessage ? (
-                            <div className={b('error-message')} role="alert">
-                                {renderErrorMessage(error)}
-                            </div>
-                        ) : !data.length && renderEmptyDataMessage ? (
-                            <div className={b('empty-message')}>{renderEmptyDataMessage()}</div>
-                        ) : null
-                    }
+                    emptyContent={() => {
+                        if (error && renderErrorMessage) {
+                            return (
+                                <div className={b('error-message')} role="alert">
+                                    {renderErrorMessage(error)}
+                                </div>
+                            );
+                        }
+                        if (!data.length && renderEmptyDataMessage) {
+                            return (
+                                <div className={b('empty-message')}>{renderEmptyDataMessage()}</div>
+                            );
+                        }
+                        return null;
+                    }}
                 />
             </div>
         </ErrorBoundary>

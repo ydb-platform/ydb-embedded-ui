@@ -108,7 +108,6 @@ export const PaginatedStorageNodesTable = ({
             getRowClassName={getRowUnavailableClassName}
             filters={tableFilters}
             tableName="storage-nodes"
-            getRowId={(row) => row.NodeId}
         />
     );
 };
