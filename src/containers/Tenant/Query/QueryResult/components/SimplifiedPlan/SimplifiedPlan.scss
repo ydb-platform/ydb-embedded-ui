@@ -24,6 +24,9 @@
         color: var(--g-color-text-secondary);
     }
     &__operation-name {
+        font-weight: 500;
+    }
+    &__operation-name {
         position: relative;
 
         max-width: 100%;

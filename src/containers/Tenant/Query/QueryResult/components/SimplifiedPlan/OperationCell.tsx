@@ -111,7 +111,8 @@ export function OperationCell<TData>({row, depth = 0, params}: OperationCellProp
                 <div className={block('operation-name-content')}>
                     {/* wrapper to inline elements */}
                     <div>
-                        {name}&nbsp;
+                        <span className={block('operation-name')}>{name}</span>
+                        &nbsp;
                         <OperationParams params={operationParams} />
                     </div>
                 </div>
